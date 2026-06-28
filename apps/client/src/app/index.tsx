@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import { useAtom } from 'jotai';
-import { Footer, Navigator } from '@components';
+import { Footer, Navigator, SpaceshipHull } from '@components';
 import { activeViewAtom } from '@store';
 import style from './style.module.css';
 
@@ -65,12 +65,16 @@ export default function App() {
 
   return (
     <div className={style.app}>
-      <Navigator
-        onSceneChange={handleSceneChange}
-        onSpaceshipEngineChange={setIsEngineRunning}
-        isSelectingTargetDirection={isSelectingTargetDirection}
-        onTargetDirectionSelected={handleTargetDirectionSelected}
-      />
+      {activeView === 'navigation' ? (
+        <Navigator
+          onSceneChange={handleSceneChange}
+          onSpaceshipEngineChange={setIsEngineRunning}
+          isSelectingTargetDirection={isSelectingTargetDirection}
+          onTargetDirectionSelected={handleTargetDirectionSelected}
+        />
+      ) : (
+        <SpaceshipHull />
+      )}
       <Footer
         activeView={activeView}
         isEngineRunning={isEngineRunning}

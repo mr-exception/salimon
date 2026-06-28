@@ -90,3 +90,42 @@
   text-transform: uppercase;
   transform: translateX(-50%);
 }
+
+.thruster {
+  position: absolute;
+  z-index: 1;
+  width: 128px;
+  height: 64px;
+  margin: 0;
+}
+
+.thruster img {
+  display: block;
+  width: 128px;
+  height: 64px;
+  image-rendering: pixelated;
+}
+
+.thruster.top {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.thruster.bottom {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) rotate(180deg);
+}
+
+.thruster.left {
+  top: 50%;
+  left: -32px;
+  transform: translateY(-50%) rotate(-90deg);
+}
+
+.thruster.right {
+  top: 50%;
+  right: -32px;
+  transform: translateY(-50%) rotate(90deg);
+}

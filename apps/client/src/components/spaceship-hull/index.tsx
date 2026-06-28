@@ -2,6 +2,7 @@ import { useRef, type CSSProperties, type PointerEvent } from 'react';
 import { INITIAL_SPACESHIP_FUEL_KNS, useSpaceshipFuelKns } from '@store';
 import coreUrl from './core.svg';
 import style from './style.module.css';
+import thrusterUrl from './thruster.svg';
 
 const HULL_COLUMNS = 32;
 const HULL_ROWS = 32;
@@ -80,6 +81,15 @@ export function SpaceshipHull() {
             <img src={coreUrl} alt="" />
             <figcaption>Core</figcaption>
           </figure>
+          {(['top', 'right', 'bottom', 'left'] as const).map((edge) => (
+            <figure
+              className={`${style.thruster} ${style[edge]}`}
+              aria-label={`${edge} thruster`}
+              key={edge}
+            >
+              <img src={thrusterUrl} alt="" />
+            </figure>
+          ))}
         </div>
       </div>
     </section>

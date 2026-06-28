@@ -1,0 +1,11 @@
+:root {
+  --color-deep-space: #050816;
+  --color-starship-navy: #0b1533;
+  --color-nebula-blue: #172554;
+  --color-plasma-cyan: #22d3ee;
+  --color-starlight: #e2e8f0;
+}
+
+body {
+  margin: 0px;
+}

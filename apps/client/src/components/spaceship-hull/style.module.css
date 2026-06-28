@@ -71,6 +71,7 @@
   display: block;
   width: 128px;
   height: 128px;
+  filter: brightness(var(--core-charge));
   image-rendering: pixelated;
 }
 

@@ -3,10 +3,10 @@
   <path fill="#172554" d="M16 0h96v8h8v8h8v96h-8v8h-8v8H16v-8H8v-8H0V16h8V8h8z"/>
   <path fill="#334b73" d="M24 8h80v8h16v16h8v64h-8v16h-16v8H24v-8H8V96H0V32h8V16h16z"/>
   <path fill="#0f172a" d="M32 24h64v8h16v16h8v32h-8v16H96v8H32v-8H16V80H8V48h8V32h16z"/>
-  <path fill="#0891b2" d="M40 32h48v8h16v16h8v16h-8v16H88v8H40v-8H24V72h-8V56h8V40h16z"/>
-  <path fill="#22d3ee" d="M48 40h32v8h16v16h-8v16H72v8H48v-8H32V64h-8V56h8v-8h16z"/>
-  <rect x="48" y="48" width="32" height="32" fill="#a5f3fc"/>
-  <rect x="56" y="56" width="16" height="16" fill="#ecfeff"/>
-  <path fill="#67e8f9" d="M0 56h16v16H0zm112 0h16v16h-16zM56 0h16v24H56zm0 104h16v24H56z"/>
+  <path fill="#15803d" d="M40 32h48v8h16v16h8v16h-8v16H88v8H40v-8H24V72h-8V56h8V40h16z"/>
+  <path fill="#22c55e" d="M48 40h32v8h16v16h-8v16H72v8H48v-8H32V64h-8V56h8v-8h16z"/>
+  <rect x="48" y="48" width="32" height="32" fill="#86efac"/>
+  <rect x="56" y="56" width="16" height="16" fill="#dcfce7"/>
+  <path fill="#4ade80" d="M0 56h16v16H0zm112 0h16v16h-16zM56 0h16v24H56zm0 104h16v24H56z"/>
   <path fill="#64748b" d="M8 8h16v8H16v8H8zm96 0h16v16h-8v-8h-8zM8 104h8v8h8v8H8zm104 0h8v16h-16v-8h8z"/>
 </svg>

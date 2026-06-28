@@ -1,4 +1,5 @@
-import { useRef, type PointerEvent } from 'react';
+import { useRef, type CSSProperties, type PointerEvent } from 'react';
+import { INITIAL_SPACESHIP_FUEL_KNS, useSpaceshipFuelKns } from '@store';
 import coreUrl from './core.svg';
 import style from './style.module.css';
 
@@ -14,6 +15,11 @@ type PanState = {
 
 export function SpaceshipHull() {
   const panStateRef = useRef<PanState | undefined>(undefined);
+  const fuelKns = useSpaceshipFuelKns();
+  const coreCharge = Math.min(
+    1,
+    Math.max(0, fuelKns / INITIAL_SPACESHIP_FUEL_KNS),
+  );
 
   const startPanning = (event: PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
@@ -66,7 +72,11 @@ export function SpaceshipHull() {
               aria-label={`Floor tile ${Math.floor(index / HULL_COLUMNS) + 1}, ${(index % HULL_COLUMNS) + 1}`}
             />
           ))}
-          <figure className={style.core}>
+          <figure
+            className={style.core}
+            aria-label={`Core, ${Math.round(coreCharge * 100)}% fuel`}
+            style={{ '--core-charge': coreCharge } as CSSProperties}
+          >
             <img src={coreUrl} alt="" />
             <figcaption>Core</figcaption>
           </figure>

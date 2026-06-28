@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 100 100">
+  <clipPath id="body"><circle cx="50" cy="50" r="48"/></clipPath>
+  <g clip-path="url(#body)" fill="none" stroke="#fff">
+    <circle opacity=".9" stroke-width="6" cx="50" cy="50" r="14"/>
+    <circle opacity=".55" stroke-width="4" cx="50" cy="50" r="27"/>
+    <circle opacity=".3" stroke-width="3" cx="50" cy="50" r="40"/>
+    <path opacity=".85" stroke-width="5" d="m50 5 7 12-7 9-7-9zm45 45-12 7-9-7 9-7zM50 95l-7-12 7-9 7 9zM5 50l12-7 9 7-9 7z"/>
+    <circle opacity=".95" fill="#fff" stroke="none" cx="50" cy="50" r="6"/>
+  </g>
+</svg>

@@ -1,15 +1,27 @@
 import Phaser from 'phaser';
 import type { Star as StarData } from '@types';
-import { drawStarPattern } from './celestial-body-pattern';
 import { getRenderPosition } from './get-render-position';
 
 const LABEL_SCREEN_GAP = 6;
 const GLOW_SCREEN_RADIUS = 7;
+export const STAR_PATTERN_TEXTURE_SIZE = 1_024;
+export const STAR_PATTERN_VARIANT_COUNT = 4;
+
+export function getStarPatternTextureKey(variant: number) {
+  const supportedVariant =
+    Number.isInteger(variant) &&
+    variant >= 0 &&
+    variant < STAR_PATTERN_VARIANT_COUNT
+      ? variant
+      : 0;
+  return `star-pattern-${supportedVariant}`;
+}
 
 export class Star extends Phaser.GameObjects.Container {
   readonly star: StarData;
   private readonly glowGraphics: Phaser.GameObjects.Graphics;
   private readonly starGraphics: Phaser.GameObjects.Graphics;
+  private readonly patternImage: Phaser.GameObjects.Image;
   private readonly label: Phaser.GameObjects.Text;
 
   constructor(scene: Phaser.Scene, star: StarData) {
@@ -19,6 +31,14 @@ export class Star extends Phaser.GameObjects.Container {
     this.star = star;
     this.glowGraphics = new Phaser.GameObjects.Graphics(scene);
     this.starGraphics = new Phaser.GameObjects.Graphics(scene);
+    this.patternImage = new Phaser.GameObjects.Image(
+      scene,
+      0,
+      0,
+      getStarPatternTextureKey(star.variant),
+    )
+      .setDisplaySize(Number(star.radius) * 2, Number(star.radius) * 2)
+      .setTint(star.color);
     this.label = new Phaser.GameObjects.Text(scene, 0, 0, star.name, {
       color: '#fef3c7',
       fontFamily: 'system-ui, sans-serif',
@@ -32,9 +52,14 @@ export class Star extends Phaser.GameObjects.Container {
     this.label.texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
 
     this.setName(star.name);
-    this.add([this.glowGraphics, this.starGraphics, this.label]);
+    this.add([
+      this.glowGraphics,
+      this.starGraphics,
+      this.patternImage,
+      this.label,
+    ]);
     this.draw();
-    this.starGraphics.setAngle(star.rotationDegrees);
+    this.patternImage.setAngle(star.rotationDegrees);
     scene.add.existing(this);
   }
 
@@ -65,6 +90,7 @@ export class Star extends Phaser.GameObjects.Container {
     this.glowGraphics.setVisible(glowVisible);
     this.glowGraphics.setScale(1 / zoom);
     this.starGraphics.setVisible(shapeVisible);
+    this.patternImage.setVisible(shapeVisible);
     this.label.setVisible(
       alwaysVisible || showViewportLabel || zoom >= this.star.renderZoomLevel,
     );
@@ -78,7 +104,7 @@ export class Star extends Phaser.GameObjects.Container {
   }
 
   syncRotation(elapsedSeconds: number) {
-    this.starGraphics.rotation =
+    this.patternImage.rotation =
       ((this.star.rotationDegrees * Math.PI) / 180 +
         (Math.PI * 2 * elapsedSeconds) / this.star.rotationPeriodSeconds) %
       (Math.PI * 2);
@@ -123,11 +149,5 @@ export class Star extends Phaser.GameObjects.Container {
 
     this.starGraphics.fillStyle(this.star.color, 0.3);
     this.starGraphics.fillCircle(0, 0, Number(this.star.radius));
-    drawStarPattern(
-      this.starGraphics,
-      this.star.variant,
-      this.star.color,
-      Number(this.star.radius),
-    );
   }
 }

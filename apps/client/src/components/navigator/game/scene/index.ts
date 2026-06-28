@@ -33,7 +33,12 @@ import {
   getPlanetNameFromPhysicsLabel,
   SPACESHIP_PHYSICS_LABEL,
 } from '../physics';
-import { Star } from '../star';
+import {
+  getStarPatternTextureKey,
+  Star,
+  STAR_PATTERN_TEXTURE_SIZE,
+  STAR_PATTERN_VARIANT_COUNT,
+} from '../star';
 import { configureCamera, isInsideWorld } from './configure-camera';
 import { configureInput, MAX_ZOOM, MIN_ZOOM } from './configure-input';
 import { drawVisibleWorld } from './draw-visible-world';
@@ -143,6 +148,16 @@ export class Scene extends Phaser.Scene {
         {
           width: PLANET_PATTERN_TEXTURE_SIZE,
           height: PLANET_PATTERN_TEXTURE_SIZE,
+        },
+      );
+    }
+    for (let variant = 0; variant < STAR_PATTERN_VARIANT_COUNT; variant += 1) {
+      this.load.svg(
+        getStarPatternTextureKey(variant),
+        `/stars/${variant}.svg`,
+        {
+          width: STAR_PATTERN_TEXTURE_SIZE,
+          height: STAR_PATTERN_TEXTURE_SIZE,
         },
       );
     }

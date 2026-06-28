@@ -4,8 +4,8 @@ import coreUrl from './core.svg';
 import style from './style.module.css';
 import thrusterUrl from './thruster.svg';
 
-const HULL_COLUMNS = 32;
-const HULL_ROWS = 32;
+const HULL_COLUMNS = 20;
+const HULL_ROWS = 20;
 const HULL_TILE_COUNT = HULL_COLUMNS * HULL_ROWS;
 
 type PanState = {

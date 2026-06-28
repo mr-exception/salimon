@@ -36,10 +36,10 @@
 .hull {
   position: relative;
   display: grid;
-  width: 2048px;
-  height: 2048px;
-  grid-template-columns: repeat(32, 64px);
-  grid-template-rows: repeat(32, 64px);
+  width: 1280px;
+  height: 1280px;
+  grid-template-columns: repeat(20, 64px);
+  grid-template-rows: repeat(20, 64px);
   margin: 0 auto;
   border: 2px solid rgb(103 232 249 / 70%);
   box-shadow:

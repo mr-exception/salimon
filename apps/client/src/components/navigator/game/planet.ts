@@ -1,22 +1,9 @@
 import Phaser from 'phaser';
 import type { Planet as PlanetData } from '@types';
+import { drawPlanetPattern } from './celestial-body-pattern';
 import { drawCelestialBody } from './draw-celestial-body';
 import { getRenderPosition } from './get-render-position';
 import { getPlanetPhysicsLabel } from './physics';
-
-const PLANET_VARIANT_COLORS = [
-  0x22c55e, // 0: green
-  0x3b82f6, // 1: blue
-  0xef4444, // 2: red
-  0xf97316, // 3: orange
-  0xa855f7, // 4: purple
-  0x06b6d4, // 5: cyan
-  0xec4899, // 6: pink
-  0xeab308, // 7: yellow
-  0x14b8a6, // 8: teal
-  0x6366f1, // 9: indigo
-  0x84cc16, // 10: lime
-] as const;
 
 const LABEL_SCREEN_GAP = 6;
 
@@ -96,16 +83,15 @@ export class Planet extends Phaser.GameObjects.Container {
     this.planetGraphics.setVisible(shapeVisible);
     this.rotationGraphics.setVisible(shapeVisible);
     if (shapeVisible) {
-      const color =
-        PLANET_VARIANT_COLORS[this.planet.variant] ?? PLANET_VARIANT_COLORS[0];
       drawCelestialBody(
         this.planetGraphics,
-        color,
+        this.planet.color,
         radius,
         zoom,
         viewport,
         this.x,
         this.y,
+        0.3,
       );
     }
     this.label.setVisible(
@@ -157,17 +143,11 @@ export class Planet extends Phaser.GameObjects.Container {
   }
 
   private draw() {
-    const color =
-      PLANET_VARIANT_COLORS[this.planet.variant] ?? PLANET_VARIANT_COLORS[0];
-
-    this.planetGraphics
-      .fillStyle(color)
-      .fillCircle(0, 0, Number(this.planet.radius));
-    this.rotationGraphics.fillStyle(0xffffff, 0.35);
-    this.rotationGraphics.fillCircle(
-      Number(this.planet.radius) * 0.45,
-      0,
-      Math.max(1, Number(this.planet.radius) * 0.08),
+    drawPlanetPattern(
+      this.rotationGraphics,
+      this.planet.variant,
+      this.planet.color,
+      Number(this.planet.radius),
     );
   }
 }

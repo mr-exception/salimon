@@ -1,13 +1,7 @@
 import Phaser from 'phaser';
 import type { Star as StarData } from '@types';
+import { drawStarPattern } from './celestial-body-pattern';
 import { getRenderPosition } from './get-render-position';
-
-const STAR_VARIANT_COLORS = [
-  0xfacc15, // 0: yellow
-  0xfb923c, // 1: orange
-  0xf8fafc, // 2: white
-  0x60a5fa, // 3: blue
-] as const;
 
 const LABEL_SCREEN_GAP = 6;
 const GLOW_SCREEN_RADIUS = 7;
@@ -120,23 +114,20 @@ export class Star extends Phaser.GameObjects.Container {
   }
 
   private draw() {
-    const color =
-      STAR_VARIANT_COLORS[this.star.variant] ?? STAR_VARIANT_COLORS[0];
-
-    this.glowGraphics.fillStyle(color, 0.12);
+    this.glowGraphics.fillStyle(this.star.color, 0.12);
     this.glowGraphics.fillCircle(0, 0, GLOW_SCREEN_RADIUS);
-    this.glowGraphics.fillStyle(color, 0.3);
+    this.glowGraphics.fillStyle(this.star.color, 0.3);
     this.glowGraphics.fillCircle(0, 0, 4);
-    this.glowGraphics.fillStyle(0xffffff, 0.9);
+    this.glowGraphics.fillStyle(this.star.color, 0.9);
     this.glowGraphics.fillCircle(0, 0, 1.5);
 
-    this.starGraphics.fillStyle(color);
+    this.starGraphics.fillStyle(this.star.color, 0.3);
     this.starGraphics.fillCircle(0, 0, Number(this.star.radius));
-    this.starGraphics.fillStyle(0x713f12, 0.45);
-    this.starGraphics.fillCircle(
-      Number(this.star.radius) * 0.45,
-      0,
-      Math.max(1, Number(this.star.radius) * 0.07),
+    drawStarPattern(
+      this.starGraphics,
+      this.star.variant,
+      this.star.color,
+      Number(this.star.radius),
     );
   }
 }

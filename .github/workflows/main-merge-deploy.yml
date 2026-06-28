@@ -1,0 +1,67 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: main-merge-deploy
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Install packages and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Upload client build
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-dist
+          path: apps/client/dist
+          if-no-files-found: error
+          retention-days: 1
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Download client build
+        uses: actions/download-artifact@v4
+        with:
+          name: client-dist
+          path: apps/client/dist
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Deploy client to S3
+        run: aws s3 sync apps/client/dist "s3://${{ vars.AWS_S3_BUCKET }}" --delete

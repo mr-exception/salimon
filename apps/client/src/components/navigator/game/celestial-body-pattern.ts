@@ -18,37 +18,6 @@ type PatternElement =
 
 type Pattern = readonly PatternElement[];
 
-const PLANET_PATTERNS: readonly Pattern[] = [
-  [{ kind: 'circle', x: 0.45, y: 0, radius: 0.08, filled: true }],
-  [{ kind: 'line', fromX: -0.85, fromY: 0, toX: 0.85, toY: 0 }],
-  [{ kind: 'line', fromX: 0, fromY: -0.85, toX: 0, toY: 0.85 }],
-  [{ kind: 'line', fromX: -0.6, fromY: 0.6, toX: 0.6, toY: -0.6 }],
-  [
-    { kind: 'circle', x: -0.42, y: 0, radius: 0.1, filled: true },
-    { kind: 'circle', x: 0.42, y: 0, radius: 0.1, filled: true },
-  ],
-  [{ kind: 'circle', x: 0, y: 0, radius: 0.55 }],
-  [
-    { kind: 'circle', x: 0, y: -0.42, radius: 0.09, filled: true },
-    { kind: 'circle', x: -0.36, y: 0.24, radius: 0.09, filled: true },
-    { kind: 'circle', x: 0.36, y: 0.24, radius: 0.09, filled: true },
-  ],
-  [
-    { kind: 'line', fromX: -0.72, fromY: 0, toX: 0.72, toY: 0 },
-    { kind: 'line', fromX: 0, fromY: -0.72, toX: 0, toY: 0.72 },
-  ],
-  [
-    { kind: 'circle', x: 0, y: 0, radius: 0.5 },
-    { kind: 'circle', x: 0, y: 0, radius: 0.13, filled: true },
-  ],
-  [
-    { kind: 'line', fromX: -0.55, fromY: -0.45, toX: 0, toY: 0.1 },
-    { kind: 'line', fromX: 0, fromY: 0.1, toX: 0.55, toY: -0.45 },
-    { kind: 'line', fromX: -0.55, fromY: 0.15, toX: 0, toY: 0.7 },
-    { kind: 'line', fromX: 0, fromY: 0.7, toX: 0.55, toY: 0.15 },
-  ],
-];
-
 const STAR_PATTERNS: readonly Pattern[] = [
   [
     { kind: 'line', fromX: -0.75, fromY: 0, toX: 0.75, toY: 0 },
@@ -70,21 +39,6 @@ const STAR_PATTERNS: readonly Pattern[] = [
     { kind: 'circle', x: 0, y: -0.48, radius: 0.1, filled: true },
   ],
 ];
-
-export function drawPlanetPattern(
-  graphics: Phaser.GameObjects.Graphics,
-  variant: number,
-  color: number,
-  radius: number,
-) {
-  graphics.clear();
-  drawPattern(
-    graphics,
-    PLANET_PATTERNS[variant] ?? PLANET_PATTERNS[0],
-    color,
-    radius,
-  );
-}
 
 export function drawStarPattern(
   graphics: Phaser.GameObjects.Graphics,

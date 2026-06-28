@@ -22,7 +22,12 @@ import {
   offsetRenderOrigin,
   setRenderOriginName,
 } from '../get-render-position';
-import { Planet } from '../planet';
+import {
+  getPlanetPatternTextureKey,
+  Planet,
+  PLANET_PATTERN_TEXTURE_SIZE,
+  PLANET_PATTERN_VARIANT_COUNT,
+} from '../planet';
 import { SPACESHIP_TEXTURE_KEY, type Spaceship } from '../spaceship';
 import {
   getPlanetNameFromPhysicsLabel,
@@ -127,6 +132,20 @@ export class Scene extends Phaser.Scene {
 
   preload() {
     this.load.svg(SPACESHIP_TEXTURE_KEY, '/spaceship.svg');
+    for (
+      let variant = 0;
+      variant < PLANET_PATTERN_VARIANT_COUNT;
+      variant += 1
+    ) {
+      this.load.svg(
+        getPlanetPatternTextureKey(variant),
+        `/planets/${variant}.svg`,
+        {
+          width: PLANET_PATTERN_TEXTURE_SIZE,
+          height: PLANET_PATTERN_TEXTURE_SIZE,
+        },
+      );
+    }
   }
 
   create() {

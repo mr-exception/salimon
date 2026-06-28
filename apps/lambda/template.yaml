@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Salimon Lambda API
+
+Parameters:
+  ClientOrigin:
+    Type: String
+    Description: Origin allowed to call the API
+    Default: http://localhost:5173
+
+Resources:
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowHeaders:
+          - Content-Type
+        AllowMethods:
+          - GET
+        AllowOrigins:
+          - !Ref ClientOrigin
+
+  WorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/world.zip
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      MemorySize: 256
+      Timeout: 10
+      Events:
+        GetWorld:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Method: GET
+            Path: /world
+
+Outputs:
+  ApiBaseUrl:
+    Description: Base URL consumed by VITE_API_BASE_URL
+    Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}

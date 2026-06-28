@@ -1,0 +1,21 @@
+{
+  "name": "lambda",
+  "private": true,
+  "version": "0.0.0",
+  "type": "commonjs",
+  "scripts": {
+    "build": "rm -rf dist && tsc --outDir dist/build && mkdir -p dist/world && cp dist/build/functions/world.js dist/world/index.js && cp src/data/world.json dist/world/world.json && cd dist/world && zip -q ../world.zip index.js world.json && cd ../.. && rm -rf dist/build dist/world",
+    "check-types": "tsc --noEmit",
+    "dev": "npm run build && sam local start-api --template template.yaml",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/aws-lambda": "^8.10.152",
+    "@types/node": "^24.12.3",
+    "eslint": "^10.3.0",
+    "globals": "^17.6.0",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.59.2"
+  }
+}

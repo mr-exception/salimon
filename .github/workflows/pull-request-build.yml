@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build
+    name: Install packages and build
     runs-on: ubuntu-latest
     timeout-minutes: 15
 

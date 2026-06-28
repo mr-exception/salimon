@@ -252,34 +252,43 @@
   text-transform: uppercase;
 }
 
-.timeSpeedField {
+.timeSpeedButtons {
   display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 7px;
-  color: var(--color-plasma-cyan);
-  font-size: 0.85rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
 }
 
-.timeSpeedField input {
-  box-sizing: border-box;
-  width: 100%;
-  min-width: 0;
+.timeSpeedButtons button {
   height: 30px;
-  padding: 0 7px;
+  padding: 0;
   border: 1px solid
     color-mix(in srgb, var(--color-plasma-cyan) 34%, transparent);
   border-radius: 4px;
   outline: none;
   background: color-mix(in srgb, var(--color-deep-space) 88%, transparent);
   color: var(--color-starlight);
+  cursor: pointer;
   font:
     600 0.78rem/1 system-ui,
     sans-serif;
   font-variant-numeric: tabular-nums;
 }
 
-.timeSpeedField input:focus {
+.timeSpeedButtons button:hover {
+  border-color: color-mix(in srgb, var(--color-plasma-cyan) 65%, transparent);
+}
+
+.timeSpeedButtons button[aria-pressed='true'] {
+  border-color: var(--color-plasma-cyan);
+  background: color-mix(
+    in srgb,
+    var(--color-plasma-cyan) 18%,
+    var(--color-deep-space)
+  );
+  color: var(--color-plasma-cyan);
+}
+
+.timeSpeedButtons button:focus-visible {
   border-color: var(--color-plasma-cyan);
   box-shadow: 0 0 0 2px
     color-mix(in srgb, var(--color-plasma-cyan) 18%, transparent);

@@ -4,26 +4,24 @@ import { drawCelestialBody } from './draw-celestial-body';
 import { getRenderPosition } from './get-render-position';
 import { getPlanetPhysicsLabel } from './physics';
 
-const PLANET_VARIANT_COLORS = [
-  0x22c55e, // 0: green
-  0x3b82f6, // 1: blue
-  0xef4444, // 2: red
-  0xf97316, // 3: orange
-  0xa855f7, // 4: purple
-  0x06b6d4, // 5: cyan
-  0xec4899, // 6: pink
-  0xeab308, // 7: yellow
-  0x14b8a6, // 8: teal
-  0x6366f1, // 9: indigo
-  0x84cc16, // 10: lime
-] as const;
-
 const LABEL_SCREEN_GAP = 6;
+export const PLANET_PATTERN_VARIANT_COUNT = 10;
+export const PLANET_PATTERN_TEXTURE_SIZE = 1_024;
+
+export function getPlanetPatternTextureKey(variant: number) {
+  const supportedVariant =
+    Number.isInteger(variant) &&
+    variant >= 0 &&
+    variant < PLANET_PATTERN_VARIANT_COUNT
+      ? variant
+      : 0;
+  return `planet-pattern-${supportedVariant}`;
+}
 
 export class Planet extends Phaser.GameObjects.Container {
   readonly planet: PlanetData;
   private readonly planetGraphics: Phaser.GameObjects.Graphics;
-  private readonly rotationGraphics: Phaser.GameObjects.Graphics;
+  private readonly patternImage: Phaser.GameObjects.Image;
   private readonly label: Phaser.GameObjects.Text;
   private readonly physicsBody: MatterJS.BodyType;
 
@@ -33,7 +31,14 @@ export class Planet extends Phaser.GameObjects.Container {
 
     this.planet = planet;
     this.planetGraphics = new Phaser.GameObjects.Graphics(scene);
-    this.rotationGraphics = new Phaser.GameObjects.Graphics(scene);
+    this.patternImage = new Phaser.GameObjects.Image(
+      scene,
+      0,
+      0,
+      getPlanetPatternTextureKey(planet.variant),
+    )
+      .setDisplaySize(Number(planet.radius) * 2, Number(planet.radius) * 2)
+      .setTint(planet.color);
     this.label = new Phaser.GameObjects.Text(scene, 0, 0, planet.name, {
       color: '#e2e8f0',
       fontFamily: 'system-ui, sans-serif',
@@ -47,9 +52,8 @@ export class Planet extends Phaser.GameObjects.Container {
     this.label.texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
 
     this.setName(planet.name);
-    this.add([this.planetGraphics, this.rotationGraphics, this.label]);
-    this.draw();
-    this.rotationGraphics.setAngle(planet.rotationDegrees);
+    this.add([this.planetGraphics, this.patternImage, this.label]);
+    this.patternImage.setAngle(planet.rotationDegrees);
     scene.add.existing(this);
     this.physicsBody = scene.matter.add.circle(
       this.x,
@@ -94,18 +98,17 @@ export class Planet extends Phaser.GameObjects.Container {
     if (!bodyVisible) return;
 
     this.planetGraphics.setVisible(shapeVisible);
-    this.rotationGraphics.setVisible(shapeVisible);
+    this.patternImage.setVisible(shapeVisible);
     if (shapeVisible) {
-      const color =
-        PLANET_VARIANT_COLORS[this.planet.variant] ?? PLANET_VARIANT_COLORS[0];
       drawCelestialBody(
         this.planetGraphics,
-        color,
+        this.planet.color,
         radius,
         zoom,
         viewport,
         this.x,
         this.y,
+        0.3,
       );
     }
     this.label.setVisible(
@@ -125,7 +128,7 @@ export class Planet extends Phaser.GameObjects.Container {
   }
 
   syncRotation(elapsedSeconds: number) {
-    this.rotationGraphics.rotation =
+    this.patternImage.rotation =
       ((this.planet.rotationDegrees * Math.PI) / 180 +
         (Math.PI * 2 * elapsedSeconds) / this.planet.rotationPeriodSeconds) %
       (Math.PI * 2);
@@ -154,20 +157,5 @@ export class Planet extends Phaser.GameObjects.Container {
       y <= labelBottom;
 
     return hitsShape || hitsLabel;
-  }
-
-  private draw() {
-    const color =
-      PLANET_VARIANT_COLORS[this.planet.variant] ?? PLANET_VARIANT_COLORS[0];
-
-    this.planetGraphics
-      .fillStyle(color)
-      .fillCircle(0, 0, Number(this.planet.radius));
-    this.rotationGraphics.fillStyle(0xffffff, 0.35);
-    this.rotationGraphics.fillCircle(
-      Number(this.planet.radius) * 0.45,
-      0,
-      Math.max(1, Number(this.planet.radius) * 0.08),
-    );
   }
 }

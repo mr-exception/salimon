@@ -292,26 +292,25 @@ export function Navigator({
           <span>{formatDistance(targetPreview.distance)}</span>
         </output>
       )}
-      <label className={style.timeControls} htmlFor="navigator-time-speed">
+      <div className={style.timeControls}>
         <span>Time speed</span>
-        <span className={style.timeSpeedField}>
-          <input
-            id="navigator-time-speed"
-            type="number"
-            min="0"
-            max="1000000000"
-            step="1"
-            value={timeSpeed}
-            onChange={(event) => {
-              const nextSpeed = event.currentTarget.valueAsNumber;
-              if (Number.isFinite(nextSpeed)) {
-                setTimeSpeed(Math.max(0, nextSpeed));
-              }
-            }}
-          />
-          <span aria-hidden="true">×</span>
-        </span>
-      </label>
+        <div
+          className={style.timeSpeedButtons}
+          role="group"
+          aria-label="Time speed"
+        >
+          {[1, 10, 100].map((speed) => (
+            <button
+              key={speed}
+              type="button"
+              aria-pressed={timeSpeed === speed}
+              onClick={() => setTimeSpeed(speed)}
+            >
+              ×{speed}
+            </button>
+          ))}
+        </div>
+      </div>
       <div className={style.navigationControls}>
         <button
           className={style.recenterButton}

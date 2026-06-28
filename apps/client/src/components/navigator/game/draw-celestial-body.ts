@@ -11,8 +11,9 @@ export function drawCelestialBody(
   viewport: Phaser.Geom.Rectangle,
   centerX: number,
   centerY: number,
+  alpha = 1,
 ) {
-  graphics.clear().fillStyle(color);
+  graphics.clear().fillStyle(color, alpha);
   const screenRadius = radius * zoom;
   if (screenRadius <= FULL_CIRCLE_MAX_SCREEN_RADIUS) {
     graphics.fillCircle(0, 0, radius);

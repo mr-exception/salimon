@@ -1,0 +1,4 @@
+interface:
+  display_name: "Generate Issue"
+  short_description: "Investigate and create a Salimon GitHub issue"
+  default_prompt: "Use $generate-issue to investigate this task and create an issue for mr-exception/salimon."

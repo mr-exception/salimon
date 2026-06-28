@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 100 100">
+  <clipPath id="body"><circle cx="50" cy="50" r="48"/></clipPath>
+  <g clip-path="url(#body)" fill="none" stroke="#fff" stroke-linecap="round">
+    <path opacity=".95" stroke-width="7" d="M50-5v38m0 34v38M-5 50h38m34 0h38"/>
+    <path opacity=".45" stroke-width="3" d="M15 15l24 24m22 22 24 24m0-70L61 39M39 61 15 85"/>
+    <ellipse opacity=".8" stroke-width="5" cx="50" cy="50" rx="18" ry="9"/>
+    <circle opacity=".95" fill="#fff" stroke="none" cx="50" cy="50" r="6"/>
+  </g>
+</svg>

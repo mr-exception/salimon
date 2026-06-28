@@ -21,14 +21,16 @@ type RotatingBody = {
 
 export type Planet = OrbitingBody &
   RotatingBody & {
-    variant: number; // each variant code defines the visual pattern and color of planet
+    color: number; // Phaser-compatible RGB color
+    variant: number; // each variant code defines the visual pattern
     shapeRenderZoomLevel: number;
     renderZoomLevel: number;
   };
 
 export type Star = OrbitingBody &
   RotatingBody & {
-    variant: number; // each variant code defines the visual pattern and color of planet
+    color: number; // Phaser-compatible RGB color
+    variant: number; // each variant code defines the visual pattern
     shapeRenderZoomLevel: number;
     renderZoomLevel: number;
   };

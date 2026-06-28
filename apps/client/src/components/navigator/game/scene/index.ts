@@ -22,13 +22,23 @@ import {
   offsetRenderOrigin,
   setRenderOriginName,
 } from '../get-render-position';
-import { Planet } from '../planet';
+import {
+  getPlanetPatternTextureKey,
+  Planet,
+  PLANET_PATTERN_TEXTURE_SIZE,
+  PLANET_PATTERN_VARIANT_COUNT,
+} from '../planet';
 import { SPACESHIP_TEXTURE_KEY, type Spaceship } from '../spaceship';
 import {
   getPlanetNameFromPhysicsLabel,
   SPACESHIP_PHYSICS_LABEL,
 } from '../physics';
-import { Star } from '../star';
+import {
+  getStarPatternTextureKey,
+  Star,
+  STAR_PATTERN_TEXTURE_SIZE,
+  STAR_PATTERN_VARIANT_COUNT,
+} from '../star';
 import { configureCamera, isInsideWorld } from './configure-camera';
 import { configureInput, MAX_ZOOM, MIN_ZOOM } from './configure-input';
 import { drawVisibleWorld } from './draw-visible-world';
@@ -127,6 +137,30 @@ export class Scene extends Phaser.Scene {
 
   preload() {
     this.load.svg(SPACESHIP_TEXTURE_KEY, '/spaceship.svg');
+    for (
+      let variant = 0;
+      variant < PLANET_PATTERN_VARIANT_COUNT;
+      variant += 1
+    ) {
+      this.load.svg(
+        getPlanetPatternTextureKey(variant),
+        `/planets/${variant}.svg`,
+        {
+          width: PLANET_PATTERN_TEXTURE_SIZE,
+          height: PLANET_PATTERN_TEXTURE_SIZE,
+        },
+      );
+    }
+    for (let variant = 0; variant < STAR_PATTERN_VARIANT_COUNT; variant += 1) {
+      this.load.svg(
+        getStarPatternTextureKey(variant),
+        `/stars/${variant}.svg`,
+        {
+          width: STAR_PATTERN_TEXTURE_SIZE,
+          height: STAR_PATTERN_TEXTURE_SIZE,
+        },
+      );
+    }
   }
 
   create() {

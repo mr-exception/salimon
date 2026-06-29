@@ -5,6 +5,8 @@ dedicated handler under `src/functions`.
 
 `npm run build --workspace lambda` produces `dist/world.zip`. The archive has
 the deployable handler as `index.js` at its root together with `world.json`.
+esbuild bundles the handler and its runtime npm dependencies into `index.js`;
+development-only and type-only packages are not shipped.
 
 ## Local development
 

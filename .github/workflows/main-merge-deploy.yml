@@ -41,6 +41,16 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
+      - name: Upload Lambda build
+        uses: actions/upload-artifact@v4
+        with:
+          name: lambda-dist
+          path: |
+            apps/lambda/dist/world.zip
+            apps/lambda/template.yaml
+          if-no-files-found: error
+          retention-days: 1
+
   deploy:
     name: Deploy
     needs: build
@@ -57,11 +67,39 @@ jobs:
           name: client-dist
           path: apps/client/dist
 
+      - name: Download Lambda build
+        uses: actions/download-artifact@v4
+        with:
+          name: lambda-dist
+          path: apps/lambda
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
 
+      - name: Package Lambda stack
+        run: |
+          aws cloudformation package \
+            --template-file apps/lambda/template.yaml \
+            --s3-bucket "${{ vars.AWS_LAMBDA_ARTIFACTS_BUCKET }}" \
+            --output-template-file apps/lambda/packaged.yaml
+
+      - name: Deploy Lambda stack
+        run: |
+          aws cloudformation deploy \
+            --template-file apps/lambda/packaged.yaml \
+            --stack-name "${{ vars.AWS_LAMBDA_STACK_NAME }}" \
+            --capabilities CAPABILITY_IAM \
+            --parameter-overrides ClientOrigin="${{ vars.CLIENT_ORIGIN }}" \
+            --no-fail-on-empty-changeset
+
       - name: Deploy client to S3
         run: aws s3 sync apps/client/dist "s3://${{ vars.AWS_S3_BUCKET }}" --delete
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ vars.AWS_CLOUDFRONT_DISTRIBUTION_ID }}" \
+            --paths "/*"

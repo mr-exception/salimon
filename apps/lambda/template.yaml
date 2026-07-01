@@ -7,6 +7,10 @@ Parameters:
     Type: String
     Description: Origin allowed to call the API
     Default: http://localhost:5173
+  MongoDbUri:
+    Type: String
+    Description: MongoDB connection URI, including credentials and database name
+    NoEcho: true
 
 Resources:
   HttpApi:
@@ -30,6 +34,9 @@ Resources:
         - arm64
       MemorySize: 256
       Timeout: 10
+      Environment:
+        Variables:
+          MONGODB_URI: !Ref MongoDbUri
       Events:
         GetWorld:
           Type: HttpApi

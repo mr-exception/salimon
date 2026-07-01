@@ -87,12 +87,16 @@ jobs:
             --output-template-file apps/lambda/packaged.yaml
 
       - name: Deploy Lambda stack
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
         run: |
           aws cloudformation deploy \
             --template-file apps/lambda/packaged.yaml \
             --stack-name "${{ vars.AWS_LAMBDA_STACK_NAME }}" \
             --capabilities CAPABILITY_IAM \
-            --parameter-overrides ClientOrigin="${{ vars.CLIENT_ORIGIN }}" \
+            --parameter-overrides \
+              ClientOrigin="${{ vars.CLIENT_ORIGIN }}" \
+              MongoDbUri="$MONGODB_URI" \
             --no-fail-on-empty-changeset
 
       - name: Deploy client to S3

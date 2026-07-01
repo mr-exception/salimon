@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "commonjs",
   "scripts": {
-    "build": "rm -rf dist && mkdir -p dist/world && esbuild src/functions/world.ts --bundle --platform=node --target=node22 --format=cjs --outfile=dist/world/index.js && cp src/data/world.json dist/world/world.json && cd dist/world && zip -q ../world.zip index.js world.json && cd ../.. && rm -rf dist/world",
+    "build": "rm -rf dist && mkdir -p dist/world && esbuild src/functions/world.ts --bundle --platform=node --target=node22 --format=cjs --outfile=dist/world/index.js && cd dist/world && zip -q ../world.zip index.js && cd ../.. && rm -rf dist/world",
     "check-types": "tsc --noEmit",
     "dev": "npm run build && sam local start-api --template template.yaml",
     "lint": "eslint ."
@@ -18,5 +18,8 @@
     "globals": "^17.6.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2"
+  },
+  "dependencies": {
+    "mongodb": "^7.4.0"
   }
 }

@@ -4,9 +4,21 @@ AWS Lambda backend for Salimon. Each HTTP endpoint is implemented by a
 dedicated handler under `src/functions`.
 
 `npm run build --workspace lambda` produces `dist/world.zip`. The archive has
-the deployable handler as `index.js` at its root together with `world.json`.
-esbuild bundles the handler and its runtime npm dependencies into `index.js`;
-development-only and type-only packages are not shipped.
+the deployable handler as `index.js` at its root. esbuild bundles the handler
+and its runtime npm dependencies into `index.js`; development-only and
+type-only packages are not shipped.
+
+`GET /world` accepts a search center and radius in meters:
+
+```text
+/world?x=0&y=0&radius=1000000
+/world?coordinate=0,0&radius=1000000
+```
+
+It returns planets and stars whose resolved center coordinates are inside the
+search circle. Coordinates and radii must be integers. Body coordinates may be
+relative to another body; the handler resolves these references before
+filtering.
 
 ## Local development
 
@@ -15,6 +27,14 @@ run:
 
 ```sh
 npm run dev --workspace lambda
+```
+
+Pass the MongoDB URI, including its database name, when starting SAM:
+
+```sh
+sam local start-api \
+  --template template.yaml \
+  --parameter-overrides MongoDbUri="$MONGODB_URI"
 ```
 
 SAM serves `GET /world` at `http://127.0.0.1:3000/world` for backend
@@ -30,6 +50,11 @@ CloudFormation. It requires these GitHub Actions repository variables:
 - `AWS_LAMBDA_ARTIFACTS_BUCKET`: S3 bucket used by CloudFormation packaging.
 - `AWS_LAMBDA_STACK_NAME`: CloudFormation stack name.
 - `CLIENT_ORIGIN`: deployed client origin allowed by API CORS.
+
+The workflow also requires a GitHub Actions secret named `MONGODB_URI`. Store
+the complete MongoDB URI in a secret rather than a repository variable because
+it contains credentials. The URI must include the database name used by the
+Lambda.
 
 The deployment role needs access to the artifact bucket and permission to
 deploy the stack's Lambda, API Gateway, IAM, and CloudFormation resources.

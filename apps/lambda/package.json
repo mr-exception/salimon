@@ -6,7 +6,6 @@
   "scripts": {
     "build": "rm -rf dist && mkdir -p dist/world && esbuild src/functions/world.ts --bundle --platform=node --target=node22 --format=cjs --outfile=dist/world/index.js && cd dist/world && zip -q ../world.zip index.js && cd ../.. && rm -rf dist/world",
     "check-types": "tsc --noEmit",
-    "dev": "npm run build && sam local start-api --template template.yaml",
     "lint": "eslint ."
   },
   "devDependencies": {

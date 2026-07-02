@@ -10,8 +10,6 @@ import {
   subscribeToWorld,
   type SpaceshipProximityTelemetry,
   useSpaceshipFallingSpeedControl,
-  useSetTimeSpeed,
-  useTimeSpeed,
 } from '@store';
 import type { World } from '@types';
 import { formatAngle, formatDistance, formatSpeed } from '../../utils';
@@ -47,14 +45,15 @@ export function Navigator({
 }: NavigatorProps) {
   const gameHostRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<Scene>(null);
-  const timeSpeed = useTimeSpeed();
-  const setTimeSpeed = useSetTimeSpeed();
   const fallingSpeedControl = useSpaceshipFallingSpeedControl();
   const [zoomLevel, setZoomLevel] = useState(1);
   const [world, setWorld] = useState<World>({
     planets: [],
     stars: [],
   });
+  const [worldLoadState, setWorldLoadState] = useState<
+    'loading' | 'ready' | 'error'
+  >('loading');
   const [contextMenu, setContextMenu] = useState<BodyContextMenuRequest | null>(
     null,
   );
@@ -91,6 +90,7 @@ export function Navigator({
       (engineIsRunning) => onSpaceshipEngineChange?.(engineIsRunning),
       (preview) => setTargetPreview(preview ?? null),
       onTargetDirectionSelected,
+      (error) => setWorldLoadState(error ? 'error' : 'ready'),
     );
     sceneRef.current = scene;
     onSceneChange?.(scene);
@@ -171,6 +171,22 @@ export function Navigator({
   return (
     <section className={style.container} aria-label="Planet navigation map">
       <div className={style.gameHost} ref={gameHostRef} />
+      {worldLoadState !== 'ready' && (
+        <div
+          className={style.worldLoadingOverlay}
+          role={worldLoadState === 'error' ? 'alert' : 'status'}
+          aria-live="polite"
+        >
+          {worldLoadState === 'loading' ? (
+            <>
+              <span className={style.worldLoadingSpinner} aria-hidden="true" />
+              <span>Loading star systems…</span>
+            </>
+          ) : (
+            <span>Unable to load star systems.</span>
+          )}
+        </div>
+      )}
       <SearchPanel
         planets={world.planets}
         stars={world.stars}
@@ -292,25 +308,6 @@ export function Navigator({
           <span>{formatDistance(targetPreview.distance)}</span>
         </output>
       )}
-      <div className={style.timeControls}>
-        <span>Time speed</span>
-        <div
-          className={style.timeSpeedButtons}
-          role="group"
-          aria-label="Time speed"
-        >
-          {[1, 10, 100].map((speed) => (
-            <button
-              key={speed}
-              type="button"
-              aria-pressed={timeSpeed === speed}
-              onClick={() => setTimeSpeed(speed)}
-            >
-              ×{speed}
-            </button>
-          ))}
-        </div>
-      </div>
       <div className={style.navigationControls}>
         <button
           className={style.recenterButton}

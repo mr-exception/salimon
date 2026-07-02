@@ -62,3 +62,17 @@ export type SerializedWorld = {
   planets: SerializedBody<Planet>[];
   stars: SerializedBody<Star>[];
 };
+
+export type SerializedPlanetSystem = {
+  planet: SerializedBody<Planet>;
+  moons: SerializedBody<Planet>[];
+};
+
+export type SerializedStarSystem = {
+  star: SerializedBody<Star>;
+  planets: SerializedPlanetSystem[];
+};
+
+export type SerializedWorldSystems = {
+  systems: SerializedStarSystem[];
+};

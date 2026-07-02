@@ -15,6 +15,46 @@
   display: block;
 }
 
+.worldLoadingOverlay {
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  inset: 0;
+  background: color-mix(in srgb, var(--color-deep-space) 92%, transparent);
+  color: var(--color-starlight);
+  font:
+    700 0.8rem/1 system-ui,
+    sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  backdrop-filter: blur(4px);
+}
+
+.worldLoadingSpinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 24%, transparent);
+  border-top-color: var(--color-plasma-cyan);
+  border-radius: 50%;
+  animation: world-loading-spin 800ms linear infinite;
+}
+
+@keyframes world-loading-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .worldLoadingSpinner {
+    animation-duration: 1600ms;
+  }
+}
+
 .searchPanel {
   position: absolute;
   top: 16px;
@@ -230,73 +270,9 @@
   font-size: 0.68rem;
 }
 
-.timeControls {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 1;
-  display: grid;
-  width: 132px;
-  gap: 7px;
-  padding: 8px 12px;
-  border: 1px solid
-    color-mix(in srgb, var(--color-plasma-cyan) 28%, transparent);
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--color-deep-space) 88%, transparent);
-  box-shadow: 0 8px 28px rgb(0 0 0 / 28%);
-  color: color-mix(in srgb, var(--color-starlight) 72%, transparent);
-  font:
-    600 0.65rem/1.2 system-ui,
-    sans-serif;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.timeSpeedButtons {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 5px;
-}
-
-.timeSpeedButtons button {
-  height: 30px;
-  padding: 0;
-  border: 1px solid
-    color-mix(in srgb, var(--color-plasma-cyan) 34%, transparent);
-  border-radius: 4px;
-  outline: none;
-  background: color-mix(in srgb, var(--color-deep-space) 88%, transparent);
-  color: var(--color-starlight);
-  cursor: pointer;
-  font:
-    600 0.78rem/1 system-ui,
-    sans-serif;
-  font-variant-numeric: tabular-nums;
-}
-
-.timeSpeedButtons button:hover {
-  border-color: color-mix(in srgb, var(--color-plasma-cyan) 65%, transparent);
-}
-
-.timeSpeedButtons button[aria-pressed='true'] {
-  border-color: var(--color-plasma-cyan);
-  background: color-mix(
-    in srgb,
-    var(--color-plasma-cyan) 18%,
-    var(--color-deep-space)
-  );
-  color: var(--color-plasma-cyan);
-}
-
-.timeSpeedButtons button:focus-visible {
-  border-color: var(--color-plasma-cyan);
-  box-shadow: 0 0 0 2px
-    color-mix(in srgb, var(--color-plasma-cyan) 18%, transparent);
-}
-
 .proximityTelemetry {
   position: absolute;
-  top: 108px;
+  top: 16px;
   right: 16px;
   z-index: 1;
   box-sizing: border-box;
@@ -583,12 +559,8 @@
     width: calc(100% - 32px);
   }
 
-  .timeControls {
-    top: 72px;
-  }
-
   .proximityTelemetry {
-    top: 164px;
+    top: 72px;
     width: min(220px, calc(100% - 32px));
   }
 

@@ -24,10 +24,10 @@ Resources:
         AllowOrigins:
           - !Ref ClientOrigin
 
-  WorldFunction:
+  WorldSystemsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/world.zip
+      CodeUri: dist/systems.zip
       Handler: index.handler
       Runtime: nodejs22.x
       Architectures:
@@ -38,12 +38,12 @@ Resources:
         Variables:
           MONGODB_URI: !Ref MongoDbUri
       Events:
-        GetWorld:
+        GetWorldSystems:
           Type: HttpApi
           Properties:
             ApiId: !Ref HttpApi
             Method: GET
-            Path: /world
+            Path: /world/systems
 
 Outputs:
   ApiBaseUrl:

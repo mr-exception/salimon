@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "commonjs",
   "scripts": {
-    "build": "rm -rf dist && mkdir -p dist/world && esbuild src/functions/world.ts --bundle --platform=node --target=node22 --format=cjs --outfile=dist/world/index.js && cd dist/world && zip -q ../world.zip index.js && cd ../.. && rm -rf dist/world",
+    "build": "rm -rf dist && mkdir -p dist/systems && esbuild src/functions/systems.ts --bundle --platform=node --target=node22 --format=cjs --outfile=dist/systems/index.js && cd dist/systems && zip -q ../systems.zip index.js && cd ../.. && rm -rf dist/systems",
     "check-types": "tsc --noEmit",
     "lint": "eslint ."
   },

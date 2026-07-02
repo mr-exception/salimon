@@ -85,6 +85,7 @@ export class Scene extends Phaser.Scene {
     preview?: TargetDirectionPreview,
   ) => void;
   protected readonly onTargetDirectionSelected?: () => void;
+  readonly onWorldLoadComplete?: (error?: unknown) => void;
   protected planetData: PlanetData[] = [];
   protected starData: StarData[] = [];
   protected planets: Planet[] = [];
@@ -120,6 +121,7 @@ export class Scene extends Phaser.Scene {
     onSpaceshipEngineChange?: (isRunning: boolean, speed: number) => void,
     onTargetDirectionPreview?: (preview?: TargetDirectionPreview) => void,
     onTargetDirectionSelected?: () => void,
+    onWorldLoadComplete?: (error?: unknown) => void,
   ) {
     super('navigation');
     this.onZoomChange = onZoomChange;
@@ -128,6 +130,7 @@ export class Scene extends Phaser.Scene {
     this.onSpaceshipEngineChange = onSpaceshipEngineChange;
     this.onTargetDirectionPreview = onTargetDirectionPreview;
     this.onTargetDirectionSelected = onTargetDirectionSelected;
+    this.onWorldLoadComplete = onWorldLoadComplete;
   }
 
   protected configureCamera = configureCamera;

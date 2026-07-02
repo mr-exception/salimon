@@ -15,6 +15,46 @@
   display: block;
 }
 
+.worldLoadingOverlay {
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  inset: 0;
+  background: color-mix(in srgb, var(--color-deep-space) 92%, transparent);
+  color: var(--color-starlight);
+  font:
+    700 0.8rem/1 system-ui,
+    sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  backdrop-filter: blur(4px);
+}
+
+.worldLoadingSpinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 24%, transparent);
+  border-top-color: var(--color-plasma-cyan);
+  border-radius: 50%;
+  animation: world-loading-spin 800ms linear infinite;
+}
+
+@keyframes world-loading-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .worldLoadingSpinner {
+    animation-duration: 1600ms;
+  }
+}
+
 .searchPanel {
   position: absolute;
   top: 16px;

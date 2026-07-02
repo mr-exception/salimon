@@ -19,7 +19,9 @@ export async function renderWorld(this: Scene) {
       }
     });
     this.updateWorldVisibility();
+    this.onWorldLoadComplete?.();
   } catch (error) {
     console.error('Failed to load world data', error);
+    this.onWorldLoadComplete?.(error);
   }
 }

@@ -51,6 +51,9 @@ export function Navigator({
     planets: [],
     stars: [],
   });
+  const [worldLoadState, setWorldLoadState] = useState<
+    'loading' | 'ready' | 'error'
+  >('loading');
   const [contextMenu, setContextMenu] = useState<BodyContextMenuRequest | null>(
     null,
   );
@@ -87,6 +90,7 @@ export function Navigator({
       (engineIsRunning) => onSpaceshipEngineChange?.(engineIsRunning),
       (preview) => setTargetPreview(preview ?? null),
       onTargetDirectionSelected,
+      (error) => setWorldLoadState(error ? 'error' : 'ready'),
     );
     sceneRef.current = scene;
     onSceneChange?.(scene);
@@ -167,6 +171,22 @@ export function Navigator({
   return (
     <section className={style.container} aria-label="Planet navigation map">
       <div className={style.gameHost} ref={gameHostRef} />
+      {worldLoadState !== 'ready' && (
+        <div
+          className={style.worldLoadingOverlay}
+          role={worldLoadState === 'error' ? 'alert' : 'status'}
+          aria-live="polite"
+        >
+          {worldLoadState === 'loading' ? (
+            <>
+              <span className={style.worldLoadingSpinner} aria-hidden="true" />
+              <span>Loading star systems…</span>
+            </>
+          ) : (
+            <span>Unable to load star systems.</span>
+          )}
+        </div>
+      )}
       <SearchPanel
         planets={world.planets}
         stars={world.stars}

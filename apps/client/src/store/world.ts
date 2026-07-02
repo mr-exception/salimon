@@ -3,7 +3,7 @@ import { atom, getDefaultStore, useAtomValue, useSetAtom } from 'jotai';
 import type {
   Planet,
   Position,
-  SerializedWorld,
+  SerializedWorldSystems,
   Spaceship,
   Star,
   World,
@@ -233,7 +233,7 @@ export async function loadWorld() {
   ).replace(/\/+$/, '');
 
   loadPromise ??= axios
-    .get<SerializedWorld>(`${apiBaseUrl}/world`, {
+    .get<SerializedWorldSystems>(`${apiBaseUrl}/world/systems`, {
       params: {
         x: '0',
         y: '0',
@@ -241,8 +241,14 @@ export async function loadWorld() {
       },
     })
     .then(({ data }) => {
-      worldState.planets = data.planets.map(deserializeBody<Planet>);
-      worldState.stars = data.stars.map(deserializeBody<Star>);
+      worldState.stars = data.systems.map(({ star }) =>
+        deserializeBody<Star>(star),
+      );
+      worldState.planets = data.systems.flatMap(({ planets }) =>
+        planets.flatMap(({ planet, moons }) =>
+          [planet, ...moons].map(deserializeBody<Planet>),
+        ),
+      );
       rebuildWorldBodyByName();
       return worldState;
     })

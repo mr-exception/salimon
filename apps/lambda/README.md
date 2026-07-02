@@ -3,22 +3,26 @@
 AWS Lambda backend for Salimon. Each HTTP endpoint is implemented by a
 dedicated handler under `src/functions`.
 
-`npm run build --workspace lambda` produces `dist/world.zip`. The archive has
+`npm run build --workspace lambda` produces `dist/systems.zip`. The archive has
 the deployable handler as `index.js` at its root. esbuild bundles the handler
 and its runtime npm dependencies into `index.js`; development-only and
 type-only packages are not shipped.
 
-`GET /world` accepts a search center and radius in meters:
+`GET /world/systems` accepts a search center and radius in meters:
 
 ```text
-/world?x=0&y=0&radius=1000000
-/world?coordinate=0,0&radius=1000000
+/world/systems?x=0&y=0&radius=1000000
+/world/systems?coordinate=0,0&radius=1000000
 ```
 
-It returns planets and stars whose resolved center coordinates are inside the
-search circle. Coordinates and radii must be integers. Body coordinates may be
-relative to another body; the handler resolves these references before
-filtering.
+It returns systems whose star's resolved center coordinates are inside the
+search circle. Each system contains its star, the planets that directly orbit
+the star, and the moons that directly orbit each planet. Once a star is in
+range, all of those orbiting bodies are returned regardless of their own
+positions.
+
+Coordinates and radii must be integers. Body coordinates may be relative to
+another body; the handler resolves these references before filtering.
 
 ## Local development
 
@@ -37,8 +41,8 @@ sam local start-api \
   --parameter-overrides MongoDbUri="$MONGODB_URI"
 ```
 
-SAM serves `GET /world` at `http://127.0.0.1:3000/world` for backend
-development and verification.
+SAM serves `GET /world/systems` at
+`http://127.0.0.1:3000/world/systems` for backend development and verification.
 
 ## Deployment
 

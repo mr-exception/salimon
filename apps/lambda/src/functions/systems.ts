@@ -13,11 +13,22 @@ type SerializedPosition = {
 type WorldBody = Document & {
   name: string;
   position: SerializedPosition;
+  orbitalCenter: string | null;
 };
 
 type Coordinate = {
   x: bigint;
   y: bigint;
+};
+
+type PlanetSystem = {
+  planet: WorldBody;
+  moons: WorldBody[];
+};
+
+type StarSystem = {
+  star: WorldBody;
+  planets: PlanetSystem[];
 };
 
 let clientPromise: Promise<MongoClient> | undefined;
@@ -117,6 +128,18 @@ function isInsideCircle(
   return deltaX * deltaX + deltaY * deltaY <= radiusSquared;
 }
 
+function groupByOrbitalCenter(bodies: WorldBody[]) {
+  const bodiesByOrbitalCenter = new Map<string | null, WorldBody[]>();
+
+  for (const body of bodies) {
+    const siblings = bodiesByOrbitalCenter.get(body.orbitalCenter) ?? [];
+    siblings.push(body);
+    bodiesByOrbitalCenter.set(body.orbitalCenter, siblings);
+  }
+
+  return bodiesByOrbitalCenter;
+}
+
 export async function handler(
   event: APIGatewayProxyEventV2,
 ): Promise<APIGatewayProxyResultV2> {
@@ -125,7 +148,8 @@ export async function handler(
     searchArea = getSearchArea(event);
   } catch (error) {
     return jsonResponse(400, {
-      error: error instanceof Error ? error.message : 'Invalid query parameters',
+      error:
+        error instanceof Error ? error.message : 'Invalid query parameters',
     });
   }
 
@@ -138,20 +162,32 @@ export async function handler(
         .collection<WorldBody>('planets')
         .find({}, { projection })
         .toArray(),
-      database.collection<WorldBody>('stars').find({}, { projection }).toArray(),
+      database
+        .collection<WorldBody>('stars')
+        .find({}, { projection })
+        .toArray(),
     ]);
     const positions = resolvePositions([...planets, ...stars]);
     const center = { x: searchArea.x, y: searchArea.y };
     const radiusSquared = searchArea.radius * searchArea.radius;
-    const isIncluded = (body: WorldBody) =>
-      isInsideCircle(positions.get(body.name)!, center, radiusSquared);
+    const planetsByOrbitalCenter = groupByOrbitalCenter(planets);
+    const systems: StarSystem[] = stars
+      .filter((star) =>
+        isInsideCircle(positions.get(star.name)!, center, radiusSquared),
+      )
+      .map((star) => ({
+        star,
+        planets: (planetsByOrbitalCenter.get(star.name) ?? []).map(
+          (planet) => ({
+            planet,
+            moons: planetsByOrbitalCenter.get(planet.name) ?? [],
+          }),
+        ),
+      }));
 
-    return jsonResponse(200, {
-      planets: planets.filter(isIncluded),
-      stars: stars.filter(isIncluded),
-    });
+    return jsonResponse(200, { systems });
   } catch (error) {
-    console.error('Failed to load world data', error);
-    return jsonResponse(500, { error: 'Failed to load world data' });
+    console.error('Failed to load world systems', error);
+    return jsonResponse(500, { error: 'Failed to load world systems' });
   }
 }

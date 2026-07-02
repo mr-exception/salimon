@@ -48,7 +48,7 @@ jobs:
         with:
           name: lambda-dist
           path: |
-            apps/lambda/dist/world.zip
+            apps/lambda/dist/systems.zip
             apps/lambda/template.yaml
           if-no-files-found: error
           retention-days: 1

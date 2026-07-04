@@ -63,7 +63,6 @@ CloudFormation. It requires these GitHub Actions repository variables:
 - `AWS_REGION`: deployment region.
 - `AWS_LAMBDA_ARTIFACTS_BUCKET`: S3 bucket used by CloudFormation packaging.
 - `AWS_LAMBDA_STACK_NAME`: CloudFormation stack name.
-- `CLIENT_ORIGIN`: deployed client origin allowed by API CORS.
 - `VITE_API_BASE_URL`: deployed API base URL used when building the client.
 
 The workflow also requires a GitHub Actions secret named `MONGODB_URI`. Store

@@ -3,10 +3,6 @@ Transform: AWS::Serverless-2016-10-31
 Description: Salimon Lambda API
 
 Parameters:
-  ClientOrigin:
-    Type: String
-    Description: Origin allowed to call the API
-    Default: http://localhost:5173
   MongoDbUri:
     Type: String
     Description: MongoDB connection URI, including credentials and database name
@@ -22,7 +18,7 @@ Resources:
         AllowMethods:
           - GET
         AllowOrigins:
-          - !Ref ClientOrigin
+          - '*'
 
   WorldSystemsFunction:
     Type: AWS::Serverless::Function

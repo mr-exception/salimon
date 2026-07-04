@@ -3,10 +3,6 @@ Transform: AWS::Serverless-2016-10-31
 Description: Salimon Lambda API
 
 Parameters:
-  ClientOrigin:
-    Type: String
-    Description: Origin allowed to call the API
-    Default: http://localhost:5173
   MongoDbUri:
     Type: String
     Description: MongoDB connection URI, including credentials and database name
@@ -22,7 +18,7 @@ Resources:
         AllowMethods:
           - GET
         AllowOrigins:
-          - !Ref ClientOrigin
+          - '*'
 
   WorldSystemsFunction:
     Type: AWS::Serverless::Function
@@ -44,6 +40,69 @@ Resources:
             ApiId: !Ref HttpApi
             Method: GET
             Path: /world/systems
+
+  UpdatePlanetsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/update-planets.zip
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      MemorySize: 256
+      Timeout: 10
+      Environment:
+        Variables:
+          MONGODB_URI: !Ref MongoDbUri
+      Events:
+        UpdateOldestPlanets:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: cron(0/5 * * * ? *)
+            RetryPolicy:
+              MaximumRetryAttempts: 2
+
+  UpdateMoonsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/update-moons.zip
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      MemorySize: 256
+      Timeout: 10
+      Environment:
+        Variables:
+          MONGODB_URI: !Ref MongoDbUri
+      Events:
+        UpdateOldestMoons:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: cron(0/5 * * * ? *)
+            RetryPolicy:
+              MaximumRetryAttempts: 2
+
+  UpdateStarsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/update-stars.zip
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      MemorySize: 256
+      Timeout: 10
+      Environment:
+        Variables:
+          MONGODB_URI: !Ref MongoDbUri
+      Events:
+        UpdateOldestStars:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: cron(0/5 * * * ? *)
+            RetryPolicy:
+              MaximumRetryAttempts: 2
 
 Outputs:
   ApiBaseUrl:

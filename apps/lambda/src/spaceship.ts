@@ -13,21 +13,36 @@ type SpaceshipPosition = {
   relativeTo?: string;
 };
 
+export type SpaceshipVelocity = {
+  x: number;
+  y: number;
+};
+
+export type SpaceshipMotionState = 'flying' | 'landed' | 'crashed';
+
 export type SpaceshipDocument = {
   securityCode: string;
   position: SpaceshipPosition;
   direction: number;
   speed: string;
+  velocity?: SpaceshipVelocity;
+  motionState?: SpaceshipMotionState;
+  simulatedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 };
 
 export type SpaceshipDto = Pick<
   SpaceshipDocument,
-  'securityCode' | 'position' | 'direction' | 'speed'
->;
+  | 'securityCode'
+  | 'position'
+  | 'direction'
+  | 'speed'
+  | 'velocity'
+  | 'motionState'
+> & { simulatedAt: string };
 
-const DEFAULT_SPACESHIP: Omit<SpaceshipDto, 'securityCode'> = {
+const DEFAULT_SPACESHIP = {
   position: {
     x: '6371200',
     y: '0',
@@ -35,7 +50,9 @@ const DEFAULT_SPACESHIP: Omit<SpaceshipDto, 'securityCode'> = {
   },
   direction: 0,
   speed: '0',
-};
+  velocity: { x: 0, y: 0 },
+  motionState: 'landed',
+} satisfies Omit<SpaceshipDto, 'securityCode' | 'simulatedAt'>;
 const UUID_V4_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const INTEGER_PATTERN = /^-?\d+$/;
@@ -53,6 +70,10 @@ export function jsonResponse(
 }
 
 export async function getSpaceshipsCollection() {
+  return (await getDatabase()).collection<SpaceshipDocument>('spaceships');
+}
+
+export async function getDatabase() {
   const uri = process.env.MONGODB_URI;
   if (!uri) throw new Error('MONGODB_URI is not configured');
 
@@ -61,7 +82,7 @@ export async function getSpaceshipsCollection() {
     throw error;
   });
 
-  return (await clientPromise).db().collection<SpaceshipDocument>('spaceships');
+  return (await clientPromise).db();
 }
 
 export function createSpaceship(): SpaceshipDocument {
@@ -70,17 +91,39 @@ export function createSpaceship(): SpaceshipDocument {
     ...DEFAULT_SPACESHIP,
     position: { ...DEFAULT_SPACESHIP.position },
     securityCode: randomUUID(),
+    simulatedAt: now,
     createdAt: now,
     updatedAt: now,
   };
 }
 
 export function toSpaceshipDto(spaceship: SpaceshipDocument): SpaceshipDto {
+  const velocity = getSpaceshipVelocity(spaceship);
   return {
     securityCode: spaceship.securityCode,
     position: spaceship.position,
     direction: spaceship.direction,
     speed: spaceship.speed,
+    velocity,
+    motionState:
+      spaceship.motionState ??
+      (spaceship.speed === '0' && spaceship.position.relativeTo
+        ? 'landed'
+        : 'flying'),
+    simulatedAt: (spaceship.simulatedAt ?? spaceship.updatedAt).toISOString(),
+  };
+}
+
+export function getSpaceshipVelocity(
+  spaceship: Pick<SpaceshipDocument, 'direction' | 'speed' | 'velocity'>,
+) {
+  if (spaceship.velocity) return spaceship.velocity;
+
+  const speed = Number(spaceship.speed);
+  const headingRadians = (spaceship.direction * Math.PI) / 180;
+  return {
+    x: Math.sin(headingRadians) * speed,
+    y: -Math.cos(headingRadians) * speed,
   };
 }
 
@@ -128,7 +171,7 @@ export function parseSpaceshipUpdate(event: APIGatewayProxyEventV2) {
     throw new Error('position.relativeTo must be a non-empty string');
   }
 
-  const { direction, speed } = candidate;
+  const { direction, speed, velocity, motionState } = candidate;
   if (
     typeof direction !== 'number' ||
     !Number.isFinite(direction) ||
@@ -140,6 +183,26 @@ export function parseSpaceshipUpdate(event: APIGatewayProxyEventV2) {
   if (typeof speed !== 'string' || !/^\d+$/.test(speed)) {
     throw new Error('speed must be a non-negative integer string');
   }
+  if (!velocity || typeof velocity !== 'object') {
+    throw new Error('velocity is required');
+  }
+  const velocityCandidate = velocity as Record<string, unknown>;
+  if (
+    typeof velocityCandidate.x !== 'number' ||
+    !Number.isFinite(velocityCandidate.x) ||
+    typeof velocityCandidate.y !== 'number' ||
+    !Number.isFinite(velocityCandidate.y)
+  ) {
+    throw new Error('velocity.x and velocity.y must be finite numbers');
+  }
+  if (
+    motionState !== 'flying' &&
+    motionState !== 'landed' &&
+    motionState !== 'crashed'
+  ) {
+    throw new Error('motionState must be flying, landed, or crashed');
+  }
+  const parsedMotionState: SpaceshipMotionState = motionState;
 
   return {
     position: {
@@ -149,5 +212,7 @@ export function parseSpaceshipUpdate(event: APIGatewayProxyEventV2) {
     },
     direction,
     speed,
+    velocity: { x: velocityCandidate.x, y: velocityCandidate.y },
+    motionState: parsedMotionState,
   };
 }

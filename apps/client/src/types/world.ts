@@ -48,6 +48,12 @@ export type SpaceshipDto = {
   };
   direction: number;
   speed: string;
+  velocity?: {
+    x: number;
+    y: number;
+  };
+  motionState?: 'flying' | 'landed' | 'crashed';
+  simulatedAt?: string;
 };
 
 export type World = {

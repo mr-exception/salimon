@@ -30,11 +30,12 @@ export async function handler(
   }
 
   try {
+    const now = new Date();
     const spaceship = await (
       await getSpaceshipsCollection()
     ).findOneAndUpdate(
       { securityCode },
-      { $set: { ...update, updatedAt: new Date() } },
+      { $set: { ...update, simulatedAt: now, updatedAt: now } },
       { returnDocument: 'after' },
     );
     if (!spaceship) return jsonResponse(404, { error: 'Spaceship not found' });

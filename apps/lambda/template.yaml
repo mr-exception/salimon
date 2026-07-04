@@ -15,8 +15,11 @@ Resources:
       CorsConfiguration:
         AllowHeaders:
           - Content-Type
+          - X-Spaceship-Security-Code
         AllowMethods:
           - GET
+          - POST
+          - PUT
         AllowOrigins:
           - '*'
 
@@ -103,6 +106,69 @@ Resources:
             ScheduleExpression: cron(0/5 * * * ? *)
             RetryPolicy:
               MaximumRetryAttempts: 2
+
+  RegisterSpaceshipFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/register-spaceship.zip
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      MemorySize: 256
+      Timeout: 10
+      Environment:
+        Variables:
+          MONGODB_URI: !Ref MongoDbUri
+      Events:
+        RegisterSpaceship:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Method: POST
+            Path: /spaceship/register
+
+  SpaceshipInfoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/spaceship-info.zip
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      MemorySize: 256
+      Timeout: 10
+      Environment:
+        Variables:
+          MONGODB_URI: !Ref MongoDbUri
+      Events:
+        GetSpaceshipInfo:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Method: GET
+            Path: /spaceship/info
+
+  UpdateSpaceshipFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/update-spaceship.zip
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      MemorySize: 256
+      Timeout: 10
+      Environment:
+        Variables:
+          MONGODB_URI: !Ref MongoDbUri
+      Events:
+        UpdateSpaceship:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Method: PUT
+            Path: /spaceship/update
 
 Outputs:
   ApiBaseUrl:

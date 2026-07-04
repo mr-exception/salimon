@@ -39,6 +39,17 @@ export type Spaceship = OrbitingBody & {
   heading: number; // degrees; positive values rotate clockwise
 };
 
+export type SpaceshipDto = {
+  securityCode: string;
+  position: {
+    x: string;
+    y: string;
+    relativeTo?: string;
+  };
+  direction: number;
+  speed: string;
+};
+
 export type World = {
   planets: Planet[];
   stars: Star[];

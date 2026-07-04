@@ -25,6 +25,19 @@ positions.
 Coordinates and radii must be integers. Body coordinates may be relative to
 another body; the handler resolves these references before filtering.
 
+Player spaceships are private records addressed by a UUID v4 security code:
+
+- `POST /spaceship/register` creates a spaceship at the default Earth surface
+  position with zero speed.
+- `GET /spaceship/info` returns the current spaceship.
+- `PUT /spaceship/update` validates and replaces its position, direction, and
+  speed.
+
+The info and update routes require the security code in the
+`x-spaceship-security-code` header. The update body uses integer strings for
+`position.x`, `position.y`, and `speed`; `direction` is a number in the range
+from 0 (inclusive) to 360 (exclusive).
+
 Separate planet, moon, and star updaters run every five minutes. Each selects
 at most 100 bodies of its type with the oldest `updatedAt` dates, calculates
 elapsed time from the EventBridge Scheduler invocation time, and rotates each

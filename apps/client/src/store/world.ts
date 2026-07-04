@@ -5,6 +5,7 @@ import type {
   Position,
   SerializedWorldSystems,
   Spaceship,
+  SpaceshipDto,
   Star,
   World,
 } from '@types';
@@ -275,6 +276,49 @@ export function setActiveWorldBodyNames(names: Iterable<string>) {
 export function setSpaceshipHeading(heading: number) {
   spaceshipState.heading = heading;
   listeners.forEach((listener) => listener(worldState));
+}
+
+export function hydrateSpaceship(dto: SpaceshipDto) {
+  spaceshipState.position = {
+    x: BigInt(dto.position.x),
+    y: BigInt(dto.position.y),
+    relativeTo: dto.position.relativeTo,
+  };
+  spaceshipState.heading = dto.direction;
+  spaceshipState.speed = BigInt(dto.speed);
+  spaceshipState.orbitalCenter = null;
+  spaceshipWorldPosition = undefined;
+  spaceshipVelocity = undefined;
+  spaceshipAttachedBodyName =
+    dto.speed === '0' ? dto.position.relativeTo : undefined;
+  spaceshipSurfaceOffset =
+    spaceshipAttachedBodyName === undefined
+      ? undefined
+      : {
+          x: Number(dto.position.x),
+          y: Number(dto.position.y),
+        };
+  store.set(
+    spaceshipMotionStateAtom,
+    spaceshipAttachedBodyName === undefined ? 'flying' : 'landed',
+  );
+  store.set(spaceshipSpeedAtom, Number(dto.speed));
+  rebuildWorldBodyByName();
+}
+
+export function getSpaceshipDto(securityCode: string): SpaceshipDto {
+  return {
+    securityCode,
+    position: {
+      x: spaceshipState.position.x.toString(),
+      y: spaceshipState.position.y.toString(),
+      ...(spaceshipState.position.relativeTo === undefined
+        ? {}
+        : { relativeTo: spaceshipState.position.relativeTo }),
+    },
+    direction: spaceshipState.heading,
+    speed: spaceshipState.speed.toString(),
+  };
 }
 
 export function getRequiredSpaceshipBurnAcceleration(

@@ -3,9 +3,10 @@
 AWS Lambda backend for Salimon. Each HTTP endpoint is implemented by a
 dedicated handler under `src/functions`.
 
-`npm run build --workspace lambda` produces `dist/systems.zip`. The archive has
-the deployable handler as `index.js` at its root. esbuild bundles the handler
-and its runtime npm dependencies into `index.js`; development-only and
+`npm run build --workspace lambda` produces deployable archives for the
+systems API and the planet, moon, and star position updaters. Each archive has
+its deployable handler as `index.js` at its root. esbuild bundles the handlers
+and their runtime npm dependencies into `index.js`; development-only and
 type-only packages are not shipped.
 
 `GET /world/systems` accepts a search center and radius in meters:
@@ -23,6 +24,15 @@ positions.
 
 Coordinates and radii must be integers. Body coordinates may be relative to
 another body; the handler resolves these references before filtering.
+
+Separate planet, moon, and star updaters run every five minutes. Each selects
+at most 100 bodies of its type with the oldest `updatedAt` dates, calculates
+elapsed time from the EventBridge Scheduler invocation time, and rotates each
+position around its orbital center using its `speed` and `clockwise`
+attributes. Planets are records whose orbital center exists in `stars`; moons
+are records whose orbital center exists in `planets`. Updates include the
+previously read `updatedAt` value as a concurrency check, preventing
+overlapping invocations from applying the same movement twice.
 
 ## Local development
 

@@ -49,6 +49,9 @@ jobs:
           name: lambda-dist
           path: |
             apps/lambda/dist/systems.zip
+            apps/lambda/dist/update-planets.zip
+            apps/lambda/dist/update-moons.zip
+            apps/lambda/dist/update-stars.zip
             apps/lambda/template.yaml
           if-no-files-found: error
           retention-days: 1

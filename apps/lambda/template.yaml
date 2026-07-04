@@ -45,6 +45,69 @@ Resources:
             Method: GET
             Path: /world/systems
 
+  UpdatePlanetsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/update-planets.zip
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      MemorySize: 256
+      Timeout: 10
+      Environment:
+        Variables:
+          MONGODB_URI: !Ref MongoDbUri
+      Events:
+        UpdateOldestPlanets:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: cron(0/5 * * * ? *)
+            RetryPolicy:
+              MaximumRetryAttempts: 2
+
+  UpdateMoonsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/update-moons.zip
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      MemorySize: 256
+      Timeout: 10
+      Environment:
+        Variables:
+          MONGODB_URI: !Ref MongoDbUri
+      Events:
+        UpdateOldestMoons:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: cron(0/5 * * * ? *)
+            RetryPolicy:
+              MaximumRetryAttempts: 2
+
+  UpdateStarsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/update-stars.zip
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      MemorySize: 256
+      Timeout: 10
+      Environment:
+        Variables:
+          MONGODB_URI: !Ref MongoDbUri
+      Events:
+        UpdateOldestStars:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: cron(0/5 * * * ? *)
+            RetryPolicy:
+              MaximumRetryAttempts: 2
+
 Outputs:
   ApiBaseUrl:
     Description: Base URL consumed by VITE_API_BASE_URL

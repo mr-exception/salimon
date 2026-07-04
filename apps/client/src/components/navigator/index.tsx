@@ -98,6 +98,9 @@ export function Navigator({
       type: Phaser.AUTO,
       parent: gameHostRef.current,
       backgroundColor: '#050816',
+      fps: {
+        forceSetTimeOut: true,
+      },
       scale: {
         mode: Phaser.Scale.RESIZE,
         width: '100%',
@@ -111,6 +114,8 @@ export function Navigator({
       },
       scene,
     });
+    // Keep the online simulation running while the document is in the background.
+    game.events.off(Phaser.Core.Events.HIDDEN);
 
     void loadWorld()
       .then((loadedWorld) => {

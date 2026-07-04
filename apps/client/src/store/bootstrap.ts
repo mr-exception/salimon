@@ -4,13 +4,15 @@ import type { SpaceshipDto } from '@types';
 import {
   getSpaceshipDto,
   hydrateSpaceship,
+  isSpaceshipEngineRunning,
   spaceshipState,
   subscribeToWorld,
 } from './world';
 
 const STORAGE_KEY = 'salimon.spaceship';
 const SECURITY_CODE_HEADER = 'x-spaceship-security-code';
-const UPDATE_DELAY_MS = 1_000;
+const COASTING_UPDATE_DELAY_MS = 5 * 60 * 1_000;
+const THRUSTING_UPDATE_DELAY_MS = 5_000;
 const DEFAULT_API_BASE_URL =
   'https://hjp81v6wyh.execute-api.us-east-1.amazonaws.com';
 
@@ -103,6 +105,7 @@ export function useBootstrap(): BootstrapState {
   useEffect(() => {
     let disposed = false;
     let updateTimer: number | undefined;
+    let updateDelay: number | undefined;
     let securityCode: string | undefined;
     let unsubscribe: (() => void) | undefined;
 
@@ -110,6 +113,7 @@ export function useBootstrap(): BootstrapState {
       if (!securityCode) return;
       window.clearTimeout(updateTimer);
       updateTimer = undefined;
+      updateDelay = undefined;
       void updateSpaceship(securityCode).catch((error: unknown) => {
         console.error('Failed to persist spaceship', error);
       });
@@ -120,13 +124,18 @@ export function useBootstrap(): BootstrapState {
         if (disposed) return;
         securityCode = spaceship.securityCode;
         unsubscribe = subscribeToWorld((_world, changedBodyNames) => {
-          if (
-            (changedBodyNames && !changedBodyNames.has(spaceshipState.name)) ||
-            updateTimer
-          ) {
+          if (changedBodyNames && !changedBodyNames.has(spaceshipState.name)) {
             return;
           }
-          updateTimer = window.setTimeout(flushUpdate, UPDATE_DELAY_MS);
+
+          const nextUpdateDelay = isSpaceshipEngineRunning()
+            ? THRUSTING_UPDATE_DELAY_MS
+            : COASTING_UPDATE_DELAY_MS;
+          if (updateTimer && updateDelay === nextUpdateDelay) return;
+
+          window.clearTimeout(updateTimer);
+          updateDelay = nextUpdateDelay;
+          updateTimer = window.setTimeout(flushUpdate, nextUpdateDelay);
         });
         window.addEventListener('pagehide', flushUpdate);
         setState('ready');

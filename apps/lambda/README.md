@@ -29,14 +29,25 @@ Player spaceships are private records addressed by a UUID v4 security code:
 
 - `POST /spaceship/register` creates a spaceship at the default Earth surface
   position with zero speed.
-- `GET /spaceship/info` returns the current spaceship.
+- `GET /spaceship/info` lazily advances an offline spaceship to the current
+  time before returning it.
 - `PUT /spaceship/update` validates and replaces its position, direction, and
-  speed.
+  speed, precise relative velocity, and motion state.
 
 The info and update routes require the security code in the
 `x-spaceship-security-code` header. The update body uses integer strings for
 `position.x`, `position.y`, and `speed`; `direction` is a number in the range
-from 0 (inclusive) to 360 (exclusive).
+from 0 (inclusive) to 360 (exclusive). `velocity.x` and `velocity.y` are finite
+numbers in meters per second, and `motionState` is `flying`, `landed`, or
+`crashed`.
+
+Spaceships stored relative to a planet or star include a simulation timestamp.
+On the next info request, the Lambda advances flying ships under the reference
+body's gravity with bounded integration steps and swept collision detection.
+Impacts above 15 m/s are stored as crashes; slower impacts are landings.
+Landed and crashed surface positions rotate with the reference body. This
+catch-up is performed only when the spaceship is requested, so offline players
+do not require scheduled Lambda invocations.
 
 Separate planet, moon, and star updaters run every five minutes. Each selects
 at most 100 bodies of its type with the oldest `updatedAt` dates, calculates

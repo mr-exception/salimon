@@ -207,6 +207,7 @@ let activeWorldBodyNames = new Set<string>();
 const suspendedSimulationSeconds = new Map<string, number>();
 let spaceshipWorldPosition: Vector | undefined;
 let spaceshipVelocity: Vector | undefined;
+let spaceshipStoredRelativeVelocity: Vector | undefined;
 let spaceshipAttachedBodyName: string | undefined = EARTH_NAME;
 let spaceshipSurfaceOffset: Vector | undefined = {
   x: DEFAULT_SURFACE_OFFSET,
@@ -289,8 +290,14 @@ export function hydrateSpaceship(dto: SpaceshipDto) {
   spaceshipState.orbitalCenter = null;
   spaceshipWorldPosition = undefined;
   spaceshipVelocity = undefined;
+  spaceshipStoredRelativeVelocity = dto.velocity
+    ? { ...dto.velocity }
+    : undefined;
+  const motionState =
+    dto.motionState ??
+    (dto.speed === '0' && dto.position.relativeTo ? 'landed' : 'flying');
   spaceshipAttachedBodyName =
-    dto.speed === '0' ? dto.position.relativeTo : undefined;
+    motionState === 'flying' ? undefined : dto.position.relativeTo;
   spaceshipSurfaceOffset =
     spaceshipAttachedBodyName === undefined
       ? undefined
@@ -298,27 +305,89 @@ export function hydrateSpaceship(dto: SpaceshipDto) {
           x: Number(dto.position.x),
           y: Number(dto.position.y),
         };
-  store.set(
-    spaceshipMotionStateAtom,
-    spaceshipAttachedBodyName === undefined ? 'flying' : 'landed',
-  );
+  store.set(spaceshipMotionStateAtom, motionState);
   store.set(spaceshipSpeedAtom, Number(dto.speed));
   rebuildWorldBodyByName();
 }
 
 export function getSpaceshipDto(securityCode: string): SpaceshipDto {
+  const worldPosition = toVector(getWorldPosition(spaceshipState.position));
+  const worldVelocity = spaceshipVelocity ?? getInitialSpaceshipWorldVelocity();
+  const reference = getClosestPersistenceReference(worldPosition);
+  const position = reference
+    ? {
+        x: Math.round(worldPosition.x - reference.position.x).toString(),
+        y: Math.round(worldPosition.y - reference.position.y).toString(),
+        relativeTo: reference.body.name,
+      }
+    : {
+        x: Math.round(worldPosition.x).toString(),
+        y: Math.round(worldPosition.y).toString(),
+      };
+  const relativeVelocity = reference
+    ? {
+        x: worldVelocity.x - reference.velocity.x,
+        y: worldVelocity.y - reference.velocity.y,
+      }
+    : worldVelocity;
+  const speed =
+    store.get(spaceshipMotionStateAtom) === 'flying'
+      ? Math.hypot(relativeVelocity.x, relativeVelocity.y)
+      : 0;
+  const direction =
+    speed === 0
+      ? spaceshipState.heading
+      : ((Math.atan2(relativeVelocity.y, relativeVelocity.x) * 180) / Math.PI +
+          450) %
+        360;
+
   return {
     securityCode,
-    position: {
-      x: spaceshipState.position.x.toString(),
-      y: spaceshipState.position.y.toString(),
-      ...(spaceshipState.position.relativeTo === undefined
-        ? {}
-        : { relativeTo: spaceshipState.position.relativeTo }),
-    },
-    direction: spaceshipState.heading,
-    speed: spaceshipState.speed.toString(),
+    position,
+    direction,
+    speed: Math.round(speed).toString(),
+    velocity: relativeVelocity,
+    motionState: store.get(spaceshipMotionStateAtom),
+    simulatedAt: new Date().toISOString(),
   };
+}
+
+function getClosestPersistenceReference(spaceshipPosition: Vector) {
+  let closest:
+    | {
+        body: Planet | Star;
+        position: Vector;
+        velocity: Vector;
+        surfaceDistance: number;
+      }
+    | undefined;
+
+  for (const body of [...worldState.planets, ...worldState.stars]) {
+    const bodyPosition = toVector(getWorldPosition(body.position));
+    const centerDistance = Math.hypot(
+      spaceshipPosition.x - bodyPosition.x,
+      spaceshipPosition.y - bodyPosition.y,
+    );
+    const surfaceDistance = Math.max(
+      0,
+      centerDistance - Number(body.radius) - SPACESHIP_RADIUS_METERS,
+    );
+    if (
+      surfaceDistance > PROXIMITY_TELEMETRY_RANGE_METERS ||
+      (closest && surfaceDistance >= closest.surfaceDistance)
+    ) {
+      continue;
+    }
+
+    closest = {
+      body,
+      position: bodyPosition,
+      velocity: getCelestialBodyWorldVelocity(body.name, new Set()),
+      surfaceDistance,
+    };
+  }
+
+  return closest;
 }
 
 export function getRequiredSpaceshipBurnAcceleration(
@@ -1904,7 +1973,9 @@ function calculateGravityAcceleration(
 }
 
 function getInitialSpaceshipWorldVelocity() {
-  const relativeVelocity = getSpaceshipVelocity();
+  const relativeVelocity =
+    spaceshipStoredRelativeVelocity ?? getSpaceshipVelocity();
+  spaceshipStoredRelativeVelocity = undefined;
   const referenceVelocity = getSpaceshipReferenceVelocity();
   return {
     x: referenceVelocity.x + relativeVelocity.x,

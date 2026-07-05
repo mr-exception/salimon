@@ -8,7 +8,6 @@ import {
 } from 'react';
 import style from './style.module.css';
 import {
-  type FooterView,
   INITIAL_SPACESHIP_FUEL_KNS,
   MAX_ENGINE_THRUST_KN,
   SPACESHIP_MASS_KG,
@@ -34,7 +33,6 @@ import {
 } from '../../utils';
 
 type FooterProps = {
-  activeView: FooterView;
   isEngineRunning?: boolean;
   isSelectingTargetDirection?: boolean;
   onStartEngines?: (targetSpeed: number, maximumThrustPercent: number) => void;
@@ -44,7 +42,6 @@ type FooterProps = {
     power: number,
   ) => void;
   onToggleTargetDirectionSelection?: () => void;
-  onViewChange: (view: FooterView) => void;
 };
 
 type SpeedControlTab = 'target-speed' | 'auto-orbit' | 'manual-drive';
@@ -228,14 +225,12 @@ function DraggablePanel({
 }
 
 export function Footer({
-  activeView,
   isEngineRunning = false,
   isSelectingTargetDirection = false,
   onStartEngines,
   onStopEngines,
   onManualThrustChange,
   onToggleTargetDirectionSelection,
-  onViewChange,
 }: FooterProps) {
   const speed = useSpaceshipSpeed();
   const fuelKns = useSpaceshipFuelKns();
@@ -406,244 +401,228 @@ export function Footer({
 
   return (
     <footer className={style.container} aria-label="Ship controls">
-      <nav className={style.views} aria-label="Display view">
-        {(['navigation', 'ship'] as const).map((view) => (
-          <button
-            className={style.viewButton}
-            data-active={activeView === view}
-            key={view}
-            onClick={() => onViewChange(view)}
-            type="button"
-          >
-            {view}
-          </button>
-        ))}
-      </nav>
+      <section className={style.speedControls} aria-label="Ship features">
+        <div className={style.controlTabs}>
+          {(
+            [
+              ['target-speed', 'Target speed'],
+              ['auto-orbit', 'Auto orbit'],
+              ['manual-drive', 'Manual drive'],
+            ] as const
+          ).map(([tab, label]) => (
+            <button
+              id={`footer-${tab}-tab`}
+              className={style.controlTab}
+              type="button"
+              aria-controls={`footer-${tab}-panel`}
+              aria-expanded={expandedSpeedControls.has(tab)}
+              aria-label={label}
+              data-active={expandedSpeedControls.has(tab)}
+              key={tab}
+              onClick={() => toggleSpeedControl(tab)}
+            >
+              <FeatureIcon feature={tab} />
+              <span className={style.tooltip} role="tooltip">
+                {label}
+              </span>
+            </button>
+          ))}
+        </div>
 
-      {activeView === 'navigation' && (
-        <section className={style.speedControls} aria-label="Ship features">
-          <div className={style.controlTabs}>
-            {(
-              [
-                ['target-speed', 'Target speed'],
-                ['auto-orbit', 'Auto orbit'],
-                ['manual-drive', 'Manual drive'],
-              ] as const
-            ).map(([tab, label]) => (
-              <button
-                id={`footer-${tab}-tab`}
-                className={style.controlTab}
-                type="button"
-                aria-controls={`footer-${tab}-panel`}
-                aria-expanded={expandedSpeedControls.has(tab)}
-                aria-label={label}
-                data-active={expandedSpeedControls.has(tab)}
-                key={tab}
-                onClick={() => toggleSpeedControl(tab)}
-              >
-                <FeatureIcon feature={tab} />
-                <span className={style.tooltip} role="tooltip">
-                  {label}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          <div className={style.controlPanels}>
-            {expandedSpeedControls.has('manual-drive') && (
-              <DraggablePanel
-                control="manual-drive"
-                onClose={() => toggleSpeedControl('manual-drive')}
-              >
-                <fieldset className={style.powerControls}>
-                  <legend>Thruster power</legend>
-                  <div className={style.powerPresets}>
-                    {[10, 25, 50, 100].map((power) => (
-                      <button
-                        type="button"
-                        data-active={manualPower === power}
-                        key={power}
-                        onClick={() => setManualPower(power)}
-                      >
-                        {power}%
-                      </button>
-                    ))}
-                  </div>
-                  <label htmlFor="footer-manual-power">
-                    <span>Custom</span>
-                    <span className={style.speedField}>
-                      <input
-                        id="footer-manual-power"
-                        type="number"
-                        min="1"
-                        max="100"
-                        step="1"
-                        value={manualPower}
-                        onChange={(event) => {
-                          const power = event.currentTarget.valueAsNumber;
-                          if (Number.isFinite(power)) {
-                            setManualPower(Math.min(100, Math.max(1, power)));
-                          }
-                        }}
-                      />
-                      <span aria-hidden="true">%</span>
-                    </span>
-                  </label>
-                </fieldset>
-              </DraggablePanel>
-            )}
-            {expandedSpeedControls.has('auto-orbit') && (
-              <DraggablePanel
-                control="auto-orbit"
-                onClose={() => toggleSpeedControl('auto-orbit')}
-              >
-                <div className={style.speedInputs}>
-                  <label htmlFor="footer-orbit-speed">
-                    <span>Orbit speed</span>
-                    <span className={style.speedField}>
-                      <input
-                        id="footer-orbit-speed"
-                        type="number"
-                        min="0.1"
-                        step="0.1"
-                        value={orbitSpeed}
-                        disabled={autoOrbit.active || isEngineRunning}
-                        onChange={(event) => {
-                          setOrbitSpeed(event.currentTarget.value);
-                          setOrbitError('');
-                        }}
-                      />
-                      <span aria-hidden="true">km/s</span>
-                    </span>
-                  </label>
-                  <label htmlFor="footer-orbit-distance">
-                    <span>Orbit distance</span>
-                    <span className={style.speedField}>
-                      <input
-                        id="footer-orbit-distance"
-                        type="number"
-                        min="0"
-                        step="10"
-                        value={orbitDistance}
-                        disabled={autoOrbit.active || isEngineRunning}
-                        onChange={(event) => {
-                          setOrbitDistance(event.currentTarget.value);
-                          setOrbitError('');
-                        }}
-                      />
-                      <span aria-hidden="true">km</span>
-                    </span>
-                  </label>
+        <div className={style.controlPanels}>
+          {expandedSpeedControls.has('manual-drive') && (
+            <DraggablePanel
+              control="manual-drive"
+              onClose={() => toggleSpeedControl('manual-drive')}
+            >
+              <fieldset className={style.powerControls}>
+                <legend>Thruster power</legend>
+                <div className={style.powerPresets}>
+                  {[10, 25, 50, 100].map((power) => (
+                    <button
+                      type="button"
+                      data-active={manualPower === power}
+                      key={power}
+                      onClick={() => setManualPower(power)}
+                    >
+                      {power}%
+                    </button>
+                  ))}
                 </div>
-                <div className={style.orbitActions}>
-                  <button
-                    type="button"
-                    data-running={autoOrbit.active}
-                    disabled={
-                      autoOrbit.active
-                        ? false
-                        : isEngineRunning ||
-                          motionState === 'crashed' ||
-                          !hasValidOrbit
-                    }
-                    onClick={toggleAutoOrbit}
-                  >
-                    {autoOrbit.active ? 'Stop orbit' : 'Auto orbit'}
-                  </button>
-                  <output className={style.orbitStatus}>
-                    {autoOrbit.active
-                      ? `Autopilot burning near ${autoOrbit.planetName ?? 'planet'}`
-                      : orbitError || 'Requires surface range < 1,000 km'}
-                  </output>
-                </div>
-              </DraggablePanel>
-            )}
-            {expandedSpeedControls.has('target-speed') && (
-              <DraggablePanel
-                control="target-speed"
-                onClose={() => toggleSpeedControl('target-speed')}
-              >
-                <div className={style.speedInputs}>
-                  <label htmlFor="footer-target-speed">
-                    <span>Target speed</span>
-                    <span className={style.speedField}>
-                      <input
-                        id="footer-target-speed"
-                        type="number"
-                        min="0"
-                        step="0.1"
-                        value={targetSpeed}
-                        disabled={isEngineRunning}
-                        onChange={(event) =>
-                          setTargetSpeed(event.currentTarget.value)
+                <label htmlFor="footer-manual-power">
+                  <span>Custom</span>
+                  <span className={style.speedField}>
+                    <input
+                      id="footer-manual-power"
+                      type="number"
+                      min="1"
+                      max="100"
+                      step="1"
+                      value={manualPower}
+                      onChange={(event) => {
+                        const power = event.currentTarget.valueAsNumber;
+                        if (Number.isFinite(power)) {
+                          setManualPower(Math.min(100, Math.max(1, power)));
                         }
-                      />
-                      <span aria-hidden="true">km/s</span>
-                    </span>
-                  </label>
-                  <label htmlFor="footer-maximum-thrust">
-                    <span>Max thrust</span>
-                    <span className={style.speedField}>
-                      <input
-                        id="footer-maximum-thrust"
-                        type="number"
-                        min="1"
-                        max="100"
-                        step="1"
-                        value={maximumThrustPercent}
-                        disabled={isEngineRunning}
-                        onChange={(event) =>
-                          setMaximumThrustPercent(event.currentTarget.value)
-                        }
-                      />
-                      <span aria-hidden="true">%</span>
-                    </span>
-                  </label>
+                      }}
+                    />
+                    <span aria-hidden="true">%</span>
+                  </span>
+                </label>
+              </fieldset>
+            </DraggablePanel>
+          )}
+          {expandedSpeedControls.has('auto-orbit') && (
+            <DraggablePanel
+              control="auto-orbit"
+              onClose={() => toggleSpeedControl('auto-orbit')}
+            >
+              <div className={style.speedInputs}>
+                <label htmlFor="footer-orbit-speed">
+                  <span>Orbit speed</span>
+                  <span className={style.speedField}>
+                    <input
+                      id="footer-orbit-speed"
+                      type="number"
+                      min="0.1"
+                      step="0.1"
+                      value={orbitSpeed}
+                      disabled={autoOrbit.active || isEngineRunning}
+                      onChange={(event) => {
+                        setOrbitSpeed(event.currentTarget.value);
+                        setOrbitError('');
+                      }}
+                    />
+                    <span aria-hidden="true">km/s</span>
+                  </span>
+                </label>
+                <label htmlFor="footer-orbit-distance">
+                  <span>Orbit distance</span>
+                  <span className={style.speedField}>
+                    <input
+                      id="footer-orbit-distance"
+                      type="number"
+                      min="0"
+                      step="10"
+                      value={orbitDistance}
+                      disabled={autoOrbit.active || isEngineRunning}
+                      onChange={(event) => {
+                        setOrbitDistance(event.currentTarget.value);
+                        setOrbitError('');
+                      }}
+                    />
+                    <span aria-hidden="true">km</span>
+                  </span>
+                </label>
+              </div>
+              <div className={style.orbitActions}>
+                <button
+                  type="button"
+                  data-running={autoOrbit.active}
+                  disabled={
+                    autoOrbit.active
+                      ? false
+                      : isEngineRunning ||
+                        motionState === 'crashed' ||
+                        !hasValidOrbit
+                  }
+                  onClick={toggleAutoOrbit}
+                >
+                  {autoOrbit.active ? 'Stop orbit' : 'Auto orbit'}
+                </button>
+                <output className={style.orbitStatus}>
+                  {autoOrbit.active
+                    ? `Autopilot burning near ${autoOrbit.planetName ?? 'planet'}`
+                    : orbitError || 'Requires surface range < 1,000 km'}
+                </output>
+              </div>
+            </DraggablePanel>
+          )}
+          {expandedSpeedControls.has('target-speed') && (
+            <DraggablePanel
+              control="target-speed"
+              onClose={() => toggleSpeedControl('target-speed')}
+            >
+              <div className={style.speedInputs}>
+                <label htmlFor="footer-target-speed">
+                  <span>Target speed</span>
+                  <span className={style.speedField}>
+                    <input
+                      id="footer-target-speed"
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      value={targetSpeed}
+                      disabled={isEngineRunning}
+                      onChange={(event) =>
+                        setTargetSpeed(event.currentTarget.value)
+                      }
+                    />
+                    <span aria-hidden="true">km/s</span>
+                  </span>
+                </label>
+                <label htmlFor="footer-maximum-thrust">
+                  <span>Max thrust</span>
+                  <span className={style.speedField}>
+                    <input
+                      id="footer-maximum-thrust"
+                      type="number"
+                      min="1"
+                      max="100"
+                      step="1"
+                      value={maximumThrustPercent}
+                      disabled={isEngineRunning}
+                      onChange={(event) =>
+                        setMaximumThrustPercent(event.currentTarget.value)
+                      }
+                    />
+                    <span aria-hidden="true">%</span>
+                  </span>
+                </label>
+              </div>
+              <div className={style.speedActions}>
+                <button
+                  type="button"
+                  data-active={isSelectingTargetDirection}
+                  onClick={onToggleTargetDirectionSelection}
+                >
+                  {isSelectingTargetDirection
+                    ? 'Cancel target direction'
+                    : 'Set target direction'}
+                </button>
+                <div className={style.speedMetrics}>
+                  <span className={style.speedMetric}>
+                    <small>Acceleration</small>
+                    {hasValidBurn ? formatAcceleration(acceleration) : '—'}
+                  </span>
+                  <span className={style.speedMetric}>
+                    <small>
+                      {burnRemainingSeconds !== undefined
+                        ? 'Time remaining'
+                        : 'Time'}
+                    </small>
+                    {burnTimeSeconds !== undefined
+                      ? formatDuration(burnTimeSeconds)
+                      : '—'}
+                  </span>
                 </div>
-                <div className={style.speedActions}>
-                  <button
-                    type="button"
-                    data-active={isSelectingTargetDirection}
-                    onClick={onToggleTargetDirectionSelection}
-                  >
-                    {isSelectingTargetDirection
-                      ? 'Cancel target direction'
-                      : 'Set target direction'}
-                  </button>
-                  <div className={style.speedMetrics}>
-                    <span className={style.speedMetric}>
-                      <small>Acceleration</small>
-                      {hasValidBurn ? formatAcceleration(acceleration) : '—'}
-                    </span>
-                    <span className={style.speedMetric}>
-                      <small>
-                        {burnRemainingSeconds !== undefined
-                          ? 'Time remaining'
-                          : 'Time'}
-                      </small>
-                      {burnTimeSeconds !== undefined
-                        ? formatDuration(burnTimeSeconds)
-                        : '—'}
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    data-running={isEngineRunning}
-                    disabled={
-                      isEngineRunning
-                        ? !onStopEngines
-                        : !canStartBurn || !onStartEngines
-                    }
-                    onClick={toggleEngines}
-                  >
-                    {isEngineRunning ? 'Stop engines' : 'Start engines'}
-                  </button>
-                </div>
-              </DraggablePanel>
-            )}
-          </div>
-        </section>
-      )}
+                <button
+                  type="button"
+                  data-running={isEngineRunning}
+                  disabled={
+                    isEngineRunning
+                      ? !onStopEngines
+                      : !canStartBurn || !onStartEngines
+                  }
+                  onClick={toggleEngines}
+                >
+                  {isEngineRunning ? 'Stop engines' : 'Start engines'}
+                </button>
+              </div>
+            </DraggablePanel>
+          )}
+        </div>
+      </section>
 
       <dl className={style.telemetry} aria-label="Ship telemetry">
         <div className={style.readout}>

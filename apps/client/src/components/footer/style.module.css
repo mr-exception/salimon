@@ -8,23 +8,10 @@
   font-family: system-ui, sans-serif;
 }
 
-.views {
-  position: absolute;
-  bottom: 16px;
-  left: 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  pointer-events: auto;
-}
-
 .speedControls {
   position: absolute;
   top: 88px;
   left: 16px;
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
   pointer-events: auto;
   color: color-mix(in srgb, var(--color-starlight) 62%, transparent);
   font-size: 0.62rem;
@@ -34,14 +21,15 @@
 }
 
 .controlTabs {
-  display: grid;
-  width: 120px;
-  gap: 4px;
+  display: flex;
+  gap: 6px;
 }
 
 .controlPanels {
-  display: grid;
-  gap: 8px;
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .powerControls {
@@ -52,6 +40,31 @@
   margin: 0;
   padding: 0;
   border: 0;
+}
+
+.durabilityList {
+  display: grid;
+  min-width: 460px;
+  gap: 8px;
+}
+
+.durabilityItem {
+  display: grid;
+  grid-template-columns: 82px 1fr 90px 70px;
+  align-items: center;
+  gap: 10px;
+}
+
+.durabilityItem meter {
+  width: 100%;
+  accent-color: var(--color-plasma-cyan);
+}
+
+.durabilityItem output {
+  color: var(--color-plasma-cyan);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  text-transform: none;
 }
 
 .powerControls legend {
@@ -76,18 +89,42 @@
   background: color-mix(in srgb, var(--color-plasma-cyan) 14%, transparent);
 }
 
-.controlPanel {
-  display: flex;
-  align-items: stretch;
-  gap: 12px;
+.controlDialog {
+  position: absolute;
+  display: grid;
   min-width: 500px;
-  padding: 14px;
   border: 1px solid
     color-mix(in srgb, var(--color-plasma-cyan) 30%, transparent);
   border-radius: 7px;
   background: color-mix(in srgb, var(--color-deep-space) 92%, transparent);
   box-shadow: 0 16px 40px rgb(0 0 0 / 42%);
   backdrop-filter: blur(10px);
+  pointer-events: auto;
+}
+
+.dialogHeader {
+  display: grid;
+  grid-template-columns: 30px 1fr 30px;
+  align-items: center;
+  min-height: 36px;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent);
+}
+
+.dialogHeader h2 {
+  margin: 0;
+  color: color-mix(in srgb, var(--color-starlight) 72%, transparent);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.dialogContent {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  padding: 14px;
 }
 
 .speedInputs {
@@ -222,11 +259,55 @@
 }
 
 .speedControls .controlTab {
-  display: flex;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  padding: 0;
   align-items: center;
-  justify-content: space-between;
-  height: 36px;
-  text-align: left;
+  height: 38px;
+  border-color: color-mix(in srgb, var(--color-plasma-cyan) 30%, transparent);
+  background: color-mix(in srgb, var(--color-deep-space) 88%, transparent);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 28%);
+  backdrop-filter: blur(8px);
+}
+
+.controlTab svg,
+.dragHandle svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.tooltip {
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 50%;
+  z-index: 3;
+  width: max-content;
+  padding: 5px 7px;
+  border: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 25%, transparent);
+  border-radius: 4px;
+  background: var(--color-deep-space);
+  color: var(--color-starlight);
+  font-size: 0.58rem;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -3px);
+  transition:
+    opacity 100ms ease,
+    transform 100ms ease;
+}
+
+.controlTab:hover .tooltip,
+.controlTab:focus-visible .tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }
 
 .speedControls .controlTab[data-active='true'] {
@@ -241,39 +322,27 @@
   color: #86efac;
 }
 
-.viewButton {
-  min-width: 112px;
-  padding: 10px 16px;
-  border: 1px solid var(--color-nebula-blue);
-  border-radius: 6px;
-  background: transparent;
-  color: var(--color-starlight);
-  font: inherit;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition:
-    border-color 120ms ease,
-    background-color 120ms ease,
-    color 120ms ease;
+.speedControls .dragHandle,
+.speedControls .closeDialog {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  place-items: center;
 }
 
-.viewButton:hover,
-.viewButton:focus-visible {
-  border-color: var(--color-plasma-cyan);
+.speedControls .dragHandle {
+  cursor: grab;
+  touch-action: none;
 }
 
-.viewButton:focus-visible {
-  outline: 2px solid var(--color-plasma-cyan);
-  outline-offset: 2px;
+.speedControls .dragHandle:active {
+  cursor: grabbing;
 }
 
-.viewButton[data-active='true'] {
-  border-color: var(--color-plasma-cyan);
-  background-color: var(--color-plasma-cyan);
-  color: var(--color-deep-space);
+.speedControls .closeDialog {
+  color: color-mix(in srgb, var(--color-starlight) 65%, transparent);
+  font-size: 1rem;
 }
 
 .telemetry {
@@ -322,15 +391,6 @@
 }
 
 @media (max-width: 760px) {
-  .views {
-    right: 16px;
-    bottom: 12px;
-  }
-
-  .viewButton {
-    flex: 1;
-  }
-
   .telemetry {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     row-gap: 12px;
@@ -338,40 +398,32 @@
   }
 
   .speedControls {
-    top: 72px;
-    right: 16px;
+    top: 80px;
     left: 12px;
   }
 
-  .controlTabs {
-    width: 104px;
+  .controlDialog {
+    left: 8px !important;
+    width: min(500px, calc(100vw - 16px));
+    min-width: 0;
+    max-height: calc(100vh - 170px);
+    overflow-y: auto;
   }
 
-  .controlPanel {
+  .dialogContent {
     flex-direction: column;
-    min-width: 0;
-    flex: 1;
-    max-height: calc(100vh - 170px);
-    overflow-y: auto;
-  }
-
-  .controlPanels {
-    min-width: 0;
-    flex: 1;
-    max-height: calc(100vh - 170px);
-    overflow-y: auto;
-  }
-
-  .controlPanels .controlPanel {
-    max-height: none;
-    overflow: visible;
   }
 
   .speedInputs,
   .speedActions,
-  .orbitActions {
+  .orbitActions,
+  .durabilityList {
     width: 100%;
     min-width: 0;
+  }
+
+  .durabilityItem {
+    grid-template-columns: 78px 1fr;
   }
 
   .speedInputs label {

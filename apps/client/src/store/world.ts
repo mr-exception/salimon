@@ -43,6 +43,9 @@ export type SpaceshipProximityTelemetry = {
 export const SPACESHIP_MASS_KG = 10_000;
 export const MAX_ENGINE_THRUST_KN = 1_000;
 export const INITIAL_SPACESHIP_FUEL_KNS = 1_000_000;
+export const MAX_HULL_DURABILITY = 200;
+export const MAX_THRUSTER_DURABILITY = 100;
+export const SPACESHIP_THRUSTER_COUNT = 4;
 export const BASE_SPACESHIP_CONFIG = {
   crashVelocityThresholdMetersPerSecond: 15,
 } as const;
@@ -70,6 +73,10 @@ const store = getDefaultStore();
 const spaceshipSpeedAtom = atom(0);
 const spaceshipTargetDirectionAtom = atom<number | undefined>(undefined);
 const spaceshipFuelKnsAtom = atom(INITIAL_SPACESHIP_FUEL_KNS);
+const spaceshipHullDurabilityAtom = atom(MAX_HULL_DURABILITY);
+const spaceshipThrusterDurabilityAtom = atom<number[]>(
+  Array(SPACESHIP_THRUSTER_COUNT).fill(MAX_THRUSTER_DURABILITY),
+);
 const spaceshipMotionStateAtom = atom<SpaceshipMotionState>('landed');
 const spaceshipAutoOrbitAtom = atom<SpaceshipAutoOrbit>({ active: false });
 const spaceshipFallingSpeedControlAtom = atom<SpaceshipFallingSpeedControl>({
@@ -108,6 +115,48 @@ export function useSetSpaceshipFuelKns() {
 
 export function getSpaceshipFuelKns() {
   return store.get(spaceshipFuelKnsAtom);
+}
+
+export function useSpaceshipHullDurability() {
+  return useAtomValue(spaceshipHullDurabilityAtom);
+}
+
+export function useSetSpaceshipHullDurability() {
+  return useSetAtom(spaceshipHullDurabilityAtom);
+}
+
+export function useSpaceshipThrusterDurability() {
+  return useAtomValue(spaceshipThrusterDurabilityAtom);
+}
+
+export function useSetSpaceshipThrusterDurability() {
+  return useSetAtom(spaceshipThrusterDurabilityAtom);
+}
+
+export function repairSpaceshipHull() {
+  store.set(spaceshipHullDurabilityAtom, MAX_HULL_DURABILITY);
+  if (store.get(spaceshipMotionStateAtom) === 'crashed') {
+    store.set(spaceshipMotionStateAtom, 'landed');
+  }
+  listeners.forEach((listener) =>
+    listener(worldState, new Set([spaceshipState.name])),
+  );
+}
+
+export function repairSpaceshipThruster(index: number) {
+  if (
+    !Number.isInteger(index) ||
+    index < 0 ||
+    index >= SPACESHIP_THRUSTER_COUNT
+  ) {
+    return;
+  }
+  const durability = [...store.get(spaceshipThrusterDurabilityAtom)];
+  durability[index] = MAX_THRUSTER_DURABILITY;
+  store.set(spaceshipThrusterDurabilityAtom, durability);
+  listeners.forEach((listener) =>
+    listener(worldState, new Set([spaceshipState.name])),
+  );
 }
 
 export function useSpaceshipMotionState() {
@@ -315,6 +364,19 @@ export function hydrateSpaceship(dto: SpaceshipDto) {
     spaceshipFuelKnsAtom,
     dto.stats?.fuelKns ?? INITIAL_SPACESHIP_FUEL_KNS,
   );
+  store.set(
+    spaceshipHullDurabilityAtom,
+    clampDurability(dto.stats?.hullDurability, MAX_HULL_DURABILITY),
+  );
+  store.set(
+    spaceshipThrusterDurabilityAtom,
+    Array.from({ length: SPACESHIP_THRUSTER_COUNT }, (_, index) =>
+      clampDurability(
+        dto.stats?.thrusterDurability?.[index],
+        MAX_THRUSTER_DURABILITY,
+      ),
+    ),
+  );
   rebuildWorldBodyByName();
 }
 
@@ -356,7 +418,11 @@ export function getSpaceshipDto(securityCode: string): SpaceshipDto {
     speed: Math.round(speed).toString(),
     velocity: relativeVelocity,
     motionState: store.get(spaceshipMotionStateAtom),
-    stats: { fuelKns: getSpaceshipFuelKns() },
+    stats: {
+      fuelKns: getSpaceshipFuelKns(),
+      hullDurability: store.get(spaceshipHullDurabilityAtom),
+      thrusterDurability: store.get(spaceshipThrusterDurabilityAtom),
+    },
     simulatedAt: new Date().toISOString(),
   };
 }
@@ -543,7 +609,8 @@ export function startSpaceshipEngines(
     targetSpeed < 0 ||
     !Number.isFinite(maximumThrustPercent) ||
     maximumThrustPercent <= 0 ||
-    maximumThrustPercent > 100
+    maximumThrustPercent > 100 ||
+    !hasWorkingSpaceshipThruster()
   ) {
     return false;
   }
@@ -571,7 +638,8 @@ export function startSpaceshipEngines(
     (Math.hypot(acceleration.x, acceleration.y) * SPACESHIP_MASS_KG) / 1_000;
   if (
     requiredThrustKilonewtons > MAX_ENGINE_THRUST_KN ||
-    store.get(spaceshipFuelKnsAtom) <= 0
+    store.get(spaceshipFuelKnsAtom) <= 0 ||
+    !hasAvailableThrusterForAcceleration(acceleration)
   ) {
     return false;
   }
@@ -805,7 +873,8 @@ export function setSpaceshipManualThrust(direction?: Vector, powerPercent = 0) {
     !Number.isFinite(powerPercent) ||
     powerPercent > 100 ||
     store.get(spaceshipMotionStateAtom) === 'crashed' ||
-    store.get(spaceshipFuelKnsAtom) <= 0
+    store.get(spaceshipFuelKnsAtom) <= 0 ||
+    !hasWorkingSpaceshipThruster()
   ) {
     spaceshipManualAcceleration = undefined;
     return false;
@@ -820,6 +889,10 @@ export function setSpaceshipManualThrust(direction?: Vector, powerPercent = 0) {
     x: (direction.x / magnitude) * acceleration,
     y: (direction.y / magnitude) * acceleration,
   };
+  if (!hasAvailableThrusterForAcceleration(spaceshipManualAcceleration)) {
+    spaceshipManualAcceleration = undefined;
+    return false;
+  }
   spaceshipVelocity ??= getInitialSpaceshipWorldVelocity();
   spaceshipWorldPosition ??= toVector(
     getWorldPosition(spaceshipState.position),
@@ -1138,6 +1211,7 @@ function getSimulatedBodyNames(bodyByName: Map<string, Body>) {
 }
 
 function advanceSpaceshipMotion(elapsedSeconds: number) {
+  wearSpaceshipHull(elapsedSeconds);
   const sources = getGravitySources();
   if (sources.length === 0) return undefined;
 
@@ -1148,6 +1222,7 @@ function advanceSpaceshipMotion(elapsedSeconds: number) {
     updateSpaceshipBurnAcceleration();
     const surfaceThrustAcceleration =
       spaceshipBurn?.acceleration ?? spaceshipManualAcceleration;
+    const surfaceThrusters = getActiveThrusters(surfaceThrustAcceleration);
     const bodyVelocity = getCelestialBodyWorldVelocity(
       spaceshipAttachedBodyName,
       new Set(),
@@ -1161,10 +1236,13 @@ function advanceSpaceshipMotion(elapsedSeconds: number) {
     store.set(spaceshipSpeedAtom, 0);
     if (
       store.get(spaceshipMotionStateAtom) !== 'landed' ||
-      !surfaceThrustAcceleration ||
-      !tryLaunchSpaceshipFromSurface(sources, surfaceThrustAcceleration)
+      !surfaceThrusters ||
+      !tryLaunchSpaceshipFromSurface(
+        sources,
+        surfaceThrusters.effectiveAcceleration,
+      )
     ) {
-      consumeSurfaceThrusterFuel(elapsedSeconds, surfaceThrustAcceleration);
+      consumeSurfaceThrusterFuel(elapsedSeconds, surfaceThrusters);
       return spaceshipWorldPosition;
     }
   }
@@ -1182,35 +1260,52 @@ function advanceSpaceshipMotion(elapsedSeconds: number) {
     spaceshipManualAcceleration ??
     spaceshipAutoOrbitAcceleration ??
     spaceshipFallingSpeedAcceleration ?? { x: 0, y: 0 };
-  const thrustKilonewtons =
-    (Math.hypot(thrustAcceleration.x, thrustAcceleration.y) *
-      SPACESHIP_MASS_KG) /
-    1_000;
+  const activeThrusters = getActiveThrusters(thrustAcceleration);
+  if (
+    Math.hypot(thrustAcceleration.x, thrustAcceleration.y) > 0 &&
+    !activeThrusters
+  ) {
+    spaceshipBurn = undefined;
+    spaceshipManualAcceleration = undefined;
+    stopSpaceshipAutoOrbit();
+    stopSpaceshipFallingSpeedControl();
+  }
+  const effectiveThrustKilonewtons = activeThrusters?.totalKilonewtons ?? 0;
+  const effectiveThrustAcceleration =
+    activeThrusters?.effectiveAcceleration ?? {
+      x: 0,
+      y: 0,
+    };
   const availableFuelKns = store.get(spaceshipFuelKnsAtom);
   const fuelSeconds =
-    thrustKilonewtons > 0
-      ? availableFuelKns / thrustKilonewtons
+    effectiveThrustKilonewtons > 0
+      ? availableFuelKns / effectiveThrustKilonewtons
       : Number.POSITIVE_INFINITY;
+  const durabilitySeconds = activeThrusters?.availableSeconds ?? 0;
   const requestedBurnSeconds = spaceshipBurn
     ? Math.min(
         elapsedSeconds,
         spaceshipBurn.durationSeconds - spaceshipBurn.elapsedSeconds,
         fuelSeconds,
+        durabilitySeconds,
       )
     : spaceshipManualAcceleration ||
         store.get(spaceshipAutoOrbitAtom).active ||
         store.get(spaceshipFallingSpeedControlAtom).active
-      ? Math.min(elapsedSeconds, fuelSeconds)
+      ? Math.min(elapsedSeconds, fuelSeconds, durabilitySeconds)
       : 0;
   const burnSeconds = integrateSpaceship(
     requestedBurnSeconds,
-    thrustAcceleration,
+    effectiveThrustAcceleration,
     sources,
   );
+  if (activeThrusters) {
+    wearSpaceshipThrusters(activeThrusters.thrustByIndex, burnSeconds);
+  }
 
   const remainingFuelKns = Math.max(
     0,
-    availableFuelKns - thrustKilonewtons * burnSeconds,
+    availableFuelKns - effectiveThrustKilonewtons * burnSeconds,
   );
   if (remainingFuelKns !== availableFuelKns) {
     store.set(spaceshipFuelKnsAtom, remainingFuelKns);
@@ -1355,17 +1450,22 @@ function tryLaunchSpaceshipFromSurface(
 
 function consumeSurfaceThrusterFuel(
   elapsedSeconds: number,
-  thrustAcceleration?: Vector,
+  activeThrusters?: ActiveThrusters,
 ) {
-  if (!thrustAcceleration) return;
-  const thrustKilonewtons =
-    (Math.hypot(thrustAcceleration.x, thrustAcceleration.y) *
-      SPACESHIP_MASS_KG) /
-    1_000;
+  if (!activeThrusters) {
+    spaceshipBurn = undefined;
+    spaceshipManualAcceleration = undefined;
+    return;
+  }
+  const burnSeconds = Math.min(
+    elapsedSeconds,
+    activeThrusters.availableSeconds,
+  );
+  wearSpaceshipThrusters(activeThrusters.thrustByIndex, burnSeconds);
   const availableFuelKns = store.get(spaceshipFuelKnsAtom);
   const remainingFuelKns = Math.max(
     0,
-    availableFuelKns - thrustKilonewtons * elapsedSeconds,
+    availableFuelKns - activeThrusters.totalKilonewtons * burnSeconds,
   );
   store.set(spaceshipFuelKnsAtom, remainingFuelKns);
   if (remainingFuelKns <= 0) {
@@ -1899,6 +1999,7 @@ function attachSpaceshipToBody(collision: CelestialBodyCollision) {
   if (motionState === 'crashed') {
     spaceshipBurn = undefined;
     spaceshipManualAcceleration = undefined;
+    store.set(spaceshipHullDurabilityAtom, 0);
   }
   lastSpaceshipBurnReachedTarget = false;
   store.set(spaceshipAutoOrbitAtom, { active: false });
@@ -1911,6 +2012,96 @@ function attachSpaceshipToBody(collision: CelestialBodyCollision) {
   store.set(spaceshipSpeedAtom, 0);
   store.set(spaceshipMotionStateAtom, motionState);
   if (motionState === 'crashed') setSpaceshipTargetDirection(undefined);
+}
+
+function clampDurability(value: number | undefined, maximum: number) {
+  return Number.isFinite(value)
+    ? Math.min(maximum, Math.max(0, value as number))
+    : maximum;
+}
+
+function wearSpaceshipHull(elapsedSeconds: number) {
+  const current = store.get(spaceshipHullDurabilityAtom);
+  if (current <= 0) return;
+  store.set(
+    spaceshipHullDurabilityAtom,
+    Math.max(0, current - (elapsedSeconds / (30 * 60)) * 0.01),
+  );
+}
+
+function wearSpaceshipThrusters(
+  thrustByIndex: readonly number[],
+  elapsedSeconds: number,
+) {
+  if (elapsedSeconds <= 0) return;
+  const current = store.get(spaceshipThrusterDurabilityAtom);
+  store.set(
+    spaceshipThrusterDurabilityAtom,
+    current.map((durability, index) =>
+      Math.max(
+        0,
+        durability - ((thrustByIndex[index] ?? 0) / 100) * 0.1 * elapsedSeconds,
+      ),
+    ),
+  );
+}
+
+function hasWorkingSpaceshipThruster() {
+  return store
+    .get(spaceshipThrusterDurabilityAtom)
+    .some((durability) => durability > 0);
+}
+
+type ActiveThrusters = {
+  availableSeconds: number;
+  effectiveAcceleration: Vector;
+  thrustByIndex: number[];
+  totalKilonewtons: number;
+};
+
+function getActiveThrusters(
+  acceleration?: Vector,
+): ActiveThrusters | undefined {
+  if (!acceleration) return undefined;
+  const durability = store.get(spaceshipThrusterDurabilityAtom);
+  const thrustByIndex = Array<number>(SPACESHIP_THRUSTER_COUNT).fill(0);
+  const effectiveAcceleration = { x: 0, y: 0 };
+  const xIndex = acceleration.x < 0 ? 1 : 3;
+  const yIndex = acceleration.y < 0 ? 2 : 0;
+
+  if (Math.abs(acceleration.x) > 1e-8 && durability[xIndex] > 0) {
+    effectiveAcceleration.x = acceleration.x;
+    thrustByIndex[xIndex] =
+      (Math.abs(acceleration.x) * SPACESHIP_MASS_KG) / 1_000;
+  }
+  if (Math.abs(acceleration.y) > 1e-8 && durability[yIndex] > 0) {
+    effectiveAcceleration.y = acceleration.y;
+    thrustByIndex[yIndex] =
+      (Math.abs(acceleration.y) * SPACESHIP_MASS_KG) / 1_000;
+  }
+
+  const activeIndexes = thrustByIndex
+    .map((thrust, index) => ({ index, thrust }))
+    .filter(({ thrust }) => thrust > 0);
+  if (activeIndexes.length === 0) return undefined;
+
+  return {
+    effectiveAcceleration,
+    thrustByIndex,
+    totalKilonewtons: activeIndexes.reduce(
+      (total, { thrust }) => total + thrust,
+      0,
+    ),
+    availableSeconds: Math.min(
+      ...activeIndexes.map(
+        ({ index, thrust }) => durability[index] / ((thrust / 100) * 0.1),
+      ),
+    ),
+  };
+}
+
+function hasAvailableThrusterForAcceleration(acceleration: Vector) {
+  return getActiveThrusters(acceleration) !== undefined;
 }
 
 function findNearbyPlanetTarget() {

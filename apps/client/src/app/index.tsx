@@ -1,14 +1,12 @@
 import { useCallback, useRef, useState } from 'react';
-import { useAtom } from 'jotai';
-import { Footer, Navigator, SpaceshipHull, StartMenu } from '@components';
-import { activeViewAtom, useBootstrap, type BootstrapRequest } from '@store';
+import { Footer, Navigator, StartMenu } from '@components';
+import { useBootstrap, type BootstrapRequest } from '@store';
 import style from './style.module.css';
 
 export default function App() {
   const [bootstrapRequest, setBootstrapRequest] =
     useState<BootstrapRequest | null>(null);
   const bootstrapState = useBootstrap(bootstrapRequest);
-  const [activeView, setActiveView] = useAtom(activeViewAtom);
   const [isEngineRunning, setIsEngineRunning] = useState(false);
   const [isSelectingTargetDirection, setIsSelectingTargetDirection] =
     useState(false);
@@ -77,26 +75,19 @@ export default function App() {
 
   return (
     <div className={style.app}>
-      <div className={style.view} hidden={activeView !== 'navigation'}>
-        <Navigator
-          onSceneChange={handleSceneChange}
-          onSpaceshipEngineChange={setIsEngineRunning}
-          isSelectingTargetDirection={isSelectingTargetDirection}
-          onTargetDirectionSelected={handleTargetDirectionSelected}
-        />
-      </div>
-      <div className={style.view} hidden={activeView !== 'ship'}>
-        <SpaceshipHull />
-      </div>
+      <Navigator
+        onSceneChange={handleSceneChange}
+        onSpaceshipEngineChange={setIsEngineRunning}
+        isSelectingTargetDirection={isSelectingTargetDirection}
+        onTargetDirectionSelected={handleTargetDirectionSelected}
+      />
       <Footer
-        activeView={activeView}
         isEngineRunning={isEngineRunning}
         onStartEngines={startEngines}
         onStopEngines={stopEngines}
         onManualThrustChange={setManualThrust}
         isSelectingTargetDirection={isSelectingTargetDirection}
         onToggleTargetDirectionSelection={toggleTargetDirectionSelection}
-        onViewChange={setActiveView}
       />
     </div>
   );

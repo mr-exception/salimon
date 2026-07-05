@@ -3,3 +3,14 @@
   display: flex;
   height: 100vh;
 }
+
+.view {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.view[hidden] {
+  display: none;
+}

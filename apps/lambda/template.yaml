@@ -107,6 +107,27 @@ Resources:
             RetryPolicy:
               MaximumRetryAttempts: 2
 
+  UpdateSpaceshipsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/update-spaceships.zip
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      MemorySize: 256
+      Timeout: 30
+      Environment:
+        Variables:
+          MONGODB_URI: !Ref MongoDbUri
+      Events:
+        UpdateOldestSpaceships:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: cron(0/5 * * * ? *)
+            RetryPolicy:
+              MaximumRetryAttempts: 2
+
   RegisterSpaceshipFunction:
     Type: AWS::Serverless::Function
     Properties:

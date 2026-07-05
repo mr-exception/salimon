@@ -211,12 +211,8 @@ export async function propagateOfflineSpaceship(
     (simulatedAt.getTime() - previousSimulationTime.getTime()) / 1_000,
   );
   const referenceName = spaceship.position.relativeTo;
-  if (elapsedSeconds === 0 || !referenceName) return spaceship;
+  if (elapsedSeconds === 0) return spaceship;
 
-  const body = await findReferenceBody(referenceName);
-  if (!body) return spaceship;
-
-  const collisionRadius = Number(body.radius) + SPACESHIP_RADIUS_METERS;
   const initialMotion: Motion = {
     position: {
       x: Number(spaceship.position.x),
@@ -228,7 +224,26 @@ export async function propagateOfflineSpaceship(
     spaceship.motionState ?? (spaceship.speed === '0' ? 'landed' : 'flying');
 
   let update;
-  if (motionState !== 'flying') {
+  const body = referenceName
+    ? await findReferenceBody(referenceName)
+    : undefined;
+  if (referenceName && !body) return spaceship;
+
+  if (!body) {
+    const motion =
+      motionState === 'flying'
+        ? {
+            position: add(
+              initialMotion.position,
+              initialMotion.velocity,
+              elapsedSeconds,
+            ),
+            velocity: initialMotion.velocity,
+          }
+        : initialMotion;
+    update = serializeMotion(spaceship, motionState, motion, simulatedAt);
+  } else if (motionState !== 'flying') {
+    const collisionRadius = Number(body.radius) + SPACESHIP_RADIUS_METERS;
     update = serializeMotion(
       spaceship,
       motionState,
@@ -244,6 +259,7 @@ export async function propagateOfflineSpaceship(
       simulatedAt,
     );
   } else {
+    const collisionRadius = Number(body.radius) + SPACESHIP_RADIUS_METERS;
     const stepCount = Math.min(
       MAX_PROPAGATION_STEPS,
       Math.max(1, Math.ceil(elapsedSeconds / TARGET_STEP_SECONDS)),

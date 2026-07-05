@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "commonjs",
   "scripts": {
-    "build": "rm -rf dist && for function in systems update-planets update-moons update-stars register-spaceship spaceship-info update-spaceship; do mkdir -p \"dist/$function\"; esbuild \"src/functions/$function.ts\" --bundle --platform=node --target=node22 --format=cjs --outfile=\"dist/$function/index.js\"; (cd \"dist/$function\" && zip -q \"../$function.zip\" index.js); rm -rf \"dist/$function\"; done",
+    "build": "rm -rf dist && for function in systems update-planets update-moons update-stars update-spaceships register-spaceship spaceship-info update-spaceship; do mkdir -p \"dist/$function\"; esbuild \"src/functions/$function.ts\" --bundle --platform=node --target=node22 --format=cjs --outfile=\"dist/$function/index.js\"; (cd \"dist/$function\" && zip -q \"../$function.zip\" index.js); rm -rf \"dist/$function\"; done",
     "check-types": "tsc --noEmit",
     "lint": "eslint ."
   },

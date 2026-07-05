@@ -4,10 +4,10 @@ AWS Lambda backend for Salimon. Each HTTP endpoint is implemented by a
 dedicated handler under `src/functions`.
 
 `npm run build --workspace lambda` produces deployable archives for the
-systems API and the planet, moon, and star position updaters. Each archive has
-its deployable handler as `index.js` at its root. esbuild bundles the handlers
-and their runtime npm dependencies into `index.js`; development-only and
-type-only packages are not shipped.
+systems API and the planet, moon, star, and spaceship position updaters. Each
+archive has its deployable handler as `index.js` at its root. esbuild bundles
+the handlers and their runtime npm dependencies into `index.js`;
+development-only and type-only packages are not shipped.
 
 `GET /world/systems` accepts a search center and radius in meters:
 
@@ -42,22 +42,22 @@ numbers in meters per second, and `motionState` is `flying`, `landed`, or
 `crashed`. Persistent ship stats are grouped under `stats`; `stats.fuelKns`
 stores the remaining fuel in kilonewton-seconds.
 
-Spaceships stored relative to a planet or star include a simulation timestamp.
-On the next info request, the Lambda advances flying ships under the reference
-body's gravity with bounded integration steps and swept collision detection.
-Impacts above 15 m/s are stored as crashes; slower impacts are landings.
-Landed and crashed surface positions rotate with the reference body. This
-catch-up is performed only when the spaceship is requested, so offline players
-do not require scheduled Lambda invocations.
+Spaceships include a simulation timestamp. The info route and scheduled
+spaceship updater advance flying ships under a reference body's gravity with
+bounded integration steps and swept collision detection. Ships without a
+reference body move inertially using their stored absolute velocity. Impacts
+above 15 m/s are stored as crashes; slower impacts are landings. Landed and
+crashed surface positions rotate with the reference body.
 
-Separate planet, moon, and star updaters run every five minutes. Each selects
-at most 100 bodies of its type with the oldest `updatedAt` dates, calculates
-elapsed time from the EventBridge Scheduler invocation time, and rotates each
-position around its orbital center using its `speed` and `clockwise`
-attributes. Planets are records whose orbital center exists in `stars`; moons
-are records whose orbital center exists in `planets`. Updates include the
-previously read `updatedAt` value as a concurrency check, preventing
-overlapping invocations from applying the same movement twice.
+Separate planet, moon, star, and spaceship updaters run every five minutes.
+Each selects at most 100 of the oldest records of its type and calculates
+elapsed time from the EventBridge Scheduler invocation time. Celestial body
+positions rotate around their orbital centers using their `speed` and
+`clockwise` attributes. Planets are records whose orbital center exists in
+`stars`; moons are records whose orbital center exists in `planets`.
+Spaceships use the same propagation performed by the info route. Updates
+include concurrency checks, preventing overlapping invocations or client
+updates from applying movement twice.
 
 ## Local development
 

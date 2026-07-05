@@ -24,6 +24,7 @@ export type ContactMessageDocument = {
   sender: ContactMessageSender;
   text: string;
   status: ContactMessageStatus;
+  isRead: boolean;
   clientMessageId?: string;
   createdAt: Date;
 };
@@ -58,6 +59,14 @@ export async function getContactMessagesCollection() {
   messageIndexesPromise ??= collection.createIndexes([
     {
       key: { spaceshipSecurityCode: 1, contactId: 1, createdAt: 1, _id: 1 },
+    },
+    {
+      key: {
+        spaceshipSecurityCode: 1,
+        sender: 1,
+        isRead: 1,
+        createdAt: 1,
+      },
     },
     {
       key: { spaceshipSecurityCode: 1, contactId: 1, clientMessageId: 1 },
@@ -104,6 +113,7 @@ export async function initializeSpaceshipContacts(
         sender: 'contact',
         text: INITIAL_CHIEF_MESSAGE,
         status: 'sent',
+        isRead: false,
         clientMessageId: 'initial-briefing',
         createdAt: now,
       },
@@ -146,6 +156,7 @@ export function toMessageDto(message: ContactMessageDocument) {
     sender: message.sender,
     text: message.text,
     status: message.status,
+    isRead: message.isRead,
     createdAt: message.createdAt.toISOString(),
   };
 }

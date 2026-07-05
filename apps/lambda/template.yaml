@@ -260,6 +260,27 @@ Resources:
             Method: GET
             Path: /contacts/messages
 
+  UnreadContactMessagesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/unread-contact-messages.zip
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      MemorySize: 256
+      Timeout: 10
+      Environment:
+        Variables:
+          MONGODB_URI: !Ref MongoDbUri
+      Events:
+        GetUnreadContactMessages:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Method: GET
+            Path: /contacts/messages/unread
+
   SendContactMessageFunction:
     Type: AWS::Serverless::Function
     Properties:

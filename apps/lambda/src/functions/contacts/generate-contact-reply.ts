@@ -98,6 +98,7 @@ async function generateReply(job: ReplyJob) {
     sender: 'contact',
     text: text.slice(0, 2_000),
     status: 'sent',
+    isRead: false,
     clientMessageId: `reply:${job.playerMessageId}`,
     createdAt: new Date(),
   };

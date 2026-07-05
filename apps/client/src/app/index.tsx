@@ -1,7 +1,26 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import axios from 'axios';
 import { Communications, Footer, Navigator, StartMenu } from '@components';
-import { useBootstrap, type BootstrapRequest } from '@store';
+import {
+  getApiBaseUrl,
+  getStoredSpaceshipSecurityCode,
+  SECURITY_CODE_HEADER,
+  useBootstrap,
+  type BootstrapRequest,
+} from '@store';
 import style from './style.module.css';
+
+type UnreadMessage = {
+  id: string;
+  contactId: string;
+  sender: 'player' | 'contact';
+  text: string;
+  status: 'sent' | 'queued' | 'failed';
+  isRead: boolean;
+  createdAt: string;
+};
+
+const UNREAD_POLL_MS = 30_000;
 
 export default function App() {
   const [bootstrapRequest, setBootstrapRequest] =
@@ -9,6 +28,7 @@ export default function App() {
   const bootstrapState = useBootstrap(bootstrapRequest);
   const [isEngineRunning, setIsEngineRunning] = useState(false);
   const [isCommunicationsOpen, setIsCommunicationsOpen] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState<UnreadMessage[]>([]);
   const [isSelectingTargetDirection, setIsSelectingTargetDirection] =
     useState(false);
   const sceneRef = useRef<{
@@ -64,6 +84,51 @@ export default function App() {
   const handleTargetDirectionSelected = useCallback(() => {
     setIsSelectingTargetDirection(false);
   }, []);
+  const handleMessagesRead = useCallback((messageIds: string[]) => {
+    if (messageIds.length === 0) return;
+    const readIds = new Set(messageIds);
+    setUnreadMessages((current) =>
+      current.filter((message) => !readIds.has(message.id)),
+    );
+  }, []);
+
+  useEffect(() => {
+    if (bootstrapState !== 'ready') return;
+    const securityCode = getStoredSpaceshipSecurityCode();
+    if (!securityCode) return;
+
+    let disposed = false;
+    let timer: number | undefined;
+    const pollUnreadMessages = async () => {
+      if (disposed) return;
+      if (!document.hidden && navigator.onLine) {
+        try {
+          const { data } = await axios.get<{ messages: UnreadMessage[] }>(
+            `${getApiBaseUrl()}/contacts/messages/unread`,
+            { headers: { [SECURITY_CODE_HEADER]: securityCode } },
+          );
+          if (!disposed) setUnreadMessages(data.messages);
+        } catch (error) {
+          console.error('Failed to load unread messages', error);
+        }
+      }
+      timer = window.setTimeout(pollUnreadMessages, UNREAD_POLL_MS);
+    };
+    const pollNow = () => {
+      window.clearTimeout(timer);
+      void pollUnreadMessages();
+    };
+
+    void pollUnreadMessages();
+    document.addEventListener('visibilitychange', pollNow);
+    window.addEventListener('online', pollNow);
+    return () => {
+      disposed = true;
+      window.clearTimeout(timer);
+      document.removeEventListener('visibilitychange', pollNow);
+      window.removeEventListener('online', pollNow);
+    };
+  }, [bootstrapState]);
 
   if (bootstrapState !== 'ready') {
     return (
@@ -88,11 +153,16 @@ export default function App() {
         onStopEngines={stopEngines}
         onManualThrustChange={setManualThrust}
         onOpenCommunications={() => setIsCommunicationsOpen(true)}
+        unreadMessageCount={unreadMessages.length}
         isSelectingTargetDirection={isSelectingTargetDirection}
         onToggleTargetDirectionSelection={toggleTargetDirectionSelection}
       />
       {isCommunicationsOpen && (
-        <Communications onClose={() => setIsCommunicationsOpen(false)} />
+        <Communications
+          unreadMessages={unreadMessages}
+          onMessagesRead={handleMessagesRead}
+          onClose={() => setIsCommunicationsOpen(false)}
+        />
       )}
     </div>
   );

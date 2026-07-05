@@ -21,11 +21,14 @@ type Message = {
   sender: 'player' | 'contact';
   text: string;
   status: 'sent' | 'queued' | 'failed';
+  isRead: boolean;
   createdAt: string;
 };
 
 type Props = {
   onClose: () => void;
+  unreadMessages: Message[];
+  onMessagesRead: (messageIds: string[]) => void;
 };
 
 const MESSAGE_POLL_MS = 5_000;
@@ -40,7 +43,11 @@ function mergeMessages(current: Message[], incoming: Message[]) {
   );
 }
 
-export function Communications({ onClose }: Props) {
+export function Communications({
+  onClose,
+  unreadMessages,
+  onMessagesRead,
+}: Props) {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [selectedContactId, setSelectedContactId] = useState<string>();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -59,7 +66,6 @@ export function Communications({ onClose }: Props) {
       { headers: { [SECURITY_CODE_HEADER]: securityCode } },
     );
     setContacts(data.contacts);
-    setSelectedContactId((current) => current ?? data.contacts[0]?.id);
   }, [securityCode]);
 
   const loadMessages = useCallback(
@@ -75,10 +81,15 @@ export function Communications({ onClose }: Props) {
       setMessages((current) =>
         after ? mergeMessages(current, data.messages) : data.messages,
       );
+      onMessagesRead(
+        data.messages
+          .filter((message) => message.sender === 'contact')
+          .map((message) => message.id),
+      );
       cursorRef.current = data.cursor;
       setError('');
     },
-    [securityCode],
+    [onMessagesRead, securityCode],
   );
 
   useEffect(() => {
@@ -191,6 +202,11 @@ export function Communications({ onClose }: Props) {
   const selectedContact = contacts.find(
     (contact) => contact.id === selectedContactId,
   );
+  const unreadCountByContact = unreadMessages.reduce<Map<string, number>>(
+    (counts, message) =>
+      counts.set(message.contactId, (counts.get(message.contactId) ?? 0) + 1),
+    new Map(),
+  );
 
   return (
     <div className={style.backdrop} role="presentation">
@@ -212,22 +228,26 @@ export function Communications({ onClose }: Props) {
 
         <div className={style.content}>
           <nav className={style.contacts} aria-label="Known contacts">
-            {contacts.map((contact) => (
-              <button
-                type="button"
-                key={contact.id}
-                data-active={contact.id === selectedContactId}
-                onClick={() => setSelectedContactId(contact.id)}
-              >
-                <span>{contact.name}</span>
-                <small>{contact.organization}</small>
-                {contact.unreadCount > 0 && (
-                  <strong aria-label={`${contact.unreadCount} unread`}>
-                    {contact.unreadCount}
-                  </strong>
-                )}
-              </button>
-            ))}
+            {contacts.map((contact) => {
+              const unreadCount = unreadCountByContact.get(contact.id) ?? 0;
+              return (
+                <button
+                  type="button"
+                  key={contact.id}
+                  data-active={contact.id === selectedContactId}
+                  data-unread={unreadCount > 0}
+                  onClick={() => setSelectedContactId(contact.id)}
+                >
+                  <span>{contact.name}</span>
+                  <small>{contact.organization}</small>
+                  {unreadCount > 0 && (
+                    <strong aria-label={`${unreadCount} unread`}>
+                      {unreadCount}
+                    </strong>
+                  )}
+                </button>
+              );
+            })}
           </nav>
 
           <div className={style.conversation}>

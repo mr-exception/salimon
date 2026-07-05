@@ -49,6 +49,7 @@ type FooterProps = {
     power: number,
   ) => void;
   onOpenCommunications?: () => void;
+  unreadMessageCount?: number;
   onToggleTargetDirectionSelection?: () => void;
 };
 
@@ -262,6 +263,7 @@ export function Footer({
   onStopEngines,
   onManualThrustChange,
   onOpenCommunications,
+  unreadMessageCount = 0,
   onToggleTargetDirectionSelection,
 }: FooterProps) {
   const speed = useSpaceshipSpeed();
@@ -484,10 +486,19 @@ export function Footer({
           <button
             className={style.controlTab}
             type="button"
-            aria-label="Communications"
+            aria-label={
+              unreadMessageCount > 0
+                ? `Communications, ${unreadMessageCount} unread messages`
+                : 'Communications'
+            }
             onClick={onOpenCommunications}
           >
             <CommunicationsIcon />
+            {unreadMessageCount > 0 && (
+              <strong className={style.unreadBadge} aria-hidden="true">
+                {unreadMessageCount > 99 ? '99+' : unreadMessageCount}
+              </strong>
+            )}
             <span className={style.tooltip} role="tooltip">
               Communications
             </span>

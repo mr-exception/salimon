@@ -322,6 +322,24 @@
   stroke-width: 1.7;
 }
 
+.unreadBadge {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  display: grid;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 3px;
+  place-items: center;
+  border: 2px solid var(--color-deep-space);
+  border-radius: 12px;
+  background: #ef4444;
+  color: white;
+  font-size: 0.58rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
 .tooltip {
   position: absolute;
   top: calc(100% + 7px);

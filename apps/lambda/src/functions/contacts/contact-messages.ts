@@ -7,7 +7,6 @@ import {
   decodeMessageCursor,
   encodeMessageCursor,
   getContactMessagesCollection,
-  getContactsCollection,
   hasContact,
   toMessageDto,
   type ContactMessageDocument,
@@ -62,13 +61,25 @@ export async function handler(
       .limit(limit)
       .toArray();
 
-    if (messages.some((message) => message.sender === 'contact')) {
+    const unreadMessageIds = messages
+      .filter(
+        (message) => message.sender === 'contact' && message.isRead !== true,
+      )
+      .map((message) => message._id);
+    if (unreadMessageIds.length > 0) {
       await (
-        await getContactsCollection()
-      ).updateOne(
-        { spaceshipSecurityCode: securityCode, contactId },
-        { $set: { lastReadAt: new Date() } },
+        await getContactMessagesCollection()
+      ).updateMany(
+        {
+          spaceshipSecurityCode: securityCode,
+          contactId,
+          _id: { $in: unreadMessageIds },
+        },
+        { $set: { isRead: true } },
       );
+      messages.forEach((message) => {
+        if (unreadMessageIds.includes(message._id)) message.isRead = true;
+      });
     }
 
     return jsonResponse(200, {

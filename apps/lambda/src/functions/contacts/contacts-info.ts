@@ -55,9 +55,7 @@ export async function handler(
               spaceshipSecurityCode: securityCode,
               contactId: contact.contactId,
               sender: 'contact',
-              ...(contact.lastReadAt
-                ? { createdAt: { $gt: contact.lastReadAt } }
-                : {}),
+              isRead: { $ne: true },
             }),
           ]);
           return [

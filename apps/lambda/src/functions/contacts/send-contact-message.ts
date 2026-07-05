@@ -111,6 +111,7 @@ export async function handler(
       sender: 'player',
       text,
       status: 'queued',
+      isRead: true,
       clientMessageId,
       createdAt: new Date(),
     };

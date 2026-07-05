@@ -85,6 +85,15 @@
   background: color-mix(in srgb, var(--color-plasma-cyan) 12%, transparent);
 }
 
+.contacts button[data-unread='true'] {
+  box-shadow: inset 3px 0 var(--color-plasma-cyan);
+  background: color-mix(in srgb, var(--color-plasma-cyan) 8%, transparent);
+}
+
+.contacts button[data-active='true'][data-unread='true'] {
+  background: color-mix(in srgb, var(--color-plasma-cyan) 16%, transparent);
+}
+
 .contacts button small {
   padding-right: 24px;
   color: color-mix(in srgb, var(--color-starlight) 52%, transparent);

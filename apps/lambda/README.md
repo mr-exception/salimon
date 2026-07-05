@@ -43,11 +43,12 @@ numbers in meters per second, and `motionState` is `flying`, `landed`, or
 stores the remaining fuel in kilonewton-seconds.
 
 Spaceships include a simulation timestamp. The info route and scheduled
-spaceship updater advance flying ships under a reference body's gravity with
-bounded integration steps and swept collision detection. Ships without a
-reference body move inertially using their stored absolute velocity. Impacts
-above 15 m/s are stored as crashes; slower impacts are landings. Landed and
-crashed surface positions rotate with the reference body.
+spaceship updater advance flying ships under the time-dependent gravity of all
+celestial bodies with bounded integration steps and swept collision detection.
+Celestial positions are reconstructed for each simulation time from their
+stored orbital state. Impacts above 15 m/s are stored as crashes; slower
+impacts are landings. Landed and crashed surface positions rotate with the
+reference body.
 
 Separate planet, moon, star, and spaceship updaters run every five minutes.
 Each selects at most 100 of the oldest records of its type and calculates

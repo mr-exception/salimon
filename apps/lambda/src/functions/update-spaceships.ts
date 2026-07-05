@@ -1,6 +1,9 @@
 import type { ScheduledEvent } from 'aws-lambda';
 import type { WithId } from 'mongodb';
-import { propagateOfflineSpaceship } from '../offline-spaceship';
+import {
+  loadOfflineWorld,
+  propagateOfflineSpaceship,
+} from '../offline-spaceship';
 import { getSpaceshipsCollection, type SpaceshipDocument } from '../spaceship';
 
 const SPACESHIP_BATCH_SIZE = 100;
@@ -26,9 +29,14 @@ export async function handler(event: ScheduledEvent) {
     .limit(SPACESHIP_BATCH_SIZE)
     .toArray();
 
+  if (oldestSpaceships.length === 0) {
+    return { selected: 0, processed: 0 };
+  }
+
+  const world = await loadOfflineWorld();
   await Promise.all(
     oldestSpaceships.map((spaceship: WithId<SpaceshipDocument>) =>
-      propagateOfflineSpaceship(spaceship, invocationTime),
+      propagateOfflineSpaceship(spaceship, invocationTime, world),
     ),
   );
 

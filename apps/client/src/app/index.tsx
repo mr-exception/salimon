@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import { Footer, Navigator, StartMenu } from '@components';
+import { Communications, Footer, Navigator, StartMenu } from '@components';
 import { useBootstrap, type BootstrapRequest } from '@store';
 import style from './style.module.css';
 
@@ -8,6 +8,7 @@ export default function App() {
     useState<BootstrapRequest | null>(null);
   const bootstrapState = useBootstrap(bootstrapRequest);
   const [isEngineRunning, setIsEngineRunning] = useState(false);
+  const [isCommunicationsOpen, setIsCommunicationsOpen] = useState(false);
   const [isSelectingTargetDirection, setIsSelectingTargetDirection] =
     useState(false);
   const sceneRef = useRef<{
@@ -86,9 +87,13 @@ export default function App() {
         onStartEngines={startEngines}
         onStopEngines={stopEngines}
         onManualThrustChange={setManualThrust}
+        onOpenCommunications={() => setIsCommunicationsOpen(true)}
         isSelectingTargetDirection={isSelectingTargetDirection}
         onToggleTargetDirectionSelection={toggleTargetDirectionSelection}
       />
+      {isCommunicationsOpen && (
+        <Communications onClose={() => setIsCommunicationsOpen(false)} />
+      )}
     </div>
   );
 }

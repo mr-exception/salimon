@@ -73,15 +73,24 @@ This premise establishes the following feature areas:
    - Reveals information through gameplay without contradicting the canon
      above.
 
+6. **Communications**
+   - Provides persistent text conversations with known NPC contacts.
+   - Begins with the Chief of EASA, who delivers the mission briefing.
+   - Uses conversations to reveal lore and support the player's journey.
+   - See [Communications](communications.md) for the narrative and technical
+     design.
+
 ## Terms
 
-| Term          | Meaning                                                    |
-| ------------- | ---------------------------------------------------------- |
-| Absenat       | The destination named in the unknown being's message.      |
-| the Core      | Humanity's name for the energy cube.                       |
-| Unknown being | The entity that contacted humanity and delivered the Core. |
-| Oxygen (O2)   | A Core-produced resource used to sustain human life.       |
-| Electricity   | A Core-produced resource used to power the spaceship.      |
+| Term          | Meaning                                                              |
+| ------------- | -------------------------------------------------------------------- |
+| Absenat       | The destination named in the unknown being's message.                |
+| the Core      | Humanity's name for the energy cube.                                 |
+| Unknown being | The entity that contacted humanity and delivered the Core.           |
+| Oxygen (O2)   | A Core-produced resource used to sustain human life.                 |
+| Electricity   | A Core-produced resource used to power the spaceship.                |
+| EASA          | Earth Aeronautics and Space Administration.                          |
+| Chief of EASA | The player's first known contact and source of the mission briefing. |
 
 ## Open Design Questions
 

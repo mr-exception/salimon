@@ -1,0 +1,253 @@
+.backdrop {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(1 7 18 / 72%);
+  backdrop-filter: blur(5px);
+}
+
+.dialog {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: min(960px, 100%);
+  height: min(700px, 90vh);
+  overflow: hidden;
+  border: 1px solid var(--color-nebula-blue);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-deep-space) 96%, black);
+  box-shadow: 0 30px 90px rgb(0 0 0 / 65%);
+  color: var(--color-starlight);
+  font-family: system-ui, sans-serif;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-nebula-blue);
+}
+
+.header small,
+.contactHeading small {
+  color: color-mix(in srgb, var(--color-starlight) 55%, transparent);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.header h2 {
+  margin: 3px 0 0;
+  color: var(--color-plasma-cyan);
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.header button {
+  border: 0;
+  background: transparent;
+  color: var(--color-starlight);
+  cursor: pointer;
+  font-size: 1.8rem;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  min-height: 0;
+}
+
+.contacts {
+  overflow-y: auto;
+  border-right: 1px solid var(--color-nebula-blue);
+}
+
+.contacts button {
+  position: relative;
+  display: grid;
+  width: 100%;
+  gap: 5px;
+  padding: 15px;
+  border: 0;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-nebula-blue) 55%, transparent);
+  background: transparent;
+  color: var(--color-starlight);
+  cursor: pointer;
+  text-align: left;
+}
+
+.contacts button[data-active='true'] {
+  background: color-mix(in srgb, var(--color-plasma-cyan) 12%, transparent);
+}
+
+.contacts button small {
+  padding-right: 24px;
+  color: color-mix(in srgb, var(--color-starlight) 52%, transparent);
+  font-size: 0.65rem;
+}
+
+.contacts button strong {
+  position: absolute;
+  top: 16px;
+  right: 12px;
+  min-width: 18px;
+  padding: 2px;
+  border-radius: 20px;
+  background: var(--color-plasma-cyan);
+  color: var(--color-deep-space);
+  font-size: 0.65rem;
+  text-align: center;
+}
+
+.conversation {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+.contactHeading {
+  display: grid;
+  gap: 3px;
+  padding: 13px 18px;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-nebula-blue) 65%, transparent);
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  padding: 18px;
+}
+
+.message {
+  align-self: flex-start;
+  max-width: min(75%, 560px);
+  padding: 10px 12px;
+  border: 1px solid
+    color-mix(in srgb, var(--color-nebula-blue) 60%, transparent);
+  border-radius: 8px 8px 8px 2px;
+  background: color-mix(in srgb, var(--color-nebula-blue) 13%, transparent);
+}
+
+.message[data-sender='player'] {
+  align-self: flex-end;
+  border-color: color-mix(in srgb, var(--color-plasma-cyan) 45%, transparent);
+  border-radius: 8px 8px 2px;
+  background: color-mix(in srgb, var(--color-plasma-cyan) 10%, transparent);
+}
+
+.message p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.message small {
+  display: block;
+  margin-top: 5px;
+  color: color-mix(in srgb, var(--color-starlight) 45%, transparent);
+  font-size: 0.6rem;
+  text-align: right;
+}
+
+.notice,
+.error {
+  color: color-mix(in srgb, var(--color-starlight) 55%, transparent);
+  font-size: 0.72rem;
+}
+
+.composer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--color-nebula-blue);
+}
+
+.composer label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.composer textarea {
+  box-sizing: border-box;
+  min-height: 42px;
+  max-height: 110px;
+  resize: vertical;
+  padding: 10px;
+  border: 1px solid var(--color-nebula-blue);
+  border-radius: 6px;
+  outline: none;
+  background: rgb(0 0 0 / 25%);
+  color: var(--color-starlight);
+  font:
+    0.8rem/1.35 system-ui,
+    sans-serif;
+}
+
+.composer textarea:focus {
+  border-color: var(--color-plasma-cyan);
+}
+
+.composer button {
+  min-width: 84px;
+  border: 1px solid var(--color-plasma-cyan);
+  border-radius: 6px;
+  background: var(--color-plasma-cyan);
+  color: var(--color-deep-space);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.composer button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.error {
+  min-height: 1em;
+  margin: 0;
+  padding: 0 18px 10px;
+  color: #fca5a5;
+}
+
+@media (max-width: 700px) {
+  .backdrop {
+    padding: 0;
+  }
+
+  .dialog {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .content {
+    grid-template-columns: 110px minmax(0, 1fr);
+  }
+
+  .contacts button {
+    padding: 12px 8px;
+  }
+
+  .contacts button small {
+    display: none;
+  }
+
+  .message {
+    max-width: 88%;
+  }
+}

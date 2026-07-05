@@ -48,6 +48,7 @@ type FooterProps = {
     direction: { x: number; y: number } | undefined,
     power: number,
   ) => void;
+  onOpenCommunications?: () => void;
   onToggleTargetDirectionSelection?: () => void;
 };
 
@@ -251,6 +252,7 @@ export function Footer({
   onStartEngines,
   onStopEngines,
   onManualThrustChange,
+  onOpenCommunications,
   onToggleTargetDirectionSelection,
 }: FooterProps) {
   const speed = useSpaceshipSpeed();

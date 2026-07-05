@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "commonjs",
   "scripts": {
-    "build": "rm -rf dist && for function in systems update-planets update-moons update-stars update-spaceships register-spaceship spaceship-info update-spaceship; do mkdir -p \"dist/$function\"; esbuild \"src/functions/$function.ts\" --bundle --platform=node --target=node22 --format=cjs --outfile=\"dist/$function/index.js\"; (cd \"dist/$function\" && zip -q \"../$function.zip\" index.js); rm -rf \"dist/$function\"; done",
+    "build": "rm -rf dist && for function in systems update-planets update-moons update-stars update-spaceships register-spaceship spaceship-info update-spaceship contacts-info contact-messages send-contact-message generate-contact-reply; do mkdir -p \"dist/$function\"; esbuild \"src/functions/$function.ts\" --bundle --platform=node --target=node22 --format=cjs --outfile=\"dist/$function/index.js\"; (cd \"dist/$function\" && zip -q \"../$function.zip\" index.js); rm -rf \"dist/$function\"; done",
     "check-types": "tsc --noEmit",
     "lint": "eslint ."
   },
@@ -19,6 +19,8 @@
     "typescript-eslint": "^8.59.2"
   },
   "dependencies": {
-    "mongodb": "^7.4.0"
+    "@aws-sdk/client-sqs": "^3.1079.0",
+    "mongodb": "^7.4.0",
+    "openai": "^6.45.0"
   }
 }

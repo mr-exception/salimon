@@ -22,6 +22,8 @@ export type SpaceshipMotionState = 'flying' | 'landed' | 'crashed';
 
 export type SpaceshipStats = {
   fuelKns: number;
+  hullDurability: number;
+  thrusterDurability: number[];
 };
 
 export type SpaceshipDocument = {
@@ -49,6 +51,9 @@ export type SpaceshipDto = Pick<
 > & { simulatedAt: string };
 
 const INITIAL_SPACESHIP_FUEL_KNS = 1_000_000;
+export const MAX_HULL_DURABILITY = 200;
+export const MAX_THRUSTER_DURABILITY = 100;
+export const SPACESHIP_THRUSTER_COUNT = 4;
 const DEFAULT_SPACESHIP = {
   position: {
     x: '6371200',
@@ -59,7 +64,13 @@ const DEFAULT_SPACESHIP = {
   speed: '0',
   velocity: { x: 0, y: 0 },
   motionState: 'landed',
-  stats: { fuelKns: INITIAL_SPACESHIP_FUEL_KNS },
+  stats: {
+    fuelKns: INITIAL_SPACESHIP_FUEL_KNS,
+    hullDurability: MAX_HULL_DURABILITY,
+    thrusterDurability: Array(SPACESHIP_THRUSTER_COUNT).fill(
+      MAX_THRUSTER_DURABILITY,
+    ),
+  },
 } satisfies Omit<SpaceshipDto, 'securityCode' | 'simulatedAt'>;
 const UUID_V4_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -119,7 +130,7 @@ export function toSpaceshipDto(spaceship: SpaceshipDocument): SpaceshipDto {
       (spaceship.speed === '0' && spaceship.position.relativeTo
         ? 'landed'
         : 'flying'),
-    stats: spaceship.stats ?? { fuelKns: INITIAL_SPACESHIP_FUEL_KNS },
+    stats: normalizeSpaceshipStats(spaceship.stats),
     simulatedAt: (spaceship.simulatedAt ?? spaceship.updatedAt).toISOString(),
   };
 }
@@ -224,6 +235,31 @@ export function parseSpaceshipUpdate(event: APIGatewayProxyEventV2) {
   ) {
     throw new Error('stats.fuelKns must be a non-negative finite number');
   }
+  const hullDurability = statsCandidate.hullDurability;
+  const thrusterDurability = statsCandidate.thrusterDurability;
+  if (
+    typeof hullDurability !== 'number' ||
+    !Number.isFinite(hullDurability) ||
+    hullDurability < 0 ||
+    hullDurability > MAX_HULL_DURABILITY
+  ) {
+    throw new Error('stats.hullDurability must be between 0 and 200');
+  }
+  if (
+    !Array.isArray(thrusterDurability) ||
+    thrusterDurability.length !== SPACESHIP_THRUSTER_COUNT ||
+    thrusterDurability.some(
+      (value) =>
+        typeof value !== 'number' ||
+        !Number.isFinite(value) ||
+        value < 0 ||
+        value > MAX_THRUSTER_DURABILITY,
+    )
+  ) {
+    throw new Error(
+      'stats.thrusterDurability must contain four values from 0 to 100',
+    );
+  }
 
   return {
     position: {
@@ -235,6 +271,24 @@ export function parseSpaceshipUpdate(event: APIGatewayProxyEventV2) {
     speed,
     velocity: { x: velocityCandidate.x, y: velocityCandidate.y },
     motionState: parsedMotionState,
-    stats: { fuelKns: statsCandidate.fuelKns },
+    stats: {
+      fuelKns: statsCandidate.fuelKns,
+      hullDurability,
+      thrusterDurability,
+    },
+  };
+}
+
+export function normalizeSpaceshipStats(
+  stats: Partial<SpaceshipStats> | undefined,
+): SpaceshipStats {
+  return {
+    fuelKns: stats?.fuelKns ?? INITIAL_SPACESHIP_FUEL_KNS,
+    hullDurability: stats?.hullDurability ?? MAX_HULL_DURABILITY,
+    thrusterDurability: Array.from(
+      { length: SPACESHIP_THRUSTER_COUNT },
+      (_, index) =>
+        stats?.thrusterDurability?.[index] ?? MAX_THRUSTER_DURABILITY,
+    ),
   };
 }

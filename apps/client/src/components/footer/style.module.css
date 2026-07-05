@@ -42,6 +42,31 @@
   border: 0;
 }
 
+.durabilityList {
+  display: grid;
+  min-width: 460px;
+  gap: 8px;
+}
+
+.durabilityItem {
+  display: grid;
+  grid-template-columns: 82px 1fr 90px 70px;
+  align-items: center;
+  gap: 10px;
+}
+
+.durabilityItem meter {
+  width: 100%;
+  accent-color: var(--color-plasma-cyan);
+}
+
+.durabilityItem output {
+  color: var(--color-plasma-cyan);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  text-transform: none;
+}
+
 .powerControls legend {
   margin-bottom: 7px;
 }
@@ -391,9 +416,14 @@
 
   .speedInputs,
   .speedActions,
-  .orbitActions {
+  .orbitActions,
+  .durabilityList {
     width: 100%;
     min-width: 0;
+  }
+
+  .durabilityItem {
+    grid-template-columns: 78px 1fr;
   }
 
   .speedInputs label {

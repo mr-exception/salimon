@@ -2,6 +2,7 @@ import type { Collection, Document } from 'mongodb';
 import {
   getDatabase,
   getSpaceshipVelocity,
+  normalizeSpaceshipStats,
   type SpaceshipDocument,
   type SpaceshipMotionState,
   type SpaceshipVelocity,
@@ -507,6 +508,11 @@ export async function propagateOfflineSpaceship(
         : serializeMotion(spaceship, 'flying', motion, simulatedAt);
   }
 
+  const stats = normalizeSpaceshipStats(spaceship.stats);
+  stats.hullDurability =
+    update.motionState === 'crashed'
+      ? 0
+      : Math.max(0, stats.hullDurability - (elapsedSeconds / (30 * 60)) * 0.01);
   const collection = (await getDatabase()).collection<SpaceshipDocument>(
     'spaceships',
   );
@@ -515,7 +521,7 @@ export async function propagateOfflineSpaceship(
       securityCode: spaceship.securityCode,
       updatedAt: spaceship.updatedAt,
     },
-    { $set: update },
+    { $set: { ...update, stats } },
     { returnDocument: 'after' },
   );
   return (

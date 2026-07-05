@@ -55,6 +55,8 @@ export type SpaceshipDto = {
   motionState?: 'flying' | 'landed' | 'crashed';
   stats?: {
     fuelKns: number;
+    hullDurability?: number;
+    thrusterDurability?: number[];
   };
   simulatedAt?: string;
 };

@@ -9,6 +9,8 @@ import {
 import style from './style.module.css';
 import {
   INITIAL_SPACESHIP_FUEL_KNS,
+  MAX_HULL_DURABILITY,
+  MAX_THRUSTER_DURABILITY,
   MAX_ENGINE_THRUST_KN,
   SPACESHIP_MASS_KG,
   getSpaceshipBurnPlan,
@@ -17,11 +19,15 @@ import {
   getSpaceshipVelocity,
   startSpaceshipAutoOrbit,
   stopSpaceshipAutoOrbit,
+  repairSpaceshipHull,
+  repairSpaceshipThruster,
   useSpaceshipAutoOrbit,
   useSpaceshipFuelKns,
+  useSpaceshipHullDurability,
   useSpaceshipMotionState,
   useSpaceshipSpeed,
   useSpaceshipTargetDirection,
+  useSpaceshipThrusterDurability,
 } from '@store';
 import {
   formatAcceleration,
@@ -44,7 +50,11 @@ type FooterProps = {
   onToggleTargetDirectionSelection?: () => void;
 };
 
-type SpeedControlTab = 'target-speed' | 'auto-orbit' | 'manual-drive';
+type SpeedControlTab =
+  | 'target-speed'
+  | 'auto-orbit'
+  | 'manual-drive'
+  | 'maintenance';
 
 type Position = {
   x: number;
@@ -55,15 +65,24 @@ const CONTROL_LABELS: Record<SpeedControlTab, string> = {
   'target-speed': 'Target speed',
   'auto-orbit': 'Auto orbit',
   'manual-drive': 'Manual drive',
+  maintenance: 'Ship durability',
 };
 
 const INITIAL_PANEL_POSITIONS: Record<SpeedControlTab, Position> = {
   'target-speed': { x: 16, y: 140 },
   'auto-orbit': { x: 32, y: 156 },
   'manual-drive': { x: 48, y: 172 },
+  maintenance: { x: 64, y: 188 },
 };
 
 function FeatureIcon({ feature }: { feature: SpeedControlTab }) {
+  if (feature === 'maintenance') {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m14.7 6.3 3-3a4 4 0 0 1-5 5l-7.4 7.4a2.1 2.1 0 0 0 3 3l7.4-7.4a4 4 0 0 1 5-5l-3 3" />
+      </svg>
+    );
+  }
   if (feature === 'target-speed') {
     return (
       <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -234,6 +253,8 @@ export function Footer({
 }: FooterProps) {
   const speed = useSpaceshipSpeed();
   const fuelKns = useSpaceshipFuelKns();
+  const hullDurability = useSpaceshipHullDurability();
+  const thrusterDurability = useSpaceshipThrusterDurability();
   const motionState = useSpaceshipMotionState();
   const targetDirection = useSpaceshipTargetDirection();
   const autoOrbit = useSpaceshipAutoOrbit();
@@ -278,7 +299,11 @@ export function Footer({
   const requiredThrustNewtons = Math.abs(acceleration) * SPACESHIP_MASS_KG;
   const maxEngineThrustNewtons = MAX_ENGINE_THRUST_KN * 1_000;
   const hasValidBurn = Number.isFinite(acceleration) && burnPlan !== undefined;
-  const canStartBurn = motionState !== 'crashed' && hasValidBurn && fuelKns > 0;
+  const canStartBurn =
+    motionState !== 'crashed' &&
+    hasValidBurn &&
+    fuelKns > 0 &&
+    thrusterDurability.some((durability) => durability > 0);
   const currentEnginePowerPercent = isEngineRunning
     ? (requiredThrustNewtons / maxEngineThrustNewtons) * 100
     : 0;
@@ -408,6 +433,7 @@ export function Footer({
               ['target-speed', 'Target speed'],
               ['auto-orbit', 'Auto orbit'],
               ['manual-drive', 'Manual drive'],
+              ['maintenance', 'Ship durability'],
             ] as const
           ).map(([tab, label]) => (
             <button
@@ -430,6 +456,55 @@ export function Footer({
         </div>
 
         <div className={style.controlPanels}>
+          {expandedSpeedControls.has('maintenance') && (
+            <DraggablePanel
+              control="maintenance"
+              onClose={() => toggleSpeedControl('maintenance')}
+            >
+              <div className={style.durabilityList}>
+                <div className={style.durabilityItem}>
+                  <span>Hull</span>
+                  <meter
+                    min="0"
+                    max={MAX_HULL_DURABILITY}
+                    low={MAX_HULL_DURABILITY * 0.25}
+                    value={hullDurability}
+                  />
+                  <output>
+                    {hullDurability.toFixed(2)} / {MAX_HULL_DURABILITY}
+                  </output>
+                  <button
+                    type="button"
+                    disabled={hullDurability >= MAX_HULL_DURABILITY}
+                    onClick={repairSpaceshipHull}
+                  >
+                    Repair
+                  </button>
+                </div>
+                {thrusterDurability.map((durability, index) => (
+                  <div className={style.durabilityItem} key={index}>
+                    <span>Thruster {index + 1}</span>
+                    <meter
+                      min="0"
+                      max={MAX_THRUSTER_DURABILITY}
+                      low={MAX_THRUSTER_DURABILITY * 0.25}
+                      value={durability}
+                    />
+                    <output>
+                      {durability.toFixed(2)} / {MAX_THRUSTER_DURABILITY}
+                    </output>
+                    <button
+                      type="button"
+                      disabled={durability >= MAX_THRUSTER_DURABILITY}
+                      onClick={() => repairSpaceshipThruster(index)}
+                    >
+                      Repair
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </DraggablePanel>
+          )}
           {expandedSpeedControls.has('manual-drive') && (
             <DraggablePanel
               control="manual-drive"

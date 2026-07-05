@@ -100,6 +100,8 @@ export function Navigator({
       backgroundColor: '#050816',
       fps: {
         forceSetTimeOut: true,
+        // Preserve real elapsed time when background tabs are throttled.
+        smoothStep: false,
       },
       scale: {
         mode: Phaser.Scale.RESIZE,

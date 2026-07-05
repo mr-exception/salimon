@@ -39,7 +39,8 @@ The info and update routes require the security code in the
 `position.x`, `position.y`, and `speed`; `direction` is a number in the range
 from 0 (inclusive) to 360 (exclusive). `velocity.x` and `velocity.y` are finite
 numbers in meters per second, and `motionState` is `flying`, `landed`, or
-`crashed`.
+`crashed`. Persistent ship stats are grouped under `stats`; `stats.fuelKns`
+stores the remaining fuel in kilonewton-seconds.
 
 Spaceships stored relative to a planet or star include a simulation timestamp.
 On the next info request, the Lambda advances flying ships under the reference

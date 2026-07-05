@@ -7,6 +7,14 @@ Parameters:
     Type: String
     Description: MongoDB connection URI, including credentials and database name
     NoEcho: true
+  OpenAiApiKey:
+    Type: String
+    Description: Server-side OpenAI API key for NPC replies
+    NoEcho: true
+  OpenAiModel:
+    Type: String
+    Description: OpenAI model used for NPC replies
+    Default: gpt-5.4-mini
 
 Resources:
   HttpApi:
@@ -190,6 +198,116 @@ Resources:
             ApiId: !Ref HttpApi
             Method: PUT
             Path: /spaceship/update
+
+  ContactReplyDeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-contact-reply-dlq.fifo
+      FifoQueue: true
+      ContentBasedDeduplication: true
+      MessageRetentionPeriod: 1209600
+
+  ContactReplyQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub ${AWS::StackName}-contact-replies.fifo
+      FifoQueue: true
+      ContentBasedDeduplication: true
+      VisibilityTimeout: 180
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt ContactReplyDeadLetterQueue.Arn
+        maxReceiveCount: 3
+
+  ContactsInfoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/contacts-info.zip
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      MemorySize: 256
+      Timeout: 10
+      Environment:
+        Variables:
+          MONGODB_URI: !Ref MongoDbUri
+      Events:
+        GetContacts:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Method: GET
+            Path: /contacts/info
+
+  ContactMessagesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/contact-messages.zip
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      MemorySize: 256
+      Timeout: 10
+      Environment:
+        Variables:
+          MONGODB_URI: !Ref MongoDbUri
+      Events:
+        GetContactMessages:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Method: GET
+            Path: /contacts/messages
+
+  SendContactMessageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/send-contact-message.zip
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      MemorySize: 256
+      Timeout: 10
+      Environment:
+        Variables:
+          MONGODB_URI: !Ref MongoDbUri
+          CONTACT_REPLY_QUEUE_URL: !Ref ContactReplyQueue
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt ContactReplyQueue.QueueName
+      Events:
+        SendContactMessage:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Method: POST
+            Path: /contacts/messages/send
+
+  GenerateContactReplyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/generate-contact-reply.zip
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      MemorySize: 512
+      Timeout: 120
+      Environment:
+        Variables:
+          MONGODB_URI: !Ref MongoDbUri
+          OPENAI_API_KEY: !Ref OpenAiApiKey
+          OPENAI_MODEL: !Ref OpenAiModel
+      Events:
+        GenerateReply:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt ContactReplyQueue.Arn
+            BatchSize: 1
+            FunctionResponseTypes:
+              - ReportBatchItemFailures
 
 Outputs:
   ApiBaseUrl:

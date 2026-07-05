@@ -74,7 +74,10 @@ Pass the MongoDB URI, including its database name, when starting SAM:
 ```sh
 sam local start-api \
   --template template.yaml \
-  --parameter-overrides MongoDbUri="$MONGODB_URI"
+  --parameter-overrides \
+    MongoDbUri="$MONGODB_URI" \
+    OpenAiApiKey="$OPENAI_API_KEY" \
+    OpenAiModel="$OPENAI_MODEL"
 ```
 
 SAM serves `GET /world/systems` at
@@ -96,5 +99,19 @@ the complete MongoDB URI in a secret rather than a repository variable because
 it contains credentials. The URI must include the database name used by the
 Lambda.
 
-The deployment role needs access to the artifact bucket and permission to
-deploy the stack's Lambda, API Gateway, IAM, and CloudFormation resources.
+The workflow also requires an `OPENAI_API_KEY` GitHub Actions secret and an
+`OPENAI_MODEL` repository variable. The deployment role needs access to the
+artifact bucket and permission to deploy the stack's Lambda, API Gateway, SQS,
+IAM, and CloudFormation resources.
+
+## Communications API
+
+The communications feature provides authenticated contact and messaging
+handlers, asynchronous NPC reply generation through SQS, and OpenAI-backed
+dialogue. Its endpoint contracts, polling strategy, and security requirements
+are defined in [Communications](../../docs/communications.md).
+
+Copy `.env.example` to an ignored local environment file when implementing or
+running these handlers. `OPENAI_API_KEY` must be supplied only to backend
+Lambda functions and stored as a deployment secret. It must never be exposed
+through a `VITE_*` client variable.

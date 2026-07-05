@@ -10,7 +10,7 @@ import {
 } from './world';
 
 const STORAGE_KEY = 'salimon.spaceship';
-const SECURITY_CODE_HEADER = 'x-spaceship-security-code';
+export const SECURITY_CODE_HEADER = 'x-spaceship-security-code';
 const COASTING_UPDATE_DELAY_MS = 5 * 60 * 1_000;
 const THRUSTING_UPDATE_DELAY_MS = 5_000;
 const DEFAULT_API_BASE_URL =
@@ -25,7 +25,7 @@ export type BootstrapState = 'idle' | 'loading' | 'ready' | 'error';
 type SpaceshipResponse = { spaceship: SpaceshipDto };
 const requestPromises = new WeakMap<BootstrapRequest, Promise<SpaceshipDto>>();
 
-function getApiBaseUrl() {
+export function getApiBaseUrl() {
   return (import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL).replace(
     /\/+$/,
     '',

@@ -106,6 +106,10 @@ export function useSetSpaceshipFuelKns() {
   return useSetAtom(spaceshipFuelKnsAtom);
 }
 
+export function getSpaceshipFuelKns() {
+  return store.get(spaceshipFuelKnsAtom);
+}
+
 export function useSpaceshipMotionState() {
   return useAtomValue(spaceshipMotionStateAtom);
 }
@@ -307,6 +311,10 @@ export function hydrateSpaceship(dto: SpaceshipDto) {
         };
   store.set(spaceshipMotionStateAtom, motionState);
   store.set(spaceshipSpeedAtom, Number(dto.speed));
+  store.set(
+    spaceshipFuelKnsAtom,
+    dto.stats?.fuelKns ?? INITIAL_SPACESHIP_FUEL_KNS,
+  );
   rebuildWorldBodyByName();
 }
 
@@ -348,6 +356,7 @@ export function getSpaceshipDto(securityCode: string): SpaceshipDto {
     speed: Math.round(speed).toString(),
     velocity: relativeVelocity,
     motionState: store.get(spaceshipMotionStateAtom),
+    stats: { fuelKns: getSpaceshipFuelKns() },
     simulatedAt: new Date().toISOString(),
   };
 }

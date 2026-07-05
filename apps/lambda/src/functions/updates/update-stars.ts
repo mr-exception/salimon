@@ -1,9 +1,8 @@
 import type { ScheduledEvent } from 'aws-lambda';
-import { updateOrbitalBodies } from '../orbital-updater';
+import { updateOrbitalBodies } from '../../orbital-updater';
 
 export function handler(event: ScheduledEvent) {
   return updateOrbitalBodies(event, {
-    collectionName: 'planets',
-    orbitalCenterCollection: 'planets',
+    collectionName: 'stars',
   });
 }

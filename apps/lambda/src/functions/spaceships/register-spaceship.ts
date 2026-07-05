@@ -4,8 +4,8 @@ import {
   getSpaceshipsCollection,
   jsonResponse,
   toSpaceshipDto,
-} from '../spaceship';
-import { initializeSpaceshipContacts } from '../contacts';
+} from '../../spaceship';
+import { initializeSpaceshipContacts } from '../../contacts';
 
 export async function handler(): Promise<APIGatewayProxyResultV2> {
   try {

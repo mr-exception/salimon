@@ -6,7 +6,7 @@ import {
   EASA_CHIEF_ID,
   getContactMessagesCollection,
   type ContactMessageDocument,
-} from '../contacts';
+} from '../../contacts';
 
 type ReplyJob = {
   spaceshipSecurityCode: string;

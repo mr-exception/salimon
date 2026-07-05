@@ -77,16 +77,17 @@ export default function App() {
 
   return (
     <div className={style.app}>
-      {activeView === 'navigation' ? (
+      <div className={style.view} hidden={activeView !== 'navigation'}>
         <Navigator
           onSceneChange={handleSceneChange}
           onSpaceshipEngineChange={setIsEngineRunning}
           isSelectingTargetDirection={isSelectingTargetDirection}
           onTargetDirectionSelected={handleTargetDirectionSelected}
         />
-      ) : (
+      </div>
+      <div className={style.view} hidden={activeView !== 'ship'}>
         <SpaceshipHull />
-      )}
+      </div>
       <Footer
         activeView={activeView}
         isEngineRunning={isEngineRunning}

@@ -16,10 +16,14 @@ const THRUSTING_UPDATE_DELAY_MS = 5_000;
 const DEFAULT_API_BASE_URL =
   'https://hjp81v6wyh.execute-api.us-east-1.amazonaws.com';
 
-type BootstrapState = 'loading' | 'ready' | 'error';
-type SpaceshipResponse = { spaceship: SpaceshipDto };
+export type BootstrapRequest =
+  | { type: 'new' }
+  | { type: 'continue' }
+  | { type: 'claim'; securityCode: string };
+export type BootstrapState = 'idle' | 'loading' | 'ready' | 'error';
 
-let bootstrapPromise: Promise<SpaceshipDto> | undefined;
+type SpaceshipResponse = { spaceship: SpaceshipDto };
+const requestPromises = new WeakMap<BootstrapRequest, Promise<SpaceshipDto>>();
 
 function getApiBaseUrl() {
   return (import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL).replace(
@@ -31,7 +35,6 @@ function getApiBaseUrl() {
 function readStoredSpaceship() {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (!stored) return undefined;
-
   try {
     const spaceship = JSON.parse(stored) as SpaceshipDto;
     return typeof spaceship.securityCode === 'string' ? spaceship : undefined;
@@ -45,45 +48,43 @@ function storeSpaceship(spaceship: SpaceshipDto) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(spaceship));
 }
 
-async function registerSpaceship() {
-  const { data } = await axios.post<SpaceshipResponse>(
-    `${getApiBaseUrl()}/spaceship/register`,
+export function getStoredSpaceshipSecurityCode() {
+  return readStoredSpaceship()?.securityCode;
+}
+
+async function getSpaceship(securityCode: string) {
+  const { data } = await axios.get<SpaceshipResponse>(
+    `${getApiBaseUrl()}/spaceship/info`,
+    { headers: { [SECURITY_CODE_HEADER]: securityCode } },
   );
   return data.spaceship;
 }
 
-async function loadSpaceship() {
-  const stored = readStoredSpaceship();
-  if (!stored) return registerSpaceship();
+function initializeSpaceship(request: BootstrapRequest) {
+  const existingPromise = requestPromises.get(request);
+  if (existingPromise) return existingPromise;
 
-  try {
-    const { data } = await axios.get<SpaceshipResponse>(
-      `${getApiBaseUrl()}/spaceship/info`,
-      {
-        headers: { [SECURITY_CODE_HEADER]: stored.securityCode },
-      },
-    );
-    return data.spaceship;
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
-      return registerSpaceship();
+  const promise = (async () => {
+    if (request.type === 'new') {
+      const { data } = await axios.post<SpaceshipResponse>(
+        `${getApiBaseUrl()}/spaceship/register`,
+      );
+      return data.spaceship;
     }
-    throw error;
-  }
-}
+    if (request.type === 'claim') {
+      return getSpaceship(request.securityCode.trim());
+    }
+    const stored = readStoredSpaceship();
+    if (!stored) throw new Error('No stored spaceship is available');
+    return getSpaceship(stored.securityCode);
+  })().then((spaceship) => {
+    storeSpaceship(spaceship);
+    hydrateSpaceship(spaceship);
+    return spaceship;
+  });
 
-function bootstrapSpaceship() {
-  bootstrapPromise ??= loadSpaceship()
-    .then((spaceship) => {
-      storeSpaceship(spaceship);
-      hydrateSpaceship(spaceship);
-      return spaceship;
-    })
-    .catch((error: unknown) => {
-      bootstrapPromise = undefined;
-      throw error;
-    });
-  return bootstrapPromise;
+  requestPromises.set(request, promise);
+  return promise;
 }
 
 async function updateSpaceship(securityCode: string) {
@@ -92,17 +93,20 @@ async function updateSpaceship(securityCode: string) {
   const { data } = await axios.put<SpaceshipResponse>(
     `${getApiBaseUrl()}/spaceship/update`,
     spaceship,
-    {
-      headers: { [SECURITY_CODE_HEADER]: securityCode },
-    },
+    { headers: { [SECURITY_CODE_HEADER]: securityCode } },
   );
   storeSpaceship(data.spaceship);
 }
 
-export function useBootstrap(): BootstrapState {
-  const [state, setState] = useState<BootstrapState>('loading');
+export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
+  const [result, setResult] = useState<{
+    request: BootstrapRequest | null;
+    state: BootstrapState;
+  }>({ request: null, state: 'idle' });
 
   useEffect(() => {
+    if (!request) return;
+
     let disposed = false;
     let updateTimer: number | undefined;
     let updateDelay: number | undefined;
@@ -119,7 +123,7 @@ export function useBootstrap(): BootstrapState {
       });
     };
 
-    void bootstrapSpaceship()
+    void initializeSpaceship(request)
       .then((spaceship) => {
         if (disposed) return;
         securityCode = spaceship.securityCode;
@@ -127,22 +131,20 @@ export function useBootstrap(): BootstrapState {
           if (changedBodyNames && !changedBodyNames.has(spaceshipState.name)) {
             return;
           }
-
           const nextUpdateDelay = isSpaceshipEngineRunning()
             ? THRUSTING_UPDATE_DELAY_MS
             : COASTING_UPDATE_DELAY_MS;
           if (updateTimer && updateDelay === nextUpdateDelay) return;
-
           window.clearTimeout(updateTimer);
           updateDelay = nextUpdateDelay;
           updateTimer = window.setTimeout(flushUpdate, nextUpdateDelay);
         });
         window.addEventListener('pagehide', flushUpdate);
-        setState('ready');
+        setResult({ request, state: 'ready' });
       })
       .catch((error: unknown) => {
         console.error('Failed to initialize spaceship', error);
-        if (!disposed) setState('error');
+        if (!disposed) setResult({ request, state: 'error' });
       });
 
     return () => {
@@ -151,7 +153,8 @@ export function useBootstrap(): BootstrapState {
       window.removeEventListener('pagehide', flushUpdate);
       window.clearTimeout(updateTimer);
     };
-  }, []);
+  }, [request]);
 
-  return state;
+  if (!request) return 'idle';
+  return result.request === request ? result.state : 'loading';
 }

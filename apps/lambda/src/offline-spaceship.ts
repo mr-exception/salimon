@@ -7,16 +7,38 @@ import {
   type SpaceshipVelocity,
 } from './spaceship';
 
-type ReferenceBody = Document & {
+type SerializedPosition = {
+  x: string;
+  y: string;
+  relativeTo?: string;
+};
+
+type CelestialBody = Document & {
   name: string;
+  position: SerializedPosition;
+  orbitalCenter: string | null;
+  clockwise: boolean;
+  speed: string;
   mass: string;
   radius: string;
   rotationPeriodSeconds?: number;
+  updatedAt: Date;
 };
 
 type Motion = {
   position: SpaceshipVelocity;
   velocity: SpaceshipVelocity;
+};
+
+export type OfflineWorld = {
+  bodies: CelestialBody[];
+  bodiesByName: Map<string, CelestialBody>;
+};
+
+type Impact = {
+  body: CelestialBody;
+  fraction: number;
+  relativePosition: SpaceshipVelocity;
 };
 
 const GRAVITATIONAL_CONSTANT = 6.6743e-11;
@@ -25,69 +47,161 @@ const CRASH_SPEED_METERS_PER_SECOND = 15;
 const MAX_PROPAGATION_STEPS = 20_000;
 const TARGET_STEP_SECONDS = 30;
 
-async function findReferenceBody(name: string) {
+export async function loadOfflineWorld(): Promise<OfflineWorld> {
   const database = await getDatabase();
-  const query = { name };
   const projection = {
     _id: 0,
     name: 1,
+    position: 1,
+    orbitalCenter: 1,
+    clockwise: 1,
+    speed: 1,
     mass: 1,
     radius: 1,
     rotationPeriodSeconds: 1,
+    updatedAt: 1,
   };
-  const collections: Collection<ReferenceBody>[] = [
-    database.collection<ReferenceBody>('planets'),
-    database.collection<ReferenceBody>('stars'),
+  const collections: Collection<CelestialBody>[] = [
+    database.collection<CelestialBody>('planets'),
+    database.collection<CelestialBody>('stars'),
   ];
-
-  return (
-    (await collections[0].findOne(query, { projection })) ??
-    (await collections[1].findOne(query, { projection }))
+  const bodyGroups = await Promise.all(
+    collections.map((collection) =>
+      collection.find({}, { projection }).toArray(),
+    ),
   );
+  const bodies = bodyGroups.flat();
+  return {
+    bodies,
+    bodiesByName: new Map(bodies.map((body) => [body.name, body])),
+  };
 }
 
-function acceleration(
-  position: SpaceshipVelocity,
-  gravitationalParameter: number,
-) {
-  const radius = Math.hypot(position.x, position.y);
-  if (radius === 0) return { x: 0, y: 0 };
-  const scale = -gravitationalParameter / radius ** 3;
-  return { x: position.x * scale, y: position.y * scale };
-}
-
-function add(
-  value: SpaceshipVelocity,
-  change: SpaceshipVelocity,
-  scale: number,
-) {
+function add(value: SpaceshipVelocity, change: SpaceshipVelocity, scale = 1) {
   return {
     x: value.x + change.x * scale,
     y: value.y + change.y * scale,
   };
 }
 
+function getBodyPositions(world: OfflineWorld, time: Date) {
+  const positions = new Map<string, SpaceshipVelocity>();
+
+  function resolve(body: CelestialBody, path: Set<string>): SpaceshipVelocity {
+    const cached = positions.get(body.name);
+    if (cached) return cached;
+    if (path.has(body.name)) {
+      throw new Error(`Circular position reference involving ${body.name}`);
+    }
+
+    const initialX = Number(body.position.x);
+    const initialY = Number(body.position.y);
+    const radius = Math.hypot(initialX, initialY);
+    const speed = Number(body.speed);
+    const elapsedSeconds = (time.getTime() - body.updatedAt.getTime()) / 1_000;
+    let localPosition = { x: initialX, y: initialY };
+
+    if (body.orbitalCenter && radius > 0 && speed !== 0) {
+      const direction = body.clockwise ? 1 : -1;
+      const angle = (direction * speed * elapsedSeconds) / radius;
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      localPosition = {
+        x: initialX * cos - initialY * sin,
+        y: initialX * sin + initialY * cos,
+      };
+    }
+
+    const referenceName = body.position.relativeTo;
+    if (referenceName) {
+      const reference = world.bodiesByName.get(referenceName);
+      if (!reference) {
+        throw new Error(
+          `Position reference ${referenceName} for ${body.name} was not found`,
+        );
+      }
+      const nextPath = new Set(path).add(body.name);
+      localPosition = add(localPosition, resolve(reference, nextPath));
+    }
+
+    positions.set(body.name, localPosition);
+    return localPosition;
+  }
+
+  world.bodies.forEach((body) => resolve(body, new Set()));
+  return positions;
+}
+
+function getBodyVelocity(world: OfflineWorld, bodyName: string, time: Date) {
+  const sampleSeconds = 0.5;
+  const before = getBodyPositions(
+    world,
+    new Date(time.getTime() - sampleSeconds * 1_000),
+  ).get(bodyName);
+  const after = getBodyPositions(
+    world,
+    new Date(time.getTime() + sampleSeconds * 1_000),
+  ).get(bodyName);
+  if (!before || !after) return { x: 0, y: 0 };
+  return {
+    x: (after.x - before.x) / (sampleSeconds * 2),
+    y: (after.y - before.y) / (sampleSeconds * 2),
+  };
+}
+
+function acceleration(
+  position: SpaceshipVelocity,
+  world: OfflineWorld,
+  time: Date,
+) {
+  const bodyPositions = getBodyPositions(world, time);
+  let x = 0;
+  let y = 0;
+
+  for (const body of world.bodies) {
+    const bodyPosition = bodyPositions.get(body.name);
+    if (!bodyPosition) continue;
+    const deltaX = bodyPosition.x - position.x;
+    const deltaY = bodyPosition.y - position.y;
+    const radiusSquared = deltaX ** 2 + deltaY ** 2;
+    if (radiusSquared === 0) continue;
+    const scale =
+      (GRAVITATIONAL_CONSTANT * Number(body.mass)) /
+      (radiusSquared * Math.sqrt(radiusSquared));
+    x += deltaX * scale;
+    y += deltaY * scale;
+  }
+
+  return { x, y };
+}
+
 function integrateStep(
   motion: Motion,
+  startedAt: Date,
   seconds: number,
-  gravitationalParameter: number,
+  world: OfflineWorld,
 ): Motion {
+  const midpoint = new Date(startedAt.getTime() + (seconds * 1_000) / 2);
+  const finishedAt = new Date(startedAt.getTime() + seconds * 1_000);
   const position1 = motion.velocity;
-  const velocity1 = acceleration(motion.position, gravitationalParameter);
+  const velocity1 = acceleration(motion.position, world, startedAt);
   const position2 = add(motion.velocity, velocity1, seconds / 2);
   const velocity2 = acceleration(
     add(motion.position, position1, seconds / 2),
-    gravitationalParameter,
+    world,
+    midpoint,
   );
   const position3 = add(motion.velocity, velocity2, seconds / 2);
   const velocity3 = acceleration(
     add(motion.position, position2, seconds / 2),
-    gravitationalParameter,
+    world,
+    midpoint,
   );
   const position4 = add(motion.velocity, velocity3, seconds);
   const velocity4 = acceleration(
     add(motion.position, position3, seconds),
-    gravitationalParameter,
+    world,
+    finishedAt,
   );
 
   return {
@@ -123,19 +237,59 @@ function findImpact(
   const a = delta.x ** 2 + delta.y ** 2;
   const b = 2 * (start.x * delta.x + start.y * delta.y);
   const c = start.x ** 2 + start.y ** 2 - collisionRadius ** 2;
-  if (c <= 0) return start;
+  if (c <= 0) return { fraction: 0, position: start };
   if (a === 0) return undefined;
 
   const discriminant = b ** 2 - 4 * a * c;
   if (discriminant < 0) return undefined;
-  const root = Math.sqrt(discriminant);
-  const time = (-b - root) / (2 * a);
-  if (time < 0 || time > 1) return undefined;
+  const fraction = (-b - Math.sqrt(discriminant)) / (2 * a);
+  if (fraction < 0 || fraction > 1) return undefined;
 
   return {
-    x: start.x + delta.x * time,
-    y: start.y + delta.y * time,
+    fraction,
+    position: add(start, delta, fraction),
   };
+}
+
+function findFirstImpact(
+  motion: Motion,
+  nextMotion: Motion,
+  world: OfflineWorld,
+  startedAt: Date,
+  seconds: number,
+): Impact | undefined {
+  const startPositions = getBodyPositions(world, startedAt);
+  const endPositions = getBodyPositions(
+    world,
+    new Date(startedAt.getTime() + seconds * 1_000),
+  );
+  let firstImpact: Impact | undefined;
+
+  for (const body of world.bodies) {
+    const startPosition = startPositions.get(body.name);
+    const endPosition = endPositions.get(body.name);
+    if (!startPosition || !endPosition) continue;
+    const impact = findImpact(
+      {
+        x: motion.position.x - startPosition.x,
+        y: motion.position.y - startPosition.y,
+      },
+      {
+        x: nextMotion.position.x - endPosition.x,
+        y: nextMotion.position.y - endPosition.y,
+      },
+      Number(body.radius) + SPACESHIP_RADIUS_METERS,
+    );
+    if (impact && (!firstImpact || impact.fraction < firstImpact.fraction)) {
+      firstImpact = {
+        body,
+        fraction: impact.fraction,
+        relativePosition: impact.position,
+      };
+    }
+  }
+
+  return firstImpact;
 }
 
 function rotateAttachedPosition(
@@ -174,6 +328,7 @@ function serializeMotion(
   motionState: SpaceshipMotionState,
   motion: Motion,
   simulatedAt: Date,
+  relativeTo?: string,
 ) {
   const speed =
     motionState === 'flying'
@@ -190,7 +345,7 @@ function serializeMotion(
     position: {
       x: Math.round(motion.position.x).toString(),
       y: Math.round(motion.position.y).toString(),
-      relativeTo: spaceship.position.relativeTo,
+      ...(relativeTo ? { relativeTo } : {}),
     },
     velocity: motionState === 'flying' ? motion.velocity : { x: 0, y: 0 },
     speed: Math.round(speed).toString(),
@@ -204,90 +359,152 @@ function serializeMotion(
 export async function propagateOfflineSpaceship(
   spaceship: SpaceshipDocument,
   simulatedAt = new Date(),
+  suppliedWorld?: OfflineWorld,
 ) {
   const previousSimulationTime = spaceship.simulatedAt ?? spaceship.updatedAt;
   const elapsedSeconds = Math.max(
     0,
     (simulatedAt.getTime() - previousSimulationTime.getTime()) / 1_000,
   );
+  if (elapsedSeconds === 0) return spaceship;
+
+  const world = suppliedWorld ?? (await loadOfflineWorld());
   const referenceName = spaceship.position.relativeTo;
-  if (elapsedSeconds === 0 || !referenceName) return spaceship;
+  const referenceBody = referenceName
+    ? world.bodiesByName.get(referenceName)
+    : undefined;
+  if (referenceName && !referenceBody) return spaceship;
 
-  const body = await findReferenceBody(referenceName);
-  if (!body) return spaceship;
-
-  const collisionRadius = Number(body.radius) + SPACESHIP_RADIUS_METERS;
-  const initialMotion: Motion = {
-    position: {
-      x: Number(spaceship.position.x),
-      y: Number(spaceship.position.y),
-    },
-    velocity: getSpaceshipVelocity(spaceship),
+  const relativePosition = {
+    x: Number(spaceship.position.x),
+    y: Number(spaceship.position.y),
   };
+  const relativeVelocity = getSpaceshipVelocity(spaceship);
   const motionState =
     spaceship.motionState ?? (spaceship.speed === '0' ? 'landed' : 'flying');
-
   let update;
-  if (motionState !== 'flying') {
+
+  if (motionState !== 'flying' && referenceBody) {
+    const collisionRadius =
+      Number(referenceBody.radius) + SPACESHIP_RADIUS_METERS;
     update = serializeMotion(
       spaceship,
       motionState,
       {
         position: rotateAttachedPosition(
-          initialMotion.position,
+          relativePosition,
           elapsedSeconds,
-          body.rotationPeriodSeconds,
+          referenceBody.rotationPeriodSeconds,
           collisionRadius,
         ),
         velocity: { x: 0, y: 0 },
       },
       simulatedAt,
+      referenceName,
+    );
+  } else if (motionState !== 'flying') {
+    update = serializeMotion(
+      spaceship,
+      motionState,
+      { position: relativePosition, velocity: { x: 0, y: 0 } },
+      simulatedAt,
     );
   } else {
+    const initialReferencePosition = referenceName
+      ? getBodyPositions(world, previousSimulationTime).get(referenceName)
+      : undefined;
+    const initialReferenceVelocity = referenceName
+      ? getBodyVelocity(world, referenceName, previousSimulationTime)
+      : undefined;
+    let motion: Motion = {
+      position: initialReferencePosition
+        ? add(initialReferencePosition, relativePosition)
+        : relativePosition,
+      velocity: initialReferenceVelocity
+        ? add(initialReferenceVelocity, relativeVelocity)
+        : relativeVelocity,
+    };
     const stepCount = Math.min(
       MAX_PROPAGATION_STEPS,
       Math.max(1, Math.ceil(elapsedSeconds / TARGET_STEP_SECONDS)),
     );
     const stepSeconds = elapsedSeconds / stepCount;
-    const gravitationalParameter = GRAVITATIONAL_CONSTANT * Number(body.mass);
-    let motion = initialMotion;
-    let impact: SpaceshipVelocity | undefined;
+    let impact: Impact | undefined;
     let impactState: SpaceshipMotionState | undefined;
+    let impactTime: Date | undefined;
 
     for (let step = 0; step < stepCount; step += 1) {
+      const stepStartedAt = new Date(
+        previousSimulationTime.getTime() + step * stepSeconds * 1_000,
+      );
       const nextMotion = integrateStep(
         motion,
+        stepStartedAt,
         stepSeconds,
-        gravitationalParameter,
+        world,
       );
-      impact = findImpact(
-        motion.position,
-        nextMotion.position,
-        collisionRadius,
+      impact = findFirstImpact(
+        motion,
+        nextMotion,
+        world,
+        stepStartedAt,
+        stepSeconds,
       );
       if (impact) {
-        const surfaceVelocity = getSurfaceVelocity(
-          impact,
-          body.rotationPeriodSeconds,
+        impactTime = new Date(
+          stepStartedAt.getTime() + impact.fraction * stepSeconds * 1_000,
         );
+        const bodyVelocity = getBodyVelocity(
+          world,
+          impact.body.name,
+          impactTime,
+        );
+        const surfaceVelocity = add(
+          bodyVelocity,
+          getSurfaceVelocity(
+            impact.relativePosition,
+            impact.body.rotationPeriodSeconds,
+          ),
+        );
+        const impactVelocity = {
+          x:
+            motion.velocity.x +
+            (nextMotion.velocity.x - motion.velocity.x) * impact.fraction,
+          y:
+            motion.velocity.y +
+            (nextMotion.velocity.y - motion.velocity.y) * impact.fraction,
+        };
         const impactSpeed = Math.hypot(
-          nextMotion.velocity.x - surfaceVelocity.x,
-          nextMotion.velocity.y - surfaceVelocity.y,
+          impactVelocity.x - surfaceVelocity.x,
+          impactVelocity.y - surfaceVelocity.y,
         );
         impactState =
           impactSpeed > CRASH_SPEED_METERS_PER_SECOND ? 'crashed' : 'landed';
-        motion = { position: impact, velocity: { x: 0, y: 0 } };
         break;
       }
       motion = nextMotion;
     }
 
-    update = serializeMotion(
-      spaceship,
-      impactState ?? 'flying',
-      motion,
-      simulatedAt,
-    );
+    update =
+      impact && impactState
+        ? serializeMotion(
+            spaceship,
+            impactState,
+            {
+              position: rotateAttachedPosition(
+                impact.relativePosition,
+                impactTime
+                  ? (simulatedAt.getTime() - impactTime.getTime()) / 1_000
+                  : 0,
+                impact.body.rotationPeriodSeconds,
+                Number(impact.body.radius) + SPACESHIP_RADIUS_METERS,
+              ),
+              velocity: { x: 0, y: 0 },
+            },
+            simulatedAt,
+            impact.body.name,
+          )
+        : serializeMotion(spaceship, 'flying', motion, simulatedAt);
   }
 
   const collection = (await getDatabase()).collection<SpaceshipDocument>(

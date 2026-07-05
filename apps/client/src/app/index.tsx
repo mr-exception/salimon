@@ -1,11 +1,13 @@
 import { useCallback, useRef, useState } from 'react';
 import { useAtom } from 'jotai';
-import { Footer, Navigator, SpaceshipHull } from '@components';
-import { activeViewAtom, useBootstrap } from '@store';
+import { Footer, Navigator, SpaceshipHull, StartMenu } from '@components';
+import { activeViewAtom, useBootstrap, type BootstrapRequest } from '@store';
 import style from './style.module.css';
 
 export default function App() {
-  const bootstrapState = useBootstrap();
+  const [bootstrapRequest, setBootstrapRequest] =
+    useState<BootstrapRequest | null>(null);
+  const bootstrapState = useBootstrap(bootstrapRequest);
   const [activeView, setActiveView] = useAtom(activeViewAtom);
   const [isEngineRunning, setIsEngineRunning] = useState(false);
   const [isSelectingTargetDirection, setIsSelectingTargetDirection] =
@@ -66,14 +68,10 @@ export default function App() {
 
   if (bootstrapState !== 'ready') {
     return (
-      <div
-        className={style.app}
-        role={bootstrapState === 'error' ? 'alert' : 'status'}
-      >
-        {bootstrapState === 'loading'
-          ? 'Loading spaceship…'
-          : 'Unable to load spaceship.'}
-      </div>
+      <StartMenu
+        bootstrapState={bootstrapState}
+        onStart={setBootstrapRequest}
+      />
     );
   }
 

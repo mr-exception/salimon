@@ -2,6 +2,15 @@
 
 Salimon is an npm-workspaces monorepo orchestrated by Turborepo.
 
+## Game
+
+Salimon: Echoes of Absenat is a deep-space survival journey in which humanity
+uses a mysterious energy cube, known as the Core, to produce oxygen and
+electricity while travelling toward Absenat.
+
+See [Game Vision](docs/game-vision.md) for the story, canon, and high-level
+gameplay requirements.
+
 ## Applications
 
 - `apps/client`: React, Vite, and Phaser client.

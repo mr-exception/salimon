@@ -41,6 +41,7 @@ import {
 type FooterProps = {
   isEngineRunning?: boolean;
   isSelectingTargetDirection?: boolean;
+  showMovementHint?: boolean;
   onStartEngines?: (targetSpeed: number, maximumThrustPercent: number) => void;
   onStopEngines?: () => void;
   onManualThrustChange?: (
@@ -246,6 +247,7 @@ function DraggablePanel({
 export function Footer({
   isEngineRunning = false,
   isSelectingTargetDirection = false,
+  showMovementHint = false,
   onStartEngines,
   onStopEngines,
   onManualThrustChange,
@@ -264,6 +266,8 @@ export function Footer({
   const [orbitDistance, setOrbitDistance] = useState('400');
   const [orbitError, setOrbitError] = useState('');
   const [manualPower, setManualPower] = useState(25);
+  const [isMovementHintVisible, setIsMovementHintVisible] =
+    useState(showMovementHint);
   const pressedDriveKeys = useRef(new Set<string>());
   const [expandedSpeedControls, setExpandedSpeedControls] = useState(
     () => new Set<SpeedControlTab>(),
@@ -349,6 +353,7 @@ export function Footer({
         return;
       }
       event.preventDefault();
+      setIsMovementHintVisible(false);
       pressedDriveKeys.current.add(key);
       updateThrust();
     };

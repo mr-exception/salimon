@@ -8,6 +8,45 @@
   font-family: system-ui, sans-serif;
 }
 
+.movementHint {
+  position: absolute;
+  bottom: 88px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 35%, transparent);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--color-deep-space) 88%, transparent);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 36%);
+  color: color-mix(in srgb, var(--color-starlight) 78%, transparent);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  transform: translateX(-50%);
+  backdrop-filter: blur(8px);
+}
+
+.movementKeys {
+  display: flex;
+  gap: 3px;
+}
+
+.movementKeys kbd {
+  min-width: 20px;
+  padding: 4px 5px;
+  border: 1px solid var(--color-nebula-blue);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--color-plasma-cyan) 10%, transparent);
+  color: var(--color-plasma-cyan);
+  font: inherit;
+  line-height: 1;
+  text-align: center;
+}
+
 .speedControls {
   position: absolute;
   top: 88px;
@@ -391,6 +430,14 @@
 }
 
 @media (max-width: 760px) {
+  .movementHint {
+    right: 12px;
+    bottom: 16px;
+    left: 12px;
+    justify-content: center;
+    transform: none;
+  }
+
   .telemetry {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     row-gap: 12px;

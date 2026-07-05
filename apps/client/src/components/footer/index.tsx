@@ -123,6 +123,15 @@ function MoveIcon() {
   );
 }
 
+function CommunicationsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 5h16v11H9l-5 4V5Z" />
+      <path d="M8 9h8M8 12h5" />
+    </svg>
+  );
+}
+
 function DraggablePanel({
   children,
   control,
@@ -433,6 +442,18 @@ export function Footer({
 
   return (
     <footer className={style.container} aria-label="Ship controls">
+      {isMovementHintVisible && (
+        <aside className={style.movementHint} aria-label="Movement hint">
+          <span>Hold</span>
+          <span className={style.movementKeys} aria-label="W A S D">
+            {['W', 'A', 'S', 'D'].map((key) => (
+              <kbd key={key}>{key}</kbd>
+            ))}
+          </span>
+          <span>to fire thrusters and move</span>
+        </aside>
+      )}
+
       <section className={style.speedControls} aria-label="Ship features">
         <div className={style.controlTabs}>
           {(
@@ -460,6 +481,17 @@ export function Footer({
               </span>
             </button>
           ))}
+          <button
+            className={style.controlTab}
+            type="button"
+            aria-label="Communications"
+            onClick={onOpenCommunications}
+          >
+            <CommunicationsIcon />
+            <span className={style.tooltip} role="tooltip">
+              Communications
+            </span>
+          </button>
         </div>
 
         <div className={style.controlPanels}>

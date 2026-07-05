@@ -7,8 +7,8 @@ import {
   getSpaceshipsCollection,
   jsonResponse,
   toSpaceshipDto,
-} from '../spaceship';
-import { propagateOfflineSpaceship } from '../offline-spaceship';
+} from '../../spaceship';
+import { propagateOfflineSpaceship } from '../../offline-spaceship';
 
 export async function handler(
   event: APIGatewayProxyEventV2,

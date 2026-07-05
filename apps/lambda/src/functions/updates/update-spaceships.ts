@@ -3,8 +3,11 @@ import type { WithId } from 'mongodb';
 import {
   loadOfflineWorld,
   propagateOfflineSpaceship,
-} from '../offline-spaceship';
-import { getSpaceshipsCollection, type SpaceshipDocument } from '../spaceship';
+} from '../../offline-spaceship';
+import {
+  getSpaceshipsCollection,
+  type SpaceshipDocument,
+} from '../../spaceship';
 
 const SPACESHIP_BATCH_SIZE = 100;
 

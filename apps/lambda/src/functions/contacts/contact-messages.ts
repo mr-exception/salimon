@@ -11,8 +11,8 @@ import {
   hasContact,
   toMessageDto,
   type ContactMessageDocument,
-} from '../contacts';
-import { getSecurityCode, jsonResponse } from '../spaceship';
+} from '../../contacts';
+import { getSecurityCode, jsonResponse } from '../../spaceship';
 
 export async function handler(
   event: APIGatewayProxyEventV2,

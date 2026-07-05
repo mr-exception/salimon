@@ -8,12 +8,12 @@ import {
   getContactMessagesCollection,
   getContactsCollection,
   initializeSpaceshipContacts,
-} from '../contacts';
+} from '../../contacts';
 import {
   getSecurityCode,
   getSpaceshipsCollection,
   jsonResponse,
-} from '../spaceship';
+} from '../../spaceship';
 
 export async function handler(
   event: APIGatewayProxyEventV2,

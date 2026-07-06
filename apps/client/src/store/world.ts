@@ -277,6 +277,7 @@ let spaceshipBurn:
     }
   | undefined;
 let lastSpaceshipBurnReachedTarget = false;
+let lastSpaceshipBurnCompleted = false;
 let spaceshipManualAcceleration: Vector | undefined;
 let spaceshipAutoOrbitAcceleration: Vector | undefined;
 let spaceshipAutoOrbitClockwise = false;
@@ -470,7 +471,7 @@ export function getRequiredSpaceshipBurnAcceleration(
   targetSpeed: number,
   durationSeconds: number,
   targetDirection?: number,
-  currentVelocity: Vector = getSpaceshipVelocity(),
+  currentVelocity: Vector = getSpaceshipWorldVelocity(),
 ) {
   if (
     !Number.isFinite(targetSpeed) ||
@@ -498,7 +499,7 @@ export function getSpaceshipBurnPlan(
   targetSpeed: number,
   maximumThrustPercent: number,
   targetDirection?: number,
-  currentVelocity: Vector = getSpaceshipVelocity(),
+  currentVelocity: Vector = getSpaceshipWorldVelocity(),
 ) {
   if (
     !Number.isFinite(targetSpeed) ||
@@ -530,10 +531,9 @@ export function getSpaceshipBurnPlan(
     position,
     getGravitySources(),
   );
-  const referenceAcceleration = getSpaceshipReferenceAcceleration();
   const compensationAcceleration = {
-    x: referenceAcceleration.x - gravityAcceleration.x,
-    y: referenceAcceleration.y - gravityAcceleration.y,
+    x: -gravityAcceleration.x,
+    y: -gravityAcceleration.y,
   };
   const maximumAcceleration =
     ((MAX_ENGINE_THRUST_KN * 1_000) / SPACESHIP_MASS_KG) *
@@ -575,13 +575,13 @@ export function getSpaceshipBurnPlan(
 }
 
 function calculateRequiredBurnAcceleration(
-  targetRelativeVelocity: Vector,
+  targetVelocity: Vector,
   remainingSeconds: number,
   currentVelocity: Vector,
 ) {
   const desiredAcceleration = {
-    x: (targetRelativeVelocity.x - currentVelocity.x) / remainingSeconds,
-    y: (targetRelativeVelocity.y - currentVelocity.y) / remainingSeconds,
+    x: (targetVelocity.x - currentVelocity.x) / remainingSeconds,
+    y: (targetVelocity.y - currentVelocity.y) / remainingSeconds,
   };
   const position =
     spaceshipWorldPosition ??
@@ -590,11 +590,10 @@ function calculateRequiredBurnAcceleration(
     position,
     getGravitySources(),
   );
-  const referenceAcceleration = getSpaceshipReferenceAcceleration();
 
   return {
-    x: desiredAcceleration.x + referenceAcceleration.x - gravityAcceleration.x,
-    y: desiredAcceleration.y + referenceAcceleration.y - gravityAcceleration.y,
+    x: desiredAcceleration.x - gravityAcceleration.x,
+    y: desiredAcceleration.y - gravityAcceleration.y,
   };
 }
 
@@ -619,7 +618,7 @@ export function startSpaceshipEngines(
   stopSpaceshipAutoOrbit();
   stopSpaceshipFallingSpeedControl();
   spaceshipManualAcceleration = undefined;
-  const currentVelocity = getSpaceshipVelocity();
+  const currentVelocity = getSpaceshipWorldVelocity();
   const direction =
     targetDirection ?? Math.atan2(currentVelocity.y, currentVelocity.x);
   const targetVelocity = {
@@ -663,6 +662,7 @@ export function startSpaceshipEngines(
     targetVelocity,
   };
   lastSpaceshipBurnReachedTarget = false;
+  lastSpaceshipBurnCompleted = false;
 
   return true;
 }
@@ -707,6 +707,7 @@ export function startSpaceshipAutoOrbit(
   spaceshipAutoOrbitAcceleration = undefined;
   spaceshipAutoOrbitClockwise = clockwise;
   lastSpaceshipBurnReachedTarget = false;
+  lastSpaceshipBurnCompleted = false;
   spaceshipState.position = {
     x: BigInt(Math.round(spaceshipWorldPosition.x)),
     y: BigInt(Math.round(spaceshipWorldPosition.y)),
@@ -850,6 +851,7 @@ export function stopSpaceshipEngines() {
 
   spaceshipBurn = undefined;
   lastSpaceshipBurnReachedTarget = false;
+  lastSpaceshipBurnCompleted = false;
   return true;
 }
 
@@ -913,6 +915,22 @@ export function getSpaceshipBurnRemainingSeconds() {
 
 export function didSpaceshipBurnReachTarget() {
   return lastSpaceshipBurnReachedTarget;
+}
+
+export function didSpaceshipBurnComplete() {
+  return lastSpaceshipBurnCompleted;
+}
+
+export function getSpaceshipWorldVelocity() {
+  if (spaceshipVelocity) return { ...spaceshipVelocity };
+
+  const relativeVelocity =
+    spaceshipStoredRelativeVelocity ?? getSpaceshipVelocity();
+  const referenceVelocity = getSpaceshipReferenceVelocity();
+  return {
+    x: referenceVelocity.x + relativeVelocity.x,
+    y: referenceVelocity.y + relativeVelocity.y,
+  };
 }
 
 export function getSpaceshipVelocity() {
@@ -1317,10 +1335,12 @@ function advanceSpaceshipMotion(elapsedSeconds: number) {
     if (spaceshipBurn.elapsedSeconds >= spaceshipBurn.durationSeconds) {
       const targetVelocity = spaceshipBurn.targetVelocity;
       spaceshipBurn = undefined;
+      lastSpaceshipBurnCompleted = true;
       lastSpaceshipBurnReachedTarget =
         isSpaceshipTargetVelocityReached(targetVelocity);
     } else if (remainingFuelKns <= 0) {
       spaceshipBurn = undefined;
+      lastSpaceshipBurnCompleted = false;
       lastSpaceshipBurnReachedTarget = false;
     }
   } else if (
@@ -1753,7 +1773,7 @@ function updateSpaceshipBurnAcceleration() {
   const acceleration = calculateRequiredBurnAcceleration(
     spaceshipBurn.targetVelocity,
     remainingSeconds,
-    getSpaceshipVelocity(),
+    getSpaceshipWorldVelocity(),
   );
   const magnitude = Math.hypot(acceleration.x, acceleration.y);
   const maximumAcceleration = spaceshipBurn.maximumAcceleration;
@@ -1824,7 +1844,7 @@ function calculateFallingSpeedControlAcceleration() {
 }
 
 function isSpaceshipTargetVelocityReached(targetVelocity: Vector) {
-  const velocity = getSpaceshipVelocity();
+  const velocity = getSpaceshipWorldVelocity();
   return (
     Math.hypot(targetVelocity.x - velocity.x, targetVelocity.y - velocity.y) <=
     0.1
@@ -2003,6 +2023,7 @@ function attachSpaceshipToBody(collision: CelestialBodyCollision) {
     store.set(spaceshipHullDurabilityAtom, 0);
   }
   lastSpaceshipBurnReachedTarget = false;
+  lastSpaceshipBurnCompleted = false;
   store.set(spaceshipAutoOrbitAtom, { active: false });
   store.set(spaceshipFallingSpeedControlAtom, {
     active: false,

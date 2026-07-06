@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import {
   advanceWorld,
-  didSpaceshipBurnReachTarget,
+  didSpaceshipBurnComplete,
   getBodyWorldVelocity,
   getSpaceshipAttachedBodyName,
   getSpaceshipBurnAcceleration,
@@ -221,7 +221,7 @@ export class Scene extends Phaser.Scene {
     } else if (this.spaceshipEngineRunning && !spaceshipEngineRunning) {
       this.spaceshipEngineRunning = false;
       this.spaceship?.setThrustersActive(false);
-      if (didSpaceshipBurnReachTarget()) {
+      if (didSpaceshipBurnComplete()) {
         this.spaceship?.clearTargetDirection();
         this.targetDirection = undefined;
         setSpaceshipTargetDirection(undefined);

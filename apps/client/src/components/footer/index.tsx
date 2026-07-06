@@ -17,7 +17,7 @@ import {
   getSpaceshipBurnPlan,
   getSpaceshipBurnAcceleration,
   getSpaceshipBurnRemainingSeconds,
-  getSpaceshipVelocity,
+  getSpaceshipWorldVelocity,
   startSpaceshipAutoOrbit,
   stopSpaceshipAutoOrbit,
   repairSpaceshipHull,
@@ -352,11 +352,11 @@ export function Footer({
     () => new Set<SpeedControlTab>(),
   );
   const [burnStartVelocity, setBurnStartVelocity] = useState(() =>
-    getSpaceshipVelocity(),
+    getSpaceshipWorldVelocity(),
   );
   const targetSpeedMetersPerSecond = Number(targetSpeed) * 1_000;
   const maximumThrustPercentValue = Number(maximumThrustPercent);
-  const currentVelocity = getSpaceshipVelocity();
+  const currentVelocity = getSpaceshipWorldVelocity();
   const calculationStartVelocity = isEngineRunning
     ? burnStartVelocity
     : currentVelocity;

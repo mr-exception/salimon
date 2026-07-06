@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
@@ -71,11 +72,18 @@ const CONTROL_LABELS: Record<SpeedControlTab, string> = {
   maintenance: 'Ship durability',
 };
 
-const INITIAL_PANEL_POSITIONS: Record<SpeedControlTab, Position> = {
-  'target-speed': { x: 16, y: 140 },
-  'auto-orbit': { x: 32, y: 156 },
-  'manual-drive': { x: 48, y: 172 },
-  maintenance: { x: 64, y: 188 },
+const PANEL_MARGIN = 16;
+const PANEL_TOP = 140;
+const PANEL_BOTTOM = 88;
+
+const PANEL_PLACEMENTS: Record<
+  SpeedControlTab,
+  { horizontal: 'left' | 'right'; vertical: 'top' | 'bottom' }
+> = {
+  'target-speed': { horizontal: 'left', vertical: 'top' },
+  'auto-orbit': { horizontal: 'right', vertical: 'top' },
+  'manual-drive': { horizontal: 'left', vertical: 'bottom' },
+  maintenance: { horizontal: 'right', vertical: 'bottom' },
 };
 
 function FeatureIcon({ feature }: { feature: SpeedControlTab }) {
@@ -148,7 +156,10 @@ function DraggablePanel({
     offsetX: number;
     offsetY: number;
   } | null>(null);
-  const [position, setPosition] = useState(INITIAL_PANEL_POSITIONS[control]);
+  const [position, setPosition] = useState<Position>({
+    x: PANEL_MARGIN,
+    y: PANEL_TOP,
+  });
 
   const clampPosition = (nextPosition: Position) => {
     const panel = panelRef.current;
@@ -166,6 +177,31 @@ function DraggablePanel({
       ),
     };
   };
+
+  useLayoutEffect(() => {
+    const setInitialPosition = () => {
+      const panel = panelRef.current;
+      if (!panel) return;
+
+      const placement = PANEL_PLACEMENTS[control];
+      setPosition(
+        clampPosition({
+          x:
+            placement.horizontal === 'left'
+              ? PANEL_MARGIN
+              : window.innerWidth - panel.offsetWidth - PANEL_MARGIN,
+          y:
+            placement.vertical === 'top'
+              ? PANEL_TOP
+              : window.innerHeight - panel.offsetHeight - PANEL_BOTTOM,
+        }),
+      );
+    };
+
+    setInitialPosition();
+    window.addEventListener('resize', setInitialPosition);
+    return () => window.removeEventListener('resize', setInitialPosition);
+  }, [control]);
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
     const panelBounds = panelRef.current?.getBoundingClientRect();

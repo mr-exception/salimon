@@ -6,7 +6,7 @@ import {
   getSpaceshipAttachedBodyName,
   getSpaceshipBurnAcceleration,
   getSpaceshipMotionState,
-  getSpaceshipVelocity,
+  getSpaceshipWorldVelocity,
   isSpaceshipEngineRunning,
   resolveSpaceshipPlanetCollision,
   setActiveWorldBodyNames,
@@ -342,7 +342,7 @@ export class Scene extends Phaser.Scene {
       drawPrediction(
         this.spaceship.x,
         this.spaceship.y,
-        getSpaceshipVelocity(),
+        getSpaceshipWorldVelocity(),
       );
     }
   }
@@ -632,7 +632,7 @@ export class Scene extends Phaser.Scene {
         this.spaceship.x,
         this.spaceship.y,
         Number(this.spaceship.spaceship.radius),
-        getSpaceshipVelocity(),
+        getSpaceshipWorldVelocity(),
       );
     }
 
@@ -683,7 +683,7 @@ export class Scene extends Phaser.Scene {
     if (distance === 0) return undefined;
 
     const direction = Math.atan2(deltaY, deltaX);
-    const velocity = getSpaceshipVelocity();
+    const velocity = getSpaceshipWorldVelocity();
     const currentDirection = Math.atan2(velocity.y, velocity.x);
     const angleDegrees = ((direction - currentDirection) * 180) / Math.PI;
     const angle = (angleDegrees + 360) % 360;

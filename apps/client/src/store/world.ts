@@ -53,6 +53,7 @@ const GRAVITATIONAL_CONSTANT = 6.6743e-11;
 const MIN_GRAVITY_ACCELERATION = 1e-8;
 const MAX_SIMULATION_STEP_SECONDS = 1;
 const MAX_SIMULATION_STEPS = 240;
+const THRUSTER_DURABILITY_DRAIN_RATE = 0.01;
 const EARTH_NAME = 'Earth';
 const EARTH_RADIUS_METERS = 6_371_000;
 const SPACESHIP_RADIUS_METERS = 200;
@@ -2040,7 +2041,10 @@ function wearSpaceshipThrusters(
     current.map((durability, index) =>
       Math.max(
         0,
-        durability - ((thrustByIndex[index] ?? 0) / 100) * 0.1 * elapsedSeconds,
+        durability -
+          ((thrustByIndex[index] ?? 0) / 100) *
+            THRUSTER_DURABILITY_DRAIN_RATE *
+            elapsedSeconds,
       ),
     ),
   );
@@ -2094,7 +2098,8 @@ function getActiveThrusters(
     ),
     availableSeconds: Math.min(
       ...activeIndexes.map(
-        ({ index, thrust }) => durability[index] / ((thrust / 100) * 0.1),
+        ({ index, thrust }) =>
+          durability[index] / ((thrust / 100) * THRUSTER_DURABILITY_DRAIN_RATE),
       ),
     ),
   };

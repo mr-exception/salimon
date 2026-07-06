@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { getSpaceshipMotionState, getSpaceshipVelocity } from '@store';
+import { getSpaceshipMotionState } from '@store';
 import type { Spaceship as SpaceshipData } from '@types';
 import { getRenderPosition } from './get-render-position';
 import { SPACESHIP_PHYSICS_LABEL } from './physics';
@@ -10,7 +10,6 @@ const MIN_SPACESHIP_LENGTH_PX = 16;
 const DIRECTION_ARROW_START_M = 280;
 const DIRECTION_ARROW_TIP_M = 1_080;
 const DIRECTION_ARROW_LENGTH_PX = 120;
-const VELOCITY_ARROW_COLOR = 0xffffff;
 const TARGET_ARROW_COLOR = 0x22c55e;
 const THRUSTER_GLOW_COLOR = 0x22d3ee;
 const THRUSTER_OFFSET_M = 224;
@@ -23,7 +22,6 @@ export class Spaceship extends Phaser.GameObjects.Container {
   readonly spaceship: SpaceshipData;
   private readonly shipImage: Phaser.GameObjects.Image;
   private readonly thrusterGlows: Phaser.GameObjects.Ellipse[];
-  private readonly velocityArrow: Phaser.GameObjects.Graphics;
   private readonly targetArrow: Phaser.GameObjects.Graphics;
   private readonly physicsBody: MatterJS.BodyType;
   private targetDirection?: number;
@@ -50,22 +48,11 @@ export class Spaceship extends Phaser.GameObjects.Container {
       createThrusterGlow(scene, 0, THRUSTER_OFFSET_M, 112, 88),
       createThrusterGlow(scene, -THRUSTER_OFFSET_M, 0, 88, 112),
     ];
-    this.velocityArrow = createDirectionArrow(
-      scene,
-      VELOCITY_ARROW_COLOR,
-      0.58,
-    );
     this.targetArrow = createDirectionArrow(scene, TARGET_ARROW_COLOR, 0.72);
     this.targetArrow.setVisible(false);
 
     this.setName(spaceship.name);
-    this.add([
-      this.velocityArrow,
-      this.targetArrow,
-      ...this.thrusterGlows,
-      this.shipImage,
-    ]);
-    this.syncVelocityIndicator();
+    this.add([this.targetArrow, ...this.thrusterGlows, this.shipImage]);
     scene.add.existing(this);
     this.physicsBody = scene.matter.add.circle(
       this.x,
@@ -97,7 +84,6 @@ export class Spaceship extends Phaser.GameObjects.Container {
       (DIRECTION_ARROW_TIP_M - DIRECTION_ARROW_START_M) /
       worldScale /
       zoom;
-    this.velocityArrow.setScale(arrowScale);
     this.targetArrow.setScale(arrowScale);
     this.setVisible(viewport.contains(this.x, this.y));
   }
@@ -109,7 +95,7 @@ export class Spaceship extends Phaser.GameObjects.Container {
       y: this.y,
     });
     this.scene.matter.body.setVelocity(this.physicsBody, { x: 0, y: 0 });
-    this.syncVelocityIndicator();
+    this.syncDirectionIndicators();
     this.syncThrusterGlows();
   }
 
@@ -168,17 +154,6 @@ export class Spaceship extends Phaser.GameObjects.Container {
     this.targetArrow.setVisible(false);
   }
 
-  private syncVelocityIndicator() {
-    const velocity = getSpaceshipVelocity();
-    const speed = Math.hypot(velocity.x, velocity.y);
-    const velocityAngle = Math.atan2(velocity.y, velocity.x);
-
-    this.velocityArrow
-      .setRotation(velocityAngle)
-      .setVisible(getSpaceshipMotionState() === 'flying' && speed > 0);
-    this.syncTargetDirection();
-  }
-
   private syncRenderPosition() {
     const renderPosition = getRenderPosition(this.spaceship.position);
     const referenceName = this.spaceship.position.relativeTo;
@@ -213,7 +188,7 @@ export class Spaceship extends Phaser.GameObjects.Container {
   }
 
   private syncDirectionIndicators() {
-    this.syncVelocityIndicator();
+    this.syncTargetDirection();
   }
 
   private syncTargetDirection() {

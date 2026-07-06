@@ -2263,6 +2263,10 @@ function getCelestialBodyWorldVelocity(
   };
 }
 
+export function getBodyWorldVelocity(bodyName: string) {
+  return getCelestialBodyWorldVelocity(bodyName, new Set());
+}
+
 function toVector(position: Position): Vector {
   return { x: Number(position.x), y: Number(position.y) };
 }

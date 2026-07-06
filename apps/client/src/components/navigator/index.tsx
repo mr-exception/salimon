@@ -31,6 +31,7 @@ function formatScaleDistance(zoom: number) {
 }
 
 type NavigatorProps = {
+  isMeasuring?: boolean;
   isSelectingTargetDirection?: boolean;
   onSceneChange?: (scene: Scene | null) => void;
   onSpaceshipEngineChange?: (isRunning: boolean) => void;
@@ -38,6 +39,7 @@ type NavigatorProps = {
 };
 
 export function Navigator({
+  isMeasuring = false,
   isSelectingTargetDirection = false,
   onSceneChange,
   onSpaceshipEngineChange,
@@ -65,6 +67,10 @@ export function Navigator({
   const [pendingFallingSpeed, setPendingFallingSpeed] = useState(
     fallingSpeedControl.targetSpeedMetersPerSecond,
   );
+
+  useEffect(() => {
+    sceneRef.current?.setMeasuringActive(isMeasuring);
+  }, [isMeasuring]);
 
   useEffect(() => {
     let lastUpdate = 0;

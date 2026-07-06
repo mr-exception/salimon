@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import {
   advanceWorld,
   didSpaceshipBurnReachTarget,
+  getBodyWorldVelocity,
   getSpaceshipAttachedBodyName,
   getSpaceshipBurnAcceleration,
   getSpaceshipMotionState,
@@ -16,6 +17,7 @@ import {
   stopSpaceshipEngines,
 } from '@store';
 import type { Planet as PlanetData, Star as StarData } from '@types';
+import { formatSpeed } from '../../../../utils';
 import {
   DEFAULT_RENDER_ORIGIN_NAME,
   getRenderPosition,
@@ -65,6 +67,11 @@ export type TargetDirectionPreview = {
 };
 
 const VIEWPORT_LABEL_OBJECT_LIMIT = 20;
+const MEASUREMENT_ARROW_LENGTH_PX = 72;
+const MEASUREMENT_ARROW_HEAD_PX = 7;
+const MEASUREMENT_ARROW_GAP_PX = 8;
+const MEASUREMENT_ARROW_COLOR = 0x22d3ee;
+const PREDICTION_COLOR = 0xa78bfa;
 
 export class Scene extends Phaser.Scene {
   protected dragging = false;
@@ -92,6 +99,14 @@ export class Scene extends Phaser.Scene {
   protected stars: Star[] = [];
   protected spaceship?: Spaceship;
   protected grid?: Phaser.GameObjects.Graphics;
+  private measurementGraphics?: Phaser.GameObjects.Graphics;
+  private predictionGraphics?: Phaser.GameObjects.Graphics;
+  private readonly measurementLabels = new Map<
+    string,
+    Phaser.GameObjects.Text
+  >();
+  private measuringActive = false;
+  private predictionSeconds?: number;
   protected lastViewportKey = '';
   protected unsubscribeFromWorld?: () => void;
   private readonly planetDataByName = new Map<string, PlanetData>();
@@ -170,6 +185,8 @@ export class Scene extends Phaser.Scene {
     setRenderOriginName(DEFAULT_RENDER_ORIGIN_NAME);
     this.configureCamera();
     this.grid = this.add.graphics().setDepth(-1);
+    this.measurementGraphics = this.add.graphics().setDepth(20);
+    this.predictionGraphics = this.add.graphics().setDepth(19);
     this.drawVisibleWorld();
     this.configureInput();
     this.matter.world.on(
@@ -234,6 +251,8 @@ export class Scene extends Phaser.Scene {
       this.lastVisibilityViewportKey = visibilityViewportKey;
       this.updateWorldVisibility();
     }
+    this.drawMeasurements();
+    this.drawPredictions();
   }
 
   private readonly handleMatterCollision = (
@@ -260,6 +279,72 @@ export class Scene extends Phaser.Scene {
     this.lastReportedZoom = camera.zoom;
     this.onZoomChange?.(camera.zoom);
     this.updateWorldVisibility();
+  }
+
+  setMeasuringActive(active: boolean) {
+    this.measuringActive = active;
+    if (!active) {
+      this.measurementGraphics?.clear();
+      this.measurementLabels.forEach((label) => label.setVisible(false));
+    }
+  }
+
+  setPrediction(active: boolean, seconds: number) {
+    this.predictionSeconds =
+      active && Number.isFinite(seconds) && seconds > 0 ? seconds : undefined;
+    if (!this.predictionSeconds) this.predictionGraphics?.clear();
+  }
+
+  private drawPredictions() {
+    const graphics = this.predictionGraphics;
+    const seconds = this.predictionSeconds;
+    if (!graphics || !seconds) return;
+
+    const zoom = this.cameras.main.zoom;
+    graphics.clear();
+    graphics.lineStyle(1.5 / zoom, PREDICTION_COLOR, 0.72);
+
+    const drawPrediction = (
+      x: number,
+      y: number,
+      velocity: { x: number; y: number },
+    ) => {
+      const targetX = x + velocity.x * seconds;
+      const targetY = y + velocity.y * seconds;
+      const markerRadius = 6 / zoom;
+      graphics.lineBetween(x, y, targetX, targetY);
+      graphics.strokeCircle(targetX, targetY, markerRadius);
+      graphics.lineBetween(
+        targetX - markerRadius * 1.5,
+        targetY,
+        targetX + markerRadius * 1.5,
+        targetY,
+      );
+      graphics.lineBetween(
+        targetX,
+        targetY - markerRadius * 1.5,
+        targetX,
+        targetY + markerRadius * 1.5,
+      );
+    };
+
+    this.planets.forEach((planet) => {
+      if (planet.visible) {
+        drawPrediction(planet.x, planet.y, getBodyWorldVelocity(planet.name));
+      }
+    });
+    this.stars.forEach((star) => {
+      if (star.visible) {
+        drawPrediction(star.x, star.y, getBodyWorldVelocity(star.name));
+      }
+    });
+    if (this.spaceship?.visible) {
+      drawPrediction(
+        this.spaceship.x,
+        this.spaceship.y,
+        getSpaceshipVelocity(),
+      );
+    }
   }
 
   navigateTo(name: string, zoom: number) {
@@ -446,6 +531,114 @@ export class Scene extends Phaser.Scene {
     this.selectingTargetDirection = active;
     this.game.canvas.style.cursor = active ? 'crosshair' : 'grab';
     if (!active) this.onTargetDirectionPreview?.(undefined);
+  }
+
+  private drawMeasurements() {
+    const graphics = this.measurementGraphics;
+    if (!graphics || !this.measuringActive) return;
+
+    const camera = this.cameras.main;
+    const zoom = camera.zoom;
+    const displayedNames = new Set<string>();
+    graphics.clear();
+    graphics.lineStyle(1.5 / zoom, MEASUREMENT_ARROW_COLOR, 0.9);
+
+    const drawMeasurement = (
+      name: string,
+      x: number,
+      y: number,
+      radius: number,
+      velocity: { x: number; y: number },
+    ) => {
+      const speed = Math.hypot(velocity.x, velocity.y);
+      const angle = speed > 0 ? Math.atan2(velocity.y, velocity.x) : 0;
+      const directionX = Math.cos(angle);
+      const directionY = Math.sin(angle);
+      const startDistance = radius + MEASUREMENT_ARROW_GAP_PX / zoom;
+      const endDistance = startDistance + MEASUREMENT_ARROW_LENGTH_PX / zoom;
+      const startX = x + directionX * startDistance;
+      const startY = y + directionY * startDistance;
+      const endX = x + directionX * endDistance;
+      const endY = y + directionY * endDistance;
+      const headLength = MEASUREMENT_ARROW_HEAD_PX / zoom;
+
+      graphics
+        .beginPath()
+        .moveTo(startX, startY)
+        .lineTo(endX, endY)
+        .lineTo(
+          endX - Math.cos(angle - Math.PI / 4) * headLength,
+          endY - Math.sin(angle - Math.PI / 4) * headLength,
+        )
+        .moveTo(endX, endY)
+        .lineTo(
+          endX - Math.cos(angle + Math.PI / 4) * headLength,
+          endY - Math.sin(angle + Math.PI / 4) * headLength,
+        )
+        .strokePath();
+
+      let label = this.measurementLabels.get(name);
+      if (!label) {
+        label = this.add
+          .text(0, 0, '', {
+            color: '#67e8f9',
+            fontFamily: 'system-ui, sans-serif',
+            fontSize: '12px',
+            fontStyle: 'bold',
+            stroke: '#050816',
+            strokeThickness: 3,
+          })
+          .setDepth(21)
+          .setOrigin(0, 0.5)
+          .setResolution(Math.max(2, window.devicePixelRatio));
+        this.measurementLabels.set(name, label);
+      }
+
+      label
+        .setText(formatSpeed(speed))
+        .setOrigin(directionX < 0 ? 1 : 0, 0.5)
+        .setPosition(
+          endX + directionX * (MEASUREMENT_ARROW_GAP_PX / zoom),
+          endY + directionY * (MEASUREMENT_ARROW_GAP_PX / zoom),
+        )
+        .setScale(1 / zoom)
+        .setVisible(true);
+      displayedNames.add(name);
+    };
+
+    this.planets.forEach((planet) => {
+      if (!planet.visible) return;
+      drawMeasurement(
+        planet.name,
+        planet.x,
+        planet.y,
+        Number(planet.planet.radius),
+        getBodyWorldVelocity(planet.name),
+      );
+    });
+    this.stars.forEach((star) => {
+      if (!star.visible) return;
+      drawMeasurement(
+        star.name,
+        star.x,
+        star.y,
+        Number(star.star.radius),
+        getBodyWorldVelocity(star.name),
+      );
+    });
+    if (this.spaceship?.visible) {
+      drawMeasurement(
+        this.spaceship.name,
+        this.spaceship.x,
+        this.spaceship.y,
+        Number(this.spaceship.spaceship.radius),
+        getSpaceshipVelocity(),
+      );
+    }
+
+    this.measurementLabels.forEach((label, name) => {
+      if (!displayedNames.has(name)) label.setVisible(false);
+    });
   }
 
   isTargetDirectionSelectionActive() {

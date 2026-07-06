@@ -28,6 +28,7 @@ export default function App() {
   const bootstrapState = useBootstrap(bootstrapRequest);
   const [isEngineRunning, setIsEngineRunning] = useState(false);
   const [isCommunicationsOpen, setIsCommunicationsOpen] = useState(false);
+  const [isMeasuring, setIsMeasuring] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState<UnreadMessage[]>([]);
   const [isSelectingTargetDirection, setIsSelectingTargetDirection] =
     useState(false);
@@ -39,6 +40,7 @@ export default function App() {
       power: number,
     ) => void;
     setTargetDirectionSelectionActive: (active: boolean) => void;
+    setPrediction: (active: boolean, seconds: number) => void;
   } | null>(null);
   const handleSceneChange = useCallback(
     (
@@ -53,6 +55,7 @@ export default function App() {
           power: number,
         ) => void;
         setTargetDirectionSelectionActive: (active: boolean) => void;
+        setPrediction: (active: boolean, seconds: number) => void;
       } | null,
     ) => {
       sceneRef.current = scene;
@@ -90,6 +93,9 @@ export default function App() {
     setUnreadMessages((current) =>
       current.filter((message) => !readIds.has(message.id)),
     );
+  }, []);
+  const setPrediction = useCallback((active: boolean, seconds: number) => {
+    sceneRef.current?.setPrediction(active, seconds);
   }, []);
 
   useEffect(() => {
@@ -142,6 +148,7 @@ export default function App() {
   return (
     <div className={style.app}>
       <Navigator
+        isMeasuring={isMeasuring}
         onSceneChange={handleSceneChange}
         onSpaceshipEngineChange={setIsEngineRunning}
         isSelectingTargetDirection={isSelectingTargetDirection}
@@ -149,13 +156,16 @@ export default function App() {
       />
       <Footer
         isEngineRunning={isEngineRunning}
+        isMeasuring={isMeasuring}
         onStartEngines={startEngines}
         onStopEngines={stopEngines}
         onManualThrustChange={setManualThrust}
+        onToggleMeasuring={() => setIsMeasuring((active) => !active)}
         onOpenCommunications={() => setIsCommunicationsOpen(true)}
         unreadMessageCount={unreadMessages.length}
         isSelectingTargetDirection={isSelectingTargetDirection}
         onToggleTargetDirectionSelection={toggleTargetDirectionSelection}
+        onPredictionChange={setPrediction}
       />
       {isCommunicationsOpen && (
         <Communications

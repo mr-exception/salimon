@@ -128,6 +128,50 @@
   background: color-mix(in srgb, var(--color-plasma-cyan) 14%, transparent);
 }
 
+.predictionControls {
+  display: grid;
+  min-width: 280px;
+  grid-template-columns: 1fr 100px;
+  align-items: end;
+  gap: 12px;
+}
+
+.predictionControls label {
+  display: grid;
+  gap: 6px;
+}
+
+.predictionField {
+  display: grid;
+  grid-template-columns: 1fr 64px;
+  gap: 6px;
+}
+
+.predictionField input,
+.predictionField select {
+  box-sizing: border-box;
+  height: 28px;
+  padding: 0 7px;
+  border: 1px solid var(--color-nebula-blue);
+  border-radius: 4px;
+  outline: none;
+  background: var(--color-deep-space);
+  color: var(--color-starlight);
+  font:
+    600 0.72rem/1 system-ui,
+    sans-serif;
+}
+
+.predictionField input:focus,
+.predictionField select:focus {
+  border-color: var(--color-plasma-cyan);
+}
+
+.predictionControls button[data-active='true'] {
+  border-color: #ef4444;
+  color: #fca5a5;
+}
+
 .controlDialog {
   position: absolute;
   display: grid;

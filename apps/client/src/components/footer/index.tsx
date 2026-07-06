@@ -41,6 +41,7 @@ import {
 
 type FooterProps = {
   isEngineRunning?: boolean;
+  isMeasuring?: boolean;
   isSelectingTargetDirection?: boolean;
   showMovementHint?: boolean;
   onStartEngines?: (targetSpeed: number, maximumThrustPercent: number) => void;
@@ -49,16 +50,19 @@ type FooterProps = {
     direction: { x: number; y: number } | undefined,
     power: number,
   ) => void;
+  onToggleMeasuring?: () => void;
   onOpenCommunications?: () => void;
   unreadMessageCount?: number;
   onToggleTargetDirectionSelection?: () => void;
+  onPredictionChange?: (active: boolean, seconds: number) => void;
 };
 
 type SpeedControlTab =
   | 'target-speed'
   | 'auto-orbit'
   | 'manual-drive'
-  | 'maintenance';
+  | 'maintenance'
+  | 'prediction';
 
 type Position = {
   x: number;
@@ -70,6 +74,7 @@ const CONTROL_LABELS: Record<SpeedControlTab, string> = {
   'auto-orbit': 'Auto orbit',
   'manual-drive': 'Manual drive',
   maintenance: 'Ship durability',
+  prediction: 'Prediction',
 };
 
 const PANEL_MARGIN = 16;
@@ -84,9 +89,19 @@ const PANEL_PLACEMENTS: Record<
   'auto-orbit': { horizontal: 'right', vertical: 'top' },
   'manual-drive': { horizontal: 'left', vertical: 'bottom' },
   maintenance: { horizontal: 'right', vertical: 'bottom' },
+  prediction: { horizontal: 'left', vertical: 'bottom' },
 };
 
 function FeatureIcon({ feature }: { feature: SpeedControlTab }) {
+  if (feature === 'prediction') {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="6" cy="17" r="2" />
+        <circle cx="18" cy="7" r="2" />
+        <path d="M8 16c4-.8 5-6.2 8-8M13 7h3v3" />
+      </svg>
+    );
+  }
   if (feature === 'maintenance') {
     return (
       <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -137,6 +152,15 @@ function CommunicationsIcon() {
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M4 5h16v11H9l-5 4V5Z" />
       <path d="M8 9h8M8 12h5" />
+    </svg>
+  );
+}
+
+function MeasuringIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 20 20 4M12 4h8v8" />
+      <path d="M4 15v5h5" />
     </svg>
   );
 }
@@ -293,14 +317,17 @@ function DraggablePanel({
 
 export function Footer({
   isEngineRunning = false,
+  isMeasuring = false,
   isSelectingTargetDirection = false,
   showMovementHint = false,
   onStartEngines,
   onStopEngines,
   onManualThrustChange,
+  onToggleMeasuring,
   onOpenCommunications,
   unreadMessageCount = 0,
   onToggleTargetDirectionSelection,
+  onPredictionChange,
 }: FooterProps) {
   const speed = useSpaceshipSpeed();
   const fuelKns = useSpaceshipFuelKns();
@@ -315,6 +342,9 @@ export function Footer({
   const [orbitDistance, setOrbitDistance] = useState('400');
   const [orbitError, setOrbitError] = useState('');
   const [manualPower, setManualPower] = useState(25);
+  const [predictionAmount, setPredictionAmount] = useState('2');
+  const [predictionUnit, setPredictionUnit] = useState<'s' | 'm' | 'h'>('m');
+  const [isPredictionActive, setIsPredictionActive] = useState(false);
   const [isMovementHintVisible, setIsMovementHintVisible] =
     useState(showMovementHint);
   const pressedDriveKeys = useRef(new Set<string>());
@@ -367,6 +397,24 @@ export function Footer({
     orbitSpeedMetersPerSecond > 0 &&
     Number.isFinite(orbitDistanceMeters) &&
     orbitDistanceMeters >= 0;
+  const predictionSeconds =
+    Number(predictionAmount) *
+    ({ s: 1, m: 60, h: 3_600 } as const)[predictionUnit];
+  const hasValidPrediction =
+    Number.isFinite(predictionSeconds) && predictionSeconds > 0;
+
+  useEffect(() => {
+    if (isPredictionActive && hasValidPrediction) {
+      onPredictionChange?.(true, predictionSeconds);
+    } else {
+      onPredictionChange?.(false, 0);
+    }
+  }, [
+    hasValidPrediction,
+    isPredictionActive,
+    onPredictionChange,
+    predictionSeconds,
+  ]);
 
   useEffect(() => {
     const stopThrust = () => {
@@ -500,6 +548,7 @@ export function Footer({
               ['auto-orbit', 'Auto orbit'],
               ['manual-drive', 'Manual drive'],
               ['maintenance', 'Ship durability'],
+              ['prediction', 'Prediction'],
             ] as const
           ).map(([tab, label]) => (
             <button
@@ -519,6 +568,19 @@ export function Footer({
               </span>
             </button>
           ))}
+          <button
+            className={style.controlTab}
+            type="button"
+            aria-label="Measuring"
+            aria-pressed={isMeasuring}
+            data-active={isMeasuring}
+            onClick={onToggleMeasuring}
+          >
+            <MeasuringIcon />
+            <span className={style.tooltip} role="tooltip">
+              Measuring
+            </span>
+          </button>
           <button
             className={style.controlTab}
             type="button"
@@ -542,6 +604,51 @@ export function Footer({
         </div>
 
         <div className={style.controlPanels}>
+          {expandedSpeedControls.has('prediction') && (
+            <DraggablePanel
+              control="prediction"
+              onClose={() => toggleSpeedControl('prediction')}
+            >
+              <div className={style.predictionControls}>
+                <label htmlFor="footer-prediction-amount">
+                  <span>Time ahead</span>
+                  <span className={style.predictionField}>
+                    <input
+                      id="footer-prediction-amount"
+                      type="number"
+                      min="1"
+                      step="1"
+                      value={predictionAmount}
+                      onChange={(event) =>
+                        setPredictionAmount(event.currentTarget.value)
+                      }
+                    />
+                    <select
+                      aria-label="Prediction time unit"
+                      value={predictionUnit}
+                      onChange={(event) =>
+                        setPredictionUnit(
+                          event.currentTarget.value as 's' | 'm' | 'h',
+                        )
+                      }
+                    >
+                      <option value="s">s</option>
+                      <option value="m">m</option>
+                      <option value="h">h</option>
+                    </select>
+                  </span>
+                </label>
+                <button
+                  type="button"
+                  data-active={isPredictionActive}
+                  disabled={!hasValidPrediction}
+                  onClick={() => setIsPredictionActive((active) => !active)}
+                >
+                  {isPredictionActive ? 'Deactivate' : 'Activate'}
+                </button>
+              </div>
+            </DraggablePanel>
+          )}
           {expandedSpeedControls.has('maintenance') && (
             <DraggablePanel
               control="maintenance"

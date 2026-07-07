@@ -64,6 +64,7 @@ export async function loadOfflineWorld(): Promise<OfflineWorld> {
   };
   const collections: Collection<CelestialBody>[] = [
     database.collection<CelestialBody>('planets'),
+    database.collection<CelestialBody>('moons'),
     database.collection<CelestialBody>('stars'),
   ];
   const bodyGroups = await Promise.all(

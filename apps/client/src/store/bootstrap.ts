@@ -111,6 +111,7 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
     let updateTimer: number | undefined;
     let updateDelay: number | undefined;
     let securityCode: string | undefined;
+    let engineWasRunning = false;
     let unsubscribe: (() => void) | undefined;
 
     const flushUpdate = () => {
@@ -131,7 +132,15 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
           if (changedBodyNames && !changedBodyNames.has(spaceshipState.name)) {
             return;
           }
-          const nextUpdateDelay = isSpaceshipEngineRunning()
+          const engineIsRunning = isSpaceshipEngineRunning();
+          if (engineWasRunning && !engineIsRunning) {
+            engineWasRunning = false;
+            flushUpdate();
+            return;
+          }
+
+          engineWasRunning = engineIsRunning;
+          const nextUpdateDelay = engineIsRunning
             ? THRUSTING_UPDATE_DELAY_MS
             : COASTING_UPDATE_DELAY_MS;
           if (updateTimer && updateDelay === nextUpdateDelay) return;

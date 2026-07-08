@@ -1,22 +1,14 @@
 import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
 import type { Filter } from 'mongodb';
-import { asyncHandler, sendError } from '../http';
-import { generateContactReplyInBackground } from '../services/contact-replies';
+import { ContactRepliesService } from '@services/contact-replies.service';
 import {
   CONTACTS,
-  decodeMessageCursor,
-  encodeMessageCursor,
-  findLatestMessage,
-  getContactMessagesCollection,
-  getContactsCollection,
-  hasContact,
-  initializeSpaceshipContacts,
-  parseJsonBody,
-  toMessageDto,
+  ContactsService,
   type ContactMessageDocument,
-} from '../services/contacts';
-import { getSpaceshipsCollection } from '../services/spaceship';
+} from '@services/contacts.service';
+import { SpaceshipService } from '@services/spaceship.service';
+import { asyncHandler, sendError } from '../http';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -43,23 +35,23 @@ contactsRouter.get(
 
     try {
       const spaceship = await (
-        await getSpaceshipsCollection()
+        await SpaceshipService.getSpaceshipsCollection()
       ).findOne({ securityCode });
       if (!spaceship) {
         sendError(response, 404, 'Spaceship not found');
         return;
       }
 
-      let contacts = await (await getContactsCollection())
+      let contacts = await (await ContactsService.getContactsCollection())
         .find({ spaceshipSecurityCode: securityCode })
         .toArray();
       if (contacts.length === 0) {
-        await initializeSpaceshipContacts(securityCode);
-        contacts = await (await getContactsCollection())
+        await ContactsService.initializeSpaceshipContacts(securityCode);
+        contacts = await (await ContactsService.getContactsCollection())
           .find({ spaceshipSecurityCode: securityCode })
           .toArray();
       }
-      const messages = await getContactMessagesCollection();
+      const messages = await ContactsService.getContactMessagesCollection();
 
       response.json({
         contacts: await Promise.all(
@@ -68,7 +60,11 @@ contactsRouter.get(
               CONTACTS[contact.contactId as keyof typeof CONTACTS];
             if (!profile) return [];
             const [latestMessage, unreadCount] = await Promise.all([
-              findLatestMessage(messages, securityCode, contact.contactId),
+              ContactsService.findLatestMessage(
+                messages,
+                securityCode,
+                contact.contactId,
+              ),
               messages.countDocuments({
                 spaceshipSecurityCode: securityCode,
                 contactId: contact.contactId,
@@ -112,7 +108,9 @@ contactsRouter.get(
       return;
     }
     const afterValue = queryString(request.query.after);
-    const after = afterValue ? decodeMessageCursor(afterValue) : undefined;
+    const after = afterValue
+      ? ContactsService.decodeMessageCursor(afterValue)
+      : undefined;
     if (afterValue && !after) {
       sendError(response, 400, 'after must be a valid cursor');
       return;
@@ -125,7 +123,7 @@ contactsRouter.get(
     const limit = Math.min(requestedLimit, 100);
 
     try {
-      if (!(await hasContact(securityCode, contactId))) {
+      if (!(await ContactsService.hasContact(securityCode, contactId))) {
         sendError(response, 404, 'Contact not found');
         return;
       }
@@ -142,7 +140,9 @@ contactsRouter.get(
             }
           : {}),
       };
-      const messages = await (await getContactMessagesCollection())
+      const messages = await (
+        await ContactsService.getContactMessagesCollection()
+      )
         .find(filter)
         .sort({ createdAt: 1, _id: 1 })
         .limit(limit)
@@ -155,7 +155,7 @@ contactsRouter.get(
         .map((message) => message._id);
       if (unreadMessageIds.length > 0) {
         await (
-          await getContactMessagesCollection()
+          await ContactsService.getContactMessagesCollection()
         ).updateMany(
           {
             spaceshipSecurityCode: securityCode,
@@ -170,10 +170,10 @@ contactsRouter.get(
       }
 
       response.json({
-        messages: messages.map(toMessageDto),
+        messages: messages.map(ContactsService.toMessageDto),
         cursor:
           messages.length > 0
-            ? encodeMessageCursor(messages[messages.length - 1])
+            ? ContactsService.encodeMessageCursor(messages[messages.length - 1])
             : afterValue,
       });
     } catch (error) {
@@ -198,16 +198,16 @@ contactsRouter.get(
 
     try {
       const spaceship = await (
-        await getSpaceshipsCollection()
+        await SpaceshipService.getSpaceshipsCollection()
       ).findOne({ securityCode });
       if (!spaceship) {
         sendError(response, 404, 'Spaceship not found');
         return;
       }
-      await initializeSpaceshipContacts(securityCode);
+      await ContactsService.initializeSpaceshipContacts(securityCode);
 
       const messages = await (
-        await getContactMessagesCollection()
+        await ContactsService.getContactMessagesCollection()
       )
         .find({
           spaceshipSecurityCode: securityCode,
@@ -217,7 +217,7 @@ contactsRouter.get(
         .sort({ createdAt: 1, _id: 1 })
         .toArray();
 
-      response.json({ messages: messages.map(toMessageDto) });
+      response.json({ messages: messages.map(ContactsService.toMessageDto) });
     } catch (error) {
       console.error('Failed to load unread contact messages', error);
       sendError(response, 500, 'Failed to load unread contact messages');
@@ -242,7 +242,7 @@ contactsRouter.post(
     let text: string;
     let clientMessageId: string;
     try {
-      const body = parseJsonBody(request.body);
+      const body = ContactsService.parseJsonBody(request.body);
       contactId =
         typeof body.contactId === 'string' ? body.contactId.trim() : '';
       text = typeof body.text === 'string' ? body.text.trim() : '';
@@ -270,12 +270,12 @@ contactsRouter.post(
     }
 
     try {
-      if (!(await hasContact(securityCode, contactId))) {
+      if (!(await ContactsService.hasContact(securityCode, contactId))) {
         sendError(response, 404, 'Contact not found');
         return;
       }
 
-      const messages = await getContactMessagesCollection();
+      const messages = await ContactsService.getContactMessagesCollection();
       const existing = await messages.findOne({
         spaceshipSecurityCode: securityCode,
         contactId,
@@ -283,14 +283,16 @@ contactsRouter.post(
       });
       if (existing) {
         if (existing.status === 'failed') {
-          generateContactReplyInBackground(existing);
+          ContactRepliesService.generateContactReplyInBackground(existing);
           existing.status = 'sent';
           await messages.updateOne(
             { _id: existing._id },
             { $set: { status: 'sent' } },
           );
         }
-        response.status(202).json({ message: toMessageDto(existing) });
+        response
+          .status(202)
+          .json({ message: ContactsService.toMessageDto(existing) });
         return;
       }
 
@@ -320,14 +322,16 @@ contactsRouter.post(
         createdAt: new Date(),
       };
       await messages.insertOne(message);
-      generateContactReplyInBackground(message);
+      ContactRepliesService.generateContactReplyInBackground(message);
       message.status = 'sent';
       await messages.updateOne(
         { _id: message._id },
         { $set: { status: 'sent' } },
       );
 
-      response.status(202).json({ message: toMessageDto(message) });
+      response
+        .status(202)
+        .json({ message: ContactsService.toMessageDto(message) });
     } catch (error) {
       console.error('Failed to send contact message', error);
       sendError(response, 500, 'Failed to send contact message');

@@ -1,12 +1,6 @@
 import type { Server } from 'node:http';
 import { WebSocket, WebSocketServer } from 'ws';
-import {
-  getSecurityCode,
-  loadSpaceship,
-  parseSpaceshipUpdate,
-  toSpaceshipDto,
-  updateSpaceship,
-} from './services/spaceship';
+import { SpaceshipService } from '@services/spaceship.service';
 
 const SPACESHIP_SOCKET_PATH = '/spaceship/socket';
 const SPACESHIP_INFO_INTERVAL_MS = 5_000;
@@ -17,7 +11,7 @@ function sendJson(socket: WebSocket, message: unknown) {
 }
 
 function getSocketSecurityCode(url: URL) {
-  return getSecurityCode({
+  return SpaceshipService.getSecurityCode({
     'x-spaceship-security-code':
       url.searchParams.get('shipSecret') ??
       url.searchParams.get('securityCode') ??
@@ -27,7 +21,7 @@ function getSocketSecurityCode(url: URL) {
 
 async function sendSpaceshipInfo(socket: WebSocket, securityCode: string) {
   try {
-    const spaceship = await loadSpaceship(securityCode);
+    const spaceship = await SpaceshipService.loadSpaceship(securityCode);
     if (!spaceship) {
       sendJson(socket, { type: 'error', error: 'Spaceship not found' });
       socket.close(1008, 'Spaceship not found');
@@ -36,7 +30,7 @@ async function sendSpaceshipInfo(socket: WebSocket, securityCode: string) {
 
     sendJson(socket, {
       type: 'spaceship:info',
-      spaceship: toSpaceshipDto(spaceship),
+      spaceship: SpaceshipService.toSpaceshipDto(spaceship),
     });
   } catch (error) {
     console.error('Failed to send spaceship info', error);
@@ -84,14 +78,21 @@ export function attachSpaceshipSocketServer(server: Server) {
           typeof message !== 'object' ||
           (message as { type?: unknown }).type !== 'spaceship:update'
         ) {
-          sendJson(socket, { type: 'error', error: 'Unsupported message type' });
+          sendJson(socket, {
+            type: 'error',
+            error: 'Unsupported message type',
+          });
           return;
         }
 
         try {
-          const body = (message as { spaceship?: unknown }).spaceship ?? message;
-          const update = parseSpaceshipUpdate(body);
-          const spaceship = await updateSpaceship(securityCode, update);
+          const body =
+            (message as { spaceship?: unknown }).spaceship ?? message;
+          const update = SpaceshipService.parseSpaceshipUpdate(body);
+          const spaceship = await SpaceshipService.updateSpaceship(
+            securityCode,
+            update,
+          );
           if (!spaceship) {
             sendJson(socket, { type: 'error', error: 'Spaceship not found' });
             socket.close(1008, 'Spaceship not found');
@@ -100,13 +101,15 @@ export function attachSpaceshipSocketServer(server: Server) {
 
           sendJson(socket, {
             type: 'spaceship:info',
-            spaceship: toSpaceshipDto(spaceship),
+            spaceship: SpaceshipService.toSpaceshipDto(spaceship),
           });
         } catch (error) {
           sendJson(socket, {
             type: 'error',
             error:
-              error instanceof Error ? error.message : 'Invalid spaceship update',
+              error instanceof Error
+                ? error.message
+                : 'Invalid spaceship update',
           });
         }
       })();

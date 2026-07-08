@@ -112,44 +112,46 @@ async function findOldestBodies(invocationTime: Date, options: UpdateOptions) {
   return { bodies, oldestBodies };
 }
 
-export async function updateOrbitalBodies(
-  time: string | Date,
-  options: UpdateOptions,
-) {
-  const invocationTime = getInvocationTime(time);
-  const { bodies, oldestBodies } = await findOldestBodies(
-    invocationTime,
-    options,
-  );
+export class OrbitalUpdaterService {
+  static async updateOrbitalBodies(
+    time: string | Date,
+    options: UpdateOptions,
+  ) {
+    const invocationTime = getInvocationTime(time);
+    const { bodies, oldestBodies } = await findOldestBodies(
+      invocationTime,
+      options,
+    );
 
-  if (oldestBodies.length === 0) {
-    return { selected: 0, updated: 0 };
-  }
+    if (oldestBodies.length === 0) {
+      return { selected: 0, updated: 0 };
+    }
 
-  const updates: AnyBulkWriteOperation<OrbitalBody>[] = oldestBodies.map(
-    (body) => {
-      const elapsedSeconds =
-        (invocationTime.getTime() - body.updatedAt.getTime()) / 1_000;
+    const updates: AnyBulkWriteOperation<OrbitalBody>[] = oldestBodies.map(
+      (body) => {
+        const elapsedSeconds =
+          (invocationTime.getTime() - body.updatedAt.getTime()) / 1_000;
 
-      return {
-        updateOne: {
-          // Including updatedAt prevents concurrent invocations from moving the
-          // same body twice from the same starting position.
-          filter: { _id: body._id, updatedAt: body.updatedAt },
-          update: {
-            $set: {
-              position: advancePosition(body, elapsedSeconds),
-              updatedAt: invocationTime,
+        return {
+          updateOne: {
+            // Including updatedAt prevents concurrent invocations from moving the
+            // same body twice from the same starting position.
+            filter: { _id: body._id, updatedAt: body.updatedAt },
+            update: {
+              $set: {
+                position: advancePosition(body, elapsedSeconds),
+                updatedAt: invocationTime,
+              },
             },
           },
-        },
-      };
-    },
-  );
-  const result = await bodies.bulkWrite(updates, { ordered: false });
+        };
+      },
+    );
+    const result = await bodies.bulkWrite(updates, { ordered: false });
 
-  return {
-    selected: oldestBodies.length,
-    updated: result.modifiedCount,
-  };
+    return {
+      selected: oldestBodies.length,
+      updated: result.modifiedCount,
+    };
+  }
 }

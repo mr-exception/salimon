@@ -1,15 +1,12 @@
 import { Router } from 'express';
 import type { WithId } from 'mongodb';
-import { asyncHandler } from '../http';
+import { OfflineSpaceshipService } from '@services/offline-spaceship.service';
+import { OrbitalUpdaterService } from '@services/orbital-updater.service';
 import {
-  loadOfflineWorld,
-  propagateOfflineSpaceship,
-} from '../services/offline-spaceship';
-import { updateOrbitalBodies } from '../services/orbital-updater';
-import {
-  getSpaceshipsCollection,
+  SpaceshipService,
   type SpaceshipDocument,
-} from '../services/spaceship';
+} from '@services/spaceship.service';
+import { asyncHandler } from '../http';
 
 const SPACESHIP_BATCH_SIZE = 100;
 
@@ -26,7 +23,7 @@ export const updatesRouter = Router();
 updatesRouter.post(
   '/planets',
   asyncHandler(async (request, response) => {
-    const result = await updateOrbitalBodies(
+    const result = await OrbitalUpdaterService.updateOrbitalBodies(
       getInvocationTime(request.body?.time),
       {
         collectionName: 'planets',
@@ -40,7 +37,7 @@ updatesRouter.post(
 updatesRouter.post(
   '/moons',
   asyncHandler(async (request, response) => {
-    const result = await updateOrbitalBodies(
+    const result = await OrbitalUpdaterService.updateOrbitalBodies(
       getInvocationTime(request.body?.time),
       {
         collectionName: 'planets',
@@ -54,7 +51,7 @@ updatesRouter.post(
 updatesRouter.post(
   '/stars',
   asyncHandler(async (request, response) => {
-    const result = await updateOrbitalBodies(
+    const result = await OrbitalUpdaterService.updateOrbitalBodies(
       getInvocationTime(request.body?.time),
       {
         collectionName: 'stars',
@@ -68,7 +65,7 @@ updatesRouter.post(
   '/spaceships',
   asyncHandler(async (request, response) => {
     const invocationTime = getInvocationTime(request.body?.time);
-    const spaceships = await getSpaceshipsCollection();
+    const spaceships = await SpaceshipService.getSpaceshipsCollection();
     const oldestSpaceships = await spaceships
       .find({
         $or: [
@@ -88,10 +85,14 @@ updatesRouter.post(
       return;
     }
 
-    const world = await loadOfflineWorld();
+    const world = await OfflineSpaceshipService.loadOfflineWorld();
     await Promise.all(
       oldestSpaceships.map((spaceship: WithId<SpaceshipDocument>) =>
-        propagateOfflineSpaceship(spaceship, invocationTime, world),
+        OfflineSpaceshipService.propagateOfflineSpaceship(
+          spaceship,
+          invocationTime,
+          world,
+        ),
       ),
     );
 

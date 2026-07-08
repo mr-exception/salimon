@@ -5,6 +5,12 @@
     "module": "Node16",
     "moduleResolution": "Node16",
     "types": ["node"],
+    "paths": {
+      "@routes/*.js": ["./src/routes/*.ts"],
+      "@routes/*": ["./src/routes/*"],
+      "@services/*.js": ["./src/services/*.ts"],
+      "@services/*": ["./src/services/*"]
+    },
     "rootDir": "src",
     "outDir": "dist",
     "strict": true,

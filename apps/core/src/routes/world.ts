@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { type Document } from 'mongodb';
+import { SpaceshipService } from '@services/spaceship.service';
 import { asyncHandler, sendError } from '../http';
-import { getDatabase } from '../services/spaceship';
 
 type SerializedPosition = {
   x: string;
@@ -139,7 +139,7 @@ worldRouter.get(
     }
 
     try {
-      const database = await getDatabase();
+      const database = await SpaceshipService.getDatabase();
       const projection = { _id: 0, updatedAt: 0 };
       const [planets, stars] = await Promise.all([
         database

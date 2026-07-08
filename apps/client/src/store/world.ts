@@ -66,8 +66,7 @@ const AUTO_ORBIT_RADIAL_ACCELERATION_GAIN = 0.08;
 const AUTO_ORBIT_TANGENTIAL_ACCELERATION_GAIN = 0.05;
 const PROXIMITY_TELEMETRY_RANGE_METERS = 3_000_000;
 const WORLD_SEARCH_RADIUS_METERS = '1025000000000000000';
-const DEFAULT_API_BASE_URL =
-  'https://hjp81v6wyh.execute-api.us-east-1.amazonaws.com';
+const DEFAULT_API_BASE_URL = 'http://localhost:3000';
 
 const store = getDefaultStore();
 

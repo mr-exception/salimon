@@ -13,8 +13,7 @@ const STORAGE_KEY = 'salimon.spaceship';
 export const SECURITY_CODE_HEADER = 'x-spaceship-security-code';
 const COASTING_UPDATE_DELAY_MS = 5 * 60 * 1_000;
 const THRUSTING_UPDATE_DELAY_MS = 5_000;
-const DEFAULT_API_BASE_URL =
-  'https://hjp81v6wyh.execute-api.us-east-1.amazonaws.com';
+const DEFAULT_API_BASE_URL = 'http://localhost:3000';
 
 export type BootstrapRequest =
   | { type: 'new' }

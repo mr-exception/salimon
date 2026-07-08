@@ -1,0 +1,27 @@
+services:
+  mongodb:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodb-data:/data/db
+
+  core:
+    build:
+      context: .
+      dockerfile: apps/core/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - apps/core/.env
+    environment:
+      PORT: 3000
+      CORS_ORIGIN: http://localhost:5173
+      MONGODB_URI: mongodb://mongodb:27017/salimon
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mongodb
+
+volumes:
+  mongodb-data:

@@ -120,6 +120,30 @@ export function toSpaceshipDto(spaceship: SpaceshipDocument): SpaceshipDto {
   };
 }
 
+export async function loadSpaceship(securityCode: string) {
+  const storedSpaceship = await (
+    await getSpaceshipsCollection()
+  ).findOne({ securityCode });
+  if (!storedSpaceship) return undefined;
+
+  const { propagateOfflineSpaceship } = await import('./offline-spaceship.js');
+  return propagateOfflineSpaceship(storedSpaceship);
+}
+
+export async function updateSpaceship(
+  securityCode: string,
+  update: ReturnType<typeof parseSpaceshipUpdate>,
+): Promise<SpaceshipDocument | undefined> {
+  const now = new Date();
+  return (
+    await getSpaceshipsCollection()
+  ).findOneAndUpdate(
+    { securityCode },
+    { $set: { ...update, simulatedAt: now, updatedAt: now } },
+    { returnDocument: 'after' },
+  ).then((spaceship) => spaceship ?? undefined);
+}
+
 export function getSpaceshipVelocity(
   spaceship: Pick<SpaceshipDocument, 'direction' | 'speed' | 'velocity'>,
 ) {

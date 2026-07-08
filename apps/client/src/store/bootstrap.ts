@@ -22,6 +22,15 @@ export type BootstrapRequest =
 export type BootstrapState = 'idle' | 'loading' | 'ready' | 'error';
 
 type SpaceshipResponse = { spaceship: SpaceshipDto };
+type SpaceshipInfoMessage = {
+  type: 'spaceship:info';
+  spaceship: SpaceshipDto;
+};
+type SpaceshipErrorMessage = {
+  type: 'error';
+  error: string;
+};
+type SpaceshipSocketMessage = SpaceshipInfoMessage | SpaceshipErrorMessage;
 const requestPromises = new WeakMap<BootstrapRequest, Promise<SpaceshipDto>>();
 
 export function getApiBaseUrl() {
@@ -29,6 +38,32 @@ export function getApiBaseUrl() {
     /\/+$/,
     '',
   );
+}
+
+function getSpaceshipSocketUrl(securityCode: string) {
+  const url = new URL(`${getApiBaseUrl()}/spaceship/socket`);
+  url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+  url.searchParams.set('shipSecret', securityCode);
+  return url.toString();
+}
+
+function parseSpaceshipSocketMessage(data: string): SpaceshipSocketMessage {
+  const message = JSON.parse(data) as Partial<SpaceshipSocketMessage>;
+  if (message.type === 'spaceship:info' && message.spaceship) {
+    return {
+      type: 'spaceship:info',
+      spaceship: message.spaceship,
+    };
+  }
+  if (message.type === 'error' && typeof message.error === 'string') {
+    return { type: 'error', error: message.error };
+  }
+  throw new Error('Unsupported spaceship socket message');
+}
+
+function applySpaceshipInfo(spaceship: SpaceshipDto) {
+  storeSpaceship(spaceship);
+  hydrateSpaceship(spaceship);
 }
 
 function readStoredSpaceship() {
@@ -51,12 +86,30 @@ export function getStoredSpaceshipSecurityCode() {
   return readStoredSpaceship()?.securityCode;
 }
 
-async function getSpaceship(securityCode: string) {
-  const { data } = await axios.get<SpaceshipResponse>(
-    `${getApiBaseUrl()}/spaceship/info`,
-    { headers: { [SECURITY_CODE_HEADER]: securityCode } },
-  );
-  return data.spaceship;
+async function getSpaceshipFromSocket(securityCode: string) {
+  return new Promise<SpaceshipDto>((resolve, reject) => {
+    const socket = new WebSocket(getSpaceshipSocketUrl(securityCode));
+
+    socket.addEventListener('message', (event) => {
+      try {
+        const message = parseSpaceshipSocketMessage(String(event.data));
+        if (message.type === 'error') {
+          reject(new Error(message.error));
+          socket.close();
+          return;
+        }
+        resolve(message.spaceship);
+        socket.close();
+      } catch (error) {
+        reject(error);
+        socket.close();
+      }
+    });
+
+    socket.addEventListener('error', () => {
+      reject(new Error('Failed to connect to spaceship socket'));
+    });
+  });
 }
 
 function initializeSpaceship(request: BootstrapRequest) {
@@ -71,14 +124,13 @@ function initializeSpaceship(request: BootstrapRequest) {
       return data.spaceship;
     }
     if (request.type === 'claim') {
-      return getSpaceship(request.securityCode.trim());
+      return getSpaceshipFromSocket(request.securityCode.trim());
     }
     const stored = readStoredSpaceship();
     if (!stored) throw new Error('No stored spaceship is available');
-    return getSpaceship(stored.securityCode);
+    return getSpaceshipFromSocket(stored.securityCode);
   })().then((spaceship) => {
-    storeSpaceship(spaceship);
-    hydrateSpaceship(spaceship);
+    applySpaceshipInfo(spaceship);
     return spaceship;
   });
 
@@ -86,15 +138,13 @@ function initializeSpaceship(request: BootstrapRequest) {
   return promise;
 }
 
-async function updateSpaceship(securityCode: string) {
+function updateSpaceship(socket: WebSocket, securityCode: string) {
   const spaceship = getSpaceshipDto(securityCode);
   storeSpaceship(spaceship);
-  const { data } = await axios.put<SpaceshipResponse>(
-    `${getApiBaseUrl()}/spaceship/update`,
-    spaceship,
-    { headers: { [SECURITY_CODE_HEADER]: securityCode } },
-  );
-  storeSpaceship(data.spaceship);
+  if (socket.readyState !== WebSocket.OPEN) {
+    throw new Error('Spaceship socket is not connected');
+  }
+  socket.send(JSON.stringify({ type: 'spaceship:update', spaceship }));
 }
 
 export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
@@ -110,6 +160,7 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
     let updateTimer: number | undefined;
     let updateDelay: number | undefined;
     let securityCode: string | undefined;
+    let socket: WebSocket | undefined;
     let engineWasRunning = false;
     let unsubscribe: (() => void) | undefined;
 
@@ -118,15 +169,34 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
       window.clearTimeout(updateTimer);
       updateTimer = undefined;
       updateDelay = undefined;
-      void updateSpaceship(securityCode).catch((error: unknown) => {
+      if (!socket) return;
+      try {
+        updateSpaceship(socket, securityCode);
+      } catch (error: unknown) {
         console.error('Failed to persist spaceship', error);
-      });
+      }
     };
 
     void initializeSpaceship(request)
       .then((spaceship) => {
         if (disposed) return;
         securityCode = spaceship.securityCode;
+        socket = new WebSocket(getSpaceshipSocketUrl(securityCode));
+        socket.addEventListener('message', (event) => {
+          try {
+            const message = parseSpaceshipSocketMessage(String(event.data));
+            if (message.type === 'error') {
+              console.error('Spaceship socket error', message.error);
+              return;
+            }
+            applySpaceshipInfo(message.spaceship);
+          } catch (error) {
+            console.error('Failed to process spaceship socket message', error);
+          }
+        });
+        socket.addEventListener('error', () => {
+          console.error('Failed to connect to spaceship socket');
+        });
         unsubscribe = subscribeToWorld((_world, changedBodyNames) => {
           if (changedBodyNames && !changedBodyNames.has(spaceshipState.name)) {
             return;
@@ -160,6 +230,7 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
       unsubscribe?.();
       window.removeEventListener('pagehide', flushUpdate);
       window.clearTimeout(updateTimer);
+      socket?.close();
     };
   }, [request]);
 

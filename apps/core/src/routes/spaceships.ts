@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { asyncHandler, sendError } from '../http';
 import { initializeSpaceshipContacts } from '../services/contacts';
-import { propagateOfflineSpaceship } from '../services/offline-spaceship';
 import {
   createSpaceship,
   getSpaceshipsCollection,
+  loadSpaceship,
   parseSpaceshipUpdate,
   toSpaceshipDto,
+  updateSpaceship,
 } from '../services/spaceship';
 
 export const spaceshipsRouter = Router();
@@ -40,14 +41,11 @@ spaceshipsRouter.get(
     }
 
     try {
-      const storedSpaceship = await (
-        await getSpaceshipsCollection()
-      ).findOne({ securityCode });
-      if (!storedSpaceship) {
+      const spaceship = await loadSpaceship(securityCode);
+      if (!spaceship) {
         sendError(response, 404, 'Spaceship not found');
         return;
       }
-      const spaceship = await propagateOfflineSpaceship(storedSpaceship);
 
       response.json({ spaceship: toSpaceshipDto(spaceship) });
     } catch (error) {
@@ -83,14 +81,7 @@ spaceshipsRouter.put(
     }
 
     try {
-      const now = new Date();
-      const spaceship = await (
-        await getSpaceshipsCollection()
-      ).findOneAndUpdate(
-        { securityCode },
-        { $set: { ...update, simulatedAt: now, updatedAt: now } },
-        { returnDocument: 'after' },
-      );
+      const spaceship = await updateSpaceship(securityCode, update);
       if (!spaceship) {
         sendError(response, 404, 'Spaceship not found');
         return;

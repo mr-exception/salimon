@@ -1,11 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import OpenAI from 'openai';
 import {
-  CONTACTS,
-  ContactsService,
-  EASA_CHIEF_ID,
+  ContactMessageModel,
   type ContactMessageDocument,
-} from '@services/contacts.service';
+} from '@models';
+import { CONTACTS, EASA_CHIEF_ID } from './contacts.service';
 
 type ReplyJob = {
   spaceshipSecurityCode: string;
@@ -42,23 +41,21 @@ export class ContactRepliesService {
       throw new Error(`Unknown contact ${job.contactId}`);
     }
 
-    const messages = await ContactsService.getContactMessagesCollection();
-    const playerMessage = await messages.findOne({
-      _id: job.playerMessageId,
-      spaceshipSecurityCode: job.spaceshipSecurityCode,
-      contactId: job.contactId,
-      sender: 'player',
-    });
+    const playerMessage = await ContactMessageModel.findPlayerMessage(
+      job.spaceshipSecurityCode,
+      job.contactId,
+      job.playerMessageId,
+    );
     if (!playerMessage) throw new Error('Player message not found');
 
-    const existingReply = await messages.findOne({
-      spaceshipSecurityCode: job.spaceshipSecurityCode,
-      contactId: job.contactId,
-      clientMessageId: `reply:${job.playerMessageId}`,
-    });
+    const existingReply = await ContactMessageModel.findByClientMessage(
+      job.spaceshipSecurityCode,
+      job.contactId,
+      `reply:${job.playerMessageId}`,
+    );
     if (existingReply) return;
 
-    const history = await messages
+    const history = await (await ContactMessageModel.getCollection())
       .find({
         spaceshipSecurityCode: job.spaceshipSecurityCode,
         contactId: job.contactId,
@@ -94,11 +91,8 @@ export class ContactRepliesService {
       clientMessageId: `reply:${job.playerMessageId}`,
       createdAt: new Date(),
     };
-    await messages.insertOne(reply);
-    await messages.updateOne(
-      { _id: playerMessage._id },
-      { $set: { status: 'sent' } },
-    );
+    await ContactMessageModel.insert(reply);
+    await ContactMessageModel.updateStatus(playerMessage._id, 'sent');
   }
 
   static generateContactReplyInBackground(message: ContactMessageDocument) {
@@ -108,9 +102,7 @@ export class ContactRepliesService {
       playerMessageId: message._id,
     }).catch(async (error: unknown) => {
       console.error('Failed to generate contact reply', error);
-      await (
-        await ContactsService.getContactMessagesCollection()
-      ).updateOne({ _id: message._id }, { $set: { status: 'failed' } });
+      await ContactMessageModel.updateStatus(message._id, 'failed');
     });
   }
 }

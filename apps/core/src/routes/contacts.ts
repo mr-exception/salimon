@@ -1,13 +1,17 @@
 import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
 import type { Filter } from 'mongodb';
-import { ContactRepliesService } from '@services/contact-replies.service';
+import {
+  ContactModel,
+  ContactMessageModel,
+  type ContactMessageDocument,
+  SpaceshipModel,
+} from '@models';
 import {
   CONTACTS,
+  ContactRepliesService,
   ContactsService,
-  type ContactMessageDocument,
-} from '@services/contacts.service';
-import { SpaceshipService } from '@services/spaceship.service';
+} from '@services';
 import { asyncHandler, sendError } from '../http';
 
 const UUID_PATTERN =
@@ -34,24 +38,20 @@ contactsRouter.get(
     }
 
     try {
-      const spaceship = await (
-        await SpaceshipService.getSpaceshipsCollection()
-      ).findOne({ securityCode });
+      const spaceship = await SpaceshipModel.findBySecurityCode(securityCode);
       if (!spaceship) {
         sendError(response, 404, 'Spaceship not found');
         return;
       }
 
-      let contacts = await (await ContactsService.getContactsCollection())
-        .find({ spaceshipSecurityCode: securityCode })
-        .toArray();
+      let contacts =
+        await ContactModel.findBySpaceshipSecurityCode(securityCode);
       if (contacts.length === 0) {
         await ContactsService.initializeSpaceshipContacts(securityCode);
-        contacts = await (await ContactsService.getContactsCollection())
-          .find({ spaceshipSecurityCode: securityCode })
-          .toArray();
+        contacts = await ContactModel.findBySpaceshipSecurityCode(
+          securityCode,
+        );
       }
-      const messages = await ContactsService.getContactMessagesCollection();
 
       response.json({
         contacts: await Promise.all(
@@ -60,17 +60,11 @@ contactsRouter.get(
               CONTACTS[contact.contactId as keyof typeof CONTACTS];
             if (!profile) return [];
             const [latestMessage, unreadCount] = await Promise.all([
-              ContactsService.findLatestMessage(
-                messages,
+              ContactsService.findLatestMessage(securityCode, contact.contactId),
+              ContactMessageModel.countUnreadContactMessages(
                 securityCode,
                 contact.contactId,
               ),
-              messages.countDocuments({
-                spaceshipSecurityCode: securityCode,
-                contactId: contact.contactId,
-                sender: 'contact',
-                isRead: { $ne: true },
-              }),
             ]);
             return [
               {
@@ -140,13 +134,7 @@ contactsRouter.get(
             }
           : {}),
       };
-      const messages = await (
-        await ContactsService.getContactMessagesCollection()
-      )
-        .find(filter)
-        .sort({ createdAt: 1, _id: 1 })
-        .limit(limit)
-        .toArray();
+      const messages = await ContactMessageModel.findMessages(filter, limit);
 
       const unreadMessageIds = messages
         .filter(
@@ -154,15 +142,10 @@ contactsRouter.get(
         )
         .map((message) => message._id);
       if (unreadMessageIds.length > 0) {
-        await (
-          await ContactsService.getContactMessagesCollection()
-        ).updateMany(
-          {
-            spaceshipSecurityCode: securityCode,
-            contactId,
-            _id: { $in: unreadMessageIds },
-          },
-          { $set: { isRead: true } },
+        await ContactMessageModel.markMessagesRead(
+          securityCode,
+          contactId,
+          unreadMessageIds,
         );
         messages.forEach((message) => {
           if (unreadMessageIds.includes(message._id)) message.isRead = true;
@@ -197,25 +180,15 @@ contactsRouter.get(
     }
 
     try {
-      const spaceship = await (
-        await SpaceshipService.getSpaceshipsCollection()
-      ).findOne({ securityCode });
+      const spaceship = await SpaceshipModel.findBySecurityCode(securityCode);
       if (!spaceship) {
         sendError(response, 404, 'Spaceship not found');
         return;
       }
       await ContactsService.initializeSpaceshipContacts(securityCode);
 
-      const messages = await (
-        await ContactsService.getContactMessagesCollection()
-      )
-        .find({
-          spaceshipSecurityCode: securityCode,
-          sender: 'contact',
-          isRead: { $ne: true },
-        })
-        .sort({ createdAt: 1, _id: 1 })
-        .toArray();
+      const messages =
+        await ContactMessageModel.findUnreadContactMessages(securityCode);
 
       response.json({ messages: messages.map(ContactsService.toMessageDto) });
     } catch (error) {
@@ -275,20 +248,16 @@ contactsRouter.post(
         return;
       }
 
-      const messages = await ContactsService.getContactMessagesCollection();
-      const existing = await messages.findOne({
-        spaceshipSecurityCode: securityCode,
+      const existing = await ContactMessageModel.findByClientMessage(
+        securityCode,
         contactId,
         clientMessageId,
-      });
+      );
       if (existing) {
         if (existing.status === 'failed') {
           ContactRepliesService.generateContactReplyInBackground(existing);
           existing.status = 'sent';
-          await messages.updateOne(
-            { _id: existing._id },
-            { $set: { status: 'sent' } },
-          );
+          await ContactMessageModel.updateStatus(existing._id, 'sent');
         }
         response
           .status(202)
@@ -296,11 +265,11 @@ contactsRouter.post(
         return;
       }
 
-      const recentMessageCount = await messages.countDocuments({
-        spaceshipSecurityCode: securityCode,
-        sender: 'player',
-        createdAt: { $gt: new Date(Date.now() - 60_000) },
-      });
+      const recentMessageCount =
+        await ContactMessageModel.countRecentPlayerMessages(
+          securityCode,
+          new Date(Date.now() - 60_000),
+        );
       if (recentMessageCount >= 10) {
         sendError(
           response,
@@ -321,13 +290,10 @@ contactsRouter.post(
         clientMessageId,
         createdAt: new Date(),
       };
-      await messages.insertOne(message);
+      await ContactMessageModel.insert(message);
       ContactRepliesService.generateContactReplyInBackground(message);
       message.status = 'sent';
-      await messages.updateOne(
-        { _id: message._id },
-        { $set: { status: 'sent' } },
-      );
+      await ContactMessageModel.updateStatus(message._id, 'sent');
 
       response
         .status(202)

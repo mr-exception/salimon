@@ -1,19 +1,9 @@
 import { Router } from 'express';
-import { type Document } from 'mongodb';
-import { SpaceshipService } from '@services/spaceship.service';
+import {
+  WorldBodyModel,
+  type WorldBodyDocument,
+} from '@models';
 import { asyncHandler, sendError } from '../http';
-
-type SerializedPosition = {
-  x: string;
-  y: string;
-  relativeTo?: string;
-};
-
-type WorldBody = Document & {
-  name: string;
-  position: SerializedPosition;
-  orbitalCenter: string | null;
-};
 
 type Coordinate = {
   x: bigint;
@@ -21,12 +11,12 @@ type Coordinate = {
 };
 
 type PlanetSystem = {
-  planet: WorldBody;
-  moons: WorldBody[];
+  planet: WorldBodyDocument;
+  moons: WorldBodyDocument[];
 };
 
 type StarSystem = {
-  star: WorldBody;
+  star: WorldBodyDocument;
   planets: PlanetSystem[];
 };
 
@@ -61,11 +51,14 @@ function getSearchArea(query: Record<string, unknown>) {
   return { x, y, radius };
 }
 
-function resolvePositions(bodies: WorldBody[]) {
+function resolvePositions(bodies: WorldBodyDocument[]) {
   const bodiesByName = new Map(bodies.map((body) => [body.name, body]));
   const positionsByName = new Map<string, Coordinate>();
 
-  function resolve(body: WorldBody, ancestors = new Set<string>()): Coordinate {
+  function resolve(
+    body: WorldBodyDocument,
+    ancestors = new Set<string>(),
+  ): Coordinate {
     const cached = positionsByName.get(body.name);
     if (cached) return cached;
     if (ancestors.has(body.name)) {
@@ -109,8 +102,8 @@ function isInsideCircle(
   return deltaX * deltaX + deltaY * deltaY <= radiusSquared;
 }
 
-function groupByOrbitalCenter(bodies: WorldBody[]) {
-  const bodiesByOrbitalCenter = new Map<string | null, WorldBody[]>();
+function groupByOrbitalCenter(bodies: WorldBodyDocument[]) {
+  const bodiesByOrbitalCenter = new Map<string | null, WorldBodyDocument[]>();
 
   for (const body of bodies) {
     const siblings = bodiesByOrbitalCenter.get(body.orbitalCenter) ?? [];
@@ -139,18 +132,7 @@ worldRouter.get(
     }
 
     try {
-      const database = await SpaceshipService.getDatabase();
-      const projection = { _id: 0, updatedAt: 0 };
-      const [planets, stars] = await Promise.all([
-        database
-          .collection<WorldBody>('planets')
-          .find({}, { projection })
-          .toArray(),
-        database
-          .collection<WorldBody>('stars')
-          .find({}, { projection })
-          .toArray(),
-      ]);
+      const { planets, stars } = await WorldBodyModel.findWorldSystemsBodies();
       const positions = resolvePositions([...planets, ...stars]);
       const center = { x: searchArea.x, y: searchArea.y };
       const radiusSquared = searchArea.radius * searchArea.radius;

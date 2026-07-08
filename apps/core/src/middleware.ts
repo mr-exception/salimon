@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
-import { SpaceshipService } from '@services/spaceship.service';
+import { SpaceshipService } from '@services';
 
 export function spaceshipSecurityCode(
   request: Request,

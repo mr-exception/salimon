@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { ContactsService } from '@services/contacts.service';
-import { SpaceshipService } from '@services/spaceship.service';
+import { SpaceshipModel } from '@models';
+import { ContactsService, SpaceshipService } from '@services';
 import { asyncHandler, sendError } from '../http';
 
 export const spaceshipsRouter = Router();
@@ -10,9 +10,7 @@ spaceshipsRouter.post(
   asyncHandler(async (_request, response) => {
     try {
       const spaceship = SpaceshipService.createSpaceship();
-      await (
-        await SpaceshipService.getSpaceshipsCollection()
-      ).insertOne(spaceship);
+      await SpaceshipModel.insert(spaceship);
       await ContactsService.initializeSpaceshipContacts(spaceship.securityCode);
       response
         .status(201)

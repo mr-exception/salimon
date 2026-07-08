@@ -1,28 +1,12 @@
-import type { Collection, Document } from 'mongodb';
 import {
-  SpaceshipService,
+  SpaceshipModel,
+  WorldBodyModel,
   type SpaceshipDocument,
   type SpaceshipMotionState,
   type SpaceshipVelocity,
-} from '@services/spaceship.service';
-
-type SerializedPosition = {
-  x: string;
-  y: string;
-  relativeTo?: string;
-};
-
-type CelestialBody = Document & {
-  name: string;
-  position: SerializedPosition;
-  orbitalCenter: string | null;
-  clockwise: boolean;
-  speed: string;
-  mass: string;
-  radius: string;
-  rotationPeriodSeconds?: number;
-  updatedAt: Date;
-};
+  type WorldBodyDocument,
+} from '@models';
+import { SpaceshipService } from './spaceship.service';
 
 type Motion = {
   position: SpaceshipVelocity;
@@ -30,12 +14,12 @@ type Motion = {
 };
 
 export type OfflineWorld = {
-  bodies: CelestialBody[];
-  bodiesByName: Map<string, CelestialBody>;
+  bodies: WorldBodyDocument[];
+  bodiesByName: Map<string, WorldBodyDocument>;
 };
 
 type Impact = {
-  body: CelestialBody;
+  body: WorldBodyDocument;
   fraction: number;
   relativePosition: SpaceshipVelocity;
 };
@@ -48,30 +32,7 @@ const TARGET_STEP_SECONDS = 30;
 
 export class OfflineSpaceshipService {
   static async loadOfflineWorld(): Promise<OfflineWorld> {
-    const database = await SpaceshipService.getDatabase();
-    const projection = {
-      _id: 0,
-      name: 1,
-      position: 1,
-      orbitalCenter: 1,
-      clockwise: 1,
-      speed: 1,
-      mass: 1,
-      radius: 1,
-      rotationPeriodSeconds: 1,
-      updatedAt: 1,
-    };
-    const collections: Collection<CelestialBody>[] = [
-      database.collection<CelestialBody>('planets'),
-      database.collection<CelestialBody>('moons'),
-      database.collection<CelestialBody>('stars'),
-    ];
-    const bodyGroups = await Promise.all(
-      collections.map((collection) =>
-        collection.find({}, { projection }).toArray(),
-      ),
-    );
-    const bodies = bodyGroups.flat();
+    const bodies = await WorldBodyModel.findOfflineBodies();
     return {
       bodies,
       bodiesByName: new Map(bodies.map((body) => [body.name, body])),
@@ -244,22 +205,10 @@ async function propagateOfflineSpaceship(
     update.motionState === 'crashed'
       ? 0
       : Math.max(0, stats.hullDurability - (elapsedSeconds / (30 * 60)) * 0.01);
-  const collection = (
-    await SpaceshipService.getDatabase()
-  ).collection<SpaceshipDocument>('spaceships');
-  const result = await collection.findOneAndUpdate(
-    {
-      securityCode: spaceship.securityCode,
-      updatedAt: spaceship.updatedAt,
-    },
-    { $set: { ...update, stats } },
-    { returnDocument: 'after' },
-  );
-  return (
-    result ??
-    (await collection.findOne({ securityCode: spaceship.securityCode })) ??
-    spaceship
-  );
+  return SpaceshipModel.updatePropagatedSpaceship(spaceship, {
+    ...update,
+    stats,
+  });
 }
 
 function add(value: SpaceshipVelocity, change: SpaceshipVelocity, scale = 1) {
@@ -272,7 +221,10 @@ function add(value: SpaceshipVelocity, change: SpaceshipVelocity, scale = 1) {
 function getBodyPositions(world: OfflineWorld, time: Date) {
   const positions = new Map<string, SpaceshipVelocity>();
 
-  function resolve(body: CelestialBody, path: Set<string>): SpaceshipVelocity {
+  function resolve(
+    body: WorldBodyDocument,
+    path: Set<string>,
+  ): SpaceshipVelocity {
     const cached = positions.get(body.name);
     if (cached) return cached;
     if (path.has(body.name)) {

@@ -1,39 +1,19 @@
 import { randomUUID } from 'node:crypto';
-import { MongoClient } from 'mongodb';
+import {
+  SpaceshipModel,
+  type SpaceshipDocument,
+  type SpaceshipMotionState,
+  type SpaceshipStats,
+} from '@models';
 
 export const SECURITY_CODE_HEADER = 'x-spaceship-security-code';
 
-type SpaceshipPosition = {
-  x: string;
-  y: string;
-  relativeTo?: string;
-};
-
-export type SpaceshipVelocity = {
-  x: number;
-  y: number;
-};
-
-export type SpaceshipMotionState = 'flying' | 'landed' | 'crashed';
-
-export type SpaceshipStats = {
-  fuelKns: number;
-  hullDurability: number;
-  thrusterDurability: number[];
-};
-
-export type SpaceshipDocument = {
-  securityCode: string;
-  position: SpaceshipPosition;
-  direction: number;
-  speed: string;
-  velocity?: SpaceshipVelocity;
-  motionState?: SpaceshipMotionState;
-  stats?: SpaceshipStats;
-  simulatedAt?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-};
+export type {
+  SpaceshipDocument,
+  SpaceshipMotionState,
+  SpaceshipStats,
+  SpaceshipVelocity,
+} from '@models';
 
 export type SpaceshipDto = Pick<
   SpaceshipDocument,
@@ -71,27 +51,8 @@ const DEFAULT_SPACESHIP = {
 const UUID_V4_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const INTEGER_PATTERN = /^-?\d+$/;
-let clientPromise: Promise<MongoClient> | undefined;
 
 export class SpaceshipService {
-  static async getSpaceshipsCollection() {
-    return (await SpaceshipService.getDatabase()).collection<SpaceshipDocument>(
-      'spaceships',
-    );
-  }
-
-  static async getDatabase() {
-    const uri = process.env.MONGODB_URI;
-    if (!uri) throw new Error('MONGODB_URI is not configured');
-
-    clientPromise ??= new MongoClient(uri).connect().catch((error: unknown) => {
-      clientPromise = undefined;
-      throw error;
-    });
-
-    return (await clientPromise).db();
-  }
-
   static createSpaceship(): SpaceshipDocument {
     const now = new Date();
     return {
@@ -124,13 +85,13 @@ export class SpaceshipService {
   }
 
   static async loadSpaceship(securityCode: string) {
-    const storedSpaceship = await (
-      await SpaceshipService.getSpaceshipsCollection()
-    ).findOne({ securityCode });
+    const storedSpaceship = await SpaceshipModel.findBySecurityCode(
+      securityCode,
+    );
     if (!storedSpaceship) return undefined;
 
     const { OfflineSpaceshipService } = await import(
-      '@services/offline-spaceship.service.js'
+      './offline-spaceship.service.js'
     );
     return OfflineSpaceshipService.propagateOfflineSpaceship(storedSpaceship);
   }
@@ -140,13 +101,11 @@ export class SpaceshipService {
     update: ReturnType<typeof SpaceshipService.parseSpaceshipUpdate>,
   ): Promise<SpaceshipDocument | undefined> {
     const now = new Date();
-    return (await SpaceshipService.getSpaceshipsCollection())
-      .findOneAndUpdate(
-        { securityCode },
-        { $set: { ...update, simulatedAt: now, updatedAt: now } },
-        { returnDocument: 'after' },
-      )
-      .then((spaceship) => spaceship ?? undefined);
+    return SpaceshipModel.updateBySecurityCode(securityCode, {
+      ...update,
+      simulatedAt: now,
+      updatedAt: now,
+    });
   }
 
   static getSpaceshipVelocity(

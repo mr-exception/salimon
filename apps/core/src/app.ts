@@ -1,9 +1,11 @@
 import cors from 'cors';
 import express, { type ErrorRequestHandler } from 'express';
-import { contactsRouter } from '@routes/contacts';
-import { spaceshipsRouter } from '@routes/spaceships';
-import { updatesRouter } from '@routes/updates';
-import { worldRouter } from '@routes/world';
+import {
+  contactsRouter,
+  spaceshipsRouter,
+  updatesRouter,
+  worldRouter,
+} from '@routes';
 import { spaceshipSecurityCode } from './middleware';
 
 const DEFAULT_CORS_ORIGIN = 'http://localhost:5173';

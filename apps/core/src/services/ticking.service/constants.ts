@@ -1,0 +1,7 @@
+export const FULL_ROTATION_RADIANS = Math.PI * 2;
+export const TICK_INTERVAL_MS = 1_000;
+export const GRAVITATIONAL_CONSTANT = 6.6743e-11;
+export const SPACESHIP_RADIUS_METERS = 200;
+export const CRASH_SPEED_METERS_PER_SECOND = 15;
+export const MAX_PROPAGATION_STEPS = 20_000;
+export const TARGET_STEP_SECONDS = 30;

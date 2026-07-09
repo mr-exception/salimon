@@ -26,16 +26,16 @@ class ContactMessageSchema {
   @prop({ required: true, type: () => String })
   public _id!: string;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => String })
   public spaceshipSecurityCode!: string;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => String })
   public contactId!: string;
 
   @prop({ required: true, enum: ['player', 'contact'], type: () => String })
   public sender!: ContactMessageSender;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => String })
   public text!: string;
 
   @prop({
@@ -45,13 +45,13 @@ class ContactMessageSchema {
   })
   public status!: ContactMessageStatus;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => Boolean })
   public isRead!: boolean;
 
-  @prop()
+  @prop({ type: () => String })
   public clientMessageId?: string;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => Date })
   public createdAt!: Date;
 }
 

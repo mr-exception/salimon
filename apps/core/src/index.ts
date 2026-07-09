@@ -13,10 +13,8 @@ if (!Number.isInteger(port) || port <= 0) {
 const server = createServer(createApp());
 SocketService.attachSpaceshipSocketServer(server);
 
-void (async () => {
-  await TickingService.start();
+TickingService.start();
 
-  server.listen(port, () => {
-    console.log(`Core API listening on http://localhost:${port}`);
-  });
-})();
+server.listen(port, () => {
+  console.log(`Core API listening on http://localhost:${port}`);
+});

@@ -8,19 +8,19 @@ export type OrbitalCenterCollectionName = 'planets' | 'stars';
 export type { SerializedPosition };
 
 class SerializedPositionSchema implements SerializedPosition {
-  @prop({ required: true })
+  @prop({ required: true, type: () => String })
   public x!: string;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => String })
   public y!: string;
 
-  @prop()
+  @prop({ type: () => String })
   public relativeTo?: string;
 }
 
 @modelOptions({ schemaOptions: { versionKey: false } })
 class WorldBodySchema {
-  @prop({ required: true })
+  @prop({ required: true, type: () => String })
   public name!: string;
 
   @prop({ required: true, type: () => SerializedPositionSchema })
@@ -29,22 +29,22 @@ class WorldBodySchema {
   @prop({ default: null, type: () => String })
   public orbitalCenter!: string | null;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => Boolean })
   public clockwise!: boolean;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => String })
   public speed!: string;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => String })
   public mass!: string;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => String })
   public radius!: string;
 
-  @prop()
+  @prop({ type: () => Number })
   public rotationPeriodSeconds?: number;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => Date })
   public updatedAt!: Date;
 }
 

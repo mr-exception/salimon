@@ -9,16 +9,16 @@ import { DatabaseModel } from './database.model';
 @index({ spaceshipSecurityCode: 1, contactId: 1 }, { unique: true })
 @modelOptions({ schemaOptions: { collection: 'contacts', versionKey: false } })
 class ContactSchema {
-  @prop({ required: true })
+  @prop({ required: true, type: () => String })
   public spaceshipSecurityCode!: string;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => String })
   public contactId!: string;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => Date })
   public unlockedAt!: Date;
 
-  @prop()
+  @prop({ type: () => Date })
   public lastReadAt?: Date;
 }
 

@@ -11,28 +11,28 @@ export type SpaceshipVelocity = Velocity;
 export type { SpaceshipMotionState, SpaceshipStats };
 
 class SpaceshipPosition implements SerializedPosition {
-  @prop({ required: true })
+  @prop({ required: true, type: () => String })
   public x!: string;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => String })
   public y!: string;
 
-  @prop()
+  @prop({ type: () => String })
   public relativeTo?: string;
 }
 class SpaceshipVelocitySchema implements SpaceshipVelocity {
-  @prop({ required: true })
+  @prop({ required: true, type: () => Number })
   public x!: number;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => Number })
   public y!: number;
 }
 
 class SpaceshipStatsSchema implements SpaceshipStats {
-  @prop({ required: true })
+  @prop({ required: true, type: () => Number })
   public fuelKns!: number;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => Number })
   public hullDurability!: number;
 
   @prop({ required: true, type: () => [Number] })
@@ -43,16 +43,16 @@ class SpaceshipStatsSchema implements SpaceshipStats {
   schemaOptions: { collection: 'spaceships', versionKey: false },
 })
 class SpaceshipSchema {
-  @prop({ required: true })
+  @prop({ required: true, type: () => String })
   public securityCode!: string;
 
   @prop({ required: true, type: () => SpaceshipPosition })
   public position!: SpaceshipPosition;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => Number })
   public direction!: number;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => String })
   public speed!: string;
 
   @prop({ type: () => SpaceshipVelocitySchema })
@@ -64,13 +64,13 @@ class SpaceshipSchema {
   @prop({ type: () => SpaceshipStatsSchema })
   public stats?: SpaceshipStats;
 
-  @prop()
+  @prop({ type: () => Date })
   public simulatedAt?: Date;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => Date })
   public createdAt!: Date;
 
-  @prop({ required: true })
+  @prop({ required: true, type: () => Date })
   public updatedAt!: Date;
 }
 

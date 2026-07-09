@@ -81,9 +81,8 @@ export class SpaceshipService {
       await RepositoryService.findSpaceshipBySecurityCode(securityCode);
     if (!storedSpaceship) return undefined;
 
-    const { OfflineSpaceshipService } =
-      await import('./offline-spaceship.service.js');
-    return OfflineSpaceshipService.propagateOfflineSpaceship(storedSpaceship);
+    const { TickingService } = await import('./ticking.service.js');
+    return TickingService.updateSpaceship(storedSpaceship);
   }
 
   static async updateSpaceship(

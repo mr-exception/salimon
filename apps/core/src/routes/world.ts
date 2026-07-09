@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { type WorldBodyDocument } from '@models';
 import type { Velocity } from '@repo/types';
-import { OrbitalUpdaterService } from '@services';
+import { TickingService } from '@services';
 import { asyncHandler, sendError } from '../http';
 
 type Coordinate = {
@@ -203,7 +203,7 @@ worldRouter.get(
 
     try {
       const { planets, moons, stars } =
-        await OrbitalUpdaterService.getWorldSystemsBodies();
+        await TickingService.getWorldSystemsBodies();
       const orbitingBodies = [...planets, ...moons];
       const positions = resolvePositions([...orbitingBodies, ...stars]);
       const center = { x: searchArea.x, y: searchArea.y };
@@ -242,10 +242,14 @@ worldRouter.get(
           return hasVisibleBody
             ? {
                 star: withVelocity(star, velocities),
-                planets: planetSystems.map(({ planet, moons: planetMoons }) => ({
-                  planet: withVelocity(planet, velocities),
-                  moons: planetMoons.map((moon) => withVelocity(moon, velocities)),
-                })),
+                planets: planetSystems.map(
+                  ({ planet, moons: planetMoons }) => ({
+                    planet: withVelocity(planet, velocities),
+                    moons: planetMoons.map((moon) =>
+                      withVelocity(moon, velocities),
+                    ),
+                  }),
+                ),
               }
             : undefined;
         })

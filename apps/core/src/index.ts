@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { createServer } from 'node:http';
-import { OrbitalUpdaterService, SocketService } from '@services';
+import { SocketService, TickingService } from '@services';
 import { createApp } from './app';
 
 const DEFAULT_PORT = 3000;
@@ -14,7 +14,7 @@ const server = createServer(createApp());
 SocketService.attachSpaceshipSocketServer(server);
 
 void (async () => {
-  await OrbitalUpdaterService.start();
+  await TickingService.start();
 
   server.listen(port, () => {
     console.log(`Core API listening on http://localhost:${port}`);

@@ -101,6 +101,15 @@ export class RepositoryService {
     return updater(RepositoryService.requireWorldData());
   }
 
+  static async updateSpaceships(
+    updater: (
+      spaceshipsBySecurityCode: Map<string, SpaceshipDocument>,
+    ) => number,
+  ): Promise<number> {
+    await RepositoryService.start();
+    return updater(RepositoryService.requireSpaceshipsBySecurityCode());
+  }
+
   static async insertSpaceship(spaceship: SpaceshipDocument) {
     await RepositoryService.start();
     RepositoryService.requireSpaceshipsBySecurityCode().set(

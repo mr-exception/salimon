@@ -1,16 +1,12 @@
 import { Router } from 'express';
 import { type WorldBodyDocument } from '@models';
+import type { Velocity } from '@repo/types';
 import { OrbitalUpdaterService } from '@services';
 import { asyncHandler, sendError } from '../http';
 
 type Coordinate = {
   x: bigint;
   y: bigint;
-};
-
-type Velocity = {
-  x: number;
-  y: number;
 };
 
 type WorldBodyResponse = WorldBodyDocument & {

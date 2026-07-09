@@ -1,15 +1,11 @@
 import type { AnyBulkWriteOperation, PipelineStage, Types } from 'mongoose';
 import { getModelForClass, modelOptions, prop } from '@typegoose/typegoose';
+import type { SerializedPosition } from '@repo/types';
 import { DatabaseModel } from './database.model';
 
 export type WorldBodyCollectionName = 'planets' | 'moons' | 'stars';
 export type OrbitalCenterCollectionName = 'planets' | 'stars';
-
-export type SerializedPosition = {
-  x: string;
-  y: string;
-  relativeTo?: string;
-};
+export type { SerializedPosition };
 
 class SerializedPositionSchema implements SerializedPosition {
   @prop({ required: true })

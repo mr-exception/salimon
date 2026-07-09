@@ -10,7 +10,7 @@ import {
   type SpaceshipProximityTelemetry,
   useSpaceshipFallingSpeedControl,
 } from '@store';
-import type { World } from '@types';
+import type { World } from '@repo/types';
 import { formatAngle, formatDistance, formatSpeed } from '../../utils';
 import { BodyContextMenu } from './body-context-menu';
 import {

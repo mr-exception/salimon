@@ -5,6 +5,7 @@ import {
   type SpaceshipMotionState,
   type SpaceshipStats,
 } from '@models';
+import type { SpaceshipDto } from '@repo/types';
 
 export const SECURITY_CODE_HEADER = 'x-spaceship-security-code';
 
@@ -15,16 +16,7 @@ export type {
   SpaceshipVelocity,
 } from '@models';
 
-export type SpaceshipDto = Pick<
-  SpaceshipDocument,
-  | 'securityCode'
-  | 'position'
-  | 'direction'
-  | 'speed'
-  | 'velocity'
-  | 'motionState'
-  | 'stats'
-> & { simulatedAt: string };
+export type { SpaceshipDto };
 
 const INITIAL_SPACESHIP_FUEL_KNS = 1_000_000;
 export const MAX_HULL_DURABILITY = 200;

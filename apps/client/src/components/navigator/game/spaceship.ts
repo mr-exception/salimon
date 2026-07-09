@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { getSpaceshipMotionState } from '@store';
-import type { Spaceship as SpaceshipData } from '@types';
+import type { Spaceship as SpaceshipData } from '@repo/types';
 import { getRenderPosition } from './get-render-position';
 import { SPACESHIP_PHYSICS_LABEL } from './physics';
 

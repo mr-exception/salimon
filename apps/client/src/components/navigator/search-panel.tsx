@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import type { Planet, Star } from '@types';
+import type { Planet, Star } from '@repo/types';
 import style from './style.module.css';
 
 export type SearchResult =

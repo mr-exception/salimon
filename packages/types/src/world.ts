@@ -1,22 +1,28 @@
 export type Position = {
-  x: bigint; // m
-  y: bigint; // m
+  x: bigint;
+  y: bigint;
+  relativeTo?: string;
+};
+
+export type SerializedPosition = {
+  x: string;
+  y: string;
   relativeTo?: string;
 };
 
 export type Velocity = {
-  x: number; // m/s
-  y: number; // m/s
+  x: number;
+  y: number;
 };
 
 type OrbitingBody = {
   position: Position;
   name: string;
-  radius: bigint; // m
-  mass: bigint; // kg
+  radius: bigint;
+  mass: bigint;
   orbitalCenter: string | null;
   clockwise: boolean;
-  speed: bigint; // m/s
+  speed: bigint;
 };
 
 type RotatingBody = {
@@ -26,43 +32,40 @@ type RotatingBody = {
 
 export type Planet = OrbitingBody &
   RotatingBody & {
-    color: number; // Phaser-compatible RGB color
-    variant: number; // each variant code defines the visual pattern
+    color: number;
+    variant: number;
     shapeRenderZoomLevel: number;
     renderZoomLevel: number;
   };
 
 export type Star = OrbitingBody &
   RotatingBody & {
-    color: number; // Phaser-compatible RGB color
-    variant: number; // each variant code defines the visual pattern
+    color: number;
+    variant: number;
     shapeRenderZoomLevel: number;
     renderZoomLevel: number;
   };
 
 export type Spaceship = OrbitingBody & {
-  heading: number; // degrees; positive values rotate clockwise
+  heading: number;
+};
+
+export type SpaceshipMotionState = 'flying' | 'landed' | 'crashed';
+
+export type SpaceshipStats = {
+  fuelKns: number;
+  hullDurability: number;
+  thrusterDurability: number[];
 };
 
 export type SpaceshipDto = {
   securityCode: string;
-  position: {
-    x: string;
-    y: string;
-    relativeTo?: string;
-  };
+  position: SerializedPosition;
   direction: number;
   speed: string;
-  velocity?: {
-    x: number;
-    y: number;
-  };
-  motionState?: 'flying' | 'landed' | 'crashed';
-  stats?: {
-    fuelKns: number;
-    hullDurability?: number;
-    thrusterDurability?: number[];
-  };
+  velocity?: Velocity;
+  motionState?: SpaceshipMotionState;
+  stats?: Partial<SpaceshipStats> & Pick<SpaceshipStats, 'fuelKns'>;
   simulatedAt?: string;
 };
 
@@ -71,15 +74,11 @@ export type World = {
   stars: Star[];
 };
 
-type SerializedBody<T extends Planet | Spaceship | Star> = Omit<
+export type SerializedBody<T extends Planet | Spaceship | Star> = Omit<
   T,
   'position' | 'radius' | 'mass' | 'speed'
 > & {
-  position: {
-    x: string;
-    y: string;
-    relativeTo?: string;
-  };
+  position: SerializedPosition;
   radius: string;
   mass: string;
   speed: string;

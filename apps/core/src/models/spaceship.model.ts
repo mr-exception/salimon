@@ -1,7 +1,16 @@
 import { getModelForClass, modelOptions, prop } from '@typegoose/typegoose';
+import type {
+  SerializedPosition,
+  SpaceshipMotionState,
+  SpaceshipStats,
+  Velocity,
+} from '@repo/types';
 import { DatabaseModel } from './database.model';
 
-class SpaceshipPosition {
+export type SpaceshipVelocity = Velocity;
+export type { SpaceshipMotionState, SpaceshipStats };
+
+class SpaceshipPosition implements SerializedPosition {
   @prop({ required: true })
   public x!: string;
 
@@ -11,12 +20,6 @@ class SpaceshipPosition {
   @prop()
   public relativeTo?: string;
 }
-
-export type SpaceshipVelocity = {
-  x: number;
-  y: number;
-};
-
 class SpaceshipVelocitySchema implements SpaceshipVelocity {
   @prop({ required: true })
   public x!: number;
@@ -24,14 +27,6 @@ class SpaceshipVelocitySchema implements SpaceshipVelocity {
   @prop({ required: true })
   public y!: number;
 }
-
-export type SpaceshipMotionState = 'flying' | 'landed' | 'crashed';
-
-export type SpaceshipStats = {
-  fuelKns: number;
-  hullDurability: number;
-  thrusterDurability: number[];
-};
 
 class SpaceshipStatsSchema implements SpaceshipStats {
   @prop({ required: true })

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import type { SpaceshipDto } from '@types';
+import type { SpaceshipDto } from '@repo/types';
 import {
   getSpaceshipDto,
   hydrateSpaceship,

@@ -8,7 +8,7 @@ import type {
   SpaceshipDto,
   Star,
   World,
-} from '@types';
+} from '@repo/types';
 
 type Body = Planet | Spaceship | Star;
 type GravitySource = {

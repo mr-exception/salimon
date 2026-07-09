@@ -1,5 +1,5 @@
 import { getWorldPosition } from '@store';
-import type { Position } from '@types';
+import type { Position } from '@repo/types';
 
 export const DEFAULT_RENDER_ORIGIN_NAME = 'Spaceship';
 

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import type { Planet as PlanetData } from '@types';
+import type { Planet as PlanetData } from '@repo/types';
 import { drawCelestialBody } from './draw-celestial-body';
 import { getRenderPosition } from './get-render-position';
 import { getPlanetPhysicsLabel } from './physics';

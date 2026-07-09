@@ -18,7 +18,7 @@ import {
   stopSpaceshipEngines,
   WORLD_VIEWPORT_REFRESH_INTERVAL_MS,
 } from '@store';
-import type { Planet as PlanetData, Star as StarData } from '@types';
+import type { Planet as PlanetData, Star as StarData } from '@repo/types';
 import { formatSpeed } from '../../../../utils';
 import {
   DEFAULT_RENDER_ORIGIN_NAME,

@@ -1,9 +1,5 @@
 import { Router } from 'express';
-import type { WithId } from 'mongodb';
-import {
-  SpaceshipModel,
-  type SpaceshipDocument,
-} from '@models';
+import { SpaceshipModel, type SpaceshipDocument } from '@models';
 import { OfflineSpaceshipService, OrbitalUpdaterService } from '@services';
 import { asyncHandler } from '../http';
 
@@ -76,7 +72,7 @@ updatesRouter.post(
 
     const world = await OfflineSpaceshipService.loadOfflineWorld();
     await Promise.all(
-      oldestSpaceships.map((spaceship: WithId<SpaceshipDocument>) =>
+      oldestSpaceships.map((spaceship: SpaceshipDocument) =>
         OfflineSpaceshipService.propagateOfflineSpaceship(
           spaceship,
           invocationTime,

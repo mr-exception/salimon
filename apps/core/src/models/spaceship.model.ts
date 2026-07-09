@@ -1,15 +1,29 @@
+import { getModelForClass, modelOptions, prop } from '@typegoose/typegoose';
 import { DatabaseModel } from './database.model';
 
-type SpaceshipPosition = {
-  x: string;
-  y: string;
-  relativeTo?: string;
-};
+class SpaceshipPosition {
+  @prop({ required: true })
+  public x!: string;
+
+  @prop({ required: true })
+  public y!: string;
+
+  @prop()
+  public relativeTo?: string;
+}
 
 export type SpaceshipVelocity = {
   x: number;
   y: number;
 };
+
+class SpaceshipVelocitySchema implements SpaceshipVelocity {
+  @prop({ required: true })
+  public x!: number;
+
+  @prop({ required: true })
+  public y!: number;
+}
 
 export type SpaceshipMotionState = 'flying' | 'landed' | 'crashed';
 
@@ -19,44 +33,81 @@ export type SpaceshipStats = {
   thrusterDurability: number[];
 };
 
-export type SpaceshipDocument = {
-  securityCode: string;
-  position: SpaceshipPosition;
-  direction: number;
-  speed: string;
-  velocity?: SpaceshipVelocity;
-  motionState?: SpaceshipMotionState;
-  stats?: SpaceshipStats;
-  simulatedAt?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-};
+class SpaceshipStatsSchema implements SpaceshipStats {
+  @prop({ required: true })
+  public fuelKns!: number;
+
+  @prop({ required: true })
+  public hullDurability!: number;
+
+  @prop({ required: true, type: () => [Number] })
+  public thrusterDurability!: number[];
+}
+
+@modelOptions({
+  schemaOptions: { collection: 'spaceships', versionKey: false },
+})
+class SpaceshipSchema {
+  @prop({ required: true })
+  public securityCode!: string;
+
+  @prop({ required: true, type: () => SpaceshipPosition })
+  public position!: SpaceshipPosition;
+
+  @prop({ required: true })
+  public direction!: number;
+
+  @prop({ required: true })
+  public speed!: string;
+
+  @prop({ type: () => SpaceshipVelocitySchema })
+  public velocity?: SpaceshipVelocity;
+
+  @prop({ enum: ['flying', 'landed', 'crashed'], type: () => String })
+  public motionState?: SpaceshipMotionState;
+
+  @prop({ type: () => SpaceshipStatsSchema })
+  public stats?: SpaceshipStats;
+
+  @prop()
+  public simulatedAt?: Date;
+
+  @prop({ required: true })
+  public createdAt!: Date;
+
+  @prop({ required: true })
+  public updatedAt!: Date;
+}
+
+export type SpaceshipDocument = SpaceshipSchema;
+
+const SpaceshipTypegooseModel = getModelForClass(SpaceshipSchema);
 
 export class SpaceshipModel {
-  static async getCollection() {
-    return (await DatabaseModel.getDatabase()).collection<SpaceshipDocument>(
-      'spaceships',
-    );
+  static async getModel() {
+    await DatabaseModel.connect();
+    return SpaceshipTypegooseModel;
   }
 
   static async insert(spaceship: SpaceshipDocument) {
-    return (await SpaceshipModel.getCollection()).insertOne(spaceship);
+    return (await SpaceshipModel.getModel()).create(spaceship);
   }
 
   static async findBySecurityCode(securityCode: string) {
-    return (await SpaceshipModel.getCollection()).findOne({ securityCode });
+    return (await SpaceshipModel.getModel())
+      .findOne({ securityCode })
+      .lean<SpaceshipDocument>()
+      .exec();
   }
 
   static async updateBySecurityCode(
     securityCode: string,
     update: Partial<SpaceshipDocument>,
   ) {
-    return (await SpaceshipModel.getCollection())
-      .findOneAndUpdate(
-        { securityCode },
-        { $set: update },
-        { returnDocument: 'after' },
-      )
+    return (await SpaceshipModel.getModel())
+      .findOneAndUpdate({ securityCode }, { $set: update }, { new: true })
+      .lean<SpaceshipDocument>()
+      .exec()
       .then((spaceship) => spaceship ?? undefined);
   }
 
@@ -64,7 +115,7 @@ export class SpaceshipModel {
     invocationTime: Date,
     batchSize: number,
   ) {
-    return (await SpaceshipModel.getCollection())
+    return (await SpaceshipModel.getModel())
       .find({
         $or: [
           { simulatedAt: { $type: 'date', $lt: invocationTime } },
@@ -76,25 +127,32 @@ export class SpaceshipModel {
       })
       .sort({ simulatedAt: 1, updatedAt: 1 })
       .limit(batchSize)
-      .toArray();
+      .lean<SpaceshipDocument[]>()
+      .exec();
   }
 
   static async updatePropagatedSpaceship(
     spaceship: SpaceshipDocument,
     update: Partial<SpaceshipDocument>,
   ) {
-    const collection = await SpaceshipModel.getCollection();
-    const result = await collection.findOneAndUpdate(
-      {
-        securityCode: spaceship.securityCode,
-        updatedAt: spaceship.updatedAt,
-      },
-      { $set: update },
-      { returnDocument: 'after' },
-    );
+    const model = await SpaceshipModel.getModel();
+    const result = await model
+      .findOneAndUpdate(
+        {
+          securityCode: spaceship.securityCode,
+          updatedAt: spaceship.updatedAt,
+        },
+        { $set: update },
+        { new: true },
+      )
+      .lean<SpaceshipDocument>()
+      .exec();
     return (
       result ??
-      (await collection.findOne({ securityCode: spaceship.securityCode })) ??
+      (await model
+        .findOne({ securityCode: spaceship.securityCode })
+        .lean<SpaceshipDocument>()
+        .exec()) ??
       spaceship
     );
   }

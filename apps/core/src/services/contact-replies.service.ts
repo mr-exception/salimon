@@ -1,9 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import OpenAI from 'openai';
-import {
-  ContactMessageModel,
-  type ContactMessageDocument,
-} from '@models';
+import { ContactMessageModel, type ContactMessageDocument } from '@models';
 import { CONTACTS, EASA_CHIEF_ID } from './contacts.service';
 
 type ReplyJob = {
@@ -55,15 +52,11 @@ export class ContactRepliesService {
     );
     if (existingReply) return;
 
-    const history = await (await ContactMessageModel.getCollection())
-      .find({
-        spaceshipSecurityCode: job.spaceshipSecurityCode,
-        contactId: job.contactId,
-        status: { $ne: 'failed' },
-      })
-      .sort({ createdAt: -1, _id: -1 })
-      .limit(MAX_CONTEXT_MESSAGES)
-      .toArray();
+    const history = await ContactMessageModel.findReplyContext(
+      job.spaceshipSecurityCode,
+      job.contactId,
+      MAX_CONTEXT_MESSAGES,
+    );
 
     const response = await getOpenAI().responses.create({
       model: process.env.OPENAI_MODEL ?? 'gpt-5.4-mini',

@@ -1,17 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
-import type { Filter } from 'mongodb';
 import {
   ContactModel,
   ContactMessageModel,
   type ContactMessageDocument,
   SpaceshipModel,
 } from '@models';
-import {
-  CONTACTS,
-  ContactRepliesService,
-  ContactsService,
-} from '@services';
+import { CONTACTS, ContactRepliesService, ContactsService } from '@services';
 import { asyncHandler, sendError } from '../http';
 
 const UUID_PATTERN =
@@ -48,9 +43,7 @@ contactsRouter.get(
         await ContactModel.findBySpaceshipSecurityCode(securityCode);
       if (contacts.length === 0) {
         await ContactsService.initializeSpaceshipContacts(securityCode);
-        contacts = await ContactModel.findBySpaceshipSecurityCode(
-          securityCode,
-        );
+        contacts = await ContactModel.findBySpaceshipSecurityCode(securityCode);
       }
 
       response.json({
@@ -60,7 +53,10 @@ contactsRouter.get(
               CONTACTS[contact.contactId as keyof typeof CONTACTS];
             if (!profile) return [];
             const [latestMessage, unreadCount] = await Promise.all([
-              ContactsService.findLatestMessage(securityCode, contact.contactId),
+              ContactsService.findLatestMessage(
+                securityCode,
+                contact.contactId,
+              ),
               ContactMessageModel.countUnreadContactMessages(
                 securityCode,
                 contact.contactId,
@@ -122,7 +118,7 @@ contactsRouter.get(
         return;
       }
 
-      const filter: Filter<ContactMessageDocument> = {
+      const filter: Record<string, unknown> = {
         spaceshipSecurityCode: securityCode,
         contactId,
         ...(after

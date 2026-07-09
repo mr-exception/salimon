@@ -1,53 +1,72 @@
-import type { Filter } from 'mongodb';
+import {
+  getModelForClass,
+  index,
+  modelOptions,
+  prop,
+} from '@typegoose/typegoose';
 import { DatabaseModel } from './database.model';
 
 export type ContactMessageSender = 'player' | 'contact';
 export type ContactMessageStatus = 'sent' | 'queued' | 'failed';
 
-export type ContactMessageDocument = {
-  _id: string;
-  spaceshipSecurityCode: string;
-  contactId: string;
-  sender: ContactMessageSender;
-  text: string;
-  status: ContactMessageStatus;
-  isRead: boolean;
-  clientMessageId?: string;
-  createdAt: Date;
-};
+@index({ spaceshipSecurityCode: 1, contactId: 1, createdAt: 1, _id: 1 })
+@index({ spaceshipSecurityCode: 1, sender: 1, isRead: 1, createdAt: 1 })
+@index(
+  { spaceshipSecurityCode: 1, contactId: 1, clientMessageId: 1 },
+  {
+    name: 'unique_client_message',
+    unique: true,
+    partialFilterExpression: { clientMessageId: { $type: 'string' } },
+  },
+)
+@modelOptions({
+  schemaOptions: { collection: 'contactMessages', versionKey: false },
+})
+class ContactMessageSchema {
+  @prop({ required: true, type: () => String })
+  public _id!: string;
 
-let indexesPromise: Promise<unknown> | undefined;
+  @prop({ required: true })
+  public spaceshipSecurityCode!: string;
+
+  @prop({ required: true })
+  public contactId!: string;
+
+  @prop({ required: true, enum: ['player', 'contact'], type: () => String })
+  public sender!: ContactMessageSender;
+
+  @prop({ required: true })
+  public text!: string;
+
+  @prop({
+    required: true,
+    enum: ['sent', 'queued', 'failed'],
+    type: () => String,
+  })
+  public status!: ContactMessageStatus;
+
+  @prop({ required: true })
+  public isRead!: boolean;
+
+  @prop()
+  public clientMessageId?: string;
+
+  @prop({ required: true })
+  public createdAt!: Date;
+}
+
+export type ContactMessageDocument = ContactMessageSchema;
+
+const ContactMessageTypegooseModel = getModelForClass(ContactMessageSchema);
 
 export class ContactMessageModel {
-  static async getCollection() {
-    const collection = (
-      await DatabaseModel.getDatabase()
-    ).collection<ContactMessageDocument>('contactMessages');
-    indexesPromise ??= collection.createIndexes([
-      {
-        key: { spaceshipSecurityCode: 1, contactId: 1, createdAt: 1, _id: 1 },
-      },
-      {
-        key: {
-          spaceshipSecurityCode: 1,
-          sender: 1,
-          isRead: 1,
-          createdAt: 1,
-        },
-      },
-      {
-        key: { spaceshipSecurityCode: 1, contactId: 1, clientMessageId: 1 },
-        name: 'unique_client_message',
-        unique: true,
-        partialFilterExpression: { clientMessageId: { $type: 'string' } },
-      },
-    ]);
-    await indexesPromise;
-    return collection;
+  static async getModel() {
+    await DatabaseModel.connect();
+    return ContactMessageTypegooseModel;
   }
 
   static async upsertInitialMessage(message: ContactMessageDocument) {
-    return (await ContactMessageModel.getCollection()).updateOne(
+    return (await ContactMessageModel.getModel()).updateOne(
       {
         spaceshipSecurityCode: message.spaceshipSecurityCode,
         contactId: message.contactId,
@@ -59,21 +78,19 @@ export class ContactMessageModel {
     );
   }
 
-  static async findLatest(
-    spaceshipSecurityCode: string,
-    contactId: string,
-  ) {
-    return (await ContactMessageModel.getCollection()).findOne(
-      { spaceshipSecurityCode, contactId },
-      { sort: { createdAt: -1, _id: -1 } },
-    );
+  static async findLatest(spaceshipSecurityCode: string, contactId: string) {
+    return (await ContactMessageModel.getModel())
+      .findOne({ spaceshipSecurityCode, contactId })
+      .sort({ createdAt: -1, _id: -1 })
+      .lean<ContactMessageDocument>()
+      .exec();
   }
 
   static async countUnreadContactMessages(
     spaceshipSecurityCode: string,
     contactId: string,
   ) {
-    return (await ContactMessageModel.getCollection()).countDocuments({
+    return (await ContactMessageModel.getModel()).countDocuments({
       spaceshipSecurityCode,
       contactId,
       sender: 'contact',
@@ -81,15 +98,13 @@ export class ContactMessageModel {
     });
   }
 
-  static async findMessages(
-    filter: Filter<ContactMessageDocument>,
-    limit: number,
-  ) {
-    return (await ContactMessageModel.getCollection())
+  static async findMessages(filter: Record<string, unknown>, limit: number) {
+    return (await ContactMessageModel.getModel())
       .find(filter)
       .sort({ createdAt: 1, _id: 1 })
       .limit(limit)
-      .toArray();
+      .lean<ContactMessageDocument[]>()
+      .exec();
   }
 
   static async markMessagesRead(
@@ -97,7 +112,7 @@ export class ContactMessageModel {
     contactId: string,
     messageIds: string[],
   ) {
-    return (await ContactMessageModel.getCollection()).updateMany(
+    return (await ContactMessageModel.getModel()).updateMany(
       {
         spaceshipSecurityCode,
         contactId,
@@ -108,14 +123,15 @@ export class ContactMessageModel {
   }
 
   static async findUnreadContactMessages(spaceshipSecurityCode: string) {
-    return (await ContactMessageModel.getCollection())
+    return (await ContactMessageModel.getModel())
       .find({
         spaceshipSecurityCode,
         sender: 'contact',
         isRead: { $ne: true },
       })
       .sort({ createdAt: 1, _id: 1 })
-      .toArray();
+      .lean<ContactMessageDocument[]>()
+      .exec();
   }
 
   static async findByClientMessage(
@@ -123,18 +139,21 @@ export class ContactMessageModel {
     contactId: string,
     clientMessageId: string,
   ) {
-    return (await ContactMessageModel.getCollection()).findOne({
-      spaceshipSecurityCode,
-      contactId,
-      clientMessageId,
-    });
+    return (await ContactMessageModel.getModel())
+      .findOne({
+        spaceshipSecurityCode,
+        contactId,
+        clientMessageId,
+      })
+      .lean<ContactMessageDocument>()
+      .exec();
   }
 
   static async countRecentPlayerMessages(
     spaceshipSecurityCode: string,
     after: Date,
   ) {
-    return (await ContactMessageModel.getCollection()).countDocuments({
+    return (await ContactMessageModel.getModel()).countDocuments({
       spaceshipSecurityCode,
       sender: 'player',
       createdAt: { $gt: after },
@@ -142,11 +161,11 @@ export class ContactMessageModel {
   }
 
   static async insert(message: ContactMessageDocument) {
-    return (await ContactMessageModel.getCollection()).insertOne(message);
+    return (await ContactMessageModel.getModel()).create(message);
   }
 
   static async updateStatus(messageId: string, status: ContactMessageStatus) {
-    return (await ContactMessageModel.getCollection()).updateOne(
+    return (await ContactMessageModel.getModel()).updateOne(
       { _id: messageId },
       { $set: { status } },
     );
@@ -157,11 +176,31 @@ export class ContactMessageModel {
     contactId: string,
     playerMessageId: string,
   ) {
-    return (await ContactMessageModel.getCollection()).findOne({
-      _id: playerMessageId,
-      spaceshipSecurityCode,
-      contactId,
-      sender: 'player',
-    });
+    return (await ContactMessageModel.getModel())
+      .findOne({
+        _id: playerMessageId,
+        spaceshipSecurityCode,
+        contactId,
+        sender: 'player',
+      })
+      .lean<ContactMessageDocument>()
+      .exec();
+  }
+
+  static async findReplyContext(
+    spaceshipSecurityCode: string,
+    contactId: string,
+    limit: number,
+  ) {
+    return (await ContactMessageModel.getModel())
+      .find({
+        spaceshipSecurityCode,
+        contactId,
+        status: { $ne: 'failed' },
+      })
+      .sort({ createdAt: -1, _id: -1 })
+      .limit(limit)
+      .lean<ContactMessageDocument[]>()
+      .exec();
   }
 }

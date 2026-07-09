@@ -11,10 +11,11 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@typegoose/typegoose": "^13.4.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
-    "mongodb": "^7.4.0",
+    "mongoose": "^9.7.4",
     "openai": "^6.45.0",
     "ws": "^8.21.0"
   },

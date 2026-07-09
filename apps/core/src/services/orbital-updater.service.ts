@@ -1,7 +1,4 @@
-import {
-  type AnyBulkWriteOperation,
-  type WithId,
-} from 'mongodb';
+import type { AnyBulkWriteOperation } from 'mongoose';
 import {
   WorldBodyModel,
   type OrbitalCenterCollectionName,
@@ -26,10 +23,7 @@ function getInvocationTime(time: string | Date): Date {
   return invocationTime;
 }
 
-function advancePosition(
-  body: WithId<WorldBodyDocument>,
-  elapsedSeconds: number,
-) {
+function advancePosition(body: WorldBodyDocument, elapsedSeconds: number) {
   const x = BigInt(body.position.x);
   const y = BigInt(body.position.y);
   const orbitalRadius = Math.hypot(Number(x), Number(y));

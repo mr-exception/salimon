@@ -1,45 +1,56 @@
+import {
+  getModelForClass,
+  index,
+  modelOptions,
+  prop,
+} from '@typegoose/typegoose';
 import { DatabaseModel } from './database.model';
 
-export type ContactDocument = {
-  spaceshipSecurityCode: string;
-  contactId: string;
-  unlockedAt: Date;
-  lastReadAt?: Date;
-};
+@index({ spaceshipSecurityCode: 1, contactId: 1 }, { unique: true })
+@modelOptions({ schemaOptions: { collection: 'contacts', versionKey: false } })
+class ContactSchema {
+  @prop({ required: true })
+  public spaceshipSecurityCode!: string;
 
-let indexesPromise: Promise<unknown> | undefined;
+  @prop({ required: true })
+  public contactId!: string;
+
+  @prop({ required: true })
+  public unlockedAt!: Date;
+
+  @prop()
+  public lastReadAt?: Date;
+}
+
+export type ContactDocument = ContactSchema;
+
+const ContactTypegooseModel = getModelForClass(ContactSchema);
 
 export class ContactModel {
-  static async getCollection() {
-    const collection = (
-      await DatabaseModel.getDatabase()
-    ).collection<ContactDocument>('contacts');
-    indexesPromise ??= collection.createIndex(
-      { spaceshipSecurityCode: 1, contactId: 1 },
-      { unique: true },
-    );
-    await indexesPromise;
-    return collection;
+  static async getModel() {
+    await DatabaseModel.connect();
+    return ContactTypegooseModel;
   }
 
   static async findBySpaceshipSecurityCode(spaceshipSecurityCode: string) {
-    return (await ContactModel.getCollection())
+    return (await ContactModel.getModel())
       .find({ spaceshipSecurityCode })
-      .toArray();
+      .lean<ContactDocument[]>()
+      .exec();
   }
 
   static async findBySpaceshipAndContact(
     spaceshipSecurityCode: string,
     contactId: string,
   ) {
-    return (await ContactModel.getCollection()).findOne({
-      spaceshipSecurityCode,
-      contactId,
-    });
+    return (await ContactModel.getModel())
+      .findOne({ spaceshipSecurityCode, contactId })
+      .lean<ContactDocument>()
+      .exec();
   }
 
   static async upsertSpaceshipContact(contact: ContactDocument) {
-    return (await ContactModel.getCollection()).updateOne(
+    return (await ContactModel.getModel()).updateOne(
       {
         spaceshipSecurityCode: contact.spaceshipSecurityCode,
         contactId: contact.contactId,

@@ -1,9 +1,5 @@
-import type {
-  AnyBulkWriteOperation,
-  Document,
-  OptionalUnlessRequiredId,
-  WithId,
-} from 'mongodb';
+import type { AnyBulkWriteOperation, PipelineStage, Types } from 'mongoose';
+import { getModelForClass, modelOptions, prop } from '@typegoose/typegoose';
 import { DatabaseModel } from './database.model';
 
 export type WorldBodyCollectionName = 'planets' | 'moons' | 'stars';
@@ -15,34 +11,80 @@ export type SerializedPosition = {
   relativeTo?: string;
 };
 
-export type WorldBodyDocument = Document & {
-  name: string;
-  position: SerializedPosition;
-  orbitalCenter: string | null;
-  clockwise: boolean;
-  speed: string;
-  mass: string;
-  radius: string;
-  rotationPeriodSeconds?: number;
-  updatedAt: Date;
-};
+class SerializedPositionSchema implements SerializedPosition {
+  @prop({ required: true })
+  public x!: string;
+
+  @prop({ required: true })
+  public y!: string;
+
+  @prop()
+  public relativeTo?: string;
+}
+
+@modelOptions({ schemaOptions: { versionKey: false } })
+class WorldBodySchema {
+  @prop({ required: true })
+  public name!: string;
+
+  @prop({ required: true, type: () => SerializedPositionSchema })
+  public position!: SerializedPosition;
+
+  @prop({ default: null, type: () => String })
+  public orbitalCenter!: string | null;
+
+  @prop({ required: true })
+  public clockwise!: boolean;
+
+  @prop({ required: true })
+  public speed!: string;
+
+  @prop({ required: true })
+  public mass!: string;
+
+  @prop({ required: true })
+  public radius!: string;
+
+  @prop()
+  public rotationPeriodSeconds?: number;
+
+  @prop({ required: true })
+  public updatedAt!: Date;
+}
+
+export type WorldBodyDocument = WorldBodySchema & { _id?: Types.ObjectId };
+
+const PlanetTypegooseModel = getModelForClass(WorldBodySchema, {
+  options: { customName: 'PlanetBody' },
+  schemaOptions: { collection: 'planets', versionKey: false },
+});
+const MoonTypegooseModel = getModelForClass(WorldBodySchema, {
+  options: { customName: 'MoonBody' },
+  schemaOptions: { collection: 'moons', versionKey: false },
+});
+const StarTypegooseModel = getModelForClass(WorldBodySchema, {
+  options: { customName: 'StarBody' },
+  schemaOptions: { collection: 'stars', versionKey: false },
+});
 
 export class WorldBodyModel {
-  static async getCollection(collectionName: WorldBodyCollectionName) {
-    return (await DatabaseModel.getDatabase()).collection<WorldBodyDocument>(
-      collectionName,
-    );
+  static async getModel(collectionName: WorldBodyCollectionName) {
+    await DatabaseModel.connect();
+    if (collectionName === 'planets') return PlanetTypegooseModel;
+    if (collectionName === 'moons') return MoonTypegooseModel;
+    return StarTypegooseModel;
   }
 
   static async findWorldSystemsBodies() {
-    const projection = { _id: 0, updatedAt: 0 };
     const [planets, stars] = await Promise.all([
-      (await WorldBodyModel.getCollection('planets'))
-        .find({}, { projection })
-        .toArray(),
-      (await WorldBodyModel.getCollection('stars'))
-        .find({}, { projection })
-        .toArray(),
+      (await WorldBodyModel.getModel('planets'))
+        .find({}, { _id: 0, updatedAt: 0 })
+        .lean<WorldBodyDocument[]>()
+        .exec(),
+      (await WorldBodyModel.getModel('stars'))
+        .find({}, { _id: 0, updatedAt: 0 })
+        .lean<WorldBodyDocument[]>()
+        .exec(),
     ]);
     return { planets, stars };
   }
@@ -60,14 +102,14 @@ export class WorldBodyModel {
       rotationPeriodSeconds: 1,
       updatedAt: 1,
     };
-    const collections = await Promise.all([
-      WorldBodyModel.getCollection('planets'),
-      WorldBodyModel.getCollection('moons'),
-      WorldBodyModel.getCollection('stars'),
+    const models = await Promise.all([
+      WorldBodyModel.getModel('planets'),
+      WorldBodyModel.getModel('moons'),
+      WorldBodyModel.getModel('stars'),
     ]);
     const bodyGroups = await Promise.all(
-      collections.map((collection) =>
-        collection.find({}, { projection }).toArray(),
+      models.map((model) =>
+        model.find({}, projection).lean<WorldBodyDocument[]>().exec(),
       ),
     );
     return bodyGroups.flat();
@@ -81,8 +123,8 @@ export class WorldBodyModel {
     },
     batchSize: number,
   ) {
-    const bodies = await WorldBodyModel.getCollection(options.collectionName);
-    const initialStages: Document[] = [
+    const bodies = await WorldBodyModel.getModel(options.collectionName);
+    const initialStages: PipelineStage[] = [
       { $match: { updatedAt: { $type: 'date', $lt: invocationTime } } },
     ];
 
@@ -102,21 +144,22 @@ export class WorldBodyModel {
     }
 
     const oldestBodies = await bodies
-      .aggregate<
-        WithId<WorldBodyDocument>
-      >([...initialStages, { $sort: { updatedAt: 1 } }, { $limit: batchSize }])
-      .toArray();
+      .aggregate<WorldBodyDocument>([
+        ...initialStages,
+        { $sort: { updatedAt: 1 } },
+        { $limit: batchSize },
+      ])
+      .exec();
 
-    return { bodies, oldestBodies };
+    return { oldestBodies };
   }
 
   static async bulkWrite(
     collectionName: WorldBodyCollectionName,
-    updates: AnyBulkWriteOperation<OptionalUnlessRequiredId<WorldBodyDocument>>[],
+    updates: AnyBulkWriteOperation<WorldBodyDocument>[],
   ) {
-    return (await WorldBodyModel.getCollection(collectionName)).bulkWrite(
-      updates,
-      { ordered: false },
-    );
+    return (await WorldBodyModel.getModel(collectionName)).bulkWrite(updates, {
+      ordered: false,
+    });
   }
 }

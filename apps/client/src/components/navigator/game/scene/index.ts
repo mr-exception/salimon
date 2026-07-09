@@ -8,6 +8,7 @@ import {
   getSpaceshipMotionState,
   getSpaceshipWorldVelocity,
   isSpaceshipEngineRunning,
+  refreshWorldViewport,
   resolveSpaceshipPlanetCollision,
   setActiveWorldBodyNames,
   setSpaceshipTargetDirection,
@@ -15,6 +16,7 @@ import {
   setSpaceshipManualThrust,
   startSpaceshipEngines,
   stopSpaceshipEngines,
+  WORLD_VIEWPORT_REFRESH_INTERVAL_MS,
 } from '@store';
 import type { Planet as PlanetData, Star as StarData } from '@types';
 import { formatSpeed } from '../../../../utils';
@@ -23,6 +25,7 @@ import {
   getRenderPosition,
   offsetRenderOrigin,
   setRenderOriginName,
+  getWorldPositionFromRenderPosition,
 } from '../get-render-position';
 import {
   getPlanetPatternTextureKey,
@@ -124,6 +127,7 @@ export class Scene extends Phaser.Scene {
   private spaceshipEngineRunning = false;
   private selectingTargetDirection = false;
   private targetDirection?: number;
+  private viewportRefreshTimer?: number;
   private readonly alwaysVisibleBodies = new Set<string>();
 
   constructor(
@@ -200,8 +204,16 @@ export class Scene extends Phaser.Scene {
       );
       this.unsubscribeFromWorld?.();
       this.unsubscribeFromWorld = undefined;
+      window.clearInterval(this.viewportRefreshTimer);
+      this.viewportRefreshTimer = undefined;
     });
     void this.renderWorld();
+    this.viewportRefreshTimer = window.setInterval(() => {
+      void this.refreshWorldFromViewport().catch((error: unknown) => {
+        console.error('Failed to refresh viewport world data', error);
+        this.onWorldLoadComplete?.(error);
+      });
+    }, WORLD_VIEWPORT_REFRESH_INTERVAL_MS);
   }
 
   update(_time: number, delta: number) {
@@ -997,6 +1009,31 @@ export class Scene extends Phaser.Scene {
     this.starDataByName.clear();
     planets.forEach((planet) => this.planetDataByName.set(planet.name, planet));
     stars.forEach((star) => this.starDataByName.set(star.name, star));
+  }
+
+  async refreshWorldFromViewport() {
+    const camera = this.cameras.main;
+    camera.preRender();
+    const viewport = camera.worldView;
+    const center = getWorldPositionFromRenderPosition(
+      viewport.centerX,
+      viewport.centerY,
+    );
+    const radius = BigInt(
+      Math.ceil(Math.hypot(viewport.width, viewport.height) / 2),
+    );
+    const world = await refreshWorldViewport({
+      x: center.x.toString(),
+      y: center.y.toString(),
+      radius: radius.toString(),
+    });
+
+    this.setWorldBodyData(world.planets, world.stars);
+    this.syncWorldPositions();
+    this.lastActiveBodiesViewportKey = '';
+    this.lastVisibilityViewportKey = '';
+    this.updateWorldVisibility();
+    return world;
   }
 
   private reconcileRenderedBodies(activeBodyNames: ReadonlySet<string>) {

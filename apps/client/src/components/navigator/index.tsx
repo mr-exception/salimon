@@ -3,7 +3,6 @@ import Phaser from 'phaser';
 import {
   BASE_SPACESHIP_CONFIG,
   getSpaceshipProximityTelemetry,
-  loadWorld,
   setSpaceshipTargetFallingSpeed,
   startSpaceshipFallingSpeedControl,
   stopSpaceshipFallingSpeedControl,
@@ -83,7 +82,13 @@ export function Navigator({
     };
 
     updateTelemetry();
-    return subscribeToWorld(updateTelemetry);
+    return subscribeToWorld((updatedWorld) => {
+      setWorld({
+        planets: updatedWorld.planets,
+        stars: updatedWorld.stars,
+      });
+      updateTelemetry();
+    });
   }, []);
 
   useEffect(() => {
@@ -124,15 +129,6 @@ export function Navigator({
     });
     // Keep the online simulation running while the document is in the background.
     game.events.off(Phaser.Core.Events.HIDDEN);
-
-    void loadWorld()
-      .then((loadedWorld) => {
-        setWorld(loadedWorld);
-        setProximityTelemetry(getSpaceshipProximityTelemetry());
-      })
-      .catch(() => {
-        // The scene reports world-loading errors; keep search unavailable.
-      });
 
     return () => {
       sceneRef.current = null;

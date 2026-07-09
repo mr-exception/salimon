@@ -67,6 +67,7 @@ const AUTO_ORBIT_TANGENTIAL_ACCELERATION_GAIN = 0.05;
 const PROXIMITY_TELEMETRY_RANGE_METERS = 3_000_000;
 const WORLD_SEARCH_RADIUS_METERS = '1025000000000000000';
 const DEFAULT_API_BASE_URL = 'http://localhost:3000';
+export const WORLD_VIEWPORT_REFRESH_INTERVAL_MS = 5 * 60 * 1_000;
 
 const store = getDefaultStore();
 
@@ -255,6 +256,7 @@ export const spaceshipState: Spaceship = {
 const listeners = new Set<WorldListener>();
 let loadPromise: Promise<World> | undefined;
 let worldBodyByName = new Map<string, Body>();
+let bodyVelocityByName = new Map<string, Vector>();
 let gravitySources: GravitySource[] = [];
 let activeWorldBodyNames = new Set<string>();
 const suspendedSimulationSeconds = new Map<string, number>();
@@ -283,37 +285,41 @@ let spaceshipAutoOrbitClockwise = false;
 let spaceshipFallingSpeedAcceleration: Vector | undefined;
 let worldElapsedSeconds = 0;
 
-export async function loadWorld() {
+type WorldViewportRequest = {
+  x?: string;
+  y?: string;
+  radius?: string;
+};
+
+export async function loadWorld(request: WorldViewportRequest = {}) {
+  if (loadPromise) return loadPromise;
+
+  loadPromise = refreshWorldViewport(request).catch((error: unknown) => {
+    loadPromise = undefined;
+    throw error;
+  });
+
+  return loadPromise;
+}
+
+export async function refreshWorldViewport({
+  x = '0',
+  y = '0',
+  radius = WORLD_SEARCH_RADIUS_METERS,
+}: WorldViewportRequest = {}) {
   const apiBaseUrl = (
     import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL
   ).replace(/\/+$/, '');
 
-  loadPromise ??= axios
-    .get<SerializedWorldSystems>(`${apiBaseUrl}/world/systems`, {
-      params: {
-        x: '0',
-        y: '0',
-        radius: WORLD_SEARCH_RADIUS_METERS,
-      },
-    })
-    .then(({ data }) => {
-      worldState.stars = data.systems.map(({ star }) =>
-        deserializeBody<Star>(star),
-      );
-      worldState.planets = data.systems.flatMap(({ planets }) =>
-        planets.flatMap(({ planet, moons }) =>
-          [planet, ...moons].map(deserializeBody<Planet>),
-        ),
-      );
-      rebuildWorldBodyByName();
-      return worldState;
-    })
-    .catch((error: unknown) => {
-      loadPromise = undefined;
-      throw error;
-    });
+  const { data } = await axios.get<SerializedWorldSystems>(
+    `${apiBaseUrl}/world/systems`,
+    {
+      params: { x, y, radius },
+    },
+  );
 
-  return loadPromise;
+  applyWorldSystems(data);
+  return worldState;
 }
 
 export function subscribeToWorld(listener: WorldListener) {
@@ -322,6 +328,44 @@ export function subscribeToWorld(listener: WorldListener) {
   return () => {
     listeners.delete(listener);
   };
+}
+
+function applyWorldSystems(data: SerializedWorldSystems) {
+  const nextVelocities = new Map<string, Vector>();
+  const stars = data.systems.map(({ star }) => {
+    if (star.velocity) nextVelocities.set(star.name, star.velocity);
+    return deserializeBody<Star>(star);
+  });
+  const planets = data.systems.flatMap(({ planets: planetSystems }) =>
+    planetSystems.flatMap(({ planet, moons }) =>
+      [planet, ...moons].map((body) => {
+        if (body.velocity) nextVelocities.set(body.name, body.velocity);
+        return deserializeBody<Planet>(body);
+      }),
+    ),
+  );
+
+  worldState.stars = mergeBodies(worldState.stars, stars);
+  worldState.planets = mergeBodies(worldState.planets, planets);
+  bodyVelocityByName = new Map([...bodyVelocityByName, ...nextVelocities]);
+  rebuildWorldBodyByName();
+  listeners.forEach((listener) => listener(worldState));
+}
+
+function mergeBodies<T extends Planet | Star>(current: T[], incoming: T[]) {
+  const currentByName = new Map(current.map((body) => [body.name, body]));
+  const merged = [...current];
+
+  incoming.forEach((body) => {
+    const existing = currentByName.get(body.name);
+    if (existing) {
+      Object.assign(existing, body);
+      return;
+    }
+
+    merged.push(body);
+  });
+  return merged;
 }
 
 export function setActiveWorldBodyNames(names: Iterable<string>) {
@@ -2289,7 +2333,10 @@ function getCelestialBodyWorldVelocity(
 }
 
 export function getBodyWorldVelocity(bodyName: string) {
-  return getCelestialBodyWorldVelocity(bodyName, new Set());
+  const snapshotVelocity = bodyVelocityByName.get(bodyName);
+  return snapshotVelocity
+    ? { ...snapshotVelocity }
+    : getCelestialBodyWorldVelocity(bodyName, new Set());
 }
 
 function toVector(position: Position): Vector {

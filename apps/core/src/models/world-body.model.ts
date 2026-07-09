@@ -76,8 +76,12 @@ export class WorldBodyModel {
   }
 
   static async findWorldSystemsBodies() {
-    const [planets, stars] = await Promise.all([
+    const [planets, moons, stars] = await Promise.all([
       (await WorldBodyModel.getModel('planets'))
+        .find({}, { _id: 0, updatedAt: 0 })
+        .lean<WorldBodyDocument[]>()
+        .exec(),
+      (await WorldBodyModel.getModel('moons'))
         .find({}, { _id: 0, updatedAt: 0 })
         .lean<WorldBodyDocument[]>()
         .exec(),
@@ -86,7 +90,36 @@ export class WorldBodyModel {
         .lean<WorldBodyDocument[]>()
         .exec(),
     ]);
-    return { planets, stars };
+    return { planets, moons, stars };
+  }
+
+  static async findAllWorldBodies() {
+    const projection = {
+      name: 1,
+      position: 1,
+      orbitalCenter: 1,
+      clockwise: 1,
+      speed: 1,
+      mass: 1,
+      radius: 1,
+      rotationPeriodSeconds: 1,
+      updatedAt: 1,
+    };
+    const [planets, moons, stars] = await Promise.all([
+      (await WorldBodyModel.getModel('planets'))
+        .find({}, projection)
+        .lean<WorldBodyDocument[]>()
+        .exec(),
+      (await WorldBodyModel.getModel('moons'))
+        .find({}, projection)
+        .lean<WorldBodyDocument[]>()
+        .exec(),
+      (await WorldBodyModel.getModel('stars'))
+        .find({}, projection)
+        .lean<WorldBodyDocument[]>()
+        .exec(),
+    ]);
+    return { planets, moons, stars };
   }
 
   static async findOfflineBodies() {
@@ -161,5 +194,25 @@ export class WorldBodyModel {
     return (await WorldBodyModel.getModel(collectionName)).bulkWrite(updates, {
       ordered: false,
     });
+  }
+
+  static async replaceBodies(
+    collectionName: WorldBodyCollectionName,
+    bodies: WorldBodyDocument[],
+  ) {
+    if (bodies.length === 0) {
+      return { modifiedCount: 0, upsertedCount: 0 };
+    }
+
+    return WorldBodyModel.bulkWrite(
+      collectionName,
+      bodies.map((body) => ({
+        replaceOne: {
+          filter: { name: body.name },
+          replacement: body,
+          upsert: true,
+        },
+      })),
+    );
   }
 }

@@ -1,11 +1,11 @@
 import {
   SpaceshipModel,
-  WorldBodyModel,
   type SpaceshipDocument,
   type SpaceshipMotionState,
   type SpaceshipVelocity,
   type WorldBodyDocument,
 } from '@models';
+import { OrbitalUpdaterService } from './orbital-updater.service';
 import { SpaceshipService } from './spaceship.service';
 
 type Motion = {
@@ -32,7 +32,8 @@ const TARGET_STEP_SECONDS = 30;
 
 export class OfflineSpaceshipService {
   static async loadOfflineWorld(): Promise<OfflineWorld> {
-    const bodies = await WorldBodyModel.findOfflineBodies();
+    const { planets, moons, stars } = await OrbitalUpdaterService.getWorldData();
+    const bodies = [...planets, ...moons, ...stars];
     return {
       bodies,
       bodiesByName: new Map(bodies.map((body) => [body.name, body])),

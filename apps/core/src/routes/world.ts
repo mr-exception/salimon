@@ -1,8 +1,6 @@
 import { Router } from 'express';
-import {
-  WorldBodyModel,
-  type WorldBodyDocument,
-} from '@models';
+import { type WorldBodyDocument } from '@models';
+import { OrbitalUpdaterService } from '@services';
 import { asyncHandler, sendError } from '../http';
 
 type Coordinate = {
@@ -10,13 +8,22 @@ type Coordinate = {
   y: bigint;
 };
 
+type Velocity = {
+  x: number;
+  y: number;
+};
+
+type WorldBodyResponse = WorldBodyDocument & {
+  velocity: Velocity;
+};
+
 type PlanetSystem = {
-  planet: WorldBodyDocument;
-  moons: WorldBodyDocument[];
+  planet: WorldBodyResponse;
+  moons: WorldBodyResponse[];
 };
 
 type StarSystem = {
-  star: WorldBodyDocument;
+  star: WorldBodyResponse;
   planets: PlanetSystem[];
 };
 
@@ -114,6 +121,73 @@ function groupByOrbitalCenter(bodies: WorldBodyDocument[]) {
   return bodiesByOrbitalCenter;
 }
 
+function resolveVelocities(
+  bodies: WorldBodyDocument[],
+  positions: Map<string, Coordinate>,
+) {
+  const bodiesByName = new Map(bodies.map((body) => [body.name, body]));
+  const velocitiesByName = new Map<string, Velocity>();
+
+  function resolve(
+    body: WorldBodyDocument,
+    ancestors = new Set<string>(),
+  ): Velocity {
+    const cached = velocitiesByName.get(body.name);
+    if (cached) return cached;
+    if (ancestors.has(body.name)) {
+      throw new Error(`Circular velocity reference involving ${body.name}`);
+    }
+
+    const centerName = body.orbitalCenter;
+    const center = centerName ? bodiesByName.get(centerName) : undefined;
+    const nextAncestors = new Set(ancestors).add(body.name);
+    const centerVelocity: Velocity = center
+      ? resolve(center, nextAncestors)
+      : { x: 0, y: 0 };
+    if (!centerName || !center || body.speed === '0') {
+      velocitiesByName.set(body.name, centerVelocity);
+      return centerVelocity;
+    }
+
+    const bodyPosition = positions.get(body.name);
+    const centerPosition = positions.get(centerName);
+    if (!bodyPosition || !centerPosition) {
+      velocitiesByName.set(body.name, centerVelocity);
+      return centerVelocity;
+    }
+
+    const x = Number(bodyPosition.x - centerPosition.x);
+    const y = Number(bodyPosition.y - centerPosition.y);
+    const radius = Math.hypot(x, y);
+    if (radius === 0) {
+      velocitiesByName.set(body.name, centerVelocity);
+      return centerVelocity;
+    }
+
+    const direction = body.clockwise ? 1 : -1;
+    const speed = Number(BigInt(body.speed));
+    const velocity = {
+      x: centerVelocity.x + (direction * -y * speed) / radius,
+      y: centerVelocity.y + (direction * x * speed) / radius,
+    };
+    velocitiesByName.set(body.name, velocity);
+    return velocity;
+  }
+
+  bodies.forEach((body) => resolve(body));
+  return velocitiesByName;
+}
+
+function withVelocity(
+  body: WorldBodyDocument,
+  velocities: Map<string, Velocity>,
+): WorldBodyResponse {
+  return {
+    ...body,
+    velocity: velocities.get(body.name) ?? { x: 0, y: 0 },
+  };
+}
+
 export const worldRouter = Router();
 
 worldRouter.get(
@@ -132,24 +206,54 @@ worldRouter.get(
     }
 
     try {
-      const { planets, stars } = await WorldBodyModel.findWorldSystemsBodies();
-      const positions = resolvePositions([...planets, ...stars]);
+      const { planets, moons, stars } =
+        await OrbitalUpdaterService.getWorldSystemsBodies();
+      const orbitingBodies = [...planets, ...moons];
+      const positions = resolvePositions([...orbitingBodies, ...stars]);
       const center = { x: searchArea.x, y: searchArea.y };
       const radiusSquared = searchArea.radius * searchArea.radius;
-      const planetsByOrbitalCenter = groupByOrbitalCenter(planets);
+      const planetsByOrbitalCenter = groupByOrbitalCenter(orbitingBodies);
+      const velocities = resolveVelocities(
+        [...orbitingBodies, ...stars],
+        positions,
+      );
       const systems: StarSystem[] = stars
-        .filter((star) =>
-          isInsideCircle(positions.get(star.name)!, center, radiusSquared),
-        )
-        .map((star) => ({
-          star,
-          planets: (planetsByOrbitalCenter.get(star.name) ?? []).map(
-            (planet) => ({
-              planet,
-              moons: planetsByOrbitalCenter.get(planet.name) ?? [],
-            }),
-          ),
-        }));
+        .map((star) => {
+          const planetSystems = (
+            planetsByOrbitalCenter.get(star.name) ?? []
+          ).map((planet) => ({
+            planet,
+            moons: planetsByOrbitalCenter.get(planet.name) ?? [],
+          }));
+          const hasVisibleBody =
+            isInsideCircle(positions.get(star.name)!, center, radiusSquared) ||
+            planetSystems.some(
+              ({ planet, moons: planetMoons }) =>
+                isInsideCircle(
+                  positions.get(planet.name)!,
+                  center,
+                  radiusSquared,
+                ) ||
+                planetMoons.some((moon) =>
+                  isInsideCircle(
+                    positions.get(moon.name)!,
+                    center,
+                    radiusSquared,
+                  ),
+                ),
+            );
+
+          return hasVisibleBody
+            ? {
+                star: withVelocity(star, velocities),
+                planets: planetSystems.map(({ planet, moons: planetMoons }) => ({
+                  planet: withVelocity(planet, velocities),
+                  moons: planetMoons.map((moon) => withVelocity(moon, velocities)),
+                })),
+              }
+            : undefined;
+        })
+        .filter((system): system is StarSystem => system !== undefined);
 
       response.json({ systems });
     } catch (error) {

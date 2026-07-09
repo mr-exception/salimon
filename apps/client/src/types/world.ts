@@ -4,6 +4,11 @@ export type Position = {
   relativeTo?: string;
 };
 
+export type Velocity = {
+  x: number; // m/s
+  y: number; // m/s
+};
+
 type OrbitingBody = {
   position: Position;
   name: string;
@@ -78,6 +83,7 @@ type SerializedBody<T extends Planet | Spaceship | Star> = Omit<
   radius: string;
   mass: string;
   speed: string;
+  velocity?: Velocity;
 };
 
 export type SerializedWorld = {

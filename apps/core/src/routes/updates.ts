@@ -20,10 +20,6 @@ updatesRouter.post(
   asyncHandler(async (request, response) => {
     const result = await OrbitalUpdaterService.updateOrbitalBodies(
       getInvocationTime(request.body?.time),
-      {
-        collectionName: 'planets',
-        orbitalCenterCollection: 'stars',
-      },
     );
     response.json(result);
   }),
@@ -34,10 +30,6 @@ updatesRouter.post(
   asyncHandler(async (request, response) => {
     const result = await OrbitalUpdaterService.updateOrbitalBodies(
       getInvocationTime(request.body?.time),
-      {
-        collectionName: 'planets',
-        orbitalCenterCollection: 'planets',
-      },
     );
     response.json(result);
   }),
@@ -48,9 +40,6 @@ updatesRouter.post(
   asyncHandler(async (request, response) => {
     const result = await OrbitalUpdaterService.updateOrbitalBodies(
       getInvocationTime(request.body?.time),
-      {
-        collectionName: 'stars',
-      },
     );
     response.json(result);
   }),

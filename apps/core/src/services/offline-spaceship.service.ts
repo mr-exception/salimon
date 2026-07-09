@@ -1,11 +1,11 @@
 import {
-  SpaceshipModel,
   type SpaceshipDocument,
   type SpaceshipMotionState,
   type SpaceshipVelocity,
   type WorldBodyDocument,
 } from '@models';
 import { OrbitalUpdaterService } from './orbital-updater.service';
+import { RepositoryService } from './repository.service';
 import { SpaceshipService } from './spaceship.service';
 
 type Motion = {
@@ -32,7 +32,8 @@ const TARGET_STEP_SECONDS = 30;
 
 export class OfflineSpaceshipService {
   static async loadOfflineWorld(): Promise<OfflineWorld> {
-    const { planets, moons, stars } = await OrbitalUpdaterService.getWorldData();
+    const { planets, moons, stars } =
+      await OrbitalUpdaterService.getWorldData();
     const bodies = [...planets, ...moons, ...stars];
     return {
       bodies,
@@ -206,7 +207,7 @@ async function propagateOfflineSpaceship(
     update.motionState === 'crashed'
       ? 0
       : Math.max(0, stats.hullDurability - (elapsedSeconds / (30 * 60)) * 0.01);
-  return SpaceshipModel.updatePropagatedSpaceship(spaceship, {
+  return RepositoryService.updatePropagatedSpaceship(spaceship, {
     ...update,
     stats,
   });

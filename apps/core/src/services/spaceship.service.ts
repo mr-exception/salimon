@@ -1,11 +1,11 @@
 import { randomUUID } from 'node:crypto';
 import {
-  SpaceshipModel,
   type SpaceshipDocument,
   type SpaceshipMotionState,
   type SpaceshipStats,
 } from '@models';
 import type { SpaceshipDto } from '@repo/types';
+import { RepositoryService } from './repository.service';
 
 export const SECURITY_CODE_HEADER = 'x-spaceship-security-code';
 
@@ -77,14 +77,12 @@ export class SpaceshipService {
   }
 
   static async loadSpaceship(securityCode: string) {
-    const storedSpaceship = await SpaceshipModel.findBySecurityCode(
-      securityCode,
-    );
+    const storedSpaceship =
+      await RepositoryService.findSpaceshipBySecurityCode(securityCode);
     if (!storedSpaceship) return undefined;
 
-    const { OfflineSpaceshipService } = await import(
-      './offline-spaceship.service.js'
-    );
+    const { OfflineSpaceshipService } =
+      await import('./offline-spaceship.service.js');
     return OfflineSpaceshipService.propagateOfflineSpaceship(storedSpaceship);
   }
 
@@ -93,7 +91,7 @@ export class SpaceshipService {
     update: ReturnType<typeof SpaceshipService.parseSpaceshipUpdate>,
   ): Promise<SpaceshipDocument | undefined> {
     const now = new Date();
-    return SpaceshipModel.updateBySecurityCode(securityCode, {
+    return RepositoryService.updateSpaceshipBySecurityCode(securityCode, {
       ...update,
       simulatedAt: now,
       updatedAt: now,

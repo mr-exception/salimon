@@ -1,32 +1,10 @@
-import {
-  WorldBodyModel,
-  type SerializedPosition,
-  type WorldBodyCollectionName,
-  type WorldBodyDocument,
-} from '@models';
+import { type SerializedPosition, type WorldBodyDocument } from '@models';
+import { RepositoryService } from './repository.service';
 
 const FULL_ROTATION_RADIANS = Math.PI * 2;
 const SIMULATION_INTERVAL_MS = 1_000;
-const DATABASE_FLUSH_INTERVAL_MS = 5 * 60 * 1_000;
 
-type WorldData = Record<WorldBodyCollectionName, WorldBodyDocument[]>;
 type Timer = ReturnType<typeof setInterval>;
-
-function cloneBody(body: WorldBodyDocument): WorldBodyDocument {
-  return {
-    ...body,
-    position: { ...body.position },
-    updatedAt: new Date(body.updatedAt),
-  };
-}
-
-function cloneWorldData(worldData: WorldData): WorldData {
-  return {
-    planets: worldData.planets.map(cloneBody),
-    moons: worldData.moons.map(cloneBody),
-    stars: worldData.stars.map(cloneBody),
-  };
-}
 
 function advancePosition(
   body: WorldBodyDocument,
@@ -62,19 +40,9 @@ function advancePosition(
   };
 }
 
-function toPublicBody(body: WorldBodyDocument): WorldBodyDocument {
-  const { _id, updatedAt, ...publicBody } = cloneBody(body);
-  void _id;
-  void updatedAt;
-  return publicBody as WorldBodyDocument;
-}
-
 export class OrbitalUpdaterService {
-  private static worldData: WorldData | undefined;
   private static simulationTimer: Timer | undefined;
-  private static databaseFlushTimer: Timer | undefined;
   private static startPromise: Promise<void> | undefined;
-  private static databaseFlushPromise: Promise<void> | undefined;
 
   static async start() {
     OrbitalUpdaterService.startPromise ??=
@@ -83,19 +51,16 @@ export class OrbitalUpdaterService {
   }
 
   private static async startSimulation() {
-    const loadedWorld = await WorldBodyModel.findAllWorldBodies();
-    OrbitalUpdaterService.worldData = cloneWorldData(loadedWorld);
-    OrbitalUpdaterService.updatePositions(new Date());
+    await RepositoryService.start();
+    await OrbitalUpdaterService.updatePositions(new Date());
 
     OrbitalUpdaterService.simulationTimer ??= setInterval(() => {
-      OrbitalUpdaterService.updatePositions(new Date());
+      void OrbitalUpdaterService.updatePositions(new Date()).catch(
+        (error: unknown) => {
+          console.error('Failed to update orbital positions', error);
+        },
+      );
     }, SIMULATION_INTERVAL_MS);
-
-    OrbitalUpdaterService.databaseFlushTimer ??= setInterval(() => {
-      void OrbitalUpdaterService.flushToDatabase().catch((error: unknown) => {
-        console.error('Failed to store simulated world data', error);
-      });
-    }, DATABASE_FLUSH_INTERVAL_MS);
   }
 
   static stop() {
@@ -104,26 +69,17 @@ export class OrbitalUpdaterService {
       OrbitalUpdaterService.simulationTimer = undefined;
     }
 
-    if (OrbitalUpdaterService.databaseFlushTimer) {
-      clearInterval(OrbitalUpdaterService.databaseFlushTimer);
-      OrbitalUpdaterService.databaseFlushTimer = undefined;
-    }
-
     OrbitalUpdaterService.startPromise = undefined;
   }
 
   static async getWorldData() {
     await OrbitalUpdaterService.start();
-    return cloneWorldData(OrbitalUpdaterService.requireWorldData());
+    return RepositoryService.getWorldData();
   }
 
   static async getWorldSystemsBodies() {
-    const worldData = await OrbitalUpdaterService.getWorldData();
-    return {
-      planets: worldData.planets.map(toPublicBody),
-      moons: worldData.moons.map(toPublicBody),
-      stars: worldData.stars.map(toPublicBody),
-    };
+    await OrbitalUpdaterService.start();
+    return RepositoryService.getWorldSystemsBodies();
   }
 
   static async updateOrbitalBodies(time: string | Date) {
@@ -133,8 +89,8 @@ export class OrbitalUpdaterService {
       throw new Error('Invocation time is invalid');
     }
 
-    const selected = OrbitalUpdaterService.updatePositions(invocationTime);
-    await OrbitalUpdaterService.flushToDatabase();
+    const selected =
+      await OrbitalUpdaterService.updatePositions(invocationTime);
 
     return {
       selected,
@@ -143,59 +99,28 @@ export class OrbitalUpdaterService {
   }
 
   static async flushToDatabase() {
-    await OrbitalUpdaterService.start();
-
-    if (OrbitalUpdaterService.databaseFlushPromise) {
-      return OrbitalUpdaterService.databaseFlushPromise;
-    }
-
-    OrbitalUpdaterService.databaseFlushPromise = (async () => {
-      const worldData = OrbitalUpdaterService.requireWorldData();
-      await Promise.all(
-        (
-          [
-            ['planets', worldData.planets],
-            ['moons', worldData.moons],
-            ['stars', worldData.stars],
-          ] as const
-        ).map(([collectionName, bodies]) =>
-          WorldBodyModel.replaceBodies(
-            collectionName,
-            bodies.map(cloneBody),
-          ),
-        ),
-      );
-    })().finally(() => {
-      OrbitalUpdaterService.databaseFlushPromise = undefined;
-    });
-
-    return OrbitalUpdaterService.databaseFlushPromise;
+    return RepositoryService.flushToDatabase();
   }
 
-  private static updatePositions(invocationTime: Date) {
-    const worldData = OrbitalUpdaterService.requireWorldData();
+  private static async updatePositions(invocationTime: Date) {
     let updated = 0;
 
-    for (const body of [
-      ...worldData.stars,
-      ...worldData.planets,
-      ...worldData.moons,
-    ]) {
-      const elapsedSeconds =
-        (invocationTime.getTime() - body.updatedAt.getTime()) / 1_000;
-      body.position = advancePosition(body, elapsedSeconds);
-      body.updatedAt = invocationTime;
-      updated += 1;
-    }
+    await RepositoryService.updateWorldBodies((worldData) => {
+      for (const body of [
+        ...worldData.stars,
+        ...worldData.planets,
+        ...worldData.moons,
+      ]) {
+        const elapsedSeconds =
+          (invocationTime.getTime() - body.updatedAt.getTime()) / 1_000;
+        body.position = advancePosition(body, elapsedSeconds);
+        body.updatedAt = invocationTime;
+        updated += 1;
+      }
+
+      return updated;
+    });
 
     return updated;
-  }
-
-  private static requireWorldData() {
-    if (!OrbitalUpdaterService.worldData) {
-      throw new Error('World simulation has not been started');
-    }
-
-    return OrbitalUpdaterService.worldData;
   }
 }

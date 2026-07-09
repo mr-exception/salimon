@@ -4,9 +4,13 @@ import {
   ContactModel,
   ContactMessageModel,
   type ContactMessageDocument,
-  SpaceshipModel,
 } from '@models';
-import { CONTACTS, ContactRepliesService, ContactsService } from '@services';
+import {
+  CONTACTS,
+  ContactRepliesService,
+  ContactsService,
+  RepositoryService,
+} from '@services';
 import { asyncHandler, sendError } from '../http';
 
 const UUID_PATTERN =
@@ -33,7 +37,8 @@ contactsRouter.get(
     }
 
     try {
-      const spaceship = await SpaceshipModel.findBySecurityCode(securityCode);
+      const spaceship =
+        await RepositoryService.findSpaceshipBySecurityCode(securityCode);
       if (!spaceship) {
         sendError(response, 404, 'Spaceship not found');
         return;
@@ -176,7 +181,8 @@ contactsRouter.get(
     }
 
     try {
-      const spaceship = await SpaceshipModel.findBySecurityCode(securityCode);
+      const spaceship =
+        await RepositoryService.findSpaceshipBySecurityCode(securityCode);
       if (!spaceship) {
         sendError(response, 404, 'Spaceship not found');
         return;

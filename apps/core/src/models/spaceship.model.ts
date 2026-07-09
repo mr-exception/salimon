@@ -88,6 +88,13 @@ export class SpaceshipModel {
     return (await SpaceshipModel.getModel()).create(spaceship);
   }
 
+  static async findAll() {
+    return (await SpaceshipModel.getModel())
+      .find({})
+      .lean<SpaceshipDocument[]>()
+      .exec();
+  }
+
   static async findBySecurityCode(securityCode: string) {
     return (await SpaceshipModel.getModel())
       .findOne({ securityCode })
@@ -149,6 +156,23 @@ export class SpaceshipModel {
         .lean<SpaceshipDocument>()
         .exec()) ??
       spaceship
+    );
+  }
+
+  static async replaceSpaceships(spaceships: SpaceshipDocument[]) {
+    if (spaceships.length === 0) {
+      return { modifiedCount: 0, upsertedCount: 0 };
+    }
+
+    return (await SpaceshipModel.getModel()).bulkWrite(
+      spaceships.map((spaceship) => ({
+        replaceOne: {
+          filter: { securityCode: spaceship.securityCode },
+          replacement: spaceship,
+          upsert: true,
+        },
+      })),
+      { ordered: false },
     );
   }
 }

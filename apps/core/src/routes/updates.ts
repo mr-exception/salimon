@@ -1,6 +1,10 @@
 import { Router } from 'express';
-import { SpaceshipModel, type SpaceshipDocument } from '@models';
-import { OfflineSpaceshipService, OrbitalUpdaterService } from '@services';
+import { type SpaceshipDocument } from '@models';
+import {
+  OfflineSpaceshipService,
+  OrbitalUpdaterService,
+  RepositoryService,
+} from '@services';
 import { asyncHandler } from '../http';
 
 const SPACESHIP_BATCH_SIZE = 100;
@@ -49,10 +53,11 @@ updatesRouter.post(
   '/spaceships',
   asyncHandler(async (request, response) => {
     const invocationTime = getInvocationTime(request.body?.time);
-    const oldestSpaceships = await SpaceshipModel.findOldestForSimulation(
-      invocationTime,
-      SPACESHIP_BATCH_SIZE,
-    );
+    const oldestSpaceships =
+      await RepositoryService.findOldestSpaceshipsForSimulation(
+        invocationTime,
+        SPACESHIP_BATCH_SIZE,
+      );
 
     if (oldestSpaceships.length === 0) {
       response.json({ selected: 0, processed: 0 });

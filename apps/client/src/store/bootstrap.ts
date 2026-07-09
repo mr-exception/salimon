@@ -11,8 +11,7 @@ import {
 
 const STORAGE_KEY = 'salimon.spaceship';
 export const SECURITY_CODE_HEADER = 'x-spaceship-security-code';
-const COASTING_UPDATE_DELAY_MS = 5 * 60 * 1_000;
-const THRUSTING_UPDATE_DELAY_MS = 5_000;
+const THRUSTING_UPDATE_DELAY_MS = 1_000;
 const DEFAULT_API_BASE_URL = 'http://localhost:3000';
 
 export type BootstrapRequest =
@@ -138,13 +137,13 @@ function initializeSpaceship(request: BootstrapRequest) {
   return promise;
 }
 
-function updateSpaceship(socket: WebSocket, securityCode: string) {
+function sendSpaceshipMovement(socket: WebSocket, securityCode: string) {
   const spaceship = getSpaceshipDto(securityCode);
   storeSpaceship(spaceship);
   if (socket.readyState !== WebSocket.OPEN) {
     throw new Error('Spaceship socket is not connected');
   }
-  socket.send(JSON.stringify({ type: 'spaceship:update', spaceship }));
+  socket.send(JSON.stringify({ type: 'spaceship:movement', spaceship }));
 }
 
 export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
@@ -157,21 +156,22 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
     if (!request) return;
 
     let disposed = false;
-    let updateTimer: number | undefined;
-    let updateDelay: number | undefined;
+    let updateInterval: number | undefined;
     let securityCode: string | undefined;
     let socket: WebSocket | undefined;
     let engineWasRunning = false;
     let unsubscribe: (() => void) | undefined;
 
+    const stopMovementUpdates = () => {
+      window.clearInterval(updateInterval);
+      updateInterval = undefined;
+    };
+
     const flushUpdate = () => {
       if (!securityCode) return;
-      window.clearTimeout(updateTimer);
-      updateTimer = undefined;
-      updateDelay = undefined;
       if (!socket) return;
       try {
-        updateSpaceship(socket, securityCode);
+        sendSpaceshipMovement(socket, securityCode);
       } catch (error: unknown) {
         console.error('Failed to persist spaceship', error);
       }
@@ -204,18 +204,22 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
           const engineIsRunning = isSpaceshipEngineRunning();
           if (engineWasRunning && !engineIsRunning) {
             engineWasRunning = false;
+            stopMovementUpdates();
             flushUpdate();
             return;
           }
 
           engineWasRunning = engineIsRunning;
-          const nextUpdateDelay = engineIsRunning
-            ? THRUSTING_UPDATE_DELAY_MS
-            : COASTING_UPDATE_DELAY_MS;
-          if (updateTimer && updateDelay === nextUpdateDelay) return;
-          window.clearTimeout(updateTimer);
-          updateDelay = nextUpdateDelay;
-          updateTimer = window.setTimeout(flushUpdate, nextUpdateDelay);
+          if (!engineIsRunning) {
+            stopMovementUpdates();
+            return;
+          }
+          if (updateInterval) return;
+          flushUpdate();
+          updateInterval = window.setInterval(
+            flushUpdate,
+            THRUSTING_UPDATE_DELAY_MS,
+          );
         });
         window.addEventListener('pagehide', flushUpdate);
         setResult({ request, state: 'ready' });
@@ -229,7 +233,7 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
       disposed = true;
       unsubscribe?.();
       window.removeEventListener('pagehide', flushUpdate);
-      window.clearTimeout(updateTimer);
+      stopMovementUpdates();
       socket?.close();
     };
   }, [request]);

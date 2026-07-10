@@ -9,7 +9,7 @@ type Coordinate = {
 
 type WorldBodyResponse = Omit<WorldBodyDocument, 'updatedAt'> & {
   velocity: Velocity;
-  positionCapturedAt: string;
+  positionCapturedAt: number;
 };
 
 type PlanetSystem = {
@@ -179,7 +179,7 @@ function withVelocity(
   return {
     ...responseBody,
     velocity: velocities.get(body.name) ?? { x: 0, y: 0 },
-    positionCapturedAt: updatedAt.toISOString(),
+    positionCapturedAt: updatedAt.getTime(),
   };
 }
 
@@ -195,7 +195,10 @@ export class WorldViewportService {
     const center = { x: searchArea.x, y: searchArea.y };
     const radiusSquared = searchArea.radius * searchArea.radius;
     const planetsByOrbitalCenter = groupByOrbitalCenter(orbitingBodies);
-    const velocities = resolveVelocities([...orbitingBodies, ...stars], positions);
+    const velocities = resolveVelocities(
+      [...orbitingBodies, ...stars],
+      positions,
+    );
     const systems: StarSystem[] = stars
       .map((star) => {
         const planetSystems = (planetsByOrbitalCenter.get(star.name) ?? []).map(
@@ -227,7 +230,9 @@ export class WorldViewportService {
               star: withVelocity(star, velocities),
               planets: planetSystems.map(({ planet, moons: planetMoons }) => ({
                 planet: withVelocity(planet, velocities),
-                moons: planetMoons.map((moon) => withVelocity(moon, velocities)),
+                moons: planetMoons.map((moon) =>
+                  withVelocity(moon, velocities),
+                ),
               })),
             }
           : undefined;

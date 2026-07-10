@@ -17,7 +17,7 @@ export type Velocity = {
 
 type OrbitingBody = {
   position: Position;
-  positionCapturedAt?: string;
+  positionCapturedAt?: number;
   name: string;
   radius: bigint;
   mass: bigint;
@@ -47,7 +47,8 @@ export type Star = OrbitingBody &
     renderZoomLevel: number;
   };
 
-export type Spaceship = OrbitingBody & {
+export type Spaceship = Omit<OrbitingBody, 'positionCapturedAt'> & {
+  positionCapturedAt?: string;
   heading: number;
 };
 
@@ -59,17 +60,16 @@ export type SpaceshipStats = {
   thrusterDurability: number[];
 };
 
-export type SpaceshipActiveFeature =
-  | {
-      type: 'target-speed';
-      targetSpeedMetersPerSecond: number;
-      maximumThrustPercent: number;
-      targetDirection?: number;
-      targetVelocity: Velocity;
-      maximumAcceleration: number;
-      durationSeconds: number;
-      elapsedSeconds: number;
-    };
+export type SpaceshipActiveFeature = {
+  type: 'target-speed';
+  targetSpeedMetersPerSecond: number;
+  maximumThrustPercent: number;
+  targetDirection?: number;
+  targetVelocity: Velocity;
+  maximumAcceleration: number;
+  durationSeconds: number;
+  elapsedSeconds: number;
+};
 
 export type SpaceshipDto = {
   securityCode: string;
@@ -91,14 +91,14 @@ export type World = {
 
 export type SerializedBody<T extends Planet | Spaceship | Star> = Omit<
   T,
-  'position' | 'radius' | 'mass' | 'speed'
+  'position' | 'radius' | 'mass' | 'speed' | 'positionCapturedAt'
 > & {
   position: SerializedPosition;
   radius: string;
   mass: string;
   speed: string;
   velocity?: Velocity;
-  positionCapturedAt?: string;
+  positionCapturedAt?: number;
 };
 
 export type SerializedWorld = {

@@ -19,6 +19,8 @@ No automated test command or test framework is currently configured. Do not docu
 
 Use TypeScript and preserve the existing ES module style. ESLint applies the recommended JavaScript, TypeScript, React Hooks, and Vite React Refresh rules. The client compiler rejects unused locals, unused parameters, and switch fallthrough. Run Prettier rather than manually aligning code.
 
+Every service in `apps/core/src/services` must use a `name.service.ts` filename and export a static class named `NameService`. Put service operations on that class as static methods instead of exporting service functions directly.
+
 Every Jotai atom in `apps/client/src/store` must have an exported getter hook and setter hook. Name them `use<Name>` and `useSet<Name>` and implement them with `useAtomValue` and `useSetAtom`:
 
 ```ts

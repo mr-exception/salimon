@@ -4,6 +4,9 @@ import {
   getApiBaseUrl,
   getStoredSpaceshipSecurityCode,
   SECURITY_CODE_HEADER,
+  sendContactMessageOverSocket,
+  subscribeToContactMessages,
+  type ContactMessage,
 } from '@store';
 import style from './style.module.css';
 
@@ -15,15 +18,7 @@ type Contact = {
   lastMessageAt?: string;
 };
 
-type Message = {
-  id: string;
-  contactId: string;
-  sender: 'player' | 'contact';
-  text: string;
-  status: 'sent' | 'queued' | 'failed';
-  isRead: boolean;
-  createdAt: string;
-};
+type Message = ContactMessage;
 
 type Props = {
   onClose: () => void;
@@ -31,7 +26,6 @@ type Props = {
   onMessagesRead: (messageIds: string[]) => void;
 };
 
-const MESSAGE_POLL_MS = 5_000;
 const CONTACT_POLL_MS = 30_000;
 const MAX_RETRY_MS = 60_000;
 
@@ -57,7 +51,12 @@ export function Communications({
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<string | undefined>(undefined);
+  const selectedContactIdRef = useRef<string | undefined>(undefined);
   const securityCode = getStoredSpaceshipSecurityCode();
+
+  useEffect(() => {
+    selectedContactIdRef.current = selectedContactId;
+  }, [selectedContactId]);
 
   const loadContacts = useCallback(async () => {
     if (!securityCode) return;
@@ -94,9 +93,8 @@ export function Communications({
 
   useEffect(() => {
     let disposed = false;
-    let retryDelay = MESSAGE_POLL_MS;
+    let retryDelay = CONTACT_POLL_MS;
     let contactTimer: number | undefined;
-    let messageTimer: number | undefined;
 
     const canPoll = () => !document.hidden && navigator.onLine;
     const pollContacts = async () => {
@@ -104,7 +102,7 @@ export function Communications({
       if (canPoll()) {
         try {
           await loadContacts();
-          retryDelay = MESSAGE_POLL_MS;
+          retryDelay = CONTACT_POLL_MS;
         } catch {
           retryDelay = Math.min(retryDelay * 2, MAX_RETRY_MS);
         }
@@ -114,26 +112,9 @@ export function Communications({
         canPoll() ? CONTACT_POLL_MS : MAX_RETRY_MS,
       );
     };
-    const pollMessages = async () => {
-      if (disposed) return;
-      if (selectedContactId && canPoll()) {
-        try {
-          await loadMessages(selectedContactId, cursorRef.current);
-          retryDelay = MESSAGE_POLL_MS;
-        } catch {
-          retryDelay = Math.min(retryDelay * 2, MAX_RETRY_MS);
-        }
-      }
-      messageTimer = window.setTimeout(
-        pollMessages,
-        retryDelay + Math.random() * 500,
-      );
-    };
     const pollNow = () => {
       window.clearTimeout(contactTimer);
-      window.clearTimeout(messageTimer);
       void pollContacts();
-      void pollMessages();
     };
 
     const initialTimer = window.setTimeout(() => {
@@ -142,7 +123,6 @@ export function Communications({
         .finally(() => {
           if (!disposed) setIsLoading(false);
         });
-      void pollMessages();
       contactTimer = window.setTimeout(pollContacts, CONTACT_POLL_MS);
     }, 0);
     document.addEventListener('visibilitychange', pollNow);
@@ -151,11 +131,24 @@ export function Communications({
       disposed = true;
       window.clearTimeout(initialTimer);
       window.clearTimeout(contactTimer);
-      window.clearTimeout(messageTimer);
       document.removeEventListener('visibilitychange', pollNow);
       window.removeEventListener('online', pollNow);
     };
-  }, [loadContacts, loadMessages, selectedContactId]);
+  }, [loadContacts]);
+
+  useEffect(
+    () =>
+      subscribeToContactMessages((message) => {
+        if (message.contactId === selectedContactIdRef.current) {
+          setMessages((current) => mergeMessages(current, [message]));
+          if (message.sender === 'contact') onMessagesRead([message.id]);
+        }
+        void loadContacts().catch(() => {
+          setError('Unable to refresh contacts.');
+        });
+      }),
+    [loadContacts, onMessagesRead],
+  );
 
   useEffect(() => {
     if (!selectedContactId) return;
@@ -180,18 +173,13 @@ export function Communications({
     setIsSending(true);
     setError('');
     try {
-      const { data } = await axios.post<{ message: Message }>(
-        `${getApiBaseUrl()}/contacts/messages/send`,
-        {
-          contactId: selectedContactId,
-          text,
-          clientMessageId: crypto.randomUUID(),
-        },
-        { headers: { [SECURITY_CODE_HEADER]: securityCode } },
-      );
+      const message = await sendContactMessageOverSocket({
+        contactId: selectedContactId,
+        text,
+        clientMessageId: crypto.randomUUID(),
+      });
       setDraft('');
-      setMessages((current) => mergeMessages(current, [data.message]));
-      await loadMessages(selectedContactId, cursorRef.current);
+      setMessages((current) => mergeMessages(current, [message]));
     } catch {
       setError('Message failed to send. Try again.');
     } finally {

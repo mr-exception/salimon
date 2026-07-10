@@ -11,6 +11,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@repo/types": "*",
+    "@repo/world": "*",
     "axios": "^1.18.0",
     "jotai": "^2.20.1",
     "phaser": "^4.1.0",

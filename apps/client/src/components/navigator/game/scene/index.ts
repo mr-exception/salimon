@@ -1,28 +1,28 @@
 import Phaser from 'phaser';
 import {
   advanceWorld,
-  didSpaceshipBurnComplete,
+  getSpaceshipActiveThrustVector,
   getBodyWorldVelocity,
   getSpaceshipAttachedBodyName,
-  getSpaceshipBurnAcceleration,
   getSpaceshipMotionState,
   getSpaceshipWorldVelocity,
   isSpaceshipEngineRunning,
-  resolveSpaceshipPlanetCollision,
+  refreshWorldViewport,
   setActiveWorldBodyNames,
   setSpaceshipTargetDirection,
   setSpaceshipHeading,
-  setSpaceshipManualThrust,
-  startSpaceshipEngines,
-  stopSpaceshipEngines,
+  startSpaceshipTargetSpeedFeature,
+  stopSpaceshipActiveFeature,
+  WORLD_VIEWPORT_REFRESH_INTERVAL_MS,
 } from '@store';
-import type { Planet as PlanetData, Star as StarData } from '@types';
+import type { Planet as PlanetData, Star as StarData } from '@repo/types';
 import { formatSpeed } from '../../../../utils';
 import {
   DEFAULT_RENDER_ORIGIN_NAME,
   getRenderPosition,
   offsetRenderOrigin,
   setRenderOriginName,
+  getWorldPositionFromRenderPosition,
 } from '../get-render-position';
 import {
   getPlanetPatternTextureKey,
@@ -31,10 +31,6 @@ import {
   PLANET_PATTERN_VARIANT_COUNT,
 } from '../planet';
 import { SPACESHIP_TEXTURE_KEY, type Spaceship } from '../spaceship';
-import {
-  getPlanetNameFromPhysicsLabel,
-  SPACESHIP_PHYSICS_LABEL,
-} from '../physics';
 import {
   getStarPatternTextureKey,
   Star,
@@ -124,6 +120,10 @@ export class Scene extends Phaser.Scene {
   private spaceshipEngineRunning = false;
   private selectingTargetDirection = false;
   private targetDirection?: number;
+  private viewportRefreshTimer?: number;
+  private viewportRefreshDebounceTimer?: number;
+  private viewportRefreshPromise?: Promise<unknown>;
+  private hasPendingViewportRefresh = false;
   private readonly alwaysVisibleBodies = new Set<string>();
 
   constructor(
@@ -189,24 +189,26 @@ export class Scene extends Phaser.Scene {
     this.predictionGraphics = this.add.graphics().setDepth(19);
     this.drawVisibleWorld();
     this.configureInput();
-    this.matter.world.on(
-      Phaser.Physics.Matter.Events.COLLISION_START,
-      this.handleMatterCollision,
-    );
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      this.matter.world.off(
-        Phaser.Physics.Matter.Events.COLLISION_START,
-        this.handleMatterCollision,
-      );
       this.unsubscribeFromWorld?.();
       this.unsubscribeFromWorld = undefined;
+      window.clearInterval(this.viewportRefreshTimer);
+      this.viewportRefreshTimer = undefined;
+      window.clearTimeout(this.viewportRefreshDebounceTimer);
+      this.viewportRefreshDebounceTimer = undefined;
     });
     void this.renderWorld();
+    this.viewportRefreshTimer = window.setInterval(() => {
+      this.refreshWorldFromViewportSafely();
+    }, WORLD_VIEWPORT_REFRESH_INTERVAL_MS);
   }
 
   update(_time: number, delta: number) {
-    this.publishActiveWorldBodies();
     const worldElapsedSeconds = advanceWorld(delta / 1000);
+    this.syncWorldPositions();
+    this.lastActiveBodiesViewportKey = '';
+    this.lastVisibilityViewportKey = '';
+    this.publishActiveWorldBodies();
     this.planets.forEach((planet) => planet.syncRotation(worldElapsedSeconds));
     this.stars.forEach((star) => star.syncRotation(worldElapsedSeconds));
     if (getSpaceshipMotionState() === 'crashed') {
@@ -216,19 +218,14 @@ export class Scene extends Phaser.Scene {
     const spaceshipEngineRunning = isSpaceshipEngineRunning();
     if (!this.spaceshipEngineRunning && spaceshipEngineRunning) {
       this.spaceshipEngineRunning = true;
-      this.spaceship?.setThrustersActive(true, getSpaceshipBurnAcceleration());
+      this.spaceship?.setThrustersActive(true, getSpaceshipActiveThrustVector());
       this.onSpaceshipEngineChange?.(true, this.getSpaceshipSpeed());
     } else if (this.spaceshipEngineRunning && !spaceshipEngineRunning) {
       this.spaceshipEngineRunning = false;
       this.spaceship?.setThrustersActive(false);
-      if (didSpaceshipBurnComplete()) {
-        this.spaceship?.clearTargetDirection();
-        this.targetDirection = undefined;
-        setSpaceshipTargetDirection(undefined);
-      }
       this.onSpaceshipEngineChange?.(false, this.getSpaceshipSpeed());
     } else if (spaceshipEngineRunning) {
-      this.spaceship?.setThrustersActive(true, getSpaceshipBurnAcceleration());
+      this.spaceship?.setThrustersActive(true, getSpaceshipActiveThrustVector());
     }
 
     const camera = this.cameras.main;
@@ -254,20 +251,6 @@ export class Scene extends Phaser.Scene {
     this.drawMeasurements();
     this.drawPredictions();
   }
-
-  private readonly handleMatterCollision = (
-    event: Phaser.Physics.Matter.Events.CollisionStartEvent,
-  ) => {
-    event.pairs.forEach(({ bodyA, bodyB }) => {
-      const labels = [bodyA.label, bodyB.label];
-      if (!labels.includes(SPACESHIP_PHYSICS_LABEL)) return;
-
-      const planetName = labels
-        .map(getPlanetNameFromPhysicsLabel)
-        .find((name) => name !== undefined);
-      if (planetName) resolveSpaceshipPlanetCollision(planetName);
-    });
-  };
 
   setZoom(zoom: number) {
     const camera = this.cameras.main;
@@ -410,35 +393,35 @@ export class Scene extends Phaser.Scene {
       return;
     }
 
-    const currentSpeed = this.getSpaceshipSpeed();
-    if (
-      !startSpaceshipEngines(
+    try {
+      startSpaceshipTargetSpeedFeature(
         targetSpeed,
         maximumThrustPercent,
         this.targetDirection,
-      )
-    ) {
+      );
+    } catch (error) {
+      console.error('Failed to start target speed feature', error);
       return;
     }
 
     this.spaceshipEngineRunning = true;
-    this.spaceship.setThrustersActive(true, getSpaceshipBurnAcceleration());
-    this.onSpaceshipEngineChange?.(true, currentSpeed);
+    this.spaceship.setThrustersActive(true, getSpaceshipActiveThrustVector());
+    this.onSpaceshipEngineChange?.(true, this.getSpaceshipSpeed());
   }
 
   stopEngines() {
-    if (!this.spaceshipEngineRunning || !stopSpaceshipEngines()) return;
+    if (!this.spaceshipEngineRunning) return;
+
+    try {
+      stopSpaceshipActiveFeature();
+    } catch (error) {
+      console.error('Failed to stop active spaceship feature', error);
+      return;
+    }
 
     this.spaceshipEngineRunning = false;
     this.spaceship?.setThrustersActive(false);
     this.onSpaceshipEngineChange?.(false, this.getSpaceshipSpeed());
-  }
-
-  setManualThrust(
-    direction: { x: number; y: number } | undefined,
-    power: number,
-  ) {
-    setSpaceshipManualThrust(direction, power);
   }
 
   private reportSpaceshipTurn(remainingDegrees: number, isTurning: boolean) {
@@ -878,7 +861,9 @@ export class Scene extends Phaser.Scene {
       activeBodyNames.add(this.cameraLockedBodyName);
     if (this.spaceship) activeBodyNames.add(this.spaceship.spaceship.name);
 
-    this.reconcileRenderedBodies(activeBodyNames);
+    if (this.reconcileRenderedBodies(activeBodyNames)) {
+      this.lastVisibilityViewportKey = '';
+    }
     setActiveWorldBodyNames(activeBodyNames);
   }
 
@@ -999,8 +984,64 @@ export class Scene extends Phaser.Scene {
     stars.forEach((star) => this.starDataByName.set(star.name, star));
   }
 
+  async refreshWorldFromViewport() {
+    const camera = this.cameras.main;
+    camera.preRender();
+    const viewport = camera.worldView;
+    const center = getWorldPositionFromRenderPosition(
+      viewport.centerX,
+      viewport.centerY,
+    );
+    const radius = BigInt(
+      Math.ceil(Math.hypot(viewport.width, viewport.height) / 2),
+    );
+    const world = await refreshWorldViewport({
+      x: center.x.toString(),
+      y: center.y.toString(),
+      radius: radius.toString(),
+    });
+
+    this.setWorldBodyData(world.planets, world.stars);
+    this.syncWorldPositions();
+    this.lastActiveBodiesViewportKey = '';
+    this.lastVisibilityViewportKey = '';
+    this.updateWorldVisibility();
+    return world;
+  }
+
+  queueViewportWorldRefresh(delayMs = 250) {
+    window.clearTimeout(this.viewportRefreshDebounceTimer);
+    this.viewportRefreshDebounceTimer = window.setTimeout(() => {
+      this.viewportRefreshDebounceTimer = undefined;
+      this.refreshWorldFromViewportSafely();
+    }, delayMs);
+  }
+
+  private refreshWorldFromViewportSafely() {
+    if (this.viewportRefreshPromise) {
+      this.hasPendingViewportRefresh = true;
+      return;
+    }
+
+    this.viewportRefreshPromise ??= this.refreshWorldFromViewport()
+      .catch((error: unknown) => {
+        console.error('Failed to refresh viewport world data', error);
+        this.onWorldLoadComplete?.(error);
+      })
+      .finally(() => {
+        this.viewportRefreshPromise = undefined;
+        if (this.hasPendingViewportRefresh) {
+          this.hasPendingViewportRefresh = false;
+          this.refreshWorldFromViewportSafely();
+        }
+      });
+  }
+
   private reconcileRenderedBodies(activeBodyNames: ReadonlySet<string>) {
-    activeBodyNames.forEach((bodyName) => this.ensureRenderedBody(bodyName));
+    let changed = false;
+    activeBodyNames.forEach((bodyName) => {
+      changed = this.ensureRenderedBody(bodyName) || changed;
+    });
 
     this.planets = this.planets.filter((planet) => {
       if (
@@ -1012,6 +1053,7 @@ export class Scene extends Phaser.Scene {
 
       this.planetByName.delete(planet.planet.name);
       planet.destroy();
+      changed = true;
       return false;
     });
 
@@ -1025,19 +1067,22 @@ export class Scene extends Phaser.Scene {
 
       this.starByName.delete(star.star.name);
       star.destroy();
+      changed = true;
       return false;
     });
+
+    return changed;
   }
 
   private ensureRenderedBody(name: string) {
-    if (this.planetByName.has(name) || this.starByName.has(name)) return;
+    if (this.planetByName.has(name) || this.starByName.has(name)) return false;
 
     const planetData = this.planetDataByName.get(name);
     if (planetData) {
       const planet = new Planet(this, planetData);
       this.planets.push(planet);
       this.planetByName.set(planet.name, planet);
-      return;
+      return true;
     }
 
     const starData = this.starDataByName.get(name);
@@ -1045,7 +1090,10 @@ export class Scene extends Phaser.Scene {
       const star = new Star(this, starData);
       this.stars.push(star);
       this.starByName.set(star.name, star);
+      return true;
     }
+
+    return false;
   }
 
   private updateCameraLock() {

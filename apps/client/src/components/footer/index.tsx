@@ -12,17 +12,7 @@ import {
   INITIAL_SPACESHIP_FUEL_KNS,
   MAX_HULL_DURABILITY,
   MAX_THRUSTER_DURABILITY,
-  MAX_ENGINE_THRUST_KN,
-  SPACESHIP_MASS_KG,
-  getSpaceshipBurnPlan,
-  getSpaceshipBurnAcceleration,
-  getSpaceshipBurnRemainingSeconds,
-  getSpaceshipWorldVelocity,
-  startSpaceshipAutoOrbit,
-  stopSpaceshipAutoOrbit,
-  repairSpaceshipHull,
-  repairSpaceshipThruster,
-  useSpaceshipAutoOrbit,
+  useSpaceshipActiveFeature,
   useSpaceshipFuelKns,
   useSpaceshipHullDurability,
   useSpaceshipMotionState,
@@ -33,7 +23,6 @@ import {
 import {
   formatAcceleration,
   formatDuration,
-  formatForce,
   formatImpulse,
   formatPercentage,
   formatSpeed,
@@ -43,13 +32,8 @@ type FooterProps = {
   isEngineRunning?: boolean;
   isMeasuring?: boolean;
   isSelectingTargetDirection?: boolean;
-  showMovementHint?: boolean;
   onStartEngines?: (targetSpeed: number, maximumThrustPercent: number) => void;
   onStopEngines?: () => void;
-  onManualThrustChange?: (
-    direction: { x: number; y: number } | undefined,
-    power: number,
-  ) => void;
   onToggleMeasuring?: () => void;
   onOpenCommunications?: () => void;
   unreadMessageCount?: number;
@@ -57,12 +41,7 @@ type FooterProps = {
   onPredictionChange?: (active: boolean, seconds: number) => void;
 };
 
-type SpeedControlTab =
-  | 'target-speed'
-  | 'auto-orbit'
-  | 'manual-drive'
-  | 'maintenance'
-  | 'prediction';
+type SpeedControlTab = 'target-speed' | 'maintenance' | 'prediction';
 
 type Position = {
   x: number;
@@ -71,8 +50,6 @@ type Position = {
 
 const CONTROL_LABELS: Record<SpeedControlTab, string> = {
   'target-speed': 'Target speed',
-  'auto-orbit': 'Auto orbit',
-  'manual-drive': 'Manual drive',
   maintenance: 'Ship durability',
   prediction: 'Prediction',
 };
@@ -86,8 +63,6 @@ const PANEL_PLACEMENTS: Record<
   { horizontal: 'left' | 'right'; vertical: 'top' | 'bottom' }
 > = {
   'target-speed': { horizontal: 'left', vertical: 'top' },
-  'auto-orbit': { horizontal: 'right', vertical: 'top' },
-  'manual-drive': { horizontal: 'left', vertical: 'bottom' },
   maintenance: { horizontal: 'right', vertical: 'bottom' },
   prediction: { horizontal: 'left', vertical: 'bottom' },
 };
@@ -115,17 +90,6 @@ function FeatureIcon({ feature }: { feature: SpeedControlTab }) {
         <path d="M4 15a8 8 0 1 1 16 0" />
         <path d="m12 15 4-5" />
         <path d="M8 18h8" />
-      </svg>
-    );
-  }
-
-  if (feature === 'auto-orbit') {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="12" cy="12" r="3" />
-        <path d="M4.6 9.1c-1.4 2.4-1.6 4.7-.3 5.9 1.9 1.9 6.5.4 10.3-3.4s5.3-8.4 3.4-10.3" />
-        <path d="m17.8 1.2.4 4-4-.4" />
-        <path d="M19.4 14.9c1.4-2.4 1.6-4.7.3-5.9" />
       </svg>
     );
   }
@@ -319,10 +283,8 @@ export function Footer({
   isEngineRunning = false,
   isMeasuring = false,
   isSelectingTargetDirection = false,
-  showMovementHint = false,
   onStartEngines,
   onStopEngines,
-  onManualThrustChange,
   onToggleMeasuring,
   onOpenCommunications,
   unreadMessageCount = 0,
@@ -335,68 +297,41 @@ export function Footer({
   const thrusterDurability = useSpaceshipThrusterDurability();
   const motionState = useSpaceshipMotionState();
   const targetDirection = useSpaceshipTargetDirection();
-  const autoOrbit = useSpaceshipAutoOrbit();
+  const activeFeature = useSpaceshipActiveFeature();
   const [targetSpeed, setTargetSpeed] = useState('10');
   const [maximumThrustPercent, setMaximumThrustPercent] = useState('100');
-  const [orbitSpeed, setOrbitSpeed] = useState('7.8');
-  const [orbitDistance, setOrbitDistance] = useState('400');
-  const [orbitError, setOrbitError] = useState('');
-  const [manualPower, setManualPower] = useState(25);
   const [predictionAmount, setPredictionAmount] = useState('2');
   const [predictionUnit, setPredictionUnit] = useState<'s' | 'm' | 'h'>('m');
   const [isPredictionActive, setIsPredictionActive] = useState(false);
-  const [isMovementHintVisible, setIsMovementHintVisible] =
-    useState(showMovementHint);
-  const pressedDriveKeys = useRef(new Set<string>());
   const [expandedSpeedControls, setExpandedSpeedControls] = useState(
     () => new Set<SpeedControlTab>(),
   );
-  const [burnStartVelocity, setBurnStartVelocity] = useState(() =>
-    getSpaceshipWorldVelocity(),
-  );
   const targetSpeedMetersPerSecond = Number(targetSpeed) * 1_000;
   const maximumThrustPercentValue = Number(maximumThrustPercent);
-  const currentVelocity = getSpaceshipWorldVelocity();
-  const calculationStartVelocity = isEngineRunning
-    ? burnStartVelocity
-    : currentVelocity;
-  const burnPlan =
-    targetDirection !== undefined
-      ? getSpaceshipBurnPlan(
-          targetSpeedMetersPerSecond,
-          maximumThrustPercentValue,
-          targetDirection,
-          calculationStartVelocity,
-        )
-      : undefined;
-  const burnAcceleration = isEngineRunning
-    ? getSpaceshipBurnAcceleration()
-    : burnPlan?.acceleration;
-  const burnRemainingSeconds = getSpaceshipBurnRemainingSeconds();
-  const burnTimeSeconds =
-    burnRemainingSeconds ??
-    (isEngineRunning ? undefined : burnPlan?.durationSeconds);
-  const acceleration = burnAcceleration
-    ? Math.hypot(burnAcceleration.x, burnAcceleration.y)
-    : Number.NaN;
-  const requiredThrustNewtons = Math.abs(acceleration) * SPACESHIP_MASS_KG;
-  const maxEngineThrustNewtons = MAX_ENGINE_THRUST_KN * 1_000;
-  const hasValidBurn = Number.isFinite(acceleration) && burnPlan !== undefined;
+  const activeTargetSpeed =
+    activeFeature?.type === 'target-speed' ? activeFeature : undefined;
+  const burnTimeSeconds = activeTargetSpeed
+    ? Math.max(
+        0,
+        activeTargetSpeed.durationSeconds - activeTargetSpeed.elapsedSeconds,
+      )
+    : undefined;
+  const acceleration = activeTargetSpeed?.maximumAcceleration ?? Number.NaN;
+  const hasValidBurn =
+    targetDirection !== undefined &&
+    Number.isFinite(targetSpeedMetersPerSecond) &&
+    targetSpeedMetersPerSecond >= 0 &&
+    Number.isFinite(maximumThrustPercentValue) &&
+    maximumThrustPercentValue > 0 &&
+    maximumThrustPercentValue <= 100;
   const canStartBurn =
     motionState !== 'crashed' &&
     hasValidBurn &&
     fuelKns > 0 &&
     thrusterDurability.some((durability) => durability > 0);
-  const currentEnginePowerPercent = isEngineRunning
-    ? (requiredThrustNewtons / maxEngineThrustNewtons) * 100
+  const currentEnginePowerPercent = activeTargetSpeed
+    ? activeTargetSpeed.maximumThrustPercent
     : 0;
-  const orbitSpeedMetersPerSecond = Number(orbitSpeed) * 1_000;
-  const orbitDistanceMeters = Number(orbitDistance) * 1_000;
-  const hasValidOrbit =
-    Number.isFinite(orbitSpeedMetersPerSecond) &&
-    orbitSpeedMetersPerSecond > 0 &&
-    Number.isFinite(orbitDistanceMeters) &&
-    orbitDistanceMeters >= 0;
   const predictionSeconds =
     Number(predictionAmount) *
     ({ s: 1, m: 60, h: 3_600 } as const)[predictionUnit];
@@ -416,69 +351,6 @@ export function Footer({
     predictionSeconds,
   ]);
 
-  useEffect(() => {
-    const stopThrust = () => {
-      pressedDriveKeys.current.clear();
-      onManualThrustChange?.(undefined, manualPower);
-    };
-    const updateThrust = () => {
-      const keys = pressedDriveKeys.current;
-      const direction = {
-        x: Number(keys.has('a')) - Number(keys.has('d')),
-        y: Number(keys.has('w')) - Number(keys.has('s')),
-      };
-      onManualThrustChange?.(
-        direction.x === 0 && direction.y === 0 ? undefined : direction,
-        manualPower,
-      );
-    };
-    const hasEditableFocus = () => {
-      const activeElement = document.activeElement;
-      return (
-        activeElement instanceof HTMLElement &&
-        (activeElement.matches('input, textarea, select') ||
-          activeElement.isContentEditable)
-      );
-    };
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const key = event.code.replace('Key', '').toLowerCase();
-      if (
-        event.repeat ||
-        !['w', 'a', 's', 'd'].includes(key) ||
-        hasEditableFocus()
-      ) {
-        return;
-      }
-      event.preventDefault();
-      setIsMovementHintVisible(false);
-      pressedDriveKeys.current.add(key);
-      updateThrust();
-    };
-    const handleKeyUp = (event: KeyboardEvent) => {
-      const key = event.code.replace('Key', '').toLowerCase();
-      if (!['w', 'a', 's', 'd'].includes(key)) return;
-      event.preventDefault();
-      pressedDriveKeys.current.delete(key);
-      updateThrust();
-    };
-    const handleBlur = () => stopThrust();
-    const handleFocusIn = () => {
-      if (hasEditableFocus()) stopThrust();
-    };
-
-    window.addEventListener('keydown', handleKeyDown, true);
-    window.addEventListener('keyup', handleKeyUp, true);
-    window.addEventListener('blur', handleBlur);
-    document.addEventListener('focusin', handleFocusIn);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown, true);
-      window.removeEventListener('keyup', handleKeyUp, true);
-      window.removeEventListener('blur', handleBlur);
-      document.removeEventListener('focusin', handleFocusIn);
-      stopThrust();
-    };
-  }, [manualPower, onManualThrustChange]);
-
   const toggleSpeedControl = (control: SpeedControlTab) => {
     setExpandedSpeedControls((expandedControls) => {
       const nextControls = new Set(expandedControls);
@@ -494,8 +366,6 @@ export function Footer({
   const startEngines = () => {
     if (!canStartBurn || isEngineRunning || !onStartEngines) return;
 
-    setOrbitError('');
-    setBurnStartVelocity(currentVelocity);
     onStartEngines(targetSpeedMetersPerSecond, maximumThrustPercentValue);
   };
 
@@ -508,45 +378,13 @@ export function Footer({
     startEngines();
   };
 
-  const toggleAutoOrbit = () => {
-    if (autoOrbit.active) {
-      stopSpaceshipAutoOrbit();
-      setOrbitError('');
-      return;
-    }
-
-    if (isEngineRunning || motionState === 'crashed' || !hasValidOrbit) return;
-
-    const started = startSpaceshipAutoOrbit(
-      orbitSpeedMetersPerSecond,
-      orbitDistanceMeters,
-    );
-    setOrbitError(
-      started ? '' : 'Move within 1,000 km of a planet surface to orbit',
-    );
-  };
-
   return (
     <footer className={style.container} aria-label="Ship controls">
-      {isMovementHintVisible && (
-        <aside className={style.movementHint} aria-label="Movement hint">
-          <span>Hold</span>
-          <span className={style.movementKeys} aria-label="W A S D">
-            {['W', 'A', 'S', 'D'].map((key) => (
-              <kbd key={key}>{key}</kbd>
-            ))}
-          </span>
-          <span>to fire thrusters and move</span>
-        </aside>
-      )}
-
       <section className={style.speedControls} aria-label="Ship features">
         <div className={style.controlTabs}>
           {(
             [
               ['target-speed', 'Target speed'],
-              ['auto-orbit', 'Auto orbit'],
-              ['manual-drive', 'Manual drive'],
               ['maintenance', 'Ship durability'],
               ['prediction', 'Prediction'],
             ] as const
@@ -666,13 +504,6 @@ export function Footer({
                   <output>
                     {hullDurability.toFixed(2)} / {MAX_HULL_DURABILITY}
                   </output>
-                  <button
-                    type="button"
-                    disabled={hullDurability >= MAX_HULL_DURABILITY}
-                    onClick={repairSpaceshipHull}
-                  >
-                    Repair
-                  </button>
                 </div>
                 {thrusterDurability.map((durability, index) => (
                   <div className={style.durabilityItem} key={index}>
@@ -686,123 +517,8 @@ export function Footer({
                     <output>
                       {durability.toFixed(2)} / {MAX_THRUSTER_DURABILITY}
                     </output>
-                    <button
-                      type="button"
-                      disabled={durability >= MAX_THRUSTER_DURABILITY}
-                      onClick={() => repairSpaceshipThruster(index)}
-                    >
-                      Repair
-                    </button>
                   </div>
                 ))}
-              </div>
-            </DraggablePanel>
-          )}
-          {expandedSpeedControls.has('manual-drive') && (
-            <DraggablePanel
-              control="manual-drive"
-              onClose={() => toggleSpeedControl('manual-drive')}
-            >
-              <fieldset className={style.powerControls}>
-                <legend>Thruster power</legend>
-                <div className={style.powerPresets}>
-                  {[10, 25, 50, 100].map((power) => (
-                    <button
-                      type="button"
-                      data-active={manualPower === power}
-                      key={power}
-                      onClick={() => setManualPower(power)}
-                    >
-                      {power}%
-                    </button>
-                  ))}
-                </div>
-                <label htmlFor="footer-manual-power">
-                  <span>Custom</span>
-                  <span className={style.speedField}>
-                    <input
-                      id="footer-manual-power"
-                      type="number"
-                      min="1"
-                      max="100"
-                      step="1"
-                      value={manualPower}
-                      onChange={(event) => {
-                        const power = event.currentTarget.valueAsNumber;
-                        if (Number.isFinite(power)) {
-                          setManualPower(Math.min(100, Math.max(1, power)));
-                        }
-                      }}
-                    />
-                    <span aria-hidden="true">%</span>
-                  </span>
-                </label>
-              </fieldset>
-            </DraggablePanel>
-          )}
-          {expandedSpeedControls.has('auto-orbit') && (
-            <DraggablePanel
-              control="auto-orbit"
-              onClose={() => toggleSpeedControl('auto-orbit')}
-            >
-              <div className={style.speedInputs}>
-                <label htmlFor="footer-orbit-speed">
-                  <span>Orbit speed</span>
-                  <span className={style.speedField}>
-                    <input
-                      id="footer-orbit-speed"
-                      type="number"
-                      min="0.1"
-                      step="0.1"
-                      value={orbitSpeed}
-                      disabled={autoOrbit.active || isEngineRunning}
-                      onChange={(event) => {
-                        setOrbitSpeed(event.currentTarget.value);
-                        setOrbitError('');
-                      }}
-                    />
-                    <span aria-hidden="true">km/s</span>
-                  </span>
-                </label>
-                <label htmlFor="footer-orbit-distance">
-                  <span>Orbit distance</span>
-                  <span className={style.speedField}>
-                    <input
-                      id="footer-orbit-distance"
-                      type="number"
-                      min="0"
-                      step="10"
-                      value={orbitDistance}
-                      disabled={autoOrbit.active || isEngineRunning}
-                      onChange={(event) => {
-                        setOrbitDistance(event.currentTarget.value);
-                        setOrbitError('');
-                      }}
-                    />
-                    <span aria-hidden="true">km</span>
-                  </span>
-                </label>
-              </div>
-              <div className={style.orbitActions}>
-                <button
-                  type="button"
-                  data-running={autoOrbit.active}
-                  disabled={
-                    autoOrbit.active
-                      ? false
-                      : isEngineRunning ||
-                        motionState === 'crashed' ||
-                        !hasValidOrbit
-                  }
-                  onClick={toggleAutoOrbit}
-                >
-                  {autoOrbit.active ? 'Stop orbit' : 'Auto orbit'}
-                </button>
-                <output className={style.orbitStatus}>
-                  {autoOrbit.active
-                    ? `Autopilot burning near ${autoOrbit.planetName ?? 'planet'}`
-                    : orbitError || 'Requires surface range < 1,000 km'}
-                </output>
               </div>
             </DraggablePanel>
           )}
@@ -861,14 +577,10 @@ export function Footer({
                 <div className={style.speedMetrics}>
                   <span className={style.speedMetric}>
                     <small>Acceleration</small>
-                    {hasValidBurn ? formatAcceleration(acceleration) : '—'}
+                    {activeTargetSpeed ? formatAcceleration(acceleration) : '—'}
                   </span>
                   <span className={style.speedMetric}>
-                    <small>
-                      {burnRemainingSeconds !== undefined
-                        ? 'Time remaining'
-                        : 'Time'}
-                    </small>
+                    <small>Time remaining</small>
                     {burnTimeSeconds !== undefined
                       ? formatDuration(burnTimeSeconds)
                       : '—'}
@@ -899,10 +611,7 @@ export function Footer({
         </div>
         <div className={style.readout}>
           <dt>Engine power</dt>
-          <dd>
-            {formatPercentage(currentEnginePowerPercent)} /{' '}
-            {formatForce(maxEngineThrustNewtons)}
-          </dd>
+          <dd>{formatPercentage(currentEnginePowerPercent)}</dd>
         </div>
         <div className={style.readout}>
           <dt>Fuel</dt>

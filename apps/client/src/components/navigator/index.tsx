@@ -1,17 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
 import {
-  BASE_SPACESHIP_CONFIG,
   getSpaceshipProximityTelemetry,
-  loadWorld,
-  setSpaceshipTargetFallingSpeed,
-  startSpaceshipFallingSpeedControl,
-  stopSpaceshipFallingSpeedControl,
   subscribeToWorld,
   type SpaceshipProximityTelemetry,
-  useSpaceshipFallingSpeedControl,
 } from '@store';
-import type { World } from '@types';
+import type { World } from '@repo/types';
 import { formatAngle, formatDistance, formatSpeed } from '../../utils';
 import { BodyContextMenu } from './body-context-menu';
 import {
@@ -47,7 +41,6 @@ export function Navigator({
 }: NavigatorProps) {
   const gameHostRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<Scene>(null);
-  const fallingSpeedControl = useSpaceshipFallingSpeedControl();
   const [zoomLevel, setZoomLevel] = useState(1);
   const [world, setWorld] = useState<World>({
     planets: [],
@@ -64,9 +57,6 @@ export function Navigator({
   const [proximityTelemetry, setProximityTelemetry] =
     useState<SpaceshipProximityTelemetry>();
   const [isProximityExpanded, setIsProximityExpanded] = useState(false);
-  const [pendingFallingSpeed, setPendingFallingSpeed] = useState(
-    fallingSpeedControl.targetSpeedMetersPerSecond,
-  );
 
   useEffect(() => {
     sceneRef.current?.setMeasuringActive(isMeasuring);
@@ -83,7 +73,13 @@ export function Navigator({
     };
 
     updateTelemetry();
-    return subscribeToWorld(updateTelemetry);
+    return subscribeToWorld((updatedWorld) => {
+      setWorld({
+        planets: updatedWorld.planets,
+        stars: updatedWorld.stars,
+      });
+      updateTelemetry();
+    });
   }, []);
 
   useEffect(() => {
@@ -125,15 +121,6 @@ export function Navigator({
     // Keep the online simulation running while the document is in the background.
     game.events.off(Phaser.Core.Events.HIDDEN);
 
-    void loadWorld()
-      .then((loadedWorld) => {
-        setWorld(loadedWorld);
-        setProximityTelemetry(getSpaceshipProximityTelemetry());
-      })
-      .catch(() => {
-        // The scene reports world-loading errors; keep search unavailable.
-      });
-
     return () => {
       sceneRef.current = null;
       onSceneChange?.(null);
@@ -156,29 +143,6 @@ export function Navigator({
 
     sceneRef.current?.toggleAlwaysVisible(contextMenu.name);
     setContextMenu(null);
-  };
-
-  const toggleFallingSpeedControl = () => {
-    if (fallingSpeedControl.active) {
-      stopSpaceshipFallingSpeedControl();
-      setPendingFallingSpeed(
-        BASE_SPACESHIP_CONFIG.crashVelocityThresholdMetersPerSecond,
-      );
-      return;
-    }
-    if (!proximityTelemetry) return;
-    startSpaceshipFallingSpeedControl(
-      proximityTelemetry.bodyName,
-      pendingFallingSpeed,
-    );
-  };
-
-  const adjustFallingSpeed = (difference: number) => {
-    const targetSpeed = Math.max(
-      0,
-      fallingSpeedControl.targetSpeedMetersPerSecond + difference,
-    );
-    setSpaceshipTargetFallingSpeed(targetSpeed);
   };
 
   return (
@@ -222,8 +186,8 @@ export function Navigator({
               aria-expanded={isProximityExpanded}
               aria-label={
                 isProximityExpanded
-                  ? 'Collapse falling speed controls'
-                  : 'Expand falling speed controls'
+                  ? 'Collapse proximity telemetry'
+                  : 'Expand proximity telemetry'
               }
               onClick={() => setIsProximityExpanded((expanded) => !expanded)}
             >
@@ -244,65 +208,6 @@ export function Navigator({
               </dd>
             </div>
           </dl>
-          {isProximityExpanded && (
-            <div className={style.fallingSpeedControls}>
-              <label htmlFor="target-falling-speed">
-                <span>Target falling speed</span>
-                <span className={style.fallingSpeedInput}>
-                  <input
-                    id="target-falling-speed"
-                    type="number"
-                    min="0"
-                    step="1"
-                    disabled={fallingSpeedControl.active}
-                    value={
-                      fallingSpeedControl.active
-                        ? fallingSpeedControl.targetSpeedMetersPerSecond
-                        : pendingFallingSpeed
-                    }
-                    onChange={(event) => {
-                      const speed = event.currentTarget.valueAsNumber;
-                      if (Number.isFinite(speed)) {
-                        setPendingFallingSpeed(Math.max(0, speed));
-                      }
-                    }}
-                  />
-                  <span>m/s</span>
-                </span>
-              </label>
-              {fallingSpeedControl.active && (
-                <div
-                  className={style.fallingSpeedAdjustments}
-                  aria-label="Adjust target falling speed"
-                >
-                  {[10, 25, 50, 100].map((amount) => (
-                    <div key={amount}>
-                      <button
-                        type="button"
-                        onClick={() => adjustFallingSpeed(-amount)}
-                      >
-                        −{amount}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => adjustFallingSpeed(amount)}
-                      >
-                        +{amount}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <button
-                className={style.fallingSpeedToggle}
-                data-active={fallingSpeedControl.active}
-                type="button"
-                onClick={toggleFallingSpeedControl}
-              >
-                {fallingSpeedControl.active ? 'Deactivate' : 'Activate'}
-              </button>
-            </div>
-          )}
         </aside>
       )}
       {contextMenu && (

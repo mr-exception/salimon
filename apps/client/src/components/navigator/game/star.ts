@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import type { Star as StarData } from '@types';
+import type { Star as StarData } from '@repo/types';
 import { getRenderPosition } from './get-render-position';
 
 const LABEL_SCREEN_GAP = 6;

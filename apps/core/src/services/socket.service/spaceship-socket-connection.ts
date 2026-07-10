@@ -1,4 +1,6 @@
 import { WebSocket } from 'ws';
+import type { ContactMessageDocument } from '@models';
+import { ContactsService } from '../contacts.service';
 import { SpaceshipService } from '../spaceship.service';
 import type { WorldViewportRequest } from '../world-viewport.service';
 import {
@@ -18,6 +20,13 @@ type SpaceshipSocketIncomingMessage =
       targetDirection?: unknown;
     }
   | { type: 'spaceship:stop-active-feature' }
+  | {
+      type: 'contact:message:send';
+      requestId?: unknown;
+      contactId?: unknown;
+      text?: unknown;
+      clientMessageId?: unknown;
+    }
   | {
       type: 'world:viewport';
       requestId?: unknown;
@@ -120,6 +129,7 @@ export class SpaceshipSocketConnection {
       message.type !== 'spaceship:movement' &&
       message.type !== 'spaceship:start-target-speed' &&
       message.type !== 'spaceship:stop-active-feature' &&
+      message.type !== 'contact:message:send' &&
       message.type !== 'world:viewport'
     ) {
       sendJson(this.socket, {
@@ -193,6 +203,11 @@ export class SpaceshipSocketConnection {
         return;
       }
 
+      if (message.type === 'contact:message:send') {
+        await this.sendContactMessage(message);
+        return;
+      }
+
       const body = message.spaceship ?? message;
       this.session.updateSpaceshipFromClient(body);
       this.hasPendingPersist = true;
@@ -203,6 +218,51 @@ export class SpaceshipSocketConnection {
           error instanceof Error ? error.message : 'Invalid spaceship update',
       });
     }
+  }
+
+  private async sendContactMessage(message: {
+    requestId?: unknown;
+    contactId?: unknown;
+    text?: unknown;
+    clientMessageId?: unknown;
+  }) {
+    const requestId =
+      typeof message.requestId === 'string' ? message.requestId : undefined;
+
+    try {
+      const messageRequest = ContactsService.parseSendMessageRequest({
+        contactId: message.contactId,
+        text: message.text,
+        clientMessageId: message.clientMessageId,
+      });
+      const contactMessage = await ContactsService.sendMessage(
+        this.securityCode,
+        messageRequest,
+        {
+          onReply: (reply) => this.sendContactMessageInfo(reply),
+        },
+      );
+      this.sendContactMessageInfo(contactMessage, requestId);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to send message';
+      sendJson(this.socket, {
+        type: 'contact:message:error',
+        requestId,
+        error: errorMessage,
+      });
+    }
+  }
+
+  private sendContactMessageInfo(
+    message: ContactMessageDocument,
+    requestId?: string,
+  ) {
+    sendJson(this.socket, {
+      type: 'contact:message',
+      requestId,
+      message: ContactsService.toMessageDto(message),
+    });
   }
 
   private async persistSpaceship() {

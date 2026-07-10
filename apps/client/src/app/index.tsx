@@ -5,6 +5,7 @@ import {
   getApiBaseUrl,
   getStoredSpaceshipSecurityCode,
   SECURITY_CODE_HEADER,
+  subscribeToContactMessages,
   useBootstrap,
   type BootstrapRequest,
 } from '@store';
@@ -19,8 +20,6 @@ type UnreadMessage = {
   isRead: boolean;
   createdAt: string;
 };
-
-const UNREAD_POLL_MS = 30_000;
 
 export default function App() {
   const [bootstrapRequest, setBootstrapRequest] =
@@ -90,35 +89,42 @@ export default function App() {
     if (!securityCode) return;
 
     let disposed = false;
-    let timer: number | undefined;
-    const pollUnreadMessages = async () => {
+    const loadUnreadMessages = async () => {
       if (disposed) return;
-      if (!document.hidden && navigator.onLine) {
-        try {
-          const { data } = await axios.get<{ messages: UnreadMessage[] }>(
-            `${getApiBaseUrl()}/contacts/messages/unread`,
-            { headers: { [SECURITY_CODE_HEADER]: securityCode } },
-          );
-          if (!disposed) setUnreadMessages(data.messages);
-        } catch (error) {
-          console.error('Failed to load unread messages', error);
-        }
+      try {
+        const { data } = await axios.get<{ messages: UnreadMessage[] }>(
+          `${getApiBaseUrl()}/contacts/messages/unread`,
+          { headers: { [SECURITY_CODE_HEADER]: securityCode } },
+        );
+        if (!disposed) setUnreadMessages(data.messages);
+      } catch (error) {
+        console.error('Failed to load unread messages', error);
       }
-      timer = window.setTimeout(pollUnreadMessages, UNREAD_POLL_MS);
     };
-    const pollNow = () => {
-      window.clearTimeout(timer);
-      void pollUnreadMessages();
+    const refreshUnreadMessages = () => {
+      if (!document.hidden && navigator.onLine) void loadUnreadMessages();
     };
+    const unsubscribe = subscribeToContactMessages((message) => {
+      if (message.sender !== 'contact') return;
+      setUnreadMessages((current) => {
+        if (current.some((currentMessage) => currentMessage.id === message.id)) {
+          return current;
+        }
+        return [...current, message].sort(
+          (left, right) =>
+            Date.parse(left.createdAt) - Date.parse(right.createdAt),
+        );
+      });
+    });
 
-    void pollUnreadMessages();
-    document.addEventListener('visibilitychange', pollNow);
-    window.addEventListener('online', pollNow);
+    void loadUnreadMessages();
+    document.addEventListener('visibilitychange', refreshUnreadMessages);
+    window.addEventListener('online', refreshUnreadMessages);
     return () => {
       disposed = true;
-      window.clearTimeout(timer);
-      document.removeEventListener('visibilitychange', pollNow);
-      window.removeEventListener('online', pollNow);
+      unsubscribe();
+      document.removeEventListener('visibilitychange', refreshUnreadMessages);
+      window.removeEventListener('online', refreshUnreadMessages);
     };
   }, [bootstrapState]);
 

@@ -1,21 +1,7 @@
-import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
-import {
-  ContactModel,
-  ContactMessageModel,
-  type ContactMessageDocument,
-} from '@models';
-import {
-  CONTACTS,
-  ContactRepliesService,
-  ContactsService,
-  RepositoryService,
-} from '@services';
+import { ContactModel, ContactMessageModel } from '@models';
+import { CONTACTS, ContactsService, RepositoryService } from '@services';
 import { asyncHandler, sendError } from '../http';
-
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const MAX_MESSAGE_LENGTH = 1_000;
 
 function queryString(value: unknown) {
   return typeof value === 'string' ? value : undefined;
@@ -213,28 +199,14 @@ contactsRouter.post(
       return;
     }
 
-    let contactId: string;
-    let text: string;
-    let clientMessageId: string;
+    let messageRequest: {
+      contactId: string;
+      text: string;
+      clientMessageId: string;
+    };
     try {
       const body = ContactsService.parseJsonBody(request.body);
-      contactId =
-        typeof body.contactId === 'string' ? body.contactId.trim() : '';
-      text = typeof body.text === 'string' ? body.text.trim() : '';
-      clientMessageId =
-        typeof body.clientMessageId === 'string'
-          ? body.clientMessageId.trim()
-          : '';
-      if (!contactId) throw new Error('contactId is required');
-      if (!text) throw new Error('text is required');
-      if (text.length > MAX_MESSAGE_LENGTH) {
-        throw new Error(
-          `text must be at most ${MAX_MESSAGE_LENGTH} characters`,
-        );
-      }
-      if (!UUID_PATTERN.test(clientMessageId)) {
-        throw new Error('clientMessageId must be a UUID');
-      }
+      messageRequest = ContactsService.parseSendMessageRequest(body);
     } catch (error) {
       sendError(
         response,
@@ -245,62 +217,26 @@ contactsRouter.post(
     }
 
     try {
-      if (!(await ContactsService.hasContact(securityCode, contactId))) {
-        sendError(response, 404, 'Contact not found');
-        return;
-      }
-
-      const existing = await ContactMessageModel.findByClientMessage(
+      const message = await ContactsService.sendMessage(
         securityCode,
-        contactId,
-        clientMessageId,
+        messageRequest,
       );
-      if (existing) {
-        if (existing.status === 'failed') {
-          ContactRepliesService.generateContactReplyInBackground(existing);
-          existing.status = 'sent';
-          await ContactMessageModel.updateStatus(existing._id, 'sent');
-        }
-        response
-          .status(202)
-          .json({ message: ContactsService.toMessageDto(existing) });
-        return;
-      }
-
-      const recentMessageCount =
-        await ContactMessageModel.countRecentPlayerMessages(
-          securityCode,
-          new Date(Date.now() - 60_000),
-        );
-      if (recentMessageCount >= 10) {
-        sendError(
-          response,
-          429,
-          'Message rate limit exceeded. Try again shortly.',
-        );
-        return;
-      }
-
-      const message: ContactMessageDocument = {
-        _id: randomUUID(),
-        spaceshipSecurityCode: securityCode,
-        contactId,
-        sender: 'player',
-        text,
-        status: 'queued',
-        isRead: true,
-        clientMessageId,
-        createdAt: new Date(),
-      };
-      await ContactMessageModel.insert(message);
-      ContactRepliesService.generateContactReplyInBackground(message);
-      message.status = 'sent';
-      await ContactMessageModel.updateStatus(message._id, 'sent');
 
       response
         .status(202)
         .json({ message: ContactsService.toMessageDto(message) });
     } catch (error) {
+      if (error instanceof Error && error.message === 'Contact not found') {
+        sendError(response, 404, error.message);
+        return;
+      }
+      if (
+        error instanceof Error &&
+        error.message === 'Message rate limit exceeded. Try again shortly.'
+      ) {
+        sendError(response, 429, error.message);
+        return;
+      }
       console.error('Failed to send contact message', error);
       sendError(response, 500, 'Failed to send contact message');
     }

@@ -35,11 +35,32 @@ type WorldViewportMessage = SerializedWorldSystems & {
   type: 'world:viewport';
   requestId?: string;
 };
+export type ContactMessage = {
+  id: string;
+  contactId: string;
+  sender: 'player' | 'contact';
+  text: string;
+  status: 'sent' | 'queued' | 'failed';
+  isRead: boolean;
+  createdAt: string;
+};
+type ContactSocketMessage = {
+  type: 'contact:message';
+  requestId?: string;
+  message: ContactMessage;
+};
+type ContactSocketErrorMessage = {
+  type: 'contact:message:error';
+  requestId?: string;
+  error: string;
+};
 type SpaceshipSocketMessage =
   | SpaceshipInfoMessage
   | WorldInfoMessage
   | SpaceshipErrorMessage
-  | WorldViewportMessage;
+  | WorldViewportMessage
+  | ContactSocketMessage
+  | ContactSocketErrorMessage;
 const requestPromises = new WeakMap<BootstrapRequest, Promise<SpaceshipDto>>();
 const worldViewportRequests = new Map<
   string,
@@ -48,8 +69,17 @@ const worldViewportRequests = new Map<
     reject: (error: Error) => void;
   }
 >();
+const contactMessageRequests = new Map<
+  string,
+  {
+    resolve: (message: ContactMessage) => void;
+    reject: (error: Error) => void;
+  }
+>();
+const contactMessageListeners = new Set<(message: ContactMessage) => void>();
 let spaceshipSocket: WebSocket | undefined;
 let nextWorldRequestId = 0;
+let nextContactMessageRequestId = 0;
 
 export function getApiBaseUrl() {
   return (import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL).replace(
@@ -92,6 +122,29 @@ function parseSpaceshipSocketMessage(data: string): SpaceshipSocketMessage {
   }
   if (message.type === 'error' && typeof message.error === 'string') {
     return { type: 'error', error: message.error };
+  }
+  if (
+    message.type === 'contact:message' &&
+    message.message &&
+    typeof message.message === 'object'
+  ) {
+    return {
+      type: 'contact:message',
+      requestId:
+        typeof message.requestId === 'string' ? message.requestId : undefined,
+      message: message.message as ContactMessage,
+    };
+  }
+  if (
+    message.type === 'contact:message:error' &&
+    typeof message.error === 'string'
+  ) {
+    return {
+      type: 'contact:message:error',
+      requestId:
+        typeof message.requestId === 'string' ? message.requestId : undefined,
+      error: message.error,
+    };
   }
   throw new Error('Unsupported spaceship socket message');
 }
@@ -207,6 +260,11 @@ function rejectPendingWorldViewportRequests(error: Error) {
   worldViewportRequests.clear();
 }
 
+function rejectPendingContactMessageRequests(error: Error) {
+  contactMessageRequests.forEach(({ reject }) => reject(error));
+  contactMessageRequests.clear();
+}
+
 function requestWorldViewportOverSocket(request: {
   x: string;
   y: string;
@@ -241,6 +299,63 @@ function handleWorldViewportInfo(
   worldViewportRequests.delete(requestId);
   request.resolve({ systems: message.systems });
   return true;
+}
+
+function handleContactMessageInfo(message: ContactSocketMessage) {
+  const requestId = message.requestId;
+  if (requestId) {
+    const request = contactMessageRequests.get(requestId);
+    if (request) {
+      contactMessageRequests.delete(requestId);
+      request.resolve(message.message);
+    }
+  }
+
+  contactMessageListeners.forEach((listener) => listener(message.message));
+}
+
+function handleContactMessageError(message: ContactSocketErrorMessage) {
+  const requestId = message.requestId;
+  if (!requestId) {
+    console.error('Contact message socket error', message.error);
+    return;
+  }
+
+  const request = contactMessageRequests.get(requestId);
+  if (!request) return;
+  contactMessageRequests.delete(requestId);
+  request.reject(new Error(message.error));
+}
+
+export function subscribeToContactMessages(
+  listener: (message: ContactMessage) => void,
+) {
+  contactMessageListeners.add(listener);
+  return () => {
+    contactMessageListeners.delete(listener);
+  };
+}
+
+export function sendContactMessageOverSocket(request: {
+  contactId: string;
+  text: string;
+  clientMessageId: string;
+}) {
+  if (!spaceshipSocket || spaceshipSocket.readyState !== WebSocket.OPEN) {
+    return Promise.reject(new Error('Spaceship socket is not connected'));
+  }
+
+  const requestId = `contact:${++nextContactMessageRequestId}`;
+  return new Promise<ContactMessage>((resolve, reject) => {
+    contactMessageRequests.set(requestId, { resolve, reject });
+    spaceshipSocket?.send(
+      JSON.stringify({
+        type: 'contact:message:send',
+        requestId,
+        ...request,
+      }),
+    );
+  });
 }
 
 export function startSpaceshipTargetSpeedFeature(
@@ -288,6 +403,14 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
               handleWorldViewportInfo(message);
               return;
             }
+            if (message.type === 'contact:message') {
+              handleContactMessageInfo(message);
+              return;
+            }
+            if (message.type === 'contact:message:error') {
+              handleContactMessageError(message);
+              return;
+            }
             if (message.type === 'world:info') {
               void applyWorldInfo(message).catch((error: unknown) => {
                 console.error('Failed to apply world info', error);
@@ -308,6 +431,9 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
           rejectPendingWorldViewportRequests(
             new Error('Failed to connect to spaceship socket'),
           );
+          rejectPendingContactMessageRequests(
+            new Error('Failed to connect to spaceship socket'),
+          );
         });
         socket.addEventListener('open', () => {
           setWorldViewportLoader(requestWorldViewportOverSocket);
@@ -319,6 +445,9 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
             setWorldViewportLoader(undefined);
           }
           rejectPendingWorldViewportRequests(
+            new Error('Spaceship socket is closed'),
+          );
+          rejectPendingContactMessageRequests(
             new Error('Spaceship socket is closed'),
           );
         });

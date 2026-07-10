@@ -24,6 +24,10 @@ export const CONTACTS = {
   },
 } as const;
 
+const MAX_MESSAGE_LENGTH = 1_000;
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 export class ContactsService {
   static async initializeSpaceshipContacts(spaceshipSecurityCode: string) {
     const now = new Date();
@@ -103,5 +107,95 @@ export class ContactsService {
 
   static findLatestMessage(spaceshipSecurityCode: string, contactId: string) {
     return ContactMessageModel.findLatest(spaceshipSecurityCode, contactId);
+  }
+
+  static parseSendMessageRequest(body: Record<string, unknown>) {
+    const contactId =
+      typeof body.contactId === 'string' ? body.contactId.trim() : '';
+    const text = typeof body.text === 'string' ? body.text.trim() : '';
+    const clientMessageId =
+      typeof body.clientMessageId === 'string'
+        ? body.clientMessageId.trim()
+        : '';
+
+    if (!contactId) throw new Error('contactId is required');
+    if (!text) throw new Error('text is required');
+    if (text.length > MAX_MESSAGE_LENGTH) {
+      throw new Error(`text must be at most ${MAX_MESSAGE_LENGTH} characters`);
+    }
+    if (!UUID_PATTERN.test(clientMessageId)) {
+      throw new Error('clientMessageId must be a UUID');
+    }
+
+    return { contactId, text, clientMessageId };
+  }
+
+  static async sendMessage(
+    spaceshipSecurityCode: string,
+    request: {
+      contactId: string;
+      text: string;
+      clientMessageId: string;
+    },
+    options: {
+      onReply?: (message: ContactMessageDocument) => void;
+    } = {},
+  ) {
+    const { ContactRepliesService } = await import(
+      './contact-replies.service.js'
+    );
+
+    if (
+      !(await ContactsService.hasContact(
+        spaceshipSecurityCode,
+        request.contactId,
+      ))
+    ) {
+      throw new Error('Contact not found');
+    }
+
+    const existing = await ContactMessageModel.findByClientMessage(
+      spaceshipSecurityCode,
+      request.contactId,
+      request.clientMessageId,
+    );
+    if (existing) {
+      if (existing.status === 'failed') {
+        ContactRepliesService.generateContactReplyInBackground(
+          existing,
+          options,
+        );
+        existing.status = 'sent';
+        await ContactMessageModel.updateStatus(existing._id, 'sent');
+      }
+      return existing;
+    }
+
+    const recentMessageCount =
+      await ContactMessageModel.countRecentPlayerMessages(
+        spaceshipSecurityCode,
+        new Date(Date.now() - 60_000),
+      );
+    if (recentMessageCount >= 10) {
+      throw new Error('Message rate limit exceeded. Try again shortly.');
+    }
+
+    const message: ContactMessageDocument = {
+      _id: randomUUID(),
+      spaceshipSecurityCode,
+      contactId: request.contactId,
+      sender: 'player',
+      text: request.text,
+      status: 'queued',
+      isRead: true,
+      clientMessageId: request.clientMessageId,
+      createdAt: new Date(),
+    };
+    await ContactMessageModel.insert(message);
+    ContactRepliesService.generateContactReplyInBackground(message, options);
+    message.status = 'sent';
+    await ContactMessageModel.updateStatus(message._id, 'sent');
+
+    return message;
   }
 }

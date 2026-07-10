@@ -1,14 +1,11 @@
 import { WebSocket } from 'ws';
-import {
-  type SpaceshipDocument,
-  SpaceshipService,
-} from '../spaceship.service';
-import { TickingService } from '../ticking.service';
+import { SpaceshipService } from '../spaceship.service';
 import {
   SPACESHIP_INFO_INTERVAL_MS,
   SPACESHIP_PERSIST_INTERVAL_MS,
 } from './constants';
 import { sendJson } from './send-json';
+import { SpaceshipSession } from './spaceship-session';
 
 type SpaceshipSocketIncomingMessage =
   | { type: 'spaceship:update'; spaceship?: unknown }
@@ -19,10 +16,17 @@ type SpaceshipSocketIncomingMessage =
       maximumThrustPercent?: unknown;
       targetDirection?: unknown;
     }
-  | { type: 'spaceship:stop-active-feature' };
+  | { type: 'spaceship:stop-active-feature' }
+  | {
+      type: 'world:viewport';
+      requestId?: unknown;
+      x?: unknown;
+      y?: unknown;
+      radius?: unknown;
+    };
 
 export class SpaceshipSocketConnection {
-  private spaceship?: SpaceshipDocument;
+  private session?: SpaceshipSession;
   private readonly infoInterval: NodeJS.Timeout;
   private readonly persistInterval: NodeJS.Timeout;
   private isPersisting = false;
@@ -51,10 +55,8 @@ export class SpaceshipSocketConnection {
 
   private async loadSpaceship() {
     try {
-      const spaceship = await SpaceshipService.loadSpaceship(
-        this.securityCode,
-      );
-      if (!spaceship) {
+      this.session = await SpaceshipSession.create(this.securityCode);
+      if (!this.session) {
         sendJson(this.socket, {
           type: 'error',
           error: 'Spaceship not found',
@@ -63,7 +65,6 @@ export class SpaceshipSocketConnection {
         return;
       }
 
-      this.spaceship = spaceship;
       void this.sendSpaceshipInfo();
     } catch (error) {
       console.error('Failed to load spaceship socket connection', error);
@@ -76,13 +77,13 @@ export class SpaceshipSocketConnection {
   }
 
   private async sendSpaceshipInfo() {
-    if (!this.spaceship) return;
+    if (!this.session) return;
 
     try {
-      this.spaceship = await TickingService.updateSpaceship(this.spaceship);
+      await this.session.refreshSpaceship();
       sendJson(this.socket, {
         type: 'spaceship:info',
-        spaceship: SpaceshipService.toSpaceshipDto(this.spaceship),
+        spaceship: this.session.getSpaceshipDto(),
       });
     } catch (error) {
       console.error('Failed to send spaceship socket info', error);
@@ -109,7 +110,8 @@ export class SpaceshipSocketConnection {
       message.type !== 'spaceship:update' &&
       message.type !== 'spaceship:movement' &&
       message.type !== 'spaceship:start-target-speed' &&
-      message.type !== 'spaceship:stop-active-feature'
+      message.type !== 'spaceship:stop-active-feature' &&
+      message.type !== 'world:viewport'
     ) {
       sendJson(this.socket, {
         type: 'error',
@@ -119,7 +121,7 @@ export class SpaceshipSocketConnection {
     }
 
     try {
-      if (!this.spaceship) {
+      if (!this.session) {
         sendJson(this.socket, {
           type: 'error',
           error: 'Spaceship is not loaded yet',
@@ -139,44 +141,53 @@ export class SpaceshipSocketConnection {
           throw new Error('Invalid target speed feature parameters');
         }
 
-        const spaceship = await TickingService.startSpaceshipTargetSpeedFeature(
-          this.spaceship,
-          {
-            targetSpeedMetersPerSecond,
-            maximumThrustPercent,
-            targetDirection,
-          },
-        );
+        const spaceship = await this.session.startTargetSpeedFeature({
+          targetSpeedMetersPerSecond,
+          maximumThrustPercent,
+          targetDirection,
+        });
         if (!spaceship) {
           throw new Error('Target speed feature could not be started');
         }
 
-        this.spaceship = spaceship;
         this.hasPendingPersist = false;
         void this.sendSpaceshipInfo();
         return;
       }
 
       if (message.type === 'spaceship:stop-active-feature') {
-        const spaceship = await TickingService.stopSpaceshipActiveFeature(
-          this.spaceship,
-        );
-        this.spaceship = spaceship;
+        await this.session.stopActiveFeature();
         this.hasPendingPersist = false;
         void this.sendSpaceshipInfo();
         return;
       }
 
+      if (message.type === 'world:viewport') {
+        const { x, y, radius, requestId } = message;
+        if (
+          typeof x !== 'string' ||
+          typeof y !== 'string' ||
+          typeof radius !== 'string' ||
+          (requestId !== undefined && typeof requestId !== 'string')
+        ) {
+          throw new Error('Invalid world viewport parameters');
+        }
+
+        const world = await this.session.getViewportWorldSystems({
+          x,
+          y,
+          radius,
+        });
+        sendJson(this.socket, {
+          type: 'world:viewport',
+          requestId,
+          ...world,
+        });
+        return;
+      }
+
       const body = message.spaceship ?? message;
-      const update = SpaceshipService.parseSpaceshipUpdate(body);
-      const now = new Date();
-      this.spaceship = {
-        ...this.spaceship,
-        ...update,
-        securityCode: this.securityCode,
-        simulatedAt: now,
-        updatedAt: now,
-      };
+      this.session.updateSpaceshipFromClient(body);
       this.hasPendingPersist = true;
     } catch (error) {
       sendJson(this.socket, {
@@ -188,21 +199,21 @@ export class SpaceshipSocketConnection {
   }
 
   private async persistSpaceship() {
-    if (!this.spaceship || !this.hasPendingPersist || this.isPersisting) {
+    if (!this.session || !this.hasPendingPersist || this.isPersisting) {
       return;
     }
 
     this.isPersisting = true;
     try {
       const update = SpaceshipService.parseSpaceshipUpdate(
-        SpaceshipService.toSpaceshipDto(this.spaceship),
+        this.session.getSpaceshipDto(),
       );
       const spaceship = await SpaceshipService.updateSpaceship(
         this.securityCode,
         update,
       );
       if (spaceship) {
-        this.spaceship = spaceship;
+        this.session = await SpaceshipSession.create(this.securityCode);
         this.hasPendingPersist = false;
       }
     } catch (error) {

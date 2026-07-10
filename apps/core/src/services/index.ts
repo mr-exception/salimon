@@ -4,3 +4,4 @@ export * from './repository.service';
 export * from './socket.service';
 export * from './spaceship.service';
 export * from './ticking.service';
+export * from './world-viewport.service';

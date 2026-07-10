@@ -81,4 +81,10 @@ export class SpaceshipSession {
     this.viewport = viewport;
     return WorldViewportService.getWorldSystems(viewport);
   }
+
+  async getCurrentViewportWorldSystems() {
+    return this.viewport
+      ? WorldViewportService.getWorldSystems(this.viewport)
+      : undefined;
+  }
 }

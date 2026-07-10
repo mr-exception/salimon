@@ -17,6 +17,9 @@ type WorldListener = (
   changedBodyNames?: ReadonlySet<string>,
 ) => void;
 type Vector = { x: number; y: number };
+type WorldViewportLoader = (
+  request: Required<WorldViewportRequest>,
+) => Promise<SerializedWorldSystems>;
 export type SpaceshipMotionState = 'flying' | 'landed' | 'crashed';
 export type SpaceshipProximityTelemetry = {
   bodyName: string;
@@ -158,16 +161,23 @@ const listeners = new Set<WorldListener>();
 let loadPromise: Promise<World> | undefined;
 let worldBodyByName = new Map<string, Body>();
 let bodyVelocityByName = new Map<string, Vector>();
+const positionRemainderByName = new Map<string, Vector>();
 let spaceshipVelocity: Vector | undefined;
+let spaceshipPositionRemainder: Vector = { x: 0, y: 0 };
 let spaceshipStoredRelativeVelocity: Vector | undefined;
 let spaceshipAttachedBodyName: string | undefined = EARTH_NAME;
 let worldElapsedSeconds = 0;
+let worldViewportLoader: WorldViewportLoader | undefined;
 
 type WorldViewportRequest = {
   x?: string;
   y?: string;
   radius?: string;
 };
+
+export function setWorldViewportLoader(loader?: WorldViewportLoader) {
+  worldViewportLoader = loader;
+}
 
 export async function loadWorld(request: WorldViewportRequest = {}) {
   if (loadPromise) return loadPromise;
@@ -185,6 +195,20 @@ export async function refreshWorldViewport({
   y = '0',
   radius = WORLD_SEARCH_RADIUS_METERS,
 }: WorldViewportRequest = {}) {
+  const request = { x, y, radius };
+  const data = worldViewportLoader
+    ? await worldViewportLoader(request)
+    : await loadWorldViewportFromRest(request);
+
+  applyWorldSystems(data);
+  return worldState;
+}
+
+async function loadWorldViewportFromRest({
+  x,
+  y,
+  radius,
+}: Required<WorldViewportRequest>) {
   const apiBaseUrl = (
     import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL
   ).replace(/\/+$/, '');
@@ -195,9 +219,7 @@ export async function refreshWorldViewport({
       params: { x, y, radius },
     },
   );
-
-  applyWorldSystems(data);
-  return worldState;
+  return data;
 }
 
 export function subscribeToWorld(listener: WorldListener) {
@@ -229,8 +251,17 @@ function applyWorldSystems(data: SerializedWorldSystems) {
   worldState.stars = mergeBodies(worldState.stars, stars);
   worldState.planets = mergeBodies(worldState.planets, planets);
   bodyVelocityByName = new Map([...bodyVelocityByName, ...nextVelocities]);
+  [...stars, ...planets].forEach((body) => {
+    positionRemainderByName.delete(body.name);
+    advanceBodyPositionToNow(body);
+  });
   rebuildWorldBodyByName();
   listeners.forEach((listener) => listener(worldState));
+}
+
+export function hydrateWorldSystems(data: SerializedWorldSystems) {
+  applyWorldSystems(data);
+  return worldState;
 }
 
 function mergeBodies<T extends Planet | Star>(current: T[], incoming: T[]) {
@@ -265,10 +296,13 @@ export function hydrateSpaceship(dto: SpaceshipDto) {
     y: BigInt(dto.position.y),
     relativeTo: dto.position.relativeTo,
   };
+  spaceshipState.positionCapturedAt =
+    dto.positionCapturedAt ?? dto.simulatedAt;
   spaceshipState.heading = dto.direction;
   spaceshipState.speed = BigInt(dto.speed);
   spaceshipState.orbitalCenter = null;
   spaceshipVelocity = undefined;
+  spaceshipPositionRemainder = { x: 0, y: 0 };
   spaceshipStoredRelativeVelocity = dto.velocity
     ? { ...dto.velocity }
     : undefined;
@@ -298,6 +332,7 @@ export function hydrateSpaceship(dto: SpaceshipDto) {
     ),
   );
   rebuildWorldBodyByName();
+  advanceSpaceshipToNow(dto.positionCapturedAt ?? dto.simulatedAt);
   listeners.forEach((listener) => listener(worldState));
 }
 
@@ -339,6 +374,7 @@ export function getSpaceshipDto(securityCode: string): SpaceshipDto {
     speed: Math.round(speed).toString(),
     velocity: relativeVelocity,
     motionState: store.get(spaceshipMotionStateAtom),
+    positionCapturedAt: new Date().toISOString(),
     stats: {
       fuelKns: getSpaceshipFuelKns(),
       hullDurability: store.get(spaceshipHullDurabilityAtom),
@@ -499,7 +535,11 @@ export function getSpaceshipProximityTelemetry():
 }
 
 export function advanceWorld(elapsedSeconds: number) {
-  if (elapsedSeconds > 0) worldElapsedSeconds += elapsedSeconds;
+  if (elapsedSeconds > 0) {
+    worldElapsedSeconds += elapsedSeconds;
+    advanceBodyPositions(elapsedSeconds);
+    advanceSpaceshipPosition(elapsedSeconds);
+  }
   return worldElapsedSeconds;
 }
 
@@ -518,6 +558,105 @@ function getInitialSpaceshipWorldVelocity() {
     x: referenceVelocity.x + relativeVelocity.x,
     y: referenceVelocity.y + relativeVelocity.y,
   };
+}
+
+function advanceBodyPositions(elapsedSeconds: number) {
+  for (const body of [...worldState.stars, ...worldState.planets]) {
+    const velocity = getBodyWorldVelocity(body.name);
+    const referenceVelocity = getPositionReferenceVelocity(body.position);
+    const remainder = positionRemainderByName.get(body.name) ?? { x: 0, y: 0 };
+    const nextRemainder = advancePositionByVelocity(
+      body.position,
+      {
+        x: velocity.x - referenceVelocity.x,
+        y: velocity.y - referenceVelocity.y,
+      },
+      elapsedSeconds,
+      remainder,
+    );
+    positionRemainderByName.set(body.name, nextRemainder);
+  }
+}
+
+function advanceBodyPositionToNow(body: Planet | Star) {
+  const positionCapturedAt = body.positionCapturedAt;
+  if (!positionCapturedAt) return;
+
+  const positionCapturedAtMs = Date.parse(positionCapturedAt);
+  if (!Number.isFinite(positionCapturedAtMs)) return;
+
+  const elapsedSeconds = Math.max(0, (Date.now() - positionCapturedAtMs) / 1000);
+  if (elapsedSeconds <= 0) return;
+
+  const velocity = getBodyWorldVelocity(body.name);
+  const referenceVelocity = getPositionReferenceVelocity(body.position);
+  const remainder = advancePositionByVelocity(
+    body.position,
+    {
+      x: velocity.x - referenceVelocity.x,
+      y: velocity.y - referenceVelocity.y,
+    },
+    elapsedSeconds,
+    { x: 0, y: 0 },
+  );
+  positionRemainderByName.set(body.name, remainder);
+  body.positionCapturedAt = new Date().toISOString();
+}
+
+function advanceSpaceshipToNow(positionCapturedAt: string | undefined) {
+  if (!positionCapturedAt) return;
+
+  const positionCapturedAtMs = Date.parse(positionCapturedAt);
+  if (!Number.isFinite(positionCapturedAtMs)) return;
+
+  const elapsedSeconds = Math.max(0, (Date.now() - positionCapturedAtMs) / 1000);
+  if (elapsedSeconds > 0) advanceSpaceshipPosition(elapsedSeconds);
+  spaceshipState.positionCapturedAt = new Date().toISOString();
+}
+
+function advanceSpaceshipPosition(elapsedSeconds: number) {
+  const motionState = store.get(spaceshipMotionStateAtom);
+  if (motionState !== 'flying') return;
+
+  const velocity = getSpaceshipWorldVelocity();
+  const referenceVelocity = getPositionReferenceVelocity(
+    spaceshipState.position,
+  );
+  spaceshipPositionRemainder = advancePositionByVelocity(
+    spaceshipState.position,
+    {
+      x: velocity.x - referenceVelocity.x,
+      y: velocity.y - referenceVelocity.y,
+    },
+    elapsedSeconds,
+    spaceshipPositionRemainder,
+  );
+}
+
+function advancePositionByVelocity(
+  position: Position,
+  velocity: Vector,
+  elapsedSeconds: number,
+  remainder: Vector,
+) {
+  const deltaX = velocity.x * elapsedSeconds + remainder.x;
+  const deltaY = velocity.y * elapsedSeconds + remainder.y;
+  const wholeX = Math.trunc(deltaX);
+  const wholeY = Math.trunc(deltaY);
+
+  if (wholeX !== 0) position.x += BigInt(wholeX);
+  if (wholeY !== 0) position.y += BigInt(wholeY);
+
+  return {
+    x: deltaX - wholeX,
+    y: deltaY - wholeY,
+  };
+}
+
+function getPositionReferenceVelocity(position: Position) {
+  return position.relativeTo
+    ? getBodyWorldVelocity(position.relativeTo)
+    : { x: 0, y: 0 };
 }
 
 function getSpaceshipReferenceVelocity() {
@@ -653,6 +792,7 @@ function deserializeBody<T extends Body>(
     radius: string;
     mass: string;
     speed: string;
+    positionCapturedAt?: string;
   },
   defaults: Partial<T> = {},
 ): T {

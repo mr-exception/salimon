@@ -74,15 +74,15 @@ export class WorldBodyModel {
   static async findWorldSystemsBodies() {
     const [planets, moons, stars] = await Promise.all([
       (await WorldBodyModel.getModel('planets'))
-        .find({}, { _id: 0, updatedAt: 0 })
+        .find({}, { _id: 0 })
         .lean<WorldBodyDocument[]>()
         .exec(),
       (await WorldBodyModel.getModel('moons'))
-        .find({}, { _id: 0, updatedAt: 0 })
+        .find({}, { _id: 0 })
         .lean<WorldBodyDocument[]>()
         .exec(),
       (await WorldBodyModel.getModel('stars'))
-        .find({}, { _id: 0, updatedAt: 0 })
+        .find({}, { _id: 0 })
         .lean<WorldBodyDocument[]>()
         .exec(),
     ]);

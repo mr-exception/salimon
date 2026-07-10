@@ -1,5 +1,6 @@
 import { WebSocket } from 'ws';
 import { SpaceshipService } from '../spaceship.service';
+import type { WorldViewportRequest } from '../world-viewport.service';
 import {
   SPACESHIP_INFO_INTERVAL_MS,
   SPACESHIP_PERSIST_INTERVAL_MS,
@@ -37,7 +38,7 @@ export class SpaceshipSocketConnection {
     private readonly securityCode: string,
   ) {
     this.infoInterval = setInterval(() => {
-      void this.sendSpaceshipInfo();
+      void this.sendWorldInfo();
     }, SPACESHIP_INFO_INTERVAL_MS);
     this.persistInterval = setInterval(() => {
       void this.persistSpaceship();
@@ -65,7 +66,7 @@ export class SpaceshipSocketConnection {
         return;
       }
 
-      void this.sendSpaceshipInfo();
+      void this.sendWorldInfo();
     } catch (error) {
       console.error('Failed to load spaceship socket connection', error);
       sendJson(this.socket, {
@@ -76,14 +77,22 @@ export class SpaceshipSocketConnection {
     }
   }
 
-  private async sendSpaceshipInfo() {
+  private async sendWorldInfo(options: {
+    requestId?: string;
+    viewport?: WorldViewportRequest;
+  } = {}) {
     if (!this.session) return;
 
     try {
       await this.session.refreshSpaceship();
+      const world = options.viewport
+        ? await this.session.getViewportWorldSystems(options.viewport)
+        : await this.session.getCurrentViewportWorldSystems();
       sendJson(this.socket, {
-        type: 'spaceship:info',
+        type: 'world:info',
+        requestId: options.requestId,
         spaceship: this.session.getSpaceshipDto(),
+        ...world,
       });
     } catch (error) {
       console.error('Failed to send spaceship socket info', error);
@@ -151,14 +160,14 @@ export class SpaceshipSocketConnection {
         }
 
         this.hasPendingPersist = false;
-        void this.sendSpaceshipInfo();
+        void this.sendWorldInfo();
         return;
       }
 
       if (message.type === 'spaceship:stop-active-feature') {
         await this.session.stopActiveFeature();
         this.hasPendingPersist = false;
-        void this.sendSpaceshipInfo();
+        void this.sendWorldInfo();
         return;
       }
 
@@ -173,15 +182,13 @@ export class SpaceshipSocketConnection {
           throw new Error('Invalid world viewport parameters');
         }
 
-        const world = await this.session.getViewportWorldSystems({
-          x,
-          y,
-          radius,
-        });
-        sendJson(this.socket, {
-          type: 'world:viewport',
+        void this.sendWorldInfo({
           requestId,
-          ...world,
+          viewport: {
+            x,
+            y,
+            radius,
+          },
         });
         return;
       }

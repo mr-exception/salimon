@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import type { SpaceshipDto } from '@repo/types';
+import type { SerializedWorldSystems, SpaceshipDto } from '@repo/types';
 import {
+  hydrateWorldSystems,
   hydrateSpaceship,
   refreshWorldViewport,
+  setWorldViewportLoader,
 } from './world';
 
 const STORAGE_KEY = 'salimon.spaceship';
@@ -21,14 +23,35 @@ type SpaceshipInfoMessage = {
   type: 'spaceship:info';
   spaceship: SpaceshipDto;
 };
+type WorldInfoMessage = Partial<SerializedWorldSystems> & {
+  type: 'world:info';
+  spaceship: SpaceshipDto;
+  requestId?: string;
+};
 type SpaceshipErrorMessage = {
   type: 'error';
   error: string;
 };
-type SpaceshipSocketMessage = SpaceshipInfoMessage | SpaceshipErrorMessage;
+type WorldViewportMessage = SerializedWorldSystems & {
+  type: 'world:viewport';
+  requestId?: string;
+};
+type SpaceshipSocketMessage =
+  | SpaceshipInfoMessage
+  | WorldInfoMessage
+  | SpaceshipErrorMessage
+  | WorldViewportMessage;
 const requestPromises = new WeakMap<BootstrapRequest, Promise<SpaceshipDto>>();
+const worldViewportRequests = new Map<
+  string,
+  {
+    resolve: (world: SerializedWorldSystems) => void;
+    reject: (error: Error) => void;
+  }
+>();
 let spaceshipSocket: WebSocket | undefined;
 let worldRefreshPromise: Promise<unknown> | undefined;
+let nextWorldRequestId = 0;
 
 export function getApiBaseUrl() {
   return (import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL).replace(
@@ -50,6 +73,23 @@ function parseSpaceshipSocketMessage(data: string): SpaceshipSocketMessage {
     return {
       type: 'spaceship:info',
       spaceship: message.spaceship,
+    };
+  }
+  if (message.type === 'world:info' && message.spaceship) {
+    return {
+      type: 'world:info',
+      spaceship: message.spaceship,
+      requestId:
+        typeof message.requestId === 'string' ? message.requestId : undefined,
+      ...(Array.isArray(message.systems) ? { systems: message.systems } : {}),
+    };
+  }
+  if (message.type === 'world:viewport' && Array.isArray(message.systems)) {
+    return {
+      type: 'world:viewport',
+      requestId:
+        typeof message.requestId === 'string' ? message.requestId : undefined,
+      systems: message.systems,
     };
   }
   if (message.type === 'error' && typeof message.error === 'string') {
@@ -75,6 +115,20 @@ async function applySpaceshipInfo(spaceship: SpaceshipDto) {
     await refreshWorldForSpaceship();
   }
   hydrateSpaceship(spaceship);
+}
+
+async function applyWorldInfo(message: WorldInfoMessage) {
+  const handledViewportRequest = handleWorldViewportInfo(message);
+  storeSpaceship(message.spaceship);
+  if (message.systems) {
+    if (!handledViewportRequest) {
+      hydrateWorldSystems({ systems: message.systems });
+    }
+    hydrateSpaceship(message.spaceship);
+    return;
+  }
+
+  await applySpaceshipInfo(message.spaceship);
 }
 
 function readStoredSpaceship() {
@@ -109,6 +163,13 @@ async function getSpaceshipFromSocket(securityCode: string) {
           socket.close();
           return;
         }
+        if (
+          message.type !== 'spaceship:info' &&
+          message.type !== 'world:info'
+        ) {
+          return;
+        }
+
         resolve(message.spaceship);
         socket.close();
       } catch (error) {
@@ -157,6 +218,47 @@ function sendSpaceshipSocketMessage(message: unknown) {
   spaceshipSocket.send(JSON.stringify(message));
 }
 
+function rejectPendingWorldViewportRequests(error: Error) {
+  worldViewportRequests.forEach(({ reject }) => reject(error));
+  worldViewportRequests.clear();
+}
+
+function requestWorldViewportOverSocket(request: {
+  x: string;
+  y: string;
+  radius: string;
+}) {
+  if (!spaceshipSocket || spaceshipSocket.readyState !== WebSocket.OPEN) {
+    return Promise.reject(new Error('Spaceship socket is not connected'));
+  }
+
+  const requestId = `world:${++nextWorldRequestId}`;
+  return new Promise<SerializedWorldSystems>((resolve, reject) => {
+    worldViewportRequests.set(requestId, { resolve, reject });
+    spaceshipSocket?.send(
+      JSON.stringify({
+        type: 'world:viewport',
+        requestId,
+        ...request,
+      }),
+    );
+  });
+}
+
+function handleWorldViewportInfo(
+  message: WorldViewportMessage | WorldInfoMessage,
+) {
+  const requestId = message.requestId;
+  if (!requestId || !message.systems) return false;
+
+  const request = worldViewportRequests.get(requestId);
+  if (!request) return false;
+
+  worldViewportRequests.delete(requestId);
+  request.resolve({ systems: message.systems });
+  return true;
+}
+
 export function startSpaceshipTargetSpeedFeature(
   targetSpeedMetersPerSecond: number,
   maximumThrustPercent: number,
@@ -198,6 +300,16 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
               console.error('Spaceship socket error', message.error);
               return;
             }
+            if (message.type === 'world:viewport') {
+              handleWorldViewportInfo(message);
+              return;
+            }
+            if (message.type === 'world:info') {
+              void applyWorldInfo(message).catch((error: unknown) => {
+                console.error('Failed to apply world info', error);
+              });
+              return;
+            }
             void applySpaceshipInfo(message.spaceship).catch(
               (error: unknown) => {
                 console.error('Failed to apply spaceship info', error);
@@ -209,8 +321,23 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
         });
         socket.addEventListener('error', () => {
           console.error('Failed to connect to spaceship socket');
+          rejectPendingWorldViewportRequests(
+            new Error('Failed to connect to spaceship socket'),
+          );
         });
-        setResult({ request, state: 'ready' });
+        socket.addEventListener('open', () => {
+          setWorldViewportLoader(requestWorldViewportOverSocket);
+          setResult({ request, state: 'ready' });
+        });
+        socket.addEventListener('close', () => {
+          if (spaceshipSocket === socket) {
+            spaceshipSocket = undefined;
+            setWorldViewportLoader(undefined);
+          }
+          rejectPendingWorldViewportRequests(
+            new Error('Spaceship socket is closed'),
+          );
+        });
       })
       .catch((error: unknown) => {
         console.error('Failed to initialize spaceship', error);
@@ -220,6 +347,7 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
     return () => {
       disposed = true;
       if (spaceshipSocket === socket) spaceshipSocket = undefined;
+      setWorldViewportLoader(undefined);
       socket?.close();
     };
   }, [request]);

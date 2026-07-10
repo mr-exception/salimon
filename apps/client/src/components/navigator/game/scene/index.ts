@@ -202,8 +202,11 @@ export class Scene extends Phaser.Scene {
   }
 
   update(_time: number, delta: number) {
-    this.publishActiveWorldBodies();
     const worldElapsedSeconds = advanceWorld(delta / 1000);
+    this.syncWorldPositions();
+    this.lastActiveBodiesViewportKey = '';
+    this.lastVisibilityViewportKey = '';
+    this.publishActiveWorldBodies();
     this.planets.forEach((planet) => planet.syncRotation(worldElapsedSeconds));
     this.stars.forEach((star) => star.syncRotation(worldElapsedSeconds));
     if (getSpaceshipMotionState() === 'crashed') {

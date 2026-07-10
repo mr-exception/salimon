@@ -7,8 +7,9 @@ type Coordinate = {
   y: bigint;
 };
 
-type WorldBodyResponse = WorldBodyDocument & {
+type WorldBodyResponse = Omit<WorldBodyDocument, 'updatedAt'> & {
   velocity: Velocity;
+  positionCapturedAt: string;
 };
 
 type PlanetSystem = {
@@ -173,9 +174,12 @@ function withVelocity(
   body: WorldBodyDocument,
   velocities: Map<string, Velocity>,
 ): WorldBodyResponse {
+  const { updatedAt, ...responseBody } = body;
+
   return {
-    ...body,
+    ...responseBody,
     velocity: velocities.get(body.name) ?? { x: 0, y: 0 },
+    positionCapturedAt: updatedAt.toISOString(),
   };
 }
 

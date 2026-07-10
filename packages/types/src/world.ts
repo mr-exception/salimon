@@ -17,6 +17,7 @@ export type Velocity = {
 
 type OrbitingBody = {
   position: Position;
+  positionCapturedAt?: string;
   name: string;
   radius: bigint;
   mass: bigint;
@@ -73,6 +74,7 @@ export type SpaceshipActiveFeature =
 export type SpaceshipDto = {
   securityCode: string;
   position: SerializedPosition;
+  positionCapturedAt?: string;
   direction: number;
   speed: string;
   velocity?: Velocity;
@@ -96,6 +98,7 @@ export type SerializedBody<T extends Planet | Spaceship | Star> = Omit<
   mass: string;
   speed: string;
   velocity?: Velocity;
+  positionCapturedAt?: string;
 };
 
 export type SerializedWorld = {

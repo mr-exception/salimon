@@ -64,6 +64,9 @@ export class SpaceshipService {
     return {
       securityCode: spaceship.securityCode,
       position: spaceship.position,
+      positionCapturedAt: (
+        spaceship.simulatedAt ?? spaceship.updatedAt
+      ).toISOString(),
       direction: spaceship.direction,
       speed: spaceship.speed,
       velocity,

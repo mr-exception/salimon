@@ -8,15 +8,9 @@ import {
 } from '@routes';
 import { spaceshipSecurityCode } from './middleware';
 
-const DEFAULT_CORS_ORIGIN = 'http://localhost:5173';
-
 export function createApp() {
   const app = express();
-  app.use(
-    cors({
-      origin: process.env.CORS_ORIGIN ?? DEFAULT_CORS_ORIGIN,
-    }),
-  );
+  app.use(cors());
   app.use(express.json({ limit: '1mb' }));
   app.use(spaceshipSecurityCode);
 

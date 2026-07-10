@@ -35,10 +35,6 @@ export default function App() {
   const sceneRef = useRef<{
     startEngines: (targetSpeed: number, maximumThrustPercent: number) => void;
     stopEngines: () => void;
-    setManualThrust: (
-      direction: { x: number; y: number } | undefined,
-      power: number,
-    ) => void;
     setTargetDirectionSelectionActive: (active: boolean) => void;
     setPrediction: (active: boolean, seconds: number) => void;
   } | null>(null);
@@ -50,10 +46,6 @@ export default function App() {
           maximumThrustPercent: number,
         ) => void;
         stopEngines: () => void;
-        setManualThrust: (
-          direction: { x: number; y: number } | undefined,
-          power: number,
-        ) => void;
         setTargetDirectionSelectionActive: (active: boolean) => void;
         setPrediction: (active: boolean, seconds: number) => void;
       } | null,
@@ -71,12 +63,6 @@ export default function App() {
   const stopEngines = useCallback(() => {
     sceneRef.current?.stopEngines();
   }, []);
-  const setManualThrust = useCallback(
-    (direction: { x: number; y: number } | undefined, power: number) => {
-      sceneRef.current?.setManualThrust(direction, power);
-    },
-    [],
-  );
   const toggleTargetDirectionSelection = useCallback(() => {
     setIsSelectingTargetDirection((isSelecting) => {
       const active = !isSelecting;
@@ -159,7 +145,6 @@ export default function App() {
         isMeasuring={isMeasuring}
         onStartEngines={startEngines}
         onStopEngines={stopEngines}
-        onManualThrustChange={setManualThrust}
         onToggleMeasuring={() => setIsMeasuring((active) => !active)}
         onOpenCommunications={() => setIsCommunicationsOpen(true)}
         unreadMessageCount={unreadMessages.length}

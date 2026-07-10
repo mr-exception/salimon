@@ -1,10 +1,10 @@
-import { spaceshipState, subscribeToWorld } from '@store';
+import { loadWorld, spaceshipState, subscribeToWorld } from '@store';
 import { Spaceship } from '../spaceship';
 import type { Scene } from '.';
 
 export async function renderWorld(this: Scene) {
   try {
-    const world = await this.refreshWorldFromViewport();
+    const world = await loadWorld();
     if (!this.sys.isActive()) return;
 
     this.setWorldBodyData(world.planets, world.stars);

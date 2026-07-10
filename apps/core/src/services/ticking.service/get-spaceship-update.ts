@@ -2,80 +2,23 @@ import type {
   SpaceshipDocument,
   SpaceshipMotionState,
   SpaceshipVelocity,
-  WorldBodyDocument,
 } from '@models';
+import { PhysicsService } from '../physics.service';
+import { SpaceshipService } from '../spaceship.service';
 import {
-  SPACESHIP_THRUSTER_COUNT,
-  SpaceshipService,
-} from '../spaceship.service';
-import {
-  CRASH_SPEED_METERS_PER_SECOND,
-  GRAVITATIONAL_CONSTANT,
-  MAX_ENGINE_THRUST_KN,
   MAX_PROPAGATION_STEPS,
-  SPACESHIP_MASS_KG,
   SPACESHIP_RADIUS_METERS,
   TARGET_STEP_SECONDS,
-  THRUSTER_DURABILITY_DRAIN_RATE,
 } from './constants';
-import type { Impact, Motion, TargetSpeedBurnPlan, WorldSnapshot } from './types';
-
-function add(value: SpaceshipVelocity, change: SpaceshipVelocity, scale = 1) {
-  return {
-    x: value.x + change.x * scale,
-    y: value.y + change.y * scale,
-  };
-}
+import type {
+  Impact,
+  Motion,
+  TargetSpeedBurnPlan,
+  WorldSnapshot,
+} from './types';
 
 export function getBodyPositions(world: WorldSnapshot, time: Date) {
-  const positions = new Map<string, SpaceshipVelocity>();
-
-  function resolve(
-    body: WorldBodyDocument,
-    path: Set<string>,
-  ): SpaceshipVelocity {
-    const cached = positions.get(body.name);
-    if (cached) return cached;
-    if (path.has(body.name)) {
-      throw new Error(`Circular position reference involving ${body.name}`);
-    }
-
-    const initialX = Number(body.position.x);
-    const initialY = Number(body.position.y);
-    const radius = Math.hypot(initialX, initialY);
-    const speed = Number(body.speed);
-    const elapsedSeconds = (time.getTime() - body.updatedAt.getTime()) / 1_000;
-    let localPosition = { x: initialX, y: initialY };
-
-    if (body.orbitalCenter && radius > 0 && speed !== 0) {
-      const direction = body.clockwise ? 1 : -1;
-      const angle = (direction * speed * elapsedSeconds) / radius;
-      const cos = Math.cos(angle);
-      const sin = Math.sin(angle);
-      localPosition = {
-        x: initialX * cos - initialY * sin,
-        y: initialX * sin + initialY * cos,
-      };
-    }
-
-    const referenceName = body.position.relativeTo;
-    if (referenceName) {
-      const reference = world.bodiesByName.get(referenceName);
-      if (!reference) {
-        throw new Error(
-          `Position reference ${referenceName} for ${body.name} was not found`,
-        );
-      }
-      const nextPath = new Set(path).add(body.name);
-      localPosition = add(localPosition, resolve(reference, nextPath));
-    }
-
-    positions.set(body.name, localPosition);
-    return localPosition;
-  }
-
-  world.bodies.forEach((body) => resolve(body, new Set()));
-  return positions;
+  return PhysicsService.getBodyPositions(world, time);
 }
 
 export function getBodyVelocity(
@@ -99,187 +42,6 @@ export function getBodyVelocity(
   };
 }
 
-function acceleration(
-  position: SpaceshipVelocity,
-  world: WorldSnapshot,
-  time: Date,
-  thrustAcceleration?: SpaceshipVelocity,
-) {
-  const bodyPositions = getBodyPositions(world, time);
-  let x = thrustAcceleration?.x ?? 0;
-  let y = thrustAcceleration?.y ?? 0;
-
-  for (const body of world.bodies) {
-    const bodyPosition = bodyPositions.get(body.name);
-    if (!bodyPosition) continue;
-    const deltaX = bodyPosition.x - position.x;
-    const deltaY = bodyPosition.y - position.y;
-    const radiusSquared = deltaX ** 2 + deltaY ** 2;
-    if (radiusSquared === 0) continue;
-    const scale =
-      (GRAVITATIONAL_CONSTANT * Number(body.mass)) /
-      (radiusSquared * Math.sqrt(radiusSquared));
-    x += deltaX * scale;
-    y += deltaY * scale;
-  }
-
-  return { x, y };
-}
-
-function integrateStep(
-  motion: Motion,
-  startedAt: Date,
-  seconds: number,
-  world: WorldSnapshot,
-  thrustAcceleration?: SpaceshipVelocity,
-): Motion {
-  const midpoint = new Date(startedAt.getTime() + (seconds * 1_000) / 2);
-  const finishedAt = new Date(startedAt.getTime() + seconds * 1_000);
-  const position1 = motion.velocity;
-  const velocity1 = acceleration(
-    motion.position,
-    world,
-    startedAt,
-    thrustAcceleration,
-  );
-  const position2 = add(motion.velocity, velocity1, seconds / 2);
-  const velocity2 = acceleration(
-    add(motion.position, position1, seconds / 2),
-    world,
-    midpoint,
-    thrustAcceleration,
-  );
-  const position3 = add(motion.velocity, velocity2, seconds / 2);
-  const velocity3 = acceleration(
-    add(motion.position, position2, seconds / 2),
-    world,
-    midpoint,
-    thrustAcceleration,
-  );
-  const position4 = add(motion.velocity, velocity3, seconds);
-  const velocity4 = acceleration(
-    add(motion.position, position3, seconds),
-    world,
-    finishedAt,
-    thrustAcceleration,
-  );
-
-  return {
-    position: {
-      x:
-        motion.position.x +
-        (seconds / 6) *
-          (position1.x + 2 * position2.x + 2 * position3.x + position4.x),
-      y:
-        motion.position.y +
-        (seconds / 6) *
-          (position1.y + 2 * position2.y + 2 * position3.y + position4.y),
-    },
-    velocity: {
-      x:
-        motion.velocity.x +
-        (seconds / 6) *
-          (velocity1.x + 2 * velocity2.x + 2 * velocity3.x + velocity4.x),
-      y:
-        motion.velocity.y +
-        (seconds / 6) *
-          (velocity1.y + 2 * velocity2.y + 2 * velocity3.y + velocity4.y),
-    },
-  };
-}
-
-function getActiveThrusters(
-  accelerationValue: SpaceshipVelocity | undefined,
-  stats: SpaceshipDocument['stats'],
-) {
-  if (!accelerationValue) return undefined;
-
-  const normalizedStats = SpaceshipService.normalizeSpaceshipStats(stats);
-  const thrustByIndex = Array<number>(SPACESHIP_THRUSTER_COUNT).fill(0);
-  const effectiveAcceleration = { x: 0, y: 0 };
-  const xIndex = accelerationValue.x < 0 ? 1 : 3;
-  const yIndex = accelerationValue.y < 0 ? 2 : 0;
-
-  if (
-    Math.abs(accelerationValue.x) > 1e-8 &&
-    normalizedStats.thrusterDurability[xIndex] > 0
-  ) {
-    effectiveAcceleration.x = accelerationValue.x;
-    thrustByIndex[xIndex] =
-      (Math.abs(accelerationValue.x) * SPACESHIP_MASS_KG) / 1_000;
-  }
-  if (
-    Math.abs(accelerationValue.y) > 1e-8 &&
-    normalizedStats.thrusterDurability[yIndex] > 0
-  ) {
-    effectiveAcceleration.y = accelerationValue.y;
-    thrustByIndex[yIndex] =
-      (Math.abs(accelerationValue.y) * SPACESHIP_MASS_KG) / 1_000;
-  }
-
-  const activeIndexes = thrustByIndex
-    .map((thrust, index) => ({ index, thrust }))
-    .filter(({ thrust }) => thrust > 0);
-  if (activeIndexes.length === 0) return undefined;
-
-  return {
-    effectiveAcceleration,
-    thrustByIndex,
-    totalKilonewtons: activeIndexes.reduce(
-      (total, { thrust }) => total + thrust,
-      0,
-    ),
-    availableSeconds: Math.min(
-      ...activeIndexes.map(
-        ({ index, thrust }) =>
-          normalizedStats.thrusterDurability[index] /
-          ((thrust / 100) * THRUSTER_DURABILITY_DRAIN_RATE),
-      ),
-    ),
-  };
-}
-
-function wearThrusters(
-  stats: ReturnType<typeof SpaceshipService.normalizeSpaceshipStats>,
-  thrustByIndex: readonly number[],
-  elapsedSeconds: number,
-) {
-  if (elapsedSeconds <= 0) return stats;
-
-  return {
-    ...stats,
-    thrusterDurability: stats.thrusterDurability.map((durability, index) =>
-      Math.max(
-        0,
-        durability -
-          ((thrustByIndex[index] ?? 0) / 100) *
-            THRUSTER_DURABILITY_DRAIN_RATE *
-            elapsedSeconds,
-      ),
-    ),
-  };
-}
-
-function calculateRequiredBurnAcceleration(
-  targetVelocity: SpaceshipVelocity,
-  remainingSeconds: number,
-  currentVelocity: SpaceshipVelocity,
-  position: SpaceshipVelocity,
-  world: WorldSnapshot,
-  time: Date,
-) {
-  const desiredAcceleration = {
-    x: (targetVelocity.x - currentVelocity.x) / remainingSeconds,
-    y: (targetVelocity.y - currentVelocity.y) / remainingSeconds,
-  };
-  const gravityAcceleration = acceleration(position, world, time);
-
-  return {
-    x: desiredAcceleration.x - gravityAcceleration.x,
-    y: desiredAcceleration.y - gravityAcceleration.y,
-  };
-}
-
 function getTargetSpeedBurnAcceleration(
   feature: TargetSpeedBurnPlan,
   motion: Motion,
@@ -289,15 +51,19 @@ function getTargetSpeedBurnAcceleration(
   const remainingSeconds = feature.durationSeconds - feature.elapsedSeconds;
   if (remainingSeconds <= 0) return undefined;
 
-  const requestedAcceleration = calculateRequiredBurnAcceleration(
-    feature.targetVelocity,
-    remainingSeconds,
-    motion.velocity,
-    motion.position,
-    world,
-    time,
+  const requestedAcceleration =
+    PhysicsService.calculateRequiredBurnAcceleration(
+      feature.targetVelocity,
+      remainingSeconds,
+      motion.velocity,
+      motion.position,
+      world,
+      time,
+    );
+  const magnitude = Math.hypot(
+    requestedAcceleration.x,
+    requestedAcceleration.y,
   );
-  const magnitude = Math.hypot(requestedAcceleration.x, requestedAcceleration.y);
   const scale =
     magnitude > feature.maximumAcceleration
       ? feature.maximumAcceleration / magnitude
@@ -341,10 +107,13 @@ export function createTargetSpeedFeature(
     ? getBodyVelocity(world, referenceName, simulatedAt)
     : undefined;
   const currentPosition = referencePosition
-    ? add(referencePosition, relativePosition)
+    ? PhysicsService.add(referencePosition, relativePosition)
     : relativePosition;
   const currentVelocity = referenceVelocity
-    ? add(referenceVelocity, SpaceshipService.getSpaceshipVelocity(spaceship))
+    ? PhysicsService.add(
+        referenceVelocity,
+        SpaceshipService.getSpaceshipVelocity(spaceship),
+      )
     : SpaceshipService.getSpaceshipVelocity(spaceship);
   const direction =
     targetDirection ?? Math.atan2(currentVelocity.y, currentVelocity.x);
@@ -359,14 +128,17 @@ export function createTargetSpeedFeature(
   const velocityChangeSquared = velocityChange.x ** 2 + velocityChange.y ** 2;
   if (velocityChangeSquared === 0) return undefined;
 
-  const gravityAcceleration = acceleration(currentPosition, world, simulatedAt);
+  const gravityAcceleration = PhysicsService.calculateGravityAcceleration(
+    currentPosition,
+    world,
+    simulatedAt,
+  );
   const compensationAcceleration = {
     x: -gravityAcceleration.x,
     y: -gravityAcceleration.y,
   };
   const maximumAcceleration =
-    ((MAX_ENGINE_THRUST_KN * 1_000) / SPACESHIP_MASS_KG) *
-    (maximumThrustPercent / 100);
+    PhysicsService.calculateMaximumEngineAcceleration(maximumThrustPercent);
   const linearCoefficient =
     2 *
     (velocityChange.x * compensationAcceleration.x +
@@ -388,7 +160,7 @@ export function createTargetSpeedFeature(
   if (!Number.isFinite(reciprocalDuration)) return undefined;
 
   const durationSeconds = 1 / reciprocalDuration;
-  const accelerationValue = calculateRequiredBurnAcceleration(
+  const accelerationValue = PhysicsService.calculateRequiredBurnAcceleration(
     targetVelocity,
     durationSeconds,
     currentVelocity,
@@ -396,7 +168,8 @@ export function createTargetSpeedFeature(
     world,
     simulatedAt,
   );
-  if (!getActiveThrusters(accelerationValue, spaceship.stats)) return undefined;
+  if (!PhysicsService.getActiveThrusters(accelerationValue, spaceship.stats))
+    return undefined;
 
   return {
     type: 'target-speed',
@@ -443,7 +216,7 @@ function findImpact(
 
   return {
     fraction,
-    position: add(start, delta, fraction),
+    position: PhysicsService.add(start, delta, fraction),
   };
 }
 
@@ -486,37 +259,6 @@ function findFirstImpact(
   }
 
   return firstImpact;
-}
-
-function rotateAttachedPosition(
-  position: SpaceshipVelocity,
-  elapsedSeconds: number,
-  rotationPeriodSeconds: number | undefined,
-  collisionRadius: number,
-) {
-  if (!rotationPeriodSeconds || rotationPeriodSeconds <= 0) return position;
-  const angle = (2 * Math.PI * elapsedSeconds) / rotationPeriodSeconds;
-  const cos = Math.cos(angle);
-  const sin = Math.sin(angle);
-  const x = position.x * cos - position.y * sin;
-  const y = position.x * sin + position.y * cos;
-  const radius = Math.hypot(x, y);
-  const scale = radius > 0 ? collisionRadius / radius : 1;
-  return { x: x * scale, y: y * scale };
-}
-
-function getSurfaceVelocity(
-  position: SpaceshipVelocity,
-  rotationPeriodSeconds: number | undefined,
-) {
-  if (!rotationPeriodSeconds || rotationPeriodSeconds <= 0) {
-    return { x: 0, y: 0 };
-  }
-  const angularVelocity = (2 * Math.PI) / rotationPeriodSeconds;
-  return {
-    x: -position.y * angularVelocity,
-    y: position.x * angularVelocity,
-  };
 }
 
 function serializeMotion(
@@ -587,7 +329,7 @@ export function getSpaceshipUpdate(
       spaceship,
       motionState,
       {
-        position: rotateAttachedPosition(
+        position: PhysicsService.rotateAttachedPosition(
           relativePosition,
           elapsedSeconds,
           referenceBody.rotationPeriodSeconds,
@@ -614,10 +356,10 @@ export function getSpaceshipUpdate(
       : undefined;
     let motion: Motion = {
       position: initialReferencePosition
-        ? add(initialReferencePosition, relativePosition)
+        ? PhysicsService.add(initialReferencePosition, relativePosition)
         : relativePosition,
       velocity: initialReferenceVelocity
-        ? add(initialReferenceVelocity, relativeVelocity)
+        ? PhysicsService.add(initialReferenceVelocity, relativeVelocity)
         : relativeVelocity,
     };
     const stepCount = Math.min(
@@ -645,7 +387,7 @@ export function getSpaceshipUpdate(
           world,
           stepStartedAt,
         );
-        const activeThrusters = getActiveThrusters(
+        const activeThrusters = PhysicsService.getActiveThrusters(
           requestedAcceleration,
           stats,
         );
@@ -661,7 +403,7 @@ export function getSpaceshipUpdate(
             activeThrusters.availableSeconds,
           );
           thrustAcceleration = activeThrusters.effectiveAcceleration;
-          stats = wearThrusters(
+          stats = PhysicsService.wearThrusters(
             stats,
             activeThrusters.thrustByIndex,
             burnSeconds,
@@ -672,7 +414,7 @@ export function getSpaceshipUpdate(
           );
         }
       }
-      const nextMotion = integrateStep(
+      const nextMotion = PhysicsService.integrateStep(
         motion,
         stepStartedAt,
         burnSeconds > 0 ? burnSeconds : stepSeconds,
@@ -698,9 +440,9 @@ export function getSpaceshipUpdate(
           impact.body.name,
           impactTime,
         );
-        const surfaceVelocity = add(
+        const surfaceVelocity = PhysicsService.add(
           bodyVelocity,
-          getSurfaceVelocity(
+          PhysicsService.getSurfaceVelocity(
             impact.relativePosition,
             impact.body.rotationPeriodSeconds,
           ),
@@ -717,8 +459,7 @@ export function getSpaceshipUpdate(
           impactVelocity.x - surfaceVelocity.x,
           impactVelocity.y - surfaceVelocity.y,
         );
-        impactState =
-          impactSpeed > CRASH_SPEED_METERS_PER_SECOND ? 'crashed' : 'landed';
+        impactState = PhysicsService.getImpactMotionState(impactSpeed);
         activeFeature = undefined;
         break;
       }
@@ -743,7 +484,7 @@ export function getSpaceshipUpdate(
           stepStartedAt.getTime() + burnSeconds * 1_000,
         );
         const coastSeconds = stepSeconds - burnSeconds;
-        const coastMotion = integrateStep(
+        const coastMotion = PhysicsService.integrateStep(
           motion,
           coastStartedAt,
           coastSeconds,
@@ -758,17 +499,16 @@ export function getSpaceshipUpdate(
         );
         if (impact) {
           impactTime = new Date(
-            coastStartedAt.getTime() +
-              impact.fraction * coastSeconds * 1_000,
+            coastStartedAt.getTime() + impact.fraction * coastSeconds * 1_000,
           );
           const bodyVelocity = getBodyVelocity(
             world,
             impact.body.name,
             impactTime,
           );
-          const surfaceVelocity = add(
+          const surfaceVelocity = PhysicsService.add(
             bodyVelocity,
-            getSurfaceVelocity(
+            PhysicsService.getSurfaceVelocity(
               impact.relativePosition,
               impact.body.rotationPeriodSeconds,
             ),
@@ -785,10 +525,7 @@ export function getSpaceshipUpdate(
             impactVelocity.x - surfaceVelocity.x,
             impactVelocity.y - surfaceVelocity.y,
           );
-          impactState =
-            impactSpeed > CRASH_SPEED_METERS_PER_SECOND
-              ? 'crashed'
-              : 'landed';
+          impactState = PhysicsService.getImpactMotionState(impactSpeed);
           activeFeature = undefined;
           break;
         }
@@ -802,7 +539,7 @@ export function getSpaceshipUpdate(
             spaceship,
             impactState,
             {
-              position: rotateAttachedPosition(
+              position: PhysicsService.rotateAttachedPosition(
                 impact.relativePosition,
                 impactTime
                   ? (simulatedAt.getTime() - impactTime.getTime()) / 1_000

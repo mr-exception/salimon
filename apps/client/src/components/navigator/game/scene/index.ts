@@ -1,22 +1,17 @@
 import Phaser from 'phaser';
 import {
   advanceWorld,
-  didSpaceshipBurnComplete,
   getBodyWorldVelocity,
   getSpaceshipAttachedBodyName,
-  getSpaceshipBurnAcceleration,
   getSpaceshipMotionState,
   getSpaceshipWorldVelocity,
   isSpaceshipEngineRunning,
   refreshWorldViewport,
-  resolveSpaceshipPlanetCollision,
   setActiveWorldBodyNames,
   setSpaceshipTargetDirection,
   setSpaceshipHeading,
-  setSpaceshipManualThrust,
   startSpaceshipTargetSpeedFeature,
   stopSpaceshipActiveFeature,
-  stopSpaceshipEngines,
   WORLD_VIEWPORT_REFRESH_INTERVAL_MS,
 } from '@store';
 import type { Planet as PlanetData, Star as StarData } from '@repo/types';
@@ -35,10 +30,6 @@ import {
   PLANET_PATTERN_VARIANT_COUNT,
 } from '../planet';
 import { SPACESHIP_TEXTURE_KEY, type Spaceship } from '../spaceship';
-import {
-  getPlanetNameFromPhysicsLabel,
-  SPACESHIP_PHYSICS_LABEL,
-} from '../physics';
 import {
   getStarPatternTextureKey,
   Star,
@@ -194,15 +185,7 @@ export class Scene extends Phaser.Scene {
     this.predictionGraphics = this.add.graphics().setDepth(19);
     this.drawVisibleWorld();
     this.configureInput();
-    this.matter.world.on(
-      Phaser.Physics.Matter.Events.COLLISION_START,
-      this.handleMatterCollision,
-    );
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      this.matter.world.off(
-        Phaser.Physics.Matter.Events.COLLISION_START,
-        this.handleMatterCollision,
-      );
       this.unsubscribeFromWorld?.();
       this.unsubscribeFromWorld = undefined;
       window.clearInterval(this.viewportRefreshTimer);
@@ -229,19 +212,14 @@ export class Scene extends Phaser.Scene {
     const spaceshipEngineRunning = isSpaceshipEngineRunning();
     if (!this.spaceshipEngineRunning && spaceshipEngineRunning) {
       this.spaceshipEngineRunning = true;
-      this.spaceship?.setThrustersActive(true, getSpaceshipBurnAcceleration());
+      this.spaceship?.setThrustersActive(true);
       this.onSpaceshipEngineChange?.(true, this.getSpaceshipSpeed());
     } else if (this.spaceshipEngineRunning && !spaceshipEngineRunning) {
       this.spaceshipEngineRunning = false;
       this.spaceship?.setThrustersActive(false);
-      if (didSpaceshipBurnComplete()) {
-        this.spaceship?.clearTargetDirection();
-        this.targetDirection = undefined;
-        setSpaceshipTargetDirection(undefined);
-      }
       this.onSpaceshipEngineChange?.(false, this.getSpaceshipSpeed());
     } else if (spaceshipEngineRunning) {
-      this.spaceship?.setThrustersActive(true, getSpaceshipBurnAcceleration());
+      this.spaceship?.setThrustersActive(true);
     }
 
     const camera = this.cameras.main;
@@ -267,20 +245,6 @@ export class Scene extends Phaser.Scene {
     this.drawMeasurements();
     this.drawPredictions();
   }
-
-  private readonly handleMatterCollision = (
-    event: Phaser.Physics.Matter.Events.CollisionStartEvent,
-  ) => {
-    event.pairs.forEach(({ bodyA, bodyB }) => {
-      const labels = [bodyA.label, bodyB.label];
-      if (!labels.includes(SPACESHIP_PHYSICS_LABEL)) return;
-
-      const planetName = labels
-        .map(getPlanetNameFromPhysicsLabel)
-        .find((name) => name !== undefined);
-      if (planetName) resolveSpaceshipPlanetCollision(planetName);
-    });
-  };
 
   setZoom(zoom: number) {
     const camera = this.cameras.main;
@@ -446,19 +410,12 @@ export class Scene extends Phaser.Scene {
       stopSpaceshipActiveFeature();
     } catch (error) {
       console.error('Failed to stop active spaceship feature', error);
-      if (!stopSpaceshipEngines()) return;
+      return;
     }
 
     this.spaceshipEngineRunning = false;
     this.spaceship?.setThrustersActive(false);
     this.onSpaceshipEngineChange?.(false, this.getSpaceshipSpeed());
-  }
-
-  setManualThrust(
-    direction: { x: number; y: number } | undefined,
-    power: number,
-  ) {
-    setSpaceshipManualThrust(direction, power);
   }
 
   private reportSpaceshipTurn(remainingDegrees: number, isTurning: boolean) {

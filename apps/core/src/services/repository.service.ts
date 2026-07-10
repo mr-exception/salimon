@@ -55,9 +55,8 @@ function cloneSpaceship(spaceship: SpaceshipDocument): SpaceshipDocument {
 }
 
 function toPublicBody(body: WorldBodyDocument): WorldBodyDocument {
-  const { _id, updatedAt, ...publicBody } = cloneBody(body);
+  const { _id, ...publicBody } = cloneBody(body);
   void _id;
-  void updatedAt;
   return publicBody as WorldBodyDocument;
 }
 

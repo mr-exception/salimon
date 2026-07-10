@@ -41,6 +41,9 @@ const PROXIMITY_TELEMETRY_RANGE_METERS = 3_000_000;
 const WORLD_SEARCH_RADIUS_METERS = '1025000000000000000';
 const DEFAULT_API_BASE_URL = 'http://localhost:3000';
 export const WORLD_VIEWPORT_REFRESH_INTERVAL_MS = 5 * 60 * 1_000;
+const GRAVITATIONAL_CONSTANT = 6.6743e-11;
+const MAX_PROPAGATION_STEPS = 20_000;
+const TARGET_STEP_SECONDS = 30;
 const DEFAULT_PLANET_SHAPE_RENDER_ZOOM_LEVEL = 0.000001;
 const DEFAULT_PLANET_RENDER_ZOOM_LEVEL = 0.0000001;
 const DEFAULT_STAR_SHAPE_RENDER_ZOOM_LEVEL = 0.0000000001;
@@ -161,7 +164,6 @@ const listeners = new Set<WorldListener>();
 let loadPromise: Promise<World> | undefined;
 let worldBodyByName = new Map<string, Body>();
 let bodyVelocityByName = new Map<string, Vector>();
-const positionRemainderByName = new Map<string, Vector>();
 let spaceshipVelocity: Vector | undefined;
 let spaceshipPositionRemainder: Vector = { x: 0, y: 0 };
 let spaceshipStoredRelativeVelocity: Vector | undefined;
@@ -252,7 +254,6 @@ function applyWorldSystems(data: SerializedWorldSystems) {
   worldState.planets = mergeBodies(worldState.planets, planets);
   bodyVelocityByName = new Map([...bodyVelocityByName, ...nextVelocities]);
   [...stars, ...planets].forEach((body) => {
-    positionRemainderByName.delete(body.name);
     advanceBodyPositionToNow(body);
   });
   rebuildWorldBodyByName();
@@ -296,8 +297,7 @@ export function hydrateSpaceship(dto: SpaceshipDto) {
     y: BigInt(dto.position.y),
     relativeTo: dto.position.relativeTo,
   };
-  spaceshipState.positionCapturedAt =
-    dto.positionCapturedAt ?? dto.simulatedAt;
+  spaceshipState.positionCapturedAt = dto.positionCapturedAt ?? dto.simulatedAt;
   spaceshipState.heading = dto.direction;
   spaceshipState.speed = BigInt(dto.speed);
   spaceshipState.orbitalCenter = null;
@@ -427,6 +427,16 @@ export function isSpaceshipEngineRunning() {
 }
 
 export function getSpaceshipActiveThrustVector() {
+  return calculateSpaceshipActiveThrustAcceleration({
+    position: toVector(getWorldPosition(spaceshipState.position)),
+    velocity: getSpaceshipWorldVelocity(),
+  });
+}
+
+function calculateSpaceshipActiveThrustAcceleration(motion: {
+  position: Vector;
+  velocity: Vector;
+}) {
   const activeFeature = store.get(spaceshipActiveFeatureAtom);
   if (activeFeature?.type !== 'target-speed') return undefined;
 
@@ -434,10 +444,14 @@ export function getSpaceshipActiveThrustVector() {
     activeFeature.durationSeconds - activeFeature.elapsedSeconds;
   if (remainingSeconds <= 0) return undefined;
 
-  const currentVelocity = getSpaceshipWorldVelocity();
+  const gravityAcceleration = calculateGravityAcceleration(motion.position);
   return {
-    x: (activeFeature.targetVelocity.x - currentVelocity.x) / remainingSeconds,
-    y: (activeFeature.targetVelocity.y - currentVelocity.y) / remainingSeconds,
+    x:
+      (activeFeature.targetVelocity.x - motion.velocity.x) / remainingSeconds -
+      gravityAcceleration.x,
+    y:
+      (activeFeature.targetVelocity.y - motion.velocity.y) / remainingSeconds -
+      gravityAcceleration.y,
   };
 }
 
@@ -562,19 +576,7 @@ function getInitialSpaceshipWorldVelocity() {
 
 function advanceBodyPositions(elapsedSeconds: number) {
   for (const body of [...worldState.stars, ...worldState.planets]) {
-    const velocity = getBodyWorldVelocity(body.name);
-    const referenceVelocity = getPositionReferenceVelocity(body.position);
-    const remainder = positionRemainderByName.get(body.name) ?? { x: 0, y: 0 };
-    const nextRemainder = advancePositionByVelocity(
-      body.position,
-      {
-        x: velocity.x - referenceVelocity.x,
-        y: velocity.y - referenceVelocity.y,
-      },
-      elapsedSeconds,
-      remainder,
-    );
-    positionRemainderByName.set(body.name, nextRemainder);
+    advanceBodyPositionByOrbit(body, elapsedSeconds);
   }
 }
 
@@ -585,22 +587,40 @@ function advanceBodyPositionToNow(body: Planet | Star) {
   const positionCapturedAtMs = Date.parse(positionCapturedAt);
   if (!Number.isFinite(positionCapturedAtMs)) return;
 
-  const elapsedSeconds = Math.max(0, (Date.now() - positionCapturedAtMs) / 1000);
+  const elapsedSeconds = Math.max(
+    0,
+    (Date.now() - positionCapturedAtMs) / 1000,
+  );
   if (elapsedSeconds <= 0) return;
 
-  const velocity = getBodyWorldVelocity(body.name);
-  const referenceVelocity = getPositionReferenceVelocity(body.position);
-  const remainder = advancePositionByVelocity(
-    body.position,
-    {
-      x: velocity.x - referenceVelocity.x,
-      y: velocity.y - referenceVelocity.y,
-    },
-    elapsedSeconds,
-    { x: 0, y: 0 },
-  );
-  positionRemainderByName.set(body.name, remainder);
+  advanceBodyPositionByOrbit(body, elapsedSeconds);
   body.positionCapturedAt = new Date().toISOString();
+}
+
+function advanceBodyPositionByOrbit(
+  body: Planet | Star,
+  elapsedSeconds: number,
+) {
+  const x = Number(body.position.x);
+  const y = Number(body.position.y);
+  const orbitalRadius = Math.hypot(x, y);
+  const speed = Number(body.speed);
+
+  if (
+    !body.orbitalCenter ||
+    orbitalRadius === 0 ||
+    speed === 0 ||
+    elapsedSeconds <= 0
+  ) {
+    return;
+  }
+
+  const direction = body.clockwise ? 1 : -1;
+  const angle = (direction * speed * elapsedSeconds) / orbitalRadius;
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+  body.position.x = BigInt(Math.round(x * cos - y * sin));
+  body.position.y = BigInt(Math.round(x * sin + y * cos));
 }
 
 function advanceSpaceshipToNow(positionCapturedAt: string | undefined) {
@@ -609,7 +629,10 @@ function advanceSpaceshipToNow(positionCapturedAt: string | undefined) {
   const positionCapturedAtMs = Date.parse(positionCapturedAt);
   if (!Number.isFinite(positionCapturedAtMs)) return;
 
-  const elapsedSeconds = Math.max(0, (Date.now() - positionCapturedAtMs) / 1000);
+  const elapsedSeconds = Math.max(
+    0,
+    (Date.now() - positionCapturedAtMs) / 1000,
+  );
   if (elapsedSeconds > 0) advanceSpaceshipPosition(elapsedSeconds);
   spaceshipState.positionCapturedAt = new Date().toISOString();
 }
@@ -618,19 +641,158 @@ function advanceSpaceshipPosition(elapsedSeconds: number) {
   const motionState = store.get(spaceshipMotionStateAtom);
   if (motionState !== 'flying') return;
 
-  const velocity = getSpaceshipWorldVelocity();
-  const referenceVelocity = getPositionReferenceVelocity(
-    spaceshipState.position,
+  const motion = integrateSpaceshipMotion(
+    {
+      position: toVector(getWorldPosition(spaceshipState.position)),
+      velocity: getSpaceshipWorldVelocity(),
+    },
+    elapsedSeconds,
   );
+  spaceshipVelocity = motion.velocity;
+  const referencePosition = spaceshipState.position.relativeTo
+    ? toVector(
+        getWorldPosition({
+          x: 0n,
+          y: 0n,
+          relativeTo: spaceshipState.position.relativeTo,
+        }),
+      )
+    : { x: 0, y: 0 };
   spaceshipPositionRemainder = advancePositionByVelocity(
     spaceshipState.position,
     {
-      x: velocity.x - referenceVelocity.x,
-      y: velocity.y - referenceVelocity.y,
+      x:
+        motion.position.x -
+        referencePosition.x -
+        Number(spaceshipState.position.x),
+      y:
+        motion.position.y -
+        referencePosition.y -
+        Number(spaceshipState.position.y),
     },
-    elapsedSeconds,
+    1,
     spaceshipPositionRemainder,
   );
+  advanceActiveFeature(elapsedSeconds);
+}
+
+function integrateSpaceshipMotion(
+  motion: { position: Vector; velocity: Vector },
+  elapsedSeconds: number,
+) {
+  if (elapsedSeconds <= 0) return motion;
+
+  const stepCount = Math.min(
+    MAX_PROPAGATION_STEPS,
+    Math.max(1, Math.ceil(elapsedSeconds / TARGET_STEP_SECONDS)),
+  );
+  const stepSeconds = elapsedSeconds / stepCount;
+  let nextMotion = motion;
+
+  for (let step = 0; step < stepCount; step += 1) {
+    nextMotion = integrateSpaceshipStep(nextMotion, stepSeconds);
+  }
+
+  return nextMotion;
+}
+
+function integrateSpaceshipStep(
+  motion: { position: Vector; velocity: Vector },
+  seconds: number,
+) {
+  const thrustAcceleration = calculateSpaceshipActiveThrustAcceleration(motion);
+  const position1 = motion.velocity;
+  const velocity1 = calculateAcceleration(motion.position, thrustAcceleration);
+  const position2 = addVector(motion.velocity, velocity1, seconds / 2);
+  const velocity2 = calculateAcceleration(
+    addVector(motion.position, position1, seconds / 2),
+    thrustAcceleration,
+  );
+  const position3 = addVector(motion.velocity, velocity2, seconds / 2);
+  const velocity3 = calculateAcceleration(
+    addVector(motion.position, position2, seconds / 2),
+    thrustAcceleration,
+  );
+  const position4 = addVector(motion.velocity, velocity3, seconds);
+  const velocity4 = calculateAcceleration(
+    addVector(motion.position, position3, seconds),
+    thrustAcceleration,
+  );
+
+  return {
+    position: {
+      x:
+        motion.position.x +
+        (seconds / 6) *
+          (position1.x + 2 * position2.x + 2 * position3.x + position4.x),
+      y:
+        motion.position.y +
+        (seconds / 6) *
+          (position1.y + 2 * position2.y + 2 * position3.y + position4.y),
+    },
+    velocity: {
+      x:
+        motion.velocity.x +
+        (seconds / 6) *
+          (velocity1.x + 2 * velocity2.x + 2 * velocity3.x + velocity4.x),
+      y:
+        motion.velocity.y +
+        (seconds / 6) *
+          (velocity1.y + 2 * velocity2.y + 2 * velocity3.y + velocity4.y),
+    },
+  };
+}
+
+function calculateAcceleration(position: Vector, thrustAcceleration?: Vector) {
+  const gravityAcceleration = calculateGravityAcceleration(position);
+  return {
+    x: gravityAcceleration.x + (thrustAcceleration?.x ?? 0),
+    y: gravityAcceleration.y + (thrustAcceleration?.y ?? 0),
+  };
+}
+
+function calculateGravityAcceleration(position: Vector) {
+  let x = 0;
+  let y = 0;
+
+  for (const body of [...worldState.stars, ...worldState.planets]) {
+    const bodyPosition = toVector(getWorldPosition(body.position));
+    const deltaX = bodyPosition.x - position.x;
+    const deltaY = bodyPosition.y - position.y;
+    const radiusSquared = deltaX ** 2 + deltaY ** 2;
+    if (radiusSquared === 0) continue;
+
+    const scale =
+      (GRAVITATIONAL_CONSTANT * Number(body.mass)) /
+      (radiusSquared * Math.sqrt(radiusSquared));
+    x += deltaX * scale;
+    y += deltaY * scale;
+  }
+
+  return { x, y };
+}
+
+function advanceActiveFeature(elapsedSeconds: number) {
+  const activeFeature = store.get(spaceshipActiveFeatureAtom);
+  if (activeFeature?.type !== 'target-speed') return;
+
+  const nextElapsedSeconds = Math.min(
+    activeFeature.durationSeconds,
+    activeFeature.elapsedSeconds + elapsedSeconds,
+  );
+  store.set(
+    spaceshipActiveFeatureAtom,
+    nextElapsedSeconds >= activeFeature.durationSeconds
+      ? undefined
+      : { ...activeFeature, elapsedSeconds: nextElapsedSeconds },
+  );
+}
+
+function addVector(value: Vector, change: Vector, scale = 1): Vector {
+  return {
+    x: value.x + change.x * scale,
+    y: value.y + change.y * scale,
+  };
 }
 
 function advancePositionByVelocity(
@@ -651,12 +813,6 @@ function advancePositionByVelocity(
     x: deltaX - wholeX,
     y: deltaY - wholeY,
   };
-}
-
-function getPositionReferenceVelocity(position: Position) {
-  return position.relativeTo
-    ? getBodyWorldVelocity(position.relativeTo)
-    : { x: 0, y: 0 };
 }
 
 function getSpaceshipReferenceVelocity() {

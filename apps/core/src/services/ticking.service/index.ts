@@ -6,15 +6,15 @@ import { TICK_INTERVAL_MS } from './constants';
 import { getSpaceshipUpdate } from './get-spaceship-update';
 import type { Timer, WorldSnapshot } from './types';
 
+type TickResult = {
+  bodies: number;
+  spaceships: number;
+};
+
 export class TickingService {
   private static timer: Timer | undefined;
   private static startPromise: Promise<void> | undefined;
-  private static tickPromise:
-    | Promise<{
-        bodies: number;
-        spaceships: number;
-      }>
-    | undefined;
+  private static tickPromise: Promise<TickResult> | undefined;
 
   static async start() {
     TickingService.startPromise ??= TickingService.startTicking();
@@ -66,8 +66,10 @@ export class TickingService {
 
   static async updateSpaceships(time: string | Date = new Date()) {
     await TickingService.start();
+    const invocationTime = TickingService.parseInvocationTime(time);
     const processed = await TickingService.advanceSpaceships(
-      TickingService.parseInvocationTime(time),
+      invocationTime,
+      await TickingService.loadWorldSnapshot(),
     );
     return {
       selected: processed,
@@ -106,8 +108,12 @@ export class TickingService {
 
     const startedAt = Date.now();
     TickingService.tickPromise = (async () => {
+      const world = await TickingService.loadWorldSnapshot();
       const bodies = await TickingService.advanceBodies(invocationTime);
-      const spaceships = await TickingService.advanceSpaceships(invocationTime);
+      const spaceships = await TickingService.advanceSpaceships(
+        invocationTime,
+        world,
+      );
       return { bodies, spaceships };
     })().finally(() => {
       console.log(`tick passed: ${Date.now() - startedAt}ms`);
@@ -122,12 +128,20 @@ export class TickingService {
 
     await RepositoryService.updateWorldBodies((worldData) => {
       for (const body of [
-        ...worldData.stars,
-        ...worldData.planets,
-        ...worldData.moons,
+        ...[...worldData.stars].sort((left, right) =>
+          left.name.localeCompare(right.name),
+        ),
+        ...[...worldData.planets].sort((left, right) =>
+          left.name.localeCompare(right.name),
+        ),
+        ...[...worldData.moons].sort((left, right) =>
+          left.name.localeCompare(right.name),
+        ),
       ]) {
-        const elapsedSeconds =
-          (invocationTime.getTime() - body.updatedAt.getTime()) / 1_000;
+        const elapsedSeconds = Math.max(
+          0,
+          (invocationTime.getTime() - body.updatedAt.getTime()) / 1_000,
+        );
         body.position = advanceBodyPosition(body, elapsedSeconds);
         body.updatedAt = invocationTime;
         updated += 1;
@@ -139,14 +153,18 @@ export class TickingService {
     return updated;
   }
 
-  private static async advanceSpaceships(invocationTime: Date) {
-    const world = await TickingService.loadWorldSnapshot();
+  private static async advanceSpaceships(
+    invocationTime: Date,
+    world: WorldSnapshot,
+  ) {
     let processed = 0;
 
     await RepositoryService.updateSpaceships((spaceshipsBySecurityCode) => {
-      const spaceships = [...spaceshipsBySecurityCode.values()].map(
-        cloneSpaceship,
-      );
+      const spaceships = [...spaceshipsBySecurityCode.values()]
+        .sort((left, right) =>
+          left.securityCode.localeCompare(right.securityCode),
+        )
+        .map(cloneSpaceship);
 
       for (const spaceship of spaceships) {
         const update = getSpaceshipUpdate(spaceship, invocationTime, world);

@@ -81,6 +81,7 @@ export function createTargetSpeedFeature(
   targetSpeedMetersPerSecond: number,
   maximumThrustPercent: number,
   targetDirection?: number,
+  referenceName?: string,
 ): TargetSpeedBurnPlan | undefined {
   if (
     spaceship.activeFeature ||
@@ -95,31 +96,23 @@ export function createTargetSpeedFeature(
     return undefined;
   }
 
-  const relativePosition = {
+  const currentPosition = {
     x: Number(spaceship.position.x),
     y: Number(spaceship.position.y),
   };
-  const referenceName = spaceship.position.relativeTo;
-  const referencePosition = referenceName
-    ? getBodyPositions(world, simulatedAt).get(referenceName)
-    : undefined;
   const referenceVelocity = referenceName
     ? getBodyVelocity(world, referenceName, simulatedAt)
     : undefined;
-  const currentPosition = referencePosition
-    ? PhysicsService.add(referencePosition, relativePosition)
-    : relativePosition;
-  const currentVelocity = referenceVelocity
-    ? PhysicsService.add(
-        referenceVelocity,
-        SpaceshipService.getSpaceshipVelocity(spaceship),
-      )
-    : SpaceshipService.getSpaceshipVelocity(spaceship);
+  const currentVelocity = SpaceshipService.getSpaceshipVelocity(spaceship);
   const direction =
     targetDirection ?? Math.atan2(currentVelocity.y, currentVelocity.x);
-  const targetVelocity = {
+  const targetRelativeVelocity = {
     x: Math.cos(direction) * targetSpeedMetersPerSecond,
     y: Math.sin(direction) * targetSpeedMetersPerSecond,
+  };
+  const targetVelocity = {
+    x: (referenceVelocity?.x ?? 0) + targetRelativeVelocity.x,
+    y: (referenceVelocity?.y ?? 0) + targetRelativeVelocity.y,
   };
   const velocityChange = {
     x: targetVelocity.x - currentVelocity.x,
@@ -261,6 +254,43 @@ function findFirstImpact(
   return firstImpact;
 }
 
+function findClosestBody(
+  position: SpaceshipVelocity,
+  world: WorldSnapshot,
+  time: Date,
+) {
+  const positions = getBodyPositions(world, time);
+  let closest:
+    | {
+        body: WorldSnapshot['bodies'][number];
+        position: SpaceshipVelocity;
+        surfaceDistance: number;
+      }
+    | undefined;
+
+  for (const body of world.bodies) {
+    const bodyPosition = positions.get(body.name);
+    if (!bodyPosition) continue;
+
+    const centerDistance = Math.hypot(
+      position.x - bodyPosition.x,
+      position.y - bodyPosition.y,
+    );
+    const surfaceDistance =
+      centerDistance - Number(body.radius) - SPACESHIP_RADIUS_METERS;
+    if (
+      closest &&
+      Math.abs(surfaceDistance) >= Math.abs(closest.surfaceDistance)
+    ) {
+      continue;
+    }
+
+    closest = { body, position: bodyPosition, surfaceDistance };
+  }
+
+  return closest;
+}
+
 function serializeMotion(
   spaceship: SpaceshipDocument,
   motionState: SpaceshipMotionState,
@@ -322,31 +352,53 @@ export function getSpaceshipUpdate(
   let update: Partial<SpaceshipDocument> | undefined;
   let activeFeature = spaceship.activeFeature;
 
-  if (motionState !== 'flying' && referenceBody) {
-    const collisionRadius =
-      Number(referenceBody.radius) + SPACESHIP_RADIUS_METERS;
-    update = serializeMotion(
-      spaceship,
-      motionState,
-      {
-        position: PhysicsService.rotateAttachedPosition(
+  if (motionState !== 'flying') {
+    const previousPosition = referenceBody
+      ? PhysicsService.add(
+          getBodyPositions(world, previousSimulationTime).get(referenceName!) ??
+            { x: 0, y: 0 },
           relativePosition,
-          elapsedSeconds,
-          referenceBody.rotationPeriodSeconds,
-          collisionRadius,
-        ),
+        )
+      : relativePosition;
+    const closestBody = findClosestBody(
+      previousPosition,
+      world,
+      previousSimulationTime,
+    );
+    if (!closestBody) {
+      update = {
+        position: spaceship.position,
         velocity: { x: 0, y: 0 },
-      },
-      simulatedAt,
-      referenceName,
-    );
-  } else if (motionState !== 'flying') {
-    update = serializeMotion(
-      spaceship,
-      motionState,
-      { position: relativePosition, velocity: { x: 0, y: 0 } },
-      simulatedAt,
-    );
+        speed: '0',
+        direction: spaceship.direction,
+        motionState,
+        simulatedAt,
+        updatedAt: simulatedAt,
+      };
+    } else {
+      const attachedPosition = PhysicsService.rotateAttachedPosition(
+        {
+          x: previousPosition.x - closestBody.position.x,
+          y: previousPosition.y - closestBody.position.y,
+        },
+        elapsedSeconds,
+        closestBody.body.rotationPeriodSeconds,
+        Number(closestBody.body.radius) + SPACESHIP_RADIUS_METERS,
+      );
+      update = {
+        position: {
+          x: Math.round(attachedPosition.x).toString(),
+          y: Math.round(attachedPosition.y).toString(),
+          relativeTo: closestBody.body.name,
+        },
+        velocity: { x: 0, y: 0 },
+        speed: '0',
+        direction: spaceship.direction,
+        motionState,
+        simulatedAt,
+        updatedAt: simulatedAt,
+      };
+    }
   } else {
     const initialReferencePosition = referenceName
       ? getBodyPositions(world, previousSimulationTime).get(referenceName)

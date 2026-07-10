@@ -3,6 +3,7 @@ import {
   ContactsService,
   RepositoryService,
   SpaceshipService,
+  TickingService,
 } from '@services';
 import { asyncHandler, sendError } from '../http';
 
@@ -12,7 +13,7 @@ spaceshipsRouter.post(
   '/register',
   asyncHandler(async (_request, response) => {
     try {
-      const spaceship = SpaceshipService.createSpaceship();
+      const spaceship = await TickingService.createSpaceship();
       await RepositoryService.insertSpaceship(spaceship);
       await ContactsService.initializeSpaceshipContacts(spaceship.securityCode);
       response

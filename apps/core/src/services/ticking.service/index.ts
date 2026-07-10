@@ -3,7 +3,11 @@ import { RepositoryService } from '../repository.service';
 import { SpaceshipService } from '../spaceship.service';
 import { advanceBodyPosition } from './advance-body-position';
 import { cloneSpaceship } from './clone-spaceship';
-import { SPACESHIP_RADIUS_METERS, TICK_INTERVAL_MS } from './constants';
+import {
+  SPACESHIP_LAUNCH_CLEARANCE_METERS,
+  SPACESHIP_RADIUS_METERS,
+  TICK_INTERVAL_MS,
+} from './constants';
 import {
   createTargetSpeedFeature,
   getBodyPositions,
@@ -45,6 +49,23 @@ export class TickingService {
   static async getWorldSystemsBodies() {
     await TickingService.start();
     return RepositoryService.getWorldSystemsBodies();
+  }
+
+  static async createSpaceship() {
+    const spaceship = SpaceshipService.createSpaceship();
+    const simulatedAt = spaceship.simulatedAt ?? new Date();
+    const world = await TickingService.loadWorldSnapshot();
+    const absoluteUpdate = TickingService.getAbsoluteSpaceshipUpdate(
+      spaceship,
+      simulatedAt,
+      world,
+    );
+    return {
+      ...spaceship,
+      ...absoluteUpdate,
+      position: absoluteUpdate?.position ?? spaceship.position,
+      velocity: absoluteUpdate?.velocity ?? spaceship.velocity,
+    };
   }
 
   static async updateWorld(time: string | Date = new Date()) {
@@ -89,9 +110,28 @@ export class TickingService {
     suppliedWorld?: WorldSnapshot,
   ) {
     const world = suppliedWorld ?? (await TickingService.loadWorldSnapshot());
-    const update = getSpaceshipUpdate(spaceship, simulatedAt, world);
-    if (!update) return spaceship;
-    return RepositoryService.updatePropagatedSpaceship(spaceship, update);
+    const absoluteUpdate = TickingService.getAbsoluteSpaceshipUpdate(
+      spaceship,
+      simulatedAt,
+      world,
+    );
+    const currentSpaceship = absoluteUpdate
+      ? {
+          ...spaceship,
+          ...absoluteUpdate,
+          position: absoluteUpdate.position ?? spaceship.position,
+          velocity: absoluteUpdate.velocity ?? spaceship.velocity,
+        }
+      : spaceship;
+    const update = getSpaceshipUpdate(currentSpaceship, simulatedAt, world);
+    if (!absoluteUpdate && !update) return spaceship;
+    return RepositoryService.updatePropagatedSpaceship(spaceship, {
+      ...absoluteUpdate,
+      ...update,
+      position: update?.position ?? absoluteUpdate?.position,
+      velocity: update?.velocity ?? absoluteUpdate?.velocity,
+      stats: update?.stats ?? absoluteUpdate?.stats,
+    });
   }
 
   static async startSpaceshipTargetSpeedFeature(
@@ -109,55 +149,103 @@ export class TickingService {
       simulatedAt,
       world,
     );
+    const currentReferenceName = currentSpaceship.position.relativeTo;
+    const currentReferenceBody = currentReferenceName
+      ? world.bodiesByName.get(currentReferenceName)
+      : undefined;
+    const currentReferencePosition = currentReferenceName
+      ? getBodyPositions(world, simulatedAt).get(currentReferenceName)
+      : undefined;
+    const currentReferenceVelocity =
+      currentReferenceName && currentReferenceBody
+        ? getBodyVelocity(world, currentReferenceName, simulatedAt)
+        : undefined;
+    const relativePosition = {
+      x: Number(currentSpaceship.position.x),
+      y: Number(currentSpaceship.position.y),
+    };
+    const absolutePosition = currentReferencePosition
+      ? {
+          x: currentReferencePosition.x + relativePosition.x,
+          y: currentReferencePosition.y + relativePosition.y,
+        }
+      : relativePosition;
+    const relativeVelocity =
+      SpaceshipService.getSpaceshipVelocity(currentSpaceship);
+    const worldVelocity = currentReferenceVelocity
+      ? {
+          x: currentReferenceVelocity.x + relativeVelocity.x,
+          y: currentReferenceVelocity.y + relativeVelocity.y,
+        }
+      : relativeVelocity;
+    const planningSpaceship = {
+      ...currentSpaceship,
+      position: {
+        x: Math.round(absolutePosition.x).toString(),
+        y: Math.round(absolutePosition.y).toString(),
+      },
+      velocity: worldVelocity,
+    };
+    const launchReference =
+      currentReferenceBody && currentReferencePosition && currentReferenceVelocity
+        ? {
+            body: currentReferenceBody,
+            position: currentReferencePosition,
+            velocity: currentReferenceVelocity,
+            surfaceDistance: 0,
+          }
+        : TickingService.findClosestReference(
+            planningSpaceship,
+            simulatedAt,
+            world,
+          );
     const activeFeature = createTargetSpeedFeature(
-      currentSpaceship,
+      planningSpaceship,
       simulatedAt,
       world,
       params.targetSpeedMetersPerSecond,
       params.maximumThrustPercent,
       params.targetDirection,
+      launchReference?.body.name,
     );
     if (!activeFeature) return undefined;
 
-    const referencePosition = currentSpaceship.position.relativeTo
-      ? getBodyPositions(world, simulatedAt).get(
-          currentSpaceship.position.relativeTo,
-        )
-      : undefined;
-    const referenceVelocity = currentSpaceship.position.relativeTo
-      ? getBodyVelocity(world, currentSpaceship.position.relativeTo, simulatedAt)
-      : undefined;
-    const relativePosition = {
-      x: Number(currentSpaceship.position.x),
-      y: Number(currentSpaceship.position.y),
-    };
-    const relativeRadius = Math.hypot(relativePosition.x, relativePosition.y);
-    const launchClearanceMeters = SPACESHIP_RADIUS_METERS * 5;
-    const launchClearance =
+    const referencePosition = launchReference?.position;
+    const referenceBody = launchReference?.body;
+    const referenceVelocity = launchReference?.velocity;
+    const launchRelativePosition = referencePosition
+      ? {
+          x: absolutePosition.x - referencePosition.x,
+          y: absolutePosition.y - referencePosition.y,
+        }
+      : absolutePosition;
+    const relativeRadius = Math.hypot(
+      launchRelativePosition.x,
+      launchRelativePosition.y,
+    );
+    const launchRadius =
+      referenceBody && relativeRadius > 0
+        ? Number(referenceBody.radius) +
+          SPACESHIP_RADIUS_METERS +
+          SPACESHIP_LAUNCH_CLEARANCE_METERS
+        : relativeRadius;
+    const launchPosition =
       referencePosition && relativeRadius > 0
         ? {
-            x: (relativePosition.x / relativeRadius) * launchClearanceMeters,
-            y: (relativePosition.y / relativeRadius) * launchClearanceMeters,
+            x: (launchRelativePosition.x / relativeRadius) * launchRadius,
+            y: (launchRelativePosition.y / relativeRadius) * launchRadius,
           }
-        : { x: 0, y: 0 };
+        : launchRelativePosition;
     const worldPosition = referencePosition
       ? {
-          x: Math.round(
-            referencePosition.x + relativePosition.x + launchClearance.x,
-          ).toString(),
-          y: Math.round(
-            referencePosition.y + relativePosition.y + launchClearance.y,
-          ).toString(),
+          x: Math.round(referencePosition.x + launchPosition.x).toString(),
+          y: Math.round(referencePosition.y + launchPosition.y).toString(),
         }
       : currentSpaceship.position;
-    const worldVelocity = referenceVelocity
+    const launchWorldVelocity = referenceVelocity
       ? {
-          x:
-            referenceVelocity.x +
-            SpaceshipService.getSpaceshipVelocity(currentSpaceship).x,
-          y:
-            referenceVelocity.y +
-            SpaceshipService.getSpaceshipVelocity(currentSpaceship).y,
+          x: referenceVelocity.x + relativeVelocity.x,
+          y: referenceVelocity.y + relativeVelocity.y,
         }
       : currentSpaceship.velocity;
 
@@ -165,7 +253,7 @@ export class TickingService {
       activeFeature,
       motionState: 'flying',
       position: worldPosition,
-      velocity: worldVelocity,
+      velocity: launchWorldVelocity,
       simulatedAt,
       updatedAt: simulatedAt,
     });
@@ -263,8 +351,25 @@ export class TickingService {
         .map(cloneSpaceship);
 
       for (const spaceship of spaceships) {
-        const update = getSpaceshipUpdate(spaceship, invocationTime, world);
-        if (!update) continue;
+        const absoluteUpdate = TickingService.getAbsoluteSpaceshipUpdate(
+          spaceship,
+          invocationTime,
+          world,
+        );
+        const currentSpaceship = absoluteUpdate
+          ? {
+              ...spaceship,
+              ...absoluteUpdate,
+              position: absoluteUpdate.position ?? spaceship.position,
+              velocity: absoluteUpdate.velocity ?? spaceship.velocity,
+            }
+          : spaceship;
+        const update = getSpaceshipUpdate(
+          currentSpaceship,
+          invocationTime,
+          world,
+        );
+        if (!absoluteUpdate && !update) continue;
 
         const current = spaceshipsBySecurityCode.get(spaceship.securityCode);
         if (
@@ -278,10 +383,13 @@ export class TickingService {
           spaceship.securityCode,
           cloneSpaceship({
             ...current,
+            ...absoluteUpdate,
             ...update,
-            position: update.position ?? current.position,
-            velocity: update.velocity ?? current.velocity,
-            stats: update.stats ?? current.stats,
+            position:
+              update?.position ?? absoluteUpdate?.position ?? current.position,
+            velocity:
+              update?.velocity ?? absoluteUpdate?.velocity ?? current.velocity,
+            stats: update?.stats ?? current.stats,
           }),
         );
         processed += 1;
@@ -308,5 +416,83 @@ export class TickingService {
       throw new Error('Invocation time is invalid');
     }
     return invocationTime;
+  }
+
+  private static getAbsoluteSpaceshipUpdate(
+    spaceship: SpaceshipDocument,
+    simulatedAt: Date,
+    world: WorldSnapshot,
+  ): Partial<SpaceshipDocument> | undefined {
+    if (spaceship.motionState !== 'flying') return undefined;
+
+    const referenceName = spaceship.position.relativeTo;
+    if (!referenceName) return undefined;
+
+    const referencePosition = getBodyPositions(world, simulatedAt).get(
+      referenceName,
+    );
+    if (!referencePosition) return undefined;
+
+    const relativePosition = {
+      x: Number(spaceship.position.x),
+      y: Number(spaceship.position.y),
+    };
+    const referenceVelocity = getBodyVelocity(world, referenceName, simulatedAt);
+    const relativeVelocity = SpaceshipService.getSpaceshipVelocity(spaceship);
+
+    return {
+      position: {
+        x: Math.round(referencePosition.x + relativePosition.x).toString(),
+        y: Math.round(referencePosition.y + relativePosition.y).toString(),
+      },
+      velocity: {
+        x: referenceVelocity.x + relativeVelocity.x,
+        y: referenceVelocity.y + relativeVelocity.y,
+      },
+    };
+  }
+
+  private static findClosestReference(
+    spaceship: SpaceshipDocument,
+    simulatedAt: Date,
+    world: WorldSnapshot,
+  ) {
+    const spaceshipPosition = {
+      x: Number(spaceship.position.x),
+      y: Number(spaceship.position.y),
+    };
+    const positions = getBodyPositions(world, simulatedAt);
+    let closest:
+      | {
+          body: WorldSnapshot['bodies'][number];
+          position: { x: number; y: number };
+          velocity: { x: number; y: number };
+          surfaceDistance: number;
+        }
+      | undefined;
+
+    for (const body of world.bodies) {
+      const position = positions.get(body.name);
+      if (!position) continue;
+
+      const centerDistance = Math.hypot(
+        spaceshipPosition.x - position.x,
+        spaceshipPosition.y - position.y,
+      );
+      const surfaceDistance = Math.max(
+        0,
+        centerDistance - Number(body.radius) - SPACESHIP_RADIUS_METERS,
+      );
+      if (closest && surfaceDistance >= closest.surfaceDistance) continue;
+
+      closest = {
+        body,
+        position,
+        velocity: getBodyVelocity(world, body.name, simulatedAt),
+        surfaceDistance,
+      };
+    }
+
+    return closest;
   }
 }

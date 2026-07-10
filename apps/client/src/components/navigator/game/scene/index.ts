@@ -121,6 +121,9 @@ export class Scene extends Phaser.Scene {
   private selectingTargetDirection = false;
   private targetDirection?: number;
   private viewportRefreshTimer?: number;
+  private viewportRefreshDebounceTimer?: number;
+  private viewportRefreshPromise?: Promise<unknown>;
+  private hasPendingViewportRefresh = false;
   private readonly alwaysVisibleBodies = new Set<string>();
 
   constructor(
@@ -191,13 +194,12 @@ export class Scene extends Phaser.Scene {
       this.unsubscribeFromWorld = undefined;
       window.clearInterval(this.viewportRefreshTimer);
       this.viewportRefreshTimer = undefined;
+      window.clearTimeout(this.viewportRefreshDebounceTimer);
+      this.viewportRefreshDebounceTimer = undefined;
     });
     void this.renderWorld();
     this.viewportRefreshTimer = window.setInterval(() => {
-      void this.refreshWorldFromViewport().catch((error: unknown) => {
-        console.error('Failed to refresh viewport world data', error);
-        this.onWorldLoadComplete?.(error);
-      });
+      this.refreshWorldFromViewportSafely();
     }, WORLD_VIEWPORT_REFRESH_INTERVAL_MS);
   }
 
@@ -1005,6 +1007,34 @@ export class Scene extends Phaser.Scene {
     this.lastVisibilityViewportKey = '';
     this.updateWorldVisibility();
     return world;
+  }
+
+  queueViewportWorldRefresh(delayMs = 250) {
+    window.clearTimeout(this.viewportRefreshDebounceTimer);
+    this.viewportRefreshDebounceTimer = window.setTimeout(() => {
+      this.viewportRefreshDebounceTimer = undefined;
+      this.refreshWorldFromViewportSafely();
+    }, delayMs);
+  }
+
+  private refreshWorldFromViewportSafely() {
+    if (this.viewportRefreshPromise) {
+      this.hasPendingViewportRefresh = true;
+      return;
+    }
+
+    this.viewportRefreshPromise ??= this.refreshWorldFromViewport()
+      .catch((error: unknown) => {
+        console.error('Failed to refresh viewport world data', error);
+        this.onWorldLoadComplete?.(error);
+      })
+      .finally(() => {
+        this.viewportRefreshPromise = undefined;
+        if (this.hasPendingViewportRefresh) {
+          this.hasPendingViewportRefresh = false;
+          this.refreshWorldFromViewportSafely();
+        }
+      });
   }
 
   private reconcileRenderedBodies(activeBodyNames: ReadonlySet<string>) {

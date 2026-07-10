@@ -54,6 +54,7 @@ export function configureInput(this: Scene) {
     camera.scrollX -= deltaX;
     camera.scrollY -= deltaY;
     this.rebaseRenderOriginAtCameraCenter();
+    this.queueViewportWorldRefresh();
     this.lastPointer.set(pointer.x, pointer.y);
   });
 
@@ -84,6 +85,7 @@ export function configureInput(this: Scene) {
       );
 
       this.setZoom(nextZoom);
+      this.queueViewportWorldRefresh();
     },
   );
 

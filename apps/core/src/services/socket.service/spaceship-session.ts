@@ -1,7 +1,4 @@
-import {
-  type SpaceshipDocument,
-  SpaceshipService,
-} from '../spaceship.service';
+import { type SpaceshipDocument, SpaceshipService } from '../spaceship.service';
 import { TickingService } from '../ticking.service';
 import {
   type WorldViewportRequest,
@@ -79,12 +76,22 @@ export class SpaceshipSession {
     if (!viewport) throw new Error('Viewport is not set');
 
     this.viewport = viewport;
-    return WorldViewportService.getWorldSystems(viewport);
+    return WorldViewportService.getWorldSystems(viewport, {
+      requiredBodyNames: this.getRequiredWorldBodyNames(),
+    });
   }
 
   async getCurrentViewportWorldSystems() {
     return this.viewport
-      ? WorldViewportService.getWorldSystems(this.viewport)
+      ? WorldViewportService.getWorldSystems(this.viewport, {
+          requiredBodyNames: this.getRequiredWorldBodyNames(),
+        })
       : undefined;
+  }
+
+  private getRequiredWorldBodyNames() {
+    return this.spaceship.position.relativeTo
+      ? [this.spaceship.position.relativeTo]
+      : [];
   }
 }

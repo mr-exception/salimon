@@ -4,7 +4,6 @@ import type { SerializedWorldSystems, SpaceshipDto } from '@repo/types';
 import {
   hydrateWorldSystems,
   hydrateSpaceship,
-  refreshWorldViewport,
   setWorldViewportLoader,
 } from './world';
 
@@ -50,7 +49,6 @@ const worldViewportRequests = new Map<
   }
 >();
 let spaceshipSocket: WebSocket | undefined;
-let worldRefreshPromise: Promise<unknown> | undefined;
 let nextWorldRequestId = 0;
 
 export function getApiBaseUrl() {
@@ -98,22 +96,8 @@ function parseSpaceshipSocketMessage(data: string): SpaceshipSocketMessage {
   throw new Error('Unsupported spaceship socket message');
 }
 
-function shouldRefreshWorldForSpaceship(spaceship: SpaceshipDto) {
-  return spaceship.motionState === 'flying' && !spaceship.position.relativeTo;
-}
-
-async function refreshWorldForSpaceship() {
-  worldRefreshPromise ??= refreshWorldViewport().finally(() => {
-    worldRefreshPromise = undefined;
-  });
-  await worldRefreshPromise;
-}
-
 async function applySpaceshipInfo(spaceship: SpaceshipDto) {
   storeSpaceship(spaceship);
-  if (shouldRefreshWorldForSpaceship(spaceship)) {
-    await refreshWorldForSpaceship();
-  }
   hydrateSpaceship(spaceship);
 }
 

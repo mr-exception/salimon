@@ -43,7 +43,6 @@ const EARTH_RADIUS_METERS = 6_371_000;
 const SPACESHIP_RADIUS_METERS = 200;
 const DEFAULT_SURFACE_OFFSET = EARTH_RADIUS_METERS + SPACESHIP_RADIUS_METERS;
 const PROXIMITY_TELEMETRY_RANGE_METERS = 3_000_000;
-const WORLD_SEARCH_RADIUS_METERS = '1025000000000000000';
 const DEFAULT_API_BASE_URL = 'http://localhost:3000';
 export const WORLD_VIEWPORT_REFRESH_INTERVAL_MS = 5 * 60 * 1_000;
 const DEFAULT_PLANET_SHAPE_RENDER_ZOOM_LEVEL = 0.000001;
@@ -174,16 +173,16 @@ let worldElapsedSeconds = 0;
 let worldViewportLoader: WorldViewportLoader | undefined;
 
 type WorldViewportRequest = {
-  x?: string;
-  y?: string;
-  radius?: string;
+  x: string;
+  y: string;
+  radius: string;
 };
 
 export function setWorldViewportLoader(loader?: WorldViewportLoader) {
   worldViewportLoader = loader;
 }
 
-export async function loadWorld(request: WorldViewportRequest = {}) {
+export async function loadWorld(request: WorldViewportRequest) {
   if (loadPromise) return loadPromise;
 
   loadPromise = refreshWorldViewport(request).catch((error: unknown) => {
@@ -195,10 +194,10 @@ export async function loadWorld(request: WorldViewportRequest = {}) {
 }
 
 export async function refreshWorldViewport({
-  x = '0',
-  y = '0',
-  radius = WORLD_SEARCH_RADIUS_METERS,
-}: WorldViewportRequest = {}) {
+  x,
+  y,
+  radius,
+}: WorldViewportRequest) {
   const request = { x, y, radius };
   const data = worldViewportLoader
     ? await worldViewportLoader(request)

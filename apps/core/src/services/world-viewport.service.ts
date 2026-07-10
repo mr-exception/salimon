@@ -22,11 +22,20 @@ type StarSystem = {
   planets: PlanetSystem[];
 };
 
+type VisiblePlanetSystem = {
+  planet: WorldBodyDocument;
+  moons: WorldBodyDocument[];
+};
+
 export type WorldViewportRequest = {
   x?: string;
   y?: string;
   radius?: string;
   coordinate?: string;
+};
+
+type WorldViewportOptions = {
+  requiredBodyNames?: Iterable<string>;
 };
 
 function parseInteger(value: string | undefined, name: string): bigint {
@@ -99,6 +108,16 @@ function isInsideCircle(
   const deltaX = position.x - center.x;
   const deltaY = position.y - center.y;
   return deltaX * deltaX + deltaY * deltaY <= radiusSquared;
+}
+
+function bodyIntersectsCircle(
+  body: WorldBodyDocument,
+  position: Coordinate,
+  center: Coordinate,
+  radius: bigint,
+) {
+  const bodyRadius = BigInt(body.radius);
+  return isInsideCircle(position, center, (radius + bodyRadius) ** 2n);
 }
 
 function groupByOrbitalCenter(bodies: WorldBodyDocument[]) {
@@ -186,6 +205,7 @@ function withVelocity(
 export class WorldViewportService {
   static async getWorldSystems(
     request: WorldViewportRequest,
+    options: WorldViewportOptions = {},
   ): Promise<SerializedWorldSystems> {
     const searchArea = getSearchArea(request);
     const { planets, moons, stars } =
@@ -193,37 +213,57 @@ export class WorldViewportService {
     const orbitingBodies = [...planets, ...moons];
     const positions = resolvePositions([...orbitingBodies, ...stars]);
     const center = { x: searchArea.x, y: searchArea.y };
-    const radiusSquared = searchArea.radius * searchArea.radius;
     const planetsByOrbitalCenter = groupByOrbitalCenter(orbitingBodies);
     const velocities = resolveVelocities(
       [...orbitingBodies, ...stars],
       positions,
     );
+    const requiredBodyNames = new Set(options.requiredBodyNames ?? []);
     const systems: StarSystem[] = stars
       .map((star) => {
-        const planetSystems = (planetsByOrbitalCenter.get(star.name) ?? []).map(
-          (planet) => ({
-            planet,
-            moons: planetsByOrbitalCenter.get(planet.name) ?? [],
-          }),
+        const isStarRequired = requiredBodyNames.has(star.name);
+        const isStarVisible = bodyIntersectsCircle(
+          star,
+          positions.get(star.name)!,
+          center,
+          searchArea.radius,
         );
-        const hasVisibleBody =
-          isInsideCircle(positions.get(star.name)!, center, radiusSquared) ||
-          planetSystems.some(
-            ({ planet, moons: planetMoons }) =>
-              isInsideCircle(
-                positions.get(planet.name)!,
-                center,
-                radiusSquared,
-              ) ||
-              planetMoons.some((moon) =>
-                isInsideCircle(
+        const planetSystems = (planetsByOrbitalCenter.get(star.name) ?? [])
+          .map((planet) => {
+            const visibleMoons = (
+              planetsByOrbitalCenter.get(planet.name) ?? []
+            ).filter(
+              (moon) =>
+                requiredBodyNames.has(moon.name) ||
+                bodyIntersectsCircle(
+                  moon,
                   positions.get(moon.name)!,
                   center,
-                  radiusSquared,
+                  searchArea.radius,
                 ),
-              ),
+            );
+            const isPlanetRequired = requiredBodyNames.has(planet.name);
+            const isPlanetVisible = bodyIntersectsCircle(
+              planet,
+              positions.get(planet.name)!,
+              center,
+              searchArea.radius,
+            );
+
+            return isPlanetRequired ||
+              isPlanetVisible ||
+              visibleMoons.length > 0
+              ? {
+                  planet,
+                  moons: visibleMoons,
+                }
+              : undefined;
+          })
+          .filter(
+            (system): system is VisiblePlanetSystem => system !== undefined,
           );
+        const hasVisibleBody =
+          isStarRequired || isStarVisible || planetSystems.length > 0;
 
         return hasVisibleBody
           ? {

@@ -3,6 +3,7 @@ import axios from 'axios';
 import type { SpaceshipDto } from '@repo/types';
 import {
   hydrateSpaceship,
+  refreshWorldViewport,
 } from './world';
 
 const STORAGE_KEY = 'salimon.spaceship';
@@ -27,6 +28,7 @@ type SpaceshipErrorMessage = {
 type SpaceshipSocketMessage = SpaceshipInfoMessage | SpaceshipErrorMessage;
 const requestPromises = new WeakMap<BootstrapRequest, Promise<SpaceshipDto>>();
 let spaceshipSocket: WebSocket | undefined;
+let worldRefreshPromise: Promise<unknown> | undefined;
 
 export function getApiBaseUrl() {
   return (import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL).replace(
@@ -56,8 +58,22 @@ function parseSpaceshipSocketMessage(data: string): SpaceshipSocketMessage {
   throw new Error('Unsupported spaceship socket message');
 }
 
-function applySpaceshipInfo(spaceship: SpaceshipDto) {
+function shouldRefreshWorldForSpaceship(spaceship: SpaceshipDto) {
+  return spaceship.motionState === 'flying' && !spaceship.position.relativeTo;
+}
+
+async function refreshWorldForSpaceship() {
+  worldRefreshPromise ??= refreshWorldViewport().finally(() => {
+    worldRefreshPromise = undefined;
+  });
+  await worldRefreshPromise;
+}
+
+async function applySpaceshipInfo(spaceship: SpaceshipDto) {
   storeSpaceship(spaceship);
+  if (shouldRefreshWorldForSpaceship(spaceship)) {
+    await refreshWorldForSpaceship();
+  }
   hydrateSpaceship(spaceship);
 }
 
@@ -124,8 +140,8 @@ function initializeSpaceship(request: BootstrapRequest) {
     const stored = readStoredSpaceship();
     if (!stored) throw new Error('No stored spaceship is available');
     return getSpaceshipFromSocket(stored.securityCode);
-  })().then((spaceship) => {
-    applySpaceshipInfo(spaceship);
+  })().then(async (spaceship) => {
+    await applySpaceshipInfo(spaceship);
     return spaceship;
   });
 
@@ -182,7 +198,11 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
               console.error('Spaceship socket error', message.error);
               return;
             }
-            applySpaceshipInfo(message.spaceship);
+            void applySpaceshipInfo(message.spaceship).catch(
+              (error: unknown) => {
+                console.error('Failed to apply spaceship info', error);
+              },
+            );
           } catch (error) {
             console.error('Failed to process spaceship socket message', error);
           }

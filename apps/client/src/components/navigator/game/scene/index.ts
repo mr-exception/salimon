@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import {
   advanceWorld,
+  getSpaceshipActiveThrustVector,
   getBodyWorldVelocity,
   getSpaceshipAttachedBodyName,
   getSpaceshipMotionState,
@@ -212,14 +213,14 @@ export class Scene extends Phaser.Scene {
     const spaceshipEngineRunning = isSpaceshipEngineRunning();
     if (!this.spaceshipEngineRunning && spaceshipEngineRunning) {
       this.spaceshipEngineRunning = true;
-      this.spaceship?.setThrustersActive(true);
+      this.spaceship?.setThrustersActive(true, getSpaceshipActiveThrustVector());
       this.onSpaceshipEngineChange?.(true, this.getSpaceshipSpeed());
     } else if (this.spaceshipEngineRunning && !spaceshipEngineRunning) {
       this.spaceshipEngineRunning = false;
       this.spaceship?.setThrustersActive(false);
       this.onSpaceshipEngineChange?.(false, this.getSpaceshipSpeed());
     } else if (spaceshipEngineRunning) {
-      this.spaceship?.setThrustersActive(true);
+      this.spaceship?.setThrustersActive(true, getSpaceshipActiveThrustVector());
     }
 
     const camera = this.cameras.main;
@@ -399,7 +400,7 @@ export class Scene extends Phaser.Scene {
     }
 
     this.spaceshipEngineRunning = true;
-    this.spaceship.setThrustersActive(true);
+    this.spaceship.setThrustersActive(true, getSpaceshipActiveThrustVector());
     this.onSpaceshipEngineChange?.(true, this.getSpaceshipSpeed());
   }
 
@@ -855,7 +856,9 @@ export class Scene extends Phaser.Scene {
       activeBodyNames.add(this.cameraLockedBodyName);
     if (this.spaceship) activeBodyNames.add(this.spaceship.spaceship.name);
 
-    this.reconcileRenderedBodies(activeBodyNames);
+    if (this.reconcileRenderedBodies(activeBodyNames)) {
+      this.lastVisibilityViewportKey = '';
+    }
     setActiveWorldBodyNames(activeBodyNames);
   }
 
@@ -1002,7 +1005,10 @@ export class Scene extends Phaser.Scene {
   }
 
   private reconcileRenderedBodies(activeBodyNames: ReadonlySet<string>) {
-    activeBodyNames.forEach((bodyName) => this.ensureRenderedBody(bodyName));
+    let changed = false;
+    activeBodyNames.forEach((bodyName) => {
+      changed = this.ensureRenderedBody(bodyName) || changed;
+    });
 
     this.planets = this.planets.filter((planet) => {
       if (
@@ -1014,6 +1020,7 @@ export class Scene extends Phaser.Scene {
 
       this.planetByName.delete(planet.planet.name);
       planet.destroy();
+      changed = true;
       return false;
     });
 
@@ -1027,19 +1034,22 @@ export class Scene extends Phaser.Scene {
 
       this.starByName.delete(star.star.name);
       star.destroy();
+      changed = true;
       return false;
     });
+
+    return changed;
   }
 
   private ensureRenderedBody(name: string) {
-    if (this.planetByName.has(name) || this.starByName.has(name)) return;
+    if (this.planetByName.has(name) || this.starByName.has(name)) return false;
 
     const planetData = this.planetDataByName.get(name);
     if (planetData) {
       const planet = new Planet(this, planetData);
       this.planets.push(planet);
       this.planetByName.set(planet.name, planet);
-      return;
+      return true;
     }
 
     const starData = this.starDataByName.get(name);
@@ -1047,7 +1057,10 @@ export class Scene extends Phaser.Scene {
       const star = new Star(this, starData);
       this.stars.push(star);
       this.starByName.set(star.name, star);
+      return true;
     }
+
+    return false;
   }
 
   private updateCameraLock() {

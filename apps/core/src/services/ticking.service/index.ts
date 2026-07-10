@@ -3,7 +3,7 @@ import { RepositoryService } from '../repository.service';
 import { SpaceshipService } from '../spaceship.service';
 import { advanceBodyPosition } from './advance-body-position';
 import { cloneSpaceship } from './clone-spaceship';
-import { TICK_INTERVAL_MS } from './constants';
+import { SPACESHIP_RADIUS_METERS, TICK_INTERVAL_MS } from './constants';
 import {
   createTargetSpeedFeature,
   getBodyPositions,
@@ -132,11 +132,12 @@ export class TickingService {
       y: Number(currentSpaceship.position.y),
     };
     const relativeRadius = Math.hypot(relativePosition.x, relativePosition.y);
+    const launchClearanceMeters = SPACESHIP_RADIUS_METERS * 5;
     const launchClearance =
       referencePosition && relativeRadius > 0
         ? {
-            x: relativePosition.x / relativeRadius,
-            y: relativePosition.y / relativeRadius,
+            x: (relativePosition.x / relativeRadius) * launchClearanceMeters,
+            y: (relativePosition.y / relativeRadius) * launchClearanceMeters,
           }
         : { x: 0, y: 0 };
     const worldPosition = referencePosition

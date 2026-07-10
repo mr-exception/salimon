@@ -298,6 +298,7 @@ export function hydrateSpaceship(dto: SpaceshipDto) {
     ),
   );
   rebuildWorldBodyByName();
+  listeners.forEach((listener) => listener(worldState));
 }
 
 export function getSpaceshipDto(securityCode: string): SpaceshipDto {
@@ -387,6 +388,21 @@ function getClosestPersistenceReference(spaceshipPosition: Vector) {
 
 export function isSpaceshipEngineRunning() {
   return store.get(spaceshipActiveFeatureAtom) !== undefined;
+}
+
+export function getSpaceshipActiveThrustVector() {
+  const activeFeature = store.get(spaceshipActiveFeatureAtom);
+  if (activeFeature?.type !== 'target-speed') return undefined;
+
+  const remainingSeconds =
+    activeFeature.durationSeconds - activeFeature.elapsedSeconds;
+  if (remainingSeconds <= 0) return undefined;
+
+  const currentVelocity = getSpaceshipWorldVelocity();
+  return {
+    x: (activeFeature.targetVelocity.x - currentVelocity.x) / remainingSeconds,
+    y: (activeFeature.targetVelocity.y - currentVelocity.y) / remainingSeconds,
+  };
 }
 
 export function getSpaceshipWorldVelocity() {

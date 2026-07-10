@@ -2,16 +2,11 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import type { SpaceshipDto } from '@repo/types';
 import {
-  getSpaceshipDto,
   hydrateSpaceship,
-  isSpaceshipEngineRunning,
-  spaceshipState,
-  subscribeToWorld,
 } from './world';
 
 const STORAGE_KEY = 'salimon.spaceship';
 export const SECURITY_CODE_HEADER = 'x-spaceship-security-code';
-const THRUSTING_UPDATE_DELAY_MS = 1_000;
 const DEFAULT_API_BASE_URL = 'http://localhost:3000';
 
 export type BootstrapRequest =
@@ -31,6 +26,7 @@ type SpaceshipErrorMessage = {
 };
 type SpaceshipSocketMessage = SpaceshipInfoMessage | SpaceshipErrorMessage;
 const requestPromises = new WeakMap<BootstrapRequest, Promise<SpaceshipDto>>();
+let spaceshipSocket: WebSocket | undefined;
 
 export function getApiBaseUrl() {
   return (import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL).replace(
@@ -137,13 +133,29 @@ function initializeSpaceship(request: BootstrapRequest) {
   return promise;
 }
 
-function sendSpaceshipMovement(socket: WebSocket, securityCode: string) {
-  const spaceship = getSpaceshipDto(securityCode);
-  storeSpaceship(spaceship);
-  if (socket.readyState !== WebSocket.OPEN) {
+function sendSpaceshipSocketMessage(message: unknown) {
+  if (!spaceshipSocket || spaceshipSocket.readyState !== WebSocket.OPEN) {
     throw new Error('Spaceship socket is not connected');
   }
-  socket.send(JSON.stringify({ type: 'spaceship:movement', spaceship }));
+
+  spaceshipSocket.send(JSON.stringify(message));
+}
+
+export function startSpaceshipTargetSpeedFeature(
+  targetSpeedMetersPerSecond: number,
+  maximumThrustPercent: number,
+  targetDirection?: number,
+) {
+  sendSpaceshipSocketMessage({
+    type: 'spaceship:start-target-speed',
+    targetSpeedMetersPerSecond,
+    maximumThrustPercent,
+    targetDirection,
+  });
+}
+
+export function stopSpaceshipActiveFeature() {
+  sendSpaceshipSocketMessage({ type: 'spaceship:stop-active-feature' });
 }
 
 export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
@@ -156,32 +168,13 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
     if (!request) return;
 
     let disposed = false;
-    let updateInterval: number | undefined;
-    let securityCode: string | undefined;
     let socket: WebSocket | undefined;
-    let engineWasRunning = false;
-    let unsubscribe: (() => void) | undefined;
-
-    const stopMovementUpdates = () => {
-      window.clearInterval(updateInterval);
-      updateInterval = undefined;
-    };
-
-    const flushUpdate = () => {
-      if (!securityCode) return;
-      if (!socket) return;
-      try {
-        sendSpaceshipMovement(socket, securityCode);
-      } catch (error: unknown) {
-        console.error('Failed to persist spaceship', error);
-      }
-    };
 
     void initializeSpaceship(request)
       .then((spaceship) => {
         if (disposed) return;
-        securityCode = spaceship.securityCode;
-        socket = new WebSocket(getSpaceshipSocketUrl(securityCode));
+        socket = new WebSocket(getSpaceshipSocketUrl(spaceship.securityCode));
+        spaceshipSocket = socket;
         socket.addEventListener('message', (event) => {
           try {
             const message = parseSpaceshipSocketMessage(String(event.data));
@@ -197,31 +190,6 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
         socket.addEventListener('error', () => {
           console.error('Failed to connect to spaceship socket');
         });
-        unsubscribe = subscribeToWorld((_world, changedBodyNames) => {
-          if (changedBodyNames && !changedBodyNames.has(spaceshipState.name)) {
-            return;
-          }
-          const engineIsRunning = isSpaceshipEngineRunning();
-          if (engineWasRunning && !engineIsRunning) {
-            engineWasRunning = false;
-            stopMovementUpdates();
-            flushUpdate();
-            return;
-          }
-
-          engineWasRunning = engineIsRunning;
-          if (!engineIsRunning) {
-            stopMovementUpdates();
-            return;
-          }
-          if (updateInterval) return;
-          flushUpdate();
-          updateInterval = window.setInterval(
-            flushUpdate,
-            THRUSTING_UPDATE_DELAY_MS,
-          );
-        });
-        window.addEventListener('pagehide', flushUpdate);
         setResult({ request, state: 'ready' });
       })
       .catch((error: unknown) => {
@@ -231,9 +199,7 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
 
     return () => {
       disposed = true;
-      unsubscribe?.();
-      window.removeEventListener('pagehide', flushUpdate);
-      stopMovementUpdates();
+      if (spaceshipSocket === socket) spaceshipSocket = undefined;
       socket?.close();
     };
   }, [request]);

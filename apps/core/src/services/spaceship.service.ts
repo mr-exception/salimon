@@ -10,6 +10,7 @@ import { RepositoryService } from './repository.service';
 export const SECURITY_CODE_HEADER = 'x-spaceship-security-code';
 
 export type {
+  SpaceshipActiveFeature,
   SpaceshipDocument,
   SpaceshipMotionState,
   SpaceshipStats,
@@ -72,6 +73,7 @@ export class SpaceshipService {
           ? 'landed'
           : 'flying'),
       stats: SpaceshipService.normalizeSpaceshipStats(spaceship.stats),
+      activeFeature: spaceship.activeFeature,
       simulatedAt: (spaceship.simulatedAt ?? spaceship.updatedAt).toISOString(),
     };
   }

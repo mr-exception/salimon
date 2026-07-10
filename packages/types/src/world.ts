@@ -58,6 +58,18 @@ export type SpaceshipStats = {
   thrusterDurability: number[];
 };
 
+export type SpaceshipActiveFeature =
+  | {
+      type: 'target-speed';
+      targetSpeedMetersPerSecond: number;
+      maximumThrustPercent: number;
+      targetDirection?: number;
+      targetVelocity: Velocity;
+      maximumAcceleration: number;
+      durationSeconds: number;
+      elapsedSeconds: number;
+    };
+
 export type SpaceshipDto = {
   securityCode: string;
   position: SerializedPosition;
@@ -66,6 +78,7 @@ export type SpaceshipDto = {
   velocity?: Velocity;
   motionState?: SpaceshipMotionState;
   stats?: Partial<SpaceshipStats> & Pick<SpaceshipStats, 'fuelKns'>;
+  activeFeature?: SpaceshipActiveFeature;
   simulatedAt?: string;
 };
 

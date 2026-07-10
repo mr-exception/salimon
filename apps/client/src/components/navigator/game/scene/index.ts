@@ -14,7 +14,8 @@ import {
   setSpaceshipTargetDirection,
   setSpaceshipHeading,
   setSpaceshipManualThrust,
-  startSpaceshipEngines,
+  startSpaceshipTargetSpeedFeature,
+  stopSpaceshipActiveFeature,
   stopSpaceshipEngines,
   WORLD_VIEWPORT_REFRESH_INTERVAL_MS,
 } from '@store';
@@ -422,24 +423,31 @@ export class Scene extends Phaser.Scene {
       return;
     }
 
-    const currentSpeed = this.getSpaceshipSpeed();
-    if (
-      !startSpaceshipEngines(
+    try {
+      startSpaceshipTargetSpeedFeature(
         targetSpeed,
         maximumThrustPercent,
         this.targetDirection,
-      )
-    ) {
+      );
+    } catch (error) {
+      console.error('Failed to start target speed feature', error);
       return;
     }
 
     this.spaceshipEngineRunning = true;
-    this.spaceship.setThrustersActive(true, getSpaceshipBurnAcceleration());
-    this.onSpaceshipEngineChange?.(true, currentSpeed);
+    this.spaceship.setThrustersActive(true);
+    this.onSpaceshipEngineChange?.(true, this.getSpaceshipSpeed());
   }
 
   stopEngines() {
-    if (!this.spaceshipEngineRunning || !stopSpaceshipEngines()) return;
+    if (!this.spaceshipEngineRunning) return;
+
+    try {
+      stopSpaceshipActiveFeature();
+    } catch (error) {
+      console.error('Failed to stop active spaceship feature', error);
+      if (!stopSpaceshipEngines()) return;
+    }
 
     this.spaceshipEngineRunning = false;
     this.spaceship?.setThrustersActive(false);

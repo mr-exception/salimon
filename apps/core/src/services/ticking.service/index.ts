@@ -1,9 +1,15 @@
 import type { SpaceshipDocument } from '@models';
 import { RepositoryService } from '../repository.service';
+import { SpaceshipService } from '../spaceship.service';
 import { advanceBodyPosition } from './advance-body-position';
 import { cloneSpaceship } from './clone-spaceship';
 import { TICK_INTERVAL_MS } from './constants';
-import { getSpaceshipUpdate } from './get-spaceship-update';
+import {
+  createTargetSpeedFeature,
+  getBodyPositions,
+  getBodyVelocity,
+  getSpaceshipUpdate,
+} from './get-spaceship-update';
 import type { Timer, WorldSnapshot } from './types';
 
 type TickResult = {
@@ -86,6 +92,95 @@ export class TickingService {
     const update = getSpaceshipUpdate(spaceship, simulatedAt, world);
     if (!update) return spaceship;
     return RepositoryService.updatePropagatedSpaceship(spaceship, update);
+  }
+
+  static async startSpaceshipTargetSpeedFeature(
+    spaceship: SpaceshipDocument,
+    params: {
+      targetSpeedMetersPerSecond: number;
+      maximumThrustPercent: number;
+      targetDirection?: number;
+    },
+  ) {
+    const simulatedAt = new Date();
+    const world = await TickingService.loadWorldSnapshot();
+    const currentSpaceship = await TickingService.updateSpaceship(
+      spaceship,
+      simulatedAt,
+      world,
+    );
+    const activeFeature = createTargetSpeedFeature(
+      currentSpaceship,
+      simulatedAt,
+      world,
+      params.targetSpeedMetersPerSecond,
+      params.maximumThrustPercent,
+      params.targetDirection,
+    );
+    if (!activeFeature) return undefined;
+
+    const referencePosition = currentSpaceship.position.relativeTo
+      ? getBodyPositions(world, simulatedAt).get(
+          currentSpaceship.position.relativeTo,
+        )
+      : undefined;
+    const referenceVelocity = currentSpaceship.position.relativeTo
+      ? getBodyVelocity(world, currentSpaceship.position.relativeTo, simulatedAt)
+      : undefined;
+    const relativePosition = {
+      x: Number(currentSpaceship.position.x),
+      y: Number(currentSpaceship.position.y),
+    };
+    const relativeRadius = Math.hypot(relativePosition.x, relativePosition.y);
+    const launchClearance =
+      referencePosition && relativeRadius > 0
+        ? {
+            x: relativePosition.x / relativeRadius,
+            y: relativePosition.y / relativeRadius,
+          }
+        : { x: 0, y: 0 };
+    const worldPosition = referencePosition
+      ? {
+          x: Math.round(
+            referencePosition.x + relativePosition.x + launchClearance.x,
+          ).toString(),
+          y: Math.round(
+            referencePosition.y + relativePosition.y + launchClearance.y,
+          ).toString(),
+        }
+      : currentSpaceship.position;
+    const worldVelocity = referenceVelocity
+      ? {
+          x:
+            referenceVelocity.x +
+            SpaceshipService.getSpaceshipVelocity(currentSpaceship).x,
+          y:
+            referenceVelocity.y +
+            SpaceshipService.getSpaceshipVelocity(currentSpaceship).y,
+        }
+      : currentSpaceship.velocity;
+
+    return RepositoryService.updatePropagatedSpaceship(currentSpaceship, {
+      activeFeature,
+      motionState: 'flying',
+      position: worldPosition,
+      velocity: worldVelocity,
+      simulatedAt,
+      updatedAt: simulatedAt,
+    });
+  }
+
+  static async stopSpaceshipActiveFeature(spaceship: SpaceshipDocument) {
+    const simulatedAt = new Date();
+    const currentSpaceship = await TickingService.updateSpaceship(
+      spaceship,
+      simulatedAt,
+    );
+    return RepositoryService.updatePropagatedSpaceship(currentSpaceship, {
+      activeFeature: undefined,
+      simulatedAt,
+      updatedAt: simulatedAt,
+    });
   }
 
   static async flushToDatabase() {

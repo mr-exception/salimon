@@ -4,6 +4,7 @@ import type {
   Planet,
   Position,
   SerializedWorldSystems,
+  SpaceshipActiveFeature,
   Spaceship,
   SpaceshipDto,
   Star,
@@ -79,6 +80,9 @@ const spaceshipThrusterDurabilityAtom = atom<number[]>(
   Array(SPACESHIP_THRUSTER_COUNT).fill(MAX_THRUSTER_DURABILITY),
 );
 const spaceshipMotionStateAtom = atom<SpaceshipMotionState>('landed');
+const spaceshipActiveFeatureAtom = atom<SpaceshipActiveFeature | undefined>(
+  undefined,
+);
 const spaceshipAutoOrbitAtom = atom<SpaceshipAutoOrbit>({ active: false });
 const spaceshipFallingSpeedControlAtom = atom<SpaceshipFallingSpeedControl>({
   active: false,
@@ -166,6 +170,14 @@ export function useSpaceshipMotionState() {
 
 export function useSetSpaceshipMotionState() {
   return useSetAtom(spaceshipMotionStateAtom);
+}
+
+export function useSpaceshipActiveFeature() {
+  return useAtomValue(spaceshipActiveFeatureAtom);
+}
+
+export function useSetSpaceshipActiveFeature() {
+  return useSetAtom(spaceshipActiveFeatureAtom);
 }
 
 export function getSpaceshipMotionState() {
@@ -404,6 +416,7 @@ export function hydrateSpaceship(dto: SpaceshipDto) {
           y: Number(dto.position.y),
         };
   store.set(spaceshipMotionStateAtom, motionState);
+  store.set(spaceshipActiveFeatureAtom, dto.activeFeature);
   store.set(spaceshipSpeedAtom, Number(dto.speed));
   store.set(
     spaceshipFuelKnsAtom,
@@ -866,6 +879,7 @@ export function stopSpaceshipFallingSpeedControl() {
 
 export function isSpaceshipEngineRunning() {
   return (
+    store.get(spaceshipActiveFeatureAtom) !== undefined ||
     spaceshipBurn !== undefined ||
     spaceshipManualAcceleration !== undefined ||
     store.get(spaceshipAutoOrbitAtom).active ||

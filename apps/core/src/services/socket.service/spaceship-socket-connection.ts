@@ -3,6 +3,7 @@ import {
   type SpaceshipDocument,
   SpaceshipService,
 } from '../spaceship.service';
+import { TickingService } from '../ticking.service';
 import {
   SPACESHIP_INFO_INTERVAL_MS,
   SPACESHIP_PERSIST_INTERVAL_MS,
@@ -11,7 +12,14 @@ import { sendJson } from './send-json';
 
 type SpaceshipSocketIncomingMessage =
   | { type: 'spaceship:update'; spaceship?: unknown }
-  | { type: 'spaceship:movement'; spaceship?: unknown };
+  | { type: 'spaceship:movement'; spaceship?: unknown }
+  | {
+      type: 'spaceship:start-target-speed';
+      targetSpeedMetersPerSecond?: unknown;
+      maximumThrustPercent?: unknown;
+      targetDirection?: unknown;
+    }
+  | { type: 'spaceship:stop-active-feature' };
 
 export class SpaceshipSocketConnection {
   private spaceship?: SpaceshipDocument;
@@ -25,14 +33,14 @@ export class SpaceshipSocketConnection {
     private readonly securityCode: string,
   ) {
     this.infoInterval = setInterval(() => {
-      this.sendSpaceshipInfo();
+      void this.sendSpaceshipInfo();
     }, SPACESHIP_INFO_INTERVAL_MS);
     this.persistInterval = setInterval(() => {
       void this.persistSpaceship();
     }, SPACESHIP_PERSIST_INTERVAL_MS);
 
     socket.on('message', (data) => {
-      this.handleMessage(data.toString());
+      void this.handleMessage(data.toString());
     });
     socket.on('close', () => {
       this.close();
@@ -56,7 +64,7 @@ export class SpaceshipSocketConnection {
       }
 
       this.spaceship = spaceship;
-      this.sendSpaceshipInfo();
+      void this.sendSpaceshipInfo();
     } catch (error) {
       console.error('Failed to load spaceship socket connection', error);
       sendJson(this.socket, {
@@ -67,16 +75,25 @@ export class SpaceshipSocketConnection {
     }
   }
 
-  private sendSpaceshipInfo() {
+  private async sendSpaceshipInfo() {
     if (!this.spaceship) return;
 
-    sendJson(this.socket, {
-      type: 'spaceship:info',
-      spaceship: SpaceshipService.toSpaceshipDto(this.spaceship),
-    });
+    try {
+      this.spaceship = await TickingService.updateSpaceship(this.spaceship);
+      sendJson(this.socket, {
+        type: 'spaceship:info',
+        spaceship: SpaceshipService.toSpaceshipDto(this.spaceship),
+      });
+    } catch (error) {
+      console.error('Failed to send spaceship socket info', error);
+      sendJson(this.socket, {
+        type: 'error',
+        error: 'Failed to update spaceship',
+      });
+    }
   }
 
-  private handleMessage(rawMessage: string) {
+  private async handleMessage(rawMessage: string) {
     let message: SpaceshipSocketIncomingMessage;
     try {
       message = JSON.parse(rawMessage) as SpaceshipSocketIncomingMessage;
@@ -90,7 +107,9 @@ export class SpaceshipSocketConnection {
 
     if (
       message.type !== 'spaceship:update' &&
-      message.type !== 'spaceship:movement'
+      message.type !== 'spaceship:movement' &&
+      message.type !== 'spaceship:start-target-speed' &&
+      message.type !== 'spaceship:stop-active-feature'
     ) {
       sendJson(this.socket, {
         type: 'error',
@@ -105,6 +124,46 @@ export class SpaceshipSocketConnection {
           type: 'error',
           error: 'Spaceship is not loaded yet',
         });
+        return;
+      }
+
+      if (message.type === 'spaceship:start-target-speed') {
+        const targetSpeedMetersPerSecond = message.targetSpeedMetersPerSecond;
+        const maximumThrustPercent = message.maximumThrustPercent;
+        const targetDirection = message.targetDirection;
+        if (
+          typeof targetSpeedMetersPerSecond !== 'number' ||
+          typeof maximumThrustPercent !== 'number' ||
+          (targetDirection !== undefined && typeof targetDirection !== 'number')
+        ) {
+          throw new Error('Invalid target speed feature parameters');
+        }
+
+        const spaceship = await TickingService.startSpaceshipTargetSpeedFeature(
+          this.spaceship,
+          {
+            targetSpeedMetersPerSecond,
+            maximumThrustPercent,
+            targetDirection,
+          },
+        );
+        if (!spaceship) {
+          throw new Error('Target speed feature could not be started');
+        }
+
+        this.spaceship = spaceship;
+        this.hasPendingPersist = false;
+        void this.sendSpaceshipInfo();
+        return;
+      }
+
+      if (message.type === 'spaceship:stop-active-feature') {
+        const spaceship = await TickingService.stopSpaceshipActiveFeature(
+          this.spaceship,
+        );
+        this.spaceship = spaceship;
+        this.hasPendingPersist = false;
+        void this.sendSpaceshipInfo();
         return;
       }
 

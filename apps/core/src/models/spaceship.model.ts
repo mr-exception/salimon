@@ -1,6 +1,7 @@
 import { getModelForClass, modelOptions, prop } from '@typegoose/typegoose';
 import type {
   SerializedPosition,
+  SpaceshipActiveFeature,
   SpaceshipMotionState,
   SpaceshipStats,
   Velocity,
@@ -8,7 +9,7 @@ import type {
 import { DatabaseModel } from './database.model';
 
 export type SpaceshipVelocity = Velocity;
-export type { SpaceshipMotionState, SpaceshipStats };
+export type { SpaceshipActiveFeature, SpaceshipMotionState, SpaceshipStats };
 
 class SpaceshipPosition implements SerializedPosition {
   @prop({ required: true, type: () => String })
@@ -39,6 +40,32 @@ class SpaceshipStatsSchema implements SpaceshipStats {
   public thrusterDurability!: number[];
 }
 
+class SpaceshipTargetSpeedFeatureSchema implements SpaceshipActiveFeature {
+  @prop({ required: true, type: () => String })
+  public type!: 'target-speed';
+
+  @prop({ required: true, type: () => Number })
+  public targetSpeedMetersPerSecond!: number;
+
+  @prop({ required: true, type: () => Number })
+  public maximumThrustPercent!: number;
+
+  @prop({ type: () => Number })
+  public targetDirection?: number;
+
+  @prop({ required: true, type: () => SpaceshipVelocitySchema })
+  public targetVelocity!: SpaceshipVelocity;
+
+  @prop({ required: true, type: () => Number })
+  public maximumAcceleration!: number;
+
+  @prop({ required: true, type: () => Number })
+  public durationSeconds!: number;
+
+  @prop({ required: true, type: () => Number })
+  public elapsedSeconds!: number;
+}
+
 @modelOptions({
   schemaOptions: { collection: 'spaceships', versionKey: false },
 })
@@ -63,6 +90,9 @@ class SpaceshipSchema {
 
   @prop({ type: () => SpaceshipStatsSchema })
   public stats?: SpaceshipStats;
+
+  @prop({ type: () => SpaceshipTargetSpeedFeatureSchema })
+  public activeFeature?: SpaceshipActiveFeature;
 
   @prop({ type: () => Date })
   public simulatedAt?: Date;

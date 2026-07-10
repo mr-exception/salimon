@@ -42,6 +42,12 @@ function cloneSpaceship(spaceship: SpaceshipDocument): SpaceshipDocument {
           thrusterDurability: [...spaceship.stats.thrusterDurability],
         }
       : undefined,
+    activeFeature: spaceship.activeFeature
+      ? {
+          ...spaceship.activeFeature,
+          targetVelocity: { ...spaceship.activeFeature.targetVelocity },
+        }
+      : undefined,
     simulatedAt: cloneDate(spaceship.simulatedAt),
     createdAt: new Date(spaceship.createdAt),
     updatedAt: new Date(spaceship.updatedAt),

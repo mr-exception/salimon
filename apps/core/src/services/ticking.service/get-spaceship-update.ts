@@ -17,6 +17,8 @@ import type {
   WorldSnapshot,
 } from './types';
 
+const TARGET_VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.1;
+
 export function getBodyPositions(world: WorldSnapshot, time: Date) {
   return PhysicsService.getBodyPositions(world, time);
 }
@@ -114,45 +116,18 @@ export function createTargetSpeedFeature(
     x: (referenceVelocity?.x ?? 0) + targetRelativeVelocity.x,
     y: (referenceVelocity?.y ?? 0) + targetRelativeVelocity.y,
   };
-  const velocityChange = {
-    x: targetVelocity.x - currentVelocity.x,
-    y: targetVelocity.y - currentVelocity.y,
-  };
-  const velocityChangeSquared = velocityChange.x ** 2 + velocityChange.y ** 2;
-  if (velocityChangeSquared === 0) return undefined;
-
-  const gravityAcceleration = PhysicsService.calculateGravityAcceleration(
+  const maximumAcceleration =
+    PhysicsService.calculateMaximumEngineAcceleration(maximumThrustPercent);
+  const durationSeconds = PhysicsService.calculateTargetSpeedBurnDuration(
+    targetVelocity,
+    currentVelocity,
     currentPosition,
+    maximumAcceleration,
     world,
     simulatedAt,
   );
-  const compensationAcceleration = {
-    x: -gravityAcceleration.x,
-    y: -gravityAcceleration.y,
-  };
-  const maximumAcceleration =
-    PhysicsService.calculateMaximumEngineAcceleration(maximumThrustPercent);
-  const linearCoefficient =
-    2 *
-    (velocityChange.x * compensationAcceleration.x +
-      velocityChange.y * compensationAcceleration.y);
-  const constantCoefficient =
-    compensationAcceleration.x ** 2 +
-    compensationAcceleration.y ** 2 -
-    maximumAcceleration ** 2;
-  const discriminant =
-    linearCoefficient ** 2 - 4 * velocityChangeSquared * constantCoefficient;
-  if (discriminant < 0) return undefined;
+  if (durationSeconds === undefined || durationSeconds === 0) return undefined;
 
-  const root = Math.sqrt(discriminant);
-  const reciprocalDurations = [
-    (-linearCoefficient + root) / (2 * velocityChangeSquared),
-    (-linearCoefficient - root) / (2 * velocityChangeSquared),
-  ].filter((value) => Number.isFinite(value) && value > 0);
-  const reciprocalDuration = Math.max(...reciprocalDurations);
-  if (!Number.isFinite(reciprocalDuration)) return undefined;
-
-  const durationSeconds = 1 / reciprocalDuration;
   const accelerationValue = PhysicsService.calculateRequiredBurnAcceleration(
     targetVelocity,
     durationSeconds,
@@ -182,11 +157,15 @@ function shouldFinishTargetSpeedBurn(
 ) {
   if (feature.elapsedSeconds < feature.durationSeconds) return false;
 
+  return isTargetVelocityReached(feature, motion);
+}
+
+function isTargetVelocityReached(feature: TargetSpeedBurnPlan, motion: Motion) {
   return (
     Math.hypot(
       feature.targetVelocity.x - motion.velocity.x,
       feature.targetVelocity.y - motion.velocity.y,
-    ) <= 0.1
+    ) <= TARGET_VELOCITY_TOLERANCE_METERS_PER_SECOND
   );
 }
 
@@ -430,8 +409,39 @@ export function getSpaceshipUpdate(
       );
       let burnSeconds = 0;
       let thrustAcceleration: SpaceshipVelocity | undefined;
-      const targetSpeedFeature =
+      let targetSpeedFeature =
         activeFeature?.type === 'target-speed' ? activeFeature : undefined;
+      if (targetSpeedFeature) {
+        if (isTargetVelocityReached(targetSpeedFeature, motion)) {
+          activeFeature = undefined;
+          targetSpeedFeature = undefined;
+        }
+      }
+      if (targetSpeedFeature) {
+        const remainingSeconds =
+          PhysicsService.calculateTargetSpeedBurnDuration(
+            targetSpeedFeature.targetVelocity,
+            motion.velocity,
+            motion.position,
+            targetSpeedFeature.maximumAcceleration,
+            world,
+            stepStartedAt,
+          );
+        if (remainingSeconds === undefined) {
+          activeFeature = undefined;
+          targetSpeedFeature = undefined;
+        } else if (remainingSeconds === 0) {
+          activeFeature = undefined;
+          targetSpeedFeature = undefined;
+        } else {
+          targetSpeedFeature = {
+            ...targetSpeedFeature,
+            durationSeconds:
+              targetSpeedFeature.elapsedSeconds +
+              Math.max(remainingSeconds, stepSeconds),
+          };
+        }
+      }
       if (targetSpeedFeature) {
         const requestedAcceleration = getTargetSpeedBurnAcceleration(
           targetSpeedFeature,
@@ -524,7 +534,6 @@ export function getSpaceshipUpdate(
         };
         if (
           shouldFinishTargetSpeedBurn(activeFeature, motion) ||
-          burnSeconds < stepSeconds ||
           stats.fuelKns <= 0
         ) {
           activeFeature = undefined;

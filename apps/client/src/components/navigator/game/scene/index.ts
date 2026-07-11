@@ -78,6 +78,7 @@ const ASTEROID_MAX_SCREEN_RADIUS = 18;
 const ASTEROID_SCREEN_MARGIN = 36;
 const ASTEROID_MIN_SCREEN_SPEED = 32;
 const ASTEROID_MAX_SCREEN_SPEED = 68;
+const ENGINE_START_RESPONSE_TIMEOUT_MS = 5_000;
 const ASTEROID_MATERIALS: AsteroidMaterial[] = ['iron', 'silicates', 'ice'];
 
 export class Scene extends Phaser.Scene {
@@ -130,6 +131,7 @@ export class Scene extends Phaser.Scene {
   private lastShowViewportLabels?: boolean;
   private spaceshipTurn?: Phaser.Tweens.Tween;
   private spaceshipEngineRunning = false;
+  private engineStartPendingUntil = 0;
   private selectingTargetDirection = false;
   private targetDirection?: number;
   private viewportRefreshTimer?: number;
@@ -217,7 +219,7 @@ export class Scene extends Phaser.Scene {
     }, WORLD_VIEWPORT_REFRESH_INTERVAL_MS);
   }
 
-  update(_time: number, delta: number) {
+  update(time: number, delta: number) {
     const worldElapsedSeconds = advanceWorld(delta / 1000);
     this.syncWorldPositions();
     this.lastActiveBodiesViewportKey = '';
@@ -230,7 +232,15 @@ export class Scene extends Phaser.Scene {
       this.targetDirection = undefined;
     }
     this.updateAsteroids(delta);
-    const spaceshipEngineRunning = isSpaceshipEngineRunning();
+    const storeEngineRunning = isSpaceshipEngineRunning();
+    const engineStartPending =
+      this.spaceshipEngineRunning &&
+      !storeEngineRunning &&
+      time < this.engineStartPendingUntil;
+    const spaceshipEngineRunning = storeEngineRunning || engineStartPending;
+    if (storeEngineRunning) {
+      this.engineStartPendingUntil = 0;
+    }
     if (!this.spaceshipEngineRunning && spaceshipEngineRunning) {
       this.spaceshipEngineRunning = true;
       this.spaceship?.setThrustersActive(
@@ -613,6 +623,8 @@ export class Scene extends Phaser.Scene {
     }
 
     this.spaceshipEngineRunning = true;
+    this.engineStartPendingUntil =
+      this.time.now + ENGINE_START_RESPONSE_TIMEOUT_MS;
     this.spaceship.setThrustersActive(true, getSpaceshipActiveThrustVector());
     this.onSpaceshipEngineChange?.(true, this.getSpaceshipSpeed());
   }
@@ -628,6 +640,7 @@ export class Scene extends Phaser.Scene {
     }
 
     this.spaceshipEngineRunning = false;
+    this.engineStartPendingUntil = 0;
     this.spaceship?.setThrustersActive(false);
     this.onSpaceshipEngineChange?.(false, this.getSpaceshipSpeed());
   }

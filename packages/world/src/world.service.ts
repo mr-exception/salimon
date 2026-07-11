@@ -277,6 +277,55 @@ export class WorldService {
     };
   }
 
+  static calculateTargetSpeedBurnDuration(
+    targetVelocity: Vector,
+    currentVelocity: Vector,
+    position: Vector,
+    maximumAcceleration: number,
+    calculateGravityAcceleration: (position: Vector) => Vector,
+  ) {
+    if (!Number.isFinite(maximumAcceleration) || maximumAcceleration <= 0) {
+      return undefined;
+    }
+
+    const velocityChange = {
+      x: targetVelocity.x - currentVelocity.x,
+      y: targetVelocity.y - currentVelocity.y,
+    };
+    const velocityChangeSquared =
+      velocityChange.x ** 2 + velocityChange.y ** 2;
+    if (velocityChangeSquared === 0) return 0;
+    const engineOnlyMinimumDuration =
+      Math.sqrt(velocityChangeSquared) / maximumAcceleration;
+
+    const gravityAcceleration = calculateGravityAcceleration(position);
+    const compensationAcceleration = {
+      x: -gravityAcceleration.x,
+      y: -gravityAcceleration.y,
+    };
+    const linearCoefficient =
+      2 *
+      (velocityChange.x * compensationAcceleration.x +
+        velocityChange.y * compensationAcceleration.y);
+    const constantCoefficient =
+      compensationAcceleration.x ** 2 +
+      compensationAcceleration.y ** 2 -
+      maximumAcceleration ** 2;
+    const discriminant =
+      linearCoefficient ** 2 - 4 * velocityChangeSquared * constantCoefficient;
+    if (discriminant < 0) return undefined;
+
+    const root = Math.sqrt(discriminant);
+    const reciprocalDurations = [
+      (-linearCoefficient + root) / (2 * velocityChangeSquared),
+      (-linearCoefficient - root) / (2 * velocityChangeSquared),
+    ].filter((value) => Number.isFinite(value) && value > 0);
+    const reciprocalDuration = Math.max(...reciprocalDurations);
+    if (!Number.isFinite(reciprocalDuration)) return undefined;
+
+    return Math.max(1 / reciprocalDuration, engineOnlyMinimumDuration);
+  }
+
   static calculateMaximumEngineAcceleration(maximumThrustPercent = 100) {
     return (
       ((MAX_ENGINE_THRUST_KN * 1_000) / SPACESHIP_MASS_KG) *

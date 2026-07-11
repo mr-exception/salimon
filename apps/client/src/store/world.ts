@@ -51,6 +51,7 @@ const DEFAULT_PLANET_SHAPE_RENDER_ZOOM_LEVEL = 0.000001;
 const DEFAULT_PLANET_RENDER_ZOOM_LEVEL = 0.0000001;
 const DEFAULT_STAR_SHAPE_RENDER_ZOOM_LEVEL = 0.0000000001;
 const DEFAULT_STAR_RENDER_ZOOM_LEVEL = 0.00000000001;
+const TARGET_VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.1;
 const PLANET_COLORS = [
   0x60a5fa, 0x34d399, 0xf59e0b, 0xf97316, 0xa78bfa, 0x94a3b8, 0x22d3ee,
   0xf472b6,
@@ -469,17 +470,38 @@ function calculateSpaceshipActiveThrustAcceleration(motion: {
   const activeFeature = store.get(spaceshipActiveFeatureAtom);
   if (activeFeature?.type !== 'target-speed') return undefined;
 
-  const remainingSeconds =
-    activeFeature.durationSeconds - activeFeature.elapsedSeconds;
+  const remainingSeconds = Math.max(
+    activeFeature.durationSeconds - activeFeature.elapsedSeconds,
+    WorldService.calculateTargetSpeedBurnDuration(
+      activeFeature.targetVelocity,
+      motion.velocity,
+      motion.position,
+      activeFeature.maximumAcceleration,
+      calculateGravityAcceleration,
+    ) ?? 0,
+  );
   if (remainingSeconds <= 0) return undefined;
 
-  return WorldService.calculateRequiredBurnAcceleration(
+  const requestedAcceleration = WorldService.calculateRequiredBurnAcceleration(
     activeFeature.targetVelocity,
     remainingSeconds,
     motion.velocity,
     motion.position,
     calculateGravityAcceleration,
   );
+  const magnitude = Math.hypot(
+    requestedAcceleration.x,
+    requestedAcceleration.y,
+  );
+  const scale =
+    magnitude > activeFeature.maximumAcceleration
+      ? activeFeature.maximumAcceleration / magnitude
+      : 1;
+
+  return {
+    x: requestedAcceleration.x * scale,
+    y: requestedAcceleration.y * scale,
+  };
 }
 
 export function getSpaceshipWorldVelocity() {
@@ -739,15 +761,39 @@ function advanceActiveFeature(elapsedSeconds: number) {
   const activeFeature = store.get(spaceshipActiveFeatureAtom);
   if (activeFeature?.type !== 'target-speed') return;
 
-  const nextElapsedSeconds = Math.min(
-    activeFeature.durationSeconds,
-    activeFeature.elapsedSeconds + elapsedSeconds,
+  const motion = {
+    position: toVector(getWorldPosition(spaceshipState.position)),
+    velocity: getSpaceshipWorldVelocity(),
+  };
+  const velocityError = Math.hypot(
+    activeFeature.targetVelocity.x - motion.velocity.x,
+    activeFeature.targetVelocity.y - motion.velocity.y,
   );
+  if (velocityError <= TARGET_VELOCITY_TOLERANCE_METERS_PER_SECOND) {
+    store.set(spaceshipActiveFeatureAtom, undefined);
+    return;
+  }
+
+  const remainingSeconds = WorldService.calculateTargetSpeedBurnDuration(
+    activeFeature.targetVelocity,
+    motion.velocity,
+    motion.position,
+    activeFeature.maximumAcceleration,
+    calculateGravityAcceleration,
+  );
+  if (remainingSeconds === undefined || remainingSeconds === 0) {
+    store.set(spaceshipActiveFeatureAtom, undefined);
+    return;
+  }
+
+  const nextElapsedSeconds = activeFeature.elapsedSeconds + elapsedSeconds;
   store.set(
     spaceshipActiveFeatureAtom,
-    nextElapsedSeconds >= activeFeature.durationSeconds
-      ? undefined
-      : { ...activeFeature, elapsedSeconds: nextElapsedSeconds },
+    {
+      ...activeFeature,
+      durationSeconds: nextElapsedSeconds + remainingSeconds,
+      elapsedSeconds: nextElapsedSeconds,
+    },
   );
 }
 

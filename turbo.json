@@ -20,11 +20,13 @@
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "passThroughEnv": ["MONGODB_URI", "OPENAI_API_KEY", "OPENAI_MODEL", "PORT"]
     },
     "start": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "passThroughEnv": ["MONGODB_URI", "OPENAI_API_KEY", "OPENAI_MODEL", "PORT"]
     }
   }
 }

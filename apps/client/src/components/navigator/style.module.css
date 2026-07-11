@@ -483,6 +483,78 @@
   color: #86efac;
 }
 
+.inventoryPanel {
+  position: absolute;
+  left: 16px;
+  bottom: 96px;
+  z-index: 1;
+  box-sizing: border-box;
+  width: min(250px, calc(100% - 32px));
+  padding: 11px 12px 12px;
+  border: 1px solid color-mix(in srgb, #f59e0b 34%, transparent);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--color-deep-space) 82%, transparent);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 26%);
+  color: var(--color-starlight);
+  font-family: system-ui, sans-serif;
+  backdrop-filter: blur(8px);
+}
+
+.inventoryPanel header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid color-mix(in srgb, #f59e0b 18%, transparent);
+}
+
+.inventoryPanel header span {
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.inventoryPanel header small {
+  color: color-mix(in srgb, var(--color-starlight) 50%, transparent);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.inventoryPanel dl {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 0;
+}
+
+.inventoryPanel dl div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 72px;
+  align-items: center;
+  gap: 12px;
+}
+
+.inventoryPanel dt {
+  overflow: hidden;
+  color: color-mix(in srgb, var(--color-starlight) 62%, transparent);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.inventoryPanel dd {
+  margin: 0;
+  color: #fbbf24;
+  font-size: 0.82rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
 .navigationControls {
   position: absolute;
   right: 16px;
@@ -570,5 +642,9 @@
 
   .navigationControls {
     bottom: 92px;
+  }
+
+  .inventoryPanel {
+    bottom: 160px;
   }
 }

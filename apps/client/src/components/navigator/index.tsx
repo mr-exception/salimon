@@ -3,6 +3,7 @@ import Phaser from 'phaser';
 import {
   getSpaceshipProximityTelemetry,
   subscribeToWorld,
+  useInventory,
   type SpaceshipProximityTelemetry,
 } from '@store';
 import type { World } from '@repo/types';
@@ -19,6 +20,11 @@ import style from './style.module.css';
 
 const SCALE_WIDTH_PX = 200;
 const TELEMETRY_UPDATE_INTERVAL_MS = 100;
+const INVENTORY_MATERIAL_LABELS = {
+  iron: 'Iron',
+  silicates: 'Silicates',
+  ice: 'Ice',
+} as const;
 
 function formatScaleDistance(zoom: number) {
   return formatDistance(SCALE_WIDTH_PX / zoom);
@@ -57,6 +63,7 @@ export function Navigator({
   const [proximityTelemetry, setProximityTelemetry] =
     useState<SpaceshipProximityTelemetry>();
   const [isProximityExpanded, setIsProximityExpanded] = useState(false);
+  const inventory = useInventory();
 
   useEffect(() => {
     sceneRef.current?.setMeasuringActive(isMeasuring);
@@ -217,6 +224,22 @@ export function Navigator({
           onToggleAlwaysVisible={toggleAlwaysVisible}
         />
       )}
+      <aside className={style.inventoryPanel} aria-label="Mined materials">
+        <header>
+          <span>Inventory</span>
+          <small>Mined materials</small>
+        </header>
+        <dl>
+          {Object.entries(INVENTORY_MATERIAL_LABELS).map(
+            ([material, label]) => (
+              <div key={material}>
+                <dt>{label}</dt>
+                <dd>{inventory[material as keyof typeof inventory]}</dd>
+              </div>
+            ),
+          )}
+        </dl>
+      </aside>
       {isSelectingTargetDirection && targetPreview && (
         <output
           className={style.targetDirectionPreview}

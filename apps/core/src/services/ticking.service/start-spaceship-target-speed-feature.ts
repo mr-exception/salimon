@@ -25,6 +25,10 @@ export async function startSpaceshipTargetSpeedFeature(
   const simulatedAt = new Date();
   const world = await loadWorldSnapshot();
   const currentSpaceship = await updateSpaceship(spaceship, simulatedAt, world);
+  const motionState =
+    currentSpaceship.motionState ??
+    (currentSpaceship.speed === '0' ? 'landed' : 'flying');
+  const isLaunchingFromSurface = motionState !== 'flying';
   const currentReferenceName = currentSpaceship.position.relativeTo;
   const currentReferenceBody = currentReferenceName
     ? world.bodiesByName.get(currentReferenceName)
@@ -63,7 +67,10 @@ export async function startSpaceshipTargetSpeedFeature(
     velocity: worldVelocity,
   };
   const launchReference =
-    currentReferenceBody && currentReferencePosition && currentReferenceVelocity
+    isLaunchingFromSurface &&
+    currentReferenceBody &&
+    currentReferencePosition &&
+    currentReferenceVelocity
       ? {
           body: currentReferenceBody,
           position: currentReferencePosition,
@@ -84,7 +91,6 @@ export async function startSpaceshipTargetSpeedFeature(
 
   const referencePosition = launchReference?.position;
   const referenceBody = launchReference?.body;
-  const referenceVelocity = launchReference?.velocity;
   const launchRelativePosition = referencePosition
     ? {
         x: absolutePosition.x - referencePosition.x,
@@ -96,7 +102,7 @@ export async function startSpaceshipTargetSpeedFeature(
     launchRelativePosition.y,
   );
   const launchRadius =
-    referenceBody && relativeRadius > 0
+    isLaunchingFromSurface && referenceBody && relativeRadius > 0
       ? Number(referenceBody.radius) +
         SPACESHIP_RADIUS_METERS +
         SPACESHIP_LAUNCH_CLEARANCE_METERS
@@ -114,20 +120,13 @@ export async function startSpaceshipTargetSpeedFeature(
         y: Math.round(referencePosition.y + launchPosition.y).toString(),
       }
     : currentSpaceship.position;
-  const launchWorldVelocity = referenceVelocity
-    ? {
-        x: referenceVelocity.x + relativeVelocity.x,
-        y: referenceVelocity.y + relativeVelocity.y,
-      }
-    : currentSpaceship.velocity;
 
   return RepositoryService.updatePropagatedSpaceship(currentSpaceship, {
     activeFeature,
     motionState: 'flying',
     position: worldPosition,
-    velocity: launchWorldVelocity,
+    velocity: worldVelocity,
     simulatedAt,
     updatedAt: simulatedAt,
   });
 }
-

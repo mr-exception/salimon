@@ -33,6 +33,8 @@ export type SpaceshipProximityTelemetry = {
   surfaceDistanceMeters: number;
   relativeSpeedMetersPerSecond: number;
 };
+export type InventoryMaterial = 'iron' | 'silicates' | 'ice';
+export type Inventory = Record<InventoryMaterial, number>;
 
 export const INITIAL_SPACESHIP_FUEL_KNS = 1_000_000;
 export const MAX_HULL_DURABILITY = 200;
@@ -68,6 +70,11 @@ const spaceshipMotionStateAtom = atom<SpaceshipMotionState>('landed');
 const spaceshipActiveFeatureAtom = atom<SpaceshipActiveFeature | undefined>(
   undefined,
 );
+const inventoryAtom = atom<Inventory>({
+  iron: 0,
+  silicates: 0,
+  ice: 0,
+});
 
 export function useSpaceshipSpeed() {
   return useAtomValue(spaceshipSpeedAtom);
@@ -131,6 +138,27 @@ export function useSpaceshipActiveFeature() {
 
 export function useSetSpaceshipActiveFeature() {
   return useSetAtom(spaceshipActiveFeatureAtom);
+}
+
+export function useInventory() {
+  return useAtomValue(inventoryAtom);
+}
+
+export function useSetInventory() {
+  return useSetAtom(inventoryAtom);
+}
+
+export function addInventoryMaterial(
+  material: InventoryMaterial,
+  amount: number,
+) {
+  if (!Number.isFinite(amount) || amount <= 0) return;
+
+  const inventory = store.get(inventoryAtom);
+  store.set(inventoryAtom, {
+    ...inventory,
+    [material]: inventory[material] + Math.round(amount),
+  });
 }
 
 export function getSpaceshipMotionState() {

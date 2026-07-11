@@ -75,14 +75,17 @@ export function Communications({
 
   useEffect(() => {
     let disposed = false;
-    void loadContacts()
-      .catch(() => setError('Unable to establish communications.'))
-      .finally(() => {
-        if (!disposed) setIsLoading(false);
-      });
+    const timer = window.setTimeout(() => {
+      void loadContacts()
+        .catch(() => setError('Unable to establish communications.'))
+        .finally(() => {
+          if (!disposed) setIsLoading(false);
+        });
+    }, 0);
 
     return () => {
       disposed = true;
+      window.clearTimeout(timer);
     };
   }, [loadContacts]);
 

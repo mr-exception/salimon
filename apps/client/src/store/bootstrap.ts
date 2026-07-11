@@ -1,10 +1,15 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import type { SerializedWorldSystems, SpaceshipDto } from '@repo/types';
+import type {
+  SerializedWorldSystems,
+  SpaceshipDto,
+  SpaceshipInventory,
+} from '@repo/types';
 import type { ContactMessageDto } from '@repo/types';
 import {
   hydrateWorldSystems,
   hydrateSpaceship,
+  setInventoryPersistHandler,
   setWorldViewportLoader,
 } from './world';
 
@@ -73,6 +78,9 @@ const contactMessageListeners = new Set<(message: ContactMessage) => void>();
 let spaceshipSocket: WebSocket | undefined;
 let nextWorldRequestId = 0;
 let nextContactMessageRequestId = 0;
+let pendingInventorySync: SpaceshipInventory | undefined;
+let unconfirmedInventorySync: SpaceshipInventory | undefined;
+let inventorySyncTimer: number | undefined;
 
 export function getApiBaseUrl() {
   return (import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL).replace(
@@ -142,23 +150,48 @@ function parseSpaceshipSocketMessage(data: string): SpaceshipSocketMessage {
   throw new Error('Unsupported spaceship socket message');
 }
 
+function inventoriesEqual(
+  left?: Partial<SpaceshipInventory>,
+  right?: Partial<SpaceshipInventory>,
+) {
+  if (!left || !right) return false;
+  return Object.entries(right).every(
+    ([material, amount]) =>
+      left[material as keyof SpaceshipInventory] === amount,
+  );
+}
+
+function preservePendingInventory(spaceship: SpaceshipDto) {
+  const inventory = pendingInventorySync ?? unconfirmedInventorySync;
+  if (!inventory) return spaceship;
+
+  if (inventoriesEqual(spaceship.inventory, inventory)) {
+    unconfirmedInventorySync = undefined;
+    return spaceship;
+  }
+
+  return { ...spaceship, inventory };
+}
+
 async function applySpaceshipInfo(spaceship: SpaceshipDto) {
-  storeSpaceship(spaceship);
-  hydrateSpaceship(spaceship);
+  const clientSpaceship = preservePendingInventory(spaceship);
+  storeSpaceship(clientSpaceship);
+  hydrateSpaceship(clientSpaceship);
 }
 
 async function applyWorldInfo(message: WorldInfoMessage) {
   const handledViewportRequest = handleWorldViewportInfo(message);
-  storeSpaceship(message.spaceship);
+  const spaceship = preservePendingInventory(message.spaceship);
+  storeSpaceship(spaceship);
   if (message.systems) {
     if (!handledViewportRequest) {
       hydrateWorldSystems({ systems: message.systems });
     }
-    hydrateSpaceship(message.spaceship);
+    hydrateSpaceship(spaceship);
     return;
   }
 
-  await applySpaceshipInfo(message.spaceship);
+  await applySpaceshipInfo(spaceship);
 }
 
 function readStoredSpaceship() {
@@ -246,6 +279,31 @@ function sendSpaceshipSocketMessage(message: unknown) {
   }
 
   spaceshipSocket.send(JSON.stringify(message));
+}
+
+function flushInventorySync() {
+  window.clearTimeout(inventorySyncTimer);
+  inventorySyncTimer = undefined;
+  if (!pendingInventorySync) return;
+  if (!spaceshipSocket || spaceshipSocket.readyState !== WebSocket.OPEN) {
+    return;
+  }
+
+  const inventory = pendingInventorySync;
+  pendingInventorySync = undefined;
+  unconfirmedInventorySync = inventory;
+  spaceshipSocket.send(
+    JSON.stringify({
+      type: 'spaceship:inventory',
+      inventory,
+    }),
+  );
+}
+
+function scheduleInventorySync(inventory: SpaceshipInventory) {
+  pendingInventorySync = inventory;
+  window.clearTimeout(inventorySyncTimer);
+  inventorySyncTimer = window.setTimeout(flushInventorySync, 500);
 }
 
 function rejectPendingWorldViewportRequests(error: Error) {
@@ -430,12 +488,15 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
         });
         socket.addEventListener('open', () => {
           setWorldViewportLoader(requestWorldViewportOverSocket);
+          setInventoryPersistHandler(scheduleInventorySync);
           setResult({ request, state: 'ready' });
         });
         socket.addEventListener('close', () => {
+          flushInventorySync();
           if (spaceshipSocket === socket) {
             spaceshipSocket = undefined;
             setWorldViewportLoader(undefined);
+            setInventoryPersistHandler(undefined);
           }
           rejectPendingWorldViewportRequests(
             new Error('Spaceship socket is closed'),
@@ -452,8 +513,10 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
 
     return () => {
       disposed = true;
+      flushInventorySync();
       if (spaceshipSocket === socket) spaceshipSocket = undefined;
       setWorldViewportLoader(undefined);
+      setInventoryPersistHandler(undefined);
       socket?.close();
     };
   }, [request]);

@@ -20,7 +20,7 @@ export type ShipModule = {
 export type ResearchDefinition = {
   module: ModuleType;
   name: string;
-  cost: Inventory;
+  cost: Partial<Inventory>;
 };
 
 const store = getDefaultStore();

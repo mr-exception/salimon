@@ -4,6 +4,7 @@ import {
   type WorldViewportRequest,
   WorldViewportService,
 } from '../world-viewport.service';
+import { RepositoryService } from '../repository.service';
 
 export class SpaceshipSession {
   private viewport?: WorldViewportRequest;
@@ -52,6 +53,19 @@ export class SpaceshipSession {
     this.spaceship = await TickingService.stopSpaceshipActiveFeature(
       this.spaceship,
     );
+    return this.spaceship;
+  }
+
+  async updateInventoryFromClient(body: unknown) {
+    const inventory = SpaceshipService.parseSpaceshipInventory(body);
+    const spaceship =
+      await RepositoryService.updateSpaceshipInventoryBySecurityCode(
+        this.securityCode,
+        inventory,
+      );
+    if (!spaceship) return undefined;
+
+    this.spaceship = spaceship;
     return this.spaceship;
   }
 

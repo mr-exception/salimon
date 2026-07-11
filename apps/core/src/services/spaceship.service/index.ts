@@ -9,7 +9,9 @@ import { createSpaceship } from './create-spaceship';
 import { getSecurityCode } from './get-security-code';
 import { getSpaceshipVelocity } from './get-spaceship-velocity';
 import { loadSpaceship } from './load-spaceship';
+import { normalizeSpaceshipInventory } from './normalize-spaceship-inventory';
 import { normalizeSpaceshipStats } from './normalize-spaceship-stats';
+import { parseSpaceshipInventory } from './parse-spaceship-inventory';
 import { parseSpaceshipUpdate } from './parse-spaceship-update';
 import { toSpaceshipDto } from './to-spaceship-dto';
 import { updateSpaceship } from './update-spaceship';
@@ -24,6 +26,7 @@ export {
 export type {
   SpaceshipActiveFeature,
   SpaceshipDocument,
+  SpaceshipInventory,
   SpaceshipMotionState,
   SpaceshipStats,
   SpaceshipVelocity,
@@ -39,5 +42,7 @@ export class SpaceshipService {
   static getSpaceshipVelocity = getSpaceshipVelocity;
   static getSecurityCode = getSecurityCode;
   static parseSpaceshipUpdate = parseSpaceshipUpdate;
+  static parseSpaceshipInventory = parseSpaceshipInventory;
   static normalizeSpaceshipStats = normalizeSpaceshipStats;
+  static normalizeSpaceshipInventory = normalizeSpaceshipInventory;
 }

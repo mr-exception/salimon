@@ -1,15 +1,18 @@
 import axios from 'axios';
 import { atom, getDefaultStore, useAtomValue, useSetAtom } from 'jotai';
 import type {
+  InventoryMaterial,
   Planet,
   Position,
   SerializedWorldSystems,
   SpaceshipActiveFeature,
   Spaceship,
   SpaceshipDto,
+  SpaceshipInventory,
   Star,
   World,
 } from '@repo/types';
+import { INVENTORY_MATERIALS } from '@repo/types';
 import {
   MAX_PROPAGATION_STEPS,
   SPACESHIP_MASS_KG,
@@ -33,8 +36,7 @@ export type SpaceshipProximityTelemetry = {
   surfaceDistanceMeters: number;
   relativeSpeedMetersPerSecond: number;
 };
-export type InventoryMaterial = 'iron' | 'silicates' | 'ice';
-export type Inventory = Record<InventoryMaterial, number>;
+export type Inventory = SpaceshipInventory;
 
 export const INITIAL_SPACESHIP_FUEL_KNS = 1_000_000;
 export const MAX_HULL_DURABILITY = 200;
@@ -71,11 +73,33 @@ const spaceshipMotionStateAtom = atom<SpaceshipMotionState>('landed');
 const spaceshipActiveFeatureAtom = atom<SpaceshipActiveFeature | undefined>(
   undefined,
 );
-const inventoryAtom = atom<Inventory>({
-  iron: 0,
-  silicates: 0,
-  ice: 0,
-});
+const inventoryAtom = atom<Inventory>(createEmptyInventory());
+let inventoryPersistHandler: ((inventory: Inventory) => void) | undefined;
+
+function createEmptyInventory(): Inventory {
+  return Object.fromEntries(
+    INVENTORY_MATERIALS.map((material) => [material, 0]),
+  ) as Inventory;
+}
+
+function normalizeInventory(inventory?: Partial<Inventory>): Inventory {
+  return Object.fromEntries(
+    INVENTORY_MATERIALS.map((material) => [
+      material,
+      inventory?.[material] ?? 0,
+    ]),
+  ) as Inventory;
+}
+
+function persistInventory(inventory: Inventory) {
+  inventoryPersistHandler?.(inventory);
+}
+
+export function setInventoryPersistHandler(
+  handler?: (inventory: Inventory) => void,
+) {
+  inventoryPersistHandler = handler;
+}
 
 export function useSpaceshipSpeed() {
   return useAtomValue(spaceshipSpeedAtom);
@@ -156,10 +180,12 @@ export function addInventoryMaterial(
   if (!Number.isFinite(amount) || amount <= 0) return;
 
   const inventory = store.get(inventoryAtom);
-  store.set(inventoryAtom, {
+  const nextInventory = {
     ...inventory,
     [material]: inventory[material] + Math.round(amount),
-  });
+  };
+  store.set(inventoryAtom, nextInventory);
+  persistInventory(nextInventory);
 }
 
 export function spendInventory(cost: Partial<Inventory>) {
@@ -170,11 +196,14 @@ export function spendInventory(cost: Partial<Inventory>) {
   );
   if (!canSpend) return false;
 
-  store.set(inventoryAtom, {
-    iron: inventory.iron - (cost.iron ?? 0),
-    silicates: inventory.silicates - (cost.silicates ?? 0),
-    ice: inventory.ice - (cost.ice ?? 0),
-  });
+  const nextInventory = Object.fromEntries(
+    INVENTORY_MATERIALS.map((material) => [
+      material,
+      inventory[material] - (cost[material] ?? 0),
+    ]),
+  ) as Inventory;
+  store.set(inventoryAtom, nextInventory);
+  persistInventory(nextInventory);
   return true;
 }
 
@@ -377,6 +406,7 @@ export function hydrateSpaceship(dto: SpaceshipDto) {
       ),
     ),
   );
+  store.set(inventoryAtom, normalizeInventory(dto.inventory));
   rebuildWorldBodyByName();
   advanceSpaceshipToNow(dto.positionCapturedAt ?? dto.simulatedAt);
   listeners.forEach((listener) => listener(worldState));
@@ -426,6 +456,7 @@ export function getSpaceshipDto(securityCode: string): SpaceshipDto {
       hullDurability: store.get(spaceshipHullDurabilityAtom),
       thrusterDurability: store.get(spaceshipThrusterDurabilityAtom),
     },
+    inventory: store.get(inventoryAtom),
     simulatedAt: new Date().toISOString(),
   };
 }

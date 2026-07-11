@@ -39,6 +39,7 @@ import {
   type ModuleType,
   type ShipModule,
 } from '@store';
+import { INVENTORY_MATERIALS, type InventoryMaterial } from '@repo/types';
 import {
   formatAcceleration,
   formatDuration,
@@ -186,7 +187,10 @@ function getModuleAttributeValue(
   return String(level);
 }
 
-function getUpgradeCost(module: ShipModule, attribute: ModuleAttribute) {
+function getUpgradeCost(
+  module: ShipModule,
+  attribute: ModuleAttribute,
+): Partial<Inventory> {
   const nextLevel = (module.levels[attribute] ?? 1) + 1;
   if (module.type === 'mining' && attribute === 'efficiency') {
     return { iron: 20 * nextLevel, silicates: 8 * nextLevel, ice: 0 };
@@ -216,16 +220,32 @@ function getUpgradeCost(module: ShipModule, attribute: ModuleAttribute) {
   return { iron: 0, silicates: 0, ice: 0 };
 }
 
-function canAfford(inventory: Inventory, cost: Inventory) {
-  return (
-    inventory.iron >= cost.iron &&
-    inventory.silicates >= cost.silicates &&
-    inventory.ice >= cost.ice
+function canAfford(inventory: Inventory, cost: Partial<Inventory>) {
+  return INVENTORY_MATERIALS.every(
+    (material) => inventory[material] >= (cost[material] ?? 0),
   );
 }
 
-function formatCost(cost: Inventory) {
-  return `Fe ${cost.iron} / Si ${cost.silicates} / Ice ${cost.ice}`;
+const COST_LABELS: Record<InventoryMaterial, string> = {
+  iron: 'Fe',
+  silicates: 'Si',
+  ice: 'Ice',
+  silver: 'Ag',
+  carbon: 'C',
+  gold: 'Au',
+  hydrogen: 'H',
+  nitrogen: 'N',
+};
+
+function formatCost(cost: Partial<Inventory>) {
+  const entries = INVENTORY_MATERIALS.filter(
+    (material) => (cost[material] ?? 0) > 0,
+  );
+  if (entries.length === 0) return 'Free';
+
+  return entries
+    .map((material) => `${COST_LABELS[material]} ${cost[material]}`)
+    .join(' / ');
 }
 
 function getModuleAttributes(type: ModuleType): ModuleAttribute[] {
@@ -532,7 +552,7 @@ export function Footer({
     }
   };
 
-  const unlockResearchModule = (type: ModuleType, cost: Inventory) => {
+  const unlockResearchModule = (type: ModuleType, cost: Partial<Inventory>) => {
     if (!spendInventory(cost)) return;
     unlockModule(type);
   };

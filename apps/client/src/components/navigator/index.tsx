@@ -6,6 +6,7 @@ import {
   useInventory,
   type SpaceshipProximityTelemetry,
 } from '@store';
+import { INVENTORY_MATERIALS } from '@repo/types';
 import type { World } from '@repo/types';
 import { formatAngle, formatDistance, formatSpeed } from '../../utils';
 import { BodyContextMenu } from './body-context-menu';
@@ -24,6 +25,11 @@ const INVENTORY_MATERIAL_LABELS = {
   iron: 'Iron',
   silicates: 'Silicates',
   ice: 'Ice',
+  silver: 'Silver',
+  carbon: 'Carbon',
+  gold: 'Gold',
+  hydrogen: 'Hydrogen',
+  nitrogen: 'Nitrogen',
 } as const;
 
 function formatScaleDistance(zoom: number) {
@@ -230,14 +236,12 @@ export function Navigator({
           <small>Mined materials</small>
         </header>
         <dl>
-          {Object.entries(INVENTORY_MATERIAL_LABELS).map(
-            ([material, label]) => (
-              <div key={material}>
-                <dt>{label}</dt>
-                <dd>{inventory[material as keyof typeof inventory]}</dd>
-              </div>
-            ),
-          )}
+          {INVENTORY_MATERIALS.map((material) => (
+            <div key={material}>
+              <dt>{INVENTORY_MATERIAL_LABELS[material]}</dt>
+              <dd>{inventory[material]}</dd>
+            </div>
+          ))}
         </dl>
       </aside>
       {isSelectingTargetDirection && targetPreview && (

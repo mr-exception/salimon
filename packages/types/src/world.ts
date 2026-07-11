@@ -60,6 +60,20 @@ export type SpaceshipStats = {
   thrusterDurability: number[];
 };
 
+export const INVENTORY_MATERIALS = [
+  'iron',
+  'silicates',
+  'ice',
+  'silver',
+  'carbon',
+  'gold',
+  'hydrogen',
+  'nitrogen',
+] as const;
+
+export type InventoryMaterial = (typeof INVENTORY_MATERIALS)[number];
+export type SpaceshipInventory = Record<InventoryMaterial, number>;
+
 export type SpaceshipActiveFeature = {
   type: 'target-speed';
   targetSpeedMetersPerSecond: number;
@@ -80,6 +94,7 @@ export type SpaceshipDto = {
   velocity?: Velocity;
   motionState?: SpaceshipMotionState;
   stats?: Partial<SpaceshipStats> & Pick<SpaceshipStats, 'fuelKns'>;
+  inventory?: Partial<SpaceshipInventory>;
   activeFeature?: SpaceshipActiveFeature;
   simulatedAt?: string;
 };

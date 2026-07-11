@@ -21,6 +21,7 @@ import {
   getMiningModuleStats,
   getThrusterModulePowerPercent,
 } from '@store';
+import { INVENTORY_MATERIALS } from '@repo/types';
 import type { Planet as PlanetData, Star as StarData } from '@repo/types';
 import { formatSpeed } from '../../../../utils';
 import {
@@ -84,11 +85,16 @@ const ASTEROID_SCREEN_MARGIN = 36;
 const ASTEROID_MIN_SCREEN_SPEED = 32;
 const ASTEROID_MAX_SCREEN_SPEED = 68;
 const ENGINE_START_RESPONSE_TIMEOUT_MS = 5_000;
-const ASTEROID_MATERIALS: AsteroidMaterial[] = ['iron', 'silicates', 'ice'];
+const ASTEROID_MATERIALS: AsteroidMaterial[] = [...INVENTORY_MATERIALS];
 const ASTEROID_MATERIAL_THICKNESS: Record<AsteroidMaterial, number> = {
   iron: 3,
   silicates: 5,
   ice: 1,
+  silver: 4,
+  carbon: 2,
+  gold: 6,
+  hydrogen: 1,
+  nitrogen: 1,
 };
 const MINING_BEAM_RANGE_PX = 230;
 const MINING_BEAM_COLOR = 0xfbbf24;

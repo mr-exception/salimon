@@ -18,8 +18,8 @@ export async function updateSpaceshipBySecurityCode(
     position: update.position ?? spaceship.position,
     velocity: update.velocity ?? spaceship.velocity,
     stats: update.stats ?? spaceship.stats,
+    inventory: update.inventory ?? spaceship.inventory,
   });
   spaceships.set(securityCode, updatedSpaceship);
   return cloneSpaceship(updatedSpaceship);
 }
-

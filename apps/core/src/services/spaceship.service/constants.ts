@@ -1,10 +1,14 @@
-import type { SpaceshipDto } from '@repo/types';
+import type { SpaceshipDto, SpaceshipInventory } from '@repo/types';
+import { INVENTORY_MATERIALS } from '@repo/types';
 
 export const SECURITY_CODE_HEADER = 'x-spaceship-security-code';
 export const INITIAL_SPACESHIP_FUEL_KNS = 1_000_000;
 export const MAX_HULL_DURABILITY = 200;
 export const MAX_THRUSTER_DURABILITY = 100;
 export const SPACESHIP_THRUSTER_COUNT = 4;
+export const EMPTY_SPACESHIP_INVENTORY = Object.fromEntries(
+  INVENTORY_MATERIALS.map((material) => [material, 0]),
+) as SpaceshipInventory;
 export const DEFAULT_SPACESHIP = {
   position: {
     x: '6371200',
@@ -22,5 +26,5 @@ export const DEFAULT_SPACESHIP = {
       MAX_THRUSTER_DURABILITY,
     ),
   },
+  inventory: EMPTY_SPACESHIP_INVENTORY,
 } satisfies Omit<SpaceshipDto, 'securityCode' | 'simulatedAt'>;
-

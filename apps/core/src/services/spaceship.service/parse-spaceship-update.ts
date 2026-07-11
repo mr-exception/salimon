@@ -1,4 +1,5 @@
 import type { SpaceshipMotionState } from '@models';
+import { parseSpaceshipInventory } from './parse-spaceship-inventory';
 import {
   MAX_HULL_DURABILITY,
   MAX_THRUSTER_DURABILITY,
@@ -119,6 +120,8 @@ export function parseSpaceshipUpdate(body: unknown) {
       hullDurability,
       thrusterDurability,
     },
+    ...(candidate.inventory === undefined
+      ? {}
+      : { inventory: parseSpaceshipInventory(candidate.inventory) }),
   };
 }
-

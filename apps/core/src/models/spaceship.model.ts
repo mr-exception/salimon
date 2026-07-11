@@ -2,6 +2,7 @@ import { getModelForClass, modelOptions, prop } from '@typegoose/typegoose';
 import type {
   SerializedPosition,
   SpaceshipActiveFeature,
+  SpaceshipInventory,
   SpaceshipMotionState,
   SpaceshipStats,
   Velocity,
@@ -9,7 +10,12 @@ import type {
 import { DatabaseModel } from './database.model';
 
 export type SpaceshipVelocity = Velocity;
-export type { SpaceshipActiveFeature, SpaceshipMotionState, SpaceshipStats };
+export type {
+  SpaceshipActiveFeature,
+  SpaceshipInventory,
+  SpaceshipMotionState,
+  SpaceshipStats,
+};
 
 class SpaceshipPosition implements SerializedPosition {
   @prop({ required: true, type: () => String })
@@ -38,6 +44,32 @@ class SpaceshipStatsSchema implements SpaceshipStats {
 
   @prop({ required: true, type: () => [Number] })
   public thrusterDurability!: number[];
+}
+
+class SpaceshipInventorySchema implements SpaceshipInventory {
+  @prop({ required: true, type: () => Number })
+  public iron!: number;
+
+  @prop({ required: true, type: () => Number })
+  public silicates!: number;
+
+  @prop({ required: true, type: () => Number })
+  public ice!: number;
+
+  @prop({ required: true, type: () => Number })
+  public silver!: number;
+
+  @prop({ required: true, type: () => Number })
+  public carbon!: number;
+
+  @prop({ required: true, type: () => Number })
+  public gold!: number;
+
+  @prop({ required: true, type: () => Number })
+  public hydrogen!: number;
+
+  @prop({ required: true, type: () => Number })
+  public nitrogen!: number;
 }
 
 class SpaceshipTargetSpeedFeatureSchema implements SpaceshipActiveFeature {
@@ -90,6 +122,9 @@ class SpaceshipSchema {
 
   @prop({ type: () => SpaceshipStatsSchema })
   public stats?: SpaceshipStats;
+
+  @prop({ type: () => SpaceshipInventorySchema })
+  public inventory?: SpaceshipInventory;
 
   @prop({ type: () => SpaceshipTargetSpeedFeatureSchema })
   public activeFeature?: SpaceshipActiveFeature;

@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
+import type { InventoryMaterial } from '@repo/types';
 
-export type AsteroidMaterial = 'iron' | 'silicates' | 'ice';
+export type AsteroidMaterial = InventoryMaterial;
 
 export type AsteroidPayload = {
   material: AsteroidMaterial;
@@ -11,6 +12,11 @@ const MATERIAL_COLORS: Record<AsteroidMaterial, number> = {
   iron: 0xb6c2ce,
   silicates: 0xd6a76a,
   ice: 0x93c5fd,
+  silver: 0xe5e7eb,
+  carbon: 0x334155,
+  gold: 0xfacc15,
+  hydrogen: 0x67e8f9,
+  nitrogen: 0x818cf8,
 };
 const OUTLINE_COLOR = 0x0f172a;
 

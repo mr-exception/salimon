@@ -14,6 +14,7 @@ export function cloneSpaceship(
           thrusterDurability: [...spaceship.stats.thrusterDurability],
         }
       : undefined,
+    inventory: spaceship.inventory ? { ...spaceship.inventory } : undefined,
     activeFeature: spaceship.activeFeature
       ? {
           ...spaceship.activeFeature,
@@ -25,4 +26,3 @@ export function cloneSpaceship(
     updatedAt: new Date(spaceship.updatedAt),
   };
 }
-

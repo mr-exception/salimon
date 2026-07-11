@@ -13,6 +13,7 @@ import { SpaceshipSession } from './spaceship-session';
 type SpaceshipSocketIncomingMessage =
   | { type: 'spaceship:update'; spaceship?: unknown }
   | { type: 'spaceship:movement'; spaceship?: unknown }
+  | { type: 'spaceship:inventory'; inventory?: unknown }
   | {
       type: 'spaceship:start-target-speed';
       targetSpeedMetersPerSecond?: unknown;
@@ -86,10 +87,12 @@ export class SpaceshipSocketConnection {
     }
   }
 
-  private async sendWorldInfo(options: {
-    requestId?: string;
-    viewport?: WorldViewportRequest;
-  } = {}) {
+  private async sendWorldInfo(
+    options: {
+      requestId?: string;
+      viewport?: WorldViewportRequest;
+    } = {},
+  ) {
     if (!this.session) return;
 
     try {
@@ -127,6 +130,7 @@ export class SpaceshipSocketConnection {
     if (
       message.type !== 'spaceship:update' &&
       message.type !== 'spaceship:movement' &&
+      message.type !== 'spaceship:inventory' &&
       message.type !== 'spaceship:start-target-speed' &&
       message.type !== 'spaceship:stop-active-feature' &&
       message.type !== 'contact:message:send' &&
@@ -205,6 +209,22 @@ export class SpaceshipSocketConnection {
 
       if (message.type === 'contact:message:send') {
         await this.sendContactMessage(message);
+        return;
+      }
+
+      if (message.type === 'spaceship:inventory') {
+        const spaceship = await this.session.updateInventoryFromClient(
+          message.inventory,
+        );
+        if (!spaceship) {
+          throw new Error('Spaceship not found');
+        }
+
+        this.hasPendingPersist = false;
+        sendJson(this.socket, {
+          type: 'spaceship:info',
+          spaceship: this.session.getSpaceshipDto(),
+        });
         return;
       }
 

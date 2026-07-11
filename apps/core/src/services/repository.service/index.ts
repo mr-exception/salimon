@@ -7,6 +7,7 @@ import { insertSpaceship } from './insert-spaceship';
 import { start } from './start';
 import { stop } from './stop';
 import { updatePropagatedSpaceship } from './update-propagated-spaceship';
+import { updateSpaceshipInventoryBySecurityCode } from './update-spaceship-inventory-by-security-code';
 import { updateSpaceshipBySecurityCode } from './update-spaceship-by-security-code';
 import { updateSpaceships } from './update-spaceships';
 import { updateWorldBodies } from './update-world-bodies';
@@ -21,8 +22,9 @@ export class RepositoryService {
   static insertSpaceship = insertSpaceship;
   static findSpaceshipBySecurityCode = findSpaceshipBySecurityCode;
   static updateSpaceshipBySecurityCode = updateSpaceshipBySecurityCode;
+  static updateSpaceshipInventoryBySecurityCode =
+    updateSpaceshipInventoryBySecurityCode;
   static findOldestSpaceshipsForSimulation = findOldestSpaceshipsForSimulation;
   static updatePropagatedSpaceship = updatePropagatedSpaceship;
   static flushToDatabase = flushToDatabase;
 }
-

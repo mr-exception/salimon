@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import type { SerializedWorldSystems, SpaceshipDto } from '@repo/types';
+import type { ContactMessageDto } from '@repo/types';
 import {
   hydrateWorldSystems,
   hydrateSpaceship,
@@ -35,15 +36,7 @@ type WorldViewportMessage = SerializedWorldSystems & {
   type: 'world:viewport';
   requestId?: string;
 };
-export type ContactMessage = {
-  id: string;
-  contactId: string;
-  sender: 'player' | 'contact';
-  text: string;
-  status: 'sent' | 'queued' | 'failed';
-  isRead: boolean;
-  createdAt: string;
-};
+export type ContactMessage = ContactMessageDto;
 type ContactSocketMessage = {
   type: 'contact:message';
   requestId?: string;

@@ -1,6 +1,9 @@
 import type { ContactMessageDocument } from '@models';
+import type { ContactMessageDto } from '@repo/types';
 
-export function toMessageDto(message: ContactMessageDocument) {
+export function toMessageDto(
+  message: ContactMessageDocument,
+): ContactMessageDto {
   return {
     id: message._id,
     contactId: message.contactId,
@@ -11,4 +14,3 @@ export function toMessageDto(message: ContactMessageDocument) {
     createdAt: message.createdAt.toISOString(),
   };
 }
-

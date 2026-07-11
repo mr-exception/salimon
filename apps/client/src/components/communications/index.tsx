@@ -6,36 +6,18 @@ import {
   SECURITY_CODE_HEADER,
   sendContactMessageOverSocket,
   subscribeToContactMessages,
-  type ContactMessage,
 } from '@store';
-import style from './style.module.css';
-
-type Contact = {
-  id: string;
-  name: string;
-  organization: string;
-  unreadCount: number;
-  lastMessageAt?: string;
-};
-
-type Message = ContactMessage;
+import { CommunicationsShell } from './components/communications-shell';
+import { ContactsList } from './components/contacts-list';
+import { ConversationPanel } from './components/conversation-panel';
+import type { Contact, Message } from './types';
+import { mergeMessages } from './utils';
 
 type Props = {
   onClose: () => void;
   unreadMessages: Message[];
   onMessagesRead: (messageIds: string[]) => void;
 };
-
-const CONTACT_POLL_MS = 30_000;
-const MAX_RETRY_MS = 60_000;
-
-function mergeMessages(current: Message[], incoming: Message[]) {
-  const byId = new Map(current.map((message) => [message.id, message]));
-  incoming.forEach((message) => byId.set(message.id, message));
-  return [...byId.values()].sort(
-    (left, right) => Date.parse(left.createdAt) - Date.parse(right.createdAt),
-  );
-}
 
 export function Communications({
   onClose,
@@ -93,46 +75,14 @@ export function Communications({
 
   useEffect(() => {
     let disposed = false;
-    let retryDelay = CONTACT_POLL_MS;
-    let contactTimer: number | undefined;
+    void loadContacts()
+      .catch(() => setError('Unable to establish communications.'))
+      .finally(() => {
+        if (!disposed) setIsLoading(false);
+      });
 
-    const canPoll = () => !document.hidden && navigator.onLine;
-    const pollContacts = async () => {
-      if (disposed) return;
-      if (canPoll()) {
-        try {
-          await loadContacts();
-          retryDelay = CONTACT_POLL_MS;
-        } catch {
-          retryDelay = Math.min(retryDelay * 2, MAX_RETRY_MS);
-        }
-      }
-      contactTimer = window.setTimeout(
-        pollContacts,
-        canPoll() ? CONTACT_POLL_MS : MAX_RETRY_MS,
-      );
-    };
-    const pollNow = () => {
-      window.clearTimeout(contactTimer);
-      void pollContacts();
-    };
-
-    const initialTimer = window.setTimeout(() => {
-      void loadContacts()
-        .catch(() => setError('Unable to establish communications.'))
-        .finally(() => {
-          if (!disposed) setIsLoading(false);
-        });
-      contactTimer = window.setTimeout(pollContacts, CONTACT_POLL_MS);
-    }, 0);
-    document.addEventListener('visibilitychange', pollNow);
-    window.addEventListener('online', pollNow);
     return () => {
       disposed = true;
-      window.clearTimeout(initialTimer);
-      window.clearTimeout(contactTimer);
-      document.removeEventListener('visibilitychange', pollNow);
-      window.removeEventListener('online', pollNow);
     };
   }, [loadContacts]);
 
@@ -197,107 +147,27 @@ export function Communications({
   );
 
   return (
-    <div className={style.backdrop} role="presentation">
-      <section
-        className={style.dialog}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="communications-title"
-      >
-        <header className={style.header}>
-          <div>
-            <small>Ship communications</small>
-            <h2 id="communications-title">Contacts</h2>
-          </div>
-          <button type="button" onClick={onClose} aria-label="Close">
-            ×
-          </button>
-        </header>
-
-        <div className={style.content}>
-          <nav className={style.contacts} aria-label="Known contacts">
-            {contacts.map((contact) => {
-              const unreadCount = unreadCountByContact.get(contact.id) ?? 0;
-              return (
-                <button
-                  type="button"
-                  key={contact.id}
-                  data-active={contact.id === selectedContactId}
-                  data-unread={unreadCount > 0}
-                  onClick={() => setSelectedContactId(contact.id)}
-                >
-                  <span>{contact.name}</span>
-                  <small>{contact.organization}</small>
-                  {unreadCount > 0 && (
-                    <strong aria-label={`${unreadCount} unread`}>
-                      {unreadCount}
-                    </strong>
-                  )}
-                </button>
-              );
-            })}
-          </nav>
-
-          <div className={style.conversation}>
-            <div className={style.contactHeading}>
-              <strong>{selectedContact?.name ?? 'No contact selected'}</strong>
-              <small>{selectedContact?.organization}</small>
-            </div>
-            <div className={style.messages} aria-live="polite">
-              {isLoading && <p className={style.notice}>Loading messages…</p>}
-              {!isLoading &&
-                messages.map((message) => (
-                  <article
-                    className={style.message}
-                    data-sender={message.sender}
-                    key={message.id}
-                  >
-                    <p>{message.text}</p>
-                    <small>
-                      {new Date(message.createdAt).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                      {message.status === 'queued' ? ' · awaiting reply' : ''}
-                    </small>
-                  </article>
-                ))}
-              <div ref={messagesEndRef} />
-            </div>
-            <form
-              className={style.composer}
-              onSubmit={(event) => {
-                event.preventDefault();
-                void sendMessage();
-              }}
-            >
-              <label htmlFor="communications-message">Message</label>
-              <textarea
-                id="communications-message"
-                value={draft}
-                maxLength={1_000}
-                placeholder="Message the Chief…"
-                onChange={(event) => setDraft(event.currentTarget.value)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' && !event.shiftKey) {
-                    event.preventDefault();
-                    void sendMessage();
-                  }
-                }}
-              />
-              <button
-                type="submit"
-                disabled={!draft.trim() || isSending || !selectedContactId}
-              >
-                {isSending ? 'Sending…' : 'Send'}
-              </button>
-            </form>
-            <p className={style.error} role="status">
-              {!navigator.onLine ? 'Communications offline.' : error}
-            </p>
-          </div>
-        </div>
-      </section>
-    </div>
+    <CommunicationsShell onClose={onClose}>
+      <ContactsList
+        contacts={contacts}
+        selectedContactId={selectedContactId}
+        unreadCountByContact={unreadCountByContact}
+        onSelectContact={setSelectedContactId}
+      />
+      <ConversationPanel
+        draft={draft}
+        error={error}
+        isLoading={isLoading}
+        isSending={isSending}
+        messages={messages}
+        messagesEndRef={messagesEndRef}
+        selectedContact={selectedContact}
+        selectedContactId={selectedContactId}
+        onDraftChange={setDraft}
+        onSendMessage={() => {
+          void sendMessage();
+        }}
+      />
+    </CommunicationsShell>
   );
 }

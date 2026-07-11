@@ -1,6 +1,7 @@
 import { ContactModel, ContactMessageModel } from '@models';
 import { CONTACTS, ContactsService, RepositoryService } from '@services';
 import { getRequiredSecurityCode, sendError } from '../../http';
+import type { ContactInfo } from '@repo/types';
 import type { Request, Response } from 'express';
 
 export async function getInfo(request: Request, response: Response) {
@@ -21,27 +22,29 @@ export async function getInfo(request: Request, response: Response) {
       contacts = await ContactModel.findBySpaceshipSecurityCode(securityCode);
     }
 
+    const contactInfo: ContactInfo[] = await Promise.all(
+      contacts.flatMap(async (contact) => {
+        const profile = CONTACTS[contact.contactId as keyof typeof CONTACTS];
+        if (!profile) return [];
+        const [latestMessage, unreadCount] = await Promise.all([
+          ContactsService.findLatestMessage(securityCode, contact.contactId),
+          ContactMessageModel.countUnreadContactMessages(
+            securityCode,
+            contact.contactId,
+          ),
+        ]);
+        return [
+          {
+            ...profile,
+            unreadCount,
+            lastMessageAt: latestMessage?.createdAt.toISOString(),
+          },
+        ];
+      }),
+    ).then((groups) => groups.flat());
+
     response.json({
-      contacts: await Promise.all(
-        contacts.flatMap(async (contact) => {
-          const profile = CONTACTS[contact.contactId as keyof typeof CONTACTS];
-          if (!profile) return [];
-          const [latestMessage, unreadCount] = await Promise.all([
-            ContactsService.findLatestMessage(securityCode, contact.contactId),
-            ContactMessageModel.countUnreadContactMessages(
-              securityCode,
-              contact.contactId,
-            ),
-          ]);
-          return [
-            {
-              ...profile,
-              unreadCount,
-              lastMessageAt: latestMessage?.createdAt.toISOString(),
-            },
-          ];
-        }),
-      ).then((groups) => groups.flat()),
+      contacts: contactInfo,
     });
   } catch (error) {
     console.error('Failed to load contacts', error);

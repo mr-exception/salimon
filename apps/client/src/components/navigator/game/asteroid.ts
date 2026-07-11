@@ -65,6 +65,27 @@ export class Asteroid extends Phaser.GameObjects.Container {
     this.setScale(1 / zoom);
   }
 
+  mine(amount: number) {
+    if (!Number.isFinite(amount) || amount <= 0 || this.payload.amount <= 0) {
+      return 0;
+    }
+
+    const minedAmount = Math.min(this.payload.amount, amount);
+    this.payload.amount -= minedAmount;
+    this.oreGlow.setAlpha(
+      Phaser.Math.Clamp(
+        this.payload.amount / Math.max(1, this.radius * 2),
+        0.15,
+        0.68,
+      ),
+    );
+    return minedAmount;
+  }
+
+  isDepleted() {
+    return this.payload.amount <= 0;
+  }
+
   isPastViewport(viewport: Phaser.Geom.Rectangle, margin: number) {
     return (
       this.x < viewport.left - margin ||

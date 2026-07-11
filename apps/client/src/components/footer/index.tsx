@@ -12,6 +12,21 @@ import {
   INITIAL_SPACESHIP_FUEL_KNS,
   MAX_HULL_DURABILITY,
   MAX_THRUSTER_DURABILITY,
+  MINING_BASE_EFFICIENCY_KNS,
+  MINING_BASE_DURABILITY_KN,
+  MINING_DURABILITY_PER_LEVEL_KN,
+  MODULE_GRID_SIZE,
+  MODULE_RESEARCH,
+  THRUSTER_BASE_DURABILITY,
+  THRUSTER_BASE_POWER_PERCENT,
+  THRUSTER_LEVEL_MULTIPLIER,
+  placeModule,
+  setModuleActive,
+  spendInventory,
+  unlockModule,
+  upgradeModuleAttribute,
+  useInventory,
+  useModules,
   useSpaceshipActiveFeature,
   useSpaceshipFuelKns,
   useSpaceshipHullDurability,
@@ -19,6 +34,10 @@ import {
   useSpaceshipSpeed,
   useSpaceshipTargetDirection,
   useSpaceshipThrusterDurability,
+  type Inventory,
+  type ModuleAttribute,
+  type ModuleType,
+  type ShipModule,
 } from '@store';
 import {
   formatAcceleration,
@@ -41,7 +60,12 @@ type FooterProps = {
   onPredictionChange?: (active: boolean, seconds: number) => void;
 };
 
-type SpeedControlTab = 'target-speed' | 'maintenance' | 'prediction';
+type SpeedControlTab =
+  | 'target-speed'
+  | 'maintenance'
+  | 'prediction'
+  | 'modules'
+  | 'research';
 
 type Position = {
   x: number;
@@ -52,6 +76,8 @@ const CONTROL_LABELS: Record<SpeedControlTab, string> = {
   'target-speed': 'Target speed',
   maintenance: 'Ship durability',
   prediction: 'Prediction',
+  modules: 'Modules',
+  research: 'Research',
 };
 
 const PANEL_MARGIN = 16;
@@ -65,9 +91,26 @@ const PANEL_PLACEMENTS: Record<
   'target-speed': { horizontal: 'left', vertical: 'top' },
   maintenance: { horizontal: 'right', vertical: 'bottom' },
   prediction: { horizontal: 'left', vertical: 'bottom' },
+  modules: { horizontal: 'left', vertical: 'top' },
+  research: { horizontal: 'right', vertical: 'top' },
 };
 
 function FeatureIcon({ feature }: { feature: SpeedControlTab }) {
+  if (feature === 'modules') {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" />
+      </svg>
+    );
+  }
+  if (feature === 'research') {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M10 4h4M12 4v6l5 8a2 2 0 0 1-1.7 3H8.7A2 2 0 0 1 7 18l5-8" />
+        <path d="M9 16h6" />
+      </svg>
+    );
+  }
   if (feature === 'prediction') {
     return (
       <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -100,6 +143,95 @@ function FeatureIcon({ feature }: { feature: SpeedControlTab }) {
       <path d="m12 3-2.5 2.5M12 3l2.5 2.5M21 12l-2.5-2.5M21 12l-2.5 2.5M12 21l-2.5-2.5M12 21l2.5-2.5M3 12l2.5-2.5M3 12l2.5 2.5" />
     </svg>
   );
+}
+
+const MODULE_LABELS: Record<ModuleType, string> = {
+  mining: 'Mining',
+  thruster: 'Thruster',
+};
+
+const ATTRIBUTE_LABELS: Record<ModuleAttribute, string> = {
+  efficiency: 'Efficiency',
+  durability: 'Durability',
+  power: 'Power',
+};
+
+function getModuleAttributeValue(
+  module: ShipModule,
+  attribute: ModuleAttribute,
+) {
+  const level = module.levels[attribute] ?? 1;
+  if (module.type === 'mining' && attribute === 'efficiency') {
+    return `${MINING_BASE_EFFICIENCY_KNS * level} KN/s`;
+  }
+  if (module.type === 'mining' && attribute === 'durability') {
+    return `${
+      MINING_BASE_DURABILITY_KN +
+      Math.max(0, level - 1) * MINING_DURABILITY_PER_LEVEL_KN
+    } KN`;
+  }
+  if (module.type === 'thruster' && attribute === 'power') {
+    return `${Math.round(
+      THRUSTER_BASE_POWER_PERCENT *
+        (1 + Math.max(0, level - 1) * THRUSTER_LEVEL_MULTIPLIER),
+    )}%`;
+  }
+  if (module.type === 'thruster' && attribute === 'durability') {
+    return `${Math.round(
+      THRUSTER_BASE_DURABILITY *
+        (1 + Math.max(0, level - 1) * THRUSTER_LEVEL_MULTIPLIER),
+    )}`;
+  }
+
+  return String(level);
+}
+
+function getUpgradeCost(module: ShipModule, attribute: ModuleAttribute) {
+  const nextLevel = (module.levels[attribute] ?? 1) + 1;
+  if (module.type === 'mining' && attribute === 'efficiency') {
+    return { iron: 20 * nextLevel, silicates: 8 * nextLevel, ice: 0 };
+  }
+  if (module.type === 'mining' && attribute === 'durability') {
+    return {
+      iron: 14 * nextLevel,
+      silicates: 12 * nextLevel,
+      ice: 4 * nextLevel,
+    };
+  }
+  if (module.type === 'thruster' && attribute === 'power') {
+    return {
+      iron: 45 * nextLevel,
+      silicates: 30 * nextLevel,
+      ice: 12 * nextLevel,
+    };
+  }
+  if (module.type === 'thruster' && attribute === 'durability') {
+    return {
+      iron: 32 * nextLevel,
+      silicates: 34 * nextLevel,
+      ice: 8 * nextLevel,
+    };
+  }
+
+  return { iron: 0, silicates: 0, ice: 0 };
+}
+
+function canAfford(inventory: Inventory, cost: Inventory) {
+  return (
+    inventory.iron >= cost.iron &&
+    inventory.silicates >= cost.silicates &&
+    inventory.ice >= cost.ice
+  );
+}
+
+function formatCost(cost: Inventory) {
+  return `Fe ${cost.iron} / Si ${cost.silicates} / Ice ${cost.ice}`;
+}
+
+function getModuleAttributes(type: ModuleType): ModuleAttribute[] {
+  return type === 'mining'
+    ? ['efficiency', 'durability']
+    : ['power', 'durability'];
 }
 
 function MoveIcon() {
@@ -298,13 +430,21 @@ export function Footer({
   const motionState = useSpaceshipMotionState();
   const targetDirection = useSpaceshipTargetDirection();
   const activeFeature = useSpaceshipActiveFeature();
+  const inventory = useInventory();
+  const modules = useModules();
   const [targetSpeed, setTargetSpeed] = useState('10');
   const [maximumThrustPercent, setMaximumThrustPercent] = useState('100');
   const [predictionAmount, setPredictionAmount] = useState('2');
   const [predictionUnit, setPredictionUnit] = useState<'s' | 'm' | 'h'>('m');
   const [isPredictionActive, setIsPredictionActive] = useState(false);
+  const [selectedModuleId, setSelectedModuleId] = useState<string | undefined>(
+    'mining-module-1',
+  );
   const [expandedSpeedControls, setExpandedSpeedControls] = useState(
     () => new Set<SpeedControlTab>(),
+  );
+  const selectedModule = modules.find(
+    (module) => module.id === selectedModuleId,
   );
   const targetSpeedMetersPerSecond = Number(targetSpeed) * 1_000;
   const maximumThrustPercentValue = Number(maximumThrustPercent);
@@ -378,6 +518,34 @@ export function Footer({
     startEngines();
   };
 
+  const selectModuleGridCell = (x: number, y: number) => {
+    const cellModule = modules.find(
+      (module) => module.position.x === x && module.position.y === y,
+    );
+    if (cellModule) {
+      setSelectedModuleId(cellModule.id);
+      return;
+    }
+
+    if (selectedModuleId) {
+      placeModule(selectedModuleId, { x, y });
+    }
+  };
+
+  const unlockResearchModule = (type: ModuleType, cost: Inventory) => {
+    if (!spendInventory(cost)) return;
+    unlockModule(type);
+  };
+
+  const upgradeResearchAttribute = (
+    module: ShipModule,
+    attribute: ModuleAttribute,
+  ) => {
+    const cost = getUpgradeCost(module, attribute);
+    if (!spendInventory(cost)) return;
+    upgradeModuleAttribute(module.id, attribute);
+  };
+
   return (
     <footer className={style.container} aria-label="Ship controls">
       <section className={style.speedControls} aria-label="Ship features">
@@ -385,6 +553,8 @@ export function Footer({
           {(
             [
               ['target-speed', 'Target speed'],
+              ['modules', 'Modules'],
+              ['research', 'Research'],
               ['maintenance', 'Ship durability'],
               ['prediction', 'Prediction'],
             ] as const
@@ -442,6 +612,166 @@ export function Footer({
         </div>
 
         <div className={style.controlPanels}>
+          {expandedSpeedControls.has('modules') && (
+            <DraggablePanel
+              control="modules"
+              onClose={() => toggleSpeedControl('modules')}
+            >
+              <div className={style.moduleGridPanel}>
+                <div
+                  className={style.moduleGrid}
+                  style={{
+                    gridTemplateColumns: `repeat(${MODULE_GRID_SIZE}, 1fr)`,
+                  }}
+                >
+                  {Array.from(
+                    { length: MODULE_GRID_SIZE * MODULE_GRID_SIZE },
+                    (_, index) => {
+                      const x = index % MODULE_GRID_SIZE;
+                      const y = Math.floor(index / MODULE_GRID_SIZE);
+                      const module = modules.find(
+                        (candidate) =>
+                          candidate.position.x === x &&
+                          candidate.position.y === y,
+                      );
+
+                      return (
+                        <button
+                          key={`${x}:${y}`}
+                          type="button"
+                          aria-label={
+                            module
+                              ? `${module.name} at ${x + 1}, ${y + 1}`
+                              : `Empty module cell ${x + 1}, ${y + 1}`
+                          }
+                          data-occupied={module ? 'true' : 'false'}
+                          data-selected={module?.id === selectedModuleId}
+                          onClick={() => selectModuleGridCell(x, y)}
+                        >
+                          {module ? MODULE_LABELS[module.type].slice(0, 1) : ''}
+                        </button>
+                      );
+                    },
+                  )}
+                </div>
+                <div className={style.moduleInspector}>
+                  {selectedModule ? (
+                    <>
+                      <header>
+                        <span>{selectedModule.name}</span>
+                        <small>
+                          {selectedModule.position.x + 1},
+                          {selectedModule.position.y + 1}
+                        </small>
+                      </header>
+                      <dl>
+                        {getModuleAttributes(selectedModule.type).map(
+                          (attribute) => (
+                            <div key={attribute}>
+                              <dt>{ATTRIBUTE_LABELS[attribute]}</dt>
+                              <dd>
+                                {getModuleAttributeValue(
+                                  selectedModule,
+                                  attribute,
+                                )}
+                              </dd>
+                            </div>
+                          ),
+                        )}
+                        <div>
+                          <dt>Durability left</dt>
+                          <dd>{selectedModule.durability.toFixed(0)}</dd>
+                        </div>
+                      </dl>
+                      {selectedModule.type === 'mining' && (
+                        <button
+                          type="button"
+                          data-active={selectedModule.active}
+                          disabled={selectedModule.durability <= 0}
+                          onClick={() =>
+                            setModuleActive(
+                              selectedModule.id,
+                              !selectedModule.active,
+                            )
+                          }
+                        >
+                          {selectedModule.active ? 'Deactivate' : 'Activate'}
+                        </button>
+                      )}
+                    </>
+                  ) : (
+                    <span className={style.emptyModuleSelection}>
+                      Select a module
+                    </span>
+                  )}
+                </div>
+              </div>
+            </DraggablePanel>
+          )}
+          {expandedSpeedControls.has('research') && (
+            <DraggablePanel
+              control="research"
+              onClose={() => toggleSpeedControl('research')}
+            >
+              <div className={style.researchList}>
+                {MODULE_RESEARCH.map((research) => {
+                  const module = modules.find(
+                    (candidate) => candidate.type === research.module,
+                  );
+                  const unlocked = module !== undefined;
+
+                  return (
+                    <section
+                      className={style.researchItem}
+                      key={research.module}
+                    >
+                      <header>
+                        <span>{research.name}</span>
+                        <small>
+                          {unlocked ? 'Unlocked' : formatCost(research.cost)}
+                        </small>
+                      </header>
+                      {!unlocked ? (
+                        <button
+                          type="button"
+                          disabled={!canAfford(inventory, research.cost)}
+                          onClick={() =>
+                            unlockResearchModule(research.module, research.cost)
+                          }
+                        >
+                          Unlock
+                        </button>
+                      ) : (
+                        <div className={style.researchUpgrades}>
+                          {getModuleAttributes(module.type).map((attribute) => {
+                            const cost = getUpgradeCost(module, attribute);
+                            return (
+                              <div key={attribute}>
+                                <span>
+                                  {ATTRIBUTE_LABELS[attribute]} L
+                                  {module.levels[attribute] ?? 1}
+                                </span>
+                                <small>{formatCost(cost)}</small>
+                                <button
+                                  type="button"
+                                  disabled={!canAfford(inventory, cost)}
+                                  onClick={() =>
+                                    upgradeResearchAttribute(module, attribute)
+                                  }
+                                >
+                                  Improve
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </section>
+                  );
+                })}
+              </div>
+            </DraggablePanel>
+          )}
           {expandedSpeedControls.has('prediction') && (
             <DraggablePanel
               control="prediction"

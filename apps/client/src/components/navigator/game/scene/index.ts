@@ -16,6 +16,11 @@ import {
   stopSpaceshipActiveFeature,
   WORLD_VIEWPORT_REFRESH_INTERVAL_MS,
 } from '@store';
+import {
+  consumeMiningDurability,
+  getMiningModuleStats,
+  getThrusterModulePowerPercent,
+} from '@store';
 import type { Planet as PlanetData, Star as StarData } from '@repo/types';
 import { formatSpeed } from '../../../../utils';
 import {
@@ -80,6 +85,13 @@ const ASTEROID_MIN_SCREEN_SPEED = 32;
 const ASTEROID_MAX_SCREEN_SPEED = 68;
 const ENGINE_START_RESPONSE_TIMEOUT_MS = 5_000;
 const ASTEROID_MATERIALS: AsteroidMaterial[] = ['iron', 'silicates', 'ice'];
+const ASTEROID_MATERIAL_THICKNESS: Record<AsteroidMaterial, number> = {
+  iron: 3,
+  silicates: 5,
+  ice: 1,
+};
+const MINING_BEAM_RANGE_PX = 230;
+const MINING_BEAM_COLOR = 0xfbbf24;
 
 export class Scene extends Phaser.Scene {
   protected dragging = false;
@@ -110,6 +122,7 @@ export class Scene extends Phaser.Scene {
   protected grid?: Phaser.GameObjects.Graphics;
   private measurementGraphics?: Phaser.GameObjects.Graphics;
   private predictionGraphics?: Phaser.GameObjects.Graphics;
+  private miningBeamGraphics?: Phaser.GameObjects.Graphics;
   private readonly measurementLabels = new Map<
     string,
     Phaser.GameObjects.Text
@@ -202,6 +215,7 @@ export class Scene extends Phaser.Scene {
     this.grid = this.add.graphics().setDepth(-1);
     this.measurementGraphics = this.add.graphics().setDepth(20);
     this.predictionGraphics = this.add.graphics().setDepth(19);
+    this.miningBeamGraphics = this.add.graphics().setDepth(18);
     this.drawVisibleWorld();
     this.configureInput();
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -232,6 +246,7 @@ export class Scene extends Phaser.Scene {
       this.targetDirection = undefined;
     }
     this.updateAsteroids(delta);
+    this.updateMining(delta);
     const storeEngineRunning = isSpaceshipEngineRunning();
     const engineStartPending =
       this.spaceshipEngineRunning &&
@@ -303,17 +318,7 @@ export class Scene extends Phaser.Scene {
     if (!asteroid) return false;
 
     addInventoryMaterial(asteroid.payload.material, asteroid.payload.amount);
-    this.asteroids = this.asteroids.filter(
-      (candidate) => candidate !== asteroid,
-    );
-    this.tweens.add({
-      targets: asteroid,
-      alpha: 0,
-      scale: asteroid.scale * 1.8,
-      duration: 120,
-      ease: 'Quad.easeOut',
-      onComplete: () => asteroid.destroy(),
-    });
+    this.destroyAsteroid(asteroid);
     return true;
   }
 
@@ -427,6 +432,86 @@ export class Scene extends Phaser.Scene {
 
     this.asteroidSpawnElapsedMs = 0;
     this.spawnAsteroid(viewport);
+  }
+
+  private updateMining(deltaMs: number) {
+    const graphics = this.miningBeamGraphics;
+    graphics?.clear();
+    const miningStats = getMiningModuleStats();
+    if (!graphics || !miningStats?.active || !this.spaceship) return;
+
+    const target = this.getMiningTarget();
+    if (!target) return;
+
+    const requestedKnSeconds = miningStats.efficiencyKns * (deltaMs / 1000);
+    const consumedKnSeconds = consumeMiningDurability(requestedKnSeconds);
+    if (consumedKnSeconds <= 0) return;
+
+    const thickness = ASTEROID_MATERIAL_THICKNESS[target.payload.material];
+    const minedAmount = target.mine(consumedKnSeconds / thickness);
+    if (minedAmount <= 0) return;
+
+    addInventoryMaterial(target.payload.material, minedAmount);
+    this.drawMiningBeam(target);
+    if (target.isDepleted()) {
+      this.destroyAsteroid(target);
+    }
+  }
+
+  private getMiningTarget() {
+    if (!this.spaceship) return undefined;
+
+    const range = MINING_BEAM_RANGE_PX / MAX_ZOOM;
+    return this.asteroids
+      .filter(
+        (asteroid) =>
+          Phaser.Math.Distance.Between(
+            this.spaceship?.x ?? 0,
+            this.spaceship?.y ?? 0,
+            asteroid.x,
+            asteroid.y,
+          ) <= range,
+      )
+      .sort(
+        (left, right) =>
+          Phaser.Math.Distance.Between(
+            this.spaceship?.x ?? 0,
+            this.spaceship?.y ?? 0,
+            left.x,
+            left.y,
+          ) -
+          Phaser.Math.Distance.Between(
+            this.spaceship?.x ?? 0,
+            this.spaceship?.y ?? 0,
+            right.x,
+            right.y,
+          ),
+      )[0];
+  }
+
+  private drawMiningBeam(target: Asteroid) {
+    if (!this.miningBeamGraphics || !this.spaceship) return;
+
+    const zoom = this.cameras.main.zoom;
+    this.miningBeamGraphics
+      .lineStyle(3 / zoom, MINING_BEAM_COLOR, 0.76)
+      .lineBetween(this.spaceship.x, this.spaceship.y, target.x, target.y)
+      .fillStyle(MINING_BEAM_COLOR, 0.34)
+      .fillCircle(target.x, target.y, Math.max(5 / zoom, target.radius * 0.4));
+  }
+
+  private destroyAsteroid(asteroid: Asteroid) {
+    this.asteroids = this.asteroids.filter(
+      (candidate) => candidate !== asteroid,
+    );
+    this.tweens.add({
+      targets: asteroid,
+      alpha: 0,
+      scale: asteroid.scale * 1.8,
+      duration: 120,
+      ease: 'Quad.easeOut',
+      onComplete: () => asteroid.destroy(),
+    });
   }
 
   private spawnAsteroid(viewport: Phaser.Geom.Rectangle) {
@@ -614,7 +699,7 @@ export class Scene extends Phaser.Scene {
     try {
       startSpaceshipTargetSpeedFeature(
         targetSpeed,
-        maximumThrustPercent,
+        maximumThrustPercent * (getThrusterModulePowerPercent() / 100),
         this.targetDirection,
       );
     } catch (error) {

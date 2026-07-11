@@ -162,6 +162,22 @@ export function addInventoryMaterial(
   });
 }
 
+export function spendInventory(cost: Partial<Inventory>) {
+  const inventory = store.get(inventoryAtom);
+  const entries = Object.entries(cost) as [InventoryMaterial, number][];
+  const canSpend = entries.every(
+    ([material, amount]) => inventory[material] >= amount,
+  );
+  if (!canSpend) return false;
+
+  store.set(inventoryAtom, {
+    iron: inventory.iron - (cost.iron ?? 0),
+    silicates: inventory.silicates - (cost.silicates ?? 0),
+    ice: inventory.ice - (cost.ice ?? 0),
+  });
+  return true;
+}
+
 export function getSpaceshipMotionState() {
   return store.get(spaceshipMotionStateAtom);
 }
@@ -787,14 +803,11 @@ function advanceActiveFeature(elapsedSeconds: number) {
   }
 
   const nextElapsedSeconds = activeFeature.elapsedSeconds + elapsedSeconds;
-  store.set(
-    spaceshipActiveFeatureAtom,
-    {
-      ...activeFeature,
-      durationSeconds: nextElapsedSeconds + remainingSeconds,
-      elapsedSeconds: nextElapsedSeconds,
-    },
-  );
+  store.set(spaceshipActiveFeatureAtom, {
+    ...activeFeature,
+    durationSeconds: nextElapsedSeconds + remainingSeconds,
+    elapsedSeconds: nextElapsedSeconds,
+  });
 }
 
 function advancePositionByVelocity(

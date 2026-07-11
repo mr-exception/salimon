@@ -7,7 +7,6 @@ import {
   worldRouter,
 } from '@routes';
 import { spaceshipSecurityCode } from './middleware';
-
 export function createApp() {
   const app = express();
   app.use(cors());

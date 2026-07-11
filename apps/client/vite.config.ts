@@ -6,7 +6,7 @@ import { fileURLToPath, URL } from 'node:url';
 export default defineConfig({
   plugins: [react()],
   preview: {
-    allowedHosts: ['https://salimon.net'],
+    allowedHosts: ['salimon.net'],
   },
   resolve: {
     alias: {

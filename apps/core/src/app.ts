@@ -1,11 +1,6 @@
 import cors from 'cors';
 import express, { type ErrorRequestHandler } from 'express';
-import {
-  contactsRouter,
-  spaceshipsRouter,
-  updatesRouter,
-  worldRouter,
-} from '@routes';
+import { contactsRouter, spaceshipsRouter } from '@routes';
 import { spaceshipSecurityCode } from './middleware';
 export function createApp() {
   const app = express();
@@ -16,10 +11,8 @@ export function createApp() {
   app.get('/health', (_request, response) => {
     response.json({ ok: true });
   });
-  app.use('/world', worldRouter);
   app.use('/spaceship', spaceshipsRouter);
   app.use('/contacts', contactsRouter);
-  app.use('/updates', updatesRouter);
 
   const errorHandler: ErrorRequestHandler = (
     error,

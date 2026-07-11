@@ -21,6 +21,8 @@ Use TypeScript and preserve the existing ES module style. ESLint applies the rec
 
 Every service in `apps/core/src/services` must use a `name.service.ts` filename and export a static class named `NameService`. Put service operations on that class as static methods instead of exporting service functions directly.
 
+REST APIs in `apps/core/src/routes` should be organized as nested route folders, not flat route files. Use a `routes.ts` file for each route group to define the Express router and path registrations, and put each route handler function in its own separate file in the same folder. Mirror URL nesting in the filesystem: for example, `/a/b/c` should live under `a/b/routes.ts`, with that `routes.ts` registering the `/c` path and importing its handler from a sibling handler file. Export route groups from `apps/core/src/routes/index.ts` via their `routes.ts` files, such as `export * from './world/routes';`.
+
 Every Jotai atom in `apps/client/src/store` must have an exported getter hook and setter hook. Name them `use<Name>` and `useSet<Name>` and implement them with `useAtomValue` and `useSetAtom`:
 
 ```ts

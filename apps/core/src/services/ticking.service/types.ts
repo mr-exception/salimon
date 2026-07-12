@@ -16,6 +16,11 @@ export type TargetSpeedBurnPlan = Extract<
   { type: 'target-speed' }
 >;
 
+export type ManualForcePlan = Extract<
+  SpaceshipActiveFeature,
+  { type: 'manual-force' }
+>;
+
 export type WorldSnapshot = {
   bodies: WorldBodyDocument[];
   bodiesByName: Map<string, WorldBodyDocument>;

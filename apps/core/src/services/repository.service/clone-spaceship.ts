@@ -15,14 +15,26 @@ export function cloneSpaceship(
         }
       : undefined,
     inventory: spaceship.inventory ? { ...spaceship.inventory } : undefined,
-    activeFeature: spaceship.activeFeature
-      ? {
-          ...spaceship.activeFeature,
-          targetVelocity: { ...spaceship.activeFeature.targetVelocity },
-        }
-      : undefined,
+    activeFeature: cloneActiveFeature(spaceship.activeFeature),
     simulatedAt: cloneDate(spaceship.simulatedAt),
     createdAt: new Date(spaceship.createdAt),
     updatedAt: new Date(spaceship.updatedAt),
+  };
+}
+
+function cloneActiveFeature(
+  activeFeature: SpaceshipDocument['activeFeature'],
+): SpaceshipDocument['activeFeature'] {
+  if (!activeFeature) return undefined;
+  if (activeFeature.type === 'target-speed') {
+    return {
+      ...activeFeature,
+      targetVelocity: { ...activeFeature.targetVelocity },
+    };
+  }
+
+  return {
+    ...activeFeature,
+    thrusters: activeFeature.thrusters.map((thruster) => ({ ...thruster })),
   };
 }

@@ -1,12 +1,18 @@
 import { type SpaceshipDocument, SpaceshipService } from '../spaceship.service';
 import { TickingService } from '../ticking.service';
 import type { AsteroidDto } from '@repo/types';
+import type { WorldBodyDocument } from '@models';
 import { AsteroidService } from '../asteroid.service';
 import {
   type WorldViewportRequest,
   WorldViewportService,
 } from '../world-viewport.service';
 import { RepositoryService } from '../repository.service';
+
+type Coordinate = {
+  x: bigint;
+  y: bigint;
+};
 
 export class SpaceshipSession {
   private viewport?: WorldViewportRequest;
@@ -43,6 +49,19 @@ export class SpaceshipSession {
     targetDirection?: number;
   }) {
     const spaceship = await TickingService.startSpaceshipTargetSpeedFeature(
+      this.spaceship,
+      params,
+    );
+    if (!spaceship) return undefined;
+
+    this.spaceship = spaceship;
+    return this.spaceship;
+  }
+
+  async startManualForceFeature(params: {
+    thrusters: { powerPercent: number; durationSeconds: number }[];
+  }) {
+    const spaceship = await TickingService.startSpaceshipManualForceFeature(
       this.spaceship,
       params,
     );
@@ -98,7 +117,7 @@ export class SpaceshipSession {
     });
     return {
       ...world,
-      asteroids: await this.getAsteroids(),
+      asteroids: await this.getViewportAsteroids(viewport),
     };
   }
 
@@ -110,7 +129,7 @@ export class SpaceshipSession {
     });
     return {
       ...world,
-      asteroids: await this.getAsteroids(),
+      asteroids: await this.getViewportAsteroids(this.viewport),
     };
   }
 
@@ -120,6 +139,100 @@ export class SpaceshipSession {
       spaceshipPosition: this.spaceship.position,
     });
     return this.asteroids;
+  }
+
+  async getViewportAsteroids(viewport: WorldViewportRequest) {
+    const asteroids = await this.getAsteroids();
+    const center = this.getViewportCenter(viewport);
+    const radius = this.parseViewportRadius(viewport);
+    if (!center || radius === undefined) return asteroids;
+
+    const worldData = await TickingService.getWorldData();
+    const worldBodies = [
+      ...worldData.planets,
+      ...worldData.moons,
+      ...worldData.stars,
+    ];
+    const bodyPositions = this.resolveWorldBodyPositions(worldBodies);
+    return asteroids.filter((asteroid) => {
+      const position = this.resolveAsteroidPosition(asteroid, bodyPositions);
+      const distanceSquared =
+        (position.x - center.x) ** 2n + (position.y - center.y) ** 2n;
+      return distanceSquared <= radius ** 2n;
+    });
+  }
+
+  private getViewportCenter(viewport: WorldViewportRequest) {
+    if (viewport.x === undefined || viewport.y === undefined) return undefined;
+
+    try {
+      return {
+        x: BigInt(viewport.x),
+        y: BigInt(viewport.y),
+      };
+    } catch {
+      return undefined;
+    }
+  }
+
+  private parseViewportRadius(viewport: WorldViewportRequest) {
+    if (viewport.radius === undefined) return undefined;
+
+    try {
+      const radius = BigInt(viewport.radius);
+      return radius >= 0n ? radius : undefined;
+    } catch {
+      return undefined;
+    }
+  }
+
+  private resolveAsteroidPosition(
+    asteroid: AsteroidDto,
+    bodyPositions: Map<string, Coordinate>,
+  ): Coordinate {
+    const position = {
+      x: BigInt(asteroid.position.x),
+      y: BigInt(asteroid.position.y),
+    };
+    if (!asteroid.position.relativeTo) return position;
+
+    const reference = bodyPositions.get(asteroid.position.relativeTo);
+    return reference
+      ? {
+          x: reference.x + position.x,
+          y: reference.y + position.y,
+        }
+      : position;
+  }
+
+  private resolveWorldBodyPositions(bodies: WorldBodyDocument[]) {
+    const bodyByName = new Map(bodies.map((body) => [body.name, body]));
+    const positionByName = new Map<string, Coordinate>();
+
+    const resolve = (body: WorldBodyDocument): Coordinate => {
+      const cached = positionByName.get(body.name);
+      if (cached) return cached;
+
+      const position = {
+        x: BigInt(body.position.x),
+        y: BigInt(body.position.y),
+      };
+      const referenceName = body.position.relativeTo;
+      const reference = referenceName
+        ? bodyByName.get(referenceName)
+        : undefined;
+      if (reference) {
+        const referencePosition = resolve(reference);
+        position.x += referencePosition.x;
+        position.y += referencePosition.y;
+      }
+
+      positionByName.set(body.name, position);
+      return position;
+    };
+
+    bodies.forEach((body) => resolve(body));
+    return positionByName;
   }
 
   private getRequiredWorldBodyNames() {

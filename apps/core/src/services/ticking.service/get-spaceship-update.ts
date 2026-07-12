@@ -7,17 +7,22 @@ import { PhysicsService } from '../physics.service';
 import { SpaceshipService } from '../spaceship.service';
 import {
   MAX_PROPAGATION_STEPS,
+  SPACESHIP_MASS_KG,
   SPACESHIP_RADIUS_METERS,
   TARGET_STEP_SECONDS,
+  THRUSTER_DURABILITY_DRAIN_RATE,
 } from './constants';
 import type {
   Impact,
+  ManualForcePlan,
   Motion,
   TargetSpeedBurnPlan,
   WorldSnapshot,
 } from './types';
 
 const TARGET_VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.1;
+const MANUAL_FORCE_THRUSTER_COUNT = 4;
+const MANUAL_FORCE_STEP_SECONDS = 0.1;
 
 export function getBodyPositions(world: WorldSnapshot, time: Date) {
   return PhysicsService.getBodyPositions(world, time);
@@ -140,6 +145,122 @@ export function createTargetSpeedFeature(
     maximumAcceleration,
     durationSeconds,
     elapsedSeconds: 0,
+  };
+}
+
+export function createManualForceFeature(
+  spaceship: SpaceshipDocument,
+  thrusters: { powerPercent: number; durationSeconds: number }[],
+): ManualForcePlan | undefined {
+  if (
+    spaceship.activeFeature ||
+    spaceship.motionState === 'crashed' ||
+    !Array.isArray(thrusters)
+  ) {
+    return undefined;
+  }
+
+  const normalizedThrusters = thrusters
+    .slice(0, MANUAL_FORCE_THRUSTER_COUNT)
+    .map((thruster) => ({
+      powerPercent: Number(thruster.powerPercent),
+      durationSeconds: Number(thruster.durationSeconds),
+    }));
+  if (
+    normalizedThrusters.length !== MANUAL_FORCE_THRUSTER_COUNT ||
+    normalizedThrusters.some(
+      (thruster) =>
+        !Number.isFinite(thruster.powerPercent) ||
+        !Number.isFinite(thruster.durationSeconds) ||
+        thruster.powerPercent < 0 ||
+        thruster.powerPercent > 100 ||
+        thruster.durationSeconds < 0,
+    )
+  ) {
+    return undefined;
+  }
+
+  const durationSeconds = Math.max(
+    ...normalizedThrusters.map((thruster) => thruster.durationSeconds),
+  );
+  if (
+    durationSeconds <= 0 ||
+    !getManualForceActiveThrusters(
+      {
+        type: 'manual-force',
+        thrusters: normalizedThrusters,
+        durationSeconds,
+        elapsedSeconds: 0,
+      },
+      spaceship.stats,
+    )
+  ) {
+    return undefined;
+  }
+
+  return {
+    type: 'manual-force',
+    thrusters: normalizedThrusters,
+    durationSeconds,
+    elapsedSeconds: 0,
+  };
+}
+
+function getManualForceActiveThrusters(
+  feature: ManualForcePlan,
+  stats: SpaceshipDocument['stats'],
+) {
+  const normalizedStats = SpaceshipService.normalizeSpaceshipStats(stats);
+  const thrustByIndex = Array<number>(MANUAL_FORCE_THRUSTER_COUNT).fill(0);
+  const effectiveAcceleration = { x: 0, y: 0 };
+
+  feature.thrusters.forEach((thruster, index) => {
+    if (
+      feature.elapsedSeconds >= thruster.durationSeconds ||
+      thruster.powerPercent <= 0 ||
+      normalizedStats.thrusterDurability[index] <= 0
+    ) {
+      return;
+    }
+
+    const acceleration = PhysicsService.calculateMaximumEngineAcceleration(
+      thruster.powerPercent,
+    );
+    thrustByIndex[index] = (acceleration * SPACESHIP_MASS_KG) / 1_000;
+    if (index === 0) effectiveAcceleration.y += acceleration;
+    if (index === 1) effectiveAcceleration.x -= acceleration;
+    if (index === 2) effectiveAcceleration.y -= acceleration;
+    if (index === 3) effectiveAcceleration.x += acceleration;
+  });
+
+  const activeIndexes = thrustByIndex
+    .map((thrust, index) => ({ index, thrust }))
+    .filter(({ thrust }) => thrust > 0);
+  if (activeIndexes.length === 0) return undefined;
+
+  return {
+    effectiveAcceleration,
+    thrustByIndex,
+    totalKilonewtons: activeIndexes.reduce(
+      (total, { thrust }) => total + thrust,
+      0,
+    ),
+    availableSeconds: Math.min(
+      ...activeIndexes.map(
+        ({ index, thrust }) =>
+          normalizedStats.thrusterDurability[index] /
+          ((thrust / 100) * THRUSTER_DURABILITY_DRAIN_RATE),
+      ),
+    ),
+    remainingScheduledSeconds: Math.min(
+      ...feature.thrusters
+        .filter(
+          (thruster, index) =>
+            thrustByIndex[index] > 0 &&
+            thruster.durationSeconds > feature.elapsedSeconds,
+        )
+        .map((thruster) => thruster.durationSeconds - feature.elapsedSeconds),
+    ),
   };
 }
 
@@ -326,8 +447,9 @@ export function getSpaceshipUpdate(
   if (motionState !== 'flying') {
     const previousPosition = referenceBody
       ? PhysicsService.add(
-          getBodyPositions(world, previousSimulationTime).get(referenceName!) ??
-            { x: 0, y: 0 },
+          getBodyPositions(world, previousSimulationTime).get(
+            referenceName!,
+          ) ?? { x: 0, y: 0 },
           relativePosition,
         )
       : relativePosition;
@@ -385,9 +507,13 @@ export function getSpaceshipUpdate(
         ? PhysicsService.add(initialReferenceVelocity, relativeVelocity)
         : relativeVelocity,
     };
+    const propagationStepSeconds =
+      activeFeature?.type === 'manual-force'
+        ? MANUAL_FORCE_STEP_SECONDS
+        : TARGET_STEP_SECONDS;
     const stepCount = Math.min(
       MAX_PROPAGATION_STEPS,
-      Math.max(1, Math.ceil(elapsedSeconds / TARGET_STEP_SECONDS)),
+      Math.max(1, Math.ceil(elapsedSeconds / propagationStepSeconds)),
     );
     const stepSeconds = elapsedSeconds / stepCount;
     let impact: Impact | undefined;
@@ -403,6 +529,8 @@ export function getSpaceshipUpdate(
       let thrustAcceleration: SpaceshipVelocity | undefined;
       let targetSpeedFeature =
         activeFeature?.type === 'target-speed' ? activeFeature : undefined;
+      let manualForceFeature =
+        activeFeature?.type === 'manual-force' ? activeFeature : undefined;
       if (targetSpeedFeature) {
         if (isTargetVelocityReached(targetSpeedFeature, motion)) {
           activeFeature = undefined;
@@ -453,6 +581,34 @@ export function getSpaceshipUpdate(
             stepSeconds,
             targetSpeedFeature.durationSeconds -
               targetSpeedFeature.elapsedSeconds,
+            fuelSeconds,
+            activeThrusters.availableSeconds,
+          );
+          thrustAcceleration = activeThrusters.effectiveAcceleration;
+          stats = PhysicsService.wearThrusters(
+            stats,
+            activeThrusters.thrustByIndex,
+            burnSeconds,
+          );
+          stats.fuelKns = Math.max(
+            0,
+            stats.fuelKns - activeThrusters.totalKilonewtons * burnSeconds,
+          );
+        }
+      }
+      if (manualForceFeature) {
+        const activeThrusters = getManualForceActiveThrusters(
+          manualForceFeature,
+          stats,
+        );
+        if (!activeThrusters || stats.fuelKns <= 0) {
+          activeFeature = undefined;
+          manualForceFeature = undefined;
+        } else {
+          const fuelSeconds = stats.fuelKns / activeThrusters.totalKilonewtons;
+          burnSeconds = Math.min(
+            stepSeconds,
+            activeThrusters.remainingScheduledSeconds,
             fuelSeconds,
             activeThrusters.availableSeconds,
           );
@@ -531,8 +687,20 @@ export function getSpaceshipUpdate(
           activeFeature = undefined;
         }
       }
+      if (manualForceFeature && burnSeconds > 0) {
+        const elapsed = manualForceFeature.elapsedSeconds + burnSeconds;
+        activeFeature =
+          elapsed >= manualForceFeature.durationSeconds || stats.fuelKns <= 0
+            ? undefined
+            : { ...manualForceFeature, elapsedSeconds: elapsed };
+      }
 
-      if (burnSeconds > 0 && burnSeconds < stepSeconds && !impact) {
+      if (
+        burnSeconds > 0 &&
+        burnSeconds < stepSeconds &&
+        !activeFeature &&
+        !impact
+      ) {
         const coastStartedAt = new Date(
           stepStartedAt.getTime() + burnSeconds * 1_000,
         );

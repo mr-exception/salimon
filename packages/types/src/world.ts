@@ -92,7 +92,7 @@ export type AsteroidDto = {
   capturedAt: string;
 };
 
-export type SpaceshipActiveFeature = {
+export type SpaceshipTargetSpeedFeature = {
   type: 'target-speed';
   targetSpeedMetersPerSecond: number;
   maximumThrustPercent: number;
@@ -102,6 +102,22 @@ export type SpaceshipActiveFeature = {
   durationSeconds: number;
   elapsedSeconds: number;
 };
+
+export type SpaceshipManualForceThruster = {
+  powerPercent: number;
+  durationSeconds: number;
+};
+
+export type SpaceshipManualForceFeature = {
+  type: 'manual-force';
+  thrusters: SpaceshipManualForceThruster[];
+  durationSeconds: number;
+  elapsedSeconds: number;
+};
+
+export type SpaceshipActiveFeature =
+  | SpaceshipTargetSpeedFeature
+  | SpaceshipManualForceFeature;
 
 export type SpaceshipDto = {
   securityCode: string;

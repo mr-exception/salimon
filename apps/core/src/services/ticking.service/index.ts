@@ -3,6 +3,7 @@ import { flushToDatabase } from './flush-to-database';
 import { getWorldData } from './get-world-data';
 import { getWorldSystemsBodies } from './get-world-systems-bodies';
 import { startSpaceshipTargetSpeedFeature } from './start-spaceship-target-speed-feature';
+import { startSpaceshipManualForceFeature } from './start-spaceship-manual-force-feature';
 import { start } from './start';
 import { stopSpaceshipActiveFeature } from './stop-spaceship-active-feature';
 import { stop } from './stop';
@@ -22,7 +23,7 @@ export class TickingService {
   static updateSpaceships = updateSpaceships;
   static updateSpaceship = updateSpaceship;
   static startSpaceshipTargetSpeedFeature = startSpaceshipTargetSpeedFeature;
+  static startSpaceshipManualForceFeature = startSpaceshipManualForceFeature;
   static stopSpaceshipActiveFeature = stopSpaceshipActiveFeature;
   static flushToDatabase = flushToDatabase;
 }
-

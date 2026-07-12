@@ -33,6 +33,9 @@ export default function App() {
     useState(false);
   const sceneRef = useRef<{
     startEngines: (targetSpeed: number, maximumThrustPercent: number) => void;
+    startManualForce: (
+      thrusters: { powerPercent: number; durationSeconds: number }[],
+    ) => void;
     stopEngines: () => void;
     setTargetDirectionSelectionActive: (active: boolean) => void;
     setPrediction: (active: boolean, seconds: number) => void;
@@ -43,6 +46,9 @@ export default function App() {
         startEngines: (
           targetSpeed: number,
           maximumThrustPercent: number,
+        ) => void;
+        startManualForce: (
+          thrusters: { powerPercent: number; durationSeconds: number }[],
         ) => void;
         stopEngines: () => void;
         setTargetDirectionSelectionActive: (active: boolean) => void;
@@ -56,6 +62,12 @@ export default function App() {
   const startEngines = useCallback(
     (targetSpeed: number, maximumThrustPercent: number) => {
       sceneRef.current?.startEngines(targetSpeed, maximumThrustPercent);
+    },
+    [],
+  );
+  const startManualForce = useCallback(
+    (thrusters: { powerPercent: number; durationSeconds: number }[]) => {
+      sceneRef.current?.startManualForce(thrusters);
     },
     [],
   );
@@ -150,6 +162,7 @@ export default function App() {
         isEngineRunning={isEngineRunning}
         isMeasuring={isMeasuring}
         onStartEngines={startEngines}
+        onStartManualForce={startManualForce}
         onStopEngines={stopEngines}
         onToggleMeasuring={() => setIsMeasuring((active) => !active)}
         onOpenCommunications={() => setIsCommunicationsOpen(true)}

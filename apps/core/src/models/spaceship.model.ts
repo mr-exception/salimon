@@ -72,32 +72,6 @@ class SpaceshipInventorySchema implements SpaceshipInventory {
   public nitrogen!: number;
 }
 
-class SpaceshipTargetSpeedFeatureSchema implements SpaceshipActiveFeature {
-  @prop({ required: true, type: () => String })
-  public type!: 'target-speed';
-
-  @prop({ required: true, type: () => Number })
-  public targetSpeedMetersPerSecond!: number;
-
-  @prop({ required: true, type: () => Number })
-  public maximumThrustPercent!: number;
-
-  @prop({ type: () => Number })
-  public targetDirection?: number;
-
-  @prop({ required: true, type: () => SpaceshipVelocitySchema })
-  public targetVelocity!: SpaceshipVelocity;
-
-  @prop({ required: true, type: () => Number })
-  public maximumAcceleration!: number;
-
-  @prop({ required: true, type: () => Number })
-  public durationSeconds!: number;
-
-  @prop({ required: true, type: () => Number })
-  public elapsedSeconds!: number;
-}
-
 @modelOptions({
   schemaOptions: { collection: 'spaceships', versionKey: false },
 })
@@ -126,7 +100,7 @@ class SpaceshipSchema {
   @prop({ type: () => SpaceshipInventorySchema })
   public inventory?: SpaceshipInventory;
 
-  @prop({ type: () => SpaceshipTargetSpeedFeatureSchema })
+  @prop({ type: () => Object })
   public activeFeature?: SpaceshipActiveFeature;
 
   @prop({ type: () => Date })

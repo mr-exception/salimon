@@ -20,6 +20,10 @@ type SpaceshipSocketIncomingMessage =
       maximumThrustPercent?: unknown;
       targetDirection?: unknown;
     }
+  | {
+      type: 'spaceship:start-manual-force';
+      thrusters?: unknown;
+    }
   | { type: 'spaceship:stop-active-feature' }
   | {
       type: 'contact:message:send';
@@ -100,13 +104,11 @@ export class SpaceshipSocketConnection {
       const world = options.viewport
         ? await this.session.getViewportWorldSystems(options.viewport)
         : await this.session.getCurrentViewportWorldSystems();
-      const asteroids = await this.session.getAsteroids();
       sendJson(this.socket, {
         type: 'world:info',
         requestId: options.requestId,
         spaceship: this.session.getSpaceshipDto(),
         ...world,
-        asteroids,
       });
     } catch (error) {
       console.error('Failed to send spaceship socket info', error);
@@ -134,6 +136,7 @@ export class SpaceshipSocketConnection {
       message.type !== 'spaceship:movement' &&
       message.type !== 'spaceship:inventory' &&
       message.type !== 'spaceship:start-target-speed' &&
+      message.type !== 'spaceship:start-manual-force' &&
       message.type !== 'spaceship:stop-active-feature' &&
       message.type !== 'contact:message:send' &&
       message.type !== 'world:viewport'
@@ -173,6 +176,31 @@ export class SpaceshipSocketConnection {
         });
         if (!spaceship) {
           throw new Error('Target speed feature could not be started');
+        }
+
+        this.hasPendingPersist = false;
+        void this.sendWorldInfo();
+        return;
+      }
+
+      if (message.type === 'spaceship:start-manual-force') {
+        const thrusters = message.thrusters;
+        if (
+          !Array.isArray(thrusters) ||
+          thrusters.some(
+            (thruster) =>
+              typeof thruster?.powerPercent !== 'number' ||
+              typeof thruster?.durationSeconds !== 'number',
+          )
+        ) {
+          throw new Error('Invalid manual force feature parameters');
+        }
+
+        const spaceship = await this.session.startManualForceFeature({
+          thrusters,
+        });
+        if (!spaceship) {
+          throw new Error('Manual force feature could not be started');
         }
 
         this.hasPendingPersist = false;

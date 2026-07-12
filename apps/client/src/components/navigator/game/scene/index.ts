@@ -13,6 +13,7 @@ import {
   setActiveWorldBodyNames,
   setSpaceshipTargetDirection,
   setSpaceshipHeading,
+  startSpaceshipManualForceFeature,
   startSpaceshipTargetSpeedFeature,
   stopSpaceshipActiveFeature,
   WORLD_VIEWPORT_REFRESH_INTERVAL_MS,
@@ -173,7 +174,7 @@ export class Scene extends Phaser.Scene {
   protected planets: Planet[] = [];
   protected stars: Star[] = [];
   protected asteroids: Asteroid[] = [];
-  protected asteroidsVisible = false;
+  protected asteroidsVisible = true;
   protected spaceship?: Spaceship;
   protected grid?: Phaser.GameObjects.Graphics;
   private measurementGraphics?: Phaser.GameObjects.Graphics;
@@ -651,6 +652,32 @@ export class Scene extends Phaser.Scene {
       );
     } catch (error) {
       console.error('Failed to start target speed feature', error);
+      return;
+    }
+
+    this.spaceshipEngineRunning = true;
+    this.engineStartPendingUntil =
+      this.time.now + ENGINE_START_RESPONSE_TIMEOUT_MS;
+    this.spaceship.setThrustersActive(true, getSpaceshipActiveThrustVector());
+    this.onSpaceshipEngineChange?.(true, this.getSpaceshipSpeed());
+  }
+
+  startManualForce(
+    thrusters: { powerPercent: number; durationSeconds: number }[],
+  ) {
+    if (
+      !this.spaceship ||
+      this.spaceshipEngineRunning ||
+      !Array.isArray(thrusters) ||
+      thrusters.length === 0
+    ) {
+      return;
+    }
+
+    try {
+      startSpaceshipManualForceFeature(thrusters);
+    } catch (error) {
+      console.error('Failed to start manual force feature', error);
       return;
     }
 

@@ -20,6 +20,7 @@ import {
   INVENTORY_MATERIALS,
   MODULE_GRID_SIZE,
   MODULE_RESEARCH,
+  SPACESHIP_THRUSTER_COUNT,
   THRUSTER_BASE_DURABILITY,
   THRUSTER_BASE_POWER_PERCENT,
   THRUSTER_LEVEL_MULTIPLIER,
@@ -57,6 +58,9 @@ type FooterProps = {
   isMeasuring?: boolean;
   isSelectingTargetDirection?: boolean;
   onStartEngines?: (targetSpeed: number, maximumThrustPercent: number) => void;
+  onStartManualForce?: (
+    thrusters: { powerPercent: number; durationSeconds: number }[],
+  ) => void;
   onStopEngines?: () => void;
   onToggleMeasuring?: () => void;
   onOpenCommunications?: () => void;
@@ -67,6 +71,7 @@ type FooterProps = {
 
 type SpeedControlTab =
   | 'target-speed'
+  | 'manual-force'
   | 'maintenance'
   | 'prediction'
   | 'modules'
@@ -79,6 +84,7 @@ type Position = {
 
 const CONTROL_LABELS: Record<SpeedControlTab, string> = {
   'target-speed': 'Target speed',
+  'manual-force': 'Manual force',
   maintenance: 'Ship durability',
   prediction: 'Prediction',
   modules: 'Modules',
@@ -94,6 +100,7 @@ const PANEL_PLACEMENTS: Record<
   { horizontal: 'left' | 'right'; vertical: 'top' | 'bottom' }
 > = {
   'target-speed': { horizontal: 'left', vertical: 'top' },
+  'manual-force': { horizontal: 'left', vertical: 'top' },
   maintenance: { horizontal: 'right', vertical: 'bottom' },
   prediction: { horizontal: 'left', vertical: 'bottom' },
   modules: { horizontal: 'left', vertical: 'top' },
@@ -138,6 +145,14 @@ function FeatureIcon({ feature }: { feature: SpeedControlTab }) {
         <path d="M4 15a8 8 0 1 1 16 0" />
         <path d="m12 15 4-5" />
         <path d="M8 18h8" />
+      </svg>
+    );
+  }
+  if (feature === 'manual-force') {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 3v18M3 12h18" />
+        <path d="m12 3-2.5 2.5M12 3l2.5 2.5M21 12l-2.5-2.5M21 12l-2.5 2.5M12 21l-2.5-2.5M12 21l2.5-2.5M3 12l2.5-2.5M3 12l2.5 2.5" />
       </svg>
     );
   }
@@ -454,6 +469,7 @@ export function Footer({
   isMeasuring = false,
   isSelectingTargetDirection = false,
   onStartEngines,
+  onStartManualForce,
   onStopEngines,
   onToggleMeasuring,
   onOpenCommunications,
@@ -472,6 +488,12 @@ export function Footer({
   const modules = useModules();
   const [targetSpeed, setTargetSpeed] = useState('10');
   const [maximumThrustPercent, setMaximumThrustPercent] = useState('100');
+  const [manualThrusters, setManualThrusters] = useState(() =>
+    Array.from({ length: SPACESHIP_THRUSTER_COUNT }, () => ({
+      powerPercent: '0',
+      durationSeconds: '0',
+    })),
+  );
   const [predictionAmount, setPredictionAmount] = useState('2');
   const [predictionUnit, setPredictionUnit] = useState<'s' | 'm' | 'h'>('m');
   const [isPredictionActive, setIsPredictionActive] = useState(false);
@@ -488,6 +510,12 @@ export function Footer({
   const maximumThrustPercentValue = Number(maximumThrustPercent);
   const activeTargetSpeed =
     activeFeature?.type === 'target-speed' ? activeFeature : undefined;
+  const activeManualForce =
+    activeFeature?.type === 'manual-force' ? activeFeature : undefined;
+  const manualForceSchedule = manualThrusters.map((thruster) => ({
+    powerPercent: Number(thruster.powerPercent),
+    durationSeconds: Number(thruster.durationSeconds),
+  }));
   const targetSpeedBurnPreview = getSpaceshipTargetSpeedBurnPreview(
     targetSpeedMetersPerSecond,
     maximumThrustPercentValue,
@@ -502,6 +530,12 @@ export function Footer({
   const acceleration =
     activeTargetSpeed?.maximumAcceleration ??
     targetSpeedBurnPreview?.maximumAcceleration;
+  const manualForceTimeSeconds = activeManualForce
+    ? Math.max(
+        0,
+        activeManualForce.durationSeconds - activeManualForce.elapsedSeconds,
+      )
+    : undefined;
   const hasValidBurn =
     targetDirection !== undefined &&
     Number.isFinite(targetSpeedMetersPerSecond) &&
@@ -515,9 +549,36 @@ export function Footer({
     targetSpeedBurnPreview !== undefined &&
     fuelKns > 0 &&
     thrusterDurability.some((durability) => durability > 0);
+  const manualForceFieldsAreValid = manualForceSchedule.every(
+    (thruster) =>
+      Number.isFinite(thruster.powerPercent) &&
+      Number.isFinite(thruster.durationSeconds) &&
+      thruster.powerPercent >= 0 &&
+      thruster.powerPercent <= 100 &&
+      thruster.durationSeconds >= 0,
+  );
+  const hasValidManualForce =
+    manualForceFieldsAreValid &&
+    manualForceSchedule.some(
+      (thruster) => thruster.powerPercent > 0 && thruster.durationSeconds > 0,
+    );
+  const canStartManualForce =
+    motionState !== 'crashed' &&
+    hasValidManualForce &&
+    fuelKns > 0 &&
+    thrusterDurability.some((durability) => durability > 0);
   const currentEnginePowerPercent = activeTargetSpeed
     ? activeTargetSpeed.maximumThrustPercent
-    : 0;
+    : activeManualForce
+      ? Math.max(
+          0,
+          ...activeManualForce.thrusters.map((thruster) =>
+            activeManualForce.elapsedSeconds < thruster.durationSeconds
+              ? thruster.powerPercent
+              : 0,
+          ),
+        )
+      : 0;
   const predictionSeconds =
     Number(predictionAmount) *
     ({ s: 1, m: 60, h: 3_600 } as const)[predictionUnit];
@@ -553,6 +614,82 @@ export function Footer({
     if (!canStartBurn || isEngineRunning || !onStartEngines) return;
 
     onStartEngines(targetSpeedMetersPerSecond, maximumThrustPercentValue);
+  };
+
+  const updateManualThruster = (
+    index: number,
+    field: 'powerPercent' | 'durationSeconds',
+    value: string,
+  ) => {
+    setManualThrusters((thrusters) =>
+      thrusters.map((thruster, thrusterIndex) =>
+        thrusterIndex === index ? { ...thruster, [field]: value } : thruster,
+      ),
+    );
+  };
+
+  const startManualForce = () => {
+    if (!canStartManualForce || isEngineRunning || !onStartManualForce) return;
+
+    onStartManualForce(manualForceSchedule);
+  };
+
+  const renderManualThrusterControl = (
+    index: number,
+    label: string,
+    className: string,
+  ) => {
+    const thruster = manualThrusters[index];
+    if (!thruster) return null;
+
+    return (
+      <div className={`${style.manualForceRow} ${className}`}>
+        <span>{label}</span>
+        <label htmlFor={`footer-manual-thruster-${index}-power`}>
+          <span>Power</span>
+          <span className={style.speedField}>
+            <input
+              id={`footer-manual-thruster-${index}-power`}
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              value={thruster.powerPercent}
+              disabled={isEngineRunning}
+              onChange={(event) =>
+                updateManualThruster(
+                  index,
+                  'powerPercent',
+                  event.currentTarget.value,
+                )
+              }
+            />
+            <span aria-hidden="true">%</span>
+          </span>
+        </label>
+        <label htmlFor={`footer-manual-thruster-${index}-duration`}>
+          <span>Time</span>
+          <span className={style.speedField}>
+            <input
+              id={`footer-manual-thruster-${index}-duration`}
+              type="number"
+              min="0"
+              step="0.1"
+              value={thruster.durationSeconds}
+              disabled={isEngineRunning}
+              onChange={(event) =>
+                updateManualThruster(
+                  index,
+                  'durationSeconds',
+                  event.currentTarget.value,
+                )
+              }
+            />
+            <span aria-hidden="true">s</span>
+          </span>
+        </label>
+      </div>
+    );
   };
 
   const toggleEngines = () => {
@@ -599,6 +736,7 @@ export function Footer({
           {(
             [
               ['target-speed', 'Target speed'],
+              ['manual-force', 'Manual force'],
               ['modules', 'Modules'],
               ['research', 'Research'],
               ['maintenance', 'Ship durability'],
@@ -976,6 +1114,63 @@ export function Footer({
                 >
                   {isEngineRunning ? 'Stop engines' : 'Start engines'}
                 </button>
+              </div>
+            </DraggablePanel>
+          )}
+          {expandedSpeedControls.has('manual-force') && (
+            <DraggablePanel
+              control="manual-force"
+              onClose={() => toggleSpeedControl('manual-force')}
+            >
+              <div className={style.manualForcePanel}>
+                {renderManualThrusterControl(
+                  0,
+                  'Top thruster',
+                  style.manualForceTop,
+                )}
+                {renderManualThrusterControl(
+                  3,
+                  'Left thruster',
+                  style.manualForceLeft,
+                )}
+                <div
+                  className={`${style.speedActions} ${style.manualForceCenter}`}
+                >
+                  <div className={style.speedMetrics}>
+                    <span className={style.speedMetric}>
+                      <small>Acceleration</small>
+                      —
+                    </span>
+                    <span className={style.speedMetric}>
+                      <small>Time remaining</small>
+                      {manualForceTimeSeconds !== undefined
+                        ? formatDuration(manualForceTimeSeconds)
+                        : '—'}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    data-running={isEngineRunning}
+                    disabled={
+                      isEngineRunning
+                        ? !onStopEngines
+                        : !canStartManualForce || !onStartManualForce
+                    }
+                    onClick={isEngineRunning ? onStopEngines : startManualForce}
+                  >
+                    {isEngineRunning ? 'Stop engines' : 'Start'}
+                  </button>
+                </div>
+                {renderManualThrusterControl(
+                  1,
+                  'Right thruster',
+                  style.manualForceRight,
+                )}
+                {renderManualThrusterControl(
+                  2,
+                  'Bottom thruster',
+                  style.manualForceBottom,
+                )}
               </div>
             </DraggablePanel>
           )}

@@ -426,6 +426,56 @@
   gap: 6px;
 }
 
+.manualForcePanel {
+  display: grid;
+  min-width: 620px;
+  grid-template-areas:
+    '. top .'
+    'left center right'
+    '. bottom .';
+  grid-template-columns: minmax(170px, 1fr) 210px minmax(170px, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.manualForceRow {
+  display: grid;
+  min-width: 170px;
+  gap: 7px;
+}
+
+.manualForceRow > span {
+  color: color-mix(in srgb, var(--color-starlight) 68%, transparent);
+  text-align: center;
+}
+
+.manualForceRow label {
+  display: grid;
+  grid-template-columns: 46px auto;
+  align-items: center;
+  gap: 6px;
+}
+
+.manualForceTop {
+  grid-area: top;
+}
+
+.manualForceLeft {
+  grid-area: left;
+}
+
+.manualForceCenter {
+  grid-area: center;
+}
+
+.manualForceRight {
+  grid-area: right;
+}
+
+.manualForceBottom {
+  grid-area: bottom;
+}
+
 .orbitActions {
   display: grid;
   width: 190px;
@@ -663,11 +713,26 @@
   .speedInputs,
   .speedActions,
   .orbitActions,
+  .manualForcePanel,
   .durabilityList,
   .moduleGridPanel,
   .researchList {
     width: 100%;
     min-width: 0;
+  }
+
+  .manualForcePanel,
+  .manualForceRow {
+    grid-template-columns: 1fr;
+  }
+
+  .manualForcePanel {
+    grid-template-areas:
+      'top'
+      'left'
+      'center'
+      'right'
+      'bottom';
   }
 
   .moduleGridPanel {

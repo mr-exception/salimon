@@ -439,6 +439,15 @@ export function startSpaceshipTargetSpeedFeature(
   });
 }
 
+export function startSpaceshipManualForceFeature(
+  thrusters: { powerPercent: number; durationSeconds: number }[],
+) {
+  sendSpaceshipSocketMessage({
+    type: 'spaceship:start-manual-force',
+    thrusters,
+  });
+}
+
 export function stopSpaceshipActiveFeature() {
   sendSpaceshipSocketMessage({ type: 'spaceship:stop-active-feature' });
 }

@@ -209,7 +209,7 @@ export function Navigator({
   const [proximityTelemetry, setProximityTelemetry] =
     useState<SpaceshipProximityTelemetry>();
   const [isProximityExpanded, setIsProximityExpanded] = useState(false);
-  const [showAsteroids, setShowAsteroids] = useState(false);
+  const [showAsteroids, setShowAsteroids] = useState(true);
   const inventory = useInventory();
 
   useEffect(() => {

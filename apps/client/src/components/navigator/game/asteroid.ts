@@ -1,12 +1,11 @@
 import Phaser from 'phaser';
-import type { InventoryMaterial } from '@repo/types';
+import type {
+  AsteroidDeposit,
+  AsteroidDto,
+  InventoryMaterial,
+} from '@repo/types';
 
 export type AsteroidMaterial = InventoryMaterial;
-
-export type AsteroidDeposit = {
-  material: AsteroidMaterial;
-  amount: number;
-};
 
 export type AsteroidMiningResult = {
   material: AsteroidMaterial;
@@ -23,16 +22,27 @@ const MATERIAL_COLORS: Record<AsteroidMaterial, number> = {
   hydrogen: 0x67e8f9,
   nitrogen: 0x818cf8,
 };
+const MATERIAL_RARITY_WEIGHT: Record<AsteroidMaterial, number> = {
+  silicates: 34,
+  iron: 28,
+  carbon: 16,
+  ice: 12,
+  hydrogen: 5,
+  nitrogen: 3,
+  silver: 1.4,
+  gold: 0.3,
+};
 const OUTLINE_COLOR = 0x0f172a;
 const ROCK_COLOR = 0x6b7280;
-const MIN_VISIBLE_SCREEN_DIAMETER_PX = 16;
+const MARKER_SCREEN_SIZE_PX = 12;
 
 export class Asteroid extends Phaser.GameObjects.Container {
+  readonly id: string;
   readonly initialMassTonnes: number;
   readonly deposits: AsteroidDeposit[];
-  readonly velocity: Phaser.Math.Vector2;
   private readonly initialRadius: number;
   private readonly rock: Phaser.GameObjects.Graphics;
+  private readonly marker: Phaser.GameObjects.Rectangle;
   private readonly oreGlows: Phaser.GameObjects.Ellipse[] = [];
   private readonly spinSpeed: number;
   private currentRadius: number;
@@ -42,21 +52,31 @@ export class Asteroid extends Phaser.GameObjects.Container {
     x: number,
     y: number,
     radius: number,
-    massTonnes: number,
+    asteroid: AsteroidDto,
     deposits: AsteroidDeposit[],
-    velocity: Phaser.Math.Vector2,
   ) {
     super(scene, x, y);
 
+    this.id = asteroid.id;
     this.initialRadius = radius;
     this.currentRadius = radius;
-    this.initialMassTonnes = massTonnes;
+    this.initialMassTonnes = asteroid.massTonnes;
     this.deposits = deposits.map((deposit) => ({ ...deposit }));
-    this.velocity = velocity;
     this.spinSpeed = Phaser.Math.FloatBetween(-0.45, 0.45);
     this.rock = new Phaser.GameObjects.Graphics(scene);
+    this.marker = new Phaser.GameObjects.Rectangle(
+      scene,
+      0,
+      0,
+      MARKER_SCREEN_SIZE_PX,
+      MARKER_SCREEN_SIZE_PX,
+      MATERIAL_COLORS[this.getHighestRarityMaterial()],
+      0.9,
+    )
+      .setStrokeStyle(1, OUTLINE_COLOR, 0.85)
+      .setVisible(false);
 
-    this.add(this.rock);
+    this.add([this.rock, this.marker]);
     this.drawRock();
     this.drawOreGlows(scene);
     this.setDepth(8);
@@ -73,12 +93,12 @@ export class Asteroid extends Phaser.GameObjects.Container {
   }
 
   update(deltaSeconds: number, zoom: number) {
-    this.x += this.velocity.x * deltaSeconds;
-    this.y += this.velocity.y * deltaSeconds;
     this.rotation += this.spinSpeed * deltaSeconds;
-    this.setVisible(
-      this.currentRadius * 2 * zoom >= MIN_VISIBLE_SCREEN_DIAMETER_PX,
-    );
+    this.updateMarkerMode(zoom);
+  }
+
+  syncPosition(x: number, y: number) {
+    this.setPosition(x, y);
   }
 
   mine(amountTonnes: number): AsteroidMiningResult[] {
@@ -141,6 +161,34 @@ export class Asteroid extends Phaser.GameObjects.Container {
 
     const glowAlpha = Phaser.Math.Clamp(massRatio, 0.12, 0.68);
     this.oreGlows.forEach((glow) => glow.setAlpha(glowAlpha));
+  }
+
+  private updateMarkerMode(zoom: number) {
+    const screenDiameter = this.currentRadius * 2 * zoom;
+    const showMarker = screenDiameter < MARKER_SCREEN_SIZE_PX;
+    this.rock.setVisible(!showMarker);
+    this.oreGlows.forEach((glow) => glow.setVisible(!showMarker));
+    this.marker.setVisible(showMarker);
+
+    if (!showMarker) return;
+
+    const scale = Math.max(this.scaleX, 0.0001);
+    const markerSize = MARKER_SCREEN_SIZE_PX / (zoom * scale);
+    this.marker
+      .setSize(markerSize, markerSize)
+      .setDisplaySize(markerSize, markerSize)
+      .setStrokeStyle(1 / (zoom * scale), OUTLINE_COLOR, 0.85);
+  }
+
+  private getHighestRarityMaterial() {
+    return this.deposits.reduce<AsteroidMaterial>(
+      (rarest, deposit) =>
+        MATERIAL_RARITY_WEIGHT[deposit.material] <
+        MATERIAL_RARITY_WEIGHT[rarest]
+          ? deposit.material
+          : rarest,
+      this.deposits[0]?.material ?? 'silicates',
+    );
   }
 
   private drawRock() {

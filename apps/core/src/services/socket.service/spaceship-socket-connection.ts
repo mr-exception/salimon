@@ -100,11 +100,13 @@ export class SpaceshipSocketConnection {
       const world = options.viewport
         ? await this.session.getViewportWorldSystems(options.viewport)
         : await this.session.getCurrentViewportWorldSystems();
+      const asteroids = await this.session.getAsteroids();
       sendJson(this.socket, {
         type: 'world:info',
         requestId: options.requestId,
         spaceship: this.session.getSpaceshipDto(),
         ...world,
+        asteroids,
       });
     } catch (error) {
       console.error('Failed to send spaceship socket info', error);

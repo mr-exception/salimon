@@ -69,11 +69,16 @@ export function Navigator({
   const [proximityTelemetry, setProximityTelemetry] =
     useState<SpaceshipProximityTelemetry>();
   const [isProximityExpanded, setIsProximityExpanded] = useState(false);
+  const [showAsteroids, setShowAsteroids] = useState(false);
   const inventory = useInventory();
 
   useEffect(() => {
     sceneRef.current?.setMeasuringActive(isMeasuring);
   }, [isMeasuring]);
+
+  useEffect(() => {
+    sceneRef.current?.setAsteroidsVisible(showAsteroids);
+  }, [showAsteroids]);
 
   useEffect(() => {
     let lastUpdate = 0;
@@ -261,6 +266,14 @@ export function Navigator({
         >
           Recenter on spaceship
         </button>
+        <label className={style.asteroidToggle}>
+          <input
+            type="checkbox"
+            checked={showAsteroids}
+            onChange={(event) => setShowAsteroids(event.target.checked)}
+          />
+          <span>Asteroids</span>
+        </label>
         <div className={style.zoomMeter}>
           <label htmlFor="navigator-zoom-level">
             {SCALE_WIDTH_PX} px ={' '}

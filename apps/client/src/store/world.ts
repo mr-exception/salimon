@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { atom, getDefaultStore, useAtomValue, useSetAtom } from 'jotai';
 import type {
+  AsteroidDto,
   InventoryMaterial,
   Planet,
   Position,
@@ -83,6 +84,7 @@ const spaceshipActiveFeatureAtom = atom<SpaceshipActiveFeature | undefined>(
   undefined,
 );
 const inventoryAtom = atom<Inventory>(createEmptyInventory());
+const asteroidsAtom = atom<AsteroidDto[]>([]);
 let inventoryPersistHandler: ((inventory: Inventory) => void) | undefined;
 
 function createEmptyInventory(): Inventory {
@@ -180,6 +182,22 @@ export function useInventory() {
 
 export function useSetInventory() {
   return useSetAtom(inventoryAtom);
+}
+
+export function useAsteroids() {
+  return useAtomValue(asteroidsAtom);
+}
+
+export function useSetAsteroids() {
+  return useSetAtom(asteroidsAtom);
+}
+
+export function getAsteroids() {
+  return store.get(asteroidsAtom);
+}
+
+export function hydrateAsteroids(asteroids?: AsteroidDto[]) {
+  store.set(asteroidsAtom, asteroids ?? []);
 }
 
 export function addInventoryMaterial(

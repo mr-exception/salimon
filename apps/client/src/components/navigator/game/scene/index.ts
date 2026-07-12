@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import {
   addInventoryMaterial,
   advanceWorld,
+  getAsteroids,
   getSpaceshipActiveThrustVector,
   getBodyWorldVelocity,
   getSpaceshipAttachedBodyName,
@@ -21,7 +22,12 @@ import {
   getMiningModuleStats,
   getThrusterModulePowerPercent,
 } from '@store';
-import type { Planet as PlanetData, Star as StarData } from '@repo/types';
+import type {
+  AsteroidDto,
+  Planet as PlanetData,
+  Position,
+  Star as StarData,
+} from '@repo/types';
 import { formatSpeed } from '../../../../utils';
 import {
   DEFAULT_RENDER_ORIGIN_NAME,
@@ -30,11 +36,7 @@ import {
   offsetRenderOrigin,
   setRenderOriginName,
 } from '../get-render-position';
-import {
-  Asteroid,
-  type AsteroidDeposit,
-  type AsteroidMaterial,
-} from '../asteroid';
+import { Asteroid, type AsteroidMaterial } from '../asteroid';
 import {
   getPlanetPatternTextureKey,
   Planet,
@@ -79,31 +81,8 @@ const MEASUREMENT_ARROW_HEAD_PX = 7;
 const MEASUREMENT_ARROW_GAP_PX = 8;
 const MEASUREMENT_ARROW_COLOR = 0x22d3ee;
 const PREDICTION_COLOR = 0xa78bfa;
-const ASTEROID_TARGET_COUNT = 2;
-const ASTEROID_SPAWN_INTERVAL_MS = 900;
-const ASTEROID_BODY_CLEARANCE_METERS = 600_000;
 const ASTEROID_ONE_TONNE_SCREEN_DIAMETER_AT_MAX_ZOOM = 250;
-const ASTEROID_SCREEN_MARGIN = 96;
-const ASTEROID_MIN_RELATIVE_SPEED_METERS_PER_SECOND = 0.5;
-const ASTEROID_MAX_RELATIVE_SPEED_METERS_PER_SECOND = 5;
-const ASTEROID_MAX_SPAWN_DISTANCE_METERS = 120_000;
-const ASTEROID_MIN_TONNES = 0.2;
-const ASTEROID_MAX_TONNES = 8;
-const ASTEROID_SPAWN_ATTEMPTS = 16;
 const ENGINE_START_RESPONSE_TIMEOUT_MS = 5_000;
-const ASTEROID_MATERIAL_RARITY: {
-  material: AsteroidMaterial;
-  weight: number;
-}[] = [
-  { material: 'silicates', weight: 34 },
-  { material: 'iron', weight: 28 },
-  { material: 'carbon', weight: 16 },
-  { material: 'ice', weight: 12 },
-  { material: 'hydrogen', weight: 5 },
-  { material: 'nitrogen', weight: 3 },
-  { material: 'silver', weight: 1.4 },
-  { material: 'gold', weight: 0.3 },
-];
 const ASTEROID_MATERIAL_THICKNESS: Record<AsteroidMaterial, number> = {
   iron: 3,
   silicates: 5,
@@ -122,40 +101,9 @@ function getAsteroidRadiusForMass(massTonnes: number) {
   return oneTonneRadius * Math.cbrt(Math.max(0.001, massTonnes));
 }
 
-function createAsteroidDeposits(massTonnes: number): AsteroidDeposit[] {
-  const materialCount = Phaser.Math.Between(1, 3);
-  const materials = pickWeightedUniqueAsteroidMaterials(materialCount);
-  const portions = materials.map(() => Phaser.Math.FloatBetween(0.35, 1));
-  const portionTotal = portions.reduce((total, portion) => total + portion, 0);
-
-  return materials.map((material, index) => ({
-    material,
-    amount: massTonnes * (portions[index] / portionTotal),
-  }));
-}
-
-function pickWeightedUniqueAsteroidMaterials(count: number) {
-  const available = [...ASTEROID_MATERIAL_RARITY];
-  const materials: AsteroidMaterial[] = [];
-
-  while (materials.length < count && available.length > 0) {
-    const totalWeight = available.reduce(
-      (total, candidate) => total + candidate.weight,
-      0,
-    );
-    let roll = Phaser.Math.FloatBetween(0, totalWeight);
-    const index = available.findIndex((candidate) => {
-      roll -= candidate.weight;
-      return roll <= 0;
-    });
-    const [selected] = available.splice(Math.max(0, index), 1);
-    materials.push(selected.material);
-  }
-
-  return materials;
-}
-
-function getAsteroidAverageThickness(deposits: readonly AsteroidDeposit[]) {
+function getAsteroidAverageThickness(
+  deposits: readonly AsteroidDto['deposits'][number][],
+) {
   const totalAmount = deposits.reduce(
     (total, deposit) => total + deposit.amount,
     0,
@@ -169,6 +117,14 @@ function getAsteroidAverageThickness(deposits: readonly AsteroidDeposit[]) {
         (deposit.amount / totalAmount),
     0,
   );
+}
+
+function deserializePosition(position: AsteroidDto['position']): Position {
+  return {
+    x: BigInt(position.x),
+    y: BigInt(position.y),
+    relativeTo: position.relativeTo,
+  };
 }
 
 export class Scene extends Phaser.Scene {
@@ -196,6 +152,7 @@ export class Scene extends Phaser.Scene {
   protected planets: Planet[] = [];
   protected stars: Star[] = [];
   protected asteroids: Asteroid[] = [];
+  protected asteroidsVisible = false;
   protected spaceship?: Spaceship;
   protected grid?: Phaser.GameObjects.Graphics;
   private measurementGraphics?: Phaser.GameObjects.Graphics;
@@ -229,7 +186,6 @@ export class Scene extends Phaser.Scene {
   private viewportRefreshDebounceTimer?: number;
   private viewportRefreshPromise?: Promise<unknown>;
   private hasPendingViewportRefresh = false;
-  private asteroidSpawnElapsedMs = ASTEROID_SPAWN_INTERVAL_MS;
   private readonly alwaysVisibleBodies = new Set<string>();
 
   constructor(
@@ -402,6 +358,17 @@ export class Scene extends Phaser.Scene {
     if (!this.predictionSeconds) this.predictionGraphics?.clear();
   }
 
+  setAsteroidsVisible(visible: boolean) {
+    this.asteroidsVisible = visible;
+    if (!visible) {
+      this.clearAsteroids();
+      this.miningBeamGraphics?.clear();
+      return;
+    }
+
+    this.syncAsteroids();
+  }
+
   private drawPredictions() {
     const graphics = this.predictionGraphics;
     const seconds = this.predictionSeconds;
@@ -457,33 +424,11 @@ export class Scene extends Phaser.Scene {
   private updateAsteroids(deltaMs: number) {
     const camera = this.cameras.main;
     const deltaSeconds = deltaMs / 1000;
-    const viewport = camera.worldView;
-    const margin = ASTEROID_SCREEN_MARGIN / camera.zoom;
+    this.syncAsteroids();
 
     this.asteroids.forEach((asteroid) =>
       asteroid.update(deltaSeconds, camera.zoom),
     );
-    this.asteroids = this.asteroids.filter((asteroid) => {
-      const keep = !asteroid.isPastViewport(viewport, margin);
-      if (!keep) asteroid.destroy();
-      return keep;
-    });
-
-    if (!this.canSpawnAsteroids()) {
-      this.asteroidSpawnElapsedMs = ASTEROID_SPAWN_INTERVAL_MS;
-      return;
-    }
-
-    this.asteroidSpawnElapsedMs += deltaMs;
-    if (
-      this.asteroids.length >= ASTEROID_TARGET_COUNT ||
-      this.asteroidSpawnElapsedMs < ASTEROID_SPAWN_INTERVAL_MS
-    ) {
-      return;
-    }
-
-    this.asteroidSpawnElapsedMs = 0;
-    this.spawnAsteroid(viewport);
   }
 
   private updateMining(deltaMs: number) {
@@ -570,100 +515,46 @@ export class Scene extends Phaser.Scene {
     });
   }
 
-  private spawnAsteroid(viewport: Phaser.Geom.Rectangle) {
-    const massTonnes = Phaser.Math.FloatBetween(
-      ASTEROID_MIN_TONNES,
-      ASTEROID_MAX_TONNES,
-    );
-    const radius = getAsteroidRadiusForMass(massTonnes);
-    const position = this.getAsteroidSpawnPosition(viewport, radius);
-    if (!position) return;
-
-    const deposits = createAsteroidDeposits(massTonnes);
-    const shipVelocity = getSpaceshipWorldVelocity();
-    const relativeDirection = Phaser.Math.RandomXY(new Phaser.Math.Vector2());
-    const relativeSpeed = Phaser.Math.FloatBetween(
-      ASTEROID_MIN_RELATIVE_SPEED_METERS_PER_SECOND,
-      ASTEROID_MAX_RELATIVE_SPEED_METERS_PER_SECOND,
-    );
-    const velocity = new Phaser.Math.Vector2(
-      shipVelocity.x + relativeDirection.x * relativeSpeed,
-      shipVelocity.y + relativeDirection.y * relativeSpeed,
-    );
-
-    this.asteroids.push(
-      new Asteroid(
-        this,
-        position.x,
-        position.y,
-        radius,
-        massTonnes,
-        deposits,
-        velocity,
-      ),
-    );
-  }
-
-  private getAsteroidSpawnPosition(
-    viewport: Phaser.Geom.Rectangle,
-    radius: number,
-  ) {
-    if (!this.spaceship) return undefined;
-
-    const visibleSpawnRadius = Math.max(
-      0,
-      Math.min(viewport.width, viewport.height) * 0.45 - radius,
-    );
-    const maxDistance = Math.min(
-      ASTEROID_MAX_SPAWN_DISTANCE_METERS,
-      Math.max(2_000, visibleSpawnRadius),
-    );
-    const minDistance = Math.min(15_000, maxDistance * 0.35);
-
-    for (let attempt = 0; attempt < ASTEROID_SPAWN_ATTEMPTS; attempt += 1) {
-      const angle = Phaser.Math.FloatBetween(0, Math.PI * 2);
-      const distance = Phaser.Math.FloatBetween(minDistance, maxDistance);
-      const x = this.spaceship.x + Math.cos(angle) * distance;
-      const y = this.spaceship.y + Math.sin(angle) * distance;
-
-      if (
-        viewport.contains(x, y) &&
-        this.isAsteroidClearOfBodies(x, y, radius)
-      ) {
-        return { x, y };
-      }
-    }
-
-    return undefined;
-  }
-
-  private canSpawnAsteroids() {
-    if (!this.spaceship || getSpaceshipMotionState() !== 'flying') return false;
-
-    const shipX = this.spaceship.x;
-    const shipY = this.spaceship.y;
-    return this.isAsteroidClearOfBodies(shipX, shipY, 0);
-  }
-
-  private isAsteroidClearOfBodies(x: number, y: number, radius: number) {
-    return [...this.planetData, ...this.starData].every((body) => {
-      const position = getRenderPosition(body.position);
-
-      return (
-        Phaser.Math.Distance.Between(
-          x,
-          y,
-          Number(position.x),
-          Number(position.y),
-        ) >
-        Number(body.radius) + ASTEROID_BODY_CLEARANCE_METERS + radius
-      );
-    });
-  }
-
   private clearAsteroids() {
     this.asteroids.forEach((asteroid) => asteroid.destroy());
     this.asteroids = [];
+  }
+
+  private syncAsteroids() {
+    if (!this.asteroidsVisible) return;
+
+    const asteroidData = getAsteroids();
+    const incomingIds = new Set(asteroidData.map((asteroid) => asteroid.id));
+    this.asteroids = this.asteroids.filter((asteroid) => {
+      const keep = incomingIds.has(asteroid.id);
+      if (!keep) asteroid.destroy();
+      return keep;
+    });
+
+    const renderedById = new Map(
+      this.asteroids.map((asteroid) => [asteroid.id, asteroid]),
+    );
+    asteroidData.forEach((asteroid) => {
+      const position = getRenderPosition(
+        deserializePosition(asteroid.position),
+      );
+      const rendered = renderedById.get(asteroid.id);
+      if (rendered) {
+        rendered.syncPosition(position.x, position.y);
+        return;
+      }
+
+      this.asteroids.push(
+        new Asteroid(
+          this,
+          position.x,
+          position.y,
+          getAsteroidRadiusForMass(asteroid.massTonnes),
+          asteroid,
+          asteroid.deposits,
+        ),
+      );
+    });
   }
 
   navigateTo(name: string, zoom: number) {

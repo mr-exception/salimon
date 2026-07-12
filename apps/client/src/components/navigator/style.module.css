@@ -592,6 +592,37 @@
   );
 }
 
+.asteroidToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 32%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--color-deep-space) 86%, transparent);
+  box-shadow: 0 8px 28px rgb(0 0 0 / 28%);
+  color: var(--color-starlight);
+  cursor: pointer;
+  font:
+    700 0.65rem/1.2 system-ui,
+    sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.asteroidToggle input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--color-plasma-cyan);
+}
+
+.asteroidToggle:has(input:checked) {
+  border-color: var(--color-plasma-cyan);
+  color: var(--color-plasma-cyan);
+}
+
 .zoomMeter {
   display: grid;
   width: 200px;

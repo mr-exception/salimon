@@ -1,5 +1,7 @@
 import { type SpaceshipDocument, SpaceshipService } from '../spaceship.service';
 import { TickingService } from '../ticking.service';
+import type { AsteroidDto } from '@repo/types';
+import { AsteroidService } from '../asteroid.service';
 import {
   type WorldViewportRequest,
   WorldViewportService,
@@ -8,6 +10,7 @@ import { RepositoryService } from '../repository.service';
 
 export class SpaceshipSession {
   private viewport?: WorldViewportRequest;
+  private asteroids: AsteroidDto[] = [];
 
   private constructor(
     private readonly securityCode: string,
@@ -90,17 +93,33 @@ export class SpaceshipSession {
     if (!viewport) throw new Error('Viewport is not set');
 
     this.viewport = viewport;
-    return WorldViewportService.getWorldSystems(viewport, {
+    const world = await WorldViewportService.getWorldSystems(viewport, {
       requiredBodyNames: this.getRequiredWorldBodyNames(),
     });
+    return {
+      ...world,
+      asteroids: await this.getAsteroids(),
+    };
   }
 
   async getCurrentViewportWorldSystems() {
-    return this.viewport
-      ? WorldViewportService.getWorldSystems(this.viewport, {
-          requiredBodyNames: this.getRequiredWorldBodyNames(),
-        })
-      : undefined;
+    if (!this.viewport) return undefined;
+
+    const world = await WorldViewportService.getWorldSystems(this.viewport, {
+      requiredBodyNames: this.getRequiredWorldBodyNames(),
+    });
+    return {
+      ...world,
+      asteroids: await this.getAsteroids(),
+    };
+  }
+
+  async getAsteroids() {
+    this.asteroids = await AsteroidService.updateSessionAsteroids({
+      asteroids: this.asteroids,
+      spaceshipPosition: this.spaceship.position,
+    });
+    return this.asteroids;
   }
 
   private getRequiredWorldBodyNames() {

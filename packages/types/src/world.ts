@@ -71,6 +71,27 @@ export type InventoryMaterial =
   | 'nitrogen';
 export type SpaceshipInventory = Record<InventoryMaterial, number>;
 
+export type AsteroidDeposit = {
+  material: InventoryMaterial;
+  amount: number;
+};
+
+export type AsteroidSizeClass = 'small' | 'medium' | 'large';
+
+export type AsteroidDto = {
+  id: string;
+  systemName: string;
+  orbitingBodyName: string;
+  sizeClass: AsteroidSizeClass;
+  massTonnes: number;
+  position: SerializedPosition;
+  orbitalCenter: string;
+  clockwise: boolean;
+  speed: string;
+  deposits: AsteroidDeposit[];
+  capturedAt: string;
+};
+
 export type SpaceshipActiveFeature = {
   type: 'target-speed';
   targetSpeedMetersPerSecond: number;
@@ -130,4 +151,5 @@ export type SerializedStarSystem = {
 
 export type SerializedWorldSystems = {
   systems: SerializedStarSystem[];
+  asteroids?: AsteroidDto[];
 };

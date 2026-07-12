@@ -1,3 +1,4 @@
+export * from './asteroid.service';
 export * from './contact-replies.service';
 export * from './contacts.service';
 export * from './physics.service';

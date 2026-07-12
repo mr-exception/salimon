@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import type {
+  AsteroidDto,
   SerializedWorldSystems,
   SpaceshipDto,
   SpaceshipInventory,
 } from '@repo/types';
 import type { ContactMessageDto } from '@repo/types';
 import {
+  hydrateAsteroids,
   hydrateWorldSystems,
   hydrateSpaceship,
   setInventoryPersistHandler,
@@ -32,6 +34,7 @@ type WorldInfoMessage = Partial<SerializedWorldSystems> & {
   type: 'world:info';
   spaceship: SpaceshipDto;
   requestId?: string;
+  asteroids?: AsteroidDto[];
 };
 type SpaceshipErrorMessage = {
   type: 'error';
@@ -40,6 +43,7 @@ type SpaceshipErrorMessage = {
 type WorldViewportMessage = SerializedWorldSystems & {
   type: 'world:viewport';
   requestId?: string;
+  asteroids?: AsteroidDto[];
 };
 export type ContactMessage = ContactMessageDto;
 type ContactSocketMessage = {
@@ -111,6 +115,9 @@ function parseSpaceshipSocketMessage(data: string): SpaceshipSocketMessage {
       requestId:
         typeof message.requestId === 'string' ? message.requestId : undefined,
       ...(Array.isArray(message.systems) ? { systems: message.systems } : {}),
+      ...(Array.isArray(message.asteroids)
+        ? { asteroids: message.asteroids }
+        : {}),
     };
   }
   if (message.type === 'world:viewport' && Array.isArray(message.systems)) {
@@ -119,6 +126,9 @@ function parseSpaceshipSocketMessage(data: string): SpaceshipSocketMessage {
       requestId:
         typeof message.requestId === 'string' ? message.requestId : undefined,
       systems: message.systems,
+      ...(Array.isArray(message.asteroids)
+        ? { asteroids: message.asteroids }
+        : {}),
     };
   }
   if (message.type === 'error' && typeof message.error === 'string') {
@@ -183,6 +193,9 @@ async function applyWorldInfo(message: WorldInfoMessage) {
   const handledViewportRequest = handleWorldViewportInfo(message);
   const spaceship = preservePendingInventory(message.spaceship);
   storeSpaceship(spaceship);
+  if (message.asteroids) {
+    hydrateAsteroids(message.asteroids);
+  }
   if (message.systems) {
     if (!handledViewportRequest) {
       hydrateWorldSystems({ systems: message.systems });
@@ -341,6 +354,10 @@ function requestWorldViewportOverSocket(request: {
 function handleWorldViewportInfo(
   message: WorldViewportMessage | WorldInfoMessage,
 ) {
+  if (message.asteroids) {
+    hydrateAsteroids(message.asteroids);
+  }
+
   const requestId = message.requestId;
   if (!requestId || !message.systems) return false;
 

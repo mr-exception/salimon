@@ -270,6 +270,136 @@
   font-size: 0.68rem;
 }
 
+.bodyDetailsBackdrop {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  background: rgb(0 0 0 / 34%);
+  cursor: default;
+}
+
+.bodyDetailsDialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 5;
+  box-sizing: border-box;
+  width: min(420px, calc(100% - 32px));
+  max-height: min(680px, calc(100% - 32px));
+  padding: 16px;
+  overflow-y: auto;
+  border: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 34%, transparent);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--color-deep-space) 96%, transparent);
+  box-shadow: 0 24px 70px rgb(0 0 0 / 56%);
+  color: var(--color-starlight);
+  font-family: system-ui, sans-serif;
+  transform: translate(-50%, -50%);
+}
+
+.bodyDetailsDialog > header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 18%, transparent);
+}
+
+.bodyDetailsDialog h2 {
+  margin: 0;
+  color: var(--color-starlight);
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.bodyDetailsDialog header span,
+.bodyDetailsDeposits h3,
+.bodyDetailsDialog dt {
+  color: color-mix(in srgb, var(--color-starlight) 55%, transparent);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.bodyDetailsDialog header button {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  padding: 0;
+  border: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 30%, transparent);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--color-deep-space) 84%, transparent);
+  color: var(--color-plasma-cyan);
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.bodyDetailsDialog header button:hover,
+.bodyDetailsDialog header button:focus-visible {
+  border-color: var(--color-plasma-cyan);
+  outline: none;
+}
+
+.bodyDetailsDialog dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 14px 0 0;
+}
+
+.bodyDetailsDialog dl div {
+  min-width: 0;
+}
+
+.bodyDetailsDialog dt {
+  margin-bottom: 5px;
+}
+
+.bodyDetailsDialog dd {
+  margin: 0;
+  overflow: hidden;
+  color: var(--color-plasma-cyan);
+  font-size: 0.82rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bodyDetailsDeposits {
+  margin-top: 16px;
+  padding-top: 13px;
+  border-top: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 18%, transparent);
+}
+
+.bodyDetailsDeposits h3 {
+  margin: 0;
+}
+
+.bodyDetailsDeposits dl {
+  gap: 9px;
+}
+
+.bodyDetailsDeposits dl div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.bodyDetailsDeposits dd {
+  text-align: right;
+}
+
 .proximityTelemetry {
   position: absolute;
   top: 16px;

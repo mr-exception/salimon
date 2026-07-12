@@ -530,6 +530,61 @@ export function isSpaceshipEngineRunning() {
   return store.get(spaceshipActiveFeatureAtom) !== undefined;
 }
 
+export type SpaceshipTargetSpeedBurnPreview = {
+  maximumAcceleration: number;
+  durationSeconds: number;
+};
+
+export function getSpaceshipTargetSpeedBurnPreview(
+  targetSpeedMetersPerSecond: number,
+  maximumThrustPercent: number,
+  targetDirection: number | undefined,
+): SpaceshipTargetSpeedBurnPreview | undefined {
+  if (
+    store.get(spaceshipActiveFeatureAtom) ||
+    store.get(spaceshipMotionStateAtom) === 'crashed' ||
+    targetDirection === undefined ||
+    !Number.isFinite(targetDirection) ||
+    !Number.isFinite(targetSpeedMetersPerSecond) ||
+    targetSpeedMetersPerSecond < 0 ||
+    !Number.isFinite(maximumThrustPercent) ||
+    maximumThrustPercent <= 0 ||
+    maximumThrustPercent > 100
+  ) {
+    return undefined;
+  }
+
+  const motion = {
+    position: toVector(getWorldPosition(spaceshipState.position)),
+    velocity: getSpaceshipWorldVelocity(),
+  };
+  const targetVelocity = {
+    x: Math.cos(targetDirection) * targetSpeedMetersPerSecond,
+    y: Math.sin(targetDirection) * targetSpeedMetersPerSecond,
+  };
+  const maximumAcceleration =
+    WorldService.calculateMaximumEngineAcceleration(maximumThrustPercent);
+  const durationSeconds = WorldService.calculateTargetSpeedBurnDuration(
+    targetVelocity,
+    motion.velocity,
+    motion.position,
+    maximumAcceleration,
+    calculateGravityAcceleration,
+  );
+  if (durationSeconds === undefined || durationSeconds === 0) return undefined;
+
+  const accelerationValue = WorldService.calculateRequiredBurnAcceleration(
+    targetVelocity,
+    durationSeconds,
+    motion.velocity,
+    motion.position,
+    calculateGravityAcceleration,
+  );
+  if (!hasAvailableThrusterForAcceleration(accelerationValue)) return undefined;
+
+  return { maximumAcceleration, durationSeconds };
+}
+
 export function getSpaceshipActiveThrustVector() {
   return calculateSpaceshipActiveThrustAcceleration({
     position: toVector(getWorldPosition(spaceshipState.position)),
@@ -576,6 +631,19 @@ function calculateSpaceshipActiveThrustAcceleration(motion: {
     x: requestedAcceleration.x * scale,
     y: requestedAcceleration.y * scale,
   };
+}
+
+function hasAvailableThrusterForAcceleration(accelerationValue: Vector) {
+  const thrusterDurability = store.get(spaceshipThrusterDurabilityAtom);
+  const xIndex = accelerationValue.x < 0 ? 1 : 3;
+  const yIndex = accelerationValue.y < 0 ? 2 : 0;
+
+  return (
+    (Math.abs(accelerationValue.x) > 1e-8 &&
+      (thrusterDurability[xIndex] ?? 0) > 0) ||
+    (Math.abs(accelerationValue.y) > 1e-8 &&
+      (thrusterDurability[yIndex] ?? 0) > 0)
+  );
 }
 
 export function getSpaceshipWorldVelocity() {

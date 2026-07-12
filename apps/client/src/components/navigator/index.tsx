@@ -8,11 +8,17 @@ import {
   type SpaceshipProximityTelemetry,
 } from '@store';
 import type { World } from '@repo/types';
-import { formatAngle, formatDistance, formatSpeed } from '../../utils';
+import {
+  formatAngle,
+  formatDistance,
+  formatSiValue,
+  formatSpeed,
+} from '../../utils';
 import { BodyContextMenu } from './body-context-menu';
 import {
   Scene,
   type BodyContextMenuRequest,
+  type BodyDetailsRequest,
   type TargetDirectionPreview,
 } from './game/scene';
 import { MAX_ZOOM, MIN_ZOOM } from './game/scene/configure-input';
@@ -34,6 +40,137 @@ const INVENTORY_MATERIAL_LABELS = {
 
 function formatScaleDistance(zoom: number) {
   return formatDistance(SCALE_WIDTH_PX / zoom);
+}
+
+function formatMass(valueInKilograms: bigint) {
+  return formatSiValue(Number(valueInKilograms), 'kg');
+}
+
+function formatTonnes(value: number) {
+  return formatSiValue(value, 't');
+}
+
+function formatVelocityDirection(velocity: { x: number; y: number }) {
+  const speed = Math.hypot(velocity.x, velocity.y);
+  if (speed === 0) return formatAngle(0);
+
+  const degrees = (Math.atan2(velocity.y, velocity.x) * 180) / Math.PI;
+  return formatAngle(Math.round((degrees + 360) % 360));
+}
+
+function getBodyDetailsTitle(details: BodyDetailsRequest) {
+  return details.kind === 'Asteroid'
+    ? `Asteroid ${details.body.id.slice(0, 8)}`
+    : details.body.name;
+}
+
+function BodyDetailsDialog({
+  details,
+  onDismiss,
+}: {
+  details: BodyDetailsRequest;
+  onDismiss: () => void;
+}) {
+  useEffect(() => {
+    const dismissOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onDismiss();
+    };
+
+    window.addEventListener('keydown', dismissOnEscape);
+    return () => window.removeEventListener('keydown', dismissOnEscape);
+  }, [onDismiss]);
+
+  const velocitySpeed = Math.hypot(details.velocity.x, details.velocity.y);
+  const title = getBodyDetailsTitle(details);
+
+  return (
+    <>
+      <button
+        type="button"
+        className={style.bodyDetailsBackdrop}
+        aria-label="Close body details"
+        onClick={onDismiss}
+      />
+      <section
+        className={style.bodyDetailsDialog}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="navigator-body-details-title"
+      >
+        <header>
+          <div>
+            <h2 id="navigator-body-details-title">{title}</h2>
+            <span>{details.kind}</span>
+          </div>
+          <button type="button" aria-label="Close details" onClick={onDismiss}>
+            ×
+          </button>
+        </header>
+        <dl>
+          {details.kind !== 'Asteroid' ? (
+            <>
+              <div>
+                <dt>System</dt>
+                <dd>{details.systemName}</dd>
+              </div>
+              <div>
+                <dt>Current speed</dt>
+                <dd>{formatSpeed(velocitySpeed)}</dd>
+              </div>
+              <div>
+                <dt>Mass</dt>
+                <dd>{formatMass(details.body.mass)}</dd>
+              </div>
+              <div>
+                <dt>Size</dt>
+                <dd>{formatDistance(Number(details.body.radius) * 2)}</dd>
+              </div>
+            </>
+          ) : (
+            <>
+              <div>
+                <dt>System</dt>
+                <dd>{details.body.systemName}</dd>
+              </div>
+              <div>
+                <dt>Orbiting</dt>
+                <dd>{details.body.orbitingBodyName}</dd>
+              </div>
+              <div>
+                <dt>Speed</dt>
+                <dd>{formatSpeed(velocitySpeed)}</dd>
+              </div>
+              <div>
+                <dt>Direction</dt>
+                <dd>{formatVelocityDirection(details.velocity)}</dd>
+              </div>
+              <div>
+                <dt>Mass</dt>
+                <dd>{formatTonnes(details.body.massTonnes)}</dd>
+              </div>
+              <div>
+                <dt>Size class</dt>
+                <dd>{details.body.sizeClass}</dd>
+              </div>
+            </>
+          )}
+        </dl>
+        {details.kind === 'Asteroid' && (
+          <section className={style.bodyDetailsDeposits}>
+            <h3>Minerals</h3>
+            <dl>
+              {details.deposits.map((deposit) => (
+                <div key={deposit.material}>
+                  <dt>{INVENTORY_MATERIAL_LABELS[deposit.material]}</dt>
+                  <dd>{formatTonnes(deposit.amount)}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        )}
+      </section>
+    </>
+  );
 }
 
 type NavigatorProps = {
@@ -62,6 +199,9 @@ export function Navigator({
     'loading' | 'ready' | 'error'
   >('loading');
   const [contextMenu, setContextMenu] = useState<BodyContextMenuRequest | null>(
+    null,
+  );
+  const [bodyDetails, setBodyDetails] = useState<BodyDetailsRequest | null>(
     null,
   );
   const [targetPreview, setTargetPreview] =
@@ -106,6 +246,7 @@ export function Navigator({
     const scene = new Scene(
       setZoomLevel,
       setContextMenu,
+      setBodyDetails,
       undefined,
       (engineIsRunning) => onSpaceshipEngineChange?.(engineIsRunning),
       (preview) => setTargetPreview(preview ?? null),
@@ -148,11 +289,13 @@ export function Navigator({
 
   const navigateTo = ({ body }: SearchResult) => {
     setContextMenu(null);
+    setBodyDetails(null);
     sceneRef.current?.navigateTo(body.name, body.renderZoomLevel * 10);
   };
 
   const recenterOnSpaceship = () => {
     setContextMenu(null);
+    setBodyDetails(null);
     sceneRef.current?.recenterOnSpaceship();
   };
 
@@ -233,6 +376,12 @@ export function Navigator({
           request={contextMenu}
           onDismiss={() => setContextMenu(null)}
           onToggleAlwaysVisible={toggleAlwaysVisible}
+        />
+      )}
+      {bodyDetails && (
+        <BodyDetailsDialog
+          details={bodyDetails}
+          onDismiss={() => setBodyDetails(null)}
         />
       )}
       <aside className={style.inventoryPanel} aria-label="Mined materials">

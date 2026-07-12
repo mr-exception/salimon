@@ -68,6 +68,26 @@ export type BodyContextMenuRequest = {
   alwaysVisible: boolean;
 };
 
+export type BodyDetailsRequest =
+  | {
+      kind: 'Planet';
+      body: PlanetData;
+      systemName: string;
+      velocity: { x: number; y: number };
+    }
+  | {
+      kind: 'Star';
+      body: StarData;
+      systemName: string;
+      velocity: { x: number; y: number };
+    }
+  | {
+      kind: 'Asteroid';
+      body: AsteroidDto;
+      deposits: AsteroidDto['deposits'];
+      velocity: { x: number; y: number };
+    };
+
 export type TargetDirectionPreview = {
   x: number;
   y: number;
@@ -134,6 +154,7 @@ export class Scene extends Phaser.Scene {
   protected readonly onBodyContextMenu?: (
     request: BodyContextMenuRequest,
   ) => void;
+  protected readonly onBodyDetails?: (request: BodyDetailsRequest) => void;
   protected readonly onSpaceshipTurnChange?: (
     remainingDegrees: number,
     isTurning: boolean,
@@ -191,6 +212,7 @@ export class Scene extends Phaser.Scene {
   constructor(
     onZoomChange?: (zoom: number) => void,
     onBodyContextMenu?: (request: BodyContextMenuRequest) => void,
+    onBodyDetails?: (request: BodyDetailsRequest) => void,
     onSpaceshipTurnChange?: (
       remainingDegrees: number,
       isTurning: boolean,
@@ -203,6 +225,7 @@ export class Scene extends Phaser.Scene {
     super('navigation');
     this.onZoomChange = onZoomChange;
     this.onBodyContextMenu = onBodyContextMenu;
+    this.onBodyDetails = onBodyDetails;
     this.onSpaceshipTurnChange = onSpaceshipTurnChange;
     this.onSpaceshipEngineChange = onSpaceshipEngineChange;
     this.onTargetDirectionPreview = onTargetDirectionPreview;
@@ -739,6 +762,102 @@ export class Scene extends Phaser.Scene {
       y: Phaser.Math.Clamp(y, 8, Math.max(8, this.scale.height - 110)),
       alwaysVisible: this.alwaysVisibleBodies.has(body.name),
     });
+  }
+
+  openBodyDetailsAt(x: number, y: number) {
+    const camera = this.cameras.main;
+    const asteroid = this.asteroids
+      .toReversed()
+      .find((candidate) => candidate.containsScreenPoint(x, y, camera));
+    if (asteroid) {
+      this.onBodyDetails?.({
+        kind: 'Asteroid',
+        body: asteroid.asteroid,
+        deposits: asteroid.deposits.map((deposit) => ({ ...deposit })),
+        velocity: this.getAsteroidWorldVelocity(asteroid),
+      });
+      return;
+    }
+
+    const star = this.stars
+      .toReversed()
+      .find((candidate) => candidate.containsScreenPoint(x, y, camera));
+    if (star) {
+      this.onBodyDetails?.({
+        kind: 'Star',
+        body: star.star,
+        systemName: star.star.name,
+        velocity: getBodyWorldVelocity(star.star.name),
+      });
+      return;
+    }
+
+    const planet = this.planets
+      .toReversed()
+      .find((candidate) => candidate.containsScreenPoint(x, y, camera));
+    if (!planet) return;
+
+    this.onBodyDetails?.({
+      kind: 'Planet',
+      body: planet.planet,
+      systemName: this.getSystemName(planet.planet),
+      velocity: getBodyWorldVelocity(planet.planet.name),
+    });
+  }
+
+  private getAsteroidWorldVelocity(asteroid: Asteroid) {
+    const center = this.getRenderedBodyPosition(
+      asteroid.asteroid.orbitalCenter,
+    );
+    const centerVelocity = getBodyWorldVelocity(
+      asteroid.asteroid.orbitalCenter,
+    );
+    if (!center) return centerVelocity;
+
+    const x = asteroid.x - center.x;
+    const y = asteroid.y - center.y;
+    const radius = Math.hypot(x, y);
+    if (radius === 0) return centerVelocity;
+
+    const direction = asteroid.asteroid.clockwise ? 1 : -1;
+    const speed = Number(asteroid.asteroid.speed);
+    return {
+      x: centerVelocity.x + (direction * -y * speed) / radius,
+      y: centerVelocity.y + (direction * x * speed) / radius,
+    };
+  }
+
+  private getRenderedBodyPosition(name: string) {
+    const planet = this.planetByName.get(name);
+    if (planet) return { x: planet.x, y: planet.y };
+
+    const star = this.starByName.get(name);
+    if (star) return { x: star.x, y: star.y };
+
+    const planetData = this.planetDataByName.get(name);
+    if (planetData) return getRenderPosition(planetData.position);
+
+    const starData = this.starDataByName.get(name);
+    if (starData) return getRenderPosition(starData.position);
+
+    return undefined;
+  }
+
+  private getSystemName(body: PlanetData | StarData) {
+    let systemName = body.name;
+    let centerName = body.orbitalCenter;
+    const visitedNames = new Set<string>();
+
+    while (centerName && !visitedNames.has(centerName)) {
+      visitedNames.add(centerName);
+      systemName = centerName;
+      centerName =
+        this.planetDataByName.get(centerName)?.orbitalCenter ??
+        this.starDataByName.get(centerName)?.orbitalCenter ??
+        null;
+    }
+
+    return systemName;
   }
 
   setTargetDirectionSelectionActive(active: boolean) {

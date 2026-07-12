@@ -3,10 +3,12 @@ import type { Scene } from '.';
 
 export const MIN_ZOOM = 0.000000000000001;
 export const MAX_ZOOM = 0.1;
+const CLICK_DISTANCE_THRESHOLD_PX = 5;
 
 export function configureInput(this: Scene) {
   const camera = this.cameras.main;
   const canvas = this.game.canvas;
+  let clickStart: Phaser.Math.Vector2 | undefined;
   const openContextMenu = (event: MouseEvent) => {
     event.preventDefault();
 
@@ -30,6 +32,7 @@ export function configureInput(this: Scene) {
 
     this.dragging = true;
     this.lastPointer.set(pointer.x, pointer.y);
+    clickStart = new Phaser.Math.Vector2(pointer.x, pointer.y);
     canvas.style.cursor = 'grabbing';
   });
 
@@ -68,6 +71,19 @@ export function configureInput(this: Scene) {
 
     this.dragging = false;
     canvas.style.cursor = 'grab';
+    if (
+      pointer.leftButtonReleased() &&
+      clickStart &&
+      Phaser.Math.Distance.Between(
+        clickStart.x,
+        clickStart.y,
+        pointer.x,
+        pointer.y,
+      ) <= CLICK_DISTANCE_THRESHOLD_PX
+    ) {
+      this.openBodyDetailsAt(pointer.x, pointer.y);
+    }
+    clickStart = undefined;
   });
 
   this.input.on(
@@ -91,6 +107,7 @@ export function configureInput(this: Scene) {
 
   this.input.on('gameout', () => {
     this.dragging = false;
+    clickStart = undefined;
     this.hideTargetDirectionPreview();
     canvas.style.cursor = this.isTargetDirectionSelectionActive()
       ? 'crosshair'

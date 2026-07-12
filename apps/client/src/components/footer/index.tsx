@@ -23,6 +23,7 @@ import {
   THRUSTER_BASE_DURABILITY,
   THRUSTER_BASE_POWER_PERCENT,
   THRUSTER_LEVEL_MULTIPLIER,
+  getSpaceshipTargetSpeedBurnPreview,
   placeModule,
   setModuleActive,
   spendInventory,
@@ -487,13 +488,20 @@ export function Footer({
   const maximumThrustPercentValue = Number(maximumThrustPercent);
   const activeTargetSpeed =
     activeFeature?.type === 'target-speed' ? activeFeature : undefined;
+  const targetSpeedBurnPreview = getSpaceshipTargetSpeedBurnPreview(
+    targetSpeedMetersPerSecond,
+    maximumThrustPercentValue,
+    targetDirection,
+  );
   const burnTimeSeconds = activeTargetSpeed
     ? Math.max(
         0,
         activeTargetSpeed.durationSeconds - activeTargetSpeed.elapsedSeconds,
       )
-    : undefined;
-  const acceleration = activeTargetSpeed?.maximumAcceleration ?? Number.NaN;
+    : targetSpeedBurnPreview?.durationSeconds;
+  const acceleration =
+    activeTargetSpeed?.maximumAcceleration ??
+    targetSpeedBurnPreview?.maximumAcceleration;
   const hasValidBurn =
     targetDirection !== undefined &&
     Number.isFinite(targetSpeedMetersPerSecond) &&
@@ -504,6 +512,7 @@ export function Footer({
   const canStartBurn =
     motionState !== 'crashed' &&
     hasValidBurn &&
+    targetSpeedBurnPreview !== undefined &&
     fuelKns > 0 &&
     thrusterDurability.some((durability) => durability > 0);
   const currentEnginePowerPercent = activeTargetSpeed
@@ -944,7 +953,9 @@ export function Footer({
                 <div className={style.speedMetrics}>
                   <span className={style.speedMetric}>
                     <small>Acceleration</small>
-                    {activeTargetSpeed ? formatAcceleration(acceleration) : '—'}
+                    {acceleration !== undefined
+                      ? formatAcceleration(acceleration)
+                      : '—'}
                   </span>
                   <span className={style.speedMetric}>
                     <small>Time remaining</small>

@@ -38,6 +38,7 @@ const MARKER_SCREEN_SIZE_PX = 12;
 
 export class Asteroid extends Phaser.GameObjects.Container {
   readonly id: string;
+  readonly asteroid: AsteroidDto;
   readonly initialMassTonnes: number;
   readonly deposits: AsteroidDeposit[];
   private readonly initialRadius: number;
@@ -58,6 +59,7 @@ export class Asteroid extends Phaser.GameObjects.Container {
     super(scene, x, y);
 
     this.id = asteroid.id;
+    this.asteroid = asteroid;
     this.initialRadius = radius;
     this.currentRadius = radius;
     this.initialMassTonnes = asteroid.massTonnes;
@@ -99,6 +101,21 @@ export class Asteroid extends Phaser.GameObjects.Container {
 
   syncPosition(x: number, y: number) {
     this.setPosition(x, y);
+  }
+
+  containsScreenPoint(
+    x: number,
+    y: number,
+    camera: Phaser.Cameras.Scene2D.Camera,
+  ) {
+    if (!this.visible) return false;
+
+    const screenX = (this.x - camera.worldView.left) * camera.zoom;
+    const screenY = (this.y - camera.worldView.top) * camera.zoom;
+    const screenRadius = this.currentRadius * camera.zoom;
+    const hitRadius = Math.max(MARKER_SCREEN_SIZE_PX / 2, screenRadius);
+
+    return Phaser.Math.Distance.Between(x, y, screenX, screenY) <= hitRadius;
   }
 
   mine(amountTonnes: number): AsteroidMiningResult[] {

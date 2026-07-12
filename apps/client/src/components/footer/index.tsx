@@ -14,7 +14,9 @@ import {
   MAX_THRUSTER_DURABILITY,
   MINING_BASE_EFFICIENCY_KNS,
   MINING_BASE_DURABILITY_KN,
+  MINING_BASE_RANGE_METERS,
   MINING_DURABILITY_PER_LEVEL_KN,
+  MINING_RANGE_LEVEL_MULTIPLIER,
   INVENTORY_MATERIALS,
   MODULE_GRID_SIZE,
   MODULE_RESEARCH,
@@ -155,6 +157,7 @@ const MODULE_LABELS: Record<ModuleType, string> = {
 const ATTRIBUTE_LABELS: Record<ModuleAttribute, string> = {
   efficiency: 'Efficiency',
   durability: 'Durability',
+  range: 'Range',
   power: 'Power',
 };
 
@@ -171,6 +174,12 @@ function getModuleAttributeValue(
       MINING_BASE_DURABILITY_KN +
       Math.max(0, level - 1) * MINING_DURABILITY_PER_LEVEL_KN
     } KN`;
+  }
+  if (module.type === 'mining' && attribute === 'range') {
+    return `${Math.round(
+      MINING_BASE_RANGE_METERS *
+        (1 + Math.max(0, level - 1) * MINING_RANGE_LEVEL_MULTIPLIER),
+    ).toLocaleString()} m`;
   }
   if (module.type === 'thruster' && attribute === 'power') {
     return `${Math.round(
@@ -201,6 +210,13 @@ function getUpgradeCost(
       iron: 14 * nextLevel,
       silicates: 12 * nextLevel,
       ice: 4 * nextLevel,
+    };
+  }
+  if (module.type === 'mining' && attribute === 'range') {
+    return {
+      iron: 18 * nextLevel,
+      silicates: 10 * nextLevel,
+      ice: 6 * nextLevel,
     };
   }
   if (module.type === 'thruster' && attribute === 'power') {
@@ -251,7 +267,7 @@ function formatCost(cost: Partial<Inventory>) {
 
 function getModuleAttributes(type: ModuleType): ModuleAttribute[] {
   return type === 'mining'
-    ? ['efficiency', 'durability']
+    ? ['efficiency', 'durability', 'range']
     : ['power', 'durability'];
 }
 

@@ -2,7 +2,7 @@ import { atom, getDefaultStore, useAtomValue, useSetAtom } from 'jotai';
 import type { Inventory } from './world';
 
 export type ModuleType = 'mining' | 'thruster';
-export type ModuleAttribute = 'efficiency' | 'durability' | 'power';
+export type ModuleAttribute = 'efficiency' | 'durability' | 'range' | 'power';
 export type ModuleGridCell = {
   x: number;
   y: number;
@@ -29,6 +29,8 @@ export const MODULE_GRID_SIZE = 8;
 export const MINING_BASE_EFFICIENCY_KNS = 1;
 export const MINING_BASE_DURABILITY_KN = 2_000;
 export const MINING_DURABILITY_PER_LEVEL_KN = 100;
+export const MINING_BASE_RANGE_METERS = 10_000;
+export const MINING_RANGE_LEVEL_MULTIPLIER = 0.05;
 export const THRUSTER_BASE_POWER_PERCENT = 100;
 export const THRUSTER_BASE_DURABILITY = 100;
 export const THRUSTER_LEVEL_MULTIPLIER = 0.05;
@@ -54,7 +56,7 @@ const modulesAtom = atom<ShipModule[]>([
     position: { x: 3, y: 3 },
     active: false,
     unlocked: true,
-    levels: { efficiency: 1, durability: 1 },
+    levels: { efficiency: 1, durability: 1, range: 1 },
     durability: MINING_BASE_DURABILITY_KN,
   },
 ]);
@@ -123,7 +125,7 @@ export function unlockModule(type: ModuleType) {
       levels:
         type === 'thruster'
           ? { power: 1, durability: 1 }
-          : { efficiency: 1, durability: 1 },
+          : { efficiency: 1, durability: 1, range: 1 },
       durability:
         type === 'thruster'
           ? THRUSTER_BASE_DURABILITY
@@ -183,10 +185,14 @@ export function getMiningModuleStats() {
 
   const efficiencyLevel = module.levels.efficiency ?? 1;
   const durabilityLevel = module.levels.durability ?? 1;
+  const rangeLevel = module.levels.range ?? 1;
   return {
     id: module.id,
     active: module.active && module.durability > 0,
     efficiencyKns: MINING_BASE_EFFICIENCY_KNS * efficiencyLevel,
+    rangeMeters:
+      MINING_BASE_RANGE_METERS *
+      (1 + Math.max(0, rangeLevel - 1) * MINING_RANGE_LEVEL_MULTIPLIER),
     durability: module.durability,
     maxDurability:
       MINING_BASE_DURABILITY_KN +
@@ -232,7 +238,9 @@ export function getThrusterModulePowerPercent() {
 function canUpgradeAttribute(type: ModuleType, attribute: ModuleAttribute) {
   return (
     (type === 'mining' &&
-      (attribute === 'efficiency' || attribute === 'durability')) ||
+      (attribute === 'efficiency' ||
+        attribute === 'durability' ||
+        attribute === 'range')) ||
     (type === 'thruster' &&
       (attribute === 'power' || attribute === 'durability'))
   );

@@ -27,7 +27,6 @@ export function configureInput(this: Scene) {
   this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
     if (!pointer.leftButtonDown()) return;
     if (this.isTargetDirectionSelectionActive()) return;
-    if (this.mineAsteroidAt(pointer.x, pointer.y)) return;
 
     this.dragging = true;
     this.lastPointer.set(pointer.x, pointer.y);

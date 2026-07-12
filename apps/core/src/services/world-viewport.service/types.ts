@@ -31,9 +31,12 @@ export type WorldViewportRequest = {
   y?: string;
   radius?: string;
   coordinate?: string;
+  left?: string;
+  right?: string;
+  top?: string;
+  bottom?: string;
 };
 
 export type WorldViewportOptions = {
   requiredBodyNames?: Iterable<string>;
 };
-

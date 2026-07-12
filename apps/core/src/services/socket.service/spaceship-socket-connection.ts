@@ -38,6 +38,10 @@ type SpaceshipSocketIncomingMessage =
       x?: unknown;
       y?: unknown;
       radius?: unknown;
+      left?: unknown;
+      right?: unknown;
+      top?: unknown;
+      bottom?: unknown;
     };
 
 export class SpaceshipSocketConnection {
@@ -216,11 +220,15 @@ export class SpaceshipSocketConnection {
       }
 
       if (message.type === 'world:viewport') {
-        const { x, y, radius, requestId } = message;
+        const { x, y, radius, requestId, left, right, top, bottom } = message;
         if (
           typeof x !== 'string' ||
           typeof y !== 'string' ||
           typeof radius !== 'string' ||
+          (left !== undefined && typeof left !== 'string') ||
+          (right !== undefined && typeof right !== 'string') ||
+          (top !== undefined && typeof top !== 'string') ||
+          (bottom !== undefined && typeof bottom !== 'string') ||
           (requestId !== undefined && typeof requestId !== 'string')
         ) {
           throw new Error('Invalid world viewport parameters');
@@ -232,6 +240,10 @@ export class SpaceshipSocketConnection {
             x,
             y,
             radius,
+            ...(left === undefined ? {} : { left }),
+            ...(right === undefined ? {} : { right }),
+            ...(top === undefined ? {} : { top }),
+            ...(bottom === undefined ? {} : { bottom }),
           },
         });
         return;

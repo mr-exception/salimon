@@ -333,6 +333,10 @@ function requestWorldViewportOverSocket(request: {
   x: string;
   y: string;
   radius: string;
+  left?: string;
+  right?: string;
+  top?: string;
+  bottom?: string;
 }) {
   if (!spaceshipSocket || spaceshipSocket.readyState !== WebSocket.OPEN) {
     return Promise.reject(new Error('Spaceship socket is not connected'));

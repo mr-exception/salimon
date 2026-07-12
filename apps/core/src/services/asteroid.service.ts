@@ -26,6 +26,8 @@ type AsteroidDensityBand = {
 type AsteroidDensityConfig = Record<AsteroidSizeClass, AsteroidDensityBand>;
 
 const ASTEROID_SESSION_RANGE_METERS = 20_000_000;
+const ASTEROID_SPAWN_MIN_DISTANCE_METERS = 25_000;
+const ASTEROID_SPAWN_MAX_DISTANCE_METERS = 1_200_000;
 const ASTEROID_MIN_TONNES = 1;
 const ASTEROID_MAX_TONNES = 3_000;
 const ASTEROID_BODY_CLEARANCE_METERS = 600_000;
@@ -192,32 +194,18 @@ export class AsteroidService {
       const bodyPosition = params.positions.get(orbitingBody.name);
       if (!bodyPosition) continue;
 
-      const orbitRadius = this.randomOrbitRadiusNearSpaceship(
-        orbitingBody,
-        bodyPosition,
+      const absolutePosition = this.randomPositionNearSpaceship(
         params.spaceshipPosition,
       );
-      const angle = this.randomAngleTowardPosition(
-        bodyPosition,
-        params.spaceshipPosition,
-        orbitRadius,
-      );
-      const position = {
-        x: Math.round(Math.cos(angle) * orbitRadius).toString(),
-        y: Math.round(Math.sin(angle) * orbitRadius).toString(),
-        relativeTo: orbitingBody.name,
-      };
-      const absolutePosition = {
-        x: bodyPosition.x + BigInt(position.x),
-        y: bodyPosition.y + BigInt(position.y),
-      };
-
-      if (
-        this.distance(absolutePosition, params.spaceshipPosition) >
-        ASTEROID_SESSION_RANGE_METERS
-      ) {
+      const orbitRadius = this.distance(absolutePosition, bodyPosition);
+      if (orbitRadius < this.getMinimumOrbitRadius(orbitingBody)) {
         continue;
       }
+      const position = {
+        x: (absolutePosition.x - bodyPosition.x).toString(),
+        y: (absolutePosition.y - bodyPosition.y).toString(),
+        relativeTo: orbitingBody.name,
+      };
 
       const massTonnes = this.randomMass(params.density);
       return {
@@ -392,22 +380,16 @@ export class AsteroidService {
     return current.name;
   }
 
-  private static randomOrbitRadiusNearSpaceship(
-    body: WorldBodyDocument,
-    bodyPosition: Coordinate,
-    spaceshipPosition: Coordinate,
-  ) {
-    const minRadius = this.getMinimumOrbitRadius(body);
-    const bodyDistance = this.distance(bodyPosition, spaceshipPosition);
-    const minSessionRadius = Math.max(
-      minRadius,
-      bodyDistance - ASTEROID_SESSION_RANGE_METERS * 0.85,
+  private static randomPositionNearSpaceship(spaceshipPosition: Coordinate) {
+    const angle = Math.random() * Math.PI * 2;
+    const distance = this.randomBetween(
+      ASTEROID_SPAWN_MIN_DISTANCE_METERS,
+      ASTEROID_SPAWN_MAX_DISTANCE_METERS,
     );
-    const maxSessionRadius = Math.max(
-      minSessionRadius,
-      bodyDistance + ASTEROID_SESSION_RANGE_METERS * 0.85,
-    );
-    return this.randomBetween(minSessionRadius, maxSessionRadius);
+    return {
+      x: spaceshipPosition.x + BigInt(Math.round(Math.cos(angle) * distance)),
+      y: spaceshipPosition.y + BigInt(Math.round(Math.sin(angle) * distance)),
+    };
   }
 
   private static getMinimumOrbitRadius(body: WorldBodyDocument) {
@@ -472,25 +454,6 @@ export class AsteroidService {
 
   private static randomBetween(min: number, max: number) {
     return min + Math.random() * (max - min);
-  }
-
-  private static randomAngleTowardPosition(
-    from: Coordinate,
-    target: Coordinate,
-    orbitRadius: number,
-  ) {
-    const deltaX = Number(target.x - from.x);
-    const deltaY = Number(target.y - from.y);
-    if (deltaX === 0 && deltaY === 0) return Math.random() * Math.PI * 2;
-
-    const centerAngle = Math.atan2(deltaY, deltaX);
-    const maxOffset = Math.min(
-      Math.PI / 3,
-      Math.asin(
-        Math.min(1, ASTEROID_SESSION_RANGE_METERS / Math.max(1, orbitRadius)),
-      ) * 0.75,
-    );
-    return centerAngle + this.randomBetween(-maxOffset, maxOffset);
   }
 
   private static distance(left: Coordinate, right: Coordinate) {

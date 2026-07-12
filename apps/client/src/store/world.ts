@@ -27,7 +27,7 @@ type WorldListener = (
   changedBodyNames?: ReadonlySet<string>,
 ) => void;
 type WorldViewportLoader = (
-  request: Required<WorldViewportRequest>,
+  request: WorldViewportRequest,
 ) => Promise<SerializedWorldSystems>;
 export type SpaceshipMotionState = 'flying' | 'landed' | 'crashed';
 export type SpaceshipProximityTelemetry = {
@@ -277,6 +277,10 @@ type WorldViewportRequest = {
   x: string;
   y: string;
   radius: string;
+  left?: string;
+  right?: string;
+  top?: string;
+  bottom?: string;
 };
 
 export function setWorldViewportLoader(loader?: WorldViewportLoader) {
@@ -298,8 +302,20 @@ export async function refreshWorldViewport({
   x,
   y,
   radius,
+  left,
+  right,
+  top,
+  bottom,
 }: WorldViewportRequest) {
-  const request = { x, y, radius };
+  const request = {
+    x,
+    y,
+    radius,
+    ...(left === undefined ? {} : { left }),
+    ...(right === undefined ? {} : { right }),
+    ...(top === undefined ? {} : { top }),
+    ...(bottom === undefined ? {} : { bottom }),
+  };
   const data = worldViewportLoader
     ? await worldViewportLoader(request)
     : await loadWorldViewportFromRest(request);
@@ -312,7 +328,7 @@ async function loadWorldViewportFromRest({
   x,
   y,
   radius,
-}: Required<WorldViewportRequest>) {
+}: WorldViewportRequest) {
   const apiBaseUrl = (
     import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL
   ).replace(/\/+$/, '');

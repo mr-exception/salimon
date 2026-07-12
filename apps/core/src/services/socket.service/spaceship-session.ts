@@ -143,9 +143,10 @@ export class SpaceshipSession {
 
   async getViewportAsteroids(viewport: WorldViewportRequest) {
     const asteroids = await this.getAsteroids();
+    const bounds = this.getViewportBounds(viewport);
     const center = this.getViewportCenter(viewport);
     const radius = this.parseViewportRadius(viewport);
-    if (!center || radius === undefined) return asteroids;
+    if (!bounds && (!center || radius === undefined)) return asteroids;
 
     const worldData = await TickingService.getWorldData();
     const worldBodies = [
@@ -156,10 +157,45 @@ export class SpaceshipSession {
     const bodyPositions = this.resolveWorldBodyPositions(worldBodies);
     return asteroids.filter((asteroid) => {
       const position = this.resolveAsteroidPosition(asteroid, bodyPositions);
+      if (bounds) {
+        return (
+          position.x >= bounds.left &&
+          position.x <= bounds.right &&
+          position.y >= bounds.top &&
+          position.y <= bounds.bottom
+        );
+      }
+
       const distanceSquared =
-        (position.x - center.x) ** 2n + (position.y - center.y) ** 2n;
-      return distanceSquared <= radius ** 2n;
+        (position.x - center!.x) ** 2n + (position.y - center!.y) ** 2n;
+      return distanceSquared <= radius! ** 2n;
     });
+  }
+
+  private getViewportBounds(viewport: WorldViewportRequest) {
+    if (
+      viewport.left === undefined ||
+      viewport.right === undefined ||
+      viewport.top === undefined ||
+      viewport.bottom === undefined
+    ) {
+      return undefined;
+    }
+
+    try {
+      const left = BigInt(viewport.left);
+      const right = BigInt(viewport.right);
+      const top = BigInt(viewport.top);
+      const bottom = BigInt(viewport.bottom);
+      return {
+        left: left < right ? left : right,
+        right: left > right ? left : right,
+        top: top < bottom ? top : bottom,
+        bottom: top > bottom ? top : bottom,
+      };
+    } catch {
+      return undefined;
+    }
   }
 
   private getViewportCenter(viewport: WorldViewportRequest) {

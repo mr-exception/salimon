@@ -547,10 +547,12 @@ export class Scene extends Phaser.Scene {
   private syncAsteroids() {
     if (!this.asteroidsVisible) return;
 
+    const viewport = this.cameras.main.worldView;
     const asteroidData = getAsteroids();
     const incomingIds = new Set(asteroidData.map((asteroid) => asteroid.id));
     this.asteroids = this.asteroids.filter((asteroid) => {
-      const keep = incomingIds.has(asteroid.id);
+      const keep =
+        incomingIds.has(asteroid.id) && !asteroid.isPastViewport(viewport, 0);
       if (!keep) asteroid.destroy();
       return keep;
     });
@@ -562,9 +564,20 @@ export class Scene extends Phaser.Scene {
       const position = getRenderPosition(
         deserializePosition(asteroid.position),
       );
+      const radius = getAsteroidRadiusForMass(asteroid.massTonnes);
       const rendered = renderedById.get(asteroid.id);
       if (rendered) {
         rendered.syncPosition(position.x, position.y);
+        return;
+      }
+      if (
+        !this.bodyBoundsIntersectViewport(
+          position.x,
+          position.y,
+          radius,
+          viewport,
+        )
+      ) {
         return;
       }
 
@@ -573,7 +586,7 @@ export class Scene extends Phaser.Scene {
           this,
           position.x,
           position.y,
-          getAsteroidRadiusForMass(asteroid.massTonnes),
+          radius,
           asteroid,
           asteroid.deposits,
         ),
@@ -1369,6 +1382,14 @@ export class Scene extends Phaser.Scene {
       viewport.centerX,
       viewport.centerY,
     );
+    const topLeft = getWorldPositionFromRenderPosition(
+      viewport.left,
+      viewport.top,
+    );
+    const bottomRight = getWorldPositionFromRenderPosition(
+      viewport.right,
+      viewport.bottom,
+    );
     const radius = BigInt(
       Math.ceil(Math.hypot(viewport.width, viewport.height) / 2),
     );
@@ -1376,6 +1397,22 @@ export class Scene extends Phaser.Scene {
       x: center.x.toString(),
       y: center.y.toString(),
       radius: radius.toString(),
+      left:
+        topLeft.x < bottomRight.x
+          ? topLeft.x.toString()
+          : bottomRight.x.toString(),
+      right:
+        topLeft.x > bottomRight.x
+          ? topLeft.x.toString()
+          : bottomRight.x.toString(),
+      top:
+        topLeft.y < bottomRight.y
+          ? topLeft.y.toString()
+          : bottomRight.y.toString(),
+      bottom:
+        topLeft.y > bottomRight.y
+          ? topLeft.y.toString()
+          : bottomRight.y.toString(),
     });
 
     this.setWorldBodyData(world.planets, world.stars);

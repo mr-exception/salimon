@@ -85,7 +85,6 @@ export async function startSpaceshipTargetSpeedFeature(
     params.targetSpeedMetersPerSecond,
     params.maximumThrustPercent,
     params.targetDirection,
-    launchReference?.body.name,
   );
   if (!activeFeature) return undefined;
 

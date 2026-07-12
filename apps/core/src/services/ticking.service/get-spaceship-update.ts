@@ -83,7 +83,6 @@ export function createTargetSpeedFeature(
   targetSpeedMetersPerSecond: number,
   maximumThrustPercent: number,
   targetDirection?: number,
-  referenceName?: string,
 ): TargetSpeedBurnPlan | undefined {
   if (
     spaceship.activeFeature ||
@@ -102,19 +101,12 @@ export function createTargetSpeedFeature(
     x: Number(spaceship.position.x),
     y: Number(spaceship.position.y),
   };
-  const referenceVelocity = referenceName
-    ? getBodyVelocity(world, referenceName, simulatedAt)
-    : undefined;
   const currentVelocity = SpaceshipService.getSpaceshipVelocity(spaceship);
   const direction =
     targetDirection ?? Math.atan2(currentVelocity.y, currentVelocity.x);
-  const targetRelativeVelocity = {
+  const targetVelocity = {
     x: Math.cos(direction) * targetSpeedMetersPerSecond,
     y: Math.sin(direction) * targetSpeedMetersPerSecond,
-  };
-  const targetVelocity = {
-    x: (referenceVelocity?.x ?? 0) + targetRelativeVelocity.x,
-    y: (referenceVelocity?.y ?? 0) + targetRelativeVelocity.y,
   };
   const maximumAcceleration =
     PhysicsService.calculateMaximumEngineAcceleration(maximumThrustPercent);

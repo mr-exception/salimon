@@ -137,6 +137,7 @@ export class SpaceshipSession {
     this.asteroids = await AsteroidService.updateSessionAsteroids({
       asteroids: this.asteroids,
       spaceshipPosition: this.spaceship.position,
+      spaceshipVelocity: SpaceshipService.getSpaceshipVelocity(this.spaceship),
     });
     return this.asteroids;
   }

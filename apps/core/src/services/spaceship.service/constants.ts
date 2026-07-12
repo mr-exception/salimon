@@ -1,5 +1,5 @@
 import type { SpaceshipDto, SpaceshipInventory } from '@repo/types';
-import { INVENTORY_MATERIALS } from '@repo/types';
+import { SPACESHIP_INVENTORY_MATERIALS } from './materials';
 
 export const SECURITY_CODE_HEADER = 'x-spaceship-security-code';
 export const INITIAL_SPACESHIP_FUEL_KNS = 1_000_000;
@@ -7,7 +7,7 @@ export const MAX_HULL_DURABILITY = 200;
 export const MAX_THRUSTER_DURABILITY = 100;
 export const SPACESHIP_THRUSTER_COUNT = 4;
 export const EMPTY_SPACESHIP_INVENTORY = Object.fromEntries(
-  INVENTORY_MATERIALS.map((material) => [material, 0]),
+  SPACESHIP_INVENTORY_MATERIALS.map((material) => [material, 0]),
 ) as SpaceshipInventory;
 export const DEFAULT_SPACESHIP = {
   position: {

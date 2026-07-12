@@ -1,4 +1,5 @@
-import { INVENTORY_MATERIALS, type SpaceshipInventory } from '@repo/types';
+import type { SpaceshipInventory } from '@repo/types';
+import { SPACESHIP_INVENTORY_MATERIALS } from './materials';
 
 export function parseSpaceshipInventory(body: unknown): SpaceshipInventory {
   if (!body || typeof body !== 'object') {
@@ -7,7 +8,7 @@ export function parseSpaceshipInventory(body: unknown): SpaceshipInventory {
 
   const candidate = body as Record<string, unknown>;
   return Object.fromEntries(
-    INVENTORY_MATERIALS.map((material) => {
+    SPACESHIP_INVENTORY_MATERIALS.map((material) => {
       const amount = candidate[material];
       if (
         typeof amount !== 'number' ||

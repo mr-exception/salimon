@@ -7,6 +7,7 @@ import {
   getSpaceshipAttachedBodyName,
   getSpaceshipMotionState,
   getSpaceshipWorldVelocity,
+  INVENTORY_MATERIALS,
   isSpaceshipEngineRunning,
   refreshWorldViewport,
   setActiveWorldBodyNames,
@@ -21,7 +22,6 @@ import {
   getMiningModuleStats,
   getThrusterModulePowerPercent,
 } from '@store';
-import { INVENTORY_MATERIALS } from '@repo/types';
 import type { Planet as PlanetData, Star as StarData } from '@repo/types';
 import { formatSpeed } from '../../../../utils';
 import {

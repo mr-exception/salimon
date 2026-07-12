@@ -60,18 +60,15 @@ export type SpaceshipStats = {
   thrusterDurability: number[];
 };
 
-export const INVENTORY_MATERIALS = [
-  'iron',
-  'silicates',
-  'ice',
-  'silver',
-  'carbon',
-  'gold',
-  'hydrogen',
-  'nitrogen',
-] as const;
-
-export type InventoryMaterial = (typeof INVENTORY_MATERIALS)[number];
+export type InventoryMaterial =
+  | 'iron'
+  | 'silicates'
+  | 'ice'
+  | 'silver'
+  | 'carbon'
+  | 'gold'
+  | 'hydrogen'
+  | 'nitrogen';
 export type SpaceshipInventory = Record<InventoryMaterial, number>;
 
 export type SpaceshipActiveFeature = {

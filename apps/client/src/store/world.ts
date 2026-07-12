@@ -12,7 +12,6 @@ import type {
   Star,
   World,
 } from '@repo/types';
-import { INVENTORY_MATERIALS } from '@repo/types';
 import {
   MAX_PROPAGATION_STEPS,
   SPACESHIP_MASS_KG,
@@ -37,6 +36,16 @@ export type SpaceshipProximityTelemetry = {
   relativeSpeedMetersPerSecond: number;
 };
 export type Inventory = SpaceshipInventory;
+export const INVENTORY_MATERIALS = [
+  'iron',
+  'silicates',
+  'ice',
+  'silver',
+  'carbon',
+  'gold',
+  'hydrogen',
+  'nitrogen',
+] as const satisfies readonly InventoryMaterial[];
 
 export const INITIAL_SPACESHIP_FUEL_KNS = 1_000_000;
 export const MAX_HULL_DURABILITY = 200;

@@ -15,6 +15,7 @@ import {
   MINING_BASE_EFFICIENCY_KNS,
   MINING_BASE_DURABILITY_KN,
   MINING_DURABILITY_PER_LEVEL_KN,
+  INVENTORY_MATERIALS,
   MODULE_GRID_SIZE,
   MODULE_RESEARCH,
   THRUSTER_BASE_DURABILITY,
@@ -39,7 +40,7 @@ import {
   type ModuleType,
   type ShipModule,
 } from '@store';
-import { INVENTORY_MATERIALS, type InventoryMaterial } from '@repo/types';
+import type { InventoryMaterial } from '@repo/types';
 import {
   formatAcceleration,
   formatDuration,

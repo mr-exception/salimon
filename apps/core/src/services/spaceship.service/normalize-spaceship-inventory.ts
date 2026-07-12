@@ -1,10 +1,11 @@
-import { INVENTORY_MATERIALS, type SpaceshipInventory } from '@repo/types';
+import type { SpaceshipInventory } from '@repo/types';
+import { SPACESHIP_INVENTORY_MATERIALS } from './materials';
 
 export function normalizeSpaceshipInventory(
   inventory: Partial<SpaceshipInventory> | undefined,
 ): SpaceshipInventory {
   return Object.fromEntries(
-    INVENTORY_MATERIALS.map((material) => [
+    SPACESHIP_INVENTORY_MATERIALS.map((material) => [
       material,
       inventory?.[material] ?? 0,
     ]),

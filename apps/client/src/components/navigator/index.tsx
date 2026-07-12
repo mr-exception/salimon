@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
 import {
   getSpaceshipProximityTelemetry,
+  INVENTORY_MATERIALS,
   subscribeToWorld,
   useInventory,
   type SpaceshipProximityTelemetry,
 } from '@store';
-import { INVENTORY_MATERIALS } from '@repo/types';
 import type { World } from '@repo/types';
 import { formatAngle, formatDistance, formatSpeed } from '../../utils';
 import { BodyContextMenu } from './body-context-menu';

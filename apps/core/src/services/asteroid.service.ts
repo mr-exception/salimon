@@ -360,9 +360,9 @@ export class AsteroidService {
       x: Number(position.x - spaceshipPosition.x),
       y: Number(position.y - spaceshipPosition.y),
     };
-    const passedShip =
+    const isAheadOfShip =
       offset.x * spaceshipVelocity.x + offset.y * spaceshipVelocity.y > 0;
-    return !passedShip && distance <= ASTEROID_SPAWN_MAX_DISTANCE_METERS;
+    return isAheadOfShip && distance <= ASTEROID_SPAWN_MAX_DISTANCE_METERS;
   }
 
   private static resolvePosition(

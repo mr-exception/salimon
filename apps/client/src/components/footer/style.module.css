@@ -426,7 +426,7 @@
   gap: 6px;
 }
 
-.manualForcePanel {
+.thrustersPanel {
   display: grid;
   min-width: 620px;
   grid-template-areas:
@@ -438,41 +438,41 @@
   gap: 12px;
 }
 
-.manualForceRow {
+.thrustersRow {
   display: grid;
   min-width: 170px;
   gap: 7px;
 }
 
-.manualForceRow > span {
+.thrustersRow > span {
   color: color-mix(in srgb, var(--color-starlight) 68%, transparent);
   text-align: center;
 }
 
-.manualForceRow label {
+.thrustersRow label {
   display: grid;
   grid-template-columns: 46px auto;
   align-items: center;
   gap: 6px;
 }
 
-.manualForceTop {
+.thrustersTop {
   grid-area: top;
 }
 
-.manualForceLeft {
+.thrustersLeft {
   grid-area: left;
 }
 
-.manualForceCenter {
+.thrustersCenter {
   grid-area: center;
 }
 
-.manualForceRight {
+.thrustersRight {
   grid-area: right;
 }
 
-.manualForceBottom {
+.thrustersBottom {
   grid-area: bottom;
 }
 
@@ -713,7 +713,7 @@
   .speedInputs,
   .speedActions,
   .orbitActions,
-  .manualForcePanel,
+  .thrustersPanel,
   .durabilityList,
   .moduleGridPanel,
   .researchList {
@@ -721,12 +721,12 @@
     min-width: 0;
   }
 
-  .manualForcePanel,
-  .manualForceRow {
+  .thrustersPanel,
+  .thrustersRow {
     grid-template-columns: 1fr;
   }
 
-  .manualForcePanel {
+  .thrustersPanel {
     grid-template-areas:
       'top'
       'left'

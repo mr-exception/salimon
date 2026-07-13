@@ -13,16 +13,11 @@ import {
   setActiveWorldBodyNames,
   setSpaceshipTargetDirection,
   setSpaceshipHeading,
-  startSpaceshipManualForceFeature,
-  startSpaceshipTargetSpeedFeature,
+  startSpaceshipThrustersFeature,
   stopSpaceshipActiveFeature,
   WORLD_VIEWPORT_REFRESH_INTERVAL_MS,
 } from '@store';
-import {
-  consumeMiningDurability,
-  getMiningModuleStats,
-  getThrusterModulePowerPercent,
-} from '@store';
+import { consumeMiningDurability, getMiningModuleStats } from '@store';
 import type {
   AsteroidDto,
   Planet as PlanetData,
@@ -221,7 +216,6 @@ export class Scene extends Phaser.Scene {
   private spaceshipEngineRunning = false;
   private engineStartPendingUntil = 0;
   private selectingTargetDirection = false;
-  private targetDirection?: number;
   private viewportRefreshTimer?: number;
   private viewportRefreshDebounceTimer?: number;
   private viewportRefreshPromise?: Promise<unknown>;
@@ -319,7 +313,6 @@ export class Scene extends Phaser.Scene {
     this.stars.forEach((star) => star.syncRotation(worldElapsedSeconds));
     if (getSpaceshipMotionState() === 'crashed') {
       this.spaceship?.clearTargetDirection();
-      this.targetDirection = undefined;
     }
     this.updateAsteroids(delta);
     this.updateMining(delta);
@@ -579,7 +572,9 @@ export class Scene extends Phaser.Scene {
       this.asteroids.map((asteroid) => [asteroid.id, asteroid]),
     );
     asteroidData.forEach((asteroid) => {
-      const position = getRenderPosition(getPredictedAsteroidPosition(asteroid));
+      const position = getRenderPosition(
+        getPredictedAsteroidPosition(asteroid),
+      );
       const radius = getAsteroidRadiusForMass(asteroid.massTonnes);
       const rendered = renderedById.get(asteroid.id);
       if (rendered) {
@@ -661,38 +656,7 @@ export class Scene extends Phaser.Scene {
     return Number(this.spaceship?.spaceship.speed ?? 0n);
   }
 
-  startEngines(targetSpeed: number, maximumThrustPercent: number) {
-    if (
-      !this.spaceship ||
-      this.spaceshipEngineRunning ||
-      !Number.isFinite(targetSpeed) ||
-      targetSpeed < 0 ||
-      !Number.isFinite(maximumThrustPercent) ||
-      maximumThrustPercent <= 0 ||
-      maximumThrustPercent > 100
-    ) {
-      return;
-    }
-
-    try {
-      startSpaceshipTargetSpeedFeature(
-        targetSpeed,
-        maximumThrustPercent * (getThrusterModulePowerPercent() / 100),
-        this.targetDirection,
-      );
-    } catch (error) {
-      console.error('Failed to start target speed feature', error);
-      return;
-    }
-
-    this.spaceshipEngineRunning = true;
-    this.engineStartPendingUntil =
-      this.time.now + ENGINE_START_RESPONSE_TIMEOUT_MS;
-    this.spaceship.setThrustersActive(true, getSpaceshipActiveThrustVector());
-    this.onSpaceshipEngineChange?.(true, this.getSpaceshipSpeed());
-  }
-
-  startManualForce(
+  startThrusters(
     thrusters: { powerPercent: number; durationSeconds: number }[],
   ) {
     if (
@@ -705,9 +669,9 @@ export class Scene extends Phaser.Scene {
     }
 
     try {
-      startSpaceshipManualForceFeature(thrusters);
+      startSpaceshipThrustersFeature(thrusters);
     } catch (error) {
-      console.error('Failed to start manual force feature', error);
+      console.error('Failed to start thrusters feature', error);
       return;
     }
 
@@ -1060,7 +1024,6 @@ export class Scene extends Phaser.Scene {
   setTargetDirection(direction: number) {
     if (!Number.isFinite(direction)) return;
 
-    this.targetDirection = direction;
     setSpaceshipTargetDirection(direction);
     this.spaceship?.setTargetDirection(direction);
   }

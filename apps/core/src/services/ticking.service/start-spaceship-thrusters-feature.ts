@@ -7,14 +7,14 @@ import {
 } from './constants';
 import { findClosestReference } from './find-closest-reference';
 import {
-  createManualForceFeature,
+  createThrustersFeature,
   getBodyPositions,
   getBodyVelocity,
 } from './get-spaceship-update';
 import { loadWorldSnapshot } from './load-world-snapshot';
 import { updateSpaceship } from './update-spaceship';
 
-export async function startSpaceshipManualForceFeature(
+export async function startSpaceshipThrustersFeature(
   spaceship: SpaceshipDocument,
   params: {
     thrusters: { powerPercent: number; durationSeconds: number }[];
@@ -76,7 +76,7 @@ export async function startSpaceshipManualForceFeature(
           surfaceDistance: 0,
         }
       : findClosestReference(planningSpaceship, simulatedAt, world);
-  const activeFeature = createManualForceFeature(
+  const activeFeature = createThrustersFeature(
     planningSpaceship,
     params.thrusters,
   );

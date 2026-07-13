@@ -24,7 +24,6 @@ import {
   THRUSTER_BASE_DURABILITY,
   THRUSTER_BASE_POWER_PERCENT,
   THRUSTER_LEVEL_MULTIPLIER,
-  getSpaceshipTargetSpeedBurnPreview,
   placeModule,
   setModuleActive,
   spendInventory,
@@ -37,7 +36,6 @@ import {
   useSpaceshipHullDurability,
   useSpaceshipMotionState,
   useSpaceshipSpeed,
-  useSpaceshipTargetDirection,
   useSpaceshipThrusterDurability,
   type Inventory,
   type ModuleAttribute,
@@ -46,7 +44,6 @@ import {
 } from '@store';
 import type { InventoryMaterial } from '@repo/types';
 import {
-  formatAcceleration,
   formatDuration,
   formatImpulse,
   formatPercentage,
@@ -56,22 +53,18 @@ import {
 type FooterProps = {
   isEngineRunning?: boolean;
   isMeasuring?: boolean;
-  isSelectingTargetDirection?: boolean;
-  onStartEngines?: (targetSpeed: number, maximumThrustPercent: number) => void;
-  onStartManualForce?: (
+  onStartThrusters?: (
     thrusters: { powerPercent: number; durationSeconds: number }[],
   ) => void;
   onStopEngines?: () => void;
   onToggleMeasuring?: () => void;
   onOpenCommunications?: () => void;
   unreadMessageCount?: number;
-  onToggleTargetDirectionSelection?: () => void;
   onPredictionChange?: (active: boolean, seconds: number) => void;
 };
 
 type SpeedControlTab =
-  | 'target-speed'
-  | 'manual-force'
+  | 'thrusters'
   | 'maintenance'
   | 'prediction'
   | 'modules'
@@ -83,8 +76,7 @@ type Position = {
 };
 
 const CONTROL_LABELS: Record<SpeedControlTab, string> = {
-  'target-speed': 'Target speed',
-  'manual-force': 'Manual force',
+  thrusters: 'Thrusters',
   maintenance: 'Ship durability',
   prediction: 'Prediction',
   modules: 'Modules',
@@ -99,8 +91,7 @@ const PANEL_PLACEMENTS: Record<
   SpeedControlTab,
   { horizontal: 'left' | 'right'; vertical: 'top' | 'bottom' }
 > = {
-  'target-speed': { horizontal: 'left', vertical: 'top' },
-  'manual-force': { horizontal: 'left', vertical: 'top' },
+  thrusters: { horizontal: 'left', vertical: 'top' },
   maintenance: { horizontal: 'right', vertical: 'bottom' },
   prediction: { horizontal: 'left', vertical: 'bottom' },
   modules: { horizontal: 'left', vertical: 'top' },
@@ -139,16 +130,7 @@ function FeatureIcon({ feature }: { feature: SpeedControlTab }) {
       </svg>
     );
   }
-  if (feature === 'target-speed') {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M4 15a8 8 0 1 1 16 0" />
-        <path d="m12 15 4-5" />
-        <path d="M8 18h8" />
-      </svg>
-    );
-  }
-  if (feature === 'manual-force') {
+  if (feature === 'thrusters') {
     return (
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M12 3v18M3 12h18" />
@@ -467,14 +449,11 @@ function DraggablePanel({
 export function Footer({
   isEngineRunning = false,
   isMeasuring = false,
-  isSelectingTargetDirection = false,
-  onStartEngines,
-  onStartManualForce,
+  onStartThrusters,
   onStopEngines,
   onToggleMeasuring,
   onOpenCommunications,
   unreadMessageCount = 0,
-  onToggleTargetDirectionSelection,
   onPredictionChange,
 }: FooterProps) {
   const speed = useSpaceshipSpeed();
@@ -482,12 +461,9 @@ export function Footer({
   const hullDurability = useSpaceshipHullDurability();
   const thrusterDurability = useSpaceshipThrusterDurability();
   const motionState = useSpaceshipMotionState();
-  const targetDirection = useSpaceshipTargetDirection();
   const activeFeature = useSpaceshipActiveFeature();
   const inventory = useInventory();
   const modules = useModules();
-  const [targetSpeed, setTargetSpeed] = useState('10');
-  const [maximumThrustPercent, setMaximumThrustPercent] = useState('100');
   const [manualThrusters, setManualThrusters] = useState(() =>
     Array.from({ length: SPACESHIP_THRUSTER_COUNT }, () => ({
       powerPercent: '0',
@@ -506,50 +482,29 @@ export function Footer({
   const selectedModule = modules.find(
     (module) => module.id === selectedModuleId,
   );
-  const targetSpeedMetersPerSecond = Number(targetSpeed) * 1_000;
-  const maximumThrustPercentValue = Number(maximumThrustPercent);
   const activeTargetSpeed =
     activeFeature?.type === 'target-speed' ? activeFeature : undefined;
-  const activeManualForce =
-    activeFeature?.type === 'manual-force' ? activeFeature : undefined;
-  const manualForceSchedule = manualThrusters.map((thruster) => ({
+  const activeThrusters =
+    activeFeature?.type === 'thrusters' ||
+    activeFeature?.type === 'manual-force'
+      ? activeFeature
+      : undefined;
+  const thrustersSchedule = manualThrusters.map((thruster) => ({
     powerPercent: Number(thruster.powerPercent),
     durationSeconds: Number(thruster.durationSeconds),
   }));
-  const targetSpeedBurnPreview = getSpaceshipTargetSpeedBurnPreview(
-    targetSpeedMetersPerSecond,
-    maximumThrustPercentValue,
-    targetDirection,
-  );
-  const burnTimeSeconds = activeTargetSpeed
+  const thrustersTimeSeconds = activeThrusters
     ? Math.max(
         0,
-        activeTargetSpeed.durationSeconds - activeTargetSpeed.elapsedSeconds,
+        activeThrusters.durationSeconds - activeThrusters.elapsedSeconds,
       )
-    : targetSpeedBurnPreview?.durationSeconds;
-  const acceleration =
-    activeTargetSpeed?.maximumAcceleration ??
-    targetSpeedBurnPreview?.maximumAcceleration;
-  const manualForceTimeSeconds = activeManualForce
-    ? Math.max(
-        0,
-        activeManualForce.durationSeconds - activeManualForce.elapsedSeconds,
-      )
-    : undefined;
-  const hasValidBurn =
-    targetDirection !== undefined &&
-    Number.isFinite(targetSpeedMetersPerSecond) &&
-    targetSpeedMetersPerSecond >= 0 &&
-    Number.isFinite(maximumThrustPercentValue) &&
-    maximumThrustPercentValue > 0 &&
-    maximumThrustPercentValue <= 100;
-  const canStartBurn =
-    motionState !== 'crashed' &&
-    hasValidBurn &&
-    targetSpeedBurnPreview !== undefined &&
-    fuelKns > 0 &&
-    thrusterDurability.some((durability) => durability > 0);
-  const manualForceFieldsAreValid = manualForceSchedule.every(
+    : activeTargetSpeed
+      ? Math.max(
+          0,
+          activeTargetSpeed.durationSeconds - activeTargetSpeed.elapsedSeconds,
+        )
+      : undefined;
+  const thrustersFieldsAreValid = thrustersSchedule.every(
     (thruster) =>
       Number.isFinite(thruster.powerPercent) &&
       Number.isFinite(thruster.durationSeconds) &&
@@ -557,23 +512,23 @@ export function Footer({
       thruster.powerPercent <= 100 &&
       thruster.durationSeconds >= 0,
   );
-  const hasValidManualForce =
-    manualForceFieldsAreValid &&
-    manualForceSchedule.some(
+  const hasValidThrusters =
+    thrustersFieldsAreValid &&
+    thrustersSchedule.some(
       (thruster) => thruster.powerPercent > 0 && thruster.durationSeconds > 0,
     );
-  const canStartManualForce =
+  const canStartThrusters =
     motionState !== 'crashed' &&
-    hasValidManualForce &&
+    hasValidThrusters &&
     fuelKns > 0 &&
     thrusterDurability.some((durability) => durability > 0);
   const currentEnginePowerPercent = activeTargetSpeed
     ? activeTargetSpeed.maximumThrustPercent
-    : activeManualForce
+    : activeThrusters
       ? Math.max(
           0,
-          ...activeManualForce.thrusters.map((thruster) =>
-            activeManualForce.elapsedSeconds < thruster.durationSeconds
+          ...activeThrusters.thrusters.map((thruster) =>
+            activeThrusters.elapsedSeconds < thruster.durationSeconds
               ? thruster.powerPercent
               : 0,
           ),
@@ -610,12 +565,6 @@ export function Footer({
     });
   };
 
-  const startEngines = () => {
-    if (!canStartBurn || isEngineRunning || !onStartEngines) return;
-
-    onStartEngines(targetSpeedMetersPerSecond, maximumThrustPercentValue);
-  };
-
   const updateManualThruster = (
     index: number,
     field: 'powerPercent' | 'durationSeconds',
@@ -628,10 +577,10 @@ export function Footer({
     );
   };
 
-  const startManualForce = () => {
-    if (!canStartManualForce || isEngineRunning || !onStartManualForce) return;
+  const startThrusters = () => {
+    if (!canStartThrusters || isEngineRunning || !onStartThrusters) return;
 
-    onStartManualForce(manualForceSchedule);
+    onStartThrusters(thrustersSchedule);
   };
 
   const renderManualThrusterControl = (
@@ -643,7 +592,7 @@ export function Footer({
     if (!thruster) return null;
 
     return (
-      <div className={`${style.manualForceRow} ${className}`}>
+      <div className={`${style.thrustersRow} ${className}`}>
         <span>{label}</span>
         <label htmlFor={`footer-manual-thruster-${index}-power`}>
           <span>Power</span>
@@ -692,15 +641,6 @@ export function Footer({
     );
   };
 
-  const toggleEngines = () => {
-    if (isEngineRunning) {
-      onStopEngines?.();
-      return;
-    }
-
-    startEngines();
-  };
-
   const selectModuleGridCell = (x: number, y: number) => {
     const cellModule = modules.find(
       (module) => module.position.x === x && module.position.y === y,
@@ -735,8 +675,7 @@ export function Footer({
         <div className={style.controlTabs}>
           {(
             [
-              ['target-speed', 'Target speed'],
-              ['manual-force', 'Manual force'],
+              ['thrusters', 'Thrusters'],
               ['modules', 'Modules'],
               ['research', 'Research'],
               ['maintenance', 'Ship durability'],
@@ -1036,115 +975,33 @@ export function Footer({
               </div>
             </DraggablePanel>
           )}
-          {expandedSpeedControls.has('target-speed') && (
+          {expandedSpeedControls.has('thrusters') && (
             <DraggablePanel
-              control="target-speed"
-              onClose={() => toggleSpeedControl('target-speed')}
+              control="thrusters"
+              onClose={() => toggleSpeedControl('thrusters')}
             >
-              <div className={style.speedInputs}>
-                <label htmlFor="footer-target-speed">
-                  <span>Target speed</span>
-                  <span className={style.speedField}>
-                    <input
-                      id="footer-target-speed"
-                      type="number"
-                      min="0"
-                      step="0.1"
-                      value={targetSpeed}
-                      disabled={isEngineRunning}
-                      onChange={(event) =>
-                        setTargetSpeed(event.currentTarget.value)
-                      }
-                    />
-                    <span aria-hidden="true">km/s</span>
-                  </span>
-                </label>
-                <label htmlFor="footer-maximum-thrust">
-                  <span>Max thrust</span>
-                  <span className={style.speedField}>
-                    <input
-                      id="footer-maximum-thrust"
-                      type="number"
-                      min="1"
-                      max="100"
-                      step="1"
-                      value={maximumThrustPercent}
-                      disabled={isEngineRunning}
-                      onChange={(event) =>
-                        setMaximumThrustPercent(event.currentTarget.value)
-                      }
-                    />
-                    <span aria-hidden="true">%</span>
-                  </span>
-                </label>
-              </div>
-              <div className={style.speedActions}>
-                <button
-                  type="button"
-                  data-active={isSelectingTargetDirection}
-                  onClick={onToggleTargetDirectionSelection}
-                >
-                  {isSelectingTargetDirection
-                    ? 'Cancel target direction'
-                    : 'Set target direction'}
-                </button>
-                <div className={style.speedMetrics}>
-                  <span className={style.speedMetric}>
-                    <small>Acceleration</small>
-                    {acceleration !== undefined
-                      ? formatAcceleration(acceleration)
-                      : '—'}
-                  </span>
-                  <span className={style.speedMetric}>
-                    <small>Time remaining</small>
-                    {burnTimeSeconds !== undefined
-                      ? formatDuration(burnTimeSeconds)
-                      : '—'}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  data-running={isEngineRunning}
-                  disabled={
-                    isEngineRunning
-                      ? !onStopEngines
-                      : !canStartBurn || !onStartEngines
-                  }
-                  onClick={toggleEngines}
-                >
-                  {isEngineRunning ? 'Stop engines' : 'Start engines'}
-                </button>
-              </div>
-            </DraggablePanel>
-          )}
-          {expandedSpeedControls.has('manual-force') && (
-            <DraggablePanel
-              control="manual-force"
-              onClose={() => toggleSpeedControl('manual-force')}
-            >
-              <div className={style.manualForcePanel}>
+              <div className={style.thrustersPanel}>
                 {renderManualThrusterControl(
                   0,
                   'Top thruster',
-                  style.manualForceTop,
+                  style.thrustersTop,
                 )}
                 {renderManualThrusterControl(
                   3,
                   'Left thruster',
-                  style.manualForceLeft,
+                  style.thrustersLeft,
                 )}
                 <div
-                  className={`${style.speedActions} ${style.manualForceCenter}`}
+                  className={`${style.speedActions} ${style.thrustersCenter}`}
                 >
                   <div className={style.speedMetrics}>
                     <span className={style.speedMetric}>
-                      <small>Acceleration</small>
-                      —
+                      <small>Acceleration</small>—
                     </span>
                     <span className={style.speedMetric}>
                       <small>Time remaining</small>
-                      {manualForceTimeSeconds !== undefined
-                        ? formatDuration(manualForceTimeSeconds)
+                      {thrustersTimeSeconds !== undefined
+                        ? formatDuration(thrustersTimeSeconds)
                         : '—'}
                     </span>
                   </div>
@@ -1154,9 +1011,9 @@ export function Footer({
                     disabled={
                       isEngineRunning
                         ? !onStopEngines
-                        : !canStartManualForce || !onStartManualForce
+                        : !canStartThrusters || !onStartThrusters
                     }
-                    onClick={isEngineRunning ? onStopEngines : startManualForce}
+                    onClick={isEngineRunning ? onStopEngines : startThrusters}
                   >
                     {isEngineRunning ? 'Stop engines' : 'Start'}
                   </button>
@@ -1164,12 +1021,12 @@ export function Footer({
                 {renderManualThrusterControl(
                   1,
                   'Right thruster',
-                  style.manualForceRight,
+                  style.thrustersRight,
                 )}
                 {renderManualThrusterControl(
                   2,
                   'Bottom thruster',
-                  style.manualForceBottom,
+                  style.thrustersBottom,
                 )}
               </div>
             </DraggablePanel>

@@ -14,15 +14,15 @@ import {
 } from './constants';
 import type {
   Impact,
-  ManualForcePlan,
+  ThrustersPlan,
   Motion,
   TargetSpeedBurnPlan,
   WorldSnapshot,
 } from './types';
 
 const TARGET_VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.1;
-const MANUAL_FORCE_THRUSTER_COUNT = 4;
-const MANUAL_FORCE_STEP_SECONDS = 0.1;
+const THRUSTER_COUNT = 4;
+const THRUSTERS_STEP_SECONDS = 0.1;
 
 export function getBodyPositions(world: WorldSnapshot, time: Date) {
   return PhysicsService.getBodyPositions(world, time);
@@ -148,10 +148,10 @@ export function createTargetSpeedFeature(
   };
 }
 
-export function createManualForceFeature(
+export function createThrustersFeature(
   spaceship: SpaceshipDocument,
   thrusters: { powerPercent: number; durationSeconds: number }[],
-): ManualForcePlan | undefined {
+): ThrustersPlan | undefined {
   if (
     spaceship.activeFeature ||
     spaceship.motionState === 'crashed' ||
@@ -161,13 +161,13 @@ export function createManualForceFeature(
   }
 
   const normalizedThrusters = thrusters
-    .slice(0, MANUAL_FORCE_THRUSTER_COUNT)
+    .slice(0, THRUSTER_COUNT)
     .map((thruster) => ({
       powerPercent: Number(thruster.powerPercent),
       durationSeconds: Number(thruster.durationSeconds),
     }));
   if (
-    normalizedThrusters.length !== MANUAL_FORCE_THRUSTER_COUNT ||
+    normalizedThrusters.length !== THRUSTER_COUNT ||
     normalizedThrusters.some(
       (thruster) =>
         !Number.isFinite(thruster.powerPercent) ||
@@ -185,9 +185,9 @@ export function createManualForceFeature(
   );
   if (
     durationSeconds <= 0 ||
-    !getManualForceActiveThrusters(
+    !getThrustersActiveThrusters(
       {
-        type: 'manual-force',
+        type: 'thrusters',
         thrusters: normalizedThrusters,
         durationSeconds,
         elapsedSeconds: 0,
@@ -199,19 +199,19 @@ export function createManualForceFeature(
   }
 
   return {
-    type: 'manual-force',
+    type: 'thrusters',
     thrusters: normalizedThrusters,
     durationSeconds,
     elapsedSeconds: 0,
   };
 }
 
-function getManualForceActiveThrusters(
-  feature: ManualForcePlan,
+function getThrustersActiveThrusters(
+  feature: ThrustersPlan,
   stats: SpaceshipDocument['stats'],
 ) {
   const normalizedStats = SpaceshipService.normalizeSpaceshipStats(stats);
-  const thrustByIndex = Array<number>(MANUAL_FORCE_THRUSTER_COUNT).fill(0);
+  const thrustByIndex = Array<number>(THRUSTER_COUNT).fill(0);
   const effectiveAcceleration = { x: 0, y: 0 };
 
   feature.thrusters.forEach((thruster, index) => {
@@ -508,8 +508,9 @@ export function getSpaceshipUpdate(
         : relativeVelocity,
     };
     const propagationStepSeconds =
+      activeFeature?.type === 'thrusters' ||
       activeFeature?.type === 'manual-force'
-        ? MANUAL_FORCE_STEP_SECONDS
+        ? THRUSTERS_STEP_SECONDS
         : TARGET_STEP_SECONDS;
     const stepCount = Math.min(
       MAX_PROPAGATION_STEPS,
@@ -529,8 +530,11 @@ export function getSpaceshipUpdate(
       let thrustAcceleration: SpaceshipVelocity | undefined;
       let targetSpeedFeature =
         activeFeature?.type === 'target-speed' ? activeFeature : undefined;
-      let manualForceFeature =
-        activeFeature?.type === 'manual-force' ? activeFeature : undefined;
+      let thrustersFeature =
+        activeFeature?.type === 'thrusters' ||
+        activeFeature?.type === 'manual-force'
+          ? activeFeature
+          : undefined;
       if (targetSpeedFeature) {
         if (isTargetVelocityReached(targetSpeedFeature, motion)) {
           activeFeature = undefined;
@@ -596,14 +600,14 @@ export function getSpaceshipUpdate(
           );
         }
       }
-      if (manualForceFeature) {
-        const activeThrusters = getManualForceActiveThrusters(
-          manualForceFeature,
+      if (thrustersFeature) {
+        const activeThrusters = getThrustersActiveThrusters(
+          thrustersFeature,
           stats,
         );
         if (!activeThrusters || stats.fuelKns <= 0) {
           activeFeature = undefined;
-          manualForceFeature = undefined;
+          thrustersFeature = undefined;
         } else {
           const fuelSeconds = stats.fuelKns / activeThrusters.totalKilonewtons;
           burnSeconds = Math.min(
@@ -687,12 +691,12 @@ export function getSpaceshipUpdate(
           activeFeature = undefined;
         }
       }
-      if (manualForceFeature && burnSeconds > 0) {
-        const elapsed = manualForceFeature.elapsedSeconds + burnSeconds;
+      if (thrustersFeature && burnSeconds > 0) {
+        const elapsed = thrustersFeature.elapsedSeconds + burnSeconds;
         activeFeature =
-          elapsed >= manualForceFeature.durationSeconds || stats.fuelKns <= 0
+          elapsed >= thrustersFeature.durationSeconds || stats.fuelKns <= 0
             ? undefined
-            : { ...manualForceFeature, elapsedSeconds: elapsed };
+            : { ...thrustersFeature, elapsedSeconds: elapsed };
       }
 
       if (

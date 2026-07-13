@@ -32,8 +32,7 @@ export default function App() {
   const [isSelectingTargetDirection, setIsSelectingTargetDirection] =
     useState(false);
   const sceneRef = useRef<{
-    startEngines: (targetSpeed: number, maximumThrustPercent: number) => void;
-    startManualForce: (
+    startThrusters: (
       thrusters: { powerPercent: number; durationSeconds: number }[],
     ) => void;
     stopEngines: () => void;
@@ -43,11 +42,7 @@ export default function App() {
   const handleSceneChange = useCallback(
     (
       scene: {
-        startEngines: (
-          targetSpeed: number,
-          maximumThrustPercent: number,
-        ) => void;
-        startManualForce: (
+        startThrusters: (
           thrusters: { powerPercent: number; durationSeconds: number }[],
         ) => void;
         stopEngines: () => void;
@@ -59,27 +54,14 @@ export default function App() {
     },
     [],
   );
-  const startEngines = useCallback(
-    (targetSpeed: number, maximumThrustPercent: number) => {
-      sceneRef.current?.startEngines(targetSpeed, maximumThrustPercent);
-    },
-    [],
-  );
-  const startManualForce = useCallback(
+  const startThrusters = useCallback(
     (thrusters: { powerPercent: number; durationSeconds: number }[]) => {
-      sceneRef.current?.startManualForce(thrusters);
+      sceneRef.current?.startThrusters(thrusters);
     },
     [],
   );
   const stopEngines = useCallback(() => {
     sceneRef.current?.stopEngines();
-  }, []);
-  const toggleTargetDirectionSelection = useCallback(() => {
-    setIsSelectingTargetDirection((isSelecting) => {
-      const active = !isSelecting;
-      sceneRef.current?.setTargetDirectionSelectionActive(active);
-      return active;
-    });
   }, []);
   const handleTargetDirectionSelected = useCallback(() => {
     setIsSelectingTargetDirection(false);
@@ -119,7 +101,9 @@ export default function App() {
     const unsubscribe = subscribeToContactMessages((message) => {
       if (message.sender !== 'contact') return;
       setUnreadMessages((current) => {
-        if (current.some((currentMessage) => currentMessage.id === message.id)) {
+        if (
+          current.some((currentMessage) => currentMessage.id === message.id)
+        ) {
           return current;
         }
         return [...current, message].sort(
@@ -161,14 +145,11 @@ export default function App() {
       <Footer
         isEngineRunning={isEngineRunning}
         isMeasuring={isMeasuring}
-        onStartEngines={startEngines}
-        onStartManualForce={startManualForce}
+        onStartThrusters={startThrusters}
         onStopEngines={stopEngines}
         onToggleMeasuring={() => setIsMeasuring((active) => !active)}
         onOpenCommunications={() => setIsCommunicationsOpen(true)}
         unreadMessageCount={unreadMessages.length}
-        isSelectingTargetDirection={isSelectingTargetDirection}
-        onToggleTargetDirectionSelection={toggleTargetDirectionSelection}
         onPredictionChange={setPrediction}
       />
       {isCommunicationsOpen && (

@@ -109,15 +109,25 @@ export type SpaceshipManualForceThruster = {
   durationSeconds: number;
 };
 
-export type SpaceshipManualForceFeature = {
-  type: 'manual-force';
+export type SpaceshipThrusterSchedule = SpaceshipManualForceThruster;
+
+export type SpaceshipThrustersFeature = {
+  type: 'thrusters';
   thrusters: SpaceshipManualForceThruster[];
   durationSeconds: number;
   elapsedSeconds: number;
 };
 
+export type SpaceshipManualForceFeature = Omit<
+  SpaceshipThrustersFeature,
+  'type'
+> & {
+  type: 'manual-force';
+};
+
 export type SpaceshipActiveFeature =
   | SpaceshipTargetSpeedFeature
+  | SpaceshipThrustersFeature
   | SpaceshipManualForceFeature;
 
 export type SpaceshipDto = {

@@ -58,10 +58,10 @@ export class SpaceshipSession {
     return this.spaceship;
   }
 
-  async startManualForceFeature(params: {
+  async startThrustersFeature(params: {
     thrusters: { powerPercent: number; durationSeconds: number }[];
   }) {
-    const spaceship = await TickingService.startSpaceshipManualForceFeature(
+    const spaceship = await TickingService.startSpaceshipThrustersFeature(
       this.spaceship,
       params,
     );

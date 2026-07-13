@@ -16,9 +16,9 @@ export type TargetSpeedBurnPlan = Extract<
   { type: 'target-speed' }
 >;
 
-export type ManualForcePlan = Extract<
+export type ThrustersPlan = Extract<
   SpaceshipActiveFeature,
-  { type: 'manual-force' }
+  { type: 'thrusters' | 'manual-force' }
 >;
 
 export type WorldSnapshot = {

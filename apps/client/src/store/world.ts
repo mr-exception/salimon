@@ -613,6 +613,32 @@ function calculateSpaceshipActiveThrustAcceleration(motion: {
   velocity: Vector;
 }) {
   const activeFeature = store.get(spaceshipActiveFeatureAtom);
+  if (
+    activeFeature?.type === 'thrusters' ||
+    activeFeature?.type === 'manual-force'
+  ) {
+    const acceleration = { x: 0, y: 0 };
+    activeFeature.thrusters.forEach((thruster, index) => {
+      if (
+        activeFeature.elapsedSeconds >= thruster.durationSeconds ||
+        thruster.powerPercent <= 0
+      ) {
+        return;
+      }
+
+      const thrustAcceleration =
+        WorldService.calculateMaximumEngineAcceleration(thruster.powerPercent);
+      if (index === 0) acceleration.y += thrustAcceleration;
+      if (index === 1) acceleration.x -= thrustAcceleration;
+      if (index === 2) acceleration.y -= thrustAcceleration;
+      if (index === 3) acceleration.x += thrustAcceleration;
+    });
+
+    return acceleration.x === 0 && acceleration.y === 0
+      ? undefined
+      : acceleration;
+  }
+
   if (activeFeature?.type !== 'target-speed') return undefined;
 
   const remainingSeconds = Math.max(
@@ -917,6 +943,20 @@ function calculateGravityAcceleration(position: Vector) {
 
 function advanceActiveFeature(elapsedSeconds: number) {
   const activeFeature = store.get(spaceshipActiveFeatureAtom);
+  if (
+    activeFeature?.type === 'thrusters' ||
+    activeFeature?.type === 'manual-force'
+  ) {
+    const nextElapsedSeconds = activeFeature.elapsedSeconds + elapsedSeconds;
+    store.set(
+      spaceshipActiveFeatureAtom,
+      nextElapsedSeconds >= activeFeature.durationSeconds
+        ? undefined
+        : { ...activeFeature, elapsedSeconds: nextElapsedSeconds },
+    );
+    return;
+  }
+
   if (activeFeature?.type !== 'target-speed') return;
 
   const motion = {

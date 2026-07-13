@@ -443,11 +443,11 @@ export function startSpaceshipTargetSpeedFeature(
   });
 }
 
-export function startSpaceshipManualForceFeature(
+export function startSpaceshipThrustersFeature(
   thrusters: { powerPercent: number; durationSeconds: number }[],
 ) {
   sendSpaceshipSocketMessage({
-    type: 'spaceship:start-manual-force',
+    type: 'spaceship:start-thrusters',
     thrusters,
   });
 }

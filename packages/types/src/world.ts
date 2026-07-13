@@ -81,13 +81,14 @@ export type AsteroidSizeClass = 'small' | 'medium' | 'large';
 export type AsteroidDto = {
   id: string;
   systemName: string;
-  orbitingBodyName: string;
+  orbitingBodyName: string | null;
   sizeClass: AsteroidSizeClass;
   massTonnes: number;
   position: SerializedPosition;
-  orbitalCenter: string;
+  orbitalCenter: string | null;
   clockwise: boolean;
   speed: string;
+  velocity?: Velocity;
   deposits: AsteroidDeposit[];
   capturedAt: string;
 };

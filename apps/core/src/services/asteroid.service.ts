@@ -7,10 +7,8 @@ import type {
   SerializedPosition,
   Velocity,
 } from '@repo/types';
-import { WorldService } from '@repo/world';
 import { TickingService } from './ticking.service';
 import { resolvePositions } from './world-viewport.service/resolve-positions';
-import { resolveVelocities } from './world-viewport.service/resolve-velocities';
 
 type Coordinate = {
   x: bigint;
@@ -27,18 +25,19 @@ type AsteroidDensityBand = {
 
 type AsteroidDensityConfig = Record<AsteroidSizeClass, AsteroidDensityBand>;
 
-const ASTEROID_DESPAWN_DISTANCE_METERS = 400_000;
-const ASTEROID_SPAWN_MIN_DISTANCE_METERS = 400_000;
-const ASTEROID_SPAWN_MAX_DISTANCE_METERS = 800_000;
+const ASTEROID_DESPAWN_DISTANCE_METERS = 1_500_000;
+const ASTEROID_SPAWN_MIN_DISTANCE_METERS = 1_500_000;
+const ASTEROID_SPAWN_MAX_DISTANCE_METERS = 3_000_000;
+const ASTEROID_MIN_SPAWN_VELOCITY_DELTA_METERS_PER_SECOND = 1;
 const ASTEROID_MAX_SPAWN_VELOCITY_DELTA_METERS_PER_SECOND = 5;
 const ASTEROID_MIN_TONNES = 1;
 const ASTEROID_MAX_TONNES = 3_000;
 const ASTEROID_BODY_CLEARANCE_METERS = 400_000;
 const ASTEROID_SPAWN_ATTEMPTS = 96;
 const DEFAULT_ASTEROID_DENSITY: AsteroidDensityConfig = {
-  small: { targetCount: 18, minTonnes: 1, maxTonnes: 60 },
-  medium: { targetCount: 8, minTonnes: 60, maxTonnes: 600 },
-  large: { targetCount: 3, minTonnes: 600, maxTonnes: 3_000 },
+  small: { targetCount: 6, minTonnes: 1, maxTonnes: 60 },
+  medium: { targetCount: 3, minTonnes: 60, maxTonnes: 600 },
+  large: { targetCount: 1, minTonnes: 600, maxTonnes: 3_000 },
 };
 const ASTEROID_MATERIAL_RARITY: {
   material: InventoryMaterial;
@@ -76,13 +75,19 @@ export class AsteroidService {
     const bodies = [...stars, ...planets, ...moons];
     const bodyByName = new Map(bodies.map((body) => [body.name, body]));
     const positions = resolvePositions(bodies);
-    const velocities = resolveVelocities(bodies, positions);
     const spaceshipPosition = this.resolvePosition(
       params.spaceshipPosition,
       positions,
     );
     const advanced = params.asteroids
-      .map((asteroid) => this.advanceAsteroid(asteroid, time))
+      .map((asteroid) =>
+        this.advanceAsteroid(
+          asteroid,
+          time,
+          positions,
+          params.spaceshipVelocity,
+        ),
+      )
       .filter((asteroid) =>
         this.isAsteroidInSessionRange(
           asteroid,
@@ -104,7 +109,6 @@ export class AsteroidService {
       bodies: bodyCandidates,
       allBodies: bodies,
       positions,
-      velocities,
       spaceshipPosition,
       spaceshipVelocity: params.spaceshipVelocity,
       bodyByName,
@@ -120,7 +124,6 @@ export class AsteroidService {
     bodies: WorldBodyDocument[];
     allBodies: WorldBodyDocument[];
     positions: Map<string, Coordinate>;
-    velocities: Map<string, Velocity>;
     spaceshipPosition: Coordinate;
     spaceshipVelocity: Velocity;
     bodyByName: Map<string, WorldBodyDocument>;
@@ -133,14 +136,12 @@ export class AsteroidService {
       params.bodyByName,
     );
 
-    bodiesBySystem.forEach((bodies, systemName) => {
+    bodiesBySystem.forEach((_, systemName) => {
       this.spawnAsteroidsForSystem({
         systemName,
         asteroids,
-        bodies,
         allBodies: params.allBodies,
         positions: params.positions,
-        velocities: params.velocities,
         spaceshipPosition: params.spaceshipPosition,
         spaceshipVelocity: params.spaceshipVelocity,
         density: params.density,
@@ -154,10 +155,8 @@ export class AsteroidService {
   static spawnAsteroidsForSystem(params: {
     systemName: string;
     asteroids: AsteroidSessionState[];
-    bodies: WorldBodyDocument[];
     allBodies: WorldBodyDocument[];
     positions: Map<string, Coordinate>;
-    velocities: Map<string, Velocity>;
     spaceshipPosition: Coordinate;
     spaceshipVelocity: Velocity;
     density: AsteroidDensityConfig;
@@ -181,10 +180,8 @@ export class AsteroidService {
           systemName: params.systemName,
           sizeClass,
           density,
-          bodies: params.bodies,
           allBodies: params.allBodies,
           positions: params.positions,
-          velocities: params.velocities,
           spaceshipPosition: params.spaceshipPosition,
           spaceshipVelocity: params.spaceshipVelocity,
           time: params.time,
@@ -198,29 +195,15 @@ export class AsteroidService {
     systemName: string;
     sizeClass: AsteroidSizeClass;
     density: AsteroidDensityBand;
-    bodies: WorldBodyDocument[];
     allBodies: WorldBodyDocument[];
     positions: Map<string, Coordinate>;
-    velocities: Map<string, Velocity>;
     spaceshipPosition: Coordinate;
     spaceshipVelocity: Velocity;
     time: Date;
   }): AsteroidSessionState | undefined {
-    const bodies = params.bodies.filter((body) =>
-      params.positions.has(body.name),
-    );
-    if (bodies.length === 0) return undefined;
-
     for (let attempt = 0; attempt < ASTEROID_SPAWN_ATTEMPTS; attempt += 1) {
-      const orbitingBody =
-        bodies[attempt % bodies.length] ??
-        bodies[this.randomInteger(0, bodies.length - 1)];
-      const bodyPosition = params.positions.get(orbitingBody.name);
-      if (!bodyPosition) continue;
-
       const absolutePosition = this.randomPositionNearSpaceship(
         params.spaceshipPosition,
-        params.spaceshipVelocity,
       );
       if (
         !this.isClearOfBodies(
@@ -232,40 +215,29 @@ export class AsteroidService {
         continue;
       }
 
-      const orbitRadius = this.distance(absolutePosition, bodyPosition);
-      if (orbitRadius === 0) {
-        continue;
-      }
-      const orbitVelocity = this.getOrbitVelocityMatchingSpaceship({
-        absolutePosition,
-        bodyPosition,
-        bodyVelocity: params.velocities.get(orbitingBody.name) ?? {
-          x: 0,
-          y: 0,
-        },
-        spaceshipVelocity: params.spaceshipVelocity,
-      });
-      if (!orbitVelocity) continue;
-
-      const position = {
-        x: (absolutePosition.x - bodyPosition.x).toString(),
-        y: (absolutePosition.y - bodyPosition.y).toString(),
-        relativeTo: orbitingBody.name,
+      const velocityDrift = this.randomVelocityDrift();
+      const velocity = {
+        x: params.spaceshipVelocity.x + velocityDrift.x,
+        y: params.spaceshipVelocity.y + velocityDrift.y,
       };
-
       const massTonnes = this.randomMass(params.density);
+
       return {
         id: `${params.systemName}:${params.time.getTime()}:${Math.random()
           .toString(36)
           .slice(2, 10)}`,
         systemName: params.systemName,
-        orbitingBodyName: orbitingBody.name,
+        orbitingBodyName: null,
         sizeClass: params.sizeClass,
         massTonnes,
-        position,
-        orbitalCenter: orbitingBody.name,
-        clockwise: orbitVelocity.clockwise,
-        speed: orbitVelocity.speed.toString(),
+        position: {
+          x: absolutePosition.x.toString(),
+          y: absolutePosition.y.toString(),
+        },
+        orbitalCenter: null,
+        clockwise: false,
+        speed: '0',
+        velocity,
         deposits: this.createDeposits(massTonnes),
       };
     }
@@ -276,15 +248,38 @@ export class AsteroidService {
   private static advanceAsteroid(
     asteroid: AsteroidDto,
     time: Date,
+    bodyPositions: Map<string, Coordinate>,
+    spaceshipVelocity: Velocity,
   ): AsteroidSessionState {
     const capturedAt = Date.parse(asteroid.capturedAt);
     const elapsedSeconds = Number.isFinite(capturedAt)
       ? Math.max(0, (time.getTime() - capturedAt) / 1000)
       : 0;
+    const drift = this.randomVelocityDrift();
+    const velocity = asteroid.velocity ?? {
+      x: spaceshipVelocity.x + drift.x,
+      y: spaceshipVelocity.y + drift.y,
+    };
+    const absolutePosition = this.resolvePosition(
+      asteroid.position,
+      bodyPositions,
+    );
 
     return {
       ...asteroid,
-      position: WorldService.advanceBodyPosition(asteroid, elapsedSeconds),
+      orbitingBodyName: null,
+      position: this.advanceFreeFloatingAsteroid(
+        {
+          x: absolutePosition.x.toString(),
+          y: absolutePosition.y.toString(),
+        },
+        velocity,
+        elapsedSeconds,
+      ),
+      orbitalCenter: null,
+      clockwise: false,
+      speed: '0',
+      velocity,
     };
   }
 
@@ -423,16 +418,8 @@ export class AsteroidService {
     return current.name;
   }
 
-  private static randomPositionNearSpaceship(
-    spaceshipPosition: Coordinate,
-    spaceshipVelocity: Velocity,
-  ) {
-    const shipSpeed = Math.hypot(spaceshipVelocity.x, spaceshipVelocity.y);
-    const angle =
-      shipSpeed > 0
-        ? Math.atan2(-spaceshipVelocity.y, -spaceshipVelocity.x) +
-          this.randomBetween(-Math.PI / 12, Math.PI / 12)
-        : Math.random() * Math.PI * 2;
+  private static randomPositionNearSpaceship(spaceshipPosition: Coordinate) {
+    const angle = Math.random() * Math.PI * 2;
     const distance = this.randomBetween(
       ASTEROID_SPAWN_MIN_DISTANCE_METERS,
       ASTEROID_SPAWN_MAX_DISTANCE_METERS,
@@ -455,94 +442,6 @@ export class AsteroidService {
       const clearance = Number(body.radius) + ASTEROID_BODY_CLEARANCE_METERS;
       return this.distance(position, bodyPosition) >= clearance;
     });
-  }
-
-  private static getOrbitVelocityMatchingSpaceship(params: {
-    absolutePosition: Coordinate;
-    bodyPosition: Coordinate;
-    bodyVelocity: Velocity;
-    spaceshipVelocity: Velocity;
-  }) {
-    const radiusVector = {
-      x: Number(params.absolutePosition.x - params.bodyPosition.x),
-      y: Number(params.absolutePosition.y - params.bodyPosition.y),
-    };
-    const radius = Math.hypot(radiusVector.x, radiusVector.y);
-    if (radius === 0) return undefined;
-
-    const shipSpeed = Math.hypot(
-      params.spaceshipVelocity.x,
-      params.spaceshipVelocity.y,
-    );
-    const speedDelta =
-      shipSpeed > 0
-        ? this.randomBetween(
-            1,
-            ASTEROID_MAX_SPAWN_VELOCITY_DELTA_METERS_PER_SECOND,
-          )
-        : this.randomBetween(
-            0,
-            ASTEROID_MAX_SPAWN_VELOCITY_DELTA_METERS_PER_SECOND,
-          );
-    const desiredVelocity =
-      shipSpeed > 0
-        ? {
-            x:
-              params.spaceshipVelocity.x +
-              (params.spaceshipVelocity.x / shipSpeed) * speedDelta,
-            y:
-              params.spaceshipVelocity.y +
-              (params.spaceshipVelocity.y / shipSpeed) * speedDelta,
-          }
-        : {
-            x: this.randomBetween(-speedDelta, speedDelta),
-            y: this.randomBetween(-speedDelta, speedDelta),
-          };
-    const relativeDesiredVelocity = {
-      x: desiredVelocity.x - params.bodyVelocity.x,
-      y: desiredVelocity.y - params.bodyVelocity.y,
-    };
-
-    const candidates = [true, false]
-      .map((clockwise) => {
-        const direction = clockwise ? 1 : -1;
-        const tangent = {
-          x: (direction * -radiusVector.y) / radius,
-          y: (direction * radiusVector.x) / radius,
-        };
-        const speed =
-          relativeDesiredVelocity.x * tangent.x +
-          relativeDesiredVelocity.y * tangent.y;
-        if (speed < 0) return undefined;
-
-        const velocity = {
-          x: params.bodyVelocity.x + tangent.x * speed,
-          y: params.bodyVelocity.y + tangent.y * speed,
-        };
-        return {
-          clockwise,
-          speed,
-          delta: Math.hypot(
-            velocity.x - params.spaceshipVelocity.x,
-            velocity.y - params.spaceshipVelocity.y,
-          ),
-        };
-      })
-      .filter((candidate) => candidate !== undefined)
-      .sort((left, right) => left.delta - right.delta);
-
-    const candidate = candidates[0];
-    if (
-      !candidate ||
-      candidate.delta > ASTEROID_MAX_SPAWN_VELOCITY_DELTA_METERS_PER_SECOND
-    ) {
-      return undefined;
-    }
-
-    return {
-      clockwise: candidate.clockwise,
-      speed: candidate.speed,
-    };
   }
 
   private static randomMass(density: AsteroidDensityBand) {
@@ -593,6 +492,33 @@ export class AsteroidService {
 
   private static randomBetween(min: number, max: number) {
     return min + Math.random() * (max - min);
+  }
+
+  private static randomVelocityDrift(): Velocity {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = this.randomBetween(
+      ASTEROID_MIN_SPAWN_VELOCITY_DELTA_METERS_PER_SECOND,
+      ASTEROID_MAX_SPAWN_VELOCITY_DELTA_METERS_PER_SECOND,
+    );
+
+    return {
+      x: Math.cos(angle) * speed,
+      y: Math.sin(angle) * speed,
+    };
+  }
+
+  private static advanceFreeFloatingAsteroid(
+    position: SerializedPosition,
+    velocity: Velocity,
+    elapsedSeconds: number,
+  ): SerializedPosition {
+    if (elapsedSeconds <= 0) return position;
+
+    return {
+      x: Math.round(Number(position.x) + velocity.x * elapsedSeconds).toString(),
+      y: Math.round(Number(position.y) + velocity.y * elapsedSeconds)
+        .toString(),
+    };
   }
 
   private static distance(left: Coordinate, right: Coordinate) {

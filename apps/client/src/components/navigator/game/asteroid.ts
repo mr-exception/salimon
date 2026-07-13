@@ -38,7 +38,7 @@ const MARKER_SCREEN_SIZE_PX = 12;
 
 export class Asteroid extends Phaser.GameObjects.Container {
   readonly id: string;
-  readonly asteroid: AsteroidDto;
+  asteroid: AsteroidDto;
   readonly initialMassTonnes: number;
   readonly deposits: AsteroidDeposit[];
   private readonly initialRadius: number;
@@ -101,6 +101,10 @@ export class Asteroid extends Phaser.GameObjects.Container {
 
   syncPosition(x: number, y: number) {
     this.setPosition(x, y);
+  }
+
+  syncAsteroid(asteroid: AsteroidDto) {
+    this.asteroid = asteroid;
   }
 
   containsScreenPoint(

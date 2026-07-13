@@ -148,6 +148,24 @@ function deserializePosition(position: AsteroidDto['position']): Position {
   };
 }
 
+function getPredictedAsteroidPosition(asteroid: AsteroidDto): Position {
+  const position = deserializePosition(asteroid.position);
+  if (!asteroid.velocity || position.relativeTo) return position;
+
+  const capturedAtMs = Date.parse(asteroid.capturedAt);
+  if (!Number.isFinite(capturedAtMs)) return position;
+
+  const elapsedSeconds = Math.max(0, (Date.now() - capturedAtMs) / 1000);
+  return {
+    x: BigInt(
+      Math.round(Number(position.x) + asteroid.velocity.x * elapsedSeconds),
+    ),
+    y: BigInt(
+      Math.round(Number(position.y) + asteroid.velocity.y * elapsedSeconds),
+    ),
+  };
+}
+
 export class Scene extends Phaser.Scene {
   protected dragging = false;
   protected lastPointer = new Phaser.Math.Vector2();
@@ -561,12 +579,11 @@ export class Scene extends Phaser.Scene {
       this.asteroids.map((asteroid) => [asteroid.id, asteroid]),
     );
     asteroidData.forEach((asteroid) => {
-      const position = getRenderPosition(
-        deserializePosition(asteroid.position),
-      );
+      const position = getRenderPosition(getPredictedAsteroidPosition(asteroid));
       const radius = getAsteroidRadiusForMass(asteroid.massTonnes);
       const rendered = renderedById.get(asteroid.id);
       if (rendered) {
+        rendered.syncAsteroid(asteroid);
         rendered.syncPosition(position.x, position.y);
         return;
       }
@@ -846,6 +863,10 @@ export class Scene extends Phaser.Scene {
   }
 
   private getAsteroidWorldVelocity(asteroid: Asteroid) {
+    if (!asteroid.asteroid.orbitalCenter) {
+      return asteroid.asteroid.velocity ?? { x: 0, y: 0 };
+    }
+
     const center = this.getRenderedBodyPosition(
       asteroid.asteroid.orbitalCenter,
     );

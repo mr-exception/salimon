@@ -15,6 +15,7 @@ export type SandboxObjectParams = {
   name?: string;
   kind?: string;
   mass: number;
+  radius?: number;
   tickMs: number;
   position: SandboxVector;
   capturedAt?: number;
@@ -30,6 +31,7 @@ export class SandboxObject {
   name?: string;
   kind?: string;
   mass: number;
+  radius: number;
   tickMs: number;
   position: SandboxVector;
   capturedAt: number;
@@ -44,6 +46,7 @@ export class SandboxObject {
     this.name = params.name;
     this.kind = params.kind;
     this.mass = params.mass;
+    this.radius = params.radius ?? 0;
     this.tickMs = params.tickMs;
     this.position = params.position;
     this.capturedAt = params.capturedAt ?? Date.now();

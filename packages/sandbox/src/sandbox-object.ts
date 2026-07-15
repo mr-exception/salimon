@@ -1,4 +1,4 @@
-import type { SandBox } from "./sandbox";
+import type { SandBox } from './sandbox';
 
 export type SandboxVector = {
   x: number;
@@ -8,6 +8,11 @@ export type SandboxVector = {
 export type SandboxForce = SandboxVector & {
   id?: string;
   durationMs: number;
+};
+
+export type SandboxGravityForceCacheEntry = {
+  objectId: string;
+  forceN: number;
 };
 
 export type SandboxObjectParams = {
@@ -25,7 +30,7 @@ export type SandboxObjectParams = {
 };
 
 export class SandboxObject {
-  private static readonly gravitationalConstant = 6.6743e-11;
+  static readonly gravitationalConstant = 6.6743e-11;
 
   id: string;
   name?: string;
@@ -40,6 +45,7 @@ export class SandboxObject {
   metadata?: Record<string, unknown>;
   activeForce?: SandboxForce;
   private sandbox?: SandBox;
+  private gravityForceCache = new Map<string, number>();
 
   constructor(params: SandboxObjectParams) {
     this.id = params.id;
@@ -61,11 +67,11 @@ export class SandboxObject {
 
   tick(timestampMs: number) {
     if (!Number.isFinite(timestampMs)) {
-      throw new Error("Tick timestamp must be a finite millisecond value.");
+      throw new Error('Tick timestamp must be a finite millisecond value.');
     }
 
     if (!Number.isFinite(this.tickMs) || this.tickMs <= 0) {
-      throw new Error("Object tickMs must be a positive millisecond value.");
+      throw new Error('Object tickMs must be a positive millisecond value.');
     }
 
     if (timestampMs - this.capturedAt < this.tickMs) {
@@ -73,7 +79,7 @@ export class SandboxObject {
     }
 
     if (!Number.isFinite(this.capturedAt)) {
-      throw new Error("Captured timestamp must be a finite millisecond value.");
+      throw new Error('Captured timestamp must be a finite millisecond value.');
     }
 
     const elapsedMilliseconds = timestampMs - this.capturedAt;
@@ -109,18 +115,18 @@ export class SandboxObject {
 
   force(force: SandboxForce) {
     if (!Number.isFinite(force.x) || !Number.isFinite(force.y)) {
-      throw new Error("Force must be a finite vector value.");
+      throw new Error('Force must be a finite vector value.');
     }
 
     if (!Number.isFinite(force.durationMs) || force.durationMs < 0) {
       throw new Error(
-        "Force duration must be a non-negative millisecond value.",
+        'Force duration must be a non-negative millisecond value.',
       );
     }
 
     if (!Number.isFinite(this.mass) || this.mass === 0) {
       throw new Error(
-        "Object mass must be finite and non-zero to apply force.",
+        'Object mass must be finite and non-zero to apply force.',
       );
     }
 
@@ -130,6 +136,45 @@ export class SandboxObject {
     }
 
     this.activeForce = { ...force };
+  }
+
+  setGravityForceCache(entries: SandboxGravityForceCacheEntry[]) {
+    this.gravityForceCache = new Map(
+      entries.map((entry) => [entry.objectId, entry.forceN]),
+    );
+  }
+
+  clearGravityForceCache() {
+    this.gravityForceCache.clear();
+  }
+
+  listGravityForceCache() {
+    return Array.from(this.gravityForceCache, ([objectId, forceN]) => ({
+      objectId,
+      forceN,
+    }));
+  }
+
+  getGravityForceN(object: SandboxObject) {
+    const distance = {
+      x: object.position.x - this.position.x,
+      y: object.position.y - this.position.y,
+    };
+    const distanceSquared = distance.x ** 2 + distance.y ** 2;
+
+    if (
+      object.id === this.id ||
+      this.mass === 0 ||
+      object.mass === 0 ||
+      distanceSquared === 0
+    ) {
+      return 0;
+    }
+
+    return (
+      (SandboxObject.gravitationalConstant * this.mass * object.mass) /
+      distanceSquared
+    );
   }
 
   private advanceBySeconds(seconds: number) {
@@ -147,7 +192,7 @@ export class SandboxObject {
 
     if (!Number.isFinite(this.mass) || this.mass === 0) {
       throw new Error(
-        "Object mass must be finite and non-zero to apply force.",
+        'Object mass must be finite and non-zero to apply force.',
       );
     }
 
@@ -176,7 +221,7 @@ export class SandboxObject {
       return;
     }
 
-    const center = this.sandbox?.getObject(this.orbitalCenterId ?? "");
+    const center = this.sandbox?.getObject(this.orbitalCenterId ?? '');
 
     if (!center) {
       this.position = {
@@ -241,7 +286,10 @@ export class SandboxObject {
 
   private calculateGravityAcceleration() {
     const acceleration = { x: 0, y: 0 };
-    const objects = this.sandbox?.listObjects() ?? [];
+    const objects =
+      this.sandbox?.listCachedGravityObjects(this) ??
+      this.sandbox?.listObjects() ??
+      [];
 
     objects.forEach((object) => {
       if (object.id === this.id || object.mass === 0) {

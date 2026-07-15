@@ -9,7 +9,9 @@ if (!Number.isInteger(port) || port <= 0) {
   throw new Error('PORT must be a positive integer');
 }
 
-TickingService.start();
+void TickingService.start().catch((error: unknown) => {
+  console.error('Failed to start world ticking', error);
+});
 
 const app = createApp();
 const server = app.listen(port, () => {

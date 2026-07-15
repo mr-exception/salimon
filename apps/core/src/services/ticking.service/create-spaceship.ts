@@ -1,6 +1,7 @@
 import { SpaceshipService } from '../spaceship.service';
 import { getAbsoluteSpaceshipUpdate } from './get-absolute-spaceship-update';
 import { loadWorldSnapshot } from './load-world-snapshot';
+import { tickingState } from './state';
 
 export async function createSpaceship() {
   const spaceship = SpaceshipService.createSpaceship();
@@ -11,11 +12,14 @@ export async function createSpaceship() {
     simulatedAt,
     world,
   );
-  return {
+  const createdSpaceship = {
     ...spaceship,
     ...absoluteUpdate,
     position: absoluteUpdate?.position ?? spaceship.position,
     velocity: absoluteUpdate?.velocity ?? spaceship.velocity,
   };
-}
 
+  tickingState.sandbox?.loadSpaceship(createdSpaceship);
+
+  return createdSpaceship;
+}

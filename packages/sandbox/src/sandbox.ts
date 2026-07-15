@@ -2,10 +2,11 @@ import {
   SandboxObject,
   type SandboxObjectParams,
   type SandboxVector,
-} from "./sandbox-object";
+} from './sandbox-object';
 
 export type SandboxState = {
   objects: SandboxObjectParams[];
+  gravityForceCacheThresholdN: number;
 };
 
 export type SandboxCollisionEvent = {
@@ -16,17 +17,27 @@ export type SandboxCollisionEvent = {
 };
 
 export type SandboxCollisionListener = (event: SandboxCollisionEvent) => void;
+export type SandboxObjectTickListener = (object: SandboxObject) => void;
 
 export class SandBox {
   private static readonly fps = 30;
   private static readonly tickIntervalMs = 1000 / SandBox.fps;
+  private static readonly defaultGravityForceCacheThresholdN = 0;
 
   private readonly objects = new Map<string, SandboxObject>();
   private readonly collisionListeners = new Set<SandboxCollisionListener>();
+  private readonly objectTickListeners = new Set<SandboxObjectTickListener>();
+  private gravityForceCacheThresholdN =
+    SandBox.defaultGravityForceCacheThresholdN;
+  private gravityForceCacheRefreshDepth = 0;
   private tickCount = 0;
   private tickTimer?: ReturnType<typeof setTimeout>;
 
   constructor(state: Partial<SandboxState> = {}) {
+    if (state.gravityForceCacheThresholdN !== undefined) {
+      this.setGravityForceCacheThresholdN(state.gravityForceCacheThresholdN);
+    }
+
     state.objects?.forEach((object) => this.addObject(object));
   }
 
@@ -36,6 +47,7 @@ export class SandBox {
 
     object.setSandbox(this);
     this.objects.set(object.id, object);
+    this.refreshGravityForceCachesWhenReady();
     return object;
   }
 
@@ -43,7 +55,23 @@ export class SandBox {
     const object = this.objects.get(id);
     this.objects.delete(id);
     object?.setSandbox(undefined);
+    object?.clearGravityForceCache();
+    this.refreshGravityForceCachesWhenReady();
     return object;
+  }
+
+  batchObjects<T>(callback: () => T) {
+    this.gravityForceCacheRefreshDepth += 1;
+
+    try {
+      return callback();
+    } finally {
+      this.gravityForceCacheRefreshDepth -= 1;
+
+      if (this.gravityForceCacheRefreshDepth === 0) {
+        this.refreshGravityForceCaches();
+      }
+    }
   }
 
   getObject(id: string) {
@@ -54,6 +82,32 @@ export class SandBox {
     return Array.from(this.objects.values());
   }
 
+  listCachedGravityObjects(object: SandboxObject) {
+    if (object.orbitalCenterId) {
+      return [];
+    }
+
+    const cachedObjectIds = object.listGravityForceCache().map((entry) => {
+      return entry.objectId;
+    });
+
+    return cachedObjectIds.flatMap((objectId) => {
+      const cachedObject = this.objects.get(objectId);
+      return cachedObject ? [cachedObject] : [];
+    });
+  }
+
+  setGravityForceCacheThresholdN(thresholdN: number) {
+    if (!Number.isFinite(thresholdN) || thresholdN < 0) {
+      throw new Error(
+        'Gravity force cache threshold must be a non-negative finite value.',
+      );
+    }
+
+    this.gravityForceCacheThresholdN = thresholdN;
+    this.refreshGravityForceCachesWhenReady();
+  }
+
   onCollision(listener: SandboxCollisionListener) {
     this.collisionListeners.add(listener);
 
@@ -62,24 +116,48 @@ export class SandBox {
     };
   }
 
+  onObjectTick(listener: SandboxObjectTickListener) {
+    this.objectTickListeners.add(listener);
+
+    return () => {
+      this.objectTickListeners.delete(listener);
+    };
+  }
+
+  tick(timestampMs = Date.now()) {
+    const objects = this.listObjects();
+    const tickedObjects = objects.filter((object) => {
+      if (timestampMs - object.capturedAt < object.tickMs) {
+        return false;
+      }
+
+      this.refreshGravityForceCache(object);
+      return object.tick(timestampMs);
+    });
+
+    tickedObjects.forEach((object) => {
+      this.objectTickListeners.forEach((listener) => listener(object));
+    });
+    this.emitCollisions(objects);
+
+    return tickedObjects;
+  }
+
   start() {
-    if (this.tickTimer) {
-      clearTimeout(this.tickTimer);
-    }
+    this.stop();
 
     const tick = () => {
       const startedAt = Date.now();
-      const objects = this.listObjects();
 
-      objects.forEach((object) => object.tick(startedAt));
-      this.emitCollisions(objects);
+      const tickedObjects = this.tick(startedAt);
 
       const calcTime = Date.now() - startedAt;
 
       this.tickCount += 1;
-      console.log(
-        `tick passed, count: ${this.tickCount}, calcTime: ${calcTime}ms, fps: ${SandBox.fps}`,
-      );
+      if (tickedObjects.length > 0)
+        console.log(
+          `[tick] objects: ${tickedObjects.length}/${this.objects.size} (${calcTime}ms)`,
+        );
 
       this.tickTimer = setTimeout(
         tick,
@@ -88,6 +166,13 @@ export class SandBox {
     };
 
     tick();
+  }
+
+  stop() {
+    if (!this.tickTimer) return;
+
+    clearTimeout(this.tickTimer);
+    this.tickTimer = undefined;
   }
 
   private emitCollisions(objects: SandboxObject[]) {
@@ -107,6 +192,34 @@ export class SandBox {
         }
       }
     }
+  }
+
+  private refreshGravityForceCaches() {
+    this.objects.forEach((object) => this.refreshGravityForceCache(object));
+  }
+
+  private refreshGravityForceCachesWhenReady() {
+    if (this.gravityForceCacheRefreshDepth > 0) return;
+
+    this.refreshGravityForceCaches();
+  }
+
+  private refreshGravityForceCache(object: SandboxObject) {
+    if (object.orbitalCenterId) {
+      object.clearGravityForceCache();
+      return;
+    }
+
+    object.setGravityForceCache(
+      this.listObjects()
+        .flatMap((cachedObject) => {
+          const forceN = object.getGravityForceN(cachedObject);
+          return forceN > this.gravityForceCacheThresholdN
+            ? [{ objectId: cachedObject.id, forceN }]
+            : [];
+        })
+        .sort((left, right) => right.forceN - left.forceN),
+    );
   }
 
   private getCollisionEvent(

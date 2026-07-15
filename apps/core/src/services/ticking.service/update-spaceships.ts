@@ -1,18 +1,17 @@
-import { advanceSpaceships } from './advance-spaceships';
-import { loadWorldSnapshot } from './load-world-snapshot';
 import { parseInvocationTime } from './parse-invocation-time';
 import { start } from './start';
+import { tickingState } from './state';
 
 export async function updateSpaceships(time: string | Date = new Date()) {
   await start();
-  const invocationTime = parseInvocationTime(time);
-  const processed = await advanceSpaceships(
-    invocationTime,
-    await loadWorldSnapshot(),
-  );
+  const processed =
+    tickingState.sandbox
+      ?.tick(parseInvocationTime(time).getTime())
+      .filter((object) =>
+        tickingState.sandbox?.getSpaceshipSecurityCode(object),
+      ).length ?? 0;
   return {
     selected: processed,
     processed,
   };
 }
-

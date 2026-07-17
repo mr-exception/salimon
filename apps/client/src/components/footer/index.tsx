@@ -54,13 +54,18 @@ type FooterProps = {
   isEngineRunning?: boolean;
   isMeasuring?: boolean;
   onStartThrusters?: (
-    thrusters: { powerPercent: number; durationSeconds: number }[],
+    thrusters: { powerPercent: number; active: boolean }[],
   ) => void;
   onStopEngines?: () => void;
   onToggleMeasuring?: () => void;
   onOpenCommunications?: () => void;
   unreadMessageCount?: number;
   onPredictionChange?: (active: boolean, seconds: number) => void;
+};
+
+type ManualThrusterInput = {
+  powerPercent: string;
+  active: boolean;
 };
 
 type SpeedControlTab =
@@ -466,8 +471,8 @@ export function Footer({
   const modules = useModules();
   const [manualThrusters, setManualThrusters] = useState(() =>
     Array.from({ length: SPACESHIP_THRUSTER_COUNT }, () => ({
-      powerPercent: '0',
-      durationSeconds: '0',
+      powerPercent: '100',
+      active: false,
     })),
   );
   const [predictionAmount, setPredictionAmount] = useState('2');
@@ -491,13 +496,10 @@ export function Footer({
       : undefined;
   const thrustersSchedule = manualThrusters.map((thruster) => ({
     powerPercent: Number(thruster.powerPercent),
-    durationSeconds: Number(thruster.durationSeconds),
+    active: thruster.active,
   }));
   const thrustersTimeSeconds = activeThrusters
-    ? Math.max(
-        0,
-        activeThrusters.durationSeconds - activeThrusters.elapsedSeconds,
-      )
+    ? Math.max(0, activeThrusters.elapsedSeconds)
     : activeTargetSpeed
       ? Math.max(
           0,
@@ -507,30 +509,28 @@ export function Footer({
   const thrustersFieldsAreValid = thrustersSchedule.every(
     (thruster) =>
       Number.isFinite(thruster.powerPercent) &&
-      Number.isFinite(thruster.durationSeconds) &&
       thruster.powerPercent >= 0 &&
-      thruster.powerPercent <= 100 &&
-      thruster.durationSeconds >= 0,
+      thruster.powerPercent <= 100,
   );
   const hasValidThrusters =
     thrustersFieldsAreValid &&
     thrustersSchedule.some(
-      (thruster) => thruster.powerPercent > 0 && thruster.durationSeconds > 0,
+      (thruster, index) =>
+        thruster.active &&
+        thruster.powerPercent > 0 &&
+        (thrusterDurability[index] ?? 0) > 0,
     );
+  const canControlManualThrusters =
+    motionState !== 'crashed' && !activeTargetSpeed;
   const canStartThrusters =
-    motionState !== 'crashed' &&
-    hasValidThrusters &&
-    fuelKns > 0 &&
-    thrusterDurability.some((durability) => durability > 0);
+    canControlManualThrusters && hasValidThrusters && fuelKns > 0;
   const currentEnginePowerPercent = activeTargetSpeed
     ? activeTargetSpeed.maximumThrustPercent
     : activeThrusters
       ? Math.max(
           0,
           ...activeThrusters.thrusters.map((thruster) =>
-            activeThrusters.elapsedSeconds < thruster.durationSeconds
-              ? thruster.powerPercent
-              : 0,
+            thruster.active ? thruster.powerPercent : 0,
           ),
         )
       : 0;
@@ -565,20 +565,71 @@ export function Footer({
     });
   };
 
-  const updateManualThruster = (
-    index: number,
-    field: 'powerPercent' | 'durationSeconds',
-    value: string,
-  ) => {
+  const getThrustersSchedule = (thrusters: ManualThrusterInput[]) =>
+    thrusters.map((thruster) => ({
+      powerPercent: Number(thruster.powerPercent),
+      active: thruster.active,
+    }));
+
+  const applyManualThrusters = (thrusters: ManualThrusterInput[]) => {
+    if (!canControlManualThrusters) return;
+
+    const schedule = getThrustersSchedule(thrusters);
+    const fieldsAreValid = schedule.every(
+      (thruster) =>
+        Number.isFinite(thruster.powerPercent) &&
+        thruster.powerPercent >= 0 &&
+        thruster.powerPercent <= 100,
+    );
+    const hasActiveThruster =
+      fieldsAreValid &&
+      fuelKns > 0 &&
+      schedule.some(
+        (thruster, index) =>
+          thruster.active &&
+          thruster.powerPercent > 0 &&
+          (thrusterDurability[index] ?? 0) > 0,
+      );
+
+    if (hasActiveThruster) {
+      onStartThrusters?.(schedule);
+    } else if (activeThrusters) {
+      onStopEngines?.();
+    }
+  };
+
+  const updateManualThrusterPower = (index: number, value: string) => {
     setManualThrusters((thrusters) =>
       thrusters.map((thruster, thrusterIndex) =>
-        thrusterIndex === index ? { ...thruster, [field]: value } : thruster,
+        thrusterIndex === index
+          ? { ...thruster, powerPercent: value }
+          : thruster,
       ),
     );
+
+    if (activeThrusters) {
+      applyManualThrusters(
+        manualThrusters.map((thruster, thrusterIndex) =>
+          thrusterIndex === index
+            ? { ...thruster, powerPercent: value }
+            : thruster,
+        ),
+      );
+    }
+  };
+
+  const toggleManualThruster = (index: number) => {
+    const nextThrusters = manualThrusters.map((thruster, thrusterIndex) =>
+      thrusterIndex === index
+        ? { ...thruster, active: !thruster.active }
+        : thruster,
+    );
+    setManualThrusters(nextThrusters);
+    applyManualThrusters(nextThrusters);
   };
 
   const startThrusters = () => {
-    if (!canStartThrusters || isEngineRunning || !onStartThrusters) return;
+    if (!canStartThrusters || activeThrusters || !onStartThrusters) return;
 
     onStartThrusters(thrustersSchedule);
   };
@@ -594,6 +645,15 @@ export function Footer({
     return (
       <div className={`${style.thrustersRow} ${className}`}>
         <span>{label}</span>
+        <button
+          className={style.thrusterToggle}
+          type="button"
+          aria-pressed={thruster.active}
+          disabled={!canControlManualThrusters}
+          onClick={() => toggleManualThruster(index)}
+        >
+          {thruster.active ? 'On' : 'Off'}
+        </button>
         <label htmlFor={`footer-manual-thruster-${index}-power`}>
           <span>Power</span>
           <span className={style.speedField}>
@@ -604,37 +664,12 @@ export function Footer({
               max="100"
               step="1"
               value={thruster.powerPercent}
-              disabled={isEngineRunning}
+              disabled={!canControlManualThrusters}
               onChange={(event) =>
-                updateManualThruster(
-                  index,
-                  'powerPercent',
-                  event.currentTarget.value,
-                )
+                updateManualThrusterPower(index, event.currentTarget.value)
               }
             />
             <span aria-hidden="true">%</span>
-          </span>
-        </label>
-        <label htmlFor={`footer-manual-thruster-${index}-duration`}>
-          <span>Time</span>
-          <span className={style.speedField}>
-            <input
-              id={`footer-manual-thruster-${index}-duration`}
-              type="number"
-              min="0"
-              step="0.1"
-              value={thruster.durationSeconds}
-              disabled={isEngineRunning}
-              onChange={(event) =>
-                updateManualThruster(
-                  index,
-                  'durationSeconds',
-                  event.currentTarget.value,
-                )
-              }
-            />
-            <span aria-hidden="true">s</span>
           </span>
         </label>
       </div>
@@ -999,7 +1034,9 @@ export function Footer({
                       <small>Acceleration</small>—
                     </span>
                     <span className={style.speedMetric}>
-                      <small>Time remaining</small>
+                      <small>
+                        {activeThrusters ? 'Active time' : 'Time remaining'}
+                      </small>
                       {thrustersTimeSeconds !== undefined
                         ? formatDuration(thrustersTimeSeconds)
                         : '—'}

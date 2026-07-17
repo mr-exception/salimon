@@ -656,12 +656,9 @@ export class Scene extends Phaser.Scene {
     return Number(this.spaceship?.spaceship.speed ?? 0n);
   }
 
-  startThrusters(
-    thrusters: { powerPercent: number; durationSeconds: number }[],
-  ) {
+  startThrusters(thrusters: { powerPercent: number; active: boolean }[]) {
     if (
       !this.spaceship ||
-      this.spaceshipEngineRunning ||
       !Array.isArray(thrusters) ||
       thrusters.length === 0
     ) {

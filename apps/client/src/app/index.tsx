@@ -33,7 +33,7 @@ export default function App() {
     useState(false);
   const sceneRef = useRef<{
     startThrusters: (
-      thrusters: { powerPercent: number; durationSeconds: number }[],
+      thrusters: { powerPercent: number; active: boolean }[],
     ) => void;
     stopEngines: () => void;
     setTargetDirectionSelectionActive: (active: boolean) => void;
@@ -43,7 +43,7 @@ export default function App() {
     (
       scene: {
         startThrusters: (
-          thrusters: { powerPercent: number; durationSeconds: number }[],
+          thrusters: { powerPercent: number; active: boolean }[],
         ) => void;
         stopEngines: () => void;
         setTargetDirectionSelectionActive: (active: boolean) => void;
@@ -55,7 +55,7 @@ export default function App() {
     [],
   );
   const startThrusters = useCallback(
-    (thrusters: { powerPercent: number; durationSeconds: number }[]) => {
+    (thrusters: { powerPercent: number; active: boolean }[]) => {
       sceneRef.current?.startThrusters(thrusters);
     },
     [],

@@ -16,8 +16,26 @@ export type SandboxCollisionEvent = {
   forceN: number;
 };
 
+export type SandboxCrashEvent = SandboxCollisionEvent;
 export type SandboxCollisionListener = (event: SandboxCollisionEvent) => void;
+export type SandboxCrashListener = (event: SandboxCrashEvent) => void;
 export type SandboxObjectTickListener = (object: SandboxObject) => void;
+
+class SandboxEventEmitter<TEvent> {
+  private readonly listeners = new Set<(event: TEvent) => void>();
+
+  subscribe(listener: (event: TEvent) => void) {
+    this.listeners.add(listener);
+
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
+
+  emit(event: TEvent) {
+    this.listeners.forEach((listener) => listener(event));
+  }
+}
 
 export class SandBox {
   private static readonly fps = 30;
@@ -25,8 +43,9 @@ export class SandBox {
   private static readonly defaultGravityForceCacheThresholdN = 0;
 
   private readonly objects = new Map<string, SandboxObject>();
-  private readonly collisionListeners = new Set<SandboxCollisionListener>();
+  private readonly crashEvents = new SandboxEventEmitter<SandboxCrashEvent>();
   private readonly objectTickListeners = new Set<SandboxObjectTickListener>();
+  private readonly activeCrashPairs = new Set<string>();
   private gravityForceCacheThresholdN =
     SandBox.defaultGravityForceCacheThresholdN;
   private gravityForceCacheRefreshDepth = 0;
@@ -39,6 +58,27 @@ export class SandBox {
     }
 
     state.objects?.forEach((object) => this.addObject(object));
+  }
+
+  static calculateCrashForceN(
+    objectAMassKg: number,
+    objectBMassKg: number,
+    closingSpeedMetersPerSecond: number,
+  ) {
+    if (
+      !Number.isFinite(objectAMassKg) ||
+      !Number.isFinite(objectBMassKg) ||
+      !Number.isFinite(closingSpeedMetersPerSecond)
+    ) {
+      throw new Error('Crash force inputs must be finite numbers.');
+    }
+
+    const reducedMass =
+      objectAMassKg + objectBMassKg === 0
+        ? 0
+        : (objectAMassKg * objectBMassKg) / (objectAMassKg + objectBMassKg);
+
+    return reducedMass * Math.max(0, closingSpeedMetersPerSecond) * SandBox.fps;
   }
 
   addObject(params: SandboxObject | SandboxObjectParams) {
@@ -109,11 +149,11 @@ export class SandBox {
   }
 
   onCollision(listener: SandboxCollisionListener) {
-    this.collisionListeners.add(listener);
+    return this.onCrash(listener);
+  }
 
-    return () => {
-      this.collisionListeners.delete(listener);
-    };
+  onCrash(listener: SandboxCrashListener) {
+    return this.crashEvents.subscribe(listener);
   }
 
   onObjectTick(listener: SandboxObjectTickListener) {
@@ -138,7 +178,7 @@ export class SandBox {
     tickedObjects.forEach((object) => {
       this.objectTickListeners.forEach((listener) => listener(object));
     });
-    this.emitCollisions(objects);
+    this.emitCrashes(objects);
 
     return tickedObjects;
   }
@@ -175,23 +215,33 @@ export class SandBox {
     this.tickTimer = undefined;
   }
 
-  private emitCollisions(objects: SandboxObject[]) {
+  private emitCrashes(objects: SandboxObject[]) {
+    const currentCrashPairs = new Set<string>();
+
     for (let index = 0; index < objects.length; index += 1) {
       for (
         let compareIndex = index + 1;
         compareIndex < objects.length;
         compareIndex += 1
       ) {
-        const collision = this.getCollisionEvent(
-          objects[index],
-          objects[compareIndex],
-        );
+        const crash = this.getCrashEvent(objects[index], objects[compareIndex]);
 
-        if (collision) {
-          this.collisionListeners.forEach((listener) => listener(collision));
+        if (crash) {
+          const pairKey = SandBox.getObjectPairKey(
+            crash.objectAId,
+            crash.objectBId,
+          );
+          currentCrashPairs.add(pairKey);
+
+          if (!this.activeCrashPairs.has(pairKey)) {
+            this.crashEvents.emit(crash);
+          }
         }
       }
     }
+
+    this.activeCrashPairs.clear();
+    currentCrashPairs.forEach((pairKey) => this.activeCrashPairs.add(pairKey));
   }
 
   private refreshGravityForceCaches() {
@@ -222,10 +272,10 @@ export class SandBox {
     );
   }
 
-  private getCollisionEvent(
+  private getCrashEvent(
     objectA: SandboxObject,
     objectB: SandboxObject,
-  ): SandboxCollisionEvent | undefined {
+  ): SandboxCrashEvent | undefined {
     const collisionDistance = objectA.radius + objectB.radius;
     const delta = {
       x: objectB.position.x - objectA.position.x,
@@ -252,8 +302,14 @@ export class SandBox {
       objectAId: objectA.id,
       objectBId: objectB.id,
       position,
-      forceN: this.getCollisionForceN(objectA, objectB, normal),
+      forceN: this.getCrashForceN(objectA, objectB, normal),
     };
+  }
+
+  private static getObjectPairKey(objectAId: string, objectBId: string) {
+    return objectAId < objectBId
+      ? `${objectAId}:${objectBId}`
+      : `${objectBId}:${objectAId}`;
   }
 
   private getCollisionPosition(
@@ -282,7 +338,7 @@ export class SandBox {
     };
   }
 
-  private getCollisionForceN(
+  private getCrashForceN(
     objectA: SandboxObject,
     objectB: SandboxObject,
     normal: SandboxVector,
@@ -297,11 +353,10 @@ export class SandBox {
       0,
       -(relativeVelocity.x * normal.x + relativeVelocity.y * normal.y),
     );
-    const reducedMass =
-      objectA.mass + objectB.mass === 0
-        ? 0
-        : (objectA.mass * objectB.mass) / (objectA.mass + objectB.mass);
-
-    return reducedMass * closingSpeed * SandBox.fps;
+    return SandBox.calculateCrashForceN(
+      objectA.mass,
+      objectB.mass,
+      closingSpeed,
+    );
   }
 }

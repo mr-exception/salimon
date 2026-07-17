@@ -106,7 +106,7 @@ export type SpaceshipTargetSpeedFeature = {
 
 export type SpaceshipManualForceThruster = {
   powerPercent: number;
-  durationSeconds: number;
+  active: boolean;
 };
 
 export type SpaceshipThrusterSchedule = SpaceshipManualForceThruster;
@@ -114,7 +114,6 @@ export type SpaceshipThrusterSchedule = SpaceshipManualForceThruster;
 export type SpaceshipThrustersFeature = {
   type: 'thrusters';
   thrusters: SpaceshipManualForceThruster[];
-  durationSeconds: number;
   elapsedSeconds: number;
 };
 

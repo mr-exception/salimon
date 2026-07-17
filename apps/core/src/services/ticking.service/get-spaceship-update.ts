@@ -150,10 +150,12 @@ export function createTargetSpeedFeature(
 
 export function createThrustersFeature(
   spaceship: SpaceshipDocument,
-  thrusters: { powerPercent: number; durationSeconds: number }[],
+  thrusters: { powerPercent: number; active: boolean }[],
 ): ThrustersPlan | undefined {
   if (
-    spaceship.activeFeature ||
+    (spaceship.activeFeature &&
+      spaceship.activeFeature.type !== 'thrusters' &&
+      spaceship.activeFeature.type !== 'manual-force') ||
     spaceship.motionState === 'crashed' ||
     !Array.isArray(thrusters)
   ) {
@@ -164,33 +166,31 @@ export function createThrustersFeature(
     .slice(0, THRUSTER_COUNT)
     .map((thruster) => ({
       powerPercent: Number(thruster.powerPercent),
-      durationSeconds: Number(thruster.durationSeconds),
+      active: Boolean(thruster.active),
     }));
   if (
     normalizedThrusters.length !== THRUSTER_COUNT ||
     normalizedThrusters.some(
       (thruster) =>
         !Number.isFinite(thruster.powerPercent) ||
-        !Number.isFinite(thruster.durationSeconds) ||
         thruster.powerPercent < 0 ||
-        thruster.powerPercent > 100 ||
-        thruster.durationSeconds < 0,
+        thruster.powerPercent > 100,
     )
   ) {
     return undefined;
   }
 
-  const durationSeconds = Math.max(
-    ...normalizedThrusters.map((thruster) => thruster.durationSeconds),
-  );
+  const elapsedSeconds =
+    spaceship.activeFeature?.type === 'thrusters' ||
+    spaceship.activeFeature?.type === 'manual-force'
+      ? spaceship.activeFeature.elapsedSeconds
+      : 0;
   if (
-    durationSeconds <= 0 ||
     !getThrustersActiveThrusters(
       {
         type: 'thrusters',
         thrusters: normalizedThrusters,
-        durationSeconds,
-        elapsedSeconds: 0,
+        elapsedSeconds,
       },
       spaceship.stats,
     )
@@ -201,8 +201,7 @@ export function createThrustersFeature(
   return {
     type: 'thrusters',
     thrusters: normalizedThrusters,
-    durationSeconds,
-    elapsedSeconds: 0,
+    elapsedSeconds,
   };
 }
 
@@ -216,7 +215,7 @@ function getThrustersActiveThrusters(
 
   feature.thrusters.forEach((thruster, index) => {
     if (
-      feature.elapsedSeconds >= thruster.durationSeconds ||
+      !thruster.active ||
       thruster.powerPercent <= 0 ||
       normalizedStats.thrusterDurability[index] <= 0
     ) {
@@ -251,15 +250,6 @@ function getThrustersActiveThrusters(
           normalizedStats.thrusterDurability[index] /
           ((thrust / 100) * THRUSTER_DURABILITY_DRAIN_RATE),
       ),
-    ),
-    remainingScheduledSeconds: Math.min(
-      ...feature.thrusters
-        .filter(
-          (thruster, index) =>
-            thrustByIndex[index] > 0 &&
-            thruster.durationSeconds > feature.elapsedSeconds,
-        )
-        .map((thruster) => thruster.durationSeconds - feature.elapsedSeconds),
     ),
   };
 }
@@ -612,7 +602,6 @@ export function getSpaceshipUpdate(
           const fuelSeconds = stats.fuelKns / activeThrusters.totalKilonewtons;
           burnSeconds = Math.min(
             stepSeconds,
-            activeThrusters.remainingScheduledSeconds,
             fuelSeconds,
             activeThrusters.availableSeconds,
           );
@@ -694,7 +683,7 @@ export function getSpaceshipUpdate(
       if (thrustersFeature && burnSeconds > 0) {
         const elapsed = thrustersFeature.elapsedSeconds + burnSeconds;
         activeFeature =
-          elapsed >= thrustersFeature.durationSeconds || stats.fuelKns <= 0
+          stats.fuelKns <= 0
             ? undefined
             : { ...thrustersFeature, elapsedSeconds: elapsed };
       }

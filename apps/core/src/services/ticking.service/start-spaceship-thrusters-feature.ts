@@ -17,7 +17,7 @@ import { updateSpaceship } from './update-spaceship';
 export async function startSpaceshipThrustersFeature(
   spaceship: SpaceshipDocument,
   params: {
-    thrusters: { powerPercent: number; durationSeconds: number }[];
+    thrusters: { powerPercent: number; active: boolean }[];
   },
 ) {
   const simulatedAt = new Date();

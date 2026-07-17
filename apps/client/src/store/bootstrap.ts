@@ -3,8 +3,10 @@ import axios from 'axios';
 import type {
   AsteroidDto,
   SerializedWorldSystems,
+  SpaceshipActiveFeature,
   SpaceshipDto,
   SpaceshipInventory,
+  SpaceshipStats,
 } from '@repo/types';
 import type { ContactMessageDto } from '@repo/types';
 import {
@@ -26,13 +28,23 @@ export type BootstrapRequest =
 export type BootstrapState = 'idle' | 'loading' | 'ready' | 'error';
 
 type SpaceshipResponse = { spaceship: SpaceshipDto };
+type SpaceshipUpdateDto = Partial<
+  Omit<SpaceshipDto, 'activeFeature' | 'inventory' | 'stats'>
+> & {
+  activeFeature?: SpaceshipActiveFeature | null;
+  inventory?: Partial<SpaceshipInventory>;
+  stats?: Partial<SpaceshipStats>;
+};
 type SpaceshipInfoMessage = {
-  type: 'spaceship:info';
+  type: 'ship:info' | 'spaceship:info';
   spaceship: SpaceshipDto;
+};
+type SpaceshipUpdateMessage = {
+  type: 'ship:update';
+  spaceship: SpaceshipUpdateDto;
 };
 type WorldInfoMessage = Partial<SerializedWorldSystems> & {
   type: 'world:info';
-  spaceship: SpaceshipDto;
   requestId?: string;
   asteroids?: AsteroidDto[];
 };
@@ -58,6 +70,7 @@ type ContactSocketErrorMessage = {
 };
 type SpaceshipSocketMessage =
   | SpaceshipInfoMessage
+  | SpaceshipUpdateMessage
   | WorldInfoMessage
   | SpaceshipErrorMessage
   | WorldViewportMessage
@@ -85,6 +98,7 @@ let nextContactMessageRequestId = 0;
 let pendingInventorySync: SpaceshipInventory | undefined;
 let unconfirmedInventorySync: SpaceshipInventory | undefined;
 let inventorySyncTimer: number | undefined;
+let currentSpaceship: SpaceshipDto | undefined;
 
 export function getApiBaseUrl() {
   return (import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL).replace(
@@ -102,16 +116,24 @@ function getSpaceshipSocketUrl(securityCode: string) {
 
 function parseSpaceshipSocketMessage(data: string): SpaceshipSocketMessage {
   const message = JSON.parse(data) as Partial<SpaceshipSocketMessage>;
-  if (message.type === 'spaceship:info' && message.spaceship) {
+  if (
+    (message.type === 'ship:info' || message.type === 'spaceship:info') &&
+    message.spaceship
+  ) {
     return {
-      type: 'spaceship:info',
-      spaceship: message.spaceship,
+      type: message.type,
+      spaceship: message.spaceship as SpaceshipDto,
     };
   }
-  if (message.type === 'world:info' && message.spaceship) {
+  if (message.type === 'ship:update' && message.spaceship) {
+    return {
+      type: 'ship:update',
+      spaceship: message.spaceship as SpaceshipUpdateDto,
+    };
+  }
+  if (message.type === 'world:info') {
     return {
       type: 'world:info',
-      spaceship: message.spaceship,
       requestId:
         typeof message.requestId === 'string' ? message.requestId : undefined,
       ...(Array.isArray(message.systems) ? { systems: message.systems } : {}),
@@ -185,14 +207,58 @@ function preservePendingInventory(spaceship: SpaceshipDto) {
 
 async function applySpaceshipInfo(spaceship: SpaceshipDto) {
   const clientSpaceship = preservePendingInventory(spaceship);
+  currentSpaceship = clientSpaceship;
   storeSpaceship(clientSpaceship);
   hydrateSpaceship(clientSpaceship);
 }
 
+async function applySpaceshipUpdate(update: SpaceshipUpdateDto) {
+  const spaceship = mergeSpaceshipUpdate(
+    currentSpaceship ?? readStoredSpaceship(),
+    update,
+  );
+  await applySpaceshipInfo(spaceship);
+}
+
+function mergeSpaceshipUpdate(
+  spaceship: SpaceshipDto | undefined,
+  update: SpaceshipUpdateDto,
+): SpaceshipDto {
+  if (!spaceship) {
+    throw new Error('Cannot apply spaceship update before spaceship info');
+  }
+
+  return {
+    ...spaceship,
+    ...update,
+    position: update.position ?? spaceship.position,
+    velocity: update.velocity ?? spaceship.velocity,
+    stats: mergeSpaceshipStats(spaceship.stats, update.stats),
+    inventory: update.inventory
+      ? { ...spaceship.inventory, ...update.inventory }
+      : spaceship.inventory,
+    activeFeature:
+      update.activeFeature === null
+        ? undefined
+        : (update.activeFeature ?? spaceship.activeFeature),
+  };
+}
+
+function mergeSpaceshipStats(
+  stats: SpaceshipDto['stats'],
+  update: Partial<SpaceshipStats> | undefined,
+): SpaceshipDto['stats'] {
+  if (!update) return stats;
+
+  return {
+    fuelKns: update.fuelKns ?? stats?.fuelKns ?? 0,
+    hullDurability: update.hullDurability ?? stats?.hullDurability,
+    thrusterDurability: update.thrusterDurability ?? stats?.thrusterDurability,
+  };
+}
+
 async function applyWorldInfo(message: WorldInfoMessage) {
   const handledViewportRequest = handleWorldViewportInfo(message);
-  const spaceship = preservePendingInventory(message.spaceship);
-  storeSpaceship(spaceship);
   if (message.asteroids) {
     hydrateAsteroids(message.asteroids);
   }
@@ -200,11 +266,7 @@ async function applyWorldInfo(message: WorldInfoMessage) {
     if (!handledViewportRequest) {
       hydrateWorldSystems({ systems: message.systems });
     }
-    hydrateSpaceship(spaceship);
-    return;
   }
-
-  await applySpaceshipInfo(spaceship);
 }
 
 function readStoredSpaceship() {
@@ -239,10 +301,7 @@ async function getSpaceshipFromSocket(securityCode: string) {
           socket.close();
           return;
         }
-        if (
-          message.type !== 'spaceship:info' &&
-          message.type !== 'world:info'
-        ) {
+        if (message.type !== 'spaceship:info' && message.type !== 'ship:info') {
           return;
         }
 
@@ -444,7 +503,7 @@ export function startSpaceshipTargetSpeedFeature(
 }
 
 export function startSpaceshipThrustersFeature(
-  thrusters: { powerPercent: number; durationSeconds: number }[],
+  thrusters: { powerPercent: number; active: boolean }[],
 ) {
   sendSpaceshipSocketMessage({
     type: 'spaceship:start-thrusters',
@@ -498,11 +557,13 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
               });
               return;
             }
-            void applySpaceshipInfo(message.spaceship).catch(
-              (error: unknown) => {
-                console.error('Failed to apply spaceship info', error);
-              },
-            );
+            const apply =
+              message.type === 'ship:update'
+                ? applySpaceshipUpdate(message.spaceship)
+                : applySpaceshipInfo(message.spaceship);
+            void apply.catch((error: unknown) => {
+              console.error('Failed to apply spaceship info', error);
+            });
           } catch (error) {
             console.error('Failed to process spaceship socket message', error);
           }

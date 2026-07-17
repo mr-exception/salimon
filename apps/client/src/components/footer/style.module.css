@@ -449,6 +449,16 @@
   text-align: center;
 }
 
+.thrusterToggle {
+  width: 100%;
+}
+
+.thrusterToggle[aria-pressed='true'] {
+  border-color: color-mix(in srgb, var(--color-cyan) 70%, transparent);
+  background: color-mix(in srgb, var(--color-cyan) 24%, transparent);
+  color: var(--color-starlight);
+}
+
 .thrustersRow label {
   display: grid;
   grid-template-columns: 46px auto;

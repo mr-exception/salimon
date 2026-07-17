@@ -3,7 +3,14 @@ import type { ContactMessageDocument } from '@models';
 import { ContactsService } from '../contacts.service';
 import { SpaceshipService } from '../spaceship.service';
 import type { WorldViewportRequest } from '../world-viewport.service';
+import type {
+  SpaceshipActiveFeature,
+  SpaceshipDto,
+  SpaceshipInventory,
+  SpaceshipStats,
+} from '@repo/types';
 import {
+  SHIP_UPDATE_INTERVAL_MS,
   SPACESHIP_INFO_INTERVAL_MS,
   SPACESHIP_PERSIST_INTERVAL_MS,
 } from './constants';
@@ -50,7 +57,9 @@ type SpaceshipSocketIncomingMessage =
 
 export class SpaceshipSocketConnection {
   private session?: SpaceshipSession;
+  private lastSentSpaceship?: SpaceshipDto;
   private readonly infoInterval: NodeJS.Timeout;
+  private readonly shipUpdateInterval: NodeJS.Timeout;
   private readonly persistInterval: NodeJS.Timeout;
   private isPersisting = false;
   private hasPendingPersist = false;
@@ -62,6 +71,9 @@ export class SpaceshipSocketConnection {
     this.infoInterval = setInterval(() => {
       void this.sendWorldInfo();
     }, SPACESHIP_INFO_INTERVAL_MS);
+    this.shipUpdateInterval = setInterval(() => {
+      void this.sendShipUpdate();
+    }, SHIP_UPDATE_INTERVAL_MS);
     this.persistInterval = setInterval(() => {
       void this.persistSpaceship();
     }, SPACESHIP_PERSIST_INTERVAL_MS);
@@ -88,6 +100,7 @@ export class SpaceshipSocketConnection {
         return;
       }
 
+      await this.sendShipInfo();
       void this.sendWorldInfo();
     } catch (error) {
       console.error('Failed to load spaceship socket connection', error);
@@ -96,6 +109,52 @@ export class SpaceshipSocketConnection {
         error: 'Failed to load spaceship',
       });
       this.socket.close(1011, 'Failed to load spaceship');
+    }
+  }
+
+  private async sendShipInfo() {
+    if (!this.session) return;
+
+    try {
+      await this.session.refreshSpaceship();
+      const spaceship = this.session.getSpaceshipDto();
+      this.lastSentSpaceship = spaceship;
+      sendJson(this.socket, {
+        type: 'ship:info',
+        spaceship,
+      });
+    } catch (error) {
+      console.error('Failed to send ship info', error);
+      sendJson(this.socket, {
+        type: 'error',
+        error: 'Failed to update spaceship',
+      });
+    }
+  }
+
+  private async sendShipUpdate() {
+    if (!this.session) return;
+
+    try {
+      await this.session.refreshSpaceship();
+      const spaceship = this.session.getSpaceshipDto();
+      const update = getSpaceshipUpdatePayload(
+        this.lastSentSpaceship,
+        spaceship,
+      );
+      this.lastSentSpaceship = spaceship;
+      if (!update) return;
+
+      sendJson(this.socket, {
+        type: 'ship:update',
+        spaceship: update,
+      });
+    } catch (error) {
+      console.error('Failed to send ship update', error);
+      sendJson(this.socket, {
+        type: 'error',
+        error: 'Failed to update spaceship',
+      });
     }
   }
 
@@ -115,7 +174,6 @@ export class SpaceshipSocketConnection {
       sendJson(this.socket, {
         type: 'world:info',
         requestId: options.requestId,
-        spaceship: this.session.getSpaceshipDto(),
         ...world,
       });
     } catch (error) {
@@ -188,7 +246,7 @@ export class SpaceshipSocketConnection {
         }
 
         this.hasPendingPersist = false;
-        void this.sendWorldInfo();
+        void this.sendShipUpdate();
         return;
       }
 
@@ -202,7 +260,7 @@ export class SpaceshipSocketConnection {
           thrusters.some(
             (thruster) =>
               typeof thruster?.powerPercent !== 'number' ||
-              typeof thruster?.durationSeconds !== 'number',
+              typeof thruster?.active !== 'boolean',
           )
         ) {
           throw new Error('Invalid thrusters feature parameters');
@@ -216,14 +274,14 @@ export class SpaceshipSocketConnection {
         }
 
         this.hasPendingPersist = false;
-        void this.sendWorldInfo();
+        void this.sendShipUpdate();
         return;
       }
 
       if (message.type === 'spaceship:stop-active-feature') {
         await this.session.stopActiveFeature();
         this.hasPendingPersist = false;
-        void this.sendWorldInfo();
+        void this.sendShipUpdate();
         return;
       }
 
@@ -271,9 +329,10 @@ export class SpaceshipSocketConnection {
         }
 
         this.hasPendingPersist = false;
+        this.lastSentSpaceship = this.session.getSpaceshipDto();
         sendJson(this.socket, {
-          type: 'spaceship:info',
-          spaceship: this.session.getSpaceshipDto(),
+          type: 'ship:info',
+          spaceship: this.lastSentSpaceship,
         });
         return;
       }
@@ -362,7 +421,86 @@ export class SpaceshipSocketConnection {
 
   private close() {
     clearInterval(this.infoInterval);
+    clearInterval(this.shipUpdateInterval);
     clearInterval(this.persistInterval);
     void this.persistSpaceship();
   }
+}
+
+type SpaceshipUpdatePayload = Partial<
+  Omit<SpaceshipDto, 'activeFeature' | 'inventory' | 'stats'>
+> & {
+  activeFeature?: SpaceshipActiveFeature | null;
+  inventory?: Partial<SpaceshipInventory>;
+  stats?: Partial<SpaceshipStats>;
+};
+
+function getSpaceshipUpdatePayload(
+  previous: SpaceshipDto | undefined,
+  next: SpaceshipDto,
+): SpaceshipUpdatePayload | undefined {
+  if (!previous) return next;
+
+  const update: SpaceshipUpdatePayload = {};
+
+  if (!isEqual(previous.securityCode, next.securityCode)) {
+    update.securityCode = next.securityCode;
+  }
+  if (!isEqual(previous.position, next.position)) {
+    update.position = next.position;
+  }
+  if (!isEqual(previous.positionCapturedAt, next.positionCapturedAt)) {
+    update.positionCapturedAt = next.positionCapturedAt;
+  }
+  if (!isEqual(previous.direction, next.direction)) {
+    update.direction = next.direction;
+  }
+  if (!isEqual(previous.speed, next.speed)) {
+    update.speed = next.speed;
+  }
+  if (!isEqual(previous.velocity, next.velocity)) {
+    update.velocity = next.velocity;
+  }
+  if (!isEqual(previous.motionState, next.motionState)) {
+    update.motionState = next.motionState;
+  }
+  if (!isEqual(previous.activeFeature, next.activeFeature)) {
+    update.activeFeature = next.activeFeature ?? null;
+  }
+  if (!isEqual(previous.simulatedAt, next.simulatedAt)) {
+    update.simulatedAt = next.simulatedAt;
+  }
+
+  const stats = getObjectUpdate(previous.stats, next.stats);
+  if (stats) update.stats = stats;
+
+  const inventory = getObjectUpdate(previous.inventory, next.inventory);
+  if (inventory) update.inventory = inventory;
+
+  return Object.keys(update).length > 0 ? update : undefined;
+}
+
+function getObjectUpdate<T extends Record<string, unknown>>(
+  previous: T | undefined,
+  next: T | undefined,
+): Partial<T> | undefined {
+  if (!next) return previous ? ({} satisfies Partial<T>) : undefined;
+
+  const update: Partial<T> = {};
+  const keys = new Set([
+    ...Object.keys(previous ?? {}),
+    ...Object.keys(next),
+  ] as (keyof T)[]);
+
+  keys.forEach((key) => {
+    if (!isEqual(previous?.[key], next[key])) {
+      update[key] = next[key];
+    }
+  });
+
+  return Object.keys(update).length > 0 ? update : undefined;
+}
+
+function isEqual(left: unknown, right: unknown) {
+  return JSON.stringify(left) === JSON.stringify(right);
 }

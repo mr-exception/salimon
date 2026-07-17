@@ -12,10 +12,12 @@ export const tickingState: {
   tickPromise: Promise<TickResult> | undefined;
   sandbox: WorldSandbox | undefined;
   unsubscribeFromSandboxTicks: (() => void) | undefined;
+  unsubscribeFromSandboxCrashes: (() => void) | undefined;
 } = {
   timer: undefined,
   startPromise: undefined,
   tickPromise: undefined,
   sandbox: undefined,
   unsubscribeFromSandboxTicks: undefined,
+  unsubscribeFromSandboxCrashes: undefined,
 };

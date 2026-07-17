@@ -619,10 +619,7 @@ function calculateSpaceshipActiveThrustAcceleration(motion: {
   ) {
     const acceleration = { x: 0, y: 0 };
     activeFeature.thrusters.forEach((thruster, index) => {
-      if (
-        activeFeature.elapsedSeconds >= thruster.durationSeconds ||
-        thruster.powerPercent <= 0
-      ) {
+      if (!thruster.active || thruster.powerPercent <= 0) {
         return;
       }
 
@@ -948,12 +945,10 @@ function advanceActiveFeature(elapsedSeconds: number) {
     activeFeature?.type === 'manual-force'
   ) {
     const nextElapsedSeconds = activeFeature.elapsedSeconds + elapsedSeconds;
-    store.set(
-      spaceshipActiveFeatureAtom,
-      nextElapsedSeconds >= activeFeature.durationSeconds
-        ? undefined
-        : { ...activeFeature, elapsedSeconds: nextElapsedSeconds },
-    );
+    store.set(spaceshipActiveFeatureAtom, {
+      ...activeFeature,
+      elapsedSeconds: nextElapsedSeconds,
+    });
     return;
   }
 

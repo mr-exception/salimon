@@ -3,6 +3,8 @@ import { tickingState } from './state';
 export function stop() {
   tickingState.unsubscribeFromSandboxTicks?.();
   tickingState.unsubscribeFromSandboxTicks = undefined;
+  tickingState.unsubscribeFromSandboxCrashes?.();
+  tickingState.unsubscribeFromSandboxCrashes = undefined;
   tickingState.sandbox?.stop();
   tickingState.sandbox = undefined;
 

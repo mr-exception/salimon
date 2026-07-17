@@ -18,7 +18,7 @@ export async function sendSpaceshipInfo(
     }
 
     sendJson(socket, {
-      type: 'spaceship:info',
+      type: 'ship:info',
       spaceship: SpaceshipService.toSpaceshipDto(spaceship),
     });
   } catch (error) {

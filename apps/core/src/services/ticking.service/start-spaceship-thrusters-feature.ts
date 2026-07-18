@@ -1,18 +1,8 @@
 import type { SpaceshipDocument } from '@models';
 import { RepositoryService } from '../repository.service';
-import { SpaceshipService } from '../spaceship.service';
-import {
-  SPACESHIP_LAUNCH_CLEARANCE_METERS,
-  SPACESHIP_RADIUS_METERS,
-} from './constants';
-import { findClosestReference } from './find-closest-reference';
-import {
-  createThrustersFeature,
-  getBodyPositions,
-  getBodyVelocity,
-} from './get-spaceship-update';
-import { loadWorldSnapshot } from './load-world-snapshot';
-import { updateSpaceship } from './update-spaceship';
+import { tickingState } from './state';
+
+const THRUSTER_COUNT = 4;
 
 export async function startSpaceshipThrustersFeature(
   spaceship: SpaceshipDocument,
@@ -20,106 +10,58 @@ export async function startSpaceshipThrustersFeature(
     thrusters: { powerPercent: number; active: boolean }[];
   },
 ) {
+  if (spaceship.motionState === 'crashed') return undefined;
+
+  const thrusters = normalizeThrusters(params.thrusters);
   const simulatedAt = new Date();
-  const world = await loadWorldSnapshot();
-  const currentSpaceship = await updateSpaceship(spaceship, simulatedAt, world);
-  const motionState =
-    currentSpaceship.motionState ??
-    (currentSpaceship.speed === '0' ? 'landed' : 'flying');
-  const isLaunchingFromSurface = motionState !== 'flying';
-  const currentReferenceName = currentSpaceship.position.relativeTo;
-  const currentReferenceBody = currentReferenceName
-    ? world.bodiesByName.get(currentReferenceName)
-    : undefined;
-  const currentReferencePosition = currentReferenceName
-    ? getBodyPositions(world, simulatedAt).get(currentReferenceName)
-    : undefined;
-  const currentReferenceVelocity =
-    currentReferenceName && currentReferenceBody
-      ? getBodyVelocity(world, currentReferenceName, simulatedAt)
-      : undefined;
-  const relativePosition = {
-    x: Number(currentSpaceship.position.x),
-    y: Number(currentSpaceship.position.y),
-  };
-  const absolutePosition = currentReferencePosition
-    ? {
-        x: currentReferencePosition.x + relativePosition.x,
-        y: currentReferencePosition.y + relativePosition.y,
-      }
-    : relativePosition;
-  const relativeVelocity =
-    SpaceshipService.getSpaceshipVelocity(currentSpaceship);
-  const worldVelocity = currentReferenceVelocity
-    ? {
-        x: currentReferenceVelocity.x + relativeVelocity.x,
-        y: currentReferenceVelocity.y + relativeVelocity.y,
-      }
-    : relativeVelocity;
-  const planningSpaceship = {
-    ...currentSpaceship,
-    position: {
-      x: Math.round(absolutePosition.x).toString(),
-      y: Math.round(absolutePosition.y).toString(),
+  const snapshot = tickingState.sandbox?.startSpaceshipThrusters(
+    spaceship.securityCode,
+    thrusters,
+    simulatedAt.getTime(),
+  );
+  if (!snapshot) return undefined;
+
+  return RepositoryService.updatePropagatedSpaceship(spaceship, {
+    activeFeature: {
+      type: 'thrusters',
+      thrusters,
+      elapsedSeconds: 0,
     },
-    velocity: worldVelocity,
-  };
-  const launchReference =
-    isLaunchingFromSurface &&
-    currentReferenceBody &&
-    currentReferencePosition &&
-    currentReferenceVelocity
-      ? {
-          body: currentReferenceBody,
-          position: currentReferencePosition,
-          velocity: currentReferenceVelocity,
-          surfaceDistance: 0,
-        }
-      : findClosestReference(planningSpaceship, simulatedAt, world);
-  const activeFeature = createThrustersFeature(
-    planningSpaceship,
-    params.thrusters,
-  );
-  if (!activeFeature) return undefined;
-
-  const referencePosition = launchReference?.position;
-  const referenceBody = launchReference?.body;
-  const launchRelativePosition = referencePosition
-    ? {
-        x: absolutePosition.x - referencePosition.x,
-        y: absolutePosition.y - referencePosition.y,
-      }
-    : absolutePosition;
-  const relativeRadius = Math.hypot(
-    launchRelativePosition.x,
-    launchRelativePosition.y,
-  );
-  const launchRadius =
-    isLaunchingFromSurface && referenceBody && relativeRadius > 0
-      ? Number(referenceBody.radius) +
-        SPACESHIP_RADIUS_METERS +
-        SPACESHIP_LAUNCH_CLEARANCE_METERS
-      : relativeRadius;
-  const launchPosition =
-    referencePosition && relativeRadius > 0
-      ? {
-          x: (launchRelativePosition.x / relativeRadius) * launchRadius,
-          y: (launchRelativePosition.y / relativeRadius) * launchRadius,
-        }
-      : launchRelativePosition;
-  const worldPosition = referencePosition
-    ? {
-        x: Math.round(referencePosition.x + launchPosition.x).toString(),
-        y: Math.round(referencePosition.y + launchPosition.y).toString(),
-      }
-    : currentSpaceship.position;
-
-  return RepositoryService.updatePropagatedSpaceship(currentSpaceship, {
-    activeFeature,
     motionState: 'flying',
-    position: worldPosition,
-    velocity: worldVelocity,
+    position: snapshot.position,
+    velocity: snapshot.velocity,
+    speed: snapshot.speed,
+    direction: snapshot.direction,
     simulatedAt,
     updatedAt: simulatedAt,
   });
+}
+
+function normalizeThrusters(
+  thrusters: { powerPercent: number; active: boolean }[],
+) {
+  if (!Array.isArray(thrusters)) {
+    throw new Error('Invalid spaceship thrusters.');
+  }
+
+  const normalizedThrusters = thrusters
+    .slice(0, THRUSTER_COUNT)
+    .map((thruster) => ({
+      powerPercent: Number(thruster.powerPercent),
+      active: Boolean(thruster.active),
+    }));
+
+  if (
+    normalizedThrusters.length !== THRUSTER_COUNT ||
+    normalizedThrusters.some(
+      (thruster) =>
+        !Number.isFinite(thruster.powerPercent) ||
+        thruster.powerPercent < 0 ||
+        thruster.powerPercent > 100,
+    )
+  ) {
+    throw new Error('Invalid spaceship thrusters.');
+  }
+
+  return normalizedThrusters;
 }

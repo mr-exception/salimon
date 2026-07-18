@@ -5,6 +5,9 @@ export const SANDBOX_WORLD_BODY_TICK_MS = 30_000;
 export const SANDBOX_SPACESHIP_TICK_MS = 5_000;
 export const DEFAULT_SPACESHIP_MASS_KG = 10_000;
 export const DEFAULT_SPACESHIP_RADIUS_METERS = 200;
+export const SANDBOX_SPACESHIP_LAUNCH_CLEARANCE_METERS = 1;
+export const SANDBOX_SPACESHIP_THRUSTER_COUNT = 4;
+export const SANDBOX_MAX_ENGINE_THRUST_N = 1_000_000;
 
 export type SandboxNumericValue = bigint | number | string;
 
@@ -38,6 +41,7 @@ export type SandboxSpaceshipLike = {
   updatedAt?: Date;
   mass?: SandboxNumericValue;
   radius?: SandboxNumericValue;
+  activeFeature?: unknown;
 };
 
 export type SandboxBodySnapshot = {
@@ -55,6 +59,21 @@ export type SandboxSpaceshipSnapshot = {
   direction: number;
   simulatedAt: Date;
   updatedAt: Date;
+};
+
+export type SandboxSpaceshipThruster = {
+  powerPercent: number;
+  active: boolean;
+};
+
+export type SandboxSpaceshipTargetSpeedPlan = {
+  targetSpeedMetersPerSecond: number;
+  maximumThrustPercent: number;
+  targetDirection?: number;
+  targetVelocity: SandboxVector;
+  maximumAcceleration: number;
+  durationSeconds: number;
+  elapsedSeconds: number;
 };
 
 type BodyReference = {
@@ -139,7 +158,7 @@ export class WorldSandbox extends SandBox {
 
     this.spaceshipCodesByObjectId.set(id, spaceship.securityCode);
 
-    return this.addObject({
+    const object = this.addObject({
       id,
       name: spaceship.securityCode,
       kind: 'spaceship',
@@ -160,6 +179,10 @@ export class WorldSandbox extends SandBox {
         relativeTo: spaceship.position.relativeTo,
       },
     });
+
+    this.restoreSpaceshipActiveForce(object, spaceship.activeFeature);
+
+    return object;
   }
 
   getBodySnapshot(object: SandboxObject, timestampMs = object.capturedAt) {
@@ -220,11 +243,310 @@ export class WorldSandbox extends SandBox {
     return this.spaceshipCodesByObjectId.get(object.id);
   }
 
+  startSpaceshipThrusters(
+    securityCode: string,
+    thrusters: readonly SandboxSpaceshipThruster[],
+    timestampMs = Date.now(),
+  ) {
+    const object = this.getObject(
+      WorldSandbox.getSpaceshipObjectId(securityCode),
+    );
+    if (!object) return undefined;
+
+    const normalizedThrusters = this.normalizeThrusters(thrusters);
+    const force = this.getThrusterForce(normalizedThrusters);
+    if (!force) return undefined;
+
+    this.launchSpaceshipIfNeeded(object);
+    object.metadata = {
+      ...object.metadata,
+      motionState: 'flying',
+      relativeTo: undefined,
+    };
+    object.force({
+      id: 'spaceship:thrusters',
+      ...force,
+      durationMs: Number.MAX_SAFE_INTEGER,
+    });
+    object.capturedAt = timestampMs;
+
+    return this.getSpaceshipSnapshot(object, timestampMs);
+  }
+
+  startSpaceshipTargetSpeed(
+    securityCode: string,
+    params: {
+      targetSpeedMetersPerSecond: number;
+      maximumThrustPercent: number;
+      targetDirection?: number;
+    },
+    timestampMs = Date.now(),
+  ) {
+    const object = this.getObject(
+      WorldSandbox.getSpaceshipObjectId(securityCode),
+    );
+    if (!object) return undefined;
+
+    const plan = this.getTargetSpeedPlan(object, params);
+    if (!plan) return undefined;
+
+    this.launchSpaceshipIfNeeded(object);
+    object.metadata = {
+      ...object.metadata,
+      motionState: 'flying',
+      relativeTo: undefined,
+    };
+    const velocity = object.velocity ?? { x: 0, y: 0 };
+    const velocityChange = WorldSandbox.subtract(plan.targetVelocity, velocity);
+    const changeMagnitude = Math.hypot(velocityChange.x, velocityChange.y);
+    if (changeMagnitude === 0) return undefined;
+
+    const forceMagnitude = object.mass * plan.maximumAcceleration;
+    object.force({
+      id: 'spaceship:target-speed',
+      x: (velocityChange.x / changeMagnitude) * forceMagnitude,
+      y: (velocityChange.y / changeMagnitude) * forceMagnitude,
+      durationMs: plan.durationSeconds * 1_000,
+    });
+    object.capturedAt = timestampMs;
+
+    return {
+      plan,
+      snapshot: this.getSpaceshipSnapshot(object, timestampMs),
+    };
+  }
+
+  stopSpaceshipForce(securityCode: string, timestampMs = Date.now()) {
+    const object = this.getObject(
+      WorldSandbox.getSpaceshipObjectId(securityCode),
+    );
+    if (!object) return undefined;
+
+    object.force({ x: 0, y: 0, durationMs: 0 });
+    object.capturedAt = timestampMs;
+    return this.getSpaceshipSnapshot(object, timestampMs);
+  }
+
+  crashSpaceship(securityCode: string, timestampMs = Date.now()) {
+    const object = this.getObject(
+      WorldSandbox.getSpaceshipObjectId(securityCode),
+    );
+    if (!object) return undefined;
+
+    object.velocity = { x: 0, y: 0 };
+    object.force({ x: 0, y: 0, durationMs: 0 });
+    object.capturedAt = timestampMs;
+    object.metadata = {
+      ...object.metadata,
+      motionState: 'crashed',
+    };
+    return this.getSpaceshipSnapshot(object, timestampMs);
+  }
+
+  hasActiveForce(object: SandboxObject) {
+    return object.activeForce !== undefined;
+  }
+
   private static toVector(position: SandboxSerializedPosition): SandboxVector {
     return {
       x: Number(position.x),
       y: Number(position.y),
     };
+  }
+
+  private normalizeThrusters(thrusters: readonly SandboxSpaceshipThruster[]) {
+    const normalizedThrusters = thrusters
+      .slice(0, SANDBOX_SPACESHIP_THRUSTER_COUNT)
+      .map((thruster) => ({
+        powerPercent: Number(thruster.powerPercent),
+        active: Boolean(thruster.active),
+      }));
+
+    if (
+      normalizedThrusters.length !== SANDBOX_SPACESHIP_THRUSTER_COUNT ||
+      normalizedThrusters.some(
+        (thruster) =>
+          !Number.isFinite(thruster.powerPercent) ||
+          thruster.powerPercent < 0 ||
+          thruster.powerPercent > 100,
+      )
+    ) {
+      throw new Error('Invalid spaceship thrusters.');
+    }
+
+    return normalizedThrusters;
+  }
+
+  private getThrusterForce(thrusters: readonly SandboxSpaceshipThruster[]) {
+    const force = { x: 0, y: 0 };
+
+    thrusters.forEach((thruster, index) => {
+      if (!thruster.active || thruster.powerPercent <= 0) return;
+
+      const thrustN =
+        SANDBOX_MAX_ENGINE_THRUST_N * (thruster.powerPercent / 100);
+      if (index === 0) force.y += thrustN;
+      if (index === 1) force.x -= thrustN;
+      if (index === 2) force.y -= thrustN;
+      if (index === 3) force.x += thrustN;
+    });
+
+    return force.x === 0 && force.y === 0 ? undefined : force;
+  }
+
+  private getTargetSpeedPlan(
+    object: SandboxObject,
+    params: {
+      targetSpeedMetersPerSecond: number;
+      maximumThrustPercent: number;
+      targetDirection?: number;
+    },
+  ): SandboxSpaceshipTargetSpeedPlan | undefined {
+    const targetSpeedMetersPerSecond = Number(
+      params.targetSpeedMetersPerSecond,
+    );
+    const maximumThrustPercent = Number(params.maximumThrustPercent);
+    if (
+      !Number.isFinite(targetSpeedMetersPerSecond) ||
+      targetSpeedMetersPerSecond < 0 ||
+      !Number.isFinite(maximumThrustPercent) ||
+      maximumThrustPercent <= 0 ||
+      maximumThrustPercent > 100 ||
+      (params.targetDirection !== undefined &&
+        !Number.isFinite(params.targetDirection))
+    ) {
+      throw new Error('Invalid target speed feature parameters.');
+    }
+
+    const velocity = object.velocity ?? { x: 0, y: 0 };
+    const currentSpeed = Math.hypot(velocity.x, velocity.y);
+    const direction =
+      params.targetDirection ??
+      (currentSpeed > 0 ? Math.atan2(velocity.y, velocity.x) : 0);
+    const targetVelocity = {
+      x: Math.cos(direction) * targetSpeedMetersPerSecond,
+      y: Math.sin(direction) * targetSpeedMetersPerSecond,
+    };
+    const maximumAcceleration =
+      (SANDBOX_MAX_ENGINE_THRUST_N / object.mass) *
+      (maximumThrustPercent / 100);
+    const velocityChange = WorldSandbox.subtract(targetVelocity, velocity);
+    const durationSeconds =
+      Math.hypot(velocityChange.x, velocityChange.y) / maximumAcceleration;
+
+    if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) {
+      return undefined;
+    }
+
+    return {
+      targetSpeedMetersPerSecond,
+      maximumThrustPercent,
+      ...(params.targetDirection === undefined
+        ? {}
+        : { targetDirection: params.targetDirection }),
+      targetVelocity,
+      maximumAcceleration,
+      durationSeconds,
+      elapsedSeconds: 0,
+    };
+  }
+
+  private launchSpaceshipIfNeeded(object: SandboxObject) {
+    if (object.metadata?.motionState === 'flying') return;
+
+    const relativeTo =
+      typeof object.metadata?.relativeTo === 'string'
+        ? object.metadata.relativeTo
+        : undefined;
+    const center = relativeTo
+      ? this.getObject(WorldSandbox.getBodyObjectId(relativeTo))
+      : undefined;
+    if (!center) return;
+
+    const relativePosition = WorldSandbox.subtract(
+      object.position,
+      center.position,
+    );
+    const relativeRadius = Math.hypot(relativePosition.x, relativePosition.y);
+    if (relativeRadius === 0) return;
+
+    const launchRadius =
+      center.radius + object.radius + SANDBOX_SPACESHIP_LAUNCH_CLEARANCE_METERS;
+    const launchPosition = {
+      x: (relativePosition.x / relativeRadius) * launchRadius,
+      y: (relativePosition.y / relativeRadius) * launchRadius,
+    };
+
+    object.position = WorldSandbox.add(center.position, launchPosition);
+    object.velocity = center.velocity ? { ...center.velocity } : { x: 0, y: 0 };
+  }
+
+  private restoreSpaceshipActiveForce(
+    object: SandboxObject,
+    activeFeature: unknown,
+  ) {
+    if (!activeFeature || typeof activeFeature !== 'object') return;
+
+    const feature = activeFeature as {
+      type?: unknown;
+      thrusters?: unknown;
+      targetVelocity?: unknown;
+      maximumAcceleration?: unknown;
+      durationSeconds?: unknown;
+      elapsedSeconds?: unknown;
+    };
+    if (feature.type === 'thrusters' || feature.type === 'manual-force') {
+      if (!Array.isArray(feature.thrusters)) return;
+
+      const force = this.getThrusterForce(
+        this.normalizeThrusters(feature.thrusters),
+      );
+      if (!force) return;
+
+      object.force({
+        id: 'spaceship:thrusters',
+        ...force,
+        durationMs: Number.MAX_SAFE_INTEGER,
+      });
+      return;
+    }
+
+    if (feature.type !== 'target-speed') return;
+
+    const targetVelocity = feature.targetVelocity;
+    if (
+      !targetVelocity ||
+      typeof targetVelocity !== 'object' ||
+      typeof (targetVelocity as SandboxVector).x !== 'number' ||
+      typeof (targetVelocity as SandboxVector).y !== 'number' ||
+      typeof feature.maximumAcceleration !== 'number' ||
+      typeof feature.durationSeconds !== 'number'
+    ) {
+      return;
+    }
+
+    const velocity = object.velocity ?? { x: 0, y: 0 };
+    const velocityChange = WorldSandbox.subtract(
+      targetVelocity as SandboxVector,
+      velocity,
+    );
+    const changeMagnitude = Math.hypot(velocityChange.x, velocityChange.y);
+    const remainingSeconds = Math.max(
+      0,
+      feature.durationSeconds -
+        (typeof feature.elapsedSeconds === 'number'
+          ? feature.elapsedSeconds
+          : 0),
+    );
+    if (changeMagnitude === 0 || remainingSeconds === 0) return;
+
+    const forceMagnitude = object.mass * feature.maximumAcceleration;
+    object.force({
+      id: 'spaceship:target-speed',
+      x: (velocityChange.x / changeMagnitude) * forceMagnitude,
+      y: (velocityChange.y / changeMagnitude) * forceMagnitude,
+      durationMs: remainingSeconds * 1_000,
+    });
   }
 
   private static add(left: SandboxVector, right: SandboxVector): SandboxVector {

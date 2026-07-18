@@ -106,18 +106,15 @@ async function registerSpaceshipCrash(
       };
   const updatedAt = new Date();
 
-  spaceshipObject.velocity = { x: 0, y: 0 };
-  spaceshipObject.activeForce = undefined;
-  spaceshipObject.capturedAt = updatedAt.getTime();
-  spaceshipObject.metadata = {
-    ...spaceshipObject.metadata,
-    motionState: 'crashed',
-    relativeTo: crashedIntoBody?.name,
-  };
+  sandbox.crashSpaceship(securityCode, updatedAt.getTime());
 
   await RepositoryService.updateSpaceships((spaceshipsBySecurityCode) => {
     const spaceship = spaceshipsBySecurityCode.get(securityCode);
     if (!spaceship || spaceship.motionState === 'crashed') return 0;
+
+    const motionState =
+      spaceship.motionState ?? (spaceship.speed === '0' ? 'landed' : 'flying');
+    if (motionState !== 'flying') return 0;
 
     const stats = SpaceshipService.normalizeSpaceshipStats(spaceship.stats);
     spaceshipsBySecurityCode.set(securityCode, {
@@ -177,6 +174,9 @@ async function syncSandboxObject(sandbox: WorldSandbox, object: SandboxObject) {
         motionState === 'flying'
           ? spaceshipSnapshot.direction
           : spaceship.direction,
+      activeFeature: sandbox.hasActiveForce(object)
+        ? spaceship.activeFeature
+        : undefined,
       simulatedAt: spaceshipSnapshot.simulatedAt,
       updatedAt: spaceshipSnapshot.updatedAt,
     });

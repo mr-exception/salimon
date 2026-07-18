@@ -1,44 +1,36 @@
 import type { SpaceshipDocument } from '@models';
+import { WorldSandbox } from '@repo/sandbox';
 import { RepositoryService } from '../repository.service';
-import { getAbsoluteSpaceshipUpdate } from './get-absolute-spaceship-update';
-import { getSpaceshipUpdate } from './get-spaceship-update';
-import { loadWorldSnapshot } from './load-world-snapshot';
+import { start } from './start';
 import { tickingState } from './state';
-import type { WorldSnapshot } from './types';
 
 export async function updateSpaceship(
   spaceship: SpaceshipDocument,
   simulatedAt = new Date(),
-  suppliedWorld?: WorldSnapshot,
 ) {
-  const world = suppliedWorld ?? (await loadWorldSnapshot());
-  const absoluteUpdate = getAbsoluteSpaceshipUpdate(
-    spaceship,
-    simulatedAt,
-    world,
-  );
-  const currentSpaceship = absoluteUpdate
-    ? {
-        ...spaceship,
-        ...absoluteUpdate,
-        position: absoluteUpdate.position ?? spaceship.position,
-        velocity: absoluteUpdate.velocity ?? spaceship.velocity,
-      }
-    : spaceship;
-  const update = getSpaceshipUpdate(currentSpaceship, simulatedAt, world);
-  if (!absoluteUpdate && !update) return spaceship;
-  const updatedSpaceship = await RepositoryService.updatePropagatedSpaceship(
-    spaceship,
-    {
-      ...absoluteUpdate,
-      ...update,
-      position: update?.position ?? absoluteUpdate?.position,
-      velocity: update?.velocity ?? absoluteUpdate?.velocity,
-      stats: update?.stats ?? absoluteUpdate?.stats,
-    },
-  );
+  await start();
 
-  tickingState.sandbox?.loadSpaceship(updatedSpaceship);
+  const sandbox = tickingState.sandbox;
+  if (!sandbox) return spaceship;
 
-  return updatedSpaceship;
+  const objectId = WorldSandbox.getSpaceshipObjectId(spaceship.securityCode);
+  const object =
+    sandbox.getObject(objectId) ?? sandbox.loadSpaceship(spaceship);
+  if (!object) return spaceship;
+
+  sandbox.tick(simulatedAt.getTime());
+  const snapshot = sandbox.getSpaceshipSnapshot(object, simulatedAt.getTime());
+  if (!snapshot) return spaceship;
+
+  return RepositoryService.updatePropagatedSpaceship(spaceship, {
+    position: snapshot.position,
+    velocity: snapshot.velocity,
+    speed: snapshot.speed,
+    direction: snapshot.direction,
+    activeFeature: sandbox.hasActiveForce(object)
+      ? spaceship.activeFeature
+      : undefined,
+    simulatedAt: snapshot.simulatedAt,
+    updatedAt: snapshot.updatedAt,
+  });
 }

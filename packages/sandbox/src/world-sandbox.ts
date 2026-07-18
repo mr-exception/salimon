@@ -486,11 +486,28 @@ export class WorldSandbox extends SandBox {
 
     const feature = activeFeature as {
       type?: unknown;
+      thrusters?: unknown;
       targetVelocity?: unknown;
       maximumAcceleration?: unknown;
       durationSeconds?: unknown;
       elapsedSeconds?: unknown;
     };
+    if (feature.type === 'thrusters' || feature.type === 'manual-force') {
+      if (!Array.isArray(feature.thrusters)) return;
+
+      const force = WorldSandbox.getThrusterForce(
+        feature.thrusters as { powerPercent: number; active: boolean }[],
+      );
+      if (!force) return;
+
+      object.force({
+        id: 'spaceship:thrusters',
+        ...force,
+        durationMs: Number.MAX_SAFE_INTEGER,
+      });
+      return;
+    }
+
     if (feature.type !== 'target-speed') return;
 
     const targetVelocity = feature.targetVelocity;

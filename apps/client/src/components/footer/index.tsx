@@ -32,10 +32,10 @@ import {
   useInventory,
   useModules,
   useSpaceshipActiveFeature,
+  useSpaceshipAbsoluteSpeed,
   useSpaceshipFuelKns,
   useSpaceshipHullDurability,
   useSpaceshipMotionState,
-  useSpaceshipSpeed,
   useSpaceshipThrusterDurability,
   type Inventory,
   type ModuleAttribute,
@@ -461,7 +461,7 @@ export function Footer({
   unreadMessageCount = 0,
   onPredictionChange,
 }: FooterProps) {
-  const speed = useSpaceshipSpeed();
+  const speed = useSpaceshipAbsoluteSpeed();
   const fuelKns = useSpaceshipFuelKns();
   const hullDurability = useSpaceshipHullDurability();
   const thrusterDurability = useSpaceshipThrusterDurability();

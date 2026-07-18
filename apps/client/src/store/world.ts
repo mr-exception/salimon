@@ -73,6 +73,7 @@ const STAR_COLORS = [0xfef08a, 0xfdba74, 0x93c5fd, 0xfca5a5];
 const store = getDefaultStore();
 
 const spaceshipSpeedAtom = atom(0);
+const spaceshipAbsoluteSpeedAtom = atom(0);
 const spaceshipTargetDirectionAtom = atom<number | undefined>(undefined);
 const spaceshipFuelKnsAtom = atom(INITIAL_SPACESHIP_FUEL_KNS);
 const spaceshipHullDurabilityAtom = atom(MAX_HULL_DURABILITY);
@@ -118,6 +119,14 @@ export function useSpaceshipSpeed() {
 
 export function useSetSpaceshipSpeed() {
   return useSetAtom(spaceshipSpeedAtom);
+}
+
+export function useSpaceshipAbsoluteSpeed() {
+  return useAtomValue(spaceshipAbsoluteSpeedAtom);
+}
+
+export function useSetSpaceshipAbsoluteSpeed() {
+  return useSetAtom(spaceshipAbsoluteSpeedAtom);
 }
 
 export function useSpaceshipTargetDirection() {
@@ -375,6 +384,7 @@ function applyWorldSystems(data: SerializedWorldSystems) {
     advanceBodyPositionToNow(body);
   });
   rebuildWorldBodyByName();
+  syncSpaceshipAbsoluteSpeed();
   listeners.forEach((listener) => listener(worldState));
 }
 
@@ -432,6 +442,7 @@ export function hydrateSpaceship(dto: SpaceshipDto) {
   store.set(spaceshipMotionStateAtom, motionState);
   store.set(spaceshipActiveFeatureAtom, dto.activeFeature);
   store.set(spaceshipSpeedAtom, Number(dto.speed));
+  syncSpaceshipAbsoluteSpeed();
   store.set(
     spaceshipFuelKnsAtom,
     dto.stats?.fuelKns ?? INITIAL_SPACESHIP_FUEL_KNS,
@@ -853,6 +864,11 @@ function getSnapshotTimeMs(value: number | string | undefined) {
   return Number.NaN;
 }
 
+function syncSpaceshipAbsoluteSpeed() {
+  const velocity = getSpaceshipWorldVelocity();
+  store.set(spaceshipAbsoluteSpeedAtom, Math.hypot(velocity.x, velocity.y));
+}
+
 function advanceSpaceshipPosition(elapsedSeconds: number) {
   const motionState = store.get(spaceshipMotionStateAtom);
   if (motionState !== 'flying') return;
@@ -863,6 +879,7 @@ function advanceSpaceshipPosition(elapsedSeconds: number) {
       elapsedSeconds,
     );
     advanceActiveFeature(elapsedSeconds);
+    syncSpaceshipAbsoluteSpeed();
     return;
   }
 
@@ -899,6 +916,7 @@ function advanceSpaceshipPosition(elapsedSeconds: number) {
     spaceshipPositionRemainder,
   );
   advanceActiveFeature(elapsedSeconds);
+  syncSpaceshipAbsoluteSpeed();
 }
 
 function advanceRelativeSpaceshipPosition(

@@ -421,4 +421,76 @@ describe('WorldSandbox collision detection', () => {
     expect(relativePosition?.relativeTo).toBe('Earth');
     expect(relativeRadius).toBeGreaterThan(launchRadius);
   });
+
+  it('restores active spaceship thrusters when loading a persisted flying spaceship', () => {
+    const capturedAt = new Date('2026-01-01T00:00:00.000Z').getTime();
+    const planetRadiusMeters = 6_371_000;
+    const spaceshipMassKg = 10_000;
+    const thrusterPowerPercent = 50;
+    const elapsedSeconds = 5;
+    const sandbox = new WorldSandbox();
+
+    sandbox.loadBody(
+      {
+        name: 'Earth',
+        position: { x: 0, y: 0 },
+        orbitalCenter: null,
+        clockwise: true,
+        speed: 0,
+        mass: 5.972e24,
+        radius: planetRadiusMeters,
+        updatedAt: new Date(capturedAt),
+      },
+      'planet',
+    );
+    sandbox.loadSpaceship({
+      securityCode: 'ship-1',
+      position: {
+        x: (
+          planetRadiusMeters +
+          DEFAULT_SPACESHIP_RADIUS_METERS +
+          SANDBOX_SPACESHIP_LAUNCH_CLEARANCE_METERS +
+          1_000
+        ).toString(),
+        y: '0',
+        relativeTo: 'Earth',
+      },
+      direction: 90,
+      speed: 100,
+      velocity: { x: 100, y: 0 },
+      motionState: 'flying',
+      simulatedAt: new Date(capturedAt),
+      mass: spaceshipMassKg,
+      activeFeature: {
+        type: 'thrusters',
+        thrusters: [
+          { active: false, powerPercent: 0 },
+          { active: false, powerPercent: 0 },
+          { active: false, powerPercent: 0 },
+          { active: true, powerPercent: thrusterPowerPercent },
+        ],
+        elapsedSeconds: 0,
+      },
+    });
+
+    const spaceship = sandbox.getObject(
+      WorldSandbox.getSpaceshipObjectId('ship-1'),
+    );
+    const thrustAcceleration =
+      (SANDBOX_MAX_ENGINE_THRUST_N * (thrusterPowerPercent / 100)) /
+      spaceshipMassKg;
+
+    expect(spaceship?.activeForce).toMatchObject({
+      id: 'spaceship:thrusters',
+      x: SANDBOX_MAX_ENGINE_THRUST_N * (thrusterPowerPercent / 100),
+      y: 0,
+    });
+
+    sandbox.tick(capturedAt + elapsedSeconds * 1_000);
+
+    expect(spaceship?.velocity?.x).toBeGreaterThan(
+      100 + thrustAcceleration * elapsedSeconds * 0.5,
+    );
+    expect(spaceship?.activeForce).toBeDefined();
+  });
 });

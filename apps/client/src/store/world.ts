@@ -290,6 +290,7 @@ type WorldViewportRequest = {
   right?: string;
   top?: string;
   bottom?: string;
+  requiredBodyNames?: string[];
 };
 
 export function setWorldViewportLoader(loader?: WorldViewportLoader) {
@@ -315,6 +316,7 @@ export async function refreshWorldViewport({
   right,
   top,
   bottom,
+  requiredBodyNames,
 }: WorldViewportRequest) {
   const request = {
     x,
@@ -324,6 +326,7 @@ export async function refreshWorldViewport({
     ...(right === undefined ? {} : { right }),
     ...(top === undefined ? {} : { top }),
     ...(bottom === undefined ? {} : { bottom }),
+    ...(requiredBodyNames === undefined ? {} : { requiredBodyNames }),
   };
   const data = worldViewportLoader
     ? await worldViewportLoader(request)
@@ -337,6 +340,7 @@ async function loadWorldViewportFromRest({
   x,
   y,
   radius,
+  requiredBodyNames,
 }: WorldViewportRequest) {
   const apiBaseUrl = (
     import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL
@@ -345,7 +349,14 @@ async function loadWorldViewportFromRest({
   const { data } = await axios.get<SerializedWorldSystems>(
     `${apiBaseUrl}/world/systems`,
     {
-      params: { x, y, radius },
+      params: {
+        x,
+        y,
+        radius,
+        ...(requiredBodyNames
+          ? { requiredBodyNames: requiredBodyNames.join(',') }
+          : {}),
+      },
     },
   );
   return data;
@@ -384,6 +395,7 @@ function applyWorldSystems(data: SerializedWorldSystems) {
     advanceBodyPositionToNow(body);
   });
   rebuildWorldBodyByName();
+  normalizeAttachedSpaceshipPosition();
   syncSpaceshipAbsoluteSpeed();
   listeners.forEach((listener) => listener(worldState));
 }
@@ -416,6 +428,71 @@ export function setActiveWorldBodyNames(names?: Iterable<string>) {
 
 export function setSpaceshipHeading(heading: number) {
   spaceshipState.heading = heading;
+  listeners.forEach((listener) => listener(worldState));
+}
+
+export function startSpaceshipThrusters(
+  thrusters: { powerPercent: number; active: boolean }[],
+) {
+  if (!Array.isArray(thrusters) || thrusters.length === 0) return;
+  if (store.get(spaceshipMotionStateAtom) === 'crashed') return;
+
+  spaceshipVelocity = getInitialSpaceshipWorldVelocity();
+  spaceshipAttachedBodyName = undefined;
+  store.set(spaceshipMotionStateAtom, 'flying');
+  store.set(spaceshipActiveFeatureAtom, {
+    type: 'thrusters',
+    thrusters: thrusters.map((thruster) => ({
+      powerPercent: thruster.powerPercent,
+      active: thruster.active,
+    })),
+    elapsedSeconds: 0,
+  });
+  syncSpaceshipAbsoluteSpeed();
+  listeners.forEach((listener) => listener(worldState));
+}
+
+export function startSpaceshipTargetSpeed(
+  targetSpeedMetersPerSecond: number,
+  maximumThrustPercent: number,
+  targetDirection: number | undefined,
+) {
+  if (
+    store.get(spaceshipMotionStateAtom) === 'crashed' ||
+    targetDirection === undefined
+  ) {
+    return;
+  }
+
+  const preview = getSpaceshipTargetSpeedBurnPreview(
+    targetSpeedMetersPerSecond,
+    maximumThrustPercent,
+    targetDirection,
+  );
+  if (!preview) return;
+
+  spaceshipVelocity = getInitialSpaceshipWorldVelocity();
+  spaceshipAttachedBodyName = undefined;
+  store.set(spaceshipMotionStateAtom, 'flying');
+  store.set(spaceshipActiveFeatureAtom, {
+    type: 'target-speed',
+    targetSpeedMetersPerSecond,
+    maximumThrustPercent,
+    targetDirection,
+    targetVelocity: {
+      x: Math.cos(targetDirection) * targetSpeedMetersPerSecond,
+      y: Math.sin(targetDirection) * targetSpeedMetersPerSecond,
+    },
+    maximumAcceleration: preview.maximumAcceleration,
+    durationSeconds: preview.durationSeconds,
+    elapsedSeconds: 0,
+  });
+  syncSpaceshipAbsoluteSpeed();
+  listeners.forEach((listener) => listener(worldState));
+}
+
+export function stopSpaceshipActiveFeatureLocally() {
+  store.set(spaceshipActiveFeatureAtom, undefined);
   listeners.forEach((listener) => listener(worldState));
 }
 
@@ -462,6 +539,7 @@ export function hydrateSpaceship(dto: SpaceshipDto) {
   );
   store.set(inventoryAtom, normalizeInventory(dto.inventory));
   rebuildWorldBodyByName();
+  normalizeAttachedSpaceshipPosition();
   advanceSpaceshipToNow(dto.positionCapturedAt ?? dto.simulatedAt);
   listeners.forEach((listener) => listener(worldState));
 }
@@ -511,6 +589,7 @@ export function getSpaceshipDto(securityCode: string): SpaceshipDto {
       thrusterDurability: store.get(spaceshipThrusterDurabilityAtom),
     },
     inventory: store.get(inventoryAtom),
+    activeFeature: store.get(spaceshipActiveFeatureAtom),
     simulatedAt: new Date().toISOString(),
   };
 }
@@ -1241,6 +1320,33 @@ function rebuildWorldBodyByName() {
       body,
     ]),
   );
+}
+
+function normalizeAttachedSpaceshipPosition() {
+  const referenceName = spaceshipState.position.relativeTo;
+  if (
+    store.get(spaceshipMotionStateAtom) === 'flying' ||
+    !referenceName ||
+    spaceshipState.position.x !== 0n ||
+    spaceshipState.position.y !== 0n
+  ) {
+    return;
+  }
+
+  const reference = getBodyByName(referenceName);
+  const surfaceOffset =
+    referenceName === EARTH_NAME && !reference
+      ? DEFAULT_SURFACE_OFFSET
+      : reference
+        ? Number(reference.radius) + Number(spaceshipState.radius)
+        : undefined;
+  if (surfaceOffset === undefined) return;
+
+  spaceshipState.position = {
+    ...spaceshipState.position,
+    x: BigInt(surfaceOffset),
+    y: 0n,
+  };
 }
 
 function deserializeBody<T extends Body>(

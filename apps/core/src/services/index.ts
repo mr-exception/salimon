@@ -3,7 +3,5 @@ export * from './contact-replies.service';
 export * from './contacts.service';
 export * from './metrics.service';
 export * from './repository.service';
-export * from './socket.service';
 export * from './spaceship.service';
-export * from './ticking.service';
 export * from './world-viewport.service';

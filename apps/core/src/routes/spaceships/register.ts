@@ -2,14 +2,13 @@ import {
   ContactsService,
   RepositoryService,
   SpaceshipService,
-  TickingService,
 } from '@services';
 import { sendError } from '../../http';
 import type { Request, Response } from 'express';
 
 export async function register(_request: Request, response: Response) {
   try {
-    const spaceship = await TickingService.createSpaceship();
+    const spaceship = SpaceshipService.createSpaceship();
     await RepositoryService.insertSpaceship(spaceship);
     await ContactsService.initializeSpaceshipContacts(spaceship.securityCode);
     response

@@ -98,6 +98,10 @@ export default function App() {
     const refreshUnreadMessages = () => {
       if (!document.hidden && navigator.onLine) void loadUnreadMessages();
     };
+    const unreadRefreshTimer = window.setInterval(
+      refreshUnreadMessages,
+      15_000,
+    );
     const unsubscribe = subscribeToContactMessages((message) => {
       if (message.sender !== 'contact') return;
       setUnreadMessages((current) => {
@@ -119,6 +123,7 @@ export default function App() {
     return () => {
       disposed = true;
       unsubscribe();
+      window.clearInterval(unreadRefreshTimer);
       document.removeEventListener('visibilitychange', refreshUnreadMessages);
       window.removeEventListener('online', refreshUnreadMessages);
     };

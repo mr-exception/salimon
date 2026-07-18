@@ -7,7 +7,7 @@ import type {
   SerializedPosition,
   Velocity,
 } from '@repo/types';
-import { TickingService } from './ticking.service';
+import { RepositoryService } from './repository.service';
 import { resolvePositions } from './world-viewport.service/resolve-positions';
 
 type Coordinate = {
@@ -71,7 +71,7 @@ export class AsteroidService {
   }) {
     const time = params.time ?? new Date();
     const { planets, moons, stars } =
-      await TickingService.getWorldSystemsBodies();
+      await RepositoryService.getWorldSystemsBodies();
     const bodies = [...stars, ...planets, ...moons];
     const bodyByName = new Map(bodies.map((body) => [body.name, body]));
     const positions = resolvePositions(bodies);

@@ -1,4 +1,4 @@
-import type { SpaceshipMotionState } from '@models';
+import type { SpaceshipActiveFeature, SpaceshipMotionState } from '@models';
 import { parseSpaceshipInventory } from './parse-spaceship-inventory';
 import {
   MAX_HULL_DURABILITY,
@@ -36,7 +36,8 @@ export function parseSpaceshipUpdate(body: unknown) {
     throw new Error('position.relativeTo must be a non-empty string');
   }
 
-  const { direction, speed, velocity, motionState, stats } = candidate;
+  const { direction, speed, velocity, motionState, stats, activeFeature } =
+    candidate;
   if (
     typeof direction !== 'number' ||
     !Number.isFinite(direction) ||
@@ -120,8 +121,102 @@ export function parseSpaceshipUpdate(body: unknown) {
       hullDurability,
       thrusterDurability,
     },
+    activeFeature: parseActiveFeature(activeFeature),
     ...(candidate.inventory === undefined
       ? {}
       : { inventory: parseSpaceshipInventory(candidate.inventory) }),
+  };
+}
+
+function parseActiveFeature(value: unknown): SpaceshipActiveFeature | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (!value || typeof value !== 'object') {
+    throw new Error('activeFeature must be an object');
+  }
+
+  const candidate = value as Record<string, unknown>;
+  if (
+    candidate.type === 'thrusters' ||
+    candidate.type === 'manual-force'
+  ) {
+    if (
+      !Array.isArray(candidate.thrusters) ||
+      typeof candidate.elapsedSeconds !== 'number' ||
+      !Number.isFinite(candidate.elapsedSeconds) ||
+      candidate.elapsedSeconds < 0
+    ) {
+      throw new Error('activeFeature thrusters are invalid');
+    }
+
+    return {
+      type: candidate.type,
+      elapsedSeconds: candidate.elapsedSeconds,
+      thrusters: candidate.thrusters.map(parseThruster),
+    };
+  }
+
+  if (candidate.type !== 'target-speed') {
+    throw new Error('activeFeature type is invalid');
+  }
+  if (
+    typeof candidate.targetSpeedMetersPerSecond !== 'number' ||
+    !Number.isFinite(candidate.targetSpeedMetersPerSecond) ||
+    typeof candidate.maximumThrustPercent !== 'number' ||
+    !Number.isFinite(candidate.maximumThrustPercent) ||
+    typeof candidate.maximumAcceleration !== 'number' ||
+    !Number.isFinite(candidate.maximumAcceleration) ||
+    typeof candidate.durationSeconds !== 'number' ||
+    !Number.isFinite(candidate.durationSeconds) ||
+    typeof candidate.elapsedSeconds !== 'number' ||
+    !Number.isFinite(candidate.elapsedSeconds) ||
+    !candidate.targetVelocity ||
+    typeof candidate.targetVelocity !== 'object'
+  ) {
+    throw new Error('activeFeature target speed values are invalid');
+  }
+  const velocity = candidate.targetVelocity as Record<string, unknown>;
+  if (
+    typeof velocity.x !== 'number' ||
+    !Number.isFinite(velocity.x) ||
+    typeof velocity.y !== 'number' ||
+    !Number.isFinite(velocity.y)
+  ) {
+    throw new Error('activeFeature target velocity is invalid');
+  }
+
+  return {
+    type: 'target-speed',
+    targetSpeedMetersPerSecond: candidate.targetSpeedMetersPerSecond,
+    maximumThrustPercent: candidate.maximumThrustPercent,
+    targetDirection:
+      typeof candidate.targetDirection === 'number' &&
+      Number.isFinite(candidate.targetDirection)
+        ? candidate.targetDirection
+        : undefined,
+    targetVelocity: { x: velocity.x, y: velocity.y },
+    maximumAcceleration: candidate.maximumAcceleration,
+    durationSeconds: candidate.durationSeconds,
+    elapsedSeconds: candidate.elapsedSeconds,
+  };
+}
+
+function parseThruster(value: unknown) {
+  if (!value || typeof value !== 'object') {
+    throw new Error('activeFeature thruster must be an object');
+  }
+  const candidate = value as Record<string, unknown>;
+  if (
+    typeof candidate.active !== 'boolean' ||
+    typeof candidate.powerPercent !== 'number' ||
+    !Number.isFinite(candidate.powerPercent) ||
+    candidate.powerPercent < 0 ||
+    candidate.powerPercent > 100
+  ) {
+    throw new Error('activeFeature thruster values are invalid');
+  }
+
+  return {
+    active: candidate.active,
+    powerPercent: candidate.powerPercent,
   };
 }

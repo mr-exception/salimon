@@ -4,7 +4,7 @@ import {
   getApiBaseUrl,
   getStoredSpaceshipSecurityCode,
   SECURITY_CODE_HEADER,
-  sendContactMessageOverSocket,
+  sendContactMessage,
   subscribeToContactMessages,
 } from '@store';
 import { CommunicationsShell } from './components/communications-shell';
@@ -117,6 +117,17 @@ export function Communications({
   }, [loadMessages, selectedContactId]);
 
   useEffect(() => {
+    if (!selectedContactId) return;
+    const timer = window.setInterval(() => {
+      void loadMessages(selectedContactId, cursorRef.current).catch(() => {
+        setError('Unable to refresh messages.');
+      });
+    }, 10_000);
+
+    return () => window.clearInterval(timer);
+  }, [loadMessages, selectedContactId]);
+
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
@@ -126,7 +137,7 @@ export function Communications({
     setIsSending(true);
     setError('');
     try {
-      const message = await sendContactMessageOverSocket({
+      const message = await sendContactMessage({
         contactId: selectedContactId,
         text,
         clientMessageId: crypto.randomUUID(),

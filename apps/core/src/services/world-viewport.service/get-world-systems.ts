@@ -1,5 +1,5 @@
 import type { SerializedWorldSystems } from '@repo/types';
-import { TickingService } from '../ticking.service';
+import { RepositoryService } from '../repository.service';
 import { bodyIntersectsCircle } from './body-intersects-circle';
 import { getSearchArea } from './get-search-area';
 import { groupByOrbitalCenter } from './group-by-orbital-center';
@@ -18,13 +18,17 @@ export async function getWorldSystems(
   options: WorldViewportOptions = {},
 ): Promise<SerializedWorldSystems> {
   const searchArea = getSearchArea(request);
-  const { planets, moons, stars } = await TickingService.getWorldSystemsBodies();
+  const { planets, moons, stars } =
+    await RepositoryService.getWorldSystemsBodies();
   const orbitingBodies = [...planets, ...moons];
   const positions = resolvePositions([...orbitingBodies, ...stars]);
   const center = { x: searchArea.x, y: searchArea.y };
   const planetsByOrbitalCenter = groupByOrbitalCenter(orbitingBodies);
-  const velocities = resolveVelocities([...orbitingBodies, ...stars], positions);
-  const requiredBodyNames = new Set(options.requiredBodyNames ?? []);
+  const velocities = resolveVelocities(
+    [...orbitingBodies, ...stars],
+    positions,
+  );
+  const requiredBodyNames = getRequiredBodyNames(request, options);
   const systems: StarSystem[] = stars
     .map((star) => {
       const isStarRequired = requiredBodyNames.has(star.name);
@@ -84,3 +88,23 @@ export async function getWorldSystems(
   return { systems } as unknown as SerializedWorldSystems;
 }
 
+function getRequiredBodyNames(
+  request: WorldViewportRequest,
+  options: WorldViewportOptions,
+) {
+  const requiredBodyNames = new Set(options.requiredBodyNames ?? []);
+  const requestBodyNames = request.requiredBodyNames;
+  const values = Array.isArray(requestBodyNames)
+    ? requestBodyNames
+    : requestBodyNames
+      ? [requestBodyNames]
+      : [];
+
+  values
+    .flatMap((value) => value.split(','))
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .forEach((value) => requiredBodyNames.add(value));
+
+  return requiredBodyNames;
+}

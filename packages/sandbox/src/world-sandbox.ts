@@ -145,7 +145,13 @@ export class WorldSandbox extends SandBox {
           WorldSandbox.getBodyObjectId(spaceship.position.relativeTo),
         )
       : undefined;
-    const localPosition = WorldSandbox.toVector(spaceship.position);
+    const radius = Number(spaceship.radius ?? DEFAULT_SPACESHIP_RADIUS_METERS);
+    const localPosition = WorldSandbox.normalizeSpaceshipLocalPosition(
+      WorldSandbox.toVector(spaceship.position),
+      center,
+      radius,
+      spaceship.motionState,
+    );
     const position = center
       ? WorldSandbox.add(localPosition, center.position)
       : localPosition;
@@ -162,7 +168,7 @@ export class WorldSandbox extends SandBox {
       name: spaceship.securityCode,
       kind: 'spaceship',
       mass: Number(spaceship.mass ?? DEFAULT_SPACESHIP_MASS_KG),
-      radius: Number(spaceship.radius ?? DEFAULT_SPACESHIP_RADIUS_METERS),
+      radius,
       tickMs: SANDBOX_SPACESHIP_TICK_MS,
       position,
       capturedAt: (
@@ -178,9 +184,7 @@ export class WorldSandbox extends SandBox {
         ...(spaceship.position.relativeTo
           ? { relativePosition: localPosition }
           : {}),
-        ...(spaceship.position.relativeTo
-          ? { relativeVelocity }
-          : {}),
+        ...(spaceship.position.relativeTo ? { relativeVelocity } : {}),
         ...(spaceship.position.relativeTo
           ? {
               relativeObjectId: WorldSandbox.getBodyObjectId(
@@ -460,11 +464,23 @@ export class WorldSandbox extends SandBox {
       object,
       relativeTo,
     );
-    const relativeRadius = Math.hypot(relativePosition.x, relativePosition.y);
-    if (relativeRadius === 0) return;
-
     const minimumLaunchRadius =
       center.radius + object.radius + SANDBOX_SPACESHIP_LAUNCH_CLEARANCE_METERS;
+    const relativeRadius = Math.hypot(relativePosition.x, relativePosition.y);
+    if (relativeRadius === 0) {
+      const launchPosition = { x: minimumLaunchRadius, y: 0 };
+      object.position = WorldSandbox.add(center.position, launchPosition);
+      object.velocity = center.velocity
+        ? { ...center.velocity }
+        : { x: 0, y: 0 };
+      object.metadata = {
+        ...object.metadata,
+        relativePosition: launchPosition,
+        relativeVelocity: { x: 0, y: 0 },
+      };
+      return;
+    }
+
     if (relativeRadius >= minimumLaunchRadius) {
       object.position = WorldSandbox.add(center.position, relativePosition);
       object.velocity = center.velocity
@@ -574,6 +590,27 @@ export class WorldSandbox extends SandBox {
     return {
       x: left.x - right.x,
       y: left.y - right.y,
+    };
+  }
+
+  private static normalizeSpaceshipLocalPosition(
+    position: SandboxVector,
+    center: SandboxObject | undefined,
+    spaceshipRadius: number,
+    motionState: SandboxSpaceshipLike['motionState'],
+  ) {
+    if (
+      !center ||
+      motionState === 'flying' ||
+      position.x !== 0 ||
+      position.y !== 0
+    ) {
+      return position;
+    }
+
+    return {
+      x: center.radius + spaceshipRadius,
+      y: 0,
     };
   }
 

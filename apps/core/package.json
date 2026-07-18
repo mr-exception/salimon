@@ -4,32 +4,29 @@
   "version": "0.0.0",
   "type": "commonjs",
   "scripts": {
-    "predev": "npm run build --workspace @repo/world && npm run build --workspace @repo/sandbox",
+    "predev": "npm run build --workspace @repo/world",
     "dev": "tsx watch src/index.ts",
     "build": "tsc && tsc-alias",
-    "prestart": "npm run build --workspace @repo/world && npm run build --workspace @repo/sandbox",
+    "prestart": "npm run build --workspace @repo/world",
     "start": "node dist/index.js",
     "check-types": "tsc --noEmit",
     "lint": "eslint ."
   },
   "dependencies": {
     "@repo/types": "*",
-    "@repo/sandbox": "*",
     "@repo/world": "*",
     "@typegoose/typegoose": "^13.4.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "mongoose": "^9.7.4",
-    "openai": "^6.45.0",
-    "ws": "^8.21.0"
+    "openai": "^6.45.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^24.12.3",
-    "@types/ws": "^8.18.1",
     "eslint": "^10.3.0",
     "globals": "^17.6.0",
     "tsc-alias": "^1.9.0",

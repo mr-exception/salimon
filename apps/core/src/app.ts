@@ -1,6 +1,11 @@
 import cors from 'cors';
 import express, { type ErrorRequestHandler } from 'express';
-import { contactsRouter, metricsRouter, spaceshipsRouter } from '@routes';
+import {
+  contactsRouter,
+  metricsRouter,
+  spaceshipsRouter,
+  worldRouter,
+} from '@routes';
 import { spaceshipSecurityCode } from './middleware';
 export function createApp() {
   const app = express();
@@ -14,6 +19,7 @@ export function createApp() {
   app.use('/spaceship', spaceshipsRouter);
   app.use('/contacts', contactsRouter);
   app.use('/metrics', metricsRouter);
+  app.use('/world', worldRouter);
 
   const errorHandler: ErrorRequestHandler = (
     error,

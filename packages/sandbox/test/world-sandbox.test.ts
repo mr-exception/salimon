@@ -174,6 +174,51 @@ describe('WorldSandbox collision detection', () => {
     expect(snapshot?.velocity.y).toBe(0);
   });
 
+  it('places a landed spaceship on the right side of its planet when loaded at the center', () => {
+    const capturedAt = new Date('2026-01-01T00:00:00.000Z').getTime();
+    const planetRadiusMeters = 6_371_000;
+    const sandbox = new WorldSandbox();
+
+    sandbox.loadBody(
+      {
+        name: 'Earth',
+        position: { x: 0, y: 0 },
+        orbitalCenter: null,
+        clockwise: true,
+        speed: 0,
+        mass: 5.972e24,
+        radius: planetRadiusMeters,
+        updatedAt: new Date(capturedAt),
+      },
+      'planet',
+    );
+    sandbox.loadSpaceship({
+      securityCode: 'ship-1',
+      position: { x: 0, y: 0, relativeTo: 'Earth' },
+      direction: 0,
+      speed: 0,
+      motionState: 'landed',
+      simulatedAt: new Date(capturedAt),
+    });
+
+    const spaceship = sandbox.getObject(
+      WorldSandbox.getSpaceshipObjectId('ship-1'),
+    );
+    const snapshot = spaceship
+      ? sandbox.getSpaceshipSnapshot(spaceship, capturedAt)
+      : undefined;
+
+    expect(spaceship?.position).toEqual({
+      x: planetRadiusMeters + DEFAULT_SPACESHIP_RADIUS_METERS,
+      y: 0,
+    });
+    expect(snapshot?.position).toEqual({
+      x: (planetRadiusMeters + DEFAULT_SPACESHIP_RADIUS_METERS).toString(),
+      y: '0',
+      relativeTo: 'Earth',
+    });
+  });
+
   it('does not move a landed spaceship that is already clear of the planet surface when thrusters start', () => {
     const capturedAt = new Date('2026-01-01T00:00:00.000Z').getTime();
     const planetRadiusMeters = 6_371_000;

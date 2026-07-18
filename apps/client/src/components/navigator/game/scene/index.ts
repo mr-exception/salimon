@@ -15,6 +15,7 @@ import {
   setSpaceshipHeading,
   startSpaceshipThrustersFeature,
   stopSpaceshipActiveFeature,
+  spaceshipState,
   WORLD_VIEWPORT_REFRESH_INTERVAL_MS,
 } from '@store';
 import { consumeMiningDurability, getMiningModuleStats } from '@store';
@@ -1374,6 +1375,9 @@ export class Scene extends Phaser.Scene {
     const radius = BigInt(
       Math.ceil(Math.hypot(viewport.width, viewport.height) / 2),
     );
+    const requiredBodyNames = spaceshipState.position.relativeTo
+      ? [spaceshipState.position.relativeTo]
+      : undefined;
     const world = await refreshWorldViewport({
       x: center.x.toString(),
       y: center.y.toString(),
@@ -1394,6 +1398,7 @@ export class Scene extends Phaser.Scene {
         topLeft.y > bottomRight.y
           ? topLeft.y.toString()
           : bottomRight.y.toString(),
+      requiredBodyNames,
     });
 
     this.setWorldBodyData(world.planets, world.stars);

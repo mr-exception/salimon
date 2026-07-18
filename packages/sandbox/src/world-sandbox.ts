@@ -179,6 +179,9 @@ export class WorldSandbox extends SandBox {
           ? { relativePosition: localPosition }
           : {}),
         ...(spaceship.position.relativeTo
+          ? { relativeVelocity }
+          : {}),
+        ...(spaceship.position.relativeTo
           ? {
               relativeObjectId: WorldSandbox.getBodyObjectId(
                 spaceship.position.relativeTo,
@@ -230,10 +233,11 @@ export class WorldSandbox extends SandBox {
     const objectVelocity = object.velocity ?? { x: 0, y: 0 };
     const velocity =
       center && relativeTo
-        ? WorldSandbox.subtract(
+        ? (WorldSandbox.getStoredVector(object, 'relativeVelocity') ??
+          WorldSandbox.subtract(
             objectVelocity,
             center.velocity ?? { x: 0, y: 0 },
-          )
+          ))
         : objectVelocity;
     const speed = Math.hypot(velocity.x, velocity.y);
 
@@ -466,6 +470,11 @@ export class WorldSandbox extends SandBox {
       object.velocity = center.velocity
         ? { ...center.velocity }
         : { x: 0, y: 0 };
+      object.metadata = {
+        ...object.metadata,
+        relativePosition,
+        relativeVelocity: { x: 0, y: 0 },
+      };
       return;
     }
 
@@ -476,6 +485,11 @@ export class WorldSandbox extends SandBox {
 
     object.position = WorldSandbox.add(center.position, launchPosition);
     object.velocity = center.velocity ? { ...center.velocity } : { x: 0, y: 0 };
+    object.metadata = {
+      ...object.metadata,
+      relativePosition: launchPosition,
+      relativeVelocity: { x: 0, y: 0 },
+    };
   }
 
   private restoreSpaceshipActiveForce(
@@ -567,21 +581,32 @@ export class WorldSandbox extends SandBox {
     object: SandboxObject,
     relativeTo: string,
   ) {
-    const relativePosition = object.metadata?.relativePosition;
-    if (
-      object.metadata?.motionState !== 'flying' &&
-      relativePosition &&
-      typeof relativePosition === 'object' &&
-      typeof (relativePosition as SandboxVector).x === 'number' &&
-      typeof (relativePosition as SandboxVector).y === 'number'
-    ) {
-      return relativePosition as SandboxVector;
+    const storedRelativePosition = WorldSandbox.getStoredVector(
+      object,
+      'relativePosition',
+    );
+    if (storedRelativePosition) {
+      return storedRelativePosition;
     }
 
     const center = this.getObject(WorldSandbox.getBodyObjectId(relativeTo));
     return center
       ? WorldSandbox.subtract(object.position, center.position)
       : object.position;
+  }
+
+  private static getStoredVector(object: SandboxObject, key: string) {
+    const value = object.metadata?.[key];
+    if (
+      value &&
+      typeof value === 'object' &&
+      typeof (value as SandboxVector).x === 'number' &&
+      typeof (value as SandboxVector).y === 'number'
+    ) {
+      return value as SandboxVector;
+    }
+
+    return undefined;
   }
 
   private static serializePosition(

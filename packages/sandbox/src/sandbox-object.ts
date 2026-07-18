@@ -31,6 +31,7 @@ export type SandboxObjectParams = {
 
 export class SandboxObject {
   static readonly gravitationalConstant = 6.6743e-11;
+  private static readonly maxSubsteps = 600;
 
   id: string;
   name?: string;
@@ -88,6 +89,38 @@ export class SandboxObject {
       return false;
     }
 
+    if (
+      this.kind === 'spaceship' &&
+      this.metadata?.motionState !== 'flying' &&
+      !this.activeForce
+    ) {
+      this.capturedAt = timestampMs;
+      return false;
+    }
+
+    const maxSubstepMilliseconds = this.tickMs * SandboxObject.maxSubsteps;
+    if (
+      this.kind !== 'spaceship' ||
+      elapsedMilliseconds > maxSubstepMilliseconds
+    ) {
+      this.advanceElapsedMilliseconds(elapsedMilliseconds);
+      this.capturedAt = timestampMs;
+      return true;
+    }
+
+    let remainingMilliseconds = elapsedMilliseconds;
+
+    while (remainingMilliseconds > 0) {
+      const stepMilliseconds = Math.min(this.tickMs, remainingMilliseconds);
+      this.advanceElapsedMilliseconds(stepMilliseconds);
+      remainingMilliseconds -= stepMilliseconds;
+    }
+
+    this.capturedAt = timestampMs;
+    return true;
+  }
+
+  private advanceElapsedMilliseconds(elapsedMilliseconds: number) {
     const forceElapsedMilliseconds = Math.min(
       elapsedMilliseconds,
       this.activeForce?.durationMs ?? 0,
@@ -101,16 +134,13 @@ export class SandboxObject {
       );
     }
 
-    const remainingMilliseconds =
-      elapsedMilliseconds - forceElapsedMilliseconds;
+    const unforcedMilliseconds = elapsedMilliseconds - forceElapsedMilliseconds;
 
-    if (remainingMilliseconds > 0) {
-      this.advanceBySeconds(remainingMilliseconds / 1000);
+    if (unforcedMilliseconds > 0) {
+      this.advanceBySeconds(unforcedMilliseconds / 1000);
     }
 
     this.updateForceDuration(forceElapsedMilliseconds);
-    this.capturedAt = timestampMs;
-    return true;
   }
 
   force(force: SandboxForce) {
@@ -345,16 +375,17 @@ export class SandboxObject {
     additionalAcceleration: SandboxVector,
   ) {
     const centerVelocity = center.velocity ?? { x: 0, y: 0 };
-    const relativePosition = {
+    const relativePosition = this.getStoredRelativePosition() ?? {
       x: this.position.x - center.position.x,
       y: this.position.y - center.position.y,
     };
     const velocity = this.velocity ?? centerVelocity;
-    const relativeVelocity = {
+    const relativeVelocity = this.getStoredRelativeVelocity() ?? {
       x: velocity.x - centerVelocity.x,
       y: velocity.y - centerVelocity.y,
     };
-    const gravityAcceleration = this.calculateObjectGravityAcceleration(center);
+    const gravityAcceleration =
+      this.calculateRelativeObjectGravityAcceleration(center, relativePosition);
     const acceleration = {
       x: gravityAcceleration.x + additionalAcceleration.x,
       y: gravityAcceleration.y + additionalAcceleration.y,
@@ -376,18 +407,51 @@ export class SandboxObject {
       x: center.position.x + nextRelativePosition.x,
       y: center.position.y + nextRelativePosition.y,
     };
+    this.metadata = {
+      ...this.metadata,
+      relativePosition: nextRelativePosition,
+      relativeVelocity: nextRelativeVelocity,
+    };
   }
 
-  private calculateObjectGravityAcceleration(object: SandboxObject) {
+  private getStoredRelativePosition() {
+    const relativePosition = this.metadata?.relativePosition;
+    if (
+      relativePosition &&
+      typeof relativePosition === 'object' &&
+      typeof (relativePosition as SandboxVector).x === 'number' &&
+      typeof (relativePosition as SandboxVector).y === 'number'
+    ) {
+      return relativePosition as SandboxVector;
+    }
+
+    return undefined;
+  }
+
+  private getStoredRelativeVelocity() {
+    const relativeVelocity = this.metadata?.relativeVelocity;
+    if (
+      relativeVelocity &&
+      typeof relativeVelocity === 'object' &&
+      typeof (relativeVelocity as SandboxVector).x === 'number' &&
+      typeof (relativeVelocity as SandboxVector).y === 'number'
+    ) {
+      return relativeVelocity as SandboxVector;
+    }
+
+    return undefined;
+  }
+
+  private calculateRelativeObjectGravityAcceleration(
+    object: SandboxObject,
+    relativePosition: SandboxVector,
+  ) {
     if (object.id === this.id || object.mass === 0) {
       return { x: 0, y: 0 };
     }
 
-    const distance = {
-      x: object.position.x - this.position.x,
-      y: object.position.y - this.position.y,
-    };
-    const distanceSquared = distance.x ** 2 + distance.y ** 2;
+    const distanceSquared =
+      relativePosition.x ** 2 + relativePosition.y ** 2;
     if (distanceSquared === 0) {
       return { x: 0, y: 0 };
     }
@@ -397,8 +461,8 @@ export class SandboxObject {
       SandboxObject.gravitationalConstant * (object.mass / distanceSquared);
 
     return {
-      x: accelerationMagnitude * (distance.x / distanceLength),
-      y: accelerationMagnitude * (distance.y / distanceLength),
+      x: accelerationMagnitude * (-relativePosition.x / distanceLength),
+      y: accelerationMagnitude * (-relativePosition.y / distanceLength),
     };
   }
 

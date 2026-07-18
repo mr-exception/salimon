@@ -40,12 +40,14 @@ class SandboxEventEmitter<TEvent> {
 export class SandBox {
   private static readonly fps = 30;
   private static readonly tickIntervalMs = 1000 / SandBox.fps;
+  private static readonly minimumTickDelayMs = 10;
   private static readonly defaultGravityForceCacheThresholdN = 0;
 
   private readonly objects = new Map<string, SandboxObject>();
   private readonly crashEvents = new SandboxEventEmitter<SandboxCrashEvent>();
   private readonly objectTickListeners = new Set<SandboxObjectTickListener>();
   private readonly activeCrashPairs = new Set<string>();
+  private hasCheckedCrashes = false;
   private gravityForceCacheThresholdN =
     SandBox.defaultGravityForceCacheThresholdN;
   private gravityForceCacheRefreshDepth = 0;
@@ -178,7 +180,12 @@ export class SandBox {
     tickedObjects.forEach((object) => {
       this.objectTickListeners.forEach((listener) => listener(object));
     });
-    this.emitCrashes(objects);
+    this.emitCrashes(
+      tickedObjects.length > 0 || this.hasCheckedCrashes
+        ? tickedObjects
+        : objects,
+      objects,
+    );
 
     return tickedObjects;
   }
@@ -201,7 +208,10 @@ export class SandBox {
 
       this.tickTimer = setTimeout(
         tick,
-        Math.max(SandBox.tickIntervalMs - calcTime, 0),
+        Math.max(
+          SandBox.tickIntervalMs - calcTime,
+          SandBox.minimumTickDelayMs,
+        ),
       );
     };
 
@@ -215,27 +225,39 @@ export class SandBox {
     this.tickTimer = undefined;
   }
 
-  private emitCrashes(objects: SandboxObject[]) {
-    const currentCrashPairs = new Set<string>();
+  private emitCrashes(tickedObjects: SandboxObject[], objects: SandboxObject[]) {
+    if (tickedObjects.length === 0) return;
+    this.hasCheckedCrashes = true;
 
-    for (let index = 0; index < objects.length; index += 1) {
-      for (
-        let compareIndex = index + 1;
-        compareIndex < objects.length;
-        compareIndex += 1
-      ) {
-        const crash = this.getCrashEvent(objects[index], objects[compareIndex]);
+    const currentCrashPairs = new Set(this.activeCrashPairs);
+    const checkedPairs = new Set<string>();
 
+    for (const object of tickedObjects) {
+      for (const comparedObject of objects) {
+        if (object.id === comparedObject.id) continue;
+        if (
+          object.kind !== 'spaceship' &&
+          comparedObject.kind !== 'spaceship'
+        ) {
+          continue;
+        }
+
+        const pairKey = SandBox.getObjectPairKey(
+          object.id,
+          comparedObject.id,
+        );
+        if (checkedPairs.has(pairKey)) continue;
+        checkedPairs.add(pairKey);
+
+        const crash = this.getCrashEvent(object, comparedObject);
         if (crash) {
-          const pairKey = SandBox.getObjectPairKey(
-            crash.objectAId,
-            crash.objectBId,
-          );
           currentCrashPairs.add(pairKey);
 
           if (!this.activeCrashPairs.has(pairKey)) {
             this.crashEvents.emit(crash);
           }
+        } else {
+          currentCrashPairs.delete(pairKey);
         }
       }
     }
@@ -255,7 +277,11 @@ export class SandBox {
   }
 
   private refreshGravityForceCache(object: SandboxObject) {
-    if (object.orbitalCenterId) {
+    if (
+      object.orbitalCenterId ||
+      (object.kind === 'spaceship' &&
+        typeof object.metadata?.relativeObjectId === 'string')
+    ) {
       object.clearGravityForceCache();
       return;
     }

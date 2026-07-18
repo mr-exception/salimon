@@ -857,6 +857,15 @@ function advanceSpaceshipPosition(elapsedSeconds: number) {
   const motionState = store.get(spaceshipMotionStateAtom);
   if (motionState !== 'flying') return;
 
+  if (spaceshipState.position.relativeTo) {
+    advanceRelativeSpaceshipPosition(
+      spaceshipState.position.relativeTo,
+      elapsedSeconds,
+    );
+    advanceActiveFeature(elapsedSeconds);
+    return;
+  }
+
   const motion = integrateSpaceshipMotion(
     {
       position: toVector(getWorldPosition(spaceshipState.position)),
@@ -892,6 +901,42 @@ function advanceSpaceshipPosition(elapsedSeconds: number) {
   advanceActiveFeature(elapsedSeconds);
 }
 
+function advanceRelativeSpaceshipPosition(
+  referenceName: string,
+  elapsedSeconds: number,
+) {
+  const referenceVelocity = getCelestialBodyWorldVelocity(
+    referenceName,
+    new Set(),
+  );
+  const worldVelocity = getSpaceshipWorldVelocity();
+  const relativeMotion = integrateSpaceshipRelativeMotion(
+    referenceName,
+    {
+      position: toVector(spaceshipState.position),
+      velocity: {
+        x: worldVelocity.x - referenceVelocity.x,
+        y: worldVelocity.y - referenceVelocity.y,
+      },
+    },
+    elapsedSeconds,
+  );
+
+  spaceshipVelocity = {
+    x: referenceVelocity.x + relativeMotion.velocity.x,
+    y: referenceVelocity.y + relativeMotion.velocity.y,
+  };
+  spaceshipPositionRemainder = advancePositionByVelocity(
+    spaceshipState.position,
+    {
+      x: relativeMotion.position.x - Number(spaceshipState.position.x),
+      y: relativeMotion.position.y - Number(spaceshipState.position.y),
+    },
+    1,
+    spaceshipPositionRemainder,
+  );
+}
+
 function integrateSpaceshipMotion(
   motion: { position: Vector; velocity: Vector },
   elapsedSeconds: number,
@@ -907,6 +952,39 @@ function integrateSpaceshipMotion(
 
   for (let step = 0; step < stepCount; step += 1) {
     nextMotion = integrateSpaceshipStep(nextMotion, stepSeconds);
+  }
+
+  return nextMotion;
+}
+
+function integrateSpaceshipRelativeMotion(
+  referenceName: string,
+  motion: { position: Vector; velocity: Vector },
+  elapsedSeconds: number,
+) {
+  if (elapsedSeconds <= 0) return motion;
+
+  const stepCount = Math.min(
+    MAX_PROPAGATION_STEPS,
+    Math.max(1, Math.ceil(elapsedSeconds / TARGET_STEP_SECONDS)),
+  );
+  const stepSeconds = elapsedSeconds / stepCount;
+  let nextMotion = motion;
+
+  for (let step = 0; step < stepCount; step += 1) {
+    const thrustAcceleration =
+      calculateSpaceshipActiveThrustAcceleration(nextMotion);
+    nextMotion = WorldService.integrateStep(
+      nextMotion,
+      stepSeconds,
+      (position) =>
+        WorldService.calculateAcceleration(
+          position,
+          (nextPosition) =>
+            calculateReferenceGravityAcceleration(nextPosition, referenceName),
+          thrustAcceleration,
+        ),
+    );
   }
 
   return nextMotion;
@@ -935,6 +1013,20 @@ function calculateGravityAcceleration(position: Vector) {
     position,
     [...worldState.stars, ...worldState.planets],
     (body) => toVector(getWorldPosition(body.position)),
+  );
+}
+
+function calculateReferenceGravityAcceleration(
+  position: Vector,
+  referenceName: string,
+) {
+  const reference = getBodyByName(referenceName);
+  if (!reference) return { x: 0, y: 0 };
+
+  return WorldService.calculateGravityAcceleration(
+    position,
+    [reference],
+    () => ({ x: 0, y: 0 }),
   );
 }
 
@@ -1023,7 +1115,7 @@ function getCelestialBodyWorldVelocity(
   const body = getBodyByName(bodyName);
   if (!body) return { x: 0, y: 0 };
 
-  const centerName = body.orbitalCenter;
+  const centerName = body.orbitalCenter ?? body.position.relativeTo;
   if (!centerName || body.speed === 0n) return { x: 0, y: 0 };
 
   path.add(bodyName);

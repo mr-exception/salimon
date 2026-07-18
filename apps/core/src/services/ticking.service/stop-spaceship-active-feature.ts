@@ -9,17 +9,20 @@ export async function stopSpaceshipActiveFeature(spaceship: SpaceshipDocument) {
     simulatedAt.getTime(),
   );
 
-  return RepositoryService.updatePropagatedSpaceship(spaceship, {
-    activeFeature: undefined,
-    ...(snapshot
-      ? {
-          position: snapshot.position,
-          velocity: snapshot.velocity,
-          speed: snapshot.speed,
-          direction: snapshot.direction,
-        }
-      : {}),
-    simulatedAt,
-    updatedAt: simulatedAt,
-  });
+  return RepositoryService.updateSpaceshipBySecurityCode(
+    spaceship.securityCode,
+    {
+      activeFeature: undefined,
+      ...(snapshot
+        ? {
+            position: snapshot.position,
+            velocity: snapshot.velocity,
+            speed: snapshot.speed,
+            direction: snapshot.direction,
+          }
+        : {}),
+      simulatedAt,
+      updatedAt: simulatedAt,
+    },
+  );
 }

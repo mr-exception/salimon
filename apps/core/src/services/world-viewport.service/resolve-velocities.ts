@@ -19,7 +19,7 @@ export function resolveVelocities(
       throw new Error(`Circular velocity reference involving ${body.name}`);
     }
 
-    const centerName = body.orbitalCenter;
+    const centerName = body.orbitalCenter ?? body.position.relativeTo;
     const center = centerName ? bodiesByName.get(centerName) : undefined;
     const nextAncestors = new Set(ancestors).add(body.name);
     const centerVelocity: Velocity = center
@@ -58,4 +58,3 @@ export function resolveVelocities(
   bodies.forEach((body) => resolve(body));
   return velocitiesByName;
 }
-

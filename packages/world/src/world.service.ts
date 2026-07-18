@@ -70,9 +70,10 @@ export class WorldService {
     const y = WorldService.toNumber(body.position.y);
     const orbitalRadius = Math.hypot(x, y);
     const speed = WorldService.toNumber(body.speed);
+    const orbitalCenter = body.orbitalCenter ?? body.position.relativeTo;
 
     if (
-      !body.orbitalCenter ||
+      !orbitalCenter ||
       orbitalRadius === 0 ||
       speed === 0 ||
       elapsedSeconds <= 0
@@ -113,11 +114,12 @@ export class WorldService {
       const initialY = WorldService.toNumber(body.position.y);
       const radius = Math.hypot(initialX, initialY);
       const speed = WorldService.toNumber(body.speed);
+      const orbitalCenter = body.orbitalCenter ?? body.position.relativeTo;
       const updatedAt = body.updatedAt ?? time;
       const elapsedSeconds = (time.getTime() - updatedAt.getTime()) / 1_000;
       let localPosition = { x: initialX, y: initialY };
 
-      if (body.orbitalCenter && radius > 0 && speed !== 0) {
+      if (orbitalCenter && radius > 0 && speed !== 0) {
         const direction = body.clockwise ? 1 : -1;
         const angle = (direction * speed * elapsedSeconds) / radius;
         const cos = Math.cos(angle);
@@ -292,8 +294,7 @@ export class WorldService {
       x: targetVelocity.x - currentVelocity.x,
       y: targetVelocity.y - currentVelocity.y,
     };
-    const velocityChangeSquared =
-      velocityChange.x ** 2 + velocityChange.y ** 2;
+    const velocityChangeSquared = velocityChange.x ** 2 + velocityChange.y ** 2;
     if (velocityChangeSquared === 0) return 0;
     const engineOnlyMinimumDuration =
       Math.sqrt(velocityChangeSquared) / maximumAcceleration;

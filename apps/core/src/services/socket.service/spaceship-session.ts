@@ -72,9 +72,12 @@ export class SpaceshipSession {
   }
 
   async stopActiveFeature() {
-    this.spaceship = await TickingService.stopSpaceshipActiveFeature(
+    const spaceship = await TickingService.stopSpaceshipActiveFeature(
       this.spaceship,
     );
+    if (!spaceship) return undefined;
+
+    this.spaceship = spaceship;
     return this.spaceship;
   }
 

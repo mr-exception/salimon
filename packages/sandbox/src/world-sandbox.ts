@@ -2,7 +2,7 @@ import { SandBox } from './sandbox';
 import { SandboxObject, type SandboxVector } from './sandbox-object';
 
 export const SANDBOX_WORLD_BODY_TICK_MS = 30_000;
-export const SANDBOX_SPACESHIP_TICK_MS = 5_000;
+export const SANDBOX_SPACESHIP_TICK_MS = 500;
 export const DEFAULT_SPACESHIP_MASS_KG = 10_000;
 export const DEFAULT_SPACESHIP_RADIUS_METERS = 200;
 export const SANDBOX_SPACESHIP_LAUNCH_CLEARANCE_METERS = 1;
@@ -149,6 +149,11 @@ export class WorldSandbox extends SandBox {
     const position = center
       ? WorldSandbox.add(localPosition, center.position)
       : localPosition;
+    const relativeVelocity =
+      spaceship.velocity ?? WorldSandbox.getHeadingVelocity(spaceship);
+    const velocity = center?.velocity
+      ? WorldSandbox.add(relativeVelocity, center.velocity)
+      : relativeVelocity;
 
     this.spaceshipCodesByObjectId.set(id, spaceship.securityCode);
 
@@ -165,12 +170,21 @@ export class WorldSandbox extends SandBox {
         spaceship.updatedAt ??
         new Date()
       ).getTime(),
-      velocity:
-        spaceship.velocity ?? WorldSandbox.getHeadingVelocity(spaceship),
+      velocity,
       metadata: {
         securityCode: spaceship.securityCode,
         motionState: spaceship.motionState,
         relativeTo: spaceship.position.relativeTo,
+        ...(spaceship.position.relativeTo
+          ? { relativePosition: localPosition }
+          : {}),
+        ...(spaceship.position.relativeTo
+          ? {
+              relativeObjectId: WorldSandbox.getBodyObjectId(
+                spaceship.position.relativeTo,
+              ),
+            }
+          : {}),
       },
     });
 
@@ -209,10 +223,18 @@ export class WorldSandbox extends SandBox {
     const center = relativeTo
       ? this.getObject(WorldSandbox.getBodyObjectId(relativeTo))
       : undefined;
-    const position = center
-      ? WorldSandbox.subtract(object.position, center.position)
-      : object.position;
-    const velocity = object.velocity ?? { x: 0, y: 0 };
+    const position =
+      center && relativeTo
+        ? this.getSpaceshipRelativePosition(object, relativeTo)
+        : object.position;
+    const objectVelocity = object.velocity ?? { x: 0, y: 0 };
+    const velocity =
+      center && relativeTo
+        ? WorldSandbox.subtract(
+            objectVelocity,
+            center.velocity ?? { x: 0, y: 0 },
+          )
+        : objectVelocity;
     const speed = Math.hypot(velocity.x, velocity.y);
 
     return {
@@ -247,7 +269,6 @@ export class WorldSandbox extends SandBox {
     object.metadata = {
       ...object.metadata,
       motionState: 'flying',
-      relativeTo: undefined,
     };
     object.capturedAt = timestampMs;
 
@@ -275,7 +296,6 @@ export class WorldSandbox extends SandBox {
     object.metadata = {
       ...object.metadata,
       motionState: 'flying',
-      relativeTo: undefined,
     };
     const velocity = object.velocity ?? { x: 0, y: 0 };
     const velocityChange = WorldSandbox.subtract(plan.targetVelocity, velocity);
@@ -295,6 +315,34 @@ export class WorldSandbox extends SandBox {
       plan,
       snapshot: this.getSpaceshipSnapshot(object, timestampMs),
     };
+  }
+
+  startSpaceshipThrusters(
+    securityCode: string,
+    thrusters: readonly { powerPercent: number; active: boolean }[],
+    timestampMs = Date.now(),
+  ) {
+    const object = this.getObject(
+      WorldSandbox.getSpaceshipObjectId(securityCode),
+    );
+    if (!object) return undefined;
+
+    const force = WorldSandbox.getThrusterForce(thrusters);
+    if (!force) return undefined;
+
+    this.launchSpaceshipIfNeeded(object);
+    object.metadata = {
+      ...object.metadata,
+      motionState: 'flying',
+    };
+    object.force({
+      id: 'spaceship:thrusters',
+      ...force,
+      durationMs: Number.MAX_SAFE_INTEGER,
+    });
+    object.capturedAt = timestampMs;
+
+    return this.getSpaceshipSnapshot(object, timestampMs);
   }
 
   stopSpaceshipForce(securityCode: string, timestampMs = Date.now()) {
@@ -402,20 +450,28 @@ export class WorldSandbox extends SandBox {
     const center = relativeTo
       ? this.getObject(WorldSandbox.getBodyObjectId(relativeTo))
       : undefined;
-    if (!center) return;
+    if (!relativeTo || !center) return;
 
-    const relativePosition = WorldSandbox.subtract(
-      object.position,
-      center.position,
+    const relativePosition = this.getSpaceshipRelativePosition(
+      object,
+      relativeTo,
     );
     const relativeRadius = Math.hypot(relativePosition.x, relativePosition.y);
     if (relativeRadius === 0) return;
 
-    const launchRadius =
+    const minimumLaunchRadius =
       center.radius + object.radius + SANDBOX_SPACESHIP_LAUNCH_CLEARANCE_METERS;
+    if (relativeRadius >= minimumLaunchRadius) {
+      object.position = WorldSandbox.add(center.position, relativePosition);
+      object.velocity = center.velocity
+        ? { ...center.velocity }
+        : { x: 0, y: 0 };
+      return;
+    }
+
     const launchPosition = {
-      x: (relativePosition.x / relativeRadius) * launchRadius,
-      y: (relativePosition.y / relativeRadius) * launchRadius,
+      x: (relativePosition.x / relativeRadius) * minimumLaunchRadius,
+      y: (relativePosition.y / relativeRadius) * minimumLaunchRadius,
     };
 
     object.position = WorldSandbox.add(center.position, launchPosition);
@@ -490,6 +546,27 @@ export class WorldSandbox extends SandBox {
     };
   }
 
+  private getSpaceshipRelativePosition(
+    object: SandboxObject,
+    relativeTo: string,
+  ) {
+    const relativePosition = object.metadata?.relativePosition;
+    if (
+      object.metadata?.motionState !== 'flying' &&
+      relativePosition &&
+      typeof relativePosition === 'object' &&
+      typeof (relativePosition as SandboxVector).x === 'number' &&
+      typeof (relativePosition as SandboxVector).y === 'number'
+    ) {
+      return relativePosition as SandboxVector;
+    }
+
+    const center = this.getObject(WorldSandbox.getBodyObjectId(relativeTo));
+    return center
+      ? WorldSandbox.subtract(object.position, center.position)
+      : object.position;
+  }
+
   private static serializePosition(
     position: SandboxVector,
     relativeTo?: string,
@@ -505,8 +582,9 @@ export class WorldSandbox extends SandBox {
     const position = WorldSandbox.toVector(body.position);
     const radius = Math.hypot(position.x, position.y);
     const speed = Number(body.speed);
+    const orbitalCenter = body.orbitalCenter ?? body.position.relativeTo;
 
-    if (!body.orbitalCenter || radius === 0 || speed === 0) {
+    if (!orbitalCenter || radius === 0 || speed === 0) {
       return { x: 0, y: 0 };
     }
 
@@ -526,5 +604,24 @@ export class WorldSandbox extends SandBox {
       x: Math.sin(headingRadians) * speed,
       y: -Math.cos(headingRadians) * speed,
     };
+  }
+
+  private static getThrusterForce(
+    thrusters: readonly { powerPercent: number; active: boolean }[],
+  ) {
+    const force = { x: 0, y: 0 };
+
+    thrusters.forEach((thruster, index) => {
+      if (!thruster.active || thruster.powerPercent <= 0) return;
+
+      const thrustN =
+        SANDBOX_MAX_ENGINE_THRUST_N * (thruster.powerPercent / 100);
+      if (index === 0) force.y += thrustN;
+      if (index === 1) force.x -= thrustN;
+      if (index === 2) force.y -= thrustN;
+      if (index === 3) force.x += thrustN;
+    });
+
+    return force.x === 0 && force.y === 0 ? undefined : force;
   }
 }

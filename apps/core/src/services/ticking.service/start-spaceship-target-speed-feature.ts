@@ -20,17 +20,20 @@ export async function startSpaceshipTargetSpeedFeature(
   );
   if (!result?.snapshot) return undefined;
 
-  return RepositoryService.updatePropagatedSpaceship(spaceship, {
-    activeFeature: {
-      type: 'target-speed',
-      ...result.plan,
+  return RepositoryService.updateSpaceshipBySecurityCode(
+    spaceship.securityCode,
+    {
+      activeFeature: {
+        type: 'target-speed',
+        ...result.plan,
+      },
+      motionState: 'flying',
+      position: result.snapshot.position,
+      velocity: result.snapshot.velocity,
+      speed: result.snapshot.speed,
+      direction: result.snapshot.direction,
+      simulatedAt,
+      updatedAt: simulatedAt,
     },
-    motionState: 'flying',
-    position: result.snapshot.position,
-    velocity: result.snapshot.velocity,
-    speed: result.snapshot.speed,
-    direction: result.snapshot.direction,
-    simulatedAt,
-    updatedAt: simulatedAt,
-  });
+  );
 }

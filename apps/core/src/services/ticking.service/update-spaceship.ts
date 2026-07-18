@@ -19,7 +19,7 @@ export async function updateSpaceship(
   if (!object) return spaceship;
 
   sandbox.tick(simulatedAt.getTime());
-  const snapshot = sandbox.getSpaceshipSnapshot(object, simulatedAt.getTime());
+  const snapshot = sandbox.getSpaceshipSnapshot(object);
   if (!snapshot) return spaceship;
 
   return RepositoryService.updatePropagatedSpaceship(spaceship, {

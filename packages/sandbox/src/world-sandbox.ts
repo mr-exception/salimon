@@ -6,7 +6,6 @@ export const SANDBOX_SPACESHIP_TICK_MS = 5_000;
 export const DEFAULT_SPACESHIP_MASS_KG = 10_000;
 export const DEFAULT_SPACESHIP_RADIUS_METERS = 200;
 export const SANDBOX_SPACESHIP_LAUNCH_CLEARANCE_METERS = 1;
-export const SANDBOX_SPACESHIP_THRUSTER_COUNT = 4;
 export const SANDBOX_MAX_ENGINE_THRUST_N = 1_000_000;
 
 export type SandboxNumericValue = bigint | number | string;
@@ -59,11 +58,6 @@ export type SandboxSpaceshipSnapshot = {
   direction: number;
   simulatedAt: Date;
   updatedAt: Date;
-};
-
-export type SandboxSpaceshipThruster = {
-  powerPercent: number;
-  active: boolean;
 };
 
 export type SandboxSpaceshipTargetSpeedPlan = {
@@ -243,19 +237,11 @@ export class WorldSandbox extends SandBox {
     return this.spaceshipCodesByObjectId.get(object.id);
   }
 
-  startSpaceshipThrusters(
-    securityCode: string,
-    thrusters: readonly SandboxSpaceshipThruster[],
-    timestampMs = Date.now(),
-  ) {
+  launchSpaceship(securityCode: string, timestampMs = Date.now()) {
     const object = this.getObject(
       WorldSandbox.getSpaceshipObjectId(securityCode),
     );
     if (!object) return undefined;
-
-    const normalizedThrusters = this.normalizeThrusters(thrusters);
-    const force = this.getThrusterForce(normalizedThrusters);
-    if (!force) return undefined;
 
     this.launchSpaceshipIfNeeded(object);
     object.metadata = {
@@ -263,11 +249,6 @@ export class WorldSandbox extends SandBox {
       motionState: 'flying',
       relativeTo: undefined,
     };
-    object.force({
-      id: 'spaceship:thrusters',
-      ...force,
-      durationMs: Number.MAX_SAFE_INTEGER,
-    });
     object.capturedAt = timestampMs;
 
     return this.getSpaceshipSnapshot(object, timestampMs);
@@ -352,46 +333,6 @@ export class WorldSandbox extends SandBox {
       x: Number(position.x),
       y: Number(position.y),
     };
-  }
-
-  private normalizeThrusters(thrusters: readonly SandboxSpaceshipThruster[]) {
-    const normalizedThrusters = thrusters
-      .slice(0, SANDBOX_SPACESHIP_THRUSTER_COUNT)
-      .map((thruster) => ({
-        powerPercent: Number(thruster.powerPercent),
-        active: Boolean(thruster.active),
-      }));
-
-    if (
-      normalizedThrusters.length !== SANDBOX_SPACESHIP_THRUSTER_COUNT ||
-      normalizedThrusters.some(
-        (thruster) =>
-          !Number.isFinite(thruster.powerPercent) ||
-          thruster.powerPercent < 0 ||
-          thruster.powerPercent > 100,
-      )
-    ) {
-      throw new Error('Invalid spaceship thrusters.');
-    }
-
-    return normalizedThrusters;
-  }
-
-  private getThrusterForce(thrusters: readonly SandboxSpaceshipThruster[]) {
-    const force = { x: 0, y: 0 };
-
-    thrusters.forEach((thruster, index) => {
-      if (!thruster.active || thruster.powerPercent <= 0) return;
-
-      const thrustN =
-        SANDBOX_MAX_ENGINE_THRUST_N * (thruster.powerPercent / 100);
-      if (index === 0) force.y += thrustN;
-      if (index === 1) force.x -= thrustN;
-      if (index === 2) force.y -= thrustN;
-      if (index === 3) force.x += thrustN;
-    });
-
-    return force.x === 0 && force.y === 0 ? undefined : force;
   }
 
   private getTargetSpeedPlan(
@@ -489,28 +430,11 @@ export class WorldSandbox extends SandBox {
 
     const feature = activeFeature as {
       type?: unknown;
-      thrusters?: unknown;
       targetVelocity?: unknown;
       maximumAcceleration?: unknown;
       durationSeconds?: unknown;
       elapsedSeconds?: unknown;
     };
-    if (feature.type === 'thrusters' || feature.type === 'manual-force') {
-      if (!Array.isArray(feature.thrusters)) return;
-
-      const force = this.getThrusterForce(
-        this.normalizeThrusters(feature.thrusters),
-      );
-      if (!force) return;
-
-      object.force({
-        id: 'spaceship:thrusters',
-        ...force,
-        durationMs: Number.MAX_SAFE_INTEGER,
-      });
-      return;
-    }
-
     if (feature.type !== 'target-speed') return;
 
     const targetVelocity = feature.targetVelocity;

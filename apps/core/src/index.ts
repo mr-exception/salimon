@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { WorldAssetService } from '@services';
 import { createApp } from './app';
 
 const DEFAULT_PORT = 3000;
@@ -8,7 +9,16 @@ if (!Number.isInteger(port) || port <= 0) {
   throw new Error('PORT must be a positive integer');
 }
 
-const app = createApp();
-app.listen(port, () => {
-  console.log(`Core API listening on http://localhost:${port}`);
+async function start() {
+  await WorldAssetService.start();
+
+  const app = createApp();
+  app.listen(port, () => {
+    console.log(`Core API listening on http://localhost:${port}`);
+  });
+}
+
+start().catch((error: unknown) => {
+  console.error('Failed to start Core API', error);
+  process.exit(1);
 });

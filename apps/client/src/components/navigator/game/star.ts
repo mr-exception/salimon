@@ -67,7 +67,7 @@ export class Star extends Phaser.GameObjects.Container {
     zoom: number,
     viewport: Phaser.Geom.Rectangle,
     alwaysVisible = false,
-    showViewportLabel = false,
+    viewportLabelMode: 'force' | 'suppress' | 'zoom' = 'zoom',
   ) {
     const { x, y } = getRenderPosition(this.star.position);
     const radius = Number(this.star.radius);
@@ -92,7 +92,9 @@ export class Star extends Phaser.GameObjects.Container {
     this.starGraphics.setVisible(shapeVisible);
     this.patternImage.setVisible(shapeVisible);
     this.label.setVisible(
-      alwaysVisible || showViewportLabel || zoom >= this.star.renderZoomLevel,
+      alwaysVisible ||
+        viewportLabelMode === 'force' ||
+        (viewportLabelMode === 'zoom' && zoom >= this.star.renderZoomLevel),
     );
     this.label.setScale(1 / zoom);
     this.label.setY(-radius - LABEL_SCREEN_GAP / zoom);
@@ -137,6 +139,26 @@ export class Star extends Phaser.GameObjects.Container {
       y <= labelBottom;
 
     return hitsGlow || hitsShape || hitsLabel;
+  }
+
+  getLabelScreenBounds(camera: Phaser.Cameras.Scene2D.Camera) {
+    if (!this.visible || !this.label.visible) return undefined;
+
+    const screenX = (this.x - camera.worldView.left) * camera.zoom;
+    const screenY = (this.y - camera.worldView.top) * camera.zoom;
+    const screenRadius = Number(this.star.radius) * camera.zoom;
+    const labelBottom = screenY - screenRadius - LABEL_SCREEN_GAP;
+
+    return new Phaser.Geom.Rectangle(
+      screenX - this.label.width / 2,
+      labelBottom - this.label.height,
+      this.label.width,
+      this.label.height,
+    );
+  }
+
+  setNameLabelVisible(visible: boolean) {
+    this.label.setVisible(visible);
   }
 
   private draw() {

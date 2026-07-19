@@ -81,7 +81,7 @@ export class Planet extends Phaser.GameObjects.Container {
     zoom: number,
     viewport: Phaser.Geom.Rectangle,
     alwaysVisible = false,
-    showViewportLabel = false,
+    viewportLabelMode: 'force' | 'suppress' | 'zoom' = 'zoom',
   ) {
     const { x, y } = getRenderPosition(this.planet.position);
     const radius = Number(this.planet.radius);
@@ -98,7 +98,7 @@ export class Planet extends Phaser.GameObjects.Container {
 
     const bodyVisible =
       intersectsViewport &&
-      (shapeVisible || alwaysVisible || showViewportLabel);
+      (shapeVisible || alwaysVisible || viewportLabelMode === 'force');
 
     this.setVisible(bodyVisible);
     if (!bodyVisible) return;
@@ -123,7 +123,9 @@ export class Planet extends Phaser.GameObjects.Container {
       }
     }
     this.label.setVisible(
-      alwaysVisible || showViewportLabel || zoom >= this.planet.renderZoomLevel,
+      alwaysVisible ||
+        viewportLabelMode === 'force' ||
+        (viewportLabelMode === 'zoom' && zoom >= this.planet.renderZoomLevel),
     );
     this.label.setScale(1 / zoom);
     this.label.setY(-visibleRadius - LABEL_SCREEN_GAP / zoom);
@@ -170,6 +172,26 @@ export class Planet extends Phaser.GameObjects.Container {
       y <= labelBottom;
 
     return hitsShape || hitsLabel;
+  }
+
+  getLabelScreenBounds(camera: Phaser.Cameras.Scene2D.Camera) {
+    if (!this.visible || !this.label.visible) return undefined;
+
+    const screenX = (this.x - camera.worldView.left) * camera.zoom;
+    const screenY = (this.y - camera.worldView.top) * camera.zoom;
+    const screenRadius = this.getVisibleRadius(camera.zoom) * camera.zoom;
+    const labelBottom = screenY - screenRadius - LABEL_SCREEN_GAP;
+
+    return new Phaser.Geom.Rectangle(
+      screenX - this.label.width / 2,
+      labelBottom - this.label.height,
+      this.label.width,
+      this.label.height,
+    );
+  }
+
+  setNameLabelVisible(visible: boolean) {
+    this.label.setVisible(visible);
   }
 
   private isBlackHole() {

@@ -93,6 +93,14 @@ export type TargetDirectionPreview = {
 };
 
 const VIEWPORT_LABEL_OBJECT_LIMIT = 20;
+type ViewportLabelMode = 'force' | 'suppress' | 'zoom';
+type NameLabelCandidate = {
+  priority: number;
+  bounds: Phaser.Geom.Rectangle;
+  hide: () => void;
+};
+const BLACK_HOLE_VIEWPORT_RADIUS_PX = 16;
+const NAME_LABEL_COLLISION_PADDING_PX = 3;
 const MEASUREMENT_ARROW_LENGTH_PX = 72;
 const MEASUREMENT_ARROW_HEAD_PX = 7;
 const MEASUREMENT_ARROW_GAP_PX = 8;
@@ -212,7 +220,7 @@ export class Scene extends Phaser.Scene {
   private lastReportedTurnState = false;
   private lastActiveBodiesViewportKey = '';
   private lastVisibilityViewportKey = '';
-  private lastShowViewportLabels?: boolean;
+  private lastViewportLabelMode?: ViewportLabelMode;
   private spaceshipTurn?: Phaser.Tweens.Tween;
   private spaceshipEngineRunning = false;
   private engineStartPendingUntil = 0;
@@ -1063,15 +1071,15 @@ export class Scene extends Phaser.Scene {
   protected updateWorldVisibility() {
     const camera = this.cameras.main;
     if (!camera) return;
-    const showViewportLabels = this.shouldShowViewportLabels();
-    this.lastShowViewportLabels = showViewportLabels;
+    const viewportLabelMode = this.getViewportLabelMode();
+    this.lastViewportLabelMode = viewportLabelMode;
 
     this.planets.forEach((planet) => {
       planet.setRenderVisibility(
         camera.zoom,
         camera.worldView,
         this.alwaysVisibleBodies.has(planet.planet.name),
-        showViewportLabels,
+        viewportLabelMode,
       );
       planet.setVisible(planet.visible && isInsideWorld(planet.x, planet.y));
     });
@@ -1080,7 +1088,7 @@ export class Scene extends Phaser.Scene {
         camera.zoom,
         camera.worldView,
         this.alwaysVisibleBodies.has(star.star.name),
-        showViewportLabels,
+        viewportLabelMode,
       );
       star.setVisible(star.visible && isInsideWorld(star.x, star.y));
     });
@@ -1091,6 +1099,8 @@ export class Scene extends Phaser.Scene {
           isInsideWorld(this.spaceship.x, this.spaceship.y),
       );
     }
+    this.applyNameLabelVisibility(viewportLabelMode);
+    this.resolveNameLabelCollisions();
     this.snapSpaceshipToSurface();
   }
 
@@ -1132,8 +1142,8 @@ export class Scene extends Phaser.Scene {
   protected updateChangedWorldVisibility(bodyNames: ReadonlySet<string>) {
     const camera = this.cameras.main;
     if (!camera) return;
-    const showViewportLabels = this.shouldShowViewportLabels();
-    if (showViewportLabels !== this.lastShowViewportLabels) {
+    const viewportLabelMode = this.getViewportLabelMode();
+    if (viewportLabelMode !== this.lastViewportLabelMode) {
       this.updateWorldVisibility();
       return;
     }
@@ -1146,7 +1156,7 @@ export class Scene extends Phaser.Scene {
         camera.zoom,
         camera.worldView,
         this.alwaysVisibleBodies.has(planet.planet.name),
-        showViewportLabels,
+        viewportLabelMode,
       );
       planet.setVisible(planet.visible && isInsideWorld(planet.x, planet.y));
     });
@@ -1158,7 +1168,7 @@ export class Scene extends Phaser.Scene {
         camera.zoom,
         camera.worldView,
         this.alwaysVisibleBodies.has(star.star.name),
-        showViewportLabels,
+        viewportLabelMode,
       );
       star.setVisible(star.visible && isInsideWorld(star.x, star.y));
     });
@@ -1169,6 +1179,8 @@ export class Scene extends Phaser.Scene {
           isInsideWorld(this.spaceship.x, this.spaceship.y),
       );
     }
+    this.applyNameLabelVisibility(viewportLabelMode);
+    this.resolveNameLabelCollisions();
     this.snapSpaceshipToSurface();
   }
 
@@ -1204,7 +1216,7 @@ export class Scene extends Phaser.Scene {
         this.alwaysVisibleBodies.has(planet.name) ||
         this.bodyMotionAreaIntersectsViewport(
           planet,
-          Number(planet.radius),
+          this.getPlanetViewportRadius(planet, camera.zoom),
           viewport,
           camera.zoom,
           bodyPositionByName,
@@ -1246,7 +1258,9 @@ export class Scene extends Phaser.Scene {
     zoom: number,
     bodyPositionByName: Map<string, RenderedBodyPosition>,
   ) {
-    if (zoom < body.shapeRenderZoomLevel) return false;
+    if (body.type !== 'blackhole' && zoom < body.shapeRenderZoomLevel) {
+      return false;
+    }
 
     const position = bodyPositionByName.get(body.name);
     if (!position) return false;
@@ -1278,23 +1292,142 @@ export class Scene extends Phaser.Scene {
     );
   }
 
-  private shouldShowViewportLabels() {
-    return (
-      this.getViewportBodyNames(this.getBodyPositionByName()).length <
-      VIEWPORT_LABEL_OBJECT_LIMIT
+  private getViewportLabelMode(): ViewportLabelMode {
+    const viewportBodyCount = this.getViewportBodyNames(
+      this.getBodyPositionByName(),
+    ).length;
+
+    if (viewportBodyCount < VIEWPORT_LABEL_OBJECT_LIMIT) return 'force';
+    if (viewportBodyCount > VIEWPORT_LABEL_OBJECT_LIMIT) return 'suppress';
+
+    return 'zoom';
+  }
+
+  private applyNameLabelVisibility(viewportLabelMode: ViewportLabelMode) {
+    const zoom = this.cameras.main.zoom;
+
+    this.stars.forEach((star) => {
+      star.setNameLabelVisible(
+        star.visible &&
+          (this.alwaysVisibleBodies.has(star.star.name) ||
+            viewportLabelMode === 'force' ||
+            (viewportLabelMode === 'zoom' &&
+              zoom >= star.star.renderZoomLevel)),
+      );
+    });
+
+    this.planets.forEach((planet) => {
+      planet.setNameLabelVisible(
+        planet.visible &&
+          (this.alwaysVisibleBodies.has(planet.planet.name) ||
+            viewportLabelMode === 'force' ||
+            (viewportLabelMode === 'zoom' &&
+              zoom >= planet.planet.renderZoomLevel)),
+      );
+    });
+  }
+
+  private resolveNameLabelCollisions() {
+    const camera = this.cameras.main;
+    if (!camera) return;
+
+    const candidates = [
+      ...this.stars.map((star) => ({
+        bodyName: star.star.name,
+        priority: 0,
+        bounds: star.getLabelScreenBounds(camera),
+        hide: () => star.setNameLabelVisible(false),
+      })),
+      ...this.planets.map((planet) => ({
+        bodyName: planet.planet.name,
+        priority: this.getPlanetLabelPriority(planet.planet),
+        bounds: planet.getLabelScreenBounds(camera),
+        hide: () => planet.setNameLabelVisible(false),
+      })),
+    ]
+      .filter(
+        (candidate): candidate is NameLabelCandidate & { bodyName: string } =>
+          Boolean(candidate.bounds),
+      )
+      .sort(
+        (a, b) =>
+          a.priority - b.priority || a.bodyName.localeCompare(b.bodyName),
+      );
+
+    const acceptedBounds: Phaser.Geom.Rectangle[] = [];
+    candidates.forEach((candidate) => {
+      const bounds = this.padScreenBounds(
+        candidate.bounds,
+        NAME_LABEL_COLLISION_PADDING_PX,
+      );
+      if (
+        acceptedBounds.some((accepted) =>
+          Phaser.Geom.Intersects.RectangleToRectangle(bounds, accepted),
+        )
+      ) {
+        candidate.hide();
+        return;
+      }
+
+      acceptedBounds.push(bounds);
+    });
+  }
+
+  private padScreenBounds(bounds: Phaser.Geom.Rectangle, padding: number) {
+    return new Phaser.Geom.Rectangle(
+      bounds.x - padding,
+      bounds.y - padding,
+      bounds.width + padding * 2,
+      bounds.height + padding * 2,
     );
+  }
+
+  private getPlanetLabelPriority(body: PlanetData) {
+    if (body.type === 'moon') return 2;
+
+    return 1;
   }
 
   private getViewportBodyNames(
     bodyPositionByName: Map<string, RenderedBodyPosition>,
   ) {
-    const viewport = this.cameras.main.worldView;
-    return [...this.planetData, ...this.starData]
+    const camera = this.cameras.main;
+    const viewport = camera.worldView;
+    const planets = this.planetData
       .filter((body) => {
         const position = bodyPositionByName.get(body.name);
-        return position && viewport.contains(position.x, position.y);
+        if (!position) return false;
+
+        return this.bodyBoundsIntersectViewport(
+          position.x,
+          position.y,
+          this.getPlanetViewportRadius(body, camera.zoom),
+          viewport,
+        );
       })
       .map((body) => body.name);
+    const stars = this.starData
+      .filter((body) => {
+        const position = bodyPositionByName.get(body.name);
+        if (!position) return false;
+
+        return this.bodyBoundsIntersectViewport(
+          position.x,
+          position.y,
+          Number(body.radius),
+          viewport,
+        );
+      })
+      .map((body) => body.name);
+
+    return [...planets, ...stars];
+  }
+
+  private getPlanetViewportRadius(body: PlanetData, zoom: number) {
+    const radius = Number(body.radius);
+    if (body.type !== 'blackhole') return radius;
+
+    return Math.max(radius, BLACK_HOLE_VIEWPORT_RADIUS_PX / zoom);
   }
 
   private bodyBoundsIntersectViewport(

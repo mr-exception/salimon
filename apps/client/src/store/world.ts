@@ -358,7 +358,7 @@ async function loadWorldViewportFromRest({
   ).replace(/\/+$/, '');
 
   worldAssetPromise ??= axios
-    .get<SerializedWorldSystems>(`${apiBaseUrl}/world/assets/world.json`)
+    .get<SerializedWorldSystems>(`${apiBaseUrl}/world/systems`)
     .then(({ data }) => data)
     .catch((error: unknown) => {
       worldAssetPromise = undefined;

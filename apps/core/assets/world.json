@@ -5,7 +5,7 @@
     [
       {
         "type": "blackhole",
-        "name": "Milky Way Center",
+        "name": "Sagittarius A*",
         "position": { "x": "0", "y": "0" },
         "orbitalCenter": null,
         "clockwise": false,
@@ -21,9 +21,9 @@
         "position": {
           "x": "245978992287100800000",
           "y": "0",
-          "relativeTo": "Milky Way Center"
+          "relativeTo": "Sagittarius A*"
         },
-        "orbitalCenter": "Milky Way Center",
+        "orbitalCenter": "Sagittarius A*",
         "clockwise": false,
         "speed": "220000",
         "mass": "1988500000000000000000000000000",

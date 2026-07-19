@@ -8,6 +8,7 @@ type WorldAsset = SerializedWorldSystems & {
 };
 
 export class WorldAssetService {
+  private static worldAsset: WorldAsset | undefined;
   private static worldAssetPromise: Promise<WorldAsset> | undefined;
 
   static getAssetsDirectory() {
@@ -22,7 +23,15 @@ export class WorldAssetService {
     };
   }
 
+  static async start() {
+    await WorldAssetService.getWorldAsset();
+  }
+
   private static async getWorldAsset() {
+    if (WorldAssetService.worldAsset) {
+      return WorldAssetService.worldAsset;
+    }
+
     WorldAssetService.worldAssetPromise ??= (async () => {
       const assetPath = path.join(
         WorldAssetService.getAssetsDirectory(),
@@ -35,6 +44,7 @@ export class WorldAssetService {
         throw new Error('World asset is missing a systems array.');
       }
 
+      WorldAssetService.worldAsset = asset;
       return asset;
     })().catch((error: unknown) => {
       WorldAssetService.worldAssetPromise = undefined;

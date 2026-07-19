@@ -33,6 +33,7 @@ type RotatingBody = {
 
 export type Planet = OrbitingBody &
   RotatingBody & {
+    type?: 'planet' | 'moon' | 'blackhole';
     color: number;
     variant: number;
     shapeRenderZoomLevel: number;
@@ -150,7 +151,7 @@ export type World = {
 
 export type SerializedBody<T extends Planet | Spaceship | Star> = Omit<
   T,
-  'position' | 'radius' | 'mass' | 'speed' | 'positionCapturedAt'
+  'type' | 'position' | 'radius' | 'mass' | 'speed' | 'positionCapturedAt'
 > & {
   position: SerializedPosition;
   radius: string;
@@ -168,7 +169,7 @@ export type SerializedWorld = {
 export type SerializedWorldBody =
   | (SerializedBody<Star> & { type: 'star' })
   | (SerializedBody<Planet> & {
-      type: 'planet' | 'moon' | 'asteroid' | 'astriod';
+      type: 'planet' | 'moon' | 'blackhole' | 'asteroid' | 'astriod';
     });
 
 export type SerializedWorldSystems = {

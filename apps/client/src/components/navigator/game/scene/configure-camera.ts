@@ -5,7 +5,9 @@ import {
 } from '../get-render-position';
 import { MAX_ZOOM } from './configure-input';
 
-const WORLD_SIZE = 2_050_000_000_000_000_000n;
+const LIGHT_YEAR_METERS = 9_460_730_472_580_800n;
+const MILKY_WAY_DIAMETER_LIGHT_YEARS = 150_000n;
+const WORLD_SIZE = MILKY_WAY_DIAMETER_LIGHT_YEARS * LIGHT_YEAR_METERS;
 
 export const WORLD_RADIUS = WORLD_SIZE / 2n;
 export const WORLD_MIN = -WORLD_RADIUS;

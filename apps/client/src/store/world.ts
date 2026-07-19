@@ -5,6 +5,8 @@ import type {
   InventoryMaterial,
   Planet,
   Position,
+  SerializedBody,
+  SerializedWorldBody,
   SerializedWorldSystems,
   SpaceshipActiveFeature,
   Spaceship,
@@ -22,6 +24,9 @@ import {
 } from '@repo/world';
 
 type Body = Planet | Spaceship | Star;
+type SerializedVisiblePlanetBody = SerializedBody<Planet> & {
+  type: 'planet' | 'moon' | 'blackhole';
+};
 type WorldListener = (
   world: World,
   changedBodyNames?: ReadonlySet<string>,
@@ -381,13 +386,8 @@ function applyWorldSystems(data: SerializedWorldSystems) {
     return deserializeBody<Star>(body, getStarVisualDefaults(body.name));
   });
   const planets = bodies.flatMap((body) => {
-    if (
-      body.type === 'star' ||
-      body.type === 'asteroid' ||
-      body.type === 'astriod'
-    ) {
-      return [];
-    }
+    if (!isVisiblePlanetBody(body)) return [];
+
     if (body.velocity) nextVelocities.set(body.name, body.velocity);
     return deserializeBody<Planet>(body, getPlanetVisualDefaults(body.name));
   });
@@ -407,6 +407,14 @@ function applyWorldSystems(data: SerializedWorldSystems) {
 export function hydrateWorldSystems(data: SerializedWorldSystems) {
   applyWorldSystems(data);
   return worldState;
+}
+
+function isVisiblePlanetBody(
+  body: SerializedWorldBody,
+): body is SerializedVisiblePlanetBody {
+  return (
+    body.type === 'planet' || body.type === 'moon' || body.type === 'blackhole'
+  );
 }
 
 function mergeBodies<T extends Planet | Star>(current: T[], incoming: T[]) {

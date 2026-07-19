@@ -1,9 +1,17 @@
-const SI_PREFIXES = [
-  { minimum: 1_000_000_000_000, symbol: 'T' },
-  { minimum: 1_000_000_000, symbol: 'G' },
-  { minimum: 1_000_000, symbol: 'M' },
-  { minimum: 1_000, symbol: 'k' },
-] as const;
+const SI_PREFIX_SYMBOLS = [
+  '',
+  'k',
+  'M',
+  'G',
+  'T',
+  'P',
+  'E',
+  'Z',
+  'Y',
+  'R',
+  'Q',
+];
+const QUETTA_PREFIX_INDEX = SI_PREFIX_SYMBOLS.length - 1;
 
 const numberFormatter = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 1,
@@ -18,10 +26,38 @@ function formatUnitValue(value: number, unit: string) {
 export function formatSiValue(value: number, unit: string) {
   if (!Number.isFinite(value)) return '—';
 
-  const prefix = SI_PREFIXES.find(({ minimum }) => Math.abs(value) >= minimum);
-  const divisor = prefix?.minimum ?? 1;
+  let formattedValue = value;
+  let prefixIndex = 0;
 
-  return formatUnitValue(value / divisor, `${prefix?.symbol ?? ''}${unit}`);
+  while (Math.abs(formattedValue) >= 1_000) {
+    formattedValue /= 1_000;
+    prefixIndex += 1;
+  }
+
+  if (Math.abs(Math.round(formattedValue * 10) / 10) >= 1_000) {
+    formattedValue /= 1_000;
+    prefixIndex += 1;
+  }
+
+  return formatUnitValue(formattedValue, `${getSiPrefix(prefixIndex)}${unit}`);
+}
+
+function getSiPrefix(index: number): string {
+  if (index <= 0) return '';
+
+  const prefix = SI_PREFIX_SYMBOLS[index];
+  if (prefix) return prefix;
+
+  return `${getCompoundSiPrefix(index - QUETTA_PREFIX_INDEX)}Q`;
+}
+
+function getCompoundSiPrefix(index: number): string {
+  if (index === 1) return 'K';
+
+  const prefix = SI_PREFIX_SYMBOLS[index];
+  if (prefix) return prefix.toUpperCase();
+
+  return `${getCompoundSiPrefix(index - QUETTA_PREFIX_INDEX)}Q`;
 }
 
 export function formatDistance(valueInMeters: number) {

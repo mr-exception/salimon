@@ -4,12 +4,28 @@
   "systems": [
     [
       {
-        "type": "star",
-        "name": "Sun",
+        "type": "blackhole",
+        "name": "Milky Way Center",
         "position": { "x": "0", "y": "0" },
         "orbitalCenter": null,
         "clockwise": false,
         "speed": "0",
+        "mass": "8544584500000000000000000000000000000",
+        "radius": "0",
+        "rotationPeriodSeconds": 0,
+        "positionCapturedAt": 1784419200000
+      },
+      {
+        "type": "star",
+        "name": "Sun",
+        "position": {
+          "x": "245978992287100800000",
+          "y": "0",
+          "relativeTo": "Milky Way Center"
+        },
+        "orbitalCenter": "Milky Way Center",
+        "clockwise": false,
+        "speed": "220000",
         "mass": "1988500000000000000000000000000",
         "radius": "695700000",
         "rotationPeriodSeconds": 2192832,

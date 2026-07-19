@@ -1,8 +1,9 @@
 import Phaser from 'phaser';
 import type { Scene } from '.';
 
-export const MIN_ZOOM = 0.000000000000001;
+export const MIN_ZOOM = 0.000000000000000002;
 export const MAX_ZOOM = 0.1;
+const MIN_PAN_EFFECTIVE_ZOOM = 0.000000000000000002;
 const CLICK_DISTANCE_THRESHOLD_PX = 5;
 
 export function configureInput(this: Scene) {
@@ -45,13 +46,9 @@ export function configureInput(this: Scene) {
 
     this.releaseCameraLock();
 
-    const previousWorldPoint = camera.getWorldPoint(
-      this.lastPointer.x,
-      this.lastPointer.y,
-    );
-    const currentWorldPoint = camera.getWorldPoint(pointer.x, pointer.y);
-    const deltaX = currentWorldPoint.x - previousWorldPoint.x;
-    const deltaY = currentWorldPoint.y - previousWorldPoint.y;
+    const effectiveZoom = Math.max(camera.zoom, MIN_PAN_EFFECTIVE_ZOOM);
+    const deltaX = (pointer.x - this.lastPointer.x) / effectiveZoom;
+    const deltaY = (pointer.y - this.lastPointer.y) / effectiveZoom;
     if (deltaX === 0 && deltaY === 0) return;
 
     camera.scrollX -= deltaX;

@@ -5,6 +5,9 @@ import { getRenderPosition } from './get-render-position';
 import { getPlanetPhysicsLabel } from './physics';
 
 const LABEL_SCREEN_GAP = 6;
+const BLACK_HOLE_MIN_SCREEN_RADIUS = 16;
+const BLACK_HOLE_STROKE_COLOR = 0xfbbf24;
+const BLACK_HOLE_STROKE_HIGHLIGHT = 0xfff7ad;
 export const PLANET_PATTERN_VARIANT_COUNT = 10;
 export const PLANET_PATTERN_TEXTURE_SIZE = 1_024;
 
@@ -54,11 +57,12 @@ export class Planet extends Phaser.GameObjects.Container {
     this.setName(planet.name);
     this.add([this.planetGraphics, this.patternImage, this.label]);
     this.patternImage.setAngle(planet.rotationDegrees);
+    if (this.isBlackHole()) this.setDepth(3);
     scene.add.existing(this);
     this.physicsBody = scene.matter.add.circle(
       this.x,
       this.y,
-      Number(planet.radius),
+      Math.max(1, Number(planet.radius)),
       {
         label: getPlanetPhysicsLabel(planet.name),
         isStatic: true,
@@ -81,14 +85,16 @@ export class Planet extends Phaser.GameObjects.Container {
   ) {
     const { x, y } = getRenderPosition(this.planet.position);
     const radius = Number(this.planet.radius);
+    const visibleRadius = this.getVisibleRadius(zoom);
     const intersectsViewport =
-      x + radius >= viewport.left &&
-      x - radius <= viewport.right &&
-      y + radius >= viewport.top &&
-      y - radius <= viewport.bottom;
+      x + visibleRadius >= viewport.left &&
+      x - visibleRadius <= viewport.right &&
+      y + visibleRadius >= viewport.top &&
+      y - visibleRadius <= viewport.bottom;
 
     const shapeVisible =
-      zoom >= this.planet.shapeRenderZoomLevel && intersectsViewport;
+      this.isBlackHole() ||
+      (zoom >= this.planet.shapeRenderZoomLevel && intersectsViewport);
 
     const bodyVisible =
       intersectsViewport &&
@@ -100,22 +106,27 @@ export class Planet extends Phaser.GameObjects.Container {
     this.planetGraphics.setVisible(shapeVisible);
     this.patternImage.setVisible(shapeVisible);
     if (shapeVisible) {
-      drawCelestialBody(
-        this.planetGraphics,
-        this.planet.color,
-        radius,
-        zoom,
-        viewport,
-        this.x,
-        this.y,
-        0.3,
-      );
+      if (this.isBlackHole()) {
+        this.patternImage.setVisible(false);
+        this.drawBlackHole(visibleRadius, zoom);
+      } else {
+        drawCelestialBody(
+          this.planetGraphics,
+          this.planet.color,
+          radius,
+          zoom,
+          viewport,
+          this.x,
+          this.y,
+          0.3,
+        );
+      }
     }
     this.label.setVisible(
       alwaysVisible || showViewportLabel || zoom >= this.planet.renderZoomLevel,
     );
     this.label.setScale(1 / zoom);
-    this.label.setY(-radius - LABEL_SCREEN_GAP / zoom);
+    this.label.setY(-visibleRadius - LABEL_SCREEN_GAP / zoom);
   }
 
   syncPosition() {
@@ -128,6 +139,8 @@ export class Planet extends Phaser.GameObjects.Container {
   }
 
   syncRotation(elapsedSeconds: number) {
+    if (this.isBlackHole()) return;
+
     this.patternImage.rotation =
       ((this.planet.rotationDegrees * Math.PI) / 180 +
         (Math.PI * 2 * elapsedSeconds) / this.planet.rotationPeriodSeconds) %
@@ -143,7 +156,7 @@ export class Planet extends Phaser.GameObjects.Container {
 
     const screenX = (this.x - camera.worldView.left) * camera.zoom;
     const screenY = (this.y - camera.worldView.top) * camera.zoom;
-    const screenRadius = Number(this.planet.radius) * camera.zoom;
+    const screenRadius = this.getVisibleRadius(camera.zoom) * camera.zoom;
     const hitRadius = Math.max(8, screenRadius);
     const hitsShape =
       this.planetGraphics.visible &&
@@ -157,5 +170,29 @@ export class Planet extends Phaser.GameObjects.Container {
       y <= labelBottom;
 
     return hitsShape || hitsLabel;
+  }
+
+  private isBlackHole() {
+    return this.planet.type === 'blackhole';
+  }
+
+  private getVisibleRadius(zoom: number) {
+    const radius = Number(this.planet.radius);
+    if (!this.isBlackHole()) return radius;
+
+    return Math.max(radius, BLACK_HOLE_MIN_SCREEN_RADIUS / zoom);
+  }
+
+  private drawBlackHole(radius: number, zoom: number) {
+    this.planetGraphics
+      .clear()
+      .fillStyle(0x000000, 1)
+      .fillCircle(0, 0, radius)
+      .lineStyle(6 / zoom, BLACK_HOLE_STROKE_COLOR, 0.34)
+      .strokeCircle(0, 0, radius)
+      .lineStyle(3 / zoom, BLACK_HOLE_STROKE_COLOR, 0.95)
+      .strokeCircle(0, 0, radius)
+      .lineStyle(1 / zoom, BLACK_HOLE_STROKE_HIGHLIGHT, 0.9)
+      .strokeCircle(0, 0, radius - 1.5 / zoom);
   }
 }

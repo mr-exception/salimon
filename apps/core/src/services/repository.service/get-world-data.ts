@@ -17,7 +17,7 @@ export async function getWorldData(): Promise<WorldData> {
       return;
     }
 
-    if (body.type === 'planet') {
+    if (body.type === 'planet' || body.type === 'blackhole') {
       worldData.planets.push(toWorldBodyDocument(body));
       return;
     }

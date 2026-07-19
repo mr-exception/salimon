@@ -278,7 +278,6 @@ export const spaceshipState: Spaceship = {
 
 const listeners = new Set<WorldListener>();
 let loadPromise: Promise<World> | undefined;
-let worldAssetPromise: Promise<SerializedWorldSystems> | undefined;
 let worldBodyByName = new Map<string, Body>();
 let bodyVelocityByName = new Map<string, Vector>();
 let spaceshipVelocity: Vector | undefined;
@@ -289,13 +288,10 @@ let worldElapsedSeconds = 0;
 let worldViewportLoader: WorldViewportLoader | undefined;
 
 type WorldViewportRequest = {
-  x: string;
-  y: string;
-  radius: string;
-  left?: string;
-  right?: string;
-  top?: string;
-  bottom?: string;
+  x1: string;
+  y1: string;
+  x2: string;
+  y2: string;
   requiredBodyNames?: string[];
 };
 
@@ -315,23 +311,17 @@ export async function loadWorld(request: WorldViewportRequest) {
 }
 
 export async function refreshWorldViewport({
-  x,
-  y,
-  radius,
-  left,
-  right,
-  top,
-  bottom,
+  x1,
+  y1,
+  x2,
+  y2,
   requiredBodyNames,
 }: WorldViewportRequest) {
   const request = {
-    x,
-    y,
-    radius,
-    ...(left === undefined ? {} : { left }),
-    ...(right === undefined ? {} : { right }),
-    ...(top === undefined ? {} : { top }),
-    ...(bottom === undefined ? {} : { bottom }),
+    x1,
+    y1,
+    x2,
+    y2,
     ...(requiredBodyNames === undefined ? {} : { requiredBodyNames }),
   };
   const data = worldViewportLoader
@@ -343,29 +333,25 @@ export async function refreshWorldViewport({
 }
 
 async function loadWorldViewportFromRest({
-  x,
-  y,
-  radius,
+  x1,
+  y1,
+  x2,
+  y2,
   requiredBodyNames,
 }: WorldViewportRequest) {
-  void x;
-  void y;
-  void radius;
-  void requiredBodyNames;
-
   const apiBaseUrl = (
     import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL
   ).replace(/\/+$/, '');
 
-  worldAssetPromise ??= axios
-    .get<SerializedWorldSystems>(`${apiBaseUrl}/world/systems`)
-    .then(({ data }) => data)
-    .catch((error: unknown) => {
-      worldAssetPromise = undefined;
-      throw error;
-    });
-
-  return worldAssetPromise;
+  return axios
+    .post<SerializedWorldSystems>(`${apiBaseUrl}/world/systems`, {
+      x1,
+      y1,
+      x2,
+      y2,
+      ...(requiredBodyNames === undefined ? {} : { requiredBodyNames }),
+    })
+    .then(({ data }) => data);
 }
 
 export function subscribeToWorld(listener: WorldListener) {

@@ -4,7 +4,7 @@ import type { Request, Response } from 'express';
 
 export async function getSystems(request: Request, response: Response) {
   try {
-    const world = await WorldViewportService.getWorldSystems(request.query);
+    const world = await WorldViewportService.getWorldSystems(request.body);
     response.json(world);
   } catch (error) {
     console.error('Failed to load world systems', error);

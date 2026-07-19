@@ -108,6 +108,7 @@ const MEASUREMENT_ARROW_COLOR = 0x22d3ee;
 const PREDICTION_COLOR = 0xa78bfa;
 const ASTEROID_ONE_TONNE_SCREEN_DIAMETER_AT_MAX_ZOOM = 250;
 const ENGINE_START_RESPONSE_TIMEOUT_MS = 5_000;
+const WORLD_VIEWPORT_REQUEST_DEBOUNCE_MS = 500;
 const ASTEROID_MATERIAL_THICKNESS: Record<AsteroidMaterial, number> = {
   iron: 3,
   silicates: 5,
@@ -191,6 +192,9 @@ export class Scene extends Phaser.Scene {
   ) => void;
   protected readonly onTargetDirectionSelected?: () => void;
   readonly onWorldLoadComplete?: (error?: unknown) => void;
+  protected readonly onWorldViewportLoadingChange?: (
+    isLoading: boolean,
+  ) => void;
   protected planetData: PlanetData[] = [];
   protected starData: StarData[] = [];
   protected planets: Planet[] = [];
@@ -243,6 +247,7 @@ export class Scene extends Phaser.Scene {
     onTargetDirectionPreview?: (preview?: TargetDirectionPreview) => void,
     onTargetDirectionSelected?: () => void,
     onWorldLoadComplete?: (error?: unknown) => void,
+    onWorldViewportLoadingChange?: (isLoading: boolean) => void,
   ) {
     super('navigation');
     this.onZoomChange = onZoomChange;
@@ -253,6 +258,7 @@ export class Scene extends Phaser.Scene {
     this.onTargetDirectionPreview = onTargetDirectionPreview;
     this.onTargetDirectionSelected = onTargetDirectionSelected;
     this.onWorldLoadComplete = onWorldLoadComplete;
+    this.onWorldViewportLoadingChange = onWorldViewportLoadingChange;
   }
 
   protected configureCamera = configureCamera;
@@ -1493,10 +1499,6 @@ export class Scene extends Phaser.Scene {
     const camera = this.cameras.main;
     camera.preRender();
     const viewport = camera.worldView;
-    const center = getWorldPositionFromRenderPosition(
-      viewport.centerX,
-      viewport.centerY,
-    );
     const topLeft = getWorldPositionFromRenderPosition(
       viewport.left,
       viewport.top,
@@ -1505,33 +1507,30 @@ export class Scene extends Phaser.Scene {
       viewport.right,
       viewport.bottom,
     );
-    const radius = BigInt(
-      Math.ceil(Math.hypot(viewport.width, viewport.height) / 2),
-    );
     const requiredBodyNames = spaceshipState.position.relativeTo
       ? [spaceshipState.position.relativeTo]
       : undefined;
+    this.onWorldViewportLoadingChange?.(true);
     const world = await refreshWorldViewport({
-      x: center.x.toString(),
-      y: center.y.toString(),
-      radius: radius.toString(),
-      left:
+      x1:
         topLeft.x < bottomRight.x
           ? topLeft.x.toString()
           : bottomRight.x.toString(),
-      right:
+      x2:
         topLeft.x > bottomRight.x
           ? topLeft.x.toString()
           : bottomRight.x.toString(),
-      top:
+      y1:
         topLeft.y < bottomRight.y
           ? topLeft.y.toString()
           : bottomRight.y.toString(),
-      bottom:
+      y2:
         topLeft.y > bottomRight.y
           ? topLeft.y.toString()
           : bottomRight.y.toString(),
       requiredBodyNames,
+    }).finally(() => {
+      this.onWorldViewportLoadingChange?.(false);
     });
 
     this.setWorldBodyData(world.planets, world.stars);
@@ -1542,7 +1541,7 @@ export class Scene extends Phaser.Scene {
     return world;
   }
 
-  queueViewportWorldRefresh(delayMs = 250) {
+  queueViewportWorldRefresh(delayMs = WORLD_VIEWPORT_REQUEST_DEBOUNCE_MS) {
     window.clearTimeout(this.viewportRefreshDebounceTimer);
     this.viewportRefreshDebounceTimer = window.setTimeout(() => {
       this.viewportRefreshDebounceTimer = undefined;
@@ -1565,7 +1564,7 @@ export class Scene extends Phaser.Scene {
         this.viewportRefreshPromise = undefined;
         if (this.hasPendingViewportRefresh) {
           this.hasPendingViewportRefresh = false;
-          this.refreshWorldFromViewportSafely();
+          this.queueViewportWorldRefresh();
         }
       });
   }

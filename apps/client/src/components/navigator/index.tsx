@@ -198,6 +198,7 @@ export function Navigator({
   const [worldLoadState, setWorldLoadState] = useState<
     'loading' | 'ready' | 'error'
   >('loading');
+  const [isWorldViewportLoading, setIsWorldViewportLoading] = useState(false);
   const [contextMenu, setContextMenu] = useState<BodyContextMenuRequest | null>(
     null,
   );
@@ -256,6 +257,7 @@ export function Navigator({
       (preview) => setTargetPreview(preview ?? null),
       onTargetDirectionSelected,
       (error) => setWorldLoadState(error ? 'error' : 'ready'),
+      setIsWorldViewportLoading,
     );
     sceneRef.current = scene;
     onSceneChange?.(scene);
@@ -327,6 +329,16 @@ export function Navigator({
           ) : (
             <span>Unable to load star systems.</span>
           )}
+        </div>
+      )}
+      {isWorldViewportLoading && worldLoadState === 'ready' && (
+        <div
+          className={style.worldViewportLoadingIndicator}
+          role="status"
+          aria-live="polite"
+        >
+          <span className={style.worldLoadingSpinner} aria-hidden="true" />
+          <span>Loading systems</span>
         </div>
       )}
       <SearchPanel

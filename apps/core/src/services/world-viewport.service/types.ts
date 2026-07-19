@@ -29,6 +29,10 @@ export type VisiblePlanetSystem = {
 export type WorldViewportRequest = {
   x?: string;
   y?: string;
+  x1?: string;
+  y1?: string;
+  x2?: string;
+  y2?: string;
   radius?: string;
   coordinate?: string;
   left?: string;

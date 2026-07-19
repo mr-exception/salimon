@@ -43,6 +43,35 @@
   animation: world-loading-spin 800ms linear infinite;
 }
 
+.worldViewportLoadingIndicator {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  height: 34px;
+  padding: 0 13px;
+  border: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 28%, transparent);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--color-deep-space) 90%, transparent);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 35%);
+  color: var(--color-starlight);
+  font:
+    700 0.68rem/1 system-ui,
+    sans-serif;
+  text-transform: uppercase;
+  transform: translateX(-50%);
+  backdrop-filter: blur(4px);
+}
+
+.worldViewportLoadingIndicator .worldLoadingSpinner {
+  width: 14px;
+  height: 14px;
+}
+
 @keyframes world-loading-spin {
   to {
     transform: rotate(1turn);

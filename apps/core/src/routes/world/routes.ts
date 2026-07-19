@@ -4,4 +4,4 @@ import { getSystems } from './get-systems';
 
 export const worldRouter = Router();
 
-worldRouter.get('/systems', asyncHandler(getSystems));
+worldRouter.post('/systems', asyncHandler(getSystems));

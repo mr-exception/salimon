@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
 import type { Scene } from '.';
 
-export const MIN_ZOOM = 0.00000000000000001;
+export const MIN_ZOOM = 0.00000000000001;
 export const MAX_ZOOM = 0.1;
-const MIN_PAN_EFFECTIVE_ZOOM = 0.00000000000000001;
+const MIN_PAN_EFFECTIVE_ZOOM = 0.00000000000001;
 const CLICK_DISTANCE_THRESHOLD_PX = 5;
 
 export function configureInput(this: Scene) {

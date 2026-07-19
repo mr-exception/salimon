@@ -32,7 +32,9 @@ export async function getWorldData(): Promise<WorldData> {
 
 function toWorldBodyDocument(body: SerializedWorldBody): WorldBodyDocument {
   return {
+    id: body.id,
     name: body.name,
+    isReal: body.isReal ?? true,
     position: { ...body.position },
     orbitalCenter: body.orbitalCenter,
     clockwise: body.clockwise,
@@ -40,6 +42,6 @@ function toWorldBodyDocument(body: SerializedWorldBody): WorldBodyDocument {
     mass: body.mass,
     radius: body.radius,
     rotationPeriodSeconds: body.rotationPeriodSeconds,
-    updatedAt: new Date(body.positionCapturedAt ?? Date.now()),
+    updatedAt: new Date(body.cTime ?? Date.now()),
   };
 }

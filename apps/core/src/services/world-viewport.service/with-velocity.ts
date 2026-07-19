@@ -11,7 +11,6 @@ export function withVelocity(
   return {
     ...responseBody,
     velocity: velocities.get(body.name) ?? { x: 0, y: 0 },
-    positionCapturedAt: updatedAt.getTime(),
+    cTime: updatedAt.getTime(),
   };
 }
-

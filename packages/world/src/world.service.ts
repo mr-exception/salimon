@@ -17,6 +17,7 @@ export type SerializedPosition = {
   x: string;
   y: string;
   relativeTo?: string;
+  relativeToId?: string;
 };
 
 export type Motion = {
@@ -30,6 +31,7 @@ export type WorldBodyLike = {
     x: NumericValue;
     y: NumericValue;
     relativeTo?: string;
+    relativeToId?: string;
   };
   mass: NumericValue;
   radius?: NumericValue;
@@ -93,6 +95,9 @@ export class WorldService {
       y: Math.round(x * sin + y * cos).toString(),
       ...(body.position.relativeTo
         ? { relativeTo: body.position.relativeTo }
+        : {}),
+      ...(body.position.relativeToId
+        ? { relativeToId: body.position.relativeToId }
         : {}),
     };
   }
@@ -374,11 +379,13 @@ export class WorldService {
     x: NumericValue;
     y: NumericValue;
     relativeTo?: string;
+    relativeToId?: string;
   }): SerializedPosition {
     return {
       x: position.x.toString(),
       y: position.y.toString(),
       ...(position.relativeTo ? { relativeTo: position.relativeTo } : {}),
+      ...(position.relativeToId ? { relativeToId: position.relativeToId } : {}),
     };
   }
 }

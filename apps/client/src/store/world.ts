@@ -899,17 +899,14 @@ function advanceBodyPositions(elapsedSeconds: number) {
 }
 
 function advanceBodyPositionToNow(body: Planet | Star) {
-  const positionCapturedAtMs = getSnapshotTimeMs(body.positionCapturedAt);
-  if (!Number.isFinite(positionCapturedAtMs)) return;
+  const cTime = getSnapshotTimeMs(body.cTime);
+  if (!Number.isFinite(cTime)) return;
 
-  const elapsedSeconds = Math.max(
-    0,
-    (Date.now() - positionCapturedAtMs) / 1000,
-  );
+  const elapsedSeconds = Math.max(0, (Date.now() - cTime) / 1000);
   if (elapsedSeconds <= 0) return;
 
   advanceBodyPositionByOrbit(body, elapsedSeconds);
-  body.positionCapturedAt = Date.now();
+  body.cTime = Date.now();
 }
 
 function advanceBodyPositionByOrbit(
@@ -1350,11 +1347,16 @@ function normalizeAttachedSpaceshipPosition() {
 function deserializeBody<T extends Body>(
   body: Partial<Omit<T, 'position' | 'radius' | 'mass' | 'speed'>> & {
     name: string;
-    position: { x: string; y: string; relativeTo?: string };
+    position: {
+      x: string;
+      y: string;
+      relativeTo?: string;
+      relativeToId?: string;
+    };
     radius: string;
     mass: string;
     speed: string;
-    positionCapturedAt?: number | string;
+    cTime?: number | string;
   },
   defaults: Partial<T> = {},
 ): T {
@@ -1365,6 +1367,7 @@ function deserializeBody<T extends Body>(
       x: BigInt(body.position.x),
       y: BigInt(body.position.y),
       relativeTo: body.position.relativeTo,
+      relativeToId: body.position.relativeToId,
     },
     radius: BigInt(body.radius),
     mass: BigInt(body.mass),

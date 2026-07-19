@@ -16,12 +16,21 @@ class SerializedPositionSchema implements SerializedPosition {
 
   @prop({ type: () => String })
   public relativeTo?: string;
+
+  @prop({ type: () => String })
+  public relativeToId?: string;
 }
 
 @modelOptions({ schemaOptions: { versionKey: false } })
 class WorldBodySchema {
+  @prop({ type: () => String })
+  public id?: string;
+
   @prop({ required: true, type: () => String })
   public name!: string;
+
+  @prop({ default: true, type: () => Boolean })
+  public isReal!: boolean;
 
   @prop({ required: true, type: () => SerializedPositionSchema })
   public position!: SerializedPosition;
@@ -91,7 +100,9 @@ export class WorldBodyModel {
 
   static async findAllWorldBodies() {
     const projection = {
+      id: 1,
       name: 1,
+      isReal: 1,
       position: 1,
       orbitalCenter: 1,
       clockwise: 1,
@@ -121,7 +132,9 @@ export class WorldBodyModel {
   static async findOfflineBodies() {
     const projection = {
       _id: 0,
+      id: 1,
       name: 1,
+      isReal: 1,
       position: 1,
       orbitalCenter: 1,
       clockwise: 1,

@@ -8,7 +8,7 @@ export type Coordinate = {
 
 export type WorldBodyResponse = Omit<WorldBodyDocument, 'updatedAt'> & {
   velocity: Velocity;
-  positionCapturedAt: number;
+  cTime: number;
 };
 
 export type PlanetSystem = {

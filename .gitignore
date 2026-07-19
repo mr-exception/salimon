@@ -27,6 +27,7 @@ out/
 build
 dist
 mongo-data/
+fetch-world-data.stats.json
 
 # Debug
 npm-debug.log*

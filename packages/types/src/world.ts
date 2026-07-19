@@ -2,12 +2,14 @@ export type Position = {
   x: bigint;
   y: bigint;
   relativeTo?: string;
+  relativeToId?: string;
 };
 
 export type SerializedPosition = {
   x: string;
   y: string;
   relativeTo?: string;
+  relativeToId?: string;
 };
 
 export type Velocity = {
@@ -16,8 +18,10 @@ export type Velocity = {
 };
 
 type OrbitingBody = {
+  id?: string;
+  isReal?: boolean;
   position: Position;
-  positionCapturedAt?: number;
+  cTime?: number;
   name: string;
   radius: bigint;
   mass: bigint;
@@ -48,7 +52,7 @@ export type Star = OrbitingBody &
     renderZoomLevel: number;
   };
 
-export type Spaceship = Omit<OrbitingBody, 'positionCapturedAt'> & {
+export type Spaceship = Omit<OrbitingBody, 'cTime'> & {
   positionCapturedAt?: string;
   heading: number;
 };
@@ -151,14 +155,15 @@ export type World = {
 
 export type SerializedBody<T extends Planet | Spaceship | Star> = Omit<
   T,
-  'type' | 'position' | 'radius' | 'mass' | 'speed' | 'positionCapturedAt'
+  'type' | 'position' | 'radius' | 'mass' | 'speed' | 'cTime'
 > & {
+  isReal: boolean;
   position: SerializedPosition;
   radius: string;
   mass: string;
   speed: string;
   velocity?: Velocity;
-  positionCapturedAt?: number;
+  cTime?: number;
 };
 
 export type SerializedWorld = {

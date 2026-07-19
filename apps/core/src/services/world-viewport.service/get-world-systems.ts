@@ -1,5 +1,5 @@
 import type { SerializedWorldBody, SerializedWorldSystems } from '@repo/types';
-import { WorldAssetService } from '../world-asset.service';
+import { WorldSystemModel } from '@models';
 import type { WorldViewportOptions, WorldViewportRequest } from './types';
 
 type Coordinate = {
@@ -18,7 +18,9 @@ export async function getWorldSystems(
   request: WorldViewportRequest,
   options: WorldViewportOptions = {},
 ): Promise<SerializedWorldSystems> {
-  const world = await WorldAssetService.getWorldSystems();
+  const systems = (await WorldSystemModel.findAllSystems()).map(
+    (system) => system.bodies,
+  );
   const viewport = getViewportRectangle(request);
   const requiredBodyNames = new Set(options.requiredBodyNames);
 
@@ -26,9 +28,9 @@ export async function getWorldSystems(
     requiredBodyNames.add(bodyName),
   );
 
-  const bodies = world.systems.flat();
+  const bodies = systems.flat();
   const positionsByName = resolvePositions(bodies);
-  const visibleSystems = world.systems.filter((system) => {
+  const visibleSystems = systems.filter((system) => {
     const primary = getPrimaryBody(system);
     const position = primary ? positionsByName.get(primary.name) : undefined;
     const isInViewport = position
@@ -38,19 +40,8 @@ export async function getWorldSystems(
 
     return isInViewport || isRequired;
   });
-  const visibleSystemNames = new Set(
-    visibleSystems.map((system) => getPrimaryBody(system)?.name),
-  );
-
   return {
     systems: visibleSystems,
-    ...(world.asteroids
-      ? {
-          asteroids: world.asteroids.filter((asteroid) =>
-            visibleSystemNames.has(asteroid.systemName),
-          ),
-        }
-      : {}),
   };
 }
 
@@ -62,7 +53,9 @@ function parseInteger(value: string | undefined, name: string) {
   return BigInt(value);
 }
 
-function getViewportRectangle(request: WorldViewportRequest): ViewportRectangle {
+function getViewportRectangle(
+  request: WorldViewportRequest,
+): ViewportRectangle {
   const x1 = parseInteger(request.x1 ?? request.left, 'x1');
   const y1 = parseInteger(request.y1 ?? request.top, 'y1');
   const x2 = parseInteger(request.x2 ?? request.right, 'x2');
@@ -77,9 +70,8 @@ function getViewportRectangle(request: WorldViewportRequest): ViewportRectangle 
 }
 
 function parseRequiredBodyNames(requiredBodyNames: string | string[] = []) {
-  return (Array.isArray(requiredBodyNames)
-    ? requiredBodyNames
-    : [requiredBodyNames]
+  return (
+    Array.isArray(requiredBodyNames) ? requiredBodyNames : [requiredBodyNames]
   )
     .flatMap((value) => value.split(','))
     .map((bodyName) => bodyName.trim())

@@ -165,17 +165,13 @@ export type SerializedWorld = {
   stars: SerializedBody<Star>[];
 };
 
-export type SerializedPlanetSystem = {
-  planet: SerializedBody<Planet>;
-  moons: SerializedBody<Planet>[];
-};
-
-export type SerializedStarSystem = {
-  star: SerializedBody<Star>;
-  planets: SerializedPlanetSystem[];
-};
+export type SerializedWorldBody =
+  | (SerializedBody<Star> & { type: 'star' })
+  | (SerializedBody<Planet> & {
+      type: 'planet' | 'moon' | 'asteroid' | 'astriod';
+    });
 
 export type SerializedWorldSystems = {
-  systems: SerializedStarSystem[];
+  systems: SerializedWorldBody[][];
   asteroids?: AsteroidDto[];
 };

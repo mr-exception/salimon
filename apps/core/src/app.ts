@@ -6,6 +6,7 @@ import {
   spaceshipsRouter,
   worldRouter,
 } from '@routes';
+import { WorldAssetService } from '@services';
 import { spaceshipSecurityCode } from './middleware';
 export function createApp() {
   const app = express();
@@ -19,6 +20,13 @@ export function createApp() {
   app.use('/spaceship', spaceshipsRouter);
   app.use('/contacts', contactsRouter);
   app.use('/metrics', metricsRouter);
+  app.use(
+    '/world/assets',
+    express.static(WorldAssetService.getAssetsDirectory(), {
+      immutable: true,
+      maxAge: '1h',
+    }),
+  );
   app.use('/world', worldRouter);
 
   const errorHandler: ErrorRequestHandler = (

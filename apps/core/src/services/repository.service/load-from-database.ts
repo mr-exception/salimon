@@ -1,18 +1,13 @@
-import { SpaceshipModel, WorldBodyModel } from '@models';
+import { SpaceshipModel } from '@models';
 import { cloneSpaceship } from './clone-spaceship';
-import { cloneWorldData } from './clone-world-data';
 import { repositoryState } from './state';
 import { flushToDatabase } from './flush-to-database';
 
 const DATABASE_FLUSH_INTERVAL_MS = 5 * 60 * 1_000;
 
 export async function loadFromDatabase() {
-  const [worldData, spaceships] = await Promise.all([
-    WorldBodyModel.findAllWorldBodies(),
-    SpaceshipModel.findAll(),
-  ]);
+  const spaceships = await SpaceshipModel.findAll();
 
-  repositoryState.worldData = cloneWorldData(worldData);
   repositoryState.spaceshipsBySecurityCode = new Map(
     spaceships.map((spaceship) => [
       spaceship.securityCode,
@@ -26,4 +21,3 @@ export async function loadFromDatabase() {
     });
   }, DATABASE_FLUSH_INTERVAL_MS);
 }
-

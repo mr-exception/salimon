@@ -221,23 +221,27 @@ export function Navigator({
   }, [showAsteroids]);
 
   useEffect(() => {
-    let lastUpdate = 0;
     const updateTelemetry = () => {
-      const now = performance.now();
-      if (now - lastUpdate < TELEMETRY_UPDATE_INTERVAL_MS) return;
-
-      lastUpdate = now;
       setProximityTelemetry(getSpaceshipProximityTelemetry());
     };
 
     updateTelemetry();
-    return subscribeToWorld((updatedWorld) => {
+    const telemetryTimer = window.setInterval(
+      updateTelemetry,
+      TELEMETRY_UPDATE_INTERVAL_MS,
+    );
+    const unsubscribeFromWorld = subscribeToWorld((updatedWorld) => {
       setWorld({
         planets: updatedWorld.planets,
         stars: updatedWorld.stars,
       });
       updateTelemetry();
     });
+
+    return () => {
+      window.clearInterval(telemetryTimer);
+      unsubscribeFromWorld();
+    };
   }, []);
 
   useEffect(() => {

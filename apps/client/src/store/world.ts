@@ -273,6 +273,7 @@ export const spaceshipState: Spaceship = {
 
 const listeners = new Set<WorldListener>();
 let loadPromise: Promise<World> | undefined;
+let worldAssetPromise: Promise<SerializedWorldSystems> | undefined;
 let worldBodyByName = new Map<string, Body>();
 let bodyVelocityByName = new Map<string, Vector>();
 let spaceshipVelocity: Vector | undefined;
@@ -342,24 +343,24 @@ async function loadWorldViewportFromRest({
   radius,
   requiredBodyNames,
 }: WorldViewportRequest) {
+  void x;
+  void y;
+  void radius;
+  void requiredBodyNames;
+
   const apiBaseUrl = (
     import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL
   ).replace(/\/+$/, '');
 
-  const { data } = await axios.get<SerializedWorldSystems>(
-    `${apiBaseUrl}/world/systems`,
-    {
-      params: {
-        x,
-        y,
-        radius,
-        ...(requiredBodyNames
-          ? { requiredBodyNames: requiredBodyNames.join(',') }
-          : {}),
-      },
-    },
-  );
-  return data;
+  worldAssetPromise ??= axios
+    .get<SerializedWorldSystems>(`${apiBaseUrl}/world/assets/world.json`)
+    .then(({ data }) => data)
+    .catch((error: unknown) => {
+      worldAssetPromise = undefined;
+      throw error;
+    });
+
+  return worldAssetPromise;
 }
 
 export function subscribeToWorld(listener: WorldListener) {
@@ -371,22 +372,25 @@ export function subscribeToWorld(listener: WorldListener) {
 }
 
 function applyWorldSystems(data: SerializedWorldSystems) {
+  store.set(asteroidsAtom, data.asteroids ?? []);
   const nextVelocities = new Map<string, Vector>();
-  const stars = data.systems.map(({ star }) => {
-    if (star.velocity) nextVelocities.set(star.name, star.velocity);
-    return deserializeBody<Star>(star, getStarVisualDefaults(star.name));
+  const bodies = data.systems.flat();
+  const stars = bodies.flatMap((body) => {
+    if (body.type !== 'star') return [];
+    if (body.velocity) nextVelocities.set(body.name, body.velocity);
+    return deserializeBody<Star>(body, getStarVisualDefaults(body.name));
   });
-  const planets = data.systems.flatMap(({ planets: planetSystems }) =>
-    planetSystems.flatMap(({ planet, moons }) =>
-      [planet, ...moons].map((body) => {
-        if (body.velocity) nextVelocities.set(body.name, body.velocity);
-        return deserializeBody<Planet>(
-          body,
-          getPlanetVisualDefaults(body.name),
-        );
-      }),
-    ),
-  );
+  const planets = bodies.flatMap((body) => {
+    if (
+      body.type === 'star' ||
+      body.type === 'asteroid' ||
+      body.type === 'astriod'
+    ) {
+      return [];
+    }
+    if (body.velocity) nextVelocities.set(body.name, body.velocity);
+    return deserializeBody<Planet>(body, getPlanetVisualDefaults(body.name));
+  });
 
   worldState.stars = mergeBodies(worldState.stars, stars);
   worldState.planets = mergeBodies(worldState.planets, planets);

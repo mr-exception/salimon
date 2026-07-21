@@ -1,11 +1,6 @@
-import type { SerializedWorldBody, SerializedWorldSystems } from '@repo/types';
+import type { SerializedWorldSystems } from '@repo/types';
 import { WorldSystemModel } from '@models';
 import type { WorldViewportOptions, WorldViewportRequest } from './types';
-
-type Coordinate = {
-  x: bigint;
-  y: bigint;
-};
 
 type ViewportRectangle = {
   left: bigint;
@@ -18,9 +13,6 @@ export async function getWorldSystems(
   request: WorldViewportRequest,
   options: WorldViewportOptions = {},
 ): Promise<SerializedWorldSystems> {
-  const systems = (await WorldSystemModel.findAllSystems()).map(
-    (system) => system.bodies,
-  );
   const viewport = getViewportRectangle(request);
   const requiredBodyNames = new Set(options.requiredBodyNames);
 
@@ -28,20 +20,13 @@ export async function getWorldSystems(
     requiredBodyNames.add(bodyName),
   );
 
-  const bodies = systems.flat();
-  const positionsByName = resolvePositions(bodies);
-  const visibleSystems = systems.filter((system) => {
-    const primary = getPrimaryBody(system);
-    const position = primary ? positionsByName.get(primary.name) : undefined;
-    const isInViewport = position
-      ? isInsideViewport(position, viewport)
-      : false;
-    const isRequired = system.some((body) => requiredBodyNames.has(body.name));
+  const visibleSystems = await WorldSystemModel.findSystemsInViewport(
+    viewport,
+    requiredBodyNames,
+  );
 
-    return isInViewport || isRequired;
-  });
   return {
-    systems: visibleSystems,
+    systems: visibleSystems.map((system) => system.bodies),
   };
 }
 
@@ -76,61 +61,4 @@ function parseRequiredBodyNames(requiredBodyNames: string | string[] = []) {
     .flatMap((value) => value.split(','))
     .map((bodyName) => bodyName.trim())
     .filter(Boolean);
-}
-
-function getPrimaryBody(system: SerializedWorldBody[]) {
-  return system.find((body) => body.type === 'star') ?? system[0];
-}
-
-function resolvePositions(bodies: SerializedWorldBody[]) {
-  const bodiesByName = new Map(bodies.map((body) => [body.name, body]));
-  const positionsByName = new Map<string, Coordinate>();
-
-  function resolve(
-    body: SerializedWorldBody,
-    ancestors = new Set<string>(),
-  ): Coordinate {
-    const cached = positionsByName.get(body.name);
-    if (cached) return cached;
-    if (ancestors.has(body.name)) {
-      throw new Error(`Circular position reference involving ${body.name}`);
-    }
-
-    const position = {
-      x: BigInt(body.position.x),
-      y: BigInt(body.position.y),
-    };
-    const referenceName = body.position.relativeTo;
-
-    if (referenceName) {
-      const reference = bodiesByName.get(referenceName);
-      if (!reference) {
-        throw new Error(
-          `Position reference ${referenceName} for ${body.name} was not found`,
-        );
-      }
-
-      const referencePosition = resolve(
-        reference,
-        new Set(ancestors).add(body.name),
-      );
-      position.x += referencePosition.x;
-      position.y += referencePosition.y;
-    }
-
-    positionsByName.set(body.name, position);
-    return position;
-  }
-
-  bodies.forEach((body) => resolve(body));
-  return positionsByName;
-}
-
-function isInsideViewport(position: Coordinate, viewport: ViewportRectangle) {
-  return (
-    position.x >= viewport.left &&
-    position.x <= viewport.right &&
-    position.y >= viewport.top &&
-    position.y <= viewport.bottom
-  );
 }

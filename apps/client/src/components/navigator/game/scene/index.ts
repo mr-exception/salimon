@@ -1487,12 +1487,46 @@ export class Scene extends Phaser.Scene {
   }
 
   protected setWorldBodyData(planets: PlanetData[], stars: StarData[]) {
-    this.planetData = planets;
-    this.starData = stars;
+    const planetDataByName = new Map(
+      planets.map((planet) => [planet.name, planet]),
+    );
+    const starDataByName = new Map(stars.map((star) => [star.name, star]));
+
+    this.planets = this.planets.filter((planet) => {
+      const nextPlanet = planetDataByName.get(planet.name);
+      if (nextPlanet) {
+        Object.assign(planet.planet, nextPlanet);
+        planetDataByName.set(planet.name, planet.planet);
+        return true;
+      }
+
+      this.planetByName.delete(planet.name);
+      planet.destroy();
+      return false;
+    });
+    this.stars = this.stars.filter((star) => {
+      const nextStar = starDataByName.get(star.name);
+      if (nextStar) {
+        Object.assign(star.star, nextStar);
+        starDataByName.set(star.name, star.star);
+        return true;
+      }
+
+      this.starByName.delete(star.name);
+      star.destroy();
+      return false;
+    });
+
+    this.planetData = planets.map(
+      (planet) => planetDataByName.get(planet.name) ?? planet,
+    );
+    this.starData = stars.map((star) => starDataByName.get(star.name) ?? star);
     this.planetDataByName.clear();
     this.starDataByName.clear();
-    planets.forEach((planet) => this.planetDataByName.set(planet.name, planet));
-    stars.forEach((star) => this.starDataByName.set(star.name, star));
+    this.planetData.forEach((planet) =>
+      this.planetDataByName.set(planet.name, planet),
+    );
+    this.starData.forEach((star) => this.starDataByName.set(star.name, star));
   }
 
   async refreshWorldFromViewport() {

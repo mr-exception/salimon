@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { randomUUID } = require('node:crypto');
+const { createHash, randomUUID } = require('node:crypto');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const dotenv = require('dotenv');
@@ -8,7 +8,6 @@ const mongoose = require('mongoose');
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-const SYSTEMS_PER_CHUNK = 100;
 const DEFAULT_PAGE_SIZE = 500;
 const SYSTEMS_COLLECTION_NAME = 'systems';
 const DEFAULT_STATS_FILE = path.resolve(
@@ -38,8 +37,8 @@ const GALACTIC_CENTER = {
   rotationPeriodSeconds: 0,
   positionCapturedAt: 1784419200000,
 };
+const GALACTIC_CENTER_SYSTEM = [GALACTIC_CENTER];
 const SOLAR_SYSTEM = [
-  GALACTIC_CENTER,
   {
     type: 'star',
     name: 'Sun',
@@ -294,8 +293,17 @@ async function main() {
   let fetchedSystemCount = 0;
 
   try {
-    await systemWriter.clear();
+    if (hasEndpointStats(endpointStats)) {
+      console.log(
+        `Using endpoint stats from ${endpointStats.path}; cached endpoints will be skipped.`,
+      );
+    } else {
+      await systemWriter.clear();
+    }
+
+    await systemWriter.addSystem(GALACTIC_CENTER_SYSTEM);
     await systemWriter.addSystem(SOLAR_SYSTEM);
+    await systemWriter.flush();
 
     for (const source of sources) {
       console.log(`Starting ${source.name} with page size ${pageSize}.`);
@@ -324,10 +332,6 @@ async function main() {
           pendingSystemsByKey.delete(key);
           addedCount += 1;
           fetchedSystemCount += 1;
-
-          if (fetchedSystemCount % 100 === 0) {
-            console.log(`Fetched ${fetchedSystemCount} systems.`);
-          }
         }
 
         return addedCount;
@@ -340,17 +344,43 @@ async function main() {
         );
 
         const endpoint = source.buildUrl(pageSize, cursor);
-        console.log(`${source.name}: page ${pageNumber} endpoint: ${endpoint}`);
 
-        const rows = await readEndpointRows({
+        const page = await readEndpointPage({
           endpointStats,
           endpoint,
+          cursor,
           source,
           pageNumber,
+          pageSize,
         });
-        totalRows += rows.length;
+        totalRows += page.rowCount;
+
+        if (page.skipped) {
+          console.log(
+            `${source.name}: page ${pageNumber} skipped cached endpoint with ${page.rowCount} rows (${totalRows} total rows).`,
+          );
+
+          if (page.rowCount < pageSize) {
+            console.log(`${source.name}: finished after ${pageNumber} pages.`);
+            break;
+          }
+
+          if (!page.nextCursor) {
+            console.log(
+              `${source.name}: stopped because cached endpoint has no next page cursor.`,
+            );
+            break;
+          }
+
+          cursor = page.nextCursor;
+          pageNumber += 1;
+          await writeEndpointStats(endpointStats);
+          continue;
+        }
+
+        const rows = page.rows;
         console.log(
-          `${source.name}: page ${pageNumber} returned ${rows.length} rows (${totalRows} total rows).`,
+          `${source.name}: page ${pageNumber} returned ${page.rowCount} rows (${totalRows} total rows).`,
         );
 
         const pageSystems = source.parseRows(rows);
@@ -358,8 +388,9 @@ async function main() {
         const openSystemKey = source.getOpenSystemKey?.(rows) ?? null;
         const addedCount = await storeCompletedSystems(openSystemKey);
         sourceAddedCount += addedCount;
+        const storedCount = await systemWriter.flush();
         console.log(
-          `${source.name}: page ${pageNumber} parsed ${pageSystems.length} systems and stored ${addedCount} completed systems (${pendingSystemsByKey.size} pending).`,
+          `${source.name}: page ${pageNumber} parsed ${pageSystems.length} systems and wrote ${storedCount} completed systems (${pendingSystemsByKey.size} pending).`,
         );
         await writeEndpointStats(endpointStats);
 
@@ -368,7 +399,7 @@ async function main() {
           break;
         }
 
-        const nextCursor = source.getNextCursor(rows, cursor, pageSize);
+        const nextCursor = page.nextCursor;
         if (!nextCursor) {
           console.log(
             `${source.name}: stopped because no next page cursor could be derived.`,
@@ -382,16 +413,15 @@ async function main() {
 
       const addedCount = await storeCompletedSystems(null);
       sourceAddedCount += addedCount;
+      const storedCount = await systemWriter.flush();
 
       console.log(
-        `Added ${sourceAddedCount} systems from ${source.name}; ${fetchedSystemCount} fetched systems total.`,
+        `Added ${sourceAddedCount} systems from ${source.name}; ${storedCount} final systems written for source; ${fetchedSystemCount} fetched systems total.`,
       );
     }
 
-    const { flushCount, systemCount } = await systemWriter.finish();
-
     console.log(
-      `Stored ${systemCount} systems in MongoDB collection ${SYSTEMS_COLLECTION_NAME} across ${flushCount} write batches.`,
+      `Finished writing MongoDB collection ${SYSTEMS_COLLECTION_NAME}.`,
     );
     await writeEndpointStats(endpointStats);
   } finally {
@@ -399,15 +429,24 @@ async function main() {
   }
 }
 
-async function readEndpointRows({ endpointStats, endpoint, source, pageNumber }) {
-  const cachedEndpoint = endpointStats.endpoints[endpoint];
+async function readEndpointPage({
+  endpointStats,
+  endpoint,
+  cursor,
+  source,
+  pageNumber,
+  pageSize,
+}) {
+  const endpointKey = getEndpointKey(endpoint);
+  const cachedEndpoint = endpointStats.endpoints[endpointKey];
 
   if (cachedEndpoint) {
-    console.log(
-      `${source.name}: page ${pageNumber} reused cached response from ${endpointStats.path}.`,
-    );
     cachedEndpoint.lastUsedAt = new Date().toISOString();
-    return cachedEndpoint.rows;
+    return {
+      skipped: true,
+      rowCount: cachedEndpoint.rowCount,
+      nextCursor: cachedEndpoint.nextCursor ?? null,
+    };
   }
 
   const response = await fetch(endpoint, {
@@ -425,16 +464,27 @@ async function readEndpointRows({ endpointStats, endpoint, source, pageNumber })
   }
 
   const rows = await source.readRows(response);
-  endpointStats.endpoints[endpoint] = {
+  const nextCursor =
+    rows.length < pageSize
+      ? null
+      : source.getNextCursor(rows, cursor, pageSize);
+
+  endpointStats.endpoints[endpointKey] = {
     source: source.name,
     pageNumber,
+    cursor,
+    nextCursor,
     rowCount: rows.length,
     fetchedAt: new Date().toISOString(),
     lastUsedAt: new Date().toISOString(),
-    rows,
   };
 
-  return rows;
+  return {
+    skipped: false,
+    rows,
+    rowCount: rows.length,
+    nextCursor,
+  };
 }
 
 async function readEndpointStats() {
@@ -450,7 +500,7 @@ async function readEndpointStats() {
 
     return {
       path: statsPath,
-      endpoints: stats.endpoints,
+      endpoints: sanitizeEndpointStats(stats.endpoints),
     };
   } catch (error) {
     if (error.code !== 'ENOENT') throw error;
@@ -460,6 +510,35 @@ async function readEndpointStats() {
       endpoints: {},
     };
   }
+}
+
+function sanitizeEndpointStats(endpoints) {
+  return Object.fromEntries(
+    Object.entries(endpoints).map(([key, endpoint]) => {
+      const safeKey = /^[a-f0-9]{64}$/.test(key) ? key : getEndpointKey(key);
+
+      return [
+        safeKey,
+        {
+          source: endpoint.source,
+          pageNumber: endpoint.pageNumber,
+          cursor: endpoint.cursor ?? null,
+          nextCursor: endpoint.nextCursor ?? null,
+          rowCount: endpoint.rowCount ?? endpoint.rows?.length ?? 0,
+          fetchedAt: endpoint.fetchedAt,
+          lastUsedAt: endpoint.lastUsedAt,
+        },
+      ];
+    }),
+  );
+}
+
+function hasEndpointStats(endpointStats) {
+  return Object.keys(endpointStats.endpoints).length > 0;
+}
+
+function getEndpointKey(endpoint) {
+  return createHash('sha256').update(endpoint).digest('hex');
 }
 
 async function writeEndpointStats(endpointStats) {
@@ -504,13 +583,16 @@ async function createWorldSystemWriter({ generatedAt }) {
     SYSTEMS_COLLECTION_NAME,
   );
   await systemsCollection.createIndex({ name: 1 }, { unique: true });
+  await systemsCollection.createIndex({
+    'primaryPosition.x': 1,
+    'primaryPosition.y': 1,
+  });
+  await systemsCollection.createIndex({ 'bodies.name': 1 });
 
-  let pendingSystems = [];
-  let flushCount = 0;
-  let systemCount = 0;
+  const pendingSystemsByName = new Map();
 
   const writeSystems = async (systems) => {
-    if (systems.length === 0) return;
+    if (systems.length === 0) return 0;
 
     await systemsCollection.bulkWrite(
       systems.map((system) => {
@@ -520,6 +602,7 @@ async function createWorldSystemWriter({ generatedAt }) {
             filter: { name },
             replacement: {
               name,
+              primaryPosition: getPrimaryPosition(system),
               bodies: system,
               generatedAt,
               updatedAt: new Date(),
@@ -531,11 +614,7 @@ async function createWorldSystemWriter({ generatedAt }) {
       { ordered: false },
     );
 
-    systemCount += systems.length;
-    flushCount += 1;
-    console.log(
-      `Stored ${systemCount} systems in MongoDB collection ${SYSTEMS_COLLECTION_NAME} (${flushCount} write batches).`,
-    );
+    return systems.length;
   };
 
   return {
@@ -546,23 +625,41 @@ async function createWorldSystemWriter({ generatedAt }) {
       );
     },
     async addSystem(system) {
-      pendingSystems.push(system);
+      const name = getSystemName(system);
+      const existingSystem = pendingSystemsByName.get(name);
 
-      while (pendingSystems.length >= SYSTEMS_PER_CHUNK) {
-        const systems = pendingSystems.slice(0, SYSTEMS_PER_CHUNK);
-        pendingSystems = pendingSystems.slice(SYSTEMS_PER_CHUNK);
-        await writeSystems(systems);
+      if (existingSystem) {
+        mergeSystemBodies(existingSystem, system);
+      } else {
+        pendingSystemsByName.set(name, system);
       }
     },
-    async finish() {
-      if (pendingSystems.length > 0) {
-        await writeSystems(pendingSystems);
-        pendingSystems = [];
+    async flush() {
+      const systemCount = await writeSystems([
+        ...pendingSystemsByName.values(),
+      ]);
+      pendingSystemsByName.clear();
+
+      if (systemCount > 0) {
+        console.log(
+          `Stored ${systemCount} unique systems in MongoDB collection ${SYSTEMS_COLLECTION_NAME}.`,
+        );
       }
 
-      return { flushCount, systemCount };
+      return systemCount;
     },
   };
+}
+
+function mergeSystemBodies(targetSystem, sourceSystem) {
+  const existingBodyNames = new Set(targetSystem.map((body) => body.name));
+
+  for (const body of sourceSystem) {
+    if (!existingBodyNames.has(body.name)) {
+      targetSystem.push(body);
+      existingBodyNames.add(body.name);
+    }
+  }
 }
 
 function getSystemName(system) {
@@ -574,6 +671,21 @@ function getSystemName(system) {
   }
 
   return name;
+}
+
+function getPrimaryPosition(system) {
+  const primary = system.find((body) => body.type === 'star') ?? system[0];
+
+  if (!primary?.position?.x || !primary.position.y) {
+    throw new Error(
+      `Cannot store ${getSystemName(system)} without a position.`,
+    );
+  }
+
+  return {
+    x: mongoose.Types.Decimal128.fromString(primary.position.x),
+    y: mongoose.Types.Decimal128.fromString(primary.position.y),
+  };
 }
 
 function fillEmptySystem(system) {

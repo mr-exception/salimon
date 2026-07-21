@@ -378,9 +378,9 @@ function applyWorldSystems(data: SerializedWorldSystems) {
     return deserializeBody<Planet>(body, getPlanetVisualDefaults(body.name));
   });
 
-  worldState.stars = mergeBodies(worldState.stars, stars);
-  worldState.planets = mergeBodies(worldState.planets, planets);
-  bodyVelocityByName = new Map([...bodyVelocityByName, ...nextVelocities]);
+  worldState.stars = stars;
+  worldState.planets = planets;
+  bodyVelocityByName = nextVelocities;
   [...stars, ...planets].forEach((body) => {
     advanceBodyPositionToNow(body);
   });
@@ -401,22 +401,6 @@ function isVisiblePlanetBody(
   return (
     body.type === 'planet' || body.type === 'moon' || body.type === 'blackhole'
   );
-}
-
-function mergeBodies<T extends Planet | Star>(current: T[], incoming: T[]) {
-  const currentByName = new Map(current.map((body) => [body.name, body]));
-  const merged = [...current];
-
-  incoming.forEach((body) => {
-    const existing = currentByName.get(body.name);
-    if (existing) {
-      Object.assign(existing, body);
-      return;
-    }
-
-    merged.push(body);
-  });
-  return merged;
 }
 
 export function setActiveWorldBodyNames(names?: Iterable<string>) {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { io, type Socket } from 'socket.io-client';
 import type { SpaceshipDto } from '@repo/types';
 import type { ContactMessageDto } from '@repo/types';
 import {
@@ -22,10 +23,20 @@ export type BootstrapRequest =
 export type BootstrapState = 'idle' | 'loading' | 'ready' | 'error';
 
 type SpaceshipResponse = { spaceship: SpaceshipDto };
-type ContactMessageResponse = { message: ContactMessage };
+type ErrorResponse = { error?: string };
+type ContactUnreadMessagesResponse = { messages: ContactMessage[] };
+type ContactMessageSocketAck =
+  | { ok: true; message: ContactMessage }
+  | { ok: false; error: string };
+type MarkThreadReadSocketAck =
+  | { ok: true; contactId: string }
+  | { ok: false; error: string };
 export type ContactMessage = ContactMessageDto;
 const requestPromises = new WeakMap<BootstrapRequest, Promise<SpaceshipDto>>();
 const contactMessageListeners = new Set<(message: ContactMessage) => void>();
+const pendingContactMessages: ContactMessage[] = [];
+let communicationSocket: Socket | undefined;
+let communicationSocketSecurityCode: string | undefined;
 let pendingSnapshotSync = false;
 let inventorySyncTimer: number | undefined;
 let currentSpaceship: SpaceshipDto | undefined;
@@ -41,6 +52,7 @@ async function applySpaceshipInfo(spaceship: SpaceshipDto) {
   currentSpaceship = spaceship;
   storeSpaceship(spaceship);
   hydrateSpaceship(spaceship);
+  connectCommunicationSocket(spaceship.securityCode);
 }
 
 function readStoredSpaceship() {
@@ -131,13 +143,108 @@ async function persistSpaceshipSnapshot() {
   storeSpaceship(snapshot);
 }
 
+export async function saveSpaceship() {
+  if (!currentSpaceship) throw new Error('Spaceship is not initialized');
+
+  const snapshot = getSpaceshipDto(currentSpaceship.securityCode);
+  try {
+    const { data } = await axios.post<SpaceshipResponse>(
+      `${getApiBaseUrl()}/spaceship/save`,
+      snapshot,
+      {
+        headers: {
+          [SECURITY_CODE_HEADER]: currentSpaceship.securityCode,
+        },
+      },
+    );
+    currentSpaceship = data.spaceship;
+    storeSpaceship(data.spaceship);
+    return data.spaceship;
+  } catch (error) {
+    if (axios.isAxiosError<ErrorResponse>(error)) {
+      throw new Error(
+        error.response?.data.error ?? 'Failed to save spaceship',
+        { cause: error },
+      );
+    }
+    throw error;
+  }
+}
+
 export function subscribeToContactMessages(
   listener: (message: ContactMessage) => void,
 ) {
   contactMessageListeners.add(listener);
+  pendingContactMessages.splice(0).forEach(listener);
   return () => {
     contactMessageListeners.delete(listener);
   };
+}
+
+function emitContactMessage(message: ContactMessage) {
+  if (contactMessageListeners.size === 0) {
+    pendingContactMessages.push(message);
+    if (pendingContactMessages.length > 100) pendingContactMessages.shift();
+    return;
+  }
+  contactMessageListeners.forEach((listener) => listener(message));
+}
+
+function connectCommunicationSocket(securityCode: string) {
+  if (communicationSocketSecurityCode === securityCode && communicationSocket) {
+    if (!communicationSocket.connected) communicationSocket.connect();
+    return communicationSocket;
+  }
+
+  communicationSocket?.disconnect();
+  communicationSocketSecurityCode = securityCode;
+  communicationSocket = io(getApiBaseUrl(), {
+    auth: { securityCode },
+    transports: ['websocket', 'polling'],
+  });
+  communicationSocket.on('contact:message', emitContactMessage);
+  communicationSocket.on(
+    'contact:unread-messages',
+    ({ messages }: ContactUnreadMessagesResponse) => {
+      messages.forEach(emitContactMessage);
+    },
+  );
+  communicationSocket.on(
+    'communications:error',
+    ({ error }: { error: string }) => {
+      console.error('Communications socket error', error);
+    },
+  );
+  communicationSocket.on('connect_error', (error) => {
+    console.error('Failed to connect communications socket', error);
+  });
+  return communicationSocket;
+}
+
+async function getCommunicationSocket() {
+  const securityCode = currentSpaceship?.securityCode;
+  if (!securityCode) throw new Error('Spaceship is not initialized');
+
+  const socket = connectCommunicationSocket(securityCode);
+  if (socket.connected) return socket;
+
+  return new Promise<Socket>((resolve, reject) => {
+    const cleanup = () => {
+      socket.off('connect', handleConnect);
+      socket.off('connect_error', handleError);
+    };
+    const handleConnect = () => {
+      cleanup();
+      resolve(socket);
+    };
+    const handleError = (error: Error) => {
+      cleanup();
+      reject(error);
+    };
+    socket.once('connect', handleConnect);
+    socket.once('connect_error', handleError);
+    socket.connect();
+  });
 }
 
 export async function sendContactMessage(request: {
@@ -145,16 +252,49 @@ export async function sendContactMessage(request: {
   text: string;
   clientMessageId: string;
 }) {
-  const securityCode = currentSpaceship?.securityCode;
-  if (!securityCode) throw new Error('Spaceship is not initialized');
+  const socket = await getCommunicationSocket();
+  return new Promise<ContactMessage>((resolve, reject) => {
+    socket
+      .timeout(10_000)
+      .emit(
+        'contact:send-message',
+        request,
+        (error: Error | null, response?: ContactMessageSocketAck) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+          if (!response?.ok) {
+            reject(new Error(response?.error ?? 'Message failed to send'));
+            return;
+          }
+          resolve(response.message);
+        },
+      );
+  });
+}
 
-  const { data } = await axios.post<ContactMessageResponse>(
-    `${getApiBaseUrl()}/contacts/messages`,
-    request,
-    { headers: { [SECURITY_CODE_HEADER]: securityCode } },
-  );
-  contactMessageListeners.forEach((listener) => listener(data.message));
-  return data.message;
+export async function markContactThreadRead(contactId: string) {
+  const socket = await getCommunicationSocket();
+  return new Promise<string>((resolve, reject) => {
+    socket
+      .timeout(10_000)
+      .emit(
+        'contact:mark-thread-read',
+        { contactId },
+        (error: Error | null, response?: MarkThreadReadSocketAck) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+          if (!response?.ok) {
+            reject(new Error(response?.error ?? 'Failed to mark thread read'));
+            return;
+          }
+          resolve(response.contactId);
+        },
+      );
+  });
 }
 
 export function startSpaceshipTargetSpeedFeature(
@@ -194,16 +334,11 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
     if (!request) return;
 
     let disposed = false;
-    let snapshotTimer: number | undefined;
 
     void initializeSpaceship(request)
       .then(() => {
         if (disposed) return;
         setInventoryPersistHandler(scheduleInventorySync);
-        snapshotTimer = window.setInterval(() => {
-          pendingSnapshotSync = true;
-          flushInventorySync();
-        }, 5_000);
         setResult({ request, state: 'ready' });
       })
       .catch((error: unknown) => {
@@ -215,7 +350,6 @@ export function useBootstrap(request: BootstrapRequest | null): BootstrapState {
       disposed = true;
       flushInventorySync();
       setInventoryPersistHandler(undefined);
-      window.clearInterval(snapshotTimer);
     };
   }, [request]);
 

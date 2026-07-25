@@ -3,6 +3,7 @@ import express, { type ErrorRequestHandler } from 'express';
 import {
   contactsRouter,
   metricsRouter,
+  searchRouter,
   spaceshipsRouter,
   worldRouter,
 } from '@routes';
@@ -20,6 +21,7 @@ export function createApp() {
   });
   app.use('/spaceship', spaceshipsRouter);
   app.use('/contacts', contactsRouter);
+  app.use('/search', searchRouter);
   app.use('/metrics', metricsRouter);
   app.use(
     '/world/assets',

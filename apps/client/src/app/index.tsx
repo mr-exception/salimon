@@ -9,6 +9,7 @@ import {
   useBootstrap,
   type BootstrapRequest,
 } from '@store';
+import type { ContactInfo } from '@repo/types';
 import style from './style.module.css';
 
 type UnreadMessage = {
@@ -27,9 +28,15 @@ export default function App() {
   const bootstrapState = useBootstrap(bootstrapRequest);
   const [isEngineRunning, setIsEngineRunning] = useState(false);
   const [isCommunicationsOpen, setIsCommunicationsOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMeasuring, setIsMeasuring] = useState(false);
   const [isRulerActive, setIsRulerActive] = useState(false);
+  const [initialCommunicationContactId, setInitialCommunicationContactId] =
+    useState<string>();
   const [unreadMessages, setUnreadMessages] = useState<UnreadMessage[]>([]);
+  const [contactNameById, setContactNameById] = useState<
+    Record<string, string>
+  >({});
   const [isSelectingTargetDirection, setIsSelectingTargetDirection] =
     useState(false);
   const sceneRef = useRef<{
@@ -76,6 +83,14 @@ export default function App() {
       current.filter((message) => !readIds.has(message.id)),
     );
   }, []);
+  const openCommunicationThread = useCallback((contactId: string) => {
+    setInitialCommunicationContactId(contactId);
+    setIsCommunicationsOpen(true);
+  }, []);
+  const openCommunications = useCallback(() => {
+    setInitialCommunicationContactId(undefined);
+    setIsCommunicationsOpen(true);
+  }, []);
   const setPrediction = useCallback((active: boolean, seconds: number) => {
     sceneRef.current?.setPrediction(active, seconds);
   }, []);
@@ -86,27 +101,30 @@ export default function App() {
     if (!securityCode) return;
 
     let disposed = false;
-    const loadUnreadMessages = async () => {
+    const loadContacts = async () => {
       if (disposed) return;
       try {
-        const { data } = await axios.get<{ messages: UnreadMessage[] }>(
-          `${getApiBaseUrl()}/contacts/messages/unread`,
+        const { data } = await axios.get<{ contacts: ContactInfo[] }>(
+          `${getApiBaseUrl()}/contacts/info`,
           { headers: { [SECURITY_CODE_HEADER]: securityCode } },
         );
-        if (!disposed) setUnreadMessages(data.messages);
+        if (!disposed) {
+          setContactNameById(
+            Object.fromEntries(
+              data.contacts.map((contact) => [contact.id, contact.name]),
+            ),
+          );
+        }
       } catch (error) {
-        console.error('Failed to load unread messages', error);
+        console.error('Failed to load contact info', error);
       }
     };
-    const refreshUnreadMessages = () => {
-      if (!document.hidden && navigator.onLine) void loadUnreadMessages();
+    const refreshContacts = () => {
+      if (!document.hidden && navigator.onLine) void loadContacts();
     };
-    const unreadRefreshTimer = window.setInterval(
-      refreshUnreadMessages,
-      15_000,
-    );
     const unsubscribe = subscribeToContactMessages((message) => {
-      if (message.sender !== 'contact') return;
+      void loadContacts();
+      if (message.sender !== 'contact' || message.isRead) return;
       setUnreadMessages((current) => {
         if (
           current.some((currentMessage) => currentMessage.id === message.id)
@@ -120,15 +138,14 @@ export default function App() {
       });
     });
 
-    void loadUnreadMessages();
-    document.addEventListener('visibilitychange', refreshUnreadMessages);
-    window.addEventListener('online', refreshUnreadMessages);
+    void loadContacts();
+    document.addEventListener('visibilitychange', refreshContacts);
+    window.addEventListener('online', refreshContacts);
     return () => {
       disposed = true;
       unsubscribe();
-      window.clearInterval(unreadRefreshTimer);
-      document.removeEventListener('visibilitychange', refreshUnreadMessages);
-      window.removeEventListener('online', refreshUnreadMessages);
+      document.removeEventListener('visibilitychange', refreshContacts);
+      window.removeEventListener('online', refreshContacts);
     };
   }, [bootstrapState]);
 
@@ -146,8 +163,10 @@ export default function App() {
       <Navigator
         isMeasuring={isMeasuring}
         isRulerActive={isRulerActive}
+        isSearchOpen={isSearchOpen}
         onSceneChange={handleSceneChange}
         onSpaceshipEngineChange={setIsEngineRunning}
+        onCloseSearch={() => setIsSearchOpen(false)}
         isSelectingTargetDirection={isSelectingTargetDirection}
         onTargetDirectionSelected={handleTargetDirectionSelected}
       />
@@ -159,12 +178,22 @@ export default function App() {
         onStopEngines={stopEngines}
         onToggleMeasuring={() => setIsMeasuring((active) => !active)}
         onToggleRuler={() => setIsRulerActive((active) => !active)}
-        onOpenCommunications={() => setIsCommunicationsOpen(true)}
+        onOpenCommunications={openCommunications}
+        onOpenCommunicationThread={openCommunicationThread}
+        onOpenSearch={() => setIsSearchOpen(true)}
         unreadMessageCount={unreadMessages.length}
+        unreadMessages={unreadMessages.map((message) => ({
+          id: message.id,
+          contactId: message.contactId,
+          senderName: contactNameById[message.contactId] ?? 'Unknown contact',
+          text: message.text,
+        }))}
         onPredictionChange={setPrediction}
       />
       {isCommunicationsOpen && (
         <Communications
+          key={initialCommunicationContactId ?? 'communications'}
+          initialContactId={initialCommunicationContactId}
           unreadMessages={unreadMessages}
           onMessagesRead={handleMessagesRead}
           onClose={() => setIsCommunicationsOpen(false)}

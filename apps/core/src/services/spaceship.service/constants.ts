@@ -6,6 +6,8 @@ export const INITIAL_SPACESHIP_FUEL_KNS = 1_000_000;
 export const MAX_HULL_DURABILITY = 200;
 export const MAX_THRUSTER_DURABILITY = 100;
 export const SPACESHIP_THRUSTER_COUNT = 4;
+export const SPACESHIP_RADIUS_METERS = 200;
+export const FREE_FLIGHT_BODY_RADIUS_CLEARANCE_RATIO = 0.2;
 export const EMPTY_SPACESHIP_INVENTORY = Object.fromEntries(
   SPACESHIP_INVENTORY_MATERIALS.map((material) => [material, 0]),
 ) as SpaceshipInventory;

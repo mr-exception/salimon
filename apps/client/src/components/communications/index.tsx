@@ -4,6 +4,7 @@ import {
   getApiBaseUrl,
   getStoredSpaceshipSecurityCode,
   SECURITY_CODE_HEADER,
+  markContactThreadRead,
   sendContactMessage,
   subscribeToContactMessages,
 } from '@store';
@@ -15,17 +16,21 @@ import { mergeMessages } from './utils';
 
 type Props = {
   onClose: () => void;
+  initialContactId?: string;
   unreadMessages: Message[];
   onMessagesRead: (messageIds: string[]) => void;
 };
 
 export function Communications({
   onClose,
+  initialContactId,
   unreadMessages,
   onMessagesRead,
 }: Props) {
   const [contacts, setContacts] = useState<Contact[]>([]);
-  const [selectedContactId, setSelectedContactId] = useState<string>();
+  const [selectedContactId, setSelectedContactId] = useState<
+    string | undefined
+  >(initialContactId);
   const [messages, setMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState('');
   const [error, setError] = useState('');
@@ -34,7 +39,12 @@ export function Communications({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<string | undefined>(undefined);
   const selectedContactIdRef = useRef<string | undefined>(undefined);
+  const unreadMessagesRef = useRef<Message[]>(unreadMessages);
   const securityCode = getStoredSpaceshipSecurityCode();
+
+  useEffect(() => {
+    unreadMessagesRef.current = unreadMessages;
+  }, [unreadMessages]);
 
   useEffect(() => {
     selectedContactIdRef.current = selectedContactId;
@@ -62,15 +72,21 @@ export function Communications({
       setMessages((current) =>
         after ? mergeMessages(current, data.messages) : data.messages,
       );
-      onMessagesRead(
-        data.messages
-          .filter((message) => message.sender === 'contact')
-          .map((message) => message.id),
-      );
+      if (!after) {
+        await markContactThreadRead(contactId);
+        onMessagesRead(
+          unreadMessagesRef.current
+            .filter((message) => message.contactId === contactId)
+            .map((message) => message.id),
+        );
+        void loadContacts().catch(() => {
+          setError('Unable to refresh contacts.');
+        });
+      }
       cursorRef.current = data.cursor;
       setError('');
     },
-    [onMessagesRead, securityCode],
+    [loadContacts, onMessagesRead, securityCode],
   );
 
   useEffect(() => {
@@ -94,7 +110,18 @@ export function Communications({
       subscribeToContactMessages((message) => {
         if (message.contactId === selectedContactIdRef.current) {
           setMessages((current) => mergeMessages(current, [message]));
-          if (message.sender === 'contact') onMessagesRead([message.id]);
+          if (message.sender === 'contact') {
+            void markContactThreadRead(message.contactId)
+              .then(() => {
+                onMessagesRead([message.id]);
+                void loadContacts().catch(() => {
+                  setError('Unable to refresh contacts.');
+                });
+              })
+              .catch(() => {
+                setError('Unable to mark message read.');
+              });
+          }
         }
         void loadContacts().catch(() => {
           setError('Unable to refresh contacts.');

@@ -24,8 +24,10 @@ import {
   THRUSTER_BASE_DURABILITY,
   THRUSTER_BASE_POWER_PERCENT,
   THRUSTER_LEVEL_MULTIPLIER,
+  getSpaceshipSaveBlockReason,
   placeModule,
   setModuleActive,
+  saveSpaceship,
   spendInventory,
   unlockModule,
   upgradeModuleAttribute,
@@ -61,8 +63,18 @@ type FooterProps = {
   onToggleMeasuring?: () => void;
   onToggleRuler?: () => void;
   onOpenCommunications?: () => void;
+  onOpenCommunicationThread?: (contactId: string) => void;
+  onOpenSearch?: () => void;
   unreadMessageCount?: number;
+  unreadMessages?: CommunicationNotification[];
   onPredictionChange?: (active: boolean, seconds: number) => void;
+};
+
+type CommunicationNotification = {
+  id: string;
+  contactId: string;
+  senderName: string;
+  text: string;
 };
 
 type ManualThrusterInput = {
@@ -150,6 +162,15 @@ function FeatureIcon({ feature }: { feature: SpeedControlTab }) {
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M12 3v18M3 12h18" />
       <path d="m12 3-2.5 2.5M12 3l2.5 2.5M21 12l-2.5-2.5M21 12l-2.5 2.5M12 21l-2.5-2.5M12 21l2.5-2.5M3 12l2.5-2.5M3 12l2.5 2.5" />
+    </svg>
+  );
+}
+
+function SaveIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 4h12l2 2v14H5z" />
+      <path d="M8 4v6h8V4M8 20v-6h8v6" />
     </svg>
   );
 }
@@ -248,6 +269,12 @@ function canAfford(inventory: Inventory, cost: Partial<Inventory>) {
   );
 }
 
+function getMessagePreview(text: string) {
+  const normalized = text.replace(/\s+/g, ' ').trim();
+  if (normalized.length <= 46) return normalized;
+  return `${normalized.slice(0, 46).trim()}...`;
+}
+
 const COST_LABELS: Record<InventoryMaterial, string> = {
   iron: 'Fe',
   silicates: 'Si',
@@ -290,6 +317,15 @@ function CommunicationsIcon() {
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M4 5h16v11H9l-5 4V5Z" />
       <path d="M8 9h8M8 12h5" />
+    </svg>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="10.5" cy="10.5" r="5.5" />
+      <path d="m15 15 5 5" />
     </svg>
   );
 }
@@ -471,7 +507,10 @@ export function Footer({
   onToggleMeasuring,
   onToggleRuler,
   onOpenCommunications,
+  onOpenCommunicationThread,
+  onOpenSearch,
   unreadMessageCount = 0,
+  unreadMessages = [],
   onPredictionChange,
 }: FooterProps) {
   const speed = useSpaceshipAbsoluteSpeed();
@@ -497,6 +536,10 @@ export function Footer({
   const [expandedSpeedControls, setExpandedSpeedControls] = useState(
     () => new Set<SpeedControlTab>(),
   );
+  const [saveStatus, setSaveStatus] = useState<
+    { type: 'success' | 'error'; message: string } | undefined
+  >();
+  const [isSaving, setIsSaving] = useState(false);
   const selectedModule = modules.find(
     (module) => module.id === selectedModuleId,
   );
@@ -547,6 +590,8 @@ export function Footer({
           ),
         )
       : 0;
+  const saveBlockReason = getSpaceshipSaveBlockReason();
+  const canSaveSpaceship = !saveBlockReason;
   const predictionSeconds =
     Number(predictionAmount) *
     ({ s: 1, m: 60, h: 3_600 } as const)[predictionUnit];
@@ -576,6 +621,33 @@ export function Footer({
       }
       return nextControls;
     });
+  };
+
+  const handleSaveSpaceship = () => {
+    const blockReason = getSpaceshipSaveBlockReason();
+    if (blockReason) {
+      setSaveStatus({
+        type: 'error',
+        message: blockReason,
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    void saveSpaceship()
+      .then(() => {
+        setSaveStatus({ type: 'success', message: 'Spaceship saved.' });
+      })
+      .catch((error: unknown) => {
+        setSaveStatus({
+          type: 'error',
+          message:
+            error instanceof Error && error.message
+              ? error.message
+              : 'Failed to save spaceship.',
+        });
+      })
+      .finally(() => setIsSaving(false));
   };
 
   const getThrustersSchedule = (thrusters: ManualThrusterInput[]) =>
@@ -719,8 +791,56 @@ export function Footer({
 
   return (
     <footer className={style.container} aria-label="Ship controls">
+      <div className={style.communicationsDock}>
+        {unreadMessages.length > 0 && (
+          <ol className={style.messageNotifications} aria-live="polite">
+            {unreadMessages.slice(-3).map((message) => (
+              <li key={message.id}>
+                <button
+                  type="button"
+                  onClick={() => onOpenCommunicationThread?.(message.contactId)}
+                >
+                  <strong>{message.senderName}</strong>
+                  <span>{getMessagePreview(message.text)}</span>
+                </button>
+              </li>
+            ))}
+          </ol>
+        )}
+        <button
+          className={style.communicationButton}
+          type="button"
+          aria-label={
+            unreadMessageCount > 0
+              ? `Communications, ${unreadMessageCount} unread messages`
+              : 'Communications'
+          }
+          onClick={onOpenCommunications}
+        >
+          <CommunicationsIcon />
+          {unreadMessageCount > 0 && (
+            <strong className={style.unreadBadge} aria-hidden="true">
+              {unreadMessageCount > 99 ? '99+' : unreadMessageCount}
+            </strong>
+          )}
+          <span className={style.tooltip} role="tooltip">
+            Communications
+          </span>
+        </button>
+      </div>
       <section className={style.speedControls} aria-label="Ship features">
         <div className={style.controlTabs}>
+          <button
+            className={style.controlTab}
+            type="button"
+            aria-label="Search"
+            onClick={onOpenSearch}
+          >
+            <SearchIcon />
+            <span className={style.tooltip} role="tooltip">
+              Search
+            </span>
+          </button>
           {(
             [
               ['thrusters', 'Thrusters'],
@@ -776,24 +896,27 @@ export function Footer({
           <button
             className={style.controlTab}
             type="button"
-            aria-label={
-              unreadMessageCount > 0
-                ? `Communications, ${unreadMessageCount} unread messages`
-                : 'Communications'
-            }
-            onClick={onOpenCommunications}
+            aria-label="Save spaceship"
+            aria-disabled={!canSaveSpaceship}
+            data-active={saveStatus?.type === 'success'}
+            disabled={isSaving}
+            onClick={handleSaveSpaceship}
           >
-            <CommunicationsIcon />
-            {unreadMessageCount > 0 && (
-              <strong className={style.unreadBadge} aria-hidden="true">
-                {unreadMessageCount > 99 ? '99+' : unreadMessageCount}
-              </strong>
-            )}
+            <SaveIcon />
             <span className={style.tooltip} role="tooltip">
-              Communications
+              {isSaving ? 'Saving spaceship' : 'Save spaceship'}
             </span>
           </button>
         </div>
+        {saveStatus && (
+          <output
+            className={style.saveStatus}
+            data-status={saveStatus.type}
+            aria-live="polite"
+          >
+            {saveStatus.message}
+          </output>
+        )}
 
         <div className={style.controlPanels}>
           {expandedSpeedControls.has('modules') && (

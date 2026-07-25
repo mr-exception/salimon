@@ -69,8 +69,10 @@
 .contacts button {
   position: relative;
   display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
   width: 100%;
-  gap: 5px;
+  gap: 10px;
   padding: 15px;
   border: 0;
   border-bottom: 1px solid
@@ -79,6 +81,38 @@
   color: var(--color-starlight);
   cursor: pointer;
   text-align: left;
+}
+
+.avatar {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 38%, transparent);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, rgb(255 255 255 / 24%), transparent 30%),
+    color-mix(in srgb, var(--color-nebula-blue) 46%, transparent);
+  color: var(--color-plasma-cyan);
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.contactSummary {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.contactSummary span,
+.contactSummary strong,
+.contactSummary small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .contacts button[data-active='true'] {
@@ -122,6 +156,8 @@
 
 .contactHeading {
   display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
   gap: 3px;
   padding: 13px 18px;
   border-bottom: 1px solid

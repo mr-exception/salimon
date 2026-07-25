@@ -48,22 +48,6 @@ export async function getMessages(request: Request, response: Response) {
     };
     const messages = await ContactMessageModel.findMessages(filter, limit);
 
-    const unreadMessageIds = messages
-      .filter(
-        (message) => message.sender === 'contact' && message.isRead !== true,
-      )
-      .map((message) => message._id);
-    if (unreadMessageIds.length > 0) {
-      await ContactMessageModel.markMessagesRead(
-        securityCode,
-        contactId,
-        unreadMessageIds,
-      );
-      messages.forEach((message) => {
-        if (unreadMessageIds.includes(message._id)) message.isRead = true;
-      });
-    }
-
     response.json({
       messages: messages.map(ContactsService.toMessageDto),
       cursor:

@@ -1,8 +1,10 @@
 import type { SpaceshipDto } from '@repo/types';
 import {
+  FREE_FLIGHT_BODY_RADIUS_CLEARANCE_RATIO,
   MAX_HULL_DURABILITY,
   MAX_THRUSTER_DURABILITY,
   SECURITY_CODE_HEADER,
+  SPACESHIP_RADIUS_METERS,
   SPACESHIP_THRUSTER_COUNT,
 } from './constants';
 import { createSpaceship } from './create-spaceship';
@@ -14,12 +16,14 @@ import { normalizeSpaceshipStats } from './normalize-spaceship-stats';
 import { parseSpaceshipInventory } from './parse-spaceship-inventory';
 import { parseSpaceshipUpdate } from './parse-spaceship-update';
 import { toSpaceshipDto } from './to-spaceship-dto';
-import { updateSpaceship } from './update-spaceship';
+import { saveSpaceship, updateSpaceship } from './update-spaceship';
 
 export {
+  FREE_FLIGHT_BODY_RADIUS_CLEARANCE_RATIO,
   MAX_HULL_DURABILITY,
   MAX_THRUSTER_DURABILITY,
   SECURITY_CODE_HEADER,
+  SPACESHIP_RADIUS_METERS,
   SPACESHIP_THRUSTER_COUNT,
 };
 
@@ -45,4 +49,5 @@ export class SpaceshipService {
   static parseSpaceshipInventory = parseSpaceshipInventory;
   static normalizeSpaceshipStats = normalizeSpaceshipStats;
   static normalizeSpaceshipInventory = normalizeSpaceshipInventory;
+  static saveSpaceship = saveSpaceship;
 }

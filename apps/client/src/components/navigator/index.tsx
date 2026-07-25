@@ -1,16 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
-import {
-  subscribeToWorld,
-  type SpaceshipProximityTelemetry,
-} from '@store';
-import type { World } from '@repo/types';
+import { type SpaceshipProximityTelemetry } from '@store';
 import {
   formatAngle,
   formatDistance,
   formatSiValue,
   formatSpeed,
 } from '../../utils';
+import { SearchDialog, type SearchResult } from '../search';
 import { BodyContextMenu } from './body-context-menu';
 import {
   Scene,
@@ -19,7 +16,6 @@ import {
   type TargetDirectionPreview,
 } from './game/scene';
 import { MAX_ZOOM, MIN_ZOOM } from './game/scene/configure-input';
-import { SearchPanel, type SearchResult } from './search-panel';
 import style from './style.module.css';
 
 const SCALE_WIDTH_PX = 200;
@@ -47,8 +43,7 @@ function proximityTelemetryChanged(
     current?.bodyName !== next?.bodyName ||
     current?.bodyKind !== next?.bodyKind ||
     current?.surfaceDistanceMeters !== next?.surfaceDistanceMeters ||
-    current?.relativeSpeedMetersPerSecond !==
-      next?.relativeSpeedMetersPerSecond
+    current?.relativeSpeedMetersPerSecond !== next?.relativeSpeedMetersPerSecond
   );
 }
 
@@ -128,7 +123,9 @@ function BodyDetailsDialog({
 type NavigatorProps = {
   isMeasuring?: boolean;
   isRulerActive?: boolean;
+  isSearchOpen?: boolean;
   isSelectingTargetDirection?: boolean;
+  onCloseSearch?: () => void;
   onSceneChange?: (scene: Scene | null) => void;
   onSpaceshipEngineChange?: (isRunning: boolean) => void;
   onTargetDirectionSelected?: () => void;
@@ -137,7 +134,9 @@ type NavigatorProps = {
 export function Navigator({
   isMeasuring = false,
   isRulerActive = false,
+  isSearchOpen = false,
   isSelectingTargetDirection = false,
+  onCloseSearch,
   onSceneChange,
   onSpaceshipEngineChange,
   onTargetDirectionSelected,
@@ -145,10 +144,6 @@ export function Navigator({
   const gameHostRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<Scene>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
-  const [world, setWorld] = useState<World>({
-    planets: [],
-    stars: [],
-  });
   const [worldLoadState, setWorldLoadState] = useState<
     'loading' | 'ready' | 'error'
   >('loading');
@@ -172,19 +167,6 @@ export function Navigator({
   useEffect(() => {
     sceneRef.current?.setRulerActive(isRulerActive);
   }, [isRulerActive]);
-
-  useEffect(() => {
-    const unsubscribeFromWorld = subscribeToWorld((updatedWorld) => {
-      setWorld({
-        planets: updatedWorld.planets,
-        stars: updatedWorld.stars,
-      });
-    });
-
-    return () => {
-      unsubscribeFromWorld();
-    };
-  }, []);
 
   useEffect(() => {
     if (!gameHostRef.current) return;
@@ -240,10 +222,10 @@ export function Navigator({
     };
   }, [onSceneChange, onSpaceshipEngineChange, onTargetDirectionSelected]);
 
-  const navigateTo = ({ body }: SearchResult) => {
+  const navigateTo = (result: SearchResult) => {
     setContextMenu(null);
     setBodyDetails(null);
-    sceneRef.current?.navigateTo(body.name, body.renderZoomLevel * 10);
+    sceneRef.current?.navigateTo(result.name, result.navigationZoom);
   };
 
   const recenterOnSpaceship = () => {
@@ -288,11 +270,12 @@ export function Navigator({
           <span>Loading systems</span>
         </div>
       )}
-      <SearchPanel
-        planets={world.planets}
-        stars={world.stars}
-        onSelect={navigateTo}
-      />
+      {isSearchOpen && (
+        <SearchDialog
+          onClose={onCloseSearch ?? (() => {})}
+          onSelect={navigateTo}
+        />
+      )}
       {proximityTelemetry && (
         <aside
           className={style.proximityTelemetry}

@@ -1,0 +1,222 @@
+.backdrop {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(1 7 18 / 72%);
+  backdrop-filter: blur(5px);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: default;
+}
+
+.dialog {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: min(520px, 100%);
+  max-height: min(560px, 90vh);
+  overflow: hidden;
+  border: 1px solid var(--color-nebula-blue);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-deep-space) 96%, black);
+  box-shadow: 0 30px 90px rgb(0 0 0 / 65%);
+  color: var(--color-starlight);
+  font-family: system-ui, sans-serif;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-nebula-blue);
+}
+
+.header small {
+  color: color-mix(in srgb, var(--color-starlight) 55%, transparent);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.header h2 {
+  margin: 3px 0 0;
+  color: var(--color-plasma-cyan);
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.header button {
+  border: 0;
+  background: transparent;
+  color: var(--color-starlight);
+  cursor: pointer;
+  font-size: 1.8rem;
+}
+
+.content {
+  display: grid;
+  min-height: 0;
+  gap: 9px;
+  padding: 18px;
+}
+
+.searchLabel {
+  color: color-mix(in srgb, var(--color-starlight) 72%, transparent);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.searchField {
+  position: relative;
+}
+
+.searchField input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 42px;
+  padding: 0 38px;
+  border: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 34%, transparent);
+  border-radius: 7px;
+  outline: none;
+  background: color-mix(in srgb, var(--color-deep-space) 88%, transparent);
+  box-shadow: 0 8px 28px rgb(0 0 0 / 28%);
+  color: var(--color-starlight);
+  font:
+    500 0.85rem/1 system-ui,
+    sans-serif;
+}
+
+.searchField input::placeholder {
+  color: color-mix(in srgb, var(--color-starlight) 45%, transparent);
+}
+
+.searchField input:focus {
+  border-color: var(--color-plasma-cyan);
+  box-shadow:
+    0 8px 28px rgb(0 0 0 / 28%),
+    0 0 0 2px color-mix(in srgb, var(--color-plasma-cyan) 18%, transparent);
+}
+
+.searchIcon {
+  position: absolute;
+  top: 13px;
+  left: 14px;
+  z-index: 1;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--color-plasma-cyan);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.searchIcon::after {
+  position: absolute;
+  right: -5px;
+  bottom: -3px;
+  width: 6px;
+  height: 2px;
+  background: var(--color-plasma-cyan);
+  content: '';
+  transform: rotate(45deg);
+  transform-origin: left center;
+}
+
+.results {
+  min-height: 180px;
+  max-height: min(340px, calc(90vh - 170px));
+  margin: 0;
+  padding: 5px;
+  overflow-y: auto;
+  border: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 24%, transparent);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--color-deep-space) 94%, transparent);
+  list-style: none;
+}
+
+.results button {
+  display: grid;
+  grid-template-columns: 9px minmax(0, 1fr) auto;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  padding: 10px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--color-starlight);
+  cursor: pointer;
+  font:
+    600 0.82rem/1 system-ui,
+    sans-serif;
+  text-align: left;
+}
+
+.results button:hover,
+.results button:focus-visible {
+  outline: none;
+  background: color-mix(in srgb, var(--color-plasma-cyan) 12%, transparent);
+}
+
+.results span:not(.resultMarker) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.results small {
+  color: color-mix(in srgb, var(--color-starlight) 52%, transparent);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.resultMarker {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-plasma-cyan);
+  box-shadow: 0 0 8px var(--color-plasma-cyan);
+}
+
+.notice,
+.error {
+  padding: 14px 10px;
+  color: color-mix(in srgb, var(--color-starlight) 58%, transparent);
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.error {
+  color: #fca5a5;
+}
+
+@media (max-width: 700px) {
+  .backdrop {
+    padding: 0;
+  }
+
+  .dialog {
+    width: 100%;
+    max-height: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+  }
+}

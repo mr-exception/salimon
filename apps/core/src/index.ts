@@ -1,6 +1,8 @@
+import { createServer } from 'node:http';
 import path from 'node:path';
 import dotenv from 'dotenv';
 import { createApp } from './app';
+import { configureSocketServer } from './socket';
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
@@ -13,7 +15,9 @@ if (!Number.isInteger(port) || port <= 0) {
 
 async function start() {
   const app = createApp();
-  app.listen(port, () => {
+  const server = createServer(app);
+  configureSocketServer(server);
+  server.listen(port, () => {
     console.log(`Core API listening on http://localhost:${port}`);
   });
 }

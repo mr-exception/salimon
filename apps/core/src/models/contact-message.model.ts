@@ -122,6 +122,21 @@ export class ContactMessageModel {
     );
   }
 
+  static async markContactMessagesRead(
+    spaceshipSecurityCode: string,
+    contactId: string,
+  ) {
+    return (await ContactMessageModel.getModel()).updateMany(
+      {
+        spaceshipSecurityCode,
+        contactId,
+        sender: 'contact',
+        isRead: { $ne: true },
+      },
+      { $set: { isRead: true } },
+    );
+  }
+
   static async findUnreadContactMessages(spaceshipSecurityCode: string) {
     return (await ContactMessageModel.getModel())
       .find({

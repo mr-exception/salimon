@@ -40,6 +40,11 @@ export type SpaceshipProximityTelemetry = {
   surfaceDistanceMeters: number;
   relativeSpeedMetersPerSecond: number;
 };
+type SpaceshipClearance = {
+  bodyName: string;
+  surfaceDistanceMeters: number;
+  minimumSurfaceDistanceMeters: number;
+};
 export type Inventory = SpaceshipInventory;
 export const INVENTORY_MATERIALS = [
   'iron',
@@ -61,6 +66,7 @@ const EARTH_RADIUS_METERS = 6_371_000;
 const SPACESHIP_RADIUS_METERS = 200;
 const DEFAULT_SURFACE_OFFSET = EARTH_RADIUS_METERS + SPACESHIP_RADIUS_METERS;
 const PROXIMITY_TELEMETRY_RANGE_METERS = 3_000_000;
+const FREE_FLIGHT_BODY_RADIUS_CLEARANCE_RATIO = 0.2;
 const DEFAULT_API_BASE_URL = 'http://localhost:3000';
 export const WORLD_VIEWPORT_REFRESH_INTERVAL_MS = 5 * 60 * 1_000;
 const DEFAULT_PLANET_RENDER_ZOOM_LEVEL = 0.0000001;
@@ -633,10 +639,7 @@ function getClosestPersistenceReference(spaceshipPosition: Vector) {
 
 function canDetachSpaceshipFromAttachedBody() {
   const referenceName = spaceshipState.position.relativeTo;
-  if (
-    store.get(spaceshipMotionStateAtom) === 'flying' ||
-    !referenceName
-  ) {
+  if (store.get(spaceshipMotionStateAtom) === 'flying' || !referenceName) {
     return true;
   }
 
@@ -645,6 +648,64 @@ function canDetachSpaceshipFromAttachedBody() {
 
 export function isSpaceshipEngineRunning() {
   return store.get(spaceshipActiveFeatureAtom) !== undefined;
+}
+
+export function getSpaceshipSaveBlockReason() {
+  if (store.get(spaceshipMotionStateAtom) !== 'flying') {
+    return 'Ship can be saved only while free flying.';
+  }
+  if (store.get(spaceshipActiveFeatureAtom)) {
+    return 'Turn off all thrusters before saving.';
+  }
+
+  const blockedClearance = getClosestBlockingSpaceshipClearance();
+  if (blockedClearance) {
+    return `Move at least ${Math.round(
+      blockedClearance.minimumSurfaceDistanceMeters,
+    ).toLocaleString()} m from ${blockedClearance.bodyName}'s surface before saving.`;
+  }
+
+  return undefined;
+}
+
+function getClosestBlockingSpaceshipClearance():
+  | SpaceshipClearance
+  | undefined {
+  const spaceshipPosition = toVector(getWorldPosition(spaceshipState.position));
+  let closest: SpaceshipClearance | undefined;
+
+  for (const body of [...worldState.planets, ...worldState.stars]) {
+    const bodyPosition = toVector(getWorldPosition(body.position));
+    const centerDistance = Math.hypot(
+      spaceshipPosition.x - bodyPosition.x,
+      spaceshipPosition.y - bodyPosition.y,
+    );
+    const surfaceDistance =
+      spaceshipAttachedBodyName === body.name &&
+      store.get(spaceshipMotionStateAtom) !== 'flying'
+        ? 0
+        : Math.max(
+            0,
+            centerDistance -
+              Number(body.radius) -
+              Number(spaceshipState.radius),
+          );
+    const minimumSurfaceDistanceMeters =
+      Number(body.radius) * FREE_FLIGHT_BODY_RADIUS_CLEARANCE_RATIO;
+
+    if (surfaceDistance >= minimumSurfaceDistanceMeters) continue;
+    if (closest && surfaceDistance >= closest.surfaceDistanceMeters) {
+      continue;
+    }
+
+    closest = {
+      bodyName: body.name,
+      surfaceDistanceMeters: surfaceDistance,
+      minimumSurfaceDistanceMeters,
+    };
+  }
+
+  return closest;
 }
 
 export type SpaceshipTargetSpeedBurnPreview = {
@@ -1338,10 +1399,7 @@ function rebuildWorldBodyByName() {
 
 function normalizeAttachedSpaceshipPosition() {
   const referenceName = spaceshipState.position.relativeTo;
-  if (
-    store.get(spaceshipMotionStateAtom) === 'flying' ||
-    !referenceName
-  ) {
+  if (store.get(spaceshipMotionStateAtom) === 'flying' || !referenceName) {
     return;
   }
 

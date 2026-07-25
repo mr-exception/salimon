@@ -15,30 +15,37 @@ type SearchPanelProps = {
 export function SearchPanel({ planets, stars, onSelect }: SearchPanelProps) {
   const [query, setQuery] = useState('');
   const normalizedQuery = query.trim().toLocaleLowerCase();
+  const searchIndex = useMemo(
+    () => [
+      ...planets.map((body) => ({
+        body,
+        kind: 'Planet' as const,
+        nameLower: body.name.toLocaleLowerCase(),
+      })),
+      ...stars.map((body) => ({
+        body,
+        kind: 'Star' as const,
+        nameLower: body.name.toLocaleLowerCase(),
+      })),
+    ],
+    [planets, stars],
+  );
   const results = useMemo<SearchResult[]>(() => {
     if (!normalizedQuery) return [];
 
-    return [
-      ...planets.map((body) => ({ body, kind: 'Planet' as const })),
-      ...stars.map((body) => ({ body, kind: 'Star' as const })),
-    ]
-      .filter(({ body }) =>
-        body.name.toLocaleLowerCase().includes(normalizedQuery),
-      )
+    return searchIndex
+      .filter(({ nameLower }) => nameLower.includes(normalizedQuery))
       .sort((a, b) => {
-        const aStartsWith = a.body.name
-          .toLocaleLowerCase()
-          .startsWith(normalizedQuery);
-        const bStartsWith = b.body.name
-          .toLocaleLowerCase()
-          .startsWith(normalizedQuery);
+        const aStartsWith = a.nameLower.startsWith(normalizedQuery);
+        const bStartsWith = b.nameLower.startsWith(normalizedQuery);
 
         return (
           Number(bStartsWith) - Number(aStartsWith) ||
           a.body.name.localeCompare(b.body.name)
         );
-      });
-  }, [normalizedQuery, planets, stars]);
+      })
+      .map(({ body, kind }) => ({ body, kind }));
+  }, [normalizedQuery, searchIndex]);
 
   const chooseResult = (result: SearchResult) => {
     onSelect(result);

@@ -40,7 +40,8 @@ export type Planet = OrbitingBody &
     type?: 'planet' | 'moon' | 'blackhole';
     color: number;
     variant: number;
-    shapeRenderZoomLevel: number;
+    minZoomRenderShape: number;
+    shapeRenderZoomLevel?: number;
     renderZoomLevel: number;
   };
 
@@ -48,7 +49,8 @@ export type Star = OrbitingBody &
   RotatingBody & {
     color: number;
     variant: number;
-    shapeRenderZoomLevel: number;
+    minZoomRenderShape: number;
+    shapeRenderZoomLevel?: number;
     renderZoomLevel: number;
   };
 
@@ -75,28 +77,6 @@ export type InventoryMaterial =
   | 'hydrogen'
   | 'nitrogen';
 export type SpaceshipInventory = Record<InventoryMaterial, number>;
-
-export type AsteroidDeposit = {
-  material: InventoryMaterial;
-  amount: number;
-};
-
-export type AsteroidSizeClass = 'small' | 'medium' | 'large';
-
-export type AsteroidDto = {
-  id: string;
-  systemName: string;
-  orbitingBodyName: string | null;
-  sizeClass: AsteroidSizeClass;
-  massTonnes: number;
-  position: SerializedPosition;
-  orbitalCenter: string | null;
-  clockwise: boolean;
-  speed: string;
-  velocity?: Velocity;
-  deposits: AsteroidDeposit[];
-  capturedAt: string;
-};
 
 export type SpaceshipTargetSpeedFeature = {
   type: 'target-speed';
@@ -174,10 +154,9 @@ export type SerializedWorld = {
 export type SerializedWorldBody =
   | (SerializedBody<Star> & { type: 'star' })
   | (SerializedBody<Planet> & {
-      type: 'planet' | 'moon' | 'blackhole' | 'asteroid' | 'astriod';
+      type: 'planet' | 'moon' | 'blackhole';
     });
 
 export type SerializedWorldSystems = {
   systems: SerializedWorldBody[][];
-  asteroids?: AsteroidDto[];
 };

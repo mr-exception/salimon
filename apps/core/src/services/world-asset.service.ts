@@ -7,6 +7,8 @@ type WorldAsset = SerializedWorldSystems & {
   generatedAt?: string;
 };
 
+const MIN_RENDER_SHAPE_SCREEN_WIDTH = 16;
+
 const GALACTIC_CENTER: SerializedWorldBody = {
   id: '9661cfb2-d951-581a-a129-f7b64d392e7a',
   type: 'blackhole',
@@ -18,6 +20,7 @@ const GALACTIC_CENTER: SerializedWorldBody = {
   speed: '0',
   mass: '8544584500000000000000000000000000000',
   radius: '0',
+  minZoomRenderShape: 0,
   rotationPeriodSeconds: 0,
   cTime: 1784419200000,
 } as SerializedWorldBody;
@@ -37,6 +40,7 @@ const SOLAR_SYSTEM = [
     speed: '220000',
     mass: '1988500000000000000000000000000',
     radius: '695700000',
+    minZoomRenderShape: getMinZoomRenderShape('695700000'),
     rotationPeriodSeconds: 2192832,
     cTime: 1784419200000,
   },
@@ -55,6 +59,7 @@ const SOLAR_SYSTEM = [
     speed: '29780',
     mass: '5972370000000000000000000',
     radius: '6371000',
+    minZoomRenderShape: getMinZoomRenderShape('6371000'),
     rotationPeriodSeconds: 86164.1,
     cTime: 1784419200000,
   },
@@ -73,6 +78,7 @@ const SOLAR_SYSTEM = [
     speed: '1022',
     mass: '73420000000000000000000',
     radius: '1737400',
+    minZoomRenderShape: getMinZoomRenderShape('1737400'),
     rotationPeriodSeconds: 2360591.51,
     cTime: 1784419200000,
   },
@@ -91,7 +97,6 @@ export class WorldAssetService {
     const asset = await WorldAssetService.getWorldAsset();
     return {
       systems: asset.systems,
-      ...(asset.asteroids ? { asteroids: asset.asteroids } : {}),
     };
   }
 
@@ -165,7 +170,6 @@ export class WorldAssetService {
         schemaVersion: firstChunk.schemaVersion,
         generatedAt: firstChunk.generatedAt,
         systems,
-        asteroids: chunks.flatMap((chunk) => chunk.asteroids ?? []),
       };
 
       WorldAssetService.worldAsset = asset;
@@ -193,6 +197,8 @@ function normalizeWorldSystems(systems: SerializedWorldBody[][]) {
 
       return {
         ...body,
+        minZoomRenderShape:
+          body.minZoomRenderShape ?? getMinZoomRenderShape(body.radius),
         position: {
           ...body.position,
           ...(reference ? { relativeTo: reference.name } : {}),
@@ -200,4 +206,11 @@ function normalizeWorldSystems(systems: SerializedWorldBody[][]) {
       };
     }),
   );
+}
+
+function getMinZoomRenderShape(radius: string) {
+  const radiusNumber = Number(radius);
+  if (!Number.isFinite(radiusNumber) || radiusNumber <= 0) return 0;
+
+  return MIN_RENDER_SHAPE_SCREEN_WIDTH / 2 / radiusNumber;
 }

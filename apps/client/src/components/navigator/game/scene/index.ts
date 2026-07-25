@@ -1,8 +1,6 @@
 import Phaser from 'phaser';
 import {
-  addInventoryMaterial,
   advanceWorld,
-  getAsteroids,
   getSpaceshipActiveThrustVector,
   getBodyWorldVelocity,
   getSpaceshipAttachedBodyName,
@@ -18,22 +16,16 @@ import {
   spaceshipState,
   WORLD_VIEWPORT_REFRESH_INTERVAL_MS,
 } from '@store';
-import { consumeMiningDurability, getMiningModuleStats } from '@store';
-import type {
-  AsteroidDto,
-  Planet as PlanetData,
-  Position,
-  Star as StarData,
-} from '@repo/types';
+import type { Planet as PlanetData, Star as StarData } from '@repo/types';
 import { formatSpeed } from '../../../../utils';
 import {
   DEFAULT_RENDER_ORIGIN_NAME,
-  getRenderPosition,
+  getRenderOriginWorldPosition,
+  getRenderPositionFromOrigin,
   getWorldPositionFromRenderPosition,
   offsetRenderOrigin,
   setRenderOriginName,
 } from '../get-render-position';
-import { Asteroid, type AsteroidMaterial } from '../asteroid';
 import {
   getPlanetPatternTextureKey,
   Planet,
@@ -77,12 +69,6 @@ export type BodyDetailsRequest =
       body: StarData;
       systemName: string;
       velocity: { x: number; y: number };
-    }
-  | {
-      kind: 'Asteroid';
-      body: AsteroidDto;
-      deposits: AsteroidDto['deposits'];
-      velocity: { x: number; y: number };
     };
 
 export type TargetDirectionPreview = {
@@ -106,69 +92,18 @@ const MEASUREMENT_ARROW_HEAD_PX = 7;
 const MEASUREMENT_ARROW_GAP_PX = 8;
 const MEASUREMENT_ARROW_COLOR = 0x22d3ee;
 const PREDICTION_COLOR = 0xa78bfa;
-const ASTEROID_ONE_TONNE_SCREEN_DIAMETER_AT_MAX_ZOOM = 250;
 const ENGINE_START_RESPONSE_TIMEOUT_MS = 5_000;
 const WORLD_VIEWPORT_REQUEST_DEBOUNCE_MS = 500;
-const ASTEROID_MATERIAL_THICKNESS: Record<AsteroidMaterial, number> = {
-  iron: 3,
-  silicates: 5,
-  ice: 1,
-  silver: 4,
-  carbon: 2,
-  gold: 6,
-  hydrogen: 1,
-  nitrogen: 1,
-};
-const MINING_BEAM_COLOR = 0xfbbf24;
 
-function getAsteroidRadiusForMass(massTonnes: number) {
-  const oneTonneRadius =
-    ASTEROID_ONE_TONNE_SCREEN_DIAMETER_AT_MAX_ZOOM / 2 / MAX_ZOOM;
-  return oneTonneRadius * Math.cbrt(Math.max(0.001, massTonnes));
-}
+function isCanceledRequest(error: unknown) {
+  if (!error || typeof error !== 'object') return false;
 
-function getAsteroidAverageThickness(
-  deposits: readonly AsteroidDto['deposits'][number][],
-) {
-  const totalAmount = deposits.reduce(
-    (total, deposit) => total + deposit.amount,
-    0,
+  const maybeCanceled = error as { code?: unknown; name?: unknown };
+  return (
+    maybeCanceled.code === 'ERR_CANCELED' ||
+    maybeCanceled.name === 'CanceledError' ||
+    maybeCanceled.name === 'AbortError'
   );
-  if (totalAmount <= 0) return 1;
-
-  return deposits.reduce(
-    (total, deposit) =>
-      total +
-      ASTEROID_MATERIAL_THICKNESS[deposit.material] *
-        (deposit.amount / totalAmount),
-    0,
-  );
-}
-
-function deserializePosition(position: AsteroidDto['position']): Position {
-  return {
-    x: BigInt(position.x),
-    y: BigInt(position.y),
-    relativeTo: position.relativeTo,
-  };
-}
-
-function getPredictedAsteroidPosition(asteroid: AsteroidDto): Position {
-  const position = deserializePosition(asteroid.position);
-  if (!asteroid.velocity || position.relativeTo) return position;
-
-  const capturedAtMs = Date.parse(asteroid.capturedAt);
-  if (!Number.isFinite(capturedAtMs)) return position;
-
-  const elapsedSeconds = Math.max(0, (Date.now() - capturedAtMs) / 1000);
-  return {
-    x: BigInt(
-      Math.round(Number(position.x) + asteroid.velocity.x * elapsedSeconds),
-    ),
-    y: BigInt(
-      Math.round(Number(position.y) + asteroid.velocity.y * elapsedSeconds),
-    ),
-  };
 }
 
 export class Scene extends Phaser.Scene {
@@ -199,13 +134,10 @@ export class Scene extends Phaser.Scene {
   protected starData: StarData[] = [];
   protected planets: Planet[] = [];
   protected stars: Star[] = [];
-  protected asteroids: Asteroid[] = [];
-  protected asteroidsVisible = true;
   protected spaceship?: Spaceship;
   protected grid?: Phaser.GameObjects.Graphics;
   private measurementGraphics?: Phaser.GameObjects.Graphics;
   private predictionGraphics?: Phaser.GameObjects.Graphics;
-  private miningBeamGraphics?: Phaser.GameObjects.Graphics;
   private readonly measurementLabels = new Map<
     string,
     Phaser.GameObjects.Text
@@ -232,6 +164,7 @@ export class Scene extends Phaser.Scene {
   private viewportRefreshTimer?: number;
   private viewportRefreshDebounceTimer?: number;
   private viewportRefreshPromise?: Promise<unknown>;
+  private viewportRefreshAbortController?: AbortController;
   private hasPendingViewportRefresh = false;
   private readonly alwaysVisibleBodies = new Set<string>();
 
@@ -300,17 +233,17 @@ export class Scene extends Phaser.Scene {
     this.grid = this.add.graphics().setDepth(-1);
     this.measurementGraphics = this.add.graphics().setDepth(20);
     this.predictionGraphics = this.add.graphics().setDepth(19);
-    this.miningBeamGraphics = this.add.graphics().setDepth(18);
     this.drawVisibleWorld();
     this.configureInput();
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.unsubscribeFromWorld?.();
       this.unsubscribeFromWorld = undefined;
-      this.clearAsteroids();
       window.clearInterval(this.viewportRefreshTimer);
       this.viewportRefreshTimer = undefined;
       window.clearTimeout(this.viewportRefreshDebounceTimer);
       this.viewportRefreshDebounceTimer = undefined;
+      this.viewportRefreshAbortController?.abort();
+      this.viewportRefreshAbortController = undefined;
     });
     void this.renderWorld();
     this.viewportRefreshTimer = window.setInterval(() => {
@@ -319,18 +252,14 @@ export class Scene extends Phaser.Scene {
   }
 
   update(time: number, delta: number) {
+    this.publishActiveWorldBodies();
     const worldElapsedSeconds = advanceWorld(delta / 1000);
     this.syncWorldPositions();
-    this.lastActiveBodiesViewportKey = '';
-    this.lastVisibilityViewportKey = '';
-    this.publishActiveWorldBodies();
     this.planets.forEach((planet) => planet.syncRotation(worldElapsedSeconds));
     this.stars.forEach((star) => star.syncRotation(worldElapsedSeconds));
     if (getSpaceshipMotionState() === 'crashed') {
       this.spaceship?.clearTargetDirection();
     }
-    this.updateAsteroids(delta);
-    this.updateMining(delta);
     const storeEngineRunning = isSpaceshipEngineRunning();
     const engineStartPending =
       this.spaceshipEngineRunning &&
@@ -408,17 +337,6 @@ export class Scene extends Phaser.Scene {
     if (!this.predictionSeconds) this.predictionGraphics?.clear();
   }
 
-  setAsteroidsVisible(visible: boolean) {
-    this.asteroidsVisible = visible;
-    if (!visible) {
-      this.clearAsteroids();
-      this.miningBeamGraphics?.clear();
-      return;
-    }
-
-    this.syncAsteroids();
-  }
-
   private drawPredictions() {
     const graphics = this.predictionGraphics;
     const seconds = this.predictionSeconds;
@@ -469,156 +387,6 @@ export class Scene extends Phaser.Scene {
         getSpaceshipWorldVelocity(),
       );
     }
-  }
-
-  private updateAsteroids(deltaMs: number) {
-    const camera = this.cameras.main;
-    const deltaSeconds = deltaMs / 1000;
-    this.syncAsteroids();
-
-    this.asteroids.forEach((asteroid) =>
-      asteroid.update(deltaSeconds, camera.zoom),
-    );
-  }
-
-  private updateMining(deltaMs: number) {
-    const graphics = this.miningBeamGraphics;
-    graphics?.clear();
-    const miningStats = getMiningModuleStats();
-    if (!graphics || !miningStats?.active || !this.spaceship) return;
-
-    const target = this.getMiningTarget();
-    if (!target) return;
-
-    const requestedKnSeconds = miningStats.efficiencyKns * (deltaMs / 1000);
-    const consumedKnSeconds = consumeMiningDurability(requestedKnSeconds);
-    if (consumedKnSeconds <= 0) return;
-
-    const thickness = getAsteroidAverageThickness(target.deposits);
-    const minedDeposits = target.mine(consumedKnSeconds / thickness);
-    if (minedDeposits.length === 0) return;
-
-    minedDeposits.forEach((deposit) => {
-      addInventoryMaterial(deposit.material, deposit.amount);
-    });
-    this.drawMiningBeam(target);
-    if (target.isDepleted()) {
-      this.destroyAsteroid(target);
-    }
-  }
-
-  private getMiningTarget() {
-    if (!this.spaceship) return undefined;
-
-    const range = getMiningModuleStats()?.rangeMeters ?? 0;
-    if (range <= 0) return undefined;
-
-    return this.asteroids
-      .filter(
-        (asteroid) =>
-          Phaser.Math.Distance.Between(
-            this.spaceship?.x ?? 0,
-            this.spaceship?.y ?? 0,
-            asteroid.x,
-            asteroid.y,
-          ) <= range,
-      )
-      .sort(
-        (left, right) =>
-          Phaser.Math.Distance.Between(
-            this.spaceship?.x ?? 0,
-            this.spaceship?.y ?? 0,
-            left.x,
-            left.y,
-          ) -
-          Phaser.Math.Distance.Between(
-            this.spaceship?.x ?? 0,
-            this.spaceship?.y ?? 0,
-            right.x,
-            right.y,
-          ),
-      )[0];
-  }
-
-  private drawMiningBeam(target: Asteroid) {
-    if (!this.miningBeamGraphics || !this.spaceship) return;
-
-    const zoom = this.cameras.main.zoom;
-    this.miningBeamGraphics
-      .lineStyle(3 / zoom, MINING_BEAM_COLOR, 0.76)
-      .lineBetween(this.spaceship.x, this.spaceship.y, target.x, target.y)
-      .fillStyle(MINING_BEAM_COLOR, 0.34)
-      .fillCircle(target.x, target.y, Math.max(5 / zoom, target.radius * 0.4));
-  }
-
-  private destroyAsteroid(asteroid: Asteroid) {
-    this.asteroids = this.asteroids.filter(
-      (candidate) => candidate !== asteroid,
-    );
-    this.tweens.add({
-      targets: asteroid,
-      alpha: 0,
-      scale: asteroid.scale * 1.8,
-      duration: 120,
-      ease: 'Quad.easeOut',
-      onComplete: () => asteroid.destroy(),
-    });
-  }
-
-  private clearAsteroids() {
-    this.asteroids.forEach((asteroid) => asteroid.destroy());
-    this.asteroids = [];
-  }
-
-  private syncAsteroids() {
-    if (!this.asteroidsVisible) return;
-
-    const viewport = this.cameras.main.worldView;
-    const asteroidData = getAsteroids();
-    const incomingIds = new Set(asteroidData.map((asteroid) => asteroid.id));
-    this.asteroids = this.asteroids.filter((asteroid) => {
-      const keep =
-        incomingIds.has(asteroid.id) && !asteroid.isPastViewport(viewport, 0);
-      if (!keep) asteroid.destroy();
-      return keep;
-    });
-
-    const renderedById = new Map(
-      this.asteroids.map((asteroid) => [asteroid.id, asteroid]),
-    );
-    asteroidData.forEach((asteroid) => {
-      const position = getRenderPosition(
-        getPredictedAsteroidPosition(asteroid),
-      );
-      const radius = getAsteroidRadiusForMass(asteroid.massTonnes);
-      const rendered = renderedById.get(asteroid.id);
-      if (rendered) {
-        rendered.syncAsteroid(asteroid);
-        rendered.syncPosition(position.x, position.y);
-        return;
-      }
-      if (
-        !this.bodyBoundsIntersectViewport(
-          position.x,
-          position.y,
-          radius,
-          viewport,
-        )
-      ) {
-        return;
-      }
-
-      this.asteroids.push(
-        new Asteroid(
-          this,
-          position.x,
-          position.y,
-          radius,
-          asteroid,
-          asteroid.deposits,
-        ),
-      );
-    });
   }
 
   navigateTo(name: string, zoom: number) {
@@ -761,7 +529,6 @@ export class Scene extends Phaser.Scene {
 
     offsetRenderOrigin(center.x, center.y);
     this.syncWorldPositions();
-    this.asteroids.forEach((asteroid) => asteroid.shift(-center.x, -center.y));
     camera.centerOn(0, 0);
     this.lastViewportKey = '';
     this.lastActiveBodiesViewportKey = '';
@@ -799,19 +566,6 @@ export class Scene extends Phaser.Scene {
 
   openBodyDetailsAt(x: number, y: number) {
     const camera = this.cameras.main;
-    const asteroid = this.asteroids
-      .toReversed()
-      .find((candidate) => candidate.containsScreenPoint(x, y, camera));
-    if (asteroid) {
-      this.onBodyDetails?.({
-        kind: 'Asteroid',
-        body: asteroid.asteroid,
-        deposits: asteroid.deposits.map((deposit) => ({ ...deposit })),
-        velocity: this.getAsteroidWorldVelocity(asteroid),
-      });
-      return;
-    }
-
     const star = this.stars
       .toReversed()
       .find((candidate) => candidate.containsScreenPoint(x, y, camera));
@@ -836,48 +590,6 @@ export class Scene extends Phaser.Scene {
       systemName: this.getSystemName(planet.planet),
       velocity: getBodyWorldVelocity(planet.planet.name),
     });
-  }
-
-  private getAsteroidWorldVelocity(asteroid: Asteroid) {
-    if (!asteroid.asteroid.orbitalCenter) {
-      return asteroid.asteroid.velocity ?? { x: 0, y: 0 };
-    }
-
-    const center = this.getRenderedBodyPosition(
-      asteroid.asteroid.orbitalCenter,
-    );
-    const centerVelocity = getBodyWorldVelocity(
-      asteroid.asteroid.orbitalCenter,
-    );
-    if (!center) return centerVelocity;
-
-    const x = asteroid.x - center.x;
-    const y = asteroid.y - center.y;
-    const radius = Math.hypot(x, y);
-    if (radius === 0) return centerVelocity;
-
-    const direction = asteroid.asteroid.clockwise ? 1 : -1;
-    const speed = Number(asteroid.asteroid.speed);
-    return {
-      x: centerVelocity.x + (direction * -y * speed) / radius,
-      y: centerVelocity.y + (direction * x * speed) / radius,
-    };
-  }
-
-  private getRenderedBodyPosition(name: string) {
-    const planet = this.planetByName.get(name);
-    if (planet) return { x: planet.x, y: planet.y };
-
-    const star = this.starByName.get(name);
-    if (star) return { x: star.x, y: star.y };
-
-    const planetData = this.planetDataByName.get(name);
-    if (planetData) return getRenderPosition(planetData.position);
-
-    const starData = this.starDataByName.get(name);
-    if (starData) return getRenderPosition(starData.position);
-
-    return undefined;
   }
 
   private getSystemName(body: PlanetData | StarData) {
@@ -1106,22 +818,25 @@ export class Scene extends Phaser.Scene {
       );
     }
     this.applyNameLabelVisibility(viewportLabelMode);
-    this.resolveNameLabelCollisions();
+    if (viewportLabelMode !== 'suppress' || this.alwaysVisibleBodies.size > 1) {
+      this.resolveNameLabelCollisions();
+    }
     this.snapSpaceshipToSurface();
   }
 
   protected syncWorldPositions(bodyNames?: ReadonlySet<string>) {
+    const originPosition = getRenderOriginWorldPosition();
     if (!bodyNames) {
-      this.planets.forEach((planet) => planet.syncPosition());
-      this.stars.forEach((star) => star.syncPosition());
+      this.planets.forEach((planet) => planet.syncPosition(originPosition));
+      this.stars.forEach((star) => star.syncPosition(originPosition));
       this.spaceship?.syncPosition();
       this.snapSpaceshipToSurface();
       return;
     }
 
     bodyNames.forEach((bodyName) => {
-      this.planetByName.get(bodyName)?.syncPosition();
-      this.starByName.get(bodyName)?.syncPosition();
+      this.planetByName.get(bodyName)?.syncPosition(originPosition);
+      this.starByName.get(bodyName)?.syncPosition(originPosition);
     });
     if (this.spaceship && bodyNames.has(this.spaceship.spaceship.name)) {
       this.spaceship.syncPosition();
@@ -1186,7 +901,9 @@ export class Scene extends Phaser.Scene {
       );
     }
     this.applyNameLabelVisibility(viewportLabelMode);
-    this.resolveNameLabelCollisions();
+    if (viewportLabelMode !== 'suppress' || this.alwaysVisibleBodies.size > 1) {
+      this.resolveNameLabelCollisions();
+    }
     this.snapSpaceshipToSurface();
   }
 
@@ -1210,24 +927,45 @@ export class Scene extends Phaser.Scene {
     this.lastActiveBodiesViewportKey = viewportKey;
 
     const activeBodyNames = new Set<string>();
+    const renderedBodyNames = new Set<string>();
     const bodyPositionByName = this.getBodyPositionByName();
     const viewportBodyNames = this.getViewportBodyNames(bodyPositionByName);
 
     if (viewportBodyNames.length < VIEWPORT_LABEL_OBJECT_LIMIT) {
-      viewportBodyNames.forEach((bodyName) => activeBodyNames.add(bodyName));
+      viewportBodyNames.forEach((bodyName) => {
+        activeBodyNames.add(bodyName);
+        renderedBodyNames.add(bodyName);
+      });
     }
 
     this.planetData.forEach((planet) => {
+      const position = bodyPositionByName.get(planet.name);
+      const radius = this.getPlanetViewportRadius(planet, camera.zoom);
+      const canRenderShape =
+        this.alwaysVisibleBodies.has(planet.name) ||
+        this.shouldRenderPlanetShape(planet, camera.zoom);
+      const intersectsViewport =
+        position &&
+        this.bodyBoundsIntersectViewport(
+          position.x,
+          position.y,
+          radius,
+          viewport,
+        );
       if (
         this.alwaysVisibleBodies.has(planet.name) ||
         this.bodyMotionAreaIntersectsViewport(
           planet,
-          this.getPlanetViewportRadius(planet, camera.zoom),
+          radius,
           viewport,
           camera.zoom,
           bodyPositionByName,
         )
       ) {
+        activeBodyNames.add(planet.name);
+      }
+      if (canRenderShape && intersectsViewport) {
+        renderedBodyNames.add(planet.name);
         activeBodyNames.add(planet.name);
       }
     });
@@ -1245,13 +983,18 @@ export class Scene extends Phaser.Scene {
         )
       ) {
         activeBodyNames.add(star.name);
+        renderedBodyNames.add(star.name);
       }
     });
-    if (this.cameraLockedBodyName)
+    if (this.cameraLockedBodyName) {
       activeBodyNames.add(this.cameraLockedBodyName);
+      renderedBodyNames.add(this.cameraLockedBodyName);
+    }
+    const attachedBodyName = getSpaceshipAttachedBodyName();
+    if (attachedBodyName) activeBodyNames.add(attachedBodyName);
     if (this.spaceship) activeBodyNames.add(this.spaceship.spaceship.name);
 
-    if (this.reconcileRenderedBodies(activeBodyNames)) {
+    if (this.reconcileRenderedBodies(renderedBodyNames)) {
       this.lastVisibilityViewportKey = '';
     }
     setActiveWorldBodyNames(activeBodyNames);
@@ -1264,7 +1007,7 @@ export class Scene extends Phaser.Scene {
     zoom: number,
     bodyPositionByName: Map<string, RenderedBodyPosition>,
   ) {
-    if (body.type !== 'blackhole' && zoom < body.shapeRenderZoomLevel) {
+    if (body.type !== 'blackhole' && zoom < body.minZoomRenderShape) {
       return false;
     }
 
@@ -1401,6 +1144,8 @@ export class Scene extends Phaser.Scene {
     const viewport = camera.worldView;
     const planets = this.planetData
       .filter((body) => {
+        if (!this.shouldRenderPlanetShape(body, camera.zoom)) return false;
+
         const position = bodyPositionByName.get(body.name);
         if (!position) return false;
 
@@ -1436,6 +1181,10 @@ export class Scene extends Phaser.Scene {
     return Math.max(radius, BLACK_HOLE_VIEWPORT_RADIUS_PX / zoom);
   }
 
+  private shouldRenderPlanetShape(body: PlanetData, zoom: number) {
+    return body.type === 'blackhole' || zoom >= body.minZoomRenderShape;
+  }
+
   private bodyBoundsIntersectViewport(
     x: number,
     y: number,
@@ -1465,11 +1214,18 @@ export class Scene extends Phaser.Scene {
 
   private getBodyPositionByName() {
     const bodyPositionByName = new Map<string, RenderedBodyPosition>();
+    const originPosition = getRenderOriginWorldPosition();
     this.planetData.forEach((planet) => {
-      bodyPositionByName.set(planet.name, getRenderPosition(planet.position));
+      bodyPositionByName.set(
+        planet.name,
+        getRenderPositionFromOrigin(planet.position, originPosition),
+      );
     });
     this.starData.forEach((star) => {
-      bodyPositionByName.set(star.name, getRenderPosition(star.position));
+      bodyPositionByName.set(
+        star.name,
+        getRenderPositionFromOrigin(star.position, originPosition),
+      );
     });
     if (this.spaceship) {
       bodyPositionByName.set(this.spaceship.name, this.spaceship);
@@ -1529,7 +1285,7 @@ export class Scene extends Phaser.Scene {
     this.starData.forEach((star) => this.starDataByName.set(star.name, star));
   }
 
-  async refreshWorldFromViewport() {
+  async refreshWorldFromViewport(signal?: AbortSignal) {
     const camera = this.cameras.main;
     camera.preRender();
     const viewport = camera.worldView;
@@ -1562,10 +1318,14 @@ export class Scene extends Phaser.Scene {
         topLeft.y > bottomRight.y
           ? topLeft.y.toString()
           : bottomRight.y.toString(),
+      zoom: camera.zoom,
       requiredBodyNames,
+      signal,
     }).finally(() => {
       this.onWorldViewportLoadingChange?.(false);
     });
+
+    if (signal?.aborted || !this.sys.isActive()) return world;
 
     this.setWorldBodyData(world.planets, world.stars);
     this.syncWorldPositions();
@@ -1586,15 +1346,25 @@ export class Scene extends Phaser.Scene {
   private refreshWorldFromViewportSafely() {
     if (this.viewportRefreshPromise) {
       this.hasPendingViewportRefresh = true;
+      this.viewportRefreshAbortController?.abort();
       return;
     }
 
-    this.viewportRefreshPromise ??= this.refreshWorldFromViewport()
+    const abortController = new AbortController();
+    this.viewportRefreshAbortController = abortController;
+    this.viewportRefreshPromise ??= this.refreshWorldFromViewport(
+      abortController.signal,
+    )
       .catch((error: unknown) => {
+        if (isCanceledRequest(error)) return;
+
         console.error('Failed to refresh viewport world data', error);
         this.onWorldLoadComplete?.(error);
       })
       .finally(() => {
+        if (this.viewportRefreshAbortController === abortController) {
+          this.viewportRefreshAbortController = undefined;
+        }
         this.viewportRefreshPromise = undefined;
         if (this.hasPendingViewportRefresh) {
           this.hasPendingViewportRefresh = false;

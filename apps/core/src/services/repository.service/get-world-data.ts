@@ -41,6 +41,7 @@ function toWorldBodyDocument(body: SerializedWorldBody): WorldBodyDocument {
     speed: body.speed,
     mass: body.mass,
     radius: body.radius,
+    minZoomRenderShape: body.minZoomRenderShape,
     rotationPeriodSeconds: body.rotationPeriodSeconds,
     updatedAt: new Date(body.cTime ?? Date.now()),
   };

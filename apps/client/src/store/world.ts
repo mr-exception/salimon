@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { atom, getDefaultStore, useAtomValue, useSetAtom } from 'jotai';
 import type {
-  AsteroidDto,
   InventoryMaterial,
   Planet,
   Position,
@@ -64,10 +63,9 @@ const DEFAULT_SURFACE_OFFSET = EARTH_RADIUS_METERS + SPACESHIP_RADIUS_METERS;
 const PROXIMITY_TELEMETRY_RANGE_METERS = 3_000_000;
 const DEFAULT_API_BASE_URL = 'http://localhost:3000';
 export const WORLD_VIEWPORT_REFRESH_INTERVAL_MS = 5 * 60 * 1_000;
-const DEFAULT_PLANET_SHAPE_RENDER_ZOOM_LEVEL = 0.000001;
 const DEFAULT_PLANET_RENDER_ZOOM_LEVEL = 0.0000001;
-const DEFAULT_STAR_SHAPE_RENDER_ZOOM_LEVEL = 0.0000000001;
 const DEFAULT_STAR_RENDER_ZOOM_LEVEL = 0.00000000001;
+const MIN_RENDER_SHAPE_SCREEN_WIDTH = 16;
 const TARGET_VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.1;
 const PLANET_COLORS = [
   0x60a5fa, 0x34d399, 0xf59e0b, 0xf97316, 0xa78bfa, 0x94a3b8, 0x22d3ee,
@@ -90,7 +88,6 @@ const spaceshipActiveFeatureAtom = atom<SpaceshipActiveFeature | undefined>(
   undefined,
 );
 const inventoryAtom = atom<Inventory>(createEmptyInventory());
-const asteroidsAtom = atom<AsteroidDto[]>([]);
 let inventoryPersistHandler: ((inventory: Inventory) => void) | undefined;
 
 function createEmptyInventory(): Inventory {
@@ -198,37 +195,6 @@ export function useSetInventory() {
   return useSetAtom(inventoryAtom);
 }
 
-export function useAsteroids() {
-  return useAtomValue(asteroidsAtom);
-}
-
-export function useSetAsteroids() {
-  return useSetAtom(asteroidsAtom);
-}
-
-export function getAsteroids() {
-  return store.get(asteroidsAtom);
-}
-
-export function hydrateAsteroids(asteroids?: AsteroidDto[]) {
-  store.set(asteroidsAtom, asteroids ?? []);
-}
-
-export function addInventoryMaterial(
-  material: InventoryMaterial,
-  amount: number,
-) {
-  if (!Number.isFinite(amount) || amount <= 0) return;
-
-  const inventory = store.get(inventoryAtom);
-  const nextInventory = {
-    ...inventory,
-    [material]: inventory[material] + Math.round(amount),
-  };
-  store.set(inventoryAtom, nextInventory);
-  persistInventory(nextInventory);
-}
-
 export function spendInventory(cost: Partial<Inventory>) {
   const inventory = store.get(inventoryAtom);
   const entries = Object.entries(cost) as [InventoryMaterial, number][];
@@ -279,6 +245,7 @@ export const spaceshipState: Spaceship = {
 const listeners = new Set<WorldListener>();
 let loadPromise: Promise<World> | undefined;
 let worldBodyByName = new Map<string, Body>();
+let worldPlanetNames = new Set<string>();
 let bodyVelocityByName = new Map<string, Vector>();
 let spaceshipVelocity: Vector | undefined;
 let spaceshipPositionRemainder: Vector = { x: 0, y: 0 };
@@ -286,13 +253,17 @@ let spaceshipStoredRelativeVelocity: Vector | undefined;
 let spaceshipAttachedBodyName: string | undefined = EARTH_NAME;
 let worldElapsedSeconds = 0;
 let worldViewportLoader: WorldViewportLoader | undefined;
+let activeWorldBodyNames: ReadonlySet<string> | undefined;
+let activeWorldBodies: (Planet | Star)[] | undefined;
 
 type WorldViewportRequest = {
   x1: string;
   y1: string;
   x2: string;
   y2: string;
+  zoom?: number;
   requiredBodyNames?: string[];
+  signal?: AbortSignal;
 };
 
 export function setWorldViewportLoader(loader?: WorldViewportLoader) {
@@ -315,18 +286,21 @@ export async function refreshWorldViewport({
   y1,
   x2,
   y2,
+  zoom,
   requiredBodyNames,
+  signal,
 }: WorldViewportRequest) {
   const request = {
     x1,
     y1,
     x2,
     y2,
+    ...(zoom === undefined ? {} : { zoom }),
     ...(requiredBodyNames === undefined ? {} : { requiredBodyNames }),
   };
   const data = worldViewportLoader
     ? await worldViewportLoader(request)
-    : await loadWorldViewportFromRest(request);
+    : await loadWorldViewportFromRest({ ...request, signal });
 
   applyWorldSystems(data);
   return worldState;
@@ -337,20 +311,27 @@ async function loadWorldViewportFromRest({
   y1,
   x2,
   y2,
+  zoom,
   requiredBodyNames,
+  signal,
 }: WorldViewportRequest) {
   const apiBaseUrl = (
     import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL
   ).replace(/\/+$/, '');
 
   return axios
-    .post<SerializedWorldSystems>(`${apiBaseUrl}/world/systems`, {
-      x1,
-      y1,
-      x2,
-      y2,
-      ...(requiredBodyNames === undefined ? {} : { requiredBodyNames }),
-    })
+    .post<SerializedWorldSystems>(
+      `${apiBaseUrl}/world/systems`,
+      {
+        x1,
+        y1,
+        x2,
+        y2,
+        ...(zoom === undefined ? {} : { zoom }),
+        ...(requiredBodyNames === undefined ? {} : { requiredBodyNames }),
+      },
+      { signal },
+    )
     .then(({ data }) => data);
 }
 
@@ -363,7 +344,6 @@ export function subscribeToWorld(listener: WorldListener) {
 }
 
 function applyWorldSystems(data: SerializedWorldSystems) {
-  store.set(asteroidsAtom, data.asteroids ?? []);
   const nextVelocities = new Map<string, Vector>();
   const bodies = data.systems.flat();
   const stars = bodies.flatMap((body) => {
@@ -385,6 +365,7 @@ function applyWorldSystems(data: SerializedWorldSystems) {
     advanceBodyPositionToNow(body);
   });
   rebuildWorldBodyByName();
+  rebuildActiveWorldBodies();
   normalizeAttachedSpaceshipPosition();
   syncSpaceshipAbsoluteSpeed();
   listeners.forEach((listener) => listener(worldState));
@@ -404,8 +385,39 @@ function isVisiblePlanetBody(
 }
 
 export function setActiveWorldBodyNames(names?: Iterable<string>) {
-  void names;
-  return;
+  if (!names) {
+    activeWorldBodyNames = undefined;
+    activeWorldBodies = undefined;
+    return;
+  }
+
+  const nextNames = new Set<string>();
+  for (const name of names) {
+    addActiveWorldBodyName(name, nextNames);
+  }
+  activeWorldBodyNames = nextNames;
+  rebuildActiveWorldBodies();
+}
+
+function addActiveWorldBodyName(name: string, names: Set<string>) {
+  if (names.has(name)) return;
+
+  names.add(name);
+  const body = getWorldBodyByName().get(name);
+  const centerName = body?.orbitalCenter ?? body?.position.relativeTo;
+  if (centerName) addActiveWorldBodyName(centerName, names);
+}
+
+function rebuildActiveWorldBodies() {
+  const activeNames = activeWorldBodyNames;
+  if (!activeNames) {
+    activeWorldBodies = undefined;
+    return;
+  }
+
+  activeWorldBodies = [...worldState.stars, ...worldState.planets].filter(
+    (body) => activeNames.has(body.name),
+  );
 }
 
 export function setSpaceshipHeading(heading: number) {
@@ -586,7 +598,7 @@ function getClosestPersistenceReference(spaceshipPosition: Vector) {
       }
     | undefined;
 
-  for (const body of [...worldState.planets, ...worldState.stars]) {
+  for (const body of getActiveWorldBodies()) {
     const bodyPosition = toVector(getWorldPosition(body.position));
     const centerDistance = Math.hypot(
       spaceshipPosition.x - bodyPosition.x,
@@ -838,7 +850,7 @@ export function getSpaceshipProximityTelemetry():
     const bodyVelocity = getCelestialBodyWorldVelocity(body.name, new Set());
     closest = {
       bodyName: body.name,
-      bodyKind: worldState.planets.includes(body as Planet) ? 'Planet' : 'Star',
+      bodyKind: worldPlanetNames.has(body.name) ? 'Planet' : 'Star',
       surfaceDistanceMeters: surfaceDistance,
       relativeSpeedMetersPerSecond: Math.hypot(
         spaceshipWorldVelocity.x - bodyVelocity.x,
@@ -877,9 +889,13 @@ function getInitialSpaceshipWorldVelocity() {
 }
 
 function advanceBodyPositions(elapsedSeconds: number) {
-  for (const body of [...worldState.stars, ...worldState.planets]) {
+  for (const body of getActiveWorldBodies()) {
     advanceBodyPositionByOrbit(body, elapsedSeconds);
   }
+}
+
+function getActiveWorldBodies() {
+  return activeWorldBodies ?? [...worldState.stars, ...worldState.planets];
 }
 
 function advanceBodyPositionToNow(body: Planet | Star) {
@@ -1087,7 +1103,7 @@ function calculateAcceleration(position: Vector, thrustAcceleration?: Vector) {
 function calculateGravityAcceleration(position: Vector) {
   return WorldService.calculateGravityAcceleration(
     position,
-    [...worldState.stars, ...worldState.planets],
+    getActiveWorldBodies(),
     (body) => toVector(getWorldPosition(body.position)),
   );
 }
@@ -1299,6 +1315,7 @@ function rebuildWorldBodyByName() {
       body,
     ]),
   );
+  worldPlanetNames = new Set(worldState.planets.map((planet) => planet.name));
 }
 
 function normalizeAttachedSpaceshipPosition() {
@@ -1341,9 +1358,13 @@ function deserializeBody<T extends Body>(
     mass: string;
     speed: string;
     cTime?: number | string;
+    minZoomRenderShape?: number;
+    shapeRenderZoomLevel?: number;
   },
-  defaults: Partial<T> = {},
+  defaults: Partial<T> & { minZoomRenderShape?: number } = {},
 ): T {
+  const radius = BigInt(body.radius);
+
   return {
     ...defaults,
     ...body,
@@ -1353,9 +1374,14 @@ function deserializeBody<T extends Body>(
       relativeTo: body.position.relativeTo,
       relativeToId: body.position.relativeToId,
     },
-    radius: BigInt(body.radius),
+    radius,
     mass: BigInt(body.mass),
     speed: BigInt(body.speed),
+    minZoomRenderShape:
+      body.minZoomRenderShape ??
+      body.shapeRenderZoomLevel ??
+      defaults.minZoomRenderShape ??
+      getMinZoomRenderShape(radius),
   } as T;
 }
 
@@ -1365,7 +1391,6 @@ function getPlanetVisualDefaults(name: string): Partial<Planet> {
   return {
     color: isEarth ? 0x3b82f6 : pickColor(name, PLANET_COLORS),
     variant: isEarth ? 0 : pickIndex(name, 10),
-    shapeRenderZoomLevel: DEFAULT_PLANET_SHAPE_RENDER_ZOOM_LEVEL,
     renderZoomLevel: DEFAULT_PLANET_RENDER_ZOOM_LEVEL,
     rotationDegrees: 0,
     rotationPeriodSeconds: 86_400,
@@ -1378,7 +1403,6 @@ function getStarVisualDefaults(name: string): Partial<Star> {
   return {
     color: isSun ? 0xfacc15 : pickColor(name, STAR_COLORS),
     variant: isSun ? 0 : pickIndex(name, 4),
-    shapeRenderZoomLevel: DEFAULT_STAR_SHAPE_RENDER_ZOOM_LEVEL,
     renderZoomLevel: DEFAULT_STAR_RENDER_ZOOM_LEVEL,
     rotationDegrees: 0,
     rotationPeriodSeconds: 2_160_000,
@@ -1395,4 +1419,11 @@ function pickIndex(name: string, length: number) {
     hash = (hash * 31 + name.charCodeAt(index)) >>> 0;
   }
   return hash % length;
+}
+
+function getMinZoomRenderShape(radius: bigint) {
+  const radiusNumber = Number(radius);
+  if (!Number.isFinite(radiusNumber) || radiusNumber <= 0) return 0;
+
+  return MIN_RENDER_SHAPE_SCREEN_WIDTH / 2 / radiusNumber;
 }

@@ -347,7 +347,6 @@
 }
 
 .bodyDetailsDialog header span,
-.bodyDetailsDeposits h3,
 .bodyDetailsDialog dt {
   color: color-mix(in srgb, var(--color-starlight) 55%, transparent);
   font-size: 0.58rem;
@@ -401,32 +400,6 @@
   font-variant-numeric: tabular-nums;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.bodyDetailsDeposits {
-  margin-top: 16px;
-  padding-top: 13px;
-  border-top: 1px solid
-    color-mix(in srgb, var(--color-plasma-cyan) 18%, transparent);
-}
-
-.bodyDetailsDeposits h3 {
-  margin: 0;
-}
-
-.bodyDetailsDeposits dl {
-  gap: 9px;
-}
-
-.bodyDetailsDeposits dl div {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 96px;
-  align-items: baseline;
-  gap: 12px;
-}
-
-.bodyDetailsDeposits dd {
-  text-align: right;
 }
 
 .proximityTelemetry {
@@ -749,37 +722,6 @@
     var(--color-plasma-cyan) 12%,
     var(--color-deep-space)
   );
-}
-
-.asteroidToggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border: 1px solid
-    color-mix(in srgb, var(--color-plasma-cyan) 32%, transparent);
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--color-deep-space) 86%, transparent);
-  box-shadow: 0 8px 28px rgb(0 0 0 / 28%);
-  color: var(--color-starlight);
-  cursor: pointer;
-  font:
-    700 0.65rem/1.2 system-ui,
-    sans-serif;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.asteroidToggle input {
-  width: 14px;
-  height: 14px;
-  margin: 0;
-  accent-color: var(--color-plasma-cyan);
-}
-
-.asteroidToggle:has(input:checked) {
-  border-color: var(--color-plasma-cyan);
-  color: var(--color-plasma-cyan);
 }
 
 .zoomMeter {

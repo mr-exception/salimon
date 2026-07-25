@@ -2,9 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
 import {
   getSpaceshipProximityTelemetry,
-  INVENTORY_MATERIALS,
   subscribeToWorld,
-  useInventory,
   type SpaceshipProximityTelemetry,
 } from '@store';
 import type { World } from '@repo/types';
@@ -26,17 +24,7 @@ import { SearchPanel, type SearchResult } from './search-panel';
 import style from './style.module.css';
 
 const SCALE_WIDTH_PX = 200;
-const TELEMETRY_UPDATE_INTERVAL_MS = 100;
-const INVENTORY_MATERIAL_LABELS = {
-  iron: 'Iron',
-  silicates: 'Silicates',
-  ice: 'Ice',
-  silver: 'Silver',
-  carbon: 'Carbon',
-  gold: 'Gold',
-  hydrogen: 'Hydrogen',
-  nitrogen: 'Nitrogen',
-} as const;
+const TELEMETRY_UPDATE_INTERVAL_MS = 250;
 
 function formatScaleDistance(zoom: number) {
   return formatDistance(SCALE_WIDTH_PX / zoom);
@@ -44,10 +32,6 @@ function formatScaleDistance(zoom: number) {
 
 function formatMass(valueInKilograms: bigint) {
   return formatSiValue(Number(valueInKilograms), 'kg');
-}
-
-function formatTonnes(value: number) {
-  return formatSiValue(value, 't');
 }
 
 function formatVelocityDirection(velocity: { x: number; y: number }) {
@@ -59,9 +43,7 @@ function formatVelocityDirection(velocity: { x: number; y: number }) {
 }
 
 function getBodyDetailsTitle(details: BodyDetailsRequest) {
-  return details.kind === 'Asteroid'
-    ? `Asteroid ${details.body.id.slice(0, 8)}`
-    : details.body.name;
+  return details.body.name;
 }
 
 function BodyDetailsDialog({
@@ -107,67 +89,27 @@ function BodyDetailsDialog({
           </button>
         </header>
         <dl>
-          {details.kind !== 'Asteroid' ? (
-            <>
-              <div>
-                <dt>System</dt>
-                <dd>{details.systemName}</dd>
-              </div>
-              <div>
-                <dt>Current speed</dt>
-                <dd>{formatSpeed(velocitySpeed)}</dd>
-              </div>
-              <div>
-                <dt>Mass</dt>
-                <dd>{formatMass(details.body.mass)}</dd>
-              </div>
-              <div>
-                <dt>Size</dt>
-                <dd>{formatDistance(Number(details.body.radius) * 2)}</dd>
-              </div>
-            </>
-          ) : (
-            <>
-              <div>
-                <dt>System</dt>
-                <dd>{details.body.systemName}</dd>
-              </div>
-              <div>
-                <dt>Orbiting</dt>
-                <dd>{details.body.orbitingBodyName}</dd>
-              </div>
-              <div>
-                <dt>Speed</dt>
-                <dd>{formatSpeed(velocitySpeed)}</dd>
-              </div>
-              <div>
-                <dt>Direction</dt>
-                <dd>{formatVelocityDirection(details.velocity)}</dd>
-              </div>
-              <div>
-                <dt>Mass</dt>
-                <dd>{formatTonnes(details.body.massTonnes)}</dd>
-              </div>
-              <div>
-                <dt>Size class</dt>
-                <dd>{details.body.sizeClass}</dd>
-              </div>
-            </>
-          )}
+          <div>
+            <dt>System</dt>
+            <dd>{details.systemName}</dd>
+          </div>
+          <div>
+            <dt>Current speed</dt>
+            <dd>{formatSpeed(velocitySpeed)}</dd>
+          </div>
+          <div>
+            <dt>Direction</dt>
+            <dd>{formatVelocityDirection(details.velocity)}</dd>
+          </div>
+          <div>
+            <dt>Mass</dt>
+            <dd>{formatMass(details.body.mass)}</dd>
+          </div>
+          <div>
+            <dt>Size</dt>
+            <dd>{formatDistance(Number(details.body.radius) * 2)}</dd>
+          </div>
         </dl>
-        {details.kind === 'Asteroid' && (
-          <section className={style.bodyDetailsDeposits}>
-            <h3>Minerals</h3>
-            <dl>
-              {details.deposits.map((deposit) => (
-                <div key={deposit.material}>
-                  <dt>{INVENTORY_MATERIAL_LABELS[deposit.material]}</dt>
-                  <dd>{formatTonnes(deposit.amount)}</dd>
-                </div>
-              ))}
-            </dl>
-          </section>
-        )}
       </section>
     </>
   );
@@ -210,16 +152,10 @@ export function Navigator({
   const [proximityTelemetry, setProximityTelemetry] =
     useState<SpaceshipProximityTelemetry>();
   const [isProximityExpanded, setIsProximityExpanded] = useState(false);
-  const [showAsteroids, setShowAsteroids] = useState(true);
-  const inventory = useInventory();
 
   useEffect(() => {
     sceneRef.current?.setMeasuringActive(isMeasuring);
   }, [isMeasuring]);
-
-  useEffect(() => {
-    sceneRef.current?.setAsteroidsVisible(showAsteroids);
-  }, [showAsteroids]);
 
   useEffect(() => {
     const updateTelemetry = () => {
@@ -400,20 +336,6 @@ export function Navigator({
           onDismiss={() => setBodyDetails(null)}
         />
       )}
-      <aside className={style.inventoryPanel} aria-label="Mined materials">
-        <header>
-          <span>Inventory</span>
-          <small>Mined materials</small>
-        </header>
-        <dl>
-          {INVENTORY_MATERIALS.map((material) => (
-            <div key={material}>
-              <dt>{INVENTORY_MATERIAL_LABELS[material]}</dt>
-              <dd>{inventory[material]}</dd>
-            </div>
-          ))}
-        </dl>
-      </aside>
       {isSelectingTargetDirection && targetPreview && (
         <output
           className={style.targetDirectionPreview}
@@ -431,14 +353,6 @@ export function Navigator({
         >
           Recenter on spaceship
         </button>
-        <label className={style.asteroidToggle}>
-          <input
-            type="checkbox"
-            checked={showAsteroids}
-            onChange={(event) => setShowAsteroids(event.target.checked)}
-          />
-          <span>Asteroids</span>
-        </label>
         <div className={style.zoomMeter}>
           <label htmlFor="navigator-zoom-level">
             {SCALE_WIDTH_PX} px ={' '}

@@ -42,8 +42,14 @@ export function getRenderOriginWorldPosition(): Position {
 }
 
 export function getRenderPosition(position: Position) {
+  return getRenderPositionFromOrigin(position, getRenderOriginWorldPosition());
+}
+
+export function getRenderPositionFromOrigin(
+  position: Position,
+  originPosition: Position,
+) {
   const worldPosition = getWorldPosition(position);
-  const originPosition = getRenderOriginWorldPosition();
 
   return {
     x: Number(worldPosition.x - originPosition.x),

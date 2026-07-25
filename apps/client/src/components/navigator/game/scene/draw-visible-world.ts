@@ -4,6 +4,7 @@ import { getRenderWorldBounds } from './configure-camera';
 
 const BASE_GRID_SPACING = 200000;
 const MIN_GRID_SCREEN_SPACING = 40;
+const MIN_WORLD_SPACE_GRID_ZOOM = 0.0000000001;
 const WORLD_BORDER_COLOR = 0x1e3a8a;
 
 export function drawVisibleWorld(this: Scene) {
@@ -27,6 +28,12 @@ export function drawVisibleWorld(this: Scene) {
   graphics.clear();
 
   const worldBounds = getRenderWorldBounds();
+  if (camera.zoom < MIN_WORLD_SPACE_GRID_ZOOM) {
+    drawScreenSpaceWorld(graphics, view, worldBounds, camera.zoom);
+    return;
+  }
+
+  graphics.setScrollFactor(1);
   const left = Math.max(view.left, worldBounds.minX);
   const right = Math.min(view.right, worldBounds.maxX);
   const top = Math.max(view.top, worldBounds.minY);
@@ -97,6 +104,46 @@ function drawWorldBorder(
 ) {
   graphics.lineStyle(2 / zoom, WORLD_BORDER_COLOR, 0.9);
   graphics.strokeCircle(centerX, centerY, radius);
+}
+
+function drawScreenSpaceWorld(
+  graphics: Phaser.GameObjects.Graphics,
+  view: Phaser.Geom.Rectangle,
+  worldBounds: ReturnType<typeof getRenderWorldBounds>,
+  zoom: number,
+) {
+  const spacing = getAdaptiveSpacing(
+    BASE_GRID_SPACING,
+    MIN_GRID_SCREEN_SPACING,
+    zoom,
+  );
+  const screenSpacing = spacing * zoom;
+
+  graphics.setScrollFactor(0);
+  graphics.lineStyle(1, 0x172554, 0.22);
+
+  for (
+    let x = (Math.ceil(view.left / spacing) * spacing - view.left) * zoom;
+    x <= view.width * zoom;
+    x += screenSpacing
+  ) {
+    graphics.lineBetween(x, 0, x, view.height * zoom);
+  }
+  for (
+    let y = (Math.ceil(view.top / spacing) * spacing - view.top) * zoom;
+    y <= view.height * zoom;
+    y += screenSpacing
+  ) {
+    graphics.lineBetween(0, y, view.width * zoom, y);
+  }
+
+  const centerX = (worldBounds.centerX - view.left) * zoom;
+  const centerY = (worldBounds.centerY - view.top) * zoom;
+  const radius = worldBounds.radius * zoom;
+  if (Number.isFinite(radius) && radius <= 10_000_000) {
+    graphics.lineStyle(2, WORLD_BORDER_COLOR, 0.9);
+    graphics.strokeCircle(centerX, centerY, radius);
+  }
 }
 
 function getAdaptiveSpacing(base: number, minimumPixels: number, zoom: number) {

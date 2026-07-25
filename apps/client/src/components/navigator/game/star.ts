@@ -1,6 +1,9 @@
 import Phaser from 'phaser';
-import type { Star as StarData } from '@repo/types';
-import { getRenderPosition } from './get-render-position';
+import type { Position, Star as StarData } from '@repo/types';
+import {
+  getRenderPosition,
+  getRenderPositionFromOrigin,
+} from './get-render-position';
 
 const LABEL_SCREEN_GAP = 6;
 const GLOW_SCREEN_RADIUS = 7;
@@ -77,9 +80,9 @@ export class Star extends Phaser.GameObjects.Container {
       y + radius >= viewport.top &&
       y - radius <= viewport.bottom;
     const shapeVisible =
-      zoom >= this.star.shapeRenderZoomLevel && intersectsViewport;
+      zoom >= this.star.minZoomRenderShape && intersectsViewport;
     const glowVisible =
-      zoom < this.star.shapeRenderZoomLevel && intersectsViewport;
+      zoom < this.star.minZoomRenderShape && intersectsViewport;
 
     const bodyVisible =
       intersectsViewport && (glowVisible || shapeVisible || alwaysVisible);
@@ -100,8 +103,10 @@ export class Star extends Phaser.GameObjects.Container {
     this.label.setY(-radius - LABEL_SCREEN_GAP / zoom);
   }
 
-  syncPosition() {
-    const position = getRenderPosition(this.star.position);
+  syncPosition(originPosition?: Position) {
+    const position = originPosition
+      ? getRenderPositionFromOrigin(this.star.position, originPosition)
+      : getRenderPosition(this.star.position);
     this.setPosition(Number(position.x), Number(position.y));
   }
 

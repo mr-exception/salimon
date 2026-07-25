@@ -7,9 +7,10 @@ import {
   worldRouter,
 } from '@routes';
 import { WorldAssetService } from '@services';
-import { spaceshipSecurityCode } from './middleware';
+import { apiRequestTiming, spaceshipSecurityCode } from './middleware';
 export function createApp() {
   const app = express();
+  app.use(apiRequestTiming);
   app.use(cors());
   app.use(express.json({ limit: '1mb' }));
   app.use(spaceshipSecurityCode);

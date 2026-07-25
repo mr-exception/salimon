@@ -1,7 +1,10 @@
 import Phaser from 'phaser';
-import type { Planet as PlanetData } from '@repo/types';
+import type { Planet as PlanetData, Position } from '@repo/types';
 import { drawCelestialBody } from './draw-celestial-body';
-import { getRenderPosition } from './get-render-position';
+import {
+  getRenderPosition,
+  getRenderPositionFromOrigin,
+} from './get-render-position';
 import { getPlanetPhysicsLabel } from './physics';
 
 const LABEL_SCREEN_GAP = 6;
@@ -94,7 +97,7 @@ export class Planet extends Phaser.GameObjects.Container {
 
     const shapeVisible =
       this.isBlackHole() ||
-      (zoom >= this.planet.shapeRenderZoomLevel && intersectsViewport);
+      (zoom >= this.planet.minZoomRenderShape && intersectsViewport);
 
     const bodyVisible =
       intersectsViewport &&
@@ -131,8 +134,10 @@ export class Planet extends Phaser.GameObjects.Container {
     this.label.setY(-visibleRadius - LABEL_SCREEN_GAP / zoom);
   }
 
-  syncPosition() {
-    const position = getRenderPosition(this.planet.position);
+  syncPosition(originPosition?: Position) {
+    const position = originPosition
+      ? getRenderPositionFromOrigin(this.planet.position, originPosition)
+      : getRenderPosition(this.planet.position);
     this.setPosition(Number(position.x), Number(position.y));
     this.scene.matter.body.setPosition(this.physicsBody, {
       x: this.x,

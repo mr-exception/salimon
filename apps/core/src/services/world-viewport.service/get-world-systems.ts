@@ -1,6 +1,9 @@
 import type { SerializedWorldSystems } from '@repo/types';
+import type { SerializedWorldBody } from '@repo/types';
 import { WorldSystemModel } from '@models';
 import type { WorldViewportOptions, WorldViewportRequest } from './types';
+
+const MIN_RENDER_SHAPE_SCREEN_WIDTH = 16;
 
 type ViewportRectangle = {
   left: bigint;
@@ -19,6 +22,7 @@ export async function getWorldSystems(
   parseRequiredBodyNames(request.requiredBodyNames).forEach((bodyName) =>
     requiredBodyNames.add(bodyName),
   );
+  const zoom = parseZoom(request.zoom);
 
   const visibleSystems = await WorldSystemModel.findSystemsInViewport(
     viewport,
@@ -26,7 +30,13 @@ export async function getWorldSystems(
   );
 
   return {
-    systems: visibleSystems.map((system) => system.bodies),
+    systems: visibleSystems
+      .map((system) =>
+        system.bodies.filter((body) =>
+          shouldTransmitBody(body, zoom, requiredBodyNames),
+        ),
+      )
+      .filter((system) => system.length > 0),
   };
 }
 
@@ -61,4 +71,35 @@ function parseRequiredBodyNames(requiredBodyNames: string | string[] = []) {
     .flatMap((value) => value.split(','))
     .map((bodyName) => bodyName.trim())
     .filter(Boolean);
+}
+
+function parseZoom(zoom: string | number | undefined) {
+  if (zoom === undefined) return undefined;
+
+  const value = typeof zoom === 'number' ? zoom : Number(zoom);
+  if (!Number.isFinite(value) || value <= 0) {
+    throw new Error('zoom must be a positive number');
+  }
+
+  return value;
+}
+
+function shouldTransmitBody(
+  body: SerializedWorldBody,
+  zoom: number | undefined,
+  requiredBodyNames: ReadonlySet<string>,
+) {
+  if (body.type === 'star' || zoom === undefined) return true;
+  if (requiredBodyNames.has(body.name)) return true;
+
+  return zoom >= getMinZoomRenderShape(body);
+}
+
+function getMinZoomRenderShape(body: SerializedWorldBody) {
+  if (body.minZoomRenderShape !== undefined) return body.minZoomRenderShape;
+
+  const radius = Number(body.radius);
+  if (!Number.isFinite(radius) || radius <= 0) return 0;
+
+  return MIN_RENDER_SHAPE_SCREEN_WIDTH / 2 / radius;
 }

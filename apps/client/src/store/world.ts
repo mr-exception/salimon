@@ -428,8 +428,9 @@ export function setSpaceshipHeading(heading: number) {
 export function startSpaceshipThrusters(
   thrusters: { powerPercent: number; active: boolean }[],
 ) {
-  if (!Array.isArray(thrusters) || thrusters.length === 0) return;
-  if (store.get(spaceshipMotionStateAtom) === 'crashed') return;
+  if (!Array.isArray(thrusters) || thrusters.length === 0) return false;
+  if (store.get(spaceshipMotionStateAtom) === 'crashed') return false;
+  if (!canDetachSpaceshipFromAttachedBody()) return false;
 
   normalizeAttachedSpaceshipPosition();
   spaceshipVelocity = getInitialSpaceshipWorldVelocity();
@@ -445,6 +446,7 @@ export function startSpaceshipThrusters(
   });
   syncSpaceshipAbsoluteSpeed();
   listeners.forEach((listener) => listener(worldState));
+  return true;
 }
 
 export function startSpaceshipTargetSpeed(
@@ -456,15 +458,16 @@ export function startSpaceshipTargetSpeed(
     store.get(spaceshipMotionStateAtom) === 'crashed' ||
     targetDirection === undefined
   ) {
-    return;
+    return false;
   }
+  if (!canDetachSpaceshipFromAttachedBody()) return false;
 
   const preview = getSpaceshipTargetSpeedBurnPreview(
     targetSpeedMetersPerSecond,
     maximumThrustPercent,
     targetDirection,
   );
-  if (!preview) return;
+  if (!preview) return false;
 
   normalizeAttachedSpaceshipPosition();
   spaceshipVelocity = getInitialSpaceshipWorldVelocity();
@@ -485,6 +488,7 @@ export function startSpaceshipTargetSpeed(
   });
   syncSpaceshipAbsoluteSpeed();
   listeners.forEach((listener) => listener(worldState));
+  return true;
 }
 
 export function stopSpaceshipActiveFeatureLocally() {
@@ -625,6 +629,18 @@ function getClosestPersistenceReference(spaceshipPosition: Vector) {
   }
 
   return closest;
+}
+
+function canDetachSpaceshipFromAttachedBody() {
+  const referenceName = spaceshipState.position.relativeTo;
+  if (
+    store.get(spaceshipMotionStateAtom) === 'flying' ||
+    !referenceName
+  ) {
+    return true;
+  }
+
+  return getBodyByName(referenceName) !== undefined;
 }
 
 export function isSpaceshipEngineRunning() {
@@ -820,15 +836,17 @@ export function getSpaceshipVelocity() {
 export function getSpaceshipProximityTelemetry():
   | SpaceshipProximityTelemetry
   | undefined {
-  const spaceshipPosition = toVector(getWorldPosition(spaceshipState.position));
   const spaceshipWorldVelocity = getSpaceshipWorldVelocity();
   let closest: SpaceshipProximityTelemetry | undefined;
 
   for (const body of [...worldState.planets, ...worldState.stars]) {
-    const bodyPosition = toVector(getWorldPosition(body.position));
+    const relativePosition = getWorldPositionRelativeTo(
+      spaceshipState.position,
+      body.name,
+    );
     const centerDistance = Math.hypot(
-      spaceshipPosition.x - bodyPosition.x,
-      spaceshipPosition.y - bodyPosition.y,
+      Number(relativePosition.x),
+      Number(relativePosition.y),
     );
     const surfaceDistance =
       spaceshipAttachedBodyName === body.name &&
@@ -1329,24 +1347,21 @@ function normalizeAttachedSpaceshipPosition() {
 
   const reference = getBodyByName(referenceName);
   if (!reference) {
-    if (
-      referenceName === EARTH_NAME &&
-      spaceshipState.position.x === 0n &&
-      spaceshipState.position.y === 0n
-    ) {
-      spaceshipState.position = {
-        ...spaceshipState.position,
-        x: BigInt(DEFAULT_SURFACE_OFFSET),
-        y: 0n,
-      };
+    if (referenceName === EARTH_NAME) {
+      normalizeAttachedSpaceshipPositionToSurface(DEFAULT_SURFACE_OFFSET);
     }
     return;
   }
 
+  normalizeAttachedSpaceshipPositionToSurface(
+    Number(reference.radius) + Number(spaceshipState.radius),
+  );
+}
+
+function normalizeAttachedSpaceshipPositionToSurface(surfaceOffset: number) {
   const offsetX = Number(spaceshipState.position.x);
   const offsetY = Number(spaceshipState.position.y);
   const distance = Math.hypot(offsetX, offsetY);
-  const surfaceOffset = Number(reference.radius) + Number(spaceshipState.radius);
   const direction =
     distance === 0
       ? { x: 1, y: 0 }

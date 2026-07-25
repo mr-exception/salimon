@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
 import {
-  getSpaceshipProximityTelemetry,
   subscribeToWorld,
   type SpaceshipProximityTelemetry,
 } from '@store';
@@ -24,8 +23,6 @@ import { SearchPanel, type SearchResult } from './search-panel';
 import style from './style.module.css';
 
 const SCALE_WIDTH_PX = 200;
-const TELEMETRY_UPDATE_INTERVAL_MS = 250;
-
 function formatScaleDistance(zoom: number) {
   return formatDistance(SCALE_WIDTH_PX / zoom);
 }
@@ -40,6 +37,19 @@ function formatVelocityDirection(velocity: { x: number; y: number }) {
 
   const degrees = (Math.atan2(velocity.y, velocity.x) * 180) / Math.PI;
   return formatAngle(Math.round((degrees + 360) % 360));
+}
+
+function proximityTelemetryChanged(
+  current: SpaceshipProximityTelemetry | undefined,
+  next: SpaceshipProximityTelemetry | undefined,
+) {
+  return (
+    current?.bodyName !== next?.bodyName ||
+    current?.bodyKind !== next?.bodyKind ||
+    current?.surfaceDistanceMeters !== next?.surfaceDistanceMeters ||
+    current?.relativeSpeedMetersPerSecond !==
+      next?.relativeSpeedMetersPerSecond
+  );
 }
 
 function getBodyDetailsTitle(details: BodyDetailsRequest) {
@@ -164,25 +174,14 @@ export function Navigator({
   }, [isRulerActive]);
 
   useEffect(() => {
-    const updateTelemetry = () => {
-      setProximityTelemetry(getSpaceshipProximityTelemetry());
-    };
-
-    updateTelemetry();
-    const telemetryTimer = window.setInterval(
-      updateTelemetry,
-      TELEMETRY_UPDATE_INTERVAL_MS,
-    );
     const unsubscribeFromWorld = subscribeToWorld((updatedWorld) => {
       setWorld({
         planets: updatedWorld.planets,
         stars: updatedWorld.stars,
       });
-      updateTelemetry();
     });
 
     return () => {
-      window.clearInterval(telemetryTimer);
       unsubscribeFromWorld();
     };
   }, []);
@@ -200,6 +199,12 @@ export function Navigator({
       onTargetDirectionSelected,
       (error) => setWorldLoadState(error ? 'error' : 'ready'),
       setIsWorldViewportLoading,
+      (nextTelemetry) =>
+        setProximityTelemetry((current) =>
+          proximityTelemetryChanged(current, nextTelemetry)
+            ? nextTelemetry
+            : current,
+        ),
     );
     sceneRef.current = scene;
     onSceneChange?.(scene);

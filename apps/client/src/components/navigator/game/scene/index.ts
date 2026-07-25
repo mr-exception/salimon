@@ -5,6 +5,7 @@ import {
   getBodyWorldVelocity,
   getSpaceshipAttachedBodyName,
   getSpaceshipMotionState,
+  getSpaceshipProximityTelemetry,
   getSpaceshipWorldVelocity,
   isSpaceshipEngineRunning,
   refreshWorldViewport,
@@ -17,6 +18,7 @@ import {
   WORLD_VIEWPORT_REFRESH_INTERVAL_MS,
 } from '@store';
 import type { Planet as PlanetData, Star as StarData } from '@repo/types';
+import type { SpaceshipProximityTelemetry } from '@store';
 import {
   formatLightDistance,
   formatSiValue,
@@ -141,6 +143,9 @@ export class Scene extends Phaser.Scene {
   protected readonly onWorldViewportLoadingChange?: (
     isLoading: boolean,
   ) => void;
+  protected readonly onProximityTelemetryChange?: (
+    telemetry?: SpaceshipProximityTelemetry,
+  ) => void;
   protected planetData: PlanetData[] = [];
   protected starData: StarData[] = [];
   protected planets: Planet[] = [];
@@ -198,6 +203,9 @@ export class Scene extends Phaser.Scene {
     onTargetDirectionSelected?: () => void,
     onWorldLoadComplete?: (error?: unknown) => void,
     onWorldViewportLoadingChange?: (isLoading: boolean) => void,
+    onProximityTelemetryChange?: (
+      telemetry?: SpaceshipProximityTelemetry,
+    ) => void,
   ) {
     super('navigation');
     this.onZoomChange = onZoomChange;
@@ -209,6 +217,7 @@ export class Scene extends Phaser.Scene {
     this.onTargetDirectionSelected = onTargetDirectionSelected;
     this.onWorldLoadComplete = onWorldLoadComplete;
     this.onWorldViewportLoadingChange = onWorldViewportLoadingChange;
+    this.onProximityTelemetryChange = onProximityTelemetryChange;
   }
 
   protected configureCamera = configureCamera;
@@ -272,6 +281,7 @@ export class Scene extends Phaser.Scene {
   update(time: number, delta: number) {
     this.publishActiveWorldBodies();
     const worldElapsedSeconds = advanceWorld(delta / 1000);
+    this.onProximityTelemetryChange?.(getSpaceshipProximityTelemetry());
     this.syncWorldPositions();
     this.planets.forEach((planet) => planet.syncRotation(worldElapsedSeconds));
     this.stars.forEach((star) => star.syncRotation(worldElapsedSeconds));
@@ -565,7 +575,7 @@ export class Scene extends Phaser.Scene {
     }
 
     try {
-      startSpaceshipThrustersFeature(thrusters);
+      if (!startSpaceshipThrustersFeature(thrusters)) return;
     } catch (error) {
       console.error('Failed to start thrusters feature', error);
       return;

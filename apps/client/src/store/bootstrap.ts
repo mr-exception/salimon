@@ -162,19 +162,21 @@ export function startSpaceshipTargetSpeedFeature(
   maximumThrustPercent: number,
   targetDirection?: number,
 ) {
-  startSpaceshipTargetSpeed(
+  const started = startSpaceshipTargetSpeed(
     targetSpeedMetersPerSecond,
     maximumThrustPercent,
     targetDirection,
   );
-  pendingSnapshotSync = true;
+  if (started) pendingSnapshotSync = true;
+  return started;
 }
 
 export function startSpaceshipThrustersFeature(
   thrusters: { powerPercent: number; active: boolean }[],
 ) {
-  startSpaceshipThrusters(thrusters);
-  pendingSnapshotSync = true;
+  const started = startSpaceshipThrusters(thrusters);
+  if (started) pendingSnapshotSync = true;
+  return started;
 }
 
 export function stopSpaceshipActiveFeature() {

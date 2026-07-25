@@ -12,6 +12,24 @@ const SI_PREFIX_SYMBOLS = [
   'Q',
 ];
 const QUETTA_PREFIX_INDEX = SI_PREFIX_SYMBOLS.length - 1;
+const SUBMETER_UNITS = [
+  { unit: 'mm', meters: 0.001 },
+  { unit: 'µm', meters: 0.000001 },
+  { unit: 'nm', meters: 0.000000001 },
+  { unit: 'pm', meters: 0.000000000001 },
+];
+const METERS_PER_LIGHT_SECOND = 299_792_458;
+const METERS_PER_LIGHT_MINUTE = METERS_PER_LIGHT_SECOND * 60;
+const METERS_PER_LIGHT_HOUR = METERS_PER_LIGHT_MINUTE * 60;
+const METERS_PER_LIGHT_DAY = METERS_PER_LIGHT_HOUR * 24;
+const METERS_PER_LIGHT_YEAR = 9_460_730_472_580_800;
+const LIGHT_DISTANCE_UNITS = [
+  { unit: 'ly', meters: METERS_PER_LIGHT_YEAR },
+  { unit: 'ld', meters: METERS_PER_LIGHT_DAY },
+  { unit: 'lh', meters: METERS_PER_LIGHT_HOUR },
+  { unit: 'lm', meters: METERS_PER_LIGHT_MINUTE },
+  { unit: 'ls', meters: METERS_PER_LIGHT_SECOND },
+];
 
 const numberFormatter = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 1,
@@ -61,7 +79,34 @@ function getCompoundSiPrefix(index: number): string {
 }
 
 export function formatDistance(valueInMeters: number) {
+  if (!Number.isFinite(valueInMeters)) return '—';
+
+  const absoluteValue = Math.abs(valueInMeters);
+  if (absoluteValue >= METERS_PER_LIGHT_YEAR) {
+    return formatUnitValue(valueInMeters / METERS_PER_LIGHT_YEAR, 'ly');
+  }
+
+  if (absoluteValue > 0 && absoluteValue < 1) {
+    const unit =
+      SUBMETER_UNITS.find(({ meters }) => absoluteValue >= meters) ??
+      SUBMETER_UNITS.at(-1);
+    if (unit) return formatUnitValue(valueInMeters / unit.meters, unit.unit);
+  }
+
   return formatSiValue(valueInMeters, 'm');
+}
+
+export function formatLightDistance(valueInMeters: number) {
+  if (!Number.isFinite(valueInMeters)) return '—';
+
+  const absoluteValue = Math.abs(valueInMeters);
+  const unit =
+    LIGHT_DISTANCE_UNITS.find(({ meters }) => absoluteValue >= meters) ??
+    LIGHT_DISTANCE_UNITS.at(-1);
+
+  if (!unit) return '—';
+
+  return formatUnitValue(valueInMeters / unit.meters, unit.unit);
 }
 
 export function formatForce(valueInNewtons: number) {

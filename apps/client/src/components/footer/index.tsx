@@ -53,11 +53,13 @@ import {
 type FooterProps = {
   isEngineRunning?: boolean;
   isMeasuring?: boolean;
+  isRulerActive?: boolean;
   onStartThrusters?: (
     thrusters: { powerPercent: number; active: boolean }[],
   ) => void;
   onStopEngines?: () => void;
   onToggleMeasuring?: () => void;
+  onToggleRuler?: () => void;
   onOpenCommunications?: () => void;
   unreadMessageCount?: number;
   onPredictionChange?: (active: boolean, seconds: number) => void;
@@ -301,6 +303,15 @@ function MeasuringIcon() {
   );
 }
 
+function RulerIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 16 16 4l4 4L8 20 4 16Z" />
+      <path d="m9 15-2-2m5-1-2-2m5-1-2-2" />
+    </svg>
+  );
+}
+
 function DraggablePanel({
   children,
   control,
@@ -454,9 +465,11 @@ function DraggablePanel({
 export function Footer({
   isEngineRunning = false,
   isMeasuring = false,
+  isRulerActive = false,
   onStartThrusters,
   onStopEngines,
   onToggleMeasuring,
+  onToggleRuler,
   onOpenCommunications,
   unreadMessageCount = 0,
   onPredictionChange,
@@ -745,6 +758,19 @@ export function Footer({
             <MeasuringIcon />
             <span className={style.tooltip} role="tooltip">
               Measuring
+            </span>
+          </button>
+          <button
+            className={style.controlTab}
+            type="button"
+            aria-label="Ruler"
+            aria-pressed={isRulerActive}
+            data-active={isRulerActive}
+            onClick={onToggleRuler}
+          >
+            <RulerIcon />
+            <span className={style.tooltip} role="tooltip">
+              Ruler
             </span>
           </button>
           <button

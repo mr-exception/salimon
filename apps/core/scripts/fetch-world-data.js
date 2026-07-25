@@ -38,59 +38,7 @@ const GALACTIC_CENTER = {
   positionCapturedAt: 1784419200000,
 };
 const GALACTIC_CENTER_SYSTEM = [GALACTIC_CENTER];
-const SOLAR_SYSTEM = [
-  {
-    type: 'star',
-    name: 'Sun',
-    isReal: true,
-    position: {
-      x: '245978992287100800000',
-      y: '0',
-      relativeTo: GALACTIC_CENTER.name,
-    },
-    orbitalCenter: GALACTIC_CENTER.name,
-    clockwise: false,
-    speed: '220000',
-    mass: '1988500000000000000000000000000',
-    radius: '695700000',
-    rotationPeriodSeconds: 2192832,
-    positionCapturedAt: 1784419200000,
-  },
-  {
-    type: 'planet',
-    name: 'Earth',
-    isReal: true,
-    position: {
-      x: '149598023000',
-      y: '0',
-      relativeTo: 'Sun',
-    },
-    orbitalCenter: 'Sun',
-    clockwise: false,
-    speed: '29780',
-    mass: '5972370000000000000000000',
-    radius: '6371000',
-    rotationPeriodSeconds: 86164.1,
-    positionCapturedAt: 1784419200000,
-  },
-  {
-    type: 'moon',
-    name: 'Moon',
-    isReal: true,
-    position: {
-      x: '333189479',
-      y: '192199500',
-      relativeTo: 'Earth',
-    },
-    orbitalCenter: 'Earth',
-    clockwise: false,
-    speed: '1022',
-    mass: '73420000000000000000000',
-    radius: '1737400',
-    rotationPeriodSeconds: 2360591.51,
-    positionCapturedAt: 1784419200000,
-  },
-];
+const SOLAR_SYSTEM = require('../data/solar-system.json').bodies;
 
 const EQUATORIAL_TO_GALACTIC = [
   [-0.0548755604162154, -0.873437090234885, -0.4838350155487132],

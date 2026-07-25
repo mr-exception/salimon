@@ -28,6 +28,7 @@ export default function App() {
   const [isEngineRunning, setIsEngineRunning] = useState(false);
   const [isCommunicationsOpen, setIsCommunicationsOpen] = useState(false);
   const [isMeasuring, setIsMeasuring] = useState(false);
+  const [isRulerActive, setIsRulerActive] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState<UnreadMessage[]>([]);
   const [isSelectingTargetDirection, setIsSelectingTargetDirection] =
     useState(false);
@@ -37,6 +38,7 @@ export default function App() {
     ) => void;
     stopEngines: () => void;
     setTargetDirectionSelectionActive: (active: boolean) => void;
+    setRulerActive: (active: boolean) => void;
     setPrediction: (active: boolean, seconds: number) => void;
   } | null>(null);
   const handleSceneChange = useCallback(
@@ -47,6 +49,7 @@ export default function App() {
         ) => void;
         stopEngines: () => void;
         setTargetDirectionSelectionActive: (active: boolean) => void;
+        setRulerActive: (active: boolean) => void;
         setPrediction: (active: boolean, seconds: number) => void;
       } | null,
     ) => {
@@ -142,6 +145,7 @@ export default function App() {
     <div className={style.app}>
       <Navigator
         isMeasuring={isMeasuring}
+        isRulerActive={isRulerActive}
         onSceneChange={handleSceneChange}
         onSpaceshipEngineChange={setIsEngineRunning}
         isSelectingTargetDirection={isSelectingTargetDirection}
@@ -150,9 +154,11 @@ export default function App() {
       <Footer
         isEngineRunning={isEngineRunning}
         isMeasuring={isMeasuring}
+        isRulerActive={isRulerActive}
         onStartThrusters={startThrusters}
         onStopEngines={stopEngines}
         onToggleMeasuring={() => setIsMeasuring((active) => !active)}
+        onToggleRuler={() => setIsRulerActive((active) => !active)}
         onOpenCommunications={() => setIsCommunicationsOpen(true)}
         unreadMessageCount={unreadMessages.length}
         onPredictionChange={setPrediction}

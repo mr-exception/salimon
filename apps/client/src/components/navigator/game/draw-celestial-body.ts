@@ -69,7 +69,7 @@ export function drawCelestialBody(
     2,
     2_048,
   );
-  const points = [new Phaser.Math.Vector2(0, 0)];
+  const points: Phaser.Math.Vector2[] = [];
   for (let index = 0; index <= segmentCount; index += 1) {
     const angle =
       direction - halfAngle + (2 * halfAngle * index) / segmentCount;
@@ -78,6 +78,16 @@ export function drawCelestialBody(
         Math.cos(angle) * radius,
         Math.sin(angle) * radius,
       ),
+    );
+  }
+  const fillDepth =
+    viewportRadius * 2 + ARC_SEGMENT_SCREEN_LENGTH / Math.max(zoom, 1e-12);
+  const interiorX = Math.cos(direction) * fillDepth;
+  const interiorY = Math.sin(direction) * fillDepth;
+  for (let index = points.length - 1; index >= 0; index -= 1) {
+    const point = points[index];
+    points.push(
+      new Phaser.Math.Vector2(point.x - interiorX, point.y - interiorY),
     );
   }
   graphics.fillPoints(points, true);

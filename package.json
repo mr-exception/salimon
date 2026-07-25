@@ -7,6 +7,7 @@
     "start:core": "turbo run start --filter=core",
     "start:client": "turbo run start --filter=client",
     "fetch-world-data": "npm run fetch-world-data --workspace core",
+    "seed-solar-system": "npm run seed-solar-system --workspace core",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",

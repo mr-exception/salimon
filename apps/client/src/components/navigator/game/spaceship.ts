@@ -85,7 +85,7 @@ export class Spaceship extends Phaser.GameObjects.Container {
       worldScale /
       zoom;
     this.targetArrow.setScale(arrowScale);
-    this.setVisible(viewport.contains(this.x, this.y));
+    this.setVisible(this.intersectsViewport(viewport));
   }
 
   syncPosition() {
@@ -184,6 +184,20 @@ export class Spaceship extends Phaser.GameObjects.Container {
     this.setPosition(
       Number(renderPosition.x) + (offsetX / distance) * visualRadiusOffset,
       Number(renderPosition.y) + (offsetY / distance) * visualRadiusOffset,
+    );
+  }
+
+  intersectsViewport(viewport: Phaser.Geom.Rectangle) {
+    const radius = Math.max(
+      Number(this.spaceship.radius) * this.worldScale,
+      (SPACESHIP_LENGTH_M * this.worldScale) / 2,
+    );
+
+    return (
+      this.x + radius >= viewport.left &&
+      this.x - radius <= viewport.right &&
+      this.y + radius >= viewport.top &&
+      this.y - radius <= viewport.bottom
     );
   }
 

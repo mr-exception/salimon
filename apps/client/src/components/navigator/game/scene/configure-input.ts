@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
 import type { Scene } from '.';
 
-export const MIN_ZOOM = 0.00000000000001;
+export const MIN_ZOOM = 0.000000000000005;
 export const MAX_ZOOM = 0.1;
-const MIN_PAN_EFFECTIVE_ZOOM = 0.00000000000001;
+const MIN_PAN_EFFECTIVE_ZOOM = 0.000000000000005;
 const CLICK_DISTANCE_THRESHOLD_PX = 5;
 
 export function configureInput(this: Scene) {
@@ -29,7 +29,10 @@ export function configureInput(this: Scene) {
 
   this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
     if (!pointer.leftButtonDown()) return;
-    if (this.isTargetDirectionSelectionActive()) return;
+    if (this.isTargetDirectionSelectionActive() || this.isRulerActive()) {
+      clickStart = new Phaser.Math.Vector2(pointer.x, pointer.y);
+      return;
+    }
 
     this.dragging = true;
     this.lastPointer.set(pointer.x, pointer.y);
@@ -38,6 +41,10 @@ export function configureInput(this: Scene) {
   });
 
   this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+    if (this.isRulerActive()) {
+      this.previewRulerAt(pointer.x, pointer.y);
+      return;
+    }
     if (this.isTargetDirectionSelectionActive()) {
       this.previewTargetDirectionAt(pointer.x, pointer.y);
       return;
@@ -59,6 +66,23 @@ export function configureInput(this: Scene) {
   });
 
   this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+    if (this.isRulerActive()) {
+      if (
+        pointer.leftButtonReleased() &&
+        clickStart &&
+        Phaser.Math.Distance.Between(
+          clickStart.x,
+          clickStart.y,
+          pointer.x,
+          pointer.y,
+        ) <= CLICK_DISTANCE_THRESHOLD_PX
+      ) {
+        this.selectRulerPointAt(pointer.x, pointer.y);
+      }
+      clickStart = undefined;
+      return;
+    }
+
     if (this.isTargetDirectionSelectionActive()) {
       if (pointer.leftButtonReleased()) {
         this.selectTargetDirectionAt(pointer.x, pointer.y);
@@ -106,8 +130,11 @@ export function configureInput(this: Scene) {
     this.dragging = false;
     clickStart = undefined;
     this.hideTargetDirectionPreview();
+    this.hideRulerPreview();
     canvas.style.cursor = this.isTargetDirectionSelectionActive()
       ? 'crosshair'
-      : 'grab';
+      : this.isRulerActive()
+        ? 'crosshair'
+        : 'grab';
   });
 }

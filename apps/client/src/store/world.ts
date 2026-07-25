@@ -431,6 +431,7 @@ export function startSpaceshipThrusters(
   if (!Array.isArray(thrusters) || thrusters.length === 0) return;
   if (store.get(spaceshipMotionStateAtom) === 'crashed') return;
 
+  normalizeAttachedSpaceshipPosition();
   spaceshipVelocity = getInitialSpaceshipWorldVelocity();
   spaceshipAttachedBodyName = undefined;
   store.set(spaceshipMotionStateAtom, 'flying');
@@ -465,6 +466,7 @@ export function startSpaceshipTargetSpeed(
   );
   if (!preview) return;
 
+  normalizeAttachedSpaceshipPosition();
   spaceshipVelocity = getInitialSpaceshipWorldVelocity();
   spaceshipAttachedBodyName = undefined;
   store.set(spaceshipMotionStateAtom, 'flying');
@@ -500,14 +502,13 @@ export function hydrateSpaceship(dto: SpaceshipDto) {
   spaceshipState.heading = dto.direction;
   spaceshipState.speed = BigInt(dto.speed);
   spaceshipState.orbitalCenter = null;
-  spaceshipVelocity = undefined;
-  spaceshipPositionRemainder = { x: 0, y: 0 };
-  spaceshipStoredRelativeVelocity = dto.velocity
-    ? { ...dto.velocity }
-    : undefined;
   const motionState =
     dto.motionState ??
     (dto.speed === '0' && dto.position.relativeTo ? 'landed' : 'flying');
+  spaceshipVelocity = undefined;
+  spaceshipPositionRemainder = { x: 0, y: 0 };
+  spaceshipStoredRelativeVelocity =
+    motionState === 'flying' && dto.velocity ? { ...dto.velocity } : undefined;
   spaceshipAttachedBodyName =
     motionState === 'flying' ? undefined : dto.position.relativeTo;
   store.set(spaceshipMotionStateAtom, motionState);
@@ -820,8 +821,7 @@ export function getSpaceshipProximityTelemetry():
   | SpaceshipProximityTelemetry
   | undefined {
   const spaceshipPosition = toVector(getWorldPosition(spaceshipState.position));
-  const spaceshipWorldVelocity =
-    spaceshipVelocity ?? getInitialSpaceshipWorldVelocity();
+  const spaceshipWorldVelocity = getSpaceshipWorldVelocity();
   let closest: SpaceshipProximityTelemetry | undefined;
 
   for (const body of [...worldState.planets, ...worldState.stars]) {
@@ -1322,27 +1322,41 @@ function normalizeAttachedSpaceshipPosition() {
   const referenceName = spaceshipState.position.relativeTo;
   if (
     store.get(spaceshipMotionStateAtom) === 'flying' ||
-    !referenceName ||
-    spaceshipState.position.x !== 0n ||
-    spaceshipState.position.y !== 0n
+    !referenceName
   ) {
     return;
   }
 
   const reference = getBodyByName(referenceName);
-  const surfaceOffset =
-    referenceName === EARTH_NAME && !reference
-      ? DEFAULT_SURFACE_OFFSET
-      : reference
-        ? Number(reference.radius) + Number(spaceshipState.radius)
-        : undefined;
-  if (surfaceOffset === undefined) return;
+  if (!reference) {
+    if (
+      referenceName === EARTH_NAME &&
+      spaceshipState.position.x === 0n &&
+      spaceshipState.position.y === 0n
+    ) {
+      spaceshipState.position = {
+        ...spaceshipState.position,
+        x: BigInt(DEFAULT_SURFACE_OFFSET),
+        y: 0n,
+      };
+    }
+    return;
+  }
 
+  const offsetX = Number(spaceshipState.position.x);
+  const offsetY = Number(spaceshipState.position.y);
+  const distance = Math.hypot(offsetX, offsetY);
+  const surfaceOffset = Number(reference.radius) + Number(spaceshipState.radius);
+  const direction =
+    distance === 0
+      ? { x: 1, y: 0 }
+      : { x: offsetX / distance, y: offsetY / distance };
   spaceshipState.position = {
     ...spaceshipState.position,
-    x: BigInt(surfaceOffset),
-    y: 0n,
+    x: BigInt(Math.round(direction.x * surfaceOffset)),
+    y: BigInt(Math.round(direction.y * surfaceOffset)),
   };
+  spaceshipPositionRemainder = { x: 0, y: 0 };
 }
 
 function deserializeBody<T extends Body>(

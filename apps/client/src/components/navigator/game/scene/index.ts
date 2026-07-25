@@ -17,7 +17,11 @@ import {
   WORLD_VIEWPORT_REFRESH_INTERVAL_MS,
 } from '@store';
 import type { Planet as PlanetData, Star as StarData } from '@repo/types';
-import { formatSpeed } from '../../../../utils';
+import {
+  formatLightDistance,
+  formatSiValue,
+  formatSpeed,
+} from '../../../../utils';
 import {
   DEFAULT_RENDER_ORIGIN_NAME,
   getRenderOriginWorldPosition,
@@ -85,12 +89,19 @@ type NameLabelCandidate = {
   bounds: Phaser.Geom.Rectangle;
   hide: () => void;
 };
+type RulerPoint = {
+  x: number;
+  y: number;
+};
 const BLACK_HOLE_VIEWPORT_RADIUS_PX = 16;
 const NAME_LABEL_COLLISION_PADDING_PX = 3;
 const MEASUREMENT_ARROW_LENGTH_PX = 72;
 const MEASUREMENT_ARROW_HEAD_PX = 7;
 const MEASUREMENT_ARROW_GAP_PX = 8;
 const MEASUREMENT_ARROW_COLOR = 0x22d3ee;
+const RULER_COLOR = 0xfbbf24;
+const RULER_POINT_RADIUS_PX = 4;
+const RULER_LABEL_OFFSET_PX = 10;
 const PREDICTION_COLOR = 0xa78bfa;
 const ENGINE_START_RESPONSE_TIMEOUT_MS = 5_000;
 const WORLD_VIEWPORT_REQUEST_DEBOUNCE_MS = 500;
@@ -137,12 +148,18 @@ export class Scene extends Phaser.Scene {
   protected spaceship?: Spaceship;
   protected grid?: Phaser.GameObjects.Graphics;
   private measurementGraphics?: Phaser.GameObjects.Graphics;
+  private rulerGraphics?: Phaser.GameObjects.Graphics;
+  private rulerLabel?: Phaser.GameObjects.Text;
   private predictionGraphics?: Phaser.GameObjects.Graphics;
   private readonly measurementLabels = new Map<
     string,
     Phaser.GameObjects.Text
   >();
   private measuringActive = false;
+  private rulerActive = false;
+  private rulerStartPoint?: RulerPoint;
+  private rulerEndPoint?: RulerPoint;
+  private rulerPreviewPoint?: RulerPoint;
   private predictionSeconds?: number;
   protected lastViewportKey = '';
   protected unsubscribeFromWorld?: () => void;
@@ -232,6 +249,7 @@ export class Scene extends Phaser.Scene {
     this.configureCamera();
     this.grid = this.add.graphics().setDepth(-1);
     this.measurementGraphics = this.add.graphics().setDepth(20);
+    this.rulerGraphics = this.add.graphics().setDepth(22);
     this.predictionGraphics = this.add.graphics().setDepth(19);
     this.drawVisibleWorld();
     this.configureInput();
@@ -308,6 +326,7 @@ export class Scene extends Phaser.Scene {
       this.updateWorldVisibility();
     }
     this.drawMeasurements();
+    this.drawRuler();
     this.drawPredictions();
   }
 
@@ -331,10 +350,107 @@ export class Scene extends Phaser.Scene {
     }
   }
 
+  setRulerActive(active: boolean) {
+    this.rulerActive = active;
+    this.game.canvas.style.cursor = active ? 'crosshair' : 'grab';
+    if (!active) this.rulerPreviewPoint = undefined;
+  }
+
   setPrediction(active: boolean, seconds: number) {
     this.predictionSeconds =
       active && Number.isFinite(seconds) && seconds > 0 ? seconds : undefined;
     if (!this.predictionSeconds) this.predictionGraphics?.clear();
+  }
+
+  isRulerActive() {
+    return this.rulerActive;
+  }
+
+  previewRulerAt(x: number, y: number) {
+    if (!this.rulerActive || !this.rulerStartPoint) return;
+
+    const point = this.getRulerPointAt(x, y);
+    this.rulerPreviewPoint = point;
+  }
+
+  selectRulerPointAt(x: number, y: number) {
+    if (!this.rulerActive) return;
+
+    const point = this.getRulerPointAt(x, y);
+    if (!point) return;
+
+    if (!this.rulerStartPoint || this.rulerEndPoint) {
+      this.rulerStartPoint = point;
+      this.rulerEndPoint = undefined;
+      this.rulerPreviewPoint = undefined;
+      return;
+    }
+
+    this.rulerEndPoint = point;
+    this.rulerPreviewPoint = undefined;
+  }
+
+  hideRulerPreview() {
+    this.rulerPreviewPoint = undefined;
+  }
+
+  private getRulerPointAt(x: number, y: number) {
+    const worldPoint = this.cameras.main.getWorldPoint(x, y);
+    if (!isInsideWorld(worldPoint.x, worldPoint.y)) return undefined;
+
+    return { x: worldPoint.x, y: worldPoint.y };
+  }
+
+  private drawRuler() {
+    const graphics = this.rulerGraphics;
+    if (!graphics) return;
+
+    const start = this.rulerStartPoint;
+    const end = this.rulerEndPoint ?? this.rulerPreviewPoint;
+    graphics.clear();
+    this.rulerLabel?.setVisible(false);
+    if (!start || !end) return;
+
+    const camera = this.cameras.main;
+    const zoom = camera.zoom;
+    const pointRadius = RULER_POINT_RADIUS_PX / zoom;
+    const labelOffset = RULER_LABEL_OFFSET_PX / zoom;
+    const distance = Math.hypot(end.x - start.x, end.y - start.y);
+    const midpointX = (start.x + end.x) / 2;
+    const midpointY = (start.y + end.y) / 2;
+
+    graphics
+      .lineStyle(1.5 / zoom, RULER_COLOR, this.rulerEndPoint ? 0.95 : 0.55)
+      .fillStyle(RULER_COLOR, 0.95)
+      .beginPath()
+      .moveTo(start.x, start.y)
+      .lineTo(end.x, end.y)
+      .strokePath()
+      .fillCircle(start.x, start.y, pointRadius)
+      .fillCircle(end.x, end.y, pointRadius);
+
+    if (!this.rulerLabel) {
+      this.rulerLabel = this.add
+        .text(0, 0, '', {
+          color: '#fde68a',
+          fontFamily: 'system-ui, sans-serif',
+          fontSize: '12px',
+          fontStyle: 'bold',
+          stroke: '#050816',
+          strokeThickness: 4,
+        })
+        .setDepth(23)
+        .setOrigin(0.5, 1)
+        .setResolution(Math.max(2, window.devicePixelRatio));
+    }
+
+    this.rulerLabel
+      .setText(
+        `${formatSiValue(distance, 'm')}\n${formatLightDistance(distance)}`,
+      )
+      .setPosition(midpointX, midpointY - labelOffset)
+      .setScale(1 / zoom)
+      .setVisible(true);
   }
 
   private drawPredictions() {
@@ -812,8 +928,9 @@ export class Scene extends Phaser.Scene {
     });
     this.spaceship?.setRenderVisibility(camera.zoom, camera.worldView);
     if (this.spaceship) {
+      this.snapSpaceshipToSurface();
       this.spaceship.setVisible(
-        this.spaceship.visible &&
+        this.spaceship.intersectsViewport(camera.worldView) &&
           isInsideWorld(this.spaceship.x, this.spaceship.y),
       );
     }
@@ -821,7 +938,6 @@ export class Scene extends Phaser.Scene {
     if (viewportLabelMode !== 'suppress' || this.alwaysVisibleBodies.size > 1) {
       this.resolveNameLabelCollisions();
     }
-    this.snapSpaceshipToSurface();
   }
 
   protected syncWorldPositions(bodyNames?: ReadonlySet<string>) {
@@ -895,8 +1011,9 @@ export class Scene extends Phaser.Scene {
     });
     if (this.spaceship && bodyNames.has(this.spaceship.spaceship.name)) {
       this.spaceship.setRenderVisibility(camera.zoom, camera.worldView);
+      this.snapSpaceshipToSurface();
       this.spaceship.setVisible(
-        this.spaceship.visible &&
+        this.spaceship.intersectsViewport(camera.worldView) &&
           isInsideWorld(this.spaceship.x, this.spaceship.y),
       );
     }
@@ -904,7 +1021,6 @@ export class Scene extends Phaser.Scene {
     if (viewportLabelMode !== 'suppress' || this.alwaysVisibleBodies.size > 1) {
       this.resolveNameLabelCollisions();
     }
-    this.snapSpaceshipToSurface();
   }
 
   private publishActiveWorldBodies() {

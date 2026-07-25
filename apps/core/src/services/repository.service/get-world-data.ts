@@ -1,31 +1,32 @@
 import type { SerializedWorldBody } from '@repo/types';
-import type { WorldBodyDocument } from '@models';
-import { WorldAssetService } from '../world-asset.service';
+import { WorldSystemModel, type WorldBodyDocument } from '@models';
 import type { WorldData } from './types';
 
 export async function getWorldData(): Promise<WorldData> {
-  const { systems } = await WorldAssetService.getWorldSystems();
+  const systems = await WorldSystemModel.findAllSystems();
   const worldData: WorldData = {
     planets: [],
     moons: [],
     stars: [],
   };
 
-  systems.flat().forEach((body) => {
-    if (body.type === 'star') {
-      worldData.stars.push(toWorldBodyDocument(body));
-      return;
-    }
+  systems
+    .flatMap((system) => system.bodies)
+    .forEach((body) => {
+      if (body.type === 'star') {
+        worldData.stars.push(toWorldBodyDocument(body));
+        return;
+      }
 
-    if (body.type === 'planet' || body.type === 'blackhole') {
-      worldData.planets.push(toWorldBodyDocument(body));
-      return;
-    }
+      if (body.type === 'planet' || body.type === 'blackhole') {
+        worldData.planets.push(toWorldBodyDocument(body));
+        return;
+      }
 
-    if (body.type === 'moon') {
-      worldData.moons.push(toWorldBodyDocument(body));
-    }
-  });
+      if (body.type === 'moon') {
+        worldData.moons.push(toWorldBodyDocument(body));
+      }
+    });
 
   return worldData;
 }

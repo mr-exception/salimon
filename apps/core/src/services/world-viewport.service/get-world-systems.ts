@@ -4,6 +4,8 @@ import { WorldSystemModel } from '@models';
 import type { WorldViewportOptions, WorldViewportRequest } from './types';
 
 const MIN_RENDER_SHAPE_SCREEN_WIDTH = 16;
+const METERS_PER_LIGHT_YEAR = 9_460_730_472_580_800n;
+const MIN_VIEWPORT_SIZE = METERS_PER_LIGHT_YEAR * 10n;
 
 type ViewportRectangle = {
   left: bigint;
@@ -56,12 +58,40 @@ function getViewportRectangle(
   const x2 = parseInteger(request.x2 ?? request.right, 'x2');
   const y2 = parseInteger(request.y2 ?? request.bottom, 'y2');
 
-  return {
+  return enforceMinimumViewportSize({
     left: x1 < x2 ? x1 : x2,
     right: x1 > x2 ? x1 : x2,
     top: y1 < y2 ? y1 : y2,
     bottom: y1 > y2 ? y1 : y2,
-  };
+  });
+}
+
+function enforceMinimumViewportSize(
+  viewport: ViewportRectangle,
+): ViewportRectangle {
+  const [left, right] = enforceMinimumRangeSize(
+    viewport.left,
+    viewport.right,
+    MIN_VIEWPORT_SIZE,
+  );
+  const [top, bottom] = enforceMinimumRangeSize(
+    viewport.top,
+    viewport.bottom,
+    MIN_VIEWPORT_SIZE,
+  );
+
+  return { left, right, top, bottom };
+}
+
+function enforceMinimumRangeSize(start: bigint, end: bigint, minimum: bigint) {
+  const size = end - start;
+  if (size >= minimum) return [start, end] as const;
+
+  const extra = minimum - size;
+  const before = extra / 2n;
+  const after = extra - before;
+
+  return [start - before, end + after] as const;
 }
 
 function parseRequiredBodyNames(requiredBodyNames: string | string[] = []) {

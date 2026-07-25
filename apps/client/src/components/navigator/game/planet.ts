@@ -11,6 +11,9 @@ const LABEL_SCREEN_GAP = 6;
 const BLACK_HOLE_MIN_SCREEN_RADIUS = 16;
 const BLACK_HOLE_STROKE_COLOR = 0xfbbf24;
 const BLACK_HOLE_STROKE_HIGHLIGHT = 0xfff7ad;
+const MAX_PATTERN_SCREEN_RADIUS = 4_096;
+const DEFAULT_PLANET_ALPHA = 0.3;
+const CLOSE_UP_PLANET_ALPHA = 0.8;
 export const PLANET_PATTERN_VARIANT_COUNT = 10;
 export const PLANET_PATTERN_TEXTURE_SIZE = 1_024;
 
@@ -107,12 +110,18 @@ export class Planet extends Phaser.GameObjects.Container {
     if (!bodyVisible) return;
 
     this.planetGraphics.setVisible(shapeVisible);
-    this.patternImage.setVisible(shapeVisible);
+    this.patternImage.setVisible(
+      shapeVisible && radius * zoom <= MAX_PATTERN_SCREEN_RADIUS,
+    );
     if (shapeVisible) {
       if (this.isBlackHole()) {
         this.patternImage.setVisible(false);
         this.drawBlackHole(visibleRadius, zoom);
       } else {
+        const alpha =
+          radius * zoom > MAX_PATTERN_SCREEN_RADIUS
+            ? CLOSE_UP_PLANET_ALPHA
+            : DEFAULT_PLANET_ALPHA;
         drawCelestialBody(
           this.planetGraphics,
           this.planet.color,
@@ -121,7 +130,7 @@ export class Planet extends Phaser.GameObjects.Container {
           viewport,
           this.x,
           this.y,
-          0.3,
+          alpha,
         );
       }
     }

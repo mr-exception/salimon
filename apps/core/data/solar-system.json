@@ -1,0 +1,474 @@
+{
+  "name": "Sun",
+  "bodies": [
+    {
+      "type": "star",
+      "name": "Sun",
+      "isReal": true,
+      "position": {
+        "x": "245978992287100800000",
+        "y": "0",
+        "relativeTo": "Sagittarius A*"
+      },
+      "orbitalCenter": "Sagittarius A*",
+      "clockwise": false,
+      "speed": "220000",
+      "mass": "1988500000000000000000000000000",
+      "radius": "695700000",
+      "rotationPeriodSeconds": 2192832,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "planet",
+      "name": "Mercury",
+      "isReal": true,
+      "position": {
+        "x": "55078959914",
+        "y": "17894782370",
+        "relativeTo": "Sun"
+      },
+      "orbitalCenter": "Sun",
+      "clockwise": false,
+      "speed": "47360",
+      "mass": "330110000000000000000000",
+      "radius": "2439700",
+      "rotationPeriodSeconds": 5067031.68,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "planet",
+      "name": "Venus",
+      "isReal": true,
+      "position": {
+        "x": "29868073805",
+        "y": "103999262502",
+        "relativeTo": "Sun"
+      },
+      "orbitalCenter": "Sun",
+      "clockwise": false,
+      "speed": "35020",
+      "mass": "4867500000000000000000000",
+      "radius": "6051800",
+      "rotationPeriodSeconds": 20995200,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "planet",
+      "name": "Earth",
+      "isReal": true,
+      "position": { "x": "149598023000", "y": "0", "relativeTo": "Sun" },
+      "orbitalCenter": "Sun",
+      "clockwise": false,
+      "speed": "29780",
+      "mass": "5972370000000000000000000",
+      "radius": "6371000",
+      "rotationPeriodSeconds": 86164.1,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "moon",
+      "name": "Moon",
+      "isReal": true,
+      "position": { "x": "332899238", "y": "192199500", "relativeTo": "Earth" },
+      "orbitalCenter": "Earth",
+      "clockwise": false,
+      "speed": "1022",
+      "mass": "73420000000000000000000",
+      "radius": "1737400",
+      "rotationPeriodSeconds": 2360591.51,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "planet",
+      "name": "Mars",
+      "isReal": true,
+      "position": {
+        "x": "-179755229308",
+        "y": "140102106254",
+        "relativeTo": "Sun"
+      },
+      "orbitalCenter": "Sun",
+      "clockwise": false,
+      "speed": "24070",
+      "mass": "641710000000000000000000",
+      "radius": "3389500",
+      "rotationPeriodSeconds": 88642.7,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "moon",
+      "name": "Phobos",
+      "isReal": true,
+      "position": { "x": "-3206743", "y": "-8809773", "relativeTo": "Mars" },
+      "orbitalCenter": "Mars",
+      "clockwise": false,
+      "speed": "2138",
+      "mass": "10659000000000000",
+      "radius": "11267",
+      "rotationPeriodSeconds": 27552,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "moon",
+      "name": "Deimos",
+      "isReal": true,
+      "position": { "x": "21781984", "y": "8714458", "relativeTo": "Mars" },
+      "orbitalCenter": "Mars",
+      "clockwise": false,
+      "speed": "1351",
+      "mass": "1476200000000000",
+      "radius": "6200",
+      "rotationPeriodSeconds": 109123,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "planet",
+      "name": "Jupiter",
+      "isReal": true,
+      "position": {
+        "x": "-666779765255",
+        "y": "-401181109622",
+        "relativeTo": "Sun"
+      },
+      "orbitalCenter": "Sun",
+      "clockwise": false,
+      "speed": "13070",
+      "mass": "1898200000000000000000000000",
+      "radius": "69911000",
+      "rotationPeriodSeconds": 35730,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "moon",
+      "name": "Io",
+      "isReal": true,
+      "position": {
+        "x": "412466424",
+        "y": "87672784",
+        "relativeTo": "Jupiter"
+      },
+      "orbitalCenter": "Jupiter",
+      "clockwise": false,
+      "speed": "17334",
+      "mass": "89319000000000000000000",
+      "radius": "1821600",
+      "rotationPeriodSeconds": 152853.5,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "moon",
+      "name": "Europa",
+      "isReal": true,
+      "position": {
+        "x": "-82247673",
+        "y": "666041901",
+        "relativeTo": "Jupiter"
+      },
+      "orbitalCenter": "Jupiter",
+      "clockwise": false,
+      "speed": "13740",
+      "mass": "48000000000000000000000",
+      "radius": "1560800",
+      "rotationPeriodSeconds": 306822,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "moon",
+      "name": "Ganymede",
+      "isReal": true,
+      "position": {
+        "x": "-1067829583",
+        "y": "-73504417",
+        "relativeTo": "Jupiter"
+      },
+      "orbitalCenter": "Jupiter",
+      "clockwise": false,
+      "speed": "10880",
+      "mass": "148190000000000000000000",
+      "radius": "2634100",
+      "rotationPeriodSeconds": 618153.4,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "moon",
+      "name": "Callisto",
+      "isReal": true,
+      "position": {
+        "x": "294581785",
+        "y": "-1859513378",
+        "relativeTo": "Jupiter"
+      },
+      "orbitalCenter": "Jupiter",
+      "clockwise": false,
+      "speed": "8204",
+      "mass": "107590000000000000000000",
+      "radius": "2410300",
+      "rotationPeriodSeconds": 1441931,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "planet",
+      "name": "Saturn",
+      "isReal": true,
+      "position": {
+        "x": "369223374305",
+        "y": "-1378083043635",
+        "relativeTo": "Sun"
+      },
+      "orbitalCenter": "Sun",
+      "clockwise": false,
+      "speed": "9680",
+      "mass": "568340000000000000000000000",
+      "radius": "58232000",
+      "rotationPeriodSeconds": 38362,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "moon",
+      "name": "Mimas",
+      "isReal": true,
+      "position": {
+        "x": "134079835",
+        "y": "127978001",
+        "relativeTo": "Saturn"
+      },
+      "orbitalCenter": "Saturn",
+      "clockwise": false,
+      "speed": "14280",
+      "mass": "37490000000000000000",
+      "radius": "198200",
+      "rotationPeriodSeconds": 81389,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "moon",
+      "name": "Enceladus",
+      "isReal": true,
+      "position": {
+        "x": "-12587926",
+        "y": "237706982",
+        "relativeTo": "Saturn"
+      },
+      "orbitalCenter": "Saturn",
+      "clockwise": false,
+      "speed": "12640",
+      "mass": "108022000000000000000",
+      "radius": "252100",
+      "rotationPeriodSeconds": 118386,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "moon",
+      "name": "Tethys",
+      "isReal": true,
+      "position": {
+        "x": "-222449148",
+        "y": "193151935",
+        "relativeTo": "Saturn"
+      },
+      "orbitalCenter": "Saturn",
+      "clockwise": false,
+      "speed": "11350",
+      "mass": "617449000000000000000",
+      "radius": "531100",
+      "rotationPeriodSeconds": 163000,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "moon",
+      "name": "Dione",
+      "isReal": true,
+      "position": {
+        "x": "-352202406",
+        "y": "-135571820",
+        "relativeTo": "Saturn"
+      },
+      "orbitalCenter": "Saturn",
+      "clockwise": false,
+      "speed": "10030",
+      "mass": "1095452000000000000000",
+      "radius": "561400",
+      "rotationPeriodSeconds": 236470,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "moon",
+      "name": "Rhea",
+      "isReal": true,
+      "position": {
+        "x": "-184441817",
+        "y": "-493761780",
+        "relativeTo": "Saturn"
+      },
+      "orbitalCenter": "Saturn",
+      "clockwise": false,
+      "speed": "8480",
+      "mass": "2306518000000000000000",
+      "radius": "763800",
+      "rotationPeriodSeconds": 390343,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "moon",
+      "name": "Titan",
+      "isReal": true,
+      "position": {
+        "x": "878006990",
+        "y": "-849417087",
+        "relativeTo": "Saturn"
+      },
+      "orbitalCenter": "Saturn",
+      "clockwise": false,
+      "speed": "5570",
+      "mass": "134520000000000000000000",
+      "radius": "2574700",
+      "rotationPeriodSeconds": 1377648,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "moon",
+      "name": "Iapetus",
+      "isReal": true,
+      "position": {
+        "x": "3275551383",
+        "y": "1392691411",
+        "relativeTo": "Saturn"
+      },
+      "orbitalCenter": "Saturn",
+      "clockwise": false,
+      "speed": "3260",
+      "mass": "1805635000000000000000",
+      "radius": "734500",
+      "rotationPeriodSeconds": 6856224,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "planet",
+      "name": "Uranus",
+      "isReal": true,
+      "position": {
+        "x": "2382688355476",
+        "y": "-1599592646748",
+        "relativeTo": "Sun"
+      },
+      "orbitalCenter": "Sun",
+      "clockwise": false,
+      "speed": "6800",
+      "mass": "86810000000000000000000000",
+      "radius": "25362000",
+      "rotationPeriodSeconds": 62064,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "moon",
+      "name": "Miranda",
+      "isReal": true,
+      "position": { "x": "64695000", "y": "112054738", "relativeTo": "Uranus" },
+      "orbitalCenter": "Uranus",
+      "clockwise": false,
+      "speed": "6680",
+      "mass": "65900000000000000000",
+      "radius": "235800",
+      "rotationPeriodSeconds": 122141,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "moon",
+      "name": "Ariel",
+      "isReal": true,
+      "position": {
+        "x": "-112306720",
+        "y": "154562601",
+        "relativeTo": "Uranus"
+      },
+      "orbitalCenter": "Uranus",
+      "clockwise": false,
+      "speed": "5510",
+      "mass": "1251000000000000000000",
+      "radius": "578900",
+      "rotationPeriodSeconds": 217728,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "moon",
+      "name": "Umbriel",
+      "isReal": true,
+      "position": {
+        "x": "-251705601",
+        "y": "-86959437",
+        "relativeTo": "Uranus"
+      },
+      "orbitalCenter": "Uranus",
+      "clockwise": false,
+      "speed": "4670",
+      "mass": "1275000000000000000000",
+      "radius": "584700",
+      "rotationPeriodSeconds": 358041,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "moon",
+      "name": "Titania",
+      "isReal": true,
+      "position": { "x": "7607489", "y": "-435843582", "relativeTo": "Uranus" },
+      "orbitalCenter": "Uranus",
+      "clockwise": false,
+      "speed": "3640",
+      "mass": "3420000000000000000000",
+      "radius": "788900",
+      "rotationPeriodSeconds": 752403,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "moon",
+      "name": "Oberon",
+      "isReal": true,
+      "position": {
+        "x": "541287040",
+        "y": "-217966849",
+        "relativeTo": "Uranus"
+      },
+      "orbitalCenter": "Uranus",
+      "clockwise": false,
+      "speed": "3150",
+      "mass": "3014000000000000000000",
+      "radius": "761400",
+      "rotationPeriodSeconds": 1160491,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "planet",
+      "name": "Neptune",
+      "isReal": true,
+      "position": {
+        "x": "3547214564939",
+        "y": "2765885432274",
+        "relativeTo": "Sun"
+      },
+      "orbitalCenter": "Sun",
+      "clockwise": false,
+      "speed": "5430",
+      "mass": "102413000000000000000000000",
+      "radius": "24622000",
+      "rotationPeriodSeconds": 57996,
+      "cTime": 1784419200000
+    },
+    {
+      "type": "moon",
+      "name": "Triton",
+      "isReal": true,
+      "position": {
+        "x": "-290642826",
+        "y": "203476886",
+        "relativeTo": "Neptune"
+      },
+      "orbitalCenter": "Neptune",
+      "clockwise": false,
+      "speed": "4390",
+      "mass": "21400000000000000000000",
+      "radius": "1353400",
+      "rotationPeriodSeconds": 507773,
+      "cTime": 1784419200000
+    }
+  ]
+}

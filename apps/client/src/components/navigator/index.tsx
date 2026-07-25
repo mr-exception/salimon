@@ -117,6 +117,7 @@ function BodyDetailsDialog({
 
 type NavigatorProps = {
   isMeasuring?: boolean;
+  isRulerActive?: boolean;
   isSelectingTargetDirection?: boolean;
   onSceneChange?: (scene: Scene | null) => void;
   onSpaceshipEngineChange?: (isRunning: boolean) => void;
@@ -125,6 +126,7 @@ type NavigatorProps = {
 
 export function Navigator({
   isMeasuring = false,
+  isRulerActive = false,
   isSelectingTargetDirection = false,
   onSceneChange,
   onSpaceshipEngineChange,
@@ -156,6 +158,10 @@ export function Navigator({
   useEffect(() => {
     sceneRef.current?.setMeasuringActive(isMeasuring);
   }, [isMeasuring]);
+
+  useEffect(() => {
+    sceneRef.current?.setRulerActive(isRulerActive);
+  }, [isRulerActive]);
 
   useEffect(() => {
     const updateTelemetry = () => {

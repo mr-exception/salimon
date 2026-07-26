@@ -122,6 +122,7 @@ function BodyDetailsDialog({
 
 type NavigatorProps = {
   isMeasuring?: boolean;
+  isMeasurementRelativeToSpaceship?: boolean;
   isRulerActive?: boolean;
   isSearchOpen?: boolean;
   isSelectingTargetDirection?: boolean;
@@ -133,6 +134,7 @@ type NavigatorProps = {
 
 export function Navigator({
   isMeasuring = false,
+  isMeasurementRelativeToSpaceship = false,
   isRulerActive = false,
   isSearchOpen = false,
   isSelectingTargetDirection = false,
@@ -163,6 +165,12 @@ export function Navigator({
   useEffect(() => {
     sceneRef.current?.setMeasuringActive(isMeasuring);
   }, [isMeasuring]);
+
+  useEffect(() => {
+    sceneRef.current?.setMeasurementRelativeToSpaceship(
+      isMeasurementRelativeToSpaceship,
+    );
+  }, [isMeasurementRelativeToSpaceship]);
 
   useEffect(() => {
     sceneRef.current?.setRulerActive(isRulerActive);

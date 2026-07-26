@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { SerializedWorldSystems, SpaceshipDto } from '@repo/types';
+import type { SpaceshipDto } from '@repo/types';
 import {
   advanceWorld,
   getSimulationFrameSnapshot,
@@ -53,21 +53,6 @@ async function initializeSpaceship(
   return data.spaceship;
 }
 
-async function loadWorldViewport(viewport: {
-  x1: string;
-  y1: string;
-  x2: string;
-  y2: string;
-  zoom?: number;
-  requiredBodyNames?: string[];
-}) {
-  const { data } = await axios.post<SerializedWorldSystems>(
-    `${getApiBaseUrl()}/world/systems`,
-    viewport,
-  );
-  return data;
-}
-
 function publishFrame(requestId?: number) {
   workerScope.postMessage({
     type: 'frame',
@@ -96,19 +81,6 @@ workerScope.onmessage = (event) => {
               type: 'spaceship',
               requestId: message.requestId,
               spaceship,
-              snapshot: getSimulationFrameSnapshot(),
-            });
-          })
-          .catch(publishError);
-        break;
-      case 'refresh-viewport':
-        void loadWorldViewport(message.viewport)
-          .then((systems) => {
-            hydrateWorldSystems(systems);
-            workerScope.postMessage({
-              type: 'viewport',
-              requestId: message.requestId,
-              systems,
               snapshot: getSimulationFrameSnapshot(),
             });
           })

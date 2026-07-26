@@ -134,6 +134,16 @@
   cursor: not-allowed;
 }
 
+.actions .dangerAction {
+  color: #f3b5a8;
+}
+
+.actions .dangerAction:hover:not(:disabled),
+.actions .dangerAction:focus-visible {
+  border-left-color: #f97316;
+  background: linear-gradient(90deg, rgba(249, 115, 22, 0.13), transparent 72%);
+}
+
 .identity {
   display: grid;
   gap: 8px;

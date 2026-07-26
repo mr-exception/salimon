@@ -507,6 +507,65 @@
   gap: 6px;
 }
 
+.measuringControls {
+  display: grid;
+  width: min(340px, calc(100vw - 70px));
+  gap: 10px;
+}
+
+.switchControl {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 18px;
+  color: color-mix(in srgb, var(--color-starlight) 72%, transparent);
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.switchControl input {
+  position: relative;
+  width: 42px;
+  height: 22px;
+  margin: 0;
+  border: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 35%, transparent);
+  border-radius: 999px;
+  appearance: none;
+  background: color-mix(in srgb, var(--color-deep-space) 82%, black);
+  cursor: pointer;
+}
+
+.switchControl input::before {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-starlight) 78%, transparent);
+  content: '';
+  transition:
+    background 120ms ease,
+    transform 120ms ease;
+}
+
+.switchControl input:checked {
+  border-color: var(--color-plasma-cyan);
+  background: color-mix(in srgb, var(--color-plasma-cyan) 28%, transparent);
+}
+
+.switchControl input:checked::before {
+  background: var(--color-plasma-cyan);
+  transform: translateX(20px);
+}
+
+.switchControl input:focus-visible {
+  outline: 2px solid var(--color-plasma-cyan);
+  outline-offset: 2px;
+}
+
 .thrustersPanel {
   display: grid;
   min-width: 620px;
@@ -837,6 +896,7 @@
   .speedInputs,
   .speedActions,
   .orbitActions,
+  .measuringControls,
   .thrustersPanel,
   .durabilityList,
   .moduleGridPanel,

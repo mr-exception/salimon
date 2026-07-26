@@ -26,6 +26,15 @@ import type {
   SimulationWorkerRequest,
   SimulationWorkerResponse,
 } from './world-simulation-protocol';
+import {
+  getWorldSector,
+  getWorldSectorKey,
+  markWorldSectorFetched,
+  readCachedWorldSectors,
+  readFetchedWorldSectorKeys,
+  writeCachedWorldSector,
+  type WorldSector,
+} from './world-sectors';
 
 type Body = Planet | Spaceship | Star;
 type SerializedVisiblePlanetBody = SerializedBody<Planet> & {
@@ -37,6 +46,9 @@ type WorldListener = (
 ) => void;
 type WorldViewportLoader = (
   request: WorldViewportRequest,
+) => Promise<SerializedWorldSystems>;
+type WorldSectorLoader = (
+  sector: WorldSector,
 ) => Promise<SerializedWorldSystems>;
 export type SpaceshipMotionState = 'flying' | 'landed' | 'crashed';
 export type SpaceshipProximityTelemetry = {
@@ -263,6 +275,7 @@ let spaceshipStoredRelativeVelocity: Vector | undefined;
 let spaceshipAttachedBodyName: string | undefined = EARTH_NAME;
 let worldElapsedSeconds = 0;
 let worldViewportLoader: WorldViewportLoader | undefined;
+let worldSectorLoader: WorldSectorLoader | undefined;
 let activeWorldBodyNames: ReadonlySet<string> | undefined;
 let activeWorldBodies: (Planet | Star)[] | undefined;
 let simulationWorker: Worker | undefined;
@@ -270,13 +283,6 @@ let simulationWorkerFailed = false;
 let simulationAdvancePending = false;
 let simulationAdvanceRequestId = 0;
 let simulationRequestId = 0;
-const pendingViewportRequests = new Map<
-  number,
-  {
-    resolve: (world: World) => void;
-    reject: (error: Error) => void;
-  }
->();
 const pendingSpaceshipRequests = new Map<
   number,
   {
@@ -287,6 +293,12 @@ const pendingSpaceshipRequests = new Map<
 let latestSimulationSnapshot:
   | Pick<SimulationFrameSnapshot, 'proximityTelemetry' | 'activeThrustVector'>
   | undefined;
+const worldSystemsBySectorKey = new Map<string, SerializedWorldSystems>();
+const worldReferenceSystemsByBodyName = new Map<
+  string,
+  SerializedWorldSystems
+>();
+let fetchedWorldSectorKeys = new Set<string>();
 
 const isBrowserMainThread =
   typeof window !== 'undefined' && typeof Worker !== 'undefined';
@@ -303,6 +315,10 @@ type WorldViewportRequest = {
 
 export function setWorldViewportLoader(loader?: WorldViewportLoader) {
   worldViewportLoader = loader;
+}
+
+export function setWorldSectorLoader(loader?: WorldSectorLoader) {
+  worldSectorLoader = loader;
 }
 
 function getSimulationWorker() {
@@ -325,15 +341,6 @@ function getSimulationWorker() {
         simulationAdvancePending = false;
         simulationWorker?.terminate();
         simulationWorker = undefined;
-        return;
-      }
-
-      if (message.type === 'viewport') {
-        applyWorldSystems(message.systems, false);
-        applySimulationFrameSnapshot(message.snapshot);
-        const pending = pendingViewportRequests.get(message.requestId);
-        pendingViewportRequests.delete(message.requestId);
-        pending?.resolve(worldState);
         return;
       }
 
@@ -379,8 +386,6 @@ function invalidateLatestSimulationSnapshot() {
 }
 
 function rejectPendingSimulationRequests(error: Error) {
-  pendingViewportRequests.forEach((pending) => pending.reject(error));
-  pendingViewportRequests.clear();
   pendingSpaceshipRequests.forEach((pending) => pending.reject(error));
   pendingSpaceshipRequests.clear();
 }
@@ -388,12 +393,79 @@ function rejectPendingSimulationRequests(error: Error) {
 export async function loadWorld(request: WorldViewportRequest) {
   if (loadPromise) return loadPromise;
 
-  loadPromise = refreshWorldViewport(request).catch((error: unknown) => {
+  loadPromise = initializeWorldSectors(request).catch((error: unknown) => {
     loadPromise = undefined;
     throw error;
   });
 
   return loadPromise;
+}
+
+async function initializeWorldSectors(request: WorldViewportRequest) {
+  await loadCachedWorldSectors();
+  await hydrateSpaceshipPositionReferences();
+  await scanWorldSector(getSpaceshipWorldSector());
+
+  if (worldSystemsBySectorKey.size === 0) {
+    return refreshWorldViewport(request);
+  }
+
+  return worldState;
+}
+
+export async function loadCachedWorldSectors() {
+  const [cachedSectors, fetchedSectorKeys] = await Promise.all([
+    readCachedWorldSectors(),
+    readFetchedWorldSectorKeys(),
+  ]);
+  fetchedWorldSectorKeys = fetchedSectorKeys;
+  cachedSectors.forEach((sector) => {
+    worldSystemsBySectorKey.set(getWorldSectorKey(sector), sector.systems);
+  });
+
+  if (cachedSectors.length > 0) {
+    applyWorldSystems(getCombinedWorldSystems());
+  }
+
+  return worldState;
+}
+
+export async function scanWorldSector(
+  sector: WorldSector,
+  signal?: AbortSignal,
+) {
+  const key = getWorldSectorKey(sector);
+  if (
+    worldSystemsBySectorKey.has(key) &&
+    fetchedWorldSectorKeys.has(key) &&
+    hasLoadedBlackHole()
+  ) {
+    return worldState;
+  }
+
+  const systems = worldSectorLoader
+    ? await worldSectorLoader(sector)
+    : await loadWorldSectorFromRest(sector, signal);
+
+  if (signal?.aborted) return worldState;
+
+  worldSystemsBySectorKey.set(key, systems);
+  await Promise.all([
+    writeCachedWorldSector(sector, systems),
+    markWorldSectorFetched(sector),
+  ]);
+  fetchedWorldSectorKeys.add(key);
+  applyWorldSystems(getCombinedWorldSystems());
+  return worldState;
+}
+
+export function getLoadedWorldSectorKeys() {
+  return new Set(worldSystemsBySectorKey.keys());
+}
+
+export function getSpaceshipWorldSector() {
+  const position = getWorldPosition(spaceshipState.position);
+  return getWorldSector({ x: position.x, y: position.y });
 }
 
 export async function refreshWorldViewport({
@@ -413,28 +485,6 @@ export async function refreshWorldViewport({
     ...(zoom === undefined ? {} : { zoom }),
     ...(requiredBodyNames === undefined ? {} : { requiredBodyNames }),
   };
-  const worker = worldViewportLoader ? undefined : getSimulationWorker();
-  if (worker) {
-    const requestId = ++simulationRequestId;
-    const promise = new Promise<World>((resolve, reject) => {
-      pendingViewportRequests.set(requestId, { resolve, reject });
-      signal?.addEventListener(
-        'abort',
-        () => {
-          pendingViewportRequests.delete(requestId);
-          reject(new DOMException('Request aborted', 'AbortError'));
-        },
-        { once: true },
-      );
-    });
-    worker.postMessage({
-      type: 'refresh-viewport',
-      requestId,
-      viewport: request,
-    } satisfies SimulationWorkerRequest);
-    return promise;
-  }
-
   const data = worldViewportLoader
     ? await worldViewportLoader(request)
     : await loadWorldViewportFromRest({ ...request, signal });
@@ -490,6 +540,51 @@ async function loadWorldViewportFromRest({
       },
       { signal },
     )
+    .then(({ data }) => data);
+}
+
+async function loadWorldSectorFromRest(
+  sector: WorldSector,
+  signal?: AbortSignal,
+) {
+  const apiBaseUrl = (
+    import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL
+  ).replace(/\/+$/, '');
+
+  return axios
+    .post<SerializedWorldSystems>(
+      `${apiBaseUrl}/world/systems`,
+      {
+        sectorX: sector.x,
+        sectorY: sector.y,
+      },
+      { signal },
+    )
+    .then(({ data }) => data);
+}
+
+async function hydrateSpaceshipPositionReferences() {
+  const referenceName = spaceshipState.position.relativeTo;
+  if (!referenceName || getBodyByName(referenceName)) return;
+
+  const systems = await loadWorldReferenceBodiesFromRest([referenceName]);
+  worldReferenceSystemsByBodyName.set(referenceName, systems);
+  applyWorldSystems(getCombinedWorldSystems());
+}
+
+async function loadWorldReferenceBodiesFromRest(requiredBodyNames: string[]) {
+  const apiBaseUrl = (
+    import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL
+  ).replace(/\/+$/, '');
+
+  return axios
+    .post<SerializedWorldSystems>(`${apiBaseUrl}/world/systems`, {
+      x1: '0',
+      y1: '0',
+      x2: '0',
+      y2: '0',
+      requiredBodyNames,
+    })
     .then(({ data }) => data);
 }
 
@@ -606,6 +701,19 @@ function applyWorldSystems(data: SerializedWorldSystems, syncWorker = true) {
   if (syncWorker) {
     postSimulationMessage({ type: 'hydrate-world', systems: data });
   }
+}
+
+function getCombinedWorldSystems(): SerializedWorldSystems {
+  return {
+    systems: [
+      ...worldReferenceSystemsByBodyName.values(),
+      ...worldSystemsBySectorKey.values(),
+    ].flatMap((systems) => systems.systems),
+  };
+}
+
+function hasLoadedBlackHole() {
+  return worldState.planets.some((planet) => planet.type === 'blackhole');
 }
 
 export function hydrateWorldSystems(data: SerializedWorldSystems) {
@@ -1612,9 +1720,6 @@ function getWorldPositionWithBodyMap(
 
     const reference = bodyByName.get(relativeTo);
     if (!reference) {
-      if (worldState.planets.length > 0 || worldState.stars.length > 0) {
-        console.warn(`Invalid position reference "${relativeTo}"`);
-      }
       return candidate;
     }
     if (path.has(relativeTo)) {

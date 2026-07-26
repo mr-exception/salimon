@@ -40,6 +40,8 @@ export type WorldViewportRequest = {
   top?: string;
   bottom?: string;
   zoom?: string | number;
+  sectorX?: string | number;
+  sectorY?: string | number;
   requiredBodyNames?: string | string[];
 };
 

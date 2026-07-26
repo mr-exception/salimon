@@ -55,12 +55,14 @@ import {
 type FooterProps = {
   isEngineRunning?: boolean;
   isMeasuring?: boolean;
+  isMeasurementRelativeToSpaceship?: boolean;
   isRulerActive?: boolean;
   onStartThrusters?: (
     thrusters: { powerPercent: number; active: boolean }[],
   ) => void;
   onStopEngines?: () => void;
   onToggleMeasuring?: () => void;
+  onMeasurementRelativeToSpaceshipChange?: (active: boolean) => void;
   onToggleRuler?: () => void;
   onOpenCommunications?: () => void;
   onOpenCommunicationThread?: (contactId: string) => void;
@@ -84,6 +86,7 @@ type ManualThrusterInput = {
 
 type SpeedControlTab =
   | 'thrusters'
+  | 'measuring'
   | 'maintenance'
   | 'prediction'
   | 'modules'
@@ -96,6 +99,7 @@ type Position = {
 
 const CONTROL_LABELS: Record<SpeedControlTab, string> = {
   thrusters: 'Thrusters',
+  measuring: 'Measuring',
   maintenance: 'Ship durability',
   prediction: 'Prediction',
   modules: 'Modules',
@@ -111,6 +115,7 @@ const PANEL_PLACEMENTS: Record<
   { horizontal: 'left' | 'right'; vertical: 'top' | 'bottom' }
 > = {
   thrusters: { horizontal: 'left', vertical: 'top' },
+  measuring: { horizontal: 'left', vertical: 'bottom' },
   maintenance: { horizontal: 'right', vertical: 'bottom' },
   prediction: { horizontal: 'left', vertical: 'bottom' },
   modules: { horizontal: 'left', vertical: 'top' },
@@ -501,10 +506,12 @@ function DraggablePanel({
 export function Footer({
   isEngineRunning = false,
   isMeasuring = false,
+  isMeasurementRelativeToSpaceship = false,
   isRulerActive = false,
   onStartThrusters,
   onStopEngines,
   onToggleMeasuring,
+  onMeasurementRelativeToSpaceshipChange,
   onToggleRuler,
   onOpenCommunications,
   onOpenCommunicationThread,
@@ -618,6 +625,22 @@ export function Footer({
         nextControls.delete(control);
       } else {
         nextControls.add(control);
+      }
+      return nextControls;
+    });
+  };
+
+  const toggleMeasuring = () => {
+    const measuringPanelIsOpen = expandedSpeedControls.has('measuring');
+    if (!isMeasuring || measuringPanelIsOpen) onToggleMeasuring?.();
+
+    setExpandedSpeedControls((expandedControls) => {
+      const nextControls = new Set(expandedControls);
+      if (!isMeasuring) nextControls.add('measuring');
+      else if (measuringPanelIsOpen) {
+        nextControls.delete('measuring');
+      } else {
+        nextControls.add('measuring');
       }
       return nextControls;
     });
@@ -872,8 +895,10 @@ export function Footer({
             type="button"
             aria-label="Measuring"
             aria-pressed={isMeasuring}
+            aria-controls="footer-measuring-panel"
+            aria-expanded={expandedSpeedControls.has('measuring')}
             data-active={isMeasuring}
-            onClick={onToggleMeasuring}
+            onClick={toggleMeasuring}
           >
             <MeasuringIcon />
             <span className={style.tooltip} role="tooltip">
@@ -1121,6 +1146,28 @@ export function Footer({
                 >
                   {isPredictionActive ? 'Deactivate' : 'Activate'}
                 </button>
+              </div>
+            </DraggablePanel>
+          )}
+          {expandedSpeedControls.has('measuring') && (
+            <DraggablePanel
+              control="measuring"
+              onClose={() => toggleSpeedControl('measuring')}
+            >
+              <div className={style.measuringControls}>
+                <label className={style.switchControl}>
+                  <span>Relative to spaceship</span>
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    checked={isMeasurementRelativeToSpaceship}
+                    onChange={(event) =>
+                      onMeasurementRelativeToSpaceshipChange?.(
+                        event.currentTarget.checked,
+                      )
+                    }
+                  />
+                </label>
               </div>
             </DraggablePanel>
           )}

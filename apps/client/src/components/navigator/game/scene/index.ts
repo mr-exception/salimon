@@ -3,23 +3,32 @@ import {
   advanceWorld,
   getSpaceshipActiveThrustVector,
   getBodyWorldVelocity,
+  getLoadedWorldSectorKeys,
   getSpaceshipAttachedBodyName,
   getSpaceshipMotionState,
   getSpaceshipProximityTelemetry,
   getSpaceshipWorldVelocity,
+  getWorldSectorBounds,
+  getWorldSectorKey,
+  getWorldSectorsInBounds,
+  getSpaceshipWorldSector,
   isSpaceshipEngineRunning,
-  refreshWorldViewport,
+  loadWorld,
+  scanWorldSector,
   setActiveWorldBodyNames,
   setSpaceshipTargetDirection,
   setSpaceshipHeading,
   startSpaceshipThrustersFeature,
   stopSpaceshipActiveFeature,
   spaceshipState,
+  WORLD_SECTOR_SIZE_METERS,
   WORLD_VIEWPORT_REFRESH_INTERVAL_MS,
+  type WorldSector,
 } from '@store';
 import type { Planet as PlanetData, Star as StarData } from '@repo/types';
 import type { SpaceshipProximityTelemetry } from '@store';
 import {
+  formatDistance,
   formatLightDistance,
   formatSiValue,
   formatSpeed,
@@ -91,6 +100,11 @@ type NameLabelCandidate = {
   bounds: Phaser.Geom.Rectangle;
   hide: () => void;
 };
+type SectorScanControl = {
+  container: Phaser.GameObjects.Container;
+  hitArea: Phaser.GameObjects.Zone;
+  label: Phaser.GameObjects.Text;
+};
 type RulerPoint = {
   x: number;
   y: number;
@@ -107,6 +121,15 @@ const RULER_LABEL_OFFSET_PX = 10;
 const PREDICTION_COLOR = 0xa78bfa;
 const ENGINE_START_RESPONSE_TIMEOUT_MS = 5_000;
 const WORLD_VIEWPORT_REQUEST_DEBOUNCE_MS = 500;
+const MAX_SCAN_PLACEHOLDERS = 80;
+const MIN_SCAN_PLACEHOLDER_SCREEN_SIZE_PX = 72;
+const SECTOR_SCAN_BUTTON_COLOR = '#38bdf8';
+const SECTOR_SCAN_FILL_COLOR = 0x0891b2;
+const SECTOR_SCAN_BORDER_COLOR = 0x38bdf8;
+const SECTOR_SCAN_CORNER_COLOR = 0xfbbf24;
+const SECTOR_SCAN_CONTROL_WIDTH = 136;
+const SECTOR_SCAN_CONTROL_HEIGHT = 52;
+const SECTOR_SCAN_CONTROL_RADIUS = 8;
 
 function isCanceledRequest(error: unknown) {
   if (!error || typeof error !== 'object') return false;
@@ -152,6 +175,7 @@ export class Scene extends Phaser.Scene {
   protected stars: Star[] = [];
   protected spaceship?: Spaceship;
   protected grid?: Phaser.GameObjects.Graphics;
+  private sectorScanGraphics?: Phaser.GameObjects.Graphics;
   private measurementGraphics?: Phaser.GameObjects.Graphics;
   private rulerGraphics?: Phaser.GameObjects.Graphics;
   private rulerLabel?: Phaser.GameObjects.Text;
@@ -161,6 +185,7 @@ export class Scene extends Phaser.Scene {
     Phaser.GameObjects.Text
   >();
   private measuringActive = false;
+  private measurementRelativeToSpaceship = false;
   private rulerActive = false;
   private rulerStartPoint?: RulerPoint;
   private rulerEndPoint?: RulerPoint;
@@ -189,6 +214,7 @@ export class Scene extends Phaser.Scene {
   private viewportRefreshAbortController?: AbortController;
   private hasPendingViewportRefresh = false;
   private readonly alwaysVisibleBodies = new Set<string>();
+  private readonly sectorScanButtons = new Map<string, SectorScanControl>();
 
   constructor(
     onZoomChange?: (zoom: number) => void,
@@ -257,6 +283,7 @@ export class Scene extends Phaser.Scene {
     setRenderOriginName(DEFAULT_RENDER_ORIGIN_NAME);
     this.configureCamera();
     this.grid = this.add.graphics().setDepth(-1);
+    this.sectorScanGraphics = this.add.graphics().setDepth(17);
     this.measurementGraphics = this.add.graphics().setDepth(20);
     this.rulerGraphics = this.add.graphics().setDepth(22);
     this.predictionGraphics = this.add.graphics().setDepth(19);
@@ -271,6 +298,12 @@ export class Scene extends Phaser.Scene {
       this.viewportRefreshDebounceTimer = undefined;
       this.viewportRefreshAbortController?.abort();
       this.viewportRefreshAbortController = undefined;
+      this.sectorScanGraphics?.destroy();
+      this.sectorScanGraphics = undefined;
+      this.sectorScanButtons.forEach((control) =>
+        this.destroySectorScanControl(control),
+      );
+      this.sectorScanButtons.clear();
     });
     void this.renderWorld();
     this.viewportRefreshTimer = window.setInterval(() => {
@@ -318,6 +351,7 @@ export class Scene extends Phaser.Scene {
     const camera = this.cameras.main;
     this.updateCameraLock();
     this.drawVisibleWorld();
+    this.updateSectorScanPlaceholders();
     const zoom = camera.zoom;
     if (zoom !== this.lastReportedZoom) {
       this.lastReportedZoom = zoom;
@@ -358,6 +392,10 @@ export class Scene extends Phaser.Scene {
       this.measurementGraphics?.clear();
       this.measurementLabels.forEach((label) => label.setVisible(false));
     }
+  }
+
+  setMeasurementRelativeToSpaceship(active: boolean) {
+    this.measurementRelativeToSpaceship = active;
   }
 
   setRulerActive(active: boolean) {
@@ -747,6 +785,11 @@ export class Scene extends Phaser.Scene {
 
     const camera = this.cameras.main;
     const zoom = camera.zoom;
+    const spaceshipVelocity = this.measurementRelativeToSpaceship
+      ? getSpaceshipWorldVelocity()
+      : undefined;
+    const spaceshipX = this.spaceship?.x;
+    const spaceshipY = this.spaceship?.y;
     const displayedNames = new Set<string>();
     graphics.clear();
     graphics.lineStyle(1.5 / zoom, MEASUREMENT_ARROW_COLOR, 0.9);
@@ -757,6 +800,7 @@ export class Scene extends Phaser.Scene {
       y: number,
       radius: number,
       velocity: { x: number; y: number },
+      distance?: number,
     ) => {
       const speed = Math.hypot(velocity.x, velocity.y);
       const angle = speed > 0 ? Math.atan2(velocity.y, velocity.x) : 0;
@@ -803,7 +847,11 @@ export class Scene extends Phaser.Scene {
       }
 
       label
-        .setText(formatSpeed(speed))
+        .setText(
+          distance === undefined
+            ? formatSpeed(speed)
+            : `${formatSpeed(speed)}\n${formatDistance(distance)}`,
+        )
         .setOrigin(directionX < 0 ? 1 : 0, 0.5)
         .setPosition(
           endX + directionX * (MEASUREMENT_ARROW_GAP_PX / zoom),
@@ -816,25 +864,43 @@ export class Scene extends Phaser.Scene {
 
     this.planets.forEach((planet) => {
       if (!planet.visible) return;
+      const velocity = getBodyWorldVelocity(planet.name);
       drawMeasurement(
         planet.name,
         planet.x,
         planet.y,
         Number(planet.planet.radius),
-        getBodyWorldVelocity(planet.name),
+        spaceshipVelocity
+          ? {
+              x: velocity.x - spaceshipVelocity.x,
+              y: velocity.y - spaceshipVelocity.y,
+            }
+          : velocity,
+        spaceshipVelocity && spaceshipX !== undefined && spaceshipY !== undefined
+          ? Math.hypot(planet.x - spaceshipX, planet.y - spaceshipY)
+          : undefined,
       );
     });
     this.stars.forEach((star) => {
       if (!star.visible) return;
+      const velocity = getBodyWorldVelocity(star.name);
       drawMeasurement(
         star.name,
         star.x,
         star.y,
         Number(star.star.radius),
-        getBodyWorldVelocity(star.name),
+        spaceshipVelocity
+          ? {
+              x: velocity.x - spaceshipVelocity.x,
+              y: velocity.y - spaceshipVelocity.y,
+            }
+          : velocity,
+        spaceshipVelocity && spaceshipX !== undefined && spaceshipY !== undefined
+          ? Math.hypot(star.x - spaceshipX, star.y - spaceshipY)
+          : undefined,
       );
     });
-    if (this.spaceship?.visible) {
+    if (this.spaceship?.visible && !this.measurementRelativeToSpaceship) {
       drawMeasurement(
         this.spaceship.name,
         this.spaceship.x,
@@ -899,6 +965,246 @@ export class Scene extends Phaser.Scene {
       direction,
       preview: { x, y, angle, distance },
     };
+  }
+
+  private updateSectorScanPlaceholders() {
+    const camera = this.cameras.main;
+    if (!camera) return;
+
+    camera.preRender();
+    const graphics = this.sectorScanGraphics;
+    const sectorScreenSize =
+      Number(WORLD_SECTOR_SIZE_METERS) * Math.max(camera.zoom, MIN_ZOOM);
+    if (sectorScreenSize < MIN_SCAN_PLACEHOLDER_SCREEN_SIZE_PX) {
+      this.clearSectorScanPlaceholders();
+      return;
+    }
+
+    const viewport = camera.worldView;
+    const topLeft = getWorldPositionFromRenderPosition(
+      viewport.left,
+      viewport.top,
+    );
+    const bottomRight = getWorldPositionFromRenderPosition(
+      viewport.right,
+      viewport.bottom,
+    );
+    const sectors = getWorldSectorsInBounds(
+      {
+        left: topLeft.x < bottomRight.x ? topLeft.x : bottomRight.x,
+        right: topLeft.x > bottomRight.x ? topLeft.x : bottomRight.x,
+        top: topLeft.y < bottomRight.y ? topLeft.y : bottomRight.y,
+        bottom: topLeft.y > bottomRight.y ? topLeft.y : bottomRight.y,
+      },
+      MAX_SCAN_PLACEHOLDERS,
+    );
+    const scannedKeys = getLoadedWorldSectorKeys();
+    const visibleUnscannedSectors = sectors.filter(
+      (sector) => !scannedKeys.has(getWorldSectorKey(sector)),
+    );
+
+    graphics?.clear();
+    visibleUnscannedSectors.forEach((sector) =>
+      this.drawUnknownSectorArea(sector),
+    );
+    this.reconcileSectorScanButtons(visibleUnscannedSectors);
+  }
+
+  private clearSectorScanPlaceholders() {
+    this.sectorScanGraphics?.clear();
+    this.sectorScanButtons.forEach((control) =>
+      this.destroySectorScanControl(control),
+    );
+    this.sectorScanButtons.clear();
+  }
+
+  private drawUnknownSectorArea(sector: WorldSector) {
+    const graphics = this.sectorScanGraphics;
+    if (!graphics) return;
+
+    const rect = this.getRenderedSectorRectangle(sector);
+    if (!rect) return;
+
+    const zoom = this.cameras.main.zoom;
+    const lineWidth = 1.25 / zoom;
+    const cornerLength = Math.min(rect.width, rect.height, 140 / zoom) * 0.24;
+
+    graphics
+      .fillStyle(SECTOR_SCAN_FILL_COLOR, 0.055)
+      .fillRect(rect.x, rect.y, rect.width, rect.height)
+      .lineStyle(lineWidth, SECTOR_SCAN_BORDER_COLOR, 0.34)
+      .strokeRect(rect.x, rect.y, rect.width, rect.height)
+      .lineStyle(2 / zoom, SECTOR_SCAN_CORNER_COLOR, 0.72);
+
+    this.drawSectorCorner(rect.x, rect.y, cornerLength, 1, 1);
+    this.drawSectorCorner(rect.right, rect.y, cornerLength, -1, 1);
+    this.drawSectorCorner(rect.x, rect.bottom, cornerLength, 1, -1);
+    this.drawSectorCorner(rect.right, rect.bottom, cornerLength, -1, -1);
+  }
+
+  private drawSectorCorner(
+    x: number,
+    y: number,
+    length: number,
+    horizontalDirection: 1 | -1,
+    verticalDirection: 1 | -1,
+  ) {
+    this.sectorScanGraphics
+      ?.lineBetween(x, y, x + length * horizontalDirection, y)
+      .lineBetween(x, y, x, y + length * verticalDirection);
+  }
+
+  private reconcileSectorScanButtons(sectors: WorldSector[]) {
+    const nextKeys = new Set(sectors.map(getWorldSectorKey));
+
+    this.sectorScanButtons.forEach((control, key) => {
+      if (nextKeys.has(key)) return;
+
+      this.destroySectorScanControl(control);
+      this.sectorScanButtons.delete(key);
+    });
+
+    sectors.forEach((sector) => {
+      const key = getWorldSectorKey(sector);
+      const rect = this.getRenderedSectorRectangle(sector);
+      if (!rect) return;
+
+      const center = {
+        x: rect.centerX,
+        y: rect.centerY,
+      };
+      const existing = this.sectorScanButtons.get(key);
+      if (existing) {
+        existing.container.setPosition(center.x, center.y);
+        existing.container.setScale(1 / this.cameras.main.zoom);
+        existing.hitArea.setPosition(center.x, center.y);
+        existing.hitArea.setScale(1 / this.cameras.main.zoom);
+        return;
+      }
+
+      const control = this.createSectorScanControl(sector, center.x, center.y);
+      this.sectorScanButtons.set(key, control);
+    });
+  }
+
+  private createSectorScanControl(sector: WorldSector, x: number, y: number) {
+    const background = this.add.graphics();
+    const label = this.add
+      .text(0, 0, 'Unknown sector\nScan', {
+        align: 'center',
+        color: SECTOR_SCAN_BUTTON_COLOR,
+        fontFamily: 'system-ui, sans-serif',
+        fontSize: '12px',
+        fontStyle: 'bold',
+        lineSpacing: 4,
+      })
+      .setOrigin(0.5)
+      .setResolution(Math.max(2, window.devicePixelRatio));
+    const container = this.add
+      .container(x, y)
+      .setDepth(18)
+      .setScale(1 / this.cameras.main.zoom)
+      .setSize(SECTOR_SCAN_CONTROL_WIDTH, SECTOR_SCAN_CONTROL_HEIGHT);
+    const hitArea = this.add
+      .zone(x, y, SECTOR_SCAN_CONTROL_WIDTH, SECTOR_SCAN_CONTROL_HEIGHT)
+      .setDepth(19)
+      .setScale(1 / this.cameras.main.zoom)
+      .setInteractive({ useHandCursor: true })
+      .on('pointerover', () => {
+        this.drawSectorScanControlBackground(background, true);
+        this.game.canvas.style.cursor = 'pointer';
+      })
+      .on('pointerout', () => {
+        this.drawSectorScanControlBackground(background, false);
+        this.game.canvas.style.cursor = this.dragging ? 'grabbing' : 'grab';
+      });
+    const control = { container, hitArea, label };
+
+    this.drawSectorScanControlBackground(background, false);
+    container.add([background, label]);
+    hitArea.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      pointer.event.stopPropagation();
+      void this.scanSectorFromButton(sector, control);
+    });
+
+    return control;
+  }
+
+  private destroySectorScanControl(control: SectorScanControl) {
+    control.hitArea.destroy();
+    control.container.destroy();
+  }
+
+  private drawSectorScanControlBackground(
+    graphics: Phaser.GameObjects.Graphics,
+    hovered: boolean,
+  ) {
+    const width = SECTOR_SCAN_CONTROL_WIDTH;
+    const height = SECTOR_SCAN_CONTROL_HEIGHT;
+    const x = -width / 2;
+    const y = -height / 2;
+
+    graphics
+      .clear()
+      .fillStyle(0x020617, hovered ? 0.66 : 0.48)
+      .fillRoundedRect(x + 4, y + 5, width, height, SECTOR_SCAN_CONTROL_RADIUS)
+      .fillStyle(0x082f49, hovered ? 0.96 : 0.86)
+      .fillRoundedRect(x, y, width, height, SECTOR_SCAN_CONTROL_RADIUS)
+      .lineStyle(1.5, hovered ? 0xfbbf24 : SECTOR_SCAN_BORDER_COLOR, 0.92)
+      .strokeRoundedRect(x, y, width, height, SECTOR_SCAN_CONTROL_RADIUS)
+      .lineStyle(1, 0xe0f2fe, hovered ? 0.22 : 0.12)
+      .lineBetween(x + 14, y + 10, x + width - 14, y + 10);
+  }
+
+  private getRenderedSectorRectangle(sector: WorldSector) {
+    const bounds = getWorldSectorBounds(sector);
+    const originPosition = getRenderOriginWorldPosition();
+    const topLeft = getRenderPositionFromOrigin(
+      { x: bounds.left, y: bounds.top },
+      originPosition,
+    );
+    const bottomRight = getRenderPositionFromOrigin(
+      { x: bounds.right, y: bounds.bottom },
+      originPosition,
+    );
+    const x = Math.min(topLeft.x, bottomRight.x);
+    const y = Math.min(topLeft.y, bottomRight.y);
+    const width = Math.abs(bottomRight.x - topLeft.x);
+    const height = Math.abs(bottomRight.y - topLeft.y);
+
+    if (width <= 0 || height <= 0) return undefined;
+
+    return new Phaser.Geom.Rectangle(x, y, width, height);
+  }
+
+  private async scanSectorFromButton(
+    sector: WorldSector,
+    control: SectorScanControl,
+  ) {
+    if (control.label.text === 'Scanning') return;
+
+    control.hitArea.disableInteractive();
+    control.label.setText('Scanning');
+    this.onWorldViewportLoadingChange?.(true);
+    try {
+      const world = await scanWorldSector(sector);
+      if (!this.sys.isActive()) return;
+
+      this.setWorldBodyData(world.planets, world.stars);
+      this.syncWorldPositions();
+      this.lastActiveBodiesViewportKey = '';
+      this.lastVisibilityViewportKey = '';
+      this.updateWorldVisibility();
+      this.updateSectorScanPlaceholders();
+    } catch (error) {
+      console.error('Failed to scan world sector', error);
+      if (this.sys.isActive()) {
+        control.label.setText('Retry scan');
+        control.hitArea.setInteractive({ useHandCursor: true });
+      }
+    } finally {
+      this.onWorldViewportLoadingChange?.(false);
+    }
   }
 
   toggleAlwaysVisible(name: string) {
@@ -1431,7 +1737,7 @@ export class Scene extends Phaser.Scene {
       ? [spaceshipState.position.relativeTo]
       : undefined;
     this.onWorldViewportLoadingChange?.(true);
-    const world = await refreshWorldViewport({
+    const viewportRequest = {
       x1:
         topLeft.x < bottomRight.x
           ? topLeft.x.toString()
@@ -1451,9 +1757,12 @@ export class Scene extends Phaser.Scene {
       zoom: camera.zoom,
       requiredBodyNames,
       signal,
-    }).finally(() => {
-      this.onWorldViewportLoadingChange?.(false);
-    });
+    };
+    const world = await loadWorld(viewportRequest)
+      .then(() => scanWorldSector(getSpaceshipWorldSector(), signal))
+      .finally(() => {
+        this.onWorldViewportLoadingChange?.(false);
+      });
 
     if (signal?.aborted || !this.sys.isActive()) return world;
 
@@ -1462,6 +1771,7 @@ export class Scene extends Phaser.Scene {
     this.lastActiveBodiesViewportKey = '';
     this.lastVisibilityViewportKey = '';
     this.updateWorldVisibility();
+    this.updateSectorScanPlaceholders();
     return world;
   }
 

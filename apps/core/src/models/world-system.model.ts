@@ -118,12 +118,18 @@ export class WorldSystemModel {
       requiredNames.length === 0
         ? []
         : [{ 'bodies.name': { $in: requiredNames } }];
+    const blackHoleMatch = { 'bodies.type': 'blackhole' };
 
     return (await WorldSystemModel.getModel())
       .aggregate<WorldSystemDocument>([
         {
           $match: {
-            $or: [indexedViewportMatch, legacyViewportMatch, ...requiredMatch],
+            $or: [
+              indexedViewportMatch,
+              legacyViewportMatch,
+              blackHoleMatch,
+              ...requiredMatch,
+            ],
           },
         },
         {

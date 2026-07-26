@@ -44,18 +44,6 @@ export type SimulationWorkerRequest =
         | { type: 'claim'; securityCode: string };
     }
   | {
-      type: 'refresh-viewport';
-      requestId: number;
-      viewport: {
-        x1: string;
-        y1: string;
-        x2: string;
-        y2: string;
-        zoom?: number;
-        requiredBodyNames?: string[];
-      };
-    }
-  | {
       type: 'hydrate-world';
       systems: SerializedWorldSystems;
     }
@@ -95,12 +83,6 @@ export type SimulationWorkerResponse =
       type: 'spaceship';
       requestId: number;
       spaceship: SpaceshipDto;
-      snapshot: SimulationFrameSnapshot;
-    }
-  | {
-      type: 'viewport';
-      requestId: number;
-      systems: SerializedWorldSystems;
       snapshot: SimulationFrameSnapshot;
     }
   | {

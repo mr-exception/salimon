@@ -11,8 +11,50 @@ type Props = {
   onStart: (request: BootstrapRequest) => void;
 };
 
+const KNOWN_INDEXED_DB_NAMES = [
+  'salimon-world',
+  'salimon-world-fetched-sectors',
+];
+
 function maskCode(code: string) {
   return `${code.slice(0, 4)}${'•'.repeat(Math.max(8, code.length - 8))}${code.slice(-4)}`;
+}
+
+async function deleteDatabase(name: string) {
+  return new Promise<void>((resolve, reject) => {
+    const request = indexedDB.deleteDatabase(name);
+
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+    request.onblocked = () => resolve();
+  });
+}
+
+async function deleteIndexedDatabases() {
+  const discoveredNames =
+    typeof indexedDB.databases === 'function'
+      ? (await indexedDB.databases()).flatMap((database) =>
+          database.name ? [database.name] : [],
+        )
+      : [];
+  const databaseNames = new Set([
+    ...KNOWN_INDEXED_DB_NAMES,
+    ...discoveredNames,
+  ]);
+
+  await Promise.all([...databaseNames].map(deleteDatabase));
+}
+
+async function clearLocalBrowserData() {
+  localStorage.clear();
+  sessionStorage.clear();
+
+  if ('caches' in window) {
+    const cacheNames = await caches.keys();
+    await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
+  }
+
+  await deleteIndexedDatabases();
 }
 
 export default function StartMenu({ bootstrapState, onStart }: Props) {
@@ -21,6 +63,7 @@ export default function StartMenu({ bootstrapState, onStart }: Props) {
   const [isClaimOpen, setIsClaimOpen] = useState(false);
   const [claimCode, setClaimCode] = useState('');
   const [copyLabel, setCopyLabel] = useState('Reveal & copy');
+  const [clearLabel, setClearLabel] = useState('Clear local data');
   const dialogRef = useRef<HTMLDialogElement>(null);
   const isLoading = bootstrapState === 'loading';
 
@@ -43,6 +86,25 @@ export default function StartMenu({ bootstrapState, onStart }: Props) {
   const claimShip = () => {
     const securityCode = claimCode.trim();
     if (securityCode) onStart({ type: 'claim', securityCode });
+  };
+
+  const clearData = async () => {
+    if (
+      !window.confirm(
+        'Clear local storage, session storage, IndexedDB, and browser caches for this app?',
+      )
+    ) {
+      return;
+    }
+
+    setClearLabel('Clearing');
+    try {
+      await clearLocalBrowserData();
+      window.location.reload();
+    } catch (error) {
+      console.error('Failed to clear local data', error);
+      setClearLabel('Clear failed');
+    }
   };
 
   return (
@@ -76,6 +138,14 @@ export default function StartMenu({ bootstrapState, onStart }: Props) {
             disabled={isLoading}
           >
             <span>03</span> Claim ship
+          </button>
+          <button
+            type="button"
+            className={style.dangerAction}
+            onClick={() => void clearData()}
+            disabled={isLoading}
+          >
+            <span>04</span> {clearLabel}
           </button>
         </nav>
 

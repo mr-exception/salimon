@@ -1,12 +1,11 @@
 import type { SerializedWorldSystems } from '@repo/types';
-import type { SerializedWorldBody } from '@repo/types';
 import { WorldSystemModel } from '@models';
 import type { WorldViewportOptions, WorldViewportRequest } from './types';
 
-const MIN_RENDER_SHAPE_SCREEN_WIDTH = 16;
-const MIN_RENDER_NAME_TO_SHAPE_ZOOM_RATIO = 0.01;
 const METERS_PER_LIGHT_YEAR = 9_460_730_472_580_800n;
 const MIN_VIEWPORT_SIZE = METERS_PER_LIGHT_YEAR * 10n;
+const WORLD_SECTOR_SIZE = METERS_PER_LIGHT_YEAR * 10n;
+const WORLD_SECTOR_HALF_SIZE = WORLD_SECTOR_SIZE / 2n;
 
 type ViewportRectangle = {
   left: bigint;
@@ -19,13 +18,13 @@ export async function getWorldSystems(
   request: WorldViewportRequest,
   options: WorldViewportOptions = {},
 ): Promise<SerializedWorldSystems> {
-  const viewport = getViewportRectangle(request);
+  const viewport =
+    getSectorViewportRectangle(request) ?? getViewportRectangle(request);
   const requiredBodyNames = new Set(options.requiredBodyNames);
 
   parseRequiredBodyNames(request.requiredBodyNames).forEach((bodyName) =>
     requiredBodyNames.add(bodyName),
   );
-  const zoom = parseZoom(request.zoom);
 
   const visibleSystems = await WorldSystemModel.findSystemsInViewport(
     viewport,
@@ -33,13 +32,7 @@ export async function getWorldSystems(
   );
 
   return {
-    systems: visibleSystems
-      .map((system) =>
-        system.bodies.filter((body) =>
-          shouldTransmitBody(body, zoom, requiredBodyNames),
-        ),
-      )
-      .filter((system) => system.length > 0),
+    systems: visibleSystems.map((system) => system.bodies),
   };
 }
 
@@ -65,6 +58,38 @@ function getViewportRectangle(
     top: y1 < y2 ? y1 : y2,
     bottom: y1 > y2 ? y1 : y2,
   });
+}
+
+function getSectorViewportRectangle(
+  request: WorldViewportRequest,
+): ViewportRectangle | undefined {
+  if (request.sectorX === undefined && request.sectorY === undefined) {
+    return undefined;
+  }
+
+  const sectorX = parseSectorCoordinate(request.sectorX, 'sectorX');
+  const sectorY = parseSectorCoordinate(request.sectorY, 'sectorY');
+  const left = BigInt(sectorX) * WORLD_SECTOR_SIZE - WORLD_SECTOR_HALF_SIZE;
+  const top = BigInt(sectorY) * WORLD_SECTOR_SIZE - WORLD_SECTOR_HALF_SIZE;
+
+  return {
+    left,
+    right: left + WORLD_SECTOR_SIZE,
+    top,
+    bottom: top + WORLD_SECTOR_SIZE,
+  };
+}
+
+function parseSectorCoordinate(
+  value: string | number | undefined,
+  name: string,
+) {
+  const parsed = typeof value === 'number' ? value : Number(value);
+  if (!Number.isInteger(parsed)) {
+    throw new Error(`${name} must be an integer`);
+  }
+
+  return parsed;
 }
 
 function enforceMinimumViewportSize(
@@ -102,42 +127,4 @@ function parseRequiredBodyNames(requiredBodyNames: string | string[] = []) {
     .flatMap((value) => value.split(','))
     .map((bodyName) => bodyName.trim())
     .filter(Boolean);
-}
-
-function parseZoom(zoom: string | number | undefined) {
-  if (zoom === undefined) return undefined;
-
-  const value = typeof zoom === 'number' ? zoom : Number(zoom);
-  if (!Number.isFinite(value) || value <= 0) {
-    throw new Error('zoom must be a positive number');
-  }
-
-  return value;
-}
-
-function shouldTransmitBody(
-  body: SerializedWorldBody,
-  zoom: number | undefined,
-  requiredBodyNames: ReadonlySet<string>,
-) {
-  if (body.type === 'star' || zoom === undefined) return true;
-  if (requiredBodyNames.has(body.name)) return true;
-
-  return zoom >= getMinZoomRenderName(body);
-}
-
-function getMinZoomRenderShape(body: SerializedWorldBody) {
-  if (body.minZoomRenderShape !== undefined) return body.minZoomRenderShape;
-
-  const radius = Number(body.radius);
-  if (!Number.isFinite(radius) || radius <= 0) return 0;
-
-  return MIN_RENDER_SHAPE_SCREEN_WIDTH / 2 / radius;
-}
-
-function getMinZoomRenderName(body: SerializedWorldBody) {
-  if (body.minZoomRenderName !== undefined) return body.minZoomRenderName;
-  if (body.renderZoomLevel !== undefined) return body.renderZoomLevel;
-
-  return getMinZoomRenderShape(body) * MIN_RENDER_NAME_TO_SHAPE_ZOOM_RATIO;
 }

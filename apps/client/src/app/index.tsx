@@ -30,6 +30,10 @@ export default function App() {
   const [isCommunicationsOpen, setIsCommunicationsOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMeasuring, setIsMeasuring] = useState(false);
+  const [
+    isMeasurementRelativeToSpaceship,
+    setIsMeasurementRelativeToSpaceship,
+  ] = useState(false);
   const [isRulerActive, setIsRulerActive] = useState(false);
   const [initialCommunicationContactId, setInitialCommunicationContactId] =
     useState<string>();
@@ -162,6 +166,7 @@ export default function App() {
     <div className={style.app}>
       <Navigator
         isMeasuring={isMeasuring}
+        isMeasurementRelativeToSpaceship={isMeasurementRelativeToSpaceship}
         isRulerActive={isRulerActive}
         isSearchOpen={isSearchOpen}
         onSceneChange={handleSceneChange}
@@ -173,10 +178,14 @@ export default function App() {
       <Footer
         isEngineRunning={isEngineRunning}
         isMeasuring={isMeasuring}
+        isMeasurementRelativeToSpaceship={isMeasurementRelativeToSpaceship}
         isRulerActive={isRulerActive}
         onStartThrusters={startThrusters}
         onStopEngines={stopEngines}
         onToggleMeasuring={() => setIsMeasuring((active) => !active)}
+        onMeasurementRelativeToSpaceshipChange={
+          setIsMeasurementRelativeToSpaceship
+        }
         onToggleRuler={() => setIsRulerActive((active) => !active)}
         onOpenCommunications={openCommunications}
         onOpenCommunicationThread={openCommunicationThread}

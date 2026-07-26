@@ -1,13 +1,13 @@
 import { randomUUID } from 'node:crypto';
 import { ContactMessageModel, type ContactMessageDocument } from '@models';
-import { CONTACTS, EASA_CHIEF_ID } from '../contacts.service';
-import { CHIEF_INSTRUCTIONS, MAX_CONTEXT_MESSAGES } from './constants';
+import { CONTACTS } from '../contacts.service';
+import { buildContactInstructions, MAX_CONTEXT_MESSAGES } from './constants';
 import { getOpenAI } from './openai';
 import type { ReplyJob } from './types';
 
 export async function generateContactReply(job: ReplyJob) {
   const profile = CONTACTS[job.contactId as keyof typeof CONTACTS];
-  if (!profile || job.contactId !== EASA_CHIEF_ID) {
+  if (!profile) {
     throw new Error(`Unknown contact ${job.contactId}`);
   }
 
@@ -33,10 +33,12 @@ export async function generateContactReply(job: ReplyJob) {
 
   const response = await getOpenAI().responses.create({
     model: process.env.OPENAI_MODEL ?? 'gpt-5.4-mini',
-    instructions: CHIEF_INSTRUCTIONS,
+    instructions: buildContactInstructions(profile),
     input: history.reverse().map((message) => ({
       role:
-        message.sender === 'player' ? ('user' as const) : ('assistant' as const),
+        message.sender === 'player'
+          ? ('user' as const)
+          : ('assistant' as const),
       content: message.text,
     })),
     max_output_tokens: 400,
@@ -59,4 +61,3 @@ export async function generateContactReply(job: ReplyJob) {
   await ContactMessageModel.updateStatus(playerMessage._id, 'sent');
   return reply;
 }
-

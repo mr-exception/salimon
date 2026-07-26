@@ -35,7 +35,9 @@ export async function getInfo(request: Request, response: Response) {
         ]);
         return [
           {
-            ...profile,
+            id: profile.id,
+            name: profile.name,
+            organization: profile.organization,
             unreadCount,
             lastMessageAt: latestMessage?.createdAt.toISOString(),
           },

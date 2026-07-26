@@ -9,6 +9,7 @@ import { sendMessage } from './send-message';
 import { toMessageDto } from './to-message-dto';
 
 export { CONTACTS, EASA_CHIEF_ID, INITIAL_CHIEF_MESSAGE };
+export type { ContactProfile } from './constants';
 
 export type { ContactDocument } from '@models';
 export type {
@@ -28,4 +29,3 @@ export class ContactsService {
   static parseSendMessageRequest = parseSendMessageRequest;
   static sendMessage = sendMessage;
 }
-

@@ -14,6 +14,7 @@ import {
 } from './world';
 
 const STORAGE_KEY = 'salimon.spaceship';
+const SHIP_SECRET_TOKEN_STORAGE_KEY = 'salimon.shipSecretToken';
 export const SECURITY_CODE_HEADER = 'x-spaceship-security-code';
 const DEFAULT_API_BASE_URL = 'http://localhost:3000';
 
@@ -72,8 +73,19 @@ function storeSpaceship(spaceship: SpaceshipDto) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(spaceship));
 }
 
-export function getStoredSpaceshipSecurityCode() {
+function readStoredShipSecretToken() {
+  const storedToken = localStorage.getItem(SHIP_SECRET_TOKEN_STORAGE_KEY);
+  if (storedToken) return storedToken;
+
   return readStoredSpaceship()?.securityCode;
+}
+
+function storeShipSecretToken(securityCode: string) {
+  localStorage.setItem(SHIP_SECRET_TOKEN_STORAGE_KEY, securityCode);
+}
+
+export function getStoredSpaceshipSecurityCode() {
+  return readStoredShipSecretToken();
 }
 
 async function getSpaceshipFromRest(securityCode: string) {
@@ -92,11 +104,13 @@ function initializeSpaceship(request: BootstrapRequest) {
     const workerRequest =
       request.type === 'continue'
         ? (() => {
-            const stored = readStoredSpaceship();
-            if (!stored) throw new Error('No stored spaceship is available');
+            const securityCode = readStoredShipSecretToken();
+            if (!securityCode) {
+              throw new Error('No stored spaceship is available');
+            }
             return {
               type: 'continue' as const,
-              securityCode: stored.securityCode,
+              securityCode,
             };
           })()
         : request;
@@ -112,9 +126,9 @@ function initializeSpaceship(request: BootstrapRequest) {
     if (request.type === 'claim') {
       return getSpaceshipFromRest(request.securityCode.trim());
     }
-    const stored = readStoredSpaceship();
-    if (!stored) throw new Error('No stored spaceship is available');
-    return getSpaceshipFromRest(stored.securityCode);
+    const securityCode = readStoredShipSecretToken();
+    if (!securityCode) throw new Error('No stored spaceship is available');
+    return getSpaceshipFromRest(securityCode);
   })().then(async (spaceship) => {
     await applySpaceshipInfo(spaceship);
     return spaceship;
@@ -155,7 +169,7 @@ async function persistSpaceshipSnapshot() {
     },
   );
   currentSpaceship = data.spaceship;
-  storeSpaceship(snapshot);
+  storeSpaceship(data.spaceship);
 }
 
 export async function saveSpaceship() {
@@ -173,6 +187,7 @@ export async function saveSpaceship() {
       },
     );
     currentSpaceship = data.spaceship;
+    storeShipSecretToken(data.spaceship.securityCode);
     storeSpaceship(data.spaceship);
     return data.spaceship;
   } catch (error) {

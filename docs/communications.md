@@ -33,11 +33,18 @@ After this introduction, the player can continue talking to the Chief.
 
 Every contact has a server-owned NPC profile containing:
 
-- Identity, role, and organization.
-- Speaking style and behavioral constraints.
-- Private lore known to that NPC.
+- Public identity: ID, display name, and organization.
+- Private role, background, goal in the world, personality, and speaking style.
 - Public game canon the NPC must not contradict.
+- Unknowns the NPC must not answer with false certainty.
+- Boundaries that prevent the NPC from changing game state or leaving the
+  fiction.
 - Story facts the NPC may reveal only after their unlock conditions are met.
+
+NPC contacts are not normal helpful chatbots. Each one lives inside Salimon and
+answers as that character, using their own motives, knowledge, pressure, and
+voice. Out-of-world information does not matter to them unless it can be handled
+in character as confusion, rumor, or irrelevant noise.
 
 The backend generates NPC replies with the OpenAI Responses API. The browser
 must never call OpenAI directly. For every reply, the backend supplies the NPC

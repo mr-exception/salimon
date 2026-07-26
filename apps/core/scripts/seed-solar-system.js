@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const MIN_RENDER_SHAPE_SCREEN_WIDTH = 16;
+const MIN_RENDER_NAME_TO_SHAPE_ZOOM_RATIO = 0.01;
 const SYSTEMS_COLLECTION_NAME = 'systems';
 const SOLAR_SYSTEM_FILE = path.resolve(__dirname, '../data/solar-system.json');
 
@@ -55,10 +56,16 @@ async function main() {
 }
 
 function withMinZoomRenderShape(body) {
+  const minZoomRenderShape =
+    body.minZoomRenderShape ?? getMinZoomRenderShape(body.radius);
+
   return {
     ...body,
-    minZoomRenderShape:
-      body.minZoomRenderShape ?? getMinZoomRenderShape(body.radius),
+    minZoomRenderShape,
+    minZoomRenderName:
+      body.minZoomRenderName ??
+      body.renderZoomLevel ??
+      minZoomRenderShape * MIN_RENDER_NAME_TO_SHAPE_ZOOM_RATIO,
   };
 }
 

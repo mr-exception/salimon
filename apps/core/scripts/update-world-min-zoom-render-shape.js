@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const MIN_RENDER_SHAPE_SCREEN_WIDTH = 16;
+const MIN_RENDER_NAME_TO_SHAPE_ZOOM_RATIO = 0.01;
 const BODY_COLLECTIONS = ['planets', 'moons', 'stars'];
 
 function minZoomExpression(radiusExpression) {
@@ -22,11 +23,21 @@ function minZoomExpression(radiusExpression) {
   };
 }
 
+function minNameZoomExpression(radiusExpression) {
+  return {
+    $multiply: [
+      minZoomExpression(radiusExpression),
+      MIN_RENDER_NAME_TO_SHAPE_ZOOM_RATIO,
+    ],
+  };
+}
+
 async function updateBodyCollection(db, collectionName) {
   const result = await db.collection(collectionName).updateMany({}, [
     {
       $set: {
         minZoomRenderShape: minZoomExpression('$radius'),
+        minZoomRenderName: minNameZoomExpression('$radius'),
       },
     },
   ]);
@@ -51,6 +62,7 @@ async function updateSystemsCollection(db) {
                 '$$body',
                 {
                   minZoomRenderShape: minZoomExpression('$$body.radius'),
+                  minZoomRenderName: minNameZoomExpression('$$body.radius'),
                 },
               ],
             },

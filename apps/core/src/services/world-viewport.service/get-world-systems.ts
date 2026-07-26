@@ -4,6 +4,7 @@ import { WorldSystemModel } from '@models';
 import type { WorldViewportOptions, WorldViewportRequest } from './types';
 
 const MIN_RENDER_SHAPE_SCREEN_WIDTH = 16;
+const MIN_RENDER_NAME_TO_SHAPE_ZOOM_RATIO = 0.01;
 const METERS_PER_LIGHT_YEAR = 9_460_730_472_580_800n;
 const MIN_VIEWPORT_SIZE = METERS_PER_LIGHT_YEAR * 10n;
 
@@ -122,7 +123,7 @@ function shouldTransmitBody(
   if (body.type === 'star' || zoom === undefined) return true;
   if (requiredBodyNames.has(body.name)) return true;
 
-  return zoom >= getMinZoomRenderShape(body);
+  return zoom >= getMinZoomRenderName(body);
 }
 
 function getMinZoomRenderShape(body: SerializedWorldBody) {
@@ -132,4 +133,11 @@ function getMinZoomRenderShape(body: SerializedWorldBody) {
   if (!Number.isFinite(radius) || radius <= 0) return 0;
 
   return MIN_RENDER_SHAPE_SCREEN_WIDTH / 2 / radius;
+}
+
+function getMinZoomRenderName(body: SerializedWorldBody) {
+  if (body.minZoomRenderName !== undefined) return body.minZoomRenderName;
+  if (body.renderZoomLevel !== undefined) return body.renderZoomLevel;
+
+  return getMinZoomRenderShape(body) * MIN_RENDER_NAME_TO_SHAPE_ZOOM_RATIO;
 }

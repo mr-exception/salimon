@@ -54,6 +54,9 @@ class WorldBodySchema {
   public minZoomRenderShape?: number;
 
   @prop({ type: () => Number })
+  public minZoomRenderName?: number;
+
+  @prop({ type: () => Number })
   public rotationPeriodSeconds?: number;
 
   @prop({ required: true, type: () => Date })
@@ -113,6 +116,7 @@ export class WorldBodyModel {
       mass: 1,
       radius: 1,
       minZoomRenderShape: 1,
+      minZoomRenderName: 1,
       rotationPeriodSeconds: 1,
       updatedAt: 1,
     };
@@ -146,6 +150,7 @@ export class WorldBodyModel {
       mass: 1,
       radius: 1,
       minZoomRenderShape: 1,
+      minZoomRenderName: 1,
       rotationPeriodSeconds: 1,
       updatedAt: 1,
     };

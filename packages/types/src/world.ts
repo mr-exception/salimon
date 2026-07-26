@@ -41,8 +41,9 @@ export type Planet = OrbitingBody &
     color: number;
     variant: number;
     minZoomRenderShape: number;
+    minZoomRenderName: number;
     shapeRenderZoomLevel?: number;
-    renderZoomLevel: number;
+    renderZoomLevel?: number;
   };
 
 export type Star = OrbitingBody &
@@ -50,8 +51,9 @@ export type Star = OrbitingBody &
     color: number;
     variant: number;
     minZoomRenderShape: number;
+    minZoomRenderName: number;
     shapeRenderZoomLevel?: number;
-    renderZoomLevel: number;
+    renderZoomLevel?: number;
   };
 
 export type Spaceship = Omit<OrbitingBody, 'cTime'> & {

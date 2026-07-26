@@ -74,9 +74,8 @@ const PROXIMITY_TELEMETRY_RANGE_METERS = 3_000_000;
 const FREE_FLIGHT_BODY_RADIUS_CLEARANCE_RATIO = 0.2;
 const DEFAULT_API_BASE_URL = 'http://localhost:3000';
 export const WORLD_VIEWPORT_REFRESH_INTERVAL_MS = 5 * 60 * 1_000;
-const DEFAULT_PLANET_RENDER_ZOOM_LEVEL = 0.0000001;
-const DEFAULT_STAR_RENDER_ZOOM_LEVEL = 0.00000000001;
 const MIN_RENDER_SHAPE_SCREEN_WIDTH = 16;
+const MIN_RENDER_NAME_TO_SHAPE_ZOOM_RATIO = 0.01;
 const TARGET_VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.1;
 const PLANET_COLORS = [
   0x60a5fa, 0x34d399, 0xf59e0b, 0xf97316, 0xa78bfa, 0x94a3b8, 0x22d3ee,
@@ -1722,11 +1721,22 @@ function deserializeBody<T extends Body>(
     speed: string;
     cTime?: number | string;
     minZoomRenderShape?: number;
+    minZoomRenderName?: number;
     shapeRenderZoomLevel?: number;
+    renderZoomLevel?: number;
   },
-  defaults: Partial<T> & { minZoomRenderShape?: number } = {},
+  defaults: Partial<T> & {
+    minZoomRenderShape?: number;
+    minZoomRenderName?: number;
+    renderZoomLevel?: number;
+  } = {},
 ): T {
   const radius = BigInt(body.radius);
+  const minZoomRenderShape =
+    body.minZoomRenderShape ??
+    body.shapeRenderZoomLevel ??
+    defaults.minZoomRenderShape ??
+    getMinZoomRenderShape(radius);
 
   return {
     ...defaults,
@@ -1740,11 +1750,13 @@ function deserializeBody<T extends Body>(
     radius,
     mass: BigInt(body.mass),
     speed: BigInt(body.speed),
-    minZoomRenderShape:
-      body.minZoomRenderShape ??
-      body.shapeRenderZoomLevel ??
-      defaults.minZoomRenderShape ??
-      getMinZoomRenderShape(radius),
+    minZoomRenderShape,
+    minZoomRenderName:
+      body.minZoomRenderName ??
+      body.renderZoomLevel ??
+      defaults.minZoomRenderName ??
+      defaults.renderZoomLevel ??
+      getMinZoomRenderName(minZoomRenderShape),
   } as T;
 }
 
@@ -1754,7 +1766,6 @@ function getPlanetVisualDefaults(name: string): Partial<Planet> {
   return {
     color: isEarth ? 0x3b82f6 : pickColor(name, PLANET_COLORS),
     variant: isEarth ? 0 : pickIndex(name, 10),
-    renderZoomLevel: DEFAULT_PLANET_RENDER_ZOOM_LEVEL,
     rotationDegrees: 0,
     rotationPeriodSeconds: 86_400,
   };
@@ -1766,10 +1777,13 @@ function getStarVisualDefaults(name: string): Partial<Star> {
   return {
     color: isSun ? 0xfacc15 : pickColor(name, STAR_COLORS),
     variant: isSun ? 0 : pickIndex(name, 4),
-    renderZoomLevel: DEFAULT_STAR_RENDER_ZOOM_LEVEL,
     rotationDegrees: 0,
     rotationPeriodSeconds: 2_160_000,
   };
+}
+
+function getMinZoomRenderName(minZoomRenderShape: number) {
+  return minZoomRenderShape * MIN_RENDER_NAME_TO_SHAPE_ZOOM_RATIO;
 }
 
 function pickColor(name: string, colors: number[]) {

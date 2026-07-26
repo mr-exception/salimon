@@ -24,6 +24,8 @@ const EARTH_RADIUS_METERS = 6_371_000;
 const DEFAULT_STAR_ORBITAL_SPEED = '220000';
 const DEFAULT_PLANET_ORBITAL_SPEED = '30000';
 const DEFAULT_ROTATION_PERIOD_SECONDS = 86_164.1;
+const MIN_RENDER_SHAPE_SCREEN_WIDTH = 16;
+const MIN_RENDER_NAME_TO_SHAPE_ZOOM_RATIO = 0.01;
 const GALACTIC_CENTER = {
   type: 'blackhole',
   name: 'Sagittarius A*',
@@ -545,13 +547,15 @@ async function createWorldSystemWriter({ generatedAt }) {
     await systemsCollection.bulkWrite(
       systems.map((system) => {
         const name = getSystemName(system);
+        const bodies = system.map(withRenderZoomFields);
+
         return {
           replaceOne: {
             filter: { name },
             replacement: {
               name,
               primaryPosition: getPrimaryPosition(system),
-              bodies: system,
+              bodies,
               generatedAt,
               updatedAt: new Date(),
             },
@@ -716,6 +720,20 @@ function getOrCreateSystem(systemsByHost, hostName, createSystem) {
   return systemsByHost.get(key);
 }
 
+function withRenderZoomFields(body) {
+  const minZoomRenderShape =
+    body.minZoomRenderShape ?? getMinZoomRenderShape(body.radius);
+
+  return {
+    ...body,
+    minZoomRenderShape,
+    minZoomRenderName:
+      body.minZoomRenderName ??
+      body.renderZoomLevel ??
+      getMinZoomRenderName(minZoomRenderShape),
+  };
+}
+
 function createStar({
   name,
   isReal = true,
@@ -725,6 +743,11 @@ function createStar({
   massSolar,
   radiusSolar,
 }) {
+  const radius = toPositiveIntegerString(
+    (radiusSolar ?? 1) * SOLAR_RADIUS_METERS,
+  );
+  const minZoomRenderShape = getMinZoomRenderShape(radius);
+
   return {
     type: 'star',
     name,
@@ -734,7 +757,9 @@ function createStar({
     clockwise: false,
     speed: DEFAULT_STAR_ORBITAL_SPEED,
     mass: toPositiveIntegerString((massSolar ?? 1) * SOLAR_MASS_KG),
-    radius: toPositiveIntegerString((radiusSolar ?? 1) * SOLAR_RADIUS_METERS),
+    radius,
+    minZoomRenderShape,
+    minZoomRenderName: getMinZoomRenderName(minZoomRenderShape),
     rotationPeriodSeconds: DEFAULT_ROTATION_PERIOD_SECONDS,
     positionCapturedAt: Date.now(),
   };
@@ -755,6 +780,11 @@ function createPlanet({
   );
   const angle = seededAngle(name);
 
+  const radius = toPositiveIntegerString(
+    (radiusEarth ?? 1) * EARTH_RADIUS_METERS,
+  );
+  const minZoomRenderShape = getMinZoomRenderShape(radius);
+
   return {
     type: 'planet',
     name,
@@ -768,13 +798,26 @@ function createPlanet({
     clockwise: false,
     speed: DEFAULT_PLANET_ORBITAL_SPEED,
     mass: toPositiveIntegerString((massEarth ?? 1) * EARTH_MASS_KG),
-    radius: toPositiveIntegerString((radiusEarth ?? 1) * EARTH_RADIUS_METERS),
+    radius,
+    minZoomRenderShape,
+    minZoomRenderName: getMinZoomRenderName(minZoomRenderShape),
     rotationPeriodSeconds:
       orbitalPeriodDays === null
         ? DEFAULT_ROTATION_PERIOD_SECONDS
         : orbitalPeriodDays * 86_400,
     positionCapturedAt: Date.now(),
   };
+}
+
+function getMinZoomRenderShape(radius) {
+  const radiusNumber = Number(radius);
+  if (!Number.isFinite(radiusNumber) || radiusNumber <= 0) return 0;
+
+  return MIN_RENDER_SHAPE_SCREEN_WIDTH / 2 / radiusNumber;
+}
+
+function getMinZoomRenderName(minZoomRenderShape) {
+  return minZoomRenderShape * MIN_RENDER_NAME_TO_SHAPE_ZOOM_RATIO;
 }
 
 function getGalactocentricPosition(raDegrees, decDegrees, distanceParsecs) {

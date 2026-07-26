@@ -1185,9 +1185,8 @@ export class Scene extends Phaser.Scene {
       star.setNameLabelVisible(
         star.visible &&
           (this.alwaysVisibleBodies.has(star.star.name) ||
-            viewportLabelMode === 'force' ||
-            (viewportLabelMode === 'zoom' &&
-              zoom >= star.star.renderZoomLevel)),
+            (zoom >= star.star.minZoomRenderName &&
+              (viewportLabelMode === 'force' || viewportLabelMode === 'zoom'))),
       );
     });
 
@@ -1195,9 +1194,8 @@ export class Scene extends Phaser.Scene {
       planet.setNameLabelVisible(
         planet.visible &&
           (this.alwaysVisibleBodies.has(planet.planet.name) ||
-            viewportLabelMode === 'force' ||
-            (viewportLabelMode === 'zoom' &&
-              zoom >= planet.planet.renderZoomLevel)),
+            (zoom >= planet.planet.minZoomRenderName &&
+              (viewportLabelMode === 'force' || viewportLabelMode === 'zoom'))),
       );
     });
   }
@@ -1270,7 +1268,7 @@ export class Scene extends Phaser.Scene {
     const viewport = camera.worldView;
     const planets = this.planetData
       .filter((body) => {
-        if (!this.shouldRenderPlanetShape(body, camera.zoom)) return false;
+        if (!this.shouldRenderPlanetInViewport(body, camera.zoom)) return false;
 
         const position = bodyPositionByName.get(body.name);
         if (!position) return false;
@@ -1309,6 +1307,12 @@ export class Scene extends Phaser.Scene {
 
   private shouldRenderPlanetShape(body: PlanetData, zoom: number) {
     return body.type === 'blackhole' || zoom >= body.minZoomRenderShape;
+  }
+
+  private shouldRenderPlanetInViewport(body: PlanetData, zoom: number) {
+    return (
+      this.shouldRenderPlanetShape(body, zoom) || zoom >= body.minZoomRenderName
+    );
   }
 
   private bodyBoundsIntersectViewport(

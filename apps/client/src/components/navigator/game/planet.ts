@@ -101,10 +101,13 @@ export class Planet extends Phaser.GameObjects.Container {
     const shapeVisible =
       this.isBlackHole() ||
       (zoom >= this.planet.minZoomRenderShape && intersectsViewport);
+    const labelVisible =
+      alwaysVisible ||
+      (zoom >= this.planet.minZoomRenderName &&
+        (viewportLabelMode === 'force' || viewportLabelMode === 'zoom'));
 
     const bodyVisible =
-      intersectsViewport &&
-      (shapeVisible || alwaysVisible || viewportLabelMode === 'force');
+      intersectsViewport && (shapeVisible || alwaysVisible || labelVisible);
 
     this.setVisible(bodyVisible);
     if (!bodyVisible) return;
@@ -134,11 +137,7 @@ export class Planet extends Phaser.GameObjects.Container {
         );
       }
     }
-    this.label.setVisible(
-      alwaysVisible ||
-        viewportLabelMode === 'force' ||
-        (viewportLabelMode === 'zoom' && zoom >= this.planet.renderZoomLevel),
-    );
+    this.label.setVisible(labelVisible);
     this.label.setScale(1 / zoom);
     this.label.setY(-visibleRadius - LABEL_SCREEN_GAP / zoom);
   }

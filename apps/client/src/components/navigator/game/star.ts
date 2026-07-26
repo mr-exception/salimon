@@ -83,9 +83,14 @@ export class Star extends Phaser.GameObjects.Container {
       zoom >= this.star.minZoomRenderShape && intersectsViewport;
     const glowVisible =
       zoom < this.star.minZoomRenderShape && intersectsViewport;
+    const labelVisible =
+      alwaysVisible ||
+      (zoom >= this.star.minZoomRenderName &&
+        (viewportLabelMode === 'force' || viewportLabelMode === 'zoom'));
 
     const bodyVisible =
-      intersectsViewport && (glowVisible || shapeVisible || alwaysVisible);
+      intersectsViewport &&
+      (glowVisible || shapeVisible || alwaysVisible || labelVisible);
 
     this.setVisible(bodyVisible);
     if (!bodyVisible) return;
@@ -94,11 +99,7 @@ export class Star extends Phaser.GameObjects.Container {
     this.glowGraphics.setScale(1 / zoom);
     this.starGraphics.setVisible(shapeVisible);
     this.patternImage.setVisible(shapeVisible);
-    this.label.setVisible(
-      alwaysVisible ||
-        viewportLabelMode === 'force' ||
-        (viewportLabelMode === 'zoom' && zoom >= this.star.renderZoomLevel),
-    );
+    this.label.setVisible(labelVisible);
     this.label.setScale(1 / zoom);
     this.label.setY(-radius - LABEL_SCREEN_GAP / zoom);
   }

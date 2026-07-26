@@ -764,8 +764,8 @@
   display: grid;
   grid-template-columns:
     minmax(70px, 0.8fr) minmax(110px, 1.1fr) minmax(180px, 1.7fr)
-    minmax(80px, 0.8fr);
-  width: min(560px, 100%);
+    minmax(110px, 0.8fr);
+  width: min(590px, 100%);
   margin: 0;
   padding: 10px 0;
   border: 1px solid

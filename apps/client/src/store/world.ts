@@ -21,6 +21,11 @@ import {
   WorldService,
   type Vector,
 } from '@repo/world';
+import type {
+  SimulationFrameSnapshot,
+  SimulationWorkerRequest,
+  SimulationWorkerResponse,
+} from './world-simulation-protocol';
 
 type Body = Planet | Spaceship | Star;
 type SerializedVisiblePlanetBody = SerializedBody<Planet> & {
@@ -261,6 +266,31 @@ let worldElapsedSeconds = 0;
 let worldViewportLoader: WorldViewportLoader | undefined;
 let activeWorldBodyNames: ReadonlySet<string> | undefined;
 let activeWorldBodies: (Planet | Star)[] | undefined;
+let simulationWorker: Worker | undefined;
+let simulationWorkerFailed = false;
+let simulationAdvancePending = false;
+let simulationAdvanceRequestId = 0;
+let simulationRequestId = 0;
+const pendingViewportRequests = new Map<
+  number,
+  {
+    resolve: (world: World) => void;
+    reject: (error: Error) => void;
+  }
+>();
+const pendingSpaceshipRequests = new Map<
+  number,
+  {
+    resolve: (spaceship: SpaceshipDto) => void;
+    reject: (error: Error) => void;
+  }
+>();
+let latestSimulationSnapshot:
+  | Pick<SimulationFrameSnapshot, 'proximityTelemetry' | 'activeThrustVector'>
+  | undefined;
+
+const isBrowserMainThread =
+  typeof window !== 'undefined' && typeof Worker !== 'undefined';
 
 type WorldViewportRequest = {
   x1: string;
@@ -274,6 +304,86 @@ type WorldViewportRequest = {
 
 export function setWorldViewportLoader(loader?: WorldViewportLoader) {
   worldViewportLoader = loader;
+}
+
+function getSimulationWorker() {
+  if (!isBrowserMainThread || simulationWorkerFailed) return undefined;
+  if (simulationWorker) return simulationWorker;
+
+  try {
+    simulationWorker = new Worker(
+      new URL('./world-simulation.worker.ts', import.meta.url),
+      { type: 'module' },
+    );
+    simulationWorker.onmessage = (
+      event: MessageEvent<SimulationWorkerResponse>,
+    ) => {
+      const message = event.data;
+      if (message.type === 'error') {
+        console.error('World simulation worker error', message.message);
+        rejectPendingSimulationRequests(new Error(message.message));
+        simulationWorkerFailed = true;
+        simulationAdvancePending = false;
+        simulationWorker?.terminate();
+        simulationWorker = undefined;
+        return;
+      }
+
+      if (message.type === 'viewport') {
+        applyWorldSystems(message.systems, false);
+        applySimulationFrameSnapshot(message.snapshot);
+        const pending = pendingViewportRequests.get(message.requestId);
+        pendingViewportRequests.delete(message.requestId);
+        pending?.resolve(worldState);
+        return;
+      }
+
+      if (message.type === 'spaceship') {
+        hydrateSpaceship(message.spaceship, false);
+        applySimulationFrameSnapshot(message.snapshot);
+        const pending = pendingSpaceshipRequests.get(message.requestId);
+        pendingSpaceshipRequests.delete(message.requestId);
+        pending?.resolve(message.spaceship);
+        return;
+      }
+
+      applySimulationFrameSnapshot(message.snapshot);
+      if (
+        message.requestId !== undefined &&
+        message.requestId === simulationAdvanceRequestId
+      ) {
+        simulationAdvancePending = false;
+      }
+    };
+    simulationWorker.onerror = (event) => {
+      console.error('World simulation worker failed', event.message);
+      rejectPendingSimulationRequests(new Error(event.message));
+      simulationWorkerFailed = true;
+      simulationAdvancePending = false;
+      simulationWorker?.terminate();
+      simulationWorker = undefined;
+    };
+  } catch (error) {
+    console.error('Failed to start world simulation worker', error);
+    simulationWorkerFailed = true;
+  }
+
+  return simulationWorker;
+}
+
+function postSimulationMessage(message: SimulationWorkerRequest) {
+  getSimulationWorker()?.postMessage(message);
+}
+
+function invalidateLatestSimulationSnapshot() {
+  latestSimulationSnapshot = undefined;
+}
+
+function rejectPendingSimulationRequests(error: Error) {
+  pendingViewportRequests.forEach((pending) => pending.reject(error));
+  pendingViewportRequests.clear();
+  pendingSpaceshipRequests.forEach((pending) => pending.reject(error));
+  pendingSpaceshipRequests.clear();
 }
 
 export async function loadWorld(request: WorldViewportRequest) {
@@ -304,12 +414,55 @@ export async function refreshWorldViewport({
     ...(zoom === undefined ? {} : { zoom }),
     ...(requiredBodyNames === undefined ? {} : { requiredBodyNames }),
   };
+  const worker = worldViewportLoader ? undefined : getSimulationWorker();
+  if (worker) {
+    const requestId = ++simulationRequestId;
+    const promise = new Promise<World>((resolve, reject) => {
+      pendingViewportRequests.set(requestId, { resolve, reject });
+      signal?.addEventListener(
+        'abort',
+        () => {
+          pendingViewportRequests.delete(requestId);
+          reject(new DOMException('Request aborted', 'AbortError'));
+        },
+        { once: true },
+      );
+    });
+    worker.postMessage({
+      type: 'refresh-viewport',
+      requestId,
+      viewport: request,
+    } satisfies SimulationWorkerRequest);
+    return promise;
+  }
+
   const data = worldViewportLoader
     ? await worldViewportLoader(request)
     : await loadWorldViewportFromRest({ ...request, signal });
 
   applyWorldSystems(data);
   return worldState;
+}
+
+export function initializeSpaceshipInSimulation(
+  request:
+    | { type: 'new' }
+    | { type: 'continue'; securityCode: string }
+    | { type: 'claim'; securityCode: string },
+) {
+  const worker = getSimulationWorker();
+  if (!worker) return undefined;
+
+  const requestId = ++simulationRequestId;
+  const promise = new Promise<SpaceshipDto>((resolve, reject) => {
+    pendingSpaceshipRequests.set(requestId, { resolve, reject });
+  });
+  worker.postMessage({
+    type: 'initialize-spaceship',
+    requestId,
+    request,
+  } satisfies SimulationWorkerRequest);
+  return promise;
 }
 
 async function loadWorldViewportFromRest({
@@ -349,7 +502,83 @@ export function subscribeToWorld(listener: WorldListener) {
   };
 }
 
-function applyWorldSystems(data: SerializedWorldSystems) {
+export function getSimulationFrameSnapshot(): SimulationFrameSnapshot {
+  const velocity = getSpaceshipWorldVelocity();
+  const activeThrustVector = getSpaceshipActiveThrustVector();
+
+  return {
+    elapsedSeconds: worldElapsedSeconds,
+    bodyPositions: getActiveWorldBodies().map((body) => ({
+      name: body.name,
+      x: body.position.x,
+      y: body.position.y,
+    })),
+    spaceship: {
+      x: spaceshipState.position.x,
+      y: spaceshipState.position.y,
+      relativeTo: spaceshipState.position.relativeTo,
+      heading: spaceshipState.heading,
+      speed: spaceshipState.speed,
+      velocity,
+      attachedBodyName: spaceshipAttachedBodyName,
+    },
+    motionState: store.get(spaceshipMotionStateAtom),
+    activeFeature: store.get(spaceshipActiveFeatureAtom),
+    absoluteSpeed: Math.hypot(velocity.x, velocity.y),
+    proximityTelemetry: getSpaceshipProximityTelemetry(),
+    activeThrustVector,
+  };
+}
+
+function applySimulationFrameSnapshot(snapshot: SimulationFrameSnapshot) {
+  worldElapsedSeconds = snapshot.elapsedSeconds;
+  latestSimulationSnapshot = {
+    proximityTelemetry: snapshot.proximityTelemetry,
+    activeThrustVector: snapshot.activeThrustVector,
+  };
+
+  const changedBodyNames = new Set<string>();
+  snapshot.bodyPositions.forEach(({ name, x, y }) => {
+    const body = getBodyByName(name);
+    if (!body) return;
+    if (body.position.x === x && body.position.y === y) return;
+
+    body.position.x = x;
+    body.position.y = y;
+    changedBodyNames.add(name);
+  });
+
+  if (
+    spaceshipState.position.x !== snapshot.spaceship.x ||
+    spaceshipState.position.y !== snapshot.spaceship.y ||
+    spaceshipState.position.relativeTo !== snapshot.spaceship.relativeTo ||
+    spaceshipState.heading !== snapshot.spaceship.heading ||
+    spaceshipState.speed !== snapshot.spaceship.speed
+  ) {
+    spaceshipState.position = {
+      x: snapshot.spaceship.x,
+      y: snapshot.spaceship.y,
+      relativeTo: snapshot.spaceship.relativeTo,
+    };
+    spaceshipState.heading = snapshot.spaceship.heading;
+    spaceshipState.speed = snapshot.spaceship.speed;
+    changedBodyNames.add(spaceshipState.name);
+  }
+
+  spaceshipVelocity = snapshot.spaceship.velocity;
+  spaceshipAttachedBodyName = snapshot.spaceship.attachedBodyName;
+  store.set(spaceshipMotionStateAtom, snapshot.motionState);
+  store.set(spaceshipActiveFeatureAtom, snapshot.activeFeature);
+  store.set(spaceshipSpeedAtom, Number(snapshot.spaceship.speed));
+  store.set(spaceshipAbsoluteSpeedAtom, snapshot.absoluteSpeed);
+
+  if (changedBodyNames.size > 0) {
+    listeners.forEach((listener) => listener(worldState, changedBodyNames));
+  }
+}
+
+function applyWorldSystems(data: SerializedWorldSystems, syncWorker = true) {
+  invalidateLatestSimulationSnapshot();
   const nextVelocities = new Map<string, Vector>();
   const bodies = data.systems.flat();
   const stars = bodies.flatMap((body) => {
@@ -375,6 +604,9 @@ function applyWorldSystems(data: SerializedWorldSystems) {
   normalizeAttachedSpaceshipPosition();
   syncSpaceshipAbsoluteSpeed();
   listeners.forEach((listener) => listener(worldState));
+  if (syncWorker) {
+    postSimulationMessage({ type: 'hydrate-world', systems: data });
+  }
 }
 
 export function hydrateWorldSystems(data: SerializedWorldSystems) {
@@ -394,6 +626,7 @@ export function setActiveWorldBodyNames(names?: Iterable<string>) {
   if (!names) {
     activeWorldBodyNames = undefined;
     activeWorldBodies = undefined;
+    postSimulationMessage({ type: 'set-active-bodies' });
     return;
   }
 
@@ -403,6 +636,10 @@ export function setActiveWorldBodyNames(names?: Iterable<string>) {
   }
   activeWorldBodyNames = nextNames;
   rebuildActiveWorldBodies();
+  postSimulationMessage({
+    type: 'set-active-bodies',
+    names: [...nextNames],
+  });
 }
 
 function addActiveWorldBodyName(name: string, names: Set<string>) {
@@ -427,13 +664,16 @@ function rebuildActiveWorldBodies() {
 }
 
 export function setSpaceshipHeading(heading: number) {
+  invalidateLatestSimulationSnapshot();
   spaceshipState.heading = heading;
   listeners.forEach((listener) => listener(worldState));
+  postSimulationMessage({ type: 'set-heading', heading });
 }
 
 export function startSpaceshipThrusters(
   thrusters: { powerPercent: number; active: boolean }[],
 ) {
+  invalidateLatestSimulationSnapshot();
   if (!Array.isArray(thrusters) || thrusters.length === 0) return false;
   if (store.get(spaceshipMotionStateAtom) === 'crashed') return false;
   if (!canDetachSpaceshipFromAttachedBody()) return false;
@@ -452,6 +692,7 @@ export function startSpaceshipThrusters(
   });
   syncSpaceshipAbsoluteSpeed();
   listeners.forEach((listener) => listener(worldState));
+  postSimulationMessage({ type: 'start-thrusters', thrusters });
   return true;
 }
 
@@ -460,6 +701,7 @@ export function startSpaceshipTargetSpeed(
   maximumThrustPercent: number,
   targetDirection: number | undefined,
 ) {
+  invalidateLatestSimulationSnapshot();
   if (
     store.get(spaceshipMotionStateAtom) === 'crashed' ||
     targetDirection === undefined
@@ -494,15 +736,24 @@ export function startSpaceshipTargetSpeed(
   });
   syncSpaceshipAbsoluteSpeed();
   listeners.forEach((listener) => listener(worldState));
+  postSimulationMessage({
+    type: 'start-target-speed',
+    targetSpeedMetersPerSecond,
+    maximumThrustPercent,
+    targetDirection,
+  });
   return true;
 }
 
 export function stopSpaceshipActiveFeatureLocally() {
+  invalidateLatestSimulationSnapshot();
   store.set(spaceshipActiveFeatureAtom, undefined);
   listeners.forEach((listener) => listener(worldState));
+  postSimulationMessage({ type: 'stop-active-feature' });
 }
 
-export function hydrateSpaceship(dto: SpaceshipDto) {
+export function hydrateSpaceship(dto: SpaceshipDto, syncWorker = true) {
+  invalidateLatestSimulationSnapshot();
   spaceshipState.position = {
     x: BigInt(dto.position.x),
     y: BigInt(dto.position.y),
@@ -547,6 +798,9 @@ export function hydrateSpaceship(dto: SpaceshipDto) {
   normalizeAttachedSpaceshipPosition();
   advanceSpaceshipToNow(dto.positionCapturedAt ?? dto.simulatedAt);
   listeners.forEach((listener) => listener(worldState));
+  if (syncWorker) {
+    postSimulationMessage({ type: 'hydrate-spaceship', spaceship: dto });
+  }
 }
 
 export function getSpaceshipDto(securityCode: string): SpaceshipDto {
@@ -764,6 +1018,10 @@ export function getSpaceshipTargetSpeedBurnPreview(
 }
 
 export function getSpaceshipActiveThrustVector() {
+  if (latestSimulationSnapshot) {
+    return latestSimulationSnapshot.activeThrustVector;
+  }
+
   return calculateSpaceshipActiveThrustAcceleration({
     position: toVector(getWorldPosition(spaceshipState.position)),
     velocity: getSpaceshipWorldVelocity(),
@@ -897,6 +1155,10 @@ export function getSpaceshipVelocity() {
 export function getSpaceshipProximityTelemetry():
   | SpaceshipProximityTelemetry
   | undefined {
+  if (latestSimulationSnapshot) {
+    return latestSimulationSnapshot.proximityTelemetry;
+  }
+
   const spaceshipWorldVelocity = getSpaceshipWorldVelocity();
   let closest: SpaceshipProximityTelemetry | undefined;
 
@@ -942,6 +1204,20 @@ export function getSpaceshipProximityTelemetry():
 }
 
 export function advanceWorld(elapsedSeconds: number) {
+  const worker = getSimulationWorker();
+  if (worker) {
+    if (elapsedSeconds > 0 && !simulationAdvancePending) {
+      simulationAdvancePending = true;
+      simulationAdvanceRequestId += 1;
+      worker.postMessage({
+        type: 'advance',
+        requestId: simulationAdvanceRequestId,
+        elapsedSeconds,
+      } satisfies SimulationWorkerRequest);
+    }
+    return worldElapsedSeconds;
+  }
+
   if (elapsedSeconds > 0) {
     worldElapsedSeconds += elapsedSeconds;
     advanceBodyPositions(elapsedSeconds);

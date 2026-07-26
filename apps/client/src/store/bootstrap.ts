@@ -6,6 +6,7 @@ import type { ContactMessageDto } from '@repo/types';
 import {
   hydrateSpaceship,
   getSpaceshipDto,
+  initializeSpaceshipInSimulation,
   setInventoryPersistHandler,
   startSpaceshipTargetSpeed,
   startSpaceshipThrusters,
@@ -88,6 +89,20 @@ function initializeSpaceship(request: BootstrapRequest) {
   if (existingPromise) return existingPromise;
 
   const promise = (async () => {
+    const workerRequest =
+      request.type === 'continue'
+        ? (() => {
+            const stored = readStoredSpaceship();
+            if (!stored) throw new Error('No stored spaceship is available');
+            return {
+              type: 'continue' as const,
+              securityCode: stored.securityCode,
+            };
+          })()
+        : request;
+    const workerSpaceship = initializeSpaceshipInSimulation(workerRequest);
+    if (workerSpaceship) return workerSpaceship;
+
     if (request.type === 'new') {
       const { data } = await axios.post<SpaceshipResponse>(
         `${getApiBaseUrl()}/spaceship/register`,

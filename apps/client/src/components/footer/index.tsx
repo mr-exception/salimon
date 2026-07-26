@@ -762,6 +762,13 @@ export function Footer({
     onStartThrusters(thrustersSchedule);
   };
 
+  const stopEngines = () => {
+    onStopEngines?.();
+    setManualThrusters((thrusters) =>
+      thrusters.map((thruster) => ({ ...thruster, active: false })),
+    );
+  };
+
   const renderManualThrusterControl = (
     index: number,
     label: string,
@@ -1269,7 +1276,7 @@ export function Footer({
                         ? !onStopEngines
                         : !canStartThrusters || !onStartThrusters
                     }
-                    onClick={isEngineRunning ? onStopEngines : startThrusters}
+                    onClick={isEngineRunning ? stopEngines : startThrusters}
                   >
                     {isEngineRunning ? 'Stop engines' : 'Start'}
                   </button>

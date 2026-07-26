@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import {
   advanceWorld,
+  getBodyWorldPositionAfter,
   getSpaceshipActiveThrustVector,
   getBodyWorldVelocity,
   getLoadedWorldSectorKeys,
@@ -510,13 +511,12 @@ export class Scene extends Phaser.Scene {
     graphics.clear();
     graphics.lineStyle(1.5 / zoom, PREDICTION_COLOR, 0.72);
 
-    const drawPrediction = (
+    const drawPredictionTarget = (
       x: number,
       y: number,
-      velocity: { x: number; y: number },
+      targetX: number,
+      targetY: number,
     ) => {
-      const targetX = x + velocity.x * seconds;
-      const targetY = y + velocity.y * seconds;
       const markerRadius = 6 / zoom;
       graphics.lineBetween(x, y, targetX, targetY);
       graphics.strokeCircle(targetX, targetY, markerRadius);
@@ -533,19 +533,43 @@ export class Scene extends Phaser.Scene {
         targetY + markerRadius * 1.5,
       );
     };
+    const drawLinearPrediction = (
+      x: number,
+      y: number,
+      velocity: { x: number; y: number },
+    ) => {
+      drawPredictionTarget(
+        x,
+        y,
+        x + velocity.x * seconds,
+        y + velocity.y * seconds,
+      );
+    };
+    const drawBodyPrediction = (bodyName: string, x: number, y: number) => {
+      const futurePosition = getBodyWorldPositionAfter(bodyName, seconds);
+      if (!futurePosition) return;
+
+      const originPosition = getRenderOriginWorldPosition();
+      drawPredictionTarget(
+        x,
+        y,
+        futurePosition.x - Number(originPosition.x),
+        futurePosition.y - Number(originPosition.y),
+      );
+    };
 
     this.planets.forEach((planet) => {
       if (planet.visible) {
-        drawPrediction(planet.x, planet.y, getBodyWorldVelocity(planet.name));
+        drawBodyPrediction(planet.name, planet.x, planet.y);
       }
     });
     this.stars.forEach((star) => {
       if (star.visible) {
-        drawPrediction(star.x, star.y, getBodyWorldVelocity(star.name));
+        drawBodyPrediction(star.name, star.x, star.y);
       }
     });
     if (this.spaceship?.visible) {
-      drawPrediction(
+      drawLinearPrediction(
         this.spaceship.x,
         this.spaceship.y,
         getSpaceshipWorldVelocity(),

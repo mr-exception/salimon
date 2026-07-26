@@ -269,6 +269,7 @@ let loadPromise: Promise<World> | undefined;
 let worldBodyByName = new Map<string, Body>();
 let worldPlanetNames = new Set<string>();
 let bodyVelocityByName = new Map<string, Vector>();
+let bodyOrbitEpochByName = new Map<string, Planet | Star>();
 let spaceshipVelocity: Vector | undefined;
 let spaceshipPositionRemainder: Vector = { x: 0, y: 0 };
 let spaceshipStoredRelativeVelocity: Vector | undefined;
@@ -690,6 +691,12 @@ function applyWorldSystems(data: SerializedWorldSystems, syncWorker = true) {
   worldState.stars = stars;
   worldState.planets = planets;
   bodyVelocityByName = nextVelocities;
+  bodyOrbitEpochByName = new Map(
+    [...stars, ...planets].map((body) => [
+      body.name,
+      cloneBodyOrbitEpoch(body),
+    ]),
+  );
   [...stars, ...planets].forEach((body) => {
     advanceBodyPositionToNow(body);
   });
@@ -1697,6 +1704,72 @@ export function getBodyWorldVelocity(bodyName: string) {
   return snapshotVelocity
     ? { ...snapshotVelocity }
     : getCelestialBodyWorldVelocity(bodyName, new Set());
+}
+
+export function getBodyWorldPositionAfter(
+  bodyName: string,
+  elapsedSeconds: number,
+) {
+  if (!Number.isFinite(elapsedSeconds) || elapsedSeconds < 0) {
+    return undefined;
+  }
+
+  return getBodyWorldPositionAt(bodyName, Date.now() + elapsedSeconds * 1_000);
+}
+
+function getBodyWorldPositionAt(
+  bodyName: string,
+  timeMs: number,
+) {
+  if (!Number.isFinite(timeMs)) return undefined;
+
+  return getBodyWorldPositionAtWithPath(bodyName, timeMs, new Set());
+}
+
+function getBodyWorldPositionAtWithPath(
+  bodyName: string,
+  timeMs: number,
+  path: Set<string>,
+): Vector | undefined {
+  if (path.has(bodyName)) return undefined;
+
+  const body = bodyOrbitEpochByName.get(bodyName);
+  if (!body) return undefined;
+
+  const epochTimeMs = getSnapshotTimeMs(body.cTime);
+  const elapsedSeconds = Number.isFinite(epochTimeMs)
+    ? (timeMs - epochTimeMs) / 1_000
+    : 0;
+  const futurePosition = WorldService.advanceBodyPosition(
+    body,
+    elapsedSeconds,
+  );
+  let position = {
+    x: Number(futurePosition.x),
+    y: Number(futurePosition.y),
+  };
+  const referenceName = futurePosition.relativeTo;
+  if (!referenceName) return position;
+
+  path.add(bodyName);
+  const referencePosition = getBodyWorldPositionAtWithPath(
+    referenceName,
+    timeMs,
+    path,
+  );
+  path.delete(bodyName);
+
+  if (!referencePosition) return position;
+
+  position = WorldService.add(position, referencePosition);
+  return position;
+}
+
+function cloneBodyOrbitEpoch<TBody extends Planet | Star>(body: TBody): TBody {
+  return {
+    ...body,
+    position: { ...body.position },
+  };
 }
 
 function toVector(position: Position): Vector {

@@ -49,7 +49,7 @@
 
 .speedControls {
   position: absolute;
-  top: 16px;
+  top: 34px;
   left: 16px;
   display: grid;
   gap: 7px;
@@ -728,7 +728,7 @@
 
 .tooltip {
   position: absolute;
-  top: calc(100% + 7px);
+  bottom: calc(100% + 7px);
   left: 50%;
   z-index: 3;
   width: max-content;
@@ -741,7 +741,7 @@
   font-size: 0.58rem;
   pointer-events: none;
   opacity: 0;
-  transform: translate(-50%, -3px);
+  transform: translate(-50%, 3px);
   transition:
     opacity 100ms ease,
     transform 100ms ease;
@@ -898,7 +898,7 @@
   }
 
   .speedControls {
-    top: 12px;
+    top: 34px;
     left: 12px;
   }
 

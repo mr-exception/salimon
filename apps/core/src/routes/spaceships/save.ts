@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { SpaceshipService } from '@services';
+import { RepositoryService, SpaceshipService } from '@services';
 import { getRequiredSecurityCode, sendError } from '../../http';
 
 export async function save(request: Request, response: Response) {
@@ -17,6 +17,7 @@ export async function save(request: Request, response: Response) {
       return;
     }
 
+    await RepositoryService.flushToDatabase();
     response.json({ spaceship: SpaceshipService.toSpaceshipDto(spaceship) });
   } catch (error) {
     const message =

@@ -670,10 +670,6 @@
   cursor: not-allowed;
 }
 
-.speedControls button[aria-disabled='true']:not(:disabled) {
-  color: color-mix(in srgb, var(--color-starlight) 52%, transparent);
-}
-
 .speedControls button[data-running='true'] {
   border-color: #ef4444;
   background: color-mix(in srgb, #ef4444 14%, transparent);
@@ -765,9 +761,27 @@
   color: var(--color-plasma-cyan);
 }
 
-.saveStatus {
+.speedControls .controlTab[data-loading='true'] {
+  border-color: var(--color-plasma-cyan);
+  background: color-mix(in srgb, var(--color-plasma-cyan) 10%, transparent);
+  color: var(--color-plasma-cyan);
+}
+
+.loadingSpinner {
+  width: 17px;
+  height: 17px;
+  border: 2px solid color-mix(in srgb, currentColor 28%, transparent);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+}
+
+.saveToast {
   box-sizing: border-box;
-  max-width: 214px;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: min(280px, calc(100vw - 32px));
   padding: 7px 9px;
   border: 1px solid color-mix(in srgb, #22c55e 36%, transparent);
   border-radius: 6px;
@@ -779,12 +793,19 @@
     sans-serif;
   letter-spacing: 0;
   text-transform: none;
+  pointer-events: none;
   backdrop-filter: blur(8px);
 }
 
-.saveStatus[data-status='error'] {
+.saveToast[data-status='error'] {
   border-color: color-mix(in srgb, #ef4444 44%, transparent);
   color: #fecaca;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .speedActions button[data-active='true'] {

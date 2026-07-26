@@ -547,6 +547,7 @@ export function Footer({
     { type: 'success' | 'error'; message: string } | undefined
   >();
   const [isSaving, setIsSaving] = useState(false);
+  const saveStatusTimerRef = useRef<number | undefined>(undefined);
   const selectedModule = modules.find(
     (module) => module.id === selectedModuleId,
   );
@@ -597,8 +598,6 @@ export function Footer({
           ),
         )
       : 0;
-  const saveBlockReason = getSpaceshipSaveBlockReason();
-  const canSaveSpaceship = !saveBlockReason;
   const predictionSeconds =
     Number(predictionAmount) *
     ({ s: 1, m: 60, h: 3_600 } as const)[predictionUnit];
@@ -617,6 +616,25 @@ export function Footer({
     onPredictionChange,
     predictionSeconds,
   ]);
+
+  useEffect(
+    () => () => {
+      window.clearTimeout(saveStatusTimerRef.current);
+    },
+    [],
+  );
+
+  const showSaveStatus = (
+    status: { type: 'success' | 'error'; message: string },
+    durationMs = status.type === 'success' ? 2_500 : 4_000,
+  ) => {
+    window.clearTimeout(saveStatusTimerRef.current);
+    setSaveStatus(status);
+    saveStatusTimerRef.current = window.setTimeout(() => {
+      setSaveStatus(undefined);
+      saveStatusTimerRef.current = undefined;
+    }, durationMs);
+  };
 
   const toggleSpeedControl = (control: SpeedControlTab) => {
     setExpandedSpeedControls((expandedControls) => {
@@ -647,9 +665,11 @@ export function Footer({
   };
 
   const handleSaveSpaceship = () => {
+    if (isSaving) return;
+
     const blockReason = getSpaceshipSaveBlockReason();
     if (blockReason) {
-      setSaveStatus({
+      showSaveStatus({
         type: 'error',
         message: blockReason,
       });
@@ -659,10 +679,10 @@ export function Footer({
     setIsSaving(true);
     void saveSpaceship()
       .then(() => {
-        setSaveStatus({ type: 'success', message: 'Spaceship saved.' });
+        showSaveStatus({ type: 'success', message: 'Spaceship saved.' });
       })
       .catch((error: unknown) => {
-        setSaveStatus({
+        showSaveStatus({
           type: 'error',
           message:
             error instanceof Error && error.message
@@ -921,13 +941,16 @@ export function Footer({
           <button
             className={style.controlTab}
             type="button"
-            aria-label="Save spaceship"
-            aria-disabled={!canSaveSpaceship}
-            data-active={saveStatus?.type === 'success'}
+            aria-label={isSaving ? 'Saving spaceship' : 'Save spaceship'}
+            data-loading={isSaving}
             disabled={isSaving}
             onClick={handleSaveSpaceship}
           >
-            <SaveIcon />
+            {isSaving ? (
+              <span className={style.loadingSpinner} aria-hidden="true" />
+            ) : (
+              <SaveIcon />
+            )}
             <span className={style.tooltip} role="tooltip">
               {isSaving ? 'Saving spaceship' : 'Save spaceship'}
             </span>
@@ -935,7 +958,7 @@ export function Footer({
         </div>
         {saveStatus && (
           <output
-            className={style.saveStatus}
+            className={style.saveToast}
             data-status={saveStatus.type}
             aria-live="polite"
           >

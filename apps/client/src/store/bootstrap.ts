@@ -73,6 +73,29 @@ function storeSpaceship(spaceship: SpaceshipDto) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(spaceship));
 }
 
+function getSpaceshipSnapshotTime(spaceship: SpaceshipDto) {
+  const snapshotTime = spaceship.positionCapturedAt ?? spaceship.simulatedAt;
+  if (!snapshotTime) return 0;
+
+  const time = Date.parse(snapshotTime);
+  return Number.isFinite(time) ? time : 0;
+}
+
+function getNewestStoredSpaceship(spaceship: SpaceshipDto) {
+  const storedSpaceship = readStoredSpaceship();
+  if (
+    !storedSpaceship ||
+    storedSpaceship.securityCode !== spaceship.securityCode
+  ) {
+    return spaceship;
+  }
+
+  return getSpaceshipSnapshotTime(storedSpaceship) >
+    getSpaceshipSnapshotTime(spaceship)
+    ? storedSpaceship
+    : spaceship;
+}
+
 function readStoredShipSecretToken() {
   const storedToken = localStorage.getItem(SHIP_SECRET_TOKEN_STORAGE_KEY);
   if (storedToken) return storedToken;
@@ -130,8 +153,12 @@ function initializeSpaceship(request: BootstrapRequest) {
     if (!securityCode) throw new Error('No stored spaceship is available');
     return getSpaceshipFromRest(securityCode);
   })().then(async (spaceship) => {
-    await applySpaceshipInfo(spaceship);
-    return spaceship;
+    const resolvedSpaceship =
+      request.type === 'continue'
+        ? getNewestStoredSpaceship(spaceship)
+        : spaceship;
+    await applySpaceshipInfo(resolvedSpaceship);
+    return resolvedSpaceship;
   });
 
   requestPromises.set(request, promise);

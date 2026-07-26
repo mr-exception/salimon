@@ -11,6 +11,7 @@ export async function register(_request: Request, response: Response) {
     const spaceship = SpaceshipService.createSpaceship();
     await RepositoryService.insertSpaceship(spaceship);
     await ContactsService.initializeSpaceshipContacts(spaceship.securityCode);
+    await RepositoryService.flushToDatabase();
     response
       .status(201)
       .json({ spaceship: SpaceshipService.toSpaceshipDto(spaceship) });

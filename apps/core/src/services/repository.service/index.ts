@@ -1,5 +1,6 @@
 import { findOldestSpaceshipsForSimulation } from './find-oldest-spaceships-for-simulation';
 import { findSpaceshipBySecurityCode } from './find-spaceship-by-security-code';
+import { flushSpaceshipToDatabase } from './flush-spaceship-to-database';
 import { flushToDatabase } from './flush-to-database';
 import { getWorldData } from './get-world-data';
 import { getWorldSystemsBodies } from './get-world-systems-bodies';
@@ -26,5 +27,6 @@ export class RepositoryService {
     updateSpaceshipInventoryBySecurityCode;
   static findOldestSpaceshipsForSimulation = findOldestSpaceshipsForSimulation;
   static updatePropagatedSpaceship = updatePropagatedSpaceship;
+  static flushSpaceshipToDatabase = flushSpaceshipToDatabase;
   static flushToDatabase = flushToDatabase;
 }

@@ -1,10 +1,20 @@
+import { SpaceshipModel } from '@models';
 import { cloneSpaceship } from './clone-spaceship';
-import { requireSpaceshipsBySecurityCode } from './state';
-import { start } from './start';
+import { repositoryState } from './state';
 
 export async function findSpaceshipBySecurityCode(securityCode: string) {
-  await start();
-  const spaceship = requireSpaceshipsBySecurityCode().get(securityCode);
-  return spaceship ? cloneSpaceship(spaceship) : undefined;
-}
+  const cachedSpaceship =
+    repositoryState.spaceshipsBySecurityCode?.get(securityCode);
+  if (cachedSpaceship) return cloneSpaceship(cachedSpaceship);
 
+  const spaceship = await SpaceshipModel.findBySecurityCode(securityCode);
+  if (!spaceship) return undefined;
+
+  repositoryState.spaceshipsBySecurityCode ??= new Map();
+  repositoryState.spaceshipsBySecurityCode.set(
+    spaceship.securityCode,
+    cloneSpaceship(spaceship),
+  );
+
+  return cloneSpaceship(spaceship);
+}

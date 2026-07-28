@@ -1,8 +1,27 @@
 import type { SerializedWorldBody } from '@repo/types';
 import { WorldSystemModel, type WorldBodyDocument } from '@models';
+import { cloneWorldData } from './clone-world-data';
+import { repositoryState } from './state';
 import type { WorldData } from './types';
 
 export async function getWorldData(): Promise<WorldData> {
+  if (repositoryState.worldData) {
+    return cloneWorldData(repositoryState.worldData);
+  }
+
+  repositoryState.worldDataPromise ??= loadWorldDataFromDatabase()
+    .then((worldData) => {
+      repositoryState.worldData = cloneWorldData(worldData);
+      return worldData;
+    })
+    .finally(() => {
+      repositoryState.worldDataPromise = undefined;
+    });
+
+  return cloneWorldData(await repositoryState.worldDataPromise);
+}
+
+async function loadWorldDataFromDatabase(): Promise<WorldData> {
   const systems = await WorldSystemModel.findAllSystems();
   const worldData: WorldData = {
     planets: [],

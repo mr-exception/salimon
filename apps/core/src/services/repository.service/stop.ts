@@ -8,6 +8,6 @@ export function stop() {
 
   repositoryState.startPromise = undefined;
   repositoryState.worldData = undefined;
+  repositoryState.worldDataPromise = undefined;
   repositoryState.spaceshipsBySecurityCode = undefined;
 }
-

@@ -214,4 +214,12 @@ export class SpaceshipModel {
       { ordered: false },
     );
   }
+
+  static async replaceSpaceship(spaceship: SpaceshipDocument) {
+    return (await SpaceshipModel.getModel()).replaceOne(
+      { securityCode: spaceship.securityCode },
+      spaceship,
+      { upsert: true },
+    );
+  }
 }

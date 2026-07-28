@@ -2,6 +2,7 @@ import type { RepositoryState } from './types';
 
 export const repositoryState: RepositoryState = {
   worldData: undefined,
+  worldDataPromise: undefined,
   spaceshipsBySecurityCode: undefined,
   startPromise: undefined,
   databaseFlushTimer: undefined,
@@ -23,4 +24,3 @@ export function requireSpaceshipsBySecurityCode() {
 
   return repositoryState.spaceshipsBySecurityCode;
 }
-

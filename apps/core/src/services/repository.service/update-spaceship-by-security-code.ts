@@ -1,15 +1,16 @@
-import type { SpaceshipDocument } from '@models';
+import { SpaceshipModel, type SpaceshipDocument } from '@models';
 import { cloneSpaceship } from './clone-spaceship';
-import { requireSpaceshipsBySecurityCode } from './state';
-import { start } from './start';
+import { repositoryState } from './state';
 
 export async function updateSpaceshipBySecurityCode(
   securityCode: string,
   update: Partial<SpaceshipDocument>,
 ) {
-  await start();
-  const spaceships = requireSpaceshipsBySecurityCode();
-  const spaceship = spaceships.get(securityCode);
+  repositoryState.spaceshipsBySecurityCode ??= new Map();
+  const spaceships = repositoryState.spaceshipsBySecurityCode;
+  const spaceship =
+    spaceships.get(securityCode) ??
+    (await SpaceshipModel.findBySecurityCode(securityCode));
   if (!spaceship) return undefined;
 
   const updatedSpaceship = cloneSpaceship({

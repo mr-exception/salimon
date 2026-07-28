@@ -17,7 +17,7 @@ export async function save(request: Request, response: Response) {
       return;
     }
 
-    await RepositoryService.flushToDatabase();
+    await RepositoryService.flushSpaceshipToDatabase(spaceship);
     response.json({ spaceship: SpaceshipService.toSpaceshipDto(spaceship) });
   } catch (error) {
     const message =

@@ -5,12 +5,14 @@ import style from './style.module.css';
 type BodyContextMenuProps = {
   request: BodyContextMenuRequest;
   onDismiss: () => void;
+  onLockOn: () => void;
   onToggleAlwaysVisible: () => void;
 };
 
 export function BodyContextMenu({
   request,
   onDismiss,
+  onLockOn,
   onToggleAlwaysVisible,
 }: BodyContextMenuProps) {
   useEffect(() => {
@@ -50,16 +52,22 @@ export function BodyContextMenu({
           <span>{request.name}</span>
           <small>{request.kind}</small>
         </header>
-        <button
-          type="button"
-          role="menuitemcheckbox"
-          aria-checked={request.alwaysVisible}
-          onClick={onToggleAlwaysVisible}
-        >
-          <span className={style.contextMenuCheck} aria-hidden="true">
-            {request.alwaysVisible ? '✓' : ''}
-          </span>
-          Always show name
+        {request.kind !== 'Asteroid' && (
+          <button
+            type="button"
+            role="menuitemcheckbox"
+            aria-checked={request.alwaysVisible}
+            onClick={onToggleAlwaysVisible}
+          >
+            <span className={style.contextMenuCheck} aria-hidden="true">
+              {request.alwaysVisible ? '✓' : ''}
+            </span>
+            Always show name
+          </button>
+        )}
+        <button type="button" role="menuitem" onClick={onLockOn}>
+          <span className={style.contextMenuLockIcon} aria-hidden="true" />
+          Lock on
         </button>
       </div>
     </>

@@ -32,6 +32,7 @@ export type SimulationFrameSnapshot = {
   absoluteSpeed: number;
   proximityTelemetry?: SpaceshipProximityTelemetry;
   activeThrustVector?: Vector;
+  activeThrusters: { powerPercent: number; active: boolean }[];
 };
 
 export type SimulationWorkerRequest =
@@ -68,6 +69,15 @@ export type SimulationWorkerRequest =
       targetSpeedMetersPerSecond: number;
       maximumThrustPercent: number;
       targetDirection?: number;
+    }
+  | {
+      type: 'start-lock-on';
+      targetName: string;
+      targetKind: 'Planet' | 'Star' | 'Asteroid' | 'Spaceship';
+      targetSpeedMetersPerSecond: number;
+      maximumThrustPercent: number;
+      targetPosition: Vector;
+      targetVelocity: Vector;
     }
   | {
       type: 'stop-active-feature';

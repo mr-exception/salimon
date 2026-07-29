@@ -34,6 +34,7 @@ import {
   useInventory,
   useModules,
   useSpaceshipActiveFeature,
+  useSpaceshipActiveThrusters,
   useSpaceshipAbsoluteSpeed,
   useSpaceshipFuelKns,
   useSpaceshipHullDurability,
@@ -526,6 +527,7 @@ export function Footer({
   const thrusterDurability = useSpaceshipThrusterDurability();
   const motionState = useSpaceshipMotionState();
   const activeFeature = useSpaceshipActiveFeature();
+  const activeThrusterSignals = useSpaceshipActiveThrusters();
   const inventory = useInventory();
   const modules = useModules();
   const [manualThrusters, setManualThrusters] = useState(() =>
@@ -553,6 +555,8 @@ export function Footer({
   );
   const activeTargetSpeed =
     activeFeature?.type === 'target-speed' ? activeFeature : undefined;
+  const activeLockOn =
+    activeFeature?.type === 'lock-on' ? activeFeature : undefined;
   const activeThrusters =
     activeFeature?.type === 'thrusters' ||
     activeFeature?.type === 'manual-force'
@@ -569,6 +573,8 @@ export function Footer({
           0,
           activeTargetSpeed.durationSeconds - activeTargetSpeed.elapsedSeconds,
         )
+      : activeLockOn
+        ? Math.max(0, activeLockOn.durationSeconds - activeLockOn.elapsedSeconds)
       : undefined;
   const thrustersFieldsAreValid = thrustersSchedule.every(
     (thruster) =>
@@ -585,19 +591,21 @@ export function Footer({
         (thrusterDurability[index] ?? 0) > 0,
     );
   const canControlManualThrusters =
-    motionState !== 'crashed' && !activeTargetSpeed;
+    motionState !== 'crashed' && !activeTargetSpeed && !activeLockOn;
   const canStartThrusters =
     canControlManualThrusters && hasValidThrusters && fuelKns > 0;
-  const currentEnginePowerPercent = activeTargetSpeed
-    ? activeTargetSpeed.maximumThrustPercent
-    : activeThrusters
-      ? Math.max(
-          0,
-          ...activeThrusters.thrusters.map((thruster) =>
-            thruster.active ? thruster.powerPercent : 0,
-          ),
-        )
-      : 0;
+  const currentEnginePowerPercent = Math.max(
+    0,
+    ...activeThrusterSignals.map((thruster) =>
+      thruster.active ? thruster.powerPercent : 0,
+    ),
+  );
+  const displayedThrusters = activeFeature
+    ? activeThrusterSignals
+    : manualThrusters.map((thruster) => ({
+        powerPercent: Number(thruster.powerPercent),
+        active: thruster.active,
+      }));
   const predictionSeconds =
     Number(predictionAmount) *
     ({ s: 1, m: 60, h: 3_600 } as const)[predictionUnit];
@@ -775,7 +783,13 @@ export function Footer({
     className: string,
   ) => {
     const thruster = manualThrusters[index];
-    if (!thruster) return null;
+    const displayedThruster = displayedThrusters[index];
+    if (!thruster || !displayedThruster) return null;
+    const displayedPower = activeFeature
+      ? Number.isInteger(displayedThruster.powerPercent)
+        ? String(displayedThruster.powerPercent)
+        : displayedThruster.powerPercent.toFixed(2)
+      : thruster.powerPercent;
 
     return (
       <div className={`${style.thrustersRow} ${className}`}>
@@ -783,11 +797,11 @@ export function Footer({
         <button
           className={style.thrusterToggle}
           type="button"
-          aria-pressed={thruster.active}
+          aria-pressed={displayedThruster.active}
           disabled={!canControlManualThrusters}
           onClick={() => toggleManualThruster(index)}
         >
-          {thruster.active ? 'On' : 'Off'}
+          {displayedThruster.active ? 'On' : 'Off'}
         </button>
         <label htmlFor={`footer-manual-thruster-${index}-power`}>
           <span>Power</span>
@@ -798,7 +812,7 @@ export function Footer({
               min="0"
               max="100"
               step="1"
-              value={thruster.powerPercent}
+              value={displayedPower}
               disabled={!canControlManualThrusters}
               onChange={(event) =>
                 updateManualThrusterPower(index, event.currentTarget.value)

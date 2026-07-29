@@ -91,6 +91,20 @@ export type SpaceshipTargetSpeedFeature = {
   elapsedSeconds: number;
 };
 
+export type SpaceshipLockOnFeature = {
+  type: 'lock-on';
+  targetName: string;
+  targetKind: 'Planet' | 'Star' | 'Asteroid' | 'Spaceship';
+  targetSpeedMetersPerSecond: number;
+  maximumThrustPercent: number;
+  targetVelocity: Velocity;
+  targetBodyVelocity: Velocity;
+  targetPosition: Velocity;
+  maximumAcceleration: number;
+  durationSeconds: number;
+  elapsedSeconds: number;
+};
+
 export type SpaceshipManualForceThruster = {
   powerPercent: number;
   active: boolean;
@@ -113,6 +127,7 @@ export type SpaceshipManualForceFeature = Omit<
 
 export type SpaceshipActiveFeature =
   | SpaceshipTargetSpeedFeature
+  | SpaceshipLockOnFeature
   | SpaceshipThrustersFeature
   | SpaceshipManualForceFeature;
 

@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
-import { type SpaceshipProximityTelemetry } from '@store';
+import {
+  useSpaceshipActiveFeature,
+  type SpaceshipLockOnTarget,
+  type SpaceshipProximityTelemetry,
+} from '@store';
 import {
   formatAngle,
   formatDistance,
@@ -51,11 +55,21 @@ function getBodyDetailsTitle(details: BodyDetailsRequest) {
   return details.body.name;
 }
 
+function formatMaterials(details: BodyDetailsRequest) {
+  if (details.kind !== 'Asteroid') return undefined;
+
+  return details.body.materials
+    .map(({ name, massKg }) => `${name}: ${formatSiValue(massKg, 'kg')}`)
+    .join(', ');
+}
+
 function BodyDetailsDialog({
   details,
+  onLockOn,
   onDismiss,
 }: {
   details: BodyDetailsRequest;
+  onLockOn: (target: SpaceshipLockOnTarget) => void;
   onDismiss: () => void;
 }) {
   useEffect(() => {
@@ -69,6 +83,7 @@ function BodyDetailsDialog({
 
   const velocitySpeed = Math.hypot(details.velocity.x, details.velocity.y);
   const title = getBodyDetailsTitle(details);
+  const materials = formatMaterials(details);
 
   return (
     <>
@@ -114,7 +129,111 @@ function BodyDetailsDialog({
             <dt>Size</dt>
             <dd>{formatDistance(Number(details.body.radius) * 2)}</dd>
           </div>
+          {details.kind === 'Asteroid' && (
+            <div>
+              <dt>Orbit surface</dt>
+              <dd>{formatDistance(details.orbitSurfaceDistanceMeters)}</dd>
+            </div>
+          )}
+          {materials && (
+            <div>
+              <dt>Materials</dt>
+              <dd title={materials}>{materials}</dd>
+            </div>
+          )}
         </dl>
+        <footer className={style.bodyDetailsActions}>
+          <button type="button" onClick={() => onLockOn(details.lockTarget)}>
+            Lock on
+          </button>
+        </footer>
+      </section>
+    </>
+  );
+}
+
+function LockOnDialog({
+  target,
+  initialSpeed,
+  onActivate,
+  onDismiss,
+}: {
+  target: SpaceshipLockOnTarget;
+  initialSpeed: number;
+  onActivate: (
+    target: SpaceshipLockOnTarget,
+    speedMetersPerSecond: number,
+  ) => boolean;
+  onDismiss: () => void;
+}) {
+  const [speed, setSpeed] = useState(() =>
+    Object.is(initialSpeed, -0) ? '-0' : String(initialSpeed),
+  );
+  const parsedSpeed = Number(speed);
+  const speedIsValid =
+    speed.trim() !== '' &&
+    Number.isFinite(parsedSpeed) &&
+    !Number.isNaN(parsedSpeed);
+
+  useEffect(() => {
+    const dismissOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onDismiss();
+    };
+
+    window.addEventListener('keydown', dismissOnEscape);
+    return () => window.removeEventListener('keydown', dismissOnEscape);
+  }, [onDismiss]);
+
+  const activateLock = () => {
+    if (!speedIsValid) return;
+    if (onActivate(target, parsedSpeed)) onDismiss();
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        className={style.bodyDetailsBackdrop}
+        aria-label="Close lock dialog"
+        onClick={onDismiss}
+      />
+      <section
+        className={style.lockOnDialog}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="navigator-lock-on-title"
+      >
+        <header>
+          <div>
+            <h2 id="navigator-lock-on-title">Lock on {target.name}</h2>
+            <span>{target.kind}</span>
+          </div>
+          <button type="button" aria-label="Close lock on" onClick={onDismiss}>
+            ×
+          </button>
+        </header>
+        <label>
+          <span>Target speed</span>
+          <input
+            type="number"
+            inputMode="decimal"
+            step="1"
+            value={speed}
+            onChange={(event) => setSpeed(event.currentTarget.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') activateLock();
+            }}
+          />
+          <small>m/s</small>
+        </label>
+        <div className={style.lockOnActions}>
+          <button type="button" onClick={onDismiss}>
+            Cancel
+          </button>
+          <button type="button" disabled={!speedIsValid} onClick={activateLock}>
+            Activate lock
+          </button>
+        </div>
       </section>
     </>
   );
@@ -145,6 +264,7 @@ export function Navigator({
 }: NavigatorProps) {
   const gameHostRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<Scene>(null);
+  const activeFeature = useSpaceshipActiveFeature();
   const [zoomLevel, setZoomLevel] = useState(1);
   const [worldLoadState, setWorldLoadState] = useState<
     'loading' | 'ready' | 'error'
@@ -156,11 +276,15 @@ export function Navigator({
   const [bodyDetails, setBodyDetails] = useState<BodyDetailsRequest | null>(
     null,
   );
+  const [lockOnTarget, setLockOnTarget] = useState<SpaceshipLockOnTarget | null>(
+    null,
+  );
   const [targetPreview, setTargetPreview] =
     useState<TargetDirectionPreview | null>(null);
   const [proximityTelemetry, setProximityTelemetry] =
     useState<SpaceshipProximityTelemetry>();
   const [isProximityExpanded, setIsProximityExpanded] = useState(false);
+  const [showAsteroids, setShowAsteroids] = useState(true);
 
   useEffect(() => {
     sceneRef.current?.setMeasuringActive(isMeasuring);
@@ -175,6 +299,10 @@ export function Navigator({
   useEffect(() => {
     sceneRef.current?.setRulerActive(isRulerActive);
   }, [isRulerActive]);
+
+  useEffect(() => {
+    sceneRef.current?.setAsteroidsVisible(showAsteroids);
+  }, [showAsteroids]);
 
   useEffect(() => {
     if (!gameHostRef.current) return;
@@ -233,12 +361,14 @@ export function Navigator({
   const navigateTo = (result: SearchResult) => {
     setContextMenu(null);
     setBodyDetails(null);
+    setLockOnTarget(null);
     sceneRef.current?.navigateTo(result.name, result.navigationZoom);
   };
 
   const recenterOnSpaceship = () => {
     setContextMenu(null);
     setBodyDetails(null);
+    setLockOnTarget(null);
     sceneRef.current?.recenterOnSpaceship();
   };
 
@@ -248,6 +378,24 @@ export function Navigator({
     sceneRef.current?.toggleAlwaysVisible(contextMenu.name);
     setContextMenu(null);
   };
+
+  const openLockOnDialog = (target: SpaceshipLockOnTarget) => {
+    setContextMenu(null);
+    setBodyDetails(null);
+    setLockOnTarget(target);
+  };
+
+  const activateLockOn = (
+    target: SpaceshipLockOnTarget,
+    speedMetersPerSecond: number,
+  ) => sceneRef.current?.startLockOn(target, speedMetersPerSecond, 100) ?? false;
+
+  const initialLockSpeed =
+    activeFeature?.type === 'lock-on' &&
+    lockOnTarget &&
+    activeFeature.targetName === lockOnTarget.name
+      ? activeFeature.targetSpeedMetersPerSecond
+      : 0;
 
   return (
     <section className={style.container} aria-label="Planet navigation map">
@@ -329,13 +477,23 @@ export function Navigator({
         <BodyContextMenu
           request={contextMenu}
           onDismiss={() => setContextMenu(null)}
+          onLockOn={() => openLockOnDialog(contextMenu.lockTarget)}
           onToggleAlwaysVisible={toggleAlwaysVisible}
         />
       )}
       {bodyDetails && (
         <BodyDetailsDialog
           details={bodyDetails}
+          onLockOn={openLockOnDialog}
           onDismiss={() => setBodyDetails(null)}
+        />
+      )}
+      {lockOnTarget && (
+        <LockOnDialog
+          target={lockOnTarget}
+          initialSpeed={initialLockSpeed}
+          onActivate={activateLockOn}
+          onDismiss={() => setLockOnTarget(null)}
         />
       )}
       {isSelectingTargetDirection && targetPreview && (
@@ -348,6 +506,14 @@ export function Navigator({
         </output>
       )}
       <div className={style.navigationControls}>
+        <label className={style.asteroidToggle}>
+          <input
+            type="checkbox"
+            checked={showAsteroids}
+            onChange={(event) => setShowAsteroids(event.currentTarget.checked)}
+          />
+          <span>Asteroids</span>
+        </label>
         <button
           className={style.recenterButton}
           type="button"

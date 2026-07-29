@@ -8,6 +8,9 @@ export async function renderWorld(this: Scene) {
     this.recenterOnSpaceship(false);
     await this.refreshWorldFromViewport();
     if (!this.sys.isActive()) return;
+    this.focusOnAttachedBodyAsteroidOrbit();
+    await this.reconcileClientAsteroids();
+    if (!this.sys.isActive()) return;
 
     this.unsubscribeFromWorld = subscribeToWorld((_world, changedBodyNames) => {
       this.setWorldBodyData(_world.planets, _world.stars);
@@ -15,6 +18,7 @@ export async function renderWorld(this: Scene) {
       if (changedBodyNames) {
         this.updateChangedWorldVisibility(changedBodyNames);
       } else {
+        void this.reconcileClientAsteroids();
         this.updateWorldVisibility();
       }
     });

@@ -32,6 +32,14 @@ function cloneActiveFeature(
       targetVelocity: { ...activeFeature.targetVelocity },
     };
   }
+  if (activeFeature.type === 'lock-on') {
+    return {
+      ...activeFeature,
+      targetVelocity: { ...activeFeature.targetVelocity },
+      targetBodyVelocity: { ...activeFeature.targetBodyVelocity },
+      targetPosition: { ...activeFeature.targetPosition },
+    };
+  }
 
   return {
     ...activeFeature,

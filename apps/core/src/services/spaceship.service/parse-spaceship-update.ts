@@ -155,74 +155,7 @@ function parseActiveFeature(value: unknown): SpaceshipActiveFeature | undefined 
     };
   }
 
-  if (candidate.type === 'lock-on') {
-    if (
-      typeof candidate.targetName !== 'string' ||
-      candidate.targetName.trim() === '' ||
-      (candidate.targetKind !== 'Planet' &&
-        candidate.targetKind !== 'Star' &&
-        candidate.targetKind !== 'Asteroid' &&
-        candidate.targetKind !== 'Spaceship') ||
-      typeof candidate.targetSpeedMetersPerSecond !== 'number' ||
-      !Number.isFinite(candidate.targetSpeedMetersPerSecond) ||
-      typeof candidate.maximumThrustPercent !== 'number' ||
-      !Number.isFinite(candidate.maximumThrustPercent) ||
-      typeof candidate.maximumAcceleration !== 'number' ||
-      !Number.isFinite(candidate.maximumAcceleration) ||
-      typeof candidate.durationSeconds !== 'number' ||
-      !Number.isFinite(candidate.durationSeconds) ||
-      typeof candidate.elapsedSeconds !== 'number' ||
-      !Number.isFinite(candidate.elapsedSeconds) ||
-      !candidate.targetVelocity ||
-      typeof candidate.targetVelocity !== 'object' ||
-      !candidate.targetBodyVelocity ||
-      typeof candidate.targetBodyVelocity !== 'object' ||
-      !candidate.targetPosition ||
-      typeof candidate.targetPosition !== 'object'
-    ) {
-      throw new Error('activeFeature lock-on values are invalid');
-    }
-
-    const targetVelocity = candidate.targetVelocity as Record<string, unknown>;
-    const targetBodyVelocity = candidate.targetBodyVelocity as Record<
-      string,
-      unknown
-    >;
-    const targetPosition = candidate.targetPosition as Record<string, unknown>;
-    if (
-      typeof targetVelocity.x !== 'number' ||
-      !Number.isFinite(targetVelocity.x) ||
-      typeof targetVelocity.y !== 'number' ||
-      !Number.isFinite(targetVelocity.y) ||
-      typeof targetBodyVelocity.x !== 'number' ||
-      !Number.isFinite(targetBodyVelocity.x) ||
-      typeof targetBodyVelocity.y !== 'number' ||
-      !Number.isFinite(targetBodyVelocity.y) ||
-      typeof targetPosition.x !== 'number' ||
-      !Number.isFinite(targetPosition.x) ||
-      typeof targetPosition.y !== 'number' ||
-      !Number.isFinite(targetPosition.y)
-    ) {
-      throw new Error('activeFeature lock-on vectors are invalid');
-    }
-
-    return {
-      type: 'lock-on',
-      targetName: candidate.targetName,
-      targetKind: candidate.targetKind,
-      targetSpeedMetersPerSecond: candidate.targetSpeedMetersPerSecond,
-      maximumThrustPercent: candidate.maximumThrustPercent,
-      targetVelocity: { x: targetVelocity.x, y: targetVelocity.y },
-      targetBodyVelocity: {
-        x: targetBodyVelocity.x,
-        y: targetBodyVelocity.y,
-      },
-      targetPosition: { x: targetPosition.x, y: targetPosition.y },
-      maximumAcceleration: candidate.maximumAcceleration,
-      durationSeconds: candidate.durationSeconds,
-      elapsedSeconds: candidate.elapsedSeconds,
-    };
-  }
+  if (candidate.type === 'lock-on') return undefined;
 
   if (candidate.type !== 'target-speed') {
     throw new Error('activeFeature type is invalid');

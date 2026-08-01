@@ -26,18 +26,19 @@ function cloneActiveFeature(
   activeFeature: SpaceshipDocument['activeFeature'],
 ): SpaceshipDocument['activeFeature'] {
   if (!activeFeature) return undefined;
+  const activeFeatureType = (activeFeature as { type?: unknown }).type;
+  if (
+    typeof activeFeature === 'object' &&
+    'type' in activeFeature &&
+    activeFeatureType === 'lock-on'
+  ) {
+    return undefined;
+  }
+
   if (activeFeature.type === 'target-speed') {
     return {
       ...activeFeature,
       targetVelocity: { ...activeFeature.targetVelocity },
-    };
-  }
-  if (activeFeature.type === 'lock-on') {
-    return {
-      ...activeFeature,
-      targetVelocity: { ...activeFeature.targetVelocity },
-      targetBodyVelocity: { ...activeFeature.targetBodyVelocity },
-      targetPosition: { ...activeFeature.targetPosition },
     };
   }
 

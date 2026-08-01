@@ -5,14 +5,12 @@ import style from './style.module.css';
 type BodyContextMenuProps = {
   request: BodyContextMenuRequest;
   onDismiss: () => void;
-  onLockOn: () => void;
   onToggleAlwaysVisible: () => void;
 };
 
 export function BodyContextMenu({
   request,
   onDismiss,
-  onLockOn,
   onToggleAlwaysVisible,
 }: BodyContextMenuProps) {
   useEffect(() => {
@@ -65,10 +63,6 @@ export function BodyContextMenu({
             Always show name
           </button>
         )}
-        <button type="button" role="menuitem" onClick={onLockOn}>
-          <span className={style.contextMenuLockIcon} aria-hidden="true" />
-          Lock on
-        </button>
       </div>
     </>
   );

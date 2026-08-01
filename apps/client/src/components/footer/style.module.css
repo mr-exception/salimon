@@ -253,10 +253,53 @@
   color: #fca5a5;
 }
 
-.moduleGridPanel {
+.modulesPanel {
   display: grid;
-  grid-template-columns: 272px minmax(190px, 1fr);
+  width: min(760px, calc(100vw - 70px));
+  grid-template-columns: 260px minmax(300px, 1fr);
   gap: 14px;
+}
+
+.moduleList {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+
+.moduleList section {
+  display: grid;
+  gap: 6px;
+}
+
+.moduleList h3 {
+  margin: 0;
+  color: color-mix(in srgb, var(--color-starlight) 54%, transparent);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.moduleList button {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+  padding: 7px 9px;
+  text-align: left;
+}
+
+.moduleList button[data-selected='true'] {
+  border-color: var(--color-plasma-cyan);
+  background: color-mix(in srgb, var(--color-plasma-cyan) 12%, transparent);
+}
+
+.moduleList small {
+  color: color-mix(in srgb, var(--color-starlight) 48%, transparent);
+  font-size: 0.56rem;
+  letter-spacing: 0.04em;
+  text-align: right;
+  text-transform: uppercase;
 }
 
 .moduleGrid {
@@ -331,7 +374,7 @@
 
 .moduleInspector dl div {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(100px, 1fr) minmax(150px, auto);
   gap: 10px;
 }
 
@@ -340,11 +383,24 @@
 }
 
 .moduleInspector dd {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  justify-content: end;
+  gap: 5px 8px;
   margin: 0;
   color: #fbbf24;
   font-variant-numeric: tabular-nums;
   text-align: right;
   text-transform: none;
+}
+
+.moduleInspector dd small {
+  grid-column: 1 / -1;
+  color: color-mix(in srgb, var(--color-starlight) 48%, transparent);
+  font-size: 0.54rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .moduleInspector button[data-active='true'] {
@@ -837,15 +893,22 @@
   font-size: 1rem;
 }
 
-.telemetry {
+.telemetryDock {
   position: absolute;
   right: 16px;
   bottom: 16px;
   display: grid;
+  justify-items: start;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.telemetry {
+  display: grid;
   grid-template-columns:
     minmax(70px, 0.8fr) minmax(110px, 1.1fr) minmax(180px, 1.7fr)
     minmax(110px, 0.8fr);
-  width: min(590px, 100%);
+  width: min(590px, calc(100vw - 32px));
   margin: 0;
   padding: 10px 0;
   border: 1px solid
@@ -853,7 +916,6 @@
   border-radius: 7px;
   background: color-mix(in srgb, var(--color-deep-space) 82%, transparent);
   backdrop-filter: blur(8px);
-  pointer-events: auto;
 }
 
 .readout {
@@ -882,6 +944,42 @@
   white-space: nowrap;
 }
 
+.miningToggle {
+  height: 32px;
+  min-width: 118px;
+  padding: 0 12px;
+  border: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 34%, transparent);
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--color-deep-space) 86%, transparent);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 28%);
+  color: var(--color-plasma-cyan);
+  cursor: pointer;
+  font:
+    800 0.68rem/1 system-ui,
+    sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+}
+
+.miningToggle:hover,
+.miningToggle:focus-visible {
+  border-color: var(--color-plasma-cyan);
+  outline: none;
+}
+
+.miningToggle[data-active='true'] {
+  border-color: color-mix(in srgb, #22c55e 70%, transparent);
+  background: color-mix(in srgb, #22c55e 18%, transparent);
+  color: #86efac;
+}
+
+.miningToggle:disabled {
+  color: color-mix(in srgb, var(--color-starlight) 45%, transparent);
+  cursor: not-allowed;
+}
+
 @media (max-width: 760px) {
   .movementHint {
     right: 12px;
@@ -895,6 +993,11 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     row-gap: 12px;
     width: 100%;
+  }
+
+  .telemetryDock {
+    right: 12px;
+    bottom: 16px;
   }
 
   .speedControls {
@@ -920,7 +1023,7 @@
   .measuringControls,
   .thrustersPanel,
   .durabilityList,
-  .moduleGridPanel,
+  .modulesPanel,
   .researchList {
     width: 100%;
     min-width: 0;
@@ -940,7 +1043,11 @@
       'bottom';
   }
 
-  .moduleGridPanel {
+  .modulesPanel {
+    grid-template-columns: 1fr;
+  }
+
+  .moduleList button {
     grid-template-columns: 1fr;
   }
 

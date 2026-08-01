@@ -91,8 +91,6 @@ const MIN_RENDER_NAME_TO_SHAPE_ZOOM_RATIO = 0.01;
 const TARGET_VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.1;
 const THRUSTER_SIGNAL_POWER_TOLERANCE_PERCENT = 0.01;
 const SIMULATION_TELEMETRY_UPDATE_INTERVAL_MS = 250;
-const LOCK_ON_SURFACE_ASCENT_CLEARANCE_METERS = 10_000;
-const LOCK_ON_MIN_SURFACE_ASCENT_SPEED_METERS_PER_SECOND = 100;
 const PLANET_COLORS = [
   0x60a5fa, 0x34d399, 0xf59e0b, 0xf97316, 0xa78bfa, 0x94a3b8, 0x22d3ee,
   0xf472b6,
@@ -233,6 +231,30 @@ export function useSetSpaceshipThrusterDurability() {
   return useSetAtom(spaceshipThrusterDurabilityAtom);
 }
 
+export function repairSpaceshipHull() {
+  store.set(spaceshipHullDurabilityAtom, MAX_HULL_DURABILITY);
+}
+
+export function repairSpaceshipThruster(index: number) {
+  if (
+    !Number.isInteger(index) ||
+    index < 0 ||
+    index >= SPACESHIP_THRUSTER_COUNT
+  ) {
+    return false;
+  }
+
+  store.set(
+    spaceshipThrusterDurabilityAtom,
+    store
+      .get(spaceshipThrusterDurabilityAtom)
+      .map((durability, thrusterIndex) =>
+        thrusterIndex === index ? MAX_THRUSTER_DURABILITY : durability,
+      ),
+  );
+  return true;
+}
+
 export function useSpaceshipActiveThrusters() {
   return useAtomValue(spaceshipActiveThrustersAtom);
 }
@@ -282,6 +304,19 @@ export function spendInventory(cost: Partial<Inventory>) {
   store.set(inventoryAtom, nextInventory);
   persistInventory(nextInventory);
   return true;
+}
+
+export function addInventory(deposit: Partial<Inventory>) {
+  const inventory = store.get(inventoryAtom);
+  const nextInventory = Object.fromEntries(
+    INVENTORY_MATERIALS.map((material) => [
+      material,
+      inventory[material] + Math.max(0, deposit[material] ?? 0),
+    ]),
+  ) as Inventory;
+
+  store.set(inventoryAtom, nextInventory);
+  persistInventory(nextInventory);
 }
 
 export function getSpaceshipMotionState() {
@@ -950,117 +985,6 @@ export function startSpaceshipTargetSpeed(
   return true;
 }
 
-export type SpaceshipLockOnTarget = {
-  name: string;
-  kind: 'Planet' | 'Star' | 'Asteroid' | 'Spaceship';
-  position: Vector;
-  velocity: Vector;
-};
-
-export function startSpaceshipLockOn(
-  target: SpaceshipLockOnTarget,
-  targetSpeedMetersPerSecond: number,
-  maximumThrustPercent: number,
-) {
-  invalidateLatestSimulationSnapshot();
-  if (
-    store.get(spaceshipMotionStateAtom) === 'crashed' ||
-    !target.name ||
-    !Number.isFinite(target.position.x) ||
-    !Number.isFinite(target.position.y) ||
-    !Number.isFinite(target.velocity.x) ||
-    !Number.isFinite(target.velocity.y) ||
-    !Number.isFinite(targetSpeedMetersPerSecond) ||
-    !Number.isFinite(maximumThrustPercent) ||
-    maximumThrustPercent <= 0 ||
-    maximumThrustPercent > 100
-  ) {
-    return false;
-  }
-  if (!canDetachSpaceshipFromAttachedBody()) return false;
-
-  const maximumAcceleration =
-    WorldService.calculateMaximumEngineAcceleration(maximumThrustPercent);
-  const motion = {
-    position: toVector(getWorldPosition(spaceshipState.position)),
-    velocity: getSpaceshipWorldVelocity(),
-  };
-  const resolvedTarget = resolveLockOnTargetMotion({
-    type: 'lock-on',
-    targetName: target.name,
-    targetKind: target.kind,
-    targetSpeedMetersPerSecond,
-    maximumThrustPercent,
-    targetPosition: target.position,
-    targetVelocity: target.velocity,
-    targetBodyVelocity: target.velocity,
-    maximumAcceleration,
-    durationSeconds: 0,
-    elapsedSeconds: 0,
-  });
-  const targetVelocity = getLockOnTargetVelocity(
-    motion.position,
-    resolvedTarget.position,
-    resolvedTarget.velocity,
-    targetSpeedMetersPerSecond,
-  );
-  const durationSeconds =
-    WorldService.calculateTargetSpeedBurnDuration(
-      targetVelocity,
-      motion.velocity,
-      motion.position,
-      maximumAcceleration,
-      calculateGravityAcceleration,
-    ) ?? 0;
-  const accelerationValue =
-    durationSeconds > 0
-      ? WorldService.calculateRequiredBurnAcceleration(
-          targetVelocity,
-          durationSeconds,
-          motion.velocity,
-          motion.position,
-          calculateGravityAcceleration,
-        )
-      : { x: 0, y: 0 };
-  if (
-    durationSeconds > 0 &&
-    !hasAvailableThrusterForAcceleration(accelerationValue)
-  ) {
-    return false;
-  }
-
-  normalizeAttachedSpaceshipPosition();
-  spaceshipVelocity = getInitialSpaceshipWorldVelocity();
-  spaceshipAttachedBodyName = undefined;
-  store.set(spaceshipMotionStateAtom, 'flying');
-  store.set(spaceshipActiveFeatureAtom, {
-    type: 'lock-on',
-    targetName: target.name,
-    targetKind: target.kind,
-    targetSpeedMetersPerSecond,
-    maximumThrustPercent,
-    targetVelocity,
-    targetBodyVelocity: resolvedTarget.velocity,
-    targetPosition: resolvedTarget.position,
-    maximumAcceleration,
-    durationSeconds,
-    elapsedSeconds: 0,
-  });
-  syncSpaceshipAbsoluteSpeed();
-  syncSpaceshipActiveThrusters();
-  listeners.forEach((listener) => listener(worldState));
-  postSimulationMessage({
-    type: 'start-lock-on',
-    targetName: target.name,
-    targetKind: target.kind,
-    targetSpeedMetersPerSecond,
-    maximumThrustPercent,
-    targetPosition: resolvedTarget.position,
-    targetVelocity: resolvedTarget.velocity,
-  });
-  return true;
-}
-
 export function stopSpaceshipActiveFeatureLocally() {
   invalidateLatestSimulationSnapshot();
   store.set(spaceshipActiveFeatureAtom, undefined);
@@ -1090,7 +1014,10 @@ export function hydrateSpaceship(dto: SpaceshipDto, syncWorker = true) {
   spaceshipAttachedBodyName =
     motionState === 'flying' ? undefined : dto.position.relativeTo;
   store.set(spaceshipMotionStateAtom, motionState);
-  store.set(spaceshipActiveFeatureAtom, dto.activeFeature);
+  store.set(
+    spaceshipActiveFeatureAtom,
+    normalizeActiveFeature(dto.activeFeature),
+  );
   store.set(spaceshipSpeedAtom, Number(dto.speed));
   syncSpaceshipAbsoluteSpeed();
   syncSpaceshipActiveThrusters();
@@ -1216,6 +1143,21 @@ function canDetachSpaceshipFromAttachedBody() {
   }
 
   return getBodyByName(referenceName) !== undefined;
+}
+
+function normalizeActiveFeature(
+  activeFeature: SpaceshipDto['activeFeature'] | unknown,
+): SpaceshipActiveFeature | undefined {
+  if (
+    activeFeature &&
+    typeof activeFeature === 'object' &&
+    'type' in activeFeature &&
+    activeFeature.type === 'lock-on'
+  ) {
+    return undefined;
+  }
+
+  return activeFeature as SpaceshipActiveFeature | undefined;
 }
 
 export function isSpaceshipEngineRunning() {
@@ -1375,40 +1317,6 @@ function calculateSpaceshipActiveThrusterSignals(motion: {
     return normalizeThrusterSignals(activeFeature.thrusters);
   }
 
-  if (activeFeature?.type === 'lock-on') {
-    const target = resolveLockOnTargetMotion(activeFeature);
-    const targetVelocity = getLockOnTargetVelocity(
-      motion.position,
-      target.position,
-      target.velocity,
-      activeFeature.targetSpeedMetersPerSecond,
-    );
-    const velocityError = Math.hypot(
-      targetVelocity.x - motion.velocity.x,
-      targetVelocity.y - motion.velocity.y,
-    );
-    if (velocityError <= TARGET_VELOCITY_TOLERANCE_METERS_PER_SECOND) {
-      return createInactiveThrusters();
-    }
-
-    const remainingSeconds =
-      WorldService.calculateTargetSpeedBurnDuration(
-        targetVelocity,
-        motion.velocity,
-        motion.position,
-        activeFeature.maximumAcceleration,
-        calculateGravityAcceleration,
-      ) ?? 0;
-    if (remainingSeconds <= 0) return createInactiveThrusters();
-
-    return getBurnThrusterSignals(
-      targetVelocity,
-      remainingSeconds,
-      motion,
-      activeFeature.maximumThrustPercent,
-    );
-  }
-
   if (activeFeature?.type !== 'target-speed') return createInactiveThrusters();
 
   const remainingSeconds = Math.max(
@@ -1493,9 +1401,8 @@ function setAxisThrusterSignal(
   acceleration: number,
   maximumThrustPercent: number,
 ) {
-  const fullPowerAcceleration = WorldService.calculateMaximumEngineAcceleration(
-    100,
-  );
+  const fullPowerAcceleration =
+    WorldService.calculateMaximumEngineAcceleration(100);
   const powerPercent =
     fullPowerAcceleration > 0
       ? (Math.abs(acceleration) / fullPowerAcceleration) * 100
@@ -1520,8 +1427,9 @@ function getThrusterSignalsAcceleration(
   normalizeThrusterSignals(thrusters).forEach((thruster, index) => {
     if (!thruster.active || thruster.powerPercent <= 0) return;
 
-    const thrustAcceleration =
-      WorldService.calculateMaximumEngineAcceleration(thruster.powerPercent);
+    const thrustAcceleration = WorldService.calculateMaximumEngineAcceleration(
+      thruster.powerPercent,
+    );
     if (index === 0) acceleration.y += thrustAcceleration;
     if (index === 1) acceleration.x -= thrustAcceleration;
     if (index === 2) acceleration.y -= thrustAcceleration;
@@ -1531,117 +1439,6 @@ function getThrusterSignalsAcceleration(
   return acceleration.x === 0 && acceleration.y === 0
     ? undefined
     : acceleration;
-}
-
-function resolveLockOnTargetMotion(
-  activeFeature: Extract<SpaceshipActiveFeature, { type: 'lock-on' }>,
-) {
-  const body = getBodyByName(activeFeature.targetName);
-  if (!body) {
-    return {
-      position: activeFeature.targetPosition,
-      velocity: activeFeature.targetBodyVelocity,
-    };
-  }
-
-  return {
-    position: toVector(getWorldPosition(body.position)),
-    velocity: getCelestialBodyWorldVelocity(body.name, new Set()),
-  };
-}
-
-function getLockOnTargetVelocity(
-  spaceshipPosition: Vector,
-  targetPosition: Vector,
-  targetVelocity: Vector,
-  targetSpeedMetersPerSecond: number,
-) {
-  const clearance = getClosestLockOnSurfaceClearance(spaceshipPosition);
-  if (clearance) {
-    return getLockOnClearanceTargetVelocity(
-      spaceshipPosition,
-      clearance,
-      targetSpeedMetersPerSecond,
-    );
-  }
-
-  const deltaX = targetPosition.x - spaceshipPosition.x;
-  const deltaY = targetPosition.y - spaceshipPosition.y;
-  const distance = Math.hypot(deltaX, deltaY);
-  if (distance === 0 || targetSpeedMetersPerSecond === 0) {
-    return { ...targetVelocity };
-  }
-
-  return {
-    x: targetVelocity.x + (deltaX / distance) * targetSpeedMetersPerSecond,
-    y: targetVelocity.y + (deltaY / distance) * targetSpeedMetersPerSecond,
-  };
-}
-
-function getLockOnClearanceTargetVelocity(
-  spaceshipPosition: Vector,
-  clearance: {
-    bodyPosition: Vector;
-    bodyVelocity: Vector;
-    surfaceDistanceMeters: number;
-  },
-  targetSpeedMetersPerSecond: number,
-) {
-  const offsetX = spaceshipPosition.x - clearance.bodyPosition.x;
-  const offsetY = spaceshipPosition.y - clearance.bodyPosition.y;
-  const distance = Math.hypot(offsetX, offsetY);
-  if (distance === 0) return { ...clearance.bodyVelocity };
-
-  const radial = { x: offsetX / distance, y: offsetY / distance };
-  const ascentSpeed = Math.max(
-    Math.abs(targetSpeedMetersPerSecond),
-    clearance.surfaceDistanceMeters <= LOCK_ON_SURFACE_ASCENT_CLEARANCE_METERS
-      ? LOCK_ON_MIN_SURFACE_ASCENT_SPEED_METERS_PER_SECOND
-      : 0,
-  );
-
-  return {
-    x: clearance.bodyVelocity.x + radial.x * ascentSpeed,
-    y: clearance.bodyVelocity.y + radial.y * ascentSpeed,
-  };
-}
-
-function getClosestLockOnSurfaceClearance(spaceshipPosition: Vector) {
-  let closest:
-    | {
-        bodyPosition: Vector;
-        bodyVelocity: Vector;
-        surfaceDistanceMeters: number;
-      }
-    | undefined;
-
-  for (const body of [...worldState.planets, ...worldState.stars]) {
-    const bodyPosition = toVector(getWorldPosition(body.position));
-    const centerDistance = Math.hypot(
-      spaceshipPosition.x - bodyPosition.x,
-      spaceshipPosition.y - bodyPosition.y,
-    );
-    const surfaceDistanceMeters = Math.max(
-      0,
-      centerDistance - Number(body.radius) - Number(spaceshipState.radius),
-    );
-    const minimumSurfaceDistanceMeters =
-      Number(body.radius) * FREE_FLIGHT_BODY_RADIUS_CLEARANCE_RATIO;
-    if (
-      surfaceDistanceMeters >= minimumSurfaceDistanceMeters ||
-      (closest && surfaceDistanceMeters >= closest.surfaceDistanceMeters)
-    ) {
-      continue;
-    }
-
-    closest = {
-      bodyPosition,
-      bodyVelocity: getCelestialBodyWorldVelocity(body.name, new Set()),
-      surfaceDistanceMeters,
-    };
-  }
-
-  return closest;
 }
 
 function hasAvailableThrusterForAcceleration(accelerationValue: Vector) {
@@ -2064,47 +1861,6 @@ function advanceActiveFeature(elapsedSeconds: number) {
     return;
   }
 
-  if (activeFeature?.type === 'lock-on') {
-    const motion = {
-      position: toVector(getWorldPosition(spaceshipState.position)),
-      velocity: getSpaceshipWorldVelocity(),
-    };
-    const target = resolveLockOnTargetMotion(activeFeature);
-    const targetVelocity = getLockOnTargetVelocity(
-      motion.position,
-      target.position,
-      target.velocity,
-      activeFeature.targetSpeedMetersPerSecond,
-    );
-    const velocityError = Math.hypot(
-      targetVelocity.x - motion.velocity.x,
-      targetVelocity.y - motion.velocity.y,
-    );
-    const remainingSeconds =
-      velocityError <= TARGET_VELOCITY_TOLERANCE_METERS_PER_SECOND
-        ? 0
-        : (WorldService.calculateTargetSpeedBurnDuration(
-            targetVelocity,
-            motion.velocity,
-            motion.position,
-            activeFeature.maximumAcceleration,
-            calculateGravityAcceleration,
-          ) ?? 0);
-    const nextElapsedSeconds = activeFeature.elapsedSeconds + elapsedSeconds;
-    store.set(spaceshipActiveFeatureAtom, {
-      ...activeFeature,
-      targetVelocity,
-      targetBodyVelocity: target.velocity,
-      targetPosition: {
-        x: target.position.x + target.velocity.x * elapsedSeconds,
-        y: target.position.y + target.velocity.y * elapsedSeconds,
-      },
-      durationSeconds: nextElapsedSeconds + remainingSeconds,
-      elapsedSeconds: nextElapsedSeconds,
-    });
-    return;
-  }
-
   if (activeFeature?.type !== 'target-speed') return;
 
   const motion = {
@@ -2217,10 +1973,7 @@ export function getBodyWorldPositionAfter(
   return getBodyWorldPositionAt(bodyName, Date.now() + elapsedSeconds * 1_000);
 }
 
-function getBodyWorldPositionAt(
-  bodyName: string,
-  timeMs: number,
-) {
+function getBodyWorldPositionAt(bodyName: string, timeMs: number) {
   if (!Number.isFinite(timeMs)) return undefined;
 
   return getBodyWorldPositionAtWithPath(bodyName, timeMs, new Set());
@@ -2240,10 +1993,7 @@ function getBodyWorldPositionAtWithPath(
   const elapsedSeconds = Number.isFinite(epochTimeMs)
     ? (timeMs - epochTimeMs) / 1_000
     : 0;
-  const futurePosition = WorldService.advanceBodyPosition(
-    body,
-    elapsedSeconds,
-  );
+  const futurePosition = WorldService.advanceBodyPosition(body, elapsedSeconds);
   let position = {
     x: Number(futurePosition.x),
     y: Number(futurePosition.y),

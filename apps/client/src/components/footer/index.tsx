@@ -12,20 +12,22 @@ import {
   INITIAL_SPACESHIP_FUEL_KNS,
   MAX_HULL_DURABILITY,
   MAX_THRUSTER_DURABILITY,
-  MINING_BASE_EFFICIENCY_KNS,
-  MINING_BASE_DURABILITY_KN,
+  MINING_BASE_RATE_KG_PER_SECOND,
+  MINING_BASE_DURABILITY_KG,
   MINING_BASE_RANGE_METERS,
-  MINING_DURABILITY_PER_LEVEL_KN,
+  MINING_DURABILITY_PER_LEVEL_KG,
   MINING_RANGE_LEVEL_MULTIPLIER,
   INVENTORY_MATERIALS,
-  MODULE_GRID_SIZE,
   MODULE_RESEARCH,
   SPACESHIP_THRUSTER_COUNT,
   THRUSTER_BASE_DURABILITY,
   THRUSTER_BASE_POWER_PERCENT,
   THRUSTER_LEVEL_MULTIPLIER,
+  getModuleMaxDurability,
   getSpaceshipSaveBlockReason,
-  placeModule,
+  repairModule,
+  repairSpaceshipHull,
+  repairSpaceshipThruster,
   setModuleActive,
   saveSpaceship,
   spendInventory,
@@ -57,6 +59,7 @@ type FooterProps = {
   isEngineRunning?: boolean;
   isMeasuring?: boolean;
   isMeasurementRelativeToSpaceship?: boolean;
+  isMeasurementVelocityAxesSeparated?: boolean;
   isRulerActive?: boolean;
   onStartThrusters?: (
     thrusters: { powerPercent: number; active: boolean }[],
@@ -64,6 +67,7 @@ type FooterProps = {
   onStopEngines?: () => void;
   onToggleMeasuring?: () => void;
   onMeasurementRelativeToSpaceshipChange?: (active: boolean) => void;
+  onMeasurementVelocityAxesSeparatedChange?: (active: boolean) => void;
   onToggleRuler?: () => void;
   onOpenCommunications?: () => void;
   onOpenCommunicationThread?: (contactId: string) => void;
@@ -88,10 +92,14 @@ type ManualThrusterInput = {
 type SpeedControlTab =
   | 'thrusters'
   | 'measuring'
-  | 'maintenance'
   | 'prediction'
   | 'modules'
   | 'research';
+
+type ModulePanelSelection =
+  | { type: 'module'; id: string }
+  | { type: 'hull' }
+  | { type: 'thruster'; index: number };
 
 type Position = {
   x: number;
@@ -101,7 +109,6 @@ type Position = {
 const CONTROL_LABELS: Record<SpeedControlTab, string> = {
   thrusters: 'Thrusters',
   measuring: 'Measuring',
-  maintenance: 'Ship durability',
   prediction: 'Prediction',
   modules: 'Modules',
   research: 'Research',
@@ -117,7 +124,6 @@ const PANEL_PLACEMENTS: Record<
 > = {
   thrusters: { horizontal: 'left', vertical: 'top' },
   measuring: { horizontal: 'left', vertical: 'bottom' },
-  maintenance: { horizontal: 'right', vertical: 'bottom' },
   prediction: { horizontal: 'left', vertical: 'bottom' },
   modules: { horizontal: 'left', vertical: 'top' },
   research: { horizontal: 'right', vertical: 'top' },
@@ -145,13 +151,6 @@ function FeatureIcon({ feature }: { feature: SpeedControlTab }) {
         <circle cx="6" cy="17" r="2" />
         <circle cx="18" cy="7" r="2" />
         <path d="M8 16c4-.8 5-6.2 8-8M13 7h3v3" />
-      </svg>
-    );
-  }
-  if (feature === 'maintenance') {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="m14.7 6.3 3-3a4 4 0 0 1-5 5l-7.4 7.4a2.1 2.1 0 0 0 3 3l7.4-7.4a4 4 0 0 1 5-5l-3 3" />
       </svg>
     );
   }
@@ -199,13 +198,13 @@ function getModuleAttributeValue(
 ) {
   const level = module.levels[attribute] ?? 1;
   if (module.type === 'mining' && attribute === 'efficiency') {
-    return `${MINING_BASE_EFFICIENCY_KNS * level} KN/s`;
+    return `${MINING_BASE_RATE_KG_PER_SECOND * level} kg/s`;
   }
   if (module.type === 'mining' && attribute === 'durability') {
     return `${
-      MINING_BASE_DURABILITY_KN +
-      Math.max(0, level - 1) * MINING_DURABILITY_PER_LEVEL_KN
-    } KN`;
+      MINING_BASE_DURABILITY_KG +
+      Math.max(0, level - 1) * MINING_DURABILITY_PER_LEVEL_KG
+    } kg`;
   }
   if (module.type === 'mining' && attribute === 'range') {
     return `${Math.round(
@@ -269,10 +268,32 @@ function getUpgradeCost(
   return { iron: 0, silicates: 0, ice: 0 };
 }
 
+function getRepairCost(
+  currentDurability: number,
+  maximumDurability: number,
+  scale = 1,
+): Partial<Inventory> {
+  if (maximumDurability <= 0 || currentDurability >= maximumDurability) {
+    return { iron: 0, silicates: 0, ice: 0 };
+  }
+
+  const missingRatio =
+    (maximumDurability - currentDurability) / maximumDurability;
+  return {
+    iron: Math.ceil(24 * missingRatio * scale),
+    silicates: Math.ceil(12 * missingRatio * scale),
+    ice: Math.ceil(4 * missingRatio * scale),
+  };
+}
+
 function canAfford(inventory: Inventory, cost: Partial<Inventory>) {
   return INVENTORY_MATERIALS.every(
     (material) => inventory[material] >= (cost[material] ?? 0),
   );
+}
+
+function hasCost(cost: Partial<Inventory>) {
+  return INVENTORY_MATERIALS.some((material) => (cost[material] ?? 0) > 0);
 }
 
 function getMessagePreview(text: string) {
@@ -508,11 +529,13 @@ export function Footer({
   isEngineRunning = false,
   isMeasuring = false,
   isMeasurementRelativeToSpaceship = false,
+  isMeasurementVelocityAxesSeparated = false,
   isRulerActive = false,
   onStartThrusters,
   onStopEngines,
   onToggleMeasuring,
   onMeasurementRelativeToSpaceshipChange,
+  onMeasurementVelocityAxesSeparatedChange,
   onToggleRuler,
   onOpenCommunications,
   onOpenCommunicationThread,
@@ -539,9 +562,8 @@ export function Footer({
   const [predictionAmount, setPredictionAmount] = useState('2');
   const [predictionUnit, setPredictionUnit] = useState<'s' | 'm' | 'h'>('m');
   const [isPredictionActive, setIsPredictionActive] = useState(false);
-  const [selectedModuleId, setSelectedModuleId] = useState<string | undefined>(
-    'mining-module-1',
-  );
+  const [modulePanelSelection, setModulePanelSelection] =
+    useState<ModulePanelSelection>({ type: 'module', id: 'mining-module-1' });
   const [expandedSpeedControls, setExpandedSpeedControls] = useState(
     () => new Set<SpeedControlTab>(),
   );
@@ -550,13 +572,18 @@ export function Footer({
   >();
   const [isSaving, setIsSaving] = useState(false);
   const saveStatusTimerRef = useRef<number | undefined>(undefined);
-  const selectedModule = modules.find(
-    (module) => module.id === selectedModuleId,
+  const selectedModule =
+    modulePanelSelection.type === 'module'
+      ? modules.find((module) => module.id === modulePanelSelection.id)
+      : undefined;
+  const miningModule = modules.find(
+    (module) => module.type === 'mining' && module.unlocked,
+  );
+  const miningModuleActive = Boolean(
+    miningModule?.active && miningModule.durability > 0,
   );
   const activeTargetSpeed =
     activeFeature?.type === 'target-speed' ? activeFeature : undefined;
-  const activeLockOn =
-    activeFeature?.type === 'lock-on' ? activeFeature : undefined;
   const activeThrusters =
     activeFeature?.type === 'thrusters' ||
     activeFeature?.type === 'manual-force'
@@ -573,8 +600,6 @@ export function Footer({
           0,
           activeTargetSpeed.durationSeconds - activeTargetSpeed.elapsedSeconds,
         )
-      : activeLockOn
-        ? Math.max(0, activeLockOn.durationSeconds - activeLockOn.elapsedSeconds)
       : undefined;
   const thrustersFieldsAreValid = thrustersSchedule.every(
     (thruster) =>
@@ -591,15 +616,15 @@ export function Footer({
         (thrusterDurability[index] ?? 0) > 0,
     );
   const canControlManualThrusters =
-    motionState !== 'crashed' && !activeTargetSpeed && !activeLockOn;
+    motionState !== 'crashed' && !activeTargetSpeed;
   const canStartThrusters =
     canControlManualThrusters && hasValidThrusters && fuelKns > 0;
-  const currentEnginePowerPercent = Math.max(
-    0,
-    ...activeThrusterSignals.map((thruster) =>
-      thruster.active ? thruster.powerPercent : 0,
-    ),
-  );
+  const currentEnginePowerPercent =
+    activeThrusterSignals.reduce(
+      (totalPowerPercent, thruster) =>
+        totalPowerPercent + (thruster.active ? thruster.powerPercent : 0),
+      0,
+    ) / SPACESHIP_THRUSTER_COUNT;
   const displayedThrusters = activeFeature
     ? activeThrusterSignals
     : manualThrusters.map((thruster) => ({
@@ -825,20 +850,6 @@ export function Footer({
     );
   };
 
-  const selectModuleGridCell = (x: number, y: number) => {
-    const cellModule = modules.find(
-      (module) => module.position.x === x && module.position.y === y,
-    );
-    if (cellModule) {
-      setSelectedModuleId(cellModule.id);
-      return;
-    }
-
-    if (selectedModuleId) {
-      placeModule(selectedModuleId, { x, y });
-    }
-  };
-
   const unlockResearchModule = (type: ModuleType, cost: Partial<Inventory>) => {
     if (!spendInventory(cost)) return;
     unlockModule(type);
@@ -851,6 +862,37 @@ export function Footer({
     const cost = getUpgradeCost(module, attribute);
     if (!spendInventory(cost)) return;
     upgradeModuleAttribute(module.id, attribute);
+  };
+
+  const repairSelectedModule = (module: ShipModule) => {
+    const cost = getRepairCost(
+      module.durability,
+      getModuleMaxDurability(module),
+      module.type === 'mining' ? 1.2 : 1,
+    );
+    if (!hasCost(cost) || !spendInventory(cost)) return;
+
+    repairModule(module.id);
+  };
+
+  const repairHull = () => {
+    const cost = getRepairCost(hullDurability, MAX_HULL_DURABILITY, 2);
+    if (!hasCost(cost) || !spendInventory(cost)) return;
+
+    repairSpaceshipHull();
+  };
+
+  const repairThruster = (index: number, durability: number) => {
+    const cost = getRepairCost(durability, MAX_THRUSTER_DURABILITY, 0.8);
+    if (!hasCost(cost) || !spendInventory(cost)) return;
+
+    repairSpaceshipThruster(index);
+  };
+
+  const toggleMiningModule = () => {
+    if (!miningModule || miningModule.durability <= 0) return;
+
+    setModuleActive(miningModule.id, !miningModule.active);
   };
 
   return (
@@ -910,7 +952,6 @@ export function Footer({
               ['thrusters', 'Thrusters'],
               ['modules', 'Modules'],
               ['research', 'Research'],
-              ['maintenance', 'Ship durability'],
               ['prediction', 'Prediction'],
             ] as const
           ).map(([tab, label]) => (
@@ -993,42 +1034,76 @@ export function Footer({
               control="modules"
               onClose={() => toggleSpeedControl('modules')}
             >
-              <div className={style.moduleGridPanel}>
-                <div
-                  className={style.moduleGrid}
-                  style={{
-                    gridTemplateColumns: `repeat(${MODULE_GRID_SIZE}, 1fr)`,
-                  }}
-                >
-                  {Array.from(
-                    { length: MODULE_GRID_SIZE * MODULE_GRID_SIZE },
-                    (_, index) => {
-                      const x = index % MODULE_GRID_SIZE;
-                      const y = Math.floor(index / MODULE_GRID_SIZE);
-                      const module = modules.find(
-                        (candidate) =>
-                          candidate.position.x === x &&
-                          candidate.position.y === y,
-                      );
-
+              <div className={style.modulesPanel}>
+                <div className={style.moduleList}>
+                  <section>
+                    <h3>Current modules</h3>
+                    {modules.map((module) => {
+                      const maximumDurability = getModuleMaxDurability(module);
                       return (
                         <button
-                          key={`${x}:${y}`}
+                          key={module.id}
                           type="button"
-                          aria-label={
-                            module
-                              ? `${module.name} at ${x + 1}, ${y + 1}`
-                              : `Empty module cell ${x + 1}, ${y + 1}`
+                          data-selected={
+                            modulePanelSelection.type === 'module' &&
+                            modulePanelSelection.id === module.id
                           }
-                          data-occupied={module ? 'true' : 'false'}
-                          data-selected={module?.id === selectedModuleId}
-                          onClick={() => selectModuleGridCell(x, y)}
+                          onClick={() =>
+                            setModulePanelSelection({
+                              type: 'module',
+                              id: module.id,
+                            })
+                          }
                         >
-                          {module ? MODULE_LABELS[module.type].slice(0, 1) : ''}
+                          <span>{module.name}</span>
+                          <small>
+                            {MODULE_LABELS[module.type]} ·{' '}
+                            {Math.round(
+                              (module.durability / maximumDurability) * 100,
+                            )}
+                            %
+                          </small>
                         </button>
                       );
-                    },
-                  )}
+                    })}
+                  </section>
+                  <section>
+                    <h3>Ship systems</h3>
+                    <button
+                      type="button"
+                      data-selected={modulePanelSelection.type === 'hull'}
+                      onClick={() => setModulePanelSelection({ type: 'hull' })}
+                    >
+                      <span>Hull</span>
+                      <small>
+                        {Math.round(
+                          (hullDurability / MAX_HULL_DURABILITY) * 100,
+                        )}
+                        %
+                      </small>
+                    </button>
+                    {thrusterDurability.map((durability, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        data-selected={
+                          modulePanelSelection.type === 'thruster' &&
+                          modulePanelSelection.index === index
+                        }
+                        onClick={() =>
+                          setModulePanelSelection({ type: 'thruster', index })
+                        }
+                      >
+                        <span>Thruster {index + 1}</span>
+                        <small>
+                          {Math.round(
+                            (durability / MAX_THRUSTER_DURABILITY) * 100,
+                          )}
+                          %
+                        </small>
+                      </button>
+                    ))}
+                  </section>
                 </div>
                 <div className={style.moduleInspector}>
                   {selectedModule ? (
@@ -1042,38 +1117,173 @@ export function Footer({
                       </header>
                       <dl>
                         {getModuleAttributes(selectedModule.type).map(
-                          (attribute) => (
-                            <div key={attribute}>
-                              <dt>{ATTRIBUTE_LABELS[attribute]}</dt>
-                              <dd>
-                                {getModuleAttributeValue(
-                                  selectedModule,
-                                  attribute,
-                                )}
-                              </dd>
-                            </div>
-                          ),
+                          (attribute) => {
+                            const cost = getUpgradeCost(
+                              selectedModule,
+                              attribute,
+                            );
+                            return (
+                              <div key={attribute}>
+                                <dt>
+                                  {ATTRIBUTE_LABELS[attribute]} L
+                                  {selectedModule.levels[attribute] ?? 1}
+                                </dt>
+                                <dd>
+                                  <span>
+                                    {getModuleAttributeValue(
+                                      selectedModule,
+                                      attribute,
+                                    )}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    disabled={!canAfford(inventory, cost)}
+                                    onClick={() =>
+                                      upgradeResearchAttribute(
+                                        selectedModule,
+                                        attribute,
+                                      )
+                                    }
+                                  >
+                                    Improve
+                                  </button>
+                                  <small>{formatCost(cost)}</small>
+                                </dd>
+                              </div>
+                            );
+                          },
                         )}
                         <div>
                           <dt>Durability left</dt>
-                          <dd>{selectedModule.durability.toFixed(0)}</dd>
+                          <dd>
+                            <span>
+                              {selectedModule.durability.toFixed(0)} /{' '}
+                              {getModuleMaxDurability(selectedModule).toFixed(
+                                0,
+                              )}
+                            </span>
+                          </dd>
                         </div>
                       </dl>
-                      {selectedModule.type === 'mining' && (
-                        <button
-                          type="button"
-                          data-active={selectedModule.active}
-                          disabled={selectedModule.durability <= 0}
-                          onClick={() =>
-                            setModuleActive(
-                              selectedModule.id,
-                              !selectedModule.active,
-                            )
+                      <button
+                        type="button"
+                        disabled={
+                          selectedModule.durability >=
+                            getModuleMaxDurability(selectedModule) ||
+                          !canAfford(
+                            inventory,
+                            getRepairCost(
+                              selectedModule.durability,
+                              getModuleMaxDurability(selectedModule),
+                              selectedModule.type === 'mining' ? 1.2 : 1,
+                            ),
+                          )
+                        }
+                        onClick={() => repairSelectedModule(selectedModule)}
+                      >
+                        Repair{' '}
+                        {formatCost(
+                          getRepairCost(
+                            selectedModule.durability,
+                            getModuleMaxDurability(selectedModule),
+                            selectedModule.type === 'mining' ? 1.2 : 1,
+                          ),
+                        )}
+                      </button>
+                    </>
+                  ) : modulePanelSelection.type === 'hull' ? (
+                    <>
+                      <header>
+                        <span>Hull</span>
+                        <small>Ship system</small>
+                      </header>
+                      <div className={style.durabilityItem}>
+                        <span>Integrity</span>
+                        <meter
+                          min="0"
+                          max={MAX_HULL_DURABILITY}
+                          low={MAX_HULL_DURABILITY * 0.25}
+                          value={hullDurability}
+                        />
+                        <output>
+                          {hullDurability.toFixed(2)} / {MAX_HULL_DURABILITY}
+                        </output>
+                      </div>
+                      <button
+                        type="button"
+                        disabled={
+                          hullDurability >= MAX_HULL_DURABILITY ||
+                          !canAfford(
+                            inventory,
+                            getRepairCost(
+                              hullDurability,
+                              MAX_HULL_DURABILITY,
+                              2,
+                            ),
+                          )
+                        }
+                        onClick={repairHull}
+                      >
+                        Repair{' '}
+                        {formatCost(
+                          getRepairCost(hullDurability, MAX_HULL_DURABILITY, 2),
+                        )}
+                      </button>
+                    </>
+                  ) : modulePanelSelection.type === 'thruster' ? (
+                    <>
+                      <header>
+                        <span>Thruster {modulePanelSelection.index + 1}</span>
+                        <small>Ship system</small>
+                      </header>
+                      <div className={style.durabilityItem}>
+                        <span>Integrity</span>
+                        <meter
+                          min="0"
+                          max={MAX_THRUSTER_DURABILITY}
+                          low={MAX_THRUSTER_DURABILITY * 0.25}
+                          value={
+                            thrusterDurability[modulePanelSelection.index] ?? 0
                           }
-                        >
-                          {selectedModule.active ? 'Deactivate' : 'Activate'}
-                        </button>
-                      )}
+                        />
+                        <output>
+                          {(
+                            thrusterDurability[modulePanelSelection.index] ?? 0
+                          ).toFixed(2)}{' '}
+                          / {MAX_THRUSTER_DURABILITY}
+                        </output>
+                      </div>
+                      <button
+                        type="button"
+                        disabled={
+                          (thrusterDurability[modulePanelSelection.index] ??
+                            0) >= MAX_THRUSTER_DURABILITY ||
+                          !canAfford(
+                            inventory,
+                            getRepairCost(
+                              thrusterDurability[modulePanelSelection.index] ??
+                                0,
+                              MAX_THRUSTER_DURABILITY,
+                              0.8,
+                            ),
+                          )
+                        }
+                        onClick={() =>
+                          repairThruster(
+                            modulePanelSelection.index,
+                            thrusterDurability[modulePanelSelection.index] ?? 0,
+                          )
+                        }
+                      >
+                        Repair{' '}
+                        {formatCost(
+                          getRepairCost(
+                            thrusterDurability[modulePanelSelection.index] ?? 0,
+                            MAX_THRUSTER_DURABILITY,
+                            0.8,
+                          ),
+                        )}
+                      </button>
                     </>
                   ) : (
                     <span className={style.emptyModuleSelection}>
@@ -1118,29 +1328,22 @@ export function Footer({
                           Unlock
                         </button>
                       ) : (
-                        <div className={style.researchUpgrades}>
-                          {getModuleAttributes(module.type).map((attribute) => {
-                            const cost = getUpgradeCost(module, attribute);
-                            return (
-                              <div key={attribute}>
-                                <span>
-                                  {ATTRIBUTE_LABELS[attribute]} L
-                                  {module.levels[attribute] ?? 1}
-                                </span>
-                                <small>{formatCost(cost)}</small>
-                                <button
-                                  type="button"
-                                  disabled={!canAfford(inventory, cost)}
-                                  onClick={() =>
-                                    upgradeResearchAttribute(module, attribute)
-                                  }
-                                >
-                                  Improve
-                                </button>
-                              </div>
-                            );
-                          })}
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setModulePanelSelection({
+                              type: 'module',
+                              id: module.id,
+                            });
+                            setExpandedSpeedControls((expandedControls) => {
+                              const nextControls = new Set(expandedControls);
+                              nextControls.add('modules');
+                              return nextControls;
+                            });
+                          }}
+                        >
+                          Inspect
+                        </button>
                       )}
                     </section>
                   );
@@ -1212,41 +1415,19 @@ export function Footer({
                     }
                   />
                 </label>
-              </div>
-            </DraggablePanel>
-          )}
-          {expandedSpeedControls.has('maintenance') && (
-            <DraggablePanel
-              control="maintenance"
-              onClose={() => toggleSpeedControl('maintenance')}
-            >
-              <div className={style.durabilityList}>
-                <div className={style.durabilityItem}>
-                  <span>Hull</span>
-                  <meter
-                    min="0"
-                    max={MAX_HULL_DURABILITY}
-                    low={MAX_HULL_DURABILITY * 0.25}
-                    value={hullDurability}
+                <label className={style.switchControl}>
+                  <span>Separate velocity axes</span>
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    checked={isMeasurementVelocityAxesSeparated}
+                    onChange={(event) =>
+                      onMeasurementVelocityAxesSeparatedChange?.(
+                        event.currentTarget.checked,
+                      )
+                    }
                   />
-                  <output>
-                    {hullDurability.toFixed(2)} / {MAX_HULL_DURABILITY}
-                  </output>
-                </div>
-                {thrusterDurability.map((durability, index) => (
-                  <div className={style.durabilityItem} key={index}>
-                    <span>Thruster {index + 1}</span>
-                    <meter
-                      min="0"
-                      max={MAX_THRUSTER_DURABILITY}
-                      low={MAX_THRUSTER_DURABILITY * 0.25}
-                      value={durability}
-                    />
-                    <output>
-                      {durability.toFixed(2)} / {MAX_THRUSTER_DURABILITY}
-                    </output>
-                  </div>
-                ))}
+                </label>
               </div>
             </DraggablePanel>
           )}
@@ -1311,27 +1492,38 @@ export function Footer({
         </div>
       </section>
 
-      <dl className={style.telemetry} aria-label="Ship telemetry">
-        <div className={style.readout}>
-          <dt>State</dt>
-          <dd>{motionState}</dd>
-        </div>
-        <div className={style.readout}>
-          <dt>Engine power</dt>
-          <dd>{formatPercentage(currentEnginePowerPercent)}</dd>
-        </div>
-        <div className={style.readout}>
-          <dt>Fuel</dt>
-          <dd>
-            {formatImpulse(fuelKns * 1_000)} /{' '}
-            {formatImpulse(INITIAL_SPACESHIP_FUEL_KNS * 1_000)}
-          </dd>
-        </div>
-        <div className={style.readout}>
-          <dt>Speed</dt>
-          <dd>{formatSpeed(speed)}</dd>
-        </div>
-      </dl>
+      <div className={style.telemetryDock}>
+        <button
+          className={style.miningToggle}
+          type="button"
+          data-active={miningModuleActive}
+          disabled={!miningModule || miningModule.durability <= 0}
+          onClick={toggleMiningModule}
+        >
+          Mining {miningModuleActive ? 'Active' : 'Off'}
+        </button>
+        <dl className={style.telemetry} aria-label="Ship telemetry">
+          <div className={style.readout}>
+            <dt>State</dt>
+            <dd>{motionState}</dd>
+          </div>
+          <div className={style.readout}>
+            <dt>Engine power</dt>
+            <dd>{formatPercentage(currentEnginePowerPercent)}</dd>
+          </div>
+          <div className={style.readout}>
+            <dt>Fuel</dt>
+            <dd>
+              {formatImpulse(fuelKns * 1_000)} /{' '}
+              {formatImpulse(INITIAL_SPACESHIP_FUEL_KNS * 1_000)}
+            </dd>
+          </div>
+          <div className={style.readout}>
+            <dt>Speed</dt>
+            <dd>{formatSpeed(speed)}</dd>
+          </div>
+        </dl>
+      </div>
     </footer>
   );
 }

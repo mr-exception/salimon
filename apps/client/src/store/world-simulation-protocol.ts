@@ -71,15 +71,6 @@ export type SimulationWorkerRequest =
       targetDirection?: number;
     }
   | {
-      type: 'start-lock-on';
-      targetName: string;
-      targetKind: 'Planet' | 'Star' | 'Asteroid' | 'Spaceship';
-      targetSpeedMetersPerSecond: number;
-      maximumThrustPercent: number;
-      targetPosition: Vector;
-      targetVelocity: Vector;
-    }
-  | {
       type: 'stop-active-feature';
     }
   | {

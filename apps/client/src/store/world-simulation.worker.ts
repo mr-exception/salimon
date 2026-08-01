@@ -7,7 +7,6 @@ import {
   hydrateWorldSystems,
   setActiveWorldBodyNames,
   setSpaceshipHeading,
-  startSpaceshipLockOn,
   startSpaceshipTargetSpeed,
   startSpaceshipThrusters,
   stopSpaceshipActiveFeatureLocally,
@@ -111,19 +110,6 @@ workerScope.onmessage = (event) => {
           message.targetSpeedMetersPerSecond,
           message.maximumThrustPercent,
           message.targetDirection,
-        );
-        publishFrame();
-        break;
-      case 'start-lock-on':
-        startSpaceshipLockOn(
-          {
-            name: message.targetName,
-            kind: message.targetKind,
-            position: message.targetPosition,
-            velocity: message.targetVelocity,
-          },
-          message.targetSpeedMetersPerSecond,
-          message.maximumThrustPercent,
         );
         publishFrame();
         break;

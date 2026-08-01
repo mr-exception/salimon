@@ -69,6 +69,8 @@ const MAX_RADIUS_METERS = 750;
 
 let databasePromise: Promise<IDBDatabase> | undefined;
 let asteroidsPromise: Promise<Asteroid[]> | undefined;
+let asteroidPersistTimer: ReturnType<typeof setTimeout> | undefined;
+const pendingPersistedAsteroids = new Map<string, Asteroid>();
 
 export async function getClientAsteroids() {
   asteroidsPromise ??= readStoredAsteroids();
@@ -132,6 +134,49 @@ export function getAsteroidWorldVelocity(asteroid: Asteroid): Vector {
 
 export function getAsteroidSurfaceDistance(asteroid: Asteroid) {
   return asteroid.orbitSurfaceDistanceMeters;
+}
+
+export function getAsteroidMaterialMassKg(asteroid: Asteroid) {
+  return asteroid.materials.reduce(
+    (total, material) => total + material.massKg,
+    0,
+  );
+}
+
+export function mineAsteroid(asteroid: Asteroid, requestedMassKg: number) {
+  if (!Number.isFinite(requestedMassKg) || requestedMassKg <= 0) return [];
+
+  let remainingRequest = Math.min(
+    requestedMassKg,
+    getAsteroidMaterialMassKg(asteroid),
+  );
+  if (remainingRequest <= 0) return [];
+
+  const minedMaterials: AsteroidMaterial[] = [];
+  asteroid.materials = asteroid.materials.flatMap((material) => {
+    if (remainingRequest <= 0 || material.massKg <= 0) {
+      return material.massKg > 0 ? [material] : [];
+    }
+
+    const minedMassKg = Math.min(material.massKg, remainingRequest);
+    remainingRequest -= minedMassKg;
+    minedMaterials.push({ name: material.name, massKg: minedMassKg });
+
+    const remainingMaterialMassKg = material.massKg - minedMassKg;
+    return remainingMaterialMassKg > 0
+      ? [{ ...material, massKg: remainingMaterialMassKg }]
+      : [];
+  });
+
+  if (minedMaterials.length === 0) return [];
+
+  const nextMassKg = getAsteroidMaterialMassKg(asteroid);
+  asteroid.mass = BigInt(Math.max(0, Math.round(nextMassKg)));
+  if (nextMassKg <= 0) {
+    asteroid.radius = 0n;
+  }
+  scheduleAsteroidPersist(asteroid);
+  return minedMaterials;
 }
 
 export function isClientAsteroidParentNearSpaceship(parent: Planet | Star) {
@@ -309,6 +354,24 @@ async function writeStoredAsteroids(asteroids: Asteroid[]) {
     transaction.onerror = () => reject(transaction.error);
     transaction.onabort = () => reject(transaction.error);
   });
+}
+
+function scheduleAsteroidPersist(asteroid: Asteroid) {
+  pendingPersistedAsteroids.set(asteroid.id, asteroid);
+  if (asteroidPersistTimer) return;
+
+  asteroidPersistTimer = setTimeout(() => {
+    asteroidPersistTimer = undefined;
+    const asteroids = [...pendingPersistedAsteroids.values()];
+    pendingPersistedAsteroids.clear();
+    void writeStoredAsteroids(asteroids).catch((error: unknown) => {
+      console.error('Failed to persist asteroids', error);
+      asteroids.forEach((pendingAsteroid) => {
+        pendingPersistedAsteroids.set(pendingAsteroid.id, pendingAsteroid);
+      });
+      scheduleAsteroidPersist(asteroids[0]);
+    });
+  }, 1_000);
 }
 
 function openDatabase() {

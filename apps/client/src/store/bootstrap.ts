@@ -8,11 +8,9 @@ import {
   getSpaceshipDto,
   initializeSpaceshipInSimulation,
   setInventoryPersistHandler,
-  startSpaceshipLockOn,
   startSpaceshipTargetSpeed,
   startSpaceshipThrusters,
   stopSpaceshipActiveFeatureLocally,
-  type SpaceshipLockOnTarget,
 } from './world';
 
 const STORAGE_KEY = 'salimon.spaceship';
@@ -374,20 +372,6 @@ export function startSpaceshipThrustersFeature(
   thrusters: { powerPercent: number; active: boolean }[],
 ) {
   const started = startSpaceshipThrusters(thrusters);
-  if (started) pendingSnapshotSync = true;
-  return started;
-}
-
-export function startSpaceshipLockOnFeature(
-  target: SpaceshipLockOnTarget,
-  targetSpeedMetersPerSecond: number,
-  maximumThrustPercent: number,
-) {
-  const started = startSpaceshipLockOn(
-    target,
-    targetSpeedMetersPerSecond,
-    maximumThrustPercent,
-  );
   if (started) pendingSnapshotSync = true;
   return started;
 }

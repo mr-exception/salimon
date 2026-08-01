@@ -1,10 +1,13 @@
 import Phaser from 'phaser';
 import {
+  addInventory,
   advanceWorld,
   advanceAsteroid,
   ensureClientAsteroidsForParents,
+  getAsteroidMaterialMassKg,
   getAsteroidSurfaceDistance,
   getAsteroidWorldVelocity,
+  consumeMiningDurability,
   getBodyWorldPositionAfter,
   getSpaceshipActiveThrustVector,
   getBodyWorldVelocity,
@@ -18,13 +21,14 @@ import {
   getWorldSectorKey,
   getWorldSectorsInBounds,
   getSpaceshipWorldSector,
+  getMiningModuleStats,
   isSpaceshipEngineRunning,
   loadWorld,
+  mineAsteroid,
   scanWorldSector,
   setActiveWorldBodyNames,
   setSpaceshipTargetDirection,
   setSpaceshipHeading,
-  startSpaceshipLockOnFeature,
   startSpaceshipThrustersFeature,
   stopSpaceshipActiveFeature,
   spaceshipState,
@@ -32,7 +36,6 @@ import {
   WORLD_SECTOR_SIZE_METERS,
   WORLD_VIEWPORT_REFRESH_INTERVAL_MS,
   type Asteroid as AsteroidData,
-  type SpaceshipLockOnTarget,
   type WorldSector,
 } from '@store';
 import type { Planet as PlanetData, Star as StarData } from '@repo/types';
@@ -86,7 +89,6 @@ export type BodyContextMenuRequest = {
   name: string;
   kind: 'Planet' | 'Star' | 'Asteroid';
   alwaysVisible: boolean;
-  lockTarget: SpaceshipLockOnTarget;
 };
 
 export type BodyDetailsRequest =
@@ -95,14 +97,12 @@ export type BodyDetailsRequest =
       body: PlanetData;
       systemName: string;
       velocity: { x: number; y: number };
-      lockTarget: SpaceshipLockOnTarget;
     }
   | {
       kind: 'Star';
       body: StarData;
       systemName: string;
       velocity: { x: number; y: number };
-      lockTarget: SpaceshipLockOnTarget;
     }
   | {
       kind: 'Asteroid';
@@ -110,7 +110,6 @@ export type BodyDetailsRequest =
       systemName: string;
       velocity: { x: number; y: number };
       orbitSurfaceDistanceMeters: number;
-      lockTarget: SpaceshipLockOnTarget;
     };
 
 export type TargetDirectionPreview = {
@@ -142,6 +141,7 @@ const MEASUREMENT_ARROW_LENGTH_PX = 72;
 const MEASUREMENT_ARROW_HEAD_PX = 7;
 const MEASUREMENT_ARROW_GAP_PX = 8;
 const MEASUREMENT_ARROW_COLOR = 0x22d3ee;
+const MEASUREMENT_AXIS_OFFSET_PX = 12;
 const RULER_COLOR = 0xfbbf24;
 const RULER_POINT_RADIUS_PX = 4;
 const RULER_LABEL_OFFSET_PX = 10;
@@ -160,6 +160,10 @@ const SECTOR_SCAN_CONTROL_RADIUS = 8;
 const ASTEROID_MAX_ORBIT_SURFACE_DISTANCE_METERS = 3_000_000;
 const ASTEROID_MAX_RADIUS_METERS = 750;
 const INITIAL_ASTEROID_VIEWPORT_FILL_RATIO = 0.42;
+const MINING_RANGE_COLOR = 0xd1d5db;
+const MINING_BEAM_COLOR = 0xe5e7eb;
+const MINING_TARGET_COLOR = 0xfbbf24;
+const MINING_TARGET_MARKER_RADIUS_PX = 10;
 
 function isCanceledRequest(error: unknown) {
   if (!error || typeof error !== 'object') return false;
@@ -212,12 +216,14 @@ export class Scene extends Phaser.Scene {
   private rulerGraphics?: Phaser.GameObjects.Graphics;
   private rulerLabel?: Phaser.GameObjects.Text;
   private predictionGraphics?: Phaser.GameObjects.Graphics;
+  private miningGraphics?: Phaser.GameObjects.Graphics;
   private readonly measurementLabels = new Map<
     string,
     Phaser.GameObjects.Text
   >();
   private measuringActive = false;
   private measurementRelativeToSpaceship = false;
+  private measurementVelocityAxesSeparated = false;
   private rulerActive = false;
   private rulerStartPoint?: RulerPoint;
   private rulerEndPoint?: RulerPoint;
@@ -247,6 +253,7 @@ export class Scene extends Phaser.Scene {
   private viewportRefreshPromise?: Promise<unknown>;
   private viewportRefreshAbortController?: AbortController;
   private hasPendingViewportRefresh = false;
+  private miningTargetId?: string;
   private readonly alwaysVisibleBodies = new Set<string>();
   private readonly sectorScanButtons = new Map<string, SectorScanControl>();
 
@@ -321,6 +328,7 @@ export class Scene extends Phaser.Scene {
     this.measurementGraphics = this.add.graphics().setDepth(20);
     this.rulerGraphics = this.add.graphics().setDepth(22);
     this.predictionGraphics = this.add.graphics().setDepth(19);
+    this.miningGraphics = this.add.graphics().setDepth(16);
     this.drawVisibleWorld();
     this.configureInput();
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -334,6 +342,8 @@ export class Scene extends Phaser.Scene {
       this.viewportRefreshAbortController = undefined;
       this.sectorScanGraphics?.destroy();
       this.sectorScanGraphics = undefined;
+      this.miningGraphics?.destroy();
+      this.miningGraphics = undefined;
       this.sectorScanButtons.forEach((control) =>
         this.destroySectorScanControl(control),
       );
@@ -366,6 +376,7 @@ export class Scene extends Phaser.Scene {
       advanceAsteroid(asteroid, delta / 1000),
     );
     this.syncWorldPositions();
+    this.updateMining(delta / 1000);
     stepNavigatorPhysics(delta / 1000);
     this.planets.forEach((planet) => planet.syncRotation(worldElapsedSeconds));
     this.stars.forEach((star) => star.syncRotation(worldElapsedSeconds));
@@ -423,6 +434,7 @@ export class Scene extends Phaser.Scene {
     this.drawMeasurements();
     this.drawRuler();
     this.drawPredictions();
+    this.drawMiningOverlay();
   }
 
   setZoom(zoom: number) {
@@ -447,6 +459,10 @@ export class Scene extends Phaser.Scene {
 
   setMeasurementRelativeToSpaceship(active: boolean) {
     this.measurementRelativeToSpaceship = active;
+  }
+
+  setMeasurementVelocityAxesSeparated(active: boolean) {
+    this.measurementVelocityAxesSeparated = active;
   }
 
   setRulerActive(active: boolean) {
@@ -632,6 +648,133 @@ export class Scene extends Phaser.Scene {
     }
   }
 
+  private updateMining(elapsedSeconds: number) {
+    const stats = getMiningModuleStats();
+    if (!stats?.active || elapsedSeconds <= 0) {
+      this.miningTargetId = undefined;
+      return;
+    }
+
+    const target = this.getMiningTarget(stats.rangeMeters);
+    this.miningTargetId = target?.id;
+    if (!target) return;
+
+    const availableMassKg = getAsteroidMaterialMassKg(target);
+    if (availableMassKg <= 0) {
+      this.miningTargetId = undefined;
+      return;
+    }
+
+    const requestedMassKg = Math.min(
+      availableMassKg,
+      stats.rateKgPerSecond * elapsedSeconds,
+    );
+    const consumedDurabilityKg = consumeMiningDurability(requestedMassKg);
+    if (consumedDurabilityKg <= 0) return;
+
+    const extractedMaterials = mineAsteroid(target, consumedDurabilityKg);
+    if (extractedMaterials.length === 0) return;
+
+    addInventory(
+      Object.fromEntries(
+        extractedMaterials.map((material) => [material.name, material.massKg]),
+      ),
+    );
+
+    if (getAsteroidMaterialMassKg(target) <= 0) {
+      this.miningTargetId = undefined;
+      this.lastVisibilityViewportKey = '';
+      this.updateAsteroidVisibility();
+    }
+  }
+
+  private getMiningTarget(rangeMeters: number) {
+    const currentTarget = this.miningTargetId
+      ? this.asteroidData.find(
+          (asteroid) => asteroid.id === this.miningTargetId,
+        )
+      : undefined;
+    if (
+      currentTarget &&
+      getAsteroidMaterialMassKg(currentTarget) > 0 &&
+      this.getAsteroidDistanceFromSpaceship(currentTarget) <= rangeMeters
+    ) {
+      return currentTarget;
+    }
+
+    let closest:
+      | {
+          asteroid: AsteroidData;
+          distance: number;
+        }
+      | undefined;
+    this.asteroidData.forEach((asteroid) => {
+      if (getAsteroidMaterialMassKg(asteroid) <= 0) return;
+
+      const distance = this.getAsteroidDistanceFromSpaceship(asteroid);
+      if (distance > rangeMeters) return;
+      if (closest && distance >= closest.distance) return;
+
+      closest = { asteroid, distance };
+    });
+
+    return closest?.asteroid;
+  }
+
+  private getAsteroidDistanceFromSpaceship(asteroid: AsteroidData) {
+    const asteroidPosition = getWorldPosition(asteroid.position);
+    const spaceshipPosition = getWorldPosition(spaceshipState.position);
+
+    return Math.hypot(
+      Number(asteroidPosition.x - spaceshipPosition.x),
+      Number(asteroidPosition.y - spaceshipPosition.y),
+    );
+  }
+
+  private drawMiningOverlay() {
+    const graphics = this.miningGraphics;
+    if (!graphics) return;
+
+    graphics.clear();
+    const stats = getMiningModuleStats();
+    if (!stats?.active || !this.spaceship) return;
+
+    const zoom = this.cameras.main.zoom;
+    graphics
+      .fillStyle(MINING_RANGE_COLOR, 0.055)
+      .fillCircle(this.spaceship.x, this.spaceship.y, stats.rangeMeters)
+      .lineStyle(1.5 / zoom, MINING_RANGE_COLOR, 0.38)
+      .strokeCircle(this.spaceship.x, this.spaceship.y, stats.rangeMeters);
+
+    const target = this.miningTargetId
+      ? this.asteroidData.find(
+          (asteroid) => asteroid.id === this.miningTargetId,
+        )
+      : undefined;
+    if (!target) return;
+
+    const targetRenderPosition =
+      this.asteroidById.get(target.id) ??
+      getRenderPositionFromOrigin(
+        target.position,
+        getRenderOriginWorldPosition(),
+      );
+    const targetX = targetRenderPosition.x;
+    const targetY = targetRenderPosition.y;
+    const targetRadius = Math.max(
+      Number(target.radius),
+      MINING_TARGET_MARKER_RADIUS_PX / zoom,
+    );
+
+    graphics
+      .lineStyle(2 / zoom, MINING_BEAM_COLOR, 0.72)
+      .lineBetween(this.spaceship.x, this.spaceship.y, targetX, targetY)
+      .lineStyle(2 / zoom, MINING_TARGET_COLOR, 0.92)
+      .strokeCircle(targetX, targetY, targetRadius + 6 / zoom)
+      .lineStyle(1 / zoom, MINING_TARGET_COLOR, 0.48)
+      .strokeCircle(targetX, targetY, targetRadius + 14 / zoom);
+  }
+
   navigateTo(name: string, zoom: number) {
     this.focusOn(name, zoom, true);
   }
@@ -711,33 +854,6 @@ export class Scene extends Phaser.Scene {
 
   getSpaceshipSpeed() {
     return Number(this.spaceship?.spaceship.speed ?? 0n);
-  }
-
-  startLockOn(
-    target: SpaceshipLockOnTarget,
-    targetSpeedMetersPerSecond: number,
-    maximumThrustPercent: number,
-  ) {
-    if (!this.spaceship) return false;
-
-    try {
-      const started = startSpaceshipLockOnFeature(
-        target,
-        targetSpeedMetersPerSecond,
-        maximumThrustPercent,
-      );
-      if (!started) return false;
-    } catch (error) {
-      console.error('Failed to start lock-on feature', error);
-      return false;
-    }
-
-    this.spaceshipEngineRunning = true;
-    this.engineStartPendingUntil =
-      this.time.now + ENGINE_START_RESPONSE_TIMEOUT_MS;
-    this.spaceship.setThrustersActive(true, getSpaceshipActiveThrustVector());
-    this.onSpaceshipEngineChange?.(true, this.getSpaceshipSpeed());
-    return true;
   }
 
   startThrusters(thrusters: { powerPercent: number; active: boolean }[]) {
@@ -842,38 +958,6 @@ export class Scene extends Phaser.Scene {
     this.updateCameraLock();
   }
 
-  private getPlanetLockTarget(planet: PlanetData): SpaceshipLockOnTarget {
-    const position = getWorldPosition(planet.position);
-    return {
-      name: planet.name,
-      kind: 'Planet',
-      position: { x: Number(position.x), y: Number(position.y) },
-      velocity: getBodyWorldVelocity(planet.name),
-    };
-  }
-
-  private getStarLockTarget(star: StarData): SpaceshipLockOnTarget {
-    const position = getWorldPosition(star.position);
-    return {
-      name: star.name,
-      kind: 'Star',
-      position: { x: Number(position.x), y: Number(position.y) },
-      velocity: getBodyWorldVelocity(star.name),
-    };
-  }
-
-  private getAsteroidLockTarget(
-    asteroid: AsteroidData,
-  ): SpaceshipLockOnTarget {
-    const position = getWorldPosition(asteroid.position);
-    return {
-      name: asteroid.name,
-      kind: 'Asteroid',
-      position: { x: Number(position.x), y: Number(position.y) },
-      velocity: getAsteroidWorldVelocity(asteroid),
-    };
-  }
-
   openBodyContextMenuAt(x: number, y: number) {
     const camera = this.cameras.main;
     const asteroid = this.asteroids
@@ -886,7 +970,6 @@ export class Scene extends Phaser.Scene {
         x: Phaser.Math.Clamp(x, 8, Math.max(8, this.scale.width - 230)),
         y: Phaser.Math.Clamp(y, 8, Math.max(8, this.scale.height - 140)),
         alwaysVisible: false,
-        lockTarget: this.getAsteroidLockTarget(asteroid.asteroid),
       });
       return;
     }
@@ -909,9 +992,6 @@ export class Scene extends Phaser.Scene {
       x: Phaser.Math.Clamp(x, 8, Math.max(8, this.scale.width - 230)),
       y: Phaser.Math.Clamp(y, 8, Math.max(8, this.scale.height - 140)),
       alwaysVisible: this.alwaysVisibleBodies.has(body.name),
-      lockTarget: star
-        ? this.getStarLockTarget(body as StarData)
-        : this.getPlanetLockTarget(body as PlanetData),
     });
   }
 
@@ -931,7 +1011,6 @@ export class Scene extends Phaser.Scene {
         orbitSurfaceDistanceMeters: getAsteroidSurfaceDistance(
           asteroid.asteroid,
         ),
-        lockTarget: this.getAsteroidLockTarget(asteroid.asteroid),
       });
       return;
     }
@@ -945,7 +1024,6 @@ export class Scene extends Phaser.Scene {
         body: star.star,
         systemName: star.star.name,
         velocity: getBodyWorldVelocity(star.star.name),
-        lockTarget: this.getStarLockTarget(star.star),
       });
       return;
     }
@@ -960,7 +1038,6 @@ export class Scene extends Phaser.Scene {
       body: planet.planet,
       systemName: this.getSystemName(planet.planet),
       velocity: getBodyWorldVelocity(planet.planet.name),
-      lockTarget: this.getPlanetLockTarget(planet.planet),
     });
   }
 
@@ -1005,28 +1082,60 @@ export class Scene extends Phaser.Scene {
       : undefined;
     const spaceshipX = this.spaceship?.x;
     const spaceshipY = this.spaceship?.y;
-    const displayedNames = new Set<string>();
+    const displayedLabelKeys = new Set<string>();
     graphics.clear();
     graphics.lineStyle(1.5 / zoom, MEASUREMENT_ARROW_COLOR, 0.9);
 
-    const drawMeasurement = (
-      name: string,
+    const formatSignedSpeed = (speed: number) =>
+      `${speed < 0 ? '-' : '+'}${formatSpeed(Math.abs(speed))}`;
+
+    const formatSignedYAxisSpeed = (speed: number) =>
+      `${speed > 0 ? '-' : '+'}${formatSpeed(Math.abs(speed))}`;
+
+    const getMeasurementLabel = (key: string) => {
+      let label = this.measurementLabels.get(key);
+      if (!label) {
+        label = this.add
+          .text(0, 0, '', {
+            color: '#67e8f9',
+            fontFamily: 'system-ui, sans-serif',
+            fontSize: '12px',
+            fontStyle: 'bold',
+            stroke: '#050816',
+            strokeThickness: 3,
+          })
+          .setDepth(21)
+          .setOrigin(0, 0.5)
+          .setResolution(Math.max(2, window.devicePixelRatio));
+        this.measurementLabels.set(key, label);
+      }
+      displayedLabelKeys.add(key);
+      return label;
+    };
+
+    const drawLabel = (
+      key: string,
+      text: string,
       x: number,
       y: number,
-      radius: number,
-      velocity: { x: number; y: number },
-      distance?: number,
+      originX: number,
+      originY = 0.5,
     ) => {
-      const speed = Math.hypot(velocity.x, velocity.y);
-      const angle = speed > 0 ? Math.atan2(velocity.y, velocity.x) : 0;
-      const directionX = Math.cos(angle);
-      const directionY = Math.sin(angle);
-      const startDistance = radius + MEASUREMENT_ARROW_GAP_PX / zoom;
-      const endDistance = startDistance + MEASUREMENT_ARROW_LENGTH_PX / zoom;
-      const startX = x + directionX * startDistance;
-      const startY = y + directionY * startDistance;
-      const endX = x + directionX * endDistance;
-      const endY = y + directionY * endDistance;
+      getMeasurementLabel(key)
+        .setText(text)
+        .setOrigin(originX, originY)
+        .setPosition(x, y)
+        .setScale(1 / zoom)
+        .setVisible(true);
+    };
+
+    const drawArrow = (
+      startX: number,
+      startY: number,
+      endX: number,
+      endY: number,
+      angle: number,
+    ) => {
       const headLength = MEASUREMENT_ARROW_HEAD_PX / zoom;
 
       graphics
@@ -1043,38 +1152,79 @@ export class Scene extends Phaser.Scene {
           endY - Math.sin(angle + Math.PI / 4) * headLength,
         )
         .strokePath();
+    };
 
-      let label = this.measurementLabels.get(name);
-      if (!label) {
-        label = this.add
-          .text(0, 0, '', {
-            color: '#67e8f9',
-            fontFamily: 'system-ui, sans-serif',
-            fontSize: '12px',
-            fontStyle: 'bold',
-            stroke: '#050816',
-            strokeThickness: 3,
-          })
-          .setDepth(21)
-          .setOrigin(0, 0.5)
-          .setResolution(Math.max(2, window.devicePixelRatio));
-        this.measurementLabels.set(name, label);
+    const drawMeasurement = (
+      name: string,
+      x: number,
+      y: number,
+      radius: number,
+      velocity: { x: number; y: number },
+      distance?: number,
+    ) => {
+      const speed = Math.hypot(velocity.x, velocity.y);
+      const startDistance = radius + MEASUREMENT_ARROW_GAP_PX / zoom;
+      const endDistance = startDistance + MEASUREMENT_ARROW_LENGTH_PX / zoom;
+
+      if (this.measurementVelocityAxesSeparated) {
+        const xStartX = x + radius;
+        const xStartY = y;
+        const xEndX = x + endDistance;
+        const xEndY = y;
+        const yStartX = x;
+        const yStartY = y - radius;
+        const yEndX = x;
+        const yEndY = y - endDistance;
+        const labelGap = MEASUREMENT_ARROW_GAP_PX / zoom;
+        const yLabelOffset = MEASUREMENT_AXIS_OFFSET_PX / zoom;
+
+        drawArrow(xStartX, xStartY, xEndX, xEndY, 0);
+        drawArrow(yStartX, yStartY, yEndX, yEndY, -Math.PI / 2);
+
+        drawLabel(
+          `${name}:x`,
+          `X ${formatSignedSpeed(velocity.x)}`,
+          xEndX + labelGap,
+          xEndY,
+          0,
+        );
+        drawLabel(
+          `${name}:y`,
+          `Y ${formatSignedYAxisSpeed(velocity.y)}`,
+          yEndX + yLabelOffset,
+          yEndY,
+          0,
+        );
+        if (distance !== undefined) {
+          drawLabel(
+            `${name}:distance`,
+            formatDistance(distance),
+            x + radius + labelGap,
+            y - radius - labelGap,
+            0,
+          );
+        }
+        return;
       }
 
-      label
-        .setText(
-          distance === undefined
-            ? formatSpeed(speed)
-            : `${formatSpeed(speed)}\n${formatDistance(distance)}`,
-        )
-        .setOrigin(directionX < 0 ? 1 : 0, 0.5)
-        .setPosition(
-          endX + directionX * (MEASUREMENT_ARROW_GAP_PX / zoom),
-          endY + directionY * (MEASUREMENT_ARROW_GAP_PX / zoom),
-        )
-        .setScale(1 / zoom)
-        .setVisible(true);
-      displayedNames.add(name);
+      const angle = speed > 0 ? Math.atan2(velocity.y, velocity.x) : 0;
+      const directionX = Math.cos(angle);
+      const directionY = Math.sin(angle);
+      const startX = x + directionX * startDistance;
+      const startY = y + directionY * startDistance;
+      const endX = x + directionX * endDistance;
+      const endY = y + directionY * endDistance;
+
+      drawArrow(startX, startY, endX, endY, angle);
+      drawLabel(
+        name,
+        distance === undefined
+          ? formatSpeed(speed)
+          : `${formatSpeed(speed)}\n${formatDistance(distance)}`,
+        endX + directionX * (MEASUREMENT_ARROW_GAP_PX / zoom),
+        endY + directionY * (MEASUREMENT_ARROW_GAP_PX / zoom),
+        directionX < 0 ? 1 : 0,
+      );
     };
 
     this.planets.forEach((planet) => {
@@ -1151,7 +1301,7 @@ export class Scene extends Phaser.Scene {
     }
 
     this.measurementLabels.forEach((label, name) => {
-      if (!displayedNames.has(name)) label.setVisible(false);
+      if (!displayedLabelKeys.has(name)) label.setVisible(false);
     });
   }
 

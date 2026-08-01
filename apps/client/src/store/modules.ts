@@ -26,10 +26,10 @@ export type ResearchDefinition = {
 const store = getDefaultStore();
 
 export const MODULE_GRID_SIZE = 8;
-export const MINING_BASE_EFFICIENCY_KNS = 1;
-export const MINING_BASE_DURABILITY_KN = 2_000;
-export const MINING_DURABILITY_PER_LEVEL_KN = 100;
-export const MINING_BASE_RANGE_METERS = 10_000;
+export const MINING_BASE_RATE_KG_PER_SECOND = 2;
+export const MINING_BASE_DURABILITY_KG = 2_000;
+export const MINING_DURABILITY_PER_LEVEL_KG = 100;
+export const MINING_BASE_RANGE_METERS = 50_000;
 export const MINING_RANGE_LEVEL_MULTIPLIER = 0.05;
 export const THRUSTER_BASE_POWER_PERCENT = 100;
 export const THRUSTER_BASE_DURABILITY = 100;
@@ -57,7 +57,7 @@ const modulesAtom = atom<ShipModule[]>([
     active: false,
     unlocked: true,
     levels: { efficiency: 1, durability: 1, range: 1 },
-    durability: MINING_BASE_DURABILITY_KN,
+    durability: MINING_BASE_DURABILITY_KG,
   },
 ]);
 
@@ -71,6 +71,21 @@ export function useSetModules() {
 
 export function getModules() {
   return store.get(modulesAtom);
+}
+
+export function getModuleMaxDurability(module: ShipModule) {
+  const durabilityLevel = module.levels.durability ?? 1;
+  if (module.type === 'mining') {
+    return (
+      MINING_BASE_DURABILITY_KG +
+      Math.max(0, durabilityLevel - 1) * MINING_DURABILITY_PER_LEVEL_KG
+    );
+  }
+
+  return (
+    THRUSTER_BASE_DURABILITY *
+    (1 + Math.max(0, durabilityLevel - 1) * THRUSTER_LEVEL_MULTIPLIER)
+  );
 }
 
 export function setModuleActive(moduleId: string, active: boolean) {
@@ -129,7 +144,7 @@ export function unlockModule(type: ModuleType) {
       durability:
         type === 'thruster'
           ? THRUSTER_BASE_DURABILITY
-          : MINING_BASE_DURABILITY_KN,
+          : MINING_BASE_DURABILITY_KG,
     },
   ]);
   return true;
@@ -161,7 +176,7 @@ export function upgradeModuleAttribute(
       if (module.type === 'mining' && attribute === 'durability') {
         return {
           ...nextModule,
-          durability: module.durability + MINING_DURABILITY_PER_LEVEL_KN,
+          durability: module.durability + MINING_DURABILITY_PER_LEVEL_KG,
         };
       }
 
@@ -177,6 +192,19 @@ export function upgradeModuleAttribute(
   );
 }
 
+export function repairModule(moduleId: string) {
+  store.set(
+    modulesAtom,
+    store
+      .get(modulesAtom)
+      .map((module) =>
+        module.id === moduleId
+          ? { ...module, durability: getModuleMaxDurability(module) }
+          : module,
+      ),
+  );
+}
+
 export function getMiningModuleStats() {
   const module = store
     .get(modulesAtom)
@@ -184,19 +212,16 @@ export function getMiningModuleStats() {
   if (!module) return undefined;
 
   const efficiencyLevel = module.levels.efficiency ?? 1;
-  const durabilityLevel = module.levels.durability ?? 1;
   const rangeLevel = module.levels.range ?? 1;
   return {
     id: module.id,
     active: module.active && module.durability > 0,
-    efficiencyKns: MINING_BASE_EFFICIENCY_KNS * efficiencyLevel,
+    rateKgPerSecond: MINING_BASE_RATE_KG_PER_SECOND * efficiencyLevel,
     rangeMeters:
       MINING_BASE_RANGE_METERS *
       (1 + Math.max(0, rangeLevel - 1) * MINING_RANGE_LEVEL_MULTIPLIER),
     durability: module.durability,
-    maxDurability:
-      MINING_BASE_DURABILITY_KN +
-      Math.max(0, durabilityLevel - 1) * MINING_DURABILITY_PER_LEVEL_KN,
+    maxDurability: getModuleMaxDurability(module),
   };
 }
 

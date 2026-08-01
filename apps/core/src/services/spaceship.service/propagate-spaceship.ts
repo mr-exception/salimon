@@ -16,6 +16,21 @@ type WorldSnapshot = {
 
 const TARGET_VELOCITY_TOLERANCE_METERS_PER_SECOND = 0.1;
 
+function normalizeActiveFeature(
+  activeFeature: SpaceshipDocument['activeFeature'] | unknown,
+): SpaceshipActiveFeature | undefined {
+  if (
+    activeFeature &&
+    typeof activeFeature === 'object' &&
+    'type' in activeFeature &&
+    activeFeature.type === 'lock-on'
+  ) {
+    return undefined;
+  }
+
+  return activeFeature as SpaceshipActiveFeature | undefined;
+}
+
 export async function propagateSpaceshipToNow(
   spaceship: SpaceshipDocument,
 ): Promise<SpaceshipDocument> {
@@ -45,7 +60,7 @@ export async function propagateSpaceshipToNow(
       position: getSpaceshipWorldPosition(spaceship, world, capturedAt),
       velocity: getSpaceshipWorldVelocity(spaceship, world, capturedAt),
     },
-    spaceship.activeFeature,
+    normalizeActiveFeature(spaceship.activeFeature),
     capturedAt,
     elapsedSeconds,
     world,
@@ -80,7 +95,7 @@ export async function propagateSpaceshipToNow(
           360,
     motionState,
     activeFeature: advanceActiveFeature(
-      spaceship.activeFeature,
+      normalizeActiveFeature(spaceship.activeFeature),
       motion.position,
       motion.velocity,
       capturedAt,

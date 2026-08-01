@@ -34,6 +34,10 @@ export default function App() {
     isMeasurementRelativeToSpaceship,
     setIsMeasurementRelativeToSpaceship,
   ] = useState(false);
+  const [
+    isMeasurementVelocityAxesSeparated,
+    setIsMeasurementVelocityAxesSeparated,
+  ] = useState(false);
   const [isRulerActive, setIsRulerActive] = useState(false);
   const [initialCommunicationContactId, setInitialCommunicationContactId] =
     useState<string>();
@@ -167,6 +171,7 @@ export default function App() {
       <Navigator
         isMeasuring={isMeasuring}
         isMeasurementRelativeToSpaceship={isMeasurementRelativeToSpaceship}
+        isMeasurementVelocityAxesSeparated={isMeasurementVelocityAxesSeparated}
         isRulerActive={isRulerActive}
         isSearchOpen={isSearchOpen}
         onSceneChange={handleSceneChange}
@@ -179,12 +184,16 @@ export default function App() {
         isEngineRunning={isEngineRunning}
         isMeasuring={isMeasuring}
         isMeasurementRelativeToSpaceship={isMeasurementRelativeToSpaceship}
+        isMeasurementVelocityAxesSeparated={isMeasurementVelocityAxesSeparated}
         isRulerActive={isRulerActive}
         onStartThrusters={startThrusters}
         onStopEngines={stopEngines}
         onToggleMeasuring={() => setIsMeasuring((active) => !active)}
         onMeasurementRelativeToSpaceshipChange={
           setIsMeasurementRelativeToSpaceship
+        }
+        onMeasurementVelocityAxesSeparatedChange={
+          setIsMeasurementVelocityAxesSeparated
         }
         onToggleRuler={() => setIsRulerActive((active) => !active)}
         onOpenCommunications={openCommunications}

@@ -4,6 +4,21 @@ import { getSpaceshipVelocity } from './get-spaceship-velocity';
 import { normalizeSpaceshipInventory } from './normalize-spaceship-inventory';
 import { normalizeSpaceshipStats } from './normalize-spaceship-stats';
 
+function normalizeActiveFeature(
+  activeFeature: SpaceshipDocument['activeFeature'] | unknown,
+): SpaceshipDto['activeFeature'] {
+  if (
+    activeFeature &&
+    typeof activeFeature === 'object' &&
+    'type' in activeFeature &&
+    activeFeature.type === 'lock-on'
+  ) {
+    return undefined;
+  }
+
+  return activeFeature as SpaceshipDto['activeFeature'];
+}
+
 export function toSpaceshipDto(spaceship: SpaceshipDocument): SpaceshipDto {
   const velocity = getSpaceshipVelocity(spaceship);
   return {
@@ -22,7 +37,7 @@ export function toSpaceshipDto(spaceship: SpaceshipDocument): SpaceshipDto {
         : 'flying'),
     stats: normalizeSpaceshipStats(spaceship.stats),
     inventory: normalizeSpaceshipInventory(spaceship.inventory),
-    activeFeature: spaceship.activeFeature,
+    activeFeature: normalizeActiveFeature(spaceship.activeFeature),
     simulatedAt: (spaceship.simulatedAt ?? spaceship.updatedAt).toISOString(),
   };
 }

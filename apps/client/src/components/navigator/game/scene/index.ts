@@ -69,6 +69,11 @@ import { configureCamera, isInsideWorld } from './configure-camera';
 import { configureInput, MAX_ZOOM, MIN_ZOOM } from './configure-input';
 import { drawVisibleWorld } from './draw-visible-world';
 import { renderWorld } from './render-world';
+import {
+  disposeNavigatorPhysics,
+  initializeNavigatorPhysics,
+  stepNavigatorPhysics,
+} from '../physics';
 
 type RenderedBodyPosition = {
   x: number;
@@ -336,11 +341,21 @@ export class Scene extends Phaser.Scene {
       this.asteroids.forEach((asteroid) => asteroid.destroy());
       this.asteroids = [];
       this.asteroidById.clear();
+      disposeNavigatorPhysics();
     });
-    void this.renderWorld();
-    this.viewportRefreshTimer = window.setInterval(() => {
-      this.refreshWorldFromViewportSafely();
-    }, WORLD_VIEWPORT_REFRESH_INTERVAL_MS);
+    initializeNavigatorPhysics()
+      .then(() => {
+        if (!this.scene.isActive()) return;
+
+        void this.renderWorld();
+        this.viewportRefreshTimer = window.setInterval(() => {
+          this.refreshWorldFromViewportSafely();
+        }, WORLD_VIEWPORT_REFRESH_INTERVAL_MS);
+      })
+      .catch((error: unknown) => {
+        console.error('Failed to initialize navigator physics', error);
+        this.onWorldLoadComplete?.(error);
+      });
   }
 
   update(time: number, delta: number) {
@@ -351,6 +366,7 @@ export class Scene extends Phaser.Scene {
       advanceAsteroid(asteroid, delta / 1000),
     );
     this.syncWorldPositions();
+    stepNavigatorPhysics(delta / 1000);
     this.planets.forEach((planet) => planet.syncRotation(worldElapsedSeconds));
     this.stars.forEach((star) => star.syncRotation(worldElapsedSeconds));
     if (getSpaceshipMotionState() === 'crashed') {

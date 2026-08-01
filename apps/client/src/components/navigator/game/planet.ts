@@ -5,7 +5,13 @@ import {
   getRenderPosition,
   getRenderPositionFromOrigin,
 } from './get-render-position';
-import { getPlanetPhysicsLabel } from './physics';
+import {
+  createStaticCirclePhysicsBody,
+  getPlanetPhysicsLabel,
+  removePhysicsBody,
+  setPhysicsBodyPosition,
+} from './physics';
+import type RAPIER from '@dimforge/rapier2d-compat';
 
 const LABEL_SCREEN_GAP = 6;
 const BLACK_HOLE_MIN_SCREEN_RADIUS = 16;
@@ -32,7 +38,7 @@ export class Planet extends Phaser.GameObjects.Container {
   private readonly planetGraphics: Phaser.GameObjects.Graphics;
   private readonly patternImage: Phaser.GameObjects.Image;
   private readonly label: Phaser.GameObjects.Text;
-  private readonly physicsBody: MatterJS.BodyType;
+  private readonly physicsBody: RAPIER.RigidBody;
 
   constructor(scene: Phaser.Scene, planet: PlanetData) {
     const position = getRenderPosition(planet.position);
@@ -65,21 +71,13 @@ export class Planet extends Phaser.GameObjects.Container {
     this.patternImage.setAngle(planet.rotationDegrees);
     if (this.isBlackHole()) this.setDepth(3);
     scene.add.existing(this);
-    this.physicsBody = scene.matter.add.circle(
-      this.x,
-      this.y,
+    this.physicsBody = createStaticCirclePhysicsBody(
+      { x: this.x, y: this.y },
       Math.max(1, Number(planet.radius)),
-      {
-        label: getPlanetPhysicsLabel(planet.name),
-        isStatic: true,
-        ignoreGravity: true,
-        restitution: 0,
-        friction: 1,
-        frictionStatic: 1,
-      },
+      getPlanetPhysicsLabel(planet.name),
     );
     this.once(Phaser.GameObjects.Events.DESTROY, () => {
-      scene.matter.world.remove(this.physicsBody);
+      removePhysicsBody(this.physicsBody);
     });
   }
 
@@ -147,7 +145,7 @@ export class Planet extends Phaser.GameObjects.Container {
       ? getRenderPositionFromOrigin(this.planet.position, originPosition)
       : getRenderPosition(this.planet.position);
     this.setPosition(Number(position.x), Number(position.y));
-    this.scene.matter.body.setPosition(this.physicsBody, {
+    setPhysicsBodyPosition(this.physicsBody, {
       x: this.x,
       y: this.y,
     });

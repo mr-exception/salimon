@@ -2,7 +2,14 @@ import Phaser from 'phaser';
 import { getSpaceshipMotionState } from '@store';
 import type { Spaceship as SpaceshipData } from '@repo/types';
 import { getRenderPosition } from './get-render-position';
-import { SPACESHIP_PHYSICS_LABEL } from './physics';
+import {
+  createDynamicCirclePhysicsBody,
+  removePhysicsBody,
+  resetPhysicsBodyVelocity,
+  setPhysicsBodyPosition,
+  SPACESHIP_PHYSICS_LABEL,
+} from './physics';
+import type RAPIER from '@dimforge/rapier2d-compat';
 
 const SPACESHIP_LENGTH_M = 400;
 const SPACESHIP_WIDTH_M = 400;
@@ -23,7 +30,7 @@ export class Spaceship extends Phaser.GameObjects.Container {
   private readonly shipImage: Phaser.GameObjects.Image;
   private readonly thrusterGlows: Phaser.GameObjects.Ellipse[];
   private readonly targetArrow: Phaser.GameObjects.Graphics;
-  private readonly physicsBody: MatterJS.BodyType;
+  private readonly physicsBody: RAPIER.RigidBody;
   private targetDirection?: number;
   private thrustVector?: Vector;
   private thrusterPulse?: Phaser.Tweens.Tween;
@@ -54,21 +61,14 @@ export class Spaceship extends Phaser.GameObjects.Container {
     this.setName(spaceship.name);
     this.add([this.targetArrow, ...this.thrusterGlows, this.shipImage]);
     scene.add.existing(this);
-    this.physicsBody = scene.matter.add.circle(
-      this.x,
-      this.y,
+    this.physicsBody = createDynamicCirclePhysicsBody(
+      { x: this.x, y: this.y },
       Number(spaceship.radius),
-      {
-        label: SPACESHIP_PHYSICS_LABEL,
-        ignoreGravity: true,
-        mass: Number(spaceship.mass),
-        restitution: 0,
-        friction: 1,
-        frictionStatic: 1,
-      },
+      Number(spaceship.mass),
+      SPACESHIP_PHYSICS_LABEL,
     );
     this.once(Phaser.GameObjects.Events.DESTROY, () => {
-      scene.matter.world.remove(this.physicsBody);
+      removePhysicsBody(this.physicsBody);
     });
   }
 
@@ -90,11 +90,11 @@ export class Spaceship extends Phaser.GameObjects.Container {
 
   syncPosition() {
     this.syncRenderPosition();
-    this.scene.matter.body.setPosition(this.physicsBody, {
+    setPhysicsBodyPosition(this.physicsBody, {
       x: this.x,
       y: this.y,
     });
-    this.scene.matter.body.setVelocity(this.physicsBody, { x: 0, y: 0 });
+    resetPhysicsBodyVelocity(this.physicsBody);
     this.syncDirectionIndicators();
     this.syncThrusterGlows();
   }
@@ -113,7 +113,7 @@ export class Spaceship extends Phaser.GameObjects.Container {
       reference.x + (offsetX / distance) * contactDistance,
       reference.y + (offsetY / distance) * contactDistance,
     );
-    this.scene.matter.body.setPosition(this.physicsBody, {
+    setPhysicsBodyPosition(this.physicsBody, {
       x: this.x,
       y: this.y,
     });

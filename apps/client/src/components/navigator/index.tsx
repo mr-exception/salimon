@@ -340,12 +340,6 @@ export function Navigator({
         width: '100%',
         height: '100%',
       },
-      physics: {
-        default: 'matter',
-        matter: {
-          gravity: { x: 0, y: 0 },
-        },
-      },
       scene,
     });
     // Keep the online simulation running while the document is in the background.

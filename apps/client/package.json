@@ -12,6 +12,7 @@
     "preview": "vite preview --host 0.0.0.0 --port 4173"
   },
   "dependencies": {
+    "@dimforge/rapier2d-compat": "^0.19.3",
     "@repo/types": "*",
     "@repo/world": "*",
     "axios": "^1.18.0",

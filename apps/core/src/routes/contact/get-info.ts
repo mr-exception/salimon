@@ -37,7 +37,10 @@ export async function getInfo(request: Request, response: Response) {
           {
             id: profile.id,
             name: profile.name,
+            description: profile.description,
+            position: profile.position,
             organization: profile.organization,
+            role: profile.role,
             unreadCount,
             lastMessageAt: latestMessage?.createdAt.toISOString(),
           },

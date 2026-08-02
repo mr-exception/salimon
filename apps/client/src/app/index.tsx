@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
-import { Communications, Footer, Navigator, StartMenu } from '@components';
+import {
+  Communications,
+  Footer,
+  IntroScene,
+  Navigator,
+  StartMenu,
+} from '@components';
 import type {
   MiningSelection,
   MiningTelemetry,
@@ -12,9 +18,19 @@ import {
   subscribeToContactMessages,
   useBootstrap,
   type BootstrapRequest,
+  type ModuleType,
 } from '@store';
 import type { ContactInfo } from '@repo/types';
 import style from './style.module.css';
+import {
+  ModuleTutorialCallout,
+  TutorialTour,
+  type TutorialFooterControl,
+} from './tutorial-tour';
+import {
+  moduleTutorialIsComplete,
+  startupTutorialIsComplete,
+} from './tutorial-storage';
 
 type UnreadMessage = {
   id: string;
@@ -30,6 +46,7 @@ export default function App() {
   const [bootstrapRequest, setBootstrapRequest] =
     useState<BootstrapRequest | null>(null);
   const bootstrapState = useBootstrap(bootstrapRequest);
+  const [isNewGameIntroActive, setIsNewGameIntroActive] = useState(false);
   const [isEngineRunning, setIsEngineRunning] = useState(false);
   const [isCommunicationsOpen, setIsCommunicationsOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -52,6 +69,13 @@ export default function App() {
   const [isSelectingTargetDirection, setIsSelectingTargetDirection] =
     useState(false);
   const [miningTelemetry, setMiningTelemetry] = useState<MiningTelemetry>();
+  const [isTutorialActive, setIsTutorialActive] = useState(false);
+  const [moduleTutorial, setModuleTutorial] = useState<{
+    type: ModuleType;
+    name: string;
+  }>();
+  const [tutorialFooterControl, setTutorialFooterControl] =
+    useState<TutorialFooterControl>();
   const sceneRef = useRef<{
     startThrusters: (
       thrusters: { powerPercent: number; active: boolean }[],
@@ -61,6 +85,7 @@ export default function App() {
     setRulerActive: (active: boolean) => void;
     setPrediction: (active: boolean, seconds: number) => void;
     setMiningSelection: (selection?: MiningSelection) => void;
+    recenterOnSpaceship: () => void;
   } | null>(null);
   const handleSceneChange = useCallback(
     (
@@ -73,12 +98,21 @@ export default function App() {
         setRulerActive: (active: boolean) => void;
         setPrediction: (active: boolean, seconds: number) => void;
         setMiningSelection: (selection?: MiningSelection) => void;
+        recenterOnSpaceship: () => void;
       } | null,
     ) => {
       sceneRef.current = scene;
     },
     [],
   );
+  const handleStart = useCallback((request: BootstrapRequest) => {
+    setIsNewGameIntroActive(request.type === 'new');
+    setBootstrapRequest(request);
+  }, []);
+  const completeNewGameIntro = useCallback(() => {
+    setIsNewGameIntroActive(false);
+    sceneRef.current?.recenterOnSpaceship();
+  }, []);
   const startThrusters = useCallback(
     (thrusters: { powerPercent: number; active: boolean }[]) => {
       sceneRef.current?.startThrusters(thrusters);
@@ -112,6 +146,26 @@ export default function App() {
   const setMiningSelection = useCallback((selection?: MiningSelection) => {
     sceneRef.current?.setMiningSelection(selection);
   }, []);
+  const handleTutorialModuleOpen = useCallback(
+    (moduleType: ModuleType, moduleName: string) => {
+      if (moduleTutorialIsComplete(moduleType)) return;
+      setModuleTutorial({ type: moduleType, name: moduleName });
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (bootstrapState !== 'ready') return;
+    if (isNewGameIntroActive) return;
+    if (startupTutorialIsComplete()) return;
+
+    const startTimer = window.setTimeout(() => {
+      sceneRef.current?.recenterOnSpaceship();
+      setIsTutorialActive(true);
+    }, 600);
+
+    return () => window.clearTimeout(startTimer);
+  }, [bootstrapState, isNewGameIntroActive]);
 
   useEffect(() => {
     if (bootstrapState !== 'ready') return;
@@ -167,13 +221,14 @@ export default function App() {
     };
   }, [bootstrapState]);
 
+  const isNewGameRequest = bootstrapRequest?.type === 'new';
+
   if (bootstrapState !== 'ready') {
-    return (
-      <StartMenu
-        bootstrapState={bootstrapState}
-        onStart={setBootstrapRequest}
-      />
-    );
+    if (isNewGameIntroActive) {
+      return <IntroScene onComplete={completeNewGameIntro} />;
+    }
+
+    return <StartMenu bootstrapState={bootstrapState} onStart={handleStart} />;
   }
 
   return (
@@ -184,6 +239,7 @@ export default function App() {
         isMeasurementVelocityAxesSeparated={isMeasurementVelocityAxesSeparated}
         isRulerActive={isRulerActive}
         isSearchOpen={isSearchOpen}
+        initialFocus={isNewGameRequest ? 'spaceship' : 'default'}
         onSceneChange={handleSceneChange}
         onSpaceshipEngineChange={setIsEngineRunning}
         onCloseSearch={() => setIsSearchOpen(false)}
@@ -191,6 +247,7 @@ export default function App() {
         onTargetDirectionSelected={handleTargetDirectionSelected}
         onMiningTelemetryChange={setMiningTelemetry}
       />
+      {isNewGameIntroActive && <IntroScene onComplete={completeNewGameIntro} />}
       <Footer
         isEngineRunning={isEngineRunning}
         isMeasuring={isMeasuring}
@@ -220,6 +277,8 @@ export default function App() {
         onPredictionChange={setPrediction}
         miningTelemetry={miningTelemetry}
         onMiningSelectionChange={setMiningSelection}
+        tutorialControl={tutorialFooterControl}
+        onTutorialModuleOpen={handleTutorialModuleOpen}
       />
       {isCommunicationsOpen && (
         <Communications
@@ -230,6 +289,18 @@ export default function App() {
           onClose={() => setIsCommunicationsOpen(false)}
         />
       )}
+      <TutorialTour
+        active={isTutorialActive && !isNewGameIntroActive}
+        onComplete={() => setIsTutorialActive(false)}
+        onOpenCommunicationThread={openCommunicationThread}
+        onFooterControlChange={setTutorialFooterControl}
+        onRecenterSpaceship={() => sceneRef.current?.recenterOnSpaceship()}
+      />
+      <ModuleTutorialCallout
+        moduleType={moduleTutorial?.type}
+        moduleName={moduleTutorial?.name}
+        onComplete={() => setModuleTutorial(undefined)}
+      />
     </div>
   );
 }

@@ -4,9 +4,13 @@ import {
   getApiBaseUrl,
   getStoredSpaceshipSecurityCode,
   SECURITY_CODE_HEADER,
+  loadCachedContactMessages,
   markContactThreadRead,
+  markCachedContactMessagesRead,
   sendContactMessage,
   subscribeToContactMessages,
+  storeCachedContactMessage,
+  storeCachedContactMessages,
 } from '@store';
 import { CommunicationsShell } from './components/communications-shell';
 import { ContactsList } from './components/contacts-list';
@@ -62,6 +66,17 @@ export function Communications({
   const loadMessages = useCallback(
     async (contactId: string, after?: string) => {
       if (!securityCode) return;
+      if (!after) {
+        try {
+          const cachedMessages = await loadCachedContactMessages(
+            securityCode,
+            contactId,
+          );
+          setMessages(cachedMessages);
+        } catch (error) {
+          console.error('Failed to load cached contact messages', error);
+        }
+      }
       const { data } = await axios.get<{
         messages: Message[];
         cursor?: string;
@@ -69,16 +84,21 @@ export function Communications({
         headers: { [SECURITY_CODE_HEADER]: securityCode },
         params: { contactId, ...(after ? { after } : {}) },
       });
+      await storeCachedContactMessages(securityCode, data.messages);
       setMessages((current) =>
         after ? mergeMessages(current, data.messages) : data.messages,
       );
       if (!after) {
+        const readMessageIds = unreadMessagesRef.current
+          .filter((message) => message.contactId === contactId)
+          .map((message) => message.id);
         await markContactThreadRead(contactId);
-        onMessagesRead(
-          unreadMessagesRef.current
-            .filter((message) => message.contactId === contactId)
-            .map((message) => message.id),
+        await markCachedContactMessagesRead(
+          securityCode,
+          contactId,
+          readMessageIds,
         );
+        onMessagesRead(readMessageIds);
         void loadContacts().catch(() => {
           setError('Unable to refresh contacts.');
         });
@@ -108,11 +128,27 @@ export function Communications({
   useEffect(
     () =>
       subscribeToContactMessages((message) => {
+        if (securityCode) {
+          void storeCachedContactMessage(securityCode, message).catch(
+            (error: unknown) => {
+              console.error('Failed to cache contact message', error);
+            },
+          );
+        }
         if (message.contactId === selectedContactIdRef.current) {
           setMessages((current) => mergeMessages(current, [message]));
           if (message.sender === 'contact') {
             void markContactThreadRead(message.contactId)
               .then(() => {
+                if (securityCode) {
+                  void markCachedContactMessagesRead(
+                    securityCode,
+                    message.contactId,
+                    [message.id],
+                  ).catch((error: unknown) => {
+                    console.error('Failed to mark cached message read', error);
+                  });
+                }
                 onMessagesRead([message.id]);
                 void loadContacts().catch(() => {
                   setError('Unable to refresh contacts.');
@@ -127,7 +163,7 @@ export function Communications({
           setError('Unable to refresh contacts.');
         });
       }),
-    [loadContacts, onMessagesRead],
+    [loadContacts, onMessagesRead, securityCode],
   );
 
   useEffect(() => {
@@ -169,6 +205,7 @@ export function Communications({
         text,
         clientMessageId: crypto.randomUUID(),
       });
+      await storeCachedContactMessage(securityCode, message);
       setDraft('');
       setMessages((current) => mergeMessages(current, [message]));
     } catch {

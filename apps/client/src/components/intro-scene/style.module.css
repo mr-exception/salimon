@@ -1,0 +1,171 @@
+.intro {
+  position: fixed;
+  z-index: 30;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  place-items: center;
+  color: #e5e7eb;
+  background:
+    radial-gradient(circle at 50% 108%, rgba(66, 86, 103, 0.38), transparent 28%),
+    linear-gradient(180deg, #020307 0%, #070910 54%, #010104 100%);
+  font-family: 'Helvetica Neue', 'Segoe UI', sans-serif;
+}
+
+.starfield {
+  position: absolute;
+  inset: 0;
+  opacity: 0.8;
+  background-image:
+    radial-gradient(circle at 8% 21%, #fff 0 1px, transparent 1.6px),
+    radial-gradient(circle at 24% 73%, #cbd5e1 0 1px, transparent 1.7px),
+    radial-gradient(circle at 58% 18%, #fff 0 1px, transparent 1.5px),
+    radial-gradient(circle at 83% 44%, #d1d5db 0 1px, transparent 1.6px),
+    radial-gradient(circle at 92% 86%, #e5e7eb 0 1px, transparent 1.5px);
+  background-size:
+    310px 260px,
+    430px 390px,
+    370px 330px,
+    520px 420px,
+    610px 520px;
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.9), transparent 28%),
+    radial-gradient(ellipse at center, transparent 24%, rgba(0, 0, 0, 0.76));
+}
+
+.slide {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(820px, calc(100% - 48px));
+  min-height: 320px;
+  align-content: center;
+  gap: 24px;
+  text-align: left;
+  animation: slide-fade-in 700ms ease-out both;
+}
+
+.marker {
+  margin: 0;
+  color: #73d7f2;
+  font-size: clamp(0.7rem, 2vw, 0.9rem);
+  font-weight: 800;
+  letter-spacing: 0.3em;
+}
+
+.crawl {
+  display: grid;
+  gap: 18px;
+}
+
+.crawl p {
+  margin: 0;
+  color: #e5e7eb;
+  font-size: clamp(1.08rem, 2.6vw, 1.72rem);
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.6;
+  text-shadow:
+    0 0 16px rgba(226, 232, 240, 0.18),
+    0 2px 0 #000;
+}
+
+.controls {
+  position: absolute;
+  right: 28px;
+  bottom: 24px;
+  left: 28px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress span {
+  width: 30px;
+  height: 2px;
+  background: rgba(229, 231, 235, 0.18);
+}
+
+.progress span[data-active='true'] {
+  background: #e5e7eb;
+  box-shadow: 0 0 12px rgba(229, 231, 235, 0.42);
+}
+
+.controls button {
+  min-width: 118px;
+  height: 38px;
+  border: 1px solid rgba(229, 231, 235, 0.38);
+  border-radius: 5px;
+  background: rgba(3, 8, 18, 0.72);
+  color: #e5e7eb;
+  cursor: pointer;
+  font:
+    800 0.68rem/1 system-ui,
+    sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.controls button:hover,
+.controls button:focus-visible {
+  border-color: #73d7f2;
+  outline: none;
+  color: #dbf8ff;
+}
+
+@keyframes slide-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 680px) {
+  .slide {
+    width: min(520px, calc(100% - 32px));
+    min-height: 420px;
+    gap: 18px;
+  }
+
+  .crawl p {
+    font-size: clamp(1rem, 6vw, 1.35rem);
+    line-height: 1.5;
+  }
+
+  .controls {
+    right: 16px;
+    bottom: 16px;
+    left: 16px;
+  }
+
+  .progress span {
+    width: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide {
+    animation: none;
+  }
+}

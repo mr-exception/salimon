@@ -86,6 +86,17 @@ export class ContactMessageModel {
       .exec();
   }
 
+  static async findLatestContactMessage(
+    spaceshipSecurityCode: string,
+    contactId: string,
+  ) {
+    return (await ContactMessageModel.getModel())
+      .findOne({ spaceshipSecurityCode, contactId, sender: 'contact' })
+      .sort({ createdAt: -1, _id: -1 })
+      .lean<ContactMessageDocument>()
+      .exec();
+  }
+
   static async countUnreadContactMessages(
     spaceshipSecurityCode: string,
     contactId: string,

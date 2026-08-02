@@ -21,7 +21,11 @@ const store = getDefaultStore();
 export * from '../modules';
 export * from './module-config';
 
-const modulesAtom = atom<ShipModule[]>([]);
+function createStarterModules() {
+  return [];
+}
+
+const modulesAtom = atom<ShipModule[]>(createStarterModules());
 
 export function useModules() {
   return useAtomValue(modulesAtom);

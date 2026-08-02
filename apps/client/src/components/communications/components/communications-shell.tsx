@@ -10,6 +10,7 @@ export function CommunicationsShell({ children, onClose }: Props) {
     <div className={style.backdrop} role="presentation">
       <section
         className={style.dialog}
+        data-tutorial-target="communications-dialog"
         role="dialog"
         aria-modal="true"
         aria-labelledby="communications-title"

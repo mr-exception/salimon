@@ -147,6 +147,7 @@ function BodyDetailsDialog({
 }
 
 type NavigatorProps = {
+  initialFocus?: 'default' | 'spaceship';
   isMeasuring?: boolean;
   isMeasurementRelativeToSpaceship?: boolean;
   isMeasurementVelocityAxesSeparated?: boolean;
@@ -161,6 +162,7 @@ type NavigatorProps = {
 };
 
 export function Navigator({
+  initialFocus = 'default',
   isMeasuring = false,
   isMeasurementRelativeToSpaceship = false,
   isMeasurementVelocityAxesSeparated = false,
@@ -175,6 +177,7 @@ export function Navigator({
 }: NavigatorProps) {
   const gameHostRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<Scene>(null);
+  const initialFocusRef = useRef(initialFocus);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [worldLoadState, setWorldLoadState] = useState<
     'loading' | 'ready' | 'error'
@@ -237,6 +240,7 @@ export function Navigator({
             : current,
         ),
       onMiningTelemetryChange,
+      initialFocusRef.current,
     );
     sceneRef.current = scene;
     onSceneChange?.(scene);

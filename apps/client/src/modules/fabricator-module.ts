@@ -13,7 +13,7 @@ export class FabricatorModule extends BaseModule {
   readonly research: ResearchDefinition = {
     module: 'fabricator',
     name: this.name,
-    cost: { iron: 80, silicates: 40, carbon: 20 },
+    cost: { iron: 0, silicates: 0, carbon: 0 },
   };
   readonly attributes: readonly ModuleAttributeDefinition[] = [
     {

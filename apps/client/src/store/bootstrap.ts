@@ -12,6 +12,7 @@ import {
   startSpaceshipThrusters,
   stopSpaceshipActiveFeatureLocally,
 } from './world';
+import { storeCachedContactMessage } from './contact-message-cache';
 
 const STORAGE_KEY = 'salimon.spaceship';
 const SHIP_SECRET_TOKEN_STORAGE_KEY = 'salimon.shipSecretToken';
@@ -239,6 +240,14 @@ export function subscribeToContactMessages(
 }
 
 function emitContactMessage(message: ContactMessage) {
+  if (currentSpaceship) {
+    void storeCachedContactMessage(currentSpaceship.securityCode, message).catch(
+      (error: unknown) => {
+        console.error('Failed to cache contact message', error);
+      },
+    );
+  }
+
   if (contactMessageListeners.size === 0) {
     pendingContactMessages.push(message);
     if (pendingContactMessages.length > 100) pendingContactMessages.shift();

@@ -154,6 +154,8 @@ export type MiningSelection = {
   material: InventoryMaterial;
 };
 
+export type InitialFocus = 'default' | 'spaceship';
+
 const VIEWPORT_LABEL_OBJECT_LIMIT = 20;
 type ViewportLabelMode = 'force' | 'suppress' | 'zoom';
 type NameLabelCandidate = {
@@ -306,6 +308,7 @@ export class Scene extends Phaser.Scene {
     {};
   private readonly alwaysVisibleBodies = new Set<string>();
   private readonly sectorScanButtons = new Map<string, SectorScanControl>();
+  readonly initialFocus: InitialFocus;
 
   constructor(
     onZoomChange?: (zoom: number) => void,
@@ -324,6 +327,7 @@ export class Scene extends Phaser.Scene {
       telemetry?: SpaceshipProximityTelemetry,
     ) => void,
     onMiningTelemetryChange?: (telemetry?: MiningTelemetry) => void,
+    initialFocus: InitialFocus = 'default',
   ) {
     super('navigation');
     this.onZoomChange = onZoomChange;
@@ -337,6 +341,7 @@ export class Scene extends Phaser.Scene {
     this.onWorldViewportLoadingChange = onWorldViewportLoadingChange;
     this.onProximityTelemetryChange = onProximityTelemetryChange;
     this.onMiningTelemetryChange = onMiningTelemetryChange;
+    this.initialFocus = initialFocus;
   }
 
   protected configureCamera = configureCamera;

@@ -8,7 +8,11 @@ export async function renderWorld(this: Scene) {
     this.recenterOnSpaceship(false);
     await this.refreshWorldFromViewport();
     if (!this.sys.isActive()) return;
-    this.focusOnAttachedBodyAsteroidOrbit();
+    if (this.initialFocus === 'spaceship') {
+      this.recenterOnSpaceship(false);
+    } else {
+      this.focusOnAttachedBodyAsteroidOrbit();
+    }
     await this.reconcileClientAsteroids();
     if (!this.sys.isActive()) return;
 

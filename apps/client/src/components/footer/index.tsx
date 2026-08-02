@@ -92,6 +92,13 @@ type FooterProps = {
   onPredictionChange?: (active: boolean, seconds: number) => void;
   miningTelemetry?: MiningTelemetry;
   onMiningSelectionChange?: (selection?: MiningSelection) => void;
+  tutorialControl?: TutorialFooterControl;
+  onTutorialModuleOpen?: (moduleType: ModuleType, moduleName: string) => void;
+};
+
+type TutorialFooterControl = {
+  panel?: SpeedControlTab | 'mining';
+  moduleType?: Extract<ModuleType, 'mining' | 'fabricator'>;
 };
 
 type CommunicationNotification = {
@@ -468,6 +475,7 @@ function DraggablePanel({
       ref={panelRef}
       id={`footer-${control}-panel`}
       className={style.controlDialog}
+      data-tutorial-target={`footer-panel-${control}`}
       role="dialog"
       aria-labelledby={`footer-${control}-title`}
       style={{ left: position.x, top: position.y }}
@@ -755,6 +763,8 @@ export function Footer({
   onPredictionChange,
   miningTelemetry,
   onMiningSelectionChange,
+  tutorialControl,
+  onTutorialModuleOpen,
 }: FooterProps) {
   const speed = useSpaceshipAbsoluteSpeed();
   const fuelKns = useSpaceshipFuelKns();
@@ -915,6 +925,45 @@ export function Footer({
     },
     [],
   );
+
+  useEffect(() => {
+    if (!tutorialControl) return;
+
+    const syncTimer = window.setTimeout(() => {
+      const matchingModule = tutorialControl.moduleType
+        ? modules.find((module) => module.type === tutorialControl.moduleType)
+        : undefined;
+      if (matchingModule) {
+        setModulePanelSelection({ type: 'module', id: matchingModule.id });
+      }
+
+      if (tutorialControl.panel === 'mining') {
+        setExpandedSpeedControls(new Set());
+        setIsMiningPanelOpen(true);
+        return;
+      }
+
+      if (tutorialControl.panel) {
+        setIsMiningPanelOpen(false);
+        setExpandedSpeedControls(new Set([tutorialControl.panel]));
+      }
+    }, 0);
+
+    return () => window.clearTimeout(syncTimer);
+  }, [modules, tutorialControl]);
+
+  useEffect(() => {
+    if (!selectedModule) return;
+    if (
+      selectedModule.type === 'mining' ||
+      selectedModule.type === 'fabricator' ||
+      selectedModule.type === 'thruster'
+    ) {
+      return;
+    }
+
+    onTutorialModuleOpen?.(selectedModule.type, selectedModule.name);
+  }, [onTutorialModuleOpen, selectedModule]);
 
   useEffect(() => {
     const blurThrusterPadOnOutsidePointerDown = (event: PointerEvent) => {
@@ -1383,24 +1432,6 @@ export function Footer({
 
   const featureButtons: ReactNode[] = [
     <button
-      key="communications"
-      className={style.featureButton}
-      type="button"
-      aria-label={
-        unreadMessageCount > 0
-          ? `Communications, ${unreadMessageCount} unread messages`
-          : 'Communications'
-      }
-      onClick={onOpenCommunications}
-    >
-      <span>Communications</span>
-      {unreadMessageCount > 0 && (
-        <strong className={style.unreadBadge} aria-hidden="true">
-          {unreadMessageCount > 99 ? '99+' : unreadMessageCount}
-        </strong>
-      )}
-    </button>,
-    <button
       key="search"
       className={style.featureButton}
       type="button"
@@ -1421,6 +1452,7 @@ export function Footer({
         id={`footer-${tab}-tab`}
         className={style.featureButton}
         type="button"
+        data-tutorial-target={`footer-${tab}-button`}
         aria-controls={`footer-${tab}-panel`}
         aria-expanded={expandedSpeedControls.has(tab)}
         data-active={expandedSpeedControls.has(tab)}
@@ -1471,6 +1503,7 @@ export function Footer({
       key="mining"
       className={style.featureButton}
       type="button"
+      data-tutorial-target="footer-mining-button"
       data-active={isMiningPanelOpen}
       disabled={!miningModule}
       onClick={() => setIsMiningPanelOpen((open) => !open)}
@@ -1516,6 +1549,24 @@ export function Footer({
             ))}
           </ol>
         )}
+        <button
+          className={style.communicationButton}
+          type="button"
+          data-tutorial-target="footer-communications-button"
+          aria-label={
+            unreadMessageCount > 0
+              ? `Communications, ${unreadMessageCount} unread messages`
+              : 'Communications'
+          }
+          onClick={onOpenCommunications}
+        >
+          <span>Communications</span>
+          {unreadMessageCount > 0 && (
+            <strong className={style.unreadBadge} aria-hidden="true">
+              {unreadMessageCount > 99 ? '99+' : unreadMessageCount}
+            </strong>
+          )}
+        </button>
       </div>
       <section className={style.speedControls} aria-label="Feature row">
         <h2 className={style.featureRowTitle}>Feature row</h2>
@@ -1611,7 +1662,10 @@ export function Footer({
                     ))}
                   </section>
                 </div>
-                <div className={style.moduleInspector}>
+                <div
+                  className={style.moduleInspector}
+                  data-tutorial-target="footer-module-inspector"
+                >
                   {selectedModule ? (
                     <>
                       <header>
@@ -1809,6 +1863,7 @@ export function Footer({
                     <section
                       className={style.researchItem}
                       key={research.module}
+                      data-tutorial-target={`research-${research.module}`}
                     >
                       <header>
                         <span>{research.name}</span>
@@ -1819,6 +1874,7 @@ export function Footer({
                       {!unlocked ? (
                         <button
                           type="button"
+                          data-tutorial-target={`research-unlock-${research.module}`}
                           disabled={!canAfford(inventory, research.cost)}
                           onClick={() =>
                             unlockResearchModule(research.module, research.cost)
@@ -2498,7 +2554,10 @@ export function Footer({
         </div>
       )}
 
-      <div className={style.telemetryDock}>
+      <div
+        className={style.telemetryDock}
+        data-tutorial-target="ship-telemetry"
+      >
         <dl className={style.telemetry} aria-label="Ship telemetry">
           <div className={style.readout}>
             <dt>State</dt>

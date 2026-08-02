@@ -1,7 +1,10 @@
 export type ContactProfile = {
   id: string;
   name: string;
+  description: string;
+  position: string;
   organization: string;
+  role: string;
 };
 
 export type ContactInfo = ContactProfile & {

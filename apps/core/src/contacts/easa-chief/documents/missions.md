@@ -15,9 +15,8 @@ Guide the pilot away from Earth and toward Absenat.
 
 ## Initial Transmission
 
-Pilot, this is the Chief of EASA. An unknown being contacted humanity and gave
-us an energy cube with one message: "Reach Absenat, where the world is going to
-start." We named the cube the Core. It produces the oxygen and electricity your
-ship needs, and both resources can be harvested aboard. Your mission is to leave
-Earth and reach Absenat. We do not yet know who sent the Core or what awaits you
-there. Stay in contact.
+Pilot, this is the Chief of EASA. Command channel is open. Your orders are
+simple: depart Earth, hold course for Absenat, and keep that ship alive. Watch
+your oxygen, power, hull, and fuel. Report hazards. Repair damage. Do not chase
+rumors or dress guesses as facts. Earth needs results. Execute the mission and
+stay on comms.

@@ -4,6 +4,7 @@ import {
   type BootstrapRequest,
   type BootstrapState,
 } from '@store';
+import { TUTORIAL_STORAGE_KEY } from '../../app/tutorial-storage';
 import style from './style.module.css';
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
 };
 
 const KNOWN_INDEXED_DB_NAMES = [
+  'salimon-communications',
   'salimon-world',
   'salimon-world-fetched-sectors',
 ];
@@ -46,8 +48,14 @@ async function deleteIndexedDatabases() {
 }
 
 async function clearLocalBrowserData() {
+  const tutorialStatus = localStorage.getItem(TUTORIAL_STORAGE_KEY);
+
   localStorage.clear();
   sessionStorage.clear();
+
+  if (tutorialStatus !== null) {
+    localStorage.setItem(TUTORIAL_STORAGE_KEY, tutorialStatus);
+  }
 
   if ('caches' in window) {
     const cacheNames = await caches.keys();
@@ -64,8 +72,9 @@ export default function StartMenu({ bootstrapState, onStart }: Props) {
   const [claimCode, setClaimCode] = useState('');
   const [copyLabel, setCopyLabel] = useState('Reveal & copy');
   const [clearLabel, setClearLabel] = useState('Clear local data');
+  const [isStartingNewGame, setIsStartingNewGame] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const isLoading = bootstrapState === 'loading';
+  const isLoading = bootstrapState === 'loading' || isStartingNewGame;
 
   useEffect(() => {
     if (isClaimOpen) dialogRef.current?.showModal();
@@ -88,10 +97,24 @@ export default function StartMenu({ bootstrapState, onStart }: Props) {
     if (securityCode) onStart({ type: 'claim', securityCode });
   };
 
+  const startNewGame = async () => {
+    setIsStartingNewGame(true);
+    try {
+      await clearLocalBrowserData();
+      onStart({ type: 'new' });
+    } catch (error) {
+      console.error(
+        'Failed to clear local data before starting a new game',
+        error,
+      );
+      setIsStartingNewGame(false);
+    }
+  };
+
   const clearData = async () => {
     if (
       !window.confirm(
-        'Clear local storage, session storage, IndexedDB, and browser caches for this app?',
+        'Clear local storage, session storage, IndexedDB, and browser caches for this app? Tutorial progress will be kept.',
       )
     ) {
       return;
@@ -120,7 +143,7 @@ export default function StartMenu({ bootstrapState, onStart }: Props) {
         <nav className={style.actions} aria-label="Game menu">
           <button
             type="button"
-            onClick={() => onStart({ type: 'new' })}
+            onClick={() => void startNewGame()}
             disabled={isLoading}
           >
             <span>01</span> Start a new game

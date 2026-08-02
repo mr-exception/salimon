@@ -1,4 +1,4 @@
-const TUTORIAL_STORAGE_KEY = 'salimon:tutorial';
+export const TUTORIAL_STORAGE_KEY = 'salimon:tutorial';
 
 type TutorialStorage = {
   startupTourCompleted?: boolean;

@@ -8,6 +8,10 @@
   font-family: system-ui, sans-serif;
 }
 
+.container[data-repair-dialog-open='true'] {
+  z-index: 40;
+}
+
 .movementHint {
   position: absolute;
   bottom: 88px;
@@ -49,24 +53,43 @@
 
 .speedControls {
   position: absolute;
-  top: 34px;
+  top: 16px;
   left: 16px;
   display: grid;
-  gap: 7px;
+  gap: 6px;
   justify-items: start;
   pointer-events: auto;
   color: color-mix(in srgb, var(--color-starlight) 62%, transparent);
-  font-size: 0.62rem;
+  font-size: 0.58rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
-.controlTabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  max-width: 214px;
+.featureRowTitle {
+  margin: 0;
+  color: color-mix(in srgb, var(--color-starlight) 68%, transparent);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.featureSlots {
+  display: grid;
+  grid-template-columns: repeat(2, 112px);
+  grid-template-rows: repeat(8, 30px);
+  gap: 5px;
+}
+
+.featureSlot {
+  box-sizing: border-box;
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 10%, transparent);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--color-deep-space) 34%, transparent);
 }
 
 .communicationsDock {
@@ -484,6 +507,632 @@
   padding: 14px;
 }
 
+.miningStatusPanel {
+  display: grid;
+  width: min(430px, calc(100vw - 48px));
+  gap: 12px;
+  font-size: 0.72rem;
+  text-transform: none;
+}
+
+.miningStatusPanel h3 {
+  margin: 0;
+  color: color-mix(in srgb, var(--color-starlight) 74%, transparent);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.miningStatusPanel p {
+  margin: 0;
+  color: color-mix(in srgb, var(--color-starlight) 54%, transparent);
+}
+
+.miningStatusSummary {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 12px;
+  align-items: end;
+}
+
+.miningDurability {
+  display: grid;
+  gap: 6px;
+}
+
+.miningDurability span {
+  color: color-mix(in srgb, var(--color-starlight) 62%, transparent);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.miningDurability meter {
+  width: 100%;
+  accent-color: var(--color-plasma-cyan);
+}
+
+.miningDurability output {
+  color: var(--color-plasma-cyan);
+  font-variant-numeric: tabular-nums;
+}
+
+.miningStatusSummary dl,
+.minedMaterials dl {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.miningStatusSummary dl div,
+.minedMaterials dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.miningStatusPanel dt {
+  color: color-mix(in srgb, var(--color-starlight) 54%, transparent);
+  text-transform: capitalize;
+}
+
+.miningStatusPanel dd {
+  margin: 0;
+  color: var(--color-plasma-cyan);
+  font-variant-numeric: tabular-nums;
+}
+
+.miningTargetList,
+.minedMaterials {
+  display: grid;
+  gap: 8px;
+}
+
+.miningTargetList ul {
+  display: grid;
+  max-height: 190px;
+  gap: 6px;
+  overflow: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.miningTargetList li {
+  display: grid;
+  gap: 3px;
+  padding: 7px 8px;
+  border: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 18%, transparent);
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--color-plasma-cyan) 5%, transparent);
+}
+
+.miningTargetList li[data-active='true'] {
+  border-color: color-mix(in srgb, var(--color-plasma-cyan) 58%, transparent);
+  background: color-mix(in srgb, var(--color-plasma-cyan) 12%, transparent);
+}
+
+.miningTargetList span {
+  overflow: hidden;
+  color: color-mix(in srgb, var(--color-starlight) 82%, transparent);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.miningTargetList small {
+  color: color-mix(in srgb, var(--color-starlight) 58%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+
+.miningMaterialList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.miningMaterialList button {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 28px;
+  padding: 5px 7px;
+  border: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--color-deep-space) 86%, transparent);
+  color: inherit;
+  cursor: pointer;
+}
+
+.miningMaterialList button:hover,
+.miningMaterialList button:focus-visible,
+.miningMaterialList button[data-selected='true'] {
+  border-color: var(--color-plasma-cyan);
+  outline: none;
+}
+
+.miningMaterialList button:disabled {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.miningActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.miningActions button {
+  min-height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--color-plasma-cyan);
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--color-plasma-cyan) 14%, transparent);
+  color: var(--color-plasma-cyan);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.miningActions button:disabled {
+  border-color: color-mix(in srgb, var(--color-starlight) 18%, transparent);
+  background: transparent;
+  color: color-mix(in srgb, var(--color-starlight) 34%, transparent);
+  cursor: not-allowed;
+}
+
+.miningActions span {
+  color: #fca5a5;
+  font-weight: 700;
+}
+
+.inventoryPanel {
+  display: grid;
+  width: min(390px, calc(100vw - 48px));
+  gap: 12px;
+  font-size: 0.72rem;
+  text-transform: none;
+}
+
+.inventorySummary,
+.inventorySection {
+  display: grid;
+  gap: 8px;
+}
+
+.inventorySummary span,
+.inventorySection h3 {
+  margin: 0;
+  color: color-mix(in srgb, var(--color-starlight) 74%, transparent);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.inventorySummary meter {
+  width: 100%;
+  accent-color: var(--color-plasma-cyan);
+}
+
+.inventorySummary output {
+  color: var(--color-plasma-cyan);
+  font-variant-numeric: tabular-nums;
+}
+
+.inventorySection p {
+  margin: 0;
+  color: color-mix(in srgb, var(--color-starlight) 54%, transparent);
+}
+
+.inventorySection dl {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.inventorySection dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.inventorySection dt {
+  color: color-mix(in srgb, var(--color-starlight) 58%, transparent);
+  text-transform: capitalize;
+}
+
+.inventorySection dd {
+  margin: 0;
+  color: var(--color-plasma-cyan);
+  font-variant-numeric: tabular-nums;
+}
+
+.fabricatorPanel {
+  display: grid;
+  width: min(460px, calc(100vw - 48px));
+  gap: 12px;
+  font-size: 0.72rem;
+  text-transform: none;
+}
+
+.fabricatorStatus {
+  display: grid;
+  grid-template-columns: 150px 1fr 86px;
+  align-items: center;
+  gap: 10px;
+}
+
+.fabricatorStatus span,
+.fabricatorBlueprints h3 {
+  margin: 0;
+  color: color-mix(in srgb, var(--color-starlight) 74%, transparent);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fabricatorStatus meter {
+  width: 100%;
+  accent-color: var(--color-plasma-cyan);
+}
+
+.fabricatorStatus output {
+  color: var(--color-plasma-cyan);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.fabricatorBlueprints {
+  display: grid;
+  gap: 8px;
+}
+
+.fabricatorBlueprint {
+  display: grid;
+  gap: 8px;
+  padding: 9px;
+  border: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 18%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--color-plasma-cyan) 5%, transparent);
+}
+
+.fabricatorBlueprint header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.fabricatorBlueprint header span {
+  color: var(--color-starlight);
+  font-weight: 800;
+}
+
+.fabricatorBlueprint header small {
+  color: color-mix(in srgb, var(--color-starlight) 58%, transparent);
+}
+
+.fabricatorBlueprint dl {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+}
+
+.fabricatorBlueprint dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.fabricatorBlueprint dt {
+  color: color-mix(in srgb, var(--color-starlight) 54%, transparent);
+}
+
+.fabricatorBlueprint dd {
+  margin: 0;
+  color: var(--color-plasma-cyan);
+  font-variant-numeric: tabular-nums;
+}
+
+.fabricatorBlueprint > button {
+  justify-self: start;
+  min-height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--color-plasma-cyan);
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--color-plasma-cyan) 14%, transparent);
+  color: var(--color-plasma-cyan);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.fabricatorBlueprint > button:disabled {
+  border-color: color-mix(in srgb, var(--color-starlight) 18%, transparent);
+  background: transparent;
+  color: color-mix(in srgb, var(--color-starlight) 34%, transparent);
+  cursor: not-allowed;
+}
+
+.fabricatorRepairTargets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.fabricatorRepairTargets button {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  padding: 5px 7px;
+  border: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 20%, transparent);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--color-deep-space) 86%, transparent);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.fabricatorRepairTargets button:hover,
+.fabricatorRepairTargets button:focus-visible,
+.fabricatorRepairTargets button[data-selected='true'] {
+  border-color: var(--color-plasma-cyan);
+  outline: none;
+}
+
+.fabricatorRepairTargets span,
+.fabricatorRepairTargets small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fabricatorRepairTargets small {
+  color: color-mix(in srgb, var(--color-starlight) 54%, transparent);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.repairDialogBackdrop {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(1 7 18 / 72%);
+  pointer-events: auto;
+  backdrop-filter: blur(5px);
+}
+
+.repairDialog {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: min(560px, 100%);
+  max-height: min(620px, 90vh);
+  overflow: hidden;
+  border: 1px solid var(--color-nebula-blue);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-deep-space) 96%, black);
+  box-shadow: 0 30px 90px rgb(0 0 0 / 65%);
+  color: var(--color-starlight);
+  font-family: system-ui, sans-serif;
+  pointer-events: auto;
+}
+
+.repairDialogHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-nebula-blue);
+}
+
+.repairDialogHeader small,
+.repairKitList h3 {
+  margin: 0;
+  color: color-mix(in srgb, var(--color-starlight) 55%, transparent);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.repairDialogHeader h2 {
+  margin: 3px 0 0;
+  color: var(--color-plasma-cyan);
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.repairDialogHeader button {
+  border: 0;
+  background: transparent;
+  color: var(--color-starlight);
+  cursor: pointer;
+  font-size: 1.8rem;
+}
+
+.repairDialogContent {
+  display: grid;
+  gap: 14px;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px 20px;
+}
+
+.repairNeed {
+  display: grid;
+  gap: 8px;
+}
+
+.repairNeed header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: color-mix(in srgb, var(--color-starlight) 68%, transparent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.repairNeed strong,
+.repairNeed output {
+  color: var(--color-plasma-cyan);
+  font-variant-numeric: tabular-nums;
+}
+
+.repairProgress {
+  position: relative;
+  height: 16px;
+  overflow: hidden;
+  border: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 28%, transparent);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--color-starlight) 8%, transparent);
+}
+
+.repairProgress::before,
+.repairProgress::after {
+  position: absolute;
+  inset: 0 auto 0 0;
+  content: '';
+}
+
+.repairProgress::before {
+  width: var(--repair-preview);
+  background: color-mix(in srgb, #22c55e 30%, transparent);
+}
+
+.repairProgress::after {
+  width: var(--repair-current);
+  background: color-mix(in srgb, var(--color-plasma-cyan) 68%, transparent);
+}
+
+.repairKitList {
+  display: grid;
+  gap: 8px;
+}
+
+.repairKitList button {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid
+    color-mix(in srgb, var(--color-plasma-cyan) 22%, transparent);
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--color-deep-space) 86%, transparent);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.repairKitList button[data-selected='true'],
+.repairKitList button:hover,
+.repairKitList button:focus-visible {
+  border-color: var(--color-plasma-cyan);
+  outline: none;
+}
+
+.repairKitList span,
+.repairKitList small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.repairKitList span {
+  color: var(--color-starlight);
+  font-weight: 800;
+}
+
+.repairKitList small {
+  color: color-mix(in srgb, var(--color-starlight) 56%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+
+.repairCountField {
+  display: grid;
+  grid-template-columns: 1fr 110px;
+  align-items: center;
+  gap: 12px;
+  color: color-mix(in srgb, var(--color-starlight) 68%, transparent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.repairCountField input {
+  box-sizing: border-box;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--color-nebula-blue);
+  border-radius: 4px;
+  outline: none;
+  background: var(--color-deep-space);
+  color: var(--color-starlight);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.repairCountField input:focus {
+  border-color: var(--color-plasma-cyan);
+}
+
+.repairDialogActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--color-nebula-blue);
+}
+
+.repairDialogActions span {
+  color: color-mix(in srgb, var(--color-starlight) 62%, transparent);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.repairDialogActions button {
+  min-height: 32px;
+  padding: 0 14px;
+  border: 1px solid var(--color-plasma-cyan);
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--color-plasma-cyan) 14%, transparent);
+  color: var(--color-plasma-cyan);
+  cursor: pointer;
+  font:
+    800 0.68rem/1 system-ui,
+    sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.repairDialogActions button:disabled {
+  border-color: color-mix(in srgb, var(--color-starlight) 18%, transparent);
+  background: transparent;
+  color: color-mix(in srgb, var(--color-starlight) 34%, transparent);
+  cursor: not-allowed;
+}
+
 .speedInputs {
   display: grid;
   align-content: center;
@@ -888,23 +1537,29 @@
   border-color: #f87171;
 }
 
-.speedControls .controlTab,
-.communicationButton {
+.speedControls .featureButton {
   position: relative;
   display: grid;
-  place-items: center;
-  width: 38px;
-  padding: 0;
   align-items: center;
-  height: 38px;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  padding: 0 8px;
   border-color: color-mix(in srgb, var(--color-plasma-cyan) 30%, transparent);
   background: color-mix(in srgb, var(--color-deep-space) 88%, transparent);
   box-shadow: 0 8px 24px rgb(0 0 0 / 28%);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   backdrop-filter: blur(8px);
 }
 
-.controlTab svg,
-.communicationButton svg,
+.speedControls .featureButton span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .dragHandle svg {
   width: 19px;
   height: 19px;
@@ -962,13 +1617,13 @@
   transform: translate(-50%, 0);
 }
 
-.speedControls .controlTab[data-active='true'] {
+.speedControls .featureButton[data-active='true'] {
   border-color: var(--color-plasma-cyan);
   background: color-mix(in srgb, var(--color-plasma-cyan) 14%, transparent);
   color: var(--color-plasma-cyan);
 }
 
-.speedControls .controlTab[data-loading='true'] {
+.speedControls .featureButton[data-loading='true'] {
   border-color: var(--color-plasma-cyan);
   background: color-mix(in srgb, var(--color-plasma-cyan) 10%, transparent);
   color: var(--color-plasma-cyan);
@@ -1021,27 +1676,51 @@
   color: #86efac;
 }
 
-.speedControls .dragHandle,
-.speedControls .closeDialog {
+.dragHandle,
+.closeDialog {
   display: grid;
   width: 30px;
   height: 30px;
   padding: 0;
+  border: 0;
+  background: transparent;
+  color: color-mix(in srgb, var(--color-starlight) 64%, transparent);
   place-items: center;
 }
 
-.speedControls .dragHandle {
+.dragHandle svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.dragHandle {
   cursor: grab;
   touch-action: none;
 }
 
-.speedControls .dragHandle:active {
+.dragHandle:hover,
+.dragHandle:focus-visible,
+.closeDialog:hover,
+.closeDialog:focus-visible {
+  color: var(--color-plasma-cyan);
+  outline: none;
+}
+
+.dragHandle:active {
   cursor: grabbing;
 }
 
-.speedControls .closeDialog {
+.closeDialog {
   color: color-mix(in srgb, var(--color-starlight) 65%, transparent);
   font-size: 1rem;
+}
+
+.dockActions {
+  display: flex;
+  gap: 6px;
 }
 
 .telemetryDock {
@@ -1152,7 +1831,7 @@
   }
 
   .speedControls {
-    top: 34px;
+    top: 16px;
     left: 12px;
   }
 
@@ -1175,7 +1854,8 @@
   .thrustersPanel,
   .durabilityList,
   .modulesPanel,
-  .researchList {
+  .researchList,
+  .fabricatorPanel {
     width: 100%;
     min-width: 0;
   }

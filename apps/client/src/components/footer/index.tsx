@@ -10,9 +10,20 @@ import {
 } from 'react';
 import style from './style.module.css';
 import {
+  FABRICATOR_BLUEPRINTS,
+  FUEL_CELL_TIERS,
+  REPAIR_KIT_TIERS,
+  type FuelCellTier,
+  type RepairKitTier,
+} from './fabricator-blueprints';
+import type { MiningSelection, MiningTelemetry } from '../navigator/game/scene';
+import {
   INITIAL_SPACESHIP_FUEL_KNS,
-  MAX_HULL_DURABILITY,
+  HULL_DURABILITY_DRAIN_PER_CRASH,
+  HULL_DURABILITY_PER_LEVEL,
   MAX_THRUSTER_DURABILITY,
+  FABRICATOR_DURABILITY_DRAIN_PER_CRAFT,
+  ENERGY_CORE_DURABILITY_DRAIN_PER_REFUEL,
   MINING_BASE_RATE_KG_PER_SECOND,
   MINING_BASE_DURABILITY_KG,
   MINING_BASE_RANGE_METERS,
@@ -21,19 +32,25 @@ import {
   INVENTORY_MATERIALS,
   MODULE_RESEARCH,
   SPACESHIP_THRUSTER_COUNT,
+  SPACESHIP_INVENTORY_CAPACITY_KG,
   THRUSTER_BASE_DURABILITY,
   THRUSTER_BASE_POWER_PERCENT,
   THRUSTER_LEVEL_MULTIPLIER,
+  addSpaceshipFuelKns,
+  consumeEnergyCoreDurability,
+  consumeFabricatorDurability,
   getModuleMaxDurability,
+  getSpaceshipMaxHullDurability,
   getSpaceshipSaveBlockReason,
-  repairModule,
-  repairSpaceshipHull,
-  repairSpaceshipThruster,
+  repairModuleByAmount,
+  repairSpaceshipHullByAmount,
+  repairSpaceshipThrusterByAmount,
   setModuleActive,
   saveSpaceship,
   spendInventory,
   unlockModule,
   upgradeModuleAttribute,
+  upgradeSpaceshipHull,
   useInventory,
   useModules,
   useSpaceshipActiveFeature,
@@ -41,6 +58,7 @@ import {
   useSpaceshipAbsoluteSpeed,
   useSpaceshipFuelKns,
   useSpaceshipHullDurability,
+  useSpaceshipHullLevel,
   useSpaceshipMotionState,
   useSpaceshipThrusterDurability,
   type Inventory,
@@ -51,9 +69,11 @@ import {
 import type { InventoryMaterial } from '@repo/types';
 import { MAX_ENGINE_THRUST_KN } from '@repo/world';
 import {
+  formatDistance,
   formatForce,
   formatImpulse,
   formatPercentage,
+  formatSiValue,
   formatSpeed,
 } from '../../utils';
 
@@ -77,6 +97,8 @@ type FooterProps = {
   unreadMessageCount?: number;
   unreadMessages?: CommunicationNotification[];
   onPredictionChange?: (active: boolean, seconds: number) => void;
+  miningTelemetry?: MiningTelemetry;
+  onMiningSelectionChange?: (selection?: MiningSelection) => void;
 };
 
 type CommunicationNotification = {
@@ -96,9 +118,17 @@ type SpeedControlTab =
   | 'measuring'
   | 'prediction'
   | 'modules'
-  | 'research';
+  | 'research'
+  | 'fabricator';
+type DraggableControl = SpeedControlTab | 'mining-status' | 'inventory';
 
 type ModulePanelSelection =
+  | { type: 'module'; id: string }
+  | { type: 'hull' }
+  | { type: 'thruster'; index: number };
+type RepairKitInventory = Record<RepairKitTier, number>;
+type FuelCellInventory = Record<FuelCellTier, number>;
+type RepairDialogTarget =
   | { type: 'module'; id: string }
   | { type: 'hull' }
   | { type: 'thruster'; index: number };
@@ -108,12 +138,15 @@ type Position = {
   y: number;
 };
 
-const CONTROL_LABELS: Record<SpeedControlTab, string> = {
+const CONTROL_LABELS: Record<DraggableControl, string> = {
   thrusters: 'Thrusters',
   measuring: 'Measuring',
   prediction: 'Prediction',
   modules: 'Modules',
   research: 'Research',
+  fabricator: 'Fabricator',
+  'mining-status': 'Mining module',
+  inventory: 'Inventory',
 };
 
 const PANEL_MARGIN = 16;
@@ -121,7 +154,7 @@ const PANEL_TOP = 140;
 const PANEL_BOTTOM = 88;
 
 const PANEL_PLACEMENTS: Record<
-  SpeedControlTab,
+  DraggableControl,
   { horizontal: 'left' | 'right'; vertical: 'top' | 'bottom' }
 > = {
   thrusters: { horizontal: 'left', vertical: 'top' },
@@ -129,9 +162,20 @@ const PANEL_PLACEMENTS: Record<
   prediction: { horizontal: 'left', vertical: 'bottom' },
   modules: { horizontal: 'left', vertical: 'top' },
   research: { horizontal: 'right', vertical: 'top' },
+  fabricator: { horizontal: 'right', vertical: 'top' },
+  'mining-status': { horizontal: 'right', vertical: 'top' },
+  inventory: { horizontal: 'right', vertical: 'bottom' },
 };
 
 const THRUSTER_LABELS = ['Top', 'Right', 'Bottom', 'Left'] as const;
+
+function createRepairKitInventory(): RepairKitInventory {
+  return { t1: 0 };
+}
+
+function createFuelCellInventory(): FuelCellInventory {
+  return { t1: 0 };
+}
 
 function createManualThrusterInputs() {
   return Array.from({ length: SPACESHIP_THRUSTER_COUNT }, () => ({
@@ -157,60 +201,11 @@ function createManualThrusterInputsFromSignals(
   });
 }
 
-function FeatureIcon({ feature }: { feature: SpeedControlTab }) {
-  if (feature === 'modules') {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" />
-      </svg>
-    );
-  }
-  if (feature === 'research') {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M10 4h4M12 4v6l5 8a2 2 0 0 1-1.7 3H8.7A2 2 0 0 1 7 18l5-8" />
-        <path d="M9 16h6" />
-      </svg>
-    );
-  }
-  if (feature === 'prediction') {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="6" cy="17" r="2" />
-        <circle cx="18" cy="7" r="2" />
-        <path d="M8 16c4-.8 5-6.2 8-8M13 7h3v3" />
-      </svg>
-    );
-  }
-  if (feature === 'thrusters') {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 3v18M3 12h18" />
-        <path d="m12 3-2.5 2.5M12 3l2.5 2.5M21 12l-2.5-2.5M21 12l-2.5 2.5M12 21l-2.5-2.5M12 21l2.5-2.5M3 12l2.5-2.5M3 12l2.5 2.5" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 3v18M3 12h18" />
-      <path d="m12 3-2.5 2.5M12 3l2.5 2.5M21 12l-2.5-2.5M21 12l-2.5 2.5M12 21l-2.5-2.5M12 21l2.5-2.5M3 12l2.5-2.5M3 12l2.5 2.5" />
-    </svg>
-  );
-}
-
-function SaveIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M5 4h12l2 2v14H5z" />
-      <path d="M8 4v6h8V4M8 20v-6h8v6" />
-    </svg>
-  );
-}
-
 const MODULE_LABELS: Record<ModuleType, string> = {
   mining: 'Mining',
   thruster: 'Thruster',
+  fabricator: 'Fabricator',
+  'energy-core': 'Energy Core',
 };
 
 const ATTRIBUTE_LABELS: Record<ModuleAttribute, string> = {
@@ -252,6 +247,12 @@ function getModuleAttributeValue(
         (1 + Math.max(0, level - 1) * THRUSTER_LEVEL_MULTIPLIER),
     )}`;
   }
+  if (module.type === 'fabricator' && attribute === 'durability') {
+    return `${Math.round(getModuleMaxDurability(module))}`;
+  }
+  if (module.type === 'energy-core' && attribute === 'durability') {
+    return `${Math.round(getModuleMaxDurability(module))}`;
+  }
 
   return String(level);
 }
@@ -292,36 +293,28 @@ function getUpgradeCost(
       ice: 8 * nextLevel,
     };
   }
-
-  return { iron: 0, silicates: 0, ice: 0 };
-}
-
-function getRepairCost(
-  currentDurability: number,
-  maximumDurability: number,
-  scale = 1,
-): Partial<Inventory> {
-  if (maximumDurability <= 0 || currentDurability >= maximumDurability) {
-    return { iron: 0, silicates: 0, ice: 0 };
+  if (module.type === 'fabricator' && attribute === 'durability') {
+    return {
+      iron: 28 * nextLevel,
+      silicates: 18 * nextLevel,
+      carbon: 10 * nextLevel,
+    };
+  }
+  if (module.type === 'energy-core' && attribute === 'durability') {
+    return {
+      iron: 38 * nextLevel,
+      silicates: 28 * nextLevel,
+      carbon: 14 * nextLevel,
+    };
   }
 
-  const missingRatio =
-    (maximumDurability - currentDurability) / maximumDurability;
-  return {
-    iron: Math.ceil(24 * missingRatio * scale),
-    silicates: Math.ceil(12 * missingRatio * scale),
-    ice: Math.ceil(4 * missingRatio * scale),
-  };
+  return { iron: 0, silicates: 0, ice: 0 };
 }
 
 function canAfford(inventory: Inventory, cost: Partial<Inventory>) {
   return INVENTORY_MATERIALS.every(
     (material) => inventory[material] >= (cost[material] ?? 0),
   );
-}
-
-function hasCost(cost: Partial<Inventory>) {
-  return INVENTORY_MATERIALS.some((material) => (cost[material] ?? 0) > 0);
 }
 
 function getMessagePreview(text: string) {
@@ -353,9 +346,9 @@ function formatCost(cost: Partial<Inventory>) {
 }
 
 function getModuleAttributes(type: ModuleType): ModuleAttribute[] {
-  return type === 'mining'
-    ? ['efficiency', 'durability', 'range']
-    : ['power', 'durability'];
+  if (type === 'mining') return ['efficiency', 'durability', 'range'];
+  if (type === 'thruster') return ['power', 'durability'];
+  return ['durability'];
 }
 
 function MoveIcon() {
@@ -363,42 +356,6 @@ function MoveIcon() {
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M12 2v20M2 12h20" />
       <path d="m12 2-3 3m3-3 3 3m7 7-3-3m3 3-3 3m-7 7-3-3m3 3 3-3M2 12l3-3m-3 3 3 3" />
-    </svg>
-  );
-}
-
-function CommunicationsIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M4 5h16v11H9l-5 4V5Z" />
-      <path d="M8 9h8M8 12h5" />
-    </svg>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="10.5" cy="10.5" r="5.5" />
-      <path d="m15 15 5 5" />
-    </svg>
-  );
-}
-
-function MeasuringIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M4 20 20 4M12 4h8v8" />
-      <path d="M4 15v5h5" />
-    </svg>
-  );
-}
-
-function RulerIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M4 16 16 4l4 4L8 20 4 16Z" />
-      <path d="m9 15-2-2m5-1-2-2m5-1-2-2" />
     </svg>
   );
 }
@@ -467,8 +424,8 @@ function DraggablePanel({
   onClose,
 }: {
   children: ReactNode;
-  control: SpeedControlTab;
-  onClose: () => void;
+  control: DraggableControl;
+  onClose?: () => void;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{
@@ -597,16 +554,251 @@ function DraggablePanel({
           <MoveIcon />
         </button>
         <h2 id={`footer-${control}-title`}>{CONTROL_LABELS[control]}</h2>
-        <button
-          className={style.closeDialog}
-          type="button"
-          aria-label={`Close ${CONTROL_LABELS[control]}`}
-          onClick={onClose}
-        >
-          ×
-        </button>
+        {onClose ? (
+          <button
+            className={style.closeDialog}
+            type="button"
+            aria-label={`Close ${CONTROL_LABELS[control]}`}
+            onClick={onClose}
+          >
+            ×
+          </button>
+        ) : (
+          <span aria-hidden="true" />
+        )}
       </header>
       <div className={style.dialogContent}>{children}</div>
+    </div>
+  );
+}
+
+function MiningStatusPanel({
+  telemetry,
+  active,
+  selectedMiningMaterial,
+  inventoryMassKg,
+  inventoryCapacityKg,
+  onSelectMiningMaterial,
+  onToggleMining,
+}: {
+  telemetry: MiningTelemetry;
+  active: boolean;
+  selectedMiningMaterial?: MiningSelection;
+  inventoryMassKg: number;
+  inventoryCapacityKg: number;
+  onSelectMiningMaterial: (selection: MiningSelection) => void;
+  onToggleMining: () => void;
+}) {
+  const durabilityPercent =
+    telemetry.maxDurability > 0
+      ? (telemetry.durability / telemetry.maxDurability) * 100
+      : 0;
+  const inventoryFull = inventoryMassKg >= inventoryCapacityKg;
+  const selectedMaterialAvailable = telemetry.targets.some(
+    (target) =>
+      target.id === selectedMiningMaterial?.asteroidId &&
+      target.materials.some(
+        (material) =>
+          material.name === selectedMiningMaterial.material &&
+          material.massKg > 0,
+      ),
+  );
+  const canStart =
+    active ||
+    (selectedMiningMaterial !== undefined &&
+      selectedMaterialAvailable &&
+      telemetry.durability > 0 &&
+      !inventoryFull);
+  const minedEntries = INVENTORY_MATERIALS.flatMap((material) => {
+    const massKg = telemetry.minedMaterials[material] ?? 0;
+    return massKg > 0 ? [{ material, massKg }] : [];
+  });
+
+  return (
+    <div className={style.miningStatusPanel}>
+      <section className={style.miningStatusSummary}>
+        <div className={style.miningDurability}>
+          <span>Durability</span>
+          <meter
+            min={0}
+            max={telemetry.maxDurability}
+            value={telemetry.durability}
+          />
+          <output>
+            {formatPercentage(durabilityPercent)} ·{' '}
+            {formatSiValue(telemetry.durability, 'kg')}
+          </output>
+        </div>
+        <dl>
+          <div>
+            <dt>Rate</dt>
+            <dd>{formatSiValue(telemetry.rateKgPerSecond, 'kg/s')}</dd>
+          </div>
+          <div>
+            <dt>Range</dt>
+            <dd>{formatDistance(telemetry.rangeMeters)}</dd>
+          </div>
+          <div>
+            <dt>Inventory</dt>
+            <dd>
+              {formatSiValue(inventoryMassKg, 'kg')} /{' '}
+              {formatSiValue(inventoryCapacityKg, 'kg')}
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <section className={style.miningTargetList}>
+        <h3>Mining asteroids</h3>
+        {telemetry.targets.length > 0 ? (
+          <ul>
+            {telemetry.targets.map((target) => (
+              <li key={target.id} data-active={target.active}>
+                <span>{target.name}</span>
+                <small>
+                  {formatDistance(target.distanceMeters)} ·{' '}
+                  {formatSiValue(target.remainingMassKg, 'kg')}
+                </small>
+                <div className={style.miningMaterialList}>
+                  {target.materials.map((material) => {
+                    const selected =
+                      target.id === selectedMiningMaterial?.asteroidId &&
+                      material.name === selectedMiningMaterial.material;
+                    return (
+                      <button
+                        key={material.name}
+                        type="button"
+                        data-selected={selected}
+                        disabled={active}
+                        onClick={() =>
+                          onSelectMiningMaterial({
+                            asteroidId: target.id,
+                            material: material.name,
+                          })
+                        }
+                      >
+                        <span>{material.name}</span>
+                        <small>{formatSiValue(material.massKg, 'kg')}</small>
+                      </button>
+                    );
+                  })}
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No asteroids in range</p>
+        )}
+      </section>
+
+      <div className={style.miningActions}>
+        <button type="button" disabled={!canStart} onClick={onToggleMining}>
+          {active ? 'Stop mining' : 'Start mining'}
+        </button>
+        {inventoryFull && <span>Inventory full</span>}
+      </div>
+
+      <section className={style.minedMaterials}>
+        <h3>Mined this run</h3>
+        {minedEntries.length > 0 ? (
+          <dl>
+            {minedEntries.map(({ material, massKg }) => (
+              <div key={material}>
+                <dt>{material}</dt>
+                <dd>{formatSiValue(massKg, 'kg')}</dd>
+              </div>
+            ))}
+          </dl>
+        ) : (
+          <p>No materials extracted yet</p>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function InventoryPanel({
+  inventory,
+  inventoryMassKg,
+  inventoryCapacityKg,
+  fuelCellInventory,
+  repairKitInventory,
+}: {
+  inventory: Inventory;
+  inventoryMassKg: number;
+  inventoryCapacityKg: number;
+  fuelCellInventory: FuelCellInventory;
+  repairKitInventory: RepairKitInventory;
+}) {
+  const materialEntries = INVENTORY_MATERIALS.map((material) => ({
+    material,
+    massKg: inventory[material],
+  }));
+  const itemEntries = [
+    ...FUEL_CELL_TIERS.flatMap((cell) => {
+      const quantity = fuelCellInventory[cell.tier];
+      return quantity > 0
+        ? [
+            {
+              key: `fuel-cell:${cell.tier}`,
+              name: cell.label,
+              detail: `${quantity} stored / ${formatForce(cell.fuelKns * 1_000)} each`,
+            },
+          ]
+        : [];
+    }),
+    ...REPAIR_KIT_TIERS.flatMap((kit) => {
+      const quantity = repairKitInventory[kit.tier];
+      return quantity > 0
+        ? [
+            {
+              key: `repair-kit:${kit.tier}`,
+              name: kit.label,
+              detail: `${quantity} stored / ${kit.repairAmount} durability each`,
+            },
+          ]
+        : [];
+    }),
+  ];
+
+  return (
+    <div className={style.inventoryPanel}>
+      <section className={style.inventorySummary}>
+        <span>Capacity</span>
+        <meter min={0} max={inventoryCapacityKg} value={inventoryMassKg} />
+        <output>
+          {formatSiValue(inventoryMassKg, 'kg')} /{' '}
+          {formatSiValue(inventoryCapacityKg, 'kg')}
+        </output>
+      </section>
+
+      <section className={style.inventorySection}>
+        <h3>Items</h3>
+        {itemEntries.length > 0 ? (
+          <dl>
+            {itemEntries.map((item) => (
+              <div key={item.key}>
+                <dt>{item.name}</dt>
+                <dd>{item.detail}</dd>
+              </div>
+            ))}
+          </dl>
+        ) : (
+          <p>No produced items stored</p>
+        )}
+      </section>
+
+      <section className={style.inventorySection}>
+        <h3>Materials</h3>
+        <dl>
+          {materialEntries.map(({ material, massKg }) => (
+            <div key={material}>
+              <dt>{material}</dt>
+              <dd>{formatSiValue(massKg, 'kg')}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
     </div>
   );
 }
@@ -628,10 +820,13 @@ export function Footer({
   unreadMessageCount = 0,
   unreadMessages = [],
   onPredictionChange,
+  miningTelemetry,
+  onMiningSelectionChange,
 }: FooterProps) {
   const speed = useSpaceshipAbsoluteSpeed();
   const fuelKns = useSpaceshipFuelKns();
   const hullDurability = useSpaceshipHullDurability();
+  const hullLevel = useSpaceshipHullLevel();
   const thrusterDurability = useSpaceshipThrusterDurability();
   const motionState = useSpaceshipMotionState();
   const activeFeature = useSpaceshipActiveFeature();
@@ -648,6 +843,25 @@ export function Footer({
   const [predictionAmount, setPredictionAmount] = useState('2');
   const [predictionUnit, setPredictionUnit] = useState<'s' | 'm' | 'h'>('m');
   const [isPredictionActive, setIsPredictionActive] = useState(false);
+  const [isMiningPanelOpen, setIsMiningPanelOpen] = useState(false);
+  const [isInventoryPanelOpen, setIsInventoryPanelOpen] = useState(false);
+  const [selectedMiningMaterial, setSelectedMiningMaterial] =
+    useState<MiningSelection>();
+  const [repairKitInventory, setRepairKitInventory] = useState(
+    createRepairKitInventory,
+  );
+  const [fuelCellInventory, setFuelCellInventory] = useState(
+    createFuelCellInventory,
+  );
+  const [repairDialogTarget, setRepairDialogTarget] =
+    useState<RepairDialogTarget>();
+  const [selectedRepairKitTier, setSelectedRepairKitTier] =
+    useState<RepairKitTier>('t1');
+  const [repairKitCountField, setRepairKitCountField] = useState('1');
+  const [isRefuelDialogOpen, setIsRefuelDialogOpen] = useState(false);
+  const [selectedFuelCellTier, setSelectedFuelCellTier] =
+    useState<FuelCellTier>('t1');
+  const [fuelCellCountField, setFuelCellCountField] = useState('1');
   const [modulePanelSelection, setModulePanelSelection] =
     useState<ModulePanelSelection>({ type: 'module', id: 'mining-module-1' });
   const [expandedSpeedControls, setExpandedSpeedControls] = useState(
@@ -657,6 +871,7 @@ export function Footer({
     { type: 'success' | 'error'; message: string } | undefined
   >();
   const [isSaving, setIsSaving] = useState(false);
+  const thrusterPadRef = useRef<HTMLDivElement>(null);
   const saveStatusTimerRef = useRef<number | undefined>(undefined);
   const selectedModule =
     modulePanelSelection.type === 'module'
@@ -665,8 +880,19 @@ export function Footer({
   const miningModule = modules.find(
     (module) => module.type === 'mining' && module.unlocked,
   );
+  const fabricatorModule = modules.find(
+    (module) => module.type === 'fabricator' && module.unlocked,
+  );
+  const energyCoreModule = modules.find(
+    (module) => module.type === 'energy-core' && module.unlocked,
+  );
   const miningModuleActive = Boolean(
     miningModule?.active && miningModule.durability > 0,
+  );
+  const maxHullDurability = getSpaceshipMaxHullDurability(hullLevel);
+  const inventoryMassKg = INVENTORY_MATERIALS.reduce(
+    (total, material) => total + inventory[material],
+    0,
   );
   const activeTargetSpeed =
     activeFeature?.type === 'target-speed' ? activeFeature : undefined;
@@ -723,10 +949,14 @@ export function Footer({
     Number.isFinite(predictionSeconds) && predictionSeconds > 0;
 
   useEffect(() => {
-    setManualThrusterAxisFields({
-      horizontal: String(displayedHorizontalThrusterValue),
-      vertical: String(displayedVerticalThrusterValue),
-    });
+    const syncTimer = window.setTimeout(() => {
+      setManualThrusterAxisFields({
+        horizontal: String(displayedHorizontalThrusterValue),
+        vertical: String(displayedVerticalThrusterValue),
+      });
+    }, 0);
+
+    return () => window.clearTimeout(syncTimer);
   }, [displayedHorizontalThrusterValue, displayedVerticalThrusterValue]);
 
   useEffect(() => {
@@ -748,6 +978,36 @@ export function Footer({
     },
     [],
   );
+
+  useEffect(() => {
+    const blurThrusterPadOnOutsidePointerDown = (event: PointerEvent) => {
+      const thrusterPad = thrusterPadRef.current;
+      if (
+        !thrusterPad ||
+        document.activeElement !== thrusterPad ||
+        !(event.target instanceof Node) ||
+        thrusterPad.contains(event.target)
+      ) {
+        return;
+      }
+
+      thrusterPad.blur();
+    };
+
+    document.addEventListener(
+      'pointerdown',
+      blurThrusterPadOnOutsidePointerDown,
+      true,
+    );
+
+    return () => {
+      document.removeEventListener(
+        'pointerdown',
+        blurThrusterPadOnOutsidePointerDown,
+        true,
+      );
+    };
+  }, []);
 
   const showSaveStatus = (
     status: { type: 'success' | 'error'; message: string },
@@ -875,9 +1135,7 @@ export function Footer({
     if (!Number.isFinite(axisValue)) return;
 
     updateManualThrusterVector(
-      axis === 'horizontal'
-        ? axisValue
-        : displayedHorizontalThrusterValue,
+      axis === 'horizontal' ? axisValue : displayedHorizontalThrusterValue,
       axis === 'vertical' ? axisValue : displayedVerticalThrusterValue,
     );
   };
@@ -892,9 +1150,7 @@ export function Footer({
     }));
 
     updateManualThrusterVector(
-      axis === 'horizontal'
-        ? clampedValue
-        : displayedHorizontalThrusterValue,
+      axis === 'horizontal' ? clampedValue : displayedHorizontalThrusterValue,
       axis === 'vertical' ? clampedValue : displayedVerticalThrusterValue,
     );
   };
@@ -918,6 +1174,7 @@ export function Footer({
   const handleThrusterPadPointerDown = (
     event: ReactPointerEvent<HTMLDivElement>,
   ) => {
+    event.currentTarget.focus({ preventScroll: true });
     event.currentTarget.setPointerCapture(event.pointerId);
     updateManualThrusterVectorFromPoint(event);
   };
@@ -928,6 +1185,29 @@ export function Footer({
     if (!event.currentTarget.hasPointerCapture(event.pointerId)) return;
 
     updateManualThrusterVectorFromPoint(event);
+  };
+
+  const handleThrusterPadKeyDown = (
+    event: ReactKeyboardEvent<HTMLDivElement>,
+  ) => {
+    if (!canControlManualThrusters) return;
+
+    const offsets: Partial<
+      Record<string, { horizontal: number; vertical: number }>
+    > = {
+      ArrowUp: { horizontal: 0, vertical: 1 },
+      ArrowRight: { horizontal: 1, vertical: 0 },
+      ArrowDown: { horizontal: 0, vertical: -1 },
+      ArrowLeft: { horizontal: -1, vertical: 0 },
+    };
+    const offset = offsets[event.key];
+    if (!offset) return;
+
+    event.preventDefault();
+    updateManualThrusterVector(
+      displayedHorizontalThrusterValue + offset.horizontal,
+      displayedVerticalThrusterValue + offset.vertical,
+    );
   };
 
   const turnOffAllThrusters = () => {
@@ -950,38 +1230,341 @@ export function Footer({
   };
 
   const repairSelectedModule = (module: ShipModule) => {
-    const cost = getRepairCost(
-      module.durability,
-      getModuleMaxDurability(module),
-      module.type === 'mining' ? 1.2 : 1,
-    );
-    if (!hasCost(cost) || !spendInventory(cost)) return;
-
-    repairModule(module.id);
+    setRepairDialogTarget({ type: 'module', id: module.id });
+    setRepairKitCountField('1');
   };
 
   const repairHull = () => {
-    const cost = getRepairCost(hullDurability, MAX_HULL_DURABILITY, 2);
-    if (!hasCost(cost) || !spendInventory(cost)) return;
+    setRepairDialogTarget({ type: 'hull' });
+    setRepairKitCountField('1');
+  };
 
-    repairSpaceshipHull();
+  const improveHull = () => {
+    const nextLevel = hullLevel + 1;
+    const cost: Partial<Inventory> = {
+      iron: 40 * nextLevel,
+      silicates: 18 * nextLevel,
+      carbon: 8 * nextLevel,
+    };
+    if (!spendInventory(cost)) return;
+
+    upgradeSpaceshipHull();
   };
 
   const repairThruster = (index: number, durability: number) => {
-    const cost = getRepairCost(durability, MAX_THRUSTER_DURABILITY, 0.8);
-    if (!hasCost(cost) || !spendInventory(cost)) return;
+    if (durability >= MAX_THRUSTER_DURABILITY) return;
 
-    repairSpaceshipThruster(index);
+    setRepairDialogTarget({ type: 'thruster', index });
+    setRepairKitCountField('1');
+  };
+
+  const selectMiningMaterial = (selection: MiningSelection) => {
+    setSelectedMiningMaterial(selection);
+    onMiningSelectionChange?.(selection);
   };
 
   const toggleMiningModule = () => {
     if (!miningModule || miningModule.durability <= 0) return;
 
-    setModuleActive(miningModule.id, !miningModule.active);
+    if (miningModuleActive) {
+      setModuleActive(miningModule.id, false);
+      return;
+    }
+
+    if (
+      !selectedMiningMaterial ||
+      inventoryMassKg >= SPACESHIP_INVENTORY_CAPACITY_KG
+    ) {
+      return;
+    }
+
+    onMiningSelectionChange?.(selectedMiningMaterial);
+    setModuleActive(miningModule.id, true);
   };
 
+  const canUseFabricator = Boolean(
+    fabricatorModule &&
+    fabricatorModule.durability >= FABRICATOR_DURABILITY_DRAIN_PER_CRAFT,
+  );
+  const repairDialogTargetDetails =
+    repairDialogTarget?.type === 'module'
+      ? (() => {
+          const module = modules.find(
+            (candidate) => candidate.id === repairDialogTarget.id,
+          );
+          if (!module) return undefined;
+          return {
+            label: module.name,
+            durability: module.durability,
+            maxDurability: getModuleMaxDurability(module),
+          };
+        })()
+      : repairDialogTarget?.type === 'hull'
+        ? {
+            label: 'Hull',
+            durability: hullDurability,
+            maxDurability: maxHullDurability,
+          }
+        : repairDialogTarget?.type === 'thruster'
+          ? {
+              label: `Thruster ${repairDialogTarget.index + 1}`,
+              durability: thrusterDurability[repairDialogTarget.index] ?? 0,
+              maxDurability: MAX_THRUSTER_DURABILITY,
+            }
+          : undefined;
+  const selectedRepairKit =
+    REPAIR_KIT_TIERS.find((kit) => kit.tier === selectedRepairKitTier) ??
+    REPAIR_KIT_TIERS[0];
+  const repairUnitsNeeded = repairDialogTargetDetails
+    ? Math.max(
+        0,
+        repairDialogTargetDetails.maxDurability -
+          repairDialogTargetDetails.durability,
+      )
+    : 0;
+  const selectedRepairKitCount = Math.max(
+    0,
+    Math.floor(Number(repairKitCountField)),
+  );
+  const selectedRepairKitAvailable = repairKitInventory[selectedRepairKit.tier];
+  const selectedRepairKitUsefulCount =
+    repairUnitsNeeded > 0
+      ? Math.ceil(repairUnitsNeeded / selectedRepairKit.repairAmount)
+      : 0;
+  const selectedRepairKitAppliedCount = Math.min(
+    selectedRepairKitCount,
+    selectedRepairKitAvailable,
+    selectedRepairKitUsefulCount,
+  );
+  const selectedRepairAmount =
+    selectedRepairKitAppliedCount * selectedRepairKit.repairAmount;
+  const repairDialogCanApply =
+    repairDialogTarget !== undefined &&
+    repairUnitsNeeded > 0 &&
+    selectedRepairKitAppliedCount > 0;
+  const selectedFuelCell =
+    FUEL_CELL_TIERS.find((cell) => cell.tier === selectedFuelCellTier) ??
+    FUEL_CELL_TIERS[0];
+  const fuelUnitsNeeded = Math.max(0, INITIAL_SPACESHIP_FUEL_KNS - fuelKns);
+  const selectedFuelCellCount = Math.max(
+    0,
+    Math.floor(Number(fuelCellCountField)),
+  );
+  const selectedFuelCellAvailable = fuelCellInventory[selectedFuelCell.tier];
+  const selectedFuelCellUsefulCount =
+    fuelUnitsNeeded > 0
+      ? Math.ceil(fuelUnitsNeeded / selectedFuelCell.fuelKns)
+      : 0;
+  const selectedFuelCellAppliedCount = Math.min(
+    selectedFuelCellCount,
+    selectedFuelCellAvailable,
+    selectedFuelCellUsefulCount,
+  );
+  const selectedRefuelAmount =
+    selectedFuelCellAppliedCount * selectedFuelCell.fuelKns;
+  const appliedRefuelAmount = Math.min(selectedRefuelAmount, fuelUnitsNeeded);
+  const refuelDialogCanApply =
+    isRefuelDialogOpen &&
+    Boolean(energyCoreModule) &&
+    fuelUnitsNeeded > 0 &&
+    selectedFuelCellAppliedCount > 0 &&
+    (energyCoreModule?.durability ?? 0) >=
+      ENERGY_CORE_DURABILITY_DRAIN_PER_REFUEL * selectedFuelCellAppliedCount;
+
+  const fabricateBlueprint = (
+    blueprintId: (typeof FABRICATOR_BLUEPRINTS)[number]['id'],
+  ) => {
+    const blueprint = FABRICATOR_BLUEPRINTS.find(
+      (candidate) => candidate.id === blueprintId,
+    );
+    if (!blueprint) return;
+    if (!fabricatorModule || !canUseFabricator) return;
+    if (!spendInventory(blueprint.cost)) return;
+    if (!consumeFabricatorDurability(fabricatorModule.id)) return;
+
+    if (blueprint.output.type === 'fuel-cell') {
+      const fuelCellOutput = blueprint.output;
+      setFuelCellInventory((current) => {
+        const tier = fuelCellOutput.tier;
+        return {
+          ...current,
+          [tier]: current[tier] + fuelCellOutput.quantity,
+        };
+      });
+      return;
+    }
+
+    const repairKitOutput = blueprint.output;
+    setRepairKitInventory((current) => {
+      const tier = repairKitOutput.tier;
+      return {
+        ...current,
+        [tier]: current[tier] + repairKitOutput.quantity,
+      };
+    });
+  };
+
+  const applyRepairKits = () => {
+    if (!repairDialogTarget || !repairDialogCanApply) return;
+
+    const repaired =
+      repairDialogTarget.type === 'module'
+        ? repairModuleByAmount(repairDialogTarget.id, selectedRepairAmount)
+        : repairDialogTarget.type === 'hull'
+          ? repairSpaceshipHullByAmount(selectedRepairAmount)
+          : repairSpaceshipThrusterByAmount(
+              repairDialogTarget.index,
+              selectedRepairAmount,
+            );
+    if (!repaired) return;
+
+    setRepairKitInventory((current) => ({
+      ...current,
+      [selectedRepairKit.tier]:
+        current[selectedRepairKit.tier] - selectedRepairKitAppliedCount,
+    }));
+    setRepairDialogTarget(undefined);
+  };
+
+  const applyFuelCells = () => {
+    if (!energyCoreModule || !refuelDialogCanApply) return;
+    if (
+      !consumeEnergyCoreDurability(
+        energyCoreModule.id,
+        selectedFuelCellAppliedCount,
+      )
+    ) {
+      return;
+    }
+
+    setFuelCellInventory((current) => ({
+      ...current,
+      [selectedFuelCell.tier]:
+        current[selectedFuelCell.tier] - selectedFuelCellAppliedCount,
+    }));
+    addSpaceshipFuelKns(appliedRefuelAmount);
+    setIsRefuelDialogOpen(false);
+  };
+
+  const featureButtons: ReactNode[] = [
+    <button
+      key="communications"
+      className={style.featureButton}
+      type="button"
+      aria-label={
+        unreadMessageCount > 0
+          ? `Communications, ${unreadMessageCount} unread messages`
+          : 'Communications'
+      }
+      onClick={onOpenCommunications}
+    >
+      <span>Communications</span>
+      {unreadMessageCount > 0 && (
+        <strong className={style.unreadBadge} aria-hidden="true">
+          {unreadMessageCount > 99 ? '99+' : unreadMessageCount}
+        </strong>
+      )}
+    </button>,
+    <button
+      key="search"
+      className={style.featureButton}
+      type="button"
+      onClick={onOpenSearch}
+    >
+      Search
+    </button>,
+    ...(
+      [
+        ['thrusters', 'Thrusters'],
+        ['modules', 'Modules'],
+        ['research', 'Research'],
+        ['fabricator', 'Fabricator'],
+        ['prediction', 'Prediction'],
+      ] as const
+    ).map(([tab, label]) => (
+      <button
+        id={`footer-${tab}-tab`}
+        className={style.featureButton}
+        type="button"
+        aria-controls={`footer-${tab}-panel`}
+        aria-expanded={expandedSpeedControls.has(tab)}
+        data-active={expandedSpeedControls.has(tab)}
+        key={tab}
+        disabled={tab === 'fabricator' && !fabricatorModule}
+        onClick={() => toggleSpeedControl(tab)}
+      >
+        {label}
+      </button>
+    )),
+    <button
+      key="measuring"
+      className={style.featureButton}
+      type="button"
+      aria-pressed={isMeasuring}
+      aria-controls="footer-measuring-panel"
+      aria-expanded={expandedSpeedControls.has('measuring')}
+      data-active={isMeasuring}
+      onClick={toggleMeasuring}
+    >
+      Measuring
+    </button>,
+    <button
+      key="ruler"
+      className={style.featureButton}
+      type="button"
+      aria-pressed={isRulerActive}
+      data-active={isRulerActive}
+      onClick={onToggleRuler}
+    >
+      Ruler
+    </button>,
+    <button
+      key="save"
+      className={style.featureButton}
+      type="button"
+      data-loading={isSaving}
+      disabled={isSaving}
+      onClick={handleSaveSpaceship}
+    >
+      {isSaving ? (
+        <span className={style.loadingSpinner} aria-hidden="true" />
+      ) : (
+        'Save'
+      )}
+    </button>,
+    <button
+      key="mining"
+      className={style.featureButton}
+      type="button"
+      data-active={isMiningPanelOpen}
+      disabled={!miningModule}
+      onClick={() => setIsMiningPanelOpen((open) => !open)}
+    >
+      Mining
+    </button>,
+    <button
+      key="inventory"
+      className={style.featureButton}
+      type="button"
+      data-active={isInventoryPanelOpen}
+      onClick={() => setIsInventoryPanelOpen((open) => !open)}
+    >
+      Inventory
+    </button>,
+  ];
+  const featureSlots = Array.from({ length: 16 }, (_, index) => ({
+    id: `feature-slot-${index + 1}`,
+    button: featureButtons[index],
+  }));
+
   return (
-    <footer className={style.container} aria-label="Ship controls">
+    <footer
+      className={style.container}
+      data-repair-dialog-open={
+        repairDialogTargetDetails || isRefuelDialogOpen ? 'true' : undefined
+      }
+      aria-label="Ship controls"
+    >
       <div className={style.communicationsDock}>
         {unreadMessages.length > 0 && (
           <ol className={style.messageNotifications} aria-live="polite">
@@ -998,110 +1581,15 @@ export function Footer({
             ))}
           </ol>
         )}
-        <button
-          className={style.communicationButton}
-          type="button"
-          aria-label={
-            unreadMessageCount > 0
-              ? `Communications, ${unreadMessageCount} unread messages`
-              : 'Communications'
-          }
-          onClick={onOpenCommunications}
-        >
-          <CommunicationsIcon />
-          {unreadMessageCount > 0 && (
-            <strong className={style.unreadBadge} aria-hidden="true">
-              {unreadMessageCount > 99 ? '99+' : unreadMessageCount}
-            </strong>
-          )}
-          <span className={style.tooltip} role="tooltip">
-            Communications
-          </span>
-        </button>
       </div>
-      <section className={style.speedControls} aria-label="Ship features">
-        <div className={style.controlTabs}>
-          <button
-            className={style.controlTab}
-            type="button"
-            aria-label="Search"
-            onClick={onOpenSearch}
-          >
-            <SearchIcon />
-            <span className={style.tooltip} role="tooltip">
-              Search
-            </span>
-          </button>
-          {(
-            [
-              ['thrusters', 'Thrusters'],
-              ['modules', 'Modules'],
-              ['research', 'Research'],
-              ['prediction', 'Prediction'],
-            ] as const
-          ).map(([tab, label]) => (
-            <button
-              id={`footer-${tab}-tab`}
-              className={style.controlTab}
-              type="button"
-              aria-controls={`footer-${tab}-panel`}
-              aria-expanded={expandedSpeedControls.has(tab)}
-              aria-label={label}
-              data-active={expandedSpeedControls.has(tab)}
-              key={tab}
-              onClick={() => toggleSpeedControl(tab)}
-            >
-              <FeatureIcon feature={tab} />
-              <span className={style.tooltip} role="tooltip">
-                {label}
-              </span>
-            </button>
+      <section className={style.speedControls} aria-label="Feature row">
+        <h2 className={style.featureRowTitle}>Feature row</h2>
+        <div className={style.featureSlots}>
+          {featureSlots.map((slot) => (
+            <div className={style.featureSlot} key={slot.id}>
+              {slot.button}
+            </div>
           ))}
-          <button
-            className={style.controlTab}
-            type="button"
-            aria-label="Measuring"
-            aria-pressed={isMeasuring}
-            aria-controls="footer-measuring-panel"
-            aria-expanded={expandedSpeedControls.has('measuring')}
-            data-active={isMeasuring}
-            onClick={toggleMeasuring}
-          >
-            <MeasuringIcon />
-            <span className={style.tooltip} role="tooltip">
-              Measuring
-            </span>
-          </button>
-          <button
-            className={style.controlTab}
-            type="button"
-            aria-label="Ruler"
-            aria-pressed={isRulerActive}
-            data-active={isRulerActive}
-            onClick={onToggleRuler}
-          >
-            <RulerIcon />
-            <span className={style.tooltip} role="tooltip">
-              Ruler
-            </span>
-          </button>
-          <button
-            className={style.controlTab}
-            type="button"
-            aria-label={isSaving ? 'Saving spaceship' : 'Save spaceship'}
-            data-loading={isSaving}
-            disabled={isSaving}
-            onClick={handleSaveSpaceship}
-          >
-            {isSaving ? (
-              <span className={style.loadingSpinner} aria-hidden="true" />
-            ) : (
-              <SaveIcon />
-            )}
-            <span className={style.tooltip} role="tooltip">
-              {isSaving ? 'Saving spaceship' : 'Save spaceship'}
-            </span>
-          </button>
         </div>
         {saveStatus && (
           <output
@@ -1161,9 +1649,7 @@ export function Footer({
                     >
                       <span>Hull</span>
                       <small>
-                        {Math.round(
-                          (hullDurability / MAX_HULL_DURABILITY) * 100,
-                        )}
+                        {Math.round((hullDurability / maxHullDurability) * 100)}
                         %
                       </small>
                     </button>
@@ -1254,65 +1740,90 @@ export function Footer({
                         type="button"
                         disabled={
                           selectedModule.durability >=
-                            getModuleMaxDurability(selectedModule) ||
-                          !canAfford(
-                            inventory,
-                            getRepairCost(
-                              selectedModule.durability,
-                              getModuleMaxDurability(selectedModule),
-                              selectedModule.type === 'mining' ? 1.2 : 1,
-                            ),
-                          )
+                          getModuleMaxDurability(selectedModule)
                         }
                         onClick={() => repairSelectedModule(selectedModule)}
                       >
-                        Repair{' '}
-                        {formatCost(
-                          getRepairCost(
-                            selectedModule.durability,
-                            getModuleMaxDurability(selectedModule),
-                            selectedModule.type === 'mining' ? 1.2 : 1,
-                          ),
-                        )}
+                        Repair
                       </button>
+                      {selectedModule.type === 'energy-core' && (
+                        <button
+                          type="button"
+                          disabled={
+                            fuelCellInventory.t1 <= 0 ||
+                            selectedModule.durability <
+                              ENERGY_CORE_DURABILITY_DRAIN_PER_REFUEL
+                          }
+                          onClick={() => {
+                            setFuelCellCountField('1');
+                            setIsRefuelDialogOpen(true);
+                          }}
+                        >
+                          Refuel
+                        </button>
+                      )}
                     </>
                   ) : modulePanelSelection.type === 'hull' ? (
                     <>
                       <header>
                         <span>Hull</span>
-                        <small>Ship system</small>
+                        <small>Ship system L{hullLevel}</small>
                       </header>
+                      <dl>
+                        <div>
+                          <dt>Drain rate</dt>
+                          <dd>
+                            <span>
+                              {HULL_DURABILITY_DRAIN_PER_CRASH} durability /
+                              crash
+                            </span>
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Improve gain</dt>
+                          <dd>
+                            <span>
+                              +{HULL_DURABILITY_PER_LEVEL} max durability
+                            </span>
+                          </dd>
+                        </div>
+                      </dl>
                       <div className={style.durabilityItem}>
                         <span>Integrity</span>
                         <meter
                           min="0"
-                          max={MAX_HULL_DURABILITY}
-                          low={MAX_HULL_DURABILITY * 0.25}
+                          max={maxHullDurability}
+                          low={maxHullDurability * 0.25}
                           value={hullDurability}
                         />
                         <output>
-                          {hullDurability.toFixed(2)} / {MAX_HULL_DURABILITY}
+                          {hullDurability.toFixed(2)} / {maxHullDurability}
                         </output>
                       </div>
                       <button
                         type="button"
                         disabled={
-                          hullDurability >= MAX_HULL_DURABILITY ||
-                          !canAfford(
-                            inventory,
-                            getRepairCost(
-                              hullDurability,
-                              MAX_HULL_DURABILITY,
-                              2,
-                            ),
-                          )
+                          !canAfford(inventory, {
+                            iron: 40 * (hullLevel + 1),
+                            silicates: 18 * (hullLevel + 1),
+                            carbon: 8 * (hullLevel + 1),
+                          })
                         }
+                        onClick={improveHull}
+                      >
+                        Improve{' '}
+                        {formatCost({
+                          iron: 40 * (hullLevel + 1),
+                          silicates: 18 * (hullLevel + 1),
+                          carbon: 8 * (hullLevel + 1),
+                        })}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={hullDurability >= maxHullDurability}
                         onClick={repairHull}
                       >
-                        Repair{' '}
-                        {formatCost(
-                          getRepairCost(hullDurability, MAX_HULL_DURABILITY, 2),
-                        )}
+                        Repair
                       </button>
                     </>
                   ) : modulePanelSelection.type === 'thruster' ? (
@@ -1342,16 +1853,7 @@ export function Footer({
                         type="button"
                         disabled={
                           (thrusterDurability[modulePanelSelection.index] ??
-                            0) >= MAX_THRUSTER_DURABILITY ||
-                          !canAfford(
-                            inventory,
-                            getRepairCost(
-                              thrusterDurability[modulePanelSelection.index] ??
-                                0,
-                              MAX_THRUSTER_DURABILITY,
-                              0.8,
-                            ),
-                          )
+                            0) >= MAX_THRUSTER_DURABILITY
                         }
                         onClick={() =>
                           repairThruster(
@@ -1360,14 +1862,7 @@ export function Footer({
                           )
                         }
                       >
-                        Repair{' '}
-                        {formatCost(
-                          getRepairCost(
-                            thrusterDurability[modulePanelSelection.index] ?? 0,
-                            MAX_THRUSTER_DURABILITY,
-                            0.8,
-                          ),
-                        )}
+                        Repair
                       </button>
                     </>
                   ) : (
@@ -1433,6 +1928,78 @@ export function Footer({
                     </section>
                   );
                 })}
+              </div>
+            </DraggablePanel>
+          )}
+          {expandedSpeedControls.has('fabricator') && (
+            <DraggablePanel
+              control="fabricator"
+              onClose={() => toggleSpeedControl('fabricator')}
+            >
+              <div className={style.fabricatorPanel}>
+                <section className={style.fabricatorStatus}>
+                  <span>Fabricator durability</span>
+                  <meter
+                    min={0}
+                    max={
+                      fabricatorModule
+                        ? getModuleMaxDurability(fabricatorModule)
+                        : FABRICATOR_DURABILITY_DRAIN_PER_CRAFT
+                    }
+                    value={fabricatorModule?.durability ?? 0}
+                  />
+                  <output>
+                    {(fabricatorModule?.durability ?? 0).toFixed(0)} /{' '}
+                    {fabricatorModule
+                      ? getModuleMaxDurability(fabricatorModule).toFixed(0)
+                      : 0}
+                  </output>
+                </section>
+
+                <section className={style.fabricatorBlueprints}>
+                  <h3>Blueprints</h3>
+                  {FABRICATOR_BLUEPRINTS.map((blueprint) => (
+                    <article
+                      className={style.fabricatorBlueprint}
+                      key={blueprint.id}
+                    >
+                      <header>
+                        <span>{blueprint.name}</span>
+                        <small>
+                          {blueprint.output.type === 'repair-kit'
+                            ? `${repairKitInventory[blueprint.output.tier]} stored`
+                            : `${fuelCellInventory[blueprint.output.tier]} stored`}
+                        </small>
+                      </header>
+                      <dl>
+                        <div>
+                          <dt>Cost</dt>
+                          <dd>{formatCost(blueprint.cost)}</dd>
+                        </div>
+                        <div>
+                          <dt>Output</dt>
+                          <dd>
+                            {blueprint.output.type === 'fuel-cell'
+                              ? `${blueprint.output.quantity} cell / ${formatForce(
+                                  blueprint.output.fuelKns * 1_000,
+                                )}`
+                              : `${blueprint.output.quantity} kit / ${blueprint.output.repairAmount} durability`}
+                          </dd>
+                        </div>
+                      </dl>
+                      <button
+                        type="button"
+                        disabled={
+                          !canUseFabricator ||
+                          !canAfford(inventory, blueprint.cost)
+                        }
+                        onClick={() => fabricateBlueprint(blueprint.id)}
+                      >
+                        Fabricate
+                      </button>
+                    </article>
+                  ))}
+                </section>
               </div>
             </DraggablePanel>
           )}
@@ -1523,12 +2090,14 @@ export function Footer({
             >
               <div className={style.thrustersPanel}>
                 <div
+                  ref={thrusterPadRef}
                   className={style.thrustersPad}
                   style={thrusterPadStyle}
                   role="application"
                   tabIndex={canControlManualThrusters ? 0 : -1}
                   aria-label="Thruster vector pad"
                   aria-disabled={!canControlManualThrusters}
+                  onKeyDown={handleThrusterPadKeyDown}
                   onPointerDown={handleThrusterPadPointerDown}
                   onPointerMove={handleThrusterPadPointerMove}
                 >
@@ -1623,16 +2192,277 @@ export function Footer({
         </div>
       </section>
 
+      {isMiningPanelOpen && miningTelemetry && (
+        <div className={style.controlPanels}>
+          <DraggablePanel
+            control="mining-status"
+            onClose={() => setIsMiningPanelOpen(false)}
+          >
+            <MiningStatusPanel
+              telemetry={miningTelemetry}
+              active={miningModuleActive}
+              selectedMiningMaterial={selectedMiningMaterial}
+              inventoryMassKg={inventoryMassKg}
+              inventoryCapacityKg={SPACESHIP_INVENTORY_CAPACITY_KG}
+              onSelectMiningMaterial={selectMiningMaterial}
+              onToggleMining={toggleMiningModule}
+            />
+          </DraggablePanel>
+        </div>
+      )}
+
+      {isInventoryPanelOpen && (
+        <div className={style.controlPanels}>
+          <DraggablePanel
+            control="inventory"
+            onClose={() => setIsInventoryPanelOpen(false)}
+          >
+            <InventoryPanel
+              inventory={inventory}
+              inventoryMassKg={inventoryMassKg}
+              inventoryCapacityKg={SPACESHIP_INVENTORY_CAPACITY_KG}
+              fuelCellInventory={fuelCellInventory}
+              repairKitInventory={repairKitInventory}
+            />
+          </DraggablePanel>
+        </div>
+      )}
+
+      {isRefuelDialogOpen && energyCoreModule && (
+        <div className={style.repairDialogBackdrop} role="presentation">
+          <section
+            className={style.repairDialog}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="refuel-dialog-title"
+          >
+            <header className={style.repairDialogHeader}>
+              <div>
+                <small>Energy Core refuel</small>
+                <h2 id="refuel-dialog-title">Energy Core</h2>
+              </div>
+              <button
+                type="button"
+                aria-label="Close refuel dialog"
+                onClick={() => setIsRefuelDialogOpen(false)}
+              >
+                ×
+              </button>
+            </header>
+
+            <div className={style.repairDialogContent}>
+              <section className={style.repairNeed}>
+                <header>
+                  <span>Fuel needed</span>
+                  <strong>{formatImpulse(fuelUnitsNeeded * 1_000)}</strong>
+                </header>
+                <div
+                  className={style.repairProgress}
+                  style={
+                    {
+                      '--repair-current': `${Math.min(
+                        100,
+                        (fuelKns / INITIAL_SPACESHIP_FUEL_KNS) * 100,
+                      )}%`,
+                      '--repair-preview': `${Math.min(
+                        100,
+                        ((fuelKns + appliedRefuelAmount) /
+                          INITIAL_SPACESHIP_FUEL_KNS) *
+                          100,
+                      )}%`,
+                    } as CSSProperties
+                  }
+                  aria-label={`${formatImpulse(
+                    fuelUnitsNeeded * 1_000,
+                  )} fuel needed`}
+                />
+                <output>
+                  {formatImpulse(fuelKns * 1_000)} /{' '}
+                  {formatImpulse(INITIAL_SPACESHIP_FUEL_KNS * 1_000)}
+                </output>
+              </section>
+
+              <section className={style.repairKitList}>
+                <h3>Fuel cells</h3>
+                {FUEL_CELL_TIERS.map((cell) => (
+                  <button
+                    key={cell.tier}
+                    type="button"
+                    data-selected={selectedFuelCellTier === cell.tier}
+                    onClick={() => {
+                      setSelectedFuelCellTier(cell.tier);
+                      setFuelCellCountField('1');
+                    }}
+                  >
+                    <span>{cell.label}</span>
+                    <small>
+                      {fuelCellInventory[cell.tier]} stored ·{' '}
+                      {formatForce(cell.fuelKns * 1_000)} each
+                    </small>
+                  </button>
+                ))}
+              </section>
+
+              <label className={style.repairCountField}>
+                <span>Use cells</span>
+                <input
+                  type="number"
+                  min="1"
+                  max={Math.max(
+                    1,
+                    Math.min(
+                      selectedFuelCellAvailable,
+                      selectedFuelCellUsefulCount,
+                    ),
+                  )}
+                  step="1"
+                  value={fuelCellCountField}
+                  onChange={(event) =>
+                    setFuelCellCountField(event.currentTarget.value)
+                  }
+                />
+              </label>
+            </div>
+
+            <footer className={style.repairDialogActions}>
+              <span>
+                Applying {selectedFuelCellAppliedCount} cell
+                {selectedFuelCellAppliedCount === 1 ? '' : 's'} refuels up to{' '}
+                {formatImpulse(appliedRefuelAmount * 1_000)}.
+              </span>
+              <button
+                type="button"
+                disabled={!refuelDialogCanApply}
+                onClick={applyFuelCells}
+              >
+                Refuel
+              </button>
+            </footer>
+          </section>
+        </div>
+      )}
+
+      {repairDialogTargetDetails && (
+        <div className={style.repairDialogBackdrop} role="presentation">
+          <section
+            className={style.repairDialog}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="repair-dialog-title"
+          >
+            <header className={style.repairDialogHeader}>
+              <div>
+                <small>Module repair</small>
+                <h2 id="repair-dialog-title">
+                  {repairDialogTargetDetails.label}
+                </h2>
+              </div>
+              <button
+                type="button"
+                aria-label="Close repair dialog"
+                onClick={() => setRepairDialogTarget(undefined)}
+              >
+                ×
+              </button>
+            </header>
+
+            <div className={style.repairDialogContent}>
+              <section className={style.repairNeed}>
+                <header>
+                  <span>Durability needed</span>
+                  <strong>{repairUnitsNeeded.toFixed(0)} units</strong>
+                </header>
+                <div
+                  className={style.repairProgress}
+                  style={
+                    {
+                      '--repair-current': `${Math.min(
+                        100,
+                        (repairDialogTargetDetails.durability /
+                          repairDialogTargetDetails.maxDurability) *
+                          100,
+                      )}%`,
+                      '--repair-preview': `${Math.min(
+                        100,
+                        ((repairDialogTargetDetails.durability +
+                          selectedRepairAmount) /
+                          repairDialogTargetDetails.maxDurability) *
+                          100,
+                      )}%`,
+                    } as CSSProperties
+                  }
+                  aria-label={`${repairUnitsNeeded.toFixed(
+                    0,
+                  )} durability units needed`}
+                />
+                <output>
+                  {repairDialogTargetDetails.durability.toFixed(0)} /{' '}
+                  {repairDialogTargetDetails.maxDurability.toFixed(0)}
+                </output>
+              </section>
+
+              <section className={style.repairKitList}>
+                <h3>Repair kits</h3>
+                {REPAIR_KIT_TIERS.map((kit) => (
+                  <button
+                    key={kit.tier}
+                    type="button"
+                    data-selected={selectedRepairKitTier === kit.tier}
+                    onClick={() => {
+                      setSelectedRepairKitTier(kit.tier);
+                      setRepairKitCountField('1');
+                    }}
+                  >
+                    <span>{kit.label}</span>
+                    <small>
+                      {repairKitInventory[kit.tier]} stored · {kit.repairAmount}{' '}
+                      units each
+                    </small>
+                  </button>
+                ))}
+              </section>
+
+              <label className={style.repairCountField}>
+                <span>Use kits</span>
+                <input
+                  type="number"
+                  min="1"
+                  max={Math.max(
+                    1,
+                    Math.min(
+                      selectedRepairKitAvailable,
+                      selectedRepairKitUsefulCount,
+                    ),
+                  )}
+                  step="1"
+                  value={repairKitCountField}
+                  onChange={(event) =>
+                    setRepairKitCountField(event.currentTarget.value)
+                  }
+                />
+              </label>
+            </div>
+
+            <footer className={style.repairDialogActions}>
+              <span>
+                Applying {selectedRepairKitAppliedCount} kit
+                {selectedRepairKitAppliedCount === 1 ? '' : 's'} repairs up to{' '}
+                {Math.min(selectedRepairAmount, repairUnitsNeeded).toFixed(0)}{' '}
+                units.
+              </span>
+              <button
+                type="button"
+                disabled={!repairDialogCanApply}
+                onClick={applyRepairKits}
+              >
+                Repair
+              </button>
+            </footer>
+          </section>
+        </div>
+      )}
+
       <div className={style.telemetryDock}>
-        <button
-          className={style.miningToggle}
-          type="button"
-          data-active={miningModuleActive}
-          disabled={!miningModule || miningModule.durability <= 0}
-          onClick={toggleMiningModule}
-        >
-          Mining {miningModuleActive ? 'Active' : 'Off'}
-        </button>
         <dl className={style.telemetry} aria-label="Ship telemetry">
           <div className={style.readout}>
             <dt>State</dt>

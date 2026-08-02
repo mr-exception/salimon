@@ -232,6 +232,38 @@ export function mineAsteroid(asteroid: Asteroid, requestedMassKg: number) {
   return minedMaterials;
 }
 
+export function mineAsteroidMaterial(
+  asteroid: Asteroid,
+  materialName: InventoryMaterial,
+  requestedMassKg: number,
+) {
+  if (!Number.isFinite(requestedMassKg) || requestedMassKg <= 0) {
+    return undefined;
+  }
+
+  const material = asteroid.materials.find(
+    (candidate) => candidate.name === materialName && candidate.massKg > 0,
+  );
+  if (!material) return undefined;
+
+  const minedMassKg = Math.min(material.massKg, requestedMassKg);
+  material.massKg -= minedMassKg;
+  asteroid.materials = asteroid.materials.filter(
+    (candidate) => candidate.massKg > 0,
+  );
+
+  const nextMassKg = getAsteroidMaterialMassKg(asteroid);
+  asteroid.mass = BigInt(Math.max(0, Math.round(nextMassKg)));
+  if (nextMassKg <= 0) {
+    asteroid.radius = 0n;
+  }
+  if (asteroid.group !== 'spaceship') {
+    scheduleAsteroidPersist(asteroid);
+  }
+
+  return { name: materialName, massKg: minedMassKg };
+}
+
 export function reconcileSpaceshipAsteroids() {
   const parents = [...worldState.planets, ...worldState.stars];
   spaceshipAsteroids = spaceshipAsteroids.filter(

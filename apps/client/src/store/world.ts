@@ -35,6 +35,7 @@ import {
   writeCachedWorldSector,
   type WorldSector,
 } from './world-sectors';
+import { THRUSTER_DURABILITY_DRAIN_PER_SECOND } from './modules';
 
 type Body = Planet | Spaceship | Star;
 type SerializedVisiblePlanetBody = SerializedBody<Planet> & {
@@ -76,8 +77,16 @@ export const INVENTORY_MATERIALS = [
 
 export const INITIAL_SPACESHIP_FUEL_KNS = 1_000_000;
 export const MAX_HULL_DURABILITY = 200;
+export const HULL_DURABILITY_PER_LEVEL = 50;
+export const HULL_DURABILITY_DRAIN_PER_CRASH = 25;
+export const HULL_DURABILITY_CONFIG = {
+  baseDurability: MAX_HULL_DURABILITY,
+  durabilityPerLevel: HULL_DURABILITY_PER_LEVEL,
+  usageDrainRatePerCrash: HULL_DURABILITY_DRAIN_PER_CRASH,
+} as const;
 export const MAX_THRUSTER_DURABILITY = 100;
 export const SPACESHIP_THRUSTER_COUNT = 4;
+export const SPACESHIP_INVENTORY_CAPACITY_KG = 5_000;
 const EARTH_NAME = 'Earth';
 const EARTH_RADIUS_METERS = 6_371_000;
 const SPACESHIP_RADIUS_METERS = 200;
@@ -104,6 +113,7 @@ const spaceshipAbsoluteSpeedAtom = atom(0);
 const spaceshipTargetDirectionAtom = atom<number | undefined>(undefined);
 const spaceshipFuelKnsAtom = atom(INITIAL_SPACESHIP_FUEL_KNS);
 const spaceshipHullDurabilityAtom = atom(MAX_HULL_DURABILITY);
+const spaceshipHullLevelAtom = atom(1);
 const spaceshipThrusterDurabilityAtom = atom<number[]>(
   Array(SPACESHIP_THRUSTER_COUNT).fill(MAX_THRUSTER_DURABILITY),
 );
@@ -223,6 +233,24 @@ export function useSetSpaceshipHullDurability() {
   return useSetAtom(spaceshipHullDurabilityAtom);
 }
 
+export function useSpaceshipHullLevel() {
+  return useAtomValue(spaceshipHullLevelAtom);
+}
+
+export function useSetSpaceshipHullLevel() {
+  return useSetAtom(spaceshipHullLevelAtom);
+}
+
+export function getSpaceshipHullLevel() {
+  return store.get(spaceshipHullLevelAtom);
+}
+
+export function getSpaceshipMaxHullDurability(level = getSpaceshipHullLevel()) {
+  return (
+    MAX_HULL_DURABILITY + Math.max(0, level - 1) * HULL_DURABILITY_PER_LEVEL
+  );
+}
+
 export function useSpaceshipThrusterDurability() {
   return useAtomValue(spaceshipThrusterDurabilityAtom);
 }
@@ -232,7 +260,39 @@ export function useSetSpaceshipThrusterDurability() {
 }
 
 export function repairSpaceshipHull() {
-  store.set(spaceshipHullDurabilityAtom, MAX_HULL_DURABILITY);
+  store.set(spaceshipHullDurabilityAtom, getSpaceshipMaxHullDurability());
+}
+
+export function repairSpaceshipHullByAmount(amount: number) {
+  if (!Number.isFinite(amount) || amount <= 0) return false;
+
+  const currentDurability = store.get(spaceshipHullDurabilityAtom);
+  const nextDurability = Math.min(
+    getSpaceshipMaxHullDurability(),
+    currentDurability + amount,
+  );
+  if (nextDurability <= currentDurability) return false;
+
+  store.set(spaceshipHullDurabilityAtom, nextDurability);
+  return true;
+}
+
+export function upgradeSpaceshipHull() {
+  const currentLevel = store.get(spaceshipHullLevelAtom);
+  store.set(spaceshipHullLevelAtom, currentLevel + 1);
+  store.set(
+    spaceshipHullDurabilityAtom,
+    store.get(spaceshipHullDurabilityAtom) + HULL_DURABILITY_PER_LEVEL,
+  );
+}
+
+function drainSpaceshipHull(amount: number) {
+  if (!Number.isFinite(amount) || amount <= 0) return;
+
+  store.set(
+    spaceshipHullDurabilityAtom,
+    Math.max(0, store.get(spaceshipHullDurabilityAtom) - amount),
+  );
 }
 
 export function repairSpaceshipThruster(index: number) {
@@ -252,6 +312,43 @@ export function repairSpaceshipThruster(index: number) {
         thrusterIndex === index ? MAX_THRUSTER_DURABILITY : durability,
       ),
   );
+  return true;
+}
+
+export function repairSpaceshipThrusterByAmount(index: number, amount: number) {
+  if (
+    !Number.isInteger(index) ||
+    index < 0 ||
+    index >= SPACESHIP_THRUSTER_COUNT ||
+    !Number.isFinite(amount) ||
+    amount <= 0
+  ) {
+    return false;
+  }
+
+  let repaired = false;
+  store.set(
+    spaceshipThrusterDurabilityAtom,
+    store
+      .get(spaceshipThrusterDurabilityAtom)
+      .map((durability, thrusterIndex) => {
+        if (thrusterIndex !== index) return durability;
+
+        const nextDurability = Math.min(
+          MAX_THRUSTER_DURABILITY,
+          durability + amount,
+        );
+        repaired = nextDurability > durability;
+        return nextDurability;
+      }),
+  );
+  return repaired;
+}
+
+export function addSpaceshipFuelKns(amount: number) {
+  if (!Number.isFinite(amount) || amount <= 0) return false;
+
+  store.set(spaceshipFuelKnsAtom, store.get(spaceshipFuelKnsAtom) + amount);
   return true;
 }
 
@@ -319,6 +416,13 @@ export function addInventory(deposit: Partial<Inventory>) {
   persistInventory(nextInventory);
 }
 
+export function getInventoryMassKg(inventory = store.get(inventoryAtom)) {
+  return INVENTORY_MATERIALS.reduce(
+    (total, material) => total + inventory[material],
+    0,
+  );
+}
+
 export function getSpaceshipMotionState() {
   return store.get(spaceshipMotionStateAtom);
 }
@@ -368,6 +472,7 @@ let simulationAdvancePending = false;
 let simulationAdvanceRequestId = 0;
 let simulationRequestId = 0;
 let lastSimulationTelemetryAtomUpdateMs = 0;
+let lastDurabilityDrainElapsedSeconds = 0;
 const pendingSpaceshipRequests = new Map<
   number,
   {
@@ -750,6 +855,23 @@ export function getSimulationFrameSnapshot(): SimulationFrameSnapshot {
 }
 
 function applySimulationFrameSnapshot(snapshot: SimulationFrameSnapshot) {
+  const currentMotionState = store.get(spaceshipMotionStateAtom);
+  if (currentMotionState !== 'crashed' && snapshot.motionState === 'crashed') {
+    drainSpaceshipHull(HULL_DURABILITY_DRAIN_PER_CRASH);
+  }
+
+  const durabilityDrainSeconds = Math.max(
+    0,
+    snapshot.elapsedSeconds - lastDurabilityDrainElapsedSeconds,
+  );
+  if (durabilityDrainSeconds > 0) {
+    drainActiveThrusterDurability(
+      snapshot.activeThrusters,
+      durabilityDrainSeconds,
+    );
+    lastDurabilityDrainElapsedSeconds = snapshot.elapsedSeconds;
+  }
+
   worldElapsedSeconds = snapshot.elapsedSeconds;
   latestSimulationSnapshot = {
     proximityTelemetry: snapshot.proximityTelemetry,
@@ -1011,6 +1133,7 @@ export function hydrateSpaceship(dto: SpaceshipDto, syncWorker = true) {
   spaceshipPositionRemainder = { x: 0, y: 0 };
   spaceshipStoredRelativeVelocity =
     motionState === 'flying' && dto.velocity ? { ...dto.velocity } : undefined;
+  lastDurabilityDrainElapsedSeconds = worldElapsedSeconds;
   spaceshipAttachedBodyName =
     motionState === 'flying' ? undefined : dto.position.relativeTo;
   store.set(spaceshipMotionStateAtom, motionState);
@@ -1025,9 +1148,14 @@ export function hydrateSpaceship(dto: SpaceshipDto, syncWorker = true) {
     spaceshipFuelKnsAtom,
     dto.stats?.fuelKns ?? INITIAL_SPACESHIP_FUEL_KNS,
   );
+  const hullLevel = Math.max(1, Math.round(dto.stats?.hullLevel ?? 1));
+  store.set(spaceshipHullLevelAtom, hullLevel);
   store.set(
     spaceshipHullDurabilityAtom,
-    clampDurability(dto.stats?.hullDurability, MAX_HULL_DURABILITY),
+    clampDurability(
+      dto.stats?.hullDurability,
+      getSpaceshipMaxHullDurability(hullLevel),
+    ),
   );
   store.set(
     spaceshipThrusterDurabilityAtom,
@@ -1090,6 +1218,7 @@ export function getSpaceshipDto(securityCode: string): SpaceshipDto {
     stats: {
       fuelKns: getSpaceshipFuelKns(),
       hullDurability: store.get(spaceshipHullDurabilityAtom),
+      hullLevel: getSpaceshipHullLevel(),
       thrusterDurability: store.get(spaceshipThrusterDurabilityAtom),
     },
     inventory: store.get(inventoryAtom),
@@ -1424,8 +1553,15 @@ function getThrusterSignalsAcceleration(
   thrusters: { powerPercent: number; active: boolean }[],
 ) {
   const acceleration = { x: 0, y: 0 };
+  const thrusterDurability = store.get(spaceshipThrusterDurabilityAtom);
   normalizeThrusterSignals(thrusters).forEach((thruster, index) => {
-    if (!thruster.active || thruster.powerPercent <= 0) return;
+    if (
+      !thruster.active ||
+      thruster.powerPercent <= 0 ||
+      (thrusterDurability[index] ?? 0) <= 0
+    ) {
+      return;
+    }
 
     const thrustAcceleration = WorldService.calculateMaximumEngineAcceleration(
       thruster.powerPercent,
@@ -1451,6 +1587,32 @@ function hasAvailableThrusterForAcceleration(accelerationValue: Vector) {
       (thrusterDurability[xIndex] ?? 0) > 0) ||
     (Math.abs(accelerationValue.y) > 1e-8 &&
       (thrusterDurability[yIndex] ?? 0) > 0)
+  );
+}
+
+function drainActiveThrusterDurability(
+  thrusters: { powerPercent: number; active: boolean }[],
+  elapsedSeconds: number,
+) {
+  if (!Number.isFinite(elapsedSeconds) || elapsedSeconds <= 0) return;
+
+  const normalizedThrusters = normalizeThrusterSignals(thrusters);
+  if (!normalizedThrusters.some((thruster) => thruster.active)) return;
+
+  store.set(
+    spaceshipThrusterDurabilityAtom,
+    store.get(spaceshipThrusterDurabilityAtom).map((durability, index) => {
+      const thruster = normalizedThrusters[index];
+      if (!thruster?.active || thruster.powerPercent <= 0 || durability <= 0) {
+        return durability;
+      }
+
+      const drain =
+        THRUSTER_DURABILITY_DRAIN_PER_SECOND *
+        (thruster.powerPercent / 100) *
+        elapsedSeconds;
+      return Math.max(0, durability - drain);
+    }),
   );
 }
 
@@ -1853,6 +2015,7 @@ function advanceActiveFeature(elapsedSeconds: number) {
     activeFeature?.type === 'thrusters' ||
     activeFeature?.type === 'manual-force'
   ) {
+    drainActiveThrusterDurability(activeFeature.thrusters, elapsedSeconds);
     const nextElapsedSeconds = activeFeature.elapsedSeconds + elapsedSeconds;
     store.set(spaceshipActiveFeatureAtom, {
       ...activeFeature,
@@ -1889,6 +2052,7 @@ function advanceActiveFeature(elapsedSeconds: number) {
   }
 
   const nextElapsedSeconds = activeFeature.elapsedSeconds + elapsedSeconds;
+  drainActiveThrusterDurability(getSpaceshipActiveThrusters(), elapsedSeconds);
   store.set(spaceshipActiveFeatureAtom, {
     ...activeFeature,
     durationSeconds: nextElapsedSeconds + remainingSeconds,

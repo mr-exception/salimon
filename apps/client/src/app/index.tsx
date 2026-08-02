@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { Communications, Footer, Navigator, StartMenu } from '@components';
+import type {
+  MiningSelection,
+  MiningTelemetry,
+} from '../components/navigator/game/scene';
 import {
   getApiBaseUrl,
   getStoredSpaceshipSecurityCode,
@@ -47,6 +51,7 @@ export default function App() {
   >({});
   const [isSelectingTargetDirection, setIsSelectingTargetDirection] =
     useState(false);
+  const [miningTelemetry, setMiningTelemetry] = useState<MiningTelemetry>();
   const sceneRef = useRef<{
     startThrusters: (
       thrusters: { powerPercent: number; active: boolean }[],
@@ -55,6 +60,7 @@ export default function App() {
     setTargetDirectionSelectionActive: (active: boolean) => void;
     setRulerActive: (active: boolean) => void;
     setPrediction: (active: boolean, seconds: number) => void;
+    setMiningSelection: (selection?: MiningSelection) => void;
   } | null>(null);
   const handleSceneChange = useCallback(
     (
@@ -66,6 +72,7 @@ export default function App() {
         setTargetDirectionSelectionActive: (active: boolean) => void;
         setRulerActive: (active: boolean) => void;
         setPrediction: (active: boolean, seconds: number) => void;
+        setMiningSelection: (selection?: MiningSelection) => void;
       } | null,
     ) => {
       sceneRef.current = scene;
@@ -101,6 +108,9 @@ export default function App() {
   }, []);
   const setPrediction = useCallback((active: boolean, seconds: number) => {
     sceneRef.current?.setPrediction(active, seconds);
+  }, []);
+  const setMiningSelection = useCallback((selection?: MiningSelection) => {
+    sceneRef.current?.setMiningSelection(selection);
   }, []);
 
   useEffect(() => {
@@ -179,6 +189,7 @@ export default function App() {
         onCloseSearch={() => setIsSearchOpen(false)}
         isSelectingTargetDirection={isSelectingTargetDirection}
         onTargetDirectionSelected={handleTargetDirectionSelected}
+        onMiningTelemetryChange={setMiningTelemetry}
       />
       <Footer
         isEngineRunning={isEngineRunning}
@@ -207,6 +218,8 @@ export default function App() {
           text: message.text,
         }))}
         onPredictionChange={setPrediction}
+        miningTelemetry={miningTelemetry}
+        onMiningSelectionChange={setMiningSelection}
       />
       {isCommunicationsOpen && (
         <Communications

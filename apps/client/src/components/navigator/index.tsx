@@ -13,6 +13,7 @@ import {
   Scene,
   type BodyContextMenuRequest,
   type BodyDetailsRequest,
+  type MiningTelemetry,
   type TargetDirectionPreview,
 } from './game/scene';
 import { MAX_ZOOM, MIN_ZOOM } from './game/scene/configure-input';
@@ -156,6 +157,7 @@ type NavigatorProps = {
   onSceneChange?: (scene: Scene | null) => void;
   onSpaceshipEngineChange?: (isRunning: boolean) => void;
   onTargetDirectionSelected?: () => void;
+  onMiningTelemetryChange?: (telemetry?: MiningTelemetry) => void;
 };
 
 export function Navigator({
@@ -169,6 +171,7 @@ export function Navigator({
   onSceneChange,
   onSpaceshipEngineChange,
   onTargetDirectionSelected,
+  onMiningTelemetryChange,
 }: NavigatorProps) {
   const gameHostRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<Scene>(null);
@@ -233,6 +236,7 @@ export function Navigator({
             ? nextTelemetry
             : current,
         ),
+      onMiningTelemetryChange,
     );
     sceneRef.current = scene;
     onSceneChange?.(scene);
@@ -260,7 +264,12 @@ export function Navigator({
       onSceneChange?.(null);
       game.destroy(true);
     };
-  }, [onSceneChange, onSpaceshipEngineChange, onTargetDirectionSelected]);
+  }, [
+    onMiningTelemetryChange,
+    onSceneChange,
+    onSpaceshipEngineChange,
+    onTargetDirectionSelected,
+  ]);
 
   const navigateTo = (result: SearchResult) => {
     setContextMenu(null);

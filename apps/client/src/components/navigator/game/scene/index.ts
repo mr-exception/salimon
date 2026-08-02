@@ -8,6 +8,7 @@ import {
   getAsteroidMaterialMassKg,
   getAsteroidSurfaceDistance,
   getAsteroidWorldVelocity,
+  getInventoryMassKg,
   consumeMiningDurability,
   getBodyWorldPositionAfter,
   getSpaceshipActiveThrustVector,
@@ -25,7 +26,7 @@ import {
   getMiningModuleStats,
   isSpaceshipEngineRunning,
   loadWorld,
-  mineAsteroid,
+  mineAsteroidMaterial,
   scanWorldSector,
   setActiveWorldBodyNames,
   setSpaceshipTargetDirection,
@@ -33,13 +34,19 @@ import {
   startSpaceshipThrustersFeature,
   stopSpaceshipActiveFeature,
   spaceshipState,
+  setModuleActive,
+  SPACESHIP_INVENTORY_CAPACITY_KG,
   isClientAsteroidParentNearSpaceship,
   WORLD_SECTOR_SIZE_METERS,
   WORLD_VIEWPORT_REFRESH_INTERVAL_MS,
   type Asteroid as AsteroidData,
   type WorldSector,
 } from '@store';
-import type { Planet as PlanetData, Star as StarData } from '@repo/types';
+import type {
+  InventoryMaterial,
+  Planet as PlanetData,
+  Star as StarData,
+} from '@repo/types';
 import type { SpaceshipProximityTelemetry } from '@store';
 import {
   formatDistance,
@@ -118,6 +125,33 @@ export type TargetDirectionPreview = {
   y: number;
   angle: number;
   distance: number;
+};
+
+export type MiningTelemetry = {
+  active: boolean;
+  selection?: MiningSelection;
+  durability: number;
+  maxDurability: number;
+  rateKgPerSecond: number;
+  rangeMeters: number;
+  targets: {
+    id: string;
+    name: string;
+    distanceMeters: number;
+    remainingMassKg: number;
+    materials: {
+      name: InventoryMaterial;
+      massKg: number;
+      selected: boolean;
+    }[];
+    active: boolean;
+  }[];
+  minedMaterials: Partial<Record<InventoryMaterial, number>>;
+};
+
+export type MiningSelection = {
+  asteroidId: string;
+  material: InventoryMaterial;
 };
 
 const VIEWPORT_LABEL_OBJECT_LIMIT = 20;
@@ -204,6 +238,9 @@ export class Scene extends Phaser.Scene {
   protected readonly onProximityTelemetryChange?: (
     telemetry?: SpaceshipProximityTelemetry,
   ) => void;
+  protected readonly onMiningTelemetryChange?: (
+    telemetry?: MiningTelemetry,
+  ) => void;
   protected planetData: PlanetData[] = [];
   protected starData: StarData[] = [];
   protected orbitalAsteroidData: AsteroidData[] = [];
@@ -262,6 +299,11 @@ export class Scene extends Phaser.Scene {
   private viewportRefreshAbortController?: AbortController;
   private hasPendingViewportRefresh = false;
   private miningTargetId?: string;
+  private miningSelection?: MiningSelection;
+  private miningWasActive = false;
+  private lastMiningTelemetryAt = 0;
+  private minedSessionMaterials: Partial<Record<InventoryMaterial, number>> =
+    {};
   private readonly alwaysVisibleBodies = new Set<string>();
   private readonly sectorScanButtons = new Map<string, SectorScanControl>();
 
@@ -281,6 +323,7 @@ export class Scene extends Phaser.Scene {
     onProximityTelemetryChange?: (
       telemetry?: SpaceshipProximityTelemetry,
     ) => void,
+    onMiningTelemetryChange?: (telemetry?: MiningTelemetry) => void,
   ) {
     super('navigation');
     this.onZoomChange = onZoomChange;
@@ -293,6 +336,7 @@ export class Scene extends Phaser.Scene {
     this.onWorldLoadComplete = onWorldLoadComplete;
     this.onWorldViewportLoadingChange = onWorldViewportLoadingChange;
     this.onProximityTelemetryChange = onProximityTelemetryChange;
+    this.onMiningTelemetryChange = onMiningTelemetryChange;
   }
 
   protected configureCamera = configureCamera;
@@ -385,7 +429,7 @@ export class Scene extends Phaser.Scene {
     );
     this.reconcileSpaceshipAsteroidData();
     this.syncWorldPositions();
-    this.updateMining(delta / 1000);
+    this.updateMining(time, delta / 1000);
     stepNavigatorPhysics(delta / 1000);
     this.planets.forEach((planet) => planet.syncRotation(worldElapsedSeconds));
     this.stars.forEach((star) => star.syncRotation(worldElapsedSeconds));
@@ -490,6 +534,10 @@ export class Scene extends Phaser.Scene {
   setAsteroidsVisible(visible: boolean) {
     this.showAsteroids = visible;
     this.updateWorldVisibility();
+  }
+
+  setMiningSelection(selection?: MiningSelection) {
+    this.miningSelection = selection;
   }
 
   isRulerActive() {
@@ -658,77 +706,148 @@ export class Scene extends Phaser.Scene {
     }
   }
 
-  private updateMining(elapsedSeconds: number) {
+  private updateMining(time: number, elapsedSeconds: number) {
     const stats = getMiningModuleStats();
-    if (!stats?.active || elapsedSeconds <= 0) {
+    if (!stats || elapsedSeconds <= 0) {
       this.miningTargetId = undefined;
+      if (this.miningWasActive) {
+        this.miningWasActive = false;
+      }
+      this.onMiningTelemetryChange?.(undefined);
       return;
     }
 
-    const target = this.getMiningTarget(stats.rangeMeters);
-    this.miningTargetId = target?.id;
-    if (!target) return;
-
-    const availableMassKg = getAsteroidMaterialMassKg(target);
-    if (availableMassKg <= 0) {
+    const targets = this.getMiningTargets(stats.rangeMeters);
+    if (!stats.active) {
       this.miningTargetId = undefined;
+      if (this.miningWasActive) {
+        this.miningWasActive = false;
+      }
+      this.publishMiningTelemetry(time, false, stats, targets);
+      return;
+    }
+
+    if (!this.miningWasActive) {
+      this.miningWasActive = true;
+      this.minedSessionMaterials = {};
+      this.lastMiningTelemetryAt = 0;
+    }
+
+    const selection = this.miningSelection;
+    const target = selection
+      ? targets.find((candidate) => candidate.id === selection.asteroidId)
+      : undefined;
+    this.miningTargetId = target?.id;
+    if (!target || !selection) {
+      setModuleActive(stats.id, false);
+      this.publishMiningTelemetry(time, true, stats, targets);
+      return;
+    }
+
+    const material = target.materials.find(
+      (candidate) =>
+        candidate.name === selection.material && candidate.massKg > 0,
+    );
+    const availableMassKg = material?.massKg ?? 0;
+    if (availableMassKg <= 0) {
+      setModuleActive(stats.id, false);
+      this.miningTargetId = undefined;
+      this.publishMiningTelemetry(time, true, stats, targets);
+      return;
+    }
+
+    const inventoryRemainingKg =
+      SPACESHIP_INVENTORY_CAPACITY_KG - getInventoryMassKg();
+    if (inventoryRemainingKg <= 0) {
+      setModuleActive(stats.id, false);
+      this.publishMiningTelemetry(time, true, stats, targets);
       return;
     }
 
     const requestedMassKg = Math.min(
       availableMassKg,
+      inventoryRemainingKg,
       stats.rateKgPerSecond * elapsedSeconds,
     );
     const consumedDurabilityKg = consumeMiningDurability(requestedMassKg);
     if (consumedDurabilityKg <= 0) return;
 
-    const extractedMaterials = mineAsteroid(target, consumedDurabilityKg);
-    if (extractedMaterials.length === 0) return;
-
-    addInventory(
-      Object.fromEntries(
-        extractedMaterials.map((material) => [material.name, material.massKg]),
-      ),
+    const extractedMaterial = mineAsteroidMaterial(
+      target,
+      selection.material,
+      consumedDurabilityKg,
     );
+    if (!extractedMaterial) return;
 
-    if (getAsteroidMaterialMassKg(target) <= 0) {
+    this.minedSessionMaterials[extractedMaterial.name] =
+      (this.minedSessionMaterials[extractedMaterial.name] ?? 0) +
+      extractedMaterial.massKg;
+
+    addInventory({ [extractedMaterial.name]: extractedMaterial.massKg });
+
+    if (
+      getAsteroidMaterialMassKg(target) <= 0 ||
+      !target.materials.some(
+        (candidate) =>
+          candidate.name === selection.material && candidate.massKg > 0,
+      )
+    ) {
+      setModuleActive(stats.id, false);
       this.miningTargetId = undefined;
       this.lastVisibilityViewportKey = '';
       this.updateAsteroidVisibility();
     }
+    this.publishMiningTelemetry(
+      time,
+      true,
+      getMiningModuleStats() ?? stats,
+      this.getMiningTargets(stats.rangeMeters),
+    );
   }
 
-  private getMiningTarget(rangeMeters: number) {
-    const currentTarget = this.miningTargetId
-      ? this.asteroidData.find(
-          (asteroid) => asteroid.id === this.miningTargetId,
-        )
-      : undefined;
-    if (
-      currentTarget &&
-      getAsteroidMaterialMassKg(currentTarget) > 0 &&
-      this.getAsteroidDistanceFromSpaceship(currentTarget) <= rangeMeters
-    ) {
-      return currentTarget;
-    }
+  private getMiningTargets(rangeMeters: number) {
+    return this.asteroidData
+      .filter((asteroid) => getAsteroidMaterialMassKg(asteroid) > 0)
+      .map((asteroid) => ({
+        asteroid,
+        distance: this.getAsteroidDistanceFromSpaceship(asteroid),
+      }))
+      .filter(({ distance }) => distance <= rangeMeters)
+      .sort((left, right) => left.distance - right.distance)
+      .map(({ asteroid }) => asteroid);
+  }
 
-    let closest:
-      | {
-          asteroid: AsteroidData;
-          distance: number;
-        }
-      | undefined;
-    this.asteroidData.forEach((asteroid) => {
-      if (getAsteroidMaterialMassKg(asteroid) <= 0) return;
+  private publishMiningTelemetry(
+    time: number,
+    force: boolean,
+    stats: NonNullable<ReturnType<typeof getMiningModuleStats>>,
+    targets: AsteroidData[],
+  ) {
+    if (!force && time - this.lastMiningTelemetryAt < 250) return;
 
-      const distance = this.getAsteroidDistanceFromSpaceship(asteroid);
-      if (distance > rangeMeters) return;
-      if (closest && distance >= closest.distance) return;
-
-      closest = { asteroid, distance };
+    this.lastMiningTelemetryAt = time;
+    this.onMiningTelemetryChange?.({
+      active: stats.active,
+      selection: this.miningSelection,
+      durability: stats.durability,
+      maxDurability: stats.maxDurability,
+      rateKgPerSecond: stats.rateKgPerSecond,
+      rangeMeters: stats.rangeMeters,
+      targets: targets.map((asteroid) => ({
+        id: asteroid.id,
+        name: asteroid.name,
+        distanceMeters: this.getAsteroidDistanceFromSpaceship(asteroid),
+        remainingMassKg: getAsteroidMaterialMassKg(asteroid),
+        materials: asteroid.materials.map((material) => ({
+          ...material,
+          selected:
+            this.miningSelection?.asteroidId === asteroid.id &&
+            this.miningSelection.material === material.name,
+        })),
+        active: asteroid.id === this.miningTargetId,
+      })),
+      minedMaterials: { ...this.minedSessionMaterials },
     });
-
-    return closest?.asteroid;
   }
 
   private getAsteroidDistanceFromSpaceship(asteroid: AsteroidData) {

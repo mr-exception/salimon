@@ -66,6 +66,7 @@ export type SpaceshipMotionState = 'flying' | 'landed' | 'crashed';
 export type SpaceshipStats = {
   fuelKns: number;
   hullDurability: number;
+  hullLevel?: number;
   thrusterDurability: number[];
 };
 

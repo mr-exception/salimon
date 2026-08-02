@@ -134,11 +134,20 @@ export default function StartMenu({ bootstrapState, onStart }: Props) {
     <main className={style.menu}>
       <div className={style.stars} aria-hidden="true" />
       <section className={style.content} aria-labelledby="game-title">
-        <p className={style.eyebrow}>Deep-space navigation protocol</p>
-        <h1 id="game-title">
-          <span>Salimon</span>
-          <small>Echoes of Absenat</small>
-        </h1>
+        <div className={style.brand}>
+          <img
+            className={style.logo}
+            src="/game-logo.png"
+            alt=""
+            width="128"
+            height="128"
+            aria-hidden="true"
+          />
+          <h1 id="game-title">
+            <span>Salimon</span>
+            <small>Echoes of Absenat</small>
+          </h1>
+        </div>
         <div className={style.rule} />
         <nav className={style.actions} aria-label="Game menu">
           <button

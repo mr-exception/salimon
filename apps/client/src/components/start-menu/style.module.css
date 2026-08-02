@@ -53,6 +53,24 @@
   width: min(560px, calc(100% - 48px));
 }
 
+.brand {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.logo {
+  display: block;
+  width: clamp(96px, 18vw, 132px);
+  height: clamp(96px, 18vw, 132px);
+  margin-bottom: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 24px 58px rgba(0, 0, 0, 0.64);
+}
+
 .eyebrow {
   margin: 0 0 16px;
   color: #a3a9a8;
@@ -66,7 +84,7 @@
   margin: 0;
   font-size: clamp(3.7rem, 10vw, 7.6rem);
   font-weight: 200;
-  letter-spacing: -0.07em;
+  letter-spacing: 0;
   line-height: 0.72;
   text-transform: uppercase;
 }
@@ -76,7 +94,7 @@
   margin-top: 34px;
   font-size: clamp(0.85rem, 2vw, 1.2rem);
   font-weight: 400;
-  letter-spacing: 0.48em;
+  letter-spacing: 0.42em;
   line-height: 1.4;
 }
 

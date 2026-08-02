@@ -9,42 +9,33 @@ import {
   type ReactNode,
 } from 'react';
 import style from './style.module.css';
+import type { MiningSelection, MiningTelemetry } from '../navigator/game/scene';
 import {
   FABRICATOR_BLUEPRINTS,
   FUEL_CELL_TIERS,
-  REPAIR_KIT_TIERS,
-  type FuelCellTier,
-  type RepairKitTier,
-} from './fabricator-blueprints';
-import type { MiningSelection, MiningTelemetry } from '../navigator/game/scene';
-import {
   INITIAL_SPACESHIP_FUEL_KNS,
   HULL_DURABILITY_DRAIN_PER_CRASH,
   HULL_DURABILITY_PER_LEVEL,
   MAX_THRUSTER_DURABILITY,
   FABRICATOR_DURABILITY_DRAIN_PER_CRAFT,
   ENERGY_CORE_DURABILITY_DRAIN_PER_REFUEL,
-  MINING_BASE_RATE_KG_PER_SECOND,
-  MINING_BASE_DURABILITY_KG,
-  MINING_BASE_RANGE_METERS,
-  MINING_DURABILITY_PER_LEVEL_KG,
-  MINING_RANGE_LEVEL_MULTIPLIER,
   INVENTORY_MATERIALS,
   MODULE_RESEARCH,
   SPACESHIP_THRUSTER_COUNT,
   SPACESHIP_INVENTORY_CAPACITY_KG,
-  THRUSTER_BASE_DURABILITY,
-  THRUSTER_BASE_POWER_PERCENT,
-  THRUSTER_LEVEL_MULTIPLIER,
   addSpaceshipFuelKns,
   consumeEnergyCoreDurability,
   consumeFabricatorDurability,
+  getHullUpgradeCost,
+  getModuleDefinition,
+  getModuleDurabilityDrainRate,
   getModuleMaxDurability,
   getSpaceshipMaxHullDurability,
   getSpaceshipSaveBlockReason,
   repairModuleByAmount,
   repairSpaceshipHullByAmount,
   repairSpaceshipThrusterByAmount,
+  REPAIR_KIT_TIERS,
   setModuleActive,
   saveSpaceship,
   spendInventory,
@@ -62,8 +53,10 @@ import {
   useSpaceshipMotionState,
   useSpaceshipThrusterDurability,
   type Inventory,
+  type FuelCellTier,
   type ModuleAttribute,
   type ModuleType,
+  type RepairKitTier,
   type ShipModule,
 } from '@store';
 import type { InventoryMaterial } from '@repo/types';
@@ -208,109 +201,6 @@ const MODULE_LABELS: Record<ModuleType, string> = {
   'energy-core': 'Energy Core',
 };
 
-const ATTRIBUTE_LABELS: Record<ModuleAttribute, string> = {
-  efficiency: 'Efficiency',
-  durability: 'Durability',
-  range: 'Range',
-  power: 'Power',
-};
-
-function getModuleAttributeValue(
-  module: ShipModule,
-  attribute: ModuleAttribute,
-) {
-  const level = module.levels[attribute] ?? 1;
-  if (module.type === 'mining' && attribute === 'efficiency') {
-    return `${MINING_BASE_RATE_KG_PER_SECOND * level} kg/s`;
-  }
-  if (module.type === 'mining' && attribute === 'durability') {
-    return `${
-      MINING_BASE_DURABILITY_KG +
-      Math.max(0, level - 1) * MINING_DURABILITY_PER_LEVEL_KG
-    } kg`;
-  }
-  if (module.type === 'mining' && attribute === 'range') {
-    return `${Math.round(
-      MINING_BASE_RANGE_METERS *
-        (1 + Math.max(0, level - 1) * MINING_RANGE_LEVEL_MULTIPLIER),
-    ).toLocaleString()} m`;
-  }
-  if (module.type === 'thruster' && attribute === 'power') {
-    return `${Math.round(
-      THRUSTER_BASE_POWER_PERCENT *
-        (1 + Math.max(0, level - 1) * THRUSTER_LEVEL_MULTIPLIER),
-    )}%`;
-  }
-  if (module.type === 'thruster' && attribute === 'durability') {
-    return `${Math.round(
-      THRUSTER_BASE_DURABILITY *
-        (1 + Math.max(0, level - 1) * THRUSTER_LEVEL_MULTIPLIER),
-    )}`;
-  }
-  if (module.type === 'fabricator' && attribute === 'durability') {
-    return `${Math.round(getModuleMaxDurability(module))}`;
-  }
-  if (module.type === 'energy-core' && attribute === 'durability') {
-    return `${Math.round(getModuleMaxDurability(module))}`;
-  }
-
-  return String(level);
-}
-
-function getUpgradeCost(
-  module: ShipModule,
-  attribute: ModuleAttribute,
-): Partial<Inventory> {
-  const nextLevel = (module.levels[attribute] ?? 1) + 1;
-  if (module.type === 'mining' && attribute === 'efficiency') {
-    return { iron: 20 * nextLevel, silicates: 8 * nextLevel, ice: 0 };
-  }
-  if (module.type === 'mining' && attribute === 'durability') {
-    return {
-      iron: 14 * nextLevel,
-      silicates: 12 * nextLevel,
-      ice: 4 * nextLevel,
-    };
-  }
-  if (module.type === 'mining' && attribute === 'range') {
-    return {
-      iron: 18 * nextLevel,
-      silicates: 10 * nextLevel,
-      ice: 6 * nextLevel,
-    };
-  }
-  if (module.type === 'thruster' && attribute === 'power') {
-    return {
-      iron: 45 * nextLevel,
-      silicates: 30 * nextLevel,
-      ice: 12 * nextLevel,
-    };
-  }
-  if (module.type === 'thruster' && attribute === 'durability') {
-    return {
-      iron: 32 * nextLevel,
-      silicates: 34 * nextLevel,
-      ice: 8 * nextLevel,
-    };
-  }
-  if (module.type === 'fabricator' && attribute === 'durability') {
-    return {
-      iron: 28 * nextLevel,
-      silicates: 18 * nextLevel,
-      carbon: 10 * nextLevel,
-    };
-  }
-  if (module.type === 'energy-core' && attribute === 'durability') {
-    return {
-      iron: 38 * nextLevel,
-      silicates: 28 * nextLevel,
-      carbon: 14 * nextLevel,
-    };
-  }
-
-  return { iron: 0, silicates: 0, ice: 0 };
-}
-
 function canAfford(inventory: Inventory, cost: Partial<Inventory>) {
   return INVENTORY_MATERIALS.every(
     (material) => inventory[material] >= (cost[material] ?? 0),
@@ -345,10 +235,53 @@ function formatCost(cost: Partial<Inventory>) {
     .join(' / ');
 }
 
-function getModuleAttributes(type: ModuleType): ModuleAttribute[] {
-  if (type === 'mining') return ['efficiency', 'durability', 'range'];
-  if (type === 'thruster') return ['power', 'durability'];
-  return ['durability'];
+function formatModuleDurabilityDrainRate(module: ShipModule) {
+  const drainRate = getModuleDurabilityDrainRate(module);
+  const amount =
+    drainRate.amount >= 1
+      ? drainRate.amount.toFixed(0)
+      : drainRate.amount.toFixed(2);
+  const suffix =
+    module.type === 'thruster' && drainRate.unit === 'second'
+      ? ' at full power'
+      : '';
+
+  return `${amount} durability / ${drainRate.unit}${suffix}`;
+}
+
+function formatModuleAttributeValue(
+  module: ShipModule,
+  attribute: ModuleAttribute,
+) {
+  return formatModuleAttributeRawValue(
+    module,
+    attribute,
+    getModuleDefinition(module.type).getAttributeValue(
+      module.levels,
+      attribute,
+    ),
+  );
+}
+
+function formatModuleAttributeRawValue(
+  module: ShipModule,
+  attribute: ModuleAttribute,
+  value: number,
+) {
+  if (attribute === 'efficiency') return `${formatSiValue(value, 'kg/s')}`;
+  if (attribute === 'range') return formatDistance(value);
+  if (attribute === 'power') return formatForce(value);
+  if (attribute === 'capacity') return formatImpulse(value);
+  if (attribute === 'durability' && module.type === 'mining') {
+    return formatSiValue(value, 'kg');
+  }
+  if (attribute === 'durability') return value.toLocaleString();
+
+  return value.toLocaleString();
+}
+
+function getCostEntries(cost: Partial<Inventory>) {
+  return INVENTORY_MATERIALS.filter((material) => (cost[material] ?? 0) > 0);
 }
 
 function MoveIcon() {
@@ -877,6 +810,9 @@ export function Footer({
     modulePanelSelection.type === 'module'
       ? modules.find((module) => module.id === modulePanelSelection.id)
       : undefined;
+  const selectedModuleDefinition = selectedModule
+    ? getModuleDefinition(selectedModule.type)
+    : undefined;
   const miningModule = modules.find(
     (module) => module.type === 'mining' && module.unlocked,
   );
@@ -890,6 +826,7 @@ export function Footer({
     miningModule?.active && miningModule.durability > 0,
   );
   const maxHullDurability = getSpaceshipMaxHullDurability(hullLevel);
+  const hullUpgradeCost = getHullUpgradeCost(hullLevel + 1);
   const inventoryMassKg = INVENTORY_MATERIALS.reduce(
     (total, material) => total + inventory[material],
     0,
@@ -1224,8 +1161,12 @@ export function Footer({
     module: ShipModule,
     attribute: ModuleAttribute,
   ) => {
-    const cost = getUpgradeCost(module, attribute);
+    const definition = getModuleDefinition(module.type);
+    const nextLevel =
+      definition.getShipModuleAttributeLevel(module, attribute) + 1;
+    const cost = definition.getUpgradeCost(attribute, nextLevel);
     if (!spendInventory(cost)) return;
+
     upgradeModuleAttribute(module.id, attribute);
   };
 
@@ -1240,13 +1181,7 @@ export function Footer({
   };
 
   const improveHull = () => {
-    const nextLevel = hullLevel + 1;
-    const cost: Partial<Inventory> = {
-      iron: 40 * nextLevel,
-      silicates: 18 * nextLevel,
-      carbon: 8 * nextLevel,
-    };
-    if (!spendInventory(cost)) return;
+    if (!spendInventory(hullUpgradeCost)) return;
 
     upgradeSpaceshipHull();
   };
@@ -1687,43 +1622,35 @@ export function Footer({
                         </small>
                       </header>
                       <dl>
-                        {getModuleAttributes(selectedModule.type).map(
-                          (attribute) => {
-                            const cost = getUpgradeCost(
-                              selectedModule,
-                              attribute,
-                            );
-                            return (
-                              <div key={attribute}>
-                                <dt>
-                                  {ATTRIBUTE_LABELS[attribute]} L
-                                  {selectedModule.levels[attribute] ?? 1}
-                                </dt>
-                                <dd>
-                                  <span>
-                                    {getModuleAttributeValue(
-                                      selectedModule,
-                                      attribute,
-                                    )}
-                                  </span>
-                                  <button
-                                    type="button"
-                                    disabled={!canAfford(inventory, cost)}
-                                    onClick={() =>
-                                      upgradeResearchAttribute(
-                                        selectedModule,
-                                        attribute,
-                                      )
-                                    }
-                                  >
-                                    Improve
-                                  </button>
-                                  <small>{formatCost(cost)}</small>
-                                </dd>
-                              </div>
-                            );
-                          },
+                        {selectedModuleDefinition?.attributes.map(
+                          (definition) => (
+                            <div key={definition.attribute}>
+                              <dt>{definition.label}</dt>
+                              <dd>
+                                <span>
+                                  {formatModuleAttributeValue(
+                                    selectedModule,
+                                    definition.attribute,
+                                  )}{' '}
+                                  (L
+                                  {selectedModuleDefinition.getShipModuleAttributeLevel(
+                                    selectedModule,
+                                    definition.attribute,
+                                  )}
+                                  )
+                                </span>
+                              </dd>
+                            </div>
+                          ),
                         )}
+                        <div>
+                          <dt>Drain rate</dt>
+                          <dd>
+                            <span>
+                              {formatModuleDurabilityDrainRate(selectedModule)}
+                            </span>
+                          </dd>
+                        </div>
                         <div>
                           <dt>Durability left</dt>
                           <dd>
@@ -1767,7 +1694,10 @@ export function Footer({
                     <>
                       <header>
                         <span>Hull</span>
-                        <small>Ship system L{hullLevel}</small>
+                        <small>
+                          Ship system {maxHullDurability.toLocaleString()}{' '}
+                          durability (L{hullLevel})
+                        </small>
                       </header>
                       <dl>
                         <div>
@@ -1802,21 +1732,10 @@ export function Footer({
                       </div>
                       <button
                         type="button"
-                        disabled={
-                          !canAfford(inventory, {
-                            iron: 40 * (hullLevel + 1),
-                            silicates: 18 * (hullLevel + 1),
-                            carbon: 8 * (hullLevel + 1),
-                          })
-                        }
+                        disabled={!canAfford(inventory, hullUpgradeCost)}
                         onClick={improveHull}
                       >
-                        Improve{' '}
-                        {formatCost({
-                          iron: 40 * (hullLevel + 1),
-                          silicates: 18 * (hullLevel + 1),
-                          carbon: 8 * (hullLevel + 1),
-                        })}
+                        Improve {formatCost(hullUpgradeCost)}
                       </button>
                       <button
                         type="button"
@@ -1908,22 +1827,139 @@ export function Footer({
                           Unlock
                         </button>
                       ) : (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setModulePanelSelection({
-                              type: 'module',
-                              id: module.id,
-                            });
-                            setExpandedSpeedControls((expandedControls) => {
-                              const nextControls = new Set(expandedControls);
-                              nextControls.add('modules');
-                              return nextControls;
-                            });
-                          }}
-                        >
-                          Inspect
-                        </button>
+                        (() => {
+                          const moduleDefinition = getModuleDefinition(
+                            module.type,
+                          );
+
+                          return (
+                            <>
+                              <div className={style.researchUpgrades}>
+                                {moduleDefinition.attributes.map(
+                                  (definition) => {
+                                    const level =
+                                      moduleDefinition.getShipModuleAttributeLevel(
+                                        module,
+                                        definition.attribute,
+                                      );
+                                    const cost =
+                                      moduleDefinition.getUpgradeCost(
+                                        definition.attribute,
+                                        level + 1,
+                                      );
+                                    const currentValue =
+                                      moduleDefinition.getAttributeValue(
+                                        module.levels,
+                                        definition.attribute,
+                                      );
+                                    const nextValue =
+                                      moduleDefinition.getAttributeValue(
+                                        {
+                                          ...module.levels,
+                                          [definition.attribute]: level + 1,
+                                        },
+                                        definition.attribute,
+                                      );
+                                    const valueDiff = nextValue - currentValue;
+
+                                    return (
+                                      <div key={definition.attribute}>
+                                        <span>
+                                          {definition.label}:{' '}
+                                          {formatModuleAttributeRawValue(
+                                            module,
+                                            definition.attribute,
+                                            currentValue,
+                                          )}{' '}
+                                          (L{level}) {'->'}{' '}
+                                          {formatModuleAttributeRawValue(
+                                            module,
+                                            definition.attribute,
+                                            nextValue,
+                                          )}{' '}
+                                          (L{level + 1})
+                                        </span>
+                                        <small>
+                                          +
+                                          {formatModuleAttributeRawValue(
+                                            module,
+                                            definition.attribute,
+                                            valueDiff,
+                                          )}
+                                        </small>
+                                        <ul
+                                          className={style.researchCost}
+                                          aria-label={`${definition.label} upgrade materials`}
+                                        >
+                                          {getCostEntries(cost).map(
+                                            (material) => {
+                                              const required =
+                                                cost[material] ?? 0;
+                                              const owned = inventory[material];
+                                              const missing = Math.max(
+                                                0,
+                                                required - owned,
+                                              );
+
+                                              return (
+                                                <li
+                                                  key={material}
+                                                  data-affordable={
+                                                    missing === 0
+                                                      ? 'true'
+                                                      : 'false'
+                                                  }
+                                                >
+                                                  {COST_LABELS[material]}{' '}
+                                                  {required}
+                                                  {missing > 0
+                                                    ? ` (missing ${missing})`
+                                                    : ''}
+                                                </li>
+                                              );
+                                            },
+                                          )}
+                                        </ul>
+                                        <button
+                                          type="button"
+                                          disabled={!canAfford(inventory, cost)}
+                                          onClick={() =>
+                                            upgradeResearchAttribute(
+                                              module,
+                                              definition.attribute,
+                                            )
+                                          }
+                                        >
+                                          Upgrade
+                                        </button>
+                                      </div>
+                                    );
+                                  },
+                                )}
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setModulePanelSelection({
+                                    type: 'module',
+                                    id: module.id,
+                                  });
+                                  setExpandedSpeedControls(
+                                    (expandedControls) => {
+                                      const nextControls = new Set(
+                                        expandedControls,
+                                      );
+                                      nextControls.add('modules');
+                                      return nextControls;
+                                    },
+                                  );
+                                }}
+                              >
+                                Inspect
+                              </button>
+                            </>
+                          );
+                        })()
                       )}
                     </section>
                   );

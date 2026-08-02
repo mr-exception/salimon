@@ -399,6 +399,20 @@
   display: grid;
   grid-template-columns: minmax(100px, 1fr) minmax(150px, auto);
   gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid
+    color-mix(in srgb, var(--color-starlight) 12%, transparent);
+}
+
+.moduleInspector dl div:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.moduleInspector > .durabilityItem {
+  padding-top: 8px;
+  border-top: 1px solid
+    color-mix(in srgb, var(--color-starlight) 12%, transparent);
 }
 
 .moduleInspector dt {
@@ -441,6 +455,8 @@
 .researchList {
   display: grid;
   width: min(620px, calc(100vw - 70px));
+  max-height: 500px;
+  overflow-y: auto;
   gap: 10px;
 }
 
@@ -460,13 +476,43 @@
 
 .researchUpgrades div {
   display: grid;
-  grid-template-columns: minmax(90px, 1fr) minmax(150px, 1.5fr) 86px;
+  grid-template-columns:
+    minmax(180px, 1.5fr) minmax(70px, auto) minmax(160px, 1fr)
+    86px;
   align-items: center;
   gap: 10px;
 }
 
 .researchUpgrades span {
   color: color-mix(in srgb, var(--color-starlight) 70%, transparent);
+}
+
+.researchCost {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.researchCost li {
+  padding: 3px 6px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  font-size: 0.54rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.researchCost li[data-affordable='true'] {
+  color: #86efac;
+  background: color-mix(in srgb, #22c55e 12%, transparent);
+}
+
+.researchCost li[data-affordable='false'] {
+  color: #fca5a5;
+  background: color-mix(in srgb, #ef4444 12%, transparent);
 }
 
 .controlDialog {

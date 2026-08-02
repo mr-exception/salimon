@@ -1,124 +1,27 @@
 import { atom, getDefaultStore, useAtomValue, useSetAtom } from 'jotai';
-import type { Inventory } from './world';
-
-export type ModuleType = 'mining' | 'thruster' | 'fabricator' | 'energy-core';
-export type ModuleAttribute = 'efficiency' | 'durability' | 'range' | 'power';
-export type ModuleGridCell = {
-  x: number;
-  y: number;
-};
-export type ShipModule = {
-  id: string;
-  type: ModuleType;
-  name: string;
-  position: ModuleGridCell;
-  active: boolean;
-  unlocked: boolean;
-  levels: Partial<Record<ModuleAttribute, number>>;
-  durability: number;
-};
-export type ResearchDefinition = {
-  module: ModuleType;
-  name: string;
-  cost: Partial<Inventory>;
-};
+import {
+  ENERGY_CORE_DURABILITY_DRAIN_PER_REFUEL,
+  FABRICATOR_DURABILITY_DRAIN_PER_CRAFT,
+  MINING_MODULE,
+  THRUSTER_MODULE,
+  createModule,
+  getModuleDefinition,
+  getModuleDurabilityDrainRateFromDefinition,
+  getModuleMaxDurabilityFromDefinition,
+  MODULE_GRID_SIZE,
+  upgradeModuleFromDefinition,
+  type ModuleAttribute,
+  type ModuleGridCell,
+  type ModuleType,
+  type ShipModule,
+} from '../modules';
 
 const store = getDefaultStore();
 
-export const MODULE_GRID_SIZE = 8;
-export const MINING_BASE_RATE_KG_PER_SECOND = 2;
-export const MINING_BASE_DURABILITY_KG = 2_000;
-export const MINING_DURABILITY_PER_LEVEL_KG = 100;
-export const MINING_BASE_RANGE_METERS = 50_000;
-export const MINING_RANGE_LEVEL_MULTIPLIER = 0.05;
-export const THRUSTER_BASE_POWER_PERCENT = 100;
-export const THRUSTER_BASE_DURABILITY = 100;
-export const THRUSTER_DURABILITY_DRAIN_PER_SECOND = 0.02;
-export const THRUSTER_LEVEL_MULTIPLIER = 0.05;
-export const FABRICATOR_BASE_DURABILITY = 500;
-export const FABRICATOR_DURABILITY_DRAIN_PER_CRAFT = 1;
-export const FABRICATOR_LEVEL_MULTIPLIER = 0.05;
-export const ENERGY_CORE_BASE_DURABILITY = 800;
-export const ENERGY_CORE_DURABILITY_DRAIN_PER_REFUEL = 1;
-export const ENERGY_CORE_LEVEL_MULTIPLIER = 0.05;
+export * from '../modules';
+export * from './module-config';
 
-export const MODULE_DURABILITY_CONFIG: Record<
-  ModuleType,
-  { baseDurability: number; usageDrainRatePerSecond: number }
-> = {
-  mining: {
-    baseDurability: MINING_BASE_DURABILITY_KG,
-    usageDrainRatePerSecond: MINING_BASE_RATE_KG_PER_SECOND,
-  },
-  thruster: {
-    baseDurability: THRUSTER_BASE_DURABILITY,
-    usageDrainRatePerSecond: THRUSTER_DURABILITY_DRAIN_PER_SECOND,
-  },
-  fabricator: {
-    baseDurability: FABRICATOR_BASE_DURABILITY,
-    usageDrainRatePerSecond: 0,
-  },
-  'energy-core': {
-    baseDurability: ENERGY_CORE_BASE_DURABILITY,
-    usageDrainRatePerSecond: 0,
-  },
-};
-
-export const MODULE_RESEARCH: ResearchDefinition[] = [
-  {
-    module: 'mining',
-    name: 'Mining module',
-    cost: { iron: 0, silicates: 0, ice: 0 },
-  },
-  {
-    module: 'thruster',
-    name: 'Thruster module',
-    cost: { iron: 120, silicates: 80, ice: 40 },
-  },
-  {
-    module: 'fabricator',
-    name: 'Fabricator module',
-    cost: { iron: 80, silicates: 40, carbon: 20 },
-  },
-  {
-    module: 'energy-core',
-    name: 'Energy Core module',
-    cost: { iron: 140, silicates: 100, carbon: 50 },
-  },
-];
-
-const modulesAtom = atom<ShipModule[]>([
-  {
-    id: 'mining-module-1',
-    type: 'mining',
-    name: 'Mining module',
-    position: { x: 3, y: 3 },
-    active: false,
-    unlocked: true,
-    levels: { efficiency: 1, durability: 1, range: 1 },
-    durability: MINING_BASE_DURABILITY_KG,
-  },
-  {
-    id: 'fabricator-module-1',
-    type: 'fabricator',
-    name: 'Fabricator module',
-    position: { x: 4, y: 3 },
-    active: false,
-    unlocked: true,
-    levels: { durability: 1 },
-    durability: FABRICATOR_BASE_DURABILITY,
-  },
-  {
-    id: 'energy-core-module-1',
-    type: 'energy-core',
-    name: 'Energy Core module',
-    position: { x: 4, y: 4 },
-    active: false,
-    unlocked: true,
-    levels: { durability: 1 },
-    durability: ENERGY_CORE_BASE_DURABILITY,
-  },
-]);
+const modulesAtom = atom<ShipModule[]>([]);
 
 export function useModules() {
   return useAtomValue(modulesAtom);
@@ -133,32 +36,11 @@ export function getModules() {
 }
 
 export function getModuleMaxDurability(module: ShipModule) {
-  const durabilityLevel = module.levels.durability ?? 1;
-  if (module.type === 'mining') {
-    return (
-      MINING_BASE_DURABILITY_KG +
-      Math.max(0, durabilityLevel - 1) * MINING_DURABILITY_PER_LEVEL_KG
-    );
-  }
+  return getModuleMaxDurabilityFromDefinition(module);
+}
 
-  if (module.type === 'fabricator') {
-    return (
-      FABRICATOR_BASE_DURABILITY *
-      (1 + Math.max(0, durabilityLevel - 1) * FABRICATOR_LEVEL_MULTIPLIER)
-    );
-  }
-
-  if (module.type === 'energy-core') {
-    return (
-      ENERGY_CORE_BASE_DURABILITY *
-      (1 + Math.max(0, durabilityLevel - 1) * ENERGY_CORE_LEVEL_MULTIPLIER)
-    );
-  }
-
-  return (
-    THRUSTER_BASE_DURABILITY *
-    (1 + Math.max(0, durabilityLevel - 1) * THRUSTER_LEVEL_MULTIPLIER)
-  );
+export function getModuleDurabilityDrainRate(module: ShipModule) {
+  return getModuleDurabilityDrainRateFromDefinition(module);
 }
 
 export function setModuleActive(moduleId: string, active: boolean) {
@@ -203,37 +85,7 @@ export function unlockModule(type: ModuleType) {
 
   store.set(modulesAtom, [
     ...currentModules,
-    {
-      id: `${type}-module-1`,
-      type,
-      name:
-        type === 'thruster'
-          ? 'Thruster module'
-          : type === 'fabricator'
-            ? 'Fabricator module'
-            : type === 'energy-core'
-              ? 'Energy Core module'
-              : 'Mining module',
-      position: firstOpenCell,
-      active: false,
-      unlocked: true,
-      levels:
-        type === 'thruster'
-          ? { power: 1, durability: 1 }
-          : type === 'fabricator'
-            ? { durability: 1 }
-            : type === 'energy-core'
-              ? { durability: 1 }
-              : { efficiency: 1, durability: 1, range: 1 },
-      durability:
-        type === 'thruster'
-          ? THRUSTER_BASE_DURABILITY
-          : type === 'fabricator'
-            ? FABRICATOR_BASE_DURABILITY
-            : type === 'energy-core'
-              ? ENERGY_CORE_BASE_DURABILITY
-              : MINING_BASE_DURABILITY_KG,
-    },
+    createModule(type, firstOpenCell),
   ]);
   return true;
 }
@@ -252,44 +104,7 @@ export function upgradeModuleAttribute(
         return module;
       }
 
-      const nextLevel = (module.levels[attribute] ?? 0) + 1;
-      const nextModule = {
-        ...module,
-        levels: {
-          ...module.levels,
-          [attribute]: nextLevel,
-        },
-      };
-
-      if (module.type === 'mining' && attribute === 'durability') {
-        return {
-          ...nextModule,
-          durability: module.durability + MINING_DURABILITY_PER_LEVEL_KG,
-        };
-      }
-
-      if (module.type === 'thruster' && attribute === 'durability') {
-        return {
-          ...nextModule,
-          durability: module.durability * (1 + THRUSTER_LEVEL_MULTIPLIER),
-        };
-      }
-
-      if (module.type === 'fabricator' && attribute === 'durability') {
-        return {
-          ...nextModule,
-          durability: module.durability * (1 + FABRICATOR_LEVEL_MULTIPLIER),
-        };
-      }
-
-      if (module.type === 'energy-core' && attribute === 'durability') {
-        return {
-          ...nextModule,
-          durability: module.durability * (1 + ENERGY_CORE_LEVEL_MULTIPLIER),
-        };
-      }
-
-      return nextModule;
+      return upgradeModuleFromDefinition(module, attribute);
     }),
   );
 }
@@ -388,15 +203,11 @@ export function getMiningModuleStats() {
     .find((candidate) => candidate.type === 'mining' && candidate.unlocked);
   if (!module) return undefined;
 
-  const efficiencyLevel = module.levels.efficiency ?? 1;
-  const rangeLevel = module.levels.range ?? 1;
   return {
     id: module.id,
     active: module.active && module.durability > 0,
-    rateKgPerSecond: MINING_BASE_RATE_KG_PER_SECOND * efficiencyLevel,
-    rangeMeters:
-      MINING_BASE_RANGE_METERS *
-      (1 + Math.max(0, rangeLevel - 1) * MINING_RANGE_LEVEL_MULTIPLIER),
+    rateKgPerSecond: MINING_MODULE.getRateKgPerSecond(module.levels),
+    rangeMeters: MINING_MODULE.getRangeMeters(module.levels),
     durability: module.durability,
     maxDurability: getModuleMaxDurability(module),
   };
@@ -428,26 +239,15 @@ export function consumeMiningDurability(requestedKnSeconds: number) {
   return consumedKnSeconds;
 }
 
-export function getThrusterModulePowerPercent() {
+export function getThrusterModulePowerKns() {
   const module = store
     .get(modulesAtom)
     .find((candidate) => candidate.type === 'thruster' && candidate.unlocked);
-  const powerLevel = module?.levels.power ?? 1;
-
-  return THRUSTER_BASE_POWER_PERCENT * (1 + (powerLevel - 1) * 0.05);
+  return THRUSTER_MODULE.getPowerKns(module?.levels ?? {});
 }
 
 function canUpgradeAttribute(type: ModuleType, attribute: ModuleAttribute) {
-  return (
-    (type === 'mining' &&
-      (attribute === 'efficiency' ||
-        attribute === 'durability' ||
-        attribute === 'range')) ||
-    (type === 'thruster' &&
-      (attribute === 'power' || attribute === 'durability')) ||
-    (type === 'fabricator' && attribute === 'durability') ||
-    (type === 'energy-core' && attribute === 'durability')
-  );
+  return getModuleDefinition(type).canUpgrade(attribute);
 }
 
 function isInsideModuleGrid(position: ModuleGridCell) {

@@ -15,6 +15,7 @@ import type {
   World,
 } from '@repo/types';
 import {
+  MAX_ENGINE_THRUST_KN,
   MAX_PROPAGATION_STEPS,
   SPACESHIP_MASS_KG,
   TARGET_STEP_SECONDS,
@@ -36,6 +37,7 @@ import {
   type WorldSector,
 } from './world-sectors';
 import { THRUSTER_DURABILITY_DRAIN_PER_SECOND } from './modules';
+import { getConfiguredModuleAttributeValue } from './module-config';
 
 type Body = Planet | Spaceship | Star;
 type SerializedVisiblePlanetBody = SerializedBody<Planet> & {
@@ -76,8 +78,14 @@ export const INVENTORY_MATERIALS = [
 ] as const satisfies readonly InventoryMaterial[];
 
 export const INITIAL_SPACESHIP_FUEL_KNS = 1_000_000;
-export const MAX_HULL_DURABILITY = 200;
-export const HULL_DURABILITY_PER_LEVEL = 50;
+export const MAX_HULL_DURABILITY = getConfiguredModuleAttributeValue(
+  'hull',
+  'durability',
+  1,
+);
+export const HULL_DURABILITY_PER_LEVEL =
+  getConfiguredModuleAttributeValue('hull', 'durability', 2) -
+  MAX_HULL_DURABILITY;
 export const HULL_DURABILITY_DRAIN_PER_CRASH = 25;
 export const HULL_DURABILITY_CONFIG = {
   baseDurability: MAX_HULL_DURABILITY,
@@ -348,7 +356,13 @@ export function repairSpaceshipThrusterByAmount(index: number, amount: number) {
 export function addSpaceshipFuelKns(amount: number) {
   if (!Number.isFinite(amount) || amount <= 0) return false;
 
-  store.set(spaceshipFuelKnsAtom, store.get(spaceshipFuelKnsAtom) + amount);
+  store.set(
+    spaceshipFuelKnsAtom,
+    Math.min(
+      INITIAL_SPACESHIP_FUEL_KNS,
+      store.get(spaceshipFuelKnsAtom) + amount,
+    ),
+  );
   return true;
 }
 
@@ -864,8 +878,9 @@ function applySimulationFrameSnapshot(snapshot: SimulationFrameSnapshot) {
     0,
     snapshot.elapsedSeconds - lastDurabilityDrainElapsedSeconds,
   );
+  let fuelDepleted = false;
   if (durabilityDrainSeconds > 0) {
-    drainActiveThrusterDurability(
+    fuelDepleted = drainActiveThrusterResources(
       snapshot.activeThrusters,
       durabilityDrainSeconds,
     );
@@ -909,7 +924,14 @@ function applySimulationFrameSnapshot(snapshot: SimulationFrameSnapshot) {
 
   spaceshipVelocity = snapshot.spaceship.velocity;
   spaceshipAttachedBodyName = snapshot.spaceship.attachedBodyName;
-  if (shouldPublishSimulationTelemetry(snapshot)) {
+  if (fuelDepleted) {
+    store.set(spaceshipMotionStateAtom, snapshot.motionState);
+    store.set(spaceshipActiveFeatureAtom, undefined);
+    setSpaceshipActiveThrusterSignals(createInactiveThrusters());
+    store.set(spaceshipSpeedAtom, Number(snapshot.spaceship.speed));
+    store.set(spaceshipAbsoluteSpeedAtom, snapshot.absoluteSpeed);
+    stopSpaceshipActiveFeatureLocally();
+  } else if (shouldPublishSimulationTelemetry(snapshot)) {
     publishSimulationTelemetryAtoms(snapshot);
   }
 
@@ -1035,6 +1057,7 @@ export function startSpaceshipThrusters(
 ) {
   invalidateLatestSimulationSnapshot();
   if (!Array.isArray(thrusters) || thrusters.length === 0) return false;
+  if (store.get(spaceshipFuelKnsAtom) <= 0) return false;
   if (store.get(spaceshipMotionStateAtom) === 'crashed') return false;
   if (!canDetachSpaceshipFromAttachedBody()) return false;
 
@@ -1065,6 +1088,7 @@ export function startSpaceshipTargetSpeed(
   invalidateLatestSimulationSnapshot();
   if (
     store.get(spaceshipMotionStateAtom) === 'crashed' ||
+    store.get(spaceshipFuelKnsAtom) <= 0 ||
     targetDirection === undefined
   ) {
     return false;
@@ -1616,6 +1640,36 @@ function drainActiveThrusterDurability(
   );
 }
 
+function drainSpaceshipFuelForActiveThrusters(
+  thrusters: { powerPercent: number; active: boolean }[],
+  elapsedSeconds: number,
+) {
+  if (!Number.isFinite(elapsedSeconds) || elapsedSeconds <= 0) return false;
+
+  const fuelDrainKns = normalizeThrusterSignals(thrusters).reduce(
+    (drain, thruster) =>
+      thruster.active && thruster.powerPercent > 0
+        ? drain +
+          MAX_ENGINE_THRUST_KN * (thruster.powerPercent / 100) * elapsedSeconds
+        : drain,
+    0,
+  );
+  if (fuelDrainKns <= 0) return false;
+
+  const currentFuelKns = store.get(spaceshipFuelKnsAtom);
+  const nextFuelKns = Math.max(0, currentFuelKns - fuelDrainKns);
+  store.set(spaceshipFuelKnsAtom, nextFuelKns);
+  return currentFuelKns > 0 && nextFuelKns <= 0;
+}
+
+function drainActiveThrusterResources(
+  thrusters: { powerPercent: number; active: boolean }[],
+  elapsedSeconds: number,
+) {
+  drainActiveThrusterDurability(thrusters, elapsedSeconds);
+  return drainSpaceshipFuelForActiveThrusters(thrusters, elapsedSeconds);
+}
+
 export function getSpaceshipWorldVelocity() {
   if (spaceshipVelocity) return { ...spaceshipVelocity };
 
@@ -2015,7 +2069,15 @@ function advanceActiveFeature(elapsedSeconds: number) {
     activeFeature?.type === 'thrusters' ||
     activeFeature?.type === 'manual-force'
   ) {
-    drainActiveThrusterDurability(activeFeature.thrusters, elapsedSeconds);
+    const fuelDepleted = drainActiveThrusterResources(
+      activeFeature.thrusters,
+      elapsedSeconds,
+    );
+    if (fuelDepleted) {
+      stopSpaceshipActiveFeatureLocally();
+      return;
+    }
+
     const nextElapsedSeconds = activeFeature.elapsedSeconds + elapsedSeconds;
     store.set(spaceshipActiveFeatureAtom, {
       ...activeFeature,
@@ -2025,6 +2087,12 @@ function advanceActiveFeature(elapsedSeconds: number) {
   }
 
   if (activeFeature?.type !== 'target-speed') return;
+  if (
+    drainActiveThrusterResources(getSpaceshipActiveThrusters(), elapsedSeconds)
+  ) {
+    stopSpaceshipActiveFeatureLocally();
+    return;
+  }
 
   const motion = {
     position: toVector(getWorldPosition(spaceshipState.position)),

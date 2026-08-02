@@ -11,6 +11,10 @@ const ASTEROID_STROKE_COLOR = 0xe2e8f0;
 const MIN_DETAILED_SCREEN_WIDTH_PX = 10;
 const SIMPLE_ASTEROID_SCREEN_RADIUS_PX = 3;
 const MIN_HIT_RADIUS_PX = 8;
+const SCALE_REFERENCE_WIDTH_PX = 200;
+const MIN_ASTEROID_SCALE_DISTANCE_METERS = 35_000_000;
+const MIN_ASTEROID_RENDER_ZOOM =
+  SCALE_REFERENCE_WIDTH_PX / MIN_ASTEROID_SCALE_DISTANCE_METERS;
 
 export class Asteroid extends Phaser.GameObjects.Container {
   readonly asteroid: AsteroidData;
@@ -43,7 +47,11 @@ export class Asteroid extends Phaser.GameObjects.Container {
       this.x - radius <= viewport.right &&
       this.y + radius >= viewport.top &&
       this.y - radius <= viewport.bottom;
-    const visible = showAsteroids && parentShapeVisible && intersectsViewport;
+    const visible =
+      showAsteroids &&
+      zoom >= MIN_ASTEROID_RENDER_ZOOM &&
+      parentShapeVisible &&
+      intersectsViewport;
 
     this.setVisible(visible);
     if (!visible) return;
@@ -55,7 +63,10 @@ export class Asteroid extends Phaser.GameObjects.Container {
     const position = originPosition
       ? getRenderPositionFromOrigin(this.asteroid.position, originPosition)
       : getRenderPosition(this.asteroid.position);
-    this.setPosition(Number(position.x), Number(position.y));
+    this.setPosition(
+      Number(position.x) + (this.asteroid.positionRemainder?.x ?? 0),
+      Number(position.y) + (this.asteroid.positionRemainder?.y ?? 0),
+    );
   }
 
   containsScreenPoint(

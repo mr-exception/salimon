@@ -2,9 +2,11 @@ import type { InventoryMaterial, Planet, Star } from '@repo/types';
 import { WorldService, type Vector } from '@repo/world';
 import {
   getBodyWorldVelocity,
+  getSpaceshipWorldVelocity,
   getWorldPosition,
   INVENTORY_MATERIALS,
   spaceshipState,
+  worldState,
 } from './world';
 
 export type AsteroidMaterial = {
@@ -15,12 +17,13 @@ export type AsteroidMaterial = {
 export type Asteroid = {
   id: string;
   name: string;
+  group?: 'orbital' | 'spaceship';
   orbitingBodyName: string;
-  orbitingBodyKind: 'Planet' | 'Star';
+  orbitingBodyKind: 'Planet' | 'Star' | 'Spaceship';
   position: {
     x: bigint;
     y: bigint;
-    relativeTo: string;
+    relativeTo?: string;
   };
   cTime: number;
   radius: bigint;
@@ -28,6 +31,8 @@ export type Asteroid = {
   orbitalCenter: string | null;
   speed: bigint;
   clockwise: boolean;
+  velocity?: Vector;
+  positionRemainder?: Vector;
   orbitSurfaceDistanceMeters: number;
   materials: AsteroidMaterial[];
 };
@@ -39,7 +44,7 @@ type AsteroidRecord = Omit<
   position: {
     x: string;
     y: string;
-    relativeTo: string;
+    relativeTo?: string;
   };
   radius: string;
   mass: string;
@@ -66,11 +71,18 @@ const MIN_MASS_KG = 1_500;
 const MAX_MASS_KG = 15_000;
 const MIN_RADIUS_METERS = 75;
 const MAX_RADIUS_METERS = 750;
+const SPACESHIP_ASTEROID_GROUP_SIZE = 25;
+const SPACESHIP_ASTEROID_RANGE_METERS = 3_000_000;
+const MIN_SPACESHIP_ASTEROID_DISTANCE_METERS = 50_000;
+const MAX_SPACESHIP_ASTEROID_RELATIVE_SPEED_METERS_PER_SECOND = 1_000;
+const SPACESHIP_ASTEROID_SPAWN_ATTEMPTS = 20;
 
 let databasePromise: Promise<IDBDatabase> | undefined;
 let asteroidsPromise: Promise<Asteroid[]> | undefined;
 let asteroidPersistTimer: ReturnType<typeof setTimeout> | undefined;
 const pendingPersistedAsteroids = new Map<string, Asteroid>();
+let spaceshipAsteroids: Asteroid[] = [];
+let spaceshipAsteroidSequence = 0;
 
 export async function getClientAsteroids() {
   asteroidsPromise ??= readStoredAsteroids();
@@ -111,13 +123,52 @@ export async function ensureClientAsteroidsForParents(
 export function advanceAsteroid(asteroid: Asteroid, elapsedSeconds: number) {
   if (elapsedSeconds <= 0) return;
 
+  if (asteroid.group === 'spaceship' && asteroid.velocity) {
+    const spaceshipVelocity = getSpaceshipWorldVelocity();
+    asteroid.positionRemainder = advancePositionByVelocity(
+      asteroid.position,
+      {
+        x: asteroid.velocity.x - spaceshipVelocity.x,
+        y: asteroid.velocity.y - spaceshipVelocity.y,
+      },
+      elapsedSeconds,
+      asteroid.positionRemainder ?? { x: 0, y: 0 },
+    );
+    asteroid.cTime = Date.now();
+    return;
+  }
+
   const position = WorldService.advanceBodyPosition(asteroid, elapsedSeconds);
   asteroid.position.x = BigInt(position.x);
   asteroid.position.y = BigInt(position.y);
   asteroid.cTime = Date.now();
 }
 
+function advancePositionByVelocity(
+  position: Asteroid['position'],
+  velocity: Vector,
+  elapsedSeconds: number,
+  remainder: Vector,
+) {
+  const deltaX = velocity.x * elapsedSeconds + remainder.x;
+  const deltaY = velocity.y * elapsedSeconds + remainder.y;
+  const wholeX = Math.trunc(deltaX);
+  const wholeY = Math.trunc(deltaY);
+
+  if (wholeX !== 0) position.x += BigInt(wholeX);
+  if (wholeY !== 0) position.y += BigInt(wholeY);
+
+  return {
+    x: deltaX - wholeX,
+    y: deltaY - wholeY,
+  };
+}
+
 export function getAsteroidWorldVelocity(asteroid: Asteroid): Vector {
+  if (asteroid.group === 'spaceship' && asteroid.velocity) {
+    return { ...asteroid.velocity };
+  }
+
   const centerVelocity = getBodyWorldVelocity(asteroid.orbitingBodyName);
   const x = Number(asteroid.position.x);
   const y = Number(asteroid.position.y);
@@ -175,8 +226,37 @@ export function mineAsteroid(asteroid: Asteroid, requestedMassKg: number) {
   if (nextMassKg <= 0) {
     asteroid.radius = 0n;
   }
-  scheduleAsteroidPersist(asteroid);
+  if (asteroid.group !== 'spaceship') {
+    scheduleAsteroidPersist(asteroid);
+  }
   return minedMaterials;
+}
+
+export function reconcileSpaceshipAsteroids() {
+  const parents = [...worldState.planets, ...worldState.stars];
+  spaceshipAsteroids = spaceshipAsteroids.filter(
+    (asteroid) =>
+      getAsteroidMaterialMassKg(asteroid) > 0 &&
+      isAsteroidNearSpaceship(asteroid) &&
+      isPositionClearOfPlanetaryObjects(
+        asteroid.position,
+        parents,
+        Number(asteroid.radius),
+      ),
+  );
+
+  if (!isSpaceshipAwayFromPlanetaryObjects(parents)) {
+    spaceshipAsteroids = [];
+    return spaceshipAsteroids;
+  }
+
+  while (spaceshipAsteroids.length < SPACESHIP_ASTEROID_GROUP_SIZE) {
+    const asteroid = createSpaceshipAsteroid(parents);
+    if (!asteroid) break;
+    spaceshipAsteroids.push(asteroid);
+  }
+
+  return spaceshipAsteroids;
 }
 
 export function isClientAsteroidParentNearSpaceship(parent: Planet | Star) {
@@ -258,6 +338,124 @@ function createAsteroid(
     orbitSurfaceDistanceMeters: surfaceDistance,
     materials: createMaterials(random, mass),
   };
+}
+
+function createSpaceshipAsteroid(
+  parents: (Planet | Star)[],
+): Asteroid | undefined {
+  for (
+    let attempt = 0;
+    attempt < SPACESHIP_ASTEROID_SPAWN_ATTEMPTS;
+    attempt += 1
+  ) {
+    const index = spaceshipAsteroidSequence;
+    spaceshipAsteroidSequence += 1;
+    const random = createSeededRandom(
+      `${spaceshipState.name}:${Date.now()}:${index}:${attempt}`,
+    );
+    const mass = Math.round(randomBetween(random, MIN_MASS_KG, MAX_MASS_KG));
+    const radius = Math.round(
+      mapRange(
+        mass,
+        MIN_MASS_KG,
+        MAX_MASS_KG,
+        MIN_RADIUS_METERS,
+        MAX_RADIUS_METERS,
+      ),
+    );
+    const distance = randomBetween(
+      random,
+      MIN_SPACESHIP_ASTEROID_DISTANCE_METERS,
+      SPACESHIP_ASTEROID_RANGE_METERS,
+    );
+    const angle = randomBetween(random, 0, Math.PI * 2);
+    const position = {
+      x: BigInt(Math.round(Math.cos(angle) * distance)),
+      y: BigInt(Math.round(Math.sin(angle) * distance)),
+      relativeTo: spaceshipState.name,
+    };
+
+    if (!isPositionClearOfPlanetaryObjects(position, parents, radius)) {
+      continue;
+    }
+
+    const spaceshipVelocity = getSpaceshipWorldVelocity();
+    const relativeSpeed = randomBetween(
+      random,
+      0,
+      MAX_SPACESHIP_ASTEROID_RELATIVE_SPEED_METERS_PER_SECOND,
+    );
+    const velocityAngle = randomBetween(random, 0, Math.PI * 2);
+    const relativeVelocity = {
+      x: Math.cos(velocityAngle) * relativeSpeed,
+      y: Math.sin(velocityAngle) * relativeSpeed,
+    };
+
+    return {
+      id: `spaceship-asteroid-${index}`,
+      name: `Deep Space Asteroid ${index + 1}`,
+      group: 'spaceship',
+      orbitingBodyName: spaceshipState.name,
+      orbitingBodyKind: 'Spaceship',
+      position,
+      cTime: Date.now(),
+      radius: BigInt(radius),
+      mass: BigInt(mass),
+      orbitalCenter: null,
+      speed: 0n,
+      clockwise: false,
+      velocity: {
+        x: spaceshipVelocity.x + relativeVelocity.x,
+        y: spaceshipVelocity.y + relativeVelocity.y,
+      },
+      orbitSurfaceDistanceMeters: distance,
+      materials: createMaterials(random, mass),
+    };
+  }
+
+  return undefined;
+}
+
+function isSpaceshipAwayFromPlanetaryObjects(parents: (Planet | Star)[]) {
+  return isPositionClearOfPlanetaryObjects(
+    spaceshipState.position,
+    parents,
+    Number(spaceshipState.radius),
+  );
+}
+
+function isPositionClearOfPlanetaryObjects(
+  position: Asteroid['position'],
+  parents: (Planet | Star)[],
+  radiusMeters = 0,
+) {
+  const worldPosition = getWorldPosition(position);
+
+  return parents.every((parent) => {
+    const parentPosition = getWorldPosition(parent.position);
+    const surfaceDistance = Math.max(
+      0,
+      Math.hypot(
+        Number(worldPosition.x - parentPosition.x),
+        Number(worldPosition.y - parentPosition.y),
+      ) -
+        Number(parent.radius) -
+        radiusMeters,
+    );
+
+    return surfaceDistance >= SPACESHIP_ASTEROID_RANGE_METERS;
+  });
+}
+
+function isAsteroidNearSpaceship(asteroid: Asteroid) {
+  const asteroidPosition = getWorldPosition(asteroid.position);
+  const spaceshipPosition = getWorldPosition(spaceshipState.position);
+  const distance = Math.hypot(
+    Number(asteroidPosition.x - spaceshipPosition.x),
+    Number(asteroidPosition.y - spaceshipPosition.y),
+  );
+
+  return distance <= SPACESHIP_ASTEROID_RANGE_METERS;
 }
 
 function createMaterials(random: () => number, mass: number) {

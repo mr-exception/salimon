@@ -5,6 +5,7 @@ import {
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
+  type CSSProperties,
   type ReactNode,
 } from 'react';
 import style from './style.module.css';
@@ -48,8 +49,9 @@ import {
   type ShipModule,
 } from '@store';
 import type { InventoryMaterial } from '@repo/types';
+import { MAX_ENGINE_THRUST_KN } from '@repo/world';
 import {
-  formatDuration,
+  formatForce,
   formatImpulse,
   formatPercentage,
   formatSpeed,
@@ -128,6 +130,32 @@ const PANEL_PLACEMENTS: Record<
   modules: { horizontal: 'left', vertical: 'top' },
   research: { horizontal: 'right', vertical: 'top' },
 };
+
+const THRUSTER_LABELS = ['Top', 'Right', 'Bottom', 'Left'] as const;
+
+function createManualThrusterInputs() {
+  return Array.from({ length: SPACESHIP_THRUSTER_COUNT }, () => ({
+    powerPercent: '100',
+    active: false,
+  }));
+}
+
+function createManualThrusterInputsFromSignals(
+  thrusters: { powerPercent: number; active: boolean }[],
+) {
+  return Array.from({ length: SPACESHIP_THRUSTER_COUNT }, (_, index) => {
+    const thruster = thrusters[index];
+    const powerPercent =
+      thruster && Number.isFinite(thruster.powerPercent)
+        ? Math.max(0, Math.min(100, Math.round(thruster.powerPercent)))
+        : 0;
+
+    return {
+      powerPercent: String(powerPercent),
+      active: Boolean(thruster?.active) && powerPercent > 0,
+    };
+  });
+}
 
 function FeatureIcon({ feature }: { feature: SpeedControlTab }) {
   if (feature === 'modules') {
@@ -375,6 +403,64 @@ function RulerIcon() {
   );
 }
 
+function clampThrusterAxisValue(value: number) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(-100, Math.min(100, Math.round(value)));
+}
+
+function formatSignedThrusterAxisValue(value: number) {
+  const clampedValue = clampThrusterAxisValue(value);
+  return `${clampedValue > 0 ? '+' : ''}${clampedValue}%`;
+}
+
+function getThrusterAxisValue(
+  thrusters: { powerPercent: number; active: boolean }[],
+  positiveIndex: number,
+  negativeIndex: number,
+) {
+  const positiveThruster = thrusters[positiveIndex];
+  const negativeThruster = thrusters[negativeIndex];
+  const positivePower =
+    positiveThruster?.active && positiveThruster.powerPercent > 0
+      ? positiveThruster.powerPercent
+      : 0;
+  const negativePower =
+    negativeThruster?.active && negativeThruster.powerPercent > 0
+      ? negativeThruster.powerPercent
+      : 0;
+
+  return clampThrusterAxisValue(positivePower - negativePower);
+}
+
+function setManualThrusterAxisValue(
+  thrusters: ManualThrusterInput[],
+  axis: 'horizontal' | 'vertical',
+  value: number,
+) {
+  const positiveIndex = axis === 'horizontal' ? 3 : 2;
+  const negativeIndex = axis === 'horizontal' ? 1 : 0;
+  const clampedValue = clampThrusterAxisValue(value);
+  const powerPercent = String(Math.abs(clampedValue));
+
+  return thrusters.map((thruster, index) => {
+    if (index === positiveIndex) {
+      return {
+        powerPercent,
+        active: clampedValue > 0,
+      };
+    }
+
+    if (index === negativeIndex) {
+      return {
+        powerPercent,
+        active: clampedValue < 0,
+      };
+    }
+
+    return thruster;
+  });
+}
+
 function DraggablePanel({
   children,
   control,
@@ -526,7 +612,6 @@ function DraggablePanel({
 }
 
 export function Footer({
-  isEngineRunning = false,
   isMeasuring = false,
   isMeasurementRelativeToSpaceship = false,
   isMeasurementVelocityAxesSeparated = false,
@@ -553,12 +638,13 @@ export function Footer({
   const activeThrusterSignals = useSpaceshipActiveThrusters();
   const inventory = useInventory();
   const modules = useModules();
-  const [manualThrusters, setManualThrusters] = useState(() =>
-    Array.from({ length: SPACESHIP_THRUSTER_COUNT }, () => ({
-      powerPercent: '100',
-      active: false,
-    })),
+  const [manualThrusters, setManualThrusters] = useState(
+    createManualThrusterInputs,
   );
+  const [manualThrusterAxisFields, setManualThrusterAxisFields] = useState({
+    horizontal: '0',
+    vertical: '0',
+  });
   const [predictionAmount, setPredictionAmount] = useState('2');
   const [predictionUnit, setPredictionUnit] = useState<'s' | 'm' | 'h'>('m');
   const [isPredictionActive, setIsPredictionActive] = useState(false);
@@ -589,36 +675,8 @@ export function Footer({
     activeFeature?.type === 'manual-force'
       ? activeFeature
       : undefined;
-  const thrustersSchedule = manualThrusters.map((thruster) => ({
-    powerPercent: Number(thruster.powerPercent),
-    active: thruster.active,
-  }));
-  const thrustersTimeSeconds = activeThrusters
-    ? Math.max(0, activeThrusters.elapsedSeconds)
-    : activeTargetSpeed
-      ? Math.max(
-          0,
-          activeTargetSpeed.durationSeconds - activeTargetSpeed.elapsedSeconds,
-        )
-      : undefined;
-  const thrustersFieldsAreValid = thrustersSchedule.every(
-    (thruster) =>
-      Number.isFinite(thruster.powerPercent) &&
-      thruster.powerPercent >= 0 &&
-      thruster.powerPercent <= 100,
-  );
-  const hasValidThrusters =
-    thrustersFieldsAreValid &&
-    thrustersSchedule.some(
-      (thruster, index) =>
-        thruster.active &&
-        thruster.powerPercent > 0 &&
-        (thrusterDurability[index] ?? 0) > 0,
-    );
   const canControlManualThrusters =
     motionState !== 'crashed' && !activeTargetSpeed;
-  const canStartThrusters =
-    canControlManualThrusters && hasValidThrusters && fuelKns > 0;
   const currentEnginePowerPercent =
     activeThrusterSignals.reduce(
       (totalPowerPercent, thruster) =>
@@ -631,11 +689,45 @@ export function Footer({
         powerPercent: Number(thruster.powerPercent),
         active: thruster.active,
       }));
+  const displayedHorizontalThrusterValue = getThrusterAxisValue(
+    displayedThrusters,
+    3,
+    1,
+  );
+  const displayedVerticalThrusterValue = getThrusterAxisValue(
+    displayedThrusters,
+    2,
+    0,
+  );
+  const thrusterPadStyle = {
+    '--thruster-x': `${50 + displayedHorizontalThrusterValue / 2}%`,
+    '--thruster-y': `${50 - displayedVerticalThrusterValue / 2}%`,
+  } as CSSProperties;
+  const thrusterReadouts = THRUSTER_LABELS.map((label, index) => {
+    const thruster = displayedThrusters[index];
+    const forceN =
+      thruster?.active && thruster.powerPercent > 0
+        ? MAX_ENGINE_THRUST_KN * 1_000 * (thruster.powerPercent / 100)
+        : 0;
+
+    return {
+      label,
+      forceN,
+      durability: thrusterDurability[index] ?? 0,
+    };
+  });
   const predictionSeconds =
     Number(predictionAmount) *
     ({ s: 1, m: 60, h: 3_600 } as const)[predictionUnit];
   const hasValidPrediction =
     Number.isFinite(predictionSeconds) && predictionSeconds > 0;
+
+  useEffect(() => {
+    setManualThrusterAxisFields({
+      horizontal: String(displayedHorizontalThrusterValue),
+      vertical: String(displayedVerticalThrusterValue),
+    });
+  }, [displayedHorizontalThrusterValue, displayedVerticalThrusterValue]);
 
   useEffect(() => {
     if (isPredictionActive && hasValidPrediction) {
@@ -759,95 +851,88 @@ export function Footer({
     }
   };
 
-  const updateManualThrusterPower = (index: number, value: string) => {
-    setManualThrusters((thrusters) =>
-      thrusters.map((thruster, thrusterIndex) =>
-        thrusterIndex === index
-          ? { ...thruster, powerPercent: value }
-          : thruster,
+  const updateManualThrusterVector = (horizontal: number, vertical: number) => {
+    const nextThrusters = setManualThrusterAxisValue(
+      setManualThrusterAxisValue(
+        createManualThrusterInputsFromSignals(displayedThrusters),
+        'horizontal',
+        horizontal,
       ),
-    );
-
-    if (activeThrusters) {
-      applyManualThrusters(
-        manualThrusters.map((thruster, thrusterIndex) =>
-          thrusterIndex === index
-            ? { ...thruster, powerPercent: value }
-            : thruster,
-        ),
-      );
-    }
-  };
-
-  const toggleManualThruster = (index: number) => {
-    const nextThrusters = manualThrusters.map((thruster, thrusterIndex) =>
-      thrusterIndex === index
-        ? { ...thruster, active: !thruster.active }
-        : thruster,
+      'vertical',
+      vertical,
     );
     setManualThrusters(nextThrusters);
     applyManualThrusters(nextThrusters);
   };
 
-  const startThrusters = () => {
-    if (!canStartThrusters || activeThrusters || !onStartThrusters) return;
-
-    onStartThrusters(thrustersSchedule);
-  };
-
-  const stopEngines = () => {
-    onStopEngines?.();
-    setManualThrusters((thrusters) =>
-      thrusters.map((thruster) => ({ ...thruster, active: false })),
-    );
-  };
-
-  const renderManualThrusterControl = (
-    index: number,
-    label: string,
-    className: string,
+  const updateManualThrusterAxis = (
+    axis: 'horizontal' | 'vertical',
+    value: string,
   ) => {
-    const thruster = manualThrusters[index];
-    const displayedThruster = displayedThrusters[index];
-    if (!thruster || !displayedThruster) return null;
-    const displayedPower = activeFeature
-      ? Number.isInteger(displayedThruster.powerPercent)
-        ? String(displayedThruster.powerPercent)
-        : displayedThruster.powerPercent.toFixed(2)
-      : thruster.powerPercent;
+    setManualThrusterAxisFields((fields) => ({ ...fields, [axis]: value }));
 
-    return (
-      <div className={`${style.thrustersRow} ${className}`}>
-        <span>{label}</span>
-        <button
-          className={style.thrusterToggle}
-          type="button"
-          aria-pressed={displayedThruster.active}
-          disabled={!canControlManualThrusters}
-          onClick={() => toggleManualThruster(index)}
-        >
-          {displayedThruster.active ? 'On' : 'Off'}
-        </button>
-        <label htmlFor={`footer-manual-thruster-${index}-power`}>
-          <span>Power</span>
-          <span className={style.speedField}>
-            <input
-              id={`footer-manual-thruster-${index}-power`}
-              type="number"
-              min="0"
-              max="100"
-              step="1"
-              value={displayedPower}
-              disabled={!canControlManualThrusters}
-              onChange={(event) =>
-                updateManualThrusterPower(index, event.currentTarget.value)
-              }
-            />
-            <span aria-hidden="true">%</span>
-          </span>
-        </label>
-      </div>
+    const axisValue = Number(value);
+    if (!Number.isFinite(axisValue)) return;
+
+    updateManualThrusterVector(
+      axis === 'horizontal'
+        ? axisValue
+        : displayedHorizontalThrusterValue,
+      axis === 'vertical' ? axisValue : displayedVerticalThrusterValue,
     );
+  };
+
+  const commitManualThrusterAxis = (axis: 'horizontal' | 'vertical') => {
+    const axisValue = Number(manualThrusterAxisFields[axis]);
+    const clampedValue = clampThrusterAxisValue(axisValue);
+
+    setManualThrusterAxisFields((fields) => ({
+      ...fields,
+      [axis]: String(clampedValue),
+    }));
+
+    updateManualThrusterVector(
+      axis === 'horizontal'
+        ? clampedValue
+        : displayedHorizontalThrusterValue,
+      axis === 'vertical' ? clampedValue : displayedVerticalThrusterValue,
+    );
+  };
+
+  const updateManualThrusterVectorFromPoint = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    if (!canControlManualThrusters) return;
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const horizontal = clampThrusterAxisValue(
+      ((event.clientX - rect.left) / rect.width - 0.5) * 200,
+    );
+    const vertical = clampThrusterAxisValue(
+      (0.5 - (event.clientY - rect.top) / rect.height) * 200,
+    );
+
+    updateManualThrusterVector(horizontal, vertical);
+  };
+
+  const handleThrusterPadPointerDown = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    event.currentTarget.setPointerCapture(event.pointerId);
+    updateManualThrusterVectorFromPoint(event);
+  };
+
+  const handleThrusterPadPointerMove = (
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) => {
+    if (!event.currentTarget.hasPointerCapture(event.pointerId)) return;
+
+    updateManualThrusterVectorFromPoint(event);
+  };
+
+  const turnOffAllThrusters = () => {
+    setManualThrusters(createManualThrusterInputs());
+    onStopEngines?.();
   };
 
   const unlockResearchModule = (type: ModuleType, cost: Partial<Inventory>) => {
@@ -1437,55 +1522,101 @@ export function Footer({
               onClose={() => toggleSpeedControl('thrusters')}
             >
               <div className={style.thrustersPanel}>
-                {renderManualThrusterControl(
-                  0,
-                  'Top thruster',
-                  style.thrustersTop,
-                )}
-                {renderManualThrusterControl(
-                  3,
-                  'Left thruster',
-                  style.thrustersLeft,
-                )}
                 <div
-                  className={`${style.speedActions} ${style.thrustersCenter}`}
+                  className={style.thrustersPad}
+                  style={thrusterPadStyle}
+                  role="application"
+                  tabIndex={canControlManualThrusters ? 0 : -1}
+                  aria-label="Thruster vector pad"
+                  aria-disabled={!canControlManualThrusters}
+                  onPointerDown={handleThrusterPadPointerDown}
+                  onPointerMove={handleThrusterPadPointerMove}
                 >
-                  <div className={style.speedMetrics}>
-                    <span className={style.speedMetric}>
-                      <small>Acceleration</small>—
-                    </span>
-                    <span className={style.speedMetric}>
-                      <small>
-                        {activeThrusters ? 'Active time' : 'Time remaining'}
-                      </small>
-                      {thrustersTimeSeconds !== undefined
-                        ? formatDuration(thrustersTimeSeconds)
-                        : '—'}
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    data-running={isEngineRunning}
-                    disabled={
-                      isEngineRunning
-                        ? !onStopEngines
-                        : !canStartThrusters || !onStartThrusters
-                    }
-                    onClick={isEngineRunning ? stopEngines : startThrusters}
-                  >
-                    {isEngineRunning ? 'Stop engines' : 'Start'}
-                  </button>
+                  <span className={style.thrustersPadAxis} />
+                  <span className={style.thrustersPadAxis} />
+                  <span className={style.thrustersPadRing} />
+                  <span className={style.thrustersPadDot} />
                 </div>
-                {renderManualThrusterControl(
-                  1,
-                  'Right thruster',
-                  style.thrustersRight,
-                )}
-                {renderManualThrusterControl(
-                  2,
-                  'Bottom thruster',
-                  style.thrustersBottom,
-                )}
+                <dl className={style.thrustersPadReadout}>
+                  <div>
+                    <dt>Horizontal</dt>
+                    <dd>
+                      {formatSignedThrusterAxisValue(
+                        displayedHorizontalThrusterValue,
+                      )}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Vertical</dt>
+                    <dd>
+                      {formatSignedThrusterAxisValue(
+                        displayedVerticalThrusterValue,
+                      )}
+                    </dd>
+                  </div>
+                </dl>
+                <div className={style.thrustersDetails}>
+                  <dl className={style.thrustersStatusList}>
+                    {thrusterReadouts.map((thruster) => (
+                      <div key={thruster.label}>
+                        <dt>{thruster.label}</dt>
+                        <dd>
+                          <span>{formatForce(thruster.forceN)}</span>
+                          <small>{formatPercentage(thruster.durability)}</small>
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <div className={style.thrustersActions}>
+                    <div className={style.thrustersVectorInputs}>
+                      <label htmlFor="footer-thruster-horizontal">
+                        <span>Horizontal</span>
+                        <input
+                          id="footer-thruster-horizontal"
+                          type="number"
+                          min="-100"
+                          max="100"
+                          step="1"
+                          value={manualThrusterAxisFields.horizontal}
+                          disabled={!canControlManualThrusters}
+                          onChange={(event) =>
+                            updateManualThrusterAxis(
+                              'horizontal',
+                              event.currentTarget.value,
+                            )
+                          }
+                          onBlur={() => commitManualThrusterAxis('horizontal')}
+                        />
+                      </label>
+                      <label htmlFor="footer-thruster-vertical">
+                        <span>Vertical</span>
+                        <input
+                          id="footer-thruster-vertical"
+                          type="number"
+                          min="-100"
+                          max="100"
+                          step="1"
+                          value={manualThrusterAxisFields.vertical}
+                          disabled={!canControlManualThrusters}
+                          onChange={(event) =>
+                            updateManualThrusterAxis(
+                              'vertical',
+                              event.currentTarget.value,
+                            )
+                          }
+                          onBlur={() => commitManualThrusterAxis('vertical')}
+                        />
+                      </label>
+                    </div>
+                    <button
+                      type="button"
+                      data-running={activeFeature ? 'true' : undefined}
+                      onClick={turnOffAllThrusters}
+                    >
+                      Turn off all thrusters
+                    </button>
+                  </div>
+                </div>
               </div>
             </DraggablePanel>
           )}

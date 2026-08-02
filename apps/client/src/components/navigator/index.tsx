@@ -108,11 +108,15 @@ function BodyDetailsDialog({
             <dd>{details.systemName}</dd>
           </div>
           <div>
-            <dt>Current speed</dt>
+            <dt>
+              {details.kind === 'Asteroid' ? 'Relative speed' : 'Current speed'}
+            </dt>
             <dd>{formatSpeed(velocitySpeed)}</dd>
           </div>
           <div>
-            <dt>Direction</dt>
+            <dt>
+              {details.kind === 'Asteroid' ? 'Relative direction' : 'Direction'}
+            </dt>
             <dd>{formatVelocityDirection(details.velocity)}</dd>
           </div>
           <div>
@@ -261,13 +265,20 @@ export function Navigator({
   const navigateTo = (result: SearchResult) => {
     setContextMenu(null);
     setBodyDetails(null);
+    sceneRef.current?.clearSelectedBodyDetails();
     sceneRef.current?.navigateTo(result.name, result.navigationZoom);
   };
 
   const recenterOnSpaceship = () => {
     setContextMenu(null);
     setBodyDetails(null);
+    sceneRef.current?.clearSelectedBodyDetails();
     sceneRef.current?.recenterOnSpaceship();
+  };
+
+  const dismissBodyDetails = () => {
+    setBodyDetails(null);
+    sceneRef.current?.clearSelectedBodyDetails();
   };
 
   const toggleAlwaysVisible = () => {
@@ -363,7 +374,7 @@ export function Navigator({
       {bodyDetails && (
         <BodyDetailsDialog
           details={bodyDetails}
-          onDismiss={() => setBodyDetails(null)}
+          onDismiss={dismissBodyDetails}
         />
       )}
       {isSelectingTargetDirection && targetPreview && (

@@ -4,6 +4,7 @@ import {
   advanceWorld,
   advanceAsteroid,
   ensureClientAsteroidsForParents,
+  reconcileSpaceshipAsteroids,
   getAsteroidMaterialMassKg,
   getAsteroidSurfaceDistance,
   getAsteroidWorldVelocity,
@@ -205,6 +206,8 @@ export class Scene extends Phaser.Scene {
   ) => void;
   protected planetData: PlanetData[] = [];
   protected starData: StarData[] = [];
+  protected orbitalAsteroidData: AsteroidData[] = [];
+  protected spaceshipAsteroidData: AsteroidData[] = [];
   protected asteroidData: AsteroidData[] = [];
   protected planets: Planet[] = [];
   protected stars: Star[] = [];
@@ -241,6 +244,11 @@ export class Scene extends Phaser.Scene {
   private lastReportedZoom = Number.NaN;
   private lastReportedTurnDegrees?: number;
   private lastReportedTurnState = false;
+  private selectedBodyDetails?: {
+    kind: BodyDetailsRequest['kind'];
+    id: string;
+  };
+  private lastBodyDetailsRefreshAt = 0;
   private lastActiveBodiesViewportKey = '';
   private lastVisibilityViewportKey = '';
   private lastViewportLabelMode?: ViewportLabelMode;
@@ -375,6 +383,7 @@ export class Scene extends Phaser.Scene {
     this.asteroidData.forEach((asteroid) =>
       advanceAsteroid(asteroid, delta / 1000),
     );
+    this.reconcileSpaceshipAsteroidData();
     this.syncWorldPositions();
     this.updateMining(delta / 1000);
     stepNavigatorPhysics(delta / 1000);
@@ -419,6 +428,7 @@ export class Scene extends Phaser.Scene {
       this.lastReportedZoom = zoom;
       this.onZoomChange?.(zoom);
     }
+    this.refreshSelectedBodyDetails(time);
 
     const visibilityViewportKey = [
       zoom,
@@ -880,7 +890,7 @@ export class Scene extends Phaser.Scene {
   }
 
   stopEngines() {
-    if (!this.spaceshipEngineRunning) return;
+    if (!this.spaceshipEngineRunning && !isSpaceshipEngineRunning()) return;
 
     try {
       stopSpaceshipActiveFeature();
@@ -1001,17 +1011,11 @@ export class Scene extends Phaser.Scene {
       .toReversed()
       .find((candidate) => candidate.containsScreenPoint(x, y, camera));
     if (asteroid) {
-      this.onBodyDetails?.({
+      this.selectedBodyDetails = {
         kind: 'Asteroid',
-        body: asteroid.asteroid,
-        systemName: this.getSystemNameForBodyName(
-          asteroid.asteroid.orbitingBodyName,
-        ),
-        velocity: getAsteroidWorldVelocity(asteroid.asteroid),
-        orbitSurfaceDistanceMeters: getAsteroidSurfaceDistance(
-          asteroid.asteroid,
-        ),
-      });
+        id: asteroid.asteroid.id,
+      };
+      this.publishAsteroidDetails(asteroid.asteroid);
       return;
     }
 
@@ -1019,6 +1023,7 @@ export class Scene extends Phaser.Scene {
       .toReversed()
       .find((candidate) => candidate.containsScreenPoint(x, y, camera));
     if (star) {
+      this.selectedBodyDetails = { kind: 'Star', id: star.star.name };
       this.onBodyDetails?.({
         kind: 'Star',
         body: star.star,
@@ -1033,11 +1038,72 @@ export class Scene extends Phaser.Scene {
       .find((candidate) => candidate.containsScreenPoint(x, y, camera));
     if (!planet) return;
 
+    this.selectedBodyDetails = { kind: 'Planet', id: planet.planet.name };
     this.onBodyDetails?.({
       kind: 'Planet',
       body: planet.planet,
       systemName: this.getSystemName(planet.planet),
       velocity: getBodyWorldVelocity(planet.planet.name),
+    });
+  }
+
+  clearSelectedBodyDetails() {
+    this.selectedBodyDetails = undefined;
+  }
+
+  private refreshSelectedBodyDetails(time: number) {
+    if (
+      !this.selectedBodyDetails ||
+      time - this.lastBodyDetailsRefreshAt < 250
+    ) {
+      return;
+    }
+
+    this.lastBodyDetailsRefreshAt = time;
+    if (this.selectedBodyDetails.kind === 'Asteroid') {
+      const asteroid = this.asteroidData.find(
+        (candidate) => candidate.id === this.selectedBodyDetails?.id,
+      );
+      if (asteroid) this.publishAsteroidDetails(asteroid);
+      return;
+    }
+
+    if (this.selectedBodyDetails.kind === 'Star') {
+      const star = this.starDataByName.get(this.selectedBodyDetails.id);
+      if (!star) return;
+
+      this.onBodyDetails?.({
+        kind: 'Star',
+        body: star,
+        systemName: star.name,
+        velocity: getBodyWorldVelocity(star.name),
+      });
+      return;
+    }
+
+    const planet = this.planetDataByName.get(this.selectedBodyDetails.id);
+    if (!planet) return;
+
+    this.onBodyDetails?.({
+      kind: 'Planet',
+      body: planet,
+      systemName: this.getSystemName(planet),
+      velocity: getBodyWorldVelocity(planet.name),
+    });
+  }
+
+  private publishAsteroidDetails(asteroid: AsteroidData) {
+    const velocity = getAsteroidWorldVelocity(asteroid);
+    const spaceshipVelocity = getSpaceshipWorldVelocity();
+    this.onBodyDetails?.({
+      kind: 'Asteroid',
+      body: asteroid,
+      systemName: this.getSystemNameForBodyName(asteroid.orbitingBodyName),
+      velocity: {
+        x: velocity.x - spaceshipVelocity.x,
+        y: velocity.y - spaceshipVelocity.y,
+      },
+      orbitSurfaceDistanceMeters: getAsteroidSurfaceDistance(asteroid),
     });
   }
 
@@ -1167,26 +1233,34 @@ export class Scene extends Phaser.Scene {
       const endDistance = startDistance + MEASUREMENT_ARROW_LENGTH_PX / zoom;
 
       if (this.measurementVelocityAxesSeparated) {
-        const xStartX = x + radius;
+        const xDirection = velocity.x < 0 ? -1 : 1;
+        const yDirection = velocity.y > 0 ? 1 : -1;
+        const xStartX = x + xDirection * radius;
         const xStartY = y;
-        const xEndX = x + endDistance;
+        const xEndX = x + xDirection * endDistance;
         const xEndY = y;
         const yStartX = x;
-        const yStartY = y - radius;
+        const yStartY = y + yDirection * radius;
         const yEndX = x;
-        const yEndY = y - endDistance;
+        const yEndY = y + yDirection * endDistance;
         const labelGap = MEASUREMENT_ARROW_GAP_PX / zoom;
         const yLabelOffset = MEASUREMENT_AXIS_OFFSET_PX / zoom;
 
-        drawArrow(xStartX, xStartY, xEndX, xEndY, 0);
-        drawArrow(yStartX, yStartY, yEndX, yEndY, -Math.PI / 2);
+        drawArrow(xStartX, xStartY, xEndX, xEndY, xDirection < 0 ? Math.PI : 0);
+        drawArrow(
+          yStartX,
+          yStartY,
+          yEndX,
+          yEndY,
+          yDirection > 0 ? Math.PI / 2 : -Math.PI / 2,
+        );
 
         drawLabel(
           `${name}:x`,
           `X ${formatSignedSpeed(velocity.x)}`,
-          xEndX + labelGap,
+          xEndX + xDirection * labelGap,
           xEndY,
-          0,
+          xDirection < 0 ? 1 : 0,
         );
         drawLabel(
           `${name}:y`,
@@ -2135,11 +2209,11 @@ export class Scene extends Phaser.Scene {
       const asteroids = await ensureClientAsteroidsForParents(parents);
       if (!this.sys.isActive()) return;
 
-      this.asteroidData = asteroids.filter((asteroid) => {
+      this.orbitalAsteroidData = asteroids.filter((asteroid) => {
         const parent = this.getAsteroidParentData(asteroid);
         return parent && isClientAsteroidParentNearSpaceship(parent);
       });
-      this.reconcileRenderedAsteroids();
+      this.reconcileSpaceshipAsteroidData(true);
       this.syncWorldPositions();
       this.lastVisibilityViewportKey = '';
       this.updateWorldVisibility();
@@ -2173,6 +2247,19 @@ export class Scene extends Phaser.Scene {
     const viewport = camera.worldView;
 
     this.asteroids.forEach((asteroid) => {
+      if (asteroid.asteroid.group === 'spaceship') {
+        asteroid.setRenderVisibility(
+          camera.zoom,
+          viewport,
+          true,
+          this.showAsteroids,
+        );
+        asteroid.setVisible(
+          asteroid.visible && isInsideWorld(asteroid.x, asteroid.y),
+        );
+        return;
+      }
+
       const parent = this.getAsteroidParentData(asteroid.asteroid);
       const parentShapeRenderable = this.isAsteroidParentShapeRenderable(
         asteroid.asteroid,
@@ -2196,6 +2283,8 @@ export class Scene extends Phaser.Scene {
     asteroid: AsteroidData,
     zoom: number,
   ) {
+    if (asteroid.group === 'spaceship') return true;
+
     const planet = this.planetDataByName.get(asteroid.orbitingBodyName);
     if (planet) return this.shouldRenderPlanetShape(planet, zoom);
 
@@ -2204,10 +2293,32 @@ export class Scene extends Phaser.Scene {
   }
 
   private getAsteroidParentData(asteroid: AsteroidData) {
+    if (asteroid.group === 'spaceship') return undefined;
+
     return (
       this.planetDataByName.get(asteroid.orbitingBodyName) ??
       this.starDataByName.get(asteroid.orbitingBodyName)
     );
+  }
+
+  private reconcileSpaceshipAsteroidData(force = false) {
+    const spaceshipAsteroidData = reconcileSpaceshipAsteroids();
+    if (
+      !force &&
+      this.spaceshipAsteroidData.length === spaceshipAsteroidData.length &&
+      this.spaceshipAsteroidData.every(
+        (asteroid, index) => asteroid.id === spaceshipAsteroidData[index]?.id,
+      )
+    ) {
+      return;
+    }
+
+    this.spaceshipAsteroidData = spaceshipAsteroidData;
+    this.asteroidData = [
+      ...this.orbitalAsteroidData,
+      ...this.spaceshipAsteroidData,
+    ];
+    this.reconcileRenderedAsteroids();
   }
 
   async refreshWorldFromViewport(signal?: AbortSignal) {

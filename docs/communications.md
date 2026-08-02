@@ -11,13 +11,16 @@ features and opens a chat dialog containing:
 - A text field and send action.
 - Sending, waiting, retry, and offline states.
 
-Contacts are discovered through the story. A new game begins with one known
-contact: the **Chief of EASA**. EASA stands for **Earth Aeronautics and Space
-Administration**.
+Contacts are discovered through the story. A new game begins with two known
+contacts:
+
+- **Chief of EASA**. EASA stands for **Earth Aeronautics and Space
+  Administration**.
+- **Tina**, the spaceship AI assistant.
 
 ## Initial Contact
 
-The Chief of EASA sends the first message when a spaceship is registered. The
+The Chief of EASA sends a first message when a spaceship is registered. The
 canonical message is:
 
 > Pilot, this is the Chief of EASA. Command channel is open. Your orders are
@@ -27,6 +30,17 @@ canonical message is:
 > mission and stay on comms.
 
 After this introduction, the player can continue talking to the Chief.
+
+Tina also sends an introduction when a spaceship is registered. The canonical
+message is:
+
+> Pilot, Tina online. I am your onboard ship AI assistant. I can brief you on
+> ship modules, resources, hazards, repairs, navigation, communications,
+> research, and the current objective: keep this vessel alive while we advance
+> toward Absenat. Ask for operational guidance when you need it.
+
+After this introduction, the player can ask Tina about spaceship modules, the
+current objective, and how in-game systems work.
 
 ## NPC Conversations
 
@@ -43,7 +57,11 @@ Every contact has a server-owned NPC profile containing:
 NPC contacts are not normal helpful chatbots. Each one lives inside Salimon and
 answers as that character, using their own motives, knowledge, pressure, and
 voice. Out-of-world information does not matter to them unless it can be handled
-in character as confusion, rumor, or irrelevant noise.
+in character as confusion, rumor, or irrelevant noise. All contacts have a hard
+rule to answer only questions about Salimon, the mission, the spaceship,
+contacts, resources, modules, navigation, hazards, research, communications,
+and other in-game systems or lore. Outside-world questions must be refused
+briefly in character and redirected to ship or mission concerns.
 
 The backend generates NPC replies with the OpenAI Responses API. The browser
 must never call OpenAI directly. For every reply, the backend supplies the NPC
@@ -162,9 +180,10 @@ The send handler should publish a job to SQS. The reply worker must use a
 dead-letter queue and safe retry policy. A unique constraint on spaceship,
 contact, and `clientMessageId` provides durable idempotency.
 
-When a spaceship is registered, backend code unlocks `easa-chief` and stores
-the Chief's initial mission message. Initial content is data, not generated
-dynamically, so every player receives the canonical mission briefing.
+When a spaceship is registered, backend code unlocks `easa-chief` and `tina`
+and stores their initial messages. Initial content is data, not generated
+dynamically, so every player receives the canonical mission briefing and Tina's
+onboarding message.
 
 ## Polling Strategy
 
@@ -205,8 +224,9 @@ reviewed deployment rather than relying on an implicit default.
 
 ## Delivery Requirements
 
-- A new spaceship has exactly one contact, the Chief of EASA.
-- The Chief's canonical mission briefing exists before the client first polls.
+- A new spaceship has the Chief of EASA and Tina as contacts.
+- The Chief's canonical mission briefing and Tina's onboarding message exist
+  before the client first polls.
 - The player can open Communications, read history, send a message, close the
   dialog, and later return to the same history.
 - Replies respect the NPC profile, authorized lore, and conversation context.

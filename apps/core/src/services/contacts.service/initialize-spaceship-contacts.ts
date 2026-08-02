@@ -1,7 +1,11 @@
-import { EASA_CHIEF_CONTACT } from '../../contacts';
+import { INITIAL_CONTACTS } from '../../contacts';
 
 export async function initializeSpaceshipContacts(
   spaceshipSecurityCode: string,
 ) {
-  await EASA_CHIEF_CONTACT.triggerFirstMessage(spaceshipSecurityCode);
+  await Promise.all(
+    INITIAL_CONTACTS.map((contact) =>
+      contact.triggerFirstMessage(spaceshipSecurityCode),
+    ),
+  );
 }

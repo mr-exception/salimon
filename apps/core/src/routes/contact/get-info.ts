@@ -16,11 +16,9 @@ export async function getInfo(request: Request, response: Response) {
       return;
     }
 
-    let contacts = await ContactModel.findBySpaceshipSecurityCode(securityCode);
-    if (contacts.length === 0) {
-      await ContactsService.initializeSpaceshipContacts(securityCode);
-      contacts = await ContactModel.findBySpaceshipSecurityCode(securityCode);
-    }
+    await ContactsService.initializeSpaceshipContacts(securityCode);
+    const contacts =
+      await ContactModel.findBySpaceshipSecurityCode(securityCode);
 
     const contactInfo: ContactInfo[] = await Promise.all(
       contacts.flatMap(async (contact) => {

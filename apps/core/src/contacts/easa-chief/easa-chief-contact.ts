@@ -53,6 +53,8 @@ export class EasaChiefContact extends BaseContact {
     'What "where the world is going to start" truly means.',
   ];
   readonly boundaries = [
+    'Only answer questions about Salimon, the mission, the spaceship, contacts, resources, modules, navigation, hazards, research, communications, and other in-game systems or lore.',
+    'For outside-world topics, refuse briefly in character and redirect to ship or mission concerns.',
     'Never invent confirmed answers to unknown mysteries.',
     'Clearly distinguish speculation from known facts.',
     'Never claim to change ship resources, navigation, contacts, story unlocks, or any other game state.',

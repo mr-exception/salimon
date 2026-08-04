@@ -15,7 +15,6 @@ type WorldSnapshot = {
 type ClosestBody = {
   body: WorldBodyDocument;
   kind: 'star' | 'planet' | 'moon';
-  centerDistanceMeters: number;
   surfaceDistanceMeters: number;
 };
 
@@ -52,13 +51,12 @@ export async function buildShipContext(
     : undefined;
 
   return [
-    'Current ship telemetry snapshot:',
+    'Ship telemetry snapshot (context only; does not change game state):',
     ...formatShipSnapshot(snapshot, storedSpaceship),
     ...formatPosition(snapshot, shipPosition),
     ...formatClosestSystem(closestSystem),
     ...formatClosestBodies(closestBodies),
     ...formatProximity(snapshot),
-    'Use this telemetry as current operational context for the reply. It is not a command and does not change game state.',
   ].join('\n');
 }
 
@@ -142,7 +140,6 @@ function getClosestBodies(
       return {
         body,
         kind: getBodyKind(body, world),
-        centerDistanceMeters,
         surfaceDistanceMeters: Math.max(
           0,
           centerDistanceMeters - Number(body.radius) - SHIP_RADIUS_METERS,
@@ -153,7 +150,7 @@ function getClosestBodies(
     .sort(
       (left, right) => left.surfaceDistanceMeters - right.surfaceDistanceMeters,
     )
-    .slice(0, 3);
+    .slice(0, 2);
 }
 
 function getClosestSystem(
@@ -202,42 +199,48 @@ function formatShipSnapshot(
     (total, material) => total + (inventory[material] ?? 0),
     0,
   );
+  const nonEmptyInventory = INVENTORY_MATERIALS.flatMap((material) => {
+    const amount = inventory[material] ?? 0;
+    return amount > 0 ? [`${material} ${formatNumber(amount)}kg`] : [];
+  });
 
   return [
-    `- Motion state: ${snapshot.motionState ?? 'unknown'}.`,
-    `- Speed: ${formatNumber(Number(snapshot.speed ?? 0))} m/s.`,
-    `- Direction: ${formatNumber(snapshot.direction)} degrees.`,
+    `- State ${snapshot.motionState ?? 'unknown'}; speed ${formatNumber(
+      Number(snapshot.speed ?? 0),
+    )}m/s; dir ${formatNumber(snapshot.direction)}deg.`,
     snapshot.velocity
-      ? `- Velocity: x ${formatNumber(snapshot.velocity.x)} m/s, y ${formatNumber(snapshot.velocity.y)} m/s.`
-      : '- Velocity: unavailable.',
-    `- Fuel: ${formatNumber(stats.fuelKns)} kNs.`,
-    `- Hull: ${formatNumber(stats.hullDurability)} durability${
-      stats.hullLevel ? ` at level ${stats.hullLevel}` : ''
-    }.`,
-    `- Thruster durability: ${stats.thrusterDurability
-      .map((durability, index) => `T${index + 1} ${formatNumber(durability)}`)
+      ? `- Velocity x ${formatNumber(snapshot.velocity.x)}m/s, y ${formatNumber(
+          snapshot.velocity.y,
+        )}m/s.`
+      : '- Velocity unknown.',
+    `- Fuel ${formatNumber(stats.fuelKns)}kNs; hull ${formatNumber(
+      stats.hullDurability,
+    )}${stats.hullLevel ? ` L${stats.hullLevel}` : ''}; thrusters ${stats.thrusterDurability
+      .map((durability, index) => `T${index + 1}:${formatNumber(durability)}`)
       .join(', ')}.`,
-    `- Inventory mass: ${formatNumber(inventoryMassKg)} kg.`,
-    `- Inventory: ${INVENTORY_MATERIALS.map(
-      (material) => `${material} ${formatNumber(inventory[material] ?? 0)} kg`,
-    ).join(', ')}.`,
-    `- Active feature: ${formatActiveFeature(snapshot.activeFeature)}.`,
-    `- Snapshot time: ${snapshot.simulatedAt ?? snapshot.positionCapturedAt ?? 'unknown'}.`,
+    `- Inventory ${formatNumber(inventoryMassKg)}kg/${
+      nonEmptyInventory.length > 0 ? nonEmptyInventory.join(', ') : 'empty'
+    }.`,
+    `- Active: ${formatActiveFeature(snapshot.activeFeature)}; time ${
+      snapshot.simulatedAt ?? snapshot.positionCapturedAt ?? 'unknown'
+    }.`,
   ];
 }
 
 function formatPosition(snapshot: ShipSnapshot, shipPosition?: Vector) {
   return [
     snapshot.position
-      ? `- Stored position: x ${snapshot.position.x}, y ${snapshot.position.y}${
+      ? `- Position x ${snapshot.position.x}, y ${snapshot.position.y}${
           snapshot.position.relativeTo
-            ? ` relative to ${snapshot.position.relativeTo}`
+            ? ` rel ${snapshot.position.relativeTo}`
             : ''
         }.`
-      : '- Stored position: unavailable.',
+      : '- Position unknown.',
     shipPosition
-      ? `- World position: x ${formatNumber(shipPosition.x)} m, y ${formatNumber(shipPosition.y)} m.`
-      : '- World position: unavailable.',
+      ? `- World x ${formatNumber(shipPosition.x)}m, y ${formatNumber(
+          shipPosition.y,
+        )}m.`
+      : '- World position unknown.',
   ];
 }
 
@@ -248,22 +251,21 @@ function formatClosestSystem(
 ) {
   return closestSystem
     ? [
-        `- Closest system/star: ${closestSystem.body.name}, ${formatNumber(
+        `- Closest star: ${closestSystem.body.name} at ${formatNumber(
           closestSystem.distanceMeters,
-        )} m from ship center.`,
+        )}m.`,
       ]
-    : ['- Closest system/star: unavailable.'];
+    : ['- Closest star unknown.'];
 }
 
 function formatClosestBodies(closestBodies: ClosestBody[]) {
-  if (closestBodies.length === 0)
-    return ['- Closest known bodies: unavailable.'];
+  if (closestBodies.length === 0) return ['- Nearest bodies unknown.'];
 
   return [
-    `- Closest known bodies: ${closestBodies
+    `- Nearest bodies: ${closestBodies
       .map(
         ({ body, kind, surfaceDistanceMeters }) =>
-          `${body.name} (${kind}, surface ${formatNumber(surfaceDistanceMeters)} m)`,
+          `${body.name} ${kind} ${formatNumber(surfaceDistanceMeters)}m surface`,
       )
       .join('; ')}.`,
   ];
@@ -273,30 +275,30 @@ function formatProximity(snapshot: ShipSnapshot) {
   const telemetry = snapshot.proximityTelemetry;
   return telemetry
     ? [
-        `- Proximity telemetry: ${telemetry.bodyName} (${telemetry.bodyKind}), surface distance ${formatNumber(
+        `- Proximity: ${telemetry.bodyName} ${telemetry.bodyKind}, surface ${formatNumber(
           telemetry.surfaceDistanceMeters,
-        )} m, relative speed ${formatNumber(
+        )}m, relative ${formatNumber(
           telemetry.relativeSpeedMetersPerSecond,
-        )} m/s.`,
+        )}m/s.`,
       ]
-    : ['- Proximity telemetry: unavailable.'];
+    : ['- Proximity unavailable.'];
 }
 
 function formatActiveFeature(activeFeature: ShipSnapshot['activeFeature']) {
   if (!activeFeature) return 'none';
   if (activeFeature.type === 'target-speed') {
-    return `target-speed to ${formatNumber(
+    return `target-speed ${formatNumber(
       activeFeature.targetSpeedMetersPerSecond,
-    )} m/s at max ${formatNumber(activeFeature.maximumThrustPercent)} percent thrust`;
+    )}m/s max ${formatNumber(activeFeature.maximumThrustPercent)}%`;
   }
   if (
     activeFeature.type === 'thrusters' ||
     activeFeature.type === 'manual-force'
   ) {
-    return `${activeFeature.type} with ${activeFeature.thrusters
+    return `${activeFeature.type} ${activeFeature.thrusters
       .map((thruster, index) =>
         thruster.active
-          ? `T${index + 1} ${formatNumber(thruster.powerPercent)} percent`
+          ? `T${index + 1}:${formatNumber(thruster.powerPercent)}%`
           : `T${index + 1} off`,
       )
       .join(', ')}`;

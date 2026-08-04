@@ -6,6 +6,7 @@ import type { ContactMessageDto } from '@repo/types';
 import {
   hydrateSpaceship,
   getSpaceshipDto,
+  getSpaceshipProximityTelemetry,
   initializeSpaceshipInSimulation,
   setInventoryPersistHandler,
   startSpaceshipTargetSpeed,
@@ -35,6 +36,9 @@ type MarkThreadReadSocketAck =
   | { ok: true; contactId: string }
   | { ok: false; error: string };
 export type ContactMessage = ContactMessageDto;
+export type ContactShipContext = SpaceshipDto & {
+  proximityTelemetry?: ReturnType<typeof getSpaceshipProximityTelemetry>;
+};
 const requestPromises = new WeakMap<BootstrapRequest, Promise<SpaceshipDto>>();
 const contactMessageListeners = new Set<(message: ContactMessage) => void>();
 const pendingContactMessages: ContactMessage[] = [];
@@ -241,11 +245,12 @@ export function subscribeToContactMessages(
 
 function emitContactMessage(message: ContactMessage) {
   if (currentSpaceship) {
-    void storeCachedContactMessage(currentSpaceship.securityCode, message).catch(
-      (error: unknown) => {
-        console.error('Failed to cache contact message', error);
-      },
-    );
+    void storeCachedContactMessage(
+      currentSpaceship.securityCode,
+      message,
+    ).catch((error: unknown) => {
+      console.error('Failed to cache contact message', error);
+    });
   }
 
   if (contactMessageListeners.size === 0) {
@@ -317,6 +322,7 @@ export async function sendContactMessage(request: {
   contactId: string;
   text: string;
   clientMessageId: string;
+  shipContext?: ContactShipContext;
 }) {
   const socket = await getCommunicationSocket();
   return new Promise<ContactMessage>((resolve, reject) => {

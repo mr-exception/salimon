@@ -65,8 +65,21 @@ briefly in character and redirected to ship or mission concerns.
 
 The backend generates NPC replies with the OpenAI Responses API. The browser
 must never call OpenAI directly. For every reply, the backend supplies the NPC
-profile, current authorized lore, a conversation summary, and recent messages
-as context.
+profile, current authorized lore, private contact documents, a conversation
+summary, and recent messages as context.
+
+Tina's private knowledge document should contain the detailed player-facing
+operational context for spaceship features, game features, modules, and
+mechanics so players can ask questions about each system from inside the
+communications UI.
+
+When the player sends a message, the client may include a bounded ship
+telemetry snapshot containing current position, speed, velocity, fuel, hull,
+thruster durability, inventory, active feature, and proximity telemetry. The
+backend treats this snapshot as untrusted context, enriches it with closest
+known body and closest star/system information from world data, and includes it
+only in the generated reply prompt. It does not persist the snapshot as message
+content and it never changes game state.
 
 Conversation state is isolated by spaceship and contact. The complete message
 history remains in the game database as the source of truth. A rolling summary

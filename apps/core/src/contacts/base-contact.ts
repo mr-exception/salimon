@@ -30,15 +30,15 @@ export abstract class BaseContact implements ContactProfile {
     request: Omit<ContactMessageRequest, 'contactId'>,
     options: ContactReplyOptions = {},
   ) {
-    const { sendMessage } = await import(
-      '../services/contacts.service/send-message.js'
-    );
+    const { sendMessage } =
+      await import('../services/contacts.service/send-message.js');
     return sendMessage(
       spaceshipSecurityCode,
       {
         contactId: this.id,
         text: request.text,
         clientMessageId: request.clientMessageId,
+        shipContext: request.shipContext,
       },
       options,
     );

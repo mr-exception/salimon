@@ -5,4 +5,8 @@ export {
   INITIAL_TINA_MESSAGE,
   TINA_ID,
 } from '../../contacts';
-export type { ContactProfile } from '../../contacts';
+export type {
+  ContactProfile,
+  ContactReplyOptions,
+  ContactShipContext,
+} from '../../contacts';

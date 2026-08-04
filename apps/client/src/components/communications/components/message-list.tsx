@@ -1,4 +1,6 @@
 import type { RefObject } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import type { Message } from '../types';
 import style from '../style.module.css';
 
@@ -19,7 +21,7 @@ export function MessageList({ isLoading, messages, messagesEndRef }: Props) {
             data-sender={message.sender}
             key={message.id}
           >
-            <p>{message.text}</p>
+            <MessageText message={message} />
             <small>
               {new Date(message.createdAt).toLocaleTimeString([], {
                 hour: '2-digit',
@@ -30,6 +32,29 @@ export function MessageList({ isLoading, messages, messagesEndRef }: Props) {
           </article>
         ))}
       <div ref={messagesEndRef} />
+    </div>
+  );
+}
+
+function MessageText({ message }: { message: Message }) {
+  if (message.sender === 'player') {
+    return <p>{message.text}</p>;
+  }
+
+  return (
+    <div className={style.markdown}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          a: ({ children, ...props }) => (
+            <a {...props} rel="noreferrer" target="_blank">
+              {children}
+            </a>
+          ),
+        }}
+      >
+        {message.text}
+      </ReactMarkdown>
     </div>
   );
 }

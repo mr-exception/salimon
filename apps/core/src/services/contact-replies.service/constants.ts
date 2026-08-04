@@ -1,9 +1,35 @@
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 import type { ContactProfile } from '../contacts.service';
 
 export const MAX_CONTEXT_MESSAGES = 30;
 
 function formatList(items: readonly string[]) {
   return items.map((item) => `- ${item}`).join('\n');
+}
+
+function readContactDocument(documentPath: string) {
+  const candidates = [
+    path.resolve(process.cwd(), 'src', documentPath),
+    path.resolve(__dirname, '../../../src', documentPath),
+    path.resolve(__dirname, '../../', documentPath),
+  ];
+  const documentFile = candidates.find((candidate) => existsSync(candidate));
+
+  return documentFile ? readFileSync(documentFile, 'utf8').trim() : undefined;
+}
+
+function formatContactDocuments(profile: ContactProfile) {
+  const documents = Object.entries(profile.documents).flatMap(
+    ([label, documentPath]) => {
+      const text = readContactDocument(documentPath);
+      return text ? [`## ${label}\n${text}`] : [];
+    },
+  );
+
+  return documents.length > 0
+    ? `\nAuthorized contact documents:\n${documents.join('\n\n')}\n`
+    : '';
 }
 
 export function buildContactInstructions(profile: ContactProfile) {
@@ -35,5 +61,6 @@ Unknown or unconfirmed:
 ${formatList(profile.unknowns)}
 
 Boundaries:
-${formatList(profile.boundaries)}`;
+${formatList(profile.boundaries)}
+${formatContactDocuments(profile)}`;
 }

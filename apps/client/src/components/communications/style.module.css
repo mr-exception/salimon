@@ -189,11 +189,83 @@
   background: color-mix(in srgb, var(--color-plasma-cyan) 10%, transparent);
 }
 
-.message p {
+.message p,
+.markdown {
   margin: 0;
   font-size: 0.85rem;
   line-height: 1.5;
   white-space: pre-wrap;
+}
+
+.markdown {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.markdown :where(p, ul, ol, blockquote, pre, table) {
+  margin: 0 0 8px;
+}
+
+.markdown :where(p, ul, ol, blockquote, pre, table):last-child {
+  margin-bottom: 0;
+}
+
+.markdown :where(ul, ol) {
+  padding-left: 18px;
+}
+
+.markdown li + li {
+  margin-top: 3px;
+}
+
+.markdown blockquote {
+  padding-left: 10px;
+  border-left: 2px solid
+    color-mix(in srgb, var(--color-nebula-blue) 70%, transparent);
+  color: color-mix(in srgb, var(--color-starlight) 72%, transparent);
+}
+
+.markdown a {
+  color: var(--color-plasma-cyan);
+}
+
+.markdown code {
+  border: 1px solid
+    color-mix(in srgb, var(--color-nebula-blue) 45%, transparent);
+  border-radius: 4px;
+  padding: 1px 4px;
+  background: color-mix(in srgb, var(--color-deep-space) 58%, transparent);
+  font-size: 0.78rem;
+}
+
+.markdown pre {
+  overflow-x: auto;
+  border: 1px solid
+    color-mix(in srgb, var(--color-nebula-blue) 50%, transparent);
+  border-radius: 6px;
+  padding: 8px;
+  background: color-mix(in srgb, var(--color-deep-space) 68%, transparent);
+}
+
+.markdown pre code {
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.markdown table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.markdown th,
+.markdown td {
+  border: 1px solid
+    color-mix(in srgb, var(--color-nebula-blue) 50%, transparent);
+  padding: 4px 6px;
+  text-align: left;
 }
 
 .message small {

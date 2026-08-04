@@ -10,6 +10,7 @@ export type {
   ContactMessageRequest,
   ContactProfile,
   ContactReplyOptions,
+  ContactShipContext,
 } from './types';
 
 export type ContactType = typeof EASA_CHIEF_ID | typeof TINA_ID;

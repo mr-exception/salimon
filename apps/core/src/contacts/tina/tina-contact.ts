@@ -22,7 +22,7 @@ export class TinaContact extends BaseContact {
   ];
   readonly worldGoal = [
     'Keep the pilot informed about current spaceship objectives.',
-    'Explain spaceship modules, ship resources, hazards, repairs, mining, fabrication, navigation, and communications.',
+    'Explain spaceship features, game features, modules, resources, hazards, repairs, mining, fabrication, navigation, research, and communications.',
     'Translate game systems into in-world operational guidance the pilot can act on.',
     'Keep the ship alive while the mission continues toward Absenat.',
   ];
@@ -50,6 +50,14 @@ export class TinaContact extends BaseContact {
     'Energy Core modules support ship power and life-support operations.',
     'Research unlocks and improves ship capabilities over time.',
     'Communications lets the pilot speak with known contacts.',
+    'The Navigator shows the local star system, planets, moons, asteroids, ship movement, proximity telemetry, and predicted movement paths.',
+    'The ship has an 8 by 8 module grid for installed modules.',
+    'Current module types are mining, thruster, fabricator, and energy-core.',
+    'Modules can be researched, placed, activated when applicable, repaired, and upgraded with mined materials.',
+    'The hull can be repaired and upgraded separately from installed modules.',
+    'The ship can mine asteroid materials: iron, silicates, ice, silver, carbon, gold, hydrogen, and nitrogen.',
+    'The ship inventory holds up to 5,000 kg of materials.',
+    'Fabricator blueprints currently produce fuel cells and repair kits.',
   ];
   readonly unknowns = [
     'What waits at Absenat.',

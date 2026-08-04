@@ -6,6 +6,7 @@ import {
   SpaceshipService,
 } from '@services';
 import type { ContactMessageDto } from '@repo/types';
+import type { ContactShipContext } from './contacts';
 import type { IncomingHttpHeaders } from 'node:http';
 import type { Server as HttpServer } from 'node:http';
 
@@ -13,6 +14,7 @@ type SendContactMessageRequest = {
   contactId: string;
   text: string;
   clientMessageId: string;
+  shipContext?: ContactShipContext;
 };
 
 type SendContactMessageAck =

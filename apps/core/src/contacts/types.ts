@@ -1,4 +1,30 @@
 import type { ContactMessageDocument } from '@models';
+import type { SpaceshipDto } from '@repo/types';
+
+export type ContactShipProximityTelemetry = {
+  bodyName: string;
+  bodyKind: 'Planet' | 'Star';
+  surfaceDistanceMeters: number;
+  relativeSpeedMetersPerSecond: number;
+};
+
+export type ContactShipContext = Partial<
+  Pick<
+    SpaceshipDto,
+    | 'position'
+    | 'positionCapturedAt'
+    | 'direction'
+    | 'speed'
+    | 'velocity'
+    | 'motionState'
+    | 'stats'
+    | 'inventory'
+    | 'activeFeature'
+    | 'simulatedAt'
+  >
+> & {
+  proximityTelemetry?: ContactShipProximityTelemetry;
+};
 
 export type ContactDocumentCollection = {
   knowledgeContext: string;
@@ -9,10 +35,12 @@ export type ContactMessageRequest = {
   contactId: string;
   text: string;
   clientMessageId: string;
+  shipContext?: ContactShipContext;
 };
 
 export type ContactReplyOptions = {
   onReply?: (message: ContactMessageDocument) => void;
+  shipContext?: ContactShipContext;
 };
 
 export type ContactProfile = {

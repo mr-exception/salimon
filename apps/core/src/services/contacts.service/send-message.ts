@@ -1,6 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { ContactMessageModel, type ContactMessageDocument } from '@models';
+import type { ContactShipContext } from './constants';
 import { hasContact } from './has-contact';
+import { initializeSpaceshipContacts } from './initialize-spaceship-contacts';
 
 export async function sendMessage(
   spaceshipSecurityCode: string,
@@ -8,14 +10,17 @@ export async function sendMessage(
     contactId: string;
     text: string;
     clientMessageId: string;
+    shipContext?: ContactShipContext;
   },
   options: {
     onReply?: (message: ContactMessageDocument) => void;
+    shipContext?: ContactShipContext;
   } = {},
 ) {
-  const { ContactRepliesService } = await import(
-    '../contact-replies.service/index.js'
-  );
+  const { ContactRepliesService } =
+    await import('../contact-replies.service/index.js');
+
+  await initializeSpaceshipContacts(spaceshipSecurityCode);
 
   if (!(await hasContact(spaceshipSecurityCode, request.contactId))) {
     throw new Error('Contact not found');
@@ -26,11 +31,15 @@ export async function sendMessage(
     request.contactId,
     request.clientMessageId,
   );
+  const replyOptions = {
+    ...options,
+    shipContext: request.shipContext ?? options.shipContext,
+  };
   if (existing) {
     if (existing.status === 'failed') {
       ContactRepliesService.generateContactReplyInBackground(
         existing,
-        options,
+        replyOptions,
       );
       existing.status = 'sent';
       await ContactMessageModel.updateStatus(existing._id, 'sent');
@@ -59,10 +68,9 @@ export async function sendMessage(
     createdAt: new Date(),
   };
   await ContactMessageModel.insert(message);
-  ContactRepliesService.generateContactReplyInBackground(message, options);
+  ContactRepliesService.generateContactReplyInBackground(message, replyOptions);
   message.status = 'sent';
   await ContactMessageModel.updateStatus(message._id, 'sent');
 
   return message;
 }
-

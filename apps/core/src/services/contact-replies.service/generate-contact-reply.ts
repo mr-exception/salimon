@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { ContactMessageModel, type ContactMessageDocument } from '@models';
 import { CONTACTS } from '../contacts.service';
+import { buildShipContext } from './build-ship-context';
 import { buildContactInstructions, MAX_CONTEXT_MESSAGES } from './constants';
 import { getOpenAI } from './openai';
 import type { ReplyJob } from './types';
@@ -30,10 +31,16 @@ export async function generateContactReply(job: ReplyJob) {
     job.contactId,
     MAX_CONTEXT_MESSAGES,
   );
+  const shipContext = await buildShipContext(
+    job.spaceshipSecurityCode,
+    job.shipContext,
+  );
 
   const response = await getOpenAI().responses.create({
     model: process.env.OPENAI_MODEL ?? 'gpt-5.4-mini',
-    instructions: buildContactInstructions(profile),
+    instructions: [buildContactInstructions(profile), shipContext]
+      .filter(Boolean)
+      .join('\n\n'),
     input: history.reverse().map((message) => ({
       role:
         message.sender === 'player'

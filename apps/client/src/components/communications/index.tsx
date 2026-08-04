@@ -3,6 +3,8 @@ import axios from 'axios';
 import {
   getApiBaseUrl,
   getStoredSpaceshipSecurityCode,
+  getSpaceshipDto,
+  getSpaceshipProximityTelemetry,
   SECURITY_CODE_HEADER,
   loadCachedContactMessages,
   markContactThreadRead,
@@ -204,6 +206,10 @@ export function Communications({
         contactId: selectedContactId,
         text,
         clientMessageId: crypto.randomUUID(),
+        shipContext: {
+          ...getSpaceshipDto(securityCode),
+          proximityTelemetry: getSpaceshipProximityTelemetry(),
+        },
       });
       await storeCachedContactMessage(securityCode, message);
       setDraft('');

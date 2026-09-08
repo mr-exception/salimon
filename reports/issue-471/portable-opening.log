@@ -1,0 +1,9 @@
+
+running 5 tests
+test session::narrative::tests::incomplete_or_mutated_packet_coordinates_and_future_inspection_reject_atomically ... ok
+test session::narrative::tests::physical_aim_range_pause_revisit_and_saved_inspection_are_independent_of_recovery ... ok
+test session::narrative::tests::recovered_near_lead_can_be_walked_to_and_investigated_with_production_controls ... ok
+test session::narrative::tests::two_paid_recoveries_supply_distinct_uncertain_routes_without_earth_or_transit_claims ... ok
+test session::narrative::tests::first_hour_can_ignore_every_clue_without_objectives_or_unearned_destinations ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 590 filtered out; finished in 3.76s

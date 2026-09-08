@@ -1,0 +1,62 @@
+{
+  "$schema": "../../../asset-manifest.schema.json",
+  "schemaVersion": 1,
+  "assetId": "fixture.scout-interior-kit",
+  "category": "fixtures",
+  "source": "models/assets/fixtures/scout-interior-kit/source.blend",
+  "runtime": "client/assets/fixtures/scout-interior-kit/model.glb",
+  "coordinates": {
+    "units": "meters",
+    "source": {
+      "up": "+Z",
+      "forward": "+X",
+      "unitScale": 1
+    },
+    "runtime": {
+      "up": "+Y",
+      "forward": "+X"
+    },
+    "conversion": "x,z,-y",
+    "pivot": "Each independent template origin; not a composed room"
+  },
+  "profile": "standard-v1",
+  "budgets": {
+    "maxTriangles": 80,
+    "maxPrimitives": 4,
+    "maxMaterials": 3,
+    "maxTextureBytes": 1,
+    "maxGlbBytes": 32768
+  },
+  "collision": {
+    "policy": "none"
+  },
+  "contracts": {
+    "root": "ASSET_scout-interior-kit",
+    "visualGroups": [
+      "Visual"
+    ],
+    "groups": [
+      "Visual"
+    ],
+    "nodes": [
+      "Shelf",
+      "Seat",
+      "Panel",
+      "PanelDamaged"
+    ],
+    "materials": [
+      "Hull Graphite",
+      "Interior Light",
+      "Terracotta Upholstery"
+    ],
+    "sockets": [],
+    "markers": [],
+    "colliders": [],
+    "requiredExtras": [
+      {
+        "node": "ASSET_scout-interior-kit",
+        "path": "salimon.assetId"
+      }
+    ]
+  }
+}

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Salimon · Verification reports</title>
+    <link rel="stylesheet" href="dashboard.css" />
+  </head>
+  <body>
+    <header>
+      <div class="brand">SALIMON <span>ENGINEERING</span></div>
+      <p class="eyebrow">PERIODIC VERIFICATION</p>
+      <h1>Build fast. Verify deeply.</h1>
+      <p class="lead">
+        Nightly checks, weekly CPU benchmarks, and a history you can inspect.
+      </p>
+      <div id="links"></div>
+    </header>
+    <main>
+      <section aria-labelledby="status-title">
+        <div class="section-title">
+          <h2 id="status-title">Latest results</h2>
+          <span id="updated"></span>
+        </div>
+        <div id="cards" class="cards"></div>
+      </section>
+      <section class="chart-panel" aria-labelledby="trend-title">
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">MEASURED OVER TIME</p>
+            <h2 id="trend-title">CPU benchmark trends</h2>
+          </div>
+          <label>Measurement<select id="metric"></select></label>
+        </div>
+        <p class="muted">
+          Lower is better. Series share the same CPU, platform and fixture
+          configuration. Hosted-runner timings are diagnostic; native Apple M1
+          FPS requires local verification.
+        </p>
+        <div id="chart-empty" class="empty" hidden></div>
+        <svg
+          id="chart"
+          viewBox="0 0 920 240"
+          role="img"
+          aria-label="Selected CPU benchmark history"
+        ></svg>
+        <div id="chart-details" class="muted"></div>
+      </section>
+      <section aria-labelledby="history-title">
+        <div class="section-title">
+          <h2 id="history-title">Run history</h2>
+          <label
+            >Suite<select id="lane">
+              <option value="all">All suites</option>
+              <option value="nightly">Nightly verification</option>
+              <option value="benchmarks">Weekly CPU benchmarks</option>
+              <option value="macos">macOS build</option>
+              <option value="windows">Windows build</option>
+            </select></label
+          >
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>When (UTC)</th>
+                <th>Suite</th>
+                <th>Result</th>
+                <th>Commit</th>
+                <th>Checks</th>
+                <th>Evidence</th>
+              </tr>
+            </thead>
+            <tbody id="runs"></tbody>
+          </table>
+        </div>
+        <p id="history-empty" class="empty" hidden>
+          No reports yet. Run Periodic verification after merging the workflow.
+        </p>
+      </section>
+    </main>
+    <footer>
+      Last 90 suite results retained here. Full logs, screenshots and raw
+      measurements are linked from each Actions run; downloadable artifacts
+      expire after 30 days.
+    </footer>
+    <script id="history-data" type="application/json">
+      __CI_HISTORY__
+    </script>
+    <script src="dashboard.js"></script>
+  </body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "seed": 412,
+  "revision": "awakening-candidates-v1",
+  "rationale": "U11 authored residual local-disk candidate cohort; fixed fictional publication, not an observed Galactic census. See docs/universe-starting-system.md.",
+  "regions": [
+    {
+      "key": "awakening",
+      "center": {
+        "cell": [
+          230336769,
+          0,
+          0
+        ],
+        "offset": [
+          -121595531648.0,
+          0.0,
+          0.0
+        ]
+      },
+      "extent_parsecs": [
+        2.0,
+        2.0,
+        2.0
+      ],
+      "residual_systems_per_cubic_parsec": 1.0,
+      "age_gyr": [
+        3.0,
+        8.0
+      ],
+      "metallicity_feh": [
+        -0.2,
+        0.3
+      ]
+    }
+  ]
+}

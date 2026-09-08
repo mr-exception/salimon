@@ -1,0 +1,7 @@
+{
+  "format": "salimon.interior-layout",
+  "version": 1,
+  "starter_bunk_id": 1001,
+  "legacy_nodes": ["Starter_BunkFrame", "Starter_BunkCushion"],
+  "physical_source": "session.habitation"
+}

@@ -1,0 +1,375 @@
+{
+  "setup": {
+    "scenario": "construction-room",
+    "seed": 545,
+    "step_ms": 100
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "assert": {
+        "path": "construction.projects.0.work.completed",
+        "equals": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "screenshot": "reserved-room",
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 300
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "construction.projects.0.funding.progress_ppm",
+        "equals": 500000
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "screenshot": "half-built-room",
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 300
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "construction.projects.0.work.completed",
+        "equals": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "build",
+        "pressed": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "build",
+        "pressed": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "screenshot": "completed-room",
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 6
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 1
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 0,
+        "dy": 140
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "screenshot": "lower-deck-stairs",
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 0,
+        "dy": -140
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 15
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "player.local_ship_position_meters.1",
+        "gte": 4.9
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 1427.9966607226331,
+        "dy": 180
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "screenshot": "upper-deck",
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 0,
+        "dy": -180
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 14
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 2
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 32
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "Surface"
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 0,
+        "dy": -200
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "screenshot": "exterior-clipped-shell-and-boarding-stairs",
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 0,
+        "dy": 200
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 32
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "InsideShip"
+      },
+      "timeout_ms": 120000
+    }
+  ]
+}

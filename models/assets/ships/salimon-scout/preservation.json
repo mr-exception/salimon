@@ -1,0 +1,2060 @@
+{
+  "legacyAssetVersion": 12,
+  "runtimeSha256": "3b6955d675956a66669bc9c52bde7853a8b24e039cf6114dbb9d17aad0ccb249",
+  "metrics": {
+    "nodes": 123,
+    "triangles": 5890,
+    "primitives": 109,
+    "materials": 13,
+    "glbBytes": 481904
+  },
+  "runtimeAxes": {
+    "up": "+Y",
+    "forward": "+X",
+    "starboard": "-Z"
+  },
+  "nodes": [
+    {
+      "name": "COLLIDER_AftDoor",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -7.78,
+        1.3817204299784946,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            0.2,
+            2.2688172040430103,
+            2.8
+          ],
+          "purpose": "interactive-door"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_CockpitCenterConsole",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        4.95,
+        0.76,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            2.1,
+            1.02,
+            2.7
+          ],
+          "purpose": "interior-obstacle"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_CockpitNoseFloor",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        7.205,
+        0.193655914,
+        0.0
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            1.29,
+            0.107311828,
+            2.2
+          ],
+          "purpose": "interior-floor"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_EnergyCore",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -1.0,
+        1.1505376344086022,
+        0.0
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            2.0,
+            1.8064516129032255,
+            2.0
+          ],
+          "purpose": "interior-obstacle"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Engine_Port_Body",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -6.4,
+        1.075268817204301,
+        7.1
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            6.800000000000001,
+            1.5483870967741935,
+            2.879999999999999
+          ],
+          "purpose": "exterior-thruster"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Engine_Port_SweptFin",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -5.97,
+        1.736559139784946,
+        7.1
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            3.34,
+            2.225806451612903,
+            0.22000000000000064
+          ],
+          "purpose": "exterior-thruster"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Engine_Starboard_Body",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -6.4,
+        1.075268817204301,
+        -7.1
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            6.800000000000001,
+            1.5483870967741935,
+            2.879999999999999
+          ],
+          "purpose": "exterior-thruster"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Engine_Starboard_SweptFin",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -5.97,
+        1.736559139784946,
+        -7.1
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            3.34,
+            2.225806451612903,
+            0.22000000000000064
+          ],
+          "purpose": "exterior-thruster"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_ExteriorHull",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -0.635,
+        1.8924731182795698,
+        0.0
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            18.33,
+            4.0,
+            20.0
+          ],
+          "purpose": "broad-phase-hull"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_InteriorCeiling",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -1.26,
+        2.860215053763441,
+        0.0
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            12.36,
+            0.10752688172043011,
+            9.2
+          ],
+          "purpose": "ceiling"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_InteriorFloor",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -0.5,
+        0.1935483870967742,
+        0.0
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            14.12,
+            0.10752688172043011,
+            9.2
+          ],
+          "purpose": "walkable-floor"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_InteriorPortWall",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -1.1,
+        1.5591397849462365,
+        4.74
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            12.68,
+            2.516129032258064,
+            0.28
+          ],
+          "purpose": "interior-wall"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_InteriorStarboardWall",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -1.1,
+        1.5591397849462365,
+        -4.74
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            12.68,
+            2.516129032258064,
+            0.28
+          ],
+          "purpose": "interior-wall"
+        }
+      }
+    },
+    {
+      "name": "Collision_Proxies",
+      "parent": "Salimon_Phase0_Scout",
+      "visual": false
+    },
+    {
+      "name": "Cabin_Aft_Glazing",
+      "parent": "Exterior",
+      "visual": true,
+      "extras": {
+        "salimon": {
+          "exterior_visibility": true
+        }
+      }
+    },
+    {
+      "name": "Cabin_Port_Glazing",
+      "parent": "Exterior",
+      "visual": true,
+      "extras": {
+        "salimon": {
+          "exterior_visibility": true
+        }
+      }
+    },
+    {
+      "name": "Cabin_Starboard_Glazing",
+      "parent": "Exterior",
+      "visual": true,
+      "extras": {
+        "salimon": {
+          "exterior_visibility": true
+        }
+      }
+    },
+    {
+      "name": "Cockpit_Glazing",
+      "parent": "Exterior",
+      "visual": true,
+      "extras": {
+        "salimon": {
+          "exterior_visibility": true
+        }
+      }
+    },
+    {
+      "name": "Cockpit_Lower_Glazing",
+      "parent": "Exterior",
+      "visual": true,
+      "extras": {
+        "salimon": {
+          "exterior_visibility": true
+        }
+      }
+    },
+    {
+      "name": "Cockpit_Window_Frame",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Dorsal_Spine",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Engine_Port",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Engine_Port_Bands",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Engine_Port_Cooling_Fins",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Engine_Port_Glow",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Engine_Port_Intake",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Engine_Port_Intake_Cowl",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Engine_Port_Liner",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Engine_Port_Nozzle",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Engine_Port_Running_Light",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Engine_Port_Swept_Fin",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Engine_Starboard",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Engine_Starboard_Bands",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Engine_Starboard_Cooling_Fins",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Engine_Starboard_Glow",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Engine_Starboard_Intake",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Engine_Starboard_Intake_Cowl",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Engine_Starboard_Liner",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Engine_Starboard_Nozzle",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Engine_Starboard_Running_Light",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Engine_Starboard_Swept_Fin",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Hull_Aft_Cap",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Hull_Belly",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Hull_Nose",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Hull_Port_Side",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Hull_Port_Stripe",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Hull_Roof",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Hull_Starboard_Side",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Hull_Starboard_Stripe",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Roof_Service_Panels",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Roof_Shoulder_Rails",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Wing_Port",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Wing_Port_Accent",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Wing_Port_Armor",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Wing_Starboard",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Wing_Starboard_Accent",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Wing_Starboard_Armor",
+      "parent": "Exterior",
+      "visual": true
+    },
+    {
+      "name": "Exterior",
+      "parent": "Salimon_Phase0_Scout",
+      "visual": false
+    },
+    {
+      "name": "MARKER_CockpitSeat",
+      "parent": "Interaction_Markers",
+      "visual": false,
+      "translation": [
+        2.76,
+        1.129032258064516,
+        0.0
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "cockpit-seat",
+          "facing": "+X"
+        }
+      }
+    },
+    {
+      "name": "MARKER_ExitDoor",
+      "parent": "Interaction_Markers",
+      "visual": false,
+      "translation": [
+        -7.1,
+        1.3440860215053763,
+        0.0
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "exit-door",
+          "facing": "-X"
+        }
+      }
+    },
+    {
+      "name": "MARKER_PlayerStart",
+      "parent": "Interaction_Markers",
+      "visual": false,
+      "translation": [
+        0.5,
+        1.9973118279569892,
+        -2.2
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "player-start",
+          "facing": "+X"
+        }
+      }
+    },
+    {
+      "name": "Interaction_Markers",
+      "parent": "Salimon_Phase0_Scout",
+      "visual": false
+    },
+    {
+      "name": "Aft_Bulkhead_Header",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Aft_Bulkhead_Port",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Aft_Bulkhead_Starboard",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Cabin_Low_Guidance_Lights",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Cabin_Woven_Runners",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Ceiling_Copper_Ribs",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Ceiling_Inner",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Ceiling_Lamp_Housings",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Ceiling_Teal_Inset_Panels",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Ceiling_Warm_Lights",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Cockpit_Console_Center",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Cockpit_Instrument_Fasteners",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Cockpit_Monitor_Bezels",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Cockpit_Monitor_Housings",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Cockpit_Ready_Indicators",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Cockpit_Rudder_Pedals",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Cockpit_Service_Vents",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Cockpit_Tactile_Keys",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Core_Cell_Separators",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Core_Ceramic_Armor",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Core_Charge_Gauge",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Core_Containment_Ribs",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Core_Containment_Rings",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Core_Cradle",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Core_Lock_Indicators",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Core_Pedestal",
+      "parent": "Interior",
+      "visual": true,
+      "extras": {
+        "salimon": {
+          "purpose": "energy-core-housing"
+        }
+      }
+    },
+    {
+      "name": "Core_Power_Conduits",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Core_Service_Markings",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Core_Service_Panel",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Core_Service_Vents",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Core_Spine_Inlays",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Core_Status_Lights",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Deck_Copper_Inlay",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Deck_Walkable",
+      "parent": "Interior",
+      "visual": true,
+      "extras": {
+        "salimon": {
+          "walkable": true
+        }
+      }
+    },
+    {
+      "name": "Door_Frame",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Door_Threshold",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Door_Welcome_Light",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Energy_Core",
+      "parent": "Interior",
+      "visual": true,
+      "extras": {
+        "salimon": {
+          "purpose": "energy-storage-core",
+          "phase0": "visual-only"
+        }
+      }
+    },
+    {
+      "name": "Exit_Door",
+      "parent": "Interior",
+      "visual": true,
+      "extras": {
+        "salimon": {
+          "interactive": "exit-door",
+          "pivot": [
+            -7.68,
+            0.24731182795698925,
+            0.0
+          ],
+          "openAngleRadians": 2.1355297104231683,
+          "rampLengthMeters": 4.4,
+          "extensionTravelMeters": 2.13118279595699,
+          "extensionFaceOffsetMeters": 0.08,
+          "rampHalfWidthMeters": 1.4
+        }
+      }
+    },
+    {
+      "name": "Pilot_Seat_Accent",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Pilot_Seat_Armature",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Pilot_Seat_Armrests",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Pilot_Seat_Back",
+      "parent": "Interior",
+      "visual": true,
+      "extras": {
+        "salimon": {
+          "interactive": "cockpit-seat",
+          "design": "reclined-tapered-bucket"
+        }
+      }
+    },
+    {
+      "name": "Pilot_Seat_Base",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Pilot_Seat_Bolsters",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Pilot_Seat_Controls",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Pilot_Seat_Cushions",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Pilot_Seat_Headrest",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Pilot_Seat_Shell",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Wall_Port_Inner",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Wall_Starboard_Inner",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Window_Port_Sill",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Window_Starboard_Sill",
+      "parent": "Interior",
+      "visual": true
+    },
+    {
+      "name": "Interior",
+      "parent": "Salimon_Phase0_Scout",
+      "visual": false
+    },
+    {
+      "name": "Salimon_Phase0_Scout",
+      "parent": null,
+      "visual": false
+    },
+    {
+      "name": "COLLIDER_Wing_Port",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -1.6,
+        0.322580645,
+        7.3
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            13.0,
+            0.258064516,
+            5.4
+          ],
+          "purpose": "exterior-wing"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Wing_Starboard",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -1.6,
+        0.322580645,
+        -7.3
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            13.0,
+            0.258064516,
+            5.4
+          ],
+          "purpose": "exterior-wing"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_CabinTraversalEnvelope",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -0.3400000000000003,
+        1.4704301075268815,
+        0.0
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            13.8,
+            2.446236559139785,
+            8.4
+          ],
+          "purpose": "traversal-volume"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_CabinExteriorEnvelope",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        0.3049999999999997,
+        1.4139784946236558,
+        0.0
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            16.45,
+            3.0430107526881716,
+            10.2
+          ],
+          "purpose": "exterior-cabin-envelope"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_PilotChair",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        2.535,
+        0.9886559139784946,
+        0.0
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            1.5299999999999998,
+            1.4826881720430107,
+            1.58
+          ],
+          "purpose": "interior-obstacle"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_CockpitPortHull",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        5.175,
+        1.5913978494623655,
+        3.55
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            5.35,
+            2.688172043010752,
+            1.3000000000000003
+          ],
+          "purpose": "interior-hull"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_CockpitStarboardHull",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        5.175,
+        1.5913978494623655,
+        -3.55
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            5.35,
+            2.688172043010752,
+            1.3000000000000003
+          ],
+          "purpose": "interior-hull"
+        }
+      }
+    },
+    {
+      "name": "MARKER_DoorwayTransition",
+      "parent": "Interaction_Markers",
+      "visual": false,
+      "translation": [
+        -7.04,
+        0.24731182795698925,
+        0.0
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "doorway-transition",
+          "facing": "-X"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Landing_Aft_Port_Foot",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -5.599999904632568,
+        -1.9875268936157227,
+        3.5999999046325684
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            1.35,
+            0.24,
+            1.1
+          ],
+          "purpose": "exterior-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Landing_Aft_Port_Leg",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -5.599999904632568,
+        -0.827526867389679,
+        3.5999999046325684
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            0.9,
+            2.56,
+            0.82
+          ],
+          "purpose": "exterior-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Landing_Aft_Starboard_Foot",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -5.599999904632568,
+        -1.9875268936157227,
+        -3.5999999046325684
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            1.35,
+            0.24,
+            1.1
+          ],
+          "purpose": "exterior-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Landing_Aft_Starboard_Leg",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -5.599999904632568,
+        -0.827526867389679,
+        -3.5999999046325684
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            0.9,
+            2.56,
+            0.82
+          ],
+          "purpose": "exterior-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Landing_Forward_Port_Foot",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        4.800000190734863,
+        -1.9875268936157227,
+        3.5999999046325684
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            1.35,
+            0.24,
+            1.1
+          ],
+          "purpose": "exterior-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Landing_Forward_Port_Leg",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        4.800000190734863,
+        -0.827526867389679,
+        3.5999999046325684
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            0.9,
+            2.56,
+            0.82
+          ],
+          "purpose": "exterior-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Landing_Forward_Starboard_Foot",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        4.800000190734863,
+        -1.9875268936157227,
+        -3.5999999046325684
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            1.35,
+            0.24,
+            1.1
+          ],
+          "purpose": "exterior-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Landing_Forward_Starboard_Leg",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        4.800000190734863,
+        -0.827526867389679,
+        -3.5999999046325684
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            0.9,
+            2.56,
+            0.82
+          ],
+          "purpose": "exterior-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "Landing_Gear_Aft_Port",
+      "parent": "Exterior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "fixed-deployed-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "Landing_Gear_Aft_Starboard",
+      "parent": "Exterior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "fixed-deployed-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "Landing_Gear_Forward_Port",
+      "parent": "Exterior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "fixed-deployed-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "Landing_Gear_Forward_Starboard",
+      "parent": "Exterior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "fixed-deployed-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "Exit_Ramp_Tip",
+      "parent": "Interior",
+      "visual": true,
+      "extras": {
+        "salimon": {
+          "interactive": "exit-ramp-tip"
+        }
+      }
+    },
+    {
+      "name": "Monitor_Wide",
+      "parent": "Interior",
+      "visual": true,
+      "extras": {
+        "salimon": {
+          "interactive": "cockpit-monitor",
+          "displayRole": "multifunction",
+          "uvOrigin": "top-left",
+          "powerSource": "shared-thruster-command",
+          "pilotFacingTargetMeters": [
+            2.76,
+            1.799032258064516,
+            0.0
+          ],
+          "pilotFacingYawDegrees": 0.0
+        }
+      }
+    },
+    {
+      "name": "Core_Monitor",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "interactive": "core-monitor",
+          "displayRole": "energy-core",
+          "uvOrigin": "top-left"
+        }
+      }
+    },
+    {
+      "name": "Fabricator_Chassis",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "Fabricator_Panels",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "Fabricator_Frame",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "Fabricator_Input",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "Fabricator_Monitor",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "displayRole": "fabricator",
+          "uvOrigin": "top-left",
+          "purpose": "fabricator-monitor"
+        }
+      }
+    },
+    {
+      "name": "Fabricator_Tray",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "COLLIDER_Fabricator",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -3.15,
+        1.45,
+        3.75
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            2.4,
+            1.9,
+            1.3
+          ],
+          "purpose": "fabricator-wall-module"
+        }
+      }
+    },
+    {
+      "name": "MARKER_FabricatorInput",
+      "parent": "Interaction_Markers",
+      "visual": false,
+      "translation": [
+        -3,
+        1.65,
+        3.55
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "fabricator-input",
+          "facingDirection": [
+            0,
+            0,
+            -1
+          ]
+        }
+      }
+    },
+    {
+      "name": "MARKER_FabricatorMonitor",
+      "parent": "Interaction_Markers",
+      "visual": false,
+      "translation": [
+        -3.8,
+        2.0,
+        3.69
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "fabricator-monitor",
+          "facingDirection": [
+            0,
+            0,
+            -1
+          ]
+        }
+      }
+    },
+    {
+      "name": "MARKER_FabricatorTray",
+      "parent": "Interaction_Markers",
+      "visual": false,
+      "translation": [
+        -2.55,
+        0.991,
+        3.4
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "fabricator-tray",
+          "facingDirection": [
+            0,
+            0,
+            -1
+          ]
+        }
+      }
+    },
+    {
+      "name": "Fabricator_Output",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "fabricator-output",
+          "visibility": "tray-occupied"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Starter_BinPort",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -6.099999904632568,
+        0.6673118472099304,
+        3.450000047683716
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            1.6,
+            0.84,
+            1.2
+          ],
+          "purpose": "starter-binport"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Starter_BinStarboard",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -6.099999904632568,
+        0.6673118472099304,
+        -3.450000047683716
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            1.6,
+            0.84,
+            1.2
+          ],
+          "purpose": "starter-binstarboard"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Starter_BulkheadPort",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -4.650000095367432,
+        1.5243816375732422,
+        2.8499999046325684
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            0.12,
+            2.5641397311097833,
+            2.7
+          ],
+          "purpose": "starter-bulkheadport"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Starter_BulkheadStarboard",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -4.650000095367432,
+        1.5243816375732422,
+        -2.8499999046325684
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            0.12,
+            2.5641397311097833,
+            2.7
+          ],
+          "purpose": "starter-bulkheadstarboard"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Starter_Bunk",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -0.800000011920929,
+        1.1200000047683716,
+        -3.6500000953674316
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            2.2,
+            1.75,
+            0.85
+          ],
+          "purpose": "starter-bunk"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Starter_Galley",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        0.6499999761581421,
+        0.7900000214576721,
+        3.700000047683716
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            1.7,
+            1.08,
+            0.76
+          ],
+          "purpose": "starter-galley"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Starter_Hygiene",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        1.5,
+        0.8199999928474426,
+        -3.6500000953674316
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            0.8,
+            1.14,
+            0.8
+          ],
+          "purpose": "starter-hygiene"
+        }
+      }
+    },
+    {
+      "name": "MARKER_Starter_AftExpansion",
+      "parent": "Interaction_Markers",
+      "visual": false,
+      "translation": [
+        -7.679999828338623,
+        0.24731183052062988,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "starter-aftexpansion"
+        }
+      }
+    },
+    {
+      "name": "MARKER_Starter_CargoDoor",
+      "parent": "Interaction_Markers",
+      "visual": false,
+      "translation": [
+        -4.650000095367432,
+        1.350000023841858,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "starter-cargodoor"
+        }
+      }
+    },
+    {
+      "name": "MARKER_Starter_UpperExpansion",
+      "parent": "Interaction_Markers",
+      "visual": false,
+      "translation": [
+        0,
+        2.8064515590667725,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "starter-upperexpansion"
+        }
+      }
+    },
+    {
+      "name": "Starter_BunkCushion",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "Starter_BunkFrame",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "Starter_CargoBins",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "Starter_CargoBulkhead",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "Starter_DoorFrame",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "Starter_Galley",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "Starter_GalleyBasin",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "Starter_GalleyTap",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "Starter_GalleyWorktop",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "Starter_Hygiene",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "Starter_HygieneSeat",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "COLLIDER_Starter_Header",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -4.650000095367432,
+        2.6464998722076416,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            0.2,
+            0.3199031719699983,
+            3.02
+          ],
+          "purpose": "starter-header"
+        }
+      }
+    }
+  ],
+  "materials": [
+    {
+      "name": "Hull Graphite",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.09,
+          0.12,
+          0.16,
+          1
+        ],
+        "roughnessFactor": 0.68,
+        "metallicFactor": 0.42
+      },
+      "doubleSided": false
+    },
+    {
+      "name": "Hull Ceramic",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.24,
+          0.3,
+          0.37,
+          1
+        ],
+        "roughnessFactor": 0.52,
+        "metallicFactor": 0.2
+      },
+      "doubleSided": false
+    },
+    {
+      "name": "Copper Accent",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.83,
+          0.53,
+          0.18,
+          1
+        ],
+        "roughnessFactor": 0.42,
+        "metallicFactor": 0.62
+      },
+      "doubleSided": false
+    },
+    {
+      "name": "Cockpit Glass",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.1,
+          0.28,
+          0.3,
+          0.1
+        ],
+        "roughnessFactor": 0.18,
+        "metallicFactor": 0.12
+      },
+      "doubleSided": true,
+      "alphaMode": "BLEND"
+    },
+    {
+      "name": "Interior Light",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.72,
+          0.69,
+          0.6,
+          1
+        ],
+        "roughnessFactor": 0.7,
+        "metallicFactor": 0.08
+      },
+      "doubleSided": false
+    },
+    {
+      "name": "Interior Dark",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.09,
+          0.12,
+          0.16,
+          1
+        ],
+        "roughnessFactor": 0.78,
+        "metallicFactor": 0.12
+      },
+      "doubleSided": false
+    },
+    {
+      "name": "Cyan Display",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.015,
+          0.22,
+          0.27,
+          1.0
+        ],
+        "roughnessFactor": 0.28,
+        "metallicFactor": 0.18
+      },
+      "doubleSided": false,
+      "emissiveFactor": [
+        0.0,
+        0.75,
+        0.92
+      ]
+    },
+    {
+      "name": "Floor Grip",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.42,
+          0.45,
+          0.45,
+          1.0
+        ],
+        "roughnessFactor": 0.86,
+        "metallicFactor": 0.04,
+        "baseColorTexture": {
+          "index": 0,
+          "texCoord": 0
+        }
+      },
+      "doubleSided": false
+    },
+    {
+      "name": "Engine Glow",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.12,
+          0.24,
+          0.3,
+          1.0
+        ],
+        "roughnessFactor": 0.3,
+        "metallicFactor": 0.28
+      },
+      "doubleSided": false,
+      "emissiveFactor": [
+        0.08,
+        0.52,
+        0.78
+      ]
+    },
+    {
+      "name": "Warm Lamp",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.75,
+          0.42,
+          0.12,
+          1.0
+        ],
+        "roughnessFactor": 0.6,
+        "metallicFactor": 0.05
+      },
+      "doubleSided": false,
+      "emissiveFactor": [
+        1.0,
+        0.56,
+        0.2
+      ]
+    },
+    {
+      "name": "Terracotta Upholstery",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.24,
+          0.3,
+          0.37,
+          1
+        ],
+        "roughnessFactor": 0.92,
+        "metallicFactor": 0.0
+      },
+      "doubleSided": false
+    },
+    {
+      "name": "Petrol Teal",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.14,
+          0.65,
+          0.72,
+          1
+        ],
+        "roughnessFactor": 0.72,
+        "metallicFactor": 0.15
+      },
+      "doubleSided": false
+    },
+    {
+      "name": "Honey Wood",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.24,
+          0.3,
+          0.37,
+          1
+        ],
+        "roughnessFactor": 0.88,
+        "metallicFactor": 0.0
+      },
+      "doubleSided": false
+    }
+  ],
+  "assetMetadata": {
+    "version": "2.0",
+    "generator": "Salimon deterministic Phase 0 ship pipeline",
+    "copyright": "Copyright 2026 Salimon contributors; custom original asset",
+    "extras": {
+      "salimon": {
+        "assetVersion": 12,
+        "units": "meters",
+        "upAxis": "+Y",
+        "forwardAxis": "+X",
+        "starboardAxis": "-Z",
+        "sourceWorkflow": "Blender source + scout export adapter"
+      }
+    }
+  }
+}

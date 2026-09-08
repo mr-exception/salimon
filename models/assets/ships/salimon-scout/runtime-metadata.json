@@ -1,0 +1,153 @@
+{
+  "extras": {
+    "salimon": {
+      "drawPrimitiveCount": 134,
+      "triangleCount": 6767,
+      "materialCount": 13,
+      "externalAssetDependencies": 0,
+      "scaleFromTask7Baseline": [
+        2.0,
+        1.075268817204301,
+        2.0
+      ],
+      "task7BaselineDimensionsMeters": [
+        10.15,
+        3.72,
+        8.3
+      ],
+      "overallDimensionsMeters": [
+        18.33,
+        6,
+        20
+      ],
+      "lowestLocalYMeters": -2.10752688172043,
+      "walkableInteriorClearanceMeters": {
+        "width": 9.2,
+        "height": 2.5591397849462365
+      },
+      "designRevision": "separated-aft-cargo-and-integrated-habitation",
+      "energyCore": {
+        "centerMeters": [
+          -1.0,
+          1.2,
+          0.0
+        ],
+        "role": "energy-storage",
+        "phase0": "visual-only"
+      },
+      "humanBodyHeightMeters": 1.8,
+      "humanEyeHeightMeters": 1.75,
+      "cockpitInstruments": {
+        "uvOrigin": "top-left",
+        "powerSource": "shared-thruster-command",
+        "surfaceTriangles": 2,
+        "additionalDraws": 0,
+        "unifiedConsole": {
+          "collisionNode": "COLLIDER_CockpitCenterConsole",
+          "monitorNodes": [
+            "Monitor_Wide"
+          ],
+          "boundsMeters": {
+            "min": [
+              3.9,
+              0.25,
+              -1.35
+            ],
+            "max": [
+              6.0,
+              1.27,
+              1.35
+            ]
+          },
+          "walkingSide": "both",
+          "noseDeckForwardMeters": 7.85
+        },
+        "monitorNode": "Monitor_Wide",
+        "textureSizePixels": [
+          1536,
+          256
+        ],
+        "surfaceBoundsMeters": {
+          "Monitor_Wide": {
+            "min": [
+              4.42,
+              0.8735,
+              -0.99
+            ],
+            "max": [
+              4.42,
+              1.2067,
+              0.99
+            ]
+          }
+        }
+      },
+      "cockpitWindows": {
+        "glazingNode": "Cockpit_Glazing",
+        "frameNode": "Cockpit_Window_Frame",
+        "lowerGlazingNode": "Cockpit_Lower_Glazing",
+        "lowerViewSamplesDegrees": [
+          [
+            12,
+            28
+          ],
+          [
+            16,
+            45
+          ],
+          [
+            30,
+            35
+          ],
+          [
+            30,
+            37
+          ],
+          [
+            32,
+            33
+          ]
+        ],
+        "cabinGlazingNodes": [
+          "Cabin_Port_Glazing",
+          "Cabin_Starboard_Glazing",
+          "Cabin_Aft_Glazing"
+        ],
+        "material": "Cockpit Glass",
+        "seatedViewpointMeters": [
+          2.76,
+          1.799032258064516,
+          0.0
+        ],
+        "standingViewpointMeters": [
+          1.3,
+          1.9973118279569892,
+          0.0
+        ],
+        "dynamicShadows": false,
+        "postEffects": false
+      },
+      "coreMonitor": {
+        "node": "Core_Monitor",
+        "textureRegionPixels": [
+          1536,
+          0,
+          512,
+          256
+        ],
+        "additionalDraws": 0
+      }
+    }
+  },
+  "assetExtras": {
+    "salimon": {
+      "assetVersion": 15,
+      "units": "meters",
+      "upAxis": "+Y",
+      "forwardAxis": "+X",
+      "starboardAxis": "-Z",
+      "sourceWorkflow": "Python procedural DCC source; Blender-importable glTF"
+    }
+  },
+  "copyright": "Copyright 2026 Salimon contributors; custom original asset"
+}

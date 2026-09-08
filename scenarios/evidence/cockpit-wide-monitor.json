@@ -1,0 +1,248 @@
+{
+  "setup": {
+    "scenario": "orbit-earth",
+    "seed": 42,
+    "step_ms": 16
+  },
+  "timeout_ms": 120000,
+  "steps": [
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "Cockpit"
+      }
+    },
+    {
+      "screenshot": "forward-sightline"
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 0,
+        "dy": 125
+      }
+    },
+    {
+      "screenshot": "dashboard-zero"
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.thruster_percentage",
+        "equals": 25
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 2
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.speed_meters_per_second",
+        "approx": 8,
+        "tolerance": 1e-08
+      }
+    },
+    {
+      "screenshot": "dashboard-thrust"
+    },
+    {
+      "action": {
+        "op": "landing"
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.flight_state",
+        "equals": "AssistedLanding { body: Earth }"
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 50
+      }
+    },
+    {
+      "screenshot": "dashboard-approaching"
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 200
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.flight_state",
+        "equals": "Landed { body: Earth }"
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.speed_meters_per_second",
+        "equals": 0
+      }
+    },
+    {
+      "screenshot": "dashboard-landed"
+    }
+  ]
+}

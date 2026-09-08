@@ -1,0 +1,9 @@
+{
+  "stool": 1000,
+  "partition": 2000,
+  "internal-door": 2000,
+  "hull-cell": 5000,
+  "deck-cell": 5000,
+  "two-deck-room": 10000,
+  "utility-module": 3000
+}

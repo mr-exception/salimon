@@ -1,0 +1,21 @@
+{
+  "setup": {
+    "scenario": "scout-lighting-dark",
+    "seed": 580,
+    "step_ms": 16
+  },
+  "timeout_ms": 360000,
+  "steps": [
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "finishes"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "dark-initial",
+      "timeout_ms": 30000
+    }
+  ]
+}

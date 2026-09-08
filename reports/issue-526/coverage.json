@@ -1,0 +1,463 @@
+{
+  "status": "passed",
+  "source_manifest_sha256": "aabbb3bdfba497605e7dd2fdcc8f055f387208303fe16256818fca278d79351d",
+  "pack_manifest_sha256": "4bd0979076733b7391e1d068e1b6b7f3b460fdc544d837534251cf4baaa20f05",
+  "source_bytes": {
+    "ps.csv": 2884261,
+    "ps-count.csv": 7,
+    "jpl-10.json": 6586,
+    "jpl-199.json": 6579,
+    "jpl-299.json": 6568,
+    "jpl-399.json": 7140,
+    "jpl-301.json": 6703,
+    "jpl-499.json": 6678,
+    "jpl-599.json": 6633,
+    "jpl-501.json": 5820,
+    "jpl-502.json": 5822,
+    "jpl-503.json": 5822,
+    "jpl-504.json": 5825,
+    "jpl-699.json": 6605,
+    "jpl-606.json": 5895,
+    "jpl-799.json": 6597,
+    "jpl-899.json": 6595,
+    "jpl-801.json": 5892,
+    "jpl-999.json": 6440,
+    "jpl-901.json": 6135
+  },
+  "ps": {
+    "duplicate_rows": 0,
+    "hosts": 4847,
+    "hosts_using_archive_ids": 370,
+    "hosts_using_gaia_ids": 4477,
+    "input_rows": 6451,
+    "planets": 6451
+  },
+  "ps_reported_distributions": {
+    "sy_dist": {
+      "values": {
+        "count": 6323,
+        "min": 4.015052812260752e+16,
+        "median": 1.0763306255879113e+19,
+        "max": 2.5734551029638e+20
+      },
+      "relative_minus": {
+        "count": 6215,
+        "min": 0.00010424479729472037,
+        "median": 0.010180462926637898,
+        "max": 0.6363636363636365
+      },
+      "relative_plus": {
+        "count": 6215,
+        "min": 0.00010424479729472037,
+        "median": 0.010347965393739816,
+        "max": 0.9166666666666666
+      }
+    },
+    "st_mass": {
+      "values": {
+        "count": 5574,
+        "min": 1.8691618e+28,
+        "median": 1.87313874e+30,
+        "max": 1.8095077e+31
+      },
+      "relative_minus": {
+        "count": 5306,
+        "min": 0.0005652454780361758,
+        "median": 0.0572626848262376,
+        "max": 1.1909090909090907
+      },
+      "relative_plus": {
+        "count": 5307,
+        "min": 0.0005652454780361758,
+        "median": 0.05607476635514017,
+        "max": 3.8191489361702127
+      }
+    },
+    "st_rad": {
+      "values": {
+        "count": 5610,
+        "min": 8557110.0,
+        "median": 660915000.0,
+        "max": 61552057499.99999
+      },
+      "relative_minus": {
+        "count": 5352,
+        "min": -0.0,
+        "median": 0.052455265272977336,
+        "max": 1.0
+      },
+      "relative_plus": {
+        "count": 5353,
+        "min": 0.0,
+        "median": 0.054098360655737705,
+        "max": 77.42814814814814
+      }
+    },
+    "pl_massj": {
+      "values": {
+        "count": 2197,
+        "min": 1.194493209e+23,
+        "median": 9.5855565e+26,
+        "max": 5.69439e+28
+      },
+      "relative_minus": {
+        "count": 2026,
+        "min": 0.0002702053560706136,
+        "median": 0.14684455715808187,
+        "max": 4.97005988023952
+      },
+      "relative_plus": {
+        "count": 2026,
+        "min": 0.0002702053560706136,
+        "median": 0.1546737446603203,
+        "max": 11.449268530858662
+      }
+    },
+    "pl_msinij": {
+      "values": {
+        "count": 1101,
+        "min": 1.1526394425000001e+24,
+        "median": 1.32109848e+27,
+        "max": 5.36411538e+28
+      },
+      "relative_minus": {
+        "count": 1066,
+        "min": -0.0,
+        "median": 0.09333542105562831,
+        "max": 1.3402061855670102
+      },
+      "relative_plus": {
+        "count": 1066,
+        "min": 0.0,
+        "median": 0.09341608441316585,
+        "max": 2.061855670103093
+      }
+    },
+    "pl_radj": {
+      "values": {
+        "count": 4826,
+        "min": 1975935.2166000002,
+        "median": 15728240.0,
+        "max": 556207760.0
+      },
+      "relative_minus": {
+        "count": 4445,
+        "min": -0.0,
+        "median": 0.07276995305164319,
+        "max": 8.684931506849315
+      },
+      "relative_plus": {
+        "count": 4445,
+        "min": 0.0,
+        "median": 0.08219175558116053,
+        "max": 77.42696794780082
+      }
+    },
+    "pl_orbper": {
+      "values": {
+        "count": 6083,
+        "min": 7837.023715199999,
+        "median": 919408.32,
+        "max": 694656000000.0
+      },
+      "relative_minus": {
+        "count": 5589,
+        "min": -0.0,
+        "median": 6.228738338759552e-06,
+        "max": 0.7666666666666667
+      },
+      "relative_plus": {
+        "count": 5589,
+        "min": 0.0,
+        "median": 6.1668159635813394e-06,
+        "max": 1.5573770491803278
+      }
+    },
+    "pl_orbsmax": {
+      "values": {
+        "count": 3955,
+        "min": 658230631.08,
+        "median": 17353353001.2,
+        "max": 2842359543300000.0
+      },
+      "relative_minus": {
+        "count": 3098,
+        "min": -0.0,
+        "median": 0.02272727272727273,
+        "max": 0.8928571428571429
+      },
+      "relative_plus": {
+        "count": 3098,
+        "min": 0.0,
+        "median": 0.022297876936055408,
+        "max": 1.5
+      }
+    },
+    "pl_orbeccen": {
+      "values": {
+        "count": 2773,
+        "min": 0.0,
+        "median": 0.079,
+        "max": 0.95
+      },
+      "relative_minus": {
+        "count": 1800,
+        "min": -0.0,
+        "median": 0.4332116788321168,
+        "max": 12.105263157894738
+      },
+      "relative_plus": {
+        "count": 1800,
+        "min": 0.0,
+        "median": 0.44641148325358854,
+        "max": 250.0
+      }
+    },
+    "pl_orbincl": {
+      "values": {
+        "count": 2103,
+        "min": 0.006464699549386997,
+        "median": 1.5413002624361924,
+        "max": 3.073385186421855
+      },
+      "relative_minus": {
+        "count": 1970,
+        "min": -0.0,
+        "median": 0.005608526722129114,
+        "max": 1.9841380019538277
+      },
+      "relative_plus": {
+        "count": 1968,
+        "min": 0.0,
+        "median": 0.005645171570309261,
+        "max": 0.9526894552894042
+      }
+    },
+    "pl_orblper": {
+      "values": {
+        "count": 1748,
+        "min": -4.066617157146788,
+        "median": 1.6166199463060078,
+        "max": 6.900002118126903
+      },
+      "relative_minus": {
+        "count": 1528,
+        "min": -0.0,
+        "median": 0.24342054636398613,
+        "max": 2283.3333333333335
+      },
+      "relative_plus": {
+        "count": 1528,
+        "min": 0.0,
+        "median": 0.23988359496144612,
+        "max": 2250.0
+      }
+    },
+    "pl_orbtper": {
+      "values": {
+        "count": 821,
+        "min": 2173967.5,
+        "median": 2455071.88,
+        "max": 2476000.0
+      },
+      "relative_minus": {
+        "count": 802,
+        "min": -0.0,
+        "median": 5.551558453109687e-06,
+        "max": 0.035577227270177904
+      },
+      "relative_plus": {
+        "count": 802,
+        "min": 0.0,
+        "median": 5.3405692177580926e-06,
+        "max": 0.015120971219670947
+      }
+    }
+  },
+  "ps_missing_quantities": {
+    "pl_massj": 4254,
+    "pl_radj": 1625,
+    "pl_orbincl": 4348,
+    "pl_orblper": 4703,
+    "pl_orbtper": 5630,
+    "st_rad": 841,
+    "pl_msinij": 5350,
+    "pl_orbper": 368,
+    "pl_orbeccen": 3678,
+    "sy_dist": 128,
+    "pl_orbsmax": 2496,
+    "st_mass": 877
+  },
+  "ps_limit_counts": {
+    "sy_dist:Unspecified": 6323,
+    "st_mass:Measurement": 5574,
+    "st_rad:Measurement": 5610,
+    "pl_msinij:Measurement": 1094,
+    "pl_orbper:Measurement": 6077,
+    "pl_orbsmax:Measurement": 3952,
+    "pl_orbeccen:Measurement": 2496,
+    "pl_orblper:Measurement": 1747,
+    "pl_orbtper:Measurement": 821,
+    "pl_massj:Measurement": 2033,
+    "pl_orbincl:Measurement": 2082,
+    "pl_radj:Measurement": 4821,
+    "pl_massj:Upper": 153,
+    "pl_orbeccen:Upper": 266,
+    "pl_orbincl:Lower": 15,
+    "pl_orbincl:Upper": 6,
+    "pl_msinij:Lower": 2,
+    "pl_orbper:Lower": 6,
+    "pl_orbsmax:Lower": 3,
+    "pl_orbeccen:Lower": 11,
+    "pl_orblper:Lower": 1,
+    "pl_massj:Lower": 11,
+    "pl_radj:Lower": 5,
+    "pl_msinij:Upper": 5
+  },
+  "ps_max_relative_conversion_error": {
+    "sy_dist": 0,
+    "st_mass": 0,
+    "st_rad": 0,
+    "pl_msinij": 0,
+    "pl_orbper": 0,
+    "pl_orbsmax": 0,
+    "pl_orbeccen": 0,
+    "pl_orblper": 0,
+    "pl_orbtper": 0,
+    "pl_massj": 0,
+    "pl_orbincl": 0,
+    "pl_radj": 0
+  },
+  "multi_planet_hosts": 1069,
+  "multi_star_rows": 577,
+  "goldens": {
+    "Proxima Cen b": {
+      "planet": "nea_planet:50726f78696d612043656e2062",
+      "host": "gaia_dr3:5853498713190525696"
+    },
+    "TRAPPIST-1 b": {
+      "planet": "nea_planet:54524150504953542d312062",
+      "host": "gaia_dr3:2635476908753563008"
+    },
+    "TRAPPIST-1 h": {
+      "planet": "nea_planet:54524150504953542d312068",
+      "host": "gaia_dr3:2635476908753563008"
+    },
+    "Kepler-16 b": {
+      "planet": "nea_planet:4b65706c65722d31362062",
+      "host": "gaia_dr3:2133476355197071616"
+    },
+    "PSR B1257+12 b": {
+      "planet": "nea_planet:5053522042313235372b31322062",
+      "host": "nea_host:5053522042313235372b3132"
+    }
+  },
+  "jpl": {
+    "targets": 18,
+    "samples": 54,
+    "max_component_error_meters": 0.0,
+    "max_component_error_mps": 0.0,
+    "missing_mass": [
+      "Io:mass",
+      "Europa:mass",
+      "Ganymede:mass",
+      "Callisto:mass",
+      "Triton:mass",
+      "Charon:mass"
+    ],
+    "source_models": {
+      "10": [
+        "Target body name: Sun (10)                        {source: DE441}",
+        "Center body name: Solar System Barycenter (0)     {source: DE441}"
+      ],
+      "199": [
+        "Target body name: Mercury (199)                   {source: DE441}",
+        "Center body name: Solar System Barycenter (0)     {source: DE441}"
+      ],
+      "299": [
+        "Target body name: Venus (299)                     {source: DE441}",
+        "Center body name: Solar System Barycenter (0)     {source: DE441}"
+      ],
+      "399": [
+        "Target body name: Earth (399)                     {source: DE441}",
+        "Center body name: Solar System Barycenter (0)     {source: DE441}"
+      ],
+      "301": [
+        "Target body name: Moon (301)                      {source: DE441}",
+        "Center body name: Solar System Barycenter (0)     {source: DE441}"
+      ],
+      "499": [
+        "Target body name: Mars (499)                      {source: mar099}",
+        "Center body name: Solar System Barycenter (0)     {source: DE441}"
+      ],
+      "599": [
+        "Target body name: Jupiter (599)                   {source: jup365_merged}",
+        "Center body name: Solar System Barycenter (0)     {source: DE441}"
+      ],
+      "501": [
+        "Target body name: Io (501)                        {source: jup365_merged}",
+        "Center body name: Solar System Barycenter (0)     {source: DE441}"
+      ],
+      "502": [
+        "Target body name: Europa (502)                    {source: jup365_merged}",
+        "Center body name: Solar System Barycenter (0)     {source: DE441}"
+      ],
+      "503": [
+        "Target body name: Ganymede (503)                  {source: jup365_merged}",
+        "Center body name: Solar System Barycenter (0)     {source: DE441}"
+      ],
+      "504": [
+        "Target body name: Callisto (504)                  {source: jup365_merged}",
+        "Center body name: Solar System Barycenter (0)     {source: DE441}"
+      ],
+      "699": [
+        "Target body name: Saturn (699)                    {source: sat441l}",
+        "Center body name: Solar System Barycenter (0)     {source: DE441}"
+      ],
+      "606": [
+        "Target body name: Titan (606)                     {source: sat441l}",
+        "Center body name: Solar System Barycenter (0)     {source: DE441}"
+      ],
+      "799": [
+        "Target body name: Uranus (799)                    {source: ura184_merged}",
+        "Center body name: Solar System Barycenter (0)     {source: DE441}"
+      ],
+      "899": [
+        "Target body name: Neptune (899)                   {source: nep098_merged}",
+        "Center body name: Solar System Barycenter (0)     {source: DE441}"
+      ],
+      "801": [
+        "Target body name: Triton (801)                    {source: nep098_merged}",
+        "Center body name: Solar System Barycenter (0)     {source: DE441}"
+      ],
+      "999": [
+        "Target body name: Pluto (999)                     {source: plu060_merged}",
+        "Center body name: Solar System Barycenter (0)     {source: DE441}"
+      ],
+      "901": [
+        "Target body name: Charon (901)                    {source: plu060_merged}",
+        "Center body name: Solar System Barycenter (0)     {source: DE441}"
+      ]
+    },
+    "coverage_tdb": "2000-01-01 00:00:00 through 2000-01-02 00:00:00; exact 12h samples only"
+  },
+  "storage": {
+    "records": 16164,
+    "partition_bytes": 1091615,
+    "sidecar_bytes": {
+      "ephemerides": 136267,
+      "planet_observations": 26398189,
+      "planet_summary": 124
+    },
+    "index_manifest_bytes": 582216,
+    "unique_blob_bytes": 27657468
+  },
+  "limitations": [
+    "Private source-inventory cell; not a located full-galaxy spatial index.",
+    "No all-small-body Solar System claim; selected targets enumerated explicitly.",
+    "PS orbital elements may be missing; phase/frame/epoch and multi-star hierarchy not invented.",
+    "Exact Gaia source IDs only; independent Gaia release cross-match is #524.",
+    "Decoder arithmetic errors are not scientific model errors or interpolation validation.",
+    "Public/commercial release terms remain unreviewed #659; no native/hardware qualification."
+  ]
+}

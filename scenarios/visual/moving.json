@@ -1,0 +1,90 @@
+{
+  "setup": {
+    "scenario": "landed-earth",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 120000,
+  "steps": [
+    {
+      "action": {
+        "op": "look",
+        "dx": 8,
+        "dy": 2
+      }
+    },
+    {
+      "screenshot": "camera-00"
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 8,
+        "dy": 2
+      }
+    },
+    {
+      "screenshot": "camera-01"
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 8,
+        "dy": 2
+      }
+    },
+    {
+      "screenshot": "camera-02"
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 8,
+        "dy": 2
+      }
+    },
+    {
+      "screenshot": "camera-03"
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 8,
+        "dy": 2
+      }
+    },
+    {
+      "screenshot": "camera-04"
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 8,
+        "dy": 2
+      }
+    },
+    {
+      "screenshot": "camera-05"
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 8,
+        "dy": 2
+      }
+    },
+    {
+      "screenshot": "camera-06"
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 8,
+        "dy": 2
+      }
+    },
+    {
+      "screenshot": "camera-07"
+    }
+  ]
+}

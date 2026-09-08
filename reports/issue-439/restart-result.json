@@ -1,0 +1,297 @@
+{
+  "status": "passed",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "source_revision": "5113d628865e8fe863ec40c7dbe3092b8fbe347b",
+  "binary_sha256": "1c85f5e107b408b48dc45ba5e8663c662c635751b74560ddb3d84a56b6dbd8b7",
+  "clock": "actual local clock on restart; only aborted attempt requests controlled +60 s",
+  "checks": [
+    "SIGKILL before publication preserves source slot bytes; no public temporary slot",
+    "both actual-clock restarts credit exactly their checkpoint delta once; aborted +60 s is never published"
+  ],
+  "restarts": [
+    {
+      "attempt": 1,
+      "seconds_to_region_ready": 35.40301614500004,
+      "actual_clock_elapsed_seconds": 0,
+      "motion_elapsed_nanos": 0,
+      "generation": 2,
+      "slots": {
+        "checkpoint-0.sav": "b1483e5407a7bb82c702d5895623af14cb43dac595c689c85ea01e6781ab17d2",
+        "checkpoint-1.sav": "db91fc69fdfd4be373fd402c86fd098252272d855135e49b6a3fc02865309e0a"
+      },
+      "process_memory": [
+        "VmHWM:\t  245948 kB",
+        "VmRSS:\t  211664 kB"
+      ],
+      "launch": {
+        "error": null,
+        "fixture_directory": "/tmp/salimon-e2e-launch-18267-1",
+        "percentage": 100.0,
+        "progress": {
+          "completed": {
+            "nanos": 0,
+            "secs": 0
+          },
+          "stage": "Ready",
+          "total": {
+            "nanos": 0,
+            "secs": 0
+          }
+        },
+        "ready": true,
+        "source_ready": true
+      },
+      "visual_context": {
+        "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "backend": "Vulkan",
+        "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+        "scale_factor": 1.0,
+        "viewport_pixels": [
+          1280,
+          800
+        ]
+      },
+      "performance": {
+        "cpu_render": {
+          "max_ms": 100.128256,
+          "mean_ms": 2.25353103357314,
+          "min_ms": 1.0629000000000002,
+          "p95_ms": 2.535247,
+          "samples": 417
+        },
+        "cpu_update": {
+          "max_ms": 8.234153,
+          "mean_ms": 3.097647213429257,
+          "min_ms": 0.804841,
+          "p95_ms": 4.212853,
+          "samples": 417
+        },
+        "drawable_pixels": [
+          1280,
+          800
+        ],
+        "gpu_allocator": {
+          "allocated_bytes": 19794308,
+          "reserved_bytes": 62914560
+        },
+        "gpu_pass": {
+          "max_ms": 124.692707,
+          "mean_ms": 37.111994485576915,
+          "min_ms": 27.258808,
+          "p95_ms": 50.54294,
+          "samples": 416
+        },
+        "presented_interval": {
+          "max_ms": 214.681373,
+          "mean_ms": 78.4340249808153,
+          "min_ms": 0.0,
+          "p95_ms": 118.307676,
+          "samples": 417
+        },
+        "raw_frame_columns": [
+          "interval_ms",
+          "cpu_update_ms",
+          "cpu_render_ms",
+          "gpu_pass_ms",
+          "scene_draw_calls",
+          "total_draw_calls"
+        ],
+        "samples": 417,
+        "raw_frames_retained_in": "restart-result-full.json.gz",
+        "raw_frames_sha256": "23b6cd492b65098b891c6aee559ad3657b1c77684c6b3e8c25cf62d22753e1b0"
+      }
+    },
+    {
+      "attempt": 2,
+      "seconds_to_region_ready": 38.69132534899995,
+      "actual_clock_elapsed_seconds": 37,
+      "motion_elapsed_nanos": 37000000000,
+      "generation": 3,
+      "slots": {
+        "checkpoint-0.sav": "d197ed1e26853be2284936b58c952cd18a19cb1224f6d3cd9ea36193111d7b5e",
+        "checkpoint-1.sav": "db91fc69fdfd4be373fd402c86fd098252272d855135e49b6a3fc02865309e0a"
+      },
+      "process_memory": [
+        "VmHWM:\t  239968 kB",
+        "VmRSS:\t  218476 kB"
+      ],
+      "launch": {
+        "error": null,
+        "fixture_directory": "/tmp/salimon-e2e-launch-18267-1",
+        "percentage": 100.0,
+        "progress": {
+          "completed": {
+            "nanos": 0,
+            "secs": 0
+          },
+          "stage": "Ready",
+          "total": {
+            "nanos": 0,
+            "secs": 0
+          }
+        },
+        "ready": true,
+        "source_ready": true
+      },
+      "visual_context": {
+        "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "backend": "Vulkan",
+        "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+        "scale_factor": 1.0,
+        "viewport_pixels": [
+          1280,
+          800
+        ]
+      },
+      "performance": {
+        "cpu_render": {
+          "max_ms": 108.842413,
+          "mean_ms": 2.4367234192771097,
+          "min_ms": 1.085844,
+          "p95_ms": 3.0201759999999997,
+          "samples": 415
+        },
+        "cpu_update": {
+          "max_ms": 36.113064,
+          "mean_ms": 3.4089909951807225,
+          "min_ms": 0.7918820000000001,
+          "p95_ms": 4.3970579999999995,
+          "samples": 415
+        },
+        "drawable_pixels": [
+          1280,
+          800
+        ],
+        "gpu_allocator": {
+          "allocated_bytes": 19794308,
+          "reserved_bytes": 62914560
+        },
+        "gpu_pass": {
+          "max_ms": 111.435437,
+          "mean_ms": 41.63159457729469,
+          "min_ms": 26.817753,
+          "p95_ms": 70.85385199999999,
+          "samples": 414
+        },
+        "presented_interval": {
+          "max_ms": 229.419173,
+          "mean_ms": 86.35991077590369,
+          "min_ms": 0.0,
+          "p95_ms": 146.999713,
+          "samples": 415
+        },
+        "raw_frame_columns": [
+          "interval_ms",
+          "cpu_update_ms",
+          "cpu_render_ms",
+          "gpu_pass_ms",
+          "scene_draw_calls",
+          "total_draw_calls"
+        ],
+        "samples": 415,
+        "raw_frames_retained_in": "restart-result-full.json.gz",
+        "raw_frames_sha256": "ff96956fe8cca413f2d4e3dd8c8847d7ced91305c47c5e9a4d47a25326112b0b"
+      }
+    }
+  ],
+  "interrupted_progress": {
+    "error": null,
+    "fixture_directory": "/tmp/salimon-e2e-launch-18267-1",
+    "percentage": 1.7066666666666668,
+    "progress": {
+      "completed": {
+        "nanos": 24000000,
+        "secs": 1
+      },
+      "stage": "Propagating",
+      "total": {
+        "nanos": 0,
+        "secs": 60
+      }
+    },
+    "ready": false,
+    "source_ready": false
+  },
+  "source_before": {
+    "generation": 1,
+    "saved_at": 1793462938,
+    "motion": {
+      "version": 1,
+      "definition_sha256": "60aa4ab68e422d640ee0dfed0f8698698e426a936ba314762694f6af6cd6a781",
+      "epoch": {
+        "day": 0,
+        "nanos": 78448000000,
+        "scale": "tt"
+      }
+    },
+    "slots": {
+      "checkpoint-0.sav": "b1483e5407a7bb82c702d5895623af14cb43dac595c689c85ea01e6781ab17d2"
+    }
+  },
+  "retained_traces": [
+    {
+      "phase": "interruption",
+      "file": "interruption-protocol.jsonl.gz",
+      "uncompressed_sha256": "b7aac8b269248343ab8712ece9319ddd4c401aeb4c0e25fcb81d2c1f530d74da"
+    },
+    {
+      "phase": "interruption",
+      "file": "interruption-scenario.json.gz",
+      "uncompressed_sha256": "4195789a4318c806315c2a0b4781f228d7cc0f42b28d0323153a62c025af32f3"
+    },
+    {
+      "phase": "interruption",
+      "file": "interruption-stderr.log.gz",
+      "uncompressed_sha256": "3248539dadd0ade19458a562437591f4f9a3c8e4ab693967993b72e6110c73c0"
+    },
+    {
+      "phase": "interruption",
+      "file": "interruption-stdout.log.gz",
+      "uncompressed_sha256": "5a48409e10e549efe0f337b32176aeb2deec95d1aa93b8d0be2d8f5300341276"
+    },
+    {
+      "phase": "restart-1",
+      "file": "restart-1-protocol.jsonl.gz",
+      "uncompressed_sha256": "63d9834d0f15e9fbdde9f4ac924f05ec1c11b30a9bcc8d2ce36dd61323167145"
+    },
+    {
+      "phase": "restart-1",
+      "file": "restart-1-scenario.json.gz",
+      "uncompressed_sha256": "ee84945127e2ad794737b73459ece99957bcc01444b1c9cc67a12290cc6075cb"
+    },
+    {
+      "phase": "restart-1",
+      "file": "restart-1-stderr.log.gz",
+      "uncompressed_sha256": "fe5742d340b0952278cf22b6607d671d2e5c9bc68db8acea50b3d0ff91984aee"
+    },
+    {
+      "phase": "restart-1",
+      "file": "restart-1-stdout.log.gz",
+      "uncompressed_sha256": "1fdd917217047e1404f93b407fdab580449515bd8a7f88e3cd85146e7bd9e42f"
+    },
+    {
+      "phase": "restart-2",
+      "file": "restart-2-protocol.jsonl.gz",
+      "uncompressed_sha256": "82532731841e86f55e529ce1416819026f897df57c16ff105fd54c5b07e8eab1"
+    },
+    {
+      "phase": "restart-2",
+      "file": "restart-2-scenario.json.gz",
+      "uncompressed_sha256": "423fd6cde0cab3cf59ca4cd000eaed428f507bf488465caec54942ddea00444c"
+    },
+    {
+      "phase": "restart-2",
+      "file": "restart-2-stderr.log.gz",
+      "uncompressed_sha256": "0fa321785b5ab506877720176e87cddc20fdaf499d7ff839593c0872b9ae6ebc"
+    },
+    {
+      "phase": "restart-2",
+      "file": "restart-2-stdout.log.gz",
+      "uncompressed_sha256": "6b8890b4d8bc17d5d29109347e4f882ba905775972616efd55814f99393753f1"
+    }
+  ],
+  "full_result": {
+    "file": "restart-result-full.json.gz",
+    "uncompressed_sha256": "83bb7c05e72407035dbbd7b5348e29346cad1d877f1e022d66ee5f1b1ec70596"
+  }
+}

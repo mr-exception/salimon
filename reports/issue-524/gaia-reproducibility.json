@@ -1,0 +1,4 @@
+{
+  "status": "passed",
+  "scope": "two offline builds on identical frozen bytes; exact manifest hashes and installed bytes agree"
+}

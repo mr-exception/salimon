@@ -1,0 +1,1930 @@
+{
+  "schema_version": 1,
+  "scenario": "scenarios/evidence/environment-audio.json",
+  "status": "passed",
+  "steps_completed": 67,
+  "setup": {
+    "scenario": "canonical-journey",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "duration_ms": 98458,
+  "command": [
+    "/workspace/salimon/target/debug/salimon-client"
+  ],
+  "game_exit_code": -15,
+  "steps": [
+    {
+      "index": 1,
+      "step": {
+        "wait": {
+          "path": "terrain.presentation_ready",
+          "equals": true
+        },
+        "frames": 1,
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "terrain.presentation_ready",
+          "equals": true
+        },
+        "attempts": 275,
+        "actual_present": true,
+        "passed": true,
+        "actual": true
+      },
+      "duration_ms": 60986
+    },
+    {
+      "index": 2,
+      "step": {
+        "assert": {
+          "path": "audio_output.preview_only",
+          "equals": true
+        }
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "audio_output.preview_only",
+          "equals": true
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": true
+      },
+      "duration_ms": 411
+    },
+    {
+      "index": 3,
+      "step": {
+        "assert": {
+          "path": "audio_output.scene_gains.27",
+          "equals": 0
+        }
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "audio_output.scene_gains.27",
+          "equals": 0
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": 0.0
+      },
+      "duration_ms": 358
+    },
+    {
+      "index": 4,
+      "step": {
+        "assert": {
+          "path": "audio_output.scene_gains.28",
+          "equals": 0
+        }
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "audio_output.scene_gains.28",
+          "equals": 0
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": 0.0
+      },
+      "duration_ms": 373
+    },
+    {
+      "index": 5,
+      "step": {
+        "assert": {
+          "path": "audio_output.scene_gains.29",
+          "equals": 0
+        }
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "audio_output.scene_gains.29",
+          "equals": 0
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": 0.0
+      },
+      "duration_ms": 372
+    },
+    {
+      "index": 6,
+      "step": {
+        "assert": {
+          "path": "audio_output.scene_gains.30",
+          "equals": 0
+        }
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "audio_output.scene_gains.30",
+          "equals": 0
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": 0.0
+      },
+      "duration_ms": 311
+    },
+    {
+      "index": 7,
+      "step": {
+        "assert": {
+          "path": "audio_output.scene_gains.31",
+          "equals": 0
+        }
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "audio_output.scene_gains.31",
+          "equals": 0
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": 0.0
+      },
+      "duration_ms": 372
+    },
+    {
+      "index": 8,
+      "step": {
+        "action": {
+          "op": "performance_reset"
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 547
+    },
+    {
+      "index": 9,
+      "step": {
+        "wait": {
+          "path": "performance.samples",
+          "gte": 3
+        },
+        "frames": 1,
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "performance.samples",
+          "gte": 3
+        },
+        "attempts": 2,
+        "actual_present": true,
+        "passed": true,
+        "actual": 4
+      },
+      "duration_ms": 819
+    },
+    {
+      "index": 10,
+      "step": {
+        "screenshot": "vacuum-quiet",
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 939
+    },
+    {
+      "index": 11,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "pause",
+          "pressed": true
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 548
+    },
+    {
+      "index": 12,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "pause",
+          "pressed": false
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 565
+    },
+    {
+      "index": 13,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "settings",
+          "pressed": true
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 517
+    },
+    {
+      "index": 14,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "settings",
+          "pressed": false
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 513
+    },
+    {
+      "index": 15,
+      "step": {
+        "action": {
+          "op": "performance_reset"
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 615
+    },
+    {
+      "index": 16,
+      "step": {
+        "wait": {
+          "path": "performance.samples",
+          "gte": 3
+        },
+        "frames": 1,
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "performance.samples",
+          "gte": 3
+        },
+        "attempts": 2,
+        "actual_present": true,
+        "passed": true,
+        "actual": 4
+      },
+      "duration_ms": 801
+    },
+    {
+      "index": 17,
+      "step": {
+        "screenshot": "environment-settings",
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 944
+    },
+    {
+      "index": 18,
+      "step": {
+        "assert": {
+          "path": "audio_output.settings.environment_audio",
+          "equals": true
+        }
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "audio_output.settings.environment_audio",
+          "equals": true
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": true
+      },
+      "duration_ms": 414
+    },
+    {
+      "index": 19,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "environment_audio",
+          "pressed": true
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 521
+    },
+    {
+      "index": 20,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "environment_audio",
+          "pressed": false
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 595
+    },
+    {
+      "index": 21,
+      "step": {
+        "assert": {
+          "path": "audio_output.settings.environment_audio",
+          "equals": false
+        }
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "audio_output.settings.environment_audio",
+          "equals": false
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": false
+      },
+      "duration_ms": 276
+    },
+    {
+      "index": 22,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "environment_volume",
+          "pressed": true
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 508
+    },
+    {
+      "index": 23,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "environment_volume",
+          "pressed": false
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 497
+    },
+    {
+      "index": 24,
+      "step": {
+        "assert": {
+          "path": "audio_output.settings.environment_volume_percent",
+          "equals": 80
+        }
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "audio_output.settings.environment_volume_percent",
+          "equals": 80
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": 80
+      },
+      "duration_ms": 278
+    },
+    {
+      "index": 25,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "environment_cues",
+          "pressed": true
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 514
+    },
+    {
+      "index": 26,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "environment_cues",
+          "pressed": false
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 286
+    },
+    {
+      "index": 27,
+      "step": {
+        "assert": {
+          "path": "audio_output.settings.environment_cues",
+          "equals": false
+        }
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "audio_output.settings.environment_cues",
+          "equals": false
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": false
+      },
+      "duration_ms": 293
+    },
+    {
+      "index": 28,
+      "step": {
+        "action": {
+          "op": "performance_reset"
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 512
+    },
+    {
+      "index": 29,
+      "step": {
+        "wait": {
+          "path": "performance.samples",
+          "gte": 3
+        },
+        "frames": 1,
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "performance.samples",
+          "gte": 3
+        },
+        "attempts": 2,
+        "actual_present": true,
+        "passed": true,
+        "actual": 4
+      },
+      "duration_ms": 802
+    },
+    {
+      "index": 30,
+      "step": {
+        "screenshot": "independent-settings",
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 1037
+    },
+    {
+      "index": 31,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "environment_audio",
+          "pressed": true
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 422
+    },
+    {
+      "index": 32,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "environment_audio",
+          "pressed": false
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 380
+    },
+    {
+      "index": 33,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "environment_cues",
+          "pressed": true
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 631
+    },
+    {
+      "index": 34,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "environment_cues",
+          "pressed": false
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 519
+    },
+    {
+      "index": 35,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "resume",
+          "pressed": true
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 486
+    },
+    {
+      "index": 36,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "resume",
+          "pressed": false
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 580
+    },
+    {
+      "index": 37,
+      "step": {
+        "action": {
+          "op": "step",
+          "frames": 4
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 691
+    },
+    {
+      "index": 38,
+      "step": {
+        "assert": {
+          "path": "audio_output.scene_gains.27",
+          "equals": 0
+        }
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "audio_output.scene_gains.27",
+          "equals": 0
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": 0.0
+      },
+      "duration_ms": 356
+    },
+    {
+      "index": 39,
+      "step": {
+        "assert": {
+          "path": "audio_output.scene_gains.28",
+          "equals": 0
+        }
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "audio_output.scene_gains.28",
+          "equals": 0
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": 0.0
+      },
+      "duration_ms": 390
+    },
+    {
+      "index": 40,
+      "step": {
+        "assert": {
+          "path": "audio_output.scene_gains.29",
+          "equals": 0
+        }
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "audio_output.scene_gains.29",
+          "equals": 0
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": 0.0
+      },
+      "duration_ms": 371
+    },
+    {
+      "index": 41,
+      "step": {
+        "assert": {
+          "path": "audio_output.scene_gains.30",
+          "equals": 0
+        }
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "audio_output.scene_gains.30",
+          "equals": 0
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": 0.0
+      },
+      "duration_ms": 382
+    },
+    {
+      "index": 42,
+      "step": {
+        "assert": {
+          "path": "audio_output.scene_gains.31",
+          "equals": 0
+        }
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "audio_output.scene_gains.31",
+          "equals": 0
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": 0.0
+      },
+      "duration_ms": 292
+    },
+    {
+      "index": 43,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "left",
+          "pressed": true
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 621
+    },
+    {
+      "index": 44,
+      "step": {
+        "action": {
+          "op": "step",
+          "frames": 296
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 588
+    },
+    {
+      "index": 45,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "left",
+          "pressed": false
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 482
+    },
+    {
+      "index": 46,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "forward",
+          "pressed": true
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 468
+    },
+    {
+      "index": 47,
+      "step": {
+        "action": {
+          "op": "step",
+          "frames": 230
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 545
+    },
+    {
+      "index": 48,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "forward",
+          "pressed": false
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 646
+    },
+    {
+      "index": 49,
+      "step": {
+        "action": {
+          "op": "look",
+          "dx": 713.9983303613166,
+          "dy": 0
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 468
+    },
+    {
+      "index": 50,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "forward",
+          "pressed": true
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 490
+    },
+    {
+      "index": 51,
+      "step": {
+        "action": {
+          "op": "step",
+          "frames": 95
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 574
+    },
+    {
+      "index": 52,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "forward",
+          "pressed": false
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 600
+    },
+    {
+      "index": 53,
+      "step": {
+        "action": {
+          "op": "interact"
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 524
+    },
+    {
+      "index": 54,
+      "step": {
+        "action": {
+          "op": "step",
+          "frames": 50
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 573
+    },
+    {
+      "index": 55,
+      "step": {
+        "assert": {
+          "path": "ship.door_state",
+          "equals": "Open"
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "ship.door_state",
+          "equals": "Open"
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": "Open"
+      },
+      "duration_ms": 324
+    },
+    {
+      "index": 56,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "forward",
+          "pressed": true
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 561
+    },
+    {
+      "index": 57,
+      "step": {
+        "action": {
+          "op": "step",
+          "frames": 160
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 638
+    },
+    {
+      "index": 58,
+      "step": {
+        "action": {
+          "op": "key",
+          "key": "forward",
+          "pressed": false
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 562
+    },
+    {
+      "index": 59,
+      "step": {
+        "assert": {
+          "path": "player.location",
+          "equals": "InsideShip"
+        },
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "player.location",
+          "equals": "InsideShip"
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": "InsideShip"
+      },
+      "duration_ms": 306
+    },
+    {
+      "index": 60,
+      "step": {
+        "assert": {
+          "path": "audio_output.scene_gains.27",
+          "equals": 0
+        }
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "audio_output.scene_gains.27",
+          "equals": 0
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": 0.0
+      },
+      "duration_ms": 336
+    },
+    {
+      "index": 61,
+      "step": {
+        "assert": {
+          "path": "audio_output.scene_gains.28",
+          "equals": 0
+        }
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "audio_output.scene_gains.28",
+          "equals": 0
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": 0.0
+      },
+      "duration_ms": 291
+    },
+    {
+      "index": 62,
+      "step": {
+        "assert": {
+          "path": "audio_output.scene_gains.29",
+          "equals": 0
+        }
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "audio_output.scene_gains.29",
+          "equals": 0
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": 0.0
+      },
+      "duration_ms": 299
+    },
+    {
+      "index": 63,
+      "step": {
+        "assert": {
+          "path": "audio_output.scene_gains.30",
+          "equals": 0
+        }
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "audio_output.scene_gains.30",
+          "equals": 0
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": 0.0
+      },
+      "duration_ms": 292
+    },
+    {
+      "index": 64,
+      "step": {
+        "assert": {
+          "path": "audio_output.scene_gains.31",
+          "equals": 0
+        }
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "audio_output.scene_gains.31",
+          "equals": 0
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": 0.0
+      },
+      "duration_ms": 289
+    },
+    {
+      "index": 65,
+      "step": {
+        "action": {
+          "op": "performance_reset"
+        }
+      },
+      "status": "passed",
+      "duration_ms": 574
+    },
+    {
+      "index": 66,
+      "step": {
+        "wait": {
+          "path": "performance.samples",
+          "gte": 3
+        },
+        "frames": 1,
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "assertion": {
+        "condition": {
+          "path": "performance.samples",
+          "gte": 3
+        },
+        "attempts": 2,
+        "actual_present": true,
+        "passed": true,
+        "actual": 4
+      },
+      "duration_ms": 950
+    },
+    {
+      "index": 67,
+      "step": {
+        "screenshot": "scout-interior-vacuum",
+        "timeout_ms": 180000
+      },
+      "status": "passed",
+      "duration_ms": 1031
+    }
+  ],
+  "capture_contexts": [
+    {
+      "png": "step-010-vacuum-quiet.png",
+      "sha256": "051bc61c8a9d78439e7fa07113d337c5c7a5c6cff6e28540c0e84157a029f83e",
+      "audio_output": {
+        "area": null,
+        "available": false,
+        "backend": "cpal-0.18.2",
+        "callback_cpu_overruns": 0,
+        "callbacks": 0,
+        "channels": 0,
+        "device_id": null,
+        "environment_warning": null,
+        "frames": 0,
+        "mailbox_bytes": 672,
+        "max_callback_frames": 0,
+        "max_callback_ns": 0,
+        "mixer_bytes": 3240,
+        "preview_only": true,
+        "sample_format": null,
+        "sample_rate": 0,
+        "scene_events": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "scene_filters": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.08749999850988388,
+          0.20999999344348907,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scene_gains": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "settings": {
+          "camera_motion": true,
+          "condition_audio": true,
+          "environment_audio": true,
+          "environment_cues": true,
+          "environment_volume_percent": 60,
+          "master_mute": false,
+          "scene_audio": true,
+          "scene_volume_percent": 60,
+          "version": 1,
+          "vignette": true
+        },
+        "voices": 32
+      },
+      "visual_context": {
+        "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "backend": "Vulkan",
+        "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+        "scale_factor": 1.0,
+        "viewport_pixels": [
+          1280,
+          800
+        ]
+      },
+      "terrain": {
+        "active_patches": 300,
+        "cache_patches": 300,
+        "cpu_cache_bytes": 8867180,
+        "generated_last_frame": 0,
+        "generated_peak": 2,
+        "generation_last_frame_micros": 0,
+        "generation_peak_micros": 18950,
+        "generation_total_micros": 776092,
+        "gpu_cache_bytes": 6904548,
+        "gpu_ready": true,
+        "mode": "Canonical",
+        "peak_upload_bytes": 2094368,
+        "pending_patches": 0,
+        "preparation_last_frame_micros": 1185,
+        "preparation_overruns": 535,
+        "preparation_peak_micros": 19480,
+        "presentation_ready": true,
+        "selection_last_frame_micros": 0,
+        "total_generated": 300,
+        "triangles": 162622,
+        "uploaded_last_frame_bytes": 76800
+      },
+      "player": {
+        "eye_position_meters": [
+          14.000008206564244,
+          2985360.749967173,
+          0.0
+        ],
+        "local_ship_position_meters": null,
+        "location": "Surface",
+        "look_target_meters": [
+          13.004680168648086,
+          2985360.8465181803,
+          -3.816844395261542e-17
+        ],
+        "nearby_body": {
+          "name": "Vesper",
+          "surface_distance_meters": 1.75
+        },
+        "relative_speed_meters_per_second": 0.0,
+        "relative_velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_local_eye_position_meters": [
+          3.1086262911737537e-15,
+          -0.3580596926622093,
+          14.000008206564244
+        ],
+        "speed_meters_per_second": 0.0,
+        "up": [
+          4.689553406933555e-06,
+          1.0,
+          0.0
+        ],
+        "velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "png": "step-017-environment-settings.png",
+      "sha256": "4dc239f45d053463da47635686cd0a3a33fbd174fb69006c01f50ea5bfb9265a",
+      "audio_output": {
+        "area": null,
+        "available": false,
+        "backend": "cpal-0.18.2",
+        "callback_cpu_overruns": 0,
+        "callbacks": 0,
+        "channels": 0,
+        "device_id": null,
+        "environment_warning": null,
+        "frames": 0,
+        "mailbox_bytes": 672,
+        "max_callback_frames": 0,
+        "max_callback_ns": 0,
+        "mixer_bytes": 3240,
+        "preview_only": true,
+        "sample_format": null,
+        "sample_rate": 0,
+        "scene_events": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "scene_filters": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "scene_gains": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "settings": {
+          "camera_motion": true,
+          "condition_audio": true,
+          "environment_audio": true,
+          "environment_cues": true,
+          "environment_volume_percent": 60,
+          "master_mute": false,
+          "scene_audio": true,
+          "scene_volume_percent": 60,
+          "version": 1,
+          "vignette": true
+        },
+        "voices": 32
+      },
+      "visual_context": {
+        "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "backend": "Vulkan",
+        "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+        "scale_factor": 1.0,
+        "viewport_pixels": [
+          1280,
+          800
+        ]
+      },
+      "terrain": {
+        "active_patches": 300,
+        "cache_patches": 300,
+        "cpu_cache_bytes": 8867180,
+        "generated_last_frame": 0,
+        "generated_peak": 2,
+        "generation_last_frame_micros": 0,
+        "generation_peak_micros": 18950,
+        "generation_total_micros": 776092,
+        "gpu_cache_bytes": 6904548,
+        "gpu_ready": true,
+        "mode": "Canonical",
+        "peak_upload_bytes": 2094368,
+        "pending_patches": 0,
+        "preparation_last_frame_micros": 743,
+        "preparation_overruns": 535,
+        "preparation_peak_micros": 19480,
+        "presentation_ready": true,
+        "selection_last_frame_micros": 0,
+        "total_generated": 300,
+        "triangles": 162622,
+        "uploaded_last_frame_bytes": 76800
+      },
+      "player": {
+        "eye_position_meters": [
+          14.000008206564244,
+          2985360.749967173,
+          0.0
+        ],
+        "local_ship_position_meters": null,
+        "location": "Surface",
+        "look_target_meters": [
+          13.004680168648086,
+          2985360.8465181803,
+          -3.816844395261542e-17
+        ],
+        "nearby_body": {
+          "name": "Vesper",
+          "surface_distance_meters": 1.75
+        },
+        "relative_speed_meters_per_second": 0.0,
+        "relative_velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_local_eye_position_meters": [
+          3.1086262911737537e-15,
+          -0.3580596926622093,
+          14.000008206564244
+        ],
+        "speed_meters_per_second": 0.0,
+        "up": [
+          4.689553406933555e-06,
+          1.0,
+          0.0
+        ],
+        "velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "png": "step-030-independent-settings.png",
+      "sha256": "ec049ff5b33c17e46cb3ab3e3d2dd279bc3be1d56fcd4ad08cfe23935ca4e1cf",
+      "audio_output": {
+        "area": null,
+        "available": false,
+        "backend": "cpal-0.18.2",
+        "callback_cpu_overruns": 0,
+        "callbacks": 0,
+        "channels": 0,
+        "device_id": null,
+        "environment_warning": null,
+        "frames": 0,
+        "mailbox_bytes": 672,
+        "max_callback_frames": 0,
+        "max_callback_ns": 0,
+        "mixer_bytes": 3240,
+        "preview_only": true,
+        "sample_format": null,
+        "sample_rate": 0,
+        "scene_events": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "scene_filters": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "scene_gains": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "settings": {
+          "camera_motion": true,
+          "condition_audio": true,
+          "environment_audio": false,
+          "environment_cues": false,
+          "environment_volume_percent": 80,
+          "master_mute": false,
+          "scene_audio": true,
+          "scene_volume_percent": 60,
+          "version": 1,
+          "vignette": true
+        },
+        "voices": 32
+      },
+      "visual_context": {
+        "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "backend": "Vulkan",
+        "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+        "scale_factor": 1.0,
+        "viewport_pixels": [
+          1280,
+          800
+        ]
+      },
+      "terrain": {
+        "active_patches": 300,
+        "cache_patches": 300,
+        "cpu_cache_bytes": 8867180,
+        "generated_last_frame": 0,
+        "generated_peak": 2,
+        "generation_last_frame_micros": 0,
+        "generation_peak_micros": 18950,
+        "generation_total_micros": 776092,
+        "gpu_cache_bytes": 6904548,
+        "gpu_ready": true,
+        "mode": "Canonical",
+        "peak_upload_bytes": 2094368,
+        "pending_patches": 0,
+        "preparation_last_frame_micros": 849,
+        "preparation_overruns": 535,
+        "preparation_peak_micros": 19480,
+        "presentation_ready": true,
+        "selection_last_frame_micros": 0,
+        "total_generated": 300,
+        "triangles": 162622,
+        "uploaded_last_frame_bytes": 76800
+      },
+      "player": {
+        "eye_position_meters": [
+          14.000008206564244,
+          2985360.749967173,
+          0.0
+        ],
+        "local_ship_position_meters": null,
+        "location": "Surface",
+        "look_target_meters": [
+          13.004680168648086,
+          2985360.8465181803,
+          -3.816844395261542e-17
+        ],
+        "nearby_body": {
+          "name": "Vesper",
+          "surface_distance_meters": 1.75
+        },
+        "relative_speed_meters_per_second": 0.0,
+        "relative_velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_local_eye_position_meters": [
+          3.1086262911737537e-15,
+          -0.3580596926622093,
+          14.000008206564244
+        ],
+        "speed_meters_per_second": 0.0,
+        "up": [
+          4.689553406933555e-06,
+          1.0,
+          0.0
+        ],
+        "velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "png": "step-067-scout-interior-vacuum.png",
+      "sha256": "2b47ae699818b67d3784f74e3e168a8cabbdce15b2bb6f61d280840a090d2e97",
+      "audio_output": {
+        "area": "habitation/engineering",
+        "available": false,
+        "backend": "cpal-0.18.2",
+        "callback_cpu_overruns": 0,
+        "callbacks": 0,
+        "channels": 0,
+        "device_id": null,
+        "environment_warning": null,
+        "frames": 0,
+        "mailbox_bytes": 672,
+        "max_callback_frames": 0,
+        "max_callback_ns": 0,
+        "mixer_bytes": 3240,
+        "preview_only": true,
+        "sample_format": null,
+        "sample_rate": 0,
+        "scene_events": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "scene_filters": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.15000000596046448,
+          0.36000001430511475,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scene_gains": [
+          0.024450154975056648,
+          0.007131626829504967,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "settings": {
+          "camera_motion": true,
+          "condition_audio": true,
+          "environment_audio": true,
+          "environment_cues": true,
+          "environment_volume_percent": 80,
+          "master_mute": false,
+          "scene_audio": true,
+          "scene_volume_percent": 60,
+          "version": 1,
+          "vignette": true
+        },
+        "voices": 32
+      },
+      "visual_context": {
+        "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "backend": "Vulkan",
+        "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+        "scale_factor": 1.0,
+        "viewport_pixels": [
+          1280,
+          800
+        ]
+      },
+      "terrain": {
+        "active_patches": 300,
+        "cache_patches": 300,
+        "cpu_cache_bytes": 8867180,
+        "generated_last_frame": 0,
+        "generated_peak": 2,
+        "generation_last_frame_micros": 0,
+        "generation_peak_micros": 18950,
+        "generation_total_micros": 776092,
+        "gpu_cache_bytes": 6904548,
+        "gpu_ready": true,
+        "mode": "Canonical",
+        "peak_upload_bytes": 2094368,
+        "pending_patches": 0,
+        "preparation_last_frame_micros": 518,
+        "preparation_overruns": 537,
+        "preparation_peak_micros": 19480,
+        "presentation_ready": true,
+        "selection_last_frame_micros": 0,
+        "total_generated": 300,
+        "triangles": 162622,
+        "uploaded_last_frame_bytes": 76800
+      },
+      "player": {
+        "eye_position_meters": [
+          0.016008206614730916,
+          2985363.1053386936,
+          3.172504169249426
+        ],
+        "local_ship_position_meters": [
+          -3.172504169249426,
+          1.9973118279569892,
+          0.01600820661473162
+        ],
+        "location": "InsideShip",
+        "look_target_meters": [
+          0.016008206614731138,
+          2985363.201885033,
+          2.177175678563125
+        ],
+        "nearby_body": {
+          "name": "Vesper",
+          "surface_distance_meters": 4.105340379290283
+        },
+        "relative_speed_meters_per_second": 0.0,
+        "relative_velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_local_eye_position_meters": [
+          -3.172504169249426,
+          1.9973118277266622,
+          0.01600820661473162
+        ],
+        "speed_meters_per_second": 0.0,
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    }
+  ]
+}

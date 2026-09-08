@@ -1,0 +1,30 @@
+[package]
+name = "salimon-client"
+description = "Native lifecycle and client composition executable for Salimon"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+salimon-universe = { path = "../universe" }
+serde.workspace = true
+salimon-survival = { path = "../survival" }
+salimon-persistence = { path = "../persistence" }
+salimon-fabrication = { path = "../fabrication" }
+salimon-physics = { path = "../physics" }
+salimon-math = { path = "../math" }
+env_logger.workspace = true
+log.workspace = true
+pollster.workspace = true
+serde_json.workspace = true
+salimon-character = { path = "../character" }
+salimon-diagnostics = { path = "../diagnostics" }
+salimon-renderer = { path = "../renderer" }
+salimon-ship = { path = "../ship" }
+salimon-world = { path = "../world" }
+winit.workspace = true
+cpal = "0.18.2"

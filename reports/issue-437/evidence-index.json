@@ -1,0 +1,1611 @@
+{
+  "status": "passed",
+  "commands": [
+    {
+      "name": "ship-contracts",
+      "argv": [
+        "cargo",
+        "test",
+        "-p",
+        "salimon-ship",
+        "--locked",
+        "--",
+        "--nocapture"
+      ],
+      "log": "/workspace/salimon/artifacts/issue-437/acceptance-final/ship-contracts.log",
+      "exit_code": 0,
+      "elapsed_seconds": 16.51023770500001
+    },
+    {
+      "name": "session-contracts",
+      "argv": [
+        "cargo",
+        "test",
+        "-p",
+        "salimon-client",
+        "--locked"
+      ],
+      "log": "/workspace/salimon/artifacts/issue-437/acceptance-final/session-contracts.log",
+      "exit_code": 0,
+      "elapsed_seconds": 285.262090273
+    },
+    {
+      "name": "native-routes",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/salimon/scripts/salimon-test",
+        "suite",
+        "--group",
+        "universe-flight",
+        "--binary",
+        "/workspace/salimon/target/debug/salimon-client",
+        "--artifacts",
+        "/workspace/salimon/artifacts/issue-437/acceptance-final/native",
+        "--screenshot-command",
+        "[\"native\"]",
+        "--summary"
+      ],
+      "log": "/workspace/salimon/artifacts/issue-437/acceptance-final/native-routes.log",
+      "exit_code": 0,
+      "elapsed_seconds": 300.33840967000003
+    },
+    {
+      "name": "os-input",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/salimon/scripts/packaged_smoke.py",
+        "--binary",
+        "/workspace/salimon/target/debug/salimon-client",
+        "--artifacts",
+        "/workspace/salimon/artifacts/issue-437/acceptance-final/os-input",
+        "--timeout",
+        "180"
+      ],
+      "log": "/workspace/salimon/artifacts/issue-437/acceptance-final/os-input.log",
+      "exit_code": 0,
+      "elapsed_seconds": 4.3751538380001875
+    }
+  ],
+  "environment": {
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "python": "3.12.14",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "display": ":98",
+    "wgpu_backend": "vulkan",
+    "vulkan_driver": "/workspace/.salimon-tools/sysroot/usr/share/vulkan/icd.d/lvp_icd.json",
+    "software_threads": "2"
+  },
+  "binary_sha256": "95261956f6f11c752af9b73342daf60c53e9905ef176d1e09915bdc3edbded1e",
+  "source_revision": "02bdd51dcff85d1405a20e72ea9d4d720d1724fb",
+  "source_dirty": true,
+  "boundaries": {
+    "protocol_routes": "production session controls; deterministic scenario initial conditions",
+    "os_input": "normal launch and X11 F2 press/release, not flight protocol input",
+    "orbital_tests": "real-scale production APIs with declared ephemerides; not a playable orbit claim",
+    "physical_devices": "unverified #557",
+    "presentation": "unverified #561",
+    "hardware_M1_Metal_FPS": "unverified #563",
+    "offline_trajectory": "not certified; #432-#434"
+  },
+  "routes": [
+    {
+      "scenario": "universe-flight.json",
+      "steps": 13,
+      "original_result_sha256": "41b426622dead652dc3db80a15a886ea516a0f57d7a2bc407e286a5b87fd2305",
+      "raw_result_member": "native/run-isi0aqeg/result.json",
+      "captures": [
+        {
+          "label": "canonical-takeoff",
+          "path": "/workspace/salimon/artifacts/issue-437/acceptance-final/native/run-isi0aqeg/step-007-canonical-takeoff.png",
+          "sha256": "0b2cc0bbf2aaa50c730ce30914ae93b19b281f3cd2a20d59fae180adad989b61",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "terrain": {
+            "active_patches": 300,
+            "cache_patches": 300,
+            "cpu_cache_bytes": 8867180,
+            "generated_last_frame": 0,
+            "generated_peak": 2,
+            "generation_last_frame_micros": 0,
+            "generation_peak_micros": 6185,
+            "generation_total_micros": 660396,
+            "gpu_cache_bytes": 6904548,
+            "gpu_ready": true,
+            "mode": "Canonical",
+            "peak_upload_bytes": 2089964,
+            "pending_patches": 0,
+            "preparation_last_frame_micros": 589,
+            "preparation_overruns": 544,
+            "preparation_peak_micros": 6730,
+            "presentation_ready": true,
+            "selection_last_frame_micros": 0,
+            "total_generated": 300,
+            "triangles": 162622,
+            "uploaded_last_frame_bytes": 76800
+          },
+          "metrics": {
+            "present_ms": {
+              "count": 560,
+              "median": 64.431094,
+              "p95": 84.25061000000001,
+              "max": 250.0
+            },
+            "cpu_update_ms": {
+              "count": 560,
+              "median": 3.2080585,
+              "p95": 5.361059,
+              "max": 11.019236
+            },
+            "cpu_render_ms": {
+              "count": 560,
+              "median": 1.7522579999999999,
+              "p95": 4.053642,
+              "max": 120.41409999999999
+            },
+            "gpu_ms": {
+              "count": 559,
+              "median": 52.399594,
+              "p95": 71.21006200000001,
+              "max": 182.45299
+            },
+            "scene_draws": {
+              "count": 560,
+              "median": 8.0,
+              "p95": 8.0,
+              "max": 308.0
+            },
+            "total_draws": {
+              "count": 560,
+              "median": 12.0,
+              "p95": 12.0,
+              "max": 312.0
+            }
+          },
+          "reference_camera": null,
+          "retained_path": "captures/universe-flight-step-007-canonical-takeoff.png"
+        },
+        {
+          "label": "canonical-landed",
+          "path": "/workspace/salimon/artifacts/issue-437/acceptance-final/native/run-isi0aqeg/step-013-canonical-landed.png",
+          "sha256": "e244c9d697f174d7b6978e9af1eed5c9a2eebd86c9c5d7b8ff034bfadd606591",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "terrain": {
+            "active_patches": 300,
+            "cache_patches": 300,
+            "cpu_cache_bytes": 8867180,
+            "generated_last_frame": 0,
+            "generated_peak": 2,
+            "generation_last_frame_micros": 0,
+            "generation_peak_micros": 6185,
+            "generation_total_micros": 660396,
+            "gpu_cache_bytes": 6904548,
+            "gpu_ready": true,
+            "mode": "Canonical",
+            "peak_upload_bytes": 2089964,
+            "pending_patches": 0,
+            "preparation_last_frame_micros": 538,
+            "preparation_overruns": 544,
+            "preparation_peak_micros": 6730,
+            "presentation_ready": true,
+            "selection_last_frame_micros": 0,
+            "total_generated": 300,
+            "triangles": 162622,
+            "uploaded_last_frame_bytes": 76800
+          },
+          "metrics": {
+            "present_ms": {
+              "count": 572,
+              "median": 64.641737,
+              "p95": 94.723931,
+              "max": 250.0
+            },
+            "cpu_update_ms": {
+              "count": 572,
+              "median": 3.1932565,
+              "p95": 5.361059,
+              "max": 11.019236
+            },
+            "cpu_render_ms": {
+              "count": 572,
+              "median": 1.75711,
+              "p95": 8.536029000000001,
+              "max": 1510.961024
+            },
+            "gpu_ms": {
+              "count": 571,
+              "median": 52.58102,
+              "p95": 74.04305,
+              "max": 182.45299
+            },
+            "scene_draws": {
+              "count": 572,
+              "median": 8.0,
+              "p95": 8.0,
+              "max": 308.0
+            },
+            "total_draws": {
+              "count": 572,
+              "median": 12.0,
+              "p95": 12.0,
+              "max": 312.0
+            }
+          },
+          "reference_camera": null,
+          "retained_path": "captures/universe-flight-step-013-canonical-landed.png"
+        }
+      ]
+    },
+    {
+      "scenario": "universe-navigation.json",
+      "steps": 19,
+      "original_result_sha256": "9008f6545e15a7168ed7236e6381b6a72908581df97cf76a9f436b39622a5812",
+      "raw_result_member": "native/run-hr79st33/result.json",
+      "captures": [
+        {
+          "label": "predicted-contact",
+          "path": "/workspace/salimon/artifacts/issue-437/acceptance-final/native/run-hr79st33/step-012-predicted-contact.png",
+          "sha256": "a485df1a2edc27af591a4b01d540809c9aa2635a7f86dc21be27a062c40475b0",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "terrain": {
+            "active_patches": 300,
+            "cache_patches": 300,
+            "cpu_cache_bytes": 8867180,
+            "generated_last_frame": 0,
+            "generated_peak": 2,
+            "generation_last_frame_micros": 0,
+            "generation_peak_micros": 4612,
+            "generation_total_micros": 639800,
+            "gpu_cache_bytes": 6904548,
+            "gpu_ready": true,
+            "mode": "Canonical",
+            "peak_upload_bytes": 2089964,
+            "pending_patches": 0,
+            "preparation_last_frame_micros": 547,
+            "preparation_overruns": 531,
+            "preparation_peak_micros": 4909,
+            "presentation_ready": true,
+            "selection_last_frame_micros": 0,
+            "total_generated": 300,
+            "triangles": 162622,
+            "uploaded_last_frame_bytes": 76800
+          },
+          "metrics": {
+            "present_ms": {
+              "count": 548,
+              "median": 74.32648699999999,
+              "p95": 94.126999,
+              "max": 250.0
+            },
+            "cpu_update_ms": {
+              "count": 548,
+              "median": 2.788482,
+              "p95": 4.756019,
+              "max": 6.6136550000000005
+            },
+            "cpu_render_ms": {
+              "count": 548,
+              "median": 1.3604825,
+              "p95": 2.70361,
+              "max": 120.600218
+            },
+            "gpu_ms": {
+              "count": 547,
+              "median": 59.004197,
+              "p95": 78.365511,
+              "max": 179.391675
+            },
+            "scene_draws": {
+              "count": 548,
+              "median": 6.0,
+              "p95": 6.0,
+              "max": 306.0
+            },
+            "total_draws": {
+              "count": 548,
+              "median": 7.0,
+              "p95": 7.0,
+              "max": 310.0
+            }
+          },
+          "reference_camera": {
+            "canonical_terrain_clearance_meters": null,
+            "name": "cockpit"
+          },
+          "retained_path": "captures/universe-navigation-step-012-predicted-contact.png"
+        },
+        {
+          "label": "contact-unavailable",
+          "path": "/workspace/salimon/artifacts/issue-437/acceptance-final/native/run-hr79st33/step-019-contact-unavailable.png",
+          "sha256": "0bc17a12fb8150b9ab54462889c370790d3a635898be44a362cd977446939bf0",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "terrain": {
+            "active_patches": 300,
+            "cache_patches": 300,
+            "cpu_cache_bytes": 8867180,
+            "generated_last_frame": 0,
+            "generated_peak": 2,
+            "generation_last_frame_micros": 0,
+            "generation_peak_micros": 4612,
+            "generation_total_micros": 639800,
+            "gpu_cache_bytes": 6904548,
+            "gpu_ready": true,
+            "mode": "Canonical",
+            "peak_upload_bytes": 2089964,
+            "pending_patches": 0,
+            "preparation_last_frame_micros": 517,
+            "preparation_overruns": 531,
+            "preparation_peak_micros": 4909,
+            "presentation_ready": true,
+            "selection_last_frame_micros": 0,
+            "total_generated": 300,
+            "triangles": 162622,
+            "uploaded_last_frame_bytes": 76800
+          },
+          "metrics": {
+            "present_ms": {
+              "count": 561,
+              "median": 74.478876,
+              "p95": 171.67834000000002,
+              "max": 250.0
+            },
+            "cpu_update_ms": {
+              "count": 561,
+              "median": 2.787115,
+              "p95": 4.756019,
+              "max": 9.309001
+            },
+            "cpu_render_ms": {
+              "count": 561,
+              "median": 1.362851,
+              "p95": 8.989120999999999,
+              "max": 1424.255638
+            },
+            "gpu_ms": {
+              "count": 560,
+              "median": 59.3486425,
+              "p95": 89.424819,
+              "max": 182.232982
+            },
+            "scene_draws": {
+              "count": 561,
+              "median": 6.0,
+              "p95": 272.0,
+              "max": 308.0
+            },
+            "total_draws": {
+              "count": 561,
+              "median": 7.0,
+              "p95": 273.0,
+              "max": 312.0
+            }
+          },
+          "reference_camera": {
+            "canonical_terrain_clearance_meters": null,
+            "name": "cockpit"
+          },
+          "retained_path": "captures/universe-navigation-step-019-contact-unavailable.png"
+        }
+      ]
+    },
+    {
+      "scenario": "inertial-flight.json",
+      "steps": 426,
+      "original_result_sha256": "ce10ef325fc7aca3d64fdeaf407088bef854f18d8ede934a0cc79c2e5fb69895",
+      "raw_result_member": "native/run-ytapcb8z/result.json",
+      "captures": [
+        {
+          "label": "inertial-flight",
+          "path": "/workspace/salimon/artifacts/issue-437/acceptance-final/native/run-ytapcb8z/step-426-inertial-flight.png",
+          "sha256": "4ab035d240d42501406b591133dc4815d887c042cf9d84a06130709d8cf8f150",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "terrain": {
+            "active_patches": 0,
+            "cache_patches": 0,
+            "cpu_cache_bytes": 0,
+            "generated_last_frame": 0,
+            "generated_peak": 0,
+            "generation_last_frame_micros": 0,
+            "generation_peak_micros": 0,
+            "generation_total_micros": 0,
+            "gpu_cache_bytes": 131072,
+            "gpu_ready": true,
+            "mode": "Flat",
+            "peak_upload_bytes": 0,
+            "pending_patches": 0,
+            "preparation_last_frame_micros": 1,
+            "preparation_overruns": 0,
+            "preparation_peak_micros": 59,
+            "presentation_ready": true,
+            "selection_last_frame_micros": 0,
+            "total_generated": 0,
+            "triangles": 0,
+            "uploaded_last_frame_bytes": 0
+          },
+          "metrics": {
+            "present_ms": {
+              "count": 836,
+              "median": 39.3203185,
+              "p95": 51.156764,
+              "max": 113.538859
+            },
+            "cpu_update_ms": {
+              "count": 836,
+              "median": 0.5253909999999999,
+              "p95": 0.753545,
+              "max": 63.55250899999999
+            },
+            "cpu_render_ms": {
+              "count": 836,
+              "median": 5.438456,
+              "p95": 16.459905,
+              "max": 46.468745
+            },
+            "gpu_ms": {
+              "count": 835,
+              "median": 23.421744,
+              "p95": 31.217038,
+              "max": 107.461958
+            },
+            "scene_draws": {
+              "count": 836,
+              "median": 4.0,
+              "p95": 4.0,
+              "max": 4.0
+            },
+            "total_draws": {
+              "count": 836,
+              "median": 7.0,
+              "p95": 7.0,
+              "max": 7.0
+            }
+          },
+          "reference_camera": null,
+          "retained_path": "captures/inertial-flight-step-426-inertial-flight.png"
+        }
+      ]
+    },
+    {
+      "scenario": "core-restart.json",
+      "steps": 20,
+      "original_result_sha256": "54444edcf87c9a44102988b7e6a111623bd21de34e91f3cae4239ceb4ec82566",
+      "raw_result_member": "native/run-hb_8cz1_/result.json",
+      "captures": [
+        {
+          "label": "core-restart",
+          "path": "/workspace/salimon/artifacts/issue-437/acceptance-final/native/run-hb_8cz1_/step-020-core-restart.png",
+          "sha256": "a2b86bb31cfb5b5ac913857a7c83f50d3934b4e2e36877ce58208817bd1cb02b",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "terrain": {
+            "active_patches": 0,
+            "cache_patches": 0,
+            "cpu_cache_bytes": 0,
+            "generated_last_frame": 0,
+            "generated_peak": 0,
+            "generation_last_frame_micros": 0,
+            "generation_peak_micros": 0,
+            "generation_total_micros": 0,
+            "gpu_cache_bytes": 131072,
+            "gpu_ready": true,
+            "mode": "Flat",
+            "peak_upload_bytes": 0,
+            "pending_patches": 0,
+            "preparation_last_frame_micros": 1,
+            "preparation_overruns": 0,
+            "preparation_peak_micros": 73,
+            "presentation_ready": true,
+            "selection_last_frame_micros": 0,
+            "total_generated": 0,
+            "triangles": 0,
+            "uploaded_last_frame_bytes": 0
+          },
+          "metrics": {
+            "present_ms": {
+              "count": 24,
+              "median": 52.628981499999995,
+              "p95": 91.73523899999999,
+              "max": 182.613539
+            },
+            "cpu_update_ms": {
+              "count": 24,
+              "median": 0.47448349999999995,
+              "p95": 0.885122,
+              "max": 2.296006
+            },
+            "cpu_render_ms": {
+              "count": 24,
+              "median": 1.663043,
+              "p95": 34.613369999999996,
+              "max": 40.203975
+            },
+            "gpu_ms": {
+              "count": 23,
+              "median": 44.089864,
+              "p95": 61.610885999999994,
+              "max": 73.11978900000001
+            },
+            "scene_draws": {
+              "count": 24,
+              "median": 4.0,
+              "p95": 5.0,
+              "max": 5.0
+            },
+            "total_draws": {
+              "count": 24,
+              "median": 8.0,
+              "p95": 9.0,
+              "max": 9.0
+            }
+          },
+          "reference_camera": null,
+          "retained_path": "captures/core-restart-step-020-core-restart.png"
+        }
+      ]
+    },
+    {
+      "scenario": "crash-recovery.json",
+      "steps": 19,
+      "original_result_sha256": "a618ed634a4e4c6ad6c8fb04fc03b7d357eaff7d95c83eba32b0e0d78a609b12",
+      "raw_result_member": "native/run-c85cfmbo/result.json",
+      "captures": [
+        {
+          "label": "crash-recovery",
+          "path": "/workspace/salimon/artifacts/issue-437/acceptance-final/native/run-c85cfmbo/step-019-crash-recovery.png",
+          "sha256": "4d9940cc1af73d5eb35c83cae33b255a04c7d6943a72becc039e786dd1d77260",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "terrain": {
+            "active_patches": 0,
+            "cache_patches": 0,
+            "cpu_cache_bytes": 0,
+            "generated_last_frame": 0,
+            "generated_peak": 0,
+            "generation_last_frame_micros": 0,
+            "generation_peak_micros": 0,
+            "generation_total_micros": 0,
+            "gpu_cache_bytes": 131072,
+            "gpu_ready": true,
+            "mode": "Flat",
+            "peak_upload_bytes": 0,
+            "pending_patches": 0,
+            "preparation_last_frame_micros": 1,
+            "preparation_overruns": 0,
+            "preparation_peak_micros": 4,
+            "presentation_ready": true,
+            "selection_last_frame_micros": 0,
+            "total_generated": 0,
+            "triangles": 0,
+            "uploaded_last_frame_bytes": 0
+          },
+          "metrics": {
+            "present_ms": {
+              "count": 25,
+              "median": 60.952064,
+              "p95": 167.98424,
+              "max": 192.850032
+            },
+            "cpu_update_ms": {
+              "count": 25,
+              "median": 0.641195,
+              "p95": 5.781943,
+              "max": 72.59
+            },
+            "cpu_render_ms": {
+              "count": 25,
+              "median": 2.103176,
+              "p95": 27.202204000000002,
+              "max": 47.471983
+            },
+            "gpu_ms": {
+              "count": 24,
+              "median": 46.2339245,
+              "p95": 59.506767,
+              "max": 73.169032
+            },
+            "scene_draws": {
+              "count": 25,
+              "median": 11.0,
+              "p95": 11.0,
+              "max": 11.0
+            },
+            "total_draws": {
+              "count": 25,
+              "median": 15.0,
+              "p95": 15.0,
+              "max": 15.0
+            }
+          },
+          "reference_camera": null,
+          "retained_path": "captures/crash-recovery-step-019-crash-recovery.png"
+        }
+      ]
+    },
+    {
+      "scenario": "cargo-flight.json",
+      "steps": 7,
+      "original_result_sha256": "aaac6dc47552589368e3c552cbdd0d3598d721cdfcefd5ff1399f7e4a95d867b",
+      "raw_result_member": "native/run-zls5slko/result.json",
+      "captures": [
+        {
+          "label": "cargo-flight",
+          "path": "/workspace/salimon/artifacts/issue-437/acceptance-final/native/run-zls5slko/step-007-cargo-flight.png",
+          "sha256": "0603ace97d5bb90d23d9416c56dc676fe8fd09a34f381f21192abb208ebb4b02",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "terrain": {
+            "active_patches": 0,
+            "cache_patches": 0,
+            "cpu_cache_bytes": 0,
+            "generated_last_frame": 0,
+            "generated_peak": 0,
+            "generation_last_frame_micros": 0,
+            "generation_peak_micros": 0,
+            "generation_total_micros": 0,
+            "gpu_cache_bytes": 131072,
+            "gpu_ready": true,
+            "mode": "Flat",
+            "peak_upload_bytes": 0,
+            "pending_patches": 0,
+            "preparation_last_frame_micros": 2,
+            "preparation_overruns": 0,
+            "preparation_peak_micros": 13,
+            "presentation_ready": true,
+            "selection_last_frame_micros": 0,
+            "total_generated": 0,
+            "triangles": 0,
+            "uploaded_last_frame_bytes": 0
+          },
+          "metrics": {
+            "present_ms": {
+              "count": 27,
+              "median": 38.79414,
+              "p95": 95.63985699999999,
+              "max": 118.30278299999999
+            },
+            "cpu_update_ms": {
+              "count": 27,
+              "median": 1.815323,
+              "p95": 2.673625,
+              "max": 3.078444
+            },
+            "cpu_render_ms": {
+              "count": 27,
+              "median": 2.030245,
+              "p95": 19.748425,
+              "max": 46.964919
+            },
+            "gpu_ms": {
+              "count": 26,
+              "median": 27.296303,
+              "p95": 47.296383,
+              "max": 47.438988
+            },
+            "scene_draws": {
+              "count": 27,
+              "median": 4.0,
+              "p95": 4.0,
+              "max": 4.0
+            },
+            "total_draws": {
+              "count": 27,
+              "median": 7.0,
+              "p95": 7.0,
+              "max": 7.0
+            }
+          },
+          "reference_camera": null,
+          "retained_path": "captures/cargo-flight-step-007-cargo-flight.png"
+        }
+      ]
+    },
+    {
+      "scenario": "moving-eva.json",
+      "steps": 112,
+      "original_result_sha256": "ba6a747008cad7537b6c4d2079038e529e4155cecaa1f7faa6cdf7b711429117",
+      "raw_result_member": "native/run-3l64305j/result.json",
+      "captures": [
+        {
+          "label": "moving-eva-no-input-drift",
+          "path": "/workspace/salimon/artifacts/issue-437/acceptance-final/native/run-3l64305j/step-037-moving-eva-no-input-drift.png",
+          "sha256": "2c29ab5c941d31fc1d1ff8f8f1314b81c45afac8bc1144004e86f0fb8864f8cd",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "terrain": {
+            "active_patches": 0,
+            "cache_patches": 0,
+            "cpu_cache_bytes": 0,
+            "generated_last_frame": 0,
+            "generated_peak": 0,
+            "generation_last_frame_micros": 0,
+            "generation_peak_micros": 0,
+            "generation_total_micros": 0,
+            "gpu_cache_bytes": 131072,
+            "gpu_ready": true,
+            "mode": "Flat",
+            "peak_upload_bytes": 0,
+            "pending_patches": 0,
+            "preparation_last_frame_micros": 2,
+            "preparation_overruns": 0,
+            "preparation_peak_micros": 5,
+            "presentation_ready": true,
+            "selection_last_frame_micros": 0,
+            "total_generated": 0,
+            "triangles": 0,
+            "uploaded_last_frame_bytes": 0
+          },
+          "metrics": {
+            "present_ms": {
+              "count": 59,
+              "median": 60.669154000000006,
+              "p95": 92.24522999999999,
+              "max": 168.40201499999998
+            },
+            "cpu_update_ms": {
+              "count": 59,
+              "median": 0.5223260000000001,
+              "p95": 0.960276,
+              "max": 65.06325
+            },
+            "cpu_render_ms": {
+              "count": 59,
+              "median": 1.533288,
+              "p95": 8.513594,
+              "max": 50.341632
+            },
+            "gpu_ms": {
+              "count": 58,
+              "median": 52.9698845,
+              "p95": 76.503397,
+              "max": 82.965755
+            },
+            "scene_draws": {
+              "count": 59,
+              "median": 5.0,
+              "p95": 5.0,
+              "max": 5.0
+            },
+            "total_draws": {
+              "count": 59,
+              "median": 8.0,
+              "p95": 9.0,
+              "max": 9.0
+            }
+          },
+          "reference_camera": null,
+          "retained_path": "captures/moving-eva-step-037-moving-eva-no-input-drift.png"
+        },
+        {
+          "label": "moving-eva-vertical-flight",
+          "path": "/workspace/salimon/artifacts/issue-437/acceptance-final/native/run-3l64305j/step-046-moving-eva-vertical-flight.png",
+          "sha256": "1ec812955c278c5a45f47ea7c41b07cb3dc7dd4c95c1513874d1dac19190fa66",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "terrain": {
+            "active_patches": 0,
+            "cache_patches": 0,
+            "cpu_cache_bytes": 0,
+            "generated_last_frame": 0,
+            "generated_peak": 0,
+            "generation_last_frame_micros": 0,
+            "generation_peak_micros": 0,
+            "generation_total_micros": 0,
+            "gpu_cache_bytes": 131072,
+            "gpu_ready": true,
+            "mode": "Flat",
+            "peak_upload_bytes": 0,
+            "pending_patches": 0,
+            "preparation_last_frame_micros": 2,
+            "preparation_overruns": 0,
+            "preparation_peak_micros": 5,
+            "presentation_ready": true,
+            "selection_last_frame_micros": 0,
+            "total_generated": 0,
+            "triangles": 0,
+            "uploaded_last_frame_bytes": 0
+          },
+          "metrics": {
+            "present_ms": {
+              "count": 73,
+              "median": 60.867451,
+              "p95": 92.24522999999999,
+              "max": 250.0
+            },
+            "cpu_update_ms": {
+              "count": 73,
+              "median": 0.506562,
+              "p95": 0.793925,
+              "max": 65.06325
+            },
+            "cpu_render_ms": {
+              "count": 73,
+              "median": 1.547149,
+              "p95": 8.513594,
+              "max": 1115.404058
+            },
+            "gpu_ms": {
+              "count": 72,
+              "median": 53.0264945,
+              "p95": 76.503397,
+              "max": 82.965755
+            },
+            "scene_draws": {
+              "count": 73,
+              "median": 5.0,
+              "p95": 5.0,
+              "max": 5.0
+            },
+            "total_draws": {
+              "count": 73,
+              "median": 9.0,
+              "p95": 9.0,
+              "max": 9.0
+            }
+          },
+          "reference_camera": null,
+          "retained_path": "captures/moving-eva-step-046-moving-eva-vertical-flight.png"
+        },
+        {
+          "label": "moving-eva-reentry",
+          "path": "/workspace/salimon/artifacts/issue-437/acceptance-final/native/run-3l64305j/step-104-moving-eva-reentry.png",
+          "sha256": "54d0660b623ea6c407cfcc806530f2bd610876f116002b5eca39f173d8253cf6",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "terrain": {
+            "active_patches": 0,
+            "cache_patches": 0,
+            "cpu_cache_bytes": 0,
+            "generated_last_frame": 0,
+            "generated_peak": 0,
+            "generation_last_frame_micros": 0,
+            "generation_peak_micros": 0,
+            "generation_total_micros": 0,
+            "gpu_cache_bytes": 131072,
+            "gpu_ready": true,
+            "mode": "Flat",
+            "peak_upload_bytes": 0,
+            "pending_patches": 0,
+            "preparation_last_frame_micros": 1,
+            "preparation_overruns": 0,
+            "preparation_peak_micros": 5,
+            "presentation_ready": true,
+            "selection_last_frame_micros": 0,
+            "total_generated": 0,
+            "triangles": 0,
+            "uploaded_last_frame_bytes": 0
+          },
+          "metrics": {
+            "present_ms": {
+              "count": 172,
+              "median": 62.49511700000001,
+              "p95": 97.99086899999999,
+              "max": 250.0
+            },
+            "cpu_update_ms": {
+              "count": 172,
+              "median": 0.490638,
+              "p95": 0.683349,
+              "max": 65.06325
+            },
+            "cpu_render_ms": {
+              "count": 172,
+              "median": 1.5406235000000001,
+              "p95": 8.146883,
+              "max": 1145.171603
+            },
+            "gpu_ms": {
+              "count": 171,
+              "median": 53.214433,
+              "p95": 76.84103,
+              "max": 100.915858
+            },
+            "scene_draws": {
+              "count": 172,
+              "median": 5.0,
+              "p95": 5.0,
+              "max": 5.0
+            },
+            "total_draws": {
+              "count": 172,
+              "median": 9.0,
+              "p95": 9.0,
+              "max": 9.0
+            }
+          },
+          "reference_camera": null,
+          "retained_path": "captures/moving-eva-step-104-moving-eva-reentry.png"
+        }
+      ]
+    },
+    {
+      "scenario": "cargo-blackout.json",
+      "steps": 39,
+      "original_result_sha256": "5106a84c76fa3e971d4ec38b81a00f23ddfa938247c4f79d2f034ab6ee4f0630",
+      "raw_result_member": "native/run-tyiu0w7o/result.json",
+      "captures": [
+        {
+          "label": "blackout-500-core-off",
+          "path": "/workspace/salimon/artifacts/issue-437/acceptance-final/native/run-tyiu0w7o/step-005-blackout-500-core-off.png",
+          "sha256": "187e8b4af0eac3e00cf4bd9154efc925f0bd11f6f1e2fc4dec7d6c11abea8102",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "terrain": {
+            "active_patches": 0,
+            "cache_patches": 0,
+            "cpu_cache_bytes": 0,
+            "generated_last_frame": 0,
+            "generated_peak": 0,
+            "generation_last_frame_micros": 0,
+            "generation_peak_micros": 0,
+            "generation_total_micros": 0,
+            "gpu_cache_bytes": 131072,
+            "gpu_ready": true,
+            "mode": "Flat",
+            "peak_upload_bytes": 0,
+            "pending_patches": 0,
+            "preparation_last_frame_micros": 1,
+            "preparation_overruns": 0,
+            "preparation_peak_micros": 2,
+            "presentation_ready": true,
+            "selection_last_frame_micros": 0,
+            "total_generated": 0,
+            "triangles": 0,
+            "uploaded_last_frame_bytes": 0
+          },
+          "metrics": {
+            "present_ms": {
+              "count": 12,
+              "median": 83.660837,
+              "p95": 160.56352199999998,
+              "max": 160.56352199999998
+            },
+            "cpu_update_ms": {
+              "count": 12,
+              "median": 2.5920864999999997,
+              "p95": 3.531706,
+              "max": 3.531706
+            },
+            "cpu_render_ms": {
+              "count": 12,
+              "median": 3.7488729999999997,
+              "p95": 34.446129,
+              "max": 34.446129
+            },
+            "gpu_ms": {
+              "count": 11,
+              "median": 74.091509,
+              "p95": 79.293293,
+              "max": 79.293293
+            },
+            "scene_draws": {
+              "count": 12,
+              "median": 5.0,
+              "p95": 5.0,
+              "max": 5.0
+            },
+            "total_draws": {
+              "count": 12,
+              "median": 9.0,
+              "p95": 9.0,
+              "max": 9.0
+            }
+          },
+          "reference_camera": null,
+          "retained_path": "captures/cargo-blackout-step-005-blackout-500-core-off.png"
+        },
+        {
+          "label": "blackout-500-converting",
+          "path": "/workspace/salimon/artifacts/issue-437/acceptance-final/native/run-tyiu0w7o/step-022-blackout-500-converting.png",
+          "sha256": "fcedef0d2676ce51581b2b0e03dca89d5ce9013b33163a0f862b32fbcf4a8c5b",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "terrain": {
+            "active_patches": 0,
+            "cache_patches": 0,
+            "cpu_cache_bytes": 0,
+            "generated_last_frame": 0,
+            "generated_peak": 0,
+            "generation_last_frame_micros": 0,
+            "generation_peak_micros": 0,
+            "generation_total_micros": 0,
+            "gpu_cache_bytes": 131072,
+            "gpu_ready": true,
+            "mode": "Flat",
+            "peak_upload_bytes": 0,
+            "pending_patches": 0,
+            "preparation_last_frame_micros": 1,
+            "preparation_overruns": 0,
+            "preparation_peak_micros": 5,
+            "presentation_ready": true,
+            "selection_last_frame_micros": 0,
+            "total_generated": 0,
+            "triangles": 0,
+            "uploaded_last_frame_bytes": 0
+          },
+          "metrics": {
+            "present_ms": {
+              "count": 63,
+              "median": 103.353654,
+              "p95": 166.857656,
+              "max": 250.0
+            },
+            "cpu_update_ms": {
+              "count": 63,
+              "median": 2.49131,
+              "p95": 3.888593,
+              "max": 20.398202
+            },
+            "cpu_render_ms": {
+              "count": 63,
+              "median": 3.6227329999999998,
+              "p95": 21.666041,
+              "max": 1142.407109
+            },
+            "gpu_ms": {
+              "count": 62,
+              "median": 72.9618105,
+              "p95": 97.38517200000001,
+              "max": 112.18095
+            },
+            "scene_draws": {
+              "count": 63,
+              "median": 5.0,
+              "p95": 5.0,
+              "max": 5.0
+            },
+            "total_draws": {
+              "count": 63,
+              "median": 9.0,
+              "p95": 9.0,
+              "max": 9.0
+            }
+          },
+          "reference_camera": null,
+          "retained_path": "captures/cargo-blackout-step-022-blackout-500-converting.png"
+        },
+        {
+          "label": "blackout-500-recharged",
+          "path": "/workspace/salimon/artifacts/issue-437/acceptance-final/native/run-tyiu0w7o/step-029-blackout-500-recharged.png",
+          "sha256": "baa128984371189854c4271b119ebb0c3c8cfcd53469411c29f7eec115824c08",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "terrain": {
+            "active_patches": 0,
+            "cache_patches": 0,
+            "cpu_cache_bytes": 0,
+            "generated_last_frame": 0,
+            "generated_peak": 0,
+            "generation_last_frame_micros": 0,
+            "generation_peak_micros": 0,
+            "generation_total_micros": 0,
+            "gpu_cache_bytes": 131072,
+            "gpu_ready": true,
+            "mode": "Flat",
+            "peak_upload_bytes": 0,
+            "pending_patches": 0,
+            "preparation_last_frame_micros": 1,
+            "preparation_overruns": 0,
+            "preparation_peak_micros": 5,
+            "presentation_ready": true,
+            "selection_last_frame_micros": 0,
+            "total_generated": 0,
+            "triangles": 0,
+            "uploaded_last_frame_bytes": 0
+          },
+          "metrics": {
+            "present_ms": {
+              "count": 87,
+              "median": 103.06451799999999,
+              "p95": 221.892136,
+              "max": 250.0
+            },
+            "cpu_update_ms": {
+              "count": 87,
+              "median": 2.362626,
+              "p95": 3.888593,
+              "max": 20.398202
+            },
+            "cpu_render_ms": {
+              "count": 87,
+              "median": 3.5826819999999997,
+              "p95": 24.100135,
+              "max": 1365.897846
+            },
+            "gpu_ms": {
+              "count": 86,
+              "median": 69.97430299999999,
+              "p95": 94.574342,
+              "max": 112.18095
+            },
+            "scene_draws": {
+              "count": 87,
+              "median": 5.0,
+              "p95": 5.0,
+              "max": 5.0
+            },
+            "total_draws": {
+              "count": 87,
+              "median": 9.0,
+              "p95": 9.0,
+              "max": 9.0
+            }
+          },
+          "reference_camera": null,
+          "retained_path": "captures/cargo-blackout-step-029-blackout-500-recharged.png"
+        },
+        {
+          "label": "blackout-500-depleted-again",
+          "path": "/workspace/salimon/artifacts/issue-437/acceptance-final/native/run-tyiu0w7o/step-039-blackout-500-depleted-again.png",
+          "sha256": "c9335207e0857f61a5e043295021b4822a9bef1f098253d2a7ebce04f85a69a1",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "terrain": {
+            "active_patches": 0,
+            "cache_patches": 0,
+            "cpu_cache_bytes": 0,
+            "generated_last_frame": 0,
+            "generated_peak": 0,
+            "generation_last_frame_micros": 0,
+            "generation_peak_micros": 0,
+            "generation_total_micros": 0,
+            "gpu_cache_bytes": 131072,
+            "gpu_ready": true,
+            "mode": "Flat",
+            "peak_upload_bytes": 0,
+            "pending_patches": 0,
+            "preparation_last_frame_micros": 2,
+            "preparation_overruns": 0,
+            "preparation_peak_micros": 5,
+            "presentation_ready": true,
+            "selection_last_frame_micros": 0,
+            "total_generated": 0,
+            "triangles": 0,
+            "uploaded_last_frame_bytes": 0
+          },
+          "metrics": {
+            "present_ms": {
+              "count": 120,
+              "median": 101.0891575,
+              "p95": 250.0,
+              "max": 250.0
+            },
+            "cpu_update_ms": {
+              "count": 120,
+              "median": 2.3049195,
+              "p95": 3.531706,
+              "max": 20.398202
+            },
+            "cpu_render_ms": {
+              "count": 120,
+              "median": 3.379091,
+              "p95": 25.004065999999998,
+              "max": 1365.897846
+            },
+            "gpu_ms": {
+              "count": 119,
+              "median": 68.069357,
+              "p95": 94.508516,
+              "max": 112.18095
+            },
+            "scene_draws": {
+              "count": 120,
+              "median": 5.0,
+              "p95": 5.0,
+              "max": 5.0
+            },
+            "total_draws": {
+              "count": 120,
+              "median": 9.0,
+              "p95": 9.0,
+              "max": 9.0
+            }
+          },
+          "reference_camera": null,
+          "retained_path": "captures/cargo-blackout-step-039-blackout-500-depleted-again.png"
+        }
+      ]
+    },
+    {
+      "scenario": "landing-speed-cutoff.json",
+      "steps": 319,
+      "original_result_sha256": "0284f2bfaf82e8c639eb73cfe90452d58e78e0f4f802d22e3ec5a385884b0b9a",
+      "raw_result_member": "native/run-syloqz29/result.json",
+      "captures": [
+        {
+          "label": "landing-below-20mps",
+          "path": "/workspace/salimon/artifacts/issue-437/acceptance-final/native/run-syloqz29/step-103-landing-below-20mps.png",
+          "sha256": "793436e7b1e4d270c5adbe79ec556f1e7be92745204a5b2c0dc3bedd0781d77c",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "terrain": {
+            "active_patches": 0,
+            "cache_patches": 0,
+            "cpu_cache_bytes": 0,
+            "generated_last_frame": 0,
+            "generated_peak": 0,
+            "generation_last_frame_micros": 0,
+            "generation_peak_micros": 0,
+            "generation_total_micros": 0,
+            "gpu_cache_bytes": 131072,
+            "gpu_ready": true,
+            "mode": "Flat",
+            "peak_upload_bytes": 0,
+            "pending_patches": 0,
+            "preparation_last_frame_micros": 2,
+            "preparation_overruns": 0,
+            "preparation_peak_micros": 32,
+            "presentation_ready": true,
+            "selection_last_frame_micros": 0,
+            "total_generated": 0,
+            "triangles": 0,
+            "uploaded_last_frame_bytes": 0
+          },
+          "metrics": {
+            "present_ms": {
+              "count": 204,
+              "median": 65.96903649999999,
+              "p95": 85.956242,
+              "max": 102.404379
+            },
+            "cpu_update_ms": {
+              "count": 204,
+              "median": 2.3084695,
+              "p95": 4.536829,
+              "max": 67.880233
+            },
+            "cpu_render_ms": {
+              "count": 204,
+              "median": 8.7550725,
+              "p95": 16.974930999999998,
+              "max": 46.473922
+            },
+            "gpu_ms": {
+              "count": 203,
+              "median": 46.373586,
+              "p95": 62.826386,
+              "max": 76.332595
+            },
+            "scene_draws": {
+              "count": 204,
+              "median": 3.0,
+              "p95": 3.0,
+              "max": 3.0
+            },
+            "total_draws": {
+              "count": 204,
+              "median": 7.0,
+              "p95": 7.0,
+              "max": 7.0
+            }
+          },
+          "reference_camera": null,
+          "retained_path": "captures/landing-speed-cutoff-step-103-landing-below-20mps.png"
+        },
+        {
+          "label": "landing-rejected-above-20mps",
+          "path": "/workspace/salimon/artifacts/issue-437/acceptance-final/native/run-syloqz29/step-108-landing-rejected-above-20mps.png",
+          "sha256": "bf63ea7e911ccdb6b40d560df057fb8941a02b613f48e232df1665231a9c897c",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "terrain": {
+            "active_patches": 0,
+            "cache_patches": 0,
+            "cpu_cache_bytes": 0,
+            "generated_last_frame": 0,
+            "generated_peak": 0,
+            "generation_last_frame_micros": 0,
+            "generation_peak_micros": 0,
+            "generation_total_micros": 0,
+            "gpu_cache_bytes": 131072,
+            "gpu_ready": true,
+            "mode": "Flat",
+            "peak_upload_bytes": 0,
+            "pending_patches": 0,
+            "preparation_last_frame_micros": 2,
+            "preparation_overruns": 0,
+            "preparation_peak_micros": 32,
+            "presentation_ready": true,
+            "selection_last_frame_micros": 0,
+            "total_generated": 0,
+            "triangles": 0,
+            "uploaded_last_frame_bytes": 0
+          },
+          "metrics": {
+            "present_ms": {
+              "count": 214,
+              "median": 65.96903649999999,
+              "p95": 89.06304800000001,
+              "max": 250.0
+            },
+            "cpu_update_ms": {
+              "count": 214,
+              "median": 0.6987975,
+              "p95": 4.536829,
+              "max": 67.880233
+            },
+            "cpu_render_ms": {
+              "count": 214,
+              "median": 3.635112,
+              "p95": 17.78848,
+              "max": 1239.03555
+            },
+            "gpu_ms": {
+              "count": 213,
+              "median": 46.435275,
+              "p95": 62.82847900000001,
+              "max": 81.67568999999999
+            },
+            "scene_draws": {
+              "count": 214,
+              "median": 3.0,
+              "p95": 3.0,
+              "max": 3.0
+            },
+            "total_draws": {
+              "count": 214,
+              "median": 7.0,
+              "p95": 7.0,
+              "max": 7.0
+            }
+          },
+          "reference_camera": null,
+          "retained_path": "captures/landing-speed-cutoff-step-108-landing-rejected-above-20mps.png"
+        },
+        {
+          "label": "landing-at-cutoff-complete",
+          "path": "/workspace/salimon/artifacts/issue-437/acceptance-final/native/run-syloqz29/step-319-landing-at-cutoff-complete.png",
+          "sha256": "e2bc1669c72f26da0aa5b563cbc6b69700afe0c039b8ac46700bc545524f211c",
+          "context": {
+            "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+            "backend": "Vulkan",
+            "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+            "scale_factor": 1.0,
+            "viewport_pixels": [
+              1280,
+              800
+            ]
+          },
+          "terrain": {
+            "active_patches": 0,
+            "cache_patches": 0,
+            "cpu_cache_bytes": 0,
+            "generated_last_frame": 0,
+            "generated_peak": 0,
+            "generation_last_frame_micros": 0,
+            "generation_peak_micros": 0,
+            "generation_total_micros": 0,
+            "gpu_cache_bytes": 131072,
+            "gpu_ready": true,
+            "mode": "Flat",
+            "peak_upload_bytes": 0,
+            "pending_patches": 0,
+            "preparation_last_frame_micros": 2,
+            "preparation_overruns": 0,
+            "preparation_peak_micros": 32,
+            "presentation_ready": true,
+            "selection_last_frame_micros": 0,
+            "total_generated": 0,
+            "triangles": 0,
+            "uploaded_last_frame_bytes": 0
+          },
+          "metrics": {
+            "present_ms": {
+              "count": 636,
+              "median": 66.7077835,
+              "p95": 85.839335,
+              "max": 250.0
+            },
+            "cpu_update_ms": {
+              "count": 636,
+              "median": 0.6987975,
+              "p95": 4.488907,
+              "max": 67.880233
+            },
+            "cpu_render_ms": {
+              "count": 636,
+              "median": 4.4012345,
+              "p95": 19.965142,
+              "max": 1239.03555
+            },
+            "gpu_ms": {
+              "count": 635,
+              "median": 46.792211,
+              "p95": 62.817082,
+              "max": 81.67568999999999
+            },
+            "scene_draws": {
+              "count": 636,
+              "median": 3.0,
+              "p95": 3.0,
+              "max": 11.0
+            },
+            "total_draws": {
+              "count": 636,
+              "median": 6.0,
+              "p95": 7.0,
+              "max": 15.0
+            }
+          },
+          "reference_camera": null,
+          "retained_path": "captures/landing-speed-cutoff-step-319-landing-at-cutoff-complete.png"
+        }
+      ]
+    }
+  ],
+  "supplemental_test": "insertion-test.log.gz",
+  "source_changes_since_driver_start": [
+    {
+      "path": "client/ship/src/trajectory/tests.rs",
+      "before_sha256": "802a7437addd68f94b1e4982f20d6fae514128cb5b0085d8bc272dfecc08ba5c",
+      "after_sha256": "6d35af7fd21521d96517696bd2d55337be9b15b26f78e67b3045206907a8a356",
+      "reason": "Added test-only funded orbital insertion regression; separately executed after formatting. Production executable behavior is unchanged."
+    }
+  ],
+  "os_input": {
+    "schema_version": 1,
+    "binary": "/workspace/salimon/target/debug/salimon-client",
+    "platform": "linux",
+    "artifacts": "/workspace/salimon/artifacts/issue-437/acceptance-final/os-input/run-vftfah1i",
+    "checks": [
+      "native window created:",
+      "renderer ready:",
+      "render attempt 1 completed with Presented",
+      "OS F2 switched to PrecisionTour",
+      "OS F2 switched to Gameplay",
+      "game remains playable after OS input"
+    ],
+    "success": true,
+    "pid": 18180,
+    "startup_screenshot": {
+      "status": "captured",
+      "path": "/workspace/salimon/artifacts/issue-437/acceptance-final/os-input/run-vftfah1i/startup.png"
+    },
+    "gameplay_screenshot": {
+      "status": "captured",
+      "path": "/workspace/salimon/artifacts/issue-437/acceptance-final/os-input/run-vftfah1i/gameplay.png"
+    },
+    "process_exit_code": -15,
+    "duration_ms": 4314,
+    "original_report": "os-input.log.gz"
+  },
+  "raw_archive_sha256": "cc750b37db38c7dc89e74ff4904f654d2bf20def1b7f04d1e9b1d640cf6ac22c"
+}

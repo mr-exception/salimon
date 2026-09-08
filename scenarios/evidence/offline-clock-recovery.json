@@ -1,0 +1,115 @@
+{
+  "setup": {
+    "scenario": "canonical-journey",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 240000,
+  "steps": [
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "offline_launch",
+        "seconds": 0,
+        "backward_clock": true
+      }
+    },
+    {
+      "wait": {
+        "path": "launch.progress.stage",
+        "equals": "Failed"
+      },
+      "frames": 1,
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "launch.ready",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "launch.error",
+        "contains": "System clock precedes"
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "resume",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "resume",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "paused",
+        "equals": true
+      }
+    },
+    {
+      "screenshot": "offline-clock-failed",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "launch_retry",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "launch_retry",
+        "pressed": false
+      }
+    },
+    {
+      "wait": {
+        "path": "launch.ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "offline-clock-recovered",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "resume",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "resume",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "paused",
+        "equals": false
+      }
+    }
+  ]
+}

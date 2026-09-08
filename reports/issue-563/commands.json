@@ -1,0 +1,191 @@
+{
+  "source_revision": "125944f175c526645600c19e8deba6a7902f9b7d",
+  "runtime_parent": "ad5a55e0590505708466cce59e4a8ba5844552b4",
+  "binary_sha256": "3f0e6e0f4638ebd9523e79ac1ef4a5657f8b6bb723ca54e5e75e4d07cd042560",
+  "platform": "macOS-26.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.2 (main, Dec  5 2025, 16:49:16) [Clang 17.0.0 (clang-1700.6.3.2)]",
+  "commands": [
+    {
+      "name": "universe",
+      "argv": [
+        "python3",
+        "scripts/verify_universe_expansion.py",
+        "--binary",
+        "/Users/mrexception/Documents/Projects/Salimon/salimon/target/release/salimon-client",
+        "--output",
+        "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe"
+      ],
+      "environment": {
+        "WGPU_BACKEND": "metal",
+        "SALIMON_SAVE_DIR": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/isolated-saves",
+        "SALIMON_SETTINGS_FILE": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/isolated-settings.json"
+      },
+      "started_utc": "2026-10-31T16:39:13.844211+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 79.68556845799321
+    },
+    {
+      "name": "construction",
+      "argv": [
+        "python3",
+        "scripts/salimon-test",
+        "suite",
+        "--group",
+        "scout-construction",
+        "--binary",
+        "/Users/mrexception/Documents/Projects/Salimon/salimon/target/release/salimon-client",
+        "--artifacts",
+        "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction",
+        "--screenshot-command",
+        "[\"native\"]",
+        "--summary"
+      ],
+      "environment": {
+        "WGPU_BACKEND": "metal",
+        "SALIMON_SAVE_DIR": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/isolated-saves",
+        "SALIMON_SETTINGS_FILE": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/isolated-settings.json"
+      },
+      "started_utc": "2026-10-31T16:40:33.531156+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 60.67110708299151
+    },
+    {
+      "name": "metal-corpus",
+      "argv": [
+        "python3",
+        "scripts/model_visual_tests.py",
+        "capture",
+        "--binary",
+        "/Users/mrexception/Documents/Projects/Salimon/salimon/target/release/salimon-client",
+        "--captures",
+        "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/metal-corpus"
+      ],
+      "environment": {
+        "WGPU_BACKEND": "metal",
+        "SALIMON_SAVE_DIR": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/isolated-saves",
+        "SALIMON_SETTINGS_FILE": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/isolated-settings.json"
+      },
+      "started_utc": "2026-10-31T16:41:34.203415+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 25.110258875007275
+    },
+    {
+      "name": "metal-temporal",
+      "argv": [
+        "python3",
+        "scripts/model_visual_tests.py",
+        "compare",
+        "--temporal-only",
+        "--captures",
+        "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/metal-corpus",
+        "--output",
+        "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/metal-temporal"
+      ],
+      "environment": {
+        "WGPU_BACKEND": "metal",
+        "SALIMON_SAVE_DIR": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/isolated-saves",
+        "SALIMON_SETTINGS_FILE": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/isolated-settings.json"
+      },
+      "started_utc": "2026-10-31T16:41:59.314744+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 4.796532416003174
+    },
+    {
+      "name": "os-smoke",
+      "argv": [
+        "python3",
+        "scripts/packaged_smoke.py",
+        "--binary",
+        "/Users/mrexception/Documents/Projects/Salimon/salimon/target/release/salimon-client",
+        "--artifacts",
+        "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/os-smoke",
+        "--timeout",
+        "120",
+        "--screenshot-command",
+        "[\"swift\", \"/Users/mrexception/Documents/Projects/Salimon/salimon/scripts/macos_window.swift\", \"{pid}\", \"{path}\"]"
+      ],
+      "environment": {
+        "WGPU_BACKEND": "metal",
+        "SALIMON_SAVE_DIR": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/isolated-saves",
+        "SALIMON_SETTINGS_FILE": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/isolated-settings.json"
+      },
+      "started_utc": "2026-10-31T16:42:04.111832+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 2.8999178749945713
+    },
+    {
+      "name": "runtime-release-tests",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "-p",
+        "salimon-client"
+      ],
+      "environment": {
+        "WGPU_BACKEND": "metal",
+        "SALIMON_SAVE_DIR": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/isolated-saves",
+        "SALIMON_SETTINGS_FILE": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/isolated-settings.json",
+        "SALIMON_BALANCE_REPORT": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/balance.json",
+        "SALIMON_AVAILABILITY_REPORT": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/availability.json"
+      },
+      "started_utc": "2026-10-31T16:42:07.012420+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 55.10101195900643
+    },
+    {
+      "name": "audio-device",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "-p",
+        "salimon-client",
+        "native_continuous_output_582",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "environment": {
+        "WGPU_BACKEND": "metal",
+        "SALIMON_SAVE_DIR": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/isolated-saves",
+        "SALIMON_SETTINGS_FILE": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/isolated-settings.json",
+        "SALIMON_AUDIO_EVIDENCE": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/audio-device"
+      },
+      "started_utc": "2026-10-31T16:43:02.114717+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 2.8466978340002242
+    },
+    {
+      "name": "audio-export",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "-p",
+        "salimon-client",
+        "export_environment_audio_627",
+        "--",
+        "--ignored",
+        "--nocapture"
+      ],
+      "environment": {
+        "WGPU_BACKEND": "metal",
+        "SALIMON_SAVE_DIR": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/isolated-saves",
+        "SALIMON_SETTINGS_FILE": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/isolated-settings.json",
+        "SALIMON_AUDIO_EVIDENCE": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/audio"
+      },
+      "started_utc": "2026-10-31T16:43:04.962315+00:00",
+      "exit_code": 0,
+      "elapsed_seconds": 0.6669176670111483
+    }
+  ],
+  "rustc": "rustc 1.89.0 (29483883e 2025-08-04)",
+  "model": "iMac21,1",
+  "cpu": "Apple M1",
+  "memory_bytes": "17179869184",
+  "power": "AC Power:\n Sleep On Power Button 1\n standby              0\n ttyskeepawake        1\n powernap             1\n womp                 1\n displaysleep         10\n networkoversleep     0\n sleep                0\n tcpkeepalive         1\n autorestart          0\n disksleep            10"
+}

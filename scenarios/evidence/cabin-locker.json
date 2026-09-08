@@ -1,0 +1,55 @@
+{
+  "setup": {
+    "scenario": "scout-cabin-locker",
+    "seed": 577,
+    "step_ms": 16
+  },
+  "timeout_ms": 360000,
+  "steps": [
+    {
+      "action": {
+        "op": "window",
+        "action": "restore"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "locker-closed",
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 55
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "window",
+        "action": "restore"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "locker-open",
+      "timeout_ms": 30000
+    }
+  ]
+}

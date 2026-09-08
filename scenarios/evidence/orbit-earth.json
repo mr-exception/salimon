@@ -1,0 +1,31 @@
+{
+  "setup": {"scenario": "orbit-earth", "seed": 42, "step_ms": 16},
+  "timeout_ms": 120000,
+  "steps": [
+    {"assert": {"path": "player.location", "equals": "Cockpit"}},
+    {"assert": {"path": "ship.cockpit_control_active", "equals": true}},
+    {"assert": {"path": "ship.flight_state", "equals": "Flying"}},
+    {"assert": {"path": "ship.door_state", "equals": "Closed"}},
+    {"assert": {"path": "ship.position_meters.0", "approx": 1000000000000, "tolerance": 0.001}},
+    {"assert": {"path": "ship.nearby_body.name", "equals": "Earth"}},
+    {"assert": {"path": "ship.nearby_body.surface_distance_meters", "approx": 1000, "tolerance": 0.01}},
+    {"action": {"op": "thruster", "direction": 1}},
+    {"assert": {"path": "ship.thruster_percentage", "equals": 1}},
+    {"action": {"op": "thruster", "direction": -1}},
+    {"assert": {"path": "ship.thruster_percentage", "equals": 0}},
+    {"action": {"op": "landing"}},
+    {"assert": {"path": "ship.flight_state", "equals": "AssistedLanding { body: Earth }"}},
+    {"action": {"op": "step", "frames": 50}},
+    {"action": {"op": "landing"}},
+    {"assert": {"path": "ship.flight_state", "equals": "AssistedLanding { body: Earth }"}},
+    {"screenshot": "assisted-landing"},
+    {"action": {"op": "interact"}},
+    {"assert": {"path": "player.location", "equals": "InsideShip"}},
+    {"assert": {"path": "ship.cockpit_control_active", "equals": false}},
+    {"wait": {"path": "ship.flight_state", "equals": "Landed { body: Earth }"}, "frames": 25, "timeout_ms": 10000},
+    {"assert": {"path": "ship.speed_meters_per_second", "equals": 0}},
+    {"assert": {"path": "ship.velocity_meters_per_second", "equals": [0, 0, 0]}},
+    {"assert": {"path": "ship.door_state", "equals": "Closed"}},
+    {"screenshot": "landing-complete"}
+  ]
+}

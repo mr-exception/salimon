@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+"""Run one or all native Salimon E2E scenarios."""
+
+import argparse
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+from salimon_test import result_summary, run
+from scenario_suites import GROUPS, select_scenarios
+
+
+def main():
+    root = Path(__file__).resolve().parent.parent
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("command", choices=["run", "suite"])
+    parser.add_argument("scenario", nargs="?", help="scenario JSON file (run only)")
+    parser.add_argument("--binary", type=Path, help="prebuilt salimon-client executable")
+    parser.add_argument("--group", choices=sorted(GROUPS), help="named gameplay suite (suite only)")
+    parser.add_argument("--evidence", action="store_true", help="run screenshot variants (suite only)")
+    parser.add_argument("--summary", action="store_true",
+                        help="print compact result metadata; full evidence remains in artifact files")
+    parser.add_argument("--artifacts", type=Path, default=root / "artifacts" / "e2e",
+                        help="root for isolated per-scenario result directories")
+    parser.add_argument("--screenshot-command", help='JSON argv array with a {path} placeholder; [] disables capture')
+    args = parser.parse_args()
+    screenshot_command = None
+    if args.screenshot_command is not None:
+        try:
+            screenshot_command = json.loads(args.screenshot_command)
+        except ValueError:
+            parser.error("--screenshot-command must be a JSON argv array")
+        if (not isinstance(screenshot_command, list)
+                or any(not isinstance(item, str) or not item for item in screenshot_command)
+                or (screenshot_command and screenshot_command != ["native"] and not any("{path}" in item for item in screenshot_command))):
+            parser.error("--screenshot-command needs nonempty argv strings and a {path} placeholder")
+    if (args.command == "run") != bool(args.scenario):
+        parser.error("run requires a scenario path; suite takes no path")
+    if args.command == "run" and (args.group or args.evidence):
+        parser.error("--group and --evidence require suite")
+    paths = [Path(args.scenario)] if args.command == "run" else select_scenarios(root / "scenarios", args.group, args.evidence)
+    if not paths:
+        print(json.dumps({"status": "failed", "error": "no scenarios found", "results": []}))
+        return 1
+    if args.binary:
+        binary = args.binary.resolve()
+    else:
+        try:
+            build = subprocess.run(["cargo", "build", "--locked", "-p", "salimon-client"], cwd=root, capture_output=True, text=True)
+        except OSError as exc:
+            print(json.dumps({"status": "failed", "error": f"cannot start cargo: {exc}", "results": []}))
+            return 1
+        if build.returncode:
+            print(json.dumps({"status": "failed", "error": "build failed: " + build.stderr[-4000:], "results": []}))
+            return 1
+        binary = root / "target" / "debug" / ("salimon-client.exe" if sys.platform == "win32" else "salimon-client")
+    results = [run(path, [str(binary)], args.artifacts, screenshot_command) for path in paths]
+    status = "passed" if all(item["status"] == "passed" for item in results) else "failed"
+    output = [result_summary(item) for item in results] if args.summary else results
+    print(json.dumps({"status": status, "results": output}))
+    return 0 if status == "passed" else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

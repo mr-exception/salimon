@@ -1,0 +1,94 @@
+{
+  "setup": {
+    "scenario": "canonical-flight",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "Cockpit"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "ship.flight_state",
+        "equals": "Landed { body: Vesper }"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "landing"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 375
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "ship.flight_state",
+        "equals": "Flying"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "canonical-takeoff",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "landing"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 500
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "ship.flight_state",
+        "equals": "Landed { body: Vesper }"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 0
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "ship.flight_state",
+        "equals": "Landed { body: Vesper }"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "canonical-landed",
+      "timeout_ms": 60000
+    }
+  ]
+}

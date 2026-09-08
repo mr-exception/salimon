@@ -1,0 +1,185 @@
+{
+  "setup": {
+    "scenario": "canonical-journey",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "Surface"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "ship.flight_state",
+        "equals": "Landed { body: Vesper }"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "published-start",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 0
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "Surface"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "left",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 296
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "left",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 230
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 713.9983303613166,
+        "dy": 0
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 95
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "approach-rear-door",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "interact"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 50
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "ship.door_state",
+        "equals": "Open"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 160
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "entered-ship",
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "InsideShip"
+      },
+      "timeout_ms": 180000
+    }
+  ]
+}

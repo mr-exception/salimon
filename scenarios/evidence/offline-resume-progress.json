@@ -1,0 +1,146 @@
+{
+  "setup": {
+    "scenario": "canonical-flight",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 240000,
+  "steps": [
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "landing"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 375
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "ship.flight_state",
+        "equals": "Flying"
+      }
+    },
+    {
+      "action": {
+        "op": "offline_launch",
+        "seconds": 60,
+        "hold": true
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "wait": {
+        "path": "launch.progress.stage",
+        "equals": "Propagating"
+      },
+      "frames": 1,
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "launch.ready",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "paused",
+        "equals": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "resume",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "resume",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "paused",
+        "equals": true
+      }
+    },
+    {
+      "screenshot": "offline-progress",
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "offline-progress-repeat",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "launch_release"
+      }
+    },
+    {
+      "wait": {
+        "path": "launch.ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "ship.engines_enabled",
+        "equals": false
+      }
+    },
+    {
+      "screenshot": "offline-ready",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "resume",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "resume",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "paused",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "launch",
+        "equals": null
+      }
+    },
+    {
+      "screenshot": "offline-resumed",
+      "timeout_ms": 60000
+    }
+  ]
+}

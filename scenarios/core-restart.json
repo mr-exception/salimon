@@ -1,0 +1,25 @@
+{
+  "setup": {"scenario": "core-restart", "seed": 0, "step_ms": 100},
+  "timeout_ms": 120000,
+  "steps": [
+    {"assert": {"path": "ship.power_available", "equals": false}},
+    {"assert": {"path": "interaction", "equals": "core"}},
+    {"assert": {"path": "ship.thruster_percentage", "equals": 50}},
+    {"assert": {"path": "world.fragment_count", "equals": 1}},
+    {"action": {"op": "interact"}},
+    {"assert": {"path": "world.fragment_count", "equals": 0}},
+    {"assert": {"path": "carrying.object_id", "equals": null}},
+    {"assert": {"path": "ship.total_mass_kg", "equals": 100000}},
+    {"assert": {"path": "ship.conversion_remaining_joules", "equals": 2000000000}},
+    {"action": {"op": "interact"}},
+    {"assert": {"path": "ship.conversion_remaining_joules", "equals": 2000000000}},
+    {"action": {"op": "step", "frames": 1}},
+    {"assert": {"path": "ship.power_available", "equals": true}},
+    {"assert": {"path": "ship.speed_meters_per_second", "gt": 100}},
+    {"assert": {"path": "ship.thruster_percentage", "equals": 50}},
+    {"action": {"op": "step", "frames": 99}},
+    {"assert": {"path": "ship.conversion_remaining_joules", "equals": 0}},
+    {"assert": {"path": "ship.energy_core.stored_joules", "gt": 0}},
+    {"assert": {"path": "world.fragment_count", "equals": 0}}
+  ]
+}

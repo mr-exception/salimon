@@ -1,0 +1,32 @@
+{
+  "setup": {
+    "scenario": "open-space",
+    "seed": 42,
+    "step_ms": 16
+  },
+  "timeout_ms": 120000,
+  "steps": [
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "Cockpit"
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.nearby_body",
+        "equals": null
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 0,
+        "dy": 125
+      }
+    },
+    {
+      "screenshot": "dashboard-out-of-range"
+    }
+  ]
+}

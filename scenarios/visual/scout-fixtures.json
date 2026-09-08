@@ -1,0 +1,12 @@
+{
+  "scout-lighting": {
+    "scenario": "scenarios/visual/scout-lighting.json",
+    "mode": "moving",
+    "repeat": 3,
+    "tolerances": {
+      "channel_tolerance": 8,
+      "changed_fraction": 0.001,
+      "masks": []
+    }
+  }
+}

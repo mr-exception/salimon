@@ -1,0 +1,93 @@
+# Client
+
+All current client runtime implementation lives here, including the Phase 0
+baseline and subsequent mining, carrying, fragment physics and EVA. Packages provide
+the `salimon-client`
+runtime binary, `salimon-renderer` GPU library, `salimon-diagnostics`
+metrics/overlay library, and portable `salimon-world` canonical Vesper and explicit compressed engineering fixtures,
+coordinate/camera model, portable character and ship domains, and the custom
+ship asset/runtime mesh path. Add future Cargo packages explicitly to the root workspace.
+
+## Ownership
+
+| Boundary | Current responsibility |
+| --- | --- |
+| `runtime/` | Native lifecycle, redraw/update scheduling, typed key routing, timing, and client composition |
+| `renderer/` | `wgpu` resources, camera-relative conversion, reverse-Z scene/ship/overlay pipelines, measurements, and presentation |
+| `fabrication/` | Portable recipes, raw storage/reservation, FIFO crafting and output tray; physical/Core/inventory integration remains separate |
+| `world/` | Canonical Vesper terrain/resources and separate six-body engineering catalog, local `f64` frames, camera state, geometry, precision fixtures, mining and carrying |
+| `physics/` | Portable physical-object gravity, velocity, contact and substeps with caller-supplied geometry |
+| `math/` | Dependency-free `f64` vector primitives; units, frames and normalization policy remain caller-owned |
+| `character/` | First-person state, typed movement, fixed gravity, cockpit/doorway/surface traversal and open-space/nearby-body EVA |
+| `ship/` | Ship pose, flight/landing/takeoff state, cockpit authority, persistent motion, and landed/open-space airlock rules |
+| `platform/` | Reserved for native input and OS-specific adapters |
+| `assets/` | Validated runtime exports/metadata and legacy editable sources; new 3D sources belong in root `models/` |
+| `diagnostics/` | Engineering metric aggregation, formatting, and RGBA overlay rasterization |
+
+Character, ship, physics and runtime also consume the dependency-free `salimon-math`
+leaf crate. World and renderer retain their own precision/validation policies.
+See the [shared math decision](../docs/technical-architecture.md#shared-math-decision-115).
+
+The current runtime dependency direction is:
+
+```text
+salimon-client (runtime, winit lifecycle, clocks, snapshot mapping)
+    ├── salimon-physics (portable physical-object motion/contact; depends on math)
+    ├── salimon-character (portable first-person movement and gravity frames)
+    ├── salimon-ship (portable ship interaction and persistent motion state)
+    ├── salimon-world (static Solar System, f64 coordinates, and camera prototype)
+    ├── salimon-diagnostics (typed observations and optional overlay image)
+    └── salimon-renderer (wgpu resources, generic overlay composition, presentation)
+```
+
+World keeps absolute body, camera, and marker coordinates in `f64` meters without
+GPU or window types. Its separate engineering catalog contains exactly Sun, Mercury, Venus,
+Earth, Moon, and Mars; the Sun is visual-only, and the five solid bodies expose
+disjoint `1.15R` landing volumes. The runtime creates the window, routes lifecycle
+and resize events, schedules redraws/updates, maps P/R/N/1–6 into typed world commands,
+routes F2/F3 and gameplay input (including contextual L landing/takeoff), composes typed character/ship snapshots, and converts
+domain state into renderer DTOs. The renderer subtracts the camera origin in `f64`, uploads only
+camera-relative `f32` data, and presents with infinite-far reverse-Z depth.
+Recoverable surface loss is handled by the runtime without discarding world
+state. Its ship mesh loader consumes the custom checked-in GLB and remains
+independent of ship behavior. Diagnostics remains observational, and no supporting crate owns the event
+loop or unrelated authoritative gameplay state.
+
+`winit` integration currently lives at the runtime boundary, which is permitted
+for this native bootstrap. Move OS-specific behavior into `platform/` as that
+behavior grows or another native target needs an adapter. Future domain modules
+must consume typed input/presentation data rather than GPU or window types.
+Current client crates have no dependency on `core/`.
+
+No full ECS/physics engine, WASM host or backend is present. Canonical orbital
+coasting and offline ship/timed progression use a versioned motion publication. Renderer owns analytic spheres, generated mipmapped textures and Sun
+illumination. The engineering camera tour is separate from player/ship state;
+world supplies camera-to-body observations without presenting it as gameplay.
+Mining, carrying, custom fragment motion/contact and EVA are implemented.
+Resource state survives local streaming within an in-memory session; disk persistence is implemented; backend persistence remains deferred. Use the
+[feature maintenance map](../docs/maintenance-map.md) for source/test routing.
+As major components gain behavior, maintain the contracts, ownership
+documentation, architecture, invariants, and relevant validation required by the
+[technical architecture](../docs/technical-architecture.md).
+
+Run the root [development workflow](../README.md#development-workflow) after
+changes. Stable Rust, workspace lints, and the root lockfile apply to all client
+crates.
+
+
+The current post-baseline flight/Core contracts and future exclusions are indexed
+in [Project Phases](../docs/project-phases.md#realistic-flightcore-wave-185197).
+Ship mass, energy, conversion/reservations and cockpit telemetry are authoritative;
+rendering and CPU profiling remain observational. `--flight-profile` is a release
+CPU workload suite, not an Apple M1 frame-rate certification.
+
+`salimon-fabrication` is a portable workspace library depending on world resource values; it awaits runtime integration in #339–#347. See its [architecture](fabrication/architecture.md).
+
+## Canonical universe schema foundation
+
+`universe/` is the portable `salimon-universe` library for immutable IDs, typed
+catalog records and explicit provenance/uncertainty. It is intentionally not in
+the runtime dependency graph yet; `world/` remains the playable fixture owner.
+See [U01 architecture](universe/architecture.md).
+
+Current source/test boundaries: [U36 universe audit](../reports/issue-441/README.md).

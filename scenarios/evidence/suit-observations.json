@@ -1,0 +1,142 @@
+{
+  "setup": {
+    "scenario": "canonical-journey",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "skip_tutorial",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 500
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "field_spot",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "field_marks.source.marks.0.id",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "field_marks.source.estimate.radius_meters",
+        "equals": 5.0
+      }
+    },
+    {
+      "screenshot": "bounded-fix",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "field_bearing",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "field_marks.source.marks.1.id",
+        "equals": 2
+      }
+    },
+    {
+      "assert": {
+        "path": "field_marks.source.marks.1.bearing_error_radians",
+        "equals": 0.02
+      }
+    },
+    {
+      "screenshot": "bearing-only",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "field_power",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "field_spot",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "field_marks.source.marks.2.estimate.position_meters",
+        "equals": null
+      }
+    },
+    {
+      "screenshot": "navigation-unavailable",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 0
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "field_marks.source.marks.1.id",
+        "equals": 2
+      }
+    },
+    {
+      "assert": {
+        "path": "field_marks.source.enabled",
+        "equals": false
+      }
+    }
+  ]
+}

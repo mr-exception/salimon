@@ -1,0 +1,1145 @@
+{
+  "$schema": "../../../asset-manifest.schema.json",
+  "schemaVersion": 1,
+  "assetId": "ship.salimon-scout",
+  "category": "ships",
+  "source": "models/assets/ships/salimon-scout/assembly/salimon-scout.blend",
+  "runtime": "client/assets/ship/export/salimon_phase0_ship.glb",
+  "coordinates": {
+    "units": "meters",
+    "source": {
+      "up": "+Z",
+      "forward": "+X",
+      "unitScale": 1
+    },
+    "runtime": {
+      "up": "+Y",
+      "forward": "+X"
+    },
+    "conversion": "x,z,-y",
+    "pivot": "Preserve current ship-local reference frame; see client/assets/ship/README.md"
+  },
+  "profile": "legacy-scout-v1",
+  "budgets": {
+    "maxTriangles": 6900,
+    "maxPrimitives": 140,
+    "maxMaterials": 13,
+    "maxTextureBytes": 65536,
+    "maxGlbBytes": 614400
+  },
+  "collision": {
+    "policy": "authored-proxies",
+    "shapes": [
+      "box"
+    ]
+  },
+  "contracts": {
+    "root": "Salimon_Phase0_Scout",
+    "visualGroups": [
+      "Exterior",
+      "Interior"
+    ],
+    "groups": [
+      "Exterior",
+      "Interior",
+      "Collision_Proxies",
+      "Interaction_Markers"
+    ],
+    "nodes": [
+      "Exit_Door",
+      "Monitor_Wide",
+      "Core_Monitor",
+      "Fabricator_Chassis",
+      "Fabricator_Panels",
+      "Fabricator_Frame",
+      "Fabricator_Input",
+      "Fabricator_Monitor",
+      "Fabricator_Tray",
+      "Fabricator_Output",
+      "Starter_BunkCushion",
+      "Starter_BunkFrame",
+      "Starter_CargoBins",
+      "Starter_CargoBulkhead",
+      "Starter_DoorFrame",
+      "Starter_Galley",
+      "Starter_GalleyBasin",
+      "Starter_GalleyTap",
+      "Starter_GalleyWorktop",
+      "Starter_Hygiene",
+      "Starter_HygieneSeat"
+    ],
+    "materials": [
+      "Hull Graphite",
+      "Hull Ceramic",
+      "Copper Accent",
+      "Cockpit Glass",
+      "Interior Light",
+      "Interior Dark",
+      "Cyan Display",
+      "Floor Grip",
+      "Engine Glow",
+      "Warm Lamp",
+      "Terracotta Upholstery",
+      "Petrol Teal",
+      "Honey Wood"
+    ],
+    "sockets": [],
+    "markers": [
+      "MARKER_CockpitSeat",
+      "MARKER_ExitDoor",
+      "MARKER_PlayerStart",
+      "MARKER_DoorwayTransition",
+      "MARKER_FabricatorInput",
+      "MARKER_FabricatorMonitor",
+      "MARKER_FabricatorTray",
+      "MARKER_Starter_AftExpansion",
+      "MARKER_Starter_CargoDoor",
+      "MARKER_Starter_UpperExpansion"
+    ],
+    "colliders": [
+      "COLLIDER_InteriorFloor",
+      "COLLIDER_InteriorPortWall",
+      "COLLIDER_InteriorStarboardWall",
+      "COLLIDER_InteriorCeiling",
+      "COLLIDER_EnergyCore",
+      "COLLIDER_AftDoor",
+      "COLLIDER_ExteriorHull",
+      "COLLIDER_Engine_Port_Body",
+      "COLLIDER_Engine_Port_SweptFin",
+      "COLLIDER_Engine_Starboard_Body",
+      "COLLIDER_Engine_Starboard_SweptFin",
+      "COLLIDER_CockpitCenterConsole",
+      "COLLIDER_CockpitNoseFloor",
+      "COLLIDER_Wing_Port",
+      "COLLIDER_Wing_Starboard",
+      "COLLIDER_CabinTraversalEnvelope",
+      "COLLIDER_CabinExteriorEnvelope",
+      "COLLIDER_PilotChair",
+      "COLLIDER_CockpitPortHull",
+      "COLLIDER_CockpitStarboardHull",
+      "COLLIDER_Landing_Aft_Port_Foot",
+      "COLLIDER_Landing_Aft_Port_Leg",
+      "COLLIDER_Landing_Aft_Starboard_Foot",
+      "COLLIDER_Landing_Aft_Starboard_Leg",
+      "COLLIDER_Landing_Forward_Port_Foot",
+      "COLLIDER_Landing_Forward_Port_Leg",
+      "COLLIDER_Landing_Forward_Starboard_Foot",
+      "COLLIDER_Landing_Forward_Starboard_Leg",
+      "COLLIDER_Fabricator",
+      "COLLIDER_Starter_BinPort",
+      "COLLIDER_Starter_BinStarboard",
+      "COLLIDER_Starter_BulkheadPort",
+      "COLLIDER_Starter_BulkheadStarboard",
+      "COLLIDER_Starter_Bunk",
+      "COLLIDER_Starter_Galley",
+      "COLLIDER_Starter_Hygiene",
+      "COLLIDER_Starter_Header"
+    ],
+    "requiredExtras": [
+      {
+        "node": "Cabin_Port_Glazing",
+        "path": "salimon"
+      },
+      {
+        "node": "Cabin_Starboard_Glazing",
+        "path": "salimon"
+      },
+      {
+        "node": "Cockpit_Lower_Glazing",
+        "path": "salimon"
+      },
+      {
+        "node": "Cabin_Aft_Glazing",
+        "path": "salimon"
+      },
+      {
+        "node": "Cockpit_Glazing",
+        "path": "salimon"
+      },
+      {
+        "node": "Deck_Walkable",
+        "path": "salimon"
+      },
+      {
+        "node": "Exit_Door",
+        "path": "salimon"
+      },
+      {
+        "node": "Monitor_Wide",
+        "path": "salimon"
+      },
+      {
+        "node": "Pilot_Seat_Back",
+        "path": "salimon"
+      },
+      {
+        "node": "Core_Pedestal",
+        "path": "salimon"
+      },
+      {
+        "node": "Energy_Core",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_InteriorFloor",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_InteriorPortWall",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_InteriorStarboardWall",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_InteriorCeiling",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_EnergyCore",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_AftDoor",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_ExteriorHull",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Engine_Port_Body",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Engine_Port_SweptFin",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Engine_Starboard_Body",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Engine_Starboard_SweptFin",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_CockpitCenterConsole",
+        "path": "salimon"
+      },
+      {
+        "node": "MARKER_CockpitSeat",
+        "path": "salimon"
+      },
+      {
+        "node": "MARKER_ExitDoor",
+        "path": "salimon"
+      },
+      {
+        "node": "MARKER_PlayerStart",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_CockpitNoseFloor",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Wing_Port",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Wing_Starboard",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_CabinTraversalEnvelope",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_CabinExteriorEnvelope",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_PilotChair",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_CockpitPortHull",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_CockpitStarboardHull",
+        "path": "salimon"
+      },
+      {
+        "node": "MARKER_DoorwayTransition",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Landing_Aft_Port_Foot",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Landing_Aft_Port_Leg",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Landing_Aft_Starboard_Foot",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Landing_Aft_Starboard_Leg",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Landing_Forward_Port_Foot",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Landing_Forward_Port_Leg",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Landing_Forward_Starboard_Foot",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Landing_Forward_Starboard_Leg",
+        "path": "salimon"
+      },
+      {
+        "node": "Landing_Gear_Aft_Port",
+        "path": "salimon"
+      },
+      {
+        "node": "Landing_Gear_Aft_Starboard",
+        "path": "salimon"
+      },
+      {
+        "node": "Landing_Gear_Forward_Port",
+        "path": "salimon"
+      },
+      {
+        "node": "Landing_Gear_Forward_Starboard",
+        "path": "salimon"
+      },
+      {
+        "node": "Exit_Ramp_Tip",
+        "path": "salimon"
+      },
+      {
+        "node": "Core_Monitor",
+        "path": "salimon"
+      },
+      {
+        "node": "Fabricator_Monitor",
+        "path": "salimon"
+      },
+      {
+        "node": "Fabricator_Output",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Fabricator",
+        "path": "salimon"
+      },
+      {
+        "node": "MARKER_FabricatorInput",
+        "path": "salimon"
+      },
+      {
+        "node": "MARKER_FabricatorMonitor",
+        "path": "salimon"
+      },
+      {
+        "node": "MARKER_FabricatorTray",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Starter_BinPort",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Starter_BinStarboard",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Starter_BulkheadPort",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Starter_BulkheadStarboard",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Starter_Bunk",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Starter_Galley",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Starter_Header",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Starter_Hygiene",
+        "path": "salimon"
+      },
+      {
+        "node": "MARKER_Starter_AftExpansion",
+        "path": "salimon"
+      },
+      {
+        "node": "MARKER_Starter_CargoDoor",
+        "path": "salimon"
+      },
+      {
+        "node": "MARKER_Starter_UpperExpansion",
+        "path": "salimon"
+      }
+    ]
+  },
+  "extensions": {
+    "ship": {
+      "version": 1,
+      "data": {
+        "preservationContract": "client/assets/ship/README.md#runtime-contract",
+        "legacyManifest": "client/assets/ship/asset-manifest.json",
+        "movingDoor": "Exit_Door",
+        "monitors": {
+          "Monitor_Wide": "multifunction"
+        },
+        "monitorUvOrigin": "top-left",
+        "glassMaterial": "Cockpit Glass",
+        "maxRuntimeDraws": 2,
+        "dimensionsMeters": [
+          18.33,
+          6,
+          20
+        ],
+        "spatialContracts": "client/assets/ship/spatial-contracts.json"
+      }
+    }
+  },
+  "quality": {
+    "toleranceMeters": 1e-05,
+    "areaToleranceSquareMeters": 1e-10,
+    "anchorsMeters": {
+      "Salimon_Phase0_Scout": [
+        0,
+        0,
+        0
+      ],
+      "COLLIDER_InteriorFloor": [
+        -0.5,
+        0.19354838132858276,
+        0.0
+      ],
+      "COLLIDER_InteriorPortWall": [
+        -1.100000023841858,
+        1.5591397285461426,
+        4.739999771118164
+      ],
+      "COLLIDER_InteriorStarboardWall": [
+        -1.100000023841858,
+        1.5591397285461426,
+        -4.739999771118164
+      ],
+      "COLLIDER_InteriorCeiling": [
+        -1.2599999904632568,
+        2.860214948654175,
+        0.0
+      ],
+      "COLLIDER_EnergyCore": [
+        -1.0,
+        1.1505376100540161,
+        0.0
+      ],
+      "COLLIDER_AftDoor": [
+        -7.78000020980835,
+        1.3817204236984253,
+        0.0
+      ],
+      "COLLIDER_ExteriorHull": [
+        -0.6349999904632568,
+        1.8924731016159058,
+        0.0
+      ],
+      "COLLIDER_Engine_Port_Body": [
+        -6.400000095367432,
+        1.0752688646316528,
+        7.099999904632568
+      ],
+      "COLLIDER_Engine_Port_SweptFin": [
+        -5.96999979019165,
+        1.7365591526031494,
+        7.099999904632568
+      ],
+      "COLLIDER_Engine_Starboard_Body": [
+        -6.400000095367432,
+        1.0752688646316528,
+        -7.099999904632568
+      ],
+      "COLLIDER_Engine_Starboard_SweptFin": [
+        -5.96999979019165,
+        1.7365591526031494,
+        -7.099999904632568
+      ],
+      "COLLIDER_CockpitCenterConsole": [
+        4.949999809265137,
+        0.7599999904632568,
+        0.0
+      ],
+      "COLLIDER_CockpitNoseFloor": [
+        7.204999923706055,
+        0.19365590810775757,
+        0.0
+      ],
+      "COLLIDER_Wing_Port": [
+        -1.600000023841858,
+        0.32258063554763794,
+        7.300000190734863
+      ],
+      "COLLIDER_Wing_Starboard": [
+        -1.600000023841858,
+        0.32258063554763794,
+        -7.300000190734863
+      ],
+      "COLLIDER_CabinTraversalEnvelope": [
+        -0.3400000035762787,
+        1.4704301357269287,
+        0.0
+      ],
+      "COLLIDER_CabinExteriorEnvelope": [
+        0.3050000071525574,
+        1.4139784574508667,
+        0.0
+      ],
+      "COLLIDER_PilotChair": [
+        2.5350000858306885,
+        0.9886559247970581,
+        0.0
+      ],
+      "COLLIDER_CockpitPortHull": [
+        5.175000190734863,
+        1.5913978815078735,
+        3.549999952316284
+      ],
+      "COLLIDER_CockpitStarboardHull": [
+        5.175000190734863,
+        1.5913978815078735,
+        -3.549999952316284
+      ],
+      "COLLIDER_Landing_Aft_Port_Foot": [
+        -5.599999904632568,
+        -1.9875268936157227,
+        3.5999999046325684
+      ],
+      "COLLIDER_Landing_Aft_Port_Leg": [
+        -5.599999904632568,
+        -0.827526867389679,
+        3.5999999046325684
+      ],
+      "COLLIDER_Landing_Aft_Starboard_Foot": [
+        -5.599999904632568,
+        -1.9875268936157227,
+        -3.5999999046325684
+      ],
+      "COLLIDER_Landing_Aft_Starboard_Leg": [
+        -5.599999904632568,
+        -0.827526867389679,
+        -3.5999999046325684
+      ],
+      "COLLIDER_Landing_Forward_Port_Foot": [
+        4.800000190734863,
+        -1.9875268936157227,
+        3.5999999046325684
+      ],
+      "COLLIDER_Landing_Forward_Port_Leg": [
+        4.800000190734863,
+        -0.827526867389679,
+        3.5999999046325684
+      ],
+      "COLLIDER_Landing_Forward_Starboard_Foot": [
+        4.800000190734863,
+        -1.9875268936157227,
+        -3.5999999046325684
+      ],
+      "COLLIDER_Landing_Forward_Starboard_Leg": [
+        4.800000190734863,
+        -0.827526867389679,
+        -3.5999999046325684
+      ],
+      "MARKER_CockpitSeat": [
+        2.759999990463257,
+        1.1290322542190552,
+        0.0
+      ],
+      "MARKER_ExitDoor": [
+        -7.099999904632568,
+        1.3440860509872437,
+        0.0
+      ],
+      "MARKER_PlayerStart": [
+        0.5,
+        1.9973118305206299,
+        -2.200000047683716
+      ],
+      "MARKER_DoorwayTransition": [
+        -7.039999961853027,
+        0.24731183052062988,
+        0.0
+      ]
+    },
+    "overlapExemptions": [
+      {
+        "nodes": [
+          "Aft_Bulkhead_Header",
+          "Exit_Ramp_Tip"
+        ],
+        "maxPairs": 6,
+        "reason": "Aft_Bulkhead_Header / Exit_Ramp_Tip: closed-pose articulated leaf/tray/frame contact caps; retain surfaces for opening and telescopic extension. Mixed-material witnesses lie on the concealed lateral/end caps, not the ramp walking face."
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Header",
+          "Hull_Aft_Cap"
+        ],
+        "maxPairs": 8,
+        "reason": "Aft_Bulkhead_Header / Hull_Aft_Cap: opposing flush attachment caps between Hull Graphite and Interior Dark solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Port",
+          "Deck_Walkable"
+        ],
+        "maxPairs": 2,
+        "reason": "Aft_Bulkhead_Port / Deck_Walkable: opposing flush attachment caps between Floor Grip and Interior Light solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Port",
+          "Hull_Aft_Cap"
+        ],
+        "maxPairs": 4,
+        "reason": "Aft_Bulkhead_Port / Hull_Aft_Cap: opposing flush attachment caps between Hull Graphite and Interior Light solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Port",
+          "Hull_Port_Side"
+        ],
+        "maxPairs": 2,
+        "reason": "Aft_Bulkhead_Port / Hull_Port_Side: opposing flush attachment caps between Hull Graphite and Interior Light solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Port",
+          "Wall_Port_Inner"
+        ],
+        "maxPairs": 7,
+        "reason": "Aft_Bulkhead_Port / Wall_Port_Inner: joined primitive seams with identical Interior Light material and co-oriented planar normals; one opaque shading result at the shared boundary."
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Starboard",
+          "Deck_Walkable"
+        ],
+        "maxPairs": 4,
+        "reason": "Aft_Bulkhead_Starboard / Deck_Walkable: opposing flush attachment caps between Floor Grip and Interior Light solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Starboard",
+          "Hull_Aft_Cap"
+        ],
+        "maxPairs": 4,
+        "reason": "Aft_Bulkhead_Starboard / Hull_Aft_Cap: opposing flush attachment caps between Hull Graphite and Interior Light solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Starboard",
+          "Hull_Starboard_Side"
+        ],
+        "maxPairs": 2,
+        "reason": "Aft_Bulkhead_Starboard / Hull_Starboard_Side: opposing flush attachment caps between Hull Graphite and Interior Light solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Starboard",
+          "Wall_Starboard_Inner"
+        ],
+        "maxPairs": 8,
+        "reason": "Aft_Bulkhead_Starboard / Wall_Starboard_Inner: joined primitive seams with identical Interior Light material and co-oriented planar normals; one opaque shading result at the shared boundary."
+      },
+      {
+        "nodes": [
+          "Cabin_Low_Guidance_Lights",
+          "Wall_Port_Inner"
+        ],
+        "maxPairs": 4,
+        "reason": "Cabin_Low_Guidance_Lights / Wall_Port_Inner: opposing flush attachment caps between Interior Light and Warm Lamp solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Cabin_Low_Guidance_Lights",
+          "Wall_Starboard_Inner"
+        ],
+        "maxPairs": 4,
+        "reason": "Cabin_Low_Guidance_Lights / Wall_Starboard_Inner: opposing flush attachment caps between Interior Light and Warm Lamp solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Ceiling_Copper_Ribs",
+          "Ceiling_Inner"
+        ],
+        "maxPairs": 16,
+        "reason": "Ceiling_Copper_Ribs / Ceiling_Inner: opposing flush attachment caps between Copper Accent and Interior Light solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Ceiling_Copper_Ribs",
+          "Ceiling_Lamp_Housings"
+        ],
+        "maxPairs": 16,
+        "reason": "Ceiling_Copper_Ribs / Ceiling_Lamp_Housings: joined primitive seams with identical Copper Accent material and co-oriented planar normals; one opaque shading result at the shared boundary."
+      },
+      {
+        "nodes": [
+          "Ceiling_Inner",
+          "Ceiling_Lamp_Housings"
+        ],
+        "maxPairs": 12,
+        "reason": "Ceiling_Inner / Ceiling_Lamp_Housings: opposing flush attachment caps between Copper Accent and Interior Light solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Ceiling_Inner",
+          "Hull_Port_Side"
+        ],
+        "maxPairs": 4,
+        "reason": "Ceiling_Inner / Hull_Port_Side: opposing flush attachment caps between Hull Graphite and Interior Light solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Ceiling_Inner",
+          "Hull_Starboard_Side"
+        ],
+        "maxPairs": 4,
+        "reason": "Ceiling_Inner / Hull_Starboard_Side: opposing flush attachment caps between Hull Graphite and Interior Light solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Ceiling_Inner",
+          "Wall_Port_Inner"
+        ],
+        "maxPairs": 8,
+        "reason": "Ceiling_Inner / Wall_Port_Inner: joined primitive seams with identical Interior Light material and co-oriented planar normals; one opaque shading result at the shared boundary."
+      },
+      {
+        "nodes": [
+          "Ceiling_Inner",
+          "Wall_Starboard_Inner"
+        ],
+        "maxPairs": 5,
+        "reason": "Ceiling_Inner / Wall_Starboard_Inner: joined primitive seams with identical Interior Light material and co-oriented planar normals; one opaque shading result at the shared boundary."
+      },
+      {
+        "nodes": [
+          "Cockpit_Monitor_Bezels",
+          "Cockpit_Monitor_Bezels"
+        ],
+        "maxPairs": 12,
+        "reason": "Cockpit_Monitor_Bezels / Cockpit_Monitor_Bezels: opposing flush attachment caps between Interior Light solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Cockpit_Monitor_Housings",
+          "Cockpit_Monitor_Housings"
+        ],
+        "maxPairs": 1,
+        "reason": "Cockpit_Monitor_Housings / Cockpit_Monitor_Housings: joined primitive seams with identical Hull Graphite material and co-oriented planar normals; one opaque shading result at the shared boundary."
+      },
+      {
+        "nodes": [
+          "Cockpit_Window_Frame",
+          "Cockpit_Window_Frame"
+        ],
+        "maxPairs": 42,
+        "reason": "Cockpit_Window_Frame / Cockpit_Window_Frame: joined primitive seams with identical Copper Accent material and co-oriented planar normals; one opaque shading result at the shared boundary."
+      },
+      {
+        "nodes": [
+          "Cockpit_Window_Frame",
+          "Deck_Walkable"
+        ],
+        "maxPairs": 33,
+        "reason": "Cockpit_Window_Frame / Deck_Walkable: opposing flush attachment caps between Copper Accent and Floor Grip solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Core_Containment_Ribs",
+          "Core_Containment_Ribs"
+        ],
+        "maxPairs": 24,
+        "reason": "Core_Containment_Ribs / Core_Containment_Ribs: joined primitive seams with identical Hull Graphite material and co-oriented planar normals; one opaque shading result at the shared boundary."
+      },
+      {
+        "nodes": [
+          "Core_Cradle",
+          "Core_Cradle"
+        ],
+        "maxPairs": 30,
+        "reason": "Core_Cradle / Core_Cradle: opposing flush attachment caps between Copper Accent solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Core_Cradle",
+          "Core_Pedestal"
+        ],
+        "maxPairs": 26,
+        "reason": "Core_Cradle / Core_Pedestal: opposing flush attachment caps between Copper Accent and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Core_Pedestal",
+          "Core_Pedestal"
+        ],
+        "maxPairs": 27,
+        "reason": "Core_Pedestal / Core_Pedestal: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Core_Pedestal",
+          "Deck_Walkable"
+        ],
+        "maxPairs": 10,
+        "reason": "Core_Pedestal / Deck_Walkable: opposing flush attachment caps between Floor Grip and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Deck_Walkable"
+        ],
+        "maxPairs": 16,
+        "reason": "Deck_Walkable / Deck_Walkable: opposing flush attachment caps between Floor Grip solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Door_Threshold"
+        ],
+        "maxPairs": 2,
+        "reason": "Deck_Walkable / Door_Threshold: opposing flush attachment caps between Floor Grip and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Hull_Aft_Cap"
+        ],
+        "maxPairs": 4,
+        "reason": "Deck_Walkable / Hull_Aft_Cap: opposing flush attachment caps between Floor Grip and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Hull_Port_Side"
+        ],
+        "maxPairs": 4,
+        "reason": "Deck_Walkable / Hull_Port_Side: opposing flush attachment caps between Floor Grip and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Hull_Starboard_Side"
+        ],
+        "maxPairs": 6,
+        "reason": "Deck_Walkable / Hull_Starboard_Side: opposing flush attachment caps between Floor Grip and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Wall_Port_Inner"
+        ],
+        "maxPairs": 6,
+        "reason": "Deck_Walkable / Wall_Port_Inner: opposing flush attachment caps between Floor Grip and Interior Light solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Wall_Starboard_Inner"
+        ],
+        "maxPairs": 8,
+        "reason": "Deck_Walkable / Wall_Starboard_Inner: opposing flush attachment caps between Floor Grip and Interior Light solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Wing_Port"
+        ],
+        "maxPairs": 4,
+        "reason": "Deck_Walkable / Wing_Port: opposing flush attachment caps between Floor Grip and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Wing_Starboard"
+        ],
+        "maxPairs": 6,
+        "reason": "Deck_Walkable / Wing_Starboard: opposing flush attachment caps between Floor Grip and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Door_Frame",
+          "Door_Frame"
+        ],
+        "maxPairs": 18,
+        "reason": "Door_Frame / Door_Frame: joined primitive seams with identical Hull Graphite material and co-oriented planar normals; one opaque shading result at the shared boundary."
+      },
+      {
+        "nodes": [
+          "Door_Frame",
+          "Hull_Aft_Cap"
+        ],
+        "maxPairs": 8,
+        "reason": "Door_Frame / Hull_Aft_Cap: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Exit_Ramp_Tip",
+          "Hull_Aft_Cap"
+        ],
+        "maxPairs": 8,
+        "reason": "Exit_Ramp_Tip / Hull_Aft_Cap: closed-pose articulated leaf/tray/frame contact caps; retain surfaces for opening and telescopic extension. Mixed-material witnesses lie on the concealed lateral/end caps, not the ramp walking face."
+      },
+      {
+        "nodes": [
+          "Hull_Aft_Cap",
+          "Hull_Aft_Cap"
+        ],
+        "maxPairs": 32,
+        "reason": "Hull_Aft_Cap / Hull_Aft_Cap: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Hull_Aft_Cap",
+          "Hull_Belly"
+        ],
+        "maxPairs": 6,
+        "reason": "Hull_Aft_Cap / Hull_Belly: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Hull_Aft_Cap",
+          "Hull_Port_Side"
+        ],
+        "maxPairs": 25,
+        "reason": "Hull_Aft_Cap / Hull_Port_Side: joined primitive seams with identical Hull Graphite material and co-oriented planar normals; one opaque shading result at the shared boundary. Opposing caps at the same join are internal construction faces."
+      },
+      {
+        "nodes": [
+          "Hull_Aft_Cap",
+          "Hull_Starboard_Side"
+        ],
+        "maxPairs": 23,
+        "reason": "Hull_Aft_Cap / Hull_Starboard_Side: joined primitive seams with identical Hull Graphite material and co-oriented planar normals; one opaque shading result at the shared boundary. Opposing caps at the same join are internal construction faces."
+      },
+      {
+        "nodes": [
+          "Hull_Belly",
+          "Hull_Belly"
+        ],
+        "maxPairs": 29,
+        "reason": "Hull_Belly / Hull_Belly: joined primitive seams with identical Hull Graphite material and co-oriented planar normals; one opaque shading result at the shared boundary. Opposing caps at the same join are internal construction faces."
+      },
+      {
+        "nodes": [
+          "Hull_Belly",
+          "Hull_Port_Side"
+        ],
+        "maxPairs": 2,
+        "reason": "Hull_Belly / Hull_Port_Side: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Hull_Belly",
+          "Hull_Starboard_Side"
+        ],
+        "maxPairs": 2,
+        "reason": "Hull_Belly / Hull_Starboard_Side: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Hull_Belly",
+          "Wing_Port"
+        ],
+        "maxPairs": 1,
+        "reason": "Hull_Belly / Wing_Port: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Hull_Belly",
+          "Wing_Starboard"
+        ],
+        "maxPairs": 1,
+        "reason": "Hull_Belly / Wing_Starboard: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Hull_Port_Side",
+          "Hull_Port_Side"
+        ],
+        "maxPairs": 32,
+        "reason": "Hull_Port_Side / Hull_Port_Side: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Hull_Port_Side",
+          "Wall_Port_Inner"
+        ],
+        "maxPairs": 18,
+        "reason": "Hull_Port_Side / Wall_Port_Inner: opposing flush attachment caps between Hull Graphite and Interior Light solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Hull_Port_Side",
+          "Window_Port_Sill"
+        ],
+        "maxPairs": 10,
+        "reason": "Hull_Port_Side / Window_Port_Sill: opposing flush attachment caps between Honey Wood and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Hull_Port_Side",
+          "Wing_Port"
+        ],
+        "maxPairs": 7,
+        "reason": "Hull_Port_Side / Wing_Port: joined primitive seams with identical Hull Graphite material and co-oriented planar normals; one opaque shading result at the shared boundary."
+      },
+      {
+        "nodes": [
+          "Hull_Starboard_Side",
+          "Hull_Starboard_Side"
+        ],
+        "maxPairs": 32,
+        "reason": "Hull_Starboard_Side / Hull_Starboard_Side: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Hull_Starboard_Side",
+          "Wall_Starboard_Inner"
+        ],
+        "maxPairs": 17,
+        "reason": "Hull_Starboard_Side / Wall_Starboard_Inner: opposing flush attachment caps between Hull Graphite and Interior Light solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Hull_Starboard_Side",
+          "Window_Starboard_Sill"
+        ],
+        "maxPairs": 10,
+        "reason": "Hull_Starboard_Side / Window_Starboard_Sill: opposing flush attachment caps between Honey Wood and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Hull_Starboard_Side",
+          "Wing_Starboard"
+        ],
+        "maxPairs": 7,
+        "reason": "Hull_Starboard_Side / Wing_Starboard: joined primitive seams with identical Hull Graphite material and co-oriented planar normals; one opaque shading result at the shared boundary."
+      },
+      {
+        "nodes": [
+          "Landing_Gear_Aft_Port",
+          "Landing_Gear_Aft_Port"
+        ],
+        "maxPairs": 4,
+        "reason": "Landing_Gear_Aft_Port / Landing_Gear_Aft_Port: opposing flush attachment caps between Hull Ceramic and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Landing_Gear_Aft_Starboard",
+          "Landing_Gear_Aft_Starboard"
+        ],
+        "maxPairs": 4,
+        "reason": "Landing_Gear_Aft_Starboard / Landing_Gear_Aft_Starboard: opposing flush attachment caps between Hull Ceramic and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Landing_Gear_Forward_Port",
+          "Landing_Gear_Forward_Port"
+        ],
+        "maxPairs": 4,
+        "reason": "Landing_Gear_Forward_Port / Landing_Gear_Forward_Port: opposing flush attachment caps between Hull Ceramic and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Landing_Gear_Forward_Starboard",
+          "Landing_Gear_Forward_Starboard"
+        ],
+        "maxPairs": 4,
+        "reason": "Landing_Gear_Forward_Starboard / Landing_Gear_Forward_Starboard: opposing flush attachment caps between Hull Ceramic and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Pilot_Seat_Armrests",
+          "Pilot_Seat_Bolsters"
+        ],
+        "maxPairs": 9,
+        "reason": "Pilot_Seat_Armrests / Pilot_Seat_Bolsters: opposing flush attachment caps between Interior Dark and Terracotta Upholstery solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Pilot_Seat_Armrests",
+          "Pilot_Seat_Controls"
+        ],
+        "maxPairs": 14,
+        "reason": "Pilot_Seat_Armrests / Pilot_Seat_Controls: opposing flush attachment caps between Hull Graphite and Interior Dark solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Pilot_Seat_Base",
+          "Pilot_Seat_Base"
+        ],
+        "maxPairs": 7,
+        "reason": "Pilot_Seat_Base / Pilot_Seat_Base: opposing flush attachment caps between Interior Dark solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Pilot_Seat_Controls",
+          "Pilot_Seat_Controls"
+        ],
+        "maxPairs": 7,
+        "reason": "Pilot_Seat_Controls / Pilot_Seat_Controls: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Wall_Port_Inner",
+          "Wing_Port"
+        ],
+        "maxPairs": 8,
+        "reason": "Wall_Port_Inner / Wing_Port: opposing flush attachment caps between Hull Graphite and Interior Light solids; exposed outer faces remain on opposite sides of this internal join."
+      },
+      {
+        "nodes": [
+          "Wall_Starboard_Inner",
+          "Wing_Starboard"
+        ],
+        "maxPairs": 6,
+        "reason": "Wall_Starboard_Inner / Wing_Starboard: opposing flush attachment caps between Hull Graphite and Interior Light solids; exposed outer faces remain on opposite sides of this internal join."
+      }
+    ]
+  },
+  "visualBudget": {
+    "style": "option-a",
+    "maxNodes": 180,
+    "maxTextureMemoryBytes": 1364,
+    "maxDrawCalls": 2
+  },
+  "styleProfile": {
+    "name": "option-a-v1"
+  }
+}

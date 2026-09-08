@@ -1,0 +1,1 @@
+{"query": "select count(*) as source_count from gaiadr3.gaia_source", "url": "https://gaia.aip.de/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=votable&QUERY=select+count%28%2A%29+as+source_count+from+gaiadr3.gaia_source&MAXREC=1"}

@@ -1,0 +1,48 @@
+{
+  "setup": {
+    "scenario": "canonical-terrain",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "universe-night"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "wait": {
+        "path": "terrain.pending_patches",
+        "equals": 0
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "reference_camera.canonical_terrain_clearance_meters",
+        "approx": 40,
+        "tolerance": 1e-06
+      }
+    },
+    {
+      "assert": {
+        "path": "natural_sites.count",
+        "equals": 0
+      }
+    },
+    {
+      "screenshot": "airless-night",
+      "timeout_ms": 180000
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "status": "failed",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "source_revision": "5113d628865e8fe863ec40c7dbe3092b8fbe347b",
+  "binary_sha256": "f8aa1248e3009939ec3580a5f0cf18b90763c05e1cf11d9202b5243db9545437",
+  "clock": "actual local clock on restart; only aborted attempt requests controlled +60 s",
+  "checks": [],
+  "restarts": [],
+  "error": "ScenarioError: invalid protocol response: {'error': {'code': 'timeout', 'message': 'command timed out'}, 'id': None, 'ok': False, 'protocol': 1}"
+}

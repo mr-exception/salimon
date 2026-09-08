@@ -1,0 +1,15 @@
+[2026-10-31T16:42:04Z INFO  salimon_client] starting Salimon native client
+[2026-10-31T16:42:04Z INFO  salimon_client::app] native window created: physical_size=1920x1080 scale_factor=2.00
+[2026-10-31T16:42:04Z INFO  salimon_client::app] renderer ready: adapter="Apple M1" backend=Metal device_type=IntegratedGpu gpu_timestamps=true
+[2026-10-31T16:42:04Z INFO  salimon_client::app] application resumed
+[2026-10-31T16:42:04Z DEBUG salimon_client::app::presentation] render attempt 1 completed with Presented(RenderStats { resource_batch: ResourceBatchStats { prepare_time: 1.417µs, upload_time: 13.292µs, upload_bytes: 160, triangles: 90, scratch_capacity_bytes: 224 }, cpu_render_time: 2.564333ms, gpu_frame_time: Pending, visible_objects: 46, rendered_objects: 46, scene_draw_calls: 19, total_draw_calls: 20, gpu_memory: None })
+[2026-10-31T16:42:04Z DEBUG salimon_client::frame] frame=1 interval_ms=0.000 present_wall_ms=6.437 cpu_update_ms=2.451 cpu_render_ms=2.564 gpu_time=Pending ticks=0 backlog_ms=0.000 focused=false occluded=false
+[2026-10-31T16:42:04Z DEBUG salimon_client::app] native drawable resized: SurfaceSize { width: 1920, height: 1080 }
+[2026-10-31T16:42:04Z DEBUG salimon_client::app] native drawable resized: SurfaceSize { width: 1920, height: 1080 }
+[2026-10-31T16:42:04Z DEBUG salimon_client::app] native drawable resized: SurfaceSize { width: 1920, height: 1080 }
+[2026-10-31T16:42:04Z DEBUG salimon_client::app] native input focus=false ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.7071067811865475, 0.0, 0.7071067811865476]
+[2026-10-31T16:42:04Z DEBUG salimon_client::app] native input focus=true ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.7071067811865475, 0.0, 0.7071067811865476]
+[2026-10-31T16:42:04Z DEBUG salimon_client::app] native window occluded: false
+[2026-10-31T16:42:05Z INFO  salimon_client::app] verified journey resumed
+[2026-10-31T16:42:06Z INFO  salimon_client::session] view mode changed to PrecisionTour (F2 toggles)
+[2026-10-31T16:42:06Z INFO  salimon_client::session] view mode changed to Gameplay (F2 toggles)

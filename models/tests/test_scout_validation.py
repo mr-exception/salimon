@@ -1,0 +1,190 @@
+"""Mutation regressions for the direct Blender scout category validator."""
+import copy
+import importlib.abc
+import json
+from pathlib import Path
+import struct
+import subprocess
+import sys
+import tempfile
+import unittest
+from unittest.mock import patch
+
+from test_scout_export import ASSET, REPO, scout
+from validate import REGISTRIES, main, node_position_bounds, overall_position_bounds, validate_sightlines
+from validate_asset import ValidationError, accessor_values, read_document, validate_manifest
+
+
+class ScoutValidationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.manifest = json.loads((ASSET / 'manifest.json').read_text())
+        cls.output = REPO / cls.manifest['runtime']
+        cls.document, cls.binary = read_document(cls.output)
+
+    def validate(self, document=None, binary=None, manifest=None):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'scout.glb'
+            path.write_bytes(scout.encode_glb(document or self.document,
+                                             self.binary if binary is None else binary))
+            return validate_manifest(manifest or self.manifest, path, REPO,
+                                     extension_validators=REGISTRIES)
+
+    def vertex_edit(self, name, semantic, edit):
+        document = copy.deepcopy(self.document)
+        binary = bytearray(self.binary)
+        node = next(n for n in document['nodes'] if n['name'] == name)
+        primitive = document['meshes'][node['mesh']]['primitives'][0]
+        accessor = document['accessors'][primitive['attributes'][semantic]]
+        view = document['bufferViews'][accessor['bufferView']]
+        width = {'VEC2': 2, 'VEC3': 3}[accessor['type']]
+        start = view.get('byteOffset', 0) + accessor.get('byteOffset', 0)
+        stride = view.get('byteStride', width * 4)
+        for row in range(accessor['count']):
+            offset = start + row * stride
+            values = struct.unpack_from('<' + 'f' * width, binary, offset)
+            struct.pack_into('<' + 'f' * width, binary, offset, *edit(values))
+        # Deliberately keep min/max unchanged: actual vertices must be measured.
+        return document, bytes(binary)
+
+    def test_direct_validator_without_geometry_generator(self):
+        class RejectGenerator(importlib.abc.MetaPathFinder):
+            def find_spec(self, fullname, path, target=None):
+                if fullname == 'generate_salimon_phase0_ship':
+                    raise AssertionError('validator tried to load procedural geometry')
+        with patch.object(sys, 'meta_path', [RejectGenerator(), *sys.meta_path]):
+            main()
+        self.assertNotIn('generate_salimon_phase0_ship', sys.modules)
+
+    def test_uv_normals_unified_console_and_real_dimensions(self):
+        cases = (
+            ('Monitor_Wide', 'TEXCOORD_0', lambda p: (p[0], 1-p[1])),
+            ('Monitor_Wide', 'NORMAL', lambda p: tuple(-v for v in p)),
+            ('Core_Monitor', 'NORMAL', lambda p: tuple(-v for v in p)),
+            ('Core_Monitor', 'TEXCOORD_0', lambda p: (p[0], 1-p[1])),
+            ('Cockpit_Monitor_Housings', 'POSITION', lambda p: (p[0], p[1], p[2] + 5)),
+            ('Hull_Nose', 'POSITION', lambda p: (p[0] + 1, p[1], p[2])),
+            ('Cockpit_Glazing', 'POSITION', lambda p: (p[0] + 1, p[1], p[2])),
+            ('Wing_Port', 'POSITION', lambda p: (p[0], p[1], p[2] + 20)),
+        )
+        for name, semantic, edit in cases:
+            with self.subTest(name=name):
+                document, binary = self.vertex_edit(name, semantic, edit)
+                with self.assertRaises(ValidationError):
+                    self.validate(document, binary)
+
+    def test_compact_nose_unified_console_and_retired_cargo_contract(self):
+        metadata = self.document['extras']['salimon']
+        self.assertEqual(self.manifest['extensions']['ship']['data']['dimensionsMeters'],
+                         [18.33, 6, 20])
+        self.assertEqual(metadata['overallDimensionsMeters'], [18.33, 6, 20])
+        overall_min, overall_max = overall_position_bounds(self.document, self.binary)
+        self.assertAlmostEqual(overall_max[0] - overall_min[0], 18.33, places=3)
+        self.assertAlmostEqual(overall_max[1] - overall_min[1], 6, places=3)
+        self.assertAlmostEqual(overall_max[2] - overall_min[2], 20, places=3)
+        self.assertAlmostEqual(node_position_bounds(self.document, self.binary, 'Hull_Nose')[1][0],
+                               8.53, places=3)
+        self.assertAlmostEqual(node_position_bounds(self.document, self.binary, 'Cockpit_Glazing')[1][0],
+                               8.20, places=3)
+        self.assertAlmostEqual(node_position_bounds(self.document, self.binary, 'Deck_Walkable')[1][0],
+                               7.85, places=3)
+        console = metadata['cockpitInstruments']['unifiedConsole']
+        self.assertEqual(console['monitorNodes'],
+                         ['Monitor_Wide'])
+        self.assertEqual(console['collisionNode'], 'COLLIDER_CockpitCenterConsole')
+        self.assertEqual(console['walkingSide'], 'both')
+        self.assertEqual(console['noseDeckForwardMeters'], 7.85)
+        self.assertAlmostEqual(console['boundsMeters']['min'][2],
+                               -console['boundsMeters']['max'][2])
+        centers = [sum(bound[2] for bound in node_position_bounds(self.document, self.binary, name)) / 2
+                   for name in console['monitorNodes']]
+        self.assertAlmostEqual(centers[0], 0.0)
+        self.assertFalse(any(n["name"] in ("Monitor_Center", "Monitor_Port", "Monitor_Starboard")
+                             for n in self.document["nodes"]))
+        self.assertEqual(len(self.manifest['contracts']['colliders']), 37)
+        self.assertNotIn('cargoRoom', metadata)
+        self.assertNotIn('cargoRoom', self.document['asset']['extras']['salimon'])
+        self.assertIn('Starter_CargoBulkhead', [n['name'] for n in self.document['nodes']])
+        self.assertFalse(any(n['name'].startswith('Cargo_Module') for n in self.document['nodes']))
+
+    def test_window_sightline_regression(self):
+        # Reposition an existing opaque wall in the seated forward ray while
+        # keeping the ship envelope and material/node contract unchanged.
+        document, binary = self.vertex_edit('Wall_Port_Inner', 'POSITION',
+                                            lambda p: (6.5, p[1], p[0]))
+        with self.assertRaisesRegex(ValidationError, 'obstructed|blocked'):
+            self.validate(document, binary)
+
+    def test_core_frame_does_not_cover_live_display(self):
+        # Pull only the frame's backing forward through the screen. All names,
+        # display UVs and the broader pedestal bounds still look valid.
+        document, binary = self.vertex_edit(
+            'Core_Pedestal', 'POSITION',
+            lambda p: (p[0], p[1], -1.) if p[1] > 1.0 else p)
+        with self.assertRaisesRegex(ValidationError, 'Core monitor display occluded'):
+            validate_sightlines(document, binary)
+
+    def test_core_monitor_needs_physical_rim_and_pedestal_supports(self):
+        for name in ('Core_Ceramic_Armor', 'Core_Cradle'):
+            # Remove the newly added front geometry, leaving the original Core
+            # meshes, the live quad, UVs and proxy inventory present.
+            document, binary = self.vertex_edit(
+                name, 'POSITION',
+                lambda p: (p[0], p[1], -.82) if p[2] < -.86 else p)
+            with self.subTest(name=name):
+                with self.assertRaisesRegex(ValidationError, 'Core monitor frame/mount missing'):
+                    validate_sightlines(document, binary)
+
+    def test_collision_anchor_material_and_budget_regressions(self):
+        for name, mutate in (
+            ('collision', lambda d: next(n for n in d['nodes'] if n['name'] == 'COLLIDER_AftDoor')['extras']['salimon'].update(sizeMeters=[.1, .1, .1])),
+            ('marker', lambda d: next(n for n in d['nodes'] if n['name'] == 'MARKER_CockpitSeat').update(translation=[0, 0, 0])),
+            ('material', lambda d: next(m for m in d['materials'] if m['name'] == 'Cockpit Glass').update(alphaMode='OPAQUE')),
+            ('stale metrics', lambda d: d['extras']['salimon'].update(triangleCount=1)),
+        ):
+            with self.subTest(name=name):
+                document = copy.deepcopy(self.document)
+                mutate(document)
+                with self.assertRaises(ValidationError):
+                    self.validate(document)
+        manifest = copy.deepcopy(self.manifest)
+        manifest['budgets']['maxTriangles'] = 1
+        with self.assertRaisesRegex(ValidationError, 'maxTriangles'):
+            self.validate(manifest=manifest)
+
+    def test_validation_is_active_with_optimized_python(self):
+        with tempfile.TemporaryDirectory() as directory:
+            export = Path(directory)
+            document = copy.deepcopy(self.document)
+            document['extras']['salimon']['triangleCount'] = 1
+            (export / 'salimon_phase0_ship.glb').write_bytes(scout.encode_glb(document, self.binary))
+            code = f'import sys; sys.path.insert(0, {str(ASSET)!r}); from validate import main; from pathlib import Path; main(Path({directory!r}))'
+            result = subprocess.run([sys.executable, '-O', '-c', code], capture_output=True, text=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('ValidationError', result.stderr)
+
+    def test_ship_semantic_failure_preserves_published_export(self):
+        paths = [self.output.with_suffix(s) for s in ('.glb', '.bin', '.gltf')]
+        paths.extend([ASSET / 'export-report.json', REPO / 'client/assets/ship/spatial-contracts.json'])
+        paths.extend(REPO / 'client/character/src' / n for n in ('spatial_contracts.rs',))
+        before = {p: p.read_bytes() for p in paths}
+        def blender(command, **kwargs):
+            document, binary = self.vertex_edit('Monitor_Wide', 'TEXCOORD_0', lambda p: (p[0], 1-p[1]))
+            Path(command[-1]).write_bytes(scout.encode_glb(document, binary))
+        with patch.object(scout.shutil, 'which', return_value='/mock/blender'), \
+             patch.object(scout.subprocess, 'run', side_effect=blender):
+            with self.assertRaises(ValidationError):
+                scout.export()
+        self.assertEqual(before, {p: p.read_bytes() for p in paths})
+
+    def test_shared_accessor_offsets_strides_and_uint32_indices(self):
+        binary = struct.pack('<IffIff', 99, 1, 2, 88, 3, 4)
+        document = {'bufferViews': [{'byteOffset': 0, 'byteStride': 12}],
+                    'accessors': [{'bufferView': 0, 'byteOffset': 4, 'count': 2, 'type': 'VEC2', 'componentType': 5126},
+                                  {'bufferView': 0, 'count': 2, 'type': 'SCALAR', 'componentType': 5125}]}
+        self.assertEqual(accessor_values(document, binary, 0), [(1, 2), (3, 4)])
+        self.assertEqual(accessor_values(document, binary, 1), [(99,), (88,)])
+
+
+if __name__ == '__main__':
+    unittest.main()

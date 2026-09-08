@@ -1,0 +1,96 @@
+{
+  "source": "reports/issue-455/evidence/native-data/after-mixed/native-500-current-mixed-active-facing.stdout.gz",
+  "sha256": "1e1eb233acf94c82429910e9a65b08a30bae238f1cc2990529f398cc7b642480",
+  "entries": [
+    {
+      "resource": "iron-ore",
+      "mass_bits": 4472406533629990549,
+      "radius_bits": 4572414629676717179
+    },
+    {
+      "resource": "iron-ore",
+      "mass_bits": 4524193975976911956,
+      "radius_bits": 4572414629676717179
+    },
+    {
+      "resource": "iron-ore",
+      "mass_bits": 4584772507054221820,
+      "radius_bits": 4578631312853188915
+    },
+    {
+      "resource": "iron-ore",
+      "mass_bits": 4598175219545276416,
+      "radius_bits": 4583076030579799602
+    },
+    {
+      "resource": "iron-ore",
+      "mass_bits": 4611686018427387909,
+      "radius_bits": 4587579630207170101
+    },
+    {
+      "resource": "iron-ore",
+      "mass_bits": 4621819117588971520,
+      "radius_bits": 4591007413281183362
+    },
+    {
+      "resource": "silicate-rock",
+      "mass_bits": 4472406533629990549,
+      "radius_bits": 4572414629676717179
+    },
+    {
+      "resource": "silicate-rock",
+      "mass_bits": 4524193975976911956,
+      "radius_bits": 4572414629676717179
+    },
+    {
+      "resource": "silicate-rock",
+      "mass_bits": 4584772507054221820,
+      "radius_bits": 4579306962895740222
+    },
+    {
+      "resource": "silicate-rock",
+      "mass_bits": 4598175219545276416,
+      "radius_bits": 4583746360322492293
+    },
+    {
+      "resource": "silicate-rock",
+      "mass_bits": 4611686018427387909,
+      "radius_bits": 4588249959949862792
+    },
+    {
+      "resource": "silicate-rock",
+      "mass_bits": 4621819117588971520,
+      "radius_bits": 4591580537149356602
+    },
+    {
+      "resource": "water-ice",
+      "mass_bits": 4472406533629990549,
+      "radius_bits": 4572414629676717179
+    },
+    {
+      "resource": "water-ice",
+      "mass_bits": 4524193975976911956,
+      "radius_bits": 4572414629676717179
+    },
+    {
+      "resource": "water-ice",
+      "mass_bits": 4584772507054221820,
+      "radius_bits": 4581493879622208034
+    },
+    {
+      "resource": "water-ice",
+      "mass_bits": 4598175219545276416,
+      "radius_bits": 4585951519403631751
+    },
+    {
+      "resource": "water-ice",
+      "mass_bits": 4611686018427387909,
+      "radius_bits": 4590455119031002249
+    },
+    {
+      "resource": "water-ice",
+      "mass_bits": 4621819117588971520,
+      "radius_bits": 4594118997752266335
+    }
+  ]
+}

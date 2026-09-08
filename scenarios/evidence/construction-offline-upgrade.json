@@ -1,0 +1,108 @@
+{
+  "setup": {
+    "scenario": "construction-module-upgrade",
+    "seed": 550,
+    "step_ms": 16
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "assert": {
+        "path": "construction.recovery_multiplier",
+        "equals": 1.25
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "construction_module",
+        "pressed": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "construction_module",
+        "pressed": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "construction.recovery_multiplier",
+        "equals": 1.25
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "screenshot": "planned-upgrade",
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "construction.recovery_multiplier",
+        "equals": 1.0
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 96
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "construction.recovery_multiplier",
+        "equals": 1.5
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "build",
+        "pressed": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "build",
+        "pressed": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "screenshot": "commissioned-after-verified-resume",
+      "timeout_ms": 120000
+    }
+  ]
+}

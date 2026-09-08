@@ -1,0 +1,350 @@
+{
+  "setup": {
+    "scenario": "canonical-terrain",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "universe-orbit"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "wait": {
+        "path": "terrain.pending_patches",
+        "equals": 0
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "terrain.active_patches",
+        "gt": 0
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.mode",
+        "equals": "Canonical"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.active_patches",
+        "lte": 512
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.cache_patches",
+        "lte": 1024
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.gpu_cache_bytes",
+        "lte": 33554432
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.generated_peak",
+        "lte": 8
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.peak_upload_bytes",
+        "lte": 2097152
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "reference_camera.canonical_terrain_clearance_meters",
+        "gt": 0
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "universe-orbit",
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "universe-orbit-repeat",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "universe-surface"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "wait": {
+        "path": "terrain.pending_patches",
+        "equals": 0
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "terrain.active_patches",
+        "gt": 0
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.mode",
+        "equals": "Canonical"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.active_patches",
+        "lte": 512
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.cache_patches",
+        "lte": 1024
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.gpu_cache_bytes",
+        "lte": 33554432
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.generated_peak",
+        "lte": 8
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.peak_upload_bytes",
+        "lte": 2097152
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "reference_camera.canonical_terrain_clearance_meters",
+        "gt": 0
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "universe-surface",
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "universe-surface-repeat",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "universe-edge"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "wait": {
+        "path": "terrain.pending_patches",
+        "equals": 0
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "terrain.active_patches",
+        "gt": 0
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.mode",
+        "equals": "Canonical"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.active_patches",
+        "lte": 512
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.cache_patches",
+        "lte": 1024
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.gpu_cache_bytes",
+        "lte": 33554432
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.generated_peak",
+        "lte": 8
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.peak_upload_bytes",
+        "lte": 2097152
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "reference_camera.canonical_terrain_clearance_meters",
+        "gt": 0
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "universe-edge",
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "universe-edge-repeat",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "universe-orbit"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "wait": {
+        "path": "terrain.pending_patches",
+        "equals": 0
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "terrain.active_patches",
+        "gt": 0
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.mode",
+        "equals": "Canonical"
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.active_patches",
+        "lte": 512
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.cache_patches",
+        "lte": 1024
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.gpu_cache_bytes",
+        "lte": 33554432
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.generated_peak",
+        "lte": 8
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.peak_upload_bytes",
+        "lte": 2097152
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "reference_camera.canonical_terrain_clearance_meters",
+        "gt": 0
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "universe-orbit-revisit",
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "universe-orbit-revisit-repeat",
+      "timeout_ms": 60000
+    }
+  ]
+}

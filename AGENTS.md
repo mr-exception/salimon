@@ -1,0 +1,93 @@
+# Repository guidelines
+
+Use the owner-approved [cloud-first verification workflow](docs/verification-workflow.md).
+Routine implementation acceptance is cloud-only: do not require human gameplay,
+native macOS/Windows execution or physical M1 verification to deliver a normal
+feature PR. Run meaningful automated checks in the available cloud executor,
+including production Linux software-Vulkan rendering where appearance matters.
+When the cloud cannot exercise a platform-specific property, mark it unverified
+and route it to non-blocking release qualification, never claim it passed.
+Human approval is reserved for actual product/legal decisions and final release
+qualification, not routine ticket completion.
+Label active issues `auto-verification` or `human-verification`; retire the
+`native` label and title prefix. AI executes cloud checks, creates/updates a PR
+and updates its issue. Human issues give actionable capture instructions and
+return evidence to Codex. Only a fully evidenced human review requiring no
+repository changes may close directly with a durable issue update instead of
+a report file/PR. Otherwise the completion/report rules below apply. Routine
+cloud delivery does not wait for M1 access; record actual platform limitations.
+
+## Start here
+
+1. Read the active [GitHub issue](https://github.com/mr-exception/salimon/issues),
+   comments, acceptance criteria and **Blocked by** section. Resolve explicit
+   blockers before dependent work. Issue metadata defines task scope; historical
+   task numbers do not prescribe execution order.
+2. Use [current architecture](docs/technical-architecture.md) and the
+   [feature maintenance map](docs/maintenance-map.md) to find owners, sources,
+   tests and scenarios. Read only the affected crate's `README.ai.md`,
+   `architecture.md`, `invariants.md` and linked contracts before editing.
+3. Follow [coding conventions](docs/coding-conventions.md) and select the exact
+   affected-area checks from [validation](docs/validation.md). Read source before
+   trusting prose, especially historical reports.
+
+## Scope and precedence
+
+Current implementation is a native, client-only custom Rust/winit/wgpu game.
+`client/` owns runtime code; `models/` owns offline authoring; `core/` has no
+backend implementation. Ship flight/landing, movement/EVA, mining, carrying and
+fragment motion/contact are implemented. Resource changes survive local streaming
+in the current in-memory session. Disk checkpoints and survival clock/full-save/terminal restart are implemented
+by #363–#371; backend persistence and networking remain deferred. Canonical ship gravity/orbital coasting and offline resume are implemented by #432–#434; observed-source flight outside that model remains separate.
+Survival HUD/status details and Journey Ended presentation are implemented by #373/#374; Starter supplies are implemented by #379; Q-wheel consumption is integrated by #377. Fabricator crafting is authorized by #336–#348; see the accepted contracts in docs/spaceship-building-and-survival.md.
+
+Explicit user instructions govern the task. Approved specifications and issue
+acceptance criteria define intended behavior; current code/tests establish what
+is implemented. Component invariants constrain changes unless deliberately
+revised with their consumers/tests. Future proposals and historical evidence
+are not active implementation instructions. If these disagree, check code and
+issue decisions, repair stale documentation in the same change, and record
+unresolved product/architecture decisions in [Project Q&A](docs/project-qa.md)
+and the issue rather than silently inventing policy.
+
+## Ownership and completion
+
+Runtime composes typed domain state and native events; renderer owns GPU work
+and renderer-neutral DTOs; supporting domains do not call runtime. See the
+maintenance map for precise boundaries and the asset regeneration owner.
+No full game engine, framework adoption or broad refactor is implied by cleanup.
+
+Keep behavior/contracts and affected guides aligned in the same change. Use one
+canonical definition per rule and link local guides to it. Preserve useful
+historical evidence while labeling its date/revision and limitations.
+
+Except for the evidence-only human-review closure defined above, every completed
+task **must** create or update
+`reports/issue-<number>/README.md` (or `reports/task-<id>/README.md` without a
+GitHub issue), recording outcome, meaningful changes, checks/results, and
+limitations or blockers. Put applicable screenshots/images beside it with
+relative links. Follow [report conventions](docs/coding-conventions.md#task-completion-reports)
+and [reports layout](reports/README.md); never add task-result folders to `docs/`.
+Link the report and relevant commits/PR from the GitHub issue completion update.
+Except for the documented evidence-only human-review case, close the source
+issue through the current PR and move unresolved points into
+linked follow-up issues; do not keep the whole source issue open for remaining
+work. Follow the canonical
+[issue completion and follow-up workflow](docs/coding-conventions.md#issue-completion-and-follow-up).
+Push to main only when explicitly requested;
+otherwise use a reviewable branch/PR for the requested workflow.
+
+For asset authoring, follow [Option A art direction and the opt-in local bridge](models/authoring.md#option-a-art-contract-authoring-protocol-100).
+Inspect existing assets first; preserve linked libraries, named interfaces and
+manifest budgets. Use reviewed parametric Blender Python; no external AI model
+services or autonomous promotion of scratch candidates to production assets.
+
+## Universe documentation readiness (#440)
+
+For every U01–U34 implementation/fix, apply the required
+[documentation maintenance gate](docs/documentation-maintenance.md) before marking
+ready. Include same-PR guide changes or a precise no-impact justification, owning
+architecture/invariants links, behavior/source/test mapping and checked paths.
+The PR/issue templates carry the author/reviewer checklist. Final audit #441 is
+not a substitute; automated linting remains #442. This policy is review-enforced,
+not a claim that branch protection or CI semantic verification was installed.

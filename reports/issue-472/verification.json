@@ -1,0 +1,7 @@
+{
+  "parent_revision": "5113d628865e8fe863ec40c7dbe3092b8fbe347b",
+  "shared_checks": "../issue-439/verification.json",
+  "hardware_fps_validated": false,
+  "physical_platform_validated": false,
+  "native_evidence": "native-evidence.json"
+}

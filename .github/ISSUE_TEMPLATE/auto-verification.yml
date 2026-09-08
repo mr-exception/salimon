@@ -1,0 +1,42 @@
+name: AI and cloud verification
+description: Reproduce checks in cloud and deliver a PR, report and issue update.
+labels: ["auto-verification"]
+body:
+  - type: markdown
+    attributes:
+      value: Follow docs/verification-workflow.md. This label describes verification method, not readiness. Do not use a native title prefix.
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and expected behavior
+      description: Link approved requirements, owning code/guides and source issue.
+    validations:
+      required: true
+  - type: textarea
+    id: blockers
+    attributes:
+      label: Blocked by
+      description: Exact implementation, source-review or decision blockers, or None.
+    validations:
+      required: true
+  - type: textarea
+    id: checks
+    attributes:
+      label: Cloud procedure and acceptance
+      description: Exact commands or steps, production routes, expected outcomes, setup/backend requirements and failure cases. Future adapters must be implemented before use.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and delivery
+      description: PR/report path, raw logs, state, original captures/audio/video, revision/hashes and environment metadata. AI executes, fixes failures, creates or updates the PR, then updates this issue.
+    validations:
+      required: true
+  - type: textarea
+    id: human
+    attributes:
+      label: Separate human criteria
+      description: Link exact transferred presentation, physical platform or decision criteria, or explain None. No automatic baseline, source permission or budget approval.
+    validations:
+      required: true

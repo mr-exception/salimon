@@ -1,0 +1,8 @@
+   Compiling salimon-universe v0.1.0 (/workspace/salimon/client/universe)
+   Compiling salimon-persistence v0.1.0 (/workspace/salimon/client/persistence)
+   Compiling salimon-physics v0.1.0 (/workspace/salimon/client/physics)
+   Compiling salimon-world v0.1.0 (/workspace/salimon/client/world)
+   Compiling salimon-ship v0.1.0 (/workspace/salimon/client/ship)
+error: couldn't create a temp dir: No space left on device (os error 28) at path "/workspace/salimon/target/debug/deps/rustcNw5aVi"
+
+error: could not compile `salimon-ship` (lib test) due to 1 previous error

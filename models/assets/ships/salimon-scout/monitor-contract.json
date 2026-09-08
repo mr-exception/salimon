@@ -1,0 +1,27 @@
+{
+  "description": "One authored wide multifunction monitor on the centered console.",
+  "monitorVertices": {
+    "Monitor_Wide": [
+      [
+        4.42,
+        1.2067,
+        -0.99
+      ],
+      [
+        4.42,
+        0.8735,
+        -0.99
+      ],
+      [
+        4.42,
+        0.8735,
+        0.99
+      ],
+      [
+        4.42,
+        1.2067,
+        0.99
+      ]
+    ]
+  }
+}

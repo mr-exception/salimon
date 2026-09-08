@@ -1,0 +1,35 @@
+--- a/src/metal/mod.rs
++++ b/src/metal/mod.rs
+@@ -644,6 +644,7 @@
+     render_layer: Mutex<Retained<CAMetalLayer>>,
+     swapchain_format: RwLock<Option<wgt::TextureFormat>>,
+     extent: RwLock<wgt::Extent3d>,
++    has_been_visible: atomic::AtomicBool,
+ }
+ 
+ unsafe impl Send for Surface {}
+--- a/src/metal/surface.rs
++++ b/src/metal/surface.rs
+@@ -40,6 +40,7 @@
+             render_layer: Mutex::new(layer),
+             swapchain_format: RwLock::new(None),
+             extent: RwLock::new(wgt::Extent3d::default()),
++            has_been_visible: std::sync::atomic::AtomicBool::new(false),
+         }
+     }
+ 
+@@ -364,7 +365,13 @@
+             if let Some(window) = hosting_window(Retained::into_super(render_layer.clone())) {
+                 const NS_WINDOW_OCCLUSION_STATE_VISIBLE: usize = 1 << 1;
+                 let occlusion_state: usize = unsafe { objc2::msg_send![&*window, occlusionState] };
+-                if occlusion_state & NS_WINDOW_OCCLUSION_STATE_VISIBLE == 0 {
++                if occlusion_state & NS_WINDOW_OCCLUSION_STATE_VISIBLE != 0 {
++                    self.has_been_visible
++                        .store(true, std::sync::atomic::Ordering::Relaxed);
++                } else if self
++                    .has_been_visible
++                    .load(std::sync::atomic::Ordering::Relaxed)
++                {
+                     return Err(crate::SurfaceError::Occluded);
+                 }
+             }

@@ -1,0 +1,3246 @@
+[
+  {
+    "suite": "universe",
+    "scenario": "offline-resume-progress",
+    "status": "passed",
+    "steps": 22,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-x1vt51aw/result.json",
+    "original_result_sha256": "dc27c977e25bb04f0fc243a14502b00253f27bff43023e4fc317e60e5a725b61",
+    "trace": "issue-557/traces/universe-offline-resume-progress.json.xz",
+    "stderr": "issue-557/traces/universe-offline-resume-progress.stderr.gz",
+    "captures": [
+      {
+        "label": "offline-progress",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-x1vt51aw/step-012-offline-progress.png",
+        "path": "issue-561/native/universe/offline-resume-progress/step-012-offline-progress.png",
+        "sha256": "a8fb3874cc3c310395bdcdb302becfc8f93f17bb5b9f9f5e2039547cf7ca8c98",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "offline-progress-repeat",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-x1vt51aw/step-013-offline-progress-repeat.png",
+        "path": "issue-561/native/universe/offline-resume-progress/step-013-offline-progress-repeat.png",
+        "sha256": "a8fb3874cc3c310395bdcdb302becfc8f93f17bb5b9f9f5e2039547cf7ca8c98",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "offline-ready",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-x1vt51aw/step-017-offline-ready.png",
+        "path": "issue-561/native/universe/offline-resume-progress/step-017-offline-ready.png",
+        "sha256": "4287889a3447dd8bdf7e1f790f01fd72c4332b12b427bfee5714c878e56bb190",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "offline-resumed",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-x1vt51aw/step-022-offline-resumed.png",
+        "path": "issue-561/native/universe/offline-resume-progress/step-022-offline-resumed.png",
+        "sha256": "4f89e83c3caca53bd667efee02cc0e1f192ef985c43fbb2ca2ab2a98b4865a28",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "universe",
+    "scenario": "offline-clock-recovery",
+    "status": "passed",
+    "steps": 16,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-ty471ifa/result.json",
+    "original_result_sha256": "2f07cacd18e727d205260d95b6e86dbdac7d8c7dd3ae99fe1b04b1d3e9375d5c",
+    "trace": "issue-557/traces/universe-offline-clock-recovery.json.xz",
+    "stderr": "issue-557/traces/universe-offline-clock-recovery.stderr.gz",
+    "captures": [
+      {
+        "label": "offline-clock-failed",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-ty471ifa/step-009-offline-clock-failed.png",
+        "path": "issue-561/native/universe/offline-clock-recovery/step-009-offline-clock-failed.png",
+        "sha256": "84db3f478fcda63c0196ca3ec717585a6bedff3422dfb560afc7c7cfe899d452",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "offline-clock-recovered",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-ty471ifa/step-013-offline-clock-recovered.png",
+        "path": "issue-561/native/universe/offline-clock-recovery/step-013-offline-clock-recovered.png",
+        "sha256": "2b765384d536352b94914fdac69db0de81ba7caa4609800fee9df9aaeff47795",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "universe",
+    "scenario": "universe-flight",
+    "status": "passed",
+    "steps": 13,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-zvmwuc57/result.json",
+    "original_result_sha256": "cdd0902a409076bdf683952d7562074db6277b1504acfcc755b881798dd310d2",
+    "trace": "issue-557/traces/universe-universe-flight.json.xz",
+    "stderr": "issue-557/traces/universe-universe-flight.stderr.gz",
+    "captures": [
+      {
+        "label": "canonical-takeoff",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-zvmwuc57/step-007-canonical-takeoff.png",
+        "path": "issue-561/native/universe/universe-flight/step-007-canonical-takeoff.png",
+        "sha256": "748352dd7e55fa1c5f42a4e19007f2e0d95e738e64822cd0d2b6e63876e82b93",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "canonical-landed",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-zvmwuc57/step-013-canonical-landed.png",
+        "path": "issue-561/native/universe/universe-flight/step-013-canonical-landed.png",
+        "sha256": "63b284dd858baf917faa5682234e17ddc030b5775bb5c9b24ec3f4816a694f48",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "universe",
+    "scenario": "universe-navigation",
+    "status": "passed",
+    "steps": 19,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-lyx_8ilk/result.json",
+    "original_result_sha256": "ad629831d76c050e7e0210fbcf884bec1fb2db343a9579ffef2994c38d3c5099",
+    "trace": "issue-557/traces/universe-universe-navigation.json.xz",
+    "stderr": "issue-557/traces/universe-universe-navigation.stderr.gz",
+    "captures": [
+      {
+        "label": "predicted-contact",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-lyx_8ilk/step-012-predicted-contact.png",
+        "path": "issue-561/native/universe/universe-navigation/step-012-predicted-contact.png",
+        "sha256": "35477faa58e392e3100da94ad66fe78d12379ff69aad99568fa33536a3cdb736",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "contact-unavailable",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-lyx_8ilk/step-019-contact-unavailable.png",
+        "path": "issue-561/native/universe/universe-navigation/step-019-contact-unavailable.png",
+        "sha256": "077bf7c75f3ad4fb287a2d467bfcc624b101cdcd91c54f729594aa14614edd33",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "universe",
+    "scenario": "inertial-flight",
+    "status": "passed",
+    "steps": 426,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-t9peq_h0/result.json",
+    "original_result_sha256": "36ee764997c650d483be8c5ee57f37e6a6fba861e11a3e8a83d20a121a0242c1",
+    "trace": "issue-557/traces/universe-inertial-flight.json.xz",
+    "stderr": "issue-557/traces/universe-inertial-flight.stderr.gz",
+    "captures": [
+      {
+        "label": "inertial-flight",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-t9peq_h0/step-426-inertial-flight.png",
+        "path": "issue-561/native/universe/inertial-flight/step-426-inertial-flight.png",
+        "sha256": "1fbb4aa4e0b57791d01a7dfbe526046747de0d30bae25d4c2cbde80f0dfa9fc0",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "universe",
+    "scenario": "core-restart",
+    "status": "passed",
+    "steps": 20,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-h_n9pk1o/result.json",
+    "original_result_sha256": "bfa63d3cb273b337f390dc6ffd13a8f4922903567f3a9fda4feea9afec2d9d27",
+    "trace": "issue-557/traces/universe-core-restart.json.xz",
+    "stderr": "issue-557/traces/universe-core-restart.stderr.gz",
+    "captures": [
+      {
+        "label": "core-restart",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-h_n9pk1o/step-020-core-restart.png",
+        "path": "issue-561/native/universe/core-restart/step-020-core-restart.png",
+        "sha256": "e095868fd6551f1d0d67dee172b4a3322eccf90f0649d626785c953c2c99bbdb",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "universe",
+    "scenario": "crash-recovery",
+    "status": "passed",
+    "steps": 19,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-sn70oc92/result.json",
+    "original_result_sha256": "a3959ba02d45beee1fac65087b9aed931b96ab606f9b6d7f6ec72f3aed86d26d",
+    "trace": "issue-557/traces/universe-crash-recovery.json.xz",
+    "stderr": "issue-557/traces/universe-crash-recovery.stderr.gz",
+    "captures": [
+      {
+        "label": "crash-recovery",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-sn70oc92/step-019-crash-recovery.png",
+        "path": "issue-561/native/universe/crash-recovery/step-019-crash-recovery.png",
+        "sha256": "2ef018ba704e33a4c41d192dbb4d4650ba886d3c26200bcbdd4d48364d88be54",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "universe",
+    "scenario": "cargo-flight",
+    "status": "passed",
+    "steps": 7,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-99xb4h4_/result.json",
+    "original_result_sha256": "1a1230e09fc5030ebbe94a9aee77354dd3827bb64b8a761f83f6a439f4f413db",
+    "trace": "issue-557/traces/universe-cargo-flight.json.xz",
+    "stderr": "issue-557/traces/universe-cargo-flight.stderr.gz",
+    "captures": [
+      {
+        "label": "cargo-flight",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-99xb4h4_/step-007-cargo-flight.png",
+        "path": "issue-561/native/universe/cargo-flight/step-007-cargo-flight.png",
+        "sha256": "47f0c4be51300d512df9256001b588bb863ee98b4c92bf41eb198dcfe4888ac9",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "universe",
+    "scenario": "moving-eva",
+    "status": "passed",
+    "steps": 112,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-fq27wi5a/result.json",
+    "original_result_sha256": "a1dd6f53db84bcc6a7775ef213f76dbea3edc1f428933cd852e90e1cd863e455",
+    "trace": "issue-557/traces/universe-moving-eva.json.xz",
+    "stderr": "issue-557/traces/universe-moving-eva.stderr.gz",
+    "captures": [
+      {
+        "label": "moving-eva-no-input-drift",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-fq27wi5a/step-037-moving-eva-no-input-drift.png",
+        "path": "issue-561/native/universe/moving-eva/step-037-moving-eva-no-input-drift.png",
+        "sha256": "94129d46ced45e5e3d70f4197a9fdd0c4cadd7e3076755edf48fe47d1bb2e42d",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "moving-eva-vertical-flight",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-fq27wi5a/step-046-moving-eva-vertical-flight.png",
+        "path": "issue-561/native/universe/moving-eva/step-046-moving-eva-vertical-flight.png",
+        "sha256": "e11acd55638179f0c269196ff003b00a59e26c852c4b9064d3d441f0d78428a8",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "moving-eva-reentry",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-fq27wi5a/step-104-moving-eva-reentry.png",
+        "path": "issue-561/native/universe/moving-eva/step-104-moving-eva-reentry.png",
+        "sha256": "480d6aeddefd8614f712717023810454e86761e41227dee872898509e2c14305",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "universe",
+    "scenario": "cargo-blackout",
+    "status": "passed",
+    "steps": 39,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-qjao1wnh/result.json",
+    "original_result_sha256": "0ae66c0db71d5320d9060c6efeabaae1d4807eaf78e7d2c03c25cf7d64ec6b58",
+    "trace": "issue-557/traces/universe-cargo-blackout.json.xz",
+    "stderr": "issue-557/traces/universe-cargo-blackout.stderr.gz",
+    "captures": [
+      {
+        "label": "blackout-500-core-off",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-qjao1wnh/step-005-blackout-500-core-off.png",
+        "path": "issue-561/native/universe/cargo-blackout/step-005-blackout-500-core-off.png",
+        "sha256": "832e8955f9141a0f3667e8eb792d2a39c8787fb5b0b1ec630ef5c3b87fed2de6",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "blackout-500-converting",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-qjao1wnh/step-022-blackout-500-converting.png",
+        "path": "issue-561/native/universe/cargo-blackout/step-022-blackout-500-converting.png",
+        "sha256": "5eeda2de7f2d3de88299bd5256cf050ae00015812401a278d273886f68915e73",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "blackout-500-recharged",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-qjao1wnh/step-029-blackout-500-recharged.png",
+        "path": "issue-561/native/universe/cargo-blackout/step-029-blackout-500-recharged.png",
+        "sha256": "5993a7835aea969a79cd552f519a4afb7bd82b1bf138f0d96fb666fe7e7d9457",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "blackout-500-depleted-again",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-qjao1wnh/step-039-blackout-500-depleted-again.png",
+        "path": "issue-561/native/universe/cargo-blackout/step-039-blackout-500-depleted-again.png",
+        "sha256": "03403d80ccebd46ed16714a3ab21064d437f1da773d009dc1c7d86d3bd361901",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "universe",
+    "scenario": "landing-speed-cutoff",
+    "status": "passed",
+    "steps": 319,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-eosf_gzb/result.json",
+    "original_result_sha256": "84412daf4620c7666c180fb68577cdec6b845f4c2edc78916627bd4b646f9acf",
+    "trace": "issue-557/traces/universe-landing-speed-cutoff.json.xz",
+    "stderr": "issue-557/traces/universe-landing-speed-cutoff.stderr.gz",
+    "captures": [
+      {
+        "label": "landing-below-20mps",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-eosf_gzb/step-103-landing-below-20mps.png",
+        "path": "issue-561/native/universe/landing-speed-cutoff/step-103-landing-below-20mps.png",
+        "sha256": "5c4b861970dfe9e336bfff19c75f49e8f2030b91918aa6fa4287980430fc9a1a",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "landing-rejected-above-20mps",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-eosf_gzb/step-108-landing-rejected-above-20mps.png",
+        "path": "issue-561/native/universe/landing-speed-cutoff/step-108-landing-rejected-above-20mps.png",
+        "sha256": "e23d352f280a6ee568cbeeb0b9f62f08884095e7e9c4e2b97f62891f12428def",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "landing-at-cutoff-complete",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-eosf_gzb/step-319-landing-at-cutoff-complete.png",
+        "path": "issue-561/native/universe/landing-speed-cutoff/step-319-landing-at-cutoff-complete.png",
+        "sha256": "f18f558bc540d71489ef32ed60c580be1ee17762e6d347a4e4d225864470d061",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "universe",
+    "scenario": "universe-terrain",
+    "status": "passed",
+    "steps": 52,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-_6gu9r2m/result.json",
+    "original_result_sha256": "e342f69801343888adc72deb8434db6f17a26d887d3b8c93aff4b77014d6030e",
+    "trace": "issue-557/traces/universe-universe-terrain.json.xz",
+    "stderr": "issue-557/traces/universe-universe-terrain.stderr.gz",
+    "captures": [
+      {
+        "label": "universe-orbit",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-_6gu9r2m/step-012-universe-orbit.png",
+        "path": "issue-561/native/universe/universe-terrain/step-012-universe-orbit.png",
+        "sha256": "06ce8f1ca96e1894899a275fbcb6b768a699995aa4dfdba67efd45461f8f03e1",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "universe-orbit-repeat",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-_6gu9r2m/step-013-universe-orbit-repeat.png",
+        "path": "issue-561/native/universe/universe-terrain/step-013-universe-orbit-repeat.png",
+        "sha256": "06ce8f1ca96e1894899a275fbcb6b768a699995aa4dfdba67efd45461f8f03e1",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "universe-surface",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-_6gu9r2m/step-025-universe-surface.png",
+        "path": "issue-561/native/universe/universe-terrain/step-025-universe-surface.png",
+        "sha256": "3be1302b5c76f3a1d7d2677eb669ab07571ea3fc985cb56b09bb7c7547f49f82",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "universe-surface-repeat",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-_6gu9r2m/step-026-universe-surface-repeat.png",
+        "path": "issue-561/native/universe/universe-terrain/step-026-universe-surface-repeat.png",
+        "sha256": "3be1302b5c76f3a1d7d2677eb669ab07571ea3fc985cb56b09bb7c7547f49f82",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "universe-edge",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-_6gu9r2m/step-038-universe-edge.png",
+        "path": "issue-561/native/universe/universe-terrain/step-038-universe-edge.png",
+        "sha256": "297f225b7fbb2e43fe72a2e1f86891a6aef7114bcfa92e8bdff14eeab44dab69",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "universe-edge-repeat",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-_6gu9r2m/step-039-universe-edge-repeat.png",
+        "path": "issue-561/native/universe/universe-terrain/step-039-universe-edge-repeat.png",
+        "sha256": "297f225b7fbb2e43fe72a2e1f86891a6aef7114bcfa92e8bdff14eeab44dab69",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "universe-orbit-revisit",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-_6gu9r2m/step-051-universe-orbit-revisit.png",
+        "path": "issue-561/native/universe/universe-terrain/step-051-universe-orbit-revisit.png",
+        "sha256": "06ce8f1ca96e1894899a275fbcb6b768a699995aa4dfdba67efd45461f8f03e1",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "universe-orbit-revisit-repeat",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-_6gu9r2m/step-052-universe-orbit-revisit-repeat.png",
+        "path": "issue-561/native/universe/universe-terrain/step-052-universe-orbit-revisit-repeat.png",
+        "sha256": "06ce8f1ca96e1894899a275fbcb6b768a699995aa4dfdba67efd45461f8f03e1",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "universe",
+    "scenario": "universe-journey",
+    "status": "passed",
+    "steps": 25,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-9rb09aqg/result.json",
+    "original_result_sha256": "55572927f42a84927750c152bc17c1a82a73ee8171b70a3537c2648c6edbf61e",
+    "trace": "issue-557/traces/universe-universe-journey.json.xz",
+    "stderr": "issue-557/traces/universe-universe-journey.stderr.gz",
+    "captures": [
+      {
+        "label": "published-start",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-9rb09aqg/step-004-published-start.png",
+        "path": "issue-561/native/universe/universe-journey/step-004-published-start.png",
+        "sha256": "392d5c1166712cc95c5c8bf88d6a42fda1af4ebba4e2ea3cd985470caad4f09f",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "approach-rear-door",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-9rb09aqg/step-017-approach-rear-door.png",
+        "path": "issue-561/native/universe/universe-journey/step-017-approach-rear-door.png",
+        "sha256": "d2d54ed9af9148f7261f513dee9da49e85d4822a57f34af651580e8f595724ea",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "entered-ship",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-9rb09aqg/step-024-entered-ship.png",
+        "path": "issue-561/native/universe/universe-journey/step-024-entered-ship.png",
+        "sha256": "87946e065f6e91e4f9cfba072d6ce3425672e678902f1067783df6a5b5840229",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "universe",
+    "scenario": "universe-mining",
+    "status": "passed",
+    "steps": 24,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-q1__y1g5/result.json",
+    "original_result_sha256": "29d842594c255f3c09b97aff4f22764b6fb9db5ebe70c943b7286d824be5680d",
+    "trace": "issue-557/traces/universe-universe-mining.json.xz",
+    "stderr": "issue-557/traces/universe-universe-mining.stderr.gz",
+    "captures": [
+      {
+        "label": "canonical-ore-before",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-q1__y1g5/step-006-canonical-ore-before.png",
+        "path": "issue-561/native/universe/universe-mining/step-006-canonical-ore-before.png",
+        "sha256": "efc233cf2dd96f2de80396a668241810fe0f2e4b5d45f429789e76f97f0c56de",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "canonical-carry",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-q1__y1g5/step-017-canonical-carry.png",
+        "path": "issue-561/native/universe/universe-mining/step-017-canonical-carry.png",
+        "sha256": "0f2d624335257321264adc08ad53cf2aa21a6f108ef0e84648055efb8ef93265",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "canonical-reloaded",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-q1__y1g5/step-024-canonical-reloaded.png",
+        "path": "issue-561/native/universe/universe-mining/step-024-canonical-reloaded.png",
+        "sha256": "8f34210181f91e37b13cb824273b84e223aa4ec0d6b3f821352d5c1c76a7e442",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "universe",
+    "scenario": "scanner-integration",
+    "status": "passed",
+    "steps": 85,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-_r95o4z5/result.json",
+    "original_result_sha256": "319f82d3d58ca736e2ef4a6cd87cf0b25637fd48b053e700b9cb0fdea8f100f4",
+    "trace": "issue-557/traces/universe-scanner-integration.json.xz",
+    "stderr": "issue-557/traces/universe-scanner-integration.stderr.gz",
+    "captures": [
+      {
+        "label": "idle",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-_r95o4z5/step-011-idle.png",
+        "path": "issue-561/native/universe/scanner-integration/step-011-idle.png",
+        "sha256": "fee067349ee4d95ee8d99eef5893fa62df2407ff1b41a69a6688ed262464b7d9",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "fresh",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-_r95o4z5/step-019-fresh.png",
+        "path": "issue-561/native/universe/scanner-integration/step-019-fresh.png",
+        "sha256": "c4253ceec23986c90c3631dc2889571fd828d319b3a800beb30fdd0c8eae8b13",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "fresh-repeat",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-_r95o4z5/step-020-fresh-repeat.png",
+        "path": "issue-561/native/universe/scanner-integration/step-020-fresh-repeat.png",
+        "sha256": "c4253ceec23986c90c3631dc2889571fd828d319b3a800beb30fdd0c8eae8b13",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "wide",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-_r95o4z5/step-053-wide.png",
+        "path": "issue-561/native/universe/scanner-integration/step-053-wide.png",
+        "sha256": "370550454389d6b2f3e9ce948ca7ed4a6179c4a48975a05b40010b89ad5aea57",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1920,
+            1080
+          ]
+        }
+      },
+      {
+        "label": "compact",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-_r95o4z5/step-062-compact.png",
+        "path": "issue-561/native/universe/scanner-integration/step-062-compact.png",
+        "sha256": "d3ffcc98b3d4b36c6a8aca3780f1fe3043a865d0688032017bb562b86311fd18",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            640,
+            360
+          ]
+        }
+      },
+      {
+        "label": "restored",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-_r95o4z5/step-071-restored.png",
+        "path": "issue-561/native/universe/scanner-integration/step-071-restored.png",
+        "sha256": "0650bc04bc96f73794a9408442b034a72df837eaa786fc0354c0d730e46ffdf0",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "blackout",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-_r95o4z5/step-085-blackout.png",
+        "path": "issue-561/native/universe/scanner-integration/step-085-blackout.png",
+        "sha256": "38b6296c169214abe583514303f28b2989bf26a713a71b8cfda39824cc6102b9",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "universe",
+    "scenario": "scanner-hologram",
+    "status": "passed",
+    "steps": 31,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-j0d70p0o/result.json",
+    "original_result_sha256": "b9115dcf2d8d30ad7ff10f2c8cbf87d04df0d4e71d28e7e5d8d414dafaccf2a7",
+    "trace": "issue-557/traces/universe-scanner-hologram.json.xz",
+    "stderr": "issue-557/traces/universe-scanner-hologram.stderr.gz",
+    "captures": [
+      {
+        "label": "undiscovered-projector",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-j0d70p0o/step-008-undiscovered-projector.png",
+        "path": "issue-561/native/universe/scanner-hologram/step-008-undiscovered-projector.png",
+        "sha256": "c5158f0d51bc708c4f3ed331ea0ee9afd68b0eb15ad7f1348e38b6ad89e6fb51",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "identified-local-contact",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-j0d70p0o/step-015-identified-local-contact.png",
+        "path": "issue-561/native/universe/scanner-hologram/step-015-identified-local-contact.png",
+        "sha256": "c4253ceec23986c90c3631dc2889571fd828d319b3a800beb30fdd0c8eae8b13",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "cockpit-coexistence",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-j0d70p0o/step-017-cockpit-coexistence.png",
+        "path": "issue-561/native/universe/scanner-hologram/step-017-cockpit-coexistence.png",
+        "sha256": "01b495f5c500b05f57c1c39996b7acf2abfffc1ba19ab7ee30e61a0f4d9c1dd0",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "blackout-projector",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-j0d70p0o/step-031-blackout-projector.png",
+        "path": "issue-561/native/universe/scanner-hologram/step-031-blackout-projector.png",
+        "sha256": "38b6296c169214abe583514303f28b2989bf26a713a71b8cfda39824cc6102b9",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "universe",
+    "scenario": "cockpit-nose",
+    "status": "passed",
+    "steps": 31,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-xeovayvz/result.json",
+    "original_result_sha256": "ba39bb181a1cd98c97116ce5201648d66eaac0c2b00ec9cfc82f6ae41c3b2027",
+    "trace": "issue-557/traces/universe-cockpit-nose.json.xz",
+    "stderr": "issue-557/traces/universe-cockpit-nose.stderr.gz",
+    "captures": [
+      {
+        "label": "walkable-cockpit-nose",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-xeovayvz/step-020-walkable-cockpit-nose.png",
+        "path": "issue-561/native/universe/cockpit-nose/step-020-walkable-cockpit-nose.png",
+        "sha256": "63d2e2fbcf37318a3ff0660a5983ff7d75bda16e8da50ac4ffdd08b39de483c2",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "universe",
+    "scenario": "player-chart",
+    "status": "passed",
+    "steps": 44,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-u20xhrn7/result.json",
+    "original_result_sha256": "77b3f83e36710bafe6d6c6cad718c27a16c1ff5cd8a34ce98ff927d1d18e42a9",
+    "trace": "issue-557/traces/universe-player-chart.json.xz",
+    "stderr": "issue-557/traces/universe-player-chart.stderr.gz",
+    "captures": [
+      {
+        "label": "empty-chart",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-u20xhrn7/step-011-empty-chart.png",
+        "path": "issue-561/native/universe/player-chart/step-011-empty-chart.png",
+        "sha256": "86647fe7de153c610cc4501beb287f1cd4bf4642578baeb0a8379bba000e5c20",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "observed-route",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-u20xhrn7/step-017-observed-route.png",
+        "path": "issue-561/native/universe/player-chart/step-017-observed-route.png",
+        "sha256": "da4018d2d4732eb3f4b0bc43a608f3cd11dba3c3cdd7638b0d7c01fb864fce21",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "resumed-route",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-u20xhrn7/step-025-resumed-route.png",
+        "path": "issue-561/native/universe/player-chart/step-025-resumed-route.png",
+        "sha256": "c562dd09854292bf6c277b1dca6fc108ad0183f827dfccf1a1f881b09e18f2e5",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "offline-refreshed-chart",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-u20xhrn7/step-034-offline-refreshed-chart.png",
+        "path": "issue-561/native/universe/player-chart/step-034-offline-refreshed-chart.png",
+        "sha256": "9d33e7775d2a98fd5b6cd01f8c5627e2b4bec7341153bcf4a0e276ed5e1a21cd",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "blackout-history-retained",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-u20xhrn7/step-044-blackout-history-retained.png",
+        "path": "issue-561/native/universe/player-chart/step-044-blackout-history-retained.png",
+        "sha256": "9e07cc179ac0288a22cd6639f35ae465a6f131855c0b10cd9f6f5b47e780ffb1",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "universe",
+    "scenario": "planetary-night",
+    "status": "passed",
+    "steps": 6,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-u0gy8qh5/result.json",
+    "original_result_sha256": "d5ff598273fd657c25f48a779a0cfad918a6e2c5cfbb19c57a03f6b66925c668",
+    "trace": "issue-557/traces/universe-planetary-night.json.xz",
+    "stderr": "issue-557/traces/universe-planetary-night.stderr.gz",
+    "captures": [
+      {
+        "label": "airless-night",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-u0gy8qh5/step-006-airless-night.png",
+        "path": "issue-561/native/universe/planetary-night/step-006-airless-night.png",
+        "sha256": "0bcf3cc9fa35cc98195561c8221297c2487159fc953ce65752d0ebeb917c3624",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "universe",
+    "scenario": "planetary-vacuum",
+    "status": "passed",
+    "steps": 6,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-v1agej96/result.json",
+    "original_result_sha256": "a42a25889f10a77422eced031d4ce2f4fb796c4bfeaed4b45261494b624e9411",
+    "trace": "issue-557/traces/universe-planetary-vacuum.json.xz",
+    "stderr": "issue-557/traces/universe-planetary-vacuum.stderr.gz",
+    "captures": [
+      {
+        "label": "airless-zenith",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-v1agej96/step-005-airless-zenith.png",
+        "path": "issue-561/native/universe/planetary-vacuum/step-005-airless-zenith.png",
+        "sha256": "404789d9b7c80ff1cd6cb4e47660d8185da418d36fc08fca7bd7b47c5bdc31cb",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "universe",
+    "scenario": "environment-audio",
+    "status": "passed",
+    "steps": 67,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-ithj7dyd/result.json",
+    "original_result_sha256": "8ff24be95a875799767842059471cd287fda7a569be27b042a26ed55b31cfd49",
+    "trace": "issue-557/traces/universe-environment-audio.json.xz",
+    "stderr": "issue-557/traces/universe-environment-audio.stderr.gz",
+    "captures": [
+      {
+        "label": "vacuum-quiet",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-ithj7dyd/step-010-vacuum-quiet.png",
+        "path": "issue-561/native/universe/environment-audio/step-010-vacuum-quiet.png",
+        "sha256": "392d5c1166712cc95c5c8bf88d6a42fda1af4ebba4e2ea3cd985470caad4f09f",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "environment-settings",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-ithj7dyd/step-017-environment-settings.png",
+        "path": "issue-561/native/universe/environment-audio/step-017-environment-settings.png",
+        "sha256": "51e0d7b35eb4e1bbfc27e04f3ed95213cf6a82757a7476fdef538a1de2e5b417",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "independent-settings",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-ithj7dyd/step-030-independent-settings.png",
+        "path": "issue-561/native/universe/environment-audio/step-030-independent-settings.png",
+        "sha256": "df91139e71c37daa45d4378306a999fd30910a8934809edeec24375747ca23ff",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "scout-interior-vacuum",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/universe/run-ithj7dyd/step-067-scout-interior-vacuum.png",
+        "path": "issue-561/native/universe/environment-audio/step-067-scout-interior-vacuum.png",
+        "sha256": "87946e065f6e91e4f9cfba072d6ce3425672e678902f1067783df6a5b5840229",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "starter-layout",
+    "status": "passed",
+    "steps": 41,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-2fx5ozfj/result.json",
+    "original_result_sha256": "e4d7eabb54c83e5433b9664ee1e4f7d02c4a8f8131c5fbeea6ff90675afbbd09",
+    "trace": "issue-557/traces/construction-starter-layout.json.xz",
+    "stderr": "issue-557/traces/construction-starter-layout.stderr.gz",
+    "captures": [
+      {
+        "label": "bulkhead-side-route-blocked",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-2fx5ozfj/step-005-bulkhead-side-route-blocked.png",
+        "path": "issue-561/native/construction/starter-layout/step-005-bulkhead-side-route-blocked.png",
+        "sha256": "3d8dd1c4f952abaf678681211c371ab5c61d531df1aa75ac15bd43c5eb939397",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "cargo-bay-ramp-closed",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-2fx5ozfj/step-016-cargo-bay-ramp-closed.png",
+        "path": "issue-561/native/construction/starter-layout/step-016-cargo-bay-ramp-closed.png",
+        "sha256": "60c443e0e08546155732842a1bc3006fdba850453147741c7d52cee2e3de9c3a",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "ramp-clearance",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-2fx5ozfj/step-024-ramp-clearance.png",
+        "path": "issue-561/native/construction/starter-layout/step-024-ramp-clearance.png",
+        "sha256": "2dd7171066667af7aa45227e4805cc409a943e5c9f1a303b6e2ae7f74b0a6c9b",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "archive-access",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-2fx5ozfj/step-041-archive-access.png",
+        "path": "issue-561/native/construction/starter-layout/step-041-archive-access.png",
+        "sha256": "4754a19fc8796f0f7827db61fee0c0f8daf0b3afb37b86a9297ff856089412f3",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "cockpit-nose",
+    "status": "passed",
+    "steps": 31,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-c5w6opeg/result.json",
+    "original_result_sha256": "29b740ea108f30435c42c3fca8741d48a8ad998ea2e8b36e11c663bb00a9537c",
+    "trace": "issue-557/traces/construction-cockpit-nose.json.xz",
+    "stderr": "issue-557/traces/construction-cockpit-nose.stderr.gz",
+    "captures": [
+      {
+        "label": "walkable-cockpit-nose",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-c5w6opeg/step-020-walkable-cockpit-nose.png",
+        "path": "issue-561/native/construction/cockpit-nose/step-020-walkable-cockpit-nose.png",
+        "sha256": "63d2e2fbcf37318a3ff0660a5983ff7d75bda16e8da50ac4ffdd08b39de483c2",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "inertial-flight",
+    "status": "passed",
+    "steps": 426,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-z3ef55s_/result.json",
+    "original_result_sha256": "9135f64d98e678e6df0027949cabcd3fb5dc95a96f6e518615af5bca0c23c39b",
+    "trace": "issue-557/traces/construction-inertial-flight.json.xz",
+    "stderr": "issue-557/traces/construction-inertial-flight.stderr.gz",
+    "captures": [
+      {
+        "label": "inertial-flight",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-z3ef55s_/step-426-inertial-flight.png",
+        "path": "issue-561/native/construction/inertial-flight/step-426-inertial-flight.png",
+        "sha256": "1fbb4aa4e0b57791d01a7dfbe526046747de0d30bae25d4c2cbde80f0dfa9fc0",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "core-restart",
+    "status": "passed",
+    "steps": 20,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-y8122_q1/result.json",
+    "original_result_sha256": "7c8cdbd1d1dea5e6104749b3c40417ba63075f8b7c6a70a73c0832b66980aa65",
+    "trace": "issue-557/traces/construction-core-restart.json.xz",
+    "stderr": "issue-557/traces/construction-core-restart.stderr.gz",
+    "captures": [
+      {
+        "label": "core-restart",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-y8122_q1/step-020-core-restart.png",
+        "path": "issue-561/native/construction/core-restart/step-020-core-restart.png",
+        "sha256": "e095868fd6551f1d0d67dee172b4a3322eccf90f0649d626785c953c2c99bbdb",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "cargo-door",
+    "status": "passed",
+    "steps": 17,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-gz_ag5rt/result.json",
+    "original_result_sha256": "5f9845c15839b6bcac3c21ca13538a98a18487c04e9b8da03d4ff986644df5d0",
+    "trace": "issue-557/traces/construction-cargo-door.json.xz",
+    "stderr": "issue-557/traces/construction-cargo-door.stderr.gz",
+    "captures": [
+      {
+        "label": "cargo-open",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-gz_ag5rt/step-009-cargo-open.png",
+        "path": "issue-561/native/construction/cargo-door/step-009-cargo-open.png",
+        "sha256": "bc16ab0092d610765b35cdb81d4c305afbce2b35fd53f7b006cc418e24e8f683",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "cargo-closed",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-gz_ag5rt/step-013-cargo-closed.png",
+        "path": "issue-561/native/construction/cargo-door/step-013-cargo-closed.png",
+        "sha256": "021ac99578c5ada108b10214adbb3a36ccb3ed002b782a33a09ca62f5b14af7c",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "cargo-reopened",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-gz_ag5rt/step-017-cargo-reopened.png",
+        "path": "issue-561/native/construction/cargo-door/step-017-cargo-reopened.png",
+        "sha256": "c69dc5b4d682a606f119e5aa4b9e90a1812c1beec930f76dc2488c123c11d394",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "boarding-ramp",
+    "status": "passed",
+    "steps": 62,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-6r57f3ux/result.json",
+    "original_result_sha256": "4dc343acc0f1cf19f90a850859019d9dae1e93ecce664a755554b0bfa472b80f",
+    "trace": "issue-557/traces/construction-boarding-ramp.json.xz",
+    "stderr": "issue-557/traces/construction-boarding-ramp.stderr.gz",
+    "captures": [
+      {
+        "label": "closed-interior",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-6r57f3ux/step-014-closed-interior.png",
+        "path": "issue-561/native/construction/boarding-ramp/step-014-closed-interior.png",
+        "sha256": "0cac926f842a0333ce1a5a7823fbb446d3f6c1758bbb2085b35609e12b2b36a0",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "lowering-interior",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-6r57f3ux/step-017-lowering-interior.png",
+        "path": "issue-561/native/construction/boarding-ramp/step-017-lowering-interior.png",
+        "sha256": "0cac926f842a0333ce1a5a7823fbb446d3f6c1758bbb2085b35609e12b2b36a0",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "closed-exterior",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-6r57f3ux/step-039-closed-exterior.png",
+        "path": "issue-561/native/construction/boarding-ramp/step-039-closed-exterior.png",
+        "sha256": "10f1cbb46c4dc5cfcdcce51011dfef32efee2d9edc60995f35a007a2f04c7321",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "lowering-exterior",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-6r57f3ux/step-043-lowering-exterior.png",
+        "path": "issue-561/native/construction/boarding-ramp/step-043-lowering-exterior.png",
+        "sha256": "f767a01ff7ef971b1e39660403364d9a5abcfbd9063fb5ff8d907b1d1fd52957",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "deployed-exterior",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-6r57f3ux/step-050-deployed-exterior.png",
+        "path": "issue-561/native/construction/boarding-ramp/step-050-deployed-exterior.png",
+        "sha256": "3359460c2ed9e75f5d624b2b0a641263b193817e54de6998fe9598222c52a35c",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "fragment-transfer",
+    "status": "passed",
+    "steps": 290,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-tmhc_qhb/result.json",
+    "original_result_sha256": "7c4317e128e9a5840ee3c46ef1629a3877929b9f8790377082ae85b6f85974c0",
+    "trace": "issue-557/traces/construction-fragment-transfer.json.xz",
+    "stderr": "issue-557/traces/construction-fragment-transfer.stderr.gz",
+    "captures": [
+      {
+        "label": "transfer-1-ship",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-tmhc_qhb/step-179-transfer-1-ship.png",
+        "path": "issue-561/native/construction/fragment-transfer/step-179-transfer-1-ship.png",
+        "sha256": "1630b87c8ce8689c01dd519a703a44921fb810eca31579821bc5d6d579d4a09d",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "transfer-2-world",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-tmhc_qhb/step-199-transfer-2-world.png",
+        "path": "issue-561/native/construction/fragment-transfer/step-199-transfer-2-world.png",
+        "sha256": "61539550028ae8ef96115115c3553f5d4b5bcfe769bc9cc5972e4c677173f1ee",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "transfer-3-ship",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-tmhc_qhb/step-218-transfer-3-ship.png",
+        "path": "issue-561/native/construction/fragment-transfer/step-218-transfer-3-ship.png",
+        "sha256": "1be13dfe2fdd8aabf50a11082b77be6ec49cc1c137e57fd99ef816b60ef48c22",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "transfer-4-ship",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-tmhc_qhb/step-270-transfer-4-ship.png",
+        "path": "issue-561/native/construction/fragment-transfer/step-270-transfer-4-ship.png",
+        "sha256": "790ba192fa843fd042cfb381ca4bba65020bc312fb7ecd6b59b4288523ed7483",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "transfer-5-ship",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-tmhc_qhb/step-290-transfer-5-ship.png",
+        "path": "issue-561/native/construction/fragment-transfer/step-290-transfer-5-ship.png",
+        "sha256": "63d7277301d0131da98aba7af1e806a38ff55e7a1a7fcabb8527a80cc9c48da9",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "habitation",
+    "status": "passed",
+    "steps": 14,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-2pkd0_mn/result.json",
+    "original_result_sha256": "30a3908eefffb072da67f2d0a05dbf6e92f953fcb6a16ab13b4214e9df94f738",
+    "trace": "issue-557/traces/construction-habitation.json.xz",
+    "stderr": "issue-557/traces/construction-habitation.stderr.gz",
+    "captures": [
+      {
+        "label": "bunk-stowed",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-2pkd0_mn/step-006-bunk-stowed.png",
+        "path": "issue-561/native/construction/habitation/step-006-bunk-stowed.png",
+        "sha256": "8484443893d6a63c217334bf8fcd753e94ffec1b09a1c0be1a898c2bda7a84ce",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "bunk-deployed",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-2pkd0_mn/step-010-bunk-deployed.png",
+        "path": "issue-561/native/construction/habitation/step-010-bunk-deployed.png",
+        "sha256": "3d014d4713eb7f9724fb150664c460d1d16366afc4a82482bab699c8f7ea8426",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "bunk-restowed",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-2pkd0_mn/step-014-bunk-restowed.png",
+        "path": "issue-561/native/construction/habitation/step-014-bunk-restowed.png",
+        "sha256": "bc81d89d8de8d07ee5aa89debf5c1005d29b4e5c360873dc7d218762fa360a1a",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "habitation-use",
+    "status": "passed",
+    "steps": 25,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-8kd98gw1/result.json",
+    "original_result_sha256": "e522292842e15556a54a274d6d6347bd4a35e7dcb62212d829f70f8d6ffc6776",
+    "trace": "issue-557/traces/construction-habitation-use.json.xz",
+    "stderr": "issue-557/traces/construction-habitation-use.stderr.gz",
+    "captures": [
+      {
+        "label": "seat-stowed",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-8kd98gw1/step-002-seat-stowed.png",
+        "path": "issue-561/native/construction/habitation-use/step-002-seat-stowed.png",
+        "sha256": "8ef3a882c0448a4d3c81ea8dc5f22628500755f845d6b831281bca64b03741a5",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "seat-deployed",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-8kd98gw1/step-007-seat-deployed.png",
+        "path": "issue-561/native/construction/habitation-use/step-007-seat-deployed.png",
+        "sha256": "8518c1a528e171ae7d5884ee34c3343c8d6cb6c84fe6a429d145ccdbf3740b24",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "seated",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-8kd98gw1/step-013-seated.png",
+        "path": "issue-561/native/construction/habitation-use/step-013-seated.png",
+        "sha256": "89e91d21b1bec0172d053fae87b2007105b02b13ac721b2656a150715f62af35",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "restrained",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-8kd98gw1/step-017-restrained.png",
+        "path": "issue-561/native/construction/habitation-use/step-017-restrained.png",
+        "sha256": "e00dc8b3ea4f729905877bbfba489b9ea5431e1f770fcd6383174f6ba3f9321b",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "standing",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-8kd98gw1/step-025-standing.png",
+        "path": "issue-561/native/construction/habitation-use/step-025-standing.png",
+        "sha256": "24bf895fb938d0756706425f7196d16d879be61220df9531692d22a069b82e4d",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "cabin-bunk",
+    "status": "passed",
+    "steps": 24,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-22tymr7f/result.json",
+    "original_result_sha256": "49ad7f2c27e4b6657b7b0d38b44135538c0347f4992252ef646f83543552651f",
+    "trace": "issue-557/traces/construction-cabin-bunk.json.xz",
+    "stderr": "issue-557/traces/construction-cabin-bunk.stderr.gz",
+    "captures": [
+      {
+        "label": "bunk-closed",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-22tymr7f/step-002-bunk-closed.png",
+        "path": "issue-561/native/construction/cabin-bunk/step-002-bunk-closed.png",
+        "sha256": "9b56ae31c39ce91001b0cc980dd6088587cd194a62fec3b5f805f08be45d4dc7",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "bunk-open",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-22tymr7f/step-007-bunk-open.png",
+        "path": "issue-561/native/construction/cabin-bunk/step-007-bunk-open.png",
+        "sha256": "0923df7fd3fa894c8ea7bc2ad5aaf23b61383950a1ff7c7a1becc7b7a2747e19",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "lying-at-shutter",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-22tymr7f/step-013-lying-at-shutter.png",
+        "path": "issue-561/native/construction/cabin-bunk/step-013-lying-at-shutter.png",
+        "sha256": "102bdcba073078bc6e0fafab40cd359f9162b550ceae79777dfdbfb7e436f0c0",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "shutter-closed",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-22tymr7f/step-019-shutter-closed.png",
+        "path": "issue-561/native/construction/cabin-bunk/step-019-shutter-closed.png",
+        "sha256": "c20debcfa8e4c007789a30aeffa9d4c4ba1f2835a3a8e81b77a5c42178b1374f",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "bunk-restrained",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-22tymr7f/step-023-bunk-restrained.png",
+        "path": "issue-561/native/construction/cabin-bunk/step-023-bunk-restrained.png",
+        "sha256": "a6c854aab0300b15e4428f2ff0b30dbe1c7ec01a3e4467210d98596c2d1f5a4d",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "cabin-table",
+    "status": "passed",
+    "steps": 7,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-_61zky8g/result.json",
+    "original_result_sha256": "9d73858343759b370b3f8d3bb1aa15f5f8d450a836b267c318b63a6715e331c7",
+    "trace": "issue-557/traces/construction-cabin-table.json.xz",
+    "stderr": "issue-557/traces/construction-cabin-table.stderr.gz",
+    "captures": [
+      {
+        "label": "table-closed",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-_61zky8g/step-002-table-closed.png",
+        "path": "issue-561/native/construction/cabin-table/step-002-table-closed.png",
+        "sha256": "f6f2cfffbb387024536d1b16105af13107866d8a8e1812e561803b4d6fe998aa",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "table-open",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-_61zky8g/step-007-table-open.png",
+        "path": "issue-561/native/construction/cabin-table/step-007-table-open.png",
+        "sha256": "1a5a09bab18174201d4bf628e887715feeea112850e93e37aa67605d965cf147",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "cabin-locker",
+    "status": "passed",
+    "steps": 7,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-u49tth88/result.json",
+    "original_result_sha256": "39b677525e82f95f77d1133f5839a1ab42b501a948c11f3b0bee333cc46400c9",
+    "trace": "issue-557/traces/construction-cabin-locker.json.xz",
+    "stderr": "issue-557/traces/construction-cabin-locker.stderr.gz",
+    "captures": [
+      {
+        "label": "locker-closed",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-u49tth88/step-002-locker-closed.png",
+        "path": "issue-561/native/construction/cabin-locker/step-002-locker-closed.png",
+        "sha256": "af39ac73c31022d6e2481c9a6f9bf463b1233c2fb38c7b45bac8d2c7c48f7f11",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "locker-open",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-u49tth88/step-007-locker-open.png",
+        "path": "issue-561/native/construction/cabin-locker/step-007-locker-open.png",
+        "sha256": "d9c1395c70782ac83c9a42fcfaf6dfbcfa5a283ea36aee97dcbd62c2b303b50e",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "room-finishes",
+    "status": "passed",
+    "steps": 27,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-yf54ffob/result.json",
+    "original_result_sha256": "1d3c42792017b14fa1189cf72f234e064a37d739b736478d8c50068bec1a636f",
+    "trace": "issue-557/traces/construction-room-finishes.json.xz",
+    "stderr": "issue-557/traces/construction-room-finishes.stderr.gz",
+    "captures": [
+      {
+        "label": "original",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-yf54ffob/step-006-original.png",
+        "path": "issue-561/native/construction/room-finishes/step-006-original.png",
+        "sha256": "d8b2a5e2b8564c1b4fbbadb96acc1d4aae27783832728369b583557f56e2a14c",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "slate-groups",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-yf54ffob/step-027-slate-groups.png",
+        "path": "issue-561/native/construction/room-finishes/step-027-slate-groups.png",
+        "sha256": "0a72c6f2ad4442da226761c1c735cf2a79cc6f7352fc92906ea53207cebfa938",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "room-lighting-blackout",
+    "status": "passed",
+    "steps": 12,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-yxopj9jt/result.json",
+    "original_result_sha256": "63c0c2981cb3e3b2fbbcc3688d433c72c00ad2d7c43ae452e8510302d55f8eb2",
+    "trace": "issue-557/traces/construction-room-lighting-blackout.json.xz",
+    "stderr": "issue-557/traces/construction-room-lighting-blackout.stderr.gz",
+    "captures": [
+      {
+        "label": "blackout-initial",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-yxopj9jt/step-002-blackout-initial.png",
+        "path": "issue-561/native/construction/room-lighting-blackout/step-002-blackout-initial.png",
+        "sha256": "b926cceab8e1b69cb470175c8283da06df32aa1caa00f25a3d7ea5b3567b52bb",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "blackout-closed",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-yxopj9jt/step-007-blackout-closed.png",
+        "path": "issue-561/native/construction/room-lighting-blackout/step-007-blackout-closed.png",
+        "sha256": "f82838a6d1a7e9f793d56fc7357a8f64a756441be42609814f066e70dd5134fc",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "blackout-opened",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-yxopj9jt/step-012-blackout-opened.png",
+        "path": "issue-561/native/construction/room-lighting-blackout/step-012-blackout-opened.png",
+        "sha256": "d53883fe4ffd8724cf6f1f06b8afd4299951f880930fda4cc5efe753407e1253",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "core-upgrade-blackout",
+    "status": "passed",
+    "steps": 24,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-hoq01kvw/result.json",
+    "original_result_sha256": "60f2ca9446c645cd538b956eeae1687d909d0b47ad0e779048a96cf6ff2a6af7",
+    "trace": "issue-557/traces/construction-core-upgrade-blackout.json.xz",
+    "stderr": "issue-557/traces/construction-core-upgrade-blackout.stderr.gz",
+    "captures": [
+      {
+        "label": "fuel-intake",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-hoq01kvw/step-004-fuel-intake.png",
+        "path": "issue-561/native/construction/core-upgrade-blackout/step-004-fuel-intake.png",
+        "sha256": "75d5fadbc8655bac9b86bce680a5851cbacda46e2fa7e4b89c158fc36db6a15d",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "upgrade-material-intake",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-hoq01kvw/step-009-upgrade-material-intake.png",
+        "path": "issue-561/native/construction/core-upgrade-blackout/step-009-upgrade-material-intake.png",
+        "sha256": "0c0ce42a743a19e1cfe1f6a9b210eee221fd5abbbe98445df90bb95780cadfcb",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "materials-ready",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-hoq01kvw/step-013-materials-ready.png",
+        "path": "issue-561/native/construction/core-upgrade-blackout/step-013-materials-ready.png",
+        "sha256": "e2c297355bc74687ba9567e685a8776dca6c31b82ae83ef085e708c0ad85205c",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "instant-upgrade",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-hoq01kvw/step-020-instant-upgrade.png",
+        "path": "issue-561/native/construction/core-upgrade-blackout/step-020-instant-upgrade.png",
+        "sha256": "a9a52a8df9b1dfa5480b16ef27093aa52e5f1ba38a783f9f99628bc7ac45c728",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "core-upgrade-powered",
+    "status": "passed",
+    "steps": 24,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-rw3ywble/result.json",
+    "original_result_sha256": "58a3c09581f90791179362b64df38fd21024f687b92ee8bf288ed7f7dc746d2e",
+    "trace": "issue-557/traces/construction-core-upgrade-powered.json.xz",
+    "stderr": "issue-557/traces/construction-core-upgrade-powered.stderr.gz",
+    "captures": [
+      {
+        "label": "fuel-intake",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-rw3ywble/step-004-fuel-intake.png",
+        "path": "issue-561/native/construction/core-upgrade-powered/step-004-fuel-intake.png",
+        "sha256": "8265e0c5f2825384cfad1d9bee8a6b84ec9f5d5cae95318bdb4d697ac3c21105",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "upgrade-material-intake",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-rw3ywble/step-009-upgrade-material-intake.png",
+        "path": "issue-561/native/construction/core-upgrade-powered/step-009-upgrade-material-intake.png",
+        "sha256": "3279130b451ed28e13a8f12ace74c3b9d0363561e7d369a781bfe17a2a3fe3c9",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "materials-ready",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-rw3ywble/step-013-materials-ready.png",
+        "path": "issue-561/native/construction/core-upgrade-powered/step-013-materials-ready.png",
+        "sha256": "5e8854c686cbd00aeb8d47d75cb7eb42ac84cf3944a6403104e82c37de25d251",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "instant-upgrade",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-rw3ywble/step-020-instant-upgrade.png",
+        "path": "issue-561/native/construction/core-upgrade-powered/step-020-instant-upgrade.png",
+        "sha256": "efec9d191d9153a695f443b30399b55a263697a9359da7cca5eb57c9fc8da8a3",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "blueprint-placement",
+    "status": "passed",
+    "steps": 79,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-fmzbam2_/result.json",
+    "original_result_sha256": "f1e313bdc00a49654704fdab1457d333d3af1739c6d535dc3513cf69ee4fe2cb",
+    "trace": "issue-557/traces/construction-blueprint-placement.json.xz",
+    "stderr": "issue-557/traces/construction-blueprint-placement.stderr.gz",
+    "captures": [
+      {
+        "label": "stool-preview-clear",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-fmzbam2_/step-009-stool-preview-clear.png",
+        "path": "issue-561/native/construction/blueprint-placement/step-009-stool-preview-clear.png",
+        "sha256": "9d5562e6e6a9d7d48e1cddde43736a35b5bbc6568f956c8643f5cb569d592222",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "rotated-stool-clearance-declined",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-fmzbam2_/step-013-rotated-stool-clearance-declined.png",
+        "path": "issue-561/native/construction/blueprint-placement/step-013-rotated-stool-clearance-declined.png",
+        "sha256": "e796e995151357a13033e621cd7f25f85b5f6e28ea09fca0dbc33ec2271fa41c",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "stool-project-inspection",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-fmzbam2_/step-025-stool-project-inspection.png",
+        "path": "issue-561/native/construction/blueprint-placement/step-025-stool-project-inspection.png",
+        "sha256": "17c5830dc9a9c74edb85b24c7a6f23486f7a649bd940b3d7f567de4f7dfb7840",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "multi-cell-module-preview",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-fmzbam2_/step-054-multi-cell-module-preview.png",
+        "path": "issue-561/native/construction/blueprint-placement/step-054-multi-cell-module-preview.png",
+        "sha256": "6bbf550bd4843858136b3b01643f48b025623d2509d084b1b22a3ef0d18cf3c0",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "multi-cell-project-inspection",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-fmzbam2_/step-059-multi-cell-project-inspection.png",
+        "path": "issue-561/native/construction/blueprint-placement/step-059-multi-cell-project-inspection.png",
+        "sha256": "25bfca6b61568897c8e3b9d1fa745c9eb3c9b7fba621b1ce5d3b15bfe73aba40",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "room-occupied-placement-declined",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-fmzbam2_/step-075-room-occupied-placement-declined.png",
+        "path": "issue-561/native/construction/blueprint-placement/step-075-room-occupied-placement-declined.png",
+        "sha256": "ddee69a5addb1146c74d4eba9c4207be7f267f354d194711f7e26ca8f245dfac",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "builder-closed-world",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-fmzbam2_/step-079-builder-closed-world.png",
+        "path": "issue-561/native/construction/blueprint-placement/step-079-builder-closed-world.png",
+        "sha256": "c2aaa156e3dcf19f48d149d5e35ede00b6dec50f541103f9961faff8b8e82a70",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "construction-materials",
+    "status": "passed",
+    "steps": 10,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-180oeuw3/result.json",
+    "original_result_sha256": "4fd1e9811e5256543fd9ce6936a7473e68b387971c8a36a2ad24d4f2aa5f4bdb",
+    "trace": "issue-557/traces/construction-construction-materials.json.xz",
+    "stderr": "issue-557/traces/construction-construction-materials.stderr.gz",
+    "captures": [
+      {
+        "label": "material-before-intake",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-180oeuw3/step-002-material-before-intake.png",
+        "path": "issue-561/native/construction/construction-materials/step-002-material-before-intake.png",
+        "sha256": "dccd4c4ca48d4315056cc91bc2291725cac519d957d03048885c80d3e0e5c029",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "material-delivered",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-180oeuw3/step-006-material-delivered.png",
+        "path": "issue-561/native/construction/construction-materials/step-006-material-delivered.png",
+        "sha256": "bae914b5854c5ffed864a5df3fe90859b245e693f9c6d009d96f53e5cf839280",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "physical-refund",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-180oeuw3/step-010-physical-refund.png",
+        "path": "issue-561/native/construction/construction-materials/step-010-physical-refund.png",
+        "sha256": "5bfe65250163986862eb9565a7c6de93f6f444065976400481339c122c1c6b60",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "construction-build",
+    "status": "passed",
+    "steps": 14,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-iyhmeahz/result.json",
+    "original_result_sha256": "99e0a25421b2610e40e24d15adea67b9dd1a1530dc3950cfb9528947d9c95f64",
+    "trace": "issue-557/traces/construction-construction-build.json.xz",
+    "stderr": "issue-557/traces/construction-construction-build.stderr.gz",
+    "captures": [
+      {
+        "label": "ready-for-intake",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-iyhmeahz/step-002-ready-for-intake.png",
+        "path": "issue-561/native/construction/construction-build/step-002-ready-for-intake.png",
+        "sha256": "f929ab025cf6959b0d70dea2d258622be0c8213ee75d666ffcf1241d3c815c69",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "half-built",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-iyhmeahz/step-007-half-built.png",
+        "path": "issue-561/native/construction/construction-build/step-007-half-built.png",
+        "sha256": "64d52dde3b519331e0984bf5a603e4ab5a08352887b99844ac9741a0d73894f6",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "completed-stool",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-iyhmeahz/step-011-completed-stool.png",
+        "path": "issue-561/native/construction/construction-build/step-011-completed-stool.png",
+        "sha256": "2c60ee90e89fa843dfe505afb694544eb70f6996bdfd656fb9dcab1aa5c52595",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "construction-cancel-0",
+    "status": "passed",
+    "steps": 16,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-3x2nc3dz/result.json",
+    "original_result_sha256": "ed30e1e0ce1f8ca7a06b3a72a59791f54979dcabde6806a89262d6a46558220b",
+    "trace": "issue-557/traces/construction-construction-cancel-0.json.xz",
+    "stderr": "issue-557/traces/construction-construction-cancel-0.stderr.gz",
+    "captures": [
+      {
+        "label": "funded-0-percent",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-3x2nc3dz/step-007-funded-0-percent.png",
+        "path": "issue-561/native/construction/construction-cancel-0/step-007-funded-0-percent.png",
+        "sha256": "0f0e566fa5422d12f463d5851997208e74b2f3d2f9f855850d42e20fc98eaa56",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "exact-100-percent-refund",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-3x2nc3dz/step-016-exact-100-percent-refund.png",
+        "path": "issue-561/native/construction/construction-cancel-0/step-016-exact-100-percent-refund.png",
+        "sha256": "e26113443378c5f63e93840418be16df4e4b9d5118e366bc6b0a1507d0db4765",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "construction-cancel-50",
+    "status": "passed",
+    "steps": 17,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-cm8inc4w/result.json",
+    "original_result_sha256": "69fb3fa679e04b57e240ea202e57b6095700e3dc258bc888caa67f3f593d6c83",
+    "trace": "issue-557/traces/construction-construction-cancel-50.json.xz",
+    "stderr": "issue-557/traces/construction-construction-cancel-50.stderr.gz",
+    "captures": [
+      {
+        "label": "funded-50-percent",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-cm8inc4w/step-008-funded-50-percent.png",
+        "path": "issue-561/native/construction/construction-cancel-50/step-008-funded-50-percent.png",
+        "sha256": "de5090fdab68c13a4bf940e3d89af797d5b62dce68e363b95bc16f0545d52e5d",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "exact-50-percent-refund",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-cm8inc4w/step-017-exact-50-percent-refund.png",
+        "path": "issue-561/native/construction/construction-cancel-50/step-017-exact-50-percent-refund.png",
+        "sha256": "266fcbc0dcf24cfce70e2e9eb80211aeec60ea186a3c0e30bea861ff0a90d2ec",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "construction-cancel-99",
+    "status": "passed",
+    "steps": 18,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-7355rbcb/result.json",
+    "original_result_sha256": "93383a3cd35cdc26130326087b7788aa60ff2f3299c6880ddb5c91b719a58686",
+    "trace": "issue-557/traces/construction-construction-cancel-99.json.xz",
+    "stderr": "issue-557/traces/construction-construction-cancel-99.stderr.gz",
+    "captures": [
+      {
+        "label": "funded-99-percent",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-7355rbcb/step-009-funded-99-percent.png",
+        "path": "issue-561/native/construction/construction-cancel-99/step-009-funded-99-percent.png",
+        "sha256": "6779e2093d66ef99b5978153231ab6b02b9bc4fbf90c60e1623fcdd604ac0737",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "exact-1-percent-refund",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-7355rbcb/step-018-exact-1-percent-refund.png",
+        "path": "issue-561/native/construction/construction-cancel-99/step-018-exact-1-percent-refund.png",
+        "sha256": "b4fdb3fa0fb6cbb38865ce75ded4839cdd3e0108a32ce2beda3d975cf71197ad",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "construction-room",
+    "status": "passed",
+    "steps": 51,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-i09rkpd4/result.json",
+    "original_result_sha256": "59150a06f99da6c0168f3246c7232524df36e28930e538d0a83f4b314a445c4a",
+    "trace": "issue-557/traces/construction-construction-room.json.xz",
+    "stderr": "issue-557/traces/construction-construction-room.stderr.gz",
+    "captures": [
+      {
+        "label": "reserved-room",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-i09rkpd4/step-002-reserved-room.png",
+        "path": "issue-561/native/construction/construction-room/step-002-reserved-room.png",
+        "sha256": "431818d3ae1331ea071aa1f8f857bf89970bbddf46640bd08757d67a9d556842",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "half-built-room",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-i09rkpd4/step-009-half-built-room.png",
+        "path": "issue-561/native/construction/construction-room/step-009-half-built-room.png",
+        "sha256": "302a4c17d113bc8675a8901b95f2a5e57a74833fa035e0f6228547b3e224923a",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "completed-room",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-i09rkpd4/step-016-completed-room.png",
+        "path": "issue-561/native/construction/construction-room/step-016-completed-room.png",
+        "sha256": "c05d74f69c5c2795389d1448b5bafed6791bee18dd2dd5927b276a719b474232",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "lower-deck-stairs",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-i09rkpd4/step-024-lower-deck-stairs.png",
+        "path": "issue-561/native/construction/construction-room/step-024-lower-deck-stairs.png",
+        "sha256": "7f410ca1b23da339c9d43d38eb171e9f0a7ed5c2ba1b462dc9ca48035011605b",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "upper-deck",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-i09rkpd4/step-031-upper-deck.png",
+        "path": "issue-561/native/construction/construction-room/step-031-upper-deck.png",
+        "sha256": "9e5e6a5516e71c07566db582ffdac1ec7607cda15dbde77ef323261365f7b65c",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "exterior-clipped-shell-and-boarding-stairs",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-i09rkpd4/step-046-exterior-clipped-shell-and-boarding-stairs.png",
+        "path": "issue-561/native/construction/construction-room/step-046-exterior-clipped-shell-and-boarding-stairs.png",
+        "sha256": "2052ef1c0f6dd431aa6edd50521b7fdb6390c881ef429170329b42ea2777f731",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "construction-interlocks",
+    "status": "passed",
+    "steps": 21,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-_g62v5fc/result.json",
+    "original_result_sha256": "7eeedad56c51deaae59fc7418b3315254642c3c170a36a587b0be481ae7dbd96",
+    "trace": "issue-557/traces/construction-construction-interlocks.json.xz",
+    "stderr": "issue-557/traces/construction-construction-interlocks.stderr.gz",
+    "captures": [
+      {
+        "label": "stopped-secured",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-_g62v5fc/step-008-stopped-secured.png",
+        "path": "issue-561/native/construction/construction-interlocks/step-008-stopped-secured.png",
+        "sha256": "ed4ec4fb0597589658f38ab0e37d2fd326a768edc235666c9728b4c374e92b5b",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "stopped-after-explicit-resume",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-_g62v5fc/step-017-stopped-after-explicit-resume.png",
+        "path": "issue-561/native/construction/construction-interlocks/step-017-stopped-after-explicit-resume.png",
+        "sha256": "935a1ed0f76137b4d9202d613685cc93fb0da3440953694bbb2d197db290b846",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "cancelled-physical-refund",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-_g62v5fc/step-021-cancelled-physical-refund.png",
+        "path": "issue-561/native/construction/construction-interlocks/step-021-cancelled-physical-refund.png",
+        "sha256": "a4598a877baae3cd725fe84126af6d0bc4051683a49de8bd0e2655f9256aeb61",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "construction-interlocks-cockpit",
+    "status": "passed",
+    "steps": 5,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-o1kl32oy/result.json",
+    "original_result_sha256": "ede333aba42b5298751f6eb7e978b5ce751701151a188819a97f5589fc87f628",
+    "trace": "issue-557/traces/construction-construction-interlocks-cockpit.json.xz",
+    "stderr": "issue-557/traces/construction-construction-interlocks-cockpit.stderr.gz",
+    "captures": [
+      {
+        "label": "cockpit-exterior-takeoff-blocker",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-o1kl32oy/step-002-cockpit-exterior-takeoff-blocker.png",
+        "path": "issue-561/native/construction/construction-interlocks-cockpit/step-002-cockpit-exterior-takeoff-blocker.png",
+        "sha256": "20d2fb6821d548769ec994641ad41e52704eef59dd7e18d91b72866d7d6957ad",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "cockpit-refused-takeoff",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-o1kl32oy/step-005-cockpit-refused-takeoff.png",
+        "path": "issue-561/native/construction/construction-interlocks-cockpit/step-005-cockpit-refused-takeoff.png",
+        "sha256": "20d2fb6821d548769ec994641ad41e52704eef59dd7e18d91b72866d7d6957ad",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "construction-module",
+    "status": "passed",
+    "steps": 16,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-saf_8_cr/result.json",
+    "original_result_sha256": "d08f72499a992426c138351f12a0813c3dafac9534ac4aa815f10cf4226e8476",
+    "trace": "issue-557/traces/construction-construction-module.json.xz",
+    "stderr": "issue-557/traces/construction-construction-module.stderr.gz",
+    "captures": [
+      {
+        "label": "planned",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-saf_8_cr/step-002-planned.png",
+        "path": "issue-561/native/construction/construction-module/step-002-planned.png",
+        "sha256": "ac21fff1e5fb47cce424bce5131ac688e4980b8555cf4f29afaa39f621396cb8",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "half-built",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-saf_8_cr/step-010-half-built.png",
+        "path": "issue-561/native/construction/construction-module/step-010-half-built.png",
+        "sha256": "e0850119ac02dfe3f38700d4111831fe259040de2791e0e1d122b8d98d2da2fb",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "commissioned",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-saf_8_cr/step-016-commissioned.png",
+        "path": "issue-561/native/construction/construction-module/step-016-commissioned.png",
+        "sha256": "477f60c5044f05819c11a551f44857778df56db73071d612b66b4ecbb52c1c71",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "construction-module-upgrade",
+    "status": "passed",
+    "steps": 27,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-3ucfie8i/result.json",
+    "original_result_sha256": "50064051cefbd5f5bd88bb66244e89840c2a49d72536935cf7ae6a59be0abc7c",
+    "trace": "issue-557/traces/construction-construction-module-upgrade.json.xz",
+    "stderr": "issue-557/traces/construction-construction-module-upgrade.stderr.gz",
+    "captures": [
+      {
+        "label": "planned-upgrade",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-3ucfie8i/step-005-planned-upgrade.png",
+        "path": "issue-561/native/construction/construction-module-upgrade/step-005-planned-upgrade.png",
+        "sha256": "166a5fa9aa587da2d08fdc3e50724d981bb8eed19e5266fa9438ca5b146b87de",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "offline-upgrade",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-3ucfie8i/step-014-offline-upgrade.png",
+        "path": "issue-561/native/construction/construction-module-upgrade/step-014-offline-upgrade.png",
+        "sha256": "f3e96e819d506dde264ac5b971662bb938b5fc3441f3acbb11b8ff1823c3dc3a",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "tier-two",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-3ucfie8i/step-027-tier-two.png",
+        "path": "issue-561/native/construction/construction-module-upgrade/step-027-tier-two.png",
+        "sha256": "4602fc12ab5ad73b4f1d6b6bf1f8987e02c64569e07ee8a9f247df56f47124c1",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "construction-module-restore",
+    "status": "passed",
+    "steps": 12,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-vxr3xqhi/result.json",
+    "original_result_sha256": "cfa06c5b3068d5bbe14cd43f6abaebcfda56fc7f4789d50574933a8b317d43be",
+    "trace": "issue-557/traces/construction-construction-module-restore.json.xz",
+    "stderr": "issue-557/traces/construction-construction-module-restore.stderr.gz",
+    "captures": [
+      {
+        "label": "cancelled-offline",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-vxr3xqhi/step-002-cancelled-offline.png",
+        "path": "issue-561/native/construction/construction-module-restore/step-002-cancelled-offline.png",
+        "sha256": "832f745d07041920e7504ab14c2929885e0b1ee083e14a62fc5e92fe0f734cf7",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "restored-tier-one",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-vxr3xqhi/step-012-restored-tier-one.png",
+        "path": "issue-561/native/construction/construction-module-restore/step-012-restored-tier-one.png",
+        "sha256": "1e8e880508c9ee45b2b57f09d44f64f866e54a511e77bb0222f0facc2281b6c2",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "construction-damage",
+    "status": "passed",
+    "steps": 19,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-wu096i9x/result.json",
+    "original_result_sha256": "8878b79d6561d33155073f56a5dae47dd83999ee6d250d35143adb81bcf265d8",
+    "trace": "issue-557/traces/construction-construction-damage.json.xz",
+    "stderr": "issue-557/traces/construction-construction-damage.stderr.gz",
+    "captures": [
+      {
+        "label": "ready-for-intake",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-wu096i9x/step-002-ready-for-intake.png",
+        "path": "issue-561/native/construction/construction-damage/step-002-ready-for-intake.png",
+        "sha256": "5f4ba42b1610659f9ec54d0d5e0c356d5868da69dccbd88874fb3d4d4df86826",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "half-built",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-wu096i9x/step-007-half-built.png",
+        "path": "issue-561/native/construction/construction-damage/step-007-half-built.png",
+        "sha256": "cebc6c4f7997bef9d151c9b7aa8cf543cccde3b7d0c721c292d4b89d4dc5674a",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "damaged-and-paused",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-wu096i9x/step-011-damaged-and-paused.png",
+        "path": "issue-561/native/construction/construction-damage/step-011-damaged-and-paused.png",
+        "sha256": "173602aab8a1ca7e6dd3cad536fb38bec6d74324de218be94e98df052a14f1f2",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "resecured-and-completed",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-wu096i9x/step-016-resecured-and-completed.png",
+        "path": "issue-561/native/construction/construction-damage/step-016-resecured-and-completed.png",
+        "sha256": "38760e16a81bea0e93ce1bffaf5c1916b474be81733b1fa8dfce294b5c731b31",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "physical-salvage",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-wu096i9x/step-019-physical-salvage.png",
+        "path": "issue-561/native/construction/construction-damage/step-019-physical-salvage.png",
+        "sha256": "982e9646c2f0454eba40d49f0e812ebd99c77830dc03061b87597d35a86cc313",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "construction-detachment",
+    "status": "passed",
+    "steps": 17,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-5ns5ra06/result.json",
+    "original_result_sha256": "a7a2603c6e2a36fb95743e58f428b505e90a2143f10bb923aa38d55995bf3c80",
+    "trace": "issue-557/traces/construction-construction-detachment.json.xz",
+    "stderr": "issue-557/traces/construction-construction-detachment.stderr.gz",
+    "captures": [
+      {
+        "label": "reserved-room",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-5ns5ra06/step-002-reserved-room.png",
+        "path": "issue-561/native/construction/construction-detachment/step-002-reserved-room.png",
+        "sha256": "e4badad759d6c24496956c6ab8dd5e16965ec94eaa15a9c8f91b506ce518567a",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "half-built-room",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-5ns5ra06/step-009-half-built-room.png",
+        "path": "issue-561/native/construction/construction-detachment/step-009-half-built-room.png",
+        "sha256": "4826d5096c538fd29da6da62205a41778dd1ba860dee1c44e6f37b628b382f9e",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "completed-before-impact",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-5ns5ra06/step-014-completed-before-impact.png",
+        "path": "issue-561/native/construction/construction-detachment/step-014-completed-before-impact.png",
+        "sha256": "11e3a0ff7658bb39979c8c075edfa1ae15178f56901c88a8bdace36927a89fb4",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "detached-debris",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-5ns5ra06/step-017-detached-debris.png",
+        "path": "issue-561/native/construction/construction-detachment/step-017-detached-debris.png",
+        "sha256": "7595972fd2f5e400fe95f1e45a0da6ced6192708338722270bbc5d74d10dd8a1",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "construction-offline",
+    "status": "passed",
+    "steps": 13,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-80rajirq/result.json",
+    "original_result_sha256": "69bfd2d6dc78f387e29ae50f97deef0ef28dfed5802d62c3567d6596dc7c4e2a",
+    "trace": "issue-557/traces/construction-construction-offline.json.xz",
+    "stderr": "issue-557/traces/construction-construction-offline.stderr.gz",
+    "captures": [
+      {
+        "label": "ready-for-intake",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-80rajirq/step-002-ready-for-intake.png",
+        "path": "issue-561/native/construction/construction-offline/step-002-ready-for-intake.png",
+        "sha256": "306287482e0497a4f03553004920989169a04a88b22eba08ef914293f7c49554",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "half-built",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-80rajirq/step-007-half-built.png",
+        "path": "issue-561/native/construction/construction-offline/step-007-half-built.png",
+        "sha256": "d97d90d700cd867c0fc6416f779656268aae1d1227daf1a059618a006a2b667a",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "completed-after-verified-resume",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-80rajirq/step-013-completed-after-verified-resume.png",
+        "path": "issue-561/native/construction/construction-offline/step-013-completed-after-verified-resume.png",
+        "sha256": "3d2bd5301a020ae7bcb7302d3519964ceaa1af1aa40fa4806a3488de619b1f38",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "suite": "construction",
+    "scenario": "construction-offline-upgrade",
+    "status": "passed",
+    "steps": 14,
+    "original_result": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-wfn2c05o/result.json",
+    "original_result_sha256": "46b08268d059ac80ffb5fbf9836ebfa98573f319ab47a17ef8918c294b8b6e43",
+    "trace": "issue-557/traces/construction-construction-offline-upgrade.json.xz",
+    "stderr": "issue-557/traces/construction-construction-offline-upgrade.stderr.gz",
+    "captures": [
+      {
+        "label": "planned-upgrade",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-wfn2c05o/step-005-planned-upgrade.png",
+        "path": "issue-561/native/construction/construction-offline-upgrade/step-005-planned-upgrade.png",
+        "sha256": "b6608875f24dad92ac95380059e9c93fcab9b749cb106d21f0b7cc7c5bf563ae",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      },
+      {
+        "label": "commissioned-after-verified-resume",
+        "original_path": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/construction/run-wfn2c05o/step-014-commissioned-after-verified-resume.png",
+        "path": "issue-561/native/construction/construction-offline-upgrade/step-014-commissioned-after-verified-resume.png",
+        "sha256": "54a4d62a3ae6c8845911a1d33fc955eb4db854a477b9fda222d44727517dacbb",
+        "context": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "driver": " / ",
+          "scale_factor": 2.0,
+          "viewport_pixels": [
+            1280,
+            800
+          ]
+        }
+      }
+    ]
+  }
+]

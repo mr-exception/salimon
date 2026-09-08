@@ -1,0 +1,138 @@
+{
+  "setup": {
+    "scenario": "orbit-earth",
+    "seed": 42,
+    "step_ms": 16
+  },
+  "timeout_ms": 120000,
+  "steps": [
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "Cockpit"
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.flight_state",
+        "equals": "Flying"
+      }
+    },
+    {
+      "screenshot": "forward-approach"
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 269.73,
+        "dy": 192.54
+      }
+    },
+    {
+      "screenshot": "lower-port-approach"
+    },
+    {
+      "action": {
+        "op": "landing"
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.flight_state",
+        "equals": "AssistedLanding { body: Earth }"
+      }
+    },
+    {
+      "wait": {
+        "path": "ship.nearby_body.surface_distance_meters",
+        "lt": 25
+      },
+      "frames": 25,
+      "timeout_ms": 15000
+    },
+    {
+      "screenshot": "lower-port-low-altitude"
+    },
+    {
+      "wait": {
+        "path": "ship.flight_state",
+        "equals": "Landed { body: Earth }"
+      },
+      "frames": 25,
+      "timeout_ms": 15000
+    },
+    {
+      "screenshot": "lower-port-landed"
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": -539.46,
+        "dy": 0
+      }
+    },
+    {
+      "screenshot": "lower-starboard-landed"
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 269.73,
+        "dy": -192.54
+      }
+    },
+    {
+      "screenshot": "forward-landed"
+    },
+    {
+      "assert": {
+        "path": "ship.cockpit_control_active",
+        "equals": true
+      }
+    },
+    {
+      "action": {
+        "op": "landing"
+      }
+    },
+    {
+      "wait": {
+        "path": "ship.flight_state",
+        "equals": "Flying"
+      },
+      "frames": 25,
+      "timeout_ms": 15000
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": -269.73,
+        "dy": 192.54
+      }
+    },
+    {
+      "screenshot": "lower-starboard-after-takeoff"
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 269.73,
+        "dy": -192.54
+      }
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "InsideShip"
+      }
+    },
+    {
+      "screenshot": "standing-cockpit"
+    }
+  ]
+}

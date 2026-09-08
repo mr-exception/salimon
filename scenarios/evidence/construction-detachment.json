@@ -1,0 +1,125 @@
+{
+  "setup": {
+    "scenario": "construction-room",
+    "seed": 549,
+    "step_ms": 100
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "assert": {
+        "path": "construction.projects.0.work.completed",
+        "equals": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "screenshot": "reserved-room",
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 300
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "construction.projects.0.funding.progress_ppm",
+        "equals": 500000
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "screenshot": "half-built-room",
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 300
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "construction.projects.0.work.completed",
+        "equals": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "screenshot": "completed-before-impact",
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "construction_impact",
+        "impact": {
+          "target": {
+            "part": 2050
+          },
+          "destroy": true,
+          "survival_ppm": 500000
+        }
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "construction.projects.0.work.destroyed",
+        "equals": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "screenshot": "detached-debris",
+      "timeout_ms": 120000
+    }
+  ]
+}

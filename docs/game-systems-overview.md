@@ -1,0 +1,58 @@
+# Game Systems Overview
+
+> Migrated from the Salimon project documents on 2026-09-29. For current task status and dependencies, use [GitHub issues](https://github.com/mr-exception/salimon/issues).
+
+## Purpose
+This page is the high-level index of Salimon's major gameplay and simulation systems. Detailed behavior belongs in dedicated specifications as each area is refined.
+The approved future starting state is the unknown alien homeworld, not Earth. Player-known navigation must rediscover Earth and the Solar System. See [lost journey](narrative-and-lost-journey.md) and [Archive and navigation](archive-recovery-and-navigation.md); Phase 0 Earth-start references are historical only.
+
+## Long-term system areas
+
+This list describes product direction, not implemented modules. The current
+client-only prototype implements navigation, walking/EVA, ship interaction,
+planetary mining, one-object carrying, fragment motion/contact, inertial flight,
+physical Core conversion/power, safe recovery and cabin zero-G. Resource state
+is retained in memory across local streaming, with no disk/backend save.
+Survival, crafting, orbital simulation, NPCs, economy, multiplayer and backend
+authority remain deferred. See [current scope](project-phases.md).
+
+1. **Exploration & navigation** — realistic-distance travel through a universe-scale world, seamless space-to-surface movement, long-term travel toward Absenat.
+2. **Player character** — first-person walking, EVA, planetary exploration, physical interaction, health and survival state.
+3. **Spaceship flight** — owner-controlled navigation, propulsion upgrades, physically located ship systems, large speed progression.
+4. **Ship construction** — modular rooms/hull expansion while landed/docked plus interior module placement during flight.
+5. **Ship simulation** — power/Core, propulsion, oxygen, pressure, thermal state, hull, sensors, weapons, damage, maintenance and environmental protection.
+6. **Survival** — oxygen, food, water, temperature, sleep, health, radiation, pressure and stamina; permadeath resets the player's run.
+7. **Physical inventory & cargo** — items/resources are physical world objects rather than abstract slots wherever possible.
+8. **Mining & gathering** — asteroid fragmentation, planetary resource destruction/extraction, physical collection and transport.
+9. **Processing & crafting** — refining raw resources, repair kits, survival supplies, construction materials, ammunition, equipment and modules.
+10. **Research & progression** — technologies that improve propulsion, modules, weapons, tools and environmental survivability, allowing farther travel.
+11. **World simulation** — real astronomical data where practical, realistic orbital motion, fictional fill content, sectors/snapshots and deterministic catch-up.
+12. **Persistence** — persistent world changes including character location, ship, inventory, NPC state, economy, mined resources and partially modified objects.
+13. **NPC simulation** — autonomous AI-backed NPCs with shared global memory, relationships, travel, factions, quests and free-form dialogue.
+14. **Economy & factions** — local supply/demand, local pricing, trade, resource regeneration and faction control/influence.
+15. **Multiplayer** — persistent shared world, natural encounters, ship boarding, cooperative operation and persistent physical player location.
+16. **Combat** — ship combat and on-foot PvE/PvP with backend-authoritative outcomes.
+17. **Networking & authority** — local state broadcasting, server validation, protected canonical world state and anti-cheat-sensitive actions.
+18. **Performance & streaming** — native `wgpu` presentation and bounded local resource streaming today; larger spatial hierarchies, LOD/asset streaming, scheduling and platform storage remain future work. Web/WASM reuse and browser caching can be evaluated for a future web client.
+19. **Audio, UI & feedback** — first-person HUD, compass/home-ship marker, ship instrumentation, environmental feedback and physical interaction affordances.
+## Design principle
+Game systems should be independently understandable and versioned domains. Their public contracts, invariants, persistence rules and authority boundaries must be explicit so autonomous AI agents can safely change one area without reasoning over the entire codebase.
+## Technical architecture
+Implementation strategy is documented in [Technical Architecture & AI Maintenance](technical-architecture.md).
+Current architecture: **Rust native composition in `client/runtime` + `winit` events + `wgpu` renderer + portable Rust domain crates**, using typed commands and snapshots. Runtime composes world, character, ship and physics state; renderer owns GPU presentation. Native builds target macOS, Windows and Debian-based Linux, with macOS as the reference playable/performance target. `core/` is a reserved backend boundary. A web/WASM host, workers and authoritative backend remain future capabilities; none is required by the current client.
+
+## Current flight and energy ownership
+
+Gameplay decisions and future scope live in [Spaceship, Building & Survival](spaceship-building-and-survival.md#accepted-propulsion-and-core-review-2026-10-14).
+Ship owns persistent velocity, mass-derived force, power/reservations/conversion,
+assists and navigation observations. Runtime owns physical boundary events,
+Core interaction and gravity composition. Character/physics own weightless
+crew/cargo; renderer owns the wide cockpit and separate Core status screens.
+[Technical architecture](technical-architecture.md#flight-update-and-validation-decisions-197)
+links portable regression/profiling and timing contracts. These implemented
+systems supersede the baseline's energy exclusion; production survival and
+upgrade progression remain OUT OF SCOPE.
+
+## Approved future travel systems — not implemented
+
+The future [single-clock and Spatial Jump Drive design](jump-drive-and-interstellar-travel.md) refines exploration, navigation, ship/Core propulsion and Fabricator module progression without changing current binary behavior. Ordinary thrusters use **Core-funded impulse** (future 1 N·s/J baseline, implementation issue [#493](https://github.com/mr-exception/salimon/issues/493)); continuous flight, local braking, coasting and offline movement remain meaningful. A reusable fabricated **Spatial Jump Drive** instead converts Core energy into forward **displacement**: energy per light-second = current ship mass * 20% of the remaining speed-to-c gap / 1 N·s/J; actual velocity remains unchanged. Six panel fields provide equivalent light-distance (years/months/days/hours/minutes/seconds), engine-**off** is a hard interlock, and a quantum-themed staging scene hides destination loading. The shared world advances 1:1 in real time, no player-specific time dilation and no automatic offline jumps. Do not confuse this with the narrative's still-unverified wormhole, a universal unrestricted search, or shipped gameplay; detailed costs and edge decisions remain in the canonical design.

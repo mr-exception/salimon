@@ -1,0 +1,153 @@
+{
+  "setup": {
+    "scenario": "construction-room",
+    "seed": 546,
+    "step_ms": 100
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 100
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "construction.projects.0.funding.progress_ppm",
+        "equals": 33333
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "construction_stop_resume",
+        "pressed": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "construction_stop_resume",
+        "pressed": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "construction.projects.0.work.stopped",
+        "equals": true
+      }
+    },
+    {
+      "screenshot": "stopped-secured",
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 100
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "construction.projects.0.funding.progress_ppm",
+        "equals": 33333
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "construction_stop_resume",
+        "pressed": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "construction_stop_resume",
+        "pressed": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 100
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "construction.projects.0.funding.progress_ppm",
+        "equals": 66666
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "construction_stop_resume",
+        "pressed": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "construction_stop_resume",
+        "pressed": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "screenshot": "stopped-after-explicit-resume",
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "right",
+        "pressed": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "right",
+        "pressed": false
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "construction.projects",
+        "equals": []
+      }
+    },
+    {
+      "screenshot": "cancelled-physical-refund",
+      "timeout_ms": 120000
+    }
+  ]
+}

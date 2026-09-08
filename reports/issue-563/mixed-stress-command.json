@@ -1,0 +1,43 @@
+{
+  "argv": [
+    "python3",
+    "scripts/benchmark_fragments.py",
+    "--binary",
+    "/Users/mrexception/Documents/Projects/Salimon/salimon/target/release/salimon-client",
+    "--mode",
+    "native",
+    "--machine-label",
+    "Apple-M1-iMac-16GB-macOS26.2-Metal-1920x1080-scale2-AC",
+    "--counts",
+    "1000",
+    "--layouts",
+    "current-mixed",
+    "--states",
+    "active",
+    "--cameras",
+    "facing",
+    "--repeats",
+    "1",
+    "--warmup-seconds",
+    "0",
+    "--sample-seconds",
+    "3",
+    "--minimum-samples",
+    "100",
+    "--timeout",
+    "90",
+    "--output",
+    "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/m1-qualification/mixed-stress"
+  ],
+  "started_utc": "2026-10-31T16:45:02.837017+00:00",
+  "focus_method": "PID-scoped System Events frontmost, no gameplay input",
+  "focus_attempts": [
+    {
+      "pid": 53160,
+      "exit_code": 0,
+      "error": ""
+    }
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 38.74271812499501
+}

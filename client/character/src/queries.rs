@@ -1,0 +1,305 @@
+//! Ship-local floor placement and sight queries over traversal proxies.
+use crate::layout::*;
+use crate::spatial_contracts::{LANDING_COLLIDERS, THRUSTER_COLLIDERS, WING_COLLIDERS};
+use salimon_math::{dot, scale, sub};
+/// A conservative physical cube placement on the cabin and narrow nose deck.
+/// Uses the traversal proxies; furniture and hull edges stay solid.
+#[must_use]
+pub fn ship_floor_placement(local: [f64; 3], half: f64) -> Option<[f64; 3]> {
+    if !half.is_finite() || half <= 0.0 || !local.iter().all(|v| v.is_finite()) {
+        return None;
+    }
+    let cabin = local[0] - half >= INTERIOR_FORWARD_MIN
+        && local[0] + half <= CABIN_FORWARD_MAX
+        && local[2].abs() + half <= INTERIOR_SIDE_LIMIT;
+    let nose = local[0] - half >= INTERIOR_FORWARD_MIN
+        && local[0] + half <= INTERIOR_FORWARD_MAX
+        && local[2].abs() + half <= NOSE_SIDE_LIMIT;
+    if !(cabin || nose) || SHIP_FLOOR_HEIGHT + half * 2.0 >= SHIP_CEILING_HEIGHT {
+        return None;
+    }
+    let header = crate::spatial_contracts::CARGO_HEADER_BOUNDS;
+    if local[0] + half > header[0]
+        && local[0] - half < header[1]
+        && local[2] + half > header[4]
+        && local[2] - half < header[5]
+        && SHIP_FLOOR_HEIGHT + half * 2.0 >= header[2]
+    {
+        return None;
+    }
+    if INTERIOR_OBSTACLES.iter().any(|b| {
+        local[0] + half > b[0]
+            && local[0] - half < b[1]
+            && local[2] + half > b[2]
+            && local[2] - half < b[3]
+    }) {
+        return None;
+    }
+    Some([local[0], SHIP_FLOOR_HEIGHT + half + 0.005, local[2]])
+}
+
+/// First ray hit on the same solid cabin, gate, and engine proxies used for traversal.
+/// Inputs are ship-local; the returned distance is in meters along a unit ray.
+#[must_use]
+pub fn ship_sight_obstruction(eye: [f64; 3], target: [f64; 3], door_open: bool) -> Option<f64> {
+    sight_obstruction(eye, target, door_open, false, false)
+}
+
+/// Runtime supplies the independently moving bunk's exact bounds separately.
+#[must_use]
+pub fn habitation_sight_obstruction(
+    eye: [f64; 3],
+    target: [f64; 3],
+    door_open: bool,
+) -> Option<f64> {
+    sight_obstruction(eye, target, door_open, false, true)
+}
+
+/// The input port is recessed behind its own conservative tray/fixture envelope.
+/// Ignore that envelope only for this authored face; all other solids still occlude.
+#[must_use]
+pub fn fabricator_input_sight_obstruction(eye: [f64; 3]) -> Option<f64> {
+    fabricator_sight_obstruction(eye, crate::FABRICATOR_INPUT_MARKER_METERS)
+}
+
+/// Authored machine surfaces omit only their own conservative fixture envelope.
+#[must_use]
+pub fn fabricator_sight_obstruction(eye: [f64; 3], target: [f64; 3]) -> Option<f64> {
+    sight_obstruction(eye, target, true, true, false)
+}
+
+fn sight_obstruction(
+    eye: [f64; 3],
+    target: [f64; 3],
+    door_open: bool,
+    input_face: bool,
+    independent_bunk: bool,
+) -> Option<f64> {
+    let direction = sub(target, eye);
+    let length = dot(direction, direction).sqrt();
+    if !length.is_finite() || length <= 0.0 || !eye.iter().all(|v| v.is_finite()) {
+        return None;
+    }
+    let direction = scale(direction, 1.0 / length);
+    let mut boxes: Vec<[f64; 6]> = EXTERIOR_OBSTACLES
+        .iter()
+        .map(|b| {
+            [
+                b[0] + PLAYER_RADIUS_METERS,
+                b[1] - PLAYER_RADIUS_METERS,
+                EXTERIOR_BOTTOM,
+                EXTERIOR_TOP,
+                b[2] + PLAYER_RADIUS_METERS,
+                b[3] - PLAYER_RADIUS_METERS,
+            ]
+        })
+        .collect();
+    if !door_open {
+        let b = CLOSED_GATE_OBSTACLE[0];
+        boxes.push([
+            b[0] + PLAYER_RADIUS_METERS,
+            b[1] - PLAYER_RADIUS_METERS,
+            EXTERIOR_BOTTOM,
+            EXTERIOR_TOP,
+            b[2] + PLAYER_RADIUS_METERS,
+            b[3] - PLAYER_RADIUS_METERS,
+        ]);
+    }
+    let inside_cabin = eye[0] >= INTERIOR_FORWARD_MIN
+        && eye[0] <= CABIN_FORWARD_MAX
+        && eye[2].abs() <= INTERIOR_SIDE_LIMIT;
+    let inside_nose = eye[0] >= INTERIOR_FORWARD_MIN
+        && eye[0] <= INTERIOR_FORWARD_MAX
+        && eye[2].abs() <= NOSE_SIDE_LIMIT;
+    if (inside_cabin || inside_nose) && eye[1] >= SHIP_FLOOR_HEIGHT && eye[1] <= SHIP_CEILING_HEIGHT
+    {
+        boxes.clear();
+        boxes.extend(
+            INTERIOR_OBSTACLES
+                .iter()
+                .filter(|b| !input_face || **b != FABRICATOR_OBSTACLE)
+                .filter(|b| !independent_bunk || **b != INTERIOR_OBSTACLES[12])
+                .map(|b| {
+                    [
+                        b[0],
+                        b[1],
+                        SHIP_FLOOR_HEIGHT,
+                        SHIP_CEILING_HEIGHT,
+                        b[2],
+                        b[3],
+                    ]
+                }),
+        );
+        // Bin envelopes block a walking body, but rays see the real hollow shells.
+        for b in &crate::spatial_contracts::STARTER_COLLIDERS[2..4] {
+            let footprint = [
+                b[0] - PLAYER_RADIUS_METERS,
+                b[1] + PLAYER_RADIUS_METERS,
+                b[4] - PLAYER_RADIUS_METERS,
+                b[5] + PLAYER_RADIUS_METERS,
+            ];
+            boxes.retain(|v| [v[0], v[1], v[4], v[5]] != footprint);
+        }
+        boxes.extend(crate::cargo::cargo_bin_solids());
+        boxes.push(crate::spatial_contracts::CARGO_HEADER_BOUNDS);
+        // The shared deck and ceiling occlude objects on the other side.
+        for (x0, x1, z0, z1) in [
+            (
+                INTERIOR_FORWARD_MIN,
+                CABIN_FORWARD_MAX,
+                -INTERIOR_SIDE_LIMIT,
+                INTERIOR_SIDE_LIMIT,
+            ),
+            (
+                CABIN_FORWARD_MAX,
+                INTERIOR_FORWARD_MAX,
+                -NOSE_SIDE_LIMIT,
+                NOSE_SIDE_LIMIT,
+            ),
+        ] {
+            boxes.push([x0, x1, EXTERIOR_BOTTOM, SHIP_FLOOR_HEIGHT, z0, z1]);
+            boxes.push([x0, x1, SHIP_CEILING_HEIGHT, EXTERIOR_TOP, z0, z1]);
+        }
+        boxes.extend([
+            [
+                INTERIOR_FORWARD_MAX,
+                EXTERIOR_FORWARD,
+                EXTERIOR_BOTTOM,
+                EXTERIOR_TOP,
+                -EXTERIOR_SIDE,
+                EXTERIOR_SIDE,
+            ],
+            [
+                INTERIOR_FORWARD_MIN,
+                crate::spatial_contracts::COCKPIT_STARBOARD_HULL_BOUNDS[0],
+                EXTERIOR_BOTTOM,
+                EXTERIOR_TOP,
+                -EXTERIOR_SIDE,
+                -INTERIOR_SIDE_LIMIT,
+            ],
+            [
+                INTERIOR_FORWARD_MIN,
+                INTERIOR_FORWARD_MAX,
+                EXTERIOR_BOTTOM,
+                EXTERIOR_TOP,
+                INTERIOR_SIDE_LIMIT,
+                EXTERIOR_SIDE - PLAYER_RADIUS_METERS,
+            ],
+            [
+                EXTERIOR_AFT,
+                INTERIOR_FORWARD_MIN,
+                EXTERIOR_BOTTOM,
+                EXTERIOR_TOP,
+                -EXTERIOR_SIDE,
+                -DOORWAY_SIDE_LIMIT,
+            ],
+            [
+                EXTERIOR_AFT,
+                INTERIOR_FORWARD_MIN,
+                EXTERIOR_BOTTOM,
+                EXTERIOR_TOP,
+                DOORWAY_SIDE_LIMIT,
+                EXTERIOR_SIDE,
+            ],
+        ]);
+        if !door_open {
+            boxes.push([
+                EXTERIOR_AFT,
+                INTERIOR_FORWARD_MIN,
+                EXTERIOR_BOTTOM,
+                EXTERIOR_TOP,
+                -DOORWAY_SIDE_LIMIT,
+                DOORWAY_SIDE_LIMIT,
+            ]);
+        }
+    }
+    boxes.extend(THRUSTER_COLLIDERS);
+    boxes.extend(WING_COLLIDERS);
+    boxes.extend(LANDING_COLLIDERS);
+    boxes
+        .into_iter()
+        .filter_map(|b| {
+            let mut near: f64 = 0.0;
+            let mut far = f64::INFINITY;
+            for axis in 0..3 {
+                let low = b[axis * 2];
+                let high = b[axis * 2 + 1];
+                if direction[axis].abs() < 1e-12 {
+                    if eye[axis] < low || eye[axis] > high {
+                        return None;
+                    }
+                } else {
+                    let a = (low - eye[axis]) / direction[axis];
+                    let z = (high - eye[axis]) / direction[axis];
+                    near = near.max(a.min(z));
+                    far = far.min(a.max(z));
+                }
+            }
+            (far >= near).then_some(near)
+        })
+        .min_by(f64::total_cmp)
+}
+#[cfg(test)]
+mod sight_tests {
+    use super::ship_sight_obstruction;
+
+    #[test]
+    fn sight_respects_solid_ship_gate_and_engines() {
+        assert!(ship_sight_obstruction([-10.0, 1.0, 0.0], [-9.0, 1.0, 0.0], false).unwrap() < 4.0);
+        assert!(ship_sight_obstruction([-10.0, 1.0, 0.0], [-9.0, 1.0, 0.0], true).unwrap() < 4.0);
+        // Open aperture itself is clear until the solid cabin farther ahead.
+        assert!(ship_sight_obstruction([-10.0, 1.0, 0.0], [-9.0, 1.0, 0.0], true).unwrap() > 2.0);
+        assert!(ship_sight_obstruction([-10.0, 1.0, 7.0], [-9.0, 1.0, 7.0], true).unwrap() < 1.0);
+        assert!(ship_sight_obstruction([-10.0, 4.0, 0.0], [-9.0, 4.0, 0.0], false).is_none());
+        assert!(ship_sight_obstruction([-10.0, 1.0, 0.0], [-11.0, 1.0, 0.0], false).is_none());
+    }
+}
+
+/// Physical onboard membership uses the object's center in the authored cabin/nose.
+/// Inclusive boundaries are independent of door animation, furniture and handling mode.
+pub fn ship_contains_object(local: [f64; 3]) -> bool {
+    use crate::spatial_contracts::{CABIN_TRAVERSAL_BOUNDS, NOSE_FLOOR_BOUNDS};
+    let cabin = CABIN_TRAVERSAL_BOUNDS;
+    let nose = NOSE_FLOOR_BOUNDS;
+    local.iter().all(|v| v.is_finite())
+        && local[1] >= SHIP_FLOOR_HEIGHT
+        && local[1] <= SHIP_CEILING_HEIGHT
+        && ((local[0] >= cabin[0]
+            && local[0] <= cabin[1]
+            && local[2] >= cabin[4]
+            && local[2] <= cabin[5])
+            || (local[0] >= nose[0]
+                && local[0] <= nose[1]
+                && local[2] >= nose[4]
+                && local[2] <= nose[5]))
+}
+
+#[cfg(test)]
+mod containment_tests {
+    use super::*;
+    #[test]
+    fn authored_gate_nose_and_vertical_edges_define_membership() {
+        assert!(ship_contains_object([-7.24, 1.0, 0.0]));
+        assert!(!ship_contains_object([-7.240001, 1.0, 0.0]));
+        assert!(ship_contains_object([7.0, 1.0, 1.0]));
+        assert!(!ship_contains_object([7.0, 1.0, 1.2]));
+        assert!(!ship_contains_object([-5.0, 10.0, 0.0]));
+        assert!(!ship_contains_object([0.0, -1.0, 0.0]));
+        assert!(!ship_contains_object([f64::NAN, 1.0, 0.0]));
+    }
+}
+
+#[cfg(test)]
+mod fabricator_tests {
+    use super::*;
+    #[test]
+    fn wall_module_blocks_physical_objects_and_sight_but_not_its_input_or_aisles() {
+        assert!(ship_floor_placement([-3.0, 1.0, 3.5], 0.1).is_none());
+        assert!(ship_floor_placement([-3.0, 1.0, 2.0], 0.1).is_some());
+        assert!(ship_floor_placement([-6.0, 1.0, 2.0], 0.1).is_some());
+        let eye = [-3.0, 1.65, 2.0];
+        let input = crate::FABRICATOR_INPUT_MARKER_METERS;
+        assert!(ship_sight_obstruction(eye, input, true).unwrap() < 1.55);
+        assert!(fabricator_input_sight_obstruction(eye).is_none_or(|hit| hit >= 1.55));
+    }
+}

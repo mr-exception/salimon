@@ -1,0 +1,172 @@
+# Universe schema maintenance
+
+Read the active issue, root [AGENTS.md](../../AGENTS.md), this crate's
+[architecture](architecture.md) and [invariants](invariants.md) before editing.
+`identity.rs` owns stable source IDs; `records.rs` owns public input DTOs;
+`validation.rs` validates publication; `lib.rs` exposes immutable catalog access.
+
+Preserve the independent schema-1 fixture, missing/uncertain source distinctions
+and existing playable world's IDs. Extend versioned wire contracts deliberately;
+no runtime/renderer coupling, new scientific assumptions, migration, data import
+or world evaluation is implied by a schema change. Run the architecture's checks
+and update affected docs/report in the same PR.
+
+U02: `coordinates.rs` owns split galactic cells, system/body/local transforms and
+moving-frame velocity; `epoch.rs` owns split calendar instants and scale gates.
+Read their architecture contract before changing numerical/time behavior.
+
+U06 source metadata is in `sources.rs`; checksum verification and atomic raw-byte
+staging are in `scripts/import_universe_sources.py`. Never promote fixture or
+restricted/unreviewed source data into production by changing a checksum alone.
+
+U04 `partitions.rs` owns the bounded prototype container and consumer-supplied
+Read/Seek adapter. Read [storage contract](../../docs/universe-storage.md) before
+changing offsets, codec/precision, limits, source map or schema versions. Run
+partition regressions and the release example; retain conditional budget evidence.
+
+U03 `reference.rs` owns strict independent reference comparison; frozen goldens,
+unit regressions and example workload adapters have separate paths in the
+[architecture](architecture.md#scientific-reference-harness--u03-404). Read the
+[reference budget guide](../../docs/universe-reference-fixtures.md) before changing
+tolerances or claiming solver/native coverage. Preserve failure and source context.
+
+U07 `ingestion/gaia.rs` adds streaming local CSV decoding and bounded canonical
+matching with typed source measurements; see the [Gaia contract](../../docs/universe-gaia-ingestion.md).
+Private real-data acquisition is authorized by the 2026-10-27 owner decision.
+Scientific full-data acceptance remains #524; future release review is #659.
+
+U08 `ingestion/{horizons,exoplanets}.rs` imports source-labeled Solar System states,
+physical measurements and PS default-row planets; see the [observed ingestion
+contract](../../docs/universe-observed-ingestion.md) before editing frame/epoch,
+unit/error/limit or identity behavior. `observed_import` is a deterministic local
+fixture example, not production packaging. Selected real source coverage follows #526 below.
+
+U09 `inference.rs` owns bounded system completion; `inference/observed.rs` adapts
+U08 measurements and `inference/tests.rs` owns preservation/failure regressions.
+Read the [inference contract](../../docs/universe-inference.md) before changing
+priors, confidence, rejection or deterministic identity. `inference_sanity` is
+portable heuristic evidence, not calibrated science or production publication.
+
+U10 `synthesis.rs` owns bounded offline fictional-system publication and SHA-256
+lanes; `synthesis/tests.rs` owns identity/source/physical/golden regressions.
+Read the [builder contract](../../docs/universe-fiction-builder.md) before changing
+recipes or publication hashes. Examples `fiction_build` and `fiction_sanity` own
+file IO and synthetic evidence; never call synthesis from runtime or replace
+observed records. U11 now publishes the selected starting world's full definition;
+other worlds' definitions and playable evaluation adapters remain downstream.
+
+U11 `starting_system.rs` owns the exact permanent candidate/world digests, fixed
+IDs, complete selected-world manifest and single radial surface query. Read the
+[starting-system contract](../../docs/universe-starting-system.md). Do not reselect
+on launch, regenerate a visited world or treat U10 recipe hashes as U11 world
+digests. Visual overrides cannot change terrain or resources. Resource routes
+must clear the authored ship disk and use the same terrain query. Golden changes
+need explicit publication/migration review; native/playable integration is U24.
+
+#513 originally limited acquisition to existing fixtures. The owner's later
+2026-10-27 authorization permits public real data for private noncommercial
+development, including ingestion, validation and local packs. #659 is a future
+public/commercial release gate; do not block private development on it. Preserve
+exact source/provenance/hash records and complete actual scientific checks.
+Python release-mode production staging additionally
+requires a human review sidecar bound to the exact source manifest; see the
+[source-use/evidence contract](../../docs/universe-sources.md#private-development-decision-and-production-evidence-513).
+Rust source metadata/schema is unchanged; never treat metadata acceptance as
+permission, full-snapshot coverage or approval of a production staging operation.
+
+
+## Incremental private offline packs (#413)
+
+See the [implemented contract](../../docs/universe-pack.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Bounded read-only pack queries (#414)
+
+See the [implemented contract](../../docs/universe-reader.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Time-addressable ephemeris models (#415)
+
+See the [implemented contract](../../docs/universe-ephemerides.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Dominant-source celestial gravity (#416)
+
+See the [implemented contract](../../docs/universe-gravity.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Gravity-aware ship trajectory (#417)
+
+See the [implemented contract](../../docs/universe-trajectory.md) for ownership, inputs, bounds, validation and remaining production/runtime limitations.
+
+
+## Predictive spatial streaming (#422)
+
+See the [streaming contract](../../docs/universe-streaming.md) for worker ownership,
+nonblocking runtime polling, explicit residency limits, stale-result rejection
+and immutable quality-independent content. Startup uses `SALIMON_UNIVERSE_PACK`;
+loaded catalog truth does not grant player discovery; ordinary gameplay uses the separate canonical Vesper publication.
+
+
+## Scanner contacts (#428)
+
+`client/universe/src/scanner.rs` owns bounded player discovery, exact sampled
+celestial states, three-hour freshness and durable encounter history. Unknown
+catalog entries are never revealed implicitly; batches validate before mutation.
+See the [scanner contract](../../docs/universe-scanner.md) for ownership, clock semantics, tests and downstream integration.
+
+
+## Scanner delivery (#429)
+
+Universe `scanner/pulses.rs` owns fixed five-second cadence and analytical funded linear-path detection. Runtime `session/scanner.rs` composes ordinary Core funding after construction, samples current body-local state and exposes read-only automation. Unknown orbital phase/velocity is never invented; body-local and galactic observations cannot be mixed.
+See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.
+
+
+## Scanner delivery (#431)
+
+Scanner contact checkpoints validate catalog revision, exact IDs/frames, timestamp ordering and bounds before atomic reconstruction. Runtime schema 25 saves canonical scanner parameters, clock/remainder and encounter history; legacy canonical saves migrate empty, current missing/malformed sources reject. Closed-app launch advances freshness once without inventing offline detections.
+See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.
+
+
+## Scanner delivery (#469)
+
+Universe `scanner/chart.rs` owns player-known observations, inferred/transmitted leads with explicit uncertainty, and immutable voluntary route annotations. Runtime `session/chart.rs` owns cockpit P/M/Enter controls and schema-26 pair validation with scanner history. Catalog truth never seeds the chart; observed knowledge outlives contact TTL and source frames are preserved without guessed transforms.
+See the [scanner contract](../../docs/universe-scanner.md) for source/test mapping, units and limitations.
+
+
+## Hybrid astronomical sky (#423)
+
+See the [sky contract](../../docs/universe-sky.md) for bounded presentation,
+split-origin/source validation, explicit frame/epoch limits and production
+verification. Sky visibility grants no scanner/chart knowledge or simulation authority.
+
+
+## Suit observations (#625)
+
+Follow the [measurement, frame, error and schema-27 contract](../../docs/suit-observations.md).
+Canonical player knowledge stores estimated spots/bearings with explicit uncertainty;
+validated reload cannot reveal catalog POIs or invent a target range.
+
+
+## Personal planetary chart (#626)
+
+Follow the [chart, uncertainty, inspection and schema-28 contract](../../docs/planetary-chart.md).
+Personal edits/targets never mutate canonical sites, suit observations or scanner history.
+
+
+## Selected observed-source coverage (#526)
+
+Follow the [real-source coverage contract](../../docs/observed-source-coverage.md) for
+frozen full PS rows, selected JPL targets/parents and physical formats, expected
+source identity, acquisition/verification commands and explicit scientific limits.
+The private pack preserves all original measurements and sidecars; source terms
+remain unreviewed for public release. Runtime/save schemas and player discovery
+are unchanged.
+
+
+Canonical motion #432: [motion publication, game-clock policy and schema-30 frame](../../docs/universe-offline-propagation.md). `src/starting_motion.rs` owns the separate authored circular model; geographic identity remains unchanged.
+
+
+## Recovered site routes and Gaia evidence (#470 / #524)
+
+Follow [transmitted-site routes](../../docs/opening-and-investigations.md) for `scanner/chart.rs`: body-local site leads retain uncertainty, explicit route provenance never grants scanner knowledge, and changed/missing provenance fails restore. `sources.rs` also retains exact TAP VOTable artifacts as `votable` encoding. [Gaia ingestion](../../docs/universe-gaia-ingestion.md) maps original-byte acquisition/independent transcription checks and actual production pack measurements; a bounded real sample cannot certify full-release coverage or its budget.

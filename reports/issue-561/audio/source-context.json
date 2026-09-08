@@ -1,0 +1,13 @@
+{
+  "body_fixed_listener_meters": [
+    612293.4917841437,
+    0.0,
+    1478207.2520180587
+  ],
+  "climate_identity": "1af15c67199f7a876b4dde7c874178bd08ac0f9fe10507d7caef91946b0e4cdf",
+  "fixture": "fictional-fixture/audio-world; seed37 climate, seed17 population",
+  "population_identity": "fa5574d60a73151fb65ed819b4e60ea1ab749b413c6f0bebd9c917f68ce91f64",
+  "shared_tt_seconds": 100000,
+  "synthesis": "production native_audio::Mix, 125 controls at 16ms, not OS playback",
+  "weather": "WeatherSample { definition_id: \"1af15c67199f7a876b4dde7c874178bd08ac0f9fe10507d7caef91946b0e4cdf\", province_id: \"c26f20910a1d2a1128f59745e4d786bd2bf23fc4fd78762d2575fdc1d52ff680:7\", epoch: Epoch { day: 10958, nanos: 56800000000000, scale: Tt }, climate_temperature_kelvin: 284.5757183935493, temperature_kelvin: 286.4142005678981, pressure_pascal: 101325.0, cloud_fraction: 0.797767997300713, storm_fraction: 0.9869136678246923, wind_mps: [-18.259967150082343, 3.908958304368779, 7.5635260420513], precipitation: Water, precipitation_kg_m2_s: 0.0003936640701446029, extinction_per_meter: 0.0010666904675547637 }"
+}

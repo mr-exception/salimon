@@ -1,0 +1,25 @@
+{
+  "setup": {
+    "scenario": "landed-earth",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 120000,
+  "steps": [
+    {
+      "screenshot": "interior-static-00"
+    },
+    {
+      "screenshot": "interior-static-01"
+    },
+    {
+      "screenshot": "interior-static-02"
+    },
+    {
+      "screenshot": "interior-static-03"
+    },
+    {
+      "screenshot": "interior-static-04"
+    }
+  ]
+}

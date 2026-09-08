@@ -1,0 +1,22 @@
+[
+  {
+    "path": "client/runtime/src/session/chart.rs",
+    "sha256": "d5b0c2f5bf1c14f9e028f23bac0b614cb7b0c30fb56fd3b6362401d969fd8b01"
+  },
+  {
+    "path": "client/runtime/src/session/narrative/tests.rs",
+    "sha256": "d499eaaa13ee5cb7bfd2c5964417ef196b78c150e9d477059c704344768a7703"
+  },
+  {
+    "path": "client/runtime/src/session/narrative.rs",
+    "sha256": "38d921c9d530a7c2f262c61c1cb254b255f7a66e12c8e99872e42ea687146dde"
+  },
+  {
+    "path": "client/universe/src/scanner/chart.rs",
+    "sha256": "5108b9eeed2776685e6beda64ed674b5395ec10a8da21a30b7134664fea0fcd3"
+  },
+  {
+    "path": "client/universe/src/sources.rs",
+    "sha256": "049716585d1fbeea8fd4df87848b9de802bec791ce63eecd1f313e5965b8d617"
+  }
+]

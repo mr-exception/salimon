@@ -1,0 +1,21 @@
+{
+  "setup": {
+    "scenario": "surface-age-recolor",
+    "seed": 581,
+    "step_ms": 16
+  },
+  "timeout_ms": 180000,
+  "steps": [
+    {
+      "action": {
+        "op": "window",
+        "action": "restore"
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "screenshot": "surface-age-recolor",
+      "timeout_ms": 120000
+    }
+  ]
+}

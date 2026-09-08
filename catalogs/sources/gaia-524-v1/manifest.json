@@ -1,0 +1,55 @@
+{
+  "format": "salimon.universe.sources",
+  "schema_version": 1,
+  "reviewed_on": "2026-10-31",
+  "sources": [
+    {
+      "id": "gaia:dr3",
+      "release": "Gaia DR3 (gaiadr3.gaia_source; reference epoch J2016.0)",
+      "endpoint": "https://gaia.aip.de/tap/sync",
+      "query": "select source_id,random_index,ref_epoch,ra,ra_error,dec,dec_error,parallax,parallax_error,pmra,pmra_error,pmdec,pmdec_error,radial_velocity,radial_velocity_error,ruwe,duplicated_source,astrometric_params_solved,ra_dec_corr,ra_parallax_corr,ra_pmra_corr,ra_pmdec_corr,dec_parallax_corr,dec_pmra_corr,dec_pmdec_corr,parallax_pmra_corr,parallax_pmdec_corr,pmra_pmdec_corr,phot_g_mean_mag from gaiadr3.gaia_source where random_index < 8192 order by source_id; select source_id,random_index,ref_epoch,ra,ra_error,dec,dec_error,parallax,parallax_error,pmra,pmra_error,pmdec,pmdec_error,radial_velocity,radial_velocity_error,ruwe,duplicated_source,astrometric_params_solved,ra_dec_corr,ra_parallax_corr,ra_pmra_corr,ra_pmdec_corr,dec_parallax_corr,dec_pmra_corr,dec_pmdec_corr,parallax_pmra_corr,parallax_pmdec_corr,pmra_pmdec_corr,phot_g_mean_mag from gaiadr3.gaia_source where source_id in (4472832130942575872,5853498713190525696) order by source_id",
+      "documentation": [
+        "https://www.cosmos.esa.int/web/gaia/dr3",
+        "https://doi.org/10.17876/gaia/dr.3/1"
+      ],
+      "license": {
+        "status": "unreviewed",
+        "policy_url": "https://www.cosmos.esa.int/web/gaia/credits",
+        "attribution": "ESA Gaia mission; Gaia DPAC; Gaia Collaboration (2023), A&A 674 A1; AIP Gaia Archive mirror.",
+        "review_issue": "https://github.com/mr-exception/salimon/issues/659"
+      },
+      "coverage": "Exact deterministic random_index < 8192 sample and two explicit golden IDs; not a full Gaia release.",
+      "uncertainty": "Published astrometric standard errors/correlations and missing values retained; no distance or unmeasured phase space invented.",
+      "artifacts": [
+        {
+          "path": "sample.xml",
+          "bytes": 4372903,
+          "sha256": "a5e18b0e75ae794c1fd7818dddc5672974514824c22d9dc5be1c6d5bf5bae846",
+          "origin": "observed_snapshot",
+          "encoding": "votable"
+        },
+        {
+          "path": "sample.csv",
+          "bytes": 2392333,
+          "sha256": "0f84776580e9f7b4c4142d7f619cf389198f0229f20f9b8aa1ccb6cb186d9d77",
+          "origin": "observed_snapshot",
+          "encoding": "csv"
+        },
+        {
+          "path": "golden.xml",
+          "bytes": 7906,
+          "sha256": "ef8ee465a9bf179dff1c54b8e63234d9141902c08fbddd52bb5f9e58bbe50276",
+          "origin": "observed_snapshot",
+          "encoding": "votable"
+        },
+        {
+          "path": "golden.csv",
+          "bytes": 1094,
+          "sha256": "8bf55041961d86a5f0242f3220ac2a56ce079b3810116281d384018288ed9a27",
+          "origin": "observed_snapshot",
+          "encoding": "csv"
+        }
+      ]
+    }
+  ]
+}

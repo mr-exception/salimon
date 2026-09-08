@@ -1,0 +1,63 @@
+{
+  "$schema": "../asset-manifest.schema.json",
+  "schemaVersion": 1,
+  "assetId": "item.mining-tool",
+  "category": "items",
+  "source": "models/assets/items/mining-tool/source.blend",
+  "runtime": "client/assets/items/mining-tool/model.glb",
+  "coordinates": {
+    "units": "meters",
+    "source": {
+      "up": "+Z",
+      "forward": "+X",
+      "unitScale": 1
+    },
+    "runtime": {
+      "up": "+Y",
+      "forward": "+X"
+    },
+    "conversion": "x,z,-y",
+    "pivot": "Bottom center of the asset in its local frame"
+  },
+  "profile": "standard-v1",
+  "budgets": {
+    "maxTriangles": 500,
+    "maxPrimitives": 8,
+    "maxMaterials": 4,
+    "maxTextureBytes": 65536,
+    "maxGlbBytes": 131072
+  },
+  "collision": {
+    "policy": "none"
+  },
+  "contracts": {
+    "root": "ASSET_mining-tool",
+    "visualGroups": [
+      "Visual"
+    ],
+    "groups": [
+      "Visual",
+      "Sockets"
+    ],
+    "nodes": [
+      "Mining_Tool"
+    ],
+    "materials": [],
+    "sockets": [
+      "SOCKET_Grip"
+    ],
+    "markers": [],
+    "colliders": [],
+    "requiredExtras": []
+  },
+  "extensions": {
+    "item": {
+      "version": 1,
+      "data": {
+        "gripSocket": "SOCKET_Grip",
+        "gripForward": "+X",
+        "gripUp": "+Y"
+      }
+    }
+  }
+}

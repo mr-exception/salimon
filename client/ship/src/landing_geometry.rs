@@ -1,0 +1,5 @@
+// Generated from authored scout geometry; do not edit by hand.
+pub const LOWEST_LOCAL_Y_METERS: f64 = -0.10752688348293304;
+pub const LANDING_FOOT_LOCAL_Y_METERS: f64 = -2.1075267791748047;
+pub const LANDED_HULL_CLEARANCE_METERS: f64 = 2.0;
+pub const LANDED_ORIGIN_HEIGHT_METERS: f64 = -LANDING_FOOT_LOCAL_Y_METERS;

@@ -1,0 +1,53 @@
+{
+  "setup": {
+    "scenario": "fragment-pile",
+    "seed": 1,
+    "step_ms": 16
+  },
+  "timeout_ms": 120000,
+  "steps": [
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 6
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_mass_kg",
+        "equals": 12
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 120,
+        "dy": 20
+      }
+    },
+    {
+      "screenshot": "settled-pile"
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 180
+      }
+    },
+    {
+      "screenshot": "pile-after-three-more-seconds"
+    }
+  ]
+}

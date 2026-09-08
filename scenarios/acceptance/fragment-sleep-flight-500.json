@@ -1,0 +1,150 @@
+{
+  "setup": {
+    "scenario": "orbit-earth",
+    "seed": 155,
+    "step_ms": 16,
+    "fragment_count": 500,
+    "fragment_layout": "scattered",
+    "fragment_settle_steps": 1200
+  },
+  "timeout_ms": 7200000,
+  "steps": [
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 500
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_mass_kg",
+        "equals": 625.0
+      }
+    },
+    {
+      "assert": {
+        "path": "world.sleeping_fragment_count",
+        "equals": 500
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "left",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 100
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "left",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.speed_meters_per_second",
+        "approx": 25000,
+        "tolerance": 0.001
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 500
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_mass_kg",
+        "equals": 625.0
+      }
+    },
+    {
+      "assert": {
+        "path": "world.sleeping_fragment_count",
+        "equals": 500
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": -1
+      }
+    },
+    {
+      "action": {
+        "op": "landing"
+      }
+    },
+    {
+      "wait": {
+        "path": "ship.flight_state",
+        "equals": "Landed { body: Earth }"
+      },
+      "frames": 100,
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 500
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_mass_kg",
+        "equals": 625.0
+      }
+    },
+    {
+      "assert": {
+        "path": "world.sleeping_fragment_count",
+        "equals": 500
+      }
+    },
+    {
+      "action": {
+        "op": "landing"
+      }
+    },
+    {
+      "wait": {
+        "path": "ship.flight_state",
+        "equals": "Flying"
+      },
+      "frames": 100,
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 500
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_mass_kg",
+        "equals": 625.0
+      }
+    },
+    {
+      "assert": {
+        "path": "world.sleeping_fragment_count",
+        "equals": 500
+      }
+    }
+  ]
+}

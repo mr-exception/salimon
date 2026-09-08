@@ -1,0 +1,96 @@
+{
+  "$schema": "../../../asset-manifest.schema.json",
+  "schemaVersion": 1,
+  "assetId": "resource.water-ice-deposit-crown",
+  "category": "resources",
+  "source": "models/assets/resources/water-ice-deposit-crown/source.blend",
+  "runtime": "client/assets/resources/water-ice-deposit-crown/model.glb",
+  "coordinates": {
+    "units": "meters",
+    "source": {
+      "up": "+Z",
+      "forward": "+X",
+      "unitScale": 1
+    },
+    "runtime": {
+      "up": "+Y",
+      "forward": "+X"
+    },
+    "conversion": "x,z,-y",
+    "pivot": "Center of authoritative unit bounding cube; geometry inside [-0.48, 0.48] meters"
+  },
+  "profile": "standard-v1",
+  "budgets": {
+    "maxTriangles": 240,
+    "maxPrimitives": 2,
+    "maxMaterials": 2,
+    "maxTextureBytes": 1,
+    "maxGlbBytes": 32768
+  },
+  "collision": {
+    "policy": "none"
+  },
+  "contracts": {
+    "root": "ASSET_water-ice-deposit-crown",
+    "visualGroups": [
+      "Visual"
+    ],
+    "groups": [
+      "Visual"
+    ],
+    "nodes": [
+      "Ice_Deposit"
+    ],
+    "materials": [
+      "Ice_Blue",
+      "Ice_Frost"
+    ],
+    "sockets": [],
+    "markers": [],
+    "colliders": [],
+    "requiredExtras": [
+      {
+        "node": "ASSET_water-ice-deposit-crown",
+        "path": "salimon.assetId"
+      },
+      {
+        "node": "Ice_Deposit",
+        "path": "salimon.role"
+      }
+    ]
+  },
+  "quality": {
+    "toleranceMeters": 1e-05,
+    "areaToleranceSquareMeters": 1e-10,
+    "boundsMeters": {
+      "Ice_Deposit": [
+        [
+          -0.4300000071525574,
+          -0.41999998688697815,
+          -0.4099498689174652
+        ],
+        [
+          0.4034228026866913,
+          0.41999998688697815,
+          0.41013845801353455
+        ]
+      ]
+    },
+    "anchorsMeters": {
+      "ASSET_water-ice-deposit-crown": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "visualBudget": {
+    "style": "option-a",
+    "maxNodes": 3,
+    "maxTextureMemoryBytes": 0,
+    "maxDrawCalls": 1
+  },
+  "styleProfile": {
+    "name": "option-a-v1"
+  }
+}

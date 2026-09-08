@@ -1,0 +1,139 @@
+# Project Phases
+
+> Migrated from the Salimon project documents on 2026-09-29. For current task status and dependencies, use [GitHub issues](https://github.com/mr-exception/salimon/issues).
+
+> The roadmap is intentionally incremental. Exact phases will be finalized after the first design questions are answered.
+## Future narrative/experience initiative (2026-10-21)
+
+A grounded cinematic Scout vertical slice, opening memory-loss narrative, Archive/Data Recovery, player-known charting, and eventual Absenat gate/Hall are specified in [experience roadmap](experience-implementation-map.md). Work is split into scoped issues #463–476 and reused existing dependencies. The future homeworld replaces historical Earth-start requirements when migrated; the currently shipped prototype is not retroactively changed. Backend-powered Hall is a later implementation stage, completely undiscoverable in all pre-completion player UI.
+
+## Phase rules
+Every phase should:
+- Have **one primary playable goal**.
+- Be small enough to reason about and finish without bundling many unrelated systems.
+- Have explicit **entry assumptions** and **completion criteria**.
+- Contain a limited set of tasks linked to the GitHub issues.
+- End with something that can be run, demonstrated, or tested.
+- Avoid implementing future-scale complexity before it is required.
+## Phase template
+### Phase N — Name
+**Goal:** What becomes possible for the player after this phase?
+**Scope:** The smallest systems required for that goal.
+**Out of scope:** Related features intentionally deferred.
+**Completion criteria:** Observable conditions proving the phase is finished.
+**Tasks:** Managed in GitHub issues.
+**Notes / decisions:** Links to relevant specifications.
+## Phase 0 baseline and evaluation
+
+[Phase 0 — Technical Feasibility Showcase](phase-0-technical-feasibility.md)
+established the custom native Rust + `winit` + `wgpu` client, compressed static
+Solar System, first-person traversal, direct-speed flight, uncancellable landing/
+takeoff assists and diagnostics. Its original exclusions bound that baseline;
+they do not prohibit systems added afterward.
+
+The [2026-09-15 evaluation](phase-0-evaluation.md) records **GO WITH REVISIONS**
+for its evaluated revision. It does not establish a hard 60 FPS floor or certify
+later revisions. Preserve its machine-specific evidence and limitations.
+
+## Current post-baseline prototype
+
+The client remains native-first and client-only. Local build scripts target macOS,
+Windows and Debian-based Linux. PR CI verifies an Ubuntu source build;
+macOS is the reference playable/performance target. Web/WASM portability remains future work. No new numbered phase or formal
+phase closure is implied by this implementation summary.
+
+Implemented beyond the navigation baseline:
+
+- Open-space and nearby-body EVA with ship/frame transitions and airlock gates.
+- Deterministic planetary iron, silicate and water-ice deposits, local streaming,
+  aimed extraction and physical fragment output.
+- One-object carrying, pickup/release and transfer between surface and ship.
+- Fragment gravity, ejection/release motion, contact and piling through the
+  portable `salimon-physics` crate and runtime environment/frame adapters.
+- Blender-authored scout, deposits, fragments and mining tool with checked-in
+  exports and generated scout spatial contracts.
+- Native build staging and declarative gameplay/evidence automation.
+
+Modified deposits and physical fragments survive local streaming **in memory for
+the current session**. This is not disk/backend persistence. Production survival, NPCs, networking, multiplayer, economy and
+orbital simulation remain deferred. `core/` remains a documentation-only backend
+boundary. The [technical architecture](technical-architecture.md) and
+[feature maintenance map](maintenance-map.md) define implemented owners/contracts.
+
+## Current work and later roadmap
+
+[GitHub issues](https://github.com/mr-exception/salimon/issues) and their explicit
+blockers/acceptance criteria govern execution; historical Task N numbering is
+not a current queue. Later small phases can extend physical cargo and ship
+interaction, then survival/ship systems, persistence/backend authority, ship
+modification, NPC interaction/economy and shared-universe capabilities. Exact
+ordering and phase completion criteria require their own decisions/issues.
+
+## Realistic flight/Core wave (#185–#197)
+
+The original baseline's direct-speed flight and no-energy exclusions are historical
+and explicitly superseded by inertial propulsion, signed throttle, event-driven
+mass, Core storage/conversion/reservations, power-dependent cabin gravity,
+blackout controls, swept crashes/recovery and physical instrumentation. This does
+not close or renumber Phase 0. See the [accepted gameplay decisions](spaceship-building-and-survival.md#accepted-propulsion-and-core-review-2026-10-14).
+
+Review decisions **9, 58, 63, 72, 84** constrain scope/workflow: ship gravity/orbits,
+manual power management and detailed inertial cabin forces remain OUT OF SCOPE;
+implementation uses small dependency-aware issues. The earlier instruction to
+hold issue creation was superseded by the later explicit request to create the
+GitHub queue. Update existing owned documents only, without a new central spec.
+Future thruster/landing upgrades and module loads remain documentation-only.
+Cloud unit/E2E/profiling work is #195/#196; Apple M1 physical signoff is isolated
+in native-labeled #198–#200 and is not established by cloud software rendering.
+
+
+Fabricator crafting is newly authorized by the [accepted five-round contracts](spaceship-building-and-survival.md#accepted-fabricator-contracts-2026-10-19-336). Implementation is staged: #336 contracts, #337 raw materials, #338 portable domain, then separate runtime/UI integration. Survival effects, disk persistence and playable progression remain deferred.
+
+
+### Fabricator portable foundation (#336–#338)
+
+Approved contracts, real organic biomass/medicinal raw resources and the portable
+recipe/storage/FIFO/tray domain are delivered. Crafting remains unconnected to
+native interactions pending #339–#347; no playable-wave completion or phase
+renumbering is implied. See [fabrication architecture](../client/fabrication/architecture.md).
+
+## Future Jump Drive and impulse model — approved documentation, pending implementation (2026-10-21)
+
+The [approved travel contract](jump-drive-and-interstellar-travel.md) changes the **future** design to one global 1:1 real-time clock without relativistic time dilation; ordinary thrusters, sub-light long voyages, engine-off offline coasting and the fictional reusable **Spatial Jump Drive** coexist. The Jump Drive is a fabricated physical ship module with an owner-authorized six-field light-distance panel, hard propulsion-engine-off gate, Core-priced forward displacement using initial **N=20%** of the remaining gap to c per light-second, quantum-themed loading, and unchanged ship velocity after arrival. It is not the lore wormhole, not ordinary cruise propulsion and not a new time scale.
+
+[Development issue #493](https://github.com/mr-exception/salimon/issues/493) separately changes normal thrusters to **1 N·s of impulse per 1 J of actual Core propulsion spend**, and reconciles existing force/power tests. Later Jump Drive implementation needs its **own** planning, material/assembly progression, Core energy/charging balance, explicit engine switch, safe arrivals, multiplayer-safe transactions, offline persistence, quantum visuals and native signoff. The current 60 GJ Core cannot fund a complete 1-light-second jump at N20% for a 100 t ship at rest; the desired ~6–12 months of full-play galaxy exploration requires measured future balance, not silent formula changes. These documents do not reopen closed implementation issues or claim a finished feature.
+
+## Universe U01 foundation (#402)
+
+The isolated portable catalog schema is delivered, with no playable universe
+migration. Current gameplay/visual implementation prerequisites are delivered;
+remaining native reference gates retain their existing issues. U02 and subsequent
+dependency-ordered expansion issues remain unimplemented. See
+[schema contract](../client/universe/architecture.md).
+
+## Ongoing universe documentation gate (#440)
+
+[U35](documentation-maintenance.md) applies to every U01–U34 PR now, with explicit
+same-PR documentation impact, guide links, justified exceptions and review checks.
+The policy setup is delivered; future authors/reviewers continue to enforce it.
+Automated CI links/stale-contract checks are #442; final audit #441 waits for
+U01–U33 and must not depend on U34. Neither defers individual PR documentation.
+
+U02 (#403) delivers isolated hierarchical coordinates/epoch APIs after U01. No
+playable world, rendering, scientific catalog or orbital flight migration occurs.
+
+U05 (#406) delivers a separate catalog-bound new-run save envelope, with verified
+slot fallback and explicit incompatibility errors. Production pack verification,
+scanner payloads, world migration and runtime adoption remain downstream. See
+[contract](save-contract.md#future-universe-new-run-contract--u05-406).
+
+U06 (#407) delivers pinned development source manifests, typed metadata and
+reproducible offline raw staging. It does not distribute a scientific universe:
+[reuse/full-snapshot follow-up #513](https://github.com/mr-exception/salimon/issues/513)
+remains required for production Gaia inputs and pack publication. See
+[source coverage and restrictions](universe-sources.md).
+
+Local Data Recovery #468 is delivered through configurable Fabricator hardware,
+Archive controls, Core-funded progress and schema 7. Full destination leads remain
+#470 after charting/world integration; native/physical/balance approval is #515.
+See [implementation boundaries](data-recovery-module.md).

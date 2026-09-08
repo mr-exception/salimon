@@ -1,0 +1,118 @@
+{
+  "setup": {
+    "scenario": "construction-cancellation",
+    "seed": 551,
+    "step_ms": 100
+  },
+  "timeout_ms": 360000,
+  "steps": [
+    {
+      "assert": {
+        "path": "construction.projects.0.funding.progress_ppm",
+        "equals": 0
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": true
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": false
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "construction.projects.0.funding.progress_ppm",
+        "equals": 500000
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.installed_solids",
+        "equals": []
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.solids",
+        "equals": []
+      }
+    },
+    {
+      "screenshot": "funded-50-percent",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "right",
+        "pressed": true
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "right",
+        "pressed": false
+      },
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "construction.projects",
+        "equals": []
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.installed_solids",
+        "equals": []
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.solids",
+        "equals": []
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.0.mass_kg",
+        "approx": 10.0,
+        "tolerance": 1e-12
+      }
+    },
+    {
+      "assert": {
+        "path": "carrying.object_id",
+        "equals": null
+      }
+    },
+    {
+      "screenshot": "exact-50-percent-refund",
+      "timeout_ms": 60000
+    }
+  ]
+}

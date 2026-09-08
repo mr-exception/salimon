@@ -1,0 +1,209 @@
+{
+  "setup": {
+    "scenario": "biological-mining",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "biology.fixture",
+        "equals": true
+      }
+    },
+    {
+      "assert": {
+        "path": "biology.target.part",
+        "equals": 2
+      }
+    },
+    {
+      "action": {
+        "op": "performance_reset"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "performance.samples",
+        "gte": 3
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "attached-medicinal-reserve",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "1",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "1",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "left",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 4
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "left",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "biology.sources.1.fraction",
+        "lt": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "biology.sources.1.fraction",
+        "gt": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.0.resource",
+        "equals": "medicinal-compounds"
+      }
+    },
+    {
+      "action": {
+        "op": "performance_reset"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "performance.samples",
+        "gte": 3
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "partial-depletion",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 0
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "biology.sources.1.fraction",
+        "lt": 1
+      }
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "left",
+        "pressed": true
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 400
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "left",
+        "pressed": false
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "biology.sources.1.fraction",
+        "gt": 0
+      }
+    },
+    {
+      "action": {
+        "op": "performance_reset"
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "wait": {
+        "path": "performance.samples",
+        "gte": 3
+      },
+      "frames": 1,
+      "timeout_ms": 180000
+    },
+    {
+      "screenshot": "cap-release-and-partial-source",
+      "timeout_ms": 180000
+    },
+    {
+      "action": {
+        "op": "offline_resume",
+        "seconds": 0
+      },
+      "timeout_ms": 180000
+    },
+    {
+      "assert": {
+        "path": "biology.sources.1.fraction",
+        "gt": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.extracted_mass_kg",
+        "gte": 10
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.1.mass_kg",
+        "approx": 10,
+        "tolerance": 1e-09
+      }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "setup": {
+    "scenario": "surface-age-replacement",
+    "seed": 581,
+    "step_ms": 16
+  },
+  "timeout_ms": 180000,
+  "steps": [
+    {
+      "action": {
+        "op": "window",
+        "action": "restore"
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "screenshot": "surface-age-replacement",
+      "timeout_ms": 120000
+    }
+  ]
+}

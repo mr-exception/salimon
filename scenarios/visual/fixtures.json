@@ -1,0 +1,91 @@
+{
+  "cockpit": {
+    "scenario": "scenarios/evidence/lower-cockpit-windows.json",
+    "mode": "moving",
+    "repeat": 3,
+    "tolerances": {
+      "channel_tolerance": 8,
+      "changed_fraction": 0.001,
+      "masks": []
+    }
+  },
+  "interior": {
+    "scenario": "scenarios/evidence/cockpit-wide-monitor.json",
+    "mode": "moving",
+    "repeat": 3,
+    "tolerances": {
+      "channel_tolerance": 8,
+      "changed_fraction": 0.001,
+      "masks": []
+    }
+  },
+  "resources": {
+    "scenario": "scenarios/evidence/mining-tool.json",
+    "mode": "moving",
+    "repeat": 3,
+    "tolerances": {
+      "channel_tolerance": 8,
+      "changed_fraction": 0.001,
+      "masks": []
+    }
+  },
+  "contacts": {
+    "scenario": "scenarios/evidence/fragment-pile-floor.json",
+    "mode": "moving",
+    "repeat": 3,
+    "tolerances": {
+      "channel_tolerance": 8,
+      "changed_fraction": 0.001,
+      "masks": []
+    }
+  },
+  "static": {
+    "scenario": "scenarios/visual/static.json",
+    "mode": "static",
+    "tolerances": {
+      "channel_tolerance": 8,
+      "changed_fraction": 0.001,
+      "masks": []
+    }
+  },
+  "exterior": {
+    "scenario": "scenarios/evidence/lower-cockpit-exterior.json",
+    "mode": "moving",
+    "repeat": 3,
+    "tolerances": {
+      "channel_tolerance": 8,
+      "changed_fraction": 0.001,
+      "masks": []
+    }
+  },
+  "core": {
+    "scenario": "scenarios/evidence/core-restart.json",
+    "mode": "moving",
+    "repeat": 3,
+    "tolerances": {
+      "channel_tolerance": 8,
+      "changed_fraction": 0.001,
+      "masks": []
+    }
+  },
+  "ramp": {
+    "scenario": "scenarios/evidence/boarding-ramp.json",
+    "mode": "moving",
+    "repeat": 3,
+    "tolerances": {
+      "channel_tolerance": 8,
+      "changed_fraction": 0.001,
+      "masks": []
+    }
+  },
+  "moving": {
+    "scenario": "scenarios/visual/moving.json",
+    "mode": "moving",
+    "repeat": 3,
+    "tolerances": {
+      "channel_tolerance": 8,
+      "changed_fraction": 0.001,
+      "masks": []
+    }
+  }
+}

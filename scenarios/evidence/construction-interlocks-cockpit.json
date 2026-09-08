@@ -1,0 +1,36 @@
+{
+  "setup": {
+    "scenario": "construction-interlocks",
+    "seed": 546,
+    "step_ms": 100
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "assert": {
+        "path": "ship.flight_state",
+        "equals": "Landed { body: Earth }"
+      }
+    },
+    {
+      "screenshot": "cockpit-exterior-takeoff-blocker",
+      "timeout_ms": 120000
+    },
+    {
+      "action": {
+        "op": "landing"
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "ship.flight_state",
+        "equals": "Landed { body: Earth }"
+      }
+    },
+    {
+      "screenshot": "cockpit-refused-takeoff",
+      "timeout_ms": 120000
+    }
+  ]
+}

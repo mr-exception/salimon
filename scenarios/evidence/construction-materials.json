@@ -1,0 +1,65 @@
+{
+  "setup": {
+    "scenario": "construction-materials",
+    "seed": 543,
+    "step_ms": 16
+  },
+  "timeout_ms": 180000,
+  "steps": [
+    {
+      "assert": {
+        "path": "construction.projects.0.id",
+        "equals": 1
+      }
+    },
+    {
+      "screenshot": "material-before-intake"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.projects.0.funding.receipts.0.id",
+        "equals": 1
+      }
+    },
+    {
+      "screenshot": "material-delivered"
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "right",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "right",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.projects",
+        "equals": []
+      }
+    },
+    {
+      "screenshot": "physical-refund"
+    }
+  ]
+}

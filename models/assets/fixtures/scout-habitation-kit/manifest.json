@@ -1,0 +1,68 @@
+{
+  "$schema": "../../../asset-manifest.schema.json",
+  "schemaVersion": 1,
+  "assetId": "fixture.scout-habitation-kit",
+  "category": "fixtures",
+  "source": "models/assets/fixtures/scout-habitation-kit/source.blend",
+  "runtime": "client/assets/fixtures/scout-habitation-kit/model.glb",
+  "coordinates": {
+    "units": "meters",
+    "source": {
+      "up": "+Z",
+      "forward": "+X",
+      "unitScale": 1
+    },
+    "runtime": {
+      "up": "+Y",
+      "forward": "+X"
+    },
+    "conversion": "x,z,-y",
+    "pivot": "Each independent template origin; not a composed room"
+  },
+  "profile": "standard-v1",
+  "budgets": {
+    "maxTriangles": 200,
+    "maxPrimitives": 10,
+    "maxMaterials": 3,
+    "maxTextureBytes": 1,
+    "maxGlbBytes": 32768
+  },
+  "collision": {
+    "policy": "none"
+  },
+  "contracts": {
+    "root": "ASSET_scout-habitation-kit",
+    "visualGroups": [
+      "Visual"
+    ],
+    "groups": [
+      "Visual"
+    ],
+    "nodes": [
+      "Table",
+      "ScreenPanel",
+      "Shutter",
+      "LockerShell",
+      "LockerDoor",
+      "SeatBase",
+      "Harness",
+      "SeatPad",
+      "SeatBack",
+      "ShutterHandle"
+    ],
+    "materials": [
+      "Hull Graphite",
+      "Interior Light",
+      "Terracotta Upholstery"
+    ],
+    "sockets": [],
+    "markers": [],
+    "colliders": [],
+    "requiredExtras": [
+      {
+        "node": "ASSET_scout-habitation-kit",
+        "path": "salimon.assetId"
+      }
+    ]
+  }
+}

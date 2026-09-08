@@ -1,0 +1,104 @@
+{
+  "setup": {
+    "scenario": "landed-earth",
+    "seed": 540,
+    "step_ms": 16
+  },
+  "timeout_ms": 180000,
+  "steps": [
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 21
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": -728.0544542657009,
+        "dy": 409.4979856993765
+      }
+    },
+    {
+      "assert": {
+        "path": "interaction",
+        "equals": "bunk"
+      }
+    },
+    {
+      "action": {
+        "op": "window",
+        "action": "restore"
+      }
+    },
+    {
+      "screenshot": "bunk-stowed"
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 55
+      }
+    },
+    {
+      "assert": {
+        "path": "habitation.bunk_open_fraction",
+        "equals": 1.0
+      }
+    },
+    {
+      "action": {
+        "op": "window",
+        "action": "restore"
+      }
+    },
+    {
+      "screenshot": "bunk-deployed"
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 55
+      }
+    },
+    {
+      "assert": {
+        "path": "habitation.bunk_open_fraction",
+        "equals": 0.0
+      }
+    },
+    {
+      "action": {
+        "op": "window",
+        "action": "restore"
+      }
+    },
+    {
+      "screenshot": "bunk-restowed"
+    }
+  ]
+}

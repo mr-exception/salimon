@@ -1,0 +1,2528 @@
+{
+  "status": "passed",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "binary_sha256": "f8aa1248e3009939ec3580a5f0cf18b90763c05e1cf11d9202b5243db9545437",
+  "command": [
+    "/workspace/salimon/target/debug/salimon-client"
+  ],
+  "profile": "locked debug; normal canonical new journey; no E2E; no optional pack",
+  "instrumentation": "game per-frame debug diagnostics enabled; intervals capped at 250 ms by FrameClock",
+  "hardware_fps_validated": false,
+  "memory_samples": [
+    {
+      "seconds": 0.00023310100004891865,
+      "kib": {
+        "VmRSS": 221148,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 0.25061399299738696,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 0.5009236949990736,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 0.751342654999462,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 1.0016790509980638,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 1.2519787780001934,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 1.5026452870006324,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 1.7529370509982982,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 2.003245264997531,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 2.253543823997461,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 2.5067473419985618,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 2.775516259000142,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 3.025816050998401,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 3.276206922997517,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 3.5265671999986807,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 3.7768678569991607,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 4.030683304998092,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 4.281011363000289,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 4.531365660997835,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 4.781659197000408,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 5.0319545559978,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 5.2823097049986245,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 5.532695424997655,
+      "kib": {
+        "VmRSS": 221148,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 5.784441702999175,
+      "kib": {
+        "VmRSS": 220468,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 6.034720781997748,
+      "kib": {
+        "VmRSS": 219480,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 6.285399188000156,
+      "kib": {
+        "VmRSS": 221148,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 6.538701012999809,
+      "kib": {
+        "VmRSS": 223852,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 6.789048160000675,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 7.042721097997855,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 7.293073361997813,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 7.543433984999865,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 7.793732398997236,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 8.07443407699975,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 8.324786826997297,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 8.57516879600007,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 8.825497726000322,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 9.07579211799748,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 9.326166235998244,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 9.576496459998452,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 9.826783499000157,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 10.077067300000635,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 10.330718130000605,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 10.58116069099924,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 10.831453020000481,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 11.081747702999564,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 11.332055229999241,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 11.582387853999535,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 11.83267987599902,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 12.082958213999518,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 12.333266723999259,
+      "kib": {
+        "VmRSS": 221148,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 12.586685479000153,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 12.836996476999047,
+      "kib": {
+        "VmRSS": 219480,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 13.08731128999716,
+      "kib": {
+        "VmRSS": 219480,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 13.3376609070001,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 13.590699160999065,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 13.841019673000119,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 14.091328138998506,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 14.341658871999243,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 14.591990806999092,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 14.874524299997574,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 15.124938769000437,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 15.375288800998533,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 15.625584836998314,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 15.875946636999288,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 16.1264046719989,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 16.376739373998134,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 16.62709977999839,
+      "kib": {
+        "VmRSS": 214072,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 16.877416281997284,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 17.127727420000156,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 17.37806510399969,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 17.628424409998843,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 17.882706582000537,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 18.133047150000493,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 18.383352443997865,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 18.633645341000374,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 18.8839740609983,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 19.13429288899715,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 19.38463105700066,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 19.634969874998205,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 19.885362168999563,
+      "kib": {
+        "VmRSS": 217304,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 20.13566426199759,
+      "kib": {
+        "VmRSS": 214404,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 20.385965353998472,
+      "kib": {
+        "VmRSS": 219480,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 20.636291206999886,
+      "kib": {
+        "VmRSS": 214128,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 20.88661444399986,
+      "kib": {
+        "VmRSS": 219480,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 21.13693964000049,
+      "kib": {
+        "VmRSS": 219480,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 21.390757124998345,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 21.641064068997366,
+      "kib": {
+        "VmRSS": 221148,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 21.89472296399981,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 22.17450049099716,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 22.424792845999036,
+      "kib": {
+        "VmRSS": 227428,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 22.67521928199858,
+      "kib": {
+        "VmRSS": 221148,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 22.925570674000483,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 23.17589661799866,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 23.426734837998083,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 23.677108137999312,
+      "kib": {
+        "VmRSS": 235516,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 23.927429830997426,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 24.17772900899945,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 24.430692261998047,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 24.68111157399835,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 24.931400304998533,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 25.18170638799711,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 25.432030054998904,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 25.682333820997883,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 25.93267301599917,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 26.183050645999174,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 26.433365316999698,
+      "kib": {
+        "VmRSS": 219480,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 26.683669836998888,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 26.934013391997723,
+      "kib": {
+        "VmRSS": 219480,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 27.184326190999855,
+      "kib": {
+        "VmRSS": 219480,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 27.434728190997703,
+      "kib": {
+        "VmRSS": 232864,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 27.685034447997168,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 27.938688123998872,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 28.188985296998,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 28.439307098000427,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 28.689645993999875,
+      "kib": {
+        "VmRSS": 220680,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 28.974797921000572,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 29.22508075099904,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 29.478853016000357,
+      "kib": {
+        "VmRSS": 237820,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 29.729259788997297,
+      "kib": {
+        "VmRSS": 222364,
+        "VmHWM": 238588
+      }
+    },
+    {
+      "seconds": 29.97966586199982,
+      "kib": {
+        "VmRSS": 216748,
+        "VmHWM": 238588
+      }
+    }
+  ],
+  "seconds_to_verified_continue": 37.96857868799998,
+  "window_geometry": "WINDOW=2097154\nX=0\nY=0\nWIDTH=1920\nHEIGHT=1080\nSCREEN=0",
+  "display_geometry": "1280 800",
+  "sample_seconds": 30.22986822799794,
+  "raw_frames": [
+    {
+      "gpu_ms": 226.682568,
+      "frame": 418,
+      "interval_ms": 216.765,
+      "wall_ms": 216.001,
+      "cpu_update_ms": 2.424,
+      "cpu_render_ms": 10.861,
+      "gpu_diagnostic": "Measured(226.682568ms)",
+      "ticks": 2,
+      "backlog_ms": 4469.291,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 196.400161,
+      "frame": 419,
+      "interval_ms": 212.43,
+      "wall_ms": 211.822,
+      "cpu_update_ms": 2.159,
+      "cpu_render_ms": 11.082,
+      "gpu_diagnostic": "Measured(196.400161ms)",
+      "ticks": 2,
+      "backlog_ms": 4653.9,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 192.361732,
+      "frame": 420,
+      "interval_ms": 250.0,
+      "wall_ms": 267.099,
+      "cpu_update_ms": 2.413,
+      "cpu_render_ms": 9.941,
+      "gpu_diagnostic": "Measured(192.361732ms)",
+      "ticks": 2,
+      "backlog_ms": 4834.457,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 248.192772,
+      "frame": 421,
+      "interval_ms": 219.906,
+      "wall_ms": 219.168,
+      "cpu_update_ms": 3.378,
+      "cpu_render_ms": 9.775,
+      "gpu_diagnostic": "Measured(248.192772ms)",
+      "ticks": 2,
+      "backlog_ms": 5070.293,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 199.149028,
+      "frame": 422,
+      "interval_ms": 237.378,
+      "wall_ms": 236.456,
+      "cpu_update_ms": 2.875,
+      "cpu_render_ms": 11.792,
+      "gpu_diagnostic": "Measured(199.149028ms)",
+      "ticks": 2,
+      "backlog_ms": 5258.383,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 213.522,
+      "frame": 423,
+      "interval_ms": 250.0,
+      "wall_ms": 265.204,
+      "cpu_update_ms": 2.186,
+      "cpu_render_ms": 9.125,
+      "gpu_diagnostic": "Measured(213.522ms)",
+      "ticks": 2,
+      "backlog_ms": 5464.594,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 247.22687,
+      "frame": 424,
+      "interval_ms": 234.238,
+      "wall_ms": 233.551,
+      "cpu_update_ms": 2.346,
+      "cpu_render_ms": 9.675,
+      "gpu_diagnostic": "Measured(247.22687ms)",
+      "ticks": 2,
+      "backlog_ms": 5698.485,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 214.499286,
+      "frame": 425,
+      "interval_ms": 250.0,
+      "wall_ms": 267.127,
+      "cpu_update_ms": 2.174,
+      "cpu_render_ms": 33.422,
+      "gpu_diagnostic": "Measured(214.499286ms)",
+      "ticks": 2,
+      "backlog_ms": 5900.734,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 224.911479,
+      "frame": 426,
+      "interval_ms": 236.434,
+      "wall_ms": 235.683,
+      "cpu_update_ms": 2.944,
+      "cpu_render_ms": 9.003,
+      "gpu_diagnostic": "Measured(224.911479ms)",
+      "ticks": 2,
+      "backlog_ms": 6136.612,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 216.911447,
+      "frame": 427,
+      "interval_ms": 250.0,
+      "wall_ms": 229.533,
+      "cpu_update_ms": 2.421,
+      "cpu_render_ms": 9.643,
+      "gpu_diagnostic": "Measured(216.911447ms)",
+      "ticks": 2,
+      "backlog_ms": 6371.279,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 210.128712,
+      "frame": 428,
+      "interval_ms": 228.373,
+      "wall_ms": 227.672,
+      "cpu_update_ms": 2.217,
+      "cpu_render_ms": 9.359,
+      "gpu_diagnostic": "Measured(210.128712ms)",
+      "ticks": 2,
+      "backlog_ms": 6569.514,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 208.649455,
+      "frame": 429,
+      "interval_ms": 250.0,
+      "wall_ms": 261.557,
+      "cpu_update_ms": 2.542,
+      "cpu_render_ms": 9.312,
+      "gpu_diagnostic": "Measured(208.649455ms)",
+      "ticks": 2,
+      "backlog_ms": 6765.791,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 243.118361,
+      "frame": 430,
+      "interval_ms": 222.386,
+      "wall_ms": 220.292,
+      "cpu_update_ms": 2.369,
+      "cpu_render_ms": 9.881,
+      "gpu_diagnostic": "Measured(243.118361ms)",
+      "ticks": 2,
+      "backlog_ms": 6997.442,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 201.581131,
+      "frame": 431,
+      "interval_ms": 250.0,
+      "wall_ms": 269.794,
+      "cpu_update_ms": 3.263,
+      "cpu_render_ms": 10.975,
+      "gpu_diagnostic": "Measured(201.581131ms)",
+      "ticks": 2,
+      "backlog_ms": 7186.411,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 249.044647,
+      "frame": 432,
+      "interval_ms": 239.427,
+      "wall_ms": 238.738,
+      "cpu_update_ms": 2.441,
+      "cpu_render_ms": 11.243,
+      "gpu_diagnostic": "Measured(249.044647ms)",
+      "ticks": 2,
+      "backlog_ms": 7424.894,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 217.944422,
+      "frame": 433,
+      "interval_ms": 250.0,
+      "wall_ms": 257.513,
+      "cpu_update_ms": 2.79,
+      "cpu_render_ms": 10.002,
+      "gpu_diagnostic": "Measured(217.944422ms)",
+      "ticks": 2,
+      "backlog_ms": 7632.381,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 238.032545,
+      "frame": 434,
+      "interval_ms": 230.355,
+      "wall_ms": 229.69,
+      "cpu_update_ms": 2.324,
+      "cpu_render_ms": 9.268,
+      "gpu_diagnostic": "Measured(238.032545ms)",
+      "ticks": 2,
+      "backlog_ms": 7858.56,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 211.828393,
+      "frame": 435,
+      "interval_ms": 250.0,
+      "wall_ms": 260.676,
+      "cpu_update_ms": 2.415,
+      "cpu_render_ms": 10.209,
+      "gpu_diagnostic": "Measured(211.828393ms)",
+      "ticks": 2,
+      "backlog_ms": 8057.0,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 208.73019,
+      "frame": 436,
+      "interval_ms": 219.091,
+      "wall_ms": 218.329,
+      "cpu_update_ms": 2.952,
+      "cpu_render_ms": 9.508,
+      "gpu_diagnostic": "Measured(208.73019ms)",
+      "ticks": 2,
+      "backlog_ms": 8286.439,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 199.431166,
+      "frame": 437,
+      "interval_ms": 223.984,
+      "wall_ms": 223.285,
+      "cpu_update_ms": 2.32,
+      "cpu_render_ms": 9.735,
+      "gpu_diagnostic": "Measured(199.431166ms)",
+      "ticks": 2,
+      "backlog_ms": 8473.466,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 203.795965,
+      "frame": 438,
+      "interval_ms": 250.0,
+      "wall_ms": 267.295,
+      "cpu_update_ms": 2.209,
+      "cpu_render_ms": 8.858,
+      "gpu_diagnostic": "Measured(203.795965ms)",
+      "ticks": 2,
+      "backlog_ms": 8665.426,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 250.078311,
+      "frame": 439,
+      "interval_ms": 216.2,
+      "wall_ms": 215.524,
+      "cpu_update_ms": 2.327,
+      "cpu_render_ms": 15.265,
+      "gpu_diagnostic": "Measured(250.078311ms)",
+      "ticks": 2,
+      "backlog_ms": 8901.397,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 191.471766,
+      "frame": 440,
+      "interval_ms": 218.828,
+      "wall_ms": 218.111,
+      "cpu_update_ms": 2.303,
+      "cpu_render_ms": 9.045,
+      "gpu_diagnostic": "Measured(191.471766ms)",
+      "ticks": 2,
+      "backlog_ms": 9085.637,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 198.815103,
+      "frame": 441,
+      "interval_ms": 250.0,
+      "wall_ms": 267.71,
+      "cpu_update_ms": 3.121,
+      "cpu_render_ms": 9.066,
+      "gpu_diagnostic": "Measured(198.815103ms)",
+      "ticks": 2,
+      "backlog_ms": 9272.438,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 249.640723,
+      "frame": 442,
+      "interval_ms": 227.725,
+      "wall_ms": 226.907,
+      "cpu_update_ms": 2.491,
+      "cpu_render_ms": 10.842,
+      "gpu_diagnostic": "Measured(249.640723ms)",
+      "ticks": 2,
+      "backlog_ms": 9508.966,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 207.579115,
+      "frame": 443,
+      "interval_ms": 250.0,
+      "wall_ms": 267.915,
+      "cpu_update_ms": 2.282,
+      "cpu_render_ms": 9.761,
+      "gpu_diagnostic": "Measured(207.579115ms)",
+      "ticks": 2,
+      "backlog_ms": 9704.731,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 245.25057,
+      "frame": 444,
+      "interval_ms": 232.375,
+      "wall_ms": 231.671,
+      "cpu_update_ms": 2.385,
+      "cpu_render_ms": 9.821,
+      "gpu_diagnostic": "Measured(245.25057ms)",
+      "ticks": 2,
+      "backlog_ms": 9941.35,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 213.248359,
+      "frame": 445,
+      "interval_ms": 210.836,
+      "wall_ms": 210.093,
+      "cpu_update_ms": 2.295,
+      "cpu_render_ms": 9.12,
+      "gpu_diagnostic": "Measured(213.248359ms)",
+      "ticks": 2,
+      "backlog_ms": 10141.764,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 193.015008,
+      "frame": 446,
+      "interval_ms": 250.0,
+      "wall_ms": 256.586,
+      "cpu_update_ms": 3.121,
+      "cpu_render_ms": 10.219,
+      "gpu_diagnostic": "Measured(193.015008ms)",
+      "ticks": 2,
+      "backlog_ms": 10320.519,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 236.663804,
+      "frame": 447,
+      "interval_ms": 236.973,
+      "wall_ms": 236.351,
+      "cpu_update_ms": 2.239,
+      "cpu_render_ms": 11.34,
+      "gpu_diagnostic": "Measured(236.663804ms)",
+      "ticks": 2,
+      "backlog_ms": 10545.727,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 216.484284,
+      "frame": 448,
+      "interval_ms": 250.0,
+      "wall_ms": 269.663,
+      "cpu_update_ms": 2.757,
+      "cpu_render_ms": 11.446,
+      "gpu_diagnostic": "Measured(216.484284ms)",
+      "ticks": 2,
+      "backlog_ms": 10751.467,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 247.414126,
+      "frame": 449,
+      "interval_ms": 217.542,
+      "wall_ms": 216.874,
+      "cpu_update_ms": 2.569,
+      "cpu_render_ms": 12.131,
+      "gpu_diagnostic": "Measured(247.414126ms)",
+      "ticks": 2,
+      "backlog_ms": 10989.799,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 194.617894,
+      "frame": 450,
+      "interval_ms": 222.572,
+      "wall_ms": 221.875,
+      "cpu_update_ms": 2.161,
+      "cpu_render_ms": 10.865,
+      "gpu_diagnostic": "Measured(194.617894ms)",
+      "ticks": 2,
+      "backlog_ms": 11175.37,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 201.329974,
+      "frame": 451,
+      "interval_ms": 250.0,
+      "wall_ms": 271.496,
+      "cpu_update_ms": 4.139,
+      "cpu_render_ms": 10.029,
+      "gpu_diagnostic": "Measured(201.329974ms)",
+      "ticks": 2,
+      "backlog_ms": 11365.923,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 250.77347,
+      "frame": 452,
+      "interval_ms": 224.724,
+      "wall_ms": 223.976,
+      "cpu_update_ms": 2.321,
+      "cpu_render_ms": 9.457,
+      "gpu_diagnostic": "Measured(250.77347ms)",
+      "ticks": 2,
+      "backlog_ms": 11606.168,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 201.087048,
+      "frame": 453,
+      "interval_ms": 250.0,
+      "wall_ms": 267.008,
+      "cpu_update_ms": 3.188,
+      "cpu_render_ms": 9.962,
+      "gpu_diagnostic": "Measured(201.087048ms)",
+      "ticks": 2,
+      "backlog_ms": 11799.106,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 246.345093,
+      "frame": 454,
+      "interval_ms": 219.353,
+      "wall_ms": 218.523,
+      "cpu_update_ms": 2.497,
+      "cpu_render_ms": 10.295,
+      "gpu_diagnostic": "Measured(246.345093ms)",
+      "ticks": 2,
+      "backlog_ms": 12034.944,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 199.249187,
+      "frame": 455,
+      "interval_ms": 250.0,
+      "wall_ms": 262.772,
+      "cpu_update_ms": 2.39,
+      "cpu_render_ms": 12.592,
+      "gpu_diagnostic": "Measured(199.249187ms)",
+      "ticks": 2,
+      "backlog_ms": 12222.234,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 241.141455,
+      "frame": 456,
+      "interval_ms": 232.947,
+      "wall_ms": 232.01,
+      "cpu_update_ms": 3.306,
+      "cpu_render_ms": 10.206,
+      "gpu_diagnostic": "Measured(241.141455ms)",
+      "ticks": 2,
+      "backlog_ms": 12453.943,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 211.997911,
+      "frame": 457,
+      "interval_ms": 250.0,
+      "wall_ms": 263.243,
+      "cpu_update_ms": 2.479,
+      "cpu_render_ms": 9.004,
+      "gpu_diagnostic": "Measured(211.997911ms)",
+      "ticks": 2,
+      "backlog_ms": 12654.588,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 245.109389,
+      "frame": 458,
+      "interval_ms": 214.354,
+      "wall_ms": 213.54,
+      "cpu_update_ms": 2.354,
+      "cpu_render_ms": 9.629,
+      "gpu_diagnostic": "Measured(245.109389ms)",
+      "ticks": 2,
+      "backlog_ms": 12886.644,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 195.127591,
+      "frame": 459,
+      "interval_ms": 212.25,
+      "wall_ms": 211.619,
+      "cpu_update_ms": 2.225,
+      "cpu_render_ms": 9.35,
+      "gpu_diagnostic": "Measured(195.127591ms)",
+      "ticks": 2,
+      "backlog_ms": 13068.815,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 194.016435,
+      "frame": 460,
+      "interval_ms": 250.0,
+      "wall_ms": 280.189,
+      "cpu_update_ms": 2.672,
+      "cpu_render_ms": 9.443,
+      "gpu_diagnostic": "Measured(194.016435ms)",
+      "ticks": 2,
+      "backlog_ms": 13249.066,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 258.234464,
+      "frame": 461,
+      "interval_ms": 235.001,
+      "wall_ms": 234.09,
+      "cpu_update_ms": 2.978,
+      "cpu_render_ms": 10.055,
+      "gpu_diagnostic": "Measured(258.234464ms)",
+      "ticks": 2,
+      "backlog_ms": 13498.166,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 213.164127,
+      "frame": 462,
+      "interval_ms": 219.29,
+      "wall_ms": 218.521,
+      "cpu_update_ms": 2.232,
+      "cpu_render_ms": 9.887,
+      "gpu_diagnostic": "Measured(213.164127ms)",
+      "ticks": 2,
+      "backlog_ms": 13701.025,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 198.343588,
+      "frame": 463,
+      "interval_ms": 250.0,
+      "wall_ms": 256.75,
+      "cpu_update_ms": 2.184,
+      "cpu_render_ms": 35.099,
+      "gpu_diagnostic": "Measured(198.343588ms)",
+      "ticks": 2,
+      "backlog_ms": 13888.297,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 212.63506,
+      "frame": 464,
+      "interval_ms": 240.444,
+      "wall_ms": 239.824,
+      "cpu_update_ms": 2.49,
+      "cpu_render_ms": 11.595,
+      "gpu_diagnostic": "Measured(212.63506ms)",
+      "ticks": 2,
+      "backlog_ms": 14113.666,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 219.400599,
+      "frame": 465,
+      "interval_ms": 250.0,
+      "wall_ms": 263.832,
+      "cpu_update_ms": 2.286,
+      "cpu_render_ms": 38.378,
+      "gpu_diagnostic": "Measured(219.400599ms)",
+      "ticks": 2,
+      "backlog_ms": 14322.275,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 216.648808,
+      "frame": 466,
+      "interval_ms": 236.828,
+      "wall_ms": 234.791,
+      "cpu_update_ms": 3.059,
+      "cpu_render_ms": 9.789,
+      "gpu_diagnostic": "Measured(216.648808ms)",
+      "ticks": 2,
+      "backlog_ms": 14556.144,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 214.787501,
+      "frame": 467,
+      "interval_ms": 250.0,
+      "wall_ms": 249.742,
+      "cpu_update_ms": 2.225,
+      "cpu_render_ms": 9.83,
+      "gpu_diagnostic": "Measured(214.787501ms)",
+      "ticks": 2,
+      "backlog_ms": 14759.615,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 201.168711,
+      "frame": 468,
+      "interval_ms": 232.937,
+      "wall_ms": 232.203,
+      "cpu_update_ms": 2.309,
+      "cpu_render_ms": 9.783,
+      "gpu_diagnostic": "Measured(201.168711ms)",
+      "ticks": 2,
+      "backlog_ms": 14978.091,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 213.012582,
+      "frame": 469,
+      "interval_ms": 250.0,
+      "wall_ms": 270.512,
+      "cpu_update_ms": 2.372,
+      "cpu_render_ms": 9.571,
+      "gpu_diagnostic": "Measured(213.012582ms)",
+      "ticks": 2,
+      "backlog_ms": 15178.908,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 251.8156,
+      "frame": 470,
+      "interval_ms": 235.908,
+      "wall_ms": 235.199,
+      "cpu_update_ms": 2.394,
+      "cpu_render_ms": 15.306,
+      "gpu_diagnostic": "Measured(251.8156ms)",
+      "ticks": 2,
+      "backlog_ms": 15418.129,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 210.009027,
+      "frame": 471,
+      "interval_ms": 249.232,
+      "wall_ms": 248.343,
+      "cpu_update_ms": 3.623,
+      "cpu_render_ms": 11.307,
+      "gpu_diagnostic": "Measured(210.009027ms)",
+      "ticks": 2,
+      "backlog_ms": 15622.218,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 227.033028,
+      "frame": 472,
+      "interval_ms": 216.389,
+      "wall_ms": 215.557,
+      "cpu_update_ms": 4.654,
+      "cpu_render_ms": 11.562,
+      "gpu_diagnostic": "Measured(227.033028ms)",
+      "ticks": 2,
+      "backlog_ms": 15839.393,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 190.180899,
+      "frame": 473,
+      "interval_ms": 220.247,
+      "wall_ms": 219.59,
+      "cpu_update_ms": 2.718,
+      "cpu_render_ms": 9.243,
+      "gpu_diagnostic": "Measured(190.180899ms)",
+      "ticks": 2,
+      "backlog_ms": 16023.606,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 200.754033,
+      "frame": 474,
+      "interval_ms": 250.0,
+      "wall_ms": 264.917,
+      "cpu_update_ms": 2.375,
+      "cpu_render_ms": 10.23,
+      "gpu_diagnostic": "Measured(200.754033ms)",
+      "ticks": 2,
+      "backlog_ms": 16212.409,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 245.979797,
+      "frame": 475,
+      "interval_ms": 224.979,
+      "wall_ms": 224.24,
+      "cpu_update_ms": 2.966,
+      "cpu_render_ms": 9.64,
+      "gpu_diagnostic": "Measured(245.979797ms)",
+      "ticks": 2,
+      "backlog_ms": 16446.064,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 205.220958,
+      "frame": 476,
+      "interval_ms": 222.263,
+      "wall_ms": 221.12,
+      "cpu_update_ms": 3.699,
+      "cpu_render_ms": 10.43,
+      "gpu_diagnostic": "Measured(205.220958ms)",
+      "ticks": 2,
+      "backlog_ms": 16639.448,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 199.457232,
+      "frame": 477,
+      "interval_ms": 250.0,
+      "wall_ms": 258.234,
+      "cpu_update_ms": 2.946,
+      "cpu_render_ms": 14.271,
+      "gpu_diagnostic": "Measured(199.457232ms)",
+      "ticks": 2,
+      "backlog_ms": 16829.43,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 233.88636,
+      "frame": 478,
+      "interval_ms": 221.554,
+      "wall_ms": 220.834,
+      "cpu_update_ms": 2.474,
+      "cpu_render_ms": 12.236,
+      "gpu_diagnostic": "Measured(233.88636ms)",
+      "ticks": 2,
+      "backlog_ms": 17056.383,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 200.283775,
+      "frame": 479,
+      "interval_ms": 250.0,
+      "wall_ms": 270.573,
+      "cpu_update_ms": 2.416,
+      "cpu_render_ms": 9.254,
+      "gpu_diagnostic": "Measured(200.283775ms)",
+      "ticks": 2,
+      "backlog_ms": 17245.84,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 253.283172,
+      "frame": 480,
+      "interval_ms": 216.349,
+      "wall_ms": 215.585,
+      "cpu_update_ms": 2.567,
+      "cpu_render_ms": 10.077,
+      "gpu_diagnostic": "Measured(253.283172ms)",
+      "ticks": 2,
+      "backlog_ms": 17485.177,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 195.955409,
+      "frame": 481,
+      "interval_ms": 235.95,
+      "wall_ms": 235.272,
+      "cpu_update_ms": 3.087,
+      "cpu_render_ms": 10.351,
+      "gpu_diagnostic": "Measured(195.955409ms)",
+      "ticks": 2,
+      "backlog_ms": 17669.439,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 213.627976,
+      "frame": 482,
+      "interval_ms": 250.0,
+      "wall_ms": 261.172,
+      "cpu_update_ms": 2.205,
+      "cpu_render_ms": 11.474,
+      "gpu_diagnostic": "Measured(213.627976ms)",
+      "ticks": 2,
+      "backlog_ms": 17873.483,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 241.628857,
+      "frame": 483,
+      "interval_ms": 227.442,
+      "wall_ms": 226.673,
+      "cpu_update_ms": 2.255,
+      "cpu_render_ms": 10.938,
+      "gpu_diagnostic": "Measured(241.628857ms)",
+      "ticks": 2,
+      "backlog_ms": 18103.425,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 205.824457,
+      "frame": 484,
+      "interval_ms": 216.662,
+      "wall_ms": 216.107,
+      "cpu_update_ms": 2.231,
+      "cpu_render_ms": 9.754,
+      "gpu_diagnostic": "Measured(205.824457ms)",
+      "ticks": 2,
+      "backlog_ms": 18298.653,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 197.83229,
+      "frame": 485,
+      "interval_ms": 248.585,
+      "wall_ms": 247.863,
+      "cpu_update_ms": 2.218,
+      "cpu_render_ms": 9.194,
+      "gpu_diagnostic": "Measured(197.83229ms)",
+      "ticks": 2,
+      "backlog_ms": 18483.482,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 204.433653,
+      "frame": 486,
+      "interval_ms": 219.35,
+      "wall_ms": 214.364,
+      "cpu_update_ms": 2.995,
+      "cpu_render_ms": 9.266,
+      "gpu_diagnostic": "Measured(204.433653ms)",
+      "ticks": 2,
+      "backlog_ms": 18704.331,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 195.877841,
+      "frame": 487,
+      "interval_ms": 222.707,
+      "wall_ms": 221.931,
+      "cpu_update_ms": 2.37,
+      "cpu_render_ms": 10.535,
+      "gpu_diagnostic": "Measured(195.877841ms)",
+      "ticks": 2,
+      "backlog_ms": 18887.471,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 201.998631,
+      "frame": 488,
+      "interval_ms": 250.0,
+      "wall_ms": 261.17,
+      "cpu_update_ms": 2.505,
+      "cpu_render_ms": 9.556,
+      "gpu_diagnostic": "Measured(201.998631ms)",
+      "ticks": 2,
+      "backlog_ms": 19078.291,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 242.803258,
+      "frame": 489,
+      "interval_ms": 216.273,
+      "wall_ms": 215.58,
+      "cpu_update_ms": 2.249,
+      "cpu_render_ms": 9.148,
+      "gpu_diagnostic": "Measured(242.803258ms)",
+      "ticks": 2,
+      "backlog_ms": 19308.154,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 197.65575,
+      "frame": 490,
+      "interval_ms": 228.179,
+      "wall_ms": 227.395,
+      "cpu_update_ms": 2.4,
+      "cpu_render_ms": 9.381,
+      "gpu_diagnostic": "Measured(197.65575ms)",
+      "ticks": 2,
+      "backlog_ms": 19492.518,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 208.371362,
+      "frame": 491,
+      "interval_ms": 250.0,
+      "wall_ms": 276.16,
+      "cpu_update_ms": 3.522,
+      "cpu_render_ms": 34.392,
+      "gpu_diagnostic": "Measured(208.371362ms)",
+      "ticks": 2,
+      "backlog_ms": 19688.642,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 230.827971,
+      "frame": 492,
+      "interval_ms": 219.792,
+      "wall_ms": 219.119,
+      "cpu_update_ms": 2.296,
+      "cpu_render_ms": 9.608,
+      "gpu_diagnostic": "Measured(230.827971ms)",
+      "ticks": 2,
+      "backlog_ms": 19933.476,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 198.281044,
+      "frame": 493,
+      "interval_ms": 250.0,
+      "wall_ms": 252.873,
+      "cpu_update_ms": 2.57,
+      "cpu_render_ms": 9.653,
+      "gpu_diagnostic": "Measured(198.281044ms)",
+      "ticks": 2,
+      "backlog_ms": 20121.274,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 234.934442,
+      "frame": 494,
+      "interval_ms": 231.969,
+      "wall_ms": 231.298,
+      "cpu_update_ms": 2.235,
+      "cpu_render_ms": 13.157,
+      "gpu_diagnostic": "Measured(234.934442ms)",
+      "ticks": 2,
+      "backlog_ms": 20342.818,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 213.872243,
+      "frame": 495,
+      "interval_ms": 250.0,
+      "wall_ms": 255.829,
+      "cpu_update_ms": 2.347,
+      "cpu_render_ms": 9.103,
+      "gpu_diagnostic": "Measured(213.872243ms)",
+      "ticks": 2,
+      "backlog_ms": 20543.534,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 242.010892,
+      "frame": 496,
+      "interval_ms": 250.0,
+      "wall_ms": 251.063,
+      "cpu_update_ms": 3.252,
+      "cpu_render_ms": 12.2,
+      "gpu_diagnostic": "Measured(242.010892ms)",
+      "ticks": 2,
+      "backlog_ms": 20772.26,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 228.064908,
+      "frame": 497,
+      "interval_ms": 250.0,
+      "wall_ms": 283.894,
+      "cpu_update_ms": 2.703,
+      "cpu_render_ms": 14.238,
+      "gpu_diagnostic": "Measured(228.064908ms)",
+      "ticks": 2,
+      "backlog_ms": 20992.474,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 257.902961,
+      "frame": 498,
+      "interval_ms": 250.0,
+      "wall_ms": 277.56,
+      "cpu_update_ms": 2.473,
+      "cpu_render_ms": 12.695,
+      "gpu_diagnostic": "Measured(257.902961ms)",
+      "ticks": 2,
+      "backlog_ms": 21245.261,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 254.871246,
+      "frame": 499,
+      "interval_ms": 238.962,
+      "wall_ms": 238.185,
+      "cpu_update_ms": 2.344,
+      "cpu_render_ms": 9.73,
+      "gpu_diagnostic": "Measured(254.871246ms)",
+      "ticks": 2,
+      "backlog_ms": 21491.597,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 219.381353,
+      "frame": 500,
+      "interval_ms": 250.0,
+      "wall_ms": 271.437,
+      "cpu_update_ms": 2.927,
+      "cpu_render_ms": 9.215,
+      "gpu_diagnostic": "Measured(219.381353ms)",
+      "ticks": 2,
+      "backlog_ms": 21698.471,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 252.943044,
+      "frame": 501,
+      "interval_ms": 250.0,
+      "wall_ms": 271.986,
+      "cpu_update_ms": 2.75,
+      "cpu_render_ms": 16.094,
+      "gpu_diagnostic": "Measured(252.943044ms)",
+      "ticks": 2,
+      "backlog_ms": 21938.644,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 244.305589,
+      "frame": 502,
+      "interval_ms": 236.791,
+      "wall_ms": 235.886,
+      "cpu_update_ms": 2.605,
+      "cpu_render_ms": 11.866,
+      "gpu_diagnostic": "Measured(244.305589ms)",
+      "ticks": 2,
+      "backlog_ms": 22179.535,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 213.046179,
+      "frame": 503,
+      "interval_ms": 250.0,
+      "wall_ms": 271.011,
+      "cpu_update_ms": 2.874,
+      "cpu_render_ms": 10.507,
+      "gpu_diagnostic": "Measured(213.046179ms)",
+      "ticks": 2,
+      "backlog_ms": 22384.123,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 250.733635,
+      "frame": 504,
+      "interval_ms": 237.567,
+      "wall_ms": 236.504,
+      "cpu_update_ms": 4.595,
+      "cpu_render_ms": 12.814,
+      "gpu_diagnostic": "Measured(250.733635ms)",
+      "ticks": 2,
+      "backlog_ms": 22624.197,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 212.260782,
+      "frame": 505,
+      "interval_ms": 250.0,
+      "wall_ms": 272.172,
+      "cpu_update_ms": 2.973,
+      "cpu_render_ms": 10.481,
+      "gpu_diagnostic": "Measured(212.260782ms)",
+      "ticks": 2,
+      "backlog_ms": 22829.607,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 251.376727,
+      "frame": 506,
+      "interval_ms": 239.755,
+      "wall_ms": 239.047,
+      "cpu_update_ms": 2.457,
+      "cpu_render_ms": 10.808,
+      "gpu_diagnostic": "Measured(251.376727ms)",
+      "ticks": 2,
+      "backlog_ms": 23070.487,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 219.496722,
+      "frame": 507,
+      "interval_ms": 250.0,
+      "wall_ms": 272.225,
+      "cpu_update_ms": 2.733,
+      "cpu_render_ms": 40.257,
+      "gpu_diagnostic": "Measured(219.496722ms)",
+      "ticks": 2,
+      "backlog_ms": 23278.265,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 221.357551,
+      "frame": 508,
+      "interval_ms": 250.0,
+      "wall_ms": 268.444,
+      "cpu_update_ms": 3.009,
+      "cpu_render_ms": 9.673,
+      "gpu_diagnostic": "Measured(221.357551ms)",
+      "ticks": 2,
+      "backlog_ms": 23519.194,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 249.920132,
+      "frame": 509,
+      "interval_ms": 215.151,
+      "wall_ms": 214.438,
+      "cpu_update_ms": 2.251,
+      "cpu_render_ms": 10.172,
+      "gpu_diagnostic": "Measured(249.920132ms)",
+      "ticks": 2,
+      "backlog_ms": 23756.35,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 195.185437,
+      "frame": 510,
+      "interval_ms": 241.422,
+      "wall_ms": 240.115,
+      "cpu_update_ms": 2.411,
+      "cpu_render_ms": 11.543,
+      "gpu_diagnostic": "Measured(195.185437ms)",
+      "ticks": 2,
+      "backlog_ms": 23940.095,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 220.245929,
+      "frame": 511,
+      "interval_ms": 250.0,
+      "wall_ms": 253.884,
+      "cpu_update_ms": 2.182,
+      "cpu_render_ms": 34.166,
+      "gpu_diagnostic": "Measured(220.245929ms)",
+      "ticks": 2,
+      "backlog_ms": 24148.841,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 211.534771,
+      "frame": 512,
+      "interval_ms": 228.928,
+      "wall_ms": 228.228,
+      "cpu_update_ms": 2.503,
+      "cpu_render_ms": 9.41,
+      "gpu_diagnostic": "Measured(211.534771ms)",
+      "ticks": 2,
+      "backlog_ms": 24371.426,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 210.490764,
+      "frame": 513,
+      "interval_ms": 250.0,
+      "wall_ms": 264.948,
+      "cpu_update_ms": 4.943,
+      "cpu_render_ms": 9.009,
+      "gpu_diagnostic": "Measured(210.490764ms)",
+      "ticks": 2,
+      "backlog_ms": 24568.382,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 244.290165,
+      "frame": 514,
+      "interval_ms": 243.84,
+      "wall_ms": 243.171,
+      "cpu_update_ms": 2.355,
+      "cpu_render_ms": 11.001,
+      "gpu_diagnostic": "Measured(244.290165ms)",
+      "ticks": 2,
+      "backlog_ms": 24801.999,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 223.355583,
+      "frame": 515,
+      "interval_ms": 250.0,
+      "wall_ms": 251.874,
+      "cpu_update_ms": 2.604,
+      "cpu_render_ms": 10.494,
+      "gpu_diagnostic": "Measured(223.355583ms)",
+      "ticks": 2,
+      "backlog_ms": 25013.796,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 232.592484,
+      "frame": 516,
+      "interval_ms": 211.586,
+      "wall_ms": 210.831,
+      "cpu_update_ms": 2.805,
+      "cpu_render_ms": 10.518,
+      "gpu_diagnostic": "Measured(232.592484ms)",
+      "ticks": 2,
+      "backlog_ms": 25234.425,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 191.112108,
+      "frame": 517,
+      "interval_ms": 218.482,
+      "wall_ms": 217.879,
+      "cpu_update_ms": 2.25,
+      "cpu_render_ms": 10.324,
+      "gpu_diagnostic": "Measured(191.112108ms)",
+      "ticks": 2,
+      "backlog_ms": 25413.859,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 199.116963,
+      "frame": 518,
+      "interval_ms": 219.494,
+      "wall_ms": 218.849,
+      "cpu_update_ms": 2.961,
+      "cpu_render_ms": 9.067,
+      "gpu_diagnostic": "Measured(199.116963ms)",
+      "ticks": 2,
+      "backlog_ms": 25600.383,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 200.992981,
+      "frame": 519,
+      "interval_ms": 250.0,
+      "wall_ms": 251.676,
+      "cpu_update_ms": 2.225,
+      "cpu_render_ms": 9.073,
+      "gpu_diagnostic": "Measured(200.992981ms)",
+      "ticks": 2,
+      "backlog_ms": 25787.985,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 234.279482,
+      "frame": 520,
+      "interval_ms": 216.443,
+      "wall_ms": 215.768,
+      "cpu_update_ms": 2.297,
+      "cpu_render_ms": 9.951,
+      "gpu_diagnostic": "Measured(234.279482ms)",
+      "ticks": 2,
+      "backlog_ms": 26008.336,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 197.592484,
+      "frame": 521,
+      "interval_ms": 226.326,
+      "wall_ms": 225.621,
+      "cpu_update_ms": 2.369,
+      "cpu_render_ms": 9.083,
+      "gpu_diagnostic": "Measured(197.592484ms)",
+      "ticks": 2,
+      "backlog_ms": 26192.81,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 208.292681,
+      "frame": 522,
+      "interval_ms": 250.0,
+      "wall_ms": 264.196,
+      "cpu_update_ms": 2.278,
+      "cpu_render_ms": 9.222,
+      "gpu_diagnostic": "Measured(208.292681ms)",
+      "ticks": 2,
+      "backlog_ms": 26387.156,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 246.171893,
+      "frame": 523,
+      "interval_ms": 229.918,
+      "wall_ms": 229.226,
+      "cpu_update_ms": 3.327,
+      "cpu_render_ms": 10.284,
+      "gpu_diagnostic": "Measured(246.171893ms)",
+      "ticks": 2,
+      "backlog_ms": 26620.043,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 209.741706,
+      "frame": 524,
+      "interval_ms": 250.0,
+      "wall_ms": 251.4,
+      "cpu_update_ms": 2.267,
+      "cpu_render_ms": 8.942,
+      "gpu_diagnostic": "Measured(209.741706ms)",
+      "ticks": 2,
+      "backlog_ms": 26817.989,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 198.119014,
+      "frame": 525,
+      "interval_ms": 229.639,
+      "wall_ms": 228.91,
+      "cpu_update_ms": 2.332,
+      "cpu_render_ms": 9.076,
+      "gpu_diagnostic": "Measured(198.119014ms)",
+      "ticks": 2,
+      "backlog_ms": 27038.117,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 211.591338,
+      "frame": 526,
+      "interval_ms": 232.682,
+      "wall_ms": 231.936,
+      "cpu_update_ms": 2.906,
+      "cpu_render_ms": 9.029,
+      "gpu_diagnostic": "Measured(211.591338ms)",
+      "ticks": 2,
+      "backlog_ms": 27235.773,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 213.485534,
+      "frame": 527,
+      "interval_ms": 250.0,
+      "wall_ms": 264.231,
+      "cpu_update_ms": 2.366,
+      "cpu_render_ms": 35.037,
+      "gpu_diagnostic": "Measured(213.485534ms)",
+      "ticks": 2,
+      "backlog_ms": 27436.374,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 219.471464,
+      "frame": 528,
+      "interval_ms": 218.196,
+      "wall_ms": 217.462,
+      "cpu_update_ms": 3.081,
+      "cpu_render_ms": 9.715,
+      "gpu_diagnostic": "Measured(219.471464ms)",
+      "ticks": 2,
+      "backlog_ms": 27669.34,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 197.160423,
+      "frame": 529,
+      "interval_ms": 250.0,
+      "wall_ms": 260.945,
+      "cpu_update_ms": 2.602,
+      "cpu_render_ms": 10.261,
+      "gpu_diagnostic": "Measured(197.160423ms)",
+      "ticks": 2,
+      "backlog_ms": 27855.533,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 202.251333,
+      "frame": 530,
+      "interval_ms": 221.164,
+      "wall_ms": 220.16,
+      "cpu_update_ms": 2.37,
+      "cpu_render_ms": 8.929,
+      "gpu_diagnostic": "Measured(202.251333ms)",
+      "ticks": 2,
+      "backlog_ms": 28085.482,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 201.011921,
+      "frame": 531,
+      "interval_ms": 224.114,
+      "wall_ms": 223.428,
+      "cpu_update_ms": 2.27,
+      "cpu_render_ms": 9.31,
+      "gpu_diagnostic": "Measured(201.011921ms)",
+      "ticks": 2,
+      "backlog_ms": 28274.328,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 205.676908,
+      "frame": 532,
+      "interval_ms": 250.0,
+      "wall_ms": 260.613,
+      "cpu_update_ms": 2.451,
+      "cpu_render_ms": 14.893,
+      "gpu_diagnostic": "Measured(205.676908ms)",
+      "ticks": 2,
+      "backlog_ms": 28466.57,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 237.236893,
+      "frame": 533,
+      "interval_ms": 227.228,
+      "wall_ms": 226.488,
+      "cpu_update_ms": 3.216,
+      "cpu_render_ms": 11.008,
+      "gpu_diagnostic": "Measured(237.236893ms)",
+      "ticks": 2,
+      "backlog_ms": 28695.923,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 205.624595,
+      "frame": 534,
+      "interval_ms": 223.184,
+      "wall_ms": 222.444,
+      "cpu_update_ms": 2.18,
+      "cpu_render_ms": 9.109,
+      "gpu_diagnostic": "Measured(205.624595ms)",
+      "ticks": 2,
+      "backlog_ms": 28891.151,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 204.695181,
+      "frame": 535,
+      "interval_ms": 244.707,
+      "wall_ms": 243.958,
+      "cpu_update_ms": 2.433,
+      "cpu_render_ms": 38.281,
+      "gpu_diagnostic": "Measured(204.695181ms)",
+      "ticks": 2,
+      "backlog_ms": 29082.344,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 196.75861,
+      "frame": 536,
+      "interval_ms": 234.991,
+      "wall_ms": 234.304,
+      "cpu_update_ms": 2.847,
+      "cpu_render_ms": 9.35,
+      "gpu_diagnostic": "Measured(196.75861ms)",
+      "ticks": 2,
+      "backlog_ms": 29294.99,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 215.12208,
+      "frame": 537,
+      "interval_ms": 222.251,
+      "wall_ms": 221.49,
+      "cpu_update_ms": 2.304,
+      "cpu_render_ms": 8.985,
+      "gpu_diagnostic": "Measured(215.12208ms)",
+      "ticks": 2,
+      "backlog_ms": 29498.055,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 204.008007,
+      "frame": 538,
+      "interval_ms": 241.483,
+      "wall_ms": 240.654,
+      "cpu_update_ms": 31.325,
+      "cpu_render_ms": 11.003,
+      "gpu_diagnostic": "Measured(204.008007ms)",
+      "ticks": 2,
+      "backlog_ms": 29688.374,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 191.364858,
+      "frame": 539,
+      "interval_ms": 208.417,
+      "wall_ms": 207.77,
+      "cpu_update_ms": 2.633,
+      "cpu_render_ms": 12.787,
+      "gpu_diagnostic": "Measured(191.364858ms)",
+      "ticks": 2,
+      "backlog_ms": 29897.676,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 185.606238,
+      "frame": 540,
+      "interval_ms": 216.223,
+      "wall_ms": 215.497,
+      "cpu_update_ms": 2.381,
+      "cpu_render_ms": 13.298,
+      "gpu_diagnostic": "Measured(185.606238ms)",
+      "ticks": 2,
+      "backlog_ms": 30074.171,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 192.100404,
+      "frame": 541,
+      "interval_ms": 226.722,
+      "wall_ms": 225.975,
+      "cpu_update_ms": 2.641,
+      "cpu_render_ms": 9.559,
+      "gpu_diagnostic": "Measured(192.100404ms)",
+      "ticks": 2,
+      "backlog_ms": 30258.415,
+      "focused": true,
+      "occluded": false
+    },
+    {
+      "gpu_ms": 206.837876,
+      "frame": 542,
+      "interval_ms": 250.0,
+      "wall_ms": 263.714,
+      "cpu_update_ms": 2.436,
+      "cpu_render_ms": 10.708,
+      "gpu_diagnostic": "Measured(206.837876ms)",
+      "ticks": 2,
+      "backlog_ms": 30453.023,
+      "focused": true,
+      "occluded": false
+    }
+  ],
+  "metrics": {
+    "interval_ms": {
+      "count": 125,
+      "median": 236.828,
+      "p95": 250.0,
+      "max": 250.0
+    },
+    "wall_ms": {
+      "count": 125,
+      "median": 235.683,
+      "p95": 271.986,
+      "max": 283.894
+    },
+    "cpu_update_ms": {
+      "count": 125,
+      "median": 2.436,
+      "p95": 3.623,
+      "max": 31.325
+    },
+    "cpu_render_ms": {
+      "count": 125,
+      "median": 10.029,
+      "p95": 34.166,
+      "max": 40.257
+    },
+    "backlog_ms": {
+      "count": 125,
+      "median": 17485.177,
+      "p95": 29294.99,
+      "max": 30453.023
+    },
+    "gpu_ms": {
+      "count": 125,
+      "median": 212.63506,
+      "p95": 251.376727,
+      "max": 258.234464
+    }
+  },
+  "submitted_frames_per_second": 4.134983290606241,
+  "software_60fps_budget": {
+    "p95_limit_ms": 16.666666666666668,
+    "passed": false
+  },
+  "renderer": "[2026-10-31T15:20:46Z INFO  salimon_client::app] renderer ready: adapter=\"llvmpipe (LLVM 19.1.7, 256 bits)\" backend=Vulkan device_type=Cpu gpu_timestamps=true"
+}

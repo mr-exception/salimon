@@ -1,0 +1,557 @@
+//! Observational ship soundscape. No simulation, save or power authority.
+pub(crate) mod acoustics;
+#[cfg(test)]
+mod synth;
+#[cfg(test)]
+mod tactile_evidence;
+#[cfg(test)]
+mod tests;
+#[cfg(test)]
+mod verification;
+use crate::{
+    condition_feedback::Settings,
+    session::{GameplaySession, ViewMode},
+};
+use salimon_character::CharacterLocation;
+use std::{collections::VecDeque, time::Duration};
+#[cfg(test)]
+use std::{path::PathBuf, time::Instant};
+
+const MAX_EVENTS: usize = 12;
+const MAX_VOICES: usize = 24;
+const CORE: [f64; 3] = [-1.0, 1.2, 0.0];
+const FABRICATOR: [f64; 3] = [-3.0, 1.65, 3.55];
+const RAMP: [f64; 3] = [-7.1, 1.34, 0.0];
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum Cue {
+    Core,
+    Ventilation,
+    Conversion,
+    Fabricator,
+    Thrust,
+    Ramp,
+    Footstep,
+    Blackout,
+    Restored,
+    LowPower,
+    Travel(u8),
+    Latch,
+    HeavyLatch,
+    Mount,
+    Restraint,
+    CargoStep,
+    Release,
+    HeavyRelease,
+}
+#[derive(Clone, Copy, Debug)]
+struct Voice {
+    cue: Cue,
+    filter: f64,
+    gain: f64,
+    pan: f64,
+}
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct Observation {
+    environment: crate::environment_audio::Frame,
+    biological_contact: (u64, Option<salimon_world::resources::ResourceId>),
+    extracted_kg: f64,
+    harvest_material: Option<salimon_world::resources::ResourceId>,
+    active: bool,
+    interior: bool,
+    walking: bool,
+    eye: [f64; 3],
+    right: [f64; 3],
+    powered: bool,
+    conversion: bool,
+    fabrication: bool,
+    construction: Option<[f64; 3]>,
+    thrust: f64,
+    door: f64,
+    low_power: bool,
+    serial: u64,
+    epoch: u64,
+    motions: [f64; 7],
+    restraints: u8,
+    mounts: u64,
+    mount_position: [f64; 3],
+    now: Duration,
+}
+impl Observation {
+    pub(crate) fn capture(s: &GameplaySession, active: bool) -> Self {
+        let state = s.snapshot();
+        let frame = crate::session::frames::character_ship_frame(state.ship.pose);
+        let eye = frame.world_to_local(state.character.eye_position_meters);
+        let look = frame.world_to_local(state.character.look_target_meters);
+        let direction = salimon_math::sub(look, eye);
+        // Ship +Y up, +Z port: forward +X yields right -Z.
+        let right = salimon_math::cross(direction, [0.0, 1.0, 0.0]);
+        let length = salimon_math::length(right);
+        let right = if length > 1e-6 {
+            right.map(|v| v / length)
+        } else {
+            [0., 0., -1.]
+        };
+        let c = s.habitation.cabin.as_ref();
+        let motions = [
+            s.habitation.bunk_open_fraction,
+            c.map_or(0., |c| c.motions[0].fraction),
+            c.map_or(0., |c| c.motions[1].fraction),
+            c.map_or(1., |c| c.motions[2].fraction),
+            c.map_or(1., |c| c.motions[3].fraction),
+            c.map_or(0., |c| c.motions[4].fraction),
+            s.cargo_door.open_fraction,
+        ];
+        Self {
+            environment: crate::environment_audio::capture(s),
+            biological_contact: s.biology.contact_audio,
+            extracted_kg: s.mining.session.extracted_mass_kg(),
+            harvest_material: s
+                .mining
+                .session
+                .attached_sphere_id()
+                .and_then(|id| s.mining.session.fragment(id))
+                .map(|f| f.material().resource()),
+            epoch: s.audio_epoch,
+            motions,
+            mounts: s.mount_audio.0,
+            mount_position: s.mount_audio.1,
+            restraints: c.map_or(0, |c| {
+                u8::from(c.seat_harness) | u8::from(c.bunk_harness) << 1
+            }),
+            active: active
+                && !s.is_paused()
+                && !s.survival.snapshot().terminal
+                && s.view_mode == ViewMode::Gameplay,
+            interior: matches!(
+                state.character.location,
+                CharacterLocation::InsideShip
+                    | CharacterLocation::Cockpit
+                    | CharacterLocation::DoorwayBlend
+            ),
+            walking: state.character.location == CharacterLocation::InsideShip
+                && state.ship.power_available
+                && (s.input.movement().forward
+                    || s.input.movement().backward
+                    || s.input.movement().left
+                    || s.input.movement().right)
+                && (eye[1]
+                    - salimon_character::SHIP_FLOOR_HEIGHT_METERS
+                    - salimon_character::PLAYER_EYE_HEIGHT_METERS)
+                    .abs()
+                    < 0.15,
+            eye,
+            right,
+            powered: state.ship.power_available,
+            conversion: state.ship.core_status.conversion_watts > 0.0,
+            fabrication: state.ship.core_status.fabricator_watts > 0.0,
+            construction: s.building.running,
+            thrust: if state.ship.power_available
+                && state.ship.engines_enabled
+                && state.ship.flight_state == salimon_ship::FlightState::Flying
+            {
+                f64::from(state.ship.thruster_percentage).abs() / 100.0
+            } else {
+                0.0
+            },
+            door: state.ship.door_open_fraction,
+            low_power: state.ship.core_status.low_energy,
+            serial: s.run.serial,
+            now: s.elapsed,
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+struct Event {
+    cue: Cue,
+    source: [f64; 3],
+}
+#[derive(Default)]
+struct Mixer {
+    last: Option<Observation>,
+    pending: VecDeque<Event>,
+    moving: [bool; 7],
+    directions: [i8; 7],
+    walking_meters: f64,
+    ramp_until: Duration,
+}
+impl Mixer {
+    fn queue(&mut self, cue: Cue) {
+        self.queue_at(cue, CORE);
+    }
+    fn queue_at(&mut self, cue: Cue, source: [f64; 3]) {
+        let event = Event { cue, source };
+        if matches!(cue, Cue::Blackout | Cue::Restored | Cue::LowPower) {
+            if self.pending.len() == MAX_EVENTS {
+                self.pending.pop_back();
+            }
+            self.pending.push_front(event);
+        } else if self.pending.len() < MAX_EVENTS {
+            self.pending.push_back(event);
+        }
+    }
+    fn observe(&mut self, o: Observation, settings: Settings) -> bool {
+        let enabled = o.active
+            && o.interior
+            && settings.scene_audio
+            && !settings.master_mute
+            && settings.scene_volume_percent > 0;
+        let old = self.last.replace(o);
+        if !enabled {
+            self.moving = [false; 7];
+            self.directions = [0; 7];
+            self.pending.clear();
+            self.walking_meters = 0.0;
+            self.ramp_until = Duration::ZERO;
+            self.last = None;
+            return false;
+        }
+        if let Some(old) =
+            old.filter(|old| old.serial == o.serial && old.epoch == o.epoch && o.now >= old.now)
+        {
+            if old.powered && !o.powered {
+                self.pending.clear();
+                self.queue(Cue::Blackout);
+            }
+            if !old.powered && o.powered {
+                self.queue(Cue::Restored);
+            }
+            if o.powered && o.low_power && !old.low_power {
+                self.queue(Cue::LowPower);
+            }
+            if (old.door - o.door).abs() > 1e-5 {
+                self.ramp_until = o.now + Duration::from_millis(500);
+            }
+            if o.now > old.now {
+                for i in 0..7 {
+                    let delta = o.motions[i] - old.motions[i];
+                    let moving = delta.abs() > 1e-7;
+                    let direction = if delta > 0. { 1 } else { -1 };
+                    if moving {
+                        if ((!self.moving[i]) && (old.motions[i] == 0. || old.motions[i] == 1.))
+                            || (self.directions[i] != 0 && self.directions[i] != direction)
+                        {
+                            self.queue_at(
+                                if i == 4 || i == 6 {
+                                    Cue::HeavyRelease
+                                } else {
+                                    Cue::Release
+                                },
+                                mechanism_source(i),
+                            );
+                        }
+                        if o.motions[i] == 0. || o.motions[i] == 1. {
+                            self.queue_at(
+                                if i == 4 || i == 6 {
+                                    Cue::HeavyLatch
+                                } else {
+                                    Cue::Latch
+                                },
+                                mechanism_source(i),
+                            );
+                        }
+                        self.directions[i] = direction;
+                    }
+                    self.moving[i] = moving && o.motions[i] != 0. && o.motions[i] != 1.;
+                }
+            }
+            if o.restraints != old.restraints {
+                self.queue_at(
+                    Cue::Restraint,
+                    mechanism_source(if (o.restraints ^ old.restraints) & 2 != 0 {
+                        0
+                    } else {
+                        2
+                    }),
+                );
+            }
+            if o.mounts != old.mounts {
+                self.queue_at(Cue::Mount, o.mount_position);
+            }
+            let delta = salimon_math::sub(o.eye, old.eye);
+            let distance = delta[0].hypot(delta[2]);
+            // Ignore resets/teleports and airborne drift. Ship translation does
+            // not produce footsteps because these are local coordinates.
+            if old.walking && o.walking && distance < 2.0 {
+                self.walking_meters += distance;
+                if self.walking_meters >= 0.8 {
+                    self.walking_meters %= 0.8;
+                    self.queue_at(
+                        if acoustics::area(o.eye) == "cargo" {
+                            Cue::CargoStep
+                        } else {
+                            Cue::Footstep
+                        },
+                        o.eye,
+                    );
+                }
+            } else {
+                self.walking_meters = 0.0;
+            }
+        } else {
+            self.moving = [false; 7];
+            self.directions = [0; 7];
+            self.pending.clear();
+            self.walking_meters = 0.0;
+            self.ramp_until = Duration::ZERO;
+        }
+        true
+    }
+    fn voices(&mut self, settings: Settings) -> Vec<Voice> {
+        let Some(o) = self.last else {
+            return Vec::new();
+        };
+        let volume = f64::from(settings.scene_volume_percent.min(100)) / 100.0;
+        let mut voices = Vec::with_capacity(MAX_VOICES);
+        let mut add = |cue, source, gain| {
+            if voices.len() < MAX_VOICES {
+                let (attenuation, pan) = spatial(o.eye, o.right, source);
+                let (separation, filter) = acoustics::transmission(
+                    o.eye,
+                    source,
+                    &acoustics::scout(o.motions[6], o.motions[3]),
+                );
+                let gain = gain * volume * attenuation * separation;
+                if gain > 0.001 {
+                    voices.push(Voice {
+                        cue,
+                        gain,
+                        pan,
+                        filter,
+                    });
+                }
+            }
+        };
+        for event in self.pending.drain(..) {
+            add(event.cue, event.source, 0.28);
+        }
+        for i in 0..7 {
+            if self.moving[i] {
+                add(
+                    Cue::Travel(i as u8),
+                    mechanism_source(i),
+                    if i == 4 || i == 6 { 0.22 } else { 0.13 },
+                );
+            }
+        }
+        if o.powered {
+            add(Cue::Core, CORE, 0.065);
+            add(Cue::Ventilation, [1., 2.3, 0.], 0.035);
+            if o.conversion {
+                add(Cue::Conversion, CORE, 0.18);
+            }
+            if o.fabrication {
+                add(Cue::Fabricator, FABRICATOR, 0.25);
+            } else if let Some(position) = o.construction {
+                add(Cue::Fabricator, position, 0.12);
+            }
+            if o.thrust > 0.0 {
+                add(Cue::Thrust, [-6.4, 1.1, 0.0], 0.3 * o.thrust);
+            }
+        }
+        if o.now < self.ramp_until {
+            add(Cue::Ramp, RAMP, 0.24);
+        }
+        voices
+    }
+}
+
+fn spatial(eye: [f64; 3], right: [f64; 3], source: [f64; 3]) -> (f64, f64) {
+    let delta = salimon_math::sub(source, eye);
+    let distance = salimon_math::length(delta);
+    if !distance.is_finite() || !right.iter().all(|v| v.is_finite()) || distance > 20.0 {
+        return (0.0, 0.0);
+    }
+    let pan = if distance > 1e-6 {
+        salimon_math::dot(delta, right) / distance
+    } else {
+        0.0
+    };
+    (
+        1.0 / (1.0 + distance * distance / 9.0),
+        pan.clamp(-1.0, 1.0),
+    )
+}
+
+#[derive(Default)]
+pub(crate) struct Presenter {
+    mixer: Mixer,
+    biological_contact: Option<u64>,
+    extracted_kg: Option<f64>,
+    environment: crate::environment_audio::Frame,
+    last_control: crate::native_audio::Control,
+    event_counts: [u64; 32],
+    preview_only: bool,
+    output: crate::native_audio::Output,
+    epoch: u64,
+    last_run: Option<(u64, u64, Duration)>,
+}
+impl Presenter {
+    pub(crate) fn telemetry(&self) -> serde_json::Value {
+        let mut v = self.output.telemetry();
+        v["preview_only"] = self.preview_only.into();
+        v["area"] = self.mixer.last.map(|o| acoustics::area(o.eye)).into();
+        v["scene_events"] = serde_json::json!(self.event_counts);
+        v["scene_gains"] = serde_json::json!(self.last_control.gains);
+        v["environment_warning"] = self.environment.warning.into();
+        v["scene_filters"] = serde_json::json!(self.last_control.filters);
+        v
+    }
+    pub(crate) fn unavailable(&self) -> bool {
+        self.output.unavailable()
+    }
+    pub(crate) fn stop(&mut self) {
+        self.mixer = Mixer::default();
+        self.extracted_kg = None;
+        self.biological_contact = None;
+        self.environment = Default::default();
+        self.last_run = None;
+        self.last_control = Default::default();
+        self.epoch = self.epoch.wrapping_add(1);
+        self.output.silence(self.epoch);
+    }
+    /// E2E stays silent; expose the same observational mapping for captured state.
+    pub(crate) fn preview(&mut self, o: Observation, settings: Settings) {
+        self.preview_only = true;
+        self.present(o, settings, None);
+    }
+    pub(crate) fn update(
+        &mut self,
+        o: Observation,
+        settings: Settings,
+        condition: Option<crate::condition_feedback::Cue>,
+    ) {
+        self.preview_only = false;
+        self.present(o, settings, condition);
+    }
+    fn present(
+        &mut self,
+        o: Observation,
+        settings: Settings,
+        condition: Option<crate::condition_feedback::Cue>,
+    ) {
+        let reset = self.last_run.is_some_and(|(serial, epoch, now)| {
+            serial != o.serial || epoch != o.epoch || o.now < now
+        });
+        if reset {
+            self.stop();
+        }
+        self.last_run = Some((o.serial, o.epoch, o.now));
+        let active = o.active && !settings.master_mute;
+        let scene = self.mixer.observe(o, settings);
+        if !active {
+            self.stop();
+            return;
+        }
+        let voices = if scene {
+            self.mixer.voices(settings)
+        } else {
+            Vec::new()
+        };
+        let mut control = controls(voices, self.epoch, scene, condition, settings);
+        let mut environment = o.environment;
+        if self.extracted_kg.is_some_and(|last| o.extracted_kg > last)
+            && let Some(material) = o.harvest_material
+        {
+            environment.bands[4] = crate::environment_audio::harvest(material);
+        }
+        if self
+            .biological_contact
+            .is_some_and(|last| last != o.biological_contact.0)
+            && let Some(material) = o.biological_contact.1
+        {
+            environment.bands[4] = crate::environment_audio::harvest(material);
+        }
+        self.biological_contact = Some(o.biological_contact.0);
+        self.extracted_kg = Some(o.extracted_kg);
+        self.environment = environment;
+        crate::environment_audio::apply(environment, &mut control, settings);
+        for (i, event) in control.events.iter().enumerate() {
+            if *event {
+                self.event_counts[i] = self.event_counts[i].saturating_add(1);
+            }
+        }
+        self.last_control = control;
+        if !self.preview_only {
+            self.output.update(control);
+        }
+    }
+}
+
+fn controls(
+    voices: Vec<Voice>,
+    epoch: u64,
+    scene: bool,
+    condition: Option<crate::condition_feedback::Cue>,
+    settings: Settings,
+) -> crate::native_audio::Control {
+    let mut control = crate::native_audio::Control {
+        epoch,
+        enabled: if scene {
+            ((1u32 << 27) - 1) & !(7 << 10)
+        } else {
+            0
+        },
+        ..Default::default()
+    };
+    if settings.condition_audio {
+        control.enabled |= 7 << 10;
+    }
+    for v in voices {
+        let index = match v.cue {
+            Cue::Core => 0,
+            Cue::Ventilation => 1,
+            Cue::Conversion => 2,
+            Cue::Fabricator => 3,
+            Cue::Thrust => 4,
+            Cue::Ramp => 5,
+            Cue::Footstep => 6,
+            Cue::Blackout => 7,
+            Cue::Restored => 8,
+            Cue::LowPower => 9,
+            Cue::Travel(i) => 13 + usize::from(i),
+            Cue::Latch => 20,
+            Cue::HeavyLatch => 21,
+            Cue::Mount => 22,
+            Cue::Restraint => 23,
+            Cue::CargoStep => 24,
+            Cue::Release => 25,
+            Cue::HeavyRelease => 26,
+        };
+        control.gains[index] = v.gain as f32;
+        control.pans[index] = v.pan as f32;
+        control.filters[index] = v.filter as f32;
+        control.events[index] = index >= 6 && !(13..20).contains(&index);
+    }
+    for i in 13..20 {
+        if control.gains[i] == 0. {
+            control.enabled &= !(1 << i);
+        }
+    }
+    if settings.condition_audio
+        && let Some(cue) = condition
+    {
+        let index = match cue {
+            crate::condition_feedback::Cue::Heart => 10,
+            crate::condition_feedback::Cue::Hunger => 11,
+            crate::condition_feedback::Cue::Breath => 12,
+        };
+        control.gains[index] = 0.125;
+        control.events[index] = true;
+    }
+    control
+}
+
+fn mechanism_source(index: usize) -> [f64; 3] {
+    let g = crate::session::cabin::geometry();
+    [
+        salimon_character::habitation_geometry::BUNK_HINGE_METERS,
+        g.table,
+        g.seat,
+        g.screen,
+        g.shutter,
+        g.locker,
+        salimon_character::cargo::CARGO_DOOR_TARGET,
+    ][index]
+}

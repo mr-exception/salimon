@@ -1,0 +1,219 @@
+{
+  "setup": {
+    "scenario": "scout-finishes-blackout",
+    "seed": 579,
+    "step_ms": 16
+  },
+  "timeout_ms": 360000,
+  "steps": [
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_2",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_2",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "interaction",
+        "equals": "galley"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "finishes"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "window",
+        "action": "restore"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "original",
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "finish_next",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "finish_next",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "finish_group",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "finish_group",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "finish_next",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "finish_next",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "finish_group",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "finish_group",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "finish_next",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "finish_next",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "finish_group",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "finish_group",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "finish_next",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "finish_next",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "finish_group",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "finish_group",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "finish_next",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "finish_next",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "finishes.rooms.1.groups",
+        "equals": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "window",
+        "action": "restore"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "slate-groups",
+      "timeout_ms": 30000
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "setup": {
+    "scenario": "terrain-earth",
+    "seed": 181,
+    "step_ms": 16
+  },
+  "timeout_ms": 600000,
+  "steps": [
+    {
+      "action": {
+        "op": "window",
+        "action": "resize",
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "wait": {
+        "path": "performance.drawable_pixels.0",
+        "equals": 1280
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "geology-earth-near"
+      }
+    },
+    {
+      "wait": {
+        "path": "terrain.pending_patches",
+        "equals": 0
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "terrain.active_patches",
+        "gt": 0
+      }
+    },
+    {
+      "screenshot": "geology-earth-near",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "geology-earth-mid"
+      }
+    },
+    {
+      "wait": {
+        "path": "terrain.pending_patches",
+        "equals": 0
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "terrain.active_patches",
+        "gt": 0
+      }
+    },
+    {
+      "screenshot": "geology-earth-mid",
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "geology-earth-far"
+      }
+    },
+    {
+      "wait": {
+        "path": "terrain.pending_patches",
+        "equals": 0
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "timeout_ms": 120000
+    },
+    {
+      "assert": {
+        "path": "terrain.active_patches",
+        "gt": 0
+      }
+    },
+    {
+      "screenshot": "geology-earth-far",
+      "timeout_ms": 60000
+    }
+  ]
+}

@@ -1,0 +1,273 @@
+{
+  "schema": 1,
+  "approved_economy": true,
+  "blueprints": [
+    {
+      "id": "stool",
+      "name": "Stool",
+      "category": "furniture",
+      "snap": "fine",
+      "fine_pitch_meters": 0.5,
+      "footprint": "interior",
+      "cells": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      ],
+      "space": {
+        "min": [
+          0,
+          0,
+          0
+        ],
+        "max": [
+          0.5,
+          1,
+          0.5
+        ]
+      },
+      "requirements": [
+        {
+          "resource": "IronOre",
+          "milligrams": 1000000
+        }
+      ],
+      "duration_seconds": 10,
+      "hull_affecting": false,
+      "flight_eligible": true
+    },
+    {
+      "id": "partition",
+      "name": "Partition",
+      "category": "wall",
+      "snap": "fine",
+      "fine_pitch_meters": 0.5,
+      "footprint": "interior",
+      "cells": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      ],
+      "space": {
+        "min": [
+          0,
+          0,
+          0
+        ],
+        "max": [
+          0.1,
+          2.2,
+          3
+        ]
+      },
+      "requirements": [
+        {
+          "resource": "IronOre",
+          "milligrams": 5000000
+        }
+      ],
+      "duration_seconds": 20,
+      "hull_affecting": false,
+      "flight_eligible": true
+    },
+    {
+      "id": "internal-door",
+      "name": "Internal door",
+      "category": "door",
+      "snap": "fine",
+      "fine_pitch_meters": 0.5,
+      "footprint": "interior",
+      "cells": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      ],
+      "space": {
+        "min": [
+          0,
+          0,
+          0
+        ],
+        "max": [
+          0.2,
+          2.2,
+          3
+        ]
+      },
+      "requirements": [
+        {
+          "resource": "IronOre",
+          "milligrams": 5000000
+        }
+      ],
+      "duration_seconds": 30,
+      "hull_affecting": false,
+      "flight_eligible": true
+    },
+    {
+      "id": "hull-cell",
+      "name": "Hull cell",
+      "category": "hull",
+      "snap": "structural",
+      "fine_pitch_meters": 0.5,
+      "footprint": "structural",
+      "cells": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      ],
+      "space": {
+        "min": [
+          0,
+          0,
+          0
+        ],
+        "max": [
+          3,
+          3,
+          3
+        ]
+      },
+      "requirements": [
+        {
+          "resource": "IronOre",
+          "milligrams": 20000000
+        }
+      ],
+      "duration_seconds": 120,
+      "hull_affecting": true,
+      "flight_eligible": false
+    },
+    {
+      "id": "deck-cell",
+      "name": "Deck cell",
+      "category": "deck",
+      "snap": "structural",
+      "fine_pitch_meters": 0.5,
+      "footprint": "structural",
+      "cells": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      ],
+      "space": {
+        "min": [
+          0,
+          0,
+          0
+        ],
+        "max": [
+          3,
+          3,
+          3
+        ]
+      },
+      "requirements": [
+        {
+          "resource": "IronOre",
+          "milligrams": 15000000
+        }
+      ],
+      "duration_seconds": 90,
+      "hull_affecting": true,
+      "flight_eligible": false
+    },
+    {
+      "id": "two-deck-room",
+      "name": "Two-deck room",
+      "category": "room",
+      "snap": "structural",
+      "fine_pitch_meters": 0.5,
+      "footprint": "structural",
+      "cells": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        },
+        {
+          "x": 1,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 1,
+          "y": 1,
+          "z": 0
+        }
+      ],
+      "space": {
+        "min": [
+          0,
+          0,
+          0
+        ],
+        "max": [
+          6,
+          6,
+          3
+        ]
+      },
+      "requirements": [
+        {
+          "resource": "IronOre",
+          "milligrams": 40000000
+        }
+      ],
+      "duration_seconds": 300,
+      "hull_affecting": true,
+      "flight_eligible": false
+    },
+    {
+      "id": "utility-module",
+      "name": "Utility module",
+      "category": "module",
+      "snap": "fine",
+      "fine_pitch_meters": 0.5,
+      "footprint": "interior",
+      "cells": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      ],
+      "space": {
+        "min": [
+          0,
+          0,
+          0
+        ],
+        "max": [
+          1,
+          1,
+          1
+        ]
+      },
+      "requirements": [
+        {
+          "resource": "IronOre",
+          "milligrams": 3000000
+        }
+      ],
+      "duration_seconds": 60,
+      "hull_affecting": false,
+      "flight_eligible": true
+    }
+  ]
+}

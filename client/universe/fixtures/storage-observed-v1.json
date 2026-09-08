@@ -1,0 +1,117 @@
+{
+  "format": "salimon.universe.catalog",
+  "schema_version": 1,
+  "revision": "u04-development-v1",
+  "datasets": [
+    {
+      "id": "jpl:horizons-earth-j2000",
+      "version": "Frozen Horizons API response; signature and model metadata retained in JSON",
+      "reference": "catalogs/sources/fixtures/jpl-earth-j2000.json; SHA256 cb4301b038c85e5c1cdc296b16564bfbd38e4fef42938fa07656d490323f31bb; development snapshot; production reuse unreviewed #513"
+    },
+    {
+      "id": "nasa:exoplanet-ps",
+      "version": "Frozen PS default-row query snapshot 2026-10-21",
+      "reference": "catalogs/sources/fixtures/exoplanet-proxima.csv; SHA256 223a3bf4b728629fff24c7ac557390129e4acd3b61c718044a44e7a59059d714; development snapshot; production reuse unreviewed #513"
+    }
+  ],
+  "records": [
+    {
+      "kind": "system",
+      "record": {
+        "header": {
+          "id": "fixture:solar",
+          "display_name": "Solar System",
+          "provenance": {
+            "kind": "fiction",
+            "builder": "u04-fixture",
+            "revision": "v1",
+            "rationale": "Structural grouping only; not scientific system ingestion"
+          }
+        }
+      }
+    },
+    {
+      "kind": "body",
+      "record": {
+        "header": {
+          "id": "jpl:399",
+          "display_name": "Earth",
+          "provenance": {
+            "kind": "observed",
+            "dataset": "jpl:horizons-earth-j2000",
+            "record_key": "399"
+          }
+        },
+        "system": "fixture:solar",
+        "parent": "fixture:solar",
+        "body_kind": "planet",
+        "mass_kg": {
+          "value": 5.97219e+24,
+          "uncertainty": {
+            "kind": "bounds",
+            "minus": 6e+20,
+            "plus": 6e+20,
+            "confidence": null
+          },
+          "provenance": {
+            "kind": "observed",
+            "dataset": "jpl:horizons-earth-j2000",
+            "record_key": "399"
+          },
+          "validity": null
+        },
+        "radius_meters": {
+          "value": 6371010.0,
+          "uncertainty": {
+            "kind": "bounds",
+            "minus": 20,
+            "plus": 20,
+            "confidence": null
+          },
+          "provenance": {
+            "kind": "observed",
+            "dataset": "jpl:horizons-earth-j2000",
+            "record_key": "399"
+          },
+          "validity": null
+        },
+        "definition": null
+      }
+    },
+    {
+      "kind": "system",
+      "record": {
+        "header": {
+          "id": "fixture:proxima",
+          "display_name": "Proxima Cen",
+          "provenance": {
+            "kind": "fiction",
+            "builder": "u04-fixture",
+            "revision": "v1",
+            "rationale": "Structural grouping only; not scientific system ingestion"
+          }
+        }
+      }
+    },
+    {
+      "kind": "body",
+      "record": {
+        "header": {
+          "id": "nasa:Proxima-Cen-b",
+          "display_name": "Proxima Cen b",
+          "provenance": {
+            "kind": "observed",
+            "dataset": "nasa:exoplanet-ps",
+            "record_key": "Proxima Cen b"
+          }
+        },
+        "system": "fixture:proxima",
+        "parent": "fixture:proxima",
+        "body_kind": "planet",
+        "mass_kg": null,
+        "radius_meters": null,
+        "definition": null
+      }
+    }
+  ]
+}

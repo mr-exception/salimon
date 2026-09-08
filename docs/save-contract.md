@@ -1,0 +1,647 @@
+# Canonical whole-game save contract (schema 29)
+
+> Current runtime captures use **schema 29**; schema 23 was the historical compressed-world baseline, and schema 24+ additionally binds canonical Vesper definitions. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. Under the approved policy, future fictional-planet upgrades require explicit versioned save/world-delta migration, preservation or validated remapping of physical anchors, and recoverable failure handling; scientific terrain detail on **any published real observed solid body** may not displace saved positions after its first authoritative real-scale surface publication. Future fictional-planet changes to geology/biome-dependent resource layouts likewise require explicit stable-ID, depletion and positional migration; the historical compressed prototype does not establish the real-body surface freeze. This note does not modify schema 3 or imply backend multiplayer exists.
+
+`salimon-persistence::SaveGame<T>` is the versioned envelope. New captures use
+version 29. Decode accepts versions 1–28 for explicit runtime migration; the
+following v1–v3 paragraphs record that historical migration:
+retain the complete physical/Fabricator/equipment payload, initialize newly
+introduced survival meters at 100 with no effects or retrospective active time,
+and initialize the run/journey source. A version-1 payload must lack survival;
+version 2 must contain complete typed survival state. V2 keeps its cumulative
+journey distance and initializes empty sampling history without inventing travel.
+Version 3 requires journey tracking source (which can have no samples on a fresh
+run). Missing/null v2/v3 survival or missing v3 tracking,
+invalid meters/effect registries/configuration, unknown fields and unsupported
+versions reject before publication. Migration is checkpointed before exposure.
+
+## Authoritative inventory
+
+| Owner | Required logical state | Regenerated/excluded state |
+| --- | --- | --- |
+| Survival/run | Meters/config, fractional drain/starvation/regeneration, full captured effect rules/stacks/partial ticks/lifetimes, wounds/death source/terminal flag, active survival duration, offline UTC watermark, consumable catalog, movement/interaction tuning, run serial, cumulative journey distance and last valid framed physical samples | Launch receipt, held inputs/UI/capture, movement scale and presentation history; derived permissions are repaired |
+| Envelope/runtime clock | Unix-second recording time, completed simulation Duration, exact admitted Duration backlog | Instant, wall-clock frame timer, profiling durations; closed-game timed power/work uses the schema-22 contract below |
+| Character | Location/frame including doorway blend, local/world position, yaw/pitch, vertical/interior/EVA velocities, nearby surface, EVA basis, gravity/ramp state | Jump key edge reset; camera matrices regenerated |
+| Ship | Pose/quaternion, linear velocity, steering ramp, propulsion/configuration, flight/landed state, full assist/bounce progress, selected signed throttle, door state/fraction, cockpit authority, terrain/footprint, Core config/charge/fraction/reservation/consumption, conversion source and progress, Fabricator demand | Held throttle/steering intent reset, transient message and last-funded interval reset; instruments regenerated |
+| World/mining | Seed in runtime, terrain definition mode/version, sparse deposit depletion journal and extracted total, all fragment stable IDs/source/material/mass/pose, allocator high-water mark, sealed growth state, carry identity, attached mining sphere | Fragment index and physical change journal rebuilt. Active attached sphere detaches on restore because no mining key is restored. Generated deposits/terrain patches recreated from seed and immutable versioned definitions; there are no editable terrain deltas in this revision |
+| Runtime physics | Ship-frame membership/local anchors, linear/angular fragment motion and frame orientation, gravity mode; contact support/sleep/dwell state by stable identity | Render interpolation, broad phase, solver scratch, GPU hulls/terrain patches and query/placement caches rebuilt; retain logical contact state and regenerate geometry |
+| Ship mass | Physical containment and stored/tray contributions, one contribution per identity | Cached ledger rebuilt/reconciled from source state; never count carried cargo twice or count queued/collected consumables |
+| Fabricator | Recipe definitions/IDs/unlocks, bins, FIFO committed job recipes/IDs/counts/current progress, queue capacity, next ID, occupied tray item | No refund/re-enqueue/recharge during restore; status/demand derived from jobs and Core |
+| Inventory/equipment | Exactly three food/two medical single-item slots with stable job/unit identities; five equipment slots and selection | No held controls or automatic consumption; carrying selection lock revalidated |
+| Session/presentation | Gameplay seed, gameplay/precision camera mode and camera controller, deterministic simulation state | Crafting/radial modals, hover, feedback, aim commands, pending OS events, held keys/buttons, focus/capture, window/GPU, automation reader, measurement flags and caches excluded |
+
+## Validation and restore order
+
+Decode into temporary owned state; check envelope version, size and structural
+integrity; validate finite SI values, unit quaternions, capacities, stable ID
+uniqueness/references and allocator bounds before publishing. A failed restore
+must leave the current session unchanged. Reconstruct immutable world/terrain
+configuration, ship and character, world entities/depletion, frame/motion/contact
+state, Fabricator/inventories/equipment, mass and power adapters, then exact
+simulation/backlog clocks. Clear native/input/modal state and invalidate
+presentation/query caches. Do not call gameplay interactions or advance a tick
+while restoring. Re-snapshot must equal the normalized restored state. This
+boundary performs no filesystem IO, checkpoint scheduling or offline fatigue
+calculation; those are later persistence/survival issues.
+
+Disk durability is implemented by #366, described below. Logical round-trip tests
+and native filesystem restart tests establish separate boundaries.
+
+## Implemented whole-session boundary (#364–#365)
+
+Runtime `session/persistence.rs::SessionState` is the concrete typed payload.
+`GameplaySession::save_bytes(now_unix_seconds)` exports it through `SaveGame`;
+`restore_bytes` validates and constructs temporary domain owners before one
+assignment. `FabricationSaveState` keeps machine/inventory validation together.
+Propulsion mass is excluded from wire data and rebuilt from the physical cargo,
+reserves and tray source state. Tests cover subsequent deterministic simulation,
+not only byte round-trip, including sleeping contacts and mid-assist/mid-craft.
+Normal-play startup/exit and automatic checkpoints are wired by #366; manual
+Save Now UI belongs to #382.
+
+## Durable active run (#366)
+
+`salimon-persistence::storage` owns a portable `CheckpointStore` and
+`SaveManager`; `NativeStore` owns filesystem operations and an exclusive OS file
+lease (released automatically after crash). Runtime `checkpoints.rs` captures
+validated `SessionState` on the session thread and sends owned bytes to one
+bounded worker. The worker revalidates full reconstruction, writes/flushes a
+same-directory temporary, renames, flushes the directory on Unix and reads back
+exact bytes before acknowledging success. Two alternating slots retain the newest
+verified checkpoint while publishing the next. Windows removes only the inactive
+slot before rename because replacement rename differs there; the current slot
+remains intact. CRC32 covers generation, length and payload; it detects accidental
+corruption, not malicious modification. Reads and payloads are size bounded.
+
+Recovery validates both slots, integrity, schema and domain reconstruction, then
+chooses the highest generation (never wall time). A corrupt latest slot falls
+back with a persistent warning in the native window title. If neither slot is
+valid, start a fresh run with a warning. Unsupported schema or unreadable files
+fail launch explicitly, preventing silent overwrite by an incompatible version.
+Unpublished temporary files are ignored. Another running game using the same
+save directory is rejected. Failed captures/writes keep the verified generation,
+log the error, warn visibly and retry after five game seconds; exit failure returns
+an unsuccessful application status.
+
+Normal play restores before window/gameplay startup and preserves the saved
+admitted clock backlog through first renderer initialization. It checkpoints on
+the first update, every 60 seconds of simulated active time, and after discrete
+cargo/fragment creation/removal/carry, landing/takeoff, door/power, Fabricator
+reserve/FIFO/completion/tray, inventory and equipment changes. While IO is busy,
+events coalesce to the next complete snapshot; clean exit drains IO and verifies
+the final snapshot. Serialization/capture still runs on the event thread; durable
+IO, readback and reconstruction verification run on the worker. No asynchronous
+mutation of gameplay owners is allowed. E2E/benchmark launches never read/write
+the user's active run. No closed-app world advancement occurs.
+
+Default directory: Linux `$XDG_DATA_HOME/salimon/active-run` (fallback
+`~/.local/share/salimon/active-run`), macOS
+`~/Library/Application Support/salimon/active-run`, Windows
+`%LOCALAPPDATA%/salimon/active-run`. `SALIMON_SAVE_DIR` overrides it. There is one
+active run, represented by two recovery generations, with no multi-slot UI.
+Existing files can be backed up/moved when deliberately starting a fresh run.
+
+## Survival lifecycle and launch transaction (#371)
+
+The session ticks survival on every admitted game interval while alive, including
+ordinary crafting/tour menus. It advances physical domains only for the admitted
+portion before a lethal boundary; death clears held controls/mining/crafting,
+stops manual pilot authority and discards pending catch-up. Further authoritative
+simulation and world commands are frozen. Terminal state is a discrete checkpoint
+event; the worker writes it into both generations before acknowledging, so its
+verified backup is terminal too. Failed writes remain failures: a death that cannot
+reach storage is not claimed durable, and visible save warnings/retry remain.
+
+Normal-play launch first restores into a temporary candidate. Only fatigue is
+credited from the checkpoint UTC to launch UTC, with the survival domain's six-hour
+configured cap and rollback/high-watermark protection. Hunger, health, effects,
+physical world and survival active duration remain frozen; schema-22 timed power/work follows [offline construction](construction-offline.md). The worker's SaveManager verifies
+and publishes credited state/watermark before the candidate is exposed. Failed
+credit publication leaves the caller's live session unchanged and fails startup.
+The receipt is launch-only: focus, minimize/resume, save and renderer changes do
+not grant recovery. Crash recovery conservatively treats time since the newest
+verified checkpoint as closed time; see the survival clock contract.
+
+A new native run is also checkpointed before play. Default save paths/lease and
+60-active-second/discrete-event/exit policy above are retained. Checkpoint failures
+while terminal use a host-time retry delay because the gameplay clock is frozen;
+no game-domain time advances to retry IO. E2E/benchmarks remain isolated from the
+user's save directory. Direct portable restore is a reconstruction operation and
+never grants offline credit; only the launch transaction does.
+
+## Terminal archive and restart (#371)
+
+The native Journey Ended screen (#374) displays the typed archived report and a
+single Restart Game action. An initial focused Enter/numpad Enter/R press or left
+click on the button requests the same verified restart transaction. Repeats,
+synthetic replay and living runs cannot restart through this path. Runtime prepares a fresh
+deterministic Earth world, clears all old objects/inventory/jobs/effects/inputs, then grants new-run supplies,
+starts meters at 100 and increments the saved run serial. Terrain mode and world
+seed retain their deterministic new-run policy. New-run supplies follow the [#379 contract](#starting-supplies-379).
+
+The existing save worker first checkpoints the terminal run into both slots,
+then durably publishes an immutable idempotent `journeys/v2/run-<serial>.json` summary,
+then verifies the fresh run in both slots. Only success replaces the live terminal
+session. Failure never grants gameplay with an unverified fresh state; retry
+retains the terminal source. After success both fallback generations belong to
+the fresh run. Interruption before success can recover a terminal run or the
+already verified pristine fresh run, never an old living generation after the
+terminal pair was verified. A first terminal write that fails can only preserve
+the prior verified checkpoint; no stronger disk-failure guarantee is claimed.
+
+Archive summaries contain their version, serial, seed, typed death cause, active
+survival duration, final absolute position and typed journey counter source.
+Byte-identical retry is idempotent; conflicting historical reports reject without
+overwrite. Native archive scans choose unused run serials when starting fresh
+after missing/damaged saves. Temporary archive files are not active reports.
+Version-2 summaries are published on the death checkpoint, clean exit and terminal
+launch recovery, before any restart request. Launch repairs a missing report after
+an interrupted terminal publication. Restart verifies the same report idempotently.
+Version-1 reports stay immutable in `journeys/run-<serial>.json`; both namespaces
+reserve serials, including an interrupted v1 restart restored by a newer client.
+Archive failure leaves verified terminal generations and retries through the same
+visible failure policy. Report version 2 includes final named location and samples.
+
+#375 owns expanded cross-system suites and #376 native reference signoff; #381
+owns a true pause menu and #382 manual Save Now controls. Survival, HUD, Journey Ended and starting supplies are implemented through
+#371/#373/#374/#379; native Q-wheel consumption UI remains #377.
+
+
+## Journey statistics (#372)
+
+`session/journey.rs` owns the cumulative distance and latest valid ship/character
+samples. Active duration remains the exact `Survival::active_time` authority,
+including ordinary menus and background running, stopping at the lethal boundary.
+It is not wall-clock age or the legacy world elapsed clock. Offline recovery
+changes neither duration nor distance.
+
+Distance is the sum of ship-origin displacement and character displacement during
+each admitted physical tick. Ship flight/coasting/landing/takeoff counts even
+while the player is outside. Cabin movement uses native ship-local f64 positions;
+an idle passenger contributes zero extra distance, including a turning cabin.
+Character endpoints are taken before/after the controller using the same completed
+ship frame. Outside/EVA and doorway crossings use absolute f64 endpoints in that
+frame. An EVA traveller and the independently moving ship each contribute their
+own path. Surface walking, gravity and inherited EVA drift count as physical travel.
+The metric is sampled path length (tick chords), not net spawn-to-current distance.
+
+Only movement inside the production physics/controller tick enters accounting.
+Out-of-tick fixture/assist commands, cockpit snaps, teleport, restore, streaming
+and camera precision-tour positions cannot bridge old samples into a fake leg.
+Physical assist motion during a tick counts normally. Render-origin shifts never
+enter the source. Last valid positions persist with explicit ShipLocal/World tags;
+they record the last completed physical sample, not an instruction to bridge a
+later rebase/restore. Fresh runs have no samples. Finite checks protect persisted
+statistics; f64 subtraction precedes norms and cabin motion avoids solar-coordinate
+round-trips. This adds no arbitrary maximum-speed teleport heuristic.
+
+Final location derives from the saved physical character position, nearest catalog
+surface (catalog order breaks ties), stable body ID and nominal altitude. Names
+are `Near <body>` within the shared inclusive 3,000,000 m envelope, otherwise
+`Space near <body>`; neither claims terrain contact. Cause is the typed survival
+death source, never inferred from location or last movement. Automation inspection
+exposes duration, distance and the same location DTO. #374 owns its native layout.
+
+Occluded or zero-sized windows stop presentation and clear held controls but keep
+the same bounded physical tick/checkpoint scheduler running at 16 ms wakeups.
+Focus loss alone also keeps time running. OS suspension and renderer reconstruction
+retain the existing explicit lifecycle gap exclusion; this is distinct from a
+running minimized/unfocused app. Native desktop delivery remains #376 signoff.
+
+
+## Journey Ended presentation (#374)
+
+`GameplaySession::ended_run()` is the single typed report builder used by both
+archive serialization and `journey_ended.rs` presentation. UI reads the existing
+typed cause, active duration, combined distance and final nearest-body context;
+it never guesses death cause or derives travel from render positions. Display
+rounding does not change archived source precision. The report is available only
+for terminal runs, including terminal launch recovery.
+
+The terminal overlay takes priority over crafting, diagnostics and survival HUD;
+reticle, held tool, inventory/equipment and action messages are hidden. The frozen
+world remains behind a dark backdrop and readable final-transmission card.
+Enter/R and pointer activation share `ClientApplication::restart_terminal()`.
+All ordinary world/view/status/diagnostic commands are rejected during terminal
+input dispatch; the existing session gate also rejects consumption/mining/flight.
+
+Failed publication retains terminal authority, shows a persistent failure footer
+and leaves Restart Game usable. Missing verified storage never permits a free
+restart. Successful verification replaces both active slots (rather than deleting
+a verified fallback prematurely), clears terminal/HUD/action/presentation caches,
+terrain streaming and inputs, and leaves cursor capture off until fresh input.
+No revive or resume action exists. Restart IO retains the existing synchronous
+verified transaction; fresh gameplay is never exposed while writes are pending.
+
+Pointer positions are physical pixels and match the exact raster button rectangle.
+Focus/capture loss, cursor leave and resize/DPI/lifecycle resets invalidate stale
+pointer coordinates. The renderer-owned `overlay_available_size` defines fitting;
+the normal terminal image exactly fits that margin so it is not further scaled.
+RGBA allocation is bounded at 64 MiB: very large surfaces retain a centered card
+without allocating an unbounded backdrop. Normal resize/DPI/aspect layouts remain
+centered and cached. Native OS-input/Metal validation remains #376.
+
+## Starting supplies (#379)
+
+Normal play constructs `GameplaySession::new_run` before the verified first
+checkpoint; terminal restart uses the same constructor before its existing
+archive/two-generation publication transaction. It grants two basic rations in
+food slots one/two, one medkit in medical slot one, and the exact integer recipe
+ingredients for one additional ration in Fabricator reserves. The fabrication
+owner derives item mass/category and reserve quantities from its validated
+starter recipes. Initial grants consume no game time, Core energy or ingredients;
+they are new-run endowments, not completed player crafting operations.
+
+The two rations use `(job 1, units 1/2)` and the medkit `(job 2, unit 1)`;
+subsequent player jobs start at 3. These are ordinary typed output identities,
+persisted with the existing allocator high-water mark and cross-owner validation.
+No parallel inventory, seed flag, recipe unlock or save-schema change is added.
+Stored reserves contribute 0.5 kg at current recipe tuning; inventory contributes
+zero under the existing collected-consumable mass exception. Enqueue, output and
+collection retain ordinary ingredient/power/tray/mass rules.
+
+Restore replaces inventories/reserves exactly, including vacancies and old saves
+with no supplies. It never calls the grant constructor. Loading, offline recovery,
+ship entry, focus/cursor release, resume and renderer reconstruction cannot grant
+items. Restart candidates contain one grant; publication failures retain terminal
+authority and retries rebuild that same candidate rather than appending supplies.
+Isolated engineering/E2E/benchmark fixtures keep their explicitly empty `Default`
+starting state; portable new-run E2E tests opt into the production constructor.
+
+
+## Gameplay pause (#381)
+
+Escape in gameplay opens the pause menu and releases the cursor. Enter or Escape
+resumes; F1 explicitly releases the cursor without pausing. P/R/N camera commands
+belong only to the F2 precision tour. Pausing closes crafting/status overlays and
+clears held movement, steering, throttle keys and mining. Requested ship throttle
+is preserved. Full simulation, Core, fabrication, loose cargo, survival effects,
+journey accounting and autosave game-time intervals freeze at the session boundary.
+UI/rendering and checkpoint IO continue. The transient pause flag is not saved.
+Both native/background and portable automation tick paths exclude paused elapsed
+time and clear pending backlog on entry/resume; focus/minimize/suspend cannot
+resume a paused session or credit offline fatigue. Resume requires fresh controls.
+The pause menu takes priority over diagnostics, HUD, reticle and equipment.
+Save Now/Save & Exit use the verified #382 worker; Q-wheel input must respect
+`GameplaySession::is_paused()` and the shared consumption gate.
+
+## Pause checkpoint controls (#382)
+
+The paused menu offers Enter/Escape Resume, N Save Now, S Settings and X Save &
+Exit. R retries failures, C cancels exit and Q explicitly exits without saving
+only after a failed exit checkpoint. Resume cancels exit intent. Menu keys require
+initial focused admission; repeats/synthetic/unfocused input cannot request IO.
+The existing center panel uniformly fits its drawable; Settings keep their keys.
+
+`checkpoints/control.rs` owns bounded coalescing, verified UTC receipts and exit
+intent. Manual/automatic captures share the same worker, atomic store and active
+run. Polling continues while paused/minimized; a newer request cannot be satisfied
+by an older in-flight snapshot. Retry bypasses frozen game-time backoff. Save &
+Exit and living-gameplay window close await verification or explicit failed-save
+risk choice. Final exit does not start a second write after either choice.
+Terminal archives/restart and 60-second/event autosaves retain their owners.
+No manual request ticks gameplay or credits offline fatigue. Native OS-input,
+DPI/appearance and M1 signoff remain separately tracked by #376.
+
+## Future Jump Drive and shared-clock save additions
+
+The [approved future travel contract](jump-drive-and-interstellar-travel.md) uses one 1:1 real-world universe clock for every online/offline player, **no relativistic time dilation**, ordinary powered flight plus real-time engine-off coasting, and an owner-triggered Core-powered Jump Drive. The engine change (#493) now maintains deterministic impulse from **actually funded joules** (1 N·s/J baseline) over exact power/clock boundaries without adding a second kinetic-energy charge. The engine switch/coefficient are implemented in schema 5; Jump Drive and shared-world clock fields are still future.
+
+A later, explicitly versioned save/online server model must include the installed Jump Drive identity/revision, parameter N (initial **20%**), effective impulse coefficient, physically mounted/upgrade parts, true engine on/off state **distinct from selected throttle**, position/orientation/velocity frame+epoch, and sufficiently precise Core amounts. Pending quantum transitions require stable idempotency transaction IDs, captured pre-jump position, mass, velocity, heading, six-field normalized light-second distance, quoted/reserved energy, validated target state and passenger/cargo identities. On recovery **commit exactly once or roll back/refund exactly once**; never duplicate an owner ship or charge twice. Do not let an unverified position materialize or let quantum staging create an alternate time line.
+
+Offline catch-up remains deterministic on one shared clock and **does not autonomously fire jumps**. The code's current compressed-world zero-offline-world-duration implementation must be explicitly migrated by the existing universe offline-propagation issues; these future plans do not claim such propagation is implemented today.
+
+## Tutorial progress and schema 4 (#380)
+
+Schema 4 adds required `state.tutorial` with seven validated objective bits and
+per-run skipped flag. Captures use version 4; versions 1–3 migrate dismissed,
+without granting supplies or inferring completed actions from an empty inventory.
+Missing/unknown objective state rejects before publication. UI/input/cache remain
+transient; only durable progress/skip participates in discrete checkpoint events.
+Verified death restart resets onboarding through `new_run`. The existing
+physical/Fabricator/survival/journey migrations and storage guarantees remain.
+
+## Funded-impulse engine migration and schema 5 (#493)
+
+Schema 5 requires physical ship `engines_enabled` and propulsion
+`impulse_ns_per_joule`. Runtime migrates valid versions 1–4 before typed domain
+decode: validate and retire both legacy force capacities, install coefficient 1
+and default legacy engine-on, preserving velocity, energy, physical cargo and
+all other state. Current-schema missing/retired/unknown fields reject atomically.
+Tutorial schema-4 progress remains required for v4/v5; earlier tutorial migration
+stays dismissed. No inventory/resource grant or simulation tick occurs on restore.
+The switch participates in discrete checkpoint events; held B/keys are transient.
+
+## Portable cross-system verification (#375)
+
+The [portable scenario DSL](../scenarios/portable/README.md) composes real session
+encoding/validation, NativeStore checkpoints and the normal verified launch path
+at explicit UTC. Full-source equality and post-restore continuation cover landed,
+moving, outside-EVA, cargo, blackout/Core and terrain states with partial
+fabrication, inventory, tutorial, active healing/damage and fixed-tick fractions.
+An extended 500-fragment case preserves depletion across stream reconciliation,
+physical identities, derived mass and continuation.
+
+Checkpoint worker fault injection covers failed writes before publication, torn
+bytes and complete writes followed by an error. Death/restart tests inject at
+each of the two terminal copies, archive and two fresh copies, retain the terminal
+visible session on error, recover valid durable state and converge to exactly one
+archive/new run. CRC-valid invalid-domain saves must fall back; future schemas
+must abort launch without replacing visible state. Existing native-store tests
+retain crash-temp-file, lease and platform durability coverage. See the
+[acceptance matrix and raw results](https://github.com/mr-exception/salimon/blob/d003bd58d506e04e3df97744f29f68449b6e2b3e/reports/issue-375/README.md).
+
+
+## Scout Archive schema 6 (#467)
+
+Schema 6 adds required `state.archive`: inner version 1, selected stable record ID
+and bounded unique read IDs. Runtime validates this with the full session before
+publishing. Save/close/relaunch retains selection/read progress and original local
+record definitions; reader open/held input remain transient. V1–V5 explicitly
+initialize an unread Archive and preserve their existing survival/tutorial/engine
+migrations. No recovery progress or charted destinations are invented. Unknown
+versions/IDs, duplicate read IDs and missing current Archive source reject before
+replacing a live session. Discrete read/selection changes use existing atomic
+checkpoint scheduling. See [source and input](../client/runtime/architecture.md#scout-archive-467).
+
+## Future universe new-run contract — U05 (#406)
+
+`salimon-persistence::universe::UniverseSave` is a **separate**
+`salimon.universe.save` version-1 wire envelope, not a migration of current
+`salimon.save` (now schema 29). It is delivered for future world integration; normal
+startup still uses the compressed-world session source. Existing saves are never
+implicitly interpreted, discarded or rewritten by this API.
+
+The universe envelope binds catalog schema/revision and an exact lowercase SHA256
+pack identity, supplied by the future **verified** pack loader. This layer checks
+identity equality, not the pack's content digest (U12 owns publication/verification).
+It stores a split calendar epoch, galaxy-split or catalog system/body-relative
+ship position, frame-relative velocity and unit xyzw orientation. Local ship
+frames reject until their independent authoritative definitions are persistable.
+Referenced fictional body anchors require their exact version/digest binding.
+Published definitions remain immutable; no terrain seed regenerates saved truth.
+
+Historical discoveries store object ID, first/last epoch and observation count;
+no catalog object becomes a live contact or player-known coordinate merely by
+loading. Discovery IDs/time scales/order/duplicates validate. Future scanner U30
+owns live expiry/contact semantics. Domain-owned mutable player/world sections
+are independently versioned opaque bytes with exact owner identity. Every encode/
+decode requires a caller-supplied validator for **every** section: unknown versions,
+identities, physical anchors and domain constraints must reject before runtime
+publication. This envelope does not implement those future gameplay domains.
+
+Unknown universe versions fail before payload decoding. Catalog or definition
+mismatch is `IncompatibleCatalog`, fatal during `SaveManager::recover`, like an
+unsupported schema: never silently fall back/reseed into a different universe.
+Ordinary corruption/torn publication retains the existing two-generation fallback.
+The size limit remains 64 MiB. Decode validates temporary owned source before any
+session assignment; callers must abort on incompatibility. Future migration must
+explicitly remap each stable ID/frame/definition and mutable section, verify both
+new generations in a distinct namespace and retain old verified saves until success.
+No implicit version upgrade, offline catch-up, world replacement or backend exists.
+
+## Recovery Module schema 7 (#468)
+
+Current captures add required version-1 Recovery config, installed component
+identity and mass, paid per-record joules and active job. Source is validated
+against the Fabricator's captured recipe/high-water and pending/tray identities.
+A missing current source or duplicate installation fails transactionally.
+Old v1–v6 saves explicitly initialize empty hardware/progress and add the blueprint
+without granting inputs or replaying work. Current schema-6 Archive identities
+and all prior physical/consumable state survive. Transient R/menu/native input
+and last-tick auxiliary power are never restored; schema-22 closed-game progress follows [offline construction](construction-offline.md).
+See [canonical Recovery contract](data-recovery-module.md#persistence-and-verification).
+
+## Independent structural domain schema (#541)
+
+`salimon_ship::structure::StructureSaveState` owns schema 1 for the independently
+validated 3 m structural graph. It preserves the Core ID, exact grid origin,
+parts/faces/envelopes, rooms, equipment, baseline/additional mass and retired IDs;
+restore rebuilds occupancy and checks support and uniqueness. See
+[owning architecture](../client/ship/architecture.md#portable-structural-foundation-541).
+This payload is not yet part of `GameplaySession` or disk checkpoints and does
+not change whole-game schema 7. Project/physical installation save integration
+remains #550; no player save acquires an invented grid or rounded Scout anchors.
+
+## Blueprint placeholder schema 8 (#542)
+
+Current captures require `state.construction`, an independent schema-1 project
+reservation ledger. It preserves stable project IDs/next-ID, owner, registered
+blueprint source, exact ship-local origin/anchor, quarter-turn orientation, target
+volume and occupied cells. These projects own no materials, installed structural
+mass, progress or power yet. Schema 1–7 migrates to an empty ledger without a
+simulation tick; unexpected nonempty construction source in a legacy envelope
+rejects. Missing schema-8 source, malformed cells/bounds, overlaps, unknown or
+changed catalog entries, wrong owner and inconsistent IDs reject before publishing
+any restored owner. An older application rejects the unknown schema rather than
+overwriting a checkpoint it cannot interpret.
+
+Builder activation, palette selection, preview, hover and visual wireframes are
+transient and rebuilt. Restored projects remain visible but never become solid or
+usable hardware by loading. The current support graph is an explicit coarse
+baseline, independent of authored collision, and is reconstructed; full installed
+structure/resource/progress/offline construction integration remains #543–#550.
+Future catalog economics changes need an explicit compatible source migration;
+this version does not silently retune an existing project's captured requirements.
+
+
+## Cargo door schema 9 (#539)
+
+The session saves a required `cargo_door` with finite `open_fraction` in [0,1]
+and the requested direction `opening`. v1–v8 migrate the historically open
+aperture. Missing current source, invalid fractions and unknown fields reject
+before publication. Restore rebinds character/resource geometry without ticking
+or moving any fragment. Door start/end/reversal participates in automatic
+checkpoint events. Intermediate motion is included in full saves. This mechanical
+door remains independent of the aft ramp and operable in blackout; it creates
+no pressure simulation. Open bins use existing fragment IDs, ship anchors, motion
+and mass sources, with no separate container contents ledger.
+
+
+## Habitation schema 10 (#540)
+
+Current session source requires finite `habitation.bunk_open_fraction` in [0,1]
+and the manual requested direction `bunk_deploying`. v1–v9 migrate to the
+stowed base fixture. Missing current source and malformed/unknown fields reject
+atomically. Restore neither ticks motion nor creates survival effects; pause
+freezes the fraction. Galley wheel/feedback remain transient and use existing
+consumable IDs. Hygiene adds no persistent need, water ledger or health grant.
+Bunk request/end states trigger checkpoints. Full tactile/occupancy transitions
+remain #577, using the same physical clearance and source boundaries.
+
+## Physical mount schema 11 (#576)
+
+Schema 11 persists stable rail/mount/secured-item source and a carried accessory's
+physical position. Restore validates source and exact child IDs, reconstructs the
+shared one-object slot and colliders before publishing, and rejects conflicts
+atomically. Schemas 1–10 migrate without new installed fixtures, preserving old
+player/cargo clearance. Hand motion does not trigger discrete autosaves. See the
+[physical mount contract](physical-mounts.md).
+
+
+## Expanded cabin mechanisms (#577)
+
+The optional schema-12 cabin source, manual reversible fixtures, supported postures, visible restraints and native controls are implemented in [the maintained cabin contract](cabin-mechanisms.md). Historical schema-10 habitation remains the migration baseline; lighting preferences (#580), sound (#583), human comfort (#561) and hardware budgets (#563) retain their separate owners.
+
+
+## Persistent cosmetic groups (#579)
+
+Five room groups and exact furniture overrides now use the [bounded finish contract](room-finishes.md). Schema 13 preserves histories independently of divider topology; physical material replacement, future constructed room geometry (#545) and actual damage (#549) retain their owners. Shared instance tint factors are now bounded to [0,4] and cosmetic RGB is clamped before lighting; warning/functional surfaces retain authored values.
+
+
+## Instant direct-material Core upgrades (#548)
+
+The owner-authorized capacity tiers, exact receipt accounting, separate fuel/material controls and schema-14 save behavior are implemented in [Core upgrades](core-upgrades.md). Ordinary construction/commissioning and blackout throttle rules remain separate. No free charge or upgrade power/timer is introduced.
+
+
+## Construction material ownership (#543)
+
+See [construction material transactions](construction-materials.md) for exact original receipts, atomic physical refunds, schema 15, mass and the owner-approved construction economy. Timed work and completed geometry remain #544/#545.
+
+
+## Room and fixture lighting (#580)
+
+The [maintained lighting contract](room-lighting.md) describes implemented presets, independent overrides, effective bus/condition gates, shutter/Sun contribution and schema 16. Actual future damage/room creation remain #549/#545; human approval #561 and hardware budgets #563.
+
+
+## Automatic construction (#544)
+
+See [automatic construction contract](construction-progress.md) for active Core-funded timers, safety/pause admission, simple interior completion, schema 17, exact save/refund behavior, production evidence and remaining #545/#547 installation adapters.
+
+
+## Completed modular structure (#545)
+
+See the [canonical completed construction contract](modular-construction.md) for the ship assembly/shell and runtime installed/work owners, character traversal, per-cell/face identity, material mass transfer, schema-18 reconstruction/migration, partition editing and the production room evidence scenario. Gameplay damage/salvage remains #549; offline construction remains #550.
+
+
+## Construction flight readiness (#546)
+
+See [construction flight safety](construction-flight-safety.md) for schema-19 Stop/Resume, actual hull and attachment admission, cockpit warnings and airborne stop latches. Source: runtime `session/construction/flight.rs`, ship `structure/construction.rs`; regressions: runtime `session/construction/flight/tests.rs`. Run workspace and construction checks plus the production `construction-interlocks.json` evidence scenario.
+
+
+## Optional module schema 20 (#547)
+
+See the [canonical module source/migration contract](non-core-modules.md#ownership-save-and-verification). Saved construction now includes a module map keyed by the original placeholder ID, commissioned tier, persistent unavailability/fault, installed maintenance receipts and optional upgrade/restoration Funding/Work. Old envelopes reject nonempty module maps; current tier/phase, paid time, allocator and cross-owner uniqueness validate before atomic publication. Continuous maintenance time does not turn every simulation tick into a discrete checkpoint.
+
+
+## Construction damage and salvage (#549)
+
+See the [canonical damage and schema-21 contract](construction-damage.md) for runtime `session/construction/damage.rs`, ship lost-cell geometry, world sealed salvage allocation, controls, exact source/mass/identity boundaries and focused tests/evidence routes. Run workspace tests/build/Clippy/fmt plus documentation validation.
+
+
+## Offline construction schema 22 (#550)
+
+[Canonical source, migration, high-water clock, remainder, saved safety reasons and atomic launch behavior](construction-offline.md). Versions 1–21 migrate without retroactive work; ordinary restore never credits time. Closed power and eligible timed systems settle before verified launch publication; saved scene and active survival remain frozen. The independent universe envelope is unchanged.
+
+
+## Cosmetic surface age schema 23 (#581)
+
+The current envelope requires validated runtime surface exposure keyed by exact installed physical IDs, with explicit pristine migration from versions 1–22. Ordinary restore grants no time; passive age and funded Fabricator usage follow the existing verified offline transaction. Recolor/clean repairs preserve exposure; replacements start fresh. See [source, limits and tests](surface-age.md).
+
+
+## Runtime domain mapping ownership (#641)
+
+Schema 23 and its serialized section/field order are unchanged by the ownership
+extraction. `client/runtime/src/session/persistence.rs` is the explicit top-level
+layout and transaction. Runtime domain `save.rs` adapters own version admission
+and reconstruction, while `session/persistence/physical.rs` owns physical source
+validation/reconstruction and `legacy.rs` owns old propulsion conversion.
+Feature-specific rules belong to their owner; adding an actual new saved section
+still requires deliberate typed composition and the documented schema migration.
+Do not flatten unknown fields or introduce a generic registry to avoid review.
+
+`client/runtime/fixtures/save-schema23-new-run.json` was captured from parent
+`bd9a8c2` before extraction. The regression compares exact new-run bytes and
+restore/recapture bytes against it, alongside unknown-field and failed-publication
+contracts. Update a golden only with a deliberate, reviewed source/format change.
+Save-file generations, atomic storage, fallback, rollback and launch/offline
+behavior retain their existing contracts and fault-injection tests.
+
+
+## Canonical surface integration (#425)
+
+The [canonical gameplay contract](universe-gameplay.md) maps current body/frame,
+resource/physics/Fabricator integration and schema-24 definition binding to owners
+and tests. It preserves the frozen terrain and explicit historical fixtures.
+
+Canonical new journeys (#426) use `session/canonical.rs::new_canonical_run`: frozen Vesper ID, published traveler offset [14,0], conservative authored-hull clearance and a view facing the landed ship. Fresh terminal restarts preserve run serial/seed policy and grant existing supplies once; restore never grants them. Flat fixtures remain explicit; normal launch rejects prototype saves under #427. Oxygen depletion stays deferred. Tests and native evidence: `reports/issue-426/README.md`; setup `canonical-journey`.
+
+## Scanner source — schema 25 (#431)
+
+Canonical sessions require the validated versioned scanner checkpoint, parameters,
+logical UTC clock and sub-millisecond remainder. History retains exact identity,
+frame, sampled position/velocity, first/last-seen and refresh counts. Current missing
+or corrupt state rejects atomically; catalog mismatch is incompatible, not silently
+reseeded. Canonical schemas 1–24 migrate empty at checkpoint UTC; compressed test
+fixtures omit scanner source. Startup/restart binds new clocks and launch advances
+freshness exactly once without free detections. See the
+[scanner checkpoint contract](universe-scanner.md#checkpoints-and-launch-431).
+
+## Player-known chart — schema 26 (#469)
+
+Canonical saves require versioned player chart source: observed encounters,
+inferred/transmitted coordinate leads with provenance and explicit unknown/radius
+uncertainty, and voluntary immutable route snapshots. The scanner/chart pair must
+agree exactly on every verified discovery. Catalog truth alone is never a source
+of player navigation knowledge. Missing/malformed/current incompatible records,
+duplicate IDs, future timestamps and forged observed entries reject atomically.
+Versions 1–25 initialize from actual migrated scanner history only; no default
+Earth route or catalog reveal. View/selection are transient. See the
+[player chart contract](universe-scanner.md#player-known-chart-469).
+
+
+## Physical organisms and clearance (#620)
+
+[Physical organism placement](physical-organisms.md) owns stable source/part
+bindings, root/exclusion rules, common physics sweeps and live character/ship
+clearance. Vesper remains sterile; mutable harvesting/removal remains #621.
+
+
+Ordinary-play isolation (#427): [canonical runtime and prototype-save gate](universe-gameplay.md#ordinary-canonical-play-427).
+
+
+## Suit observations (#625)
+
+See [suit measurements and field marks](suit-observations.md) for source/validation
+ownership, F10/F11/F12, configuration, schema 27 and preserved scanner boundaries.
+
+
+## Personal planetary chart (#626)
+
+[Planetary chart](planetary-chart.md) maps personal history, physical inspection,
+native text/keys, uncertainty presentation and schema-28 validation to owners/tests.
+
+## Biological source journal — schema 29 (#621)
+
+[Exact source/shape/depletion/restore contract](biological-harvesting.md). Captures
+include the catalog-bound biological journal and explicit fixture context; pending
+grips/audio/caches are excluded. Versions 1–28 migrate empty; new biological data
+cannot be backdated. Natural fragment anatomy is optional on older objects.
+Publication, geometry, mass, allocator, carry and source-debit cross-checks precede
+atomic publication. Missing and partial anatomy never regrows on stream/reload.
+
+
+## Canonical motion source — schema 30 (#432)
+
+Canonical sessions persist `state.motion`: version 1, exact motion-definition SHA256 and a TT uniform game epoch. The motion publication includes the unchanged geographic SHA256. Physical ship position/velocity remain in the explicit nonrotating translating Vesper frame; the model reconstructs inertial state using the split galactic system anchor. Schema 24–29 sources lacking motion migrate from `saved_at_unix_seconds`, preserving physical, resource and geographic state. Schema-30 missing/mismatched sources and canonical motion on an engineering world reject atomically. Restore alone advances no time. Closing and launch disable engines while retaining momentum and committed paid assistance. [Full model, clock policy, numerical regime and validity limits](universe-offline-propagation.md).
+
+
+Schema-30 canonical launch settles final motion/work/scanner sub-ticks before publication (#433). Legacy construction-only remainder debt is settled before introducing the migrated motion epoch, preserving saved body-relative geography. Fatigue-only recovery, frozen survival sources, containment and paid-work receipts retain their existing owners. [Chronology and analytic scanner applicability](universe-offline-propagation.md#offline-timed-systems-and-scanner-433).
+
+
+## Asynchronous launch publication (#434)
+
+The native menu owns admission while one worker reads/reconstructs/propagates/verifies and atomically checkpoints through SaveManager. Verified source bytes reconstruct thread-local domain caches on the main thread; no private partial source is playable. Continue also waits for the restored camera region to be ready. A rollback/invalid clock or pre-publication cancellation leaves recoverable generations intact. Retry starts a new verified attempt, without a public staging save slot. Menu wall time does not erase previously admitted saved backlog. [Full source/IO/region contract](universe-offline-propagation.md#native-progress-and-verified-resume-434).
+
+
+Unknown present canonical world/motion publications are incompatible catalogs,
+not corrupt generations eligible for a fresh bootstrap. Launch preserves both
+slots and shows a compatible-version recovery message. Malformed/absent required
+source retains the existing validation/fallback policy. Tests: runtime
+`launch::incompatible_tests` exercises both publication pointers with valid-length
+unknown digests and byte-exact slot preservation.
+
+
+## Narrative inspections — schema 31 (#470)
+
+Current saves require `state.narrative` version 1, two optional first-inspection UTC-millisecond values bounded by the scanner clock, and no transient reader state. Schemas 1–30 without this source migrate to no inspections. Recovered `salimon-site` chart entries must match the exact versioned packet source/position/uncertainty and completed paid work; invalid combinations fail before publication. See [source/interaction ownership](opening-and-investigations.md).

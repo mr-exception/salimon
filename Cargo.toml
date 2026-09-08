@@ -1,5 +1,5 @@
 [workspace]
-members = ["client/runtime"]
+members = ["client/renderer", "client/runtime"]
 default-members = ["client/runtime"]
 resolver = "3"
 
@@ -8,6 +8,13 @@ version = "0.1.0"
 edition = "2024"
 rust-version = "1.89"
 publish = false
+
+[workspace.dependencies]
+env_logger = "=0.11.8"
+log = "=0.4.29"
+pollster = "=0.4.0"
+wgpu = "=30.0.1"
+winit = "=0.30.13"
 
 [workspace.lints.rust]
 unsafe_code = "deny"

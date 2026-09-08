@@ -5,16 +5,16 @@ current milestone is **Phase 0 — Technical Feasibility Showcase**: a native ma
 client-only prototype using a custom `wgpu` renderer, with Windows and web as
 later targets. The reference performance machine is a MacBook Air M1.
 
-This repository implements **task 1: Create Phase 0 repository shell**. The client
-currently prints a startup message and exits successfully. Native windowing,
-input, GPU initialization, and the render loop belong to task 2; there is no
-playable scene yet.
+This repository implements **task 2: Bootstrap native macOS runtime and `wgpu`
+renderer**. The client opens a native, resizable window and continuously renders
+a bootstrap triangle through `wgpu`. This proves the application lifecycle and
+GPU presentation path; it is not yet a playable scene.
 
 ## Source of requirements
 
 The [Salimon Notion space](https://app.notion.com/p/801c9c427af24e9b8d57b07572ef4119)
 holds the task list and documentation. Start with
-[task 1](https://app.notion.com/p/3d5b456853b981e485dfcc5d8dc86c9f), the
+[task 2](https://app.notion.com/p/3d5b456853b981e0b34ec086b885ddb7), the
 [Phase 0 specification](https://app.notion.com/p/3d5b456853b981db968dca1901a270a2), and
 [Technical Architecture & AI Maintenance](https://app.notion.com/p/3d5b456853b981078a82c68207f4444e).
 [AGENTS.md](AGENTS.md) describes how future agents should access those sources;
@@ -29,8 +29,8 @@ salimon/
 ├── core/
 │   └── README.md       # Future backend boundary; no Phase 0 implementation
 └── client/
-    ├── runtime/        # salimon-client executable and future orchestration
-    ├── renderer/       # Future GPU resources and rendering
+    ├── runtime/        # salimon-client lifecycle and composition executable
+    ├── renderer/       # salimon-renderer GPU library and bootstrap scene
     ├── world/          # Future portable scene/domain state
     ├── character/      # Future first-person character behavior
     ├── ship/           # Future ship state and control
@@ -39,9 +39,11 @@ salimon/
     └── diagnostics/    # Future engineering metrics and overlay
 ```
 
-Only `client/runtime/` is a Cargo package today. The other client directories
-document ownership until their implementation tasks begin. See
-[client/README.md](client/README.md) for the intended dependency boundaries.
+`client/runtime/` and `client/renderer/` are Cargo packages. The other client
+directories document ownership until their implementation tasks begin. The
+runtime drives native lifecycle and timing, while the renderer owns `wgpu`
+resources and presentation. See [client/README.md](client/README.md) for the
+dependency boundaries.
 
 ## macOS setup
 
@@ -60,10 +62,11 @@ document ownership until their implementation tasks begin. See
 `rust-toolchain.toml` selects stable Rust and the formatting/linting components.
 The workspace uses Rust 2024 and requires Rust 1.89 or newer. The stable channel
 is intentionally not an exact compiler pin; record compiler versions when
-reporting validation or performance. Task 1 was verified with Rust/Cargo 1.89.0
+reporting validation or performance. Task 2 was verified with Rust/Cargo 1.89.0
 on native Apple Silicon macOS (`aarch64-apple-darwin`). Intel macOS is not yet
-verified. The shell has no third-party dependencies and needs no credentials,
-Notion access, or network connection to build once Rust is installed.
+verified. The first build may need network access to download the locked `winit`
+and `wgpu` dependency graph. Running the client needs no credentials or Notion
+connection.
 
 ## Build and run
 
@@ -74,12 +77,10 @@ cargo build --workspace --locked
 cargo run --locked -p salimon-client
 ```
 
-Expected output:
-
-```text
-Salimon Phase 0: repository shell ready.
-Native window and rendering will be added in task 2.
-```
+The run command opens the **Salimon Phase 0** native window and continues until
+the window is closed. A colored triangle on the clear background confirms that
+the `wgpu` surface, render pipeline, command submission, and presentation path
+are active.
 
 For an optimized native build:
 
@@ -90,6 +91,22 @@ cargo run --locked --release -p salimon-client
 
 Cargo builds for the host architecture by default; outputs go to the ignored
 root `target/` directory. No application bundle or installer exists yet.
+
+### Native smoke check
+
+Task 2 requires an interactive check on macOS in addition to automated tests:
+
+1. Launch the client and confirm the bootstrap triangle is visible.
+2. Resize the window repeatedly, including to a very small size, and confirm
+   rendering follows the new drawable size without a panic or validation error.
+3. Minimize and restore the window, then confirm rendering resumes.
+4. Close the window, launch the client again, and confirm both shutdown and
+   relaunch are clean.
+
+The runtime maintains monotonic frame timing for future consumers, but it does
+not display FPS or profiling metrics. The optional engineering overlay belongs
+to Task 3. This bootstrap does not establish the later Phase 0 performance target
+at fixed 1920x1080.
 
 ## Development workflow
 
@@ -103,11 +120,10 @@ cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo test --workspace --locked
 ```
 
-Use `cargo fmt --all` to apply formatting. The test command currently discovers
-zero tests: this shell has no simulation or gameplay behavior. Its acceptance
-checks are a successful native build, clean formatting/linting, the startup
-smoke run, and the documented directory boundaries. Add behavior-specific tests
-as implementation tasks introduce contracts and invariants.
+Use `cargo fmt --all` to apply formatting. Automated tests cover logic that does
+not require a live native surface; the native launch, drawing, resize, minimize,
+restore, and close behavior still require the smoke check above. Task 2 does not
+add simulation or gameplay behavior.
 
 Add future crates explicitly to the root workspace and inherit its package
 metadata and lints. Keep `Cargo.lock` committed; validate normal changes with

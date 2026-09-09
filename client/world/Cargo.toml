@@ -1,0 +1,10 @@
+[package]
+name = "salimon-world"
+description = "Portable large-scale coordinates and camera prototype for Salimon"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

@@ -21,8 +21,9 @@ font, CPU rasterization, the overlay pixel revision, and unavailable-state
 semantics. It uses only the Rust standard library.
 
 Callers own all source measurements. Keep `FrameSample`, `DomainMetrics`, and
-`OverlayImage` typed and narrow. Do not add `winit`, `wgpu`, world, character, or
-ship dependencies here; doing so would invert the intended observation flow.
+`OverlayImage` typed and narrow. Camera telemetry must remain explicitly distinct
+from player and ship state. Do not add `winit`, `wgpu`, world, character, or ship
+dependencies here; doing so would invert the intended observation flow.
 
 ## Change checklist
 

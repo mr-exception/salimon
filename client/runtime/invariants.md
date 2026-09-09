@@ -6,8 +6,8 @@
    a GPU surface.
 3. Every accepted nonzero resize reaches the renderer before the next presented
    frame.
-4. Frame intervals come from a monotonic clock and clamp unreported long OS
-   stalls; the renderer never owns or advances simulation time.
+4. Frame and update intervals come from monotonic clocks and clamp unreported
+   long OS stalls; the renderer never owns or advances simulation time.
 5. Recoverable surface loss rebuilds or reconfigures rendering state. A transient
    surface acquisition failure is delayed and does not crash or hot-loop the
    application.
@@ -23,3 +23,7 @@
     it never becomes authoritative state or changes simulation behavior.
 11. Suspension, occlusion, zero-sized drawables, and renderer reconstruction
     reset the rolling timing window before presentation resumes.
+12. Native input is translated into typed portable commands; `winit` event types
+    never enter the world crate.
+13. Renderer reconstruction preserves portable camera state. Lifecycle gaps
+    reset the update clock so the prototype cannot jump forward on resume.

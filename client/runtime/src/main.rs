@@ -2,6 +2,7 @@
 
 mod app;
 mod frame_clock;
+mod update_clock;
 
 use std::process::ExitCode;
 

@@ -8,7 +8,7 @@ and renderer composition:
 ```text
 runtime timing ------\
 renderer counters ----> FrameSample + DomainMetrics -> Diagnostics
-future domain state --/                              -> OverlayImage
+world/domain state --/                               -> OverlayImage
                                                            |
                                                            v
                                                   renderer composition
@@ -16,9 +16,10 @@ future domain state --/                              -> OverlayImage
 
 The runtime owns input, lifecycle, redraw scheduling, and measurement cadence.
 The renderer owns GPU timestamps, allocator reports, render counters, texture
-upload, and blending. Future domain modules own player, ship, and world state.
-Diagnostics borrows those values for one call and stores only a formatted
-snapshot; it never receives raw platform events or GPU/domain resources.
+upload, and blending. `salimon-world` owns the current camera prototype; future
+domain modules own player, ship, and production world state. Diagnostics borrows
+those values for one call and stores only a formatted snapshot; it never
+receives raw platform events or GPU/domain resources.
 
 ## Data flow
 
@@ -40,9 +41,10 @@ snapshot; it never receives raw platform events or GPU/domain resources.
 
 GPU timing is a three-state value because timestamp queries are optional and
 readback is asynchronous. Memory and domain fields are optional because platform
-support and later Phase 0 systems arrive incrementally. The formatted panel
-states those gaps explicitly instead of treating zero as missing or fabricating
-sample data.
+support and Phase 0 systems arrive incrementally. Task 4 camera telemetry is
+named separately from future player and ship positions so an engineering camera
+is never presented as gameplay state. The formatted panel states gaps explicitly
+instead of treating zero as missing or fabricating sample data.
 
 ## Performance model
 

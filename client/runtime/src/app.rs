@@ -5,8 +5,10 @@ use std::time::{Duration, Instant};
 
 use salimon_diagnostics::{Diagnostics, DomainMetrics, FrameSample, GpuMemory, GpuTime};
 use salimon_renderer::{
-    GpuFrameTime, OverlayImage as RendererOverlayImage, RenderOutcome, Renderer, SurfaceSize,
+    CameraFrame, GpuFrameTime, OverlayImage as RendererOverlayImage, RenderOutcome, Renderer,
+    SceneFrame, SceneInstance, SurfaceSize,
 };
+use salimon_world::{CameraCommand, CameraPrototype, PrototypeSnapshot, TransitionPhase};
 use winit::application::ApplicationHandler;
 use winit::dpi::LogicalSize;
 use winit::event::{ElementState, WindowEvent};
@@ -15,8 +17,9 @@ use winit::keyboard::{KeyCode, PhysicalKey};
 use winit::window::{Window, WindowAttributes, WindowId};
 
 use crate::frame_clock::FrameClock;
+use crate::update_clock::UpdateClock;
 
-const WINDOW_TITLE: &str = "Salimon — Phase 0 Renderer Bootstrap";
+const WINDOW_TITLE: &str = "Salimon — Large-Scale Camera Prototype";
 const INITIAL_WIDTH: f64 = 1280.0;
 const INITIAL_HEIGHT: f64 = 720.0;
 const MINIMUM_WIDTH: f64 = 640.0;
@@ -69,6 +72,8 @@ struct ClientApplication {
     window: Option<Arc<Window>>,
     renderer: Option<Renderer>,
     frame_clock: FrameClock,
+    update_clock: UpdateClock,
+    camera_prototype: CameraPrototype,
     diagnostics: Diagnostics,
     render_attempts: u64,
     retry_at: Option<Instant>,
@@ -124,6 +129,7 @@ impl ClientApplication {
         self.render_attempts = 0;
         self.retry_at = None;
         self.frame_clock.reset_interval();
+        self.update_clock.reset();
         self.diagnostics.reset_frame_window();
         Ok(())
     }
@@ -150,6 +156,7 @@ impl ClientApplication {
         } else {
             event_loop.set_control_flow(ControlFlow::Wait);
             self.frame_clock.reset_interval();
+            self.update_clock.reset();
             self.diagnostics.reset_frame_window();
         }
     }
@@ -163,12 +170,19 @@ impl ClientApplication {
     fn redraw(&mut self, event_loop: &ActiveEventLoop, window: Arc<Window>) {
         if self.occluded {
             self.frame_clock.reset_interval();
+            self.update_clock.reset();
             self.diagnostics.reset_frame_window();
             return;
         }
 
         self.render_attempts = self.render_attempts.saturating_add(1);
         let render_started_at = Instant::now();
+        let update_started_at = Instant::now();
+        let update_delta = self.update_clock.step(update_started_at);
+        self.camera_prototype.advance(update_delta);
+        let prototype_snapshot = self.camera_prototype.snapshot();
+        let (camera, scene_instances) = map_prototype_to_renderer(prototype_snapshot);
+        let cpu_update_time = update_started_at.elapsed();
         let overlay_image = self
             .diagnostics
             .overlay()
@@ -182,8 +196,14 @@ impl ClientApplication {
             .renderer
             .as_mut()
             .expect("redraws require an initialized renderer")
-            .render(overlay_image, || window.pre_present_notify())
-        {
+            .render(
+                SceneFrame {
+                    camera,
+                    instances: &scene_instances,
+                },
+                overlay_image,
+                || window.pre_present_notify(),
+            ) {
             Ok(outcome) => outcome,
             Err(error) => {
                 self.fail(event_loop, error);
@@ -212,7 +232,7 @@ impl ClientApplication {
                         frame_number: timing.frame_number,
                         frame_interval: timing.frame_interval,
                         cpu_render_time: render_stats.cpu_render_time,
-                        cpu_update_time: None,
+                        cpu_update_time: Some(cpu_update_time),
                         gpu_time: match render_stats.gpu_frame_time {
                             GpuFrameTime::Unsupported => GpuTime::Unsupported,
                             GpuFrameTime::Pending => GpuTime::Pending,
@@ -227,17 +247,18 @@ impl ClientApplication {
                             reserved_bytes: memory.reserved_bytes,
                         }),
                     },
-                    DomainMetrics::default(),
+                    camera_domain_metrics(prototype_snapshot),
                 );
                 if timing.frame_number == 1
                     || timing.frame_number.is_multiple_of(TIMING_LOG_INTERVAL)
                 {
                     log::debug!(
                         target: "salimon_client::frame",
-                        "frame={} interval_ms={:.3} present_wall_ms={:.3} cpu_render_ms={:.3} gpu_time={:?}",
+                        "frame={} interval_ms={:.3} present_wall_ms={:.3} cpu_update_ms={:.3} cpu_render_ms={:.3} gpu_time={:?}",
                         timing.frame_number,
                         timing.frame_interval.as_secs_f64() * 1_000.0,
                         timing.submission_wall_time.as_secs_f64() * 1_000.0,
+                        cpu_update_time.as_secs_f64() * 1_000.0,
                         render_stats.cpu_render_time.as_secs_f64() * 1_000.0,
                         render_stats.gpu_frame_time
                     );
@@ -247,6 +268,7 @@ impl ClientApplication {
             RenderOutcome::Retry => self.schedule_retry(event_loop, RENDER_RETRY_DELAY),
             RenderOutcome::Idle => {
                 self.frame_clock.reset_interval();
+                self.update_clock.reset();
                 self.diagnostics.reset_frame_window();
                 if surface_size(&window).is_drawable() {
                     self.schedule_retry(event_loop, IDLE_RETRY_DELAY);
@@ -295,6 +317,7 @@ impl ApplicationHandler for ClientApplication {
         self.renderer = None;
         self.retry_at = None;
         self.frame_clock.reset_interval();
+        self.update_clock.reset();
         self.diagnostics.reset_frame_window();
         log::info!("application suspended; GPU presentation resources released");
     }
@@ -319,6 +342,7 @@ impl ApplicationHandler for ClientApplication {
                 self.window = None;
                 self.retry_at = None;
                 self.frame_clock.reset_interval();
+                self.update_clock.reset();
                 self.diagnostics.reset_frame_window();
                 event_loop.exit();
             }
@@ -334,6 +358,7 @@ impl ApplicationHandler for ClientApplication {
                 self.occluded = is_occluded;
                 self.retry_at = None;
                 self.frame_clock.reset_interval();
+                self.update_clock.reset();
                 self.diagnostics.reset_frame_window();
                 if is_occluded {
                     event_loop.set_control_flow(ControlFlow::Wait);
@@ -349,6 +374,18 @@ impl ApplicationHandler for ClientApplication {
                 log::info!(
                     "engineering diagnostics overlay {} (F3 toggles)",
                     if visible { "visible" } else { "hidden" }
+                );
+                window.request_redraw();
+            }
+            WindowEvent::KeyboardInput { event, .. }
+                if camera_command(event.state, event.repeat, event.physical_key).is_some() =>
+            {
+                let command = camera_command(event.state, event.repeat, event.physical_key)
+                    .expect("guard accepts only camera commands");
+                self.camera_prototype.apply_command(command);
+                log::info!(
+                    "camera prototype command: {command:?}; paused={}",
+                    self.camera_prototype.is_paused()
                 );
                 window.request_redraw();
             }
@@ -396,9 +433,65 @@ fn is_diagnostics_toggle(state: ElementState, repeat: bool, key: PhysicalKey) ->
     state == ElementState::Pressed && !repeat && key == PhysicalKey::Code(KeyCode::F3)
 }
 
+fn camera_command(state: ElementState, repeat: bool, key: PhysicalKey) -> Option<CameraCommand> {
+    if state != ElementState::Pressed || repeat {
+        return None;
+    }
+
+    match key {
+        PhysicalKey::Code(KeyCode::KeyP) => Some(CameraCommand::TogglePause),
+        PhysicalKey::Code(KeyCode::KeyR) => Some(CameraCommand::Restart),
+        PhysicalKey::Code(KeyCode::KeyN) => Some(CameraCommand::JumpToNear),
+        _ => None,
+    }
+}
+
+fn map_prototype_to_renderer(snapshot: PrototypeSnapshot<'_>) -> (CameraFrame, Vec<SceneInstance>) {
+    let camera = CameraFrame {
+        position_meters: snapshot.camera.position.meters(),
+        target_meters: snapshot.camera.target.meters(),
+        up: snapshot.camera.up.map(|component| component as f32),
+        vertical_fov_radians: snapshot.camera.vertical_field_of_view_radians as f32,
+        near_plane_meters: snapshot.camera.physical_near_plane_meters as f32,
+    };
+    let instances = snapshot
+        .primitives
+        .iter()
+        .map(|primitive| SceneInstance {
+            center_meters: primitive.absolute_center.meters(),
+            half_extents_meters: primitive.half_extents_meters,
+            color: primitive.color,
+        })
+        .collect();
+
+    (camera, instances)
+}
+
+fn camera_domain_metrics(snapshot: PrototypeSnapshot<'_>) -> DomainMetrics<'static> {
+    DomainMetrics {
+        camera_position: Some(snapshot.camera.position.meters()),
+        camera_altitude_meters: Some(snapshot.camera.altitude_meters),
+        camera_phase: Some(transition_phase_name(snapshot.transition_phase)),
+        camera_paused: Some(snapshot.paused),
+        ..DomainMetrics::default()
+    }
+}
+
+const fn transition_phase_name(phase: TransitionPhase) -> &'static str {
+    match phase {
+        TransitionPhase::Approach => "approach",
+        TransitionPhase::NearDwell => "near dwell",
+        TransitionPhase::Retreat => "retreat",
+        TransitionPhase::FarDwell => "far dwell",
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::is_diagnostics_toggle;
+    use super::{
+        camera_command, camera_domain_metrics, is_diagnostics_toggle, map_prototype_to_renderer,
+    };
+    use salimon_world::{CameraCommand, CameraPrototype};
     use winit::event::ElementState;
     use winit::keyboard::{KeyCode, PhysicalKey};
 
@@ -414,5 +507,79 @@ mod tests {
             false,
             PhysicalKey::Code(KeyCode::F2),
         ));
+    }
+
+    #[test]
+    fn camera_keys_map_only_initial_physical_presses() {
+        assert_eq!(
+            camera_command(
+                ElementState::Pressed,
+                false,
+                PhysicalKey::Code(KeyCode::KeyP),
+            ),
+            Some(CameraCommand::TogglePause)
+        );
+        assert_eq!(
+            camera_command(
+                ElementState::Pressed,
+                false,
+                PhysicalKey::Code(KeyCode::KeyR),
+            ),
+            Some(CameraCommand::Restart)
+        );
+        assert_eq!(
+            camera_command(
+                ElementState::Pressed,
+                false,
+                PhysicalKey::Code(KeyCode::KeyN),
+            ),
+            Some(CameraCommand::JumpToNear)
+        );
+        assert_eq!(
+            camera_command(
+                ElementState::Pressed,
+                true,
+                PhysicalKey::Code(KeyCode::KeyP),
+            ),
+            None
+        );
+        assert_eq!(
+            camera_command(
+                ElementState::Released,
+                false,
+                PhysicalKey::Code(KeyCode::KeyN),
+            ),
+            None
+        );
+        assert_eq!(
+            camera_command(
+                ElementState::Pressed,
+                false,
+                PhysicalKey::Code(KeyCode::KeyW),
+            ),
+            None
+        );
+    }
+
+    #[test]
+    fn runtime_mapping_preserves_absolute_world_values_and_fixture_telemetry() {
+        let snapshot = CameraPrototype::default().snapshot();
+        let (camera, instances) = map_prototype_to_renderer(snapshot);
+        let metrics = camera_domain_metrics(snapshot);
+
+        assert_eq!(camera.position_meters, snapshot.camera.position.meters());
+        assert_eq!(camera.target_meters, snapshot.camera.target.meters());
+        assert_eq!(instances.len(), snapshot.primitives.len());
+        assert_eq!(
+            instances[0].center_meters,
+            snapshot.primitives[0].absolute_center.meters()
+        );
+        assert_eq!(metrics.camera_position, Some(camera.position_meters));
+        assert_eq!(
+            metrics.camera_altitude_meters,
+            Some(snapshot.camera.altitude_meters)
+        );
+        assert_eq!(metrics.camera_phase, Some("approach"));
+        assert_eq!(metrics.camera_paused, Some(false));
     }
 }

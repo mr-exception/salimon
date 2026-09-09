@@ -1,38 +1,80 @@
 # Renderer
 
-`salimon-renderer` is the custom rendering library introduced in Task 2 and
-instrumented in Task 3. It uses `wgpu` 30.0.1 to initialize the native
-surface/device/queue, draw the bootstrap triangle, composite an optional generic
-RGBA overlay, and report renderer-owned measurements. The triangle remains a
-presentation-path proof, not game or world content.
+`salimon-renderer` is the custom `wgpu` 30.0.1 rendering library introduced in
+Task 2, instrumented in Task 3, and extended with the Task 4 large-scale camera
+prototype. It draws generic instanced cuboids, composites an optional borrowed
+RGBA overlay, and reports renderer-owned measurements. The cuboids are
+validation geometry, not canonical world or Solar System content.
 
 The public integration surface is intentionally narrow:
 
 - `Renderer::new` initializes window-bound GPU state.
-- `Renderer::resize` updates the drawable surface size.
-- `Renderer::render` accepts an optional borrowed `OverlayImage`, records,
-  submits, and presents one frame, then returns `RenderStats` with a successful
-  `RenderOutcome::Presented`.
+- `Renderer::resize` updates the color surface and matching depth target.
+- `Renderer::render` accepts a borrowed `SceneFrame`, an optional borrowed
+  `OverlayImage`, and the platform presentation callback.
+- `CameraFrame` and `SceneInstance` carry renderer-facing snapshots without a
+  dependency on world, character, or ship crates.
 
-The renderer owns GPU resources, surface configuration, shader/pipeline state,
-render passes, generic overlay composition, and presentation. It does not own
-the native event loop, frame clock, lifecycle policy, diagnostics content or
-visibility policy, or authoritative game/world state. Surface acquisition
-failures are reported to the runtime so the runtime can choose recovery or
-shutdown behavior.
+## Large-scale coordinate and depth strategy
 
-`RenderStats` reports CPU encoding/submission wall time, the bootstrap scene's
-visible/rendered object count, scene draw calls, total draw calls including the
-optional overlay, GPU pass time, and GPU allocator totals. Timestamp queries are requested only when the adapter
-optional overlay, GPU pass time, and GPU allocator totals. Timestamp queries are
-requested only when the adapter supports them and are read through a
-non-blocking three-slot ring. Until the first result arrives, timing is
-`Pending`; unsupported adapters report `Unsupported`. Allocator totals are
-sampled periodically and remain unavailable when the backend cannot generate a
-report. These are renderer/GPU metrics, not process RSS or gameplay state.
+Camera and instance centers cross the public boundary as finite `f64` metres.
+Every instance center is subtracted from the camera position on the CPU while
+both values are still `f64`; only that camera-relative delta is converted to
+`f32` for the GPU. Camera target minus camera position follows the same rule.
+The GPU therefore never subtracts two rounded, large absolute `f32` positions.
+
+The camera uses a right-handed, infinite reverse-Z perspective projection in
+WebGPU's zero-to-one depth range. A `Depth32Float` attachment is cleared to
+`0.0`, scene fragments compare with `Greater`, and the near plane maps to `1.0`.
+Depth approaches zero with distance and has no finite far plane. The caller
+still owns the near-plane choice; `0.05 m` is the Task 4 validation value and
+should only be reduced when close geometry requires it.
+
+The renderer's adjacent-depth-value test measures the view-space separation
+represented by `Depth32Float` with that near plane:
+
+| View distance | Adjacent reverse-Z distance step |
+| ---: | ---: |
+| `12 m` | about `0.00000134 m` |
+| `120 Mm` | about `7.99 m` |
+
+These values quantify depth-buffer resolution, not whole-object precision.
+Large geometry can lose more precision while its vertices are reconstructed,
+as described below.
+
+Representative IEEE-754 spacing shows the useful envelope and the remaining
+limitation:
+
+| Magnitude | `f64` absolute spacing | `f32` camera-relative spacing |
+| ---: | ---: | ---: |
+| `1 km` | much less than `1 nm` | about `0.061 mm` |
+| `1 Mm` | about `0.116 nm` | `0.0625 m` |
+| `1 Gm` | about `0.00012 mm` | `64 m` |
+| `1 Tm` | about `0.122 mm` | `65.536 km` |
+
+Near-camera detail keeps local `f32` precision even when the absolute camera
+origin is `1 Tm` from zero; the translation-invariance unit test covers that
+case. Far-away instance centers still inherit `f32` spacing based on their
+camera distance. Later LOD or planet rendering must avoid expecting metre-scale
+mesh detail to survive at gigametre/terametre relative distances. Task 4 does
+not add logarithmic depth, split coordinates in WGSL, multiple depth passes, or
+planet-specific proxies because reverse-Z plus camera-relative input is enough
+to validate the foundational path without taking Task 5 or Task 6 scope.
+
+## Ownership and metrics
+
+The renderer owns GPU resources, surface/depth configuration, shader and
+pipeline state, command encoding, generic overlay composition, timestamp
+readback, allocator reporting, and presentation. It does not own the native
+event loop, frame clock, lifecycle policy, diagnostics content, or authoritative
+game/world state.
+
+Task 4 uses conservative bounding-sphere frustum culling but no occlusion
+culling. `RenderStats` reports the retained visible/rendered instance count,
+zero scene draws for an empty retained set or one otherwise, and adds the
+overlay draw only when visible. GPU timestamps remain capability-gated and use
+the existing non-blocking three-slot readback ring.
 
 Run the library through `cargo run --locked -p salimon-client`. See
 [README.ai.md](README.ai.md), [architecture.md](architecture.md), and
-[invariants.md](invariants.md) before changing its contract. The Task 3 overlay
-does not claim the later Phase 0 1920x1080 performance target; Task 11 owns that
-benchmark.
+[invariants.md](invariants.md) before changing its contract.

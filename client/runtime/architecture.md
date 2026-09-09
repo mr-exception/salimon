@@ -8,15 +8,17 @@ that future portable simulation code may consume.
 
 ```text
 winit event loop
-    -> salimon-client lifecycle + frame clock + diagnostics composition
+    -> salimon-client lifecycle + frame/update clocks + typed key mapping
+        -> salimon-world camera/precision prototype + renderer-neutral snapshot
         -> salimon-diagnostics aggregation / RGBA view
-        -> salimon-renderer new / resize / render
-            -> wgpu surface and GPU work
+        -> map snapshot -> salimon-renderer new / resize / render
+            -> wgpu surface, camera-relative conversion, depth, and presentation
 ```
 
-The dependency direction is one-way: the runtime depends on diagnostics and the
-renderer. Neither supporting crate calls into the runtime, and no current crate
-depends on future world, character, or ship modules.
+The dependency direction is one-way: the runtime depends on world, diagnostics,
+and the renderer. Supporting crates never call into the runtime; the renderer
+and diagnostics do not depend on world. Runtime mapping prevents portable world
+types from acquiring `wgpu` or `winit` dependencies.
 
 ## Lifecycle flow
 
@@ -25,22 +27,26 @@ depends on future world, character, or ship modules.
    is not configured or rendered.
 3. Schedule redraws while the application has a live, drawable window, and use a
    short delayed retry when the presentation surface is temporarily unavailable.
-4. For each successfully presented redraw, record monotonic frame timing after
-   the renderer submits and presents the frame, then combine it with renderer
-   measurements for diagnostics.
-5. Recover from surface loss through renderer reconstruction/reconfiguration;
+4. Before each drawable render attempt, advance the Task 4 portable prototype
+   with a bounded monotonic delta, map its snapshot to renderer DTOs, and measure
+   that real update work.
+5. For each successfully presented redraw, record monotonic frame timing after
+   the renderer submits and presents the frame, then combine it with renderer,
+   update, and camera measurements for diagnostics.
+6. Recover from surface loss through renderer reconstruction/reconfiguration;
    treat transient acquisition failures as nonfatal and report unrecoverable
    renderer failures before exiting.
-6. On a close request, stop the event loop and release window/GPU state cleanly.
+7. On a close request, stop the event loop and release window/GPU state cleanly.
 
 ## Diagnostics flow
 
-F3 initial key presses toggle the diagnostics crate; releases and key-repeat
-events are ignored. The runtime maps renderer measurements into diagnostics
-observations without sharing `wgpu` or `winit` types. The diagnostics crate owns
-aggregation and the RGBA panel, while the renderer owns only generic image
-composition. Future world/ship tasks provide optional typed domain metrics at
-this composition point.
+F3 initial key presses toggle diagnostics. P toggles the camera fixture, R
+restarts it, and N selects and pauses the exact near-surface inspection view;
+releases and key-repeat events are ignored. The runtime maps native keys to typed
+commands and renderer/world measurements to diagnostics without sharing `wgpu`
+or `winit` types. Diagnostics owns aggregation and the RGBA panel, while the
+renderer owns only generic image composition. Camera metrics remain separate
+from unavailable future player/ship state.
 
 ## Evolution
 

@@ -18,11 +18,13 @@ and ship modules provide optional domain values through `DomainMetrics`.
 - `FrameSample` carries one successfully presented frame's runtime and renderer
   measurements. Zero frame intervals are retained as the latest state but are
   excluded from the rolling statistics window.
-- `DomainMetrics` and `BodyDistance` borrow caller-owned state. Missing future
-  world, character, or ship measurements render as `N/A`; the diagnostics layer
-  never invents positions, speeds, or distances.
+- `DomainMetrics` and `BodyDistance` borrow caller-owned state. Camera prototype
+  telemetry is explicitly named; missing future world, character, or ship
+  measurements render as `N/A`. The diagnostics layer never invents positions,
+  speeds, or distances.
 - `overlay` returns a borrowed `OverlayImage` only while diagnostics are visible.
-  The renderer can use `revision` to avoid uploading unchanged pixels.
+  The renderer can use `revision` to avoid uploading unchanged pixels and scales
+  the panel down uniformly when the drawable cannot contain it at source size.
 - `overlay_text` exposes the matching text snapshot for tests, logging, and
   accessibility-oriented inspection.
 
@@ -35,10 +37,11 @@ display-density changes, frame-window resets, and memory warnings.
 
 - FPS is derived from the average nonzero presented-frame interval. Frame time
   shows average and nearest-rank p95 values for the same rolling window.
-- CPU render and update times are averages of supplied samples. The current
-  runtime supplies renderer encoding/submission wall time, excluding present
-  wait; missing simulation-update timing is shown as `N/A` and excluded from its
-  average.
+- CPU render and update times are averages of supplied samples. The runtime
+  supplies renderer encoding/submission wall time, excluding present wait, and
+  Task 4 supplies the measured portable-prototype update/mapping time. A future
+  frame with unavailable update timing would still show `N/A` and be excluded
+  from that average.
 - GPU timing distinguishes unsupported hardware, an asynchronous result that is
   pending, and a measured duration. CPU submission time must never be supplied
   as GPU time.
@@ -46,8 +49,10 @@ display-density changes, frame-window resets, and memory warnings.
   Producers must document whether a count includes diagnostic composition.
 - GPU allocator memory is optional and reports allocated/reserved bytes. It is
   not a claim about whole-process memory.
-- Position, velocity, speed, and body-distance values use meters as their input
-  unit and are formatted with practical metric prefixes.
+- Camera/player/ship position, camera altitude, velocity, speed, and
+  body-distance values use meters as their input unit and are formatted with
+  practical metric prefixes. Camera phase and pause state describe only the
+  Task 4 engineering transition fixture.
 
 Normal gameplay flight information still belongs on cockpit displays. This
 overlay is an engineering surface and must remain optional.

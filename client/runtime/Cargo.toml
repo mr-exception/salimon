@@ -15,4 +15,5 @@ log.workspace = true
 pollster.workspace = true
 salimon-diagnostics = { path = "../diagnostics" }
 salimon-renderer = { path = "../renderer" }
+salimon-world = { path = "../world" }
 winit.workspace = true

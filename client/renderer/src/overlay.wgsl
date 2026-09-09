@@ -1,5 +1,5 @@
 struct OverlayDimensions {
-    surface_and_image: vec4<f32>,
+    surface_and_display: vec4<f32>,
 }
 
 @group(0) @binding(0)
@@ -24,10 +24,10 @@ fn vs_main(@builtin(vertex_index) vertex_index: u32) -> VertexOutput {
         vec2<f32>(1.0, 1.0),
     );
     let corner = corners[vertex_index];
-    let surface_size = dimensions.surface_and_image.xy;
-    let image_size = dimensions.surface_and_image.zw;
+    let surface_size = dimensions.surface_and_display.xy;
+    let display_size = dimensions.surface_and_display.zw;
     let margin = vec2<f32>(16.0, 16.0);
-    let pixel_position = margin + corner * image_size;
+    let pixel_position = margin + corner * display_size;
     let ndc = vec2<f32>(
         pixel_position.x / surface_size.x * 2.0 - 1.0,
         1.0 - pixel_position.y / surface_size.y * 2.0,

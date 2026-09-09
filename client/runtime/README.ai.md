@@ -18,8 +18,9 @@ coordination of client capabilities. It is not a gameplay domain.
 
 The runtime owns the `winit` application handler, native window lifetime,
 renderer orchestration, resize and redraw routing, surface-loss recovery policy,
-monotonic frame clock, F3 routing, and diagnostics composition. Its outbound
-dependencies are `salimon-renderer` and `salimon-diagnostics`.
+monotonic frame/update clocks, typed input routing, and client composition. Its
+outbound dependencies are `salimon-world`, `salimon-renderer`, and
+`salimon-diagnostics`.
 
 Do not add GPU pipelines/resources, authoritative world or ship state, backend
 behavior, persistence, or networking here. Keep new platform-specific behavior
@@ -29,6 +30,10 @@ necessary.
 ## Change checklist
 
 - Preserve the lifecycle and timing invariants.
+- Translate native keys into typed world commands; never pass `winit` events to
+  portable code.
+- Keep camera state through renderer rebuilds while resetting the monotonic
+  update interval across lifecycle discontinuities.
 - Keep the renderer call surface narrow and typed.
 - Keep diagnostics observational: map typed snapshots at the composition root
   and do not fabricate unavailable world or ship values.

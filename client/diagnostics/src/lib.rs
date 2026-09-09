@@ -56,6 +56,10 @@ pub struct BodyDistance<'a> {
 /// Missing values are rendered as unavailable rather than as synthetic zeroes.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct DomainMetrics<'a> {
+    pub camera_position: Option<[f64; 3]>,
+    pub camera_altitude_meters: Option<f64>,
+    pub camera_phase: Option<&'a str>,
+    pub camera_paused: Option<bool>,
     pub player_position: Option<[f64; 3]>,
     pub ship_position: Option<[f64; 3]>,
     pub ship_velocity: Option<[f64; 3]>,
@@ -75,6 +79,10 @@ pub struct OverlayImage<'a> {
 
 #[derive(Clone, Debug, Default, PartialEq)]
 struct OwnedDomainMetrics {
+    camera_position: Option<[f64; 3]>,
+    camera_altitude_meters: Option<f64>,
+    camera_phase: Option<String>,
+    camera_paused: Option<bool>,
     player_position: Option<[f64; 3]>,
     ship_position: Option<[f64; 3]>,
     ship_velocity: Option<[f64; 3]>,
@@ -92,6 +100,14 @@ struct OwnedBodyDistance {
 impl From<DomainMetrics<'_>> for OwnedDomainMetrics {
     fn from(metrics: DomainMetrics<'_>) -> Self {
         Self {
+            camera_position: valid_vector(metrics.camera_position),
+            camera_altitude_meters: valid_distance(metrics.camera_altitude_meters),
+            camera_phase: metrics
+                .camera_phase
+                .map(str::trim)
+                .filter(|phase| !phase.is_empty())
+                .map(str::to_owned),
+            camera_paused: metrics.camera_paused,
             player_position: valid_vector(metrics.player_position),
             ship_position: valid_vector(metrics.ship_position),
             ship_velocity: valid_vector(metrics.ship_velocity),
@@ -116,6 +132,10 @@ fn valid_vector(value: Option<[f64; 3]>) -> Option<[f64; 3]> {
 
 fn valid_speed(value: Option<f64>) -> Option<f64> {
     value.filter(|speed| speed.is_finite() && *speed >= 0.0)
+}
+
+fn valid_distance(value: Option<f64>) -> Option<f64> {
+    value.filter(|distance| distance.is_finite() && *distance >= 0.0)
 }
 
 /// Rolling diagnostics collector and optional presentation state.
@@ -332,6 +352,35 @@ impl Diagnostics {
 
         let _ = writeln!(
             text,
+            "CAMERA POSITION  {}",
+            self.domain_metrics
+                .camera_position
+                .map(format_position)
+                .unwrap_or_else(|| "N/A".to_owned())
+        );
+        let _ = writeln!(
+            text,
+            "CAMERA ALTITUDE  {}",
+            self.domain_metrics
+                .camera_altitude_meters
+                .map(format_distance)
+                .unwrap_or_else(|| "N/A".to_owned())
+        );
+        let camera_phase = self
+            .domain_metrics
+            .camera_phase
+            .as_deref()
+            .map(str::to_ascii_uppercase)
+            .unwrap_or_else(|| "N/A".to_owned());
+        let camera_motion = match self.domain_metrics.camera_paused {
+            Some(true) => "PAUSED",
+            Some(false) => "RUNNING",
+            None => "N/A",
+        };
+        let _ = writeln!(text, "CAMERA TRANSITION {camera_phase} / {camera_motion}");
+
+        let _ = writeln!(
+            text,
             "PLAYER POSITION  {}",
             self.domain_metrics
                 .player_position
@@ -481,7 +530,11 @@ fn format_distance(meters: f64) -> String {
 }
 
 fn metric_scale(magnitude: f64) -> (f64, &'static str) {
-    if magnitude >= 1_000_000.0 {
+    if magnitude >= 1_000_000_000_000.0 {
+        (1_000_000_000_000.0, "Tm")
+    } else if magnitude >= 1_000_000_000.0 {
+        (1_000_000_000.0, "Gm")
+    } else if magnitude >= 1_000_000.0 {
         (1_000_000.0, "Mm")
     } else if magnitude >= 1_000.0 {
         (1_000.0, "km")
@@ -885,6 +938,10 @@ mod tests {
         diagnostics.record_presented(
             sample(1, Duration::from_millis(16), GpuTime::Pending),
             DomainMetrics {
+                camera_position: Some([1_000_000_000_000.0, 0.0, 12.0]),
+                camera_altitude_meters: Some(12.0),
+                camera_phase: Some("approach"),
+                camera_paused: Some(false),
                 player_position: Some([1_000.0, 2_000.0, 3_000.0]),
                 ship_position: Some([1_000_000.0, 0.0, -2_000_000.0]),
                 ship_velocity: Some([0.0, 1_500.0, 0.0]),
@@ -896,6 +953,9 @@ mod tests {
 
         let text = diagnostics.overlay_text().expect("overlay is visible");
         assert!(text.contains("PLAYER POSITION  [1.00, 2.00, 3.00] km"));
+        assert!(text.contains("CAMERA POSITION  [1.00, 0.00, 0.00] Tm"));
+        assert!(text.contains("CAMERA ALTITUDE  12.00 m"));
+        assert!(text.contains("CAMERA TRANSITION APPROACH / RUNNING"));
         assert!(text.contains("SHIP SPEED       2.50 Mm/s"));
         assert!(text.contains("THRUSTER         73%"));
         assert!(text.contains("NEARBY BODY      MARS  2.50 Mm"));
@@ -912,6 +972,10 @@ mod tests {
         diagnostics.record_presented(
             sample(1, Duration::from_millis(16), GpuTime::Pending),
             DomainMetrics {
+                camera_position: Some([f64::NAN, 0.0, 0.0]),
+                camera_altitude_meters: Some(f64::NEG_INFINITY),
+                camera_phase: Some("  "),
+                camera_paused: None,
                 player_position: Some([f64::NAN, 0.0, 0.0]),
                 ship_position: Some([f64::INFINITY, 0.0, 0.0]),
                 ship_velocity: Some([0.0, f64::NEG_INFINITY, 0.0]),
@@ -922,6 +986,9 @@ mod tests {
         );
 
         let text = diagnostics.overlay_text().expect("overlay is visible");
+        assert!(text.contains("CAMERA POSITION  N/A"));
+        assert!(text.contains("CAMERA ALTITUDE  N/A"));
+        assert!(text.contains("CAMERA TRANSITION N/A / N/A"));
         assert!(text.contains("PLAYER POSITION  N/A (TASK 8+)"));
         assert!(text.contains("SHIP SPEED       N/A (TASK 9+)"));
         assert!(text.contains("THRUSTER         N/A (TASK 9+)"));

@@ -1,3 +1,6 @@
+// Keep this physical-pixel inset aligned with the vertex shader's margin.
+const OVERLAY_MARGIN_PIXELS: u32 = 16;
+
 /// Borrowed RGBA image supplied by a diagnostics or UI producer.
 #[derive(Clone, Copy, Debug)]
 pub struct OverlayImage<'a> {
@@ -51,6 +54,15 @@ impl std::fmt::Display for OverlayImageError {
     }
 }
 
+fn fitted_overlay_size(surface_size: [u32; 2], image_size: [u32; 2]) -> [f32; 2] {
+    let available = surface_size.map(|size| size.saturating_sub(2 * OVERLAY_MARGIN_PIXELS) as f32);
+    let image_size = image_size.map(|size| size as f32);
+    let scale = (available[0] / image_size[0])
+        .min(available[1] / image_size[1])
+        .min(1.0);
+    image_size.map(|size| size * scale)
+}
+
 pub(crate) struct OverlayRenderer {
     pipeline: wgpu::RenderPipeline,
     bind_group_layout: wgpu::BindGroupLayout,
@@ -63,7 +75,11 @@ pub(crate) struct OverlayRenderer {
 }
 
 impl OverlayRenderer {
-    pub(crate) fn new(device: &wgpu::Device, surface_format: wgpu::TextureFormat) -> Self {
+    pub(crate) fn new(
+        device: &wgpu::Device,
+        surface_format: wgpu::TextureFormat,
+        depth_format: wgpu::TextureFormat,
+    ) -> Self {
         let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             label: Some("Salimon overlay bind group layout"),
             entries: &[
@@ -105,7 +121,13 @@ impl OverlayRenderer {
                 compilation_options: wgpu::PipelineCompilationOptions::default(),
             },
             primitive: wgpu::PrimitiveState::default(),
-            depth_stencil: None,
+            depth_stencil: Some(wgpu::DepthStencilState {
+                format: depth_format,
+                depth_write_enabled: Some(false),
+                depth_compare: Some(wgpu::CompareFunction::Always),
+                stencil: wgpu::StencilState::default(),
+                bias: wgpu::DepthBiasState::default(),
+            }),
             multisample: wgpu::MultisampleState::default(),
             fragment: Some(wgpu::FragmentState {
                 module: &shader,
@@ -185,18 +207,20 @@ impl OverlayRenderer {
             self.last_revision = Some(image.revision);
         }
 
+        let display_size =
+            fitted_overlay_size([surface_width, surface_height], [image.width, image.height]);
         let dimensions = [
             surface_width as f32,
             surface_height as f32,
-            image.width as f32,
-            image.height as f32,
+            display_size[0],
+            display_size[1],
         ];
         let mut bytes = [0_u8; 16];
         for (chunk, value) in bytes.chunks_exact_mut(4).zip(dimensions) {
             chunk.copy_from_slice(&value.to_ne_bytes());
         }
         queue.write_buffer(&self.dimensions_buffer, 0, &bytes);
-        self.visible = true;
+        self.visible = display_size.into_iter().all(|size| size > 0.0);
         Ok(())
     }
 
@@ -255,7 +279,39 @@ impl OverlayRenderer {
 
 #[cfg(test)]
 mod tests {
-    use super::{OverlayImage, OverlayImageError};
+    use super::{OverlayImage, OverlayImageError, fitted_overlay_size};
+
+    #[test]
+    fn keeps_source_size_when_the_panel_fits() {
+        assert_eq!(fitted_overlay_size([1280, 720], [560, 600]), [560.0, 600.0]);
+        assert_eq!(fitted_overlay_size([592, 632], [560, 600]), [560.0, 600.0]);
+    }
+
+    #[test]
+    fn fits_a_wide_panel_uniformly_inside_the_horizontal_margins() {
+        assert_eq!(fitted_overlay_size([640, 360], [1024, 256]), [608.0, 152.0]);
+    }
+
+    #[test]
+    fn fits_tall_and_high_density_panels_inside_all_margins() {
+        for (surface, source) in [([640, 360], [560, 600]), ([1280, 720], [1120, 1200])] {
+            let displayed = fitted_overlay_size(surface, source);
+            assert!(displayed[0] <= (surface[0] - 32) as f32);
+            assert!(displayed[1] <= (surface[1] - 32) as f32);
+            assert!(displayed[0] <= source[0] as f32);
+            assert!(displayed[1] <= source[1] as f32);
+            let width_scale = displayed[0] / source[0] as f32;
+            let height_scale = displayed[1] / source[1] as f32;
+            assert!((width_scale - height_scale).abs() < 1.0e-6);
+            assert!((displayed[1] - (surface[1] - 32) as f32).abs() < 1.0e-4);
+        }
+    }
+
+    #[test]
+    fn hides_the_panel_when_the_surface_cannot_contain_both_margins() {
+        assert_eq!(fitted_overlay_size([32, 360], [560, 600]), [0.0, 0.0]);
+        assert_eq!(fitted_overlay_size([640, 0], [560, 600]), [0.0, 0.0]);
+    }
 
     #[test]
     fn accepts_exact_rgba_byte_length() {

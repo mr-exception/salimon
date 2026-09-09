@@ -3,8 +3,15 @@
 //! This crate owns `wgpu` resources and surface presentation. It deliberately
 //! has no dependency on world, character, or ship state.
 
+mod gpu_timing;
+mod overlay;
+
 use std::error::Error;
 use std::fmt;
+use std::time::Duration;
+
+use gpu_timing::GpuTimer;
+pub use overlay::OverlayImage;
 
 const CLEAR_COLOR: wgpu::Color = wgpu::Color {
     r: 0.008,
@@ -38,13 +45,44 @@ pub struct RendererInfo {
     pub adapter_name: String,
     pub backend: String,
     pub device_type: String,
+    pub timestamp_queries_supported: bool,
+}
+
+/// Availability and latest completed value for GPU pass timing.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum GpuFrameTime {
+    /// The selected adapter cannot issue timestamp queries.
+    Unsupported,
+    /// Timestamp queries are supported but no asynchronous result is ready yet.
+    Pending,
+    /// Duration of the latest completed scene and overlay render pass.
+    Measured(Duration),
+}
+
+/// Optional allocator totals reported by the active GPU backend.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct GpuMemoryMetrics {
+    pub allocated_bytes: u64,
+    pub reserved_bytes: u64,
+}
+
+/// Measurements associated with one successfully presented renderer frame.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct RenderStats {
+    pub cpu_render_time: Duration,
+    pub gpu_frame_time: GpuFrameTime,
+    pub visible_objects: u32,
+    pub rendered_objects: u32,
+    pub scene_draw_calls: u32,
+    pub total_draw_calls: u32,
+    pub gpu_memory: Option<GpuMemoryMetrics>,
 }
 
 /// Result of attempting to render one frame.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum RenderOutcome {
     /// Commands were submitted and the surface image was presented.
-    Presented,
+    Presented(RenderStats),
     /// No drawable image is currently available; wait for a lifecycle event.
     Idle,
     /// The surface is temporarily unavailable or was reconfigured; retry later.
@@ -84,6 +122,10 @@ pub struct Renderer {
     queue: wgpu::Queue,
     configuration: wgpu::SurfaceConfiguration,
     pipeline: wgpu::RenderPipeline,
+    overlay: overlay::OverlayRenderer,
+    gpu_timer: Option<GpuTimer>,
+    cached_gpu_memory: Option<GpuMemoryMetrics>,
+    presented_frames: u64,
     drawable: bool,
     info: RendererInfo,
 }
@@ -114,17 +156,24 @@ impl Renderer {
                 RendererError::new("failed to find a compatible GPU adapter", error)
             })?;
 
+        let timestamp_queries_supported =
+            adapter.features().contains(wgpu::Features::TIMESTAMP_QUERY);
         let adapter_info = adapter.get_info();
         let info = RendererInfo {
             adapter_name: adapter_info.name,
             backend: format!("{:?}", adapter_info.backend),
             device_type: format!("{:?}", adapter_info.device_type),
+            timestamp_queries_supported,
         };
-
+        let required_features = if timestamp_queries_supported {
+            wgpu::Features::TIMESTAMP_QUERY
+        } else {
+            wgpu::Features::empty()
+        };
         let (device, queue) = adapter
             .request_device(&wgpu::DeviceDescriptor {
                 label: Some("Salimon Phase 0 device"),
-                required_features: wgpu::Features::empty(),
+                required_features,
                 required_limits: wgpu::Limits::default(),
                 experimental_features: wgpu::ExperimentalFeatures::disabled(),
                 memory_hints: wgpu::MemoryHints::MemoryUsage,
@@ -177,6 +226,8 @@ impl Renderer {
             multiview_mask: None,
             cache: None,
         });
+        let overlay = overlay::OverlayRenderer::new(&device, configuration.format);
+        let gpu_timer = timestamp_queries_supported.then(|| GpuTimer::new(&device, &queue));
 
         let mut renderer = Self {
             surface,
@@ -184,6 +235,10 @@ impl Renderer {
             queue,
             configuration,
             pipeline,
+            overlay,
+            gpu_timer,
+            cached_gpu_memory: None,
+            presented_frames: 0,
             drawable: false,
             info,
         };
@@ -211,15 +266,19 @@ impl Renderer {
         self.configure_surface();
     }
 
-    /// Draws and presents the bootstrap scene.
+    /// Draws and presents the bootstrap scene plus an optional generic RGBA overlay.
     ///
     /// `before_present` lets the platform runtime issue its presentation
     /// notification at the exact boundary without introducing a `winit`
     /// dependency into this crate.
     pub fn render(
         &mut self,
+        overlay_image: Option<OverlayImage<'_>>,
         before_present: impl FnOnce(),
     ) -> Result<RenderOutcome, RendererError> {
+        if let Some(gpu_timer) = self.gpu_timer.as_mut() {
+            gpu_timer.poll(&self.device);
+        }
         if !self.drawable {
             return Ok(RenderOutcome::Idle);
         }
@@ -249,12 +308,25 @@ impl Renderer {
         let view = frame
             .texture
             .create_view(&wgpu::TextureViewDescriptor::default());
+        let cpu_render_started_at = std::time::Instant::now();
+        self.overlay
+            .prepare(
+                &self.device,
+                &self.queue,
+                self.configuration.width,
+                self.configuration.height,
+                overlay_image,
+            )
+            .map_err(|error| RendererError::new("failed to prepare overlay", error))?;
         let mut encoder = self
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor {
                 label: Some("Salimon bootstrap frame encoder"),
             });
+        let timing_slot = self.gpu_timer.as_mut().and_then(GpuTimer::acquire_slot);
         {
+            let timestamp_writes =
+                timing_slot.and_then(|_| self.gpu_timer.as_ref().map(GpuTimer::timestamp_writes));
             let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("Salimon bootstrap render pass"),
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
@@ -267,18 +339,49 @@ impl Renderer {
                     },
                 })],
                 depth_stencil_attachment: None,
-                timestamp_writes: None,
+                timestamp_writes,
                 occlusion_query_set: None,
                 multiview_mask: None,
             });
             render_pass.set_pipeline(&self.pipeline);
             render_pass.draw(0..3, 0..1);
+            self.overlay.draw(&mut render_pass);
+        }
+        if let (Some(gpu_timer), Some(slot_index)) = (self.gpu_timer.as_ref(), timing_slot) {
+            gpu_timer.resolve_and_map(&mut encoder, slot_index);
         }
 
         self.queue.submit([encoder.finish()]);
+        let cpu_render_time = cpu_render_started_at.elapsed();
         before_present();
         self.queue.present(frame);
-        Ok(RenderOutcome::Presented)
+        self.presented_frames = self.presented_frames.saturating_add(1);
+        if self.presented_frames == 1 || self.presented_frames.is_multiple_of(60) {
+            self.cached_gpu_memory =
+                self.device
+                    .generate_allocator_report()
+                    .map(|report| GpuMemoryMetrics {
+                        allocated_bytes: report.total_allocated_bytes,
+                        reserved_bytes: report.total_reserved_bytes,
+                    });
+        }
+
+        let gpu_frame_time = match self.gpu_timer.as_ref() {
+            Some(timer) => timer
+                .latest()
+                .map_or(GpuFrameTime::Pending, GpuFrameTime::Measured),
+            None => GpuFrameTime::Unsupported,
+        };
+        let overlay_draw_calls = u32::from(self.overlay.is_visible());
+        Ok(RenderOutcome::Presented(RenderStats {
+            cpu_render_time,
+            gpu_frame_time,
+            visible_objects: 1,
+            rendered_objects: 1,
+            scene_draw_calls: 1,
+            total_draw_calls: 1 + overlay_draw_calls,
+            gpu_memory: self.cached_gpu_memory,
+        }))
     }
 
     fn configure_surface(&self) {

@@ -24,6 +24,7 @@ integration. Building and running the client does not require Notion access.
 | Product decisions | [Project Q&A](https://app.notion.com/p/3d5b456853b981888824e2cdfe1a5297) |
 | Task 1 | [Create Phase 0 repository shell](https://app.notion.com/p/3d5b456853b981e485dfcc5d8dc86c9f) |
 | Task 2 | [Bootstrap native macOS runtime and wgpu renderer](https://app.notion.com/p/3d5b456853b981e0b34ec086b885ddb7) |
+| Task 3 | [Add Phase 0 diagnostics overlay](https://app.notion.com/p/3d5b456853b98136afd1dd612e9af67c) |
 
 ## Task lookup and updates
 

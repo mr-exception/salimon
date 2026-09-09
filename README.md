@@ -5,16 +5,17 @@ current milestone is **Phase 0 — Technical Feasibility Showcase**: a native ma
 client-only prototype using a custom `wgpu` renderer, with Windows and web as
 later targets. The reference performance machine is a MacBook Air M1.
 
-This repository implements **task 2: Bootstrap native macOS runtime and `wgpu`
-renderer**. The client opens a native, resizable window and continuously renders
-a bootstrap triangle through `wgpu`. This proves the application lifecycle and
-GPU presentation path; it is not yet a playable scene.
+This repository implements **task 3: Add Phase 0 diagnostics overlay** on top of
+the Task 2 native runtime and renderer bootstrap. The client opens a native,
+resizable window, continuously renders a triangle through `wgpu`, and exposes an
+optional engineering view for live runtime/renderer measurements. It is not yet
+a playable scene.
 
 ## Source of requirements
 
 The [Salimon Notion space](https://app.notion.com/p/801c9c427af24e9b8d57b07572ef4119)
 holds the task list and documentation. Start with
-[task 2](https://app.notion.com/p/3d5b456853b981e0b34ec086b885ddb7), the
+[task 3](https://app.notion.com/p/3d5b456853b98136afd1dd612e9af67c), the
 [Phase 0 specification](https://app.notion.com/p/3d5b456853b981db968dca1901a270a2), and
 [Technical Architecture & AI Maintenance](https://app.notion.com/p/3d5b456853b981078a82c68207f4444e).
 [AGENTS.md](AGENTS.md) describes how future agents should access those sources;
@@ -36,14 +37,15 @@ salimon/
     ├── ship/           # Future ship state and control
     ├── platform/       # Future native window/input/platform adapters
     ├── assets/         # Future source art and exported assets
-    └── diagnostics/    # Future engineering metrics and overlay
+    └── diagnostics/    # Engineering metrics and overlay rasterization
 ```
 
-`client/runtime/` and `client/renderer/` are Cargo packages. The other client
-directories document ownership until their implementation tasks begin. The
-runtime drives native lifecycle and timing, while the renderer owns `wgpu`
-resources and presentation. See [client/README.md](client/README.md) for the
-dependency boundaries.
+`client/runtime/`, `client/renderer/`, and `client/diagnostics/` are Cargo
+packages. The other client directories document ownership until their
+implementation tasks begin. The runtime drives native lifecycle and composes
+typed observations; diagnostics aggregates and rasterizes the engineering view;
+the renderer owns `wgpu` resources and presentation. See
+[client/README.md](client/README.md) for the dependency boundaries.
 
 ## macOS setup
 
@@ -82,6 +84,15 @@ the window is closed. A colored triangle on the clear background confirms that
 the `wgpu` surface, render pipeline, command submission, and presentation path
 are active.
 
+Press **F3** to toggle the engineering diagnostics overlay. It is hidden by
+default and updates at a throttled cadence while frame observations continue to
+be collected. The view includes FPS/frame time, CPU-side encoding/submission
+time, GPU pass time when timestamp queries are supported, scene and total
+draw/object counts, optional GPU allocator totals, and memory-pressure warnings.
+Rows for player/ship position, ship velocity/speed/thruster, and nearby-body
+distance are explicitly `N/A` until their owning systems are implemented by
+later tasks.
+
 For an optimized native build:
 
 ```sh
@@ -94,19 +105,23 @@ root `target/` directory. No application bundle or installer exists yet.
 
 ### Native smoke check
 
-Task 2 requires an interactive check on macOS in addition to automated tests:
+Rendering and diagnostics require an interactive check on macOS in addition to
+automated tests:
 
 1. Launch the client and confirm the bootstrap triangle is visible.
-2. Resize the window repeatedly, including to a very small size, and confirm
+2. Press F3 and confirm the diagnostics panel appears, values update, and GPU
+   timing/memory show either a plausible value or an explicit unavailable state.
+3. Press F3 again and confirm the panel disappears while the triangle remains.
+4. Resize the window repeatedly, including to a very small size, and confirm
    rendering follows the new drawable size without a panic or validation error.
-3. Minimize and restore the window, then confirm rendering resumes.
-4. Close the window, launch the client again, and confirm both shutdown and
+5. Minimize and restore the window, then confirm rendering and diagnostics resume
+   without counting the paused interval.
+6. Close the window, launch the client again, and confirm both shutdown and
    relaunch are clean.
 
-The runtime maintains monotonic frame timing for future consumers, but it does
-not display FPS or profiling metrics. The optional engineering overlay belongs
-to Task 3. This bootstrap does not establish the later Phase 0 performance target
-at fixed 1920x1080.
+This bootstrap instrumentation does not establish the later Phase 0 performance
+target at fixed 1920x1080; Task 11 owns benchmark-scenario evidence on the
+reference MacBook Air M1.
 
 ## Development workflow
 
@@ -121,9 +136,9 @@ cargo test --workspace --locked
 ```
 
 Use `cargo fmt --all` to apply formatting. Automated tests cover logic that does
-not require a live native surface; the native launch, drawing, resize, minimize,
-restore, and close behavior still require the smoke check above. Task 2 does not
-add simulation or gameplay behavior.
+not require a live native surface; the native launch, drawing, overlay toggle,
+resize, minimize, restore, and close behavior still require the smoke check
+above. Task 3 does not add simulation or gameplay behavior.
 
 Add future crates explicitly to the root workspace and inherit its package
 metadata and lints. Keep `Cargo.lock` committed; validate normal changes with

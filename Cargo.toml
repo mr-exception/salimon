@@ -1,5 +1,5 @@
 [workspace]
-members = ["client/renderer", "client/runtime"]
+members = ["client/diagnostics", "client/renderer", "client/runtime"]
 default-members = ["client/runtime"]
 resolver = "3"
 

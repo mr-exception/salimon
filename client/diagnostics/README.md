@@ -1,7 +1,56 @@
 # Diagnostics
 
-Reserved for engineering metrics, profiling, and the optional diagnostics
-overlay. Gather timing and rendering measurements through explicit interfaces;
-diagnostics should observe client state without owning gameplay behavior. Normal
-flight information belongs on cockpit monitors. No metrics or overlay are
-implemented yet.
+`salimon-diagnostics` owns the optional Phase 0 engineering overlay. It accepts
+typed runtime, renderer, and future domain measurements; maintains a bounded
+frame window; formats an honest diagnostic snapshot; and CPU-rasterizes that
+snapshot into a borrowed RGBA image for the renderer to composite.
+
+The crate has no platform, GPU, renderer, or gameplay dependencies. It does not
+sample clocks or query hardware itself. The runtime decides when to toggle and
+record diagnostics, the renderer reports measurements it owns, and future world
+and ship modules provide optional domain values through `DomainMetrics`.
+
+## Public contract
+
+- `Diagnostics` is hidden by default and exposes `toggle`, `is_visible`,
+  `set_scale_factor`, `reset_frame_window`, `record_memory_warning`, and
+  `record_presented`.
+- `FrameSample` carries one successfully presented frame's runtime and renderer
+  measurements. Zero frame intervals are retained as the latest state but are
+  excluded from the rolling statistics window.
+- `DomainMetrics` and `BodyDistance` borrow caller-owned state. Missing future
+  world, character, or ship measurements render as `N/A`; the diagnostics layer
+  never invents positions, speeds, or distances.
+- `overlay` returns a borrowed `OverlayImage` only while diagnostics are visible.
+  The renderer can use `revision` to avoid uploading unchanged pixels.
+- `overlay_text` exposes the matching text snapshot for tests, logging, and
+  accessibility-oriented inspection.
+
+The rolling window contains at most 120 valid frame samples. Visible text and
+pixels refresh at most once per 250 milliseconds of successfully presented frame
+time, except for state changes that need immediate feedback such as toggling,
+display-density changes, frame-window resets, and memory warnings.
+
+## Metric semantics
+
+- FPS is derived from the average nonzero presented-frame interval. Frame time
+  shows average and nearest-rank p95 values for the same rolling window.
+- CPU render and update times are averages of supplied samples. The current
+  runtime supplies renderer encoding/submission wall time, excluding present
+  wait; missing simulation-update timing is shown as `N/A` and excluded from its
+  average.
+- GPU timing distinguishes unsupported hardware, an asynchronous result that is
+  pending, and a measured duration. CPU submission time must never be supplied
+  as GPU time.
+- Visible/rendered object and scene/total draw-call counts are caller-reported.
+  Producers must document whether a count includes diagnostic composition.
+- GPU allocator memory is optional and reports allocated/reserved bytes. It is
+  not a claim about whole-process memory.
+- Position, velocity, speed, and body-distance values use meters as their input
+  unit and are formatted with practical metric prefixes.
+
+Normal gameplay flight information still belongs on cockpit displays. This
+overlay is an engineering surface and must remain optional.
+
+See [README.ai.md](README.ai.md), [architecture.md](architecture.md), and
+[invariants.md](invariants.md) before changing its contract.

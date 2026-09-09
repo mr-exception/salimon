@@ -17,3 +17,9 @@
    rendering implementation, authoritative domain state, or backend behavior.
 8. Future world, character, and ship code must not receive raw `winit` events or
    `wgpu` resources from the runtime.
+9. The engineering overlay is hidden by default and toggles only on an initial
+   physical F3 press, never on release or key repeat.
+10. Diagnostics observes typed runtime, renderer, and future domain snapshots;
+    it never becomes authoritative state or changes simulation behavior.
+11. Suspension, occlusion, zero-sized drawables, and renderer reconstruction
+    reset the rolling timing window before presentation resumes.

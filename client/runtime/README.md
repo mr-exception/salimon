@@ -1,10 +1,10 @@
 # Runtime
 
 The `salimon-client` binary is the native client composition entry point. It owns
-the Task 2 `winit` application lifecycle, native window, redraw scheduling,
-resize routing, recoverable surface-loss handling, and monotonic frame clock.
-It creates and drives `salimon-renderer` but does not own GPU implementation
-details.
+the `winit` application lifecycle, native window, redraw scheduling, resize
+routing, recoverable surface-loss handling, monotonic frame clock, and Task 3
+diagnostics composition. It drives `salimon-renderer` and
+`salimon-diagnostics` but does not own their GPU or aggregation implementation.
 
 Run from the repository root with `cargo run --locked -p salimon-client`.
 The process opens a resizable native window and runs until the window is closed.
@@ -21,8 +21,12 @@ The process opens a resizable native window and runs until the window is closed.
 - Measure frames from a monotonic clock in the runtime. The renderer must not
   become the owner of simulation time.
 
-The bootstrap clock is groundwork only. Task 3 owns the optional FPS/frame-time,
-CPU/GPU timing, and draw/object diagnostics overlay.
+Press **F3** to show or hide the engineering diagnostics overlay. It is hidden by
+default and remains a developer view rather than a normal gameplay HUD. Runtime
+frame observations feed the diagnostics crate after each successful present;
+the prior published image is supplied to the renderer on the next frame. Timing
+history resets across suspension, occlusion, zero-sized drawables, and renderer
+reconstruction so pauses do not contaminate FPS data.
 
 ## Boundaries
 

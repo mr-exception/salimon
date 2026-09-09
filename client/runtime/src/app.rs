@@ -3,11 +3,15 @@ use std::fmt;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
-use salimon_renderer::{RenderOutcome, Renderer, SurfaceSize};
+use salimon_diagnostics::{Diagnostics, DomainMetrics, FrameSample, GpuMemory, GpuTime};
+use salimon_renderer::{
+    GpuFrameTime, OverlayImage as RendererOverlayImage, RenderOutcome, Renderer, SurfaceSize,
+};
 use winit::application::ApplicationHandler;
 use winit::dpi::LogicalSize;
-use winit::event::WindowEvent;
+use winit::event::{ElementState, WindowEvent};
 use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
+use winit::keyboard::{KeyCode, PhysicalKey};
 use winit::window::{Window, WindowAttributes, WindowId};
 
 use crate::frame_clock::FrameClock;
@@ -65,6 +69,7 @@ struct ClientApplication {
     window: Option<Arc<Window>>,
     renderer: Option<Renderer>,
     frame_clock: FrameClock,
+    diagnostics: Diagnostics,
     render_attempts: u64,
     retry_at: Option<Instant>,
     occluded: bool,
@@ -94,6 +99,7 @@ impl ClientApplication {
             size.height,
             window.scale_factor()
         );
+        self.diagnostics.set_scale_factor(window.scale_factor());
         self.window = Some(Arc::new(window));
         Ok(())
     }
@@ -108,15 +114,17 @@ impl ClientApplication {
             .map_err(|error| RunError::new("failed to initialize renderer", error))?;
         let info = renderer.info();
         log::info!(
-            "renderer ready: adapter=\"{}\" backend={} device_type={}",
+            "renderer ready: adapter=\"{}\" backend={} device_type={} gpu_timestamps={}",
             info.adapter_name,
             info.backend,
-            info.device_type
+            info.device_type,
+            info.timestamp_queries_supported
         );
         self.renderer = Some(renderer);
         self.render_attempts = 0;
         self.retry_at = None;
         self.frame_clock.reset_interval();
+        self.diagnostics.reset_frame_window();
         Ok(())
     }
 
@@ -142,6 +150,7 @@ impl ClientApplication {
         } else {
             event_loop.set_control_flow(ControlFlow::Wait);
             self.frame_clock.reset_interval();
+            self.diagnostics.reset_frame_window();
         }
     }
 
@@ -154,16 +163,26 @@ impl ClientApplication {
     fn redraw(&mut self, event_loop: &ActiveEventLoop, window: Arc<Window>) {
         if self.occluded {
             self.frame_clock.reset_interval();
+            self.diagnostics.reset_frame_window();
             return;
         }
 
         self.render_attempts = self.render_attempts.saturating_add(1);
         let render_started_at = Instant::now();
+        let overlay_image = self
+            .diagnostics
+            .overlay()
+            .map(|image| RendererOverlayImage {
+                width: image.width,
+                height: image.height,
+                rgba8: image.rgba8,
+                revision: image.revision,
+            });
         let outcome = match self
             .renderer
             .as_mut()
             .expect("redraws require an initialized renderer")
-            .render(|| window.pre_present_notify())
+            .render(overlay_image, || window.pre_present_notify())
         {
             Ok(outcome) => outcome,
             Err(error) => {
@@ -172,7 +191,8 @@ impl ClientApplication {
             }
         };
         if self.render_attempts == 1
-            || (outcome != RenderOutcome::Presented && self.render_attempts.is_multiple_of(100))
+            || (!matches!(outcome, RenderOutcome::Presented(_))
+                && self.render_attempts.is_multiple_of(100))
         {
             log::debug!(
                 "render attempt {} completed with {outcome:?}",
@@ -181,21 +201,45 @@ impl ClientApplication {
         }
 
         match outcome {
-            RenderOutcome::Presented => {
+            RenderOutcome::Presented(render_stats) => {
                 self.retry_at = None;
                 event_loop.set_control_flow(ControlFlow::Wait);
                 let timing = self
                     .frame_clock
                     .record_presented(render_started_at, Instant::now());
+                self.diagnostics.record_presented(
+                    FrameSample {
+                        frame_number: timing.frame_number,
+                        frame_interval: timing.frame_interval,
+                        cpu_render_time: render_stats.cpu_render_time,
+                        cpu_update_time: None,
+                        gpu_time: match render_stats.gpu_frame_time {
+                            GpuFrameTime::Unsupported => GpuTime::Unsupported,
+                            GpuFrameTime::Pending => GpuTime::Pending,
+                            GpuFrameTime::Measured(duration) => GpuTime::Measured(duration),
+                        },
+                        visible_objects: render_stats.visible_objects,
+                        rendered_objects: render_stats.rendered_objects,
+                        scene_draw_calls: render_stats.scene_draw_calls,
+                        total_draw_calls: render_stats.total_draw_calls,
+                        gpu_memory: render_stats.gpu_memory.map(|memory| GpuMemory {
+                            allocated_bytes: memory.allocated_bytes,
+                            reserved_bytes: memory.reserved_bytes,
+                        }),
+                    },
+                    DomainMetrics::default(),
+                );
                 if timing.frame_number == 1
                     || timing.frame_number.is_multiple_of(TIMING_LOG_INTERVAL)
                 {
                     log::debug!(
                         target: "salimon_client::frame",
-                        "frame={} interval_ms={:.3} submission_wall_ms={:.3}",
+                        "frame={} interval_ms={:.3} present_wall_ms={:.3} cpu_render_ms={:.3} gpu_time={:?}",
                         timing.frame_number,
                         timing.frame_interval.as_secs_f64() * 1_000.0,
-                        timing.submission_wall_time.as_secs_f64() * 1_000.0
+                        timing.submission_wall_time.as_secs_f64() * 1_000.0,
+                        render_stats.cpu_render_time.as_secs_f64() * 1_000.0,
+                        render_stats.gpu_frame_time
                     );
                 }
                 window.request_redraw();
@@ -203,6 +247,7 @@ impl ClientApplication {
             RenderOutcome::Retry => self.schedule_retry(event_loop, RENDER_RETRY_DELAY),
             RenderOutcome::Idle => {
                 self.frame_clock.reset_interval();
+                self.diagnostics.reset_frame_window();
                 if surface_size(&window).is_drawable() {
                     self.schedule_retry(event_loop, IDLE_RETRY_DELAY);
                 } else {
@@ -250,6 +295,7 @@ impl ApplicationHandler for ClientApplication {
         self.renderer = None;
         self.retry_at = None;
         self.frame_clock.reset_interval();
+        self.diagnostics.reset_frame_window();
         log::info!("application suspended; GPU presentation resources released");
     }
 
@@ -273,9 +319,14 @@ impl ApplicationHandler for ClientApplication {
                 self.window = None;
                 self.retry_at = None;
                 self.frame_clock.reset_interval();
+                self.diagnostics.reset_frame_window();
                 event_loop.exit();
             }
-            WindowEvent::Resized(_) | WindowEvent::ScaleFactorChanged { .. } => {
+            WindowEvent::Resized(_) => {
+                self.resize_renderer(event_loop, &window);
+            }
+            WindowEvent::ScaleFactorChanged { .. } => {
+                self.diagnostics.set_scale_factor(window.scale_factor());
                 self.resize_renderer(event_loop, &window);
             }
             WindowEvent::Occluded(is_occluded) => {
@@ -283,12 +334,23 @@ impl ApplicationHandler for ClientApplication {
                 self.occluded = is_occluded;
                 self.retry_at = None;
                 self.frame_clock.reset_interval();
+                self.diagnostics.reset_frame_window();
                 if is_occluded {
                     event_loop.set_control_flow(ControlFlow::Wait);
                 } else {
                     event_loop.set_control_flow(ControlFlow::Wait);
                     window.request_redraw();
                 }
+            }
+            WindowEvent::KeyboardInput { event, .. }
+                if is_diagnostics_toggle(event.state, event.repeat, event.physical_key) =>
+            {
+                let visible = self.diagnostics.toggle();
+                log::info!(
+                    "engineering diagnostics overlay {} (F3 toggles)",
+                    if visible { "visible" } else { "hidden" }
+                );
+                window.request_redraw();
             }
             WindowEvent::RedrawRequested if self.renderer.is_some() => {
                 self.redraw(event_loop, window);
@@ -298,6 +360,7 @@ impl ApplicationHandler for ClientApplication {
     }
 
     fn memory_warning(&mut self, _event_loop: &ActiveEventLoop) {
+        self.diagnostics.record_memory_warning();
         log::warn!("the operating system reported memory pressure");
     }
 
@@ -327,4 +390,29 @@ impl ApplicationHandler for ClientApplication {
 fn surface_size(window: &Window) -> SurfaceSize {
     let size = window.inner_size();
     SurfaceSize::new(size.width, size.height)
+}
+
+fn is_diagnostics_toggle(state: ElementState, repeat: bool, key: PhysicalKey) -> bool {
+    state == ElementState::Pressed && !repeat && key == PhysicalKey::Code(KeyCode::F3)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::is_diagnostics_toggle;
+    use winit::event::ElementState;
+    use winit::keyboard::{KeyCode, PhysicalKey};
+
+    #[test]
+    fn f3_toggles_only_on_the_initial_press() {
+        let f3 = PhysicalKey::Code(KeyCode::F3);
+
+        assert!(is_diagnostics_toggle(ElementState::Pressed, false, f3));
+        assert!(!is_diagnostics_toggle(ElementState::Pressed, true, f3));
+        assert!(!is_diagnostics_toggle(ElementState::Released, false, f3));
+        assert!(!is_diagnostics_toggle(
+            ElementState::Pressed,
+            false,
+            PhysicalKey::Code(KeyCode::F2),
+        ));
+    }
 }

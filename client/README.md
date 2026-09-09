@@ -1,7 +1,8 @@
 # Client
 
-All Phase 0 implementation lives here. Task 2 provides the `salimon-client`
-runtime binary and the `salimon-renderer` library. The remaining directories are
+All Phase 0 implementation lives here. Tasks 2 and 3 provide the
+`salimon-client` runtime binary, `salimon-renderer` GPU library, and
+`salimon-diagnostics` metrics/overlay library. The remaining directories are
 documented ownership boundaries until their implementation tasks begin. Add
 future Cargo packages explicitly to the root workspace.
 
@@ -9,27 +10,30 @@ future Cargo packages explicitly to the root workspace.
 
 | Boundary | Current responsibility |
 | --- | --- |
-| `runtime/` | Native application lifecycle, redraw scheduling, frame timing, and client composition |
-| `renderer/` | `wgpu` device/surface resources, bootstrap pipeline, and presentation |
+| `runtime/` | Native lifecycle, redraw scheduling, frame timing, F3 routing, and client composition |
+| `renderer/` | `wgpu` resources, bootstrap/overlay pipelines, measurements, and presentation |
 | `world/` | Reserved for portable scene data, coordinates, and world state |
 | `character/` | Reserved for first-person character state and movement |
 | `ship/` | Reserved for ship state, cockpit control, flight, and landing/takeoff |
 | `platform/` | Reserved for native input and OS-specific adapters |
 | `assets/` | Reserved for editable source art and exported game-ready content |
-| `diagnostics/` | Reserved for engineering metrics, profiling, and the optional overlay |
+| `diagnostics/` | Engineering metric aggregation, formatting, and RGBA overlay rasterization |
 
 The current dependency direction is:
 
 ```text
 salimon-client (runtime, winit lifecycle, frame clock)
-    └── salimon-renderer (wgpu resources and presentation)
+    ├── salimon-diagnostics (typed observations and optional overlay image)
+    └── salimon-renderer (wgpu resources, generic overlay composition, presentation)
 ```
 
 The runtime creates the window, routes lifecycle and resize events, schedules
-redraws, maintains monotonic frame timing, and invokes the renderer through its
-narrow `new`/`resize`/`render` boundary. Recoverable surface loss is handled by
-the runtime through that boundary. The renderer does not own the event loop or
-authoritative world/game state.
+redraws, maintains monotonic frame timing, routes F3, and maps runtime/renderer
+measurements into diagnostics through typed values. It supplies the resulting
+borrowed RGBA image through the renderer's narrow `new`/`resize`/`render`
+boundary. Recoverable surface loss is handled by the runtime through that
+boundary. Neither supporting crate owns the event loop or authoritative
+world/game state.
 
 `winit` integration currently lives at the runtime boundary, which is permitted
 for this native bootstrap. Move OS-specific behavior into `platform/` as that
@@ -37,10 +41,12 @@ behavior grows or another native target needs an adapter. Future domain modules
 must consume typed input/presentation data rather than GPU or window types.
 There is no dependency on `core/` in Phase 0.
 
-Task 2 deliberately adds no ECS, physics engine, WASM host, diagnostics overlay,
-or backend scaffolding. Task 3 owns visible FPS and profiling diagnostics. As
-major components gain behavior, maintain the contracts, ownership documentation,
-architecture, invariants, and relevant validation required by the
+Tasks 2 and 3 deliberately add no ECS, physics engine, WASM host, gameplay state,
+or backend scaffolding. Future domain tasks populate the diagnostics crate's
+optional player, ship, and body-distance inputs; until then those values remain
+explicitly unavailable. As major components gain behavior, maintain the
+contracts, ownership documentation, architecture, invariants, and relevant
+validation required by the
 [Notion architecture](https://app.notion.com/p/3d5b456853b981078a82c68207f4444e).
 
 Run the root [development workflow](../README.md#development-workflow) after

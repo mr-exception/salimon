@@ -18,8 +18,8 @@ coordination of client capabilities. It is not a gameplay domain.
 
 The runtime owns the `winit` application handler, native window lifetime,
 renderer orchestration, resize and redraw routing, surface-loss recovery policy,
-and monotonic frame clock. Its current outbound dependency is
-`salimon-renderer`.
+monotonic frame clock, F3 routing, and diagnostics composition. Its outbound
+dependencies are `salimon-renderer` and `salimon-diagnostics`.
 
 Do not add GPU pipelines/resources, authoritative world or ship state, backend
 behavior, persistence, or networking here. Keep new platform-specific behavior
@@ -30,6 +30,8 @@ necessary.
 
 - Preserve the lifecycle and timing invariants.
 - Keep the renderer call surface narrow and typed.
+- Keep diagnostics observational: map typed snapshots at the composition root
+  and do not fabricate unavailable world or ship values.
 - Add or update deterministic tests for non-GUI logic.
 - Run all root build/format/lint/test gates.
 - Perform the root native smoke check for lifecycle or rendering changes.

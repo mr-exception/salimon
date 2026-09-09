@@ -1641,9 +1641,14 @@ dependencies = [
  "env_logger",
  "log",
  "pollster",
+ "salimon-diagnostics",
  "salimon-renderer",
  "winit",
 ]
+
+[[package]]
+name = "salimon-diagnostics"
+version = "0.1.0"
 
 [[package]]
 name = "salimon-renderer"

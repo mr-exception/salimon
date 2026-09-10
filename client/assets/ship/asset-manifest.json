@@ -1,0 +1,20 @@
+{
+  "name": "Salimon Phase 0 Scout",
+  "assetVersion": 1,
+  "source": "source/generate_salimon_phase0_ship.py",
+  "editableInterchange": "export/salimon_phase0_ship.gltf",
+  "runtimeAsset": "export/salimon_phase0_ship.glb",
+  "units": "meters",
+  "axes": {
+    "up": "+Y",
+    "forward": "+X",
+    "starboard": "-Z"
+  },
+  "budgets": {
+    "maximumTriangles": 700,
+    "maximumPrimitives": 45,
+    "maximumMaterials": 9,
+    "maximumGlbBytes": 262144
+  },
+  "license": "Custom original Salimon project asset; no external asset dependencies"
+}

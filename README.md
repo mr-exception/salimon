@@ -5,18 +5,17 @@ current milestone is **Phase 0 — Technical Feasibility Showcase**: a native ma
 client-only prototype using a custom `wgpu` renderer, with Windows and web as
 later targets. The reference performance machine is a MacBook Air M1.
 
-This repository implements **task 6: Implement scalable planet rendering**
-on top of the native runtime, renderer, diagnostics, and large-scale coordinate
-prototype. The native client continuously presents a static, client-side scene
-containing exactly the Sun, Mercury, Venus, Earth, Moon, and Mars. Generic textured
-spheres use continuous material LOD, Sun lighting, and precise surface depth;
-the camera tour can inspect each body and retains the Earth precision markers.
+This repository implements through **task 7: Create custom Phase 0 spaceship
+asset**. The Task 6 native client continuously presents the compressed Solar
+System and scalable planet-rendering fixture; Task 7 adds a custom, source-editable
+Salimon scout under [`client/assets/ship`](client/assets/ship/README.md), ready for
+the character and runtime integration owned by Task 8.
 
 ## Source of requirements
 
 The [Salimon Notion space](https://app.notion.com/p/801c9c427af24e9b8d57b07572ef4119)
 holds the task list and documentation. Start with
-[task 6](https://app.notion.com/p/3d5b456853b981eca132cff958c0a890), the
+[task 7](https://app.notion.com/p/3d5b456853b981f18cc1d56d50570646), the
 [Phase 0 specification](https://app.notion.com/p/3d5b456853b981db968dca1901a270a2), and
 [Technical Architecture & AI Maintenance](https://app.notion.com/p/3d5b456853b981078a82c68207f4444e).
 [AGENTS.md](AGENTS.md) describes how future agents should access those sources;
@@ -37,7 +36,7 @@ salimon/
     ├── character/      # Future first-person character behavior
     ├── ship/           # Future ship state and control
     ├── platform/       # Future native window/input/platform adapters
-    ├── assets/         # Future source art and exported assets
+    ├── assets/         # Editable source art and exported runtime assets
     └── diagnostics/    # Engineering metrics and overlay rasterization
 ```
 
@@ -47,7 +46,8 @@ ownership until their implementation tasks begin. World owns portable coordinate
 and camera state; the runtime drives native lifecycle and maps typed snapshots;
 diagnostics aggregates and rasterizes the engineering view; the renderer owns
 camera-relative GPU conversion, reverse-Z depth, `wgpu` resources, and
-presentation. See
+presentation. Assets owns the custom Task 7 ship's procedural DCC source,
+Blender-importable glTF, packaged GLB, texture, metadata, and validation tools. See
 [client/README.md](client/README.md) for the dependency boundaries.
 
 ## macOS setup
@@ -175,6 +175,8 @@ resize, minimize, restore, and close behavior still require the smoke check
 above. Task 6 adds textured sphere presentation, Sun lighting, and per-body
 inspection. [Sphere rendering](client/renderer/sphere-rendering.md) records the
 precision technique, LOD budget, material source, and future terrain path.
+Task 7 adds no runtime loader or ship behavior; validate and regenerate its model
+using the commands in the [ship asset documentation](client/assets/ship/README.md).
 Orbital simulation, gameplay, persistence, networking, and backend behavior remain
 outside this implementation.
 

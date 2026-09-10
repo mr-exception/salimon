@@ -19,8 +19,8 @@ coordination of client capabilities. It is not a gameplay domain.
 The runtime owns the `winit` application handler, native window lifetime,
 renderer orchestration, resize and redraw routing, surface-loss recovery policy,
 monotonic frame/update clocks, typed input routing, and client composition. Its
-outbound dependencies are `salimon-world`, `salimon-renderer`, and
-`salimon-diagnostics`.
+outbound dependencies are `salimon-character`, `salimon-ship`, `salimon-world`,
+`salimon-renderer`, and `salimon-diagnostics`.
 
 Do not add GPU pipelines/resources, authoritative world or ship state, backend
 behavior, persistence, or networking here. Keep new platform-specific behavior
@@ -30,8 +30,8 @@ necessary.
 ## Change checklist
 
 - Preserve the lifecycle and timing invariants.
-- Translate native keys into typed world commands; never pass `winit` events to
-  portable code.
+- Translate native keys/mouse motion into typed domain commands; never pass
+  `winit` events to portable code.
 - Keep camera state through renderer rebuilds while resetting the monotonic
   update interval across lifecycle discontinuities.
 - Keep the renderer call surface narrow and typed.
@@ -39,8 +39,8 @@ necessary.
   noncanonical markers to separate cuboids; preserve absolute `f64` centers
   and sphere radii. Keep material-style selection at the composition boundary.
 - Keep diagnostics observational: map typed snapshots at the composition root
-  and report real camera-to-body surface distances without fabricating unavailable
-  player or ship values.
+  and report real camera-to-body surface distances plus live typed player/ship
+  values in gameplay view.
 - Add or update deterministic tests for non-GUI logic.
 - Run all root build/format/lint/test gates.
 - Perform the root native smoke check for lifecycle or rendering changes.

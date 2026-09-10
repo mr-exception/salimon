@@ -5,17 +5,17 @@ current milestone is **Phase 0 — Technical Feasibility Showcase**: a native ma
 client-only prototype using a custom `wgpu` renderer, with Windows and web as
 later targets. The reference performance machine is a MacBook Air M1.
 
-This repository implements through **task 7: Create custom Phase 0 spaceship
-asset**. The Task 6 native client continuously presents the compressed Solar
-System and scalable planet-rendering fixture; Task 7 adds a custom, source-editable
-Salimon scout under [`client/assets/ship`](client/assets/ship/README.md), ready for
-the character and runtime integration owned by Task 8.
+This repository implements through **task 8: Implement first-person character
+and walkable ship shell**. The native client starts inside the custom Task 7
+Salimon scout landed on Earth, with portable character/ship state, runtime-loaded
+GLB geometry, walking, free mouse look, jumping, cockpit interaction, a landed-only
+door, and radial surface traversal.
 
 ## Source of requirements
 
 The [Salimon Notion space](https://app.notion.com/p/801c9c427af24e9b8d57b07572ef4119)
 holds the task list and documentation. Start with
-[task 7](https://app.notion.com/p/3d5b456853b981f18cc1d56d50570646), the
+[task 8](https://app.notion.com/p/3d5b456853b9815da60dc171587fd457), the
 [Phase 0 specification](https://app.notion.com/p/3d5b456853b981db968dca1901a270a2), and
 [Technical Architecture & AI Maintenance](https://app.notion.com/p/3d5b456853b981078a82c68207f4444e).
 [AGENTS.md](AGENTS.md) describes how future agents should access those sources;
@@ -33,21 +33,21 @@ salimon/
     ├── runtime/        # salimon-client lifecycle and composition executable
     ├── renderer/       # salimon-renderer GPU library and presentation
     ├── world/          # Compressed Solar System, f64 coordinates, and camera fixture
-    ├── character/      # Future first-person character behavior
-    ├── ship/           # Future ship state and control
+    ├── character/      # Portable first-person movement and gravity transitions
+    ├── ship/           # Portable ship pose, cockpit authority, motion, and door state
     ├── platform/       # Future native window/input/platform adapters
     ├── assets/         # Editable source art and exported runtime assets
     └── diagnostics/    # Engineering metrics and overlay rasterization
 ```
 
-`client/runtime/`, `client/renderer/`, `client/world/`, and
-`client/diagnostics/` are Cargo packages. The other client directories document
-ownership until their implementation tasks begin. World owns portable coordinate
+`client/runtime/`, `client/renderer/`, `client/world/`, `client/character/`,
+`client/ship/`, and `client/diagnostics/` are Cargo packages. World owns portable coordinate
 and camera state; the runtime drives native lifecycle and maps typed snapshots;
 diagnostics aggregates and rasterizes the engineering view; the renderer owns
 camera-relative GPU conversion, reverse-Z depth, `wgpu` resources, and
 presentation. Assets owns the custom Task 7 ship's procedural DCC source,
-Blender-importable glTF, packaged GLB, texture, metadata, and validation tools. See
+Blender-importable glTF, packaged GLB, texture, metadata, and validation tools;
+the renderer loads that checked-in GLB without depending on ship state. See
 [client/README.md](client/README.md) for the dependency boundaries.
 
 ## macOS setup
@@ -83,7 +83,16 @@ cargo run --locked -p salimon-client
 ```
 
 The run command opens the **Salimon — Compressed Solar System** native window and
-continues until the window is closed. Six textured spheres show the static
+continues until the window is closed. It captures the cursor for mouse look and
+starts inside the landed ship facing the cockpit. Use **WASD** to walk, the mouse
+to look, and **Space** to jump. Press **E** near the cockpit to enter or leave
+control instantly; press **E** near the aft door to open/close it while landed.
+Walk backward through the open door to transition over 0.25 seconds to Earth-radial
+gravity and inspect the ship exterior. There is no sprint or crouch. Press
+**Escape** to release the captured cursor for window controls; click the game
+view to capture it again.
+
+Press **F2** to switch to the engineering Solar System precision tour. Six textured spheres show the static
 compressed bodies during the automatic far-space-to-Earth-surface transition.
 The Sun is explicitly visual-only; the other five bodies have disjoint `1.15R`
 landing volumes. Three separate meter-scale markers remain near Earth's positive-Z
@@ -91,7 +100,7 @@ surface for precision inspection. The spheres have original generated materials,
 unshadowed Sun illumination, and an emissive Sun; there are no atmospheres,
 clouds, dynamic shadows, or post effects.
 
-Press **P** to pause or resume the automatic transition, **R** to restart it at
+In the precision tour, press **P** to pause or resume the automatic transition, **R** to restart it at
 the selected body's far endpoint, and **N** to jump to the exact 12 m near-surface dwell and
 pause there for inspection. Only the initial physical key press is acted on;
 repeats and releases are ignored.
@@ -106,8 +115,8 @@ be collected. The view includes FPS/frame time, real world-update and
 CPU-side render time, GPU pass time when timestamp queries are supported, scene
 and total draw/object counts, optional GPU allocator totals, camera
 position/altitude/transition state, and memory-pressure warnings. Rows for
-player/ship position and ship velocity/speed/thruster are explicitly `N/A` until
-their owning systems are implemented. The nearby-body row reports the closest
+player/ship position and ship velocity/speed/thruster report live Task 8
+snapshots in gameplay view. The nearby-body row reports the closest
 of six nonnegative camera-to-surface observations.
 
 The coordinate/depth approach and its measured precision limits are documented
@@ -131,26 +140,32 @@ root `target/` directory. No application bundle or installer exists yet.
 Rendering and diagnostics require an interactive check on macOS in addition to
 automated tests:
 
-1. Launch the client and confirm the far view contains distinct textured spheres
+1. Launch the client and confirm it starts inside the landed ship facing the
+   cockpit. Walk and mouse-look around the cockpit/cabin, jump, and check the
+   invisible interior collision boundaries.
+2. Use E for instant cockpit entry/exit and to open the aft door. Walk outside,
+   confirm the 0.25-second gravity transition is smooth, inspect the custom
+   exterior/material variation, then re-enter and close the door.
+3. Press F2 and confirm the far view contains distinct textured spheres
    for exactly Sun, Mercury, Venus, Earth, Moon, and Mars, with visibly distinct
    compressed sizes and no other celestial bodies.
-2. Let the fixture traverse far and near scales; confirm there is no visible
+4. Let the fixture traverse far and near scales; confirm there is no visible
    position jitter, premature far clipping, depth inversion, or coplanar flicker
    in the intentionally separated markers.
-3. Press N and confirm the exact 12 m Earth-surface view and its three markers remain
+5. Press N and confirm the exact 12 m Earth-surface view and its three markers remain
    stable while paused; press P to resume, then R and confirm the camera restarts
    at the far endpoint.
    Repeat with keys 2, 3, 5, and 6 to inspect Mercury, Venus, Moon, and Mars
    through their complete approach/retreat. Check the lit curved silhouettes,
    smooth material filtering, and surface detail at N; use 4 to return to Earth.
-4. Press F3 and confirm the panel identifies Earth as the nearest body at the
+6. Press F3 and confirm the panel identifies Earth as the nearest body at the
    12 m dwell, while camera altitude/phase, CPU/GPU states, and scene counts
    update truthfully; hide it again without affecting the scene.
-5. Resize repeatedly, including to a very small size, and confirm projection and
+7. Resize repeatedly, including to a very small size, and confirm projection and
    depth follow the drawable size without a panic or validation error.
-6. Minimize and restore, then confirm rendering/animation resume without a time
+8. Minimize and restore, then confirm rendering/animation resume without a time
    jump or paused interval contaminating diagnostics.
-7. Close the window, launch the client again, and confirm both shutdown and
+9. Close the window, launch the client again, and confirm both shutdown and
    relaunch are clean.
 
 This bootstrap instrumentation does not establish the later Phase 0 performance
@@ -175,8 +190,9 @@ resize, minimize, restore, and close behavior still require the smoke check
 above. Task 6 adds textured sphere presentation, Sun lighting, and per-body
 inspection. [Sphere rendering](client/renderer/sphere-rendering.md) records the
 precision technique, LOD budget, material source, and future terrain path.
-Task 7 adds no runtime loader or ship behavior; validate and regenerate its model
-using the commands in the [ship asset documentation](client/assets/ship/README.md).
+Task 8 loads Task 7's GLB through a renderer-owned mesh path and keeps behavior in
+separate character/ship crates. Validate and regenerate its model using the
+commands in the [ship asset documentation](client/assets/ship/README.md).
 Orbital simulation, gameplay, persistence, networking, and backend behavior remain
 outside this implementation.
 

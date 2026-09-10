@@ -9,16 +9,18 @@ that future portable simulation code may consume.
 ```text
 winit event loop
     -> salimon-client lifecycle + frame/update clocks + typed key mapping
+        -> salimon-character movement / camera snapshot
+        -> salimon-ship pose / interaction snapshot
         -> salimon-world static Solar System + camera/precision snapshot
         -> salimon-diagnostics aggregation / RGBA view
         -> map snapshot -> salimon-renderer new / resize / render
             -> wgpu surface, camera-relative conversion, depth, and presentation
 ```
 
-The dependency direction is one-way: the runtime depends on world, diagnostics,
-and the renderer. Supporting crates never call into the runtime; the renderer
-and diagnostics do not depend on world. Runtime mapping prevents portable world
-types from acquiring `wgpu` or `winit` dependencies.
+The dependency direction is one-way: the runtime depends on character, ship,
+world, diagnostics, and renderer. Supporting crates never call into runtime;
+renderer and diagnostics do not depend on behavior domains. Runtime mapping
+prevents portable types from acquiring `wgpu` or `winit` dependencies.
 
 ## Lifecycle flow
 
@@ -27,8 +29,8 @@ types from acquiring `wgpu` or `winit` dependencies.
    is not configured or rendered.
 3. Schedule redraws while the application has a live, drawable window, and use a
    short delayed retry when the presentation surface is temporarily unavailable.
-4. Before each drawable render attempt, advance the portable camera with a
-   bounded monotonic delta. Map the six catalog bodies to `f64` sphere/material
+4. Before each drawable render attempt, advance portable character/ship/camera
+   state with a bounded monotonic delta. Map the six catalog bodies to `f64` sphere/material
    DTOs, map Sun lighting, preserve separate marker cuboids, calculate camera-to-surface
    distances, and measure that real update work.
 5. For each successfully presented redraw, record monotonic frame timing after
@@ -41,7 +43,7 @@ types from acquiring `wgpu` or `winit` dependencies.
 
 ## Diagnostics flow
 
-F3 initial key presses toggle diagnostics. P toggles the camera fixture, R
+F2 toggles gameplay/precision-tour view and F3 toggles diagnostics. P toggles the camera fixture, R
 restarts it, and N selects and pauses the exact near-surface inspection view;
 releases and key-repeat events are ignored. The runtime maps native keys to typed
 commands; 1–6 restart inspection of Sun, Mercury, Venus, Earth, Moon, and Mars.
@@ -49,8 +51,8 @@ It maps renderer/world measurements to diagnostics without sharing `wgpu` or
 `winit` types. All six catalog names and nonnegative camera-to-nominal-surface
 observations flow through `BodyDistance`; diagnostics selects the closest for its
 single nearby-body row. Diagnostics owns aggregation and the RGBA panel, while
-the renderer owns only generic image composition. Camera metrics remain separate
-from unavailable future player/ship state.
+the renderer owns only generic image composition. Gameplay view supplies live
+player/ship diagnostics; precision-tour view supplies its camera metrics.
 
 ## Evolution
 

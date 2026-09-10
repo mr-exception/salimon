@@ -1,6 +1,6 @@
 [package]
-name = "salimon-renderer"
-description = "Custom wgpu renderer for the Salimon client"
+name = "salimon-ship"
+description = "Portable Phase 0 ship state and interaction rules for Salimon"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -10,5 +10,4 @@ publish.workspace = true
 workspace = true
 
 [dependencies]
-gltf.workspace = true
-wgpu.workspace = true
+salimon-world = { path = "../world" }

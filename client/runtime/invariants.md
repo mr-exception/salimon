@@ -15,7 +15,7 @@
    cleanly. Unrecoverable renderer failures are reported before termination.
 7. The runtime may orchestrate renderer/platform capabilities but must not own
    rendering implementation, authoritative domain state, or backend behavior.
-8. Future world, character, and ship code must not receive raw `winit` events or
+8. World, character, and ship code must not receive raw `winit` events or
    `wgpu` resources from the runtime.
 9. The engineering overlay is hidden by default and toggles only on an initial
    physical F3 press, never on release or key repeat.
@@ -32,3 +32,9 @@
     material and the point-light position; every solid maps to a lit material.
 15. Diagnostics body observations preserve catalog order/names and report finite,
     nonnegative camera-to-nominal-surface distances for all six bodies.
+16. Gameplay starts inside the ship landed on Earth; F2 preserves access to the
+    earlier precision-tour fixture without changing domain state.
+17. Runtime contextual E routing changes cockpit authority or requests a door
+    action, but never owns the resulting character/ship behavior.
+18. Escape releases cursor capture so native window controls remain reachable;
+    clicking the game view restores mouse-look capture.

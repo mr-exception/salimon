@@ -11,7 +11,7 @@
    not exit the application or own lifecycle recovery or retry policy.
 6. Rendering never advances simulation, mutates authoritative world/game state,
    or consumes raw gameplay-domain internals.
-7. `CameraFrame`, `SceneInstance`, `SphereInstance`, and `PointLight` are renderer DTOs, not authoritative world
+7. `CameraFrame`, `SceneInstance`, `SphereInstance`, `ShipMeshInstance`, and `PointLight` are renderer DTOs, not authoritative world
    state. The runtime maps domain snapshots into them while preserving absolute
    `f64` positions; it does not rebase those positions.
 8. The renderer subtracts camera position from instance centers and camera
@@ -37,3 +37,6 @@
 15. Texture LOD varies continuously with projected footprint. Local detail uses
     a body-relative origin wrapped in CPU `f64`; no universe-scale `f32` texture
     coordinates, atmosphere, clouds, shadows, or post-effect dependency is used.
+16. The checked-in ship GLB is validated and loaded by the renderer without a
+    dependency on ship or character behavior. Pose and door state cross only as
+    generic presentation data and remain camera-relative on the GPU.

@@ -18,7 +18,7 @@ exposes renderer-owned measurements.
 ## Public boundary
 
 Keep `Renderer::new`, `Renderer::resize`, and `Renderer::render` plus
-`CameraFrame`, `SceneInstance`, `SphereInstance`, `PointLight`, `SceneFrame`, and the typed image/result values
+`CameraFrame`, `SceneInstance`, `SphereInstance`, `ShipMeshInstance`, `PointLight`, `SceneFrame`, and the typed image/result values
 as the narrow host-facing contract unless a task explicitly requires a change.
 Window/surface handles needed during initialization are integration inputs; they
 do not transfer native lifecycle policy to the renderer.
@@ -59,3 +59,7 @@ ray intersections, surface depth, body-local texture LOD/detail, and lighting.
 identity and landing rules out of all three. Preserve rationalized near-root
 depth and the wrapped `f64` detail origin; large `f32` center/radius subtraction
 would reintroduce the former proxy's sub-meter surface-position error.
+
+`ship_mesh.rs` owns the checked-in Task 7 GLB parser, immutable vertex buffer,
+camera-relative pose uniform, door visual offset, and basic material lighting.
+Keep gameplay interaction and ship state out of this module.

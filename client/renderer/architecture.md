@@ -6,18 +6,19 @@ The renderer is a library boundary around native `wgpu` presentation. It owns
 the surface, adapter/device/queue state, surface configuration, shader modules,
 render pipelines, command encoding, camera-relative GPU conversion,
 renderer-owned projection and depth, generic overlay composition, and frame
-presentation for the Task 6 textured spheres and Task 3 instrumentation.
+presentation for the Task 6 textured spheres, Task 8 ship mesh, and Task 3 instrumentation.
 
 ```text
 salimon-world absolute f64 snapshot
     -> runtime maps domain types to renderer DTOs (no rebasing)
     -> Renderer::render(SceneFrame, optional RGBA overlay)
         -> validate absolute f64 camera, cuboids, spheres, and light inputs
+        -> load the checked-in ship GLB once and update only its pose/door uniform
         -> subtract camera in f64, then cast relative values to f32
         -> conservatively cull cuboid and projected sphere bounds
         -> build renderer-owned view + infinite reverse-Z projection
         -> acquire surface texture
-        -> encode depth-tested cuboids + analytic spheres + optional overlay
+        -> encode depth-tested cuboids + analytic spheres + ship mesh + optional overlay
         -> resolve optional timestamp queries asynchronously
         -> submit command buffer
         -> present
@@ -41,9 +42,11 @@ relative results to `f32`, and builds the right-handed infinite reverse-Z
 projection and depth state.
 
 Runtime emits six `SphereInstance` values with absolute `f64` center/radius,
-three marker cuboids, and the Sun mapped into `PointLight`. Generic material
+three marker cuboids, a generic `ShipMeshInstance`, and the Sun mapped into `PointLight`. Generic material
 styles identify presentation choices. `SceneFrame` conveys no celestial IDs,
-landing volumes, world catalog ownership, or simulation behavior.
+landing volumes, world catalog ownership, or simulation behavior. The GLB loader
+expands its small Phase 0 mesh once at renderer initialization; material colors
+and a door-vertex flag are retained in the GPU vertex stream.
 
 The scene uses a conservative bounding-sphere frustum test before upload.
 Spheres use conservative projected bounds. The combined retained set defines

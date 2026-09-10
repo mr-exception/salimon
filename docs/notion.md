@@ -29,6 +29,7 @@ integration. Building and running the client does not require Notion access.
 | Task 5 | [Build compressed Solar System scene](https://app.notion.com/p/3d5b456853b981f98685d3b91e81340c) |
 | Task 6 | [Implement scalable planet rendering](https://app.notion.com/p/3d5b456853b981eca132cff958c0a890) |
 | Task 7 | [Create custom Phase 0 spaceship asset](https://app.notion.com/p/3d5b456853b981f18cc1d56d50570646) |
+| Task 8 | [Implement first-person character and walkable ship shell](https://app.notion.com/p/3d5b456853b9815da60dc171587fd457) |
 
 ## Task lookup and updates
 

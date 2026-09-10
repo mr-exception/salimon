@@ -5,6 +5,7 @@
 
 mod gpu_timing;
 mod overlay;
+mod ship_mesh;
 mod spheres;
 mod surface_textures;
 
@@ -14,6 +15,7 @@ use std::time::Duration;
 
 use gpu_timing::GpuTimer;
 pub use overlay::OverlayImage;
+pub use ship_mesh::ShipMeshInstance;
 pub use spheres::{PointLight, SphereInstance, SurfaceMaterial};
 use wgpu::util::DeviceExt;
 
@@ -101,6 +103,7 @@ pub struct SceneFrame<'a> {
     pub instances: &'a [SceneInstance],
     pub spheres: &'a [SphereInstance],
     pub light: Option<PointLight>,
+    pub ship: Option<ShipMeshInstance>,
 }
 
 /// Physical pixel dimensions for the renderer's presentation surface.
@@ -602,6 +605,7 @@ pub struct Renderer {
     depth_target: DepthTarget,
     overlay: overlay::OverlayRenderer,
     spheres: spheres::SphereRenderer,
+    ship_mesh: ship_mesh::ShipMeshRenderer,
     gpu_timer: Option<GpuTimer>,
     cached_gpu_memory: Option<GpuMemoryMetrics>,
     presented_frames: u64,
@@ -786,6 +790,7 @@ impl Renderer {
         let depth_target = DepthTarget::new(&device, configured_width, configured_height);
         let overlay = overlay::OverlayRenderer::new(&device, configuration.format, DEPTH_FORMAT);
         let spheres = spheres::SphereRenderer::new(&device, &queue, configuration.format);
+        let ship_mesh = ship_mesh::ShipMeshRenderer::new(&device, configuration.format)?;
         let gpu_timer = timestamp_queries_supported.then(|| GpuTimer::new(&device, &queue));
 
         let mut renderer = Self {
@@ -802,6 +807,7 @@ impl Renderer {
             depth_target,
             overlay,
             spheres,
+            ship_mesh,
             gpu_timer,
             cached_gpu_memory: None,
             presented_frames: 0,
@@ -887,6 +893,8 @@ impl Renderer {
             self.configuration.width,
             self.configuration.height,
         )?;
+        self.ship_mesh
+            .prepare(&self.queue, scene, prepared_scene.view_projection)?;
         self.ensure_instance_capacity(prepared_scene.instances.len())?;
         self.queue.write_buffer(
             &self.camera_buffer,
@@ -949,6 +957,7 @@ impl Renderer {
                 render_pass.draw(0..CUBE_VERTEX_COUNT, 0..prepared_scene.instance_count);
             }
             self.spheres.draw(&mut render_pass);
+            self.ship_mesh.draw(&mut render_pass);
             self.overlay.draw(&mut render_pass);
         }
         if let (Some(gpu_timer), Some(slot_index)) = (self.gpu_timer.as_ref(), timing_slot) {
@@ -978,8 +987,10 @@ impl Renderer {
         };
         let overlay_draw_calls = u32::from(self.overlay.is_visible());
         let scene_draw_calls = scene_draw_calls(prepared_scene.instance_count)
-            + scene_draw_calls(self.spheres.count());
-        let object_count = prepared_scene.instance_count + self.spheres.count();
+            + scene_draw_calls(self.spheres.count())
+            + scene_draw_calls(self.ship_mesh.count());
+        let object_count =
+            prepared_scene.instance_count + self.spheres.count() + self.ship_mesh.count();
         Ok(RenderOutcome::Presented(RenderStats {
             cpu_render_time,
             gpu_frame_time,
@@ -1097,6 +1108,7 @@ mod tests {
                 instances: &local_instances,
                 spheres: &[],
                 light: None,
+                ship: None,
             },
             16.0 / 9.0,
         )
@@ -1114,6 +1126,7 @@ mod tests {
                 instances: &translated_instances,
                 spheres: &[],
                 light: None,
+                ship: None,
             },
             16.0 / 9.0,
         )
@@ -1156,6 +1169,7 @@ mod tests {
                     instances: &[],
                     spheres: &[],
                     light: None,
+                    ship: None,
                 },
                 1.0,
             ),
@@ -1174,6 +1188,7 @@ mod tests {
                     instances: &invalid_instances,
                     spheres: &[],
                     light: None,
+                    ship: None,
                 },
                 1.0,
             ),
@@ -1211,6 +1226,7 @@ mod tests {
                 instances: &instances,
                 spheres: &[],
                 light: None,
+                ship: None,
             },
             1.0,
         )

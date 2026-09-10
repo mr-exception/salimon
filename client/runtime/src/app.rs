@@ -3,22 +3,28 @@ use std::fmt;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
+use salimon_character::{
+    CharacterController, CharacterLocation, MovementInput, ShipFrame, SurfaceFrame,
+};
 use salimon_diagnostics::{
     BodyDistance, Diagnostics, DomainMetrics, FrameSample, GpuMemory, GpuTime,
 };
 use salimon_renderer::{
     CameraFrame, GpuFrameTime, OverlayImage as RendererOverlayImage, PointLight, RenderOutcome,
-    Renderer, SceneFrame, SceneInstance, SphereInstance, SurfaceMaterial, SurfaceSize,
+    Renderer, SceneFrame, SceneInstance, ShipMeshInstance, SphereInstance, SurfaceMaterial,
+    SurfaceSize,
 };
+use salimon_ship::{DoorState, FlightState, ShipController, ShipPose, ShipSnapshot};
 use salimon_world::{
-    CameraCommand, CameraPrototype, CelestialBodyId, TransitionPhase, WorldSnapshot,
+    CELESTIAL_BODIES, CameraCommand, CameraPrototype, CelestialBodyId, TransitionPhase,
+    WorldPosition, WorldSnapshot,
 };
 use winit::application::ApplicationHandler;
 use winit::dpi::LogicalSize;
-use winit::event::{ElementState, WindowEvent};
+use winit::event::{DeviceEvent, DeviceId, ElementState, WindowEvent};
 use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
 use winit::keyboard::{KeyCode, PhysicalKey};
-use winit::window::{Window, WindowAttributes, WindowId};
+use winit::window::{CursorGrabMode, Window, WindowAttributes, WindowId};
 
 use crate::frame_clock::FrameClock;
 use crate::update_clock::UpdateClock;
@@ -71,18 +77,51 @@ impl fmt::Display for RunError {
 
 impl Error for RunError {}
 
-#[derive(Default)]
 struct ClientApplication {
     window: Option<Arc<Window>>,
     renderer: Option<Renderer>,
     frame_clock: FrameClock,
     update_clock: UpdateClock,
     camera_prototype: CameraPrototype,
+    character: CharacterController,
+    ship: ShipController,
+    movement_input: MovementInput,
+    view_mode: ViewMode,
+    cursor_captured: bool,
     diagnostics: Diagnostics,
     render_attempts: u64,
     retry_at: Option<Instant>,
     occluded: bool,
     failure: Option<String>,
+}
+
+impl Default for ClientApplication {
+    fn default() -> Self {
+        Self {
+            window: None,
+            renderer: None,
+            frame_clock: FrameClock::default(),
+            update_clock: UpdateClock::default(),
+            camera_prototype: CameraPrototype::default(),
+            character: CharacterController::default(),
+            ship: ShipController::default(),
+            movement_input: MovementInput::default(),
+            view_mode: ViewMode::Gameplay,
+            cursor_captured: false,
+            diagnostics: Diagnostics::default(),
+            render_attempts: 0,
+            retry_at: None,
+            occluded: false,
+            failure: None,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+enum ViewMode {
+    #[default]
+    Gameplay,
+    PrecisionTour,
 }
 
 impl ClientApplication {
@@ -101,6 +140,7 @@ impl ClientApplication {
             .map_err(|error| RunError::new("failed to create native window", error))?;
         window.set_visible(true);
         window.focus_window();
+        self.cursor_captured = capture_cursor(&window);
         let size = window.inner_size();
         log::info!(
             "native window created: physical_size={}x{} scale_factor={:.2}",
@@ -171,6 +211,37 @@ impl ClientApplication {
         event_loop.set_control_flow(ControlFlow::WaitUntil(retry_at));
     }
 
+    fn interact(&mut self) {
+        let ship_snapshot = self.ship.snapshot();
+        let ship_frame = character_ship_frame(ship_snapshot.pose);
+        let surface = earth_surface_frame();
+        match self.character.location() {
+            CharacterLocation::Cockpit => {
+                self.character.leave_cockpit();
+                self.ship.set_cockpit_control(false);
+                log::info!("left cockpit control; ship motion remains autonomous");
+            }
+            CharacterLocation::InsideShip
+            | CharacterLocation::DoorwayBlend
+            | CharacterLocation::Surface => {
+                let character = self.character.snapshot(ship_frame, surface);
+                let local = ship_frame.world_to_local(character.eye_position_meters);
+                if (local[0] - 1.38).abs() < 2.0 && local[2].abs() < 1.1 {
+                    self.character.enter_cockpit();
+                    self.ship.set_cockpit_control(true);
+                    log::info!("entered cockpit control");
+                } else if (local[0] + 3.84).abs() < 1.35 && local[2].abs() < 1.15 {
+                    self.ship.toggle_door();
+                    if let Some(message) = self.ship.snapshot().cockpit_message {
+                        log::info!("cockpit monitor: {}", message.text());
+                    } else {
+                        log::info!("exit door is now {:?}", self.ship.snapshot().door_state);
+                    }
+                }
+            }
+        }
+    }
+
     fn redraw(&mut self, event_loop: &ActiveEventLoop, window: Arc<Window>) {
         if self.occluded {
             self.frame_clock.reset_interval();
@@ -184,9 +255,40 @@ impl ClientApplication {
         let update_started_at = Instant::now();
         let update_delta = self.update_clock.step(update_started_at);
         self.camera_prototype.advance(update_delta);
+        self.ship.advance(update_delta);
+        let ship_snapshot = self.ship.snapshot();
+        let ship_frame = character_ship_frame(ship_snapshot.pose);
+        let surface_frame = earth_surface_frame();
+        if self.view_mode == ViewMode::Gameplay {
+            self.character.advance(
+                update_delta,
+                self.movement_input,
+                ship_frame,
+                surface_frame,
+                ship_snapshot.door_state == DoorState::Open,
+                matches!(ship_snapshot.flight_state, FlightState::Landed { .. }),
+            );
+        }
         let world_snapshot = self.camera_prototype.snapshot();
-        let (camera, scene_instances, spheres, light) = map_world_to_renderer(world_snapshot);
-        let body_distances = camera_body_distances(world_snapshot);
+        let (mut camera, scene_instances, spheres, light) = map_world_to_renderer(world_snapshot);
+        let character_snapshot = self.character.snapshot(ship_frame, surface_frame);
+        let ship_mesh = if self.view_mode == ViewMode::Gameplay {
+            camera = CameraFrame {
+                position_meters: character_snapshot.eye_position_meters,
+                target_meters: character_snapshot.look_target_meters,
+                up: character_snapshot.up,
+                vertical_fov_radians: 70.0_f32.to_radians(),
+                near_plane_meters: 0.05,
+            };
+            Some(ShipMeshInstance {
+                position_meters: ship_snapshot.pose.position_meters,
+                orientation: ship_snapshot.pose.orientation.map(|value| value as f32),
+                door_open: ship_snapshot.door_state == DoorState::Open,
+            })
+        } else {
+            None
+        };
+        let body_distances = camera_body_distances_from(world_snapshot, camera.position_meters);
         let cpu_update_time = update_started_at.elapsed();
         let overlay_image = self
             .diagnostics
@@ -207,6 +309,7 @@ impl ClientApplication {
                     instances: &scene_instances,
                     spheres: &spheres,
                     light: Some(light),
+                    ship: ship_mesh,
                 },
                 overlay_image,
                 || window.pre_present_notify(),
@@ -254,7 +357,15 @@ impl ClientApplication {
                             reserved_bytes: memory.reserved_bytes,
                         }),
                     },
-                    camera_domain_metrics(world_snapshot, &body_distances),
+                    if self.view_mode == ViewMode::Gameplay {
+                        gameplay_domain_metrics(
+                            character_snapshot.eye_position_meters,
+                            ship_snapshot,
+                            &body_distances,
+                        )
+                    } else {
+                        camera_domain_metrics(world_snapshot, &body_distances)
+                    },
                 );
                 if timing.frame_number == 1
                     || timing.frame_number.is_multiple_of(TIMING_LOG_INTERVAL)
@@ -298,6 +409,23 @@ impl ClientApplication {
 }
 
 impl ApplicationHandler for ClientApplication {
+    fn device_event(
+        &mut self,
+        _event_loop: &ActiveEventLoop,
+        _device_id: DeviceId,
+        event: DeviceEvent,
+    ) {
+        if self.view_mode == ViewMode::Gameplay
+            && self.cursor_captured
+            && let DeviceEvent::MouseMotion { delta } = event
+        {
+            self.character.apply_mouse_delta(delta.0, delta.1);
+            if let Some(window) = self.window.as_ref() {
+                window.request_redraw();
+            }
+        }
+    }
+
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
         self.occluded = false;
         self.retry_at = None;
@@ -374,6 +502,53 @@ impl ApplicationHandler for ClientApplication {
                     window.request_redraw();
                 }
             }
+            WindowEvent::Focused(focused) => {
+                if focused {
+                    self.cursor_captured = capture_cursor(&window);
+                } else {
+                    self.movement_input = MovementInput::default();
+                    self.cursor_captured = false;
+                }
+            }
+            WindowEvent::MouseInput {
+                state: ElementState::Pressed,
+                ..
+            } if !self.cursor_captured => {
+                self.cursor_captured = capture_cursor(&window);
+            }
+            WindowEvent::KeyboardInput { event, .. }
+                if release_cursor_pressed(event.state, event.repeat, event.physical_key) =>
+            {
+                release_cursor(&window);
+                self.cursor_captured = false;
+                self.movement_input = MovementInput::default();
+            }
+            WindowEvent::KeyboardInput { event, .. }
+                if interaction_pressed(event.state, event.repeat, event.physical_key) =>
+            {
+                self.interact();
+                window.request_redraw();
+            }
+            WindowEvent::KeyboardInput { event, .. }
+                if view_toggle_pressed(event.state, event.repeat, event.physical_key) =>
+            {
+                self.view_mode = match self.view_mode {
+                    ViewMode::Gameplay => ViewMode::PrecisionTour,
+                    ViewMode::PrecisionTour => ViewMode::Gameplay,
+                };
+                log::info!("view mode changed to {:?} (F2 toggles)", self.view_mode);
+                window.request_redraw();
+            }
+            WindowEvent::KeyboardInput { event, .. }
+                if movement_key(event.physical_key).is_some() =>
+            {
+                update_movement_input(
+                    &mut self.movement_input,
+                    event.physical_key,
+                    event.state == ElementState::Pressed,
+                );
+                window.request_redraw();
+            }
             WindowEvent::KeyboardInput { event, .. }
                 if is_diagnostics_toggle(event.state, event.repeat, event.physical_key) =>
             {
@@ -390,6 +565,7 @@ impl ApplicationHandler for ClientApplication {
                 let command = camera_command(event.state, event.repeat, event.physical_key)
                     .expect("guard accepts only camera commands");
                 self.camera_prototype.apply_command(command);
+                self.view_mode = ViewMode::PrecisionTour;
                 log::info!(
                     "camera tour command: {command:?}; paused={}",
                     self.camera_prototype.is_paused()
@@ -434,6 +610,84 @@ impl ApplicationHandler for ClientApplication {
 fn surface_size(window: &Window) -> SurfaceSize {
     let size = window.inner_size();
     SurfaceSize::new(size.width, size.height)
+}
+
+fn capture_cursor(window: &Window) -> bool {
+    if let Err(error) = window.set_cursor_grab(CursorGrabMode::Locked) {
+        log::warn!("could not lock cursor for mouse look: {error}");
+        window.set_cursor_visible(true);
+        return false;
+    }
+    window.set_cursor_visible(false);
+    true
+}
+
+fn release_cursor(window: &Window) {
+    if let Err(error) = window.set_cursor_grab(CursorGrabMode::None) {
+        log::warn!("could not release cursor: {error}");
+    }
+    window.set_cursor_visible(true);
+}
+
+fn release_cursor_pressed(state: ElementState, repeat: bool, key: PhysicalKey) -> bool {
+    state == ElementState::Pressed && !repeat && key == PhysicalKey::Code(KeyCode::Escape)
+}
+
+fn character_ship_frame(pose: ShipPose) -> ShipFrame {
+    ShipFrame {
+        origin_meters: pose.position_meters,
+        axes: pose.axes(),
+    }
+}
+
+fn earth_surface_frame() -> SurfaceFrame {
+    let earth = CELESTIAL_BODIES
+        .iter()
+        .find(|body| body.id == CelestialBodyId::Earth)
+        .expect("world catalog always contains Earth");
+    SurfaceFrame {
+        body_center_meters: earth.center.meters(),
+        radius_meters: earth.radius_meters,
+    }
+}
+
+fn interaction_pressed(state: ElementState, repeat: bool, key: PhysicalKey) -> bool {
+    state == ElementState::Pressed && !repeat && key == PhysicalKey::Code(KeyCode::KeyE)
+}
+
+fn view_toggle_pressed(state: ElementState, repeat: bool, key: PhysicalKey) -> bool {
+    state == ElementState::Pressed && !repeat && key == PhysicalKey::Code(KeyCode::F2)
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum MovementKey {
+    Forward,
+    Backward,
+    Left,
+    Right,
+    Jump,
+}
+
+fn movement_key(key: PhysicalKey) -> Option<MovementKey> {
+    match key {
+        PhysicalKey::Code(KeyCode::KeyW) => Some(MovementKey::Forward),
+        PhysicalKey::Code(KeyCode::KeyS) => Some(MovementKey::Backward),
+        PhysicalKey::Code(KeyCode::KeyA) => Some(MovementKey::Left),
+        PhysicalKey::Code(KeyCode::KeyD) => Some(MovementKey::Right),
+        PhysicalKey::Code(KeyCode::Space) => Some(MovementKey::Jump),
+        _ => None,
+    }
+}
+
+fn update_movement_input(input: &mut MovementInput, key: PhysicalKey, pressed: bool) {
+    match movement_key(key) {
+        Some(MovementKey::Forward) => input.forward = pressed,
+        Some(MovementKey::Backward) => input.backward = pressed,
+        Some(MovementKey::Left) => input.left = pressed,
+        Some(MovementKey::Right) => input.right = pressed,
+        Some(MovementKey::Jump) => input.jump = pressed,
+        None => {}
+    }
 }
 
 fn is_diagnostics_toggle(state: ElementState, repeat: bool, key: PhysicalKey) -> bool {
@@ -524,15 +778,42 @@ fn map_world_to_renderer(
     (camera, instances, spheres, light)
 }
 
+#[cfg(test)]
 fn camera_body_distances(snapshot: WorldSnapshot<'_>) -> Vec<BodyDistance<'static>> {
+    camera_body_distances_from(snapshot, snapshot.camera.position.meters())
+}
+
+fn camera_body_distances_from(
+    snapshot: WorldSnapshot<'_>,
+    position_meters: [f64; 3],
+) -> Vec<BodyDistance<'static>> {
+    let position = WorldPosition::new(position_meters[0], position_meters[1], position_meters[2]);
     snapshot
         .celestial_bodies
         .iter()
         .map(|body| BodyDistance {
             name: body.name,
-            distance_meters: body.surface_distance_from(snapshot.camera.position),
+            distance_meters: body.surface_distance_from(position),
         })
         .collect()
+}
+
+fn gameplay_domain_metrics<'a>(
+    player_position: [f64; 3],
+    ship: ShipSnapshot,
+    body_distances: &'a [BodyDistance<'static>],
+) -> DomainMetrics<'a> {
+    let forward = ship.pose.axes()[0];
+    DomainMetrics {
+        camera_position: Some(player_position),
+        player_position: Some(player_position),
+        ship_position: Some(ship.pose.position_meters),
+        ship_velocity: Some(forward.map(|value| value * ship.speed_meters_per_second)),
+        ship_speed_mps: Some(ship.speed_meters_per_second),
+        thruster_percent: Some(ship.thruster_percentage),
+        nearby_bodies: body_distances,
+        ..DomainMetrics::default()
+    }
 }
 
 fn camera_domain_metrics<'a>(
@@ -563,6 +844,7 @@ mod tests {
     use super::{
         INITIAL_HEIGHT, INITIAL_WIDTH, camera_body_distances, camera_command,
         camera_domain_metrics, is_diagnostics_toggle, map_world_to_renderer,
+        release_cursor_pressed,
     };
     use salimon_world::{CELESTIAL_BODIES, CameraCommand, CameraPrototype, CelestialBodyId};
     use winit::event::ElementState;
@@ -579,6 +861,18 @@ mod tests {
             ElementState::Pressed,
             false,
             PhysicalKey::Code(KeyCode::F2),
+        ));
+    }
+
+    #[test]
+    fn escape_releases_cursor_only_on_the_initial_press() {
+        let escape = PhysicalKey::Code(KeyCode::Escape);
+        assert!(release_cursor_pressed(ElementState::Pressed, false, escape));
+        assert!(!release_cursor_pressed(ElementState::Pressed, true, escape));
+        assert!(!release_cursor_pressed(
+            ElementState::Released,
+            false,
+            escape
         ));
     }
 

@@ -1,6 +1,6 @@
 [package]
 name = "salimon-world"
-description = "Portable large-scale coordinates and camera prototype for Salimon"
+description = "Portable compressed Solar System, coordinates, and camera prototype for Salimon"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

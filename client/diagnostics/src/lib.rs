@@ -44,7 +44,8 @@ pub struct FrameSample {
     pub gpu_memory: Option<GpuMemory>,
 }
 
-/// Distance from the observed player or ship to one world body.
+/// Nonnegative surface distance from the producer's documented reference point
+/// to one world body.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct BodyDistance<'a> {
     pub name: &'a str,
@@ -437,7 +438,7 @@ impl Diagnostics {
                     format_distance(body.distance_meters)
                 )
             })
-            .unwrap_or_else(|| "N/A (TASK 5+)".to_owned());
+            .unwrap_or_else(|| "N/A (NO BODY DATA)".to_owned());
         let _ = writeln!(text, "NEARBY BODY      {nearby}");
 
         text.pop();
@@ -992,7 +993,7 @@ mod tests {
         assert!(text.contains("PLAYER POSITION  N/A (TASK 8+)"));
         assert!(text.contains("SHIP SPEED       N/A (TASK 9+)"));
         assert!(text.contains("THRUSTER         N/A (TASK 9+)"));
-        assert!(text.contains("NEARBY BODY      N/A (TASK 5+)"));
+        assert!(text.contains("NEARBY BODY      N/A (NO BODY DATA)"));
     }
 
     #[test]

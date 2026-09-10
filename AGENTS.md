@@ -32,9 +32,10 @@ composition, redraw/update scheduling, surface recovery, and clocks;
 `client/renderer/` owns `wgpu` resources, camera-relative GPU conversion,
 reverse-Z depth, and presentation behind a narrow API. Task 4 activates
 `client/world/` for portable `f64`-meter coordinates and the renderer-neutral
-camera/precision prototype. The runtime maps world snapshots into renderer DTOs;
-the renderer must not depend on world, character, or ship state. The platform
-adapter is still reserved; `winit` integration may remain at the runtime boundary
+camera/precision prototype; Task 5 adds the immutable compressed Solar System
+catalog and body-distance math there. The runtime maps world snapshots into
+renderer DTOs; the renderer must not depend on world, character, or ship state.
+The platform adapter is still reserved; `winit` integration may remain at the runtime boundary
 until platform-specific behavior warrants extraction. Use custom Rust and
 low-level libraries; no full game engine. Phase 0 excludes backend/networking,
 persistence, and production gameplay systems. Task 3 owns the optional
@@ -53,8 +54,9 @@ cargo test --workspace --locked
 ```
 
 `cargo run` is interactive and continues until the native window closes. In
-addition to automated gates, smoke-test the visible scale-transition fixture,
-near-surface precision markers, pause/restart controls, live resize,
+addition to automated gates, smoke-test all six colored Solar System body proxies,
+the visible scale-transition fixture, near-surface precision markers,
+pause/restart controls, live resize,
 minimize/restore, clean close, and relaunch on macOS. Use rustfmt defaults, Rust
 2024, and the shared Cargo lints. Workspace crates inherit shared metadata/lints.
 Commit `Cargo.lock`; exclude `target/`. Keep setup instructions, component

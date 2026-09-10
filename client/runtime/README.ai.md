@@ -35,8 +35,11 @@ necessary.
 - Keep camera state through renderer rebuilds while resetting the monotonic
   update interval across lifecycle discontinuities.
 - Keep the renderer call surface narrow and typed.
+- Map all six world bodies before the three noncanonical precision markers;
+  preserve absolute `f64` centers and narrow radii only for presentation.
 - Keep diagnostics observational: map typed snapshots at the composition root
-  and do not fabricate unavailable world or ship values.
+  and report real camera-to-body surface distances without fabricating unavailable
+  player or ship values.
 - Add or update deterministic tests for non-GUI logic.
 - Run all root build/format/lint/test gates.
 - Perform the root native smoke check for lifecycle or rendering changes.

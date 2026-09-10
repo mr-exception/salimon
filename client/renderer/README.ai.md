@@ -4,7 +4,7 @@
 
 `salimon-renderer` owns GPU presentation through `wgpu`. It initializes a native
 surface and pipelines, responds to valid size changes, renders borrowed
-renderer-facing validation scenes, composites generic RGBA overlay input, and
+renderer-facing scenes, composites generic RGBA overlay input, and
 exposes renderer-owned measurements.
 
 ## Read before changing
@@ -51,7 +51,11 @@ domain state, diagnostics text, or toggle policy.
 - Update the component docs whenever ownership, API, or recovery behavior
   intentionally changes.
 
-The giant surface proxy is an intentional stress case, not evidence of
+Task 5 body proxies are generic cuboids produced by runtime; do not add body
+identity, landing rules, or Solar System dependencies here. Task 6 owns the
+explicit sphere and Sun-lighting presentation path.
+
+The radius-scaled Earth proxy is an intentional stress case, not evidence of
 sub-meter precision across one huge mesh. Reconstructing its near face from a
 center and half-extent near `6 Mm` in GPU `f32` uses `0.5 m` representable steps,
 so rounding can contribute up to about `0.25 m` of face-position error. Small

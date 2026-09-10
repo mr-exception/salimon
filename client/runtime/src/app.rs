@@ -3,12 +3,14 @@ use std::fmt;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
-use salimon_diagnostics::{Diagnostics, DomainMetrics, FrameSample, GpuMemory, GpuTime};
+use salimon_diagnostics::{
+    BodyDistance, Diagnostics, DomainMetrics, FrameSample, GpuMemory, GpuTime,
+};
 use salimon_renderer::{
     CameraFrame, GpuFrameTime, OverlayImage as RendererOverlayImage, RenderOutcome, Renderer,
     SceneFrame, SceneInstance, SurfaceSize,
 };
-use salimon_world::{CameraCommand, CameraPrototype, PrototypeSnapshot, TransitionPhase};
+use salimon_world::{CameraCommand, CameraPrototype, TransitionPhase, WorldSnapshot};
 use winit::application::ApplicationHandler;
 use winit::dpi::LogicalSize;
 use winit::event::{ElementState, WindowEvent};
@@ -19,7 +21,7 @@ use winit::window::{Window, WindowAttributes, WindowId};
 use crate::frame_clock::FrameClock;
 use crate::update_clock::UpdateClock;
 
-const WINDOW_TITLE: &str = "Salimon — Large-Scale Camera Prototype";
+const WINDOW_TITLE: &str = "Salimon — Compressed Solar System";
 const INITIAL_WIDTH: f64 = 1280.0;
 const INITIAL_HEIGHT: f64 = 720.0;
 const MINIMUM_WIDTH: f64 = 640.0;
@@ -180,8 +182,9 @@ impl ClientApplication {
         let update_started_at = Instant::now();
         let update_delta = self.update_clock.step(update_started_at);
         self.camera_prototype.advance(update_delta);
-        let prototype_snapshot = self.camera_prototype.snapshot();
-        let (camera, scene_instances) = map_prototype_to_renderer(prototype_snapshot);
+        let world_snapshot = self.camera_prototype.snapshot();
+        let (camera, scene_instances) = map_world_to_renderer(world_snapshot);
+        let body_distances = camera_body_distances(world_snapshot);
         let cpu_update_time = update_started_at.elapsed();
         let overlay_image = self
             .diagnostics
@@ -247,7 +250,7 @@ impl ClientApplication {
                             reserved_bytes: memory.reserved_bytes,
                         }),
                     },
-                    camera_domain_metrics(prototype_snapshot),
+                    camera_domain_metrics(world_snapshot, &body_distances),
                 );
                 if timing.frame_number == 1
                     || timing.frame_number.is_multiple_of(TIMING_LOG_INTERVAL)
@@ -384,7 +387,7 @@ impl ApplicationHandler for ClientApplication {
                     .expect("guard accepts only camera commands");
                 self.camera_prototype.apply_command(command);
                 log::info!(
-                    "camera prototype command: {command:?}; paused={}",
+                    "camera tour command: {command:?}; paused={}",
                     self.camera_prototype.is_paused()
                 );
                 window.request_redraw();
@@ -446,7 +449,7 @@ fn camera_command(state: ElementState, repeat: bool, key: PhysicalKey) -> Option
     }
 }
 
-fn map_prototype_to_renderer(snapshot: PrototypeSnapshot<'_>) -> (CameraFrame, Vec<SceneInstance>) {
+fn map_world_to_renderer(snapshot: WorldSnapshot<'_>) -> (CameraFrame, Vec<SceneInstance>) {
     let camera = CameraFrame {
         position_meters: snapshot.camera.position.meters(),
         target_meters: snapshot.camera.target.meters(),
@@ -454,25 +457,50 @@ fn map_prototype_to_renderer(snapshot: PrototypeSnapshot<'_>) -> (CameraFrame, V
         vertical_fov_radians: snapshot.camera.vertical_field_of_view_radians as f32,
         near_plane_meters: snapshot.camera.physical_near_plane_meters as f32,
     };
-    let instances = snapshot
-        .primitives
+    let mut instances: Vec<_> = snapshot
+        .celestial_bodies
         .iter()
-        .map(|primitive| SceneInstance {
-            center_meters: primitive.absolute_center.meters(),
-            half_extents_meters: primitive.half_extents_meters,
-            color: primitive.color,
+        .map(|body| SceneInstance {
+            center_meters: body.center.meters(),
+            half_extents_meters: [body.radius_meters as f32; 3],
+            color: body.display_color,
         })
         .collect();
+    instances.extend(
+        snapshot
+            .precision_markers
+            .iter()
+            .map(|marker| SceneInstance {
+                center_meters: marker.absolute_center.meters(),
+                half_extents_meters: marker.half_extents_meters,
+                color: marker.color,
+            }),
+    );
 
     (camera, instances)
 }
 
-fn camera_domain_metrics(snapshot: PrototypeSnapshot<'_>) -> DomainMetrics<'static> {
+fn camera_body_distances(snapshot: WorldSnapshot<'_>) -> Vec<BodyDistance<'static>> {
+    snapshot
+        .celestial_bodies
+        .iter()
+        .map(|body| BodyDistance {
+            name: body.name,
+            distance_meters: body.surface_distance_from(snapshot.camera.position),
+        })
+        .collect()
+}
+
+fn camera_domain_metrics<'a>(
+    snapshot: WorldSnapshot<'_>,
+    body_distances: &'a [BodyDistance<'static>],
+) -> DomainMetrics<'a> {
     DomainMetrics {
         camera_position: Some(snapshot.camera.position.meters()),
         camera_altitude_meters: Some(snapshot.camera.altitude_meters),
         camera_phase: Some(transition_phase_name(snapshot.transition_phase)),
         camera_paused: Some(snapshot.paused),
+        nearby_bodies: body_distances,
         ..DomainMetrics::default()
     }
 }
@@ -489,9 +517,10 @@ const fn transition_phase_name(phase: TransitionPhase) -> &'static str {
 #[cfg(test)]
 mod tests {
     use super::{
-        camera_command, camera_domain_metrics, is_diagnostics_toggle, map_prototype_to_renderer,
+        INITIAL_HEIGHT, INITIAL_WIDTH, camera_body_distances, camera_command,
+        camera_domain_metrics, is_diagnostics_toggle, map_world_to_renderer,
     };
-    use salimon_world::{CameraCommand, CameraPrototype};
+    use salimon_world::{CELESTIAL_BODIES, CameraCommand, CameraPrototype, CelestialBodyId};
     use winit::event::ElementState;
     use winit::keyboard::{KeyCode, PhysicalKey};
 
@@ -562,18 +591,27 @@ mod tests {
     }
 
     #[test]
-    fn runtime_mapping_preserves_absolute_world_values_and_fixture_telemetry() {
+    fn runtime_mapping_preserves_body_and_camera_fields_then_appends_markers() {
         let snapshot = CameraPrototype::default().snapshot();
-        let (camera, instances) = map_prototype_to_renderer(snapshot);
-        let metrics = camera_domain_metrics(snapshot);
+        let (camera, instances) = map_world_to_renderer(snapshot);
+        let body_distances = camera_body_distances(snapshot);
+        let metrics = camera_domain_metrics(snapshot, &body_distances);
 
         assert_eq!(camera.position_meters, snapshot.camera.position.meters());
         assert_eq!(camera.target_meters, snapshot.camera.target.meters());
-        assert_eq!(instances.len(), snapshot.primitives.len());
-        assert_eq!(
-            instances[0].center_meters,
-            snapshot.primitives[0].absolute_center.meters()
-        );
+        assert_eq!(instances.len(), 9);
+        assert_eq!(snapshot.celestial_bodies.len(), 6);
+        assert_eq!(snapshot.precision_markers.len(), 3);
+        for (instance, body) in instances[..6].iter().zip(snapshot.celestial_bodies) {
+            assert_eq!(instance.center_meters, body.center.meters());
+            assert_eq!(instance.half_extents_meters, [body.radius_meters as f32; 3]);
+            assert_eq!(instance.color, body.display_color);
+        }
+        for (instance, marker) in instances[6..].iter().zip(snapshot.precision_markers) {
+            assert_eq!(instance.center_meters, marker.absolute_center.meters());
+            assert_eq!(instance.half_extents_meters, marker.half_extents_meters);
+            assert_eq!(instance.color, marker.color);
+        }
         assert_eq!(metrics.camera_position, Some(camera.position_meters));
         assert_eq!(
             metrics.camera_altitude_meters,
@@ -581,5 +619,64 @@ mod tests {
         );
         assert_eq!(metrics.camera_phase, Some("approach"));
         assert_eq!(metrics.camera_paused, Some(false));
+        assert_eq!(metrics.nearby_bodies, body_distances);
+    }
+
+    #[test]
+    fn initial_overview_fully_frames_every_body_proxy() {
+        let snapshot = CameraPrototype::default().snapshot();
+        let aspect_ratio = INITIAL_WIDTH / INITIAL_HEIGHT;
+        let vertical_tangent = (snapshot.camera.vertical_field_of_view_radians * 0.5).tan();
+        let horizontal_tangent = vertical_tangent * aspect_ratio;
+
+        for body in snapshot.celestial_bodies {
+            let offset = body.center.offset_from(snapshot.camera.position);
+            let forward_depth = -offset[2];
+            let nearest_face_depth = forward_depth - body.radius_meters;
+            assert!(
+                nearest_face_depth > snapshot.camera.physical_near_plane_meters,
+                "{}'s nearest face must be in front of the overview camera",
+                body.name
+            );
+            assert!(
+                offset[0].abs() + body.radius_meters <= nearest_face_depth * horizontal_tangent,
+                "{} must fit horizontally in the initial overview",
+                body.name
+            );
+            assert!(
+                offset[1].abs() + body.radius_meters <= nearest_face_depth * vertical_tangent,
+                "{} must fit vertically in the initial overview",
+                body.name
+            );
+        }
+    }
+
+    #[test]
+    fn diagnostics_reports_every_body_and_near_view_earth_is_closest() {
+        let mut prototype = CameraPrototype::default();
+        prototype.apply_command(CameraCommand::JumpToNear);
+        let snapshot = prototype.snapshot();
+        let distances = camera_body_distances(snapshot);
+
+        assert_eq!(distances.len(), CELESTIAL_BODIES.len());
+        assert_eq!(
+            distances.iter().map(|body| body.name).collect::<Vec<_>>(),
+            CELESTIAL_BODIES
+                .iter()
+                .map(|body| body.name)
+                .collect::<Vec<_>>()
+        );
+        assert!(distances.iter().all(|body| body.distance_meters >= 0.0));
+        let nearest = distances
+            .iter()
+            .min_by(|first, second| first.distance_meters.total_cmp(&second.distance_meters))
+            .expect("catalog is nonempty");
+        let earth = CELESTIAL_BODIES
+            .iter()
+            .find(|body| body.id == CelestialBodyId::Earth)
+            .expect("Earth is canonical");
+
+        assert_eq!(nearest.name, earth.name);
+        assert!((nearest.distance_meters - 12.0).abs() <= f64::EPSILON);
     }
 }

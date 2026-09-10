@@ -7,8 +7,8 @@ snapshot into a borrowed RGBA image for the renderer to composite.
 
 The crate has no platform, GPU, renderer, or gameplay dependencies. It does not
 sample clocks or query hardware itself. The runtime decides when to toggle and
-record diagnostics, the renderer reports measurements it owns, and future world
-and ship modules provide optional domain values through `DomainMetrics`.
+record diagnostics, the renderer reports measurements it owns, and world/future
+ship modules provide optional domain values through `DomainMetrics`.
 
 ## Public contract
 
@@ -18,10 +18,11 @@ and ship modules provide optional domain values through `DomainMetrics`.
 - `FrameSample` carries one successfully presented frame's runtime and renderer
   measurements. Zero frame intervals are retained as the latest state but are
   excluded from the rolling statistics window.
-- `DomainMetrics` and `BodyDistance` borrow caller-owned state. Camera prototype
-  telemetry is explicitly named; missing future world, character, or ship
-  measurements render as `N/A`. The diagnostics layer never invents positions,
-  speeds, or distances.
+- `DomainMetrics` and `BodyDistance` borrow caller-owned state. Task 5 supplies
+  all six catalog names and nonnegative camera-to-nominal-surface observations;
+  the panel displays the closest one. Camera prototype telemetry is explicitly
+  named; missing future character or ship measurements render as `N/A`. The
+  diagnostics layer never invents positions, speeds, or distances.
 - `overlay` returns a borrowed `OverlayImage` only while diagnostics are visible.
   The renderer can use `revision` to avoid uploading unchanged pixels and scales
   the panel down uniformly when the drawable cannot contain it at source size.
@@ -39,7 +40,7 @@ display-density changes, frame-window resets, and memory warnings.
   shows average and nearest-rank p95 values for the same rolling window.
 - CPU render and update times are averages of supplied samples. The runtime
   supplies renderer encoding/submission wall time, excluding present wait, and
-  Task 4 supplies the measured portable-prototype update/mapping time. A future
+  runtime supplies the measured portable-world update/mapping time. A future
   frame with unavailable update timing would still show `N/A` and be excluded
   from that average.
 - GPU timing distinguishes unsupported hardware, an asynchronous result that is
@@ -51,8 +52,10 @@ display-density changes, frame-window resets, and memory warnings.
   not a claim about whole-process memory.
 - Camera/player/ship position, camera altitude, velocity, speed, and
   body-distance values use meters as their input unit and are formatted with
-  practical metric prefixes. Camera phase and pause state describe only the
-  Task 4 engineering transition fixture.
+  practical metric prefixes. The Task 5 nearby-body row describes the closest
+  distance from the engineering camera to a nominal body surface, not player or
+  ship state. Camera phase and pause state describe only the Task 4 engineering
+  transition fixture.
 
 Normal gameplay flight information still belongs on cockpit displays. This
 overlay is an engineering surface and must remain optional.

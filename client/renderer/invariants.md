@@ -19,8 +19,9 @@
 9. View/projection construction and depth policy are renderer-owned. The scene
    path uses a right-handed infinite reverse-Z projection and matching depth
    target/comparison state.
-10. The validation cuboids and shader exercise presentation only and must not be
-    treated as canonical scene data.
+10. Generic cuboids and the shader exercise presentation only. Task 5 body
+    proxies must not introduce celestial identity, landing rules, or a world
+    dependency; Task 6 owns textured/scalable spheres and Sun lighting.
 11. The renderer uses low-level `wgpu` directly and must not introduce a full
     game engine.
 12. Overlay input is a validated, borrowed RGBA image. The renderer may cache and

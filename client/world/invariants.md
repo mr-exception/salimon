@@ -1,17 +1,23 @@
 # World Invariants
 
-1. Canonical world positions and camera positions use finite `f64` meters.
-2. Camera-relative positions subtract their `f64` origin before any `f32`
+1. Canonical world positions, camera positions, radii, speeds, and distance math
+   use finite `f64` meters.
+2. The immutable catalog contains exactly, and in order: Sun, Mercury, Venus,
+   Earth, Moon, Mars. IDs and names are unique, and radii are positive/distinct.
+3. The Sun is the only visual-only body and exposes no landing radius. The other
+   five bodies are solid and every pair of their `1.15R` landing volumes is
+   disjoint.
+4. The Earth-to-Mars nominal-surface gap is `60,000,000 m`; at the Phase 0
+   reference maximum speed of `500,000 m/s`, it takes exactly 120 seconds.
+5. Earth's positive-Z surface is `SURFACE_ANCHOR`; the near camera dwell remains
+   exactly 12 m above that surface.
+6. Camera-relative positions subtract their `f64` origin before any `f32`
    conversion.
-3. World code never depends on `winit`, `wgpu`, native handles, or graphics
-   clip-space conventions.
-4. The renderer never receives or mutates authoritative world state.
-5. Camera altitude and near-plane values remain finite and strictly positive
-   throughout the tour.
-6. Approach and retreat are monotonic, dwell phases hold exact endpoints, a
-   restart deterministically returns to the far approach endpoint, and a near
-   inspection command selects the exact near-dwell endpoint and pauses there.
-7. Pausing changes only tour progression; snapshots and primitive definitions
-   remain stable.
-8. Prototype primitives are immutable validation references. They are not real
-   Phase 0 celestial data and must not leak into Task 5 as canonical content.
+7. World code never depends on `winit`, `wgpu`, native handles, graphics
+   clip-space conventions, networking, persistence, or backend services.
+8. Approach and retreat are monotonic, dwell phases hold exact endpoints, and
+   pause/restart/near-inspection commands remain deterministic.
+9. Pausing changes only tour progression. The body catalog and three precision
+   markers are immutable across snapshots.
+10. Precision markers are noncanonical validation references and never count as
+    celestial bodies or landing volumes.

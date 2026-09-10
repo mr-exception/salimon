@@ -2,9 +2,11 @@
 
 `salimon-renderer` is the custom `wgpu` 30.0.1 rendering library introduced in
 Task 2, instrumented in Task 3, and extended with the Task 4 large-scale camera
-prototype. It draws generic instanced cuboids, composites an optional borrowed
-RGBA overlay, and reports renderer-owned measurements. The cuboids are
-validation geometry, not canonical world or Solar System content.
+prototype. In Task 5 it still draws generic instanced cuboids: runtime maps each
+canonical body to a colored proxy with half-extents equal to its compressed
+radius and appends three noncanonical precision markers. The renderer does not
+know which instances are bodies. Task 6 owns textured/scalable sphere rendering
+and Sun lighting.
 
 The public integration surface is intentionally narrow:
 
@@ -28,7 +30,8 @@ WebGPU's zero-to-one depth range. A `Depth32Float` attachment is cleared to
 `0.0`, scene fragments compare with `Greater`, and the near plane maps to `1.0`.
 Depth approaches zero with distance and has no finite far plane. The caller
 still owns the near-plane choice; `0.05 m` is the Task 4 validation value and
-should only be reduced when close geometry requires it.
+should only be reduced when close geometry requires it. Task 5 continues to use
+this established coordinate/depth path without changing the renderer API.
 
 The renderer's adjacent-depth-value test measures the view-space separation
 represented by `Depth32Float` with that near plane:
@@ -56,10 +59,10 @@ Near-camera detail keeps local `f32` precision even when the absolute camera
 origin is `1 Tm` from zero; the translation-invariance unit test covers that
 case. Far-away instance centers still inherit `f32` spacing based on their
 camera distance. Later LOD or planet rendering must avoid expecting metre-scale
-mesh detail to survive at gigametre/terametre relative distances. Task 4 does
-not add logarithmic depth, split coordinates in WGSL, multiple depth passes, or
-planet-specific proxies because reverse-Z plus camera-relative input is enough
-to validate the foundational path without taking Task 5 or Task 6 scope.
+mesh detail to survive at gigametre/terametre relative distances. The established
+path does not add logarithmic depth, split coordinates in WGSL, or multiple depth
+passes. Task 5 reuses it for generic body proxies; Task 6 owns planet-specific
+spheres, LOD, materials, and lighting.
 
 ## Ownership and metrics
 
@@ -69,7 +72,7 @@ readback, allocator reporting, and presentation. It does not own the native
 event loop, frame clock, lifecycle policy, diagnostics content, or authoritative
 game/world state.
 
-Task 4 uses conservative bounding-sphere frustum culling but no occlusion
+The scene uses conservative bounding-sphere frustum culling but no occlusion
 culling. `RenderStats` reports the retained visible/rendered instance count,
 zero scene draws for an empty retained set or one otherwise, and adds the
 overlay draw only when visible. GPU timestamps remain capability-gated and use

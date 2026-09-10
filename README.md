@@ -5,18 +5,18 @@ current milestone is **Phase 0 — Technical Feasibility Showcase**: a native ma
 client-only prototype using a custom `wgpu` renderer, with Windows and web as
 later targets. The reference performance machine is a MacBook Air M1.
 
-This repository implements **task 4: Implement large-scale coordinate and camera
-prototype** on top of the native runtime, renderer, and diagnostics bootstrap.
-The client opens a native, resizable window and continuously moves an engineering
-camera from a `120 Mm` far-space view to meter-scale surface markers placed near
-a deliberately large absolute coordinate. It is a precision fixture, not yet a
-playable Solar System scene.
+This repository implements **task 5: Build compressed Solar System scene**
+on top of the native runtime, renderer, diagnostics, and large-scale coordinate
+prototype. The native client continuously presents a static, client-side scene
+containing exactly the Sun, Mercury, Venus, Earth, Moon, and Mars. Colored,
+radius-scaled cuboids stand in for bodies until Task 6 adds scalable textured
+spheres and Sun lighting; the Task 4 camera tour and precision markers remain.
 
 ## Source of requirements
 
 The [Salimon Notion space](https://app.notion.com/p/801c9c427af24e9b8d57b07572ef4119)
 holds the task list and documentation. Start with
-[task 4](https://app.notion.com/p/3d5b456853b981258981dec8275426a0), the
+[task 5](https://app.notion.com/p/3d5b456853b981f98685d3b91e81340c), the
 [Phase 0 specification](https://app.notion.com/p/3d5b456853b981db968dca1901a270a2), and
 [Technical Architecture & AI Maintenance](https://app.notion.com/p/3d5b456853b981078a82c68207f4444e).
 [AGENTS.md](AGENTS.md) describes how future agents should access those sources;
@@ -33,7 +33,7 @@ salimon/
 └── client/
     ├── runtime/        # salimon-client lifecycle and composition executable
     ├── renderer/       # salimon-renderer GPU library and presentation
-    ├── world/          # Portable f64 coordinates and Task 4 camera fixture
+    ├── world/          # Compressed Solar System, f64 coordinates, and camera fixture
     ├── character/      # Future first-person character behavior
     ├── ship/           # Future ship state and control
     ├── platform/       # Future native window/input/platform adapters
@@ -82,11 +82,13 @@ cargo build --workspace --locked
 cargo run --locked -p salimon-client
 ```
 
-The run command opens the **Salimon Phase 0** native window and continues until
-the window is closed. Colored cuboid proxies and scale markers show the automatic
-far-space-to-near-surface camera transition. The fixture uses anonymous geometry
-so Task 5 can own the compressed Solar System data and Task 6 can own planet
-rendering without inheriting temporary content.
+The run command opens the **Salimon — Compressed Solar System** native window and
+continues until the window is closed. Six colored cuboid proxies show the static
+compressed bodies during the automatic far-space-to-Earth-surface transition.
+The Sun is explicitly visual-only; the other five bodies have disjoint `1.15R`
+landing volumes. Three separate meter-scale markers remain near Earth's positive-Z
+surface for precision inspection. Task 6 will replace body proxies with textured,
+scalable spheres and add Sun lighting.
 
 Press **P** to pause or resume the automatic transition, **R** to restart it at
 the far endpoint, and **N** to jump to the exact 12 m near-surface dwell and
@@ -95,12 +97,13 @@ repeats and releases are ignored.
 
 Press **F3** to toggle the engineering diagnostics overlay. It is hidden by
 default and updates at a throttled cadence while frame observations continue to
-be collected. The view includes FPS/frame time, real prototype-update and
+be collected. The view includes FPS/frame time, real world-update and
 CPU-side render time, GPU pass time when timestamp queries are supported, scene
 and total draw/object counts, optional GPU allocator totals, camera
 position/altitude/transition state, and memory-pressure warnings. Rows for
-player/ship position, ship velocity/speed/thruster, and nearby-body distance are
-explicitly `N/A` until their owning systems are implemented by later tasks.
+player/ship position and ship velocity/speed/thruster are explicitly `N/A` until
+their owning systems are implemented. The nearby-body row reports the closest
+of six nonnegative camera-to-surface observations.
 
 The coordinate/depth approach and its measured precision limits are documented
 in [client/world/coordinate-strategy.md](client/world/coordinate-strategy.md).
@@ -123,16 +126,18 @@ root `target/` directory. No application bundle or installer exists yet.
 Rendering and diagnostics require an interactive check on macOS in addition to
 automated tests:
 
-1. Launch the client and confirm the colored far-space proxy approaches smoothly
-   until the meter-scale surface pad and markers are visible.
+1. Launch the client and confirm the far view contains distinct colored proxies
+   for exactly Sun, Mercury, Venus, Earth, Moon, and Mars, with visibly distinct
+   compressed sizes and no other celestial bodies.
 2. Let the fixture traverse far and near scales; confirm there is no visible
    position jitter, premature far clipping, depth inversion, or coplanar flicker
    in the intentionally separated markers.
-3. Press N and confirm the exact 12 m near-surface view and its markers remain
+3. Press N and confirm the exact 12 m Earth-surface view and its three markers remain
    stable while paused; press P to resume, then R and confirm the camera restarts
    at the far endpoint.
-4. Press F3 and confirm the panel shows updating camera altitude/phase, CPU/GPU
-   states, and truthful scene counts; hide it again without affecting the scene.
+4. Press F3 and confirm the panel identifies Earth as the nearest body at the
+   12 m dwell, while camera altitude/phase, CPU/GPU states, and scene counts
+   update truthfully; hide it again without affecting the scene.
 5. Resize repeatedly, including to a very small size, and confirm projection and
    depth follow the drawable size without a panic or validation error.
 6. Minimize and restore, then confirm rendering/animation resume without a time
@@ -159,8 +164,9 @@ cargo test --workspace --locked
 Use `cargo fmt --all` to apply formatting. Automated tests cover logic that does
 not require a live native surface; the native launch, drawing, overlay toggle,
 resize, minimize, restore, and close behavior still require the smoke check
-above. Task 4 adds only a deterministic engineering camera/coordinate fixture;
-it does not add gameplay, celestial-body data, planet rendering, or backend
+above. Task 5 adds only immutable client-side celestial-body data, geometry math,
+proxy mapping, and diagnostics distances. It does not add orbital simulation,
+gameplay, textured planet rendering, lighting, persistence, networking, or backend
 behavior.
 
 Add future crates explicitly to the root workspace and inherit its package

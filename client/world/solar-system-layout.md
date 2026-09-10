@@ -39,7 +39,8 @@ solid landing-volume checks.
 
 ## Presentation
 
-Task 5 maps each catalog body to a colored cuboid whose three half-extents equal
-the compressed radius. These are temporary generic renderer proxies. Task 6 owns
-textured/scalable sphere rendering and Sun lighting. Three Task 4 meter-scale
-precision markers are appended separately and are not catalog members.
+Runtime maps each catalog body to an analytic textured sphere at its unchanged
+compressed radius. The Sun uses emissive material and supplies a generic point
+light; the five solid bodies use lit generic materials. Three Task 4 meter-scale
+precision-marker cuboids remain separate and are not catalog members. The
+renderer has no celestial IDs, landing rules, or world dependency.

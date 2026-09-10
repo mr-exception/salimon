@@ -5,6 +5,8 @@
 
 mod gpu_timing;
 mod overlay;
+mod spheres;
+mod surface_textures;
 
 use std::error::Error;
 use std::fmt;
@@ -12,6 +14,7 @@ use std::time::Duration;
 
 use gpu_timing::GpuTimer;
 pub use overlay::OverlayImage;
+pub use spheres::{PointLight, SphereInstance, SurfaceMaterial};
 use wgpu::util::DeviceExt;
 
 const CLEAR_COLOR: wgpu::Color = wgpu::Color {
@@ -96,6 +99,8 @@ pub struct SceneInstance {
 pub struct SceneFrame<'a> {
     pub camera: CameraFrame,
     pub instances: &'a [SceneInstance],
+    pub spheres: &'a [SphereInstance],
+    pub light: Option<PointLight>,
 }
 
 /// Physical pixel dimensions for the renderer's presentation surface.
@@ -596,6 +601,7 @@ pub struct Renderer {
     instance_capacity: usize,
     depth_target: DepthTarget,
     overlay: overlay::OverlayRenderer,
+    spheres: spheres::SphereRenderer,
     gpu_timer: Option<GpuTimer>,
     cached_gpu_memory: Option<GpuMemoryMetrics>,
     presented_frames: u64,
@@ -779,6 +785,7 @@ impl Renderer {
         });
         let depth_target = DepthTarget::new(&device, configured_width, configured_height);
         let overlay = overlay::OverlayRenderer::new(&device, configuration.format, DEPTH_FORMAT);
+        let spheres = spheres::SphereRenderer::new(&device, &queue, configuration.format);
         let gpu_timer = timestamp_queries_supported.then(|| GpuTimer::new(&device, &queue));
 
         let mut renderer = Self {
@@ -794,6 +801,7 @@ impl Renderer {
             instance_capacity: 1,
             depth_target,
             overlay,
+            spheres,
             gpu_timer,
             cached_gpu_memory: None,
             presented_frames: 0,
@@ -872,6 +880,13 @@ impl Renderer {
         let aspect_ratio = self.configuration.width as f32 / self.configuration.height as f32;
         let prepared_scene = prepare_scene(scene, aspect_ratio)
             .map_err(|error| RendererError::new("failed to prepare scene", error))?;
+        self.spheres.prepare(
+            &self.device,
+            &self.queue,
+            scene,
+            self.configuration.width,
+            self.configuration.height,
+        )?;
         self.ensure_instance_capacity(prepared_scene.instances.len())?;
         self.queue.write_buffer(
             &self.camera_buffer,
@@ -933,6 +948,7 @@ impl Renderer {
                 render_pass.set_vertex_buffer(1, self.instance_buffer.slice(..));
                 render_pass.draw(0..CUBE_VERTEX_COUNT, 0..prepared_scene.instance_count);
             }
+            self.spheres.draw(&mut render_pass);
             self.overlay.draw(&mut render_pass);
         }
         if let (Some(gpu_timer), Some(slot_index)) = (self.gpu_timer.as_ref(), timing_slot) {
@@ -961,12 +977,14 @@ impl Renderer {
             None => GpuFrameTime::Unsupported,
         };
         let overlay_draw_calls = u32::from(self.overlay.is_visible());
-        let scene_draw_calls = scene_draw_calls(prepared_scene.instance_count);
+        let scene_draw_calls = scene_draw_calls(prepared_scene.instance_count)
+            + scene_draw_calls(self.spheres.count());
+        let object_count = prepared_scene.instance_count + self.spheres.count();
         Ok(RenderOutcome::Presented(RenderStats {
             cpu_render_time,
             gpu_frame_time,
-            visible_objects: prepared_scene.instance_count,
-            rendered_objects: prepared_scene.instance_count,
+            visible_objects: object_count,
+            rendered_objects: object_count,
             scene_draw_calls,
             total_draw_calls: scene_draw_calls + overlay_draw_calls,
             gpu_memory: self.cached_gpu_memory,
@@ -1077,6 +1095,8 @@ mod tests {
             SceneFrame {
                 camera: local_camera,
                 instances: &local_instances,
+                spheres: &[],
+                light: None,
             },
             16.0 / 9.0,
         )
@@ -1092,6 +1112,8 @@ mod tests {
             SceneFrame {
                 camera: translated_camera,
                 instances: &translated_instances,
+                spheres: &[],
+                light: None,
             },
             16.0 / 9.0,
         )
@@ -1132,6 +1154,8 @@ mod tests {
                 SceneFrame {
                     camera: coincident_camera,
                     instances: &[],
+                    spheres: &[],
+                    light: None,
                 },
                 1.0,
             ),
@@ -1148,6 +1172,8 @@ mod tests {
                 SceneFrame {
                     camera: camera([0.0; 3], [0.0, 0.0, -1.0]),
                     instances: &invalid_instances,
+                    spheres: &[],
+                    light: None,
                 },
                 1.0,
             ),
@@ -1183,6 +1209,8 @@ mod tests {
             SceneFrame {
                 camera: camera([0.0; 3], [0.0, 0.0, -1.0]),
                 instances: &instances,
+                spheres: &[],
+                light: None,
             },
             1.0,
         )

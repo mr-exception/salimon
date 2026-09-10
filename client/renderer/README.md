@@ -2,11 +2,12 @@
 
 `salimon-renderer` is the custom `wgpu` 30.0.1 rendering library introduced in
 Task 2, instrumented in Task 3, and extended with the Task 4 large-scale camera
-prototype. In Task 5 it still draws generic instanced cuboids: runtime maps each
-canonical body to a colored proxy with half-extents equal to its compressed
-radius and appends three noncanonical precision markers. The renderer does not
-know which instances are bodies. Task 6 owns textured/scalable sphere rendering
-and Sun lighting.
+prototype. Task 6 adds screen-bounded analytic spheres, original mipmapped
+surface textures, local detail, and unshadowed point lighting. Runtime maps the
+six bodies to generic sphere/material DTOs and the three precision markers to
+separate cuboids. The renderer knows no celestial identities or landing rules.
+See [sphere-rendering.md](sphere-rendering.md) for the precision/LOD technique,
+material source, limitations, and future terrain path.
 
 The public integration surface is intentionally narrow:
 
@@ -14,7 +15,7 @@ The public integration surface is intentionally narrow:
 - `Renderer::resize` updates the color surface and matching depth target.
 - `Renderer::render` accepts a borrowed `SceneFrame`, an optional borrowed
   `OverlayImage`, and the platform presentation callback.
-- `CameraFrame` and `SceneInstance` carry renderer-facing snapshots without a
+- `CameraFrame`, `SceneInstance`, `SphereInstance`, and `PointLight` carry renderer-facing snapshots without a
   dependency on world, character, or ship crates.
 
 ## Large-scale coordinate and depth strategy
@@ -30,8 +31,8 @@ WebGPU's zero-to-one depth range. A `Depth32Float` attachment is cleared to
 `0.0`, scene fragments compare with `Greater`, and the near plane maps to `1.0`.
 Depth approaches zero with distance and has no finite far plane. The caller
 still owns the near-plane choice; `0.05 m` is the Task 4 validation value and
-should only be reduced when close geometry requires it. Task 5 continues to use
-this established coordinate/depth path without changing the renderer API.
+should only be reduced when close geometry requires it. Spheres write analytic
+surface depth into that same attachment.
 
 The renderer's adjacent-depth-value test measures the view-space separation
 represented by `Depth32Float` with that near plane:
@@ -61,8 +62,9 @@ case. Far-away instance centers still inherit `f32` spacing based on their
 camera distance. Later LOD or planet rendering must avoid expecting metre-scale
 mesh detail to survive at gigametre/terametre relative distances. The established
 path does not add logarithmic depth, split coordinates in WGSL, or multiple depth
-passes. Task 5 reuses it for generic body proxies; Task 6 owns planet-specific
-spheres, LOD, materials, and lighting.
+passes. Task 6 additionally retains the sphere's camera-to-surface distance in
+CPU `f64`, avoiding the cancellation of large GPU center/radius operands when
+solving the near surface intersection.
 
 ## Ownership and metrics
 
@@ -72,10 +74,10 @@ readback, allocator reporting, and presentation. It does not own the native
 event loop, frame clock, lifecycle policy, diagnostics content, or authoritative
 game/world state.
 
-The scene uses conservative bounding-sphere frustum culling but no occlusion
-culling. `RenderStats` reports the retained visible/rendered instance count,
-zero scene draws for an empty retained set or one otherwise, and adds the
-overlay draw only when visible. GPU timestamps remain capability-gated and use
+Cuboids use conservative bounding-sphere frustum culling; analytic spheres use
+conservative projected bounds. There is no occlusion culling. `RenderStats`
+reports the combined retained instance count and at most one draw for each
+nonempty geometry class, plus the overlay draw when visible. GPU timestamps remain capability-gated and use
 the existing non-blocking three-slot readback ring.
 
 Run the library through `cargo run --locked -p salimon-client`. See

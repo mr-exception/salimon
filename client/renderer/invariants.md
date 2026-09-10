@@ -11,7 +11,7 @@
    not exit the application or own lifecycle recovery or retry policy.
 6. Rendering never advances simulation, mutates authoritative world/game state,
    or consumes raw gameplay-domain internals.
-7. `CameraFrame` and `SceneInstance` are renderer DTOs, not authoritative world
+7. `CameraFrame`, `SceneInstance`, `SphereInstance`, and `PointLight` are renderer DTOs, not authoritative world
    state. The runtime maps domain snapshots into them while preserving absolute
    `f64` positions; it does not rebase those positions.
 8. The renderer subtracts camera position from instance centers and camera
@@ -19,9 +19,10 @@
 9. View/projection construction and depth policy are renderer-owned. The scene
    path uses a right-handed infinite reverse-Z projection and matching depth
    target/comparison state.
-10. Generic cuboids and the shader exercise presentation only. Task 5 body
-    proxies must not introduce celestial identity, landing rules, or a world
-    dependency; Task 6 owns textured/scalable spheres and Sun lighting.
+10. Cuboids, analytic spheres, generic materials, and point lighting exercise
+    presentation only, with no celestial identity, landing rules, or world
+    dependency. Sphere surface altitude is subtracted in `f64` before GPU
+    conversion; its fragment depth uses the rationalized ray-intersection root.
 11. The renderer uses low-level `wgpu` directly and must not introduce a full
     game engine.
 12. Overlay input is a validated, borrowed RGBA image. The renderer may cache and
@@ -33,3 +34,6 @@
 14. Scene object counts describe instances retained by conservative frustum
     culling, and scene draw counts exclude diagnostics presentation. Total draw
     calls include the overlay when it is visible.
+15. Texture LOD varies continuously with projected footprint. Local detail uses
+    a body-relative origin wrapped in CPU `f64`; no universe-scale `f32` texture
+    coordinates, atmosphere, clouds, shadows, or post-effect dependency is used.

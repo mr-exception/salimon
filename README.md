@@ -5,18 +5,18 @@ current milestone is **Phase 0 — Technical Feasibility Showcase**: a native ma
 client-only prototype using a custom `wgpu` renderer, with Windows and web as
 later targets. The reference performance machine is a MacBook Air M1.
 
-This repository implements **task 5: Build compressed Solar System scene**
+This repository implements **task 6: Implement scalable planet rendering**
 on top of the native runtime, renderer, diagnostics, and large-scale coordinate
 prototype. The native client continuously presents a static, client-side scene
-containing exactly the Sun, Mercury, Venus, Earth, Moon, and Mars. Colored,
-radius-scaled cuboids stand in for bodies until Task 6 adds scalable textured
-spheres and Sun lighting; the Task 4 camera tour and precision markers remain.
+containing exactly the Sun, Mercury, Venus, Earth, Moon, and Mars. Generic textured
+spheres use continuous material LOD, Sun lighting, and precise surface depth;
+the camera tour can inspect each body and retains the Earth precision markers.
 
 ## Source of requirements
 
 The [Salimon Notion space](https://app.notion.com/p/801c9c427af24e9b8d57b07572ef4119)
 holds the task list and documentation. Start with
-[task 5](https://app.notion.com/p/3d5b456853b981f98685d3b91e81340c), the
+[task 6](https://app.notion.com/p/3d5b456853b981eca132cff958c0a890), the
 [Phase 0 specification](https://app.notion.com/p/3d5b456853b981db968dca1901a270a2), and
 [Technical Architecture & AI Maintenance](https://app.notion.com/p/3d5b456853b981078a82c68207f4444e).
 [AGENTS.md](AGENTS.md) describes how future agents should access those sources;
@@ -83,17 +83,22 @@ cargo run --locked -p salimon-client
 ```
 
 The run command opens the **Salimon — Compressed Solar System** native window and
-continues until the window is closed. Six colored cuboid proxies show the static
+continues until the window is closed. Six textured spheres show the static
 compressed bodies during the automatic far-space-to-Earth-surface transition.
 The Sun is explicitly visual-only; the other five bodies have disjoint `1.15R`
 landing volumes. Three separate meter-scale markers remain near Earth's positive-Z
-surface for precision inspection. Task 6 will replace body proxies with textured,
-scalable spheres and add Sun lighting.
+surface for precision inspection. The spheres have original generated materials,
+unshadowed Sun illumination, and an emissive Sun; there are no atmospheres,
+clouds, dynamic shadows, or post effects.
 
 Press **P** to pause or resume the automatic transition, **R** to restart it at
-the far endpoint, and **N** to jump to the exact 12 m near-surface dwell and
+the selected body's far endpoint, and **N** to jump to the exact 12 m near-surface dwell and
 pause there for inspection. Only the initial physical key press is acted on;
 repeats and releases are ignored.
+
+Press **1–6** to restart the approach for **Sun, Mercury, Venus, Earth, Moon,
+Mars**, respectively. Earth is selected at launch. Selection is an engineering
+camera fixture; it does not move bodies or implement flight/landing gameplay.
 
 Press **F3** to toggle the engineering diagnostics overlay. It is hidden by
 default and updates at a throttled cadence while frame observations continue to
@@ -126,7 +131,7 @@ root `target/` directory. No application bundle or installer exists yet.
 Rendering and diagnostics require an interactive check on macOS in addition to
 automated tests:
 
-1. Launch the client and confirm the far view contains distinct colored proxies
+1. Launch the client and confirm the far view contains distinct textured spheres
    for exactly Sun, Mercury, Venus, Earth, Moon, and Mars, with visibly distinct
    compressed sizes and no other celestial bodies.
 2. Let the fixture traverse far and near scales; confirm there is no visible
@@ -135,6 +140,9 @@ automated tests:
 3. Press N and confirm the exact 12 m Earth-surface view and its three markers remain
    stable while paused; press P to resume, then R and confirm the camera restarts
    at the far endpoint.
+   Repeat with keys 2, 3, 5, and 6 to inspect Mercury, Venus, Moon, and Mars
+   through their complete approach/retreat. Check the lit curved silhouettes,
+   smooth material filtering, and surface detail at N; use 4 to return to Earth.
 4. Press F3 and confirm the panel identifies Earth as the nearest body at the
    12 m dwell, while camera altitude/phase, CPU/GPU states, and scene counts
    update truthfully; hide it again without affecting the scene.
@@ -164,10 +172,11 @@ cargo test --workspace --locked
 Use `cargo fmt --all` to apply formatting. Automated tests cover logic that does
 not require a live native surface; the native launch, drawing, overlay toggle,
 resize, minimize, restore, and close behavior still require the smoke check
-above. Task 5 adds only immutable client-side celestial-body data, geometry math,
-proxy mapping, and diagnostics distances. It does not add orbital simulation,
-gameplay, textured planet rendering, lighting, persistence, networking, or backend
-behavior.
+above. Task 6 adds textured sphere presentation, Sun lighting, and per-body
+inspection. [Sphere rendering](client/renderer/sphere-rendering.md) records the
+precision technique, LOD budget, material source, and future terrain path.
+Orbital simulation, gameplay, persistence, networking, and backend behavior remain
+outside this implementation.
 
 Add future crates explicitly to the root workspace and inherit its package
 metadata and lints. Keep `Cargo.lock` committed; validate normal changes with

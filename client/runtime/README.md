@@ -37,15 +37,17 @@ System overview to Earth's meter-scale surface markers and retreats in a loop.
 Press **P** on its initial key press to
 pause/resume the transition, **R** to restart it at the far endpoint, and **N**
 to select the exact 12 m near-surface dwell and pause it for inspection. The
-runtime translates those `winit` events into typed world commands; raw platform
+keys **1–6** select Sun, Mercury, Venus, Earth, Moon, and Mars, respectively,
+and restart that body's tour. Earth is the initial target; R retains selection.
+The runtime translates those `winit` events into typed world commands; raw platform
 events never cross the world boundary.
 
 ## Boundaries
 
 Keep world/camera behavior in `salimon-world`. The runtime retains the portable
 camera object only as the composition root. It maps the snapshot's six bodies to
-colored radius-scaled cuboid `SceneInstance` values, appends the three separate
-precision markers, and supplies diagnostics with nonnegative camera-to-body
+`SphereInstance` values with generic material styles, maps the Sun to `PointLight`,
+keeps the three precision-marker cuboids separate, and supplies diagnostics with nonnegative camera-to-body
 surface observations for every catalog body; diagnostics displays the closest.
 `winit` integration remains here until platform-specific behavior justifies an
 adapter under `client/platform/`. The runtime must not acquire GPU, backend,

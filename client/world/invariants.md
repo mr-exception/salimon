@@ -9,8 +9,9 @@
    disjoint.
 4. The Earth-to-Mars nominal-surface gap is `60,000,000 m`; at the Phase 0
    reference maximum speed of `500,000 m/s`, it takes exactly 120 seconds.
-5. Earth's positive-Z surface is `SURFACE_ANCHOR`; the near camera dwell remains
-   exactly 12 m above that surface.
+5. Earth's positive-Z surface is `SURFACE_ANCHOR` and is the default camera
+   target. Inspection selects a body's positive-Z surface; the near dwell is
+   exactly 12 m above the selected surface, including after restart.
 6. Camera-relative positions subtract their `f64` origin before any `f32`
    conversion.
 7. World code never depends on `winit`, `wgpu`, native handles, graphics

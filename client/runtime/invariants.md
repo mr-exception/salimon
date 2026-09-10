@@ -27,8 +27,8 @@
     never enter the world crate.
 13. Renderer reconstruction preserves portable camera state. Lifecycle gaps
     reset the update clock so the prototype cannot jump forward on resume.
-14. Each world snapshot maps exactly six body proxies followed by exactly three
-    noncanonical precision markers. Body centers remain absolute `f64`; only
-    radii narrow to `f32` as renderer-facing half-extents.
+14. Each world snapshot maps exactly six spheres plus three separate noncanonical
+    marker cuboids. Sphere centers/radii remain `f64`. The Sun maps to emissive
+    material and the point-light position; every solid maps to a lit material.
 15. Diagnostics body observations preserve catalog order/names and report finite,
     nonnegative camera-to-nominal-surface distances for all six bodies.

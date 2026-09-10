@@ -41,13 +41,21 @@ collapses that offset to zero. The prototype budget therefore permits less than
 1 mm global anchor spacing, no more than 8 m scalar spacing at the far endpoint,
 and less than 0.01 mm scalar spacing at the near endpoint.
 
-The radius-scaled Earth cuboid proxy exposes a separate GPU reconstruction
+The former Task 5 radius-scaled Earth cuboid proxy exposed a GPU reconstruction
 limit. Its near face is formed in the vertex shader by combining a
 camera-relative center and half-extent near `6 Mm`. `f32` values at that
 magnitude have `0.5 m` spacing, so the reconstructed face can carry up to about
 `0.25 m` of rounding error. This does not erase the local precision of the small
 nearby markers: their centers remain near the camera and use the much finer
 spacing represented by the near endpoint row above.
+
+Task 6 retains those numeric tests as evidence of the failure mode, and replaces
+body proxies with analytic spheres. CPU `f64` camera-to-surface altitude feeds a
+rationalized GPU ray-intersection root, preserving near-surface depth without
+large `f32` subtraction. [Sphere rendering](../renderer/sphere-rendering.md)
+documents the method, regression envelope, local material coordinates, and
+future patch-local terrain path. Precision-report proxy fields describe the
+historical reconstruction limit, not current sphere depth error.
 
 The renderer separately tests `Depth32Float` quantization under the `0.05 m`
 infinite reverse-Z projection. Adjacent depth values represent about
@@ -62,12 +70,11 @@ meter detail there.
   rebasing protects nearby geometry; it does not make distant geometry locally
   precise.
 - Camera-relative centers do not solve precision inside a single enormous mesh;
-  the Earth cuboid proxy deliberately demonstrates that remaining limit.
+  the retained numeric Earth-proxy regression demonstrates that failure mode.
 - Uniform world scaling alone would not improve physical precision, so this
   prototype keeps meters explicit rather than hiding precision loss in units.
-- The six radius-scaled cuboids are Task 5 presentation proxies for canonical
-  body records, not sphere meshes, terrain, or gameplay physics. Task 6 owns
-  scalable textured spheres and Sun lighting.
+- The six Task 6 spheres are presentation surfaces, not production terrain or
+  gameplay physics. Analytic geometry has no elevation or terrain patches.
 - The three meter-scale cuboids are noncanonical precision markers and remain
   separate from the body catalog.
 - Large meshes spanning multiple local regions will eventually need chunk-local

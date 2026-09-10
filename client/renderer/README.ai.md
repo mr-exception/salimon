@@ -18,7 +18,7 @@ exposes renderer-owned measurements.
 ## Public boundary
 
 Keep `Renderer::new`, `Renderer::resize`, and `Renderer::render` plus
-`CameraFrame`, `SceneInstance`, `SceneFrame`, and the typed image/result values
+`CameraFrame`, `SceneInstance`, `SphereInstance`, `PointLight`, `SceneFrame`, and the typed image/result values
 as the narrow host-facing contract unless a task explicitly requires a change.
 Window/surface handles needed during initialization are integration inputs; they
 do not transfer native lifecycle policy to the renderer.
@@ -51,12 +51,11 @@ domain state, diagnostics text, or toggle policy.
 - Update the component docs whenever ownership, API, or recovery behavior
   intentionally changes.
 
-Task 5 body proxies are generic cuboids produced by runtime; do not add body
-identity, landing rules, or Solar System dependencies here. Task 6 owns the
-explicit sphere and Sun-lighting presentation path.
-
-The radius-scaled Earth proxy is an intentional stress case, not evidence of
-sub-meter precision across one huge mesh. Reconstructing its near face from a
-center and half-extent near `6 Mm` in GPU `f32` uses `0.5 m` representable steps,
-so rounding can contribute up to about `0.25 m` of face-position error. Small
-markers near the camera still retain their local camera-relative precision.
+Read [sphere-rendering.md](sphere-rendering.md) before changing spherical
+presentation. `spheres.rs` owns conservative screen bounds, CPU `f64` altitude,
+material resources, and one instanced analytic draw. `spheres.wgsl` owns stable
+ray intersections, surface depth, body-local texture LOD/detail, and lighting.
+`surface_textures.rs` is original generated texture source. Keep celestial
+identity and landing rules out of all three. Preserve rationalized near-root
+depth and the wrapped `f64` detail origin; large `f32` center/radius subtraction
+would reintroduce the former proxy's sub-meter surface-position error.

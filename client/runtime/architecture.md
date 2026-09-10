@@ -28,8 +28,8 @@ types from acquiring `wgpu` or `winit` dependencies.
 3. Schedule redraws while the application has a live, drawable window, and use a
    short delayed retry when the presentation surface is temporarily unavailable.
 4. Before each drawable render attempt, advance the portable camera with a
-   bounded monotonic delta. Map the six catalog bodies to radius-scaled colored
-   cuboid DTOs, append the three precision markers, calculate camera-to-surface
+   bounded monotonic delta. Map the six catalog bodies to `f64` sphere/material
+   DTOs, map Sun lighting, preserve separate marker cuboids, calculate camera-to-surface
    distances, and measure that real update work.
 5. For each successfully presented redraw, record monotonic frame timing after
    the renderer submits and presents the frame, then combine it with renderer,
@@ -44,8 +44,9 @@ types from acquiring `wgpu` or `winit` dependencies.
 F3 initial key presses toggle diagnostics. P toggles the camera fixture, R
 restarts it, and N selects and pauses the exact near-surface inspection view;
 releases and key-repeat events are ignored. The runtime maps native keys to typed
-commands and renderer/world measurements to diagnostics without sharing `wgpu`
-or `winit` types. All six catalog names and nonnegative camera-to-nominal-surface
+commands; 1–6 restart inspection of Sun, Mercury, Venus, Earth, Moon, and Mars.
+It maps renderer/world measurements to diagnostics without sharing `wgpu` or
+`winit` types. All six catalog names and nonnegative camera-to-nominal-surface
 observations flow through `BodyDistance`; diagnostics selects the closest for its
 single nearby-body row. Diagnostics owns aggregation and the RGBA panel, while
 the renderer owns only generic image composition. Camera metrics remain separate

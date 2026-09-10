@@ -10,9 +10,10 @@ is involved.
 A host advances `CameraPrototype` with a monotonic duration, translates
 `CameraCommand` values from platform input, and reads a borrowed `WorldSnapshot`.
 The snapshot exposes the static body catalog, the Task 4 camera, and three
-noncanonical meter-scale precision markers. The runtime maps bodies to colored,
-radius-scaled cuboid proxies through the generic renderer DTO; Task 6 owns the
-later textured sphere path and Sun lighting.
+noncanonical meter-scale precision markers. The runtime maps bodies to renderer
+sphere/material DTOs and the Sun to a point light, preserving `f64` centers/radii.
+`InspectBody` selects each catalog body's positive-Z surface for the same
+120 Mm-to-12 m validation tour. Earth remains the initial target.
 
 ```text
 world absolute f64 bodies + camera + markers

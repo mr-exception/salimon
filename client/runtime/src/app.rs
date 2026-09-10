@@ -7,10 +7,12 @@ use salimon_diagnostics::{
     BodyDistance, Diagnostics, DomainMetrics, FrameSample, GpuMemory, GpuTime,
 };
 use salimon_renderer::{
-    CameraFrame, GpuFrameTime, OverlayImage as RendererOverlayImage, RenderOutcome, Renderer,
-    SceneFrame, SceneInstance, SurfaceSize,
+    CameraFrame, GpuFrameTime, OverlayImage as RendererOverlayImage, PointLight, RenderOutcome,
+    Renderer, SceneFrame, SceneInstance, SphereInstance, SurfaceMaterial, SurfaceSize,
 };
-use salimon_world::{CameraCommand, CameraPrototype, TransitionPhase, WorldSnapshot};
+use salimon_world::{
+    CameraCommand, CameraPrototype, CelestialBodyId, TransitionPhase, WorldSnapshot,
+};
 use winit::application::ApplicationHandler;
 use winit::dpi::LogicalSize;
 use winit::event::{ElementState, WindowEvent};
@@ -183,7 +185,7 @@ impl ClientApplication {
         let update_delta = self.update_clock.step(update_started_at);
         self.camera_prototype.advance(update_delta);
         let world_snapshot = self.camera_prototype.snapshot();
-        let (camera, scene_instances) = map_world_to_renderer(world_snapshot);
+        let (camera, scene_instances, spheres, light) = map_world_to_renderer(world_snapshot);
         let body_distances = camera_body_distances(world_snapshot);
         let cpu_update_time = update_started_at.elapsed();
         let overlay_image = self
@@ -203,6 +205,8 @@ impl ClientApplication {
                 SceneFrame {
                     camera,
                     instances: &scene_instances,
+                    spheres: &spheres,
+                    light: Some(light),
                 },
                 overlay_image,
                 || window.pre_present_notify(),
@@ -445,11 +449,36 @@ fn camera_command(state: ElementState, repeat: bool, key: PhysicalKey) -> Option
         PhysicalKey::Code(KeyCode::KeyP) => Some(CameraCommand::TogglePause),
         PhysicalKey::Code(KeyCode::KeyR) => Some(CameraCommand::Restart),
         PhysicalKey::Code(KeyCode::KeyN) => Some(CameraCommand::JumpToNear),
+        PhysicalKey::Code(KeyCode::Digit1) => {
+            Some(CameraCommand::InspectBody(CelestialBodyId::Sun))
+        }
+        PhysicalKey::Code(KeyCode::Digit2) => {
+            Some(CameraCommand::InspectBody(CelestialBodyId::Mercury))
+        }
+        PhysicalKey::Code(KeyCode::Digit3) => {
+            Some(CameraCommand::InspectBody(CelestialBodyId::Venus))
+        }
+        PhysicalKey::Code(KeyCode::Digit4) => {
+            Some(CameraCommand::InspectBody(CelestialBodyId::Earth))
+        }
+        PhysicalKey::Code(KeyCode::Digit5) => {
+            Some(CameraCommand::InspectBody(CelestialBodyId::Moon))
+        }
+        PhysicalKey::Code(KeyCode::Digit6) => {
+            Some(CameraCommand::InspectBody(CelestialBodyId::Mars))
+        }
         _ => None,
     }
 }
 
-fn map_world_to_renderer(snapshot: WorldSnapshot<'_>) -> (CameraFrame, Vec<SceneInstance>) {
+fn map_world_to_renderer(
+    snapshot: WorldSnapshot<'_>,
+) -> (
+    CameraFrame,
+    Vec<SceneInstance>,
+    Vec<SphereInstance>,
+    PointLight,
+) {
     let camera = CameraFrame {
         position_meters: snapshot.camera.position.meters(),
         target_meters: snapshot.camera.target.meters(),
@@ -457,27 +486,42 @@ fn map_world_to_renderer(snapshot: WorldSnapshot<'_>) -> (CameraFrame, Vec<Scene
         vertical_fov_radians: snapshot.camera.vertical_field_of_view_radians as f32,
         near_plane_meters: snapshot.camera.physical_near_plane_meters as f32,
     };
-    let mut instances: Vec<_> = snapshot
+    let spheres = snapshot
         .celestial_bodies
         .iter()
-        .map(|body| SceneInstance {
+        .map(|body| SphereInstance {
             center_meters: body.center.meters(),
-            half_extents_meters: [body.radius_meters as f32; 3],
-            color: body.display_color,
+            radius_meters: body.radius_meters,
+            material: match body.id {
+                CelestialBodyId::Sun => SurfaceMaterial::Emissive,
+                CelestialBodyId::Mercury => SurfaceMaterial::Stone,
+                CelestialBodyId::Venus => SurfaceMaterial::Ochre,
+                CelestialBodyId::Earth => SurfaceMaterial::Oceanic,
+                CelestialBodyId::Moon => SurfaceMaterial::Slate,
+                CelestialBodyId::Mars => SurfaceMaterial::Rust,
+            },
         })
         .collect();
-    instances.extend(
-        snapshot
-            .precision_markers
-            .iter()
-            .map(|marker| SceneInstance {
-                center_meters: marker.absolute_center.meters(),
-                half_extents_meters: marker.half_extents_meters,
-                color: marker.color,
-            }),
-    );
+    let instances = snapshot
+        .precision_markers
+        .iter()
+        .map(|marker| SceneInstance {
+            center_meters: marker.absolute_center.meters(),
+            half_extents_meters: marker.half_extents_meters,
+            color: marker.color,
+        })
+        .collect();
+    let sun = snapshot
+        .celestial_bodies
+        .iter()
+        .find(|body| body.id == CelestialBodyId::Sun)
+        .expect("world catalog always contains the Sun");
+    let light = PointLight {
+        position_meters: sun.center.meters(),
+        color: [1.0, 0.96, 0.88],
+    };
 
-    (camera, instances)
+    (camera, instances, spheres, light)
 }
 
 fn camera_body_distances(snapshot: WorldSnapshot<'_>) -> Vec<BodyDistance<'static>> {
@@ -540,6 +584,27 @@ mod tests {
 
     #[test]
     fn camera_keys_map_only_initial_physical_presses() {
+        for (key, body) in [
+            (KeyCode::Digit1, CelestialBodyId::Sun),
+            (KeyCode::Digit2, CelestialBodyId::Mercury),
+            (KeyCode::Digit3, CelestialBodyId::Venus),
+            (KeyCode::Digit4, CelestialBodyId::Earth),
+            (KeyCode::Digit5, CelestialBodyId::Moon),
+            (KeyCode::Digit6, CelestialBodyId::Mars),
+        ] {
+            assert_eq!(
+                camera_command(ElementState::Pressed, false, PhysicalKey::Code(key)),
+                Some(CameraCommand::InspectBody(body))
+            );
+            assert_eq!(
+                camera_command(ElementState::Pressed, true, PhysicalKey::Code(key)),
+                None
+            );
+            assert_eq!(
+                camera_command(ElementState::Released, false, PhysicalKey::Code(key)),
+                None
+            );
+        }
         assert_eq!(
             camera_command(
                 ElementState::Pressed,
@@ -591,23 +656,31 @@ mod tests {
     }
 
     #[test]
-    fn runtime_mapping_preserves_body_and_camera_fields_then_appends_markers() {
+    fn runtime_mapping_preserves_spheres_light_camera_and_separate_markers() {
         let snapshot = CameraPrototype::default().snapshot();
-        let (camera, instances) = map_world_to_renderer(snapshot);
+        let (camera, instances, spheres, light) = map_world_to_renderer(snapshot);
         let body_distances = camera_body_distances(snapshot);
         let metrics = camera_domain_metrics(snapshot, &body_distances);
 
         assert_eq!(camera.position_meters, snapshot.camera.position.meters());
         assert_eq!(camera.target_meters, snapshot.camera.target.meters());
-        assert_eq!(instances.len(), 9);
+        assert_eq!(instances.len(), 3);
+        assert_eq!(spheres.len(), 6);
         assert_eq!(snapshot.celestial_bodies.len(), 6);
         assert_eq!(snapshot.precision_markers.len(), 3);
-        for (instance, body) in instances[..6].iter().zip(snapshot.celestial_bodies) {
+        for (instance, body) in spheres.iter().zip(snapshot.celestial_bodies) {
             assert_eq!(instance.center_meters, body.center.meters());
-            assert_eq!(instance.half_extents_meters, [body.radius_meters as f32; 3]);
-            assert_eq!(instance.color, body.display_color);
+            assert_eq!(instance.radius_meters, body.radius_meters);
+            assert_eq!(
+                instance.material == salimon_renderer::SurfaceMaterial::Emissive,
+                body.id == CelestialBodyId::Sun
+            );
         }
-        for (instance, marker) in instances[6..].iter().zip(snapshot.precision_markers) {
+        assert_eq!(
+            light.position_meters,
+            snapshot.celestial_bodies[0].center.meters()
+        );
+        for (instance, marker) in instances.iter().zip(snapshot.precision_markers) {
             assert_eq!(instance.center_meters, marker.absolute_center.meters());
             assert_eq!(instance.half_extents_meters, marker.half_extents_meters);
             assert_eq!(instance.color, marker.color);
@@ -623,7 +696,7 @@ mod tests {
     }
 
     #[test]
-    fn initial_overview_fully_frames_every_body_proxy() {
+    fn initial_overview_fully_frames_every_sphere() {
         let snapshot = CameraPrototype::default().snapshot();
         let aspect_ratio = INITIAL_WIDTH / INITIAL_HEIGHT;
         let vertical_tangent = (snapshot.camera.vertical_field_of_view_radians * 0.5).tan();

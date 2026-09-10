@@ -314,6 +314,8 @@ pub enum CameraCommand {
     TogglePause,
     Restart,
     JumpToNear,
+    /// Restart the validation approach at a body's positive-Z surface.
+    InspectBody(CelestialBodyId),
 }
 
 /// Numeric spacing at the representative coordinates exercised by the tour.
@@ -368,6 +370,7 @@ pub struct WorldSnapshot<'a> {
 pub struct CameraPrototype {
     elapsed_in_cycle: Duration,
     paused: bool,
+    inspected_body: CelestialBodyId,
 }
 
 impl Default for CameraPrototype {
@@ -375,6 +378,7 @@ impl Default for CameraPrototype {
         Self {
             elapsed_in_cycle: Duration::ZERO,
             paused: false,
+            inspected_body: CelestialBodyId::Earth,
         }
     }
 }
@@ -414,6 +418,11 @@ impl CameraPrototype {
                 self.elapsed_in_cycle = Self::APPROACH_DURATION;
                 self.paused = true;
             }
+            CameraCommand::InspectBody(body) => {
+                self.inspected_body = body;
+                self.elapsed_in_cycle = Duration::ZERO;
+                self.paused = false;
+            }
         }
     }
 
@@ -430,9 +439,14 @@ impl CameraPrototype {
     #[must_use]
     pub fn snapshot(&self) -> WorldSnapshot<'static> {
         let timeline = sample_timeline(self.elapsed_in_cycle);
+        let body = CELESTIAL_BODIES
+            .iter()
+            .find(|body| body.id == self.inspected_body)
+            .expect("all inspection identities are catalog members");
+        let surface_anchor = body.center.translated([0.0, 0.0, body.radius_meters]);
         let camera = CameraSnapshot {
-            position: SURFACE_ANCHOR.translated([0.0, 0.0, timeline.altitude_meters]),
-            target: SURFACE_ANCHOR,
+            position: surface_anchor.translated([0.0, 0.0, timeline.altitude_meters]),
+            target: surface_anchor,
             up: CAMERA_UP,
             vertical_field_of_view_radians: Self::VERTICAL_FIELD_OF_VIEW_RADIANS,
             physical_near_plane_meters: Self::PHYSICAL_NEAR_PLANE_METERS,
@@ -539,6 +553,35 @@ mod tests {
     use std::time::Duration;
 
     const TEST_EPSILON: f64 = 1.0e-9;
+
+    #[test]
+    fn inspection_tours_reach_every_catalog_surface_and_keep_the_scene_immutable() {
+        let mut prototype = CameraPrototype::default();
+        for body in CELESTIAL_BODIES {
+            prototype.apply_command(CameraCommand::InspectBody(body.id));
+            let far = prototype.snapshot();
+            assert!(!far.paused);
+            assert_eq!(
+                body.surface_distance_from(far.camera.position),
+                CameraPrototype::FAR_ALTITUDE_METERS
+            );
+            assert_eq!(
+                far.camera.target,
+                body.center.translated([0.0, 0.0, body.radius_meters])
+            );
+            prototype.advance(CameraPrototype::APPROACH_DURATION);
+            let near = prototype.snapshot();
+            assert_eq!(
+                body.surface_distance_from(near.camera.position),
+                CameraPrototype::NEAR_ALTITUDE_METERS
+            );
+            assert_eq!(near.celestial_bodies, CELESTIAL_BODIES);
+            prototype.apply_command(CameraCommand::JumpToNear);
+            assert!(prototype.is_paused());
+            prototype.apply_command(CameraCommand::Restart);
+            assert_eq!(prototype.snapshot().camera, far.camera);
+        }
+    }
 
     #[test]
     fn subtracting_in_f64_preserves_local_offsets_at_the_large_anchor() {

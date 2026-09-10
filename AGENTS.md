@@ -33,7 +33,9 @@ composition, redraw/update scheduling, surface recovery, and clocks;
 reverse-Z depth, and presentation behind a narrow API. Task 4 activates
 `client/world/` for portable `f64`-meter coordinates and the renderer-neutral
 camera/precision prototype; Task 5 adds the immutable compressed Solar System
-catalog and body-distance math there. The runtime maps world snapshots into
+catalog and body-distance math there. Task 6 adds analytic textured spheres,
+material LOD, and Sun lighting under `client/renderer/`, with per-body camera
+inspection in world. The runtime maps world snapshots into
 renderer DTOs; the renderer must not depend on world, character, or ship state.
 The platform adapter is still reserved; `winit` integration may remain at the runtime boundary
 until platform-specific behavior warrants extraction. Use custom Rust and
@@ -54,10 +56,11 @@ cargo test --workspace --locked
 ```
 
 `cargo run` is interactive and continues until the native window closes. In
-addition to automated gates, smoke-test all six colored Solar System body proxies,
+addition to automated gates, smoke-test all six textured Solar System spheres,
 the visible scale-transition fixture, near-surface precision markers,
 pause/restart controls, live resize,
-minimize/restore, clean close, and relaunch on macOS. Use rustfmt defaults, Rust
+minimize/restore, clean close, and relaunch on macOS. Inspect all five solid-body
+approaches using keys 2–6 (4 is Earth); N pauses at 12 m. Use rustfmt defaults, Rust
 2024, and the shared Cargo lints. Workspace crates inherit shared metadata/lints.
 Commit `Cargo.lock`; exclude `target/`. Keep setup instructions, component
 maintenance docs, ownership documents, and implementation aligned.

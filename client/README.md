@@ -1,6 +1,6 @@
 # Client
 
-All Phase 0 implementation lives here. Tasks 2–5 provide the `salimon-client`
+All Phase 0 implementation lives here. Tasks 2–6 provide the `salimon-client`
 runtime binary, `salimon-renderer` GPU library, `salimon-diagnostics`
 metrics/overlay library, and portable `salimon-world` compressed Solar System,
 coordinate, and camera model. The remaining directories are documented ownership
@@ -33,7 +33,7 @@ World keeps absolute body, camera, and marker coordinates in `f64` meters withou
 GPU or window types. Its static catalog contains exactly Sun, Mercury, Venus,
 Earth, Moon, and Mars; the Sun is visual-only, and the five solid bodies expose
 disjoint `1.15R` landing volumes. The runtime creates the window, routes lifecycle
-and resize events, schedules redraws/updates, maps P/R/N into typed world commands,
+and resize events, schedules redraws/updates, maps P/R/N/1–6 into typed world commands,
 routes F3, and converts the renderer-neutral world snapshot into the renderer's
 generic scene DTOs. The renderer subtracts the camera origin in `f64`, uploads only
 camera-relative `f32` data, and presents with infinite-far reverse-Z depth.
@@ -47,8 +47,9 @@ behavior grows or another native target needs an adapter. Future domain modules
 must consume typed input/presentation data rather than GPU or window types.
 There is no dependency on `core/` in Phase 0.
 
-Tasks 2–5 deliberately add no ECS, physics engine, WASM host, gameplay state,
-orbital simulation, planet renderer, or backend scaffolding. Task 4 camera
+Tasks 2–6 deliberately add no ECS, physics engine, WASM host, gameplay state,
+orbital simulation, or backend scaffolding. Task 6 adds renderer-owned analytic
+spheres, generated mipmapped textures, and Sun illumination. Task 4 camera
 telemetry is explicitly separate from future player/ship state; Task 5 supplies
 camera-to-body surface observations without presenting the camera as gameplay
 state. As major components gain behavior, maintain the contracts, ownership

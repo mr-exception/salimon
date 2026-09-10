@@ -5,8 +5,9 @@ current milestone is **Phase 0 — Technical Feasibility Showcase**: a native ma
 client-only prototype using a custom `wgpu` renderer, with Windows and web as
 later targets. The reference performance machine is a MacBook Air M1.
 
-This repository implements through **task 8: Implement first-person character
-and walkable ship shell**. The native client starts inside the custom Task 7
+This repository includes **task 8: Fix inverted horizontal mouse look** and the
+completed **task 11: Implement first-person character and walkable ship shell**.
+The native client starts inside the custom Task 7
 Salimon scout landed on Earth, with portable character/ship state, runtime-loaded
 GLB geometry, walking, free mouse look, jumping, cockpit interaction, a landed-only
 door, and radial surface traversal.
@@ -15,7 +16,7 @@ door, and radial surface traversal.
 
 The [Salimon Notion space](https://app.notion.com/p/801c9c427af24e9b8d57b07572ef4119)
 holds the task list and documentation. Start with
-[task 8](https://app.notion.com/p/3d5b456853b9815da60dc171587fd457), the
+[task 8](https://app.notion.com/p/3d7b456853b981afa732d26495be8d6a), the
 [Phase 0 specification](https://app.notion.com/p/3d5b456853b981db968dca1901a270a2), and
 [Technical Architecture & AI Maintenance](https://app.notion.com/p/3d5b456853b981078a82c68207f4444e).
 [AGENTS.md](AGENTS.md) describes how future agents should access those sources;
@@ -190,7 +191,7 @@ resize, minimize, restore, and close behavior still require the smoke check
 above. Task 6 adds textured sphere presentation, Sun lighting, and per-body
 inspection. [Sphere rendering](client/renderer/sphere-rendering.md) records the
 precision technique, LOD budget, material source, and future terrain path.
-Task 8 loads Task 7's GLB through a renderer-owned mesh path and keeps behavior in
+Task 11 loads Task 7's GLB through a renderer-owned mesh path and keeps behavior in
 separate character/ship crates. Validate and regenerate its model using the
 commands in the [ship asset documentation](client/assets/ship/README.md).
 Orbital simulation, gameplay, persistence, networking, and backend behavior remain

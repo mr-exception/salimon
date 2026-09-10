@@ -9,3 +9,5 @@
    around the complete sphere.
 6. Cockpit entry/exit is instant and does not mutate ship velocity or orientation.
 7. The crate receives no native events and exposes no GPU types.
+8. Positive horizontal mouse delta turns toward the camera's screen-right direction;
+   vertical mouse delta retains the conventional down-is-positive device mapping.

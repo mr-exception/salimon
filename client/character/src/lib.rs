@@ -149,7 +149,7 @@ impl CharacterController {
             return;
         }
         self.yaw_radians =
-            (self.yaw_radians - delta_x * LOOK_SENSITIVITY_RADIANS_PER_PIXEL).rem_euclid(TAU);
+            (self.yaw_radians + delta_x * LOOK_SENSITIVITY_RADIANS_PER_PIXEL).rem_euclid(TAU);
         self.pitch_radians = (self.pitch_radians - delta_y * LOOK_SENSITIVITY_RADIANS_PER_PIXEL)
             .clamp(-FRAC_PI_2 + 0.01, FRAC_PI_2 - 0.01);
     }
@@ -441,6 +441,36 @@ mod tests {
         assert_eq!(controller.location(), CharacterLocation::Cockpit);
         controller.leave_cockpit();
         assert_eq!(controller.location(), CharacterLocation::InsideShip);
+    }
+
+    #[test]
+    fn horizontal_mouse_delta_turns_view_in_screen_direction_inside_and_in_cockpit() {
+        let mut right = CharacterController::default();
+        right.apply_mouse_delta(10.0, 0.0);
+        let right_snapshot = right.snapshot(frame(), surface());
+        assert!(right_snapshot.look_target_meters[2] > right_snapshot.eye_position_meters[2]);
+
+        let mut left = CharacterController::default();
+        left.apply_mouse_delta(-10.0, 0.0);
+        let left_snapshot = left.snapshot(frame(), surface());
+        assert!(left_snapshot.look_target_meters[2] < left_snapshot.eye_position_meters[2]);
+
+        right.enter_cockpit();
+        let cockpit_snapshot = right.snapshot(frame(), surface());
+        assert!(cockpit_snapshot.look_target_meters[2] > cockpit_snapshot.eye_position_meters[2]);
+    }
+
+    #[test]
+    fn vertical_mouse_delta_keeps_the_existing_pitch_direction() {
+        let mut down = CharacterController::default();
+        down.apply_mouse_delta(0.0, 10.0);
+        let down_snapshot = down.snapshot(frame(), surface());
+        assert!(down_snapshot.look_target_meters[1] < down_snapshot.eye_position_meters[1]);
+
+        let mut up = CharacterController::default();
+        up.apply_mouse_delta(0.0, -10.0);
+        let up_snapshot = up.snapshot(frame(), surface());
+        assert!(up_snapshot.look_target_meters[1] > up_snapshot.eye_position_meters[1]);
     }
 
     #[test]

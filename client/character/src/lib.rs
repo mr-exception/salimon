@@ -19,6 +19,7 @@ const INTERIOR_FORWARD_MAX: f64 = 0.65;
 const INTERIOR_SIDE_LIMIT: f64 = 1.43;
 const DOORWAY_FORWARD: f64 = -3.52;
 const COCKPIT_POSITION: [f64; 3] = [1.38, 1.72, 0.0];
+const COCKPIT_VIEW_PITCH_RADIANS: f64 = -0.10;
 const PLAYER_START: [f64; 3] = [-0.35, EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT, 0.0];
 const LOOK_SENSITIVITY_RADIANS_PER_PIXEL: f64 = 0.0022;
 
@@ -323,7 +324,7 @@ impl CharacterController {
         let right = normalize(cross(base_forward, up));
         let pitch = self.pitch_radians
             + if matches!(self.position, PositionState::Cockpit) {
-                -0.45
+                COCKPIT_VIEW_PITCH_RADIANS
             } else {
                 0.0
             };
@@ -471,6 +472,21 @@ mod tests {
         up.apply_mouse_delta(0.0, -10.0);
         let up_snapshot = up.snapshot(frame(), surface());
         assert!(up_snapshot.look_target_meters[1] > up_snapshot.eye_position_meters[1]);
+    }
+
+    #[test]
+    fn default_cockpit_view_keeps_the_forward_window_in_sight() {
+        let mut controller = CharacterController::default();
+        controller.enter_cockpit();
+        let snapshot = controller.snapshot(frame(), surface());
+        let look = sub(snapshot.look_target_meters, snapshot.eye_position_meters);
+
+        assert!(look[0] > 0.99, "cockpit view must remain primarily forward");
+        assert!(
+            look[1] > -0.11,
+            "cockpit view must clear the console and nose"
+        );
+        assert!(look[2].abs() < 1.0e-12);
     }
 
     #[test]

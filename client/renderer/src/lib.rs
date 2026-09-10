@@ -988,7 +988,7 @@ impl Renderer {
         let overlay_draw_calls = u32::from(self.overlay.is_visible());
         let scene_draw_calls = scene_draw_calls(prepared_scene.instance_count)
             + scene_draw_calls(self.spheres.count())
-            + scene_draw_calls(self.ship_mesh.count());
+            + self.ship_mesh.draw_count();
         let object_count =
             prepared_scene.instance_count + self.spheres.count() + self.ship_mesh.count();
         Ok(RenderOutcome::Presented(RenderStats {

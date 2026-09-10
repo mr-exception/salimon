@@ -11,3 +11,5 @@
 7. The crate receives no native events and exposes no GPU types.
 8. Positive horizontal mouse delta turns toward the camera's screen-right direction;
    vertical mouse delta retains the conventional down-is-positive device mapping.
+9. The default seated cockpit view remains primarily forward and clears the
+   console/nose into the modeled cockpit glazing.

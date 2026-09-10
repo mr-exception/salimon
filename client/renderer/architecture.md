@@ -13,12 +13,12 @@ salimon-world absolute f64 snapshot
     -> runtime maps domain types to renderer DTOs (no rebasing)
     -> Renderer::render(SceneFrame, optional RGBA overlay)
         -> validate absolute f64 camera, cuboids, spheres, and light inputs
-        -> load the checked-in ship GLB once and update only its pose/door uniform
+        -> load the checked-in ship GLB once, split opaque/glass vertices, and update only its pose/door uniform
         -> subtract camera in f64, then cast relative values to f32
         -> conservatively cull cuboid and projected sphere bounds
         -> build renderer-owned view + infinite reverse-Z projection
         -> acquire surface texture
-        -> encode depth-tested cuboids + analytic spheres + ship mesh + optional overlay
+        -> encode depth-tested cuboids + analytic spheres + opaque ship + cockpit glass + optional overlay
         -> resolve optional timestamp queries asynchronously
         -> submit command buffer
         -> present
@@ -46,7 +46,10 @@ three marker cuboids, a generic `ShipMeshInstance`, and the Sun mapped into `Poi
 styles identify presentation choices. `SceneFrame` conveys no celestial IDs,
 landing volumes, world catalog ownership, or simulation behavior. The GLB loader
 expands its small Phase 0 mesh once at renderer initialization; material colors
-and a door-vertex flag are retained in the GPU vertex stream.
+and a door-vertex flag are retained in the GPU vertex stream. Opaque ship
+geometry writes reverse-Z depth first. The double-sided cockpit glass then uses
+one alpha-blended draw with depth testing but no depth writes, shadows, sorting,
+or post effects.
 
 The scene uses a conservative bounding-sphere frustum test before upload.
 Spheres use conservative projected bounds. The combined retained set defines

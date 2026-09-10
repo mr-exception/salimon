@@ -40,3 +40,6 @@
 16. The checked-in ship GLB is validated and loaded by the renderer without a
     dependency on ship or character behavior. Pose and door state cross only as
     generic presentation data and remain camera-relative on the GPU.
+17. Cockpit glass is the ship's only blended material. It renders after opaque
+    ship geometry with reverse-Z depth testing and no depth writes, shadows, or
+    post effects, preserving exterior visibility from either side.

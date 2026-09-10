@@ -60,6 +60,7 @@ identity and landing rules out of all three. Preserve rationalized near-root
 depth and the wrapped `f64` detail origin; large `f32` center/radius subtraction
 would reintroduce the former proxy's sub-meter surface-position error.
 
-`ship_mesh.rs` owns the checked-in Task 7 GLB parser, immutable vertex buffer,
-camera-relative pose uniform, door visual offset, and basic material lighting.
-Keep gameplay interaction and ship state out of this module.
+`ship_mesh.rs` owns the checked-in ship GLB parser, immutable opaque/glass vertex
+buffers, camera-relative pose uniform, door visual offset, basic material
+lighting, and the inexpensive depth-tested cockpit-glass blend pass. Keep
+gameplay interaction and ship state out of this module.

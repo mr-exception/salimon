@@ -44,6 +44,13 @@ def validate_buffer_ranges(document: dict[str, object], binary_length: int) -> N
         assert int(accessor["count"]) > 0, f"accessor {index} is empty"
 
 
+def node_position_bounds(document: dict[str, object], node_name: str) -> tuple[list[float], list[float]]:
+    node = next(node for node in document["nodes"] if node["name"] == node_name)
+    primitive = document["meshes"][node["mesh"]]["primitives"][0]
+    accessor = document["accessors"][primitive["attributes"]["POSITION"]]
+    return accessor["min"], accessor["max"]
+
+
 def main() -> None:
     gltf_path = EXPORT / f"{NAME}.gltf"
     bin_path = EXPORT / f"{NAME}.bin"
@@ -73,6 +80,8 @@ def main() -> None:
         "Collision_Proxies",
         "Interaction_Markers",
         "Hull_Nose",
+        "Cockpit_Glazing",
+        "Cockpit_Window_Frame",
         "Wing_Port",
         "Wing_Starboard",
         "Cockpit_Console_Center",
@@ -86,6 +95,29 @@ def main() -> None:
         "MARKER_PlayerStart",
     }
     assert required_nodes <= set(node_names), f"missing nodes: {sorted(required_nodes - set(node_names))}"
+
+    glass = document["materials"][material_names.index("Cockpit Glass")]
+    assert glass["alphaMode"] == "BLEND", "cockpit glass must use inexpensive alpha blending"
+    assert glass["doubleSided"] is True, "cockpit glass must render from inside and outside"
+    assert 0.0 < glass["pbrMetallicRoughness"]["baseColorFactor"][3] < 0.5
+
+    glazing_min, glazing_max = node_position_bounds(document, "Cockpit_Glazing")
+    _, nose_max = node_position_bounds(document, "Hull_Nose")
+    _, console_max = node_position_bounds(document, "Cockpit_Console_Center")
+    assert glazing_min[0] <= 2.6 and glazing_max[0] >= 4.9
+    assert glazing_min[1] <= 1.0 and glazing_max[1] >= 2.6
+    assert glazing_min[2] <= -1.5 and glazing_max[2] >= 1.5
+    assert nose_max[1] <= 1.02, "solid nose must stay below the forward window"
+    assert console_max[1] <= 1.20, "console must stay below the seated eye line"
+    assert nose_max[0] >= console_max[0], "nose must still extend beyond the forward console"
+
+    windows = document["extras"]["salimon"]["cockpitWindows"]
+    assert windows["glazingNode"] == "Cockpit_Glazing"
+    assert windows["material"] == "Cockpit Glass"
+    assert windows["seatedViewpointMeters"] == [1.38, 1.72, 0.0]
+    assert windows["standingViewpointMeters"] == [0.65, 1.85, 0.0]
+    assert windows["dynamicShadows"] is False
+    assert windows["postEffects"] is False
 
     metrics = document["extras"]["salimon"]
     assert metrics["externalAssetDependencies"] == 0

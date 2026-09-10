@@ -18,8 +18,10 @@ pub struct ShipMeshInstance {
 
 #[derive(Debug)]
 struct ShipGeometry {
-    vertices: Vec<f32>,
-    vertex_count: u32,
+    opaque_vertices: Vec<f32>,
+    glass_vertices: Vec<f32>,
+    opaque_vertex_count: u32,
+    glass_vertex_count: u32,
 }
 
 fn load_geometry() -> Result<ShipGeometry, RendererError> {
@@ -28,7 +30,8 @@ fn load_geometry() -> Result<ShipGeometry, RendererError> {
     let blob = gltf.blob.as_deref().ok_or_else(|| {
         RendererError::new("failed to load Phase 0 ship GLB", "GLB has no binary chunk")
     })?;
-    let mut vertices = Vec::new();
+    let mut opaque_vertices = Vec::new();
+    let mut glass_vertices = Vec::new();
 
     for node in gltf.document.nodes() {
         let Some(mesh) = node.mesh() else { continue };
@@ -69,6 +72,12 @@ fn load_geometry() -> Result<ShipGeometry, RendererError> {
             );
             let material = primitive.material();
             let mut color = material.pbr_metallic_roughness().base_color_factor();
+            let is_glass = material.name() == Some("Cockpit Glass");
+            let vertices = if is_glass {
+                &mut glass_vertices
+            } else {
+                &mut opaque_vertices
+            };
             let emissive = material.emissive_factor();
             for component in 0..3 {
                 color[component] = (color[component] + emissive[component]).min(1.0);
@@ -110,21 +119,29 @@ fn load_geometry() -> Result<ShipGeometry, RendererError> {
             }
         }
     }
-    let vertex_count = u32::try_from(vertices.len() / 11).map_err(|_| {
+    let opaque_vertex_count = u32::try_from(opaque_vertices.len() / 11).map_err(|_| {
         RendererError::new(
             "failed to load Phase 0 ship GLB",
-            "vertex count exceeds u32",
+            "opaque vertex count exceeds u32",
         )
     })?;
-    if vertex_count == 0 {
+    let glass_vertex_count = u32::try_from(glass_vertices.len() / 11).map_err(|_| {
+        RendererError::new(
+            "failed to load Phase 0 ship GLB",
+            "glass vertex count exceeds u32",
+        )
+    })?;
+    if opaque_vertex_count == 0 || glass_vertex_count == 0 {
         return Err(RendererError::new(
             "failed to load Phase 0 ship GLB",
-            "ship has no renderable vertices",
+            "ship must contain both opaque geometry and cockpit glass",
         ));
     }
     Ok(ShipGeometry {
-        vertices,
-        vertex_count,
+        opaque_vertices,
+        glass_vertices,
+        opaque_vertex_count,
+        glass_vertex_count,
     })
 }
 
@@ -154,12 +171,88 @@ fn normalize(vector: [f32; 3]) -> [f32; 3] {
 }
 
 pub(crate) struct ShipMeshRenderer {
-    pipeline: wgpu::RenderPipeline,
+    opaque_pipeline: wgpu::RenderPipeline,
+    glass_pipeline: wgpu::RenderPipeline,
     bind_group: wgpu::BindGroup,
     uniform: wgpu::Buffer,
-    vertices: wgpu::Buffer,
-    vertex_count: u32,
+    opaque_vertices: wgpu::Buffer,
+    glass_vertices: wgpu::Buffer,
+    opaque_vertex_count: u32,
+    glass_vertex_count: u32,
     visible: bool,
+}
+
+fn create_pipeline(
+    device: &wgpu::Device,
+    format: wgpu::TextureFormat,
+    layout: &wgpu::PipelineLayout,
+    shader: &wgpu::ShaderModule,
+    glass: bool,
+) -> wgpu::RenderPipeline {
+    device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+        label: Some(if glass {
+            "Salimon Phase 0 cockpit glass pipeline"
+        } else {
+            "Salimon Phase 0 opaque ship pipeline"
+        }),
+        layout: Some(layout),
+        vertex: wgpu::VertexState {
+            module: shader,
+            entry_point: Some("vs_main"),
+            buffers: &[Some(wgpu::VertexBufferLayout {
+                array_stride: VERTEX_STRIDE,
+                step_mode: wgpu::VertexStepMode::Vertex,
+                attributes: &[
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32x3,
+                        offset: 0,
+                        shader_location: 0,
+                    },
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32x3,
+                        offset: 12,
+                        shader_location: 1,
+                    },
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32x4,
+                        offset: 24,
+                        shader_location: 2,
+                    },
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32,
+                        offset: 40,
+                        shader_location: 3,
+                    },
+                ],
+            })],
+            compilation_options: wgpu::PipelineCompilationOptions::default(),
+        },
+        primitive: wgpu::PrimitiveState::default(),
+        depth_stencil: Some(wgpu::DepthStencilState {
+            format: DEPTH_FORMAT,
+            depth_write_enabled: Some(!glass),
+            depth_compare: Some(wgpu::CompareFunction::Greater),
+            stencil: wgpu::StencilState::default(),
+            bias: wgpu::DepthBiasState::default(),
+        }),
+        multisample: wgpu::MultisampleState::default(),
+        fragment: Some(wgpu::FragmentState {
+            module: shader,
+            entry_point: Some("fs_main"),
+            targets: &[Some(wgpu::ColorTargetState {
+                format,
+                blend: Some(if glass {
+                    wgpu::BlendState::ALPHA_BLENDING
+                } else {
+                    wgpu::BlendState::REPLACE
+                }),
+                write_mask: wgpu::ColorWrites::ALL,
+            })],
+            compilation_options: wgpu::PipelineCompilationOptions::default(),
+        }),
+        multiview_mask: None,
+        cache: None,
+    })
 }
 
 impl ShipMeshRenderer {
@@ -201,74 +294,29 @@ impl ShipMeshRenderer {
             bind_group_layouts: &[Some(&layout)],
             immediate_size: 0,
         });
-        let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-            label: Some("Salimon Phase 0 ship pipeline"),
-            layout: Some(&pipeline_layout),
-            vertex: wgpu::VertexState {
-                module: &shader,
-                entry_point: Some("vs_main"),
-                buffers: &[Some(wgpu::VertexBufferLayout {
-                    array_stride: VERTEX_STRIDE,
-                    step_mode: wgpu::VertexStepMode::Vertex,
-                    attributes: &[
-                        wgpu::VertexAttribute {
-                            format: wgpu::VertexFormat::Float32x3,
-                            offset: 0,
-                            shader_location: 0,
-                        },
-                        wgpu::VertexAttribute {
-                            format: wgpu::VertexFormat::Float32x3,
-                            offset: 12,
-                            shader_location: 1,
-                        },
-                        wgpu::VertexAttribute {
-                            format: wgpu::VertexFormat::Float32x4,
-                            offset: 24,
-                            shader_location: 2,
-                        },
-                        wgpu::VertexAttribute {
-                            format: wgpu::VertexFormat::Float32,
-                            offset: 40,
-                            shader_location: 3,
-                        },
-                    ],
-                })],
-                compilation_options: wgpu::PipelineCompilationOptions::default(),
-            },
-            primitive: wgpu::PrimitiveState::default(),
-            depth_stencil: Some(wgpu::DepthStencilState {
-                format: DEPTH_FORMAT,
-                depth_write_enabled: Some(true),
-                depth_compare: Some(wgpu::CompareFunction::Greater),
-                stencil: wgpu::StencilState::default(),
-                bias: wgpu::DepthBiasState::default(),
-            }),
-            multisample: wgpu::MultisampleState::default(),
-            fragment: Some(wgpu::FragmentState {
-                module: &shader,
-                entry_point: Some("fs_main"),
-                targets: &[Some(wgpu::ColorTargetState {
-                    format,
-                    blend: Some(wgpu::BlendState::REPLACE),
-                    write_mask: wgpu::ColorWrites::ALL,
-                })],
-                compilation_options: wgpu::PipelineCompilationOptions::default(),
-            }),
-            multiview_mask: None,
-            cache: None,
+        let opaque_pipeline = create_pipeline(device, format, &pipeline_layout, &shader, false);
+        let glass_pipeline = create_pipeline(device, format, &pipeline_layout, &shader, true);
+        let opaque_vertex_bytes = encode_f32s(geometry.opaque_vertices);
+        let opaque_vertices = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("Salimon Phase 0 opaque ship vertices"),
+            contents: &opaque_vertex_bytes,
+            usage: wgpu::BufferUsages::VERTEX,
         });
-        let vertex_bytes = encode_f32s(geometry.vertices);
-        let vertices = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("Salimon Phase 0 ship vertices"),
-            contents: &vertex_bytes,
+        let glass_vertex_bytes = encode_f32s(geometry.glass_vertices);
+        let glass_vertices = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("Salimon Phase 0 cockpit glass vertices"),
+            contents: &glass_vertex_bytes,
             usage: wgpu::BufferUsages::VERTEX,
         });
         Ok(Self {
-            pipeline,
+            opaque_pipeline,
+            glass_pipeline,
             bind_group,
             uniform,
-            vertices,
-            vertex_count: geometry.vertex_count,
+            opaque_vertices,
+            glass_vertices,
+            opaque_vertex_count: geometry.opaque_vertex_count,
+            glass_vertex_count: geometry.glass_vertex_count,
             visible: false,
         })
     }
@@ -338,14 +386,21 @@ impl ShipMeshRenderer {
         if !self.visible {
             return;
         }
-        pass.set_pipeline(&self.pipeline);
+        pass.set_pipeline(&self.opaque_pipeline);
         pass.set_bind_group(0, &self.bind_group, &[]);
-        pass.set_vertex_buffer(0, self.vertices.slice(..));
-        pass.draw(0..self.vertex_count, 0..1);
+        pass.set_vertex_buffer(0, self.opaque_vertices.slice(..));
+        pass.draw(0..self.opaque_vertex_count, 0..1);
+        pass.set_pipeline(&self.glass_pipeline);
+        pass.set_vertex_buffer(0, self.glass_vertices.slice(..));
+        pass.draw(0..self.glass_vertex_count, 0..1);
     }
 
     pub(crate) fn count(&self) -> u32 {
         u32::from(self.visible)
+    }
+
+    pub(crate) fn draw_count(&self) -> u32 {
+        u32::from(self.visible) * 2
     }
 }
 
@@ -386,13 +441,26 @@ mod tests {
     #[test]
     fn checked_in_ship_glb_loads_as_renderable_triangles() {
         let geometry = load_geometry().expect("checked-in ship must stay renderer-compatible");
-        assert_eq!(geometry.vertex_count, 1_860);
-        assert_eq!(geometry.vertices.len(), geometry.vertex_count as usize * 11);
+        assert!(geometry.opaque_vertex_count > geometry.glass_vertex_count);
+        assert_eq!(
+            geometry.opaque_vertices.len(),
+            geometry.opaque_vertex_count as usize * 11
+        );
+        assert_eq!(
+            geometry.glass_vertices.len(),
+            geometry.glass_vertex_count as usize * 11
+        );
         assert!(
             geometry
-                .vertices
+                .opaque_vertices
                 .chunks_exact(11)
                 .any(|vertex| vertex[10] == 1.0)
+        );
+        assert!(
+            geometry
+                .glass_vertices
+                .chunks_exact(11)
+                .all(|vertex| vertex[9] > 0.0 && vertex[9] < 0.5)
         );
     }
 }

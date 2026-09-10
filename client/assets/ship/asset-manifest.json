@@ -1,6 +1,6 @@
 {
   "name": "Salimon Phase 0 Scout",
-  "assetVersion": 1,
+  "assetVersion": 2,
   "source": "source/generate_salimon_phase0_ship.py",
   "editableInterchange": "export/salimon_phase0_ship.gltf",
   "runtimeAsset": "export/salimon_phase0_ship.glb",
@@ -15,6 +15,14 @@
     "maximumPrimitives": 45,
     "maximumMaterials": 9,
     "maximumGlbBytes": 262144
+  },
+  "cockpitWindows": {
+    "glazingNode": "Cockpit_Glazing",
+    "frameNode": "Cockpit_Window_Frame",
+    "material": "Cockpit Glass",
+    "treatment": "double-sided alpha blend; no shadows or post effects",
+    "seatedViewpointMeters": [1.38, 1.72, 0.0],
+    "standingViewpointMeters": [0.65, 1.85, 0.0]
   },
   "license": "Custom original Salimon project asset; no external asset dependencies"
 }

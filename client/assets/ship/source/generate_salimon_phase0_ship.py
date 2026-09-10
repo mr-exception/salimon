@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate Salimon's custom Phase 0 ship as glTF 2.0 and GLB.
 
-The script is the editable, deterministic DCC source for Task 7. It uses only
+The script is the editable, deterministic DCC source for Tasks 7 and 9. It uses only
 the Python standard library so later agents can reshape the ship by changing
 named dimensions/components and regenerate the runtime exports without Blender.
 The emitted .gltf can also be imported directly into Blender for hand editing.
@@ -51,6 +51,13 @@ class Geometry:
     normals: list[tuple[float, float, float]] = field(default_factory=list)
     texcoords: list[tuple[float, float]] = field(default_factory=list)
     indices: list[int] = field(default_factory=list)
+
+    def extend(self, other: Geometry) -> None:
+        base = len(self.positions)
+        self.positions.extend(other.positions)
+        self.normals.extend(other.normals)
+        self.texcoords.extend(other.texcoords)
+        self.indices.extend(base + index for index in other.indices)
 
     def add_face(self, points: Sequence[tuple[float, float, float]]) -> None:
         if len(points) < 3:
@@ -114,6 +121,47 @@ def tapered_box(
     geometry.add_face([d, a, e, h])
     geometry.add_face([d, h, g, c])
     geometry.add_face([a, b, f, e])
+    return geometry
+
+
+def cockpit_glazing(
+    x0: float,
+    x1: float,
+    y0_start: float,
+    y1_start: float,
+    z_start: float,
+    y0_end: float,
+    y1_end: float,
+    z_end: float,
+) -> Geometry:
+    """Build the front, roof, and side panes of an open-backed canopy."""
+    geometry = Geometry()
+    a = (x0, y0_start, -z_start)
+    b = (x0, y1_start, -z_start)
+    c = (x0, y1_start, z_start)
+    d = (x0, y0_start, z_start)
+    e = (x1, y0_end, -z_end)
+    f = (x1, y1_end, -z_end)
+    g = (x1, y1_end, z_end)
+    h = (x1, y0_end, z_end)
+    geometry.add_face([e, f, g, h])
+    geometry.add_face([b, c, g, f])
+    geometry.add_face([d, h, g, c])
+    geometry.add_face([a, b, f, e])
+    return geometry
+
+
+def cockpit_window_frame() -> Geometry:
+    """Combine lightweight canopy rails into one draw primitive."""
+    geometry = Geometry()
+    for rail in (
+        box(2.50, 2.62, 1.00, 2.72, 1.48, 1.62),
+        box(2.50, 2.62, 1.00, 2.72, -1.62, -1.48),
+        box(2.50, 4.92, 2.55, 2.69, -0.09, 0.09),
+        box(4.80, 4.96, 0.72, 2.04, 0.32, 0.46),
+        box(4.80, 4.96, 0.72, 2.04, -0.46, -0.32),
+    ):
+        geometry.extend(rail)
     return geometry
 
 
@@ -227,7 +275,7 @@ MATERIALS = [
     ("Hull Graphite", [0.12, 0.15, 0.17, 1.0], 0.68, 0.42, None, None),
     ("Hull Ceramic", [0.56, 0.60, 0.60, 1.0], 0.52, 0.20, None, None),
     ("Copper Accent", [0.48, 0.20, 0.08, 1.0], 0.42, 0.62, None, None),
-    ("Cockpit Glass", [0.025, 0.09, 0.12, 1.0], 0.20, 0.72, [0.0, 0.16, 0.20], None),
+    ("Cockpit Glass", [0.04, 0.22, 0.28, 0.24], 0.18, 0.12, [0.0, 0.05, 0.06], None),
     ("Interior Light", [0.55, 0.58, 0.56, 1.0], 0.70, 0.08, None, None),
     ("Interior Dark", [0.10, 0.12, 0.13, 1.0], 0.78, 0.12, None, None),
     ("Cyan Display", [0.015, 0.22, 0.27, 1.0], 0.28, 0.18, [0.0, 0.75, 0.92], None),
@@ -246,7 +294,14 @@ def make_materials() -> list[dict[str, object]]:
         }
         if texture is not None:
             pbr["baseColorTexture"] = {"index": texture, "texCoord": 0}
-        material: dict[str, object] = {"name": name, "pbrMetallicRoughness": pbr, "doubleSided": False}
+        is_glass = name == "Cockpit Glass"
+        material: dict[str, object] = {
+            "name": name,
+            "pbrMetallicRoughness": pbr,
+            "doubleSided": is_glass,
+        }
+        if is_glass:
+            material["alphaMode"] = "BLEND"
         if emissive is not None:
             material["emissiveFactor"] = emissive
         result.append(material)
@@ -273,7 +328,9 @@ def ship_components() -> list[Component]:
     add("Hull_Roof", box(-3.7, 2.5, 2.72, 3.08, -1.72, 1.72), 1, "Exterior")
     add("Hull_Port_Side", box(-3.8, 2.6, 0.18, 2.72, 1.72, 2.05), 0, "Exterior")
     add("Hull_Starboard_Side", box(-3.8, 2.6, 0.18, 2.72, -2.05, -1.72), 0, "Exterior")
-    add("Hull_Nose", tapered_box(2.5, 5.25, 0.10, 2.95, 1.95, 0.62, 1.82, 0.36), 1, "Exterior")
+    # Keep the lower nose solid while leaving the cockpit volume above it open.
+    # The canopy panes below are the only geometry across the forward sightline.
+    add("Hull_Nose", tapered_box(2.5, 5.25, 0.10, 1.02, 1.95, 0.62, 0.76, 0.36), 1, "Exterior")
     add("Hull_Aft_Cap", box(-4.25, -3.8, 0.18, 2.72, -2.05, 2.05), 0, "Exterior")
     port_wing = [(1.65, 1.88), (-2.60, 1.88), (-4.05, 4.15), (0.50, 3.42)]
     starboard_wing = [(0.50, -3.42), (-4.05, -4.15), (-2.60, -1.88), (1.65, -1.88)]
@@ -286,7 +343,8 @@ def ship_components() -> list[Component]:
     add("Engine_Port_Glow", cylinder_x(-4.90, -4.84, 0.83, 2.78, 0.33), 8, "Exterior")
     add("Engine_Starboard_Glow", cylinder_x(-4.90, -4.84, 0.83, -2.78, 0.33), 8, "Exterior")
     add("Dorsal_Spine", tapered_box(-3.40, 2.30, 3.07, 3.62, 0.48, 3.08, 3.18, 0.12), 2, "Exterior")
-    add("Window_Canopy", tapered_box(3.15, 4.76, 1.02, 2.56, 1.48, 0.79, 1.69, 0.31), 3, "Exterior")
+    add("Cockpit_Glazing", cockpit_glazing(2.58, 4.92, 1.00, 2.64, 1.50, 0.72, 2.02, 0.42), 3, "Exterior", exterior_visibility=True)
+    add("Cockpit_Window_Frame", cockpit_window_frame(), 2, "Exterior")
     add("Hull_Port_Detail", box(-2.70, 1.50, 1.02, 1.16, 2.05, 2.12), 2, "Exterior")
     add("Hull_Starboard_Detail", box(-2.70, 1.50, 1.02, 1.16, -2.12, -2.05), 2, "Exterior")
 
@@ -313,8 +371,6 @@ def ship_components() -> list[Component]:
     add("Cabin_Storage_Starboard", box(-2.92, -1.58, 0.30, 1.22, -1.48, -1.02), 0, "Interior")
     add("Ceiling_Light_Forward", box(0.35, 1.90, 2.52, 2.61, -0.14, 0.14), 6, "Interior")
     add("Ceiling_Light_Aft", box(-2.65, -0.55, 2.52, 2.61, -0.14, 0.14), 6, "Interior")
-    add("Interior_Window", box(3.20, 3.24, 1.08, 2.42, -1.32, 1.32), 3, "Interior")
-
     return components
 
 
@@ -404,7 +460,7 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
             "copyright": "Copyright 2026 Salimon contributors; custom original asset",
             "extras": {
                 "salimon": {
-                    "assetVersion": 1,
+                    "assetVersion": 2,
                     "units": "meters",
                     "upAxis": "+Y",
                     "forwardAxis": "+X",
@@ -431,6 +487,15 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
                 "materialCount": len(MATERIALS),
                 "externalAssetDependencies": 0,
                 "walkableInteriorClearanceMeters": {"width": 3.10, "height": 2.33},
+                "cockpitWindows": {
+                    "glazingNode": "Cockpit_Glazing",
+                    "frameNode": "Cockpit_Window_Frame",
+                    "material": "Cockpit Glass",
+                    "seatedViewpointMeters": [1.38, 1.72, 0.0],
+                    "standingViewpointMeters": [0.65, 1.85, 0.0],
+                    "dynamicShadows": False,
+                    "postEffects": False,
+                },
             }
         },
     }

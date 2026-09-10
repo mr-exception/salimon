@@ -71,7 +71,6 @@ def main() -> None:
                 "Aft_Bulkhead_Port",
                 "Aft_Bulkhead_Starboard",
                 "Aft_Bulkhead_Header",
-                "Interior_Window",
             },
         ),
         (panel_size[0] * 2, 0),

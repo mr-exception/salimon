@@ -12,9 +12,11 @@ controller changes to Earth-radial surface walking. Surface movement is projecte
 back to the same spherical radius each update, so the portable rule works around
 the full body rather than only near the initial landing point.
 
-Cockpit entry and exit are instant. This crate does not decide whether the ship
-is landed, whether the door may open, or how ship motion changes; the runtime
-passes those facts through `ShipFrame`/`SurfaceFrame` DTOs.
+Cockpit entry and exit are instant. The default seated view is slightly pitched
+down while retaining a clear forward sightline through the Task 9 glazing; mouse
+look remains independent and unrestricted. This crate does not decide whether
+the ship is landed, whether the door may open, or how ship motion changes; the
+runtime passes those facts through `ShipFrame`/`SurfaceFrame` DTOs.
 
 See [README.ai.md](README.ai.md), [architecture.md](architecture.md), and
 [invariants.md](invariants.md) before modifying controller behavior.

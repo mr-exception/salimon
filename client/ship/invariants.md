@@ -16,3 +16,9 @@
     percentage points, clamp to 0–100%, and map directly to speed.
 11. Flying ships are corrected outside every solid body's nominal surface plus
     the conservative ship collision radius; the visual-only Sun is ignored.
+12. Landing is offered only with cockpit authority inside exactly `1.15R`, works
+    for every solid catalog body, and preserves the captured approach location.
+13. Landing and takeoff automation cannot be cancelled and continues after the
+    cockpit is left; steering and thruster input cannot override it.
+14. Takeoff requires cockpit authority and a closed door, follows the landed
+    surface normal, and returns control only after clearing the landing volume.

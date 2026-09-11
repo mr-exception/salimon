@@ -149,26 +149,34 @@ automated tests:
    confirm the 0.25-second gravity transition is smooth, inspect the custom
    exterior/material variation, confirm its lowest point rests on Earth without
    a visible gap or penetration, then re-enter and close the door.
-3. Press F2 and confirm the far view contains distinct textured spheres
+3. From cockpit control, approach Mercury, Venus, Earth, Moon, and Mars from
+   representative non-polar directions. Confirm `Press L to land` appears only
+   inside `1.15R`; press L at high speed/poor orientation, leave the cockpit,
+   and confirm landing still aligns and completes at the approached surface.
+   Walk outside on each body and confirm radial full-sphere movement. Return,
+   leave the door open, and confirm L reports `Close door before takeoff`; close
+   it, start takeoff, leave the cockpit, and confirm the ship clears the landing
+   volume before normal flight resumes without a loading screen.
+4. Press F2 and confirm the far view contains distinct textured spheres
    for exactly Sun, Mercury, Venus, Earth, Moon, and Mars, with visibly distinct
    compressed sizes and no other celestial bodies.
-4. Let the fixture traverse far and near scales; confirm there is no visible
+5. Let the fixture traverse far and near scales; confirm there is no visible
    position jitter, premature far clipping, depth inversion, or coplanar flicker
    in the intentionally separated markers.
-5. Press N and confirm the exact 12 m Earth-surface view and its three markers remain
+6. Press N and confirm the exact 12 m Earth-surface view and its three markers remain
    stable while paused; press P to resume, then R and confirm the camera restarts
    at the far endpoint.
    Repeat with keys 2, 3, 5, and 6 to inspect Mercury, Venus, Moon, and Mars
    through their complete approach/retreat. Check the lit curved silhouettes,
    smooth material filtering, and surface detail at N; use 4 to return to Earth.
-6. Press F3 and confirm the panel identifies Earth as the nearest body at the
+7. Press F3 and confirm the panel identifies Earth as the nearest body at the
    12 m dwell, while camera altitude/phase, CPU/GPU states, and scene counts
    update truthfully; hide it again without affecting the scene.
-7. Resize repeatedly, including to a very small size, and confirm projection and
+8. Resize repeatedly, including to a very small size, and confirm projection and
    depth follow the drawable size without a panic or validation error.
-8. Minimize and restore, then confirm rendering/animation resume without a time
+9. Minimize and restore, then confirm rendering/animation resume without a time
    jump or paused interval contaminating diagnostics.
-9. Close the window, launch the client again, and confirm both shutdown and
+10. Close the window, launch the client again, and confirm both shutdown and
    relaunch are clean.
 
 During the Task 10 interior/exterior pass at fixed 1920×1080 on the reference M1

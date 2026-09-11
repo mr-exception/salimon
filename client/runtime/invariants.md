@@ -44,3 +44,7 @@
     roll without changing the independent character mouse-look state.
 21. Up/Down Arrow changes thruster only on an initial press, never key repeat or
     release; leaving cockpit or losing focus clears held steering input.
+22. L is translated to the ship domain only on an initial press; the runtime
+    cannot cancel or steer an active assisted landing/takeoff sequence.
+23. Character surface traversal receives the body frame stored by landed or
+    assisted ship state, so every solid body uses the same character gravity.

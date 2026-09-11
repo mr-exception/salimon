@@ -53,6 +53,13 @@ as cockpit-monitor information, while mouse look remains independent and never
 steers or recenters the ship. Leaving with E clears held steering but preserves
 heading, thruster, and autonomous forward motion.
 
+While controlling the cockpit, L starts assisted landing whenever the ship is
+inside a solid body's `1.15R` volume. When landed, the same key starts takeoff;
+the door must be closed. Contextual prompts and interlock/progress messages use
+the cockpit-monitor message path. Automatic sequences continue after leaving
+the cockpit, and runtime composition switches character radial gravity to the
+active Mercury, Venus, Earth, Moon, or Mars surface frame.
+
 Task 10 maps contextual interaction zones to the enlarged cockpit and exit-door
 markers. It retains the 0.05 m gameplay near plane and passes the baked-scale GLB
 to the renderer without an extra transform.

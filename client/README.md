@@ -14,7 +14,7 @@ ship asset/runtime mesh path. Add future Cargo packages explicitly to the root w
 | `renderer/` | `wgpu` resources, camera-relative conversion, reverse-Z scene/ship/overlay pipelines, measurements, and presentation |
 | `world/` | Immutable six-body compressed Solar System, portable `f64` coordinates, camera state, geometry math, and precision markers |
 | `character/` | First-person state, typed movement, fixed gravity, cockpit/doorway/surface traversal |
-| `ship/` | Ship pose, landed/flying state, cockpit authority, persistent motion, and landed-only door rules |
+| `ship/` | Ship pose, flight/landing/takeoff state, cockpit authority, persistent motion, and landed-only door rules |
 | `platform/` | Reserved for native input and OS-specific adapters |
 | `assets/` | Editable source art, validated metadata, and exported game-ready content |
 | `diagnostics/` | Engineering metric aggregation, formatting, and RGBA overlay rasterization |
@@ -35,7 +35,7 @@ GPU or window types. Its static catalog contains exactly Sun, Mercury, Venus,
 Earth, Moon, and Mars; the Sun is visual-only, and the five solid bodies expose
 disjoint `1.15R` landing volumes. The runtime creates the window, routes lifecycle
 and resize events, schedules redraws/updates, maps P/R/N/1–6 into typed world commands,
-routes F2/F3 and gameplay input, composes typed character/ship snapshots, and converts
+routes F2/F3 and gameplay input (including contextual L landing/takeoff), composes typed character/ship snapshots, and converts
 domain state into renderer DTOs. The renderer subtracts the camera origin in `f64`, uploads only
 camera-relative `f32` data, and presents with infinite-far reverse-Z depth.
 Recoverable surface loss is handled by the runtime without discarding world

@@ -7,7 +7,8 @@
 use std::time::Duration;
 
 use salimon_world::{
-    BodyRole, CELESTIAL_BODIES, CelestialBodyId, PHASE_ZERO_REFERENCE_MAX_SPEED_METERS_PER_SECOND,
+    BodyRole, CELESTIAL_BODIES, CelestialBody, CelestialBodyId,
+    LANDING_RANGE_ALTITUDE_RADIUS_FACTOR, PHASE_ZERO_REFERENCE_MAX_SPEED_METERS_PER_SECOND,
 };
 
 /// Lowest point of the uniformly enlarged Task 10 runtime mesh in ship-local Y.
@@ -18,6 +19,11 @@ pub const STEERING_RATE_RADIANS_PER_SECOND: f64 = 5.0_f64.to_radians();
 pub const STEERING_RAMP_SECONDS: f64 = 0.12;
 /// Conservative bounding sphere for the 20.3 x 7.44 x 16.6 meter ship asset.
 pub const COLLISION_RADIUS_METERS: f64 = 13.7;
+/// Height above a solid surface at which Phase 0 landing assistance is offered.
+pub const LANDING_RANGE_RADIUS_FRACTION: f64 = LANDING_RANGE_ALTITUDE_RADIUS_FACTOR;
+/// Deliberately readable fixed speeds for the short automatic sequences.
+pub const LANDING_ASSIST_SPEED_METERS_PER_SECOND: f64 = 40.0;
+pub const TAKEOFF_ASSIST_SPEED_METERS_PER_SECOND: f64 = 60.0;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct SteeringInput {
@@ -38,12 +44,19 @@ pub enum DoorState {
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum FlightState {
     Landed { body: CelestialBodyId },
+    AssistedLanding { body: CelestialBodyId },
+    AssistedTakeoff { body: CelestialBodyId },
     Flying,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CockpitMessage {
     DoorLockedWhileInFlight,
+    PressToLand,
+    PressToTakeOff,
+    CloseDoorBeforeTakeoff,
+    LandingInProgress,
+    TakeoffInProgress,
 }
 
 impl CockpitMessage {
@@ -51,6 +64,11 @@ impl CockpitMessage {
     pub const fn text(self) -> &'static str {
         match self {
             Self::DoorLockedWhileInFlight => "Door locked while in flight",
+            Self::PressToLand => "Press L to land",
+            Self::PressToTakeOff => "Press L to take off",
+            Self::CloseDoorBeforeTakeoff => "Close door before takeoff",
+            Self::LandingInProgress => "Assisted landing in progress",
+            Self::TakeoffInProgress => "Assisted takeoff in progress",
         }
     }
 }
@@ -108,6 +126,7 @@ pub struct ShipController {
     cockpit_message: Option<CockpitMessage>,
     steering_target: SteeringInput,
     steering: SteeringInput,
+    assist_surface_normal: [f64; 3],
 }
 
 impl Default for ShipController {
@@ -132,6 +151,7 @@ impl Default for ShipController {
             cockpit_message: None,
             steering_target: SteeringInput::default(),
             steering: SteeringInput::default(),
+            assist_surface_normal: [0.0, 1.0, 0.0],
         }
     }
 }
@@ -148,6 +168,7 @@ impl ShipController {
             cockpit_message: None,
             steering_target: SteeringInput::default(),
             steering: SteeringInput::default(),
+            assist_surface_normal: [0.0, 1.0, 0.0],
         }
     }
 
@@ -159,19 +180,20 @@ impl ShipController {
     }
 
     pub fn set_steering_input(&mut self, input: SteeringInput) {
-        self.steering_target = if self.cockpit_control_active {
-            SteeringInput {
-                pitch: input.pitch.clamp(-1.0, 1.0),
-                yaw: input.yaw.clamp(-1.0, 1.0),
-                roll: input.roll.clamp(-1.0, 1.0),
-            }
-        } else {
-            SteeringInput::default()
-        };
+        self.steering_target =
+            if self.cockpit_control_active && self.flight_state == FlightState::Flying {
+                SteeringInput {
+                    pitch: input.pitch.clamp(-1.0, 1.0),
+                    yaw: input.yaw.clamp(-1.0, 1.0),
+                    roll: input.roll.clamp(-1.0, 1.0),
+                }
+            } else {
+                SteeringInput::default()
+            };
     }
 
     pub fn adjust_thruster(&mut self, percentage_points: i8) {
-        if !self.cockpit_control_active {
+        if !self.cockpit_control_active || self.flight_state != FlightState::Flying {
             return;
         }
         self.thruster_percentage = i16::from(self.thruster_percentage)
@@ -188,7 +210,9 @@ impl ShipController {
                     DoorState::Open => DoorState::Closed,
                 };
             }
-            FlightState::Flying => {
+            FlightState::Flying
+            | FlightState::AssistedLanding { .. }
+            | FlightState::AssistedTakeoff { .. } => {
                 self.door_state = DoorState::Closed;
                 self.cockpit_message = Some(CockpitMessage::DoorLockedWhileInFlight);
             }
@@ -202,15 +226,115 @@ impl ShipController {
     pub fn advance(&mut self, delta: Duration) {
         let seconds = delta.as_secs_f64().min(0.1);
         self.advance_steering(seconds);
-        if self.flight_state != FlightState::Flying {
+        match self.flight_state {
+            FlightState::Flying => {
+                let distance = self.speed_meters_per_second() * seconds;
+                let forward = self.pose.axes()[0];
+                for (position, direction) in self.pose.position_meters.iter_mut().zip(forward) {
+                    *position += direction * distance;
+                }
+                self.resolve_solid_body_collisions();
+            }
+            FlightState::AssistedLanding { body } => self.advance_landing(body, seconds),
+            FlightState::AssistedTakeoff { body } => self.advance_takeoff(body, seconds),
+            FlightState::Landed { .. } => {}
+        }
+    }
+
+    /// Performs the contextual `L` action. Automatic sequences deliberately do
+    /// nothing here, making them uncancellable once started.
+    pub fn trigger_landing_action(&mut self) {
+        if !self.cockpit_control_active {
             return;
         }
-        let distance = self.speed_meters_per_second() * seconds;
-        let forward = self.pose.axes()[0];
-        for (position, direction) in self.pose.position_meters.iter_mut().zip(forward) {
-            *position += direction * distance;
+        self.cockpit_message = None;
+        match self.flight_state {
+            FlightState::Flying => {
+                if let Some(body) = self.landing_target() {
+                    let center = body.center.meters();
+                    self.assist_surface_normal =
+                        normalize_or(sub(self.pose.position_meters, center), self.pose.axes()[1]);
+                    self.pose.orientation = surface_aligned_orientation(
+                        self.assist_surface_normal,
+                        self.pose.axes()[0],
+                    );
+                    self.steering_target = SteeringInput::default();
+                    self.steering = SteeringInput::default();
+                    self.flight_state = FlightState::AssistedLanding { body: body.id };
+                }
+            }
+            FlightState::Landed { body } => {
+                if self.door_state == DoorState::Open {
+                    self.cockpit_message = Some(CockpitMessage::CloseDoorBeforeTakeoff);
+                } else {
+                    let center = body_definition(body).center.meters();
+                    self.assist_surface_normal =
+                        normalize_or(sub(self.pose.position_meters, center), self.pose.axes()[1]);
+                    self.flight_state = FlightState::AssistedTakeoff { body };
+                }
+            }
+            FlightState::AssistedLanding { .. } | FlightState::AssistedTakeoff { .. } => {}
         }
-        self.resolve_solid_body_collisions();
+    }
+
+    #[must_use]
+    pub fn contextual_cockpit_message(&self) -> Option<CockpitMessage> {
+        if let Some(message) = self.cockpit_message {
+            return Some(message);
+        }
+        match self.flight_state {
+            FlightState::AssistedLanding { .. } => Some(CockpitMessage::LandingInProgress),
+            FlightState::AssistedTakeoff { .. } => Some(CockpitMessage::TakeoffInProgress),
+            FlightState::Landed { .. } if self.cockpit_control_active => {
+                Some(CockpitMessage::PressToTakeOff)
+            }
+            FlightState::Flying
+                if self.cockpit_control_active && self.landing_target().is_some() =>
+            {
+                Some(CockpitMessage::PressToLand)
+            }
+            _ => None,
+        }
+    }
+
+    fn landing_target(&self) -> Option<&'static CelestialBody> {
+        CELESTIAL_BODIES.iter().find(|body| {
+            body.role == BodyRole::Solid
+                && vector_length(sub(self.pose.position_meters, body.center.meters()))
+                    <= body.radius_meters * (1.0 + LANDING_RANGE_RADIUS_FRACTION)
+        })
+    }
+
+    fn advance_landing(&mut self, body_id: CelestialBodyId, seconds: f64) {
+        let body = body_definition(body_id);
+        let destination_distance = body.radius_meters - LOWEST_LOCAL_Y_METERS;
+        let current_distance = vector_length(sub(self.pose.position_meters, body.center.meters()));
+        let speed = LANDING_ASSIST_SPEED_METERS_PER_SECOND.max(body.radius_meters * 0.10);
+        let next_distance = (current_distance - speed * seconds).max(destination_distance);
+        self.pose.position_meters = add(
+            body.center.meters(),
+            scale(self.assist_surface_normal, next_distance),
+        );
+        if next_distance <= destination_distance + 1.0e-9 {
+            self.flight_state = FlightState::Landed { body: body_id };
+            self.thruster_percentage = 0;
+        }
+    }
+
+    fn advance_takeoff(&mut self, body_id: CelestialBodyId, seconds: f64) {
+        let body = body_definition(body_id);
+        let clear_distance =
+            body.radius_meters * (1.0 + LANDING_RANGE_RADIUS_FRACTION) + COLLISION_RADIUS_METERS;
+        let current_distance = vector_length(sub(self.pose.position_meters, body.center.meters()));
+        let speed = TAKEOFF_ASSIST_SPEED_METERS_PER_SECOND.max(body.radius_meters * 0.15);
+        let next_distance = (current_distance + speed * seconds).min(clear_distance);
+        self.pose.position_meters = add(
+            body.center.meters(),
+            scale(self.assist_surface_normal, next_distance),
+        );
+        if next_distance >= clear_distance - 1.0e-9 {
+            self.flight_state = FlightState::Flying;
+        }
     }
 
     #[must_use]
@@ -283,6 +407,83 @@ impl ShipController {
             }
         }
     }
+}
+
+fn body_definition(id: CelestialBodyId) -> &'static CelestialBody {
+    CELESTIAL_BODIES
+        .iter()
+        .find(|body| body.id == id)
+        .expect("flight state only stores catalog body identifiers")
+}
+
+fn add(left: [f64; 3], right: [f64; 3]) -> [f64; 3] {
+    [left[0] + right[0], left[1] + right[1], left[2] + right[2]]
+}
+
+fn sub(left: [f64; 3], right: [f64; 3]) -> [f64; 3] {
+    [left[0] - right[0], left[1] - right[1], left[2] - right[2]]
+}
+
+fn scale(vector: [f64; 3], amount: f64) -> [f64; 3] {
+    vector.map(|value| value * amount)
+}
+
+fn dot(left: [f64; 3], right: [f64; 3]) -> f64 {
+    left.into_iter().zip(right).map(|(a, b)| a * b).sum()
+}
+
+fn cross(left: [f64; 3], right: [f64; 3]) -> [f64; 3] {
+    [
+        left[1] * right[2] - left[2] * right[1],
+        left[2] * right[0] - left[0] * right[2],
+        left[0] * right[1] - left[1] * right[0],
+    ]
+}
+
+fn normalize_or(vector: [f64; 3], fallback: [f64; 3]) -> [f64; 3] {
+    let length = vector_length(vector);
+    if length > 1.0e-12 {
+        scale(vector, length.recip())
+    } else {
+        fallback
+    }
+}
+
+fn surface_aligned_orientation(up: [f64; 3], prior_forward: [f64; 3]) -> [f64; 4] {
+    let tangent = sub(prior_forward, scale(up, dot(prior_forward, up)));
+    let forward = normalize_or(
+        tangent,
+        normalize_or(cross([0.0, 0.0, 1.0], up), [1.0, 0.0, 0.0]),
+    );
+    let port = normalize_or(cross(forward, up), [0.0, 0.0, 1.0]);
+    quaternion_from_axes(forward, up, port)
+}
+
+fn quaternion_from_axes(forward: [f64; 3], up: [f64; 3], port: [f64; 3]) -> [f64; 4] {
+    let m00 = forward[0];
+    let m01 = up[0];
+    let m02 = port[0];
+    let m10 = forward[1];
+    let m11 = up[1];
+    let m12 = port[1];
+    let m20 = forward[2];
+    let m21 = up[2];
+    let m22 = port[2];
+    let trace = m00 + m11 + m22;
+    let quaternion = if trace > 0.0 {
+        let s = (trace + 1.0).sqrt() * 2.0;
+        [(m21 - m12) / s, (m02 - m20) / s, (m10 - m01) / s, 0.25 * s]
+    } else if m00 > m11 && m00 > m22 {
+        let s = (1.0 + m00 - m11 - m22).sqrt() * 2.0;
+        [0.25 * s, (m01 + m10) / s, (m02 + m20) / s, (m21 - m12) / s]
+    } else if m11 > m22 {
+        let s = (1.0 + m11 - m00 - m22).sqrt() * 2.0;
+        [(m01 + m10) / s, 0.25 * s, (m12 + m21) / s, (m02 - m20) / s]
+    } else {
+        let s = (1.0 + m22 - m00 - m11).sqrt() * 2.0;
+        [(m02 + m20) / s, (m12 + m21) / s, 0.25 * s, (m10 - m01) / s]
+    };
+    normalized_quaternion(quaternion)
 }
 
 fn approach(current: f64, target: f64, maximum_delta: f64) -> f64 {
@@ -504,5 +705,99 @@ mod tests {
             position[2] - earth.center.meters()[2],
         ]);
         assert!((distance - earth.radius_meters - COLLISION_RADIUS_METERS).abs() < 1.0e-3);
+    }
+
+    #[test]
+    fn every_solid_body_supports_uncancellable_arbitrary_point_landing() {
+        for body in CELESTIAL_BODIES
+            .iter()
+            .filter(|body| body.role == BodyRole::Solid)
+        {
+            let normal = normalize_or([0.31, 0.72, -0.62], [0.0, 1.0, 0.0]);
+            let approach_distance = body.radius_meters * 1.10 + COLLISION_RADIUS_METERS;
+            let mut ship = ShipController::flying(
+                ShipPose {
+                    position_meters: add(body.center.meters(), scale(normal, approach_distance)),
+                    orientation: axis_angle_quaternion([0.0, 0.0, 1.0], 1.2),
+                },
+                100,
+            );
+            assert_eq!(
+                ship.contextual_cockpit_message(),
+                Some(CockpitMessage::PressToLand)
+            );
+            ship.trigger_landing_action();
+            assert_eq!(
+                ship.snapshot().flight_state,
+                FlightState::AssistedLanding { body: body.id }
+            );
+            ship.set_cockpit_control(false);
+            ship.trigger_landing_action();
+            for _ in 0..200 {
+                ship.advance(Duration::from_millis(100));
+            }
+            let snapshot = ship.snapshot();
+            assert_eq!(snapshot.flight_state, FlightState::Landed { body: body.id });
+            assert_eq!(snapshot.thruster_percentage, 0);
+            let landed_normal = normalize_or(
+                sub(snapshot.pose.position_meters, body.center.meters()),
+                [0.0, 1.0, 0.0],
+            );
+            assert!(dot(landed_normal, normal) > 1.0 - 1.0e-10);
+            assert!(dot(snapshot.pose.axes()[1], normal) > 1.0 - 1.0e-10);
+        }
+    }
+
+    #[test]
+    fn landing_requires_cockpit_authority_and_exact_range() {
+        let mars = body_definition(CelestialBodyId::Mars);
+        let mut ship = ShipController::flying(
+            ShipPose {
+                position_meters: add(mars.center.meters(), [mars.radius_meters * 1.16, 0.0, 0.0]),
+                orientation: [0.0, 0.0, 0.0, 1.0],
+            },
+            0,
+        );
+        assert_eq!(ship.contextual_cockpit_message(), None);
+        ship.pose.position_meters[0] = mars.center.meters()[0] + mars.radius_meters * 1.149_999;
+        ship.set_cockpit_control(false);
+        ship.trigger_landing_action();
+        assert_eq!(ship.snapshot().flight_state, FlightState::Flying);
+        ship.set_cockpit_control(true);
+        ship.trigger_landing_action();
+        assert_eq!(
+            ship.snapshot().flight_state,
+            FlightState::AssistedLanding {
+                body: CelestialBodyId::Mars
+            }
+        );
+    }
+
+    #[test]
+    fn takeoff_is_door_interlocked_and_completes_without_cockpit_authority() {
+        let mut ship = ShipController::default();
+        ship.set_cockpit_control(true);
+        ship.toggle_door();
+        ship.trigger_landing_action();
+        assert_eq!(
+            ship.contextual_cockpit_message(),
+            Some(CockpitMessage::CloseDoorBeforeTakeoff)
+        );
+        assert!(matches!(
+            ship.snapshot().flight_state,
+            FlightState::Landed { .. }
+        ));
+        ship.toggle_door();
+        ship.trigger_landing_action();
+        assert!(matches!(
+            ship.snapshot().flight_state,
+            FlightState::AssistedTakeoff { .. }
+        ));
+        ship.set_cockpit_control(false);
+        ship.trigger_landing_action();
+        for _ in 0..200 {
+            ship.advance(Duration::from_millis(100));
+        }
+        assert_eq!(ship.snapshot().flight_state, FlightState::Flying);
     }
 }

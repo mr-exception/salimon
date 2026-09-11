@@ -232,7 +232,7 @@ impl ClientApplication {
     fn interact(&mut self) {
         let ship_snapshot = self.ship.snapshot();
         let ship_frame = character_ship_frame(ship_snapshot.pose);
-        let surface = earth_surface_frame();
+        let surface = surface_frame_for_ship(ship_snapshot);
         match self.character.location() {
             CharacterLocation::Cockpit => {
                 self.character.leave_cockpit();
@@ -283,7 +283,7 @@ impl ClientApplication {
         self.ship.advance(update_delta);
         let ship_snapshot = self.ship.snapshot();
         let ship_frame = character_ship_frame(ship_snapshot.pose);
-        let surface_frame = earth_surface_frame();
+        let surface_frame = surface_frame_for_ship(ship_snapshot);
         if self.view_mode == ViewMode::Gameplay {
             self.character.advance(
                 update_delta,
@@ -297,6 +297,18 @@ impl ClientApplication {
         let world_snapshot = self.camera_prototype.snapshot();
         let (mut camera, scene_instances, spheres, light) = map_world_to_renderer(world_snapshot);
         let character_snapshot = self.character.snapshot(ship_frame, surface_frame);
+        let monitor_message = self.ship.contextual_cockpit_message();
+        if let Some(message) = monitor_message {
+            window.set_title(&format!("{WINDOW_TITLE} — {}", message.text()));
+        } else if ship_snapshot.cockpit_control_active {
+            window.set_title(&format!(
+                "{WINDOW_TITLE} — {} — {}%",
+                format_metric_speed(ship_snapshot.speed_meters_per_second),
+                ship_snapshot.thruster_percentage
+            ));
+        } else {
+            window.set_title(WINDOW_TITLE);
+        }
         let ship_mesh = if self.view_mode == ViewMode::Gameplay {
             camera = CameraFrame {
                 position_meters: character_snapshot.eye_position_meters,
@@ -557,6 +569,15 @@ impl ApplicationHandler for ClientApplication {
                 window.request_redraw();
             }
             WindowEvent::KeyboardInput { event, .. }
+                if landing_action_pressed(event.state, event.repeat, event.physical_key) =>
+            {
+                self.ship.trigger_landing_action();
+                if let Some(message) = self.ship.contextual_cockpit_message() {
+                    log::info!("cockpit monitor: {}", message.text());
+                }
+                window.request_redraw();
+            }
+            WindowEvent::KeyboardInput { event, .. }
                 if view_toggle_pressed(event.state, event.repeat, event.physical_key) =>
             {
                 self.view_mode = match self.view_mode {
@@ -699,19 +720,47 @@ fn character_ship_frame(pose: ShipPose) -> ShipFrame {
     }
 }
 
-fn earth_surface_frame() -> SurfaceFrame {
-    let earth = CELESTIAL_BODIES
+fn surface_frame_for_ship(ship: ShipSnapshot) -> SurfaceFrame {
+    let body_id = match ship.flight_state {
+        FlightState::Landed { body }
+        | FlightState::AssistedLanding { body }
+        | FlightState::AssistedTakeoff { body } => body,
+        FlightState::Flying => {
+            CELESTIAL_BODIES
+                .iter()
+                .filter(|body| body.role == salimon_world::BodyRole::Solid)
+                .min_by(|left, right| {
+                    distance_squared(left.center.meters(), ship.pose.position_meters).total_cmp(
+                        &distance_squared(right.center.meters(), ship.pose.position_meters),
+                    )
+                })
+                .expect("world catalog always contains a solid body")
+                .id
+        }
+    };
+    let body = CELESTIAL_BODIES
         .iter()
-        .find(|body| body.id == CelestialBodyId::Earth)
-        .expect("world catalog always contains Earth");
+        .find(|body| body.id == body_id)
+        .expect("ship body identifier belongs to the world catalog");
     SurfaceFrame {
-        body_center_meters: earth.center.meters(),
-        radius_meters: earth.radius_meters,
+        body_center_meters: body.center.meters(),
+        radius_meters: body.radius_meters,
     }
+}
+
+fn distance_squared(left: [f64; 3], right: [f64; 3]) -> f64 {
+    left.into_iter()
+        .zip(right)
+        .map(|(a, b)| (a - b) * (a - b))
+        .sum()
 }
 
 fn interaction_pressed(state: ElementState, repeat: bool, key: PhysicalKey) -> bool {
     state == ElementState::Pressed && !repeat && key == PhysicalKey::Code(KeyCode::KeyE)
+}
+
+fn landing_action_pressed(state: ElementState, repeat: bool, key: PhysicalKey) -> bool {
+    state == ElementState::Pressed && !repeat && key == PhysicalKey::Code(KeyCode::KeyL)
 }
 
 fn view_toggle_pressed(state: ElementState, repeat: bool, key: PhysicalKey) -> bool {
@@ -978,8 +1027,8 @@ mod tests {
     use super::{
         INITIAL_HEIGHT, INITIAL_WIDTH, InteractionTarget, ShipControlInput, camera_body_distances,
         camera_command, camera_domain_metrics, format_metric_speed, interaction_target,
-        is_diagnostics_toggle, map_world_to_renderer, release_cursor_pressed, ship_control_key,
-        thruster_step, update_ship_control_input,
+        is_diagnostics_toggle, landing_action_pressed, map_world_to_renderer,
+        release_cursor_pressed, ship_control_key, thruster_step, update_ship_control_input,
     };
     use salimon_world::{CELESTIAL_BODIES, CameraCommand, CameraPrototype, CelestialBodyId};
     use winit::event::ElementState;
@@ -1008,6 +1057,31 @@ mod tests {
             ElementState::Released,
             false,
             escape
+        ));
+    }
+
+    #[test]
+    fn landing_action_accepts_only_initial_l_press() {
+        let landing = PhysicalKey::Code(KeyCode::KeyL);
+        assert!(landing_action_pressed(
+            ElementState::Pressed,
+            false,
+            landing
+        ));
+        assert!(!landing_action_pressed(
+            ElementState::Pressed,
+            true,
+            landing
+        ));
+        assert!(!landing_action_pressed(
+            ElementState::Released,
+            false,
+            landing
+        ));
+        assert!(!landing_action_pressed(
+            ElementState::Pressed,
+            false,
+            PhysicalKey::Code(KeyCode::KeyK),
         ));
     }
 

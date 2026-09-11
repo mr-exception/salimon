@@ -11,6 +11,8 @@ are read-only environmental inputs. `CharacterSnapshot` is the presentation and
 diagnostics output. The runtime maps these types to/from ship and renderer DTOs;
 neither dependency points back into character.
 
-The seated cockpit snapshot starts with only a slight downward pitch so its
-forward ray clears the console and solid nose while crossing the Task 9 glazing.
-Mouse look remains unrestricted and independent of ship orientation.
+The seated cockpit snapshot starts with only a slight downward pitch so its Task
+10 anchor and forward ray clear the enlarged console and solid nose while
+crossing the glazing. Human eye height remains unscaled while ship-local bounds
+and authored anchors follow the 2× asset. Mouse look remains unrestricted and
+independent of ship orientation.

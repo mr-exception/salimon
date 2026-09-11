@@ -11,16 +11,16 @@ pub const DOORWAY_GRAVITY_BLEND_DURATION: Duration = Duration::from_millis(250);
 const WALK_SPEED_METERS_PER_SECOND: f64 = 3.8;
 const JUMP_SPEED_METERS_PER_SECOND: f64 = 4.4;
 const EYE_HEIGHT_METERS: f64 = 1.62;
-const SHIP_FLOOR_HEIGHT: f64 = 0.23;
-const INTERIOR_FORWARD_MIN: f64 = -3.62;
+const SHIP_FLOOR_HEIGHT: f64 = 0.46;
+const INTERIOR_FORWARD_MIN: f64 = -7.24;
 // Stop walking before the cockpit console; cockpit seating is a contextual
 // transition rather than walking through its visible geometry.
-const INTERIOR_FORWARD_MAX: f64 = 0.65;
-const INTERIOR_SIDE_LIMIT: f64 = 1.43;
-const DOORWAY_FORWARD: f64 = -3.52;
-const COCKPIT_POSITION: [f64; 3] = [1.38, 1.72, 0.0];
+const INTERIOR_FORWARD_MAX: f64 = 1.30;
+const INTERIOR_SIDE_LIMIT: f64 = 2.86;
+const DOORWAY_FORWARD: f64 = -7.04;
+const COCKPIT_POSITION: [f64; 3] = [2.76, 2.77, 0.0];
 const COCKPIT_VIEW_PITCH_RADIANS: f64 = -0.10;
-const PLAYER_START: [f64; 3] = [-0.35, EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT, 0.0];
+const PLAYER_START: [f64; 3] = [-0.70, EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT, 0.0];
 const LOOK_SENSITIVITY_RADIANS_PER_PIXEL: f64 = 0.0022;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
@@ -165,7 +165,7 @@ impl CharacterController {
     pub fn leave_cockpit(&mut self) {
         if matches!(self.position, PositionState::Cockpit) {
             self.position = PositionState::Inside {
-                local: [0.75, EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT, 0.0],
+                local: [1.50, EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT, 0.0],
             };
         }
     }
@@ -445,6 +445,17 @@ mod tests {
     }
 
     #[test]
+    fn task10_anchors_and_walk_bounds_match_the_enlarged_ship() {
+        assert_eq!(PLAYER_START, [-0.70, 2.08, 0.0]);
+        assert_eq!(COCKPIT_POSITION, [2.76, 2.77, 0.0]);
+        assert_eq!(SHIP_FLOOR_HEIGHT, 0.46);
+        assert_eq!(INTERIOR_FORWARD_MIN, -7.24);
+        assert_eq!(INTERIOR_FORWARD_MAX, 1.30);
+        assert_eq!(INTERIOR_SIDE_LIMIT, 2.86);
+        assert_eq!(DOORWAY_FORWARD, -7.04);
+    }
+
+    #[test]
     fn horizontal_mouse_delta_turns_view_in_screen_direction_inside_and_in_cockpit() {
         let mut right = CharacterController::default();
         right.apply_mouse_delta(10.0, 0.0);
@@ -512,7 +523,7 @@ mod tests {
     fn closed_or_flying_door_keeps_player_inside() {
         let mut controller = CharacterController {
             position: PositionState::Inside {
-                local: [-3.5, PLAYER_START[1], 0.0],
+                local: [-7.0, PLAYER_START[1], 0.0],
             },
             ..CharacterController::default()
         };
@@ -544,7 +555,7 @@ mod tests {
     fn landed_open_door_starts_exact_quarter_second_gravity_blend() {
         let mut controller = CharacterController {
             position: PositionState::Inside {
-                local: [-3.5, PLAYER_START[1], 0.0],
+                local: [-7.0, PLAYER_START[1], 0.0],
             },
             ..CharacterController::default()
         };

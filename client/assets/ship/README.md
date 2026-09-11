@@ -1,15 +1,23 @@
 # Salimon Phase 0 Scout
 
-This directory contains the custom spaceship asset produced for Task 7. It is a
-scope-limited polished greybox: a 13.4 m scout with a tapered ceramic nose,
+This directory contains the custom spaceship asset produced for Task 7 and
+uniformly enlarged by Task 10. It is a scope-limited polished greybox: a
+20.30 m-long, 7.44 m-tall, 16.60 m-wide scout with a tapered ceramic nose,
 graphite lifting body, copper edge accents, paired engine pods, framed cockpit
 glazing, and a deliberately readable wing silhouette.
 
-The interior has a 3.1 m-wide walkable deck, cockpit and pilot seat, center and
+The Task 7 mesh bounds were 10.15 × 3.72 × 8.30 m (length × height × width).
+Task 10 applies an exact 2.0 uniform linear scale to all render geometry and
+collision proxies. The enlarged interior has a 6.20 m-wide walkable deck and
+4.66 m of vertical clearance. Player eye height remains 1.62 m rather than
+scaling with the ship; the regenerated player, seat, door, and camera anchors
+are placed against the scaled floor and fixtures so the interior stays usable.
+
+The interior contains a cockpit and pilot seat, center and
 side monitors, a small aft cabin/corridor, storage and bench forms, ceiling
 lights, and an interactive rear exit door. The solid nose stays below the
 console and the open-backed, double-sided canopy gives the seated eye at
-`[1.38, 1.72, 0.0]` and a standing eye at `[0.65, 1.85, 0.0]` clear forward and
+`[2.76, 2.77, 0.0]` and a standing eye at `[1.30, 2.08, 0.0]` clear forward and
 side sightlines. Task 11 owns character movement, physics, door behavior, and
 runtime integration.
 
@@ -47,13 +55,18 @@ Collision nodes are metadata-only boxes so they add no draw calls. They define
 the interior floor, side walls, ceiling, aft door, and one coarse exterior hull.
 Interaction markers identify the cockpit seat, exit door, and player start.
 Their `extras.salimon` metadata is the handoff contract for later import code.
+The runtime places the landed ship so its scaled lowest mesh point (`-0.20 m`
+local Y) rests on Earth's nominal surface; the identity orientation keeps local
+`+Y` aligned to the surface normal at the starting point.
 
 The runtime export remains below the fixed triangle, primitive, material, and
 256 KiB GLB budgets. Its only transparent surface is the `Cockpit Glass`
 material: a double-sided alpha-blended pane rendered in one additional ship draw
-without shadows or post effects. All other materials remain opaque. Task 11 owns
-measured 1920×1080 performance evidence on the reference M1 MacBook Air after
-runtime integration.
+without shadows or post effects. All other materials remain opaque. The scale
+pass adds no primitives, triangles, materials, textures, or draw calls, so its
+GPU workload is unchanged apart from projected pixel coverage. The fixed
+1920×1080 smoke check below remains required on the reference M1 MacBook Air for
+the Phase 0 60 FPS acceptance target.
 
 ## Visual and import checks
 
@@ -63,3 +76,10 @@ attributes, PNG signature, and all declared budgets. After geometry edits, also
 import the glTF or GLB into the target DCC/runtime and visually check the outer
 silhouette, central interior clearance, seated and standing cockpit sightlines,
 rear door, normals, and material assignments.
+
+For the Task 10 native smoke check, run the release client at a fixed 1920×1080
+window, enable F3, and walk the cockpit, corridor, and open doorway. Confirm the
+camera does not clip severely at the 0.05 m near plane; the cockpit/door prompts
+activate at their enlarged fixtures; the player can exit and re-enter; the
+lowest exterior point rests on Earth without a visible gap or penetration; and
+the overlay never reports below 60 FPS during the interior and exterior passes.

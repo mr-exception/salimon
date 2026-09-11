@@ -10,6 +10,9 @@ use salimon_world::{
     CELESTIAL_BODIES, CelestialBodyId, PHASE_ZERO_REFERENCE_MAX_SPEED_METERS_PER_SECOND,
 };
 
+/// Lowest point of the uniformly enlarged Task 10 runtime mesh in ship-local Y.
+pub const LOWEST_LOCAL_Y_METERS: f64 = -0.20;
+
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum DoorState {
     Closed,
@@ -95,7 +98,7 @@ impl Default for ShipController {
             .find(|body| body.id == CelestialBodyId::Earth)
             .expect("world catalog always contains Earth");
         let mut position_meters = earth.center.meters();
-        position_meters[1] += earth.radius_meters - 0.18;
+        position_meters[1] += earth.radius_meters - LOWEST_LOCAL_Y_METERS;
         Self {
             pose: ShipPose {
                 position_meters,
@@ -208,6 +211,17 @@ mod tests {
         );
         assert_eq!(snapshot.door_state, DoorState::Closed);
         assert_eq!(snapshot.thruster_percentage, 0);
+        let earth = CELESTIAL_BODIES
+            .iter()
+            .find(|body| body.id == CelestialBodyId::Earth)
+            .unwrap();
+        assert_eq!(snapshot.pose.orientation, [0.0, 0.0, 0.0, 1.0]);
+        assert!(
+            (snapshot.pose.position_meters[1] + LOWEST_LOCAL_Y_METERS
+                - (earth.center.meters()[1] + earth.radius_meters))
+                .abs()
+                < 1.0e-9
+        );
     }
 
     #[test]

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate Salimon's custom Phase 0 ship as glTF 2.0 and GLB.
 
-The script is the editable, deterministic DCC source for Tasks 7 and 9. It uses only
+The script is the editable, deterministic DCC source for Tasks 7, 9, and 10. It uses only
 the Python standard library so later agents can reshape the ship by changing
 named dimensions/components and regenerate the runtime exports without Blender.
 The emitted .gltf can also be imported directly into Blender for hand editing.
@@ -24,6 +24,26 @@ ROOT = Path(__file__).resolve().parents[1]
 EXPORT_DIR = ROOT / "export"
 TEXTURE_DIR = ROOT / "textures"
 MODEL_NAME = "salimon_phase0_ship"
+TASK7_BASELINE_DIMENSIONS_METERS = [10.15, 3.72, 8.30]
+LINEAR_SCALE_FROM_TASK7 = 2.0
+PLAYER_EYE_HEIGHT_METERS = 1.62
+SCALED_FLOOR_HEIGHT_METERS = 0.23 * LINEAR_SCALE_FROM_TASK7
+COCKPIT_SEAT_MARKER_METERS = [1.38 * LINEAR_SCALE_FROM_TASK7, 1.05 * LINEAR_SCALE_FROM_TASK7, 0.0]
+COCKPIT_VIEWPOINT_METERS = [
+    COCKPIT_SEAT_MARKER_METERS[0],
+    COCKPIT_SEAT_MARKER_METERS[1] + 0.67,
+    0.0,
+]
+STANDING_VIEWPOINT_METERS = [
+    0.65 * LINEAR_SCALE_FROM_TASK7,
+    SCALED_FLOOR_HEIGHT_METERS + PLAYER_EYE_HEIGHT_METERS,
+    0.0,
+]
+PLAYER_START_METERS = [
+    -0.35 * LINEAR_SCALE_FROM_TASK7,
+    SCALED_FLOOR_HEIGHT_METERS + PLAYER_EYE_HEIGHT_METERS,
+    0.0,
+]
 
 
 def vector_sub(a: Sequence[float], b: Sequence[float]) -> tuple[float, float, float]:
@@ -82,6 +102,19 @@ class Geometry:
             )
         for index in range(1, len(points) - 1):
             self.indices.extend((base, base + index, base + index + 1))
+
+
+def scaled_vector(values: Sequence[float]) -> list[float]:
+    return [value * LINEAR_SCALE_FROM_TASK7 for value in values]
+
+
+def scaled_geometry(geometry: Geometry) -> Geometry:
+    return Geometry(
+        positions=[tuple(scaled_vector(position)) for position in geometry.positions],
+        normals=geometry.normals.copy(),
+        texcoords=geometry.texcoords.copy(),
+        indices=geometry.indices.copy(),
+    )
 
 
 def box(x0: float, x1: float, y0: float, y1: float, z0: float, z1: float) -> Geometry:
@@ -321,9 +354,9 @@ def ship_components() -> list[Component]:
     components: list[Component] = []
 
     def add(name: str, geometry: Geometry, material: int, group: str, **extras: object) -> None:
-        components.append(Component(name, geometry, material, group, extras))
+        components.append(Component(name, scaled_geometry(geometry), material, group, extras))
 
-    # Exterior: a compact 13.4 m scout with a faceted lifting-body silhouette.
+    # Exterior: the Task 7 baseline is uniformly enlarged for the Task 10 pass.
     add("Hull_Belly", box(-4.2, 3.3, -0.10, 0.18, -2.05, 2.05), 0, "Exterior")
     add("Hull_Roof", box(-3.7, 2.5, 2.72, 3.08, -1.72, 1.72), 1, "Exterior")
     add("Hull_Port_Side", box(-3.8, 2.6, 0.18, 2.72, 1.72, 2.05), 0, "Exterior")
@@ -356,7 +389,14 @@ def ship_components() -> list[Component]:
     add("Aft_Bulkhead_Port", box(-3.78, -3.62, 0.28, 2.62, 0.72, 1.55), 5, "Interior")
     add("Aft_Bulkhead_Starboard", box(-3.78, -3.62, 0.28, 2.62, -1.55, -0.72), 5, "Interior")
     add("Aft_Bulkhead_Header", box(-3.78, -3.62, 2.34, 2.62, -0.72, 0.72), 5, "Interior")
-    add("Exit_Door", box(-3.91, -3.77, 0.28, 2.34, -0.70, 0.70), 2, "Interior", interactive="exit-door", pivot=[-3.84, 0.28, 0.70])
+    add(
+        "Exit_Door",
+        box(-3.91, -3.77, 0.28, 2.34, -0.70, 0.70),
+        2,
+        "Interior",
+        interactive="exit-door",
+        pivot=scaled_vector([-3.84, 0.28, 0.70]),
+    )
     add("Door_Threshold", box(-3.94, -3.55, 0.20, 0.32, -0.78, 0.78), 2, "Interior")
     add("Cockpit_Console_Center", tapered_box(2.16, 3.12, 0.28, 1.02, 0.74, 0.42, 1.20, 0.52), 5, "Interior")
     add("Cockpit_Console_Port", box(1.78, 3.02, 0.34, 0.82, 0.82, 1.48), 5, "Interior")
@@ -418,7 +458,7 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
         nodes.append(node)
         nodes[groups[component.group]]["children"].append(node_index)  # type: ignore[index,union-attr]
 
-    collision_specs = [
+    baseline_collision_specs = [
         ("COLLIDER_InteriorFloor", [0.0, 0.18, 0.0], [7.06, 0.10, 3.10], "walkable-floor"),
         ("COLLIDER_InteriorPortWall", [-0.55, 1.45, 1.61], [6.07, 2.34, 0.14], "interior-wall"),
         ("COLLIDER_InteriorStarboardWall", [-0.55, 1.45, -1.61], [6.07, 2.34, 0.14], "interior-wall"),
@@ -426,21 +466,27 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
         ("COLLIDER_AftDoor", [-3.84, 1.31, 0.0], [0.14, 2.06, 1.40], "interactive-door"),
         ("COLLIDER_ExteriorHull", [0.25, 1.48, 0.0], [10.50, 3.16, 4.10], "broad-phase-hull"),
     ]
-    for name, center, size, purpose in collision_specs:
+    for name, center, size, purpose in baseline_collision_specs:
         node_index = len(nodes)
         nodes.append(
             {
                 "name": name,
-                "translation": center,
-                "extras": {"salimon": {"collisionShape": "box", "sizeMeters": size, "purpose": purpose}},
+                "translation": scaled_vector(center),
+                "extras": {
+                    "salimon": {
+                        "collisionShape": "box",
+                        "sizeMeters": scaled_vector(size),
+                        "purpose": purpose,
+                    }
+                },
             }
         )
         nodes[groups["Collision"]]["children"].append(node_index)  # type: ignore[index,union-attr]
 
     markers = [
-        ("MARKER_CockpitSeat", [1.38, 1.05, 0.0], "+X", "cockpit-seat"),
-        ("MARKER_ExitDoor", [-3.55, 1.25, 0.0], "-X", "exit-door"),
-        ("MARKER_PlayerStart", [-0.35, 1.72, 0.0], "+X", "player-start"),
+        ("MARKER_CockpitSeat", COCKPIT_SEAT_MARKER_METERS, "+X", "cockpit-seat"),
+        ("MARKER_ExitDoor", scaled_vector([-3.55, 1.25, 0.0]), "-X", "exit-door"),
+        ("MARKER_PlayerStart", PLAYER_START_METERS, "+X", "player-start"),
     ]
     for name, position, facing, purpose in markers:
         node_index = len(nodes)
@@ -460,7 +506,7 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
             "copyright": "Copyright 2026 Salimon contributors; custom original asset",
             "extras": {
                 "salimon": {
-                    "assetVersion": 2,
+                    "assetVersion": 3,
                     "units": "meters",
                     "upAxis": "+Y",
                     "forwardAxis": "+X",
@@ -486,13 +532,24 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
                 "triangleCount": sum(len(component.geometry.indices) // 3 for component in components),
                 "materialCount": len(MATERIALS),
                 "externalAssetDependencies": 0,
-                "walkableInteriorClearanceMeters": {"width": 3.10, "height": 2.33},
+                "linearScaleFromTask7Baseline": LINEAR_SCALE_FROM_TASK7,
+                "task7BaselineDimensionsMeters": TASK7_BASELINE_DIMENSIONS_METERS,
+                "overallDimensionsMeters": [
+                    dimension * LINEAR_SCALE_FROM_TASK7
+                    for dimension in TASK7_BASELINE_DIMENSIONS_METERS
+                ],
+                "lowestLocalYMeters": -0.10 * LINEAR_SCALE_FROM_TASK7,
+                "walkableInteriorClearanceMeters": {
+                    "width": 3.10 * LINEAR_SCALE_FROM_TASK7,
+                    "height": 2.33 * LINEAR_SCALE_FROM_TASK7,
+                },
+                "humanEyeHeightMeters": PLAYER_EYE_HEIGHT_METERS,
                 "cockpitWindows": {
                     "glazingNode": "Cockpit_Glazing",
                     "frameNode": "Cockpit_Window_Frame",
                     "material": "Cockpit Glass",
-                    "seatedViewpointMeters": [1.38, 1.72, 0.0],
-                    "standingViewpointMeters": [0.65, 1.85, 0.0],
+                    "seatedViewpointMeters": COCKPIT_VIEWPOINT_METERS,
+                    "standingViewpointMeters": STANDING_VIEWPOINT_METERS,
                     "dynamicShadows": False,
                     "postEffects": False,
                 },

@@ -13,3 +13,6 @@
    vertical mouse delta retains the conventional down-is-positive device mapping.
 9. The default seated cockpit view remains primarily forward and clears the
    console/nose into the modeled cockpit glazing.
+10. Task 10 ship-local floor, walk bounds, doorway, player start, and cockpit
+    camera remain aligned to the enlarged asset while human eye height stays
+    1.62 m.

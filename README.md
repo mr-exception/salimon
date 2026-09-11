@@ -5,8 +5,8 @@ current milestone is **Phase 0 — Technical Feasibility Showcase**: a native ma
 client-only prototype using a custom `wgpu` renderer, with Windows and web as
 later targets. The reference performance machine is a MacBook Air M1.
 
-This repository includes **task 8: Fix inverted horizontal mouse look** and the
-completed **task 11: Implement first-person character and walkable ship shell**.
+This repository includes **task 10: Scale spaceship to at least twice its current
+size** and the completed first-person character and walkable ship shell.
 The native client starts inside the custom Task 7
 Salimon scout landed on Earth, with portable character/ship state, runtime-loaded
 GLB geometry, walking, free mouse look, jumping, cockpit interaction, a landed-only
@@ -16,7 +16,7 @@ door, and radial surface traversal.
 
 The [Salimon Notion space](https://app.notion.com/p/801c9c427af24e9b8d57b07572ef4119)
 holds the task list and documentation. Start with
-[task 8](https://app.notion.com/p/3d7b456853b981afa732d26495be8d6a), the
+[task 10](https://app.notion.com/p/3d7b456853b981cabd1bd60a1d641b99), the
 [Phase 0 specification](https://app.notion.com/p/3d5b456853b981db968dca1901a270a2), and
 [Technical Architecture & AI Maintenance](https://app.notion.com/p/3d5b456853b981078a82c68207f4444e).
 [AGENTS.md](AGENTS.md) describes how future agents should access those sources;
@@ -141,12 +141,14 @@ root `target/` directory. No application bundle or installer exists yet.
 Rendering and diagnostics require an interactive check on macOS in addition to
 automated tests:
 
-1. Launch the client and confirm it starts inside the landed ship facing the
-   cockpit. Walk and mouse-look around the cockpit/cabin, jump, and check the
-   invisible interior collision boundaries.
+1. Launch the client at 1920×1080 and confirm it starts inside the enlarged
+   landed ship facing the cockpit. Walk and mouse-look around the cockpit/cabin,
+   jump, and check the invisible interior collision boundaries. Confirm the
+   20.30 × 7.44 × 16.60 m ship has no severe 0.05 m near-plane clipping.
 2. Use E for instant cockpit entry/exit and to open the aft door. Walk outside,
    confirm the 0.25-second gravity transition is smooth, inspect the custom
-   exterior/material variation, then re-enter and close the door.
+   exterior/material variation, confirm its lowest point rests on Earth without
+   a visible gap or penetration, then re-enter and close the door.
 3. Press F2 and confirm the far view contains distinct textured spheres
    for exactly Sun, Mercury, Venus, Earth, Moon, and Mars, with visibly distinct
    compressed sizes and no other celestial bodies.
@@ -169,9 +171,10 @@ automated tests:
 9. Close the window, launch the client again, and confirm both shutdown and
    relaunch are clean.
 
-This bootstrap instrumentation does not establish the later Phase 0 performance
-target at fixed 1920x1080; Task 11 owns benchmark-scenario evidence on the
-reference MacBook Air M1.
+During the Task 10 interior/exterior pass at fixed 1920×1080 on the reference M1
+MacBook Air, enable F3 and confirm the overlay never reports below 60 FPS. Record
+that machine-specific evidence in the Notion task before treating the performance
+criterion as manually verified.
 
 ## Development workflow
 

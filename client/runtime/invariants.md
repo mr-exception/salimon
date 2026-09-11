@@ -38,3 +38,5 @@
     action, but never owns the resulting character/ship behavior.
 18. Escape releases cursor capture so native window controls remain reachable;
     clicking the game view restores mouse-look capture.
+19. Gameplay interaction zones match the Task 10 cockpit and exit-door markers;
+    runtime composition does not apply a second scale to the baked ship mesh.

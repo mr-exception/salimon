@@ -46,6 +46,10 @@ and restart that body's tour. Earth is the initial target; R retains selection.
 The runtime translates those `winit` events into typed world commands; raw platform
 events never cross the world boundary.
 
+Task 10 maps contextual interaction zones to the enlarged cockpit and exit-door
+markers. It retains the 0.05 m gameplay near plane and passes the baked-scale GLB
+to the renderer without an extra transform.
+
 ## Boundaries
 
 Keep behavior in its owning portable crate. The runtime retains character, ship,

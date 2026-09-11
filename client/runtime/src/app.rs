@@ -124,6 +124,22 @@ enum ViewMode {
     PrecisionTour,
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum InteractionTarget {
+    Cockpit,
+    ExitDoor,
+}
+
+fn interaction_target(local_eye_position: [f64; 3]) -> Option<InteractionTarget> {
+    if (local_eye_position[0] - 2.76).abs() < 4.0 && local_eye_position[2].abs() < 2.2 {
+        Some(InteractionTarget::Cockpit)
+    } else if (local_eye_position[0] + 7.10).abs() < 2.7 && local_eye_position[2].abs() < 2.3 {
+        Some(InteractionTarget::ExitDoor)
+    } else {
+        None
+    }
+}
+
 impl ClientApplication {
     fn create_window(&mut self, event_loop: &ActiveEventLoop) -> Result<(), RunError> {
         if self.window.is_some() {
@@ -226,17 +242,21 @@ impl ClientApplication {
             | CharacterLocation::Surface => {
                 let character = self.character.snapshot(ship_frame, surface);
                 let local = ship_frame.world_to_local(character.eye_position_meters);
-                if (local[0] - 1.38).abs() < 2.0 && local[2].abs() < 1.1 {
-                    self.character.enter_cockpit();
-                    self.ship.set_cockpit_control(true);
-                    log::info!("entered cockpit control");
-                } else if (local[0] + 3.84).abs() < 1.35 && local[2].abs() < 1.15 {
-                    self.ship.toggle_door();
-                    if let Some(message) = self.ship.snapshot().cockpit_message {
-                        log::info!("cockpit monitor: {}", message.text());
-                    } else {
-                        log::info!("exit door is now {:?}", self.ship.snapshot().door_state);
+                match interaction_target(local) {
+                    Some(InteractionTarget::Cockpit) => {
+                        self.character.enter_cockpit();
+                        self.ship.set_cockpit_control(true);
+                        log::info!("entered cockpit control");
                     }
+                    Some(InteractionTarget::ExitDoor) => {
+                        self.ship.toggle_door();
+                        if let Some(message) = self.ship.snapshot().cockpit_message {
+                            log::info!("cockpit monitor: {}", message.text());
+                        } else {
+                            log::info!("exit door is now {:?}", self.ship.snapshot().door_state);
+                        }
+                    }
+                    None => {}
                 }
             }
         }
@@ -842,8 +862,8 @@ const fn transition_phase_name(phase: TransitionPhase) -> &'static str {
 #[cfg(test)]
 mod tests {
     use super::{
-        INITIAL_HEIGHT, INITIAL_WIDTH, camera_body_distances, camera_command,
-        camera_domain_metrics, is_diagnostics_toggle, map_world_to_renderer,
+        INITIAL_HEIGHT, INITIAL_WIDTH, InteractionTarget, camera_body_distances, camera_command,
+        camera_domain_metrics, interaction_target, is_diagnostics_toggle, map_world_to_renderer,
         release_cursor_pressed,
     };
     use salimon_world::{CELESTIAL_BODIES, CameraCommand, CameraPrototype, CelestialBodyId};
@@ -987,6 +1007,19 @@ mod tests {
         assert_eq!(metrics.camera_phase, Some("approach"));
         assert_eq!(metrics.camera_paused, Some(false));
         assert_eq!(metrics.nearby_bodies, body_distances);
+    }
+
+    #[test]
+    fn task10_interaction_zones_follow_enlarged_asset_markers() {
+        assert_eq!(
+            interaction_target([2.76, 2.77, 0.0]),
+            Some(InteractionTarget::Cockpit)
+        );
+        assert_eq!(
+            interaction_target([-7.10, 2.50, 0.0]),
+            Some(InteractionTarget::ExitDoor)
+        );
+        assert_eq!(interaction_target([-2.0, 2.08, 3.0]), None);
     }
 
     #[test]

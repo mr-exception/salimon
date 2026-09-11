@@ -1,7 +1,7 @@
 # Character
 
 `salimon-character` owns the portable Phase 0 first-person controller. It starts
-at the Task 7 player-start contract inside the landed ship, consumes typed
+at the Task 10 player-start contract inside the landed ship, consumes typed
 WASD/jump/mouse-look input, applies the shared 9.81 m/s² gravity strength, and
 produces a renderer-neutral camera snapshot.
 
@@ -11,6 +11,11 @@ open landed doorway begins an exact 0.25-second up-vector blend before the
 controller changes to Earth-radial surface walking. Surface movement is projected
 back to the same spherical radius each update, so the portable rule works around
 the full body rather than only near the initial landing point.
+
+Task 10 keeps the human eye height at 1.62 m while moving the floor, player
+start, cockpit camera, doorway crossing, and invisible bounds to match the exact
+2× ship asset. This preserves comfortable player-scale navigation inside the
+larger geometry instead of scaling the character itself.
 
 Cockpit entry and exit are instant. The default seated view is slightly pitched
 down while retaining a clear forward sightline through the Task 9 glazing; mouse

@@ -1,6 +1,6 @@
 # Client
 
-All Phase 0 implementation lives here. Tasks 2–8 and 11 provide the `salimon-client`
+All Phase 0 implementation lives here. Tasks 2–11 provide the `salimon-client`
 runtime binary, `salimon-renderer` GPU library, `salimon-diagnostics`
 metrics/overlay library, and portable `salimon-world` compressed Solar System,
 coordinate/camera model, portable character and ship domains, and the custom
@@ -49,7 +49,7 @@ behavior grows or another native target needs an adapter. Future domain modules
 must consume typed input/presentation data rather than GPU or window types.
 There is no dependency on `core/` in Phase 0.
 
-Tasks 2–8 and 11 deliberately add no ECS, physics engine, WASM host,
+Tasks 2–11 deliberately add no ECS, physics engine, WASM host,
 orbital simulation, or backend scaffolding. Task 6 adds renderer-owned analytic
 spheres, generated mipmapped textures, and Sun illumination. Task 4 camera
 telemetry is explicitly separate from future player/ship state; Task 5 supplies

@@ -7,8 +7,11 @@ while flying it remains closed and emits the cockpit message `Door locked while
 in flight`.
 
 Leaving the cockpit changes only control authority. A flying ship keeps its pose,
-orientation, selected thruster percentage, and direct-speed motion. Task 9 owns
-keyboard steering and thruster adjustment; Task 10 owns assisted landing/takeoff.
+orientation, selected thruster percentage, and direct-speed motion. Later tasks
+own keyboard steering, thruster adjustment, and assisted landing/takeoff. The
+Task 10 scale pass places the runtime mesh's `-0.20 m` lowest local-Y point on
+Earth's nominal surface and preserves identity orientation so local `+Y` follows
+the starting surface normal.
 The custom source and runtime model remain under
 [`client/assets/ship`](../assets/ship/README.md).
 

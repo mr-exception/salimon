@@ -8,3 +8,5 @@
 5. Flying direct-speed motion continues while cockpit control is inactive.
 6. Authoritative position and orientation math remains CPU-side `f64`.
 7. The crate owns no platform input, GPU resources, or character state.
+8. The default Earth pose places the Task 10 mesh's lowest local-Y point on the
+   nominal surface with local `+Y` aligned to the outward normal.

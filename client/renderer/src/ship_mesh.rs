@@ -7,6 +7,7 @@ use crate::{DEPTH_FORMAT, RendererError, SceneFrame, encode_f32s};
 const SHIP_GLB: &[u8] = include_bytes!("../../assets/ship/export/salimon_phase0_ship.glb");
 const VERTEX_STRIDE: u64 = 44;
 const UNIFORM_SIZE: u64 = 160;
+const OPEN_DOOR_OFFSET_METERS: f32 = 4.50;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ShipMeshInstance {
@@ -369,7 +370,7 @@ impl ShipMeshRenderer {
             axes[2][2],
             0.0,
             0.0,
-            f32::from(ship.door_open) * 2.25,
+            f32::from(ship.door_open) * OPEN_DOOR_OFFSET_METERS,
             0.0,
             0.0,
             0.0,
@@ -462,5 +463,10 @@ mod tests {
                 .chunks_exact(11)
                 .all(|vertex| vertex[9] > 0.0 && vertex[9] < 0.5)
         );
+    }
+
+    #[test]
+    fn task10_door_offset_matches_the_uniform_asset_scale() {
+        assert_eq!(OPEN_DOOR_OFFSET_METERS, 4.50);
     }
 }

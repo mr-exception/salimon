@@ -6,7 +6,7 @@ prototype. Task 6 adds screen-bounded analytic spheres, original mipmapped
 surface textures, local detail, and unshadowed point lighting. Runtime maps the
 six bodies to generic sphere/material DTOs and the three precision markers to
 separate cuboids. The renderer knows no celestial identities or landing rules.
-Task 8 adds a renderer-owned GLB loader and a generic `ShipMeshInstance` pose DTO.
+Task 11 adds a renderer-owned GLB loader and a generic `ShipMeshInstance` pose DTO.
 Task 9 splits the asset's cockpit glass into a second, depth-tested alpha-blended
 draw so exterior geometry remains visible from inside; the renderer still has no
 dependency on character or ship behavior crates.

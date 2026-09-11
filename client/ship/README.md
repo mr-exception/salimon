@@ -1,6 +1,6 @@
 # Ship
 
-`salimon-ship` owns portable Phase 0 ship state. Task 8 establishes the landed-on-
+`salimon-ship` owns portable Phase 0 ship state. Task 11 establishes the landed-on-
 Earth starting pose, cockpit-control authority, persistent direct-speed motion,
 and the landed-only door rule. Opening or closing the exit uses a typed action;
 while flying it remains closed and emits the cockpit message `Door locked while

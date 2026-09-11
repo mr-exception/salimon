@@ -116,7 +116,7 @@ be collected. The view includes FPS/frame time, real world-update and
 CPU-side render time, GPU pass time when timestamp queries are supported, scene
 and total draw/object counts, optional GPU allocator totals, camera
 position/altitude/transition state, and memory-pressure warnings. Rows for
-player/ship position and ship velocity/speed/thruster report live Task 8
+player/ship position and ship velocity/speed/thruster report live Task 11
 snapshots in gameplay view. The nearby-body row reports the closest
 of six nonnegative camera-to-surface observations.
 

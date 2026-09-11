@@ -46,6 +46,13 @@ and restart that body's tour. Earth is the initial target; R retains selection.
 The runtime translates those `winit` events into typed world commands; raw platform
 events never cross the world boundary.
 
+While seated in the cockpit, W/S pitch, A/D yaw, and Left/Right Arrow roll.
+Up/Down Arrow change direct-speed thruster power by one percentage point on each
+initial press. The current practical metric speed and percentage are published
+as cockpit-monitor information, while mouse look remains independent and never
+steers or recenters the ship. Leaving with E clears held steering but preserves
+heading, thruster, and autonomous forward motion.
+
 Task 10 maps contextual interaction zones to the enlarged cockpit and exit-door
 markers. It retains the 0.05 m gameplay near plane and passes the baked-scale GLB
 to the renderer without an extra transform.

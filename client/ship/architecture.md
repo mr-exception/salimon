@@ -8,6 +8,9 @@ renderer mapping.
 
 Orientation is a normalized local-to-world quaternion. `ShipPose::axes` exposes
 forward/up/port axes without leaking a math or engine dependency. The current
-advance step applies direct speed along local +X only while flying.
+advance step applies local-axis quaternion steering, direct speed along local +X,
+and nearest-valid-position correction against every solid catalog body while
+flying. Steering target and smoothed values are portable numeric state; platform
+key state remains outside this crate.
 The default landed pose derives its vertical clearance from the enlarged asset's
 lowest local-Y point, keeping visible geometry tangent to Earth's nominal surface.

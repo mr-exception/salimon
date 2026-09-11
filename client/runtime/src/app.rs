@@ -14,7 +14,7 @@ use salimon_renderer::{
     Renderer, SceneFrame, SceneInstance, ShipMeshInstance, SphereInstance, SurfaceMaterial,
     SurfaceSize,
 };
-use salimon_ship::{DoorState, FlightState, ShipController, ShipPose, ShipSnapshot};
+use salimon_ship::{DoorState, FlightState, ShipController, ShipPose, ShipSnapshot, SteeringInput};
 use salimon_world::{
     CELESTIAL_BODIES, CameraCommand, CameraPrototype, CelestialBodyId, TransitionPhase,
     WorldPosition, WorldSnapshot,
@@ -86,6 +86,7 @@ struct ClientApplication {
     character: CharacterController,
     ship: ShipController,
     movement_input: MovementInput,
+    ship_control_input: ShipControlInput,
     view_mode: ViewMode,
     cursor_captured: bool,
     diagnostics: Diagnostics,
@@ -106,6 +107,7 @@ impl Default for ClientApplication {
             character: CharacterController::default(),
             ship: ShipController::default(),
             movement_input: MovementInput::default(),
+            ship_control_input: ShipControlInput::default(),
             view_mode: ViewMode::Gameplay,
             cursor_captured: false,
             diagnostics: Diagnostics::default(),
@@ -235,6 +237,7 @@ impl ClientApplication {
             CharacterLocation::Cockpit => {
                 self.character.leave_cockpit();
                 self.ship.set_cockpit_control(false);
+                self.ship_control_input = ShipControlInput::default();
                 log::info!("left cockpit control; ship motion remains autonomous");
             }
             CharacterLocation::InsideShip
@@ -275,6 +278,8 @@ impl ClientApplication {
         let update_started_at = Instant::now();
         let update_delta = self.update_clock.step(update_started_at);
         self.camera_prototype.advance(update_delta);
+        self.ship
+            .set_steering_input(self.ship_control_input.steering());
         self.ship.advance(update_delta);
         let ship_snapshot = self.ship.snapshot();
         let ship_frame = character_ship_frame(ship_snapshot.pose);
@@ -527,6 +532,7 @@ impl ApplicationHandler for ClientApplication {
                     self.cursor_captured = capture_cursor(&window);
                 } else {
                     self.movement_input = MovementInput::default();
+                    self.ship_control_input = ShipControlInput::default();
                     self.cursor_captured = false;
                 }
             }
@@ -542,6 +548,7 @@ impl ApplicationHandler for ClientApplication {
                 release_cursor(&window);
                 self.cursor_captured = false;
                 self.movement_input = MovementInput::default();
+                self.ship_control_input = ShipControlInput::default();
             }
             WindowEvent::KeyboardInput { event, .. }
                 if interaction_pressed(event.state, event.repeat, event.physical_key) =>
@@ -557,6 +564,38 @@ impl ApplicationHandler for ClientApplication {
                     ViewMode::PrecisionTour => ViewMode::Gameplay,
                 };
                 log::info!("view mode changed to {:?} (F2 toggles)", self.view_mode);
+                window.request_redraw();
+            }
+            WindowEvent::KeyboardInput { event, .. }
+                if self.character.location() == CharacterLocation::Cockpit
+                    && ship_control_key(event.physical_key).is_some() =>
+            {
+                update_ship_control_input(
+                    &mut self.ship_control_input,
+                    event.physical_key,
+                    event.state == ElementState::Pressed,
+                );
+                window.request_redraw();
+            }
+            WindowEvent::KeyboardInput { event, .. }
+                if self.character.location() == CharacterLocation::Cockpit
+                    && thruster_step(event.state, event.repeat, event.physical_key).is_some() =>
+            {
+                self.ship.adjust_thruster(
+                    thruster_step(event.state, event.repeat, event.physical_key)
+                        .expect("guard accepts only thruster steps"),
+                );
+                let snapshot = self.ship.snapshot();
+                log::info!(
+                    "cockpit monitor: {} / {}%",
+                    format_metric_speed(snapshot.speed_meters_per_second),
+                    snapshot.thruster_percentage
+                );
+                window.set_title(&format!(
+                    "{WINDOW_TITLE} — {} — {}%",
+                    format_metric_speed(snapshot.speed_meters_per_second),
+                    snapshot.thruster_percentage
+                ));
                 window.request_redraw();
             }
             WindowEvent::KeyboardInput { event, .. }
@@ -686,6 +725,81 @@ enum MovementKey {
     Left,
     Right,
     Jump,
+}
+
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+struct ShipControlInput {
+    pitch_up: bool,
+    pitch_down: bool,
+    yaw_left: bool,
+    yaw_right: bool,
+    roll_left: bool,
+    roll_right: bool,
+}
+
+impl ShipControlInput {
+    fn steering(self) -> SteeringInput {
+        SteeringInput {
+            pitch: f64::from(i8::from(self.pitch_up) - i8::from(self.pitch_down)),
+            yaw: f64::from(i8::from(self.yaw_right) - i8::from(self.yaw_left)),
+            roll: f64::from(i8::from(self.roll_right) - i8::from(self.roll_left)),
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum ShipControlKey {
+    PitchUp,
+    PitchDown,
+    YawLeft,
+    YawRight,
+    RollLeft,
+    RollRight,
+}
+
+fn ship_control_key(key: PhysicalKey) -> Option<ShipControlKey> {
+    match key {
+        PhysicalKey::Code(KeyCode::KeyW) => Some(ShipControlKey::PitchUp),
+        PhysicalKey::Code(KeyCode::KeyS) => Some(ShipControlKey::PitchDown),
+        PhysicalKey::Code(KeyCode::KeyA) => Some(ShipControlKey::YawLeft),
+        PhysicalKey::Code(KeyCode::KeyD) => Some(ShipControlKey::YawRight),
+        PhysicalKey::Code(KeyCode::ArrowLeft) => Some(ShipControlKey::RollLeft),
+        PhysicalKey::Code(KeyCode::ArrowRight) => Some(ShipControlKey::RollRight),
+        _ => None,
+    }
+}
+
+fn update_ship_control_input(input: &mut ShipControlInput, key: PhysicalKey, pressed: bool) {
+    match ship_control_key(key) {
+        Some(ShipControlKey::PitchUp) => input.pitch_up = pressed,
+        Some(ShipControlKey::PitchDown) => input.pitch_down = pressed,
+        Some(ShipControlKey::YawLeft) => input.yaw_left = pressed,
+        Some(ShipControlKey::YawRight) => input.yaw_right = pressed,
+        Some(ShipControlKey::RollLeft) => input.roll_left = pressed,
+        Some(ShipControlKey::RollRight) => input.roll_right = pressed,
+        None => {}
+    }
+}
+
+fn thruster_step(state: ElementState, repeat: bool, key: PhysicalKey) -> Option<i8> {
+    if state != ElementState::Pressed || repeat {
+        return None;
+    }
+    match key {
+        PhysicalKey::Code(KeyCode::ArrowUp) => Some(1),
+        PhysicalKey::Code(KeyCode::ArrowDown) => Some(-1),
+        _ => None,
+    }
+}
+
+fn format_metric_speed(meters_per_second: f64) -> String {
+    if meters_per_second >= 1_000_000.0 {
+        format!("{:.2} Mm/s", meters_per_second / 1_000_000.0)
+    } else if meters_per_second >= 1_000.0 {
+        format!("{:.2} km/s", meters_per_second / 1_000.0)
+    } else {
+        format!("{meters_per_second:.1} m/s")
+    }
 }
 
 fn movement_key(key: PhysicalKey) -> Option<MovementKey> {
@@ -862,9 +976,10 @@ const fn transition_phase_name(phase: TransitionPhase) -> &'static str {
 #[cfg(test)]
 mod tests {
     use super::{
-        INITIAL_HEIGHT, INITIAL_WIDTH, InteractionTarget, camera_body_distances, camera_command,
-        camera_domain_metrics, interaction_target, is_diagnostics_toggle, map_world_to_renderer,
-        release_cursor_pressed,
+        INITIAL_HEIGHT, INITIAL_WIDTH, InteractionTarget, ShipControlInput, camera_body_distances,
+        camera_command, camera_domain_metrics, format_metric_speed, interaction_target,
+        is_diagnostics_toggle, map_world_to_renderer, release_cursor_pressed, ship_control_key,
+        thruster_step, update_ship_control_input,
     };
     use salimon_world::{CELESTIAL_BODIES, CameraCommand, CameraPrototype, CelestialBodyId};
     use winit::event::ElementState;
@@ -967,6 +1082,37 @@ mod tests {
             ),
             None
         );
+    }
+
+    #[test]
+    fn cockpit_keys_map_to_independent_held_axes() {
+        let mut input = ShipControlInput::default();
+        update_ship_control_input(&mut input, PhysicalKey::Code(KeyCode::KeyW), true);
+        update_ship_control_input(&mut input, PhysicalKey::Code(KeyCode::KeyA), true);
+        update_ship_control_input(&mut input, PhysicalKey::Code(KeyCode::ArrowRight), true);
+        assert_eq!(input.steering().pitch, 1.0);
+        assert_eq!(input.steering().yaw, -1.0);
+        assert_eq!(input.steering().roll, 1.0);
+        update_ship_control_input(&mut input, PhysicalKey::Code(KeyCode::KeyW), false);
+        assert_eq!(input.steering().pitch, 0.0);
+        assert!(ship_control_key(PhysicalKey::Code(KeyCode::ArrowUp)).is_none());
+    }
+
+    #[test]
+    fn thruster_keys_accept_only_initial_arrow_presses() {
+        let up = PhysicalKey::Code(KeyCode::ArrowUp);
+        let down = PhysicalKey::Code(KeyCode::ArrowDown);
+        assert_eq!(thruster_step(ElementState::Pressed, false, up), Some(1));
+        assert_eq!(thruster_step(ElementState::Pressed, false, down), Some(-1));
+        assert_eq!(thruster_step(ElementState::Pressed, true, up), None);
+        assert_eq!(thruster_step(ElementState::Released, false, down), None);
+    }
+
+    #[test]
+    fn cockpit_speed_uses_practical_metric_units() {
+        assert_eq!(format_metric_speed(12.0), "12.0 m/s");
+        assert_eq!(format_metric_speed(12_500.0), "12.50 km/s");
+        assert_eq!(format_metric_speed(2_500_000.0), "2.50 Mm/s");
     }
 
     #[test]

@@ -40,3 +40,7 @@
     clicking the game view restores mouse-look capture.
 19. Gameplay interaction zones match the Task 10 cockpit and exit-door markers;
     runtime composition does not apply a second scale to the baked ship mesh.
+20. Cockpit W/S, A/D, and Left/Right Arrow state maps to typed pitch, yaw, and
+    roll without changing the independent character mouse-look state.
+21. Up/Down Arrow changes thruster only on an initial press, never key repeat or
+    release; leaving cockpit or losing focus clears held steering input.

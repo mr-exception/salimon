@@ -14,7 +14,7 @@ const EARTH_RADIUS_METERS: f64 = 6_000_000.0;
 const EARTH_CENTER: WorldPosition = SURFACE_ANCHOR.translated([0.0, 0.0, -EARTH_RADIUS_METERS]);
 
 /// Phase 0's reference maximum travel speed, used to tune compressed distances.
-pub const PHASE_ZERO_REFERENCE_MAX_SPEED_METERS_PER_SECOND: f64 = 500_000.0;
+pub const PHASE_ZERO_REFERENCE_MAX_SPEED_METERS_PER_SECOND: f64 = 2_500_000.0;
 /// Height above a solid body's surface at which landing assist becomes available.
 pub const LANDING_RANGE_ALTITUDE_RADIUS_FACTOR: f64 = 0.15;
 
@@ -1001,7 +1001,7 @@ mod tests {
     }
 
     #[test]
-    fn earth_to_mars_surface_gap_tunes_to_120_seconds() {
+    fn earth_to_mars_surface_gap_tunes_to_24_seconds() {
         let earth = body(CelestialBodyId::Earth);
         let mars = body(CelestialBodyId::Mars);
         let surface_gap = earth.surface_separation_from(mars);
@@ -1010,7 +1010,7 @@ mod tests {
         assert_eq!(surface_gap, 60_000_000.0);
         assert_eq!(
             surface_gap / PHASE_ZERO_REFERENCE_MAX_SPEED_METERS_PER_SECOND,
-            120.0
+            24.0
         );
     }
 

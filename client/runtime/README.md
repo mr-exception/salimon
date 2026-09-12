@@ -33,9 +33,10 @@ history resets across suspension, occlusion, zero-sized drawables, and renderer
 reconstruction so pauses do not contaminate FPS data.
 
 Gameplay view is the default. WASD/Space/mouse events are translated to typed
-character input; E performs contextual cockpit/door interaction. F2 toggles the
-camera fixture, which approaches automatically from a six-body compressed Solar
-System overview to Earth's meter-scale surface markers and retreats in a loop.
+character input. Looking at the cockpit while close to its seat presents
+`Press E to use`; E performs contextual cockpit/door interaction. F2 toggles
+the camera fixture, which approaches automatically from a six-body compressed
+Solar System overview to Earth's meter-scale surface markers and retreats in a loop.
 Escape releases the mouse-look cursor lock and a click in the game view captures
 it again.
 Press **P** on its initial key press to
@@ -46,7 +47,8 @@ and restart that body's tour. Earth is the initial target; R retains selection.
 The runtime translates those `winit` events into typed world commands; raw platform
 events never cross the world boundary.
 
-While seated in the cockpit, W/S pitch, A/D yaw, and Left/Right Arrow roll.
+While seated in the cockpit, W/S pitch, A yaws left, D yaws right, and
+Left/Right Arrow roll.
 Up/Down Arrow change direct-speed thruster power by one percentage point on each
 initial press. The current practical metric speed and percentage are published
 as cockpit-monitor information, while mouse look remains independent and never

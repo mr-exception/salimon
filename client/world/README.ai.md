@@ -23,7 +23,7 @@ networking, textured sphere rendering, or lighting.
 
 - Preserve the exact ordered membership: Sun, Mercury, Venus, Earth, Moon, Mars.
 - Keep the Sun visual-only and all five `1.15R` solid landing volumes disjoint.
-- Preserve the 120-second Earth-to-Mars surface trip at the Phase 0 reference
+- Preserve the 24-second Earth-to-Mars surface trip at the Phase 0 reference
   maximum speed unless a source-of-truth decision changes it.
 - Preserve the subtract-before-cast precision contract.
 - Keep tour commands and updates deterministic and independently testable.

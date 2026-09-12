@@ -26,7 +26,7 @@ The Earth-to-Mars center distance is `69,500,000 m`. Subtracting Earth's
 of `60,000,000 m`. At the exported Phase 0 reference maximum speed:
 
 ```text
-60,000,000 m / 500,000 m/s = 120 s
+60,000,000 m / 2,500,000 m/s = 24 s
 ```
 
 ## Landing volumes

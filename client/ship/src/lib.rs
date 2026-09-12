@@ -11,14 +11,14 @@ use salimon_world::{
     LANDING_RANGE_ALTITUDE_RADIUS_FACTOR, PHASE_ZERO_REFERENCE_MAX_SPEED_METERS_PER_SECOND,
 };
 
-/// Lowest point of the uniformly enlarged Task 10 runtime mesh in ship-local Y.
-pub const LOWEST_LOCAL_Y_METERS: f64 = -0.20;
+/// Lowest point of the revised 4 m-tall Task 10 runtime mesh in ship-local Y.
+pub const LOWEST_LOCAL_Y_METERS: f64 = -0.107_526_881_720_430_11;
 /// Phase 0 steering rate after the short presentation ramp has settled.
 pub const STEERING_RATE_RADIANS_PER_SECOND: f64 = 5.0_f64.to_radians();
 /// Time for a steering axis to ramp fully on or off. This is not inertia.
 pub const STEERING_RAMP_SECONDS: f64 = 0.12;
-/// Conservative bounding sphere for the 20.3 x 7.44 x 16.6 meter ship asset.
-pub const COLLISION_RADIUS_METERS: f64 = 13.7;
+/// Conservative bounding sphere for the wider 20.3 x 4.0 x 20.0 meter ship asset.
+pub const COLLISION_RADIUS_METERS: f64 = 15.0;
 /// Height above a solid surface at which Phase 0 landing assistance is offered.
 pub const LANDING_RANGE_RADIUS_FRACTION: f64 = LANDING_RANGE_ALTITUDE_RADIUS_FACTOR;
 /// Deliberately readable fixed speeds for the short automatic sequences.
@@ -29,7 +29,7 @@ pub const TAKEOFF_ASSIST_SPEED_METERS_PER_SECOND: f64 = 60.0;
 pub struct SteeringInput {
     /// `-1` pitches down, `1` pitches up.
     pub pitch: f64,
-    /// `-1` yaws left, `1` yaws right.
+    /// `-1` yaws right, `1` yaws left in the ship's rendered frame.
     pub yaw: f64,
     /// `-1` rolls left, `1` rolls right.
     pub roll: f64,
@@ -620,6 +620,10 @@ mod tests {
         );
         ship.adjust_thruster(1);
         assert_eq!(ship.snapshot().thruster_percentage, 100);
+        assert_eq!(
+            ship.snapshot().speed_meters_per_second,
+            PHASE_ZERO_REFERENCE_MAX_SPEED_METERS_PER_SECOND
+        );
         ship.adjust_thruster(1);
         assert_eq!(ship.snapshot().thruster_percentage, 100);
         ship.adjust_thruster(-1);

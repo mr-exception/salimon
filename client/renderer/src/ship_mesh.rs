@@ -5,7 +5,8 @@ use wgpu::util::DeviceExt;
 use crate::{DEPTH_FORMAT, RendererError, SceneFrame, encode_f32s};
 
 const SHIP_GLB: &[u8] = include_bytes!("../../assets/ship/export/salimon_phase0_ship.glb");
-const VERTEX_STRIDE: u64 = 44;
+const VERTEX_FLOATS: usize = 15;
+const VERTEX_STRIDE: u64 = (VERTEX_FLOATS * size_of::<f32>()) as u64;
 const UNIFORM_SIZE: u64 = 160;
 const OPEN_DOOR_OFFSET_METERS: f32 = 4.50;
 
@@ -33,10 +34,17 @@ fn load_geometry() -> Result<ShipGeometry, RendererError> {
     })?;
     let mut opaque_vertices = Vec::new();
     let mut glass_vertices = Vec::new();
+    let mut interior_nodes = vec![false; gltf.document.nodes().len()];
+    for node in gltf.document.nodes() {
+        if node.name() == Some("Interior") {
+            mark_interior_nodes(node, &mut interior_nodes);
+        }
+    }
 
     for node in gltf.document.nodes() {
         let Some(mesh) = node.mesh() else { continue };
         let door_flag = f32::from(node.name() == Some("Exit_Door"));
+        let interior_flag = f32::from(interior_nodes[node.index()]);
         let matrix = node.transform().matrix();
         for primitive in mesh.primitives() {
             if primitive.mode() != gltf::mesh::Mode::Triangles {
@@ -72,7 +80,7 @@ fn load_geometry() -> Result<ShipGeometry, RendererError> {
                 |values| values.into_u32().collect(),
             );
             let material = primitive.material();
-            let mut color = material.pbr_metallic_roughness().base_color_factor();
+            let color = material.pbr_metallic_roughness().base_color_factor();
             let is_glass = material.name() == Some("Cockpit Glass");
             let vertices = if is_glass {
                 &mut glass_vertices
@@ -80,9 +88,6 @@ fn load_geometry() -> Result<ShipGeometry, RendererError> {
                 &mut opaque_vertices
             };
             let emissive = material.emissive_factor();
-            for component in 0..3 {
-                color[component] = (color[component] + emissive[component]).min(1.0);
-            }
             for index in indices {
                 let vertex_index = usize::try_from(index).map_err(|_| {
                     RendererError::new(
@@ -116,17 +121,22 @@ fn load_geometry() -> Result<ShipGeometry, RendererError> {
                     color[2],
                     color[3],
                     door_flag,
+                    emissive[0],
+                    emissive[1],
+                    emissive[2],
+                    interior_flag,
                 ]);
             }
         }
     }
-    let opaque_vertex_count = u32::try_from(opaque_vertices.len() / 11).map_err(|_| {
-        RendererError::new(
-            "failed to load Phase 0 ship GLB",
-            "opaque vertex count exceeds u32",
-        )
-    })?;
-    let glass_vertex_count = u32::try_from(glass_vertices.len() / 11).map_err(|_| {
+    let opaque_vertex_count =
+        u32::try_from(opaque_vertices.len() / VERTEX_FLOATS).map_err(|_| {
+            RendererError::new(
+                "failed to load Phase 0 ship GLB",
+                "opaque vertex count exceeds u32",
+            )
+        })?;
+    let glass_vertex_count = u32::try_from(glass_vertices.len() / VERTEX_FLOATS).map_err(|_| {
         RendererError::new(
             "failed to load Phase 0 ship GLB",
             "glass vertex count exceeds u32",
@@ -144,6 +154,15 @@ fn load_geometry() -> Result<ShipGeometry, RendererError> {
         opaque_vertex_count,
         glass_vertex_count,
     })
+}
+
+/// The asset's presentation grouping provides a warm cabin fill without adding
+/// gameplay identity, runtime lights, or another ship draw.
+fn mark_interior_nodes(node: gltf::Node<'_>, interior_nodes: &mut [bool]) {
+    interior_nodes[node.index()] = true;
+    for child in node.children() {
+        mark_interior_nodes(child, interior_nodes);
+    }
 }
 
 fn transform_position(matrix: [[f32; 4]; 4], point: [f32; 3]) -> [f32; 3] {
@@ -223,6 +242,16 @@ fn create_pipeline(
                         format: wgpu::VertexFormat::Float32,
                         offset: 40,
                         shader_location: 3,
+                    },
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32x3,
+                        offset: 44,
+                        shader_location: 4,
+                    },
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32,
+                        offset: 56,
+                        shader_location: 5,
                     },
                 ],
             })],
@@ -445,28 +474,76 @@ mod tests {
         assert!(geometry.opaque_vertex_count > geometry.glass_vertex_count);
         assert_eq!(
             geometry.opaque_vertices.len(),
-            geometry.opaque_vertex_count as usize * 11
+            geometry.opaque_vertex_count as usize * VERTEX_FLOATS
         );
         assert_eq!(
             geometry.glass_vertices.len(),
-            geometry.glass_vertex_count as usize * 11
+            geometry.glass_vertex_count as usize * VERTEX_FLOATS
         );
         assert!(
             geometry
                 .opaque_vertices
-                .chunks_exact(11)
+                .chunks_exact(VERTEX_FLOATS)
                 .any(|vertex| vertex[10] == 1.0)
         );
         assert!(
             geometry
                 .glass_vertices
-                .chunks_exact(11)
+                .chunks_exact(VERTEX_FLOATS)
                 .all(|vertex| vertex[9] > 0.0 && vertex[9] < 0.5)
         );
     }
 
     #[test]
-    fn task10_door_offset_matches_the_uniform_asset_scale() {
+    fn material_emission_stays_separate_from_base_color_and_cabin_fill() {
+        let geometry = load_geometry().expect("checked-in ship must load");
+        let gltf = gltf::Gltf::from_slice(SHIP_GLB).expect("checked-in GLB must parse");
+        let vertices: Vec<_> = geometry
+            .opaque_vertices
+            .chunks_exact(VERTEX_FLOATS)
+            .chain(geometry.glass_vertices.chunks_exact(VERTEX_FLOATS))
+            .collect();
+        let emissive_materials: Vec<_> = gltf
+            .materials()
+            .filter(|material| material.emissive_factor().iter().any(|value| *value > 0.0))
+            .collect();
+        assert!(!emissive_materials.is_empty());
+        for material in emissive_materials {
+            let base = material.pbr_metallic_roughness().base_color_factor();
+            let emission = material.emissive_factor();
+            assert!(
+                vertices
+                    .iter()
+                    .any(|vertex| { vertex[6..10] == base && vertex[11..14] == emission })
+            );
+        }
+        assert!(vertices.iter().any(|vertex| vertex[14] == 1.0));
+        assert!(vertices.iter().any(|vertex| vertex[14] == 0.0));
+        assert!(vertices.iter().any(|vertex| {
+            vertex[14] == 1.0 && vertex[11..14].iter().any(|value| *value > 0.0)
+        }));
+        assert!(vertices.iter().any(|vertex| {
+            vertex[14] == 0.0 && vertex[11..14].iter().any(|value| *value > 0.0)
+        }));
+    }
+
+    #[test]
+    fn checked_in_ship_stays_within_the_lightweight_asset_budget() {
+        let geometry = load_geometry().expect("checked-in ship must load");
+        let gltf = gltf::Gltf::from_slice(SHIP_GLB).expect("checked-in GLB must parse");
+        assert!(SHIP_GLB.len() <= 512 * 1024);
+        assert!((geometry.opaque_vertex_count + geometry.glass_vertex_count) / 3 <= 4_500);
+        assert!(
+            gltf.meshes()
+                .map(|mesh| mesh.primitives().len())
+                .sum::<usize>()
+                <= 100
+        );
+        assert!(gltf.materials().len() <= 13);
+    }
+
+    #[test]
+    fn task10_door_offset_matches_the_horizontal_asset_scale() {
         assert_eq!(OPEN_DOOR_OFFSET_METERS, 4.50);
     }
 }

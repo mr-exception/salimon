@@ -14,7 +14,9 @@ use salimon_renderer::{
     Renderer, SceneFrame, SceneInstance, ShipMeshInstance, SphereInstance, SurfaceMaterial,
     SurfaceSize,
 };
-use salimon_ship::{DoorState, FlightState, ShipController, ShipPose, ShipSnapshot, SteeringInput};
+use salimon_ship::{
+    CockpitMessage, DoorState, FlightState, ShipController, ShipPose, ShipSnapshot, SteeringInput,
+};
 use salimon_world::{
     CELESTIAL_BODIES, CameraCommand, CameraPrototype, CelestialBodyId, TransitionPhase,
     WorldPosition, WorldSnapshot,
@@ -37,6 +39,10 @@ const MINIMUM_HEIGHT: f64 = 360.0;
 const TIMING_LOG_INTERVAL: u64 = 300;
 const RENDER_RETRY_DELAY: Duration = Duration::from_millis(50);
 const IDLE_RETRY_DELAY: Duration = Duration::from_millis(250);
+const COCKPIT_INTERACTION_POSITION_METERS: [f64; 3] = [2.76, 1.799_032_258_064_516, 0.0];
+const COCKPIT_INTERACTION_RANGE_METERS: f64 = 4.0;
+const COCKPIT_INTERACTION_MINIMUM_AIM_DOT: f64 = 0.866_025_403_784_438_6;
+const COCKPIT_INTERACTION_PROMPT: &str = "Press E to use";
 
 pub(crate) fn run() -> Result<(), RunError> {
     let event_loop = EventLoop::new()
@@ -132,13 +138,57 @@ enum InteractionTarget {
     ExitDoor,
 }
 
-fn interaction_target(local_eye_position: [f64; 3]) -> Option<InteractionTarget> {
-    if (local_eye_position[0] - 2.76).abs() < 4.0 && local_eye_position[2].abs() < 2.2 {
+fn interaction_target(
+    local_eye_position: [f64; 3],
+    local_look_target: [f64; 3],
+) -> Option<InteractionTarget> {
+    let to_cockpit = subtract(COCKPIT_INTERACTION_POSITION_METERS, local_eye_position);
+    let look_direction = subtract(local_look_target, local_eye_position);
+    let cockpit_distance = vector_length(to_cockpit);
+    let cockpit_is_aimed_at = cockpit_distance > f64::EPSILON
+        && cockpit_distance <= COCKPIT_INTERACTION_RANGE_METERS
+        && dot(to_cockpit, look_direction)
+            / (cockpit_distance * vector_length(look_direction)).max(f64::EPSILON)
+            >= COCKPIT_INTERACTION_MINIMUM_AIM_DOT;
+
+    if cockpit_is_aimed_at {
         Some(InteractionTarget::Cockpit)
     } else if (local_eye_position[0] + 7.10).abs() < 2.7 && local_eye_position[2].abs() < 2.3 {
         Some(InteractionTarget::ExitDoor)
     } else {
         None
+    }
+}
+
+fn subtract(left: [f64; 3], right: [f64; 3]) -> [f64; 3] {
+    std::array::from_fn(|index| left[index] - right[index])
+}
+
+fn dot(left: [f64; 3], right: [f64; 3]) -> f64 {
+    left.into_iter().zip(right).map(|(a, b)| a * b).sum()
+}
+
+fn vector_length(vector: [f64; 3]) -> f64 {
+    dot(vector, vector).sqrt()
+}
+
+fn gameplay_window_title(
+    ship: ShipSnapshot,
+    monitor_message: Option<CockpitMessage>,
+    interaction: Option<InteractionTarget>,
+) -> String {
+    if let Some(message) = monitor_message {
+        format!("{WINDOW_TITLE} — {}", message.text())
+    } else if ship.cockpit_control_active {
+        format!(
+            "{WINDOW_TITLE} — {} — {}%",
+            format_metric_speed(ship.speed_meters_per_second),
+            ship.thruster_percentage
+        )
+    } else if interaction == Some(InteractionTarget::Cockpit) {
+        format!("{WINDOW_TITLE} — {COCKPIT_INTERACTION_PROMPT}")
+    } else {
+        WINDOW_TITLE.to_owned()
     }
 }
 
@@ -244,8 +294,9 @@ impl ClientApplication {
             | CharacterLocation::DoorwayBlend
             | CharacterLocation::Surface => {
                 let character = self.character.snapshot(ship_frame, surface);
-                let local = ship_frame.world_to_local(character.eye_position_meters);
-                match interaction_target(local) {
+                let local_eye = ship_frame.world_to_local(character.eye_position_meters);
+                let local_look = ship_frame.world_to_local(character.look_target_meters);
+                match interaction_target(local_eye, local_look) {
                     Some(InteractionTarget::Cockpit) => {
                         self.character.enter_cockpit();
                         self.ship.set_cockpit_control(true);
@@ -298,17 +349,21 @@ impl ClientApplication {
         let (mut camera, scene_instances, spheres, light) = map_world_to_renderer(world_snapshot);
         let character_snapshot = self.character.snapshot(ship_frame, surface_frame);
         let monitor_message = self.ship.contextual_cockpit_message();
-        if let Some(message) = monitor_message {
-            window.set_title(&format!("{WINDOW_TITLE} — {}", message.text()));
-        } else if ship_snapshot.cockpit_control_active {
-            window.set_title(&format!(
-                "{WINDOW_TITLE} — {} — {}%",
-                format_metric_speed(ship_snapshot.speed_meters_per_second),
-                ship_snapshot.thruster_percentage
-            ));
+        let interaction = if self.view_mode == ViewMode::Gameplay
+            && character_snapshot.location != CharacterLocation::Cockpit
+        {
+            interaction_target(
+                ship_frame.world_to_local(character_snapshot.eye_position_meters),
+                ship_frame.world_to_local(character_snapshot.look_target_meters),
+            )
         } else {
-            window.set_title(WINDOW_TITLE);
-        }
+            None
+        };
+        window.set_title(&gameplay_window_title(
+            ship_snapshot,
+            monitor_message,
+            interaction,
+        ));
         let ship_mesh = if self.view_mode == ViewMode::Gameplay {
             camera = CameraFrame {
                 position_meters: character_snapshot.eye_position_meters,
@@ -790,7 +845,7 @@ impl ShipControlInput {
     fn steering(self) -> SteeringInput {
         SteeringInput {
             pitch: f64::from(i8::from(self.pitch_up) - i8::from(self.pitch_down)),
-            yaw: f64::from(i8::from(self.yaw_right) - i8::from(self.yaw_left)),
+            yaw: f64::from(i8::from(self.yaw_left) - i8::from(self.yaw_right)),
             roll: f64::from(i8::from(self.roll_right) - i8::from(self.roll_left)),
         }
     }
@@ -1025,11 +1080,13 @@ const fn transition_phase_name(phase: TransitionPhase) -> &'static str {
 #[cfg(test)]
 mod tests {
     use super::{
-        INITIAL_HEIGHT, INITIAL_WIDTH, InteractionTarget, ShipControlInput, camera_body_distances,
-        camera_command, camera_domain_metrics, format_metric_speed, interaction_target,
-        is_diagnostics_toggle, landing_action_pressed, map_world_to_renderer,
-        release_cursor_pressed, ship_control_key, thruster_step, update_ship_control_input,
+        COCKPIT_INTERACTION_PROMPT, INITIAL_HEIGHT, INITIAL_WIDTH, InteractionTarget,
+        ShipControlInput, camera_body_distances, camera_command, camera_domain_metrics,
+        format_metric_speed, gameplay_window_title, interaction_target, is_diagnostics_toggle,
+        landing_action_pressed, map_world_to_renderer, release_cursor_pressed, ship_control_key,
+        thruster_step, update_ship_control_input,
     };
+    use salimon_ship::{FlightState, ShipController};
     use salimon_world::{CELESTIAL_BODIES, CameraCommand, CameraPrototype, CelestialBodyId};
     use winit::event::ElementState;
     use winit::keyboard::{KeyCode, PhysicalKey};
@@ -1165,11 +1222,22 @@ mod tests {
         update_ship_control_input(&mut input, PhysicalKey::Code(KeyCode::KeyA), true);
         update_ship_control_input(&mut input, PhysicalKey::Code(KeyCode::ArrowRight), true);
         assert_eq!(input.steering().pitch, 1.0);
-        assert_eq!(input.steering().yaw, -1.0);
+        assert_eq!(input.steering().yaw, 1.0);
         assert_eq!(input.steering().roll, 1.0);
         update_ship_control_input(&mut input, PhysicalKey::Code(KeyCode::KeyW), false);
         assert_eq!(input.steering().pitch, 0.0);
         assert!(ship_control_key(PhysicalKey::Code(KeyCode::ArrowUp)).is_none());
+    }
+
+    #[test]
+    fn a_and_d_emit_the_corrected_opposite_yaw_directions() {
+        let mut input = ShipControlInput::default();
+        update_ship_control_input(&mut input, PhysicalKey::Code(KeyCode::KeyA), true);
+        assert_eq!(input.steering().yaw, 1.0);
+
+        update_ship_control_input(&mut input, PhysicalKey::Code(KeyCode::KeyA), false);
+        update_ship_control_input(&mut input, PhysicalKey::Code(KeyCode::KeyD), true);
+        assert_eq!(input.steering().yaw, -1.0);
     }
 
     #[test]
@@ -1230,16 +1298,56 @@ mod tests {
     }
 
     #[test]
-    fn task10_interaction_zones_follow_enlarged_asset_markers() {
+    fn interaction_zones_follow_seat_aisle_and_rear_door() {
+        let aisle = [0.50, 1.997_311_827_956_989_2, -2.20];
         assert_eq!(
-            interaction_target([2.76, 2.77, 0.0]),
+            interaction_target(aisle, [2.76, 1.799_032_258_064_516, 0.0]),
             Some(InteractionTarget::Cockpit)
         );
         assert_eq!(
-            interaction_target([-7.10, 2.50, 0.0]),
+            interaction_target(aisle, [-1.76, 2.195_591_397_849_462, -4.40]),
+            None,
+        );
+        assert_eq!(
+            interaction_target(
+                [-7.10, 1.344_086_021_505_376_3, 0.0],
+                [-8.10, 1.344_086_021_505_376_3, 0.0],
+            ),
             Some(InteractionTarget::ExitDoor)
         );
-        assert_eq!(interaction_target([-2.0, 2.08, 3.0]), None);
+        assert_eq!(
+            interaction_target(
+                [-2.0, 1.997_311_827_956_989_2, 3.0],
+                [2.76, 1.799_032_258_064_516, 0.0],
+            ),
+            None
+        );
+        assert_eq!(
+            interaction_target(
+                [-7.0, 1.997_311_827_956_989_2, 4.0],
+                [-8.0, 1.997_311_827_956_989_2, 4.0],
+            ),
+            None
+        );
+    }
+
+    #[test]
+    fn cockpit_prompt_is_shown_only_for_the_aimed_nearby_cockpit() {
+        let ship = ShipController::default().snapshot();
+        assert_eq!(
+            ship.flight_state,
+            FlightState::Landed {
+                body: CelestialBodyId::Earth
+            }
+        );
+        assert_eq!(
+            gameplay_window_title(ship, None, Some(InteractionTarget::Cockpit)),
+            format!("Salimon — Compressed Solar System — {COCKPIT_INTERACTION_PROMPT}")
+        );
+        assert_eq!(
+            gameplay_window_title(ship, None, None),
+            "Salimon — Compressed Solar System"
+        );
     }
 
     #[test]

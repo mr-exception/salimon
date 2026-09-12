@@ -16,8 +16,11 @@ directly to speed. The runtime supplies typed held axes and discrete percentage
 steps. `L` starts an uncancellable automatic landing at the current approach
 normal inside a body's `1.15R` volume, or an automatic takeoff while landed.
 Both sequences continue without cockpit authority; an open door blocks takeoff
-with `Close door before takeoff`. The
-Task 10 scale pass places the runtime mesh's `-0.20 m` lowest local-Y point on
+with `Close door before takeoff`.
+
+The wider ship uses a conservative 15 m collision radius for its
+20.30 × 4.00 × 20.00 m exterior. The Task 10 playtest revision places the runtime
+mesh's `-0.108 m` lowest local-Y point on
 Earth's nominal surface and preserves identity orientation so local `+Y` follows
 the starting surface normal.
 The custom source and runtime model remain under

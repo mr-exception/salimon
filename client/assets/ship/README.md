@@ -1,85 +1,104 @@
 # Salimon Phase 0 Scout
 
-This directory contains the custom spaceship asset produced for Task 7 and
-uniformly enlarged by Task 10. It is a scope-limited polished greybox: a
-20.30 m-long, 7.44 m-tall, 16.60 m-wide scout with a tapered ceramic nose,
-graphite lifting body, copper edge accents, paired engine pods, framed cockpit
-glazing, and a deliberately readable wing silhouette.
+A custom, editable 20.30 × 4.00 × 20.00 m scout (length × height × width)
+with a broad living cabin, ivory armor, graphite structure, copper seams,
+layered wing plates and paired aft ion thrusters. The cabin deck is 9.20 m wide,
+up from 6.20 m, with 2.56 m floor-to-ceiling clearance. Deep window sills and
+furniture narrow the actual walking lanes; the character controller accounts
+for the player's 0.24 m radius.
 
-The Task 7 mesh bounds were 10.15 × 3.72 × 8.30 m (length × height × width).
-Task 10 applies an exact 2.0 uniform linear scale to all render geometry and
-collision proxies. The enlarged interior has a 6.20 m-wide walkable deck and
-4.66 m of vertical clearance. Player eye height remains 1.62 m rather than
-scaling with the ship; the regenerated player, seat, door, and camera anchors
-are placed against the scaled floor and fixtures so the interior stays usable.
+Three tall window bays on each side and two aft observation panes surround the
+living area. The forward canopy has no central sightline mullion. Its low console
+and 1.505 m seat back leave clear forward rays from both the seated eye
+`[2.76, 1.799, 0.0]` and standing eye `[1.30, 1.997, 0.0]`. All panes share
+inexpensive, lightly tinted, double-sided glass. The aft hull contains a real
+door aperture; opening the door does not leave a solid cap across the exit.
 
-The interior contains a cockpit and pilot seat, center and
-side monitors, a small aft cabin/corridor, storage and bench forms, ceiling
-lights, and an interactive rear exit door. The solid nose stays below the
-console and the open-backed, double-sided canopy gives the seated eye at
-`[2.76, 2.77, 0.0]` and a standing eye at `[1.30, 2.08, 0.0]` clear forward and
-side sightlines. Task 11 owns character movement, physics, door behavior, and
-runtime integration.
+The interior uses warm ivory lining, copper lamp housings, terracotta cushions
+and woven runners, petrol-teal cabinetry and honey-colored worktops. Amber
+ceiling and floor guidance lights complement cyan instrument displays. The
+central **Energy Core** has three cyan energy cells in a graphite cage, copper
+containment rings, segmented ceramic armor, an open crown, inset light strips,
+locking indicators, service vents and a charge gauge. Its stepped pedestal and
+housing fit the existing 2 × 2 m collision footprint, preserving the two broad
+walking routes around it. This follows
+Notion's Core definition: the vast storage battery and recoverable heart of the
+ship. Its representation is visual only in Phase 0; no energy, damage, fuel, or
+repair simulation is added.
 
-## Files and regeneration
+The aft engines have hollow flared nozzles, recessed emitters, stepped liners,
+armor rings, cooling fins and running lights. Their forms use 8–12 sided
+cross-sections instead of dense smoothing or displacement.
 
-- `source/generate_salimon_phase0_ship.py` is the deterministic editable source.
-  It contains named component dimensions and uses no external assets or Python
-  packages. Edit it and run `python3` to regenerate every checked-in export.
-- `export/salimon_phase0_ship.gltf` plus its `.bin` is the readable/editable glTF
-  2.0 interchange source and can be imported into Blender.
+## Source and regeneration
+
+- `source/generate_salimon_phase0_ship.py` is the deterministic editable source,
+  using only Python's standard library. Dimensions and named components remain
+  outside the Rust renderer.
+- `export/salimon_phase0_ship.gltf` plus `.bin` is the Blender-importable glTF 2.0
+  interchange asset.
 - `export/salimon_phase0_ship.glb` is the self-contained runtime export.
 - `textures/salimon_floor_grip.png` is an original 16×16 procedural texture.
-- `asset-manifest.json` fixes units, axes, ownership, and shipping budgets.
-
-From the repository root:
+- `asset-manifest.json` records axes, scale, design dimensions and budgets.
+- [preview.jpg](preview.jpg) shows six source-geometry views, including standing
+  cockpit and rear cabin sightlines.
+- [Core close-up](previews/core-hero.png), [reverse detail](previews/core-detail.png)
+  and [cabin context](previews/core-cabin.png) show the redesigned Energy Core.
 
 ```sh
 python3 client/assets/ship/source/generate_salimon_phase0_ship.py
 python3 client/assets/ship/source/validate_salimon_phase0_ship.py
-```
-
-The optional preview renderer needs Pillow and writes only the requested image:
-
-```sh
 python3 client/assets/ship/source/render_salimon_phase0_ship_preview.py /tmp/salimon-ship-preview.jpg
+python3 client/assets/ship/source/render_salimon_phase0_ship_preview.py --core client/assets/ship/previews
 ```
+
+The optional preview requires Pillow. It renders the actual source geometry;
+asset previews do not replace native runtime or reference hardware checks.
 
 ## Runtime contract
 
-The asset uses meters, `+Y` up, `+X` ship-forward, and `-Z` starboard. Mesh nodes
-have baked geometry and identity transforms. Stable hierarchy groups separate
-`Exterior`, `Interior`, `Collision_Proxies`, and `Interaction_Markers`.
+Units are meters; `+Y` is up, `+X` is forward, `-Z` is starboard. Meshes have baked
+positions and identity transforms. `Exterior`, `Interior`, `Collision_Proxies`
+and `Interaction_Markers` are stable hierarchy groups. Geometry is authored at
+Task 7 scale then converted by `[2.0, 4.0 / 3.72, 2.0]`; this revision reshapes the
+cabin and wings, so its dimensions are no longer a pure scale of Task 7.
 
-Collision nodes are metadata-only boxes so they add no draw calls. They define
-the interior floor, side walls, ceiling, aft door, and one coarse exterior hull.
-Interaction markers identify the cockpit seat, exit door, and player start.
-Their `extras.salimon` metadata is the handoff contract for later import code.
-The runtime places the landed ship so its scaled lowest mesh point (`-0.20 m`
-local Y) rests on Earth's nominal surface; the identity orientation keeps local
-`+Y` aligned to the surface normal at the starting point.
+Metadata-only collision boxes describe the floor, walls, ceiling, central Core,
+door and coarse exterior. They add no draw calls. The gameplay controller still
+owns matching portable constants; changing these dimensions requires updating
+character/runtime contract tests together. The visible deck and collision floor
+now agree at local Y `0.2473118 m`. The human is 1.80 m tall with 1.75 m eye height.
+Spawn and cockpit exit use the clear starboard aisle `[0.50, 1.9973, -2.20]`.
+The landed ship rests at its lowest mesh point (`-0.1075269 m` local Y), and its
+conservative exterior collision radius is 15 m.
 
-The runtime export remains below the fixed triangle, primitive, material, and
-256 KiB GLB budgets. Its only transparent surface is the `Cockpit Glass`
-material: a double-sided alpha-blended pane rendered in one additional ship draw
-without shadows or post effects. All other materials remain opaque. The scale
-pass adds no primitives, triangles, materials, textures, or draw calls, so its
-GPU workload is unchanged apart from projected pixel coverage. The fixed
-1920×1080 smoke check below remains required on the reference M1 MacBook Air for
-the Phase 0 60 FPS acceptance target.
+Only `Exit_Door` moves for the door state. Only the `Cockpit Glass` material uses
+alpha blending. The renderer combines opaque geometry into one draw and all
+window panes into a second draw; it preserves emissive color separately and
+applies a warm fill to `Interior` descendants. There are no dynamic shadows,
+post effects, additional light passes or per-frame geometry generation.
 
-## Visual and import checks
+## Budgets and verification
 
-The validator checks GLB chunk structure, buffer ranges, required hierarchy and
-gameplay markers, unique node names, matching glTF/GLB contents, primitive
-attributes, PNG signature, and all declared budgets. After geometry edits, also
-import the glTF or GLB into the target DCC/runtime and visually check the outer
-silhouette, central interior clearance, seated and standing cockpit sightlines,
-rear door, normals, and material assignments.
+Current export: **4,476 triangles, 91 primitives, 13 materials**.
+Hard caps: 4,500 triangles, 100 primitives, 13 materials, 512 KiB GLB; runtime ship
+submission remains two draws. This is a deliberate increase from the initial
+620-triangle greybox to allow the requested design detail, while remaining small.
+The original texture is included for DCC interchange; the native ship shader
+currently uses material colors and emission rather than sampling this texture.
+No third-party models, textures or other external asset dependencies are used.
 
-For the Task 10 native smoke check, run the release client at a fixed 1920×1080
-window, enable F3, and walk the cockpit, corridor, and open doorway. Confirm the
-camera does not clip severely at the 0.05 m near plane; the cockpit/door prompts
-activate at their enlarged fixtures; the player can exit and re-enter; the
-lowest exterior point rests on Earth without a visible gap or penetration; and
-the overlay never reports below 60 FPS during the interior and exterior passes.
+The validator checks exports agree, buffer/GLB structure, hierarchy, material
+budgets, measured bounds, floor alignment, Core metadata and housing containment
+inside its collider, seat height and actual
+triangle ray intersections for forward seated/standing and side/rear window
+sightlines, plus unoccluded recessed engine emitters. Rust tests cover import/emission, widened walking, core/furniture
+containment, doorway transitions, cockpit access and collision radius.
+
+Native smoke validation should include walking around both sides of the Core,
+viewing forward from behind the chair, inspecting side and rear windows,
+opening/closing and crossing the aft doorway, boarding/leaving the seat, jumping,
+and walking outside to inspect both nozzles and the wider silhouette. Also run
+the normal Solar System/resize/minimize/relaunch checks from the root README.
+The fixed 1920×1080 60 FPS acceptance check still requires the reference
+MacBook Air M1; asset complexity alone does not establish that result.

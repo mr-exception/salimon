@@ -18,3 +18,5 @@ normal until beyond the landing volume. Runtime maps the active body's frame to
 character traversal and owns only the contextual `L` key translation.
 The default landed pose derives its vertical clearance from the enlarged asset's
 lowest local-Y point, keeping visible geometry tangent to Earth's nominal surface.
+The wider 20.30 × 4.00 × 20.00 m hull uses a conservative 15 m collision sphere;
+this same clearance is included when completing automatic takeoff.

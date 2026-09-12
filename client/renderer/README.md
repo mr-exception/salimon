@@ -10,8 +10,12 @@ Task 11 adds a renderer-owned GLB loader and a generic `ShipMeshInstance` pose D
 Task 9 splits the asset's cockpit glass into a second, depth-tested alpha-blended
 draw so exterior geometry remains visible from inside; the renderer still has no
 dependency on character or ship behavior crates.
-Task 10 consumes the uniformly enlarged checked-in GLB without a runtime scale
-transform and doubles the authored open-door presentation offset to 4.50 m.
+Task 10 consumes the per-axis-rescaled checked-in GLB without a runtime scale
+transform and keeps the 2× horizontal open-door presentation offset at 4.50 m.
+The ship's `Interior` asset group receives a restrained warm ambient fill;
+material emission stays independent of base color so lamps, displays, the core,
+and thrusters remain self-lit. Lighting is evaluated per vertex and still uses
+only the opaque and glass draws, with no dynamic shadows or light loops.
 See [sphere-rendering.md](sphere-rendering.md) for the precision/LOD technique,
 material source, limitations, and future terrain path.
 

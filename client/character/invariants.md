@@ -13,6 +13,14 @@
    vertical mouse delta retains the conventional down-is-positive device mapping.
 9. The default seated cockpit view remains primarily forward and clears the
    console/nose into the modeled cockpit glazing.
-10. Task 10 ship-local floor, walk bounds, doorway, player start, and cockpit
-    camera remain aligned to the enlarged asset while human eye height stays
-    1.62 m.
+10. Ship-local floor, walk bounds, doorway, player start, and cockpit
+    camera remain aligned to the wider 4.00 m-tall asset; player body height is
+    1.80 m and standing eye height is 1.75 m.
+11. The central Core pedestal, sofa, and worktop are solid to walking movement,
+    with body-radius clearance and edge sliding; both side aisles remain traversable.
+12. Rear window bulkheads remain solid with the door open. Doorway crossings
+    require enough lateral clearance for the player's complete body.
+13. Spawn and cockpit exit place the player in the starboard aisle without
+    intersecting the Core, chair, or walking boundary.
+14. Jumping keeps the complete player body below the ceiling fixtures and the
+    lower door lintel; reaching the ceiling cancels upward speed.

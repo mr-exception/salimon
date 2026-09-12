@@ -7,6 +7,8 @@ translation and domain composition belong to `client/runtime`.
 Important regression areas are diagonal-speed normalization, edge-triggered
 jumping, closed/flying doorway containment, the exact 250 ms gravity blend,
 instant cockpit transitions, horizontal mouse-delta direction in both walking
-and cockpit views, the default forward cockpit-window sightline, and
-constant-radius full-sphere movement. Add a focused unit test whenever one of
+and cockpit views, the default forward cockpit-window sightline, central Core
+and furniture collision and sliding, both cabin aisles, window sill clearance,
+ceiling and lintel containment, rear doorway body clearance, safe cockpit exit,
+and constant-radius full-sphere movement. Add a focused unit test whenever one of
 these rules changes.

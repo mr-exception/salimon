@@ -25,24 +25,31 @@ EXPORT_DIR = ROOT / "export"
 TEXTURE_DIR = ROOT / "textures"
 MODEL_NAME = "salimon_phase0_ship"
 TASK7_BASELINE_DIMENSIONS_METERS = [10.15, 3.72, 8.30]
-LINEAR_SCALE_FROM_TASK7 = 2.0
-PLAYER_EYE_HEIGHT_METERS = 1.62
-SCALED_FLOOR_HEIGHT_METERS = 0.23 * LINEAR_SCALE_FROM_TASK7
-COCKPIT_SEAT_MARKER_METERS = [1.38 * LINEAR_SCALE_FROM_TASK7, 1.05 * LINEAR_SCALE_FROM_TASK7, 0.0]
+HORIZONTAL_SCALE_FROM_TASK7 = 2.0
+TARGET_HEIGHT_METERS = 4.0
+VERTICAL_SCALE_FROM_TASK7 = TARGET_HEIGHT_METERS / TASK7_BASELINE_DIMENSIONS_METERS[1]
+PLAYER_BODY_HEIGHT_METERS = 1.80
+PLAYER_EYE_HEIGHT_METERS = 1.75
+SCALED_FLOOR_HEIGHT_METERS = 0.23 * VERTICAL_SCALE_FROM_TASK7
+COCKPIT_SEAT_MARKER_METERS = [
+    1.38 * HORIZONTAL_SCALE_FROM_TASK7,
+    1.05 * VERTICAL_SCALE_FROM_TASK7,
+    0.0,
+]
 COCKPIT_VIEWPOINT_METERS = [
     COCKPIT_SEAT_MARKER_METERS[0],
     COCKPIT_SEAT_MARKER_METERS[1] + 0.67,
     0.0,
 ]
 STANDING_VIEWPOINT_METERS = [
-    0.65 * LINEAR_SCALE_FROM_TASK7,
+    0.65 * HORIZONTAL_SCALE_FROM_TASK7,
     SCALED_FLOOR_HEIGHT_METERS + PLAYER_EYE_HEIGHT_METERS,
     0.0,
 ]
 PLAYER_START_METERS = [
-    -0.35 * LINEAR_SCALE_FROM_TASK7,
+    0.50,
     SCALED_FLOOR_HEIGHT_METERS + PLAYER_EYE_HEIGHT_METERS,
-    0.0,
+    -2.20,
 ]
 
 
@@ -105,13 +112,26 @@ class Geometry:
 
 
 def scaled_vector(values: Sequence[float]) -> list[float]:
-    return [value * LINEAR_SCALE_FROM_TASK7 for value in values]
+    return [
+        values[0] * HORIZONTAL_SCALE_FROM_TASK7,
+        values[1] * VERTICAL_SCALE_FROM_TASK7,
+        values[2] * HORIZONTAL_SCALE_FROM_TASK7,
+    ]
 
 
 def scaled_geometry(geometry: Geometry) -> Geometry:
     return Geometry(
         positions=[tuple(scaled_vector(position)) for position in geometry.positions],
-        normals=geometry.normals.copy(),
+        normals=[
+            normalize(
+                (
+                    normal[0] / HORIZONTAL_SCALE_FROM_TASK7,
+                    normal[1] / VERTICAL_SCALE_FROM_TASK7,
+                    normal[2] / HORIZONTAL_SCALE_FROM_TASK7,
+                )
+            )
+            for normal in geometry.normals
+        ],
         texcoords=geometry.texcoords.copy(),
         indices=geometry.indices.copy(),
     )
@@ -184,22 +204,8 @@ def cockpit_glazing(
     return geometry
 
 
-def cockpit_window_frame() -> Geometry:
-    """Combine lightweight canopy rails into one draw primitive."""
-    geometry = Geometry()
-    for rail in (
-        box(2.50, 2.62, 1.00, 2.72, 1.48, 1.62),
-        box(2.50, 2.62, 1.00, 2.72, -1.62, -1.48),
-        box(2.50, 4.92, 2.55, 2.69, -0.09, 0.09),
-        box(4.80, 4.96, 0.72, 2.04, 0.32, 0.46),
-        box(4.80, 4.96, 0.72, 2.04, -0.46, -0.32),
-    ):
-        geometry.extend(rail)
-    return geometry
-
-
 def extrude_y(footprint: Sequence[tuple[float, float]], y0: float, y1: float) -> Geometry:
-    """Extrude a counter-clockwise X/Z footprint between two Y planes."""
+    """Extrude a clockwise X/Z footprint between two Y planes."""
     geometry = Geometry()
     bottom = [(x, y0, z) for x, z in reversed(footprint)]
     top = [(x, y1, z) for x, z in footprint]
@@ -305,15 +311,19 @@ class BufferBuilder:
 
 
 MATERIALS = [
-    ("Hull Graphite", [0.12, 0.15, 0.17, 1.0], 0.68, 0.42, None, None),
-    ("Hull Ceramic", [0.56, 0.60, 0.60, 1.0], 0.52, 0.20, None, None),
-    ("Copper Accent", [0.48, 0.20, 0.08, 1.0], 0.42, 0.62, None, None),
-    ("Cockpit Glass", [0.04, 0.22, 0.28, 0.24], 0.18, 0.12, [0.0, 0.05, 0.06], None),
-    ("Interior Light", [0.55, 0.58, 0.56, 1.0], 0.70, 0.08, None, None),
-    ("Interior Dark", [0.10, 0.12, 0.13, 1.0], 0.78, 0.12, None, None),
+    ("Hull Graphite", [0.065, 0.115, 0.14, 1.0], 0.68, 0.42, None, None),
+    ("Hull Ceramic", [0.72, 0.75, 0.69, 1.0], 0.52, 0.20, None, None),
+    ("Copper Accent", [0.66, 0.30, 0.13, 1.0], 0.42, 0.62, None, None),
+    ("Cockpit Glass", [0.10, 0.28, 0.30, 0.10], 0.18, 0.12, None, None),
+    ("Interior Light", [0.82, 0.71, 0.53, 1.0], 0.70, 0.08, None, None),
+    ("Interior Dark", [0.095, 0.13, 0.14, 1.0], 0.78, 0.12, None, None),
     ("Cyan Display", [0.015, 0.22, 0.27, 1.0], 0.28, 0.18, [0.0, 0.75, 0.92], None),
     ("Floor Grip", [0.42, 0.45, 0.45, 1.0], 0.86, 0.04, None, 0),
     ("Engine Glow", [0.12, 0.24, 0.30, 1.0], 0.30, 0.28, [0.08, 0.52, 0.78], None),
+    ("Warm Lamp", [0.75, 0.42, 0.12, 1.0], 0.60, 0.05, [1.0, 0.56, 0.20], None),
+    ("Terracotta Upholstery", [0.49, 0.19, 0.115, 1.0], 0.92, 0.0, None, None),
+    ("Petrol Teal", [0.07, 0.29, 0.29, 1.0], 0.72, 0.15, None, None),
+    ("Honey Wood", [0.42, 0.25, 0.12, 1.0], 0.88, 0.0, None, None),
 ]
 
 
@@ -350,67 +360,302 @@ class Component:
     extras: dict[str, object] = field(default_factory=dict)
 
 
+def combined(*parts: Geometry) -> Geometry:
+    result = Geometry()
+    for part in parts:
+        result.extend(part)
+    return result
+
+
+def ring_x(x0: float, x1: float, cy: float, cz: float,
+           outer0: float, outer1: float, inner0: float, inner1: float,
+           segments: int = 12) -> Geometry:
+    """Hollow faceted nozzle: real inner wall and annular lips, no solid cap."""
+    result = Geometry()
+    def point(x: float, radius: float, i: int) -> tuple[float, float, float]:
+        angle = 2 * math.pi * i / segments
+        return (x, cy + math.cos(angle) * radius, cz + math.sin(angle) * radius)
+    for i in range(segments):
+        j = (i + 1) % segments
+        a, b = point(x0, outer0, i), point(x0, outer0, j)
+        c, d = point(x1, outer1, j), point(x1, outer1, i)
+        e, f = point(x0, inner0, i), point(x0, inner0, j)
+        g, h = point(x1, inner1, j), point(x1, inner1, i)
+        for face in ([a,b,c,d], [h,g,f,e], [e,f,b,a], [d,c,g,h]):
+            result.add_face(face)
+    return result
+
+
+def cylinder_y(cx: float, cz: float, y0: float, y1: float,
+               radius0: float, radius1: float, segments: int = 12) -> Geometry:
+    result = Geometry()
+    lower = [(cx + math.cos(i*2*math.pi/segments)*radius0, y0,
+              cz + math.sin(i*2*math.pi/segments)*radius0) for i in range(segments)]
+    upper = [(cx + math.cos(i*2*math.pi/segments)*radius1, y1,
+              cz + math.sin(i*2*math.pi/segments)*radius1) for i in range(segments)]
+    result.add_face(lower)
+    result.add_face(list(reversed(upper)))
+    for i in range(segments):
+        j = (i+1) % segments
+        result.add_face([lower[i], upper[i], upper[j], lower[j]])
+    return result
+
+
+def core_radial(geometry: Geometry, angle: float) -> Geometry:
+    """Place local radial/Y/tangent geometry around the Core's vertical axis."""
+    cosine, sine = math.cos(angle), math.sin(angle)
+    def rotate(point: tuple[float, float, float]) -> tuple[float, float, float]:
+        x, y, z = point
+        return (cosine*x-sine*z, y, sine*x+cosine*z)
+    return Geometry(
+        positions=[(x-.50,y,z) for x,y,z in map(rotate, geometry.positions)],
+        normals=list(map(rotate, geometry.normals)),
+        texcoords=geometry.texcoords.copy(), indices=geometry.indices.copy(),
+    )
+
+
+def core_ring(y0: float, y1: float, outer: float, inner: float,
+              start: float = 0.0, sweep: float = 2*math.pi,
+              segments: int = 8) -> Geometry:
+    """Closed hollow ring/arc with outward winding and an open central bore."""
+    result = Geometry()
+    def point(radius: float, y: float, index: int) -> tuple[float,float,float]:
+        angle = start+sweep*index/segments
+        return (-.50+radius*math.cos(angle), y, radius*math.sin(angle))
+    for i in range(segments):
+        a,b = point(outer,y0,i),point(outer,y0,i+1)
+        c,d = point(outer,y1,i+1),point(outer,y1,i)
+        e,f = point(inner,y0,i),point(inner,y0,i+1)
+        g,h = point(inner,y1,i+1),point(inner,y1,i)
+        for face in ([a,d,c,b],[e,f,g,h],[e,a,b,f],[d,h,g,c]):
+            result.add_face(face)
+    if sweep < 2*math.pi-1e-6:
+        result.add_face([point(inner,y0,0),point(inner,y1,0),point(outer,y1,0),point(outer,y0,0)])
+        result.add_face([point(outer,y0,segments),point(outer,y1,segments),point(inner,y1,segments),point(inner,y0,segments)])
+    return result
+
+
 def ship_components() -> list[Component]:
     components: list[Component] = []
 
     def add(name: str, geometry: Geometry, material: int, group: str, **extras: object) -> None:
         components.append(Component(name, scaled_geometry(geometry), material, group, extras))
 
-    # Exterior: the Task 7 baseline is uniformly enlarged for the Task 10 pass.
-    add("Hull_Belly", box(-4.2, 3.3, -0.10, 0.18, -2.05, 2.05), 0, "Exterior")
-    add("Hull_Roof", box(-3.7, 2.5, 2.72, 3.08, -1.72, 1.72), 1, "Exterior")
-    add("Hull_Port_Side", box(-3.8, 2.6, 0.18, 2.72, 1.72, 2.05), 0, "Exterior")
-    add("Hull_Starboard_Side", box(-3.8, 2.6, 0.18, 2.72, -2.05, -1.72), 0, "Exterior")
-    # Keep the lower nose solid while leaving the cockpit volume above it open.
-    # The canopy panes below are the only geometry across the forward sightline.
-    add("Hull_Nose", tapered_box(2.5, 5.25, 0.10, 1.02, 1.95, 0.62, 0.76, 0.36), 1, "Exterior")
-    add("Hull_Aft_Cap", box(-4.25, -3.8, 0.18, 2.72, -2.05, 2.05), 0, "Exterior")
-    port_wing = [(1.65, 1.88), (-2.60, 1.88), (-4.05, 4.15), (0.50, 3.42)]
-    starboard_wing = [(0.50, -3.42), (-4.05, -4.15), (-2.60, -1.88), (1.65, -1.88)]
-    add("Wing_Port", extrude_y(port_wing, 0.18, 0.38), 0, "Exterior")
-    add("Wing_Starboard", extrude_y(starboard_wing, 0.18, 0.38), 0, "Exterior")
-    add("Wing_Port_Accent", extrude_y([(0.55, 3.28), (-3.55, 3.93), (-3.25, 3.55), (0.65, 3.05)], 0.39, 0.44), 2, "Exterior")
-    add("Wing_Starboard_Accent", extrude_y([(0.65, -3.05), (-3.25, -3.55), (-3.55, -3.93), (0.55, -3.28)], 0.39, 0.44), 2, "Exterior")
-    add("Engine_Port", cylinder_x(-4.85, -1.90, 0.83, 2.78, 0.48), 0, "Exterior")
-    add("Engine_Starboard", cylinder_x(-4.85, -1.90, 0.83, -2.78, 0.48), 0, "Exterior")
-    add("Engine_Port_Glow", cylinder_x(-4.90, -4.84, 0.83, 2.78, 0.33), 8, "Exterior")
-    add("Engine_Starboard_Glow", cylinder_x(-4.90, -4.84, 0.83, -2.78, 0.33), 8, "Exterior")
-    add("Dorsal_Spine", tapered_box(-3.40, 2.30, 3.07, 3.62, 0.48, 3.08, 3.18, 0.12), 2, "Exterior")
-    add("Cockpit_Glazing", cockpit_glazing(2.58, 4.92, 1.00, 2.64, 1.50, 0.72, 2.02, 0.42), 3, "Exterior", exterior_visibility=True)
-    add("Cockpit_Window_Frame", cockpit_window_frame(), 2, "Exterior")
-    add("Hull_Port_Detail", box(-2.70, 1.50, 1.02, 1.16, 2.05, 2.12), 2, "Exterior")
-    add("Hull_Starboard_Detail", box(-2.70, 1.50, 1.02, 1.16, -2.12, -2.05), 2, "Exterior")
+    # Wide lifting-body scout; horizontal dimensions authored at half scale.
+    # Wall assemblies leave actual openings from waist height to the ceiling.
+    add("Hull_Belly", tapered_box(-4.2, 3.3, -0.10, 0.18, 2.55, -0.10, 0.18, 2.15), 0, "Exterior")
+    roof_outline = [(-3.90,-2.18),(-3.55,-2.62),(2.15,-2.62),(2.58,-2.30),
+                    (2.58,2.30),(2.15,2.62),(-3.55,2.62),(-3.90,2.18)]
+    add("Hull_Roof", extrude_y(list(reversed(roof_outline)),2.72,3.08), 1, "Exterior")
+    # Beveled shoulder rails break up the broad roof without cutting cabin space.
+    shoulders = Geometry()
+    for sign in (-1,1):
+        shoulders.extend(tapered_box(-3.45,2.14,2.94,3.14,.11,2.96,3.08,.07))
+        start = len(shoulders.positions) - 24
+        for i in range(start,len(shoulders.positions)):
+            x,y,z=shoulders.positions[i]
+            shoulders.positions[i]=(x,y,z+sign*2.46)
+    add("Roof_Shoulder_Rails",shoulders,0,"Exterior")
+    for label, sign in (("Port", 1), ("Starboard", -1)):
+        z0, z1 = sorted((sign*2.30, sign*2.55))
+        frames = combined(box(-3.8, 2.6, 0.18, 0.87, z0, z1),
+                          box(-3.8, 2.6, 2.52, 2.73, z0, z1))
+        for x in (-3.72, -1.70, 0.40, 2.44):
+            frames.extend(box(x-.06, x+.06, .87, 2.52, z0, z1))
+        add(f"Hull_{label}_Side", frames, 0, "Exterior")
+        glass = Geometry()
+        for x0,x1 in ((-3.66,-1.76),(-1.64,.34),(.46,2.38)):
+            z=sign*2.42
+            glass.add_face([(x0,.87,z),(x1,.87,z),(x1,2.52,z),(x0,2.52,z)])
+        add(f"Cabin_{label}_Glazing", glass, 3, "Exterior", exterior_visibility=True)
+        add(f"Hull_{label}_Stripe", box(-3.60,2.30,.68,.82,
+            *sorted((sign*2.555,sign*2.58))), 2, "Exterior")
+    add("Hull_Nose", tapered_box(2.5, 5.25, 0.10, .89, 2.55, .48, .66, .62), 1, "Exterior")
+    # Rear observation windows flank a real door opening; no solid aft cap.
+    aft = combined(box(-3.96,-3.78,.18,.88,-2.55,-.72),
+                   box(-3.96,-3.78,.18,.88,.72,2.55),
+                   box(-3.96,-3.78,2.52,2.73,-2.55,2.55))
+    for z in (-2.48,-.76,.76,2.48):
+        aft.extend(box(-3.96,-3.78,.88,2.52,z-.06,z+.06))
+    add("Hull_Aft_Cap", aft, 0, "Exterior")
+    aft_glass=Geometry()
+    for z0,z1 in ((-2.42,-.82),(.82,2.42)):
+        aft_glass.add_face([(-3.86,.88,z0),(-3.86,2.52,z0),(-3.86,2.52,z1),(-3.86,.88,z1)])
+    add("Cabin_Aft_Glazing", aft_glass, 3, "Exterior", exterior_visibility=True)
+    for label, sign in (("Port",1),("Starboard",-1)):
+        def wing_poly(points):
+            values=[(x,z*sign) for x,z in points]
+            return values if sign==1 else list(reversed(values))
+        add(f"Wing_{label}",extrude_y(wing_poly([(2.45,2.30),(-2.90,2.30),(-4.05,5.0),(.70,4.05)]),.18,.42),0,"Exterior")
+        add(f"Wing_{label}_Armor",extrude_y(wing_poly([(1.70,2.66),(-2.76,2.66),(-3.55,4.70),(.48,3.82)]),.43,.52),1,"Exterior")
+        add(f"Wing_{label}_Accent",extrude_y(wing_poly([(.55,3.92),(-3.64,4.74),(-3.42,4.44),(.63,3.69)]),.53,.58),2,"Exterior")
+        cy,cz=1.00,sign*3.55
+        add(f"Engine_{label}",ring_x(-4.47,-1.72,cy,cz,.62,.62,.36,.36),0,"Exterior")
+        add(f"Engine_{label}_Intake_Cowl",ring_x(-2.0,-1.50,cy,cz,.66,.43,.36,.30),1,"Exterior")
+        add(f"Engine_{label}_Intake",cylinder_x(-1.68,-1.65,cy,cz,.29),5,"Exterior")
+        # Swept stabilizers provide an aft silhouette beyond the flat wing deck.
+        fin = Geometry()
+        profile=[(-3.82,.58),(-3.48,2.65),(-2.96,2.35),(-2.15,.58)]
+        lower=[(x,y,cz-.055) for x,y in profile]
+        upper=[(x,y,cz+.055) for x,y in profile]
+        fin.add_face(lower)
+        fin.add_face(list(reversed(upper)))
+        for i in range(len(profile)):
+            j=(i+1)%len(profile)
+            fin.add_face([lower[i],upper[i],upper[j],lower[j]])
+        add(f"Engine_{label}_Swept_Fin",fin,0,"Exterior")
+        # Flared hollow nozzles, stepped heat shields, recessed ion emitters.
+        add(f"Engine_{label}_Nozzle",ring_x(-4.90,-4.14,cy,cz,.70,.54,.55,.40),2,"Exterior")
+        add(f"Engine_{label}_Liner",ring_x(-4.86,-4.18,cy,cz,.54,.39,.48,.31),5,"Exterior")
+        add(f"Engine_{label}_Glow",cylinder_x(-4.61,-4.58,cy,cz,.43),8,"Exterior")
+        rings=combined(ring_x(-4.74,-4.67,cy,cz,.72,.72,.68,.68),
+                       ring_x(-4.10,-3.99,cy,cz,.66,.66,.60,.60),
+                       ring_x(-2.13,-2.02,cy,cz,.65,.65,.60,.60))
+        add(f"Engine_{label}_Bands",rings,1,"Exterior")
+        vanes=Geometry()
+        for i in range(8):
+            angle=2*math.pi*i/8
+            y,z=cy+math.cos(angle)*.61,cz+math.sin(angle)*.61
+            vanes.extend(box(-3.85,-2.30,y-.055,y+.055,z-.045,z+.045))
+        add(f"Engine_{label}_Cooling_Fins",vanes,11,"Exterior")
+        add(f"Engine_{label}_Running_Light",box(-3.6,-2.6,1.63,1.67,cz-.045,cz+.045),8,"Exterior")
+    add("Dorsal_Spine",tapered_box(-3.40,2.30,3.07,3.62,.36,3.08,3.18,.12),0,"Exterior")
+    roof_panels=Geometry()
+    for x in (-3.2,-1.8,-.4,1.0):
+        for z in (-1.55,1.55):
+            roof_panels.extend(box(x,x+1.1,3.081,3.115,z-.55,z+.55))
+    add("Roof_Service_Panels",roof_panels,11,"Exterior")
+    add("Cockpit_Glazing",cockpit_glazing(2.50,4.92,.89,2.72,2.42,.66,2.14,.62),3,"Exterior",exterior_visibility=True)
+    canopy_frame=Geometry()
+    # Sloping side edges, no center mullion across the pilot's forward view.
+    for sign in (-1,1):
+        canopy_frame.extend(box(2.44,2.56,.89,2.74,*sorted((sign*2.36,sign*2.48))))
+        canopy_frame.extend(box(4.86,4.98,.66,2.18,*sorted((sign*.56,sign*.68))))
+    canopy_frame.extend(box(4.85,4.99,2.12,2.22,-.68,.68))
+    add("Cockpit_Window_Frame",canopy_frame,2,"Exterior")
 
-    # Interior: a clear 3.1 m wide path from the cockpit to the aft exit.
-    add("Deck_Walkable", box(-3.78, 3.28, 0.18, 0.28, -1.55, 1.55), 7, "Interior", walkable=True)
-    add("Ceiling_Inner", box(-3.62, 2.46, 2.61, 2.71, -1.54, 1.54), 4, "Interior")
-    add("Wall_Port_Inner", box(-3.62, 2.45, 0.28, 2.62, 1.54, 1.68), 4, "Interior")
-    add("Wall_Starboard_Inner", box(-3.62, 2.45, 0.28, 2.62, -1.68, -1.54), 4, "Interior")
-    add("Aft_Bulkhead_Port", box(-3.78, -3.62, 0.28, 2.62, 0.72, 1.55), 5, "Interior")
-    add("Aft_Bulkhead_Starboard", box(-3.78, -3.62, 0.28, 2.62, -1.55, -0.72), 5, "Interior")
-    add("Aft_Bulkhead_Header", box(-3.78, -3.62, 2.34, 2.62, -0.72, 0.72), 5, "Interior")
-    add(
-        "Exit_Door",
-        box(-3.91, -3.77, 0.28, 2.34, -0.70, 0.70),
-        2,
-        "Interior",
-        interactive="exit-door",
-        pivot=scaled_vector([-3.84, 0.28, 0.70]),
-    )
-    add("Door_Threshold", box(-3.94, -3.55, 0.20, 0.32, -0.78, 0.78), 2, "Interior")
-    add("Cockpit_Console_Center", tapered_box(2.16, 3.12, 0.28, 1.02, 0.74, 0.42, 1.20, 0.52), 5, "Interior")
-    add("Cockpit_Console_Port", box(1.78, 3.02, 0.34, 0.82, 0.82, 1.48), 5, "Interior")
-    add("Cockpit_Console_Starboard", box(1.78, 3.02, 0.34, 0.82, -1.48, -0.82), 5, "Interior")
-    add("Monitor_Center", box(2.34, 2.39, 0.75, 1.14, -0.52, 0.52), 6, "Interior", interactive="cockpit-monitor")
-    add("Monitor_Port", box(2.08, 2.13, 0.74, 1.02, 0.91, 1.38), 6, "Interior")
-    add("Monitor_Starboard", box(2.08, 2.13, 0.74, 1.02, -1.38, -0.91), 6, "Interior")
-    add("Pilot_Seat_Base", box(0.90, 1.62, 0.28, 0.58, -0.48, 0.48), 5, "Interior")
-    add("Pilot_Seat_Back", box(0.78, 1.05, 0.54, 1.78, -0.52, 0.52), 5, "Interior", interactive="cockpit-seat")
-    add("Pilot_Seat_Accent", box(1.04, 1.12, 0.68, 1.54, -0.42, 0.42), 2, "Interior")
-    add("Cabin_Bench_Port", box(-2.75, -0.75, 0.30, 0.72, 1.02, 1.48), 5, "Interior")
-    add("Cabin_Storage_Starboard", box(-2.92, -1.58, 0.30, 1.22, -1.48, -1.02), 0, "Interior")
-    add("Ceiling_Light_Forward", box(0.35, 1.90, 2.52, 2.61, -0.14, 0.14), 6, "Interior")
-    add("Ceiling_Light_Aft", box(-2.65, -0.55, 2.52, 2.61, -0.14, 0.14), 6, "Interior")
+    # Warm living cabin: structural lower walls, deep sills and generous glazing.
+    add("Deck_Walkable",box(-3.78,3.28,.13,.23,-2.30,2.30),7,"Interior",walkable=True)
+    add("Ceiling_Inner",box(-3.72,2.46,2.61,2.71,-2.30,2.30),4,"Interior")
+    for label,sign in (("Port",1),("Starboard",-1)):
+        add(f"Wall_{label}_Inner",combined(
+            box(-3.72,2.45,.23,.86,*sorted((sign*2.23,sign*2.30))),
+            box(-3.72,2.45,2.53,2.62,*sorted((sign*2.23,sign*2.30)))),4,"Interior")
+        add(f"Window_{label}_Sill",box(-3.62,2.38,.84,.92,*sorted((sign*2.10,sign*2.30))),12,"Interior")
+    add("Aft_Bulkhead_Port",box(-3.78,-3.70,.23,.87,.80,2.30),4,"Interior")
+    add("Aft_Bulkhead_Starboard",box(-3.78,-3.70,.23,.87,-2.30,-.80),4,"Interior")
+    add("Aft_Bulkhead_Header",box(-3.78,-3.62,2.34,2.62,-.80,.80),5,"Interior")
+    # Combine door surface accents into its geometry so the complete door moves.
+    add("Exit_Door",box(-3.91,-3.77,.23,2.34,-.70,.70),11,"Interior",interactive="exit-door",pivot=scaled_vector([-3.84,.23,.70]))
+    door_frame=combined(box(-3.77,-3.60,.23,2.37,-.80,-.70),box(-3.77,-3.60,.23,2.37,.70,.80),box(-3.77,-3.60,2.34,2.42,-.80,.80))
+    add("Door_Frame",door_frame,2,"Interior")
+    add("Door_Threshold",box(-3.94,-3.55,.17,.23,-.78,.78),2,"Interior")
+    add("Cockpit_Console_Center",tapered_box(2.16,3.12,.23,.87,.74,.32,1.0,.52),5,"Interior")
+    add("Cockpit_Console_Port",box(1.78,3.02,.23,.74,.82,1.48),11,"Interior")
+    add("Cockpit_Console_Starboard",box(1.78,3.02,.23,.74,-1.48,-.82),11,"Interior")
+    add("Monitor_Center",box(2.155,2.18,.68,.98,-.48,.48),6,"Interior",interactive="cockpit-monitor")
+    add("Monitor_Port",box(2.08,2.13,.74,.88,.91,1.38),6,"Interior")
+    add("Monitor_Starboard",box(2.08,2.13,.74,.88,-1.38,-.91),6,"Interior")
+    add("Pilot_Seat_Base",combined(box(.94,1.62,.23,.51,-.36,.36),box(.90,1.62,.51,.65,-.40,.40)),5,"Interior")
+    add("Pilot_Seat_Back",box(.78,1.00,.51,1.40,-.40,.40),10,"Interior",interactive="cockpit-seat")
+    add("Pilot_Seat_Accent",combined(box(1.0,1.06,.66,1.31,-.32,.32),box(1.05,1.55,.65,.71,-.36,.36)),12,"Interior")
+    # Furnishings are kept against the wall, leaving two broad circulation lanes.
+    add("Cabin_Bench_Port",box(-2.85,-1.12,.23,.47,1.83,2.22),5,"Interior")
+    cushions=Geometry()
+    for x in (-2.82,-2.26,-1.70):
+        cushions.extend(box(x,x+.51,.47,.67,1.80,2.20))
+        cushions.extend(box(x,x+.51,.67,1.03,2.10,2.22))
+    add("Cabin_Bench_Cushions",cushions,10,"Interior")
+    add("Cabin_Storage_Starboard",box(-2.88,-1.6,.23,.79,-2.22,-1.88),11,"Interior")
+    add("Cabin_Worktop",box(-2.98,-1.50,.79,.86,-2.24,-1.79),12,"Interior")
+    drawers=Geometry()
+    for x in (-2.76,-2.18):
+        for y in (.37,.61):
+            drawers.extend(box(x,x+.42,y,y+.12,-1.887,-1.872))
+    add("Cabin_Drawer_Fronts",drawers,4,"Interior")
+    trim=Geometry()
+    for sign in (-1,1):
+        trim.extend(box(-3.55,1.60,.232,.242,*sorted((sign*1.57,sign*1.61))))
+    add("Deck_Copper_Inlay",trim,2,"Interior")
+    runner=Geometry()
+    for sign in (-1,1):
+        runner.extend(box(-2.80,.63,.232,.237,*sorted((sign*.78,sign*1.40))))
+    add("Cabin_Woven_Runners",runner,10,"Interior")
+
+    # Recoverable energy-storage heart: segmented cells in an armored service
+    # cage. All solid details fit the existing collision envelope and reuse
+    # the ship palette; luminous inserts need no new lights or render passes.
+    add("Core_Pedestal",combined(cylinder_y(-.50,0,.23,.32,.50,.50,8),
+                                cylinder_y(-.50,0,.32,.43,.46,.38,8)),0,"Interior",purpose="energy-core-housing")
+    add("Core_Cradle",combined(cylinder_y(-.50,0,.43,.53,.38,.32,8),
+                              cylinder_y(-.50,0,1.76,1.84,.32,.40,8),
+                              core_ring(1.84,1.88,.40,.19)),2,"Interior")
+    add("Energy_Core",combined(cylinder_y(-.50,0,.58,.90,.18,.23,8),
+                               cylinder_y(-.50,0,.94,1.29,.23,.23,8),
+                               cylinder_y(-.50,0,1.33,1.69,.23,.15,8)),6,"Interior",purpose="energy-storage-core",phase0="visual-only")
+    add("Core_Cell_Separators",combined(cylinder_y(-.50,0,.89,.95,.245,.245,8),
+                                       cylinder_y(-.50,0,1.28,1.34,.245,.245,8)),0,"Interior")
+    # A stepped crown and segmented ceramic armor distinguish the removable
+    # energy cartridge from its heavier installed plinth.
+    armor, ribs, insets, contacts, vents = (Geometry() for _ in range(5))
+    for i in range(4):
+        angle=math.pi/4+i*math.pi/2
+        spine=combined(box(.30,.35,.51,1.78,-.04,.04),
+                       box(.30,.43,.47,.66,-.06,.06),
+                       box(.30,.43,1.62,1.82,-.06,.06))
+        ribs.extend(core_radial(spine,angle))
+        insets.extend(core_radial(box(.351,.359,.72,1.57,-.018,.018),angle))
+        contacts.extend(core_radial(box(.431,.437,.54,.60,-.025,.025),angle))
+        contacts.extend(core_radial(box(.431,.437,1.68,1.73,-.025,.025),angle))
+    for i in range(8):
+        angle=i*math.pi/4
+        armor.extend(core_ring(.34,.415,.445,.39,angle+.06,math.pi/4-.12,1))
+        armor.extend(core_ring(1.80,1.86,.415,.355,angle+.07,math.pi/4-.14,1))
+        # Small inset slots and locking tabs provide readable surface detail.
+        for y in (.357,.381):
+            vents.extend(core_radial(box(.426,.432,y,y+.009,-.055,.055),angle+math.pi/8))
+    add("Core_Containment_Ribs",ribs,0,"Interior")
+    add("Core_Ceramic_Armor",armor,1,"Interior")
+    add("Core_Spine_Inlays",insets,8,"Interior")
+    add("Core_Lock_Indicators",contacts,9,"Interior")
+    add("Core_Service_Vents",vents,5,"Interior")
+    add("Core_Containment_Rings",combined(core_ring(.65,.70,.325,.27),
+                                         core_ring(1.10,1.15,.39,.30),
+                                         core_ring(1.56,1.61,.325,.27)),2,"Interior")
+    add("Core_Status_Lights",combined(core_ring(.315,.338,.47,.425),
+                                     cylinder_y(-.50,0,1.862,1.895,.15,.11,8)),8,"Interior")
+    # Recessed forward service panel with a segmented charge gauge.
+    add("Core_Service_Panel",core_radial(box(.355,.40,.91,1.30,-.105,.105),0),5,"Interior")
+    gauge=Geometry()
+    for y in (.96,1.02,1.08,1.14):
+        gauge.extend(core_radial(box(.401,.405,y,y+.027,-.07,.045),0))
+    add("Core_Charge_Gauge",gauge,6,"Interior")
+    add("Core_Service_Markings",core_radial(combined(box(.401,.405,1.23,1.25,-.07,.07),
+                                                   box(.401,.405,.955,1.185,.065,.078)),0),1,"Interior")
+    add("Core_Power_Conduits",combined(box(-3.30,-1.0,.235,.26,-.055,.055),
+                                     box(0,.50,.235,.26,-.055,.055)),2,"Interior")
+    ceiling_lamps=Geometry()
+    lamp_housings=Geometry()
+    for sign in (-1,1):
+        z=sign*1.73
+        for x0,x1 in ((-3.3,-1.05),(-.30,2.0)):
+            lamp_housings.extend(box(x0-.06,x1+.06,2.51,2.61,z-.12,z+.12))
+            ceiling_lamps.extend(box(x0,x1,2.505,2.52,z-.055,z+.055))
+    ceiling_ribs=Geometry()
+    for x in (-3.42,-1.70,.40,2.20):
+        ceiling_ribs.extend(box(x-.035,x+.035,2.55,2.61,-2.18,2.18))
+    add("Ceiling_Copper_Ribs",ceiling_ribs,2,"Interior")
+    ceiling_insets=Geometry()
+    for x0,x1 in ((-3.27,-1.85),(-1.55,.25),(.55,2.05)):
+        ceiling_insets.extend(box(x0,x1,2.598,2.609,-.57,.57))
+    add("Ceiling_Teal_Inset_Panels",ceiling_insets,11,"Interior")
+    add("Ceiling_Lamp_Housings",lamp_housings,2,"Interior")
+    add("Ceiling_Warm_Lights",ceiling_lamps,9,"Interior")
+    guidance=Geometry()
+    for sign in (-1,1):
+        guidance.extend(box(-3.55,1.7,.30,.34,*sorted((sign*2.21,sign*2.23))))
+    add("Cabin_Low_Guidance_Lights",guidance,9,"Interior")
+    add("Door_Welcome_Light",box(-3.60,-3.56,2.37,2.42,-.50,.50),9,"Interior")
     return components
 
 
@@ -459,12 +704,15 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
         nodes[groups[component.group]]["children"].append(node_index)  # type: ignore[index,union-attr]
 
     baseline_collision_specs = [
-        ("COLLIDER_InteriorFloor", [0.0, 0.18, 0.0], [7.06, 0.10, 3.10], "walkable-floor"),
-        ("COLLIDER_InteriorPortWall", [-0.55, 1.45, 1.61], [6.07, 2.34, 0.14], "interior-wall"),
-        ("COLLIDER_InteriorStarboardWall", [-0.55, 1.45, -1.61], [6.07, 2.34, 0.14], "interior-wall"),
-        ("COLLIDER_InteriorCeiling", [-0.58, 2.61, 0.0], [6.08, 0.10, 3.08], "ceiling"),
-        ("COLLIDER_AftDoor", [-3.84, 1.31, 0.0], [0.14, 2.06, 1.40], "interactive-door"),
-        ("COLLIDER_ExteriorHull", [0.25, 1.48, 0.0], [10.50, 3.16, 4.10], "broad-phase-hull"),
+        ("COLLIDER_InteriorFloor", [-0.25, 0.18, 0.0], [7.06, 0.10, 4.60], "walkable-floor"),
+        ("COLLIDER_InteriorPortWall", [-0.55, 1.45, 2.37], [6.34, 2.34, 0.14], "interior-wall"),
+        ("COLLIDER_InteriorStarboardWall", [-0.55, 1.45, -2.37], [6.34, 2.34, 0.14], "interior-wall"),
+        ("COLLIDER_InteriorCeiling", [-0.63, 2.66, 0.0], [6.18, 0.10, 4.60], "ceiling"),
+        ("COLLIDER_CabinBench", [-1.985, .63, 2.01], [1.73, .80, .42], "interior-obstacle"),
+        ("COLLIDER_CabinWorktop", [-2.24, .545, -2.015], [1.48, .63, .45], "interior-obstacle"),
+        ("COLLIDER_EnergyCore", [-0.50, 1.07, 0.0], [1.0, 1.68, 1.0], "interior-obstacle"),
+        ("COLLIDER_AftDoor", [-3.84, 1.285, 0.0], [0.14, 2.11, 1.40], "interactive-door"),
+        ("COLLIDER_ExteriorHull", [0.175, 1.76, 0.0], [10.15, 3.72, 10.00], "broad-phase-hull"),
     ]
     for name, center, size, purpose in baseline_collision_specs:
         node_index = len(nodes)
@@ -506,7 +754,7 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
             "copyright": "Copyright 2026 Salimon contributors; custom original asset",
             "extras": {
                 "salimon": {
-                    "assetVersion": 3,
+                    "assetVersion": 6,
                     "units": "meters",
                     "upAxis": "+Y",
                     "forwardAxis": "+X",
@@ -532,21 +780,30 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
                 "triangleCount": sum(len(component.geometry.indices) // 3 for component in components),
                 "materialCount": len(MATERIALS),
                 "externalAssetDependencies": 0,
-                "linearScaleFromTask7Baseline": LINEAR_SCALE_FROM_TASK7,
+                "scaleFromTask7Baseline": [
+                    HORIZONTAL_SCALE_FROM_TASK7,
+                    VERTICAL_SCALE_FROM_TASK7,
+                    HORIZONTAL_SCALE_FROM_TASK7,
+                ],
                 "task7BaselineDimensionsMeters": TASK7_BASELINE_DIMENSIONS_METERS,
                 "overallDimensionsMeters": [
-                    dimension * LINEAR_SCALE_FROM_TASK7
-                    for dimension in TASK7_BASELINE_DIMENSIONS_METERS
+                    TASK7_BASELINE_DIMENSIONS_METERS[0] * HORIZONTAL_SCALE_FROM_TASK7,
+                    TARGET_HEIGHT_METERS,
+                    20.0,
                 ],
-                "lowestLocalYMeters": -0.10 * LINEAR_SCALE_FROM_TASK7,
+                "lowestLocalYMeters": -0.10 * VERTICAL_SCALE_FROM_TASK7,
                 "walkableInteriorClearanceMeters": {
-                    "width": 3.10 * LINEAR_SCALE_FROM_TASK7,
-                    "height": 2.33 * LINEAR_SCALE_FROM_TASK7,
+                    "width": 4.60 * HORIZONTAL_SCALE_FROM_TASK7,
+                    "height": 2.38 * VERTICAL_SCALE_FROM_TASK7,
                 },
+                "designRevision": "wide-cozy-cabin-sci-fi-core",
+                "energyCore": {"centerMeters": [-1.0, 1.2, 0.0], "role": "energy-storage", "phase0": "visual-only"},
+                "humanBodyHeightMeters": PLAYER_BODY_HEIGHT_METERS,
                 "humanEyeHeightMeters": PLAYER_EYE_HEIGHT_METERS,
                 "cockpitWindows": {
                     "glazingNode": "Cockpit_Glazing",
                     "frameNode": "Cockpit_Window_Frame",
+                    "cabinGlazingNodes": ["Cabin_Port_Glazing", "Cabin_Starboard_Glazing", "Cabin_Aft_Glazing"],
                     "material": "Cockpit Glass",
                     "seatedViewpointMeters": COCKPIT_VIEWPOINT_METERS,
                     "standingViewpointMeters": STANDING_VIEWPOINT_METERS,

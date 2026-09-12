@@ -35,13 +35,15 @@
 16. Gameplay starts inside the ship landed on Earth; F2 preserves access to the
     earlier precision-tour fixture without changing domain state.
 17. Runtime contextual E routing changes cockpit authority or requests a door
-    action, but never owns the resulting character/ship behavior.
+    action, but never owns the resulting character/ship behavior. Cockpit entry
+    requires both range and aim, and that same gate presents `Press E to use`.
 18. Escape releases cursor capture so native window controls remain reachable;
     clicking the game view restores mouse-look capture.
 19. Gameplay interaction zones match the Task 10 cockpit and exit-door markers;
     runtime composition does not apply a second scale to the baked ship mesh.
 20. Cockpit W/S, A/D, and Left/Right Arrow state maps to typed pitch, yaw, and
-    roll without changing the independent character mouse-look state.
+    roll without changing the independent character mouse-look state; A turns
+    left and D turns right in the rendered cockpit view.
 21. Up/Down Arrow changes thruster only on an initial press, never key repeat or
     release; leaving cockpit or losing focus clears held steering input.
 22. L is translated to the ship domain only on an initial press; the runtime

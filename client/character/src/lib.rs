@@ -10,17 +10,52 @@ pub const FIXED_GRAVITY_METERS_PER_SECOND_SQUARED: f64 = 9.81;
 pub const DOORWAY_GRAVITY_BLEND_DURATION: Duration = Duration::from_millis(250);
 const WALK_SPEED_METERS_PER_SECOND: f64 = 3.8;
 const JUMP_SPEED_METERS_PER_SECOND: f64 = 4.4;
-const EYE_HEIGHT_METERS: f64 = 1.62;
-const SHIP_FLOOR_HEIGHT: f64 = 0.46;
+pub const PLAYER_BODY_HEIGHT_METERS: f64 = 1.80;
+pub const PLAYER_EYE_HEIGHT_METERS: f64 = 1.75;
+const PLAYER_RADIUS_METERS: f64 = 0.24;
+const SHIP_FLOOR_HEIGHT: f64 = 0.247_311_827_956_989_25;
+// Keep the player's head below the lowest ceiling lamps and the aft lintel.
+const SHIP_CEILING_HEIGHT: f64 = 2.505 * (4.0 / 3.72);
+const DOORWAY_CEILING_HEIGHT: f64 = 2.34 * (4.0 / 3.72);
 const INTERIOR_FORWARD_MIN: f64 = -7.24;
+const AFT_WALL_FORWARD_MIN: f64 = -7.24 + PLAYER_RADIUS_METERS;
 // Stop walking before the cockpit console; cockpit seating is a contextual
 // transition rather than walking through its visible geometry.
 const INTERIOR_FORWARD_MAX: f64 = 1.30;
-const INTERIOR_SIDE_LIMIT: f64 = 2.86;
+// Window sills project into the 9.20 m deck to Z = +/-4.20 m.
+const INTERIOR_SIDE_LIMIT: f64 = 4.20 - PLAYER_RADIUS_METERS;
 const DOORWAY_FORWARD: f64 = -7.04;
-const COCKPIT_POSITION: [f64; 3] = [2.76, 2.77, 0.0];
+const DOORWAY_SIDE_LIMIT: f64 = 1.40 - PLAYER_RADIUS_METERS;
+// The center Core's two-meter pedestal remains solid, with clear aisles on
+// both sides. Inflate its planar footprint by the player's body radius.
+const CORE_FORWARD_MIN: f64 = -2.0 - PLAYER_RADIUS_METERS;
+const CORE_FORWARD_MAX: f64 = PLAYER_RADIUS_METERS;
+const CORE_SIDE_LIMIT: f64 = 1.0 + PLAYER_RADIUS_METERS;
+// [forward minimum, forward maximum, side minimum, side maximum]. These simple
+// body-expanded footprints match the Core, port sofa, and starboard worktop.
+const INTERIOR_OBSTACLES: [[f64; 4]; 3] = [
+    [
+        CORE_FORWARD_MIN,
+        CORE_FORWARD_MAX,
+        -CORE_SIDE_LIMIT,
+        CORE_SIDE_LIMIT,
+    ],
+    [
+        -5.70 - PLAYER_RADIUS_METERS,
+        -2.24 + PLAYER_RADIUS_METERS,
+        3.60 - PLAYER_RADIUS_METERS,
+        4.44 + PLAYER_RADIUS_METERS,
+    ],
+    [
+        -5.96 - PLAYER_RADIUS_METERS,
+        -3.00 + PLAYER_RADIUS_METERS,
+        -4.48 - PLAYER_RADIUS_METERS,
+        -3.58 + PLAYER_RADIUS_METERS,
+    ],
+];
+const COCKPIT_POSITION: [f64; 3] = [2.76, 1.799_032_258_064_516, 0.0];
 const COCKPIT_VIEW_PITCH_RADIANS: f64 = -0.10;
-const PLAYER_START: [f64; 3] = [-0.70, EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT, 0.0];
+const PLAYER_START: [f64; 3] = [0.50, PLAYER_EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT, -2.20];
 const LOOK_SENSITIVITY_RADIANS_PER_PIXEL: f64 = 0.0022;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
@@ -165,7 +200,7 @@ impl CharacterController {
     pub fn leave_cockpit(&mut self) {
         if matches!(self.position, PositionState::Cockpit) {
             self.position = PositionState::Inside {
-                local: [1.50, EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT, 0.0],
+                local: PLAYER_START,
             };
         }
     }
@@ -189,6 +224,7 @@ impl CharacterController {
         match self.position {
             PositionState::Cockpit => {}
             PositionState::Inside { mut local } => {
+                let previous = local;
                 let movement = movement_axes(input);
                 let (forward, right) = planar_look(self.yaw_radians);
                 local[0] += (forward[0] * movement[0] + right[0] * movement[1])
@@ -197,25 +233,43 @@ impl CharacterController {
                 local[2] += (forward[1] * movement[0] + right[1] * movement[1])
                     * WALK_SPEED_METERS_PER_SECOND
                     * seconds;
-                if jump_started && local[1] <= EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT + 0.001 {
+                if jump_started && local[1] <= PLAYER_EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT + 0.001
+                {
                     self.vertical_speed = JUMP_SPEED_METERS_PER_SECOND;
                 }
                 self.vertical_speed -= FIXED_GRAVITY_METERS_PER_SECOND_SQUARED * seconds;
                 local[1] += self.vertical_speed * seconds;
-                if local[1] <= EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT {
-                    local[1] = EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT;
+                if local[1] <= PLAYER_EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT {
+                    local[1] = PLAYER_EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT;
                     self.vertical_speed = 0.0;
                 }
                 local[2] = local[2].clamp(-INTERIOR_SIDE_LIMIT, INTERIOR_SIDE_LIMIT);
                 local[0] = local[0].min(INTERIOR_FORWARD_MAX);
-                if local[0] < DOORWAY_FORWARD && door_open && ship_landed {
+                local = slide_around_fixtures(previous, local);
+                let ceiling = if local[0] < -6.88 && local[2].abs() < 1.84 {
+                    DOORWAY_CEILING_HEIGHT
+                } else {
+                    SHIP_CEILING_HEIGHT
+                };
+                let maximum_eye = ceiling - (PLAYER_BODY_HEIGHT_METERS - PLAYER_EYE_HEIGHT_METERS);
+                if local[1] > maximum_eye {
+                    local[1] = maximum_eye;
+                    self.vertical_speed = self.vertical_speed.min(0.0);
+                }
+                let within_doorway = local[2].abs() <= DOORWAY_SIDE_LIMIT;
+                if local[0] < DOORWAY_FORWARD && within_doorway && door_open && ship_landed {
                     self.position = PositionState::Doorway {
                         world: ship.local_to_world(local),
                         elapsed: Duration::ZERO,
                         leaving_ship: true,
                     };
                 } else {
-                    local[0] = local[0].max(INTERIOR_FORWARD_MIN);
+                    let aft_limit = if within_doorway {
+                        INTERIOR_FORWARD_MIN
+                    } else {
+                        AFT_WALL_FORWARD_MIN
+                    };
+                    local[0] = local[0].max(aft_limit);
                     self.position = PositionState::Inside { local };
                 }
             }
@@ -240,7 +294,7 @@ impl CharacterController {
                         };
                     } else {
                         let mut local = ship.world_to_local(world);
-                        local[1] = EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT;
+                        local[1] = PLAYER_EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT;
                         self.position = PositionState::Inside { local };
                     }
                 } else {
@@ -265,8 +319,8 @@ impl CharacterController {
                 world = project_eye_to_surface(world, surface);
 
                 let local = ship.world_to_local(world);
-                let near_door =
-                    (local[0] - (DOORWAY_FORWARD - 0.12)).abs() < 0.8 && local[2].abs() < 0.8;
+                let near_door = (local[0] - (DOORWAY_FORWARD - 0.12)).abs() < 0.8
+                    && local[2].abs() <= DOORWAY_SIDE_LIMIT;
                 if door_open && ship_landed && near_door && movement[0] > 0.0 {
                     self.position = PositionState::Doorway {
                         world,
@@ -345,6 +399,32 @@ impl CharacterController {
     }
 }
 
+fn slide_around_fixtures(previous: [f64; 3], mut proposed: [f64; 3]) -> [f64; 3] {
+    // Resolve one planar axis at a time so diagonal input slides along the
+    // fixtures instead of stopping the player or tunneling through a corner.
+    for [forward_min, forward_max, side_min, side_max] in INTERIOR_OBSTACLES {
+        if previous[2] > side_min && previous[2] < side_max {
+            proposed[0] = stop_at_obstacle(previous[0], proposed[0], forward_min, forward_max);
+        }
+    }
+    for [forward_min, forward_max, side_min, side_max] in INTERIOR_OBSTACLES {
+        if proposed[0] > forward_min && proposed[0] < forward_max {
+            proposed[2] = stop_at_obstacle(previous[2], proposed[2], side_min, side_max);
+        }
+    }
+    proposed
+}
+
+fn stop_at_obstacle(previous: f64, proposed: f64, minimum: f64, maximum: f64) -> f64 {
+    if previous <= minimum && proposed > minimum {
+        minimum
+    } else if previous >= maximum && proposed < maximum {
+        maximum
+    } else {
+        proposed
+    }
+}
+
 fn movement_axes(input: MovementInput) -> [f64; 2] {
     let forward = f64::from(u8::from(input.forward)) - f64::from(u8::from(input.backward));
     let right = f64::from(u8::from(input.right)) - f64::from(u8::from(input.left));
@@ -366,7 +446,7 @@ fn project_eye_to_surface(world: [f64; 3], surface: SurfaceFrame) -> [f64; 3] {
         surface.body_center_meters,
         scale(
             normalize(sub(world, surface.body_center_meters)),
-            surface.radius_meters + EYE_HEIGHT_METERS,
+            surface.radius_meters + PLAYER_EYE_HEIGHT_METERS,
         ),
     )
 }
@@ -445,14 +525,234 @@ mod tests {
     }
 
     #[test]
-    fn task10_anchors_and_walk_bounds_match_the_enlarged_ship() {
-        assert_eq!(PLAYER_START, [-0.70, 2.08, 0.0]);
-        assert_eq!(COCKPIT_POSITION, [2.76, 2.77, 0.0]);
-        assert_eq!(SHIP_FLOOR_HEIGHT, 0.46);
+    fn anchors_and_walk_bounds_match_the_wider_ship() {
+        assert_eq!(PLAYER_BODY_HEIGHT_METERS, 1.80);
+        assert_eq!(PLAYER_EYE_HEIGHT_METERS, 1.75);
+        assert_eq!(PLAYER_START, [0.50, 1.997_311_827_956_989_2, -2.20]);
+        assert_eq!(COCKPIT_POSITION, [2.76, 1.799_032_258_064_516, 0.0]);
+        assert_eq!(SHIP_FLOOR_HEIGHT, 0.247_311_827_956_989_25);
         assert_eq!(INTERIOR_FORWARD_MIN, -7.24);
         assert_eq!(INTERIOR_FORWARD_MAX, 1.30);
-        assert_eq!(INTERIOR_SIDE_LIMIT, 2.86);
+        assert!((INTERIOR_SIDE_LIMIT - 3.96).abs() < 1.0e-12);
         assert_eq!(DOORWAY_FORWARD, -7.04);
+    }
+
+    fn inside_at(x: f64, z: f64) -> CharacterController {
+        CharacterController {
+            position: PositionState::Inside {
+                local: [x, PLAYER_START[1], z],
+            },
+            ..CharacterController::default()
+        }
+    }
+
+    fn walk_steps(controller: &mut CharacterController, input: MovementInput, steps: u32) {
+        for _ in 0..steps {
+            controller.advance(
+                Duration::from_millis(100),
+                input,
+                frame(),
+                surface(),
+                false,
+                true,
+            );
+        }
+    }
+
+    #[test]
+    fn cockpit_exit_returns_to_clear_aisle_without_a_position_snap() {
+        let mut controller = CharacterController::default();
+        controller.enter_cockpit();
+        controller.leave_cockpit();
+        assert_eq!(controller.local_ship_position(), Some(PLAYER_START));
+        walk_steps(&mut controller, MovementInput::default(), 1);
+        assert_eq!(controller.local_ship_position(), Some(PLAYER_START));
+    }
+
+    #[test]
+    fn center_core_blocks_approaches_from_all_four_sides() {
+        for (x, z, input, expected_x, expected_z) in [
+            (
+                -3.0,
+                0.0,
+                MovementInput {
+                    forward: true,
+                    ..MovementInput::default()
+                },
+                CORE_FORWARD_MIN,
+                0.0,
+            ),
+            (
+                1.2,
+                0.0,
+                MovementInput {
+                    backward: true,
+                    ..MovementInput::default()
+                },
+                CORE_FORWARD_MAX,
+                0.0,
+            ),
+            (
+                -1.0,
+                -2.0,
+                MovementInput {
+                    right: true,
+                    ..MovementInput::default()
+                },
+                -1.0,
+                -CORE_SIDE_LIMIT,
+            ),
+            (
+                -1.0,
+                2.0,
+                MovementInput {
+                    left: true,
+                    ..MovementInput::default()
+                },
+                -1.0,
+                CORE_SIDE_LIMIT,
+            ),
+        ] {
+            let mut controller = inside_at(x, z);
+            walk_steps(&mut controller, input, 20);
+            let local = controller.local_ship_position().unwrap();
+            assert_eq!(local[0], expected_x);
+            assert_eq!(local[2], expected_z);
+        }
+    }
+
+    #[test]
+    fn diagonal_movement_slides_along_core_and_can_round_its_corner() {
+        let mut controller = inside_at(CORE_FORWARD_MIN, 0.0);
+        let input = MovementInput {
+            forward: true,
+            right: true,
+            ..MovementInput::default()
+        };
+        walk_steps(&mut controller, input, 3);
+        let alongside = controller.local_ship_position().unwrap();
+        assert_eq!(alongside[0], CORE_FORWARD_MIN);
+        assert!(alongside[2] > 0.7);
+        walk_steps(&mut controller, input, 8);
+        let around_corner = controller.local_ship_position().unwrap();
+        assert!(around_corner[0] > CORE_FORWARD_MIN + 1.0);
+        assert!(around_corner[2] > CORE_SIDE_LIMIT);
+    }
+
+    #[test]
+    fn both_aisles_allow_walking_from_rear_cabin_to_cockpit() {
+        for side in [-2.4, 2.4] {
+            let mut controller = inside_at(-6.0, side);
+            walk_steps(
+                &mut controller,
+                MovementInput {
+                    forward: true,
+                    ..MovementInput::default()
+                },
+                24,
+            );
+            let local = controller.local_ship_position().unwrap();
+            assert_eq!(local[0], INTERIOR_FORWARD_MAX);
+            assert_eq!(local[2], side);
+        }
+    }
+
+    #[test]
+    fn wider_cabin_allows_window_approaches_and_stops_before_window_sills() {
+        for (side, input) in [
+            (
+                -1.0,
+                MovementInput {
+                    left: true,
+                    ..MovementInput::default()
+                },
+            ),
+            (
+                1.0,
+                MovementInput {
+                    right: true,
+                    ..MovementInput::default()
+                },
+            ),
+        ] {
+            let mut controller = inside_at(-6.5, 0.0);
+            walk_steps(&mut controller, input, 20);
+            let local = controller.local_ship_position().unwrap();
+            assert!((local[2] - side * 3.96).abs() < 1.0e-12);
+            assert!(local[2].abs() > 3.9);
+        }
+    }
+
+    #[test]
+    fn port_sofa_and_starboard_worktop_block_walkers_with_body_clearance() {
+        for (input, expected_side) in [
+            (
+                MovementInput {
+                    right: true,
+                    ..MovementInput::default()
+                },
+                3.36,
+            ),
+            (
+                MovementInput {
+                    left: true,
+                    ..MovementInput::default()
+                },
+                -3.34,
+            ),
+        ] {
+            let mut controller = inside_at(-4.5, 0.0);
+            walk_steps(&mut controller, input, 20);
+            let local = controller.local_ship_position().unwrap();
+            assert!((local[2] - expected_side).abs() < 1.0e-12);
+        }
+        for (side, expected_forward) in [(3.5, -5.94), (-3.5, -6.20)] {
+            let mut controller = inside_at(-6.5, side);
+            walk_steps(
+                &mut controller,
+                MovementInput {
+                    forward: true,
+                    ..MovementInput::default()
+                },
+                20,
+            );
+            assert!(
+                (controller.local_ship_position().unwrap()[0] - expected_forward).abs() < 1.0e-12
+            );
+        }
+    }
+
+    #[test]
+    fn jump_keeps_player_head_below_ceiling_lamps_and_aft_lintel() {
+        for (x, z, ceiling) in [
+            (0.5, -2.2, SHIP_CEILING_HEIGHT),
+            (-7.0, 0.0, DOORWAY_CEILING_HEIGHT),
+        ] {
+            let mut controller = inside_at(x, z);
+            let mut highest_eye = PLAYER_START[1];
+            let head_above_eye = PLAYER_BODY_HEIGHT_METERS - PLAYER_EYE_HEIGHT_METERS;
+            for _ in 0..100 {
+                controller.advance(
+                    Duration::from_millis(16),
+                    MovementInput {
+                        jump: true,
+                        ..MovementInput::default()
+                    },
+                    frame(),
+                    surface(),
+                    false,
+                    true,
+                );
+                let eye = controller.local_ship_position().unwrap()[1];
+                highest_eye = highest_eye.max(eye);
+                assert!(eye + head_above_eye <= ceiling + 1.0e-12);
+            }
+            assert!((highest_eye + head_above_eye - ceiling).abs() < 1.0e-12);
+            assert_eq!(
+                controller.local_ship_position().unwrap()[1],
+                PLAYER_START[1]
+            );
+        }
     }
 
     #[test]
@@ -552,6 +852,97 @@ mod tests {
     }
 
     #[test]
+    fn open_door_does_not_allow_walking_through_rear_windows_or_door_jambs() {
+        for side in [-4.0, -1.20, 1.20, 4.0] {
+            let mut controller = inside_at(-7.0, side);
+            for _ in 0..10 {
+                controller.advance(
+                    Duration::from_millis(100),
+                    MovementInput {
+                        backward: true,
+                        ..MovementInput::default()
+                    },
+                    frame(),
+                    surface(),
+                    true,
+                    true,
+                );
+            }
+            assert_eq!(controller.location(), CharacterLocation::InsideShip);
+            assert_eq!(
+                controller.local_ship_position().unwrap()[0],
+                AFT_WALL_FORWARD_MIN
+            );
+        }
+    }
+
+    #[test]
+    fn doorway_aperture_accepts_player_body_clearance_on_both_sides() {
+        for side in [-1.15, 0.0, 1.15] {
+            let mut controller = inside_at(-7.0, side);
+            controller.advance(
+                Duration::from_millis(50),
+                MovementInput {
+                    backward: true,
+                    ..MovementInput::default()
+                },
+                frame(),
+                surface(),
+                true,
+                true,
+            );
+            assert_eq!(controller.location(), CharacterLocation::DoorwayBlend);
+        }
+    }
+
+    #[test]
+    fn surface_reentry_uses_same_clear_doorway_and_reaches_cabin_floor() {
+        for side in [-1.30_f64, -1.15, 1.15, 1.30] {
+            let mut controller = CharacterController {
+                position: PositionState::Surface {
+                    world: project_eye_to_surface(
+                        frame().local_to_world([-8.0, PLAYER_START[1], side]),
+                        surface(),
+                    ),
+                },
+                ..CharacterController::default()
+            };
+            let input = MovementInput {
+                forward: true,
+                ..MovementInput::default()
+            };
+            controller.advance(
+                Duration::from_millis(100),
+                input,
+                frame(),
+                surface(),
+                true,
+                true,
+            );
+            if side.abs() > DOORWAY_SIDE_LIMIT {
+                assert_eq!(controller.location(), CharacterLocation::Surface);
+            } else {
+                assert_eq!(controller.location(), CharacterLocation::DoorwayBlend);
+                for _ in 0..16 {
+                    controller.advance(
+                        Duration::from_millis(16),
+                        input,
+                        frame(),
+                        surface(),
+                        true,
+                        true,
+                    );
+                }
+                assert_eq!(controller.location(), CharacterLocation::InsideShip);
+                let local = controller.local_ship_position().unwrap();
+                assert!(local[0] > DOORWAY_FORWARD);
+                assert!(local[2].abs() < DOORWAY_SIDE_LIMIT);
+                assert_eq!(local[1], PLAYER_START[1]);
+            }
+        }
+    }
+
+    #[test]
     fn landed_open_door_starts_exact_quarter_second_gravity_blend() {
         let mut controller = CharacterController {
             position: PositionState::Inside {
@@ -596,7 +987,7 @@ mod tests {
     fn surface_motion_stays_on_full_sphere_with_fixed_eye_height() {
         let mut controller = CharacterController {
             position: PositionState::Surface {
-                world: [0.0, 11.62, 0.0],
+                world: [0.0, 11.75, 0.0],
             },
             ..CharacterController::default()
         };
@@ -617,6 +1008,6 @@ mod tests {
         );
         let snapshot = controller.snapshot(frame(), small_surface);
         let radius = dot(snapshot.eye_position_meters, snapshot.eye_position_meters).sqrt();
-        assert!((radius - 11.62).abs() < 1.0e-9);
+        assert!((radius - 11.75).abs() < 1.0e-9);
     }
 }

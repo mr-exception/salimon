@@ -5,8 +5,10 @@ current milestone is **Phase 0 — Technical Feasibility Showcase**: a native ma
 client-only prototype using a custom `wgpu` renderer, with Windows and web as
 later targets. The reference performance machine is a MacBook Air M1.
 
-This repository includes **task 10: Scale spaceship to at least twice its current
-size** and the completed first-person character and walkable ship shell.
+The custom scout now includes a wider living cabin, panoramic side/rear windows,
+a central Energy Core, warm materials and detailed aft thrusters. See the
+[ship design preview](client/assets/ship/preview.jpg). It builds on Task 10
+proportions and the first-person character and walkable ship shell.
 The native client starts inside the custom Task 7
 Salimon scout landed on Earth, with portable character/ship state, runtime-loaded
 GLB geometry, walking, free mouse look, jumping, cockpit interaction, a landed-only
@@ -142,9 +144,11 @@ Rendering and diagnostics require an interactive check on macOS in addition to
 automated tests:
 
 1. Launch the client at 1920×1080 and confirm it starts inside the enlarged
-   landed ship facing the cockpit. Walk and mouse-look around the cockpit/cabin,
+   landed ship facing the cockpit. Inspect the warm 9.20 m-wide cabin, walk
+   both routes around the central Energy Core, and look through the side/rear
+   windows and forward from behind the lowered chair. Walk around the cockpit/cabin,
    jump, and check the invisible interior collision boundaries. Confirm the
-   20.30 × 7.44 × 16.60 m ship has no severe 0.05 m near-plane clipping.
+   20.30 × 4.00 × 20.00 m ship has no severe 0.05 m near-plane clipping.
 2. Use E for instant cockpit entry/exit and to open the aft door. Walk outside,
    confirm the 0.25-second gravity transition is smooth, inspect the custom
    exterior/material variation, confirm its lowest point rests on Earth without

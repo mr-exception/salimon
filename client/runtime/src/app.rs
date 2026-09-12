@@ -22,7 +22,7 @@ use salimon_world::{
     WorldPosition, WorldSnapshot,
 };
 use winit::application::ApplicationHandler;
-use winit::dpi::LogicalSize;
+use winit::dpi::{LogicalSize, PhysicalSize};
 use winit::event::{DeviceEvent, DeviceId, ElementState, WindowEvent};
 use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
 use winit::keyboard::{KeyCode, PhysicalKey};
@@ -32,8 +32,8 @@ use crate::frame_clock::FrameClock;
 use crate::update_clock::UpdateClock;
 
 const WINDOW_TITLE: &str = "Salimon — Compressed Solar System";
-const INITIAL_WIDTH: f64 = 1280.0;
-const INITIAL_HEIGHT: f64 = 720.0;
+const INITIAL_WIDTH: u32 = 1920;
+const INITIAL_HEIGHT: u32 = 1080;
 const MINIMUM_WIDTH: f64 = 640.0;
 const MINIMUM_HEIGHT: f64 = 360.0;
 const TIMING_LOG_INTERVAL: u64 = 300;
@@ -43,6 +43,10 @@ const COCKPIT_INTERACTION_POSITION_METERS: [f64; 3] = [2.76, 1.799_032_258_064_5
 const COCKPIT_INTERACTION_RANGE_METERS: f64 = 4.0;
 const COCKPIT_INTERACTION_MINIMUM_AIM_DOT: f64 = 0.866_025_403_784_438_6;
 const COCKPIT_INTERACTION_PROMPT: &str = "Press E to use";
+
+const fn initial_window_size() -> PhysicalSize<u32> {
+    PhysicalSize::new(INITIAL_WIDTH, INITIAL_HEIGHT)
+}
 
 pub(crate) fn run() -> Result<(), RunError> {
     let event_loop = EventLoop::new()
@@ -200,7 +204,7 @@ impl ClientApplication {
 
         let attributes = WindowAttributes::default()
             .with_title(WINDOW_TITLE)
-            .with_inner_size(LogicalSize::new(INITIAL_WIDTH, INITIAL_HEIGHT))
+            .with_inner_size(initial_window_size())
             .with_min_inner_size(LogicalSize::new(MINIMUM_WIDTH, MINIMUM_HEIGHT))
             .with_resizable(true);
         let window = event_loop
@@ -1082,9 +1086,9 @@ mod tests {
     use super::{
         COCKPIT_INTERACTION_PROMPT, INITIAL_HEIGHT, INITIAL_WIDTH, InteractionTarget,
         ShipControlInput, camera_body_distances, camera_command, camera_domain_metrics,
-        format_metric_speed, gameplay_window_title, interaction_target, is_diagnostics_toggle,
-        landing_action_pressed, map_world_to_renderer, release_cursor_pressed, ship_control_key,
-        thruster_step, update_ship_control_input,
+        format_metric_speed, gameplay_window_title, initial_window_size, interaction_target,
+        is_diagnostics_toggle, landing_action_pressed, map_world_to_renderer,
+        release_cursor_pressed, ship_control_key, thruster_step, update_ship_control_input,
     };
     use salimon_ship::{FlightState, ShipController};
     use salimon_world::{CELESTIAL_BODIES, CameraCommand, CameraPrototype, CelestialBodyId};
@@ -1353,7 +1357,7 @@ mod tests {
     #[test]
     fn initial_overview_fully_frames_every_sphere() {
         let snapshot = CameraPrototype::default().snapshot();
-        let aspect_ratio = INITIAL_WIDTH / INITIAL_HEIGHT;
+        let aspect_ratio = INITIAL_WIDTH as f64 / INITIAL_HEIGHT as f64;
         let vertical_tangent = (snapshot.camera.vertical_field_of_view_radians * 0.5).tan();
         let horizontal_tangent = vertical_tangent * aspect_ratio;
 
@@ -1377,6 +1381,12 @@ mod tests {
                 body.name
             );
         }
+    }
+
+    #[test]
+    fn initial_drawable_requests_the_phase_zero_benchmark_resolution() {
+        assert_eq!(initial_window_size().width, 1920);
+        assert_eq!(initial_window_size().height, 1080);
     }
 
     #[test]

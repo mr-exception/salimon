@@ -85,10 +85,11 @@ cargo build --workspace --locked
 cargo run --locked -p salimon-client
 ```
 
-The run command opens the **Salimon — Compressed Solar System** native window and
-continues until the window is closed. It captures the cursor for mouse look and
-starts inside the landed ship facing the cockpit. Use **WASD** to walk, the mouse
-to look, and **Space** to jump. Press **E** near the cockpit to enter or leave
+The run command opens the **Salimon — Compressed Solar System** native window at
+the Phase 0 benchmark's physical 1920×1080 drawable size and continues until the
+window is closed. It captures the cursor for mouse look and starts inside the
+landed ship facing the cockpit. Use **WASD** to walk, the mouse to look, and
+**Space** to jump. Press **E** near the cockpit to enter or leave
 control instantly; press **E** near the aft door to open/close it while landed.
 Walk backward through the open door to transition over 0.25 seconds to Earth-radial
 gravity and inspect the ship exterior. There is no sprint or crouch. Press
@@ -143,7 +144,7 @@ root `target/` directory. No application bundle or installer exists yet.
 Rendering and diagnostics require an interactive check on macOS in addition to
 automated tests:
 
-1. Launch the client at 1920×1080 and confirm it starts inside the enlarged
+1. Launch the client and confirm its initial drawable is 1920×1080 and it starts inside the enlarged
    landed ship facing the cockpit. Inspect the warm 9.20 m-wide cabin, walk
    both routes around the central Energy Core, and look through the side/rear
    windows and forward from behind the lowered chair. Walk around the cockpit/cabin,

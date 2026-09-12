@@ -8,7 +8,8 @@ client composition. It drives `salimon-character`, `salimon-ship`,
 implementation.
 
 Run from the repository root with `cargo run --locked -p salimon-client`.
-The process opens a resizable native window and runs until the window is closed.
+The process requests a physical 1920×1080 initial drawable for the Phase 0
+benchmark, opens a resizable native window, and runs until the window is closed.
 
 ## Lifecycle contract
 

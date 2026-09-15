@@ -1,6 +1,6 @@
 {
   "name": "Salimon Phase 0 Scout",
-  "assetVersion": 6,
+  "assetVersion": 7,
   "source": "source/generate_salimon_phase0_ship.py",
   "editableInterchange": "export/salimon_phase0_ship.gltf",
   "runtimeAsset": "export/salimon_phase0_ship.glb",
@@ -58,6 +58,15 @@
       "Cabin_Starboard_Glazing",
       "Cabin_Aft_Glazing"
     ]
+  },
+  "cockpitSideMonitors": {
+    "pilotFacingTargetMeters": [
+      2.76,
+      1.799032258064516,
+      0.0
+    ],
+    "orientation": "symmetric yaw toward the seated pilot viewpoint",
+    "validatedFromSeat": true
   },
   "license": "Custom original Salimon project asset; no external asset dependencies",
   "interior": {

@@ -5,7 +5,7 @@
     "copyright": "Copyright 2026 Salimon contributors; custom original asset",
     "extras": {
       "salimon": {
-        "assetVersion": 6,
+        "assetVersion": 7,
         "units": "meters",
         "upAxis": "+Y",
         "forwardAxis": "+X",
@@ -430,11 +430,33 @@
     },
     {
       "name": "Monitor_Port",
-      "mesh": 58
+      "mesh": 58,
+      "extras": {
+        "salimon": {
+          "interactive": "cockpit-monitor",
+          "pilotFacingTargetMeters": [
+            2.76,
+            1.799032258064516,
+            0.0
+          ],
+          "pilotFacingYawDegrees": -57.658509
+        }
+      }
     },
     {
       "name": "Monitor_Starboard",
-      "mesh": 59
+      "mesh": 59,
+      "extras": {
+        "salimon": {
+          "interactive": "cockpit-monitor",
+          "pilotFacingTargetMeters": [
+            2.76,
+            1.799032258064516,
+            0.0
+          ],
+          "pilotFacingYawDegrees": 57.658509
+        }
+      }
     },
     {
       "name": "Pilot_Seat_Base",
@@ -6902,14 +6924,14 @@
       "count": 24,
       "type": "VEC3",
       "min": [
-        4.16,
+        3.786160694169854,
         0.7956989247311828,
-        1.82
+        1.9963230436622594
       ],
       "max": [
-        4.26,
+        4.633839305830146,
         0.9462365591397849,
-        2.76
+        2.5836769563377406
       ]
     },
     {
@@ -6942,14 +6964,14 @@
       "count": 24,
       "type": "VEC3",
       "min": [
-        4.16,
+        3.786160694169854,
         0.7956989247311828,
-        -2.76
+        -2.5836769563377406
       ],
       "max": [
-        4.26,
+        4.633839305830146,
         0.9462365591397849,
-        -1.82
+        -1.9963230436622594
       ]
     },
     {

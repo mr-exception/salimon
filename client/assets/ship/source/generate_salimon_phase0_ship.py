@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Generate Salimon's custom Phase 0 ship as glTF 2.0 and GLB.
 
-The script is the editable, deterministic DCC source for Tasks 7, 9, and 10. It uses only
+The script is the editable, deterministic DCC source for Tasks 7, 9, 10, and the
+cockpit asset follow-ups. It uses only
 the Python standard library so later agents can reshape the ship by changing
 named dimensions/components and regenerate the runtime exports without Blender.
 The emitted .gltf can also be imported directly into Blender for hand editing.
@@ -134,6 +135,44 @@ def scaled_geometry(geometry: Geometry) -> Geometry:
         ],
         texcoords=geometry.texcoords.copy(),
         indices=geometry.indices.copy(),
+    )
+
+
+def face_geometry_toward_xz(
+    geometry: Geometry,
+    pivot: tuple[float, float],
+    target: Sequence[float],
+) -> tuple[Geometry, float]:
+    """Yaw geometry whose authored -X face normal points at an X/Z target."""
+    pivot_x, pivot_z = pivot
+    toward_x = target[0] - pivot_x
+    toward_z = target[2] - pivot_z
+    length = math.hypot(toward_x, toward_z)
+    if length == 0.0:
+        raise ValueError("monitor target cannot coincide with its pivot")
+    normal_x, normal_z = toward_x / length, toward_z / length
+    cosine, sine = -normal_x, normal_z
+
+    def rotate(value: Sequence[float], translate: bool) -> tuple[float, float, float]:
+        x = value[0] - pivot_x if translate else value[0]
+        z = value[2] - pivot_z if translate else value[2]
+        rotated = (
+            cosine * x + sine * z,
+            value[1],
+            -sine * x + cosine * z,
+        )
+        if translate:
+            return (rotated[0] + pivot_x, rotated[1], rotated[2] + pivot_z)
+        return normalize(rotated)
+
+    return (
+        Geometry(
+            positions=[rotate(position, True) for position in geometry.positions],
+            normals=[rotate(normal, False) for normal in geometry.normals],
+            texcoords=geometry.texcoords.copy(),
+            indices=geometry.indices.copy(),
+        ),
+        math.degrees(math.atan2(sine, cosine)),
     )
 
 
@@ -554,8 +593,21 @@ def ship_components() -> list[Component]:
     add("Cockpit_Console_Port",box(1.78,3.02,.23,.74,.82,1.48),11,"Interior")
     add("Cockpit_Console_Starboard",box(1.78,3.02,.23,.74,-1.48,-.82),11,"Interior")
     add("Monitor_Center",box(2.155,2.18,.68,.98,-.48,.48),6,"Interior",interactive="cockpit-monitor")
-    add("Monitor_Port",box(2.08,2.13,.74,.88,.91,1.38),6,"Interior")
-    add("Monitor_Starboard",box(2.08,2.13,.74,.88,-1.38,-.91),6,"Interior")
+    authored_pilot_viewpoint = (
+        COCKPIT_VIEWPOINT_METERS[0] / HORIZONTAL_SCALE_FROM_TASK7,
+        COCKPIT_VIEWPOINT_METERS[1] / VERTICAL_SCALE_FROM_TASK7,
+        COCKPIT_VIEWPOINT_METERS[2] / HORIZONTAL_SCALE_FROM_TASK7,
+    )
+    for label, z0, z1 in (("Port",.91,1.38),("Starboard",-1.38,-.91)):
+        monitor, yaw_degrees = face_geometry_toward_xz(
+            box(2.08,2.13,.74,.88,z0,z1),
+            ((2.08+2.13)/2,(z0+z1)/2),
+            authored_pilot_viewpoint,
+        )
+        add(f"Monitor_{label}",monitor,6,"Interior",
+            interactive="cockpit-monitor",
+            pilotFacingTargetMeters=COCKPIT_VIEWPOINT_METERS,
+            pilotFacingYawDegrees=round(yaw_degrees,6))
     add("Pilot_Seat_Base",combined(box(.94,1.62,.23,.51,-.36,.36),box(.90,1.62,.51,.65,-.40,.40)),5,"Interior")
     add("Pilot_Seat_Back",box(.78,1.00,.51,1.40,-.40,.40),10,"Interior",interactive="cockpit-seat")
     add("Pilot_Seat_Accent",combined(box(1.0,1.06,.66,1.31,-.32,.32),box(1.05,1.55,.65,.71,-.36,.36)),12,"Interior")
@@ -754,7 +806,7 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
             "copyright": "Copyright 2026 Salimon contributors; custom original asset",
             "extras": {
                 "salimon": {
-                    "assetVersion": 6,
+                    "assetVersion": 7,
                     "units": "meters",
                     "upAxis": "+Y",
                     "forwardAxis": "+X",

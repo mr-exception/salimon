@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import math
 import struct
 from pathlib import Path
 
@@ -120,6 +121,35 @@ def validate_sightlines(document: dict, binary: bytes) -> None:
                 if glass:glass_hit=True
                 else:assert False, f"{label} obstructed by {name} at {min(distances):.2f}m"
         assert glass_hit, f"{label} misses modeled glazing"
+    # Both side screens must face the actual seated viewpoint, not ship-aft.
+    seated_eye=(2.76,1.799032258064516,0.)
+    for label, sign in (("Port",1),("Starboard",-1)):
+        name=f"Monitor_{label}"
+        monitor=node(document,name)
+        metadata=monitor["extras"]["salimon"]
+        assert_vectors_close(metadata["pilotFacingTargetMeters"],list(seated_eye))
+        pivot=(4.21,.81*4/3.72,sign*2.29)
+        toward_eye=sub(seated_eye,pivot)
+        length=math.hypot(toward_eye[0],toward_eye[2])
+        expected_normal=(toward_eye[0]/length,0.,toward_eye[2]/length)
+        expected_yaw=math.degrees(math.atan2(expected_normal[2],-expected_normal[0]))
+        assert abs(metadata["pilotFacingYawDegrees"]-expected_yaw) < 1e-5
+        assert abs(expected_yaw) > 45., f"{name} still faces mostly toward ship rear"
+
+        primitive=document["meshes"][monitor["mesh"]]["primitives"][0]
+        positions=values(primitive["attributes"]["POSITION"])
+        normals=values(primitive["attributes"]["NORMAL"])
+        front=[position for position,normal in zip(positions,normals)
+               if dot(normal,expected_normal) > .99999]
+        assert len(front)==4, f"{name} must retain one readable rectangular face"
+        center=tuple(sum(point[axis] for point in front)/4 for axis in range(3))
+        for corner in front:
+            target=tuple(center[axis]+.8*(corner[axis]-center[axis]) for axis in range(3))
+            direction=sub(target,seated_eye)
+            hits=[(distance,mesh_name) for mesh_name,glass,triangles in meshes
+                  if not glass for tri in triangles
+                  if (distance:=hit(seated_eye,direction,tri)) is not None]
+            assert hits and min(hits)[1] == name, f"{name} is not inspectable from the seat"
     # End caps used to conceal the thruster emitters. Trace down each nozzle.
     for label, z in (("Port",7.10),("Starboard",-7.10)):
         origin=(-10.5,4/3.72,z)

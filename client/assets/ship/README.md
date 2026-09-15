@@ -78,6 +78,11 @@ window panes into a second draw; it preserves emissive color separately and
 applies a warm fill to `Interior` descendants. There are no dynamic shadows,
 post effects, additional light passes or per-frame geometry generation.
 
+`Monitor_Port` and `Monitor_Starboard` are yawed symmetrically toward the authored
+seated eye `[2.76, 1.799, 0.0]`, rather than retaining rear-facing `-X` screens.
+Their pilot-facing targets and yaw angles are recorded in node metadata so source,
+export, validation, and the renderer's baked transforms share one contract.
+
 ## Budgets and verification
 
 Current export: **4,476 triangles, 91 primitives, 13 materials**.
@@ -90,7 +95,8 @@ No third-party models, textures or other external asset dependencies are used.
 
 The validator checks exports agree, buffer/GLB structure, hierarchy, material
 budgets, measured bounds, floor alignment, Core metadata and housing containment
-inside its collider, seat height and actual
+inside its collider, side-monitor pilot-facing normals and unobstructed seated
+inspection rays, seat height and actual
 triangle ray intersections for forward seated/standing and side/rear window
 sightlines, plus unoccluded recessed engine emitters. Rust tests cover import/emission, widened walking, core/furniture
 containment, doorway transitions, cockpit access and collision radius.

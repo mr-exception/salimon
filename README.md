@@ -28,6 +28,9 @@ holds the task list and documentation. Start with
 [Technical Architecture & AI Maintenance](https://app.notion.com/p/3d5b456853b981078a82c68207f4444e).
 [AGENTS.md](AGENTS.md) describes how future agents should access those sources;
 [docs/notion.md](docs/notion.md) records the stable page and database identifiers.
+The checked-in [Phase 0 evaluation](docs/phase-0-evaluation.md) records the
+go-with-revisions decision, benchmark evidence, limitations, and required
+follow-up before Phase 1.
 
 ## Repository boundaries
 

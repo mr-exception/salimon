@@ -11,4 +11,5 @@ and cockpit views, the default forward cockpit-window sightline, central Core
 and furniture collision and sliding, both cabin aisles, window sill clearance,
 ceiling and lintel containment, rear doorway body clearance, safe cockpit exit,
 and constant-radius full-sphere movement. Add a focused unit test whenever one of
-these rules changes.
+these rules changes. Surface camera and movement direction must continue to share
+the same yaw-derived local tangent basis rather than using fixed ship/world axes.

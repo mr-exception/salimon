@@ -24,3 +24,6 @@
     intersecting the Core, chair, or walking boundary.
 14. Jumping keeps the complete player body below the ceiling fixtures and the
     lower door lintel; reaching the ceiling cancels upward speed.
+15. Surface W/S movement follows the camera's horizontal forward/back direction,
+    A/D follows its tangent-plane right/left direction, and all four directions
+    remain tangent to the active solid body at every sphere orientation.

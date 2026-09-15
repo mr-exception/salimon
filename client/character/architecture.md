@@ -25,4 +25,7 @@ The seated cockpit snapshot starts with only a slight downward pitch so its Task
 10 anchor and forward ray clear the console and solid nose while crossing the
 glazing. The 1.80 m body / 1.75 m eye-height contract and ship-local anchors
 follow the wider 4.00 m-tall asset. Mouse look remains unrestricted and
-independent of ship orientation.
+independent of ship orientation. On a solid-body surface, the controller derives
+one camera-relative tangent basis from yaw and the local radial up vector; both
+the camera snapshot and WASD movement consume that basis so forward and strafing
+remain view-relative at every sphere orientation.

@@ -307,9 +307,7 @@ impl CharacterController {
             }
             PositionState::Surface { mut world } => {
                 let up = normalize(sub(world, surface.body_center_meters));
-                let reference_forward = reject(ship.axes[0], up);
-                let forward = normalize_or(reference_forward, ship.axes[2]);
-                let right = normalize(cross(forward, up));
+                let (forward, right) = surface_view_basis(ship.axes, up, self.yaw_radians);
                 let movement = movement_axes(input);
                 let tangent = add(scale(forward, movement[0]), scale(right, movement[1]));
                 world = add(
@@ -365,15 +363,14 @@ impl CharacterController {
                 )
             }
         };
-        let (planar_forward, _) = planar_look(self.yaw_radians);
-        let raw_forward = normalize(add(
-            scale(ship.axes[0], planar_forward[0]),
-            scale(ship.axes[2], planar_forward[1]),
-        ));
         let base_forward = if matches!(self.position, PositionState::Surface { .. }) {
-            normalize_or(reject(raw_forward, up), reject(ship.axes[2], up))
+            surface_view_basis(ship.axes, up, self.yaw_radians).0
         } else {
-            raw_forward
+            let (planar_forward, _) = planar_look(self.yaw_radians);
+            normalize(add(
+                scale(ship.axes[0], planar_forward[0]),
+                scale(ship.axes[2], planar_forward[1]),
+            ))
         };
         let right = normalize(cross(base_forward, up));
         let pitch = self.pitch_radians
@@ -439,6 +436,33 @@ fn movement_axes(input: MovementInput) -> [f64; 2] {
 fn planar_look(yaw: f64) -> ([f64; 2], [f64; 2]) {
     let forward = [yaw.cos(), yaw.sin()];
     (forward, [-forward[1], forward[0]])
+}
+
+fn surface_view_basis(
+    ship_axes: [[f64; 3]; 3],
+    up: [f64; 3],
+    yaw_radians: f64,
+) -> ([f64; 3], [f64; 3]) {
+    let (planar_forward, _) = planar_look(yaw_radians);
+    let raw_forward = add(
+        scale(ship_axes[0], planar_forward[0]),
+        scale(ship_axes[2], planar_forward[1]),
+    );
+    let forward = normalize_or(
+        reject(raw_forward, up),
+        normalize_or(reject(ship_axes[2], up), orthogonal_tangent(up)),
+    );
+    let right = normalize(cross(forward, up));
+    (forward, right)
+}
+
+fn orthogonal_tangent(normal: [f64; 3]) -> [f64; 3] {
+    let reference = if normal[1].abs() < 0.9 {
+        [0.0, 1.0, 0.0]
+    } else {
+        [1.0, 0.0, 0.0]
+    };
+    normalize(cross(normal, reference))
 }
 
 fn project_eye_to_surface(world: [f64; 3], surface: SurfaceFrame) -> [f64; 3] {
@@ -1009,5 +1033,158 @@ mod tests {
         let snapshot = controller.snapshot(frame(), small_surface);
         let radius = dot(snapshot.eye_position_meters, snapshot.eye_position_meters).sqrt();
         assert!((radius - 11.75).abs() < 1.0e-9);
+    }
+
+    #[test]
+    fn surface_wasd_follows_camera_tangent_basis_across_bodies_and_orientations() {
+        let cases = [
+            ("Mercury", 2_400_000.0, [0.0, 1.0, 0.0], 0.0),
+            ("Venus", 5_500_000.0, [1.0, 0.0, 0.0], 0.65),
+            ("Earth", 6_000_000.0, [0.0, 0.0, 1.0], 1.4),
+            ("Mars", 3_500_000.0, normalize([1.0, 2.0, -3.0]), 2.2),
+            ("Moon", 1_600_000.0, normalize([-2.0, 1.0, 1.0]), 5.1),
+        ];
+        let inputs = [
+            (
+                "forward",
+                MovementInput {
+                    forward: true,
+                    ..MovementInput::default()
+                },
+                [1.0, 0.0],
+            ),
+            (
+                "backward",
+                MovementInput {
+                    backward: true,
+                    ..MovementInput::default()
+                },
+                [-1.0, 0.0],
+            ),
+            (
+                "right",
+                MovementInput {
+                    right: true,
+                    ..MovementInput::default()
+                },
+                [0.0, 1.0],
+            ),
+            (
+                "left",
+                MovementInput {
+                    left: true,
+                    ..MovementInput::default()
+                },
+                [0.0, -1.0],
+            ),
+        ];
+
+        for (body, radius_meters, up, yaw_radians) in cases {
+            let surface = SurfaceFrame {
+                body_center_meters: [125.0, -80.0, 45.0],
+                radius_meters,
+            };
+            let start = add(
+                surface.body_center_meters,
+                scale(up, radius_meters + PLAYER_EYE_HEIGHT_METERS),
+            );
+
+            for (direction, input, expected_axes) in inputs {
+                let mut controller = CharacterController {
+                    position: PositionState::Surface { world: start },
+                    yaw_radians,
+                    ..CharacterController::default()
+                };
+                let before = controller.snapshot(frame(), surface);
+                let camera_forward = normalize(reject(
+                    sub(before.look_target_meters, before.eye_position_meters),
+                    up,
+                ));
+                let camera_right = normalize(cross(camera_forward, up));
+                let expected = add(
+                    scale(camera_forward, expected_axes[0]),
+                    scale(camera_right, expected_axes[1]),
+                );
+
+                controller.advance(
+                    Duration::from_millis(10),
+                    input,
+                    frame(),
+                    surface,
+                    false,
+                    true,
+                );
+
+                let after = controller.snapshot(frame(), surface);
+                let traveled = normalize(reject(
+                    sub(after.eye_position_meters, before.eye_position_meters),
+                    up,
+                ));
+                assert!(
+                    dot(traveled, expected) > 0.999_999,
+                    "{body} {direction} movement must follow the camera tangent basis"
+                );
+                let altitude = dot(
+                    sub(after.eye_position_meters, surface.body_center_meters),
+                    sub(after.eye_position_meters, surface.body_center_meters),
+                )
+                .sqrt();
+                assert!(
+                    (altitude - radius_meters - PLAYER_EYE_HEIGHT_METERS).abs() < 1.0e-8,
+                    "{body} movement must preserve surface eye height"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn surface_forward_direction_tracks_camera_yaw_changes() {
+        let surface = SurfaceFrame {
+            body_center_meters: [0.0, 0.0, 0.0],
+            radius_meters: 100.0,
+        };
+        let start = [0.0, 101.75, 0.0];
+        let mut before_turn = CharacterController {
+            position: PositionState::Surface { world: start },
+            ..CharacterController::default()
+        };
+        let mut after_turn = before_turn.clone();
+        after_turn.apply_mouse_delta(400.0, 0.0);
+
+        for controller in [&mut before_turn, &mut after_turn] {
+            let before = controller.snapshot(frame(), surface);
+            let expected = normalize(reject(
+                sub(before.look_target_meters, before.eye_position_meters),
+                [0.0, 1.0, 0.0],
+            ));
+            controller.advance(
+                Duration::from_millis(10),
+                MovementInput {
+                    forward: true,
+                    ..MovementInput::default()
+                },
+                frame(),
+                surface,
+                false,
+                true,
+            );
+            let after = controller.snapshot(frame(), surface);
+            let traveled = normalize(reject(
+                sub(after.eye_position_meters, before.eye_position_meters),
+                [0.0, 1.0, 0.0],
+            ));
+            assert!(dot(traveled, expected) > 0.999_999);
+        }
+
+        let first = before_turn.snapshot(frame(), surface).eye_position_meters;
+        let turned = after_turn.snapshot(frame(), surface).eye_position_meters;
+        assert!(
+            sub(first, start)[2].abs() < 1.0e-8,
+            "zero yaw should move along ship forward"
+        );
+        assert!(
+            sub(turned, start)[2] > 0.0,
+            "positive yaw should rotate surface-forward movement toward screen right"
+        );
     }
 }

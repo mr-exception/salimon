@@ -22,7 +22,9 @@ The catalog is a static ordered slice. `CelestialBody` carries stable identity,
 name, absolute center, compressed radius, display color, and `BodyRole`.
 Geometry helpers calculate center distance, signed nominal-surface separation,
 optional solid landing-volume separation, and nonnegative point-to-surface
-distance. `VisualOnly` deliberately makes the Sun's landing radius absent.
+distance. They also provide deterministic nearest-surface selection and signed
+radial point velocity without assuming a ship or renderer. `VisualOnly`
+deliberately makes the Sun's landing radius absent but not absent from proximity.
 
 The runtime is the composition root and translates `winit` events into
 `CameraCommand`. The renderer does not depend on this crate. It receives generic

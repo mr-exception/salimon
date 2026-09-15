@@ -9,6 +9,7 @@ use std::time::Duration;
 use salimon_world::{
     BodyRole, CELESTIAL_BODIES, CelestialBody, CelestialBodyId,
     LANDING_RANGE_ALTITUDE_RADIUS_FACTOR, PHASE_ZERO_REFERENCE_MAX_SPEED_METERS_PER_SECOND,
+    WorldPosition, nearest_celestial_body_within_surface_distance,
 };
 
 /// Lowest point of the revised 4 m-tall Task 10 runtime mesh in ship-local Y.
@@ -24,6 +25,11 @@ pub const LANDING_RANGE_RADIUS_FRACTION: f64 = LANDING_RANGE_ALTITUDE_RADIUS_FAC
 /// Deliberately readable fixed speeds for the short automatic sequences.
 pub const LANDING_ASSIST_SPEED_METERS_PER_SECOND: f64 = 40.0;
 pub const TAKEOFF_ASSIST_SPEED_METERS_PER_SECOND: f64 = 60.0;
+/// Inclusive nominal-surface distance for the cockpit's nearby-body sensor.
+pub const NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS: f64 = 3_000_000.0;
+/// Noncanonical Phase 0 fixture values used to exercise live Core telemetry.
+pub const DEFAULT_CORE_ENERGY_CAPACITY_JOULES: u64 = 1_000_000_000_000;
+pub const DEFAULT_CORE_ENERGY_STORED_JOULES: u64 = 750_000_000_000;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct SteeringInput {
@@ -80,6 +86,30 @@ pub struct ShipPose {
     pub orientation: [f64; 4],
 }
 
+/// Bounded Energy Core telemetry fixture. Phase 0 does not consume or generate it.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct EnergyCoreState {
+    pub capacity_joules: u64,
+    pub stored_joules: u64,
+}
+
+impl Default for EnergyCoreState {
+    fn default() -> Self {
+        Self {
+            capacity_joules: DEFAULT_CORE_ENERGY_CAPACITY_JOULES,
+            stored_joules: DEFAULT_CORE_ENERGY_STORED_JOULES,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct NearbyBodyTelemetry {
+    pub name: &'static str,
+    pub surface_distance_meters: f64,
+    /// Negative approaches the body, positive recedes, and zero is stationary.
+    pub radial_speed_meters_per_second: f64,
+}
+
 impl ShipPose {
     #[must_use]
     pub fn axes(self) -> [[f64; 3]; 3] {
@@ -112,6 +142,9 @@ pub struct ShipSnapshot {
     pub cockpit_control_active: bool,
     pub thruster_percentage: u8,
     pub speed_meters_per_second: f64,
+    pub velocity_meters_per_second: [f64; 3],
+    pub energy_core: EnergyCoreState,
+    pub nearby_body: Option<NearbyBodyTelemetry>,
     pub cockpit_message: Option<CockpitMessage>,
     pub steering: SteeringInput,
 }
@@ -123,6 +156,7 @@ pub struct ShipController {
     door_state: DoorState,
     cockpit_control_active: bool,
     thruster_percentage: u8,
+    energy_core: EnergyCoreState,
     cockpit_message: Option<CockpitMessage>,
     steering_target: SteeringInput,
     steering: SteeringInput,
@@ -148,6 +182,7 @@ impl Default for ShipController {
             door_state: DoorState::Closed,
             cockpit_control_active: false,
             thruster_percentage: 0,
+            energy_core: EnergyCoreState::default(),
             cockpit_message: None,
             steering_target: SteeringInput::default(),
             steering: SteeringInput::default(),
@@ -165,6 +200,7 @@ impl ShipController {
             door_state: DoorState::Closed,
             cockpit_control_active: true,
             thruster_percentage: thruster_percentage.min(100),
+            energy_core: EnergyCoreState::default(),
             cockpit_message: None,
             steering_target: SteeringInput::default(),
             steering: SteeringInput::default(),
@@ -199,6 +235,11 @@ impl ShipController {
         self.thruster_percentage = i16::from(self.thruster_percentage)
             .saturating_add(i16::from(percentage_points))
             .clamp(0, 100) as u8;
+    }
+
+    /// Changes only the Phase 0 telemetry fixture; no power simulation is run.
+    pub fn set_stored_core_energy_joules(&mut self, stored_joules: u64) {
+        self.energy_core.stored_joules = stored_joules.min(self.energy_core.capacity_joules);
     }
 
     pub fn toggle_door(&mut self) {
@@ -309,7 +350,7 @@ impl ShipController {
         let body = body_definition(body_id);
         let destination_distance = body.radius_meters - LOWEST_LOCAL_Y_METERS;
         let current_distance = vector_length(sub(self.pose.position_meters, body.center.meters()));
-        let speed = LANDING_ASSIST_SPEED_METERS_PER_SECOND.max(body.radius_meters * 0.10);
+        let speed = landing_assist_speed(body);
         let next_distance = (current_distance - speed * seconds).max(destination_distance);
         self.pose.position_meters = add(
             body.center.meters(),
@@ -326,7 +367,7 @@ impl ShipController {
         let clear_distance =
             body.radius_meters * (1.0 + LANDING_RANGE_RADIUS_FRACTION) + COLLISION_RADIUS_METERS;
         let current_distance = vector_length(sub(self.pose.position_meters, body.center.meters()));
-        let speed = TAKEOFF_ASSIST_SPEED_METERS_PER_SECOND.max(body.radius_meters * 0.15);
+        let speed = takeoff_assist_speed(body);
         let next_distance = (current_distance + speed * seconds).min(clear_distance);
         self.pose.position_meters = add(
             body.center.meters(),
@@ -344,7 +385,46 @@ impl ShipController {
     }
 
     #[must_use]
+    pub fn velocity_meters_per_second(&self) -> [f64; 3] {
+        match self.flight_state {
+            FlightState::Flying => scale(self.pose.axes()[0], self.speed_meters_per_second()),
+            FlightState::AssistedLanding { body } => scale(
+                self.assist_surface_normal,
+                -landing_assist_speed(body_definition(body)),
+            ),
+            FlightState::AssistedTakeoff { body } => scale(
+                self.assist_surface_normal,
+                takeoff_assist_speed(body_definition(body)),
+            ),
+            FlightState::Landed { .. } => [0.0; 3],
+        }
+    }
+
+    fn nearby_body_telemetry(
+        &self,
+        velocity_meters_per_second: [f64; 3],
+    ) -> Option<NearbyBodyTelemetry> {
+        let position = WorldPosition::new(
+            self.pose.position_meters[0],
+            self.pose.position_meters[1],
+            self.pose.position_meters[2],
+        );
+        nearest_celestial_body_within_surface_distance(
+            CELESTIAL_BODIES,
+            position,
+            NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS,
+        )
+        .map(|(body, surface_distance_meters)| NearbyBodyTelemetry {
+            name: body.name,
+            surface_distance_meters,
+            radial_speed_meters_per_second: body
+                .radial_speed_meters_per_second(position, velocity_meters_per_second),
+        })
+    }
+
+    #[must_use]
     pub fn snapshot(&self) -> ShipSnapshot {
+        let velocity_meters_per_second = self.velocity_meters_per_second();
         ShipSnapshot {
             pose: self.pose,
             flight_state: self.flight_state,
@@ -352,6 +432,9 @@ impl ShipController {
             cockpit_control_active: self.cockpit_control_active,
             thruster_percentage: self.thruster_percentage,
             speed_meters_per_second: self.speed_meters_per_second(),
+            velocity_meters_per_second,
+            energy_core: self.energy_core,
+            nearby_body: self.nearby_body_telemetry(velocity_meters_per_second),
             cockpit_message: self.cockpit_message,
             steering: self.steering,
         }
@@ -414,6 +497,14 @@ fn body_definition(id: CelestialBodyId) -> &'static CelestialBody {
         .iter()
         .find(|body| body.id == id)
         .expect("flight state only stores catalog body identifiers")
+}
+
+fn landing_assist_speed(body: &CelestialBody) -> f64 {
+    LANDING_ASSIST_SPEED_METERS_PER_SECOND.max(body.radius_meters * 0.10)
+}
+
+fn takeoff_assist_speed(body: &CelestialBody) -> f64 {
+    TAKEOFF_ASSIST_SPEED_METERS_PER_SECOND.max(body.radius_meters * 0.15)
 }
 
 fn add(left: [f64; 3], right: [f64; 3]) -> [f64; 3] {
@@ -803,5 +894,68 @@ mod tests {
             ship.advance(Duration::from_millis(100));
         }
         assert_eq!(ship.snapshot().flight_state, FlightState::Flying);
+    }
+
+    #[test]
+    fn core_energy_fixture_is_bounded_and_updates_live_snapshots() {
+        let mut ship = ShipController::default();
+        assert_eq!(ship.snapshot().energy_core, EnergyCoreState::default());
+
+        ship.set_stored_core_energy_joules(125_000_000_000);
+        assert_eq!(ship.snapshot().energy_core.stored_joules, 125_000_000_000);
+        ship.set_stored_core_energy_joules(u64::MAX);
+        assert_eq!(
+            ship.snapshot().energy_core.stored_joules,
+            DEFAULT_CORE_ENERGY_CAPACITY_JOULES
+        );
+    }
+
+    #[test]
+    fn nearby_body_telemetry_crosses_range_and_reports_radial_direction() {
+        let earth = body_definition(CelestialBodyId::Earth);
+        let position = add(
+            earth.center.meters(),
+            [
+                earth.radius_meters + NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS,
+                0.0,
+                0.0,
+            ],
+        );
+        let mut ship = ShipController::flying(
+            ShipPose {
+                position_meters: position,
+                orientation: [0.0, 0.0, 0.0, 1.0],
+            },
+            10,
+        );
+
+        let receding = ship.snapshot().nearby_body.unwrap();
+        assert_eq!(receding.name, "Earth");
+        assert_eq!(
+            receding.surface_distance_meters,
+            NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS
+        );
+        assert!(receding.radial_speed_meters_per_second > 0.0);
+
+        ship.pose.orientation = [0.0, 1.0, 0.0, 0.0];
+        assert!(
+            ship.snapshot()
+                .nearby_body
+                .unwrap()
+                .radial_speed_meters_per_second
+                < 0.0
+        );
+
+        ship.thruster_percentage = 0;
+        assert_eq!(
+            ship.snapshot()
+                .nearby_body
+                .unwrap()
+                .radial_speed_meters_per_second,
+            0.0
+        );
+
+        ship.pose.position_meters[0] += 1.0;
+        assert!(ship.snapshot().nearby_body.is_none());
     }
 }

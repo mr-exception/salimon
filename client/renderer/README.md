@@ -94,3 +94,13 @@ the existing non-blocking three-slot readback ring.
 Run the library through `cargo run --locked -p salimon-client`. See
 [README.ai.md](README.ai.md), [architecture.md](architecture.md), and
 [invariants.md](invariants.md) before changing its contract.
+
+The cockpit includes three physical instrument screens: a central metric speed
+readout, a port Core stored/capacity panel, and a starboard nearby-body panel
+with surface distance plus approaching/receding/zero radial speed. Both side
+panels retain the synchronized thruster percentage. The runtime supplies
+`CockpitInstruments` on `ShipMeshInstance` every gameplay frame, including while
+the player walks around. A cached 512 × 768 sRGB atlas supplies crisp self-lit
+text and segmented bars in the existing opaque ship draw. Only display changes
+trigger rasterization/upload; the opaque/glass submission remains two draws.
+The renderer retains no ship control or simulation dependency.

@@ -2,7 +2,8 @@
 
 `ShipController` is authoritative portable state. It owns a double-precision
 world pose, landed/flying/assisted state, door state, cockpit authority, persistent
-thruster percentage, and a typed cockpit message. `ShipSnapshot` is the only
+thruster percentage, a bounded noncanonical Core telemetry fixture, and a typed
+cockpit message. `ShipSnapshot` is the only
 runtime-facing observation needed by character composition, diagnostics, and
 renderer mapping.
 
@@ -20,3 +21,6 @@ The default landed pose derives its vertical clearance from the enlarged asset's
 lowest local-Y point, keeping visible geometry tangent to Earth's nominal surface.
 The wider 20.30 × 4.00 × 20.00 m hull uses a conservative 15 m collision sphere;
 this same clearance is included when completing automatic takeoff.
+Snapshot velocity reflects direct flight or the active assist sequence. The ship
+combines that velocity with world-owned surface-distance/radial helpers to report
+the nearest of all six catalog bodies within an inclusive 3,000,000 m range.

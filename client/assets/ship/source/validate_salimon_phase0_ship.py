@@ -84,7 +84,7 @@ def validate_sightlines(document: dict, binary: bytes) -> None:
     def values(index):
         accessor=document["accessors"][index]
         view=document["bufferViews"][accessor["bufferView"]]
-        size=3 if accessor["type"]=="VEC3" else 1
+        size={"VEC3":3,"VEC2":2,"SCALAR":1}[accessor["type"]]
         kind="f" if accessor["componentType"]==5126 else "H"
         start=view.get("byteOffset",0)+accessor.get("byteOffset",0)
         return list(struct.iter_unpack("<"+kind*size,binary[start:start+accessor["count"]*struct.calcsize("<"+kind*size)]))
@@ -121,35 +121,60 @@ def validate_sightlines(document: dict, binary: bytes) -> None:
                 if glass:glass_hit=True
                 else:assert False, f"{label} obstructed by {name} at {min(distances):.2f}m"
         assert glass_hit, f"{label} misses modeled glazing"
-    # Both side screens must face the actual seated viewpoint, not ship-aft.
+    # Live cockpit surfaces must present an unobstructed rectangle from the
+    # actual seated eye, with top-left UVs and normals toward the pilot.
     seated_eye=(2.76,1.799032258064516,0.)
-    for label, sign in (("Port",1),("Starboard",-1)):
+    for label, role, x, y0, y1, z0, z1 in (
+        ("Center","speed",4.28,.95,1.63,-.90,.90),
+        ("Port","thruster-power",4.10,.95,1.40,1.90,2.80),
+        ("Starboard","thruster-power",4.10,.95,1.40,-2.80,-1.90),
+    ):
         name=f"Monitor_{label}"
         monitor=node(document,name)
         metadata=monitor["extras"]["salimon"]
-        assert_vectors_close(metadata["pilotFacingTargetMeters"],list(seated_eye))
-        pivot=(4.21,.81*4/3.72,sign*2.29)
-        toward_eye=sub(seated_eye,pivot)
-        length=math.hypot(toward_eye[0],toward_eye[2])
-        expected_normal=(toward_eye[0]/length,0.,toward_eye[2]/length)
-        expected_yaw=math.degrees(math.atan2(expected_normal[2],-expected_normal[0]))
-        assert abs(metadata["pilotFacingYawDegrees"]-expected_yaw) < 1e-5
-        assert abs(expected_yaw) > 45., f"{name} still faces mostly toward ship rear"
-
+        assert metadata["displayRole"] == role
+        assert metadata["uvOrigin"] == "top-left"
+        if label != "Center":
+            assert metadata["powerSource"] == "shared-thruster-command"
         primitive=document["meshes"][monitor["mesh"]]["primitives"][0]
         positions=values(primitive["attributes"]["POSITION"])
         normals=values(primitive["attributes"]["NORMAL"])
-        front=[position for position,normal in zip(positions,normals)
-               if dot(normal,expected_normal) > .99999]
-        assert len(front)==4, f"{name} must retain one readable rectangular face"
-        center=tuple(sum(point[axis] for point in front)/4 for axis in range(3))
-        for corner in front:
-            target=tuple(center[axis]+.8*(corner[axis]-center[axis]) for axis in range(3))
-            direction=sub(target,seated_eye)
+        uvs=values(primitive["attributes"]["TEXCOORD_0"])
+        assert len(positions)==4 and len(values(primitive["indices"]))==6
+        center=(x,(y0+y1)/2,(z0+z1)/2)
+        toward_eye=sub(seated_eye,center)
+        horizontal_length=math.hypot(toward_eye[0],toward_eye[2])
+        expected_normal=(toward_eye[0]/horizontal_length,0.,toward_eye[2]/horizontal_length)
+        tangent=(expected_normal[2],0.,-expected_normal[0])
+        for position, normal, uv in zip(positions,normals,uvs):
+            horizontal_offset=(uv[0]-.5)*(z1-z0)
+            assert_vectors_close(position,[
+                center[0]+tangent[0]*horizontal_offset,
+                y1-(y1-y0)*uv[1],
+                center[2]+tangent[2]*horizontal_offset,
+            ])
+            assert_vectors_close(normal,expected_normal)
+        assert set(uvs)=={(0.,0.),(0.,1.),(1.,0.),(1.,1.)}
+        assert_vectors_close(metadata["pilotFacingTargetMeters"],list(seated_eye))
+        expected_yaw=math.degrees(math.atan2(expected_normal[2],-expected_normal[0]))
+        assert abs(metadata["pilotFacingYawDegrees"]-expected_yaw) < 1e-5
+        if label != "Center":
+            assert abs(expected_yaw) > 45., f"{name} still faces mostly toward ship rear"
+        origin=seated_eye
+        for u,v in ((.08,.08),(.92,.08),(.5,.5),(.08,.92),(.92,.92)):
+            horizontal_offset=(u-.5)*(z1-z0)
+            target=(center[0]+tangent[0]*horizontal_offset,
+                    y1-(y1-y0)*v,
+                    center[2]+tangent[2]*horizontal_offset)
+            direction=sub(target,origin)
             hits=[(distance,mesh_name) for mesh_name,glass,triangles in meshes
                   if not glass for tri in triangles
-                  if (distance:=hit(seated_eye,direction,tri)) is not None]
-            assert hits and min(hits)[1] == name, f"{name} is not inspectable from the seat"
+                  if (distance:=hit(origin,direction,tri)) is not None]
+            assert hits, f"{name} inspection ray missed all surfaces"
+            nearest=min(hits)
+            assert nearest[1] == name, f"{name} display occluded by {nearest[1]} at UV {(u,v)}"
+            assert abs(nearest[0]-1.) < 1e-5
+
     # End caps used to conceal the thruster emitters. Trace down each nozzle.
     for label, z in (("Port",7.10),("Starboard",-7.10)):
         origin=(-10.5,4/3.72,z)
@@ -208,6 +233,17 @@ def main() -> None:
         "Wing_Starboard",
         "Cockpit_Console_Center",
         "Pilot_Seat_Back",
+        "Pilot_Seat_Shell",
+        "Pilot_Seat_Cushions",
+        "Pilot_Seat_Bolsters",
+        "Pilot_Seat_Headrest",
+        "Pilot_Seat_Armrests",
+        "Pilot_Seat_Controls",
+        "Cockpit_Monitor_Housings",
+        "Cockpit_Monitor_Bezels",
+        "Monitor_Center",
+        "Monitor_Port",
+        "Monitor_Starboard",
         "Exit_Door",
         "Deck_Walkable",
         "COLLIDER_InteriorFloor",
@@ -263,15 +299,15 @@ def main() -> None:
         [20.30, 4.00, 20.0],
     )
     assert metrics["externalAssetDependencies"] == 0
-    assert metrics["triangleCount"] <= 4500, "triangle budget exceeded"
-    assert metrics["drawPrimitiveCount"] <= 100, "primitive budget exceeded"
+    assert metrics["triangleCount"] <= 6000, "triangle budget exceeded"
+    assert metrics["drawPrimitiveCount"] <= 120, "primitive budget exceeded"
     assert metrics["materialCount"] <= 13, "material budget exceeded"
     assert len(glb_path.read_bytes()) <= 512 * 1024, "GLB size budget exceeded"
 
     # Compare measured payload counts with the declared budget contract.
     manifest = json.loads((ROOT / "asset-manifest.json").read_text())
     assert manifest["assetVersion"] == document["asset"]["extras"]["salimon"]["assetVersion"]
-    assert manifest["budgets"]["maximumTriangles"] == 4500
+    assert manifest["budgets"]["maximumTriangles"] == 6000
     measured_triangles = sum(document["accessors"][p["indices"]]["count"] // 3
                              for mesh in document["meshes"] for p in mesh["primitives"])
     assert measured_triangles == metrics["triangleCount"]
@@ -306,6 +342,26 @@ def main() -> None:
         for axis in range(3):
             assert abs(center[axis]-size[axis]/2-mesh_min[axis]) < 1e-6
             assert abs(center[axis]+size[axis]/2-mesh_max[axis]) < 1e-6
+    # Profile geometry must remain shaped (not a relabeled cube) and compact.
+    for name in ("Pilot_Seat_Shell","Pilot_Seat_Back","Pilot_Seat_Cushions",
+                 "Pilot_Seat_Bolsters","Pilot_Seat_Headrest"):
+        shaped=node(document,name)
+        primitive=document["meshes"][shaped["mesh"]]["primitives"][0]
+        assert document["accessors"][primitive["attributes"]["POSITION"]]["count"] >= 40
+        lower,upper=node_position_bounds(document,name)
+        assert lower[0] >= 1.55 and upper[0] <= 3.35
+        assert lower[2] >= -.80 and upper[2] <= .80
+        assert upper[1] < windows["standingViewpointMeters"][1]-.25
+    assert metrics["cockpitInstruments"]["powerSource"] == "shared-thruster-command"
+    assert metrics["cockpitInstruments"]["additionalDraws"] == 0
+    instruments = manifest["cockpitInstruments"]
+    assert_vectors_close(instruments["pilotFacingTargetMeters"], windows["seatedViewpointMeters"])
+    for label in ("Port", "Starboard"):
+        name = f"Monitor_{label}"
+        assert instruments["sideYawDegrees"][name] == node(document, name)["extras"]["salimon"]["pilotFacingYawDegrees"]
+        lower, upper = node_position_bounds(document, name)
+        assert_vectors_close(instruments["surfaceBoundsMeters"][name]["min"], lower)
+        assert_vectors_close(instruments["surfaceBoundsMeters"][name]["max"], upper)
     assert metrics["energyCore"]["role"] == "energy-storage"
     assert metrics["energyCore"]["phase0"] == "visual-only"
     roof = node(document, "Hull_Roof")

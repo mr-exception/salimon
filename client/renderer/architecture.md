@@ -13,7 +13,7 @@ salimon-world absolute f64 snapshot
     -> runtime maps domain types to renderer DTOs (no rebasing)
     -> Renderer::render(SceneFrame, optional RGBA overlay)
         -> validate absolute f64 camera, cuboids, spheres, and light inputs
-        -> load the checked-in ship GLB once, split opaque/glass vertices, and update only its pose/door uniform
+        -> load the checked-in ship GLB once, split opaque/glass vertices, update its pose/door uniform, and refresh the instrument atlas only when displayed values change
         -> subtract camera in f64, then cast relative values to f32
         -> conservatively cull cuboid and projected sphere bounds
         -> build renderer-owned view + infinite reverse-Z projection
@@ -47,7 +47,16 @@ styles identify presentation choices. `SceneFrame` conveys no celestial IDs,
 landing volumes, world catalog ownership, or simulation behavior. The GLB loader
 expands its small Phase 0 mesh once at renderer initialization; material colors
 and a door-vertex flag are retained in the GPU vertex stream. Opaque ship
-geometry writes reverse-Z depth first. The double-sided cockpit glass then uses
+geometry writes reverse-Z depth first. Three monitor quads carry UVs and a
+flat panel index. Their fragment branch samples a shared, linearly filtered
+512 × 768 sRGB atlas without a separate draw or light pass.
+`CockpitInstruments` carries presentation-only speed, shared power, Core energy,
+and optional nearby-body surface-distance/radial values;
+`cockpit_instruments.rs` caches rounded display keys before formatting or
+rasterizing. Unchanged frames allocate no instrument images and upload no
+instrument pixels. One atlas occupies 1.5 MiB on the CPU and GPU each.
+The screens remain attached to the ship and obey normal occlusion/free-look.
+The double-sided cockpit glass then uses
 one alpha-blended draw with depth testing but no depth writes, shadows, sorting,
 or post effects.
 

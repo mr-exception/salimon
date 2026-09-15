@@ -10,9 +10,9 @@ use salimon_diagnostics::{
     BodyDistance, Diagnostics, DomainMetrics, FrameSample, GpuMemory, GpuTime,
 };
 use salimon_renderer::{
-    CameraFrame, GpuFrameTime, OverlayImage as RendererOverlayImage, OverlayPlacement, PointLight,
-    RenderOutcome, Renderer, SceneFrame, SceneInstance, ShipMeshInstance, SphereInstance,
-    SurfaceMaterial, SurfaceSize,
+    CameraFrame, CockpitInstruments, GpuFrameTime, NearbyBodyInstruments,
+    OverlayImage as RendererOverlayImage, OverlayPlacement, PointLight, RenderOutcome, Renderer,
+    SceneFrame, SceneInstance, ShipMeshInstance, SphereInstance, SurfaceMaterial, SurfaceSize,
 };
 use salimon_ship::{
     CockpitMessage, DoorState, FlightState, ShipController, ShipPose, ShipSnapshot, SteeringInput,
@@ -180,18 +180,11 @@ fn vector_length(vector: [f64; 3]) -> f64 {
 }
 
 fn gameplay_window_title(
-    ship: ShipSnapshot,
     monitor_message: Option<CockpitMessage>,
     interaction: Option<InteractionTarget>,
 ) -> String {
     if let Some(message) = monitor_message {
         format!("{WINDOW_TITLE} — {}", message.text())
-    } else if ship.cockpit_control_active {
-        format!(
-            "{WINDOW_TITLE} — {} — {}%",
-            format_metric_speed(ship.speed_meters_per_second),
-            ship.thruster_percentage
-        )
     } else if interaction == Some(InteractionTarget::Cockpit) {
         format!("{WINDOW_TITLE} — {COCKPIT_INTERACTION_PROMPT}")
     } else {
@@ -209,6 +202,25 @@ fn action_bar_context(
         .or_else(|| {
             (interaction == Some(InteractionTarget::Cockpit)).then_some(COCKPIT_INTERACTION_PROMPT)
         })
+}
+
+fn map_ship_to_renderer(ship: ShipSnapshot) -> ShipMeshInstance {
+    ShipMeshInstance {
+        position_meters: ship.pose.position_meters,
+        orientation: ship.pose.orientation.map(|value| value as f32),
+        door_open: ship.door_state == DoorState::Open,
+        instruments: CockpitInstruments {
+            speed_meters_per_second: ship.speed_meters_per_second,
+            thruster_percentage: ship.thruster_percentage,
+            core_energy_capacity_joules: ship.energy_core.capacity_joules,
+            core_energy_stored_joules: ship.energy_core.stored_joules,
+            nearby_body: ship.nearby_body.map(|body| NearbyBodyInstruments {
+                name: body.name,
+                surface_distance_meters: body.surface_distance_meters,
+                radial_speed_meters_per_second: body.radial_speed_meters_per_second,
+            }),
+        },
+    }
 }
 
 impl ClientApplication {
@@ -385,11 +397,7 @@ impl ClientApplication {
         self.action_bar.advance(update_delta);
         let contextual_action = action_bar_context(monitor_message, interaction);
         self.action_bar.set_contextual(contextual_action);
-        window.set_title(&gameplay_window_title(
-            ship_snapshot,
-            monitor_message,
-            interaction,
-        ));
+        window.set_title(&gameplay_window_title(monitor_message, interaction));
         let ship_mesh = if self.view_mode == ViewMode::Gameplay {
             camera = CameraFrame {
                 position_meters: character_snapshot.eye_position_meters,
@@ -398,11 +406,7 @@ impl ClientApplication {
                 vertical_fov_radians: 70.0_f32.to_radians(),
                 near_plane_meters: 0.05,
             };
-            Some(ShipMeshInstance {
-                position_meters: ship_snapshot.pose.position_meters,
-                orientation: ship_snapshot.pose.orientation.map(|value| value as f32),
-                door_open: ship_snapshot.door_state == DoorState::Open,
-            })
+            Some(map_ship_to_renderer(ship_snapshot))
         } else {
             None
         };
@@ -706,11 +710,6 @@ impl ApplicationHandler for ClientApplication {
                     format_metric_speed(snapshot.speed_meters_per_second),
                     snapshot.thruster_percentage
                 );
-                window.set_title(&format!(
-                    "{WINDOW_TITLE} — {} — {}%",
-                    format_metric_speed(snapshot.speed_meters_per_second),
-                    snapshot.thruster_percentage
-                ));
                 window.request_redraw();
             }
             WindowEvent::KeyboardInput { event, .. }
@@ -1080,12 +1079,11 @@ fn gameplay_domain_metrics<'a>(
     ship: ShipSnapshot,
     body_distances: &'a [BodyDistance<'static>],
 ) -> DomainMetrics<'a> {
-    let forward = ship.pose.axes()[0];
     DomainMetrics {
         camera_position: Some(player_position),
         player_position: Some(player_position),
         ship_position: Some(ship.pose.position_meters),
-        ship_velocity: Some(forward.map(|value| value * ship.speed_meters_per_second)),
+        ship_velocity: Some(ship.velocity_meters_per_second),
         ship_speed_mps: Some(ship.speed_meters_per_second),
         thruster_percent: Some(ship.thruster_percentage),
         nearby_bodies: body_distances,
@@ -1122,9 +1120,11 @@ mod tests {
         COCKPIT_INTERACTION_PROMPT, INITIAL_HEIGHT, INITIAL_WIDTH, InteractionTarget,
         ShipControlInput, action_bar_context, camera_body_distances, camera_command,
         camera_domain_metrics, format_metric_speed, gameplay_window_title, initial_window_size,
-        interaction_target, is_diagnostics_toggle, landing_action_pressed, map_world_to_renderer,
-        release_cursor_pressed, ship_control_key, thruster_step, update_ship_control_input,
+        interaction_target, is_diagnostics_toggle, landing_action_pressed, map_ship_to_renderer,
+        map_world_to_renderer, release_cursor_pressed, ship_control_key, thruster_step,
+        update_ship_control_input,
     };
+    use salimon_renderer::CockpitInstruments;
     use salimon_ship::{CockpitMessage, FlightState, ShipController};
     use salimon_world::{CELESTIAL_BODIES, CameraCommand, CameraPrototype, CelestialBodyId};
     use winit::event::ElementState;
@@ -1297,6 +1297,85 @@ mod tests {
     }
 
     #[test]
+    fn cockpit_instruments_follow_live_power_and_landing_after_leaving_the_seat() {
+        let pose = ShipController::default().snapshot().pose;
+        let mut ship = ShipController::flying(pose, 0);
+        let stopped = map_ship_to_renderer(ship.snapshot());
+        assert_eq!(stopped.instruments.speed_meters_per_second, 0.0);
+        assert_eq!(stopped.instruments.thruster_percentage, 0);
+        assert_eq!(
+            stopped.instruments.core_energy_capacity_joules,
+            salimon_ship::DEFAULT_CORE_ENERGY_CAPACITY_JOULES
+        );
+        assert_eq!(stopped.instruments.nearby_body.unwrap().name, "Earth");
+
+        ship.set_stored_core_energy_joules(250_000_000_000);
+        let changed_energy = map_ship_to_renderer(ship.snapshot());
+        assert_eq!(
+            changed_energy.instruments.core_energy_stored_joules,
+            250_000_000_000
+        );
+
+        ship.adjust_thruster(1);
+        let minimum_power = map_ship_to_renderer(ship.snapshot());
+        assert_eq!(minimum_power.instruments.thruster_percentage, 1);
+        assert_eq!(
+            minimum_power.instruments.speed_meters_per_second,
+            salimon_world::PHASE_ZERO_REFERENCE_MAX_SPEED_METERS_PER_SECOND / 100.0
+        );
+
+        ship.adjust_thruster(99);
+        let full_power = map_ship_to_renderer(ship.snapshot());
+        assert_eq!(full_power.instruments.thruster_percentage, 100);
+        assert_eq!(
+            full_power.instruments.speed_meters_per_second,
+            salimon_world::PHASE_ZERO_REFERENCE_MAX_SPEED_METERS_PER_SECOND
+        );
+
+        ship.trigger_landing_action();
+        ship.set_cockpit_control(false);
+        let assisting = map_ship_to_renderer(ship.snapshot()).instruments;
+        assert_eq!(assisting.core_energy_stored_joules, 250_000_000_000);
+        assert_eq!(
+            assisting.speed_meters_per_second,
+            full_power.instruments.speed_meters_per_second
+        );
+        assert!(
+            assisting
+                .nearby_body
+                .unwrap()
+                .radial_speed_meters_per_second
+                < 0.0
+        );
+        ship.advance(std::time::Duration::from_millis(100));
+        assert!(matches!(
+            ship.snapshot().flight_state,
+            FlightState::Landed { .. }
+        ));
+        assert_eq!(
+            map_ship_to_renderer(ship.snapshot()).instruments,
+            CockpitInstruments {
+                core_energy_stored_joules: 250_000_000_000,
+                ..stopped.instruments
+            }
+        );
+
+        let out_of_range = ShipController::flying(
+            salimon_ship::ShipPose {
+                position_meters: [0.0; 3],
+                orientation: [0.0, 0.0, 0.0, 1.0],
+            },
+            0,
+        );
+        assert!(
+            map_ship_to_renderer(out_of_range.snapshot())
+                .instruments
+                .nearby_body
+                .is_none()
+        );
+    }
+
+    #[test]
     fn runtime_mapping_preserves_spheres_light_camera_and_separate_markers() {
         let snapshot = CameraPrototype::default().snapshot();
         let (camera, instances, spheres, light) = map_world_to_renderer(snapshot);
@@ -1380,11 +1459,11 @@ mod tests {
             }
         );
         assert_eq!(
-            gameplay_window_title(ship, None, Some(InteractionTarget::Cockpit)),
+            gameplay_window_title(None, Some(InteractionTarget::Cockpit)),
             format!("Salimon — Compressed Solar System — {COCKPIT_INTERACTION_PROMPT}")
         );
         assert_eq!(
-            gameplay_window_title(ship, None, None),
+            gameplay_window_title(None, None),
             "Salimon — Compressed Solar System"
         );
     }

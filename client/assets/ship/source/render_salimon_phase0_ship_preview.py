@@ -252,11 +252,43 @@ def render_core_previews(output: Path) -> None:
         print(f"Rendered {output / filename}", flush=True)
 
 
+
+def render_cockpit_previews(output: Path) -> None:
+    """Inspect the exported pilot station and chair with actual source geometry."""
+    output.mkdir(parents=True, exist_ok=True)
+    views=[
+        ("cockpit-station.png","PILOT STATION","Faceted housings / inset bezels / tactile controls / deck pedals",
+         Camera((.4,3.4,-5.4),(3.7,1.0,0.0)),("Cockpit_Console","Cockpit_Monitor","Cockpit_Instrument",
+         "Cockpit_Tactile","Cockpit_Ready","Cockpit_Service","Cockpit_Deck","Cockpit_Rudder","Monitor_","Pilot_")),
+        ("pilot-chair.png","PILOT BUCKET","Contoured shell / split cushions / side bolsters / compact headrest",
+         Camera((5.9,2.9,-4.3),(2.5,1.0,0.0)),("Pilot_",)),
+        ("cockpit-seated.png","AT THE CONTROLS","Authored seated eye / slight downward inspection / clear forward glazing",
+         Camera((2.76,1.799032258064516,0.0),(5.5,1.38,0.0),True,74.0),()),
+    ]
+    for filename,title,caption,camera,included in views:
+        panel=render(camera,(1800,1040),included_prefixes=included).resize((1440,832),Image.Resampling.LANCZOS)
+        plate=Image.new("RGB",(1520,1050),BACKGROUND)
+        plate.paste(panel,(40,136))
+        draw=ImageDraw.Draw(plate)
+        draw.text((40,24),"SALIMON / SCOUT SYSTEMS",fill=(102,220,224),font=ImageFont.load_default(size=17))
+        draw.text((40,59),title,fill=(232,235,228),font=ImageFont.load_default(size=40))
+        draw.text((40,110),caption,fill=(159,176,184),font=ImageFont.load_default(size=18))
+        draw.line((40,984,1480,984),fill=(54,80,87))
+        draw.text((40,1000),"SOURCE GEOMETRY / Approximate lighting; cyan instrument faces receive live telemetry artwork in the runtime.",
+                  fill=(137,157,167),font=ImageFont.load_default(size=15))
+        plate.save(output/filename)
+        print(f"Rendered {output/filename}",flush=True)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", type=Path)
     parser.add_argument("--core", action="store_true", help="Render three Core detail PNGs into the output directory")
+    parser.add_argument("--cockpit", action="store_true", help="Render pilot station, chair and seated-view PNGs into the output directory")
     args = parser.parse_args()
+    if args.cockpit:
+        render_cockpit_previews(args.output)
+        return
     if args.core:
         render_core_previews(args.output)
         return

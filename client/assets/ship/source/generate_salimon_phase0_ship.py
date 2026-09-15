@@ -474,6 +474,172 @@ def core_ring(y0: float, y1: float, outer: float, inner: float,
     return result
 
 
+
+def chamfered_loft_y(sections: Sequence[tuple[float, float, float, float, float]],
+                     center_z: float = 0.0) -> Geometry:
+    """Loft eight-corner X/Z profiles: (height, rear, front, half-width, bevel).
+
+    A few flat rings create cushions, molded shells and cast housings without
+    subdivision, smoothing dependencies, or frame-time geometry generation.
+    """
+    result = Geometry()
+    rings = []
+    for y, x0, x1, half_width, bevel in sections:
+        z0, z1 = center_z-half_width, center_z+half_width
+        rings.append([(x0+bevel,y,z0),(x0,y,z0+bevel),
+                      (x0,y,z1-bevel),(x0+bevel,y,z1),
+                      (x1-bevel,y,z1),(x1,y,z1-bevel),
+                      (x1,y,z0+bevel),(x1-bevel,y,z0)])
+    result.add_face(list(reversed(rings[0])))
+    result.add_face(rings[-1])
+    for lower, upper in zip(rings, rings[1:]):
+        for i in range(8):
+            j = (i+1) % 8
+            result.add_face([lower[i],lower[j],upper[j],upper[i]])
+    return result
+
+
+def cockpit_components() -> list[Component]:
+    """Human-scale pilot station in final meters, independent of hull scaling."""
+    components: list[Component] = []
+    def add(name: str, geometry: Geometry, material: int, **extras: object) -> None:
+        components.append(Component(name,geometry,material,"Interior",extras))
+
+    # A shallow faceted dashboard and two cast side pods keep the glazing open.
+    add("Cockpit_Console_Center",chamfered_loft_y([
+        (.25,4.42,6.10,.96,.18),(.68,4.33,6.12,1.06,.18),
+        (1.04,4.39,5.95,1.04,.18)]),5)
+    for label, sign in (("Port",1),("Starboard",-1)):
+        add(f"Cockpit_Console_{label}",chamfered_loft_y([
+            (.25,3.65,5.95,.50,.12),(.83,3.66,5.96,.60,.14)],sign*2.30),11)
+    # Compact instrument housings use one shared dark mesh, plus ivory lips,
+    # copper fasteners and small tactile controls outside the live display area.
+    housings, bezels, trim, controls, status, vents = (Geometry() for _ in range(6))
+    for label, x, y0, y1, z0, z1, role in (
+        ("Center",4.28,.95,1.63,-.90,.90,"speed"),
+        ("Port",4.10,.95,1.40,1.90,2.80,"thruster-power"),
+        ("Starboard",4.10,.95,1.40,-2.80,-1.90,"thruster-power"),
+    ):
+        # Housing is 31 mm behind the instrument-facing plane.
+        x += .031
+        width, cz = z1-z0, (z0+z1)/2
+        def face_pilot(geometry: Geometry) -> Geometry:
+            return face_geometry_toward_xz(
+                geometry, (x-.031, cz), COCKPIT_VIEWPOINT_METERS
+            )[0]
+
+        housing = chamfered_loft_y([
+            (y0-.115,x-.012,x+.20,width/2+.10,.055),
+            (y0-.06,x-.025,x+.20,width/2+.12,.055),
+            (y1+.065,x-.025,x+.16,width/2+.10,.055)],cz)
+        housing.extend(box(x+.06,x+.17,.80,y0+.03,cz-.10,cz+.10))
+        housings.extend(face_pilot(housing))
+        # Surface lies in front of the housing's recessed mounting plane.
+        # Its entire assembly yaws so the normal intersects the seated eye.
+        screen=Geometry()
+        screen.add_face([(x-.031,y1,z0),(x-.031,y0,z0),
+                         (x-.031,y0,z1),(x-.031,y1,z1)])
+        screen.texcoords = [(0.,0.),(0.,1.),(1.,1.),(1.,0.)]
+        screen, yaw_degrees = face_geometry_toward_xz(
+            screen, (x-.031, cz), COCKPIT_VIEWPOINT_METERS
+        )
+        add(f"Monitor_{label}",screen,6,interactive="cockpit-monitor",
+            displayRole=role,thrusterSide=label.lower() if label!="Center" else "none",
+            uvOrigin="top-left",powerSource="shared-thruster-command" if label!="Center" else "none",
+            pilotFacingTargetMeters=COCKPIT_VIEWPOINT_METERS,
+            pilotFacingYawDegrees=round(yaw_degrees, 6))
+        for a,b,c,d in ((y0-.035,y0-.006,z0-.04,z1+.04),
+                        (y1+.006,y1+.035,z0-.04,z1+.04),
+                        (y0,y1,z0-.04,z0-.008),(y0,y1,z1+.008,z1+.04)):
+            bezel = Geometry()
+            bezel.add_face([(x-.047,b,c),(x-.047,a,c),
+                            (x-.047,a,d),(x-.047,b,d)])
+            bezels.extend(face_pilot(bezel))
+        for z in (z0-.067,z1+.067):
+            for y in (y0-.02,y1+.02):
+                fastener = Geometry()
+                fastener.add_face([(x-.039,y+math.cos(i*math.pi/3)*.015,
+                                    z+math.sin(i*math.pi/3)*.015) for i in range(6)])
+                trim.extend(face_pilot(fastener))
+        for i in range(3 if label=="Center" else 2):
+            z=cz+(i-(1 if label=="Center" else .5))*.12
+            controls.extend(face_pilot(box(x-.045,x-.023,y0-.083,y0-.053,z-.037,z+.037)))
+        status.extend(face_pilot(box(x-.046,x-.026,y1+.015,y1+.032,z0+.055,z0+.13)))
+    add("Cockpit_Monitor_Housings",housings,0)
+    add("Cockpit_Monitor_Bezels",bezels,4)
+    add("Cockpit_Instrument_Fasteners",trim,2)
+    add("Cockpit_Tactile_Keys",controls,11)
+    add("Cockpit_Ready_Indicators",status,9)
+    for sign in (-1,1):
+        for x in (4.58,4.77,4.96,5.15):
+            z0,z1=sign*2.30-.26,sign*2.30+.26
+            vents.add_face([(x,.846,z0),(x,.846,z1),
+                            (x+.09,.846,z1),(x+.09,.846,z0)])
+    add("Cockpit_Service_Vents",vents,5)
+    deck_trim=Geometry()
+    pedals=Geometry()
+    for sign in (-1,1):
+        deck_trim.extend(box(3.43,4.24,.255,.275,sign*.82-.025,sign*.82+.025))
+        pedal=tapered_box(3.40,3.91,.27,.28,.16,.27,.36,.16)
+        pedal.positions=[(x,y,z+sign*.35) for x,y,z in pedal.positions]
+        pedals.extend(pedal)
+    add("Cockpit_Deck_Edge_Trim",deck_trim,2)
+    add("Cockpit_Rudder_Pedals",pedals,5)
+
+    # Contoured pilot bucket: a low reclined shell, split upholstery, shoulder
+    # bolsters and compact head pad; all details remain below standing sight.
+    rails=Geometry()
+    for z in (-.43,.43):
+        rails.extend(box(1.77,3.22,.25,.32,z-.055,z+.055))
+    rails.extend(cylinder_y(2.50,0,.31,.50,.30,.25,6))
+    rails.extend(cylinder_y(2.50,0,.50,.71,.115,.115,6))
+    add("Pilot_Seat_Base",rails,5)
+    add("Pilot_Seat_Shell",chamfered_loft_y([
+        (.69,2.04,3.19,.54,.15),(.77,1.97,3.30,.65,.18),
+        (.87,2.02,3.24,.63,.17)]),4)
+    add("Pilot_Seat_Back",chamfered_loft_y([
+        (.77,1.99,2.32,.61,.09),(1.30,1.89,2.17,.58,.075),
+        (1.59,1.86,2.08,.40,.065)]),5,interactive="cockpit-seat",
+        design="reclined-tapered-bucket")
+    upholstery=Geometry()
+    for z in (-.245,.245):
+        upholstery.extend(chamfered_loft_y([
+            (.855,2.20,3.22,.232,.06),(.94,2.23,3.18,.235,.075),
+            (.985,2.28,3.10,.215,.075)],z))
+        upholstery.extend(chamfered_loft_y([
+            (.98,2.30,2.41,.22,.04),(1.29,2.17,2.28,.215,.035),
+            (1.46,2.11,2.21,.165,.03)],z))
+    add("Pilot_Seat_Cushions",upholstery,10)
+    bolsters=Geometry()
+    for z in (-.53,.53):
+        bolsters.extend(chamfered_loft_y([
+            (.84,2.07,3.10,.08,.03),(1.00,2.14,3.0,.105,.04),
+            (1.08,2.24,2.68,.07,.04)],z))
+    add("Pilot_Seat_Bolsters",bolsters,10)
+    add("Pilot_Seat_Headrest",chamfered_loft_y([
+        (1.49,1.97,2.14,.26,.045),(1.68,1.91,2.12,.27,.04),
+        (1.73,1.94,2.08,.21,.04)]),10)
+    armrests, arm_pads, seat_trim = (Geometry() for _ in range(3))
+    for sign in (-1,1):
+        z=sign*.69
+        armrests.extend(box(2.18,2.31,.80,1.10,z-.047,z+.047))
+        arm_pads.extend(chamfered_loft_y([
+            (1.08,2.15,2.91,.10,.055),(1.16,2.19,2.86,.095,.05)],z))
+        seat_trim.extend(box(1.88,1.91,.99,1.29,sign*.43-.03,sign*.43+.03))
+    # Rear shell spine and readable copper service accents avoid a solid cube.
+    seat_trim.extend(box(1.86,1.90,1.16,1.47,-.065,.065))
+    add("Pilot_Seat_Armature",armrests,0)
+    add("Pilot_Seat_Armrests",arm_pads,5)
+    add("Pilot_Seat_Accent",seat_trim,2)
+    # Port throttle and starboard short stick are silhouettes, not simulated
+    # mechanisms. Current flight input is represented by the live monitors.
+    add("Pilot_Seat_Controls",combined(
+        box(2.69,2.77,1.16,1.25,.63,.75),
+        cylinder_y(2.72,-.69,1.16,1.29,.034,.030,6),
+        box(2.67,2.76,1.29,1.34,-.725,-.655)),0)
+    return components
+
+
 def ship_components() -> list[Component]:
     components: list[Component] = []
 
@@ -589,28 +755,7 @@ def ship_components() -> list[Component]:
     door_frame=combined(box(-3.77,-3.60,.23,2.37,-.80,-.70),box(-3.77,-3.60,.23,2.37,.70,.80),box(-3.77,-3.60,2.34,2.42,-.80,.80))
     add("Door_Frame",door_frame,2,"Interior")
     add("Door_Threshold",box(-3.94,-3.55,.17,.23,-.78,.78),2,"Interior")
-    add("Cockpit_Console_Center",tapered_box(2.16,3.12,.23,.87,.74,.32,1.0,.52),5,"Interior")
-    add("Cockpit_Console_Port",box(1.78,3.02,.23,.74,.82,1.48),11,"Interior")
-    add("Cockpit_Console_Starboard",box(1.78,3.02,.23,.74,-1.48,-.82),11,"Interior")
-    add("Monitor_Center",box(2.155,2.18,.68,.98,-.48,.48),6,"Interior",interactive="cockpit-monitor")
-    authored_pilot_viewpoint = (
-        COCKPIT_VIEWPOINT_METERS[0] / HORIZONTAL_SCALE_FROM_TASK7,
-        COCKPIT_VIEWPOINT_METERS[1] / VERTICAL_SCALE_FROM_TASK7,
-        COCKPIT_VIEWPOINT_METERS[2] / HORIZONTAL_SCALE_FROM_TASK7,
-    )
-    for label, z0, z1 in (("Port",.91,1.38),("Starboard",-1.38,-.91)):
-        monitor, yaw_degrees = face_geometry_toward_xz(
-            box(2.08,2.13,.74,.88,z0,z1),
-            ((2.08+2.13)/2,(z0+z1)/2),
-            authored_pilot_viewpoint,
-        )
-        add(f"Monitor_{label}",monitor,6,"Interior",
-            interactive="cockpit-monitor",
-            pilotFacingTargetMeters=COCKPIT_VIEWPOINT_METERS,
-            pilotFacingYawDegrees=round(yaw_degrees,6))
-    add("Pilot_Seat_Base",combined(box(.94,1.62,.23,.51,-.36,.36),box(.90,1.62,.51,.65,-.40,.40)),5,"Interior")
-    add("Pilot_Seat_Back",box(.78,1.00,.51,1.40,-.40,.40),10,"Interior",interactive="cockpit-seat")
-    add("Pilot_Seat_Accent",combined(box(1.0,1.06,.66,1.31,-.32,.32),box(1.05,1.55,.65,.71,-.36,.36)),12,"Interior")
+    components.extend(cockpit_components())
     # Furnishings are kept against the wall, leaving two broad circulation lanes.
     add("Cabin_Bench_Port",box(-2.85,-1.12,.23,.47,1.83,2.22),5,"Interior")
     cushions=Geometry()
@@ -848,10 +993,16 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
                     "width": 4.60 * HORIZONTAL_SCALE_FROM_TASK7,
                     "height": 2.38 * VERTICAL_SCALE_FROM_TASK7,
                 },
-                "designRevision": "wide-cozy-cabin-sci-fi-core",
+                "designRevision": "detailed-pilot-station-live-instruments",
                 "energyCore": {"centerMeters": [-1.0, 1.2, 0.0], "role": "energy-storage", "phase0": "visual-only"},
                 "humanBodyHeightMeters": PLAYER_BODY_HEIGHT_METERS,
                 "humanEyeHeightMeters": PLAYER_EYE_HEIGHT_METERS,
+                "cockpitInstruments": {
+                    "speedNode": "Monitor_Center",
+                    "powerNodes": ["Monitor_Port", "Monitor_Starboard"],
+                    "uvOrigin": "top-left", "powerSource": "shared-thruster-command",
+                    "surfaceTriangles": 6, "additionalDraws": 0,
+                },
                 "cockpitWindows": {
                     "glazingNode": "Cockpit_Glazing",
                     "frameNode": "Cockpit_Window_Frame",

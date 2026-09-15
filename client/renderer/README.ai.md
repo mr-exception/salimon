@@ -18,7 +18,7 @@ exposes renderer-owned measurements.
 ## Public boundary
 
 Keep `Renderer::new`, `Renderer::resize`, and `Renderer::render` plus
-`CameraFrame`, `SceneInstance`, `SphereInstance`, `ShipMeshInstance`, `PointLight`, `SceneFrame`, and the typed image/result values
+`CameraFrame`, `SceneInstance`, `SphereInstance`, `ShipMeshInstance`, `CockpitInstruments`, `PointLight`, `SceneFrame`, and the typed image/result values
 as the narrow host-facing contract unless a task explicitly requires a change.
 Window/surface handles needed during initialization are integration inputs; they
 do not transfer native lifecycle policy to the renderer.
@@ -62,5 +62,10 @@ would reintroduce the former proxy's sub-meter surface-position error.
 
 `ship_mesh.rs` owns the checked-in ship GLB parser, immutable opaque/glass vertex
 buffers, camera-relative pose uniform, door visual offset, basic material
-lighting, and the inexpensive depth-tested cockpit-glass blend pass. Keep
-gameplay interaction and ship state out of this module.
+lighting, and the inexpensive depth-tested cockpit-glass blend pass. The three
+named monitor quads retain UVs and a panel index in the immutable vertex stream.
+`cockpit_instruments.rs` formats typed speed/power, Core energy, and optional
+nearby-body DTO values into one cached
+512 × 768 RGBA atlas; upload it only when the displayed values change. Screens
+are self-lit surfaces in the existing opaque draw and stay live when unseated.
+Keep gameplay interaction and ship state out of these modules.

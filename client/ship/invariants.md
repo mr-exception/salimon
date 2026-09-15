@@ -22,3 +22,8 @@
     cockpit is left; steering and thruster input cannot override it.
 14. Takeoff requires cockpit authority and a closed door, follows the landed
     surface normal, and returns control only after clearing the landing volume.
+15. Phase 0 Core telemetry is bounded by its 1 TJ fixture capacity and does not
+    imply consumption, generation, fuel, persistence, or production energy rules.
+16. Nearby-body telemetry selects the nearest catalog surface at an inclusive
+    3,000,000 m threshold and reports actual signed radial velocity: negative
+    approaching, positive receding, and zero stationary/tangential.

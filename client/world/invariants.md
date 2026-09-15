@@ -22,3 +22,7 @@
    markers are immutable across snapshots.
 10. Precision markers are noncanonical validation references and never count as
     celestial bodies or landing volumes.
+11. Nearest-body queries compare nominal surface distance, include all catalog
+    roles, accept an exact finite threshold, and preserve catalog order for ties.
+12. Radial speed is the signed center-distance derivative: negative approaches,
+    positive recedes, zero is stationary/tangential or an undefined center axis.

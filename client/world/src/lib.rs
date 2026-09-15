@@ -215,6 +215,27 @@ impl CelestialBody {
         (self.center.distance_to(position) - self.radius_meters).max(0.0)
     }
 
+    /// Rate at which a point's center distance is changing. Negative values
+    /// approach the body, positive values recede, and zero is stationary.
+    #[must_use]
+    pub fn radial_speed_meters_per_second(
+        self,
+        position: WorldPosition,
+        velocity_meters_per_second: [f64; 3],
+    ) -> f64 {
+        let offset = position.offset_from(self.center);
+        let distance = vector_length(offset);
+        if distance <= f64::EPSILON {
+            return 0.0;
+        }
+        offset
+            .into_iter()
+            .zip(velocity_meters_per_second)
+            .map(|(component, velocity)| component * velocity)
+            .sum::<f64>()
+            / distance
+    }
+
     #[must_use]
     pub fn center_distance_to(self, other: Self) -> f64 {
         self.center.distance_to(other.center)
@@ -245,6 +266,31 @@ impl CelestialBody {
             other_radius,
         ))
     }
+}
+
+/// Returns the nearest body whose nominal surface is no farther than `maximum`.
+/// Catalog order resolves exact ties deterministically.
+#[must_use]
+pub fn nearest_celestial_body_within_surface_distance(
+    bodies: &[CelestialBody],
+    position: WorldPosition,
+    maximum_distance_meters: f64,
+) -> Option<(&CelestialBody, f64)> {
+    if !maximum_distance_meters.is_finite() || maximum_distance_meters < 0.0 {
+        return None;
+    }
+
+    bodies
+        .iter()
+        .filter_map(|body| {
+            let distance = body.surface_distance_from(position);
+            (distance <= maximum_distance_meters).then_some((body, distance))
+        })
+        .min_by(|(_, left), (_, right)| left.total_cmp(right))
+}
+
+fn vector_length(vector: [f64; 3]) -> f64 {
+    vector.iter().map(|value| value * value).sum::<f64>().sqrt()
 }
 
 /// Signed surface separation for two spheres.
@@ -547,7 +593,8 @@ mod tests {
         BodyRole, CELESTIAL_BODIES, CameraCommand, CameraPrototype, CelestialBody, CelestialBodyId,
         EARTH_RADIUS_METERS, LANDING_RANGE_ALTITUDE_RADIUS_FACTOR,
         PHASE_ZERO_REFERENCE_MAX_SPEED_METERS_PER_SECOND, PrecisionReport, SURFACE_ANCHOR,
-        TransitionPhase, WorldPosition, sphere_surface_separation,
+        TransitionPhase, WorldPosition, nearest_celestial_body_within_surface_distance,
+        sphere_surface_separation,
     };
     use std::collections::HashSet;
     use std::time::Duration;
@@ -1085,5 +1132,74 @@ mod tests {
             .iter()
             .find(|body| body.id == id)
             .expect("catalog body must exist")
+    }
+
+    #[test]
+    fn nearby_body_selection_uses_surface_distance_and_an_inclusive_threshold() {
+        let bodies = [
+            CelestialBody::new(
+                CelestialBodyId::Earth,
+                "First",
+                WorldPosition::new(0.0, 0.0, 0.0),
+                100.0,
+                [1.0; 4],
+                BodyRole::Solid,
+            ),
+            CelestialBody::new(
+                CelestialBodyId::Moon,
+                "Second",
+                WorldPosition::new(1_000.0, 0.0, 0.0),
+                100.0,
+                [1.0; 4],
+                BodyRole::Solid,
+            ),
+        ];
+
+        let first = nearest_celestial_body_within_surface_distance(
+            &bodies,
+            WorldPosition::new(400.0, 0.0, 0.0),
+            300.0,
+        )
+        .unwrap();
+        assert_eq!(first.0.name, "First");
+        assert_eq!(first.1, 300.0);
+
+        let second = nearest_celestial_body_within_surface_distance(
+            &bodies,
+            WorldPosition::new(600.0, 0.0, 0.0),
+            300.0,
+        )
+        .unwrap();
+        assert_eq!(second.0.name, "Second");
+        assert_eq!(second.1, 300.0);
+
+        assert!(
+            nearest_celestial_body_within_surface_distance(
+                &bodies[..1],
+                WorldPosition::new(400.001, 0.0, 0.0),
+                300.0,
+            )
+            .is_none()
+        );
+    }
+
+    #[test]
+    fn radial_speed_distinguishes_approaching_receding_and_zero() {
+        let earth = body(CelestialBodyId::Earth);
+        let position = earth
+            .center
+            .translated([earth.radius_meters + 10.0, 0.0, 0.0]);
+        assert_eq!(
+            earth.radial_speed_meters_per_second(position, [-25.0, 0.0, 0.0]),
+            -25.0
+        );
+        assert_eq!(
+            earth.radial_speed_meters_per_second(position, [25.0, 0.0, 0.0]),
+            25.0
+        );
+        assert_eq!(
+            earth.radial_speed_meters_per_second(position, [0.0, 25.0, 0.0]),
+            0.0
+        );
     }
 }

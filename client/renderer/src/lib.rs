@@ -3,6 +3,7 @@
 //! This crate owns `wgpu` resources and surface presentation. It deliberately
 //! has no dependency on world, character, or ship state.
 
+mod cockpit_instruments;
 mod gpu_timing;
 mod overlay;
 mod ship_mesh;
@@ -13,6 +14,7 @@ use std::error::Error;
 use std::fmt;
 use std::time::Duration;
 
+pub use cockpit_instruments::{CockpitInstruments, NearbyBodyInstruments};
 use gpu_timing::GpuTimer;
 pub use overlay::{OverlayImage, OverlayPlacement};
 pub use ship_mesh::ShipMeshInstance;

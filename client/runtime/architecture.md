@@ -33,7 +33,10 @@ prevents portable types from acquiring `wgpu` or `winit` dependencies.
 4. Before each drawable render attempt, advance portable character/ship/camera
    state with a bounded monotonic delta. Map the six catalog bodies to `f64` sphere/material
    DTOs, map Sun lighting, preserve separate marker cuboids, calculate camera-to-surface
-   distances, and measure that real update work.
+   distances, and measure that real update work. In gameplay view, map the ship's
+   pose, door state, and latest speed/thruster snapshot into `ShipMeshInstance`.
+   Its `CockpitInstruments` is refreshed regardless of cockpit control authority,
+   so the physical screens keep following autonomous ship changes after exit.
 5. For each successfully presented redraw, record monotonic frame timing after
    the renderer submits and presents the frame, then combine it with renderer,
    update, and camera measurements for diagnostics.
@@ -57,7 +60,9 @@ player/ship diagnostics; precision-tour view supplies its camera metrics.
 
 ## Contextual action-bar flow
 
-The runtime maps typed ship messages and the aimed cockpit interaction into one
+The runtime field-maps ship-owned Core and nearby-body telemetry into renderer
+instrument DTOs every gameplay frame; it never derives proximity or radial
+velocity. The runtime maps typed ship messages and the aimed cockpit interaction into one
 bottom-centered action bar for the normal gameplay view. State-derived actions
 remain visible only while applicable. Immediate blocked-door feedback overrides
 the current action for three seconds and then expires without changing ship

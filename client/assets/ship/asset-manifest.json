@@ -32,8 +32,8 @@
     "designRevision": "Cabin reshaped to 9.20m clear width; exterior wing span20m; per-axis authoring scale retained, no longer a pure scale of Task7."
   },
   "budgets": {
-    "maximumTriangles": 4500,
-    "maximumPrimitives": 100,
+    "maximumTriangles": 6000,
+    "maximumPrimitives": 120,
     "maximumMaterials": 13,
     "maximumGlbBytes": 524288,
     "runtimeShipDraws": 2
@@ -59,15 +59,6 @@
       "Cabin_Aft_Glazing"
     ]
   },
-  "cockpitSideMonitors": {
-    "pilotFacingTargetMeters": [
-      2.76,
-      1.799032258064516,
-      0.0
-    ],
-    "orientation": "symmetric yaw toward the seated pilot viewpoint",
-    "validatedFromSeat": true
-  },
   "license": "Custom original Salimon project asset; no external asset dependencies",
   "interior": {
     "clearWidthMeters": 9.2,
@@ -83,8 +74,67 @@
         2
       ]
     },
-    "coreRole": "Energy storage and recoverable ship heart; visual-only in Phase0",
+    "coreRole": "Energy storage and recoverable ship heart; Phase0 exposes a noncanonical bounded telemetry fixture without production energy simulation",
     "coreDesign": "Segmented cyan energy cells, copper containment rings, graphite cage, ceramic armor, service vents and charge gauge",
-    "palette": "Warm ivory, copper, terracotta, honey wood and petrol teal with amber emissive lamps"
+    "palette": "Warm ivory, copper, terracotta, honey wood and petrol teal with amber emissive lamps",
+    "cockpitDesign": "Faceted dashboard, recessed instrument housings, ivory bezels, copper fasteners, tactile keys, service vents and pedals; contoured pilot bucket with split upholstery, side bolsters, compact headrest, armrests, hand controls and suspension rails"
+  },
+  "cockpitInstruments": {
+    "speedNode": "Monitor_Center",
+    "powerNodes": [
+      "Monitor_Port",
+      "Monitor_Starboard"
+    ],
+    "uvOrigin": "top-left",
+    "powerSource": "shared-thruster-command",
+    "pilotFacingTargetMeters": [
+      2.76,
+      1.799032258064516,
+      0.0
+    ],
+    "sideYawDegrees": {
+      "Monitor_Port": -60.30766,
+      "Monitor_Starboard": 60.30766
+    },
+    "surfaceTriangles": 6,
+    "additionalDraws": 0,
+    "surfaceBoundsMeters": {
+      "Monitor_Center": {
+        "min": [
+          4.28,
+          0.95,
+          -0.9
+        ],
+        "max": [
+          4.28,
+          1.63,
+          0.9
+        ]
+      },
+      "Monitor_Port": {
+        "min": [
+          3.709086016318018,
+          0.95,
+          2.127095856113253
+        ],
+        "max": [
+          4.490913983681981,
+          1.4,
+          2.5729041438867464
+        ]
+      },
+      "Monitor_Starboard": {
+        "min": [
+          3.709086016318018,
+          0.95,
+          -2.5729041438867464
+        ],
+        "max": [
+          4.490913983681981,
+          1.4,
+          -2.127095856113253
+        ]
+      }
+    }
   }
 }

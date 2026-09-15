@@ -50,7 +50,12 @@
     cannot cancel or steer an active assisted landing/takeoff sequence.
 23. Character surface traversal receives the body frame stored by landed or
     assisted ship state, so every solid body uses the same character gravity.
-24. Normal gameplay view presents applicable cockpit/interaction messages in a
+24. Every visible ship receives current snapshot speed, thruster, Core energy,
+    and optional nearby-body distance/radial data through renderer-owned
+    `CockpitInstruments`; leaving the cockpit does not freeze or hide these
+    values. Runtime field-maps rather than derives flight telemetry or simulates
+    monitor values. Contextual messages remain in the window title.
+25. Normal gameplay view presents applicable cockpit/interaction messages in a
     readable bottom-centered action bar. State-derived prompts disappear when
     their source becomes inapplicable; immediate blocked-door feedback expires
     after three seconds. Precision-tour view never displays the gameplay bar.

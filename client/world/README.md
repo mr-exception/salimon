@@ -7,6 +7,11 @@ The Sun is visual-only; the other five bodies expose solid landing volumes with
 outer radius `1.15R`. No orbital simulation, backend, networking, or persistence
 is involved.
 
+Portable helpers select the nearest nominal body surface inside an inclusive
+distance threshold and project point velocity onto the center-to-point radial
+axis. Signed radial speed is negative while approaching, positive while receding,
+and zero for stationary or tangential motion; selection includes the visual Sun.
+
 A host advances `CameraPrototype` with a monotonic duration, translates
 `CameraCommand` values from platform input, and reads a borrowed `WorldSnapshot`.
 The snapshot exposes the static body catalog, the Task 4 camera, and three

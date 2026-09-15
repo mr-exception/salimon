@@ -52,14 +52,21 @@ While seated in the cockpit, W/S pitch, A yaws left, D yaws right, and
 Left/Right Arrow roll.
 Up/Down Arrow change direct-speed thruster power by one percentage point on each
 initial press. The current practical metric speed and percentage are published
-as cockpit-monitor information, while mouse look remains independent and never
-steers or recenters the ship. Leaving with E clears held steering but preserves
-heading, thruster, and autonomous forward motion.
+on the physical cockpit screens through `ShipMeshInstance::instruments` on every
+gameplay frame, including while the player walks away from the seat. The port
+screen shows live stored/capacity Core energy; the starboard screen shows the
+nearest body within 3 Mm, its surface distance, and approaching/receding/zero
+radial speed, or a clear out-of-range state. Mouse look
+remains independent and never steers or recenters the ship. Leaving with E clears
+held steering but preserves heading, thruster, and autonomous forward motion.
+The speed screen preserves the ship snapshot's direct-speed reading. Separate
+snapshot velocity keeps nearby radial telemetry accurate during assisted landing
+and takeoff without redefining the direct-speed field.
 
 While controlling the cockpit, L starts assisted landing whenever the ship is
 inside a solid body's `1.15R` volume. When landed, the same key starts takeoff;
-the door must be closed. Contextual prompts and interlock/progress messages use
-the cockpit-monitor message path. Automatic sequences continue after leaving
+the door must be closed. Contextual prompts and interlock/progress messages remain
+in the native window title. Automatic sequences continue after leaving
 the cockpit, and runtime composition switches character radial gravity to the
 active Mercury, Venus, Earth, Moon, or Mars surface frame.
 
@@ -73,8 +80,9 @@ Keep behavior in its owning portable crate. The runtime retains character, ship,
 and camera objects only as the composition root. It maps the snapshot's six bodies to
 `SphereInstance` values with generic material styles, maps the Sun to `PointLight`,
 keeps the three precision-marker cuboids separate, maps the ship snapshot to a
-generic mesh instance, and supplies diagnostics with nonnegative camera-to-body
-surface observations for every catalog body; diagnostics displays the closest.
+generic mesh instance with live renderer-owned `CockpitInstruments` data, and
+supplies diagnostics with nonnegative camera-to-body surface observations for
+every catalog body; diagnostics displays the closest.
 `winit` integration remains here until platform-specific behavior justifies an
 adapter under `client/platform/`. The runtime must not acquire GPU, backend,
 networking, or persistence responsibilities in Phase 0.

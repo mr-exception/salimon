@@ -2,10 +2,11 @@
 
 use wgpu::util::DeviceExt;
 
-use crate::{DEPTH_FORMAT, RendererError, SceneFrame, encode_f32s};
+use crate::cockpit_instruments::{ATLAS_HEIGHT, ATLAS_WIDTH, InstrumentAtlas};
+use crate::{CockpitInstruments, DEPTH_FORMAT, RendererError, SceneFrame, encode_f32s};
 
 const SHIP_GLB: &[u8] = include_bytes!("../../assets/ship/export/salimon_phase0_ship.glb");
-const VERTEX_FLOATS: usize = 15;
+const VERTEX_FLOATS: usize = 18;
 const VERTEX_STRIDE: u64 = (VERTEX_FLOATS * size_of::<f32>()) as u64;
 const UNIFORM_SIZE: u64 = 160;
 const OPEN_DOOR_OFFSET_METERS: f32 = 4.50;
@@ -16,6 +17,8 @@ pub struct ShipMeshInstance {
     /// Unit quaternion `[x, y, z, w]` rotating ship-local coordinates to world.
     pub orientation: [f32; 4],
     pub door_open: bool,
+    /// Read-only presentation values, kept live independently of cockpit control.
+    pub instruments: CockpitInstruments,
 }
 
 #[derive(Debug)]
@@ -45,6 +48,12 @@ fn load_geometry() -> Result<ShipGeometry, RendererError> {
         let Some(mesh) = node.mesh() else { continue };
         let door_flag = f32::from(node.name() == Some("Exit_Door"));
         let interior_flag = f32::from(interior_nodes[node.index()]);
+        let display_panel = match node.name() {
+            Some("Monitor_Center") => 1.0,
+            Some("Monitor_Port") => 2.0,
+            Some("Monitor_Starboard") => 3.0,
+            _ => 0.0,
+        };
         let matrix = node.transform().matrix();
         for primitive in mesh.primitives() {
             if primitive.mode() != gltf::mesh::Mode::Triangles {
@@ -69,6 +78,16 @@ fn load_geometry() -> Result<ShipGeometry, RendererError> {
                     RendererError::new("failed to load Phase 0 ship GLB", "mesh is missing normals")
                 })?
                 .collect();
+            let texcoords: Vec<_> = reader
+                .read_tex_coords(0)
+                .map(|coordinates| coordinates.into_f32().collect())
+                .unwrap_or_default();
+            if display_panel > 0.0 && texcoords.len() != positions.len() {
+                return Err(RendererError::new(
+                    "failed to load cockpit display",
+                    "display surfaces require one UV coordinate per vertex",
+                ));
+            }
             if positions.len() != normals.len() {
                 return Err(RendererError::new(
                     "failed to load Phase 0 ship GLB",
@@ -109,6 +128,7 @@ fn load_geometry() -> Result<ShipGeometry, RendererError> {
                 })?;
                 let transformed_position = transform_position(matrix, *position);
                 let transformed_normal = normalize(transform_direction(matrix, *normal));
+                let uv = texcoords.get(vertex_index).copied().unwrap_or([0.0; 2]);
                 vertices.extend_from_slice(&[
                     transformed_position[0],
                     transformed_position[1],
@@ -125,6 +145,9 @@ fn load_geometry() -> Result<ShipGeometry, RendererError> {
                     emissive[1],
                     emissive[2],
                     interior_flag,
+                    uv[0],
+                    uv[1],
+                    display_panel,
                 ]);
             }
         }
@@ -200,6 +223,8 @@ pub(crate) struct ShipMeshRenderer {
     opaque_vertex_count: u32,
     glass_vertex_count: u32,
     visible: bool,
+    instrument_atlas: InstrumentAtlas,
+    instrument_texture: wgpu::Texture,
 }
 
 fn create_pipeline(
@@ -253,6 +278,11 @@ fn create_pipeline(
                         offset: 56,
                         shader_location: 5,
                     },
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32x3,
+                        offset: 60,
+                        shader_location: 6,
+                    },
                 ],
             })],
             compilation_options: wgpu::PipelineCompilationOptions::default(),
@@ -299,24 +329,76 @@ impl ShipMeshRenderer {
         });
         let layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             label: Some("Salimon ship bindings"),
-            entries: &[wgpu::BindGroupLayoutEntry {
-                binding: 0,
-                visibility: wgpu::ShaderStages::VERTEX_FRAGMENT,
-                ty: wgpu::BindingType::Buffer {
-                    ty: wgpu::BufferBindingType::Uniform,
-                    has_dynamic_offset: false,
-                    min_binding_size: wgpu::BufferSize::new(UNIFORM_SIZE),
+            entries: &[
+                wgpu::BindGroupLayoutEntry {
+                    binding: 0,
+                    visibility: wgpu::ShaderStages::VERTEX_FRAGMENT,
+                    ty: wgpu::BindingType::Buffer {
+                        ty: wgpu::BufferBindingType::Uniform,
+                        has_dynamic_offset: false,
+                        min_binding_size: wgpu::BufferSize::new(UNIFORM_SIZE),
+                    },
+                    count: None,
                 },
-                count: None,
-            }],
+                wgpu::BindGroupLayoutEntry {
+                    binding: 1,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Texture {
+                        sample_type: wgpu::TextureSampleType::Float { filterable: true },
+                        view_dimension: wgpu::TextureViewDimension::D2,
+                        multisampled: false,
+                    },
+                    count: None,
+                },
+                wgpu::BindGroupLayoutEntry {
+                    binding: 2,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
+                    count: None,
+                },
+            ],
+        });
+        // One small, cached atlas serves all three panels in the existing opaque
+        // draw. The mesh and all other ship materials remain immutable.
+        let instrument_texture = device.create_texture(&wgpu::TextureDescriptor {
+            label: Some("Salimon cockpit instrument atlas"),
+            size: wgpu::Extent3d {
+                width: ATLAS_WIDTH,
+                height: ATLAS_HEIGHT,
+                depth_or_array_layers: 1,
+            },
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: wgpu::TextureFormat::Rgba8UnormSrgb,
+            usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
+            view_formats: &[],
+        });
+        let instrument_view =
+            instrument_texture.create_view(&wgpu::TextureViewDescriptor::default());
+        let instrument_sampler = device.create_sampler(&wgpu::SamplerDescriptor {
+            label: Some("Salimon cockpit screen filtering"),
+            min_filter: wgpu::FilterMode::Linear,
+            mag_filter: wgpu::FilterMode::Linear,
+            ..Default::default()
         });
         let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
             label: Some("Salimon ship bind group"),
             layout: &layout,
-            entries: &[wgpu::BindGroupEntry {
-                binding: 0,
-                resource: uniform.as_entire_binding(),
-            }],
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: uniform.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::TextureView(&instrument_view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 2,
+                    resource: wgpu::BindingResource::Sampler(&instrument_sampler),
+                },
+            ],
         });
         let shader = device.create_shader_module(wgpu::include_wgsl!("ship_mesh.wgsl"));
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
@@ -348,6 +430,8 @@ impl ShipMeshRenderer {
             opaque_vertex_count: geometry.opaque_vertex_count,
             glass_vertex_count: geometry.glass_vertex_count,
             visible: false,
+            instrument_atlas: InstrumentAtlas::new(),
+            instrument_texture,
         })
     }
 
@@ -379,6 +463,27 @@ impl ShipMeshRenderer {
             ));
         }
         let axes = quaternion_axes(ship.orientation);
+        if self.instrument_atlas.update(ship.instruments) {
+            queue.write_texture(
+                wgpu::TexelCopyTextureInfo {
+                    texture: &self.instrument_texture,
+                    mip_level: 0,
+                    origin: wgpu::Origin3d::ZERO,
+                    aspect: wgpu::TextureAspect::All,
+                },
+                &self.instrument_atlas.pixels,
+                wgpu::TexelCopyBufferLayout {
+                    offset: 0,
+                    bytes_per_row: Some(ATLAS_WIDTH * 4),
+                    rows_per_image: Some(ATLAS_HEIGHT),
+                },
+                wgpu::Extent3d {
+                    width: ATLAS_WIDTH,
+                    height: ATLAS_HEIGHT,
+                    depth_or_array_layers: 1,
+                },
+            );
+        }
         let mut values = Vec::with_capacity(40);
         values.extend_from_slice(&view_projection);
         values.extend_from_slice(&[
@@ -532,14 +637,40 @@ mod tests {
         let geometry = load_geometry().expect("checked-in ship must load");
         let gltf = gltf::Gltf::from_slice(SHIP_GLB).expect("checked-in GLB must parse");
         assert!(SHIP_GLB.len() <= 512 * 1024);
-        assert!((geometry.opaque_vertex_count + geometry.glass_vertex_count) / 3 <= 4_500);
+        assert!((geometry.opaque_vertex_count + geometry.glass_vertex_count) / 3 <= 6_000);
         assert!(
             gltf.meshes()
                 .map(|mesh| mesh.primitives().len())
                 .sum::<usize>()
-                <= 100
+                <= 120
         );
         assert!(gltf.materials().len() <= 13);
+    }
+
+    #[test]
+    fn cockpit_panels_are_three_textured_quads_in_the_opaque_draw() {
+        let geometry = load_geometry().expect("ship display contract must load");
+        for panel in [1.0, 2.0, 3.0] {
+            let vertices: Vec<_> = geometry
+                .opaque_vertices
+                .chunks_exact(VERTEX_FLOATS)
+                .filter(|vertex| vertex[17] == panel)
+                .collect();
+            assert_eq!(vertices.len(), 6, "each screen is exactly two triangles");
+            for vertex in &vertices {
+                assert_eq!(vertex[14], 1.0, "screens are interior surfaces");
+                assert!(vertex[15..17].iter().all(|uv| (0.0..=1.0).contains(uv)));
+            }
+            for corner in [[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [1.0, 1.0]] {
+                assert!(vertices.iter().any(|vertex| vertex[15..17] == corner));
+            }
+        }
+        assert!(
+            geometry
+                .glass_vertices
+                .chunks_exact(VERTEX_FLOATS)
+                .all(|vertex| vertex[17] == 0.0)
+        );
     }
 
     #[test]

@@ -3,10 +3,15 @@
 Salimon is a space exploration game built around a custom Rust runtime. The
 current milestone is **Phase 0 — Technical Feasibility Showcase**: a native macOS,
 client-only prototype using a custom `wgpu` renderer, with Windows and web as
-later targets. The reference performance machine is a MacBook Air M1.
+later targets. The reference performance machine is an Apple M1 iMac
+(`iMac21,1`, model `Z12X002L9GR/A`) with 8 CPU cores, 8 integrated GPU cores,
+and 16 GB unified memory.
 
 The custom scout now includes a wider living cabin, panoramic side/rear windows,
-a central Energy Core, warm materials and detailed aft thrusters. See the
+a central Energy Core, warm materials and detailed aft thrusters. The cockpit
+has a contoured pilot chair, formed consoles, and physical monitors showing live
+metric speed, thruster percentage, Core stored/capacity energy, and nearby-body
+surface distance plus approaching/receding/zero radial speed. See the
 [ship design preview](client/assets/ship/preview.jpg). It builds on Task 10
 proportions and the first-person character and walkable ship shell.
 The native client starts inside the custom Task 7
@@ -148,7 +153,12 @@ automated tests:
    landed ship facing the cockpit. Inspect the warm 9.20 m-wide cabin, walk
    both routes around the central Energy Core, and look through the side/rear
    windows and forward from behind the lowered chair. Walk around the cockpit/cabin,
-   jump, and check the invisible interior collision boundaries. Confirm the
+   inspect the shaped seat and console details, and verify the center speed/power,
+   port Core energy, and starboard nearby-body screens. Check 0%, 1%, and 100%
+   during flight; cross the 3 Mm nearby threshold; confirm approaching, receding,
+   zero, and out-of-range states; and confirm readings remain live after leaving
+   the seat. Jump and check the
+   invisible interior collision boundaries. Confirm the
    20.30 × 4.00 × 20.00 m ship has no severe 0.05 m near-plane clipping.
 2. Use E for instant cockpit entry/exit and to open the aft door. Walk outside,
    confirm the 0.25-second gravity transition is smooth, inspect the custom
@@ -184,9 +194,9 @@ automated tests:
 10. Close the window, launch the client again, and confirm both shutdown and
    relaunch are clean.
 
-During the Task 10 interior/exterior pass at fixed 1920×1080 on the reference M1
-MacBook Air, enable F3 and confirm the overlay never reports below 60 FPS. Record
-that machine-specific evidence in the Notion task before treating the performance
+During the Task 14 benchmark at fixed 1920×1080 on the reference Apple M1 iMac,
+enable F3 and confirm the overlay never reports below 60 FPS. Record that
+machine-specific evidence in the Notion task before treating the performance
 criterion as manually verified.
 
 ## Development workflow

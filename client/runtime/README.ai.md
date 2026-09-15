@@ -38,6 +38,11 @@ necessary.
 - Keep contextual gameplay prompts in the runtime-owned action-bar state. Map
   typed domain messages to text here, keep transient expiry out of gameplay
   domains, and send only borrowed RGBA pixels plus placement to the renderer.
+- Map current ship snapshot speed/thruster data into `CockpitInstruments` on
+  every gameplay frame, including after cockpit exit. Preserve ship-domain
+  telemetry semantics and keep screen drawing in the renderer.
+- Field-map Core energy and optional nearby-body distance/radial telemetry from
+  the same snapshot. Do not select bodies or derive velocity in runtime.
 - Map all six world bodies to spheres, the Sun to a point light, and the three
   noncanonical markers to separate cuboids; preserve absolute `f64` centers
   and sphere radii. Keep material-style selection at the composition boundary.

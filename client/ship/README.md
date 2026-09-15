@@ -18,6 +18,13 @@ normal inside a body's `1.15R` volume, or an automatic takeoff while landed.
 Both sequences continue without cockpit authority; an open door blocks takeoff
 with `Close door before takeoff`.
 
+Each snapshot also carries a bounded Phase 0 Energy Core telemetry fixture and
+the nearest catalog body within an inclusive 3,000,000 m surface distance. The
+fixture starts at 750 GJ stored in a 1 TJ capacity and has no consumption,
+generation, persistence, or gameplay consequences. Nearby telemetry includes
+the body's name, surface distance, and signed radial speed: negative approaches,
+positive recedes, and zero is stationary.
+
 The wider ship uses a conservative 15 m collision radius for its
 20.30 × 4.00 × 20.00 m exterior. The Task 10 playtest revision places the runtime
 mesh's `-0.108 m` lowest local-Y point on

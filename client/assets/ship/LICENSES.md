@@ -1,7 +1,8 @@
 # Ship asset licensing
 
 The **Salimon Phase 0 Scout** geometry, hierarchy, material palette, and floor
-texture are custom original project assets generated for Salimon. No ready-made
+texture, contoured pilot chair, dashboard and monitor housings are custom
+original project assets generated for Salimon. No ready-made
 ship, downloaded mesh, public texture, font, or third-party prop is included.
 
 The generator uses only Python standard-library code. The optional preview script

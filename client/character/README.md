@@ -7,7 +7,8 @@ produces a renderer-neutral camera snapshot.
 
 The controller uses ship-local floor gravity while inside, clamps movement to
 simple invisible interior bounds, and slides around the central Core pedestal,
-port sofa, and starboard worktop.
+port sofa, starboard worktop, pilot chair, cockpit consoles/monitors, and forward
+hull proxies.
 The enlarged room has a 9.20 m interior width with walking routes on both sides
 of the Core. A 0.24 m body radius keeps the player clear of fixtures, projecting
 window sills, and rear window bulkheads. Jumping keeps the player's head below
@@ -22,8 +23,10 @@ The Task 10 playtest revision defines a 1.80 m player body with a 1.75 m standin
 eye height. The floor, player start, cockpit camera, doorway crossing, and
 invisible bounds match the redesigned 20.30 × 4.00 × 20.00 m ship. Spawn and
 cockpit exit use the clear starboard aisle at `[0.50, 1.9973, -2.20]`, outside
-the Core and the lowered pilot chair. Walking stops before the cockpit fixtures;
-seating remains a contextual transition.
+the Core and the lowered pilot chair. Walking can enter the cockpit on either
+side of the chair, while body-expanded object proxies keep the player out of the
+chair, monitor consoles, walls, and exterior hull. Seating remains a contextual
+transition.
 
 Cockpit entry and exit are instant. The default seated view is slightly pitched
 down while retaining a clear forward sightline through the Task 9 glazing; mouse

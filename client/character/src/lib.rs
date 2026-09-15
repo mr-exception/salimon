@@ -19,9 +19,9 @@ const SHIP_CEILING_HEIGHT: f64 = 2.505 * (4.0 / 3.72);
 const DOORWAY_CEILING_HEIGHT: f64 = 2.34 * (4.0 / 3.72);
 const INTERIOR_FORWARD_MIN: f64 = -7.24;
 const AFT_WALL_FORWARD_MIN: f64 = -7.24 + PLAYER_RADIUS_METERS;
-// Stop walking before the cockpit console; cockpit seating is a contextual
-// transition rather than walking through its visible geometry.
-const INTERIOR_FORWARD_MAX: f64 = 1.30;
+// The walkable deck ends at local X = 6.56 m. Keep the complete player body
+// inside the forward hull instead of excluding the whole cockpit.
+const INTERIOR_FORWARD_MAX: f64 = 6.56 - PLAYER_RADIUS_METERS;
 // Window sills project into the 9.20 m deck to Z = +/-4.20 m.
 const INTERIOR_SIDE_LIMIT: f64 = 4.20 - PLAYER_RADIUS_METERS;
 const DOORWAY_FORWARD: f64 = -7.04;
@@ -31,9 +31,50 @@ const DOORWAY_SIDE_LIMIT: f64 = 1.40 - PLAYER_RADIUS_METERS;
 const CORE_FORWARD_MIN: f64 = -2.0 - PLAYER_RADIUS_METERS;
 const CORE_FORWARD_MAX: f64 = PLAYER_RADIUS_METERS;
 const CORE_SIDE_LIMIT: f64 = 1.0 + PLAYER_RADIUS_METERS;
+const COCKPIT_CHAIR_OBSTACLE: [f64; 4] = [
+    1.77 - PLAYER_RADIUS_METERS,
+    3.30 + PLAYER_RADIUS_METERS,
+    -0.79 - PLAYER_RADIUS_METERS,
+    0.79 + PLAYER_RADIUS_METERS,
+];
+const COCKPIT_CENTER_CONSOLE_OBSTACLE: [f64; 4] = [
+    4.33 - PLAYER_RADIUS_METERS,
+    6.12 + PLAYER_RADIUS_METERS,
+    -1.06 - PLAYER_RADIUS_METERS,
+    1.06 + PLAYER_RADIUS_METERS,
+];
+const COCKPIT_PORT_CONSOLE_OBSTACLE: [f64; 4] = [
+    3.65 - PLAYER_RADIUS_METERS,
+    5.96 + PLAYER_RADIUS_METERS,
+    1.70 - PLAYER_RADIUS_METERS,
+    2.90 + PLAYER_RADIUS_METERS,
+];
+const COCKPIT_STARBOARD_CONSOLE_OBSTACLE: [f64; 4] = [
+    3.65 - PLAYER_RADIUS_METERS,
+    5.96 + PLAYER_RADIUS_METERS,
+    -2.90 - PLAYER_RADIUS_METERS,
+    -1.70 + PLAYER_RADIUS_METERS,
+];
+// The solid forward hull closes the deck outside the side consoles. Expanding
+// its inner faces by the body radius prevents a walker from bypassing a console
+// through the exterior shell while retaining the aisle between it and the chair.
+const COCKPIT_PORT_HULL_OBSTACLE: [f64; 4] = [
+    2.50 - PLAYER_RADIUS_METERS,
+    INTERIOR_FORWARD_MAX,
+    2.90 - PLAYER_RADIUS_METERS,
+    INTERIOR_SIDE_LIMIT,
+];
+const COCKPIT_STARBOARD_HULL_OBSTACLE: [f64; 4] = [
+    2.50 - PLAYER_RADIUS_METERS,
+    INTERIOR_FORWARD_MAX,
+    -INTERIOR_SIDE_LIMIT,
+    -2.90 + PLAYER_RADIUS_METERS,
+];
 // [forward minimum, forward maximum, side minimum, side maximum]. These simple
-// body-expanded footprints match the Core, port sofa, and starboard worktop.
-const INTERIOR_OBSTACLES: [[f64; 4]; 3] = [
+// body-expanded footprints match the Core, cabin furniture, pilot chair, and
+// console/monitor assemblies. A single proxy covers each console and its
+// attached monitor because their floor-plane footprints overlap.
+const INTERIOR_OBSTACLES: [[f64; 4]; 9] = [
     [
         CORE_FORWARD_MIN,
         CORE_FORWARD_MAX,
@@ -52,6 +93,12 @@ const INTERIOR_OBSTACLES: [[f64; 4]; 3] = [
         -4.48 - PLAYER_RADIUS_METERS,
         -3.58 + PLAYER_RADIUS_METERS,
     ],
+    COCKPIT_CHAIR_OBSTACLE,
+    COCKPIT_CENTER_CONSOLE_OBSTACLE,
+    COCKPIT_PORT_CONSOLE_OBSTACLE,
+    COCKPIT_STARBOARD_CONSOLE_OBSTACLE,
+    COCKPIT_PORT_HULL_OBSTACLE,
+    COCKPIT_STARBOARD_HULL_OBSTACLE,
 ];
 const COCKPIT_POSITION: [f64; 3] = [2.76, 1.799_032_258_064_516, 0.0];
 const COCKPIT_VIEW_PITCH_RADIANS: f64 = -0.10;
@@ -556,7 +603,7 @@ mod tests {
         assert_eq!(COCKPIT_POSITION, [2.76, 1.799_032_258_064_516, 0.0]);
         assert_eq!(SHIP_FLOOR_HEIGHT, 0.247_311_827_956_989_25);
         assert_eq!(INTERIOR_FORWARD_MIN, -7.24);
-        assert_eq!(INTERIOR_FORWARD_MAX, 1.30);
+        assert!((INTERIOR_FORWARD_MAX - 6.32).abs() < 1.0e-12);
         assert!((INTERIOR_SIDE_LIMIT - 3.96).abs() < 1.0e-12);
         assert_eq!(DOORWAY_FORWARD, -7.04);
     }
@@ -664,7 +711,7 @@ mod tests {
     }
 
     #[test]
-    fn both_aisles_allow_walking_from_rear_cabin_to_cockpit() {
+    fn both_cabin_aisles_enter_the_cockpit_until_the_side_consoles() {
         for side in [-2.4, 2.4] {
             let mut controller = inside_at(-6.0, side);
             walk_steps(
@@ -673,12 +720,225 @@ mod tests {
                     forward: true,
                     ..MovementInput::default()
                 },
-                24,
+                30,
             );
             let local = controller.local_ship_position().unwrap();
-            assert_eq!(local[0], INTERIOR_FORWARD_MAX);
+            assert_eq!(local[0], COCKPIT_PORT_CONSOLE_OBSTACLE[0]);
+            assert!(local[0] > 1.30, "the old broad cockpit exclusion is gone");
             assert_eq!(local[2], side);
         }
+    }
+
+    #[test]
+    fn cockpit_side_routes_pass_the_chair_and_reach_the_monitor_console() {
+        for side in [-1.20, 1.20] {
+            let mut controller = inside_at(0.50, side);
+            walk_steps(
+                &mut controller,
+                MovementInput {
+                    forward: true,
+                    ..MovementInput::default()
+                },
+                20,
+            );
+
+            let local = controller.local_ship_position().unwrap();
+            assert_eq!(local[0], COCKPIT_CENTER_CONSOLE_OBSTACLE[0]);
+            assert!(local[0] > COCKPIT_CHAIR_OBSTACLE[1]);
+            assert_eq!(local[2], side);
+        }
+    }
+
+    #[test]
+    fn cockpit_chair_blocks_walkers_from_every_planar_direction() {
+        let [forward_min, forward_max, side_min, side_max] = COCKPIT_CHAIR_OBSTACLE;
+        for (x, z, input, expected_x, expected_z) in [
+            (
+                0.5,
+                0.0,
+                MovementInput {
+                    forward: true,
+                    ..MovementInput::default()
+                },
+                forward_min,
+                0.0,
+            ),
+            (
+                3.8,
+                0.0,
+                MovementInput {
+                    backward: true,
+                    ..MovementInput::default()
+                },
+                forward_max,
+                0.0,
+            ),
+            (
+                2.5,
+                -1.5,
+                MovementInput {
+                    right: true,
+                    ..MovementInput::default()
+                },
+                2.5,
+                side_min,
+            ),
+            (
+                2.5,
+                1.5,
+                MovementInput {
+                    left: true,
+                    ..MovementInput::default()
+                },
+                2.5,
+                side_max,
+            ),
+        ] {
+            let mut controller = inside_at(x, z);
+            walk_steps(&mut controller, input, 20);
+            let local = controller.local_ship_position().unwrap();
+            assert_eq!(local[0], expected_x);
+            assert_eq!(local[2], expected_z);
+        }
+    }
+
+    #[test]
+    fn cockpit_console_proxies_cover_the_monitor_bodies() {
+        for (obstacle, x, z) in [
+            (COCKPIT_CENTER_CONSOLE_OBSTACLE, 3.7, 0.0),
+            (COCKPIT_PORT_CONSOLE_OBSTACLE, 3.0, 2.3),
+            (COCKPIT_STARBOARD_CONSOLE_OBSTACLE, 3.0, -2.3),
+        ] {
+            let mut controller = inside_at(x, z);
+            walk_steps(
+                &mut controller,
+                MovementInput {
+                    forward: true,
+                    ..MovementInput::default()
+                },
+                20,
+            );
+            assert_eq!(controller.local_ship_position().unwrap()[0], obstacle[0]);
+        }
+    }
+
+    #[test]
+    fn cockpit_collision_slides_around_the_chair_and_allows_retreat() {
+        let mut controller = inside_at(COCKPIT_CHAIR_OBSTACLE[0], 0.0);
+        walk_steps(
+            &mut controller,
+            MovementInput {
+                forward: true,
+                right: true,
+                ..MovementInput::default()
+            },
+            8,
+        );
+        let around_corner = controller.local_ship_position().unwrap();
+        assert!(around_corner[0] > COCKPIT_CHAIR_OBSTACLE[0]);
+        assert!(around_corner[2] > COCKPIT_CHAIR_OBSTACLE[3]);
+
+        walk_steps(
+            &mut controller,
+            MovementInput {
+                backward: true,
+                ..MovementInput::default()
+            },
+            3,
+        );
+        assert!(controller.local_ship_position().unwrap()[0] < around_corner[0]);
+    }
+
+    #[test]
+    fn cockpit_side_hull_blocks_bypassing_the_consoles() {
+        for (side, outward, hull, expected_side) in [
+            (
+                1.0,
+                MovementInput {
+                    right: true,
+                    ..MovementInput::default()
+                },
+                COCKPIT_PORT_HULL_OBSTACLE,
+                COCKPIT_PORT_HULL_OBSTACLE[2],
+            ),
+            (
+                -1.0,
+                MovementInput {
+                    left: true,
+                    ..MovementInput::default()
+                },
+                COCKPIT_STARBOARD_HULL_OBSTACLE,
+                COCKPIT_STARBOARD_HULL_OBSTACLE[3],
+            ),
+        ] {
+            let mut across_hull = inside_at(2.0, side * 3.2);
+            walk_steps(
+                &mut across_hull,
+                MovementInput {
+                    forward: true,
+                    ..MovementInput::default()
+                },
+                10,
+            );
+            assert_eq!(across_hull.local_ship_position().unwrap()[0], hull[0]);
+
+            let mut around_console = inside_at(3.0, side * 2.4);
+            walk_steps(&mut around_console, outward, 10);
+            assert_eq!(
+                around_console.local_ship_position().unwrap()[2],
+                expected_side
+            );
+        }
+    }
+
+    #[test]
+    fn interior_walls_and_forward_hull_keep_the_complete_player_inside() {
+        for (start, input, axis, expected) in [
+            (
+                [1.0, 0.0],
+                MovementInput {
+                    right: true,
+                    ..MovementInput::default()
+                },
+                2,
+                INTERIOR_SIDE_LIMIT,
+            ),
+            (
+                [1.0, 0.0],
+                MovementInput {
+                    left: true,
+                    ..MovementInput::default()
+                },
+                2,
+                -INTERIOR_SIDE_LIMIT,
+            ),
+            (
+                [5.0, 1.4],
+                MovementInput {
+                    forward: true,
+                    ..MovementInput::default()
+                },
+                0,
+                INTERIOR_FORWARD_MAX,
+            ),
+        ] {
+            let mut controller = inside_at(start[0], start[1]);
+            walk_steps(&mut controller, input, 20);
+            assert_eq!(controller.local_ship_position().unwrap()[axis], expected);
+        }
+    }
+
+    #[test]
+    fn cockpit_chair_collision_preserves_instant_seating_and_safe_exit() {
+        let mut controller = inside_at(COCKPIT_CHAIR_OBSTACLE[0], 0.0);
+        controller.enter_cockpit();
+        assert_eq!(controller.location(), CharacterLocation::Cockpit);
+        assert_eq!(controller.local_ship_position(), Some(COCKPIT_POSITION));
+
+        controller.leave_cockpit();
+        assert_eq!(controller.local_ship_position(), Some(PLAYER_START));
+        walk_steps(&mut controller, MovementInput::default(), 1);
+        assert_eq!(controller.local_ship_position(), Some(PLAYER_START));
     }
 
     #[test]

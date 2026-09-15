@@ -8,8 +8,10 @@ Important regression areas are diagonal-speed normalization, edge-triggered
 jumping, closed/flying doorway containment, the exact 250 ms gravity blend,
 instant cockpit transitions, horizontal mouse-delta direction in both walking
 and cockpit views, the default forward cockpit-window sightline, central Core
-and furniture collision and sliding, both cabin aisles, window sill clearance,
+and furniture collision and sliding, both cockpit side routes, pilot-chair and
+console/monitor collision, forward-hull containment, window sill clearance,
 ceiling and lintel containment, rear doorway body clearance, safe cockpit exit,
-and constant-radius full-sphere movement. Add a focused unit test whenever one of
-these rules changes. Surface camera and movement direction must continue to share
-the same yaw-derived local tangent basis rather than using fixed ship/world axes.
+and constant-radius full-sphere movement. Add a focused unit test whenever one
+of these rules changes. Surface camera and movement direction must continue to
+share the same yaw-derived local tangent basis rather than using fixed ship/world
+axes.

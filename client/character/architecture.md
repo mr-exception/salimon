@@ -6,15 +6,18 @@ the ship without copying ship simulation into this crate. Doorway and surface
 states use world coordinates so the gravity transition and radial projection are
 explicit.
 
-The ship interior uses a rectangular walking envelope with a body-radius margin
-and three simple planar obstacles for the central Core pedestal, port sofa, and
-starboard worktop. Movement resolves
-forward and sideways axes separately against that obstacle, preserving sliding
-and the clear routes on both sides without a physics engine or mesh collision.
-The side bounds account for the projecting window sills. The aft bulkhead stays
-solid outside the body-clear doorway aperture, even when the door is open.
-Jump height is bounded by the lowest ceiling fixtures and a lower local bound
-at the door lintel. Spawn and cockpit exit share a clear starboard aisle position.
+The ship interior uses a body-radius-inset walking envelope and simple planar
+collision proxies for the central Core pedestal, cabin furniture, pilot chair,
+three console/monitor assemblies, and the solid forward hull beside the cockpit.
+Movement resolves forward and sideways axes separately, preserving edge sliding
+and clear routes on both sides of the chair without a physics engine or mesh
+collision. The outer cockpit hull proxies prevent bypassing a side console
+through the exterior shell, while the forward envelope follows the actual deck
+edge instead of globally excluding the cockpit. The side bounds account for the
+projecting window sills. The aft bulkhead stays solid outside the body-clear
+doorway aperture, even when the door is open. Jump height is bounded by the
+lowest ceiling fixtures and a lower local bound at the door lintel. Spawn and
+cockpit exit share a clear starboard aisle position.
 
 `MovementInput` is the typed platform boundary. `ShipFrame` and `SurfaceFrame`
 are read-only environmental inputs. `CharacterSnapshot` is the presentation and

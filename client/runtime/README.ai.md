@@ -35,6 +35,9 @@ necessary.
 - Keep camera state through renderer rebuilds while resetting the monotonic
   update interval across lifecycle discontinuities.
 - Keep the renderer call surface narrow and typed.
+- Keep contextual gameplay prompts in the runtime-owned action-bar state. Map
+  typed domain messages to text here, keep transient expiry out of gameplay
+  domains, and send only borrowed RGBA pixels plus placement to the renderer.
 - Map all six world bodies to spheres, the Sun to a point light, and the three
   noncanonical markers to separate cuboids; preserve absolute `f64` centers
   and sphere radii. Keep material-style selection at the composition boundary.

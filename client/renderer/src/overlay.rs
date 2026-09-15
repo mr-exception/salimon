@@ -8,6 +8,15 @@ pub struct OverlayImage<'a> {
     pub height: u32,
     pub rgba8: &'a [u8],
     pub revision: u64,
+    pub placement: OverlayPlacement,
+}
+
+/// Screen-space placement selected by the overlay's presentation producer.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub enum OverlayPlacement {
+    #[default]
+    TopLeft,
+    BottomCenter,
 }
 
 impl OverlayImage<'_> {
@@ -61,6 +70,20 @@ fn fitted_overlay_size(surface_size: [u32; 2], image_size: [u32; 2]) -> [f32; 2]
         .min(available[1] / image_size[1])
         .min(1.0);
     image_size.map(|size| size * scale)
+}
+
+fn overlay_origin(
+    surface_size: [u32; 2],
+    display_size: [f32; 2],
+    placement: OverlayPlacement,
+) -> [f32; 2] {
+    match placement {
+        OverlayPlacement::TopLeft => [OVERLAY_MARGIN_PIXELS as f32; 2],
+        OverlayPlacement::BottomCenter => [
+            (surface_size[0] as f32 - display_size[0]).max(0.0) * 0.5,
+            (surface_size[1] as f32 - OVERLAY_MARGIN_PIXELS as f32 - display_size[1]).max(0.0),
+        ],
+    }
 }
 
 pub(crate) struct OverlayRenderer {
@@ -144,7 +167,7 @@ impl OverlayRenderer {
         });
         let dimensions_buffer = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("Salimon overlay dimensions"),
-            size: 16,
+            size: 32,
             usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
@@ -209,13 +232,22 @@ impl OverlayRenderer {
 
         let display_size =
             fitted_overlay_size([surface_width, surface_height], [image.width, image.height]);
+        let origin = overlay_origin(
+            [surface_width, surface_height],
+            display_size,
+            image.placement,
+        );
         let dimensions = [
             surface_width as f32,
             surface_height as f32,
             display_size[0],
             display_size[1],
+            origin[0],
+            origin[1],
+            0.0,
+            0.0,
         ];
-        let mut bytes = [0_u8; 16];
+        let mut bytes = [0_u8; 32];
         for (chunk, value) in bytes.chunks_exact_mut(4).zip(dimensions) {
             chunk.copy_from_slice(&value.to_ne_bytes());
         }
@@ -279,7 +311,9 @@ impl OverlayRenderer {
 
 #[cfg(test)]
 mod tests {
-    use super::{OverlayImage, OverlayImageError, fitted_overlay_size};
+    use super::{
+        OverlayImage, OverlayImageError, OverlayPlacement, fitted_overlay_size, overlay_origin,
+    };
 
     #[test]
     fn keeps_source_size_when_the_panel_fits() {
@@ -314,6 +348,18 @@ mod tests {
     }
 
     #[test]
+    fn places_action_bars_at_the_bottom_center() {
+        assert_eq!(
+            overlay_origin([1280, 720], [600.0, 80.0], OverlayPlacement::BottomCenter),
+            [340.0, 624.0]
+        );
+        assert_eq!(
+            overlay_origin([1280, 720], [600.0, 80.0], OverlayPlacement::TopLeft),
+            [16.0, 16.0]
+        );
+    }
+
+    #[test]
     fn accepts_exact_rgba_byte_length() {
         assert_eq!(
             OverlayImage {
@@ -321,6 +367,7 @@ mod tests {
                 height: 3,
                 rgba8: &[0; 24],
                 revision: 1,
+                placement: OverlayPlacement::TopLeft,
             }
             .validate(),
             Ok(())
@@ -335,6 +382,7 @@ mod tests {
                 height: 1,
                 rgba8: &[],
                 revision: 0,
+                placement: OverlayPlacement::TopLeft,
             }
             .validate(),
             Err(OverlayImageError::Empty)
@@ -345,6 +393,7 @@ mod tests {
                 height: 2,
                 rgba8: &[0; 15],
                 revision: 0,
+                placement: OverlayPlacement::TopLeft,
             }
             .validate(),
             Err(OverlayImageError::InvalidByteLength {

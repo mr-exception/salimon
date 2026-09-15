@@ -13,6 +13,7 @@ winit event loop
         -> salimon-ship pose / interaction snapshot
         -> salimon-world static Solar System + camera/precision snapshot
         -> salimon-diagnostics aggregation / RGBA view
+        -> runtime contextual action-bar state / RGBA view
         -> map snapshot -> salimon-renderer new / resize / render
             -> wgpu surface, camera-relative conversion, depth, and presentation
 ```
@@ -53,6 +54,15 @@ observations flow through `BodyDistance`; diagnostics selects the closest for it
 single nearby-body row. Diagnostics owns aggregation and the RGBA panel, while
 the renderer owns only generic image composition. Gameplay view supplies live
 player/ship diagnostics; precision-tour view supplies its camera metrics.
+
+## Contextual action-bar flow
+
+The runtime maps typed ship messages and the aimed cockpit interaction into one
+bottom-centered action bar for the normal gameplay view. State-derived actions
+remain visible only while applicable. Immediate blocked-door feedback overrides
+the current action for three seconds and then expires without changing ship
+state. The renderer receives a borrowed RGBA image and placement only, allowing
+the action bar and optional diagnostics panel to be composited independently.
 
 ## Evolution
 

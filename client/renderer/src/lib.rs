@@ -14,7 +14,7 @@ use std::fmt;
 use std::time::Duration;
 
 use gpu_timing::GpuTimer;
-pub use overlay::OverlayImage;
+pub use overlay::{OverlayImage, OverlayPlacement};
 pub use ship_mesh::ShipMeshInstance;
 pub use spheres::{PointLight, SphereInstance, SurfaceMaterial};
 use wgpu::util::DeviceExt;
@@ -604,6 +604,7 @@ pub struct Renderer {
     instance_capacity: usize,
     depth_target: DepthTarget,
     overlay: overlay::OverlayRenderer,
+    action_bar: overlay::OverlayRenderer,
     spheres: spheres::SphereRenderer,
     ship_mesh: ship_mesh::ShipMeshRenderer,
     gpu_timer: Option<GpuTimer>,
@@ -789,6 +790,7 @@ impl Renderer {
         });
         let depth_target = DepthTarget::new(&device, configured_width, configured_height);
         let overlay = overlay::OverlayRenderer::new(&device, configuration.format, DEPTH_FORMAT);
+        let action_bar = overlay::OverlayRenderer::new(&device, configuration.format, DEPTH_FORMAT);
         let spheres = spheres::SphereRenderer::new(&device, &queue, configuration.format);
         let ship_mesh = ship_mesh::ShipMeshRenderer::new(&device, configuration.format)?;
         let gpu_timer = timestamp_queries_supported.then(|| GpuTimer::new(&device, &queue));
@@ -806,6 +808,7 @@ impl Renderer {
             instance_capacity: 1,
             depth_target,
             overlay,
+            action_bar,
             spheres,
             ship_mesh,
             gpu_timer,
@@ -848,6 +851,7 @@ impl Renderer {
         &mut self,
         scene: SceneFrame<'_>,
         overlay_image: Option<OverlayImage<'_>>,
+        action_bar_image: Option<OverlayImage<'_>>,
         before_present: impl FnOnce(),
     ) -> Result<RenderOutcome, RendererError> {
         if let Some(gpu_timer) = self.gpu_timer.as_mut() {
@@ -917,6 +921,15 @@ impl Renderer {
                 overlay_image,
             )
             .map_err(|error| RendererError::new("failed to prepare overlay", error))?;
+        self.action_bar
+            .prepare(
+                &self.device,
+                &self.queue,
+                self.configuration.width,
+                self.configuration.height,
+                action_bar_image,
+            )
+            .map_err(|error| RendererError::new("failed to prepare action bar", error))?;
         let mut encoder = self
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor {
@@ -959,6 +972,7 @@ impl Renderer {
             self.spheres.draw(&mut render_pass);
             self.ship_mesh.draw(&mut render_pass);
             self.overlay.draw(&mut render_pass);
+            self.action_bar.draw(&mut render_pass);
         }
         if let (Some(gpu_timer), Some(slot_index)) = (self.gpu_timer.as_ref(), timing_slot) {
             gpu_timer.resolve_and_map(&mut encoder, slot_index);
@@ -985,7 +999,8 @@ impl Renderer {
                 .map_or(GpuFrameTime::Pending, GpuFrameTime::Measured),
             None => GpuFrameTime::Unsupported,
         };
-        let overlay_draw_calls = u32::from(self.overlay.is_visible());
+        let overlay_draw_calls =
+            u32::from(self.overlay.is_visible()) + u32::from(self.action_bar.is_visible());
         let scene_draw_calls = scene_draw_calls(prepared_scene.instance_count)
             + scene_draw_calls(self.spheres.count())
             + self.ship_mesh.draw_count();

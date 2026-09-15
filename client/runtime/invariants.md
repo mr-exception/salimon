@@ -50,3 +50,7 @@
     cannot cancel or steer an active assisted landing/takeoff sequence.
 23. Character surface traversal receives the body frame stored by landed or
     assisted ship state, so every solid body uses the same character gravity.
+24. Normal gameplay view presents applicable cockpit/interaction messages in a
+    readable bottom-centered action bar. State-derived prompts disappear when
+    their source becomes inapplicable; immediate blocked-door feedback expires
+    after three seconds. Precision-tour view never displays the gameplay bar.

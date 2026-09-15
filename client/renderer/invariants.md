@@ -25,15 +25,16 @@
     conversion; its fragment depth uses the rationalized ray-intersection root.
 11. The renderer uses low-level `wgpu` directly and must not introduce a full
     game engine.
-12. Overlay input is a validated, borrowed RGBA image. The renderer may cache and
-    uniformly fit and composite it but never owns diagnostics aggregation, text,
-    toggle policy, or gameplay data.
+12. Overlay inputs are validated, borrowed RGBA images with typed screen-space
+    placement. The renderer may cache, uniformly fit, and composite them but
+    never owns diagnostics aggregation, action text, expiry/toggle policy, or
+    gameplay data.
 13. GPU timestamps are requested only when the selected adapter supports them;
     readback must not block the presentation loop. Unsupported or pending data
     is reported explicitly.
 14. Scene object counts describe instances retained by conservative frustum
-    culling, and scene draw counts exclude diagnostics presentation. Total draw
-    calls include the overlay when it is visible.
+    culling, and scene draw counts exclude overlay presentation. Total draw calls
+    include each diagnostics/action overlay when it is visible.
 15. Texture LOD varies continuously with projected footprint. Local detail uses
     a body-relative origin wrapped in CPU `f64`; no universe-scale `f32` texture
     coordinates, atmosphere, clouds, shadows, or post-effect dependency is used.

@@ -10,9 +10,9 @@ use salimon_diagnostics::{
     BodyDistance, Diagnostics, DomainMetrics, FrameSample, GpuMemory, GpuTime,
 };
 use salimon_renderer::{
-    CameraFrame, GpuFrameTime, OverlayImage as RendererOverlayImage, PointLight, RenderOutcome,
-    Renderer, SceneFrame, SceneInstance, ShipMeshInstance, SphereInstance, SurfaceMaterial,
-    SurfaceSize,
+    CameraFrame, GpuFrameTime, OverlayImage as RendererOverlayImage, OverlayPlacement, PointLight,
+    RenderOutcome, Renderer, SceneFrame, SceneInstance, ShipMeshInstance, SphereInstance,
+    SurfaceMaterial, SurfaceSize,
 };
 use salimon_ship::{
     CockpitMessage, DoorState, FlightState, ShipController, ShipPose, ShipSnapshot, SteeringInput,
@@ -28,6 +28,7 @@ use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
 use winit::keyboard::{KeyCode, PhysicalKey};
 use winit::window::{CursorGrabMode, Window, WindowAttributes, WindowId};
 
+use crate::action_bar::ActionBar;
 use crate::frame_clock::FrameClock;
 use crate::update_clock::UpdateClock;
 
@@ -100,6 +101,7 @@ struct ClientApplication {
     view_mode: ViewMode,
     cursor_captured: bool,
     diagnostics: Diagnostics,
+    action_bar: ActionBar,
     render_attempts: u64,
     retry_at: Option<Instant>,
     occluded: bool,
@@ -121,6 +123,7 @@ impl Default for ClientApplication {
             view_mode: ViewMode::Gameplay,
             cursor_captured: false,
             diagnostics: Diagnostics::default(),
+            action_bar: ActionBar::default(),
             render_attempts: 0,
             retry_at: None,
             occluded: false,
@@ -196,6 +199,18 @@ fn gameplay_window_title(
     }
 }
 
+fn action_bar_context(
+    monitor_message: Option<CockpitMessage>,
+    interaction: Option<InteractionTarget>,
+) -> Option<&'static str> {
+    monitor_message
+        .filter(|message| *message != CockpitMessage::DoorLockedWhileInFlight)
+        .map(CockpitMessage::text)
+        .or_else(|| {
+            (interaction == Some(InteractionTarget::Cockpit)).then_some(COCKPIT_INTERACTION_PROMPT)
+        })
+}
+
 impl ClientApplication {
     fn create_window(&mut self, event_loop: &ActiveEventLoop) -> Result<(), RunError> {
         if self.window.is_some() {
@@ -221,6 +236,7 @@ impl ClientApplication {
             window.scale_factor()
         );
         self.diagnostics.set_scale_factor(window.scale_factor());
+        self.action_bar.set_scale_factor(window.scale_factor());
         self.window = Some(Arc::new(window));
         Ok(())
     }
@@ -309,6 +325,9 @@ impl ClientApplication {
                     Some(InteractionTarget::ExitDoor) => {
                         self.ship.toggle_door();
                         if let Some(message) = self.ship.snapshot().cockpit_message {
+                            if message == CockpitMessage::DoorLockedWhileInFlight {
+                                self.action_bar.show_transient(message.text());
+                            }
                             log::info!("cockpit monitor: {}", message.text());
                         } else {
                             log::info!("exit door is now {:?}", self.ship.snapshot().door_state);
@@ -363,6 +382,9 @@ impl ClientApplication {
         } else {
             None
         };
+        self.action_bar.advance(update_delta);
+        let contextual_action = action_bar_context(monitor_message, interaction);
+        self.action_bar.set_contextual(contextual_action);
         window.set_title(&gameplay_window_title(
             ship_snapshot,
             monitor_message,
@@ -394,6 +416,17 @@ impl ClientApplication {
                 height: image.height,
                 rgba8: image.rgba8,
                 revision: image.revision,
+                placement: OverlayPlacement::TopLeft,
+            });
+        let action_bar_image = self
+            .action_bar
+            .image(self.view_mode == ViewMode::Gameplay)
+            .map(|image| RendererOverlayImage {
+                width: image.width,
+                height: image.height,
+                rgba8: image.rgba8,
+                revision: image.revision,
+                placement: OverlayPlacement::BottomCenter,
             });
         let outcome = match self
             .renderer
@@ -408,6 +441,7 @@ impl ClientApplication {
                     ship: ship_mesh,
                 },
                 overlay_image,
+                action_bar_image,
                 || window.pre_present_notify(),
             ) {
             Ok(outcome) => outcome,
@@ -582,6 +616,7 @@ impl ApplicationHandler for ClientApplication {
             }
             WindowEvent::ScaleFactorChanged { .. } => {
                 self.diagnostics.set_scale_factor(window.scale_factor());
+                self.action_bar.set_scale_factor(window.scale_factor());
                 self.resize_renderer(event_loop, &window);
             }
             WindowEvent::Occluded(is_occluded) => {
@@ -1085,12 +1120,12 @@ const fn transition_phase_name(phase: TransitionPhase) -> &'static str {
 mod tests {
     use super::{
         COCKPIT_INTERACTION_PROMPT, INITIAL_HEIGHT, INITIAL_WIDTH, InteractionTarget,
-        ShipControlInput, camera_body_distances, camera_command, camera_domain_metrics,
-        format_metric_speed, gameplay_window_title, initial_window_size, interaction_target,
-        is_diagnostics_toggle, landing_action_pressed, map_world_to_renderer,
+        ShipControlInput, action_bar_context, camera_body_distances, camera_command,
+        camera_domain_metrics, format_metric_speed, gameplay_window_title, initial_window_size,
+        interaction_target, is_diagnostics_toggle, landing_action_pressed, map_world_to_renderer,
         release_cursor_pressed, ship_control_key, thruster_step, update_ship_control_input,
     };
-    use salimon_ship::{FlightState, ShipController};
+    use salimon_ship::{CockpitMessage, FlightState, ShipController};
     use salimon_world::{CELESTIAL_BODIES, CameraCommand, CameraPrototype, CelestialBodyId};
     use winit::event::ElementState;
     use winit::keyboard::{KeyCode, PhysicalKey};
@@ -1351,6 +1386,52 @@ mod tests {
         assert_eq!(
             gameplay_window_title(ship, None, None),
             "Salimon — Compressed Solar System"
+        );
+    }
+
+    #[test]
+    fn action_bar_context_tracks_ship_prompt_state_transitions() {
+        let mut landed = ShipController::default();
+        assert_eq!(
+            action_bar_context(landed.contextual_cockpit_message(), None),
+            None
+        );
+
+        landed.set_cockpit_control(true);
+        assert_eq!(
+            action_bar_context(landed.contextual_cockpit_message(), None),
+            Some("Press L to take off")
+        );
+        landed.toggle_door();
+        landed.trigger_landing_action();
+        assert_eq!(
+            action_bar_context(landed.contextual_cockpit_message(), None),
+            Some("Close door before takeoff")
+        );
+        landed.toggle_door();
+        assert_eq!(
+            action_bar_context(landed.contextual_cockpit_message(), None),
+            Some("Press L to take off")
+        );
+        landed.set_cockpit_control(false);
+        assert_eq!(
+            action_bar_context(landed.contextual_cockpit_message(), None),
+            None
+        );
+
+        let pose = ShipController::default().snapshot().pose;
+        let flying = ShipController::flying(pose, 0);
+        assert_eq!(
+            action_bar_context(flying.contextual_cockpit_message(), None),
+            Some("Press L to land")
+        );
+        assert_eq!(
+            action_bar_context(
+                Some(CockpitMessage::DoorLockedWhileInFlight),
+                Some(super::InteractionTarget::Cockpit),
+            ),
+            Some(super::COCKPIT_INTERACTION_PROMPT),
+            "timed blocked feedback is owned by ActionBar, not stale ship state"
         );
     }
 

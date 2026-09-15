@@ -4,7 +4,7 @@
 
 `salimon-renderer` owns GPU presentation through `wgpu`. It initializes a native
 surface and pipelines, responds to valid size changes, renders borrowed
-renderer-facing scenes, composites generic RGBA overlay input, and
+renderer-facing scenes, composites generic placed RGBA overlay inputs, and
 exposes renderer-owned measurements.
 
 ## Read before changing
@@ -33,7 +33,7 @@ reverse-Z depth target, and depth policy.
 The renderer owns `wgpu` state, shaders, pipelines, command encoding, overlay
 composition, GPU timestamp readback, allocator reporting, and presentation. It
 must not own frame scheduling, CPU timing aggregation, input, authoritative
-domain state, diagnostics text, or toggle policy.
+domain state, diagnostics/action text, expiry, or toggle policy.
 
 ## Change checklist
 

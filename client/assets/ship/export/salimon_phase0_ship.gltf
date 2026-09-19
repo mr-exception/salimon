@@ -5,7 +5,7 @@
     "copyright": "Copyright 2026 Salimon contributors; custom original asset",
     "extras": {
       "salimon": {
-        "assetVersion": 7,
+        "assetVersion": 8,
         "units": "meters",
         "upAxis": "+Y",
         "forwardAxis": "+X",
@@ -160,15 +160,16 @@
         116,
         117,
         118,
-        119
+        119,
+        120
       ]
     },
     {
       "name": "Interaction_Markers",
       "children": [
-        120,
         121,
-        122
+        122,
+        123
       ]
     },
     {
@@ -860,6 +861,25 @@
             20.0
           ],
           "purpose": "broad-phase-hull"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_CockpitCenterConsole",
+      "translation": [
+        5.2163,
+        0.8382499999999999,
+        0.0
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            1.8073999999999995,
+            1.1764999999999999,
+            2.12
+          ],
+          "purpose": "interior-obstacle"
         }
       }
     },
@@ -7563,14 +7583,14 @@
       "count": 4,
       "type": "VEC3",
       "min": [
-        4.28,
-        0.95,
-        -0.9
+        4.3238,
+        0.905,
+        -0.63
       ],
       "max": [
-        4.28,
-        1.63,
-        0.9
+        4.3238,
+        1.3809999999999998,
+        0.63
       ]
     },
     {
@@ -7689,7 +7709,7 @@
       ],
       "max": [
         4.68233800005066,
-        1.6949999999999998,
+        1.4649999999999999,
         2.8057705874049157
       ]
     },
@@ -7724,12 +7744,12 @@
       "type": "VEC3",
       "min": [
         3.6664126259858687,
-        0.9149999999999999,
+        0.8805,
         -2.5788186817013203
       ],
       "max": [
         4.517736412671073,
-        1.6649999999999998,
+        1.4349999999999998,
         2.5788186817013203
       ]
     },
@@ -7764,12 +7784,12 @@
       "type": "VEC3",
       "min": [
         3.6356358126152752,
-        0.9149999999999999,
+        0.8805,
         -2.6055772006404743
       ],
       "max": [
         4.556438706713195,
-        1.6649999999999998,
+        1.4349999999999998,
         2.6055772006404743
       ]
     },
@@ -7804,11 +7824,11 @@
       "type": "VEC3",
       "min": [
         4.008801523485407,
-        0.867,
+        0.8469,
         -2.404997808503267
       ],
       "max": [
-        4.288,
+        4.329400000000001,
         0.8969999999999999,
         2.404997808503267
       ]
@@ -7844,12 +7864,12 @@
       "type": "VEC3",
       "min": [
         3.749434253971813,
-        1.4149999999999998,
+        1.3914999999999997,
         -2.550003792785944
       ],
       "max": [
         4.44561232060848,
-        1.662,
+        1.432,
         2.1958338752770015
       ]
     },
@@ -9544,7 +9564,7 @@
         "width": 9.2,
         "height": 2.5591397849462365
       },
-      "designRevision": "detailed-pilot-station-live-instruments",
+      "designRevision": "compact-center-monitor-70-percent",
       "energyCore": {
         "centerMeters": [
           -1.0,
@@ -9565,7 +9585,40 @@
         "uvOrigin": "top-left",
         "powerSource": "shared-thruster-command",
         "surfaceTriangles": 6,
-        "additionalDraws": 0
+        "additionalDraws": 0,
+        "centerAssembly": {
+          "uniformScaleFromAssetVersion7": 0.7,
+          "pivotMeters": [
+            4.426,
+            0.8,
+            0.0
+          ],
+          "baselineBoundsMeters": {
+            "min": [
+              4.264,
+              0.8,
+              -1.02
+            ],
+            "max": [
+              4.511,
+              1.695,
+              1.02
+            ]
+          },
+          "boundsMeters": {
+            "min": [
+              4.312600000000001,
+              0.8,
+              -0.714
+            ],
+            "max": [
+              4.4855,
+              1.4264999999999999,
+              0.714
+            ]
+          },
+          "collisionNode": "COLLIDER_CockpitCenterConsole"
+        }
       },
       "cockpitWindows": {
         "glazingNode": "Cockpit_Glazing",

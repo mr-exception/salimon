@@ -8,6 +8,8 @@ import math
 import struct
 from pathlib import Path
 
+from generate_salimon_phase0_ship import cockpit_components
+
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPORT = ROOT / "export"
@@ -79,15 +81,84 @@ def assert_vectors_close(actual: list[float], expected: list[float]) -> None:
     )
 
 
+def accessor_values(document: dict, binary: bytes, index: int) -> list[tuple]:
+    accessor = document["accessors"][index]
+    view = document["bufferViews"][accessor["bufferView"]]
+    size = {"VEC3": 3, "VEC2": 2, "SCALAR": 1}[accessor["type"]]
+    kind = "f" if accessor["componentType"] == 5126 else "H"
+    start = view.get("byteOffset", 0) + accessor.get("byteOffset", 0)
+    layout = "<" + kind * size
+    return list(struct.iter_unpack(layout, binary[start:start + accessor["count"] * struct.calcsize(layout)]))
+
+
+def validate_center_monitor_scale(document: dict, binary: bytes, manifest: dict) -> None:
+    """Check every assembly vertex, including details in shared-material meshes."""
+    # Center is authored first in each merged mesh. Explicit vertex counts keep
+    # the scale assertion independent of the implementation's resizing helper.
+    center_vertex_counts = {
+        "Monitor_Center": 4,
+        "Cockpit_Monitor_Housings": 104,
+        "Cockpit_Monitor_Bezels": 16,
+        "Cockpit_Instrument_Fasteners": 24,
+        "Cockpit_Tactile_Keys": 72,
+        "Cockpit_Ready_Indicators": 24,
+    }
+    pivot, scale = [4.426, .80, 0.0], .7
+    before_positions, after_positions = [], []
+    for baseline in cockpit_components(center_monitor_scale=1.0):
+        exported = node(document, baseline.name)
+        primitive = document["meshes"][exported["mesh"]]["primitives"][0]
+        positions = accessor_values(document, binary, primitive["attributes"]["POSITION"])
+        assert len(positions) == len(baseline.geometry.positions)
+        center_count = center_vertex_counts.get(baseline.name, 0)
+        for index, (actual, original) in enumerate(zip(positions, baseline.geometry.positions)):
+            if index < center_count:
+                expected = [anchor + scale * (value-anchor) for value, anchor in zip(original, pivot)]
+                before_positions.append(original)
+                after_positions.append(actual)
+            else:
+                expected = original
+            assert_vectors_close(actual, expected)
+        # Uniform positive scaling preserves normals, proportions, UV mapping
+        # and topology; all side-monitor and dashboard vertices stay unchanged.
+        for attribute, expected in (("NORMAL", baseline.geometry.normals),
+                                    ("TEXCOORD_0", baseline.geometry.texcoords)):
+            actual = accessor_values(document, binary, primitive["attributes"][attribute])
+            assert len(actual) == len(expected)
+            for values, original in zip(actual, expected):
+                assert_vectors_close(values, original)
+        assert [value[0] for value in accessor_values(document, binary, primitive["indices"])] == baseline.geometry.indices
+
+    def bounds(positions):
+        return {"min": [min(point[axis] for point in positions) for axis in range(3)],
+                "max": [max(point[axis] for point in positions) for axis in range(3)]}
+
+    before, after = bounds(before_positions), bounds(after_positions)
+    assert_vectors_close(before["min"], [4.264, .8, -1.02])
+    assert_vectors_close(before["max"], [4.511, 1.695, 1.02])
+    assert_vectors_close(after["min"], [4.3126, .8, -.714])
+    assert_vectors_close(after["max"], [4.4855, 1.4265, .714])
+    for axis in range(3):
+        assert abs((after["max"][axis]-after["min"][axis]) /
+                   (before["max"][axis]-before["min"][axis]) - scale) < 1e-5
+    metadata = document["extras"]["salimon"]["cockpitInstruments"]["centerAssembly"]
+    assert metadata == manifest["cockpitInstruments"]["centerAssembly"]
+    assert metadata["uniformScaleFromAssetVersion7"] == scale
+    assert_vectors_close(metadata["pivotMeters"], pivot)
+    for bound in ("min", "max"):
+        assert_vectors_close(metadata["baselineBoundsMeters"][bound], before[bound])
+        assert_vectors_close(metadata["boundsMeters"][bound], after[bound])
+    collider = node(document, metadata["collisionNode"])
+    center = collider["translation"]
+    size = collider["extras"]["salimon"]["sizeMeters"]
+    assert_vectors_close([value-width/2 for value, width in zip(center, size)], [4.3126, .25, -1.06])
+    assert_vectors_close([value+width/2 for value, width in zip(center, size)], [6.12, 1.4265, 1.06])
+
+
 def validate_sightlines(document: dict, binary: bytes) -> None:
     """Ray-test real exported triangles, catching opaque walls behind new panes."""
     def values(index):
-        accessor=document["accessors"][index]
-        view=document["bufferViews"][accessor["bufferView"]]
-        size={"VEC3":3,"VEC2":2,"SCALAR":1}[accessor["type"]]
-        kind="f" if accessor["componentType"]==5126 else "H"
-        start=view.get("byteOffset",0)+accessor.get("byteOffset",0)
-        return list(struct.iter_unpack("<"+kind*size,binary[start:start+accessor["count"]*struct.calcsize("<"+kind*size)]))
+        return accessor_values(document, binary, index)
     def sub(a,b): return tuple(x-y for x,y in zip(a,b))
     def dot(a,b): return sum(x*y for x,y in zip(a,b))
     def cross(a,b): return (a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0])
@@ -125,7 +196,7 @@ def validate_sightlines(document: dict, binary: bytes) -> None:
     # actual seated eye, with top-left UVs and normals toward the pilot.
     seated_eye=(2.76,1.799032258064516,0.)
     for label, role, x, y0, y1, z0, z1 in (
-        ("Center","speed",4.28,.95,1.63,-.90,.90),
+        ("Center","speed",4.3238,.905,1.381,-.63,.63),
         ("Port","thruster-power",4.10,.95,1.40,1.90,2.80),
         ("Starboard","thruster-power",4.10,.95,1.40,-2.80,-1.90),
     ):
@@ -356,12 +427,14 @@ def main() -> None:
     assert metrics["cockpitInstruments"]["additionalDraws"] == 0
     instruments = manifest["cockpitInstruments"]
     assert_vectors_close(instruments["pilotFacingTargetMeters"], windows["seatedViewpointMeters"])
-    for label in ("Port", "Starboard"):
+    for label in ("Center", "Port", "Starboard"):
         name = f"Monitor_{label}"
-        assert instruments["sideYawDegrees"][name] == node(document, name)["extras"]["salimon"]["pilotFacingYawDegrees"]
+        if label != "Center":
+            assert instruments["sideYawDegrees"][name] == node(document, name)["extras"]["salimon"]["pilotFacingYawDegrees"]
         lower, upper = node_position_bounds(document, name)
         assert_vectors_close(instruments["surfaceBoundsMeters"][name]["min"], lower)
         assert_vectors_close(instruments["surfaceBoundsMeters"][name]["max"], upper)
+    validate_center_monitor_scale(document, geometry, manifest)
     assert metrics["energyCore"]["role"] == "energy-storage"
     assert metrics["energyCore"]["phase0"] == "visual-only"
     roof = node(document, "Hull_Roof")

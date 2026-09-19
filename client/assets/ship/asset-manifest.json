@@ -1,6 +1,6 @@
 {
   "name": "Salimon Phase 0 Scout",
-  "assetVersion": 7,
+  "assetVersion": 8,
   "source": "source/generate_salimon_phase0_ship.py",
   "editableInterchange": "export/salimon_phase0_ship.gltf",
   "runtimeAsset": "export/salimon_phase0_ship.glb",
@@ -101,14 +101,14 @@
     "surfaceBoundsMeters": {
       "Monitor_Center": {
         "min": [
-          4.28,
-          0.95,
-          -0.9
+          4.3238,
+          0.905,
+          -0.63
         ],
         "max": [
-          4.28,
-          1.63,
-          0.9
+          4.3238,
+          1.381,
+          0.63
         ]
       },
       "Monitor_Port": {
@@ -135,6 +135,39 @@
           -2.127095856113253
         ]
       }
+    },
+    "centerAssembly": {
+      "uniformScaleFromAssetVersion7": 0.7,
+      "pivotMeters": [
+        4.426,
+        0.8,
+        0.0
+      ],
+      "baselineBoundsMeters": {
+        "min": [
+          4.264,
+          0.8,
+          -1.02
+        ],
+        "max": [
+          4.511,
+          1.695,
+          1.02
+        ]
+      },
+      "boundsMeters": {
+        "min": [
+          4.312600000000001,
+          0.8,
+          -0.714
+        ],
+        "max": [
+          4.4855,
+          1.4264999999999999,
+          0.714
+        ]
+      },
+      "collisionNode": "COLLIDER_CockpitCenterConsole"
     }
   }
 }

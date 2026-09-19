@@ -650,7 +650,26 @@ mod tests {
     #[test]
     fn cockpit_panels_are_three_textured_quads_in_the_opaque_draw() {
         let geometry = load_geometry().expect("ship display contract must load");
-        for panel in [1.0, 2.0, 3.0] {
+        // Task 16 bakes the center assembly's 0.7 scale into the asset. The
+        // renderer consumes these final meters directly; side panels keep
+        // their previous dimensions and yaw toward the seated pilot.
+        for (panel, center, width, height, normal) in [
+            (1.0, [4.3238, 1.143, 0.0], 1.26, 0.476, [-1.0, 0.0, 0.0]),
+            (
+                2.0,
+                [4.10, 1.175, 2.35],
+                0.90,
+                0.45,
+                normalize([-1.34, 0.0, -2.35]),
+            ),
+            (
+                3.0,
+                [4.10, 1.175, -2.35],
+                0.90,
+                0.45,
+                normalize([-1.34, 0.0, 2.35]),
+            ),
+        ] {
             let vertices: Vec<_> = geometry
                 .opaque_vertices
                 .chunks_exact(VERTEX_FLOATS)
@@ -660,6 +679,24 @@ mod tests {
             for vertex in &vertices {
                 assert_eq!(vertex[14], 1.0, "screens are interior surfaces");
                 assert!(vertex[15..17].iter().all(|uv| (0.0..=1.0).contains(uv)));
+                let horizontal_offset = (vertex[15] - 0.5) * width;
+                let expected_position = [
+                    center[0] + normal[2] * horizontal_offset,
+                    center[1] + (0.5 - vertex[16]) * height,
+                    center[2] - normal[0] * horizontal_offset,
+                ];
+                for (axis, expected) in expected_position.into_iter().enumerate() {
+                    assert!(
+                        (vertex[axis] - expected).abs() < 1.0e-5,
+                        "panel {panel} axis {axis} must preserve its authored dimensions and top-left UV fit"
+                    );
+                }
+                for (axis, expected) in normal.into_iter().enumerate() {
+                    assert!(
+                        (vertex[axis + 3] - expected).abs() < 1.0e-5,
+                        "panel {panel} must retain its pilot-facing normal"
+                    );
+                }
             }
             for corner in [[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [1.0, 1.0]] {
                 assert!(vertices.iter().any(|vertex| vertex[15..17] == corner));

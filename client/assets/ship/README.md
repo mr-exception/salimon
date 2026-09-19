@@ -34,6 +34,12 @@ the center displays speed and common thrust, the port panel shows Core energy,
 and the starboard panel shows nearby-body distance/radial state. Both sides retain
 the shared thruster power percentage. Both thrusters currently use the same
 flight command.
+The center monitor's complete assembly is uniformly 70% of its previous (asset version 7) size,
+including its screen, housing, mounting stem, bezel, fasteners, tactile keys and
+ready indicator. Scaling around the stem attachment `[4.426, 0.80, 0.0]` keeps it
+anchored to the dashboard and lowers the top edge from 1.695 m to 1.4265 m.
+The live screen is now 1.26 × 0.476 m; the dashboard and both side monitors retain
+their existing geometry and placement.
 The pilot chair is a contoured bucket with a reclined tapered back, split
 terracotta cushions, side bolsters, compact headrest, armrests, a short stick and
 throttle-shaped hand control, plus a suspension pedestal on floor rails. The
@@ -86,7 +92,7 @@ updated pilot station is authored directly in final meters by
 `cockpit_components()` to retain human proportions independently of hull scale.
 
 Metadata-only collision boxes describe the floor, walls, ceiling, central Core,
-door and coarse exterior. They add no draw calls. The gameplay controller still
+door, center console/monitor assembly and coarse exterior. They add no draw calls. The gameplay controller still
 owns matching portable constants; changing these dimensions requires updating
 character/runtime contract tests together. The visible deck and collision floor
 now agree at local Y `0.2473118 m`. The human is 1.80 m tall with 1.75 m eye height.
@@ -108,9 +114,15 @@ record the exact pilot-facing target/yaw alongside `displayRole`, `uvOrigin`, an
 the `shared-thruster-command` power source. Six triangles provide the complete
 live instrument surface without extra ship draws.
 
+`COLLIDER_CockpitCenterConsole` combines the unchanged dashboard with the smaller
+monitor: its physical bounds are `[4.3126, 0.25, -1.06]` to
+`[6.12, 1.4265, 1.06]`. Character collision expands this footprint by the player's
+radius. `cockpitInstruments.centerAssembly` records the original and reduced
+monitor bounds, uniform scale and fixed pivot in both exports and the manifest.
+
 ## Budgets and verification
 
-Current export: **5,494 triangles, 106 primitives, 13 materials**, 467,372-byte GLB.
+Current export: **5,494 triangles, 106 primitives, 13 materials**, 468,388-byte GLB.
 Hard caps: 6,000 triangles, 120 primitives, 13 materials, 512 KiB GLB; runtime ship
 submission remains two draws. This is a deliberate increase from the initial
 620-triangle greybox to allow the requested design detail, while remaining small.
@@ -122,6 +134,8 @@ The validator checks exports agree, buffer/GLB structure, hierarchy, material
 budgets, measured bounds, floor alignment, Core metadata and housing containment
 inside its collider, shaped chair components, exact monitor planes/normals/UVs,
 side-display yaw toward the authored pilot viewpoint,
+the exact 0.7 transform of every center-monitor assembly vertex, unchanged side
+and dashboard geometry/UVs/topology, and the matching combined console collider,
 fifteen unobstructed seated-eye rays over the three displays, seat height and actual
 triangle ray intersections for forward seated/standing and side/rear window
 sightlines, plus unoccluded recessed engine emitters. Rust tests cover import/emission, widened walking, core/furniture

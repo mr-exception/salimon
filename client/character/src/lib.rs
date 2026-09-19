@@ -38,7 +38,7 @@ const COCKPIT_CHAIR_OBSTACLE: [f64; 4] = [
     0.79 + PLAYER_RADIUS_METERS,
 ];
 const COCKPIT_CENTER_CONSOLE_OBSTACLE: [f64; 4] = [
-    4.33 - PLAYER_RADIUS_METERS,
+    4.3126 - PLAYER_RADIUS_METERS,
     6.12 + PLAYER_RADIUS_METERS,
     -1.06 - PLAYER_RADIUS_METERS,
     1.06 + PLAYER_RADIUS_METERS,
@@ -819,6 +819,26 @@ mod tests {
                 20,
             );
             assert_eq!(controller.local_ship_position().unwrap()[0], obstacle[0]);
+        }
+    }
+
+    #[test]
+    fn reduced_center_monitor_blocks_walking_and_jumping_before_its_front_face() {
+        // Asset version 8's complete center assembly begins at X=4.3126 m,
+        // slightly in front of the dashboard's pilot-facing edge at X=4.33 m.
+        for jump in [false, true] {
+            let mut controller = inside_at(3.7, 0.0);
+            walk_steps(
+                &mut controller,
+                MovementInput {
+                    forward: true,
+                    jump,
+                    ..MovementInput::default()
+                },
+                20,
+            );
+            let eye = controller.local_ship_position().unwrap();
+            assert!((eye[0] + PLAYER_RADIUS_METERS - 4.3126).abs() < 1.0e-9);
         }
     }
 

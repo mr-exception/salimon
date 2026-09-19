@@ -52,6 +52,31 @@ PLAYER_START_METERS = [
     SCALED_FLOOR_HEIGHT_METERS + PLAYER_EYE_HEIGHT_METERS,
     -2.20,
 ]
+CENTER_MONITOR_SCALE = 0.7
+# The bottom-center of the existing mounting stem stays fixed on the dashboard.
+CENTER_MONITOR_PIVOT_METERS = (4.426, 0.80, 0.0)
+CENTER_MONITOR_BASELINE_BOUNDS_METERS = {
+    "min": [4.264, 0.80, -1.02],
+    "max": [4.511, 1.695, 1.02],
+}
+
+
+def scale_center_monitor_point(point: Sequence[float], scale: float) -> list[float]:
+    return [pivot + (value - pivot) * scale
+            for value, pivot in zip(point, CENTER_MONITOR_PIVOT_METERS)]
+
+
+def center_monitor_metadata() -> dict[str, object]:
+    return {
+        "uniformScaleFromAssetVersion7": CENTER_MONITOR_SCALE,
+        "pivotMeters": list(CENTER_MONITOR_PIVOT_METERS),
+        "baselineBoundsMeters": CENTER_MONITOR_BASELINE_BOUNDS_METERS,
+        "boundsMeters": {
+            bound: scale_center_monitor_point(point, CENTER_MONITOR_SCALE)
+            for bound, point in CENTER_MONITOR_BASELINE_BOUNDS_METERS.items()
+        },
+        "collisionNode": "COLLIDER_CockpitCenterConsole",
+    }
 
 
 def vector_sub(a: Sequence[float], b: Sequence[float]) -> tuple[float, float, float]:
@@ -499,7 +524,7 @@ def chamfered_loft_y(sections: Sequence[tuple[float, float, float, float, float]
     return result
 
 
-def cockpit_components() -> list[Component]:
+def cockpit_components(center_monitor_scale: float = CENTER_MONITOR_SCALE) -> list[Component]:
     """Human-scale pilot station in final meters, independent of hull scaling."""
     components: list[Component] = []
     def add(name: str, geometry: Geometry, material: int, **extras: object) -> None:
@@ -523,10 +548,21 @@ def cockpit_components() -> list[Component]:
         # Housing is 31 mm behind the instrument-facing plane.
         x += .031
         width, cz = z1-z0, (z0+z1)/2
+        def resize_center(geometry: Geometry) -> Geometry:
+            if label != "Center":
+                return geometry
+            return Geometry(
+                positions=[tuple(scale_center_monitor_point(point, center_monitor_scale))
+                           for point in geometry.positions],
+                normals=geometry.normals.copy(),
+                texcoords=geometry.texcoords.copy(),
+                indices=geometry.indices.copy(),
+            )
+
         def face_pilot(geometry: Geometry) -> Geometry:
-            return face_geometry_toward_xz(
+            return resize_center(face_geometry_toward_xz(
                 geometry, (x-.031, cz), COCKPIT_VIEWPOINT_METERS
-            )[0]
+            )[0])
 
         housing = chamfered_loft_y([
             (y0-.115,x-.012,x+.20,width/2+.10,.055),
@@ -543,7 +579,7 @@ def cockpit_components() -> list[Component]:
         screen, yaw_degrees = face_geometry_toward_xz(
             screen, (x-.031, cz), COCKPIT_VIEWPOINT_METERS
         )
-        add(f"Monitor_{label}",screen,6,interactive="cockpit-monitor",
+        add(f"Monitor_{label}",resize_center(screen),6,interactive="cockpit-monitor",
             displayRole=role,thrusterSide=label.lower() if label!="Center" else "none",
             uvOrigin="top-left",powerSource="shared-thruster-command" if label!="Center" else "none",
             pilotFacingTargetMeters=COCKPIT_VIEWPOINT_METERS,
@@ -928,6 +964,26 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
         )
         nodes[groups["Collision"]]["children"].append(node_index)  # type: ignore[index,union-attr]
 
+    # This combined proxy follows the controller's conservative floor-plane
+    # footprint: the dashboard and its attached, uniformly reduced monitor.
+    monitor_bounds = center_monitor_metadata()["boundsMeters"]
+    dashboard = next(component.geometry for component in components
+                     if component.name == "Cockpit_Console_Center")
+    lower = [min(monitor_bounds["min"][axis], min(point[axis] for point in dashboard.positions))
+             for axis in range(3)]
+    upper = [max(monitor_bounds["max"][axis], max(point[axis] for point in dashboard.positions))
+             for axis in range(3)]
+    nodes[groups["Collision"]]["children"].append(len(nodes))  # type: ignore[index,union-attr]
+    nodes.append({
+        "name": "COLLIDER_CockpitCenterConsole",
+        "translation": [(minimum + maximum) / 2 for minimum, maximum in zip(lower, upper)],
+        "extras": {"salimon": {
+            "collisionShape": "box",
+            "sizeMeters": [maximum - minimum for minimum, maximum in zip(lower, upper)],
+            "purpose": "interior-obstacle",
+        }},
+    })
+
     markers = [
         ("MARKER_CockpitSeat", COCKPIT_SEAT_MARKER_METERS, "+X", "cockpit-seat"),
         ("MARKER_ExitDoor", scaled_vector([-3.55, 1.25, 0.0]), "-X", "exit-door"),
@@ -951,7 +1007,7 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
             "copyright": "Copyright 2026 Salimon contributors; custom original asset",
             "extras": {
                 "salimon": {
-                    "assetVersion": 7,
+                    "assetVersion": 8,
                     "units": "meters",
                     "upAxis": "+Y",
                     "forwardAxis": "+X",
@@ -993,7 +1049,7 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
                     "width": 4.60 * HORIZONTAL_SCALE_FROM_TASK7,
                     "height": 2.38 * VERTICAL_SCALE_FROM_TASK7,
                 },
-                "designRevision": "detailed-pilot-station-live-instruments",
+                "designRevision": "compact-center-monitor-70-percent",
                 "energyCore": {"centerMeters": [-1.0, 1.2, 0.0], "role": "energy-storage", "phase0": "visual-only"},
                 "humanBodyHeightMeters": PLAYER_BODY_HEIGHT_METERS,
                 "humanEyeHeightMeters": PLAYER_EYE_HEIGHT_METERS,
@@ -1002,6 +1058,7 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
                     "powerNodes": ["Monitor_Port", "Monitor_Starboard"],
                     "uvOrigin": "top-left", "powerSource": "shared-thruster-command",
                     "surfaceTriangles": 6, "additionalDraws": 0,
+                    "centerAssembly": center_monitor_metadata(),
                 },
                 "cockpitWindows": {
                     "glazingNode": "Cockpit_Glazing",

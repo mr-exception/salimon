@@ -83,4 +83,4 @@ meter detail there.
 - Reversed-Z improves useful depth distribution and removes a finite far clip;
   it cannot distinguish exactly coplanar surfaces or compensate for poorly
   chosen near geometry. Visual GPU limitations must be recorded by the runtime
-  and renderer smoke test on the reference MacBook Air M1.
+  and renderer smoke test on the reference Apple M1 iMac.

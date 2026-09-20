@@ -1340,14 +1340,21 @@ mod tests {
             assisting.speed_meters_per_second,
             full_power.instruments.speed_meters_per_second
         );
-        assert!(
+        // Landing starts with an alignment hold, even when already at the
+        // surface. The live monitor must report the actual stationary phase.
+        assert_eq!(
             assisting
                 .nearby_body
                 .unwrap()
-                .radial_speed_meters_per_second
-                < 0.0
+                .radial_speed_meters_per_second,
+            0.0
         );
         ship.advance(std::time::Duration::from_millis(100));
+        assert!(matches!(
+            ship.snapshot().flight_state,
+            FlightState::AssistedLanding { .. }
+        ));
+        ship.advance(salimon_ship::LANDING_ASSIST_DURATION - std::time::Duration::from_millis(100));
         assert!(matches!(
             ship.snapshot().flight_state,
             FlightState::Landed { .. }
@@ -1373,6 +1380,46 @@ mod tests {
                 .nearby_body
                 .is_none()
         );
+    }
+
+    #[test]
+    fn cockpit_proximity_monitor_tracks_eased_assists_without_pilot_authority() {
+        let mut ship = ShipController::default();
+        ship.set_cockpit_control(true);
+        ship.trigger_landing_action();
+        ship.set_cockpit_control(false);
+        ship.advance(std::time::Duration::from_secs(1));
+        let lifting = map_ship_to_renderer(ship.snapshot())
+            .instruments
+            .nearby_body
+            .unwrap();
+        assert!((lifting.radial_speed_meters_per_second - 11.25).abs() < 1.0e-9);
+        ship.advance(std::time::Duration::from_secs(1));
+        let lifted = map_ship_to_renderer(ship.snapshot())
+            .instruments
+            .nearby_body
+            .unwrap();
+        assert!(lifted.surface_distance_meters > lifting.surface_distance_meters);
+        assert_eq!(lifted.radial_speed_meters_per_second, 0.0);
+
+        let mut pose = ShipController::default().snapshot().pose;
+        pose.position_meters[1] += 100.0;
+        let mut ship = ShipController::flying(pose, 100);
+        ship.trigger_landing_action();
+        ship.set_cockpit_control(false);
+        ship.advance(std::time::Duration::from_secs(2));
+        let aligned = map_ship_to_renderer(ship.snapshot())
+            .instruments
+            .nearby_body
+            .unwrap();
+        assert_eq!(aligned.radial_speed_meters_per_second, 0.0);
+        ship.advance(std::time::Duration::from_secs(1));
+        let descending = map_ship_to_renderer(ship.snapshot())
+            .instruments
+            .nearby_body
+            .unwrap();
+        assert!(descending.surface_distance_meters < aligned.surface_distance_meters);
+        assert!(descending.radial_speed_meters_per_second < 0.0);
     }
 
     #[test]

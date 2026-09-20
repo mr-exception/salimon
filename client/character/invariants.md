@@ -5,6 +5,8 @@
    seated, irrespective of the nearby planetary surface.
 3. A closed door, or any flying ship, prevents transition out of the interior.
 4. A landed open-door crossing blends gravity direction for exactly 250 ms.
+   WASD stays camera-relative throughout the blend; re-entry requires movement
+   toward the cabin rather than a particular key.
 5. Surface positions remain at body radius plus eye height and support traversal
    around the complete sphere.
 6. Cockpit entry/exit is instant and does not mutate ship velocity or orientation.
@@ -21,7 +23,8 @@
     clearance and edge sliding; both side routes into the cockpit remain
     traversable.
 12. Rear window bulkheads remain solid with the door open. Doorway crossings
-    require enough lateral clearance for the player's complete body.
+    require enough lateral clearance for the player's complete body, including
+    oblique movement throughout the gravity blend.
 13. Spawn and cockpit exit place the player in the starboard aisle without
     intersecting the Core, chair, or walking boundary.
 14. Jumping keeps the complete player body below the ceiling fixtures and the
@@ -32,3 +35,8 @@
 16. The cockpit uses its actual forward deck boundary plus solid side-hull
     proxies; a walking player cannot bypass the side consoles into the exterior
     shell.
+17. Surface walkers collide with the front, sides, and aft bulkheads regardless
+    of door state. The landed open aft gate is the only entry route, with the
+    same body clearance as interior traversal. Hull contact preserves surface
+    eye radius and permits sliding; distant or vertically separated surface
+    walkers cannot be captured by the doorway.

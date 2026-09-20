@@ -65,7 +65,7 @@ and the optional overlay adds one. Object counts mean retained bounds, not exact
 occlusion visibility. Cost scales with covered pixels rather than sphere radius.
 Fragment depth and discarded silhouette fragments can limit early-depth
 optimizations; profile overlapping large bodies before increasing scene size.
-The later Task 11 benchmark must establish the M1 fixed-1080p performance target.
+Task 14 must establish the reference Apple M1 iMac fixed-1080p performance target.
 
 ## Future higher-detail terrain
 

@@ -15,7 +15,14 @@ window sills, and rear window bulkheads. Jumping keeps the player's head below
 the ceiling lights and the lower door lintel. The aft transition is restricted to the actual
 2.80 m doorway, and a closed/flying doorway remains solid. An
 open landed doorway begins an exact 0.25-second up-vector blend before the
-controller changes to Earth-radial surface walking. Surface movement is projected
+controller changes to Earth-radial surface walking. Doorway movement retains
+the interior's camera-relative WASD directions, including strafing. Re-entry
+requires actual movement toward the cabin, independent of the pressed key.
+Outside walkers collide with a conservative cabin/nose envelope, including the
+side hull and rear windows, whether the gate is open or closed. Only the landed
+open gate admits entry; exterior contact allows sliding around the hull while
+preserving body clearance and surface eye height.
+Surface movement is projected
 back to the same spherical radius each update, so the portable rule works around
 the full body rather than only near the initial landing point.
 

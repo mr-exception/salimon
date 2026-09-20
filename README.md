@@ -99,7 +99,7 @@ window is closed. It captures the cursor for mouse look and starts inside the
 landed ship facing the cockpit. Use **WASD** to walk, the mouse to look, and
 **Space** to jump. Press **E** near the cockpit to enter or leave
 control instantly; press **E** near the aft door to open/close it while landed.
-Walk backward through the open door to transition over 0.25 seconds to Earth-radial
+Face the open door and walk forward through it to transition over 0.25 seconds to Earth-radial
 gravity and inspect the ship exterior. There is no sprint or crouch. Press
 **Escape** to release the captured cursor for window controls; click the game
 view to capture it again.
@@ -163,8 +163,14 @@ automated tests:
    the seat. Jump and check the
    invisible interior collision boundaries. Confirm the
    20.30 × 4.00 × 20.00 m ship has no severe 0.05 m near-plane clipping.
-2. Use E for instant cockpit entry/exit and to open the aft door. Walk outside,
-   confirm the 0.25-second gravity transition is smooth, inspect the custom
+2. Use E for instant cockpit entry/exit and to open the aft door. Face the door
+   and hold W to walk outside; confirm movement stays outward throughout the
+   doorway blend and does not pull you back inside. Also check sideways and
+   backward crossings and re-entry while moving toward the cabin. Outside,
+   push against both sides, the nose, and rear windows with the gate open:
+   all remain solid. Slide around an aft corner and re-enter through the gate;
+   confirm the jambs still require full body clearance.
+   Confirm the 0.25-second gravity transition is smooth, inspect the custom
    exterior/material variation, confirm its lowest point rests on Earth without
    a visible gap or penetration, then re-enter and close the door.
 3. From cockpit control, approach Mercury, Venus, Earth, Moon, and Mars from

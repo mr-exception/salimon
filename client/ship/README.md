@@ -3,7 +3,7 @@
 `salimon-ship` owns portable Phase 0 ship state. It provides the landed-on-Earth
 starting pose, cockpit-control authority, persistent direct-speed motion,
 Task 12 steering/thruster controls, solid-body boundary correction, Task 13
-assisted landing/takeoff, and the
+assisted landing/takeoff with Task 17 timing, and the
 landed-only door rule. Opening or closing the exit uses a typed action;
 while flying it remains closed and emits the cockpit message `Door locked while
 in flight`.
@@ -17,6 +17,15 @@ steps. `L` starts an uncancellable automatic landing at the current approach
 normal inside a body's `1.15R` volume, or an automatic takeoff while landed.
 Both sequences continue without cockpit authority; an open door blocks takeoff
 with `Close door before takeoff`.
+
+Landing takes 8 seconds: 2 seconds to smoothly align the hull while holding its
+position, 4 seconds to approach a low hover, and 2 seconds to touch down. The
+final descent covers at most 15 m (a quarter of the available height for a close
+approach). Takeoff takes 6 seconds: a readable 15 m lift over 2 seconds, then
+4 seconds to clear the landing volume plus the collision radius. Each movement
+phase eases out of and into rest, and alignment follows the shortest quaternion
+arc. Timing uses supplied elapsed time, including frames longer than 100 ms;
+no orientation or position change occurs on activation.
 
 Each snapshot also carries a bounded Phase 0 Energy Core telemetry fixture and
 the nearest catalog body within an inclusive 3,000,000 m surface distance. The

@@ -4,7 +4,20 @@ The controller stores one portable position state: cockpit, ship-local interior,
 world-space doorway blend, or world-space surface. Ship-local positions move with
 the ship without copying ship simulation into this crate. Doorway and surface
 states use world coordinates so the gravity transition and radial projection are
-explicit.
+explicit. Interior and doorway movement share the same normalized, yaw-relative
+ship-plane direction; the doorway converts both planar axes into world space.
+During the blend, lateral movement slides along the body-clear doorway limits.
+Surface re-entry uses the movement tangent's component along ship-forward, so
+walking away or parallel to the door cannot trigger an entering blend.
+Surface walking also collides with a conservative, body-expanded cabin/nose
+envelope. Overlapping aft wall proxies leave only the actual gate aperture;
+closed or unlanded gates fill that opening. Entry requires inward movement from
+the exterior into this aperture with vertical hull overlap. Collision slides
+along the exterior and solves surface height without changing the resolved
+ship-local planar coordinates, so radial projection cannot push a walker back
+through the hull. The proxies have finite height and exclude the broad asset
+bounds for wings/engines. A completed entry gravity blend stays in the doorway
+until the player reaches the cabin, preserving slow and diagonal crossings.
 
 The ship interior uses a body-radius-inset walking envelope and simple planar
 collision proxies for the central Core pedestal, cabin furniture, pilot chair,

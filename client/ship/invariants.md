@@ -27,3 +27,10 @@
 16. Nearby-body telemetry selects the nearest catalog surface at an inclusive
     3,000,000 m threshold and reports actual signed radial velocity: negative
     approaching, positive receding, and zero stationary/tangential.
+17. Landing lasts 8 seconds and takeoff 6 seconds of supplied update time,
+    independent of frame partition or the direct-flight 100 ms clamp.
+18. Assist activation preserves the pose. Landing levels smoothly over 2 seconds
+    before descending; takeoff preserves landed orientation. Every radial phase
+    begins and ends at rest, and the final pose is sampled exactly once at completion.
+19. Landing reserves 2 seconds for its last 15 m or less; takeoff reserves 2 seconds
+    for its first 15 m, so local surface motion stays readable on every solid body.

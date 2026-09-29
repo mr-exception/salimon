@@ -61,3 +61,7 @@
     readable bottom-centered action bar. State-derived prompts disappear when
     their source becomes inapplicable; immediate blocked-door feedback expires
     after three seconds. Precision-tour view never displays the gameplay bar.
+26. E2E scenario setup requires an explicit launch flag and occurs before the
+    native event loop. It changes only initial controller state and update-clock
+    policy. A ready line follows successful renderer initialization; ordinary
+    launches retain the default state and monotonic clock.

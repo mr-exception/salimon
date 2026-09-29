@@ -71,6 +71,11 @@ the action bar and optional diagnostics panel to be composited independently.
 
 ## Evolution
 
+An explicit `--e2e` launch selects a fixed update duration and one known initial
+scenario before the event loop starts. The runtime composes existing character,
+ship, and immutable catalog values; subsequent frames and interactions use the
+same production controllers. The ready signal follows successful renderer setup.
+
 Diagnostics remains observational and non-authoritative. When additional native
 targets or platform services appear, move OS-specific policy behind
 `client/platform/` without moving portable timing or client orchestration out of

@@ -11,6 +11,31 @@ Run from the repository root with `cargo run --locked -p salimon-client`.
 The process requests a physical 1920×1080 initial drawable for the Phase 0
 benchmark, opens a resizable native window, and runs until the window is closed.
 
+## Deterministic E2E launch
+
+Pass `--e2e` after `--` to opt into reproducible initial conditions. For example:
+
+```sh
+cargo run --locked -p salimon-client -- --e2e --scenario orbit-moon --seed 42 --step-ms 16
+```
+
+Scenarios: `landed-earth` (default, standing in the ship), `cockpit-earth`
+(seated in the landed ship), `orbit-earth`, and `orbit-moon` (seated in a flying
+ship, 1 km above the nominal surface). The world catalog is immutable; the seed
+selects a reproducible tangent offset of at most 100 m for orbit scenarios.
+`--seed` defaults to 0. `--step-ms` defaults to 16 and accepts 1–100 milliseconds.
+Each drawable update uses this fixed duration; rendering still follows the native
+window lifecycle. Tests can drive ordinary keyboard/mouse interactions after
+setup. Ship flight, doors, character motion, and collision remain on their normal
+controller paths. There is no runtime command to mutate state after launch.
+
+Wait for the stdout line `SALIMON_E2E_READY scenario=<name> seed=<n> step_ms=<n>`
+before sending input. It is emitted after window and renderer initialization;
+setup or GPU/window failure exits nonzero with a diagnostic on stderr/log output.
+Close the window to finish the run. Scenario flags without `--e2e`, malformed
+values, and unknown scenarios fail before opening a window. Normal launches use
+the original monotonic update clock and default starting state.
+
 ## Lifecycle contract
 
 - Create window-bound rendering state only after the native application is

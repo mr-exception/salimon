@@ -1,5 +1,6 @@
 use std::error::Error;
 use std::fmt;
+use std::io::Write;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
@@ -29,6 +30,7 @@ use winit::keyboard::{KeyCode, PhysicalKey};
 use winit::window::{CursorGrabMode, Window, WindowAttributes, WindowId};
 
 use crate::action_bar::ActionBar;
+use crate::e2e;
 use crate::frame_clock::FrameClock;
 use crate::update_clock::UpdateClock;
 
@@ -49,12 +51,17 @@ const fn initial_window_size() -> PhysicalSize<u32> {
     PhysicalSize::new(INITIAL_WIDTH, INITIAL_HEIGHT)
 }
 
-pub(crate) fn run() -> Result<(), RunError> {
+pub(crate) fn run(config: Option<e2e::Config>) -> Result<(), RunError> {
     let event_loop = EventLoop::new()
         .map_err(|error| RunError::new("failed to create native event loop", error))?;
     event_loop.set_control_flow(ControlFlow::Wait);
 
     let mut application = ClientApplication::default();
+    if let Some(config) = config {
+        e2e::initialize(&mut application, config)
+            .map_err(|error| RunError::new("E2E setup failed", error))?;
+    }
+    application.e2e_config = config;
     event_loop
         .run_app(&mut application)
         .map_err(|error| RunError::new("native event loop failed", error))?;
@@ -88,14 +95,16 @@ impl fmt::Display for RunError {
 
 impl Error for RunError {}
 
-struct ClientApplication {
+pub(crate) struct ClientApplication {
     window: Option<Arc<Window>>,
     renderer: Option<Renderer>,
     frame_clock: FrameClock,
-    update_clock: UpdateClock,
+    pub(crate) update_clock: UpdateClock,
     camera_prototype: CameraPrototype,
-    character: CharacterController,
-    ship: ShipController,
+    pub(crate) character: CharacterController,
+    pub(crate) ship: ShipController,
+    e2e_config: Option<e2e::Config>,
+    e2e_ready_sent: bool,
     movement_input: MovementInput,
     ship_control_input: ShipControlInput,
     view_mode: ViewMode,
@@ -118,6 +127,8 @@ impl Default for ClientApplication {
             camera_prototype: CameraPrototype::default(),
             character: CharacterController::default(),
             ship: ShipController::default(),
+            e2e_config: None,
+            e2e_ready_sent: false,
             movement_input: MovementInput::default(),
             ship_control_input: ShipControlInput::default(),
             view_mode: ViewMode::Gameplay,
@@ -281,6 +292,18 @@ impl ClientApplication {
             info.timestamp_queries_supported
         );
         self.renderer = Some(renderer);
+        if let Some(config) = self.e2e_config.filter(|_| !self.e2e_ready_sent) {
+            println!(
+                "SALIMON_E2E_READY scenario={} seed={} step_ms={}",
+                config.scenario.name(),
+                config.seed,
+                config.step.as_millis()
+            );
+            std::io::stdout()
+                .flush()
+                .map_err(|error| RunError::new("failed to emit E2E ready signal", error))?;
+            self.e2e_ready_sent = true;
+        }
         self.render_attempts = 0;
         self.retry_at = None;
         self.frame_clock.reset_interval();

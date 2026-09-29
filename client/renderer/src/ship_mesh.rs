@@ -650,24 +650,23 @@ mod tests {
     #[test]
     fn cockpit_panels_are_three_textured_quads_in_the_opaque_draw() {
         let geometry = load_geometry().expect("ship display contract must load");
-        // Task 16 bakes the center assembly's 0.7 scale into the asset. The
-        // renderer consumes these final meters directly; side panels keep
-        // their previous dimensions and yaw toward the seated pilot.
+        // Asset version 9 bakes the second 0.7 reduction and seatward shift
+        // into all three assemblies; the renderer consumes final meters.
         for (panel, center, width, height, normal) in [
-            (1.0, [4.3238, 1.143, 0.0], 1.26, 0.476, [-1.0, 0.0, 0.0]),
+            (1.0, [3.95446, 1.0401, 0.0], 0.882, 0.3332, [-1.0, 0.0, 0.0]),
             (
                 2.0,
-                [4.10, 1.175, 2.35],
-                0.90,
-                0.45,
-                normalize([-1.34, 0.0, -2.35]),
+                [3.70, 1.0625, 2.35],
+                0.63,
+                0.315,
+                normalize([-0.94, 0.0, -2.35]),
             ),
             (
                 3.0,
-                [4.10, 1.175, -2.35],
-                0.90,
-                0.45,
-                normalize([-1.34, 0.0, 2.35]),
+                [3.70, 1.0625, -2.35],
+                0.63,
+                0.315,
+                normalize([-0.94, 0.0, 2.35]),
             ),
         ] {
             let vertices: Vec<_> = geometry

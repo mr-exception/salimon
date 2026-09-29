@@ -1,6 +1,6 @@
 {
   "name": "Salimon Phase 0 Scout",
-  "assetVersion": 8,
+  "assetVersion": 9,
   "source": "source/generate_salimon_phase0_ship.py",
   "editableInterchange": "export/salimon_phase0_ship.gltf",
   "runtimeAsset": "export/salimon_phase0_ship.glb",
@@ -93,51 +93,53 @@
       0.0
     ],
     "sideYawDegrees": {
-      "Monitor_Port": -60.30766,
-      "Monitor_Starboard": 60.30766
+      "Monitor_Port": -68.198591,
+      "Monitor_Starboard": 68.198591
     },
     "surfaceTriangles": 6,
     "additionalDraws": 0,
     "surfaceBoundsMeters": {
       "Monitor_Center": {
         "min": [
-          4.3238,
-          0.905,
-          -0.63
+          3.9544600000000005,
+          0.8734999999999999,
+          -0.441
         ],
         "max": [
-          4.3238,
-          1.381,
-          0.63
+          3.9544600000000005,
+          1.2066999999999999,
+          0.441
         ]
       },
       "Monitor_Port": {
         "min": [
-          3.709086016318018,
-          0.95,
-          2.127095856113253
+          3.407529842371143,
+          0.905,
+          2.233011936948457
         ],
         "max": [
-          4.490913983681981,
-          1.4,
-          2.5729041438867464
+          3.9924701576288566,
+          1.22,
+          2.4669880630515424
         ]
       },
       "Monitor_Starboard": {
         "min": [
-          3.709086016318018,
-          0.95,
-          -2.5729041438867464
+          3.407529842371143,
+          0.905,
+          -2.4669880630515424
         ],
         "max": [
-          4.490913983681981,
-          1.4,
-          -2.127095856113253
+          3.9924701576288566,
+          1.22,
+          -2.233011936948457
         ]
       }
     },
     "centerAssembly": {
-      "uniformScaleFromAssetVersion7": 0.7,
+      "uniformScaleFromAssetVersion7": 0.49,
+      "uniformScaleFromAssetVersion8": 0.7,
+      "seatwardOffsetMeters": 0.4,
       "pivotMeters": [
         4.426,
         0.8,
@@ -157,14 +159,14 @@
       },
       "boundsMeters": {
         "min": [
-          4.312600000000001,
+          3.9466200000000007,
           0.8,
-          -0.714
+          -0.4998
         ],
         "max": [
-          4.4855,
-          1.4264999999999999,
-          0.714
+          4.0676499999999995,
+          1.23855,
+          0.4998
         ]
       },
       "collisionNode": "COLLIDER_CockpitCenterConsole"

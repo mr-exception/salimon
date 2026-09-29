@@ -52,7 +52,9 @@ PLAYER_START_METERS = [
     SCALED_FLOOR_HEIGHT_METERS + PLAYER_EYE_HEIGHT_METERS,
     -2.20,
 ]
-CENTER_MONITOR_SCALE = 0.7
+CENTER_MONITOR_SCALE = 0.49  # 70% of the already reduced version 8 assembly.
+SIDE_MONITOR_SCALE = 0.7
+MONITOR_SEATWARD_OFFSET_METERS = 0.40
 # The bottom-center of the existing mounting stem stays fixed on the dashboard.
 CENTER_MONITOR_PIVOT_METERS = (4.426, 0.80, 0.0)
 CENTER_MONITOR_BASELINE_BOUNDS_METERS = {
@@ -61,14 +63,17 @@ CENTER_MONITOR_BASELINE_BOUNDS_METERS = {
 }
 
 
-def scale_center_monitor_point(point: Sequence[float], scale: float) -> list[float]:
-    return [pivot + (value - pivot) * scale
-            for value, pivot in zip(point, CENTER_MONITOR_PIVOT_METERS)]
+def scale_center_monitor_point(point: Sequence[float], scale: float,
+                               seatward_offset: float = MONITOR_SEATWARD_OFFSET_METERS) -> list[float]:
+    return [pivot + (value - pivot) * scale - (seatward_offset if axis == 0 else 0)
+            for axis, (value, pivot) in enumerate(zip(point, CENTER_MONITOR_PIVOT_METERS))]
 
 
 def center_monitor_metadata() -> dict[str, object]:
     return {
         "uniformScaleFromAssetVersion7": CENTER_MONITOR_SCALE,
+        "uniformScaleFromAssetVersion8": 0.7,
+        "seatwardOffsetMeters": MONITOR_SEATWARD_OFFSET_METERS,
         "pivotMeters": list(CENTER_MONITOR_PIVOT_METERS),
         "baselineBoundsMeters": CENTER_MONITOR_BASELINE_BOUNDS_METERS,
         "boundsMeters": {
@@ -524,7 +529,8 @@ def chamfered_loft_y(sections: Sequence[tuple[float, float, float, float, float]
     return result
 
 
-def cockpit_components(center_monitor_scale: float = CENTER_MONITOR_SCALE) -> list[Component]:
+def cockpit_components(center_monitor_scale: float = CENTER_MONITOR_SCALE,
+                       monitor_seatward_offset: float = MONITOR_SEATWARD_OFFSET_METERS) -> list[Component]:
     """Human-scale pilot station in final meters, independent of hull scaling."""
     components: list[Component] = []
     def add(name: str, geometry: Geometry, material: int, **extras: object) -> None:
@@ -534,6 +540,11 @@ def cockpit_components(center_monitor_scale: float = CENTER_MONITOR_SCALE) -> li
     add("Cockpit_Console_Center",chamfered_loft_y([
         (.25,4.42,6.10,.96,.18),(.68,4.33,6.12,1.06,.18),
         (1.04,4.39,5.95,1.04,.18)]),5)
+    # The smaller display sits ahead of the fixed dashboard. Its low bridge
+    # carries the mounting stem back to the original console surface.
+    add("Cockpit_Center_Monitor_Bridge", box(
+        CENTER_MONITOR_PIVOT_METERS[0] - MONITOR_SEATWARD_OFFSET_METERS - .05, 4.47,
+        .78, .84, -.105, .105), 0)
     for label, sign in (("Port",1),("Starboard",-1)):
         add(f"Cockpit_Console_{label}",chamfered_loft_y([
             (.25,3.65,5.95,.50,.12),(.83,3.66,5.96,.60,.14)],sign*2.30),11)
@@ -545,14 +556,25 @@ def cockpit_components(center_monitor_scale: float = CENTER_MONITOR_SCALE) -> li
         ("Port",4.10,.95,1.40,1.90,2.80,"thruster-power"),
         ("Starboard",4.10,.95,1.40,-2.80,-1.90,"thruster-power"),
     ):
+        if label != "Center":
+            x -= monitor_seatward_offset
         # Housing is 31 mm behind the instrument-facing plane.
         x += .031
         width, cz = z1-z0, (z0+z1)/2
         def resize_center(geometry: Geometry) -> Geometry:
             if label != "Center":
-                return geometry
+                pivot = (x-.031, .80, cz)
+                return Geometry(
+                    positions=[tuple(anchor + (value-anchor)*SIDE_MONITOR_SCALE
+                                     for value, anchor in zip(point, pivot))
+                               for point in geometry.positions],
+                    normals=geometry.normals.copy(),
+                    texcoords=geometry.texcoords.copy(),
+                    indices=geometry.indices.copy(),
+                )
             return Geometry(
-                positions=[tuple(scale_center_monitor_point(point, center_monitor_scale))
+                positions=[tuple(scale_center_monitor_point(point, center_monitor_scale,
+                                                            monitor_seatward_offset))
                            for point in geometry.positions],
                 normals=geometry.normals.copy(),
                 texcoords=geometry.texcoords.copy(),
@@ -1048,7 +1070,7 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
             "copyright": "Copyright 2026 Salimon contributors; custom original asset",
             "extras": {
                 "salimon": {
-                    "assetVersion": 8,
+                    "assetVersion": 9,
                     "units": "meters",
                     "upAxis": "+Y",
                     "forwardAxis": "+X",
@@ -1090,7 +1112,7 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
                     "width": 4.60 * HORIZONTAL_SCALE_FROM_TASK7,
                     "height": 2.38 * VERTICAL_SCALE_FROM_TASK7,
                 },
-                "designRevision": "compact-center-monitor-70-percent",
+                "designRevision": "compact-cockpit-monitors-seatward",
                 "energyCore": {"centerMeters": [-1.0, 1.2, 0.0], "role": "energy-storage", "phase0": "visual-only"},
                 "humanBodyHeightMeters": PLAYER_BODY_HEIGHT_METERS,
                 "humanEyeHeightMeters": PLAYER_EYE_HEIGHT_METERS,

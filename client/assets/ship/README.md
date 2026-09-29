@@ -34,12 +34,12 @@ the center displays speed and common thrust, the port panel shows Core energy,
 and the starboard panel shows nearby-body distance/radial state. Both sides retain
 the shared thruster power percentage. Both thrusters currently use the same
 flight command.
-The center monitor's complete assembly is uniformly 70% of its previous (asset version 7) size,
-including its screen, housing, mounting stem, bezel, fasteners, tactile keys and
-ready indicator. Scaling around the stem attachment `[4.426, 0.80, 0.0]` keeps it
-anchored to the dashboard and lowers the top edge from 1.695 m to 1.4265 m.
-The live screen is now 1.26 × 0.476 m; the dashboard and both side monitors retain
-their existing geometry and placement.
+Asset version 9 scales every monitor assembly to 70% of its version 8 size and
+moves it 0.40 m toward the pilot seat. The center screen is 0.882 × 0.3332 m
+(49% of version 7); side screens are 0.63 × 0.315 m. Housings, bezels, fasteners,
+keys, indicators and mounting stems move with their screens. A low support bridge
+connects the center stem to the unchanged dashboard; the side stems remain on
+their consoles.
 The pilot chair is a contoured bucket with a reclined tapered back, split
 terracotta cushions, side bolsters, compact headrest, armrests, a short stick and
 throttle-shaped hand control, plus a suspension pedestal on floor rails. The
@@ -119,14 +119,14 @@ the `shared-thruster-command` power source. Six triangles provide the complete
 live instrument surface without extra ship draws.
 
 `COLLIDER_CockpitCenterConsole` combines the unchanged dashboard with the smaller
-monitor: its physical bounds are `[4.3126, 0.25, -1.06]` to
-`[6.12, 1.4265, 1.06]`. Character collision expands this footprint by the player's
+monitor: its physical bounds are `[3.94662, 0.25, -1.06]` to
+`[6.12, 1.23855, 1.06]`. Character collision expands this footprint by the player's
 radius. `cockpitInstruments.centerAssembly` records the original and reduced
 monitor bounds, uniform scale and fixed pivot in both exports and the manifest.
 
 ## Budgets and verification
 
-Current export: **5,494 triangles, 106 primitives, 13 materials**, 469,304-byte GLB.
+Current export: **5,506 triangles, 107 primitives, 13 materials**, 471,036-byte GLB.
 Hard caps: 6,000 triangles, 120 primitives, 13 materials, 512 KiB GLB; runtime ship
 submission remains two draws. This is a deliberate increase from the initial
 620-triangle greybox to allow the requested design detail, while remaining small.
@@ -138,8 +138,9 @@ The validator checks exports agree, buffer/GLB structure, hierarchy, material
 budgets, measured bounds, floor alignment, Core metadata and housing containment
 inside its collider, shaped chair components, exact monitor planes/normals/UVs,
 side-display yaw toward the authored pilot viewpoint,
-the exact 0.7 transform of every center-monitor assembly vertex, unchanged side
-and dashboard geometry/UVs/topology, and the matching combined console collider,
+the exact 0.49 transform and 0.40 m seatward translation of every center-monitor
+assembly vertex, fitted side display geometry, unchanged dashboard geometry,
+and the matching combined console collider,
 fifteen unobstructed seated-eye rays over the three displays, seat height and actual
 triangle ray intersections for forward seated/standing and side/rear window
 sightlines, unoccluded recessed engine emitters, and source-aligned thruster proxies

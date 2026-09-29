@@ -106,9 +106,10 @@ def validate_center_monitor_scale(document: dict, binary: bytes, manifest: dict)
         "Cockpit_Tactile_Keys": 72,
         "Cockpit_Ready_Indicators": 24,
     }
-    pivot, scale = [4.426, .80, 0.0], .7
+    pivot, scale, seatward = [4.426, .80, 0.0], .49, .40
     before_positions, after_positions = [], []
-    for baseline in cockpit_components(center_monitor_scale=1.0):
+    current = {component.name: component for component in cockpit_components()}
+    for baseline in cockpit_components(center_monitor_scale=1.0, monitor_seatward_offset=0.0):
         exported = node(document, baseline.name)
         primitive = document["meshes"][exported["mesh"]]["primitives"][0]
         positions = accessor_values(document, binary, primitive["attributes"]["POSITION"])
@@ -116,15 +117,16 @@ def validate_center_monitor_scale(document: dict, binary: bytes, manifest: dict)
         center_count = center_vertex_counts.get(baseline.name, 0)
         for index, (actual, original) in enumerate(zip(positions, baseline.geometry.positions)):
             if index < center_count:
-                expected = [anchor + scale * (value-anchor) for value, anchor in zip(original, pivot)]
+                expected = [anchor + scale * (value-anchor) - (seatward if axis == 0 else 0)
+                            for axis, (value, anchor) in enumerate(zip(original, pivot))]
                 before_positions.append(original)
                 after_positions.append(actual)
             else:
-                expected = original
+                expected = current[baseline.name].geometry.positions[index]
             assert_vectors_close(actual, expected)
         # Uniform positive scaling preserves normals, proportions, UV mapping
-        # and topology; all side-monitor and dashboard vertices stay unchanged.
-        for attribute, expected in (("NORMAL", baseline.geometry.normals),
+        # and topology. Side displays have their own seatward transform.
+        for attribute, expected in (("NORMAL", current[baseline.name].geometry.normals),
                                     ("TEXCOORD_0", baseline.geometry.texcoords)):
             actual = accessor_values(document, binary, primitive["attributes"][attribute])
             assert len(actual) == len(expected)
@@ -139,14 +141,16 @@ def validate_center_monitor_scale(document: dict, binary: bytes, manifest: dict)
     before, after = bounds(before_positions), bounds(after_positions)
     assert_vectors_close(before["min"], [4.264, .8, -1.02])
     assert_vectors_close(before["max"], [4.511, 1.695, 1.02])
-    assert_vectors_close(after["min"], [4.3126, .8, -.714])
-    assert_vectors_close(after["max"], [4.4855, 1.4265, .714])
+    assert_vectors_close(after["min"], [3.94662, .8, -.4998])
+    assert_vectors_close(after["max"], [4.06765, 1.23855, .4998])
     for axis in range(3):
         assert abs((after["max"][axis]-after["min"][axis]) /
                    (before["max"][axis]-before["min"][axis]) - scale) < 1e-5
     metadata = document["extras"]["salimon"]["cockpitInstruments"]["centerAssembly"]
     assert metadata == manifest["cockpitInstruments"]["centerAssembly"]
     assert metadata["uniformScaleFromAssetVersion7"] == scale
+    assert metadata["uniformScaleFromAssetVersion8"] == .7
+    assert metadata["seatwardOffsetMeters"] == seatward
     assert_vectors_close(metadata["pivotMeters"], pivot)
     for bound in ("min", "max"):
         assert_vectors_close(metadata["baselineBoundsMeters"][bound], before[bound])
@@ -154,8 +158,8 @@ def validate_center_monitor_scale(document: dict, binary: bytes, manifest: dict)
     collider = node(document, metadata["collisionNode"])
     center = collider["translation"]
     size = collider["extras"]["salimon"]["sizeMeters"]
-    assert_vectors_close([value-width/2 for value, width in zip(center, size)], [4.3126, .25, -1.06])
-    assert_vectors_close([value+width/2 for value, width in zip(center, size)], [6.12, 1.4265, 1.06])
+    assert_vectors_close([value-width/2 for value, width in zip(center, size)], [3.94662, .25, -1.06])
+    assert_vectors_close([value+width/2 for value, width in zip(center, size)], [6.12, 1.23855, 1.06])
 
 
 def validate_sightlines(document: dict, binary: bytes) -> None:
@@ -199,9 +203,9 @@ def validate_sightlines(document: dict, binary: bytes) -> None:
     # actual seated eye, with top-left UVs and normals toward the pilot.
     seated_eye=(2.76,1.799032258064516,0.)
     for label, role, x, y0, y1, z0, z1 in (
-        ("Center","speed",4.3238,.905,1.381,-.63,.63),
-        ("Port","thruster-power",4.10,.95,1.40,1.90,2.80),
-        ("Starboard","thruster-power",4.10,.95,1.40,-2.80,-1.90),
+        ("Center","speed",3.95446,.8735,1.2067,-.441,.441),
+        ("Port","thruster-power",3.70,.905,1.22,2.035,2.665),
+        ("Starboard","thruster-power",3.70,.905,1.22,-2.665,-2.035),
     ):
         name=f"Monitor_{label}"
         monitor=node(document,name)

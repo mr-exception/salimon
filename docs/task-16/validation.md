@@ -1,5 +1,22 @@
 # Task 16 — central cockpit monitor
 
+## Follow-up: asset version 9 (2026-09-29)
+
+After the initial 70% reduction, the user requested that the monitors be made
+smaller again and brought closer to the cockpit seat. All three complete monitor
+assemblies are now 70% of their version 8 linear dimensions and 0.40 m nearer
+the seat along ship X. The center screen is 0.882 × 0.3332 m, the side screens
+0.63 × 0.315 m. A low bridge supports the center stem on the original dashboard.
+The center console collider and character obstacle start at X=3.94662 m; screen
+UVs and live telemetry roles are preserved. Regenerated source previews are in
+`client/assets/ship/previews/`. They are source renders, not native captures.
+
+The asset generator and validator pass with 5,506 triangles, 107 primitives,
+13 materials and a 471,036-byte GLB. Native seated/standing captures, interactive
+readability/free-look/telemetry checks and macOS smoke tests remain outstanding.
+The workspace used for this follow-up is headless Linux without Cargo or a native
+display, so the issue should remain open pending those checks.
+
 [GitHub issue](https://github.com/mr-exception/salimon/issues/25)
 — implementation recorded on 2026-09-19. Status: **In Progress**, awaiting the
 remaining native visual acceptance checks.

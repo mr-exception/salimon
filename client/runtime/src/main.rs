@@ -1,8 +1,8 @@
 //! Native client entry point for the Salimon Phase 0 showcase.
 
 mod action_bar;
-mod automation;
 mod app;
+mod automation;
 mod e2e;
 mod frame_clock;
 mod update_clock;

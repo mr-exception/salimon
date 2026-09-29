@@ -579,8 +579,8 @@ fn slide_around_thrusters(previous: [f64; 3], mut proposed: [f64; 3], tolerance:
         // Test the entire body, so a raised foot or a low surface approach
         // cannot cross a thruster merely because the eye is outside its box.
         let body_bottom = proposed[1].min(previous[1]) - PLAYER_EYE_HEIGHT_METERS;
-        let body_top = proposed[1].max(previous[1])
-            + (PLAYER_BODY_HEIGHT_METERS - PLAYER_EYE_HEIGHT_METERS);
+        let body_top =
+            proposed[1].max(previous[1]) + (PLAYER_BODY_HEIGHT_METERS - PLAYER_EYE_HEIGHT_METERS);
         if body_bottom < y_max && body_top > y_min {
             let obstacle = [[
                 x_min - PLAYER_RADIUS_METERS,
@@ -613,14 +613,18 @@ fn slide_around_obstacles_with_tolerance(
     // fixtures instead of stopping the player or tunneling through a corner.
     for &[forward_min, forward_max, side_min, side_max] in obstacles {
         if previous[2] > side_min && previous[2] < side_max {
-            proposed[0] =
-                stop_at_obstacle(previous[0], proposed[0], forward_min, forward_max, tolerance);
+            proposed[0] = stop_at_obstacle(
+                previous[0],
+                proposed[0],
+                forward_min,
+                forward_max,
+                tolerance,
+            );
         }
     }
     for &[forward_min, forward_max, side_min, side_max] in obstacles {
         if proposed[0] > forward_min && proposed[0] < forward_max {
-            proposed[2] =
-                stop_at_obstacle(previous[2], proposed[2], side_min, side_max, tolerance);
+            proposed[2] = stop_at_obstacle(previous[2], proposed[2], side_min, side_max, tolerance);
         }
     }
     proposed
@@ -1716,11 +1720,17 @@ mod tests {
         }
         let gate = [-10.0, 1.75, 0.0];
         let inward = [-9.0, 1.75, 0.0];
-        assert_eq!(slide_around_thrusters(gate, inward, COLLISION_EPSILON), inward);
+        assert_eq!(
+            slide_around_thrusters(gate, inward, COLLISION_EPSILON),
+            inward
+        );
         // A body fully above the raised fin has no phantom horizontal wall.
         let high = [THRUSTER_COLLIDERS[0][0] - 1.0, 5.0, 7.1];
         let beyond = [THRUSTER_COLLIDERS[0][0] + 1.0, 5.0, 7.1];
-        assert_eq!(slide_around_thrusters(high, beyond, COLLISION_EPSILON), beyond);
+        assert_eq!(
+            slide_around_thrusters(high, beyond, COLLISION_EPSILON),
+            beyond
+        );
     }
 
     #[test]

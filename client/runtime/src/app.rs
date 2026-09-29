@@ -401,7 +401,11 @@ impl ClientApplication {
         self.camera_prototype.snapshot().transition_phase
     }
 
-    pub(crate) fn automation_interaction(&self, local_eye: [f64; 3], local_look: [f64; 3]) -> Option<&'static str> {
+    pub(crate) fn automation_interaction(
+        &self,
+        local_eye: [f64; 3],
+        local_look: [f64; 3],
+    ) -> Option<&'static str> {
         match available_interaction_target(self.character.location(), local_eye, local_look) {
             Some(InteractionTarget::Cockpit) => Some("cockpit"),
             Some(InteractionTarget::ExitDoor) => Some("exit_door"),
@@ -410,7 +414,9 @@ impl ClientApplication {
     }
 
     pub(crate) fn automation_key(&mut self, key: PhysicalKey, pressed: bool) {
-        if self.character.location() == CharacterLocation::Cockpit && ship_control_key(key).is_some() {
+        if self.character.location() == CharacterLocation::Cockpit
+            && ship_control_key(key).is_some()
+        {
             update_ship_control_input(&mut self.ship_control_input, key, pressed);
         } else {
             update_movement_input(&mut self.movement_input, key, pressed);
@@ -420,13 +426,19 @@ impl ClientApplication {
     /// The same portable gameplay update runs on redraw and on explicit E2E steps.
     pub(crate) fn advance_game(&mut self, delta: Duration) {
         self.camera_prototype.advance(delta);
-        self.ship.set_steering_input(self.ship_control_input.steering());
+        self.ship
+            .set_steering_input(self.ship_control_input.steering());
         self.ship.advance(delta);
         let ship = self.ship.snapshot();
         if self.view_mode == ViewMode::Gameplay {
-            self.character.advance(delta, self.movement_input, character_ship_frame(ship.pose),
-                surface_frame_for_ship(ship), ship.door_state == DoorState::Open,
-                matches!(ship.flight_state, FlightState::Landed { .. }));
+            self.character.advance(
+                delta,
+                self.movement_input,
+                character_ship_frame(ship.pose),
+                surface_frame_for_ship(ship),
+                ship.door_state == DoorState::Open,
+                matches!(ship.flight_state, FlightState::Landed { .. }),
+            );
         }
         self.action_bar.advance(delta);
     }
@@ -833,7 +845,11 @@ impl ApplicationHandler for ClientApplication {
     fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
         if self.automation.is_some() {
             // Drain the queue on the native thread; the stdin thread never touches state.
-            while let Some(request) = self.automation.as_ref().and_then(|receiver| receiver.try_recv().ok()) {
+            while let Some(request) = self
+                .automation
+                .as_ref()
+                .and_then(|receiver| receiver.try_recv().ok())
+            {
                 if Instant::now() <= request.deadline {
                     let response = automation::execute(self, &request.line);
                     let _ = request.reply.send(response);
@@ -848,7 +864,9 @@ impl ApplicationHandler for ClientApplication {
                     window.request_redraw();
                 }
             }
-            event_loop.set_control_flow(ControlFlow::WaitUntil(Instant::now() + Duration::from_millis(10)));
+            event_loop.set_control_flow(ControlFlow::WaitUntil(
+                Instant::now() + Duration::from_millis(10),
+            ));
             return;
         }
         let Some(retry_at) = self.retry_at else {
@@ -899,14 +917,14 @@ fn release_cursor_pressed(state: ElementState, repeat: bool, key: PhysicalKey) -
     state == ElementState::Pressed && !repeat && key == PhysicalKey::Code(KeyCode::Escape)
 }
 
-fn character_ship_frame(pose: ShipPose) -> ShipFrame {
+pub(crate) fn character_ship_frame(pose: ShipPose) -> ShipFrame {
     ShipFrame {
         origin_meters: pose.position_meters,
         axes: pose.axes(),
     }
 }
 
-fn surface_frame_for_ship(ship: ShipSnapshot) -> SurfaceFrame {
+pub(crate) fn surface_frame_for_ship(ship: ShipSnapshot) -> SurfaceFrame {
     let body_id = match ship.flight_state {
         FlightState::Landed { body }
         | FlightState::AssistedLanding { body }

@@ -12,7 +12,8 @@ pub(crate) struct UpdateClock {
 
 impl UpdateClock {
     pub(crate) fn step(&mut self, now: Instant) -> Duration {
-        let elapsed = self.last_update_at
+        let elapsed = self
+            .last_update_at
             .replace(now)
             .map_or(Duration::ZERO, |previous| {
                 now.saturating_duration_since(previous).min(MAX_UPDATE_STEP)
@@ -76,6 +77,9 @@ mod tests {
         clock.set_fixed_step(Duration::from_millis(16));
         assert_eq!(clock.step(origin), Duration::from_millis(16));
         clock.reset();
-        assert_eq!(clock.step(origin + Duration::from_secs(5)), Duration::from_millis(16));
+        assert_eq!(
+            clock.step(origin + Duration::from_secs(5)),
+            Duration::from_millis(16)
+        );
     }
 }

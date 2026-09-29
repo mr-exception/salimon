@@ -34,7 +34,11 @@ pub(crate) fn start() -> Receiver<Request> {
                 Ok(_) => {}
             }
             if line.len() > MAX_LINE {
-                write_response(&error(Value::Null, "line_too_long", "maximum line size is 16 KiB"));
+                write_response(&error(
+                    Value::Null,
+                    "line_too_long",
+                    "maximum line size is 16 KiB",
+                ));
                 continue;
             }
             let (reply, answer) = mpsc::channel();
@@ -56,8 +60,10 @@ pub(crate) fn start() -> Receiver<Request> {
 }
 
 pub(crate) fn ready(scenario: &str, seed: u64, step_ms: u128) {
-    write_response(&json!({"protocol": PROTOCOL, "event": "ready", "scenario": scenario,
-        "seed": seed, "step_ms": step_ms, "timeout_ms": TIMEOUT.as_millis()}));
+    write_response(
+        &json!({"protocol": PROTOCOL, "event": "ready", "scenario": scenario,
+        "seed": seed, "step_ms": step_ms, "timeout_ms": TIMEOUT.as_millis()}),
+    );
 }
 
 fn write_response(value: &Value) {
@@ -78,29 +84,40 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
     }
     let command: Value = match serde_json::from_str(line) {
         Ok(value) => value,
-        Err(_) => return error(Value::Null, "invalid_json", "expected one JSON object per line"),
+        Err(_) => {
+            return error(
+                Value::Null,
+                "invalid_json",
+                "expected one JSON object per line",
+            );
+        }
     };
     let id = command.get("id").cloned().unwrap_or(Value::Null);
     if !command.is_object() || !(id.is_string() || id.is_number()) {
-        return error(id, "invalid_request", "object with string or numeric id required");
+        return error(
+            id,
+            "invalid_request",
+            "object with string or numeric id required",
+        );
     }
     if command.get("protocol").and_then(Value::as_u64) != Some(u64::from(PROTOCOL)) {
         return error(id, "protocol_mismatch", "expected protocol 1");
     }
     let result = match command.get("op").and_then(Value::as_str) {
         Some("inspect") => Ok(inspect(app)),
-        Some("step") => {
-            match command.get("frames").and_then(Value::as_u64) {
-                Some(frames @ 1..=600) => {
-                    let step = app.e2e_step().expect("automation only runs in E2E mode");
-                    for _ in 0..frames {
-                        app.advance_game(step);
-                    }
-                    Ok(json!({"frames": frames}))
+        Some("step") => match command.get("frames").and_then(Value::as_u64) {
+            Some(frames @ 1..=600) => {
+                let step = app.e2e_step().expect("automation only runs in E2E mode");
+                for _ in 0..frames {
+                    app.advance_game(step);
                 }
-                _ => Err(("invalid_argument", "frames must be an integer from 1 to 600")),
+                Ok(json!({"frames": frames}))
             }
-        }
+            _ => Err((
+                "invalid_argument",
+                "frames must be an integer from 1 to 600",
+            )),
+        },
         Some("look") => {
             let dx = command.get("dx").and_then(Value::as_f64);
             let dy = command.get("dy").and_then(Value::as_f64);
@@ -131,18 +148,19 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
             app.ship.trigger_landing_action();
             Ok(json!({"applied": true}))
         }
-        Some("thruster") => {
-            match command.get("direction").and_then(Value::as_i64) {
-                Some(direction @ -1..=1) if direction != 0 => {
-                    if app.character.location() == CharacterLocation::Cockpit {
-                        app.ship.adjust_thruster(direction as i8);
-                    }
-                    Ok(json!({"applied": app.character.location() == CharacterLocation::Cockpit}))
+        Some("thruster") => match command.get("direction").and_then(Value::as_i64) {
+            Some(direction @ -1..=1) if direction != 0 => {
+                if app.character.location() == CharacterLocation::Cockpit {
+                    app.ship.adjust_thruster(direction as i8);
                 }
-                _ => Err(("invalid_argument", "direction must be -1 or 1")),
+                Ok(json!({"applied": app.character.location() == CharacterLocation::Cockpit}))
             }
-        }
-        _ => Err(("unknown_op", "expected inspect, step, look, key, interact, landing, or thruster")),
+            _ => Err(("invalid_argument", "direction must be -1 or 1")),
+        },
+        _ => Err((
+            "unknown_op",
+            "expected inspect, step, look, key, interact, landing, or thruster",
+        )),
     };
     match result {
         Ok(result) => json!({"protocol": PROTOCOL, "id": id, "ok": true, "result": result}),
@@ -204,23 +222,42 @@ mod tests {
 
     fn app(scenario: Scenario) -> ClientApplication {
         let mut app = ClientApplication::default();
-        e2e::initialize(&mut app, Config {
-            scenario,
-            seed: 7,
-            step: Duration::from_millis(20),
-        }).unwrap();
+        e2e::initialize(
+            &mut app,
+            Config {
+                scenario,
+                seed: 7,
+                step: Duration::from_millis(20),
+            },
+        )
+        .unwrap();
         app
     }
 
     #[test]
     fn protocol_rejects_malformed_and_unavailable_commands() {
         let mut normal = ClientApplication::default();
-        assert_eq!(execute(&mut normal, r#"{"protocol":1,"id":1,"op":"inspect"}"#)["error"]["code"], "disabled");
+        assert_eq!(
+            execute(&mut normal, r#"{"protocol":1,"id":1,"op":"inspect"}"#)["error"]["code"],
+            "disabled"
+        );
         let mut test = app(Scenario::LandedEarth);
         assert_eq!(execute(&mut test, "{")["error"]["code"], "invalid_json");
-        assert_eq!(execute(&mut test, r#"{"protocol":2,"id":"a","op":"inspect"}"#)["error"]["code"], "protocol_mismatch");
-        assert_eq!(execute(&mut test, r#"{"protocol":1,"id":2,"op":"step","frames":601}"#)["error"]["code"], "invalid_argument");
-        assert_eq!(execute(&mut test, r#"{"protocol":1,"id":3,"op":"warp"}"#)["error"]["code"], "unknown_op");
+        assert_eq!(
+            execute(&mut test, r#"{"protocol":2,"id":"a","op":"inspect"}"#)["error"]["code"],
+            "protocol_mismatch"
+        );
+        assert_eq!(
+            execute(
+                &mut test,
+                r#"{"protocol":1,"id":2,"op":"step","frames":601}"#
+            )["error"]["code"],
+            "invalid_argument"
+        );
+        assert_eq!(
+            execute(&mut test, r#"{"protocol":1,"id":3,"op":"warp"}"#)["error"]["code"],
+            "unknown_op"
+        );
     }
 
     #[test]
@@ -228,26 +265,59 @@ mod tests {
         let mut test = app(Scenario::LandedEarth);
         let before = execute(&mut test, r#"{"protocol":1,"id":1,"op":"inspect"}"#);
         assert_eq!(before["result"]["player"]["location"], "InsideShip");
-        assert_eq!(before["result"]["world"]["bodies"].as_array().unwrap().len(), 6);
-        assert_eq!(execute(&mut test, r#"{"protocol":1,"id":2,"op":"key","key":"forward","pressed":true}"#)["ok"], true);
-        assert_eq!(execute(&mut test, r#"{"protocol":1,"id":3,"op":"step","frames":5}"#)["ok"], true);
+        assert_eq!(
+            before["result"]["world"]["bodies"]
+                .as_array()
+                .unwrap()
+                .len(),
+            6
+        );
+        assert_eq!(
+            execute(
+                &mut test,
+                r#"{"protocol":1,"id":2,"op":"key","key":"forward","pressed":true}"#
+            )["ok"],
+            true
+        );
+        assert_eq!(
+            execute(&mut test, r#"{"protocol":1,"id":3,"op":"step","frames":5}"#)["ok"],
+            true
+        );
         let after = execute(&mut test, r#"{"protocol":1,"id":4,"op":"inspect"}"#);
-        assert_ne!(before["result"]["player"]["eye_position_meters"], after["result"]["player"]["eye_position_meters"]);
-        execute(&mut test, r#"{"protocol":1,"id":5,"op":"key","key":"forward","pressed":false}"#);
+        assert_ne!(
+            before["result"]["player"]["eye_position_meters"],
+            after["result"]["player"]["eye_position_meters"]
+        );
+        execute(
+            &mut test,
+            r#"{"protocol":1,"id":5,"op":"key","key":"forward","pressed":false}"#,
+        );
         let stable = execute(&mut test, r#"{"protocol":1,"id":6,"op":"inspect"}"#);
         execute(&mut test, r#"{"protocol":1,"id":7,"op":"step","frames":1}"#);
-        assert_eq!(stable["result"]["player"]["eye_position_meters"], execute(&mut test, r#"{"protocol":1,"id":8,"op":"inspect"}"#)["result"]["player"]["eye_position_meters"]);
+        assert_eq!(
+            stable["result"]["player"]["eye_position_meters"],
+            execute(&mut test, r#"{"protocol":1,"id":8,"op":"inspect"}"#)["result"]["player"]["eye_position_meters"]
+        );
     }
 
     #[test]
     fn cockpit_commands_respect_authority() {
-        let mut test = app(Scenario::CockpitEarth);
+        let mut test = app(Scenario::OrbitEarth);
         let before = test.ship.snapshot().thruster_percentage;
-        execute(&mut test, r#"{"protocol":1,"id":1,"op":"thruster","direction":1}"#);
+        execute(
+            &mut test,
+            r#"{"protocol":1,"id":1,"op":"thruster","direction":1}"#,
+        );
         assert_eq!(test.ship.snapshot().thruster_percentage, before + 1);
         execute(&mut test, r#"{"protocol":1,"id":2,"op":"interact"}"#);
         assert_eq!(test.character.location(), CharacterLocation::InsideShip);
-        assert_eq!(execute(&mut test, r#"{"protocol":1,"id":3,"op":"thruster","direction":1}"#)["result"]["applied"], false);
+        assert_eq!(
+            execute(
+                &mut test,
+                r#"{"protocol":1,"id":3,"op":"thruster","direction":1}"#
+            )["result"]["applied"],
+            false
+        );
         assert_eq!(test.ship.snapshot().thruster_percentage, before + 1);
     }
 }

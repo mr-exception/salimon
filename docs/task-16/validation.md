@@ -1,5 +1,38 @@
 # Task 16 — central cockpit monitor
 
+## Native completion check (2026-09-29)
+
+On Apple Silicon macOS with Rust 1.89.0, asset version 9 was rendered in the
+native Metal client. Matching native [standing](after-standing.jpg) and
+[seated](after-seated.jpg) views now accompany the original before captures.
+The seated view shows a clear forward window above the smaller center display;
+the standing view shows the smaller assemblies and clear cockpit sightline.
+The center display is legible with ordinary downward free-look, and the
+[port](after-port.jpg) and [starboard](after-starboard.jpg) displays are legible
+when looking toward them. The seated fixture used the same normal character
+and ship cockpit state as gameplay. No fixture code was committed.
+
+The live center monitor changed from 0.0 m/s at 0% thrust to 25.00 km/s at
+1% thrust after assisted takeoff. Authoritative native E2E state reported
+`Flying`, 25,000 m/s, and 1% thrust at that checkpoint. The contextual
+`Press L to take off` prompt appeared while landed and cleared after takeoff.
+Free-look exposed the live Earth proximity panel and the Core energy panel;
+neither panel clipped through its housing. The smaller displays remain
+readable at the default 960 × 572 window capture returned by the desktop
+service (1920 × 1080 physical drawable at scale factor 2).
+
+The asset validator passed for version 9 (5,506 triangles, 107 primitives,
+13 materials, 471,036-byte GLB). The workspace build, rustfmt check, Clippy
+with warnings denied, and all workspace tests passed after fixing the current
+runtime/E2E compilation and test regressions. Native smoke checked the six
+rendered Solar System bodies, Earth precision markers at the 12 m dwell,
+Mercury/Venus/Moon/Mars near-surface textures, P/R/N tour controls, live F3
+diagnostics, live resize, and minimize/restore. The initial native window rendered after its
+startup delay, and the client relaunched cleanly for seated and exterior
+sessions.
+
+The checks above supersede the outstanding-native-check status recorded below.
+
 ## Follow-up: asset version 9 (2026-09-29)
 
 After the initial 70% reduction, the user requested that the monitors be made

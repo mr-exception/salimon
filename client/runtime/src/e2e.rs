@@ -60,7 +60,9 @@ pub(crate) fn parse_args(args: impl IntoIterator<Item = String>) -> Result<Optio
             enabled = true;
             continue;
         }
-        let value = args.next().ok_or_else(|| format!("{arg} requires a value"))?;
+        let value = args
+            .next()
+            .ok_or_else(|| format!("{arg} requires a value"))?;
         match arg.as_str() {
             "--scenario" if scenario.is_none() => scenario = Some(Scenario::parse(&value)?),
             "--seed" if seed.is_none() => {
@@ -114,7 +116,9 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
             let body = CELESTIAL_BODIES
                 .iter()
                 .find(|body| body.id == id)
-                .ok_or_else(|| format!("scenario setup failed: {id:?} missing from world catalog"))?;
+                .ok_or_else(|| {
+                    format!("scenario setup failed: {id:?} missing from world catalog")
+                })?;
             let mut position = body.center.meters();
             position[1] += body.radius_meters + 1_000.0;
             // Small reproducible tangent offset exercises distinct seeds without
@@ -176,7 +180,10 @@ mod tests {
         );
         let start = Instant::now();
         assert_eq!(a.update_clock.step(start), config.step);
-        assert_eq!(a.update_clock.step(start + Duration::from_secs(2)), config.step);
+        assert_eq!(
+            a.update_clock.step(start + Duration::from_secs(2)),
+            config.step
+        );
         a.ship.advance(config.step);
         b.ship.advance(config.step);
         assert_eq!(a.ship.snapshot(), b.ship.snapshot());
@@ -196,7 +203,10 @@ mod tests {
         .unwrap();
         assert_eq!(landed.character.location(), CharacterLocation::InsideShip);
         landed.ship.toggle_door();
-        assert_eq!(landed.ship.snapshot().door_state, salimon_ship::DoorState::Open);
+        assert_eq!(
+            landed.ship.snapshot().door_state,
+            salimon_ship::DoorState::Open
+        );
         let mut cockpit = ClientApplication::default();
         initialize(
             &mut cockpit,
@@ -230,7 +240,10 @@ mod tests {
         .unwrap();
         assert_ne!(first, orbit.ship.snapshot().pose.position_meters);
         orbit.ship.toggle_door();
-        assert_eq!(orbit.ship.snapshot().door_state, salimon_ship::DoorState::Closed);
+        assert_eq!(
+            orbit.ship.snapshot().door_state,
+            salimon_ship::DoorState::Closed
+        );
     }
 
     #[test]

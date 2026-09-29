@@ -92,8 +92,12 @@ updated pilot station is authored directly in final meters by
 `cockpit_components()` to retain human proportions independently of hull scale.
 
 Metadata-only collision boxes describe the floor, walls, ceiling, central Core,
-door, center console/monitor assembly and coarse exterior. They add no draw calls. The gameplay controller still
-owns matching portable constants; changing these dimensions requires updating
+door, center console/monitor assembly, coarse exterior, and both thruster bodies
+and swept fins. They add no draw calls. The four thruster boxes are measured from
+the editable engine meshes at export time; regeneration also writes
+`client/character/src/thruster_collision.rs`, and validation compares that
+portable controller contract with both exports. Other gameplay bounds still
+have matching portable constants; changing those dimensions requires updating
 character/runtime contract tests together. The visible deck and collision floor
 now agree at local Y `0.2473118 m`. The human is 1.80 m tall with 1.75 m eye height.
 Spawn and cockpit exit use the clear starboard aisle `[0.50, 1.9973, -2.20]`.
@@ -122,7 +126,7 @@ monitor bounds, uniform scale and fixed pivot in both exports and the manifest.
 
 ## Budgets and verification
 
-Current export: **5,494 triangles, 106 primitives, 13 materials**, 468,388-byte GLB.
+Current export: **5,494 triangles, 106 primitives, 13 materials**, 469,304-byte GLB.
 Hard caps: 6,000 triangles, 120 primitives, 13 materials, 512 KiB GLB; runtime ship
 submission remains two draws. This is a deliberate increase from the initial
 620-triangle greybox to allow the requested design detail, while remaining small.
@@ -138,7 +142,8 @@ the exact 0.7 transform of every center-monitor assembly vertex, unchanged side
 and dashboard geometry/UVs/topology, and the matching combined console collider,
 fifteen unobstructed seated-eye rays over the three displays, seat height and actual
 triangle ray intersections for forward seated/standing and side/rear window
-sightlines, plus unoccluded recessed engine emitters. Rust tests cover import/emission, widened walking, core/furniture
+sightlines, unoccluded recessed engine emitters, and source-aligned thruster proxies
+in both exports and the controller. Rust tests cover import/emission, widened walking, core/furniture
 containment, doorway transitions, cockpit access and collision radius.
 
 Native smoke validation should include walking around both sides of the Core,

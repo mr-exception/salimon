@@ -15,8 +15,10 @@ closed or unlanded gates fill that opening. Entry requires inward movement from
 the exterior into this aperture with vertical hull overlap. Collision slides
 along the exterior and solves surface height without changing the resolved
 ship-local planar coordinates, so radial projection cannot push a walker back
-through the hull. The proxies have finite height and exclude the broad asset
-bounds for wings/engines. A completed entry gravity blend stays in the doorway
+through the hull. The hull proxies have finite height and exclude the broad wing
+bounds. Each engine has source-derived body and raised-fin boxes with separate
+height checks and body-radius expansion. These ship-local boxes follow the landed
+ship frame and leave the aft gate clear. A completed entry gravity blend stays in the doorway
 until the player reaches the cabin, preserving slow and diagonal crossings.
 Doorway movement rechecks the landed/open rule before each update. When the gate
 becomes impassable, the blend ends immediately and an overlapping character

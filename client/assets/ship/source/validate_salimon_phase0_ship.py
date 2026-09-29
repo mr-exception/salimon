@@ -8,7 +8,10 @@ import math
 import struct
 from pathlib import Path
 
-from generate_salimon_phase0_ship import cockpit_components
+from generate_salimon_phase0_ship import (
+    cockpit_components, ship_components, thruster_collision_rust_source,
+    thruster_collision_specs,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -281,6 +284,25 @@ def main() -> None:
     assert material_names == [material["name"] for material in glb_document["materials"]]
     assert document["accessors"] == glb_document["accessors"]
     assert document["nodes"] == glb_document["nodes"]
+    components = ship_components()
+    assert (ROOT.parents[1] / "character" / "src" / "thruster_collision.rs").read_text() == (
+        thruster_collision_rust_source(components)
+    ), "portable thruster collision bounds differ from the editable asset"
+    collision_group = node(document, "Collision_Proxies")
+    for name, lower, upper in thruster_collision_specs(components):
+        collider = node(document, name)
+        assert document["nodes"].index(collider) in collision_group["children"]
+        assert "mesh" not in collider, "collision proxies must not add draw calls"
+        metadata = collider["extras"]["salimon"]
+        assert metadata["collisionShape"] == "box"
+        assert metadata["purpose"] == "exterior-thruster"
+        assert_vectors_close(collider["translation"], [(a + b) / 2 for a, b in zip(lower, upper)])
+        assert_vectors_close(metadata["sizeMeters"], [b - a for a, b in zip(lower, upper)])
+    # The two engines must not become one invisible wall across the aft gate.
+    port = node(document, "COLLIDER_Engine_Port_Body")
+    starboard = node(document, "COLLIDER_Engine_Starboard_Body")
+    assert port["translation"][2] - port["extras"]["salimon"]["sizeMeters"][2] / 2 > 5.1
+    assert starboard["translation"][2] + starboard["extras"]["salimon"]["sizeMeters"][2] / 2 < -5.1
     assert geometry == glb_binary[: len(geometry)], "glTF and GLB geometry payloads differ"
 
     required_nodes = {

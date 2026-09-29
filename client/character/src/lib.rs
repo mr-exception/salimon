@@ -6,6 +6,9 @@
 use std::f64::consts::{FRAC_PI_2, TAU};
 use std::time::Duration;
 
+mod thruster_collision;
+use thruster_collision::THRUSTER_COLLIDERS;
+
 pub const FIXED_GRAVITY_METERS_PER_SECOND_SQUARED: f64 = 9.81;
 pub const DOORWAY_GRAVITY_BLEND_DURATION: Duration = Duration::from_millis(250);
 const WALK_SPEED_METERS_PER_SECOND: f64 = 3.8;
@@ -460,6 +463,11 @@ impl CharacterController {
                         local = ship.world_to_local(world);
                     }
                 }
+                let before_thrusters = local;
+                local = slide_around_thrusters(previous, local, world_round_trip_tolerance(world));
+                if local[0] != before_thrusters[0] || local[2] != before_thrusters[2] {
+                    world = surface_eye_at_ship_planar_position(local, ship, surface);
+                }
                 let through_gate = overlaps_hull
                     && previous[0] < DOORWAY_FORWARD
                     && local[0] > EXTERIOR_AFT
@@ -566,30 +574,68 @@ fn slide_around_fixtures(previous: [f64; 3], proposed: [f64; 3]) -> [f64; 3] {
     slide_around_obstacles(previous, proposed, &INTERIOR_OBSTACLES)
 }
 
-fn slide_around_obstacles(
-    previous: [f64; 3],
-    mut proposed: [f64; 3],
-    obstacles: &[[f64; 4]],
-) -> [f64; 3] {
-    // Resolve one planar axis at a time so diagonal input slides along the
-    // fixtures instead of stopping the player or tunneling through a corner.
-    for &[forward_min, forward_max, side_min, side_max] in obstacles {
-        if previous[2] > side_min && previous[2] < side_max {
-            proposed[0] = stop_at_obstacle(previous[0], proposed[0], forward_min, forward_max);
-        }
-    }
-    for &[forward_min, forward_max, side_min, side_max] in obstacles {
-        if proposed[0] > forward_min && proposed[0] < forward_max {
-            proposed[2] = stop_at_obstacle(previous[2], proposed[2], side_min, side_max);
+fn slide_around_thrusters(previous: [f64; 3], mut proposed: [f64; 3], tolerance: f64) -> [f64; 3] {
+    for [x_min, x_max, y_min, y_max, z_min, z_max] in THRUSTER_COLLIDERS {
+        // Test the entire body, so a raised foot or a low surface approach
+        // cannot cross a thruster merely because the eye is outside its box.
+        let body_bottom = proposed[1].min(previous[1]) - PLAYER_EYE_HEIGHT_METERS;
+        let body_top = proposed[1].max(previous[1])
+            + (PLAYER_BODY_HEIGHT_METERS - PLAYER_EYE_HEIGHT_METERS);
+        if body_bottom < y_max && body_top > y_min {
+            let obstacle = [[
+                x_min - PLAYER_RADIUS_METERS,
+                x_max + PLAYER_RADIUS_METERS,
+                z_min - PLAYER_RADIUS_METERS,
+                z_max + PLAYER_RADIUS_METERS,
+            ]];
+            proposed =
+                slide_around_obstacles_with_tolerance(previous, proposed, &obstacle, tolerance);
         }
     }
     proposed
 }
 
-fn stop_at_obstacle(previous: f64, proposed: f64, minimum: f64, maximum: f64) -> f64 {
-    if previous <= minimum + COLLISION_EPSILON && proposed > minimum {
+fn slide_around_obstacles(
+    previous: [f64; 3],
+    proposed: [f64; 3],
+    obstacles: &[[f64; 4]],
+) -> [f64; 3] {
+    slide_around_obstacles_with_tolerance(previous, proposed, obstacles, COLLISION_EPSILON)
+}
+
+fn slide_around_obstacles_with_tolerance(
+    previous: [f64; 3],
+    mut proposed: [f64; 3],
+    obstacles: &[[f64; 4]],
+    tolerance: f64,
+) -> [f64; 3] {
+    // Resolve one planar axis at a time so diagonal input slides along the
+    // fixtures instead of stopping the player or tunneling through a corner.
+    for &[forward_min, forward_max, side_min, side_max] in obstacles {
+        if previous[2] > side_min && previous[2] < side_max {
+            proposed[0] =
+                stop_at_obstacle(previous[0], proposed[0], forward_min, forward_max, tolerance);
+        }
+    }
+    for &[forward_min, forward_max, side_min, side_max] in obstacles {
+        if proposed[0] > forward_min && proposed[0] < forward_max {
+            proposed[2] =
+                stop_at_obstacle(previous[2], proposed[2], side_min, side_max, tolerance);
+        }
+    }
+    proposed
+}
+
+fn stop_at_obstacle(
+    previous: f64,
+    proposed: f64,
+    minimum: f64,
+    maximum: f64,
+    tolerance: f64,
+) -> f64 {
+    if previous <= minimum + tolerance && proposed > minimum {
         minimum
-    } else if previous >= maximum - COLLISION_EPSILON && proposed < maximum {
+    } else if previous >= maximum - tolerance && proposed < maximum {
         maximum
     } else {
         proposed
@@ -1617,6 +1663,96 @@ mod tests {
             radius_meters: 6_000_000.0,
         };
         (ship, surface)
+    }
+
+    #[test]
+    fn each_thruster_blocks_all_planar_approaches_without_bridging_clear_space() {
+        for collider in [THRUSTER_COLLIDERS[0], THRUSTER_COLLIDERS[2]] {
+            let [x_min, x_max, _, _, z_min, z_max] = collider;
+            let mid_x = (x_min + x_max) / 2.0;
+            let mid_z = (z_min + z_max) / 2.0;
+            let eye = 1.75;
+            for (start, end, axis, contact) in [
+                (
+                    [x_min - 1.0, eye, mid_z],
+                    [x_min + 1.0, eye, mid_z],
+                    0,
+                    x_min - PLAYER_RADIUS_METERS,
+                ),
+                (
+                    [x_max + 1.0, eye, mid_z],
+                    [x_max - 1.0, eye, mid_z],
+                    0,
+                    x_max + PLAYER_RADIUS_METERS,
+                ),
+                (
+                    [mid_x, eye, z_min - 1.0],
+                    [mid_x, eye, z_min + 1.0],
+                    2,
+                    z_min - PLAYER_RADIUS_METERS,
+                ),
+                (
+                    [mid_x, eye, z_max + 1.0],
+                    [mid_x, eye, z_max - 1.0],
+                    2,
+                    z_max + PLAYER_RADIUS_METERS,
+                ),
+            ] {
+                let stopped = slide_around_thrusters(start, end, COLLISION_EPSILON);
+                assert!(
+                    (stopped[axis] - contact).abs() < 1.0e-9,
+                    "{collider:?}: {stopped:?}"
+                );
+            }
+            // Beyond the fitted engine and its body radius, travel stays open.
+            let clear_z = if mid_z > 0.0 {
+                z_max + 0.5
+            } else {
+                z_min - 0.5
+            };
+            let start = [x_min - 1.0, eye, clear_z];
+            let end = [x_min + 1.0, eye, clear_z];
+            assert_eq!(slide_around_thrusters(start, end, COLLISION_EPSILON), end);
+        }
+        let gate = [-10.0, 1.75, 0.0];
+        let inward = [-9.0, 1.75, 0.0];
+        assert_eq!(slide_around_thrusters(gate, inward, COLLISION_EPSILON), inward);
+        // A body fully above the raised fin has no phantom horizontal wall.
+        let high = [THRUSTER_COLLIDERS[0][0] - 1.0, 5.0, 7.1];
+        let beyond = [THRUSTER_COLLIDERS[0][0] + 1.0, 5.0, 7.1];
+        assert_eq!(slide_around_thrusters(high, beyond, COLLISION_EPSILON), beyond);
+    }
+
+    #[test]
+    fn landed_thrusters_follow_ship_frame_on_both_sides() {
+        for (ship, surface) in [(frame(), surface()), rotated_catalog_frames()] {
+            for z in [7.1, -7.1] {
+                let start = ship.local_to_world([-11.0, 1.75, z]);
+                let mut controller = CharacterController {
+                    position: PositionState::Surface {
+                        world: project_eye_to_surface(start, surface),
+                    },
+                    ..CharacterController::default()
+                };
+                for _ in 0..35 {
+                    controller.advance(
+                        Duration::from_millis(100),
+                        MovementInput {
+                            forward: true,
+                            ..MovementInput::default()
+                        },
+                        ship,
+                        surface,
+                        false,
+                        true,
+                    );
+                }
+                let local =
+                    ship.world_to_local(controller.snapshot(ship, surface).eye_position_meters);
+                assert!(local[0] <= -9.8 - PLAYER_RADIUS_METERS + 0.002, "{local:?}");
+                assert_eq!(controller.location(), CharacterLocation::Surface);
+            }
+        }
     }
 
     #[test]

@@ -46,3 +46,6 @@
     walking or jump input is processed. A closed gate cannot grant ship gravity,
     interior state, or cockpit entry. Repeated reopening restores the ordinary
     250 ms blend and body-clear passage in either direction.
+19. Both engine bodies and their raised fins block exterior surface movement
+    from all planar approaches while vertically overlapping the player's body.
+    Their boxes follow the ship frame and leave clearance beyond their bounds.

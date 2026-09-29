@@ -161,15 +161,19 @@
         117,
         118,
         119,
-        120
+        120,
+        121,
+        122,
+        123,
+        124
       ]
     },
     {
       "name": "Interaction_Markers",
       "children": [
-        121,
-        122,
-        123
+        125,
+        126,
+        127
       ]
     },
     {
@@ -861,6 +865,82 @@
             20.0
           ],
           "purpose": "broad-phase-hull"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Engine_Port_Body",
+      "translation": [
+        -6.4,
+        1.075268817204301,
+        7.1
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            6.800000000000001,
+            1.5483870967741935,
+            2.879999999999999
+          ],
+          "purpose": "exterior-thruster"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Engine_Port_SweptFin",
+      "translation": [
+        -5.97,
+        1.736559139784946,
+        7.1
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            3.34,
+            2.225806451612903,
+            0.22000000000000064
+          ],
+          "purpose": "exterior-thruster"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Engine_Starboard_Body",
+      "translation": [
+        -6.4,
+        1.075268817204301,
+        -7.1
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            6.800000000000001,
+            1.5483870967741935,
+            2.879999999999999
+          ],
+          "purpose": "exterior-thruster"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Engine_Starboard_SweptFin",
+      "translation": [
+        -5.97,
+        1.736559139784946,
+        -7.1
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            3.34,
+            2.225806451612903,
+            0.22000000000000064
+          ],
+          "purpose": "exterior-thruster"
         }
       }
     },

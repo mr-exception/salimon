@@ -1,0 +1,12 @@
+{
+  "setup": {"scenario": "landed-earth", "seed": 0, "step_ms": 16},
+  "timeout_ms": 60000,
+  "steps": [
+    {"assert": {"path": "player.location", "equals": "InsideShip"}},
+    {"assert": {"path": "ship.door_state", "equals": "Closed"}},
+    {"action": {"op": "key", "key": "forward", "pressed": true}},
+    {"action": {"op": "step", "frames": 5}},
+    {"action": {"op": "key", "key": "forward", "pressed": false}},
+    {"wait": {"path": "ship.flight_state", "equals": "Landed { body: Earth }"}, "timeout_ms": 5000}
+  ]
+}

@@ -13,6 +13,8 @@ benchmark, opens a resizable native window, and runs until the window is closed.
 
 ## Deterministic E2E launch
 
+For declarative end-to-end tests, see [the scenario runner](../../scripts/README.md).
+
 Pass `--e2e` after `--` to opt into reproducible initial conditions. For example:
 
 ```sh

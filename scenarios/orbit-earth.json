@@ -1,0 +1,11 @@
+{
+  "setup": {"scenario": "orbit-earth", "seed": 42, "step_ms": 16},
+  "timeout_ms": 60000,
+  "steps": [
+    {"assert": {"path": "player.location", "equals": "Cockpit"}},
+    {"assert": {"path": "ship.flight_state", "equals": "Flying"}},
+    {"assert": {"path": "ship.cockpit_control_active", "equals": true}},
+    {"action": {"op": "thruster", "direction": 1}},
+    {"wait": {"path": "ship.thruster_percentage", "gte": 1}, "frames": 1}
+  ]
+}

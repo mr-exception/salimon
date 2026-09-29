@@ -83,6 +83,10 @@ and `wgpu` dependency graph. Running the client needs no external account connec
 
 ## Build and run
 
+Run declarative native E2E scenarios with `scripts/salimon-test suite` or
+`scripts/salimon-test run scenarios/landed-earth.json`; see
+[runner documentation](scripts/README.md) for the scenario format and JSON results.
+
 Run these commands from the repository root:
 
 ```sh

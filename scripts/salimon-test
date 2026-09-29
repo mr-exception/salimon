@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+"""Run one or all native Salimon E2E scenarios."""
+
+import argparse
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+from salimon_test import run
+
+
+def main():
+    root = Path(__file__).resolve().parent.parent
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("command", choices=["run", "suite"])
+    parser.add_argument("scenario", nargs="?", help="scenario JSON file (run only)")
+    parser.add_argument("--binary", type=Path, help="prebuilt salimon-client executable")
+    args = parser.parse_args()
+    if (args.command == "run") != bool(args.scenario):
+        parser.error("run requires a scenario path; suite takes no path")
+    paths = [Path(args.scenario)] if args.command == "run" else sorted((root / "scenarios").glob("*.json"))
+    if not paths:
+        print(json.dumps({"status": "failed", "error": "no scenarios found", "results": []}))
+        return 1
+    if args.binary:
+        binary = args.binary.resolve()
+    else:
+        try:
+            build = subprocess.run(["cargo", "build", "--locked", "-p", "salimon-client"], cwd=root, capture_output=True, text=True)
+        except OSError as exc:
+            print(json.dumps({"status": "failed", "error": f"cannot start cargo: {exc}", "results": []}))
+            return 1
+        if build.returncode:
+            print(json.dumps({"status": "failed", "error": "build failed: " + build.stderr[-4000:], "results": []}))
+            return 1
+        binary = root / "target" / "debug" / ("salimon-client.exe" if sys.platform == "win32" else "salimon-client")
+    results = [run(path, [str(binary)]) for path in paths]
+    status = "passed" if all(item["status"] == "passed" for item in results) else "failed"
+    print(json.dumps({"status": status, "results": results}))
+    return 0 if status == "passed" else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

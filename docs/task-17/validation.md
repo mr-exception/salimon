@@ -69,4 +69,23 @@ renderer, and camera. Additional logs observe flight state, cockpit authority,
 altitude, and velocity. This does not change normal startup or production input.
 High-speed takeover and non-polar orientations are covered by automated tests.
 
-Native results and screenshots are listed below after completing the run.
+The native run recorded landed views on each of Mercury, Venus, Earth, the
+Moon, and Mars. The cockpit view changed from open space to the local horizon
+during descent, and the takeoff view cleared the horizon after the lift and
+clearance phases. Venus was also exercised after leaving cockpit control: the
+landing finished and takeoff continued while the character was out of the seat.
+These captures document the earlier macOS run; they are still images, so the
+smoothness and exact phase boundaries are additionally guarded by the portable
+timing and pose regressions above.
+
+| Body | Native capture | Visible result |
+| --- | --- | --- |
+| Mercury | [landed](mercury-landed.png), [clearance](mercury-clearance.png) | Surface horizon, then clear view of nearby bodies |
+| Venus | [landed out of seat](venus-landed-out-of-seat.png), [takeoff out of seat](venus-takeoff-out-of-seat.png) | Surface view and in-progress takeoff outside cockpit control |
+| Earth | [before alignment](earth-before-alignment.png), [landed](earth-landed.png) | Initial approach, then surface horizon |
+| Moon | [landed](moon-landed.png) | Surface horizon |
+| Mars | [landed](mars-landed.png), [clearance](mars-clearance.png) | Surface horizon, then clear view above it |
+
+The current review environment is Linux and has no Rust toolchain or macOS
+window, so the native run and workspace gates reported here are the recorded
+2026-09-20 validation, not a new local execution.

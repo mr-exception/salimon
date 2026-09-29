@@ -1,6 +1,6 @@
 # Task 14 — closed ship door
 
-[Notion task](https://app.notion.com/p/3e0b456853b98166923ff463434bbd69).
+[GitHub issue](https://github.com/mr-exception/salimon/issues/73).
 
 ## Behavior and regression evidence
 

@@ -1,6 +1,6 @@
 # Task 17 — assisted landing and takeoff timing
 
-[Notion task](https://app.notion.com/p/3e0b456853b981bd867bf6754e2a29f2).
+[GitHub issue](https://github.com/mr-exception/salimon/issues/27).
 Implementation: `8343190ff5416cc03ce0512d39049cbe64f9d984`.
 
 ## Timing and motion

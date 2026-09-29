@@ -21,16 +21,14 @@ door, and radial surface traversal.
 
 ## Source of requirements
 
-The [Salimon Notion space](https://app.notion.com/p/801c9c427af24e9b8d57b07572ef4119)
-holds the task list and documentation. Start with
-[task 10](https://app.notion.com/p/3d7b456853b981cabd1bd60a1d641b99), the
-[Phase 0 specification](https://app.notion.com/p/3d5b456853b981db968dca1901a270a2), and
-[Technical Architecture & AI Maintenance](https://app.notion.com/p/3d5b456853b981078a82c68207f4444e).
-[AGENTS.md](AGENTS.md) describes how future agents should access those sources;
-[docs/notion.md](docs/notion.md) records the stable page and database identifiers.
-The checked-in [Phase 0 evaluation](docs/phase-0-evaluation.md) records the
-go-with-revisions decision, benchmark evidence, limitations, and required
-follow-up before Phase 1.
+The [project documents](docs/README.md) and
+[GitHub issues](https://github.com/mr-exception/salimon/issues) are the source of
+truth. Start with the [Phase 0 specification](docs/phase-0-technical-feasibility.md)
+and [technical architecture](docs/technical-architecture.md). Check an issue's
+**Blocked by** section before work. [AGENTS.md](AGENTS.md) describes the
+contributor workflow. The checked-in [Phase 0 evaluation](docs/phase-0-evaluation.md)
+records the go-with-revisions decision, benchmark evidence, limitations, and
+required follow-up before Phase 1.
 
 ## Repository boundaries
 
@@ -81,8 +79,7 @@ is intentionally not an exact compiler pin; record compiler versions when
 reporting validation or performance. Task 2 was verified with Rust/Cargo 1.89.0
 on native Apple Silicon macOS (`aarch64-apple-darwin`). Intel macOS is not yet
 verified. The first build may need network access to download the locked `winit`
-and `wgpu` dependency graph. Running the client needs no credentials or Notion
-connection.
+and `wgpu` dependency graph. Running the client needs no external account connection.
 
 ## Build and run
 
@@ -205,12 +202,12 @@ automated tests:
 
 During the Task 14 benchmark at fixed 1920×1080 on the reference Apple M1 iMac,
 enable F3 and confirm the overlay never reports below 60 FPS. Record that
-machine-specific evidence in the Notion task before treating the performance
+machine-specific evidence in the GitHub issue before treating the performance
 criterion as manually verified.
 
 ## Development workflow
 
-Read the current task and its linked Notion specifications before changing
+Read the current GitHub issue and its linked specifications before changing
 behavior. Keep all Phase 0 implementation under `client/`; leave `core/` as a
 documentation-only boundary.
 

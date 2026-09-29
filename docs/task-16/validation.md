@@ -1,6 +1,6 @@
 # Task 16 — central cockpit monitor
 
-[Notion task](https://app.notion.com/p/3e0b456853b981638badfefae6f81bbd)
+[GitHub issue](https://github.com/mr-exception/salimon/issues/25)
 — implementation recorded on 2026-09-19. Status: **In Progress**, awaiting the
 remaining native visual acceptance checks.
 

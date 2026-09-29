@@ -1,28 +1,20 @@
 # Repository Guidelines
 
-## Notion Source of Truth
+## Project source of truth
 
-This repository implements the game described in the
-[Salimon Notion space](https://app.notion.com/p/801c9c427af24e9b8d57b07572ef4119).
-Use the connected Notion tools; [docs/notion.md](docs/notion.md) records the
-workspace, documentation indexes, task database/data source, and specification
-IDs. These links persist project context, not authentication or automatic sync.
+Use [docs/README.md](docs/README.md) for project specifications and
+[GitHub issues](https://github.com/mr-exception/salimon/issues) for tasks.
+Before starting an issue, read its full description and **Blocked by** section;
+do not start until every blocker is closed. The migrated Notion order is a planning
+priority, not a substitute for explicit dependencies. Read the linked specifications
+and the current code before implementation.
 
-Before each task, fetch the selected task from the
-[Tasks database](https://app.notion.com/p/e2dadc570fff48b4899def8b0ee70a27), read its
-`Order`, `Status`, `Description`, and `Acceptance Criteria`, then refresh the
-[Phase 0 specification](https://app.notion.com/p/3d5b456853b981db968dca1901a270a2) and
-[technical architecture](https://app.notion.com/p/3d5b456853b981078a82c68207f4444e).
-Task numbers refer to the database's `Order` property. Consult linked domain
-documents as needed. The hub also contains older unrelated notes; use the game
-specifications under Documents and Business Specs for this repository.
-
-Check Notion connection identity with `fetch` using `id: "self"`. If access is
-unavailable, report it and request reconnection rather than substituting sibling
-repositories or assuming cached requirements are current. Keep credentials out
-of Git. Record unresolved behavior decisions in Project Q&A before changing
-intended behavior. Update the existing task with progress and validation evidence;
-mark it Done only after its acceptance criteria pass.
+Record progress, validation evidence, and relevant commits on the GitHub issue.
+Close it only after its acceptance criteria pass. Record unresolved product or
+architecture decisions in [Project Q&A](docs/project-qa.md), then update the
+relevant specification and issue. The legacy Salimon hub notes are archived in
+[docs/legacy-salimon-hub.md](docs/legacy-salimon-hub.md) and do not define the
+game.
 
 ## Architecture and Scope
 

@@ -56,7 +56,7 @@ telemetry is explicitly separate from future player/ship state; Task 5 supplies
 camera-to-body surface observations without presenting the camera as gameplay
 state. As major components gain behavior, maintain the contracts, ownership
 documentation, architecture, invariants, and relevant validation required by the
-[Notion architecture](https://app.notion.com/p/3d5b456853b981078a82c68207f4444e).
+[technical architecture](../docs/technical-architecture.md).
 
 Run the root [development workflow](../README.md#development-workflow) after
 changes. Stable Rust, workspace lints, and the root lockfile apply to all client

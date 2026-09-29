@@ -18,6 +18,20 @@ ship-local planar coordinates, so radial projection cannot push a walker back
 through the hull. The proxies have finite height and exclude the broad asset
 bounds for wings/engines. A completed entry gravity blend stays in the doorway
 until the player reaches the cabin, preserving slow and diagonal crossings.
+Doorway movement rechecks the landed/open rule before each update. When the gate
+becomes impassable, the blend ends immediately and an overlapping character
+resolves to the nearer of the interior and exterior stopping planes. Existing
+surface state always stays outside: a short or stopped exit may leave it within
+the gate volume, so closure clears that overlap before the usual movement sweep.
+The recovery is restricted to the aperture and vertical hull overlap to preserve
+side-wall sliding and movement below the ship. Surface recovery solves eye height
+at the resolved ship-local planar coordinates, retaining body clearance.
+The following movement sweep retains the exact resolved local stopping plane;
+decoding it from quantized world coordinates could falsely treat contact as an
+existing penetration. Aperture-overlap recognition allows a few world-coordinate
+ULPs at the catalog's 1e12 m anchor, without widening the passable aperture.
+Closure restores the doorway's exact lateral bounds before choosing the next
+state, so a rounded jamb contact cannot become an interior aft-wall overlap.
 
 The ship interior uses a body-radius-inset walking envelope and simple planar
 collision proxies for the central Core pedestal, cabin furniture, pilot chair,

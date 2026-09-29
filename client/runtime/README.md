@@ -34,10 +34,12 @@ history resets across suspension, occlusion, zero-sized drawables, and renderer
 reconstruction so pauses do not contaminate FPS data.
 
 Gameplay view is the default. WASD/Space/mouse events are translated to typed
-character input. Looking at the cockpit while close to its seat presents
-`Press E to use`; E performs contextual cockpit/door interaction. F2 toggles
-the camera fixture, which approaches automatically from a six-body compressed
-Solar System overview to Earth's meter-scale surface markers and retreats in a loop.
+character input. Looking at the cockpit while close to its seat from inside the
+ship presents `Press E to use`; E performs contextual cockpit/door interaction.
+The doorway and surface positions can still operate the landed door but cannot
+enter cockpit control. F2 toggles the camera fixture, which approaches
+automatically from a six-body compressed Solar System overview to Earth's
+meter-scale surface markers and retreats in a loop.
 Escape releases the mouse-look cursor lock and a click in the game view captures
 it again.
 Press **P** on its initial key press to

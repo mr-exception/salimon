@@ -167,6 +167,17 @@ fn interaction_target(
     }
 }
 
+fn available_interaction_target(
+    location: CharacterLocation,
+    local_eye_position: [f64; 3],
+    local_look_target: [f64; 3],
+) -> Option<InteractionTarget> {
+    match interaction_target(local_eye_position, local_look_target) {
+        Some(InteractionTarget::Cockpit) if location != CharacterLocation::InsideShip => None,
+        target => target,
+    }
+}
+
 fn subtract(left: [f64; 3], right: [f64; 3]) -> [f64; 3] {
     std::array::from_fn(|index| left[index] - right[index])
 }
@@ -328,11 +339,14 @@ impl ClientApplication {
                 let character = self.character.snapshot(ship_frame, surface);
                 let local_eye = ship_frame.world_to_local(character.eye_position_meters);
                 let local_look = ship_frame.world_to_local(character.look_target_meters);
-                match interaction_target(local_eye, local_look) {
+                match available_interaction_target(self.character.location(), local_eye, local_look)
+                {
                     Some(InteractionTarget::Cockpit) => {
                         self.character.enter_cockpit();
-                        self.ship.set_cockpit_control(true);
-                        log::info!("entered cockpit control");
+                        if self.character.location() == CharacterLocation::Cockpit {
+                            self.ship.set_cockpit_control(true);
+                            log::info!("entered cockpit control");
+                        }
                     }
                     Some(InteractionTarget::ExitDoor) => {
                         self.ship.toggle_door();
@@ -387,7 +401,8 @@ impl ClientApplication {
         let interaction = if self.view_mode == ViewMode::Gameplay
             && character_snapshot.location != CharacterLocation::Cockpit
         {
-            interaction_target(
+            available_interaction_target(
+                character_snapshot.location,
                 ship_frame.world_to_local(character_snapshot.eye_position_meters),
                 ship_frame.world_to_local(character_snapshot.look_target_meters),
             )
@@ -1118,12 +1133,13 @@ const fn transition_phase_name(phase: TransitionPhase) -> &'static str {
 mod tests {
     use super::{
         COCKPIT_INTERACTION_PROMPT, INITIAL_HEIGHT, INITIAL_WIDTH, InteractionTarget,
-        ShipControlInput, action_bar_context, camera_body_distances, camera_command,
-        camera_domain_metrics, format_metric_speed, gameplay_window_title, initial_window_size,
-        interaction_target, is_diagnostics_toggle, landing_action_pressed, map_ship_to_renderer,
-        map_world_to_renderer, release_cursor_pressed, ship_control_key, thruster_step,
-        update_ship_control_input,
+        ShipControlInput, action_bar_context, available_interaction_target, camera_body_distances,
+        camera_command, camera_domain_metrics, format_metric_speed, gameplay_window_title,
+        initial_window_size, interaction_target, is_diagnostics_toggle, landing_action_pressed,
+        map_ship_to_renderer, map_world_to_renderer, release_cursor_pressed, ship_control_key,
+        thruster_step, update_ship_control_input,
     };
+    use salimon_character::CharacterLocation;
     use salimon_renderer::CockpitInstruments;
     use salimon_ship::{CockpitMessage, FlightState, ShipController};
     use salimon_world::{CELESTIAL_BODIES, CameraCommand, CameraPrototype, CelestialBodyId};
@@ -1494,6 +1510,27 @@ mod tests {
             ),
             None
         );
+    }
+
+    #[test]
+    fn cockpit_interaction_requires_ship_interior_but_exterior_door_remains_usable() {
+        let aisle = [0.50, 1.997_311_827_956_989_2, -2.20];
+        let cockpit = [2.76, 1.799_032_258_064_516, 0.0];
+        assert_eq!(
+            available_interaction_target(CharacterLocation::InsideShip, aisle, cockpit),
+            Some(InteractionTarget::Cockpit)
+        );
+        for location in [CharacterLocation::DoorwayBlend, CharacterLocation::Surface] {
+            assert_eq!(available_interaction_target(location, aisle, cockpit), None);
+            assert_eq!(
+                available_interaction_target(
+                    location,
+                    [-7.10, 1.344_086_021_505_376_3, 0.0],
+                    [-8.10, 1.344_086_021_505_376_3, 0.0],
+                ),
+                Some(InteractionTarget::ExitDoor)
+            );
+        }
     }
 
     #[test]

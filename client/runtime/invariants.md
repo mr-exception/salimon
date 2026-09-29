@@ -36,7 +36,9 @@
     earlier precision-tour fixture without changing domain state.
 17. Runtime contextual E routing changes cockpit authority or requests a door
     action, but never owns the resulting character/ship behavior. Cockpit entry
-    requires both range and aim, and that same gate presents `Press E to use`.
+    requires the character to be inside the ship as well as in range and aimed;
+    the same gate presents `Press E to use`. Exterior and doorway characters
+    cannot gain cockpit authority through a spatial interaction hit.
 18. Escape releases cursor capture so native window controls remain reachable;
     clicking the game view restores mouse-look capture.
 19. Gameplay interaction zones match the Task 10 cockpit and exit-door markers;

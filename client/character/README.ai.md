@@ -14,6 +14,9 @@ console/monitor collision, forward-hull containment, window sill clearance,
 ceiling and lintel containment, rear doorway body clearance, safe cockpit exit,
 exterior hull containment with the gate open or closed, corner sliding and gate
 approach from outside, vertical separation from the hull,
+door closure during a blend or after a stopped exit, repeated open/close
+crossings at the center and both jambs, closed-gate contact in rotated frames at
+the catalog's 1e12 m anchor,
 and constant-radius full-sphere movement. Add a focused unit test whenever one
 of these rules changes. Surface camera and movement direction must continue to
 share the same yaw-derived local tangent basis rather than using fixed ship/world

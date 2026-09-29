@@ -3,7 +3,9 @@
 1. Ship-floor and solid-body walking use one fixed 9.81 m/s² gravity strength.
 2. Ship gravity completely owns the character while the controller is inside or
    seated, irrespective of the nearby planetary surface.
-3. A closed door, or any flying ship, prevents transition out of the interior.
+3. A closed door, or any flying ship, blocks passage in either direction. Closing
+   during a doorway blend ends it before movement and resolves overlap to the
+   nearer physical side; an existing surface walker always remains outside.
 4. A landed open-door crossing blends gravity direction for exactly 250 ms.
    WASD stays camera-relative throughout the blend; re-entry requires movement
    toward the cabin rather than a particular key.
@@ -40,3 +42,7 @@
     same body clearance as interior traversal. Hull contact preserves surface
     eye radius and permits sliding; distant or vertically separated surface
     walkers cannot be captured by the doorway.
+18. Closing around a surface walker in the gate clears the overlap before
+    walking or jump input is processed. A closed gate cannot grant ship gravity,
+    interior state, or cockpit entry. Repeated reopening restores the ordinary
+    250 ms blend and body-clear passage in either direction.

@@ -22,6 +22,10 @@ Outside walkers collide with a conservative cabin/nose envelope, including the
 side hull and rear windows, whether the gate is open or closed. Only the landed
 open gate admits entry; exterior contact allows sliding around the hull while
 preserving body clearance and surface eye height.
+Closing the gate cancels an active gravity blend and keeps the player on the
+nearer physical side with body clearance. A surface walker still overlapping
+the gate after a short exit is moved clear of the closed door before further
+movement. Reopening restores the usual passage and starts a fresh blend.
 Surface movement is projected
 back to the same spherical radius each update, so the portable rule works around
 the full body rather than only near the initial landing point.

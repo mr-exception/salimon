@@ -13,6 +13,7 @@ workspace = true
 env_logger.workspace = true
 log.workspace = true
 pollster.workspace = true
+serde_json = "=1.0.151"
 salimon-character = { path = "../character" }
 salimon-diagnostics = { path = "../diagnostics" }
 salimon-renderer = { path = "../renderer" }

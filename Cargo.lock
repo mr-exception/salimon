@@ -1705,6 +1705,7 @@ dependencies = [
  "env_logger",
  "log",
  "pollster",
+ "serde_json",
  "salimon-character",
  "salimon-diagnostics",
  "salimon-renderer",

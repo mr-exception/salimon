@@ -65,3 +65,7 @@
     native event loop. It changes only initial controller state and update-clock
     policy. A ready line follows successful renderer initialization; ordinary
     launches retain the default state and monotonic clock.
+27. The versioned JSON automation channel starts only after E2E renderer readiness.
+    Its reader never touches game state; commands run on the native event thread.
+    Only explicit fixed steps advance E2E simulation, and gameplay actions retain
+    production interaction and controller gates. Ordinary launches do not read stdin.

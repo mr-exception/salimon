@@ -140,6 +140,7 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
         return Err("scenario setup failed: unexpected ship flight state".into());
     }
     app.update_clock.set_fixed_step(config.step);
+    app.e2e_config = Some(config);
     Ok(())
 }
 

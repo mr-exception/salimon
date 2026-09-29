@@ -24,14 +24,42 @@ Scenarios: `landed-earth` (default, standing in the ship), `cockpit-earth`
 ship, 1 km above the nominal surface). The world catalog is immutable; the seed
 selects a reproducible tangent offset of at most 100 m for orbit scenarios.
 `--seed` defaults to 0. `--step-ms` defaults to 16 and accepts 1–100 milliseconds.
-Each drawable update uses this fixed duration; rendering still follows the native
-window lifecycle. Tests can drive ordinary keyboard/mouse interactions after
-setup. Ship flight, doors, character motion, and collision remain on their normal
-controller paths. There is no runtime command to mutate state after launch.
+The command channel advances simulation only when asked to step; redraws do not
+advance it. Ship flight, doors, character motion, and collision remain on their
+normal controller paths. The process still needs a native window and renderer.
 
 Wait for the stdout line `SALIMON_E2E_READY scenario=<name> seed=<n> step_ms=<n>`
 before sending input. It is emitted after window and renderer initialization;
-setup or GPU/window failure exits nonzero with a diagnostic on stderr/log output.
+the next stdout line is a versioned JSON ready event. Send newline-delimited JSON
+requests on stdin, one at a time, and read one JSON response per request. The
+legacy ready line is not a JSON response. Example:
+
+```json
+{"protocol":1,"id":1,"op":"key","key":"forward","pressed":true}
+{"protocol":1,"id":2,"op":"step","frames":10}
+{"protocol":1,"id":3,"op":"key","key":"forward","pressed":false}
+{"protocol":1,"id":4,"op":"inspect"}
+```
+
+`key` accepts `forward`, `backward`, `left`, `right`, `jump`, `roll_left`, and
+`roll_right`. Held forward/backward/left/right steer the ship when seated, and
+move the character otherwise. `look` accepts finite pixel deltas `dx` and `dy`.
+`interact` uses the same aimed/range interaction as E, so walking and looking at
+the cockpit seat is required to enter it; interacting again leaves it. `landing`
+uses the same L action and its cockpit and proximity gates. `thruster` accepts a
+`direction` of `1` or `-1` and applies one Up/Down Arrow step when seated. `step`
+accepts 1–600 `frames` of the launch-configured duration. `inspect` returns
+player pose/location, ship pose/flight/door/control/telemetry, the aimed
+interaction target, and all catalog bodies with ship surface distances.
+
+Responses include `protocol`, the caller's string or numeric `id`, `ok`, and
+either `result` or `error` with `code` and `message`. Requests need protocol 1,
+an ID, and an operation. Lines are limited to 16 KiB. A command waiting longer
+than five seconds gets a structured timeout; expired queued commands are dropped.
+Only E2E launches start a stdin reader; ordinary launches do not consume stdin.
+The JSON channel does not expose mutable scenario state after setup.
+
+Setup or GPU/window failure exits nonzero with a diagnostic on stderr/log output.
 Close the window to finish the run. Scenario flags without `--e2e`, malformed
 values, and unknown scenarios fail before opening a window. Normal launches use
 the original monotonic update clock and default starting state.

@@ -50,6 +50,8 @@ necessary.
   and report real camera-to-body surface distances plus live typed player/ship
   values in gameplay view.
 - Add or update deterministic tests for non-GUI logic.
+- Keep the E2E JSON reader isolated from game state; execute its commands on the
+  native event thread and preserve production gates for action commands.
 - Run all root build/format/lint/test gates.
 - Perform the root native smoke check for lifecycle or rendering changes.
 - Update this guide and the component architecture/invariants when ownership or

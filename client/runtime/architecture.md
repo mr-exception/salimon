@@ -75,6 +75,10 @@ An explicit `--e2e` launch selects a fixed update duration and one known initial
 scenario before the event loop starts. The runtime composes existing character,
 ship, and immutable catalog values; subsequent frames and interactions use the
 same production controllers. The ready signal follows successful renderer setup.
+Only E2E mode starts a stdin JSON reader. It passes requests to the native event
+thread, where held input, look, interaction, thruster, landing, and explicit fixed
+steps use the gameplay controllers. Rendering never advances E2E simulation;
+inspection reads domain snapshots without mutating them.
 
 Diagnostics remains observational and non-authoritative. When additional native
 targets or platform services appear, move OS-specific policy behind

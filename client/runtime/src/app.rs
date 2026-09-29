@@ -2,6 +2,7 @@ use std::error::Error;
 use std::fmt;
 use std::io::Write;
 use std::sync::Arc;
+use std::sync::mpsc::Receiver;
 use std::time::{Duration, Instant};
 
 use salimon_character::{
@@ -30,6 +31,7 @@ use winit::keyboard::{KeyCode, PhysicalKey};
 use winit::window::{CursorGrabMode, Window, WindowAttributes, WindowId};
 
 use crate::action_bar::ActionBar;
+use crate::automation::{self, Request};
 use crate::e2e;
 use crate::frame_clock::FrameClock;
 use crate::update_clock::UpdateClock;
@@ -61,7 +63,6 @@ pub(crate) fn run(config: Option<e2e::Config>) -> Result<(), RunError> {
         e2e::initialize(&mut application, config)
             .map_err(|error| RunError::new("E2E setup failed", error))?;
     }
-    application.e2e_config = config;
     event_loop
         .run_app(&mut application)
         .map_err(|error| RunError::new("native event loop failed", error))?;
@@ -103,8 +104,9 @@ pub(crate) struct ClientApplication {
     camera_prototype: CameraPrototype,
     pub(crate) character: CharacterController,
     pub(crate) ship: ShipController,
-    e2e_config: Option<e2e::Config>,
+    pub(crate) e2e_config: Option<e2e::Config>,
     e2e_ready_sent: bool,
+    automation: Option<Receiver<Request>>,
     movement_input: MovementInput,
     ship_control_input: ShipControlInput,
     view_mode: ViewMode,
@@ -129,6 +131,7 @@ impl Default for ClientApplication {
             ship: ShipController::default(),
             e2e_config: None,
             e2e_ready_sent: false,
+            automation: None,
             movement_input: MovementInput::default(),
             ship_control_input: ShipControlInput::default(),
             view_mode: ViewMode::Gameplay,
@@ -303,6 +306,8 @@ impl ClientApplication {
                 .flush()
                 .map_err(|error| RunError::new("failed to emit E2E ready signal", error))?;
             self.e2e_ready_sent = true;
+            automation::ready(config.scenario.name(), config.seed, config.step.as_millis());
+            self.automation = Some(automation::start());
         }
         self.render_attempts = 0;
         self.retry_at = None;
@@ -345,7 +350,7 @@ impl ClientApplication {
         event_loop.set_control_flow(ControlFlow::WaitUntil(retry_at));
     }
 
-    fn interact(&mut self) {
+    pub(crate) fn interact(&mut self) {
         let ship_snapshot = self.ship.snapshot();
         let ship_frame = character_ship_frame(ship_snapshot.pose);
         let surface = surface_frame_for_ship(ship_snapshot);
@@ -388,6 +393,44 @@ impl ClientApplication {
         }
     }
 
+    pub(crate) fn e2e_step(&self) -> Option<Duration> {
+        self.e2e_config.map(|config| config.step)
+    }
+
+    pub(crate) fn camera_phase(&self) -> TransitionPhase {
+        self.camera_prototype.snapshot().transition_phase
+    }
+
+    pub(crate) fn automation_interaction(&self, local_eye: [f64; 3], local_look: [f64; 3]) -> Option<&'static str> {
+        match available_interaction_target(self.character.location(), local_eye, local_look) {
+            Some(InteractionTarget::Cockpit) => Some("cockpit"),
+            Some(InteractionTarget::ExitDoor) => Some("exit_door"),
+            None => None,
+        }
+    }
+
+    pub(crate) fn automation_key(&mut self, key: PhysicalKey, pressed: bool) {
+        if self.character.location() == CharacterLocation::Cockpit && ship_control_key(key).is_some() {
+            update_ship_control_input(&mut self.ship_control_input, key, pressed);
+        } else {
+            update_movement_input(&mut self.movement_input, key, pressed);
+        }
+    }
+
+    /// The same portable gameplay update runs on redraw and on explicit E2E steps.
+    pub(crate) fn advance_game(&mut self, delta: Duration) {
+        self.camera_prototype.advance(delta);
+        self.ship.set_steering_input(self.ship_control_input.steering());
+        self.ship.advance(delta);
+        let ship = self.ship.snapshot();
+        if self.view_mode == ViewMode::Gameplay {
+            self.character.advance(delta, self.movement_input, character_ship_frame(ship.pose),
+                surface_frame_for_ship(ship), ship.door_state == DoorState::Open,
+                matches!(ship.flight_state, FlightState::Landed { .. }));
+        }
+        self.action_bar.advance(delta);
+    }
+
     fn redraw(&mut self, event_loop: &ActiveEventLoop, window: Arc<Window>) {
         if self.occluded {
             self.frame_clock.reset_interval();
@@ -399,24 +442,17 @@ impl ClientApplication {
         self.render_attempts = self.render_attempts.saturating_add(1);
         let render_started_at = Instant::now();
         let update_started_at = Instant::now();
-        let update_delta = self.update_clock.step(update_started_at);
-        self.camera_prototype.advance(update_delta);
-        self.ship
-            .set_steering_input(self.ship_control_input.steering());
-        self.ship.advance(update_delta);
+        let update_delta = if self.automation.is_some() {
+            Duration::ZERO
+        } else {
+            self.update_clock.step(update_started_at)
+        };
+        if !update_delta.is_zero() {
+            self.advance_game(update_delta);
+        }
         let ship_snapshot = self.ship.snapshot();
         let ship_frame = character_ship_frame(ship_snapshot.pose);
         let surface_frame = surface_frame_for_ship(ship_snapshot);
-        if self.view_mode == ViewMode::Gameplay {
-            self.character.advance(
-                update_delta,
-                self.movement_input,
-                ship_frame,
-                surface_frame,
-                ship_snapshot.door_state == DoorState::Open,
-                matches!(ship_snapshot.flight_state, FlightState::Landed { .. }),
-            );
-        }
         let world_snapshot = self.camera_prototype.snapshot();
         let (mut camera, scene_instances, spheres, light) = map_world_to_renderer(world_snapshot);
         let character_snapshot = self.character.snapshot(ship_frame, surface_frame);
@@ -432,7 +468,6 @@ impl ClientApplication {
         } else {
             None
         };
-        self.action_bar.advance(update_delta);
         let contextual_action = action_bar_context(monitor_message, interaction);
         self.action_bar.set_contextual(contextual_action);
         window.set_title(&gameplay_window_title(monitor_message, interaction));
@@ -796,6 +831,26 @@ impl ApplicationHandler for ClientApplication {
     }
 
     fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
+        if self.automation.is_some() {
+            // Drain the queue on the native thread; the stdin thread never touches state.
+            while let Some(request) = self.automation.as_ref().and_then(|receiver| receiver.try_recv().ok()) {
+                if Instant::now() <= request.deadline {
+                    let response = automation::execute(self, &request.line);
+                    let _ = request.reply.send(response);
+                    if let Some(window) = &self.window {
+                        window.request_redraw();
+                    }
+                }
+            }
+            if self.retry_at.is_some_and(|at| Instant::now() >= at) {
+                self.retry_at = None;
+                if let Some(window) = &self.window {
+                    window.request_redraw();
+                }
+            }
+            event_loop.set_control_flow(ControlFlow::WaitUntil(Instant::now() + Duration::from_millis(10)));
+            return;
+        }
         let Some(retry_at) = self.retry_at else {
             return;
         };

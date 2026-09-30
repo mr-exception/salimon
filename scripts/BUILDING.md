@@ -113,5 +113,9 @@ behavior with the [manual smoke checks](../README.md#native-smoke-check) and the
 check, not a hardware performance/visual-quality benchmark. Packaged OS-input
 automation remains separate work in issue #32.
 
+The existing E2E runner CLI subprocess contract uses a POSIX shebang fixture and
+is explicitly skipped on Windows. All build-interface contracts and the other
+runner contracts execute there; Windows does not claim that Unix-only fixture.
+
 Signing, notarization, installers, automatic updates, non-Debian distributions
 and application store packaging are outside this build interface.

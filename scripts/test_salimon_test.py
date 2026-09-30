@@ -203,6 +203,7 @@ pathlib.Path(sys.argv[1]).write_bytes(b"\\x89PNG\\r\\n\\x1a\\n" + b"fake")
             with self.assertRaises(ScenarioError):
                 parse_scenario(self.scenario)
 
+    @unittest.skipIf(sys.platform == "win32", "CLI fixture requires a POSIX executable shebang")
     def test_cli_writes_report_and_propagates_failure_exit(self):
         executable = self.directory / "fake-client"
         executable.write_text(f"#!{sys.executable}\n" + FAKE)

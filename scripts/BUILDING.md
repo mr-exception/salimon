@@ -28,14 +28,14 @@ Debian-based Linux setup (in addition to installing Rust via rustup):
 
 ```sh
 sudo apt-get update
-sudo apt-get install -y python3 build-essential libxkbcommon-dev libwayland-dev \
+sudo apt-get install -y python3 build-essential libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev \
   libx11-dev libxi-dev libxcursor-dev libxrandr-dev libvulkan1 mesa-vulkan-drivers
 ```
 
 Mesa provides Vulkan for supported open-source drivers and software rendering.
 For proprietary GPUs install the vendor's Vulkan driver instead. Development
 packages above also supply the required desktop runtime libraries. A machine
-that only runs a copied build needs `libxkbcommon0`, `libwayland-client0`,
+that only runs a copied build needs `libxkbcommon0`, `libxkbcommon-x11-0`, `libwayland-client0`,
 `libx11-6`, `libxi6`, `libxcursor1`, `libxrandr2`, `libvulkan1` and its GPU's
 Vulkan driver. Headless builds are supported; interactive execution needs a
 display. Runtime distribution compatibility is limited to the build host's

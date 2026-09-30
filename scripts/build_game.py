@@ -102,7 +102,7 @@ def stage(executable, destination, host, profile, rust):
             f"Salimon native {profile} build ({host})\n\n"
             f"Run {name} from any directory. Game assets are embedded in the executable.\n"
             "A graphical desktop and compatible GPU/driver are required.\n"
-            "Linux: install libxkbcommon0, libwayland-client0, libx11-6, libxi6,\n"
+            "Linux: install libxkbcommon0, libxkbcommon-x11-0, libwayland-client0, libx11-6, libxi6,\n"
             "libxcursor1, libxrandr2, libvulkan1 and a compatible Vulkan driver.\n"
             "Windows: install the Visual C++ 2015-2022 runtime if missing.\n"
             "macOS: this executable is unsigned; allow it through local security settings.\n"

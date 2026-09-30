@@ -589,7 +589,7 @@ fn rasterize_panel(text: &str, scale: u32) -> (u32, u32, Vec<u8>) {
     let height = (content_height + PADDING * 2) * scale;
     let pixel_count = width as usize * height as usize;
     let mut pixels = vec![0_u8; pixel_count * 4];
-    for pixel in pixels.chunks_exact_mut(4) {
+    for pixel in pixels.as_chunks_mut::<4>().0 {
         pixel.copy_from_slice(&BACKGROUND);
     }
 
@@ -1006,7 +1006,14 @@ mod tests {
             overlay.rgba8.len(),
             overlay.width as usize * overlay.height as usize * 4
         );
-        assert!(overlay.rgba8.chunks_exact(4).any(|pixel| pixel[3] > 0));
+        assert!(
+            overlay
+                .rgba8
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .any(|pixel| pixel[3] > 0)
+        );
     }
 
     #[test]

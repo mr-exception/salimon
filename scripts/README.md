@@ -1,5 +1,8 @@
 # Native E2E scenario runner
 
+Build standalone executables with the [cross-platform build interface](BUILDING.md).
+Pass its staged executable to `--binary` to test the distribution artifact.
+
 Run from the repository root on a machine with a native window and working GPU:
 
 ```sh

@@ -588,13 +588,17 @@ mod tests {
         assert!(
             geometry
                 .opaque_vertices
-                .chunks_exact(VERTEX_FLOATS)
+                .as_chunks::<VERTEX_FLOATS>()
+                .0
+                .iter()
                 .any(|vertex| vertex[10] == 1.0)
         );
         assert!(
             geometry
                 .glass_vertices
-                .chunks_exact(VERTEX_FLOATS)
+                .as_chunks::<VERTEX_FLOATS>()
+                .0
+                .iter()
                 .all(|vertex| vertex[9] > 0.0 && vertex[9] < 0.5)
         );
     }
@@ -605,8 +609,16 @@ mod tests {
         let gltf = gltf::Gltf::from_slice(SHIP_GLB).expect("checked-in GLB must parse");
         let vertices: Vec<_> = geometry
             .opaque_vertices
-            .chunks_exact(VERTEX_FLOATS)
-            .chain(geometry.glass_vertices.chunks_exact(VERTEX_FLOATS))
+            .as_chunks::<VERTEX_FLOATS>()
+            .0
+            .iter()
+            .chain(
+                geometry
+                    .glass_vertices
+                    .as_chunks::<VERTEX_FLOATS>()
+                    .0
+                    .iter(),
+            )
             .collect();
         let emissive_materials: Vec<_> = gltf
             .materials()
@@ -671,7 +683,9 @@ mod tests {
         ] {
             let vertices: Vec<_> = geometry
                 .opaque_vertices
-                .chunks_exact(VERTEX_FLOATS)
+                .as_chunks::<VERTEX_FLOATS>()
+                .0
+                .iter()
                 .filter(|vertex| vertex[17] == panel)
                 .collect();
             assert_eq!(vertices.len(), 6, "each screen is exactly two triangles");
@@ -704,7 +718,9 @@ mod tests {
         assert!(
             geometry
                 .glass_vertices
-                .chunks_exact(VERTEX_FLOATS)
+                .as_chunks::<VERTEX_FLOATS>()
+                .0
+                .iter()
                 .all(|vertex| vertex[17] == 0.0)
         );
     }

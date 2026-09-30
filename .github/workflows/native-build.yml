@@ -1,0 +1,57 @@
+name: Native builds
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-14, windows-2022]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: Debian build and runtime dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libxkbcommon-dev libwayland-dev libx11-dev libxi-dev libxcursor-dev libxrandr-dev libvulkan1 mesa-vulkan-drivers xvfb
+      - name: Build script and E2E runner contract tests
+        run: python -m unittest discover -s scripts -p 'test_*.py'
+      - name: Rust quality gates
+        run: |
+          cargo fmt --all -- --check
+          cargo clippy --workspace --all-targets --locked -- -D warnings
+          cargo test --workspace --locked
+      - name: Stage debug executable
+        run: python scripts/build_game.py --profile debug --output artifacts/build/debug
+      - name: Stage release executable
+        run: python scripts/build_game.py --profile release --output artifacts/build/release
+      - name: Linux native startup and gameplay smoke
+        if: runner.os == 'Linux'
+        env:
+          WGPU_BACKEND: vulkan
+        run: xvfb-run -a -s '-screen 0 1280x800x24' python scripts/salimon-test run scenarios/landed-earth.json --binary artifacts/build/release/salimon-client --screenshot-command '[]'
+      - name: Preserve runnable builds and smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: salimon-${{ matrix.os }}
+          path: |
+            artifacts/build/
+            artifacts/e2e/
+          if-no-files-found: warn

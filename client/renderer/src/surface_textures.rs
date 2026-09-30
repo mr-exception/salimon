@@ -125,7 +125,7 @@ mod tests {
             assert_eq!(chain.len(), MIP_COUNT as usize);
             for (width, height, pixels) in &chain {
                 assert_eq!(pixels.len(), (width * height * 4) as usize);
-                assert!(pixels.chunks_exact(4).all(|p| p[3] == 255));
+                assert!(pixels.as_chunks::<4>().0.iter().all(|p| p[3] == 255));
             }
             let last = chain.last().unwrap();
             assert_eq!((last.0, last.1), (1, 1));

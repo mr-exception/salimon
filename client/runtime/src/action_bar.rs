@@ -124,7 +124,7 @@ fn rasterize_action_bar(text: &str, scale: u32) -> (u32, u32, Vec<u8>) {
     let width = (content_width + HORIZONTAL_PADDING * 2) * scale;
     let height = (GLYPH_HEIGHT + VERTICAL_PADDING * 2) * scale;
     let mut pixels = vec![0_u8; width as usize * height as usize * 4];
-    for pixel in pixels.chunks_exact_mut(4) {
+    for pixel in pixels.as_chunks_mut::<4>().0 {
         pixel.copy_from_slice(&BACKGROUND);
     }
     fill_rect(&mut pixels, width, 0, 0, width, scale, BORDER);

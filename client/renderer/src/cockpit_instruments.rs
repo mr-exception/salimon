@@ -534,7 +534,14 @@ mod tests {
                 thruster_percentage: percentage,
                 ..CockpitInstruments::default()
             }));
-            assert!(atlas.pixels.chunks_exact(4).all(|pixel| pixel[3] == 255));
+            assert!(
+                atlas
+                    .pixels
+                    .as_chunks::<4>()
+                    .0
+                    .iter()
+                    .all(|pixel| pixel[3] == 255)
+            );
         }
         assert!(!atlas.update(CockpitInstruments {
             speed_meters_per_second: f64::NAN,

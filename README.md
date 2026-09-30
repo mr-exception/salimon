@@ -2,8 +2,8 @@
 
 Salimon is a space exploration game built around a custom Rust runtime. The
 current milestone is **Phase 0 — Technical Feasibility Showcase**: a native macOS,
-client-only prototype using a custom `wgpu` renderer, with Windows and web as
-later targets. The reference performance machine is an Apple M1 iMac
+client-only prototype using a custom `wgpu` renderer. Native build scripts target
+macOS, Windows, and Debian-based Linux; web remains a later target. The reference performance machine is an Apple M1 iMac
 (`iMac21,1`, model `Z12X002L9GR/A`) with 8 CPU cores, 8 integrated GPU cores,
 and 16 GB unified memory.
 
@@ -82,6 +82,11 @@ verified. The first build may need network access to download the locked `winit`
 and `wgpu` dependency graph. Running the client needs no external account connection.
 
 ## Build and run
+
+For standalone native debug/release executables on macOS, Windows, and Debian
+Linux, use `python3 scripts/build_game.py --profile release` (`python` on
+Windows). See [native build documentation](scripts/BUILDING.md) for prerequisites,
+output locations, failure handling, and the cross-platform CI build matrix.
 
 Run declarative native E2E scenarios with `scripts/salimon-test suite` or
 `scripts/salimon-test run scenarios/landed-earth.json`; see

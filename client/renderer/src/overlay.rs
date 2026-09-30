@@ -248,7 +248,7 @@ impl OverlayRenderer {
             0.0,
         ];
         let mut bytes = [0_u8; 32];
-        for (chunk, value) in bytes.chunks_exact_mut(4).zip(dimensions) {
+        for (chunk, value) in bytes.as_chunks_mut::<4>().0.iter_mut().zip(dimensions) {
             chunk.copy_from_slice(&value.to_ne_bytes());
         }
         queue.write_buffer(&self.dimensions_buffer, 0, &bytes);

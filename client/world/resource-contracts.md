@@ -14,7 +14,7 @@ These are initial gameplay approximations, not purity/chemistry simulations.
 Persist or communicate `ResourceId::key()`, never catalog indices or Rust enum
 discriminants. Unknown keys return `None`. Catalog entries are immutable; display
 names may change without changing identity. Adding a material requires a new
-stable key and catalog entry. No per-planet distribution is defined here (#41).
+stable key and catalog entry. Per-planet generation inputs live in `salimon_world::resource_distribution`.
 
 `RawMaterial::new` validates positive finite kilograms and derives positive
 finite solid volume as mass / density. Fragment volume does not describe a mesh
@@ -41,3 +41,34 @@ count is stored. Carrying ownership, gravity, velocity, cargo containment, and
 the permanent one-object carrying invariant will be implemented by their tasks.
 
 Run focused contracts with `cargo test --locked -p salimon-world --test resources`.
+
+## Planetary resource distribution
+
+`default_resource_distribution(body_id)` supplies immutable validated profiles
+for Mercury, Venus, Earth, Moon, and Mars; Sun is empty. These are gameplay
+approximations, not real geological maps. Custom `BodyResourceDistribution`
+values may declare zero or more resources, including an empty solid body.
+
+Each `ResourceDistribution` has a stable material ID, positive finite relative
+selection weight, nominal surface spacing in meters, and inclusive positive
+finite initial deposit mass bounds in kilograms. Weights need not sum to one;
+generation must normalize them when selecting materials. Duplicate material
+entries are rejected. Actual placement and deposit sampling belong to #42.
+
+`generation_inputs(world_seed, biome)` returns material-key-sorted entries with
+per-material seeds. Seeds use explicit little-endian world/body seeds, stable
+body/material keys, and fixed FNV-1a wrapping arithmetic; no process hash, clock,
+catalog index, or RNG state is used. Reordering entries or adding another
+material does not perturb an existing material's seed. Changing parameters
+changes the returned input even though its seed stays fixed. The generation
+algorithm must use these parameters and its own documented deterministic sampler.
+
+Named `BiomeResourceOverride` lists replace the entire base resource list,
+including with an empty list. Unknown or absent biome keys fall back to base
+inputs and seeds; recognized biome keys partition seeds. Duplicate or empty/
+whitespace-padded biome keys are rejected. No terrain/biome detection is
+implemented. This extension point lets later terrain work choose a biome
+without redesigning the resource configuration.
+
+Run configuration coverage with
+`cargo test --locked -p salimon-world --test resource_distribution`.

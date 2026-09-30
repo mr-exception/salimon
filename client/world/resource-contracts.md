@@ -72,3 +72,39 @@ without redesigning the resource configuration.
 
 Run configuration coverage with
 `cargo test --locked -p salimon-world --test resource_distribution`.
+
+## Nearby deterministic deposits
+
+`resource_generation::materialize_nearby_deposits` is the renderer-neutral
+materialization boundary for #42. Call with the active body/profile, stable world
+seed, optional biome, player position, and positive radius; replace the owned
+active list on success. Only centers inside that nearby ball are returned.
+Far-space and empty profiles return empty lists. Invalid geometry, mismatched
+body/profile, excessive resolution, and excessive candidate work return typed
+errors, with no partial result.
+
+Generation version 1 partitions six cube faces into cells at nominal configured
+spacing and radially projects seeded, inset cell samples onto the body's sphere.
+Cube projection causes modest spacing variation; this is a gameplay distribution,
+not terrain or a geological map. Each material gets an independent cell lattice;
+normalized relative weights thin candidate cells, while each material's spacing
+controls its potential density. Seeds and IDs use explicit FNV-1a arithmetic over
+configuration seeds, version, resolution, face, and cell indices; random lanes
+use fixed SplitMix64 arithmetic. No clock, process RNG, catalog order, or query
+origin affects a deposit. IDs are 64-bit content keys scoped to body; as with any
+64-bit hash, they are not a mathematical collision-free encoding of an entire
+planet. Changing seed/configuration defines a new generated world.
+
+A conservative cube-face interval calculation visits only cells intersecting the
+nearby ball, including poles and face seams. Requests examine at most 65,536 cells
+across all resources, and resolution is capped at 100 million cells per face edge;
+no full-planet cache or allocation exists. Use smaller nearby radii for dense
+custom profiles. `SurfaceDeposit` retains authoritative f64 body-local position,
+a validated resource deposit with initial/remaining mass, and a spherical bound
+whose volume equals initial mass divided by material density. Absolute coordinates
+are formed only by translating the body-local position at the boundary.
+
+Unloading and rematerializing untouched deposits reproduces their IDs, material,
+mass, geometry, and bounds. Modified/depleted-state retention belongs to #50;
+visuals belong to #43 and mining belongs to #44. No rendering or mining behavior
+is introduced here. Run `cargo test --locked -p salimon-world --test resource_generation`.

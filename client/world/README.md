@@ -4,8 +4,9 @@ The renderer-independent [resource contracts](resource-contracts.md) define stab
 raw-material identities, the initial catalog, validated deposits, and physical
 fragments for the planetary collection work. Per-body resource distribution
 profiles expose validated weights, spacing, mass ranges, deterministic generation
-inputs, and optional biome overrides. Generation and gameplay integration
-are separate tasks.
+inputs, and optional biome overrides. Bounded nearby deposit materialization
+uses deterministic cube-sphere cells with body-local geometry and physical bounds.
+Visuals, mining, and modified-state retention remain separate tasks.
 
 `salimon-world` owns the portable Phase 0 compressed Solar System, large-scale
 coordinates, camera tour, and body geometry math. Its immutable catalog contains

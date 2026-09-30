@@ -8,6 +8,7 @@
 use std::time::Duration;
 
 pub mod resource_distribution;
+pub mod resource_generation;
 pub mod resources;
 
 pub const SURFACE_ANCHOR: WorldPosition =

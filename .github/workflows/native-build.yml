@@ -5,6 +5,11 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      visual_evidence:
+        description: Run optional Linux screenshot checkpoint scenarios
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -29,7 +34,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev libx11-dev libxi-dev libxcursor-dev libxrandr-dev libvulkan1 mesa-vulkan-drivers xvfb xdotool imagemagick
+          sudo apt-get install -y build-essential libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev libx11-dev libxi-dev libxcursor-dev libxrandr-dev libvulkan1 mesa-vulkan-drivers xvfb xauth xdotool imagemagick
       - name: Build script and E2E runner contract tests
         run: python -m unittest discover -s scripts -p 'test_*.py'
       - name: Rust quality gates
@@ -42,15 +47,45 @@ jobs:
         run: python scripts/build_game.py --profile debug --output artifacts/build/debug
       - name: Stage release executable
         run: python scripts/build_game.py --profile release --output artifacts/build/release
-      - name: Linux native startup and gameplay smoke
+      - name: Linux deterministic E2E baseline (Mesa software Vulkan)
         if: runner.os == 'Linux'
+        timeout-minutes: 10
+        shell: bash
         env:
           WGPU_BACKEND: vulkan
-        run: xvfb-run -a -s '-screen 0 1280x800x24' python scripts/salimon-test run scenarios/landed-earth.json --binary artifacts/build/release/salimon-client --screenshot-command '[]'
+          VK_DRIVER_FILES: /usr/share/vulkan/icd.d/lvp_icd.x86_64.json
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/e2e
+          test -f "$VK_DRIVER_FILES"
+          command -v import
+          xvfb-run -a -s '-screen 0 1280x800x24' bash -euo pipefail -c '
+            import -window root artifacts/e2e/display-ready.png
+            python scripts/salimon-test suite --binary artifacts/build/release/salimon-client
+          ' 2>&1 | tee artifacts/e2e/baseline.log
+      - name: Linux optional visual checkpoints (Mesa software Vulkan)
+        if: runner.os == 'Linux' && inputs.visual_evidence == true
+        timeout-minutes: 10
+        shell: bash
+        env:
+          WGPU_BACKEND: vulkan
+          VK_DRIVER_FILES: /usr/share/vulkan/icd.d/lvp_icd.x86_64.json
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s '-screen 0 1280x800x24' bash -euo pipefail -c '
+            for scenario in scenarios/evidence/*.json; do
+              python scripts/salimon-test run "$scenario" --binary artifacts/build/release/salimon-client
+            done
+          ' 2>&1 | tee artifacts/e2e/visual.log
+      - name: Record native graphics coverage on macOS and Windows
+        if: runner.os != 'Linux'
+        shell: bash
+        run: echo 'Native graphical E2E is not run on this platform in CI; run the baseline/evidence suites on a local GPU desktop. Build, Rust, and Python checks still run.' >> "$GITHUB_STEP_SUMMARY"
       - name: Linux packaged black-box smoke (real X11 input)
         if: runner.os == 'Linux'
         env:
           WGPU_BACKEND: vulkan
+          VK_DRIVER_FILES: /usr/share/vulkan/icd.d/lvp_icd.x86_64.json
         run: xvfb-run -a -s '-screen 0 1920x1080x24' python scripts/packaged_smoke.py --binary artifacts/build/release/salimon-client --timeout 90
       - name: Preserve runnable builds and smoke evidence
         if: always()

@@ -95,6 +95,41 @@ software rendering; it does not establish hardware performance or native macOS/
 Windows graphics fidelity. Missing display/GPU support is a failed launch,
 not a passed or skipped scenario. Visual runs require a working capture helper.
 
+## Continuous integration coverage
+
+Every push to `main` and every pull request runs the deterministic baseline
+`suite` against the staged **release** executable on Ubuntu 24.04 in
+`.github/workflows/native-build.yml`. This required Linux check covers launch,
+seeded readiness, the cockpit/door/surface/assisted-takeoff path and the
+orbit/assisted-landing path. It uses a dedicated 1280×800 Xvfb display and
+explicitly selects Mesa lavapipe via `VK_DRIVER_FILES`; software Vulkan is the
+CI fallback, not a hardware performance or native graphics fidelity check.
+Display, Vulkan, and screenshot-helper failures fail the job. A capture
+preflight saves `display-ready.png`, and automatic failure screenshots remain
+enabled throughout the suite.
+
+The runner's nonzero exit status propagates through `tee` using Bash
+`pipefail`. `baseline.log` contains the aggregate report, including the failed
+scenario/step reason. The always-run artifact upload preserves all
+`artifacts/e2e/` results, per-step state, protocol/process logs, failure state
+and available failure screenshots in `salimon-ubuntu-24.04`, alongside runnable
+builds and packaged smoke evidence. Each native scenario has a bounded timeout;
+the CI step also has a ten-minute limit. Inspect `result.json` for the first
+failed step before checking its logs and screenshots.
+
+The fast required baseline has no successful-run screenshot checkpoints. For
+the slower visual suite, manually dispatch **Native builds** with
+`visual_evidence` enabled. It runs both `scenarios/evidence/*.json` paths and
+uploads named screenshots plus `visual.log`; capture failures fail that step.
+The separate required packaged smoke still checks normal startup and real OS
+keyboard input. Both Linux checks use software Vulkan.
+
+macOS and Windows CI run build, Rust, and applicable Python contract checks;
+graphical E2E is explicitly not run there and this is recorded in the job
+summary. Validate those platforms with local baseline and evidence runs on
+their native GPU desktops. No successful Linux check claims macOS/Windows
+graphics coverage.
+
 ## State and visual evidence
 
 Every scenario gets a unique `artifacts/e2e/run-*/` directory (including parse,

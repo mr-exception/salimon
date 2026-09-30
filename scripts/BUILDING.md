@@ -105,12 +105,15 @@ python3 -m unittest discover -s scripts -p 'test_*.py'
 `.github/workflows/native-build.yml` runs these contracts and Rust quality gates,
 builds/stages debug and release on the native macOS runner, Windows (x86-64 MSVC)
 and Ubuntu (x86-64), and uploads the runnable folders. Linux also launches the
-staged release executable under Xvfb with Mesa software Vulkan and runs the
-existing landed-Earth gameplay scenario. It uploads logs/results even on failure.
+staged release executable under Xvfb with explicitly selected Mesa lavapipe and
+runs the complete deterministic Phase 0 baseline suite (landed Earth and orbit
+Earth). It uploads logs/results and available failure screenshots even on failure.
+See [CI coverage](README.md#continuous-integration-coverage) for required checks,
+failure diagnosis, and the optional manual-dispatch visual checkpoint suite.
 No graphical launch is claimed for macOS/Windows CI; validate native GPU/window
 behavior with the [manual smoke checks](../README.md#native-smoke-check) and the
-[E2E runner](README.md) on those desktops. Linux software rendering is a startup
-check, not a hardware performance/visual-quality benchmark. Packaged OS-input
+[E2E runner](README.md) on those desktops. Linux software rendering checks
+gameplay, not hardware performance or visual quality. Packaged OS-input
 automation is provided by the [black-box smoke command](PACKAGED_SMOKE.md).
 
 The existing E2E runner CLI subprocess contract uses a POSIX shebang fixture and

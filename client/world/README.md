@@ -2,7 +2,9 @@
 
 The renderer-independent [resource contracts](resource-contracts.md) define stable
 raw-material identities, the initial catalog, validated deposits, and physical
-fragments for the planetary collection work. Generation and gameplay integration
+fragments for the planetary collection work. Per-body resource distribution
+profiles expose validated weights, spacing, mass ranges, deterministic generation
+inputs, and optional biome overrides. Generation and gameplay integration
 are separate tasks.
 
 `salimon-world` owns the portable Phase 0 compressed Solar System, large-scale

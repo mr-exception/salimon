@@ -1,0 +1,15 @@
+{
+  "setup": {"scenario": "landed-earth", "seed": 0, "step_ms": 16},
+  "timeout_ms": 60000,
+  "steps": [
+    {"assert": {"path": "player.location", "equals": "InsideShip"}},
+    {"assert": {"path": "world.bodies.3.name", "equals": "Earth"}},
+    {"assert": {"path": "ship.position_meters.0", "exists": true}},
+    {"assert": {"path": "ship.door_state", "equals": "Closed"}},
+    {"screenshot": "landed-cabin"},
+    {"action": {"op": "key", "key": "forward", "pressed": true}},
+    {"action": {"op": "step", "frames": 5}},
+    {"action": {"op": "key", "key": "forward", "pressed": false}},
+    {"screenshot": "after-walking"}
+  ]
+}

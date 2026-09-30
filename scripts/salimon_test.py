@@ -2,16 +2,19 @@
 
 import json
 import queue
+import re
 import subprocess
 import threading
 import time
 from pathlib import Path
 
+from e2e_artifacts import Artifacts
+
 
 PROTOCOL = 1
 SETUPS = {"landed-earth", "cockpit-earth", "orbit-earth", "orbit-moon"}
 OPS = {"inspect", "step", "look", "key", "interact", "landing", "thruster"}
-COMPARISONS = {"equals", "not_equals", "gt", "gte", "lt", "lte", "approx"}
+COMPARISONS = {"equals", "not_equals", "gt", "gte", "lt", "lte", "approx", "exists", "contains"}
 
 
 class ScenarioError(Exception):
@@ -45,15 +48,18 @@ def parse_scenario(path):
     if not isinstance(steps, list) or not steps:
         raise ScenarioError("steps must be a nonempty array")
     for index, step in enumerate(steps, 1):
-        if not isinstance(step, dict) or len({"action", "wait", "assert"} & step.keys()) != 1:
-            raise ScenarioError(f"step {index}: specify exactly one action, wait, or assert")
-        kind = next(iter({"action", "wait", "assert"} & step.keys()))
+        if not isinstance(step, dict) or len({"action", "wait", "assert", "screenshot"} & step.keys()) != 1:
+            raise ScenarioError(f"step {index}: specify exactly one action, wait, assert, or screenshot")
+        kind = next(iter({"action", "wait", "assert", "screenshot"} & step.keys()))
         permitted = {kind, "timeout_ms"} | ({"frames"} if kind == "wait" else set())
         if set(step) - permitted:
             raise ScenarioError(f"step {index}: unknown fields")
         if "timeout_ms" in step:
             positive_int(step["timeout_ms"], f"step {index} timeout_ms")
-        if kind == "action":
+        if kind == "screenshot":
+            if not isinstance(step[kind], str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,80}", step[kind]):
+                raise ScenarioError(f"step {index}: screenshot needs a safe checkpoint name")
+        elif kind == "action":
             action = step[kind]
             if not isinstance(action, dict) or action.get("op") not in OPS or "protocol" in action or "id" in action:
                 raise ScenarioError(f"step {index}: invalid action")
@@ -64,6 +70,8 @@ def parse_scenario(path):
             comparisons = COMPARISONS & condition.keys()
             if len(comparisons) != 1 or set(condition) - {"path", "tolerance"} - COMPARISONS:
                 raise ScenarioError(f"step {index}: condition needs exactly one comparison")
+            if "exists" in comparisons and type(condition["exists"]) is not bool:
+                raise ScenarioError(f"step {index}: exists must be boolean")
             if "tolerance" in condition and ("approx" not in comparisons or type(condition["tolerance"]) not in (int, float) or condition["tolerance"] < 0):
                 raise ScenarioError(f"step {index}: invalid tolerance")
             if kind == "wait":
@@ -73,15 +81,34 @@ def parse_scenario(path):
     return {"setup": {"scenario": name, "seed": seed, "step_ms": step_ms}, "timeout_ms": timeout, "steps": steps}
 
 
-def matches(state, condition):
+MISSING = object()
+
+
+def inspection_value(state, path):
     current = state
-    for part in condition["path"].split("."):
+    for part in path.split("."):
         try:
             current = current[int(part)] if isinstance(current, list) else current[part]
-        except (KeyError, IndexError, ValueError, TypeError) as exc:
-            raise ScenarioError(f"missing inspection path: {condition['path']}") from exc
+        except (KeyError, IndexError, ValueError, TypeError):
+            return MISSING
+    return current
+
+
+def matches(state, condition):
+    current = inspection_value(state, condition["path"])
     key = next(iter(COMPARISONS & condition.keys()))
     expected = condition[key]
+    if key == "exists":
+        return (current is not MISSING) == expected
+    if current is MISSING:
+        raise ScenarioError(f"missing inspection path: {condition['path']}")
+    if key == "contains":
+        if not isinstance(current, (list, dict, str)):
+            raise ScenarioError("contains requires an array, object, or string")
+        try:
+            return expected in current
+        except TypeError as exc:
+            raise ScenarioError(f"invalid contains comparison: {exc}") from exc
     if key == "equals":
         return current == expected
     if key == "not_equals":
@@ -97,8 +124,9 @@ def matches(state, condition):
 
 
 class Game:
-    def __init__(self, command, setup, deadline):
+    def __init__(self, command, setup, deadline, artifacts=None):
         self.command = command
+        self.artifacts = artifacts
         self.setup = setup
         self.deadline = deadline
         self.responses = queue.Queue()
@@ -134,12 +162,16 @@ class Game:
     def _read_stdout(self):
         try:
             for line in self.process.stdout:
+                if self.artifacts:
+                    self.artifacts.log("stdout.log", line.rstrip())
                 self.responses.put(line.strip())
         finally:
             self.responses.put(None)
 
     def _read_stderr(self):
         for line in self.process.stderr:
+            if self.artifacts:
+                self.artifacts.log("stderr.log", line.rstrip())
             self.stderr.append(line.rstrip())
             if len(self.stderr) > 30:
                 self.stderr.pop(0)
@@ -169,12 +201,16 @@ class Game:
     def request(self, action, deadline=None):
         self.next_id += 1
         request = {"protocol": PROTOCOL, "id": self.next_id, **action}
+        if self.artifacts:
+            self.artifacts.log("protocol.jsonl", json.dumps({"direction": "request", "message": request}))
         try:
             self.process.stdin.write(json.dumps(request, allow_nan=False) + "\n")
             self.process.stdin.flush()
         except (OSError, ValueError, TypeError) as exc:
             raise ScenarioError(f"cannot send command: {exc}") from exc
         response = self._json(self._receive(f"response to {action['op']}", deadline))
+        if self.artifacts:
+            self.artifacts.log("protocol.jsonl", json.dumps({"direction": "response", "message": response}))
         if response.get("protocol") != PROTOCOL or response.get("id") != self.next_id or type(response.get("ok")) is not bool:
             raise ScenarioError(f"invalid protocol response: {response}")
         if not response["ok"]:
@@ -200,33 +236,93 @@ class Game:
         self.process.stderr.close()
 
 
-def run(path, command):
+def run(path, command, artifact_root="artifacts/e2e", screenshot_command=None):
     start = time.monotonic()
-    result = {"scenario": str(path), "status": "failed", "steps_completed": 0}
+    result = {"schema_version": 1, "scenario": str(path), "status": "failed",
+              "steps_completed": 0, "steps": [], "command": command}
+    artifacts = None
+    game = None
     try:
+        # Even parse/startup failures have a result and diagnostic directory.
+        artifacts = Artifacts({"source": str(path)}, artifact_root, screenshot_command)
+        artifacts.open_logs()
+        result["artifact_directory"] = str(artifacts.directory)
         scenario = parse_scenario(path)
+        artifacts.write_json("scenario.json", scenario)
+        result["setup"] = scenario["setup"]
         deadline = start + scenario["timeout_ms"] / 1000
-        with Game(command, scenario["setup"], deadline) as game:
-            for index, step in enumerate(scenario["steps"], 1):
-                step_deadline = min(deadline, time.monotonic() + step.get("timeout_ms", 5000) / 1000)
-                try:
-                    if "action" in step:
-                        game.request(step["action"], step_deadline)
-                    elif "assert" in step:
-                        if not matches(game.request({"op": "inspect"}, step_deadline), step["assert"]):
-                            raise ScenarioError(f"assertion failed: {step['assert']}")
-                    else:
-                        while True:
-                            if matches(game.request({"op": "inspect"}, step_deadline), step["wait"]):
-                                break
-                            if time.monotonic() >= step_deadline:
-                                raise ScenarioError(f"wait timed out: {step['wait']}")
-                            game.request({"op": "step", "frames": step.get("frames", 1)}, step_deadline)
-                    result["steps_completed"] = index
-                except ScenarioError as exc:
-                    raise ScenarioError(f"step {index}: {exc}") from exc
+        game = Game(command, scenario["setup"], deadline, artifacts)
+        with game:
+            try:
+                for index, step in enumerate(scenario["steps"], 1):
+                    step_start = time.monotonic()
+                    record = {"index": index, "step": step, "status": "failed",
+                              "started_ms": round((step_start - start) * 1000)}
+                    result["steps"].append(record)
+                    step_deadline = min(deadline, step_start + step.get("timeout_ms", 5000) / 1000)
+                    try:
+                        if "action" in step:
+                            record["response"] = game.request(step["action"], step_deadline)
+                            record["state"] = game.request({"op": "inspect"}, step_deadline)
+                        elif "screenshot" in step:
+                            record["state"] = game.request({"op": "inspect"}, step_deadline)
+                            record["screenshot"] = artifacts.screenshot(
+                                f"step-{index:03d}-{step['screenshot']}", max(0.001, step_deadline - time.monotonic()))
+                            if record["screenshot"]["status"] != "captured":
+                                raise ScenarioError(f"screenshot {step['screenshot']}: {record['screenshot']}")
+                        else:
+                            condition = step.get("assert", step.get("wait"))
+                            attempts = 0
+                            while True:
+                                state = game.request({"op": "inspect"}, step_deadline)
+                                record["state"] = state
+                                attempts += 1
+                                actual = inspection_value(state, condition["path"])
+                                assertion = {"condition": condition, "attempts": attempts,
+                                             "actual_present": actual is not MISSING, "passed": False}
+                                if actual is not MISSING:
+                                    assertion["actual"] = actual
+                                record["assertion"] = assertion
+                                assertion["passed"] = matches(state, condition)
+                                if assertion["passed"]:
+                                    break
+                                if "assert" in step:
+                                    raise ScenarioError(f"assertion failed: {condition}")
+                                if time.monotonic() >= step_deadline:
+                                    raise ScenarioError(f"wait timed out: {condition}")
+                                game.request({"op": "step", "frames": step.get("frames", 1)}, step_deadline)
+                        record["status"] = "passed"
+                        result["steps_completed"] = index
+                    except ScenarioError as exc:
+                        record["error"] = str(exc)
+                        raise ScenarioError(f"step {index}: {exc}") from exc
+                    finally:
+                        record["duration_ms"] = round((time.monotonic() - step_start) * 1000)
+                        artifacts.write_json(f"step-{index:03d}.json", record)
+            except (ScenarioError, OSError, subprocess.SubprocessError):
+                # Capture before process termination. Avoid a new protocol request after
+                # a timeout: the outstanding response would desynchronize the channel.
+                result["failure_screenshot"] = artifacts.screenshot("failure")
+                last_state = next((record["state"] for record in reversed(result["steps"])
+                                   if "state" in record), None)
+                if last_state is not None:
+                    result["failure_state_file"] = artifacts.write_json("failure-state.json", last_state)
+                raise
         result["status"] = "passed"
     except (ScenarioError, OSError, subprocess.SubprocessError) as exc:
         result["error"] = str(exc)
-    result["duration_ms"] = round((time.monotonic() - start) * 1000)
+        if artifacts and "failure_screenshot" not in result:
+            result["failure_screenshot"] = {"status": "unavailable", "reason": "game did not become ready"}
+    finally:
+        result["duration_ms"] = round((time.monotonic() - start) * 1000)
+        if game and game.process:
+            result["game_exit_code"] = game.process.poll()
+        if artifacts:
+            artifacts.close()
+            try:
+                result["result_file"] = str(artifacts.directory / "result.json")
+                artifacts.write_json("result.json", result)
+            except OSError as exc:
+                result["status"] = "failed"
+                result["artifact_error"] = str(exc)
     return result

@@ -16,7 +16,20 @@ def main():
     parser.add_argument("command", choices=["run", "suite"])
     parser.add_argument("scenario", nargs="?", help="scenario JSON file (run only)")
     parser.add_argument("--binary", type=Path, help="prebuilt salimon-client executable")
+    parser.add_argument("--artifacts", type=Path, default=root / "artifacts" / "e2e",
+                        help="root for isolated per-scenario result directories")
+    parser.add_argument("--screenshot-command", help='JSON argv array with a {path} placeholder; [] disables capture')
     args = parser.parse_args()
+    screenshot_command = None
+    if args.screenshot_command is not None:
+        try:
+            screenshot_command = json.loads(args.screenshot_command)
+        except ValueError:
+            parser.error("--screenshot-command must be a JSON argv array")
+        if (not isinstance(screenshot_command, list)
+                or any(not isinstance(item, str) or not item for item in screenshot_command)
+                or (screenshot_command and not any("{path}" in item for item in screenshot_command))):
+            parser.error("--screenshot-command needs nonempty argv strings and a {path} placeholder")
     if (args.command == "run") != bool(args.scenario):
         parser.error("run requires a scenario path; suite takes no path")
     paths = [Path(args.scenario)] if args.command == "run" else sorted((root / "scenarios").glob("*.json"))
@@ -35,7 +48,7 @@ def main():
             print(json.dumps({"status": "failed", "error": "build failed: " + build.stderr[-4000:], "results": []}))
             return 1
         binary = root / "target" / "debug" / ("salimon-client.exe" if sys.platform == "win32" else "salimon-client")
-    results = [run(path, [str(binary)]) for path in paths]
+    results = [run(path, [str(binary)], args.artifacts, screenshot_command) for path in paths]
     status = "passed" if all(item["status"] == "passed" for item in results) else "failed"
     print(json.dumps({"status": status, "results": results}))
     return 0 if status == "passed" else 1

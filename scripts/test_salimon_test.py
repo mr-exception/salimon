@@ -7,7 +7,7 @@ import time
 import unittest
 from pathlib import Path
 
-from salimon_test import Game, ScenarioError, parse_scenario, run
+from salimon_test import Game, ScenarioError, matches, parse_scenario, run
 
 
 FAKE = '''import json, os, sys, time
@@ -49,7 +49,7 @@ class RunnerTests(unittest.TestCase):
         self.scenario.write_text(json.dumps(self.data))
 
     def execute(self):
-        return run(self.scenario, [sys.executable, str(self.fake)])
+        return run(self.scenario, [sys.executable, str(self.fake)], self.directory / "artifacts", [])
 
     def test_parser_rejects_unknown_and_ambiguous_steps(self):
         self.data["steps"][0]["assert"] = {"path": "ship.speed", "equals": 4}
@@ -93,6 +93,114 @@ class RunnerTests(unittest.TestCase):
         for mode, expected in (("wrong_id", "invalid protocol response"), ("rejected", "game rejected")):
             self.fake.write_text(FAKE.replace('mode = os.environ.get("FAKE_MODE", "normal")', f'mode = "{mode}"'))
             self.assertIn(expected, self.execute()["error"])
+
+    def test_result_contains_evidence_and_full_logs(self):
+        self.fake.write_text(FAKE.replace('for line in sys.stdin:',
+                                        'for i in range(100): print("diagnostic %s" % i, file=sys.stderr, flush=True)\nfor line in sys.stdin:'))
+        result = self.execute()
+        directory = Path(result["artifact_directory"])
+        persisted = json.loads((directory / "result.json").read_text())
+        self.assertEqual(persisted, result)
+        self.assertTrue(result["steps"][1]["assertion"]["passed"])
+        self.assertEqual(result["steps"][1]["assertion"]["actual"], 4)
+        self.assertEqual(result["steps"][1]["state"]["ship"]["speed"], 4)
+        self.assertIn("diagnostic 0\n", (directory / "stderr.log").read_text())
+        self.assertIn("diagnostic 99\n", (directory / "stderr.log").read_text())
+        self.assertIn("SALIMON_E2E_READY", (directory / "stdout.log").read_text())
+        self.assertIn('"direction": "request"', (directory / "protocol.jsonl").read_text())
+        self.assertTrue((directory / "step-002.json").exists())
+        self.assertNotEqual(result["artifact_directory"], self.execute()["artifact_directory"])
+
+    def test_failure_records_actual_and_last_state(self):
+        self.data["steps"] = [{"assert": {"path": "ship.speed", "equals": 8}}]
+        self.save()
+        result = self.execute()
+        self.assertEqual(result["steps"][0]["assertion"]["actual"], 4)
+        self.assertFalse(result["steps"][0]["assertion"]["passed"])
+        self.assertEqual(result["failure_screenshot"]["status"], "unavailable")
+        self.assertTrue((Path(result["artifact_directory"]) / "failure-state.json").exists())
+
+    def test_parse_and_launch_failures_preserve_results(self):
+        self.scenario.write_text("{")
+        result = self.execute()
+        self.assertEqual(result["status"], "failed")
+        self.assertTrue(Path(result["result_file"]).exists())
+        self.save()
+        result = run(self.scenario, [str(self.directory / "missing")], self.directory / "artifacts", [])
+        self.assertEqual(result["status"], "failed")
+        self.assertTrue(Path(result["result_file"]).exists())
+
+    def test_existence_and_collection_contracts(self):
+        state = {"entities": ["ship", "player"], "interaction": None}
+        self.assertTrue(matches(state, {"path": "entities", "contains": "ship"}))
+        self.assertFalse(matches(state, {"path": "entities", "contains": "cargo"}))
+        self.assertTrue(matches(state, {"path": "interaction", "exists": True}))
+        self.assertTrue(matches(state, {"path": "absent", "exists": False}))
+        self.assertTrue(matches(state, {"path": "entities.0", "equals": "ship"}))
+        with self.assertRaises(ScenarioError):
+            matches(state, {"path": "interaction", "contains": "ship"})
+
+    def test_capture_checkpoint_and_failure_before_termination(self):
+        # The helper is local trusted argv, never taken from scenario JSON.
+        capture = self.directory / "capture.py"
+        pid_file = self.directory / "pid"
+        self.fake.write_text("import pathlib, os\npathlib.Path(%r).write_text(str(os.getpid()))\n" % str(pid_file) + FAKE)
+        capture.write_text("import pathlib, os\nos.kill(int(pathlib.Path(%r).read_text()), 0)\n" % str(pid_file) + 'import pathlib, sys\npathlib.Path(sys.argv[1]).write_bytes(b"\\x89PNG\\r\\n\\x1a\\n" + b"fake")\n')
+        self.data["steps"] = [{"screenshot": "cockpit"}, {"assert": {"path": "ship.speed", "equals": 8}}]
+        self.save()
+        result = run(self.scenario, [sys.executable, str(self.fake)], self.directory / "artifacts",
+                     [sys.executable, str(capture), "{path}"])
+        self.assertEqual(result["steps"][0]["screenshot"]["status"], "captured")
+        self.assertEqual(result["failure_screenshot"]["status"], "captured")
+        self.assertTrue(Path(result["failure_screenshot"]["path"]).exists())
+        self.assertIsNotNone(result["game_exit_code"])
+
+    def test_unavailable_and_failed_checkpoints_fail_explicitly(self):
+        self.data["steps"] = [{"screenshot": "view"}]
+        self.save()
+        self.assertEqual(self.execute()["status"], "failed")
+        result = run(self.scenario, [sys.executable, str(self.fake)], self.directory / "artifacts",
+                     [sys.executable, "-c", "raise SystemExit(2)", "{path}"])
+        self.assertEqual(result["steps"][0]["screenshot"]["status"], "failed")
+        self.assertIn("exited 2", result["steps"][0]["screenshot"]["reason"])
+
+    def test_capture_timeout_and_invalid_png(self):
+        self.data["steps"] = [{"screenshot": "view", "timeout_ms": 100}]
+        self.save()
+        result = run(self.scenario, [sys.executable, str(self.fake)], self.directory / "artifacts",
+                     [sys.executable, "-c", "import time; time.sleep(0.2)", "{path}"])
+        self.assertEqual(result["status"], "failed")
+        self.assertIn("timed out", result["steps"][0]["screenshot"]["reason"])
+        result = run(self.scenario, [sys.executable, str(self.fake)], self.directory / "artifacts",
+                     [sys.executable, "-c", "import pathlib,sys; pathlib.Path(sys.argv[1]).write_text('bad')", "{path}"])
+        self.assertIn("did not produce a PNG", result["steps"][0]["screenshot"]["reason"])
+
+    def test_checkpoint_names_and_exists_are_validated(self):
+        for step in ({"screenshot": "../escape"}, {"screenshot": ""},
+                     {"assert": {"path": "ship", "exists": 1}}):
+            self.data["steps"] = [step]
+            self.save()
+            with self.assertRaises(ScenarioError):
+                parse_scenario(self.scenario)
+
+    def test_cli_writes_report_and_propagates_failure_exit(self):
+        executable = self.directory / "fake-client"
+        executable.write_text(f"#!{sys.executable}\n" + FAKE)
+        executable.chmod(0o755)
+        import subprocess
+        cli = Path(__file__).with_name("salimon-test")
+        command = [sys.executable, str(cli), "run", str(self.scenario), "--binary", str(executable),
+                   "--artifacts", str(self.directory / "artifacts"), "--screenshot-command", "[]"]
+        success = subprocess.run(command, capture_output=True, text=True)
+        self.assertEqual(success.returncode, 0, success.stderr)
+        self.assertEqual(json.loads(success.stdout)["status"], "passed")
+        self.data["steps"] = [{"assert": {"path": "ship.speed", "equals": 8}}]
+        self.save()
+        failure = subprocess.run(command, capture_output=True, text=True)
+        self.assertEqual(failure.returncode, 1)
+        report = json.loads(failure.stdout)
+        self.assertEqual(report["status"], "failed")
+        self.assertTrue(Path(report["results"][0]["result_file"]).exists())
 
 
 if __name__ == "__main__":

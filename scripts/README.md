@@ -55,11 +55,12 @@ python3 -m unittest discover -s scripts -p 'test_*.py'
 
 ## Phase 0 baseline suite
 
-The default `suite` checks two complete native gameplay paths:
+The default `suite` checks three native gameplay paths:
 
 | Scenario | Coverage |
 | --- | --- |
 | `landed-earth.json` | Known initial player pose and ship state; walking/aiming into cockpit control; non-pilot control rejection; closed-door exit collision; opening and exiting to the surface; closing the door outside and walking against it twice; reopening and returning inside; the open-door takeoff interlock; closing the door and completing assisted takeoff. |
+| `resource-deposits.json` | Real airlock exit and surface walk to a stable generated silicate deposit; checks material, positive mass, proximity, and presentation data. |
 | `orbit-earth.json` | Known seeded orbit pose; thruster changes; starting assisted landing; repeated landing action cannot cancel it; leaving cockpit control during landing; autonomous completion with zero ship velocity. |
 
 These files use only the existing `key`, `look`, `interact`, `thruster`,
@@ -205,3 +206,18 @@ dedicated Xvfb display with a compatible Vulkan implementation:
 xvfb-run -a -s '-screen 0 1280x800x24' scripts/salimon-test \
   run scenarios/evidence/landed-earth.json --binary target/debug/salimon-client
 ```
+
+The Linux CI baseline step also requires the matching resource-deposit visual
+scenario, saving a `generated-silicate-deposit` screenshot and authoritative
+state within 4 m of the deposit. A screenshot failure fails CI. This uses the
+same real gameplay route as `scenarios/resource-deposits.json`; no state
+teleportation or fixture deposits are used. Run it locally with:
+
+```sh
+scripts/salimon-test run scenarios/evidence/resource-deposits.json
+```
+
+Deposit colors/proportions are validation greyboxes: orange iron ore, muted
+green-grey silicate rock, and cyan water ice. Inspect `world.deposits` and
+`world.nearest_deposit` for the generated identity, material, physical bounds,
+remaining mass, positions, player distance, and renderer-facing geometry.

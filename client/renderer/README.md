@@ -104,3 +104,8 @@ the player walks around. A cached 512 × 768 sRGB atlas supplies crisp self-lit
 text and segmented bars in the existing opaque ship draw. Only display changes
 trigger rasterization/upload; the opaque/glass submission remains two draws.
 The renderer retains no ship control or simulation dependency.
+
+The runtime also maps nearby generated planetary deposits into the existing
+instanced cuboid draw. Material-specific colors/proportions live at the
+composition boundary; the renderer receives no resource-domain state. Deposit
+centers stay absolute f64 until the usual camera-relative GPU conversion.

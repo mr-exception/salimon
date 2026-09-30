@@ -152,3 +152,22 @@ See [README.ai.md](README.ai.md), [architecture.md](architecture.md), and
 [invariants.md](invariants.md) before changing lifecycle or timing behavior.
 Use the root [native smoke check](../../README.md#native-smoke-check) to validate
 launch, resize, minimize/restore, close, and relaunch behavior.
+
+## Planetary deposit presentation
+
+Gameplay materializes deterministic deposits within 120 m of the player's eye
+using the world generator and the session seed (zero for normal launch). The
+precision tour remains unchanged. `resource_presentation.rs` maps the world
+snapshot into existing renderer cuboids: orange iron ore, muted green-grey
+silicate rock, and cyan water ice, with distinct proportions. Each cuboid is
+inscribed in its deposit's spherical physical bound and centered on its f64
+surface anchor; its outward half is visible on any supported solid body.
+These are unlit greybox validation shapes, not final terrain art. The renderer
+receives only generic presentation DTOs, with no material IDs or mining state.
+Depleted deposits are omitted by the mapping. Mining and restored streaming
+state remain separate tasks; this presentation uses the current stateless
+world generator without introducing an inventory or extraction behavior.
+
+Automation exposes `world.deposits` and `world.nearest_deposit` with stable body-scoped IDs, material keys,
+world/body-local/ship-local positions, mass/state, physical radius, and visual
+color/extents. `world.deposit_query_error` is null on successful queries.

@@ -466,7 +466,8 @@ impl ClientApplication {
         let ship_frame = character_ship_frame(ship_snapshot.pose);
         let surface_frame = surface_frame_for_ship(ship_snapshot);
         let world_snapshot = self.camera_prototype.snapshot();
-        let (mut camera, scene_instances, spheres, light) = map_world_to_renderer(world_snapshot);
+        let (mut camera, mut scene_instances, spheres, light) =
+            map_world_to_renderer(world_snapshot);
         let character_snapshot = self.character.snapshot(ship_frame, surface_frame);
         let monitor_message = self.ship.contextual_cockpit_message();
         let interaction = if self.view_mode == ViewMode::Gameplay
@@ -495,6 +496,19 @@ impl ClientApplication {
         } else {
             None
         };
+        if self.view_mode == ViewMode::Gameplay {
+            match crate::resource_presentation::nearby_deposits(
+                camera.position_meters,
+                self.e2e_config.map_or(0, |config| config.seed),
+            ) {
+                Ok(deposits) => scene_instances.extend(
+                    deposits
+                        .into_iter()
+                        .filter_map(crate::resource_presentation::visual),
+                ),
+                Err(error) => log::error!("deposit presentation query failed: {error:?}"),
+            }
+        }
         let body_distances = camera_body_distances_from(world_snapshot, camera.position_meters);
         let cpu_update_time = update_started_at.elapsed();
         let overlay_image = self

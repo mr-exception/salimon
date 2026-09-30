@@ -194,6 +194,31 @@ fn inspect(app: &ClientApplication) -> Value {
             "ship_surface_distance_meters": (body.center.meters().iter().zip(ship.pose.position_meters)
                 .map(|(center, position)| (*center - position).powi(2)).sum::<f64>()).sqrt() - body.radius_meters})
     }).collect();
+    let deposits = crate::resource_presentation::nearby_deposits(
+        character.eye_position_meters,
+        app.e2e_config.map_or(0, |config| config.seed),
+    );
+    let (deposits, deposit_error) = match deposits {
+        Ok(entries) => (entries.into_iter().map(|entry| json!({
+            "id": format!("{:?}:{}", entry.deposit.id().body, entry.deposit.id().local),
+            "resource": entry.deposit.material().resource().key(),
+            "position_meters": entry.deposit.position().meters(),
+            "ship_local_position_meters": frame.world_to_local(entry.deposit.position().meters()),
+            "body_local_position_meters": entry.body_local_position_meters,
+            "bounds_radius_meters": entry.bounds_radius_meters,
+            "remaining_mass_kg": entry.deposit.remaining_mass_kg(),
+            "distance_to_player_meters": entry.deposit.position().offset_from(salimon_world::WorldPosition::new(character.eye_position_meters[0], character.eye_position_meters[1], character.eye_position_meters[2])).iter().map(|v| v * v).sum::<f64>().sqrt(),
+            "state": format!("{:?}", entry.deposit.state()),
+            "visual": crate::resource_presentation::visual(entry).map(|mesh| json!({"color": mesh.color, "half_extents_meters": mesh.half_extents_meters}))
+        })).collect::<Vec<_>>(), None),
+        Err(error) => (Vec::new(), Some(format!("{error:?}"))),
+    };
+    let nearest_deposit = deposits.iter().min_by(|a, b| {
+        a["distance_to_player_meters"]
+            .as_f64()
+            .unwrap()
+            .total_cmp(&b["distance_to_player_meters"].as_f64().unwrap())
+    });
     json!({
         "player": {"location": format!("{:?}", character.location),
             "eye_position_meters": character.eye_position_meters,
@@ -212,7 +237,7 @@ fn inspect(app: &ClientApplication) -> Value {
                 "radial_speed_meters_per_second": body.radial_speed_meters_per_second})),
             "cockpit_message": ship.cockpit_message.map(|message| message.text())},
         "interaction": interaction,
-        "world": {"bodies": bodies, "camera_phase": format!("{:?}", app.camera_phase())}
+        "world": {"nearest_deposit": nearest_deposit, "deposits": deposits, "deposit_query_error": deposit_error, "bodies": bodies, "camera_phase": format!("{:?}", app.camera_phase())}
     })
 }
 
@@ -233,6 +258,41 @@ mod tests {
         )
         .unwrap();
         app
+    }
+
+    #[test]
+    fn deposit_walkthrough_uses_real_movement_and_generated_state() {
+        let mut test = app(Scenario::LandedEarth);
+        test.e2e_config.as_mut().unwrap().seed = 0;
+        let scenario: Value =
+            serde_json::from_str(include_str!("../../../scenarios/resource-deposits.json"))
+                .unwrap();
+        for step in scenario["steps"].as_array().unwrap() {
+            if let Some(action) = step.get("action") {
+                let mut command = action.clone();
+                command["protocol"] = json!(1);
+                command["id"] = json!(1);
+                assert_eq!(execute(&mut test, &command.to_string())["ok"], true);
+            }
+        }
+        let state = inspect(&test);
+        assert_eq!(state["player"]["location"], "Surface");
+        assert_eq!(state["world"]["deposit_query_error"], Value::Null);
+        assert_eq!(
+            state["world"]["nearest_deposit"]["id"],
+            "Earth:16443359315117775089"
+        );
+        assert!(
+            state["world"]["nearest_deposit"]["distance_to_player_meters"]
+                .as_f64()
+                .unwrap()
+                < 4.0
+        );
+        assert_eq!(
+            state["world"]["nearest_deposit"]["resource"],
+            "silicate-rock"
+        );
+        assert!(state["world"]["nearest_deposit"]["visual"].is_object());
     }
 
     #[test]

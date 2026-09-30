@@ -62,6 +62,7 @@ jobs:
           xvfb-run -a -s '-screen 0 1280x800x24' bash -euo pipefail -c '
             import -window root artifacts/e2e/display-ready.png
             python scripts/salimon-test suite --binary artifacts/build/release/salimon-client
+            python scripts/salimon-test run scenarios/evidence/resource-deposits.json --binary artifacts/build/release/salimon-client
           ' 2>&1 | tee artifacts/e2e/baseline.log
       - name: Linux optional visual checkpoints (Mesa software Vulkan)
         if: runner.os == 'Linux' && inputs.visual_evidence == true

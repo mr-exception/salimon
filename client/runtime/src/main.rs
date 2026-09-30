@@ -5,6 +5,7 @@ mod app;
 mod automation;
 mod e2e;
 mod frame_clock;
+mod resource_presentation;
 mod update_clock;
 
 use std::process::ExitCode;

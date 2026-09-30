@@ -103,7 +103,8 @@ Every push to `main` and every pull request runs the deterministic baseline
 `.github/workflows/native-build.yml`. This required Linux check covers launch,
 seeded readiness, the cockpit/door/surface/assisted-takeoff path and the
 orbit/assisted-landing path. It uses a dedicated 1280×800 Xvfb display and
-explicitly selects Mesa lavapipe via `VK_DRIVER_FILES`; software Vulkan is the
+discovers the installed Mesa lavapipe ICD filename and selects it via
+`VK_DRIVER_FILES`; software Vulkan is the
 CI fallback, not a hardware performance or native graphics fidelity check.
 Display, Vulkan, and screenshot-helper failures fail the job. A capture
 preflight saves `display-ready.png`, and automatic failure screenshots remain

@@ -105,6 +105,8 @@ window is closed. It captures the cursor for mouse look and starts inside the
 landed ship facing the cockpit. Use **WASD** to walk, the mouse to look, and
 **Space** to jump. Press **E** near the cockpit to enter or leave
 control instantly; press **E** near the aft door to open/close it while landed.
+Press **M** to equip the handheld mining tool on the surface; aim at a deposit
+within 4 m and hold **F** or left mouse to extract at 2 kg/s. Press M to stow.
 Face the open door and walk forward through it to transition over 0.25 seconds to Earth-radial
 gravity and inspect the ship exterior. There is no sprint or crouch. Press
 **Escape** to release the captured cursor for window controls; click the game

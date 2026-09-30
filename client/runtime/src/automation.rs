@@ -175,6 +175,8 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "left" => Some(KeyCode::KeyA),
         "right" => Some(KeyCode::KeyD),
         "jump" => Some(KeyCode::Space),
+        "equip_mining_tool" => Some(KeyCode::KeyM),
+        "mine" => Some(KeyCode::KeyF),
         "roll_left" => Some(KeyCode::ArrowLeft),
         "roll_right" => Some(KeyCode::ArrowRight),
         _ => None,
@@ -194,7 +196,7 @@ fn inspect(app: &ClientApplication) -> Value {
             "ship_surface_distance_meters": (body.center.meters().iter().zip(ship.pose.position_meters)
                 .map(|(center, position)| (*center - position).powi(2)).sum::<f64>()).sqrt() - body.radius_meters})
     }).collect();
-    let deposits = crate::resource_presentation::nearby_deposits(
+    let deposits = app.mining.nearby(
         character.eye_position_meters,
         app.e2e_config.map_or(0, |config| config.seed),
     );
@@ -219,7 +221,19 @@ fn inspect(app: &ClientApplication) -> Value {
             .unwrap()
             .total_cmp(&b["distance_to_player_meters"].as_f64().unwrap())
     });
+    let mining_target = app.mining.target(
+        character,
+        frame,
+        ship.door_state == salimon_ship::DoorState::Open,
+        app.e2e_config.map_or(0, |config| config.seed),
+    );
     json!({
+        "mining": { "equipped": app.mining.equipped, "held": app.mining.held,
+            "active": app.mining.held && mining_target.is_some(),
+            "extracted_mass_kg": app.mining.session.extracted_mass_kg(),
+            "range_meters": salimon_world::mining::MINING_RANGE_METERS,
+            "rate_kg_per_second": salimon_world::mining::MINING_RATE_KG_PER_SECOND,
+            "target": mining_target.map(|target| json!({"id": format!("{:?}:{}", target.id.body, target.id.local), "distance_meters": target.distance_meters})) },
         "player": {"location": format!("{:?}", character.location),
             "eye_position_meters": character.eye_position_meters,
             "ship_local_eye_position_meters": local_eye,
@@ -301,6 +315,68 @@ mod tests {
             "silicate-rock"
         );
         assert!(state["world"]["nearest_deposit"]["visual"].is_object());
+    }
+
+    #[test]
+    fn mining_real_inputs_gate_surface_equipment_aim_and_release() {
+        let mut test = app(Scenario::LandedEarth);
+        test.mining.toggle();
+        test.mining.held = true;
+        test.advance_game(Duration::from_secs(1));
+        assert_eq!(
+            test.mining.session.extracted_mass_kg(),
+            0.0,
+            "inside cannot mine"
+        );
+        e2e::initialize(
+            &mut test,
+            Config {
+                scenario: Scenario::LandedEarth,
+                seed: 0,
+                step: Duration::from_millis(16),
+            },
+        )
+        .unwrap();
+        // The fixture does not alter mining state; reset only test's initial input.
+        test.mining = crate::mining::MiningTool::default();
+        let scenario: Value =
+            serde_json::from_str(include_str!("../../../scenarios/mining.json")).unwrap();
+        for (index, step) in scenario["steps"].as_array().unwrap().iter().enumerate() {
+            if let Some(action) = step.get("action") {
+                let mut command = action.clone();
+                command["protocol"] = json!(1);
+                command["id"] = json!(index);
+                assert_eq!(execute(&mut test, &command.to_string())["ok"], true);
+            } else if let Some(check) = step.get("assert") {
+                // Mining/deposit checks independently verify the real route and hold/release controls.
+                let path = check["path"].as_str().unwrap();
+                if !path.starts_with("mining.") && !path.starts_with("world.nearest_deposit.") {
+                    continue;
+                }
+                let state = inspect(&test);
+                let value = path.split('.').fold(&state, |value, key| {
+                    if value.is_array() {
+                        &value[key.parse::<usize>().unwrap()]
+                    } else {
+                        &value[key]
+                    }
+                });
+                if let Some(expected) = check.get("equals") {
+                    if value.is_number() && expected.is_number() {
+                        assert_eq!(value.as_f64(), expected.as_f64(), "step {index}: {path}");
+                    } else {
+                        assert_eq!(value, expected, "step {index}: {path}");
+                    }
+                }
+                if let Some(expected) = check.get("approx") {
+                    assert!(
+                        (value.as_f64().unwrap() - expected.as_f64().unwrap()).abs()
+                            <= check["tolerance"].as_f64().unwrap(),
+                        "step {index}: {path}"
+                    );
+                }
+            }
+        }
     }
 
     #[test]

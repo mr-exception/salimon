@@ -33,3 +33,8 @@
 14. Resource entity identities and material properties do not change when a
     fragment moves. Resource poses use finite absolute meters/unit quaternions;
     resource state carries no renderer data or abstract inventory counts.
+
+- Mining targets require a forward ray intersection within 4 m, ahead of all
+  supplied solid obstructions. Depleted deposits cannot be targeted.
+- Extraction is 2 kg/s of simulation time capped to remaining mass; it cannot
+  replenish deposits or credit abstract inventory.

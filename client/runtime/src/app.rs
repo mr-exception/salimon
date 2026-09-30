@@ -25,7 +25,7 @@ use salimon_world::{
 };
 use winit::application::ApplicationHandler;
 use winit::dpi::{LogicalSize, PhysicalSize};
-use winit::event::{DeviceEvent, DeviceId, ElementState, WindowEvent};
+use winit::event::{DeviceEvent, DeviceId, ElementState, MouseButton, WindowEvent};
 use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
 use winit::keyboard::{KeyCode, PhysicalKey};
 use winit::window::{CursorGrabMode, Window, WindowAttributes, WindowId};
@@ -107,6 +107,7 @@ pub(crate) struct ClientApplication {
     pub(crate) e2e_config: Option<e2e::Config>,
     e2e_ready_sent: bool,
     automation: Option<Receiver<Request>>,
+    pub(crate) mining: crate::mining::MiningTool,
     movement_input: MovementInput,
     ship_control_input: ShipControlInput,
     view_mode: ViewMode,
@@ -132,6 +133,7 @@ impl Default for ClientApplication {
             e2e_config: None,
             e2e_ready_sent: false,
             automation: None,
+            mining: crate::mining::MiningTool::default(),
             movement_input: MovementInput::default(),
             ship_control_input: ShipControlInput::default(),
             view_mode: ViewMode::Gameplay,
@@ -414,6 +416,14 @@ impl ClientApplication {
     }
 
     pub(crate) fn automation_key(&mut self, key: PhysicalKey, pressed: bool) {
+        if key == PhysicalKey::Code(KeyCode::KeyM) && pressed {
+            self.mining.toggle();
+            return;
+        }
+        if key == PhysicalKey::Code(KeyCode::KeyF) {
+            self.mining.held = pressed;
+            return;
+        }
         if self.character.location() == CharacterLocation::Cockpit
             && ship_control_key(key).is_some()
         {
@@ -438,6 +448,16 @@ impl ClientApplication {
                 surface_frame_for_ship(ship),
                 ship.door_state == DoorState::Open,
                 matches!(ship.flight_state, FlightState::Landed { .. }),
+            );
+        }
+        if self.view_mode == ViewMode::Gameplay {
+            let frame = character_ship_frame(ship.pose);
+            self.mining.advance(
+                delta,
+                self.character.snapshot(frame, surface_frame_for_ship(ship)),
+                frame,
+                ship.door_state == DoorState::Open,
+                self.e2e_config.map_or(0, |config| config.seed),
             );
         }
         self.action_bar.advance(delta);
@@ -481,7 +501,23 @@ impl ClientApplication {
         } else {
             None
         };
-        let contextual_action = action_bar_context(monitor_message, interaction);
+        let mining_target = self.mining.target(
+            character_snapshot,
+            ship_frame,
+            ship_snapshot.door_state == DoorState::Open,
+            self.e2e_config.map_or(0, |config| config.seed),
+        );
+        let contextual_action = action_bar_context(monitor_message, interaction).or_else(|| {
+            (character_snapshot.location == CharacterLocation::Surface).then_some(
+                if !self.mining.equipped {
+                    "Press M to equip mining tool"
+                } else if mining_target.is_some() {
+                    "Hold F or left mouse to mine"
+                } else {
+                    "Aim at a deposit within 4 m - M to stow"
+                },
+            )
+        });
         self.action_bar.set_contextual(contextual_action);
         window.set_title(&gameplay_window_title(monitor_message, interaction));
         let ship_mesh = if self.view_mode == ViewMode::Gameplay {
@@ -497,7 +533,7 @@ impl ClientApplication {
             None
         };
         if self.view_mode == ViewMode::Gameplay {
-            match crate::resource_presentation::nearby_deposits(
+            match self.mining.nearby(
                 camera.position_meters,
                 self.e2e_config.map_or(0, |config| config.seed),
             ) {
@@ -508,6 +544,12 @@ impl ClientApplication {
                 ),
                 Err(error) => log::error!("deposit presentation query failed: {error:?}"),
             }
+        }
+        if self.view_mode == ViewMode::Gameplay {
+            scene_instances.extend(self.mining.visuals(
+                character_snapshot,
+                self.mining.held && mining_target.is_some(),
+            ));
         }
         let body_distances = camera_body_distances_from(world_snapshot, camera.position_meters);
         let cpu_update_time = update_started_at.elapsed();
@@ -687,6 +729,7 @@ impl ApplicationHandler for ClientApplication {
         self.frame_clock.reset_interval();
         self.update_clock.reset();
         self.diagnostics.reset_frame_window();
+        self.mining.held = false;
         log::info!("application suspended; GPU presentation resources released");
     }
 
@@ -743,6 +786,7 @@ impl ApplicationHandler for ClientApplication {
                     self.movement_input = MovementInput::default();
                     self.ship_control_input = ShipControlInput::default();
                     self.cursor_captured = false;
+                    self.mining.held = false;
                 }
             }
             WindowEvent::MouseInput {
@@ -758,6 +802,23 @@ impl ApplicationHandler for ClientApplication {
                 self.cursor_captured = false;
                 self.movement_input = MovementInput::default();
                 self.ship_control_input = ShipControlInput::default();
+                self.mining.held = false;
+            }
+            WindowEvent::MouseInput {
+                state,
+                button: MouseButton::Left,
+                ..
+            } => {
+                self.mining.held = self.cursor_captured && state == ElementState::Pressed;
+            }
+            WindowEvent::KeyboardInput { event, .. }
+                if event.physical_key == PhysicalKey::Code(KeyCode::KeyM)
+                    || event.physical_key == PhysicalKey::Code(KeyCode::KeyF) =>
+            {
+                if self.cursor_captured && !event.repeat {
+                    self.automation_key(event.physical_key, event.state == ElementState::Pressed);
+                    window.request_redraw();
+                }
             }
             WindowEvent::KeyboardInput { event, .. }
                 if interaction_pressed(event.state, event.repeat, event.physical_key) =>
@@ -781,6 +842,7 @@ impl ApplicationHandler for ClientApplication {
                     ViewMode::Gameplay => ViewMode::PrecisionTour,
                     ViewMode::PrecisionTour => ViewMode::Gameplay,
                 };
+                self.mining.held = false;
                 log::info!("view mode changed to {:?} (F2 toggles)", self.view_mode);
                 window.request_redraw();
             }
@@ -837,6 +899,7 @@ impl ApplicationHandler for ClientApplication {
                 let command = camera_command(event.state, event.repeat, event.physical_key)
                     .expect("guard accepts only camera commands");
                 self.camera_prototype.apply_command(command);
+                self.mining.held = false;
                 self.view_mode = ViewMode::PrecisionTour;
                 log::info!(
                     "camera tour command: {command:?}; paused={}",

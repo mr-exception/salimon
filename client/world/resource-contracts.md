@@ -108,3 +108,26 @@ Unloading and rematerializing untouched deposits reproduces their IDs, material,
 mass, geometry, and bounds. Modified/depleted-state retention belongs to #50;
 visuals belong to #43 and mining belongs to #44. No rendering or mining behavior
 is introduced here. Run `cargo test --locked -p salimon-world --test resource_generation`.
+
+## Handheld extraction
+
+`mining` owns aimed target validation and time-based extraction. A normalized
+`MiningRay` selects the first nondepleted spherical deposit bound within **4 m**
+of the eye ray; missed, behind-eye, out-of-range, and obscured targets are rejected.
+Solid body spheres occlude the ray. Runtime supplies the first ship-proxy hit
+from the character domain in the same meter units, so hull/closed gates/engines
+cannot be mined through. Ship glazing is conservatively solid for this tool.
+
+`extract` removes **2 kg/s × simulation delta**, capped to remaining mass; zero
+and depleted extraction return zero. It returns removed kilograms for the
+physical-fragment producer in #45 and does not credit an inventory. Current
+#44 output only changes source mass; there are no collectible fragments yet.
+`MiningSession` owns modified-deposit mass by stable ID and a diagnostic total.
+All inspection/presentation queries apply that state. Its lifetime is one local
+world/seed configuration; full streaming storage policy and coverage belong to
+#50. Runtime hosts the session but does not own the extraction rules.
+
+Run `cargo test --locked -p salimon-world --test mining` for aim, obstruction,
+large-coordinate, extraction timing, and depletion checks. The native
+`scenarios/mining.json` follows the real surface walkthrough and tool inputs;
+its evidence variant adds screenshot checkpoints.

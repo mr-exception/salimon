@@ -185,6 +185,65 @@ impl ShipFrame {
     }
 }
 
+/// First ray hit on the same solid cabin, gate, and engine proxies used for traversal.
+/// Inputs are ship-local; the returned distance is in meters along a unit ray.
+#[must_use]
+pub fn ship_sight_obstruction(eye: [f64; 3], target: [f64; 3], door_open: bool) -> Option<f64> {
+    let direction = sub(target, eye);
+    let length = dot(direction, direction).sqrt();
+    if !length.is_finite() || length <= 0.0 || !eye.iter().all(|v| v.is_finite()) {
+        return None;
+    }
+    let direction = scale(direction, 1.0 / length);
+    let mut boxes: Vec<[f64; 6]> = EXTERIOR_OBSTACLES
+        .iter()
+        .map(|b| {
+            [
+                b[0] + PLAYER_RADIUS_METERS,
+                b[1] - PLAYER_RADIUS_METERS,
+                EXTERIOR_BOTTOM,
+                EXTERIOR_TOP,
+                b[2] + PLAYER_RADIUS_METERS,
+                b[3] - PLAYER_RADIUS_METERS,
+            ]
+        })
+        .collect();
+    if !door_open {
+        let b = CLOSED_GATE_OBSTACLE[0];
+        boxes.push([
+            b[0] + PLAYER_RADIUS_METERS,
+            b[1] - PLAYER_RADIUS_METERS,
+            EXTERIOR_BOTTOM,
+            EXTERIOR_TOP,
+            b[2] + PLAYER_RADIUS_METERS,
+            b[3] - PLAYER_RADIUS_METERS,
+        ]);
+    }
+    boxes.extend(THRUSTER_COLLIDERS);
+    boxes
+        .into_iter()
+        .filter_map(|b| {
+            let mut near: f64 = 0.0;
+            let mut far = f64::INFINITY;
+            for axis in 0..3 {
+                let low = b[axis * 2];
+                let high = b[axis * 2 + 1];
+                if direction[axis].abs() < 1e-12 {
+                    if eye[axis] < low || eye[axis] > high {
+                        return None;
+                    }
+                } else {
+                    let a = (low - eye[axis]) / direction[axis];
+                    let z = (high - eye[axis]) / direction[axis];
+                    near = near.max(a.min(z));
+                    far = far.min(a.max(z));
+                }
+            }
+            (far >= near).then_some(near)
+        })
+        .min_by(f64::total_cmp)
+}
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct SurfaceFrame {
     pub body_center_meters: [f64; 3],
@@ -2636,5 +2695,21 @@ mod tests {
             sub(turned, start)[2] > 0.0,
             "positive yaw should rotate surface-forward movement toward screen right"
         );
+    }
+}
+
+#[cfg(test)]
+mod sight_tests {
+    use super::ship_sight_obstruction;
+
+    #[test]
+    fn sight_respects_solid_ship_gate_and_engines() {
+        assert!(ship_sight_obstruction([-10.0, 1.0, 0.0], [-9.0, 1.0, 0.0], false).unwrap() < 4.0);
+        assert!(ship_sight_obstruction([-10.0, 1.0, 0.0], [-9.0, 1.0, 0.0], true).unwrap() < 4.0);
+        // Open aperture itself is clear until the solid cabin farther ahead.
+        assert!(ship_sight_obstruction([-10.0, 1.0, 0.0], [-9.0, 1.0, 0.0], true).unwrap() > 2.0);
+        assert!(ship_sight_obstruction([-10.0, 1.0, 7.0], [-9.0, 1.0, 7.0], true).unwrap() < 1.0);
+        assert!(ship_sight_obstruction([-10.0, 4.0, 0.0], [-9.0, 4.0, 0.0], false).is_none());
+        assert!(ship_sight_obstruction([-10.0, 1.0, 0.0], [-11.0, 1.0, 0.0], false).is_none());
     }
 }

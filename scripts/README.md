@@ -55,16 +55,17 @@ python3 -m unittest discover -s scripts -p 'test_*.py'
 
 ## Phase 0 baseline suite
 
-The default `suite` checks three native gameplay paths:
+The default `suite` checks four native gameplay paths:
 
 | Scenario | Coverage |
 | --- | --- |
 | `landed-earth.json` | Known initial player pose and ship state; walking/aiming into cockpit control; non-pilot control rejection; closed-door exit collision; opening and exiting to the surface; closing the door outside and walking against it twice; reopening and returning inside; the open-door takeoff interlock; closing the door and completing assisted takeoff. |
 | `resource-deposits.json` | Real airlock exit and surface walk to a stable generated silicate deposit; checks material, positive mass, proximity, and presentation data. |
+| `mining.json` | Surface tool equip/aim/hold, exact timed extraction, aim/range/release rejection, return to the deposit, bounded depletion, and stow; no inventory credit. |
 | `orbit-earth.json` | Known seeded orbit pose; thruster changes; starting assisted landing; repeated landing action cannot cancel it; leaving cockpit control during landing; autonomous completion with zero ship velocity. |
 
 These files use only the existing `key`, `look`, `interact`, `thruster`,
-`landing`, and fixed `step` operations after fixture setup. They never set
+`landing`, mining equip/hold keys, and fixed `step` operations after fixture setup. They never set
 expected end states. Held movement keys are released before interacting so
 cockpit authority changes cannot redirect an outstanding movement key.
 Door collision checks assert both location and ship-relative eye position;
@@ -222,3 +223,11 @@ Deposit colors/proportions are validation greyboxes: orange iron ore, muted
 green-grey silicate rock, and cyan water ice. Inspect `world.deposits` and
 `world.nearest_deposit` for the generated identity, material, physical bounds,
 remaining mass, positions, player distance, and renderer-facing geometry.
+
+## Mining evidence
+
+`scenarios/evidence/mining.json` adds equipped, actively mined, and depleted
+screenshots to the same deterministic mining route. Run it with a working
+native capture helper to inspect the greybox handheld tool and removed deposit.
+Its baseline is automatically included in CI's default suite. Extraction totals
+are diagnostics only; physical-fragment output is implemented separately in #45.

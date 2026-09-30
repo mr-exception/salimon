@@ -171,3 +171,20 @@ world generator without introducing an inventory or extraction behavior.
 Automation exposes `world.deposits` and `world.nearest_deposit` with stable body-scoped IDs, material keys,
 world/body-local/ship-local positions, mass/state, physical radius, and visual
 color/extents. `world.deposit_query_error` is null on successful queries.
+
+## Handheld mining (#44)
+
+Press **M** to equip/stow the mining tool. On a planetary surface, aim the center
+marker at a deposit within **4 m**, then hold **F** or the **left mouse button**.
+The tool removes **2 kg/s** while aim, range, line of sight, and remaining mass
+are valid. Release to stop; changing view, releasing the cursor, or losing focus
+clears held input. Hull/gate/engine proxies and the solid planet obstruct mining.
+A small greybox tool and illuminated indicator show equipped/active state; contextual
+prompts explain equip/use. Tool gear does not occupy world-object carry capacity.
+
+Automation keys `equip_mining_tool` (press toggles) and `mine` (held press/release)
+use the same input path. `inspect` exposes `mining.equipped`, `held`, `active`,
+`target`, `range_meters`, `rate_kg_per_second`, and diagnostic
+`extracted_mass_kg`. Deposit inspection and visuals read world-owned session
+mass deltas. Extraction is advanced only by simulation steps in E2E mode.
+Fragments and physical collection are the subsequent #45/#46 scope.

@@ -69,3 +69,8 @@
     Its reader never touches game state; commands run on the native event thread.
     Only explicit fixed steps advance E2E simulation, and gameplay actions retain
     production interaction and controller gates. Ordinary launches do not read stdin.
+
+- Handheld extraction requires gameplay view, Surface location, an equipped tool,
+  held mining input, and a valid unobscured world target. It never uses E.
+- Inspection and presentation apply the same world-owned session mass deltas.
+- Focus loss, cursor release, view switch, and stowing clear held mining input.

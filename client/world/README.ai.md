@@ -19,8 +19,9 @@ three Task 4 precision markers separate from the six canonical bodies. Do not ad
 window events, GPU types, renderer projections, gameplay simulation, persistence,
 networking, textured sphere rendering, or lighting. Portable resource contracts
 belong in `resources`; read [resource-contracts.md](resource-contracts.md) before
-extending them. Generation, extraction, carrying, and cargo gameplay remain
-separate issue scopes.
+extending them. Portable generation and extraction live in their own modules. Carrying and cargo
+gameplay remain separate issue scopes. Read the mining contract and focused tests
+before changing aim, rate, session mutation, or obstruction semantics.
 
 ## Change checklist
 

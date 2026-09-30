@@ -45,3 +45,9 @@ restart retains selection. No catalog positions or gameplay behavior change.
 order but does not move presentation conversion into world. Projection matrices,
 clip-space conventions, depth targets, and reverse-Z policy remain renderer
 concerns.
+
+The portable `mining` module owns normalized aimed rays, first-deposit selection,
+solid-body obstruction, bounded time-based extraction, and modified-deposit
+session state. Runtime provides a character ray and ship obstruction distance,
+then applies session deltas to freshly generated candidates for inspection and
+presentation. No renderer types, input events, or abstract inventory enter world.

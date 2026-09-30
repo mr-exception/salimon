@@ -8,7 +8,7 @@ coordination of client capabilities. It is not a gameplay domain.
 
 ## Read before changing
 
-1. Fetch the active Notion task, Phase 0 specification, and technical
+1. Fetch the active GitHub issue, Phase 0 specification, and technical
    architecture as required by the root [AGENTS.md](../../AGENTS.md).
 2. Read [architecture.md](architecture.md) and [invariants.md](invariants.md).
 3. Read the renderer's [maintenance guide](../renderer/README.ai.md) before
@@ -56,3 +56,6 @@ necessary.
 - Perform the root native smoke check for lifecycle or rendering changes.
 - Update this guide and the component architecture/invariants when ownership or
   behavior intentionally changes.
+
+Mining input/presentation is runtime composition; keep target validation, rate,
+source mass mutation, and session state in `salimon_world::mining`.

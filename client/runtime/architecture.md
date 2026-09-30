@@ -84,3 +84,12 @@ Diagnostics remains observational and non-authoritative. When additional native
 targets or platform services appear, move OS-specific policy behind
 `client/platform/` without moving portable timing or client orchestration out of
 the runtime.
+
+## Mining composition
+
+`mining.rs` translates equip/hold state plus character camera/ship obstruction
+into portable `salimon_world::mining` calls. World owns target selection, rate,
+validated deposit mutation, and session mass deltas. Character exposes ray hits
+against its solid ship proxies. Runtime queries nearby generation, applies
+world session state for both GPU mapping and inspection, and presents a generic
+cuboid tool/aim marker without exposing gameplay types to the renderer.

@@ -53,6 +53,10 @@ uses the same L action and its cockpit and proximity gates. `thruster` accepts a
 accepts 1–600 `frames` of the launch-configured duration. `inspect` returns
 player pose/location, ship pose/flight/door/control/telemetry, the aimed
 interaction target, and all catalog bodies with ship surface distances.
+`player.ship_local_eye_position_meters` expresses the eye in the current ship
+frame for every location, including surface/doorway positions where
+`player.local_ship_position_meters` is null. This allows door-collision
+assertions without subtracting large world coordinates in scenario files.
 
 Responses include `protocol`, the caller's string or numeric `id`, `ok`, and
 either `result` or `error` with `code` and `message`. Requests need protocol 1,

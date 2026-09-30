@@ -18,12 +18,14 @@
     {"action": {"op": "step", "frames": 50}},
     {"action": {"op": "landing"}},
     {"assert": {"path": "ship.flight_state", "equals": "AssistedLanding { body: Earth }"}},
+    {"screenshot": "assisted-landing"},
     {"action": {"op": "interact"}},
     {"assert": {"path": "player.location", "equals": "InsideShip"}},
     {"assert": {"path": "ship.cockpit_control_active", "equals": false}},
     {"wait": {"path": "ship.flight_state", "equals": "Landed { body: Earth }"}, "frames": 25, "timeout_ms": 10000},
     {"assert": {"path": "ship.speed_meters_per_second", "equals": 0}},
     {"assert": {"path": "ship.velocity_meters_per_second", "equals": [0, 0, 0]}},
-    {"assert": {"path": "ship.door_state", "equals": "Closed"}}
+    {"assert": {"path": "ship.door_state", "equals": "Closed"}},
+    {"screenshot": "landing-complete"}
   ]
 }

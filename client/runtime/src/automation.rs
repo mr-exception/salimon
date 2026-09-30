@@ -197,6 +197,7 @@ fn inspect(app: &ClientApplication) -> Value {
     json!({
         "player": {"location": format!("{:?}", character.location),
             "eye_position_meters": character.eye_position_meters,
+            "ship_local_eye_position_meters": local_eye,
             "look_target_meters": character.look_target_meters,
             "local_ship_position_meters": character.local_ship_position_meters},
         "ship": {"position_meters": ship.pose.position_meters, "orientation": ship.pose.orientation,

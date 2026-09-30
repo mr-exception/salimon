@@ -53,6 +53,48 @@ Runner contract tests need only Python 3 and can run without a display:
 python3 -m unittest discover -s scripts -p 'test_*.py'
 ```
 
+## Phase 0 baseline suite
+
+The default `suite` checks two complete native gameplay paths:
+
+| Scenario | Coverage |
+| --- | --- |
+| `landed-earth.json` | Known initial player pose and ship state; walking/aiming into cockpit control; non-pilot control rejection; closed-door exit collision; opening and exiting to the surface; closing the door outside and walking against it twice; reopening and returning inside; the open-door takeoff interlock; closing the door and completing assisted takeoff. |
+| `orbit-earth.json` | Known seeded orbit pose; thruster changes; starting assisted landing; repeated landing action cannot cancel it; leaving cockpit control during landing; autonomous completion with zero ship velocity. |
+
+These files use only the existing `key`, `look`, `interact`, `thruster`,
+`landing`, and fixed `step` operations after fixture setup. They never set
+expected end states. Held movement keys are released before interacting so
+cockpit authority changes cannot redirect an outstanding movement key.
+Door collision checks assert both location and ship-relative eye position;
+remaining outside alone would not prove the door stopped movement.
+
+Walking routes use the fixtures' clear side aisle around the central Core and
+the rear doorway. Their frame counts are deliberately tied to `step_ms: 16`.
+Assisted-sequence completion polls authoritative state with bounded fixed-frame
+advances instead of wall-clock sleeps. Changing the ship layout, movement
+speed, or fixture coordinates requires updating the routes and checking them
+again against the native client. Run `suite` at least three times when changing
+these fixtures/routes; identical setup and actions should produce identical
+per-step state snapshots regardless of render timing.
+
+The required baseline suite emits structured state/results/logs and automatic
+failure capture without requiring screenshots on successful runs. The matching
+`scenarios/evidence/landed-earth.json` and `scenarios/evidence/orbit-earth.json`
+add named screenshot checkpoints for the same actions and assertions; contract
+tests keep these variants synchronized. Run both individually for visual QA:
+
+```sh
+scripts/salimon-test run scenarios/evidence/landed-earth.json
+scripts/salimon-test run scenarios/evidence/orbit-earth.json
+```
+
+Use an unobscured native desktop or dedicated X11 display with Vulkan support.
+Linux Xvfb plus Mesa lavapipe can verify the native protocol/gameplay paths with
+software rendering; it does not establish hardware performance or native macOS/
+Windows graphics fidelity. Missing display/GPU support is a failed launch,
+not a passed or skipped scenario. Visual runs require a working capture helper.
+
 ## State and visual evidence
 
 Every scenario gets a unique `artifacts/e2e/run-*/` directory (including parse,
@@ -120,11 +162,9 @@ output (the in-memory exception only includes a short stderr tail). Then inspect
 the named checkpoint/failure PNG for context and its capture log for display
 errors. A missing screenshot does not mean a gameplay assertion passed.
 
-The opt-in `scenarios/evidence/landed-earth.json` example demonstrates state and
-visual checkpoints without imposing screenshot dependencies on the default
-suite. Existing suite scenarios still emit logs/results and automatic failure
-captures. Use it on an unobscured native display or a dedicated Xvfb display with
-a compatible Vulkan implementation:
+The opt-in evidence scenarios add visual checkpoints without imposing screenshot
+dependencies on the default suite. Use them on an unobscured native display or a
+dedicated Xvfb display with a compatible Vulkan implementation:
 
 ```sh
 xvfb-run -a -s '-screen 0 1280x800x24' scripts/salimon-test \

@@ -7,6 +7,8 @@
 
 use std::time::Duration;
 
+pub mod resources;
+
 pub const SURFACE_ANCHOR: WorldPosition =
     WorldPosition::new(1_000_000_000_000.0, -750_000_000_000.0, 250_000_000_000.0);
 const CAMERA_UP: [f64; 3] = [0.0, 1.0, 0.0];

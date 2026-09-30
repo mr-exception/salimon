@@ -1,5 +1,10 @@
 # World
 
+The renderer-independent [resource contracts](resource-contracts.md) define stable
+raw-material identities, the initial catalog, validated deposits, and physical
+fragments for the planetary collection work. Generation and gameplay integration
+are separate tasks.
+
 `salimon-world` owns the portable Phase 0 compressed Solar System, large-scale
 coordinates, camera tour, and body geometry math. Its immutable catalog contains
 exactly Sun, Mercury, Venus, Earth, Moon, and Mars in authoritative `f64` meters.

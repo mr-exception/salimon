@@ -26,3 +26,10 @@
     roles, accept an exact finite threshold, and preserve catalog order for ties.
 12. Radial speed is the signed center-distance derivative: negative approaches,
     positive recedes, zero is stationary/tangential or an undefined center axis.
+13. Resource keys are stable and independent of display names/catalog order.
+    Raw material mass/derived volume are positive and finite; remaining deposit
+    mass is finite, nonnegative, bounded by original mass, and cannot increase
+    during local extraction updates.
+14. Resource entity identities and material properties do not change when a
+    fragment moves. Resource poses use finite absolute meters/unit quaternions;
+    resource state carries no renderer data or abstract inventory counts.

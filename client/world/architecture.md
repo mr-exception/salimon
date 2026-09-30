@@ -2,6 +2,10 @@
 
 ## Responsibility
 
+The `resources` module owns the [planetary resource contracts](resource-contracts.md):
+stable material/entity identities, SI mass/volume properties, bounded deposit
+state, and physical fragment poses. It has no rendering or backend dependencies.
+
 `salimon-world` owns portable absolute coordinates, the immutable Task 5 body
 catalog and geometry helpers, the deterministic Task 4 camera tour, three
 noncanonical precision markers, and numeric precision reporting. It does not own

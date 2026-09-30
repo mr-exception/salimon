@@ -145,7 +145,27 @@ class RunnerTests(unittest.TestCase):
         capture = self.directory / "capture.py"
         pid_file = self.directory / "pid"
         self.fake.write_text("import pathlib, os\npathlib.Path(%r).write_text(str(os.getpid()))\n" % str(pid_file) + FAKE)
-        capture.write_text("import pathlib, os\nos.kill(int(pathlib.Path(%r).read_text()), 0)\n" % str(pid_file) + 'import pathlib, sys\npathlib.Path(sys.argv[1]).write_bytes(b"\\x89PNG\\r\\n\\x1a\\n" + b"fake")\n')
+        capture.write_text('''import pathlib, os, sys
+pid = int(pathlib.Path(%r).read_text())
+if os.name == "nt":
+    # Windows signal 0 sends CTRL_C_EVENT; query the process without signalling.
+    import ctypes
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel.OpenProcess.argtypes = [ctypes.c_uint32, ctypes.c_int, ctypes.c_uint32]
+    kernel.OpenProcess.restype = ctypes.c_void_p
+    kernel.WaitForSingleObject.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
+    kernel.WaitForSingleObject.restype = ctypes.c_uint32
+    kernel.CloseHandle.argtypes = [ctypes.c_void_p]
+    handle = kernel.OpenProcess(0x00100000, False, pid)
+    assert handle, "game process unavailable"
+    try:
+        assert kernel.WaitForSingleObject(handle, 0) == 258, "game already terminated"
+    finally:
+        kernel.CloseHandle(handle)
+else:
+    os.kill(pid, 0)
+pathlib.Path(sys.argv[1]).write_bytes(b"\\x89PNG\\r\\n\\x1a\\n" + b"fake")
+''' % str(pid_file))
         self.data["steps"] = [{"screenshot": "cockpit"}, {"assert": {"path": "ship.speed", "equals": 8}}]
         self.save()
         result = run(self.scenario, [sys.executable, str(self.fake)], self.directory / "artifacts",

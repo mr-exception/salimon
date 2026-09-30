@@ -2,6 +2,8 @@
 
 Build standalone executables with the [cross-platform build interface](BUILDING.md).
 Pass its staged executable to `--binary` to test the distribution artifact.
+For normal launch and real OS keyboard input, use the separate
+[packaged black-box smoke command](PACKAGED_SMOKE.md).
 
 Run from the repository root on a machine with a native window and working GPU:
 

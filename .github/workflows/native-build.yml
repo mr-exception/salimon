@@ -29,7 +29,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev libx11-dev libxi-dev libxcursor-dev libxrandr-dev libvulkan1 mesa-vulkan-drivers xvfb
+          sudo apt-get install -y build-essential libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev libx11-dev libxi-dev libxcursor-dev libxrandr-dev libvulkan1 mesa-vulkan-drivers xvfb xdotool imagemagick
       - name: Build script and E2E runner contract tests
         run: python -m unittest discover -s scripts -p 'test_*.py'
       - name: Rust quality gates
@@ -47,6 +47,11 @@ jobs:
         env:
           WGPU_BACKEND: vulkan
         run: xvfb-run -a -s '-screen 0 1280x800x24' python scripts/salimon-test run scenarios/landed-earth.json --binary artifacts/build/release/salimon-client --screenshot-command '[]'
+      - name: Linux packaged black-box smoke (real X11 input)
+        if: runner.os == 'Linux'
+        env:
+          WGPU_BACKEND: vulkan
+        run: xvfb-run -a -s '-screen 0 1920x1080x24' python scripts/packaged_smoke.py --binary artifacts/build/release/salimon-client --timeout 90
       - name: Preserve runnable builds and smoke evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -55,4 +60,5 @@ jobs:
           path: |
             artifacts/build/
             artifacts/e2e/
+            artifacts/packaged-smoke/
           if-no-files-found: warn

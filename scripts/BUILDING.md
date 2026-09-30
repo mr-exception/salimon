@@ -111,7 +111,7 @@ No graphical launch is claimed for macOS/Windows CI; validate native GPU/window
 behavior with the [manual smoke checks](../README.md#native-smoke-check) and the
 [E2E runner](README.md) on those desktops. Linux software rendering is a startup
 check, not a hardware performance/visual-quality benchmark. Packaged OS-input
-automation remains separate work in issue #32.
+automation is provided by the [black-box smoke command](PACKAGED_SMOKE.md).
 
 The existing E2E runner CLI subprocess contract uses a POSIX shebang fixture and
 is explicitly skipped on Windows. All build-interface contracts and the other

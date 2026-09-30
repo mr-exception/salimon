@@ -33,6 +33,7 @@ jobs:
       - name: Build script and E2E runner contract tests
         run: python -m unittest discover -s scripts -p 'test_*.py'
       - name: Rust quality gates
+        shell: bash
         run: |
           cargo fmt --all -- --check
           cargo clippy --workspace --all-targets --locked -- -D warnings

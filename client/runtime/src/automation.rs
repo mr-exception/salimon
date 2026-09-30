@@ -263,7 +263,15 @@ mod tests {
     #[test]
     fn deposit_walkthrough_uses_real_movement_and_generated_state() {
         let mut test = app(Scenario::LandedEarth);
-        test.e2e_config.as_mut().unwrap().seed = 0;
+        e2e::initialize(
+            &mut test,
+            Config {
+                scenario: Scenario::LandedEarth,
+                seed: 0,
+                step: Duration::from_millis(16),
+            },
+        )
+        .unwrap();
         let scenario: Value =
             serde_json::from_str(include_str!("../../../scenarios/resource-deposits.json"))
                 .unwrap();

@@ -10,7 +10,7 @@ from pathlib import Path
 
 from generate_salimon_phase0_ship import (
     cockpit_components, ship_components, thruster_collision_rust_source,
-    thruster_collision_specs,
+    thruster_collision_specs, CARGO_SOLIDS, CARGO_ROOM_METADATA, cargo_layout_rust_source,
 )
 
 
@@ -19,7 +19,7 @@ EXPORT = ROOT / "export"
 TEXTURE = ROOT / "textures" / "salimon_floor_grip.png"
 NAME = "salimon_phase0_ship"
 TASK7_BASELINE_DIMENSIONS = [10.15, 3.72, 8.30]
-TASK10_REVISED_DIMENSIONS = [20.30, 4.00, 20.00]
+TASK10_REVISED_DIMENSIONS = [20.90, 4.00, 21.00]
 TASK10_REVISED_SCALE = [2.0, 4.0 / 3.72, 2.0]
 
 
@@ -199,6 +199,20 @@ def validate_sightlines(document: dict, binary: bytes) -> None:
                 if glass:glass_hit=True
                 else:assert False, f"{label} obstructed by {name} at {min(distances):.2f}m"
         assert glass_hit, f"{label} misses modeled glazing"
+    # A standing player sees through the actual cargo doorway to the far wall;
+    # neither the old sill/glazing, wing nor an opaque hull cap covers the opening.
+    for x in (.7, 1.3, 1.8):
+        origin=(x,eye,3.5)
+        hits=[(d,name) for name,glass,triangles in meshes
+              for tri in triangles if (d:=hit(origin,(0,0,1),tri)) is not None]
+        assert min(hits)[1] == "Cargo_Port_Wall", f"cargo passage blocked at X={x}: {min(hits)}"
+        assert abs(min(hits)[0]-7.1) < 1e-5
+    origin=(-.5,eye,8.0)
+    hits=[(d,name) for name,glass,triangles in meshes for tri in triangles
+          if (d:=hit(origin,(0,-1,0),tri)) is not None]
+    assert min(hits)[1] == "Cargo_Deck", "cargo floor must be level and not covered by wing geometry"
+    assert abs(min(hits)[0]-1.75) < 1e-5
+
     # Live cockpit surfaces must present an unobstructed rectangle from the
     # actual seated eye, with top-left UVs and normals toward the pilot.
     seated_eye=(2.76,1.799032258064516,0.)
@@ -292,6 +306,7 @@ def main() -> None:
     assert (ROOT.parents[1] / "character" / "src" / "thruster_collision.rs").read_text() == (
         thruster_collision_rust_source(components)
     ), "portable thruster collision bounds differ from the editable asset"
+    assert (ROOT.parents[1] / "character" / "src" / "cargo_layout.rs").read_text() == cargo_layout_rust_source(components), "portable cargo walls differ from the asset source"
     collision_group = node(document, "Collision_Proxies")
     for name, lower, upper in thruster_collision_specs(components):
         collider = node(document, name)
@@ -390,10 +405,10 @@ def main() -> None:
     assert_vectors_close(node(document, "MARKER_ExitDoor")["translation"], [-7.10, 1.3440860215053763, 0.0])
     assert_vectors_close(node(document, "MARKER_PlayerStart")["translation"], [0.50, 1.9973118279569892, -2.20])
     exterior_collider = node(document, "COLLIDER_ExteriorHull")
-    assert_vectors_close(exterior_collider["translation"], [0.35, 1.76*4/3.72, 0.0])
+    assert_vectors_close(exterior_collider["translation"], [0.05, 1.76*4/3.72, .5])
     assert_vectors_close(
         exterior_collider["extras"]["salimon"]["sizeMeters"],
-        [20.30, 4.00, 20.0],
+        [20.90, 4.00, 21.0],
     )
     assert metrics["externalAssetDependencies"] == 0
     assert metrics["triangleCount"] <= 6000, "triangle budget exceeded"
@@ -439,6 +454,17 @@ def main() -> None:
         for axis in range(3):
             assert abs(center[axis]-size[axis]/2-mesh_min[axis]) < 1e-6
             assert abs(center[axis]+size[axis]/2-mesh_max[axis]) < 1e-6
+    assert metrics["cargoRoom"] == manifest["interior"]["cargoRoom"]
+    assert metrics["cargoRoom"] == CARGO_ROOM_METADATA
+    for name in CARGO_SOLIDS:
+        lower, upper = node_position_bounds(document, name)
+        proxy = node(document, "COLLIDER_" + name)
+        assert_vectors_close(proxy["translation"], [(a+b)/2 for a,b in zip(lower,upper)])
+        assert_vectors_close(proxy["extras"]["salimon"]["sizeMeters"], [b-a for a,b in zip(lower,upper)])
+    assert abs(node_position_bounds(document, "Cargo_Deck")[1][1] - .23*4/3.72) < 1e-6
+    # All corners of the expanded exterior remain within the flight sphere.
+    assert max(sum(p[a]**2 for a in range(3))**.5
+               for component in components for p in component.geometry.positions) < 16.0
     # Profile geometry must remain shaped (not a relabeled cube) and compact.
     for name in ("Pilot_Seat_Shell","Pilot_Seat_Back","Pilot_Seat_Cushions",
                  "Pilot_Seat_Bolsters","Pilot_Seat_Headrest"):

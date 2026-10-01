@@ -32,7 +32,7 @@ the full body rather than only near the initial landing point.
 
 The Task 10 playtest revision defines a 1.80 m player body with a 1.75 m standing
 eye height. The floor, player start, cockpit camera, doorway crossing, and
-invisible bounds match the redesigned 20.30 × 4.00 × 20.00 m ship. Spawn and
+invisible bounds match the redesigned 20.90 × 4.00 × 21.00 m ship. Spawn and
 cockpit exit use the clear starboard aisle at `[0.50, 1.9973, -2.20]`, outside
 the Core and the lowered pilot chair. Walking can enter the cockpit on either
 side of the chair, while body-expanded object proxies keep the player out of the

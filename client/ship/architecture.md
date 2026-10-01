@@ -26,7 +26,7 @@ position error. Automatic sequences consume the full supplied delta; the
 character traversal and owns only the contextual `L` key translation.
 The default landed pose derives its vertical clearance from the enlarged asset's
 lowest local-Y point, keeping visible geometry tangent to Earth's nominal surface.
-The wider 20.30 × 4.00 × 20.00 m hull uses a conservative 15 m collision sphere;
+The wider 20.90 × 4.00 × 21.00 m hull uses a conservative 16 m collision sphere;
 this same clearance is included when completing automatic takeoff.
 Snapshot velocity reflects direct flight or the analytic derivative of the active
 assist segment, including zero during alignment and at rest. The ship

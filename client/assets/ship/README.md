@@ -1,6 +1,6 @@
 # Salimon Phase 0 Scout
 
-A custom, editable 20.30 × 4.00 × 20.00 m scout (length × height × width)
+A custom, editable 20.90 × 4.00 × 21.00 m scout (length × height × width)
 with a broad living cabin, ivory armor, graphite structure, copper seams,
 layered wing plates and paired aft ion thrusters. The cabin deck is 9.20 m wide,
 up from 6.20 m, with 2.56 m floor-to-ceiling clearance. Deep window sills and
@@ -50,6 +50,35 @@ smoothing or subdivision.
 The aft engines have hollow flared nozzles, recessed emitters, stepped liners,
 armor rings, cooling fins and running lights. Their forms use 8–12 sided
 cross-sections instead of dense smoothing or displacement.
+
+## Dedicated cargo module (#34)
+
+Asset version 10 adds a port cargo room with a 5.4 × 5.5 m clear floor
+(29.7 m²) and 2.56 m structural height. It has a level deck, enclosing walls,
+ceiling lamps and painted loading lanes. The 1.8 m passage at local X
+0.4–2.2 m connects directly to the cabin's port aisle, beyond the Core. Its
+clear height is 2.253 m; player-body expansion leaves 1.32 m usable passage
+width. The cabin and cargo room use the same ship-local movement frame and
+internal gravity. The controller retains its conservative lamp/head clearance.
+
+The port wing plates stop behind the module, and the port engine moves 0.60 m
+aft to clear its wall. Cockpit, spawn, door anchors, floor height and existing
+starboard walking routes remain aligned. The 16 m flight sphere contains every
+exterior vertex; the familiar 15 m takeoff lift/touchdown stage stays unchanged.
+
+`interior.cargoRoom` in the manifest and `extras.salimon.cargoRoom` in the
+exports describe the real physical volume. The generator writes
+`client/character/src/cargo_layout.rs` from room geometry and passage metadata;
+validation checks this contract and every room collision proxy against both
+exports. Triangle rays verify the doorway is free of old glazing/sills/hull and
+the cargo deck is not covered by a wing. The room does not implement storage,
+item transfer or cargo counting; those belong to dependent issues #47/#49.
+
+`scenarios/cargo-room.json` uses real movement and interactions to exit/re-enter
+the ship, reach the room, test its walls/partition, return to the airlock and
+cockpit, take off, and revisit the room in flight. Its evidence variant captures
+the exterior, cockpit, and room while landed and flying. See
+[issue #34 evidence](../../../docs/issue-34/README.md).
 
 ## Source and regeneration
 
@@ -102,7 +131,7 @@ character/runtime contract tests together. The visible deck and collision floor
 now agree at local Y `0.2473118 m`. The human is 1.80 m tall with 1.75 m eye height.
 Spawn and cockpit exit use the clear starboard aisle `[0.50, 1.9973, -2.20]`.
 The landed ship rests at its lowest mesh point (`-0.1075269 m` local Y), and its
-conservative exterior collision radius is 15 m.
+conservative exterior collision radius is 16 m.
 
 Only `Exit_Door` moves for the door state. Only the `Cockpit Glass` material uses
 alpha blending. The renderer combines opaque geometry into one draw and all
@@ -126,7 +155,7 @@ monitor bounds, uniform scale and fixed pivot in both exports and the manifest.
 
 ## Budgets and verification
 
-Current export: **5,506 triangles, 107 primitives, 13 materials**, 471,036-byte GLB.
+Current export: **5,720 triangles, 119 primitives, 13 materials**, 497,628-byte GLB.
 Hard caps: 6,000 triangles, 120 primitives, 13 materials, 512 KiB GLB; runtime ship
 submission remains two draws. This is a deliberate increase from the initial
 620-triangle greybox to allow the requested design detail, while remaining small.

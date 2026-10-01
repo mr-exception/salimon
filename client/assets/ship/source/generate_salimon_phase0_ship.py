@@ -31,6 +31,7 @@ TARGET_HEIGHT_METERS = 4.0
 VERTICAL_SCALE_FROM_TASK7 = TARGET_HEIGHT_METERS / TASK7_BASELINE_DIMENSIONS_METERS[1]
 PLAYER_BODY_HEIGHT_METERS = 1.80
 PLAYER_EYE_HEIGHT_METERS = 1.75
+EXTERIOR_BOTTOM_METERS = -0.10 * VERTICAL_SCALE_FROM_TASK7
 SCALED_FLOOR_HEIGHT_METERS = 0.23 * VERTICAL_SCALE_FROM_TASK7
 COCKPIT_SEAT_MARKER_METERS = [
     1.38 * HORIZONTAL_SCALE_FROM_TASK7,
@@ -52,6 +53,16 @@ PLAYER_START_METERS = [
     SCALED_FLOOR_HEIGHT_METERS + PLAYER_EYE_HEIGHT_METERS,
     -2.20,
 ]
+CARGO_SOLIDS = ("Cargo_Deck", "Cargo_Ceiling", "Cargo_Aft_Wall",
+    "Cargo_Forward_Wall", "Cargo_Port_Wall", "Cargo_Inboard_Partition", "Cargo_Passage_Header")
+CARGO_ROOM_METADATA = {
+    "clearMinMeters": [-3.2, SCALED_FLOOR_HEIGHT_METERS, 5.1],
+    "clearMaxMeters": [2.2, 2.61 * VERTICAL_SCALE_FROM_TASK7, 10.6],
+    "passageMinXMeters": .4, "passageMaxXMeters": 2.2,
+    "passageClearHeightMeters": 2.50 - SCALED_FLOOR_HEIGHT_METERS,
+    "floorAreaSquareMeters": 29.7,
+    "role": "physical-room-for-loose-fragments-and-future-containers",
+}
 CENTER_MONITOR_SCALE = 0.49  # 70% of the already reduced version 8 assembly.
 SIDE_MONITOR_SCALE = 0.7
 MONITOR_SEATWARD_OFFSET_METERS = 0.40
@@ -721,17 +732,21 @@ def ship_components() -> list[Component]:
     add("Roof_Shoulder_Rails",shoulders,0,"Exterior")
     for label, sign in (("Port", 1), ("Starboard", -1)):
         z0, z1 = sorted((sign*2.30, sign*2.55))
-        frames = combined(box(-3.8, 2.6, 0.18, 0.87, z0, z1),
-                          box(-3.8, 2.6, 2.52, 2.73, z0, z1))
-        for x in (-3.72, -1.70, 0.40, 2.44):
+        frames = combined(box(-3.8, .2 if sign == 1 else 2.6, 0.18, 0.87, z0, z1),
+                          box(-3.8, -1.6 if sign == 1 else 2.6, 2.52, 2.73, z0, z1))
+        if sign == 1:
+            frames.extend(box(1.1,2.6,.18,.87,z0,z1))
+            frames.extend(box(1.1,2.6,2.52,2.73,z0,z1))
+        for x in (-3.72, -1.70, *(() if sign == 1 else (.40,)), 2.44):
             frames.extend(box(x-.06, x+.06, .87, 2.52, z0, z1))
         add(f"Hull_{label}_Side", frames, 0, "Exterior")
         glass = Geometry()
-        for x0,x1 in ((-3.66,-1.76),(-1.64,.34),(.46,2.38)):
+        for x0,x1 in (((-3.66,-1.76),(1.1,2.38)) if sign == 1
+                      else ((-3.66,-1.76),(-1.64,.34),(.46,2.38))):
             z=sign*2.42
             glass.add_face([(x0,.87,z),(x1,.87,z),(x1,2.52,z),(x0,2.52,z)])
         add(f"Cabin_{label}_Glazing", glass, 3, "Exterior", exterior_visibility=True)
-        add(f"Hull_{label}_Stripe", box(-3.60,2.30,.68,.82,
+        add(f"Hull_{label}_Stripe", box(-3.60,.2 if sign == 1 else 2.30,.68,.82,
             *sorted((sign*2.555,sign*2.58))), 2, "Exterior")
     add("Hull_Nose", tapered_box(2.5, 5.25, 0.10, .89, 2.55, .48, .66, .62), 1, "Exterior")
     # Rear observation windows flank a real door opening; no solid aft cap.
@@ -747,7 +762,7 @@ def ship_components() -> list[Component]:
     add("Cabin_Aft_Glazing", aft_glass, 3, "Exterior", exterior_visibility=True)
     for label, sign in (("Port",1),("Starboard",-1)):
         def wing_poly(points):
-            values=[(x,z*sign) for x,z in points]
+            values=[(min(x,-1.8) if sign == 1 else x,z*sign) for x,z in points]
             return values if sign==1 else list(reversed(values))
         add(f"Wing_{label}",extrude_y(wing_poly([(2.45,2.30),(-2.90,2.30),(-4.05,5.0),(.70,4.05)]),.18,.42),0,"Exterior")
         add(f"Wing_{label}_Armor",extrude_y(wing_poly([(1.70,2.66),(-2.76,2.66),(-3.55,4.70),(.48,3.82)]),.43,.52),1,"Exterior")
@@ -802,9 +817,14 @@ def ship_components() -> list[Component]:
     add("Ceiling_Inner",box(-3.72,2.46,2.61,2.71,-2.30,2.30),4,"Interior")
     for label,sign in (("Port",1),("Starboard",-1)):
         add(f"Wall_{label}_Inner",combined(
-            box(-3.72,2.45,.23,.86,*sorted((sign*2.23,sign*2.30))),
-            box(-3.72,2.45,2.53,2.62,*sorted((sign*2.23,sign*2.30)))),4,"Interior")
-        add(f"Window_{label}_Sill",box(-3.62,2.38,.84,.92,*sorted((sign*2.10,sign*2.30))),12,"Interior")
+            box(-3.72,.2 if sign == 1 else 2.45,.23,.86,*sorted((sign*2.23,sign*2.30))),
+            box(-3.72,-1.6 if sign == 1 else 2.45,2.53,2.62,*sorted((sign*2.23,sign*2.30)))),4,"Interior")
+        add(f"Window_{label}_Sill",box(-3.62,.2 if sign == 1 else 2.38,.84,.92,*sorted((sign*2.10,sign*2.30))),12,"Interior")
+        if sign == 1:
+            add("Cargo_Passage_Forward_Jamb",combined(
+                box(1.1,2.45,.23,.86,2.23,2.30),
+                box(1.1,2.38,.84,.92,2.10,2.30),
+                box(1.1,2.45,2.53,2.62,2.23,2.30)),4,"Interior")
     add("Aft_Bulkhead_Port",box(-3.78,-3.70,.23,.87,.80,2.30),4,"Interior")
     add("Aft_Bulkhead_Starboard",box(-3.78,-3.70,.23,.87,-2.30,-.80),4,"Interior")
     add("Aft_Bulkhead_Header",box(-3.78,-3.62,2.34,2.62,-.80,.80),5,"Interior")
@@ -814,6 +834,29 @@ def ship_components() -> list[Component]:
     add("Door_Frame",door_frame,2,"Interior")
     add("Door_Threshold",box(-3.94,-3.55,.17,.23,-.78,.78),2,"Interior")
     components.extend(cockpit_components())
+    # Dedicated port module: 5.4 x 5.5 m clear cargo floor, level with cabin.
+    # Final-meter geometry preserves human proportions and the existing aft gate.
+    floor = SCALED_FLOOR_HEIGHT_METERS
+    ceiling = 2.61 * VERTICAL_SCALE_FROM_TASK7
+    def cargo(name, geometry, material, group="Interior"):
+        components.append(Component(name, geometry, material, group))
+    cargo("Cargo_Deck",box(-3.2,2.2,floor-.10,floor,4.2,10.6),7)
+    cargo("Cargo_Ceiling",box(-3.2,2.2,ceiling,ceiling+.10,5.1,10.6),4)
+    cargo("Cargo_Aft_Wall",box(-3.4,-3.2,floor,ceiling+.10,5.1,11.0),4)
+    cargo("Cargo_Forward_Wall",box(2.2,2.4,floor,ceiling+.10,5.1,11.0),4)
+    cargo("Cargo_Port_Wall",box(-3.4,2.4,floor,ceiling+.10,10.6,11.0),4)
+    cargo("Cargo_Inboard_Partition",box(-3.2,.4,floor,ceiling,4.6,5.1),4)
+    cargo("Cargo_Passage_Header",box(.4,2.2,2.50,ceiling,4.2,5.1),2)
+    cargo("Cargo_Hull_Belly",box(-3.4,2.4,EXTERIOR_BOTTOM_METERS,floor-.10,4.6,11.0),0,"Exterior")
+    cargo("Cargo_Hull_Roof",box(-3.4,2.4,ceiling+.10,3.32,4.6,11.0),1,"Exterior")
+    lamps=combined(box(-2.7,1.7,ceiling-.055,ceiling,6.2,6.3),
+                   box(-2.7,1.7,ceiling-.055,ceiling,9.5,9.6))
+    cargo("Cargo_Lights",lamps,9)
+    # Painted floor perimeter and loading lanes identify the physical room.
+    lanes=Geometry()
+    for z in (5.4,7.8,10.2):
+        lanes.extend(box(-2.8,1.8,floor+.001,floor+.006,z,z+.04))
+    cargo("Cargo_Deck_Markings",lanes,2)
     # Furnishings are kept against the wall, leaving two broad circulation lanes.
     add("Cabin_Bench_Port",box(-2.85,-1.12,.23,.47,1.83,2.22),5,"Interior")
     cushions=Geometry()
@@ -911,6 +954,11 @@ def ship_components() -> list[Component]:
         guidance.extend(box(-3.55,1.7,.30,.34,*sorted((sign*2.21,sign*2.23))))
     add("Cabin_Low_Guidance_Lights",guidance,9,"Interior")
     add("Door_Welcome_Light",box(-3.60,-3.56,2.37,2.42,-.50,.50),9,"Interior")
+    # Set the port engine back 0.60 m so its intake cannot penetrate the
+    # cargo module's aft wall. The marker/airlock and cockpit stay fixed.
+    for component in components:
+        if component.name.startswith("Engine_Port"):
+            component.geometry.positions = [(x-.60,y,z) for x,y,z in component.geometry.positions]
     return components
 
 
@@ -938,7 +986,35 @@ def thruster_collision_rust_source(components: list[Component]) -> str:
     for name, lower, upper in thruster_collision_specs(components):
         bounds = [lower[0], upper[0], lower[1], upper[1], lower[2], upper[2]]
         lines.append(f"    // {name}")
-        lines.append("    [" + ", ".join(repr(float(value)) for value in bounds) + "],")
+        lines.append("    [")
+        lines.extend("        " + repr(float(value)) + "," for value in bounds)
+        lines.append("    ],")
+    lines.append("];")
+    return "\n".join(lines) + "\n"
+
+
+def cargo_layout_rust_source(components: list[Component]) -> str:
+    """Generate final-meter traversal bounds from the actual room geometry."""
+    bounds = {component.name: (
+        [min(p[a] for p in component.geometry.positions) for a in range(3)],
+        [max(p[a] for p in component.geometry.positions) for a in range(3)])
+        for component in components}
+    deck_min, deck_max = bounds["Deck_Walkable"]
+    cargo_deck_min, _ = bounds["Cargo_Deck"]
+    z0, z1 = cargo_deck_min[2], CARGO_ROOM_METADATA["clearMinMeters"][2]
+    walls = [[deck_min[0], CARGO_ROOM_METADATA["passageMinXMeters"], z0, z1],
+             [CARGO_ROOM_METADATA["passageMaxXMeters"], deck_max[0], z0, z1]]
+    for name in ("Cargo_Aft_Wall", "Cargo_Forward_Wall", "Cargo_Port_Wall"):
+        lower, upper = bounds[name]
+        walls.append([lower[0], upper[0], lower[2], upper[2]])
+    def rust_array(values):
+        return "[" + ", ".join(repr(float(v)) for v in values) + "]"
+    lines = ["// Generated by generate_salimon_phase0_ship.py; do not edit by hand.",
+        "pub const CARGO_ROOM_MIN_METERS: [f64; 3] = " + rust_array(CARGO_ROOM_METADATA["clearMinMeters"]) + ";",
+        "pub const CARGO_ROOM_MAX_METERS: [f64; 3] = " + rust_array(CARGO_ROOM_METADATA["clearMaxMeters"]) + ";",
+        "// [forward min/max, port min/max]; includes the cabin partition at the passage.",
+        "pub(super) const CARGO_WALLS: [[f64; 4]; 5] = ["]
+    lines.extend("    " + rust_array(wall) + "," for wall in walls)
     lines.append("];")
     return "\n".join(lines) + "\n"
 
@@ -989,14 +1065,15 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
 
     baseline_collision_specs = [
         ("COLLIDER_InteriorFloor", [-0.25, 0.18, 0.0], [7.06, 0.10, 4.60], "walkable-floor"),
-        ("COLLIDER_InteriorPortWall", [-0.55, 1.45, 2.37], [6.34, 2.34, 0.14], "interior-wall"),
+        ("COLLIDER_InteriorPortWall", [-1.79, 1.45, 2.37], [3.98, 2.34, 0.14], "interior-wall"),
+        ("COLLIDER_PortWallForward", [2.19, 1.45, 2.37], [2.18, 2.34, 0.14], "interior-wall"),
         ("COLLIDER_InteriorStarboardWall", [-0.55, 1.45, -2.37], [6.34, 2.34, 0.14], "interior-wall"),
         ("COLLIDER_InteriorCeiling", [-0.63, 2.66, 0.0], [6.18, 0.10, 4.60], "ceiling"),
         ("COLLIDER_CabinBench", [-1.985, .63, 2.01], [1.73, .80, .42], "interior-obstacle"),
         ("COLLIDER_CabinWorktop", [-2.24, .545, -2.015], [1.48, .63, .45], "interior-obstacle"),
         ("COLLIDER_EnergyCore", [-0.50, 1.07, 0.0], [1.0, 1.68, 1.0], "interior-obstacle"),
         ("COLLIDER_AftDoor", [-3.84, 1.285, 0.0], [0.14, 2.11, 1.40], "interactive-door"),
-        ("COLLIDER_ExteriorHull", [0.175, 1.76, 0.0], [10.15, 3.72, 10.00], "broad-phase-hull"),
+        ("COLLIDER_ExteriorHull", [0.025, 1.76, .25], [10.45, 3.72, 10.50], "broad-phase-hull"),
     ]
     for name, center, size, purpose in baseline_collision_specs:
         node_index = len(nodes)
@@ -1014,6 +1091,18 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
             }
         )
         nodes[groups["Collision"]]["children"].append(node_index)  # type: ignore[index,union-attr]
+
+    for component in components:
+        if component.name not in CARGO_SOLIDS:
+            continue
+        lower = [min(point[a] for point in component.geometry.positions) for a in range(3)]
+        upper = [max(point[a] for point in component.geometry.positions) for a in range(3)]
+        nodes[groups["Collision"]]["children"].append(len(nodes))
+        nodes.append({"name": "COLLIDER_" + component.name,
+            "translation": [(a+b)/2 for a,b in zip(lower,upper)],
+            "extras": {"salimon": {"collisionShape": "box",
+                "sizeMeters": [b-a for a,b in zip(lower,upper)],
+                "purpose": "cargo-room"}}})
 
     for name, lower, upper in thruster_collision_specs(components):
         nodes[groups["Collision"]]["children"].append(len(nodes))  # type: ignore[index,union-attr]
@@ -1070,7 +1159,7 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
             "copyright": "Copyright 2026 Salimon contributors; custom original asset",
             "extras": {
                 "salimon": {
-                    "assetVersion": 9,
+                    "assetVersion": 10,
                     "units": "meters",
                     "upAxis": "+Y",
                     "forwardAxis": "+X",
@@ -1103,16 +1192,17 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
                 ],
                 "task7BaselineDimensionsMeters": TASK7_BASELINE_DIMENSIONS_METERS,
                 "overallDimensionsMeters": [
-                    TASK7_BASELINE_DIMENSIONS_METERS[0] * HORIZONTAL_SCALE_FROM_TASK7,
+                    20.90,
                     TARGET_HEIGHT_METERS,
-                    20.0,
+                    21.0,
                 ],
                 "lowestLocalYMeters": -0.10 * VERTICAL_SCALE_FROM_TASK7,
                 "walkableInteriorClearanceMeters": {
                     "width": 4.60 * HORIZONTAL_SCALE_FROM_TASK7,
                     "height": 2.38 * VERTICAL_SCALE_FROM_TASK7,
                 },
-                "designRevision": "compact-cockpit-monitors-seatward",
+                "designRevision": "port-cargo-module",
+                "cargoRoom": CARGO_ROOM_METADATA,
                 "energyCore": {"centerMeters": [-1.0, 1.2, 0.0], "role": "energy-storage", "phase0": "visual-only"},
                 "humanBodyHeightMeters": PLAYER_BODY_HEIGHT_METERS,
                 "humanEyeHeightMeters": PLAYER_EYE_HEIGHT_METERS,
@@ -1177,6 +1267,8 @@ def write_outputs() -> None:
     # The portable controller consumes the same source-derived bounds as glTF.
     (ROOT.parents[1] / "character" / "src" / "thruster_collision.rs").write_text(
         thruster_collision_rust_source(ship_components()), encoding="utf-8")
+    (ROOT.parents[1] / "character" / "src" / "cargo_layout.rs").write_text(
+        cargo_layout_rust_source(ship_components()), encoding="utf-8")
     print(
         f"Generated {MODEL_NAME}: {len(document['meshes'])} primitives, "
         f"{document['extras']['salimon']['triangleCount']} triangles, "  # type: ignore[index]

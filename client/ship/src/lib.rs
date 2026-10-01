@@ -18,8 +18,8 @@ pub const LOWEST_LOCAL_Y_METERS: f64 = -0.107_526_881_720_430_11;
 pub const STEERING_RATE_RADIANS_PER_SECOND: f64 = 5.0_f64.to_radians();
 /// Time for a steering axis to ramp fully on or off. This is not inertia.
 pub const STEERING_RAMP_SECONDS: f64 = 0.12;
-/// Conservative bounding sphere for the wider 20.3 x 4.0 x 20.0 meter ship asset.
-pub const COLLISION_RADIUS_METERS: f64 = 15.0;
+/// Conservative bounding sphere for the wider 20.9 x 4.0 x 21.0 meter ship asset.
+pub const COLLISION_RADIUS_METERS: f64 = 16.0;
 /// Height above a solid surface at which Phase 0 landing assistance is offered.
 pub const LANDING_RANGE_RADIUS_FRACTION: f64 = LANDING_RANGE_ALTITUDE_RADIUS_FACTOR;
 /// Landing spends two seconds aligning, four approaching, and two touching down.
@@ -195,10 +195,9 @@ impl AssistTransition {
         let intermediate_distance = if landing {
             // Reserve visible local motion for touchdown even on the largest body.
             destination_distance
-                + ((start_distance - destination_distance).max(0.0) * 0.25)
-                    .min(COLLISION_RADIUS_METERS)
+                + ((start_distance - destination_distance).max(0.0) * 0.25).min(15.0)
         } else {
-            (start_distance + COLLISION_RADIUS_METERS).min(destination_distance)
+            (start_distance + 15.0).min(destination_distance)
         };
         Self {
             elapsed: Duration::ZERO,

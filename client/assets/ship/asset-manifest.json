@@ -1,6 +1,6 @@
 {
   "name": "Salimon Phase 0 Scout",
-  "assetVersion": 9,
+  "assetVersion": 10,
   "source": "source/generate_salimon_phase0_ship.py",
   "editableInterchange": "export/salimon_phase0_ship.gltf",
   "runtimeAsset": "export/salimon_phase0_ship.glb",
@@ -22,14 +22,14 @@
       8.3
     ],
     "dimensionsMeters": [
-      20.3,
+      20.9,
       4,
-      20
+      21
     ],
     "lowestLocalYMeters": -0.10752688172043011,
     "humanBodyHeightMeters": 1.8,
     "humanEyeHeightMeters": 1.75,
-    "designRevision": "Cabin reshaped to 9.20m clear width; exterior wing span20m; per-axis authoring scale retained, no longer a pure scale of Task7."
+    "designRevision": "Port cargo module with level deck and dedicated passage; cockpit and aft airlock anchors preserved."
   },
   "budgets": {
     "maximumTriangles": 6000,
@@ -77,7 +77,24 @@
     "coreRole": "Energy storage and recoverable ship heart; Phase0 exposes a noncanonical bounded telemetry fixture without production energy simulation",
     "coreDesign": "Segmented cyan energy cells, copper containment rings, graphite cage, ceramic armor, service vents and charge gauge",
     "palette": "Warm ivory, copper, terracotta, honey wood and petrol teal with amber emissive lamps",
-    "cockpitDesign": "Faceted dashboard, recessed instrument housings, ivory bezels, copper fasteners, tactile keys, service vents and pedals; contoured pilot bucket with split upholstery, side bolsters, compact headrest, armrests, hand controls and suspension rails"
+    "cockpitDesign": "Faceted dashboard, recessed instrument housings, ivory bezels, copper fasteners, tactile keys, service vents and pedals; contoured pilot bucket with split upholstery, side bolsters, compact headrest, armrests, hand controls and suspension rails",
+    "cargoRoom": {
+      "clearMinMeters": [
+        -3.2,
+        0.24731182795698925,
+        5.1
+      ],
+      "clearMaxMeters": [
+        2.2,
+        2.8064516129032255,
+        10.6
+      ],
+      "passageMinXMeters": 0.4,
+      "passageMaxXMeters": 2.2,
+      "passageClearHeightMeters": 2.252688172043011,
+      "floorAreaSquareMeters": 29.7,
+      "role": "physical-room-for-loose-fragments-and-future-containers"
+    }
   },
   "cockpitInstruments": {
     "speedNode": "Monitor_Center",

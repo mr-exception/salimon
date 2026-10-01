@@ -3,8 +3,8 @@
 pub(super) const THRUSTER_COLLIDERS: [[f64; 6]; 4] = [
     // COLLIDER_Engine_Port_Body
     [
-        -9.8,
-        -3.0,
+        -10.4,
+        -3.6,
         0.3010752688172043,
         1.8494623655913978,
         5.66,
@@ -12,8 +12,8 @@ pub(super) const THRUSTER_COLLIDERS: [[f64; 6]; 4] = [
     ],
     // COLLIDER_Engine_Port_SweptFin
     [
-        -7.64,
-        -4.3,
+        -8.24,
+        -4.8999999999999995,
         0.6236559139784945,
         2.8494623655913975,
         6.989999999999999,

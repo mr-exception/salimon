@@ -300,7 +300,7 @@ def main() -> None:
     views = [
         ("01 / FORWARD EXTERIOR", "Wide hull, panoramic canopy and copper trim", Camera((23, 17, 28), (0, 1.5, 0)), None, ()),
         ("02 / AFT EXTERIOR", "Recessed twin nozzles, heat shields and observation windows", Camera((-25, 14, -28), (0, 1.5, 0)), None, ()),
-        ("03 / CABIN CUTAWAY", "Roof and wall groups hidden to inspect circulation", Camera((13, 22, 18), (-0.5, 0, 0)), {"Interior"}, ("Ceiling_", "Wall_", "Window_", "Aft_Bulkhead", "Exit_Door", "Door_Frame", "Door_Welcome")),
+        ("03 / CABIN CUTAWAY", "Roof and wall groups hidden to inspect circulation", Camera((13, 22, 18), (-0.5, 0, 0)), {"Interior"}, ("Ceiling_", "Wall_", "Window_", "Aft_Bulkhead", "Exit_Door", "Door_Frame", "Door_Welcome", "Cargo_Ceiling", "Cargo_Aft_Wall", "Cargo_Forward_Wall", "Cargo_Port_Wall", "Cargo_Inboard_Partition", "Cargo_Passage_Header", "Cargo_Lights")),
         ("04 / STANDING BEHIND THE CHAIR", "Authored standing eye height; forward view remains open", Camera(eye, (11, eye[1], 0), True), None, ()),
         ("05 / CORE AND SIDE WINDOWS", "Warm lounge, central energy Core and broad side glazing", Camera((0.3, eye[1], -2.6), (-2.3, 1.5, 2.1), True), None, ()),
         ("06 / REAR CABIN VIEW", "Aft observation windows beside the exit door", Camera((0.6, eye[1], 2.45), (-7.7, 1.9, -0.2), True), None, ()),

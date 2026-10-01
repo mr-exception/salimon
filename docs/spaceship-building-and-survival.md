@@ -11,6 +11,15 @@ The spaceship is the player's **primary home, vehicle, survival system, workshop
 - Other systems such as railguns, laser weapons, fabrication, charging, processing, maintenance, and life-support functions should exist at distinct physical locations.
 - Other players aboard the ship may operate all modules except owner-only navigation.
 - The initial ship must be large enough to contain a **dedicated walkable cargo room** in addition to the cockpit, access/airlock space, and other required interior circulation. The cargo room is a real physical room for loose objects and future containers, not an abstract inventory screen.
+### Initial cargo-room layout
+The initial scout has a dedicated port module with a 29.7 m² clear cargo floor
+(local X −3.2…2.2 m, Z 5.1…10.6 m), level with the cabin at Y 0.2473118 m.
+A 1.8 m passage at X 0.4…2.2 m leads from the cabin port aisle into the room.
+The cockpit and aft airlock anchors are preserved. The physical space supports
+future loose-fragment storage and containers; counting, containment behavior and
+planet-to-ship fragment transfer are implemented by their separate dependent
+tasks. The room remains in the ship's reference frame during flight.
+
 ## Construction
 - Ship expansion uses **modular rooms/hull sections**.
 - Adding new structural rooms requires the ship to be landed or docked.

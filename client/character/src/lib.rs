@@ -6,6 +6,9 @@
 use std::f64::consts::{FRAC_PI_2, TAU};
 use std::time::Duration;
 
+mod cargo_layout;
+use cargo_layout::CARGO_WALLS;
+pub use cargo_layout::{CARGO_ROOM_MAX_METERS, CARGO_ROOM_MIN_METERS};
 mod thruster_collision;
 use thruster_collision::THRUSTER_COLLIDERS;
 
@@ -41,7 +44,13 @@ const EXTERIOR_TOP: f64 = 2.73 * (4.0 / 3.72);
 // crossing to the nearer side of the two existing body-clear stopping planes.
 const CLOSED_GATE_MIDPOINT: f64 = (EXTERIOR_AFT + INTERIOR_FORWARD_MIN) * 0.5;
 const COLLISION_EPSILON: f64 = 1.0e-7;
-const EXTERIOR_OBSTACLES: [[f64; 4]; 3] = [
+const EXTERIOR_OBSTACLES: [[f64; 4]; 4] = [
+    [
+        -3.4 - PLAYER_RADIUS_METERS,
+        2.4 + PLAYER_RADIUS_METERS,
+        4.6 - PLAYER_RADIUS_METERS,
+        11.0 + PLAYER_RADIUS_METERS,
+    ],
     [
         DOORWAY_FORWARD,
         EXTERIOR_FORWARD,
@@ -386,10 +395,15 @@ impl CharacterController {
                     local[1] = PLAYER_EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT;
                     self.vertical_speed = 0.0;
                 }
-                local[2] = local[2].clamp(-INTERIOR_SIDE_LIMIT, INTERIOR_SIDE_LIMIT);
+                local[2] = local[2].clamp(
+                    -INTERIOR_SIDE_LIMIT,
+                    CARGO_ROOM_MAX_METERS[2] - PLAYER_RADIUS_METERS,
+                );
                 local[0] = local[0].min(INTERIOR_FORWARD_MAX);
                 local = slide_around_fixtures(previous, local);
-                let ceiling = if local[0] < -6.88 && local[2].abs() < 1.84 {
+                let ceiling = if (local[0] < -6.88 && local[2].abs() < 1.84)
+                    || (local[2] > 4.0 && local[2] < 5.1 && local[0] > 0.16 && local[0] < 2.44)
+                {
                     DOORWAY_CEILING_HEIGHT
                 } else {
                     SHIP_CEILING_HEIGHT
@@ -618,7 +632,7 @@ impl CharacterController {
 
 fn overlaps_exterior_hull(local: [f64; 3]) -> bool {
     local[1] + (PLAYER_BODY_HEIGHT_METERS - PLAYER_EYE_HEIGHT_METERS) > EXTERIOR_BOTTOM
-        && local[1] - PLAYER_EYE_HEIGHT_METERS < EXTERIOR_TOP
+        && local[1] - PLAYER_EYE_HEIGHT_METERS < if local[2] > 4.6 { 3.32 } else { EXTERIOR_TOP }
 }
 
 fn world_round_trip_tolerance(world: [f64; 3]) -> f64 {
@@ -630,7 +644,16 @@ fn world_round_trip_tolerance(world: [f64; 3]) -> f64 {
 }
 
 fn slide_around_fixtures(previous: [f64; 3], proposed: [f64; 3]) -> [f64; 3] {
-    slide_around_obstacles(previous, proposed, &INTERIOR_OBSTACLES)
+    let proposed = slide_around_obstacles(previous, proposed, &INTERIOR_OBSTACLES);
+    let walls = CARGO_WALLS.map(|[x0, x1, z0, z1]| {
+        [
+            x0 - PLAYER_RADIUS_METERS,
+            x1 + PLAYER_RADIUS_METERS,
+            z0 - PLAYER_RADIUS_METERS,
+            z1 + PLAYER_RADIUS_METERS,
+        ]
+    });
+    slide_around_obstacles(previous, proposed, &walls)
 }
 
 fn slide_around_thrusters(previous: [f64; 3], mut proposed: [f64; 3], tolerance: f64) -> [f64; 3] {
@@ -1177,7 +1200,7 @@ mod tests {
     fn interior_walls_and_forward_hull_keep_the_complete_player_inside() {
         for (start, input, axis, expected) in [
             (
-                [1.0, 0.0],
+                [-6.5, 0.0],
                 MovementInput {
                     right: true,
                     ..MovementInput::default()
@@ -1207,6 +1230,87 @@ mod tests {
             let mut controller = inside_at(start[0], start[1]);
             walk_steps(&mut controller, input, 20);
             assert_eq!(controller.local_ship_position().unwrap()[axis], expected);
+        }
+    }
+
+    #[test]
+    fn cargo_passage_walkthrough_preserves_level_floor_and_ship_frame() {
+        let mut player = inside_at(1.3, 3.0);
+        walk_steps(
+            &mut player,
+            MovementInput {
+                right: true,
+                ..MovementInput::default()
+            },
+            20,
+        );
+        let local = player.local_ship_position().unwrap();
+        assert_eq!(player.location(), CharacterLocation::InsideShip);
+        assert!((local[2] - (CARGO_ROOM_MAX_METERS[2] - PLAYER_RADIUS_METERS)).abs() < 1e-12);
+        assert_eq!(local[1], PLAYER_START[1]);
+        walk_steps(
+            &mut player,
+            MovementInput {
+                backward: true,
+                ..MovementInput::default()
+            },
+            20,
+        );
+        assert!(
+            (player.local_ship_position().unwrap()[0] - (-3.2 + PLAYER_RADIUS_METERS)).abs()
+                < 1e-12
+        );
+        walk_steps(
+            &mut player,
+            MovementInput {
+                forward: true,
+                ..MovementInput::default()
+            },
+            20,
+        );
+        assert!(
+            (player.local_ship_position().unwrap()[0] - (2.2 - PLAYER_RADIUS_METERS)).abs() < 1e-12
+        );
+        player = inside_at(1.3, 8.0);
+        walk_steps(
+            &mut player,
+            MovementInput {
+                left: true,
+                ..MovementInput::default()
+            },
+            15,
+        );
+        assert!(player.local_ship_position().unwrap()[2] < 3.0);
+        assert_eq!(player.local_ship_position().unwrap()[1], PLAYER_START[1]);
+        assert_eq!(player.location(), CharacterLocation::InsideShip);
+    }
+
+    #[test]
+    fn cargo_partition_blocks_both_sides_except_the_passage() {
+        for x in [-1.8, -1.0, 0.0] {
+            let mut cabin = inside_at(x, 3.0);
+            walk_steps(
+                &mut cabin,
+                MovementInput {
+                    right: true,
+                    ..MovementInput::default()
+                },
+                30,
+            );
+            assert!((cabin.local_ship_position().unwrap()[2] - INTERIOR_SIDE_LIMIT).abs() < 1e-12);
+            let mut cargo = inside_at(x, 7.0);
+            walk_steps(
+                &mut cargo,
+                MovementInput {
+                    left: true,
+                    ..MovementInput::default()
+                },
+                30,
+            );
+            assert!(
+                (cargo.local_ship_position().unwrap()[2] - (5.1 + PLAYER_RADIUS_METERS)).abs()
+                    < 1e-12
+            );
         }
     }
 

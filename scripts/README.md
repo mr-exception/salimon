@@ -55,10 +55,11 @@ python3 -m unittest discover -s scripts -p 'test_*.py'
 
 ## Phase 0 baseline suite
 
-The default `suite` checks six native gameplay paths:
+The default `suite` checks seven native gameplay paths:
 
 | Scenario | Coverage |
 | --- | --- |
+| `cargo-room.json` | Exit/re-enter the actual aft airlock, traverse the new port cargo passage, test outer walls and the solid partition, return to door/cockpit, take off and walk the room again in flight. |
 | `landed-earth.json` | Known initial player pose and ship state; walking/aiming into cockpit control; non-pilot control rejection; closed-door exit collision; opening and exiting to the surface; closing the door outside and walking against it twice; reopening and returning inside; the open-door takeoff interlock; closing the door and completing assisted takeoff. |
 | `resource-deposits.json` | Real airlock exit and surface walk to a stable generated silicate deposit; checks material, positive mass, proximity, and presentation data. |
 | `resource-streaming.json` | Partial mining, walking beyond the 120 m active radius, explicit source-ID absence, return with identical mass, full depletion, and a second round trip without regeneration or duplicate fragments. |
@@ -278,3 +279,20 @@ pickup, and the one-object limit. Their evidence variants add
 `deposit-context-tool-stowed`, `active-mining-context`, and
 `fragment-target-context` checkpoints alongside `blocked-second-pickup`.
 Both variants already run in the required Linux native-build job.
+
+## Cargo-room walkthrough (#34)
+
+The default suite includes `cargo-room.json`. Its evidence variant is required
+in Linux CI and records exterior/cockpit plus landed/flying cargo views. Run:
+
+```sh
+python scripts/salimon-test run scenarios/evidence/cargo-room.json \
+  --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
+```
+
+The helper waits 0.5 seconds before the normal platform screenshot command to
+reduce stale frames from asynchronous GPU presentation. It is not a GPU fence;
+authoritative movement/state assertions remain the verification source. Capture
+errors still fail the scenario and the runner's normal deadlines apply. Use a
+dedicated unobscured test display. Checked-in validation images and results are
+in [issue #34 evidence](../docs/issue-34/README.md).

@@ -268,3 +268,13 @@ scripts/salimon-test run scenarios/evidence/carrying.json
 The runtime contract test also executes the same scenario against the actual
 portable gameplay update/input path without a GPU, checking every assertion.
 This is logic coverage; a native E2E run establishes launch/render/capture coverage.
+
+## Contextual resource UI (#48)
+
+The existing mining/carrying routes also assert `resource_ui.context`, including
+material identity, rounded mass, partial depletion, tool-stowed inspection,
+active mining, empty context after looking away and stowing, loose-object
+pickup, and the one-object limit. Their evidence variants add
+`deposit-context-tool-stowed`, `active-mining-context`, and
+`fragment-target-context` checkpoints alongside `blocked-second-pickup`.
+Both variants already run in the required Linux native-build job.

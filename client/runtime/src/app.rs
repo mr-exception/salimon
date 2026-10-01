@@ -559,23 +559,15 @@ impl ClientApplication {
             ship_snapshot.door_state == DoorState::Open,
             self.e2e_config.map_or(0, |config| config.seed),
         );
-        let fragment_target = crate::carrying::target(
-            &self.mining,
-            character_snapshot,
-            ship_frame,
-            ship_snapshot.door_state == DoorState::Open,
-        );
         let contextual_action = action_bar_context(monitor_message, interaction)
-            .or_else(|| crate::carrying::context(&self.mining, fragment_target, character_snapshot))
+            .map(str::to_owned)
             .or_else(|| {
-                (character_snapshot.location == CharacterLocation::Surface).then_some(
-                    if !self.mining.equipped {
-                        "Press M to equip mining tool"
-                    } else if mining_target.is_some() {
-                        "Hold F or left mouse to mine"
-                    } else {
-                        "Aim at a deposit within 4 m - M to stow"
-                    },
+                crate::resource_context::context(
+                    &self.mining,
+                    character_snapshot,
+                    ship_frame,
+                    ship_snapshot.door_state == DoorState::Open,
+                    self.e2e_config.map_or(0, |config| config.seed),
                 )
             });
         self.action_bar.set_contextual(contextual_action);

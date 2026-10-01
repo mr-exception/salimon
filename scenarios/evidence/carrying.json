@@ -14,6 +14,12 @@
     },
     {
       "assert": {
+        "path": "resource_ui.context",
+        "equals": null
+      }
+    },
+    {
+      "assert": {
         "path": "player.local_ship_position_meters",
         "equals": [
           0.5,
@@ -378,6 +384,21 @@
       }
     },
     {
+      "assert": {
+        "path": "resource_ui.context",
+        "contains": "Silicate rock - approx"
+      }
+    },
+    {
+      "assert": {
+        "path": "resource_ui.context",
+        "contains": "kg left - untouched\nM to equip mining tool"
+      }
+    },
+    {
+      "screenshot": "deposit-context-tool-stowed"
+    },
+    {
       "action": {
         "op": "key",
         "key": "mine",
@@ -436,6 +457,12 @@
       }
     },
     {
+      "assert": {
+        "path": "resource_ui.context",
+        "contains": "Hold F or left mouse to mine"
+      }
+    },
+    {
       "action": {
         "op": "key",
         "key": "mine",
@@ -456,6 +483,15 @@
     },
     {
       "assert": {
+        "path": "resource_ui.context",
+        "contains": "Mining - release F or left mouse to stop"
+      }
+    },
+    {
+      "screenshot": "active-mining-context"
+    },
+    {
+      "assert": {
         "path": "mining.extracted_mass_kg",
         "approx": 1.92,
         "tolerance": 1e-09
@@ -472,6 +508,12 @@
       "assert": {
         "path": "world.nearest_deposit.state",
         "equals": "PartiallyMined"
+      }
+    },
+    {
+      "assert": {
+        "path": "resource_ui.context",
+        "contains": "Silicate rock - approx 34.5 kg left - partly mined"
       }
     },
     {
@@ -561,6 +603,12 @@
       "assert": {
         "path": "mining.target",
         "equals": null
+      }
+    },
+    {
+      "assert": {
+        "path": "resource_ui.context",
+        "equals": "Aim at a deposit within 4 m - M to stow"
       }
     },
     {
@@ -859,6 +907,15 @@
       }
     },
     {
+      "assert": {
+        "path": "resource_ui.context",
+        "equals": "Silicate rock fragment - approx 2.00 kg\nQ to pick up fragment"
+      }
+    },
+    {
+      "screenshot": "fragment-target-context"
+    },
+    {
       "action": {
         "op": "key",
         "key": "pickup",
@@ -904,6 +961,12 @@
       "assert": {
         "path": "carrying.target_id",
         "equals": 2
+      }
+    },
+    {
+      "assert": {
+        "path": "resource_ui.context",
+        "contains": "Only one world object - G to place/drop first"
       }
     },
     {

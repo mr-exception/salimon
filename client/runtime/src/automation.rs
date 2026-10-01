@@ -260,7 +260,15 @@ fn inspect(app: &ClientApplication) -> Value {
         frame,
         ship.door_state == salimon_ship::DoorState::Open,
     );
+    let resource_context = crate::resource_context::context(
+        &app.mining,
+        character,
+        frame,
+        ship.door_state == salimon_ship::DoorState::Open,
+        app.e2e_config.map_or(0, |config| config.seed),
+    );
     json!({
+        "resource_ui": {"context": resource_context},
         "carrying": {"object_id": app.mining.session.carried_id().map(|id| id.0),
             "target_id": fragment_target.map(|id| id.0),
             "context": crate::carrying::context(&app.mining, fragment_target, character),
@@ -390,7 +398,10 @@ mod tests {
             } else if let Some(check) = step.get("assert") {
                 // Mining/deposit checks independently verify the real route and hold/release controls.
                 let path = check["path"].as_str().unwrap();
-                if !path.starts_with("mining.") && !path.starts_with("world.") {
+                if !path.starts_with("mining.")
+                    && !path.starts_with("world.")
+                    && !path.starts_with("resource_ui.")
+                {
                     continue;
                 }
                 let state = inspect(&test);
@@ -407,6 +418,12 @@ mod tests {
                     } else {
                         assert_eq!(value, expected, "step {index}: {path}");
                     }
+                }
+                if let Some(expected) = check.get("contains") {
+                    assert!(
+                        value.as_str().unwrap().contains(expected.as_str().unwrap()),
+                        "step {index}: {path}: {value}"
+                    );
                 }
                 if let Some(expected) = check.get("approx") {
                     assert!(
@@ -534,6 +551,11 @@ mod tests {
                     } else {
                         assert_eq!(value, expected, "step {index}: {path}");
                     }
+                } else if let Some(expected) = check.get("contains") {
+                    assert!(
+                        value.as_str().unwrap().contains(expected.as_str().unwrap()),
+                        "step {index}: {path}: {value}"
+                    );
                 } else if let Some(expected) = check.get("approx") {
                     assert!(
                         (value.as_f64().unwrap() - expected.as_f64().unwrap()).abs()

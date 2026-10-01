@@ -14,6 +14,12 @@
     },
     {
       "assert": {
+        "path": "resource_ui.context",
+        "equals": null
+      }
+    },
+    {
+      "assert": {
         "path": "player.local_ship_position_meters",
         "equals": [
           0.5,
@@ -378,6 +384,18 @@
       }
     },
     {
+      "assert": {
+        "path": "resource_ui.context",
+        "contains": "Silicate rock - approx"
+      }
+    },
+    {
+      "assert": {
+        "path": "resource_ui.context",
+        "contains": "kg left - untouched\nM to equip mining tool"
+      }
+    },
+    {
       "action": {
         "op": "key",
         "key": "mine",
@@ -436,6 +454,12 @@
       }
     },
     {
+      "assert": {
+        "path": "resource_ui.context",
+        "contains": "Hold F or left mouse to mine"
+      }
+    },
+    {
       "action": {
         "op": "key",
         "key": "mine",
@@ -456,6 +480,12 @@
     },
     {
       "assert": {
+        "path": "resource_ui.context",
+        "contains": "Mining - release F or left mouse to stop"
+      }
+    },
+    {
+      "assert": {
         "path": "mining.extracted_mass_kg",
         "approx": 1.92,
         "tolerance": 1e-09
@@ -472,6 +502,12 @@
       "assert": {
         "path": "world.nearest_deposit.state",
         "equals": "PartiallyMined"
+      }
+    },
+    {
+      "assert": {
+        "path": "resource_ui.context",
+        "contains": "Silicate rock - approx 34.5 kg left - partly mined"
       }
     },
     {
@@ -561,6 +597,12 @@
       "assert": {
         "path": "mining.target",
         "equals": null
+      }
+    },
+    {
+      "assert": {
+        "path": "resource_ui.context",
+        "equals": "Aim at a deposit within 4 m - M to stow"
       }
     },
     {
@@ -823,6 +865,19 @@
         "path": "world.fragment_mass_kg",
         "approx": 36.40896041381627,
         "tolerance": 1e-08
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 0,
+        "dy": -1000
+      }
+    },
+    {
+      "assert": {
+        "path": "resource_ui.context",
+        "equals": null
       }
     }
   ]

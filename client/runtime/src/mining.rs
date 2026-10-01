@@ -38,7 +38,20 @@ impl MiningTool {
         door_open: bool,
         seed: u64,
     ) -> Option<MiningTarget> {
-        if !self.equipped || player.location != CharacterLocation::Surface {
+        self.equipped
+            .then(|| self.inspect_target(player, frame, door_open, seed))
+            .flatten()
+    }
+
+    /// Inspect a reachable deposit even when the handheld tool is stowed.
+    pub(crate) fn inspect_target(
+        &self,
+        player: CharacterSnapshot,
+        frame: ShipFrame,
+        door_open: bool,
+        seed: u64,
+    ) -> Option<MiningTarget> {
+        if player.location != CharacterLocation::Surface {
             return None;
         }
         let origin = position(player.eye_position_meters);

@@ -234,3 +234,22 @@ look input. `scenarios/carrying.json` verifies pickup, occupied-slot rejection,
 clear/occupied placement, subsequent pickup, tool independence, conservation,
 and visible entity proximity after walking. The evidence variant adds named
 screenshots, and required Linux CI runs both variants.
+
+## Contextual resource UI (#48)
+
+The existing bottom action bar shows the aimed deposit's catalog material name,
+approximate remaining kilograms, and untouched/partly-mined state within the
+production 4 m mining range and line of sight. Inspection works with the tool
+stowed; extraction still requires equipping it. The second line offers equip,
+mine, active-mining release, or stow controls according to current state.
+Aimed loose fragments show material and approximate kilograms with pickup;
+carrying shows drop/placement or the permanent one-object limit when aiming
+at another fragment. Ship interaction messages and short action feedback keep
+their existing priority. With no target, no carried object and a stowed tool,
+resource context disappears. There is no inventory panel or resource balance.
+
+`resource_ui.context` in test-mode inspection uses the same context builder as
+the rendered action bar. The mining and carrying baseline scenarios assert
+material/mass/state, mining controls, empty context, pickup and carrying limits;
+their evidence variants capture deposit targeting with the tool stowed, active
+mining, loose fragment targeting and blocked second pickup.

@@ -17,9 +17,9 @@ pub(crate) struct ActionBarImage<'a> {
 
 #[derive(Debug)]
 pub(crate) struct ActionBar {
-    contextual: Option<&'static str>,
+    contextual: Option<String>,
     transient: Option<(&'static str, Duration)>,
-    rendered_text: Option<&'static str>,
+    rendered_text: Option<String>,
     scale: u32,
     width: u32,
     height: u32,
@@ -57,7 +57,7 @@ impl ActionBar {
         }
     }
 
-    pub(crate) fn set_contextual(&mut self, message: Option<&'static str>) {
+    pub(crate) fn set_contextual(&mut self, message: Option<String>) {
         if self.contextual != message {
             self.contextual = message;
             self.rebuild_if_needed(false);
@@ -91,11 +91,11 @@ impl ActionBar {
         let text = self
             .transient
             .map(|(message, _)| message)
-            .or(self.contextual);
-        if !force && self.rendered_text == text {
+            .or(self.contextual.as_deref());
+        if !force && self.rendered_text.as_deref() == text {
             return;
         }
-        self.rendered_text = text;
+        self.rendered_text = text.map(str::to_owned);
         if let Some(text) = text {
             (self.width, self.height, self.pixels) = rasterize_action_bar(text, self.scale);
         } else {
@@ -117,12 +117,19 @@ fn rasterize_action_bar(text: &str, scale: u32) -> (u32, u32, Vec<u8>) {
     const BORDER: [u8; 4] = [45, 212, 191, 255];
     const TEXT: [u8; 4] = [248, 250, 252, 255];
 
-    let characters = text.chars().count().max(1) as u32;
+    let lines: Vec<_> = text.lines().collect();
+    let characters = lines
+        .iter()
+        .map(|line| line.chars().count())
+        .max()
+        .unwrap_or(1)
+        .max(1) as u32;
     let content_width = characters
         .saturating_mul(CHARACTER_ADVANCE)
         .saturating_sub(CHARACTER_ADVANCE - GLYPH_WIDTH);
     let width = (content_width + HORIZONTAL_PADDING * 2) * scale;
-    let height = (GLYPH_HEIGHT + VERTICAL_PADDING * 2) * scale;
+    let height =
+        (lines.len().max(1) as u32 * (GLYPH_HEIGHT + 2) - 2 + VERTICAL_PADDING * 2) * scale;
     let mut pixels = vec![0_u8; width as usize * height as usize * 4];
     for pixel in pixels.as_chunks_mut::<4>().0 {
         pixel.copy_from_slice(&BACKGROUND);
@@ -130,21 +137,23 @@ fn rasterize_action_bar(text: &str, scale: u32) -> (u32, u32, Vec<u8>) {
     fill_rect(&mut pixels, width, 0, 0, width, scale, BORDER);
     fill_rect(&mut pixels, width, 0, height - scale, width, scale, BORDER);
 
-    for (index, character) in text.chars().enumerate() {
-        let glyph_x = (HORIZONTAL_PADDING + index as u32 * CHARACTER_ADVANCE) * scale;
-        let glyph_y = VERTICAL_PADDING * scale;
-        for (row, bits) in glyph_rows(character).into_iter().enumerate() {
-            for column in 0..GLYPH_WIDTH {
-                if bits & (1 << (GLYPH_WIDTH - 1 - column)) != 0 {
-                    fill_rect(
-                        &mut pixels,
-                        width,
-                        glyph_x + column * scale,
-                        glyph_y + row as u32 * scale,
-                        scale,
-                        scale,
-                        TEXT,
-                    );
+    for (line_index, line) in lines.iter().enumerate() {
+        for (index, character) in line.chars().enumerate() {
+            let glyph_x = (HORIZONTAL_PADDING + index as u32 * CHARACTER_ADVANCE) * scale;
+            let glyph_y = (VERTICAL_PADDING + line_index as u32 * (GLYPH_HEIGHT + 2)) * scale;
+            for (row, bits) in glyph_rows(character).into_iter().enumerate() {
+                for column in 0..GLYPH_WIDTH {
+                    if bits & (1 << (GLYPH_WIDTH - 1 - column)) != 0 {
+                        fill_rect(
+                            &mut pixels,
+                            width,
+                            glyph_x + column * scale,
+                            glyph_y + row as u32 * scale,
+                            scale,
+                            scale,
+                            TEXT,
+                        );
+                    }
                 }
             }
         }
@@ -209,6 +218,8 @@ fn glyph_rows(character: char) -> [u8; 7] {
         '7' => [31, 1, 2, 4, 8, 8, 8],
         '8' => [14, 17, 17, 14, 17, 17, 14],
         '9' => [14, 17, 17, 15, 1, 1, 14],
+        '.' => [0, 0, 0, 0, 0, 6, 6],
+        '/' => [1, 2, 2, 4, 8, 8, 16],
         '%' => [17, 2, 4, 8, 17, 0, 0],
         '-' => [0, 0, 0, 31, 0, 0, 0],
         _ => [0; 7],
@@ -221,13 +232,41 @@ mod tests {
     use std::time::Duration;
 
     #[test]
+    fn dynamic_multiline_context_updates_mass_and_renders_both_rows() {
+        let mut bar = ActionBar::default();
+        bar.set_contextual(Some(
+            "Silicate rock - approx 10.5 kg left\nHold F to mine".to_owned(),
+        ));
+        let first = bar.image(true).unwrap();
+        let revision = first.revision;
+        assert_eq!(first.height, 88);
+        let text_pixels_on_row = |row: usize| {
+            first.rgba8[row * first.width as usize * 4..(row + 1) * first.width as usize * 4]
+                .as_chunks::<4>()
+                .0
+                .contains(&[248, 250, 252, 255])
+        };
+        assert!(text_pixels_on_row(12));
+        assert!(text_pixels_on_row(48));
+        bar.set_contextual(Some(
+            "Silicate rock - approx 9.5 kg left\nHold F to mine".to_owned(),
+        ));
+        assert!(bar.image(true).unwrap().revision > revision);
+        bar.show_transient("Only one world object - G to place/drop first");
+        bar.advance(Duration::from_secs(3));
+        assert!(bar.rendered_text.as_deref().unwrap().contains("9.5 kg"));
+        bar.set_contextual(None);
+        assert!(bar.image(true).is_none());
+    }
+
+    #[test]
     fn contextual_prompts_appear_change_and_disappear() {
         let mut bar = ActionBar::default();
         assert!(bar.image(true).is_none());
 
-        bar.set_contextual(Some("Press L to land"));
+        bar.set_contextual(Some("Press L to land".to_owned()));
         let landing_revision = bar.image(true).expect("landing action is visible").revision;
-        bar.set_contextual(Some("Press L to take off"));
+        bar.set_contextual(Some("Press L to take off".to_owned()));
         assert!(bar.image(true).expect("takeoff action is visible").revision > landing_revision);
 
         bar.set_contextual(None);
@@ -237,20 +276,26 @@ mod tests {
     #[test]
     fn blocked_action_temporarily_overrides_then_restores_context() {
         let mut bar = ActionBar::default();
-        bar.set_contextual(Some("Press L to take off"));
+        bar.set_contextual(Some("Press L to take off".to_owned()));
         bar.show_transient("Door locked while in flight");
-        assert_eq!(bar.rendered_text, Some("Door locked while in flight"));
+        assert_eq!(
+            bar.rendered_text.as_deref(),
+            Some("Door locked while in flight")
+        );
 
         bar.advance(Duration::from_secs(2));
-        assert_eq!(bar.rendered_text, Some("Door locked while in flight"));
+        assert_eq!(
+            bar.rendered_text.as_deref(),
+            Some("Door locked while in flight")
+        );
         bar.advance(Duration::from_secs(1));
-        assert_eq!(bar.rendered_text, Some("Press L to take off"));
+        assert_eq!(bar.rendered_text.as_deref(), Some("Press L to take off"));
     }
 
     #[test]
     fn action_bar_is_hidden_outside_normal_gameplay_view() {
         let mut bar = ActionBar::default();
-        bar.set_contextual(Some("Close door before takeoff"));
+        bar.set_contextual(Some("Close door before takeoff".to_owned()));
         assert!(bar.image(true).is_some());
         assert!(bar.image(false).is_none());
     }

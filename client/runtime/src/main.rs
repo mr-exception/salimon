@@ -7,6 +7,7 @@ mod carrying;
 mod e2e;
 mod frame_clock;
 mod mining;
+mod resource_context;
 mod resource_presentation;
 mod update_clock;
 

@@ -98,6 +98,7 @@ pub fn extract(deposit: &mut ResourceDeposit, delta: Duration) -> f64 {
 /// create a new session when starting a different world/seed configuration.
 #[derive(Default)]
 pub struct MiningSession {
+    carry: crate::carrying::CarrySlot,
     remaining: std::collections::HashMap<DepositId, f64>,
     extracted_mass_kg: f64,
     fragments: crate::resource_fragments::FragmentOutput,
@@ -130,6 +131,43 @@ impl MiningSession {
             self.extracted_mass_kg += removed;
         }
         removed
+    }
+
+    pub fn carried_id(&self) -> Option<crate::resources::FragmentId> {
+        self.carry.object().map(|object| match object {
+            crate::carrying::WorldObjectId::ResourceFragment(id) => id,
+        })
+    }
+
+    pub fn pick_up(&mut self, id: crate::resources::FragmentId) -> bool {
+        if !self.fragments().iter().any(|piece| piece.id() == id)
+            || !self
+                .carry
+                .pick_up(crate::carrying::WorldObjectId::ResourceFragment(id))
+        {
+            return false;
+        }
+        // Extraction must never grow a piece after the player has collected it.
+        self.fragments.seal(id);
+        true
+    }
+
+    pub fn move_carried(&mut self, pose: crate::resources::ResourceTransform) {
+        if let Some(id) = self.carried_id() {
+            self.fragments
+                .get_mut(id)
+                .expect("carried identity exists")
+                .set_transform(pose);
+        }
+    }
+
+    pub fn drop_carried(&mut self, pose: crate::resources::ResourceTransform) -> bool {
+        if self.carried_id().is_none() {
+            return false;
+        }
+        self.move_carried(pose);
+        self.carry.release();
+        true
     }
 
     /// Diagnostic extraction total, never spendable inventory or carried mass.

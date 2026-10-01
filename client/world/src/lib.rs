@@ -7,6 +7,7 @@
 
 use std::time::Duration;
 
+pub mod carrying;
 pub mod mining;
 pub mod resource_distribution;
 pub mod resource_fragments;

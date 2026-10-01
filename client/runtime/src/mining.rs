@@ -9,6 +9,7 @@ use salimon_world::resource_generation::{GenerationError, SurfaceDeposit};
 
 #[derive(Default)]
 pub(crate) struct MiningTool {
+    pub(crate) carry_feedback: Option<&'static str>,
     pub(crate) equipped: bool,
     pub(crate) held: bool,
     pub(crate) session: MiningSession,
@@ -94,7 +95,7 @@ impl MiningTool {
     }
 
     pub(crate) fn visuals(&self, player: CharacterSnapshot, active: bool) -> Vec<SceneInstance> {
-        if !self.equipped || player.location != CharacterLocation::Surface {
+        if player.location != CharacterLocation::Surface {
             return Vec::new();
         }
         let Some(ray) = MiningRay::new(
@@ -103,6 +104,16 @@ impl MiningTool {
         ) else {
             return Vec::new();
         };
+        let marker = SceneInstance {
+            center_meters: std::array::from_fn(|i| {
+                player.eye_position_meters[i] + ray.direction[i] * 0.5
+            }),
+            half_extents_meters: [0.002; 3],
+            color: [0.9, 0.9, 0.9, 1.0],
+        };
+        if !self.equipped {
+            return vec![marker];
+        }
         let up = player.up.map(f64::from);
         let right = [
             ray.direction[1] * up[2] - ray.direction[2] * up[1],
@@ -134,14 +145,7 @@ impl MiningTool {
                 half_extents_meters: [0.03, 0.05, 0.03],
                 color: [0.15, 0.17, 0.20, 1.0],
             },
-            // A small aim marker on the camera ray, independent of world scale.
-            SceneInstance {
-                center_meters: std::array::from_fn(|i| {
-                    player.eye_position_meters[i] + ray.direction[i] * 0.5
-                }),
-                half_extents_meters: [0.002; 3],
-                color: [0.9, 0.9, 0.9, 1.0],
-            },
+            marker,
         ]
     }
 }

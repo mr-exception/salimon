@@ -124,6 +124,7 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
             match (dx, dy) {
                 (Some(dx), Some(dy)) if dx.is_finite() && dy.is_finite() => {
                     app.character.apply_mouse_delta(dx, dy);
+                    app.sync_carried();
                     Ok(json!({"applied": true}))
                 }
                 _ => Err(("invalid_argument", "finite dx and dy numbers required")),
@@ -176,6 +177,8 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "right" => Some(KeyCode::KeyD),
         "jump" => Some(KeyCode::Space),
         "equip_mining_tool" => Some(KeyCode::KeyM),
+        "pickup" => Some(KeyCode::KeyQ),
+        "drop" => Some(KeyCode::KeyG),
         "mine" => Some(KeyCode::KeyF),
         "roll_left" => Some(KeyCode::ArrowLeft),
         "roll_right" => Some(KeyCode::ArrowRight),
@@ -238,6 +241,9 @@ fn inspect(app: &ClientApplication) -> Value {
             let mesh = crate::resource_presentation::fragment_visual(piece);
             json!({
                 "id": piece.id().0,
+                "carried": app.mining.session.carried_id() == Some(piece.id()),
+                "distance_to_player_meters": piece.transform().position().offset_from(salimon_world::WorldPosition::new(character.eye_position_meters[0], character.eye_position_meters[1], character.eye_position_meters[2])).iter().map(|v| v * v).sum::<f64>().sqrt(),
+                "ship_local_position_meters": frame.world_to_local(piece.transform().position().meters()),
                 "source_deposit_id": format!("{:?}:{}", piece.source().body, piece.source().local),
                 "resource": piece.material().resource().key(),
                 "mass_kg": piece.material().mass_kg(), "volume_m3": piece.material().volume_m3(),
@@ -248,7 +254,17 @@ fn inspect(app: &ClientApplication) -> Value {
             })
         })
         .collect();
+    let fragment_target = crate::carrying::target(
+        &app.mining,
+        character,
+        frame,
+        ship.door_state == salimon_ship::DoorState::Open,
+    );
     json!({
+        "carrying": {"object_id": app.mining.session.carried_id().map(|id| id.0),
+            "target_id": fragment_target.map(|id| id.0),
+            "context": crate::carrying::context(&app.mining, fragment_target, character),
+            "last_action_feedback": app.mining.carry_feedback},
         "mining": { "equipped": app.mining.equipped, "held": app.mining.held,
             "active": app.mining.held && mining_target.is_some(),
             "extracted_mass_kg": app.mining.session.extracted_mass_kg(),
@@ -258,7 +274,7 @@ fn inspect(app: &ClientApplication) -> Value {
         "player": {"location": format!("{:?}", character.location),
             "eye_position_meters": character.eye_position_meters,
             "ship_local_eye_position_meters": local_eye,
-            "look_target_meters": character.look_target_meters,
+            "look_target_meters": character.look_target_meters, "up": character.up,
             "local_ship_position_meters": character.local_ship_position_meters},
         "ship": {"position_meters": ship.pose.position_meters, "orientation": ship.pose.orientation,
             "flight_state": format!("{:?}", ship.flight_state), "door_state": format!("{:?}", ship.door_state),
@@ -444,6 +460,74 @@ mod tests {
                 }
                 let value =
                     value.unwrap_or_else(|| panic!("missing step {index}: {path}: {state}"));
+                if let Some(expected) = check.get("equals") {
+                    if value.is_number() && expected.is_number() {
+                        assert_eq!(value.as_f64(), expected.as_f64(), "step {index}: {path}");
+                    } else {
+                        assert_eq!(value, expected, "step {index}: {path}");
+                    }
+                } else if let Some(expected) = check.get("approx") {
+                    assert!(
+                        (value.as_f64().unwrap() - expected.as_f64().unwrap()).abs()
+                            <= check["tolerance"].as_f64().unwrap(),
+                        "step {index}: {path}: {value}"
+                    );
+                } else if let Some(expected) = check.get("gt") {
+                    assert!(
+                        value.as_f64().unwrap() > expected.as_f64().unwrap(),
+                        "step {index}: {path}"
+                    );
+                } else if let Some(expected) = check.get("lt") {
+                    assert!(
+                        value.as_f64().unwrap() < expected.as_f64().unwrap(),
+                        "step {index}: {path}"
+                    );
+                } else {
+                    panic!("unhandled check at step {index}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn physical_carrying_walkthrough_uses_real_gameplay_actions() {
+        let mut test = app(Scenario::LandedEarth);
+        e2e::initialize(
+            &mut test,
+            Config {
+                scenario: Scenario::LandedEarth,
+                seed: 0,
+                step: Duration::from_millis(16),
+            },
+        )
+        .unwrap();
+        let scenario: Value =
+            serde_json::from_str(include_str!("../../../scenarios/carrying.json")).unwrap();
+        for (index, step) in scenario["steps"].as_array().unwrap().iter().enumerate() {
+            if let Some(action) = step.get("action") {
+                let mut command = action.clone();
+                command["protocol"] = json!(1);
+                command["id"] = json!(index);
+                assert_eq!(execute(&mut test, &command.to_string())["ok"], true);
+            } else if let Some(check) = step.get("assert") {
+                let state = inspect(&test);
+                let path = check["path"].as_str().unwrap();
+                let value = path.split('.').try_fold(&state, |value, key| {
+                    if value.is_array() {
+                        value.get(key.parse::<usize>().unwrap())
+                    } else {
+                        value.get(key)
+                    }
+                });
+                if let Some(expected) = check.get("exists") {
+                    assert_eq!(
+                        value.is_some(),
+                        expected.as_bool().unwrap(),
+                        "step {index}: {path}"
+                    );
+                    continue;
+                }
+                let value = value.unwrap_or_else(|| panic!("missing step {index}: {path}"));
                 if let Some(expected) = check.get("equals") {
                     if value.is_number() && expected.is_number() {
                         assert_eq!(value.as_f64(), expected.as_f64(), "step {index}: {path}");

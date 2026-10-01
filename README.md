@@ -107,6 +107,9 @@ landed ship facing the cockpit. Use **WASD** to walk, the mouse to look, and
 control instantly; press **E** near the aft door to open/close it while landed.
 Press **M** to equip the handheld mining tool on the surface; aim at a deposit
 within 4 m and hold **F** or left mouse to extract at 2 kg/s. Press M to stow.
+Aim at a physical fragment within 3 m and press **Q** to pick it up. You can
+carry one world object at a time; equipped gear remains separate. Press **G**
+to place/drop it on clear nearby planetary ground.
 Face the open door and walk forward through it to transition over 0.25 seconds to Earth-radial
 gravity and inspect the ship exterior. There is no sprint or crouch. Press
 **Escape** to release the captured cursor for window controls; click the game

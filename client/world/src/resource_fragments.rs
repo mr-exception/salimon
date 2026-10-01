@@ -11,6 +11,7 @@ pub const FRAGMENT_MAX_MASS_KG: f64 = 2.0;
 #[derive(Default)]
 pub(crate) struct FragmentOutput {
     fragments: Vec<ResourceFragment>,
+    sealed: std::collections::HashSet<FragmentId>,
 }
 
 impl FragmentOutput {
@@ -18,12 +19,19 @@ impl FragmentOutput {
         &self.fragments
     }
 
+    pub(crate) fn get_mut(&mut self, id: FragmentId) -> Option<&mut ResourceFragment> {
+        self.fragments.iter_mut().find(|piece| piece.id() == id)
+    }
+
+    pub(crate) fn seal(&mut self, id: FragmentId) {
+        self.sealed.insert(id);
+    }
+
     pub(crate) fn emit(&mut self, deposit: ResourceDeposit, mut mass: f64) {
         while mass > 0.0 {
-            let tail = self
-                .fragments
-                .iter()
-                .rposition(|piece| piece.source() == deposit.id());
+            let tail = self.fragments.iter().rposition(|piece| {
+                piece.source() == deposit.id() && !self.sealed.contains(&piece.id())
+            });
             let growing = tail
                 .filter(|index| self.fragments[*index].material().mass_kg() < FRAGMENT_MAX_MASS_KG);
             let previous = growing.map_or(0.0, |index| self.fragments[index].material().mass_kg());

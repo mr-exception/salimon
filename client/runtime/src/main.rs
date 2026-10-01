@@ -3,6 +3,7 @@
 mod action_bar;
 mod app;
 mod automation;
+mod carrying;
 mod e2e;
 mod frame_clock;
 mod mining;

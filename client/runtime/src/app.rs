@@ -416,6 +416,15 @@ impl ClientApplication {
     }
 
     pub(crate) fn automation_key(&mut self, key: PhysicalKey, pressed: bool) {
+        if self.view_mode != ViewMode::Gameplay {
+            return;
+        }
+        if matches!(key, PhysicalKey::Code(KeyCode::KeyQ | KeyCode::KeyG)) {
+            if pressed {
+                self.carry_action(key == PhysicalKey::Code(KeyCode::KeyQ));
+            }
+            return;
+        }
         if key == PhysicalKey::Code(KeyCode::KeyM) && pressed {
             self.mining.toggle();
             return;
@@ -431,6 +440,47 @@ impl ClientApplication {
         } else {
             update_movement_input(&mut self.movement_input, key, pressed);
         }
+    }
+
+    fn carry_action(&mut self, pickup: bool) {
+        let ship = self.ship.snapshot();
+        let frame = character_ship_frame(ship.pose);
+        let player = self.character.snapshot(frame, surface_frame_for_ship(ship));
+        let door_open = ship.door_state == DoorState::Open;
+        let message = if pickup {
+            match crate::carrying::target(&self.mining, player, frame, door_open) {
+                Some(id) if self.mining.session.pick_up(id) => {
+                    "Fragment picked up - G to place/drop"
+                }
+                Some(_) => "Only one world object - G to place/drop first",
+                None => "Aim at a fragment within 3 m",
+            }
+        } else if self.mining.session.carried_id().is_none() {
+            "No world object carried"
+        } else if let Some(pose) = crate::carrying::drop_pose(
+            &self.mining,
+            player,
+            frame,
+            door_open,
+            self.e2e_config.map_or(0, |config| config.seed),
+        ) {
+            self.mining.session.drop_carried(pose);
+            "Fragment placed"
+        } else {
+            "Aim at clear nearby ground to place fragment"
+        };
+        crate::carrying::follow(&mut self.mining, player);
+        self.mining.carry_feedback = Some(message);
+        self.action_bar.show_transient(message);
+    }
+
+    pub(crate) fn sync_carried(&mut self) {
+        let ship = self.ship.snapshot();
+        let frame = character_ship_frame(ship.pose);
+        crate::carrying::follow(
+            &mut self.mining,
+            self.character.snapshot(frame, surface_frame_for_ship(ship)),
+        );
     }
 
     /// The same portable gameplay update runs on redraw and on explicit E2E steps.
@@ -460,6 +510,7 @@ impl ClientApplication {
                 self.e2e_config.map_or(0, |config| config.seed),
             );
         }
+        self.sync_carried();
         self.action_bar.advance(delta);
     }
 
@@ -482,6 +533,7 @@ impl ClientApplication {
         if !update_delta.is_zero() {
             self.advance_game(update_delta);
         }
+        self.sync_carried();
         let ship_snapshot = self.ship.snapshot();
         let ship_frame = character_ship_frame(ship_snapshot.pose);
         let surface_frame = surface_frame_for_ship(ship_snapshot);
@@ -507,17 +559,25 @@ impl ClientApplication {
             ship_snapshot.door_state == DoorState::Open,
             self.e2e_config.map_or(0, |config| config.seed),
         );
-        let contextual_action = action_bar_context(monitor_message, interaction).or_else(|| {
-            (character_snapshot.location == CharacterLocation::Surface).then_some(
-                if !self.mining.equipped {
-                    "Press M to equip mining tool"
-                } else if mining_target.is_some() {
-                    "Hold F or left mouse to mine"
-                } else {
-                    "Aim at a deposit within 4 m - M to stow"
-                },
-            )
-        });
+        let fragment_target = crate::carrying::target(
+            &self.mining,
+            character_snapshot,
+            ship_frame,
+            ship_snapshot.door_state == DoorState::Open,
+        );
+        let contextual_action = action_bar_context(monitor_message, interaction)
+            .or_else(|| crate::carrying::context(&self.mining, fragment_target, character_snapshot))
+            .or_else(|| {
+                (character_snapshot.location == CharacterLocation::Surface).then_some(
+                    if !self.mining.equipped {
+                        "Press M to equip mining tool"
+                    } else if mining_target.is_some() {
+                        "Hold F or left mouse to mine"
+                    } else {
+                        "Aim at a deposit within 4 m - M to stow"
+                    },
+                )
+            });
         self.action_bar.set_contextual(contextual_action);
         window.set_title(&gameplay_window_title(monitor_message, interaction));
         let ship_mesh = if self.view_mode == ViewMode::Gameplay {
@@ -818,7 +878,9 @@ impl ApplicationHandler for ClientApplication {
             }
             WindowEvent::KeyboardInput { event, .. }
                 if event.physical_key == PhysicalKey::Code(KeyCode::KeyM)
-                    || event.physical_key == PhysicalKey::Code(KeyCode::KeyF) =>
+                    || event.physical_key == PhysicalKey::Code(KeyCode::KeyF)
+                    || event.physical_key == PhysicalKey::Code(KeyCode::KeyQ)
+                    || event.physical_key == PhysicalKey::Code(KeyCode::KeyG) =>
             {
                 if self.cursor_captured && !event.repeat {
                     self.automation_key(event.physical_key, event.state == ElementState::Pressed);

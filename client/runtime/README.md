@@ -193,16 +193,44 @@ use the same input path. `inspect` exposes `mining.equipped`, `held`, `active`,
 `target`, `range_meters`, `rate_kg_per_second`, and diagnostic
 `extracted_mass_kg`. Deposit inspection and visuals read world-owned session
 mass deltas. Extraction is advanced only by simulation steps in E2E mode.
-Physical collection is the subsequent #46 scope.
+Physical collection uses Q/G as described below.
 
 ## Physical resource fragments (#45)
 
 Mining creates visible material-colored cubes beside the deposit. A piece grows
 up to 2 kg before the next piece starts; its size follows material density and
 mass. Fragments remain in the local session after stowing the tool or leaving
-the active area. They are stationary world objects; pickup/drop is #46.
+the active area. They are stationary when loose, and follow the player while carried.
 `world.fragments` exposes nearby IDs, source-deposit IDs, material keys, mass,
 volume, side length, absolute pose, and visual extents. `world.fragment_count`
 and `world.fragment_mass_kg` inspect all session output (diagnostics, not inventory).
 Presentation and nearby inspection use the same 120 m query. Mining evidence
 screenshots show both fractional output and the pieces left after depletion.
+
+## Physical carrying (#46)
+
+On a planetary surface, aim the center marker at a fragment within **3 m** and
+press **Q**. Exact cube bounds, solid terrain, and hull/gate/engine sight proxies
+validate the target. One shared domain `CarrySlot` holding `WorldObjectId` represents the permanent limit
+for all future world-object kinds; there is no upgradeable capacity or resource
+inventory. Equipped mining gear stays separate. A second pickup is rejected with
+contextual feedback and does not change either object's identity or mass.
+
+The same physical entity follows the eye/look pose, stays visible at the player's
+left hand, and retains its material, mass, volume, provenance, and orientation.
+Collecting a partial piece seals its mass: further mining starts/grows a different
+loose piece. Press **G** to place/drop onto aimed nearby ground, or ground just
+ahead when looking horizontally. Placement maintains radial ground clearance
+and rejects hull obstruction, occupied fragment space, and intact deposits.
+Loose pieces remain stationary; throwing/rigid-body simulation is not added.
+Inside-ship/cargo placement and gravity-frame transfer remain issue #47's scope.
+
+Automation keys `pickup` and `drop` use the same Q/G handlers. Inspection exposes
+`carrying.object_id`, `target_id`, `context`, and `last_action_feedback`; each
+nearby physical fragment includes `carried`, distance to player, and ship-local
+position. The final feedback is diagnostic history, while gameplay transient
+feedback expires after three seconds. Carry poses synchronize on movement and
+look input. `scenarios/carrying.json` verifies pickup, occupied-slot rejection,
+clear/occupied placement, subsequent pickup, tool independence, conservation,
+and visible entity proximity after walking. The evidence variant adds named
+screenshots, and required Linux CI runs both variants.

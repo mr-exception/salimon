@@ -117,3 +117,48 @@ fn separate_deposits_have_unique_ids_and_requery_does_not_duplicate_output() {
     assert_eq!(reloaded[0].deposit.remaining_mass_kg(), 4.0);
     assert_eq!(session.fragments(), before);
 }
+
+#[test]
+fn collected_piece_preserves_identity_mass_and_pose_during_further_extraction() {
+    use salimon_world::resources::{FragmentId, ResourceTransform};
+    let body = CELESTIAL_BODIES[3];
+    let mut deposit = ResourceDeposit::new(
+        DepositId {
+            body: body.id,
+            local: 1,
+        },
+        RawMaterial::new(RESOURCE_CATALOG[0].id, 5.0).unwrap(),
+        body.center.translated([0.0, body.radius_meters, 0.0]),
+        5.0,
+    )
+    .unwrap();
+    let mut session = MiningSession::default();
+    session.extract(&mut deposit, Duration::from_millis(250));
+    let original = session.fragments()[0];
+    assert!(!session.pick_up(FragmentId(999)));
+    assert!(session.pick_up(original.id()));
+    let held = ResourceTransform::new(
+        original.transform().position().translated([1.0, 2.0, 3.0]),
+        original.transform().orientation_xyzw(),
+    )
+    .unwrap();
+    session.move_carried(held);
+    session.extract(&mut deposit, Duration::from_millis(250));
+    assert_eq!(session.fragments().len(), 2);
+    assert!(!session.pick_up(session.fragments()[1].id()));
+    assert_eq!(session.carried_id(), Some(original.id()));
+    assert_eq!(session.fragments()[0].material(), original.material());
+    assert_eq!(session.fragments()[0].source(), original.source());
+    assert_eq!(session.fragments()[0].transform(), held);
+    assert!(session.drop_carried(original.transform()));
+    assert!(!session.drop_carried(held));
+    session.extract(&mut deposit, Duration::from_secs(100));
+    assert_eq!(session.fragments()[0], original);
+    let sum: f64 = session
+        .fragments()
+        .iter()
+        .map(|p| p.material().mass_kg())
+        .sum();
+    assert_eq!(sum, 5.0);
+    assert!(session.pick_up(session.fragments()[1].id()));
+}

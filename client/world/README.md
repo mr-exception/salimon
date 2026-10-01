@@ -44,3 +44,12 @@ See [solar-system-layout.md](solar-system-layout.md) for the exact compressed
 catalog and travel/landing math, [coordinate-strategy.md](coordinate-strategy.md)
 for measured numeric limits, [architecture.md](architecture.md) for dependency
 boundaries, and [invariants.md](invariants.md) before changing world behavior.
+
+### Physical carrying
+
+`carrying` owns the permanent one-world-object identity slot, independent of gear,
+and exact cube aiming with supplied terrain/hull occlusion. `MiningSession` owns
+the carried fragment ID, guarded pickup, transform changes, and release, keeping
+the physical entity in the same session collection throughout. Collected pieces
+are sealed against later extraction growth. Runtime composes character-relative
+poses and validates planetary placement; ship/cargo transfer is future work.

@@ -55,13 +55,14 @@ python3 -m unittest discover -s scripts -p 'test_*.py'
 
 ## Phase 0 baseline suite
 
-The default `suite` checks five native gameplay paths:
+The default `suite` checks six native gameplay paths:
 
 | Scenario | Coverage |
 | --- | --- |
 | `landed-earth.json` | Known initial player pose and ship state; walking/aiming into cockpit control; non-pilot control rejection; closed-door exit collision; opening and exiting to the surface; closing the door outside and walking against it twice; reopening and returning inside; the open-door takeoff interlock; closing the door and completing assisted takeoff. |
 | `resource-deposits.json` | Real airlock exit and surface walk to a stable generated silicate deposit; checks material, positive mass, proximity, and presentation data. |
 | `resource-streaming.json` | Partial mining, walking beyond the 120 m active radius, explicit source-ID absence, return with identical mass, full depletion, and a second round trip without regeneration or duplicate fragments. |
+| `carrying.json` | Physical pickup, blocked second pickup, equipped-tool independence, occupied/clear placement, subsequent pickup, and entity proximity after walking. |
 | `mining.json` | Surface tool equip/aim/hold, exact timed extraction, aim/range/release rejection, return to the deposit, bounded depletion, and stow; no inventory credit. |
 | `orbit-earth.json` | Known seeded orbit pose; thruster changes; starting assisted landing; repeated landing action cannot cancel it; leaving cockpit control during landing; autonomous completion with zero ship velocity. |
 
@@ -249,3 +250,21 @@ physical output totals. The baseline is included in the default suite; Linux CI
 also runs `scenarios/evidence/resource-streaming.json` with named screenshots.
 No teleportation or test-only state mutation is used. Local session state is
 retained only until the world/session ends, without disk or backend persistence.
+
+## Physical pickup/drop (#46)
+
+`scenarios/carrying.json` follows the real mining route, approaches and aims at
+physical pieces, and uses `pickup`/`drop` keys (Q/G). It verifies single-object
+rejection, material/mass/identity preservation, tool independence, placement
+rejection on occupied ground, release, subsequent pickup, and carried entity
+proximity after movement. The evidence variant adds first pickup, blocked second
+pickup, placement, and moving carry screenshots. Both run in required Linux CI.
+Run the evidence variant with a working display/capture helper:
+
+```sh
+scripts/salimon-test run scenarios/evidence/carrying.json
+```
+
+The runtime contract test also executes the same scenario against the actual
+portable gameplay update/input path without a GPU, checking every assertion.
+This is logic coverage; a native E2E run establishes launch/render/capture coverage.

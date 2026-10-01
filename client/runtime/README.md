@@ -287,3 +287,12 @@ normal thruster/airlock/walking actions to exit at 25,000 m/s and cross influenc
 `player.nearby_body` reports the selected solid body and player surface distance.
 Velocity inspection includes inherited motion plus gravity and assisted input.
 Body selection uses the player's world position independently of ship telemetry.
+
+### Physical cargo membership
+
+`cargo` derives containment from session fragments and ship-local support anchors,
+using the generated character layout bounds and conservative placement clearance.
+It owns no duplicate entity or inventory state. Inspection lists the actual cargo
+entities independent of nearby presentation filtering; pickup excludes carried
+objects immediately. The physical-cargo baseline covers repeated deliveries,
+leave/return, removal, and ship-local stability in flight.

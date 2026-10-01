@@ -242,6 +242,7 @@ fn inspect(app: &ClientApplication) -> Value {
             let mesh = crate::resource_presentation::fragment_visual(piece);
             json!({
                 "id": piece.id().0,
+                "in_cargo_room": crate::cargo::stored(&app.mining, piece),
                 "reference_frame": if app.mining.ship_fragments.contains_key(&piece.id()) { "ship" } else { "world" },
                 "carried": app.mining.session.carried_id() == Some(piece.id()),
                 "distance_to_player_meters": piece.transform().position().offset_from(salimon_world::WorldPosition::new(character.eye_position_meters[0], character.eye_position_meters[1], character.eye_position_meters[2])).iter().map(|v| v * v).sum::<f64>().sqrt(),
@@ -254,6 +255,21 @@ fn inspect(app: &ClientApplication) -> Value {
                 "orientation_xyzw": piece.transform().orientation_xyzw(),
                 "visual": {"color": mesh.color, "half_extents_meters": mesh.half_extents_meters}
             })
+        })
+        .collect();
+    let cargo_fragments: Vec<_> = app
+        .mining
+        .session
+        .fragments()
+        .iter()
+        .copied()
+        .filter(|piece| crate::cargo::stored(&app.mining, *piece))
+        .map(|piece| {
+            json!({"id": piece.id().0,
+            "source_deposit_id": format!("{:?}:{}", piece.source().body, piece.source().local),
+            "resource": piece.material().resource().key(), "mass_kg": piece.material().mass_kg(),
+            "volume_m3": piece.material().volume_m3(),
+            "ship_local_position_meters": app.mining.ship_fragments[&piece.id()]})
         })
         .collect();
     let fragment_target = crate::carrying::target(
@@ -308,6 +324,9 @@ fn inspect(app: &ClientApplication) -> Value {
                 "surface_distance_meters": body.surface_distance_meters,
                 "radial_speed_meters_per_second": body.radial_speed_meters_per_second})),
             "cockpit_message": ship.cockpit_message.map(|message| message.text())},
+        "cargo": {"bounds_min_meters": salimon_character::CARGO_ROOM_MIN_METERS,
+            "bounds_max_meters": salimon_character::CARGO_ROOM_MAX_METERS,
+            "fragment_count": cargo_fragments.len(), "fragments": cargo_fragments},
         "interaction": interaction,
         "world": {"fragments": fragments,
             "fragment_count": app.mining.session.fragments().len(),
@@ -556,6 +575,14 @@ mod tests {
         assert_gameplay_scenario(
             Scenario::EvaApproach,
             include_str!("../../../scenarios/nearby-eva.json"),
+        );
+    }
+
+    #[test]
+    fn physical_cargo_walkthrough_uses_real_gameplay_actions() {
+        assert_gameplay_scenario(
+            Scenario::LandedEarth,
+            include_str!("../../../scenarios/physical-cargo.json"),
         );
     }
 

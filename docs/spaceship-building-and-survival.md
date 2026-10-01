@@ -16,9 +16,10 @@ The initial scout has a dedicated port module with a 29.7 m² clear cargo floor
 (local X −3.2…2.2 m, Z 5.1…10.6 m), level with the cabin at Y 0.2473118 m.
 A 1.8 m passage at X 0.4…2.2 m leads from the cabin port aisle into the room.
 The cockpit and aft airlock anchors are preserved. The physical space supports
-future loose-fragment storage and containers; counting, containment behavior and
-planet-to-ship fragment transfer are implemented by their separate dependent
-tasks. The room remains in the ship's reference frame during flight.
+loose-fragment storage and future containers. Physical membership is derived
+from the actual loose entities supported by the ship whose complete conservative
+bounds fit inside this room; carried, cabin and surface objects are excluded.
+Pickup and clear-floor placement update membership without a separate inventory. The room remains in the ship's reference frame during flight.
 
 ## Construction
 - Ship expansion uses **modular rooms/hull sections**.

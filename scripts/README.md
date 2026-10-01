@@ -381,3 +381,19 @@ python scripts/salimon-test run scenarios/evidence/fragment-transfer.json \
 Inspection exposes each visible fragment's `reference_frame` (`ship` for loose
 interior anchors, `world` otherwise) alongside its existing carried flag and
 ship-local pose. These fields describe actual physical entities, not inventory.
+
+## Physical cargo containment (#49)
+
+`physical-cargo.json` mines a generated deposit and stores two real fragments
+across separate trips through the cargo passage. It verifies the one-object
+limit, room leave/re-entry, removal to the surface, and stable cargo through
+assisted takeoff and flight. `cargo.fragments` lists only actual loose fragments
+whose complete conservative bound fits within the generated cargo-room bounds;
+it is independent of player distance and excludes carried and cabin/surface
+objects. `cargo.fragment_count` derives from that list, never an inventory counter.
+
+The baseline runs in the default suite and its complete action/assertion route
+also runs in a portable runtime regression. The evidence variant adds five named
+captures and runs in required Linux CI with settled capture. Capture failures fail
+that run. See [validation status](../docs/issue-49/README.md) for the current local
+display limitation and commands to reproduce on a working native display.

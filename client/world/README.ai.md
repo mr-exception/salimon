@@ -22,6 +22,9 @@ belong in `resources`; read [resource-contracts.md](resource-contracts.md) befor
 extending them. Portable generation and extraction live in their own modules. Carrying and cargo
 gameplay remain separate issue scopes. Read the mining contract and focused tests
 before changing aim, rate, session mutation, or obstruction semantics.
+`resource_fragments` owns conservative output and surface poses; do not move
+fragment creation or mass splitting into runtime or renderer. Querying output
+must remain read-only. End a growing output tail before adding fragment carrying.
 
 ## Change checklist
 

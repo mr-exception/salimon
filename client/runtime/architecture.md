@@ -93,3 +93,6 @@ validated deposit mutation, and session mass deltas. Character exposes ray hits
 against its solid ship proxies. Runtime queries nearby generation, applies
 world session state for both GPU mapping and inspection, and presents a generic
 cuboid tool/aim marker without exposing gameplay types to the renderer.
+Physical fragments are world-owned session entities. Runtime maps their
+mass-derived cube size and absolute pose to generic presentation DTOs; the same
+nearby query supplies automation state even when the tool is stowed.

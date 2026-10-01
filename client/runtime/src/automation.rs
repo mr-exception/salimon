@@ -227,6 +227,23 @@ fn inspect(app: &ClientApplication) -> Value {
         ship.door_state == salimon_ship::DoorState::Open,
         app.e2e_config.map_or(0, |config| config.seed),
     );
+    let fragments: Vec<_> = app
+        .mining
+        .nearby_fragments(character.eye_position_meters)
+        .map(|piece| {
+            let mesh = crate::resource_presentation::fragment_visual(piece);
+            json!({
+                "id": piece.id().0,
+                "source_deposit_id": format!("{:?}:{}", piece.source().body, piece.source().local),
+                "resource": piece.material().resource().key(),
+                "mass_kg": piece.material().mass_kg(), "volume_m3": piece.material().volume_m3(),
+                "side_meters": salimon_world::resource_fragments::side_meters(piece),
+                "position_meters": piece.transform().position().meters(),
+                "orientation_xyzw": piece.transform().orientation_xyzw(),
+                "visual": {"color": mesh.color, "half_extents_meters": mesh.half_extents_meters}
+            })
+        })
+        .collect();
     json!({
         "mining": { "equipped": app.mining.equipped, "held": app.mining.held,
             "active": app.mining.held && mining_target.is_some(),
@@ -251,7 +268,10 @@ fn inspect(app: &ClientApplication) -> Value {
                 "radial_speed_meters_per_second": body.radial_speed_meters_per_second})),
             "cockpit_message": ship.cockpit_message.map(|message| message.text())},
         "interaction": interaction,
-        "world": {"nearest_deposit": nearest_deposit, "deposits": deposits, "deposit_query_error": deposit_error, "bodies": bodies, "camera_phase": format!("{:?}", app.camera_phase())}
+        "world": {"fragments": fragments,
+            "fragment_count": app.mining.session.fragments().len(),
+            "fragment_mass_kg": app.mining.session.fragments().iter().map(|piece| piece.material().mass_kg()).sum::<f64>(),
+            "nearest_deposit": nearest_deposit, "deposits": deposits, "deposit_query_error": deposit_error, "bodies": bodies, "camera_phase": format!("{:?}", app.camera_phase())}
     })
 }
 
@@ -350,7 +370,7 @@ mod tests {
             } else if let Some(check) = step.get("assert") {
                 // Mining/deposit checks independently verify the real route and hold/release controls.
                 let path = check["path"].as_str().unwrap();
-                if !path.starts_with("mining.") && !path.starts_with("world.nearest_deposit.") {
+                if !path.starts_with("mining.") && !path.starts_with("world.") {
                     continue;
                 }
                 let state = inspect(&test);

@@ -54,6 +54,21 @@ impl MiningTool {
         )
     }
 
+    pub(crate) fn nearby_fragments(
+        &self,
+        player: [f64; 3],
+    ) -> impl Iterator<Item = salimon_world::resources::ResourceFragment> + '_ {
+        self.session
+            .fragments()
+            .iter()
+            .copied()
+            .filter(move |piece| {
+                let offset = piece.transform().position().offset_from(position(player));
+                offset.iter().map(|v| v * v).sum::<f64>()
+                    <= crate::resource_presentation::ACTIVE_RADIUS_METERS.powi(2)
+            })
+    }
+
     pub(crate) fn advance(
         &mut self,
         delta: Duration,

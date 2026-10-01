@@ -2,7 +2,7 @@
 use std::time::Duration;
 
 use crate::resource_generation::SurfaceDeposit;
-use crate::resources::{DepositId, DepositState, ResourceDeposit};
+use crate::resources::{DepositId, DepositState, ResourceDeposit, ResourceFragment};
 use crate::{BodyRole, CELESTIAL_BODIES, WorldPosition};
 
 pub const MINING_RANGE_METERS: f64 = 4.0;
@@ -82,14 +82,15 @@ pub fn aimed_deposit(
         })
 }
 
-/// Returns extracted kilograms for the future physical-fragment producer; no inventory credit.
+/// Returns the actual mass difference, preserving conservation despite floating-point rounding.
 pub fn extract(deposit: &mut ResourceDeposit, delta: Duration) -> f64 {
+    let before = deposit.remaining_mass_kg();
     let removed =
         (MINING_RATE_KG_PER_SECOND * delta.as_secs_f64()).min(deposit.remaining_mass_kg());
     deposit
         .set_remaining_mass_kg(deposit.remaining_mass_kg() - removed)
         .expect("bounded extraction can only decrease finite remaining mass");
-    removed
+    before - deposit.remaining_mass_kg()
 }
 
 /// Session-owned extraction deltas keyed by stable deposit identity, separate from presentation.
@@ -97,6 +98,7 @@ pub fn extract(deposit: &mut ResourceDeposit, delta: Duration) -> f64 {
 pub struct MiningSession {
     remaining: std::collections::HashMap<DepositId, f64>,
     extracted_mass_kg: f64,
+    fragments: crate::resource_fragments::FragmentOutput,
 }
 
 impl MiningSession {
@@ -113,6 +115,7 @@ impl MiningSession {
 
     pub fn extract(&mut self, deposit: &mut ResourceDeposit, delta: Duration) -> f64 {
         let removed = extract(deposit, delta);
+        self.fragments.emit(*deposit, removed);
         self.remaining
             .insert(deposit.id(), deposit.remaining_mass_kg());
         self.extracted_mass_kg += removed;
@@ -122,6 +125,11 @@ impl MiningSession {
     /// Diagnostic extraction total, never spendable inventory or carried mass.
     pub const fn extracted_mass_kg(&self) -> f64 {
         self.extracted_mass_kg
+    }
+
+    /// Physical session entities, independent of active deposit streaming and tool equipment.
+    pub fn fragments(&self) -> &[ResourceFragment] {
+        self.fragments.fragments()
     }
 }
 

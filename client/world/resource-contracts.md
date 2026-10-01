@@ -119,9 +119,8 @@ from the character domain in the same meter units, so hull/closed gates/engines
 cannot be mined through. Ship glazing is conservatively solid for this tool.
 
 `extract` removes **2 kg/s × simulation delta**, capped to remaining mass; zero
-and depleted extraction return zero. It returns removed kilograms for the
-physical-fragment producer in #45 and does not credit an inventory. Current
-#44 output only changes source mass; there are no collectible fragments yet.
+and depleted extraction return zero. It returns the actual before/after mass
+difference; `MiningSession` represents all of that mass as physical fragments.
 `MiningSession` owns modified-deposit mass by stable ID and a diagnostic total.
 All inspection/presentation queries apply that state. Its lifetime is one local
 world/seed configuration; full streaming storage policy and coverage belong to
@@ -131,3 +130,28 @@ Run `cargo test --locked -p salimon-world --test mining` for aim, obstruction,
 large-coordinate, extraction timing, and depletion checks. The native
 `scenarios/mining.json` follows the real surface walkthrough and tool inputs;
 its evidence variant adds screenshot checkpoints.
+
+## Physical extraction output (#45)
+
+`resource_fragments` owns bounded splitting and deterministic surface placement.
+Each source deposit's most recent piece grows to **2 kg**, then a new piece is
+created. A fractional piece exists immediately, including on the first positive
+simulation step; there is no pending output mass or general resource inventory.
+Piece IDs are monotonically allocated within the session. Growth preserves ID,
+source, material key, and pose, and derives the new solid volume from density.
+Finished pieces are unchanged by later extraction. Picking up a growing piece
+must end its participation in the output tail when #46 adds carrying.
+
+Pieces have finite absolute poses and identity orientation. A deterministic
+tangent grid beside the source separates the pieces, with space above the body
+surface reserved for a full-size cube. Side length is the cube root of solid
+volume. This is a stationary surface greybox abstraction, without rigid-body
+falling, rolling, stacking, pickup/drop, or ship ownership yet. Runtime maps the
+same authoritative pieces into generic cuboids and nearby-entity inspection.
+The session retains pieces independently of deposit materialization and tool
+equipment; querying or re-rendering never emits additional pieces.
+
+Run `cargo test --locked -p salimon-world --test resource_fragments` for material
+identity, unique IDs, partial growth, conservation at different timesteps, zero
+output, large-step splitting, depletion, and requery behavior. The mining E2E
+route now checks piece mass/volume/pose and the complete depleted output.

@@ -229,5 +229,11 @@ remaining mass, positions, player distance, and renderer-facing geometry.
 `scenarios/evidence/mining.json` adds equipped, actively mined, and depleted
 screenshots to the same deterministic mining route. Run it with a working
 native capture helper to inspect the greybox handheld tool and removed deposit.
-Its baseline is automatically included in CI's default suite. Extraction totals
-are diagnostics only; physical-fragment output is implemented separately in #45.
+Its baseline is automatically included in CI's default suite. Both variants
+assert physical fragment identity, material, mass, volume, pose, and bounded
+output after depletion. Extraction totals and session fragment totals are
+diagnostics only, never inventory. The partial/depleted screenshots show the
+physical cubes left beside the deposit.
+Linux's required baseline job runs this mining evidence variant; capture errors
+fail the job. Checked-in [issue #45 evidence](../docs/issue-45/README.md) records
+the initial Linux validation.

@@ -74,3 +74,5 @@
   held mining input, and a valid unobscured world target. It never uses E.
 - Inspection and presentation apply the same world-owned session mass deltas.
 - Focus loss, cursor release, view switch, and stowing clear held mining input.
+- Fragment presentation/inspection read world-owned physical entities; neither
+  can mutate mass or allocate output. Stowing does not remove fragments.

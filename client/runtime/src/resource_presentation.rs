@@ -4,7 +4,7 @@ use salimon_world::resource_distribution::default_resource_distribution;
 use salimon_world::resource_generation::{
     GenerationError, SurfaceDeposit, materialize_nearby_deposits,
 };
-use salimon_world::resources::{DepositState, ResourceId};
+use salimon_world::resources::{DepositState, ResourceFragment, ResourceId};
 use salimon_world::{BodyRole, CELESTIAL_BODIES, WorldPosition};
 
 pub(crate) const ACTIVE_RADIUS_METERS: f64 = 120.0;
@@ -60,6 +60,20 @@ pub(crate) fn visual(entry: SurfaceDeposit) -> Option<SceneInstance> {
         half_extents_meters: proportions.map(|p| (p * entry.bounds_radius_meters / norm) as f32),
         color,
     })
+}
+
+pub(crate) fn fragment_visual(fragment: ResourceFragment) -> SceneInstance {
+    let color = match fragment.material().resource() {
+        ResourceId::IronOre => [0.75, 0.22, 0.06, 1.0],
+        ResourceId::SilicateRock => [0.45, 0.50, 0.36, 1.0],
+        ResourceId::WaterIce => [0.25, 0.85, 1.0, 1.0],
+    };
+    SceneInstance {
+        center_meters: fragment.transform().position().meters(),
+        half_extents_meters: [(salimon_world::resource_fragments::side_meters(fragment) * 0.5)
+            as f32; 3],
+        color,
+    }
 }
 
 #[cfg(test)]

@@ -9,6 +9,7 @@ use std::time::Duration;
 
 pub mod mining;
 pub mod resource_distribution;
+pub mod resource_fragments;
 pub mod resource_generation;
 pub mod resources;
 

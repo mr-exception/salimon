@@ -404,6 +404,12 @@
       }
     },
     {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 0
+      }
+    },
+    {
       "action": {
         "op": "key",
         "key": "equip_mining_tool",
@@ -469,6 +475,76 @@
       "assert": {
         "path": "world.nearest_deposit.state",
         "equals": "PartiallyMined"
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_mass_kg",
+        "approx": 1.92,
+        "tolerance": 1e-09
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.0.id",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.0.source_deposit_id",
+        "equals": "Earth:16443359315117775089"
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.0.resource",
+        "equals": "silicate-rock"
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.0.mass_kg",
+        "approx": 1.92,
+        "tolerance": 1e-09
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.0.volume_m3",
+        "approx": 0.000711111111111111,
+        "tolerance": 1e-12
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.0.side_meters",
+        "approx": 0.0892577266776226,
+        "tolerance": 1e-09
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.0.orientation_xyzw",
+        "equals": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.0.visual.color.0",
+        "approx": 0.45,
+        "tolerance": 0.001
       }
     },
     {
@@ -651,6 +727,32 @@
       }
     },
     {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 19
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_mass_kg",
+        "approx": 36.40896041381627,
+        "tolerance": 1e-08
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.0.mass_kg",
+        "equals": 2
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.18.mass_kg",
+        "approx": 0.40896041381627,
+        "tolerance": 1e-08
+      }
+    },
+    {
       "screenshot": "depleted-deposit"
     },
     {
@@ -717,6 +819,19 @@
       "assert": {
         "path": "mining.equipped",
         "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 19
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_mass_kg",
+        "approx": 36.40896041381627,
+        "tolerance": 1e-08
       }
     }
   ]

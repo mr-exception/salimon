@@ -187,4 +187,16 @@ use the same input path. `inspect` exposes `mining.equipped`, `held`, `active`,
 `target`, `range_meters`, `rate_kg_per_second`, and diagnostic
 `extracted_mass_kg`. Deposit inspection and visuals read world-owned session
 mass deltas. Extraction is advanced only by simulation steps in E2E mode.
-Fragments and physical collection are the subsequent #45/#46 scope.
+Physical collection is the subsequent #46 scope.
+
+## Physical resource fragments (#45)
+
+Mining creates visible material-colored cubes beside the deposit. A piece grows
+up to 2 kg before the next piece starts; its size follows material density and
+mass. Fragments remain in the local session after stowing the tool or leaving
+the active area. They are stationary world objects; pickup/drop is #46.
+`world.fragments` exposes nearby IDs, source-deposit IDs, material keys, mass,
+volume, side length, absolute pose, and visual extents. `world.fragment_count`
+and `world.fragment_mass_kg` inspect all session output (diagnostics, not inventory).
+Presentation and nearby inspection use the same 120 m query. Mining evidence
+screenshots show both fractional output and the pieces left after depletion.

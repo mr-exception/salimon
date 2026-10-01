@@ -546,6 +546,11 @@ impl ClientApplication {
             }
         }
         if self.view_mode == ViewMode::Gameplay {
+            scene_instances.extend(
+                self.mining
+                    .nearby_fragments(camera.position_meters)
+                    .map(crate::resource_presentation::fragment_visual),
+            );
             scene_instances.extend(self.mining.visuals(
                 character_snapshot,
                 self.mining.held && mining_target.is_some(),

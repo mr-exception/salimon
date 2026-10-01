@@ -38,3 +38,7 @@
   supplied solid obstructions. Depleted deposits cannot be targeted.
 - Extraction is 2 kg/s of simulation time capped to remaining mass; it cannot
   replenish deposits or credit abstract inventory.
+- Every positive session extraction is represented in physical fragments of the
+  source material, capped at 2 kg per piece. Their total mass equals removed
+  deposit mass within floating-point tolerance; zero/depleted extraction creates
+  no objects. IDs/poses survive growth and read-only requery.

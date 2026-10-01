@@ -42,3 +42,8 @@
   source material, capped at 2 kg per piece. Their total mass equals removed
   deposit mass within floating-point tolerance; zero/depleted extraction creates
   no objects. IDs/poses survive growth and read-only requery.
+
+- A local world session retains modified deposit mass by stable ID, including
+  depleted tombstones, independently of active area queries. Restoration is
+  idempotent, never increases mass, and precedes extraction even for stale copies.
+  Stream-out/reload never regenerates mined mass or emits duplicate fragments.

@@ -215,6 +215,10 @@ fn inspect(app: &ClientApplication) -> Value {
         })).collect::<Vec<_>>(), None),
         Err(error) => (Vec::new(), Some(format!("{error:?}"))),
     };
+    let deposits_by_id: serde_json::Map<String, Value> = deposits
+        .iter()
+        .map(|entry| (entry["id"].as_str().unwrap().to_owned(), entry.clone()))
+        .collect();
     let nearest_deposit = deposits.iter().min_by(|a, b| {
         a["distance_to_player_meters"]
             .as_f64()
@@ -271,7 +275,7 @@ fn inspect(app: &ClientApplication) -> Value {
         "world": {"fragments": fragments,
             "fragment_count": app.mining.session.fragments().len(),
             "fragment_mass_kg": app.mining.session.fragments().iter().map(|piece| piece.material().mass_kg()).sum::<f64>(),
-            "nearest_deposit": nearest_deposit, "deposits": deposits, "deposit_query_error": deposit_error, "bodies": bodies, "camera_phase": format!("{:?}", app.camera_phase())}
+            "nearest_deposit": nearest_deposit, "deposits": deposits, "deposits_by_id": deposits_by_id, "deposit_query_error": deposit_error, "bodies": bodies, "camera_phase": format!("{:?}", app.camera_phase())}
     })
 }
 
@@ -394,6 +398,76 @@ mod tests {
                             <= check["tolerance"].as_f64().unwrap(),
                         "step {index}: {path}"
                     );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn streaming_walkthrough_reloads_partial_and_depleted_state() {
+        let mut test = app(Scenario::LandedEarth);
+        e2e::initialize(
+            &mut test,
+            Config {
+                scenario: Scenario::LandedEarth,
+                seed: 0,
+                step: Duration::from_millis(16),
+            },
+        )
+        .unwrap();
+        let scenario: Value =
+            serde_json::from_str(include_str!("../../../scenarios/resource-streaming.json"))
+                .unwrap();
+        for (index, step) in scenario["steps"].as_array().unwrap().iter().enumerate() {
+            if let Some(action) = step.get("action") {
+                let mut command = action.clone();
+                command["protocol"] = json!(1);
+                command["id"] = json!(index);
+                assert_eq!(execute(&mut test, &command.to_string())["ok"], true);
+            } else if let Some(check) = step.get("assert") {
+                let state = inspect(&test);
+                let path = check["path"].as_str().unwrap();
+                let value = path.split('.').try_fold(&state, |value, key| {
+                    if value.is_array() {
+                        value.get(key.parse::<usize>().unwrap())
+                    } else {
+                        value.get(key)
+                    }
+                });
+                if let Some(expected) = check.get("exists") {
+                    assert_eq!(
+                        value.is_some(),
+                        expected.as_bool().unwrap(),
+                        "step {index}: {path}"
+                    );
+                    continue;
+                }
+                let value =
+                    value.unwrap_or_else(|| panic!("missing step {index}: {path}: {state}"));
+                if let Some(expected) = check.get("equals") {
+                    if value.is_number() && expected.is_number() {
+                        assert_eq!(value.as_f64(), expected.as_f64(), "step {index}: {path}");
+                    } else {
+                        assert_eq!(value, expected, "step {index}: {path}");
+                    }
+                } else if let Some(expected) = check.get("approx") {
+                    assert!(
+                        (value.as_f64().unwrap() - expected.as_f64().unwrap()).abs()
+                            <= check["tolerance"].as_f64().unwrap(),
+                        "step {index}: {path}: {value}"
+                    );
+                } else if let Some(expected) = check.get("gt") {
+                    assert!(
+                        value.as_f64().unwrap() > expected.as_f64().unwrap(),
+                        "step {index}: {path}"
+                    );
+                } else if let Some(expected) = check.get("lt") {
+                    assert!(
+                        value.as_f64().unwrap() < expected.as_f64().unwrap(),
+                        "step {index}: {path}"
+                    );
+                } else {
+                    panic!("unhandled check at step {index}");
                 }
             }
         }

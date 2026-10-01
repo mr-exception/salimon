@@ -164,13 +164,19 @@ inscribed in its deposit's spherical physical bound and centered on its f64
 surface anchor; its outward half is visible on any supported solid body.
 These are unlit greybox validation shapes, not final terrain art. The renderer
 receives only generic presentation DTOs, with no material IDs or mining state.
-Depleted deposits are omitted by the mapping. Mining and restored streaming
-state remain separate tasks; this presentation uses the current stateless
-world generator without introducing an inventory or extraction behavior.
+Depleted deposits are omitted by the mapping. The stateless generator is reconciled with the world-owned mining session
+journal before every presentation, targeting, and inspection query. Leaving
+120 m unloads a deposit from the active list without discarding partial or
+depleted state; returning restores the same ID/mass and omits depleted visuals.
 
 Automation exposes `world.deposits` and `world.nearest_deposit` with stable body-scoped IDs, material keys,
 world/body-local/ship-local positions, mass/state, physical radius, and visual
 color/extents. `world.deposit_query_error` is null on successful queries.
+`world.deposits_by_id` indexes the same active snapshots by stable ID so E2E
+checks can prove a specific deposit was unloaded without depending on list order.
+`scenarios/resource-streaming.json` walks beyond the active radius and returns
+after partial extraction and depletion; its evidence variant captures both
+unloaded areas and restored deposits.
 
 ## Handheld mining (#44)
 

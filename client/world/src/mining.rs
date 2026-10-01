@@ -93,7 +93,9 @@ pub fn extract(deposit: &mut ResourceDeposit, delta: Duration) -> f64 {
     before - deposit.remaining_mass_kg()
 }
 
-/// Session-owned extraction deltas keyed by stable deposit identity, separate from presentation.
+/// Sparse local-world journal keyed by stable deposit identity, separate from active lists.
+/// Keep this session while streaming, stowing tools, or rebuilding presentation;
+/// create a new session when starting a different world/seed configuration.
 #[derive(Default)]
 pub struct MiningSession {
     remaining: std::collections::HashMap<DepositId, f64>,
@@ -104,21 +106,29 @@ pub struct MiningSession {
 impl MiningSession {
     pub fn apply_to(&self, deposits: &mut [SurfaceDeposit]) {
         for entry in deposits {
-            if let Some(mass) = self.remaining.get(&entry.deposit.id()) {
-                entry
-                    .deposit
-                    .set_remaining_mass_kg(*mass)
-                    .expect("session extraction mass was validated on mutation");
-            }
+            self.restore(&mut entry.deposit);
+        }
+    }
+
+    fn restore(&self, deposit: &mut ResourceDeposit) {
+        if let Some(mass) = self.remaining.get(&deposit.id()) {
+            deposit
+                .set_remaining_mass_kg((*mass).min(deposit.remaining_mass_kg()))
+                .expect("restoration can only decrease validated remaining mass");
         }
     }
 
     pub fn extract(&mut self, deposit: &mut ResourceDeposit, delta: Duration) -> f64 {
+        // Freshly generated or stale active copies must reconcile before extraction,
+        // so they cannot replenish the journal or emit already removed mass again.
+        self.restore(deposit);
         let removed = extract(deposit, delta);
-        self.fragments.emit(*deposit, removed);
-        self.remaining
-            .insert(deposit.id(), deposit.remaining_mass_kg());
-        self.extracted_mass_kg += removed;
+        if removed > 0.0 {
+            self.fragments.emit(*deposit, removed);
+            self.remaining
+                .insert(deposit.id(), deposit.remaining_mass_kg());
+            self.extracted_mass_kg += removed;
+        }
         removed
     }
 

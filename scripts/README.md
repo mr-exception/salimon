@@ -55,12 +55,13 @@ python3 -m unittest discover -s scripts -p 'test_*.py'
 
 ## Phase 0 baseline suite
 
-The default `suite` checks four native gameplay paths:
+The default `suite` checks five native gameplay paths:
 
 | Scenario | Coverage |
 | --- | --- |
 | `landed-earth.json` | Known initial player pose and ship state; walking/aiming into cockpit control; non-pilot control rejection; closed-door exit collision; opening and exiting to the surface; closing the door outside and walking against it twice; reopening and returning inside; the open-door takeoff interlock; closing the door and completing assisted takeoff. |
 | `resource-deposits.json` | Real airlock exit and surface walk to a stable generated silicate deposit; checks material, positive mass, proximity, and presentation data. |
+| `resource-streaming.json` | Partial mining, walking beyond the 120 m active radius, explicit source-ID absence, return with identical mass, full depletion, and a second round trip without regeneration or duplicate fragments. |
 | `mining.json` | Surface tool equip/aim/hold, exact timed extraction, aim/range/release rejection, return to the deposit, bounded depletion, and stow; no inventory credit. |
 | `orbit-earth.json` | Known seeded orbit pose; thruster changes; starting assisted landing; repeated landing action cannot cancel it; leaving cockpit control during landing; autonomous completion with zero ship velocity. |
 
@@ -237,3 +238,14 @@ physical cubes left beside the deposit.
 Linux's required baseline job runs this mining evidence variant; capture errors
 fail the job. Checked-in [issue #45 evidence](../docs/issue-45/README.md) records
 the initial Linux validation.
+
+## Local streamed resource state (#50)
+
+`scenarios/resource-streaming.json` uses the same real mining route, releases
+mining input, walks 153.6 m away and back, and checks the source is absent from
+`world.deposits_by_id` while away. It verifies partial mass restoration, then
+repeats after depletion and verifies zero mass, no visual/target, and unchanged
+physical output totals. The baseline is included in the default suite; Linux CI
+also runs `scenarios/evidence/resource-streaming.json` with named screenshots.
+No teleportation or test-only state mutation is used. Local session state is
+retained only until the world/session ends, without disk or backend persistence.

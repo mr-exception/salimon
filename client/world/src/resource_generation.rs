@@ -25,8 +25,8 @@ pub enum GenerationError {
 
 /// Maximum candidate cells examined per request, across all materials and faces.
 pub const MAX_CANDIDATES: usize = 65_536;
-/// The caller replaces its active list on each successful query; keeping mined
-/// state across unload/reload is a separate local-state layer (#50).
+/// The caller replaces its active list on each successful query, then applies
+/// its world-owned MiningSession journal to restore partial/depleted state.
 /// Radius selects deposit centers by body-local chord distance from the supplied
 /// player position, including altitude. Empty/far-space queries allocate no planet.
 pub fn materialize_nearby_deposits(

@@ -27,8 +27,7 @@ stores original material, fixed absolute position, and remaining mass in
 `[0, initial mass]`. Its state is derived as untouched, partially mined, or
 depleted; depletion retains the ID and original properties. Construction accepts
 validated restored state. Local updates cannot increase mass and invalid updates
-leave state unchanged. Regeneration, streaming storage, mining rates, and actual
-fragment creation belong to later issues; this setter alone does not guarantee
+leave state unchanged. This setter alone does not guarantee
 conservation across a deposit and independently constructed fragments.
 
 `ResourceFragment` holds a session-unique `FragmentId`, source `DepositId`,
@@ -105,9 +104,8 @@ whose volume equals initial mass divided by material density. Absolute coordinat
 are formed only by translating the body-local position at the boundary.
 
 Unloading and rematerializing untouched deposits reproduces their IDs, material,
-mass, geometry, and bounds. Modified/depleted-state retention belongs to #50;
-visuals belong to #43 and mining belongs to #44. No rendering or mining behavior
-is introduced here. Run `cargo test --locked -p salimon-world --test resource_generation`.
+mass, geometry, and bounds. Apply the local world MiningSession journal after generation to retain modified
+and depleted state; generation itself remains stateless. Run `cargo test --locked -p salimon-world --test resource_generation`.
 
 ## Handheld extraction
 
@@ -123,8 +121,16 @@ and depleted extraction return zero. It returns the actual before/after mass
 difference; `MiningSession` represents all of that mass as physical fragments.
 `MiningSession` owns modified-deposit mass by stable ID and a diagnostic total.
 All inspection/presentation queries apply that state. Its lifetime is one local
-world/seed configuration; full streaming storage policy and coverage belong to
-#50. Runtime hosts the session but does not own the extraction rules.
+world/seed configuration. The sparse journal retains only changed deposit IDs
+and remaining kilograms, including zero-mass tombstones. Dropping active lists,
+stowing the tool, or rebuilding the renderer never clears it. Restoration is
+idempotent and only decreases mass; extraction reconciles fresh/stale copies
+before emitting fragments, preventing re-extraction of already removed mass.
+Untouched queries need no journal entry. Starting a new world creates a new
+session; there is no disk, backend, or cross-session persistence. Runtime hosts
+the session but does not own the extraction rules. See `resource_streaming`
+tests for generated untouched/partial/depleted deposits across repeated cycles
+on all five solid bodies and stale-copy conservation.
 
 Run `cargo test --locked -p salimon-world --test mining` for aim, obstruction,
 large-coordinate, extraction timing, and depletion checks. The native

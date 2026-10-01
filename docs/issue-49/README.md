@@ -23,12 +23,31 @@ ordinary G placement on clear cargo floor restores it.
   fragment 2 stays at its ship-local anchor through takeoff and 25,000 m/s flight.
   Identity, 2 kg mass and the 19 physical session entities remain preserved.
 
-Native graphical E2E remains **blocked in this workspace**. The native runner
-failed before readiness because no display was available. Attempting Xvfb also
-failed to open Unix listening sockets; TCP display connection failed. No gameplay
-assertion or screenshot was reached, and no visual success is claimed. The issue
-must remain open until the native baseline and evidence scenarios pass on a
-working display. Build/contract success does not establish rendered validation.
+## Native CI validation — complete
+
+The earlier local display failure was resolved through verification of the
+[successful CI run](https://github.com/mr-exception/salimon/actions/runs/36880501864)
+for implementation commit `b333321d305eeb70cc42dda9c214718466f25c9c`.
+All three platform jobs passed Rust/Python checks and debug/release staging.
+Linux passed the required native E2E and real-X11 packaged smoke checks using
+Xvfb and Mesa software Vulkan. Native macOS/Windows graphics remain unverified.
+
+Downloaded and inspected Linux artifact `11171825888` (SHA-256
+`5d8f7714ad08c113214c0bd8c618aa72ecee675c68766346e0ff43fdb20461ea`).
+The baseline passed all 366 steps in 19,896 ms; the evidence variant passed all
+371 steps in 28,024 ms, including every required capture. The [validation record](ci-validation.json)
+preserves final authoritative states and all screenshot checkpoint states.
+Full step snapshots and protocol/process logs remain in the linked CI artifact.
+
+- [First delivery](step-174-first-cargo-fragment.png): cargo contains fragment 1.
+- [Two deliveries](step-239-two-cargo-fragments.png): two physical pieces visible on the cargo floor.
+- [Removal](step-311-cargo-fragment-removed.png): fragment 1 placed on the surface; fragment 2 remains in cargo.
+- [Return](step-333-cargo-after-return.png): room traversal preserves fragment 2. This view faces the room wall; membership is verified by state.
+- [Flight](step-371-cargo-during-flight.png): cockpit view after takeoff at 25,000 m/s; state verifies fragment 2 at its unchanged local anchor.
+
+Screenshots are supporting visual evidence; authoritative assertions establish
+identity, membership and mass. All acceptance criteria now pass and #49 can close.
+The local failed-launch records below are historical evidence, not the final result.
 
 The new baseline runs in the default CI suite. Linux CI also requires the evidence
 variant, including first delivery, two pieces, removal, return and flight captures.

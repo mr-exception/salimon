@@ -395,8 +395,8 @@ objects. `cargo.fragment_count` derives from that list, never an inventory count
 The baseline runs in the default suite and its complete action/assertion route
 also runs in a portable runtime regression. The evidence variant adds five named
 captures and runs in required Linux CI with settled capture. Capture failures fail
-that run. See [validation status](../docs/issue-49/README.md) for the current local
-display limitation and commands to reproduce on a working native display.
+that run. See [validation status](../docs/issue-49/README.md) for the passing native CI results, checkpoint states, screenshots and reproduction
+commands.
 
 ## Lower cockpit windows (#38)
 

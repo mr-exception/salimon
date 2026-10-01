@@ -80,6 +80,37 @@ acceleration. Cargo traversal and airlock collision checks cover the real layout
 The required Linux CI job runs this evidence group against the release binary.
 See [checked-in validation](../docs/issue-39/README.md) for results and screenshots.
 
+## Resource collection suite (#51)
+
+Run the complete resource regression suite, then its synchronized visual routes:
+
+```sh
+python3 scripts/salimon-test suite --group resource-collection
+python3 scripts/salimon-test suite --group resource-collection --evidence \
+  --screenshot-command '["python3", "scripts/capture_settled.py", "{path}"]'
+```
+
+Both commands accept `--binary` and `--artifacts`. The six required routes run in
+this order: resource-deposits, mining, carrying, fragment-transfer, physical-cargo,
+resource-streaming. Each starts a fresh seeded native client. Missing scenario
+files, failed launches, failed assertions and failed evidence captures fail the
+aggregate report; no route is silently skipped. Linux CI requires the evidence
+suite against the staged release executable and uploads all shared runner artifacts.
+
+| Boundary | Regression coverage |
+| --- | --- |
+| Distribution/generation | `client/world/tests/resource_distribution.rs` and `resource_generation.rs`: deterministic seeds, material weights, geometry, ordering, reload identity and invalid inputs. |
+| Extraction/physical output | `client/world/tests/mining.rs` and `resource_fragments.rs`: range, aim, line of sight, depletion, nonnegative mass and conservation across all materials and time steps. |
+| Carrying/transfer/cargo | Runtime carrying/cargo contracts and production-action walkthroughs in `client/runtime/src/automation.rs`; native carrying, fragment-transfer and physical-cargo routes protect one-object rejection, round trips, placement, removal and ship-relative support in flight. |
+| Stream restoration | `client/world/tests/resource_streaming.rs` and native resource-streaming: partial and depleted source IDs leave the active radius and return with unchanged mass and no duplicate output. |
+
+Evidence variants add only named screenshot checkpoints to the baseline actions
+and assertions. Every run preserves structured results, per-step state and logs;
+failures also preserve available state and screenshots. Runner contracts cover
+failed capture, process cleanup and assertion/startup failure; suite contracts
+verify that failed launches retain six isolated result directories. Native
+macOS/Windows graphics need local GPU validation; Linux CI uses software Vulkan.
+
 ## Phase 0 baseline suite
 
 The default `suite` checks seven native gameplay paths:

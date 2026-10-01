@@ -64,13 +64,8 @@ jobs:
           xvfb-run -a -s '-screen 0 1280x800x24' bash -euo pipefail -c '
             import -window root artifacts/e2e/display-ready.png
             python scripts/salimon-test suite --binary artifacts/build/release/salimon-client
-            python scripts/salimon-test run scenarios/evidence/resource-deposits.json --binary artifacts/build/release/salimon-client
-            python scripts/salimon-test run scenarios/evidence/mining.json --binary artifacts/build/release/salimon-client
-            python scripts/salimon-test run scenarios/evidence/resource-streaming.json --binary artifacts/build/release/salimon-client
-            python scripts/salimon-test run scenarios/evidence/carrying.json --binary artifacts/build/release/salimon-client
-            python scripts/salimon-test run scenarios/evidence/fragment-transfer.json --binary artifacts/build/release/salimon-client --screenshot-command "[\"python\", \"scripts/capture_settled.py\", \"{path}\"]"
-            python scripts/salimon-test run scenarios/evidence/physical-cargo.json --binary artifacts/build/release/salimon-client --screenshot-command "[\"python\", \"scripts/capture_settled.py\", \"{path}\"]"
             python scripts/salimon-test run scenarios/evidence/lower-cockpit-windows.json --binary artifacts/build/release/salimon-client --screenshot-command "[\"python\", \"scripts/capture_settled.py\", \"{path}\"]"
+            python scripts/salimon-test suite --group resource-collection --evidence --binary artifacts/build/release/salimon-client --screenshot-command "[\"python\", \"scripts/capture_settled.py\", \"{path}\"]"
             python scripts/salimon-test suite --group ship-eva --evidence --binary artifacts/build/release/salimon-client --screenshot-command "[\"python\", \"scripts/capture_settled.py\", \"{path}\"]"
           ' 2>&1 | tee artifacts/e2e/baseline.log
       - name: Linux optional visual checkpoints (Mesa software Vulkan)

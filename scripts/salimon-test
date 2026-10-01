@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 from salimon_test import run
-from scenario_suites import select_scenarios
+from scenario_suites import GROUPS, select_scenarios
 
 
 def main():
@@ -17,7 +17,7 @@ def main():
     parser.add_argument("command", choices=["run", "suite"])
     parser.add_argument("scenario", nargs="?", help="scenario JSON file (run only)")
     parser.add_argument("--binary", type=Path, help="prebuilt salimon-client executable")
-    parser.add_argument("--group", choices=["ship-eva"], help="named prerequisite suite (suite only)")
+    parser.add_argument("--group", choices=sorted(GROUPS), help="named gameplay suite (suite only)")
     parser.add_argument("--evidence", action="store_true", help="run screenshot variants (suite only)")
     parser.add_argument("--artifacts", type=Path, default=root / "artifacts" / "e2e",
                         help="root for isolated per-scenario result directories")

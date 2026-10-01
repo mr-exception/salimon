@@ -370,7 +370,8 @@ impl ClientApplication {
             CharacterLocation::InsideShip
             | CharacterLocation::DoorwayBlend
             | CharacterLocation::Surface
-            | CharacterLocation::Space => {
+            | CharacterLocation::Space
+            | CharacterLocation::NearbyBody => {
                 let character = self.character.snapshot(ship_frame, surface);
                 let local_eye = ship_frame.world_to_local(character.eye_position_meters);
                 let local_look = ship_frame.world_to_local(character.look_target_meters);
@@ -496,6 +497,14 @@ impl ClientApplication {
         self.ship.advance(delta);
         let ship = self.ship.snapshot();
         if self.view_mode == ViewMode::Gameplay {
+            let eye = self
+                .character
+                .snapshot(
+                    character_ship_frame(ship.pose),
+                    surface_frame_for_ship(ship),
+                )
+                .eye_position_meters;
+            self.character.set_nearby_surface(nearby_surface_at(eye));
             self.character.advance_with_motion(
                 delta,
                 self.movement_input,
@@ -507,6 +516,14 @@ impl ClientApplication {
                 ship.door_state == DoorState::Open,
                 matches!(ship.flight_state, FlightState::Landed { .. }),
             );
+            let eye = self
+                .character
+                .snapshot(
+                    character_ship_frame(ship.pose),
+                    surface_frame_for_ship(ship),
+                )
+                .eye_position_meters;
+            self.character.set_nearby_surface(nearby_surface_at(eye));
         }
         if self.view_mode == ViewMode::Gameplay {
             let frame = character_ship_frame(ship.pose);
@@ -1094,6 +1111,15 @@ pub(crate) fn surface_frame_for_ship(ship: ShipSnapshot) -> SurfaceFrame {
         body_center_meters: body.center.meters(),
         radius_meters: body.radius_meters,
     }
+}
+
+pub(crate) fn nearby_surface_at(eye: [f64; 3]) -> Option<SurfaceFrame> {
+    salimon_world::nearby_solid_body(WorldPosition::new(eye[0], eye[1], eye[2])).map(|(body, _)| {
+        SurfaceFrame {
+            body_center_meters: body.center.meters(),
+            radius_meters: body.radius_meters,
+        }
+    })
 }
 
 fn distance_squared(left: [f64; 3], right: [f64; 3]) -> f64 {

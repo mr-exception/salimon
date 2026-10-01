@@ -15,6 +15,7 @@ pub(crate) enum Scenario {
     OrbitEarth,
     OrbitMoon,
     OpenSpace,
+    EvaApproach,
 }
 
 impl Scenario {
@@ -25,8 +26,9 @@ impl Scenario {
             "orbit-earth" => Ok(Self::OrbitEarth),
             "orbit-moon" => Ok(Self::OrbitMoon),
             "open-space" => Ok(Self::OpenSpace),
+            "eva-approach" => Ok(Self::EvaApproach),
             _ => Err(format!(
-                "unknown scenario '{value}'; expected landed-earth, cockpit-earth, orbit-earth, orbit-moon, or open-space"
+                "unknown scenario '{value}'; expected landed-earth, cockpit-earth, orbit-earth, orbit-moon, open-space, or eva-approach"
             )),
         }
     }
@@ -38,6 +40,7 @@ impl Scenario {
             Self::OrbitEarth => "orbit-earth",
             Self::OrbitMoon => "orbit-moon",
             Self::OpenSpace => "open-space",
+            Self::EvaApproach => "eva-approach",
         }
     }
 }
@@ -110,7 +113,10 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
     match config.scenario {
         Scenario::LandedEarth => {}
         Scenario::CockpitEarth => app.character.enter_cockpit(),
-        Scenario::OrbitEarth | Scenario::OrbitMoon | Scenario::OpenSpace => {
+        Scenario::OrbitEarth
+        | Scenario::OrbitMoon
+        | Scenario::OpenSpace
+        | Scenario::EvaApproach => {
             let id = if config.scenario != Scenario::OrbitMoon {
                 CelestialBodyId::Earth
             } else {
@@ -124,7 +130,9 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
                 })?;
             let mut position = body.center.meters();
             position[1] += body.radius_meters
-                + if config.scenario == Scenario::OpenSpace {
+                + if config.scenario == Scenario::EvaApproach {
+                    salimon_ship::NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS + 200_000.0
+                } else if config.scenario == Scenario::OpenSpace {
                     salimon_ship::NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS + 10_000.0
                 } else {
                     1_000.0
@@ -135,7 +143,16 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
             app.ship = ShipController::flying(
                 ShipPose {
                     position_meters: position,
-                    orientation: [0.0, 0.0, 0.0, 1.0],
+                    orientation: if config.scenario == Scenario::EvaApproach {
+                        [
+                            0.0,
+                            0.0,
+                            -std::f64::consts::FRAC_1_SQRT_2,
+                            std::f64::consts::FRAC_1_SQRT_2,
+                        ]
+                    } else {
+                        [0.0, 0.0, 0.0, 1.0]
+                    },
                 },
                 0,
             );
@@ -148,7 +165,7 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
     let snapshot = app.ship.snapshot();
     if matches!(
         config.scenario,
-        Scenario::OrbitEarth | Scenario::OrbitMoon | Scenario::OpenSpace
+        Scenario::OrbitEarth | Scenario::OrbitMoon | Scenario::OpenSpace | Scenario::EvaApproach
     ) != (snapshot.flight_state == FlightState::Flying)
     {
         return Err("scenario setup failed: unexpected ship flight state".into());

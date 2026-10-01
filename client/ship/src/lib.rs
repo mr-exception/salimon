@@ -32,7 +32,7 @@ const LANDING_TOUCHDOWN_SECONDS: f64 = 2.0;
 const TAKEOFF_LIFT_SECONDS: f64 = 2.0;
 const TAKEOFF_CLEARANCE_SECONDS: f64 = 4.0;
 /// Inclusive nominal-surface distance for the cockpit's nearby-body sensor.
-pub const NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS: f64 = 3_000_000.0;
+pub use salimon_world::NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS;
 /// Noncanonical Phase 0 fixture values used to exercise live Core telemetry.
 pub const DEFAULT_CORE_ENERGY_CAPACITY_JOULES: u64 = 1_000_000_000_000;
 pub const DEFAULT_CORE_ENERGY_STORED_JOULES: u64 = 750_000_000_000;

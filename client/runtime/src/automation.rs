@@ -286,7 +286,8 @@ fn inspect(app: &ClientApplication) -> Value {
             "range_meters": salimon_world::mining::MINING_RANGE_METERS,
             "rate_kg_per_second": salimon_world::mining::MINING_RATE_KG_PER_SECOND,
             "target": mining_target.map(|target| json!({"id": format!("{:?}:{}", target.id.body, target.id.local), "distance_meters": target.distance_meters})) },
-        "player": {"velocity_meters_per_second": player_velocity,
+        "player": {"nearby_body": salimon_world::nearby_solid_body(salimon_world::WorldPosition::new(character.eye_position_meters[0], character.eye_position_meters[1], character.eye_position_meters[2])).map(|(body, distance)| json!({"name": body.name, "surface_distance_meters": distance})),
+            "velocity_meters_per_second": player_velocity,
             "speed_meters_per_second": player_velocity.iter().map(|v| v*v).sum::<f64>().sqrt(),
             "relative_velocity_meters_per_second": relative_velocity,
             "relative_speed_meters_per_second": relative_velocity.iter().map(|v| v*v).sum::<f64>().sqrt(),
@@ -538,6 +539,14 @@ mod tests {
         assert_gameplay_scenario(
             Scenario::OpenSpace,
             include_str!("../../../scenarios/moving-eva.json"),
+        );
+    }
+
+    #[test]
+    fn nearby_eva_walkthrough_uses_real_gameplay_actions() {
+        assert_gameplay_scenario(
+            Scenario::EvaApproach,
+            include_str!("../../../scenarios/nearby-eva.json"),
         );
     }
 

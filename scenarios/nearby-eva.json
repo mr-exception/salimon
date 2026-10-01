@@ -1,0 +1,271 @@
+{
+  "setup": {
+    "scenario": "eva-approach",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 120000,
+  "steps": [
+    {
+      "assert": {
+        "path": "ship.nearby_body",
+        "equals": null
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.flight_state",
+        "equals": "Flying"
+      }
+    },
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 110
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 36
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "interaction",
+        "equals": "exit_door"
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 40
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "InsideShip"
+      }
+    },
+    {
+      "assert": {
+        "path": "player.ship_local_eye_position_meters.0",
+        "approx": -7.24,
+        "tolerance": 0.001
+      }
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.door_state",
+        "equals": "Open"
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 40
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "Space"
+      }
+    },
+    {
+      "assert": {
+        "path": "player.ship_local_eye_position_meters.0",
+        "lt": -8.2
+      }
+    },
+    {
+      "assert": {
+        "path": "player.ship_local_eye_position_meters.1",
+        "approx": 1.9973118279569892,
+        "tolerance": 0.001
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 30
+      }
+    },
+    {
+      "assert": {
+        "path": "player.nearby_body",
+        "equals": null
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 200
+      }
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "Space"
+      }
+    },
+    {
+      "assert": {
+        "path": "player.nearby_body",
+        "equals": null
+      }
+    },
+    {
+      "assert": {
+        "path": "player.velocity_meters_per_second.1",
+        "approx": -25000,
+        "tolerance": 0.02
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 100
+      }
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "NearbyBody"
+      }
+    },
+    {
+      "assert": {
+        "path": "player.nearby_body.name",
+        "equals": "Earth"
+      }
+    },
+    {
+      "assert": {
+        "path": "player.nearby_body.surface_distance_meters",
+        "lt": 3000000
+      }
+    },
+    {
+      "assert": {
+        "path": "player.nearby_body.surface_distance_meters",
+        "gt": 2900000
+      }
+    },
+    {
+      "assert": {
+        "path": "player.velocity_meters_per_second.1",
+        "lt": -25000
+      }
+    },
+    {
+      "assert": {
+        "path": "player.velocity_meters_per_second.1",
+        "gt": -25020
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 100
+      }
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "NearbyBody"
+      }
+    },
+    {
+      "assert": {
+        "path": "player.nearby_body.surface_distance_meters",
+        "gt": 2800000
+      }
+    },
+    {
+      "assert": {
+        "path": "player.velocity_meters_per_second.1",
+        "lt": -25015
+      }
+    },
+    {
+      "assert": {
+        "path": "player.velocity_meters_per_second.1",
+        "gt": -25040
+      }
+    }
+  ]
+}

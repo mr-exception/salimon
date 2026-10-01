@@ -277,3 +277,13 @@ The velocity fields describe EVA motion; interior/cockpit use the ship-frame
 transport velocity. `moving-eva.json` tests a 25,000 m/s ship and ten seconds of
 no-input drift, vertical/pitched controls, door collision, and re-entry.
 Nearby-body gravity transition is handled separately by #36.
+
+## Nearby-body EVA (#36)
+
+`eva-approach` is an initial-conditions-only fixture: Earth surface distance
+3,200,000 m, ship-forward radially inward, zero initial speed. The scenario uses
+normal thruster/airlock/walking actions to exit at 25,000 m/s and cross influence.
+`player.location` reports `NearbyBody` while airborne under radial gravity;
+`player.nearby_body` reports the selected solid body and player surface distance.
+Velocity inspection includes inherited motion plus gravity and assisted input.
+Body selection uses the player's world position independently of ship telemetry.

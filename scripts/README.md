@@ -21,7 +21,7 @@ does not complete within two seconds. The `suite` command discovers all
 `scenarios/*.json` files in filename order.
 
 Each JSON file contains `setup` (`scenario`, `seed`, `step_ms`), an overall
-`timeout_ms`, and ordered `steps`. Setup uses the four native fixtures listed
+`timeout_ms`, and ordered `steps`. Setup uses the native fixtures listed
 in [runtime documentation](../client/runtime/README.md). The default overall
 timeout is 60000 ms; each step defaults to 5000 ms. Startup shares the overall
 timeout. A step can specify its own `timeout_ms`. Example:
@@ -322,3 +322,14 @@ the synchronized evidence variant adds drift, vertical-flight and re-entry
 screenshots and runs in required Linux CI. Portable runtime tests execute both
 stationary and moving routes, and character contracts compare 10/20/100 ms
 updates and verify detached motion/view independence from ship changes.
+
+## Nearby-body EVA (#36)
+
+`nearby-eva.json` uses the `eva-approach` initial fixture and normal gameplay
+controls to leave a moving ship, stay in open-space mode outside influence, then
+cross Earth's inclusive shared surface-distance threshold. Assertions check the
+player-selected body, nearby movement mode, continuous altitude, inherited
+25,000 m/s motion, and bounded radial acceleration. The baseline runs in the
+default suite; its evidence variant adds three screenshot/state checkpoints and
+runs in required Linux CI. Character contracts additionally check boundary mode
+changes, gravity integration across update sizes, influence exit, and contact.

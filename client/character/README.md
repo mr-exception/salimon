@@ -70,4 +70,11 @@ view direction, Space ascends and Left Shift descends. Flight assist commands
 to zero when input is released. This assist does not cancel inherited velocity.
 `eva_velocity` reports world motion while detached. Open-gate re-entry restores
 ship-local movement and gravity and preserves the world view direction.
-Nearby-body transitions remain #36.
+The runtime selects nearby solid bodies using player surface distance and the
+world-owned inclusive 3,000,000 m threshold. `NearbyBody` retains the airborne
+position and drift velocity and adds fixed 9.81 m/s² radial gravity once per
+update. The view adopts radial up; 3D assisted controls remain available during
+descent. Body contact clamps to eye height and adopts the existing surface walk.
+The selected surface remains authoritative even if the ship is near another
+body. Leaving influence disables gravity while retaining current world motion;
+re-entry restores interior gravity and clears influence.

@@ -5,6 +5,9 @@
 //! `f32`; [`WorldPosition::camera_relative_f32`] is the canonical conversion.
 //! This crate deliberately has no windowing or GPU dependency.
 
+/// Shared inclusive surface-distance limit for nearby-body gameplay.
+pub const NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS: f64 = 3_000_000.0;
+
 use std::time::Duration;
 
 pub mod carrying;
@@ -294,6 +297,19 @@ pub fn nearest_celestial_body_within_surface_distance(
             (distance <= maximum_distance_meters).then_some((body, distance))
         })
         .min_by(|(_, left), (_, right)| left.total_cmp(right))
+}
+
+/// Select solid bodies by surface distance, preserving catalog order on ties.
+#[must_use]
+pub fn nearby_solid_body(position: WorldPosition) -> Option<(&'static CelestialBody, f64)> {
+    CELESTIAL_BODIES
+        .iter()
+        .filter(|body| body.role == BodyRole::Solid)
+        .filter_map(|body| {
+            let distance = body.surface_distance_from(position);
+            (distance <= NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS).then_some((body, distance))
+        })
+        .min_by(|(_, a), (_, b)| a.total_cmp(b))
 }
 
 fn vector_length(vector: [f64; 3]) -> f64 {
@@ -1208,5 +1224,36 @@ mod tests {
             earth.radial_speed_meters_per_second(position, [0.0, 25.0, 0.0]),
             0.0
         );
+    }
+}
+
+#[cfg(test)]
+mod nearby_solid_tests {
+    use super::*;
+    #[test]
+    fn solid_influence_is_inclusive_shared_and_deterministic_for_every_body() {
+        for body in CELESTIAL_BODIES
+            .iter()
+            .filter(|b| b.role == BodyRole::Solid)
+        {
+            for (offset, expected) in [(-1.0, true), (0.0, true), (1.0, false)] {
+                let c = body.center.meters();
+                let position = WorldPosition::new(
+                    c[0],
+                    c[1] + body.radius_meters + NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS + offset,
+                    c[2],
+                );
+                assert_eq!(
+                    nearby_solid_body(position).map(|(b, _)| b.id),
+                    expected.then_some(body.id)
+                );
+                assert_eq!(nearby_solid_body(position), nearby_solid_body(position));
+            }
+        }
+        let sun = CELESTIAL_BODIES
+            .iter()
+            .find(|b| b.role != BodyRole::Solid)
+            .unwrap();
+        assert_eq!(nearby_solid_body(sun.center), None);
     }
 }

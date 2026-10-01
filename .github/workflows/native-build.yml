@@ -71,6 +71,7 @@ jobs:
             python scripts/salimon-test run scenarios/evidence/cargo-room.json --binary artifacts/build/release/salimon-client --screenshot-command "[\"python\", \"scripts/capture_settled.py\", \"{path}\"]"
             python scripts/salimon-test run scenarios/evidence/space-airlock.json --binary artifacts/build/release/salimon-client --screenshot-command "[\"python\", \"scripts/capture_settled.py\", \"{path}\"]"
             python scripts/salimon-test run scenarios/evidence/moving-eva.json --binary artifacts/build/release/salimon-client --screenshot-command "[\"python\", \"scripts/capture_settled.py\", \"{path}\"]"
+            python scripts/salimon-test run scenarios/evidence/nearby-eva.json --binary artifacts/build/release/salimon-client --screenshot-command "[\"python\", \"scripts/capture_settled.py\", \"{path}\"]"
           ' 2>&1 | tee artifacts/e2e/baseline.log
       - name: Linux optional visual checkpoints (Mesa software Vulkan)
         if: runner.os == 'Linux' && inputs.visual_evidence == true

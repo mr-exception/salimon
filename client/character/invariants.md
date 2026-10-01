@@ -57,3 +57,8 @@
 21. EVA translation is normalized in 3D and integrated using elapsed seconds.
     Flight assist cancels only the commanded motion on release. Re-entry resets
     EVA control state and adopts interior gravity without changing ship velocity.
+
+22. Nearby-body airborne state preserves position and drift on influence changes.
+    Only one selected solid body applies fixed radial gravity. Ship interior
+    gravity owns the player after re-entry; body contact uses that selected
+    surface and never a distant ship's nearest-body frame.

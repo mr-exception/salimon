@@ -268,6 +268,7 @@ pub enum CharacterLocation {
     DoorwayBlend,
     Surface,
     Space,
+    NearbyBody,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -309,6 +310,7 @@ pub struct CharacterController {
     eva_inherited_velocity: [f64; 3],
     eva_control_velocity: [f64; 3],
     eva_axes: [[f64; 3]; 3],
+    nearby_surface: Option<SurfaceFrame>,
 }
 
 impl Default for CharacterController {
@@ -324,6 +326,7 @@ impl Default for CharacterController {
             eva_inherited_velocity: [0.0; 3],
             eva_control_velocity: [0.0; 3],
             eva_axes: [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+            nearby_surface: None,
         }
     }
 }
@@ -336,6 +339,9 @@ impl CharacterController {
             PositionState::Inside { .. } => CharacterLocation::InsideShip,
             PositionState::Doorway { .. } => CharacterLocation::DoorwayBlend,
             PositionState::Surface { .. } => CharacterLocation::Surface,
+            PositionState::Space { .. } if self.nearby_surface.is_some() => {
+                CharacterLocation::NearbyBody
+            }
             PositionState::Space { .. } => CharacterLocation::Space,
         }
     }
@@ -379,8 +385,44 @@ impl CharacterController {
     /// World velocity is retained at exit; control velocity uses flight assist.
     #[must_use]
     pub fn eva_velocity(&self) -> Option<[f64; 3]> {
-        (self.location() == CharacterLocation::Space)
+        matches!(self.position, PositionState::Space { .. })
             .then(|| add(self.eva_inherited_velocity, self.eva_control_velocity))
+    }
+
+    /// Runtime selects the nearby solid body using the shared world-distance rule.
+    /// Changing movement mode never projects position or resets drift velocity.
+    pub fn set_nearby_surface(&mut self, surface: Option<SurfaceFrame>) {
+        let PositionState::Space { world } = self.position else {
+            if matches!(
+                self.position,
+                PositionState::Inside { .. } | PositionState::Cockpit
+            ) {
+                self.nearby_surface = None;
+            }
+            return;
+        };
+        if self.nearby_surface == surface {
+            return;
+        }
+        if let Some(body) = surface {
+            let (planar, _) = planar_look(self.yaw_radians);
+            let old_forward = normalize(add(
+                scale(self.eva_axes[0], planar[0]),
+                scale(self.eva_axes[2], planar[1]),
+            ));
+            let look = add(
+                scale(old_forward, self.pitch_radians.cos()),
+                scale(self.eva_axes[1], self.pitch_radians.sin()),
+            );
+            let up = normalize(sub(world, body.body_center_meters));
+            let forward = normalize_or(reject(old_forward, up), orthogonal_tangent(up));
+            self.eva_axes = [forward, up, normalize(cross(forward, up))];
+            self.yaw_radians = dot(look, self.eva_axes[2])
+                .atan2(dot(look, forward))
+                .rem_euclid(TAU);
+            self.pitch_radians = dot(look, up).clamp(-1.0, 1.0).asin();
+        }
+        self.nearby_surface = surface;
     }
 
     pub fn advance(
@@ -411,6 +453,7 @@ impl CharacterController {
         door_open: bool,
         ship_landed: bool,
     ) {
+        let surface = self.nearby_surface.unwrap_or(surface);
         let (ship, ship_velocity) = ship_motion;
         let seconds = delta.as_secs_f64().min(0.1);
         if seconds <= 0.0 {
@@ -461,6 +504,7 @@ impl CharacterController {
                     self.eva_inherited_velocity = ship_velocity;
                     self.eva_control_velocity = [0.0; 3];
                     self.eva_axes = ship.axes;
+                    self.nearby_surface = None;
                     self.position = PositionState::Space {
                         world: ship.local_to_world(local),
                     };
@@ -546,7 +590,21 @@ impl CharacterController {
             PositionState::Space { world } => {
                 // Integrate the inherited world motion independently of the ship.
                 // The runtime has already advanced the ship by this same interval.
-                let drifted = add(world, scale(self.eva_inherited_velocity, seconds));
+                let gravity = self.nearby_surface.map_or([0.0; 3], |body| {
+                    scale(
+                        normalize(sub(body.body_center_meters, world)),
+                        FIXED_GRAVITY_METERS_PER_SECOND_SQUARED,
+                    )
+                });
+                let drifted = add(
+                    world,
+                    add(
+                        scale(self.eva_inherited_velocity, seconds),
+                        scale(gravity, 0.5 * seconds * seconds),
+                    ),
+                );
+                self.eva_inherited_velocity =
+                    add(self.eva_inherited_velocity, scale(gravity, seconds));
                 let mut previous = ship.world_to_local(drifted);
                 if !door_open
                     && previous[0] > EXTERIOR_AFT
@@ -557,8 +615,11 @@ impl CharacterController {
                 }
                 let view = self.snapshot(ship, surface);
                 let forward = normalize(sub(view.look_target_meters, view.eye_position_meters));
-                let up = self.eva_axes[1];
-                let right = normalize(cross(forward, up));
+                let up = self.nearby_surface.map_or(self.eva_axes[1], |body| {
+                    normalize(sub(world, body.body_center_meters))
+                });
+                let right =
+                    normalize_or(cross(forward, up), normalize(cross(self.eva_axes[0], up)));
                 let movement = add(
                     add(
                         scale(forward, axis(input.forward, input.backward)),
@@ -591,6 +652,7 @@ impl CharacterController {
                 if door_open && through_gate && local[0] > previous[0] {
                     local[0] = local[0].max(DOORWAY_FORWARD);
                     self.vertical_speed = 0.0;
+                    self.nearby_surface = None;
                     self.eva_control_velocity = [0.0; 3];
                     // Preserve the world look direction when adopting ship gravity.
                     self.yaw_radians = dot(forward, ship.axes[2])
@@ -605,9 +667,26 @@ impl CharacterController {
                         1.0 / seconds,
                     );
                     self.eva_control_velocity = actual;
-                    self.position = PositionState::Space {
-                        world: ship.local_to_world(local),
-                    };
+                    let next = ship.local_to_world(local);
+                    if self.nearby_surface.is_some()
+                        && dot(
+                            sub(next, surface.body_center_meters),
+                            sub(next, surface.body_center_meters),
+                        )
+                        .sqrt()
+                            <= surface.radius_meters + PLAYER_EYE_HEIGHT_METERS
+                    {
+                        self.yaw_radians = dot(forward, ship.axes[2])
+                            .atan2(dot(forward, ship.axes[0]))
+                            .rem_euclid(TAU);
+                        self.position = PositionState::Surface {
+                            world: project_eye_to_surface(next, surface),
+                        };
+                        self.eva_inherited_velocity = [0.0; 3];
+                        self.eva_control_velocity = [0.0; 3];
+                    } else {
+                        self.position = PositionState::Space { world: next };
+                    }
                 }
             }
             PositionState::Surface { mut world } => {
@@ -685,10 +764,17 @@ impl CharacterController {
 
     #[must_use]
     pub fn snapshot(&self, ship: ShipFrame, surface: SurfaceFrame) -> CharacterSnapshot {
+        let surface = self.nearby_surface.unwrap_or(surface);
         let (eye, up, blend) = match self.position {
             PositionState::Cockpit => (ship.local_to_world(COCKPIT_POSITION), ship.axes[1], None),
             PositionState::Inside { local } => (ship.local_to_world(local), ship.axes[1], None),
-            PositionState::Space { world } => (world, self.eva_axes[1], None),
+            PositionState::Space { world } => (
+                world,
+                self.nearby_surface.map_or(self.eva_axes[1], |body| {
+                    normalize(sub(world, body.body_center_meters))
+                }),
+                None,
+            ),
             PositionState::Surface { world } => (
                 world,
                 normalize(sub(world, surface.body_center_meters)),
@@ -715,7 +801,7 @@ impl CharacterController {
                 )
             }
         };
-        let view_axes = if self.location() == CharacterLocation::Space {
+        let view_axes = if matches!(self.position, PositionState::Space { .. }) {
             self.eva_axes
         } else {
             ship.axes
@@ -3138,5 +3224,136 @@ mod sight_tests {
         assert!(ship_sight_obstruction([-10.0, 1.0, 7.0], [-9.0, 1.0, 7.0], true).unwrap() < 1.0);
         assert!(ship_sight_obstruction([-10.0, 4.0, 0.0], [-9.0, 4.0, 0.0], false).is_none());
         assert!(ship_sight_obstruction([-10.0, 1.0, 0.0], [-11.0, 1.0, 0.0], false).is_none());
+    }
+}
+
+#[cfg(test)]
+mod nearby_eva_tests {
+    use super::*;
+
+    fn body() -> SurfaceFrame {
+        SurfaceFrame {
+            body_center_meters: [0.0; 3],
+            radius_meters: 6_000_000.0,
+        }
+    }
+    fn ship() -> ShipFrame {
+        ShipFrame {
+            origin_meters: [1_000_000.0, 0.0, 0.0],
+            axes: [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+        }
+    }
+    fn player(altitude: f64) -> CharacterController {
+        CharacterController {
+            position: PositionState::Space {
+                world: [0.0, body().radius_meters + altitude, 0.0],
+            },
+            eva_inherited_velocity: [0.0, -25_000.0, 0.0],
+            ..CharacterController::default()
+        }
+    }
+
+    #[test]
+    fn influence_changes_preserve_position_velocity_and_look() {
+        for yaw in [0.0, 0.8, 2.4] {
+            let mut p = player(3_000_000.0);
+            p.yaw_radians = yaw;
+            p.pitch_radians = -0.6;
+            let before = p.snapshot(ship(), body());
+            let velocity = p.eva_velocity();
+            p.set_nearby_surface(Some(body()));
+            assert_eq!(p.location(), CharacterLocation::NearbyBody);
+            assert_eq!(
+                p.snapshot(ship(), body()),
+                CharacterSnapshot {
+                    location: CharacterLocation::NearbyBody,
+                    ..before
+                }
+            );
+            assert_eq!(p.eva_velocity(), velocity);
+            p.set_nearby_surface(None);
+            assert_eq!(p.location(), CharacterLocation::Space);
+            assert_eq!(p.snapshot(ship(), body()), before);
+            assert_eq!(p.eva_velocity(), velocity);
+        }
+        // View parallel to radial gravity must still produce a finite tangent frame.
+        let mut p = player(3_000_000.0);
+        p.eva_axes = [[0.0, 1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, -1.0]];
+        p.set_nearby_surface(Some(body()));
+        assert!(
+            p.snapshot(ship(), body())
+                .look_target_meters
+                .iter()
+                .all(|v| v.is_finite())
+        );
+        assert!(dot(p.eva_axes[0], p.eva_axes[1]).abs() < 1e-12);
+    }
+
+    #[test]
+    fn radial_gravity_is_applied_once_and_is_frame_rate_independent() {
+        let mut results = Vec::new();
+        for ms in [10, 20, 100] {
+            let mut p = player(3_000_000.0);
+            p.set_nearby_surface(Some(body()));
+            for _ in 0..1000 / ms {
+                p.set_nearby_surface(Some(body()));
+                p.advance(
+                    Duration::from_millis(ms),
+                    MovementInput::default(),
+                    ship(),
+                    body(),
+                    false,
+                    false,
+                );
+            }
+            let eye = p.snapshot(ship(), body()).eye_position_meters;
+            assert!((eye[1] - (9_000_000.0 - 25_000.0 - 4.905)).abs() < 1e-6);
+            assert!((p.eva_velocity().unwrap()[1] + 25_009.81).abs() < 1e-7);
+            results.push(eye);
+            let velocity = p.eva_velocity();
+            p.set_nearby_surface(None);
+            p.advance(
+                Duration::from_millis(ms),
+                MovementInput::default(),
+                ship(),
+                body(),
+                false,
+                false,
+            );
+            assert_eq!(p.eva_velocity(), velocity);
+        }
+        for eye in results {
+            assert!((eye[1] - (9_000_000.0 - 25_004.905)).abs() < 1e-6);
+        }
+    }
+
+    #[test]
+    fn contact_lands_on_selected_body_and_interior_clears_influence() {
+        let mut p = player(3.0);
+        p.eva_inherited_velocity = [0.0, -10.0, 0.0];
+        p.set_nearby_surface(Some(body()));
+        for _ in 0..4 {
+            p.advance(
+                Duration::from_millis(100),
+                MovementInput::default(),
+                ship(),
+                body(),
+                false,
+                false,
+            );
+        }
+        assert_eq!(p.location(), CharacterLocation::Surface);
+        let other = SurfaceFrame {
+            radius_meters: 1.0,
+            ..body()
+        };
+        let eye = p.snapshot(ship(), other).eye_position_meters;
+        assert!((eye[1] - body().radius_meters - PLAYER_EYE_HEIGHT_METERS).abs() < 1e-8);
+        assert_eq!(p.eva_velocity(), None);
+        p.position = PositionState::Inside {
+            local: PLAYER_START,
+        };
+        p.set_nearby_surface(Some(body()));
+        assert_eq!(p.nearby_surface, None);
     }
 }

@@ -69,3 +69,12 @@ control velocity adds 3D view-relative translation without modifying inherited
 velocity. Input release removes controlled movement only. Re-entry clears EVA
 control state and rebases yaw/pitch to preserve the world look direction when
 adopting the ship frame. The stationary `advance` adapter supplies zero velocity.
+
+Nearby-body influence is a runtime-selected optional `SurfaceFrame`, leaving the
+portable character independent of the world catalog. Detached state reports
+`NearbyBody` while influenced. Updates integrate drift plus half-step radial
+acceleration, then update drift velocity once. Surface contact adopts existing
+walking; influence exit retains drift. Influence changes preserve world position
+and rebase the view to radial up without resetting look direction. Interior
+re-entry clears the external influence. The runtime evaluates the shared world
+selector before and after movement so authoritative mode matches boundary crossing.

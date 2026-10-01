@@ -125,3 +125,15 @@ The game should avoid conventional abstract inventory.
 - Rooms and modules can be individually detached or destroyed during combat and can physically separate from the ship.
 - Structural integrity is primarily a numerical design constraint rather than a full bending/breaking simulation.
 - Weapon damage should be localized to specific hull sections/modules and can cause decompression, disabled systems, and internal damage.
+
+### Nearby-body EVA implementation (#36)
+
+Nearby means an inclusive **surface distance** of 3,000,000 m measured from the
+player, using the world-owned constant also re-exported by ship telemetry.
+Only solid bodies apply EVA gravity. The nearest eligible surface wins;
+exact ties follow catalog order. Entry preserves world position and inherited
+velocity and adds the shared fixed 9.81 m/s² radial gravity. Airborne assisted
+3D controls remain available, and the camera uses radial up. On body contact,
+existing eye-height surface walking takes over. Exiting influence disables radial
+gravity and preserves accumulated drift. Ship interior gravity overrides this
+mode after re-entry. This does not add orbital physics to ship flight.

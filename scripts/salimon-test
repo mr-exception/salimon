@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 from salimon_test import run
+from scenario_suites import select_scenarios
 
 
 def main():
@@ -16,6 +17,8 @@ def main():
     parser.add_argument("command", choices=["run", "suite"])
     parser.add_argument("scenario", nargs="?", help="scenario JSON file (run only)")
     parser.add_argument("--binary", type=Path, help="prebuilt salimon-client executable")
+    parser.add_argument("--group", choices=["ship-eva"], help="named prerequisite suite (suite only)")
+    parser.add_argument("--evidence", action="store_true", help="run screenshot variants (suite only)")
     parser.add_argument("--artifacts", type=Path, default=root / "artifacts" / "e2e",
                         help="root for isolated per-scenario result directories")
     parser.add_argument("--screenshot-command", help='JSON argv array with a {path} placeholder; [] disables capture')
@@ -32,7 +35,9 @@ def main():
             parser.error("--screenshot-command needs nonempty argv strings and a {path} placeholder")
     if (args.command == "run") != bool(args.scenario):
         parser.error("run requires a scenario path; suite takes no path")
-    paths = [Path(args.scenario)] if args.command == "run" else sorted((root / "scenarios").glob("*.json"))
+    if args.command == "run" and (args.group or args.evidence):
+        parser.error("--group and --evidence require suite")
+    paths = [Path(args.scenario)] if args.command == "run" else select_scenarios(root / "scenarios", args.group, args.evidence)
     if not paths:
         print(json.dumps({"status": "failed", "error": "no scenarios found", "results": []}))
         return 1

@@ -53,6 +53,33 @@ Runner contract tests need only Python 3 and can run without a display:
 python3 -m unittest discover -s scripts -p 'test_*.py'
 ```
 
+## Ship/EVA prerequisite suite (#39)
+
+Before resource transfer/cargo work, run the four prerequisite routes together:
+
+```sh
+python3 scripts/salimon-test suite --group ship-eva
+python3 scripts/salimon-test suite --group ship-eva --evidence \
+  --screenshot-command '["python3", "scripts/capture_settled.py", "{path}"]'
+```
+
+Both commands support `--binary` and `--artifacts`. The first runs cargo-room,
+space-airlock, moving-eva and nearby-eva in that order. The second runs their
+synchronized screenshot variants; capture failure fails the suite. Each scenario
+starts a fresh native client and emits the shared result, step snapshots,
+protocol/process logs and failure artifacts. A missing prerequisite file fails
+rather than silently reducing coverage. `--group` and `--evidence` require `suite`;
+`suite --evidence` without a group runs every evidence variant.
+
+The moving route checks all three ship-relative position axes within 0.02 m
+after 600 frames (9.6 seconds) without input, zero relative speed within 0.02 m/s,
+and ship/player inherited speed of 25,000 m/s. It also checks velocity after
+re-entry. The nearby route checks open-space mode before threshold crossing,
+Earth selection inside 3,000,000 m, continuous altitude and bounded radial
+acceleration. Cargo traversal and airlock collision checks cover the real layout.
+The required Linux CI job runs this evidence group against the release binary.
+See [checked-in validation](../docs/issue-39/README.md) for results and screenshots.
+
 ## Phase 0 baseline suite
 
 The default `suite` checks seven native gameplay paths:

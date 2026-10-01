@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-01",
+  "platform": "Linux Xvfb / Mesa software Vulkan",
+  "evidence": [
+    {
+      "scenario": "cargo-room",
+      "status": "passed",
+      "steps_completed": 140,
+      "screenshots": [
+        "step-018-cargo-route-cockpit-17.png",
+        "step-042-airlock-exterior.png",
+        "step-077-cargo-room-landed.png",
+        "step-123-cargo-route-cockpit-120.png",
+        "step-138-cargo-room-flying.png"
+      ],
+      "archive_directory": "cargo-room"
+    },
+    {
+      "scenario": "space-airlock",
+      "status": "passed",
+      "steps_completed": 52,
+      "screenshots": [
+        "step-022-space-exit.png",
+        "step-034-space-closed-door.png",
+        "step-042-space-reentry.png",
+        "step-050-space-interior-closed-door.png"
+      ],
+      "archive_directory": "space-airlock"
+    },
+    {
+      "scenario": "moving-eva",
+      "status": "passed",
+      "steps_completed": 94,
+      "screenshots": [
+        "step-034-moving-eva-no-input-drift.png",
+        "step-043-moving-eva-vertical-flight.png",
+        "step-086-moving-eva-reentry.png"
+      ],
+      "archive_directory": "moving-eva"
+    },
+    {
+      "scenario": "nearby-eva",
+      "status": "passed",
+      "steps_completed": 45,
+      "screenshots": [
+        "step-027-eva-outside-influence.png",
+        "step-039-eva-nearby-radial-gravity.png",
+        "step-045-eva-inherited-velocity-preserved.png"
+      ],
+      "archive_directory": "nearby-eva"
+    }
+  ],
+  "quality_gates": {
+    "build": "passed",
+    "rustfmt": "passed",
+    "clippy_with_warnings_denied": "passed",
+    "rust_tests_passed": 222,
+    "python_tests_passed": 32
+  },
+  "repeatability": {
+    "runs": 3,
+    "all_prerequisite_step_states_identical": true
+  },
+  "native_suites": [
+    {
+      "run": 1,
+      "status": "passed",
+      "scenarios": [
+        {
+          "scenario": "cargo-room.json",
+          "status": "passed",
+          "steps_completed": 135
+        },
+        {
+          "scenario": "carrying.json",
+          "status": "passed",
+          "steps_completed": 185
+        },
+        {
+          "scenario": "landed-earth.json",
+          "status": "passed",
+          "steps_completed": 108
+        },
+        {
+          "scenario": "mining.json",
+          "status": "passed",
+          "steps_completed": 135
+        },
+        {
+          "scenario": "moving-eva.json",
+          "status": "passed",
+          "steps_completed": 91
+        },
+        {
+          "scenario": "nearby-eva.json",
+          "status": "passed",
+          "steps_completed": 42
+        },
+        {
+          "scenario": "orbit-earth.json",
+          "status": "passed",
+          "steps_completed": 23
+        },
+        {
+          "scenario": "resource-deposits.json",
+          "status": "passed",
+          "steps_completed": 56
+        },
+        {
+          "scenario": "resource-streaming.json",
+          "status": "passed",
+          "steps_completed": 132
+        },
+        {
+          "scenario": "space-airlock.json",
+          "status": "passed",
+          "steps_completed": 48
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "status": "passed",
+      "scenarios": [
+        {
+          "scenario": "cargo-room.json",
+          "status": "passed",
+          "steps_completed": 135
+        },
+        {
+          "scenario": "space-airlock.json",
+          "status": "passed",
+          "steps_completed": 48
+        },
+        {
+          "scenario": "moving-eva.json",
+          "status": "passed",
+          "steps_completed": 91
+        },
+        {
+          "scenario": "nearby-eva.json",
+          "status": "passed",
+          "steps_completed": 42
+        }
+      ]
+    },
+    {
+      "run": 3,
+      "status": "passed",
+      "scenarios": [
+        {
+          "scenario": "cargo-room.json",
+          "status": "passed",
+          "steps_completed": 135
+        },
+        {
+          "scenario": "space-airlock.json",
+          "status": "passed",
+          "steps_completed": 48
+        },
+        {
+          "scenario": "moving-eva.json",
+          "status": "passed",
+          "steps_completed": 91
+        },
+        {
+          "scenario": "nearby-eva.json",
+          "status": "passed",
+          "steps_completed": 42
+        }
+      ]
+    }
+  ]
+}

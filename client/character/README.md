@@ -78,3 +78,9 @@ descent. Body contact clamps to eye height and adopts the existing surface walk.
 The selected surface remains authoritative even if the ship is near another
 body. Leaving influence disables gravity while retaining current world motion;
 re-entry restores interior gravity and clears influence.
+
+`ship_floor_placement` supplies conservative cabin/cargo deck support using the
+same furniture/partition bounds as traversal. Interior sight queries use walls,
+furniture, deck, ceiling, and the gate rather than treating the whole cabin as
+a solid exterior box. These renderer-neutral queries also validate loose resource
+placement and pickup; no resource types enter the character crate.

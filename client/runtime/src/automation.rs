@@ -242,6 +242,7 @@ fn inspect(app: &ClientApplication) -> Value {
             let mesh = crate::resource_presentation::fragment_visual(piece);
             json!({
                 "id": piece.id().0,
+                "reference_frame": if app.mining.ship_fragments.contains_key(&piece.id()) { "ship" } else { "world" },
                 "carried": app.mining.session.carried_id() == Some(piece.id()),
                 "distance_to_player_meters": piece.transform().position().offset_from(salimon_world::WorldPosition::new(character.eye_position_meters[0], character.eye_position_meters[1], character.eye_position_meters[2])).iter().map(|v| v * v).sum::<f64>().sqrt(),
                 "ship_local_position_meters": frame.world_to_local(piece.transform().position().meters()),
@@ -527,6 +528,14 @@ mod tests {
     }
 
     #[test]
+    fn fragment_transfer_walkthrough_uses_real_gameplay_actions() {
+        assert_gameplay_scenario(
+            Scenario::LandedEarth,
+            include_str!("../../../scenarios/fragment-transfer.json"),
+        );
+    }
+
+    #[test]
     fn space_airlock_walkthrough_uses_real_gameplay_actions() {
         assert_gameplay_scenario(
             Scenario::OpenSpace,
@@ -568,6 +577,19 @@ mod tests {
                 command["protocol"] = json!(1);
                 command["id"] = json!(index);
                 assert_eq!(execute(&mut test, &command.to_string())["ok"], true);
+                if let Some(id) = test.mining.session.carried_id() {
+                    let state = inspect(&test);
+                    let piece = state["world"]["fragments"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .find(|p| p["id"].as_u64() == Some(id.0))
+                        .expect("carried identity stays visible");
+                    assert!(
+                        piece["distance_to_player_meters"].as_f64().unwrap() < 1.0,
+                        "carried pose at step {index}"
+                    );
+                }
             } else if let Some(check) = step.get("assert") {
                 let state = inspect(&test);
                 let path = check["path"].as_str().unwrap();

@@ -170,6 +170,23 @@ impl MiningSession {
         true
     }
 
+    /// Move an existing loose physical entity with its supporting reference frame.
+    /// Carried objects are controlled exclusively by the carry slot.
+    pub fn move_loose(
+        &mut self,
+        id: crate::resources::FragmentId,
+        pose: crate::resources::ResourceTransform,
+    ) -> bool {
+        if self.carried_id() == Some(id) {
+            return false;
+        }
+        let Some(piece) = self.fragments.get_mut(id) else {
+            return false;
+        };
+        piece.set_transform(pose);
+        true
+    }
+
     /// Diagnostic extraction total, never spendable inventory or carried mass.
     pub const fn extracted_mass_kg(&self) -> f64 {
         self.extracted_mass_kg

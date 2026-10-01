@@ -360,3 +360,24 @@ player-selected body, nearby movement mode, continuous altitude, inherited
 default suite; its evidence variant adds three screenshot/state checkpoints and
 runs in required Linux CI. Character contracts additionally check boundary mode
 changes, gravity integration across update sizes, influence exit, and contact.
+
+## Planet/ship fragment transfer (#47)
+
+`fragment-transfer.json` uses the real mining/pickup route, carries one fragment
+through the open gate, drops/retrieves it inside, carries it back outside, then
+repeats. It checks identity/mass, ownership, world versus ship support, re-entry,
+and stable ship-local placement while walking away/back and during assisted
+takeoff and 25,000 m/s flight. The portable runtime executes the same route,
+checking carried proximity after each input/step. Narrow contracts cover rotated
+and translated ship frames, pickup detachment, invalid placement, and sight
+obstruction. The default suite includes the baseline; Linux CI also requires
+the evidence variant with settled capture:
+
+```sh
+python scripts/salimon-test run scenarios/evidence/fragment-transfer.json \
+  --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
+```
+
+Inspection exposes each visible fragment's `reference_frame` (`ship` for loose
+interior anchors, `world` otherwise) alongside its existing carried flag and
+ship-local pose. These fields describe actual physical entities, not inventory.

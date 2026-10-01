@@ -36,7 +36,10 @@ pub(crate) fn target(
     frame: ShipFrame,
     door_open: bool,
 ) -> Option<FragmentId> {
-    if player.location != CharacterLocation::Surface {
+    if !matches!(
+        player.location,
+        CharacterLocation::Surface | CharacterLocation::InsideShip
+    ) {
         return None;
     }
     let ray = ray(player)?;
@@ -67,7 +70,10 @@ pub(crate) fn context(
     target: Option<FragmentId>,
     player: CharacterSnapshot,
 ) -> Option<&'static str> {
-    if player.location != CharacterLocation::Surface {
+    if !matches!(
+        player.location,
+        CharacterLocation::Surface | CharacterLocation::InsideShip
+    ) {
         return None;
     }
     if tool.session.carried_id().is_some() {
@@ -107,7 +113,7 @@ pub(crate) fn follow(tool: &mut MiningTool, player: CharacterSnapshot) {
 }
 
 /// Place on the aimed nearby surface, or just ahead at ground level when looking
-/// horizontally. Unsupported ship/cargo placement belongs to the transfer issue.
+/// horizontally. Interior placement uses the shared ship-local deck/collision layout.
 pub(crate) fn drop_pose(
     tool: &MiningTool,
     player: CharacterSnapshot,
@@ -115,7 +121,10 @@ pub(crate) fn drop_pose(
     door_open: bool,
     seed: u64,
 ) -> Option<ResourceTransform> {
-    if player.location != CharacterLocation::Surface {
+    if !matches!(
+        player.location,
+        CharacterLocation::Surface | CharacterLocation::InsideShip
+    ) {
         return None;
     }
     let id = tool.session.carried_id()?;
@@ -125,6 +134,36 @@ pub(crate) fn drop_pose(
         .iter()
         .find(|piece| piece.id() == id)?;
     let ray = ray(player)?;
+    if player.location == CharacterLocation::InsideShip {
+        let eye = frame.world_to_local(player.eye_position_meters);
+        let direction = std::array::from_fn::<_, 3, _>(|i| dot(ray.direction, frame.axes[i]));
+        // Bounding sphere clearance keeps world-axis greybox cubes clear even as the ship rotates.
+        let half = salimon_world::resource_fragments::side_meters(piece) * 0.5 * 3.0_f64.sqrt();
+        let floor = salimon_character::CARGO_ROOM_MIN_METERS[1];
+        let t = if direction[1] < -1e-9 {
+            ((floor - eye[1]) / direction[1]).min(3.0)
+        } else {
+            0.9
+        };
+        let aim = std::array::from_fn(|i| eye[i] + direction[i] * t);
+        let local = salimon_character::ship_floor_placement(aim, half)?;
+        let center = position(frame.local_to_world(local));
+        let distance = dot(
+            center.offset_from(ray.origin),
+            center.offset_from(ray.origin),
+        )
+        .sqrt();
+        if distance > 3.0
+            || hull_obstruction(player, frame, door_open, center.meters())
+                .is_some_and(|d| d < distance - half)
+        {
+            return None;
+        }
+        if overlaps(tool, id, center, half) {
+            return None;
+        }
+        return ResourceTransform::new(center, piece.transform().orientation_xyzw()).ok();
+    }
     let body = CELESTIAL_BODIES
         .iter()
         .filter(|body| body.role == BodyRole::Solid)
@@ -170,18 +209,7 @@ pub(crate) fn drop_pose(
         return None;
     }
     // Keep placed physical pieces distinct, and avoid placing inside deposits.
-    if tool
-        .session
-        .fragments()
-        .iter()
-        .filter(|p| p.id() != id)
-        .any(|other| {
-            let offset = center.offset_from(other.transform().position());
-            let extent =
-                half + salimon_world::resource_fragments::side_meters(*other) * 0.5 + 0.005;
-            offset.iter().all(|v| v.abs() < extent)
-        })
-    {
+    if overlaps(tool, id, center, half) {
         return None;
     }
     let deposits = tool.nearby(player.eye_position_meters, seed).ok()?;
@@ -196,6 +224,36 @@ pub(crate) fn drop_pose(
     ResourceTransform::new(center, piece.transform().orientation_xyzw()).ok()
 }
 
+fn overlaps(tool: &MiningTool, id: FragmentId, center: WorldPosition, half: f64) -> bool {
+    tool.session
+        .fragments()
+        .iter()
+        .filter(|p| p.id() != id)
+        .any(|other| {
+            let extent =
+                half + salimon_world::resource_fragments::side_meters(*other) * 0.5 + 0.005;
+            center
+                .offset_from(other.transform().position())
+                .iter()
+                .all(|v| v.abs() < extent)
+        })
+}
+
+/// Interior gravity abstracts acceleration: loose pieces retain their ship-local
+/// coordinates while the ship translates/rotates. Surface pieces remain world-local.
+pub(crate) fn sync_ship_fragments(tool: &mut MiningTool, frame: ShipFrame) {
+    if let Some(id) = tool.session.carried_id() {
+        tool.ship_fragments.remove(&id);
+    }
+    for (&id, &local) in &tool.ship_fragments {
+        if let Ok(pose) =
+            ResourceTransform::new(position(frame.local_to_world(local)), [0.0, 0.0, 0.0, 1.0])
+        {
+            tool.session.move_loose(id, pose);
+        }
+    }
+}
+
 fn dot(a: [f64; 3], b: [f64; 3]) -> f64 {
     a.iter().zip(b).map(|(a, b)| a * b).sum()
 }
@@ -205,4 +263,110 @@ fn cross(a: [f64; 3], b: [f64; 3]) -> [f64; 3] {
         a[2] * b[0] - a[0] * b[2],
         a[0] * b[1] - a[1] * b[0],
     ]
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use salimon_world::CelestialBodyId;
+    use salimon_world::resources::{DepositId, RawMaterial, ResourceDeposit, ResourceId};
+    use std::time::Duration;
+
+    fn mined() -> MiningTool {
+        let mut tool = MiningTool::default();
+        let mut deposit = ResourceDeposit::new(
+            DepositId {
+                body: CelestialBodyId::Earth,
+                local: 1,
+            },
+            RawMaterial::new(ResourceId::SilicateRock, 2.0).unwrap(),
+            position([0.0, 0.0, 0.0]),
+            2.0,
+        )
+        .unwrap();
+        tool.session.extract(&mut deposit, Duration::from_secs(1));
+        tool
+    }
+
+    #[test]
+    fn loose_ship_piece_keeps_local_pose_across_translation_rotation_and_pickup() {
+        let mut tool = mined();
+        let original = tool.session.fragments()[0];
+        let id = original.id();
+        let local = [-5.8, 0.4, 0.0];
+        tool.ship_fragments.insert(id, local);
+        for axes in [
+            [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+            [[0.0, 1.0, 0.0], [-1.0, 0.0, 0.0], [0.0, 0.0, 1.0]],
+        ] {
+            for offset in [0.0, 25_000.0, 1.0e12] {
+                let frame = ShipFrame {
+                    origin_meters: [offset, offset, offset],
+                    axes,
+                };
+                sync_ship_fragments(&mut tool, frame);
+                let piece = tool.session.fragments()[0];
+                assert_eq!(piece.id(), id);
+                assert_eq!(piece.source(), original.source());
+                assert_eq!(piece.material(), original.material());
+                for (actual, expected) in frame
+                    .world_to_local(piece.transform().position().meters())
+                    .iter()
+                    .zip(local)
+                {
+                    assert!((actual - expected).abs() < 0.001);
+                }
+            }
+        }
+        assert!(tool.session.pick_up(id));
+        let carried =
+            ResourceTransform::new(position([10.0, 20.0, 30.0]), [0.0, 0.0, 0.0, 1.0]).unwrap();
+        tool.session.move_carried(carried);
+        assert!(!tool.session.move_loose(id, original.transform()));
+        sync_ship_fragments(
+            &mut tool,
+            ShipFrame {
+                origin_meters: [0.0; 3],
+                axes: [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+            },
+        );
+        assert!(tool.ship_fragments.is_empty());
+        assert_eq!(tool.session.fragments()[0].transform(), carried);
+    }
+
+    #[test]
+    fn interior_placement_rejects_walls_furniture_edges_and_oversized_objects() {
+        use salimon_character::ship_floor_placement;
+        assert!(ship_floor_placement([-5.8, 2.0, 0.0], 0.1).is_some());
+        assert!(ship_floor_placement([1.0, 2.0, 8.0], 0.1).is_some());
+        for point in [
+            [-1.0, 2.0, 0.0],
+            [-3.2, 2.0, 8.0],
+            [2.3, 2.0, 8.0],
+            [0.0, 2.0, 10.6],
+            [-8.0, 2.0, 0.0],
+            [0.0, 2.0, 4.8],
+        ] {
+            assert!(ship_floor_placement(point, 0.1).is_none(), "{point:?}");
+        }
+        assert!(ship_floor_placement([1.0, 2.0, 8.0], 2.0).is_none());
+        assert!(ship_floor_placement([f64::NAN, 2.0, 8.0], 0.1).is_none());
+    }
+
+    #[test]
+    fn ship_sight_reaches_loose_items_but_not_through_core_partition_or_closed_gate() {
+        use salimon_character::ship_sight_obstruction;
+        assert!(
+            ship_sight_obstruction([-5.8, 2.0, 0.0], [-4.9, 0.4, 0.0], true)
+                .is_none_or(|d| d > 1.84)
+        );
+        assert!(ship_sight_obstruction([-2.5, 2.0, 0.0], [1.0, 0.4, 0.0], true).is_some());
+        assert!(ship_sight_obstruction([-4.0, 2.0, 3.0], [-4.0, 0.4, 8.0], true).is_some());
+        assert_eq!(
+            ship_sight_obstruction([-6.5, 2.0, 0.0], [-9.0, 0.4, 0.0], true),
+            None
+        );
+        assert!(ship_sight_obstruction([-6.5, 2.0, 0.0], [-9.0, 0.4, 0.0], false).is_some());
+        assert!(ship_sight_obstruction([-5.8, 2.0, 0.0], [-5.8, 0.0, 0.0], true).is_some());
+    }
 }

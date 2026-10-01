@@ -96,3 +96,16 @@ cuboid tool/aim marker without exposing gameplay types to the renderer.
 Physical fragments are world-owned session entities. Runtime maps their
 mass-derived cube size and absolute pose to generic presentation DTOs; the same
 nearby query supplies automation state even when the tool is stowed.
+
+## Physical surface/ship transfer (#47)
+
+`carrying.rs` composes surface and interior targeting/placement with the shared
+character collision layout. `MiningTool.ship_fragments` holds supporting ship-local
+coordinates keyed by existing physical fragment IDs, never inventory quantities.
+Successful interior release installs an anchor; pickup removes it before following
+the player; surface release stays world-local. Every gameplay update and look/input
+synchronization maps loose anchors through the current ship frame. The same world
+session owns every entity and its immutable mass/material/source throughout.
+Greybox cubes remain world-axis aligned; conservative bounding-sphere clearance
+keeps them off the deck/walls as the supporting ship rotates. This intentionally
+abstracts acceleration through internal gravity without adding rigid-body physics.

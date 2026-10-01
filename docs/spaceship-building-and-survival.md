@@ -137,3 +137,17 @@ velocity and adds the shared fixed 9.81 m/s² radial gravity. Airborne assisted
 existing eye-height surface walking takes over. Exiting influence disables radial
 gravity and preserves accumulated drift. Ship interior gravity overrides this
 mode after re-entry. This does not add orbital physics to ship flight.
+
+### Physical planet/ship transfer (#47)
+
+Q targets/picks up fragments on the surface or while walking inside; G places on
+clear nearby ground or the ship deck, including the cargo-room floor. Placement
+rejects furniture, partitions, hull edges, and overlapping fragments. Doorway
+movement keeps the same carried world entity relative to the player's eye/up
+basis. Releasing inside attaches that physical entity to a ship-local support
+anchor: it moves with the ship without reacting to acceleration. Pickup detaches
+it; releasing outside restores a stationary world pose on radial ground.
+Identity, material, mass, and source stay unchanged through repeated trips.
+Current greybox cubes retain world-axis orientation with conservative clearance
+for rotated decks. This adds no abstract inventory, container system, cargo
+counting, rigid-body dynamics, or backend persistence.

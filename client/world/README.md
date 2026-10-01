@@ -52,4 +52,6 @@ and exact cube aiming with supplied terrain/hull occlusion. `MiningSession` owns
 the carried fragment ID, guarded pickup, transform changes, and release, keeping
 the physical entity in the same session collection throughout. Collected pieces
 are sealed against later extraction growth. Runtime composes character-relative
-poses and validates planetary placement; ship/cargo transfer is future work.
+poses and validates surface and ship-deck placement. Runtime retains ship-local anchors
+for loose interior pieces and releases those anchors on pickup; world owns
+identity, raw material, mass, and the same session entities through every transfer.

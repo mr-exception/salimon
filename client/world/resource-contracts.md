@@ -36,8 +36,9 @@ matching source material are the responsibility of the future extraction system.
 A pose uses absolute `f64` meters and a finite unit quaternion in `[x,y,z,w]`
 order. Constructors reject invalid positions/rotations; rotations within `1e-9`
 of unit squared length are normalized. No visual scale or resource inventory
-count is stored. Carrying ownership, gravity, velocity, cargo containment, and
-the permanent one-object carrying invariant will be implemented by their tasks.
+count is stored. `MiningSession` now owns permanent single-object carrying
+and guarded loose-entity pose updates. Runtime composes surface/ship transfer and
+ship-local support anchors. Cargo containment and item velocity remain separate work.
 
 Run focused contracts with `cargo test --locked -p salimon-world --test resources`.
 

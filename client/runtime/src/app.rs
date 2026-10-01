@@ -470,11 +470,24 @@ impl ClientApplication {
             door_open,
             self.e2e_config.map_or(0, |config| config.seed),
         ) {
+            let id = self
+                .mining
+                .session
+                .carried_id()
+                .expect("drop has carried identity");
             self.mining.session.drop_carried(pose);
+            if player.location == CharacterLocation::InsideShip {
+                self.mining
+                    .ship_fragments
+                    .insert(id, frame.world_to_local(pose.position().meters()));
+            } else {
+                self.mining.ship_fragments.remove(&id);
+            }
             "Fragment placed"
         } else {
             "Aim at clear nearby ground to place fragment"
         };
+        crate::carrying::sync_ship_fragments(&mut self.mining, frame);
         crate::carrying::follow(&mut self.mining, player);
         self.mining.carry_feedback = Some(message);
         self.action_bar.show_transient(message);
@@ -483,6 +496,7 @@ impl ClientApplication {
     pub(crate) fn sync_carried(&mut self) {
         let ship = self.ship.snapshot();
         let frame = character_ship_frame(ship.pose);
+        crate::carrying::sync_ship_fragments(&mut self.mining, frame);
         crate::carrying::follow(
             &mut self.mining,
             self.character.snapshot(frame, surface_frame_for_ship(ship)),

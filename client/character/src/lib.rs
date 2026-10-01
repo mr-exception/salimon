@@ -196,6 +196,38 @@ impl ShipFrame {
     }
 }
 
+/// A conservative physical cube placement on the shared cabin/cargo deck.
+/// Uses the traversal proxies; furniture, partitions, and hull edges stay solid.
+#[must_use]
+pub fn ship_floor_placement(local: [f64; 3], half: f64) -> Option<[f64; 3]> {
+    if !half.is_finite() || half <= 0.0 || !local.iter().all(|v| v.is_finite()) {
+        return None;
+    }
+    let cabin = local[0] - half >= INTERIOR_FORWARD_MIN
+        && local[0] + half <= INTERIOR_FORWARD_MAX
+        && local[2].abs() + half <= INTERIOR_SIDE_LIMIT;
+    let cargo = local[0] - half >= CARGO_ROOM_MIN_METERS[0]
+        && local[0] + half <= CARGO_ROOM_MAX_METERS[0]
+        && local[2] - half >= CARGO_ROOM_MIN_METERS[2]
+        && local[2] + half <= CARGO_ROOM_MAX_METERS[2];
+    if !(cabin || cargo) || SHIP_FLOOR_HEIGHT + half * 2.0 >= SHIP_CEILING_HEIGHT {
+        return None;
+    }
+    if INTERIOR_OBSTACLES
+        .iter()
+        .chain(CARGO_WALLS.iter())
+        .any(|b| {
+            local[0] + half > b[0]
+                && local[0] - half < b[1]
+                && local[2] + half > b[2]
+                && local[2] - half < b[3]
+        })
+    {
+        return None;
+    }
+    Some([local[0], SHIP_FLOOR_HEIGHT + half + 0.005, local[2]])
+}
+
 /// First ray hit on the same solid cabin, gate, and engine proxies used for traversal.
 /// Inputs are ship-local; the returned distance is in meters along a unit ray.
 #[must_use]
@@ -229,6 +261,112 @@ pub fn ship_sight_obstruction(eye: [f64; 3], target: [f64; 3], door_open: bool) 
             b[2] + PLAYER_RADIUS_METERS,
             b[3] - PLAYER_RADIUS_METERS,
         ]);
+    }
+    let inside_cabin = eye[0] >= INTERIOR_FORWARD_MIN
+        && eye[0] <= INTERIOR_FORWARD_MAX
+        && eye[2].abs() <= INTERIOR_SIDE_LIMIT;
+    let inside_cargo = eye[0] >= CARGO_ROOM_MIN_METERS[0]
+        && eye[0] <= CARGO_ROOM_MAX_METERS[0]
+        && eye[2] >= CARGO_ROOM_MIN_METERS[2]
+        && eye[2] <= CARGO_ROOM_MAX_METERS[2];
+    if (inside_cabin || inside_cargo)
+        && eye[1] >= SHIP_FLOOR_HEIGHT
+        && eye[1] <= SHIP_CEILING_HEIGHT
+    {
+        boxes.clear();
+        boxes.extend(
+            INTERIOR_OBSTACLES
+                .iter()
+                .chain(CARGO_WALLS.iter())
+                .map(|b| {
+                    [
+                        b[0],
+                        b[1],
+                        SHIP_FLOOR_HEIGHT,
+                        SHIP_CEILING_HEIGHT,
+                        b[2],
+                        b[3],
+                    ]
+                }),
+        );
+        // The shared deck and ceiling occlude objects on the other side.
+        for (x0, x1, z0, z1) in [
+            (
+                INTERIOR_FORWARD_MIN,
+                INTERIOR_FORWARD_MAX,
+                -INTERIOR_SIDE_LIMIT,
+                INTERIOR_SIDE_LIMIT,
+            ),
+            (
+                CARGO_ROOM_MIN_METERS[0],
+                CARGO_ROOM_MAX_METERS[0],
+                CARGO_ROOM_MIN_METERS[2],
+                CARGO_ROOM_MAX_METERS[2],
+            ),
+        ] {
+            boxes.push([x0, x1, EXTERIOR_BOTTOM, SHIP_FLOOR_HEIGHT, z0, z1]);
+            boxes.push([x0, x1, SHIP_CEILING_HEIGHT, EXTERIOR_TOP, z0, z1]);
+        }
+        boxes.extend([
+            [
+                INTERIOR_FORWARD_MAX,
+                EXTERIOR_FORWARD,
+                EXTERIOR_BOTTOM,
+                EXTERIOR_TOP,
+                -EXTERIOR_SIDE,
+                EXTERIOR_SIDE,
+            ],
+            [
+                INTERIOR_FORWARD_MIN,
+                2.5,
+                EXTERIOR_BOTTOM,
+                EXTERIOR_TOP,
+                -EXTERIOR_SIDE,
+                -INTERIOR_SIDE_LIMIT,
+            ],
+            [
+                INTERIOR_FORWARD_MIN,
+                0.4,
+                EXTERIOR_BOTTOM,
+                EXTERIOR_TOP,
+                INTERIOR_SIDE_LIMIT,
+                5.1,
+            ],
+            [
+                2.2,
+                INTERIOR_FORWARD_MAX,
+                EXTERIOR_BOTTOM,
+                EXTERIOR_TOP,
+                INTERIOR_SIDE_LIMIT,
+                5.1,
+            ],
+            [
+                EXTERIOR_AFT,
+                INTERIOR_FORWARD_MIN,
+                EXTERIOR_BOTTOM,
+                EXTERIOR_TOP,
+                -EXTERIOR_SIDE,
+                -DOORWAY_SIDE_LIMIT,
+            ],
+            [
+                EXTERIOR_AFT,
+                INTERIOR_FORWARD_MIN,
+                EXTERIOR_BOTTOM,
+                EXTERIOR_TOP,
+                DOORWAY_SIDE_LIMIT,
+                EXTERIOR_SIDE,
+            ],
+        ]);
+        if !door_open {
+            boxes.push([
+                EXTERIOR_AFT,
+                INTERIOR_FORWARD_MIN,
+                EXTERIOR_BOTTOM,
+                EXTERIOR_TOP,
+                -DOORWAY_SIDE_LIMIT,
+                DOORWAY_SIDE_LIMIT,
+            ]);
+        }
     }
     boxes.extend(THRUSTER_COLLIDERS);
     boxes

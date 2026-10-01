@@ -10,7 +10,10 @@ pub(crate) fn context(
     door_open: bool,
     seed: u64,
 ) -> Option<String> {
-    if player.location != CharacterLocation::Surface {
+    if !matches!(
+        player.location,
+        CharacterLocation::Surface | CharacterLocation::InsideShip
+    ) {
         return None;
     }
     let target = crate::carrying::target(tool, player, frame, door_open);
@@ -27,6 +30,9 @@ pub(crate) fn context(
             piece.material().mass_kg(),
             prompt,
         ));
+    }
+    if player.location != CharacterLocation::Surface {
+        return None;
     }
     if let Some(target) = tool.inspect_target(player, frame, door_open, seed) {
         let entries = tool.nearby(player.eye_position_meters, seed).ok()?;

@@ -61,3 +61,11 @@ independent of ship orientation. On a solid-body surface, the controller derives
 one camera-relative tangent basis from yaw and the local radial up vector; both
 the camera snapshot and WASD movement consume that basis so forward and strafing
 remain view-relative at every sphere orientation.
+
+Open-space state additionally retains the exit velocity and orientation basis.
+`advance_with_motion` receives the already-advanced ship frame and its velocity;
+world drift integrates independently each update. A normalized flight-assist
+control velocity adds 3D view-relative translation without modifying inherited
+velocity. Input release removes controlled movement only. Re-entry clears EVA
+control state and rebases yaw/pitch to preserve the world look direction when
+adopting the ship frame. The stationary `advance` adapter supplies zero velocity.

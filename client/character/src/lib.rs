@@ -162,6 +162,8 @@ pub struct MovementInput {
     pub left: bool,
     pub right: bool,
     pub jump: bool,
+    /// EVA down; ignored during floor/surface walking.
+    pub descend: bool,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -304,6 +306,9 @@ pub struct CharacterController {
     pitch_radians: f64,
     vertical_speed: f64,
     jump_was_down: bool,
+    eva_inherited_velocity: [f64; 3],
+    eva_control_velocity: [f64; 3],
+    eva_axes: [[f64; 3]; 3],
 }
 
 impl Default for CharacterController {
@@ -316,6 +321,9 @@ impl Default for CharacterController {
             pitch_radians: 0.0,
             vertical_speed: 0.0,
             jump_was_down: false,
+            eva_inherited_velocity: [0.0; 3],
+            eva_control_velocity: [0.0; 3],
+            eva_axes: [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
         }
     }
 }
@@ -368,6 +376,13 @@ impl CharacterController {
         }
     }
 
+    /// World velocity is retained at exit; control velocity uses flight assist.
+    #[must_use]
+    pub fn eva_velocity(&self) -> Option<[f64; 3]> {
+        (self.location() == CharacterLocation::Space)
+            .then(|| add(self.eva_inherited_velocity, self.eva_control_velocity))
+    }
+
     pub fn advance(
         &mut self,
         delta: Duration,
@@ -377,6 +392,26 @@ impl CharacterController {
         door_open: bool,
         ship_landed: bool,
     ) {
+        self.advance_with_motion(
+            delta,
+            input,
+            (ship, [0.0; 3]),
+            surface,
+            door_open,
+            ship_landed,
+        );
+    }
+
+    pub fn advance_with_motion(
+        &mut self,
+        delta: Duration,
+        input: MovementInput,
+        ship_motion: (ShipFrame, [f64; 3]),
+        surface: SurfaceFrame,
+        door_open: bool,
+        ship_landed: bool,
+    ) {
+        let (ship, ship_velocity) = ship_motion;
         let seconds = delta.as_secs_f64().min(0.1);
         if seconds <= 0.0 {
             return;
@@ -423,6 +458,9 @@ impl CharacterController {
                 let within_doorway = local[2].abs() <= DOORWAY_SIDE_LIMIT;
                 if local[0] < DOORWAY_FORWARD && within_doorway && door_open && !ship_landed {
                     self.vertical_speed = 0.0;
+                    self.eva_inherited_velocity = ship_velocity;
+                    self.eva_control_velocity = [0.0; 3];
+                    self.eva_axes = ship.axes;
                     self.position = PositionState::Space {
                         world: ship.local_to_world(local),
                     };
@@ -506,9 +544,10 @@ impl CharacterController {
                 }
             }
             PositionState::Space { world } => {
-                // Access-only movement. Inertial, ship-velocity-aware EVA is #37.
-                // Never project a space exit onto the fallback planetary surface.
-                let mut previous = ship.world_to_local(world);
+                // Integrate the inherited world motion independently of the ship.
+                // The runtime has already advanced the ship by this same interval.
+                let drifted = add(world, scale(self.eva_inherited_velocity, seconds));
+                let mut previous = ship.world_to_local(drifted);
                 if !door_open
                     && previous[0] > EXTERIOR_AFT
                     && previous[0] < DOORWAY_FORWARD + PLAYER_RADIUS_METERS
@@ -516,10 +555,24 @@ impl CharacterController {
                 {
                     previous[0] = EXTERIOR_AFT;
                 }
-                let movement = ship_planar_movement(input, self.yaw_radians);
-                let mut local = previous;
-                local[0] += movement[0] * WALK_SPEED_METERS_PER_SECOND * seconds;
-                local[2] += movement[1] * WALK_SPEED_METERS_PER_SECOND * seconds;
+                let view = self.snapshot(ship, surface);
+                let forward = normalize(sub(view.look_target_meters, view.eye_position_meters));
+                let up = self.eva_axes[1];
+                let right = normalize(cross(forward, up));
+                let movement = add(
+                    add(
+                        scale(forward, axis(input.forward, input.backward)),
+                        scale(right, axis(input.right, input.left)),
+                    ),
+                    scale(up, axis(input.jump, input.descend)),
+                );
+                let length = dot(movement, movement).sqrt().max(1.0);
+                self.eva_control_velocity = scale(movement, WALK_SPEED_METERS_PER_SECOND / length);
+                let proposed = ship.world_to_local(add(
+                    ship.local_to_world(previous),
+                    scale(self.eva_control_velocity, seconds),
+                ));
+                let mut local = proposed;
                 if overlaps_exterior_hull(local) {
                     local = slide_around_obstacles(previous, local, &EXTERIOR_OBSTACLES);
                     if !door_open {
@@ -535,11 +588,23 @@ impl CharacterController {
                     && local[1]
                         <= DOORWAY_CEILING_HEIGHT
                             - (PLAYER_BODY_HEIGHT_METERS - PLAYER_EYE_HEIGHT_METERS);
-                if door_open && through_gate && movement[0] > 0.0 {
+                if door_open && through_gate && local[0] > previous[0] {
                     local[0] = local[0].max(DOORWAY_FORWARD);
                     self.vertical_speed = 0.0;
+                    self.eva_control_velocity = [0.0; 3];
+                    // Preserve the world look direction when adopting ship gravity.
+                    self.yaw_radians = dot(forward, ship.axes[2])
+                        .atan2(dot(forward, ship.axes[0]))
+                        .rem_euclid(TAU);
+                    self.pitch_radians = dot(forward, ship.axes[1]).clamp(-1.0, 1.0).asin();
                     self.position = PositionState::Inside { local };
                 } else {
+                    // Remove blocked velocity components from inspection state.
+                    let actual = scale(
+                        sub(ship.local_to_world(local), ship.local_to_world(previous)),
+                        1.0 / seconds,
+                    );
+                    self.eva_control_velocity = actual;
                     self.position = PositionState::Space {
                         world: ship.local_to_world(local),
                     };
@@ -623,7 +688,7 @@ impl CharacterController {
         let (eye, up, blend) = match self.position {
             PositionState::Cockpit => (ship.local_to_world(COCKPIT_POSITION), ship.axes[1], None),
             PositionState::Inside { local } => (ship.local_to_world(local), ship.axes[1], None),
-            PositionState::Space { world } => (world, ship.axes[1], None),
+            PositionState::Space { world } => (world, self.eva_axes[1], None),
             PositionState::Surface { world } => (
                 world,
                 normalize(sub(world, surface.body_center_meters)),
@@ -650,13 +715,18 @@ impl CharacterController {
                 )
             }
         };
+        let view_axes = if self.location() == CharacterLocation::Space {
+            self.eva_axes
+        } else {
+            ship.axes
+        };
         let base_forward = if matches!(self.position, PositionState::Surface { .. }) {
             surface_view_basis(ship.axes, up, self.yaw_radians).0
         } else {
             let (planar_forward, _) = planar_look(self.yaw_radians);
             normalize(add(
-                scale(ship.axes[0], planar_forward[0]),
-                scale(ship.axes[2], planar_forward[1]),
+                scale(view_axes[0], planar_forward[0]),
+                scale(view_axes[2], planar_forward[1]),
             ))
         };
         let right = normalize(cross(base_forward, up));
@@ -681,6 +751,10 @@ impl CharacterController {
             doorway_blend_fraction: blend,
         }
     }
+}
+
+fn axis(positive: bool, negative: bool) -> f64 {
+    f64::from(u8::from(positive)) - f64::from(u8::from(negative))
 }
 
 fn overlaps_exterior_hull(local: [f64; 3]) -> bool {
@@ -2932,6 +3006,122 @@ mod tests {
             sub(turned, start)[2] > 0.0,
             "positive yaw should rotate surface-forward movement toward screen right"
         );
+    }
+    #[test]
+    fn moving_space_exit_inherits_velocity_and_keeps_world_motion_independent() {
+        let velocity = [120.0, -7.0, 4.0];
+        let mut ship = frame();
+        let mut player = inside_at(-7.0, 0.0);
+        let backward = MovementInput {
+            backward: true,
+            ..MovementInput::default()
+        };
+        for _ in 0..1 {
+            ship.origin_meters = add(ship.origin_meters, scale(velocity, 0.016));
+            player.advance_with_motion(
+                Duration::from_millis(16),
+                backward,
+                (ship, velocity),
+                surface(),
+                true,
+                false,
+            );
+        }
+        assert_eq!(player.location(), CharacterLocation::Space);
+        assert_eq!(player.eva_velocity(), Some(velocity));
+        let exit = player.snapshot(ship, surface()).eye_position_meters;
+        let local = ship.world_to_local(exit);
+        for _ in 0..600 {
+            ship.origin_meters = add(ship.origin_meters, scale(velocity, 0.016));
+            player.advance_with_motion(
+                Duration::from_millis(16),
+                MovementInput::default(),
+                (ship, velocity),
+                surface(),
+                true,
+                false,
+            );
+        }
+        let current = player.snapshot(ship, surface()).eye_position_meters;
+        for (i, expected) in local.iter().enumerate() {
+            assert!((ship.world_to_local(current)[i] - expected).abs() < 1e-8);
+        }
+        // Changing the ship velocity must not change an already detached player.
+        ship.origin_meters = add(ship.origin_meters, [10.0, 0.0, 0.0]);
+        player.advance_with_motion(
+            Duration::from_millis(16),
+            MovementInput::default(),
+            (ship, [625.0, 0.0, 0.0]),
+            surface(),
+            true,
+            false,
+        );
+        let next = player.snapshot(ship, surface()).eye_position_meters;
+        for i in 0..3 {
+            assert!((next[i] - current[i] - velocity[i] * 0.016).abs() < 1e-8);
+        }
+        assert_eq!(player.eva_velocity(), Some(velocity));
+    }
+
+    #[test]
+    fn eva_three_axis_control_is_normalized_and_frame_rate_independent() {
+        let mut results = Vec::new();
+        for step_ms in [10, 20, 100] {
+            let mut player = CharacterController {
+                position: PositionState::Space {
+                    world: [-30.0, 12.0, 0.0],
+                },
+                ..CharacterController::default()
+            };
+            player.apply_mouse_delta(100.0, -80.0);
+            let before = player.snapshot(frame(), surface()).eye_position_meters;
+            for _ in 0..(1000 / step_ms) {
+                player.advance(
+                    Duration::from_millis(step_ms),
+                    MovementInput {
+                        backward: true,
+                        right: true,
+                        jump: true,
+                        ..MovementInput::default()
+                    },
+                    frame(),
+                    surface(),
+                    true,
+                    false,
+                );
+            }
+            let after = player.snapshot(frame(), surface()).eye_position_meters;
+            let displacement = sub(after, before);
+            assert!(
+                (dot(displacement, displacement).sqrt() - WALK_SPEED_METERS_PER_SECOND).abs()
+                    < 1e-8
+            );
+            assert!(displacement[1] > 0.0);
+            results.push(after);
+        }
+        for result in &results[1..] {
+            for i in 0..3 {
+                assert!((result[i] - results[0][i]).abs() < 1e-8);
+            }
+        }
+    }
+
+    #[test]
+    fn eva_orientation_is_independent_of_ship_rotation() {
+        let player = CharacterController {
+            position: PositionState::Space {
+                world: [-20.0, 12.0, 0.0],
+            },
+            ..CharacterController::default()
+        };
+        let before = player.snapshot(frame(), surface());
+        let rotated = ShipFrame {
+            axes: [[0.0, 0.0, 1.0], [0.0, 1.0, 0.0], [-1.0, 0.0, 0.0]],
+            ..frame()
+        };
+        let after = player.snapshot(rotated, surface());
+        assert_eq!(before.look_target_meters, after.look_target_meters);
+        assert_eq!(before.up, after.up);
     }
 }
 

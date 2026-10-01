@@ -175,7 +175,8 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "backward" => Some(KeyCode::KeyS),
         "left" => Some(KeyCode::KeyA),
         "right" => Some(KeyCode::KeyD),
-        "jump" => Some(KeyCode::Space),
+        "jump" | "ascend" => Some(KeyCode::Space),
+        "descend" => Some(KeyCode::ShiftLeft),
         "equip_mining_tool" => Some(KeyCode::KeyM),
         "pickup" => Some(KeyCode::KeyQ),
         "drop" => Some(KeyCode::KeyG),
@@ -267,6 +268,12 @@ fn inspect(app: &ClientApplication) -> Value {
         ship.door_state == salimon_ship::DoorState::Open,
         app.e2e_config.map_or(0, |config| config.seed),
     );
+    let player_velocity = app
+        .character
+        .eva_velocity()
+        .unwrap_or(ship.velocity_meters_per_second);
+    let relative_velocity =
+        std::array::from_fn::<_, 3, _>(|i| player_velocity[i] - ship.velocity_meters_per_second[i]);
     json!({
         "resource_ui": {"context": resource_context},
         "carrying": {"object_id": app.mining.session.carried_id().map(|id| id.0),
@@ -279,7 +286,11 @@ fn inspect(app: &ClientApplication) -> Value {
             "range_meters": salimon_world::mining::MINING_RANGE_METERS,
             "rate_kg_per_second": salimon_world::mining::MINING_RATE_KG_PER_SECOND,
             "target": mining_target.map(|target| json!({"id": format!("{:?}:{}", target.id.body, target.id.local), "distance_meters": target.distance_meters})) },
-        "player": {"location": format!("{:?}", character.location),
+        "player": {"velocity_meters_per_second": player_velocity,
+            "speed_meters_per_second": player_velocity.iter().map(|v| v*v).sum::<f64>().sqrt(),
+            "relative_velocity_meters_per_second": relative_velocity,
+            "relative_speed_meters_per_second": relative_velocity.iter().map(|v| v*v).sum::<f64>().sqrt(),
+            "location": format!("{:?}", character.location),
             "eye_position_meters": character.eye_position_meters,
             "ship_local_eye_position_meters": local_eye,
             "look_target_meters": character.look_target_meters, "up": character.up,
@@ -519,6 +530,14 @@ mod tests {
         assert_gameplay_scenario(
             Scenario::OpenSpace,
             include_str!("../../../scenarios/space-airlock.json"),
+        );
+    }
+
+    #[test]
+    fn moving_eva_walkthrough_uses_real_gameplay_actions() {
+        assert_gameplay_scenario(
+            Scenario::OpenSpace,
+            include_str!("../../../scenarios/moving-eva.json"),
         );
     }
 

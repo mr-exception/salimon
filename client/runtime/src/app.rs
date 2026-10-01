@@ -496,10 +496,13 @@ impl ClientApplication {
         self.ship.advance(delta);
         let ship = self.ship.snapshot();
         if self.view_mode == ViewMode::Gameplay {
-            self.character.advance(
+            self.character.advance_with_motion(
                 delta,
                 self.movement_input,
-                character_ship_frame(ship.pose),
+                (
+                    character_ship_frame(ship.pose),
+                    ship.velocity_meters_per_second,
+                ),
                 surface_frame_for_ship(ship),
                 ship.door_state == DoorState::Open,
                 matches!(ship.flight_state, FlightState::Landed { .. }),
@@ -1119,6 +1122,7 @@ enum MovementKey {
     Left,
     Right,
     Jump,
+    Descend,
 }
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
@@ -1203,6 +1207,7 @@ fn movement_key(key: PhysicalKey) -> Option<MovementKey> {
         PhysicalKey::Code(KeyCode::KeyA) => Some(MovementKey::Left),
         PhysicalKey::Code(KeyCode::KeyD) => Some(MovementKey::Right),
         PhysicalKey::Code(KeyCode::Space) => Some(MovementKey::Jump),
+        PhysicalKey::Code(KeyCode::ShiftLeft) => Some(MovementKey::Descend),
         _ => None,
     }
 }
@@ -1214,6 +1219,7 @@ fn update_movement_input(input: &mut MovementInput, key: PhysicalKey, pressed: b
         Some(MovementKey::Left) => input.left = pressed,
         Some(MovementKey::Right) => input.right = pressed,
         Some(MovementKey::Jump) => input.jump = pressed,
+        Some(MovementKey::Descend) => input.descend = pressed,
         None => {}
     }
 }

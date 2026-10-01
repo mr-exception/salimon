@@ -43,7 +43,7 @@ legacy ready line is not a JSON response. Example:
 {"protocol":1,"id":4,"op":"inspect"}
 ```
 
-`key` accepts `forward`, `backward`, `left`, `right`, `jump`, `roll_left`, and
+`key` accepts `forward`, `backward`, `left`, `right`, `jump`/`ascend`, `descend`, `roll_left`, and
 `roll_right`. Held forward/backward/left/right steer the ship when seated, and
 move the character otherwise. `look` accepts finite pixel deltas `dx` and `dy`.
 `interact` uses the same aimed/range interaction as E, so walking and looking at
@@ -258,3 +258,22 @@ Test-mode windows request a 1280 x 800 physical drawable so the full viewport
 and bottom action bar fit the dedicated CI display. Normal launch retains the
 1920 x 1080 benchmark drawable. Desktop capture must include the entire window
 when validating HUD legibility.
+
+## Ship-relative EVA (#37)
+
+The runtime supplies both the current ship frame and world velocity to the
+character update after advancing the ship. Exiting a flying airlock captures
+that velocity and orientation once; detached world motion is then independent
+of later ship steering/thrust. Mouse look controls EVA yaw/pitch; WASD translates
+in that view, Space ascends, and Left Shift descends. Normalized 3D input uses
+3.8 m/s flight assist: releasing input removes only controlled translation,
+preserving inherited world drift. Re-entry adopts ship gravity and velocity,
+while preserving the world look direction.
+
+Automation exposes `player.velocity_meters_per_second`,
+`speed_meters_per_second`, `relative_velocity_meters_per_second`,
+`relative_speed_meters_per_second`, and the existing ship-relative eye position.
+The velocity fields describe EVA motion; interior/cockpit use the ship-frame
+transport velocity. `moving-eva.json` tests a 25,000 m/s ship and ten seconds of
+no-input drift, vertical/pitched controls, door collision, and re-entry.
+Nearby-body gravity transition is handled separately by #36.

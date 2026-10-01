@@ -103,7 +103,10 @@ The run command opens the **Salimon — Compressed Solar System** native window 
 the Phase 0 benchmark's physical 1920×1080 drawable size and continues until the
 window is closed. It captures the cursor for mouse look and starts inside the
 landed ship facing the cockpit. Use **WASD** to walk, the mouse to look, and
-**Space** to jump. Press **E** near the cockpit to enter or leave
+**Space** to jump. During open-space EVA, **WASD** translates relative to the
+view (including pitch), **Space** ascends, and **Left Shift** descends. Release
+translation input to stop assisted relative movement while retaining inherited
+ship velocity. Press **E** near the cockpit to enter or leave
 control instantly; press **E** near the aft door to open/close it while landed or in open space beyond the nearby-body threshold.
 Press **M** to equip the handheld mining tool on the surface; aim at a deposit
 within 4 m and hold **F** or left mouse to extract at 2 kg/s. Press M to stow.

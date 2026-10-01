@@ -52,10 +52,22 @@ See [README.ai.md](README.ai.md), [architecture.md](architecture.md), and
 
 An open flying airlock exits into `Space`, retaining the current world eye
 position and ship-up camera orientation without planetary projection or floor
-gravity. Camera-relative planar movement supports stationary-ship exit/re-entry;
+gravity. Camera-relative 3D movement supports stationary and moving-ship exit/re-entry;
 closed-gate, rear-window, hull and thruster collisions remain active. Closing
 around a player within the aperture resolves them outside with body clearance.
 Re-entry through the open aperture restores interior floor gravity.
 
-This is the access prerequisite: inherited ship velocity, free 3D inertial EVA,
-and no-input moving-ship drift are owned by #37; nearby-body transition is #36.
+## Inertial EVA (#37)
+
+`advance_with_motion` accepts the current ship transform and world linear
+velocity. The stationary-frame `advance` entry point remains available to
+portable walking callers/tests. Exit captures the current world velocity and
+ship orientation; detached position integrates inherited world motion without
+following subsequent ship steering or thrust. EVA view orientation retains its
+exit basis and independent mouse yaw/pitch. Normalized WASD follows the complete
+view direction, Space ascends and Left Shift descends. Flight assist commands
+3.8 m/s translation relative to the inherited drift, returning control velocity
+to zero when input is released. This assist does not cancel inherited velocity.
+`eva_velocity` reports world motion while detached. Open-gate re-entry restores
+ship-local movement and gravity and preserves the world view direction.
+Nearby-body transitions remain #36.

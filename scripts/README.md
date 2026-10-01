@@ -310,3 +310,15 @@ is required in Linux CI. Use the settled capture helper as for the cargo room.
 The portable runtime test executes the same access scenario, while ship tests
 cover inclusive threshold locking and assisted-sequence locking. Moving-ship
 velocity inheritance and free 3D EVA are #37, and nearby-body transitions #36.
+
+## Moving-ship EVA (#37)
+
+`moving-eva.json` sets one thruster increment through normal cockpit controls,
+then follows the airlock route at 25,000 m/s. It verifies inherited world velocity,
+no-input ship-relative stability over 600 fixed frames, Space/Shift vertical
+translation, pitched/yawed view-relative translation, assisted stop, closed-gate
+collision, and clean interior re-entry. The baseline runs in the default suite;
+the synchronized evidence variant adds drift, vertical-flight and re-entry
+screenshots and runs in required Linux CI. Portable runtime tests execute both
+stationary and moving routes, and character contracts compare 10/20/100 ms
+updates and verify detached motion/view independence from ship changes.

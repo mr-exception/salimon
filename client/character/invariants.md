@@ -3,7 +3,8 @@
 1. Ship-floor and solid-body walking use one fixed 9.81 m/s² gravity strength.
 2. Ship gravity completely owns the character while the controller is inside or
    seated, irrespective of the nearby planetary surface.
-3. A closed door, or any flying ship, blocks passage in either direction. Closing
+3. A closed door blocks passage in either direction. An open flying airlock
+   admits space EVA; landed crossings use the doorway gravity blend. Closing
    during a doorway blend ends it before movement and resolves overlap to the
    nearer physical side; an existing surface walker always remains outside.
 4. A landed open-door crossing blends gravity direction for exactly 250 ms.
@@ -38,7 +39,7 @@
     proxies; a walking player cannot bypass the side consoles into the exterior
     shell.
 17. Surface walkers collide with the front, sides, and aft bulkheads regardless
-    of door state. The landed open aft gate is the only entry route, with the
+    of door state. The open aft gate is the only entry route, with the
     same body clearance as interior traversal. Hull contact preserves surface
     eye radius and permits sliding; distant or vertically separated surface
     walkers cannot be captured by the doorway.
@@ -49,3 +50,10 @@
 19. Both engine bodies and their raised fins block exterior surface movement
     from all planar approaches while vertically overlapping the player's body.
     Their boxes follow the ship frame and leave clearance beyond their bounds.
+
+20. Space exits inherit world position, linear velocity and orientation from the
+    current ship frame. No-input drift preserves that inherited velocity;
+    subsequent ship thrust or steering cannot silently attach the player again.
+21. EVA translation is normalized in 3D and integrated using elapsed seconds.
+    Flight assist cancels only the commanded motion on release. Re-entry resets
+    EVA control state and adopts interior gravity without changing ship velocity.

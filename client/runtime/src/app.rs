@@ -258,7 +258,11 @@ impl ClientApplication {
 
         let attributes = WindowAttributes::default()
             .with_title(WINDOW_TITLE)
-            .with_inner_size(initial_window_size())
+            .with_inner_size(if self.e2e_config.is_some() {
+                PhysicalSize::new(1280, 800)
+            } else {
+                initial_window_size()
+            })
             .with_min_inner_size(LogicalSize::new(MINIMUM_WIDTH, MINIMUM_HEIGHT))
             .with_resizable(true);
         let window = event_loop

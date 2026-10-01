@@ -253,3 +253,8 @@ the rendered action bar. The mining and carrying baseline scenarios assert
 material/mass/state, mining controls, empty context, pickup and carrying limits;
 their evidence variants capture deposit targeting with the tool stowed, active
 mining, loose fragment targeting and blocked second pickup.
+
+Test-mode windows request a 1280 x 800 physical drawable so the full viewport
+and bottom action bar fit the dedicated CI display. Normal launch retains the
+1920 x 1080 benchmark drawable. Desktop capture must include the entire window
+when validating HUD legibility.

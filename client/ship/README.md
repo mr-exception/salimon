@@ -4,9 +4,11 @@
 starting pose, cockpit-control authority, persistent direct-speed motion,
 Task 12 steering/thruster controls, solid-body boundary correction, Task 13
 assisted landing/takeoff with Task 17 timing, and the
-landed-only door rule. Opening or closing the exit uses a typed action;
-while flying it remains closed and emits the cockpit message `Door locked while
-in flight`.
+landed/open-space door rule. Opening or closing the exit uses a typed action.
+Landed ships allow access; flying ships allow it only when the existing nearby
+sensor reports no celestial body within the inclusive 3,000,000 m surface
+threshold. Nearby flight and assisted sequences retain the `Door locked while
+in flight` message. No pressure or survival simulation is implemented.
 
 Leaving the cockpit changes only control authority. A flying ship keeps its pose,
 orientation, selected thruster percentage, and direct-speed motion. Steering

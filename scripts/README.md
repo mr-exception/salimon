@@ -296,3 +296,17 @@ authoritative movement/state assertions remain the verification source. Capture
 errors still fail the scenario and the runner's normal deadlines apply. Use a
 dedicated unobscured test display. Checked-in validation images and results are
 in [issue #34 evidence](../docs/issue-34/README.md).
+
+## Space airlock access (#35)
+
+`open-space` initializes a stationary flying ship 10 km beyond the shared
+3,000,000 m nearby-body surface-distance threshold. `space-airlock.json` uses
+normal controls to leave the cockpit, walk to the gate, open it, exit without
+planetary snapping, close it from outside, verify blocked re-entry, reopen and
+re-enter, close it again, and verify blocked exit. It runs in the default suite.
+`scenarios/evidence/space-airlock.json` adds four screenshot/state checkpoints and
+is required in Linux CI. Use the settled capture helper as for the cargo room.
+
+The portable runtime test executes the same access scenario, while ship tests
+cover inclusive threshold locking and assisted-sequence locking. Moving-ship
+velocity inheritance and free 3D EVA are #37, and nearby-body transitions #36.

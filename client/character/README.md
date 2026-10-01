@@ -13,7 +13,7 @@ The enlarged room has a 9.20 m interior width with walking routes on both sides
 of the Core. A 0.24 m body radius keeps the player clear of fixtures, projecting
 window sills, and rear window bulkheads. Jumping keeps the player's head below
 the ceiling lights and the lower door lintel. The aft transition is restricted to the actual
-2.80 m doorway, and a closed/flying doorway remains solid. An
+2.80 m doorway, and a closed doorway remains solid. An
 open landed doorway begins an exact 0.25-second up-vector blend before the
 controller changes to Earth-radial surface walking. Doorway movement retains
 the interior's camera-relative WASD directions, including strafing. Re-entry
@@ -47,3 +47,15 @@ runtime passes those facts through `ShipFrame`/`SurfaceFrame` DTOs.
 
 See [README.ai.md](README.ai.md), [architecture.md](architecture.md), and
 [invariants.md](invariants.md) before modifying controller behavior.
+
+## Space airlock access (#35)
+
+An open flying airlock exits into `Space`, retaining the current world eye
+position and ship-up camera orientation without planetary projection or floor
+gravity. Camera-relative planar movement supports stationary-ship exit/re-entry;
+closed-gate, rear-window, hull and thruster collisions remain active. Closing
+around a player within the aperture resolves them outside with body clearance.
+Re-entry through the open aperture restores interior floor gravity.
+
+This is the access prerequisite: inherited ship velocity, free 3D inertial EVA,
+and no-input moving-ship drift are owned by #37; nearby-body transition is #36.

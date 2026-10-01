@@ -14,6 +14,7 @@ pub(crate) enum Scenario {
     CockpitEarth,
     OrbitEarth,
     OrbitMoon,
+    OpenSpace,
 }
 
 impl Scenario {
@@ -23,8 +24,9 @@ impl Scenario {
             "cockpit-earth" => Ok(Self::CockpitEarth),
             "orbit-earth" => Ok(Self::OrbitEarth),
             "orbit-moon" => Ok(Self::OrbitMoon),
+            "open-space" => Ok(Self::OpenSpace),
             _ => Err(format!(
-                "unknown scenario '{value}'; expected landed-earth, cockpit-earth, orbit-earth, or orbit-moon"
+                "unknown scenario '{value}'; expected landed-earth, cockpit-earth, orbit-earth, orbit-moon, or open-space"
             )),
         }
     }
@@ -35,6 +37,7 @@ impl Scenario {
             Self::CockpitEarth => "cockpit-earth",
             Self::OrbitEarth => "orbit-earth",
             Self::OrbitMoon => "orbit-moon",
+            Self::OpenSpace => "open-space",
         }
     }
 }
@@ -107,8 +110,8 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
     match config.scenario {
         Scenario::LandedEarth => {}
         Scenario::CockpitEarth => app.character.enter_cockpit(),
-        Scenario::OrbitEarth | Scenario::OrbitMoon => {
-            let id = if config.scenario == Scenario::OrbitEarth {
+        Scenario::OrbitEarth | Scenario::OrbitMoon | Scenario::OpenSpace => {
+            let id = if config.scenario != Scenario::OrbitMoon {
                 CelestialBodyId::Earth
             } else {
                 CelestialBodyId::Moon
@@ -120,7 +123,12 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
                     format!("scenario setup failed: {id:?} missing from world catalog")
                 })?;
             let mut position = body.center.meters();
-            position[1] += body.radius_meters + 1_000.0;
+            position[1] += body.radius_meters
+                + if config.scenario == Scenario::OpenSpace {
+                    salimon_ship::NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS + 10_000.0
+                } else {
+                    1_000.0
+                };
             // Small reproducible tangent offset exercises distinct seeds without
             // changing the scenario's body or proximity contract.
             position[2] += (mix(config.seed) % 201) as f64 - 100.0;
@@ -138,8 +146,10 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
         app.ship.set_cockpit_control(true);
     }
     let snapshot = app.ship.snapshot();
-    if matches!(config.scenario, Scenario::OrbitEarth | Scenario::OrbitMoon)
-        != (snapshot.flight_state == FlightState::Flying)
+    if matches!(
+        config.scenario,
+        Scenario::OrbitEarth | Scenario::OrbitMoon | Scenario::OpenSpace
+    ) != (snapshot.flight_state == FlightState::Flying)
     {
         return Err("scenario setup failed: unexpected ship flight state".into());
     }

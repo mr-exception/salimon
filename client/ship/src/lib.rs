@@ -1,7 +1,7 @@
 //! Portable Phase 0 ship state and interaction rules.
 //!
 //! This crate owns direct-speed flight, smoothed steering, cockpit authority,
-//! solid-body collision correction, and the landed-only door contract without
+//! solid-body collision correction, and landed/open-space airlock access without
 //! depending on platform input or GPU presentation.
 
 use std::time::Duration;
@@ -294,15 +294,17 @@ impl ShipController {
     pub fn toggle_door(&mut self) {
         self.cockpit_message = None;
         match self.flight_state {
-            FlightState::Landed { .. } => {
+            state
+                if matches!(state, FlightState::Landed { .. })
+                    || (state == FlightState::Flying
+                        && self.nearby_body_telemetry([0.0; 3]).is_none()) =>
+            {
                 self.door_state = match self.door_state {
                     DoorState::Closed => DoorState::Open,
                     DoorState::Open => DoorState::Closed,
                 };
             }
-            FlightState::Flying
-            | FlightState::AssistedLanding { .. }
-            | FlightState::AssistedTakeoff { .. } => {
+            _ => {
                 self.door_state = DoorState::Closed;
                 self.cockpit_message = Some(CockpitMessage::DoorLockedWhileInFlight);
             }
@@ -775,14 +777,14 @@ mod tests {
     }
 
     #[test]
-    fn landed_door_toggles_but_flying_door_is_locked_with_monitor_message() {
+    fn landed_and_open_space_doors_toggle_but_nearby_flight_is_locked() {
         let mut landed = ShipController::default();
         landed.toggle_door();
         assert_eq!(landed.snapshot().door_state, DoorState::Open);
 
         let mut flying = ShipController::flying(
             ShipPose {
-                position_meters: [0.0; 3],
+                position_meters: ShipController::default().snapshot().pose.position_meters,
                 orientation: [0.0, 0.0, 0.0, 1.0],
             },
             40,
@@ -794,6 +796,47 @@ mod tests {
             snapshot.cockpit_message.map(CockpitMessage::text),
             Some("Door locked while in flight")
         );
+    }
+
+    #[test]
+    fn space_airlock_uses_inclusive_nearby_threshold_and_assist_lock() {
+        let earth = CELESTIAL_BODIES
+            .iter()
+            .find(|body| body.id == CelestialBodyId::Earth)
+            .unwrap();
+        for (distance, expected) in [
+            (NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS, DoorState::Closed),
+            (
+                NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS + 1.0,
+                DoorState::Open,
+            ),
+        ] {
+            let mut position = earth.center.meters();
+            position[1] += earth.radius_meters + distance;
+            let mut ship = ShipController::flying(
+                ShipPose {
+                    position_meters: position,
+                    orientation: [0.0, 0.0, 0.0, 1.0],
+                },
+                0,
+            );
+            ship.toggle_door();
+            assert_eq!(ship.snapshot().door_state, expected);
+            ship.toggle_door();
+            assert_eq!(ship.snapshot().door_state, DoorState::Closed);
+            for state in [
+                FlightState::AssistedLanding {
+                    body: CelestialBodyId::Earth,
+                },
+                FlightState::AssistedTakeoff {
+                    body: CelestialBodyId::Earth,
+                },
+            ] {
+                ship.flight_state = state;
+                ship.toggle_door();
+                assert_eq!(ship.door_state, DoorState::Closed);
+            }
+        }
     }
 
     #[test]

@@ -508,18 +508,32 @@ mod tests {
 
     #[test]
     fn physical_carrying_walkthrough_uses_real_gameplay_actions() {
-        let mut test = app(Scenario::LandedEarth);
+        assert_gameplay_scenario(
+            Scenario::LandedEarth,
+            include_str!("../../../scenarios/carrying.json"),
+        );
+    }
+
+    #[test]
+    fn space_airlock_walkthrough_uses_real_gameplay_actions() {
+        assert_gameplay_scenario(
+            Scenario::OpenSpace,
+            include_str!("../../../scenarios/space-airlock.json"),
+        );
+    }
+
+    fn assert_gameplay_scenario(initial: Scenario, source: &str) {
+        let mut test = app(initial);
+        let scenario: Value = serde_json::from_str(source).unwrap();
         e2e::initialize(
             &mut test,
             Config {
-                scenario: Scenario::LandedEarth,
-                seed: 0,
-                step: Duration::from_millis(16),
+                scenario: initial,
+                seed: scenario["setup"]["seed"].as_u64().unwrap(),
+                step: Duration::from_millis(scenario["setup"]["step_ms"].as_u64().unwrap()),
             },
         )
         .unwrap();
-        let scenario: Value =
-            serde_json::from_str(include_str!("../../../scenarios/carrying.json")).unwrap();
         for (index, step) in scenario["steps"].as_array().unwrap().iter().enumerate() {
             if let Some(action) = step.get("action") {
                 let mut command = action.clone();

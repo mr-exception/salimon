@@ -1,0 +1,672 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "steps_completed": 52,
+  "setup": {
+    "scenario": "open-space",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "duration_ms": 6260,
+  "scenario": "scenarios/evidence/space-airlock.json",
+  "platform": "Linux Xvfb / Mesa lavapipe software Vulkan",
+  "rust_tests": 213,
+  "python_tests": 29,
+  "assertions": [
+    {
+      "index": 1,
+      "condition": {
+        "path": "ship.nearby_body",
+        "equals": null
+      },
+      "result": {
+        "condition": {
+          "path": "ship.nearby_body",
+          "equals": null
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": null
+      }
+    },
+    {
+      "index": 2,
+      "condition": {
+        "path": "ship.flight_state",
+        "equals": "Flying"
+      },
+      "result": {
+        "condition": {
+          "path": "ship.flight_state",
+          "equals": "Flying"
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": "Flying"
+      }
+    },
+    {
+      "index": 10,
+      "condition": {
+        "path": "interaction",
+        "equals": "exit_door"
+      },
+      "result": {
+        "condition": {
+          "path": "interaction",
+          "equals": "exit_door"
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": "exit_door"
+      }
+    },
+    {
+      "index": 14,
+      "condition": {
+        "path": "player.location",
+        "equals": "InsideShip"
+      },
+      "result": {
+        "condition": {
+          "path": "player.location",
+          "equals": "InsideShip"
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": "InsideShip"
+      }
+    },
+    {
+      "index": 15,
+      "condition": {
+        "path": "player.ship_local_eye_position_meters.0",
+        "approx": -7.24,
+        "tolerance": 0.001
+      },
+      "result": {
+        "condition": {
+          "path": "player.ship_local_eye_position_meters.0",
+          "approx": -7.24,
+          "tolerance": 0.001
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": -7.239990234375
+      }
+    },
+    {
+      "index": 17,
+      "condition": {
+        "path": "ship.door_state",
+        "equals": "Open"
+      },
+      "result": {
+        "condition": {
+          "path": "ship.door_state",
+          "equals": "Open"
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": "Open"
+      }
+    },
+    {
+      "index": 21,
+      "condition": {
+        "path": "player.location",
+        "equals": "Space"
+      },
+      "result": {
+        "condition": {
+          "path": "player.location",
+          "equals": "Space"
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": "Space"
+      }
+    },
+    {
+      "index": 23,
+      "condition": {
+        "path": "player.ship_local_eye_position_meters.0",
+        "lt": -8.2
+      },
+      "result": {
+        "condition": {
+          "path": "player.ship_local_eye_position_meters.0",
+          "lt": -8.2
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": -9.671630859375
+      }
+    },
+    {
+      "index": 24,
+      "condition": {
+        "path": "player.ship_local_eye_position_meters.1",
+        "approx": 1.9973118279569892,
+        "tolerance": 0.001
+      },
+      "result": {
+        "condition": {
+          "path": "player.ship_local_eye_position_meters.1",
+          "approx": 1.9973118279569892,
+          "tolerance": 0.001
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": 1.997314453125
+      }
+    },
+    {
+      "index": 26,
+      "condition": {
+        "path": "player.ship_local_eye_position_meters.1",
+        "approx": 1.9973118279569892,
+        "tolerance": 0.001
+      },
+      "result": {
+        "condition": {
+          "path": "player.ship_local_eye_position_meters.1",
+          "approx": 1.9973118279569892,
+          "tolerance": 0.001
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": 1.997314453125
+      }
+    },
+    {
+      "index": 27,
+      "condition": {
+        "path": "interaction",
+        "equals": "exit_door"
+      },
+      "result": {
+        "condition": {
+          "path": "interaction",
+          "equals": "exit_door"
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": "exit_door"
+      }
+    },
+    {
+      "index": 29,
+      "condition": {
+        "path": "ship.door_state",
+        "equals": "Closed"
+      },
+      "result": {
+        "condition": {
+          "path": "ship.door_state",
+          "equals": "Closed"
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": "Closed"
+      }
+    },
+    {
+      "index": 33,
+      "condition": {
+        "path": "player.location",
+        "equals": "Space"
+      },
+      "result": {
+        "condition": {
+          "path": "player.location",
+          "equals": "Space"
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": "Space"
+      }
+    },
+    {
+      "index": 35,
+      "condition": {
+        "path": "player.ship_local_eye_position_meters.0",
+        "approx": -8.16,
+        "tolerance": 0.001
+      },
+      "result": {
+        "condition": {
+          "path": "player.ship_local_eye_position_meters.0",
+          "approx": -8.16,
+          "tolerance": 0.001
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": -8.1600341796875
+      }
+    },
+    {
+      "index": 37,
+      "condition": {
+        "path": "ship.door_state",
+        "equals": "Open"
+      },
+      "result": {
+        "condition": {
+          "path": "ship.door_state",
+          "equals": "Open"
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": "Open"
+      }
+    },
+    {
+      "index": 41,
+      "condition": {
+        "path": "player.location",
+        "equals": "InsideShip"
+      },
+      "result": {
+        "condition": {
+          "path": "player.location",
+          "equals": "InsideShip"
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": "InsideShip"
+      }
+    },
+    {
+      "index": 43,
+      "condition": {
+        "path": "player.local_ship_position_meters.0",
+        "gt": -7.0
+      },
+      "result": {
+        "condition": {
+          "path": "player.local_ship_position_meters.0",
+          "gt": -7.0
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": -5.459199999999989
+      }
+    },
+    {
+      "index": 45,
+      "condition": {
+        "path": "ship.door_state",
+        "equals": "Closed"
+      },
+      "result": {
+        "condition": {
+          "path": "ship.door_state",
+          "equals": "Closed"
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": "Closed"
+      }
+    },
+    {
+      "index": 49,
+      "condition": {
+        "path": "player.location",
+        "equals": "InsideShip"
+      },
+      "result": {
+        "condition": {
+          "path": "player.location",
+          "equals": "InsideShip"
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": "InsideShip"
+      }
+    },
+    {
+      "index": 51,
+      "condition": {
+        "path": "player.ship_local_eye_position_meters.0",
+        "approx": -7.24,
+        "tolerance": 0.001
+      },
+      "result": {
+        "condition": {
+          "path": "player.ship_local_eye_position_meters.0",
+          "approx": -7.24,
+          "tolerance": 0.001
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": -7.239990234375
+      }
+    },
+    {
+      "index": 52,
+      "condition": {
+        "path": "ship.flight_state",
+        "equals": "Flying"
+      },
+      "result": {
+        "condition": {
+          "path": "ship.flight_state",
+          "equals": "Flying"
+        },
+        "attempts": 1,
+        "actual_present": true,
+        "passed": true,
+        "actual": "Flying"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "name": "space-exit",
+      "image": "step-022-space-exit.png",
+      "player": {
+        "eye_position_meters": [
+          999999999990.3284,
+          -749990989998.0027,
+          249993999899.9888
+        ],
+        "local_ship_position_meters": null,
+        "location": "Space",
+        "look_target_meters": [
+          999999999991.3284,
+          -749990989998.0027,
+          249993999899.9888
+        ],
+        "ship_local_eye_position_meters": [
+          -9.671630859375,
+          1.997314453125,
+          -0.011199951171875
+        ],
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ]
+      },
+      "ship": {
+        "cockpit_control_active": false,
+        "cockpit_message": null,
+        "door_state": "Open",
+        "energy_core": {
+          "capacity_joules": 1000000000000,
+          "stored_joules": 750000000000
+        },
+        "flight_state": "Flying",
+        "nearby_body": null,
+        "orientation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "position_meters": [
+          1000000000000.0,
+          -749990990000.0,
+          249993999900.0
+        ],
+        "speed_meters_per_second": 0.0,
+        "thruster_percentage": 0,
+        "velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "name": "space-closed-door",
+      "image": "step-034-space-closed-door.png",
+      "player": {
+        "eye_position_meters": [
+          999999999991.84,
+          -749990989998.0027,
+          249993999899.9888
+        ],
+        "local_ship_position_meters": null,
+        "location": "Space",
+        "look_target_meters": [
+          999999999992.84,
+          -749990989998.0027,
+          249993999899.9888
+        ],
+        "ship_local_eye_position_meters": [
+          -8.1600341796875,
+          1.997314453125,
+          -0.011199951171875
+        ],
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ]
+      },
+      "ship": {
+        "cockpit_control_active": false,
+        "cockpit_message": null,
+        "door_state": "Closed",
+        "energy_core": {
+          "capacity_joules": 1000000000000,
+          "stored_joules": 750000000000
+        },
+        "flight_state": "Flying",
+        "nearby_body": null,
+        "orientation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "position_meters": [
+          1000000000000.0,
+          -749990990000.0,
+          249993999900.0
+        ],
+        "speed_meters_per_second": 0.0,
+        "thruster_percentage": 0,
+        "velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "name": "space-reentry",
+      "image": "step-042-space-reentry.png",
+      "player": {
+        "eye_position_meters": [
+          999999999994.5408,
+          -749990989998.0027,
+          249993999899.9888
+        ],
+        "local_ship_position_meters": [
+          -5.459199999999989,
+          1.9973118279569892,
+          -0.011199951171875
+        ],
+        "location": "InsideShip",
+        "look_target_meters": [
+          999999999995.5408,
+          -749990989998.0027,
+          249993999899.9888
+        ],
+        "ship_local_eye_position_meters": [
+          -5.459228515625,
+          1.997314453125,
+          -0.011199951171875
+        ],
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ]
+      },
+      "ship": {
+        "cockpit_control_active": false,
+        "cockpit_message": null,
+        "door_state": "Open",
+        "energy_core": {
+          "capacity_joules": 1000000000000,
+          "stored_joules": 750000000000
+        },
+        "flight_state": "Flying",
+        "nearby_body": null,
+        "orientation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "position_meters": [
+          1000000000000.0,
+          -749990990000.0,
+          249993999900.0
+        ],
+        "speed_meters_per_second": 0.0,
+        "thruster_percentage": 0,
+        "velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    {
+      "name": "space-interior-closed-door",
+      "image": "step-050-space-interior-closed-door.png",
+      "player": {
+        "eye_position_meters": [
+          999999999992.76,
+          -749990989998.0027,
+          249993999899.9888
+        ],
+        "local_ship_position_meters": [
+          -7.24,
+          1.9973118279569892,
+          -0.011199951171875
+        ],
+        "location": "InsideShip",
+        "look_target_meters": [
+          999999999993.76,
+          -749990989998.0027,
+          249993999899.9888
+        ],
+        "ship_local_eye_position_meters": [
+          -7.239990234375,
+          1.997314453125,
+          -0.011199951171875
+        ],
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ]
+      },
+      "ship": {
+        "cockpit_control_active": false,
+        "cockpit_message": null,
+        "door_state": "Closed",
+        "energy_core": {
+          "capacity_joules": 1000000000000,
+          "stored_joules": 750000000000
+        },
+        "flight_state": "Flying",
+        "nearby_body": null,
+        "orientation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "position_meters": [
+          1000000000000.0,
+          -749990990000.0,
+          249993999900.0
+        ],
+        "speed_meters_per_second": 0.0,
+        "thruster_percentage": 0,
+        "velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    }
+  ],
+  "suite": [
+    {
+      "status": "passed",
+      "steps_completed": 135,
+      "duration_ms": 7017,
+      "scenario": "cargo-room.json"
+    },
+    {
+      "status": "passed",
+      "steps_completed": 185,
+      "duration_ms": 8434,
+      "scenario": "carrying.json"
+    },
+    {
+      "status": "passed",
+      "steps_completed": 108,
+      "duration_ms": 6341,
+      "scenario": "landed-earth.json"
+    },
+    {
+      "status": "passed",
+      "steps_completed": 135,
+      "duration_ms": 6279,
+      "scenario": "mining.json"
+    },
+    {
+      "status": "passed",
+      "steps_completed": 23,
+      "duration_ms": 3379,
+      "scenario": "orbit-earth.json"
+    },
+    {
+      "status": "passed",
+      "steps_completed": 56,
+      "duration_ms": 3776,
+      "scenario": "resource-deposits.json"
+    },
+    {
+      "status": "passed",
+      "steps_completed": 132,
+      "duration_ms": 6442,
+      "scenario": "resource-streaming.json"
+    },
+    {
+      "status": "passed",
+      "steps_completed": 48,
+      "duration_ms": 3179,
+      "scenario": "space-airlock.json"
+    }
+  ]
+}

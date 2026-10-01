@@ -265,6 +265,7 @@ pub enum CharacterLocation {
     InsideShip,
     DoorwayBlend,
     Surface,
+    Space,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -289,6 +290,9 @@ enum PositionState {
         leaving_ship: bool,
     },
     Surface {
+        world: [f64; 3],
+    },
+    Space {
         world: [f64; 3],
     },
 }
@@ -324,6 +328,7 @@ impl CharacterController {
             PositionState::Inside { .. } => CharacterLocation::InsideShip,
             PositionState::Doorway { .. } => CharacterLocation::DoorwayBlend,
             PositionState::Surface { .. } => CharacterLocation::Surface,
+            PositionState::Space { .. } => CharacterLocation::Space,
         }
     }
 
@@ -332,7 +337,9 @@ impl CharacterController {
         match self.position {
             PositionState::Cockpit => Some(COCKPIT_POSITION),
             PositionState::Inside { local } => Some(local),
-            PositionState::Doorway { .. } | PositionState::Surface { .. } => None,
+            PositionState::Doorway { .. }
+            | PositionState::Surface { .. }
+            | PositionState::Space { .. } => None,
         }
     }
 
@@ -414,7 +421,12 @@ impl CharacterController {
                     self.vertical_speed = self.vertical_speed.min(0.0);
                 }
                 let within_doorway = local[2].abs() <= DOORWAY_SIDE_LIMIT;
-                if local[0] < DOORWAY_FORWARD && within_doorway && doorway_passable {
+                if local[0] < DOORWAY_FORWARD && within_doorway && door_open && !ship_landed {
+                    self.vertical_speed = 0.0;
+                    self.position = PositionState::Space {
+                        world: ship.local_to_world(local),
+                    };
+                } else if local[0] < DOORWAY_FORWARD && within_doorway && doorway_passable {
                     self.position = PositionState::Doorway {
                         world: ship.local_to_world(local),
                         elapsed: Duration::ZERO,
@@ -490,6 +502,46 @@ impl CharacterController {
                         world,
                         elapsed,
                         leaving_ship,
+                    };
+                }
+            }
+            PositionState::Space { world } => {
+                // Access-only movement. Inertial, ship-velocity-aware EVA is #37.
+                // Never project a space exit onto the fallback planetary surface.
+                let mut previous = ship.world_to_local(world);
+                if !door_open
+                    && previous[0] > EXTERIOR_AFT
+                    && previous[0] < DOORWAY_FORWARD + PLAYER_RADIUS_METERS
+                    && previous[2].abs() <= DOORWAY_SIDE_LIMIT
+                {
+                    previous[0] = EXTERIOR_AFT;
+                }
+                let movement = ship_planar_movement(input, self.yaw_radians);
+                let mut local = previous;
+                local[0] += movement[0] * WALK_SPEED_METERS_PER_SECOND * seconds;
+                local[2] += movement[1] * WALK_SPEED_METERS_PER_SECOND * seconds;
+                if overlaps_exterior_hull(local) {
+                    local = slide_around_obstacles(previous, local, &EXTERIOR_OBSTACLES);
+                    if !door_open {
+                        local = slide_around_obstacles(previous, local, &CLOSED_GATE_OBSTACLE);
+                    }
+                }
+                local = slide_around_thrusters(previous, local, world_round_trip_tolerance(world));
+                let through_gate = previous[0] < DOORWAY_FORWARD
+                    && local[0] >= DOORWAY_FORWARD - COLLISION_EPSILON
+                    && previous[2].abs() <= DOORWAY_SIDE_LIMIT + COLLISION_EPSILON
+                    && local[2].abs() <= DOORWAY_SIDE_LIMIT + COLLISION_EPSILON
+                    && local[1] >= PLAYER_EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT - COLLISION_EPSILON
+                    && local[1]
+                        <= DOORWAY_CEILING_HEIGHT
+                            - (PLAYER_BODY_HEIGHT_METERS - PLAYER_EYE_HEIGHT_METERS);
+                if door_open && through_gate && movement[0] > 0.0 {
+                    local[0] = local[0].max(DOORWAY_FORWARD);
+                    self.vertical_speed = 0.0;
+                    self.position = PositionState::Inside { local };
+                } else {
+                    self.position = PositionState::Space {
+                        world: ship.local_to_world(local),
                     };
                 }
             }
@@ -571,6 +623,7 @@ impl CharacterController {
         let (eye, up, blend) = match self.position {
             PositionState::Cockpit => (ship.local_to_world(COCKPIT_POSITION), ship.axes[1], None),
             PositionState::Inside { local } => (ship.local_to_world(local), ship.axes[1], None),
+            PositionState::Space { world } => (world, ship.axes[1], None),
             PositionState::Surface { world } => (
                 world,
                 normalize(sub(world, surface.body_center_meters)),
@@ -1490,7 +1543,87 @@ mod tests {
     }
 
     #[test]
-    fn closed_or_flying_door_keeps_player_inside() {
+    fn space_access_preserves_height_blocks_hull_and_handles_closing_in_gate() {
+        let mut controller = CharacterController {
+            position: PositionState::Inside {
+                local: [-7.0, PLAYER_START[1], 0.0],
+            },
+            ..CharacterController::default()
+        };
+        let backward = MovementInput {
+            backward: true,
+            ..MovementInput::default()
+        };
+        for _ in 0..12 {
+            controller.advance(
+                Duration::from_millis(16),
+                backward,
+                frame(),
+                surface(),
+                true,
+                false,
+            );
+        }
+        assert_eq!(controller.location(), CharacterLocation::Space);
+        let before = controller.snapshot(frame(), surface());
+        controller.advance(
+            Duration::from_millis(16),
+            MovementInput::default(),
+            frame(),
+            surface(),
+            false,
+            false,
+        );
+        let closed = controller.snapshot(frame(), surface());
+        assert!(frame().world_to_local(closed.eye_position_meters)[0] <= EXTERIOR_AFT);
+        assert!((closed.eye_position_meters[1] - before.eye_position_meters[1]).abs() < 1e-9);
+        for _ in 0..30 {
+            controller.advance(
+                Duration::from_millis(16),
+                MovementInput {
+                    forward: true,
+                    ..MovementInput::default()
+                },
+                frame(),
+                surface(),
+                false,
+                false,
+            );
+        }
+        assert_eq!(controller.location(), CharacterLocation::Space);
+        assert!(
+            (frame().world_to_local(controller.snapshot(frame(), surface()).eye_position_meters)
+                [0]
+                - EXTERIOR_AFT)
+                .abs()
+                < 1e-7
+        );
+        // The open gate never makes its opaque rear windows passable.
+        controller.position = PositionState::Space {
+            world: frame().local_to_world([-9.0, PLAYER_START[1], 3.0]),
+        };
+        for _ in 0..30 {
+            controller.advance(
+                Duration::from_millis(16),
+                MovementInput {
+                    forward: true,
+                    ..MovementInput::default()
+                },
+                frame(),
+                surface(),
+                true,
+                false,
+            );
+        }
+        assert_eq!(controller.location(), CharacterLocation::Space);
+        assert!(
+            frame().world_to_local(controller.snapshot(frame(), surface()).eye_position_meters)[0]
+                <= EXTERIOR_AFT + 1e-7
+        );
+    }
+
+    #[test]
+    fn closed_door_keeps_player_inside_on_surface_and_in_space() {
         let mut controller = CharacterController {
             position: PositionState::Inside {
                 local: [-7.0, PLAYER_START[1], 0.0],
@@ -1515,7 +1648,7 @@ mod tests {
             leave,
             frame(),
             surface(),
-            true,
+            false,
             false,
         );
         assert_eq!(controller.location(), CharacterLocation::InsideShip);

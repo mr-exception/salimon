@@ -369,7 +369,8 @@ impl ClientApplication {
             }
             CharacterLocation::InsideShip
             | CharacterLocation::DoorwayBlend
-            | CharacterLocation::Surface => {
+            | CharacterLocation::Surface
+            | CharacterLocation::Space => {
                 let character = self.character.snapshot(ship_frame, surface);
                 let local_eye = ship_frame.world_to_local(character.eye_position_meters);
                 let local_look = ship_frame.world_to_local(character.look_target_meters);

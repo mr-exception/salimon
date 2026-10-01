@@ -16,7 +16,7 @@ surface distance plus approaching/receding/zero radial speed. See the
 proportions and the first-person character and walkable ship shell.
 The native client starts inside the custom Task 7
 Salimon scout landed on Earth, with portable character/ship state, runtime-loaded
-GLB geometry, walking, free mouse look, jumping, cockpit interaction, a landed-only
+GLB geometry, walking, free mouse look, jumping, cockpit interaction, a landed/open-space
 door, and radial surface traversal.
 
 ## Source of requirements
@@ -104,7 +104,7 @@ the Phase 0 benchmark's physical 1920×1080 drawable size and continues until th
 window is closed. It captures the cursor for mouse look and starts inside the
 landed ship facing the cockpit. Use **WASD** to walk, the mouse to look, and
 **Space** to jump. Press **E** near the cockpit to enter or leave
-control instantly; press **E** near the aft door to open/close it while landed.
+control instantly; press **E** near the aft door to open/close it while landed or in open space beyond the nearby-body threshold.
 Press **M** to equip the handheld mining tool on the surface; aim at a deposit
 within 4 m and hold **F** or left mouse to extract at 2 kg/s. Press M to stow.
 Aim at a physical fragment within 3 m and press **Q** to pick it up. You can

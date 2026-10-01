@@ -70,6 +70,7 @@ jobs:
             python scripts/salimon-test run scenarios/evidence/carrying.json --binary artifacts/build/release/salimon-client
             python scripts/salimon-test run scenarios/evidence/fragment-transfer.json --binary artifacts/build/release/salimon-client --screenshot-command "[\"python\", \"scripts/capture_settled.py\", \"{path}\"]"
             python scripts/salimon-test run scenarios/evidence/physical-cargo.json --binary artifacts/build/release/salimon-client --screenshot-command "[\"python\", \"scripts/capture_settled.py\", \"{path}\"]"
+            python scripts/salimon-test run scenarios/evidence/lower-cockpit-windows.json --binary artifacts/build/release/salimon-client --screenshot-command "[\"python\", \"scripts/capture_settled.py\", \"{path}\"]"
             python scripts/salimon-test suite --group ship-eva --evidence --binary artifacts/build/release/salimon-client --screenshot-command "[\"python\", \"scripts/capture_settled.py\", \"{path}\"]"
           ' 2>&1 | tee artifacts/e2e/baseline.log
       - name: Linux optional visual checkpoints (Mesa software Vulkan)

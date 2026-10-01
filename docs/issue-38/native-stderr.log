@@ -1,0 +1,3 @@
+[2026-10-01T15:41:16Z WARN  salimon_client::app] could not lock cursor for mouse look: the requested operation is not supported by Winit
+[2026-10-01T15:41:16Z ERROR wgpu_hal::gles::egl] EGL 'eglInitialize' code 0x3001: DRI2: failed to load driver
+[2026-10-01T15:41:16Z ERROR wgpu_hal::gles::egl] EGL 'eglInitialize' code 0x3001: DRI2: failed to load driver

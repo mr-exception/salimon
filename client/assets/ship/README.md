@@ -80,6 +80,28 @@ cockpit, take off, and revisit the room in flight. Its evidence variant captures
 the exterior, cockpit, and room while landed and flying. See
 [issue #34 evidence](../../../docs/issue-34/README.md).
 
+## Lower cockpit glazing (#38)
+
+Asset version 11 opens the lower nose, its cheek panes, and two structural glass
+floor shoulders beside the center console. The deck and belly have matching
+apertures. Copper rims identify the floor panes; the original deck collision
+continues to support their load-bearing glass. The pilot station, monitor faces,
+chair, controls, interaction markers and main canopy retain their transforms.
+
+`Cockpit_Lower_Glazing` uses the existing lightly tinted, double-sided glass draw,
+with alpha blending and no depth writes. Its exported outward normals include
+upward floor panes and downward nose glazing. The seated eye can see through
+both sides at 12/18 degrees down and through the floor shoulders at 26/30 degrees
+down. The manifest records the validated pitch/yaw samples. Exported-triangle
+rays must hit lower glazing and no opaque mesh; they cover the actual deck,
+belly, consoles, trim and hull rather than only pane bounds. The asset remains
+within 6,000 triangles, 120 primitives, 13 materials and the 512 KiB GLB budget.
+
+The required native E2E visual scenario follows real free-look, assisted landing,
+low-altitude approach, landed inspection, takeoff and cockpit exit. See
+[issue #38 evidence](../../../docs/issue-38/README.md) for matching before/after
+native screenshots and authoritative state/logs.
+
 ## Source and regeneration
 
 - `source/generate_salimon_phase0_ship.py` is the deterministic editable source,

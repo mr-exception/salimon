@@ -1,6 +1,6 @@
 {
   "name": "Salimon Phase 0 Scout",
-  "assetVersion": 10,
+  "assetVersion": 11,
   "source": "source/generate_salimon_phase0_ship.py",
   "editableInterchange": "export/salimon_phase0_ship.gltf",
   "runtimeAsset": "export/salimon_phase0_ship.glb",
@@ -57,6 +57,29 @@
       "Cabin_Port_Glazing",
       "Cabin_Starboard_Glazing",
       "Cabin_Aft_Glazing"
+    ],
+    "lowerGlazingNode": "Cockpit_Lower_Glazing",
+    "lowerViewSamplesDegrees": [
+      [
+        12,
+        28
+      ],
+      [
+        18,
+        28
+      ],
+      [
+        26,
+        32
+      ],
+      [
+        30,
+        34
+      ],
+      [
+        30,
+        36
+      ]
     ]
   },
   "license": "Custom original Salimon project asset; no external asset dependencies",

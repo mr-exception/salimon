@@ -199,6 +199,18 @@ def validate_sightlines(document: dict, binary: bytes) -> None:
                 if glass:glass_hit=True
                 else:assert False, f"{label} obstructed by {name} at {min(distances):.2f}m"
         assert glass_hit, f"{label} misses modeled glazing"
+    # Sample both sides of the console from the real seated eye. Rays must
+    # pass through the LOWER pane, then reach the world without any opaque
+    # hull, deck, monitor, furniture or collision proxy covering the view.
+    for pitch,absolute_yaw in ((12,28),(18,28),(26,32),(30,34),(30,36)):
+        for yaw in (-absolute_yaw, absolute_yaw):
+            p,y=math.radians(pitch),math.radians(yaw)
+            direction=(math.cos(p)*math.cos(y),-math.sin(p),math.cos(p)*math.sin(y))
+            hits=[(d,name,glass) for name,glass,triangles in meshes for tri in triangles
+                  if (d:=hit((2.76,1.799032258064516,0),direction,tri)) is not None]
+            assert hits, f"lower window ray misses glazing: {pitch}/{yaw}"
+            assert any(name == "Cockpit_Lower_Glazing" for _,name,_ in hits)
+            assert all(glass for _,_,glass in hits), f"lower view {pitch}/{yaw} blocked: {hits}"
     # A standing player sees through the actual cargo doorway to the far wall;
     # neither the old sill/glazing, wing nor an opaque hull cap covers the opening.
     for x in (.7, 1.3, 1.8):
@@ -384,6 +396,11 @@ def main() -> None:
     windows = document["extras"]["salimon"]["cockpitWindows"]
     assert windows["glazingNode"] == "Cockpit_Glazing"
     assert windows["material"] == "Cockpit Glass"
+    assert windows["lowerGlazingNode"] == "Cockpit_Lower_Glazing"
+    lower_node=node(document, windows["lowerGlazingNode"])
+    lower_primitive=document["meshes"][lower_node["mesh"]]["primitives"][0]
+    assert document["materials"][lower_primitive["material"]]["name"] == "Cockpit Glass"
+    assert lower_node["extras"]["salimon"]["exterior_visibility"] is True
     assert_vectors_close(windows["seatedViewpointMeters"], [2.76, 1.799032258064516, 0.0])
     assert_vectors_close(windows["standingViewpointMeters"], [1.30, 1.9973118279569892, 0.0])
     assert windows["dynamicShadows"] is False
@@ -419,6 +436,13 @@ def main() -> None:
     # Compare measured payload counts with the declared budget contract.
     manifest = json.loads((ROOT / "asset-manifest.json").read_text())
     assert manifest["assetVersion"] == document["asset"]["extras"]["salimon"]["assetVersion"]
+    assert manifest["cockpitWindows"]["lowerGlazingNode"] == windows["lowerGlazingNode"]
+    assert manifest["cockpitWindows"]["lowerViewSamplesDegrees"] == windows["lowerViewSamplesDegrees"]
+    lower_normals=accessor_values(document,geometry,lower_primitive["attributes"]["NORMAL"])
+    assert all(abs(sum(n*n for n in normal)-1.0)<1e-5 for normal in lower_normals)
+    assert any(normal[1] > .99 for normal in lower_normals), "floor panes face upward"
+    assert any(normal[1] < -.9 for normal in lower_normals), "nose pane faces downward"
+
     assert manifest["budgets"]["maximumTriangles"] == 6000
     measured_triangles = sum(document["accessors"][p["indices"]]["count"] // 3
                              for mesh in document["meshes"] for p in mesh["primitives"])

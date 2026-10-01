@@ -717,7 +717,11 @@ def ship_components() -> list[Component]:
 
     # Wide lifting-body scout; horizontal dimensions authored at half scale.
     # Wall assemblies leave actual openings from waist height to the ceiling.
-    add("Hull_Belly", tapered_box(-4.2, 3.3, -0.10, 0.18, 2.55, -0.10, 0.18, 2.15), 0, "Exterior")
+    belly = tapered_box(-4.2,2.4,-.10,.18,2.55,-.10,.18,2.195)
+    belly.extend(box(2.4,3.3,-.10,.18,-.55,.55))
+    for sign in (-1,1):
+        belly.extend(box(2.4,3.3,-.10,.18,*sorted((sign*1.05,sign*2.15))))
+    add("Hull_Belly",belly,0,"Exterior")
     roof_outline = [(-3.90,-2.18),(-3.55,-2.62),(2.15,-2.62),(2.58,-2.30),
                     (2.58,2.30),(2.15,2.62),(-3.55,2.62),(-3.90,2.18)]
     add("Hull_Roof", extrude_y(list(reversed(roof_outline)),2.72,3.08), 1, "Exterior")
@@ -748,7 +752,36 @@ def ship_components() -> list[Component]:
         add(f"Cabin_{label}_Glazing", glass, 3, "Exterior", exterior_visibility=True)
         add(f"Hull_{label}_Stripe", box(-3.60,.2 if sign == 1 else 2.30,.68,.82,
             *sorted((sign*2.555,sign*2.58))), 2, "Exterior")
-    add("Hull_Nose", tapered_box(2.5, 5.25, 0.10, .89, 2.55, .48, .66, .62), 1, "Exterior")
+    # Solid deck support ends before the downward viewing bay. No opaque
+    # belly/top cap spans the panes; inside and outside use the same mesh.
+    nose = box(2.44,2.50,.10,.23,-.55,.55)
+    nose.extend(box(4.87,5.25,.40,.48,-.66,.66))
+    for sign in (-1,1):
+        rail = tapered_box(2.50,4.92,.14,.22,.035,.44,.52,.035)
+        for i,(x,y,z) in enumerate(rail.positions):
+            width = 2.42 + (.62-2.42)*(x-2.50)/(4.92-2.50)
+            rail.positions[i] = (x,y,z+sign*width)
+        nose.extend(rail)
+    add("Hull_Nose",nose,1,"Exterior")
+    lower = Geometry()
+    # Bottom pane slopes up toward the nose; two cheek panes
+    # join it to the original canopy sill without overlapping opaque faces.
+    lower.add_face([(3.28,.23,-1.84),(4.92,.48,-.62),
+                    (4.92,.48,.62),(3.28,.23,1.84)])
+    # Load-bearing glazed floor shoulders open a much steeper seated ray
+    # beside the console. The same deck collision supports these glass panels.
+    for sign in (-1,1):
+        z0,z1=sorted((sign*.55,sign*1.05))
+        lower.add_face([(2.4,.23,z0),(2.4,.23,z1),
+                        (3.28,.23,z1),(3.28,.23,z0)])
+    for sign in (-1,1):
+        pane=[(2.50,.23,sign*2.42),(2.50,.89,sign*2.42),
+              (4.92,.66,sign*.62),(4.92,.48,sign*.62),
+              (3.28,.23,sign*1.84)]
+        lower.add_face(list(reversed(pane)) if sign == 1 else pane)
+    lower.add_face([(4.92,.48,-.62),(4.92,.66,-.62),
+                    (4.92,.66,.62),(4.92,.48,.62)])
+    add("Cockpit_Lower_Glazing",lower,3,"Exterior",exterior_visibility=True)
     # Rear observation windows flank a real door opening; no solid aft cap.
     aft = combined(box(-3.96,-3.78,.18,.88,-2.55,-.72),
                    box(-3.96,-3.78,.18,.88,.72,2.55),
@@ -810,10 +843,21 @@ def ship_components() -> list[Component]:
         canopy_frame.extend(box(2.44,2.56,.89,2.74,*sorted((sign*2.36,sign*2.48))))
         canopy_frame.extend(box(4.86,4.98,.66,2.18,*sorted((sign*.56,sign*.68))))
     canopy_frame.extend(box(4.85,4.99,2.12,2.22,-.68,.68))
+    # Copper outlines make the load-bearing floor windows legible from the
+    # seat; narrow strips sit on the opaque deck edges, outside the aperture.
+    for sign in (-1,1):
+        for z0,z1 in ((.53,.55),(1.05,1.07)):
+            canopy_frame.extend(box(2.4,3.28,.23,.25,*sorted((sign*z0,sign*z1))))
+        for x0,x1 in ((2.38,2.4),(3.28,3.30)):
+            canopy_frame.extend(box(x0,x1,.23,.25,*sorted((sign*.53,sign*1.07))))
     add("Cockpit_Window_Frame",canopy_frame,2,"Exterior")
 
     # Warm living cabin: structural lower walls, deep sills and generous glazing.
-    add("Deck_Walkable",box(-3.78,3.28,.13,.23,-2.30,2.30),7,"Interior",walkable=True)
+    deck = box(-3.78,2.4,.13,.23,-2.30,2.30)
+    deck.extend(box(2.4,3.28,.13,.23,-.55,.55))
+    for sign in (-1,1):
+        deck.extend(box(2.4,3.28,.13,.23,*sorted((sign*1.05,sign*2.30))))
+    add("Deck_Walkable",deck,7,"Interior",walkable=True)
     add("Ceiling_Inner",box(-3.72,2.46,2.61,2.71,-2.30,2.30),4,"Interior")
     for label,sign in (("Port",1),("Starboard",-1)):
         add(f"Wall_{label}_Inner",combined(
@@ -1159,7 +1203,7 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
             "copyright": "Copyright 2026 Salimon contributors; custom original asset",
             "extras": {
                 "salimon": {
-                    "assetVersion": 10,
+                    "assetVersion": 11,
                     "units": "meters",
                     "upAxis": "+Y",
                     "forwardAxis": "+X",
@@ -1201,7 +1245,7 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
                     "width": 4.60 * HORIZONTAL_SCALE_FROM_TASK7,
                     "height": 2.38 * VERTICAL_SCALE_FROM_TASK7,
                 },
-                "designRevision": "port-cargo-module",
+                "designRevision": "lower-cockpit-glazing",
                 "cargoRoom": CARGO_ROOM_METADATA,
                 "energyCore": {"centerMeters": [-1.0, 1.2, 0.0], "role": "energy-storage", "phase0": "visual-only"},
                 "humanBodyHeightMeters": PLAYER_BODY_HEIGHT_METERS,
@@ -1216,6 +1260,8 @@ def build_document(texture_bytes: bytes) -> tuple[dict[str, object], bytes]:
                 "cockpitWindows": {
                     "glazingNode": "Cockpit_Glazing",
                     "frameNode": "Cockpit_Window_Frame",
+                    "lowerGlazingNode": "Cockpit_Lower_Glazing",
+                    "lowerViewSamplesDegrees": [[12,28],[18,28],[26,32],[30,34],[30,36]],
                     "cabinGlazingNodes": ["Cabin_Port_Glazing", "Cabin_Starboard_Glazing", "Cabin_Aft_Glazing"],
                     "material": "Cockpit Glass",
                     "seatedViewpointMeters": COCKPIT_VIEWPOINT_METERS,

@@ -397,3 +397,23 @@ also runs in a portable runtime regression. The evidence variant adds five named
 captures and runs in required Linux CI with settled capture. Capture failures fail
 that run. See [validation status](../docs/issue-49/README.md) for the current local
 display limitation and commands to reproduce on a working native display.
+
+## Lower cockpit windows (#38)
+
+`lower-cockpit-windows.json` starts in the deterministic Earth approach and uses
+normal free-look to inspect the lower pane at 30 degrees down / 34 degrees to
+each side of the console. It starts assisted landing, checks the surface distance
+falls below 25 m, waits for touchdown, inspects both sides, restores the forward
+view, takes off and leaves cockpit control. Its evidence variant records eight
+native screenshots, including the seated low-altitude surface view. The default
+suite runs the baseline; Linux CI requires the settled-capture evidence variant.
+
+```sh
+python scripts/salimon-test run scenarios/evidence/lower-cockpit-windows.json \
+  --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
+```
+
+The authored pilot view begins at -0.10 radians; mouse deltas in this route
+include that offset. Asset validation independently checks actual exported
+triangle sightlines. Passing gameplay assertions alone does not establish visual
+correctness; inspect the native checkpoints as well.

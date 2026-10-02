@@ -937,7 +937,12 @@ impl ApplicationHandler for ClientApplication {
                 event,
                 is_synthetic,
                 ..
-            } if view_toggle_pressed(event.state, event.repeat, event.physical_key, is_synthetic) =>
+            } if view_toggle_pressed(
+                event.state,
+                event.repeat,
+                event.physical_key,
+                is_synthetic,
+            ) =>
             {
                 self.view_mode = match self.view_mode {
                     ViewMode::Gameplay => ViewMode::PrecisionTour,
@@ -1447,7 +1452,12 @@ mod tests {
         assert!(view_toggle_pressed(ElementState::Pressed, false, f2, false));
         assert!(!view_toggle_pressed(ElementState::Pressed, false, f2, true));
         assert!(!view_toggle_pressed(ElementState::Pressed, true, f2, false));
-        assert!(!view_toggle_pressed(ElementState::Released, false, f2, false));
+        assert!(!view_toggle_pressed(
+            ElementState::Released,
+            false,
+            f2,
+            false
+        ));
         assert!(!view_toggle_pressed(
             ElementState::Pressed,
             false,

@@ -35,7 +35,7 @@ Inspect the original import after saving/reopening:
 ```sh
 blender --background --python-exit-code 1 \
   --python models/assets/ships/salimon-scout/bootstrap.py -- --verify
-python3 client/assets/ship/source/validate_salimon_phase0_ship.py
+python3 models/assets/ships/salimon-scout/validate.py
 python3 -m unittest discover -s models/tests -v
 ```
 
@@ -68,7 +68,7 @@ profile. Do not rename this ship to the new `ASSET_`/`Visual` conventions.
 
 The seated eye is `[2.76, 1.7990322581, 0]` in runtime meters. Preserve screen
 planes/normals, seatward monitor offsets, console collision, all unobstructed
-monitor rays and lower cockpit/window sightlines checked by the legacy validator.
+monitor rays and lower cockpit/window sightlines checked by the scout category validator.
 Blender UV coordinates flip V relative to glTF; the verification checks the
 corresponding values, so do not visually flip the screens to compensate twice.
 
@@ -107,11 +107,19 @@ still requires an explicit category adapter; use the scout command above.
 `runtime-metadata.json` preserves asset-level nonvisual metadata not imported
 into Blender. It supplies ship dimensions, instrument/window policy and legacy
 metrics; the adapter never generates visual geometry or replaces Blender
-materials. Detailed legacy validation remains in place until #82. The old
+materials. Detailed validation now lives in `validate.py`, registered as the
+`ships/ship/v1` extension during export. It reuses shared envelope, accessor,
+hierarchy and budget checks and measures exported vertices for dimensions,
+monitor planes/UVs, collision envelopes and sightlines. `monitor-contract.json`
+records the authored center assembly vertices independently of DCC vertex
+ordering; update that explicit contract deliberately when redesigning the center
+assembly. No validator imports procedural geometry. The compatibility command
+in `client/assets/ship/source/` forwards here. The old
 Python CLI accepts only `--legacy-layout-only` and writes the two retained Rust
 spatial layouts; it cannot replace Blender visual exports.
 
-#81 moves spatial contracts into authored proxies/anchors and generated runtime metadata. #82 removes the remaining detailed validator's procedural geometry definitions, and #83 retires the generator. Do not
+#81 and #82 are implemented: authored spatial contracts and direct validation
+are supported. #83 retires the remaining legacy generator/reference tooling. Do not
 change frozen spatial/material contracts as part of a visual edit.
 
 ## Migration comparison

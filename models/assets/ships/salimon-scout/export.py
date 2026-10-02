@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Export Blender scout visuals, preserving legacy metadata until #81–#83."""
+"""Export Blender scout visuals, preserving runtime metadata and validating authored contracts."""
 import argparse
 import copy
 import hashlib
-import importlib.util
 import json
 import os
 from pathlib import Path
@@ -18,7 +17,8 @@ REPO = ASSET.parents[3]
 sys.path.insert(0, str(ASSET))
 sys.path.insert(0, str(REPO / 'models/tools'))
 from export_asset import ExportError, contained_path, resolve_manifest
-from validate_asset import read_document, require, validate_manifest
+from validate_asset import read_document, validate_manifest
+from validate import REGISTRIES, validate_preservation
 from spatial_contracts import (
     anchors_rust_source,
     build_spatial_contracts,
@@ -35,46 +35,6 @@ def encode_glb(document, binary):
     return (struct.pack('<4sII', b'glTF', 2, 28 + len(data) + len(binary)) +
             struct.pack('<II', len(data), 0x4E4F534A) + data +
             struct.pack('<II', len(binary), 0x004E4942) + binary)
-
-
-def validate_preservation(context, data):
-    """Keep runtime-significant hierarchy, transforms, extras and material roles."""
-    baseline = json.loads((ASSET / 'preservation.json').read_text())
-    doc = context['document']
-    nodes = {n['name']: n for n in doc['nodes']}
-    parents = {doc['nodes'][child]['name']: n['name'] for n in doc['nodes']
-               for child in n.get('children', [])}
-    require(nodes.keys() == {n['name'] for n in baseline['nodes']}, 'scout node set changed')
-    for expected in baseline['nodes']:
-        name = expected['name']
-        actual = nodes[name]
-        require(parents.get(name) == expected['parent'], f'{name}: parent changed')
-        require(('mesh' in actual) == expected['visual'], f'{name}: visual role changed')
-        spatial = name.startswith(('COLLIDER_', 'MARKER_'))
-        if not spatial:
-            require(actual.get('extras', {}) == expected.get('extras', {}), f'{name}: legacy extras changed')
-            require(all(abs(a-b) <= 1e-6 for a, b in zip(actual.get('translation', [0, 0, 0]),
-                                                        expected.get('translation', [0, 0, 0]))),
-                    f'{name}: spatial transform changed')
-        require(actual.get('rotation', [0, 0, 0, 1]) == [0, 0, 0, 1] and
-                actual.get('scale', [1, 1, 1]) == [1, 1, 1] and 'matrix' not in actual,
-                f'{name}: legacy baked transform required')
-    materials = {m['name']: m for m in doc['materials']}
-    for expected in baseline['materials']:
-        actual = materials[expected['name']]
-        for key, default in (('alphaMode', 'OPAQUE'), ('doubleSided', False)):
-            require(actual.get(key, default) == expected.get(key, default),
-                    f'{expected["name"]}: {key} changed')
-        for key, default in (('baseColorFactor', [1, 1, 1, 1]),
-                             ('metallicFactor', 1), ('roughnessFactor', 1)):
-            a = actual.get('pbrMetallicRoughness', {}).get(key, default)
-            b = expected.get('pbrMetallicRoughness', {}).get(key, default)
-            a, b = (a, b) if isinstance(a, list) else ([a], [b])
-            require(all(abs(x-y) < 1e-6 for x, y in zip(a, b)), f'{expected["name"]}: {key} changed')
-        require(all(abs(x-y) < 1e-6 for x, y in zip(actual.get('emissiveFactor', [0, 0, 0]),
-                                                  expected.get('emissiveFactor', [0, 0, 0]))),
-                f'{expected["name"]}: emission changed')
-
 
 def export(blender=None):
     manifest_path, manifest = resolve_manifest('ship.salimon-scout', REPO)
@@ -102,21 +62,11 @@ def export(blender=None):
         doc['asset']['extras']['salimon']['sourceWorkflow'] = 'Blender source + scout export adapter'
         doc['asset']['copyright'] = metadata['copyright']
         temporary.write_bytes(encode_glb(doc, binary))
-        metrics = validate_manifest(manifest, temporary, REPO, extension_validators={
-            ('ships', 'ship', 1): validate_preservation,
-        })
+        metrics = validate_manifest(manifest, temporary, REPO, extension_validators=REGISTRIES)
         interchange = copy.deepcopy(doc)
         interchange['buffers'][0]['uri'] = output.with_suffix('.bin').name
         (staged / output.with_suffix('.gltf').name).write_text(json.dumps(interchange, indent=2) + '\n')
         (staged / output.with_suffix('.bin').name).write_bytes(binary)
-        # Until #82 the old validator still owns detailed sightline/monitor and
-        # generated-layout checks. Run those against the complete staged set.
-        legacy_dir = REPO / 'client/assets/ship/source'
-        sys.path.insert(0, str(legacy_dir))
-        spec = importlib.util.spec_from_file_location('scout_legacy_validator', legacy_dir / 'validate_salimon_phase0_ship.py')
-        validator = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(validator)
-        validator.main(staged)
         (staged / 'spatial-contracts.json').write_text(sidecar_json(spatial))
         (staged / 'cargo_layout.rs').write_text(cargo_rust_source(spatial))
         (staged / 'thruster_collision.rs').write_text(thruster_rust_source(spatial))

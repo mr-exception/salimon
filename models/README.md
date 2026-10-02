@@ -54,9 +54,11 @@ committed Blender-authored item, using the same pipeline and no category extensi
 
 The [scout Blender source](assets/ships/salimon-scout/README.md) now owns visual
 geometry/materials and produces the checked-in runtime GLB through its ship
-adapter (#80). Shared export and budget checks run alongside the preserved
-legacy ship validator. The Python definitions and generated Rust spatial
-layouts remain only for the staged spatial/validation migrations (#81–#83).
+adapter (#80). Shared export and budget checks run with the scout category
+validator, which reads the authored GLB and declarative preservation/monitor
+contracts directly. Spatial layouts come from authored proxies/markers (#81).
+The old generator/reference tooling remains for retirement in #83; validation
+and export no longer import it (#82).
 Runtime-generated spherical textures remain owned by the renderer as described
 in [client assets](../client/assets/README.md); they need no `.blend` source.
 

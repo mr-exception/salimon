@@ -107,8 +107,9 @@ native screenshots and authoritative state/logs.
 The [Blender scout source](../../../models/assets/ships/salimon-scout/README.md)
 is authoritative for visual geometry and materials. The scout adapter uses the
 generic exporter and checks all preserved contracts before replacing exports.
-The legacy generator remains only for spatial-layout generation and detailed
-validation until #81–#83; it cannot overwrite runtime visual assets.
+The legacy generator/reference tooling remains for retirement in #83.
+The scout export and validator use authored GLB data and declarative contracts;
+neither imports it. Spatial Rust layouts are derived from authored proxies/markers.
 
 - `../../../models/assets/ships/salimon-scout/source.blend` is the editable visual source.
 - `export/salimon_phase0_ship.gltf` plus `.bin` is the matching DCC interchange.
@@ -126,7 +127,7 @@ validation until #81–#83; it cannot overwrite runtime visual assets.
 
 ```sh
 python3 models/assets/ships/salimon-scout/export.py --blender /path/to/blender
-python3 client/assets/ship/source/validate_salimon_phase0_ship.py
+python3 models/assets/ships/salimon-scout/validate.py
 python3 client/assets/ship/source/render_salimon_phase0_ship_preview.py /tmp/salimon-ship-preview.jpg
 python3 client/assets/ship/source/render_salimon_phase0_ship_preview.py --core client/assets/ship/previews
 python3 client/assets/ship/source/render_salimon_phase0_ship_preview.py --cockpit client/assets/ship/previews
@@ -193,7 +194,7 @@ The validator checks exports agree, buffer/GLB structure, hierarchy, material
 budgets, measured bounds, floor alignment, Core metadata and housing containment
 inside its collider, shaped chair components, exact monitor planes/normals/UVs,
 side-display yaw toward the authored pilot viewpoint,
-the exact 0.49 transform and 0.40 m seatward translation of every center-monitor
+the authored 0.49 scale and 0.40 m seatward placement contract of the center-monitor
 assembly vertex (independent of DCC vertex ordering, with normal encoding tolerance), fitted side display geometry, unchanged dashboard geometry,
 and the matching combined console collider,
 fifteen unobstructed seated-eye rays over the three displays, seat height and actual

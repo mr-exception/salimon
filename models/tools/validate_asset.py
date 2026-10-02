@@ -67,6 +67,26 @@ def read_document(path):
     return document, binary
 
 
+def accessor_values(document, binary, reference):
+    """Decode validated embedded accessors, honoring offsets and byte strides."""
+    accessor = document['accessors'][reference]
+    view = document['bufferViews'][accessor['bufferView']]
+    width = {'SCALAR': 1, 'VEC2': 2, 'VEC3': 3, 'VEC4': 4}[accessor['type']]
+    kind = {5120: 'b', 5121: 'B', 5122: 'h', 5123: 'H', 5125: 'I', 5126: 'f'}[accessor['componentType']]
+    layout = '<' + kind * width
+    start = view.get('byteOffset', 0) + accessor.get('byteOffset', 0)
+    stride = view.get('byteStride', struct.calcsize(layout))
+    return [struct.unpack_from(layout, binary, start + row * stride)
+            for row in range(accessor['count'])]
+
+
+def position_bounds(document, binary, reference):
+    """Measure real vertices instead of trusting declared accessor min/max."""
+    values = accessor_values(document, binary, reference)
+    return ([min(p[a] for p in values) for a in range(3)],
+            [max(p[a] for p in values) for a in range(3)])
+
+
 def validate_document(path, manifest, extension_validators=None, collision_validators=None):
     """Run shared checks first; registered callbacks may add, never bypass, checks."""
     doc, binary = read_document(path)
@@ -230,7 +250,7 @@ def validate_document(path, manifest, extension_validators=None, collision_valid
         measured = sum(mesh_triangles[i] for i in used)
         require(measured > 0 and measured <= lod['maxTriangles'], f'LOD {lod["level"]}: triangle budget exceeded or empty')
         covered.update(subtree)
-    context = {'manifest': manifest, 'document': doc, 'runtime': path, 'metrics': metrics}
+    context = {'manifest': manifest, 'document': doc, 'binary': binary, 'runtime': path, 'metrics': metrics}
     if manifest['collision']['policy'] == 'generated':
         generator = manifest['collision']['generator']
         callback = (collision_validators or {}).get(generator)

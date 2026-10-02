@@ -20,7 +20,7 @@ The [iron fragment](../assets/resources/iron-fragment/README.md) is a committed,
 runnable resource asset; the [cargo container](../assets/items/cargo-container/README.md)
 is a runnable item asset (`item.cargo-container`).
 The [scout](../assets/ships/salimon-scout/README.md) uses a ship adapter over the
-same headless exporter, shared validator and legacy detailed checks:
+same headless exporter, shared validator and scout category extension:
 
 ```sh
 python3 models/assets/ships/salimon-scout/export.py --blender /path/to/blender
@@ -28,7 +28,7 @@ python3 models/assets/ships/salimon-scout/export.py --blender /path/to/blender
 
 Use this adapter for `ship.salimon-scout`; the generic CLI has no automatically
 registered ship extension. The adapter preserves legacy asset-level metadata
-and matching interchange output until #81–#83 complete the migration.
+and matching interchange output. Detailed checks read the authored GLB directly.
 
 The command checks the local v1 schema, source/output containment (including
 symlinks), and missing dependencies before invoking a fresh headless Blender
@@ -62,8 +62,8 @@ logs remain visible. Review output diffs before committing.
 
 The generic semantic validator also runs on the temporary GLB before replacement.
 Category-specific metadata values and gameplay integration require registered
-category validators and their own consumer tests. Keep the
-legacy scout's generator/validator until its migration issues complete.
+category validators and their own consumer tests. The scout adapter registers its complete category validator; the old procedural
+generator is not loaded by export or validation.
 
 ## Regression checks
 
@@ -90,7 +90,15 @@ python models/tools/validate_asset.py resource.iron-fragment
 IDs, directories, and manifest paths use the same discovery/schema/path checks as
 export. Success emits JSON containing the asset and measured budgets; failure
 returns nonzero with the asset ID and broken contract. Examples are not real
-assets and are not discovered. The legacy scout validator remains separate.
+assets and are not discovered. Validate the scout with its registered category adapter:
+
+```sh
+python models/assets/ships/salimon-scout/validate.py
+```
+
+The old `client/assets/ship/source/validate_salimon_phase0_ship.py` command
+forwards to this adapter. Both verify matching interchange and generated spatial
+outputs, in addition to the GLB checks used during staged export.
 
 Shared checks cover source existence, resolved source/runtime containment,
 unique IDs/destinations, embedded GLB buffer ranges, finite geometry/transforms,
@@ -121,7 +129,10 @@ loads arbitrary plugins from a manifest.
 `extension_validators` maps `(category, namespace, version)` to
 `callback(context, data)`. `collision_validators` maps a documented versioned
 generator ID to `callback(context)`. Context supplies `manifest`, parsed
-`document`, runtime `Path`, and measured `metrics`. A callback raises
+`document`, decoded `binary` bytes, runtime `Path`, and measured `metrics`.
+`accessor_values(document, binary, reference)` honors buffer/accessor offsets,
+strides and all supported scalar widths; `position_bounds` measures actual
+vertex data rather than trusting accessor min/max. A callback raises
 `ValidationError` with its broken contract on failure. Common checks always run
 first. Unknown namespaces/versions/generators fail clearly, including the item
 and ship extension examples until their category adapters are implemented.

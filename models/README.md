@@ -20,7 +20,7 @@ same shared contract; do not copy ship tooling for each category.
 | --- | --- |
 | `models/assets/<category>/<asset-slug>/source.blend` | Editable geometry, materials, collision proxies, and spatial anchors |
 | The asset's `textures/` directory | Editable texture inputs; pack or resolve dependencies reproducibly |
-| The asset's `manifest.json` | Logical identity, source/export paths, budgets, required names, and category contract; schema follows in #76 |
+| The asset's `manifest.json` | Logical identity, source/export paths, budgets, required names, and category contract; see [manifest v1](manifest.md) |
 | The asset's `README.md` | Design intent, origin/pivot, licensing, authoring instructions, and contract notes |
 | `models/tools/` (reserved) | Generic offline export/validation tooling from #77/#78 |
 | `client/assets/<category>/<asset-slug>/` | Checked-in runtime GLB and any explicitly required runtime metadata/textures |
@@ -36,14 +36,16 @@ Runtime destinations are declared per asset, so the existing singular
 `client/assets/ship/export/salimon_phase0_ship.glb` remains a valid destination.
 Do not relocate it merely to match the default layout for new assets.
 
-Read [shared contracts](contracts.md) before creating an asset and
-[the authoring workflow](authoring.md) before using Blender or an AI bridge.
+Read [manifest v1](manifest.md) and [shared contracts](contracts.md) before
+creating an asset, and [the authoring workflow](authoring.md) before using
+Blender or an AI bridge.
 
 ## Current implementation and migration boundary
 
-This workspace defines the authoring design; export commands and machine-readable
-manifests are not implemented yet. Do not create speculative manifests before
-#76 defines their schema. No `.blend` asset has been migrated here by #75.
+This workspace defines the authoring design and [manifest schema v1](manifest.md).
+The ship/resource/item examples are design fixtures with future source paths,
+not migrated assets. Generic export and semantic validation commands follow in
+#77/#78. No `.blend` asset has been migrated here yet.
 
 The existing scout remains owned by its
 [legacy procedural source and validator](../client/assets/ship/README.md).

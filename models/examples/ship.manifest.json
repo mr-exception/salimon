@@ -1,0 +1,277 @@
+{
+  "$schema": "../asset-manifest.schema.json",
+  "schemaVersion": 1,
+  "assetId": "ship.salimon-scout",
+  "category": "ships",
+  "source": "models/assets/ships/salimon-scout/source.blend",
+  "runtime": "client/assets/ship/export/salimon_phase0_ship.glb",
+  "coordinates": {
+    "units": "meters",
+    "source": {
+      "up": "+Z",
+      "forward": "+X",
+      "unitScale": 1
+    },
+    "runtime": {
+      "up": "+Y",
+      "forward": "+X"
+    },
+    "conversion": "x,z,-y",
+    "pivot": "Preserve current ship-local reference frame; see client/assets/ship/README.md"
+  },
+  "profile": "legacy-scout-v1",
+  "budgets": {
+    "maxTriangles": 6000,
+    "maxPrimitives": 120,
+    "maxMaterials": 13,
+    "maxTextureBytes": 65536,
+    "maxGlbBytes": 524288
+  },
+  "collision": {
+    "policy": "authored-proxies",
+    "shapes": [
+      "box"
+    ]
+  },
+  "contracts": {
+    "root": "Salimon_Phase0_Scout",
+    "visualGroups": [
+      "Exterior",
+      "Interior"
+    ],
+    "groups": [
+      "Exterior",
+      "Interior",
+      "Collision_Proxies",
+      "Interaction_Markers"
+    ],
+    "nodes": [
+      "Exit_Door",
+      "Monitor_Center",
+      "Monitor_Port",
+      "Monitor_Starboard"
+    ],
+    "materials": [
+      "Hull Graphite",
+      "Hull Ceramic",
+      "Copper Accent",
+      "Cockpit Glass",
+      "Interior Light",
+      "Interior Dark",
+      "Cyan Display",
+      "Floor Grip",
+      "Engine Glow",
+      "Warm Lamp",
+      "Terracotta Upholstery",
+      "Petrol Teal",
+      "Honey Wood"
+    ],
+    "sockets": [],
+    "markers": [
+      "MARKER_CockpitSeat",
+      "MARKER_ExitDoor",
+      "MARKER_PlayerStart"
+    ],
+    "colliders": [
+      "COLLIDER_InteriorFloor",
+      "COLLIDER_InteriorPortWall",
+      "COLLIDER_PortWallForward",
+      "COLLIDER_InteriorStarboardWall",
+      "COLLIDER_InteriorCeiling",
+      "COLLIDER_CabinBench",
+      "COLLIDER_CabinWorktop",
+      "COLLIDER_EnergyCore",
+      "COLLIDER_AftDoor",
+      "COLLIDER_ExteriorHull",
+      "COLLIDER_Cargo_Deck",
+      "COLLIDER_Cargo_Ceiling",
+      "COLLIDER_Cargo_Aft_Wall",
+      "COLLIDER_Cargo_Forward_Wall",
+      "COLLIDER_Cargo_Port_Wall",
+      "COLLIDER_Cargo_Inboard_Partition",
+      "COLLIDER_Cargo_Passage_Header",
+      "COLLIDER_Engine_Port_Body",
+      "COLLIDER_Engine_Port_SweptFin",
+      "COLLIDER_Engine_Starboard_Body",
+      "COLLIDER_Engine_Starboard_SweptFin",
+      "COLLIDER_CockpitCenterConsole"
+    ],
+    "requiredExtras": [
+      {
+        "node": "Cabin_Port_Glazing",
+        "path": "salimon"
+      },
+      {
+        "node": "Cabin_Starboard_Glazing",
+        "path": "salimon"
+      },
+      {
+        "node": "Cockpit_Lower_Glazing",
+        "path": "salimon"
+      },
+      {
+        "node": "Cabin_Aft_Glazing",
+        "path": "salimon"
+      },
+      {
+        "node": "Cockpit_Glazing",
+        "path": "salimon"
+      },
+      {
+        "node": "Deck_Walkable",
+        "path": "salimon"
+      },
+      {
+        "node": "Exit_Door",
+        "path": "salimon"
+      },
+      {
+        "node": "Monitor_Center",
+        "path": "salimon"
+      },
+      {
+        "node": "Monitor_Port",
+        "path": "salimon"
+      },
+      {
+        "node": "Monitor_Starboard",
+        "path": "salimon"
+      },
+      {
+        "node": "Pilot_Seat_Back",
+        "path": "salimon"
+      },
+      {
+        "node": "Core_Pedestal",
+        "path": "salimon"
+      },
+      {
+        "node": "Energy_Core",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_InteriorFloor",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_InteriorPortWall",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_PortWallForward",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_InteriorStarboardWall",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_InteriorCeiling",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_CabinBench",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_CabinWorktop",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_EnergyCore",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_AftDoor",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_ExteriorHull",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Cargo_Deck",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Cargo_Ceiling",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Cargo_Aft_Wall",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Cargo_Forward_Wall",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Cargo_Port_Wall",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Cargo_Inboard_Partition",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Cargo_Passage_Header",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Engine_Port_Body",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Engine_Port_SweptFin",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Engine_Starboard_Body",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Engine_Starboard_SweptFin",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_CockpitCenterConsole",
+        "path": "salimon"
+      },
+      {
+        "node": "MARKER_CockpitSeat",
+        "path": "salimon"
+      },
+      {
+        "node": "MARKER_ExitDoor",
+        "path": "salimon"
+      },
+      {
+        "node": "MARKER_PlayerStart",
+        "path": "salimon"
+      }
+    ]
+  },
+  "extensions": {
+    "ship": {
+      "version": 1,
+      "data": {
+        "preservationContract": "client/assets/ship/README.md#runtime-contract",
+        "legacyManifest": "client/assets/ship/asset-manifest.json",
+        "movingDoor": "Exit_Door",
+        "monitors": {
+          "Monitor_Center": "flight",
+          "Monitor_Port": "energy",
+          "Monitor_Starboard": "navigation"
+        },
+        "monitorUvOrigin": "pilot-facing-top-left",
+        "glassMaterial": "Cockpit Glass",
+        "maxRuntimeDraws": 2,
+        "dimensionsMeters": [
+          20.9,
+          4,
+          21
+        ]
+      }
+    }
+  }
+}

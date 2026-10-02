@@ -21,6 +21,7 @@ GitHub issues are the task source of truth. Read each issue's **Blocked by** sec
 ## Repository documents
 
 - [3D authoring workspace and ownership](../models/README.md)
+- [Authored asset manifest schema and examples](../models/manifest.md)
 - [Shared 3D asset contracts](../models/contracts.md)
 - [Blender and AI authoring workflow](../models/authoring.md)
 

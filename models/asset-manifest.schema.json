@@ -1,0 +1,460 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mr-exception/salimon/blob/main/models/asset-manifest.schema.json",
+  "title": "Salimon authored 3D asset manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "minLength": 1
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "assetId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9.-]*$"
+    },
+    "category": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "source": {
+      "type": "string",
+      "pattern": "^(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\)(?!.*//)(?!.*(?:^|/)\\.(?:/|$))models/assets/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_.-]+)*\\.blend$"
+    },
+    "runtime": {
+      "type": "string",
+      "pattern": "^client/assets/(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*//)[A-Za-z0-9_/-]+(?:\\.[A-Za-z0-9_-]+)*\\.glb$"
+    },
+    "coordinates": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "units": {
+          "const": "meters"
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "up": {
+              "const": "+Z"
+            },
+            "forward": {
+              "const": "+X"
+            },
+            "unitScale": {
+              "const": 1
+            }
+          },
+          "required": [
+            "up",
+            "forward",
+            "unitScale"
+          ]
+        },
+        "runtime": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "up": {
+              "const": "+Y"
+            },
+            "forward": {
+              "const": "+X"
+            }
+          },
+          "required": [
+            "up",
+            "forward"
+          ]
+        },
+        "conversion": {
+          "const": "x,z,-y"
+        },
+        "pivot": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "units",
+        "source",
+        "runtime",
+        "conversion",
+        "pivot"
+      ]
+    },
+    "profile": {
+      "enum": [
+        "standard-v1",
+        "legacy-scout-v1"
+      ]
+    },
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "maxTriangles": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxPrimitives": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxMaterials": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxTextureBytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxGlbBytes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "maxTriangles",
+        "maxPrimitives",
+        "maxMaterials",
+        "maxTextureBytes",
+        "maxGlbBytes"
+      ]
+    },
+    "collision": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "policy": {
+          "enum": [
+            "none",
+            "authored-proxies",
+            "generated"
+          ]
+        },
+        "shapes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "box",
+              "sphere",
+              "capsule",
+              "convex-hull"
+            ]
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        "generator": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "policy"
+      ]
+    },
+    "contracts": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "root": {
+          "type": "string",
+          "minLength": 1
+        },
+        "visualGroups": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "materials": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "sockets": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "markers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "colliders": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "requiredExtras": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "node": {
+                "type": "string",
+                "minLength": 1
+              },
+              "path": {
+                "type": "string",
+                "pattern": "^salimon(?:\\.[A-Za-z0-9_-]+)*$"
+              }
+            },
+            "required": [
+              "node",
+              "path"
+            ]
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "root",
+        "visualGroups",
+        "groups",
+        "nodes",
+        "materials",
+        "sockets",
+        "markers",
+        "colliders",
+        "requiredExtras"
+      ]
+    },
+    "lods": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "level": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "node": {
+            "type": "string",
+            "minLength": 1
+          },
+          "maxTriangles": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "selection": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "level",
+          "node",
+          "maxTriangles",
+          "selection"
+        ]
+      },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9-]*$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "data": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "version",
+          "data"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "assetId",
+    "category",
+    "source",
+    "runtime",
+    "coordinates",
+    "profile",
+    "budgets",
+    "collision",
+    "contracts"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "collision": {
+            "properties": {
+              "policy": {
+                "const": "authored-proxies"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "collision": {
+            "required": [
+              "shapes"
+            ],
+            "not": {
+              "required": [
+                "generator"
+              ]
+            }
+          },
+          "contracts": {
+            "properties": {
+              "colliders": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "collision": {
+            "properties": {
+              "policy": {
+                "const": "generated"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "collision": {
+            "required": [
+              "generator"
+            ],
+            "not": {
+              "required": [
+                "shapes"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "collision": {
+            "properties": {
+              "policy": {
+                "const": "none"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "collision": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "shapes"
+                  ]
+                },
+                {
+                  "required": [
+                    "generator"
+                  ]
+                }
+              ]
+            }
+          },
+          "contracts": {
+            "properties": {
+              "colliders": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "profile": {
+            "const": "legacy-scout-v1"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "category": {
+            "const": "ships"
+          },
+          "assetId": {
+            "const": "ship.salimon-scout"
+          },
+          "contracts": {
+            "properties": {
+              "root": {
+                "const": "Salimon_Phase0_Scout"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

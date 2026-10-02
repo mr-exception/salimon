@@ -1,8 +1,9 @@
 # Shared 3D asset contracts
 
-These conventions apply to newly authored assets. The manifest schema (#76),
-exporter (#77), and validators (#78) will make them executable. Existing assets
-retain their documented contracts during migration; no runtime reader currently
+These conventions apply to newly authored assets. The
+[manifest schema v1](manifest.md) records these contracts; the exporter (#77) and
+validators (#78) will enforce them on assets. Existing assets retain their
+documented contracts during migration; no runtime reader currently
 implements the new generic conventions.
 
 ## Units, axes, pivot, and transforms

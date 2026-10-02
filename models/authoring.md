@@ -9,7 +9,7 @@ invent tool names or require it for repeatable exports.
 
 ## Before editing
 
-1. Read the asset's manifest (once #76 exists), README, shared
+1. Read the asset's [manifest](manifest.md), README, shared
    [contracts](contracts.md), category extension, and dependent runtime consumers.
 2. For an existing asset, open a copy/checkpoint of its source and inspect the
    hierarchy, dimensions, materials, proxies, and anchors. Preserve stable names

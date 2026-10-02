@@ -16,7 +16,8 @@ or manifest path under `models/assets/` can replace the logical ID. Relative
 paths are repository-root-relative regardless of the calling working directory.
 Logical IDs are discovered only from real `models/assets/**/manifest.json`
 files; `models/examples/` remains schema documentation, not runnable content.
-There are no committed Blender sources until #79/#84/#85.
+The [iron fragment](../assets/resources/iron-fragment/README.md) is a committed,
+runnable resource asset. The scout and item migrations remain separate tasks.
 
 The command checks the local v1 schema, source/output containment (including
 symlinks), and missing dependencies before invoking a fresh headless Blender

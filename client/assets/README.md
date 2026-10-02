@@ -11,6 +11,13 @@ an original floor texture, validation tooling, and licensing documentation.
 Task 9 revises that same source/export contract with modeled cockpit glazing and
 validated seated/standing exterior sightlines.
 
+The first generic authored resource export is
+`resources/iron-fragment/model.glb`. Its editable Blender source, manifest,
+preview, and regeneration instructions live in
+[the iron fragment authoring directory](../../models/assets/resources/iron-fragment/README.md).
+It is ready for future consumer integration; current resource gameplay rendering
+does not load it yet.
+
 Task 6's original generic spherical albedo and detail textures are generated
 deterministically by `client/renderer/src/surface_textures.rs` at initialization.
 That code is their editable source; no external imagery, downloaded assets, or

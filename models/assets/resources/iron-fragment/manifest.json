@@ -1,0 +1,63 @@
+{
+  "$schema": "../../../asset-manifest.schema.json",
+  "schemaVersion": 1,
+  "assetId": "resource.iron-fragment",
+  "category": "resources",
+  "source": "models/assets/resources/iron-fragment/source.blend",
+  "runtime": "client/assets/resources/iron-fragment/model.glb",
+  "coordinates": {
+    "units": "meters",
+    "source": {
+      "up": "+Z",
+      "forward": "+X",
+      "unitScale": 1
+    },
+    "runtime": {
+      "up": "+Y",
+      "forward": "+X"
+    },
+    "conversion": "x,z,-y",
+    "pivot": "Bottom center of the asset in its local frame"
+  },
+  "profile": "standard-v1",
+  "budgets": {
+    "maxTriangles": 100,
+    "maxPrimitives": 3,
+    "maxMaterials": 3,
+    "maxTextureBytes": 1,
+    "maxGlbBytes": 16384
+  },
+  "collision": {
+    "policy": "none"
+  },
+  "contracts": {
+    "root": "ASSET_iron-fragment",
+    "visualGroups": [
+      "Visual"
+    ],
+    "groups": [
+      "Visual"
+    ],
+    "nodes": [
+      "Iron_Fragment"
+    ],
+    "materials": [
+      "Iron_Ore",
+      "Iron_Inclusions",
+      "Oxide_Crust"
+    ],
+    "sockets": [],
+    "markers": [],
+    "colliders": [],
+    "requiredExtras": [
+      {
+        "node": "ASSET_iron-fragment",
+        "path": "salimon.assetId"
+      },
+      {
+        "node": "Iron_Fragment",
+        "path": "salimon.role"
+      }
+    ]
+  }
+}

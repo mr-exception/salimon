@@ -46,7 +46,9 @@ This workspace defines the authoring design and [manifest schema v1](manifest.md
 The ship/resource/item examples are design fixtures with future source paths,
 not migrated assets. The [generic export command](tools/README.md) is available;
 the [generic validator](tools/README.md#generic-validation) checks runtime
-contracts. No `.blend` asset has been migrated here yet.
+contracts. The [iron fragment](assets/resources/iron-fragment/README.md) is the
+first committed Blender-authored resource, with a validated runtime GLB. It
+uses shared tooling without a category extension; gameplay integration is separate.
 
 The existing scout remains owned by its
 [legacy procedural source and validator](../client/assets/ship/README.md).

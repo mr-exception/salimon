@@ -1,6 +1,10 @@
 # Assets
 
-Owns editable art sources and exported game-ready assets. Task 7 adds the custom
+Owns checked-in game-ready assets and legacy editable sources. New offline 3D
+authoring sources belong in the root [models workspace](../../models/README.md);
+its [shared contracts](../../models/contracts.md) separate visual meshes,
+colliders, sockets, interaction markers, and optional LODs. Normal client builds
+consume checked-in exports and never require Blender. Task 7 adds the custom
 [Salimon Phase 0 Scout](ship/README.md), including deterministic procedural source,
 Blender-importable glTF, a self-contained GLB, collision/interaction metadata,
 an original floor texture, validation tooling, and licensing documentation.

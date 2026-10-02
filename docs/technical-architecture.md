@@ -306,3 +306,20 @@ Task 7 establishes `client/assets/ship/` as the renderer-neutral source/export b
 The initial asset was committed as `042f7ae` with 620 triangles, 41 primitives, nine reused materials, one tiny original texture, a 77,032-byte GLB, and no external asset dependencies. The first-person character and walkable ship integration was completed in the task now ordered as Task 11 while keeping character and ship behavior in their owning modules.
 ## Phase 0 playtest-driven asset follow-ups
 Tasks 8–10 are the immediate Phase 0 priorities after the Task 7 asset baseline: correct reversed horizontal mouse look, add cockpit windows with usable exterior sightlines, and scale the ship uniformly to at least 2× its baseline linear dimensions. Scaling or revising the asset must update editable source, glTF/GLB exports, renderer inputs, collision proxies, interaction markers, player/seat/door anchors, landed placement, camera assumptions, tests, and maintenance documentation as one coherent contract change.
+
+## Generic 3D authoring boundary (#75)
+
+The root [models workspace](../models/README.md) owns new editable DCC sources
+and shared asset contracts across ships, resources, items, structures, props,
+characters, and vehicles. `client/assets/` owns checked-in runtime exports.
+Blender and optional AI/MCP authoring bridges stay outside the runtime and normal
+Cargo/native builds. Common contracts cover coordinates, visual geometry,
+collision proxies, sockets, interaction markers, and optional LODs; versioned
+category extensions add consumer-specific requirements without moving gameplay
+policy into art. See [contracts](../models/contracts.md) and
+[authoring workflow](../models/authoring.md).
+
+The Task 7 boundary above describes the current legacy scout. Its source, runtime
+path, node names, metadata, and validators remain unchanged until the staged
+migration (#79–#83). Generic manifest/export/validation tooling is separate work
+(#76–#78); defining this workspace does not implement it or change asset loading.

@@ -36,6 +36,7 @@ required follow-up before Phase 1.
 salimon/
 ├── Cargo.toml          # Workspace metadata, members, and shared lints
 ├── Cargo.lock          # Committed dependency resolution
+├── models/            # Offline 3D authoring workspace and shared contracts
 ├── core/
 │   └── README.md       # Future backend boundary; no Phase 0 implementation
 └── client/
@@ -45,7 +46,7 @@ salimon/
     ├── character/      # Portable first-person movement and gravity transitions
     ├── ship/           # Portable ship pose, cockpit authority, motion, and door state
     ├── platform/       # Future native window/input/platform adapters
-    ├── assets/         # Editable source art and exported runtime assets
+    ├── assets/         # Runtime exports and legacy editable sources
     └── diagnostics/    # Engineering metrics and overlay rasterization
 ```
 
@@ -58,6 +59,13 @@ presentation. Assets owns the custom Task 7 ship's procedural DCC source,
 Blender-importable glTF, packaged GLB, texture, metadata, and validation tools;
 the renderer loads that checked-in GLB without depending on ship state. See
 [client/README.md](client/README.md) for the dependency boundaries.
+
+The [3D authoring workspace](models/README.md) defines shared contracts for future
+Blender-authored ships, resources, items, structures, props, characters, and
+vehicles. Editable new sources belong in `models/`; validated runtime exports
+belong in `client/assets/`. The current scout remains on its legacy pipeline
+until the migration issues complete. Blender is optional for authoring and is
+never required by normal client builds.
 
 ## macOS setup
 

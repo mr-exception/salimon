@@ -16,7 +16,7 @@ ship asset/runtime mesh path. Add future Cargo packages explicitly to the root w
 | `character/` | First-person state, typed movement, fixed gravity, cockpit/doorway/surface traversal |
 | `ship/` | Ship pose, flight/landing/takeoff state, cockpit authority, persistent motion, and landed-only door rules |
 | `platform/` | Reserved for native input and OS-specific adapters |
-| `assets/` | Editable source art, validated metadata, and exported game-ready content |
+| `assets/` | Validated runtime exports/metadata and legacy editable sources; new 3D sources belong in root `models/` |
 | `diagnostics/` | Engineering metric aggregation, formatting, and RGBA overlay rasterization |
 
 The current dependency direction is:

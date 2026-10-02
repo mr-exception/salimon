@@ -20,6 +20,10 @@ GitHub issues are the task source of truth. Read each issue's **Blocked by** sec
 
 ## Repository documents
 
+- [3D authoring workspace and ownership](../models/README.md)
+- [Shared 3D asset contracts](../models/contracts.md)
+- [Blender and AI authoring workflow](../models/authoring.md)
+
 - [Phase 0 evaluation](phase-0-evaluation.md)
 - [Legacy Salimon hub notes](legacy-salimon-hub.md) — older entity/buffer concept, separate from the current space game.
 - [All issues](https://github.com/mr-exception/salimon/issues)

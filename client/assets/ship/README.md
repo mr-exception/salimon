@@ -104,6 +104,12 @@ native screenshots and authoritative state/logs.
 
 ## Source and regeneration
 
+The root [models workspace](../../../models/README.md) defines the future generic
+Blender authoring boundary. This ship remains on the procedural source below
+until #79–#83 migrate it in stages. Its runtime path, generator, validator, and
+metadata contracts are unchanged; do not apply the new naming conventions by
+renaming current ship nodes.
+
 - `source/generate_salimon_phase0_ship.py` is the deterministic editable source,
   using only Python's standard library. Dimensions and named components remain
   outside the Rust renderer.

@@ -48,10 +48,9 @@ Blender process, invalid output, or missing contract preserves the previous
 runtime file and returns a nonzero exit with the asset ID and error. Blender
 logs remain visible. Review output diffs before committing.
 
-These are export-preservation checks, **not** the semantic validation framework
-in #78: measured budgets, category extensions, transform/LOD semantics, collision
-algorithm dispatch, and metadata values still require that validator. Export
-success alone is not authorization to accept an asset into gameplay. Keep the
+The generic semantic validator also runs on the temporary GLB before replacement.
+Category-specific metadata values and gameplay integration require registered
+category validators and their own consumer tests. Keep the
 legacy scout's generator/validator until its migration issues complete.
 
 ## Regression checks
@@ -67,3 +66,56 @@ exports using the same command, verifies stable names/nested extras, axis mappin
 proxy exclusion and helper exclusion, then verifies a missing contract cannot
 overwrite a valid artifact. Fixtures never replace the game's ship or create
 committed example assets.
+
+## Generic validation
+
+Validate a checked-in authored asset without Blender:
+
+```sh
+python models/tools/validate_asset.py resource.iron-fragment
+```
+
+IDs, directories, and manifest paths use the same discovery/schema/path checks as
+export. Success emits JSON containing the asset and measured budgets; failure
+returns nonzero with the asset ID and broken contract. Examples are not real
+assets and are not discovered. The legacy scout validator remains separate.
+
+Shared checks cover source existence, resolved source/runtime containment,
+unique IDs/destinations, embedded GLB buffer ranges, finite geometry/transforms,
+unit scale, normalized rotations, affine unscaled matrices, root ownership,
+required names/extras, duplicate names, spatial role overlap, standard naming
+and parent groups, nonvisual proxies/sockets/markers, declared proxy shapes and
+positive meter dimensions, consecutive/disjoint LODs with shared pivots, and all
+five measured budgets. Triangle/primitive counts sum mesh definitions across
+all LODs; instancing/draw-call policy belongs to a category extension. Texture
+bytes count encoded embedded image payloads. V1 accepts static triangle lists
+and ordinary embedded accessors; unsupported sparse data, rigs, animation, and
+required glTF extensions fail rather than bypassing checks.
+
+The standalone validator checks manifest meter/axis declarations and runtime
+scale. It does not parse `.blend` contents: the headless exporter separately
+checks the actual saved scene's metric unit scale and applies the axis mapping.
+Intentional source dimensions, articulated behavior, monitor UVs/materials, and
+other category semantics remain category checks.
+
+### Extension API
+
+Import `validate_asset.validate_asset(asset, repo=..., extension_validators=...,
+collision_validators=...)`, or pass those same keyword registries to
+`export_asset.export_asset`. The CLI has empty registries by default; it never
+loads arbitrary plugins from a manifest.
+
+`extension_validators` maps `(category, namespace, version)` to
+`callback(context, data)`. `collision_validators` maps a documented versioned
+generator ID to `callback(context)`. Context supplies `manifest`, parsed
+`document`, runtime `Path`, and measured `metrics`. A callback raises
+`ValidationError` with its broken contract on failure. Common checks always run
+first. Unknown namespaces/versions/generators fail clearly, including the item
+and ship extension examples until their category adapters are implemented.
+No category semantics or collision algorithm is guessed by generic tooling.
+
+`validate_manifest(manifest, runtime, repo=..., **registries)` is the exporter
+entry point for a temporary GLB. Its manifest must already pass schema and
+workspace identity checks through `resolve_manifest`; `validate_asset` is the
+public entry point that performs both stages. Export runs this before atomic
+replacement, so semantic failures preserve existing output.

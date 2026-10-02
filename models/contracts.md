@@ -2,8 +2,9 @@
 
 These conventions apply to newly authored assets. The
 [manifest schema v1](manifest.md) records these contracts. The
-[exporter](tools/README.md) preserves exported contracts; semantic validators
-(#78) will enforce the remaining invariants on assets. Existing assets retain their
+[exporter](tools/README.md) preserves exported contracts; the
+[generic validator](tools/README.md#generic-validation) enforces shared runtime
+invariants. Existing assets retain their
 documented contracts during migration; no runtime reader currently
 implements the new generic conventions.
 

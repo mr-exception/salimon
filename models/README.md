@@ -22,7 +22,7 @@ same shared contract; do not copy ship tooling for each category.
 | The asset's `textures/` directory | Editable texture inputs; pack or resolve dependencies reproducibly |
 | The asset's `manifest.json` | Logical identity, source/export paths, budgets, required names, and category contract; see [manifest v1](manifest.md) |
 | The asset's `README.md` | Design intent, origin/pivot, licensing, authoring instructions, and contract notes |
-| `models/tools/` | Generic offline export tooling; semantic validation follows in #78 |
+| `models/tools/` | Generic offline export and validation tooling |
 | `client/assets/<category>/<asset-slug>/` | Checked-in runtime GLB and any explicitly required runtime metadata/textures |
 | Rust domain modules | Gameplay policy and authoritative simulation; consume spatial contracts through typed boundaries |
 | `client/renderer/` | Rendering and asset import; no dependency on editable authoring sources or Blender |
@@ -45,7 +45,8 @@ Blender or an AI bridge.
 This workspace defines the authoring design and [manifest schema v1](manifest.md).
 The ship/resource/item examples are design fixtures with future source paths,
 not migrated assets. The [generic export command](tools/README.md) is available;
-semantic validation follows in #78. No `.blend` asset has been migrated here yet.
+the [generic validator](tools/README.md#generic-validation) checks runtime
+contracts. No `.blend` asset has been migrated here yet.
 
 The existing scout remains owned by its
 [legacy procedural source and validator](../client/assets/ship/README.md).

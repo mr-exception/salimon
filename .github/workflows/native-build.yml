@@ -38,6 +38,10 @@ jobs:
           icd_files=(/usr/share/vulkan/icd.d/lvp_icd*.json)
           test -f "${icd_files[0]}"
           echo "VK_DRIVER_FILES=${icd_files[0]}" >> "$GITHUB_ENV"
+      - name: Generic model validation contract tests
+        run: |
+          python -m pip install -r models/tools/requirements.txt
+          python -m unittest discover -s models/tests -v
       - name: Build script and E2E runner contract tests
         run: python -m unittest discover -s scripts -p 'test_*.py'
       - name: Rust quality gates

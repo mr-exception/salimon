@@ -112,7 +112,8 @@ Schema checks validate structure and scalar constraints. They do **not** prove
 source existence, symlink containment, unique IDs across assets, valid exported
 names/hierarchy, finite transforms, applied scale, measured budgets, supported
 collision algorithms, LOD ordering, or category semantics. The
-[generic command](tools/README.md) implements export; #78 implements generic semantic validation and category extension dispatch. Keep
+[generic command](tools/README.md) implements export; the validator implements
+generic semantic validation and category extension dispatch. Keep
 these authoring dependencies outside Cargo and normal game builds.
 
 Run the schema regression checks in an optional Python environment:

@@ -116,13 +116,19 @@ mesh.parent = visual
 mesh['salimon'] = {'role': 'fixture'}
 marker = bpy.data.objects.new('SOCKET_Grip', None)
 scene.collection.objects.link(marker)
-marker.parent = root
+sockets = bpy.data.objects.new('Sockets', None)
+scene.collection.objects.link(sockets)
+sockets.parent = root
+marker.parent = sockets
 marker.location = (1, 2, 3)
 marker['salimon'] = {'purpose': 'grip'}
 bpy.ops.mesh.primitive_cube_add(size=2)
 proxy = bpy.context.object
 proxy.name = 'COLLIDER_Bounds'
-proxy.parent = root
+collision = bpy.data.objects.new('Collision_Proxies', None)
+scene.collection.objects.link(collision)
+collision.parent = root
+proxy.parent = collision
 proxy['salimon'] = {'shape': 'box'}
 bpy.ops.mesh.primitive_cube_add(size=9)
 bpy.context.object.name = 'Authoring_Helper'

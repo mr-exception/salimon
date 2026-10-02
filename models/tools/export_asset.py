@@ -88,7 +88,7 @@ def read_glb(path):
 
 
 def check_export(path, manifest):
-    """Verify export preservation; full semantic/budget validation belongs to #78."""
+    """Verify export preservation; semantic/budget checks are layered on by validate_asset."""
     document = read_glb(path)
     nodes = {}
     for node in document.get('nodes', []):
@@ -117,7 +117,7 @@ def check_export(path, manifest):
         raise ExportError('runtime GLB must embed buffers and images')
 
 
-def export_asset(asset, blender=None, repo=REPO):
+def export_asset(asset, blender=None, repo=REPO, **registries):
     manifest_path, manifest = resolve_manifest(asset, repo)
     identity = manifest['assetId']
     try:
@@ -141,7 +141,8 @@ def export_asset(asset, blender=None, repo=REPO):
                 raise ExportError(f'Blender failed with exit code {result.returncode}')
             if not temporary.is_file():
                 raise ExportError('Blender finished without producing the runtime GLB')
-            check_export(temporary, manifest)
+            from validate_asset import validate_manifest
+            validate_manifest(manifest, temporary, repo, **registries)
             os.replace(temporary, output)
         return output
     except (OSError, ExportError) as exc:

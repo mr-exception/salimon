@@ -296,8 +296,9 @@ Salimon uses a **right-handed world coordinate system with ****`+Y`**** up and m
 - Camera rebasing is sufficient for small validation scenes, but it is **not** the long-term universe representation. Large bodies, terrain patches, meshes, and universe-scale content should use body-local or patch-local geometry within a documented spatial hierarchy.
 - Prototype distances, anchors, FOV, near-plane values, transition timing, colors, and proxy geometry used by coordinate/camera validation tasks are test fixtures only. They do not define canonical Solar System layout, body placement, ship behavior, camera feel, or final visual tuning.
 # Implemented Phase 0 Asset Boundary
-Task 7 establishes `client/assets/ship/` as the renderer-neutral source/export boundary for the custom Salimon ship. The checked-in contract is:
-- deterministic procedural authoring source and readable glTF interchange remain editable;
+The custom scout uses `models/assets/ships/salimon-scout/` for offline authoring
+and `client/assets/ship/` as the renderer-neutral runtime export boundary. The checked-in contract is:
+- editable Blender source is authoritative; the scout adapter uses shared export/validation and publishes matching glTF interchange plus spatial contracts;
 - self-contained GLB is the runtime artifact;
 - units are meters with `+Y` up, `+X` ship-forward, and `-Z` starboard;
 - stable named Exterior, Interior, Collision_Proxies, and Interaction_Markers groups carry gameplay-facing metadata without depending on renderer, world, character, or ship code;

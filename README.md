@@ -55,17 +55,18 @@ salimon/
 and camera state; the runtime drives native lifecycle and maps typed snapshots;
 diagnostics aggregates and rasterizes the engineering view; the renderer owns
 camera-relative GPU conversion, reverse-Z depth, `wgpu` resources, and
-presentation. Assets owns the custom Task 7 ship's procedural DCC source,
-Blender-importable glTF, packaged GLB, texture, metadata, and validation tools;
-the renderer loads that checked-in GLB without depending on ship state. See
+presentation. Assets owns the custom scout's checked-in glTF interchange,
+packaged GLB, texture and runtime metadata; `models/` owns its Blender source,
+export adapter and validation tools. The renderer loads that checked-in GLB without depending on ship state. See
 [client/README.md](client/README.md) for the dependency boundaries.
 
 The [3D authoring workspace](models/README.md) defines shared contracts for future
 Blender-authored ships, resources, items, structures, props, characters, and
 vehicles. Editable new sources belong in `models/`; validated runtime exports
-belong in `client/assets/`. The current scout remains on its legacy pipeline
-until the migration issues complete. Blender is optional for authoring and is
-never required by normal client builds.
+belong in `client/assets/`. The scout uses Blender source with shared
+export/validation and a ship category adapter that also derives spatial Rust
+layouts from authored proxies/markers. Blender is optional for authoring and
+is never required by normal client builds.
 
 ## macOS setup
 

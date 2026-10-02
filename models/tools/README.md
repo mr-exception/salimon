@@ -62,8 +62,8 @@ logs remain visible. Review output diffs before committing.
 
 The generic semantic validator also runs on the temporary GLB before replacement.
 Category-specific metadata values and gameplay integration require registered
-category validators and their own consumer tests. The scout adapter registers its complete category validator; the old procedural
-generator is not loaded by export or validation.
+category validators and their own consumer tests. The scout adapter registers
+its complete category validator; no procedural ship generator remains.
 
 ## Regression checks
 

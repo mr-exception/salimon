@@ -1,13 +1,11 @@
-"""Run with Blender 4.5: --background --python bootstrap.py [-- --verify].
+"""Read-only Blender source/interchange comparison; run with Blender 4.5.
 
-One-time import of the legacy v11 scout; never exports or writes runtime assets.
---verify opens the committed source and checks its imported preservation contract.
+blender --background --python-exit-code 1 --python verify_source.py
 """
 import hashlib
 import json
 from pathlib import Path
 import struct
-import sys
 
 import bpy
 from mathutils import Vector
@@ -101,26 +99,7 @@ def main():
     document = json.loads((LEGACY / 'export/salimon_phase0_ship.gltf').read_text())
     runtime = LEGACY / 'export/salimon_phase0_ship.glb'
     before = hashlib.sha256(runtime.read_bytes()).hexdigest()
-    baseline = json.loads((ASSET / 'preservation.json').read_text())
-    if '--verify' not in sys.argv:
-        assert before == baseline['runtimeSha256'], 'Bootstrap is retired after Blender migration; edit source.blend instead'
-    if '--verify' in sys.argv:
-        bpy.ops.wm.open_mainfile(filepath=str(ASSET / 'source.blend'))
-    else:
-        if (ASSET / 'source.blend').exists():
-            raise RuntimeError('Source already exists; use --verify to inspect it. Do not overwrite authored edits.')
-        bpy.ops.wm.read_factory_settings(use_empty=True)
-        bpy.ops.import_scene.gltf(filepath=str(runtime))
-        bpy.context.scene.unit_settings.system = 'METRIC'
-        bpy.context.scene.unit_settings.scale_length = 1
-        bpy.ops.file.pack_all()
-        # Metadata-only legacy colliders stay empties until issue #81.
-        for obj in bpy.context.scene.objects:
-            if obj.name.startswith('COLLIDER_'):
-                obj.empty_display_type = 'CUBE'
-                obj.empty_display_size = 0.25
-        bpy.ops.wm.save_as_mainfile(filepath=str(ASSET / 'source.blend'))
-        bpy.ops.wm.open_mainfile(filepath=str(ASSET / 'source.blend'))
+    bpy.ops.wm.open_mainfile(filepath=str(ASSET / 'source.blend'))
     verify(document)
     assert hashlib.sha256(runtime.read_bytes()).hexdigest() == before, 'Runtime changed'
 

@@ -55,7 +55,7 @@ process logs and failure captures in its normal `artifacts/e2e/run-*` output.
 ## Reproduce
 
 ```sh
-python client/assets/ship/source/generate_salimon_phase0_ship.py
+python models/assets/ships/salimon-scout/export.py --blender /path/to/blender
 python client/assets/ship/source/validate_salimon_phase0_ship.py
 cargo build --workspace --locked
 python scripts/salimon-test suite

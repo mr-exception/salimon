@@ -67,8 +67,8 @@ starboard walking routes remain aligned. The 16 m flight sphere contains every
 exterior vertex; the familiar 15 m takeoff lift/touchdown stage stays unchanged.
 
 `interior.cargoRoom` in the manifest and `extras.salimon.cargoRoom` in the
-exports describe the real physical volume. The generator writes
-`client/character/src/cargo_layout.rs` from room geometry and passage metadata;
+exports describe the real physical volume. The Blender scout adapter writes
+`client/character/src/cargo_layout.rs` from authored proxies and passage metadata;
 validation checks this contract and every room collision proxy against both
 exports. Triangle rays verify the doorway is free of old glazing/sills/hull and
 the cargo deck is not covered by a wing. The room does not implement storage,
@@ -107,9 +107,9 @@ native screenshots and authoritative state/logs.
 The [Blender scout source](../../../models/assets/ships/salimon-scout/README.md)
 is authoritative for visual geometry and materials. The scout adapter uses the
 generic exporter and checks all preserved contracts before replacing exports.
-The legacy generator/reference tooling remains for retirement in #83.
-The scout export and validator use authored GLB data and declarative contracts;
-neither imports it. Spatial Rust layouts are derived from authored proxies/markers.
+The procedural geometry generator and its software preview tool are retired.
+The scout export and validator use authored GLB data and declarative contracts.
+Spatial Rust layouts are derived from authored proxies/markers.
 
 - `../../../models/assets/ships/salimon-scout/source.blend` is the editable visual source.
 - `export/salimon_phase0_ship.gltf` plus `.bin` is the matching DCC interchange.
@@ -128,29 +128,25 @@ neither imports it. Spatial Rust layouts are derived from authored proxies/marke
 ```sh
 python3 models/assets/ships/salimon-scout/export.py --blender /path/to/blender
 python3 models/assets/ships/salimon-scout/validate.py
-python3 client/assets/ship/source/render_salimon_phase0_ship_preview.py /tmp/salimon-ship-preview.jpg
-python3 client/assets/ship/source/render_salimon_phase0_ship_preview.py --core client/assets/ship/previews
-python3 client/assets/ship/source/render_salimon_phase0_ship_preview.py --cockpit client/assets/ship/previews
 ```
 
-The optional legacy preview requires Pillow and renders procedural reference geometry,
-not later Blender edits. Use native screenshots to inspect the Blender runtime;
+The checked-in previews are historical design references. Inspect edits in Blender
+and use native screenshots to inspect the exported runtime;
 asset previews do not replace native runtime or reference hardware checks.
 
 ## Runtime contract
 
 Units are meters; `+Y` is up, `+X` is forward, `-Z` is starboard. Meshes have baked
 positions and identity transforms. `Exterior`, `Interior`, `Collision_Proxies`
-and `Interaction_Markers` are stable hierarchy groups. Geometry is authored at
-Task 7 scale then converted by `[2.0, 4.0 / 3.72, 2.0]`; this revision reshapes the
-cabin and wings, so its dimensions are no longer a pure scale of Task 7. The
-updated pilot station is authored directly in final meters by
-`cockpit_components()` to retain human proportions independently of hull scale.
+and `Interaction_Markers` are stable hierarchy groups. Geometry in `source.blend`
+is authored in final meters. The historical Task 7
+scaling is already baked into this source; do not apply it again. Edit the pilot
+station directly in meters to retain human proportions independently of hull scale.
 
 Metadata-only collision boxes describe the floor, walls, ceiling, central Core,
 door, center console/monitor assembly, coarse exterior, and both thruster bodies
-and swept fins. They add no draw calls. The four thruster boxes are measured from
-the editable engine meshes at export time; regeneration also writes
+and swept fins. They add no draw calls. The four thruster boxes are authored
+proxies checked against the engine mesh bounds; the scout adapter also writes
 `client/character/src/thruster_collision.rs`, and validation compares that
 portable controller contract with both exports. Other gameplay bounds still
 have matching portable constants; changing those dimensions requires updating

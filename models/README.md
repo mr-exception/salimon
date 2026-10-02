@@ -57,12 +57,13 @@ geometry/materials and produces the checked-in runtime GLB through its ship
 adapter (#80). Shared export and budget checks run with the scout category
 validator, which reads the authored GLB and declarative preservation/monitor
 contracts directly. Spatial layouts come from authored proxies/markers (#81).
-The old generator/reference tooling remains for retirement in #83; validation
-and export no longer import it (#82).
+The procedural generator and reference preview tool are retired (#83). Blender
+source plus shared export/validation and the scout adapter are the supported
+authoring path; generated spatial layouts come from authored proxies/markers.
 Runtime-generated spherical textures remain owned by the renderer as described
 in [client assets](../client/assets/README.md); they need no `.blend` source.
 
-| Next issue | Deliverable |
+| Implemented issue | Deliverable |
 | --- | --- |
 | #76 | Shared manifest schema and ship/resource/item examples |
 | #77 | Generic, opt-in headless Blender export command |
@@ -72,5 +73,5 @@ in [client assets](../client/assets/README.md); they need no `.blend` source.
 | #81–#83 | Migrate spatial contracts, decouple validation, retire the legacy generator |
 | #84/#85 | Prove the shared pipeline with a resource and an item |
 
-These are separate GitHub tasks with their own blockers. This document does not
-authorize skipping their dependencies or changing runtime behavior.
+These completed migration tasks preserve the existing runtime behavior and
+metadata contract. Future authoring changes must pass the same validation gates.

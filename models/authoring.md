@@ -38,7 +38,7 @@ Do not commit workstation-specific absolute paths or `.blend1`/temporary
 autosave files. Document the Blender version and any add-ons needed to reproduce
 the source/export. Do not depend on a bridge's session history to reconstruct it.
 
-## Export and review (tooling follows in #77/#78)
+## Export and review
 
 1. Save the source, then run the generic opt-in export for its logical identity
    or asset path. Headless export must use saved source and manifest data, not
@@ -55,7 +55,8 @@ the source/export. Do not depend on a bridge's session history to reconstruct it
    tests prove interactions. Commit the source, manifest, runtime export, and
    required consumer/documentation updates together in a functional state.
 
-No generic export/validation command exists yet. Until migration completes, use
+Use the [generic export command](tools/README.md) for authored assets. Full
+semantic/category validation follows in #78. Until the scout migration completes, use
 the [existing scout generation and validation commands](../client/assets/ship/README.md#source-and-regeneration)
 for that asset. Normal `cargo build --workspace --locked` and
 `scripts/build_game.py` continue to consume checked-in runtime assets without

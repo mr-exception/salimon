@@ -24,6 +24,7 @@ GitHub issues are the task source of truth. Read each issue's **Blocked by** sec
 - [Authored asset manifest schema and examples](../models/manifest.md)
 - [Shared 3D asset contracts](../models/contracts.md)
 - [Blender and AI authoring workflow](../models/authoring.md)
+- [Generic Blender export command](../models/tools/README.md)
 
 - [Phase 0 evaluation](phase-0-evaluation.md)
 - [Legacy Salimon hub notes](legacy-salimon-hub.md) — older entity/buffer concept, separate from the current space game.

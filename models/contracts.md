@@ -1,8 +1,9 @@
 # Shared 3D asset contracts
 
 These conventions apply to newly authored assets. The
-[manifest schema v1](manifest.md) records these contracts; the exporter (#77) and
-validators (#78) will enforce them on assets. Existing assets retain their
+[manifest schema v1](manifest.md) records these contracts. The
+[exporter](tools/README.md) preserves exported contracts; semantic validators
+(#78) will enforce the remaining invariants on assets. Existing assets retain their
 documented contracts during migration; no runtime reader currently
 implements the new generic conventions.
 

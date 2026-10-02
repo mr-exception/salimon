@@ -106,13 +106,13 @@ mining yield, carrying limits, and other gameplay rules remain in Rust domains.
 Unknown extension namespaces/versions must fail clearly until a registered
 category validator supports them; they must never be silently ignored.
 
-## Schema checks and later tooling
+## Schema checks and tooling
 
 Schema checks validate structure and scalar constraints. They do **not** prove
 source existence, symlink containment, unique IDs across assets, valid exported
 names/hierarchy, finite transforms, applied scale, measured budgets, supported
-collision algorithms, LOD ordering, or category semantics. #77 implements export;
-#78 implements generic semantic validation and category extension dispatch. Keep
+collision algorithms, LOD ordering, or category semantics. The
+[generic command](tools/README.md) implements export; #78 implements generic semantic validation and category extension dispatch. Keep
 these authoring dependencies outside Cargo and normal game builds.
 
 Run the schema regression checks in an optional Python environment:

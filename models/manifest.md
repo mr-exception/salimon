@@ -4,9 +4,10 @@
 Draft 2020-12 contract for `models/assets/<category>/<slug>/manifest.json`.
 The [ship](examples/ship.manifest.json),
 [resource](examples/resource.manifest.json), and
-[item](examples/item.manifest.json) examples are design fixtures, **not migrated
-assets**. Their future `.blend` sources do not exist yet. Do not discover assets
-by scanning `models/examples/`, or copy an example without adapting its contracts.
+[item](examples/item.manifest.json) examples are schema design fixtures, not the
+manifests used for exports. Some source paths now refer to committed assets;
+use their actual manifests under `models/assets/`. Do not discover assets by
+scanning `models/examples/`, or copy an example without adapting its contracts.
 The legacy `client/assets/ship/asset-manifest.json` remains unchanged and uses its
 own format until the scheduled migration.
 

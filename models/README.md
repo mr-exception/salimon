@@ -52,7 +52,9 @@ uses shared tooling without a category extension; gameplay integration is separa
 The [cargo container](assets/items/cargo-container/README.md) is the first
 committed Blender-authored item, using the same pipeline and no category extension.
 
-The existing scout remains owned by its
+The [scout Blender source](assets/ships/salimon-scout/README.md) is now committed
+with a generic manifest and frozen preservation contract. Its runtime export
+has not switched to Blender yet. The existing scout remains owned by its
 [legacy procedural source and validator](../client/assets/ship/README.md).
 Its generator, manifest, glTF/GLB, metadata, Rust generated layout, and renderer
 behavior stay authoritative until their explicit migration issues complete.

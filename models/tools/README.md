@@ -18,8 +18,9 @@ Logical IDs are discovered only from real `models/assets/**/manifest.json`
 files; `models/examples/` remains schema documentation, not runnable content.
 The [iron fragment](../assets/resources/iron-fragment/README.md) is a committed,
 runnable resource asset; the [cargo container](../assets/items/cargo-container/README.md)
-is a runnable item asset (`item.cargo-container`). The scout migration remains
-a separate task.
+is a runnable item asset (`item.cargo-container`).
+The [scout source bootstrap](../assets/ships/salimon-scout/README.md) is also committed, but its generic export is staged until the visual/spatial migration
+and ship validator adapter are implemented.
 
 The command checks the local v1 schema, source/output containment (including
 symlinks), and missing dependencies before invoking a fresh headless Blender

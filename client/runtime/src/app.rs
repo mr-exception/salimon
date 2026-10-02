@@ -933,8 +933,11 @@ impl ApplicationHandler for ClientApplication {
                 }
                 window.request_redraw();
             }
-            WindowEvent::KeyboardInput { event, .. }
-                if view_toggle_pressed(event.state, event.repeat, event.physical_key) =>
+            WindowEvent::KeyboardInput {
+                event,
+                is_synthetic,
+                ..
+            } if view_toggle_pressed(event.state, event.repeat, event.physical_key, is_synthetic) =>
             {
                 self.view_mode = match self.view_mode {
                     ViewMode::Gameplay => ViewMode::PrecisionTour,
@@ -1151,8 +1154,17 @@ fn landing_action_pressed(state: ElementState, repeat: bool, key: PhysicalKey) -
     state == ElementState::Pressed && !repeat && key == PhysicalKey::Code(KeyCode::KeyL)
 }
 
-fn view_toggle_pressed(state: ElementState, repeat: bool, key: PhysicalKey) -> bool {
-    state == ElementState::Pressed && !repeat && key == PhysicalKey::Code(KeyCode::F2)
+fn view_toggle_pressed(
+    state: ElementState,
+    repeat: bool,
+    key: PhysicalKey,
+    is_synthetic: bool,
+) -> bool {
+    // Winit replays held keys on focus changes. A replay must not toggle views.
+    state == ElementState::Pressed
+        && !repeat
+        && !is_synthetic
+        && key == PhysicalKey::Code(KeyCode::F2)
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -1420,7 +1432,7 @@ mod tests {
         camera_command, camera_domain_metrics, format_metric_speed, gameplay_window_title,
         initial_window_size, interaction_target, is_diagnostics_toggle, landing_action_pressed,
         map_ship_to_renderer, map_world_to_renderer, release_cursor_pressed, ship_control_key,
-        thruster_step, update_ship_control_input,
+        thruster_step, update_ship_control_input, view_toggle_pressed,
     };
     use salimon_character::CharacterLocation;
     use salimon_renderer::CockpitInstruments;
@@ -1428,6 +1440,21 @@ mod tests {
     use salimon_world::{CELESTIAL_BODIES, CameraCommand, CameraPrototype, CelestialBodyId};
     use winit::event::ElementState;
     use winit::keyboard::{KeyCode, PhysicalKey};
+
+    #[test]
+    fn focus_replayed_f2_does_not_toggle_the_view_again() {
+        let f2 = PhysicalKey::Code(KeyCode::F2);
+        assert!(view_toggle_pressed(ElementState::Pressed, false, f2, false));
+        assert!(!view_toggle_pressed(ElementState::Pressed, false, f2, true));
+        assert!(!view_toggle_pressed(ElementState::Pressed, true, f2, false));
+        assert!(!view_toggle_pressed(ElementState::Released, false, f2, false));
+        assert!(!view_toggle_pressed(
+            ElementState::Pressed,
+            false,
+            PhysicalKey::Code(KeyCode::F3),
+            false,
+        ));
+    }
 
     #[test]
     fn f3_toggles_only_on_the_initial_press() {

@@ -32,8 +32,11 @@ def input_key(pid, key):
         if not windows:
             raise RuntimeError("No visible game window for launched PID")
         window = windows[-1]
-        command(["xdotool", "windowfocus", "--sync", window])
-        command(["xdotool", "key", "--clearmodifiers", key])
+        # Avoid refocusing an already focused window while its event loop drains
+        # the previous key release; focus changes can replay held X11 keys.
+        if command(["xdotool", "getwindowfocus"]) != window:
+            command(["xdotool", "windowfocus", "--sync", window])
+        command(["xdotool", "key", "--clearmodifiers", "--delay", "80", key])
     elif sys.platform == "darwin":
         code = 120
         command(["osascript", "-e", f'''tell application "System Events"

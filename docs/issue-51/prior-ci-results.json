@@ -1,0 +1,151 @@
+{
+  "commit": "77d7c3433336eba488b54f3f796f9555ec1b7b7c",
+  "workflow_run": 36904311961,
+  "results": [
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/resource-deposits.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-2pp7prs1"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/nearby-eva.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-31o64sbj"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/moving-eva.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-4fnopyrs"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/mining.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-5rhi5d7p"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/fragment-transfer.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-6a9vd_qt"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/cargo-room.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-7317qw6d"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/orbit-earth.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-75hk0hbj"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/physical-cargo.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-7ha2ywyu"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/resource-deposits.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-8waesgi_"
+    },
+    {
+      "scenario": "scenarios/evidence/lower-cockpit-windows.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-9c5y91zb"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/mining.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-a4etiuo0"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/lower-cockpit-windows.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-aj10uget"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/resource-streaming.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-arlvlqxa"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/fragment-transfer.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-b3l1w8m9"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/moving-eva.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-gqg3ji87"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/cargo-room.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-k56r61r5"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/physical-cargo.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-ln9jtbtr"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/landed-earth.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-n2dq0l5k"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/resource-streaming.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-s8ky7wx8"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/space-airlock.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-ulj2tfv1"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/carrying.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-uu8ct5gj"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/space-airlock.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-v8n00bsm"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/nearby-eva.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-w3joixym"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/carrying.json",
+      "status": "passed",
+      "artifact_directory": "e2e/run-zzlrazew"
+    }
+  ],
+  "packaged_smoke": {
+    "schema_version": 1,
+    "binary": "/home/runner/work/salimon/salimon/artifacts/build/release/salimon-client",
+    "platform": "linux",
+    "artifacts": "/home/runner/work/salimon/salimon/artifacts/packaged-smoke/run-a2jgojaf",
+    "checks": [
+      "native window created:",
+      "renderer ready:",
+      "render attempt 1 completed with Presented",
+      "OS F2 switched to PrecisionTour"
+    ],
+    "success": false,
+    "pid": 5684,
+    "startup_screenshot": {
+      "status": "captured",
+      "path": "/home/runner/work/salimon/salimon/artifacts/packaged-smoke/run-a2jgojaf/startup.png"
+    },
+    "error": "Timed out waiting for 'view mode changed to Gameplay'",
+    "failure_screenshot": {
+      "status": "captured",
+      "path": "/home/runner/work/salimon/salimon/artifacts/packaged-smoke/run-a2jgojaf/failure.png"
+    },
+    "process_exit_code": -15,
+    "duration_ms": 90304
+  }
+}

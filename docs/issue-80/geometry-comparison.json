@@ -1,0 +1,11 @@
+{
+  "result": "equivalent",
+  "visualMeshes": 120,
+  "orientedTriangles": 5938,
+  "maxPositionDeltaMeters": 0,
+  "maxNormalComponentDelta": 0.0003999967884737998,
+  "maxUvDelta": 2.9802322387695312e-08,
+  "oldGlbBytes": 513824,
+  "newGlbBytes": 485332,
+  "comparison": "All triangles, winding, per-corner position/normal/UV and material role compared independent of DCC vertex ordering."
+}

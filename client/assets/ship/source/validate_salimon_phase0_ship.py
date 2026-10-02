@@ -113,26 +113,40 @@ def validate_center_monitor_scale(document: dict, binary: bytes, manifest: dict)
         exported = node(document, baseline.name)
         primitive = document["meshes"][exported["mesh"]]["primitives"][0]
         positions = accessor_values(document, binary, primitive["attributes"]["POSITION"])
-        assert len(positions) == len(baseline.geometry.positions)
         center_count = center_vertex_counts.get(baseline.name, 0)
-        for index, (actual, original) in enumerate(zip(positions, baseline.geometry.positions)):
-            if index < center_count:
-                expected = [anchor + scale * (value-anchor) - (seatward if axis == 0 else 0)
-                            for axis, (value, anchor) in enumerate(zip(original, pivot))]
-                before_positions.append(original)
-                after_positions.append(actual)
-            else:
-                expected = current[baseline.name].geometry.positions[index]
-            assert_vectors_close(actual, expected)
-        # Uniform positive scaling preserves normals, proportions, UV mapping
-        # and topology. Side displays have their own seatward transform.
-        for attribute, expected in (("NORMAL", current[baseline.name].geometry.normals),
-                                    ("TEXCOORD_0", baseline.geometry.texcoords)):
-            actual = accessor_values(document, binary, primitive["attributes"][attribute])
-            assert len(actual) == len(expected)
-            for values, original in zip(actual, expected):
-                assert_vectors_close(values, original)
-        assert [value[0] for value in accessor_values(document, binary, primitive["indices"])] == baseline.geometry.indices
+        expected_geometry = current[baseline.name].geometry
+        # DCC export may merge/reorder vertices. Compare oriented triangles with
+        # all shader attributes rather than incidental accessor/index ordering.
+        normals = accessor_values(document, binary, primitive["attributes"]["NORMAL"])
+        uvs = accessor_values(document, binary, primitive["attributes"]["TEXCOORD_0"])
+        expected = list(zip(expected_geometry.positions, expected_geometry.normals,
+                            expected_geometry.texcoords))
+        actual = list(zip(positions, normals, uvs))
+        for vertex in actual:
+            assert any(all(abs(a-b) <= (2e-4 if attribute == 1 else 1e-6)
+                           for attribute, (av, ev) in enumerate(zip(vertex, candidate))
+                           for a, b in zip(av, ev)) for candidate in expected), baseline.name
+        from collections import Counter
+        def triangles(vertices, indices):
+            def key(i):
+                vertex = vertices[i]
+                candidate = min(expected, key=lambda e: sum(abs(x-y) for k in (0, 2)
+                                                           for x, y in zip(vertex[k], e[k])))
+                return tuple(x for k in (0, 2) for x in candidate[k])
+            result = []
+            for offset in range(0, len(indices), 3):
+                triangle = tuple(key(i) for i in indices[offset:offset+3])
+                result.append(min(triangle[i:] + triangle[:i] for i in range(3)))
+            return Counter(result)
+        indices = [v[0] for v in accessor_values(document, binary, primitive["indices"])]
+        assert triangles(actual, indices) == triangles(expected, expected_geometry.indices), baseline.name
+        for original, actual_position in zip(baseline.geometry.positions[:center_count],
+                                             expected_geometry.positions[:center_count]):
+            expected_position = [anchor + scale * (value-anchor) - (seatward if axis == 0 else 0)
+                                 for axis, (value, anchor) in enumerate(zip(original, pivot))]
+            assert_vectors_close(actual_position, expected_position)
+            before_positions.append(original)
+            after_positions.append(actual_position)
 
     def bounds(positions):
         return {"min": [min(point[axis] for point in positions) for axis in range(3)],
@@ -290,10 +304,10 @@ def validate_sightlines(document: dict, binary: bytes) -> None:
         assert min(hits)[1] == f"Engine_{label}_Glow", f"{label} nozzle emitter is occluded"
 
 
-def main() -> None:
-    gltf_path = EXPORT / f"{NAME}.gltf"
-    bin_path = EXPORT / f"{NAME}.bin"
-    glb_path = EXPORT / f"{NAME}.glb"
+def main(export: Path = EXPORT) -> None:
+    gltf_path = export / f"{NAME}.gltf"
+    bin_path = export / f"{NAME}.bin"
+    glb_path = export / f"{NAME}.glb"
     document = json.loads(gltf_path.read_text(encoding="utf-8"))
     glb_document, glb_binary = parse_glb(glb_path)
     geometry = bin_path.read_bytes()
@@ -534,7 +548,7 @@ def main() -> None:
         assert len(mesh["primitives"]) == 1
         primitive = mesh["primitives"][0]
         assert set(primitive["attributes"]) == {"POSITION", "NORMAL", "TEXCOORD_0"}
-        assert primitive["mode"] == 4
+        assert primitive.get("mode", 4) == 4
         assert 0 <= primitive["material"] < len(document["materials"])
 
     print(

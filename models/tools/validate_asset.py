@@ -139,9 +139,17 @@ def validate_document(path, manifest, extension_validators=None, collision_valid
         require(not any(n and n.startswith('COLLIDER_') for n in names), 'collision none: unexpected proxy')
     for name in contracts['colliders']:
         node = nodes[names[name]]
-        require(node.get('extras', {}).get('salimon', {}).get('shape') in manifest['collision'].get('shapes', []),
+        extras = node.get('extras', {})
+        metadata = extras.get('salimon', {})
+        # The explicit migration profile preserves metadata-only legacy boxes
+        # until #81 moves them into authored proxies. Standard assets still
+        # require source-frame proxy dimensions and shape metadata.
+        legacy = manifest['profile'] == 'legacy-scout-v1'
+        shape = metadata.get('collisionShape' if legacy else 'shape')
+        require(shape in manifest['collision'].get('shapes', []),
                 f'{name}: shape is not declared in collision.shapes')
-        dimensions = vector(node.get('extras', {}).get('salimonProxyDimensions'), 3, name + '.salimonProxyDimensions')
+        dimensions = vector(metadata.get('sizeMeters') if legacy else extras.get('salimonProxyDimensions'),
+                            3, name + ('.sizeMeters' if legacy else '.salimonProxyDimensions'))
         require(all(x > 0 for x in dimensions), f'{name}: proxy dimensions must be positive meters')
     materials = doc.get('materials', [])
     duplicates = [n for n, count in Counter(m.get('name') for m in materials if m.get('name')).items() if count > 1]

@@ -1,0 +1,12 @@
+{
+  "assetId": "ship.salimon-scout",
+  "sourceSha256": "0eddefea48816c9ebfca12b3ce8eecad2ed99610ef317dcf530e4af68fbe8af2",
+  "runtimeSha256": "e4b7aa33250830490845c021b1a59f44164f9e534a43e4ab6e645f10a4255c74",
+  "metrics": {
+    "maxTriangles": 5938,
+    "maxPrimitives": 120,
+    "maxMaterials": 13,
+    "maxTextureBytes": 116,
+    "maxGlbBytes": 485332
+  }
+}

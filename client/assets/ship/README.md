@@ -104,19 +104,15 @@ native screenshots and authoritative state/logs.
 
 ## Source and regeneration
 
-The root [models workspace](../../../models/README.md) defines the future generic
-Blender authoring boundary. An [editable Blender scout source](../../../models/assets/ships/salimon-scout/README.md)
-now preserves the current export and its runtime contracts (#79). This ship
-remains on the procedural runtime source below until #80–#83 migrate it in stages.
-Its runtime path, generator, validator, and metadata contracts are unchanged; do not apply the new naming conventions by
-renaming current ship nodes.
+The [Blender scout source](../../../models/assets/ships/salimon-scout/README.md)
+is authoritative for visual geometry and materials. The scout adapter uses the
+generic exporter and checks all preserved contracts before replacing exports.
+The legacy generator remains only for spatial-layout generation and detailed
+validation until #81–#83; it cannot overwrite runtime visual assets.
 
-- `source/generate_salimon_phase0_ship.py` is the deterministic editable source,
-  using only Python's standard library. Dimensions and named components remain
-  outside the Rust renderer.
-- `export/salimon_phase0_ship.gltf` plus `.bin` is the Blender-importable glTF 2.0
-  interchange asset.
-- `export/salimon_phase0_ship.glb` is the self-contained runtime export.
+- `../../../models/assets/ships/salimon-scout/source.blend` is the editable visual source.
+- `export/salimon_phase0_ship.gltf` plus `.bin` is the matching DCC interchange.
+- `export/salimon_phase0_ship.glb` is the self-contained Blender runtime export.
 - `textures/salimon_floor_grip.png` is an original 16×16 procedural texture.
 - `asset-manifest.json` records axes, scale, design dimensions and budgets.
 - [preview.jpg](preview.jpg) shows six source-geometry views, including standing
@@ -129,14 +125,15 @@ renaming current ship nodes.
   and [cabin context](previews/core-cabin.png) show the redesigned Energy Core.
 
 ```sh
-python3 client/assets/ship/source/generate_salimon_phase0_ship.py
+python3 models/assets/ships/salimon-scout/export.py --blender /path/to/blender
 python3 client/assets/ship/source/validate_salimon_phase0_ship.py
 python3 client/assets/ship/source/render_salimon_phase0_ship_preview.py /tmp/salimon-ship-preview.jpg
 python3 client/assets/ship/source/render_salimon_phase0_ship_preview.py --core client/assets/ship/previews
 python3 client/assets/ship/source/render_salimon_phase0_ship_preview.py --cockpit client/assets/ship/previews
 ```
 
-The optional preview requires Pillow. It renders the actual source geometry;
+The optional legacy preview requires Pillow and renders procedural reference geometry,
+not later Blender edits. Use native screenshots to inspect the Blender runtime;
 asset previews do not replace native runtime or reference hardware checks.
 
 ## Runtime contract
@@ -184,7 +181,7 @@ monitor bounds, uniform scale and fixed pivot in both exports and the manifest.
 
 ## Budgets and verification
 
-Current export: **5,720 triangles, 119 primitives, 13 materials**, 497,628-byte GLB.
+Current Blender export: **5,938 triangles, 120 primitives, 13 materials**, 485,332-byte GLB.
 Hard caps: 6,000 triangles, 120 primitives, 13 materials, 512 KiB GLB; runtime ship
 submission remains two draws. This is a deliberate increase from the initial
 620-triangle greybox to allow the requested design detail, while remaining small.
@@ -197,7 +194,7 @@ budgets, measured bounds, floor alignment, Core metadata and housing containment
 inside its collider, shaped chair components, exact monitor planes/normals/UVs,
 side-display yaw toward the authored pilot viewpoint,
 the exact 0.49 transform and 0.40 m seatward translation of every center-monitor
-assembly vertex, fitted side display geometry, unchanged dashboard geometry,
+assembly vertex (independent of DCC vertex ordering, with normal encoding tolerance), fitted side display geometry, unchanged dashboard geometry,
 and the matching combined console collider,
 fifteen unobstructed seated-eye rays over the three displays, seat height and actual
 triangle ray intersections for forward seated/standing and side/rear window

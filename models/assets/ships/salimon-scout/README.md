@@ -1,4 +1,4 @@
-# Salimon scout — staged Blender source
+# Salimon scout — Blender visual source
 
 `source.blend` is an editable Blender 4.5.3 LTS import of the checked-in v11
 scout GLB. All 150 named objects, 120 visual meshes/primitives, 5,938 triangles,
@@ -6,10 +6,20 @@ scout GLB. All 150 named objects, 120 visual meshes/primitives, 5,938 triangles,
 The original floor texture is packed. This is original Salimon geometry under
 the repository license, with no third-party model dependencies.
 
-This completes source bootstrap (#79). The procedural generator remains the
-runtime visual authority until #80. No client code, GLB, legacy manifest,
-generated Rust layout or native behavior changes here. Do not run the generic
-export command against the ship's runtime destination yet.
+`source.blend` is now authoritative for visual geometry and materials (#80).
+The runtime GLB remains at its existing destination. Export through the scout
+adapter, which uses the shared headless Blender exporter, validates a temporary
+GLB with shared budgets and the preserved ship contracts, then publishes the
+GLB and matching interchange files:
+
+```sh
+python3 models/assets/ships/salimon-scout/export.py --blender /path/to/blender
+```
+
+Install `models/tools/requirements.txt` in the authoring Python environment.
+`export-report.json` records source/runtime SHA-256 and measured budgets. All
+checks finish before replacing runtime files; a failed export keeps the prior
+GLB, interchange and report. Blender is optional for normal Cargo builds.
 
 ## Open, edit, and verify
 
@@ -29,12 +39,10 @@ python3 client/assets/ship/source/validate_salimon_phase0_ship.py
 python3 -m unittest discover -s models/tests -v
 ```
 
-The Blender check compares names, hierarchy, exact node extras, translated
+The Blender check compares the saved source against the current interchange: names, hierarchy, exact node extras, translated
 anchors, mesh geometry in meters, triangle/material assignments, monitor UVs
-and packed images with the legacy interchange. It deliberately fails after
-intentional geometry changes; review those changes under #80 rather than
-rewriting the baseline to hide differences. Without `--verify`, the helper
-bootstraps a missing source; it refuses to overwrite an existing source.
+and packed images with the legacy interchange. Verify after exporting intentional edits. Bootstrap without `--verify` is retired
+after this migration and cannot overwrite an existing source.
 Blender is never required by Cargo or normal client builds.
 
 ## Preservation contract
@@ -89,14 +97,36 @@ manifest also owns cargo volume/passage, instrument assemblies and sightline
 samples. Read [the complete legacy runtime contract](../../../../client/assets/ship/README.md#runtime-contract)
 and its validator before altering them.
 
-The manifest declares the intended authored-proxy policy and ship extension
-preservation contract. Generic schema/path discovery succeeds, but standalone
-generic semantic validation/export is intentionally **not migration-ready**:
-the unchanged runtime has `collisionShape`/`sizeMeters`, whereas the generic
-validator requires `shape`/`salimonProxyDimensions`; its CLI also has no ship
-extension adapter. Do not weaken validation or strip requirements to bypass
-this. #80 owns Blender visual export, #81 owns authored spatial contracts, #82
-owns direct ship validation, and #83 retires the old generator.
+The `legacy-scout-v1` profile explicitly validates legacy metadata boxes using
+`collisionShape`/`sizeMeters`; standard assets still require
+`shape`/`salimonProxyDimensions`. This preserves the old spatial contract without
+pretending these empties are newly authored proxy meshes. The scout adapter
+registers the ship extension and checks frozen names, hierarchy, transforms,
+extras, material roles and factors. Standalone generic CLI export/validation
+still requires an explicit category adapter; use the scout command above.
 
-Runtime SHA-256 at bootstrap:
+`runtime-metadata.json` preserves asset-level nonvisual metadata not imported
+into Blender. It supplies ship dimensions, instrument/window policy and legacy
+metrics; the adapter never generates visual geometry or replaces Blender
+materials. Detailed legacy validation remains in place until #82. The old
+Python CLI accepts only `--legacy-layout-only` and writes the two retained Rust
+spatial layouts; it cannot replace Blender visual exports.
+
+#81 moves spatial contracts into authored proxies/anchors, #82 removes
+validation's procedural definitions, and #83 retires the generator. Do not
+change frozen spatial/material contracts as part of a visual edit.
+
+## Migration comparison
+
+All 150 node names/hierarchy roles, 120 primitives, 5,938 oriented triangles,
+13 material roles, monitor UVs, door metadata and spatial extras are preserved.
+Blender changes node/material/accessor ordering and merges equivalent vertices;
+normal encoding has minor DCC precision differences. No geometry, silhouette,
+UV, budget or gameplay change is intentional. The GLB shrinks from 513,824 to
+485,332 bytes. The interchange now includes the same embedded image buffer as
+the GLB, with its binary externally referenced for editing.
+
+See [migration evidence](../../../../docs/issue-80/README.md) for the complete
+triangle comparison and recorded validation limits.
+Original bootstrap GLB SHA-256:
 `926c93570a48dae8c66b1721a9183d70c69c3f3d3b15ff92cbbae9d2fe3eb312`.

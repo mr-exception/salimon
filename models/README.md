@@ -52,12 +52,11 @@ uses shared tooling without a category extension; gameplay integration is separa
 The [cargo container](assets/items/cargo-container/README.md) is the first
 committed Blender-authored item, using the same pipeline and no category extension.
 
-The [scout Blender source](assets/ships/salimon-scout/README.md) is now committed
-with a generic manifest and frozen preservation contract. Its runtime export
-has not switched to Blender yet. The existing scout remains owned by its
-[legacy procedural source and validator](../client/assets/ship/README.md).
-Its generator, manifest, glTF/GLB, metadata, Rust generated layout, and renderer
-behavior stay authoritative until their explicit migration issues complete.
+The [scout Blender source](assets/ships/salimon-scout/README.md) now owns visual
+geometry/materials and produces the checked-in runtime GLB through its ship
+adapter (#80). Shared export and budget checks run alongside the preserved
+legacy ship validator. The Python definitions and generated Rust spatial
+layouts remain only for the staged spatial/validation migrations (#81–#83).
 Runtime-generated spherical textures remain owned by the renderer as described
 in [client assets](../client/assets/README.md); they need no `.blend` source.
 

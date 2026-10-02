@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
-"""Generate Salimon's custom Phase 0 ship as glTF 2.0 and GLB.
+"""Legacy scout geometry definitions retained for validation/layout until #81–#83.
 
-The script is the editable, deterministic DCC source for Tasks 7, 9, 10, and the
-cockpit asset follow-ups. It uses only
-the Python standard library so later agents can reshape the ship by changing
-named dimensions/components and regenerate the runtime exports without Blender.
-The emitted .gltf can also be imported directly into Blender for hand editing.
+Blender is the authoritative visual source. This CLI can regenerate the two
+retained Rust spatial layouts only; it never overwrites authored runtime art.
 """
 
 from __future__ import annotations
@@ -1301,31 +1298,23 @@ def glb_bytes(document: dict[str, object], geometry: bytes, texture: bytes) -> b
     )
 
 
-def write_outputs() -> None:
-    EXPORT_DIR.mkdir(parents=True, exist_ok=True)
-    TEXTURE_DIR.mkdir(parents=True, exist_ok=True)
-    texture = make_grip_texture()
-    document, geometry = build_document(texture)
-    (EXPORT_DIR / f"{MODEL_NAME}.gltf").write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
-    (EXPORT_DIR / f"{MODEL_NAME}.bin").write_bytes(geometry)
-    (TEXTURE_DIR / "salimon_floor_grip.png").write_bytes(texture)
-    (EXPORT_DIR / f"{MODEL_NAME}.glb").write_bytes(glb_bytes(document, geometry, texture))
-    # The portable controller consumes the same source-derived bounds as glTF.
+def write_legacy_layout() -> None:
+    """Retained spatial code generation only; visual assets are Blender-owned."""
+    components = ship_components()
     (ROOT.parents[1] / "character" / "src" / "thruster_collision.rs").write_text(
-        thruster_collision_rust_source(ship_components()), encoding="utf-8")
+        thruster_collision_rust_source(components), encoding="utf-8")
     (ROOT.parents[1] / "character" / "src" / "cargo_layout.rs").write_text(
-        cargo_layout_rust_source(ship_components()), encoding="utf-8")
-    print(
-        f"Generated {MODEL_NAME}: {len(document['meshes'])} primitives, "
-        f"{document['extras']['salimon']['triangleCount']} triangles, "  # type: ignore[index]
-        f"{len(geometry)} geometry bytes"
-    )
+        cargo_layout_rust_source(components), encoding="utf-8")
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.parse_args()
-    write_outputs()
+    parser = argparse.ArgumentParser(description="Legacy ship layout tooling; visual export moved to Blender")
+    parser.add_argument("--legacy-layout-only", action="store_true")
+    args = parser.parse_args()
+    if not args.legacy_layout_only:
+        parser.error("Visual regeneration moved to models/assets/ships/salimon-scout/export.py; "
+                     "use --legacy-layout-only to regenerate retained Rust spatial contracts")
+    write_legacy_layout()
 
 
 if __name__ == "__main__":

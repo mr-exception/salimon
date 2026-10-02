@@ -1,7 +1,7 @@
 {
   "name": "Salimon Phase 0 Scout",
   "assetVersion": 11,
-  "source": "source/generate_salimon_phase0_ship.py",
+  "source": "../../../models/assets/ships/salimon-scout/source.blend",
   "editableInterchange": "export/salimon_phase0_ship.gltf",
   "runtimeAsset": "export/salimon_phase0_ship.glb",
   "units": "meters",
@@ -211,5 +211,7 @@
       },
       "collisionNode": "COLLIDER_CockpitCenterConsole"
     }
-  }
+  },
+  "exportCommand": "python3 models/assets/ships/salimon-scout/export.py",
+  "legacySpatialSource": "source/generate_salimon_phase0_ship.py"
 }

@@ -102,7 +102,8 @@ def main():
     runtime = LEGACY / 'export/salimon_phase0_ship.glb'
     before = hashlib.sha256(runtime.read_bytes()).hexdigest()
     baseline = json.loads((ASSET / 'preservation.json').read_text())
-    assert before == baseline['runtimeSha256'], 'Legacy GLB changed; review the migration baseline first'
+    if '--verify' not in sys.argv:
+        assert before == baseline['runtimeSha256'], 'Bootstrap is retired after Blender migration; edit source.blend instead'
     if '--verify' in sys.argv:
         bpy.ops.wm.open_mainfile(filepath=str(ASSET / 'source.blend'))
     else:

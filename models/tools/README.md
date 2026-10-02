@@ -19,8 +19,16 @@ files; `models/examples/` remains schema documentation, not runnable content.
 The [iron fragment](../assets/resources/iron-fragment/README.md) is a committed,
 runnable resource asset; the [cargo container](../assets/items/cargo-container/README.md)
 is a runnable item asset (`item.cargo-container`).
-The [scout source bootstrap](../assets/ships/salimon-scout/README.md) is also committed, but its generic export is staged until the visual/spatial migration
-and ship validator adapter are implemented.
+The [scout](../assets/ships/salimon-scout/README.md) uses a ship adapter over the
+same headless exporter, shared validator and legacy detailed checks:
+
+```sh
+python3 models/assets/ships/salimon-scout/export.py --blender /path/to/blender
+```
+
+Use this adapter for `ship.salimon-scout`; the generic CLI has no automatically
+registered ship extension. The adapter preserves legacy asset-level metadata
+and matching interchange output until #81–#83 complete the migration.
 
 The command checks the local v1 schema, source/output containment (including
 symlinks), and missing dependencies before invoking a fresh headless Blender
@@ -89,7 +97,8 @@ unique IDs/destinations, embedded GLB buffer ranges, finite geometry/transforms,
 unit scale, normalized rotations, affine unscaled matrices, root ownership,
 required names/extras, duplicate names, spatial role overlap, standard naming
 and parent groups, nonvisual proxies/sockets/markers, declared proxy shapes and
-positive meter dimensions, consecutive/disjoint LODs with shared pivots, and all
+positive meter dimensions (the explicit `legacy-scout-v1` profile checks retained
+`collisionShape`/`sizeMeters` boxes), consecutive/disjoint LODs with shared pivots, and all
 five measured budgets. Triangle/primitive counts sum mesh definitions across
 all LODs; instancing/draw-call policy belongs to a category extension. Texture
 bytes count encoded embedded image payloads. V1 accepts static triangle lists

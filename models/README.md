@@ -49,6 +49,8 @@ the [generic validator](tools/README.md#generic-validation) checks runtime
 contracts. The [iron fragment](assets/resources/iron-fragment/README.md) is the
 first committed Blender-authored resource, with a validated runtime GLB. It
 uses shared tooling without a category extension; gameplay integration is separate.
+The [cargo container](assets/items/cargo-container/README.md) is the first
+committed Blender-authored item, using the same pipeline and no category extension.
 
 The existing scout remains owned by its
 [legacy procedural source and validator](../client/assets/ship/README.md).

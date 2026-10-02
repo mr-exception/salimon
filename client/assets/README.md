@@ -18,6 +18,11 @@ preview, and regeneration instructions live in
 It is ready for future consumer integration; current resource gameplay rendering
 does not load it yet.
 
+The first generic authored item export is `items/cargo-container/model.glb`.
+Its source, manifest, preview, and editing/export instructions live in
+[the cargo container authoring directory](../../models/assets/items/cargo-container/README.md).
+It is a standalone asset-pipeline proof for future consumer integration.
+
 Task 6's original generic spherical albedo and detail textures are generated
 deterministically by `client/renderer/src/surface_textures.rs` at initialization.
 That code is their editable source; no external imagery, downloaded assets, or

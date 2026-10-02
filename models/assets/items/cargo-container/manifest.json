@@ -1,0 +1,64 @@
+{
+  "$schema": "../../../asset-manifest.schema.json",
+  "schemaVersion": 1,
+  "assetId": "item.cargo-container",
+  "category": "items",
+  "source": "models/assets/items/cargo-container/source.blend",
+  "runtime": "client/assets/items/cargo-container/model.glb",
+  "coordinates": {
+    "units": "meters",
+    "source": {
+      "up": "+Z",
+      "forward": "+X",
+      "unitScale": 1
+    },
+    "runtime": {
+      "up": "+Y",
+      "forward": "+X"
+    },
+    "conversion": "x,z,-y",
+    "pivot": "Bottom center of the asset in its local frame"
+  },
+  "profile": "standard-v1",
+  "budgets": {
+    "maxTriangles": 1000,
+    "maxPrimitives": 4,
+    "maxMaterials": 4,
+    "maxTextureBytes": 1,
+    "maxGlbBytes": 131072
+  },
+  "collision": {
+    "policy": "none"
+  },
+  "contracts": {
+    "root": "ASSET_cargo-container",
+    "visualGroups": [
+      "Visual"
+    ],
+    "groups": [
+      "Visual"
+    ],
+    "nodes": [
+      "Cargo_Container"
+    ],
+    "materials": [
+      "Cargo_Panel",
+      "Cargo_Frame",
+      "Cargo_Trim",
+      "Cargo_Latch"
+    ],
+    "sockets": [],
+    "markers": [],
+    "colliders": [],
+    "requiredExtras": [
+      {
+        "node": "ASSET_cargo-container",
+        "path": "salimon.assetId"
+      },
+      {
+        "node": "Cargo_Container",
+        "path": "salimon.role"
+      }
+    ]
+  }
+}

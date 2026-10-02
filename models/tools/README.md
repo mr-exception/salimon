@@ -17,7 +17,9 @@ paths are repository-root-relative regardless of the calling working directory.
 Logical IDs are discovered only from real `models/assets/**/manifest.json`
 files; `models/examples/` remains schema documentation, not runnable content.
 The [iron fragment](../assets/resources/iron-fragment/README.md) is a committed,
-runnable resource asset. The scout and item migrations remain separate tasks.
+runnable resource asset; the [cargo container](../assets/items/cargo-container/README.md)
+is a runnable item asset (`item.cargo-container`). The scout migration remains
+a separate task.
 
 The command checks the local v1 schema, source/output containment (including
 symlinks), and missing dependencies before invoking a fresh headless Blender

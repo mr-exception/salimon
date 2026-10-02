@@ -1,0 +1,199 @@
+{
+  "implementation_commit": "2be215c41f2452c43ce9d8f0a63522517a455543",
+  "workflow_run": "https://github.com/mr-exception/salimon/actions/runs/37019407848",
+  "linux_job_id": 110878302825,
+  "artifact_id": 11232264051,
+  "artifact_sha256": "b1bc8ccedbe16cd0ecd4a08006d2e551b28ea41419cc57c5ac38df5aea34cf80",
+  "coverage": "Linux Xvfb, Mesa software Vulkan; macOS/Windows build and quality checks only",
+  "results": [
+    {
+      "artifact_path": "e2e/run-0mjm84yn/result.json",
+      "scenario": "evidence/cargo-room.json",
+      "status": "passed",
+      "steps": 140,
+      "captured_screenshots": 5
+    },
+    {
+      "artifact_path": "e2e/run-2n_50iw1/result.json",
+      "scenario": "evidence/resource-deposits.json",
+      "status": "passed",
+      "steps": 57,
+      "captured_screenshots": 1
+    },
+    {
+      "artifact_path": "e2e/run-38noxj04/result.json",
+      "scenario": "evidence/physical-cargo.json",
+      "status": "passed",
+      "steps": 371,
+      "captured_screenshots": 5
+    },
+    {
+      "artifact_path": "e2e/run-4t1en1_n/result.json",
+      "scenario": "scenarios/evidence/lower-cockpit-windows.json",
+      "status": "passed",
+      "steps": 24,
+      "captured_screenshots": 8
+    },
+    {
+      "artifact_path": "e2e/run-5n3pv6_4/result.json",
+      "scenario": "evidence/nearby-eva.json",
+      "status": "passed",
+      "steps": 45,
+      "captured_screenshots": 3
+    },
+    {
+      "artifact_path": "e2e/run-7bh2q7cy/result.json",
+      "scenario": "lower-cockpit-windows.json",
+      "status": "passed",
+      "steps": 16,
+      "captured_screenshots": 0
+    },
+    {
+      "artifact_path": "e2e/run-7lz0p3kr/result.json",
+      "scenario": "nearby-eva.json",
+      "status": "passed",
+      "steps": 42,
+      "captured_screenshots": 0
+    },
+    {
+      "artifact_path": "e2e/run-86y0_yzd/result.json",
+      "scenario": "physical-cargo.json",
+      "status": "passed",
+      "steps": 366,
+      "captured_screenshots": 0
+    },
+    {
+      "artifact_path": "e2e/run-8x5ao7qv/result.json",
+      "scenario": "resource-streaming.json",
+      "status": "passed",
+      "steps": 132,
+      "captured_screenshots": 0
+    },
+    {
+      "artifact_path": "e2e/run-8zrewbt5/result.json",
+      "scenario": "cargo-room.json",
+      "status": "passed",
+      "steps": 135,
+      "captured_screenshots": 0
+    },
+    {
+      "artifact_path": "e2e/run-9a4jk_jg/result.json",
+      "scenario": "evidence/mining.json",
+      "status": "passed",
+      "steps": 140,
+      "captured_screenshots": 5
+    },
+    {
+      "artifact_path": "e2e/run-_41e58w0/result.json",
+      "scenario": "moving-eva.json",
+      "status": "passed",
+      "steps": 91,
+      "captured_screenshots": 0
+    },
+    {
+      "artifact_path": "e2e/run-_pkd6idt/result.json",
+      "scenario": "evidence/space-airlock.json",
+      "status": "passed",
+      "steps": 52,
+      "captured_screenshots": 4
+    },
+    {
+      "artifact_path": "e2e/run-bo_duo4y/result.json",
+      "scenario": "fragment-transfer.json",
+      "status": "passed",
+      "steps": 250,
+      "captured_screenshots": 0
+    },
+    {
+      "artifact_path": "e2e/run-ffqfgfyy/result.json",
+      "scenario": "mining.json",
+      "status": "passed",
+      "steps": 135,
+      "captured_screenshots": 0
+    },
+    {
+      "artifact_path": "e2e/run-irhw5tfq/result.json",
+      "scenario": "resource-loop.json",
+      "status": "passed",
+      "steps": 273,
+      "captured_screenshots": 0
+    },
+    {
+      "artifact_path": "e2e/run-qwb5l6up/result.json",
+      "scenario": "orbit-earth.json",
+      "status": "passed",
+      "steps": 23,
+      "captured_screenshots": 0
+    },
+    {
+      "artifact_path": "e2e/run-rmjqa9sc/result.json",
+      "scenario": "space-airlock.json",
+      "status": "passed",
+      "steps": 48,
+      "captured_screenshots": 0
+    },
+    {
+      "artifact_path": "e2e/run-s0tiwgsg/result.json",
+      "scenario": "carrying.json",
+      "status": "passed",
+      "steps": 185,
+      "captured_screenshots": 0
+    },
+    {
+      "artifact_path": "e2e/run-vs05jkf3/result.json",
+      "scenario": "landed-earth.json",
+      "status": "passed",
+      "steps": 108,
+      "captured_screenshots": 0
+    },
+    {
+      "artifact_path": "e2e/run-vzro_zh_/result.json",
+      "scenario": "evidence/moving-eva.json",
+      "status": "passed",
+      "steps": 94,
+      "captured_screenshots": 3
+    },
+    {
+      "artifact_path": "e2e/run-wi_ilzjj/result.json",
+      "scenario": "evidence/fragment-transfer.json",
+      "status": "passed",
+      "steps": 255,
+      "captured_screenshots": 5
+    },
+    {
+      "artifact_path": "e2e/run-wm9dmx2a/result.json",
+      "scenario": "evidence/resource-streaming.json",
+      "status": "passed",
+      "steps": 138,
+      "captured_screenshots": 6
+    },
+    {
+      "artifact_path": "e2e/run-wo2z4ror/result.json",
+      "scenario": "evidence/carrying.json",
+      "status": "passed",
+      "steps": 192,
+      "captured_screenshots": 7
+    },
+    {
+      "artifact_path": "e2e/run-ymruhck1/result.json",
+      "scenario": "resource-deposits.json",
+      "status": "passed",
+      "steps": 56,
+      "captured_screenshots": 0
+    },
+    {
+      "artifact_path": "e2e/run-zfnam2ty/result.json",
+      "scenario": "evidence/resource-loop.json",
+      "status": "passed",
+      "steps": 284,
+      "captured_screenshots": 11
+    },
+    {
+      "artifact_path": "packaged-smoke/run-_rm_427f/result.json",
+      "scenario": "",
+      "status": "passed",
+      "steps": 0,
+      "captured_screenshots": 0
+    }
+  ]
+}

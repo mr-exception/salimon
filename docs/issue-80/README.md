@@ -38,14 +38,31 @@ and output hashes plus measured budgets.
 - `cargo test --workspace --locked --offline`: 231 tests pass.
 - `cargo build --workspace --locked --offline`: pass.
 
-Graphical native smoke was attempted with the migrated binary using the existing
-lower-cockpit evidence scenario. This execution environment could not create X11
-listening sockets; the game exited before its ready signal with "Failed to open
-connection to X server". No scenario actions or screenshots completed. This is
-an environment limitation, not a passed native smoke. The required local macOS
-smoke/reference-hardware check also remains unavailable here. Keep #80 open
-until the native door/monitor/cargo/flight/window routes are validated on a
-working display (the normal push CI includes Linux native evidence routes).
+### Native graphics follow-up
+
+The original local X11 launch failed before ready. Subsequent push CI for the
+exact implementation commit `2be215c41f2452c43ce9d8f0a63522517a455543`
+completed successfully on 2026-10-02:
+[Native builds run 37019407848](https://github.com/mr-exception/salimon/actions/runs/37019407848).
+
+The downloaded Linux artifact was verified against its published SHA-256.
+[native-ci-validation.json](native-ci-validation.json) records every scenario
+result, screenshot count, artifact ID and digest. All 27 deterministic/evidence
+scenario runs passed, as did the packaged launch/real X11 input smoke. This
+includes the lower-cockpit window/landing/takeoff route, space airlock door
+close/open and reentry, moving/nearby EVA, cockpit-to-cargo navigation, physical
+cargo during flight, and the complete resource loop. Screenshot checkpoints
+were captured successfully. Reviewed forward/standing cockpit screenshots show
+readable live monitor textures; the cargo screenshot shows the preserved room
+and the closed-door checkpoint shows the blocking door surface.
+
+Builds, Rust quality gates and Python tooling tests passed on Linux, macOS and
+Windows. Native graphical scenarios ran on Linux Xvfb with Mesa software Vulkan;
+macOS and Windows graphics, reference-hardware performance, resize and
+minimize/restore were not exercised by this CI run. Those broader platform
+smokes remain separate coverage limitations. The Linux native behavior and
+visual evidence resolve the outstanding #80 migration validation; no runtime
+code or asset changes were needed in this follow-up.
 
 ## Reproduce
 

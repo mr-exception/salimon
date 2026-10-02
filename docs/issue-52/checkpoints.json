@@ -1,0 +1,772 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "setup": {
+    "scenario": "resource-approach",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "steps_completed": 284,
+  "duration_ms": 27588,
+  "checkpoints": [
+    {
+      "name": "reference-approach",
+      "step": 3,
+      "screenshot": "reference-approach.png",
+      "player_location": "Cockpit",
+      "flight_state": "Flying",
+      "resource_types": [],
+      "nearest_deposit": null,
+      "fragment_count": 0,
+      "fragment_mass_kg": -0.0,
+      "carrying": {
+        "context": null,
+        "last_action_feedback": null,
+        "object_id": null,
+        "target_id": null
+      },
+      "cargo": {
+        "bounds_max_meters": [
+          2.2,
+          2.8064516129032255,
+          10.6
+        ],
+        "bounds_min_meters": [
+          -3.2,
+          0.24731182795698925,
+          5.1
+        ],
+        "fragment_count": 0,
+        "fragments": []
+      }
+    },
+    {
+      "name": "reference-touchdown",
+      "step": 9,
+      "screenshot": "reference-touchdown.png",
+      "player_location": "Cockpit",
+      "flight_state": "Landed { body: Earth }",
+      "resource_types": [
+        "iron-ore",
+        "silicate-rock",
+        "water-ice"
+      ],
+      "nearest_deposit": {
+        "body_local_position_meters": [
+          -4.702354134741541,
+          5999999.999996066,
+          5.00928392765614
+        ],
+        "bounds_radius_meters": 0.14922052294913324,
+        "distance_to_player_meters": 9.187790464655919,
+        "id": "Earth:6203697542242763774",
+        "position_meters": [
+          999999999995.2976,
+          -749994000000.0,
+          249994000005.00928
+        ],
+        "remaining_mass_kg": 37.57837936464672,
+        "resource": "silicate-rock",
+        "ship_local_position_meters": [
+          -4.702392578125,
+          -0.1075439453125,
+          5.00927734375
+        ],
+        "state": "Untouched",
+        "visual": {
+          "color": [
+            0.44999998807907104,
+            0.5,
+            0.36000001430511475,
+            1.0
+          ],
+          "half_extents_meters": [
+            0.0844118744134903,
+            0.06330890953540802,
+            0.10551484674215317
+          ]
+        }
+      },
+      "fragment_count": 0,
+      "fragment_mass_kg": -0.0,
+      "carrying": {
+        "context": null,
+        "last_action_feedback": null,
+        "object_id": null,
+        "target_id": null
+      },
+      "cargo": {
+        "bounds_max_meters": [
+          2.2,
+          2.8064516129032255,
+          10.6
+        ],
+        "bounds_min_meters": [
+          -3.2,
+          0.24731182795698925,
+          5.1
+        ],
+        "fragment_count": 0,
+        "fragments": []
+      }
+    },
+    {
+      "name": "multiple-local-resource-types",
+      "step": 36,
+      "screenshot": "multiple-local-resource-types.png",
+      "player_location": "Surface",
+      "flight_state": "Landed { body: Earth }",
+      "resource_types": [
+        "iron-ore",
+        "silicate-rock",
+        "water-ice"
+      ],
+      "nearest_deposit": {
+        "body_local_position_meters": [
+          -4.702354134741541,
+          5999999.999996066,
+          5.00928392765614
+        ],
+        "bounds_radius_meters": 0.14922052294913324,
+        "distance_to_player_meters": 7.277432333224852,
+        "id": "Earth:6203697542242763774",
+        "position_meters": [
+          999999999995.2976,
+          -749994000000.0,
+          249994000005.00928
+        ],
+        "remaining_mass_kg": 37.57837936464672,
+        "resource": "silicate-rock",
+        "ship_local_position_meters": [
+          -4.702392578125,
+          -0.1075439453125,
+          5.00927734375
+        ],
+        "state": "Untouched",
+        "visual": {
+          "color": [
+            0.44999998807907104,
+            0.5,
+            0.36000001430511475,
+            1.0
+          ],
+          "half_extents_meters": [
+            0.0844118744134903,
+            0.06330890953540802,
+            0.10551484674215317
+          ]
+        }
+      },
+      "fragment_count": 0,
+      "fragment_mass_kg": -0.0,
+      "carrying": {
+        "context": null,
+        "last_action_feedback": null,
+        "object_id": null,
+        "target_id": null
+      },
+      "cargo": {
+        "bounds_max_meters": [
+          2.2,
+          2.8064516129032255,
+          10.6
+        ],
+        "bounds_min_meters": [
+          -3.2,
+          0.24731182795698925,
+          5.1
+        ],
+        "fragment_count": 0,
+        "fragments": []
+      }
+    },
+    {
+      "name": "physical-mining-output",
+      "step": 82,
+      "screenshot": "physical-mining-output.png",
+      "player_location": "Surface",
+      "flight_state": "Landed { body: Earth }",
+      "resource_types": [
+        "iron-ore",
+        "silicate-rock",
+        "water-ice"
+      ],
+      "nearest_deposit": {
+        "body_local_position_meters": [
+          -19.985340816812307,
+          5999999.999964554,
+          -5.09369198284137
+        ],
+        "bounds_radius_meters": 0.14765629551909198,
+        "distance_to_player_meters": 3.5045875677131724,
+        "id": "Earth:16443359315117775089",
+        "position_meters": [
+          999999999980.0146,
+          -749994000000.0,
+          249993999994.9063
+        ],
+        "remaining_mass_kg": 34.48896041381648,
+        "resource": "silicate-rock",
+        "ship_local_position_meters": [
+          -19.9853515625,
+          -0.1075439453125,
+          -5.09368896484375
+        ],
+        "state": "PartiallyMined",
+        "visual": {
+          "color": [
+            0.44999998807907104,
+            0.5,
+            0.36000001430511475,
+            1.0
+          ],
+          "half_extents_meters": [
+            0.08352701365947723,
+            0.06264526396989822,
+            0.10440877079963684
+          ]
+        }
+      },
+      "fragment_count": 1,
+      "fragment_mass_kg": 1.9199999999997885,
+      "carrying": {
+        "context": null,
+        "last_action_feedback": null,
+        "object_id": null,
+        "target_id": null
+      },
+      "cargo": {
+        "bounds_max_meters": [
+          2.2,
+          2.8064516129032255,
+          10.6
+        ],
+        "bounds_min_meters": [
+          -3.2,
+          0.24731182795698925,
+          5.1
+        ],
+        "fragment_count": 0,
+        "fragments": []
+      }
+    },
+    {
+      "name": "partial-restored",
+      "step": 105,
+      "screenshot": "partial-restored.png",
+      "player_location": "Surface",
+      "flight_state": "Landed { body: Earth }",
+      "resource_types": [
+        "iron-ore",
+        "silicate-rock",
+        "water-ice"
+      ],
+      "nearest_deposit": {
+        "body_local_position_meters": [
+          -19.985340816812307,
+          5999999.999964554,
+          -5.09369198284137
+        ],
+        "bounds_radius_meters": 0.14765629551909198,
+        "distance_to_player_meters": 3.5045875677131724,
+        "id": "Earth:16443359315117775089",
+        "position_meters": [
+          999999999980.0146,
+          -749994000000.0,
+          249993999994.9063
+        ],
+        "remaining_mass_kg": 34.48896041381648,
+        "resource": "silicate-rock",
+        "ship_local_position_meters": [
+          -19.9853515625,
+          -0.1075439453125,
+          -5.09368896484375
+        ],
+        "state": "PartiallyMined",
+        "visual": {
+          "color": [
+            0.44999998807907104,
+            0.5,
+            0.36000001430511475,
+            1.0
+          ],
+          "half_extents_meters": [
+            0.08352701365947723,
+            0.06264526396989822,
+            0.10440877079963684
+          ]
+        }
+      },
+      "fragment_count": 1,
+      "fragment_mass_kg": 1.9199999999997885,
+      "carrying": {
+        "context": null,
+        "last_action_feedback": null,
+        "object_id": null,
+        "target_id": null
+      },
+      "cargo": {
+        "bounds_max_meters": [
+          2.2,
+          2.8064516129032255,
+          10.6
+        ],
+        "bounds_min_meters": [
+          -3.2,
+          0.24731182795698925,
+          5.1
+        ],
+        "fragment_count": 0,
+        "fragments": []
+      }
+    },
+    {
+      "name": "depleted-restored",
+      "step": 167,
+      "screenshot": "depleted-restored.png",
+      "player_location": "Surface",
+      "flight_state": "Landed { body: Earth }",
+      "resource_types": [
+        "iron-ore",
+        "silicate-rock",
+        "water-ice"
+      ],
+      "nearest_deposit": {
+        "body_local_position_meters": [
+          -19.985340816812307,
+          5999999.999964554,
+          -5.09369198284137
+        ],
+        "bounds_radius_meters": 0.14765629551909198,
+        "distance_to_player_meters": 3.5045875677131724,
+        "id": "Earth:16443359315117775089",
+        "position_meters": [
+          999999999980.0146,
+          -749994000000.0,
+          249993999994.9063
+        ],
+        "remaining_mass_kg": 0.0,
+        "resource": "silicate-rock",
+        "ship_local_position_meters": [
+          -19.9853515625,
+          -0.1075439453125,
+          -5.09368896484375
+        ],
+        "state": "Depleted",
+        "visual": null
+      },
+      "fragment_count": 19,
+      "fragment_mass_kg": 36.40896041381627,
+      "carrying": {
+        "context": null,
+        "last_action_feedback": null,
+        "object_id": null,
+        "target_id": null
+      },
+      "cargo": {
+        "bounds_max_meters": [
+          2.2,
+          2.8064516129032255,
+          10.6
+        ],
+        "bounds_min_meters": [
+          -3.2,
+          0.24731182795698925,
+          5.1
+        ],
+        "fragment_count": 0,
+        "fragments": []
+      }
+    },
+    {
+      "name": "first-fragment-carried",
+      "step": 183,
+      "screenshot": "first-fragment-carried.png",
+      "player_location": "Surface",
+      "flight_state": "Landed { body: Earth }",
+      "resource_types": [
+        "iron-ore",
+        "silicate-rock",
+        "water-ice"
+      ],
+      "nearest_deposit": {
+        "body_local_position_meters": [
+          -19.985340816812307,
+          5999999.999964554,
+          -5.09369198284137
+        ],
+        "bounds_radius_meters": 0.14765629551909198,
+        "distance_to_player_meters": 2.525469875530449,
+        "id": "Earth:16443359315117775089",
+        "position_meters": [
+          999999999980.0146,
+          -749994000000.0,
+          249993999994.9063
+        ],
+        "remaining_mass_kg": 0.0,
+        "resource": "silicate-rock",
+        "ship_local_position_meters": [
+          -19.9853515625,
+          -0.1075439453125,
+          -5.09368896484375
+        ],
+        "state": "Depleted",
+        "visual": null
+      },
+      "fragment_count": 19,
+      "fragment_mass_kg": 36.40896041381627,
+      "carrying": {
+        "context": "Carrying fragment - G to place/drop",
+        "last_action_feedback": "Fragment picked up - G to place/drop",
+        "object_id": 1,
+        "target_id": null
+      },
+      "cargo": {
+        "bounds_max_meters": [
+          2.2,
+          2.8064516129032255,
+          10.6
+        ],
+        "bounds_min_meters": [
+          -3.2,
+          0.24731182795698925,
+          5.1
+        ],
+        "fragment_count": 0,
+        "fragments": []
+      }
+    },
+    {
+      "name": "first-cargo-delivery",
+      "step": 214,
+      "screenshot": "first-cargo-delivery.png",
+      "player_location": "InsideShip",
+      "flight_state": "Landed { body: Earth }",
+      "resource_types": [
+        "iron-ore",
+        "silicate-rock",
+        "water-ice"
+      ],
+      "nearest_deposit": {
+        "body_local_position_meters": [
+          -4.702354134741541,
+          5999999.999996066,
+          5.00928392765614
+        ],
+        "bounds_radius_meters": 0.14922052294913324,
+        "distance_to_player_meters": 7.036828504765034,
+        "id": "Earth:6203697542242763774",
+        "position_meters": [
+          999999999995.2976,
+          -749994000000.0,
+          249994000005.00928
+        ],
+        "remaining_mass_kg": 37.57837936464672,
+        "resource": "silicate-rock",
+        "ship_local_position_meters": [
+          -4.702392578125,
+          -0.1075439453125,
+          5.00927734375
+        ],
+        "state": "Untouched",
+        "visual": {
+          "color": [
+            0.44999998807907104,
+            0.5,
+            0.36000001430511475,
+            1.0
+          ],
+          "half_extents_meters": [
+            0.0844118744134903,
+            0.06330890953540802,
+            0.10551484674215317
+          ]
+        }
+      },
+      "fragment_count": 19,
+      "fragment_mass_kg": 36.40896041381627,
+      "carrying": {
+        "context": "Q to pick up fragment",
+        "last_action_feedback": "Fragment placed",
+        "object_id": null,
+        "target_id": 1
+      },
+      "cargo": {
+        "bounds_max_meters": [
+          2.2,
+          2.8064516129032255,
+          10.6
+        ],
+        "bounds_min_meters": [
+          -3.2,
+          0.24731182795698925,
+          5.1
+        ],
+        "fragment_count": 1,
+        "fragments": [
+          {
+            "id": 1,
+            "mass_kg": 2.0,
+            "resource": "silicate-rock",
+            "ship_local_position_meters": [
+              0.4091796875,
+              0.3306884765625,
+              8.01904296875
+            ],
+            "source_deposit_id": "Earth:16443359315117775089",
+            "volume_m3": 0.0007407407407407407
+          }
+        ]
+      }
+    },
+    {
+      "name": "second-fragment-carried",
+      "step": 241,
+      "screenshot": "second-fragment-carried.png",
+      "player_location": "Surface",
+      "flight_state": "Landed { body: Earth }",
+      "resource_types": [
+        "iron-ore",
+        "silicate-rock",
+        "water-ice"
+      ],
+      "nearest_deposit": {
+        "body_local_position_meters": [
+          -19.985340816812307,
+          5999999.999964554,
+          -5.09369198284137
+        ],
+        "bounds_radius_meters": 0.14765629551909198,
+        "distance_to_player_meters": 2.53769653128418,
+        "id": "Earth:16443359315117775089",
+        "position_meters": [
+          999999999980.0146,
+          -749994000000.0,
+          249993999994.9063
+        ],
+        "remaining_mass_kg": 0.0,
+        "resource": "silicate-rock",
+        "ship_local_position_meters": [
+          -19.9853515625,
+          -0.1075439453125,
+          -5.09368896484375
+        ],
+        "state": "Depleted",
+        "visual": null
+      },
+      "fragment_count": 19,
+      "fragment_mass_kg": 36.40896041381627,
+      "carrying": {
+        "context": "Carrying fragment - G to place/drop",
+        "last_action_feedback": "Fragment picked up - G to place/drop",
+        "object_id": 2,
+        "target_id": null
+      },
+      "cargo": {
+        "bounds_max_meters": [
+          2.2,
+          2.8064516129032255,
+          10.6
+        ],
+        "bounds_min_meters": [
+          -3.2,
+          0.24731182795698925,
+          5.1
+        ],
+        "fragment_count": 1,
+        "fragments": [
+          {
+            "id": 1,
+            "mass_kg": 2.0,
+            "resource": "silicate-rock",
+            "ship_local_position_meters": [
+              0.4091796875,
+              0.3306884765625,
+              8.01904296875
+            ],
+            "source_deposit_id": "Earth:16443359315117775089",
+            "volume_m3": 0.0007407407407407407
+          }
+        ]
+      }
+    },
+    {
+      "name": "second-pickup-rejected",
+      "step": 268,
+      "screenshot": "second-pickup-rejected.png",
+      "player_location": "InsideShip",
+      "flight_state": "Landed { body: Earth }",
+      "resource_types": [
+        "iron-ore",
+        "silicate-rock",
+        "water-ice"
+      ],
+      "nearest_deposit": {
+        "body_local_position_meters": [
+          -4.702354134741541,
+          5999999.999996066,
+          5.00928392765614
+        ],
+        "bounds_radius_meters": 0.14922052294913324,
+        "distance_to_player_meters": 7.036815451956221,
+        "id": "Earth:6203697542242763774",
+        "position_meters": [
+          999999999995.2976,
+          -749994000000.0,
+          249994000005.00928
+        ],
+        "remaining_mass_kg": 37.57837936464672,
+        "resource": "silicate-rock",
+        "ship_local_position_meters": [
+          -4.702392578125,
+          -0.1075439453125,
+          5.00927734375
+        ],
+        "state": "Untouched",
+        "visual": {
+          "color": [
+            0.44999998807907104,
+            0.5,
+            0.36000001430511475,
+            1.0
+          ],
+          "half_extents_meters": [
+            0.0844118744134903,
+            0.06330890953540802,
+            0.10551484674215317
+          ]
+        }
+      },
+      "fragment_count": 19,
+      "fragment_mass_kg": 36.40896041381627,
+      "carrying": {
+        "context": "Only one world object - G to place/drop first",
+        "last_action_feedback": "Only one world object - G to place/drop first",
+        "object_id": 2,
+        "target_id": 1
+      },
+      "cargo": {
+        "bounds_max_meters": [
+          2.2,
+          2.8064516129032255,
+          10.6
+        ],
+        "bounds_min_meters": [
+          -3.2,
+          0.24731182795698925,
+          5.1
+        ],
+        "fragment_count": 1,
+        "fragments": [
+          {
+            "id": 1,
+            "mass_kg": 2.0,
+            "resource": "silicate-rock",
+            "ship_local_position_meters": [
+              0.4091796875,
+              0.3306884765625,
+              8.01904296875
+            ],
+            "source_deposit_id": "Earth:16443359315117775089",
+            "volume_m3": 0.0007407407407407407
+          }
+        ]
+      }
+    },
+    {
+      "name": "two-delivered-fragments",
+      "step": 283,
+      "screenshot": "two-delivered-fragments.png",
+      "player_location": "InsideShip",
+      "flight_state": "Landed { body: Earth }",
+      "resource_types": [
+        "iron-ore",
+        "silicate-rock",
+        "water-ice"
+      ],
+      "nearest_deposit": {
+        "body_local_position_meters": [
+          -4.702354134741541,
+          5999999.999996066,
+          5.00928392765614
+        ],
+        "bounds_radius_meters": 0.14922052294913324,
+        "distance_to_player_meters": 7.504691065545777,
+        "id": "Earth:6203697542242763774",
+        "position_meters": [
+          999999999995.2976,
+          -749994000000.0,
+          249994000005.00928
+        ],
+        "remaining_mass_kg": 37.57837936464672,
+        "resource": "silicate-rock",
+        "ship_local_position_meters": [
+          -4.702392578125,
+          -0.1075439453125,
+          5.00927734375
+        ],
+        "state": "Untouched",
+        "visual": {
+          "color": [
+            0.44999998807907104,
+            0.5,
+            0.36000001430511475,
+            1.0
+          ],
+          "half_extents_meters": [
+            0.0844118744134903,
+            0.06330890953540802,
+            0.10551484674215317
+          ]
+        }
+      },
+      "fragment_count": 19,
+      "fragment_mass_kg": 36.40896041381627,
+      "carrying": {
+        "context": "Q to pick up fragment",
+        "last_action_feedback": "Fragment placed",
+        "object_id": null,
+        "target_id": 2
+      },
+      "cargo": {
+        "bounds_max_meters": [
+          2.2,
+          2.8064516129032255,
+          10.6
+        ],
+        "bounds_min_meters": [
+          -3.2,
+          0.24731182795698925,
+          5.1
+        ],
+        "fragment_count": 2,
+        "fragments": [
+          {
+            "id": 1,
+            "mass_kg": 2.0,
+            "resource": "silicate-rock",
+            "ship_local_position_meters": [
+              0.4091796875,
+              0.3306884765625,
+              8.01904296875
+            ],
+            "source_deposit_id": "Earth:16443359315117775089",
+            "volume_m3": 0.0007407407407407407
+          },
+          {
+            "id": 2,
+            "mass_kg": 2.0,
+            "resource": "silicate-rock",
+            "ship_local_position_meters": [
+              0.4093017578125,
+              0.3306884765625,
+              8.9918212890625
+            ],
+            "source_deposit_id": "Earth:16443359315117775089",
+            "volume_m3": 0.0007407407407407407
+          }
+        ]
+      }
+    }
+  ]
+}

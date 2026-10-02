@@ -223,6 +223,11 @@ fn inspect(app: &ClientApplication) -> Value {
         .iter()
         .map(|entry| (entry["id"].as_str().unwrap().to_owned(), entry.clone()))
         .collect();
+    let resource_types: std::collections::BTreeSet<_> = deposits
+        .iter()
+        .filter(|entry| entry["remaining_mass_kg"].as_f64().unwrap_or(0.0) > 0.0)
+        .filter_map(|entry| entry["resource"].as_str())
+        .collect();
     let nearest_deposit = deposits.iter().min_by(|a, b| {
         a["distance_to_player_meters"]
             .as_f64()
@@ -331,7 +336,7 @@ fn inspect(app: &ClientApplication) -> Value {
         "world": {"fragments": fragments,
             "fragment_count": app.mining.session.fragments().len(),
             "fragment_mass_kg": app.mining.session.fragments().iter().map(|piece| piece.material().mass_kg()).sum::<f64>(),
-            "nearest_deposit": nearest_deposit, "deposits": deposits, "deposits_by_id": deposits_by_id, "deposit_query_error": deposit_error, "bodies": bodies, "camera_phase": format!("{:?}", app.camera_phase())}
+            "nearest_deposit": nearest_deposit, "resource_types": resource_types, "deposits": deposits, "deposits_by_id": deposits_by_id, "deposit_query_error": deposit_error, "bodies": bodies, "camera_phase": format!("{:?}", app.camera_phase())}
     })
 }
 
@@ -453,7 +458,11 @@ mod tests {
                 }
                 if let Some(expected) = check.get("contains") {
                     assert!(
-                        value.as_str().unwrap().contains(expected.as_str().unwrap()),
+                        match value {
+                            Value::Array(values) => values.contains(expected),
+                            Value::String(text) => text.contains(expected.as_str().unwrap()),
+                            _ => panic!("unsupported contains at step {index}: {path}"),
+                        },
                         "step {index}: {path}: {value}"
                     );
                 }
@@ -586,6 +595,14 @@ mod tests {
         );
     }
 
+    #[test]
+    fn resource_loop_uses_real_landing_mining_and_cargo_actions() {
+        assert_gameplay_scenario(
+            Scenario::ResourceApproach,
+            include_str!("../../../scenarios/resource-loop.json"),
+        );
+    }
+
     fn assert_gameplay_scenario(initial: Scenario, source: &str) {
         let mut test = app(initial);
         let scenario: Value = serde_json::from_str(source).unwrap();
@@ -644,7 +661,11 @@ mod tests {
                     }
                 } else if let Some(expected) = check.get("contains") {
                     assert!(
-                        value.as_str().unwrap().contains(expected.as_str().unwrap()),
+                        match value {
+                            Value::Array(values) => values.contains(expected),
+                            Value::String(text) => text.contains(expected.as_str().unwrap()),
+                            _ => panic!("unsupported contains at step {index}: {path}"),
+                        },
                         "step {index}: {path}: {value}"
                     );
                 } else if let Some(expected) = check.get("approx") {

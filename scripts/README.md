@@ -90,9 +90,9 @@ python3 scripts/salimon-test suite --group resource-collection --evidence \
   --screenshot-command '["python3", "scripts/capture_settled.py", "{path}"]'
 ```
 
-Both commands accept `--binary` and `--artifacts`. The six required routes run in
+Both commands accept `--binary` and `--artifacts`. The seven required routes run in
 this order: resource-deposits, mining, carrying, fragment-transfer, physical-cargo,
-resource-streaming. Each starts a fresh seeded native client. Missing scenario
+resource-streaming, resource-loop. Each starts a fresh seeded native client. Missing scenario
 files, failed launches, failed assertions and failed evidence captures fail the
 aggregate report; no route is silently skipped. Linux CI requires the evidence
 suite against the staged release executable and uploads all shared runner artifacts.
@@ -108,8 +108,39 @@ Evidence variants add only named screenshot checkpoints to the baseline actions
 and assertions. Every run preserves structured results, per-step state and logs;
 failures also preserve available state and screenshots. Runner contracts cover
 failed capture, process cleanup and assertion/startup failure; suite contracts
-verify that failed launches retain six isolated result directories. Native
+verify that failed launches retain seven isolated result directories. Native
 macOS/Windows graphics need local GPU validation; Linux CI uses software Vulkan.
+
+## Deterministic first resource loop (#52)
+
+`resource-loop.json` is one uninterrupted reference scenario, using seed 0 and
+16 ms steps. `resource-approach` starts seated 1 km directly above the Earth
+reference landing site. Normal assisted landing reaches the surface; all later
+walking, mining, pickup and placement use production controls. No scenario
+command teleports the player, inserts deposits or fragments, or sets cargo state.
+
+```sh
+python3 scripts/salimon-test run scenarios/resource-loop.json
+python3 scripts/salimon-test run scenarios/evidence/resource-loop.json \
+  --screenshot-command '["python3", "scripts/capture_settled.py", "{path}"]'
+```
+
+Both variants run in required Linux CI through baseline discovery and the
+resource-collection evidence group. The route checks two actual locally
+materialized collectible types (iron ore and silicate rock), walks to the stable
+silicate source, verifies physical mass/identity/volume after mining, leaves and
+returns across the 120 m streaming boundary after partial mining and again after
+depletion, then delivers fragments 1 and 2 on separate trips to the cargo room.
+It attempts another pickup while carrying fragment 2 and verifies rejection,
+unchanged cargo and carried ownership before placing it. Final cargo contains
+both loose physical objects with the original source/material/mass. The evidence
+variant adds eleven named screenshots without changing actions or assertions.
+
+Every run writes structured results, per-step state snapshots and process/protocol
+logs; evidence captures also save their authoritative states. See the shared
+artifact format below and [checked-in validation](../docs/issue-52/README.md).
+This scenario covers the first local resource loop; refining, crafting, trading,
+survival consumption, asteroid mining and backend persistence are outside it.
 
 ## Phase 0 baseline suite
 

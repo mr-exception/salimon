@@ -25,6 +25,9 @@ Scenarios: `landed-earth` (default, standing in the ship), `cockpit-earth`
 (seated in the landed ship), `orbit-earth`, and `orbit-moon` (seated in a flying
 ship, 1 km above the nominal surface). The world catalog is immutable; the seed
 selects a reproducible tangent offset of at most 100 m for orbit scenarios.
+`resource-approach` starts seated 1 km directly above the Earth reference landing
+site without the orbit fixture's tangent offset, allowing a full landing-to-cargo
+resource route. Its seed still selects the normal generated resource world.
 `--seed` defaults to 0. `--step-ms` defaults to 16 and accepts 1–100 milliseconds.
 The command channel advances simulation only when asked to step; redraws do not
 advance it. Ship flight, doors, character motion, and collision remain on their

@@ -12,7 +12,7 @@ from e2e_artifacts import Artifacts
 
 
 PROTOCOL = 1
-SETUPS = {"landed-earth", "cockpit-earth", "orbit-earth", "orbit-moon", "open-space", "eva-approach"}
+SETUPS = {"resource-approach", "landed-earth", "cockpit-earth", "orbit-earth", "orbit-moon", "open-space", "eva-approach"}
 OPS = {"inspect", "step", "look", "key", "interact", "landing", "thruster"}
 COMPARISONS = {"equals", "not_equals", "gt", "gte", "lt", "lte", "approx", "exists", "contains"}
 

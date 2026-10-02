@@ -13,6 +13,7 @@ pub(crate) enum Scenario {
     LandedEarth,
     CockpitEarth,
     OrbitEarth,
+    ResourceApproach,
     OrbitMoon,
     OpenSpace,
     EvaApproach,
@@ -24,11 +25,12 @@ impl Scenario {
             "landed-earth" => Ok(Self::LandedEarth),
             "cockpit-earth" => Ok(Self::CockpitEarth),
             "orbit-earth" => Ok(Self::OrbitEarth),
+            "resource-approach" => Ok(Self::ResourceApproach),
             "orbit-moon" => Ok(Self::OrbitMoon),
             "open-space" => Ok(Self::OpenSpace),
             "eva-approach" => Ok(Self::EvaApproach),
             _ => Err(format!(
-                "unknown scenario '{value}'; expected landed-earth, cockpit-earth, orbit-earth, orbit-moon, open-space, or eva-approach"
+                "unknown scenario '{value}'; expected landed-earth, cockpit-earth, resource-approach, orbit-earth, orbit-moon, open-space, or eva-approach"
             )),
         }
     }
@@ -38,6 +40,7 @@ impl Scenario {
             Self::LandedEarth => "landed-earth",
             Self::CockpitEarth => "cockpit-earth",
             Self::OrbitEarth => "orbit-earth",
+            Self::ResourceApproach => "resource-approach",
             Self::OrbitMoon => "orbit-moon",
             Self::OpenSpace => "open-space",
             Self::EvaApproach => "eva-approach",
@@ -113,7 +116,8 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
     match config.scenario {
         Scenario::LandedEarth => {}
         Scenario::CockpitEarth => app.character.enter_cockpit(),
-        Scenario::OrbitEarth
+        Scenario::ResourceApproach
+        | Scenario::OrbitEarth
         | Scenario::OrbitMoon
         | Scenario::OpenSpace
         | Scenario::EvaApproach => {
@@ -139,7 +143,9 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
                 };
             // Small reproducible tangent offset exercises distinct seeds without
             // changing the scenario's body or proximity contract.
-            position[2] += (mix(config.seed) % 201) as f64 - 100.0;
+            if config.scenario != Scenario::ResourceApproach {
+                position[2] += (mix(config.seed) % 201) as f64 - 100.0;
+            }
             app.ship = ShipController::flying(
                 ShipPose {
                     position_meters: position,
@@ -165,7 +171,11 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
     let snapshot = app.ship.snapshot();
     if matches!(
         config.scenario,
-        Scenario::OrbitEarth | Scenario::OrbitMoon | Scenario::OpenSpace | Scenario::EvaApproach
+        Scenario::ResourceApproach
+            | Scenario::OrbitEarth
+            | Scenario::OrbitMoon
+            | Scenario::OpenSpace
+            | Scenario::EvaApproach
     ) != (snapshot.flight_state == FlightState::Flying)
     {
         return Err("scenario setup failed: unexpected ship flight state".into());

@@ -26,3 +26,17 @@ Local validation: all 34 Python contract tests and `git diff --check` passed.
 Rust/native validation of the follow-up is delegated to the required CI job;
 this workspace has no Rust toolchain or X11 display. Issue #51 must remain open
 until the follow-up Rust, resource E2E and packaged smoke gates pass.
+
+## Follow-up native result
+
+Run [36960052701](https://github.com/mr-exception/salimon/actions/runs/36960052701)
+on `be6cba56944685dd5934a0de91a01078f037a79a` passed all Rust/contract/build gates
+on all three platforms and the full Linux native E2E step. Packaged smoke failed
+before sending its first key: `xdotool getwindowfocus` tried to resolve WM_CLASS
+on X11 PointerRoot (window 1), causing BadWindow in the WM-free Xvfb session.
+
+The next correction uses documented `getwindowfocus -f` to read the actual X11
+focus without top-level-window lookup. PointerRoot now triggers normal focusing
+of the PID-matched game window. The helper contract includes PointerRoot, an
+unrelated focused window and the already-focused game. Unexpected helper errors
+still fail the smoke; this does not suppress input failures.

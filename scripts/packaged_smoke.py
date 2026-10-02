@@ -32,9 +32,10 @@ def input_key(pid, key):
         if not windows:
             raise RuntimeError("No visible game window for launched PID")
         window = windows[-1]
+        # Raw focus also supports X11 PointerRoot (1) before a WM focuses the game.
         # Avoid refocusing an already focused window while its event loop drains
         # the previous key release; focus changes can replay held X11 keys.
-        if command(["xdotool", "getwindowfocus"]) != window:
+        if command(["xdotool", "getwindowfocus", "-f"]) != window:
             command(["xdotool", "windowfocus", "--sync", window])
         command(["xdotool", "key", "--clearmodifiers", "--delay", "80", key])
     elif sys.platform == "darwin":

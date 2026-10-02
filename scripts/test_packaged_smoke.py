@@ -93,7 +93,7 @@ class PortableContracts(unittest.TestCase):
                 smoke.input_key(123, 'F2')
 
     def test_linux_input_keeps_focus_and_sends_a_complete_key(self):
-        for focused in ('456', '789'):
+        for focused in ('456', '789', '1'):
             with self.subTest(focused=focused), \
                     patch.object(smoke.sys, 'platform', 'linux'), \
                     patch.dict(smoke.os.environ, {'DISPLAY': ':123'}), \
@@ -102,6 +102,6 @@ class PortableContracts(unittest.TestCase):
                 smoke.input_key(123, 'F2')
             calls = [call.args[0] for call in helper.call_args_list]
             self.assertEqual(calls[0], ['xdotool', 'search', '--onlyvisible', '--pid', '123'])
-            self.assertEqual(calls[1], ['xdotool', 'getwindowfocus'])
+            self.assertEqual(calls[1], ['xdotool', 'getwindowfocus', '-f'])
             self.assertEqual(calls[-1], ['xdotool', 'key', '--clearmodifiers', '--delay', '80', 'F2'])
             self.assertEqual(['xdotool', 'windowfocus', '--sync', '456'] in calls, focused != '456')

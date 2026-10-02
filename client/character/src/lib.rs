@@ -11,6 +11,11 @@ use cargo_layout::CARGO_WALLS;
 pub use cargo_layout::{CARGO_ROOM_MAX_METERS, CARGO_ROOM_MIN_METERS};
 mod thruster_collision;
 use thruster_collision::THRUSTER_COLLIDERS;
+mod ship_anchors;
+pub use ship_anchors::{
+    CARGO_ANCHOR_METERS, COCKPIT_SEAT_MARKER_METERS, ENGINE_PORT_ANCHOR_METERS,
+    ENGINE_STARBOARD_ANCHOR_METERS, EXIT_DOOR_MARKER_METERS, PLAYER_START_MARKER_METERS,
+};
 
 pub const FIXED_GRAVITY_METERS_PER_SECOND_SQUARED: f64 = 9.81;
 pub const DOORWAY_GRAVITY_BLEND_DURATION: Duration = Duration::from_millis(250);
@@ -150,9 +155,13 @@ const INTERIOR_OBSTACLES: [[f64; 4]; 9] = [
     COCKPIT_PORT_HULL_OBSTACLE,
     COCKPIT_STARBOARD_HULL_OBSTACLE,
 ];
-const COCKPIT_POSITION: [f64; 3] = [2.76, 1.799_032_258_064_516, 0.0];
+const COCKPIT_POSITION: [f64; 3] = [
+    COCKPIT_SEAT_MARKER_METERS[0],
+    COCKPIT_SEAT_MARKER_METERS[1] + 0.67,
+    COCKPIT_SEAT_MARKER_METERS[2],
+];
 const COCKPIT_VIEW_PITCH_RADIANS: f64 = -0.10;
-const PLAYER_START: [f64; 3] = [0.50, PLAYER_EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT, -2.20];
+const PLAYER_START: [f64; 3] = PLAYER_START_MARKER_METERS;
 const LOOK_SENSITIVITY_RADIANS_PER_PIXEL: f64 = 0.0022;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
@@ -1236,7 +1245,9 @@ mod tests {
         assert_eq!(PLAYER_BODY_HEIGHT_METERS, 1.80);
         assert_eq!(PLAYER_EYE_HEIGHT_METERS, 1.75);
         assert_eq!(PLAYER_START, [0.50, 1.997_311_827_956_989_2, -2.20]);
-        assert_eq!(COCKPIT_POSITION, [2.76, 1.799_032_258_064_516, 0.0]);
+        assert!((COCKPIT_POSITION[0] - 2.76).abs() < 1.0e-12);
+        assert!((COCKPIT_POSITION[1] - 1.799_032_258_064_516).abs() < 1.0e-12);
+        assert!(COCKPIT_POSITION[2].abs() < 1.0e-12);
         assert_eq!(SHIP_FLOOR_HEIGHT, 0.247_311_827_956_989_25);
         assert_eq!(INTERIOR_FORWARD_MIN, -7.24);
         assert!((INTERIOR_FORWARD_MAX - 6.32).abs() < 1.0e-12);
@@ -1580,7 +1591,8 @@ mod tests {
         ] {
             let mut controller = inside_at(start[0], start[1]);
             walk_steps(&mut controller, input, 20);
-            assert_eq!(controller.local_ship_position().unwrap()[axis], expected);
+            let actual = controller.local_ship_position().unwrap()[axis];
+            assert!((actual - expected).abs() < 1.0e-12);
         }
     }
 

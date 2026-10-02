@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Legacy scout geometry definitions retained for validation/layout until #81–#83.
+"""Legacy scout geometry definitions retained for detailed validation until #82–#83.
 
-Blender is the authoritative visual source. This CLI can regenerate the two
-retained Rust spatial layouts only; it never overwrites authored runtime art.
+Blender-authored nodes own visual and spatial contracts. This module remains
+importable by the legacy detailed validator, but its CLI no longer writes assets
+or Rust layout files.
 """
 
 from __future__ import annotations
@@ -1298,23 +1299,10 @@ def glb_bytes(document: dict[str, object], geometry: bytes, texture: bytes) -> b
     )
 
 
-def write_legacy_layout() -> None:
-    """Retained spatial code generation only; visual assets are Blender-owned."""
-    components = ship_components()
-    (ROOT.parents[1] / "character" / "src" / "thruster_collision.rs").write_text(
-        thruster_collision_rust_source(components), encoding="utf-8")
-    (ROOT.parents[1] / "character" / "src" / "cargo_layout.rs").write_text(
-        cargo_layout_rust_source(components), encoding="utf-8")
-
-
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Legacy ship layout tooling; visual export moved to Blender")
-    parser.add_argument("--legacy-layout-only", action="store_true")
-    args = parser.parse_args()
-    if not args.legacy_layout_only:
-        parser.error("Visual regeneration moved to models/assets/ships/salimon-scout/export.py; "
-                     "use --legacy-layout-only to regenerate retained Rust spatial contracts")
-    write_legacy_layout()
+    parser = argparse.ArgumentParser(description="Legacy validation definitions; authoring moved to Blender")
+    parser.parse_args()
+    parser.error("Ship visual and spatial authoring moved to models/assets/ships/salimon-scout/export.py")
 
 
 if __name__ == "__main__":

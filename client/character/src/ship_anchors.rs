@@ -1,0 +1,7 @@
+// Generated from Blender-authored scout spatial contracts; do not edit by hand.
+pub const COCKPIT_SEAT_MARKER_METERS: [f64; 3] = [2.76, 1.129032258064516, 0.0];
+pub const EXIT_DOOR_MARKER_METERS: [f64; 3] = [-7.1, 1.3440860215053763, 0.0];
+pub const PLAYER_START_MARKER_METERS: [f64; 3] = [0.5, 1.9973118279569892, -2.2];
+pub const ENGINE_PORT_ANCHOR_METERS: [f64; 3] = [-7.0, 1.075268817204301, 7.1];
+pub const ENGINE_STARBOARD_ANCHOR_METERS: [f64; 3] = [-6.4, 1.075268817204301, -7.1];
+pub const CARGO_ANCHOR_METERS: [f64; 3] = [-0.5, 1.5268817204301075, 7.8500000000000005];

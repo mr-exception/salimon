@@ -15,9 +15,17 @@ import tempfile
 
 ASSET = Path(__file__).resolve().parent
 REPO = ASSET.parents[3]
+sys.path.insert(0, str(ASSET))
 sys.path.insert(0, str(REPO / 'models/tools'))
 from export_asset import ExportError, contained_path, resolve_manifest
 from validate_asset import read_document, require, validate_manifest
+from spatial_contracts import (
+    anchors_rust_source,
+    build_spatial_contracts,
+    cargo_rust_source,
+    sidecar_json,
+    thruster_rust_source,
+)
 
 
 def encode_glb(document, binary):
@@ -42,10 +50,12 @@ def validate_preservation(context, data):
         actual = nodes[name]
         require(parents.get(name) == expected['parent'], f'{name}: parent changed')
         require(('mesh' in actual) == expected['visual'], f'{name}: visual role changed')
-        require(actual.get('extras', {}) == expected.get('extras', {}), f'{name}: legacy extras changed')
-        require(all(abs(a-b) <= 1e-6 for a, b in zip(actual.get('translation', [0, 0, 0]),
-                                                    expected.get('translation', [0, 0, 0]))),
-                f'{name}: spatial transform changed')
+        spatial = name.startswith(('COLLIDER_', 'MARKER_'))
+        if not spatial:
+            require(actual.get('extras', {}) == expected.get('extras', {}), f'{name}: legacy extras changed')
+            require(all(abs(a-b) <= 1e-6 for a, b in zip(actual.get('translation', [0, 0, 0]),
+                                                        expected.get('translation', [0, 0, 0]))),
+                    f'{name}: spatial transform changed')
         require(actual.get('rotation', [0, 0, 0, 1]) == [0, 0, 0, 1] and
                 actual.get('scale', [1, 1, 1]) == [1, 1, 1] and 'matrix' not in actual,
                 f'{name}: legacy baked transform required')
@@ -82,9 +92,12 @@ def export(blender=None):
                         str(REPO / 'models/tools/blender_export.py'), '--',
                         str(manifest_path), str(temporary)], cwd=REPO, check=True)
         doc, binary = read_document(temporary)
+        preservation = json.loads((ASSET / 'preservation.json').read_text())
+        spatial = build_spatial_contracts(doc, preservation)
         # Geometry/materials stay entirely Blender-owned. Only legacy nonvisual
         # asset metadata is carried forward; no generator is invoked here.
         doc['extras'] = copy.deepcopy(metadata['extras'])
+        doc['extras']['salimon']['spatialContracts'] = copy.deepcopy(spatial)
         doc['asset']['extras'] = copy.deepcopy(metadata['assetExtras'])
         doc['asset']['extras']['salimon']['sourceWorkflow'] = 'Blender source + scout export adapter'
         doc['asset']['copyright'] = metadata['copyright']
@@ -104,10 +117,17 @@ def export(blender=None):
         validator = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(validator)
         validator.main(staged)
+        (staged / 'spatial-contracts.json').write_text(sidecar_json(spatial))
+        (staged / 'cargo_layout.rs').write_text(cargo_rust_source(spatial))
+        (staged / 'thruster_collision.rs').write_text(thruster_rust_source(spatial))
+        (staged / 'ship_anchors.rs').write_text(anchors_rust_source(spatial))
         report = dict(assetId=manifest['assetId'], sourceSha256=hashlib.sha256(source.read_bytes()).hexdigest(),
                       runtimeSha256=hashlib.sha256(temporary.read_bytes()).hexdigest(), metrics=metrics)
         # Every check completes before any destination is replaced. GLB is
         # replaced last; normal client builds consume only that file.
+        os.replace(staged / 'spatial-contracts.json', REPO / 'client/assets/ship/spatial-contracts.json')
+        for name in ('cargo_layout.rs', 'thruster_collision.rs', 'ship_anchors.rs'):
+            os.replace(staged / name, REPO / 'client/character/src' / name)
         for suffix in ('.bin', '.gltf', '.glb'):
             destination = output.with_suffix(suffix)
             os.replace(staged / destination.name, destination)
@@ -121,6 +141,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     try:
         print(json.dumps(export(args.blender), sort_keys=True))
-    except (ExportError, OSError, subprocess.CalledProcessError, AssertionError) as exc:
+    except (ExportError, OSError, subprocess.CalledProcessError, AssertionError, ValueError) as exc:
         print(f'scout export failed: {exc}', file=sys.stderr)
         sys.exit(1)

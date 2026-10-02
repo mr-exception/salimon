@@ -36,11 +36,9 @@ class ScoutExportTests(unittest.TestCase):
         self.assertIn('Blender', self.document['asset']['generator'])
         self.assertIn('Blender', self.document['asset']['extras']['salimon']['sourceWorkflow'])
 
-    def test_runtime_contract_changes_are_rejected(self):
+    def test_non_spatial_legacy_contract_changes_are_rejected(self):
         for name, mutate in (
             ('Exit_Door', lambda n: n.update(extras={})),
-            ('MARKER_PlayerStart', lambda n: n.update(translation=[0, 0, 0])),
-            ('COLLIDER_AftDoor', lambda n: n['extras']['salimon'].update(sizeMeters=[1, 1, 1])),
             ('Monitor_Port', lambda n: n.update(rotation=[0, 0, 1, 0])),
         ):
             with self.subTest(node=name):
@@ -53,9 +51,27 @@ class ScoutExportTests(unittest.TestCase):
         with self.assertRaises(ValidationError):
             scout.validate_preservation({'document': doc}, {})
 
+    def test_authored_spatial_contract_changes_round_trip(self):
+        preservation = json.loads((ASSET / 'preservation.json').read_text())
+        doc = copy.deepcopy(self.document)
+        marker = next(n for n in doc['nodes'] if n['name'] == 'MARKER_PlayerStart')
+        marker['translation'] = [0.75, 2.0, -2.0]
+        collider = next(n for n in doc['nodes'] if n['name'] == 'COLLIDER_AftDoor')
+        collider['extras']['salimon']['sizeMeters'] = [0.4, 2.4, 3.0]
+        scout.validate_preservation({'document': doc}, {})
+        spatial = scout.build_spatial_contracts(doc, preservation)
+        self.assertEqual(spatial['markers']['MARKER_PlayerStart']['positionMeters'], [0.75, 2.0, -2.0])
+        self.assertEqual(spatial['colliders']['COLLIDER_AftDoor']['sizeMeters'], [0.4, 2.4, 3.0])
+
     def test_failed_staged_validation_preserves_all_published_files(self):
         paths = [self.output.with_suffix(s) for s in ('.glb', '.bin', '.gltf')]
-        paths.append(ASSET / 'export-report.json')
+        paths.extend([
+            ASSET / 'export-report.json',
+            REPO / 'client/assets/ship/spatial-contracts.json',
+            REPO / 'client/character/src/cargo_layout.rs',
+            REPO / 'client/character/src/thruster_collision.rs',
+            REPO / 'client/character/src/ship_anchors.rs',
+        ])
         before = {p: p.read_bytes() for p in paths}
         manifest = copy.deepcopy(self.manifest)
         manifest['budgets']['maxGlbBytes'] = 1

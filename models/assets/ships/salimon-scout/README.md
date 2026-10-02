@@ -91,8 +91,7 @@ boundaries, four engine bounds and the center console. The three markers remain
 empties. Empty cube display glyphs help find colliders but **do not describe
 their actual box dimensions**; use their saved size metadata.
 
-`client/character/src/cargo_layout.rs` and `thruster_collision.rs` remain
-generator-owned; other gameplay constants and policy stay in Rust. The legacy
+`client/character/src/cargo_layout.rs`, `thruster_collision.rs`, and `ship_anchors.rs` are generated from the Blender-authored proxy/marker nodes by this adapter. `client/assets/ship/spatial-contracts.json` is the matching runtime sidecar. Seat, exit, spawn, engine and cargo anchors are therefore sourced from authored spatial transforms while gameplay rules remain in Rust. The legacy
 manifest also owns cargo volume/passage, instrument assemblies and sightline
 samples. Read [the complete legacy runtime contract](../../../../client/assets/ship/README.md#runtime-contract)
 and its validator before altering them.
@@ -112,8 +111,7 @@ materials. Detailed legacy validation remains in place until #82. The old
 Python CLI accepts only `--legacy-layout-only` and writes the two retained Rust
 spatial layouts; it cannot replace Blender visual exports.
 
-#81 moves spatial contracts into authored proxies/anchors, #82 removes
-validation's procedural definitions, and #83 retires the generator. Do not
+#81 moves spatial contracts into authored proxies/anchors and generated runtime metadata. #82 removes the remaining detailed validator's procedural geometry definitions, and #83 retires the generator. Do not
 change frozen spatial/material contracts as part of a visual edit.
 
 ## Migration comparison

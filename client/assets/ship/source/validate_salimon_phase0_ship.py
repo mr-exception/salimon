@@ -7,11 +7,15 @@ import json
 import math
 import struct
 from pathlib import Path
+import sys
 
 from generate_salimon_phase0_ship import (
-    cockpit_components, ship_components, thruster_collision_rust_source,
-    thruster_collision_specs, CARGO_SOLIDS, CARGO_ROOM_METADATA, cargo_layout_rust_source,
+    cockpit_components, ship_components, CARGO_SOLIDS, CARGO_ROOM_METADATA,
 )
+
+SCOUT = Path(__file__).resolve().parents[4] / "models/assets/ships/salimon-scout"
+sys.path.insert(0, str(SCOUT))
+from spatial_contracts import build_spatial_contracts
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -329,20 +333,20 @@ def main(export: Path = EXPORT) -> None:
     assert document["accessors"] == glb_document["accessors"]
     assert document["nodes"] == glb_document["nodes"]
     components = ship_components()
-    assert (ROOT.parents[1] / "character" / "src" / "thruster_collision.rs").read_text() == (
-        thruster_collision_rust_source(components)
-    ), "portable thruster collision bounds differ from the editable asset"
-    assert (ROOT.parents[1] / "character" / "src" / "cargo_layout.rs").read_text() == cargo_layout_rust_source(components), "portable cargo walls differ from the asset source"
+    preservation = json.loads((SCOUT / "preservation.json").read_text())
+    spatial = build_spatial_contracts(document, preservation)
     collision_group = node(document, "Collision_Proxies")
-    for name, lower, upper in thruster_collision_specs(components):
+    for name in ("COLLIDER_Engine_Port_Body", "COLLIDER_Engine_Port_SweptFin",
+                 "COLLIDER_Engine_Starboard_Body", "COLLIDER_Engine_Starboard_SweptFin"):
         collider = node(document, name)
         assert document["nodes"].index(collider) in collision_group["children"]
         assert "mesh" not in collider, "collision proxies must not add draw calls"
         metadata = collider["extras"]["salimon"]
         assert metadata["collisionShape"] == "box"
         assert metadata["purpose"] == "exterior-thruster"
-        assert_vectors_close(collider["translation"], [(a + b) / 2 for a, b in zip(lower, upper)])
-        assert_vectors_close(metadata["sizeMeters"], [b - a for a, b in zip(lower, upper)])
+        authored = spatial["colliders"][name]
+        assert_vectors_close(collider["translation"], authored["centerMeters"])
+        assert_vectors_close(metadata["sizeMeters"], authored["sizeMeters"])
     # The two engines must not become one invisible wall across the aft gate.
     port = node(document, "COLLIDER_Engine_Port_Body")
     starboard = node(document, "COLLIDER_Engine_Starboard_Body")

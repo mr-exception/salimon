@@ -270,7 +270,8 @@
           20.9,
           4,
           21
-        ]
+        ],
+        "spatialContracts": "client/assets/ship/spatial-contracts.json"
       }
     }
   }

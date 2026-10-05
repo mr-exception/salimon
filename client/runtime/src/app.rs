@@ -679,11 +679,19 @@ impl ClientApplication {
                 camera.position_meters,
                 self.e2e_config.map_or(0, |config| config.seed),
             ) {
-                Ok(deposits) => scene_instances.extend(
-                    deposits
-                        .into_iter()
-                        .filter_map(crate::resource_presentation::visual),
-                ),
+                Ok(deposits) => {
+                    resource_meshes.extend(
+                        deposits
+                            .iter()
+                            .copied()
+                            .filter_map(crate::resource_presentation::deposit_mesh),
+                    );
+                    scene_instances.extend(
+                        deposits
+                            .into_iter()
+                            .filter_map(crate::resource_presentation::visual),
+                    );
+                }
                 Err(error) => log::error!("deposit presentation query failed: {error:?}"),
             }
         }

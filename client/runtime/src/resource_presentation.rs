@@ -44,7 +44,9 @@ pub(crate) fn nearby_deposits(
 }
 
 pub(crate) fn visual(entry: SurfaceDeposit) -> Option<SceneInstance> {
-    if entry.deposit.state() == DepositState::Depleted {
+    if entry.deposit.state() == DepositState::Depleted
+        || entry.deposit.material().resource() == ResourceId::WaterIce
+    {
         return None;
     }
     let (color, proportions): ([f32; 4], [f64; 3]) = match entry.deposit.material().resource() {
@@ -59,6 +61,28 @@ pub(crate) fn visual(entry: SurfaceDeposit) -> Option<SceneInstance> {
         center_meters: entry.deposit.position().meters(),
         half_extents_meters: proportions.map(|p| (p * entry.bounds_radius_meters / norm) as f32),
         color,
+    })
+}
+
+/// Stable local identity selects presentation only. World bounds and mass stay authoritative.
+pub(crate) fn deposit_mesh(entry: SurfaceDeposit) -> Option<ResourceMeshInstance> {
+    if entry.deposit.state() == DepositState::Depleted
+        || entry.deposit.material().resource() != ResourceId::WaterIce
+    {
+        return None;
+    }
+    let mesh = match entry.deposit.id().local % 4 {
+        0 => ResourceMesh::IceDepositSpire,
+        1 => ResourceMesh::IceDepositCrown,
+        2 => ResourceMesh::IceDepositRidge,
+        _ => ResourceMesh::IceDepositShelf,
+    };
+    Some(ResourceMeshInstance {
+        mesh,
+        center_meters: entry.deposit.position().meters(),
+        // Every baked vertex fits +/-0.48 m. Inscribe its cube in the
+        // authoritative sphere without relying on orientation or geometry shape.
+        side_meters: entry.bounds_radius_meters / (0.48 * 3.0_f64.sqrt()),
     })
 }
 
@@ -177,7 +201,10 @@ mod tests {
     #[test]
     fn every_material_has_distinct_bounded_geometry_at_its_exact_anchor() {
         let mut appearances = Vec::new();
-        for material in RESOURCE_CATALOG {
+        for material in RESOURCE_CATALOG
+            .iter()
+            .filter(|m| m.id != ResourceId::WaterIce)
+        {
             let position = WorldPosition::new(1e12, -7.5e11, 2.5e11);
             let deposit = ResourceDeposit::new(
                 DepositId {
@@ -209,6 +236,53 @@ mod tests {
             let mut depleted = entry;
             depleted.deposit.set_remaining_mass_kg(0.0).unwrap();
             assert!(visual(depleted).is_none());
+        }
+    }
+
+    #[test]
+    fn ice_deposit_identity_bounds_and_depletion_survive_rematerialization() {
+        let variants = [
+            ResourceMesh::IceDepositSpire,
+            ResourceMesh::IceDepositCrown,
+            ResourceMesh::IceDepositRidge,
+            ResourceMesh::IceDepositShelf,
+        ];
+        for local in 0..8 {
+            for radius in [0.01, 0.2, 3.0] {
+                let make = |mass| SurfaceDeposit {
+                    deposit: ResourceDeposit::new(
+                        DepositId {
+                            body: CelestialBodyId::Earth,
+                            local,
+                        },
+                        RawMaterial::new(ResourceId::WaterIce, 30.0).unwrap(),
+                        WorldPosition::new(1e12, -7.5e11, 2.5e11),
+                        mass,
+                    )
+                    .unwrap(),
+                    body_local_position_meters: [0.0, 0.0, 6e6],
+                    bounds_radius_meters: radius,
+                };
+                let original = make(30.0);
+                let mesh = deposit_mesh(original).unwrap();
+                assert_eq!(mesh.mesh, variants[(local % 4) as usize]);
+                assert_eq!(mesh.center_meters, original.deposit.position().meters());
+                assert!((mesh.side_meters * 0.48 * 3.0_f64.sqrt() - radius).abs() < 1e-12);
+                assert_eq!(deposit_mesh(make(1.0)), Some(mesh));
+                assert_eq!(deposit_mesh(make(30.0)), Some(mesh));
+                assert!(visual(original).is_none());
+                assert!(deposit_mesh(make(0.0)).is_none());
+                let mut rock = original;
+                rock.deposit = ResourceDeposit::new(
+                    original.deposit.id(),
+                    RawMaterial::new(ResourceId::IronOre, 30.0).unwrap(),
+                    original.deposit.position(),
+                    30.0,
+                )
+                .unwrap();
+                assert!(deposit_mesh(rock).is_none());
+                assert!(visual(rock).is_some());
+            }
         }
     }
 

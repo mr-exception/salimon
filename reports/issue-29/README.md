@@ -24,7 +24,7 @@ issue's GPT-6 Astra/Ultra suggestion could not be selected in-place.
 
 [Machine-readable validation summary](validation.json),
 [native checkpoint image](landed-cabin.png), and
-[automatic failure image](failure.png) record the acceptance evidence.
+[automatic failure image](landed-cabin.png) record the acceptance evidence.
 Run commands and artifact inspection instructions are in
 [the runner documentation](../../scripts/README.md).
 
@@ -37,3 +37,7 @@ capture requires an unobscured game display; images represent the last
 presented frame, while assertions use authoritative inspection state. These
 runs validate evidence generation and gameplay contracts, not hardware GPU
 performance or the macOS manual-playtest checklist.
+
+Documentation cleanup (#98): the originally checked-in failure and cabin PNGs
+were byte-identical. Both links now resolve to the retained cabin image; this
+does not establish a distinct failure view. Historical assertions remain unchanged.

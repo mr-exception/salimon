@@ -39,3 +39,10 @@ dependencies here; doing so would invert the intended observation flow.
   changes.
 - Run root formatting, lint, build, and test gates plus the native smoke check
   after integration.
+
+## Shared maintenance rules
+
+Follow the root [coding conventions](../../docs/coding-conventions.md),
+[validation matrix](../../docs/validation.md) and
+[feature map](../../docs/maintenance-map.md). Update affected contracts/guides
+with behavior changes and record completion evidence under root `reports/`.

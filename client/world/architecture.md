@@ -56,3 +56,12 @@ presentation. No renderer types, input events, or abstract inventory enter world
 and owns physical output, stable session IDs, bounded pieces, and deterministic
 surface placement. Fragment queries are read-only and independent of deposit
 streaming. Runtime maps these domain objects into nearby inspection and cuboids.
+
+## Carrying and session lifetime
+
+`carrying.rs` owns the one-object slot and occluded fragment aiming.
+`MiningSession` guards pickup/release and validated pose mutation, sealing output
+on pickup. Runtime composes hand poses, ship support and fragment motion/contact
+with character collision geometry. Generated deposits can stream out and back
+in without losing modified mass; fragments remain the same physical entities.
+All retention is in memory for the current session, with no disk/backend save.

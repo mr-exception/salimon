@@ -1,58 +1,55 @@
-# Repository Guidelines
+# Repository guidelines
 
-## Project source of truth
+## Start here
 
-Use [docs/README.md](docs/README.md) for project specifications and
-[GitHub issues](https://github.com/mr-exception/salimon/issues) for tasks.
-Before starting an issue, read its full description and **Blocked by** section;
-do not start until every blocker is closed. The migrated Notion order is a planning
-priority, not a substitute for explicit dependencies. Read the linked specifications
-and the current code before implementation.
+1. Read the active [GitHub issue](https://github.com/mr-exception/salimon/issues),
+   comments, acceptance criteria and **Blocked by** section. Resolve explicit
+   blockers before dependent work. Issue metadata defines task scope; historical
+   task numbers do not prescribe execution order.
+2. Use [current architecture](docs/technical-architecture.md) and the
+   [feature maintenance map](docs/maintenance-map.md) to find owners, sources,
+   tests and scenarios. Read only the affected crate's `README.ai.md`,
+   `architecture.md`, `invariants.md` and linked contracts before editing.
+3. Follow [coding conventions](docs/coding-conventions.md) and select the exact
+   affected-area checks from [validation](docs/validation.md). Read source before
+   trusting prose, especially historical reports.
 
-Record progress, validation evidence, and relevant commits on the GitHub issue.
-Close it only after its acceptance criteria pass. Record unresolved product or
-architecture decisions in [Project Q&A](docs/project-qa.md), then update the
-relevant specification and issue. The legacy Salimon hub notes are archived in
-[docs/legacy-salimon-hub.md](docs/legacy-salimon-hub.md) and do not define the
-game.
+## Scope and precedence
 
-## Architecture and Scope
+Current implementation is a native, client-only custom Rust/winit/wgpu game.
+`client/` owns runtime code; `models/` owns offline authoring; `core/` has no
+backend implementation. Ship flight/landing, movement/EVA, mining, carrying and
+fragment motion/contact are implemented. Resource changes survive local streaming
+in the current in-memory session. Disk/backend persistence, networking, orbital
+simulation and production survival/energy management remain deferred.
 
-All Phase 0 code belongs under `client/`; `core/` contains only a README and has no
-backend behavior. `client/runtime/` owns the native `winit` lifecycle,
-composition, redraw/update scheduling, surface recovery, and clocks;
-`client/renderer/` owns `wgpu` resources, camera-relative GPU conversion,
-reverse-Z depth, and presentation behind a narrow API. Task 4 activates
-`client/world/` for portable `f64`-meter coordinates and the renderer-neutral
-camera/precision prototype; Task 5 adds the immutable compressed Solar System
-catalog and body-distance math there. Task 6 adds analytic textured spheres,
-material LOD, and Sun lighting under `client/renderer/`, with per-body camera
-inspection in world. The runtime maps world snapshots into
-renderer DTOs; the renderer must not depend on world, character, or ship state.
-The platform adapter is still reserved; `winit` integration may remain at the runtime boundary
-until platform-specific behavior warrants extraction. Use custom Rust and
-low-level libraries; no full game engine. Phase 0 excludes backend/networking,
-persistence, and production gameplay systems. Task 3 owns the optional
-diagnostics overlay.
+Explicit user instructions govern the task. Approved specifications and issue
+acceptance criteria define intended behavior; current code/tests establish what
+is implemented. Component invariants constrain changes unless deliberately
+revised with their consumers/tests. Future proposals and historical evidence
+are not active implementation instructions. If these disagree, check code and
+issue decisions, repair stale documentation in the same change, and record
+unresolved product/architecture decisions in [Project Q&A](docs/project-qa.md)
+and the issue rather than silently inventing policy.
 
-## Build, Test, and Style
+## Ownership and completion
 
-Follow [README.md](README.md) for macOS setup. From the root, run:
+Runtime composes typed domain state and native events; renderer owns GPU work
+and renderer-neutral DTOs; supporting domains do not call runtime. See the
+maintenance map for precise boundaries and the asset regeneration owner.
+No full game engine, framework adoption or broad refactor is implied by cleanup.
 
-```sh
-cargo build --workspace --locked
-cargo run --locked -p salimon-client
-cargo fmt --all -- --check
-cargo clippy --workspace --all-targets --locked -- -D warnings
-cargo test --workspace --locked
-```
+Keep behavior/contracts and affected guides aligned in the same change. Use one
+canonical definition per rule and link local guides to it. Preserve useful
+historical evidence while labeling its date/revision and limitations.
 
-`cargo run` is interactive and continues until the native window closes. In
-addition to automated gates, smoke-test all six textured Solar System spheres,
-the visible scale-transition fixture, near-surface precision markers,
-pause/restart controls, live resize,
-minimize/restore, clean close, and relaunch on macOS. Inspect all five solid-body
-approaches using keys 2–6 (4 is Earth); N pauses at 12 m. Use rustfmt defaults, Rust
-2024, and the shared Cargo lints. Workspace crates inherit shared metadata/lints.
-Commit `Cargo.lock`; exclude `target/`. Keep setup instructions, component
-maintenance docs, ownership documents, and implementation aligned.
+Every completed task **must** create or update
+`reports/issue-<number>/README.md` (or `reports/task-<id>/README.md` without a
+GitHub issue), recording outcome, meaningful changes, checks/results, and
+limitations or blockers. Put applicable screenshots/images beside it with
+relative links. Follow [report conventions](docs/coding-conventions.md#task-completion-reports)
+and [reports layout](reports/README.md); never add task-result folders to `docs/`.
+Link the report and relevant commits/PR from the GitHub issue completion update.
+Close an issue only after acceptance criteria pass; a PR awaiting merge should
+link the issue for closure on merge. Push to main only when explicitly requested;
+otherwise use a reviewable branch/PR for the requested workflow.

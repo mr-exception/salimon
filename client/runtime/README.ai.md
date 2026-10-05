@@ -59,3 +59,10 @@ necessary.
 
 Mining input/presentation is runtime composition; keep target validation, rate,
 source mass mutation, and session state in `salimon_world::mining`.
+
+## Shared maintenance rules
+
+Follow the root [coding conventions](../../docs/coding-conventions.md),
+[validation matrix](../../docs/validation.md) and
+[feature map](../../docs/maintenance-map.md). Update affected contracts/guides
+with behavior changes and record completion evidence under root `reports/`.

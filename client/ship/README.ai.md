@@ -23,3 +23,10 @@ Allow for submillimeter `f64` position quantization at the catalog's 1e12 m anch
 Keep Core values as a bounded, noncanonical Phase 0 telemetry fixture until an
 energy-management task defines production behavior. Ship snapshots own actual
 flight/assist velocity and nearby-body telemetry; runtime must only map it.
+
+## Shared maintenance rules
+
+Follow the root [coding conventions](../../docs/coding-conventions.md),
+[validation matrix](../../docs/validation.md) and
+[feature map](../../docs/maintenance-map.md). Update affected contracts/guides
+with behavior changes and record completion evidence under root `reports/`.

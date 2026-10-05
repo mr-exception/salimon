@@ -18,6 +18,13 @@ GitHub issues are the task source of truth. Read each issue's **Blocked by** sec
 - [Phase 0 — Technical Feasibility Showcase](phase-0-technical-feasibility.md)
 - [Project Q&A](project-qa.md)
 
+## Maintenance entry points
+
+- [Feature ownership, sources, tests and scenarios](maintenance-map.md)
+- [Coding conventions and completion reports](coding-conventions.md)
+- [Validation matrix and prerequisites](validation.md)
+- [Historical task reports](../reports/README.md)
+
 ## Repository documents
 
 - [3D authoring workspace and ownership](../models/README.md)

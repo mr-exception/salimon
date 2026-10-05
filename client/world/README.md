@@ -13,8 +13,8 @@ local streaming independently of runtime presentation.
 coordinates, camera tour, and body geometry math. Its immutable catalog contains
 exactly Sun, Mercury, Venus, Earth, Moon, and Mars in authoritative `f64` meters.
 The Sun is visual-only; the other five bodies expose solid landing volumes with
-outer radius `1.15R`. No orbital simulation, backend, networking, or persistence
-is involved.
+outer radius `1.15R`. No orbital simulation, backend, networking, or disk persistence is involved.
+Resource deltas and fragments are retained in memory for the current session.
 
 Portable helpers select the nearest nominal body surface inside an inclusive
 distance threshold and project point velocity onto the center-to-point radial

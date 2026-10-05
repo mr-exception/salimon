@@ -52,7 +52,7 @@ cross-sections instead of dense smoothing or displacement.
 The dedicated port cargo room and its protruding hull have been removed from the
 current scout. Loose fragments may still rest on clear main-cabin deck space and
 move with the ship. The ship does not define a dedicated cargo storage volume or
-cargo-room membership count. The historical [issue #34 evidence](../../../docs/issue-34/README.md)
+cargo-room membership count. The historical [issue #34 evidence](../../../reports/issue-34/README.md)
 documents the earlier layout, not the current asset.
 
 ## Cockpit glazing and nose
@@ -75,7 +75,7 @@ within 6,000 triangles, 120 primitives, 13 materials and the 512 KiB GLB budget.
 
 The native visual scenario follows free-look, assisted landing, low-altitude
 approach, landed inspection, takeoff and cockpit exit. See
-[issue #38 evidence](../../../docs/issue-38/README.md) for historical lower-window
+[issue #38 evidence](../../../reports/issue-38/README.md) for historical lower-window
 screenshots and authoritative state/logs; recheck these views after nose edits.
 
 ## Source and regeneration

@@ -69,3 +69,10 @@ nearby-body DTO values into one cached
 512 × 768 RGBA atlas; upload it only when the displayed values change. Screens
 are self-lit surfaces in the existing opaque draw and stay live when unseated.
 Keep gameplay interaction and ship state out of these modules.
+
+## Shared maintenance rules
+
+Follow the root [coding conventions](../../docs/coding-conventions.md),
+[validation matrix](../../docs/validation.md) and
+[feature map](../../docs/maintenance-map.md). Update affected contracts/guides
+with behavior changes and record completion evidence under root `reports/`.

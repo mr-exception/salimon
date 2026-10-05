@@ -4,7 +4,7 @@
 
 The runtime is the native host and composition root. It translates `winit`
 lifecycle/window events into a small set of renderer operations and owns timing
-that future portable simulation code may consume.
+consumed by current portable character, ship, world, and resource controllers.
 
 ```text
 winit event loop
@@ -91,10 +91,9 @@ the runtime.
 into portable `salimon_world::mining` calls. World owns target selection, rate,
 validated deposit mutation, and session mass deltas. Character exposes ray hits
 against its solid ship proxies. Runtime queries nearby generation, applies
-world session state for both GPU mapping and inspection, and presents a generic
-cuboid tool/aim marker without exposing gameplay types to the renderer.
+world session state for both GPU mapping and inspection, and presents the tool/aim marker and resource geometry through generic renderer DTOs without exposing gameplay types to the renderer.
 Physical fragments are world-owned session entities. Runtime maps their
-mass-derived cube size and absolute pose to generic presentation DTOs; the same
+mass-derived presentation size and absolute pose to generic presentation DTOs; the same
 nearby query supplies automation state even when the tool is stowed.
 
 ## Physical surface/ship transfer (#47)
@@ -106,6 +105,10 @@ Successful interior release installs an anchor; pickup removes it before followi
 the player; surface release stays world-local. Every gameplay update and look/input
 synchronization maps loose anchors through the current ship frame. The same world
 session owns every entity and its immutable mass/material/source throughout.
-Greybox cubes remain world-axis aligned; conservative bounding-sphere clearance
-keeps them off the deck/walls as the supporting ship rotates. This intentionally
-abstracts acceleration through internal gravity without adding rigid-body physics.
+`fragment_physics.rs` composes deterministic loose-fragment motion and spherical
+contacts in ship-local or planet-relative meters, including gravity, release
+velocity, deck/hull contact and fragment piling. `MiningTool.fragment_motion`
+tracks velocities by existing fragment ID; carried pieces are excluded. This is
+a small custom simulation, without Rapier or another physics engine. World
+continues to own validated poses, identity, material and mass; runtime owns
+cross-domain support frames and contact composition.

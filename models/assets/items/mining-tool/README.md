@@ -25,7 +25,7 @@ renderer changes this material region only; it does not derive mining policy.
   renderer uses projection directly, so pitch, yaw, gravity and distant world
   origins cannot move the grip on screen. Regular reverse-Z depth remains active.
 - This visual neither supplies the mining ray nor changes reach, extraction,
-  targeting, equip/stow controls or resource identity. The aim marker stays
+  targeting, equip/stow controls or resource identity. The screen-space dot/`+` reticle stays
   separate. Surface/gameplay/equipped gates remain runtime-owned.
 - Budgets: 2,000 triangles, 16 primitives, 4 materials, 0 texture bytes (schema
   cap 1), 192 KiB GLB. Current export: 640 triangles, 12 primitives, 4 materials,

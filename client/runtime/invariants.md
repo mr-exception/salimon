@@ -79,4 +79,9 @@
 
 - Authored handheld presentation is visible only in gameplay on the surface
   while equipped; active feedback requires held input and a valid target. The
-  separate aim marker remains available when stowed.
+  separate screen-space reticle remains available when stowed.
+
+- Gameplay aiming uses a screen-space centered dot when the tool is stowed and
+  `+` when equipped, selected from the actual equip state every redraw. Camera
+  pitch/yaw, location and drawable resize do not shift it. Precision tour hides
+  it. No world-space aim cuboid is emitted; interaction/mining rays are unchanged.

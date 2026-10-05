@@ -34,7 +34,7 @@
     is reported explicitly.
 14. Scene object counts describe instances retained by conservative frustum
     culling, and scene draw counts exclude overlay presentation. Total draw calls
-    include each diagnostics/action overlay when it is visible.
+    include each diagnostics/action/reticle overlay when it is visible.
 15. Texture LOD varies continuously with projected footprint. Local detail uses
     a body-relative origin wrapped in CPU `f64`; no universe-scale `f32` texture
     coordinates, atmosphere, clouds, shadows, or post-effect dependency is used.
@@ -55,7 +55,11 @@
     and upload their atlas panels; no target renders an explicit out-of-range state.
     Monitor UVs use top-left (0, 0); each named surface is exactly two triangles.
 
-20. Held mining-tool geometry is the checked-in authored GLB, grip-centered and
+20. Center-placed overlays use the current drawable dimensions, place their
+    midpoint at NDC (0, 0), and ignore scene occlusion. The renderer consumes
+    image/revision/placement only, never equipment or targeting state.
+
+21. Held mining-tool geometry is the checked-in authored GLB, grip-centered and
     baked with identity node transforms. Camera-local presentation preserves
     orientation through look/gravity changes and never supplies a gameplay ray.
     Active feedback is presentation-only; normal reverse-Z depth applies.

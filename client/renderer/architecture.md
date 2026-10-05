@@ -104,5 +104,15 @@ the visual. The identity grip and baked vertices rotate into a camera-local
 frame in `held_item.wgsl`, using the frame projection and ordinary reverse-Z
 depth. Pitch/gravity/world origins do not affect screen placement. Status
 material regions switch amber/teal; runtime retains mining gates and the
-separate aim marker. The visual adds one scene object and one draw. See the
+separate screen-space reticle. The visual adds one scene object and one draw. See the
 [mining-tool contract](../../models/assets/items/mining-tool/README.md).
+
+## Centered gameplay overlay
+
+`Renderer::render` accepts an independent borrowed reticle image in addition to
+its diagnostics and action-bar images. `OverlayPlacement::Center` maps the image
+midpoint to drawable center (NDC zero) using the current surface configuration on
+every prepare, including after resize/reconstruction. The existing alpha image
+pipeline draws it after the scene with depth comparison Always and no depth
+writes. Cached pixels change only with the supplied revision; gameplay equipment
+policy stays in runtime. Total draw calls include the visible reticle draw.

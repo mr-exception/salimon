@@ -10,6 +10,7 @@ mod frame_clock;
 mod mining;
 mod resource_context;
 mod resource_presentation;
+mod reticle;
 mod update_clock;
 
 use std::process::ExitCode;

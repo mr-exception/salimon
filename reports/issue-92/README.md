@@ -3,6 +3,11 @@
 Validated on 2026-10-05, Ubuntu 24.04 x86_64, Rust 1.99.0, Blender 4.5.3 LTS,
 Mesa lavapipe 25.2.8 and a dedicated Xvfb 1280×800 display.
 
+## Initial implementation (before PR #101)
+
+The evidence below records the original branch before integration of the new
+screen-space reticle. See the merge validation section for the current result.
+
 ## Outcome
 
 Replaced the equipped tool's three procedural cuboids with an original editable
@@ -69,3 +74,35 @@ Windows hardware, release packaging and reference-machine FPS were not tested.
 This is a static lightweight model, with no animated hands or moving parts.
 The custom renderer uses base colors, a stable inexpensive fill and runtime
 status colors rather than a general PBR item-material system.
+
+## Merge validation — PR #101 integration
+
+Merged `main` at `9d0b5f8` after PR #101 landed. Resolved mining presentation
+and appended-contract conflicts by preserving the authored GLB and the new
+screen-space dot/`+` reticle. Removed the now-obsolete procedural `visuals`
+method and its caller completely; no duplicate 3D marker or tool cuboids remain.
+`MiningTool::held_item` maps the existing equip/surface/active gates into the
+renderer DTO and has a regression covering stow, held input, valid target and
+interior visibility. Reticle selection/alignment tests from #101 remain intact.
+Both renderer contracts and draw-count paths are retained.
+
+Revalidated on the same Ubuntu/Rust/software Vulkan environment:
+
+- `cargo fmt --all -- --check`: passed.
+- `cargo test --workspace --locked`: 242 tests passed.
+- `cargo clippy --workspace --all-targets --locked -- -D warnings`: passed.
+- `cargo build --workspace --locked`: passed.
+- `python models/tools/validate_asset.py item.mining-tool`: passed.
+- The same `scenarios/evidence/mining-tool.json` native command above passed
+  all 146 steps with the combined code, including extraction and pitch checks.
+  Used the same TCP Xvfb setup with display `:117`; an earlier `:95` attempt
+  encountered an already-active display and reached no gameplay steps.
+- [Combined native checkpoint summary](merge-evidence.json).
+
+The model source/export and shader were unchanged during conflict resolution,
+so Blender integration and script tests were not repeated. macOS/Windows and
+release packaging limits still apply.
+
+| Stowed dot | Equipped cross and authored tool | Active feedback |
+| --- | --- | --- |
+| ![Dot](merge-deposit-context-tool-stowed.png) | ![Cross and tool](merge-equipped-mining-tool.png) | ![Mining](merge-active-mining-context.png) |

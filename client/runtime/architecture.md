@@ -91,7 +91,9 @@ the runtime.
 into portable `salimon_world::mining` calls. World owns target selection, rate,
 validated deposit mutation, and session mass deltas. Character exposes ray hits
 against its solid ship proxies. Runtime queries nearby generation, applies
-world session state for both GPU mapping and inspection, and presents the tool/aim marker and resource geometry through generic renderer DTOs without exposing gameplay types to the renderer.
+world session state for both GPU mapping and inspection, and presents the authored tool through `MiningTool::held_item` / `HeldItemInstance`
+and resource geometry through generic renderer DTOs without exposing gameplay
+types to the renderer. No procedural tool or aim cuboid remains.
 Physical fragments are world-owned session entities. Runtime maps their
 mass-derived presentation size and absolute pose to generic presentation DTOs; the same
 nearby query supplies automation state even when the tool is stowed.
@@ -112,3 +114,13 @@ tracks velocities by existing fragment ID; carried pieces are excluded. This is
 a small custom simulation, without Rapier or another physics engine. World
 continues to own validated poses, identity, material and mass; runtime owns
 cross-domain support frames and contact composition.
+
+## First-person reticle
+
+`reticle.rs` selects a static outlined dot or `+` RGBA image directly from
+`MiningTool.equipped` each gameplay redraw. Precision-tour view hides it. The
+renderer composites it independently of diagnostics/action text at the drawable
+center, without scene depth or a world-space aim cuboid. This center is NDC
+(0, 0), matching the existing eye-to-look-target interaction/mining ray; target
+selection and extraction remain unchanged. Equip/stow changes the image revision
+so the existing overlay texture cache uploads only on state changes.

@@ -1,14 +1,18 @@
 //! Static authored resource meshes, batched into one opaque depth-tested draw.
 use crate::{CameraFrame, DEPTH_FORMAT, RendererError, encode_f32s};
 const FLOATS: usize = 7;
-const ASSETS: [&[u8]; 2] = [
+const ASSETS: [&[u8]; 4] = [
     include_bytes!("../../assets/resources/water-ice-fragment-shard/model.glb"),
     include_bytes!("../../assets/resources/water-ice-fragment-cluster/model.glb"),
+    include_bytes!("../../assets/resources/silicate-fragment-slab/model.glb"),
+    include_bytes!("../../assets/resources/silicate-fragment-ridge/model.glb"),
 ];
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ResourceMesh {
     IceShard,
     IceCluster,
+    SilicateSlab,
+    SilicateRidge,
 }
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ResourceMeshInstance {
@@ -18,9 +22,9 @@ pub struct ResourceMeshInstance {
     pub side_meters: f64,
 }
 fn geometry(bytes: &[u8]) -> Result<Vec<[f32; FLOATS]>, RendererError> {
-    let fail = |message: &str| RendererError::new("load water-ice fragment", message);
+    let fail = |message: &str| RendererError::new("load resource fragment", message);
     let asset = gltf::Gltf::from_slice(bytes)
-        .map_err(|e| RendererError::new("load water-ice fragment", e))?;
+        .map_err(|e| RendererError::new("load resource fragment", e))?;
     let blob = asset
         .blob
         .as_deref()
@@ -85,7 +89,7 @@ fn geometry(bytes: &[u8]) -> Result<Vec<[f32; FLOATS]>, RendererError> {
     Ok(vertices)
 }
 fn relative_vertices(
-    meshes: &[Vec<[f32; FLOATS]>; 2],
+    meshes: &[Vec<[f32; FLOATS]>; 4],
     instances: &[ResourceMeshInstance],
     camera: CameraFrame,
 ) -> Result<Vec<f32>, RendererError> {
@@ -103,6 +107,8 @@ fn relative_vertices(
         let mesh = match instance.mesh {
             ResourceMesh::IceShard => 0,
             ResourceMesh::IceCluster => 1,
+            ResourceMesh::SilicateSlab => 2,
+            ResourceMesh::SilicateRidge => 3,
         };
         for vertex in &meshes[mesh] {
             for (axis, value) in vertex.iter().take(3).enumerate() {
@@ -121,7 +127,7 @@ pub(crate) struct ResourceMeshRenderer {
     uniform: wgpu::Buffer,
     binding: wgpu::BindGroup,
     vertices: wgpu::Buffer,
-    meshes: [Vec<[f32; FLOATS]>; 2],
+    meshes: [Vec<[f32; FLOATS]>; 4],
     capacity: usize,
     count: u32,
     objects: u32,
@@ -131,7 +137,12 @@ impl ResourceMeshRenderer {
         device: &wgpu::Device,
         format: wgpu::TextureFormat,
     ) -> Result<Self, RendererError> {
-        let meshes = [geometry(ASSETS[0])?, geometry(ASSETS[1])?];
+        let meshes = [
+            geometry(ASSETS[0])?,
+            geometry(ASSETS[1])?,
+            geometry(ASSETS[2])?,
+            geometry(ASSETS[3])?,
+        ];
         let vertices = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("Resource vertices"),
             size: 28,
@@ -267,18 +278,21 @@ impl ResourceMeshRenderer {
 mod tests {
     use super::*;
     #[test]
-    fn both_exports_are_distinct_and_bounded() {
-        let a = geometry(ASSETS[0]).unwrap();
-        let b = geometry(ASSETS[1]).unwrap();
-        assert_ne!(a, b);
-        for mesh in [a, b] {
+    fn authored_exports_are_distinct_and_bounded() {
+        let meshes = ASSETS.map(|asset| geometry(asset).unwrap());
+        for left in 0..meshes.len() {
+            for right in left + 1..meshes.len() {
+                assert_ne!(meshes[left], meshes[right]);
+            }
+        }
+        for mesh in meshes {
             assert!(mesh.len() / 3 <= 200);
             assert!(mesh.iter().all(|v| v[..3].iter().all(|p| p.abs() <= 0.48)));
         }
     }
     #[test]
     fn subtracts_large_origin_before_narrowing() {
-        let meshes = [geometry(ASSETS[0]).unwrap(), geometry(ASSETS[1]).unwrap()];
+        let meshes = ASSETS.map(|asset| geometry(asset).unwrap());
         let camera = CameraFrame {
             position_meters: [1e12; 3],
             target_meters: [1e12, 1e12, 1e12 - 1.0],
@@ -286,7 +300,12 @@ mod tests {
             vertical_fov_radians: 1.0,
             near_plane_meters: 0.1,
         };
-        for mesh in [ResourceMesh::IceShard, ResourceMesh::IceCluster] {
+        for mesh in [
+            ResourceMesh::IceShard,
+            ResourceMesh::IceCluster,
+            ResourceMesh::SilicateSlab,
+            ResourceMesh::SilicateRidge,
+        ] {
             for side in [0.01, 0.5, 3.0] {
                 let instance = ResourceMeshInstance {
                     mesh,

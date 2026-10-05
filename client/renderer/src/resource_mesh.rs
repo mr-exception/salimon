@@ -1,11 +1,13 @@
 //! Static authored resource meshes, batched into one opaque depth-tested draw.
 use crate::{CameraFrame, DEPTH_FORMAT, RendererError, encode_f32s};
 const FLOATS: usize = 7;
-const ASSETS: [&[u8]; 4] = [
+const ASSETS: [&[u8]; 6] = [
     include_bytes!("../../assets/resources/water-ice-fragment-shard/model.glb"),
     include_bytes!("../../assets/resources/water-ice-fragment-cluster/model.glb"),
     include_bytes!("../../assets/resources/silicate-fragment-slab/model.glb"),
     include_bytes!("../../assets/resources/silicate-fragment-ridge/model.glb"),
+    include_bytes!("../../assets/resources/iron-fragment/model.glb"),
+    include_bytes!("../../assets/resources/iron-fragment-shard/model.glb"),
 ];
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ResourceMesh {
@@ -13,6 +15,8 @@ pub enum ResourceMesh {
     IceCluster,
     SilicateSlab,
     SilicateRidge,
+    IronChunk,
+    IronShard,
 }
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ResourceMeshInstance {
@@ -89,7 +93,7 @@ fn geometry(bytes: &[u8]) -> Result<Vec<[f32; FLOATS]>, RendererError> {
     Ok(vertices)
 }
 fn relative_vertices(
-    meshes: &[Vec<[f32; FLOATS]>; 4],
+    meshes: &[Vec<[f32; FLOATS]>; 6],
     instances: &[ResourceMeshInstance],
     camera: CameraFrame,
 ) -> Result<Vec<f32>, RendererError> {
@@ -109,6 +113,8 @@ fn relative_vertices(
             ResourceMesh::IceCluster => 1,
             ResourceMesh::SilicateSlab => 2,
             ResourceMesh::SilicateRidge => 3,
+            ResourceMesh::IronChunk => 4,
+            ResourceMesh::IronShard => 5,
         };
         for vertex in &meshes[mesh] {
             for (axis, value) in vertex.iter().take(3).enumerate() {
@@ -127,7 +133,7 @@ pub(crate) struct ResourceMeshRenderer {
     uniform: wgpu::Buffer,
     binding: wgpu::BindGroup,
     vertices: wgpu::Buffer,
-    meshes: [Vec<[f32; FLOATS]>; 4],
+    meshes: [Vec<[f32; FLOATS]>; 6],
     capacity: usize,
     count: u32,
     objects: u32,
@@ -142,6 +148,8 @@ impl ResourceMeshRenderer {
             geometry(ASSETS[1])?,
             geometry(ASSETS[2])?,
             geometry(ASSETS[3])?,
+            geometry(ASSETS[4])?,
+            geometry(ASSETS[5])?,
         ];
         let vertices = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("Resource vertices"),
@@ -305,6 +313,8 @@ mod tests {
             ResourceMesh::IceCluster,
             ResourceMesh::SilicateSlab,
             ResourceMesh::SilicateRidge,
+            ResourceMesh::IronChunk,
+            ResourceMesh::IronShard,
         ] {
             for side in [0.01, 0.5, 3.0] {
                 let instance = ResourceMeshInstance {

@@ -34,10 +34,23 @@ jsonschema 4.26.0; standalone rustfmt 1.99.0.
 - `BLENDER=/tmp/blender-4.5.3-linux-x64/blender python -m unittest discover -s models/tests -v`:
   passed, 47 tests including real Blender integration and new deposit validation.
 - `python -m unittest discover -s scripts -p 'test_*.py'`:
-  passed, 34 tests (before scenario assertion updates; final rerun recorded below).
+  passed, 34 tests, including a final rerun after scenario assertion updates.
 - Standalone rustfmt applied to changed Rust files; `git diff --check`: passed.
-- Cargo/workspace and native graphical checks: pending PR CI; Cargo is not
-  installed in the local environment. Results will be recorded after CI completes.
+- [Native builds run 37312274224](https://github.com/mr-exception/salimon/actions/runs/37312274224):
+  passed on macOS 14, Windows 2022 and Ubuntu 24.04 for implementation commit
+  `08d6d85e92c4a943e4708dc8e05f1a3344903a94`. All three ran
+  `cargo fmt --all -- --check`,
+  `cargo clippy --workspace --all-targets --locked -- -D warnings`,
+  `cargo test --workspace --locked`, model/script checks and debug/release staging.
+  Linux also passed deterministic baseline, lower-cockpit screenshot,
+  resource-collection and ship-EVA evidence suites, and real X11 packaged smoke.
+  Native screenshots/state/build artifacts are attached to that run.
+- Cargo was not installed locally; CI provided workspace and native coverage.
+- Re-exported all four saved compressed Blender sources through the generic
+  exporter: passed with byte-identical GLBs (`sha256sum -c`).
+- Changed documentation relative-link checks: passed.
+
+This final report-only update does not change the successfully tested implementation.
 
 | Variant | Triangles | GLB bytes | Materials/primitives | Texture bytes |
 | --- | ---: | ---: | --- | ---: |

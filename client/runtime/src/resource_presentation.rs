@@ -78,12 +78,26 @@ pub(crate) fn fragment_visual(fragment: ResourceFragment) -> SceneInstance {
 
 /// Identity alone chooses the authored variant; movement and mass cannot change it.
 pub(crate) fn fragment_mesh(fragment: ResourceFragment) -> Option<ResourceMeshInstance> {
-    (fragment.material().resource() == ResourceId::WaterIce).then(|| ResourceMeshInstance {
-        mesh: if fragment.id().0.is_multiple_of(2) {
-            ResourceMesh::IceShard
-        } else {
-            ResourceMesh::IceCluster
-        },
+    let even = fragment.id().0.is_multiple_of(2);
+    let mesh = match fragment.material().resource() {
+        ResourceId::WaterIce => {
+            if even {
+                ResourceMesh::IceShard
+            } else {
+                ResourceMesh::IceCluster
+            }
+        }
+        ResourceId::SilicateRock => {
+            if even {
+                ResourceMesh::SilicateSlab
+            } else {
+                ResourceMesh::SilicateRidge
+            }
+        }
+        ResourceId::IronOre => return None,
+    };
+    Some(ResourceMeshInstance {
+        mesh,
         center_meters: fragment.transform().position().meters(),
         side_meters: salimon_world::resource_fragments::side_meters(fragment),
     })
@@ -114,19 +128,7 @@ pub(crate) fn fragment_visuals(fragment: ResourceFragment) -> Vec<SceneInstance>
                 [0.28, 0.22, 0.20, 1.0],
             ],
         ),
-        ResourceId::SilicateRock => (
-            [
-                ([0.0, -0.20, 0.0], [0.48, 0.25, 0.45]),
-                ([0.15 * flip, 0.04, 0.06], [0.30, 0.18, 0.32]),
-                ([-0.24 * flip, -0.02, -0.17], [0.20, 0.12, 0.22]),
-            ],
-            [
-                [0.42, 0.47, 0.35, 1.0],
-                [0.62, 0.65, 0.52, 1.0],
-                [0.27, 0.31, 0.26, 1.0],
-            ],
-        ),
-        ResourceId::WaterIce => return Vec::new(),
+        ResourceId::SilicateRock | ResourceId::WaterIce => return Vec::new(),
     };
     parts
         .into_iter()
@@ -149,48 +151,53 @@ mod tests {
     };
 
     #[test]
-    fn ice_variant_follows_identity_and_authoritative_size() {
-        for id in [1, 2, 3, 4] {
-            for mass in [0.01, 2.0, 100.0] {
-                let mut fragment = ResourceFragment::new(
-                    FragmentId(id),
-                    DepositId {
-                        body: CelestialBodyId::Earth,
-                        local: 1,
-                    },
-                    RawMaterial::new(ResourceId::WaterIce, mass).unwrap(),
-                    ResourceTransform::new(WorldPosition::new(4.0, 5.0, 6.0), [0.0, 0.0, 0.0, 1.0])
+    fn authored_fragment_variants_follow_identity_and_authoritative_size() {
+        for resource in [ResourceId::WaterIce, ResourceId::SilicateRock] {
+            for id in [1, 2, 3, 4] {
+                for mass in [0.01, 2.0, 100.0] {
+                    let mut fragment = ResourceFragment::new(
+                        FragmentId(id),
+                        DepositId {
+                            body: CelestialBodyId::Earth,
+                            local: 1,
+                        },
+                        RawMaterial::new(resource, mass).unwrap(),
+                        ResourceTransform::new(
+                            WorldPosition::new(4.0, 5.0, 6.0),
+                            [0.0, 0.0, 0.0, 1.0],
+                        )
                         .unwrap(),
-                );
-                let visual = fragment_mesh(fragment).unwrap();
-                assert_eq!(
-                    visual.mesh,
-                    if id % 2 == 0 {
-                        ResourceMesh::IceShard
-                    } else {
-                        ResourceMesh::IceCluster
-                    }
-                );
-                assert_eq!(
-                    visual.side_meters,
-                    salimon_world::resource_fragments::side_meters(fragment)
-                );
-                assert_eq!(
-                    visual.center_meters,
-                    fragment.transform().position().meters()
-                );
-                assert!(fragment_visuals(fragment).is_empty());
-                fragment.set_transform(
-                    ResourceTransform::new(
-                        WorldPosition::new(1e12, 2e12, 3e12),
-                        [0.0, 0.0, 0.0, 1.0],
-                    )
-                    .unwrap(),
-                );
-                let moved = fragment_mesh(fragment).unwrap();
-                assert_eq!(moved.mesh, visual.mesh);
-                assert_eq!(moved.side_meters, visual.side_meters);
-                assert_eq!(fragment.material().mass_kg(), mass);
+                    );
+                    let visual = fragment_mesh(fragment).unwrap();
+                    let expected = match (resource, id % 2 == 0) {
+                        (ResourceId::WaterIce, true) => ResourceMesh::IceShard,
+                        (ResourceId::WaterIce, false) => ResourceMesh::IceCluster,
+                        (ResourceId::SilicateRock, true) => ResourceMesh::SilicateSlab,
+                        (ResourceId::SilicateRock, false) => ResourceMesh::SilicateRidge,
+                        (ResourceId::IronOre, _) => unreachable!(),
+                    };
+                    assert_eq!(visual.mesh, expected);
+                    assert_eq!(
+                        visual.side_meters,
+                        salimon_world::resource_fragments::side_meters(fragment)
+                    );
+                    assert_eq!(
+                        visual.center_meters,
+                        fragment.transform().position().meters()
+                    );
+                    assert!(fragment_visuals(fragment).is_empty());
+                    fragment.set_transform(
+                        ResourceTransform::new(
+                            WorldPosition::new(1e12, 2e12, 3e12),
+                            [0.0, 0.0, 0.0, 1.0],
+                        )
+                        .unwrap(),
+                    );
+                    let moved = fragment_mesh(fragment).unwrap();
+                    assert_eq!(moved.mesh, visual.mesh);
+                    assert_eq!(moved.side_meters, visual.side_meters);
+                    assert_eq!(fragment.material().mass_kg(), mass);
+                }
             }
         }
     }
@@ -209,7 +216,8 @@ mod tests {
                 RawMaterial::new(material.id, 2.0).unwrap(),
                 ResourceTransform::new(center, [0.0, 0.0, 0.0, 1.0]).unwrap(),
             );
-            if material.id == ResourceId::WaterIce {
+            if matches!(material.id, ResourceId::WaterIce | ResourceId::SilicateRock) {
+                assert!(fragment_mesh(piece).is_some());
                 assert!(fragment_visuals(piece).is_empty());
                 continue;
             }

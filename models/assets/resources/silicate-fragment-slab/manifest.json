@@ -1,0 +1,30 @@
+{
+  "$schema": "../../../asset-manifest.schema.json",
+  "schemaVersion": 1,
+  "assetId": "resource.silicate-fragment-slab",
+  "category": "resources",
+  "source": "models/assets/resources/silicate-fragment-slab/source.blend",
+  "runtime": "client/assets/resources/silicate-fragment-slab/model.glb",
+  "coordinates": {
+    "units": "meters",
+    "source": {"up": "+Z", "forward": "+X", "unitScale": 1},
+    "runtime": {"up": "+Y", "forward": "+X"},
+    "conversion": "x,z,-y",
+    "pivot": "Center of authoritative unit bounding cube; geometry inside [-0.48, 0.48] meters"
+  },
+  "profile": "standard-v1",
+  "budgets": {"maxTriangles": 64, "maxPrimitives": 2, "maxMaterials": 2, "maxTextureBytes": 1, "maxGlbBytes": 16384},
+  "collision": {"policy": "none"},
+  "contracts": {
+    "root": "ASSET_silicate-fragment-slab",
+    "visualGroups": ["Visual"],
+    "groups": ["Visual"],
+    "nodes": ["Silicate_Fragment"],
+    "materials": ["Silicate_Dark", "Silicate_Light"],
+    "sockets": [], "markers": [], "colliders": [],
+    "requiredExtras": [
+      {"node": "ASSET_silicate-fragment-slab", "path": "salimon.assetId"},
+      {"node": "Silicate_Fragment", "path": "salimon.role"}
+    ]
+  }
+}

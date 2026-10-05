@@ -123,15 +123,8 @@ impl MiningTool {
         ) else {
             return Vec::new();
         };
-        let marker = SceneInstance {
-            center_meters: std::array::from_fn(|i| {
-                player.eye_position_meters[i] + ray.direction[i] * 0.5
-            }),
-            half_extents_meters: [0.002; 3],
-            color: [0.9, 0.9, 0.9, 1.0],
-        };
         if !self.equipped {
-            return vec![marker];
+            return Vec::new();
         }
         let up = player.up.map(f64::from);
         let right = [
@@ -164,11 +157,41 @@ impl MiningTool {
                 half_extents_meters: [0.03, 0.05, 0.03],
                 color: [0.15, 0.17, 0.20, 1.0],
             },
-            marker,
         ]
     }
 }
 
 fn position(p: [f64; 3]) -> WorldPosition {
     WorldPosition::new(p[0], p[1], p[2])
+}
+
+#[cfg(test)]
+mod tests {
+    use super::MiningTool;
+    use salimon_character::{CharacterLocation, CharacterSnapshot};
+
+    #[test]
+    fn tool_visuals_never_emit_the_old_world_space_aim_marker() {
+        let mut tool = MiningTool::default();
+        for look_target_meters in [[1.0, 0.0, 0.0], [0.1, 0.9, 0.0], [0.1, -0.9, 0.0]] {
+            let player = CharacterSnapshot {
+                location: CharacterLocation::Surface,
+                eye_position_meters: [0.0; 3],
+                look_target_meters,
+                up: [0.0, 1.0, 0.0],
+                local_ship_position_meters: None,
+                doorway_blend_fraction: None,
+            };
+            assert!(tool.visuals(player, false).is_empty());
+            tool.toggle();
+            let visuals = tool.visuals(player, false);
+            assert_eq!(visuals.len(), 3);
+            assert!(
+                visuals
+                    .iter()
+                    .all(|part| part.half_extents_meters != [0.002; 3])
+            );
+            tool.toggle();
+        }
+    }
 }

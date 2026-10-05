@@ -95,3 +95,13 @@ analytic spheres for distant presentation. Preserve the dependency direction: do
 modules produce absolute snapshots, the runtime maps them into presentation
 DTOs without doing precision conversion, and the renderer remains a GPU
 consumer rather than an authoritative state owner.
+
+## Centered gameplay overlay
+
+`Renderer::render` accepts an independent borrowed reticle image in addition to
+its diagnostics and action-bar images. `OverlayPlacement::Center` maps the image
+midpoint to drawable center (NDC zero) using the current surface configuration on
+every prepare, including after resize/reconstruction. The existing alpha image
+pipeline draws it after the scene with depth comparison Always and no depth
+writes. Cached pixels change only with the supplied revision; gameplay equipment
+policy stays in runtime. Total draw calls include the visible reticle draw.

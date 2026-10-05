@@ -76,3 +76,8 @@
 - Focus loss, cursor release, view switch, and stowing clear held mining input.
 - Fragment presentation/inspection read world-owned physical entities; neither
   can mutate mass or allocate output. Stowing does not remove fragments.
+
+- Gameplay aiming uses a screen-space centered dot when the tool is stowed and
+  `+` when equipped, selected from the actual equip state every redraw. Camera
+  pitch/yaw, location and drawable resize do not shift it. Precision tour hides
+  it. No world-space aim cuboid is emitted; interaction/mining rays are unchanged.

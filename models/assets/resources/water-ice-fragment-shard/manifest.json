@@ -1,0 +1,62 @@
+{
+  "$schema": "../../../asset-manifest.schema.json",
+  "schemaVersion": 1,
+  "assetId": "resource.water-ice-fragment-shard",
+  "category": "resources",
+  "source": "models/assets/resources/water-ice-fragment-shard/source.blend",
+  "runtime": "client/assets/resources/water-ice-fragment-shard/model.glb",
+  "coordinates": {
+    "units": "meters",
+    "source": {
+      "up": "+Z",
+      "forward": "+X",
+      "unitScale": 1
+    },
+    "runtime": {
+      "up": "+Y",
+      "forward": "+X"
+    },
+    "conversion": "x,z,-y",
+    "pivot": "Center of authoritative unit bounding cube; geometry inside [-0.48, 0.48] meters"
+  },
+  "profile": "standard-v1",
+  "budgets": {
+    "maxTriangles": 200,
+    "maxPrimitives": 2,
+    "maxMaterials": 2,
+    "maxTextureBytes": 1,
+    "maxGlbBytes": 32768
+  },
+  "collision": {
+    "policy": "none"
+  },
+  "contracts": {
+    "root": "ASSET_water-ice-fragment-shard",
+    "visualGroups": [
+      "Visual"
+    ],
+    "groups": [
+      "Visual"
+    ],
+    "nodes": [
+      "Ice_Fragment"
+    ],
+    "materials": [
+      "Ice_Blue",
+      "Ice_Frost"
+    ],
+    "sockets": [],
+    "markers": [],
+    "colliders": [],
+    "requiredExtras": [
+      {
+        "node": "ASSET_water-ice-fragment-shard",
+        "path": "salimon.assetId"
+      },
+      {
+        "node": "Ice_Fragment",
+        "path": "salimon.role"
+      }
+    ]
+  }
+}

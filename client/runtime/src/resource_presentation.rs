@@ -1,5 +1,5 @@
-//! Composition-only mapping: world owns generated deposits; GPU receives generic cuboids.
-use salimon_renderer::SceneInstance;
+//! Composition-only resource mapping; world retains physical state.
+use salimon_renderer::{ResourceMesh, ResourceMeshInstance, SceneInstance};
 use salimon_world::resource_distribution::default_resource_distribution;
 use salimon_world::resource_generation::{
     GenerationError, SurfaceDeposit, materialize_nearby_deposits,
@@ -76,7 +76,20 @@ pub(crate) fn fragment_visual(fragment: ResourceFragment) -> SceneInstance {
     }
 }
 
-/// Three low-cost cuboids give each material a recognizable silhouette while
+/// Identity alone chooses the authored variant; movement and mass cannot change it.
+pub(crate) fn fragment_mesh(fragment: ResourceFragment) -> Option<ResourceMeshInstance> {
+    (fragment.material().resource() == ResourceId::WaterIce).then(|| ResourceMeshInstance {
+        mesh: if fragment.id().0.is_multiple_of(2) {
+            ResourceMesh::IceShard
+        } else {
+            ResourceMesh::IceCluster
+        },
+        center_meters: fragment.transform().position().meters(),
+        side_meters: salimon_world::resource_fragments::side_meters(fragment),
+    })
+}
+
+/// Three low-cost cuboids give unmigrated materials a recognizable silhouette while
 /// keeping all pieces inside the physical fragment's bounding cube.
 pub(crate) fn fragment_visuals(fragment: ResourceFragment) -> Vec<SceneInstance> {
     type ShapeParts = [([f64; 3], [f64; 3]); 3];
@@ -113,18 +126,7 @@ pub(crate) fn fragment_visuals(fragment: ResourceFragment) -> Vec<SceneInstance>
                 [0.27, 0.31, 0.26, 1.0],
             ],
         ),
-        ResourceId::WaterIce => (
-            [
-                ([0.0, 0.0, 0.0], [0.26, 0.50, 0.27]),
-                ([0.25 * flip, -0.16, 0.10], [0.14, 0.32, 0.17]),
-                ([-0.20 * flip, -0.23, -0.14], [0.12, 0.25, 0.13]),
-            ],
-            [
-                [0.28, 0.78, 0.94, 1.0],
-                [0.64, 0.96, 1.0, 1.0],
-                [0.13, 0.51, 0.77, 1.0],
-            ],
-        ),
+        ResourceId::WaterIce => return Vec::new(),
     };
     parts
         .into_iter()
@@ -147,6 +149,53 @@ mod tests {
     };
 
     #[test]
+    fn ice_variant_follows_identity_and_authoritative_size() {
+        for id in [1, 2, 3, 4] {
+            for mass in [0.01, 2.0, 100.0] {
+                let mut fragment = ResourceFragment::new(
+                    FragmentId(id),
+                    DepositId {
+                        body: CelestialBodyId::Earth,
+                        local: 1,
+                    },
+                    RawMaterial::new(ResourceId::WaterIce, mass).unwrap(),
+                    ResourceTransform::new(WorldPosition::new(4.0, 5.0, 6.0), [0.0, 0.0, 0.0, 1.0])
+                        .unwrap(),
+                );
+                let visual = fragment_mesh(fragment).unwrap();
+                assert_eq!(
+                    visual.mesh,
+                    if id % 2 == 0 {
+                        ResourceMesh::IceShard
+                    } else {
+                        ResourceMesh::IceCluster
+                    }
+                );
+                assert_eq!(
+                    visual.side_meters,
+                    salimon_world::resource_fragments::side_meters(fragment)
+                );
+                assert_eq!(
+                    visual.center_meters,
+                    fragment.transform().position().meters()
+                );
+                assert!(fragment_visuals(fragment).is_empty());
+                fragment.set_transform(
+                    ResourceTransform::new(
+                        WorldPosition::new(1e12, 2e12, 3e12),
+                        [0.0, 0.0, 0.0, 1.0],
+                    )
+                    .unwrap(),
+                );
+                let moved = fragment_mesh(fragment).unwrap();
+                assert_eq!(moved.mesh, visual.mesh);
+                assert_eq!(moved.side_meters, visual.side_meters);
+                assert_eq!(fragment.material().mass_kg(), mass);
+            }
+        }
+    }
+
+    #[test]
     fn fragment_materials_have_distinct_silhouettes_and_accents() {
         let mut shapes = Vec::new();
         for material in RESOURCE_CATALOG {
@@ -160,6 +209,10 @@ mod tests {
                 RawMaterial::new(material.id, 2.0).unwrap(),
                 ResourceTransform::new(center, [0.0, 0.0, 0.0, 1.0]).unwrap(),
             );
+            if material.id == ResourceId::WaterIce {
+                assert!(fragment_visuals(piece).is_empty());
+                continue;
+            }
             let visuals = fragment_visuals(piece);
             assert_eq!(visuals.len(), 3);
             let side = salimon_world::resource_fragments::side_meters(piece);

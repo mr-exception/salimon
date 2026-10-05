@@ -117,3 +117,14 @@ every prepare, including after resize/reconstruction. The existing alpha image
 pipeline draws it after the scene with depth comparison Always and no depth
 writes. Cached pixels change only with the supplied revision; gameplay equipment
 policy stays in runtime. Total draw calls include the visible reticle draw.
+
+## Authored ice fragments
+
+`resource_mesh.rs` loads two checked-in water-ice GLBs at initialization and
+validates their baked identity transforms and ±0.48 m local bounds. Runtime maps
+stable variant choice, absolute center and authoritative side into
+`ResourceMeshInstance`; the renderer subtracts camera position in `f64` before
+narrowing scaled vertices. Both variants share one opaque reverse-Z draw with
+flat material colors and inexpensive local facet shading. No transparency,
+textures or gameplay-domain dependency is added. Geometry buffers grow only
+when needed; diagnostics count individual fragments and the single batch draw.

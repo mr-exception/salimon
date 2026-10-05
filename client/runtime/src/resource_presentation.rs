@@ -202,7 +202,7 @@ mod tests {
     fn every_material_has_distinct_bounded_geometry_at_its_exact_anchor() {
         let mut appearances = Vec::new();
         for material in RESOURCE_CATALOG
-            .into_iter()
+            .iter()
             .filter(|m| m.id != ResourceId::WaterIce)
         {
             let position = WorldPosition::new(1e12, -7.5e11, 2.5e11);

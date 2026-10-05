@@ -17,6 +17,7 @@ pub enum OverlayPlacement {
     #[default]
     TopLeft,
     BottomCenter,
+    Center,
 }
 
 impl OverlayImage<'_> {
@@ -79,6 +80,10 @@ fn overlay_origin(
 ) -> [f32; 2] {
     match placement {
         OverlayPlacement::TopLeft => [OVERLAY_MARGIN_PIXELS as f32; 2],
+        OverlayPlacement::Center => [
+            (surface_size[0] as f32 - display_size[0]) * 0.5,
+            (surface_size[1] as f32 - display_size[1]) * 0.5,
+        ],
         OverlayPlacement::BottomCenter => [
             (surface_size[0] as f32 - display_size[0]).max(0.0) * 0.5,
             (surface_size[1] as f32 - OVERLAY_MARGIN_PIXELS as f32 - display_size[1]).max(0.0),
@@ -357,6 +362,20 @@ mod tests {
             overlay_origin([1280, 720], [600.0, 80.0], OverlayPlacement::TopLeft),
             [16.0, 16.0]
         );
+    }
+
+    #[test]
+    fn centered_overlay_matches_the_projection_center_after_resize() {
+        for surface in [[1280, 720], [1920, 1080], [801, 603], [360, 640], [16, 16]] {
+            let size = fitted_overlay_size(surface, [17, 17]);
+            let origin = overlay_origin(surface, size, OverlayPlacement::Center);
+            // The overlay shader maps this midpoint to NDC (0, 0), the camera ray.
+            for axis in 0..2 {
+                let midpoint = origin[axis] + size[axis] * 0.5;
+                assert_eq!(midpoint, surface[axis] as f32 * 0.5);
+                assert_eq!(midpoint / surface[axis] as f32 * 2.0 - 1.0, 0.0);
+            }
+        }
     }
 
     #[test]

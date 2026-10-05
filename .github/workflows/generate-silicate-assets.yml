@@ -24,6 +24,8 @@ jobs:
           sudo apt-get install -y blender python3-numpy
           python -m pip install -r models/tools/requirements.txt
       - name: Generate editable sources and runtime exports
+        env:
+          PYTHONPATH: /usr/lib/python3/dist-packages
         run: |
           blender --background --factory-startup --python-exit-code 1 --python models/assets/resources/silicate-fragment-slab/create_source.py
           blender --background --factory-startup --python-exit-code 1 --python models/assets/resources/silicate-fragment-ridge/create_source.py

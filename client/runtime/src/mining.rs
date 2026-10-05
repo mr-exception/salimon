@@ -113,7 +113,7 @@ impl MiningTool {
         self.session.extract(&mut entry.deposit, delta);
     }
 
-    pub(crate) fn visuals(&self, player: CharacterSnapshot, active: bool) -> Vec<SceneInstance> {
+    pub(crate) fn visuals(&self, player: CharacterSnapshot) -> Vec<SceneInstance> {
         if player.location != CharacterLocation::Surface {
             return Vec::new();
         }
@@ -130,42 +130,7 @@ impl MiningTool {
             half_extents_meters: [0.002; 3],
             color: [0.9, 0.9, 0.9, 1.0],
         };
-        if !self.equipped {
-            return vec![marker];
-        }
-        let up = player.up.map(f64::from);
-        let right = [
-            ray.direction[1] * up[2] - ray.direction[2] * up[1],
-            ray.direction[2] * up[0] - ray.direction[0] * up[2],
-            ray.direction[0] * up[1] - ray.direction[1] * up[0],
-        ];
-        let center = std::array::from_fn(|i| {
-            player.eye_position_meters[i] + ray.direction[i] * 0.55 + right[i] * 0.20 - up[i] * 0.20
-        });
-        vec![
-            SceneInstance {
-                center_meters: center,
-                half_extents_meters: [0.06, 0.06, 0.06],
-                color: [0.24, 0.27, 0.30, 1.0],
-            },
-            SceneInstance {
-                center_meters: std::array::from_fn(|i| {
-                    center[i] - ray.direction[i] * 0.07 + up[i] * 0.04
-                }),
-                half_extents_meters: [0.035, 0.035, 0.035],
-                color: if active {
-                    [0.2, 1.0, 0.8, 1.0]
-                } else {
-                    [0.9, 0.6, 0.15, 1.0]
-                },
-            },
-            SceneInstance {
-                center_meters: std::array::from_fn(|i| center[i] - up[i] * 0.08),
-                half_extents_meters: [0.03, 0.05, 0.03],
-                color: [0.15, 0.17, 0.20, 1.0],
-            },
-            marker,
-        ]
+        vec![marker]
     }
 }
 

@@ -5,6 +5,7 @@
 
 mod cockpit_instruments;
 mod gpu_timing;
+mod held_item;
 mod overlay;
 mod ship_mesh;
 mod spheres;
@@ -16,6 +17,7 @@ use std::time::Duration;
 
 pub use cockpit_instruments::{CockpitInstruments, NearbyBodyInstruments};
 use gpu_timing::GpuTimer;
+pub use held_item::HeldItemInstance;
 pub use overlay::{OverlayImage, OverlayPlacement};
 pub use ship_mesh::ShipMeshInstance;
 pub use spheres::{PointLight, SphereInstance, SurfaceMaterial};
@@ -106,6 +108,7 @@ pub struct SceneFrame<'a> {
     pub spheres: &'a [SphereInstance],
     pub light: Option<PointLight>,
     pub ship: Option<ShipMeshInstance>,
+    pub held_item: Option<HeldItemInstance>,
 }
 
 /// Physical pixel dimensions for the renderer's presentation surface.
@@ -609,6 +612,7 @@ pub struct Renderer {
     action_bar: overlay::OverlayRenderer,
     spheres: spheres::SphereRenderer,
     ship_mesh: ship_mesh::ShipMeshRenderer,
+    held_item: held_item::HeldItemRenderer,
     gpu_timer: Option<GpuTimer>,
     cached_gpu_memory: Option<GpuMemoryMetrics>,
     presented_frames: u64,
@@ -795,6 +799,7 @@ impl Renderer {
         let action_bar = overlay::OverlayRenderer::new(&device, configuration.format, DEPTH_FORMAT);
         let spheres = spheres::SphereRenderer::new(&device, &queue, configuration.format);
         let ship_mesh = ship_mesh::ShipMeshRenderer::new(&device, configuration.format)?;
+        let held_item = held_item::HeldItemRenderer::new(&device, configuration.format)?;
         let gpu_timer = timestamp_queries_supported.then(|| GpuTimer::new(&device, &queue));
 
         let mut renderer = Self {
@@ -813,6 +818,7 @@ impl Renderer {
             action_bar,
             spheres,
             ship_mesh,
+            held_item,
             gpu_timer,
             cached_gpu_memory: None,
             presented_frames: 0,
@@ -901,6 +907,8 @@ impl Renderer {
         )?;
         self.ship_mesh
             .prepare(&self.queue, scene, prepared_scene.view_projection)?;
+        self.held_item
+            .prepare(&self.queue, scene.camera, aspect_ratio, scene.held_item)?;
         self.ensure_instance_capacity(prepared_scene.instances.len())?;
         self.queue.write_buffer(
             &self.camera_buffer,
@@ -973,6 +981,7 @@ impl Renderer {
             }
             self.spheres.draw(&mut render_pass);
             self.ship_mesh.draw(&mut render_pass);
+            self.held_item.draw(&mut render_pass);
             self.overlay.draw(&mut render_pass);
             self.action_bar.draw(&mut render_pass);
         }
@@ -1005,9 +1014,12 @@ impl Renderer {
             u32::from(self.overlay.is_visible()) + u32::from(self.action_bar.is_visible());
         let scene_draw_calls = scene_draw_calls(prepared_scene.instance_count)
             + scene_draw_calls(self.spheres.count())
-            + self.ship_mesh.draw_count();
-        let object_count =
-            prepared_scene.instance_count + self.spheres.count() + self.ship_mesh.count();
+            + self.ship_mesh.draw_count()
+            + self.held_item.count();
+        let object_count = prepared_scene.instance_count
+            + self.spheres.count()
+            + self.ship_mesh.count()
+            + self.held_item.count();
         Ok(RenderOutcome::Presented(RenderStats {
             cpu_render_time,
             gpu_frame_time,
@@ -1126,6 +1138,7 @@ mod tests {
                 spheres: &[],
                 light: None,
                 ship: None,
+                held_item: None,
             },
             16.0 / 9.0,
         )
@@ -1144,6 +1157,7 @@ mod tests {
                 spheres: &[],
                 light: None,
                 ship: None,
+                held_item: None,
             },
             16.0 / 9.0,
         )
@@ -1187,6 +1201,7 @@ mod tests {
                     spheres: &[],
                     light: None,
                     ship: None,
+                    held_item: None,
                 },
                 1.0,
             ),
@@ -1206,6 +1221,7 @@ mod tests {
                     spheres: &[],
                     light: None,
                     ship: None,
+                    held_item: None,
                 },
                 1.0,
             ),
@@ -1244,6 +1260,7 @@ mod tests {
                 spheres: &[],
                 light: None,
                 ship: None,
+                held_item: None,
             },
             1.0,
         )

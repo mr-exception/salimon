@@ -54,3 +54,8 @@
     panels retain common thruster power. Only changed displayed values rebuild
     and upload their atlas panels; no target renders an explicit out-of-range state.
     Monitor UVs use top-left (0, 0); each named surface is exactly two triangles.
+
+20. Held mining-tool geometry is the checked-in authored GLB, grip-centered and
+    baked with identity node transforms. Camera-local presentation preserves
+    orientation through look/gravity changes and never supplies a gameplay ray.
+    Active feedback is presentation-only; normal reverse-Z depth applies.

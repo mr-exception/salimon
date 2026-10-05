@@ -76,3 +76,7 @@
 - Focus loss, cursor release, view switch, and stowing clear held mining input.
 - Fragment presentation/inspection read world-owned physical entities; neither
   can mutate mass or allocate output. Stowing does not remove fragments.
+
+- Authored handheld presentation is visible only in gameplay on the surface
+  while equipped; active feedback requires held input and a valid target. The
+  separate aim marker remains available when stowed.

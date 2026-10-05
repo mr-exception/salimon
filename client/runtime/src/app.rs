@@ -689,12 +689,7 @@ impl ClientApplication {
         }
         if self.view_mode == ViewMode::Gameplay {
             for fragment in self.mining.nearby_fragments(camera.position_meters) {
-                if let Some(mesh) = crate::resource_presentation::fragment_mesh(fragment) {
-                    resource_meshes.push(mesh);
-                } else {
-                    scene_instances
-                        .extend(crate::resource_presentation::fragment_visuals(fragment));
-                }
+                resource_meshes.push(crate::resource_presentation::fragment_mesh(fragment));
             }
         }
         let body_distances = camera_body_distances_from(world_snapshot, camera.position_meters);

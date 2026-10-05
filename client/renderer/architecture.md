@@ -120,7 +120,7 @@ policy stays in runtime. Total draw calls include the visible reticle draw.
 
 ## Authored resource fragments
 
-`resource_mesh.rs` loads checked-in water-ice and silicate fragment GLBs at initialization and
+`resource_mesh.rs` loads checked-in water-ice, silicate and iron fragment GLBs at initialization and
 validates their baked identity transforms and ±0.48 m local bounds. Runtime maps
 stable variant choice, absolute center and authoritative side into
 `ResourceMeshInstance`; the renderer subtracts camera position in `f64` before

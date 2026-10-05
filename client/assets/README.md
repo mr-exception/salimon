@@ -15,8 +15,9 @@ The first generic authored resource export is
 `resources/iron-fragment/model.glb`. Its editable Blender source, manifest,
 preview, and regeneration instructions live in
 [the iron fragment authoring directory](../../models/assets/resources/iron-fragment/README.md).
-It is ready for future consumer integration; current resource gameplay rendering
-does not load it yet.
+Runtime now embeds it as the even-ID iron chunk variant alongside
+`resources/iron-fragment-shard/model.glb` for odd IDs. Both use the authoritative
+fragment center and cube side; their visuals do not define mass or collision.
 
 The first generic authored item export is `items/cargo-container/model.glb`.
 Its source, manifest, preview, and editing/export instructions live in

@@ -1,10 +1,10 @@
 {
   "$schema": "../../../asset-manifest.schema.json",
   "schemaVersion": 1,
-  "assetId": "resource.iron-fragment",
+  "assetId": "resource.iron-fragment-shard",
   "category": "resources",
-  "source": "models/assets/resources/iron-fragment/source.blend",
-  "runtime": "client/assets/resources/iron-fragment/model.glb",
+  "source": "models/assets/resources/iron-fragment-shard/source.blend",
+  "runtime": "client/assets/resources/iron-fragment-shard/model.glb",
   "coordinates": {
     "units": "meters",
     "source": {
@@ -31,7 +31,7 @@
     "policy": "none"
   },
   "contracts": {
-    "root": "ASSET_iron-fragment",
+    "root": "ASSET_iron-fragment-shard",
     "visualGroups": [
       "Visual"
     ],
@@ -51,7 +51,7 @@
     "colliders": [],
     "requiredExtras": [
       {
-        "node": "ASSET_iron-fragment",
+        "node": "ASSET_iron-fragment-shard",
         "path": "salimon.assetId"
       },
       {

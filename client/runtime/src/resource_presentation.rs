@@ -77,7 +77,7 @@ pub(crate) fn fragment_visual(fragment: ResourceFragment) -> SceneInstance {
 }
 
 /// Identity alone chooses the authored variant; movement and mass cannot change it.
-pub(crate) fn fragment_mesh(fragment: ResourceFragment) -> Option<ResourceMeshInstance> {
+pub(crate) fn fragment_mesh(fragment: ResourceFragment) -> ResourceMeshInstance {
     let even = fragment.id().0.is_multiple_of(2);
     let mesh = match fragment.material().resource() {
         ResourceId::WaterIce => {
@@ -94,51 +94,19 @@ pub(crate) fn fragment_mesh(fragment: ResourceFragment) -> Option<ResourceMeshIn
                 ResourceMesh::SilicateRidge
             }
         }
-        ResourceId::IronOre => return None,
+        ResourceId::IronOre => {
+            if even {
+                ResourceMesh::IronChunk
+            } else {
+                ResourceMesh::IronShard
+            }
+        }
     };
-    Some(ResourceMeshInstance {
+    ResourceMeshInstance {
         mesh,
         center_meters: fragment.transform().position().meters(),
         side_meters: salimon_world::resource_fragments::side_meters(fragment),
-    })
-}
-
-/// Three low-cost cuboids give unmigrated materials a recognizable silhouette while
-/// keeping all pieces inside the physical fragment's bounding cube.
-pub(crate) fn fragment_visuals(fragment: ResourceFragment) -> Vec<SceneInstance> {
-    type ShapeParts = [([f64; 3], [f64; 3]); 3];
-    type ShapeColors = [[f32; 4]; 3];
-    let side = salimon_world::resource_fragments::side_meters(fragment);
-    let center = fragment.transform().position().meters();
-    let flip = if fragment.id().0.is_multiple_of(2) {
-        -1.0
-    } else {
-        1.0
-    };
-    let (parts, colors): (ShapeParts, ShapeColors) = match fragment.material().resource() {
-        ResourceId::IronOre => (
-            [
-                ([0.0, -0.09, 0.0], [0.43, 0.31, 0.37]),
-                ([0.22 * flip, 0.22, -0.13], [0.19, 0.23, 0.18]),
-                ([-0.25 * flip, 0.04, 0.22], [0.18, 0.18, 0.16]),
-            ],
-            [
-                [0.55, 0.16, 0.10, 1.0],
-                [0.96, 0.40, 0.12, 1.0],
-                [0.28, 0.22, 0.20, 1.0],
-            ],
-        ),
-        ResourceId::SilicateRock | ResourceId::WaterIce => return Vec::new(),
-    };
-    parts
-        .into_iter()
-        .zip(colors)
-        .map(|((offset, extent), color)| SceneInstance {
-            center_meters: std::array::from_fn(|i| center[i] + offset[i] * side),
-            half_extents_meters: extent.map(|v| (v * side) as f32),
-            color,
-        })
-        .collect()
+    }
 }
 
 #[cfg(test)]
@@ -152,7 +120,11 @@ mod tests {
 
     #[test]
     fn authored_fragment_variants_follow_identity_and_authoritative_size() {
-        for resource in [ResourceId::WaterIce, ResourceId::SilicateRock] {
+        for resource in [
+            ResourceId::WaterIce,
+            ResourceId::SilicateRock,
+            ResourceId::IronOre,
+        ] {
             for id in [1, 2, 3, 4] {
                 for mass in [0.01, 2.0, 100.0] {
                     let mut fragment = ResourceFragment::new(
@@ -168,13 +140,14 @@ mod tests {
                         )
                         .unwrap(),
                     );
-                    let visual = fragment_mesh(fragment).unwrap();
+                    let visual = fragment_mesh(fragment);
                     let expected = match (resource, id % 2 == 0) {
                         (ResourceId::WaterIce, true) => ResourceMesh::IceShard,
                         (ResourceId::WaterIce, false) => ResourceMesh::IceCluster,
                         (ResourceId::SilicateRock, true) => ResourceMesh::SilicateSlab,
                         (ResourceId::SilicateRock, false) => ResourceMesh::SilicateRidge,
-                        (ResourceId::IronOre, _) => unreachable!(),
+                        (ResourceId::IronOre, true) => ResourceMesh::IronChunk,
+                        (ResourceId::IronOre, false) => ResourceMesh::IronShard,
                     };
                     assert_eq!(visual.mesh, expected);
                     assert_eq!(
@@ -185,7 +158,6 @@ mod tests {
                         visual.center_meters,
                         fragment.transform().position().meters()
                     );
-                    assert!(fragment_visuals(fragment).is_empty());
                     fragment.set_transform(
                         ResourceTransform::new(
                             WorldPosition::new(1e12, 2e12, 3e12),
@@ -193,59 +165,12 @@ mod tests {
                         )
                         .unwrap(),
                     );
-                    let moved = fragment_mesh(fragment).unwrap();
+                    let moved = fragment_mesh(fragment);
                     assert_eq!(moved.mesh, visual.mesh);
                     assert_eq!(moved.side_meters, visual.side_meters);
                     assert_eq!(fragment.material().mass_kg(), mass);
                 }
             }
-        }
-    }
-
-    #[test]
-    fn fragment_materials_have_distinct_silhouettes_and_accents() {
-        let mut shapes = Vec::new();
-        for material in RESOURCE_CATALOG {
-            let center = WorldPosition::new(4.0, 5.0, 6.0);
-            let piece = ResourceFragment::new(
-                FragmentId(1),
-                DepositId {
-                    body: CelestialBodyId::Earth,
-                    local: 1,
-                },
-                RawMaterial::new(material.id, 2.0).unwrap(),
-                ResourceTransform::new(center, [0.0, 0.0, 0.0, 1.0]).unwrap(),
-            );
-            if matches!(material.id, ResourceId::WaterIce | ResourceId::SilicateRock) {
-                assert!(fragment_mesh(piece).is_some());
-                assert!(fragment_visuals(piece).is_empty());
-                continue;
-            }
-            let visuals = fragment_visuals(piece);
-            assert_eq!(visuals.len(), 3);
-            let side = salimon_world::resource_fragments::side_meters(piece);
-            for visual in &visuals {
-                for axis in 0..3 {
-                    assert!(
-                        (visual.center_meters[axis] - center.meters()[axis]).abs()
-                            + f64::from(visual.half_extents_meters[axis])
-                            <= side * 0.51
-                    );
-                }
-            }
-            let signature: Vec<_> = visuals
-                .iter()
-                .map(|part| (part.half_extents_meters, part.color))
-                .collect();
-            assert!(!shapes.contains(&signature));
-            shapes.push(signature);
-            let alternate = ResourceFragment::new(
-                FragmentId(2),
-                piece.source(),
-                piece.material(),
-                piece.transform(),
-            );
-            assert_ne!(visuals, fragment_visuals(alternate));
         }
     }
 

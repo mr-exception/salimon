@@ -129,8 +129,8 @@ so the existing overlay texture cache uploads only on state changes.
 
 `resource_presentation::fragment_mesh` selects one of two Blender exports by
 stable fragment ID parity and supplies the world-owned position/physical side.
-Water ice and silicate rock emit no procedural cuboids; iron ore retains its
-existing presentation. Silicate uses slab/ridge variants with the same stable
-identity and authoritative-size rules. Rotation remains presentation-independent as before;
+All materials emit authored meshes without procedural fragment cuboids. Iron
+uses the evolved original chunk and a taller shard; silicate uses slab/ridge
+variants. Each follows the same stable identity and authoritative-size rules. Rotation remains presentation-independent as before;
 carried, dropped, ship-local and streamed pieces use the same identity mapping.
 World mass/volume and runtime contact/carrying controllers are unchanged.

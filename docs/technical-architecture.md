@@ -112,3 +112,15 @@ assessment and machine-specific benchmark limits. Older task reports and
 replace the former Notion task database and worker-selection instructions.
 The maintenance goal is a focused change whose owners, contracts and useful
 checks can be identified without reading unrelated domains.
+
+## Authored water-ice deposits (#88)
+
+Four opaque Blender-authored spire/crown/ridge/shelf exports use the shared
+resource mesh batch. Runtime selects `DepositId.local % 4` in that order and
+emits no water-ice cuboid. Depleted deposits emit no authored visual. Baked
+coordinates fit ±0.48 m; uniform scaling by `bounds_radius_meters /
+(0.48 * sqrt(3))` inscribes the visual cube in the authoritative spherical bound
+at its absolute deposit center, at every body/latitude. Variant choice ignores
+query order, camera, streaming and remaining mass. World generation, mining,
+mass, session persistence and streaming rules are unchanged. See the
+[asset guide](../models/assets/resources/water-ice-deposit-spire/README.md).

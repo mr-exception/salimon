@@ -127,4 +127,16 @@ stable variant choice, absolute center and authoritative side into
 narrowing scaled vertices. All authored variants share one opaque reverse-Z draw with
 flat material colors and inexpensive local facet shading. No transparency,
 textures or gameplay-domain dependency is added. Geometry buffers grow only
-when needed; diagnostics count individual fragments and the single batch draw.
+when needed; diagnostics count individual resource instances and the single batch draw.
+
+## Authored water-ice deposits (#88)
+
+Four opaque Blender-authored spire/crown/ridge/shelf exports use the shared
+resource mesh batch. Runtime selects `DepositId.local % 4` in that order and
+emits no water-ice cuboid. Depleted deposits emit no authored visual. Baked
+coordinates fit ±0.48 m; uniform scaling by `bounds_radius_meters /
+(0.48 * sqrt(3))` inscribes the visual cube in the authoritative spherical bound
+at its absolute deposit center, at every body/latitude. Variant choice ignores
+query order, camera, streaming and remaining mass. World generation, mining,
+mass, session persistence and streaming rules are unchanged. See the
+[asset guide](../../models/assets/resources/water-ice-deposit-spire/README.md).

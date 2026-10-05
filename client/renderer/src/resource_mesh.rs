@@ -1,13 +1,17 @@
 //! Static authored resource meshes, batched into one opaque depth-tested draw.
 use crate::{CameraFrame, DEPTH_FORMAT, RendererError, encode_f32s};
 const FLOATS: usize = 7;
-const ASSETS: [&[u8]; 6] = [
+const ASSETS: [&[u8]; 10] = [
     include_bytes!("../../assets/resources/water-ice-fragment-shard/model.glb"),
     include_bytes!("../../assets/resources/water-ice-fragment-cluster/model.glb"),
     include_bytes!("../../assets/resources/silicate-fragment-slab/model.glb"),
     include_bytes!("../../assets/resources/silicate-fragment-ridge/model.glb"),
     include_bytes!("../../assets/resources/iron-fragment/model.glb"),
     include_bytes!("../../assets/resources/iron-fragment-shard/model.glb"),
+    include_bytes!("../../assets/resources/water-ice-deposit-spire/model.glb"),
+    include_bytes!("../../assets/resources/water-ice-deposit-crown/model.glb"),
+    include_bytes!("../../assets/resources/water-ice-deposit-ridge/model.glb"),
+    include_bytes!("../../assets/resources/water-ice-deposit-shelf/model.glb"),
 ];
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ResourceMesh {
@@ -17,18 +21,23 @@ pub enum ResourceMesh {
     SilicateRidge,
     IronChunk,
     IronShard,
+    IceDepositSpire,
+    IceDepositCrown,
+    IceDepositRidge,
+    IceDepositShelf,
 }
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ResourceMeshInstance {
     pub mesh: ResourceMesh,
     pub center_meters: [f64; 3],
-    /// Uniform visual scale from the authoritative bounding cube side.
+    /// Uniform visual scale; runtime inscribes deposits in their authoritative sphere.
+    /// Fragments use their authoritative bounding cube side.
     pub side_meters: f64,
 }
 fn geometry(bytes: &[u8]) -> Result<Vec<[f32; FLOATS]>, RendererError> {
-    let fail = |message: &str| RendererError::new("load resource fragment", message);
-    let asset = gltf::Gltf::from_slice(bytes)
-        .map_err(|e| RendererError::new("load resource fragment", e))?;
+    let fail = |message: &str| RendererError::new("load resource mesh", message);
+    let asset =
+        gltf::Gltf::from_slice(bytes).map_err(|e| RendererError::new("load resource mesh", e))?;
     let blob = asset
         .blob
         .as_deref()
@@ -93,7 +102,7 @@ fn geometry(bytes: &[u8]) -> Result<Vec<[f32; FLOATS]>, RendererError> {
     Ok(vertices)
 }
 fn relative_vertices(
-    meshes: &[Vec<[f32; FLOATS]>; 6],
+    meshes: &[Vec<[f32; FLOATS]>; 10],
     instances: &[ResourceMeshInstance],
     camera: CameraFrame,
 ) -> Result<Vec<f32>, RendererError> {
@@ -115,6 +124,10 @@ fn relative_vertices(
             ResourceMesh::SilicateRidge => 3,
             ResourceMesh::IronChunk => 4,
             ResourceMesh::IronShard => 5,
+            ResourceMesh::IceDepositSpire => 6,
+            ResourceMesh::IceDepositCrown => 7,
+            ResourceMesh::IceDepositRidge => 8,
+            ResourceMesh::IceDepositShelf => 9,
         };
         for vertex in &meshes[mesh] {
             for (axis, value) in vertex.iter().take(3).enumerate() {
@@ -133,7 +146,7 @@ pub(crate) struct ResourceMeshRenderer {
     uniform: wgpu::Buffer,
     binding: wgpu::BindGroup,
     vertices: wgpu::Buffer,
-    meshes: [Vec<[f32; FLOATS]>; 6],
+    meshes: [Vec<[f32; FLOATS]>; 10],
     capacity: usize,
     count: u32,
     objects: u32,
@@ -150,6 +163,10 @@ impl ResourceMeshRenderer {
             geometry(ASSETS[3])?,
             geometry(ASSETS[4])?,
             geometry(ASSETS[5])?,
+            geometry(ASSETS[6])?,
+            geometry(ASSETS[7])?,
+            geometry(ASSETS[8])?,
+            geometry(ASSETS[9])?,
         ];
         let vertices = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("Resource vertices"),
@@ -294,7 +311,7 @@ mod tests {
             }
         }
         for mesh in meshes {
-            assert!(mesh.len() / 3 <= 200);
+            assert!(mesh.len() / 3 <= 240);
             assert!(mesh.iter().all(|v| v[..3].iter().all(|p| p.abs() <= 0.48)));
         }
     }
@@ -315,6 +332,10 @@ mod tests {
             ResourceMesh::SilicateRidge,
             ResourceMesh::IronChunk,
             ResourceMesh::IronShard,
+            ResourceMesh::IceDepositSpire,
+            ResourceMesh::IceDepositCrown,
+            ResourceMesh::IceDepositRidge,
+            ResourceMesh::IceDepositShelf,
         ] {
             for side in [0.01, 0.5, 3.0] {
                 let instance = ResourceMeshInstance {

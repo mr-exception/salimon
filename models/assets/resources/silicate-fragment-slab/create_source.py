@@ -1,4 +1,4 @@
-"""Deterministic low-poly silicate slab recipe for Blender 4.5 LTS."""
+"""Deterministic low-poly silicate slab recipe for Blender 4.x."""
 from pathlib import Path
 import bpy
 

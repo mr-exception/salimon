@@ -618,6 +618,7 @@ impl ClientApplication {
         let world_snapshot = self.camera_prototype.snapshot();
         let (mut camera, mut scene_instances, spheres, light) =
             map_world_to_renderer(world_snapshot);
+        let mut resource_meshes = Vec::new();
         let character_snapshot = self.character.snapshot(ship_frame, surface_frame);
         let monitor_message = self.ship.contextual_cockpit_message();
         let interaction = if self.view_mode == ViewMode::Gameplay
@@ -687,11 +688,14 @@ impl ClientApplication {
             }
         }
         if self.view_mode == ViewMode::Gameplay {
-            scene_instances.extend(
-                self.mining
-                    .nearby_fragments(camera.position_meters)
-                    .flat_map(crate::resource_presentation::fragment_visuals),
-            );
+            for fragment in self.mining.nearby_fragments(camera.position_meters) {
+                if let Some(mesh) = crate::resource_presentation::fragment_mesh(fragment) {
+                    resource_meshes.push(mesh);
+                } else {
+                    scene_instances
+                        .extend(crate::resource_presentation::fragment_visuals(fragment));
+                }
+            }
         }
         let body_distances = camera_body_distances_from(world_snapshot, camera.position_meters);
         let cpu_update_time = update_started_at.elapsed();
@@ -723,6 +727,7 @@ impl ClientApplication {
                 SceneFrame {
                     camera,
                     instances: &scene_instances,
+                    resource_meshes: &resource_meshes,
                     spheres: &spheres,
                     light: Some(light),
                     ship: ship_mesh,

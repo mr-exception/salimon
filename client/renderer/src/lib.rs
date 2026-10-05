@@ -7,6 +7,7 @@ mod cockpit_instruments;
 mod gpu_timing;
 mod held_item;
 mod overlay;
+mod resource_mesh;
 mod ship_mesh;
 mod spheres;
 mod surface_textures;
@@ -19,6 +20,7 @@ pub use cockpit_instruments::{CockpitInstruments, NearbyBodyInstruments};
 use gpu_timing::GpuTimer;
 pub use held_item::HeldItemInstance;
 pub use overlay::{OverlayImage, OverlayPlacement};
+pub use resource_mesh::{ResourceMesh, ResourceMeshInstance};
 pub use ship_mesh::ShipMeshInstance;
 pub use spheres::{PointLight, SphereInstance, SurfaceMaterial};
 use wgpu::util::DeviceExt;
@@ -105,6 +107,7 @@ pub struct SceneInstance {
 pub struct SceneFrame<'a> {
     pub camera: CameraFrame,
     pub instances: &'a [SceneInstance],
+    pub resource_meshes: &'a [ResourceMeshInstance],
     pub spheres: &'a [SphereInstance],
     pub light: Option<PointLight>,
     pub ship: Option<ShipMeshInstance>,
@@ -614,6 +617,7 @@ pub struct Renderer {
     spheres: spheres::SphereRenderer,
     ship_mesh: ship_mesh::ShipMeshRenderer,
     held_item: held_item::HeldItemRenderer,
+    resource_meshes: resource_mesh::ResourceMeshRenderer,
     gpu_timer: Option<GpuTimer>,
     cached_gpu_memory: Option<GpuMemoryMetrics>,
     presented_frames: u64,
@@ -802,6 +806,8 @@ impl Renderer {
         let spheres = spheres::SphereRenderer::new(&device, &queue, configuration.format);
         let ship_mesh = ship_mesh::ShipMeshRenderer::new(&device, configuration.format)?;
         let held_item = held_item::HeldItemRenderer::new(&device, configuration.format)?;
+        let resource_meshes =
+            resource_mesh::ResourceMeshRenderer::new(&device, configuration.format)?;
         let gpu_timer = timestamp_queries_supported.then(|| GpuTimer::new(&device, &queue));
 
         let mut renderer = Self {
@@ -822,6 +828,7 @@ impl Renderer {
             spheres,
             ship_mesh,
             held_item,
+            resource_meshes,
             gpu_timer,
             cached_gpu_memory: None,
             presented_frames: 0,
@@ -913,6 +920,13 @@ impl Renderer {
             .prepare(&self.queue, scene, prepared_scene.view_projection)?;
         self.held_item
             .prepare(&self.queue, scene.camera, aspect_ratio, scene.held_item)?;
+        self.resource_meshes.prepare(
+            &self.device,
+            &self.queue,
+            scene.camera,
+            prepared_scene.view_projection,
+            scene.resource_meshes,
+        )?;
         self.ensure_instance_capacity(prepared_scene.instances.len())?;
         self.queue.write_buffer(
             &self.camera_buffer,
@@ -994,6 +1008,7 @@ impl Renderer {
             }
             self.spheres.draw(&mut render_pass);
             self.ship_mesh.draw(&mut render_pass);
+            self.resource_meshes.draw(&mut render_pass);
             self.held_item.draw(&mut render_pass);
             self.overlay.draw(&mut render_pass);
             self.action_bar.draw(&mut render_pass);
@@ -1030,11 +1045,13 @@ impl Renderer {
         let scene_draw_calls = scene_draw_calls(prepared_scene.instance_count)
             + scene_draw_calls(self.spheres.count())
             + self.ship_mesh.draw_count()
-            + self.held_item.count();
+            + self.held_item.count()
+            + self.resource_meshes.draw_count();
         let object_count = prepared_scene.instance_count
             + self.spheres.count()
             + self.ship_mesh.count()
-            + self.held_item.count();
+            + self.held_item.count()
+            + self.resource_meshes.object_count();
         Ok(RenderOutcome::Presented(RenderStats {
             cpu_render_time,
             gpu_frame_time,
@@ -1149,6 +1166,7 @@ mod tests {
         let local = prepare_scene(
             SceneFrame {
                 camera: local_camera,
+                resource_meshes: &[],
                 instances: &local_instances,
                 spheres: &[],
                 light: None,
@@ -1168,6 +1186,7 @@ mod tests {
         let translated = prepare_scene(
             SceneFrame {
                 camera: translated_camera,
+                resource_meshes: &[],
                 instances: &translated_instances,
                 spheres: &[],
                 light: None,
@@ -1212,6 +1231,7 @@ mod tests {
             prepare_scene(
                 SceneFrame {
                     camera: coincident_camera,
+                    resource_meshes: &[],
                     instances: &[],
                     spheres: &[],
                     light: None,
@@ -1232,6 +1252,7 @@ mod tests {
             prepare_scene(
                 SceneFrame {
                     camera: camera([0.0; 3], [0.0, 0.0, -1.0]),
+                    resource_meshes: &[],
                     instances: &invalid_instances,
                     spheres: &[],
                     light: None,
@@ -1271,6 +1292,7 @@ mod tests {
         let prepared = prepare_scene(
             SceneFrame {
                 camera: camera([0.0; 3], [0.0, 0.0, -1.0]),
+                resource_meshes: &[],
                 instances: &instances,
                 spheres: &[],
                 light: None,

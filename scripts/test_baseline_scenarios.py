@@ -7,7 +7,7 @@ from salimon_test import parse_scenario
 
 
 SCENARIOS = Path(__file__).resolve().parent.parent / "scenarios"
-BASELINES = ("lower-cockpit-windows.json", "landed-earth.json", "orbit-earth.json", "resource-deposits.json", "mining.json", "resource-streaming.json", "carrying.json", "fragment-transfer.json", "physical-cargo.json", "resource-loop.json", "cargo-room.json", "space-airlock.json", "moving-eva.json", "nearby-eva.json")
+BASELINES = ("lower-cockpit-windows.json", "landed-earth.json", "orbit-earth.json", "resource-deposits.json", "mining.json", "resource-streaming.json", "carrying.json", "fragment-transfer.json", "resource-loop.json", "cockpit-nose.json", "space-airlock.json", "moving-eva.json", "nearby-eva.json")
 
 
 class BaselineScenarioTests(unittest.TestCase):

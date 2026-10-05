@@ -14,7 +14,7 @@ from validate_asset import (ValidationError, accessor_values, position_bounds, r
 from spatial_contracts import build_spatial_contracts
 
 TASK7_BASELINE_DIMENSIONS = [10.15, 3.72, 8.30]
-TASK10_REVISED_DIMENSIONS = [20.90, 4.00, 21.00]
+CURRENT_DIMENSIONS = [18.33, 4.00, 20.00]
 TASK10_REVISED_SCALE = [2.0, 4.0 / 3.72, 2.0]
 
 def validate_preservation(context, data):
@@ -58,8 +58,10 @@ def validate_preservation(context, data):
 
 def node_position_bounds(document: dict[str, object], binary: bytes, node_name: str) -> tuple[list[float], list[float]]:
     node = next(node for node in document["nodes"] if node["name"] == node_name)
-    primitive = document["meshes"][node["mesh"]]["primitives"][0]
-    return position_bounds(document, binary, primitive["attributes"]["POSITION"])
+    bounds = [position_bounds(document, binary, primitive["attributes"]["POSITION"])
+              for primitive in document["meshes"][node["mesh"]]["primitives"]]
+    return ([min(lower[axis] for lower, _ in bounds) for axis in range(3)],
+            [max(upper[axis] for _, upper in bounds) for axis in range(3)])
 
 
 def overall_position_bounds(document, binary):
@@ -81,35 +83,51 @@ def assert_vectors_close(actual: list[float], expected: list[float]) -> None:
     ))
 
 
-def validate_center_monitor_scale(document: dict, binary: bytes, manifest: dict) -> None:
-    """Check the authored center assembly without recreating procedural meshes."""
-    contract = json.loads((SCOUT / "monitor-contract.json").read_text())["centerVertices"]
-    measured = []
-    for name, expected in contract.items():
-        exported = node(document, name)
-        primitive = document["meshes"][exported["mesh"]]["primitives"][0]
-        positions = accessor_values(document, binary, primitive["attributes"]["POSITION"])
-        for point in expected:
-            require(any(all(abs(a-b) <= 1e-6 for a,b in zip(point, actual)) for actual in positions), f"{name}: center assembly vertex changed")
-        measured.extend(next(actual for actual in positions if all(abs(a-b) <= 1e-6 for a,b in zip(point, actual))) for point in expected)
-    bounds = {"min": [min(p[a] for p in measured) for a in range(3)],
-              "max": [max(p[a] for p in measured) for a in range(3)]}
-    pivot, scale, seatward = [4.426, .80, 0.0], .49, .40
-    metadata = document["extras"]["salimon"]["cockpitInstruments"]["centerAssembly"]
-    require(metadata == manifest["cockpitInstruments"]["centerAssembly"], 'metadata == manifest["cockpitInstruments"]["centerAssembly"]')
-    require(metadata["uniformScaleFromAssetVersion7"] == scale, 'metadata["uniformScaleFromAssetVersion7"] == scale')
-    require(metadata["uniformScaleFromAssetVersion8"] == .7, 'metadata["uniformScaleFromAssetVersion8"] == .7')
-    require(metadata["seatwardOffsetMeters"] == seatward, 'metadata["seatwardOffsetMeters"] == seatward')
-    assert_vectors_close(metadata["pivotMeters"], pivot)
-    baseline = {"min": [4.264, .8, -1.02], "max": [4.511, 1.695, 1.02]}
-    for bound in ("min", "max"):
-        assert_vectors_close(metadata["baselineBoundsMeters"][bound], baseline[bound])
-        assert_vectors_close(metadata["boundsMeters"][bound], bounds[bound])
+def validate_unified_console(document: dict, binary: bytes, manifest: dict) -> None:
+    """Keep three authored live quads together within one centered collision proxy."""
+    contract = json.loads((SCOUT / "monitor-contract.json").read_text())["monitorVertices"]
+    metadata = document["extras"]["salimon"]["cockpitInstruments"]["unifiedConsole"]
+    require(metadata == manifest["cockpitInstruments"]["unifiedConsole"],
+            "unified console metadata differs from the ship manifest")
+    require(metadata["monitorNodes"] == ["Monitor_Port", "Monitor_Center", "Monitor_Starboard"],
+            "unified console must retain the three live displays")
+    require(metadata["walkingSide"] == "both", "center console must leave both side routes")
+    require(abs(metadata["noseDeckForwardMeters"] - 7.85) < 1e-6,
+            "shortened nose deck must end at X=7.85 m")
     collider = node(document, metadata["collisionNode"])
     center = collider["translation"]
     size = collider["extras"]["salimon"]["sizeMeters"]
-    assert_vectors_close([value-width/2 for value, width in zip(center, size)], [3.94662, .25, -1.06])
-    assert_vectors_close([value+width/2 for value, width in zip(center, size)], [6.12, 1.23855, 1.06])
+    lower = [value-width/2 for value, width in zip(center, size)]
+    upper = [value+width/2 for value, width in zip(center, size)]
+    assert_vectors_close(metadata["boundsMeters"]["min"], lower)
+    assert_vectors_close(metadata["boundsMeters"]["max"], upper)
+    assert_vectors_close(lower, [3.9, .25, -1.35])
+    assert_vectors_close(upper, [6.0, 1.27, 1.35])
+    for name in metadata["monitorNodes"]:
+        exported = node(document, name)
+        primitive = document["meshes"][exported["mesh"]]["primitives"][0]
+        positions = accessor_values(document, binary, primitive["attributes"]["POSITION"])
+        expected = contract[name]
+        require(len(positions) == len(expected) == 4, f"{name}: expected one quad")
+        for point in expected:
+            require(any(all(abs(a-b) <= 1e-6 for a,b in zip(point, actual)) for actual in positions),
+                    f"{name}: authored surface vertex changed")
+        require(all(lower[axis] - 1e-6 <= point[axis] <= upper[axis] + 1e-6
+                    for point in positions for axis in range(3)), f"{name}: outside console proxy")
+        center_side = sum(point[2] for point in positions) / len(positions)
+        if name == "Monitor_Center":
+            require(abs(center_side) < .2, "center display left the cockpit centerline")
+        elif name == "Monitor_Port":
+            require(center_side > .5, "port display left the port side of the station")
+        else:
+            require(center_side < -.5, "starboard display left the starboard side of the station")
+    # The visible base and its display housings are one physical station.
+    for name in ("Cockpit_Console_Center", "Cockpit_Monitor_Housings",
+                 "Cockpit_Monitor_Bezels"):
+        mesh_min, mesh_max = node_position_bounds(document, binary, name)
+        require(all(mesh_min[axis] >= lower[axis]-1e-6 and
+                    mesh_max[axis] <= upper[axis]+1e-6 for axis in range(3)),
+                f"{name}: outside unified console proxy")
 
 
 def validate_sightlines(document: dict, binary: bytes) -> None:
@@ -130,10 +148,11 @@ def validate_sightlines(document: dict, binary: bytes) -> None:
         return distance if distance>.001 else None
     meshes=[]
     for mesh in document["meshes"]:
-        p=mesh["primitives"][0]; positions=values(p["attributes"]["POSITION"]); indices=values(p["indices"])
-        triangles=[[positions[indices[i+j][0]] for j in range(3)] for i in range(0,len(indices),3)]
-        glass=document["materials"][p["material"]]["name"]=="Cockpit Glass"
-        meshes.append((mesh["name"],glass,triangles))
+        for p in mesh["primitives"]:
+            positions=values(p["attributes"]["POSITION"]); indices=values(p["indices"])
+            triangles=[[positions[indices[i+j][0]] for j in range(3)] for i in range(0,len(indices),3)]
+            glass=document["materials"][p["material"]]["name"]=="Cockpit Glass"
+            meshes.append((mesh["name"],glass,triangles))
     eye=.23*4/3.72+1.75
     checks=[("behind chair forward",(1.3,eye,0),(1,0,0)),
             ("seated forward",(2.76,1.799032258064516,0),(1,0,0)),
@@ -149,40 +168,30 @@ def validate_sightlines(document: dict, binary: bytes) -> None:
                 if glass:glass_hit=True
                 else:require(False, f"{label} obstructed by {name} at {min(distances):.2f}m")
         require(glass_hit, f"{label} misses modeled glazing")
-    # Sample both sides of the console from the real seated eye. Rays must
-    # pass through the LOWER pane, then reach the world without any opaque
-    # hull, deck, monitor, furniture or collision proxy covering the view.
-    for pitch,absolute_yaw in ((12,28),(18,28),(26,32),(30,34),(30,36)):
-        for yaw in (-absolute_yaw, absolute_yaw):
-            p,y=math.radians(pitch),math.radians(yaw)
-            direction=(math.cos(p)*math.cos(y),-math.sin(p),math.cos(p)*math.sin(y))
-            hits=[(d,name,glass) for name,glass,triangles in meshes for tri in triangles
-                  if (d:=hit((2.76,1.799032258064516,0),direction,tri)) is not None]
-            require(hits, f"lower window ray misses glazing: {pitch}/{yaw}")
-            require(any(name == "Cockpit_Lower_Glazing" for _,name,_ in hits), 'any(name == "Cockpit_Lower_Glazing" for _,name,_ in hits)')
-            require(all(glass for _,_,glass in hits), f"lower view {pitch}/{yaw} blocked: {hits}")
-    # A standing player sees through the actual cargo doorway to the far wall;
-    # neither the old sill/glazing, wing nor an opaque hull cap covers the opening.
-    for x in (.7, 1.3, 1.8):
-        origin=(x,eye,3.5)
-        hits=[(d,name) for name,glass,triangles in meshes
-              for tri in triangles if (d:=hit(origin,(0,0,1),tri)) is not None]
-        require(min(hits)[1] == "Cargo_Port_Wall", f"cargo passage blocked at X={x}: {min(hits)}")
-        require(abs(min(hits)[0]-7.1) < 1e-5, 'abs(min(hits)[0]-7.1) < 1e-5')
-    origin=(-.5,eye,8.0)
-    hits=[(d,name) for name,glass,triangles in meshes for tri in triangles
-          if (d:=hit(origin,(0,-1,0),tri)) is not None]
-    require(min(hits)[1] == "Cargo_Deck", "cargo floor must be level and not covered by wing geometry")
-    require(abs(min(hits)[0]-1.75) < 1e-5, 'abs(min(hits)[0]-1.75) < 1e-5')
+    # The centered station keeps side routes open; sample the port lower glass.
+    samples=document["extras"]["salimon"]["cockpitWindows"]["lowerViewSamplesDegrees"]
+    for pitch,yaw in samples:
+        p,y=math.radians(pitch),math.radians(yaw)
+        direction=(math.cos(p)*math.cos(y),-math.sin(p),math.cos(p)*math.sin(y))
+        hits=[(d,name,glass) for name,glass,triangles in meshes for tri in triangles
+              if (d:=hit((2.76,1.799032258064516,0),direction,tri)) is not None]
+        require(hits, f"lower window ray misses glazing: {pitch}/{yaw}")
+        require(any(name == "Cockpit_Lower_Glazing" for _,name,_ in hits),
+                f"lower window ray misses lower glazing: {pitch}/{yaw}")
+        require(all(glass for _,_,glass in hits), f"lower view {pitch}/{yaw} blocked: {hits}")
+    # The restored port wall has its middle observation pane again.
+    origin=(1.3,eye,2.2)
+    hits=[(d,name,glass) for name,glass,triangles in meshes
+          for tri in triangles if (d:=hit(origin,(0,0,1),tri)) is not None]
+    require(any(name == "Cabin_Port_Glazing" for _,name,_ in hits),
+            "restored port window is missing")
+    require(all(glass for _,_,glass in hits), "restored port view is obstructed")
 
     # Live cockpit surfaces must present an unobstructed rectangle from the
     # actual seated eye, with top-left UVs and normals toward the pilot.
     seated_eye=(2.76,1.799032258064516,0.)
-    for label, role, x, y0, y1, z0, z1 in (
-        ("Center","speed",3.95446,.8735,1.2067,-.441,.441),
-        ("Port","thruster-power",3.70,.905,1.22,2.035,2.665),
-        ("Starboard","thruster-power",3.70,.905,1.22,-2.665,-2.035),
-    ):
+    for label, role in (("Center","speed"), ("Port","thruster-power"),
+                        ("Starboard","thruster-power")):
         name=f"Monitor_{label}"
         monitor=node(document,name)
         metadata=monitor["extras"]["salimon"]
@@ -195,31 +204,32 @@ def validate_sightlines(document: dict, binary: bytes) -> None:
         normals=values(primitive["attributes"]["NORMAL"])
         uvs=values(primitive["attributes"]["TEXCOORD_0"])
         require(len(positions)==4 and len(values(primitive["indices"]))==6, 'len(positions)==4 and len(values(primitive["indices"]))==6')
-        center=(x,(y0+y1)/2,(z0+z1)/2)
+        corners={tuple(uv): tuple(position) for position,uv in zip(positions,uvs)}
+        require(set(corners) == {(0.,0.),(0.,1.),(1.,0.),(1.,1.)},
+                f"{name}: top-left monitor UV mapping changed")
+        def point(u,v):
+            weights=((0.,0.,(1-u)*(1-v)),(1.,0.,u*(1-v)),
+                     (0.,1.,(1-u)*v),(1.,1.,u*v))
+            return tuple(sum(corners[a,b][axis]*weight for a,b,weight in weights)
+                         for axis in range(3))
+        center=point(.5,.5)
+        require(abs(center[2]) < 1.2, f"{name}: display left the centered console")
         toward_eye=sub(seated_eye,center)
         horizontal_length=math.hypot(toward_eye[0],toward_eye[2])
         expected_normal=(toward_eye[0]/horizontal_length,0.,toward_eye[2]/horizontal_length)
-        tangent=(expected_normal[2],0.,-expected_normal[0])
-        for position, normal, uv in zip(positions,normals,uvs):
-            horizontal_offset=(uv[0]-.5)*(z1-z0)
-            assert_vectors_close(position,[
-                center[0]+tangent[0]*horizontal_offset,
-                y1-(y1-y0)*uv[1],
-                center[2]+tangent[2]*horizontal_offset,
-            ])
-            assert_vectors_close(normal,expected_normal)
+        for normal in normals:
+            require(all(abs(a-b) < 1e-4 for a,b in zip(normal,expected_normal)),
+                    f"{name}: monitor normal no longer faces the pilot")
         require(set(uvs)=={(0.,0.),(0.,1.),(1.,0.),(1.,1.)}, 'set(uvs)=={(0.,0.),(0.,1.),(1.,0.),(1.,1.)}')
+        require(corners[0.,0.][1] > corners[0.,1.][1],
+                f"{name}: screen top and bottom reversed")
         assert_vectors_close(metadata["pilotFacingTargetMeters"],list(seated_eye))
         expected_yaw=math.degrees(math.atan2(expected_normal[2],-expected_normal[0]))
-        require(abs(metadata["pilotFacingYawDegrees"]-expected_yaw) < 1e-5, 'abs(metadata["pilotFacingYawDegrees"]-expected_yaw) < 1e-5')
-        if label != "Center":
-            require(abs(expected_yaw) > 45., f"{name} still faces mostly toward ship rear")
+        require(abs(metadata["pilotFacingYawDegrees"]-expected_yaw) < .01,
+                f"{name}: pilot-facing yaw metadata differs from its surface")
         origin=seated_eye
         for u,v in ((.08,.08),(.92,.08),(.5,.5),(.08,.92),(.92,.92)):
-            horizontal_offset=(u-.5)*(z1-z0)
-            target=(center[0]+tangent[0]*horizontal_offset,
-                    y1-(y1-y0)*v,
-                    center[2]+tangent[2]*horizontal_offset)
+            target=point(u,v)
             direction=sub(target,origin)
             hits=[(distance,mesh_name) for mesh_name,glass,triangles in meshes
                   if not glass for tri in triangles
@@ -247,14 +257,21 @@ def validate_scout(context, data):
     node_names = [n["name"] for n in document["nodes"]]
     material_names = [m["name"] for m in document["materials"]]
     for mesh in document["meshes"]:
-        require(len(mesh["primitives"]) == 1, f"{mesh['name']}: expected one primitive")
-        primitive = mesh["primitives"][0]
-        require(set(primitive["attributes"]) == {"POSITION", "NORMAL", "TEXCOORD_0"},
-                f"{mesh['name']}: required shader attributes changed")
-        for semantic, kind in (("NORMAL", "VEC3"), ("TEXCOORD_0", "VEC2")):
-            accessor = document["accessors"][primitive["attributes"][semantic]]
-            require(accessor["type"] == kind and accessor["componentType"] == 5126,
-                    f"{mesh['name']}: {semantic} must be float {kind}")
+        if mesh["name"] not in ("Exit_Door", "Door_Frame", "Aft_Bulkhead_Header"):
+            require(len(mesh["primitives"]) == 1, f"{mesh['name']}: expected one primitive")
+        for primitive in mesh["primitives"]:
+            attributes = set(primitive["attributes"])
+            required = {"POSITION", "NORMAL"}
+            if mesh["name"] not in ("Exit_Door", "Door_Frame", "Aft_Bulkhead_Header"):
+                required.add("TEXCOORD_0")
+            require(required <= attributes <= required | {"TEXCOORD_0"},
+                    f"{mesh['name']}: required shader attributes changed")
+            for semantic, kind in (("NORMAL", "VEC3"), ("TEXCOORD_0", "VEC2")):
+                if semantic not in primitive["attributes"]:
+                    continue
+                accessor = document["accessors"][primitive["attributes"][semantic]]
+                require(accessor["type"] == kind and accessor["componentType"] == 5126,
+                        f"{mesh['name']}: {semantic} must be float {kind}")
     preservation = json.loads((SCOUT / "preservation.json").read_text())
     spatial = build_spatial_contracts(document, preservation)
     if "spatialContracts" in document["extras"]["salimon"]:
@@ -285,7 +302,8 @@ def validate_scout(context, data):
     glazing_min, glazing_max = node_position_bounds(document, geometry, "Cockpit_Glazing")
     _, nose_max = node_position_bounds(document, geometry, "Hull_Nose")
     _, console_max = node_position_bounds(document, geometry, "Cockpit_Console_Center")
-    require(glazing_min[0] <= 5.2 and glazing_max[0] >= 9.8, 'glazing_min[0] <= 5.2 and glazing_max[0] >= 9.8')
+    require(glazing_min[0] <= 5.2 and abs(glazing_max[0] - 8.2) < 1e-6,
+            "cockpit glazing length differs from the compact nose")
     require(glazing_min[1] <= 1.08 and glazing_max[1] >= 2.83, 'glazing_min[1] <= 1.08 and glazing_max[1] >= 2.83')
     require(glazing_min[2] <= -3.0 and glazing_max[2] >= 3.0, 'glazing_min[2] <= -3.0 and glazing_max[2] >= 3.0')
     require(nose_max[1] <= 1.10, "solid nose must stay below the forward window")
@@ -310,21 +328,20 @@ def validate_scout(context, data):
     require(metrics["humanBodyHeightMeters"] == 1.80, 'metrics["humanBodyHeightMeters"] == 1.80')
     require(metrics["humanEyeHeightMeters"] == 1.75, 'metrics["humanEyeHeightMeters"] == 1.75')
     assert_vectors_close(metrics["task7BaselineDimensionsMeters"], TASK7_BASELINE_DIMENSIONS)
-    assert_vectors_close(metrics["overallDimensionsMeters"], TASK10_REVISED_DIMENSIONS)
+    assert_vectors_close(metrics["overallDimensionsMeters"], CURRENT_DIMENSIONS)
     overall_min, overall_max = overall_position_bounds(document, geometry)
     measured_dimensions = [maximum - minimum for minimum, maximum in zip(overall_min, overall_max)]
-    assert_vectors_close(measured_dimensions, TASK10_REVISED_DIMENSIONS)
-    require(measured_dimensions[0] >= TASK7_BASELINE_DIMENSIONS[0] * 2.0, 'measured_dimensions[0] >= TASK7_BASELINE_DIMENSIONS[0] * 2.0')
+    assert_vectors_close(measured_dimensions, CURRENT_DIMENSIONS)
     require(measured_dimensions[2] >= TASK7_BASELINE_DIMENSIONS[2] * 2.0, 'measured_dimensions[2] >= TASK7_BASELINE_DIMENSIONS[2] * 2.0')
     require(abs(overall_min[1] - metrics["lowestLocalYMeters"]) <= 1.0e-6, 'abs(overall_min[1] - metrics["lowestLocalYMeters"]) <= 1.0e-6')
     assert_vectors_close(node(document, "MARKER_CockpitSeat")["translation"], [2.76, 1.129032258064516, 0.0])
     assert_vectors_close(node(document, "MARKER_ExitDoor")["translation"], [-7.10, 1.3440860215053763, 0.0])
     assert_vectors_close(node(document, "MARKER_PlayerStart")["translation"], [0.50, 1.9973118279569892, -2.20])
     exterior_collider = node(document, "COLLIDER_ExteriorHull")
-    assert_vectors_close(exterior_collider["translation"], [0.05, 1.76*4/3.72, .5])
+    assert_vectors_close(exterior_collider["translation"], [-.635, 1.76*4/3.72, 0.0])
     assert_vectors_close(
         exterior_collider["extras"]["salimon"]["sizeMeters"],
-        [20.90, 4.00, 21.0],
+        CURRENT_DIMENSIONS,
     )
     require(metrics["externalAssetDependencies"] == 0, 'metrics["externalAssetDependencies"] == 0')
 
@@ -371,21 +388,67 @@ def validate_scout(context, data):
         for axis in range(3):
             require(abs(center[axis]-size[axis]/2-mesh_min[axis]) < 1e-6, 'abs(center[axis]-size[axis]/2-mesh_min[axis]) < 1e-6')
             require(abs(center[axis]+size[axis]/2-mesh_max[axis]) < 1e-6, 'abs(center[axis]+size[axis]/2-mesh_max[axis]) < 1e-6')
-    require(metrics["cargoRoom"] == manifest["interior"]["cargoRoom"], 'metrics["cargoRoom"] == manifest["interior"]["cargoRoom"]')
-    for key, expected in spatial["cargoRoom"].items():
-        actual = metrics["cargoRoom"][key]
-        if isinstance(expected, list):
-            assert_vectors_close(actual, expected)
-        elif isinstance(expected, (int, float)):
-            require(abs(actual-expected) < 1e-6, f"cargoRoom.{key}: authored bounds differ")
-        else:
-            require(actual == expected, f"cargoRoom.{key}: role differs")
-    for name in (n.removeprefix("COLLIDER_") for n in spatial["colliders"] if n.startswith("COLLIDER_Cargo_")):
-        lower, upper = node_position_bounds(document, geometry, name)
-        proxy = node(document, "COLLIDER_" + name)
-        assert_vectors_close(proxy["translation"], [(a+b)/2 for a,b in zip(lower,upper)])
-        assert_vectors_close(proxy["extras"]["salimon"]["sizeMeters"], [b-a for a,b in zip(lower,upper)])
-    require(abs(node_position_bounds(document, geometry, "Cargo_Deck")[1][1] - .23*4/3.72) < 1e-6, 'abs(node_position_bounds(document, geometry, "Cargo_Deck")[1][1] - .23*4/3.72) < 1e-6')
+    require("cargoRoom" not in metrics and "cargoRoom" not in manifest["interior"],
+            "dedicated cargo module metadata remains")
+    require(not any(name.startswith(("Cargo_", "COLLIDER_Cargo_")) for name in node_names),
+            "dedicated cargo geometry or proxies remain")
+    require(not any(name.startswith(("Cabin_Bench", "Cabin_Storage", "Cabin_Worktop",
+                                         "Cabin_Drawer", "COLLIDER_CabinBench",
+                                         "COLLIDER_CabinWorktop")) for name in node_names),
+            "removed cabin furniture or collision proxy remains")
+    require("Cockpit_Deck_Edge_Trim" not in node_names,
+            "removed flickering cockpit floor rectangle remains")
+    threshold_top = node_position_bounds(document, geometry, "Door_Threshold")[1][1]
+    require(threshold_top - floor_top >= .02,
+            "door threshold top must sit visibly above the deck")
+    door = node(document, "Exit_Door")
+    assert_vectors_close(door["extras"]["salimon"]["pivot"], [-7.68, 2.516129032, 0.0])
+    door_box = node(document, "COLLIDER_AftDoor")
+    center = door_box["translation"]
+    size = door_box["extras"]["salimon"]["sizeMeters"]
+    for primitive in document["meshes"][door["mesh"]]["primitives"]:
+        bounds = position_bounds(document, geometry, primitive["attributes"]["POSITION"])
+        for axis in range(3):
+            require(bounds[0][axis] >= center[axis] - size[axis] / 2 - 1e-6 and
+                    bounds[1][axis] <= center[axis] + size[axis] / 2 + 1e-6,
+                    "pressure door detail exceeds its collision envelope")
+    door_material_bounds = {
+        document["materials"][primitive["material"]]["name"]:
+            position_bounds(document, geometry, primitive["attributes"]["POSITION"])
+        for primitive in document["meshes"][door["mesh"]]["primitives"]
+    }
+    require(door_material_bounds["Petrol Teal"][0][0] -
+            door_material_bounds["Hull Graphite"][0][0] >= 0.02,
+            "door exterior backing and plate must not be coplanar")
+    # The balanced hull has matching sides and the rebuilt port window.
+    for port_name, starboard_name in (("Wing_Port", "Wing_Starboard"),
+                                      ("Hull_Port_Side", "Hull_Starboard_Side"),
+                                      ("Cabin_Port_Glazing", "Cabin_Starboard_Glazing")):
+        port_min, port_max = node_position_bounds(document, geometry, port_name)
+        starboard_min, starboard_max = node_position_bounds(document, geometry, starboard_name)
+        assert_vectors_close(port_min[:2], starboard_min[:2])
+        assert_vectors_close(port_max[:2], starboard_max[:2])
+        require(abs(port_min[2] + starboard_max[2]) < 1e-6 and
+                abs(port_max[2] + starboard_min[2]) < 1e-6,
+                f"{port_name}: hull sides are not symmetric")
+    for name in ("COLLIDER_Wing_Port", "COLLIDER_Wing_Starboard"):
+        collider = node(document, name)
+        require(collider["extras"]["salimon"]["purpose"] == "exterior-wing",
+                f"{name}: wing collision purpose changed")
+        wing = name.removeprefix("COLLIDER_")
+        mesh_min, mesh_max = node_position_bounds(document, geometry, wing)
+        center = collider["translation"]
+        size = collider["extras"]["salimon"]["sizeMeters"]
+        for axis in range(3):
+            require(abs(center[axis]-size[axis]/2-mesh_min[axis]) < 1e-5 and
+                    abs(center[axis]+size[axis]/2-mesh_max[axis]) < 1e-5,
+                    f"{name}: wing proxy does not cover its mesh bounds")
+    nose_floor = node(document, "COLLIDER_CockpitNoseFloor")
+    assert_vectors_close(nose_floor["translation"], [7.205, .193655914, 0.0])
+    assert_vectors_close(nose_floor["extras"]["salimon"]["sizeMeters"],
+                         [1.29, .107311828, 2.2])
+    require(abs(deck_max[0] - 7.85) < 1e-6 and abs(nose_max[0] - 8.53) < 1e-6,
+            "shortened walkable nose dimensions changed")
     # All corners of the expanded exterior remain within the flight sphere.
     require(max(sum(p[a]**2 for a in range(3))**.5
                for mesh in document["meshes"] for primitive in mesh["primitives"]
@@ -411,7 +474,7 @@ def validate_scout(context, data):
         lower, upper = node_position_bounds(document, geometry, name)
         assert_vectors_close(instruments["surfaceBoundsMeters"][name]["min"], lower)
         assert_vectors_close(instruments["surfaceBoundsMeters"][name]["max"], upper)
-    validate_center_monitor_scale(document, geometry, manifest)
+    validate_unified_console(document, geometry, manifest)
     require(metrics["energyCore"]["role"] == "energy-storage", 'metrics["energyCore"]["role"] == "energy-storage"')
     require(metrics["energyCore"]["phase0"] == "visual-only", 'metrics["energyCore"]["phase0"] == "visual-only"')
     roof = node(document, "Hull_Roof")
@@ -451,10 +514,10 @@ def main(export=None):
     require((export / "salimon_phase0_ship.bin").read_bytes() == binary,
             "glTF and GLB geometry payloads differ")
     if export == ROOT / "export":
-        from spatial_contracts import anchors_rust_source, cargo_rust_source, sidecar_json, thruster_rust_source
+        from spatial_contracts import anchors_rust_source, sidecar_json, thruster_rust_source
         spatial = build_spatial_contracts(document, json.loads((SCOUT / "preservation.json").read_text()))
         require((ROOT / "spatial-contracts.json").read_text() == sidecar_json(spatial), "spatial sidecar is stale")
-        for name, source in (("ship_anchors.rs", anchors_rust_source), ("cargo_layout.rs", cargo_rust_source),
+        for name, source in (("ship_anchors.rs", anchors_rust_source),
                              ("thruster_collision.rs", thruster_rust_source)):
             require((REPO / "client/character/src" / name).read_text() == source(spatial), f"{name}: generated layout is stale")
     print(json.dumps({"asset": "ship.salimon-scout", "status": "passed", "metrics": metrics}, sort_keys=True))

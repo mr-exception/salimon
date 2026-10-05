@@ -4,7 +4,7 @@ struct ShipUniform {
     forward: vec4<f32>,
     up: vec4<f32>,
     port: vec4<f32>,
-    door_offset: vec4<f32>,
+    door_pose: vec4<f32>,
     padding: vec4<f32>,
 };
 
@@ -34,15 +34,29 @@ fn vs_main(
     @location(5) interior_flag: f32,
     @location(6) display: vec3<f32>,
 ) -> VertexOutput {
-    let local = local_position + ship.door_offset.xyz * door_flag;
+    let angle = ship.door_pose.x * door_flag;
+    let cosine = cos(angle);
+    let sine = sin(angle);
+    let hinge = ship.door_pose.yz;
+    let offset = local_position.xy - hinge;
+    let local = vec3<f32>(
+        hinge.x + cosine * offset.x - sine * offset.y,
+        hinge.y + sine * offset.x + cosine * offset.y,
+        local_position.z,
+    );
     let relative = ship.center.xyz
         + ship.forward.xyz * local.x
         + ship.up.xyz * local.y
         + ship.port.xyz * local.z;
+    let hinged_normal = vec3<f32>(
+        cosine * local_normal.x - sine * local_normal.y,
+        sine * local_normal.x + cosine * local_normal.y,
+        local_normal.z,
+    );
     let normal = normalize(
-        ship.forward.xyz * local_normal.x
-        + ship.up.xyz * local_normal.y
-        + ship.port.xyz * local_normal.z
+        ship.forward.xyz * hinged_normal.x
+        + ship.up.xyz * hinged_normal.y
+        + ship.port.xyz * hinged_normal.z
     );
     var output: VertexOutput;
     output.clip_position = ship.view_projection * vec4<f32>(relative, 1.0);

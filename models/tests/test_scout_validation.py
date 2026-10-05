@@ -11,7 +11,7 @@ import unittest
 from unittest.mock import patch
 
 from test_scout_export import ASSET, REPO, scout
-from validate import REGISTRIES, main
+from validate import REGISTRIES, main, node_position_bounds, overall_position_bounds
 from validate_asset import ValidationError, accessor_values, read_document, validate_manifest
 
 
@@ -56,11 +56,13 @@ class ScoutValidationTests(unittest.TestCase):
             main()
         self.assertNotIn('generate_salimon_phase0_ship', sys.modules)
 
-    def test_uv_normals_center_assembly_and_real_dimensions(self):
+    def test_uv_normals_unified_console_and_real_dimensions(self):
         cases = (
             ('Monitor_Center', 'TEXCOORD_0', lambda p: (p[0], 1-p[1])),
             ('Monitor_Port', 'NORMAL', lambda p: tuple(-v for v in p)),
-            ('Cockpit_Monitor_Housings', 'POSITION', lambda p: (p[0] + .05, p[1], p[2])),
+            ('Cockpit_Monitor_Housings', 'POSITION', lambda p: (p[0], p[1], p[2] + 5)),
+            ('Hull_Nose', 'POSITION', lambda p: (p[0] + 1, p[1], p[2])),
+            ('Cockpit_Glazing', 'POSITION', lambda p: (p[0] + 1, p[1], p[2])),
             ('Wing_Port', 'POSITION', lambda p: (p[0], p[1], p[2] + 20)),
         )
         for name, semantic, edit in cases:
@@ -68,6 +70,38 @@ class ScoutValidationTests(unittest.TestCase):
                 document, binary = self.vertex_edit(name, semantic, edit)
                 with self.assertRaises(ValidationError):
                     self.validate(document, binary)
+
+    def test_compact_nose_unified_console_and_retired_cargo_contract(self):
+        metadata = self.document['extras']['salimon']
+        self.assertEqual(self.manifest['extensions']['ship']['data']['dimensionsMeters'],
+                         [18.33, 4, 20])
+        self.assertEqual(metadata['overallDimensionsMeters'], [18.33, 4, 20])
+        overall_min, overall_max = overall_position_bounds(self.document, self.binary)
+        self.assertAlmostEqual(overall_max[0] - overall_min[0], 18.33, places=3)
+        self.assertAlmostEqual(overall_max[1] - overall_min[1], 4, places=3)
+        self.assertAlmostEqual(overall_max[2] - overall_min[2], 20, places=3)
+        self.assertAlmostEqual(node_position_bounds(self.document, self.binary, 'Hull_Nose')[1][0],
+                               8.53, places=3)
+        self.assertAlmostEqual(node_position_bounds(self.document, self.binary, 'Cockpit_Glazing')[1][0],
+                               8.20, places=3)
+        self.assertAlmostEqual(node_position_bounds(self.document, self.binary, 'Deck_Walkable')[1][0],
+                               7.85, places=3)
+        console = metadata['cockpitInstruments']['unifiedConsole']
+        self.assertEqual(console['monitorNodes'],
+                         ['Monitor_Port', 'Monitor_Center', 'Monitor_Starboard'])
+        self.assertEqual(console['collisionNode'], 'COLLIDER_CockpitCenterConsole')
+        self.assertEqual(console['walkingSide'], 'both')
+        self.assertEqual(console['noseDeckForwardMeters'], 7.85)
+        self.assertAlmostEqual(console['boundsMeters']['min'][2],
+                               -console['boundsMeters']['max'][2])
+        centers = [sum(bound[2] for bound in node_position_bounds(self.document, self.binary, name)) / 2
+                   for name in console['monitorNodes']]
+        self.assertGreater(centers[0], centers[1])
+        self.assertGreater(centers[1], centers[2])
+        self.assertEqual(len(self.manifest['contracts']['colliders']), 15)
+        self.assertNotIn('cargoRoom', metadata)
+        self.assertNotIn('cargoRoom', self.document['asset']['extras']['salimon'])
+        self.assertFalse(any('Cargo' in node['name'] for node in self.document['nodes']))
 
     def test_window_sightline_regression(self):
         # Reposition an existing opaque wall in the seated forward ray while
@@ -108,7 +142,7 @@ class ScoutValidationTests(unittest.TestCase):
     def test_ship_semantic_failure_preserves_published_export(self):
         paths = [self.output.with_suffix(s) for s in ('.glb', '.bin', '.gltf')]
         paths.extend([ASSET / 'export-report.json', REPO / 'client/assets/ship/spatial-contracts.json'])
-        paths.extend(REPO / 'client/character/src' / n for n in ('cargo_layout.rs', 'thruster_collision.rs', 'ship_anchors.rs'))
+        paths.extend(REPO / 'client/character/src' / n for n in ('thruster_collision.rs', 'ship_anchors.rs'))
         before = {p: p.read_bytes() for p in paths}
         def blender(command, **kwargs):
             document, binary = self.vertex_edit('Monitor_Center', 'TEXCOORD_0', lambda p: (p[0], 1-p[1]))

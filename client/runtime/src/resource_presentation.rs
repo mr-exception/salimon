@@ -76,11 +76,113 @@ pub(crate) fn fragment_visual(fragment: ResourceFragment) -> SceneInstance {
     }
 }
 
+/// Three low-cost cuboids give each material a recognizable silhouette while
+/// keeping all pieces inside the physical fragment's bounding cube.
+pub(crate) fn fragment_visuals(fragment: ResourceFragment) -> Vec<SceneInstance> {
+    type ShapeParts = [([f64; 3], [f64; 3]); 3];
+    type ShapeColors = [[f32; 4]; 3];
+    let side = salimon_world::resource_fragments::side_meters(fragment);
+    let center = fragment.transform().position().meters();
+    let flip = if fragment.id().0 % 2 == 0 { -1.0 } else { 1.0 };
+    let (parts, colors): (ShapeParts, ShapeColors) = match fragment.material().resource() {
+        ResourceId::IronOre => (
+            [
+                ([0.0, -0.09, 0.0], [0.43, 0.31, 0.37]),
+                ([0.22 * flip, 0.22, -0.13], [0.19, 0.23, 0.18]),
+                ([-0.25 * flip, 0.04, 0.22], [0.18, 0.18, 0.16]),
+            ],
+            [
+                [0.55, 0.16, 0.10, 1.0],
+                [0.96, 0.40, 0.12, 1.0],
+                [0.28, 0.22, 0.20, 1.0],
+            ],
+        ),
+        ResourceId::SilicateRock => (
+            [
+                ([0.0, -0.20, 0.0], [0.48, 0.25, 0.45]),
+                ([0.15 * flip, 0.04, 0.06], [0.30, 0.18, 0.32]),
+                ([-0.24 * flip, -0.02, -0.17], [0.20, 0.12, 0.22]),
+            ],
+            [
+                [0.42, 0.47, 0.35, 1.0],
+                [0.62, 0.65, 0.52, 1.0],
+                [0.27, 0.31, 0.26, 1.0],
+            ],
+        ),
+        ResourceId::WaterIce => (
+            [
+                ([0.0, 0.0, 0.0], [0.26, 0.50, 0.27]),
+                ([0.25 * flip, -0.16, 0.10], [0.14, 0.32, 0.17]),
+                ([-0.20 * flip, -0.23, -0.14], [0.12, 0.25, 0.13]),
+            ],
+            [
+                [0.28, 0.78, 0.94, 1.0],
+                [0.64, 0.96, 1.0, 1.0],
+                [0.13, 0.51, 0.77, 1.0],
+            ],
+        ),
+    };
+    parts
+        .into_iter()
+        .zip(colors)
+        .map(|((offset, extent), color)| SceneInstance {
+            center_meters: std::array::from_fn(|i| center[i] + offset[i] * side),
+            half_extents_meters: extent.map(|v| (v * side) as f32),
+            color,
+        })
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use salimon_world::CelestialBodyId;
-    use salimon_world::resources::{DepositId, RESOURCE_CATALOG, RawMaterial, ResourceDeposit};
+    use salimon_world::resources::{
+        DepositId, FragmentId, RESOURCE_CATALOG, RawMaterial, ResourceDeposit, ResourceFragment,
+        ResourceTransform,
+    };
+
+    #[test]
+    fn fragment_materials_have_distinct_silhouettes_and_accents() {
+        let mut shapes = Vec::new();
+        for material in RESOURCE_CATALOG {
+            let center = WorldPosition::new(4.0, 5.0, 6.0);
+            let piece = ResourceFragment::new(
+                FragmentId(1),
+                DepositId {
+                    body: CelestialBodyId::Earth,
+                    local: 1,
+                },
+                RawMaterial::new(material.id, 2.0).unwrap(),
+                ResourceTransform::new(center, [0.0, 0.0, 0.0, 1.0]).unwrap(),
+            );
+            let visuals = fragment_visuals(piece);
+            assert_eq!(visuals.len(), 3);
+            let side = salimon_world::resource_fragments::side_meters(piece);
+            for visual in &visuals {
+                for axis in 0..3 {
+                    assert!(
+                        (visual.center_meters[axis] - center.meters()[axis]).abs()
+                            + f64::from(visual.half_extents_meters[axis])
+                            <= side * 0.51
+                    );
+                }
+            }
+            let signature: Vec<_> = visuals
+                .iter()
+                .map(|part| (part.half_extents_meters, part.color))
+                .collect();
+            assert!(!shapes.contains(&signature));
+            shapes.push(signature);
+            let alternate = ResourceFragment::new(
+                FragmentId(2),
+                piece.source(),
+                piece.material(),
+                piece.transform(),
+            );
+            assert_ne!(visuals, fragment_visuals(alternate));
+        }
+    }
 
     #[test]
     fn every_material_has_distinct_bounded_geometry_at_its_exact_anchor() {

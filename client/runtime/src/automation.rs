@@ -237,7 +237,7 @@ fn inspect(app: &ClientApplication) -> Value {
     let mining_target = app.mining.target(
         character,
         frame,
-        ship.door_state == salimon_ship::DoorState::Open,
+        ship.door_state == salimon_ship::DoorState::Open && ship.door_open_fraction >= 0.95,
         app.e2e_config.map_or(0, |config| config.seed),
     );
     let fragments: Vec<_> = app
@@ -247,7 +247,6 @@ fn inspect(app: &ClientApplication) -> Value {
             let mesh = crate::resource_presentation::fragment_visual(piece);
             json!({
                 "id": piece.id().0,
-                "in_cargo_room": crate::cargo::stored(&app.mining, piece),
                 "reference_frame": if app.mining.ship_fragments.contains_key(&piece.id()) { "ship" } else { "world" },
                 "carried": app.mining.session.carried_id() == Some(piece.id()),
                 "distance_to_player_meters": piece.transform().position().offset_from(salimon_world::WorldPosition::new(character.eye_position_meters[0], character.eye_position_meters[1], character.eye_position_meters[2])).iter().map(|v| v * v).sum::<f64>().sqrt(),
@@ -262,32 +261,17 @@ fn inspect(app: &ClientApplication) -> Value {
             })
         })
         .collect();
-    let cargo_fragments: Vec<_> = app
-        .mining
-        .session
-        .fragments()
-        .iter()
-        .copied()
-        .filter(|piece| crate::cargo::stored(&app.mining, *piece))
-        .map(|piece| {
-            json!({"id": piece.id().0,
-            "source_deposit_id": format!("{:?}:{}", piece.source().body, piece.source().local),
-            "resource": piece.material().resource().key(), "mass_kg": piece.material().mass_kg(),
-            "volume_m3": piece.material().volume_m3(),
-            "ship_local_position_meters": app.mining.ship_fragments[&piece.id()]})
-        })
-        .collect();
     let fragment_target = crate::carrying::target(
         &app.mining,
         character,
         frame,
-        ship.door_state == salimon_ship::DoorState::Open,
+        ship.door_state == salimon_ship::DoorState::Open && ship.door_open_fraction >= 0.95,
     );
     let resource_context = crate::resource_context::context(
         &app.mining,
         character,
         frame,
-        ship.door_state == salimon_ship::DoorState::Open,
+        ship.door_state == salimon_ship::DoorState::Open && ship.door_open_fraction >= 0.95,
         app.e2e_config.map_or(0, |config| config.seed),
     );
     let player_velocity = app
@@ -319,7 +303,7 @@ fn inspect(app: &ClientApplication) -> Value {
             "look_target_meters": character.look_target_meters, "up": character.up,
             "local_ship_position_meters": character.local_ship_position_meters},
         "ship": {"position_meters": ship.pose.position_meters, "orientation": ship.pose.orientation,
-            "flight_state": format!("{:?}", ship.flight_state), "door_state": format!("{:?}", ship.door_state),
+            "flight_state": format!("{:?}", ship.flight_state), "door_state": format!("{:?}", ship.door_state), "door_open_fraction": ship.door_open_fraction,
             "cockpit_control_active": ship.cockpit_control_active,
             "thruster_percentage": ship.thruster_percentage, "speed_meters_per_second": ship.speed_meters_per_second,
             "velocity_meters_per_second": ship.velocity_meters_per_second,
@@ -329,9 +313,6 @@ fn inspect(app: &ClientApplication) -> Value {
                 "surface_distance_meters": body.surface_distance_meters,
                 "radial_speed_meters_per_second": body.radial_speed_meters_per_second})),
             "cockpit_message": ship.cockpit_message.map(|message| message.text())},
-        "cargo": {"bounds_min_meters": salimon_character::CARGO_ROOM_MIN_METERS,
-            "bounds_max_meters": salimon_character::CARGO_ROOM_MAX_METERS,
-            "fragment_count": cargo_fragments.len(), "fragments": cargo_fragments},
         "interaction": interaction,
         "world": {"fragments": fragments,
             "fragment_count": app.mining.session.fragments().len(),
@@ -470,7 +451,7 @@ mod tests {
                     assert!(
                         (value.as_f64().unwrap() - expected.as_f64().unwrap()).abs()
                             <= check["tolerance"].as_f64().unwrap(),
-                        "step {index}: {path}"
+                        "step {index}: {path}: {value}"
                     );
                 }
             }
@@ -533,12 +514,12 @@ mod tests {
                 } else if let Some(expected) = check.get("gt") {
                     assert!(
                         value.as_f64().unwrap() > expected.as_f64().unwrap(),
-                        "step {index}: {path}"
+                        "step {index}: {path}: {value}"
                     );
                 } else if let Some(expected) = check.get("lt") {
                     assert!(
                         value.as_f64().unwrap() < expected.as_f64().unwrap(),
-                        "step {index}: {path}"
+                        "step {index}: {path}: {value}"
                     );
                 } else {
                     panic!("unhandled check at step {index}");
@@ -588,15 +569,15 @@ mod tests {
     }
 
     #[test]
-    fn physical_cargo_walkthrough_uses_real_gameplay_actions() {
+    fn cockpit_nose_walkthrough_uses_real_gameplay_actions() {
         assert_gameplay_scenario(
             Scenario::LandedEarth,
-            include_str!("../../../scenarios/physical-cargo.json"),
+            include_str!("../../../scenarios/cockpit-nose.json"),
         );
     }
 
     #[test]
-    fn resource_loop_uses_real_landing_mining_and_cargo_actions() {
+    fn resource_loop_uses_real_landing_mining_and_cabin_delivery_actions() {
         assert_gameplay_scenario(
             Scenario::ResourceApproach,
             include_str!("../../../scenarios/resource-loop.json"),
@@ -677,12 +658,12 @@ mod tests {
                 } else if let Some(expected) = check.get("gt") {
                     assert!(
                         value.as_f64().unwrap() > expected.as_f64().unwrap(),
-                        "step {index}: {path}"
+                        "step {index}: {path}: {value}"
                     );
                 } else if let Some(expected) = check.get("lt") {
                     assert!(
                         value.as_f64().unwrap() < expected.as_f64().unwrap(),
-                        "step {index}: {path}"
+                        "step {index}: {path}: {value}"
                     );
                 } else {
                     panic!("unhandled check at step {index}");

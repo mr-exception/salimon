@@ -7,13 +7,15 @@ macOS, Windows, and Debian-based Linux; web remains a later target. The referenc
 (`iMac21,1`, model `Z12X002L9GR/A`) with 8 CPU cores, 8 integrated GPU cores,
 and 16 GB unified memory.
 
-The custom scout now includes a wider living cabin, panoramic side/rear windows,
-a central Energy Core, warm materials and detailed aft thrusters. The cockpit
-has a contoured pilot chair, formed consoles, and physical monitors showing live
+The custom scout has a broad living cabin, panoramic side/rear windows,
+a central Energy Core, warm materials and detailed aft thrusters. Its compact
+nose and shorter cockpit glazing keep the exterior silhouette streamlined.
+One center cockpit console carries three physical monitors showing live
 metric speed, thruster percentage, Core stored/capacity energy, and nearby-body
-surface distance plus approaching/receding/zero radial speed. See the
-[ship design preview](client/assets/ship/preview.jpg). It builds on Task 10
-proportions and the first-person character and walkable ship shell.
+surface distance plus approaching/receding/zero radial speed. Routes on both sides
+let the player walk past the console into the cockpit nose. Loose fragments can
+be dropped on the cabin deck and pile up; the separate cargo module is removed. See
+the [ship asset guide](client/assets/ship/README.md).
 The native client starts inside the custom Task 7
 Salimon scout landed on Earth, with portable character/ship state, runtime-loaded
 GLB geometry, walking, free mouse look, jumping, cockpit interaction, a landed/open-space
@@ -100,6 +102,8 @@ output locations, failure handling, and the cross-platform CI build matrix.
 Run declarative native E2E scenarios with `scripts/salimon-test suite` or
 `scripts/salimon-test run scenarios/landed-earth.json`; see
 [runner documentation](scripts/README.md) for the scenario format and JSON results.
+Use `scripts/salimon-test run scenarios/cockpit-nose.json` to check the new
+walking routes on both sides and unified console.
 
 Run these commands from the repository root:
 
@@ -119,9 +123,9 @@ ship velocity. Press **E** near the cockpit to enter or leave
 control instantly; press **E** near the aft door to open/close it while landed or in open space beyond the nearby-body threshold.
 Press **M** to equip the handheld mining tool on the surface; aim at a deposit
 within 4 m and hold **F** or left mouse to extract at 2 kg/s. Press M to stow.
-Aim at a physical fragment within 3 m and press **Q** to pick it up. You can
-carry one world object at a time; equipped gear remains separate. Press **G**
-to place/drop it on clear nearby planetary ground.
+Aim at a physical fragment within 3 m and press **E** to pick it up. You can
+carry one world object at a time; equipped gear remains separate. Press **E**
+again to release it from your hand. Gravity and contact make fragments fall and pile up.
 Face the open door and walk forward through it to transition over 0.25 seconds to Earth-radial
 gravity and inspect the ship exterior. There is no sprint or crouch. Press
 **Escape** to release the captured cursor for window controls; click the game
@@ -175,17 +179,20 @@ root `target/` directory. No application bundle or installer exists yet.
 Rendering and diagnostics require an interactive check on macOS in addition to
 automated tests:
 
-1. Launch the client and confirm its initial drawable is 1920×1080 and it starts inside the enlarged
-   landed ship facing the cockpit. Inspect the warm 9.20 m-wide cabin, walk
-   both routes around the central Energy Core, and look through the side/rear
-   windows and forward from behind the lowered chair. Walk around the cockpit/cabin,
-   inspect the shaped seat and console details, and verify the center speed/power,
-   port Core energy, and starboard nearby-body screens. Check 0%, 1%, and 100%
+1. Launch the client and confirm its initial drawable is 1920×1080 and it starts inside the
+   landed ship facing the cockpit. Inspect the warm cabin, walk both routes
+   around the central Energy Core, and look through the side/rear windows and
+   forward from behind the lowered chair. Follow the routes on both sides past the
+   single center console into the shortened cockpit nose. Inspect the three
+   monitors on that console: speed/power, Core energy, and nearby-body state.
+   Check seated forward and downward visibility through the shortened glazing,
+   and inspect the exterior silhouette without the former port cargo module.
+   Check 0%, 1%, and 100%
    during flight; cross the 3 Mm nearby threshold; confirm approaching, receding,
    zero, and out-of-range states; and confirm readings remain live after leaving
    the seat. Jump and check the
-   invisible interior collision boundaries. Confirm the
-   20.30 × 4.00 × 20.00 m ship has no severe 0.05 m near-plane clipping.
+   invisible interior collision boundaries. Confirm the shortened nose has no
+   severe 0.05 m near-plane clipping.
 2. Use E for instant cockpit entry/exit and to open the aft door. Face the door
    and hold W to walk outside; confirm movement stays outward throughout the
    doorway blend and does not pull you back inside. Also check sideways and

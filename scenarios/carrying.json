@@ -244,6 +244,12 @@
     },
     {
       "action": {
+        "op": "step",
+        "frames": 45
+      }
+    },
+    {
+      "action": {
         "op": "key",
         "key": "backward",
         "pressed": true
@@ -890,8 +896,8 @@
     {
       "action": {
         "op": "look",
-        "dx": 195.38672847056907,
-        "dy": 93.04000492761612
+        "dx": 171.38672847056907,
+        "dy": 102.04000492761612
       }
     },
     {
@@ -903,14 +909,12 @@
     {
       "assert": {
         "path": "resource_ui.context",
-        "equals": "Silicate rock fragment - approx 2.00 kg\nQ to pick up fragment"
+        "equals": "Silicate rock fragment - approx 2.00 kg\nE to pick up fragment"
       }
     },
     {
       "action": {
-        "op": "key",
-        "key": "pickup",
-        "pressed": true
+        "op": "interact"
       }
     },
     {
@@ -941,8 +945,8 @@
     {
       "action": {
         "op": "look",
-        "dx": 64.13885593868746,
-        "dy": -13.149463873613234
+        "dx": -99.86114406131254,
+        "dy": 12.850536126386766
       }
     },
     {
@@ -954,7 +958,7 @@
     {
       "assert": {
         "path": "resource_ui.context",
-        "contains": "Only one world object - G to place/drop first"
+        "contains": "Only one world object - E to drop first"
       }
     },
     {
@@ -980,7 +984,7 @@
     {
       "assert": {
         "path": "carrying.last_action_feedback",
-        "equals": "Only one world object - G to place/drop first"
+        "equals": "Only one world object - E to drop first"
       }
     },
     {
@@ -1017,9 +1021,7 @@
     },
     {
       "action": {
-        "op": "key",
-        "key": "drop",
-        "pressed": true
+        "op": "interact"
       }
     },
     {
@@ -1032,13 +1034,13 @@
     {
       "assert": {
         "path": "carrying.object_id",
-        "equals": 1
+        "equals": null
       }
     },
     {
       "assert": {
         "path": "carrying.last_action_feedback",
-        "equals": "Aim at clear nearby ground to place fragment"
+        "equals": "Fragment dropped"
       }
     },
     {
@@ -1095,7 +1097,7 @@
     {
       "assert": {
         "path": "carrying.last_action_feedback",
-        "equals": "Fragment placed"
+        "equals": "No world object carried"
       }
     },
     {

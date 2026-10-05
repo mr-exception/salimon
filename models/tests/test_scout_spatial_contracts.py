@@ -14,7 +14,6 @@ sys.path.insert(0, str(REPO / "models/tools"))
 from spatial_contracts import (
     anchors_rust_source,
     build_spatial_contracts,
-    cargo_rust_source,
     sidecar_json,
     thruster_rust_source,
 )
@@ -33,7 +32,8 @@ class ScoutSpatialContractsTests(unittest.TestCase):
         cls.contracts = build_spatial_contracts(document, preservation)
 
     def test_missing_or_renamed_spatial_contracts_are_rejected(self):
-        for name in ("COLLIDER_Cargo_Deck", "COLLIDER_Engine_Port_Body",
+        for name in ("COLLIDER_CockpitNoseFloor", "COLLIDER_CockpitCenterConsole",
+                     "COLLIDER_Engine_Port_Body",
                      "MARKER_CockpitSeat", "MARKER_ExitDoor", "MARKER_PlayerStart"):
             with self.subTest(name=name):
                 document = copy.deepcopy(self.document)
@@ -59,24 +59,32 @@ class ScoutSpatialContractsTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, message):
                     build_spatial_contracts(document, self.preservation)
 
-    def test_authored_engine_and_cargo_edits_reach_runtime_layouts(self):
+    def test_authored_engine_and_seat_edits_reach_runtime_layouts(self):
         document = copy.deepcopy(self.document)
         engine = next(node for node in document["nodes"]
                       if node["name"] == "COLLIDER_Engine_Port_Body")
         engine["translation"][0] += 1.0
-        deck = next(node for node in document["nodes"] if node["name"] == "COLLIDER_Cargo_Deck")
-        deck["translation"][1] += 0.1
+        seat = next(node for node in document["nodes"] if node["name"] == "MARKER_CockpitSeat")
+        seat["translation"][1] += 0.1
         edited = build_spatial_contracts(document, self.preservation)
         self.assertAlmostEqual(edited["anchors"]["enginePort"][0],
-                               self.contracts["anchors"]["enginePort"][0] + 1.0)
-        self.assertAlmostEqual(edited["cargoRoom"]["clearMinMeters"][1],
-                               self.contracts["cargoRoom"]["clearMinMeters"][1] + 0.1)
+                               self.contracts["anchors"]["enginePort"][0] + 1.0,
+                               delta=1e-6)
+        self.assertAlmostEqual(edited["anchors"]["cockpitSeat"][1],
+                               self.contracts["anchors"]["cockpitSeat"][1] + 0.1,
+                               delta=1e-6)
         self.assertNotEqual(thruster_rust_source(edited), thruster_rust_source(self.contracts))
-        self.assertNotEqual(cargo_rust_source(edited), cargo_rust_source(self.contracts))
         self.assertNotEqual(anchors_rust_source(edited), anchors_rust_source(self.contracts))
+        self.assertNotEqual(sidecar_json(edited), sidecar_json(self.contracts))
 
     def test_authored_contract_inventory_and_semantics(self):
-        self.assertEqual(len(self.contracts["colliders"]), 22)
+        self.assertEqual(len(self.contracts["colliders"]), 15)
+        self.assertNotIn("cargoRoom", self.contracts)
+        self.assertNotIn("cargoCenter", self.contracts["anchors"])
+        self.assertFalse(any(name.startswith("COLLIDER_Cargo_")
+                             for name in self.contracts["colliders"]))
+        self.assertIn("COLLIDER_CockpitNoseFloor", self.contracts["colliders"])
+        self.assertIn("COLLIDER_CockpitCenterConsole", self.contracts["colliders"])
         self.assertEqual(
             set(self.contracts["markers"]),
             {"MARKER_CockpitSeat", "MARKER_ExitDoor", "MARKER_PlayerStart"},
@@ -88,16 +96,8 @@ class ScoutSpatialContractsTests(unittest.TestCase):
             self.contracts["colliders"]["COLLIDER_Engine_Port_Body"]["purpose"],
             "exterior-thruster",
         )
-        self.assertEqual(
-            self.contracts["colliders"]["COLLIDER_Cargo_Deck"]["purpose"],
-            "cargo-room",
-        )
-
     def test_generated_runtime_outputs_match_checked_in_files(self):
-        self.assertEqual(
-            (REPO / "client/character/src/cargo_layout.rs").read_text(),
-            cargo_rust_source(self.contracts),
-        )
+        self.assertFalse((REPO / "client/character/src/cargo_layout.rs").exists())
         self.assertEqual(
             (REPO / "client/character/src/thruster_collision.rs").read_text(),
             thruster_rust_source(self.contracts),

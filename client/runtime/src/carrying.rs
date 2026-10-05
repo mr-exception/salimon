@@ -1,4 +1,4 @@
-//! Compose physical carrying with character aim and surface placement.
+//! Compose physical carrying with character aim and release from hand height.
 use crate::mining::MiningTool;
 use salimon_character::{CharacterLocation, CharacterSnapshot, ShipFrame};
 use salimon_world::carrying::{WorldObjectId, aimed_fragment};
@@ -78,12 +78,12 @@ pub(crate) fn context(
     }
     if tool.session.carried_id().is_some() {
         Some(if target.is_some() {
-            "Only one world object - G to place/drop first"
+            "Only one world object - E to drop first"
         } else {
-            "Carrying fragment - G to place/drop"
+            "Carrying fragment - E to drop"
         })
     } else {
-        target.map(|_| "Q to pick up fragment")
+        target.map(|_| "E to pick up fragment")
     }
 }
 
@@ -112,14 +112,10 @@ pub(crate) fn follow(tool: &mut MiningTool, player: CharacterSnapshot) {
     }
 }
 
-/// Place on the aimed nearby surface, or just ahead at ground level when looking
-/// horizontally. Interior placement uses the shared ship-local deck/collision layout.
-pub(crate) fn drop_pose(
+/// Release at the current carried pose. Gravity and contacts then determine where it lands.
+pub(crate) fn release_pose(
     tool: &MiningTool,
     player: CharacterSnapshot,
-    frame: ShipFrame,
-    door_open: bool,
-    seed: u64,
 ) -> Option<ResourceTransform> {
     if !matches!(
         player.location,
@@ -128,115 +124,11 @@ pub(crate) fn drop_pose(
         return None;
     }
     let id = tool.session.carried_id()?;
-    let piece = *tool
-        .session
-        .fragments()
-        .iter()
-        .find(|piece| piece.id() == id)?;
-    let ray = ray(player)?;
-    if player.location == CharacterLocation::InsideShip {
-        let eye = frame.world_to_local(player.eye_position_meters);
-        let direction = std::array::from_fn::<_, 3, _>(|i| dot(ray.direction, frame.axes[i]));
-        // Bounding sphere clearance keeps world-axis greybox cubes clear even as the ship rotates.
-        let half = salimon_world::resource_fragments::side_meters(piece) * 0.5 * 3.0_f64.sqrt();
-        let floor = salimon_character::CARGO_ROOM_MIN_METERS[1];
-        let t = if direction[1] < -1e-9 {
-            ((floor - eye[1]) / direction[1]).min(3.0)
-        } else {
-            0.9
-        };
-        let aim = std::array::from_fn(|i| eye[i] + direction[i] * t);
-        let local = salimon_character::ship_floor_placement(aim, half)?;
-        let center = position(frame.local_to_world(local));
-        let distance = dot(
-            center.offset_from(ray.origin),
-            center.offset_from(ray.origin),
-        )
-        .sqrt();
-        if distance > 3.0
-            || hull_obstruction(player, frame, door_open, center.meters())
-                .is_some_and(|d| d < distance - half)
-        {
-            return None;
-        }
-        if overlaps(tool, id, center, half) {
-            return None;
-        }
-        return ResourceTransform::new(center, piece.transform().orientation_xyzw()).ok();
-    }
-    let body = CELESTIAL_BODIES
-        .iter()
-        .filter(|body| body.role == BodyRole::Solid)
-        .min_by(|a, b| {
-            let distance = |body: &salimon_world::CelestialBody| {
-                let offset = ray.origin.offset_from(body.center);
-                dot(offset, offset).sqrt() - body.radius_meters
-            };
-            distance(a).total_cmp(&distance(b))
-        })?;
-    let radial = ray.origin.offset_from(body.center);
-    let radius = dot(radial, radial).sqrt();
-    if radius - body.radius_meters > 3.0 {
-        return None;
-    }
-    let up = radial.map(|v| v / radius);
-    let tangent = std::array::from_fn(|i| ray.direction[i] - up[i] * dot(ray.direction, up));
-    let norm = dot(tangent, tangent).sqrt();
-    let ground = if let Some(distance) = ray
-        .sphere_distance(body.center, body.radius_meters)
-        .filter(|d| *d <= 3.0)
-    {
-        ray.origin.translated(ray.direction.map(|v| v * distance))
-    } else if norm > 1e-9 {
-        ray.origin.translated(tangent.map(|v| v / norm * 0.9))
-    } else {
-        return None;
-    };
-    let radial = ground.offset_from(body.center);
-    let length = dot(radial, radial).sqrt();
-    let up = radial.map(|v| v / length);
-    let half = salimon_world::resource_fragments::side_meters(piece) * 0.5;
-    let support = half * up.iter().map(|v| v.abs()).sum::<f64>() + 0.005;
-    let center = body
-        .center
-        .translated(up.map(|v| v * (body.radius_meters + support)));
-    let offset = center.offset_from(ray.origin);
-    let distance = dot(offset, offset).sqrt();
-    if distance > 3.0
-        || hull_obstruction(player, frame, door_open, center.meters())
-            .is_some_and(|d| d <= distance + half)
-    {
-        return None;
-    }
-    // Keep placed physical pieces distinct, and avoid placing inside deposits.
-    if overlaps(tool, id, center, half) {
-        return None;
-    }
-    let deposits = tool.nearby(player.eye_position_meters, seed).ok()?;
-    if deposits.iter().any(|entry| {
-        entry.deposit.remaining_mass_kg() > 0.0 && {
-            let offset = center.offset_from(entry.deposit.position());
-            dot(offset, offset).sqrt() < entry.bounds_radius_meters + half * 3.0_f64.sqrt()
-        }
-    }) {
-        return None;
-    }
-    ResourceTransform::new(center, piece.transform().orientation_xyzw()).ok()
-}
-
-fn overlaps(tool: &MiningTool, id: FragmentId, center: WorldPosition, half: f64) -> bool {
     tool.session
         .fragments()
         .iter()
-        .filter(|p| p.id() != id)
-        .any(|other| {
-            let extent =
-                half + salimon_world::resource_fragments::side_meters(*other) * 0.5 + 0.005;
-            center
-                .offset_from(other.transform().position())
-                .iter()
-                .all(|v| v.abs() < extent)
-        })
+        .find(|piece| piece.id() == id)
+        .map(|piece| piece.transform())
 }
 
 /// Interior gravity abstracts acceleration: loose pieces retain their ship-local
@@ -254,9 +146,6 @@ pub(crate) fn sync_ship_fragments(tool: &mut MiningTool, frame: ShipFrame) {
     }
 }
 
-fn dot(a: [f64; 3], b: [f64; 3]) -> f64 {
-    a.iter().zip(b).map(|(a, b)| a * b).sum()
-}
 fn cross(a: [f64; 3], b: [f64; 3]) -> [f64; 3] {
     [
         a[1] * b[2] - a[2] * b[1],
@@ -335,33 +224,33 @@ mod tests {
     }
 
     #[test]
-    fn interior_placement_rejects_walls_furniture_edges_and_oversized_objects() {
+    fn cabin_placement_rejects_walls_core_edges_and_oversized_objects() {
         use salimon_character::ship_floor_placement;
         assert!(ship_floor_placement([-5.8, 2.0, 0.0], 0.1).is_some());
-        assert!(ship_floor_placement([1.0, 2.0, 8.0], 0.1).is_some());
+        assert!(ship_floor_placement([1.0, 2.0, 3.0], 0.1).is_some());
         for point in [
             [-1.0, 2.0, 0.0],
-            [-3.2, 2.0, 8.0],
+            [5.0, 2.0, -1.0],
             [2.3, 2.0, 8.0],
-            [0.0, 2.0, 10.6],
+            [0.0, 2.0, 8.0],
             [-8.0, 2.0, 0.0],
             [0.0, 2.0, 4.8],
         ] {
             assert!(ship_floor_placement(point, 0.1).is_none(), "{point:?}");
         }
-        assert!(ship_floor_placement([1.0, 2.0, 8.0], 2.0).is_none());
-        assert!(ship_floor_placement([f64::NAN, 2.0, 8.0], 0.1).is_none());
+        assert!(ship_floor_placement([1.0, 2.0, 3.0], 10.0).is_none());
+        assert!(ship_floor_placement([f64::NAN, 2.0, 3.0], 0.1).is_none());
     }
 
     #[test]
-    fn ship_sight_reaches_loose_items_but_not_through_core_partition_or_closed_gate() {
+    fn ship_sight_reaches_loose_items_but_not_through_core_console_or_closed_gate() {
         use salimon_character::ship_sight_obstruction;
         assert!(
             ship_sight_obstruction([-5.8, 2.0, 0.0], [-4.9, 0.4, 0.0], true)
                 .is_none_or(|d| d > 1.84)
         );
         assert!(ship_sight_obstruction([-2.5, 2.0, 0.0], [1.0, 0.4, 0.0], true).is_some());
-        assert!(ship_sight_obstruction([-4.0, 2.0, 3.0], [-4.0, 0.4, 8.0], true).is_some());
+        assert!(ship_sight_obstruction([2.5, 2.0, 1.3], [5.0, 0.4, -1.0], true).is_some());
         assert_eq!(
             ship_sight_obstruction([-6.5, 2.0, 0.0], [-9.0, 0.4, 0.0], true),
             None

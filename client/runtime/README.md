@@ -26,8 +26,8 @@ Scenarios: `landed-earth` (default, standing in the ship), `cockpit-earth`
 ship, 1 km above the nominal surface). The world catalog is immutable; the seed
 selects a reproducible tangent offset of at most 100 m for orbit scenarios.
 `resource-approach` starts seated 1 km directly above the Earth reference landing
-site without the orbit fixture's tangent offset, allowing a full landing-to-cargo
-resource route. Its seed still selects the normal generated resource world.
+site without the orbit fixture's tangent offset, allowing a full landing, mining,
+and cabin-delivery route. Its seed still selects the normal generated resource world.
 `--seed` defaults to 0. `--step-ms` defaults to 16 and accepts 1–100 milliseconds.
 The command channel advances simulation only when asked to step; redraws do not
 advance it. Ship flight, doors, character motion, and collision remain on their
@@ -196,14 +196,17 @@ use the same input path. `inspect` exposes `mining.equipped`, `held`, `active`,
 `target`, `range_meters`, `rate_kg_per_second`, and diagnostic
 `extracted_mass_kg`. Deposit inspection and visuals read world-owned session
 mass deltas. Extraction is advanced only by simulation steps in E2E mode.
-Physical collection uses Q/G as described below.
+Physical collection uses E as described below.
 
 ## Physical resource fragments (#45)
 
-Mining creates visible material-colored cubes beside the deposit. A piece grows
+Mining ejects visible material-specific fragments from the deposit. A piece grows
 up to 2 kg before the next piece starts; its size follows material density and
 mass. Fragments remain in the local session after stowing the tool or leaving
-the active area. They are stationary when loose, and follow the player while carried.
+the active area. Loose pieces move under gravity and contact, and follow the player while carried.
+Iron ore has an angular rust-and-graphite cluster, silicate rock a low layered
+shape, and water ice a tall cyan crystal cluster. Each uses three inexpensive
+renderer cuboids within its physical bound.
 `world.fragments` exposes nearby IDs, source-deposit IDs, material keys, mass,
 volume, side length, absolute pose, and visual extents. `world.fragment_count`
 and `world.fragment_mass_kg` inspect all session output (diagnostics, not inventory).
@@ -213,7 +216,7 @@ screenshots show both fractional output and the pieces left after depletion.
 ## Physical carrying (#46)
 
 On a planetary surface, aim the center marker at a fragment within **3 m** and
-press **Q**. Exact cube bounds, solid terrain, and hull/gate/engine sight proxies
+press **E**. Fragment bounds, solid terrain, and hull/gate/engine sight proxies
 validate the target. One shared domain `CarrySlot` holding `WorldObjectId` represents the permanent limit
 for all future world-object kinds; there is no upgradeable capacity or resource
 inventory. Equipped mining gear stays separate. A second pickup is rejected with
@@ -222,19 +225,17 @@ contextual feedback and does not change either object's identity or mass.
 The same physical entity follows the eye/look pose, stays visible at the player's
 left hand, and retains its material, mass, volume, provenance, and orientation.
 Collecting a partial piece seals its mass: further mining starts/grows a different
-loose piece. Press **G** to place/drop onto aimed nearby ground, or ground just
-ahead when looking horizontally. Placement maintains radial ground clearance
-and rejects hull obstruction, occupied fragment space, and intact deposits.
-Loose pieces remain stationary; throwing/rigid-body simulation is not added.
-Inside-ship/cargo placement and gravity-frame transfer remain issue #47's scope.
+loose piece. Press **E** again to release it from hand height. The piece falls,
+bounces lightly, and settles against the ground or other fragments. Inside the
+ship, simulation uses ship-local coordinates so a settled pile travels with the hull.
 
-Automation keys `pickup` and `drop` use the same Q/G handlers. Inspection exposes
+The `interact` automation action exercises E pickup and drop. Inspection exposes
 `carrying.object_id`, `target_id`, `context`, and `last_action_feedback`; each
 nearby physical fragment includes `carried`, distance to player, and ship-local
 position. The final feedback is diagnostic history, while gameplay transient
 feedback expires after three seconds. Carry poses synchronize on movement and
 look input. `scenarios/carrying.json` verifies pickup, occupied-slot rejection,
-clear/occupied placement, subsequent pickup, tool independence, conservation,
+release and subsequent pickup, tool independence, conservation,
 and visible entity proximity after walking. The evidence variant adds named
 screenshots, and required Linux CI runs both variants.
 
@@ -246,7 +247,7 @@ production 4 m mining range and line of sight. Inspection works with the tool
 stowed; extraction still requires equipping it. The second line offers equip,
 mine, active-mining release, or stow controls according to current state.
 Aimed loose fragments show material and approximate kilograms with pickup;
-carrying shows drop/placement or the permanent one-object limit when aiming
+carrying shows drop or the permanent one-object limit when aiming
 at another fragment. Ship interaction messages and short action feedback keep
 their existing priority. With no target, no carried object and a stowed tool,
 resource context disappears. There is no inventory panel or resource balance.
@@ -291,11 +292,11 @@ normal thruster/airlock/walking actions to exit at 25,000 m/s and cross influenc
 Velocity inspection includes inherited motion plus gravity and assisted input.
 Body selection uses the player's world position independently of ship telemetry.
 
-### Physical cargo membership
+### Loose fragments aboard the ship
 
-`cargo` derives containment from session fragments and ship-local support anchors,
-using the generated character layout bounds and conservative placement clearance.
-It owns no duplicate entity or inventory state. Inspection lists the actual cargo
-entities independent of nearby presentation filtering; pickup excludes carried
-objects immediately. The physical-cargo baseline covers repeated deliveries,
-leave/return, removal, and ship-local stability in flight.
+Fragments dropped on the cabin deck retain ship-local support anchors. Inspection
+reports `reference_frame: "ship"` for nearby loose ship-supported fragments and
+`"world"` for loose surface fragments; carried fragments keep the same identity
+through pickup and release. `fragment-transfer.json` covers cabin release,
+retrieval, surface removal, and ship-local stability in flight. `resource-loop.json`
+continues from landing and mining through delivery onto the main cabin deck.

@@ -6,15 +6,12 @@
 use std::f64::consts::{FRAC_PI_2, TAU};
 use std::time::Duration;
 
-mod cargo_layout;
-use cargo_layout::CARGO_WALLS;
-pub use cargo_layout::{CARGO_ROOM_MAX_METERS, CARGO_ROOM_MIN_METERS};
 mod thruster_collision;
-use thruster_collision::THRUSTER_COLLIDERS;
+use thruster_collision::{THRUSTER_COLLIDERS, WING_COLLIDERS};
 mod ship_anchors;
 pub use ship_anchors::{
-    CARGO_ANCHOR_METERS, COCKPIT_SEAT_MARKER_METERS, ENGINE_PORT_ANCHOR_METERS,
-    ENGINE_STARBOARD_ANCHOR_METERS, EXIT_DOOR_MARKER_METERS, PLAYER_START_MARKER_METERS,
+    COCKPIT_SEAT_MARKER_METERS, ENGINE_PORT_ANCHOR_METERS, ENGINE_STARBOARD_ANCHOR_METERS,
+    EXIT_DOOR_MARKER_METERS, PLAYER_START_MARKER_METERS,
 };
 
 pub const FIXED_GRAVITY_METERS_PER_SECOND_SQUARED: f64 = 9.81;
@@ -24,15 +21,18 @@ const JUMP_SPEED_METERS_PER_SECOND: f64 = 4.4;
 pub const PLAYER_BODY_HEIGHT_METERS: f64 = 1.80;
 pub const PLAYER_EYE_HEIGHT_METERS: f64 = 1.75;
 const PLAYER_RADIUS_METERS: f64 = 0.24;
-const SHIP_FLOOR_HEIGHT: f64 = 0.247_311_827_956_989_25;
+pub const SHIP_FLOOR_HEIGHT_METERS: f64 = 0.247_311_827_956_989_25;
+const SHIP_FLOOR_HEIGHT: f64 = SHIP_FLOOR_HEIGHT_METERS;
 // Keep the player's head below the lowest ceiling lamps and the aft lintel.
 const SHIP_CEILING_HEIGHT: f64 = 2.505 * (4.0 / 3.72);
 const DOORWAY_CEILING_HEIGHT: f64 = 2.34 * (4.0 / 3.72);
 const INTERIOR_FORWARD_MIN: f64 = -7.24;
 const AFT_WALL_FORWARD_MIN: f64 = -7.24 + PLAYER_RADIUS_METERS;
-// The walkable deck ends at local X = 6.56 m. Keep the complete player body
-// inside the forward hull instead of excluding the whole cockpit.
-const INTERIOR_FORWARD_MAX: f64 = 6.56 - PLAYER_RADIUS_METERS;
+// The broad deck ends at X=6.56 m. A narrower level floor continues into the
+// shortened nose through X=7.85 m. Keep the complete player body over each deck.
+const CABIN_FORWARD_MAX: f64 = 6.56 - PLAYER_RADIUS_METERS;
+const INTERIOR_FORWARD_MAX: f64 = 7.85 - PLAYER_RADIUS_METERS;
+const NOSE_SIDE_LIMIT: f64 = 1.10 - PLAYER_RADIUS_METERS;
 // Window sills project into the 9.20 m deck to Z = +/-4.20 m.
 const INTERIOR_SIDE_LIMIT: f64 = 4.20 - PLAYER_RADIUS_METERS;
 const DOORWAY_FORWARD: f64 = -7.04;
@@ -41,7 +41,7 @@ const DOORWAY_SIDE_LIMIT: f64 = 1.40 - PLAYER_RADIUS_METERS;
 // The aft wall is split around the same clear aperture used inside. Wings and
 // engines are excluded so their broad asset bounds cannot obstruct the gate.
 const EXTERIOR_AFT: f64 = -7.92 - PLAYER_RADIUS_METERS;
-const EXTERIOR_FORWARD: f64 = 10.50 + PLAYER_RADIUS_METERS;
+const EXTERIOR_FORWARD: f64 = 8.53 + PLAYER_RADIUS_METERS;
 const EXTERIOR_SIDE: f64 = 5.10 + PLAYER_RADIUS_METERS;
 const EXTERIOR_BOTTOM: f64 = -0.10 * (4.0 / 3.72);
 const EXTERIOR_TOP: f64 = 2.73 * (4.0 / 3.72);
@@ -49,13 +49,7 @@ const EXTERIOR_TOP: f64 = 2.73 * (4.0 / 3.72);
 // crossing to the nearer side of the two existing body-clear stopping planes.
 const CLOSED_GATE_MIDPOINT: f64 = (EXTERIOR_AFT + INTERIOR_FORWARD_MIN) * 0.5;
 const COLLISION_EPSILON: f64 = 1.0e-7;
-const EXTERIOR_OBSTACLES: [[f64; 4]; 4] = [
-    [
-        -3.4 - PLAYER_RADIUS_METERS,
-        2.4 + PLAYER_RADIUS_METERS,
-        4.6 - PLAYER_RADIUS_METERS,
-        11.0 + PLAYER_RADIUS_METERS,
-    ],
+const EXTERIOR_OBSTACLES: [[f64; 4]; 3] = [
     [
         DOORWAY_FORWARD,
         EXTERIOR_FORWARD,
@@ -92,27 +86,14 @@ const COCKPIT_CHAIR_OBSTACLE: [f64; 4] = [
     -0.79 - PLAYER_RADIUS_METERS,
     0.79 + PLAYER_RADIUS_METERS,
 ];
-const COCKPIT_CENTER_CONSOLE_OBSTACLE: [f64; 4] = [
-    3.94662 - PLAYER_RADIUS_METERS,
-    6.12 + PLAYER_RADIUS_METERS,
-    -1.06 - PLAYER_RADIUS_METERS,
-    1.06 + PLAYER_RADIUS_METERS,
+const COCKPIT_CONSOLE_OBSTACLE: [f64; 4] = [
+    3.90 - PLAYER_RADIUS_METERS,
+    6.00 + PLAYER_RADIUS_METERS,
+    -1.35 - PLAYER_RADIUS_METERS,
+    1.35 + PLAYER_RADIUS_METERS,
 ];
-const COCKPIT_PORT_CONSOLE_OBSTACLE: [f64; 4] = [
-    3.65 - PLAYER_RADIUS_METERS,
-    5.96 + PLAYER_RADIUS_METERS,
-    1.70 - PLAYER_RADIUS_METERS,
-    2.90 + PLAYER_RADIUS_METERS,
-];
-const COCKPIT_STARBOARD_CONSOLE_OBSTACLE: [f64; 4] = [
-    3.65 - PLAYER_RADIUS_METERS,
-    5.96 + PLAYER_RADIUS_METERS,
-    -2.90 - PLAYER_RADIUS_METERS,
-    -1.70 + PLAYER_RADIUS_METERS,
-];
-// The solid forward hull closes the deck outside the side consoles. Expanding
-// its inner faces by the body radius prevents a walker from bypassing a console
-// through the exterior shell while retaining the aisle between it and the chair.
+// The solid forward hull closes the wide deck at both sides. Its body-expanded
+// inner faces keep walkers out of the exterior shell.
 const COCKPIT_PORT_HULL_OBSTACLE: [f64; 4] = [
     2.50 - PLAYER_RADIUS_METERS,
     INTERIOR_FORWARD_MAX,
@@ -125,35 +106,36 @@ const COCKPIT_STARBOARD_HULL_OBSTACLE: [f64; 4] = [
     -INTERIOR_SIDE_LIMIT,
     -2.90 + PLAYER_RADIUS_METERS,
 ];
+// The broad deck shoulders stop at X=6.56 m. The narrow center floor continues
+// into the nose; these body-expanded shoulders keep both feet over that floor.
+const COCKPIT_PORT_NOSE_SHOULDER: [f64; 4] = [
+    CABIN_FORWARD_MAX,
+    INTERIOR_FORWARD_MAX,
+    NOSE_SIDE_LIMIT,
+    INTERIOR_SIDE_LIMIT,
+];
+const COCKPIT_STARBOARD_NOSE_SHOULDER: [f64; 4] = [
+    CABIN_FORWARD_MAX,
+    INTERIOR_FORWARD_MAX,
+    -INTERIOR_SIDE_LIMIT,
+    -NOSE_SIDE_LIMIT,
+];
 // [forward minimum, forward maximum, side minimum, side maximum]. These simple
-// body-expanded footprints match the Core, cabin furniture, pilot chair, and
-// console/monitor assemblies. A single proxy covers each console and its
-// attached monitor because their floor-plane footprints overlap.
-const INTERIOR_OBSTACLES: [[f64; 4]; 9] = [
+// body-expanded footprints match the Core, pilot chair, and
+// unified console/monitor assembly.
+const INTERIOR_OBSTACLES: [[f64; 4]; 7] = [
     [
         CORE_FORWARD_MIN,
         CORE_FORWARD_MAX,
         -CORE_SIDE_LIMIT,
         CORE_SIDE_LIMIT,
     ],
-    [
-        -5.70 - PLAYER_RADIUS_METERS,
-        -2.24 + PLAYER_RADIUS_METERS,
-        3.60 - PLAYER_RADIUS_METERS,
-        4.44 + PLAYER_RADIUS_METERS,
-    ],
-    [
-        -5.96 - PLAYER_RADIUS_METERS,
-        -3.00 + PLAYER_RADIUS_METERS,
-        -4.48 - PLAYER_RADIUS_METERS,
-        -3.58 + PLAYER_RADIUS_METERS,
-    ],
     COCKPIT_CHAIR_OBSTACLE,
-    COCKPIT_CENTER_CONSOLE_OBSTACLE,
-    COCKPIT_PORT_CONSOLE_OBSTACLE,
-    COCKPIT_STARBOARD_CONSOLE_OBSTACLE,
+    COCKPIT_CONSOLE_OBSTACLE,
     COCKPIT_PORT_HULL_OBSTACLE,
     COCKPIT_STARBOARD_HULL_OBSTACLE,
+    COCKPIT_PORT_NOSE_SHOULDER,
+    COCKPIT_STARBOARD_NOSE_SHOULDER,
 ];
 const COCKPIT_POSITION: [f64; 3] = [
     COCKPIT_SEAT_MARKER_METERS[0],
@@ -161,7 +143,13 @@ const COCKPIT_POSITION: [f64; 3] = [
     COCKPIT_SEAT_MARKER_METERS[2],
 ];
 const COCKPIT_VIEW_PITCH_RADIANS: f64 = -0.10;
-const PLAYER_START: [f64; 3] = PLAYER_START_MARKER_METERS;
+// Keep the standing eye exactly on the controller floor; glTF marker positions
+// are stored as f32 and can differ from that plane by a few nanometers.
+const PLAYER_START: [f64; 3] = [
+    PLAYER_START_MARKER_METERS[0],
+    SHIP_FLOOR_HEIGHT + PLAYER_EYE_HEIGHT_METERS,
+    PLAYER_START_MARKER_METERS[2],
+];
 const LOOK_SENSITIVITY_RADIANS_PER_PIXEL: f64 = 0.0022;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
@@ -205,33 +193,28 @@ impl ShipFrame {
     }
 }
 
-/// A conservative physical cube placement on the shared cabin/cargo deck.
-/// Uses the traversal proxies; furniture, partitions, and hull edges stay solid.
+/// A conservative physical cube placement on the cabin and narrow nose deck.
+/// Uses the traversal proxies; furniture and hull edges stay solid.
 #[must_use]
 pub fn ship_floor_placement(local: [f64; 3], half: f64) -> Option<[f64; 3]> {
     if !half.is_finite() || half <= 0.0 || !local.iter().all(|v| v.is_finite()) {
         return None;
     }
     let cabin = local[0] - half >= INTERIOR_FORWARD_MIN
-        && local[0] + half <= INTERIOR_FORWARD_MAX
+        && local[0] + half <= CABIN_FORWARD_MAX
         && local[2].abs() + half <= INTERIOR_SIDE_LIMIT;
-    let cargo = local[0] - half >= CARGO_ROOM_MIN_METERS[0]
-        && local[0] + half <= CARGO_ROOM_MAX_METERS[0]
-        && local[2] - half >= CARGO_ROOM_MIN_METERS[2]
-        && local[2] + half <= CARGO_ROOM_MAX_METERS[2];
-    if !(cabin || cargo) || SHIP_FLOOR_HEIGHT + half * 2.0 >= SHIP_CEILING_HEIGHT {
+    let nose = local[0] - half >= INTERIOR_FORWARD_MIN
+        && local[0] + half <= INTERIOR_FORWARD_MAX
+        && local[2].abs() + half <= NOSE_SIDE_LIMIT;
+    if !(cabin || nose) || SHIP_FLOOR_HEIGHT + half * 2.0 >= SHIP_CEILING_HEIGHT {
         return None;
     }
-    if INTERIOR_OBSTACLES
-        .iter()
-        .chain(CARGO_WALLS.iter())
-        .any(|b| {
-            local[0] + half > b[0]
-                && local[0] - half < b[1]
-                && local[2] + half > b[2]
-                && local[2] - half < b[3]
-        })
-    {
+    if INTERIOR_OBSTACLES.iter().any(|b| {
+        local[0] + half > b[0]
+            && local[0] - half < b[1]
+            && local[2] + half > b[2]
+            && local[2] - half < b[3]
+    }) {
         return None;
     }
     Some([local[0], SHIP_FLOOR_HEIGHT + half + 0.005, local[2]])
@@ -272,45 +255,37 @@ pub fn ship_sight_obstruction(eye: [f64; 3], target: [f64; 3], door_open: bool) 
         ]);
     }
     let inside_cabin = eye[0] >= INTERIOR_FORWARD_MIN
-        && eye[0] <= INTERIOR_FORWARD_MAX
+        && eye[0] <= CABIN_FORWARD_MAX
         && eye[2].abs() <= INTERIOR_SIDE_LIMIT;
-    let inside_cargo = eye[0] >= CARGO_ROOM_MIN_METERS[0]
-        && eye[0] <= CARGO_ROOM_MAX_METERS[0]
-        && eye[2] >= CARGO_ROOM_MIN_METERS[2]
-        && eye[2] <= CARGO_ROOM_MAX_METERS[2];
-    if (inside_cabin || inside_cargo)
-        && eye[1] >= SHIP_FLOOR_HEIGHT
-        && eye[1] <= SHIP_CEILING_HEIGHT
+    let inside_nose = eye[0] >= INTERIOR_FORWARD_MIN
+        && eye[0] <= INTERIOR_FORWARD_MAX
+        && eye[2].abs() <= NOSE_SIDE_LIMIT;
+    if (inside_cabin || inside_nose) && eye[1] >= SHIP_FLOOR_HEIGHT && eye[1] <= SHIP_CEILING_HEIGHT
     {
         boxes.clear();
-        boxes.extend(
-            INTERIOR_OBSTACLES
-                .iter()
-                .chain(CARGO_WALLS.iter())
-                .map(|b| {
-                    [
-                        b[0],
-                        b[1],
-                        SHIP_FLOOR_HEIGHT,
-                        SHIP_CEILING_HEIGHT,
-                        b[2],
-                        b[3],
-                    ]
-                }),
-        );
+        boxes.extend(INTERIOR_OBSTACLES.iter().map(|b| {
+            [
+                b[0],
+                b[1],
+                SHIP_FLOOR_HEIGHT,
+                SHIP_CEILING_HEIGHT,
+                b[2],
+                b[3],
+            ]
+        }));
         // The shared deck and ceiling occlude objects on the other side.
         for (x0, x1, z0, z1) in [
             (
                 INTERIOR_FORWARD_MIN,
-                INTERIOR_FORWARD_MAX,
+                CABIN_FORWARD_MAX,
                 -INTERIOR_SIDE_LIMIT,
                 INTERIOR_SIDE_LIMIT,
             ),
             (
-                CARGO_ROOM_MIN_METERS[0],
-                CARGO_ROOM_MAX_METERS[0],
-                CARGO_ROOM_MIN_METERS[2],
-                CARGO_ROOM_MAX_METERS[2],
+                CABIN_FORWARD_MAX,
+                INTERIOR_FORWARD_MAX,
+                -NOSE_SIDE_LIMIT,
+                NOSE_SIDE_LIMIT,
             ),
         ] {
             boxes.push([x0, x1, EXTERIOR_BOTTOM, SHIP_FLOOR_HEIGHT, z0, z1]);
@@ -335,14 +310,6 @@ pub fn ship_sight_obstruction(eye: [f64; 3], target: [f64; 3], door_open: bool) 
             ],
             [
                 INTERIOR_FORWARD_MIN,
-                0.4,
-                EXTERIOR_BOTTOM,
-                EXTERIOR_TOP,
-                INTERIOR_SIDE_LIMIT,
-                5.1,
-            ],
-            [
-                2.2,
                 INTERIOR_FORWARD_MAX,
                 EXTERIOR_BOTTOM,
                 EXTERIOR_TOP,
@@ -378,6 +345,7 @@ pub fn ship_sight_obstruction(eye: [f64; 3], target: [f64; 3], door_open: bool) 
         }
     }
     boxes.extend(THRUSTER_COLLIDERS);
+    boxes.extend(WING_COLLIDERS);
     boxes
         .into_iter()
         .filter_map(|b| {
@@ -627,15 +595,10 @@ impl CharacterController {
                     local[1] = PLAYER_EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT;
                     self.vertical_speed = 0.0;
                 }
-                local[2] = local[2].clamp(
-                    -INTERIOR_SIDE_LIMIT,
-                    CARGO_ROOM_MAX_METERS[2] - PLAYER_RADIUS_METERS,
-                );
+                local[2] = local[2].clamp(-INTERIOR_SIDE_LIMIT, INTERIOR_SIDE_LIMIT);
                 local[0] = local[0].min(INTERIOR_FORWARD_MAX);
                 local = slide_around_fixtures(previous, local);
-                let ceiling = if (local[0] < -6.88 && local[2].abs() < 1.84)
-                    || (local[2] > 4.0 && local[2] < 5.1 && local[0] > 0.16 && local[0] < 2.44)
-                {
+                let ceiling = if local[0] < -6.88 && local[2].abs() < 1.84 {
                     DOORWAY_CEILING_HEIGHT
                 } else {
                     SHIP_CEILING_HEIGHT
@@ -787,7 +750,7 @@ impl CharacterController {
                         local = slide_around_obstacles(previous, local, &CLOSED_GATE_OBSTACLE);
                     }
                 }
-                local = slide_around_thrusters(previous, local, world_round_trip_tolerance(world));
+                local = slide_around_appendages(previous, local, world_round_trip_tolerance(world));
                 let through_gate = previous[0] < DOORWAY_FORWARD
                     && local[0] >= DOORWAY_FORWARD - COLLISION_EPSILON
                     && previous[2].abs() <= DOORWAY_SIDE_LIMIT + COLLISION_EPSILON
@@ -879,9 +842,9 @@ impl CharacterController {
                         local = ship.world_to_local(world);
                     }
                 }
-                let before_thrusters = local;
-                local = slide_around_thrusters(previous, local, world_round_trip_tolerance(world));
-                if local[0] != before_thrusters[0] || local[2] != before_thrusters[2] {
+                let before_appendages = local;
+                local = slide_around_appendages(previous, local, world_round_trip_tolerance(world));
+                if local[0] != before_appendages[0] || local[2] != before_appendages[2] {
                     world = surface_eye_at_ship_planar_position(local, ship, surface);
                 }
                 let through_gate = overlaps_hull
@@ -992,7 +955,7 @@ fn axis(positive: bool, negative: bool) -> f64 {
 
 fn overlaps_exterior_hull(local: [f64; 3]) -> bool {
     local[1] + (PLAYER_BODY_HEIGHT_METERS - PLAYER_EYE_HEIGHT_METERS) > EXTERIOR_BOTTOM
-        && local[1] - PLAYER_EYE_HEIGHT_METERS < if local[2] > 4.6 { 3.32 } else { EXTERIOR_TOP }
+        && local[1] - PLAYER_EYE_HEIGHT_METERS < EXTERIOR_TOP
 }
 
 fn world_round_trip_tolerance(world: [f64; 3]) -> f64 {
@@ -1004,20 +967,13 @@ fn world_round_trip_tolerance(world: [f64; 3]) -> f64 {
 }
 
 fn slide_around_fixtures(previous: [f64; 3], proposed: [f64; 3]) -> [f64; 3] {
-    let proposed = slide_around_obstacles(previous, proposed, &INTERIOR_OBSTACLES);
-    let walls = CARGO_WALLS.map(|[x0, x1, z0, z1]| {
-        [
-            x0 - PLAYER_RADIUS_METERS,
-            x1 + PLAYER_RADIUS_METERS,
-            z0 - PLAYER_RADIUS_METERS,
-            z1 + PLAYER_RADIUS_METERS,
-        ]
-    });
-    slide_around_obstacles(previous, proposed, &walls)
+    slide_around_obstacles(previous, proposed, &INTERIOR_OBSTACLES)
 }
 
-fn slide_around_thrusters(previous: [f64; 3], mut proposed: [f64; 3], tolerance: f64) -> [f64; 3] {
-    for [x_min, x_max, y_min, y_max, z_min, z_max] in THRUSTER_COLLIDERS {
+fn slide_around_appendages(previous: [f64; 3], mut proposed: [f64; 3], tolerance: f64) -> [f64; 3] {
+    for [x_min, x_max, y_min, y_max, z_min, z_max] in
+        THRUSTER_COLLIDERS.into_iter().chain(WING_COLLIDERS)
+    {
         // Test the entire body, so a raised foot or a low surface approach
         // cannot cross a thruster merely because the eye is outside its box.
         let body_bottom = proposed[1].min(previous[1]) - PLAYER_EYE_HEIGHT_METERS;
@@ -1241,17 +1197,27 @@ mod tests {
     }
 
     #[test]
-    fn anchors_and_walk_bounds_match_the_wider_ship() {
+    fn anchors_and_walk_bounds_match_the_shorter_ship() {
         assert_eq!(PLAYER_BODY_HEIGHT_METERS, 1.80);
         assert_eq!(PLAYER_EYE_HEIGHT_METERS, 1.75);
-        assert_eq!(PLAYER_START, [0.50, 1.997_311_827_956_989_2, -2.20]);
-        assert!((COCKPIT_POSITION[0] - 2.76).abs() < 1.0e-12);
-        assert!((COCKPIT_POSITION[1] - 1.799_032_258_064_516).abs() < 1.0e-12);
+        for (actual, expected) in
+            PLAYER_START
+                .into_iter()
+                .zip([0.50, 1.997_311_827_956_989_2, -2.20])
+        {
+            assert!((actual - expected).abs() < 1.0e-6);
+        }
+        assert!((COCKPIT_POSITION[0] - 2.76).abs() < 1.0e-6);
+        assert!((COCKPIT_POSITION[1] - 1.799_032_258_064_516).abs() < 1.0e-6);
         assert!(COCKPIT_POSITION[2].abs() < 1.0e-12);
         assert_eq!(SHIP_FLOOR_HEIGHT, 0.247_311_827_956_989_25);
         assert_eq!(INTERIOR_FORWARD_MIN, -7.24);
-        assert!((INTERIOR_FORWARD_MAX - 6.32).abs() < 1.0e-12);
+        assert!((CABIN_FORWARD_MAX - 6.32).abs() < 1.0e-12);
+        assert!((INTERIOR_FORWARD_MAX - 7.61).abs() < 1.0e-12);
+        assert!((NOSE_SIDE_LIMIT - 0.86).abs() < 1.0e-12);
         assert!((INTERIOR_SIDE_LIMIT - 3.96).abs() < 1.0e-12);
+        assert!((EXTERIOR_FORWARD - 8.77).abs() < 1.0e-12);
+        assert!((COCKPIT_CONSOLE_OBSTACLE[2] + 1.59).abs() < 1.0e-12);
         assert_eq!(DOORWAY_FORWARD, -7.04);
     }
 
@@ -1358,7 +1324,7 @@ mod tests {
     }
 
     #[test]
-    fn both_cabin_aisles_enter_the_cockpit_until_the_side_consoles() {
+    fn both_side_aisles_reach_the_nose_shoulder() {
         for side in [-2.4, 2.4] {
             let mut controller = inside_at(-6.0, side);
             walk_steps(
@@ -1367,17 +1333,17 @@ mod tests {
                     forward: true,
                     ..MovementInput::default()
                 },
-                30,
+                45,
             );
             let local = controller.local_ship_position().unwrap();
-            assert_eq!(local[0], COCKPIT_PORT_CONSOLE_OBSTACLE[0]);
+            assert_eq!(local[0], CABIN_FORWARD_MAX);
             assert!(local[0] > 1.30, "the old broad cockpit exclusion is gone");
             assert_eq!(local[2], side);
         }
     }
 
     #[test]
-    fn cockpit_side_routes_pass_the_chair_and_reach_the_monitor_console() {
+    fn cockpit_routes_pass_the_chair_then_stop_at_the_center_console() {
         for side in [-1.20, 1.20] {
             let mut controller = inside_at(0.50, side);
             walk_steps(
@@ -1390,7 +1356,7 @@ mod tests {
             );
 
             let local = controller.local_ship_position().unwrap();
-            assert_eq!(local[0], COCKPIT_CENTER_CONSOLE_OBSTACLE[0]);
+            assert_eq!(local[0], COCKPIT_CONSOLE_OBSTACLE[0]);
             assert!(local[0] > COCKPIT_CHAIR_OBSTACLE[1]);
             assert_eq!(local[2], side);
         }
@@ -1450,13 +1416,9 @@ mod tests {
     }
 
     #[test]
-    fn cockpit_console_proxies_cover_the_monitor_bodies() {
-        for (obstacle, x, z) in [
-            (COCKPIT_CENTER_CONSOLE_OBSTACLE, 3.7, 0.0),
-            (COCKPIT_PORT_CONSOLE_OBSTACLE, 3.0, 2.3),
-            (COCKPIT_STARBOARD_CONSOLE_OBSTACLE, 3.0, -2.3),
-        ] {
-            let mut controller = inside_at(x, z);
+    fn unified_cockpit_console_blocks_all_three_monitor_positions() {
+        for z in [-0.915, 0.075, 0.8025] {
+            let mut controller = inside_at(3.56, z);
             walk_steps(
                 &mut controller,
                 MovementInput {
@@ -1465,16 +1427,17 @@ mod tests {
                 },
                 20,
             );
-            assert_eq!(controller.local_ship_position().unwrap()[0], obstacle[0]);
+            assert_eq!(
+                controller.local_ship_position().unwrap()[0],
+                COCKPIT_CONSOLE_OBSTACLE[0]
+            );
         }
     }
 
     #[test]
-    fn reduced_center_monitor_blocks_walking_and_jumping_before_its_front_face() {
-        // Asset version 9's complete center assembly begins at X=3.94662 m,
-        // slightly in front of the dashboard's pilot-facing edge at X=4.33 m.
+    fn unified_console_blocks_walking_and_jumping_before_its_front_face() {
         for jump in [false, true] {
-            let mut controller = inside_at(3.7, 0.0);
+            let mut controller = inside_at(3.55, -0.5);
             walk_steps(
                 &mut controller,
                 MovementInput {
@@ -1485,7 +1448,7 @@ mod tests {
                 20,
             );
             let eye = controller.local_ship_position().unwrap();
-            assert!((eye[0] + PLAYER_RADIUS_METERS - 3.94662).abs() < 1.0e-9);
+            assert!((eye[0] + PLAYER_RADIUS_METERS - 3.90).abs() < 1.0e-9);
         }
     }
 
@@ -1559,7 +1522,7 @@ mod tests {
     }
 
     #[test]
-    fn interior_walls_and_forward_hull_keep_the_complete_player_inside() {
+    fn interior_walls_and_short_nose_keep_the_complete_player_inside() {
         for (start, input, axis, expected) in [
             (
                 [-6.5, 0.0],
@@ -1586,6 +1549,15 @@ mod tests {
                     ..MovementInput::default()
                 },
                 0,
+                CABIN_FORWARD_MAX,
+            ),
+            (
+                [6.7, 0.0],
+                MovementInput {
+                    forward: true,
+                    ..MovementInput::default()
+                },
+                0,
                 INTERIOR_FORWARD_MAX,
             ),
         ] {
@@ -1597,60 +1569,82 @@ mod tests {
     }
 
     #[test]
-    fn cargo_passage_walkthrough_preserves_level_floor_and_ship_frame() {
-        let mut player = inside_at(1.3, 3.0);
-        walk_steps(
-            &mut player,
-            MovementInput {
-                right: true,
-                ..MovementInput::default()
-            },
-            20,
-        );
-        let local = player.local_ship_position().unwrap();
-        assert_eq!(player.location(), CharacterLocation::InsideShip);
-        assert!((local[2] - (CARGO_ROOM_MAX_METERS[2] - PLAYER_RADIUS_METERS)).abs() < 1e-12);
-        assert_eq!(local[1], PLAYER_START[1]);
-        walk_steps(
-            &mut player,
-            MovementInput {
-                backward: true,
-                ..MovementInput::default()
-            },
-            20,
-        );
-        assert!(
-            (player.local_ship_position().unwrap()[0] - (-3.2 + PLAYER_RADIUS_METERS)).abs()
-                < 1e-12
-        );
-        walk_steps(
-            &mut player,
-            MovementInput {
-                forward: true,
-                ..MovementInput::default()
-            },
-            20,
-        );
-        assert!(
-            (player.local_ship_position().unwrap()[0] - (2.2 - PLAYER_RADIUS_METERS)).abs() < 1e-12
-        );
-        player = inside_at(1.3, 8.0);
-        walk_steps(
-            &mut player,
-            MovementInput {
-                left: true,
-                ..MovementInput::default()
-            },
-            15,
-        );
-        assert!(player.local_ship_position().unwrap()[2] < 3.0);
-        assert_eq!(player.local_ship_position().unwrap()[1], PLAYER_START[1]);
-        assert_eq!(player.location(), CharacterLocation::InsideShip);
+    fn narrow_nose_shoulders_keep_the_player_over_the_floor() {
+        for (input, expected_side) in [
+            (
+                MovementInput {
+                    left: true,
+                    ..MovementInput::default()
+                },
+                -NOSE_SIDE_LIMIT,
+            ),
+            (
+                MovementInput {
+                    right: true,
+                    ..MovementInput::default()
+                },
+                NOSE_SIDE_LIMIT,
+            ),
+        ] {
+            let mut controller = inside_at(7.3, 0.0);
+            walk_steps(&mut controller, input, 10);
+            let local = controller.local_ship_position().unwrap();
+            assert_eq!(local[0], 7.3);
+            assert_eq!(local[2], expected_side);
+        }
     }
 
     #[test]
-    fn cargo_partition_blocks_both_sides_except_the_passage() {
-        for x in [-1.8, -1.0, 0.0] {
+    fn both_console_sides_reach_the_level_nose_floor() {
+        for (side, inward) in [
+            (
+                -2.2,
+                MovementInput {
+                    right: true,
+                    ..MovementInput::default()
+                },
+            ),
+            (
+                2.2,
+                MovementInput {
+                    left: true,
+                    ..MovementInput::default()
+                },
+            ),
+        ] {
+            let mut player = inside_at(0.5, side);
+            walk_steps(
+                &mut player,
+                MovementInput {
+                    forward: true,
+                    ..MovementInput::default()
+                },
+                20,
+            );
+            assert_eq!(player.local_ship_position().unwrap()[0], CABIN_FORWARD_MAX);
+            walk_steps(&mut player, inward, 4);
+            walk_steps(
+                &mut player,
+                MovementInput {
+                    forward: true,
+                    ..MovementInput::default()
+                },
+                6,
+            );
+            let local = player.local_ship_position().unwrap();
+            assert_eq!(player.location(), CharacterLocation::InsideShip);
+            assert!(
+                (local[0] - INTERIOR_FORWARD_MAX).abs() < 1e-12,
+                "{side}: {local:?}"
+            );
+            assert!(local[2].abs() < NOSE_SIDE_LIMIT);
+            assert_eq!(local[1], PLAYER_START[1]);
+        }
+    }
+
+    #[test]
+    fn removed_port_cargo_area_cannot_support_or_admit_a_walker() {
+        for x in [-1.8, -1.0, 0.0, 1.3] {
             let mut cabin = inside_at(x, 3.0);
             walk_steps(
                 &mut cabin,
@@ -1661,20 +1655,10 @@ mod tests {
                 30,
             );
             assert!((cabin.local_ship_position().unwrap()[2] - INTERIOR_SIDE_LIMIT).abs() < 1e-12);
-            let mut cargo = inside_at(x, 7.0);
-            walk_steps(
-                &mut cargo,
-                MovementInput {
-                    left: true,
-                    ..MovementInput::default()
-                },
-                30,
-            );
-            assert!(
-                (cargo.local_ship_position().unwrap()[2] - (5.1 + PLAYER_RADIUS_METERS)).abs()
-                    < 1e-12
-            );
         }
+        assert!(ship_floor_placement([-1.0, 0.0, 8.0], 0.1).is_none());
+        assert!(ship_floor_placement([7.3, 0.0, 0.0], 0.1).is_some());
+        assert!(ship_floor_placement([7.3, 0.0, 1.2], 0.1).is_none());
     }
 
     #[test]
@@ -1717,41 +1701,21 @@ mod tests {
     }
 
     #[test]
-    fn port_sofa_and_starboard_worktop_block_walkers_with_body_clearance() {
-        for (input, expected_side) in [
-            (
-                MovementInput {
-                    right: true,
-                    ..MovementInput::default()
-                },
-                3.36,
-            ),
-            (
-                MovementInput {
-                    left: true,
-                    ..MovementInput::default()
-                },
-                -3.34,
-            ),
+    fn cleared_cabin_sides_allow_walking_to_the_wall() {
+        for input in [
+            MovementInput {
+                right: true,
+                ..MovementInput::default()
+            },
+            MovementInput {
+                left: true,
+                ..MovementInput::default()
+            },
         ] {
             let mut controller = inside_at(-4.5, 0.0);
             walk_steps(&mut controller, input, 20);
             let local = controller.local_ship_position().unwrap();
-            assert!((local[2] - expected_side).abs() < 1.0e-12);
-        }
-        for (side, expected_forward) in [(3.5, -5.94), (-3.5, -6.20)] {
-            let mut controller = inside_at(-6.5, side);
-            walk_steps(
-                &mut controller,
-                MovementInput {
-                    forward: true,
-                    ..MovementInput::default()
-                },
-                20,
-            );
-            assert!(
-                (controller.local_ship_position().unwrap()[0] - expected_forward).abs() < 1.0e-12
-            );
+            assert!((local[2].abs() - INTERIOR_SIDE_LIMIT).abs() < 1.0e-12);
         }
     }
 
@@ -2067,7 +2031,7 @@ mod tests {
                 -5.34,
             ),
             ([DOORWAY_FORWARD, PLAYER_START[1], 6.0], -FRAC_PI_2, 2, 5.34),
-            ([12.0, PLAYER_START[1], 0.0], std::f64::consts::PI, 0, 10.74),
+            ([12.0, PLAYER_START[1], 0.0], std::f64::consts::PI, 0, 8.77),
             ([-9.0, PLAYER_START[1], -3.0], 0.0, 0, -8.16),
             ([-9.0, PLAYER_START[1], 3.0], 0.0, 0, -8.16),
             ([-9.0, PLAYER_START[1], -1.17], 0.0, 0, -8.16),
@@ -2308,7 +2272,7 @@ mod tests {
                     z_max + PLAYER_RADIUS_METERS,
                 ),
             ] {
-                let stopped = slide_around_thrusters(start, end, COLLISION_EPSILON);
+                let stopped = slide_around_appendages(start, end, COLLISION_EPSILON);
                 assert!(
                     (stopped[axis] - contact).abs() < 1.0e-9,
                     "{collider:?}: {stopped:?}"
@@ -2322,21 +2286,44 @@ mod tests {
             };
             let start = [x_min - 1.0, eye, clear_z];
             let end = [x_min + 1.0, eye, clear_z];
-            assert_eq!(slide_around_thrusters(start, end, COLLISION_EPSILON), end);
+            assert_eq!(slide_around_appendages(start, end, COLLISION_EPSILON), end);
         }
         let gate = [-10.0, 1.75, 0.0];
         let inward = [-9.0, 1.75, 0.0];
         assert_eq!(
-            slide_around_thrusters(gate, inward, COLLISION_EPSILON),
+            slide_around_appendages(gate, inward, COLLISION_EPSILON),
             inward
         );
         // A body fully above the raised fin has no phantom horizontal wall.
         let high = [THRUSTER_COLLIDERS[0][0] - 1.0, 5.0, 7.1];
         let beyond = [THRUSTER_COLLIDERS[0][0] + 1.0, 5.0, 7.1];
         assert_eq!(
-            slide_around_thrusters(high, beyond, COLLISION_EPSILON),
+            slide_around_appendages(high, beyond, COLLISION_EPSILON),
             beyond
         );
+    }
+
+    #[test]
+    fn both_wings_block_body_sweeps_but_allow_clearance_above() {
+        for [x_min, x_max, _, y_max, z_min, z_max] in WING_COLLIDERS {
+            let x = (x_min + x_max) / 2.0;
+            let (start_z, end_z, stop_z) = if z_min > 0.0 {
+                (z_max + 1.0, z_max - 1.0, z_max + PLAYER_RADIUS_METERS)
+            } else {
+                (z_min - 1.0, z_min + 1.0, z_min - PLAYER_RADIUS_METERS)
+            };
+            let start = [x, 1.75, start_z];
+            let end = [x, 1.75, end_z];
+            let stopped = slide_around_appendages(start, end, COLLISION_EPSILON);
+            assert!((stopped[2] - stop_z).abs() < 1.0e-9);
+
+            let high = [x, y_max + PLAYER_EYE_HEIGHT_METERS + 0.1, start_z];
+            let high_end = [x, high[1], end_z];
+            assert_eq!(
+                slide_around_appendages(high, high_end, COLLISION_EPSILON),
+                high_end
+            );
+        }
     }
 
     #[test]
@@ -3336,8 +3323,8 @@ mod tests {
             results.push(after);
         }
         for result in &results[1..] {
-            for i in 0..3 {
-                assert!((result[i] - results[0][i]).abs() < 1e-8);
+            for (&actual, &reference) in result.iter().zip(results[0].iter()) {
+                assert!((actual - reference).abs() < 1e-8);
             }
         }
     }

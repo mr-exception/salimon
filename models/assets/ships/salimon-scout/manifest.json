@@ -75,26 +75,19 @@
     "colliders": [
       "COLLIDER_InteriorFloor",
       "COLLIDER_InteriorPortWall",
-      "COLLIDER_PortWallForward",
       "COLLIDER_InteriorStarboardWall",
       "COLLIDER_InteriorCeiling",
-      "COLLIDER_CabinBench",
-      "COLLIDER_CabinWorktop",
       "COLLIDER_EnergyCore",
       "COLLIDER_AftDoor",
       "COLLIDER_ExteriorHull",
-      "COLLIDER_Cargo_Deck",
-      "COLLIDER_Cargo_Ceiling",
-      "COLLIDER_Cargo_Aft_Wall",
-      "COLLIDER_Cargo_Forward_Wall",
-      "COLLIDER_Cargo_Port_Wall",
-      "COLLIDER_Cargo_Inboard_Partition",
-      "COLLIDER_Cargo_Passage_Header",
       "COLLIDER_Engine_Port_Body",
       "COLLIDER_Engine_Port_SweptFin",
       "COLLIDER_Engine_Starboard_Body",
       "COLLIDER_Engine_Starboard_SweptFin",
-      "COLLIDER_CockpitCenterConsole"
+      "COLLIDER_CockpitCenterConsole",
+      "COLLIDER_CockpitNoseFloor",
+      "COLLIDER_Wing_Port",
+      "COLLIDER_Wing_Starboard"
     ],
     "requiredExtras": [
       {
@@ -158,23 +151,11 @@
         "path": "salimon"
       },
       {
-        "node": "COLLIDER_PortWallForward",
-        "path": "salimon"
-      },
-      {
         "node": "COLLIDER_InteriorStarboardWall",
         "path": "salimon"
       },
       {
         "node": "COLLIDER_InteriorCeiling",
-        "path": "salimon"
-      },
-      {
-        "node": "COLLIDER_CabinBench",
-        "path": "salimon"
-      },
-      {
-        "node": "COLLIDER_CabinWorktop",
         "path": "salimon"
       },
       {
@@ -187,34 +168,6 @@
       },
       {
         "node": "COLLIDER_ExteriorHull",
-        "path": "salimon"
-      },
-      {
-        "node": "COLLIDER_Cargo_Deck",
-        "path": "salimon"
-      },
-      {
-        "node": "COLLIDER_Cargo_Ceiling",
-        "path": "salimon"
-      },
-      {
-        "node": "COLLIDER_Cargo_Aft_Wall",
-        "path": "salimon"
-      },
-      {
-        "node": "COLLIDER_Cargo_Forward_Wall",
-        "path": "salimon"
-      },
-      {
-        "node": "COLLIDER_Cargo_Port_Wall",
-        "path": "salimon"
-      },
-      {
-        "node": "COLLIDER_Cargo_Inboard_Partition",
-        "path": "salimon"
-      },
-      {
-        "node": "COLLIDER_Cargo_Passage_Header",
         "path": "salimon"
       },
       {
@@ -248,6 +201,18 @@
       {
         "node": "MARKER_PlayerStart",
         "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_CockpitNoseFloor",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Wing_Port",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Wing_Starboard",
+        "path": "salimon"
       }
     ]
   },
@@ -267,9 +232,9 @@
         "glassMaterial": "Cockpit Glass",
         "maxRuntimeDraws": 2,
         "dimensionsMeters": [
-          20.9,
-          4,
-          21
+          18.33,
+          4.0,
+          20.0
         ],
         "spatialContracts": "client/assets/ship/spatial-contracts.json"
       }

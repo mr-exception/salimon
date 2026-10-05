@@ -1,10 +1,10 @@
 """Named gameplay suites share the baseline's authoritative routes."""
 
-SHIP_EVA = ("cargo-room.json", "space-airlock.json", "moving-eva.json", "nearby-eva.json")
+SHIP_EVA = ("cockpit-nose.json", "space-airlock.json", "moving-eva.json", "nearby-eva.json")
 
 RESOURCE_COLLECTION = (
     "resource-deposits.json", "mining.json", "carrying.json",
-    "fragment-transfer.json", "physical-cargo.json", "resource-streaming.json", "resource-loop.json",
+    "fragment-transfer.json", "resource-streaming.json", "resource-loop.json",
 )
 GROUPS = {"ship-eva": SHIP_EVA, "resource-collection": RESOURCE_COLLECTION}
 

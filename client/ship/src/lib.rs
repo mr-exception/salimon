@@ -18,7 +18,7 @@ pub const LOWEST_LOCAL_Y_METERS: f64 = -0.107_526_881_720_430_11;
 pub const STEERING_RATE_RADIANS_PER_SECOND: f64 = 5.0_f64.to_radians();
 /// Time for a steering axis to ramp fully on or off. This is not inertia.
 pub const STEERING_RAMP_SECONDS: f64 = 0.12;
-/// Conservative bounding sphere for the wider 20.9 x 4.0 x 21.0 meter ship asset.
+/// Conservative bounding sphere for the 18.33 x 4.0 x 20.0 meter ship asset.
 pub const COLLISION_RADIUS_METERS: f64 = 16.0;
 /// Height above a solid surface at which Phase 0 landing assistance is offered.
 pub const LANDING_RANGE_RADIUS_FRACTION: f64 = LANDING_RANGE_ALTITUDE_RADIUS_FACTOR;
@@ -52,6 +52,8 @@ pub enum DoorState {
     Closed,
     Open,
 }
+
+pub const DOOR_HINGE_ANIMATION_DURATION: Duration = Duration::from_millis(700);
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum FlightState {
@@ -145,6 +147,8 @@ pub struct ShipSnapshot {
     pub pose: ShipPose,
     pub flight_state: FlightState,
     pub door_state: DoorState,
+    /// 0 is closed; 1 is raised clear of the aft doorway.
+    pub door_open_fraction: f64,
     pub cockpit_control_active: bool,
     pub thruster_percentage: u8,
     pub speed_meters_per_second: f64,
@@ -160,6 +164,7 @@ pub struct ShipController {
     pose: ShipPose,
     flight_state: FlightState,
     door_state: DoorState,
+    door_open_fraction: f64,
     cockpit_control_active: bool,
     thruster_percentage: u8,
     energy_core: EnergyCoreState,
@@ -229,6 +234,7 @@ impl Default for ShipController {
                 body: CelestialBodyId::Earth,
             },
             door_state: DoorState::Closed,
+            door_open_fraction: 0.0,
             cockpit_control_active: false,
             thruster_percentage: 0,
             energy_core: EnergyCoreState::default(),
@@ -247,6 +253,7 @@ impl ShipController {
             pose,
             flight_state: FlightState::Flying,
             door_state: DoorState::Closed,
+            door_open_fraction: 0.0,
             cockpit_control_active: true,
             thruster_percentage: thruster_percentage.min(100),
             energy_core: EnergyCoreState::default(),
@@ -316,6 +323,11 @@ impl ShipController {
     }
 
     pub fn advance(&mut self, delta: Duration) {
+        let door_step = delta.as_secs_f64() / DOOR_HINGE_ANIMATION_DURATION.as_secs_f64();
+        self.door_open_fraction = match self.door_state {
+            DoorState::Open => (self.door_open_fraction + door_step).min(1.0),
+            DoorState::Closed => (self.door_open_fraction - door_step).max(0.0),
+        };
         let seconds = delta.as_secs_f64().min(0.1);
         self.advance_steering(seconds);
         match self.flight_state {
@@ -350,7 +362,7 @@ impl ShipController {
                 }
             }
             FlightState::Landed { body } => {
-                if self.door_state == DoorState::Open {
+                if self.door_state == DoorState::Open || self.door_open_fraction > 0.0 {
                     self.cockpit_message = Some(CockpitMessage::CloseDoorBeforeTakeoff);
                 } else {
                     self.assist = Some(AssistTransition::new(
@@ -527,6 +539,7 @@ impl ShipController {
             pose: self.pose,
             flight_state: self.flight_state,
             door_state: self.door_state,
+            door_open_fraction: self.door_open_fraction,
             cockpit_control_active: self.cockpit_control_active,
             thruster_percentage: self.thruster_percentage,
             speed_meters_per_second: self.speed_meters_per_second(),
@@ -796,6 +809,26 @@ mod tests {
             snapshot.cockpit_message.map(CockpitMessage::text),
             Some("Door locked while in flight")
         );
+    }
+
+    #[test]
+    fn top_hinged_door_advances_reverses_and_blocks_takeoff_until_closed() {
+        let mut ship = ShipController::default();
+        ship.toggle_door();
+        assert_eq!(ship.snapshot().door_open_fraction, 0.0);
+        ship.advance(DOOR_HINGE_ANIMATION_DURATION / 2);
+        assert!((ship.snapshot().door_open_fraction - 0.5).abs() < 1.0e-12);
+        ship.toggle_door();
+        ship.advance(DOOR_HINGE_ANIMATION_DURATION / 4);
+        assert!((ship.snapshot().door_open_fraction - 0.25).abs() < 1.0e-12);
+        ship.set_cockpit_control(true);
+        ship.trigger_landing_action();
+        assert_eq!(
+            ship.snapshot().cockpit_message,
+            Some(CockpitMessage::CloseDoorBeforeTakeoff)
+        );
+        ship.advance(DOOR_HINGE_ANIMATION_DURATION / 4);
+        assert_eq!(ship.snapshot().door_open_fraction, 0.0);
     }
 
     #[test]

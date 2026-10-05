@@ -7,7 +7,7 @@ produces a renderer-neutral camera snapshot.
 
 The controller uses ship-local floor gravity while inside, clamps movement to
 simple invisible interior bounds, and slides around the central Core pedestal,
-port sofa, starboard worktop, pilot chair, cockpit consoles/monitors, and forward
+pilot chair, unified cockpit console/monitors, and forward
 hull proxies.
 The enlarged room has a 9.20 m interior width with walking routes on both sides
 of the Core. A 0.24 m body radius keeps the player clear of fixtures, projecting
@@ -30,14 +30,17 @@ Surface movement is projected
 back to the same spherical radius each update, so the portable rule works around
 the full body rather than only near the initial landing point.
 
-The Task 10 playtest revision defines a 1.80 m player body with a 1.75 m standing
-eye height. The floor, player start, cockpit camera, doorway crossing, and
-invisible bounds match the redesigned 20.90 × 4.00 × 21.00 m ship. Spawn and
+The player body is 1.80 m tall with a 1.75 m standing eye height. The floor,
+player start, cockpit camera, doorway crossing, and invisible bounds follow the
+authored ship geometry. Spawn and
 cockpit exit use the clear starboard aisle at `[0.50, 1.9973, -2.20]`, outside
-the Core and the lowered pilot chair. Walking can enter the cockpit on either
-side of the chair, while body-expanded object proxies keep the player out of the
-chair, monitor consoles, walls, and exterior hull. Seating remains a contextual
-transition.
+the Core and the lowered pilot chair. Walking can pass the chair on its port
+side, continue past the unified center console, then turn into the narrow
+nose. The broad deck allows body centers through X `6.32 m`; the nose floor
+continues to X `7.85 m`, with body centers through X `7.61 m` and within
+`±0.86 m` of the centerline. The single console collision footprint is X
+`3.66–6.44 m`, Z `−3.34–0.24 m`, including the player's radius. Seating
+remains a contextual transition.
 
 Cockpit entry and exit are instant. The default seated view is slightly pitched
 down while retaining a clear forward sightline through the Task 9 glazing; mouse
@@ -79,8 +82,8 @@ The selected surface remains authoritative even if the ship is near another
 body. Leaving influence disables gravity while retaining current world motion;
 re-entry restores interior gravity and clears influence.
 
-`ship_floor_placement` supplies conservative cabin/cargo deck support using the
-same furniture/partition bounds as traversal. Interior sight queries use walls,
-furniture, deck, ceiling, and the gate rather than treating the whole cabin as
-a solid exterior box. These renderer-neutral queries also validate loose resource
-placement and pickup; no resource types enter the character crate.
+`ship_floor_placement` supplies conservative cabin and nose deck support using
+the same Core and console bounds as traversal. Interior sight queries use walls,
+Core, deck, ceiling, and the gate rather than treating the whole cabin as
+a solid exterior box. These renderer-neutral queries also keep loose resource
+motion on the deck and validate pickup sightlines; no resource types enter the character crate.

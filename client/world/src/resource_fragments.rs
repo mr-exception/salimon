@@ -90,13 +90,14 @@ fn spawn_position(deposit: ResourceDeposit, ordinal: usize) -> WorldPosition {
     let norm = tangent.iter().map(|v| v * v).sum::<f64>().sqrt();
     let tangent = tangent.map(|v| v / norm);
     let bitangent = cross(up, tangent);
-    // Reserve full-piece space so growing pieces never shift position or intersect the sphere.
+    // Start at the deposit edge; runtime gives new pieces an outward impulse.
+    // Reserve full-piece height while their mass grows.
     let side = (FRAGMENT_MAX_MASS_KG
         / deposit.material().resource().definition().density_kg_per_m3)
         .cbrt();
     let support = side * up.iter().map(|v| v.abs()).sum::<f64>() * 0.5 + 0.005;
-    let column = 0.8 + (ordinal % 8) as f64 * 0.3;
-    let row = (ordinal / 8) as f64 * 0.3;
+    let column = 0.20 + (ordinal % 4) as f64 * 0.025;
+    let row = ((ordinal / 4) % 3) as f64 * 0.025 - 0.025;
     deposit.position().translated(std::array::from_fn(|i| {
         up[i] * support + tangent[i] * column + bitangent[i] * row
     }))

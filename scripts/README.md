@@ -55,7 +55,7 @@ python3 -m unittest discover -s scripts -p 'test_*.py'
 
 ## Ship/EVA prerequisite suite (#39)
 
-Before resource transfer/cargo work, run the four prerequisite routes together:
+Before resource transfer work, run the four prerequisite routes together:
 
 ```sh
 python3 scripts/salimon-test suite --group ship-eva
@@ -63,7 +63,7 @@ python3 scripts/salimon-test suite --group ship-eva --evidence \
   --screenshot-command '["python3", "scripts/capture_settled.py", "{path}"]'
 ```
 
-Both commands support `--binary` and `--artifacts`. The first runs cargo-room,
+Both commands support `--binary` and `--artifacts`. The first runs cockpit-nose,
 space-airlock, moving-eva and nearby-eva in that order. The second runs their
 synchronized screenshot variants; capture failure fails the suite. Each scenario
 starts a fresh native client and emits the shared result, step snapshots,
@@ -76,7 +76,7 @@ after 600 frames (9.6 seconds) without input, zero relative speed within 0.02 m/
 and ship/player inherited speed of 25,000 m/s. It also checks velocity after
 re-entry. The nearby route checks open-space mode before threshold crossing,
 Earth selection inside 3,000,000 m, continuous altitude and bounded radial
-acceleration. Cargo traversal and airlock collision checks cover the real layout.
+acceleration. Cockpit-to-nose traversal and airlock collision checks cover the real layout.
 The required Linux CI job runs this evidence group against the release binary.
 See [checked-in validation](../docs/issue-39/README.md) for results and screenshots.
 
@@ -90,8 +90,8 @@ python3 scripts/salimon-test suite --group resource-collection --evidence \
   --screenshot-command '["python3", "scripts/capture_settled.py", "{path}"]'
 ```
 
-Both commands accept `--binary` and `--artifacts`. The seven required routes run in
-this order: resource-deposits, mining, carrying, fragment-transfer, physical-cargo,
+Both commands accept `--binary` and `--artifacts`. The six required routes run in
+this order: resource-deposits, mining, carrying, fragment-transfer,
 resource-streaming, resource-loop. Each starts a fresh seeded native client. Missing scenario
 files, failed launches, failed assertions and failed evidence captures fail the
 aggregate report; no route is silently skipped. Linux CI requires the evidence
@@ -101,14 +101,14 @@ suite against the staged release executable and uploads all shared runner artifa
 | --- | --- |
 | Distribution/generation | `client/world/tests/resource_distribution.rs` and `resource_generation.rs`: deterministic seeds, material weights, geometry, ordering, reload identity and invalid inputs. |
 | Extraction/physical output | `client/world/tests/mining.rs` and `resource_fragments.rs`: range, aim, line of sight, depletion, nonnegative mass and conservation across all materials and time steps. |
-| Carrying/transfer/cargo | Runtime carrying/cargo contracts and production-action walkthroughs in `client/runtime/src/automation.rs`; native carrying, fragment-transfer and physical-cargo routes protect one-object rejection, round trips, placement, removal and ship-relative support in flight. |
+| Carrying/transfer | Runtime carrying contracts and production-action walkthroughs in `client/runtime/src/automation.rs`; native carrying and fragment-transfer routes protect one-object rejection, round trips, cabin placement, removal and ship-relative support in flight. |
 | Stream restoration | `client/world/tests/resource_streaming.rs` and native resource-streaming: partial and depleted source IDs leave the active radius and return with unchanged mass and no duplicate output. |
 
 Evidence variants add only named screenshot checkpoints to the baseline actions
 and assertions. Every run preserves structured results, per-step state and logs;
 failures also preserve available state and screenshots. Runner contracts cover
 failed capture, process cleanup and assertion/startup failure; suite contracts
-verify that failed launches retain seven isolated result directories. Native
+verify that failed launches retain six isolated result directories. Native
 macOS/Windows graphics need local GPU validation; Linux CI uses software Vulkan.
 
 ## Deterministic first resource loop (#52)
@@ -117,7 +117,7 @@ macOS/Windows graphics need local GPU validation; Linux CI uses software Vulkan.
 16 ms steps. `resource-approach` starts seated 1 km directly above the Earth
 reference landing site. Normal assisted landing reaches the surface; all later
 walking, mining, pickup and placement use production controls. No scenario
-command teleports the player, inserts deposits or fragments, or sets cargo state.
+command teleports the player, inserts deposits or fragments, or sets fragment state.
 
 ```sh
 python3 scripts/salimon-test run scenarios/resource-loop.json
@@ -130,11 +130,9 @@ resource-collection evidence group. The route checks two actual locally
 materialized collectible types (iron ore and silicate rock), walks to the stable
 silicate source, verifies physical mass/identity/volume after mining, leaves and
 returns across the 120 m streaming boundary after partial mining and again after
-depletion, then delivers fragments 1 and 2 on separate trips to the cargo room.
-It attempts another pickup while carrying fragment 2 and verifies rejection,
-unchanged cargo and carried ownership before placing it. Final cargo contains
-both loose physical objects with the original source/material/mass. The evidence
-variant adds eleven named screenshots without changing actions or assertions.
+depletion, then carries fragment 1 through the aft door and places it on the main
+cabin deck. The fragment keeps its identity, material and ship-relative support.
+The evidence variant adds named screenshots without changing actions or assertions.
 
 Every run writes structured results, per-step state snapshots and process/protocol
 logs; evidence captures also save their authoritative states. See the shared
@@ -144,11 +142,11 @@ survival consumption, asteroid mining and backend persistence are outside it.
 
 ## Phase 0 baseline suite
 
-The default `suite` checks seven native gameplay paths:
+The default `suite` discovers every baseline scenario, including these routes:
 
 | Scenario | Coverage |
 | --- | --- |
-| `cargo-room.json` | Exit/re-enter the actual aft airlock, traverse the new port cargo passage, test outer walls and the solid partition, return to door/cockpit, take off and walk the room again in flight. |
+| `cockpit-nose.json` | Walk around the pilot chair and unified console into the short cockpit nose, then return to the cabin. |
 | `landed-earth.json` | Known initial player pose and ship state; walking/aiming into cockpit control; non-pilot control rejection; closed-door exit collision; opening and exiting to the surface; closing the door outside and walking against it twice; reopening and returning inside; the open-door takeoff interlock; closing the door and completing assisted takeoff. |
 | `resource-deposits.json` | Real airlock exit and surface walk to a stable generated silicate deposit; checks material, positive mass, proximity, and presentation data. |
 | `resource-streaming.json` | Partial mining, walking beyond the 120 m active radius, explicit source-ID absence, return with identical mass, full depletion, and a second round trip without regeneration or duplicate fragments. |
@@ -369,13 +367,13 @@ pickup, and the one-object limit. Their evidence variants add
 `fragment-target-context` checkpoints alongside `blocked-second-pickup`.
 Both variants already run in the required Linux native-build job.
 
-## Cargo-room walkthrough (#34)
+## Cockpit nose walkthrough
 
-The default suite includes `cargo-room.json`. Its evidence variant is required
-in Linux CI and records exterior/cockpit plus landed/flying cargo views. Run:
+The default suite includes `cockpit-nose.json`. Its evidence variant records the
+walkable nose from the character's actual position. Run:
 
 ```sh
-python scripts/salimon-test run scenarios/evidence/cargo-room.json \
+python scripts/salimon-test run scenarios/evidence/cockpit-nose.json \
   --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
 ```
 
@@ -383,8 +381,8 @@ The helper waits 0.5 seconds before the normal platform screenshot command to
 reduce stale frames from asynchronous GPU presentation. It is not a GPU fence;
 authoritative movement/state assertions remain the verification source. Capture
 errors still fail the scenario and the runner's normal deadlines apply. Use a
-dedicated unobscured test display. Checked-in validation images and results are
-in [issue #34 evidence](../docs/issue-34/README.md).
+dedicated unobscured test display. The prior cargo-room route and its evidence
+remain archived under [issue #34](../docs/issue-34/README.md).
 
 ## Space airlock access (#35)
 
@@ -394,7 +392,7 @@ normal controls to leave the cockpit, walk to the gate, open it, exit without
 planetary snapping, close it from outside, verify blocked re-entry, reopen and
 re-enter, close it again, and verify blocked exit. It runs in the default suite.
 `scenarios/evidence/space-airlock.json` adds four screenshot/state checkpoints and
-is required in Linux CI. Use the settled capture helper as for the cargo room.
+is required in Linux CI. Use the settled capture helper as for the cockpit nose.
 
 The portable runtime test executes the same access scenario, while ship tests
 cover inclusive threshold locking and assisted-sequence locking. Moving-ship
@@ -444,21 +442,13 @@ Inspection exposes each visible fragment's `reference_frame` (`ship` for loose
 interior anchors, `world` otherwise) alongside its existing carried flag and
 ship-local pose. These fields describe actual physical entities, not inventory.
 
-## Physical cargo containment (#49)
+## Ship-supported fragments
 
-`physical-cargo.json` mines a generated deposit and stores two real fragments
-across separate trips through the cargo passage. It verifies the one-object
-limit, room leave/re-entry, removal to the surface, and stable cargo through
-assisted takeoff and flight. `cargo.fragments` lists only actual loose fragments
-whose complete conservative bound fits within the generated cargo-room bounds;
-it is independent of player distance and excludes carried and cabin/surface
-objects. `cargo.fragment_count` derives from that list, never an inventory counter.
-
-The baseline runs in the default suite and its complete action/assertion route
-also runs in a portable runtime regression. The evidence variant adds five named
-captures and runs in required Linux CI with settled capture. Capture failures fail
-that run. See [validation status](../docs/issue-49/README.md) for the passing native CI results, checkpoint states, screenshots and reproduction
-commands.
+`fragment-transfer.json` verifies that a loose fragment dropped on the cabin deck
+keeps its ship-local pose while the ship moves, and that pickup and surface
+placement transfer the same physical entity between reference frames. The
+resource loop additionally delivers a mined fragment into the cabin. The former
+dedicated cargo-room behavior is archived in [issue #49](../docs/issue-49/README.md).
 
 ## Lower cockpit windows (#38)
 

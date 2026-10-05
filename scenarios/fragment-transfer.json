@@ -244,6 +244,12 @@
     },
     {
       "action": {
+        "op": "step",
+        "frames": 45
+      }
+    },
+    {
+      "action": {
         "op": "key",
         "key": "backward",
         "pressed": true
@@ -890,8 +896,8 @@
     {
       "action": {
         "op": "look",
-        "dx": 195.38672847056907,
-        "dy": 93.04000492761612
+        "dx": 171.38672847056907,
+        "dy": 102.04000492761612
       }
     },
     {
@@ -903,7 +909,7 @@
     {
       "assert": {
         "path": "resource_ui.context",
-        "equals": "Silicate rock fragment - approx 2.00 kg\nQ to pick up fragment"
+        "equals": "Silicate rock fragment - approx 2.00 kg\nE to pick up fragment"
       }
     },
     {
@@ -941,7 +947,7 @@
     {
       "action": {
         "op": "look",
-        "dx": -1285.6829063584482,
+        "dx": -1261.6829063584482,
         "dy": -330.70695098465796
       }
     },
@@ -1046,8 +1052,8 @@
     {
       "action": {
         "op": "look",
-        "dx": 0.0,
-        "dy": -9.107345218456969
+        "dx": -135.0,
+        "dy": 45.89265478154303
       }
     },
     {
@@ -1145,8 +1151,8 @@
     {
       "action": {
         "op": "look",
-        "dx": 0.0,
-        "dy": -5.400331541815164
+        "dx": -135.0,
+        "dy": 24.599668458184837
       }
     },
     {
@@ -1316,29 +1322,29 @@
     {
       "assert": {
         "path": "world.fragments.0.ship_local_position_meters.0",
-        "approx": -4.9212646484375,
+        "approx": -6.235595703125,
         "tolerance": 0.001
       }
     },
     {
       "assert": {
         "path": "world.fragments.0.ship_local_position_meters.1",
-        "approx": 0.3306884765625,
+        "approx": 0.2926025390625,
         "tolerance": 0.001
       }
     },
     {
       "assert": {
         "path": "world.fragments.0.ship_local_position_meters.2",
-        "approx": 9.1552734375e-05,
+        "approx": -1.5989990234375,
         "tolerance": 0.001
       }
     },
     {
       "action": {
         "op": "look",
-        "dx": -714.0696018873633,
-        "dy": 493.4368172358474
+        "dx": -1630.0,
+        "dy": 511.0
       }
     },
     {
@@ -1350,8 +1356,8 @@
     {
       "action": {
         "op": "look",
-        "dx": -1427.8281875737302,
-        "dy": -493.42186519849184
+        "dx": -509.09673963436717,
+        "dy": -510.98504796264444
       }
     },
     {
@@ -1401,7 +1407,7 @@
     {
       "action": {
         "op": "look",
-        "dx": 800.8564409856434,
+        "dx": 1325.8564409856433,
         "dy": 0.0
       }
     },
@@ -1428,7 +1434,7 @@
     {
       "action": {
         "op": "look",
-        "dx": 627.7564950155775,
+        "dx": 443.7564950155775,
         "dy": 0.0
       }
     },
@@ -1514,21 +1520,21 @@
     {
       "assert": {
         "path": "world.fragments.0.ship_local_position_meters.0",
-        "approx": -4.9212646484375,
+        "approx": -6.235595703125,
         "tolerance": 0.001
       }
     },
     {
       "assert": {
         "path": "world.fragments.0.ship_local_position_meters.1",
-        "approx": 0.3306884765625,
+        "approx": 0.2926025390625,
         "tolerance": 0.001
       }
     },
     {
       "assert": {
         "path": "world.fragments.0.ship_local_position_meters.2",
-        "approx": 9.1552734375e-05,
+        "approx": -1.5989990234375,
         "tolerance": 0.001
       }
     },
@@ -1612,8 +1618,8 @@
     {
       "action": {
         "op": "look",
-        "dx": -703.3862386681203,
-        "dy": 493.4213375785643
+        "dx": -1631.3862386681203,
+        "dy": 473.4213375785643
       }
     },
     {

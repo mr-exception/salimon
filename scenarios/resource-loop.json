@@ -155,6 +155,9 @@
       }
     },
     {
+      "action": {"op": "step", "frames": 45}
+    },
+    {
       "action": {
         "op": "key",
         "key": "backward",
@@ -1091,8 +1094,8 @@
     {
       "action": {
         "op": "look",
-        "dx": 195.38672847056907,
-        "dy": 93.04000492761612
+        "dx": 171.38672847056907,
+        "dy": 102.04000492761612
       }
     },
     {
@@ -1104,7 +1107,7 @@
     {
       "assert": {
         "path": "resource_ui.context",
-        "equals": "Silicate rock fragment - approx 2.00 kg\nQ to pick up fragment"
+        "equals": "Silicate rock fragment - approx 2.00 kg\nE to pick up fragment"
       }
     },
     {
@@ -1140,15 +1143,9 @@
       }
     },
     {
-      "assert": {
-        "path": "cargo.fragment_count",
-        "equals": 0
-      }
-    },
-    {
       "action": {
         "op": "look",
-        "dx": -1285.6829063584482,
+        "dx": -1261.6829063584482,
         "dy": -330.70695098465796
       }
     },
@@ -1200,10 +1197,15 @@
       }
     },
     {
-      "action": {
-        "op": "look",
-        "dx": 712.4195613489455,
-        "dy": 0.0
+      "assert": {
+        "path": "player.location",
+        "equals": "InsideShip"
+      }
+    },
+    {
+      "assert": {
+        "path": "carrying.object_id",
+        "equals": 1
       }
     },
     {
@@ -1216,61 +1218,7 @@
     {
       "action": {
         "op": "step",
-        "frames": 33
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": false
-      }
-    },
-    {
-      "action": {
-        "op": "look",
-        "dx": -711.6975477728629,
-        "dy": 0.0
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 117
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": false
-      }
-    },
-    {
-      "action": {
-        "op": "look",
-        "dx": 715.4677696129189,
-        "dy": 0.0
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 99
+        "frames": 28
       }
     },
     {
@@ -1282,14 +1230,14 @@
     },
     {
       "assert": {
-        "path": "carrying.object_id",
-        "equals": 1
+        "path": "player.local_ship_position_meters.0",
+        "gt": -6.0
       }
     },
     {
       "action": {
         "op": "look",
-        "dx": 712.944088643727,
+        "dx": 1.1513425306095761,
         "dy": 500.0
       }
     },
@@ -1315,458 +1263,20 @@
     },
     {
       "assert": {
-        "path": "cargo.fragment_count",
+        "path": "world.fragments.0.reference_frame",
+        "equals": "ship"
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.0.id",
         "equals": 1
-      }
-    },
-    {
-      "assert": {
-        "path": "cargo.fragments.0.id",
-        "equals": 1
-      }
-    },
-    {
-      "assert": {
-        "path": "world.fragments.0.in_cargo_room",
-        "equals": true
-      }
-    },
-    {
-      "action": {
-        "op": "look",
-        "dx": 714.0038614571371,
-        "dy": -499.9988199815731
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 99
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": false
-      }
-    },
-    {
-      "action": {
-        "op": "look",
-        "dx": -714.0080993810495,
-        "dy": 0.0
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 117
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": false
-      }
-    },
-    {
-      "action": {
-        "op": "look",
-        "dx": 717.1580926201348,
-        "dy": 0.0
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 33
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": false
-      }
-    },
-    {
-      "action": {
-        "op": "look",
-        "dx": -717.7106284719346,
-        "dy": 0.0
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 86
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": false
-      }
-    },
-    {
-      "assert": {
-        "path": "cargo.fragment_count",
-        "equals": 1
-      }
-    },
-    {
-      "action": {
-        "op": "look",
-        "dx": 290.1472624458775,
-        "dy": 0.0
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 146
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": false
-      }
-    },
-    {
-      "action": {
-        "op": "look",
-        "dx": -79.02724819291026,
-        "dy": 315.3568898675988
-      }
-    },
-    {
-      "assert": {
-        "path": "carrying.target_id",
-        "equals": 2
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "pickup",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "pickup",
-        "pressed": false
-      }
-    },
-    {
-      "assert": {
-        "path": "carrying.object_id",
-        "equals": 2
-      }
-    },
-    {
-      "action": {
-        "op": "look",
-        "dx": -1349.6037198114238,
-        "dy": -315.3259059873122
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 146
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": false
-      }
-    },
-    {
-      "action": {
-        "op": "look",
-        "dx": -288.099651918041,
-        "dy": 0.0
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 86
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": false
-      }
-    },
-    {
-      "action": {
-        "op": "look",
-        "dx": 717.1928914377444,
-        "dy": 0.0
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 33
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": false
-      }
-    },
-    {
-      "action": {
-        "op": "look",
-        "dx": -718.4982209815328,
-        "dy": 0.0
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 117
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": false
-      }
-    },
-    {
-      "action": {
-        "op": "look",
-        "dx": 715.4862601319048,
-        "dy": 0.0
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 99
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": false
-      }
-    },
-    {
-      "action": {
-        "op": "look",
-        "dx": 712.928515618704,
-        "dy": 490.89147465221583
-      }
-    },
-    {
-      "assert": {
-        "path": "carrying.target_id",
-        "equals": 1
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "pickup",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "pickup",
-        "pressed": false
-      }
-    },
-    {
-      "assert": {
-        "path": "carrying.object_id",
-        "equals": 2
-      }
-    },
-    {
-      "assert": {
-        "path": "carrying.last_action_feedback",
-        "equals": "Only one world object - G to place/drop first"
       }
     },
     {
       "assert": {
         "path": "world.fragments.0.carried",
         "equals": false
-      }
-    },
-    {
-      "assert": {
-        "path": "world.fragments.1.carried",
-        "equals": true
-      }
-    },
-    {
-      "assert": {
-        "path": "cargo.fragment_count",
-        "equals": 1
-      }
-    },
-    {
-      "action": {
-        "op": "look",
-        "dx": -714.002835645145,
-        "dy": -490.91510189403436
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 16
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": false
-      }
-    },
-    {
-      "action": {
-        "op": "look",
-        "dx": 714.0538168667226,
-        "dy": 500.0
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "drop",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "drop",
-        "pressed": false
-      }
-    },
-    {
-      "assert": {
-        "path": "carrying.object_id",
-        "equals": null
-      }
-    },
-    {
-      "assert": {
-        "path": "cargo.fragment_count",
-        "equals": 2
-      }
-    },
-    {
-      "assert": {
-        "path": "cargo.fragments.0.id",
-        "equals": 1
-      }
-    },
-    {
-      "assert": {
-        "path": "cargo.fragments.1.id",
-        "equals": 2
       }
     },
     {

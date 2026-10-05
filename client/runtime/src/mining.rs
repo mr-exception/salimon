@@ -11,6 +11,10 @@ use salimon_world::resource_generation::{GenerationError, SurfaceDeposit};
 pub(crate) struct MiningTool {
     pub(crate) ship_fragments:
         std::collections::HashMap<salimon_world::resources::FragmentId, [f64; 3]>,
+    pub(crate) fragment_motion: std::collections::HashMap<
+        salimon_world::resources::FragmentId,
+        crate::fragment_physics::FragmentMotion,
+    >,
     pub(crate) carry_feedback: Option<&'static str>,
     pub(crate) equipped: bool,
     pub(crate) held: bool,

@@ -10,16 +10,9 @@ The spaceship is the player's **primary home, vehicle, survival system, workshop
 - The cockpit/navigation module controls navigation and can only be operated by the ship owner.
 - Other systems such as railguns, laser weapons, fabrication, charging, processing, maintenance, and life-support functions should exist at distinct physical locations.
 - Other players aboard the ship may operate all modules except owner-only navigation.
-- The initial ship must be large enough to contain a **dedicated walkable cargo room** in addition to the cockpit, access/airlock space, and other required interior circulation. The cargo room is a real physical room for loose objects and future containers, not an abstract inventory screen.
-### Initial cargo-room layout
-The initial scout has a dedicated port module with a 29.7 m² clear cargo floor
-(local X −3.2…2.2 m, Z 5.1…10.6 m), level with the cabin at Y 0.2473118 m.
-A 1.8 m passage at X 0.4…2.2 m leads from the cabin port aisle into the room.
-The cockpit and aft airlock anchors are preserved. The physical space supports
-loose-fragment storage and future containers. Physical membership is derived
-from the actual loose entities supported by the ship whose complete conservative
-bounds fit inside this room; carried, cabin and surface objects are excluded.
-Pickup and clear-floor placement update membership without a separate inventory. The room remains in the ship's reference frame during flight.
+- The initial scout has a walkable cabin, cockpit, and aft airlock. Its separate port cargo room and protruding cargo hull module are removed to keep the exterior silhouette coherent.
+- The cockpit has a shorter nose and shorter canopy glazing. One center console carries three physical monitors, with a clear walking routes on both sides from the cabin past the console into the cockpit nose. Seated forward and downward visibility remains usable.
+- Loose physical fragments can be dropped on the main-cabin deck and travel with the ship. The initial scout has no dedicated cargo room or designated storage volume; its cabin bench and storage cabinet are removed. Future dedicated physical storage is an open design question in [Project Q&A](project-qa.md).
 
 ## Construction
 - Ship expansion uses **modular rooms/hull sections**.
@@ -70,7 +63,7 @@ Death is intentionally severe. If the player dies or suffers unrecoverable total
 Inventory should avoid abstract chest/list behavior wherever possible.
 - Resources exist as physical objects/fragments.
 - Players can drop resources directly on the ship floor and create visible piles.
-- The initial spaceship includes a dedicated physical cargo room sized for carrying and organizing multiple loose resource fragments over repeated one-object-at-a-time trips.
+- The initial scout can carry loose fragments dropped on the main-cabin deck. It has no dedicated cargo room or cargo-counting volume.
 - Physical containers organize objects spatially; the player can see and retrieve the actual contents.
 - Cargo mass and placement may affect the ship where simulation depth permits.
 ## Space EVA and airlock
@@ -141,13 +134,13 @@ mode after re-entry. This does not add orbital physics to ship flight.
 
 ### Physical planet/ship transfer (#47)
 
-Q targets/picks up fragments on the surface or while walking inside; G places on
-clear nearby ground or the ship deck, including the cargo-room floor. Placement
-rejects furniture, partitions, hull edges, and overlapping fragments. Doorway
+E picks up an aimed fragment on the surface or while walking inside; E releases
+the carried fragment from hand height. Gravity and contact let fragments settle
+on the ground or pile against one another. Doorway
 movement keeps the same carried world entity relative to the player's eye/up
 basis. Releasing inside attaches that physical entity to a ship-local support
-anchor: it moves with the ship without reacting to acceleration. Pickup detaches
-it; releasing outside restores a stationary world pose on radial ground.
+anchor: it moves with the ship while simulated against the cabin deck. Pickup detaches
+it; releasing outside lets it fall onto radial ground.
 Identity, material, mass, and source stay unchanged through repeated trips.
 Current greybox cubes retain world-axis orientation with conservative clearance
 for rotated decks. This adds no abstract inventory, container system, cargo

@@ -243,6 +243,9 @@
       }
     },
     {
+      "action": {"op": "step", "frames": 45}
+    },
+    {
       "action": {
         "op": "key",
         "key": "backward",

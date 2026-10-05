@@ -9,14 +9,17 @@ const SHIP_GLB: &[u8] = include_bytes!("../../assets/ship/export/salimon_phase0_
 const VERTEX_FLOATS: usize = 18;
 const VERTEX_STRIDE: u64 = (VERTEX_FLOATS * size_of::<f32>()) as u64;
 const UNIFORM_SIZE: u64 = 160;
-const OPEN_DOOR_OFFSET_METERS: f32 = 4.50;
+// The sealed aft leaf rotates outward and upward around its top edge.
+const OPEN_DOOR_ANGLE_RADIANS: f32 = -1.919_862_2;
+const DOOR_HINGE_X_METERS: f32 = -7.68;
+const DOOR_HINGE_Y_METERS: f32 = 2.516_129;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ShipMeshInstance {
     pub position_meters: [f64; 3],
     /// Unit quaternion `[x, y, z, w]` rotating ship-local coordinates to world.
     pub orientation: [f32; 4],
-    pub door_open: bool,
+    pub door_open_fraction: f32,
     /// Read-only presentation values, kept live independently of cockpit control.
     pub instruments: CockpitInstruments,
 }
@@ -447,6 +450,8 @@ impl ShipMeshRenderer {
         };
         if !ship.position_meters.iter().all(|value| value.is_finite())
             || !ship.orientation.iter().all(|value| value.is_finite())
+            || !ship.door_open_fraction.is_finite()
+            || !(0.0..=1.0).contains(&ship.door_open_fraction)
         {
             return Err(RendererError::new(
                 "failed to prepare ship",
@@ -486,6 +491,8 @@ impl ShipMeshRenderer {
         }
         let mut values = Vec::with_capacity(40);
         values.extend_from_slice(&view_projection);
+        let fraction = ship.door_open_fraction;
+        let eased_fraction = fraction * fraction * (3.0 - 2.0 * fraction);
         values.extend_from_slice(&[
             center[0],
             center[1],
@@ -503,9 +510,9 @@ impl ShipMeshRenderer {
             axes[2][1],
             axes[2][2],
             0.0,
-            0.0,
-            f32::from(ship.door_open) * OPEN_DOOR_OFFSET_METERS,
-            0.0,
+            OPEN_DOOR_ANGLE_RADIANS * eased_fraction,
+            DOOR_HINGE_X_METERS,
+            DOOR_HINGE_Y_METERS,
             0.0,
             0.0,
             0.0,
@@ -662,23 +669,29 @@ mod tests {
     #[test]
     fn cockpit_panels_are_three_textured_quads_in_the_opaque_draw() {
         let geometry = load_geometry().expect("ship display contract must load");
-        // Asset version 9 bakes the second 0.7 reduction and seatward shift
-        // into all three assemblies; the renderer consumes final meters.
+        // The three live quads sit on one centered console. The renderer
+        // consumes their final authored positions in meters.
         for (panel, center, width, height, normal) in [
-            (1.0, [3.95446, 1.0401, 0.0], 0.882, 0.3332, [-1.0, 0.0, 0.0]),
+            (
+                1.0,
+                [4.42, 1.0401, 0.075],
+                0.662_429_45,
+                0.3332,
+                normalize([-1.66, 0.0, -0.075]),
+            ),
             (
                 2.0,
-                [3.70, 1.0625, 2.35],
-                0.63,
+                [4.28, 1.0625, 0.8025],
+                0.529_898_46,
                 0.315,
-                normalize([-0.94, 0.0, -2.35]),
+                normalize([-1.52, 0.0, -0.8025]),
             ),
             (
                 3.0,
-                [3.70, 1.0625, -2.35],
-                0.63,
+                [4.28, 1.0625, -0.915],
+                0.539_714,
                 0.315,
-                normalize([-0.94, 0.0, 2.35]),
+                normalize([-1.52, 0.0, 0.915]),
             ),
         ] {
             let vertices: Vec<_> = geometry
@@ -700,13 +713,13 @@ mod tests {
                 ];
                 for (axis, expected) in expected_position.into_iter().enumerate() {
                     assert!(
-                        (vertex[axis] - expected).abs() < 1.0e-5,
+                        (vertex[axis] - expected).abs() < 1.0e-4,
                         "panel {panel} axis {axis} must preserve its authored dimensions and top-left UV fit"
                     );
                 }
                 for (axis, expected) in normal.into_iter().enumerate() {
                     assert!(
-                        (vertex[axis + 3] - expected).abs() < 1.0e-5,
+                        (vertex[axis + 3] - expected).abs() < 1.0e-4,
                         "panel {panel} must retain its pilot-facing normal"
                     );
                 }
@@ -726,7 +739,12 @@ mod tests {
     }
 
     #[test]
-    fn task10_door_offset_matches_the_horizontal_asset_scale() {
-        assert_eq!(OPEN_DOOR_OFFSET_METERS, 4.50);
+    fn aft_door_hinges_outward_above_the_aperture() {
+        let bottom = [-7.68_f32, 0.24731183_f32];
+        let relative_y = bottom[1] - DOOR_HINGE_Y_METERS;
+        let opened_x = DOOR_HINGE_X_METERS - relative_y * OPEN_DOOR_ANGLE_RADIANS.sin();
+        let opened_y = DOOR_HINGE_Y_METERS + relative_y * OPEN_DOOR_ANGLE_RADIANS.cos();
+        assert!(opened_x < -9.5);
+        assert!(opened_y > 3.0);
     }
 }

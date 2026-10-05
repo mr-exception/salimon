@@ -9,4 +9,13 @@
 - Once answered, remove the question from this page and incorporate the decision into the relevant project document and/or task.
 - Do not keep resolved decisions, implementation notes, task history, or technical summaries here.
 ## Open questions
-There are currently **no open questions** requiring an answer.
+### Where should dedicated physical storage go after the cargo-room removal?
+
+The current scout revision removes the dedicated port cargo room and its storage
+volume to improve the ship silhouette. Loose fragments can still be dropped on
+clear main-cabin deck space. The previous requirement for an initial dedicated
+cargo room is superseded. Decide whether a later scout revision should add
+integrated storage within the aerodynamic hull, use a detachable module, or defer
+dedicated storage to a later ship design. This decision affects future container
+placement, cargo capacity and ship expansion; it does not block the current
+geometry revision or loose-fragment storage on the deck.

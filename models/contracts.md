@@ -85,7 +85,7 @@ the shared invariants or force its requirements on unrelated categories.
 
 | Category | Examples of additional contracts |
 | --- | --- |
-| Ship | Interior/exterior groups, moving door, seat/entry/engine/cargo anchors, monitor faces and UVs |
+| Ship | Interior/exterior groups, moving door, seat/entry/engine anchors, monitor faces and UVs |
 | Resource | Deposit/fragment visual roles, declared collision bounds; resource identity/yield stays in the resource domain |
 | Item | Optional grip/mount sockets or use marker; carrying policy stays in the item/character domain |
 | Structure | Footprint, entry and placement anchors |
@@ -103,16 +103,20 @@ as contract changes, not cosmetic edits.
 ## Existing scout compatibility
 
 The scout's [current contract](../client/assets/ship/README.md#runtime-contract)
-takes precedence during migration. Preserve `Exterior`, `Interior`,
-`Collision_Proxies`, `Interaction_Markers`, `Exit_Door`, `Monitor_Center`,
-`Monitor_Port`, `Monitor_Starboard`, collision names, material roles, and
-`extras.salimon` metadata. Its baked coordinates and identity transforms,
-pilot-facing monitor normals/top-left UVs, glazing behavior, cargo layout, and
-generated controller bounds must survive the later migration.
+retains `Exterior`, `Interior`, `Collision_Proxies`, `Interaction_Markers`,
+`Exit_Door`, `Monitor_Center`, `Monitor_Port`, `Monitor_Starboard`, material roles
+and `extras.salimon` metadata. Its baked coordinates, identity transforms,
+pilot-facing monitor normals/top-left UVs and glazing behavior remain validated.
+The three monitors share a unified starboard console, and an authored nose-floor
+proxy supports a port-side walking route. The shortened nose and canopy must
+keep seated forward and downward visibility. The retired dedicated cargo room
+has no collider, spatial anchor or storage-volume contract. The cabin bench and
+storage assembly are removed. The aft pressure door parks to port when open.
 
 `Exit_Door` and monitor names are consumed directly by
 `client/renderer/src/ship_mesh.rs`; renaming them would change behavior. Do not
 wrap or rename the current hierarchy just to match `ASSET_<slug>`/`Visual`.
-The ship category adapter must express the legacy hierarchy as an explicit
-compatibility contract. Detailed preservation evidence belongs to #79 and the
-runtime switch to #80, rather than a generic requirement for resource/item art.
+The ship category adapter expresses this legacy hierarchy and the current
+13-collider inventory as an explicit compatibility contract. Detailed migration
+evidence remains in #79 and #80; the current geometry revision updates the
+asset, spatial contracts and their runtime consumers together.

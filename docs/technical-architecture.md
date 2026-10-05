@@ -320,7 +320,10 @@ category extensions add consumer-specific requirements without moving gameplay
 policy into art. See [contracts](../models/contracts.md) and
 [authoring workflow](../models/authoring.md).
 
-The Task 7 boundary above describes the current legacy scout. Its source, runtime
-path, node names, metadata, and validators remain unchanged until the staged
-migration (#79–#83). Generic manifest/export/validation tooling is separate work
-(#76–#78); defining this workspace does not implement it or change asset loading.
+The staged migration (#79–#83) is complete: Blender is the authoritative scout
+source, and the shared exporter plus ship category validator publish its runtime
+asset and authored spatial contracts. The current design removes the dedicated
+port cargo module and its storage volume, shortens the nose and glazing, and
+combines three monitors on a center console. The both sides remain walkable
+into the nose. Geometry changes must update exported assets, spatial contracts,
+character collision, runtime behavior and tests together.

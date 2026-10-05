@@ -120,6 +120,9 @@
       }
     },
     {
+      "action": {"op": "step", "frames": 45}
+    },
+    {
       "action": {
         "op": "key",
         "key": "backward",
@@ -173,7 +176,7 @@
     {
       "action": {
         "op": "step",
-        "frames": 200
+        "frames": 155
       }
     },
     {

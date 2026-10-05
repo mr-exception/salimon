@@ -140,7 +140,7 @@ its evidence variant adds screenshot checkpoints.
 
 ## Physical extraction output (#45)
 
-`resource_fragments` owns bounded splitting and deterministic surface placement.
+`resource_fragments` owns bounded splitting and deterministic emergence near the deposit.
 Each source deposit's most recent piece grows to **2 kg**, then a new piece is
 created. A fractional piece exists immediately, including on the first positive
 simulation step; there is no pending output mass or general resource inventory.
@@ -149,12 +149,12 @@ source, material key, and pose, and derives the new solid volume from density.
 Finished pieces are unchanged by later extraction. Picking up a growing piece
 must end its participation in the output tail when #46 adds carrying.
 
-Pieces have finite absolute poses and identity orientation. A deterministic
-tangent grid beside the source separates the pieces, with space above the body
-surface reserved for a full-size cube. Side length is the cube root of solid
-volume. This is a stationary surface greybox abstraction, without rigid-body
-falling, rolling, stacking, pickup/drop, or ship ownership yet. Runtime maps the
-same authoritative pieces into generic cuboids and nearby-entity inspection.
+Pieces have finite absolute poses and identity orientation. They emerge near
+the source with enough height for a full-size piece. Side length is the cube
+root of solid volume. Runtime applies an ejection impulse, gravity, and
+fragment contacts while the world crate owns mass, identity, and provenance.
+Runtime maps the same authoritative pieces into distinct material silhouettes
+and nearby-entity inspection.
 The session retains pieces independently of deposit materialization and tool
 equipment; querying or re-rendering never emits additional pieces.
 

@@ -1,4 +1,4 @@
-"""Migration regressions for the Blender-owned scout and its retained contracts."""
+"""Regressions for the Blender-owned scout and its authored contracts."""
 import copy
 import hashlib
 import importlib.util
@@ -58,17 +58,21 @@ class ScoutExportTests(unittest.TestCase):
         marker['translation'] = [0.75, 2.0, -2.0]
         collider = next(n for n in doc['nodes'] if n['name'] == 'COLLIDER_AftDoor')
         collider['extras']['salimon']['sizeMeters'] = [0.4, 2.4, 3.0]
+        nose_floor = next(n for n in doc['nodes'] if n['name'] == 'COLLIDER_CockpitNoseFloor')
+        nose_floor['translation'][0] += 0.1
         scout.validate_preservation({'document': doc}, {})
         spatial = scout.build_spatial_contracts(doc, preservation)
         self.assertEqual(spatial['markers']['MARKER_PlayerStart']['positionMeters'], [0.75, 2.0, -2.0])
         self.assertEqual(spatial['colliders']['COLLIDER_AftDoor']['sizeMeters'], [0.4, 2.4, 3.0])
+        self.assertAlmostEqual(spatial['colliders']['COLLIDER_CockpitNoseFloor']['centerMeters'][0],
+                               nose_floor['translation'][0])
+        self.assertNotIn('cargoRoom', spatial)
 
     def test_failed_staged_validation_preserves_all_published_files(self):
         paths = [self.output.with_suffix(s) for s in ('.glb', '.bin', '.gltf')]
         paths.extend([
             ASSET / 'export-report.json',
             REPO / 'client/assets/ship/spatial-contracts.json',
-            REPO / 'client/character/src/cargo_layout.rs',
             REPO / 'client/character/src/thruster_collision.rs',
             REPO / 'client/character/src/ship_anchors.rs',
         ])

@@ -36,10 +36,10 @@ generation, persistence, or gameplay consequences. Nearby telemetry includes
 the body's name, surface distance, and signed radial speed: negative approaches,
 positive recedes, and zero is stationary.
 
-The wider ship uses a conservative 16 m collision radius for its
-20.90 × 4.00 × 21.00 m exterior. The Task 10 playtest revision places the runtime
-mesh's `-0.108 m` lowest local-Y point on
-Earth's nominal surface and preserves identity orientation so local `+Y` follows
+The current scout uses a conservative 16 m collision radius for its
+18.33 × 4.00 × 20.00 m exterior. The landed pose places the authored runtime
+mesh's `-0.108 m` lowest local-Y point on Earth's nominal surface and preserves
+identity orientation so local `+Y` follows
 the starting surface normal.
 The custom source and runtime model remain under
 [`client/assets/ship`](../assets/ship/README.md).

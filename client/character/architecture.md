@@ -15,8 +15,8 @@ closed or unlanded gates fill that opening. Entry requires inward movement from
 the exterior into this aperture with vertical hull overlap. Collision slides
 along the exterior and solves surface height without changing the resolved
 ship-local planar coordinates, so radial projection cannot push a walker back
-through the hull. The hull proxies have finite height and exclude the broad wing
-bounds. Each engine has source-derived body and raised-fin boxes with separate
+through the hull. The hull proxies have finite height, and source-derived wing
+boxes block exterior movement at wing height. Each engine has source-derived body and raised-fin boxes with separate
 height checks and body-radius expansion. These ship-local boxes follow the landed
 ship frame and leave the aft gate clear. A completed entry gravity blend stays in the doorway
 until the player reaches the cabin, preserving slow and diagonal crossings.
@@ -36,13 +36,13 @@ Closure restores the doorway's exact lateral bounds before choosing the next
 state, so a rounded jamb contact cannot become an interior aft-wall overlap.
 
 The ship interior uses a body-radius-inset walking envelope and simple planar
-collision proxies for the central Core pedestal, cabin furniture, pilot chair,
-three console/monitor assemblies, and the solid forward hull beside the cockpit.
+collision proxies for the central Core pedestal, pilot chair,
+one centered console with three monitors, and the solid forward hull beside the cockpit.
 Movement resolves forward and sideways axes separately, preserving edge sliding
-and clear routes on both sides of the chair without a physics engine or mesh
-collision. The outer cockpit hull proxies prevent bypassing a side console
-through the exterior shell, while the forward envelope follows the actual deck
-edge instead of globally excluding the cockpit. The side bounds account for the
+and a clear side route past the chair and console without a physics engine or mesh
+collision. The outer cockpit hull proxies retain solid side walls; a narrower
+nose floor extends beyond the broad deck and body-expanded shoulder proxies
+keep the player on it. The side bounds account for the
 projecting window sills. The aft bulkhead stays solid outside the body-clear
 doorway aperture, even when the door is open. Jump height is bounded by the
 lowest ceiling fixtures and a lower local bound at the door lintel. Spawn and

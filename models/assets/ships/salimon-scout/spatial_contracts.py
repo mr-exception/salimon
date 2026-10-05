@@ -11,6 +11,7 @@ THRUSTER_COLLIDERS = (
     "COLLIDER_Engine_Starboard_Body",
     "COLLIDER_Engine_Starboard_SweptFin",
 )
+WING_COLLIDERS = ("COLLIDER_Wing_Port", "COLLIDER_Wing_Starboard")
 MARKERS = ("MARKER_CockpitSeat", "MARKER_ExitDoor", "MARKER_PlayerStart")
 
 
@@ -73,36 +74,14 @@ def _marker(nodes, baseline, name):
     }
 
 
-def _cargo_room(colliders):
-    deck = colliders["COLLIDER_Cargo_Deck"]
-    ceiling = colliders["COLLIDER_Cargo_Ceiling"]
-    aft = colliders["COLLIDER_Cargo_Aft_Wall"]
-    forward = colliders["COLLIDER_Cargo_Forward_Wall"]
-    port = colliders["COLLIDER_Cargo_Port_Wall"]
-    partition = colliders["COLLIDER_Cargo_Inboard_Partition"]
-    header = colliders["COLLIDER_Cargo_Passage_Header"]
-    clear_min = [aft["upperMeters"][0], deck["upperMeters"][1], partition["upperMeters"][2]]
-    clear_max = [forward["lowerMeters"][0], ceiling["lowerMeters"][1], port["lowerMeters"][2]]
-    return {
-        "clearMinMeters": clear_min,
-        "clearMaxMeters": clear_max,
-        "passageMinXMeters": partition["upperMeters"][0],
-        "passageMaxXMeters": forward["lowerMeters"][0],
-        "passageClearHeightMeters": header["lowerMeters"][1] - deck["upperMeters"][1],
-        "floorAreaSquareMeters": (clear_max[0] - clear_min[0]) * (clear_max[2] - clear_min[2]),
-        "role": "physical-room-for-loose-fragments-and-future-containers",
-    }
-
-
 def build_spatial_contracts(document, preservation=None):
     nodes = _nodes(document)
     baseline = _baseline_nodes(preservation)
     collider_names = sorted(name for name in nodes if name.startswith("COLLIDER_"))
-    if len(collider_names) != 22:
-        raise ValueError(f"expected 22 authored scout colliders, found {len(collider_names)}")
+    if len(collider_names) != 15:
+        raise ValueError(f"expected 15 authored scout colliders, found {len(collider_names)}")
     colliders = {name: _box(nodes, baseline, name) for name in collider_names}
     markers = {name: _marker(nodes, baseline, name) for name in MARKERS}
-    cargo = _cargo_room(colliders)
     return {
         "schemaVersion": 1,
         "assetId": "ship.salimon-scout",
@@ -115,10 +94,7 @@ def build_spatial_contracts(document, preservation=None):
             "playerStart": markers["MARKER_PlayerStart"]["positionMeters"],
             "enginePort": colliders["COLLIDER_Engine_Port_Body"]["centerMeters"],
             "engineStarboard": colliders["COLLIDER_Engine_Starboard_Body"]["centerMeters"],
-            "cargoCenter": [(cargo["clearMinMeters"][axis] + cargo["clearMaxMeters"][axis]) / 2
-                            for axis in range(3)],
         },
-        "cargoRoom": cargo,
     }
 
 
@@ -139,34 +115,6 @@ def _rust_array_entry(values, indent="    ", max_width=60):
     return [indent + "[", *(child + _rust_number(value) + "," for value in values), indent + "],"]
 
 
-def cargo_rust_source(contracts):
-    cargo = contracts["cargoRoom"]
-    colliders = contracts["colliders"]
-    z0 = colliders["COLLIDER_Cargo_Deck"]["lowerMeters"][2]
-    z1 = cargo["clearMinMeters"][2]
-    walls = [
-        [colliders["COLLIDER_InteriorPortWall"]["lowerMeters"][0],
-         colliders["COLLIDER_InteriorPortWall"]["upperMeters"][0], z0, z1],
-        [colliders["COLLIDER_PortWallForward"]["lowerMeters"][0],
-         colliders["COLLIDER_PortWallForward"]["upperMeters"][0], z0, z1],
-    ]
-    for name in ("COLLIDER_Cargo_Aft_Wall", "COLLIDER_Cargo_Forward_Wall", "COLLIDER_Cargo_Port_Wall"):
-        box = colliders[name]
-        walls.append([box["lowerMeters"][0], box["upperMeters"][0],
-                      box["lowerMeters"][2], box["upperMeters"][2]])
-    lines = [
-        "// Generated from Blender-authored scout spatial contracts; do not edit by hand.",
-        "pub const CARGO_ROOM_MIN_METERS: [f64; 3] = " + _rust_array(cargo["clearMinMeters"]) + ";",
-        "pub const CARGO_ROOM_MAX_METERS: [f64; 3] = " + _rust_array(cargo["clearMaxMeters"]) + ";",
-        "// [forward min/max, port min/max]; includes the cabin partition at the passage.",
-        "pub(super) const CARGO_WALLS: [[f64; 4]; 5] = [",
-    ]
-    for wall in walls:
-        lines.extend(_rust_array_entry(wall))
-    lines.append("];")
-    return "\n".join(lines) + "\n"
-
-
 def thruster_rust_source(contracts):
     lines = [
         "// Generated from Blender-authored scout spatial contracts; do not edit by hand.",
@@ -182,6 +130,15 @@ def thruster_rust_source(contracts):
         lines.extend("        " + _rust_number(value) + "," for value in bounds)
         lines.append("    ],")
     lines.append("];")
+    lines.append("pub(super) const WING_COLLIDERS: [[f64; 6]; 2] = [")
+    for name in WING_COLLIDERS:
+        box = contracts["colliders"][name]
+        bounds = [box["lowerMeters"][0], box["upperMeters"][0],
+                  box["lowerMeters"][1], box["upperMeters"][1],
+                  box["lowerMeters"][2], box["upperMeters"][2]]
+        lines.append(f"    // {name}")
+        lines.append("    " + _rust_array(bounds) + ",")
+    lines.append("];")
     return "\n".join(lines) + "\n"
 
 
@@ -193,7 +150,6 @@ def anchors_rust_source(contracts):
         ("PLAYER_START_MARKER_METERS", "playerStart"),
         ("ENGINE_PORT_ANCHOR_METERS", "enginePort"),
         ("ENGINE_STARBOARD_ANCHOR_METERS", "engineStarboard"),
-        ("CARGO_ANCHOR_METERS", "cargoCenter"),
     )
     lines = ["// Generated from Blender-authored scout spatial contracts; do not edit by hand."]
     lines.extend(

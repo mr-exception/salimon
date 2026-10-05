@@ -21,10 +21,9 @@
 10. Ship-local floor, walk bounds, doorway, player start, and cockpit
     camera remain aligned to the wider 4.00 m-tall asset; player body height is
     1.80 m and standing eye height is 1.75 m.
-11. The central Core pedestal, sofa, worktop, pilot chair, and cockpit
-    console/monitor assemblies are solid to walking movement, with body-radius
-    clearance and edge sliding; both side routes into the cockpit remain
-    traversable.
+11. The central Core pedestal, pilot chair, and unified starboard
+    cockpit console with three monitors are solid to walking movement, with
+    body-radius clearance and edge sliding. The aisles on both sides reach the nose.
 12. Rear window bulkheads remain solid with the door open. Doorway crossings
     require enough lateral clearance for the player's complete body, including
     oblique movement throughout the gravity blend.
@@ -35,9 +34,9 @@
 15. Surface W/S movement follows the camera's horizontal forward/back direction,
     A/D follows its tangent-plane right/left direction, and all four directions
     remain tangent to the active solid body at every sphere orientation.
-16. The cockpit uses its actual forward deck boundary plus solid side-hull
-    proxies; a walking player cannot bypass the side consoles into the exterior
-    shell.
+16. The broad cockpit deck ends at X 6.56 m and a narrow nose floor continues
+    to X 7.85 m. Body-expanded shoulder and side-hull proxies keep walkers on
+    those floors and out of the exterior shell.
 17. Surface walkers collide with the front, sides, and aft bulkheads regardless
     of door state. The open aft gate is the only entry route, with the
     same body clearance as interior traversal. Hull contact preserves surface

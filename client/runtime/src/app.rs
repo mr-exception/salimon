@@ -226,8 +226,10 @@ fn action_bar_context(
     monitor_message
         .filter(|message| *message != CockpitMessage::DoorLockedWhileInFlight)
         .map(CockpitMessage::text)
-        .or_else(|| {
-            (interaction == Some(InteractionTarget::Cockpit)).then_some(COCKPIT_INTERACTION_PROMPT)
+        .or(match interaction {
+            Some(InteractionTarget::Cockpit) => Some(COCKPIT_INTERACTION_PROMPT),
+            Some(InteractionTarget::ExitDoor) => Some("E to open/close exit door"),
+            None => None,
         })
 }
 
@@ -235,7 +237,7 @@ fn map_ship_to_renderer(ship: ShipSnapshot) -> ShipMeshInstance {
     ShipMeshInstance {
         position_meters: ship.pose.position_meters,
         orientation: ship.pose.orientation.map(|value| value as f32),
-        door_open: ship.door_state == DoorState::Open,
+        door_open_fraction: ship.door_open_fraction as f32,
         instruments: CockpitInstruments {
             speed_meters_per_second: ship.speed_meters_per_second,
             thruster_percentage: ship.thruster_percentage,
@@ -248,6 +250,10 @@ fn map_ship_to_renderer(ship: ShipSnapshot) -> ShipMeshInstance {
             }),
         },
     }
+}
+
+fn door_passable(ship: ShipSnapshot) -> bool {
+    ship.door_state == DoorState::Open && ship.door_open_fraction >= 0.95
 }
 
 impl ClientApplication {
@@ -375,8 +381,25 @@ impl ClientApplication {
                 let character = self.character.snapshot(ship_frame, surface);
                 let local_eye = ship_frame.world_to_local(character.eye_position_meters);
                 let local_look = ship_frame.world_to_local(character.look_target_meters);
-                match available_interaction_target(self.character.location(), local_eye, local_look)
+                let interaction =
+                    available_interaction_target(self.character.location(), local_eye, local_look);
+                if matches!(
+                    character.location,
+                    CharacterLocation::Surface | CharacterLocation::InsideShip
+                ) && (self.mining.session.carried_id().is_some()
+                    || crate::carrying::target(
+                        &self.mining,
+                        character,
+                        ship_frame,
+                        door_passable(ship_snapshot),
+                    )
+                    .is_some())
+                    && interaction != Some(InteractionTarget::ExitDoor)
                 {
+                    self.carry_action(self.mining.session.carried_id().is_none());
+                    return;
+                }
+                match interaction {
                     Some(InteractionTarget::Cockpit) => {
                         self.character.enter_cockpit();
                         if self.character.location() == CharacterLocation::Cockpit {
@@ -452,24 +475,20 @@ impl ClientApplication {
         let ship = self.ship.snapshot();
         let frame = character_ship_frame(ship.pose);
         let player = self.character.snapshot(frame, surface_frame_for_ship(ship));
-        let door_open = ship.door_state == DoorState::Open;
+        let door_open = door_passable(ship);
         let message = if pickup {
             match crate::carrying::target(&self.mining, player, frame, door_open) {
                 Some(id) if self.mining.session.pick_up(id) => {
-                    "Fragment picked up - G to place/drop"
+                    self.mining.fragment_motion.remove(&id);
+                    self.mining.ship_fragments.remove(&id);
+                    "Fragment picked up - E to drop"
                 }
-                Some(_) => "Only one world object - G to place/drop first",
+                Some(_) => "Only one world object - E to drop first",
                 None => "Aim at a fragment within 3 m",
             }
         } else if self.mining.session.carried_id().is_none() {
             "No world object carried"
-        } else if let Some(pose) = crate::carrying::drop_pose(
-            &self.mining,
-            player,
-            frame,
-            door_open,
-            self.e2e_config.map_or(0, |config| config.seed),
-        ) {
+        } else if let Some(pose) = crate::carrying::release_pose(&self.mining, player) {
             let id = self
                 .mining
                 .session
@@ -483,9 +502,21 @@ impl ClientApplication {
             } else {
                 self.mining.ship_fragments.remove(&id);
             }
-            "Fragment placed"
+            let forward = std::array::from_fn(|i| {
+                player.look_target_meters[i] - player.eye_position_meters[i]
+            });
+            let length = forward.iter().map(|v| v * v).sum::<f64>().sqrt();
+            let forward = forward.map(|v| v / length);
+            crate::fragment_physics::release(
+                &mut self.mining,
+                id,
+                forward,
+                frame,
+                player.location == CharacterLocation::InsideShip,
+            );
+            "Fragment dropped"
         } else {
-            "Aim at clear nearby ground to place fragment"
+            "Cannot drop fragment here"
         };
         crate::carrying::sync_ship_fragments(&mut self.mining, frame);
         crate::carrying::follow(&mut self.mining, player);
@@ -527,7 +558,7 @@ impl ClientApplication {
                     ship.velocity_meters_per_second,
                 ),
                 surface_frame_for_ship(ship),
-                ship.door_state == DoorState::Open,
+                door_passable(ship),
                 matches!(ship.flight_state, FlightState::Landed { .. }),
             );
             let eye = self
@@ -545,8 +576,16 @@ impl ClientApplication {
                 delta,
                 self.character.snapshot(frame, surface_frame_for_ship(ship)),
                 frame,
-                ship.door_state == DoorState::Open,
+                door_passable(ship),
                 self.e2e_config.map_or(0, |config| config.seed),
+            );
+            crate::fragment_physics::advance(
+                &mut self.mining,
+                frame,
+                delta,
+                self.character
+                    .snapshot(frame, surface_frame_for_ship(ship))
+                    .eye_position_meters,
             );
         }
         self.sync_carried();
@@ -595,20 +634,31 @@ impl ClientApplication {
         let mining_target = self.mining.target(
             character_snapshot,
             ship_frame,
-            ship_snapshot.door_state == DoorState::Open,
+            door_passable(ship_snapshot),
             self.e2e_config.map_or(0, |config| config.seed),
         );
-        let contextual_action = action_bar_context(monitor_message, interaction)
-            .map(str::to_owned)
-            .or_else(|| {
-                crate::resource_context::context(
+        let fragment_interaction = interaction != Some(InteractionTarget::ExitDoor)
+            && (self.mining.session.carried_id().is_some()
+                || crate::carrying::target(
                     &self.mining,
                     character_snapshot,
                     ship_frame,
-                    ship_snapshot.door_state == DoorState::Open,
-                    self.e2e_config.map_or(0, |config| config.seed),
+                    door_passable(ship_snapshot),
                 )
-            });
+                .is_some());
+        let resource_context = crate::resource_context::context(
+            &self.mining,
+            character_snapshot,
+            ship_frame,
+            door_passable(ship_snapshot),
+            self.e2e_config.map_or(0, |config| config.seed),
+        );
+        let ship_context = action_bar_context(monitor_message, interaction).map(str::to_owned);
+        let contextual_action = if fragment_interaction {
+            resource_context.or(ship_context)
+        } else {
+            ship_context.or(resource_context)
+        };
         self.action_bar.set_contextual(contextual_action);
         window.set_title(&gameplay_window_title(monitor_message, interaction));
         let ship_mesh = if self.view_mode == ViewMode::Gameplay {
@@ -640,7 +690,7 @@ impl ClientApplication {
             scene_instances.extend(
                 self.mining
                     .nearby_fragments(camera.position_meters)
-                    .map(crate::resource_presentation::fragment_visual),
+                    .flat_map(crate::resource_presentation::fragment_visuals),
             );
             scene_instances.extend(self.mining.visuals(
                 character_snapshot,
@@ -1878,6 +1928,10 @@ mod tests {
         assert_eq!(
             action_bar_context(landed.contextual_cockpit_message(), None),
             None
+        );
+        assert_eq!(
+            action_bar_context(None, Some(InteractionTarget::ExitDoor)),
+            Some("E to open/close exit door")
         );
 
         landed.set_cockpit_control(true);

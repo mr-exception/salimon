@@ -1,0 +1,78 @@
+{
+  "$schema": "../../../asset-manifest.schema.json",
+  "schemaVersion": 1,
+  "assetId": "item.mining-tool",
+  "category": "items",
+  "source": "models/assets/items/mining-tool/source.blend",
+  "runtime": "client/assets/items/mining-tool/model.glb",
+  "coordinates": {
+    "units": "meters",
+    "source": {
+      "up": "+Z",
+      "forward": "+X",
+      "unitScale": 1
+    },
+    "runtime": {
+      "up": "+Y",
+      "forward": "+X"
+    },
+    "conversion": "x,z,-y",
+    "pivot": "Grip center; SOCKET_Grip identity, +X forward, +Z source up"
+  },
+  "profile": "standard-v1",
+  "budgets": {
+    "maxTriangles": 2000,
+    "maxPrimitives": 16,
+    "maxMaterials": 4,
+    "maxTextureBytes": 1,
+    "maxGlbBytes": 196608
+  },
+  "collision": {
+    "policy": "none"
+  },
+  "contracts": {
+    "root": "ASSET_mining-tool",
+    "visualGroups": [
+      "Visual"
+    ],
+    "groups": [
+      "Visual",
+      "Sockets"
+    ],
+    "nodes": [
+      "Housing",
+      "Grip",
+      "Battery",
+      "Top_Rail",
+      "Status_Panel",
+      "Status_Top",
+      "Emitter_Collar",
+      "Emitter_Lens",
+      "Cooling_Fin_0",
+      "Cooling_Fin_1",
+      "Cooling_Fin_2",
+      "Cooling_Fin_3"
+    ],
+    "materials": [
+      "Tool_Housing",
+      "Tool_Grip",
+      "Tool_Metal",
+      "Tool_Status"
+    ],
+    "sockets": [
+      "SOCKET_Grip"
+    ],
+    "markers": [],
+    "colliders": [],
+    "requiredExtras": [
+      {
+        "node": "ASSET_mining-tool",
+        "path": "salimon.assetId"
+      },
+      {
+        "node": "SOCKET_Grip",
+        "path": "salimon.role"
+      }
+    ]
+  }
+}

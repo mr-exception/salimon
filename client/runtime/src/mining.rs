@@ -2,7 +2,7 @@
 use std::time::Duration;
 
 use salimon_character::{CharacterLocation, CharacterSnapshot, ShipFrame};
-use salimon_renderer::SceneInstance;
+use salimon_renderer::HeldItemInstance;
 use salimon_world::WorldPosition;
 use salimon_world::mining::{MiningRay, MiningSession, MiningTarget, aimed_deposit};
 use salimon_world::resource_generation::{GenerationError, SurfaceDeposit};
@@ -113,62 +113,60 @@ impl MiningTool {
         self.session.extract(&mut entry.deposit, delta);
     }
 
-    pub(crate) fn visuals(&self, player: CharacterSnapshot, active: bool) -> Vec<SceneInstance> {
-        if player.location != CharacterLocation::Surface {
-            return Vec::new();
-        }
-        let Some(ray) = MiningRay::new(
-            position(player.eye_position_meters),
-            position(player.look_target_meters),
-        ) else {
-            return Vec::new();
-        };
-        let marker = SceneInstance {
-            center_meters: std::array::from_fn(|i| {
-                player.eye_position_meters[i] + ray.direction[i] * 0.5
-            }),
-            half_extents_meters: [0.002; 3],
-            color: [0.9, 0.9, 0.9, 1.0],
-        };
-        if !self.equipped {
-            return vec![marker];
-        }
-        let up = player.up.map(f64::from);
-        let right = [
-            ray.direction[1] * up[2] - ray.direction[2] * up[1],
-            ray.direction[2] * up[0] - ray.direction[0] * up[2],
-            ray.direction[0] * up[1] - ray.direction[1] * up[0],
-        ];
-        let center = std::array::from_fn(|i| {
-            player.eye_position_meters[i] + ray.direction[i] * 0.55 + right[i] * 0.20 - up[i] * 0.20
-        });
-        vec![
-            SceneInstance {
-                center_meters: center,
-                half_extents_meters: [0.06, 0.06, 0.06],
-                color: [0.24, 0.27, 0.30, 1.0],
+    /// Equip/location gates and active feedback for the authored visual.
+    /// The caller supplies gameplay visibility and the existing target result.
+    pub(crate) fn held_item(
+        &self,
+        player: CharacterSnapshot,
+        valid_target: bool,
+    ) -> Option<HeldItemInstance> {
+        (player.location == CharacterLocation::Surface && self.equipped).then_some(
+            HeldItemInstance {
+                active: self.held && valid_target,
             },
-            SceneInstance {
-                center_meters: std::array::from_fn(|i| {
-                    center[i] - ray.direction[i] * 0.07 + up[i] * 0.04
-                }),
-                half_extents_meters: [0.035, 0.035, 0.035],
-                color: if active {
-                    [0.2, 1.0, 0.8, 1.0]
-                } else {
-                    [0.9, 0.6, 0.15, 1.0]
-                },
-            },
-            SceneInstance {
-                center_meters: std::array::from_fn(|i| center[i] - up[i] * 0.08),
-                half_extents_meters: [0.03, 0.05, 0.03],
-                color: [0.15, 0.17, 0.20, 1.0],
-            },
-            marker,
-        ]
+        )
     }
 }
 
 fn position(p: [f64; 3]) -> WorldPosition {
     WorldPosition::new(p[0], p[1], p[2])
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn authored_tool_visibility_and_feedback_follow_existing_gates() {
+        let mut tool = MiningTool::default();
+        let mut player = CharacterSnapshot {
+            location: CharacterLocation::Surface,
+            eye_position_meters: [0.0; 3],
+            look_target_meters: [1.0, 0.0, 0.0],
+            up: [0.0, 1.0, 0.0],
+            local_ship_position_meters: None,
+            doorway_blend_fraction: None,
+        };
+        assert!(tool.held_item(player, true).is_none());
+        tool.toggle();
+        assert_eq!(
+            tool.held_item(player, true),
+            Some(HeldItemInstance { active: false })
+        );
+        tool.held = true;
+        assert_eq!(
+            tool.held_item(player, false),
+            Some(HeldItemInstance { active: false })
+        );
+        assert_eq!(
+            tool.held_item(player, true),
+            Some(HeldItemInstance { active: true })
+        );
+        player.location = CharacterLocation::InsideShip;
+        assert!(tool.held_item(player, true).is_none());
+        player.location = CharacterLocation::Surface;
+        tool.toggle();
+        assert!(tool.held_item(player, true).is_none());
+        assert!(!tool.held);
+    }
 }

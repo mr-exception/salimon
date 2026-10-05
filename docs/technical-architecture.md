@@ -74,8 +74,9 @@ for commands and generated files; normal builds never require Blender.
 The current scout removes the dedicated cargo module, shortens the nose/glazing
 and uses three monitors on one center console with walking routes on both sides.
 Loose fragments use the cabin deck. Historical cargo and migration evidence in
-[reports/](../reports/README.md) describes earlier revisions. Modular ship
-assembly and resource/tool Blender presentation work remain issue-scoped plans;
+[reports/](../reports/README.md) describes earlier revisions. The mining tool now renders a Blender-authored GLB with a camera-local grip
+and status material. Modular ship assembly and resource Blender presentation
+work remain issue-scoped plans;
 they are not implemented by this documentation update.
 
 ## Future candidates and deferred capabilities

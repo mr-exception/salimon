@@ -43,3 +43,22 @@ were not run; preservation evidence comes from saved source/interchange geometry
 and runtime consumer tests, not a new graphical capture. Blender remains optional
 for normal client builds. Reopen/reload the assembly after saving component edits;
 keep linked ownership rather than appending/making components local there.
+
+## PR update — conflicts and Windows CI (2026-10-05)
+
+Merged main at `8acb48d` into the review branch. Resolved the model README
+conflict by retaining both the modular scout workflow and the newly merged
+Blender mining-tool documentation.
+
+The original Native builds run `37285408626` passed Linux (including graphical
+E2E and packaged smoke) and macOS, but Windows failed the authoring hash check:
+`Path` string conversion produced backslash keys instead of the report's slash
+keys. Export and provenance validation now use `as_posix()` for portable keys.
+A focused regression uses `PureWindowsPath` to exercise Windows path semantics
+on any host. Hash values and runtime artifacts are unchanged.
+
+Post-merge local checks passed: 42 model tests with real Blender verification,
+34 script tests, rustfmt, Clippy, workspace Rust tests and workspace build. The
+updated three-platform workflow will run on the new PR commit; its status is
+reported on GitHub. Native graphical suites were not rerun locally for this
+path-format and documentation fix.

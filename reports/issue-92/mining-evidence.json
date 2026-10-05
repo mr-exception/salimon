@@ -1,0 +1,318 @@
+{
+  "scenario": "scenarios/evidence/mining-tool.json",
+  "status": "passed",
+  "steps_completed": 146,
+  "screenshots": [
+    {
+      "index": 63,
+      "screenshot": {
+        "status": "captured",
+        "path": "deposit-context-tool-stowed.png"
+      },
+      "state": {
+        "player": {
+          "eye_position_meters": [
+            999999999983.0334,
+            -749993999998.25,
+            249993999994.58
+          ],
+          "local_ship_position_meters": null,
+          "location": "Surface",
+          "look_target_meters": [
+            999999999982.1721,
+            -749993999998.7494,
+            249993999994.6731
+          ],
+          "nearby_body": {
+            "name": "Earth",
+            "surface_distance_meters": 1.750026436522603
+          },
+          "relative_speed_meters_per_second": 0.0,
+          "relative_velocity_meters_per_second": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "ship_local_eye_position_meters": [
+            -16.966552734375,
+            1.6424560546875,
+            -5.420013427734375
+          ],
+          "speed_meters_per_second": 0.0,
+          "up": [
+            -2.8277579531277297e-06,
+            1.0,
+            -9.033353194354277e-07
+          ],
+          "velocity_meters_per_second": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "mining": {
+          "active": false,
+          "equipped": false,
+          "extracted_mass_kg": 0.0,
+          "held": false,
+          "range_meters": 4.0,
+          "rate_kg_per_second": 2.0,
+          "target": null
+        },
+        "resource_ui": {
+          "context": "Silicate rock - approx 36.4 kg left - untouched\nM to equip mining tool"
+        }
+      }
+    },
+    {
+      "index": 74,
+      "screenshot": {
+        "status": "captured",
+        "path": "equipped-mining-tool.png"
+      },
+      "state": {
+        "player": {
+          "eye_position_meters": [
+            999999999983.0334,
+            -749993999998.25,
+            249993999994.58
+          ],
+          "local_ship_position_meters": null,
+          "location": "Surface",
+          "look_target_meters": [
+            999999999982.1721,
+            -749993999998.7494,
+            249993999994.6731
+          ],
+          "nearby_body": {
+            "name": "Earth",
+            "surface_distance_meters": 1.750026436522603
+          },
+          "relative_speed_meters_per_second": 0.0,
+          "relative_velocity_meters_per_second": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "ship_local_eye_position_meters": [
+            -16.966552734375,
+            1.6424560546875,
+            -5.420013427734375
+          ],
+          "speed_meters_per_second": 0.0,
+          "up": [
+            -2.8277579531277297e-06,
+            1.0,
+            -9.033353194354277e-07
+          ],
+          "velocity_meters_per_second": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "mining": {
+          "active": false,
+          "equipped": true,
+          "extracted_mass_kg": 0.0,
+          "held": false,
+          "range_meters": 4.0,
+          "rate_kg_per_second": 2.0,
+          "target": {
+            "distance_meters": 3.3569314494630955,
+            "id": "Earth:16443359315117775089"
+          }
+        },
+        "resource_ui": {
+          "context": "Silicate rock - approx 36.4 kg left - untouched\nHold F or left mouse to mine - M to stow"
+        }
+      }
+    },
+    {
+      "index": 76,
+      "screenshot": {
+        "status": "captured",
+        "path": "tool-look-up.png"
+      },
+      "state": {
+        "player": {
+          "eye_position_meters": [
+            999999999983.0334,
+            -749993999998.25,
+            249993999994.58
+          ],
+          "local_ship_position_meters": null,
+          "location": "Surface",
+          "look_target_meters": [
+            999999999982.0396,
+            -749993999998.2229,
+            249993999994.6874
+          ],
+          "nearby_body": {
+            "name": "Earth",
+            "surface_distance_meters": 1.750026436522603
+          },
+          "relative_speed_meters_per_second": 0.0,
+          "relative_velocity_meters_per_second": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "ship_local_eye_position_meters": [
+            -16.966552734375,
+            1.6424560546875,
+            -5.420013427734375
+          ],
+          "speed_meters_per_second": 0.0,
+          "up": [
+            -2.8277579531277297e-06,
+            1.0,
+            -9.033353194354277e-07
+          ],
+          "velocity_meters_per_second": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "mining": {
+          "active": false,
+          "equipped": true,
+          "extracted_mass_kg": 0.0,
+          "held": false,
+          "range_meters": 4.0,
+          "rate_kg_per_second": 2.0,
+          "target": null
+        },
+        "resource_ui": {
+          "context": "Aim at a deposit within 4 m - M to stow"
+        }
+      }
+    },
+    {
+      "index": 78,
+      "screenshot": {
+        "status": "captured",
+        "path": "tool-look-down.png"
+      },
+      "state": {
+        "player": {
+          "eye_position_meters": [
+            999999999983.0334,
+            -749993999998.25,
+            249993999994.58
+          ],
+          "local_ship_position_meters": null,
+          "location": "Surface",
+          "look_target_meters": [
+            999999999982.5586,
+            -749993999999.1285,
+            249993999994.63132
+          ],
+          "nearby_body": {
+            "name": "Earth",
+            "surface_distance_meters": 1.750026436522603
+          },
+          "relative_speed_meters_per_second": 0.0,
+          "relative_velocity_meters_per_second": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "ship_local_eye_position_meters": [
+            -16.966552734375,
+            1.6424560546875,
+            -5.420013427734375
+          ],
+          "speed_meters_per_second": 0.0,
+          "up": [
+            -2.8277579531277297e-06,
+            1.0,
+            -9.033353194354277e-07
+          ],
+          "velocity_meters_per_second": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "mining": {
+          "active": false,
+          "equipped": true,
+          "extracted_mass_kg": 0.0,
+          "held": false,
+          "range_meters": 4.0,
+          "rate_kg_per_second": 2.0,
+          "target": null
+        },
+        "resource_ui": {
+          "context": "Aim at a deposit within 4 m - M to stow"
+        }
+      }
+    },
+    {
+      "index": 84,
+      "screenshot": {
+        "status": "captured",
+        "path": "active-mining-context.png"
+      },
+      "state": {
+        "player": {
+          "eye_position_meters": [
+            999999999983.0334,
+            -749993999998.25,
+            249993999994.58
+          ],
+          "local_ship_position_meters": null,
+          "location": "Surface",
+          "look_target_meters": [
+            999999999982.1721,
+            -749993999998.7494,
+            249993999994.6731
+          ],
+          "nearby_body": {
+            "name": "Earth",
+            "surface_distance_meters": 1.750026436522603
+          },
+          "relative_speed_meters_per_second": 0.0,
+          "relative_velocity_meters_per_second": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "ship_local_eye_position_meters": [
+            -16.966552734375,
+            1.6424560546875,
+            -5.420013427734375
+          ],
+          "speed_meters_per_second": 0.0,
+          "up": [
+            -2.8277579531277297e-06,
+            1.0,
+            -9.033353194354277e-07
+          ],
+          "velocity_meters_per_second": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "mining": {
+          "active": true,
+          "equipped": true,
+          "extracted_mass_kg": 1.9199999999997885,
+          "held": true,
+          "range_meters": 4.0,
+          "rate_kg_per_second": 2.0,
+          "target": {
+            "distance_meters": 3.3569314494630955,
+            "id": "Earth:16443359315117775089"
+          }
+        },
+        "resource_ui": {
+          "context": "Silicate rock - approx 34.5 kg left - partly mined\nMining - release F or left mouse to stop"
+        }
+      }
+    }
+  ]
+}

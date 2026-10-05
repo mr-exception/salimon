@@ -95,3 +95,24 @@ analytic spheres for distant presentation. Preserve the dependency direction: do
 modules produce absolute snapshots, the runtime maps them into presentation
 DTOs without doing precision conversion, and the renderer remains a GPU
 consumer rather than an authoritative state owner.
+
+## Held item presentation
+
+`held_item.rs` loads the checked-in mining-tool GLB once into an immutable
+vertex buffer. `HeldItemInstance` carries active feedback only; absence stows
+the visual. The identity grip and baked vertices rotate into a camera-local
+frame in `held_item.wgsl`, using the frame projection and ordinary reverse-Z
+depth. Pitch/gravity/world origins do not affect screen placement. Status
+material regions switch amber/teal; runtime retains mining gates and the
+separate screen-space reticle. The visual adds one scene object and one draw. See the
+[mining-tool contract](../../models/assets/items/mining-tool/README.md).
+
+## Centered gameplay overlay
+
+`Renderer::render` accepts an independent borrowed reticle image in addition to
+its diagnostics and action-bar images. `OverlayPlacement::Center` maps the image
+midpoint to drawable center (NDC zero) using the current surface configuration on
+every prepare, including after resize/reconstruction. The existing alpha image
+pipeline draws it after the scene with depth comparison Always and no depth
+writes. Cached pixels change only with the supplied revision; gameplay equipment
+policy stays in runtime. Total draw calls include the visible reticle draw.

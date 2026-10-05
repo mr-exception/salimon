@@ -78,3 +78,7 @@ metadata contract. Future authoring changes must pass the same validation gates.
 
 The scout uses nine independently editable component libraries and a final linked
 assembly. See its [component ownership and editing workflow](assets/ships/salimon-scout/README.md#open-edit-and-verify).
+
+The [mining tool](assets/items/mining-tool/README.md) is a generic authored item
+integrated into first-person rendering, with an identity grip socket and
+runtime-driven status material.

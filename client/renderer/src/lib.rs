@@ -5,6 +5,7 @@
 
 mod cockpit_instruments;
 mod gpu_timing;
+mod held_item;
 mod overlay;
 mod ship_mesh;
 mod spheres;
@@ -16,6 +17,7 @@ use std::time::Duration;
 
 pub use cockpit_instruments::{CockpitInstruments, NearbyBodyInstruments};
 use gpu_timing::GpuTimer;
+pub use held_item::HeldItemInstance;
 pub use overlay::{OverlayImage, OverlayPlacement};
 pub use ship_mesh::ShipMeshInstance;
 pub use spheres::{PointLight, SphereInstance, SurfaceMaterial};
@@ -106,6 +108,7 @@ pub struct SceneFrame<'a> {
     pub spheres: &'a [SphereInstance],
     pub light: Option<PointLight>,
     pub ship: Option<ShipMeshInstance>,
+    pub held_item: Option<HeldItemInstance>,
 }
 
 /// Physical pixel dimensions for the renderer's presentation surface.
@@ -607,8 +610,10 @@ pub struct Renderer {
     depth_target: DepthTarget,
     overlay: overlay::OverlayRenderer,
     action_bar: overlay::OverlayRenderer,
+    reticle: overlay::OverlayRenderer,
     spheres: spheres::SphereRenderer,
     ship_mesh: ship_mesh::ShipMeshRenderer,
+    held_item: held_item::HeldItemRenderer,
     gpu_timer: Option<GpuTimer>,
     cached_gpu_memory: Option<GpuMemoryMetrics>,
     presented_frames: u64,
@@ -793,8 +798,10 @@ impl Renderer {
         let depth_target = DepthTarget::new(&device, configured_width, configured_height);
         let overlay = overlay::OverlayRenderer::new(&device, configuration.format, DEPTH_FORMAT);
         let action_bar = overlay::OverlayRenderer::new(&device, configuration.format, DEPTH_FORMAT);
+        let reticle = overlay::OverlayRenderer::new(&device, configuration.format, DEPTH_FORMAT);
         let spheres = spheres::SphereRenderer::new(&device, &queue, configuration.format);
         let ship_mesh = ship_mesh::ShipMeshRenderer::new(&device, configuration.format)?;
+        let held_item = held_item::HeldItemRenderer::new(&device, configuration.format)?;
         let gpu_timer = timestamp_queries_supported.then(|| GpuTimer::new(&device, &queue));
 
         let mut renderer = Self {
@@ -811,8 +818,10 @@ impl Renderer {
             depth_target,
             overlay,
             action_bar,
+            reticle,
             spheres,
             ship_mesh,
+            held_item,
             gpu_timer,
             cached_gpu_memory: None,
             presented_frames: 0,
@@ -844,7 +853,7 @@ impl Renderer {
         self.configure_surface();
     }
 
-    /// Draws and presents a renderer-facing scene plus an optional generic RGBA overlay.
+    /// Draws and presents a scene plus optional diagnostics, action-bar, and reticle images.
     ///
     /// `before_present` lets the platform runtime issue its presentation
     /// notification at the exact boundary without introducing a `winit`
@@ -854,6 +863,7 @@ impl Renderer {
         scene: SceneFrame<'_>,
         overlay_image: Option<OverlayImage<'_>>,
         action_bar_image: Option<OverlayImage<'_>>,
+        reticle_image: Option<OverlayImage<'_>>,
         before_present: impl FnOnce(),
     ) -> Result<RenderOutcome, RendererError> {
         if let Some(gpu_timer) = self.gpu_timer.as_mut() {
@@ -901,6 +911,8 @@ impl Renderer {
         )?;
         self.ship_mesh
             .prepare(&self.queue, scene, prepared_scene.view_projection)?;
+        self.held_item
+            .prepare(&self.queue, scene.camera, aspect_ratio, scene.held_item)?;
         self.ensure_instance_capacity(prepared_scene.instances.len())?;
         self.queue.write_buffer(
             &self.camera_buffer,
@@ -932,6 +944,15 @@ impl Renderer {
                 action_bar_image,
             )
             .map_err(|error| RendererError::new("failed to prepare action bar", error))?;
+        self.reticle
+            .prepare(
+                &self.device,
+                &self.queue,
+                self.configuration.width,
+                self.configuration.height,
+                reticle_image,
+            )
+            .map_err(|error| RendererError::new("failed to prepare reticle", error))?;
         let mut encoder = self
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor {
@@ -973,8 +994,10 @@ impl Renderer {
             }
             self.spheres.draw(&mut render_pass);
             self.ship_mesh.draw(&mut render_pass);
+            self.held_item.draw(&mut render_pass);
             self.overlay.draw(&mut render_pass);
             self.action_bar.draw(&mut render_pass);
+            self.reticle.draw(&mut render_pass);
         }
         if let (Some(gpu_timer), Some(slot_index)) = (self.gpu_timer.as_ref(), timing_slot) {
             gpu_timer.resolve_and_map(&mut encoder, slot_index);
@@ -1001,13 +1024,17 @@ impl Renderer {
                 .map_or(GpuFrameTime::Pending, GpuFrameTime::Measured),
             None => GpuFrameTime::Unsupported,
         };
-        let overlay_draw_calls =
-            u32::from(self.overlay.is_visible()) + u32::from(self.action_bar.is_visible());
+        let overlay_draw_calls = u32::from(self.overlay.is_visible())
+            + u32::from(self.action_bar.is_visible())
+            + u32::from(self.reticle.is_visible());
         let scene_draw_calls = scene_draw_calls(prepared_scene.instance_count)
             + scene_draw_calls(self.spheres.count())
-            + self.ship_mesh.draw_count();
-        let object_count =
-            prepared_scene.instance_count + self.spheres.count() + self.ship_mesh.count();
+            + self.ship_mesh.draw_count()
+            + self.held_item.count();
+        let object_count = prepared_scene.instance_count
+            + self.spheres.count()
+            + self.ship_mesh.count()
+            + self.held_item.count();
         Ok(RenderOutcome::Presented(RenderStats {
             cpu_render_time,
             gpu_frame_time,
@@ -1126,6 +1153,7 @@ mod tests {
                 spheres: &[],
                 light: None,
                 ship: None,
+                held_item: None,
             },
             16.0 / 9.0,
         )
@@ -1144,6 +1172,7 @@ mod tests {
                 spheres: &[],
                 light: None,
                 ship: None,
+                held_item: None,
             },
             16.0 / 9.0,
         )
@@ -1187,6 +1216,7 @@ mod tests {
                     spheres: &[],
                     light: None,
                     ship: None,
+                    held_item: None,
                 },
                 1.0,
             ),
@@ -1206,6 +1236,7 @@ mod tests {
                     spheres: &[],
                     light: None,
                     ship: None,
+                    held_item: None,
                 },
                 1.0,
             ),
@@ -1244,6 +1275,7 @@ mod tests {
                 spheres: &[],
                 light: None,
                 ship: None,
+                held_item: None,
             },
             1.0,
         )

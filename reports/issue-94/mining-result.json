@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "scenario": "scenarios/evidence/mining.json",
+  "status": "passed",
+  "steps_completed": 141,
+  "setup": {
+    "scenario": "landed-earth",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "duration_ms": 10193,
+  "screenshots": [
+    "dot.png",
+    "cross.png",
+    "mining.png"
+  ]
+}

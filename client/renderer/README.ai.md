@@ -18,7 +18,7 @@ exposes renderer-owned measurements.
 ## Public boundary
 
 Keep `Renderer::new`, `Renderer::resize`, and `Renderer::render` plus
-`CameraFrame`, `SceneInstance`, `SphereInstance`, `ShipMeshInstance`, `CockpitInstruments`, `PointLight`, `SceneFrame`, and the typed image/result values
+`CameraFrame`, `SceneInstance`, `SphereInstance`, `ShipMeshInstance`, `HeldItemInstance`, `CockpitInstruments`, `PointLight`, `SceneFrame`, and the typed image/result values
 as the narrow host-facing contract unless a task explicitly requires a change.
 Window/surface handles needed during initialization are integration inputs; they
 do not transfer native lifecycle policy to the renderer.
@@ -76,3 +76,7 @@ Follow the root [coding conventions](../../docs/coding-conventions.md),
 [validation matrix](../../docs/validation.md) and
 [feature map](../../docs/maintenance-map.md). Update affected contracts/guides
 with behavior changes and record completion evidence under root `reports/`.
+
+`held_item.rs` / `held_item.wgsl` own static authored mining-tool loading,
+camera-local grip placement and status-region feedback. Runtime owns equip
+and active gates; the asset README defines the baked grip contract.

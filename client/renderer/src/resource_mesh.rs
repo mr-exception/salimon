@@ -1,7 +1,7 @@
 //! Static authored resource meshes, batched into one opaque depth-tested draw.
 use crate::{CameraFrame, DEPTH_FORMAT, RendererError, encode_f32s};
 const FLOATS: usize = 7;
-const ASSETS: [&[u8]; 10] = [
+const ASSETS: [&[u8]; 14] = [
     include_bytes!("../../assets/resources/water-ice-fragment-shard/model.glb"),
     include_bytes!("../../assets/resources/water-ice-fragment-cluster/model.glb"),
     include_bytes!("../../assets/resources/silicate-fragment-slab/model.glb"),
@@ -12,6 +12,10 @@ const ASSETS: [&[u8]; 10] = [
     include_bytes!("../../assets/resources/water-ice-deposit-crown/model.glb"),
     include_bytes!("../../assets/resources/water-ice-deposit-ridge/model.glb"),
     include_bytes!("../../assets/resources/water-ice-deposit-shelf/model.glb"),
+    include_bytes!("../../assets/resources/silicate-deposit-boulder/model.glb"),
+    include_bytes!("../../assets/resources/silicate-deposit-slab/model.glb"),
+    include_bytes!("../../assets/resources/silicate-deposit-ridge/model.glb"),
+    include_bytes!("../../assets/resources/silicate-deposit-scree/model.glb"),
 ];
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ResourceMesh {
@@ -25,6 +29,10 @@ pub enum ResourceMesh {
     IceDepositCrown,
     IceDepositRidge,
     IceDepositShelf,
+    SilicateDepositBoulder,
+    SilicateDepositSlab,
+    SilicateDepositRidge,
+    SilicateDepositScree,
 }
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ResourceMeshInstance {
@@ -102,7 +110,7 @@ fn geometry(bytes: &[u8]) -> Result<Vec<[f32; FLOATS]>, RendererError> {
     Ok(vertices)
 }
 fn relative_vertices(
-    meshes: &[Vec<[f32; FLOATS]>; 10],
+    meshes: &[Vec<[f32; FLOATS]>; 14],
     instances: &[ResourceMeshInstance],
     camera: CameraFrame,
 ) -> Result<Vec<f32>, RendererError> {
@@ -128,6 +136,10 @@ fn relative_vertices(
             ResourceMesh::IceDepositCrown => 7,
             ResourceMesh::IceDepositRidge => 8,
             ResourceMesh::IceDepositShelf => 9,
+            ResourceMesh::SilicateDepositBoulder => 10,
+            ResourceMesh::SilicateDepositSlab => 11,
+            ResourceMesh::SilicateDepositRidge => 12,
+            ResourceMesh::SilicateDepositScree => 13,
         };
         for vertex in &meshes[mesh] {
             for (axis, value) in vertex.iter().take(3).enumerate() {
@@ -146,7 +158,7 @@ pub(crate) struct ResourceMeshRenderer {
     uniform: wgpu::Buffer,
     binding: wgpu::BindGroup,
     vertices: wgpu::Buffer,
-    meshes: [Vec<[f32; FLOATS]>; 10],
+    meshes: [Vec<[f32; FLOATS]>; 14],
     capacity: usize,
     count: u32,
     objects: u32,
@@ -167,6 +179,10 @@ impl ResourceMeshRenderer {
             geometry(ASSETS[7])?,
             geometry(ASSETS[8])?,
             geometry(ASSETS[9])?,
+            geometry(ASSETS[10])?,
+            geometry(ASSETS[11])?,
+            geometry(ASSETS[12])?,
+            geometry(ASSETS[13])?,
         ];
         let vertices = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("Resource vertices"),
@@ -336,6 +352,10 @@ mod tests {
             ResourceMesh::IceDepositCrown,
             ResourceMesh::IceDepositRidge,
             ResourceMesh::IceDepositShelf,
+            ResourceMesh::SilicateDepositBoulder,
+            ResourceMesh::SilicateDepositSlab,
+            ResourceMesh::SilicateDepositRidge,
+            ResourceMesh::SilicateDepositScree,
         ] {
             for side in [0.01, 0.5, 3.0] {
                 let instance = ResourceMeshInstance {

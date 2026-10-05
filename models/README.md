@@ -83,3 +83,7 @@ assembly. See its [component ownership and editing workflow](assets/ships/salimo
 The [mining tool](assets/items/mining-tool/README.md) is a generic authored item
 integrated into first-person rendering, with an identity grip socket and
 runtime-driven status material.
+
+Four [silicate deposit variants](assets/resources/silicate-deposit-boulder/README.md)
+use the generic resource pipeline and render with stable identity selection and
+authoritative spherical bounds.

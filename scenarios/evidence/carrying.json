@@ -371,9 +371,14 @@
     },
     {
       "assert": {
-        "path": "world.nearest_deposit.visual.color.0",
-        "approx": 0.45,
-        "tolerance": 0.001
+        "path": "world.nearest_deposit.visual",
+        "equals": null
+      }
+    },
+    {
+      "assert": {
+        "path": "world.nearest_deposit.authored_visual.mesh",
+        "equals": "SilicateDepositSlab"
       }
     },
     {
@@ -803,6 +808,12 @@
     {
       "assert": {
         "path": "world.nearest_deposit.visual",
+        "equals": null
+      }
+    },
+    {
+      "assert": {
+        "path": "world.nearest_deposit.authored_visual",
         "equals": null
       }
     },

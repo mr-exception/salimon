@@ -237,7 +237,10 @@
       }
     },
     {
-      "action": {"op": "step", "frames": 45}
+      "action": {
+        "op": "step",
+        "frames": 45
+      }
     },
     {
       "action": {
@@ -370,6 +373,42 @@
       "assert": {
         "path": "world.nearest_deposit.authored_visual.mesh",
         "equals": "SilicateDepositSlab"
+      }
+    },
+    {
+      "assert": {
+        "path": "world.deposits_by_id.Earth:1529931109935973032.visual",
+        "equals": null
+      }
+    },
+    {
+      "assert": {
+        "path": "world.deposits_by_id.Earth:1529931109935973032.authored_visual.mesh",
+        "equals": "IronDepositNodule"
+      }
+    },
+    {
+      "assert": {
+        "path": "world.deposits_by_id.Earth:7312054527039075213.visual",
+        "equals": null
+      }
+    },
+    {
+      "assert": {
+        "path": "world.deposits_by_id.Earth:7312054527039075213.authored_visual.mesh",
+        "equals": "IronDepositVein"
+      }
+    },
+    {
+      "assert": {
+        "path": "world.deposits_by_id.Earth:8530470202720685190.visual",
+        "equals": null
+      }
+    },
+    {
+      "assert": {
+        "path": "world.deposits_by_id.Earth:8530470202720685190.authored_visual.mesh",
+        "equals": "IronDepositLedge"
       }
     }
   ]

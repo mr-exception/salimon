@@ -149,3 +149,14 @@ cuboid. Depletion hides the mesh. The centered ±0.48 m baked cube uses uniform
 `bounds_radius_meters / (0.48 * sqrt(3))` scaling inside the authoritative sphere.
 Identity, mining, mass, session persistence and streaming stay world-owned.
 See the [asset guide](../../models/assets/resources/silicate-deposit-boulder/README.md).
+
+## Authored iron deposits (#86)
+
+Four opaque Blender-authored nodule/vein/ledge/rubble exports complete deposit
+migration to the shared resource mesh batch. Runtime chooses `DepositId.local % 4`
+in that order. All resources now emit authored meshes; no deposit cuboid path
+remains. Depletion hides the visual. The centered ±0.48 m baked cube uses uniform
+`bounds_radius_meters / (0.48 * sqrt(3))` scaling inside the authoritative sphere.
+Identity, targeting, mining, mass, session persistence and streaming stay world-owned.
+Automation retains the legacy `visual` field as null and reports mesh/center/scale
+through `authored_visual`. See the [asset guide](../../models/assets/resources/iron-deposit-nodule/README.md).

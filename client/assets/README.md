@@ -38,3 +38,7 @@ Silicate deposits embed four opaque authored boulder/slab/ridge/scree GLBs.
 The [source and scaling guide](../../models/assets/resources/silicate-deposit-boulder/README.md)
 defines stable variant selection and presentation bounds; gameplay mass/mining
 and streaming remain independent of mesh geometry.
+
+Iron deposits embed four opaque authored nodule/vein/ledge/rubble GLBs.
+The [source and scaling guide](../../models/assets/resources/iron-deposit-nodule/README.md)
+defines stable selection and spherical presentation bounds independently of gameplay.

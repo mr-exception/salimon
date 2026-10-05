@@ -22,7 +22,8 @@ renderer changes this material region only; it does not derive mining policy.
   Z -0.058…0.058 m. No collision, use marker, animation, textures or LODs.
 - Grip placement is camera-local: 0.55 m forward, 0.20 m right, 0.20 m down.
   Local +X follows camera forward and +Y follows orthonormal camera up. The
-  renderer uses projection directly, so pitch, yaw, gravity and distant world
+  renderer owns one asset-to-view matrix in `held_item.rs` and composes it with
+  the active camera projection, so pitch, yaw, gravity and distant world
   origins cannot move the grip on screen. Regular reverse-Z depth remains active.
 - This visual neither supplies the mining ray nor changes reach, extraction,
   targeting, equip/stow controls or resource identity. The screen-space dot/`+` reticle stays

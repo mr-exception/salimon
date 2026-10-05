@@ -33,10 +33,32 @@ jsonschema 4.26.0.
 - `python -m unittest discover -s scripts -p 'test_*.py'`:
   passed, 34 tests.
 - `git diff --check`: passed.
-- Rust format/lint/workspace tests and staged native gameplay checks:
-  delegated to the PR's existing three-platform Native builds workflow; results
-  will be recorded once available. Rust was not installed locally. Automatic
-  approval review rejected executing the downloaded Rust installer.
+- [Native builds run 37308925737](https://github.com/mr-exception/salimon/actions/runs/37308925737):
+  passed on macOS 14, Windows 2022 and Ubuntu 24.04 for implementation commit
+  `2cb822a5a9d61465e5c70f8d2bcedf02ce82eeff`. All three ran
+  `cargo fmt --all -- --check`,
+  `cargo clippy --workspace --all-targets --locked -- -D warnings`,
+  `cargo test --workspace --locked`, model/script tests, and debug/release staging.
+  Linux also passed the deterministic baseline, lower-cockpit screenshot,
+  resource-collection and ship-EVA evidence suites, and real X11 packaged smoke.
+  Build/screenshot/state artifacts are attached to that run.
+- Rust was not installed locally: automatic approval review rejected executing
+  the downloaded Rust installer, so the existing CI provided Rust/native coverage.
+  Initial CI caught two formatting differences and a test slice-iteration warning;
+  both were corrected before the successful run.
+- Changed documentation relative-link checks: passed.
+- Re-exported all four compressed editable sources: passed with identical GLBs.
+
+Measured generic export budgets:
+
+| Variant | Triangles | GLB bytes | Materials/primitives | Texture bytes |
+| --- | ---: | ---: | --- | ---: |
+| Spire | 32 | 3,716 | 2 / 2 | 0 |
+| Crown | 128 | 8,620 | 2 / 2 | 0 |
+| Ridge | 96 | 6,992 | 2 / 2 | 0 |
+| Shelf | 64 | 5,348 | 2 / 2 | 0 |
+
+This final report-only update does not change the successfully tested implementation.
 
 Regression coverage checks opaque materials, baked transforms, distinct exported
 geometry, actual vertex bounds, the spherical scaling rule, stable identity

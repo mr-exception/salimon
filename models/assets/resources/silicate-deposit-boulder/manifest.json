@@ -1,0 +1,62 @@
+{
+  "$schema": "../../../asset-manifest.schema.json",
+  "schemaVersion": 1,
+  "assetId": "resource.silicate-deposit-boulder",
+  "category": "resources",
+  "source": "models/assets/resources/silicate-deposit-boulder/source.blend",
+  "runtime": "client/assets/resources/silicate-deposit-boulder/model.glb",
+  "coordinates": {
+    "units": "meters",
+    "source": {
+      "up": "+Z",
+      "forward": "+X",
+      "unitScale": 1
+    },
+    "runtime": {
+      "up": "+Y",
+      "forward": "+X"
+    },
+    "conversion": "x,z,-y",
+    "pivot": "Center of authoritative unit bounding cube; geometry inside [-0.48, 0.48] meters"
+  },
+  "profile": "standard-v1",
+  "budgets": {
+    "maxTriangles": 240,
+    "maxPrimitives": 2,
+    "maxMaterials": 2,
+    "maxTextureBytes": 1,
+    "maxGlbBytes": 32768
+  },
+  "collision": {
+    "policy": "none"
+  },
+  "contracts": {
+    "root": "ASSET_silicate-deposit-boulder",
+    "visualGroups": [
+      "Visual"
+    ],
+    "groups": [
+      "Visual"
+    ],
+    "nodes": [
+      "Silicate_Deposit"
+    ],
+    "materials": [
+      "Silicate_Dark",
+      "Silicate_Light"
+    ],
+    "sockets": [],
+    "markers": [],
+    "colliders": [],
+    "requiredExtras": [
+      {
+        "node": "ASSET_silicate-deposit-boulder",
+        "path": "salimon.assetId"
+      },
+      {
+        "node": "Silicate_Deposit",
+        "path": "salimon.role"
+      }
+    ]
+  }
+}

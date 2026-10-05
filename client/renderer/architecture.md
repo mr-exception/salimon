@@ -140,3 +140,12 @@ at its absolute deposit center, at every body/latitude. Variant choice ignores
 query order, camera, streaming and remaining mass. World generation, mining,
 mass, session persistence and streaming rules are unchanged. See the
 [asset guide](../../models/assets/resources/water-ice-deposit-spire/README.md).
+
+## Authored silicate deposits (#87)
+
+Four opaque Blender-authored boulder/slab/ridge/scree exports share the resource mesh
+batch. Runtime selects `DepositId.local % 4` in that order and emits no silicate
+cuboid. Depletion hides the mesh. The centered ±0.48 m baked cube uses uniform
+`bounds_radius_meters / (0.48 * sqrt(3))` scaling inside the authoritative sphere.
+Identity, mining, mass, session persistence and streaming stay world-owned.
+See the [asset guide](../../models/assets/resources/silicate-deposit-boulder/README.md).

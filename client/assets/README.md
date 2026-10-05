@@ -33,3 +33,8 @@ additional license obligations are involved. See the renderer's
 The equipped mining tool uses `items/mining-tool/model.glb` at runtime. Its
 [editable source and grip/material contract](../../models/assets/items/mining-tool/README.md)
 use the generic item pipeline; the renderer embeds it independently of Blender.
+
+Silicate deposits embed four opaque authored boulder/slab/ridge/scree GLBs.
+The [source and scaling guide](../../models/assets/resources/silicate-deposit-boulder/README.md)
+defines stable variant selection and presentation bounds; gameplay mass/mining
+and streaming remain independent of mesh geometry.

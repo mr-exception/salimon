@@ -215,7 +215,8 @@ fn inspect(app: &ClientApplication) -> Value {
             "remaining_mass_kg": entry.deposit.remaining_mass_kg(),
             "distance_to_player_meters": entry.deposit.position().offset_from(salimon_world::WorldPosition::new(character.eye_position_meters[0], character.eye_position_meters[1], character.eye_position_meters[2])).iter().map(|v| v * v).sum::<f64>().sqrt(),
             "state": format!("{:?}", entry.deposit.state()),
-            "visual": crate::resource_presentation::visual(entry).map(|mesh| json!({"color": mesh.color, "half_extents_meters": mesh.half_extents_meters}))
+            "visual": crate::resource_presentation::visual(entry).map(|mesh| json!({"color": mesh.color, "half_extents_meters": mesh.half_extents_meters})),
+            "authored_visual": crate::resource_presentation::deposit_mesh(entry).map(|mesh| json!({"mesh": format!("{:?}", mesh.mesh), "center_meters": mesh.center_meters, "side_meters": mesh.side_meters}))
         })).collect::<Vec<_>>(), None),
         Err(error) => (Vec::new(), Some(format!("{error:?}"))),
     };
@@ -380,7 +381,11 @@ mod tests {
             state["world"]["nearest_deposit"]["resource"],
             "silicate-rock"
         );
-        assert!(state["world"]["nearest_deposit"]["visual"].is_object());
+        assert!(state["world"]["nearest_deposit"]["visual"].is_null());
+        assert_eq!(
+            state["world"]["nearest_deposit"]["authored_visual"]["mesh"],
+            "SilicateDepositSlab"
+        );
     }
 
     #[test]

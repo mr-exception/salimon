@@ -77,6 +77,10 @@
 - Fragment presentation/inspection read world-owned physical entities; neither
   can mutate mass or allocate output. Stowing does not remove fragments.
 
+- Authored handheld presentation is visible only in gameplay on the surface
+  while equipped; active feedback requires held input and a valid target. The
+  separate screen-space reticle remains available when stowed.
+
 - Gameplay aiming uses a screen-space centered dot when the tool is stowed and
   `+` when equipped, selected from the actual equip state every redraw. Camera
   pitch/yaw, location and drawable resize do not shift it. Precision tour hides

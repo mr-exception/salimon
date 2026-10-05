@@ -28,3 +28,7 @@ deterministically by `client/renderer/src/surface_textures.rs` at initialization
 That code is their editable source; no external imagery, downloaded assets, or
 additional license obligations are involved. See the renderer's
 [material documentation](../renderer/sphere-rendering.md).
+
+The equipped mining tool uses `items/mining-tool/model.glb` at runtime. Its
+[editable source and grip/material contract](../../models/assets/items/mining-tool/README.md)
+use the generic item pipeline; the renderer embeds it independently of Blender.

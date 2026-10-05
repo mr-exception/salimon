@@ -96,6 +96,17 @@ modules produce absolute snapshots, the runtime maps them into presentation
 DTOs without doing precision conversion, and the renderer remains a GPU
 consumer rather than an authoritative state owner.
 
+## Held item presentation
+
+`held_item.rs` loads the checked-in mining-tool GLB once into an immutable
+vertex buffer. `HeldItemInstance` carries active feedback only; absence stows
+the visual. The identity grip and baked vertices rotate into a camera-local
+frame in `held_item.wgsl`, using the frame projection and ordinary reverse-Z
+depth. Pitch/gravity/world origins do not affect screen placement. Status
+material regions switch amber/teal; runtime retains mining gates and the
+separate screen-space reticle. The visual adds one scene object and one draw. See the
+[mining-tool contract](../../models/assets/items/mining-tool/README.md).
+
 ## Centered gameplay overlay
 
 `Renderer::render` accepts an independent borrowed reticle image in addition to

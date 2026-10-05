@@ -692,10 +692,6 @@ impl ClientApplication {
                     .nearby_fragments(camera.position_meters)
                     .flat_map(crate::resource_presentation::fragment_visuals),
             );
-            scene_instances.extend(self.mining.visuals(
-                character_snapshot,
-                self.mining.held && mining_target.is_some(),
-            ));
         }
         let body_distances = camera_body_distances_from(world_snapshot, camera.position_meters);
         let cpu_update_time = update_started_at.elapsed();
@@ -730,6 +726,12 @@ impl ClientApplication {
                     spheres: &spheres,
                     light: Some(light),
                     ship: ship_mesh,
+                    held_item: if self.view_mode == ViewMode::Gameplay {
+                        self.mining
+                            .held_item(character_snapshot, mining_target.is_some())
+                    } else {
+                        None
+                    },
                 },
                 overlay_image,
                 action_bar_image,

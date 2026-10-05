@@ -91,7 +91,9 @@ the runtime.
 into portable `salimon_world::mining` calls. World owns target selection, rate,
 validated deposit mutation, and session mass deltas. Character exposes ray hits
 against its solid ship proxies. Runtime queries nearby generation, applies
-world session state for both GPU mapping and inspection, and presents the tool and resource geometry through generic renderer DTOs without exposing gameplay types to the renderer.
+world session state for both GPU mapping and inspection, and presents the authored tool through `MiningTool::held_item` / `HeldItemInstance`
+and resource geometry through generic renderer DTOs without exposing gameplay
+types to the renderer. No procedural tool or aim cuboid remains.
 Physical fragments are world-owned session entities. Runtime maps their
 mass-derived presentation size and absolute pose to generic presentation DTOs; the same
 nearby query supplies automation state even when the tool is stowed.

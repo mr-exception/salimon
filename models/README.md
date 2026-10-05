@@ -75,3 +75,7 @@ in [client assets](../client/assets/README.md); they need no `.blend` source.
 
 These completed migration tasks preserve the existing runtime behavior and
 metadata contract. Future authoring changes must pass the same validation gates.
+
+The [mining tool](assets/items/mining-tool/README.md) is a generic authored item
+integrated into first-person rendering, with an identity grip socket and
+runtime-driven status material.

@@ -58,3 +58,8 @@
 20. Center-placed overlays use the current drawable dimensions, place their
     midpoint at NDC (0, 0), and ignore scene occlusion. The renderer consumes
     image/revision/placement only, never equipment or targeting state.
+
+21. Held mining-tool geometry is the checked-in authored GLB, grip-centered and
+    baked with identity node transforms. Camera-local presentation preserves
+    orientation through look/gravity changes and never supplies a gameplay ray.
+    Active feedback is presentation-only; normal reverse-Z depth applies.

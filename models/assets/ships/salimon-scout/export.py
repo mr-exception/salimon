@@ -70,7 +70,9 @@ def export(blender=None):
         (staged / 'thruster_collision.rs').write_text(thruster_rust_source(spatial))
         (staged / 'ship_anchors.rs').write_text(anchors_rust_source(spatial))
         report = dict(assetId=manifest['assetId'], sourceSha256=hashlib.sha256(source.read_bytes()).hexdigest(),
-                      runtimeSha256=hashlib.sha256(temporary.read_bytes()).hexdigest(), metrics=metrics)
+                      runtimeSha256=hashlib.sha256(temporary.read_bytes()).hexdigest(), metrics=metrics,
+                      authoringSha256={str(p.relative_to(ASSET)): hashlib.sha256(p.read_bytes()).hexdigest()
+                                       for p in sorted(ASSET.rglob('*.blend'))})
         # Every check completes before any destination is replaced. GLB is
         # replaced last; normal client builds consume only that file.
         os.replace(staged / 'spatial-contracts.json', REPO / 'client/assets/ship/spatial-contracts.json')

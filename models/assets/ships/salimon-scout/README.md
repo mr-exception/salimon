@@ -1,6 +1,6 @@
 # Salimon scout — Blender visual source
 
-`source.blend` is the editable Blender source for the current scout. It contains
+`assembly/salimon-scout.blend` is the editable Blender source for the current scout. It contains
 the authored visual geometry, metadata-only colliders and interaction empties.
 The original floor texture is packed. This is original Salimon geometry under
 the repository license, with no third-party model dependencies. The current
@@ -8,7 +8,7 @@ revision removes the protruding port cargo module, cabin bench and storage,
 shortens the cockpit nose and glazing, and places three monitors on one
 center console. Body-clear routes on both sides reach the nose from the cabin.
 
-`source.blend` is authoritative for visual geometry and materials (#80).
+`assembly/salimon-scout.blend` is authoritative for visual geometry and materials (#80).
 The runtime GLB remains at its existing destination. Export through the scout
 adapter, which uses the shared headless Blender exporter, validates a temporary
 GLB with shared budgets and the preserved ship contracts, then publishes the
@@ -25,7 +25,51 @@ GLB, interchange and report. Blender is optional for normal Cargo builds.
 
 ## Open, edit, and verify
 
-Open `source.blend` in Blender. Mesh objects retain separate materials and
+Open `assembly/salimon-scout.blend` in Blender to inspect the complete ship.
+Edit geometry in the owning `components/<component>/source.blend` instead; the
+assembly uses direct linked Collections, so save the component and reload its
+library (or reopen the assembly) to see the change. Do not append/make local or
+create collection instances in the saved assembly: that would break ownership or
+introduce extra runtime nodes. Each component opens with its editable local
+objects and linked shared hierarchy/materials. All use the same ship-local frame.
+
+| Component | Ownership |
+| --- | --- |
+| hull | Hull panels, spine, roof details and exterior hull collider |
+| cockpit | Cockpit and cabin glazing, window frame and nose-floor collider |
+| wings | Both wings, armor/accents and their colliders |
+| engines | Both pods, fins, intake/nozzle details and engine colliders |
+| exit-door | Moving door, frame/threshold/light, door collider and exit marker |
+| pilot-seat | Seat and cockpit-seat marker |
+| cockpit-console | Console, monitors, housings, controls and console collider |
+| energy-core | Core, pedestal, details and core collider |
+| cabin-interior | Deck, walls, ceiling, trim/lights, cabin colliders and spawn marker |
+
+`assembly/shared.blend` owns the root/group empties and the 13 shared materials
+(including the packed floor image). Components link these dependencies through
+relative paths, so each parent/material has one identity in the assembly.
+Open that file to deliberately edit shared materials; preserve their contracts.
+Keep the entire asset folder together when moving/copying it. Existing node
+parenting is independent of Collection organization and is preserved verbatim.
+New objects must belong to their owner's `Scout_<component>` Collection and
+parent to the appropriate shared runtime group. Keep small details with their
+owner. The runtime still loads one GLB; no runtime modular loading is added.
+
+The export report hashes every component, shared library and assembly as well as
+the runtime GLB. After any source edit, export and run the checks below. Test
+portable library paths and independent edit propagation without changing saved
+sources with:
+
+```sh
+blender --background --python-exit-code 1 \
+  --python models/assets/ships/salimon-scout/verify_modular.py
+```
+
+The check copies the asset to a temporary folder, changes one hull vertex,
+saves only that component, then verifies the assembly sees the change and every
+other mesh remains unchanged. The sources use Blender 4.5.3 LTS.
+
+Mesh objects retain separate materials and
 editable vertices; parented empties retain the export hierarchy. The saved scene
 uses metric units with scale 1, +Z up and +X forward. Blender's glTF importer
 applies the inverse runtime mapping `(x,y,z) -> (x,-z,y)`; a later Y-up export

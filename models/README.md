@@ -18,7 +18,7 @@ same shared contract; do not copy ship tooling for each category.
 
 | Location | Owner and purpose |
 | --- | --- |
-| `models/assets/<category>/<asset-slug>/source.blend` | Editable geometry, materials, collision proxies, and spatial anchors |
+| Manifest-defined `.blend` source (normally `source.blend`; scout uses a linked assembly) | Editable geometry, materials, collision proxies, and spatial anchors |
 | The asset's `textures/` directory | Editable texture inputs; pack or resolve dependencies reproducibly |
 | The asset's `manifest.json` | Logical identity, source/export paths, budgets, required names, and category contract; see [manifest v1](manifest.md) |
 | The asset's `README.md` | Design intent, origin/pivot, licensing, authoring instructions, and contract notes |
@@ -75,3 +75,6 @@ in [client assets](../client/assets/README.md); they need no `.blend` source.
 
 These completed migration tasks preserve the existing runtime behavior and
 metadata contract. Future authoring changes must pass the same validation gates.
+
+The scout uses nine independently editable component libraries and a final linked
+assembly. See its [component ownership and editing workflow](assets/ships/salimon-scout/README.md#open-edit-and-verify).

@@ -62,3 +62,7 @@ The scout migration is complete. Use the ship category adapter and
 for that asset. Normal `cargo build --workspace --locked` and
 `scripts/build_game.py` continue to consume checked-in runtime assets without
 Blender; editing a `.blend` alone will not change the game.
+
+For the scout, edit the owning component rather than making assembly links local.
+Shared root/groups/materials belong to its shared library; see the
+[modular scout workflow](assets/ships/salimon-scout/README.md#open-edit-and-verify).

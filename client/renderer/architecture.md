@@ -101,8 +101,9 @@ consumer rather than an authoritative state owner.
 `held_item.rs` loads the checked-in mining-tool GLB once into an immutable
 vertex buffer. `HeldItemInstance` carries active feedback only; absence stows
 the visual. The identity grip and baked vertices rotate into a camera-local
-frame in `held_item.wgsl`, using the frame projection and ordinary reverse-Z
-depth. Pitch/gravity/world origins do not affect screen placement. Status
+frame through the single `GRIP_TO_VIEW` transform in `held_item.rs`. CPU
+preparation composes it with the active camera projection; `held_item.wgsl`
+consumes that model-to-clip matrix and uses ordinary reverse-Z depth. Pitch/gravity/world origins do not affect screen placement. Status
 material regions switch amber/teal; runtime retains mining gates and the
 separate screen-space reticle. The visual adds one scene object and one draw. See the
 [mining-tool contract](../../models/assets/items/mining-tool/README.md).

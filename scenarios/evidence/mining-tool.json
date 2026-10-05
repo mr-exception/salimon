@@ -927,6 +927,79 @@
         "path": "resource_ui.context",
         "equals": null
       }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "equip_mining_tool",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "equip_mining_tool",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.equipped",
+        "equals": true
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 0,
+        "dy": -10000
+      }
+    },
+    {
+      "screenshot": "tool-extreme-up"
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 600,
+        "dy": 0
+      }
+    },
+    {
+      "screenshot": "tool-extreme-up-yaw"
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 0,
+        "dy": 20000
+      }
+    },
+    {
+      "screenshot": "tool-extreme-down"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "equip_mining_tool",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "equip_mining_tool",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.equipped",
+        "equals": false
+      }
+    },
+    {
+      "screenshot": "tool-extreme-stowed"
     }
   ]
 }

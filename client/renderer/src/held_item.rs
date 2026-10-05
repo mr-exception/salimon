@@ -1,5 +1,8 @@
 //! Static authored handheld visual. No gameplay policy or world-space state.
-use crate::{CameraFrame, DEPTH_FORMAT, RendererError, encode_f32s, infinite_reverse_z_projection};
+use crate::{
+    CameraFrame, DEPTH_FORMAT, RendererError, encode_f32s, infinite_reverse_z_projection,
+    multiply_mat4,
+};
 use wgpu::util::DeviceExt;
 
 const GLB: &[u8] = include_bytes!("../../assets/items/mining-tool/model.glb");
@@ -9,6 +12,20 @@ const FLOATS: usize = 11;
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct HeldItemInstance {
     pub active: bool,
+}
+
+// Column-major asset-to-view transform: asset +X forward, +Y up, +Z right.
+// Work directly in the active camera's orthonormal view frame. This is equivalent
+// to camera-relative basis placement followed by the scene view rotation, without
+// adding/subtracting a distant absolute eye position or applying look twice.
+const GRIP_TO_VIEW: [f32; 16] = [
+    0.0, 0.0, -1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.20, -0.20, -0.55, 1.0,
+];
+
+fn model_to_clip(camera: CameraFrame, aspect: f32) -> Result<[f32; 16], RendererError> {
+    let projection = infinite_reverse_z_projection(camera, aspect)
+        .map_err(|e| RendererError::new("prepare held item", e))?;
+    Ok(multiply_mat4(projection, GRIP_TO_VIEW))
 }
 
 fn geometry() -> Result<Vec<f32>, RendererError> {
@@ -192,9 +209,7 @@ impl HeldItemRenderer {
     ) -> Result<(), RendererError> {
         self.visible = item.is_some();
         if let Some(item) = item {
-            let projection = infinite_reverse_z_projection(camera, aspect)
-                .map_err(|e| RendererError::new("prepare held item", e))?;
-            let mut values = projection.to_vec();
+            let mut values = model_to_clip(camera, aspect)?.to_vec();
             values.extend_from_slice(&[f32::from(item.active), 0.0, 0.0, 0.0]);
             queue.write_buffer(&self.uniform, 0, &encode_f32s(values));
         }
@@ -226,24 +241,92 @@ mod tests {
         // Every vertex stays in front of the 5cm near plane after grip placement.
         assert!(vertices.iter().all(|p| 0.55 + p[0] > 0.05));
     }
-    #[test]
-    fn projection_is_independent_of_camera_position_pitch_and_gravity() {
-        let a = CameraFrame {
-            position_meters: [0.0; 3],
-            target_meters: [1.0, 0.0, 0.0],
-            up: [0.0, 1.0, 0.0],
+    fn transform(matrix: [f32; 16], p: [f32; 3]) -> [f32; 4] {
+        std::array::from_fn(|row| {
+            matrix[row] * p[0] + matrix[4 + row] * p[1] + matrix[8 + row] * p[2] + matrix[12 + row]
+        })
+    }
+
+    fn camera(yaw: f64, pitch: f64, position: [f64; 3], tilted_gravity: bool) -> CameraFrame {
+        let mut forward = [
+            pitch.cos() * yaw.cos(),
+            pitch.sin(),
+            pitch.cos() * yaw.sin(),
+        ];
+        let mut up = [0.0, 1.0, 0.0];
+        if tilted_gravity {
+            forward.swap(0, 1);
+            up.swap(0, 1);
+        }
+        CameraFrame {
+            position_meters: position,
+            target_meters: std::array::from_fn(|i| position[i] + forward[i]),
+            up,
             vertical_fov_radians: 1.2,
             near_plane_meters: 0.05,
-        };
-        let b = CameraFrame {
-            position_meters: [1e12; 3],
-            target_meters: [1e12, 1e12 + 1.0, 1e12 + 0.01],
-            up: [1.0, 0.0, 0.0],
-            ..a
-        };
+        }
+    }
+
+    #[test]
+    fn placement_matches_active_camera_basis_across_yaw_pitch_and_gravity() {
+        let vertices = geometry().expect("validated mining tool must load");
+        for yaw in [0.0, 1.2, -2.4] {
+            // Character controller's supported pitch limits.
+            for pitch in [
+                -std::f64::consts::FRAC_PI_2 + 0.01,
+                0.0,
+                std::f64::consts::FRAC_PI_2 - 0.01,
+            ] {
+                for tilted in [false, true] {
+                    for origin in [[0.0; 3], [1e12; 3]] {
+                        let camera = camera(yaw, pitch, origin, tilted);
+                        let basis = crate::camera_basis(camera).unwrap();
+                        let projection = infinite_reverse_z_projection(camera, 1.6).unwrap();
+                        let actual = model_to_clip(camera, 1.6).unwrap();
+                        let world_to_clip = multiply_mat4(projection, crate::view_rotation(basis));
+                        for vertex in vertices.as_chunks::<FLOATS>().0 {
+                            let p = [vertex[0], vertex[1], vertex[2]];
+                            // Independent oracle: place the grip and asset axes along
+                            // the actual scene camera's forward/right/orthonormal up.
+                            let relative = std::array::from_fn(|i| {
+                                basis.forward[i] * (0.55 + p[0])
+                                    + basis.right[i] * (0.20 + p[2])
+                                    + basis.up[i] * (-0.20 + p[1])
+                            });
+                            let expected = transform(world_to_clip, relative);
+                            let clip = transform(actual, p);
+                            for i in 0..4 {
+                                assert!((clip[i] - expected[i]).abs() < 1e-6);
+                            }
+                            assert!(clip[3] > camera.near_plane_meters);
+                            assert!(clip[0].abs() < clip[3] && clip[1].abs() < clip[3]);
+                            assert!(clip[2] > 0.0 && clip[2] < clip[3]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn grip_follows_look_without_changing_screen_offset_or_center_aim() {
+        let a = camera(0.0, 0.0, [0.0; 3], false);
+        let b = camera(1.2, 1.5, [1e12; 3], true);
+        let basis_a = crate::camera_basis(a).unwrap();
+        let basis_b = crate::camera_basis(b).unwrap();
+        assert_ne!(basis_a.forward, basis_b.forward);
         assert_eq!(
-            infinite_reverse_z_projection(a, 1.6),
-            infinite_reverse_z_projection(b, 1.6)
+            model_to_clip(a, 1.6).unwrap(),
+            model_to_clip(b, 1.6).unwrap()
         );
+        for camera in [a, b] {
+            let basis = crate::camera_basis(camera).unwrap();
+            let vp = multiply_mat4(
+                infinite_reverse_z_projection(camera, 1.6).unwrap(),
+                crate::view_rotation(basis),
+            );
+            let aim = transform(vp, basis.forward);
+            assert!(aim[0].abs() < 1e-6 && aim[1].abs() < 1e-6);
+        }
     }
 }

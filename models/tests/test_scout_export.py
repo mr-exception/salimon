@@ -3,11 +3,13 @@ import copy
 import hashlib
 import importlib.util
 import json
-from pathlib import Path
+import os
+import subprocess
+from pathlib import Path, PureWindowsPath
 import shutil
 import sys
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 REPO = Path(__file__).resolve().parents[2]
 ASSET = REPO / 'models/assets/ships/salimon-scout'
@@ -27,7 +29,10 @@ class ScoutExportTests(unittest.TestCase):
 
     def test_checked_in_export_provenance_and_shared_budgets(self):
         report = json.loads((ASSET / 'export-report.json').read_text())
-        self.assertEqual(report['sourceSha256'], hashlib.sha256((ASSET / 'source.blend').read_bytes()).hexdigest())
+        self.assertEqual(report['sourceSha256'], hashlib.sha256((REPO / self.manifest['source']).read_bytes()).hexdigest())
+        self.assertEqual(report['authoringSha256'], {
+            p.relative_to(ASSET).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+            for p in sorted(ASSET.rglob('*.blend'))})
         self.assertEqual(report['runtimeSha256'], hashlib.sha256(self.output.read_bytes()).hexdigest())
         metrics = validate_asset('ship.salimon-scout', extension_validators={
             ('ships', 'ship', 1): scout.validate_preservation,
@@ -35,6 +40,27 @@ class ScoutExportTests(unittest.TestCase):
         self.assertEqual(report['metrics'], metrics)
         self.assertIn('Blender', self.document['asset']['generator'])
         self.assertIn('Blender', self.document['asset']['extras']['salimon']['sourceWorkflow'])
+
+    def test_authoring_hash_keys_are_portable_on_windows(self):
+        asset = Mock()
+        source = Mock()
+        asset.rglob.return_value = [source]
+        source.relative_to.return_value = PureWindowsPath('components/hull/source.blend')
+        source.read_bytes.return_value = b'authored component'
+        self.assertEqual(scout.authoring_hashes(asset), {
+            'components/hull/source.blend': hashlib.sha256(b'authored component').hexdigest(),
+        })
+
+    def test_linked_component_edit_propagation_and_saved_source(self):
+        blender = shutil.which(os.environ.get('BLENDER', 'blender'))
+        if not blender:
+            self.skipTest('Blender required for linked component verification')
+        for script in ('verify_modular.py', 'verify_source.py'):
+            result = subprocess.run([blender, '--background', '--factory-startup',
+                                     '--disable-autoexec', '--python-exit-code', '1',
+                                     '--python', str(ASSET / script)],
+                                    capture_output=True, text=True, timeout=60)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_non_spatial_legacy_contract_changes_are_rejected(self):
         for name, mutate in (

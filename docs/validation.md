@@ -44,6 +44,7 @@ against exported interchange and run model plus affected Rust consumer tests:
 ```sh
 python models/assets/ships/salimon-scout/export.py --blender /path/to/blender
 blender --background --python-exit-code 1 --python models/assets/ships/salimon-scout/verify_source.py
+blender --background --python-exit-code 1 --python models/assets/ships/salimon-scout/verify_modular.py
 python models/assets/ships/salimon-scout/validate.py
 BLENDER=/path/to/blender python -m unittest discover -s models/tests -v
 ```

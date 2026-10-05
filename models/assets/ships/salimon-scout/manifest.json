@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "assetId": "ship.salimon-scout",
   "category": "ships",
-  "source": "models/assets/ships/salimon-scout/source.blend",
+  "source": "models/assets/ships/salimon-scout/assembly/salimon-scout.blend",
   "runtime": "client/assets/ship/export/salimon_phase0_ship.glb",
   "coordinates": {
     "units": "meters",

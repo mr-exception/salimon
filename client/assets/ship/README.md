@@ -87,7 +87,7 @@ The procedural geometry generator and its software preview tool are retired.
 The scout export and validator use authored GLB data and declarative contracts.
 Spatial Rust layouts are derived from authored proxies/markers.
 
-- `../../../models/assets/ships/salimon-scout/source.blend` is the editable visual source.
+- `../../../models/assets/ships/salimon-scout/assembly/salimon-scout.blend` is the editable visual source.
 - `export/salimon_phase0_ship.gltf` plus `.bin` is the matching DCC interchange.
 - `export/salimon_phase0_ship.glb` is the self-contained Blender runtime export.
 - `textures/salimon_floor_grip.png` is an original 16×16 procedural texture.
@@ -126,7 +126,7 @@ not replace native runtime or reference hardware checks.
 
 Units are meters; `+Y` is up, `+X` is forward, `-Z` is starboard. Meshes have baked
 positions and identity transforms. `Exterior`, `Interior`, `Collision_Proxies`
-and `Interaction_Markers` are stable hierarchy groups. Geometry in `source.blend`
+and `Interaction_Markers` are stable hierarchy groups. Geometry in the linked Blender assembly
 is authored in final meters. The historical Task 7
 scaling is already baked into this source; do not apply it again. Edit the pilot
 station directly in meters to retain human proportions independently of hull scale.

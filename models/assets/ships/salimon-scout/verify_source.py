@@ -99,7 +99,7 @@ def main():
     document = json.loads((LEGACY / 'export/salimon_phase0_ship.gltf').read_text())
     runtime = LEGACY / 'export/salimon_phase0_ship.glb'
     before = hashlib.sha256(runtime.read_bytes()).hexdigest()
-    bpy.ops.wm.open_mainfile(filepath=str(ASSET / 'source.blend'))
+    bpy.ops.wm.open_mainfile(filepath=str(ASSET / 'assembly/salimon-scout.blend'))
     verify(document)
     assert hashlib.sha256(runtime.read_bytes()).hexdigest() == before, 'Runtime changed'
 

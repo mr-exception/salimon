@@ -27,6 +27,12 @@ from spatial_contracts import (
 )
 
 
+def authoring_hashes(asset=ASSET):
+    """Use portable manifest-style keys even when exporting on Windows."""
+    return {p.relative_to(asset).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+            for p in sorted(asset.rglob('*.blend'))}
+
+
 def encode_glb(document, binary):
     data = json.dumps(document, separators=(',', ':')).encode()
     data += b' ' * (-len(data) % 4)
@@ -70,7 +76,8 @@ def export(blender=None):
         (staged / 'thruster_collision.rs').write_text(thruster_rust_source(spatial))
         (staged / 'ship_anchors.rs').write_text(anchors_rust_source(spatial))
         report = dict(assetId=manifest['assetId'], sourceSha256=hashlib.sha256(source.read_bytes()).hexdigest(),
-                      runtimeSha256=hashlib.sha256(temporary.read_bytes()).hexdigest(), metrics=metrics)
+                      runtimeSha256=hashlib.sha256(temporary.read_bytes()).hexdigest(), metrics=metrics,
+                      authoringSha256=authoring_hashes())
         # Every check completes before any destination is replaced. GLB is
         # replaced last; normal client builds consume only that file.
         os.replace(staged / 'spatial-contracts.json', REPO / 'client/assets/ship/spatial-contracts.json')

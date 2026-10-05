@@ -83,7 +83,11 @@ pub(crate) fn fragment_visuals(fragment: ResourceFragment) -> Vec<SceneInstance>
     type ShapeColors = [[f32; 4]; 3];
     let side = salimon_world::resource_fragments::side_meters(fragment);
     let center = fragment.transform().position().meters();
-    let flip = if fragment.id().0 % 2 == 0 { -1.0 } else { 1.0 };
+    let flip = if fragment.id().0.is_multiple_of(2) {
+        -1.0
+    } else {
+        1.0
+    };
     let (parts, colors): (ShapeParts, ShapeColors) = match fragment.material().resource() {
         ResourceId::IronOre => (
             [

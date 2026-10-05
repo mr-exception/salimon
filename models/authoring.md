@@ -57,8 +57,8 @@ the source/export. Do not depend on a bridge's session history to reconstruct it
 
 Use the [generic export command](tools/README.md) for authored assets. The
 [generic validator](tools/README.md#generic-validation) supports category extensions.
-Until the scout migration completes, use
-the [existing scout generation and validation commands](../client/assets/ship/README.md#source-and-regeneration)
+The scout migration is complete. Use the ship category adapter and
+[scout export and validation commands](../client/assets/ship/README.md#source-and-regeneration)
 for that asset. Normal `cargo build --workspace --locked` and
 `scripts/build_game.py` continue to consume checked-in runtime assets without
 Blender; editing a `.blend` alone will not change the game.

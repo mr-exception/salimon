@@ -22,3 +22,10 @@ and constant-radius full-sphere movement. Add a focused unit test whenever one
 of these rules changes. Surface camera and movement direction must continue to
 share the same yaw-derived local tangent basis rather than using fixed ship/world
 axes.
+
+## Shared maintenance rules
+
+Follow the root [coding conventions](../../docs/coding-conventions.md),
+[validation matrix](../../docs/validation.md) and
+[feature map](../../docs/maintenance-map.md). Update affected contracts/guides
+with behavior changes and record completion evidence under root `reports/`.

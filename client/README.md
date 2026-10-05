@@ -1,6 +1,7 @@
 # Client
 
-All Phase 0 implementation lives here. Tasks 2–11 provide the `salimon-client`
+All Phase 0 runtime implementation lives here. The current packages provide
+the `salimon-client`
 runtime binary, `salimon-renderer` GPU library, `salimon-diagnostics`
 metrics/overlay library, and portable `salimon-world` compressed Solar System,
 coordinate/camera model, portable character and ship domains, and the custom
@@ -12,9 +13,9 @@ ship asset/runtime mesh path. Add future Cargo packages explicitly to the root w
 | --- | --- |
 | `runtime/` | Native lifecycle, redraw/update scheduling, typed key routing, timing, and client composition |
 | `renderer/` | `wgpu` resources, camera-relative conversion, reverse-Z scene/ship/overlay pipelines, measurements, and presentation |
-| `world/` | Immutable six-body compressed Solar System, portable `f64` coordinates, camera state, geometry math, and precision markers |
-| `character/` | First-person state, typed movement, fixed gravity, cockpit/doorway/surface traversal |
-| `ship/` | Ship pose, flight/landing/takeoff state, cockpit authority, persistent motion, and landed-only door rules |
+| `world/` | Immutable six-body compressed Solar System, portable `f64` coordinates, camera state, geometry math, precision markers, resource generation, mining session state, and carrying |
+| `character/` | First-person state, typed movement, fixed gravity, cockpit/doorway/surface traversal and open-space/nearby-body EVA |
+| `ship/` | Ship pose, flight/landing/takeoff state, cockpit authority, persistent motion, and landed/open-space airlock rules |
 | `platform/` | Reserved for native input and OS-specific adapters |
 | `assets/` | Validated runtime exports/metadata and legacy editable sources; new 3D sources belong in root `models/` |
 | `diagnostics/` | Engineering metric aggregation, formatting, and RGBA overlay rasterization |
@@ -49,12 +50,15 @@ behavior grows or another native target needs an adapter. Future domain modules
 must consume typed input/presentation data rather than GPU or window types.
 There is no dependency on `core/` in Phase 0.
 
-Tasks 2–11 deliberately add no ECS, physics engine, WASM host,
-orbital simulation, or backend scaffolding. Task 6 adds renderer-owned analytic
-spheres, generated mipmapped textures, and Sun illumination. Task 4 camera
-telemetry is explicitly separate from future player/ship state; Task 5 supplies
-camera-to-body surface observations without presenting the camera as gameplay
-state. As major components gain behavior, maintain the contracts, ownership
+No ECS, physics engine, WASM host, orbital simulation or backend scaffolding
+is present. Renderer owns analytic spheres, generated mipmapped textures and Sun
+illumination. The engineering camera tour is separate from player/ship state;
+world supplies camera-to-body observations without presenting it as gameplay.
+Mining, carrying, custom fragment motion/contact and EVA are implemented.
+Resource state survives local streaming within an in-memory session; disk/backend
+persistence remains deferred. Use the
+[feature maintenance map](../docs/maintenance-map.md) for source/test routing.
+As major components gain behavior, maintain the contracts, ownership
 documentation, architecture, invariants, and relevant validation required by the
 [technical architecture](../docs/technical-architecture.md).
 

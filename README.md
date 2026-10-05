@@ -44,7 +44,7 @@ salimon/
 └── client/
     ├── runtime/        # salimon-client lifecycle and composition executable
     ├── renderer/       # salimon-renderer GPU library and presentation
-    ├── world/          # Compressed Solar System, f64 coordinates, and camera fixture
+    ├── world/          # Catalog, coordinates, resource generation, mining and carrying
     ├── character/      # Portable first-person movement and gravity transitions
     ├── ship/           # Portable ship pose, cockpit authority, motion, and door state
     ├── platform/       # Future native window/input/platform adapters
@@ -240,6 +240,11 @@ criterion as manually verified.
 
 ## Development workflow
 
+Use the [ownership map](docs/maintenance-map.md) to route changes, follow the
+[coding conventions](docs/coding-conventions.md), and run the affected checks in
+the [validation matrix](docs/validation.md), including Python/model checks.
+Store task outcomes and applicable images in [reports/](reports/README.md).
+
 Read the current GitHub issue and its linked specifications before changing
 behavior. Keep all Phase 0 implementation under `client/`; leave `core/` as a
 documentation-only boundary.
@@ -259,8 +264,11 @@ precision technique, LOD budget, material source, and future terrain path.
 Task 11 loads Task 7's GLB through a renderer-owned mesh path and keeps behavior in
 separate character/ship crates. Validate and regenerate its model using the
 commands in the [ship asset documentation](client/assets/ship/README.md).
-Orbital simulation, gameplay, persistence, networking, and backend behavior remain
-outside this implementation.
+Mining, carrying, fragment motion/contact, ship flight and assisted landing,
+airlock access, and EVA are implemented. Modified deposits and physical fragments
+are retained in memory across local streaming during the current session.
+Orbital simulation, disk/backend persistence, networking, survival, and production
+energy management remain deferred.
 
 Add future crates explicitly to the root workspace and inherit its package
 metadata and lints. Keep `Cargo.lock` committed; validate normal changes with

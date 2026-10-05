@@ -78,7 +78,7 @@ re-entry. The nearby route checks open-space mode before threshold crossing,
 Earth selection inside 3,000,000 m, continuous altitude and bounded radial
 acceleration. Cockpit-to-nose traversal and airlock collision checks cover the real layout.
 The required Linux CI job runs this evidence group against the release binary.
-See [checked-in validation](../docs/issue-39/README.md) for results and screenshots.
+See [checked-in validation](../reports/issue-39/README.md) for results and screenshots.
 
 ## Resource collection suite (#51)
 
@@ -136,7 +136,7 @@ The evidence variant adds named screenshots without changing actions or assertio
 
 Every run writes structured results, per-step state snapshots and process/protocol
 logs; evidence captures also save their authoritative states. See the shared
-artifact format below and [checked-in validation](../docs/issue-52/README.md).
+artifact format below and [checked-in validation](../reports/issue-52/README.md).
 This scenario covers the first local resource loop; refining, crafting, trading,
 survival consumption, asteroid mining and backend persistence are outside it.
 
@@ -325,7 +325,7 @@ output after depletion. Extraction totals and session fragment totals are
 diagnostics only, never inventory. The partial/depleted screenshots show the
 physical cubes left beside the deposit.
 Linux's required baseline job runs this mining evidence variant; capture errors
-fail the job. Checked-in [issue #45 evidence](../docs/issue-45/README.md) records
+fail the job. Checked-in [issue #45 evidence](../reports/issue-45/README.md) records
 the initial Linux validation.
 
 ## Local streamed resource state (#50)
@@ -382,7 +382,7 @@ reduce stale frames from asynchronous GPU presentation. It is not a GPU fence;
 authoritative movement/state assertions remain the verification source. Capture
 errors still fail the scenario and the runner's normal deadlines apply. Use a
 dedicated unobscured test display. The prior cargo-room route and its evidence
-remain archived under [issue #34](../docs/issue-34/README.md).
+remain archived under [issue #34](../reports/issue-34/README.md).
 
 ## Space airlock access (#35)
 
@@ -448,7 +448,7 @@ ship-local pose. These fields describe actual physical entities, not inventory.
 keeps its ship-local pose while the ship moves, and that pickup and surface
 placement transfer the same physical entity between reference frames. The
 resource loop additionally delivers a mined fragment into the cabin. The former
-dedicated cargo-room behavior is archived in [issue #49](../docs/issue-49/README.md).
+dedicated cargo-room behavior is archived in [issue #49](../reports/issue-49/README.md).
 
 ## Lower cockpit windows (#38)
 

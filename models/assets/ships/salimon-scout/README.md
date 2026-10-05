@@ -139,7 +139,7 @@ UVs and gameplay behavior while shrinking the GLB from 513,824 to 485,332 bytes.
 The current design revision changes that historical geometry and removes the
 dedicated cargo module.
 
-See [migration evidence](../../../../docs/issue-80/README.md) for the complete
+See [migration evidence](../../../../reports/issue-80/README.md) for the complete
 triangle comparison and recorded validation limits.
 Original bootstrap GLB SHA-256:
 `926c93570a48dae8c66b1721a9183d70c69c3f3d3b15ff92cbbae9d2fe3eb312`.

@@ -184,3 +184,15 @@ at its absolute deposit center, at every body/latitude. Variant choice ignores
 query order, camera, streaming and remaining mass. World generation, mining,
 mass, session persistence and streaming rules are unchanged. See the
 [asset guide](../models/assets/resources/water-ice-deposit-spire/README.md).
+
+## Scout spatial geometry (#111)
+
+The linked Blender components own 20 scout boxes and four spatial markers.
+The offline adapter generates one character `spatial_contracts.rs` alongside
+the sidecar/embedded contract. Dedicated cabin envelopes exclude appendages
+and account for sills/fixtures; chair and cockpit-side proxies preserve the
+previous conservative walking footprints. Character layout composes clearance,
+gate/shoulder proxies and query policy from generated raw bounds. Player size,
+movement, permissions, ranges, gravity/timing and camera offsets stay in Rust.
+See the [authored geometry/policy map](../models/assets/ships/salimon-scout/README.md#geometry-and-gameplay-policy).
+Runtime builds require neither Blender nor asset generation.

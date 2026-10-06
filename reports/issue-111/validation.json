@@ -1,0 +1,1267 @@
+{
+  "environment": {
+    "os": "Linux x86_64",
+    "rust": "1.99.0",
+    "python": "3.12.14",
+    "blender": "4.5.3 LTS",
+    "graphics": "Mesa lavapipe / Vulkan / Xvfb 1280x800, debug executable"
+  },
+  "scenarios": [
+    {
+      "scenario": "cockpit-nose.json",
+      "status": "passed",
+      "steps_completed": 31,
+      "duration_ms": 4448,
+      "captures": [
+        {
+          "image": "walkable-cockpit-nose.png",
+          "step": 20,
+          "state": {
+            "player": {
+              "eye_position_meters": [
+                1000000000007.492,
+                -749993999997.8951,
+                249994000000.6576
+              ],
+              "local_ship_position_meters": [
+                7.492000000000021,
+                1.9973118279569892,
+                0.6575999999999991
+              ],
+              "location": "InsideShip",
+              "look_target_meters": [
+                1000000000008.492,
+                -749993999997.8951,
+                249994000000.6576
+              ],
+              "nearby_body": {
+                "name": "Earth",
+                "surface_distance_meters": 2.10486311186105
+              },
+              "relative_speed_meters_per_second": 0.0,
+              "relative_velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "ship_local_eye_position_meters": [
+                7.491943359375,
+                1.997314453125,
+                0.6575927734375
+              ],
+              "speed_meters_per_second": 0.0,
+              "up": [
+                0.0,
+                1.0,
+                0.0
+              ],
+              "velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "ship": {
+              "cockpit_control_active": false,
+              "cockpit_message": null,
+              "door_open_fraction": 0.0,
+              "door_state": "Closed",
+              "energy_core": {
+                "capacity_joules": 1000000000000,
+                "stored_joules": 750000000000
+              },
+              "flight_state": "Landed { body: Earth }",
+              "nearby_body": {
+                "name": "Earth",
+                "radial_speed_meters_per_second": 0.0,
+                "surface_distance_meters": 0.1075439453125
+              },
+              "orientation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_meters": [
+                1000000000000.0,
+                -749993999999.8925,
+                249994000000.0
+              ],
+              "speed_meters_per_second": 0.0,
+              "thruster_percentage": 0,
+              "velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "carrying": {
+              "context": null,
+              "last_action_feedback": null,
+              "object_id": null,
+              "target_id": null
+            },
+            "mining": {
+              "active": false,
+              "equipped": false,
+              "extracted_mass_kg": 0.0,
+              "held": false,
+              "range_meters": 4.0,
+              "rate_kg_per_second": 2.0,
+              "target": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "space-airlock.json",
+      "status": "passed",
+      "steps_completed": 54,
+      "duration_ms": 6032,
+      "captures": [
+        {
+          "image": "space-interior-closed-door.png",
+          "step": 52,
+          "state": {
+            "player": {
+              "eye_position_meters": [
+                999999999992.76,
+                -749990989998.0027,
+                249993999899.9888
+              ],
+              "local_ship_position_meters": [
+                -7.24,
+                1.9973118279569892,
+                -0.011199951171875
+              ],
+              "location": "InsideShip",
+              "look_target_meters": [
+                999999999993.76,
+                -749990989998.0027,
+                249993999899.9888
+              ],
+              "nearby_body": null,
+              "relative_speed_meters_per_second": 0.0,
+              "relative_velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "ship_local_eye_position_meters": [
+                -7.239990234375,
+                1.997314453125,
+                -0.011199951171875
+              ],
+              "speed_meters_per_second": 0.0,
+              "up": [
+                0.0,
+                1.0,
+                0.0
+              ],
+              "velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "ship": {
+              "cockpit_control_active": false,
+              "cockpit_message": null,
+              "door_open_fraction": 0.0,
+              "door_state": "Closed",
+              "energy_core": {
+                "capacity_joules": 1000000000000,
+                "stored_joules": 750000000000
+              },
+              "flight_state": "Flying",
+              "nearby_body": null,
+              "orientation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_meters": [
+                1000000000000.0,
+                -749990990000.0,
+                249993999900.0
+              ],
+              "speed_meters_per_second": 0.0,
+              "thruster_percentage": 0,
+              "velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "carrying": {
+              "context": null,
+              "last_action_feedback": null,
+              "object_id": null,
+              "target_id": null
+            },
+            "mining": {
+              "active": false,
+              "equipped": false,
+              "extracted_mass_kg": 0.0,
+              "held": false,
+              "range_meters": 4.0,
+              "rate_kg_per_second": 2.0,
+              "target": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "moving-eva.json",
+      "status": "passed",
+      "steps_completed": 96,
+      "duration_ms": 6232,
+      "captures": [
+        {
+          "image": "moving-eva-reentry.png",
+          "step": 88,
+          "state": {
+            "player": {
+              "eye_position_meters": [
+                1000000437994.5408,
+                -749990989998.0027,
+                249993999899.9888
+              ],
+              "local_ship_position_meters": [
+                -5.459199999999989,
+                1.9973118279569892,
+                -0.011199951171875
+              ],
+              "location": "InsideShip",
+              "look_target_meters": [
+                1000000437995.5408,
+                -749990989998.0027,
+                249993999899.9888
+              ],
+              "nearby_body": null,
+              "relative_speed_meters_per_second": 0.0,
+              "relative_velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "ship_local_eye_position_meters": [
+                -5.459228515625,
+                1.997314453125,
+                -0.011199951171875
+              ],
+              "speed_meters_per_second": 25000.0,
+              "up": [
+                0.0,
+                1.0,
+                0.0
+              ],
+              "velocity_meters_per_second": [
+                25000.0,
+                0.0,
+                0.0
+              ]
+            },
+            "ship": {
+              "cockpit_control_active": false,
+              "cockpit_message": null,
+              "door_open_fraction": 1.0,
+              "door_state": "Open",
+              "energy_core": {
+                "capacity_joules": 1000000000000,
+                "stored_joules": 750000000000
+              },
+              "flight_state": "Flying",
+              "nearby_body": null,
+              "orientation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_meters": [
+                1000000438000.0,
+                -749990990000.0,
+                249993999900.0
+              ],
+              "speed_meters_per_second": 25000.0,
+              "thruster_percentage": 1,
+              "velocity_meters_per_second": [
+                25000.0,
+                0.0,
+                0.0
+              ]
+            },
+            "carrying": {
+              "context": null,
+              "last_action_feedback": null,
+              "object_id": null,
+              "target_id": null
+            },
+            "mining": {
+              "active": false,
+              "equipped": false,
+              "extracted_mass_kg": 0.0,
+              "held": false,
+              "range_meters": 4.0,
+              "rate_kg_per_second": 2.0,
+              "target": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "nearby-eva.json",
+      "status": "passed",
+      "steps_completed": 46,
+      "duration_ms": 6452,
+      "captures": []
+    },
+    {
+      "scenario": "resource-deposits.json",
+      "status": "passed",
+      "steps_completed": 65,
+      "duration_ms": 5381,
+      "captures": []
+    },
+    {
+      "scenario": "mining.json",
+      "status": "passed",
+      "steps_completed": 143,
+      "duration_ms": 11443,
+      "captures": []
+    },
+    {
+      "scenario": "carrying.json",
+      "status": "passed",
+      "steps_completed": 195,
+      "duration_ms": 14223,
+      "captures": []
+    },
+    {
+      "scenario": "fragment-transfer.json",
+      "status": "passed",
+      "steps_completed": 258,
+      "duration_ms": 16003,
+      "captures": [
+        {
+          "image": "transfer-1-ship.png",
+          "step": 163,
+          "state": {
+            "player": {
+              "eye_position_meters": [
+                999999999994.188,
+                -749993999997.8951,
+                249994000000.00015
+              ],
+              "local_ship_position_meters": [
+                -5.811957983827117,
+                1.9973118279569892,
+                0.00016213607355247832
+              ],
+              "location": "InsideShip",
+              "look_target_meters": [
+                999999999994.6239,
+                -749993999998.7952,
+                249994000000.00015
+              ],
+              "nearby_body": {
+                "name": "Earth",
+                "surface_distance_meters": 2.104861213825643
+              },
+              "relative_speed_meters_per_second": 0.0,
+              "relative_velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "ship_local_eye_position_meters": [
+                -5.81201171875,
+                1.997314453125,
+                0.000152587890625
+              ],
+              "speed_meters_per_second": 0.0,
+              "up": [
+                0.0,
+                1.0,
+                0.0
+              ],
+              "velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "ship": {
+              "cockpit_control_active": false,
+              "cockpit_message": null,
+              "door_open_fraction": 1.0,
+              "door_state": "Open",
+              "energy_core": {
+                "capacity_joules": 1000000000000,
+                "stored_joules": 750000000000
+              },
+              "flight_state": "Landed { body: Earth }",
+              "nearby_body": {
+                "name": "Earth",
+                "radial_speed_meters_per_second": 0.0,
+                "surface_distance_meters": 0.1075439453125
+              },
+              "orientation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_meters": [
+                1000000000000.0,
+                -749993999999.8925,
+                249994000000.0
+              ],
+              "speed_meters_per_second": 0.0,
+              "thruster_percentage": 0,
+              "velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "carrying": {
+              "context": null,
+              "last_action_feedback": "Fragment dropped",
+              "object_id": null,
+              "target_id": null
+            },
+            "mining": {
+              "active": false,
+              "equipped": false,
+              "extracted_mass_kg": 36.408960413815784,
+              "held": false,
+              "range_meters": 4.0,
+              "rate_kg_per_second": 2.0,
+              "target": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "resource-streaming.json",
+      "status": "passed",
+      "steps_completed": 141,
+      "duration_ms": 14566,
+      "captures": []
+    },
+    {
+      "scenario": "resource-loop.json",
+      "status": "passed",
+      "steps_completed": 211,
+      "duration_ms": 18845,
+      "captures": []
+    },
+    {
+      "scenario": "lower-cockpit-windows.json",
+      "status": "passed",
+      "steps_completed": 24,
+      "duration_ms": 10029,
+      "captures": [
+        {
+          "image": "forward-approach.png",
+          "step": 3,
+          "state": {
+            "player": {
+              "eye_position_meters": [
+                1000000000002.76,
+                -749993998998.2009,
+                249994000085.0
+              ],
+              "local_ship_position_meters": [
+                2.76,
+                1.799032258064516,
+                0.0
+              ],
+              "location": "Cockpit",
+              "look_target_meters": [
+                1000000000003.755,
+                -749993998998.3008,
+                249994000085.0
+              ],
+              "nearby_body": {
+                "name": "Earth",
+                "surface_distance_meters": 1001.7996748834848
+              },
+              "relative_speed_meters_per_second": 0.0,
+              "relative_velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "ship_local_eye_position_meters": [
+                2.760009765625,
+                1.799072265625,
+                0.0
+              ],
+              "speed_meters_per_second": 0.0,
+              "up": [
+                0.0,
+                1.0,
+                0.0
+              ],
+              "velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "ship": {
+              "cockpit_control_active": true,
+              "cockpit_message": null,
+              "door_open_fraction": 0.0,
+              "door_state": "Closed",
+              "energy_core": {
+                "capacity_joules": 1000000000000,
+                "stored_joules": 750000000000
+              },
+              "flight_state": "Flying",
+              "nearby_body": {
+                "name": "Earth",
+                "radial_speed_meters_per_second": 0.0,
+                "surface_distance_meters": 1000.0006019826978
+              },
+              "orientation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_meters": [
+                1000000000000.0,
+                -749993999000.0,
+                249994000085.0
+              ],
+              "speed_meters_per_second": 0.0,
+              "thruster_percentage": 0,
+              "velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "carrying": {
+              "context": null,
+              "last_action_feedback": null,
+              "object_id": null,
+              "target_id": null
+            },
+            "mining": {
+              "active": false,
+              "equipped": false,
+              "extracted_mass_kg": 0.0,
+              "held": false,
+              "range_meters": 4.0,
+              "rate_kg_per_second": 2.0,
+              "target": null
+            }
+          }
+        },
+        {
+          "image": "lower-port-approach.png",
+          "step": 5,
+          "state": {
+            "player": {
+              "eye_position_meters": [
+                1000000000002.76,
+                -749993998998.2009,
+                249994000085.0
+              ],
+              "local_ship_position_meters": [
+                2.76,
+                1.799032258064516,
+                0.0
+              ],
+              "location": "Cockpit",
+              "look_target_meters": [
+                1000000000003.478,
+                -749993998998.7009,
+                249994000085.48428
+              ],
+              "nearby_body": {
+                "name": "Earth",
+                "surface_distance_meters": 1001.7996748834848
+              },
+              "relative_speed_meters_per_second": 0.0,
+              "relative_velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "ship_local_eye_position_meters": [
+                2.760009765625,
+                1.799072265625,
+                0.0
+              ],
+              "speed_meters_per_second": 0.0,
+              "up": [
+                0.0,
+                1.0,
+                0.0
+              ],
+              "velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "ship": {
+              "cockpit_control_active": true,
+              "cockpit_message": null,
+              "door_open_fraction": 0.0,
+              "door_state": "Closed",
+              "energy_core": {
+                "capacity_joules": 1000000000000,
+                "stored_joules": 750000000000
+              },
+              "flight_state": "Flying",
+              "nearby_body": {
+                "name": "Earth",
+                "radial_speed_meters_per_second": 0.0,
+                "surface_distance_meters": 1000.0006019826978
+              },
+              "orientation": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "position_meters": [
+                1000000000000.0,
+                -749993999000.0,
+                249994000085.0
+              ],
+              "speed_meters_per_second": 0.0,
+              "thruster_percentage": 0,
+              "velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "carrying": {
+              "context": null,
+              "last_action_feedback": null,
+              "object_id": null,
+              "target_id": null
+            },
+            "mining": {
+              "active": false,
+              "equipped": false,
+              "extracted_mass_kg": 0.0,
+              "held": false,
+              "range_meters": 4.0,
+              "rate_kg_per_second": 2.0,
+              "target": null
+            }
+          }
+        },
+        {
+          "image": "lower-port-low-altitude.png",
+          "step": 9,
+          "state": {
+            "player": {
+              "eye_position_meters": [
+                1000000000002.76,
+                -749993999983.094,
+                249994000084.98608
+              ],
+              "local_ship_position_meters": [
+                2.76,
+                1.799032258064516,
+                0.0
+              ],
+              "location": "Cockpit",
+              "look_target_meters": [
+                1000000000003.478,
+                -749993999983.594,
+                249994000085.47034
+              ],
+              "nearby_body": {
+                "name": "Earth",
+                "surface_distance_meters": 16.906608378514647
+              },
+              "relative_speed_meters_per_second": 0.0,
+              "relative_velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "ship_local_eye_position_meters": [
+                2.760009765625,
+                1.7990722658767886,
+                5.034968129806533e-06
+              ],
+              "speed_meters_per_second": 0.0,
+              "up": [
+                0.0,
+                1.0,
+                1.4164305866870563e-05
+              ],
+              "velocity_meters_per_second": [
+                -0.0,
+                -0.0,
+                -0.0
+              ]
+            },
+            "ship": {
+              "cockpit_control_active": true,
+              "cockpit_message": null,
+              "door_open_fraction": 0.0,
+              "door_state": "Closed",
+              "energy_core": {
+                "capacity_joules": 1000000000000,
+                "stored_joules": 750000000000
+              },
+              "flight_state": "AssistedLanding { body: Earth }",
+              "nearby_body": {
+                "name": "Earth",
+                "radial_speed_meters_per_second": -0.0,
+                "surface_distance_meters": 15.107535478658974
+              },
+              "orientation": [
+                7.082152973971422e-06,
+                0.0,
+                0.0,
+                0.9999999999749216
+              ],
+              "position_meters": [
+                1000000000000.0,
+                -749993999984.8931,
+                249994000084.98605
+              ],
+              "speed_meters_per_second": 0.0,
+              "thruster_percentage": 0,
+              "velocity_meters_per_second": [
+                -0.0,
+                -0.0,
+                -0.0
+              ]
+            },
+            "carrying": {
+              "context": null,
+              "last_action_feedback": null,
+              "object_id": null,
+              "target_id": null
+            },
+            "mining": {
+              "active": false,
+              "equipped": false,
+              "extracted_mass_kg": 0.0,
+              "held": false,
+              "range_meters": 4.0,
+              "rate_kg_per_second": 2.0,
+              "target": null
+            }
+          }
+        },
+        {
+          "image": "lower-port-landed.png",
+          "step": 11,
+          "state": {
+            "player": {
+              "eye_position_meters": [
+                1000000000002.76,
+                -749993999998.094,
+                249994000084.98587
+              ],
+              "local_ship_position_meters": [
+                2.76,
+                1.799032258064516,
+                0.0
+              ],
+              "location": "Cockpit",
+              "look_target_meters": [
+                1000000000003.478,
+                -749993999998.594,
+                249994000085.47012
+              ],
+              "nearby_body": {
+                "name": "Earth",
+                "surface_distance_meters": 1.906608377583325
+              },
+              "relative_speed_meters_per_second": 0.0,
+              "relative_velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "ship_local_eye_position_meters": [
+                2.760009765625,
+                1.7990722658767886,
+                5.034968129806533e-06
+              ],
+              "speed_meters_per_second": 0.0,
+              "up": [
+                0.0,
+                1.0,
+                1.4164305866870563e-05
+              ],
+              "velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "ship": {
+              "cockpit_control_active": true,
+              "cockpit_message": null,
+              "door_open_fraction": 0.0,
+              "door_state": "Closed",
+              "energy_core": {
+                "capacity_joules": 1000000000000,
+                "stored_joules": 750000000000
+              },
+              "flight_state": "Landed { body: Earth }",
+              "nearby_body": {
+                "name": "Earth",
+                "radial_speed_meters_per_second": 0.0,
+                "surface_distance_meters": 0.10753547586500645
+              },
+              "orientation": [
+                7.082152973971422e-06,
+                0.0,
+                0.0,
+                0.9999999999749216
+              ],
+              "position_meters": [
+                1000000000000.0,
+                -749993999999.8931,
+                249994000084.98584
+              ],
+              "speed_meters_per_second": 0.0,
+              "thruster_percentage": 0,
+              "velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "carrying": {
+              "context": null,
+              "last_action_feedback": null,
+              "object_id": null,
+              "target_id": null
+            },
+            "mining": {
+              "active": false,
+              "equipped": false,
+              "extracted_mass_kg": 0.0,
+              "held": false,
+              "range_meters": 4.0,
+              "rate_kg_per_second": 2.0,
+              "target": null
+            }
+          }
+        },
+        {
+          "image": "lower-starboard-landed.png",
+          "step": 13,
+          "state": {
+            "player": {
+              "eye_position_meters": [
+                1000000000002.76,
+                -749993999998.094,
+                249994000084.98587
+              ],
+              "local_ship_position_meters": [
+                2.76,
+                1.799032258064516,
+                0.0
+              ],
+              "location": "Cockpit",
+              "look_target_meters": [
+                1000000000003.478,
+                -749993999998.594,
+                249994000084.5016
+              ],
+              "nearby_body": {
+                "name": "Earth",
+                "surface_distance_meters": 1.906608377583325
+              },
+              "relative_speed_meters_per_second": 0.0,
+              "relative_velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "ship_local_eye_position_meters": [
+                2.760009765625,
+                1.7990722658767886,
+                5.034968129806533e-06
+              ],
+              "speed_meters_per_second": 0.0,
+              "up": [
+                0.0,
+                1.0,
+                1.4164305866870563e-05
+              ],
+              "velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "ship": {
+              "cockpit_control_active": true,
+              "cockpit_message": null,
+              "door_open_fraction": 0.0,
+              "door_state": "Closed",
+              "energy_core": {
+                "capacity_joules": 1000000000000,
+                "stored_joules": 750000000000
+              },
+              "flight_state": "Landed { body: Earth }",
+              "nearby_body": {
+                "name": "Earth",
+                "radial_speed_meters_per_second": 0.0,
+                "surface_distance_meters": 0.10753547586500645
+              },
+              "orientation": [
+                7.082152973971422e-06,
+                0.0,
+                0.0,
+                0.9999999999749216
+              ],
+              "position_meters": [
+                1000000000000.0,
+                -749993999999.8931,
+                249994000084.98584
+              ],
+              "speed_meters_per_second": 0.0,
+              "thruster_percentage": 0,
+              "velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "carrying": {
+              "context": null,
+              "last_action_feedback": null,
+              "object_id": null,
+              "target_id": null
+            },
+            "mining": {
+              "active": false,
+              "equipped": false,
+              "extracted_mass_kg": 0.0,
+              "held": false,
+              "range_meters": 4.0,
+              "rate_kg_per_second": 2.0,
+              "target": null
+            }
+          }
+        },
+        {
+          "image": "forward-landed.png",
+          "step": 15,
+          "state": {
+            "player": {
+              "eye_position_meters": [
+                1000000000002.76,
+                -749993999998.094,
+                249994000084.98587
+              ],
+              "local_ship_position_meters": [
+                2.76,
+                1.799032258064516,
+                0.0
+              ],
+              "location": "Cockpit",
+              "look_target_meters": [
+                1000000000003.755,
+                -749993999998.1938,
+                249994000084.98587
+              ],
+              "nearby_body": {
+                "name": "Earth",
+                "surface_distance_meters": 1.906608377583325
+              },
+              "relative_speed_meters_per_second": 0.0,
+              "relative_velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "ship_local_eye_position_meters": [
+                2.760009765625,
+                1.7990722658767886,
+                5.034968129806533e-06
+              ],
+              "speed_meters_per_second": 0.0,
+              "up": [
+                0.0,
+                1.0,
+                1.4164305866870563e-05
+              ],
+              "velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "ship": {
+              "cockpit_control_active": true,
+              "cockpit_message": null,
+              "door_open_fraction": 0.0,
+              "door_state": "Closed",
+              "energy_core": {
+                "capacity_joules": 1000000000000,
+                "stored_joules": 750000000000
+              },
+              "flight_state": "Landed { body: Earth }",
+              "nearby_body": {
+                "name": "Earth",
+                "radial_speed_meters_per_second": 0.0,
+                "surface_distance_meters": 0.10753547586500645
+              },
+              "orientation": [
+                7.082152973971422e-06,
+                0.0,
+                0.0,
+                0.9999999999749216
+              ],
+              "position_meters": [
+                1000000000000.0,
+                -749993999999.8931,
+                249994000084.98584
+              ],
+              "speed_meters_per_second": 0.0,
+              "thruster_percentage": 0,
+              "velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "carrying": {
+              "context": null,
+              "last_action_feedback": null,
+              "object_id": null,
+              "target_id": null
+            },
+            "mining": {
+              "active": false,
+              "equipped": false,
+              "extracted_mass_kg": 0.0,
+              "held": false,
+              "range_meters": 4.0,
+              "rate_kg_per_second": 2.0,
+              "target": null
+            }
+          }
+        },
+        {
+          "image": "lower-starboard-after-takeoff.png",
+          "step": 20,
+          "state": {
+            "player": {
+              "eye_position_meters": [
+                1000000000002.76,
+                -749993099982.2017,
+                249994000097.73398
+              ],
+              "local_ship_position_meters": [
+                2.76,
+                1.799032258064516,
+                0.0
+              ],
+              "location": "Cockpit",
+              "look_target_meters": [
+                1000000000003.478,
+                -749993099982.7017,
+                249994000097.2497
+              ],
+              "nearby_body": {
+                "name": "Earth",
+                "surface_distance_meters": 900017.7990325624
+              },
+              "relative_speed_meters_per_second": 0.0,
+              "relative_velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "ship_local_eye_position_meters": [
+                2.760009765625,
+                1.7990722658767886,
+                5.034968129806533e-06
+              ],
+              "speed_meters_per_second": 0.0,
+              "up": [
+                0.0,
+                1.0,
+                1.4164305866870563e-05
+              ],
+              "velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "ship": {
+              "cockpit_control_active": true,
+              "cockpit_message": null,
+              "door_open_fraction": 0.0,
+              "door_state": "Closed",
+              "energy_core": {
+                "capacity_joules": 1000000000000,
+                "stored_joules": 750000000000
+              },
+              "flight_state": "Flying",
+              "nearby_body": {
+                "name": "Earth",
+                "radial_speed_meters_per_second": 0.0,
+                "surface_distance_meters": 900015.9999597445
+              },
+              "orientation": [
+                7.082152973971422e-06,
+                0.0,
+                0.0,
+                0.9999999999749216
+              ],
+              "position_meters": [
+                1000000000000.0,
+                -749993099984.0007,
+                249994000097.73395
+              ],
+              "speed_meters_per_second": 0.0,
+              "thruster_percentage": 0,
+              "velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "carrying": {
+              "context": null,
+              "last_action_feedback": null,
+              "object_id": null,
+              "target_id": null
+            },
+            "mining": {
+              "active": false,
+              "equipped": false,
+              "extracted_mass_kg": 0.0,
+              "held": false,
+              "range_meters": 4.0,
+              "rate_kg_per_second": 2.0,
+              "target": null
+            }
+          }
+        },
+        {
+          "image": "standing-cockpit.png",
+          "step": 24,
+          "state": {
+            "player": {
+              "eye_position_meters": [
+                1000000000000.5,
+                -749993099982.0034,
+                249994000095.53397
+              ],
+              "local_ship_position_meters": [
+                0.5,
+                1.9973118279569892,
+                -2.2
+              ],
+              "location": "InsideShip",
+              "look_target_meters": [
+                1000000000001.5,
+                -749993099982.0034,
+                249994000095.53397
+              ],
+              "nearby_body": {
+                "name": "Earth",
+                "surface_distance_meters": 900017.9972434053
+              },
+              "relative_speed_meters_per_second": 0.0,
+              "relative_velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "ship_local_eye_position_meters": [
+                0.5,
+                1.9972832917109133,
+                -2.2000099798054245
+              ],
+              "speed_meters_per_second": 0.0,
+              "up": [
+                0.0,
+                1.0,
+                1.4164305866870563e-05
+              ],
+              "velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "ship": {
+              "cockpit_control_active": false,
+              "cockpit_message": null,
+              "door_open_fraction": 0.0,
+              "door_state": "Closed",
+              "energy_core": {
+                "capacity_joules": 1000000000000,
+                "stored_joules": 750000000000
+              },
+              "flight_state": "Flying",
+              "nearby_body": {
+                "name": "Earth",
+                "radial_speed_meters_per_second": 0.0,
+                "surface_distance_meters": 900015.9999597445
+              },
+              "orientation": [
+                7.082152973971422e-06,
+                0.0,
+                0.0,
+                0.9999999999749216
+              ],
+              "position_meters": [
+                1000000000000.0,
+                -749993099984.0007,
+                249994000097.73395
+              ],
+              "speed_meters_per_second": 0.0,
+              "thruster_percentage": 0,
+              "velocity_meters_per_second": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "carrying": {
+              "context": null,
+              "last_action_feedback": null,
+              "object_id": null,
+              "target_id": null
+            },
+            "mining": {
+              "active": false,
+              "equipped": false,
+              "extracted_mass_kg": 0.0,
+              "held": false,
+              "range_meters": 4.0,
+              "rate_kg_per_second": 2.0,
+              "target": null
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

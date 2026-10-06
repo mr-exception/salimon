@@ -514,12 +514,11 @@ def main(export=None):
     require((export / "salimon_phase0_ship.bin").read_bytes() == binary,
             "glTF and GLB geometry payloads differ")
     if export == ROOT / "export":
-        from spatial_contracts import anchors_rust_source, sidecar_json, thruster_rust_source
+        from spatial_contracts import sidecar_json, spatial_rust_source
         spatial = build_spatial_contracts(document, json.loads((SCOUT / "preservation.json").read_text()))
         require((ROOT / "spatial-contracts.json").read_text() == sidecar_json(spatial), "spatial sidecar is stale")
-        for name, source in (("ship_anchors.rs", anchors_rust_source),
-                             ("thruster_collision.rs", thruster_rust_source)):
-            require((REPO / "client/character/src" / name).read_text() == source(spatial), f"{name}: generated layout is stale")
+        require((REPO / "client/character/src/spatial_contracts.rs").read_text() == spatial_rust_source(spatial),
+                "spatial_contracts.rs: generated layout is stale")
     print(json.dumps({"asset": "ship.salimon-scout", "status": "passed", "metrics": metrics}, sort_keys=True))
 
 

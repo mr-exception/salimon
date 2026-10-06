@@ -132,16 +132,27 @@ scaling is already baked into this source; do not apply it again. Edit the pilot
 station directly in meters to retain human proportions independently of hull scale.
 
 Metadata-only collision boxes describe the floor, walls, ceiling, central Core,
-door, unified center console/monitor assembly, coarse exterior, and both thruster bodies
-and swept fins. They add no draw calls. The four thruster boxes are authored
-proxies checked against the engine mesh bounds; the scout adapter also writes
-`client/character/src/thruster_collision.rs`, and validation compares that
-portable controller contract with both exports. Other gameplay bounds still
-have matching portable constants; changing those dimensions requires updating
-character/runtime contract tests together. The human is 1.80 m tall with a 1.75 m
-eye height. Keep the spawn and cockpit exit in a clear aisle. Recompute landed
-placement and the exterior collision radius from the exported silhouette after
-geometry edits.
+door, console, pilot chair, cockpit side hull, cabin traversal/exterior envelopes,
+coarse exterior, wings and both thruster bodies/fins. They add no draw calls.
+The adapter generates `client/character/src/spatial_contracts.rs` and the matching
+`spatial-contracts.json` sidecar/GLB extras. Validation compares generated Rust
+and sidecar to the export. The public character anchors keep their existing API.
+
+The 20 authored boxes and four markers are enumerated in the scout manifest.
+`COLLIDER_CabinTraversalEnvelope` bounds the clear cabin after window sills,
+aft header and lowest ceiling lamps. It is a free-space volume, not a solid box.
+`COLLIDER_CabinExteriorEnvelope` is the conservative cabin/nose contact envelope,
+excluding wings/engines; `COLLIDER_ExteriorHull` remains the full broad-phase box.
+`COLLIDER_PilotChair` and `COLLIDER_Cockpit{Port,Starboard}Hull` preserve the
+previous conservative planar fixture footprints. `MARKER_DoorwayTransition`
+marks the inner crossing plane separately from the exit interaction marker.
+See [component ownership and geometry/policy mapping](../../../models/assets/ships/salimon-scout/README.md#geometry-and-gameplay-policy).
+
+Character `layout.rs` applies player radius to those raw bounds and builds the
+open/closed gate and nose-shoulder proxies. Sight and floor placement consume
+the same derived geometry. The human is 1.80 m tall with a 1.75 m eye height;
+these dimensions, the seated eye offset and permissions are Rust gameplay policy.
+Keep spawn/cockpit exit in a clear aisle. Runtime Cargo builds need no Blender.
 
 Only `Exit_Door` moves for the door state. Its sealed leaf rotates 110 degrees
 outward and upward about the top hinge over 700 ms, leaving the 2.8 m doorway

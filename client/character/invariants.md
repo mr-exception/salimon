@@ -73,3 +73,10 @@ are in `controller/eva.rs`. Look/snapshots live in `controller/camera.rs`.
 uses the same proxies for sight/placement. Mode regressions remain alongside
 owners, with hull/appendage integration coverage in `controller/collision_tests.rs`.
 See the [source ownership table](architecture.md#internal-ownership).
+
+23. Scout-specific floor, doorway, interior/exterior envelopes, fixtures,
+    cockpit sides and appendage geometry come from exporter-generated
+    `src/spatial_contracts.rs`. `layout.rs` derives body-clear proxies and
+    retains gameplay policy; never reintroduce manual ship dimensions.
+    The source [geometry/policy mapping](../../models/assets/ships/salimon-scout/README.md#geometry-and-gameplay-policy)
+    defines the coarse proxy semantics and supported symmetry/level-floor assumptions.

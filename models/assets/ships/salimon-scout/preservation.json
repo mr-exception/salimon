@@ -1003,6 +1003,127 @@
           "purpose": "exterior-wing"
         }
       }
+    },
+    {
+      "name": "COLLIDER_CabinTraversalEnvelope",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -0.3400000000000003,
+        1.4704301075268815,
+        0.0
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            13.8,
+            2.446236559139785,
+            8.4
+          ],
+          "purpose": "traversal-volume"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_CabinExteriorEnvelope",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        0.3049999999999997,
+        1.4139784946236558,
+        0.0
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            16.45,
+            3.0430107526881716,
+            10.2
+          ],
+          "purpose": "exterior-cabin-envelope"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_PilotChair",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        2.535,
+        0.9886559139784946,
+        0.0
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            1.5299999999999998,
+            1.4826881720430107,
+            1.58
+          ],
+          "purpose": "interior-obstacle"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_CockpitPortHull",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        5.175,
+        1.5913978494623655,
+        3.55
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            5.35,
+            2.688172043010752,
+            1.3000000000000003
+          ],
+          "purpose": "interior-hull"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_CockpitStarboardHull",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        5.175,
+        1.5913978494623655,
+        -3.55
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            5.35,
+            2.688172043010752,
+            1.3000000000000003
+          ],
+          "purpose": "interior-hull"
+        }
+      }
+    },
+    {
+      "name": "MARKER_DoorwayTransition",
+      "parent": "Interaction_Markers",
+      "visual": false,
+      "translation": [
+        -7.04,
+        0.24731182795698925,
+        0.0
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "doorway-transition",
+          "facing": "-X"
+        }
+      }
     }
   ],
   "materials": [

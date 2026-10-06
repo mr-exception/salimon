@@ -84,7 +84,7 @@ appearance needs native visual evidence in addition to CPU-side tests.
 Editable new assets live in `models/assets/`; runtime exports in `client/assets/`.
 Read asset manifests, preservation/category contracts, licensing and consumers.
 Do not hand-edit generated GLB/glTF/bin, export reports, spatial sidecars or
-`client/character/src/{ship_anchors,thruster_collision}.rs`. For the scout use
+`client/character/src/spatial_contracts.rs`. For the scout use
 `python models/assets/ships/salimon-scout/export.py --blender /path/to/blender`,
 then its validator; generic asset CLI commands do not register the scout adapter.
 See [authoring](../models/authoring.md) and

@@ -98,7 +98,7 @@ class ScoutValidationTests(unittest.TestCase):
                    for name in console['monitorNodes']]
         self.assertGreater(centers[0], centers[1])
         self.assertGreater(centers[1], centers[2])
-        self.assertEqual(len(self.manifest['contracts']['colliders']), 15)
+        self.assertEqual(len(self.manifest['contracts']['colliders']), 20)
         self.assertNotIn('cargoRoom', metadata)
         self.assertNotIn('cargoRoom', self.document['asset']['extras']['salimon'])
         self.assertFalse(any('Cargo' in node['name'] for node in self.document['nodes']))
@@ -142,7 +142,7 @@ class ScoutValidationTests(unittest.TestCase):
     def test_ship_semantic_failure_preserves_published_export(self):
         paths = [self.output.with_suffix(s) for s in ('.glb', '.bin', '.gltf')]
         paths.extend([ASSET / 'export-report.json', REPO / 'client/assets/ship/spatial-contracts.json'])
-        paths.extend(REPO / 'client/character/src' / n for n in ('thruster_collision.rs', 'ship_anchors.rs'))
+        paths.extend(REPO / 'client/character/src' / n for n in ('spatial_contracts.rs',))
         before = {p: p.read_bytes() for p in paths}
         def blender(command, **kwargs):
             document, binary = self.vertex_edit('Monitor_Center', 'TEXCOORD_0', lambda p: (p[0], 1-p[1]))

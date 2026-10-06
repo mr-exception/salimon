@@ -1,14 +1,14 @@
 # Diagnostics
 
-`salimon-diagnostics` owns the optional Phase 0 engineering overlay. It accepts
+`salimon-diagnostics` owns the optional engineering overlay. It accepts
 typed runtime, renderer, and future domain measurements; maintains a bounded
 frame window; formats an honest diagnostic snapshot; and CPU-rasterizes that
 snapshot into a borrowed RGBA image for the renderer to composite.
 
 The crate has no platform, GPU, renderer, or gameplay dependencies. It does not
 sample clocks or query hardware itself. The runtime decides when to toggle and
-record diagnostics, the renderer reports measurements it owns, and world/future
-ship modules provide optional domain values through `DomainMetrics`.
+record diagnostics, the renderer reports measurements it owns, and world/ship
+modules provide optional domain values through `DomainMetrics`.
 
 ## Public contract
 
@@ -18,10 +18,10 @@ ship modules provide optional domain values through `DomainMetrics`.
 - `FrameSample` carries one successfully presented frame's runtime and renderer
   measurements. Zero frame intervals are retained as the latest state but are
   excluded from the rolling statistics window.
-- `DomainMetrics` and `BodyDistance` borrow caller-owned state. Task 5 supplies
+- `DomainMetrics` and `BodyDistance` borrow caller-owned state. Runtime supplies
   all six catalog names and nonnegative camera-to-nominal-surface observations;
   the panel displays the closest one. Camera prototype telemetry is explicitly
-  named; missing future character or ship measurements render as `N/A`. The
+  named; missing character or ship measurements render as `N/A`. The
   diagnostics layer never invents positions, speeds, or distances.
 - `overlay` returns a borrowed `OverlayImage` only while diagnostics are visible.
   The renderer can use `revision` to avoid uploading unchanged pixels and scales
@@ -52,9 +52,9 @@ display-density changes, frame-window resets, and memory warnings.
   not a claim about whole-process memory.
 - Camera/player/ship position, camera altitude, velocity, speed, and
   body-distance values use meters as their input unit and are formatted with
-  practical metric prefixes. The Task 5 nearby-body row describes the closest
+  practical metric prefixes. The nearby-body row describes the closest
   distance from the engineering camera to a nominal body surface, not player or
-  ship state. Camera phase and pause state describe only the Task 4 engineering
+  ship state. Camera phase and pause state describe only the engineering
   transition fixture.
 
 Normal gameplay flight information still belongs on cockpit displays. This

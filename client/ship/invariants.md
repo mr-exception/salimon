@@ -8,7 +8,7 @@
 5. Flying direct-speed motion continues while cockpit control is inactive.
 6. Authoritative position and orientation math remains CPU-side `f64`.
 7. The crate owns no platform input, GPU resources, or character state.
-8. The default Earth pose places the Task 10 mesh's lowest local-Y point on the
+8. The default Earth pose places the authored scout mesh's lowest local-Y point on the
    nominal surface with local `+Y` aligned to the outward normal.
 9. Sustained pitch, yaw, and roll each use exactly 5 degrees/second after a
    0.12-second start/stop presentation ramp; leaving the cockpit clears input.
@@ -22,7 +22,7 @@
     cockpit is left; steering and thruster input cannot override it.
 14. Takeoff requires cockpit authority and a closed door, follows the landed
     surface normal, and returns control only after clearing the landing volume.
-15. Phase 0 Core telemetry is bounded by its 1 TJ fixture capacity and does not
+15. Core telemetry is bounded by its 1 TJ fixture capacity and does not
     imply consumption, generation, fuel, persistence, or production energy rules.
 16. Nearby-body telemetry selects the nearest catalog surface at an inclusive
     3,000,000 m threshold and reports actual signed radial velocity: negative

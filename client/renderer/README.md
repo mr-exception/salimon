@@ -1,17 +1,18 @@
 # Renderer
 
-`salimon-renderer` is the custom `wgpu` 30.0.1 rendering library introduced in
-Task 2, instrumented in Task 3, and extended with the Task 4 large-scale camera
-prototype. Task 6 adds screen-bounded analytic spheres, original mipmapped
+`salimon-renderer` is the custom `wgpu` 30.0.1 rendering library. It provides
+measurements, large-scale camera presentation, screen-bounded analytic spheres,
+original mipmapped
 surface textures, local detail, and unshadowed point lighting. Runtime maps the
 six bodies to generic sphere/material DTOs and the three precision markers to
 separate cuboids. The renderer knows no celestial identities or landing rules.
-Task 11 adds a renderer-owned GLB loader and a generic `ShipMeshInstance` pose DTO.
-Task 9 splits the asset's cockpit glass into a second, depth-tested alpha-blended
+Ship presentation uses a renderer-owned GLB loader and a generic
+`ShipMeshInstance` pose DTO.
+The asset's cockpit glass renders in a second, depth-tested alpha-blended
 draw so exterior geometry remains visible from inside; the renderer still has no
 dependency on character or ship behavior crates.
-Task 10 consumes the per-axis-rescaled checked-in GLB without a runtime scale
-transform and keeps the 2× horizontal open-door presentation offset at 4.50 m.
+The renderer consumes the baked-scale checked-in GLB without a runtime scale
+transform and keeps the horizontal open-door presentation offset at 4.50 m.
 The ship's `Interior` asset group receives a restrained warm ambient fill;
 material emission stays independent of base color so lamps, displays, the core,
 and thrusters remain self-lit. Lighting is evaluated per vertex and still uses
@@ -40,7 +41,7 @@ The camera uses a right-handed, infinite reverse-Z perspective projection in
 WebGPU's zero-to-one depth range. A `Depth32Float` attachment is cleared to
 `0.0`, scene fragments compare with `Greater`, and the near plane maps to `1.0`.
 Depth approaches zero with distance and has no finite far plane. The caller
-still owns the near-plane choice; `0.05 m` is the Task 4 validation value and
+still owns the near-plane choice; `0.05 m` is the current validation value and
 should only be reduced when close geometry requires it. Spheres write analytic
 surface depth into that same attachment.
 
@@ -72,7 +73,7 @@ case. Far-away instance centers still inherit `f32` spacing based on their
 camera distance. Later LOD or planet rendering must avoid expecting metre-scale
 mesh detail to survive at gigametre/terametre relative distances. The established
 path does not add logarithmic depth, split coordinates in WGSL, or multiple depth
-passes. Task 6 additionally retains the sphere's camera-to-surface distance in
+passes. The sphere path additionally retains camera-to-surface distance in
 CPU `f64`, avoiding the cancellation of large GPU center/radius operands when
 solving the near surface intersection.
 

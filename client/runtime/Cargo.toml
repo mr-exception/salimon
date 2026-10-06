@@ -1,6 +1,6 @@
 [package]
 name = "salimon-client"
-description = "Native client entry point for the Salimon Phase 0 showcase"
+description = "Native lifecycle and client composition executable for Salimon"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

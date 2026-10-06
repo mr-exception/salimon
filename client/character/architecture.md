@@ -86,8 +86,8 @@ are read-only environmental inputs. `CharacterSnapshot` is the presentation and
 diagnostics output. The runtime maps these types to/from ship and renderer DTOs;
 neither dependency points back into character.
 
-The seated cockpit snapshot starts with only a slight downward pitch so its Task
-10 anchor and forward ray clear the console and solid nose while crossing the
+The seated cockpit snapshot starts with only a slight downward pitch so its authored
+cockpit anchor and forward ray clear the console and solid nose while crossing the
 glazing. The 1.80 m body / 1.75 m eye-height contract and ship-local anchors
 follow the wider 4.00 m-tall asset. Mouse look remains unrestricted and
 independent of ship orientation. On a solid-body surface, the controller derives

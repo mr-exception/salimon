@@ -1,9 +1,9 @@
 # Ship
 
-`salimon-ship` owns portable Phase 0 ship state. It provides the landed-on-Earth
+`salimon-ship` owns portable ship state. It provides the landed-on-Earth
 starting pose, cockpit-control authority, persistent direct-speed motion,
-Task 12 steering/thruster controls, solid-body boundary correction, Task 13
-assisted landing/takeoff with Task 17 timing, and the
+steering/thruster controls, solid-body boundary correction,
+timed assisted landing/takeoff, and the
 landed/open-space door rule. Opening or closing the exit uses a typed action.
 Landed ships allow access; flying ships allow it only when the existing nearby
 sensor reports no celestial body within the inclusive 3,000,000 m surface
@@ -29,7 +29,7 @@ phase eases out of and into rest, and alignment follows the shortest quaternion
 arc. Timing uses supplied elapsed time, including frames longer than 100 ms;
 no orientation or position change occurs on activation.
 
-Each snapshot also carries a bounded Phase 0 Energy Core telemetry fixture and
+Each snapshot also carries a bounded Energy Core telemetry fixture and
 the nearest catalog body within an inclusive 3,000,000 m surface distance. The
 fixture starts at 750 GJ stored in a 1 TJ capacity and has no consumption,
 generation, persistence, or gameplay consequences. Nearby telemetry includes

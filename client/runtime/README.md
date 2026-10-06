@@ -8,8 +8,9 @@ client composition. It drives `salimon-character`, `salimon-ship`,
 implementation.
 
 Run from the repository root with `cargo run --locked -p salimon-client`.
-The process requests a physical 1920×1080 initial drawable for the Phase 0
-benchmark, opens a resizable native window, and runs until the window is closed.
+The process requests a physical 1920×1080 initial drawable for reference
+performance measurements, opens a resizable native window, and runs until the
+window is closed.
 
 ## Deterministic E2E launch
 
@@ -134,7 +135,7 @@ in the native window title. Automatic sequences continue after leaving
 the cockpit, and runtime composition switches character radial gravity to the
 active Mercury, Venus, Earth, Moon, or Mars surface frame.
 
-Task 10 maps contextual interaction zones to the enlarged cockpit and exit-door
+Runtime maps contextual interaction zones to the enlarged cockpit and exit-door
 markers. It retains the 0.05 m gameplay near plane and passes the baked-scale GLB
 to the renderer without an extra transform.
 
@@ -149,7 +150,7 @@ supplies diagnostics with nonnegative camera-to-body surface observations for
 every catalog body; diagnostics displays the closest.
 `winit` integration remains here until platform-specific behavior justifies an
 adapter under `client/platform/`. The runtime must not acquire GPU, backend,
-networking, or persistence responsibilities in Phase 0.
+networking, or persistence responsibilities.
 
 See [README.ai.md](README.ai.md), [architecture.md](architecture.md), and
 [invariants.md](invariants.md) before changing lifecycle or timing behavior.

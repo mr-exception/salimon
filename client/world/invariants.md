@@ -7,7 +7,7 @@
 3. The Sun is the only visual-only body and exposes no landing radius. The other
    five bodies are solid and every pair of their `1.15R` landing volumes is
    disjoint.
-4. The Earth-to-Mars nominal-surface gap is `60,000,000 m`; at the Phase 0
+4. The Earth-to-Mars nominal-surface gap is `60,000,000 m`; at the catalog
    reference maximum speed of `2,500,000 m/s`, it takes exactly 24 seconds.
 5. Earth's positive-Z surface is `SURFACE_ANCHOR` and is the default camera
    target. Inspection selects a body's positive-Z surface; the near dwell is

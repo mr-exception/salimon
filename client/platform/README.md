@@ -1,8 +1,8 @@
 # Platform
 
-Reserved for native input and OS-specific adapters. Task 2 uses `winit` inside
-the runtime because the bootstrap has no portable gameplay domains and the
-architecture permits native integration at the platform/runtime boundary. No
+Reserved for native input and OS-specific adapters. The runtime owns current
+`winit` integration and translates native events into typed commands for the
+portable gameplay domains. No
 separate platform crate or adapter is implemented yet.
 
 Move behavior here when it becomes genuinely platform-specific or when Windows

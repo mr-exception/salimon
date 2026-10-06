@@ -1,6 +1,6 @@
 [package]
 name = "salimon-ship"
-description = "Portable Phase 0 ship state and interaction rules for Salimon"
+description = "Portable ship flight, assists, telemetry and interaction rules for Salimon"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

@@ -9,7 +9,7 @@ uses deterministic cube-sphere cells with body-local geometry and physical bound
 The world-owned mining session journals modified/depleted deposit mass across
 local streaming independently of runtime presentation.
 
-`salimon-world` owns the portable Phase 0 compressed Solar System, large-scale
+`salimon-world` owns the portable compressed Solar System, large-scale
 coordinates, camera tour, and body geometry math. Its immutable catalog contains
 exactly Sun, Mercury, Venus, Earth, Moon, and Mars in authoritative `f64` meters.
 The Sun is visual-only; the other five bodies expose solid landing volumes with
@@ -23,7 +23,7 @@ and zero for stationary or tangential motion; selection includes the visual Sun.
 
 A host advances `CameraPrototype` with a monotonic duration, translates
 `CameraCommand` values from platform input, and reads a borrowed `WorldSnapshot`.
-The snapshot exposes the static body catalog, the Task 4 camera, and three
+The snapshot exposes the static body catalog, the engineering camera, and three
 noncanonical meter-scale precision markers. The runtime maps bodies to renderer
 sphere/material DTOs and the Sun to a point light, preserving `f64` centers/radii.
 `InspectBody` selects each catalog body's positive-Z surface for the same

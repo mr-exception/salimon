@@ -45,7 +45,7 @@ Runtime emits six `SphereInstance` values with absolute `f64` center/radius,
 three marker cuboids, a generic `ShipMeshInstance`, and the Sun mapped into `PointLight`. Generic material
 styles identify presentation choices. `SceneFrame` conveys no celestial IDs,
 landing volumes, world catalog ownership, or simulation behavior. The GLB loader
-expands its small Phase 0 mesh once at renderer initialization; material colors
+expands the checked-in ship mesh once at renderer initialization; material colors
 and a door-vertex flag are retained in the GPU vertex stream. Opaque ship
 geometry writes reverse-Z depth first. Three monitor quads carry UVs and a
 flat panel index. Their fragment branch samples a shared, linearly filtered

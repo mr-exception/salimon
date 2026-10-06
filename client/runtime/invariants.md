@@ -41,7 +41,7 @@
     cannot gain cockpit authority through a spatial interaction hit.
 18. Escape releases cursor capture so native window controls remain reachable;
     clicking the game view restores mouse-look capture.
-19. Gameplay interaction zones match the Task 10 cockpit and exit-door markers;
+19. Gameplay interaction zones match the authored cockpit and exit-door markers;
     runtime composition does not apply a second scale to the baked ship mesh.
 20. Cockpit W/S, A/D, and Left/Right Arrow state maps to typed pitch, yaw, and
     roll without changing the independent character mouse-look state; A turns

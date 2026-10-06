@@ -56,7 +56,7 @@ loop or unrelated authoritative gameplay state.
 for this native bootstrap. Move OS-specific behavior into `platform/` as that
 behavior grows or another native target needs an adapter. Future domain modules
 must consume typed input/presentation data rather than GPU or window types.
-There is no dependency on `core/` in Phase 0.
+Current client crates have no dependency on `core/`.
 
 No ECS, physics engine, WASM host, orbital simulation or backend scaffolding
 is present. Renderer owns analytic spheres, generated mipmapped textures and Sun

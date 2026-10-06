@@ -20,7 +20,7 @@ Tests cover every solid body, multiple normals and starting heights, frame
 partitioning, exact completion, controls/interlocks, and velocity derivatives.
 Allow for submillimeter `f64` position quantization at the catalog's 1e12 m anchor.
 
-Keep Core values as a bounded, noncanonical Phase 0 telemetry fixture until an
+Keep Core values as a bounded, noncanonical telemetry fixture until an
 energy-management task defines production behavior. Ship snapshots own actual
 flight/assist velocity and nearby-body telemetry; runtime must only map it.
 

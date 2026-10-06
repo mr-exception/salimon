@@ -4,6 +4,12 @@ Keep this crate independent of `winit`, `wgpu`, character, renderer, and
 diagnostics. It may consume stable world identities/constants. Presentation and
 input adapters belong to runtime; mesh loading belongs to renderer.
 
+Start at `src/lib.rs` for the stable public reexports and constants. Public
+pose/snapshot DTOs live in `state.rs`; `controller/mod.rs` owns private state,
+constructors, update ordering and snapshots. Change rules in the focused
+`controller/{flight,steering,assist,door,cockpit,telemetry}.rs` owner and keep its
+regressions alongside it. `orientation.rs` owns local quaternion/vector policy.
+
 The portable assisted-landing/takeoff state machine builds on direct-speed
 flight motion. Protect cockpit-only activation, exact landing range, arbitrary
 surface normals, uncancellable automatic completion, door-interlocked takeoff,

@@ -9,7 +9,7 @@ Use the [maintenance map](maintenance-map.md) before changing a boundary and the
 Keep internal modules and functions focused on one responsibility. Split when
 independent responsibilities obscure ownership or require unrelated context;
 there is no arbitrary line-count limit. Large inline test modules alone do not
-justify a rewrite. The source map identifies the focused character modules, broad ship `lib.rs`,
+justify a rewrite. The source map identifies the focused character and ship modules,
 and runtime `app.rs` orchestration/private helpers.
 
 Public contracts use typed commands, snapshots and validated domain values.

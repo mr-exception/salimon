@@ -71,7 +71,7 @@ or shared frame/normalization policy would obscure existing domain contracts.
 
 | Inventory at this decision | Compatibility and action |
 | --- | --- |
-| character `src/lib.rs`; ship `src/lib.rs` | Identical add/sub/scale/dot/right-handed cross; import shared primitives. Ship's length has the same X/Y/Z sum-of-squares order and is imported under its existing name. |
+| character vector consumers; ship `src/orientation.rs`, `controller/{flight,assist}.rs` | Identical add/sub/scale/dot/right-handed cross; import shared primitives. Ship's length has the same X/Y/Z sum-of-squares order and is imported under its existing name. |
 | physics `src/lib.rs` (extracted from runtime `fragment_physics.rs`); runtime `carrying.rs` | Fragment component arithmetic/dot/cross/length has the same order and semantics; import it. Carrying imports the identical cross product. |
 | runtime `app/interaction.rs` (formerly in `app.rs`) | Subtract/dot/length also compatible, but leave these composition helpers outside the limited first migration. |
 | world `src/lib.rs`, `mining.rs`, `resource_fragments.rs` | Length/dot/cross are compatible candidates, left local for now to avoid extending the first migration into world ownership. `WorldPosition`, subtraction/rebasing and resource pose validation remain world-owned. |

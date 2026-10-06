@@ -11,7 +11,7 @@ iterating and the [applicable validation gates](validation.md) before completion
 | Rendering, depth, lighting, instruments | renderer `src/lib.rs`, `spheres.rs`, `ship_mesh.rs`, `cockpit_instruments.rs`, `overlay.rs`, adjacent WGSL | renderer invariants, `sphere-rendering.md`, inline tests and CPU/shader layout | `lower-cockpit-windows.json`; evidence variants and visual tour |
 | Shared vector arithmetic | math `src/lib.rs`; character/ship and runtime fragment/carrying consumers | math architecture/invariants; arithmetic/handedness/precision tests; domain normalization/quaternion tests | Existing movement, flight and fragment scenarios |
 | Coordinates, catalog, landing geometry | world `src/lib.rs` | world invariants, `solar-system-layout.md`, `coordinate-strategy.md`, inline catalog/precision tests | `orbit-earth.json`; F2/N/1–6 precision tour |
-| Flight, assists, cockpit authority, airlock | ship `src/lib.rs`; runtime `app.rs`, `app/input.rs`, `app/interaction.rs`, `app/scene.rs`, `action_bar.rs` compose | ship architecture/invariants, inline motion/assist/door tests | `orbit-earth.json`, `space-airlock.json`, `lower-cockpit-windows.json` |
+| Flight, assists, cockpit authority, airlock | ship `src/lib.rs` facade, `state.rs`, `orientation.rs`, `controller/{mod,flight,steering,assist,door,cockpit,telemetry}.rs`; runtime `app.rs`, `app/input.rs`, `app/interaction.rs`, `app/scene.rs`, `action_bar.rs` compose | ship architecture/invariants, inline motion/assist/door tests | `orbit-earth.json`, `space-airlock.json`, `lower-cockpit-windows.json` |
 | Walking, gravity, hull collision, EVA | character `src/controller/{mod,interior,doorway,surface,eva,camera}.rs`, `collision.rs`, `layout.rs`, `queries.rs`; runtime `app.rs`, `app/frames.rs` compose ship snapshots | character architecture/invariants; mode-local collision/gravity/EVA tests and `controller/collision_tests.rs`; generated `spatial_contracts.rs` | `cockpit-nose.json`, `space-airlock.json`, `moving-eva.json`, `nearby-eva.json` |
 | Resource identities/generation/streaming | world `src/resources.rs`, `resource_distribution.rs`, `resource_generation.rs`, `mining.rs` | `resource-contracts.md`, world invariants; inline generation/session tests | `resource-deposits.json`, `resource-streaming.json` |
 | Mining and resource UI | world `src/mining.rs`, `resource_fragments.rs`; runtime `mining.rs`, `resource_context.rs`, `resource_presentation.rs`, `action_bar.rs`; renderer `held_item.rs` / `held_item.wgsl` | world extraction/mass tests; runtime input/presentation and scenario contracts | `mining.json`, `resource-loop.json`; evidence `mining-tool.json` |
@@ -48,8 +48,12 @@ regressions and shared fixtures are in `controller/collision_tests.rs` and
 existing paths and come from the scout exporter. Keep portable movement here
 and native events in runtime.
 
-`ship/src/lib.rs` contains pose/state, input/control authority, direct flight,
-landing/takeoff assists, door interlocks and instrument telemetry plus tests.
-It may consume world contracts; it does not own renderer meshes or character
-movement. Split future responsibilities when needed, rather than imposing file
-size limits or moving tests solely to reduce line count.
+`ship/src/lib.rs` is the public facade and constants. `ship/src/state.rs` owns
+pose/snapshot DTOs; `orientation.rs` owns ship-local quaternion/normalization
+policy. `controller/mod.rs` owns private authoritative state, construction,
+update dispatch and snapshot composition. Child `controller/{flight,steering,assist,door,cockpit,telemetry}.rs`
+own direct flight/collision, ramped rotations, captured assist paths/interlocks,
+airlock permissions/animation, authority/messages and instrument observation.
+Existing regression tests live alongside those owners, including all-body assist
+timing and quaternion boundaries. Ship may consume world/math contracts; it does
+not own renderer meshes, native input or character movement.

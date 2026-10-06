@@ -1,5 +1,29 @@
 # Ship Architecture
 
+## Source ownership
+
+`src/lib.rs` is the public facade: existing types, constants and methods keep
+their crate-root paths. `state.rs` owns pose, axes, steering input, door/flight
+states and snapshot DTOs. `orientation.rs` owns normalization, quaternion
+composition, surface alignment and interpolation with its regressions.
+
+`controller/mod.rs` keeps authoritative fields private and owns construction,
+update dispatch and snapshot composition. Its child modules implement rules on
+that same controller, without adding controllers, crates or framework layers:
+
+| Module | Ownership and adjacent regression coverage |
+| --- | --- |
+| `flight.rs` | Thruster authority, direct speed/velocity, motion and solid-body correction |
+| `steering.rs` | Input clamps, cockpit/flight gate, ramps and local-axis rotations |
+| `assist.rs` | Landing range, captured paths, timing/derivatives, takeoff interlocks and all-body assists |
+| `door.rs` | Landed/open-space permissions, locked interactions and reversible hinge animation |
+| `cockpit.rs` | Control authority and typed/contextual message routing; authority coverage also lives with flight/steering/assist rules |
+| `telemetry.rs` | Core fixture DTO/default/bounds and nearby-body sensor selection/radial speed |
+
+Update order remains door animation, clamped steering, then flight or full-delta
+assist dispatch. Module methods use only parent-visible access where needed;
+external consumers still observe `ShipSnapshot`. Dependencies are unchanged.
+
 `ShipController` is authoritative portable state. It owns a double-precision
 world pose, landed/flying/assisted state, door state, cockpit authority, persistent
 thruster percentage, a bounded noncanonical Core telemetry fixture, and a typed

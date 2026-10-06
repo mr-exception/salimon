@@ -1,8 +1,9 @@
 # Ship Invariants
 
 1. The default ship is landed on Earth with its door closed and zero thruster.
-2. The exit door can change state only while landed; it is always closed in flight.
-3. A flying door interaction emits exactly `Door locked while in flight` through
+2. The exit door can change state while landed or flying outside nearby-body range;
+   nearby flight and active assists lock it closed on interaction.
+3. A locked door interaction emits exactly `Door locked while in flight` through
    typed cockpit-message state.
 4. Leaving cockpit control never changes orientation, thruster, or current speed.
 5. Flying direct-speed motion continues while cockpit control is inactive.
@@ -34,3 +35,12 @@
     begins and ends at rest, and the final pose is sampled exactly once at completion.
 19. Landing reserves 2 seconds for its last 15 m or less; takeoff reserves 2 seconds
     for its first 15 m, so local surface motion stays readable on every solid body.
+
+## Source ownership
+
+The public facade in `src/lib.rs` reexports the same contracts. `state.rs` owns
+pose/snapshot DTOs; `controller/mod.rs` keeps state private and preserves update
+order. Flight, steering, assist, door, cockpit and telemetry rules live in the
+corresponding `controller/` child module, with regression tests beside their
+owners. Orientation policies and regressions live in `orientation.rs`. See
+[architecture](architecture.md#source-ownership) for the detailed map.

@@ -14,9 +14,10 @@ dependencies; each crate's architecture/invariants defines its local contracts.
 
 | Boundary | Implemented ownership |
 | --- | --- |
-| `client/runtime/` | Native lifecycle, input, clocks, domain composition, automation, resource presentation and cross-domain fragment contact simulation |
+| `client/runtime/` | Native lifecycle, input, clocks, domain composition, automation, resource presentation and physical-object frame/session adapters |
 | `client/world/` | Static six-body compressed catalog, `f64` coordinates/camera tour, resource contracts, generation, extraction/session deltas, fragments and one-object carrying |
 | `client/ship/` | Pose, cockpit authority, direct flight, uncancellable landing/takeoff, airlock interlocks and live telemetry |
+| `client/physics/` | Portable small-object gravity, ejection/release velocity, spherical contacts, restitution and deterministic substeps; caller-supplied surfaces/geometry |
 | `client/math/` | Dependency-free `f64` vector component arithmetic; no domain/frame ownership |
 | `client/character/` | Portable movement, collision, gravity, cockpit transitions and open-space/nearby-body EVA |
 | `client/renderer/` | GPU resources, GLB loading, sphere/ship/image pipelines, reverse-Z, instruments and measurements through renderer-neutral DTOs |
@@ -70,7 +71,7 @@ or shared frame/normalization policy would obscure existing domain contracts.
 | Inventory at this decision | Compatibility and action |
 | --- | --- |
 | character `src/lib.rs`; ship `src/lib.rs` | Identical add/sub/scale/dot/right-handed cross; import shared primitives. Ship's length has the same X/Y/Z sum-of-squares order and is imported under its existing name. |
-| runtime `fragment_physics.rs`; `carrying.rs` | Fragment component arithmetic/dot/cross/length has the same order and semantics; import it. Carrying imports the identical cross product. |
+| physics `src/lib.rs` (extracted from runtime `fragment_physics.rs`); runtime `carrying.rs` | Fragment component arithmetic/dot/cross/length has the same order and semantics; import it. Carrying imports the identical cross product. |
 | runtime `app.rs` | Subtract/dot/length also compatible, but leave this composition file outside the limited first migration. |
 | world `src/lib.rs`, `mining.rs`, `resource_fragments.rs` | Length/dot/cross are compatible candidates, left local for now to avoid extending the first migration into world ownership. `WorldPosition`, subtraction/rebasing and resource pose validation remain world-owned. |
 | world `resource_generation.rs` | Chained `hypot` length deliberately differs from naive sum of squares; retain overflow-safe deterministic generation math. |
@@ -106,6 +107,35 @@ and uses three monitors on one center console with walking routes on both sides.
 Loose fragments use the cabin deck. Historical cargo and migration evidence in
 [reports/](../reports/README.md) describes earlier revisions. The mining tool now renders a Blender-authored GLB with a camera-local grip
 and status material. Water-ice and silicate fragments each use two Blender-authored variants selected by stable identity; iron fragment presentation remains an issue-scoped migration.
+
+## Physical-object simulation decision (#114)
+
+Extract now into `salimon-physics`, a narrow portable crate depending only on
+`salimon-math` and the standard library. The existing gravity, ejection/release,
+contact, restitution, friction and substep rules already form a reusable unit;
+keeping them in native composition would make the next loose-object feature
+extend runtime with unrelated rules. A broad `salimon-simulation` crate or full
+physics engine is not warranted by this extraction.
+
+Runtime's `fragment_physics.rs` selects loose nearby fragments in session order,
+excludes the carried piece, supplies mass-derived radius and selected spherical
+body or ship-local floor geometry, projects release directions and maps results
+back through the ship frame into validated world poses. World still owns IDs,
+material, mass, orientation and session lifetime. Character's authored collision
+layout still supplies the pure floor-containment query. Physics owns the response
+to that geometry; it never reads the catalog, resource sessions or ship state.
+
+Future cargo, loose equipment, debris and other independently moving physical
+objects should use this boundary for compatible motion/contact. Their feature
+owners adapt identity/state and environment here, extending physics with focused
+contracts/tests when new rules are actually required. Do not add unrelated
+physical rules to runtime. Character locomotion and ship flight retain their
+existing domain controllers. The current solver uses equal contact weighting,
+spherical proxies and quadratic pairs; it is not a mass-aware rigid-body engine.
+Multiple ship frames must be stepped separately; the current single-ship adapter
+preserves the old grouping, constants, iteration order and 48-substep cap.
+See [physics architecture](../client/physics/architecture.md) and
+[invariants](../client/physics/invariants.md) before extending it.
 
 ## Future candidates and deferred capabilities
 

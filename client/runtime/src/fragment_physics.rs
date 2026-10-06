@@ -1,38 +1,19 @@
-//! Small, deterministic fragment simulation in ship-local or planet-relative metres.
-//! Spherical contacts bound the irregular display meshes without a physics engine.
+//! Fragment/session adapter for the portable physical-object simulation.
+//! Selects geometry and frames; physical rules live in salimon-physics.
 use std::time::Duration;
 
-use salimon_math::{add, cross, dot, length, scale, sub};
+use salimon_math::{dot, length, sub};
 
 use crate::mining::MiningTool;
 use salimon_character::{SHIP_FLOOR_HEIGHT_METERS, ShipFrame, ship_floor_placement};
 use salimon_world::resources::{FragmentId, ResourceTransform};
 use salimon_world::{BodyRole, CELESTIAL_BODIES, WorldPosition};
 
-const GRAVITY: f64 = 9.81;
-const RESTITUTION: f64 = 0.12;
-const MAX_STEP: f64 = 1.0 / 90.0;
+use salimon_physics::{ObjectState, SphereSurface, Surface};
 
 #[derive(Clone, Copy, Debug, Default)]
 pub(crate) struct FragmentMotion {
     pub(crate) velocity: [f64; 3],
-}
-
-#[derive(Clone, Copy)]
-struct Body {
-    center: [f64; 3],
-    radius: f64,
-}
-
-#[derive(Clone, Copy)]
-struct Piece {
-    id: FragmentId,
-    position: [f64; 3],
-    velocity: [f64; 3],
-    radius: f64,
-    ship: bool,
-    body: Option<Body>,
-    orientation: [f64; 4],
 }
 
 pub(crate) fn release(
@@ -43,11 +24,11 @@ pub(crate) fn release(
     inside: bool,
 ) {
     let velocity = if inside {
-        [
-            dot(player_forward, frame.axes[0]) * 1.1,
-            0.35,
-            dot(player_forward, frame.axes[2]) * 1.1,
-        ]
+        salimon_physics::floor_release_velocity([
+            dot(player_forward, frame.axes[0]),
+            0.0,
+            dot(player_forward, frame.axes[2]),
+        ])
     } else {
         let position = tool
             .session
@@ -58,10 +39,7 @@ pub(crate) fn release(
             .transform()
             .position()
             .meters();
-        let up = nearest_body(position)
-            .map(|body| normalize(sub(position, body.center)))
-            .unwrap_or([0.0, 1.0, 0.0]);
-        add(scale(player_forward, 1.1), scale(up, 0.3))
+        salimon_physics::release_velocity(player_forward, position, nearest_body(position))
     };
     tool.fragment_motion.insert(id, FragmentMotion { velocity });
 }
@@ -72,7 +50,7 @@ pub(crate) fn advance(tool: &mut MiningTool, frame: ShipFrame, delta: Duration, 
         return;
     }
     let carried = tool.session.carried_id();
-    let mut pieces: Vec<_> = tool
+    let pieces: Vec<_> = tool
         .session
         .fragments()
         .iter()
@@ -89,162 +67,56 @@ pub(crate) fn advance(tool: &mut MiningTool, frame: ShipFrame, delta: Duration, 
             let body = if ship { None } else { nearest_body(position) };
             let initial = if tool.fragment_motion.contains_key(&p.id()) {
                 tool.fragment_motion[&p.id()].velocity
-            } else if let Some(body) = body {
-                // New mined pieces spring outward from the source rather than arriving in a row.
-                let up = normalize(sub(position, body.center));
-                let axis = if up[1].abs() < 0.9 {
-                    [0.0, 1.0, 0.0]
-                } else {
-                    [1.0, 0.0, 0.0]
-                };
-                let tangent = normalize(cross(up, axis));
-                add(
-                    scale(up, 1.55),
-                    scale(tangent, 0.70 + (p.id().0 % 3) as f64 * 0.12),
-                )
             } else {
-                [0.0; 3]
+                salimon_physics::ejection_velocity(position, body, (p.id().0 % 3) as u8)
             };
-            Piece {
-                id: p.id(),
-                position,
-                velocity: initial,
-                radius: salimon_world::resource_fragments::side_meters(p) * 0.5,
-                ship,
-                body,
-                orientation: p.transform().orientation_xyzw(),
-            }
+            (
+                p,
+                ObjectState {
+                    position,
+                    velocity: initial,
+                    radius: salimon_world::resource_fragments::side_meters(p) * 0.5,
+                    surface: if ship {
+                        Surface::Floor {
+                            height_meters: SHIP_FLOOR_HEIGHT_METERS,
+                        }
+                    } else {
+                        body.map(Surface::Sphere).unwrap_or(Surface::Unsupported)
+                    },
+                },
+            )
         })
         .collect();
     if pieces.is_empty() {
         return;
     }
-    // A fixed maximum substep prevents fast ejected pieces from tunnelling through a pile.
-    let steps = (elapsed / MAX_STEP).ceil().clamp(1.0, 48.0) as usize;
-    let dt = elapsed / steps as f64;
-    for _ in 0..steps {
-        for piece in &mut pieces {
-            let previous = piece.position;
-            let up = piece
-                .body
-                .map(|body| normalize(sub(piece.position, body.center)))
-                .unwrap_or([0.0, 1.0, 0.0]);
-            piece.velocity = sub(piece.velocity, scale(up, GRAVITY * dt));
-            piece.position = add(piece.position, scale(piece.velocity, dt));
-            if piece.ship && ship_floor_placement(piece.position, piece.radius).is_none() {
-                piece.position[0] = previous[0];
-                piece.position[2] = previous[2];
-                piece.velocity[0] *= -0.15;
-                piece.velocity[2] *= -0.15;
-            }
-            ground_contact(piece);
-        }
-        for _ in 0..3 {
-            for i in 0..pieces.len() {
-                for j in i + 1..pieces.len() {
-                    let (left, right) = pieces.split_at_mut(j);
-                    let a = &mut left[i];
-                    let b = &mut right[0];
-                    if a.ship != b.ship
-                        || (a.body.is_some()
-                            && b.body.is_some()
-                            && a.body.unwrap().center != b.body.unwrap().center)
-                    {
-                        continue;
-                    }
-                    let separation = sub(b.position, a.position);
-                    let distance = length(separation);
-                    let minimum = a.radius + b.radius;
-                    if distance >= minimum {
-                        continue;
-                    }
-                    let normal = if distance > 1e-9 {
-                        scale(separation, 1.0 / distance)
-                    } else {
-                        [0.0, 1.0, 0.0]
-                    };
-                    let correction = scale(normal, (minimum - distance + 0.0001) * 0.5);
-                    let old_a = a.position;
-                    let old_b = b.position;
-                    a.position = sub(a.position, correction);
-                    b.position = add(b.position, correction);
-                    if a.ship && ship_floor_placement(a.position, a.radius).is_none() {
-                        a.position[0] = old_a[0];
-                        a.position[2] = old_a[2];
-                    }
-                    if b.ship && ship_floor_placement(b.position, b.radius).is_none() {
-                        b.position[0] = old_b[0];
-                        b.position[2] = old_b[2];
-                    }
-                    let approach = dot(sub(b.velocity, a.velocity), normal);
-                    if approach < 0.0 {
-                        let impulse = -(1.0 + RESTITUTION) * approach * 0.5;
-                        a.velocity = sub(a.velocity, scale(normal, impulse));
-                        b.velocity = add(b.velocity, scale(normal, impulse));
-                    }
-                    ground_contact(a);
-                    ground_contact(b);
-                }
-            }
-        }
-        for piece in &mut pieces {
-            piece.velocity = scale(piece.velocity, 0.995);
-            if length(piece.velocity) < 0.015 {
-                piece.velocity = [0.0; 3];
-            }
-        }
-    }
-    for piece in pieces {
+    let mut states: Vec<_> = pieces.iter().map(|(_, state)| *state).collect();
+    salimon_physics::advance(&mut states, delta, |position, radius| {
+        ship_floor_placement(position, radius).is_some()
+    });
+    for ((fragment, _), piece) in pieces.into_iter().zip(states) {
         tool.fragment_motion.insert(
-            piece.id,
+            fragment.id(),
             FragmentMotion {
                 velocity: piece.velocity,
             },
         );
-        let position = if piece.ship {
-            tool.ship_fragments.insert(piece.id, piece.position);
+        let position = if matches!(piece.surface, Surface::Floor { .. }) {
+            tool.ship_fragments.insert(fragment.id(), piece.position);
             frame.local_to_world(piece.position)
         } else {
             piece.position
         };
         let pose = ResourceTransform::new(
             WorldPosition::new(position[0], position[1], position[2]),
-            piece.orientation,
+            fragment.transform().orientation_xyzw(),
         )
         .expect("finite fragment physics pose");
-        tool.session.move_loose(piece.id, pose);
+        tool.session.move_loose(fragment.id(), pose);
     }
 }
 
-fn ground_contact(piece: &mut Piece) {
-    let (up, penetration) = if piece.ship {
-        (
-            [0.0, 1.0, 0.0],
-            SHIP_FLOOR_HEIGHT_METERS + piece.radius - piece.position[1],
-        )
-    } else if let Some(body) = piece.body {
-        let radial = sub(piece.position, body.center);
-        let distance = length(radial);
-        (normalize(radial), body.radius + piece.radius - distance)
-    } else {
-        return;
-    };
-    if penetration <= 0.0 {
-        return;
-    }
-    piece.position = add(piece.position, scale(up, penetration));
-    let downward = dot(piece.velocity, up);
-    if downward < 0.0 {
-        piece.velocity = sub(piece.velocity, scale(up, downward * (1.0 + RESTITUTION)));
-    }
-    let normal_speed = dot(piece.velocity, up);
-    piece.velocity = add(
-        scale(sub(piece.velocity, scale(up, normal_speed)), 0.88),
-        scale(up, normal_speed),
-    );
-}
-
-fn nearest_body(position: [f64; 3]) -> Option<Body> {
+fn nearest_body(position: [f64; 3]) -> Option<SphereSurface> {
     CELESTIAL_BODIES
         .iter()
         .filter(|body| body.role == BodyRole::Solid)
@@ -253,19 +125,10 @@ fn nearest_body(position: [f64; 3]) -> Option<Body> {
                 .abs()
                 .total_cmp(&(length(sub(position, b.center.meters())) - b.radius_meters).abs())
         })
-        .map(|body| Body {
+        .map(|body| SphereSurface {
             center: body.center.meters(),
             radius: body.radius_meters,
         })
-}
-
-fn normalize(a: [f64; 3]) -> [f64; 3] {
-    let len = length(a);
-    if len > 1e-12 {
-        scale(a, 1.0 / len)
-    } else {
-        [0.0, 1.0, 0.0]
-    }
 }
 
 #[cfg(test)]
@@ -298,12 +161,59 @@ mod tests {
     }
 
     #[test]
-    fn fragment_normalization_keeps_radial_fallback_and_threshold() {
-        for vector in [[0.0; 3], [1.0e-12, 0.0, 0.0], [f64::NAN, 0.0, 0.0]] {
-            assert_eq!(normalize(vector), [0.0, 1.0, 0.0]);
-        }
-        assert_eq!(normalize([0.0, 0.0, 2.0e-12]), [0.0, 0.0, 1.0]);
-        assert!((length(normalize([3.0, 4.0, 0.0])) - 1.0).abs() < 1.0e-15);
+    fn adapter_excludes_carried_and_distant_fragments() {
+        let mut tool = mined(4.0);
+        let ids: Vec<_> = tool.session.fragments().iter().map(|p| p.id()).collect();
+        assert_eq!(ids.len(), 2);
+        assert!(tool.session.pick_up(ids[0]));
+        assert!(
+            tool.session.move_loose(
+                ids[1],
+                ResourceTransform::new(WorldPosition::new(125.0, 0.0, 0.0), [0.0, 0.0, 0.0, 1.0])
+                    .unwrap()
+            )
+        );
+        let before = tool.session.fragments().to_vec();
+        advance(&mut tool, frame(), Duration::from_millis(16), [0.0; 3]);
+        assert_eq!(tool.session.fragments(), before);
+        assert!(tool.fragment_motion.is_empty());
+    }
+
+    #[test]
+    fn adapter_preserves_entity_contract_and_maps_rotated_ship_frame() {
+        let mut tool = mined(2.0);
+        let id = tool.session.fragments()[0].id();
+        let frame = ShipFrame {
+            origin_meters: [1000.0, 2000.0, 3000.0],
+            axes: [[0.0, 0.0, -1.0], [0.0, 1.0, 0.0], [1.0, 0.0, 0.0]],
+        };
+        let local = [-5.0, 1.3, 0.0];
+        let world = frame.local_to_world(local);
+        let pose = ResourceTransform::new(
+            WorldPosition::new(world[0], world[1], world[2]),
+            [0.0, 1.0, 0.0, 0.0],
+        )
+        .unwrap();
+        assert!(tool.session.move_loose(id, pose));
+        tool.ship_fragments.insert(id, local);
+        tool.fragment_motion.insert(id, FragmentMotion::default());
+        let before = tool.session.fragments()[0];
+        release(&mut tool, id, frame.axes[0], frame, true);
+        assert_eq!(tool.fragment_motion[&id].velocity, [1.1, 0.35, 0.0]);
+        advance(&mut tool, frame, Duration::from_millis(100), world);
+        let after = tool.session.fragments()[0];
+        assert_eq!(after.id(), before.id());
+        assert_eq!(after.source(), before.source());
+        assert_eq!(after.material(), before.material());
+        assert_eq!(
+            after.transform().orientation_xyzw(),
+            before.transform().orientation_xyzw()
+        );
+        assert_eq!(
+            after.transform().position().meters(),
+            frame.local_to_world(tool.ship_fragments[&id])
+        );
+        assert_ne!(after.transform().position(), before.transform().position());
     }
 
     #[test]

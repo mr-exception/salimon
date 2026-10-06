@@ -19,7 +19,7 @@ winit event loop
 ```
 
 The dependency direction is one-way: the runtime depends on character, ship,
-world, diagnostics, and renderer. Supporting crates never call into runtime;
+world, physics, diagnostics, and renderer. Supporting crates never call into runtime;
 renderer and diagnostics do not depend on behavior domains. Runtime mapping
 prevents portable types from acquiring `wgpu` or `winit` dependencies.
 
@@ -107,13 +107,15 @@ Successful interior release installs an anchor; pickup removes it before followi
 the player; surface release stays world-local. Every gameplay update and look/input
 synchronization maps loose anchors through the current ship frame. The same world
 session owns every entity and its immutable mass/material/source throughout.
-`fragment_physics.rs` composes deterministic loose-fragment motion and spherical
-contacts in ship-local or planet-relative meters, including gravity, release
-velocity, deck/hull contact and fragment piling. `MiningTool.fragment_motion`
-tracks velocities by existing fragment ID; carried pieces are excluded. This is
-a small custom simulation, without Rapier or another physics engine. World
-continues to own validated poses, identity, material and mass; runtime owns
-cross-domain support frames and contact composition.
+`fragment_physics.rs` adapts loose session fragments to `salimon-physics` in
+ship-local or absolute planet coordinates. It supplies selected body geometry,
+character-owned floor containment, stable object order and mass-derived radius,
+then writes velocity/pose results through existing IDs. Carried pieces are
+excluded. Gravity, release/ejection, restitution, deck/hull response, spherical
+contacts and substeps live in the portable physics crate. World retains identity,
+material, mass, orientation and validated poses; runtime retains cross-domain
+frame/session sequencing. See the canonical
+[ownership decision](../../docs/technical-architecture.md#physical-object-simulation-decision-114).
 
 ## First-person reticle
 

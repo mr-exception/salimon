@@ -1711,6 +1711,7 @@ dependencies = [
  "salimon-character",
  "salimon-diagnostics",
  "salimon-math",
+ "salimon-physics",
  "salimon-renderer",
  "salimon-ship",
  "salimon-world",
@@ -1725,6 +1726,13 @@ version = "0.1.0"
 [[package]]
 name = "salimon-math"
 version = "0.1.0"
+
+[[package]]
+name = "salimon-physics"
+version = "0.1.0"
+dependencies = [
+ "salimon-math",
+]
 
 [[package]]
 name = "salimon-renderer"

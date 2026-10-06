@@ -1,6 +1,6 @@
 //! Body-expanded hull, fixture and appendage collision.
 use crate::layout::*;
-use crate::thruster_collision::{THRUSTER_COLLIDERS, WING_COLLIDERS};
+use crate::spatial_contracts::{THRUSTER_COLLIDERS, WING_COLLIDERS};
 use crate::{PLAYER_BODY_HEIGHT_METERS, PLAYER_EYE_HEIGHT_METERS};
 pub(crate) fn overlaps_exterior_hull(local: [f64; 3]) -> bool {
     local[1] + (PLAYER_BODY_HEIGHT_METERS - PLAYER_EYE_HEIGHT_METERS) > EXTERIOR_BOTTOM

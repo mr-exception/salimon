@@ -39,8 +39,7 @@ movement mode. `controller/camera.rs` owns look and snapshots. Regression tests
 stay with these mode owners; `controller/collision_tests.rs` checks movement
 through shared proxies and `controller/test_support.rs` contains test fixtures.
 `state.rs` owns frame/snapshot/location contracts and private position variants;
-`input.rs` owns typed controls and planar normalization. `layout.rs` centralizes
-handwritten dimensions/proxies, `collision.rs` owns sweep/slide helpers,
+`input.rs` owns typed controls and planar normalization. `layout.rs` derives
+body-clear proxies from authored geometry, `collision.rs` owns sweep/slide helpers,
 `queries.rs` owns public sight/placement queries, and `math.rs` owns character
-normalization/projection policy. Generated `ship_anchors.rs` and
-`thruster_collision.rs` remain exporter-owned.
+normalization/projection policy. Generated `spatial_contracts.rs` remains exporter-owned.

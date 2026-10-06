@@ -117,6 +117,11 @@ storage assembly are removed. The aft pressure door parks to port when open.
 `client/renderer/src/ship_mesh.rs`; renaming them would change behavior. Do not
 wrap or rename the current hierarchy just to match `ASSET_<slug>`/`Visual`.
 The ship category adapter expresses this legacy hierarchy and the current
-13-collider inventory as an explicit compatibility contract. Detailed migration
+20-collider/four-marker inventory as an explicit compatibility contract. Detailed migration
 evidence remains in #79 and #80; the current geometry revision updates the
 asset, spatial contracts and their runtime consumers together.
+
+Scout traversal dimensions are generated from authored proxies/markers into one
+Rust spatial module. Gameplay clearance and permissions stay with the character
+domain. See the [geometry/policy mapping](assets/ships/salimon-scout/README.md#geometry-and-gameplay-policy)
+before editing envelopes or adding a new proxy consumer.

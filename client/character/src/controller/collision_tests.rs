@@ -1,7 +1,7 @@
 //! Controller integration regressions for the collision proxies.
 use super::test_support::*;
 use super::*;
-use crate::thruster_collision::{THRUSTER_COLLIDERS, WING_COLLIDERS};
+use crate::spatial_contracts::{THRUSTER_COLLIDERS, WING_COLLIDERS};
 #[test]
 fn each_thruster_blocks_all_planar_approaches_without_bridging_clear_space() {
     for collider in [THRUSTER_COLLIDERS[0], THRUSTER_COLLIDERS[2]] {

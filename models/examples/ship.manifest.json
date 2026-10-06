@@ -70,7 +70,8 @@
     "markers": [
       "MARKER_CockpitSeat",
       "MARKER_ExitDoor",
-      "MARKER_PlayerStart"
+      "MARKER_PlayerStart",
+      "MARKER_DoorwayTransition"
     ],
     "colliders": [
       "COLLIDER_InteriorFloor",
@@ -87,7 +88,12 @@
       "COLLIDER_CockpitCenterConsole",
       "COLLIDER_CockpitNoseFloor",
       "COLLIDER_Wing_Port",
-      "COLLIDER_Wing_Starboard"
+      "COLLIDER_Wing_Starboard",
+      "COLLIDER_CabinTraversalEnvelope",
+      "COLLIDER_CabinExteriorEnvelope",
+      "COLLIDER_PilotChair",
+      "COLLIDER_CockpitPortHull",
+      "COLLIDER_CockpitStarboardHull"
     ],
     "requiredExtras": [
       {
@@ -212,6 +218,30 @@
       },
       {
         "node": "COLLIDER_Wing_Starboard",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_CabinTraversalEnvelope",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_CabinExteriorEnvelope",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_PilotChair",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_CockpitPortHull",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_CockpitStarboardHull",
+        "path": "salimon"
+      },
+      {
+        "node": "MARKER_DoorwayTransition",
         "path": "salimon"
       }
     ]

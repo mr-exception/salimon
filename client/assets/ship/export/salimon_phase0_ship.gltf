@@ -19,11 +19,30 @@
     {
       "name": "Scene",
       "nodes": [
-        122
+        128
       ]
     }
   ],
   "nodes": [
+    {
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            13.8,
+            2.446236559139785,
+            8.4
+          ],
+          "purpose": "traversal-volume"
+        }
+      },
+      "name": "COLLIDER_CabinTraversalEnvelope",
+      "translation": [
+        -0.3400000035762787,
+        1.4704301357269287,
+        0
+      ]
+    },
     {
       "extras": {
         "salimon": {
@@ -98,6 +117,44 @@
         -1.100000023841858,
         1.5591397285461426,
         -4.739999771118164
+      ]
+    },
+    {
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            5.35,
+            2.688172043010752,
+            1.3000000000000003
+          ],
+          "purpose": "interior-hull"
+        }
+      },
+      "name": "COLLIDER_CockpitPortHull",
+      "translation": [
+        5.175000190734863,
+        1.5913978815078735,
+        3.549999952316284
+      ]
+    },
+    {
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            5.35,
+            2.688172043010752,
+            1.3000000000000003
+          ],
+          "purpose": "interior-hull"
+        }
+      },
+      "name": "COLLIDER_CockpitStarboardHull",
+      "translation": [
+        5.175000190734863,
+        1.5913978815078735,
+        -3.549999952316284
       ]
     },
     {
@@ -257,6 +314,25 @@
         "salimon": {
           "collisionShape": "box",
           "sizeMeters": [
+            16.45,
+            3.0430107526881716,
+            10.2
+          ],
+          "purpose": "exterior-cabin-envelope"
+        }
+      },
+      "name": "COLLIDER_CabinExteriorEnvelope",
+      "translation": [
+        0.3050000071525574,
+        1.4139784574508667,
+        0
+      ]
+    },
+    {
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
             18.33,
             4.0,
             20.0
@@ -268,6 +344,25 @@
       "translation": [
         -0.6349999904632568,
         1.8924731016159058,
+        0
+      ]
+    },
+    {
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            1.5299999999999998,
+            1.4826881720430107,
+            1.58
+          ],
+          "purpose": "interior-obstacle"
+        }
+      },
+      "name": "COLLIDER_PilotChair",
+      "translation": [
+        2.5350000858306885,
+        0.9886559247970581,
         0
       ]
     },
@@ -325,7 +420,12 @@
         11,
         12,
         13,
-        14
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
       ],
       "name": "Collision_Proxies"
     },
@@ -528,11 +628,6 @@
     },
     {
       "children": [
-        16,
-        17,
-        18,
-        19,
-        20,
         21,
         22,
         23,
@@ -570,7 +665,12 @@
         55,
         56,
         57,
-        58
+        58,
+        59,
+        60,
+        61,
+        62,
+        63
       ],
       "name": "Exterior"
     },
@@ -586,6 +686,20 @@
         0.5,
         1.9973118305206299,
         -2.200000047683716
+      ]
+    },
+    {
+      "extras": {
+        "salimon": {
+          "purpose": "doorway-transition",
+          "facing": "-X"
+        }
+      },
+      "name": "MARKER_DoorwayTransition",
+      "translation": [
+        -7.039999961853027,
+        0.24731183052062988,
+        0
       ]
     },
     {
@@ -618,9 +732,10 @@
     },
     {
       "children": [
-        60,
-        61,
-        62
+        65,
+        66,
+        67,
+        68
       ],
       "name": "Interaction_Markers"
     },
@@ -931,12 +1046,6 @@
     },
     {
       "children": [
-        64,
-        65,
-        66,
-        67,
-        68,
-        69,
         70,
         71,
         72,
@@ -987,16 +1096,22 @@
         117,
         118,
         119,
-        120
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126
       ],
       "name": "Interior"
     },
     {
       "children": [
-        15,
-        59,
-        63,
-        121
+        20,
+        64,
+        69,
+        127
       ],
       "name": "Salimon_Phase0_Scout"
     }
@@ -8425,6 +8540,54 @@
             "shape": "box",
             "purpose": "interactive-door"
           },
+          "COLLIDER_CabinExteriorEnvelope": {
+            "centerMeters": [
+              0.3049999999999997,
+              1.4139784946236558,
+              0.0
+            ],
+            "sizeMeters": [
+              16.45,
+              3.0430107526881716,
+              10.2
+            ],
+            "lowerMeters": [
+              -7.92,
+              -0.10752688172043001,
+              -5.1
+            ],
+            "upperMeters": [
+              8.53,
+              2.9354838709677415,
+              5.1
+            ],
+            "shape": "box",
+            "purpose": "exterior-cabin-envelope"
+          },
+          "COLLIDER_CabinTraversalEnvelope": {
+            "centerMeters": [
+              -0.3400000000000003,
+              1.4704301075268815,
+              0.0
+            ],
+            "sizeMeters": [
+              13.8,
+              2.446236559139785,
+              8.4
+            ],
+            "lowerMeters": [
+              -7.24,
+              0.24731182795698903,
+              -4.2
+            ],
+            "upperMeters": [
+              6.5600000000000005,
+              2.693548387096774,
+              4.2
+            ],
+            "shape": "box",
+            "purpose": "traversal-volume"
+          },
           "COLLIDER_CockpitCenterConsole": {
             "centerMeters": [
               4.95,
@@ -8472,6 +8635,54 @@
             ],
             "shape": "box",
             "purpose": "interior-floor"
+          },
+          "COLLIDER_CockpitPortHull": {
+            "centerMeters": [
+              5.175,
+              1.5913978494623655,
+              3.55
+            ],
+            "sizeMeters": [
+              5.35,
+              2.688172043010752,
+              1.3000000000000003
+            ],
+            "lowerMeters": [
+              2.5,
+              0.24731182795698947,
+              2.8999999999999995
+            ],
+            "upperMeters": [
+              7.85,
+              2.9354838709677415,
+              4.2
+            ],
+            "shape": "box",
+            "purpose": "interior-hull"
+          },
+          "COLLIDER_CockpitStarboardHull": {
+            "centerMeters": [
+              5.175,
+              1.5913978494623655,
+              -3.55
+            ],
+            "sizeMeters": [
+              5.35,
+              2.688172043010752,
+              1.3000000000000003
+            ],
+            "lowerMeters": [
+              2.5,
+              0.24731182795698947,
+              -4.2
+            ],
+            "upperMeters": [
+              7.85,
+              2.9354838709677415,
+              -2.8999999999999995
+            ],
+            "shape": "box",
+            "purpose": "interior-hull"
           },
           "COLLIDER_EnergyCore": {
             "centerMeters": [
@@ -8713,6 +8924,30 @@
             "shape": "box",
             "purpose": "interior-wall"
           },
+          "COLLIDER_PilotChair": {
+            "centerMeters": [
+              2.535,
+              0.9886559139784946,
+              0.0
+            ],
+            "sizeMeters": [
+              1.5299999999999998,
+              1.4826881720430107,
+              1.58
+            ],
+            "lowerMeters": [
+              1.7700000000000002,
+              0.24731182795698925,
+              -0.79
+            ],
+            "upperMeters": [
+              3.3,
+              1.73,
+              0.79
+            ],
+            "shape": "box",
+            "purpose": "interior-obstacle"
+          },
           "COLLIDER_Wing_Port": {
             "centerMeters": [
               -1.6,
@@ -8789,6 +9024,15 @@
             ],
             "purpose": "player-start",
             "facing": "+X"
+          },
+          "MARKER_DoorwayTransition": {
+            "positionMeters": [
+              -7.04,
+              0.24731182795698925,
+              0.0
+            ],
+            "purpose": "doorway-transition",
+            "facing": "-X"
           }
         },
         "anchors": {
@@ -8800,6 +9044,11 @@
           "exitDoor": [
             -7.1,
             1.3440860215053763,
+            0.0
+          ],
+          "doorwayTransition": [
+            -7.04,
+            0.24731182795698925,
             0.0
           ],
           "playerStart": [

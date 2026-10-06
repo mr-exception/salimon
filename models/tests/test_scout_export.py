@@ -99,8 +99,7 @@ class ScoutExportTests(unittest.TestCase):
         paths.extend([
             ASSET / 'export-report.json',
             REPO / 'client/assets/ship/spatial-contracts.json',
-            REPO / 'client/character/src/thruster_collision.rs',
-            REPO / 'client/character/src/ship_anchors.rs',
+            REPO / 'client/character/src/spatial_contracts.rs',
         ])
         before = {p: p.read_bytes() for p in paths}
         manifest = copy.deepcopy(self.manifest)

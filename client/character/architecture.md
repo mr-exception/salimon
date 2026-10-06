@@ -19,7 +19,7 @@ new crate dependencies or native/platform types.
 | `layout.rs`, `collision.rs` | Shared authored dimensions/proxies and hull/fixture/appendage sweep/sliding |
 | `queries.rs` | Public ship-local floor placement and sight obstruction |
 | `math.rs` | Domain normalization fallback/threshold, rejection, interpolation and tangent selection |
-| `ship_anchors.rs`, `thruster_collision.rs` | Unmodified exporter-generated spatial contracts |
+| `spatial_contracts.rs` | Unmodified exporter-generated spatial contracts |
 
 Controller mode modules are children of the controller owner so private fields
 remain private. A private `Step` samples the existing input edge and environmental
@@ -118,3 +118,13 @@ Compatible `f64` component arithmetic comes from the dependency-free
 `salimon-math` leaf crate. Normalization, frame and quaternion policies stay
 with their owning domain. See the canonical
 [decision and inventory](../../docs/technical-architecture.md#shared-math-decision-115).
+
+## Authored spatial geometry (#111)
+
+`spatial_contracts.rs` is the single generated raw geometry/anchor module.
+`layout.rs` applies player-radius clearance, conservative planar projection,
+shoulder/gate composition and camera policy; collision, sight and floor placement
+consume that layout. Public anchor exports and floor-height APIs are preserved.
+The [scout mapping](../../models/assets/ships/salimon-scout/README.md#geometry-and-gameplay-policy)
+identifies component ownership, coarse envelope semantics and remaining gameplay
+policy. Builds use checked-in artifacts and never run Blender.

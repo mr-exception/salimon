@@ -35,15 +35,15 @@ objects and linked shared hierarchy/materials. All use the same ship-local frame
 
 | Component | Ownership |
 | --- | --- |
-| hull | Hull panels, spine, roof details and exterior hull collider |
-| cockpit | Cockpit and cabin glazing, window frame and nose-floor collider |
+| hull | Hull panels, spine, roof details, broad hull and cabin exterior envelope |
+| cockpit | Cockpit and cabin glazing, window frame, nose-floor collider and cockpit side-hull proxies |
 | wings | Both wings, armor/accents and their colliders |
 | engines | Both pods, fins, intake/nozzle details and engine colliders |
-| exit-door | Moving door, frame/threshold/light, door collider and exit marker |
-| pilot-seat | Seat and cockpit-seat marker |
+| exit-door | Moving door, frame/threshold/light, door collider, exit marker and doorway transition marker |
+| pilot-seat | Seat, chair collider and cockpit-seat marker |
 | cockpit-console | Console, monitors, housings, controls and console collider |
 | energy-core | Core, pedestal, details and core collider |
-| cabin-interior | Deck, walls, ceiling, trim/lights, cabin colliders and spawn marker |
+| cabin-interior | Deck, walls, ceiling, trim/lights, cabin colliders, traversal envelope and spawn marker |
 
 `assembly/shared.blend` owns the root/group empties and the 13 shared materials
 (including the packed floor image). Components link these dependencies through
@@ -137,7 +137,7 @@ All current `COLLIDER_` names, translations, `collisionShape=box`, `sizeMeters` 
 legacy metadata-only empties, not newly authored solid proxies. The groups cover
 cabin floor/walls/ceiling, Core, aft door, coarse hull, engine bounds
 and the unified center console. The retired cargo-room boundaries are absent.
-The three markers remain empties. Empty cube display glyphs help find colliders
+The four markers remain empties. Empty cube display glyphs help find colliders
 but **do not describe their actual box dimensions**; use their saved size metadata.
 
 The adapter generates portable spatial Rust layouts from Blender-authored
@@ -187,3 +187,42 @@ See [migration evidence](../../../../reports/issue-80/README.md) for the complet
 triangle comparison and recorded validation limits.
 Original bootstrap GLB SHA-256:
 `926c93570a48dae8c66b1721a9183d70c69c3f3d3b15ff92cbbae9d2fe3eb312`.
+
+## Geometry and gameplay policy
+
+The scout adapter emits one `client/character/src/spatial_contracts.rs`, replacing
+`ship_anchors.rs` and `thruster_collision.rs`. Raw bounds use
+`[forward min, forward max, up min, up max, port min, port max]` in runtime meters.
+Anchors and selected traversal boxes plus engine/wing arrays come from the same
+20-box/four-marker inventory as the sidecar and embedded GLB contract. Rustfmt
+must be on PATH for offline export/validation of the generated Rust module.
+Normal runtime builds consume checked-in artifacts without Blender or Python.
+
+| Authored source | Character consumer |
+| --- | --- |
+| InteriorFloor upper Y / forward maximum | Floor height / broad deck end |
+| CockpitNoseFloor bounds | Narrow floor end/width; derived shoulder footprints |
+| CabinTraversalEnvelope | Aft inner stopping plane, sill-limited width, lowest lamp clearance |
+| CabinExteriorEnvelope | Cabin/nose exterior contact, height overlap and sight shells; excludes appendages |
+| AftDoor upper Y / side width | Lintel height / gate aperture |
+| DoorwayTransition marker X | Inner doorway crossing plane |
+| EnergyCore, PilotChair, CockpitCenterConsole | Body-expanded planar fixture footprints |
+| CockpitPortHull / CockpitStarboardHull | Conservative solid side-hull footprints |
+| Engine/wing boxes | Exterior body contact and sight obstruction |
+| Seat/start/exit markers and engine centers | Existing public anchors |
+
+Traversal and exterior envelopes are intentional coarse authored geometry,
+not automatically extracted from the full visual mesh. They preserve the prior
+walking/doorway limits, including projecting sills and low fixtures. Keep them
+aligned when editing those visuals. The full `ExteriorHull` contains appendages
+and roof details and cannot replace the cabin-only envelope. Nose/cabin floors
+must remain level; widths used by centered traversal must stay symmetric.
+Required names, positive finite sizes, finite transforms/bounds, nonvisual roles,
+identity parent frames and axis-aligned applied transforms are checked at export.
+
+`client/character/src/layout.rs` owns radius expansion/inset, conservative planar
+projection, gate splitting, shoulder composition and ceiling-height clamping.
+Player dimensions, seated eye offset, view pitch/sensitivity, gravity, timing,
+door permissions, movement/carrying rules and interaction ranges remain Rust
+policy. Existing fixture sight occlusion still spans floor to ceiling; the raw
+fixture Y bounds do not change that conservative query rule in this migration.

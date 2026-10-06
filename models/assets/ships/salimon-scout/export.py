@@ -20,10 +20,9 @@ from export_asset import ExportError, contained_path, resolve_manifest
 from validate_asset import read_document, validate_manifest
 from validate import REGISTRIES, validate_preservation
 from spatial_contracts import (
-    anchors_rust_source,
     build_spatial_contracts,
     sidecar_json,
-    thruster_rust_source,
+    spatial_rust_source,
 )
 
 
@@ -73,16 +72,14 @@ def export(blender=None):
         (staged / output.with_suffix('.gltf').name).write_text(json.dumps(interchange, indent=2) + '\n')
         (staged / output.with_suffix('.bin').name).write_bytes(binary)
         (staged / 'spatial-contracts.json').write_text(sidecar_json(spatial))
-        (staged / 'thruster_collision.rs').write_text(thruster_rust_source(spatial))
-        (staged / 'ship_anchors.rs').write_text(anchors_rust_source(spatial))
+        (staged / 'spatial_contracts.rs').write_text(spatial_rust_source(spatial))
         report = dict(assetId=manifest['assetId'], sourceSha256=hashlib.sha256(source.read_bytes()).hexdigest(),
                       runtimeSha256=hashlib.sha256(temporary.read_bytes()).hexdigest(), metrics=metrics,
                       authoringSha256=authoring_hashes())
         # Every check completes before any destination is replaced. GLB is
         # replaced last; normal client builds consume only that file.
         os.replace(staged / 'spatial-contracts.json', REPO / 'client/assets/ship/spatial-contracts.json')
-        for name in ('thruster_collision.rs', 'ship_anchors.rs'):
-            os.replace(staged / name, REPO / 'client/character/src' / name)
+        os.replace(staged / 'spatial_contracts.rs', REPO / 'client/character/src/spatial_contracts.rs')
         for suffix in ('.bin', '.gltf', '.glb'):
             destination = output.with_suffix(suffix)
             os.replace(staged / destination.name, destination)

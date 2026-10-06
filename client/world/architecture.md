@@ -1,5 +1,21 @@
 # World Architecture
 
+## Source map
+
+`src/lib.rs` is the public facade: existing root imports stay stable, while
+non-resource implementation modules remain private.
+
+| Source | Responsibility and existing tests |
+| --- | --- |
+| `src/coordinates.rs` | `WorldPosition`, absolute `f64` arithmetic and subtract-before-cast regression |
+| `src/catalog.rs` | Body IDs/roles/definitions, ordered static catalog, anchor/reference speed, membership and travel tuning tests |
+| `src/geometry.rs` | Body surface/landing distances, radial speed, sphere separation and landing-volume tests |
+| `src/proximity.rs` | Nearest-surface and nearby-solid selection, inclusive threshold and influence tests |
+| `src/precision.rs` | Three immutable noncanonical markers, scalar spacing reports and numeric precision regressions |
+| `src/camera.rs` | Camera commands/state/snapshots, timeline sampling and deterministic tour tests |
+
+Resource modules keep their existing ownership and public module paths.
+
 ## Responsibility
 
 The `resources` module owns the [planetary resource contracts](resource-contracts.md):

@@ -29,6 +29,13 @@ fragment creation or mass splitting into runtime or renderer. Querying output
 must remain read-only. Seal a growing output tail on pickup so subsequent extraction cannot change
 the carried object's mass.
 
+## Source navigation
+
+Use the [architecture source map](architecture.md#source-map) for coordinates,
+catalog, geometry, proximity, precision and engineering-camera code/tests.
+`src/lib.rs` preserves the root public API through reexports; add rules to their
+owning module rather than expanding the facade. Resource module paths are unchanged.
+
 ## Change checklist
 
 - Preserve the exact ordered membership: Sun, Mercury, Venus, Earth, Moon, Mars.

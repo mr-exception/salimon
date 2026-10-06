@@ -21,7 +21,7 @@ CI uses Python 3.12. Initial installation/builds require network access.
 | Native release staging | `python scripts/build_game.py --profile release --output artifacts/build/release` | Optimized host executable; not a signed app/installer |
 
 For focused iteration use `cargo test -p salimon-world --locked`,
-`cargo test -p salimon-character --locked`, `cargo test -p salimon-ship --locked`,
+`cargo test -p salimon-character --locked`, `cargo test -p salimon-physics --locked`, `cargo test -p salimon-ship --locked`,
 `cargo test -p salimon-renderer --locked`, `cargo test -p salimon-diagnostics --locked`
 or `cargo test -p salimon-client --locked` for the affected owner; broaden to
 workspace gates for cross-crate changes. The

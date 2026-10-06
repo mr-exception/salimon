@@ -14,7 +14,10 @@ character/ship `lib.rs` and runtime `app.rs` files.
 
 Public contracts use typed commands, snapshots and validated domain values.
 Runtime owns composition, platform input and cross-domain sequencing; domains
-own their rules and state. Renderer owns GPU resources and renderer-neutral
+own their rules and state. Physical-object gravity, contact response and substeps belong in `salimon-physics`;
+runtime supplies environment/frame/session adapters. See the
+[ownership decision](technical-architecture.md#physical-object-simulation-decision-114).
+Renderer owns GPU resources and renderer-neutral
 DTOs, never character/ship/world dependencies. Keep fields private when mutation
 must preserve invariants; use the narrowest useful visibility (`pub(crate)` for
 internal crate interfaces). Read affected Cargo dependencies before changing

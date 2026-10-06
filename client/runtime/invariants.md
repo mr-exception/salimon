@@ -85,3 +85,9 @@
   `+` when equipped, selected from the actual equip state every redraw. Camera
   pitch/yaw, location and drawable resize do not shift it. Precision tour hides
   it. No world-space aim cuboid is emitted; interaction/mining rays are unchanged.
+
+- Loose-fragment simulation preserves session iteration order, excludes the carried
+  ID and objects at least 125 m from the player, and preserves IDs/mass/material/
+  orientation during pose writeback. Ship anchors/velocities use ship-local metres;
+  surface objects use absolute metres. Physical response is owned by
+  `salimon-physics`; runtime supplies geometry and frame conversions only.

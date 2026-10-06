@@ -15,7 +15,7 @@ iterating and the [applicable validation gates](validation.md) before completion
 | Walking, gravity, hull collision, EVA | character `src/lib.rs`; runtime `app.rs` composes ship snapshots | character architecture/invariants; inline collision/gravity/EVA tests; generated `ship_anchors.rs`, `thruster_collision.rs` | `cockpit-nose.json`, `space-airlock.json`, `moving-eva.json`, `nearby-eva.json` |
 | Resource identities/generation/streaming | world `src/resources.rs`, `resource_distribution.rs`, `resource_generation.rs`, `mining.rs` | `resource-contracts.md`, world invariants; inline generation/session tests | `resource-deposits.json`, `resource-streaming.json` |
 | Mining and resource UI | world `src/mining.rs`, `resource_fragments.rs`; runtime `mining.rs`, `resource_context.rs`, `resource_presentation.rs`, `action_bar.rs`; renderer `held_item.rs` / `held_item.wgsl` | world extraction/mass tests; runtime input/presentation and scenario contracts | `mining.json`, `resource-loop.json`; evidence `mining-tool.json` |
-| Carrying, transfer, fragment motion/contact | world `src/carrying.rs`, `mining.rs`, `resource_fragments.rs`; runtime `carrying.rs`, `fragment_physics.rs` | world identity/mass/one-object invariants; runtime frame/placement/contact tests | `carrying.json`, `fragment-transfer.json`, `resource-loop.json` |
+| Carrying, transfer, fragment motion/contact | world `src/carrying.rs`, `mining.rs`, `resource_fragments.rs`; runtime `carrying.rs`, `fragment_physics.rs` adapters; physics `src/lib.rs` rules | world identity/mass/one-object invariants; physics motion/contact/step tests; runtime frame/placement/session tests | `carrying.json`, `fragment-transfer.json`, `resource-loop.json` |
 | Automation, staging, packaged input | runtime `src/automation.rs`, `e2e.rs`; `scripts/salimon_test.py`, `build_game.py`, `packaged_smoke.py` | runtime protocol/scenario tests; `scripts/test_*.py`; scripts README/BUILDING/PACKAGED_SMOKE | default suite, `--group resource-collection`, `--group ship-eva`; packaged smoke |
 | Asset authoring and spatial contracts | `models/tools/`, `models/assets/ships/salimon-scout/{export,validate,spatial_contracts}.py`; renderer `ship_mesh.rs`; generated character layouts | models contracts/manifest, scout preservation metadata, `models/tests/`, asset README | cockpit/door/lower-window routes and applicable evidence variants |
 | Observational diagnostics | diagnostics `src/lib.rs`; runtime snapshot mapping | diagnostics architecture/invariants and inline tests | F3 native smoke; never authoritative gameplay state |
@@ -29,7 +29,8 @@ behavior or hardware performance.
 
 `runtime/src/app.rs` coordinates native events, update ordering, domain snapshots,
 render mapping and automation dispatch. Clocks, E2E protocol, mining/carrying,
-fragment contacts and resource presentation already have separate internal modules.
+fragment frame/session adapters and resource presentation have separate internal modules.
+Physical-object rules live in `physics/src/lib.rs`, not the native composition layer.
 Route changes to these modules before growing the event-handler composition.
 
 `character/src/lib.rs` contains typed input/state, frame/camera math, walking and

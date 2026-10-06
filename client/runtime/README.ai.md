@@ -20,7 +20,7 @@ The runtime owns the `winit` application handler, native window lifetime,
 renderer orchestration, resize and redraw routing, surface-loss recovery policy,
 monotonic frame/update clocks, typed input routing, and client composition. Its
 outbound dependencies are `salimon-character`, `salimon-ship`, `salimon-world`,
-`salimon-renderer`, and `salimon-diagnostics`.
+`salimon-physics`, `salimon-renderer`, and `salimon-diagnostics`.
 
 Do not add GPU pipelines/resources, authoritative world or ship state, backend
 behavior, persistence, or networking here. Keep new platform-specific behavior
@@ -66,3 +66,8 @@ Follow the root [coding conventions](../../docs/coding-conventions.md),
 [validation matrix](../../docs/validation.md) and
 [feature map](../../docs/maintenance-map.md). Update affected contracts/guides
 with behavior changes and record completion evidence under root `reports/`.
+
+Loose-object physical rules belong in `salimon-physics`. Runtime selects session
+entities/environment, supplies geometry and sequences the solver; keep restitution,
+gravity, contact response and substeps out of the native adapter. See the
+[ownership decision](../../docs/technical-architecture.md#physical-object-simulation-decision-114).

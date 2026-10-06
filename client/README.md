@@ -14,11 +14,16 @@ ship asset/runtime mesh path. Add future Cargo packages explicitly to the root w
 | `runtime/` | Native lifecycle, redraw/update scheduling, typed key routing, timing, and client composition |
 | `renderer/` | `wgpu` resources, camera-relative conversion, reverse-Z scene/ship/overlay pipelines, measurements, and presentation |
 | `world/` | Immutable six-body compressed Solar System, portable `f64` coordinates, camera state, geometry math, precision markers, resource generation, mining session state, and carrying |
+| `math/` | Dependency-free `f64` vector primitives; units, frames and normalization policy remain caller-owned |
 | `character/` | First-person state, typed movement, fixed gravity, cockpit/doorway/surface traversal and open-space/nearby-body EVA |
 | `ship/` | Ship pose, flight/landing/takeoff state, cockpit authority, persistent motion, and landed/open-space airlock rules |
 | `platform/` | Reserved for native input and OS-specific adapters |
 | `assets/` | Validated runtime exports/metadata and legacy editable sources; new 3D sources belong in root `models/` |
 | `diagnostics/` | Engineering metric aggregation, formatting, and RGBA overlay rasterization |
+
+Character, ship and runtime also consume the dependency-free `salimon-math`
+leaf crate. World and renderer retain their own precision/validation policies.
+See the [shared math decision](../docs/technical-architecture.md#shared-math-decision-115).
 
 The current dependency direction is:
 

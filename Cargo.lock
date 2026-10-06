@@ -1697,6 +1697,9 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 [[package]]
 name = "salimon-character"
 version = "0.1.0"
+dependencies = [
+ "salimon-math",
+]
 
 [[package]]
 name = "salimon-client"
@@ -1705,17 +1708,22 @@ dependencies = [
  "env_logger",
  "log",
  "pollster",
- "serde_json",
  "salimon-character",
  "salimon-diagnostics",
+ "salimon-math",
  "salimon-renderer",
  "salimon-ship",
  "salimon-world",
+ "serde_json",
  "winit",
 ]
 
 [[package]]
 name = "salimon-diagnostics"
+version = "0.1.0"
+
+[[package]]
+name = "salimon-math"
 version = "0.1.0"
 
 [[package]]
@@ -1730,6 +1738,7 @@ dependencies = [
 name = "salimon-ship"
 version = "0.1.0"
 dependencies = [
+ "salimon-math",
  "salimon-world",
 ]
 

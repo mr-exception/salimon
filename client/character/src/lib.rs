@@ -6,6 +6,8 @@
 use std::f64::consts::{FRAC_PI_2, TAU};
 use std::time::Duration;
 
+use salimon_math::{add, cross, dot, scale, sub};
+
 mod thruster_collision;
 use thruster_collision::{THRUSTER_COLLIDERS, WING_COLLIDERS};
 mod ship_anchors;
@@ -1123,30 +1125,6 @@ fn surface_eye_at_ship_planar_position(
     ship.local_to_world(local)
 }
 
-fn add(left: [f64; 3], right: [f64; 3]) -> [f64; 3] {
-    [left[0] + right[0], left[1] + right[1], left[2] + right[2]]
-}
-
-fn sub(left: [f64; 3], right: [f64; 3]) -> [f64; 3] {
-    [left[0] - right[0], left[1] - right[1], left[2] - right[2]]
-}
-
-fn scale(vector: [f64; 3], amount: f64) -> [f64; 3] {
-    vector.map(|value| value * amount)
-}
-
-fn dot(left: [f64; 3], right: [f64; 3]) -> f64 {
-    left.into_iter().zip(right).map(|(a, b)| a * b).sum()
-}
-
-fn cross(left: [f64; 3], right: [f64; 3]) -> [f64; 3] {
-    [
-        left[1] * right[2] - left[2] * right[1],
-        left[2] * right[0] - left[0] * right[2],
-        left[0] * right[1] - left[1] * right[0],
-    ]
-}
-
 fn normalize(vector: [f64; 3]) -> [f64; 3] {
     normalize_or(vector, [0.0, 1.0, 0.0])
 }
@@ -1184,6 +1162,18 @@ mod tests {
             body_center_meters: [0.0, -90.0, 0.0],
             radius_meters: 100.0,
         }
+    }
+
+    #[test]
+    fn normalization_preserves_domain_threshold_and_fallback() {
+        let fallback = [1.0, 0.0, 0.0];
+        for vector in [[0.0; 3], [1.0e-12, 0.0, 0.0], [f64::NAN, 0.0, 0.0]] {
+            assert_eq!(normalize_or(vector, fallback), fallback);
+        }
+        assert_eq!(normalize([0.0; 3]), [0.0, 1.0, 0.0]);
+        assert_eq!(normalize_or([0.0, 2.0e-12, 0.0], fallback), [0.0, 1.0, 0.0]);
+        let unit = normalize([3.0, 4.0, 0.0]);
+        assert!((dot(unit, unit) - 1.0).abs() < 1.0e-15);
     }
 
     #[test]

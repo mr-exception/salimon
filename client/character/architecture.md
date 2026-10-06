@@ -78,3 +78,10 @@ walking; influence exit retains drift. Influence changes preserve world position
 and rebase the view to radial up without resetting look direction. Interior
 re-entry clears the external influence. The runtime evaluates the shared world
 selector before and after movement so authoritative mode matches boundary crossing.
+
+## Shared vector primitives
+
+Compatible `f64` component arithmetic comes from the dependency-free
+`salimon-math` leaf crate. Normalization, frame and quaternion policies stay
+with their owning domain. See the canonical
+[decision and inventory](../../docs/technical-architecture.md#shared-math-decision-115).

@@ -1,6 +1,7 @@
 //! Compose physical carrying with character aim and release from hand height.
 use crate::mining::MiningTool;
 use salimon_character::{CharacterLocation, CharacterSnapshot, ShipFrame};
+use salimon_math::cross;
 use salimon_world::carrying::{WorldObjectId, aimed_fragment};
 use salimon_world::mining::MiningRay;
 use salimon_world::resources::{FragmentId, ResourceTransform};
@@ -144,14 +145,6 @@ pub(crate) fn sync_ship_fragments(tool: &mut MiningTool, frame: ShipFrame) {
             tool.session.move_loose(id, pose);
         }
     }
-}
-
-fn cross(a: [f64; 3], b: [f64; 3]) -> [f64; 3] {
-    [
-        a[1] * b[2] - a[2] * b[1],
-        a[2] * b[0] - a[0] * b[2],
-        a[0] * b[1] - a[1] * b[0],
-    ]
 }
 
 #[cfg(test)]

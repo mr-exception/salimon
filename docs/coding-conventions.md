@@ -30,6 +30,13 @@ or camera-relative frames on vectors/transforms. CPU absolute positions stay
 [coordinate contract](../client/world/coordinate-strategy.md) and
 [asset axes](../models/contracts.md), including Blender/runtime conversion.
 
+Use `salimon-math` for compatible `f64` component arithmetic in migrated
+consumers. Keep domain normalization thresholds/fallbacks and frame conversion
+with their owner. Do not replace `hypot`, overflow-safe renderer normalization,
+resource validation or quaternion policy with a superficially similar helper.
+The [shared math decision](technical-architecture.md#shared-math-decision-115)
+records compatible operations and intentional duplication.
+
 Keep identities stable across streaming, pickup and drop. Preserve explicit
 catalog and simulation iteration order; do not rely on hash-map iteration for
 deterministic results. State tolerances with their unit and reason (e.g. floating

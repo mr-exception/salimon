@@ -10,4 +10,5 @@ publish.workspace = true
 workspace = true
 
 [dependencies]
+salimon-math = { path = "../math" }
 salimon-world = { path = "../world" }

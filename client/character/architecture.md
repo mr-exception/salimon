@@ -1,5 +1,38 @@
 # Character Architecture
 
+## Internal ownership
+
+The crate root is a stable public facade; callers still import the same types,
+functions and constants from `salimon_character`. Internal modules introduce no
+new crate dependencies or native/platform types.
+
+| Source under `src/` | Responsibility |
+| --- | --- |
+| `state.rs` | Typed ship/surface frames, location/snapshot and private position state |
+| `input.rs` | Portable movement flags and normalized planar controls |
+| `controller/mod.rs` | Private mutable controller fields, default state, inspection and one-mode update dispatch |
+| `controller/interior.rs` | Ship-local walking/jumping and instant cockpit transitions |
+| `controller/doorway.rs` | Gate clearance/recovery and exact 250 ms gravity transition |
+| `controller/surface.rs` | Radial walking, shared yaw tangent basis and eye-height projection |
+| `controller/eva.rs` | Independent inherited drift, 3D assist, nearby-body influence and re-entry/contact |
+| `controller/camera.rs` | Mouse look and snapshots for all modes |
+| `layout.rs`, `collision.rs` | Shared authored dimensions/proxies and hull/fixture/appendage sweep/sliding |
+| `queries.rs` | Public ship-local floor placement and sight obstruction |
+| `math.rs` | Domain normalization fallback/threshold, rejection, interpolation and tangent selection |
+| `ship_anchors.rs`, `thruster_collision.rs` | Unmodified exporter-generated spatial contracts |
+
+Controller mode modules are children of the controller owner so private fields
+remain private. A private `Step` samples the existing input edge and environmental
+frames once per update; dispatch selects exactly one movement mode. It retains
+the original capped integration seconds and uncapped doorway elapsed duration.
+Tests live with mode/query/math owners; shared test-only frames and constructors
+live in `controller/test_support.rs`, and hull/appendage controller regressions
+live in `controller/collision_tests.rs`. Shared geometry remains independent of
+controller mutation so both traversal and placement/sight consume its proxies.
+
+## Movement and presentation
+
+
 The controller stores one portable position state: cockpit, ship-local interior,
 world-space doorway blend, or world-space surface. Ship-local positions move with
 the ship without copying ship simulation into this crate. Doorway and surface

@@ -61,3 +61,15 @@
     Only one selected solid body applies fixed radial gravity. Ship interior
     gravity owns the player after re-entry; body contact uses that selected
     surface and never a distant ship's nearest-body frame.
+
+## Implementation owners
+
+These numbered rules remain unchanged by the internal decomposition. Interior
+and cockpit rules are in `src/controller/interior.rs`; landed transitions and
+closure recovery are in `controller/doorway.rs`; surface rules and tangent/height
+projection are in `controller/surface.rs`; drift, assist and nearby-body rules
+are in `controller/eva.rs`. Look/snapshots live in `controller/camera.rs`.
+`src/layout.rs` and `collision.rs` supply shared geometry and sliding; `queries.rs`
+uses the same proxies for sight/placement. Mode regressions remain alongside
+owners, with hull/appendage integration coverage in `controller/collision_tests.rs`.
+See the [source ownership table](architecture.md#internal-ownership).

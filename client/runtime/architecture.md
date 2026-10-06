@@ -166,3 +166,10 @@ remains. Depletion hides the visual. The centered ±0.48 m baked cube uses unifo
 Identity, targeting, mining, mass, session persistence and streaming stay world-owned.
 Automation retains the legacy `visual` field as null and reports mesh/center/scale
 through `authored_visual`. See the [asset guide](../../models/assets/resources/iron-deposit-nodule/README.md).
+
+## Shared vector primitives
+
+Compatible `f64` component arithmetic comes from the dependency-free
+`salimon-math` leaf crate. Normalization, frame and quaternion policies stay
+with their owning domain. See the canonical
+[decision and inventory](../../docs/technical-architecture.md#shared-math-decision-115).

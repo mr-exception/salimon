@@ -17,6 +17,7 @@ dependencies; each crate's architecture/invariants defines its local contracts.
 | `client/runtime/` | Native lifecycle, input, clocks, domain composition, automation, resource presentation and cross-domain fragment contact simulation |
 | `client/world/` | Static six-body compressed catalog, `f64` coordinates/camera tour, resource contracts, generation, extraction/session deltas, fragments and one-object carrying |
 | `client/ship/` | Pose, cockpit authority, direct flight, uncancellable landing/takeoff, airlock interlocks and live telemetry |
+| `client/math/` | Dependency-free `f64` vector component arithmetic; no domain/frame ownership |
 | `client/character/` | Portable movement, collision, gravity, cockpit transitions and open-space/nearby-body EVA |
 | `client/renderer/` | GPU resources, GLB loading, sphere/ship/image pipelines, reverse-Z, instruments and measurements through renderer-neutral DTOs |
 | `client/diagnostics/` | Observational metrics, formatting and overlay rasterization |
@@ -58,6 +59,35 @@ management is implemented. Core energy is a bounded telemetry fixture.
   uncancellable assists. Changes must update owning invariants and tests.
 - Profile before optimizing or adding shared-memory coupling. Linux software
   rendering does not establish the reference Apple M1 iMac's hardware budget.
+
+## Shared math decision (#115)
+
+Adopt a narrow dependency-free `salimon-math` leaf crate, with only `add`, `sub`,
+`scale`, `dot`, `cross` and sum-of-squares `length` on `[f64; 3]`. Actual repeated
+code supports sharing these primitives; a generic vector/quaternion framework
+or shared frame/normalization policy would obscure existing domain contracts.
+
+| Inventory at this decision | Compatibility and action |
+| --- | --- |
+| character `src/lib.rs`; ship `src/lib.rs` | Identical add/sub/scale/dot/right-handed cross; import shared primitives. Ship's length has the same X/Y/Z sum-of-squares order and is imported under its existing name. |
+| runtime `fragment_physics.rs`; `carrying.rs` | Fragment component arithmetic/dot/cross/length has the same order and semantics; import it. Carrying imports the identical cross product. |
+| runtime `app.rs` | Subtract/dot/length also compatible, but leave this composition file outside the limited first migration. |
+| world `src/lib.rs`, `mining.rs`, `resource_fragments.rs` | Length/dot/cross are compatible candidates, left local for now to avoid extending the first migration into world ownership. `WorldPosition`, subtraction/rebasing and resource pose validation remain world-owned. |
+| world `resource_generation.rs` | Chained `hypot` length deliberately differs from naive sum of squares; retain overflow-safe deterministic generation math. |
+| character/ship/fragment normalization | Current magnitude cutoff is `> 1e-12`, but fallbacks belong to the caller (character/fragment +Y; ship caller-selected). Keep local functions and their exact comparison/arithmetic, including existing NaN/overflow behavior. Character rejection/interpolation/tangent selection stay local. |
+| ship quaternion helpers and `ShipPose::axes` | `[x,y,z,w]` local-to-world unit orientation, Hamilton composition, shortest-arc slerp and identity fallback. No identical second simulation implementation warrants sharing them. Keep in ship and test composition/handedness there. |
+| world `ResourceTransform::new` | Reject invalid/non-unit orientations, then canonicalize accepted rounding error (`1e-9` squared-norm tolerance); incompatible with ship's identity fallback. Keep validation in world. |
+| renderer `lib.rs`, `ship_mesh.rs`, `held_item.rs`, `resource_mesh.rs` | `f32` arithmetic, finite-input/scaled normalization, GPU matrix/quaternion axes and camera basis preparation have separate precision/layout contracts. Retain locally, including all subtract-before-cast paths. |
+| character/runtime ship frame conversion | Point translation and axis projection depend on environmental frame contracts. Keep with frame owners rather than adding generic frame types. |
+
+The first migration changes no public gameplay DTOs, normalization rules,
+arithmetic ordering, axes or coordinate conversion. Math adds no dependencies;
+character, ship and runtime depend on it, while world and renderer remain
+unchanged. Shared tests cover right-handed cross products, distant `f64`
+subtraction and IEEE edge behavior. Owning-crate tests cover normalization
+boundaries and quaternion composition alongside existing movement, landing,
+fragment/contact and renderer precision regressions. See
+[math maintenance](../client/math/README.ai.md).
 
 ## Authored asset boundary
 

@@ -2,6 +2,8 @@
 //! Spherical contacts bound the irregular display meshes without a physics engine.
 use std::time::Duration;
 
+use salimon_math::{add, cross, dot, length, scale, sub};
+
 use crate::mining::MiningTool;
 use salimon_character::{SHIP_FLOOR_HEIGHT_METERS, ShipFrame, ship_floor_placement};
 use salimon_world::resources::{FragmentId, ResourceTransform};
@@ -256,12 +258,7 @@ fn nearest_body(position: [f64; 3]) -> Option<Body> {
             radius: body.radius_meters,
         })
 }
-fn dot(a: [f64; 3], b: [f64; 3]) -> f64 {
-    a.iter().zip(b).map(|(x, y)| x * y).sum()
-}
-fn length(a: [f64; 3]) -> f64 {
-    dot(a, a).sqrt()
-}
+
 fn normalize(a: [f64; 3]) -> [f64; 3] {
     let len = length(a);
     if len > 1e-12 {
@@ -269,22 +266,6 @@ fn normalize(a: [f64; 3]) -> [f64; 3] {
     } else {
         [0.0, 1.0, 0.0]
     }
-}
-fn add(a: [f64; 3], b: [f64; 3]) -> [f64; 3] {
-    std::array::from_fn(|i| a[i] + b[i])
-}
-fn sub(a: [f64; 3], b: [f64; 3]) -> [f64; 3] {
-    std::array::from_fn(|i| a[i] - b[i])
-}
-fn scale(a: [f64; 3], s: f64) -> [f64; 3] {
-    a.map(|v| v * s)
-}
-fn cross(a: [f64; 3], b: [f64; 3]) -> [f64; 3] {
-    [
-        a[1] * b[2] - a[2] * b[1],
-        a[2] * b[0] - a[0] * b[2],
-        a[0] * b[1] - a[1] * b[0],
-    ]
 }
 
 #[cfg(test)]
@@ -314,6 +295,15 @@ mod tests {
         tool.session
             .extract(&mut deposit, Duration::from_secs_f64(mass / 2.0));
         tool
+    }
+
+    #[test]
+    fn fragment_normalization_keeps_radial_fallback_and_threshold() {
+        for vector in [[0.0; 3], [1.0e-12, 0.0, 0.0], [f64::NAN, 0.0, 0.0]] {
+            assert_eq!(normalize(vector), [0.0, 1.0, 0.0]);
+        }
+        assert_eq!(normalize([0.0, 0.0, 2.0e-12]), [0.0, 0.0, 1.0]);
+        assert!((length(normalize([3.0, 4.0, 0.0])) - 1.0).abs() < 1.0e-15);
     }
 
     #[test]

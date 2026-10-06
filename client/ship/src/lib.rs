@@ -6,6 +6,8 @@
 
 use std::time::Duration;
 
+use salimon_math::{add, cross, dot, length as vector_length, scale, sub};
+
 use salimon_world::{
     BodyRole, CELESTIAL_BODIES, CelestialBody, CelestialBodyId,
     LANDING_RANGE_ALTITUDE_RADIUS_FACTOR, PHASE_ZERO_REFERENCE_MAX_SPEED_METERS_PER_SECOND,
@@ -653,30 +655,6 @@ fn quaternion_slerp(start: [f64; 4], end: [f64; 4], amount: f64) -> [f64; 4] {
     }))
 }
 
-fn add(left: [f64; 3], right: [f64; 3]) -> [f64; 3] {
-    [left[0] + right[0], left[1] + right[1], left[2] + right[2]]
-}
-
-fn sub(left: [f64; 3], right: [f64; 3]) -> [f64; 3] {
-    [left[0] - right[0], left[1] - right[1], left[2] - right[2]]
-}
-
-fn scale(vector: [f64; 3], amount: f64) -> [f64; 3] {
-    vector.map(|value| value * amount)
-}
-
-fn dot(left: [f64; 3], right: [f64; 3]) -> f64 {
-    left.into_iter().zip(right).map(|(a, b)| a * b).sum()
-}
-
-fn cross(left: [f64; 3], right: [f64; 3]) -> [f64; 3] {
-    [
-        left[1] * right[2] - left[2] * right[1],
-        left[2] * right[0] - left[0] * right[2],
-        left[0] * right[1] - left[1] * right[0],
-    ]
-}
-
 fn normalize_or(vector: [f64; 3], fallback: [f64; 3]) -> [f64; 3] {
     let length = vector_length(vector);
     if length > 1.0e-12 {
@@ -727,10 +705,6 @@ fn approach(current: f64, target: f64, maximum_delta: f64) -> f64 {
     current + (target - current).clamp(-maximum_delta, maximum_delta)
 }
 
-fn vector_length(vector: [f64; 3]) -> f64 {
-    vector.iter().map(|value| value * value).sum::<f64>().sqrt()
-}
-
 fn axis_angle_quaternion(axis: [f64; 3], angle: f64) -> [f64; 4] {
     let half = angle * 0.5;
     let sine = half.sin();
@@ -764,6 +738,39 @@ fn normalized_quaternion(quaternion: [f64; 4]) -> [f64; 4] {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn local_quaternion_composition_preserves_right_handed_axes() {
+        let yaw = axis_angle_quaternion([0.0, 1.0, 0.0], std::f64::consts::FRAC_PI_2);
+        let roll = axis_angle_quaternion([1.0, 0.0, 0.0], std::f64::consts::FRAC_PI_2);
+        let pose = ShipPose {
+            position_meters: [0.0; 3],
+            orientation: normalized_quaternion(quaternion_multiply(yaw, roll)),
+        };
+        let [forward, up, port] = pose.axes();
+        for (actual, expected) in [
+            (forward, [0.0, 0.0, -1.0]),
+            (up, [1.0, 0.0, 0.0]),
+            (port, [0.0, -1.0, 0.0]),
+        ] {
+            assert!(vector_length(sub(actual, expected)) < 1.0e-15);
+        }
+        assert!(vector_length(sub(cross(forward, up), port)) < 1.0e-15);
+        let identity = [0.0, 0.0, 0.0, 1.0];
+        for invalid in [
+            [0.0; 4],
+            [1.0e-12, 0.0, 0.0, 0.0],
+            [f64::NAN; 4],
+            [f64::INFINITY; 4],
+        ] {
+            assert_eq!(normalized_quaternion(invalid), identity);
+        }
+        assert_eq!(normalized_quaternion([0.0, 0.0, 0.0, 2.0]), identity);
+        assert_eq!(
+            normalize_or([1.0e-12, 0.0, 0.0], [0.0, 1.0, 0.0]),
+            [0.0, 1.0, 0.0]
+        );
+    }
 
     #[test]
     fn default_ship_is_landed_on_earth_with_closed_door() {

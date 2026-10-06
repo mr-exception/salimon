@@ -32,3 +32,10 @@ Snapshot velocity reflects direct flight or the analytic derivative of the activ
 assist segment, including zero during alignment and at rest. The ship
 combines that velocity with world-owned surface-distance/radial helpers to report
 the nearest of all six catalog bodies within an inclusive 3,000,000 m range.
+
+## Shared vector primitives
+
+Compatible `f64` component arithmetic comes from the dependency-free
+`salimon-math` leaf crate. Normalization, frame and quaternion policies stay
+with their owning domain. See the canonical
+[decision and inventory](../../docs/technical-architecture.md#shared-math-decision-115).

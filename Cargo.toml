@@ -2,6 +2,7 @@
 members = [
     "client/character",
     "client/diagnostics",
+    "client/math",
     "client/renderer",
     "client/runtime",
     "client/ship",

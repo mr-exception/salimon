@@ -24,8 +24,17 @@ outbound dependencies are `salimon-character`, `salimon-ship`, `salimon-world`,
 
 Do not add GPU pipelines/resources, authoritative world or ship state, backend
 behavior, persistence, or networking here. Keep new platform-specific behavior
-small and plan extraction to `client/platform/` when reusable adapters become
-necessary.
+small in `app/native.rs`. Introduce a separate platform boundary only when a
+real second implementation requires it.
+
+## Source routing
+
+Start in `app.rs` for lifecycle, recovery, update order or automation dispatch.
+Use its private `app/input.rs`, `interaction.rs`, `frames.rs`, `scene.rs`,
+`diagnostics.rs` and `native.rs` for the corresponding translation helpers and
+local regression tests. See the [module ownership table](architecture.md#internal-composition-modules).
+Keep cross-domain update sequencing visible in `app.rs`; a helper extraction must
+not reorder it or move domain rules into runtime mapping.
 
 ## Change checklist
 

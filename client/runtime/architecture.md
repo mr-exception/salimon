@@ -23,6 +23,33 @@ world, physics, diagnostics, and renderer. Supporting crates never call into run
 renderer and diagnostics do not depend on behavior domains. Runtime mapping
 prevents portable types from acquiring `wgpu` or `winit` dependencies.
 
+## Internal composition modules
+
+`src/app.rs` owns `ClientApplication`, the `ApplicationHandler` lifecycle,
+renderer recovery/redraw scheduling, automation dispatch and gameplay update
+ordering. Its private `src/app/` modules hold cohesive translation helpers:
+
+| Module | Responsibility |
+| --- | --- |
+| `input.rs` | Physical-key commands, initial-press/repeat gates and held movement/steering state |
+| `interaction.rs` | Ship-local cockpit/door targeting, interior authority gate and contextual text selection |
+| `frames.rs` | Ship/surface frame adapters and nearby solid-body selection |
+| `scene.rs` | World spheres/markers/light and live ship instrument DTO mapping; absolute `f64` positions stay intact |
+| `diagnostics.rs` | Body distances, gameplay/tour metrics, presented-frame measurements and metric log formatting |
+| `native.rs` | Window attributes, drawable size and cursor grab/release operations |
+
+These are internal composition helpers, not new domain or platform interfaces.
+Pure helper regressions live beside their owners. Existing crate-visible frame
+helpers remain available through `app` for automation/carrying consumers; domain
+and renderer DTOs are unchanged. Renderer and diagnostic maps observe snapshots
+without advancing controllers or taking ownership of authoritative state.
+
+`advance_game` stays in `app.rs`: preserve ship/character/camera advancement,
+nearby surface updates, mining, carried-object synchronization and loose-fragment
+stepping in their existing order. Redraw maps snapshots after those updates and
+records diagnostics only after a successful presentation. Automation continues
+to run on the native event thread with explicit fixed steps and production gates.
+
 ## Lifecycle flow
 
 1. On resume, create the native window and initialize its renderer when needed.

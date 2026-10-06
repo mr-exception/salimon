@@ -10,7 +10,7 @@ Keep internal modules and functions focused on one responsibility. Split when
 independent responsibilities obscure ownership or require unrelated context;
 there is no arbitrary line-count limit. Large inline test modules alone do not
 justify a rewrite. The source map identifies responsibilities in the broad
-character/ship `lib.rs` and runtime `app.rs` files.
+character/ship `lib.rs` files and runtime `app.rs` orchestration/private helpers.
 
 Public contracts use typed commands, snapshots and validated domain values.
 Runtime owns composition, platform input and cross-domain sequencing; domains

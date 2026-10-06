@@ -1,0 +1,63 @@
+{
+  "$schema": "../../../asset-manifest.schema.json",
+  "schemaVersion": 1,
+  "assetId": "resource.iron-deposit-nodule",
+  "category": "resources",
+  "source": "models/assets/resources/iron-deposit-nodule/source.blend",
+  "runtime": "client/assets/resources/iron-deposit-nodule/model.glb",
+  "coordinates": {
+    "units": "meters",
+    "source": {
+      "up": "+Z",
+      "forward": "+X",
+      "unitScale": 1
+    },
+    "runtime": {
+      "up": "+Y",
+      "forward": "+X"
+    },
+    "conversion": "x,z,-y",
+    "pivot": "Center of authoritative unit bounding cube; geometry inside [-0.48, 0.48] meters"
+  },
+  "profile": "standard-v1",
+  "budgets": {
+    "maxTriangles": 240,
+    "maxPrimitives": 3,
+    "maxMaterials": 3,
+    "maxTextureBytes": 1,
+    "maxGlbBytes": 32768
+  },
+  "collision": {
+    "policy": "none"
+  },
+  "contracts": {
+    "root": "ASSET_iron-deposit-nodule",
+    "visualGroups": [
+      "Visual"
+    ],
+    "groups": [
+      "Visual"
+    ],
+    "nodes": [
+      "Iron_Deposit"
+    ],
+    "materials": [
+      "Iron_Ore",
+      "Iron_Inclusions",
+      "Oxide_Crust"
+    ],
+    "sockets": [],
+    "markers": [],
+    "colliders": [],
+    "requiredExtras": [
+      {
+        "node": "ASSET_iron-deposit-nodule",
+        "path": "salimon.assetId"
+      },
+      {
+        "node": "Iron_Deposit",
+        "path": "salimon.role"
+      }
+    ]
+  }
+}

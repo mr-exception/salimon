@@ -376,9 +376,6 @@
       }
     },
     {
-      "screenshot": "generated-silicate-deposit"
-    },
-    {
       "assert": {
         "path": "world.deposits_by_id.Earth:1529931109935973032.visual",
         "equals": null
@@ -412,6 +409,102 @@
       "assert": {
         "path": "world.deposits_by_id.Earth:8530470202720685190.authored_visual.mesh",
         "equals": "IronDepositLedge"
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": -652.6430654406413,
+        "dy": -250.0095168197738
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 305
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 0.4348432130031231,
+        "dy": 275.0394272451786
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "equip_mining_tool",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "equip_mining_tool",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "mine",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 100
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.active",
+        "equals": true
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.extracted_mass_kg",
+        "approx": 3.2,
+        "tolerance": 1e-08
+      }
+    },
+    {
+      "assert": {
+        "path": "world.deposits_by_id.Earth:18012929353344056861.authored_visual.mesh",
+        "equals": "IronDepositVein"
+      }
+    },
+    {
+      "screenshot": "iron-mining"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "mine",
+        "pressed": false
       }
     }
   ]

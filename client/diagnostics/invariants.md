@@ -12,7 +12,7 @@
 5. CPU render timing and GPU execution timing remain separately labeled. GPU
    unsupported, pending, and measured states are never conflated.
 6. Missing, non-finite, negative distance/speed, empty camera phase, or
-   out-of-range thruster values render as `N/A`; valid Task 5 body rows preserve
+   out-of-range thruster values render as `N/A`; valid body rows preserve
    producer-supplied names and nonnegative camera-to-surface distances.
    Diagnostics never creates authoritative gameplay values or labels camera
    state as player/ship state.

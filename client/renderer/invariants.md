@@ -44,7 +44,7 @@
 17. Cockpit glass is the ship's only blended material. It renders after opaque
     ship geometry with reverse-Z depth testing and no depth writes, shadows, or
     post effects, preserving exterior visibility from either side.
-18. Ship vertices use the Task 10 scale baked into the checked-in GLB; the open
+18. Ship vertices use the authored scale baked into the checked-in GLB; the open
     door offset is 4.50 m and no compensating runtime mesh scale is applied.
 
 19. Cockpit instruments consume only renderer-facing speed/power, Core-energy,

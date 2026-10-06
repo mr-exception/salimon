@@ -1,6 +1,6 @@
 # Character
 
-`salimon-character` owns the portable Phase 0 first-person controller. It starts
+`salimon-character` owns the portable first-person controller. It starts
 at the redesigned ship's player-start contract inside the landed ship, consumes typed
 WASD/jump/mouse-look input, applies the shared 9.81 m/s² gravity strength, and
 produces a renderer-neutral camera snapshot.
@@ -15,7 +15,8 @@ window sills, and rear window bulkheads. Jumping keeps the player's head below
 the ceiling lights and the lower door lintel. The aft transition is restricted to the actual
 2.80 m doorway, and a closed doorway remains solid. An
 open landed doorway begins an exact 0.25-second up-vector blend before the
-controller changes to Earth-radial surface walking. Doorway movement retains
+controller changes to radial surface walking around the active solid body
+supplied by `SurfaceFrame`. Doorway movement retains
 the interior's camera-relative WASD directions, including strafing. Re-entry
 requires actual movement toward the cabin, independent of the pressed key.
 Outside walkers collide with a conservative cabin/nose envelope, including the
@@ -43,8 +44,8 @@ continues to X `7.85 m`, with body centers through X `7.61 m` and within
 remains a contextual transition.
 
 Cockpit entry and exit are instant. The default seated view is slightly pitched
-down while retaining a clear forward sightline through the Task 9 glazing; mouse
-look remains independent and unrestricted. This crate does not decide whether
+down while retaining a clear forward sightline through the authored cockpit
+glazing; mouse look remains independent and unrestricted. This crate does not decide whether
 the ship is landed, whether the door may open, or how ship motion changes; the
 runtime passes those facts through `ShipFrame`/`SurfaceFrame` DTOs.
 

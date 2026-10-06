@@ -27,8 +27,9 @@ door, and radial surface traversal.
 
 The [project documents](docs/README.md) and
 [GitHub issues](https://github.com/mr-exception/salimon/issues) are the source of
-truth. Start with the [Phase 0 specification](docs/phase-0-technical-feasibility.md)
-and [technical architecture](docs/technical-architecture.md). Check an issue's
+truth. Start with the [current scope](docs/project-phases.md),
+[technical architecture](docs/technical-architecture.md), and the active issue's
+linked contracts. Check an issue's
 **Blocked by** section before work. [AGENTS.md](AGENTS.md) describes the
 contributor workflow. The checked-in [Phase 0 evaluation](docs/phase-0-evaluation.md)
 records the go-with-revisions decision, benchmark evidence, limitations, and
@@ -42,7 +43,7 @@ salimon/
 ├── Cargo.lock          # Committed dependency resolution
 ├── models/            # Offline 3D authoring workspace and shared contracts
 ├── core/
-│   └── README.md       # Future backend boundary; no Phase 0 implementation
+│   └── README.md       # Future backend boundary; no backend implementation
 └── client/
     ├── runtime/        # salimon-client lifecycle and composition executable
     ├── math/           # Dependency-free shared f64 component arithmetic
@@ -91,9 +92,11 @@ is never required by normal client builds.
 `rust-toolchain.toml` selects stable Rust and the formatting/linting components.
 The workspace uses Rust 2024 and requires Rust 1.89 or newer. The stable channel
 is intentionally not an exact compiler pin; record compiler versions when
-reporting validation or performance. Task 2 was verified with Rust/Cargo 1.89.0
-on native Apple Silicon macOS (`aarch64-apple-darwin`). Intel macOS is not yet
-verified. The first build may need network access to download the locked `winit`
+reporting validation or performance. The dated
+[reference evaluation](docs/phase-0-evaluation.md) records Rust/Cargo 1.89.0
+on native Apple Silicon macOS (`aarch64-apple-darwin`); it does not certify
+other machines or current revisions. The first build may need network access to
+download the locked `winit`
 and `wgpu` dependency graph. Running the client needs no external account connection.
 
 ## Build and run
@@ -117,7 +120,7 @@ cargo run --locked -p salimon-client
 ```
 
 The run command opens the **Salimon — Compressed Solar System** native window at
-the Phase 0 benchmark's physical 1920×1080 drawable size and continues until the
+a requested physical 1920×1080 drawable size and continues until the
 window is closed. It captures the cursor for mouse look and starts inside the
 landed ship facing the cockpit. Use **WASD** to walk, the mouse to look, and
 **Space** to jump. During open-space EVA, **WASD** translates relative to the
@@ -130,8 +133,8 @@ within 4 m and hold **F** or left mouse to extract at 2 kg/s. Press M to stow.
 Aim at a physical fragment within 3 m and press **E** to pick it up. You can
 carry one world object at a time; equipped gear remains separate. Press **E**
 again to release it from your hand. Gravity and contact make fragments fall and pile up.
-Face the open door and walk forward through it to transition over 0.25 seconds to Earth-radial
-gravity and inspect the ship exterior. There is no sprint or crouch. Press
+Face the open door and walk forward through it to transition over 0.25 seconds
+to the active solid body's radial gravity and inspect the ship exterior. There is no sprint or crouch. Press
 **Escape** to release the captured cursor for window controls; click the game
 view to capture it again.
 
@@ -158,7 +161,7 @@ be collected. The view includes FPS/frame time, real world-update and
 CPU-side render time, GPU pass time when timestamp queries are supported, scene
 and total draw/object counts, optional GPU allocator totals, camera
 position/altitude/transition state, and memory-pressure warnings. Rows for
-player/ship position and ship velocity/speed/thruster report live Task 11
+player/ship position and ship velocity/speed/thruster report live domain
 snapshots in gameplay view. The nearby-body row reports the closest
 of six nonnegative camera-to-surface observations.
 
@@ -237,10 +240,14 @@ automated tests:
 10. Close the window, launch the client again, and confirm both shutdown and
    relaunch are clean.
 
-During the Task 14 benchmark at fixed 1920×1080 on the reference Apple M1 iMac,
-enable F3 and confirm the overlay never reports below 60 FPS. Record that
-machine-specific evidence in the GitHub issue before treating the performance
-criterion as manually verified.
+For performance evaluation, use a release build at fixed 1920×1080 on the
+reference Apple M1 iMac and enable F3. Record FPS, average/p95 presented-frame
+intervals, CPU/GPU timings, scenario, drawable size, machine, and revision in
+the task report. The overlay reports rolling statistics and cannot prove a
+per-frame 60 FPS floor. The dated [Phase 0 evaluation](docs/phase-0-evaluation.md)
+did not establish that strict historical target; the smoke check validates
+behavior, while performance claims require evidence for the measured revision.
+See [validation policy](docs/validation.md#native-graphical-gates).
 
 ## Development workflow
 
@@ -250,7 +257,7 @@ the [validation matrix](docs/validation.md), including Python/model checks.
 Store task outcomes and applicable images in [reports/](reports/README.md).
 
 Read the current GitHub issue and its linked specifications before changing
-behavior. Keep all Phase 0 implementation under `client/`; leave `core/` as a
+behavior. Keep current client implementation under `client/`; leave `core/` as a
 documentation-only boundary.
 
 ```sh
@@ -262,11 +269,11 @@ cargo test --workspace --locked
 Use `cargo fmt --all` to apply formatting. Automated tests cover logic that does
 not require a live native surface; the native launch, drawing, overlay toggle,
 resize, minimize, restore, and close behavior still require the smoke check
-above. Task 6 adds textured sphere presentation, Sun lighting, and per-body
-inspection. [Sphere rendering](client/renderer/sphere-rendering.md) records the
+above. The renderer provides textured sphere presentation, Sun lighting, and
+per-body inspection. [Sphere rendering](client/renderer/sphere-rendering.md) records the
 precision technique, LOD budget, material source, and future terrain path.
-Task 11 loads Task 7's GLB through a renderer-owned mesh path and keeps behavior in
-separate character/ship crates. Validate and regenerate its model using the
+The runtime loads the authored scout GLB through a renderer-owned mesh path and
+keeps behavior in separate character/ship crates. Validate and regenerate its model using the
 commands in the [ship asset documentation](client/assets/ship/README.md).
 Mining, carrying, fragment motion/contact, ship flight and assisted landing,
 airlock access, and EVA are implemented. Modified deposits and physical fragments

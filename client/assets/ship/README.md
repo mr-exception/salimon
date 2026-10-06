@@ -1,4 +1,4 @@
-# Salimon Phase 0 Scout
+# Salimon Scout
 
 A custom, editable scout with a broad living cabin, ivory armor, graphite
 structure, copper seams, layered wing plates and paired aft ion thrusters. The
@@ -24,7 +24,7 @@ locking indicators, service vents and a charge gauge. Its stepped pedestal and
 housing fit the existing 2 × 2 m collision footprint, preserving the two broad
 walking routes around it. This follows
 Notion's Core definition: the vast storage battery and recoverable heart of the
-ship. Phase 0 adds a bounded live stored/capacity telemetry fixture for the
+ship. The runtime supplies a bounded live stored/capacity telemetry fixture for the
 monitors, but no consumption, generation, damage, fuel, repair, or production
 energy simulation.
 
@@ -52,8 +52,8 @@ cross-sections instead of dense smoothing or displacement.
 The dedicated port cargo room and its protruding hull have been removed from the
 current scout. Loose fragments may still rest on clear main-cabin deck space and
 move with the ship. The ship does not define a dedicated cargo storage volume or
-cargo-room membership count. The historical [issue #34 evidence](../../../reports/issue-34/README.md)
-documents the earlier layout, not the current asset.
+cargo-room membership count. The historical [cargo-room issue #34](https://github.com/mr-exception/salimon/issues/34)
+describes the earlier layout, not the current asset.
 
 ## Cockpit glazing and nose
 
@@ -75,8 +75,8 @@ within 6,000 triangles, 120 primitives, 13 materials and the 512 KiB GLB budget.
 
 The native visual scenario follows free-look, assisted landing, low-altitude
 approach, landed inspection, takeoff and cockpit exit. See
-[issue #38 evidence](../../../reports/issue-38/README.md) for historical lower-window
-screenshots and authoritative state/logs; recheck these views after nose edits.
+[issue #111 evidence](../../../reports/issue-111/README.md) for dated lower-window
+screenshots and state/logs; recheck these views after nose edits.
 
 ## Source and regeneration
 
@@ -206,5 +206,8 @@ following the side route into the cockpit nose, inspecting seated downward views
 jumping, and walking outside to inspect both nozzles and the streamlined
 silhouette without a cargo module. Also run
 the normal Solar System/resize/minimize/relaunch checks from the root README.
-The fixed 1920×1080 60 FPS acceptance check still requires the reference Apple
-M1 iMac; asset complexity alone does not establish that result.
+Reference performance measurements require an optimized build at fixed
+1920×1080 on the Apple M1 iMac, with machine/revision and frame-pacing evidence
+recorded under the [validation policy](../../../docs/validation.md#native-graphical-gates).
+The dated [Phase 0 evaluation](../../../docs/phase-0-evaluation.md) did not prove
+a strict 60 FPS floor; asset complexity alone establishes no performance result.

@@ -1,4 +1,4 @@
-# Phase 0 Coordinate Strategy
+# Coordinate Strategy
 
 ## Strategy
 
@@ -41,7 +41,7 @@ collapses that offset to zero. The prototype budget therefore permits less than
 1 mm global anchor spacing, no more than 8 m scalar spacing at the far endpoint,
 and less than 0.01 mm scalar spacing at the near endpoint.
 
-The former Task 5 radius-scaled Earth cuboid proxy exposed a GPU reconstruction
+The former radius-scaled Earth cuboid proxy exposed a GPU reconstruction
 limit. Its near face is formed in the vertex shader by combining a
 camera-relative center and half-extent near `6 Mm`. `f32` values at that
 magnitude have `0.5 m` spacing, so the reconstructed face can carry up to about
@@ -49,8 +49,8 @@ magnitude have `0.5 m` spacing, so the reconstructed face can carry up to about
 nearby markers: their centers remain near the camera and use the much finer
 spacing represented by the near endpoint row above.
 
-Task 6 retains those numeric tests as evidence of the failure mode, and replaces
-body proxies with analytic spheres. CPU `f64` camera-to-surface altitude feeds a
+The numeric tests retain evidence of that historical failure mode. Current
+body presentation uses analytic spheres. CPU `f64` camera-to-surface altitude feeds a
 rationalized GPU ray-intersection root, preserving near-surface depth without
 large `f32` subtraction. [Sphere rendering](../renderer/sphere-rendering.md)
 documents the method, regression envelope, local material coordinates, and
@@ -73,13 +73,13 @@ meter detail there.
   the retained numeric Earth-proxy regression demonstrates that failure mode.
 - Uniform world scaling alone would not improve physical precision, so this
   prototype keeps meters explicit rather than hiding precision loss in units.
-- The six Task 6 spheres are presentation surfaces, not production terrain or
+- The six analytic spheres are presentation surfaces, not production terrain or
   gameplay physics. Analytic geometry has no elevation or terrain patches.
 - The three meter-scale cuboids are noncanonical precision markers and remain
   separate from the body catalog.
 - Large meshes spanning multiple local regions will eventually need chunk-local
   anchors or high/low GPU position encoding. Renderer-side per-instance CPU
-  rebasing is enough for the small Phase 0 validation set, not a shipping scene.
+  rebasing is enough for the small prototype validation set, not a shipping scene.
 - Reversed-Z improves useful depth distribution and removes a finite far clip;
   it cannot distinguish exactly coplanar surfaces or compensate for poorly
   chosen near geometry. Visual GPU limitations must be recorded by the runtime

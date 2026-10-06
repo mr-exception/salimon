@@ -20,7 +20,8 @@ CI uses Python 3.12. Initial installation/builds require network access.
 | Native debug staging | `python scripts/build_game.py --profile debug --output artifacts/build/debug` | Builds for host and writes build metadata |
 | Native release staging | `python scripts/build_game.py --profile release --output artifacts/build/release` | Optimized host executable; not a signed app/installer |
 
-For focused iteration use `cargo test -p salimon-world --locked`,
+For focused iteration use `cargo test -p salimon-math --locked`,
+`cargo test -p salimon-world --locked`,
 `cargo test -p salimon-character --locked`, `cargo test -p salimon-physics --locked`, `cargo test -p salimon-ship --locked`,
 `cargo test -p salimon-renderer --locked`, `cargo test -p salimon-diagnostics --locked`
 or `cargo test -p salimon-client --locked` for the affected owner; broaden to
@@ -91,7 +92,11 @@ it does not establish macOS Metal/Windows hardware fidelity or performance.
 Use the root [native smoke check](../README.md#native-smoke-check) for gameplay,
 F2 precision, F3 telemetry, resize, minimize/restore, close and relaunch. Record
 reference Apple M1 iMac 1920×1080 performance separately; no substitute machine
-can establish its 60 FPS acceptance evidence.
+can establish reference-machine performance. Record rolling FPS, average/p95
+presented-frame intervals and CPU/GPU timings with machine, scenario, drawable
+size and revision. Rolling diagnostics cannot prove a per-frame 60 FPS floor;
+the dated [Phase 0 evaluation](phase-0-evaluation.md) did not prove that strict
+historical target. Native smoke checks do not certify performance.
 
 ## Reporting
 

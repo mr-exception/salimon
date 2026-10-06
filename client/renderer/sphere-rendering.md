@@ -1,6 +1,6 @@
 # Scalable sphere presentation
 
-Task 6 uses analytic spheres. Each retained sphere draws a six-vertex screen
+The renderer uses analytic spheres. Each retained sphere draws a six-vertex screen
 rectangle; fragments solve a ray/sphere intersection, sample body-local material,
 and write the actual surface's reverse-Z depth. This produces a continuous curved
 silhouette from distant space to the 12 m inspection point without tessellation
@@ -65,7 +65,10 @@ and the optional overlay adds one. Object counts mean retained bounds, not exact
 occlusion visibility. Cost scales with covered pixels rather than sphere radius.
 Fragment depth and discarded silhouette fragments can limit early-depth
 optimizations; profile overlapping large bodies before increasing scene size.
-Task 14 must establish the reference Apple M1 iMac fixed-1080p performance target.
+Record reference Apple M1 iMac fixed-1080p performance evidence for the measured
+revision under the [validation policy](../../docs/validation.md#native-graphical-gates).
+The dated [Phase 0 evaluation](../../docs/phase-0-evaluation.md) did not establish
+a strict 60 FPS floor.
 
 ## Future higher-detail terrain
 

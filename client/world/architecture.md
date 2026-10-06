@@ -6,8 +6,8 @@ The `resources` module owns the [planetary resource contracts](resource-contract
 stable material/entity identities, SI mass/volume properties, bounded deposit
 state, and physical fragment poses. It has no rendering or backend dependencies.
 
-`salimon-world` owns portable absolute coordinates, the immutable Task 5 body
-catalog and geometry helpers, the deterministic Task 4 camera tour, three
+`salimon-world` owns portable absolute coordinates, the immutable six-body
+catalog and geometry helpers, the deterministic engineering camera tour, three
 noncanonical precision markers, and numeric precision reporting. It does not own
 platform input, frame scheduling, GPU buffers, projection matrices, depth
 textures, presentation policy, orbital simulation, or backend behavior.
@@ -55,7 +55,7 @@ presentation. No renderer types, input events, or abstract inventory enter world
 `resource_fragments` receives the actual extracted mass inside `MiningSession`
 and owns physical output, stable session IDs, bounded pieces, and deterministic
 surface placement. Fragment queries are read-only and independent of deposit
-streaming. Runtime maps these domain objects into nearby inspection and cuboids.
+streaming. Runtime maps these domain objects into nearby inspection and authored mesh DTOs.
 
 ## Carrying and session lifetime
 

@@ -17,8 +17,8 @@ world/domain state --/                               -> OverlayImage
 The runtime owns input, lifecycle, redraw scheduling, and measurement cadence.
 The renderer owns GPU timestamps, allocator reports, render counters, texture
 upload, and blending. `salimon-world` owns the current camera prototype and
-static six-body catalog; future domain modules own player, ship, and production
-simulation state. Diagnostics borrows
+static six-body catalog; character and ship own current player/ship state, while
+world and physics own resource and physical-object rules. Diagnostics borrows
 those values for one call and stores only a formatted snapshot; it never
 receives raw platform events or GPU/domain resources.
 
@@ -42,10 +42,10 @@ receives raw platform events or GPU/domain resources.
 
 GPU timing is a three-state value because timestamp queries are optional and
 readback is asynchronous. Memory and domain fields are optional because platform
-support and Phase 0 systems arrive incrementally. Task 5 supplies six catalog
-camera-to-nominal-surface observations, from which diagnostics displays the
-closest. Task 4 camera telemetry remains named separately from future player and
-ship positions so an engineering camera is never presented as gameplay state.
+support varies. Runtime supplies six catalog camera-to-nominal-surface
+observations, from which diagnostics displays the closest. Engineering camera
+telemetry remains named separately from live player and ship positions so an
+engineering camera is never presented as gameplay state.
 The formatted panel states gaps explicitly instead of treating zero as missing
 or fabricating sample data.
 

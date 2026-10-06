@@ -9,7 +9,7 @@ exposes renderer-owned measurements.
 
 ## Read before changing
 
-1. Fetch the active Notion task, Phase 0 specification, and technical
+1. Fetch the active GitHub issue, affected project specification, and technical
    architecture as required by the root [AGENTS.md](../../AGENTS.md).
 2. Read [architecture.md](architecture.md) and [invariants.md](invariants.md).
 3. Read the runtime's [maintenance guide](../runtime/README.ai.md) before changing

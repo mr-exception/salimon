@@ -1,8 +1,10 @@
 # Salimon
 
 Salimon is a space exploration game built around a custom Rust runtime. The
-current milestone is **Phase 0 — Technical Feasibility Showcase**: a native macOS,
-client-only prototype using a custom `wgpu` renderer. Native build scripts target
+current implementation extends the **Phase 0 — Technical Feasibility Showcase**
+with mining, physical fragments, carrying and EVA: a native-first, client-only
+prototype using a custom `wgpu` renderer. See [current scope](docs/project-phases.md).
+Native build scripts target
 macOS, Windows, and Debian-based Linux; web remains a later target. The reference performance machine is an Apple M1 iMac
 (`iMac21,1`, model `Z12X002L9GR/A`) with 8 CPU cores, 8 integrated GPU cores,
 and 16 GB unified memory.
@@ -16,7 +18,7 @@ surface distance plus approaching/receding/zero radial speed. Routes on both sid
 let the player walk past the console into the cockpit nose. Loose fragments can
 be dropped on the cabin deck and pile up; the separate cargo module is removed. See
 the [ship asset guide](client/assets/ship/README.md).
-The native client starts inside the custom Task 7
+The native client starts inside the custom
 Salimon scout landed on Earth, with portable character/ship state, runtime-loaded
 GLB geometry, walking, free mouse look, jumping, cockpit interaction, a landed/open-space
 door, and radial surface traversal.
@@ -43,6 +45,8 @@ salimon/
 │   └── README.md       # Future backend boundary; no Phase 0 implementation
 └── client/
     ├── runtime/        # salimon-client lifecycle and composition executable
+    ├── math/           # Dependency-free shared f64 component arithmetic
+    ├── physics/        # Portable fragment motion/contact rules
     ├── renderer/       # salimon-renderer GPU library and presentation
     ├── world/          # Catalog, coordinates, resource generation, mining and carrying
     ├── character/      # Portable first-person movement and gravity transitions
@@ -53,7 +57,7 @@ salimon/
 ```
 
 `client/runtime/`, `client/renderer/`, `client/world/`, `client/character/`,
-`client/ship/`, and `client/diagnostics/` are Cargo packages. World owns portable coordinate
+`client/ship/`, `client/math/`, `client/physics/` and `client/diagnostics/` are Cargo packages. World owns portable coordinate
 and camera state; the runtime drives native lifecycle and maps typed snapshots;
 diagnostics aggregates and rasterizes the engineering view; the renderer owns
 camera-relative GPU conversion, reverse-Z depth, `wgpu` resources, and

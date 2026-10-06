@@ -3,6 +3,15 @@
 > Migrated from the Salimon project documents on 2026-09-29. For current task status and dependencies, use [GitHub issues](https://github.com/mr-exception/salimon/issues).
 
 > **Salimon** is a realistic, native-first 3D space exploration and survival game set in a persistent shared universe. The player lives physically inside an evolving spaceship, travels across real and fictional space, gathers and processes resources, survives harsh environments, meets autonomous AI-driven NPCs and other players, and works toward the distant mystery of **Absenat**.
+## Current delivery status
+
+The shared universe and survival pillars below describe the long-term vision.
+Today the playable application is a native, client-only Rust + `winit` + `wgpu`
+prototype with navigation, walking/EVA, mining, carrying and fragment physics.
+Native builds target macOS, Windows and Debian-based Linux; macOS remains the
+reference playable/performance target. Web/WASM portability, backend persistence
+and networking are future capabilities. See [Project Phases](project-phases.md).
+
 ## Narrative premise
 An unknown entity teleports an object to Earth every 18 hours. Humanity calls it **the Core**: a battery capable of storing extremely large amounts of electrical energy for effectively unlimited time, solving Earth's energy crisis.
 Whenever a Core appears, the entity leaves the same message:
@@ -24,7 +33,7 @@ Typical quests may involve transporting items, traveling to remote locations, fi
 - **Living AI world:** NPCs are autonomous actors backed by AI models, with globally shared memory and world state across players. NPC actions, relationships, quests, alliances, hostility, factions, trading, and movement affect one common world.
 - **Persistent shared multiplayer:** players encounter one another naturally in the universe, can walk into each other's ships, cooperate or fight, and remain where they physically are even after disconnect/reconnect.
 - **Mystery and exploration:** Salimon should continually suggest that the universe contains unknown history, unexplained entities, anomalies, rare discoveries, and paths toward Absenat.
-- **macOS-native first:** the first playable client targets macOS, with the architecture remaining platform-independent so Windows and web clients can reuse the same domain modules and backend.
+- **Native-first delivery:** macOS is the reference playable/performance target; native build scripts also target Windows and Debian-based Linux. Portable Rust domains preserve future web/WASM and server reuse without requiring a browser host or backend today.
 ## Distinctive identity
 Salimon should differentiate itself through the combination of:
 - a physically believable, extremely large shared universe;
@@ -33,7 +42,7 @@ Salimon should differentiate itself through the combination of:
 - physical rather than abstract cargo and resource handling;
 - autonomous AI-backed NPCs with globally shared memory and consequences;
 - persistent multiplayer where everyone inhabits the same evolving world;
-- a custom low-level runtime with no full game engine, initially optimized for native macOS while preserving future Windows and web portability.
+- a custom low-level runtime with no full game engine, optimized for native desktop delivery while preserving future web/WASM portability.
 ## Development principle
 The project is delivered through **small, reachable phases**. Each phase must produce a player-visible result, remain narrow enough for autonomous AI implementation and validation, and preserve the long-term architecture rather than creating disposable prototypes.
 ## Confirmed story and progression decisions

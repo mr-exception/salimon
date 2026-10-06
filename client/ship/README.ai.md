@@ -10,7 +10,7 @@ surface normals, uncancellable automatic completion, door-interlocked takeoff,
 cockpit exit, monitor-message routing, direct-speed continuation, steering, and
 collision correction with unit tests.
 
-Each timed assist captures each assist's starting pose and radial waypoints, then evaluates
+Each timed assist captures its starting pose and radial waypoints, then evaluates
 the path from elapsed `Duration`. Landing is 8 seconds (2 alignment, 4 approach,
 2 touchdown); takeoff is 6 seconds (2 local lift, 4 clearance). Keep the local
 15 m phases readable across every catalog radius and preserve smooth position,

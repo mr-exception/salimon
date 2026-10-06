@@ -19,11 +19,49 @@ Every phase should:
 **Completion criteria:** Observable conditions proving the phase is finished.
 **Tasks:** Managed in GitHub issues.
 **Notes / decisions:** Links to relevant specifications.
-## Committed Phase 0
+## Phase 0 baseline and evaluation
+
 [Phase 0 — Technical Feasibility Showcase](phase-0-technical-feasibility.md)
-Phase 0 is a **technical feasibility showcase**: a native macOS, fully client-side, compressed Solar System test world using the custom Rust + `wgpu` runtime. It includes first-person ship/interior traversal, direct-speed ship orientation and thruster control, interplanetary travel, seamless planetary approach, assisted landing/takeoff, and performance diagnostics. The Phase 0 ship must be at least 2× the original Task 7 linear scale, provide useful exterior visibility through cockpit windows, and use correctly directed horizontal mouse look. It intentionally excludes gameplay systems such as survival, energy/fuel, inventory, NPCs, multiplayer, combat, economy, persistence, and backend behavior.
-The repository must already contain both `client/` and `core/` top-level boundaries; `core/` remains intentionally empty during this phase.
-### Current Phase 0 execution priorities
-The ordered [Related page](https://github.com/mr-exception/salimon/issues) database remains authoritative. Tasks 1–7 are the completed foundation. The next priorities are Task 8 mouse-look correction, Task 9 cockpit windows, and Task 10 ship scaling. The completed first-person/walkable-shell work is now Task 11; flight controls, assisted landing/takeoff, benchmarking, and final evaluation continue as Tasks 12–15.
-## Later roadmap shape
-After Phase 0 is validated, later phases can grow through player embodiment/ship interior interaction → resources and physical cargo → survival/ship systems → persistence/backend authority → ship modification → NPC interaction/economy → multiplayer/shared universe capabilities. Exact ordering remains subject to design decisions and Phase 0 findings.
+established the custom native Rust + `winit` + `wgpu` client, compressed static
+Solar System, first-person traversal, direct-speed flight, uncancellable landing/
+takeoff assists and diagnostics. Its original exclusions bound that baseline;
+they do not prohibit systems added afterward.
+
+The [2026-09-15 evaluation](phase-0-evaluation.md) records **GO WITH REVISIONS**
+for its evaluated revision. It does not establish a hard 60 FPS floor or certify
+later revisions. Preserve its machine-specific evidence and limitations.
+
+## Current post-baseline prototype
+
+The client remains native-first and client-only. Build scripts/CI target macOS,
+Windows and Debian-based Linux; macOS is the reference playable/performance
+target. Web/WASM portability remains future work. No new numbered phase or formal
+phase closure is implied by this implementation summary.
+
+Implemented beyond the navigation baseline:
+
+- Open-space and nearby-body EVA with ship/frame transitions and airlock gates.
+- Deterministic planetary iron, silicate and water-ice deposits, local streaming,
+  aimed extraction and physical fragment output.
+- One-object carrying, pickup/release and transfer between surface and ship.
+- Fragment gravity, ejection/release motion, contact and piling through the
+  portable `salimon-physics` crate and runtime environment/frame adapters.
+- Blender-authored scout, deposits, fragments and mining tool with checked-in
+  exports and generated scout spatial contracts.
+- Native build staging and declarative gameplay/evidence automation.
+
+Modified deposits and physical fragments survive local streaming **in memory for
+the current session**. This is not disk/backend persistence. Production survival,
+energy/fuel management, crafting, NPCs, networking, multiplayer, economy and
+orbital simulation remain deferred. `core/` remains a documentation-only backend
+boundary. The [technical architecture](technical-architecture.md) and
+[feature maintenance map](maintenance-map.md) define implemented owners/contracts.
+
+## Current work and later roadmap
+
+[GitHub issues](https://github.com/mr-exception/salimon/issues) and their explicit
+blockers/acceptance criteria govern execution; historical Task N numbering is
+not a current queue. Later small phases can extend physical cargo and ship
+interaction, then survival/ship systems, persistence/backend authority, ship
+modification, NPC interaction/economy and shared-universe capabilities. Exact
+ordering and phase completion criteria require their own decisions/issues.

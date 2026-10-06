@@ -4,7 +4,15 @@
 
 ## Purpose
 This page is the high-level index of Salimon's major gameplay and simulation systems. Detailed behavior belongs in dedicated specifications as each area is refined.
-## Confirmed system areas
+## Long-term system areas
+
+This list describes product direction, not implemented modules. The current
+client-only prototype implements navigation, walking/EVA, ship interaction,
+planetary mining, one-object carrying and fragment motion/contact. Resource state
+is retained in memory across local streaming, with no disk/backend save.
+Survival, crafting, orbital simulation, NPCs, economy, multiplayer and backend
+authority remain deferred. See [current scope](project-phases.md).
+
 1. **Exploration & navigation** — realistic-distance travel through a universe-scale world, seamless space-to-surface movement, long-term travel toward Absenat.
 2. **Player character** — first-person walking, EVA, planetary exploration, physical interaction, health and survival state.
 3. **Spaceship flight** — owner-controlled navigation, propulsion upgrades, physically located ship systems, large speed progression.
@@ -22,10 +30,10 @@ This page is the high-level index of Salimon's major gameplay and simulation sys
 15. **Multiplayer** — persistent shared world, natural encounters, ship boarding, cooperative operation and persistent physical player location.
 16. **Combat** — ship combat and on-foot PvE/PvP with backend-authoritative outcomes.
 17. **Networking & authority** — local state broadcasting, server validation, protected canonical world state and anti-cheat-sensitive actions.
-18. **Web performance & streaming** — desktop WebGPU first, sector streaming, workers, WASM domain modules, LOD/asset streaming and IndexedDB/local caching where useful.
+18. **Performance & streaming** — native `wgpu` presentation and bounded local resource streaming today; larger spatial hierarchies, LOD/asset streaming, scheduling and platform storage remain future work. Web/WASM reuse and browser caching can be evaluated for a future web client.
 19. **Audio, UI & feedback** — first-person HUD, compass/home-ship marker, ship instrumentation, environmental feedback and physical interaction affordances.
 ## Design principle
 Game systems should be independently understandable and versioned domains. Their public contracts, invariants, persistence rules and authority boundaries must be explicit so autonomous AI agents can safely change one area without reasoning over the entire codebase.
 ## Technical architecture
 Implementation strategy is documented in [Technical Architecture & AI Maintenance](technical-architecture.md).
-Key direction: **TypeScript browser host + WebGPU renderer + Web Workers + WASM gameplay/simulation domains + authoritative backend**, with typed contracts and event-driven communication between major systems.
+Current architecture: **Rust native composition in `client/runtime` + `winit` events + `wgpu` renderer + portable Rust domain crates**, using typed commands and snapshots. Runtime composes world, character, ship and physics state; renderer owns GPU presentation. Native builds target macOS, Windows and Debian-based Linux, with macOS as the reference playable/performance target. `core/` is a reserved backend boundary. A web/WASM host, workers and authoritative backend remain future capabilities; none is required by the current client.

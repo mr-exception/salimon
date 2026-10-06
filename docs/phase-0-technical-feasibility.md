@@ -1,5 +1,12 @@
 # Phase 0 — Technical Feasibility Showcase
 
+> **Scope status:** This document defines the Phase 0 navigation baseline. Its
+> exclusions do not describe the current post-baseline prototype: mining,
+> physical fragments, carrying and EVA are now implemented. Use
+> [Project Phases](project-phases.md) and [Technical Architecture](technical-architecture.md)
+> for current scope. The [2026-09-15 evaluation](phase-0-evaluation.md) records
+> GO WITH REVISIONS and performance limitations at its evaluated revision.
+
 > Migrated from the Salimon project documents on 2026-09-29. For current task status and dependencies, use [GitHub issues](https://github.com/mr-exception/salimon/issues).
 
 > **Purpose:** Prove that Salimon's custom native Rust runtime, renderer, large-scale scene approach, first-person ship experience, and seamless space-to-surface presentation are technically viable before adding real gameplay systems.
@@ -132,8 +139,8 @@ Include an optional engineering overlay showing at minimum:
 - distance to selected/nearby bodies;
 - normal gameplay flight information such as current speed and speed percentage should be presented on **cockpit monitors**, not as a floating screen HUD;
 - memory-related metrics where practical.
-## Explicitly out of scope
-Do **not** implement these in Phase 0:
+## Original baseline exclusions
+These exclusions apply to the original Phase 0 showcase, not later issue-scoped work:
 - Backend functionality or networking
 - Multiplayer
 - Persistence/server snapshots
@@ -210,22 +217,22 @@ Phase 0 validates the project's large-range rendering approach using the canonic
 - Coordinate/camera prototype values such as a `120 Mm` to `12 m` approach range, `60°` vertical FOV, `0.05 m` near plane, large anchor coordinates, proxy geometry, colors, and transition timings are validation defaults only. They must not be treated as final Solar System layout, celestial content, ship/camera behavior, or tuning.
 - Phase 0 may use CPU camera rebasing for this small showcase. Future large meshes and universe-scale content must move toward body-local/patch-local geometry and the project's spatial hierarchy.
 ## Task 7 implementation note — custom Phase 0 ship asset
-Task 7 was completed on 2026-09-10 in commit `042f7ae`. The repository now contains the custom original **Salimon Phase 0 Scout** under `client/assets/ship/`: deterministic editable source, Blender-importable glTF, a self-contained GLB, an original procedural texture, licensing documentation, collision proxies, and cockpit/door/player interaction markers.
+Task 7 was completed on 2026-09-10 in commit `042f7ae`. At that revision, the repository contained the custom original **Salimon Phase 0 Scout** under `client/assets/ship/`: deterministic editable source, Blender-importable glTF, a self-contained GLB, an original procedural texture, licensing documentation, collision proxies, and cockpit/door/player interaction markers.
 The asset is a polished greybox/material demo with a designed exterior silhouette and a 3.1 m-wide walkable cockpit/cabin/corridor. It uses 620 triangles, 41 primitives, nine reusable materials, and a 77,032-byte GLB with no third-party asset dependencies. Runtime character/ship integration was completed in the task now ordered as Task 11, and measured M1 1920×1080 evidence is now Task 14 scope.
-## Current Phase 0 task plan
-The ordered [Related page](https://github.com/mr-exception/salimon/issues) database is authoritative for status and execution order. After Tasks 1–7 established the repository, runtime, diagnostics, coordinate strategy, Solar System scene, renderer, and first ship asset, hands-on playtesting inserted these immediate priorities:
+## Historical Phase 0 task plan
+This historical ordering records the original plan; current [GitHub issues](https://github.com/mr-exception/salimon/issues) and explicit blockers govern new work. After Tasks 1–7 established the repository, runtime, diagnostics, coordinate strategy, Solar System scene, renderer, and first ship asset, hands-on playtesting inserted these immediate priorities:
 1. **Task 8 —** [Fix inverted horizontal mouse look](https://github.com/mr-exception/salimon/issues/67).
 2. **Task 9 —** [Add cockpit windows with exterior visibility](https://github.com/mr-exception/salimon/issues/68).
 3. **Task 10 —** [Resize spaceship for player-scale proportions](https://github.com/mr-exception/salimon/issues/69).
 The previously completed first-person character and walkable ship shell is now Task 11. Direct-speed flight controls, assisted landing/takeoff, reference Apple M1 iMac benchmarking, and the go/revise/stop evaluation follow as Tasks 12–15.
 ## Phase 0 implementation summary — 2026-09-14
-> **Implementation status:** Core Phase 0 build work is complete. Thirteen implementation tasks are finished. Formal phase closure is still pending the interactive M1 benchmark and final go/revise/stop evaluation.
+> **Historical status at 2026-09-14:** Core Phase 0 build work is complete. Thirteen implementation tasks are finished. Formal phase closure is still pending the interactive M1 benchmark and final go/revise/stop evaluation.
 - Established the Phase 0 repository/module boundaries and native macOS Rust runtime with an isolated `wgpu` renderer.
 - Added diagnostics/profiling, large-scale coordinate and camera handling, the compressed static Solar System, and scalable planet rendering.
 - Built a custom editable/exported Salimon spaceship, refined cockpit visibility and player-scale interior proportions, and added first-person walking and interaction inside/outside the landed ship.
 - Implemented direct-speed cockpit flight controls, independent free-look, assisted landing/takeoff, surface transitions, full-sphere walking on supported solid bodies, and focused regression fixes/tests.
 - Automated quality gates currently pass formatting, Clippy with warnings denied, all 119 tests, and the optimized release build.
-### Remaining closure work
+### Remaining closure work at 2026-09-14
 1. Run the seven-scenario interactive benchmark on the reference M1 iMac at fixed 1920×1080 and confirm the 60 FPS hard floor.
 2. Record measured limitations/bottlenecks and complete the final go/revise/stop evaluation for the Rust/`wgpu` architecture.
 Phase 0 should therefore be treated as **implementation-complete, but not formally closed** until these two closure items are finished.

@@ -3,7 +3,8 @@
 ## Implemented architecture
 
 Salimon uses a custom Rust runtime with low-level `winit` and `wgpu`, without a
-full game engine. Phase 0 is a native, client-only prototype. Build scripts and
+full game engine. The current prototype extends the Phase 0 baseline and remains native and
+client-only. Build scripts and
 CI stage macOS, Windows and Debian-based Linux executables; graphical CI runs
 on Linux software Vulkan. Native macOS is the reference playable/performance
 target. Web/server reuse remains a future capability, not a shipped target.
@@ -106,7 +107,7 @@ The current scout removes the dedicated cargo module, shortens the nose/glazing
 and uses three monitors on one center console with walking routes on both sides.
 Loose fragments use the cabin deck. Historical cargo and migration evidence in
 [reports/](../reports/README.md) describes earlier revisions. The mining tool now renders a Blender-authored GLB with a camera-local grip
-and status material. Water-ice and silicate fragments each use two Blender-authored variants selected by stable identity; iron fragment presentation remains an issue-scoped migration.
+and status material. Iron, silicate and water-ice fragments each use two Blender-authored variants selected by stable identity. All three deposit materials use four authored variants; see [renderer architecture](../client/renderer/architecture.md) for selection and bounds contracts.
 
 ## Physical-object simulation decision (#114)
 

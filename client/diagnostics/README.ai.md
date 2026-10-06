@@ -8,7 +8,7 @@ event loop, GPU resources, authoritative domain state, or benchmark policy.
 
 ## Read before changing
 
-1. Fetch the active Notion task, Phase 0 specification, and technical
+1. Fetch the active GitHub issue, affected project specification, and technical
    architecture as required by the root `AGENTS.md`.
 2. Read [architecture.md](architecture.md) and [invariants.md](invariants.md).
 3. Read the runtime and renderer maintenance guides before changing either side

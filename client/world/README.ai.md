@@ -15,7 +15,7 @@
 Keep the immutable compressed body catalog, absolute coordinates, body/landing
 geometry, reference speed, and portable camera behavior here. Use `f64` meters
 until after origin subtraction, and expose renderer-neutral snapshots. Keep the
-three Task 4 precision markers separate from the six canonical bodies. Do not add
+three engineering precision markers separate from the six canonical bodies. Do not add
 window events, GPU types, renderer projections, disk/backend persistence,
 networking, textured sphere rendering, or lighting. Portable resource contracts
 belong in `resources`; read [resource-contracts.md](resource-contracts.md) before

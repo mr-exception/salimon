@@ -1,6 +1,7 @@
 # Client
 
-All Phase 0 runtime implementation lives here. The current packages provide
+All current client runtime implementation lives here, including the Phase 0
+baseline and subsequent mining, carrying, fragment physics and EVA. Packages provide
 the `salimon-client`
 runtime binary, `salimon-renderer` GPU library, `salimon-diagnostics`
 metrics/overlay library, and portable `salimon-world` compressed Solar System,

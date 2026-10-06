@@ -6,7 +6,7 @@ The renderer is a library boundary around native `wgpu` presentation. It owns
 the surface, adapter/device/queue state, surface configuration, shader modules,
 render pipelines, command encoding, camera-relative GPU conversion,
 renderer-owned projection and depth, generic overlay composition, and frame
-presentation for the Task 6 textured spheres, Task 11 ship mesh, and Task 3 instrumentation.
+presentation for textured spheres, authored ship/resource/item meshes and instrumentation.
 
 ```text
 salimon-world absolute f64 snapshot

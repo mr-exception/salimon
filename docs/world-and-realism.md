@@ -15,7 +15,7 @@ Salimon's world is intended to model the **known universe**, not only one galaxy
 The simulation should be spatially partitioned so only relevant regions are active at full fidelity.
 Suggested hierarchy:
 **Universe → galaxy/large region → stellar system → local sector → planet/station/asteroid field/ship → interior/local interaction space.**
-This hierarchy is required for browser performance, networking, persistence, and backend simulation.
+This is the long-term spatial hierarchy for native and future browser performance, networking, persistence and backend simulation. The current prototype uses a static compressed six-body catalog and bounded local resource streaming; it does not implement the full hierarchy or backend.
 ## Locations
 Initial supported location categories:
 - Planets

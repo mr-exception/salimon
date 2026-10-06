@@ -1,7 +1,0 @@
-    Checking salimon-world v0.1.0 (/workspace/scratch/f8f55569d019/salimon/client/world)
-    Checking salimon-renderer v0.1.0 (/workspace/scratch/f8f55569d019/salimon/client/renderer)
-    Checking salimon-character v0.1.0 (/workspace/scratch/f8f55569d019/salimon/client/character)
-    Checking salimon-diagnostics v0.1.0 (/workspace/scratch/f8f55569d019/salimon/client/diagnostics)
-    Checking salimon-ship v0.1.0 (/workspace/scratch/f8f55569d019/salimon/client/ship)
-    Checking salimon-client v0.1.0 (/workspace/scratch/f8f55569d019/salimon/client/runtime)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.40s

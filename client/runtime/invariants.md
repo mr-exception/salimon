@@ -111,5 +111,6 @@
   1–6 inspects bodies without changing equipment state.
 - Successful physical pickup clears toolbar selection immediately. World-session
   carrying blocks all slot selection; dropping never restores selection.
-- Toolbar state/input remains independent of renderer and individual tool equip
-  behavior until the dependent presentation work connects those consumers.
+- Toolbar loadout/selection maps directly to renderer DTOs in gameplay and is
+  hidden in precision tour. Toolbar presentation cannot change equip behavior;
+  individual tool equip integration remains separate work.

@@ -669,6 +669,8 @@ impl ClientApplication {
                 overlay_image,
                 action_bar_image,
                 crate::reticle::image(self.view_mode == ViewMode::Gameplay, &self.mining),
+                (self.view_mode == ViewMode::Gameplay).then(|| self.equipment.presentation()),
+                window.scale_factor(),
                 || window.pre_present_notify(),
             ) {
             Ok(outcome) => outcome,

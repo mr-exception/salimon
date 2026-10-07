@@ -181,3 +181,21 @@ cockpit glass does not write depth. Global overlays skip the depth comparison.
 Cached texture pixels/revisions remain independent of placement; depth bindings
 are refreshed when surface reconstruction replaces the depth view. Gameplay
 eligibility, text, priority and transient expiry remain runtime-owned.
+
+## Equipment toolbar HUD (#129)
+
+Runtime supplies `EquipmentToolbar` (five optional `EquipmentIcon` values plus
+an optional typed `EquipmentSlot`) to `Renderer::render`; absence hides the HUD
+in precision tour. `equipment_toolbar.rs` owns the compact five-slot raster,
+number glyphs, drill silhouette and selected border/background. It reads no
+gameplay domains and never derives usability, selection or equipped state.
+Raster pixels and GPU uploads are cached by contents, selection and bounded
+finite DPI density (1x–2x, matching the existing HUD scale-factor convention).
+
+The toolbar uses its own generic RGBA overlay cache/draw, bottom-centered in the
+current physical viewport with uniform fitting on resize. It occupies the lowest
+HUD band. Global/transient `BottomCenter` action images are converted to
+`BottomCenterInset(fitted toolbar height + scaled gap)` and fit into the remaining
+height. At tiny sizes an unfittable message is hidden; it never covers the toolbar.
+World prompts keep object-relative placement and depth visibility. Total draw
+counts include the toolbar. No inventory/tool behavior lives in this raster.

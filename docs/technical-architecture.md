@@ -207,3 +207,11 @@ camera-relative projection, viewport fitting and reverse-Z anchor visibility
 through a separate overlay pass. Global guidance and transient feedback retain
 screen placement. See [runtime flow](../client/runtime/architecture.md#contextual-action-bar-flow)
 and [renderer contract](../client/renderer/architecture.md#world-anchored-prompts-127).
+
+## Equipment toolbar HUD (#129)
+
+Runtime field-maps five-slot equipment state to renderer-neutral toolbar DTOs
+for gameplay; precision tour omits it. Renderer rasterizes/caches numbered slots,
+mining-tool silhouette and optional highlight, and stacks global/transient
+messages above the fitted bottom-center toolbar. DPI follows bounded native
+scale-factor handling. See the [renderer contract](../client/renderer/architecture.md#equipment-toolbar-hud-129).

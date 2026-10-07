@@ -1,0 +1,164 @@
+{
+  "suite": {
+    "status": "passed",
+    "results": [
+      {
+        "scenario": "carrying.json",
+        "status": "passed",
+        "steps_completed": 235
+      },
+      {
+        "scenario": "cockpit-nose.json",
+        "status": "passed",
+        "steps_completed": 30
+      },
+      {
+        "scenario": "fragment-transfer.json",
+        "status": "passed",
+        "steps_completed": 253
+      },
+      {
+        "scenario": "landed-earth.json",
+        "status": "passed",
+        "steps_completed": 110
+      },
+      {
+        "scenario": "lower-cockpit-windows.json",
+        "status": "passed",
+        "steps_completed": 16
+      },
+      {
+        "scenario": "mining.json",
+        "status": "passed",
+        "steps_completed": 138
+      },
+      {
+        "scenario": "moving-eva.json",
+        "status": "passed",
+        "steps_completed": 93
+      },
+      {
+        "scenario": "nearby-eva.json",
+        "status": "passed",
+        "steps_completed": 43
+      },
+      {
+        "scenario": "orbit-earth.json",
+        "status": "passed",
+        "steps_completed": 23
+      },
+      {
+        "scenario": "resource-deposits.json",
+        "status": "passed",
+        "steps_completed": 64
+      },
+      {
+        "scenario": "resource-loop.json",
+        "status": "passed",
+        "steps_completed": 203
+      },
+      {
+        "scenario": "resource-streaming.json",
+        "status": "passed",
+        "steps_completed": 135
+      },
+      {
+        "scenario": "space-airlock.json",
+        "status": "passed",
+        "steps_completed": 50
+      }
+    ]
+  },
+  "native-release": {
+    "status": "passed",
+    "results": [
+      {
+        "scenario": "equipment-toolbar.json",
+        "status": "passed",
+        "steps_completed": 14
+      }
+    ]
+  },
+  "windows": {
+    "status": "passed",
+    "results": [
+      {
+        "scenario": "lower-cockpit-windows.json",
+        "status": "passed",
+        "steps_completed": 24
+      }
+    ]
+  },
+  "resources": {
+    "status": "passed",
+    "results": [
+      {
+        "scenario": "resource-deposits.json",
+        "status": "passed",
+        "steps_completed": 65
+      },
+      {
+        "scenario": "mining.json",
+        "status": "passed",
+        "steps_completed": 143
+      },
+      {
+        "scenario": "carrying.json",
+        "status": "passed",
+        "steps_completed": 243
+      },
+      {
+        "scenario": "fragment-transfer.json",
+        "status": "passed",
+        "steps_completed": 258
+      },
+      {
+        "scenario": "resource-streaming.json",
+        "status": "passed",
+        "steps_completed": 141
+      },
+      {
+        "scenario": "resource-loop.json",
+        "status": "passed",
+        "steps_completed": 211
+      }
+    ]
+  },
+  "eva": {
+    "status": "passed",
+    "results": [
+      {
+        "scenario": "cockpit-nose.json",
+        "status": "passed",
+        "steps_completed": 31
+      },
+      {
+        "scenario": "space-airlock.json",
+        "status": "passed",
+        "steps_completed": 54
+      },
+      {
+        "scenario": "moving-eva.json",
+        "status": "passed",
+        "steps_completed": 96
+      },
+      {
+        "scenario": "nearby-eva.json",
+        "status": "passed",
+        "steps_completed": 46
+      }
+    ]
+  },
+  "smoke": {
+    "success": true,
+    "checks": [
+      "native window created:",
+      "renderer ready:",
+      "render attempt 1 completed with Presented",
+      "OS F2 switched to PrecisionTour",
+      "OS F2 switched to Gameplay",
+      "game remains playable after OS input"
+    ],
+    "duration_ms": 1058
+  }
+}

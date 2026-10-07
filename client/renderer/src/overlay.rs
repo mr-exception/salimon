@@ -17,6 +17,8 @@ pub enum OverlayPlacement {
     #[default]
     TopLeft,
     BottomCenter,
+    /// Bottom-center message above a renderer-reserved physical-pixel band.
+    BottomCenterInset(u32),
     Center,
     /// Absolute object center and conservative visible-surface radius, in metres.
     World {
@@ -69,7 +71,7 @@ impl std::fmt::Display for OverlayImageError {
     }
 }
 
-fn fitted_overlay_size(surface_size: [u32; 2], image_size: [u32; 2]) -> [f32; 2] {
+pub(crate) fn fitted_overlay_size(surface_size: [u32; 2], image_size: [u32; 2]) -> [f32; 2] {
     let available = surface_size.map(|size| size.saturating_sub(2 * OVERLAY_MARGIN_PIXELS) as f32);
     let image_size = image_size.map(|size| size as f32);
     let scale = (available[0] / image_size[0])
@@ -89,6 +91,14 @@ fn overlay_origin(
         OverlayPlacement::Center => [
             (surface_size[0] as f32 - display_size[0]) * 0.5,
             (surface_size[1] as f32 - display_size[1]) * 0.5,
+        ],
+        OverlayPlacement::BottomCenterInset(inset) => [
+            (surface_size[0] as f32 - display_size[0]).max(0.0) * 0.5,
+            (surface_size[1] as f32
+                - OVERLAY_MARGIN_PIXELS as f32
+                - inset as f32
+                - display_size[1])
+                .max(0.0),
         ],
         OverlayPlacement::BottomCenter => [
             (surface_size[0] as f32 - display_size[0]).max(0.0) * 0.5,
@@ -285,8 +295,12 @@ impl OverlayRenderer {
             self.last_revision = Some(image.revision);
         }
 
+        let layout_height = match image.placement {
+            OverlayPlacement::BottomCenterInset(inset) => surface_height.saturating_sub(inset),
+            _ => surface_height,
+        };
         let mut display_size =
-            fitted_overlay_size([surface_width, surface_height], [image.width, image.height]);
+            fitted_overlay_size([surface_width, layout_height], [image.width, image.height]);
         if matches!(image.placement, OverlayPlacement::World { .. }) {
             let scale = (surface_width as f32 * 0.6 / display_size[0]).min(1.0);
             display_size = display_size.map(|value| value * scale);
@@ -501,6 +515,43 @@ mod tests {
     fn hides_the_panel_when_the_surface_cannot_contain_both_margins() {
         assert_eq!(fitted_overlay_size([32, 360], [560, 600]), [0.0, 0.0]);
         assert_eq!(fitted_overlay_size([640, 0], [560, 600]), [0.0, 0.0]);
+    }
+
+    #[test]
+    fn messages_stack_above_toolbar_after_resize_and_dpi_changes() {
+        use crate::equipment_toolbar::{EquipmentToolbar, ToolbarRaster};
+        for dpi in [1.0, 1.5, 2.0] {
+            let mut toolbar = ToolbarRaster::default();
+            toolbar.update(
+                EquipmentToolbar {
+                    slots: [None; 5],
+                    selected: None,
+                },
+                dpi,
+            );
+            let image = toolbar.image().unwrap();
+            for surface in [[1280, 720], [1920, 1080], [360, 640], [400, 180], [64, 64]] {
+                let toolbar_size = fitted_overlay_size(surface, [image.width, image.height]);
+                let toolbar_origin =
+                    overlay_origin(surface, toolbar_size, OverlayPlacement::BottomCenter);
+                let inset = toolbar.message_inset(surface);
+                let message_size =
+                    fitted_overlay_size([surface[0], surface[1].saturating_sub(inset)], [1200, 96]);
+                let message_origin = overlay_origin(
+                    surface,
+                    message_size,
+                    OverlayPlacement::BottomCenterInset(inset),
+                );
+                if message_size[1] > 0.0 {
+                    assert!(message_origin[1] + message_size[1] < toolbar_origin[1]);
+                    assert!(message_origin[1] >= 16.0);
+                }
+                assert!(
+                    (toolbar_origin[0] + toolbar_size[0] * 0.5 - surface[0] as f32 * 0.5).abs()
+                        < 0.001
+                );
+            }
+        }
     }
 
     #[test]

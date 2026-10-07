@@ -81,3 +81,8 @@ with behavior changes and record completion evidence under root `reports/`.
 `held_item.rs` / `held_item.wgsl` own static authored mining-tool loading,
 camera-local grip placement and status-region feedback. Runtime owns equip
 and active gates; the asset README defines the baked grip contract.
+
+`equipment_toolbar.rs` owns HUD rasterization/cache from `EquipmentToolbar`,
+`EquipmentIcon` and `EquipmentSlot`. Runtime supplies visibility/state/DPI;
+renderer owns bottom-band layout and message stacking through `overlay.rs`.
+See [toolbar contract](architecture.md#equipment-toolbar-hud-129) and CPU tests.

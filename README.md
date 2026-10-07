@@ -134,6 +134,10 @@ Aim at a physical fragment within 3 m and press **F** to pick it up. You can
 carry one world object at a time; equipped gear remains separate. Press **F**
 again to release it from your hand. Grab/drop consumes that F press; otherwise
 held F mines. Release F before another action. E only operates cockpit/door interactions. Gravity and contact make fragments fall and pile up.
+Object-specific prompts appear just above their cockpit, door, deposit or fragment.
+They follow the target as you look or move and hide outside the view or behind
+closer geometry. Flight/tool guidance and short blocked-action feedback remain
+at the bottom of the screen.
 Face the open door and walk forward through it to transition over 0.25 seconds
 to the active solid body's radial gravity and inspect the ship exterior. There is no sprint or crouch. Press
 **Escape** to release the captured cursor for window controls; click the game

@@ -313,7 +313,7 @@ impl DepthTarget {
             sample_count: 1,
             dimension: wgpu::TextureDimension::D2,
             format: DEPTH_FORMAT,
-            usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
+            usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::TEXTURE_BINDING,
             view_formats: &[],
         });
         let view = texture.create_view(&wgpu::TextureViewDescriptor::default());
@@ -800,9 +800,9 @@ impl Renderer {
             mapped_at_creation: false,
         });
         let depth_target = DepthTarget::new(&device, configured_width, configured_height);
-        let overlay = overlay::OverlayRenderer::new(&device, configuration.format, DEPTH_FORMAT);
-        let action_bar = overlay::OverlayRenderer::new(&device, configuration.format, DEPTH_FORMAT);
-        let reticle = overlay::OverlayRenderer::new(&device, configuration.format, DEPTH_FORMAT);
+        let overlay = overlay::OverlayRenderer::new(&device, configuration.format);
+        let action_bar = overlay::OverlayRenderer::new(&device, configuration.format);
+        let reticle = overlay::OverlayRenderer::new(&device, configuration.format);
         let spheres = spheres::SphereRenderer::new(&device, &queue, configuration.format);
         let ship_mesh = ship_mesh::ShipMeshRenderer::new(&device, configuration.format)?;
         let held_item = held_item::HeldItemRenderer::new(&device, configuration.format)?;
@@ -947,6 +947,9 @@ impl Renderer {
                 self.configuration.width,
                 self.configuration.height,
                 overlay_image,
+                scene.camera,
+                prepared_scene.view_projection,
+                &self.depth_target.view,
             )
             .map_err(|error| RendererError::new("failed to prepare overlay", error))?;
         self.action_bar
@@ -956,6 +959,9 @@ impl Renderer {
                 self.configuration.width,
                 self.configuration.height,
                 action_bar_image,
+                scene.camera,
+                prepared_scene.view_projection,
+                &self.depth_target.view,
             )
             .map_err(|error| RendererError::new("failed to prepare action bar", error))?;
         self.reticle
@@ -965,6 +971,9 @@ impl Renderer {
                 self.configuration.width,
                 self.configuration.height,
                 reticle_image,
+                scene.camera,
+                prepared_scene.view_projection,
+                &self.depth_target.view,
             )
             .map_err(|error| RendererError::new("failed to prepare reticle", error))?;
         let mut encoder = self
@@ -974,8 +983,13 @@ impl Renderer {
             });
         let timing_slot = self.gpu_timer.as_mut().and_then(GpuTimer::acquire_slot);
         {
-            let timestamp_writes =
-                timing_slot.and_then(|_| self.gpu_timer.as_ref().map(GpuTimer::timestamp_writes));
+            let timestamp_writes = timing_slot.and_then(|_| {
+                self.gpu_timer.as_ref().map(|timer| {
+                    let mut writes = timer.timestamp_writes();
+                    writes.end_of_pass_write_index = None;
+                    writes
+                })
+            });
             let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("Salimon validation render pass"),
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
@@ -991,7 +1005,7 @@ impl Renderer {
                     view: &self.depth_target.view,
                     depth_ops: Some(wgpu::Operations {
                         load: wgpu::LoadOp::Clear(0.0),
-                        store: wgpu::StoreOp::Discard,
+                        store: wgpu::StoreOp::Store,
                     }),
                     stencil_ops: None,
                 }),
@@ -1010,6 +1024,31 @@ impl Renderer {
             self.ship_mesh.draw(&mut render_pass);
             self.resource_meshes.draw(&mut render_pass);
             self.held_item.draw(&mut render_pass);
+        }
+        {
+            let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                label: Some("Salimon overlay pass"),
+                color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                    view: &view,
+                    depth_slice: None,
+                    resolve_target: None,
+                    ops: wgpu::Operations {
+                        load: wgpu::LoadOp::Load,
+                        store: wgpu::StoreOp::Store,
+                    },
+                })],
+                depth_stencil_attachment: None,
+                // Preserve the timing interval across scene and overlay passes.
+                timestamp_writes: timing_slot.and_then(|_| {
+                    self.gpu_timer.as_ref().map(|timer| {
+                        let mut writes = timer.timestamp_writes();
+                        writes.beginning_of_pass_write_index = None;
+                        writes
+                    })
+                }),
+                occlusion_query_set: None,
+                multiview_mask: None,
+            });
             self.overlay.draw(&mut render_pass);
             self.action_bar.draw(&mut render_pass);
             self.reticle.draw(&mut render_pass);

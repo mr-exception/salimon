@@ -26,7 +26,7 @@
 11. The renderer uses low-level `wgpu` directly and must not introduce a full
     game engine.
 12. Overlay inputs are validated, borrowed RGBA images with typed screen-space
-    placement. The renderer may cache, uniformly fit, and composite them but
+    or absolute-world placement. The renderer may cache, uniformly fit, and composite them but
     never owns diagnostics aggregation, action text, expiry/toggle policy, or
     gameplay data.
 13. GPU timestamps are requested only when the selected adapter supports them;
@@ -63,3 +63,9 @@
     baked with identity node transforms. Camera-local presentation preserves
     orientation through look/gravity changes and never supplies a gameplay ray.
     Active feedback is presentation-only; normal reverse-Z depth applies.
+
+22. World prompt anchors are rebased in `f64` and projected with the scene camera.
+    Invalid, behind-camera, clipped or non-fitting labels are hidden, never
+    clamped to screen edges. The separate overlay pass samples stored reverse-Z
+    scene depth at the anchor to hide an entire occluded prompt. Its conservative
+    radius avoids target self-occlusion and never changes gameplay eligibility.

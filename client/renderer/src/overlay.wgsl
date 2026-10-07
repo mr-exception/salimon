@@ -1,6 +1,7 @@
 struct OverlayDimensions {
     surface_and_display: vec4<f32>,
     origin: vec4<f32>,
+    visibility: vec4<f32>,
 }
 
 @group(0) @binding(0)
@@ -8,6 +9,9 @@ var overlay_image: texture_2d<f32>;
 
 @group(0) @binding(1)
 var<uniform> dimensions: OverlayDimensions;
+
+@group(0) @binding(2)
+var scene_depth: texture_depth_2d;
 
 struct VertexOutput {
     @builtin(position) position: vec4<f32>,
@@ -41,6 +45,13 @@ fn vs_main(@builtin(vertex_index) vertex_index: u32) -> VertexOutput {
 
 @fragment
 fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
+    if dimensions.visibility.w > 0.0 {
+        let anchor_pixel = vec2<i32>(dimensions.visibility.xy);
+        let size = vec2<i32>(textureDimensions(scene_depth));
+        let depth = textureLoad(scene_depth, clamp(anchor_pixel, vec2<i32>(0), size - vec2<i32>(1)), 0);
+        // Reverse-Z: nearer geometry has greater depth. Hide the entire label.
+        if depth > dimensions.visibility.z + 0.000001 { discard; }
+    }
     let texture_size = vec2<i32>(textureDimensions(overlay_image));
     let unclamped = vec2<i32>(input.uv * vec2<f32>(texture_size));
     let texel = clamp(unclamped, vec2<i32>(0), texture_size - vec2<i32>(1));

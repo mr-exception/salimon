@@ -5,7 +5,8 @@
 `salimon-renderer` owns GPU presentation through `wgpu`. It initializes a native
 surface and pipelines, responds to valid size changes, renders borrowed
 renderer-facing scenes, composites generic placed RGBA overlay inputs, and
-exposes renderer-owned measurements.
+exposes renderer-owned measurements. World-placed overlays use the scene camera
+and stored scene depth; keep projection/occlusion out of runtime gameplay policy.
 
 ## Read before changing
 

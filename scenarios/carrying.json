@@ -1244,6 +1244,18 @@
         "path": "carrying.object_id",
         "equals": 2
       }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 200
+      }
+    },
+    {
+      "assert": {
+        "path": "resource_ui.context",
+        "contains": "Carrying fragment - F to drop"
+      }
     }
   ]
 }

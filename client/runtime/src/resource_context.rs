@@ -1,7 +1,12 @@
-//! Aimed physical-object information, composed into the existing action bar.
+//! Applicable resource text and absolute object anchors; no projection or GPU policy.
 use crate::mining::MiningTool;
 use salimon_character::{CharacterLocation, CharacterSnapshot, ShipFrame};
 use salimon_world::resources::DepositState;
+
+pub(crate) struct Prompt {
+    pub text: String,
+    pub placement: salimon_renderer::OverlayPlacement,
+}
 
 pub(crate) fn context(
     tool: &MiningTool,
@@ -9,7 +14,7 @@ pub(crate) fn context(
     frame: ShipFrame,
     door_open: bool,
     seed: u64,
-) -> Option<String> {
+) -> Option<Prompt> {
     if !matches!(
         player.location,
         CharacterLocation::Surface | CharacterLocation::InsideShip
@@ -17,19 +22,27 @@ pub(crate) fn context(
         return None;
     }
     let target = crate::carrying::target(tool, player, frame, door_open);
-    if let Some(id) = target.or(tool.session.carried_id()) {
+    if let Some(id) = tool.session.carried_id().or(target) {
         let piece = tool
             .session
             .fragments()
             .iter()
             .find(|piece| piece.id() == id)?;
         let prompt = crate::carrying::context(tool, target, player)?;
-        return Some(format!(
-            "{} fragment - approx {:.2} kg\n{}",
-            piece.material().resource().definition().name,
-            piece.material().mass_kg(),
-            prompt,
-        ));
+        return Some(Prompt {
+            placement: salimon_renderer::OverlayPlacement::World {
+                anchor_meters: piece.transform().position().meters(),
+                radius_meters: salimon_world::resource_fragments::side_meters(*piece)
+                    * 0.5
+                    * 3.0_f64.sqrt(),
+            },
+            text: format!(
+                "{} fragment - approx {:.2} kg\n{}",
+                piece.material().resource().definition().name,
+                piece.material().mass_kg(),
+                prompt,
+            ),
+        });
     }
     if player.location != CharacterLocation::Surface {
         return None;
@@ -38,8 +51,9 @@ pub(crate) fn context(
         let entries = tool.nearby(player.eye_position_meters, seed).ok()?;
         let deposit = entries
             .iter()
-            .find(|entry| entry.deposit.id() == target.id)?
-            .deposit;
+            .find(|entry| entry.deposit.id() == target.id)?;
+        let radius = deposit.bounds_radius_meters;
+        let deposit = deposit.deposit;
         let state = match deposit.state() {
             DepositState::Untouched => "untouched",
             DepositState::PartiallyMined => "partly mined",
@@ -52,14 +66,22 @@ pub(crate) fn context(
         } else {
             "Hold F or left mouse to mine - M to stow"
         };
-        return Some(format!(
-            "{} - approx {:.1} kg left - {}\n{}",
-            deposit.material().resource().definition().name,
-            deposit.remaining_mass_kg(),
-            state,
-            prompt,
-        ));
+        return Some(Prompt {
+            placement: salimon_renderer::OverlayPlacement::World {
+                anchor_meters: deposit.position().meters(),
+                radius_meters: radius,
+            },
+            text: format!(
+                "{} - approx {:.1} kg left - {}\n{}",
+                deposit.material().resource().definition().name,
+                deposit.remaining_mass_kg(),
+                state,
+                prompt,
+            ),
+        });
     }
-    tool.equipped
-        .then(|| "Aim at a deposit within 4 m - M to stow".to_owned())
+    tool.equipped.then(|| Prompt {
+        text: "Aim at a deposit within 4 m - M to stow".to_owned(),
+        placement: salimon_renderer::OverlayPlacement::BottomCenter,
+    })
 }

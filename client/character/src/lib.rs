@@ -22,6 +22,11 @@ pub use spatial_contracts::{
 };
 pub use state::{CharacterLocation, CharacterSnapshot, ShipFrame, SurfaceFrame};
 
+/// Depth from the authored door interaction marker to the closed door's aft face.
+/// Presentation may use this bound to avoid hiding the marker behind its own door.
+pub const EXIT_DOOR_MARKER_DEPTH_METERS: f64 =
+    EXIT_DOOR_MARKER_METERS[0] - spatial_contracts::AFT_DOOR_BOUNDS[0];
+
 pub const FIXED_GRAVITY_METERS_PER_SECOND_SQUARED: f64 = 9.81;
 pub const DOORWAY_GRAVITY_BLEND_DURATION: Duration = Duration::from_millis(250);
 pub const PLAYER_BODY_HEIGHT_METERS: f64 = 1.80;

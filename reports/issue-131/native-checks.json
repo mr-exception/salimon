@@ -1,0 +1,942 @@
+[
+  {
+    "scenario": "scenarios/evidence/carrying.json",
+    "status": "passed",
+    "steps_completed": 263,
+    "duration_ms": 18601,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "checks": [
+      {
+        "index": 1,
+        "assert": {
+          "path": "equipment.slots",
+          "equals": [
+            "mining_tool",
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "status": "passed"
+      },
+      {
+        "index": 2,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 5,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": 1
+        },
+        "status": "passed"
+      },
+      {
+        "index": 8,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": 2
+        },
+        "status": "passed"
+      },
+      {
+        "index": 11,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": 3
+        },
+        "status": "passed"
+      },
+      {
+        "index": 14,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": 4
+        },
+        "status": "passed"
+      },
+      {
+        "index": 17,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": 5
+        },
+        "status": "passed"
+      },
+      {
+        "index": 78,
+        "assert": {
+          "path": "mining.equipped",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 85,
+        "assert": {
+          "path": "mining.extracted_mass_kg",
+          "equals": 0
+        },
+        "status": "passed"
+      },
+      {
+        "index": 89,
+        "assert": {
+          "path": "mining.equipped",
+          "equals": true
+        },
+        "status": "passed"
+      },
+      {
+        "index": 92,
+        "assert": {
+          "path": "carrying.object_id",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 93,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": 1
+        },
+        "status": "passed"
+      },
+      {
+        "index": 94,
+        "assert": {
+          "path": "mining.held_item_visible",
+          "equals": true
+        },
+        "status": "passed"
+      },
+      {
+        "index": 95,
+        "assert": {
+          "path": "mining.extracted_mass_kg",
+          "equals": 0
+        },
+        "status": "passed"
+      },
+      {
+        "index": 96,
+        "assert": {
+          "path": "mining.target.id",
+          "equals": "Earth:16443359315117775089"
+        },
+        "status": "passed"
+      },
+      {
+        "index": 100,
+        "assert": {
+          "path": "mining.active",
+          "equals": true
+        },
+        "status": "passed"
+      },
+      {
+        "index": 103,
+        "assert": {
+          "path": "mining.extracted_mass_kg",
+          "approx": 1.92,
+          "tolerance": 1e-09
+        },
+        "status": "passed"
+      },
+      {
+        "index": 119,
+        "assert": {
+          "path": "mining.target",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 121,
+        "assert": {
+          "path": "mining.active",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 122,
+        "assert": {
+          "path": "mining.extracted_mass_kg",
+          "approx": 1.92,
+          "tolerance": 1e-09
+        },
+        "status": "passed"
+      },
+      {
+        "index": 126,
+        "assert": {
+          "path": "mining.extracted_mass_kg",
+          "approx": 1.92,
+          "tolerance": 1e-09
+        },
+        "status": "passed"
+      },
+      {
+        "index": 132,
+        "assert": {
+          "path": "mining.target",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 133,
+        "assert": {
+          "path": "mining.extracted_mass_kg",
+          "approx": 1.92,
+          "tolerance": 1e-09
+        },
+        "status": "passed"
+      },
+      {
+        "index": 138,
+        "assert": {
+          "path": "mining.target.id",
+          "equals": "Earth:16443359315117775089"
+        },
+        "status": "passed"
+      },
+      {
+        "index": 151,
+        "assert": {
+          "path": "mining.active",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 152,
+        "assert": {
+          "path": "mining.extracted_mass_kg",
+          "approx": 36.40896041381627,
+          "tolerance": 1e-08
+        },
+        "status": "passed"
+      },
+      {
+        "index": 156,
+        "assert": {
+          "path": "mining.extracted_mass_kg",
+          "approx": 36.40896041381627,
+          "tolerance": 1e-08
+        },
+        "status": "passed"
+      },
+      {
+        "index": 159,
+        "assert": {
+          "path": "mining.equipped",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 168,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": 1
+        },
+        "status": "passed"
+      },
+      {
+        "index": 169,
+        "assert": {
+          "path": "carrying.target_id",
+          "equals": 1
+        },
+        "status": "passed"
+      },
+      {
+        "index": 173,
+        "assert": {
+          "path": "carrying.object_id",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 175,
+        "assert": {
+          "path": "mining.held",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 176,
+        "assert": {
+          "path": "carrying.object_id",
+          "equals": 1
+        },
+        "status": "passed"
+      },
+      {
+        "index": 177,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 178,
+        "assert": {
+          "path": "mining.held",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 179,
+        "assert": {
+          "path": "mining.active",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 180,
+        "assert": {
+          "path": "mining.held_item_visible",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 181,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 184,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 187,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 190,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 193,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 196,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 199,
+        "assert": {
+          "path": "mining.equipped",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 201,
+        "assert": {
+          "path": "carrying.target_id",
+          "equals": 2
+        },
+        "status": "passed"
+      },
+      {
+        "index": 205,
+        "assert": {
+          "path": "carrying.object_id",
+          "equals": 1
+        },
+        "status": "passed"
+      },
+      {
+        "index": 206,
+        "assert": {
+          "path": "carrying.last_action_feedback",
+          "equals": "Fragment picked up - F to drop"
+        },
+        "status": "passed"
+      },
+      {
+        "index": 211,
+        "assert": {
+          "path": "mining.equipped",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 212,
+        "assert": {
+          "path": "carrying.object_id",
+          "equals": 1
+        },
+        "status": "passed"
+      },
+      {
+        "index": 214,
+        "assert": {
+          "path": "carrying.object_id",
+          "equals": 1
+        },
+        "status": "passed"
+      },
+      {
+        "index": 216,
+        "assert": {
+          "path": "mining.held",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 218,
+        "assert": {
+          "path": "carrying.object_id",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 219,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 220,
+        "assert": {
+          "path": "mining.equipped",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 221,
+        "assert": {
+          "path": "mining.held_item_visible",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 225,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": 1
+        },
+        "status": "passed"
+      },
+      {
+        "index": 226,
+        "assert": {
+          "path": "mining.equipped",
+          "equals": true
+        },
+        "status": "passed"
+      },
+      {
+        "index": 227,
+        "assert": {
+          "path": "mining.held",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 228,
+        "assert": {
+          "path": "mining.held_item_visible",
+          "equals": true
+        },
+        "status": "passed"
+      },
+      {
+        "index": 232,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": 5
+        },
+        "status": "passed"
+      },
+      {
+        "index": 233,
+        "assert": {
+          "path": "carrying.last_action_feedback",
+          "equals": "Fragment dropped"
+        },
+        "status": "passed"
+      },
+      {
+        "index": 238,
+        "assert": {
+          "path": "carrying.object_id",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 243,
+        "assert": {
+          "path": "carrying.last_action_feedback",
+          "equals": "Fragment dropped"
+        },
+        "status": "passed"
+      },
+      {
+        "index": 245,
+        "assert": {
+          "path": "carrying.target_id",
+          "equals": 2
+        },
+        "status": "passed"
+      },
+      {
+        "index": 248,
+        "assert": {
+          "path": "carrying.object_id",
+          "equals": 2
+        },
+        "status": "passed"
+      },
+      {
+        "index": 258,
+        "assert": {
+          "path": "mining.equipped",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 259,
+        "assert": {
+          "path": "carrying.object_id",
+          "equals": 2
+        },
+        "status": "passed"
+      }
+    ]
+  },
+  {
+    "scenario": "scenarios/evidence/resource-loop.json",
+    "status": "passed",
+    "steps_completed": 249,
+    "duration_ms": 20070,
+    "setup": {
+      "scenario": "resource-approach",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "checks": [
+      {
+        "index": 53,
+        "assert": {
+          "path": "mining.equipped",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 59,
+        "assert": {
+          "path": "mining.extracted_mass_kg",
+          "equals": 0
+        },
+        "status": "passed"
+      },
+      {
+        "index": 63,
+        "assert": {
+          "path": "mining.equipped",
+          "equals": true
+        },
+        "status": "passed"
+      },
+      {
+        "index": 66,
+        "assert": {
+          "path": "carrying.object_id",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 67,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": 1
+        },
+        "status": "passed"
+      },
+      {
+        "index": 68,
+        "assert": {
+          "path": "mining.held_item_visible",
+          "equals": true
+        },
+        "status": "passed"
+      },
+      {
+        "index": 69,
+        "assert": {
+          "path": "mining.extracted_mass_kg",
+          "equals": 0
+        },
+        "status": "passed"
+      },
+      {
+        "index": 70,
+        "assert": {
+          "path": "mining.target.id",
+          "equals": "Earth:16443359315117775089"
+        },
+        "status": "passed"
+      },
+      {
+        "index": 74,
+        "assert": {
+          "path": "mining.active",
+          "equals": true
+        },
+        "status": "passed"
+      },
+      {
+        "index": 76,
+        "assert": {
+          "path": "mining.extracted_mass_kg",
+          "approx": 1.92,
+          "tolerance": 1e-09
+        },
+        "status": "passed"
+      },
+      {
+        "index": 112,
+        "assert": {
+          "path": "mining.target.id",
+          "equals": "Earth:16443359315117775089"
+        },
+        "status": "passed"
+      },
+      {
+        "index": 116,
+        "assert": {
+          "path": "mining.target",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 118,
+        "assert": {
+          "path": "mining.active",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 119,
+        "assert": {
+          "path": "mining.extracted_mass_kg",
+          "approx": 1.92,
+          "tolerance": 1e-09
+        },
+        "status": "passed"
+      },
+      {
+        "index": 123,
+        "assert": {
+          "path": "mining.extracted_mass_kg",
+          "approx": 1.92,
+          "tolerance": 1e-09
+        },
+        "status": "passed"
+      },
+      {
+        "index": 129,
+        "assert": {
+          "path": "mining.target",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 130,
+        "assert": {
+          "path": "mining.extracted_mass_kg",
+          "approx": 1.92,
+          "tolerance": 1e-09
+        },
+        "status": "passed"
+      },
+      {
+        "index": 135,
+        "assert": {
+          "path": "mining.target.id",
+          "equals": "Earth:16443359315117775089"
+        },
+        "status": "passed"
+      },
+      {
+        "index": 148,
+        "assert": {
+          "path": "mining.active",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 149,
+        "assert": {
+          "path": "mining.extracted_mass_kg",
+          "approx": 36.40896041381627,
+          "tolerance": 1e-08
+        },
+        "status": "passed"
+      },
+      {
+        "index": 153,
+        "assert": {
+          "path": "mining.extracted_mass_kg",
+          "approx": 36.40896041381627,
+          "tolerance": 1e-08
+        },
+        "status": "passed"
+      },
+      {
+        "index": 176,
+        "assert": {
+          "path": "mining.target",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 180,
+        "assert": {
+          "path": "mining.equipped",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 189,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": 1
+        },
+        "status": "passed"
+      },
+      {
+        "index": 190,
+        "assert": {
+          "path": "mining.held_item_visible",
+          "equals": true
+        },
+        "status": "passed"
+      },
+      {
+        "index": 191,
+        "assert": {
+          "path": "carrying.target_id",
+          "equals": 1
+        },
+        "status": "passed"
+      },
+      {
+        "index": 195,
+        "assert": {
+          "path": "carrying.object_id",
+          "equals": 1
+        },
+        "status": "passed"
+      },
+      {
+        "index": 196,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 197,
+        "assert": {
+          "path": "mining.held",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 198,
+        "assert": {
+          "path": "mining.active",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 199,
+        "assert": {
+          "path": "mining.held_item_visible",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 202,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 205,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 208,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 211,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 214,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 217,
+        "assert": {
+          "path": "mining.equipped",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 227,
+        "assert": {
+          "path": "carrying.object_id",
+          "equals": 1
+        },
+        "status": "passed"
+      },
+      {
+        "index": 235,
+        "assert": {
+          "path": "carrying.object_id",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 236,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": null
+        },
+        "status": "passed"
+      },
+      {
+        "index": 237,
+        "assert": {
+          "path": "mining.equipped",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 238,
+        "assert": {
+          "path": "mining.held_item_visible",
+          "equals": false
+        },
+        "status": "passed"
+      },
+      {
+        "index": 242,
+        "assert": {
+          "path": "equipment.selected_slot",
+          "equals": 1
+        },
+        "status": "passed"
+      },
+      {
+        "index": 243,
+        "assert": {
+          "path": "mining.equipped",
+          "equals": true
+        },
+        "status": "passed"
+      },
+      {
+        "index": 244,
+        "assert": {
+          "path": "mining.held",
+          "equals": false
+        },
+        "status": "passed"
+      }
+    ]
+  }
+]

@@ -132,3 +132,12 @@ policy. Builds use checked-in artifacts and never run Blender.
 The exported `EXIT_DOOR_MARKER_DEPTH_METERS` derives the aft-face depth from
 the authored door marker and collider bounds for consumers presenting interaction
 guidance. It does not alter traversal, collision or interaction eligibility.
+
+## Carrying and equipment composition
+
+Character movement and location do not own equipment selection. Runtime composes
+one-world-object carrying with the five-slot toolbar: successful pickup clears
+selection, carrying blocks numeric selection, and release requires an explicit
+new selection. Failed pickup does not stow equipment. See the
+[runtime contract](../runtime/architecture.md#carrying-and-equipment-regression-contract-131)
+and carrying/resource-loop scenarios; no character movement rule changes.

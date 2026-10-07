@@ -155,7 +155,10 @@
       }
     },
     {
-      "action": {"op": "step", "frames": 45}
+      "action": {
+        "op": "step",
+        "frames": 45
+      }
     },
     {
       "action": {
@@ -377,6 +380,44 @@
       "assert": {
         "path": "mining.equipped",
         "equals": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "carrying.object_id",
+        "equals": null
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.held_item_visible",
+        "equals": true
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.extracted_mass_kg",
+        "equals": 0
       }
     },
     {
@@ -1116,6 +1157,32 @@
       }
     },
     {
+      "action": {
+        "op": "key",
+        "key": "slot_1",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_1",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.held_item_visible",
+        "equals": true
+      }
+    },
+    {
       "assert": {
         "path": "carrying.target_id",
         "equals": 1
@@ -1145,6 +1212,130 @@
       "assert": {
         "path": "carrying.object_id",
         "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": null
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.held",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.active",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.held_item_visible",
+        "equals": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_1",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_1",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": null
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_2",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_2",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": null
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_3",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_3",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": null
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_4",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_4",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": null
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_5",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_5",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": null
       }
     },
     {
@@ -1276,6 +1467,56 @@
       "assert": {
         "path": "carrying.object_id",
         "equals": null
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": null
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.equipped",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.held_item_visible",
+        "equals": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_1",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_1",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.equipped",
+        "equals": true
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.held",
+        "equals": false
       }
     },
     {

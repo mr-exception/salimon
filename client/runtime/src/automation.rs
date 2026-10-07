@@ -303,6 +303,7 @@ fn inspect(app: &ClientApplication) -> Value {
             "last_action_feedback": app.mining.carry_feedback},
         "mining": { "equipped": app.equipment.mining_equipped(), "held": app.mining.held,
             "active": app.mining.held && mining_target.is_some(),
+            "held_item_visible": app.held_item(character, mining_target.is_some()).is_some(),
             "extracted_mass_kg": app.mining.session.extracted_mass_kg(),
             "range_meters": salimon_world::mining::MINING_RANGE_METERS,
             "rate_kg_per_second": salimon_world::mining::MINING_RATE_KG_PER_SECOND,
@@ -764,6 +765,8 @@ mod tests {
         assert!(test.mining.session.carried_id().is_some());
         assert_eq!(inspect(&test)["equipment"]["selected_slot"], Value::Null);
         assert!(!test.equipment.mining_equipped());
+        assert_eq!(inspect(&test)["mining"]["held_item_visible"], false);
+        assert_eq!(test.equipment.presentation().selected, None);
         for key in ["slot_1", "slot_2", "slot_3", "slot_4", "slot_5"] {
             let request = json!({"protocol": 1, "id": 1, "op": "key", "key": key, "pressed": true});
             assert_eq!(execute(&mut test, &request.to_string())["ok"], true);
@@ -784,6 +787,14 @@ mod tests {
         test.automation_key(PhysicalKey::Code(KeyCode::Digit5), true);
         assert_eq!(inspect(&test)["equipment"]["selected_slot"], 5);
         assert_eq!(inspect(&test)["equipment"]["slots"][4], Value::Null);
+        test.automation_key(PhysicalKey::Code(KeyCode::Digit1), true);
+        assert_eq!(inspect(&test)["equipment"]["selected_slot"], 1);
+        assert!(test.equipment.mining_equipped());
+        assert_eq!(inspect(&test)["mining"]["held_item_visible"], true);
+        assert!(
+            !test.mining.held,
+            "re-selection must not resume held mining"
+        );
     }
 
     #[test]

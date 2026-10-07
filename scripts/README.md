@@ -483,3 +483,10 @@ five slots and the pickup/drop lockout. The bottom-center toolbar, held tool,
 reticle and mining gates derive from this selection. Select `slot_1` to equip;
 select `slot_2`–`slot_5` to stow and cancel held mining. The old toggle command
 `equip_mining_tool` and M binding are removed; use explicit slot selection.
+
+Inspection also returns `mining.held_item_visible`, using the same held-item
+DTO helper as redraw (gameplay view, surface location and selected mining tool).
+It is false throughout carrying and after drop until explicit slot 1 selection
+on the surface. Carrying/resource-loop baseline and evidence variants check
+failed pickup preserves selection, all five inputs are blocked while carrying,
+and re-selection does not resume a previous mining hold.

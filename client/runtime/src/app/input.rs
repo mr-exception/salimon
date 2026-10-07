@@ -10,6 +10,11 @@ pub(super) fn release_cursor_pressed(state: ElementState, repeat: bool, key: Phy
     state == ElementState::Pressed && !repeat && key == PhysicalKey::Code(KeyCode::Escape)
 }
 
+/// Tool/carrying input accepts real edges only; focus replay cannot grab/drop.
+pub(super) fn tool_key_event(repeat: bool, is_synthetic: bool, key: PhysicalKey) -> bool {
+    !repeat && !is_synthetic && matches!(key, PhysicalKey::Code(KeyCode::KeyM | KeyCode::KeyF))
+}
+
 pub(super) fn interaction_pressed(state: ElementState, repeat: bool, key: PhysicalKey) -> bool {
     state == ElementState::Pressed && !repeat && key == PhysicalKey::Code(KeyCode::KeyE)
 }
@@ -185,6 +190,19 @@ pub(super) fn camera_command(
 mod tests {
     use super::*;
     use salimon_world::CameraCommand;
+    #[test]
+    fn f_carrying_ignores_repeat_focus_replay_and_other_keys() {
+        let f = PhysicalKey::Code(KeyCode::KeyF);
+        assert!(tool_key_event(false, false, f));
+        assert!(!tool_key_event(true, false, f));
+        assert!(!tool_key_event(false, true, f));
+        assert!(!tool_key_event(
+            false,
+            false,
+            PhysicalKey::Code(KeyCode::KeyE)
+        ));
+    }
+
     #[test]
     fn focus_replayed_f2_does_not_toggle_the_view_again() {
         let f2 = PhysicalKey::Code(KeyCode::F2);

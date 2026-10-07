@@ -926,7 +926,7 @@
     {
       "assert": {
         "path": "resource_ui.context",
-        "equals": "Silicate rock fragment - approx 2.00 kg\nE to pick up fragment"
+        "equals": "Silicate rock fragment - approx 2.00 kg\nF to pick up fragment"
       }
     },
     {
@@ -938,10 +938,22 @@
       }
     },
     {
+      "assert": {
+        "path": "carrying.object_id",
+        "equals": null
+      }
+    },
+    {
       "action": {
         "op": "key",
-        "key": "pickup",
-        "pressed": false
+        "key": "grab_drop",
+        "pressed": true
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.held",
+        "equals": false
       }
     },
     {
@@ -981,20 +993,20 @@
     {
       "assert": {
         "path": "resource_ui.context",
-        "contains": "Only one world object - E to drop first"
+        "contains": "Only one world object - F to drop first"
       }
     },
     {
       "action": {
         "op": "key",
-        "key": "pickup",
+        "key": "grab_drop",
         "pressed": true
       }
     },
     {
       "action": {
         "op": "key",
-        "key": "pickup",
+        "key": "grab_drop",
         "pressed": false
       }
     },
@@ -1007,7 +1019,7 @@
     {
       "assert": {
         "path": "carrying.last_action_feedback",
-        "equals": "Only one world object - E to drop first"
+        "equals": "Fragment picked up - F to drop"
       }
     },
     {
@@ -1051,9 +1063,28 @@
       }
     },
     {
+      "assert": {
+        "path": "carrying.object_id",
+        "equals": 1
+      }
+    },
+    {
       "action": {
         "op": "key",
-        "key": "drop",
+        "key": "grab_drop",
+        "pressed": true
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.held",
+        "equals": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
         "pressed": false
       }
     },
@@ -1070,6 +1101,9 @@
       }
     },
     {
+      "screenshot": "fragment-placed"
+    },
+    {
       "action": {
         "op": "look",
         "dx": -1281.5671143427062,
@@ -1079,14 +1113,14 @@
     {
       "action": {
         "op": "key",
-        "key": "drop",
+        "key": "grab_drop",
         "pressed": true
       }
     },
     {
       "action": {
         "op": "key",
-        "key": "drop",
+        "key": "grab_drop",
         "pressed": false
       }
     },
@@ -1123,11 +1157,8 @@
     {
       "assert": {
         "path": "carrying.last_action_feedback",
-        "equals": "No world object carried"
+        "equals": "Fragment dropped"
       }
-    },
-    {
-      "screenshot": "fragment-placed"
     },
     {
       "action": {
@@ -1145,14 +1176,14 @@
     {
       "action": {
         "op": "key",
-        "key": "pickup",
+        "key": "grab_drop",
         "pressed": true
       }
     },
     {
       "action": {
         "op": "key",
-        "key": "pickup",
+        "key": "grab_drop",
         "pressed": false
       }
     },

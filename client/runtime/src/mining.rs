@@ -18,12 +18,47 @@ pub(crate) struct MiningTool {
     pub(crate) carry_feedback: Option<&'static str>,
     pub(crate) equipped: bool,
     pub(crate) held: bool,
+    f_down: bool,
+    f_mining: bool,
+    mouse_held: bool,
     pub(crate) session: MiningSession,
 }
 
 impl MiningTool {
     pub(crate) fn toggle(&mut self) {
         self.equipped = !self.equipped;
+        self.clear_input();
+    }
+
+    /// Latch the initial F edge; a carrying action consumes this entire press.
+    pub(crate) fn press_f(&mut self) -> bool {
+        if self.f_down {
+            return false;
+        }
+        self.f_down = true;
+        true
+    }
+
+    pub(crate) fn start_f_mining(&mut self) {
+        self.f_mining = true;
+        self.held = true;
+    }
+
+    pub(crate) fn release_f(&mut self) {
+        self.f_down = false;
+        self.f_mining = false;
+        self.held = self.mouse_held;
+    }
+
+    pub(crate) fn set_mouse_held(&mut self, pressed: bool) {
+        self.mouse_held = pressed;
+        self.held = self.f_mining || self.mouse_held;
+    }
+
+    pub(crate) fn clear_input(&mut self) {
+        self.f_down = false;
+        self.f_mining = false;
+        self.mouse_held = false;
         self.held = false;
     }
 
@@ -135,6 +170,31 @@ fn position(p: [f64; 3]) -> WorldPosition {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn carrying_press_is_latched_and_mouse_mining_is_independent() {
+        let mut tool = MiningTool::default();
+        assert!(tool.press_f());
+        assert!(
+            !tool.held,
+            "carrying consumes F without starting extraction"
+        );
+        assert!(!tool.press_f(), "repeated press cannot change the action");
+        tool.set_mouse_held(true);
+        tool.release_f();
+        assert!(tool.held, "F release must preserve left mouse mining");
+        assert!(tool.press_f());
+        tool.start_f_mining();
+        tool.set_mouse_held(false);
+        assert!(tool.held, "mouse release must preserve F mining");
+        tool.clear_input();
+        assert!(!tool.held);
+        assert!(tool.press_f(), "reset clears the F latch");
+        tool.start_f_mining();
+        tool.toggle();
+        assert!(!tool.held);
+        assert!(tool.press_f(), "stow clears the F latch too");
+    }
 
     #[test]
     fn authored_tool_visibility_and_feedback_follow_existing_gates() {

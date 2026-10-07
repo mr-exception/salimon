@@ -150,7 +150,7 @@ The default `suite` discovers every baseline scenario, including these routes:
 | `landed-earth.json` | Known initial player pose and ship state; walking/aiming into cockpit control; non-pilot control rejection; closed-door exit collision; opening and exiting to the surface; closing the door outside and walking against it twice; reopening and returning inside; the open-door takeoff interlock; closing the door and completing assisted takeoff. |
 | `resource-deposits.json` | Real airlock exit and surface walk to a stable generated silicate deposit; checks material, positive mass, proximity, and presentation data. |
 | `resource-streaming.json` | Partial mining, walking beyond the 120 m active radius, explicit source-ID absence, return with identical mass, full depletion, and a second round trip without regeneration or duplicate fragments. |
-| `carrying.json` | Physical pickup, blocked second pickup, equipped-tool independence, occupied/clear placement, subsequent pickup, and entity proximity after walking. |
+| `carrying.json` | Physical pickup, held-F repeat suppression, equipped-tool independence, occupied/clear placement, subsequent pickup, and entity proximity after walking. |
 | `mining.json` | Surface tool equip/aim/hold, exact timed extraction, aim/range/release rejection, return to the deposit, bounded depletion, and stow; no inventory credit. |
 | `orbit-earth.json` | Known seeded orbit pose; thruster changes; starting assisted landing; repeated landing action cannot cancel it; leaving cockpit control during landing; autonomous completion with zero ship velocity. |
 
@@ -342,11 +342,12 @@ retained only until the world/session ends, without disk or backend persistence.
 ## Physical pickup/drop (#46)
 
 `scenarios/carrying.json` follows the real mining route, approaches and aims at
-physical pieces, and uses `pickup`/`drop` keys (Q/G). It verifies single-object
-rejection, material/mass/identity preservation, tool independence, placement
-rejection on occupied ground, release, subsequent pickup, and carried entity
-proximity after movement. The evidence variant adds first pickup, blocked second
-pickup, placement, and moving carry screenshots. Both run in required Linux CI.
+physical pieces, and uses `grab_drop` (F). Legacy `pickup`/`drop`/`mine`
+aliases also route contextual F. It verifies E cannot grab/drop, held-F repeat
+suppression, material/mass/identity preservation, tool independence, release,
+subsequent pickup, and carried entity proximity after movement. The evidence
+variant adds first pickup, repeated-F suppression, placement and moving carry
+screenshots. Both run in required Linux CI.
 Run the evidence variant with a working display/capture helper:
 
 ```sh

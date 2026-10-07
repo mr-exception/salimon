@@ -33,7 +33,7 @@ pub(crate) use frames::{character_ship_frame, nearby_surface_at, surface_frame_f
 use input::{
     ShipControlInput, camera_command, interaction_pressed, is_diagnostics_toggle, is_movement_key,
     is_ship_control_key, landing_action_pressed, release_cursor_pressed, thruster_step,
-    update_movement_input, update_ship_control_input, view_toggle_pressed,
+    tool_key_event, update_movement_input, update_ship_control_input, view_toggle_pressed,
 };
 use interaction::{
     InteractionTarget, action_bar_context, available_interaction_target, gameplay_window_title,
@@ -276,22 +276,6 @@ impl ClientApplication {
                 let local_look = ship_frame.world_to_local(character.look_target_meters);
                 let interaction =
                     available_interaction_target(self.character.location(), local_eye, local_look);
-                if matches!(
-                    character.location,
-                    CharacterLocation::Surface | CharacterLocation::InsideShip
-                ) && (self.mining.session.carried_id().is_some()
-                    || crate::carrying::target(
-                        &self.mining,
-                        character,
-                        ship_frame,
-                        door_passable(ship_snapshot),
-                    )
-                    .is_some())
-                    && interaction != Some(InteractionTarget::ExitDoor)
-                {
-                    self.carry_action(self.mining.session.carried_id().is_none());
-                    return;
-                }
                 match interaction {
                     Some(InteractionTarget::Cockpit) => {
                         self.character.enter_cockpit();
@@ -341,18 +325,27 @@ impl ClientApplication {
         if self.view_mode != ViewMode::Gameplay {
             return;
         }
-        if matches!(key, PhysicalKey::Code(KeyCode::KeyQ | KeyCode::KeyG)) {
-            if pressed {
-                self.carry_action(key == PhysicalKey::Code(KeyCode::KeyQ));
-            }
-            return;
-        }
         if key == PhysicalKey::Code(KeyCode::KeyM) && pressed {
             self.mining.toggle();
             return;
         }
         if key == PhysicalKey::Code(KeyCode::KeyF) {
-            self.mining.held = pressed;
+            if !pressed {
+                self.mining.release_f();
+            } else if self.mining.press_f() {
+                let ship = self.ship.snapshot();
+                let frame = character_ship_frame(ship.pose);
+                let player = self.character.snapshot(frame, surface_frame_for_ship(ship));
+                let pickup = self.mining.session.carried_id().is_none();
+                if !pickup
+                    || crate::carrying::target(&self.mining, player, frame, door_passable(ship))
+                        .is_some()
+                {
+                    self.carry_action(pickup);
+                } else {
+                    self.mining.start_f_mining();
+                }
+            }
             return;
         }
         if self.character.location() == CharacterLocation::Cockpit && is_ship_control_key(key) {
@@ -372,9 +365,9 @@ impl ClientApplication {
                 Some(id) if self.mining.session.pick_up(id) => {
                     self.mining.fragment_motion.remove(&id);
                     self.mining.ship_fragments.remove(&id);
-                    "Fragment picked up - E to drop"
+                    "Fragment picked up - F to drop"
                 }
-                Some(_) => "Only one world object - E to drop first",
+                Some(_) => "Only one world object - F to drop first",
                 None => "Aim at a fragment within 3 m",
             }
         } else if self.mining.session.carried_id().is_none() {
@@ -753,7 +746,7 @@ impl ApplicationHandler for ClientApplication {
         self.frame_clock.reset_interval();
         self.update_clock.reset();
         self.diagnostics.reset_frame_window();
-        self.mining.held = false;
+        self.mining.clear_input();
         log::info!("application suspended; GPU presentation resources released");
     }
 
@@ -810,7 +803,7 @@ impl ApplicationHandler for ClientApplication {
                     self.movement_input = MovementInput::default();
                     self.ship_control_input = ShipControlInput::default();
                     self.cursor_captured = false;
-                    self.mining.held = false;
+                    self.mining.clear_input();
                 }
             }
             WindowEvent::MouseInput {
@@ -826,22 +819,26 @@ impl ApplicationHandler for ClientApplication {
                 self.cursor_captured = false;
                 self.movement_input = MovementInput::default();
                 self.ship_control_input = ShipControlInput::default();
-                self.mining.held = false;
+                self.mining.clear_input();
             }
             WindowEvent::MouseInput {
                 state,
                 button: MouseButton::Left,
                 ..
             } => {
-                self.mining.held = self.cursor_captured && state == ElementState::Pressed;
+                self.mining
+                    .set_mouse_held(self.cursor_captured && state == ElementState::Pressed);
             }
-            WindowEvent::KeyboardInput { event, .. }
-                if event.physical_key == PhysicalKey::Code(KeyCode::KeyM)
-                    || event.physical_key == PhysicalKey::Code(KeyCode::KeyF)
-                    || event.physical_key == PhysicalKey::Code(KeyCode::KeyQ)
-                    || event.physical_key == PhysicalKey::Code(KeyCode::KeyG) =>
+            WindowEvent::KeyboardInput {
+                event,
+                is_synthetic,
+                ..
+            } if event.physical_key == PhysicalKey::Code(KeyCode::KeyM)
+                || event.physical_key == PhysicalKey::Code(KeyCode::KeyF) =>
             {
-                if self.cursor_captured && !event.repeat {
+                if self.cursor_captured
+                    && tool_key_event(event.repeat, is_synthetic, event.physical_key)
+                {
                     self.automation_key(event.physical_key, event.state == ElementState::Pressed);
                     window.request_redraw();
                 }
@@ -876,7 +873,7 @@ impl ApplicationHandler for ClientApplication {
                     ViewMode::Gameplay => ViewMode::PrecisionTour,
                     ViewMode::PrecisionTour => ViewMode::Gameplay,
                 };
-                self.mining.held = false;
+                self.mining.clear_input();
                 log::info!("view mode changed to {:?} (F2 toggles)", self.view_mode);
                 window.request_redraw();
             }
@@ -931,7 +928,7 @@ impl ApplicationHandler for ClientApplication {
                 let command = camera_command(event.state, event.repeat, event.physical_key)
                     .expect("guard accepts only camera commands");
                 self.camera_prototype.apply_command(command);
-                self.mining.held = false;
+                self.mining.clear_input();
                 self.view_mode = ViewMode::PrecisionTour;
                 log::info!(
                     "camera tour command: {command:?}; paused={}",

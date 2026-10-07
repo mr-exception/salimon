@@ -91,3 +91,12 @@
   orientation during pose writeback. Ship anchors/velocities use ship-local metres;
   surface objects use absolute metres. Physical response is owned by
   `salimon-physics`; runtime supplies geometry and frame conversions only.
+
+- F initial presses grab an aimed reachable world object, or release the carried
+  object. Carrying wins over keyboard mining for that entire press; repeated or
+  synthetic native presses cannot repeat the action. E never changes carrying.
+- Held F mines only when its initial press had no carrying action. Left mouse
+  mining has independent held state; releasing either input preserves the other.
+  Focus loss, cursor release, view switch and stow clear both inputs and F latch.
+- Automation `grab_drop` and legacy `mine`/`pickup`/`drop` aliases all use the
+  production contextual F route; no Q/G item-specific carrying route exists.

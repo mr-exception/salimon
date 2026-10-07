@@ -920,20 +920,20 @@
     {
       "assert": {
         "path": "resource_ui.context",
-        "equals": "Silicate rock fragment - approx 2.00 kg\nE to pick up fragment"
+        "equals": "Silicate rock fragment - approx 2.00 kg\nF to pick up fragment"
       }
     },
     {
       "action": {
         "op": "key",
-        "key": "pickup",
+        "key": "grab_drop",
         "pressed": true
       }
     },
     {
       "action": {
         "op": "key",
-        "key": "pickup",
+        "key": "grab_drop",
         "pressed": false
       }
     },
@@ -1031,14 +1031,14 @@
     {
       "action": {
         "op": "key",
-        "key": "drop",
+        "key": "grab_drop",
         "pressed": true
       }
     },
     {
       "action": {
         "op": "key",
-        "key": "drop",
+        "key": "grab_drop",
         "pressed": false
       }
     },
@@ -1079,14 +1079,14 @@
     {
       "action": {
         "op": "key",
-        "key": "pickup",
+        "key": "grab_drop",
         "pressed": true
       }
     },
     {
       "action": {
         "op": "key",
-        "key": "pickup",
+        "key": "grab_drop",
         "pressed": false
       }
     },
@@ -1139,14 +1139,14 @@
     {
       "action": {
         "op": "key",
-        "key": "drop",
+        "key": "grab_drop",
         "pressed": true
       }
     },
     {
       "action": {
         "op": "key",
-        "key": "drop",
+        "key": "grab_drop",
         "pressed": false
       }
     },
@@ -1181,14 +1181,14 @@
     {
       "action": {
         "op": "key",
-        "key": "pickup",
+        "key": "grab_drop",
         "pressed": true
       }
     },
     {
       "action": {
         "op": "key",
-        "key": "pickup",
+        "key": "grab_drop",
         "pressed": false
       }
     },
@@ -1241,14 +1241,14 @@
     {
       "action": {
         "op": "key",
-        "key": "drop",
+        "key": "grab_drop",
         "pressed": true
       }
     },
     {
       "action": {
         "op": "key",
-        "key": "drop",
+        "key": "grab_drop",
         "pressed": false
       }
     },

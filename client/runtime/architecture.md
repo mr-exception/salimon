@@ -202,3 +202,13 @@ Compatible `f64` component arithmetic comes from the dependency-free
 `salimon-math` leaf crate. Normalization, frame and quaternion policies stay
 with their owning domain. See the canonical
 [decision and inventory](../../docs/technical-architecture.md#shared-math-decision-115).
+
+## Physical interaction input (#126)
+
+E routes only cockpit/door interactions. `automation_key` shares the native F
+route: on an initial press, carrying wins if an object is held or a reachable
+object is aimed at; otherwise it starts keyboard mining. MiningTool latches F
+until release, preventing a consumed grab/drop press from mining or repeating.
+Independent mouse and keyboard mining state is combined into `held`; lifecycle
+resets and stowing clear both and the latch. Automation `grab_drop` plus legacy
+`mine`/`pickup`/`drop` names map to F with identical contextual semantics.

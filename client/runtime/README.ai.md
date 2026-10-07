@@ -66,7 +66,9 @@ not reorder it or move domain rules into runtime mapping.
 - Update this guide and the component architecture/invariants when ownership or
   behavior intentionally changes.
 
-Mining input/presentation is runtime composition; keep target validation, rate,
+F grab/drop priority and independent keyboard/mouse held state are runtime
+composition in `app.rs`/`app/input.rs` and `mining.rs`; see runtime invariants.
+Automation must share that route. Mining input/presentation is runtime composition; keep target validation, rate,
 source mass mutation, and session state in `salimon_world::mining`.
 
 ## Shared maintenance rules

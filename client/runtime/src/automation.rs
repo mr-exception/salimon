@@ -178,9 +178,7 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "jump" | "ascend" => Some(KeyCode::Space),
         "descend" => Some(KeyCode::ShiftLeft),
         "equip_mining_tool" => Some(KeyCode::KeyM),
-        "pickup" => Some(KeyCode::KeyQ),
-        "drop" => Some(KeyCode::KeyG),
-        "mine" => Some(KeyCode::KeyF),
+        "grab_drop" | "pickup" | "drop" | "mine" => Some(KeyCode::KeyF),
         "roll_left" => Some(KeyCode::ArrowLeft),
         "roll_right" => Some(KeyCode::ArrowRight),
         _ => None,
@@ -559,6 +557,62 @@ mod tests {
             Scenario::LandedEarth,
             include_str!("../../../scenarios/carrying.json"),
         );
+    }
+
+    #[test]
+    fn carrying_evidence_uses_the_same_f_contract() {
+        assert_gameplay_scenario(
+            Scenario::LandedEarth,
+            include_str!("../../../scenarios/evidence/carrying.json"),
+        );
+    }
+
+    #[test]
+    fn equipped_f_pickup_consumes_the_press_and_e_does_not_release() {
+        let mut test = app(Scenario::LandedEarth);
+        let scenario: Value =
+            serde_json::from_str(include_str!("../../../scenarios/carrying.json")).unwrap();
+        e2e::initialize(
+            &mut test,
+            Config {
+                scenario: Scenario::LandedEarth,
+                seed: 0,
+                step: Duration::from_millis(16),
+            },
+        )
+        .unwrap();
+        for step in scenario["steps"].as_array().unwrap() {
+            if step.get("assert").and_then(|check| check["path"].as_str())
+                == Some("carrying.target_id")
+                && step["assert"]["equals"] == json!(1)
+            {
+                break;
+            }
+            if let Some(action) = step.get("action") {
+                let mut command = action.clone();
+                command["protocol"] = json!(1);
+                command["id"] = json!(1);
+                assert_eq!(execute(&mut test, &command.to_string())["ok"], true);
+            }
+        }
+        test.mining.toggle();
+        assert!(test.mining.equipped);
+        let mass = test.mining.session.extracted_mass_kg();
+        test.interact();
+        assert!(test.mining.session.carried_id().is_none());
+        test.automation_key(PhysicalKey::Code(KeyCode::KeyF), true);
+        assert!(test.mining.session.carried_id().is_some());
+        assert!(!test.mining.held);
+        test.automation_key(PhysicalKey::Code(KeyCode::KeyF), true);
+        test.advance_game(Duration::from_secs(1));
+        assert_eq!(test.mining.session.extracted_mass_kg(), mass);
+        assert!(test.mining.session.carried_id().is_some());
+        test.interact();
+        assert!(test.mining.session.carried_id().is_some());
+        test.automation_key(PhysicalKey::Code(KeyCode::KeyF), false);
+        test.automation_key(PhysicalKey::Code(KeyCode::KeyF), true);
+        assert!(test.mining.session.carried_id().is_none());
+        assert!(!test.mining.held, "drop must not start F mining either");
     }
 
     #[test]

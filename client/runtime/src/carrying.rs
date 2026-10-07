@@ -79,12 +79,12 @@ pub(crate) fn context(
     }
     if tool.session.carried_id().is_some() {
         Some(if target.is_some() {
-            "Only one world object - E to drop first"
+            "Only one world object - F to drop first"
         } else {
-            "Carrying fragment - E to drop"
+            "Carrying fragment - F to drop"
         })
     } else {
-        target.map(|_| "E to pick up fragment")
+        target.map(|_| "F to pick up fragment")
     }
 }
 

@@ -130,9 +130,10 @@ ship velocity. Press **E** near the cockpit to enter or leave
 control instantly; press **E** near the aft door to open/close it while landed or in open space beyond the nearby-body threshold.
 Press **M** to equip the handheld mining tool on the surface; aim at a deposit
 within 4 m and hold **F** or left mouse to extract at 2 kg/s. Press M to stow.
-Aim at a physical fragment within 3 m and press **E** to pick it up. You can
-carry one world object at a time; equipped gear remains separate. Press **E**
-again to release it from your hand. Gravity and contact make fragments fall and pile up.
+Aim at a physical fragment within 3 m and press **F** to pick it up. You can
+carry one world object at a time; equipped gear remains separate. Press **F**
+again to release it from your hand. Grab/drop consumes that F press; otherwise
+held F mines. Release F before another action. E only operates cockpit/door interactions. Gravity and contact make fragments fall and pile up.
 Face the open door and walk forward through it to transition over 0.25 seconds
 to the active solid body's radial gravity and inspect the ship exterior. There is no sprint or crouch. Press
 **Escape** to release the captured cursor for window controls; click the game

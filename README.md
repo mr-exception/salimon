@@ -128,6 +128,11 @@ view (including pitch), **Space** ascends, and **Left Shift** descends. Release
 translation input to stop assisted relative movement while retaining inherited
 ship velocity. Press **E** near the cockpit to enter or leave
 control instantly; press **E** near the aft door to open/close it while landed or in open space beyond the nearby-body threshold.
+Gameplay **1–5** selects one of five equipment slots (slot 1: mining tool;
+slots 2–5: empty). Pickup clears selection; carrying blocks selection, and
+dropping requires selecting a slot again. This state/input foundation has no
+visible toolbar yet; mining presentation still uses M until the dependent work.
+
 Press **M** to equip the handheld mining tool on the surface; aim at a deposit
 within 4 m and hold **F** or left mouse to extract at 2 kg/s. Press M to stow.
 Aim at a physical fragment within 3 m and press **F** to pick it up. You can
@@ -156,7 +161,7 @@ the selected body's far endpoint, and **N** to jump to the exact 12 m near-surfa
 pause there for inspection. Only the initial physical key press is acted on;
 repeats and releases are ignored.
 
-Press **1–6** to restart the approach for **Sun, Mercury, Venus, Earth, Moon,
+In precision-tour view, press **1–6** to restart the approach for **Sun, Mercury, Venus, Earth, Moon,
 Mars**, respectively. Earth is selected at launch. Selection is an engineering
 camera fixture; it does not move bodies or implement flight/landing gameplay.
 

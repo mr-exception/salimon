@@ -33,7 +33,8 @@ pub(crate) use frames::{character_ship_frame, nearby_surface_at, surface_frame_f
 use input::{
     ShipControlInput, camera_command, interaction_pressed, is_diagnostics_toggle, is_movement_key,
     is_ship_control_key, landing_action_pressed, release_cursor_pressed, thruster_step,
-    tool_key_event, update_movement_input, update_ship_control_input, view_toggle_pressed,
+    tool_key_event, toolbar_selection_pressed, toolbar_slot, update_movement_input,
+    update_ship_control_input, view_toggle_pressed,
 };
 use interaction::{
     InteractionTarget, action_bar_context, available_interaction_target, gameplay_window_title,
@@ -106,6 +107,7 @@ pub(crate) struct ClientApplication {
     e2e_ready_sent: bool,
     automation: Option<Receiver<Request>>,
     pub(crate) mining: crate::mining::MiningTool,
+    pub(crate) equipment: crate::equipment::EquipmentToolbar,
     movement_input: MovementInput,
     ship_control_input: ShipControlInput,
     view_mode: ViewMode,
@@ -132,6 +134,7 @@ impl Default for ClientApplication {
             e2e_ready_sent: false,
             automation: None,
             mining: crate::mining::MiningTool::default(),
+            equipment: crate::equipment::EquipmentToolbar::default(),
             movement_input: MovementInput::default(),
             ship_control_input: ShipControlInput::default(),
             view_mode: ViewMode::Gameplay,
@@ -323,6 +326,25 @@ impl ClientApplication {
 
     pub(crate) fn automation_key(&mut self, key: PhysicalKey, pressed: bool) {
         if self.view_mode != ViewMode::Gameplay {
+            if let Some(command) = camera_command(
+                if pressed {
+                    ElementState::Pressed
+                } else {
+                    ElementState::Released
+                },
+                false,
+                key,
+                true,
+            ) {
+                self.camera_prototype.apply_command(command);
+            }
+            return;
+        }
+        if let Some(slot) = toolbar_slot(key) {
+            if pressed {
+                self.equipment
+                    .select(slot, self.mining.session.carried_id().is_some());
+            }
             return;
         }
         if key == PhysicalKey::Code(KeyCode::KeyM) && pressed {
@@ -363,6 +385,7 @@ impl ClientApplication {
         let message = if pickup {
             match crate::carrying::target(&self.mining, player, frame, door_open) {
                 Some(id) if self.mining.session.pick_up(id) => {
+                    self.equipment.sync_carrying(true);
                     self.mining.fragment_motion.remove(&id);
                     self.mining.ship_fragments.remove(&id);
                     "Fragment picked up - F to drop"
@@ -867,6 +890,25 @@ impl ApplicationHandler for ClientApplication {
                     window.request_redraw();
                 }
             }
+            WindowEvent::KeyboardInput {
+                event,
+                is_synthetic,
+                ..
+            } if self.view_mode == ViewMode::Gameplay
+                && toolbar_slot(event.physical_key).is_some() =>
+            {
+                if self.cursor_captured
+                    && toolbar_selection_pressed(
+                        event.state,
+                        event.repeat,
+                        event.physical_key,
+                        is_synthetic,
+                    )
+                {
+                    self.automation_key(event.physical_key, true);
+                    window.request_redraw();
+                }
+            }
             WindowEvent::KeyboardInput { event, .. }
                 if interaction_pressed(event.state, event.repeat, event.physical_key) =>
             {
@@ -947,10 +989,21 @@ impl ApplicationHandler for ClientApplication {
                 window.request_redraw();
             }
             WindowEvent::KeyboardInput { event, .. }
-                if camera_command(event.state, event.repeat, event.physical_key).is_some() =>
+                if camera_command(
+                    event.state,
+                    event.repeat,
+                    event.physical_key,
+                    self.view_mode == ViewMode::PrecisionTour,
+                )
+                .is_some() =>
             {
-                let command = camera_command(event.state, event.repeat, event.physical_key)
-                    .expect("guard accepts only camera commands");
+                let command = camera_command(
+                    event.state,
+                    event.repeat,
+                    event.physical_key,
+                    self.view_mode == ViewMode::PrecisionTour,
+                )
+                .expect("guard accepts only camera commands");
                 self.camera_prototype.apply_command(command);
                 self.mining.clear_input();
                 self.view_mode = ViewMode::PrecisionTour;
@@ -1018,5 +1071,55 @@ impl ApplicationHandler for ClientApplication {
         self.renderer = None;
         self.window = None;
         log::info!("application exiting cleanly");
+    }
+}
+
+#[cfg(test)]
+mod toolbar_tests {
+    use super::*;
+    use crate::equipment::ToolbarSlot;
+    use salimon_world::{CameraCommand, CelestialBodyId};
+
+    #[test]
+    fn numeric_inputs_select_gameplay_slots_without_changing_the_tour() {
+        let mut app = ClientApplication::default();
+        let initial_camera = app.camera_prototype.snapshot().camera;
+        for (key, slot) in [
+            (KeyCode::Digit1, ToolbarSlot::One),
+            (KeyCode::Digit2, ToolbarSlot::Two),
+            (KeyCode::Digit3, ToolbarSlot::Three),
+            (KeyCode::Digit4, ToolbarSlot::Four),
+            (KeyCode::Digit5, ToolbarSlot::Five),
+        ] {
+            app.automation_key(PhysicalKey::Code(key), true);
+            app.automation_key(PhysicalKey::Code(key), false);
+            assert_eq!(app.equipment.selected(), Some(slot));
+            assert_eq!(app.view_mode, ViewMode::Gameplay);
+            assert_eq!(app.camera_prototype.snapshot().camera, initial_camera);
+        }
+    }
+
+    #[test]
+    fn precision_tour_numbers_leave_equipment_selection_intact() {
+        let mut app = ClientApplication::default();
+        app.automation_key(PhysicalKey::Code(KeyCode::Digit4), true);
+        app.view_mode = ViewMode::PrecisionTour;
+        for (key, body) in [
+            (KeyCode::Digit1, CelestialBodyId::Sun),
+            (KeyCode::Digit2, CelestialBodyId::Mercury),
+            (KeyCode::Digit3, CelestialBodyId::Venus),
+            (KeyCode::Digit4, CelestialBodyId::Earth),
+            (KeyCode::Digit5, CelestialBodyId::Moon),
+            (KeyCode::Digit6, CelestialBodyId::Mars),
+        ] {
+            let mut expected = CameraPrototype::default();
+            expected.apply_command(CameraCommand::InspectBody(body));
+            app.automation_key(PhysicalKey::Code(key), true);
+            assert_eq!(
+                app.camera_prototype.snapshot().camera,
+                expected.snapshot().camera
+            );
+            assert_eq!(app.equipment.selected(), Some(ToolbarSlot::Four));
+        }
     }
 }

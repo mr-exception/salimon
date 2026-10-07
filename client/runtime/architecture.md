@@ -77,7 +77,7 @@ to run on the native event thread with explicit fixed steps and production gates
 F2 toggles gameplay/precision-tour view and F3 toggles diagnostics. P toggles the camera fixture, R
 restarts it, and N selects and pauses the exact near-surface inspection view;
 releases and key-repeat events are ignored. The runtime maps native keys to typed
-commands; 1–6 restart inspection of Sun, Mercury, Venus, Earth, Moon, and Mars.
+commands; in precision-tour view, 1–6 restart inspection of Sun, Mercury, Venus, Earth, Moon, and Mars.
 It maps renderer/world measurements to diagnostics without sharing `wgpu` or
 `winit` types. All six catalog names and nonnegative camera-to-nominal-surface
 observations flow through `BodyDistance`; diagnostics selects the closest for its
@@ -220,3 +220,21 @@ until release, preventing a consumed grab/drop press from mining or repeating.
 Independent mouse and keyboard mining state is combined into `held`; lifecycle
 resets and stowing clear both and the latch. Automation `grab_drop` plus legacy
 `mine`/`pickup`/`drop` names map to F with identical contextual semantics.
+
+## Equipment toolbar state (#128)
+
+`equipment.rs` owns a portable five-slot loadout and optional typed selection,
+composed by `ClientApplication.equipment`. Slot 1 contains `MiningTool`; slots
+2–5 are empty. Initial selection is absent. Gameplay numeric keys 1–5 select
+one slot, including empty slots, without toggling the current selection off.
+Native selection accepts only captured-cursor, nonsynthetic initial presses.
+The same mapping is used by automation. Numeric camera inspection commands
+only apply in precision-tour view; P/R/N retain their engineering shortcuts.
+
+Successful physical pickup immediately clears selection. Selection reads the
+world session's carried identity and is refused while it is occupied; release
+never restores a previous selection. Renderer state does not own the loadout.
+Toolbar rendering and deriving mining-tool presentation from selection remain
+separate dependent work: the existing M equip control is preserved for now.
+Automation inspection exposes `equipment.slots` (tool names/null) and
+`equipment.selected_slot` (1–5/null).

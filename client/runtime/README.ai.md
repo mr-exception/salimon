@@ -84,3 +84,7 @@ Loose-object physical rules belong in `salimon-physics`. Runtime selects session
 entities/environment, supplies geometry and sequences the solver; keep restitution,
 gravity, contact response and substeps out of the native adapter. See the
 [ownership decision](../../docs/technical-architecture.md#physical-object-simulation-decision-114).
+
+Equipment toolbar state lives in `equipment.rs`, composed in `app.rs`. Keep
+world-session carrying checks and native/automation view gates aligned. Its
+selection does not yet replace M mining equip/presentation (dependent work).

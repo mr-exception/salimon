@@ -102,3 +102,14 @@
   Focus loss, cursor release, view switch and stow clear both inputs and F latch.
 - Automation `grab_drop` and legacy `mine`/`pickup`/`drop` aliases all use the
   production contextual F route; no Q/G item-specific carrying route exists.
+
+- Equipment toolbar state has exactly five slots, initially mining tool then four
+  empty slots, and zero or one selected slot (initially none). Empty selection
+  targets are valid; repeated selection of the same slot never toggles it off.
+- Gameplay 1–5 selects slots only on real initial native presses with cursor
+  captured; releases, repeats and focus replay do not select. Precision-tour
+  1–6 inspects bodies without changing equipment state.
+- Successful physical pickup clears toolbar selection immediately. World-session
+  carrying blocks all slot selection; dropping never restores selection.
+- Toolbar state/input remains independent of renderer and individual tool equip
+  behavior until the dependent presentation work connects those consumers.

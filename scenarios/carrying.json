@@ -8,6 +8,124 @@
   "steps": [
     {
       "assert": {
+        "path": "equipment.slots",
+        "equals": [
+          "mining_tool",
+          null,
+          null,
+          null,
+          null
+        ]
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": null
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_1",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_1",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": 1
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_2",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_2",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": 2
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_3",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_3",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": 3
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_4",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_4",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": 4
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_5",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_5",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": 5
+      }
+    },
+    {
+      "assert": {
         "path": "player.location",
         "equals": "InsideShip"
       }
@@ -912,6 +1030,26 @@
       }
     },
     {
+      "action": {
+        "op": "key",
+        "key": "slot_1",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_1",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": 1
+      }
+    },
+    {
       "assert": {
         "path": "carrying.target_id",
         "equals": 1
@@ -951,6 +1089,112 @@
       "assert": {
         "path": "carrying.object_id",
         "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": null
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_1",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_1",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": null
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_2",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_2",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": null
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_3",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_3",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": null
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_4",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_4",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": null
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_5",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_5",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": null
       }
     },
     {
@@ -1077,6 +1321,32 @@
       "assert": {
         "path": "carrying.object_id",
         "equals": null
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": null
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_5",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_5",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": 5
       }
     },
     {

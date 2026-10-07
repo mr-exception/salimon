@@ -1,0 +1,695 @@
+{
+  "date": "2026-10-07",
+  "base_commit": "c26406a7533b9c4eb8be31b0d56f0fbe06abb0ed",
+  "environment": "Ubuntu 24.04, Rust 1.99.0, Python 3.12, wgpu 30.0.1, Mesa lavapipe 25.2.8, TCP Xvfb 1280x800, debug executable",
+  "baseline": [
+    {
+      "scenario": "carrying.json",
+      "status": "passed",
+      "steps": 193
+    },
+    {
+      "scenario": "cockpit-nose.json",
+      "status": "passed",
+      "steps": 30
+    },
+    {
+      "scenario": "fragment-transfer.json",
+      "status": "passed",
+      "steps": 253
+    },
+    {
+      "scenario": "landed-earth.json",
+      "status": "passed",
+      "steps": 110
+    },
+    {
+      "scenario": "lower-cockpit-windows.json",
+      "status": "passed",
+      "steps": 16
+    },
+    {
+      "scenario": "mining.json",
+      "status": "passed",
+      "steps": 138
+    },
+    {
+      "scenario": "moving-eva.json",
+      "status": "passed",
+      "steps": 93
+    },
+    {
+      "scenario": "nearby-eva.json",
+      "status": "passed",
+      "steps": 43
+    },
+    {
+      "scenario": "orbit-earth.json",
+      "status": "passed",
+      "steps": 23
+    },
+    {
+      "scenario": "resource-deposits.json",
+      "status": "passed",
+      "steps": 64
+    },
+    {
+      "scenario": "resource-loop.json",
+      "status": "passed",
+      "steps": 203
+    },
+    {
+      "scenario": "resource-streaming.json",
+      "status": "passed",
+      "steps": 135
+    },
+    {
+      "scenario": "space-airlock.json",
+      "status": "passed",
+      "steps": 50
+    }
+  ],
+  "evidence": [
+    {
+      "scenario": "scenarios/evidence/world-prompts.json",
+      "status": "passed",
+      "steps": 80,
+      "duration_ms": 15843
+    },
+    {
+      "scenario": "scenarios/evidence/carrying.json",
+      "status": "passed",
+      "steps": 203,
+      "duration_ms": 30371
+    },
+    {
+      "scenario": "scenarios/evidence/mining-tool.json",
+      "status": "passed",
+      "steps": 161,
+      "duration_ms": 29058
+    }
+  ],
+  "checkpoints": [
+    {
+      "image": "cockpit.png",
+      "source_scenario": "scenarios/evidence/world-prompts.json",
+      "step": 17,
+      "status": "passed",
+      "player": {
+        "eye_position_meters": [
+          1000000000000.5,
+          -749993999997.8951,
+          249993999997.8
+        ],
+        "local_ship_position_meters": [
+          0.5,
+          1.9973118279569892,
+          -2.2
+        ],
+        "location": "InsideShip",
+        "look_target_meters": [
+          1000000000001.2179,
+          -749993999997.8951,
+          249993999998.49612
+        ],
+        "nearby_body": {
+          "name": "Earth",
+          "surface_distance_meters": 2.104858823120594
+        },
+        "relative_speed_meters_per_second": 0.0,
+        "relative_velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_local_eye_position_meters": [
+          0.5,
+          1.997314453125,
+          -2.20001220703125
+        ],
+        "speed_meters_per_second": 0.0,
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "ship": {
+        "position_meters": [
+          1000000000000.0,
+          -749993999999.8925,
+          249994000000.0
+        ],
+        "orientation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "door_state": "Closed"
+      },
+      "interaction": "cockpit",
+      "resource_ui": {
+        "anchor_meters": null,
+        "context": null
+      },
+      "carrying": {
+        "context": null,
+        "last_action_feedback": null,
+        "object_id": null,
+        "target_id": null
+      }
+    },
+    {
+      "image": "cockpit-camera-moved.png",
+      "source_scenario": "scenarios/evidence/world-prompts.json",
+      "step": 19,
+      "status": "passed",
+      "player": {
+        "eye_position_meters": [
+          1000000000000.5,
+          -749993999997.8951,
+          249993999997.8
+        ],
+        "local_ship_position_meters": [
+          0.5,
+          1.9973118279569892,
+          -2.2
+        ],
+        "location": "InsideShip",
+        "look_target_meters": [
+          1000000000001.085,
+          -749993999997.8951,
+          249993999998.61108
+        ],
+        "nearby_body": {
+          "name": "Earth",
+          "surface_distance_meters": 2.104858823120594
+        },
+        "relative_speed_meters_per_second": 0.0,
+        "relative_velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_local_eye_position_meters": [
+          0.5,
+          1.997314453125,
+          -2.20001220703125
+        ],
+        "speed_meters_per_second": 0.0,
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "ship": {
+        "position_meters": [
+          1000000000000.0,
+          -749993999999.8925,
+          249994000000.0
+        ],
+        "orientation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "door_state": "Closed"
+      },
+      "interaction": "cockpit",
+      "resource_ui": {
+        "anchor_meters": null,
+        "context": null
+      },
+      "carrying": {
+        "context": null,
+        "last_action_feedback": null,
+        "object_id": null,
+        "target_id": null
+      }
+    },
+    {
+      "image": "cockpit-behind-camera.png",
+      "source_scenario": "scenarios/evidence/world-prompts.json",
+      "step": 21,
+      "status": "passed",
+      "player": {
+        "eye_position_meters": [
+          1000000000000.5,
+          -749993999997.8951,
+          249993999997.8
+        ],
+        "local_ship_position_meters": [
+          0.5,
+          1.9973118279569892,
+          -2.2
+        ],
+        "location": "InsideShip",
+        "look_target_meters": [
+          999999999999.915,
+          -749993999997.8951,
+          249993999996.9889
+        ],
+        "nearby_body": {
+          "name": "Earth",
+          "surface_distance_meters": 2.104858823120594
+        },
+        "relative_speed_meters_per_second": 0.0,
+        "relative_velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_local_eye_position_meters": [
+          0.5,
+          1.997314453125,
+          -2.20001220703125
+        ],
+        "speed_meters_per_second": 0.0,
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "ship": {
+        "position_meters": [
+          1000000000000.0,
+          -749993999999.8925,
+          249994000000.0
+        ],
+        "orientation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "door_state": "Closed"
+      },
+      "interaction": null,
+      "resource_ui": {
+        "anchor_meters": null,
+        "context": null
+      },
+      "carrying": {
+        "context": null,
+        "last_action_feedback": null,
+        "object_id": null,
+        "target_id": null
+      }
+    },
+    {
+      "image": "door.png",
+      "source_scenario": "scenarios/evidence/world-prompts.json",
+      "step": 39,
+      "status": "passed",
+      "player": {
+        "eye_position_meters": [
+          999999999993.812,
+          -749993999997.8951,
+          249993999999.9888
+        ],
+        "local_ship_position_meters": [
+          -6.188000000000013,
+          1.9973118279569892,
+          -0.011200000000001036
+        ],
+        "location": "InsideShip",
+        "look_target_meters": [
+          999999999992.9595,
+          -749993999998.4178,
+          249993999999.9888
+        ],
+        "nearby_body": {
+          "name": "Earth",
+          "surface_distance_meters": 2.1048615891486406
+        },
+        "relative_speed_meters_per_second": 0.0,
+        "relative_velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_local_eye_position_meters": [
+          -6.18798828125,
+          1.997314453125,
+          -0.011199951171875
+        ],
+        "speed_meters_per_second": 0.0,
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "ship": {
+        "position_meters": [
+          1000000000000.0,
+          -749993999999.8925,
+          249994000000.0
+        ],
+        "orientation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "door_state": "Closed"
+      },
+      "interaction": "exit_door",
+      "resource_ui": {
+        "anchor_meters": null,
+        "context": null
+      },
+      "carrying": {
+        "context": null,
+        "last_action_feedback": null,
+        "object_id": null,
+        "target_id": null
+      }
+    },
+    {
+      "image": "deposit.png",
+      "source_scenario": "scenarios/evidence/world-prompts.json",
+      "step": 75,
+      "status": "passed",
+      "player": {
+        "eye_position_meters": [
+          999999999983.0334,
+          -749993999998.25,
+          249993999994.58
+        ],
+        "local_ship_position_meters": null,
+        "location": "Surface",
+        "look_target_meters": [
+          999999999982.1721,
+          -749993999998.7494,
+          249993999994.6731
+        ],
+        "nearby_body": {
+          "name": "Earth",
+          "surface_distance_meters": 1.750026436522603
+        },
+        "relative_speed_meters_per_second": 0.0,
+        "relative_velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_local_eye_position_meters": [
+          -16.966552734375,
+          1.6424560546875,
+          -5.420013427734375
+        ],
+        "speed_meters_per_second": 0.0,
+        "up": [
+          -2.8277579531277297e-06,
+          1.0,
+          -9.033353194354277e-07
+        ],
+        "velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "ship": {
+        "position_meters": [
+          1000000000000.0,
+          -749993999999.8925,
+          249994000000.0
+        ],
+        "orientation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "door_state": "Open"
+      },
+      "interaction": null,
+      "resource_ui": {
+        "anchor_meters": [
+          999999999980.0146,
+          -749994000000.0,
+          249993999994.9063
+        ],
+        "context": "Silicate rock - approx 36.4 kg left - untouched\nM to equip mining tool"
+      },
+      "carrying": {
+        "context": null,
+        "last_action_feedback": null,
+        "object_id": null,
+        "target_id": null
+      }
+    },
+    {
+      "image": "deposit-camera-moved.png",
+      "source_scenario": "scenarios/evidence/world-prompts.json",
+      "step": 79,
+      "status": "passed",
+      "player": {
+        "eye_position_meters": [
+          999999999983.0334,
+          -749993999998.25,
+          249993999994.58
+        ],
+        "local_ship_position_meters": null,
+        "location": "Surface",
+        "look_target_meters": [
+          999999999982.1702,
+          -749993999998.7494,
+          249993999994.65414
+        ],
+        "nearby_body": {
+          "name": "Earth",
+          "surface_distance_meters": 1.750026436522603
+        },
+        "relative_speed_meters_per_second": 0.0,
+        "relative_velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_local_eye_position_meters": [
+          -16.966552734375,
+          1.6424560546875,
+          -5.420013427734375
+        ],
+        "speed_meters_per_second": 0.0,
+        "up": [
+          -2.8277579531277297e-06,
+          1.0,
+          -9.033353194354277e-07
+        ],
+        "velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "ship": {
+        "position_meters": [
+          1000000000000.0,
+          -749993999999.8925,
+          249994000000.0
+        ],
+        "orientation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "door_state": "Open"
+      },
+      "interaction": null,
+      "resource_ui": {
+        "anchor_meters": [
+          999999999980.0146,
+          -749994000000.0,
+          249993999994.9063
+        ],
+        "context": "Silicate rock - approx 36.4 kg left - untouched\nM to equip mining tool"
+      },
+      "carrying": {
+        "context": null,
+        "last_action_feedback": null,
+        "object_id": null,
+        "target_id": null
+      }
+    },
+    {
+      "image": "fragment.png",
+      "source_scenario": "scenarios/evidence/carrying.json",
+      "step": 145,
+      "status": "passed",
+      "player": {
+        "eye_position_meters": [
+          999999999981.825,
+          -749993999998.25,
+          249993999994.7106
+        ],
+        "local_ship_position_meters": null,
+        "location": "Surface",
+        "look_target_meters": [
+          999999999981.1179,
+          -749993999998.9297,
+          249993999994.5154
+        ],
+        "nearby_body": {
+          "name": "Earth",
+          "surface_distance_meters": 1.7500298591330647
+        },
+        "relative_speed_meters_per_second": 0.0,
+        "relative_velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_local_eye_position_meters": [
+          -18.175048828125,
+          1.6424560546875,
+          -5.289398193359375
+        ],
+        "speed_meters_per_second": 0.0,
+        "up": [
+          -3.029173967661336e-06,
+          1.0,
+          -8.815661090011417e-07
+        ],
+        "velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "ship": {
+        "position_meters": [
+          1000000000000.0,
+          -749993999999.8925,
+          249994000000.0
+        ],
+        "orientation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "door_state": "Open"
+      },
+      "interaction": null,
+      "resource_ui": {
+        "anchor_meters": [
+          999999999980.054,
+          -749993999999.9548,
+          249993999994.22018
+        ],
+        "context": "Silicate rock fragment - approx 2.00 kg\nF to pick up fragment"
+      },
+      "carrying": {
+        "context": "F to pick up fragment",
+        "last_action_feedback": null,
+        "object_id": null,
+        "target_id": 1
+      }
+    },
+    {
+      "image": "carried-fragment.png",
+      "source_scenario": "scenarios/evidence/carrying.json",
+      "step": 203,
+      "status": "passed",
+      "player": {
+        "eye_position_meters": [
+          999999999981.8555,
+          -749993999998.25,
+          249993999994.1033
+        ],
+        "local_ship_position_meters": null,
+        "location": "Surface",
+        "look_target_meters": [
+          999999999981.1423,
+          -749993999998.9502,
+          249993999994.06784
+        ],
+        "nearby_body": {
+          "name": "Earth",
+          "surface_distance_meters": 1.7500303331762552
+        },
+        "relative_speed_meters_per_second": 0.0,
+        "relative_velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_local_eye_position_meters": [
+          -18.14453125,
+          1.6424560546875,
+          -5.896697998046875
+        ],
+        "speed_meters_per_second": 0.0,
+        "up": [
+          -3.024087618541671e-06,
+          1.0,
+          -9.827826943364926e-07
+        ],
+        "velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "ship": {
+        "position_meters": [
+          1000000000000.0,
+          -749993999999.8925,
+          249994000000.0
+        ],
+        "orientation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "door_state": "Open"
+      },
+      "interaction": null,
+      "resource_ui": {
+        "anchor_meters": [
+          999999999981.3849,
+          -749993999998.8851,
+          249993999994.22287
+        ],
+        "context": "Silicate rock fragment - approx 2.00 kg\nCarrying fragment - F to drop"
+      },
+      "carrying": {
+        "context": "Carrying fragment - F to drop",
+        "last_action_feedback": "Fragment picked up - F to drop",
+        "object_id": 2,
+        "target_id": null
+      }
+    }
+  ],
+  "native_os_smoke": true
+}

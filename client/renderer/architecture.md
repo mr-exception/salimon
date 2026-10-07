@@ -18,7 +18,8 @@ salimon-world absolute f64 snapshot
         -> conservatively cull cuboid and projected sphere bounds
         -> build renderer-owned view + infinite reverse-Z projection
         -> acquire surface texture
-        -> encode depth-tested cuboids + analytic spheres + opaque ship + cockpit glass + optional overlay
+        -> encode depth-tested cuboids + analytic spheres + opaque ship + cockpit glass
+        -> store scene depth, then composite overlays in a separate color-load pass
         -> resolve optional timestamp queries asynchronously
         -> submit command buffer
         -> present
@@ -81,7 +82,7 @@ size changes, uniformly scales oversized panels to stay inside 16-pixel drawable
 margins, and composites them with alpha blending. It never formats metrics or
 decides when the overlay is visible.
 
-The combined render pass uses capability-gated timestamp queries. A three-slot
+The scene and overlay passes share one capability-gated timestamp interval. A three-slot
 readback ring is polled without waiting, so GPU timing does not synchronously
 stall presentation. Scene object/draw counts exclude the engineering overlay;
 the total draw count includes its one compositing draw. Optional allocator
@@ -160,3 +161,23 @@ remains. Depletion hides the visual. The centered ±0.48 m baked cube uses unifo
 Identity, targeting, mining, mass, session persistence and streaming stay world-owned.
 Automation retains the legacy `visual` field as null and reports mesh/center/scale
 through `authored_visual`. See the [asset guide](../../models/assets/resources/iron-deposit-nodule/README.md).
+
+## World-anchored prompts (#127)
+
+`OverlayPlacement::World` carries an absolute `f64` object center and conservative
+camera-facing visibility radius in metres. `overlay.rs` subtracts the camera in
+`f64` and uses the same prepared view/projection as the scene. Nonfinite,
+behind-camera, near-clipped and off-viewport anchors are hidden. The label is
+centered 12 physical pixels above the projected anchor, uniformly limited to
+60% of drawable width; a rectangle that cannot fit is hidden rather than clamped.
+Movement/rotation/resize reprojects each frame without rerasterizing unchanged text.
+
+Scene depth is stored and sampled in a separate color-load overlay pass (no
+attached depth target). `overlay.wgsl` compares reverse-Z depth at the anchor
+against its camera-facing bound, hiding the entire label behind closer geometry.
+The bound avoids self-occlusion at centers inside target meshes; it is a
+conservative visibility approximation, not a new interaction range. Transparent
+cockpit glass does not write depth. Global overlays skip the depth comparison.
+Cached texture pixels/revisions remain independent of placement; depth bindings
+are refreshed when surface reconstruction replaces the depth view. Gameplay
+eligibility, text, priority and transient expiry remain runtime-owned.

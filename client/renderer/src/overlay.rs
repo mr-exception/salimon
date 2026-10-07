@@ -11,13 +11,18 @@ pub struct OverlayImage<'a> {
     pub placement: OverlayPlacement,
 }
 
-/// Screen-space placement selected by the overlay's presentation producer.
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+/// Screen-space or absolute world-object placement selected by the producer.
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub enum OverlayPlacement {
     #[default]
     TopLeft,
     BottomCenter,
     Center,
+    /// Absolute object center and conservative visible-surface radius, in metres.
+    World {
+        anchor_meters: [f64; 3],
+        radius_meters: f64,
+    },
 }
 
 impl OverlayImage<'_> {
@@ -79,6 +84,7 @@ fn overlay_origin(
     placement: OverlayPlacement,
 ) -> [f32; 2] {
     match placement {
+        OverlayPlacement::World { .. } => unreachable!("world placement is projected separately"),
         OverlayPlacement::TopLeft => [OVERLAY_MARGIN_PIXELS as f32; 2],
         OverlayPlacement::Center => [
             (surface_size[0] as f32 - display_size[0]) * 0.5,
@@ -91,23 +97,53 @@ fn overlay_origin(
     }
 }
 
+/// Project the center for placement and the camera-facing bound for reverse-Z visibility.
+fn project_anchor(
+    camera: crate::CameraFrame,
+    matrix: [f32; 16],
+    anchor: [f64; 3],
+    radius: f64,
+) -> Option<[f32; 3]> {
+    if !radius.is_finite() || radius < 0.0 {
+        return None;
+    }
+    let relative: [f64; 3] = std::array::from_fn(|i| anchor[i] - camera.position_meters[i]);
+    if !relative.iter().all(|v| v.is_finite()) {
+        return None;
+    }
+    let clip: [f64; 4] = std::array::from_fn(|row| {
+        (0..3)
+            .map(|col| f64::from(matrix[col * 4 + row]) * relative[col])
+            .sum::<f64>()
+            + f64::from(matrix[12 + row])
+    });
+    if !clip.iter().all(|v| v.is_finite()) || clip[3] <= 0.0 {
+        return None;
+    }
+    let ndc = clip.map(|v| v / clip[3]);
+    if ndc[0].abs() > 1.0 || ndc[1].abs() > 1.0 || !(0.0..=1.0).contains(&ndc[2]) {
+        return None;
+    }
+    let distance = relative.iter().map(|v| v * v).sum::<f64>().sqrt();
+    let factor = 1.0 - (radius / distance).min(0.5);
+    let depth = (ndc[2] / factor).min(1.0);
+    Some([ndc[0] as f32, ndc[1] as f32, depth as f32])
+}
+
 pub(crate) struct OverlayRenderer {
     pipeline: wgpu::RenderPipeline,
     bind_group_layout: wgpu::BindGroupLayout,
     dimensions_buffer: wgpu::Buffer,
     texture: Option<wgpu::Texture>,
     bind_group: Option<wgpu::BindGroup>,
+    depth_view: Option<wgpu::TextureView>,
     image_size: Option<(u32, u32)>,
     last_revision: Option<u64>,
     visible: bool,
 }
 
 impl OverlayRenderer {
-    pub(crate) fn new(
-        device: &wgpu::Device,
-        surface_format: wgpu::TextureFormat,
-        depth_format: wgpu::TextureFormat,
-    ) -> Self {
+    pub(crate) fn new(device: &wgpu::Device, surface_format: wgpu::TextureFormat) -> Self {
         let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             label: Some("Salimon overlay bind group layout"),
             entries: &[
@@ -123,11 +159,21 @@ impl OverlayRenderer {
                 },
                 wgpu::BindGroupLayoutEntry {
                     binding: 1,
-                    visibility: wgpu::ShaderStages::VERTEX,
+                    visibility: wgpu::ShaderStages::VERTEX_FRAGMENT,
                     ty: wgpu::BindingType::Buffer {
                         ty: wgpu::BufferBindingType::Uniform,
                         has_dynamic_offset: false,
                         min_binding_size: None,
+                    },
+                    count: None,
+                },
+                wgpu::BindGroupLayoutEntry {
+                    binding: 2,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Texture {
+                        sample_type: wgpu::TextureSampleType::Depth,
+                        view_dimension: wgpu::TextureViewDimension::D2,
+                        multisampled: false,
                     },
                     count: None,
                 },
@@ -149,13 +195,7 @@ impl OverlayRenderer {
                 compilation_options: wgpu::PipelineCompilationOptions::default(),
             },
             primitive: wgpu::PrimitiveState::default(),
-            depth_stencil: Some(wgpu::DepthStencilState {
-                format: depth_format,
-                depth_write_enabled: Some(false),
-                depth_compare: Some(wgpu::CompareFunction::Always),
-                stencil: wgpu::StencilState::default(),
-                bias: wgpu::DepthBiasState::default(),
-            }),
+            depth_stencil: None,
             multisample: wgpu::MultisampleState::default(),
             fragment: Some(wgpu::FragmentState {
                 module: &shader,
@@ -172,7 +212,7 @@ impl OverlayRenderer {
         });
         let dimensions_buffer = device.create_buffer(&wgpu::BufferDescriptor {
             label: Some("Salimon overlay dimensions"),
-            size: 32,
+            size: 48,
             usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
             mapped_at_creation: false,
         });
@@ -183,12 +223,14 @@ impl OverlayRenderer {
             dimensions_buffer,
             texture: None,
             bind_group: None,
+            depth_view: None,
             image_size: None,
             last_revision: None,
             visible: false,
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn prepare(
         &mut self,
         device: &wgpu::Device,
@@ -196,6 +238,9 @@ impl OverlayRenderer {
         surface_width: u32,
         surface_height: u32,
         image: Option<OverlayImage<'_>>,
+        camera: crate::CameraFrame,
+        view_projection: [f32; 16],
+        depth_view: &wgpu::TextureView,
     ) -> Result<(), OverlayImageError> {
         let Some(image) = image else {
             self.visible = false;
@@ -203,6 +248,11 @@ impl OverlayRenderer {
         };
         image.validate()?;
 
+        // Surface reconstruction replaces the depth view; rebuild its binding then.
+        if self.depth_view.as_ref() != Some(depth_view) {
+            self.depth_view = Some(depth_view.clone());
+            self.image_size = None;
+        }
         let image_size = (image.width, image.height);
         if self.image_size != Some(image_size) {
             self.recreate_texture(device, image.width, image.height);
@@ -235,13 +285,46 @@ impl OverlayRenderer {
             self.last_revision = Some(image.revision);
         }
 
-        let display_size =
+        let mut display_size =
             fitted_overlay_size([surface_width, surface_height], [image.width, image.height]);
-        let origin = overlay_origin(
-            [surface_width, surface_height],
-            display_size,
-            image.placement,
-        );
+        if matches!(image.placement, OverlayPlacement::World { .. }) {
+            let scale = (surface_width as f32 * 0.6 / display_size[0]).min(1.0);
+            display_size = display_size.map(|value| value * scale);
+        }
+        let (origin, visibility) = match image.placement {
+            OverlayPlacement::World {
+                anchor_meters,
+                radius_meters,
+            } => {
+                let Some(projected) =
+                    project_anchor(camera, view_projection, anchor_meters, radius_meters)
+                else {
+                    self.visible = false;
+                    return Ok(());
+                };
+                let pixel = [
+                    (projected[0] * 0.5 + 0.5) * surface_width as f32,
+                    (0.5 - projected[1] * 0.5) * surface_height as f32,
+                ];
+                let origin = [
+                    pixel[0] - display_size[0] * 0.5,
+                    pixel[1] - display_size[1] - 12.0,
+                ];
+                // Hide rather than clamp a label whose full rectangle does not fit.
+                if (0..2).any(|i| {
+                    origin[i] < 0.0
+                        || origin[i] + display_size[i] > [surface_width, surface_height][i] as f32
+                }) {
+                    self.visible = false;
+                    return Ok(());
+                }
+                (origin, [pixel[0], pixel[1], projected[2], 1.0])
+            }
+            placement => (
+                overlay_origin([surface_width, surface_height], display_size, placement),
+                [0.0; 4],
+            ),
+        };
         let dimensions = [
             surface_width as f32,
             surface_height as f32,
@@ -251,8 +334,12 @@ impl OverlayRenderer {
             origin[1],
             0.0,
             0.0,
+            visibility[0],
+            visibility[1],
+            visibility[2],
+            visibility[3],
         ];
-        let mut bytes = [0_u8; 32];
+        let mut bytes = [0_u8; 48];
         for (chunk, value) in bytes.as_chunks_mut::<4>().0.iter_mut().zip(dimensions) {
             chunk.copy_from_slice(&value.to_ne_bytes());
         }
@@ -306,6 +393,14 @@ impl OverlayRenderer {
                     binding: 1,
                     resource: self.dimensions_buffer.as_entire_binding(),
                 },
+                wgpu::BindGroupEntry {
+                    binding: 2,
+                    resource: wgpu::BindingResource::TextureView(
+                        self.depth_view
+                            .as_ref()
+                            .expect("prepare installs depth view"),
+                    ),
+                },
             ],
         });
         self.texture = Some(texture);
@@ -319,6 +414,62 @@ mod tests {
     use super::{
         OverlayImage, OverlayImageError, OverlayPlacement, fitted_overlay_size, overlay_origin,
     };
+
+    fn test_camera(origin: f64) -> crate::CameraFrame {
+        crate::CameraFrame {
+            position_meters: [origin; 3],
+            target_meters: [origin, origin, origin - 1.0],
+            up: [0.0, 1.0, 0.0],
+            vertical_fov_radians: std::f32::consts::FRAC_PI_2,
+            near_plane_meters: 0.05,
+        }
+    }
+
+    #[test]
+    fn world_projection_rebases_before_narrowing_and_tracks_motion() {
+        for origin in [0.0, 1.0e12] {
+            let camera = test_camera(origin);
+            let matrix = crate::infinite_reverse_z_projection(camera, 1.0).unwrap();
+            let anchor = [origin, origin, origin - 2.0];
+            let projected = super::project_anchor(camera, matrix, anchor, 0.0).unwrap();
+            assert_eq!(&projected[..2], &[0.0, 0.0]);
+            assert!((projected[2] - 0.025).abs() < 1.0e-6);
+            let shifted = super::project_anchor(
+                camera,
+                matrix,
+                [origin + 1.0, origin + 0.5, origin - 2.0],
+                0.0,
+            )
+            .unwrap();
+            assert!((shifted[0] - 0.5).abs() < 1.0e-6);
+            assert!((shifted[1] - 0.25).abs() < 1.0e-6);
+            let mut moved = camera;
+            moved.position_meters[0] += 1.0;
+            assert!(super::project_anchor(moved, matrix, anchor, 0.0).unwrap()[0] < 0.0);
+            let surface = super::project_anchor(camera, matrix, anchor, 0.25).unwrap();
+            assert!(surface[2] > projected[2]);
+        }
+    }
+
+    #[test]
+    fn world_projection_hides_behind_near_plane_offscreen_and_invalid_targets() {
+        let camera = test_camera(0.0);
+        let matrix = crate::infinite_reverse_z_projection(camera, 1.0).unwrap();
+        for anchor in [
+            [0.0, 0.0, 1.0],
+            [0.0, 0.0, -0.01],
+            [3.0, 0.0, -2.0],
+            [0.0, -3.0, -2.0],
+            [f64::NAN, 0.0, -2.0],
+            [0.0; 3],
+        ] {
+            assert!(
+                super::project_anchor(camera, matrix, anchor, 0.0).is_none(),
+                "{anchor:?}"
+            );
+        }
+        assert!(super::project_anchor(camera, matrix, [0.0, 0.0, -2.0], -1.0).is_none());
+    }
 
     #[test]
     fn keeps_source_size_when_the_panel_fits() {

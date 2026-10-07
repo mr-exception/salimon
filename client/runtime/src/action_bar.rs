@@ -78,6 +78,10 @@ impl ActionBar {
         self.rebuild_if_needed(false);
     }
 
+    pub(crate) fn has_transient(&self) -> bool {
+        self.transient.is_some()
+    }
+
     pub(crate) fn image(&self, visible: bool) -> Option<ActionBarImage<'_>> {
         (visible && self.rendered_text.is_some()).then_some(ActionBarImage {
             width: self.width,

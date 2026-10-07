@@ -197,3 +197,13 @@ gate/shoulder proxies and query policy from generated raw bounds. Player size,
 movement, permissions, ranges, gravity/timing and camera offsets stay in Rust.
 See the [authored geometry/policy map](../models/assets/ships/salimon-scout/README.md#geometry-and-gameplay-policy).
 Runtime builds require neither Blender nor asset generation.
+
+## Object-relative prompt presentation (#127)
+
+Runtime selects applicable cockpit/door/resource/carrying prompts and supplies
+borrowed text pixels plus an absolute `f64` object anchor. Ship markers and
+selected physical poses remain the canonical position sources. Renderer owns
+camera-relative projection, viewport fitting and reverse-Z anchor visibility
+through a separate overlay pass. Global guidance and transient feedback retain
+screen placement. See [runtime flow](../client/runtime/architecture.md#contextual-action-bar-flow)
+and [renderer contract](../client/renderer/architecture.md#world-anchored-prompts-127).

@@ -4,7 +4,11 @@ use super::native::WINDOW_TITLE;
 use salimon_character::CharacterLocation;
 use salimon_ship::CockpitMessage;
 
-const COCKPIT_INTERACTION_POSITION_METERS: [f64; 3] = [2.76, 1.799_032_258_064_516, 0.0];
+const COCKPIT_INTERACTION_POSITION_METERS: [f64; 3] = [
+    salimon_character::COCKPIT_SEAT_MARKER_METERS[0],
+    salimon_character::COCKPIT_SEAT_MARKER_METERS[1] + 0.67,
+    salimon_character::COCKPIT_SEAT_MARKER_METERS[2],
+];
 const COCKPIT_INTERACTION_RANGE_METERS: f64 = 4.0;
 const COCKPIT_INTERACTION_MINIMUM_AIM_DOT: f64 = 0.866_025_403_784_438_6;
 const COCKPIT_INTERACTION_PROMPT: &str = "Press E to use";
@@ -13,6 +17,23 @@ const COCKPIT_INTERACTION_PROMPT: &str = "Press E to use";
 pub(super) enum InteractionTarget {
     Cockpit,
     ExitDoor,
+}
+
+pub(super) fn prompt_placement(
+    target: InteractionTarget,
+    frame: salimon_character::ShipFrame,
+) -> salimon_renderer::OverlayPlacement {
+    let (local, radius_meters) = match target {
+        InteractionTarget::Cockpit => (COCKPIT_INTERACTION_POSITION_METERS, 0.1),
+        InteractionTarget::ExitDoor => (
+            salimon_character::EXIT_DOOR_MARKER_METERS,
+            salimon_character::EXIT_DOOR_MARKER_DEPTH_METERS,
+        ),
+    };
+    salimon_renderer::OverlayPlacement::World {
+        anchor_meters: frame.local_to_world(local),
+        radius_meters,
+    }
 }
 
 fn interaction_target(
@@ -92,6 +113,31 @@ mod tests {
     use super::*;
     use salimon_ship::{FlightState, ShipController};
     use salimon_world::CelestialBodyId;
+    #[test]
+    fn prompt_anchors_follow_authored_markers_through_ship_translation_and_rotation() {
+        let frame = salimon_character::ShipFrame {
+            origin_meters: [1.0e12, 20.0, 30.0],
+            axes: [[0.0, 0.0, -1.0], [0.0, 1.0, 0.0], [1.0, 0.0, 0.0]],
+        };
+        for (target, local) in [
+            (
+                InteractionTarget::Cockpit,
+                COCKPIT_INTERACTION_POSITION_METERS,
+            ),
+            (
+                InteractionTarget::ExitDoor,
+                salimon_character::EXIT_DOOR_MARKER_METERS,
+            ),
+        ] {
+            let salimon_renderer::OverlayPlacement::World { anchor_meters, .. } =
+                prompt_placement(target, frame)
+            else {
+                panic!("object prompt must be world anchored")
+            };
+            assert_eq!(anchor_meters, frame.local_to_world(local));
+        }
+    }
+
     #[test]
     fn interaction_zones_follow_seat_aisle_and_rear_door() {
         let aisle = [0.50, 1.997_311_827_956_989_2, -2.20];

@@ -46,7 +46,9 @@ not reorder it or move domain rules into runtime mapping.
 - Keep the renderer call surface narrow and typed.
 - Keep contextual gameplay prompts in the runtime-owned action-bar state. Map
   typed domain messages to text here, keep transient expiry out of gameplay
-  domains, and send only borrowed RGBA pixels plus placement to the renderer.
+  domains, and send only borrowed RGBA pixels plus typed screen/world placement
+  to the renderer. Object anchors retain absolute `f64` coordinates; authored
+  ship markers and selected resource poses are canonical sources.
 - Map current ship snapshot speed/thruster data into `CockpitInstruments` on
   every gameplay frame, including after cockpit exit. Preserve ship-domain
   telemetry semantics and keep screen drawing in the renderer.

@@ -57,10 +57,12 @@
     `CockpitInstruments`; leaving the cockpit does not freeze or hide these
     values. Runtime field-maps rather than derives flight telemetry or simulates
     monitor values. Contextual messages remain in the window title.
-25. Normal gameplay view presents applicable cockpit/interaction messages in a
-    readable bottom-centered action bar. State-derived prompts disappear when
-    their source becomes inapplicable; immediate blocked-door feedback expires
-    after three seconds. Precision-tour view never displays the gameplay bar.
+25. Applicable cockpit, door, fragment and deposit prompts carry current absolute
+    world anchors. Existing eligibility/obstruction gates select them; renderer
+    projection/scene depth determines presentation visibility. Carried-object
+    drop guidance follows the carried pose. Global flight/tool guidance and
+    three-second blocked feedback remain screen-space. Precision tour hides
+    gameplay prompts.
 26. E2E scenario setup requires an explicit launch flag and occurs before the
     native event loop. It changes only initial controller state and update-clock
     policy. A ready line follows successful renderer initialization; ordinary

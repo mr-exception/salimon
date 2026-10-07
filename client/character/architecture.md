@@ -128,3 +128,7 @@ consume that layout. Public anchor exports and floor-height APIs are preserved.
 The [scout mapping](../../models/assets/ships/salimon-scout/README.md#geometry-and-gameplay-policy)
 identifies component ownership, coarse envelope semantics and remaining gameplay
 policy. Builds use checked-in artifacts and never run Blender.
+
+The exported `EXIT_DOOR_MARKER_DEPTH_METERS` derives the aft-face depth from
+the authored door marker and collider bounds for consumers presenting interaction
+guidance. It does not alter traversal, collision or interaction eligibility.

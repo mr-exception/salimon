@@ -89,12 +89,20 @@ player/ship diagnostics; precision-tour view supplies its camera metrics.
 
 The runtime field-maps ship-owned Core and nearby-body telemetry into renderer
 instrument DTOs every gameplay frame; it never derives proximity or radial
-velocity. The runtime maps typed ship messages and the aimed cockpit interaction into one
-bottom-centered action bar for the normal gameplay view. State-derived actions
-remain visible only while applicable. Immediate blocked-door feedback overrides
-the current action for three seconds and then expires without changing ship
-state. The renderer receives a borrowed RGBA image and placement only, allowing
-the action bar and optional diagnostics panel to be composited independently.
+velocity. Runtime selects one applicable prompt with the existing door/ship/resource
+priority, and rasterizes its text in `action_bar.rs`. Cockpit and door anchors
+use authored interaction markers transformed by the current ship frame;
+resource anchors use the selected deposit or fragment's absolute position.
+While carrying, drop guidance follows the carried object, even when another
+fragment is aimed at. `resource_context::Prompt` pairs text with typed renderer
+placement. State-derived prompts disappear when eligibility changes.
+
+The renderer receives borrowed RGBA pixels and `OverlayPlacement::World`
+(absolute `f64` center and conservative visibility radius), or screen placement
+for global flight/tool guidance. Renderer owns projection, fitting and depth
+visibility; runtime never rebases or projects an anchor. Immediate blocked-door
+feedback overrides the current prompt at bottom center for three seconds and
+then expires without changing ship state. Precision tour hides gameplay prompts.
 
 ## Evolution
 

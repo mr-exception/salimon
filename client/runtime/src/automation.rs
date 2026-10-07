@@ -280,7 +280,13 @@ fn inspect(app: &ClientApplication) -> Value {
     let relative_velocity =
         std::array::from_fn::<_, 3, _>(|i| player_velocity[i] - ship.velocity_meters_per_second[i]);
     json!({
-        "resource_ui": {"context": resource_context},
+        "resource_ui": {
+            "context": resource_context.as_ref().map(|prompt| &prompt.text),
+            "anchor_meters": resource_context.as_ref().and_then(|prompt| match prompt.placement {
+                salimon_renderer::OverlayPlacement::World { anchor_meters, .. } => Some(anchor_meters),
+                _ => None,
+            }),
+        },
         "carrying": {"object_id": app.mining.session.carried_id().map(|id| id.0),
             "target_id": fragment_target.map(|id| id.0),
             "context": crate::carrying::context(&app.mining, fragment_target, character),
@@ -404,6 +410,71 @@ mod tests {
                 entry["position_meters"]
             );
         }
+    }
+
+    #[test]
+    fn resource_prompt_anchors_match_deposit_and_carried_pose() {
+        let mut test = app(Scenario::LandedEarth);
+        e2e::initialize(
+            &mut test,
+            Config {
+                scenario: Scenario::LandedEarth,
+                seed: 0,
+                step: Duration::from_millis(16),
+            },
+        )
+        .unwrap();
+        let scenario: Value =
+            serde_json::from_str(include_str!("../../../scenarios/evidence/carrying.json"))
+                .unwrap();
+        let mut saw_deposit = false;
+        let mut saw_carried = false;
+        let mut saw_fragment = false;
+        for (index, step) in scenario["steps"].as_array().unwrap().iter().enumerate() {
+            if let Some(action) = step.get("action") {
+                let mut command = action.clone();
+                command["protocol"] = json!(1);
+                command["id"] = json!(index);
+                assert_eq!(execute(&mut test, &command.to_string())["ok"], true);
+            }
+            let state = inspect(&test);
+            let anchor = &state["resource_ui"]["anchor_meters"];
+            if anchor.is_null() {
+                continue;
+            }
+            if let Some(id) = test.mining.session.carried_id() {
+                let piece = test
+                    .mining
+                    .session
+                    .fragments()
+                    .iter()
+                    .find(|piece| piece.id() == id)
+                    .unwrap();
+                assert_eq!(*anchor, json!(piece.transform().position().meters()));
+                saw_carried = true;
+            } else if state["carrying"]["target_id"].is_number() {
+                let id = state["carrying"]["target_id"].as_u64().unwrap();
+                let piece = test
+                    .mining
+                    .session
+                    .fragments()
+                    .iter()
+                    .find(|piece| piece.id().0 == id)
+                    .unwrap();
+                assert_eq!(*anchor, json!(piece.transform().position().meters()));
+                saw_fragment = true;
+            } else {
+                assert!(
+                    state["world"]["deposits"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .any(|entry| entry["position_meters"] == *anchor)
+                );
+                saw_deposit = true;
+            }
+        }
+        assert!(saw_deposit && saw_fragment && saw_carried);
     }
 
     #[test]

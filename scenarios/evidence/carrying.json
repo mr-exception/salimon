@@ -1265,6 +1265,21 @@
     },
     {
       "screenshot": "carrying-second-fragment-after-walking"
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 200
+      }
+    },
+    {
+      "assert": {
+        "path": "resource_ui.context",
+        "contains": "Carrying fragment - F to drop"
+      }
+    },
+    {
+      "screenshot": "carried-world-context"
     }
   ]
 }

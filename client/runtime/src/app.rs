@@ -537,13 +537,33 @@ impl ClientApplication {
             door_passable(ship_snapshot),
             self.e2e_config.map_or(0, |config| config.seed),
         );
-        let ship_context = action_bar_context(monitor_message, interaction).map(str::to_owned);
+        let ship_context = action_bar_context(monitor_message, interaction).map(|text| {
+            crate::resource_context::Prompt {
+                text: text.to_owned(),
+                placement: if monitor_message
+                    .filter(|message| {
+                        *message != salimon_ship::CockpitMessage::DoorLockedWhileInFlight
+                    })
+                    .is_some()
+                {
+                    OverlayPlacement::BottomCenter
+                } else {
+                    interaction.map_or(OverlayPlacement::BottomCenter, |target| {
+                        interaction::prompt_placement(target, ship_frame)
+                    })
+                },
+            }
+        });
         let contextual_action = if fragment_interaction {
             resource_context.or(ship_context)
         } else {
             ship_context.or(resource_context)
         };
-        self.action_bar.set_contextual(contextual_action);
+        let contextual_placement = contextual_action
+            .as_ref()
+            .map_or(OverlayPlacement::BottomCenter, |prompt| prompt.placement);
+        self.action_bar
+            .set_contextual(contextual_action.map(|prompt| prompt.text));
         window.set_title(&gameplay_window_title(monitor_message, interaction));
         let ship_mesh = if self.view_mode == ViewMode::Gameplay {
             camera = CameraFrame {
@@ -598,7 +618,11 @@ impl ClientApplication {
                 height: image.height,
                 rgba8: image.rgba8,
                 revision: image.revision,
-                placement: OverlayPlacement::BottomCenter,
+                placement: if self.action_bar.has_transient() {
+                    OverlayPlacement::BottomCenter
+                } else {
+                    contextual_placement
+                },
             });
         let outcome = match self
             .renderer

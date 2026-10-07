@@ -177,6 +177,12 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "right" => Some(KeyCode::KeyD),
         "jump" | "ascend" => Some(KeyCode::Space),
         "descend" => Some(KeyCode::ShiftLeft),
+        "1" | "slot_1" => Some(KeyCode::Digit1),
+        "2" | "slot_2" => Some(KeyCode::Digit2),
+        "3" | "slot_3" => Some(KeyCode::Digit3),
+        "4" | "slot_4" => Some(KeyCode::Digit4),
+        "5" | "slot_5" => Some(KeyCode::Digit5),
+        "6" => Some(KeyCode::Digit6),
         "equip_mining_tool" => Some(KeyCode::KeyM),
         "grab_drop" | "pickup" | "drop" | "mine" => Some(KeyCode::KeyF),
         "roll_left" => Some(KeyCode::ArrowLeft),
@@ -287,6 +293,9 @@ fn inspect(app: &ClientApplication) -> Value {
                 _ => None,
             }),
         },
+        "equipment": {"slots": app.equipment.slots().map(|tool| tool.map(|tool| match tool {
+            crate::equipment::EquipmentTool::MiningTool => "mining_tool",
+        })), "selected_slot": app.equipment.selected().map(|slot| slot.index() + 1)},
         "carrying": {"object_id": app.mining.session.carried_id().map(|id| id.0),
             "target_id": fragment_target.map(|id| id.0),
             "context": crate::carrying::context(&app.mining, fragment_target, character),
@@ -668,11 +677,19 @@ mod tests {
         }
         test.mining.toggle();
         assert!(test.mining.equipped);
+        test.automation_key(PhysicalKey::Code(KeyCode::Digit1), true);
+        assert_eq!(inspect(&test)["equipment"]["selected_slot"], 1);
         let mass = test.mining.session.extracted_mass_kg();
         test.interact();
         assert!(test.mining.session.carried_id().is_none());
         test.automation_key(PhysicalKey::Code(KeyCode::KeyF), true);
         assert!(test.mining.session.carried_id().is_some());
+        assert_eq!(inspect(&test)["equipment"]["selected_slot"], Value::Null);
+        for key in ["slot_1", "slot_2", "slot_3", "slot_4", "slot_5"] {
+            let request = json!({"protocol": 1, "id": 1, "op": "key", "key": key, "pressed": true});
+            assert_eq!(execute(&mut test, &request.to_string())["ok"], true);
+            assert_eq!(inspect(&test)["equipment"]["selected_slot"], Value::Null);
+        }
         assert!(!test.mining.held);
         test.automation_key(PhysicalKey::Code(KeyCode::KeyF), true);
         test.advance_game(Duration::from_secs(1));
@@ -684,6 +701,10 @@ mod tests {
         test.automation_key(PhysicalKey::Code(KeyCode::KeyF), true);
         assert!(test.mining.session.carried_id().is_none());
         assert!(!test.mining.held, "drop must not start F mining either");
+        assert_eq!(inspect(&test)["equipment"]["selected_slot"], Value::Null);
+        test.automation_key(PhysicalKey::Code(KeyCode::Digit5), true);
+        assert_eq!(inspect(&test)["equipment"]["selected_slot"], 5);
+        assert_eq!(inspect(&test)["equipment"]["slots"][4], Value::Null);
     }
 
     #[test]

@@ -5,6 +5,7 @@ mod app;
 mod automation;
 mod carrying;
 mod e2e;
+mod equipment;
 mod fragment_physics;
 mod frame_clock;
 mod mining;

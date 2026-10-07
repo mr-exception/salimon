@@ -470,3 +470,14 @@ The authored pilot view begins at -0.10 radians; mouse deltas in this route
 include that offset. Asset validation independently checks actual exported
 triangle sightlines. Passing gameplay assertions alone does not establish visual
 correctness; inspect the native checkpoints as well.
+
+### Equipment toolbar input/state
+
+Automation `key` accepts `slot_1`–`slot_5` (aliases `1`–`5`) through the
+production numeric-key route. Inspection returns `equipment.slots`, a five-item
+array initially `["mining_tool", null, null, null, null]`, and
+`equipment.selected_slot`, a one-based slot number or null. Selection is absent
+at launch, cleared on pickup and blocked while carrying; dropping leaves it
+absent until another explicit selection. The carrying baseline verifies all
+five slots and the pickup/drop lockout. Toolbar rendering and mining equip
+presentation are dependent work; `equip_mining_tool` still maps to M.

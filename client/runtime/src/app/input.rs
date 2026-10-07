@@ -15,6 +15,27 @@ pub(super) fn tool_key_event(repeat: bool, is_synthetic: bool, key: PhysicalKey)
     !repeat && !is_synthetic && matches!(key, PhysicalKey::Code(KeyCode::KeyM | KeyCode::KeyF))
 }
 
+pub(super) fn toolbar_slot(key: PhysicalKey) -> Option<crate::equipment::ToolbarSlot> {
+    use crate::equipment::ToolbarSlot;
+    match key {
+        PhysicalKey::Code(KeyCode::Digit1) => Some(ToolbarSlot::One),
+        PhysicalKey::Code(KeyCode::Digit2) => Some(ToolbarSlot::Two),
+        PhysicalKey::Code(KeyCode::Digit3) => Some(ToolbarSlot::Three),
+        PhysicalKey::Code(KeyCode::Digit4) => Some(ToolbarSlot::Four),
+        PhysicalKey::Code(KeyCode::Digit5) => Some(ToolbarSlot::Five),
+        _ => None,
+    }
+}
+
+pub(super) fn toolbar_selection_pressed(
+    state: ElementState,
+    repeat: bool,
+    key: PhysicalKey,
+    is_synthetic: bool,
+) -> bool {
+    state == ElementState::Pressed && !repeat && !is_synthetic && toolbar_slot(key).is_some()
+}
+
 pub(super) fn interaction_pressed(state: ElementState, repeat: bool, key: PhysicalKey) -> bool {
     state == ElementState::Pressed && !repeat && key == PhysicalKey::Code(KeyCode::KeyE)
 }
@@ -155,8 +176,25 @@ pub(super) fn camera_command(
     state: ElementState,
     repeat: bool,
     key: PhysicalKey,
+    precision_tour: bool,
 ) -> Option<CameraCommand> {
     if state != ElementState::Pressed || repeat {
+        return None;
+    }
+
+    if !precision_tour
+        && matches!(
+            key,
+            PhysicalKey::Code(
+                KeyCode::Digit1
+                    | KeyCode::Digit2
+                    | KeyCode::Digit3
+                    | KeyCode::Digit4
+                    | KeyCode::Digit5
+                    | KeyCode::Digit6
+            )
+        )
+    {
         return None;
     }
 
@@ -190,6 +228,57 @@ pub(super) fn camera_command(
 mod tests {
     use super::*;
     use salimon_world::CameraCommand;
+    #[test]
+    fn toolbar_keys_are_real_initial_edges_and_tour_numbers_are_gated() {
+        for (index, key) in [
+            KeyCode::Digit1,
+            KeyCode::Digit2,
+            KeyCode::Digit3,
+            KeyCode::Digit4,
+            KeyCode::Digit5,
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            let key = PhysicalKey::Code(key);
+            assert_eq!(toolbar_slot(key).unwrap().index(), index);
+            assert!(toolbar_selection_pressed(
+                ElementState::Pressed,
+                false,
+                key,
+                false
+            ));
+            assert!(!toolbar_selection_pressed(
+                ElementState::Pressed,
+                true,
+                key,
+                false
+            ));
+            assert!(!toolbar_selection_pressed(
+                ElementState::Pressed,
+                false,
+                key,
+                true
+            ));
+            assert!(!toolbar_selection_pressed(
+                ElementState::Released,
+                false,
+                key,
+                false
+            ));
+            assert_eq!(
+                camera_command(ElementState::Pressed, false, key, false),
+                None
+            );
+        }
+        let six = PhysicalKey::Code(KeyCode::Digit6);
+        assert_eq!(toolbar_slot(six), None);
+        assert_eq!(
+            camera_command(ElementState::Pressed, false, six, false),
+            None
+        );
+    }
+
     #[test]
     fn f_carrying_ignores_repeat_focus_replay_and_other_keys() {
         let f = PhysicalKey::Code(KeyCode::KeyF);
@@ -285,15 +374,15 @@ mod tests {
             (KeyCode::Digit6, CelestialBodyId::Mars),
         ] {
             assert_eq!(
-                camera_command(ElementState::Pressed, false, PhysicalKey::Code(key)),
+                camera_command(ElementState::Pressed, false, PhysicalKey::Code(key), true),
                 Some(CameraCommand::InspectBody(body))
             );
             assert_eq!(
-                camera_command(ElementState::Pressed, true, PhysicalKey::Code(key)),
+                camera_command(ElementState::Pressed, true, PhysicalKey::Code(key), true),
                 None
             );
             assert_eq!(
-                camera_command(ElementState::Released, false, PhysicalKey::Code(key)),
+                camera_command(ElementState::Released, false, PhysicalKey::Code(key), true),
                 None
             );
         }
@@ -302,6 +391,7 @@ mod tests {
                 ElementState::Pressed,
                 false,
                 PhysicalKey::Code(KeyCode::KeyP),
+                true,
             ),
             Some(CameraCommand::TogglePause)
         );
@@ -310,6 +400,7 @@ mod tests {
                 ElementState::Pressed,
                 false,
                 PhysicalKey::Code(KeyCode::KeyR),
+                true,
             ),
             Some(CameraCommand::Restart)
         );
@@ -318,6 +409,7 @@ mod tests {
                 ElementState::Pressed,
                 false,
                 PhysicalKey::Code(KeyCode::KeyN),
+                true,
             ),
             Some(CameraCommand::JumpToNear)
         );
@@ -326,6 +418,7 @@ mod tests {
                 ElementState::Pressed,
                 true,
                 PhysicalKey::Code(KeyCode::KeyP),
+                true,
             ),
             None
         );
@@ -334,6 +427,7 @@ mod tests {
                 ElementState::Released,
                 false,
                 PhysicalKey::Code(KeyCode::KeyN),
+                true,
             ),
             None
         );
@@ -342,6 +436,7 @@ mod tests {
                 ElementState::Pressed,
                 false,
                 PhysicalKey::Code(KeyCode::KeyW),
+                true,
             ),
             None
         );

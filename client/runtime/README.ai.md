@@ -87,7 +87,8 @@ gravity, contact response and substeps out of the native adapter. See the
 
 Equipment toolbar state lives in `equipment.rs`, composed in `app.rs`. Keep
 world-session carrying checks and native/automation view gates aligned. Its
-selection does not yet replace M mining equip/presentation (dependent work).
+selection is the sole equipment authority for mining, held presentation and reticle.
+Slot changes clear mining input; physical pickup clears selection and held mining.
 
 Map toolbar contents and optional selection through `equipment::presentation`
 for gameplay redraws only. Renderer owns rasterization and message stacking;

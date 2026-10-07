@@ -183,7 +183,6 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "4" | "slot_4" => Some(KeyCode::Digit4),
         "5" | "slot_5" => Some(KeyCode::Digit5),
         "6" => Some(KeyCode::Digit6),
-        "equip_mining_tool" => Some(KeyCode::KeyM),
         "grab_drop" | "pickup" | "drop" | "mine" => Some(KeyCode::KeyF),
         "roll_left" => Some(KeyCode::ArrowLeft),
         "roll_right" => Some(KeyCode::ArrowRight),
@@ -240,6 +239,7 @@ fn inspect(app: &ClientApplication) -> Value {
             .total_cmp(&b["distance_to_player_meters"].as_f64().unwrap())
     });
     let mining_target = app.mining.target(
+        &app.equipment,
         character,
         frame,
         ship.door_state == salimon_ship::DoorState::Open && ship.door_open_fraction >= 0.95,
@@ -274,6 +274,7 @@ fn inspect(app: &ClientApplication) -> Value {
     );
     let resource_context = crate::resource_context::context(
         &app.mining,
+        &app.equipment,
         character,
         frame,
         ship.door_state == salimon_ship::DoorState::Open && ship.door_open_fraction >= 0.95,
@@ -300,7 +301,7 @@ fn inspect(app: &ClientApplication) -> Value {
             "target_id": fragment_target.map(|id| id.0),
             "context": crate::carrying::context(&app.mining, fragment_target, character),
             "last_action_feedback": app.mining.carry_feedback},
-        "mining": { "equipped": app.mining.equipped, "held": app.mining.held,
+        "mining": { "equipped": app.equipment.mining_equipped(), "held": app.mining.held,
             "active": app.mining.held && mining_target.is_some(),
             "extracted_mass_kg": app.mining.session.extracted_mass_kg(),
             "range_meters": salimon_world::mining::MINING_RANGE_METERS,
@@ -487,9 +488,84 @@ mod tests {
     }
 
     #[test]
+    fn toolbar_stows_cancel_both_mining_inputs_and_never_resume_on_reselect() {
+        let mut test = app(Scenario::LandedEarth);
+        e2e::initialize(
+            &mut test,
+            Config {
+                scenario: Scenario::LandedEarth,
+                seed: 0,
+                step: Duration::from_millis(16),
+            },
+        )
+        .unwrap();
+        let scenario: Value =
+            serde_json::from_str(include_str!("../../../scenarios/mining.json")).unwrap();
+        for step in scenario["steps"].as_array().unwrap() {
+            if step.get("assert").and_then(|check| check["path"].as_str()) == Some("mining.active")
+                && step["assert"]["equals"] == json!(true)
+            {
+                break;
+            }
+            if let Some(action) = step.get("action") {
+                let mut command = action.clone();
+                command["protocol"] = json!(1);
+                command["id"] = json!(1);
+                assert_eq!(execute(&mut test, &command.to_string())["ok"], true);
+            }
+        }
+        assert_eq!(inspect(&test)["mining"]["active"], true);
+        let ship = test.ship.snapshot();
+        let frame = character_ship_frame(ship.pose);
+        let player = test.character.snapshot(frame, surface_frame_for_ship(ship));
+        for key in [
+            KeyCode::Digit2,
+            KeyCode::Digit3,
+            KeyCode::Digit4,
+            KeyCode::Digit5,
+        ] {
+            test.mining.set_mouse_held(true);
+            test.automation_key(PhysicalKey::Code(key), true);
+            assert!(!test.mining.held);
+            assert_eq!(inspect(&test)["mining"]["equipped"], false);
+            assert_eq!(inspect(&test)["mining"]["target"], Value::Null);
+            assert!(
+                test.mining
+                    .held_item(&test.equipment, player, true)
+                    .is_none()
+            );
+            let dot = crate::reticle::image(true, &test.equipment).unwrap();
+            let mass = test.mining.session.extracted_mass_kg();
+            test.advance_game(Duration::from_millis(16));
+            assert_eq!(test.mining.session.extracted_mass_kg(), mass);
+            test.automation_key(PhysicalKey::Code(KeyCode::Digit1), true);
+            assert!(
+                test.mining
+                    .held_item(&test.equipment, player, true)
+                    .is_some()
+            );
+            assert_ne!(
+                crate::reticle::image(true, &test.equipment)
+                    .unwrap()
+                    .revision,
+                dot.revision
+            );
+            assert!(!test.mining.held, "selection must not restart held mining");
+            assert!(test.mining.press_f());
+            test.mining.start_f_mining();
+        }
+        assert_eq!(key_code("equip_mining_tool"), None);
+        test.automation_key(PhysicalKey::Code(KeyCode::KeyM), true);
+        assert!(
+            test.equipment.mining_equipped(),
+            "M cannot toggle selection"
+        );
+    }
+
+    #[test]
     fn mining_real_inputs_gate_surface_equipment_aim_and_release() {
         let mut test = app(Scenario::LandedEarth);
-        test.mining.toggle();
+        test.automation_key(PhysicalKey::Code(KeyCode::Digit1), true);
         test.mining.held = true;
         test.advance_game(Duration::from_secs(1));
         assert_eq!(
@@ -508,6 +584,7 @@ mod tests {
         .unwrap();
         // The fixture does not alter mining state; reset only test's initial input.
         test.mining = crate::mining::MiningTool::default();
+        test.equipment = crate::equipment::EquipmentToolbar::default();
         let scenario: Value =
             serde_json::from_str(include_str!("../../../scenarios/mining.json")).unwrap();
         for (index, step) in scenario["steps"].as_array().unwrap().iter().enumerate() {
@@ -675,16 +752,18 @@ mod tests {
                 assert_eq!(execute(&mut test, &command.to_string())["ok"], true);
             }
         }
-        test.mining.toggle();
-        assert!(test.mining.equipped);
+        test.automation_key(PhysicalKey::Code(KeyCode::Digit1), true);
+        assert!(test.equipment.mining_equipped());
         test.automation_key(PhysicalKey::Code(KeyCode::Digit1), true);
         assert_eq!(inspect(&test)["equipment"]["selected_slot"], 1);
         let mass = test.mining.session.extracted_mass_kg();
+        test.mining.set_mouse_held(true);
         test.interact();
         assert!(test.mining.session.carried_id().is_none());
         test.automation_key(PhysicalKey::Code(KeyCode::KeyF), true);
         assert!(test.mining.session.carried_id().is_some());
         assert_eq!(inspect(&test)["equipment"]["selected_slot"], Value::Null);
+        assert!(!test.equipment.mining_equipped());
         for key in ["slot_1", "slot_2", "slot_3", "slot_4", "slot_5"] {
             let request = json!({"protocol": 1, "id": 1, "op": "key", "key": key, "pressed": true});
             assert_eq!(execute(&mut test, &request.to_string())["ok"], true);

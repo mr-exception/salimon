@@ -1,7 +1,7 @@
-//! Gameplay aim presentation; equipment authority stays in `MiningTool`.
+//! Gameplay aim presentation; equipment authority stays in `EquipmentToolbar`.
 use salimon_renderer::{OverlayImage, OverlayPlacement};
 
-use crate::mining::MiningTool;
+use crate::equipment::EquipmentToolbar;
 
 const SIZE: u32 = 17;
 const BYTE_COUNT: usize = (SIZE * SIZE * 4) as usize;
@@ -43,12 +43,12 @@ const fn pixels(cross: bool) -> [u8; BYTE_COUNT] {
     rgba
 }
 
-pub(crate) fn image(gameplay: bool, tool: &MiningTool) -> Option<OverlayImage<'static>> {
+pub(crate) fn image(gameplay: bool, tool: &EquipmentToolbar) -> Option<OverlayImage<'static>> {
     gameplay.then_some(OverlayImage {
         width: SIZE,
         height: SIZE,
-        rgba8: if tool.equipped { &CROSS } else { &DOT },
-        revision: u64::from(tool.equipped),
+        rgba8: if tool.mining_equipped() { &CROSS } else { &DOT },
+        revision: u64::from(tool.mining_equipped()),
         placement: OverlayPlacement::Center,
     })
 }
@@ -56,18 +56,18 @@ pub(crate) fn image(gameplay: bool, tool: &MiningTool) -> Option<OverlayImage<'s
 #[cfg(test)]
 mod tests {
     use super::{CROSS, DOT, SIZE, image};
-    use crate::mining::MiningTool;
+    use crate::equipment::EquipmentToolbar;
 
     #[test]
     fn equip_and_stow_select_the_current_authoritative_state() {
-        let mut tool = MiningTool::default();
+        let mut tool = EquipmentToolbar::default();
         let empty = image(true, &tool).unwrap();
         assert_eq!(empty.rgba8, DOT);
-        tool.toggle();
+        tool.select(crate::equipment::ToolbarSlot::One, false);
         let equipped = image(true, &tool).unwrap();
         assert_eq!(equipped.rgba8, CROSS);
         assert_ne!(equipped.revision, empty.revision);
-        tool.toggle();
+        tool.sync_carrying(true);
         let stowed = image(true, &tool).unwrap();
         assert_eq!(stowed.rgba8, empty.rgba8);
         assert_eq!(stowed.revision, empty.revision);

@@ -479,5 +479,7 @@ array initially `["mining_tool", null, null, null, null]`, and
 `equipment.selected_slot`, a one-based slot number or null. Selection is absent
 at launch, cleared on pickup and blocked while carrying; dropping leaves it
 absent until another explicit selection. The carrying baseline verifies all
-five slots and the pickup/drop lockout. Toolbar rendering and mining equip
-presentation are dependent work; `equip_mining_tool` still maps to M.
+five slots and the pickup/drop lockout. The bottom-center toolbar, held tool,
+reticle and mining gates derive from this selection. Select `slot_1` to equip;
+select `slot_2`–`slot_5` to stow and cancel held mining. The old toggle command
+`equip_mining_tool` and M binding are removed; use explicit slot selection.

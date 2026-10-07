@@ -454,14 +454,14 @@
     {
       "action": {
         "op": "key",
-        "key": "equip_mining_tool",
+        "key": "slot_1",
         "pressed": true
       }
     },
     {
       "action": {
         "op": "key",
-        "key": "equip_mining_tool",
+        "key": "slot_1",
         "pressed": false
       }
     },

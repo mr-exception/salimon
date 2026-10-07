@@ -12,7 +12,7 @@ pub(super) fn release_cursor_pressed(state: ElementState, repeat: bool, key: Phy
 
 /// Tool/carrying input accepts real edges only; focus replay cannot grab/drop.
 pub(super) fn tool_key_event(repeat: bool, is_synthetic: bool, key: PhysicalKey) -> bool {
-    !repeat && !is_synthetic && matches!(key, PhysicalKey::Code(KeyCode::KeyM | KeyCode::KeyF))
+    !repeat && !is_synthetic && matches!(key, PhysicalKey::Code(KeyCode::KeyF))
 }
 
 pub(super) fn toolbar_slot(key: PhysicalKey) -> Option<crate::equipment::ToolbarSlot> {
@@ -283,6 +283,11 @@ mod tests {
     fn f_carrying_ignores_repeat_focus_replay_and_other_keys() {
         let f = PhysicalKey::Code(KeyCode::KeyF);
         assert!(tool_key_event(false, false, f));
+        assert!(!tool_key_event(
+            false,
+            false,
+            PhysicalKey::Code(KeyCode::KeyM)
+        ));
         assert!(!tool_key_event(true, false, f));
         assert!(!tool_key_event(false, true, f));
         assert!(!tool_key_event(

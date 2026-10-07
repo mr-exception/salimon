@@ -155,7 +155,7 @@ frame/session sequencing. See the canonical
 ## First-person reticle
 
 `reticle.rs` selects a static outlined dot or `+` RGBA image directly from
-`MiningTool.equipped` each gameplay redraw. Precision-tour view hides it. The
+`EquipmentToolbar::mining_equipped()` each gameplay redraw. Precision-tour view hides it. The
 renderer composites it independently of diagnostics/action text at the drawable
 center, without scene depth or a world-space aim cuboid. This center is NDC
 (0, 0), matching the existing eye-to-look-target interaction/mining ray; target
@@ -234,8 +234,12 @@ only apply in precision-tour view; P/R/N retain their engineering shortcuts.
 Successful physical pickup immediately clears selection. Selection reads the
 world session's carried identity and is refused while it is occupied; release
 never restores a previous selection. Renderer state does not own the loadout.
-Deriving mining-tool equip/presentation from selection remains
-separate dependent work: the existing M equip control is preserved for now.
+`EquipmentToolbar::mining_equipped()` derives active equipment from the selected
+slot and its contents. Mining target/extraction, held mesh, reticle and prompts
+read this decision; MiningTool stores no equipped boolean. Slot changes cancel
+held mining; pickup clears selection and held input while preserving the consumed
+F latch. M and automation `equip_mining_tool` are removed; scenarios explicitly
+select `slot_1` to equip and empty slots to stow.
 Automation inspection exposes `equipment.slots` (tool names/null) and
 `equipment.selected_slot` (1–5/null).
 

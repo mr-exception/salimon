@@ -113,4 +113,8 @@
   carrying blocks all slot selection; dropping never restores selection.
 - Toolbar loadout/selection maps directly to renderer DTOs in gameplay and is
   hidden in precision tour. Toolbar presentation cannot change equip behavior;
-  individual tool equip integration remains separate work.
+  slot 1 is the sole mining equip authority; empty/absent selection stows it.
+- Mining owns no independent equipped boolean. Targets, extraction, held tool,
+  reticle and prompts all consume the toolbar decision. Switching slots cancels
+  held input immediately; pickup cancels mouse mining without releasing the
+  consumed F latch. M and the legacy equip automation key are unavailable.

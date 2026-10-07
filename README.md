@@ -130,11 +130,11 @@ ship velocity. Press **E** near the cockpit to enter or leave
 control instantly; press **E** near the aft door to open/close it while landed or in open space beyond the nearby-body threshold.
 Gameplay **1–5** selects one of five equipment slots (slot 1: mining tool;
 slots 2–5: empty). Pickup clears selection; carrying blocks selection, and
-dropping requires selecting a slot again. This state/input foundation has no
-visible toolbar yet; mining presentation still uses M until the dependent work.
+dropping requires selecting a slot again. The toolbar appears at bottom center.
+Slot 1 equips the mining tool; selecting an empty slot stows it and stops mining.
 
-Press **M** to equip the handheld mining tool on the surface; aim at a deposit
-within 4 m and hold **F** or left mouse to extract at 2 kg/s. Press M to stow.
+Press **1** to equip the handheld mining tool on the surface; aim at a deposit
+within 4 m and hold **F** or left mouse to extract at 2 kg/s. Press **2–5** to stow.
 Aim at a physical fragment within 3 m and press **F** to pick it up. You can
 carry one world object at a time; equipped gear remains separate. Press **F**
 again to release it from your hand. Grab/drop consumes that F press; otherwise

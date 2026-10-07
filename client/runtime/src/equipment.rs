@@ -41,6 +41,10 @@ impl Default for EquipmentToolbar {
 }
 
 impl EquipmentToolbar {
+    pub(crate) fn mining_equipped(&self) -> bool {
+        self.selected.and_then(|slot| self.slots[slot.index()]) == Some(EquipmentTool::MiningTool)
+    }
+
     pub(crate) fn slots(&self) -> &[Option<EquipmentTool>; 5] {
         &self.slots
     }

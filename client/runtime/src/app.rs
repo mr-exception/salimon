@@ -342,13 +342,13 @@ impl ClientApplication {
         }
         if let Some(slot) = toolbar_slot(key) {
             if pressed {
+                let previous = self.equipment.selected();
                 self.equipment
                     .select(slot, self.mining.session.carried_id().is_some());
+                if previous != self.equipment.selected() {
+                    self.mining.clear_input();
+                }
             }
-            return;
-        }
-        if key == PhysicalKey::Code(KeyCode::KeyM) && pressed {
-            self.mining.toggle();
             return;
         }
         if key == PhysicalKey::Code(KeyCode::KeyF) {
@@ -364,7 +364,7 @@ impl ClientApplication {
                         .is_some()
                 {
                     self.carry_action(pickup);
-                } else {
+                } else if self.equipment.mining_equipped() {
                     self.mining.start_f_mining();
                 }
             }
@@ -386,6 +386,7 @@ impl ClientApplication {
             match crate::carrying::target(&self.mining, player, frame, door_open) {
                 Some(id) if self.mining.session.pick_up(id) => {
                     self.equipment.sync_carrying(true);
+                    self.mining.stop_mining();
                     self.mining.fragment_motion.remove(&id);
                     self.mining.ship_fragments.remove(&id);
                     "Fragment picked up - F to drop"
@@ -480,6 +481,7 @@ impl ClientApplication {
         if self.view_mode == ViewMode::Gameplay {
             let frame = character_ship_frame(ship.pose);
             self.mining.advance(
+                &self.equipment,
                 delta,
                 self.character.snapshot(frame, surface_frame_for_ship(ship)),
                 frame,
@@ -539,6 +541,7 @@ impl ClientApplication {
             None
         };
         let mining_target = self.mining.target(
+            &self.equipment,
             character_snapshot,
             ship_frame,
             door_passable(ship_snapshot),
@@ -555,6 +558,7 @@ impl ClientApplication {
                 .is_some());
         let resource_context = crate::resource_context::context(
             &self.mining,
+            &self.equipment,
             character_snapshot,
             ship_frame,
             door_passable(ship_snapshot),
@@ -660,15 +664,18 @@ impl ClientApplication {
                     light: Some(light),
                     ship: ship_mesh,
                     held_item: if self.view_mode == ViewMode::Gameplay {
-                        self.mining
-                            .held_item(character_snapshot, mining_target.is_some())
+                        self.mining.held_item(
+                            &self.equipment,
+                            character_snapshot,
+                            mining_target.is_some(),
+                        )
                     } else {
                         None
                     },
                 },
                 overlay_image,
                 action_bar_image,
-                crate::reticle::image(self.view_mode == ViewMode::Gameplay, &self.mining),
+                crate::reticle::image(self.view_mode == ViewMode::Gameplay, &self.equipment),
                 (self.view_mode == ViewMode::Gameplay).then(|| self.equipment.presentation()),
                 window.scale_factor(),
                 || window.pre_present_notify(),
@@ -875,16 +882,17 @@ impl ApplicationHandler for ClientApplication {
                 button: MouseButton::Left,
                 ..
             } => {
-                self.mining
-                    .set_mouse_held(self.cursor_captured && state == ElementState::Pressed);
+                self.mining.set_mouse_held(
+                    self.cursor_captured
+                        && self.equipment.mining_equipped()
+                        && state == ElementState::Pressed,
+                );
             }
             WindowEvent::KeyboardInput {
                 event,
                 is_synthetic,
                 ..
-            } if event.physical_key == PhysicalKey::Code(KeyCode::KeyM)
-                || event.physical_key == PhysicalKey::Code(KeyCode::KeyF) =>
-            {
+            } if event.physical_key == PhysicalKey::Code(KeyCode::KeyF) => {
                 if self.cursor_captured
                     && tool_key_event(event.repeat, is_synthetic, event.physical_key)
                 {

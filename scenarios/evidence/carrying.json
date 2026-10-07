@@ -521,7 +521,7 @@
     {
       "assert": {
         "path": "resource_ui.context",
-        "contains": "kg left - untouched\nM to equip mining tool"
+        "contains": "kg left - untouched\n1 to equip mining tool"
       }
     },
     {
@@ -562,14 +562,14 @@
     {
       "action": {
         "op": "key",
-        "key": "equip_mining_tool",
+        "key": "slot_1",
         "pressed": true
       }
     },
     {
       "action": {
         "op": "key",
-        "key": "equip_mining_tool",
+        "key": "slot_1",
         "pressed": false
       }
     },
@@ -737,7 +737,7 @@
     {
       "assert": {
         "path": "resource_ui.context",
-        "equals": "Aim at a deposit within 4 m - M to stow"
+        "equals": "Aim at a deposit within 4 m - 2-5 to stow"
       }
     },
     {
@@ -978,14 +978,14 @@
     {
       "action": {
         "op": "key",
-        "key": "equip_mining_tool",
+        "key": "slot_2",
         "pressed": true
       }
     },
     {
       "action": {
         "op": "key",
-        "key": "equip_mining_tool",
+        "key": "slot_2",
         "pressed": false
       }
     },
@@ -1278,21 +1278,21 @@
     {
       "action": {
         "op": "key",
-        "key": "equip_mining_tool",
+        "key": "slot_1",
         "pressed": true
       }
     },
     {
       "action": {
         "op": "key",
-        "key": "equip_mining_tool",
+        "key": "slot_1",
         "pressed": false
       }
     },
     {
       "assert": {
         "path": "mining.equipped",
-        "equals": true
+        "equals": false
       }
     },
     {
@@ -1510,14 +1510,14 @@
     {
       "action": {
         "op": "key",
-        "key": "equip_mining_tool",
+        "key": "slot_2",
         "pressed": true
       }
     },
     {
       "action": {
         "op": "key",
-        "key": "equip_mining_tool",
+        "key": "slot_2",
         "pressed": false
       }
     },

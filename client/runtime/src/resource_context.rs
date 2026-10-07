@@ -10,6 +10,7 @@ pub(crate) struct Prompt {
 
 pub(crate) fn context(
     tool: &MiningTool,
+    equipment: &crate::equipment::EquipmentToolbar,
     player: CharacterSnapshot,
     frame: ShipFrame,
     door_open: bool,
@@ -59,12 +60,12 @@ pub(crate) fn context(
             DepositState::PartiallyMined => "partly mined",
             DepositState::Depleted => return None,
         };
-        let prompt = if !tool.equipped {
-            "M to equip mining tool"
+        let prompt = if !equipment.mining_equipped() {
+            "1 to equip mining tool"
         } else if tool.held {
             "Mining - release F or left mouse to stop"
         } else {
-            "Hold F or left mouse to mine - M to stow"
+            "Hold F or left mouse to mine - 2-5 to stow"
         };
         return Some(Prompt {
             placement: salimon_renderer::OverlayPlacement::World {
@@ -80,8 +81,8 @@ pub(crate) fn context(
             ),
         });
     }
-    tool.equipped.then(|| Prompt {
-        text: "Aim at a deposit within 4 m - M to stow".to_owned(),
+    equipment.mining_equipped().then(|| Prompt {
+        text: "Aim at a deposit within 4 m - 2-5 to stow".to_owned(),
         placement: salimon_renderer::OverlayPlacement::BottomCenter,
     })
 }

@@ -1,0 +1,85 @@
+{
+  "baseline": [
+    {
+      "scenario": "fragment-transfer.json",
+      "status": "passed",
+      "steps_completed": 253
+    },
+    {
+      "scenario": "mining.json",
+      "status": "passed",
+      "steps_completed": 138
+    },
+    {
+      "scenario": "resource-deposits.json",
+      "status": "passed",
+      "steps_completed": 64
+    },
+    {
+      "scenario": "resource-streaming.json",
+      "status": "passed",
+      "steps_completed": 135
+    },
+    {
+      "scenario": "carrying.json",
+      "status": "passed",
+      "steps_completed": 235
+    },
+    {
+      "scenario": "resource-loop.json",
+      "status": "passed",
+      "steps_completed": 203
+    }
+  ],
+  "mining_tool_evidence": {
+    "scenario": "mining-tool.json",
+    "status": "passed",
+    "steps_completed": 161,
+    "screenshots": [
+      {
+        "status": "captured",
+        "path": "/workspace/scratch/86cf42e82224/salimon/artifacts/issue-130/run-usageuro/step-064-deposit-context-tool-stowed.png"
+      },
+      {
+        "status": "captured",
+        "path": "/workspace/scratch/86cf42e82224/salimon/artifacts/issue-130/run-usageuro/step-075-equipped-mining-tool.png"
+      },
+      {
+        "status": "captured",
+        "path": "/workspace/scratch/86cf42e82224/salimon/artifacts/issue-130/run-usageuro/step-077-tool-look-up.png"
+      },
+      {
+        "status": "captured",
+        "path": "/workspace/scratch/86cf42e82224/salimon/artifacts/issue-130/run-usageuro/step-079-tool-look-down.png"
+      },
+      {
+        "status": "captured",
+        "path": "/workspace/scratch/86cf42e82224/salimon/artifacts/issue-130/run-usageuro/step-085-active-mining-context.png"
+      },
+      {
+        "status": "captured",
+        "path": "/workspace/scratch/86cf42e82224/salimon/artifacts/issue-130/run-usageuro/step-100-partiallymined-deposit.png"
+      },
+      {
+        "status": "captured",
+        "path": "/workspace/scratch/86cf42e82224/salimon/artifacts/issue-130/run-usageuro/step-133-depleted-deposit.png"
+      },
+      {
+        "status": "captured",
+        "path": "/workspace/scratch/86cf42e82224/salimon/artifacts/issue-130/run-usageuro/step-153-tool-extreme-up.png"
+      },
+      {
+        "status": "captured",
+        "path": "/workspace/scratch/86cf42e82224/salimon/artifacts/issue-130/run-usageuro/step-155-tool-extreme-up-yaw.png"
+      },
+      {
+        "status": "captured",
+        "path": "/workspace/scratch/86cf42e82224/salimon/artifacts/issue-130/run-usageuro/step-157-tool-extreme-down.png"
+      },
+      {
+        "status": "captured",
+        "path": "/workspace/scratch/86cf42e82224/salimon/artifacts/issue-130/run-usageuro/step-161-tool-extreme-stowed.png"
+      }
+    ]
+  }
+}

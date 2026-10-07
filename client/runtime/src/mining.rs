@@ -16,7 +16,6 @@ pub(crate) struct MiningTool {
         crate::fragment_physics::FragmentMotion,
     >,
     pub(crate) carry_feedback: Option<&'static str>,
-    pub(crate) equipped: bool,
     pub(crate) held: bool,
     f_down: bool,
     f_mining: bool,
@@ -25,11 +24,6 @@ pub(crate) struct MiningTool {
 }
 
 impl MiningTool {
-    pub(crate) fn toggle(&mut self) {
-        self.equipped = !self.equipped;
-        self.clear_input();
-    }
-
     /// Latch the initial F edge; a carrying action consumes this entire press.
     pub(crate) fn press_f(&mut self) -> bool {
         if self.f_down {
@@ -55,11 +49,16 @@ impl MiningTool {
         self.held = self.f_mining || self.mouse_held;
     }
 
-    pub(crate) fn clear_input(&mut self) {
-        self.f_down = false;
+    /// Cancel extraction while preserving a contextual F press consumed by pickup.
+    pub(crate) fn stop_mining(&mut self) {
         self.f_mining = false;
         self.mouse_held = false;
         self.held = false;
+    }
+
+    pub(crate) fn clear_input(&mut self) {
+        self.f_down = false;
+        self.stop_mining();
     }
 
     pub(crate) fn nearby(
@@ -74,12 +73,14 @@ impl MiningTool {
 
     pub(crate) fn target(
         &self,
+        equipment: &crate::equipment::EquipmentToolbar,
         player: CharacterSnapshot,
         frame: ShipFrame,
         door_open: bool,
         seed: u64,
     ) -> Option<MiningTarget> {
-        self.equipped
+        equipment
+            .mining_equipped()
             .then(|| self.inspect_target(player, frame, door_open, seed))
             .flatten()
     }
@@ -126,6 +127,7 @@ impl MiningTool {
 
     pub(crate) fn advance(
         &mut self,
+        equipment: &crate::equipment::EquipmentToolbar,
         delta: Duration,
         player: CharacterSnapshot,
         frame: ShipFrame,
@@ -135,7 +137,7 @@ impl MiningTool {
         if !self.held {
             return;
         }
-        let Some(target) = self.target(player, frame, door_open, seed) else {
+        let Some(target) = self.target(equipment, player, frame, door_open, seed) else {
             return;
         };
         let Ok(mut deposits) = self.nearby(player.eye_position_meters, seed) else {
@@ -152,10 +154,11 @@ impl MiningTool {
     /// The caller supplies gameplay visibility and the existing target result.
     pub(crate) fn held_item(
         &self,
+        equipment: &crate::equipment::EquipmentToolbar,
         player: CharacterSnapshot,
         valid_target: bool,
     ) -> Option<HeldItemInstance> {
-        (player.location == CharacterLocation::Surface && self.equipped).then_some(
+        (player.location == CharacterLocation::Surface && equipment.mining_equipped()).then_some(
             HeldItemInstance {
                 active: self.held && valid_target,
             },
@@ -191,7 +194,7 @@ mod tests {
         assert!(!tool.held);
         assert!(tool.press_f(), "reset clears the F latch");
         tool.start_f_mining();
-        tool.toggle();
+        tool.clear_input();
         assert!(!tool.held);
         assert!(tool.press_f(), "stow clears the F latch too");
     }
@@ -199,6 +202,7 @@ mod tests {
     #[test]
     fn authored_tool_visibility_and_feedback_follow_existing_gates() {
         let mut tool = MiningTool::default();
+        let mut equipment = crate::equipment::EquipmentToolbar::default();
         let mut player = CharacterSnapshot {
             location: CharacterLocation::Surface,
             eye_position_meters: [0.0; 3],
@@ -207,26 +211,27 @@ mod tests {
             local_ship_position_meters: None,
             doorway_blend_fraction: None,
         };
-        assert!(tool.held_item(player, true).is_none());
-        tool.toggle();
+        assert!(tool.held_item(&equipment, player, true).is_none());
+        equipment.select(crate::equipment::ToolbarSlot::One, false);
         assert_eq!(
-            tool.held_item(player, true),
+            tool.held_item(&equipment, player, true),
             Some(HeldItemInstance { active: false })
         );
         tool.held = true;
         assert_eq!(
-            tool.held_item(player, false),
+            tool.held_item(&equipment, player, false),
             Some(HeldItemInstance { active: false })
         );
         assert_eq!(
-            tool.held_item(player, true),
+            tool.held_item(&equipment, player, true),
             Some(HeldItemInstance { active: true })
         );
         player.location = CharacterLocation::InsideShip;
-        assert!(tool.held_item(player, true).is_none());
+        assert!(tool.held_item(&equipment, player, true).is_none());
         player.location = CharacterLocation::Surface;
-        tool.toggle();
-        assert!(tool.held_item(player, true).is_none());
+        equipment.sync_carrying(true);
+        tool.clear_input();
+        assert!(tool.held_item(&equipment, player, true).is_none());
         assert!(!tool.held);
     }
 }

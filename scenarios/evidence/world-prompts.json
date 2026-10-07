@@ -464,7 +464,7 @@
     {
       "assert": {
         "path": "resource_ui.context",
-        "contains": "kg left - untouched\nM to equip mining tool"
+        "contains": "kg left - untouched\n1 to equip mining tool"
       }
     },
     {

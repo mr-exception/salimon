@@ -10,6 +10,11 @@ sample clocks or query hardware itself. The runtime decides when to toggle and
 record diagnostics, the renderer reports measurements it owns, and world/ship
 modules provide optional domain values through `DomainMetrics`.
 
+Internals are private modules: `aggregation.rs` owns bounded observations and
+refresh cadence, `format.rs` owns text/units, and `raster.rs` owns bitmap drawing.
+`lib.rs` preserves the public contracts and coordinates presentation. See the
+[architecture source map](architecture.md#private-source-owners).
+
 ## Public contract
 
 - `Diagnostics` is hidden by default and exposes `toggle`, `is_visible`,

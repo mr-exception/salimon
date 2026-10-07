@@ -19,8 +19,25 @@ The renderer owns GPU timestamps, allocator reports, render counters, texture
 upload, and blending. `salimon-world` owns the current camera prototype and
 static six-body catalog; character and ship own current player/ship state, while
 world and physics own resource and physical-object rules. Diagnostics borrows
-those values for one call and stores only a formatted snapshot; it never
+those values for one call and stores only an owned observation snapshot; it never
 receives raw platform events or GPU/domain resources.
+
+## Private source owners
+
+- `src/lib.rs`: stable public DTOs and `Diagnostics` facade; visibility, density,
+  text/pixel storage, revision and immediate rebuild orchestration.
+- `src/aggregation.rs`: bounded frame history, latest frame, refresh accumulator,
+  owned/validated domain snapshots, memory-warning count, averages and p95.
+- `src/format.rs`: diagnostic rows, GPU availability labels, and unit formatting.
+  It reads aggregation state without mutating observations or presentation.
+- `src/raster.rs`: embedded bitmap glyphs, panel layout/colors and RGBA drawing.
+  It accepts only text and glyph scale, with no metric or platform knowledge.
+
+All modules are private. Formatting/rasterization tests live beside their owners;
+aggregation tests cover window eviction, statistics and snapshot cadence. Facade
+tests retain end-to-end visibility, lifecycle and refresh/revision coverage.
+Runtime still decides when to observe, toggle and reset across lifecycle events;
+renderer still owns all GPU work. No public DTO or method contract changes.
 
 ## Data flow
 

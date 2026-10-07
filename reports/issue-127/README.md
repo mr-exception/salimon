@@ -58,6 +58,19 @@ smoke. The final carrying checkpoint waits for transient expiry before capturing
 the actual carried-object prompt. [Structured evidence](evidence.json) preserves
 selected camera, interaction and resource-anchor states and test outcomes.
 
+## PR #138 CI repair (2026-10-07)
+
+Run `37601868906` failed on Linux, macOS and Windows in
+`test_visual_variants_only_add_checkpoints`: the carrying evidence scenario
+included a 200-frame transient-expiry wait and carried-prompt assertion absent
+from its baseline. Added those same steps to `scenarios/carrying.json`, retaining
+the screenshot-only differences and the existing parity check unchanged.
+
+Reproduced the failure locally, then passed all 34 script contracts with
+`python -m unittest discover -s scripts -p 'test_*.py'` on Python 3.12.14.
+`git diff --check` passed. This repair changes only the baseline scenario and
+this report; native execution/build checks are delegated to the new CI run.
+
 ## Visual evidence
 
 ![Cockpit](cockpit.png)

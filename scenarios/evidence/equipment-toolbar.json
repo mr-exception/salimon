@@ -1,0 +1,88 @@
+{
+  "setup": {
+    "scenario": "landed-earth",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 120000,
+  "steps": [
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": null
+      }
+    },
+    {
+      "screenshot": "no-selection"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_1",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_1",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": 1
+      }
+    },
+    {
+      "screenshot": "selected-slot-1"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_2",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_2",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": 2
+      }
+    },
+    {
+      "screenshot": "selected-slot-2"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_5",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_5",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": 5
+      }
+    },
+    {
+      "screenshot": "selected-slot-5"
+    }
+  ]
+}

@@ -390,7 +390,7 @@ fn speed_text(speed: SpeedDisplay) -> (String, &'static str, [u8; 4]) {
     }
 }
 
-fn glyph_rows(character: char) -> [u8; 7] {
+pub(crate) fn glyph_rows(character: char) -> [u8; 7] {
     // Deliberately preserve the case of metric prefixes: m/s and Mm/s denote
     // different scales. Labels elsewhere use the uppercase instrument face.
     match character {

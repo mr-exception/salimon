@@ -4,6 +4,7 @@
 //! has no dependency on world, character, or ship state.
 
 mod cockpit_instruments;
+mod equipment_toolbar;
 mod gpu_timing;
 mod held_item;
 mod overlay;
@@ -17,6 +18,7 @@ use std::fmt;
 use std::time::Duration;
 
 pub use cockpit_instruments::{CockpitInstruments, NearbyBodyInstruments};
+pub use equipment_toolbar::{EquipmentIcon, EquipmentSlot, EquipmentToolbar};
 use gpu_timing::GpuTimer;
 pub use held_item::HeldItemInstance;
 pub use overlay::{OverlayImage, OverlayPlacement};
@@ -614,6 +616,8 @@ pub struct Renderer {
     overlay: overlay::OverlayRenderer,
     action_bar: overlay::OverlayRenderer,
     reticle: overlay::OverlayRenderer,
+    toolbar: overlay::OverlayRenderer,
+    toolbar_raster: equipment_toolbar::ToolbarRaster,
     spheres: spheres::SphereRenderer,
     ship_mesh: ship_mesh::ShipMeshRenderer,
     held_item: held_item::HeldItemRenderer,
@@ -803,6 +807,7 @@ impl Renderer {
         let overlay = overlay::OverlayRenderer::new(&device, configuration.format);
         let action_bar = overlay::OverlayRenderer::new(&device, configuration.format);
         let reticle = overlay::OverlayRenderer::new(&device, configuration.format);
+        let toolbar = overlay::OverlayRenderer::new(&device, configuration.format);
         let spheres = spheres::SphereRenderer::new(&device, &queue, configuration.format);
         let ship_mesh = ship_mesh::ShipMeshRenderer::new(&device, configuration.format)?;
         let held_item = held_item::HeldItemRenderer::new(&device, configuration.format)?;
@@ -825,6 +830,8 @@ impl Renderer {
             overlay,
             action_bar,
             reticle,
+            toolbar,
+            toolbar_raster: equipment_toolbar::ToolbarRaster::default(),
             spheres,
             ship_mesh,
             held_item,
@@ -860,17 +867,20 @@ impl Renderer {
         self.configure_surface();
     }
 
-    /// Draws and presents a scene plus optional diagnostics, action-bar, and reticle images.
+    /// Draws a scene, optional diagnostics/action/reticle images and typed equipment HUD.
     ///
     /// `before_present` lets the platform runtime issue its presentation
     /// notification at the exact boundary without introducing a `winit`
     /// dependency into this crate.
+    #[allow(clippy::too_many_arguments)]
     pub fn render(
         &mut self,
         scene: SceneFrame<'_>,
         overlay_image: Option<OverlayImage<'_>>,
         action_bar_image: Option<OverlayImage<'_>>,
         reticle_image: Option<OverlayImage<'_>>,
+        toolbar_state: Option<EquipmentToolbar>,
+        scale_factor: f64,
         before_present: impl FnOnce(),
     ) -> Result<RenderOutcome, RendererError> {
         if let Some(gpu_timer) = self.gpu_timer.as_mut() {
@@ -952,6 +962,32 @@ impl Renderer {
                 &self.depth_target.view,
             )
             .map_err(|error| RendererError::new("failed to prepare overlay", error))?;
+        if let Some(state) = toolbar_state {
+            self.toolbar_raster.update(state, scale_factor);
+        }
+        let toolbar_image = toolbar_state.and_then(|_| self.toolbar_raster.image());
+        self.toolbar
+            .prepare(
+                &self.device,
+                &self.queue,
+                self.configuration.width,
+                self.configuration.height,
+                toolbar_image,
+                scene.camera,
+                prepared_scene.view_projection,
+                &self.depth_target.view,
+            )
+            .map_err(|error| RendererError::new("failed to prepare equipment toolbar", error))?;
+        // Toolbar occupies the lowest HUD band; global/transient text stacks above it.
+        let action_bar_image = action_bar_image.map(|mut image| {
+            if toolbar_state.is_some() && image.placement == OverlayPlacement::BottomCenter {
+                image.placement = OverlayPlacement::BottomCenterInset(
+                    self.toolbar_raster
+                        .message_inset([self.configuration.width, self.configuration.height]),
+                );
+            }
+            image
+        });
         self.action_bar
             .prepare(
                 &self.device,
@@ -1050,6 +1086,7 @@ impl Renderer {
                 multiview_mask: None,
             });
             self.overlay.draw(&mut render_pass);
+            self.toolbar.draw(&mut render_pass);
             self.action_bar.draw(&mut render_pass);
             self.reticle.draw(&mut render_pass);
         }
@@ -1080,7 +1117,8 @@ impl Renderer {
         };
         let overlay_draw_calls = u32::from(self.overlay.is_visible())
             + u32::from(self.action_bar.is_visible())
-            + u32::from(self.reticle.is_visible());
+            + u32::from(self.reticle.is_visible())
+            + u32::from(self.toolbar.is_visible());
         let scene_draw_calls = scene_draw_calls(prepared_scene.instance_count)
             + scene_draw_calls(self.spheres.count())
             + self.ship_mesh.draw_count()

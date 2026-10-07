@@ -69,3 +69,8 @@
     clamped to screen edges. The separate overlay pass samples stored reverse-Z
     scene depth at the anchor to hide an entire occluded prompt. Its conservative
     radius avoids target self-occlusion and never changes gameplay eligibility.
+
+23. Equipment toolbar contents/selection cross as renderer-neutral DTOs. Renderer
+    only rasterizes/composites them; five slots remain visible even when all are
+    empty. Absence hides the toolbar. Resize/DPI recomputes readable fitting, and
+    bottom-center global/transient messages stack above its reserved band.

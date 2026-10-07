@@ -234,7 +234,15 @@ only apply in precision-tour view; P/R/N retain their engineering shortcuts.
 Successful physical pickup immediately clears selection. Selection reads the
 world session's carried identity and is refused while it is occupied; release
 never restores a previous selection. Renderer state does not own the loadout.
-Toolbar rendering and deriving mining-tool presentation from selection remain
+Deriving mining-tool equip/presentation from selection remains
 separate dependent work: the existing M equip control is preserved for now.
 Automation inspection exposes `equipment.slots` (tool names/null) and
 `equipment.selected_slot` (1–5/null).
+
+## Equipment toolbar presentation (#129)
+
+`EquipmentToolbar::presentation` field-maps runtime loadout/selection to typed
+renderer-neutral icons/slots. Each gameplay redraw sends that DTO plus the native
+window scale factor; precision tour sends no toolbar. The renderer owns raster,
+cache and bottom-center stacking with global/transient action images. Runtime
+never draws this HUD in `action_bar.rs` or changes selection for display.

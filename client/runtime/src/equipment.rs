@@ -49,6 +49,24 @@ impl EquipmentToolbar {
         self.selected
     }
 
+    pub(crate) fn presentation(&self) -> salimon_renderer::EquipmentToolbar {
+        use salimon_renderer::{EquipmentIcon, EquipmentSlot};
+        salimon_renderer::EquipmentToolbar {
+            slots: self.slots.map(|tool| {
+                tool.map(|tool| match tool {
+                    EquipmentTool::MiningTool => EquipmentIcon::MiningTool,
+                })
+            }),
+            selected: self.selected.map(|slot| match slot {
+                ToolbarSlot::One => EquipmentSlot::One,
+                ToolbarSlot::Two => EquipmentSlot::Two,
+                ToolbarSlot::Three => EquipmentSlot::Three,
+                ToolbarSlot::Four => EquipmentSlot::Four,
+                ToolbarSlot::Five => EquipmentSlot::Five,
+            }),
+        }
+    }
+
     /// World session remains the authority for whether a physical object is held.
     pub(crate) fn select(&mut self, slot: ToolbarSlot, carrying: bool) {
         self.sync_carrying(carrying);
@@ -88,6 +106,36 @@ mod tests {
             toolbar.select(slot, false);
             assert_eq!(toolbar.selected(), Some(slot), "selection is not a toggle");
         }
+    }
+
+    #[test]
+    fn presentation_maps_contents_and_selection_without_equipping_tools() {
+        let mut toolbar = EquipmentToolbar::default();
+        let initial = toolbar.presentation();
+        assert_eq!(
+            initial.slots,
+            [
+                Some(salimon_renderer::EquipmentIcon::MiningTool),
+                None,
+                None,
+                None,
+                None
+            ]
+        );
+        assert_eq!(initial.selected, None);
+        for (slot, expected) in [
+            (ToolbarSlot::One, salimon_renderer::EquipmentSlot::One),
+            (ToolbarSlot::Two, salimon_renderer::EquipmentSlot::Two),
+            (ToolbarSlot::Three, salimon_renderer::EquipmentSlot::Three),
+            (ToolbarSlot::Four, salimon_renderer::EquipmentSlot::Four),
+            (ToolbarSlot::Five, salimon_renderer::EquipmentSlot::Five),
+        ] {
+            toolbar.select(slot, false);
+            assert_eq!(toolbar.presentation().selected, Some(expected));
+            assert_eq!(toolbar.presentation().slots, initial.slots);
+        }
+        toolbar.sync_carrying(true);
+        assert_eq!(toolbar.presentation().selected, None);
     }
 
     #[test]

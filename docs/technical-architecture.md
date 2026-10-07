@@ -22,7 +22,7 @@ dependencies; each crate's architecture/invariants defines its local contracts.
 | `client/math/` | Dependency-free `f64` vector component arithmetic; no domain/frame ownership |
 | `client/character/` | Portable movement, collision, gravity, cockpit transitions and open-space/nearby-body EVA |
 | `client/renderer/` | GPU resources, GLB loading, sphere/ship/image pipelines, reverse-Z, instruments and measurements through renderer-neutral DTOs |
-| `client/diagnostics/` | Observational metrics, formatting and overlay rasterization |
+| `client/diagnostics/` | Public DTO/facade plus private aggregation, formatting and CPU rasterization modules; see [source owners](../client/diagnostics/architecture.md#private-source-owners) |
 | `models/` and `client/assets/` | Offline authored sources/contracts and checked-in validated runtime exports respectively |
 | `client/platform/` and `core/` | Reserved adapter/backend boundaries; no backend implementation |
 

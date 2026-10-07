@@ -25,6 +25,14 @@ Callers own all source measurements. Keep `FrameSample`, `DomainMetrics`, and
 from player and ship state. Do not add `winit`, `wgpu`, world, character, or ship
 dependencies here; doing so would invert the intended observation flow.
 
+## Source navigation
+
+Start in `src/lib.rs` for the public API and presentation orchestration;
+`src/aggregation.rs` owns observations/statistics and cadence, `src/format.rs`
+owns rows/units, and `src/raster.rs` owns the font and RGBA drawing. Tests live
+with the relevant owner; facade tests verify the combined public behavior.
+See [private source owners](architecture.md#private-source-owners) for boundaries.
+
 ## Change checklist
 
 - Preserve the 120-sample bound and ignore zero intervals in frame statistics.

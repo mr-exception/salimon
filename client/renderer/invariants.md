@@ -62,7 +62,9 @@
 21. Held mining-tool geometry is the checked-in authored GLB, grip-centered and
     baked with identity node transforms. Camera-local presentation preserves
     orientation through look/gravity changes and never supplies a gameplay ray.
-    Active feedback is presentation-only; normal reverse-Z depth applies.
+    Its embedded surface atlas/UVs and metallic/roughness factors reach the
+    fragment shader; unsupported texture/material contracts fail asset loading.
+    Active feedback changes only status regions; normal reverse-Z depth applies.
 
 22. World prompt anchors are rebased in `f64` and projected with the scene camera.
     Invalid, behind-camera, clipped or non-fitting labels are hidden, never
@@ -74,3 +76,5 @@
     only rasterizes/composites them; five slots remain visible even when all are
     empty. Absence hides the toolbar. Resize/DPI recomputes readable fitting, and
     bottom-center global/transient messages stack above its reserved band.
+    Mining icon placement uses visible alpha bounds so asymmetric canvas padding
+    cannot shift artwork from the slot center; glyphs/borders remain legible.

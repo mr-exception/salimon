@@ -12,3 +12,4 @@ workspace = true
 [dependencies]
 gltf.workspace = true
 wgpu.workspace = true
+png = "=0.18.0"

@@ -100,7 +100,14 @@ consumer rather than an authoritative state owner.
 ## Held item presentation
 
 `held_item.rs` loads the checked-in mining-tool GLB once into an immutable
-vertex buffer. `HeldItemInstance` carries active feedback only; absence stows
+vertex buffer with positions/normals, base factor, status flag, authored UVs and
+metallic/roughness factors (15 `f32`s per vertex). It decodes the single embedded
+opaque 256×256 PNG using the bounded `item_image.rs` decoder and uploads an sRGB
+atlas with nine linear-color-averaged mip levels once. Unsupported maps/material
+contracts fail loading. The fragment shader samples the authored atlas and uses
+camera-local fill/highlights with authored metallic/roughness; steel, matte
+rubber/polymer and status remain distinct without a new scene pass.
+`HeldItemInstance` carries active feedback only; absence stows
 the visual. The identity grip and baked vertices rotate into a camera-local
 frame through the single `GRIP_TO_VIEW` transform in `held_item.rs`. CPU
 preparation composes it with the active camera projection; `held_item.wgsl`
@@ -187,7 +194,12 @@ eligibility, text, priority and transient expiry remain runtime-owned.
 Runtime supplies `EquipmentToolbar` (five optional `EquipmentIcon` values plus
 an optional typed `EquipmentSlot`) to `Renderer::render`; absence hides the HUD
 in precision tour. `equipment_toolbar.rs` owns the compact five-slot raster,
-number glyphs, drill silhouette and selected border/background. It reads no
+number glyphs, source-rendered PNG tool artwork and selected border/background.
+The shared bounded PNG decoder loads the icon once. Visible alpha bounds, rather
+than canvas dimensions/fixed silhouette offsets, determine a uniform fit centered
+in the slot with four logical pixels of padding. Straight-alpha artwork composites
+onto the slot, then numbers draw last. The regression pads/offsets the image
+asymmetrically and checks centered artwork at all three raster densities. It reads no
 gameplay domains and never derives usability, selection or equipped state.
 Raster pixels and GPU uploads are cached by contents, selection and bounded
 finite DPI density (1x–2x, matching the existing HUD scale-factor convention).

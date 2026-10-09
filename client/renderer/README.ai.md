@@ -79,7 +79,9 @@ Follow the root [coding conventions](../../docs/coding-conventions.md),
 with behavior changes and record completion evidence under root `reports/`.
 
 `held_item.rs` / `held_item.wgsl` own static authored mining-tool loading,
-camera-local grip placement and status-region feedback. Runtime owns equip
+camera-local grip placement, embedded PNG surface/UV sampling, material shading
+and status-region feedback. `item_image.rs` bounds PNG decoding for the held
+atlas and derived toolbar icon. Runtime owns equip
 and active gates; the asset README defines the baked grip contract.
 
 `equipment_toolbar.rs` owns HUD rasterization/cache from `EquipmentToolbar`,

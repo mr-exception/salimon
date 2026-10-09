@@ -6,7 +6,7 @@ use crate::{
 use wgpu::util::DeviceExt;
 
 const GLB: &[u8] = include_bytes!("../../assets/items/mining-tool/model.glb");
-const FLOATS: usize = 11;
+const FLOATS: usize = 15;
 
 /// Presentation of the checked-in mining tool; None stows it.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -28,7 +28,7 @@ fn model_to_clip(camera: CameraFrame, aspect: f32) -> Result<[f32; 16], Renderer
     Ok(multiply_mat4(projection, GRIP_TO_VIEW))
 }
 
-fn geometry() -> Result<Vec<f32>, RendererError> {
+fn geometry() -> Result<(Vec<f32>, crate::item_image::ItemImage), RendererError> {
     let asset =
         gltf::Gltf::from_slice(GLB).map_err(|e| RendererError::new("load item.mining-tool", e))?;
     let blob = asset
@@ -49,6 +49,38 @@ fn geometry() -> Result<Vec<f32>, RendererError> {
         return Err(RendererError::new(
             "load item.mining-tool",
             "missing SOCKET_Grip",
+        ));
+    }
+    let image = asset
+        .images()
+        .next()
+        .ok_or_else(|| RendererError::new("load item.mining-tool", "missing surface atlas"))?;
+    if asset.images().count() != 1 {
+        return Err(RendererError::new(
+            "load item.mining-tool",
+            "expected one surface atlas",
+        ));
+    }
+    let gltf::image::Source::View {
+        view,
+        mime_type: "image/png",
+    } = image.source()
+    else {
+        return Err(RendererError::new(
+            "load item.mining-tool",
+            "atlas must be embedded PNG",
+        ));
+    };
+    let bytes = blob
+        .get(view.offset()..view.offset() + view.length())
+        .ok_or_else(|| RendererError::new("load item.mining-tool", "atlas range exceeds blob"))?;
+    let atlas = crate::item_image::decode(bytes)?;
+    if [atlas.width, atlas.height] != [256, 256]
+        || atlas.pixels.as_chunks::<4>().0.iter().any(|p| p[3] != 255)
+    {
+        return Err(RendererError::new(
+            "load item.mining-tool",
+            "expected opaque 256x256 atlas",
         ));
     }
     let mut vertices = Vec::new();
@@ -74,7 +106,29 @@ fn geometry() -> Result<Vec<f32>, RendererError> {
                 |i| i.into_u32().collect(),
             );
             let material = primitive.material();
-            let color = material.pbr_metallic_roughness().base_color_factor();
+            let pbr = material.pbr_metallic_roughness();
+            let texture = pbr.base_color_texture().ok_or_else(|| {
+                RendererError::new("load item.mining-tool", "missing base-color texture")
+            })?;
+            if texture.tex_coord() != 0
+                || texture.texture().source().index() != image.index()
+                || pbr.metallic_roughness_texture().is_some()
+                || material.normal_texture().is_some()
+                || material.occlusion_texture().is_some()
+                || material.emissive_texture().is_some()
+                || material.alpha_mode() != gltf::material::AlphaMode::Opaque
+            {
+                return Err(RendererError::new(
+                    "load item.mining-tool",
+                    "unsupported material/texture contract",
+                ));
+            }
+            let uv: Vec<_> = reader
+                .read_tex_coords(0)
+                .ok_or_else(|| RendererError::new("load item.mining-tool", "missing TEXCOORD_0"))?
+                .into_f32()
+                .collect();
+            let color = pbr.base_color_factor();
             let indicator = f32::from(material.name() == Some("Tool_Status"));
             for index in indices {
                 let p = positions.get(index as usize).ok_or_else(|| {
@@ -87,6 +141,10 @@ fn geometry() -> Result<Vec<f32>, RendererError> {
                 vertices.extend_from_slice(n);
                 vertices.extend_from_slice(&color);
                 vertices.push(indicator);
+                vertices.extend_from_slice(uv.get(index as usize).ok_or_else(|| {
+                    RendererError::new("load item.mining-tool", "UV index out of bounds")
+                })?);
+                vertices.extend_from_slice(&[pbr.metallic_factor(), pbr.roughness_factor()]);
             }
         }
     }
@@ -96,7 +154,7 @@ fn geometry() -> Result<Vec<f32>, RendererError> {
             "empty or nonfinite geometry",
         ));
     }
-    Ok(vertices)
+    Ok((vertices, atlas))
 }
 
 pub(crate) struct HeldItemRenderer {
@@ -110,9 +168,19 @@ pub(crate) struct HeldItemRenderer {
 impl HeldItemRenderer {
     pub(crate) fn new(
         device: &wgpu::Device,
+        queue: &wgpu::Queue,
         format: wgpu::TextureFormat,
     ) -> Result<Self, RendererError> {
-        let geometry = geometry()?;
+        let (geometry, atlas) = geometry()?;
+        let texture = surface_texture(device, queue, atlas);
+        let texture_view = texture.create_view(&Default::default());
+        let sampler = device.create_sampler(&wgpu::SamplerDescriptor {
+            label: Some("Mining tool surface sampler"),
+            mag_filter: wgpu::FilterMode::Linear,
+            min_filter: wgpu::FilterMode::Linear,
+            mipmap_filter: wgpu::MipmapFilterMode::Linear,
+            ..Default::default()
+        });
         let count = u32::try_from(geometry.len() / FLOATS)
             .map_err(|e| RendererError::new("load item.mining-tool", e))?;
         let vertices = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
@@ -128,24 +196,52 @@ impl HeldItemRenderer {
         });
         let layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             label: Some("Held item bindings"),
-            entries: &[wgpu::BindGroupLayoutEntry {
-                binding: 0,
-                visibility: wgpu::ShaderStages::VERTEX,
-                ty: wgpu::BindingType::Buffer {
-                    ty: wgpu::BufferBindingType::Uniform,
-                    has_dynamic_offset: false,
-                    min_binding_size: wgpu::BufferSize::new(80),
+            entries: &[
+                wgpu::BindGroupLayoutEntry {
+                    binding: 0,
+                    visibility: wgpu::ShaderStages::VERTEX_FRAGMENT,
+                    ty: wgpu::BindingType::Buffer {
+                        ty: wgpu::BufferBindingType::Uniform,
+                        has_dynamic_offset: false,
+                        min_binding_size: wgpu::BufferSize::new(80),
+                    },
+                    count: None,
                 },
-                count: None,
-            }],
+                wgpu::BindGroupLayoutEntry {
+                    binding: 1,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Texture {
+                        sample_type: wgpu::TextureSampleType::Float { filterable: true },
+                        view_dimension: wgpu::TextureViewDimension::D2,
+                        multisampled: false,
+                    },
+                    count: None,
+                },
+                wgpu::BindGroupLayoutEntry {
+                    binding: 2,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
+                    count: None,
+                },
+            ],
         });
         let binding = device.create_bind_group(&wgpu::BindGroupDescriptor {
             label: Some("Held item binding"),
             layout: &layout,
-            entries: &[wgpu::BindGroupEntry {
-                binding: 0,
-                resource: uniform.as_entire_binding(),
-            }],
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: uniform.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::TextureView(&texture_view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 2,
+                    resource: wgpu::BindingResource::Sampler(&sampler),
+                },
+            ],
         });
         let shader = device.create_shader_module(wgpu::include_wgsl!("held_item.wgsl"));
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
@@ -154,7 +250,8 @@ impl HeldItemRenderer {
             immediate_size: 0,
         });
         let attributes = wgpu::vertex_attr_array![
-            0 => Float32x3, 1 => Float32x3, 2 => Float32x4, 3 => Float32
+            0 => Float32x3, 1 => Float32x3, 2 => Float32x4, 3 => Float32,
+            4 => Float32x2, 5 => Float32x2
         ];
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("Held item pipeline"),
@@ -228,16 +325,105 @@ impl HeldItemRenderer {
     }
 }
 
+// Build a full color-correct mip chain once at initialization. Sampling sRGB
+// texels yields linear albedo; averaging in linear space avoids dark mip edges.
+fn surface_texture(
+    device: &wgpu::Device,
+    queue: &wgpu::Queue,
+    atlas: crate::item_image::ItemImage,
+) -> wgpu::Texture {
+    let texture = device.create_texture(&wgpu::TextureDescriptor {
+        label: Some("Mining tool surface atlas"),
+        size: wgpu::Extent3d {
+            width: atlas.width,
+            height: atlas.height,
+            depth_or_array_layers: 1,
+        },
+        mip_level_count: 9,
+        sample_count: 1,
+        dimension: wgpu::TextureDimension::D2,
+        format: wgpu::TextureFormat::Rgba8UnormSrgb,
+        usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
+        view_formats: &[],
+    });
+    let (mut width, mut height, mut pixels) = (atlas.width, atlas.height, atlas.pixels);
+    for level in 0..9 {
+        queue.write_texture(
+            wgpu::TexelCopyTextureInfo {
+                texture: &texture,
+                mip_level: level,
+                origin: wgpu::Origin3d::ZERO,
+                aspect: wgpu::TextureAspect::All,
+            },
+            &pixels,
+            wgpu::TexelCopyBufferLayout {
+                offset: 0,
+                bytes_per_row: Some(width * 4),
+                rows_per_image: Some(height),
+            },
+            wgpu::Extent3d {
+                width,
+                height,
+                depth_or_array_layers: 1,
+            },
+        );
+        if level < 8 {
+            let mut next = Vec::with_capacity((width * height) as usize);
+            for y in 0..height / 2 {
+                for x in 0..width / 2 {
+                    for channel in 0..3 {
+                        let mut sum = 0.0_f32;
+                        for dy in 0..2 {
+                            for dx in 0..2 {
+                                let s = f32::from(
+                                    pixels[(((y * 2 + dy) * width + x * 2 + dx) * 4 + channel)
+                                        as usize],
+                                ) / 255.0;
+                                sum += if s <= 0.04045 {
+                                    s / 12.92
+                                } else {
+                                    ((s + 0.055) / 1.055).powf(2.4)
+                                };
+                            }
+                        }
+                        let linear = sum / 4.0;
+                        let s = if linear <= 0.0031308 {
+                            linear * 12.92
+                        } else {
+                            1.055 * linear.powf(1.0 / 2.4) - 0.055
+                        };
+                        next.push((s * 255.0).round() as u8);
+                    }
+                    next.push(255);
+                }
+            }
+            pixels = next;
+            width /= 2;
+            height /= 2;
+        }
+    }
+    texture
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     #[test]
     fn authored_mesh_has_grip_and_separate_status_region() {
-        let v = geometry().expect("validated mining tool must load");
-        assert!(v.len() / FLOATS / 3 <= 2000);
+        let (v, atlas) = geometry().expect("validated mining tool must load");
+        assert_eq!([atlas.width, atlas.height], [256, 256]);
+        assert!(atlas.pixels.as_chunks::<4>().0.iter().any(|p| p[0] != p[2]));
+        assert!(v.len() / FLOATS / 3 <= 3000);
         let vertices = v.as_chunks::<FLOATS>().0;
         assert!(vertices.iter().any(|p| p[10] == 1.0));
         assert!(vertices.iter().any(|p| p[10] == 0.0));
+        assert!(
+            vertices
+                .iter()
+                .all(|p| (0.0..=1.0).contains(&p[11]) && (0.0..=1.0).contains(&p[12]))
+        );
+        assert!(vertices.iter().any(|p| p[13] > 0.8 && p[14] < 0.4));
+        assert!(vertices.iter().any(|p| p[13] == 0.0 && p[14] > 0.8));
         // Every vertex stays in front of the 5cm near plane after grip placement.
         assert!(vertices.iter().all(|p| 0.55 + p[0] > 0.05));
     }
@@ -269,7 +455,7 @@ mod tests {
 
     #[test]
     fn placement_matches_active_camera_basis_across_yaw_pitch_and_gravity() {
-        let vertices = geometry().expect("validated mining tool must load");
+        let (vertices, _) = geometry().expect("validated mining tool must load");
         for yaw in [0.0, 1.2, -2.4] {
             // Character controller's supported pitch limits.
             for pitch in [

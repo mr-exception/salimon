@@ -1,6 +1,7 @@
 //! Renderer-owned toolbar rasterization; selection and contents are supplied by runtime.
 
 use crate::{OverlayImage, OverlayPlacement};
+use std::sync::OnceLock;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum EquipmentIcon {
@@ -80,6 +81,9 @@ impl ToolbarRaster {
                     BACKGROUND
                 },
             );
+            if *icon == Some(EquipmentIcon::MiningTool) {
+                self.mining_icon(x);
+            }
             for (row, bits) in
                 crate::cockpit_instruments::glyph_rows(char::from(b'1' + index as u8))
                     .iter()
@@ -91,14 +95,37 @@ impl ToolbarRaster {
                     }
                 }
             }
-            if *icon == Some(EquipmentIcon::MiningTool) {
-                // Compact side-profile drill: grip, housing, cyan status stripe, bit.
-                self.rect(x + 10, 23, 5, 7, INK);
-                self.rect(x + 9, 16, 16, 8, INK);
-                self.rect(x + 11, 18, 10, 4, [35, 70, 81, 255]);
-                self.rect(x + 12, 18, 3, 4, SELECTED);
-                self.rect(x + 25, 18, 4, 4, INK);
-                self.rect(x + 29, 19, 2, 2, INK);
+        }
+    }
+
+    fn mining_icon(&mut self, slot_x: u32) {
+        static ART: OnceLock<crate::item_image::ItemImage> = OnceLock::new();
+        let art = ART.get_or_init(|| {
+            crate::item_image::decode(include_bytes!("../../assets/items/mining-tool/icon.png"))
+                .expect("checked-in mining icon PNG is covered by the artwork regression")
+        });
+        let scale = self.key.expect("raster key is installed before drawing").1;
+        let bounds = alpha_bounds(art).expect("checked-in mining icon has visible artwork");
+        let [x, y, width, height] = icon_placement(bounds, scale);
+        for dy in 0..height {
+            for dx in 0..width {
+                let sx = bounds[0] + dx * (bounds[2] - bounds[0]) / width;
+                let sy = bounds[1] + dy * (bounds[3] - bounds[1]) / height;
+                let source = ((sy * art.width + sx) * 4) as usize;
+                let pixel = &art.pixels[source..source + 4];
+                if pixel[3] < 16 {
+                    continue;
+                }
+                let target = (((y + dy) * WIDTH * scale + slot_x * scale + x + dx) * 4) as usize;
+                let alpha = u32::from(pixel[3]);
+                // Composite straight-alpha artwork onto the slot; do not replace
+                // its background with the icon's asymmetric transparent canvas.
+                for (channel, value) in pixel.iter().take(3).enumerate() {
+                    self.pixels[target + channel] = ((u32::from(*value) * alpha
+                        + u32::from(self.pixels[target + channel]) * (255 - alpha)
+                        + 127)
+                        / 255) as u8;
+                }
             }
         }
     }
@@ -131,6 +158,37 @@ impl ToolbarRaster {
             (size[1] + 8.0 * self.key.expect("image requires raster key").1 as f32).ceil() as u32
         })
     }
+}
+
+// Half-open bounds of visible pixels, excluding antialias fringe below 16/255.
+fn alpha_bounds(art: &crate::item_image::ItemImage) -> Option<[u32; 4]> {
+    let mut bounds = [art.width, art.height, 0, 0];
+    for y in 0..art.height {
+        for x in 0..art.width {
+            if art.pixels[((y * art.width + x) * 4 + 3) as usize] >= 16 {
+                bounds[0] = bounds[0].min(x);
+                bounds[1] = bounds[1].min(y);
+                bounds[2] = bounds[2].max(x + 1);
+                bounds[3] = bounds[3].max(y + 1);
+            }
+        }
+    }
+    (bounds[2] > bounds[0] && bounds[3] > bounds[1]).then_some(bounds)
+}
+
+fn icon_placement(bounds: [u32; 4], scale: u32) -> [u32; 4] {
+    let width = bounds[2] - bounds[0];
+    let height = bounds[3] - bounds[1];
+    let available = (SLOT - 8) * scale;
+    let longest = width.max(height);
+    let fitted_width = (width * available / longest).max(1);
+    let fitted_height = (height * available / longest).max(1);
+    [
+        (SLOT * scale - fitted_width) / 2,
+        (SLOT * scale - fitted_height) / 2,
+        fitted_width,
+        fitted_height,
+    ]
 }
 
 #[cfg(test)]
@@ -171,21 +229,97 @@ mod tests {
                         &BORDER
                     }
                 );
-                assert_eq!(
-                    pixel(x + 10, 16),
-                    if index == 0 {
-                        &INK
-                    } else if selection.map(EquipmentSlot::index) == Some(index as usize) {
-                        &[16, 49, 56, 240]
-                    } else {
-                        &BACKGROUND
-                    }
-                );
+                if index == 0 {
+                    assert!((12..26).any(|y| (4..30).any(|dx| {
+                        let p = pixel(x + dx, y);
+                        u16::from(p[0]) > u16::from(p[2]) + 20 // warm manufactured housing
+                    })));
+                } else {
+                    assert_eq!(
+                        pixel(x + 17, 17),
+                        if selection.map(EquipmentSlot::index) == Some(index as usize) {
+                            &[16, 49, 56, 240]
+                        } else {
+                            &BACKGROUND
+                        }
+                    );
+                }
                 // Each number contains visible ink; the inter-slot gap stays transparent.
                 assert!((4..11).any(|y| (4..9).any(|dx| pixel(x + dx, y) == INK)));
                 if index < 4 {
                     assert_eq!(pixel(x + SLOT, 0), &[0; 4]);
                 }
+            }
+        }
+    }
+
+    #[test]
+    fn artwork_is_centered_by_visible_bounds_despite_asymmetric_canvas() {
+        let art =
+            crate::item_image::decode(include_bytes!("../../assets/items/mining-tool/icon.png"))
+                .unwrap();
+        let bounds = alpha_bounds(&art).unwrap();
+        // A padded, offset copy must receive identical fitted artwork placement.
+        let mut padded = crate::item_image::ItemImage {
+            width: art.width + 37,
+            height: art.height + 21,
+            pixels: vec![0; ((art.width + 37) * (art.height + 21) * 4) as usize],
+        };
+        for y in 0..art.height {
+            for x in 0..art.width {
+                let from = ((y * art.width + x) * 4) as usize;
+                let to = (((y + 3) * padded.width + x + 29) * 4) as usize;
+                padded.pixels[to..to + 4].copy_from_slice(&art.pixels[from..from + 4]);
+            }
+        }
+        for scale in 2..=4 {
+            let placement = icon_placement(bounds, scale);
+            assert_eq!(
+                placement,
+                icon_placement(alpha_bounds(&padded).unwrap(), scale)
+            );
+            let [x, y, w, h] = placement;
+            assert!((2 * x + w).abs_diff(SLOT * scale) <= 1);
+            assert!((2 * y + h).abs_diff(SLOT * scale) <= 1);
+            assert!(x >= 4 * scale && y >= 4 * scale);
+            for selection in [None, Some(EquipmentSlot::One), Some(EquipmentSlot::Two)] {
+                let mut raster = ToolbarRaster::default();
+                raster.update(state(selection), f64::from(scale) / 2.0);
+                let image = raster.image().unwrap();
+                let mut empty = ToolbarRaster::default();
+                empty.update(
+                    EquipmentToolbar {
+                        slots: [None; 5],
+                        selected: selection,
+                    },
+                    f64::from(scale) / 2.0,
+                );
+                let background = empty.image().unwrap();
+                let mut visible = [SLOT * scale, SLOT * scale, 0, 0];
+                for py in 0..SLOT * scale {
+                    for px in 0..SLOT * scale {
+                        let offset = ((py * image.width + px) * 4) as usize;
+                        if image.rgba8[offset..offset + 4] != background.rgba8[offset..offset + 4] {
+                            visible[0] = visible[0].min(px);
+                            visible[1] = visible[1].min(py);
+                            visible[2] = visible[2].max(px + 1);
+                            visible[3] = visible[3].max(py + 1);
+                        }
+                    }
+                }
+                // Test the final composited raster too, not only its layout math.
+                assert!((visible[0] + visible[2]).abs_diff(SLOT * scale) <= 2);
+                assert!((visible[1] + visible[3]).abs_diff(SLOT * scale) <= 2);
+                // The number is still legible and the selected border is intact.
+                assert!(image.rgba8.as_chunks::<4>().0.contains(&INK));
+                assert_eq!(
+                    &image.rgba8[..4],
+                    if selection == Some(EquipmentSlot::One) {
+                        &SELECTED
+                    } else {
+                        &BORDER
+                    }
+                );
             }
         }
     }

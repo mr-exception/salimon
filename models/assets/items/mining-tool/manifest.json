@@ -21,11 +21,11 @@
   },
   "profile": "standard-v1",
   "budgets": {
-    "maxTriangles": 2000,
+    "maxTriangles": 3000,
     "maxPrimitives": 16,
     "maxMaterials": 4,
-    "maxTextureBytes": 1,
-    "maxGlbBytes": 196608
+    "maxTextureBytes": 98304,
+    "maxGlbBytes": 393216
   },
   "collision": {
     "policy": "none"
@@ -51,7 +51,10 @@
       "Cooling_Fin_0",
       "Cooling_Fin_1",
       "Cooling_Fin_2",
-      "Cooling_Fin_3"
+      "Cooling_Fin_3",
+      "Housing_Details",
+      "Rubber_Details",
+      "Metal_Details"
     ],
     "materials": [
       "Tool_Housing",

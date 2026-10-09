@@ -81,6 +81,17 @@ class ValidationTests(unittest.TestCase):
         other.write_text(self.path.read_text())
         self.rejects('duplicate assetId')
 
+    def test_texture_references_and_required_uvs(self):
+        self.doc['materials'] = [{'pbrMetallicRoughness': {'baseColorTexture': {'index': 0}}}]
+        self.doc['meshes'][0]['primitives'][0]['material'] = 0
+        self.rejects('material 0.texture: invalid index')
+        self.doc['textures'] = [{'source': 0}]
+        self.rejects('texture 0.source: invalid index')
+        self.doc['images'] = [{'bufferView': 0, 'mimeType': 'image/png'}]
+        self.rejects('textured material needs TEXCOORD_0')
+        self.doc['meshes'][0]['primitives'][0]['attributes']['TEXCOORD_0'] = 0
+        self.rejects('TEXCOORD_0: expected float VEC2')
+
     def test_all_budgets(self):
         self.doc['materials'] = [{'name': 'a'}, {'name': 'b'}]
         self.doc['images'] = [{'bufferView': 0, 'mimeType': 'image/png'}]

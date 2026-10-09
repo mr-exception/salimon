@@ -109,8 +109,10 @@
 - Gameplay 1–5 selects slots only on real initial native presses with cursor
   captured; releases, repeats and focus replay do not select. Precision-tour
   1–6 inspects bodies without changing equipment state.
-- Successful physical pickup clears toolbar selection immediately. World-session
-  carrying blocks all slot selection; dropping never restores selection.
+- Successful physical pickup clears toolbar selection immediately; a failed pickup
+  preserves selection and mining input. World-session carrying blocks all slot
+  selection; dropping never restores selection. Explicit selection after drop
+  never resumes a previous mining hold.
 - Toolbar loadout/selection maps directly to renderer DTOs in gameplay and is
   hidden in precision tour. Toolbar presentation cannot change equip behavior;
   slot 1 is the sole mining equip authority; empty/absent selection stows it.

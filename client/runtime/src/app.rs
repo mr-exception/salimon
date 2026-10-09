@@ -304,6 +304,16 @@ impl ClientApplication {
         }
     }
 
+    pub(crate) fn held_item(
+        &self,
+        player: salimon_character::CharacterSnapshot,
+        valid_target: bool,
+    ) -> Option<salimon_renderer::HeldItemInstance> {
+        (self.view_mode == ViewMode::Gameplay)
+            .then(|| self.mining.held_item(&self.equipment, player, valid_target))
+            .flatten()
+    }
+
     pub(crate) fn e2e_step(&self) -> Option<Duration> {
         self.e2e_config.map(|config| config.step)
     }
@@ -651,6 +661,7 @@ impl ClientApplication {
                     contextual_placement
                 },
             });
+        let held_item = self.held_item(character_snapshot, mining_target.is_some());
         let outcome = match self
             .renderer
             .as_mut()
@@ -663,15 +674,7 @@ impl ClientApplication {
                     spheres: &spheres,
                     light: Some(light),
                     ship: ship_mesh,
-                    held_item: if self.view_mode == ViewMode::Gameplay {
-                        self.mining.held_item(
-                            &self.equipment,
-                            character_snapshot,
-                            mining_target.is_some(),
-                        )
-                    } else {
-                        None
-                    },
+                    held_item,
                 },
                 overlay_image,
                 action_bar_image,
@@ -1106,6 +1109,32 @@ mod toolbar_tests {
             assert_eq!(app.equipment.selected(), Some(slot));
             assert_eq!(app.view_mode, ViewMode::Gameplay);
             assert_eq!(app.camera_prototype.snapshot().camera, initial_camera);
+        }
+    }
+
+    #[test]
+    fn failed_pickup_preserves_selected_tool_and_mining_input() {
+        for slot in [
+            ToolbarSlot::One,
+            ToolbarSlot::Two,
+            ToolbarSlot::Three,
+            ToolbarSlot::Four,
+            ToolbarSlot::Five,
+        ] {
+            let mut app = ClientApplication::default();
+            app.equipment.select(slot, false);
+            app.mining.set_mouse_held(true);
+            app.carry_action(true);
+            assert!(app.mining.session.carried_id().is_none());
+            assert_eq!(app.equipment.selected(), Some(slot));
+            assert!(
+                app.mining.held,
+                "failed pickup must not stow or cancel mining"
+            );
+            assert_eq!(
+                app.mining.carry_feedback,
+                Some("Aim at a fragment within 3 m")
+            );
         }
     }
 

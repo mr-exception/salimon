@@ -250,3 +250,18 @@ renderer-neutral icons/slots. Each gameplay redraw sends that DTO plus the nativ
 window scale factor; precision tour sends no toolbar. The renderer owns raster,
 cache and bottom-center stacking with global/transient action images. Runtime
 never draws this HUD in `action_bar.rs` or changes selection for display.
+
+## Carrying and equipment regression contract (#131)
+
+A failed pickup leaves the selected slot and held mining input unchanged. A
+successful pickup stows the tool and cancels extraction in the same F edge;
+all five slot inputs stay blocked until release. Drop leaves no selection and
+no held mining input. An explicit slot 1 selection equips again without resuming
+an old keyboard/mouse hold. The toolbar remains visible with its usual five
+slots and no highlight while carrying; carrying never creates a sixth slot.
+
+Automation inspection exposes `mining.held_item_visible` from the shared `ClientApplication::held_item` DTO helper used by redraw,
+including the same view/location/equipment presentation gates, so carrying scenarios
+check the absence of the held tool as well as selection/extraction state.
+Baseline and evidence carrying/resource-loop scenarios cover an F miss before
+extraction, equipped pickup, lockout and explicit selection after drop.

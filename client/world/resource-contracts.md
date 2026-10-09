@@ -162,3 +162,14 @@ Run `cargo test --locked -p salimon-world --test resource_fragments` for materia
 identity, unique IDs, partial growth, conservation at different timesteps, zero
 output, large-step splitting, depletion, and requery behavior. The mining E2E
 route now checks piece mass/volume/pose and the complete depleted output.
+
+## Carrying and equipment exclusivity (#131)
+
+The session's carried identity remains the sole authority for the permanent
+one-world-object limit. Runtime clears equipment only after `pick_up` succeeds;
+a rejected pickup preserves selection. While carrying, all five slots remain
+visible and deselected and mining cannot stay active or render a held tool.
+Dropping restores neither the previous slot nor a held mining input; selecting
+1–5 explicitly becomes available immediately. This affects no material, mass,
+fragment identity or persistence rule. See the
+[runtime regression contract](../runtime/architecture.md#carrying-and-equipment-regression-contract-131).

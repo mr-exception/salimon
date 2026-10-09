@@ -580,6 +580,44 @@
       }
     },
     {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "carrying.object_id",
+        "equals": null
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.held_item_visible",
+        "equals": true
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.extracted_mass_kg",
+        "equals": 0
+      }
+    },
+    {
       "assert": {
         "path": "mining.target.id",
         "equals": "Earth:16443359315117775089"
@@ -1107,6 +1145,30 @@
       }
     },
     {
+      "assert": {
+        "path": "mining.held",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.active",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.held_item_visible",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": null
+      }
+    },
+    {
       "action": {
         "op": "key",
         "key": "slot_1",
@@ -1343,6 +1405,62 @@
         "path": "equipment.selected_slot",
         "equals": null
       }
+    },
+    {
+      "assert": {
+        "path": "mining.equipped",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.held_item_visible",
+        "equals": false
+      }
+    },
+    {
+      "screenshot": "dropped-toolbar-deselected"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_1",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_1",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "equipment.selected_slot",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.equipped",
+        "equals": true
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.held",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.held_item_visible",
+        "equals": true
+      }
+    },
+    {
+      "screenshot": "mining-tool-explicitly-reselected"
     },
     {
       "action": {

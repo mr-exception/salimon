@@ -1,0 +1,2314 @@
+[
+  {
+    "run": "before-reviewed",
+    "scenario": "scenarios/evidence/mining-tool.json",
+    "status": "passed",
+    "steps_completed": 161,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "captures": [
+      {
+        "label": "step-064-deposit-context-tool-stowed",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": null,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": [
+              999999999980.0146,
+              -749994000000.0,
+              249993999994.9063
+            ],
+            "context": "Silicate rock - approx 36.4 kg left - untouched\n1 to equip mining tool"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-075-equipped-mining-tool",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": true,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": {
+              "distance_meters": 3.3569314494630955,
+              "id": "Earth:16443359315117775089"
+            }
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": [
+              999999999980.0146,
+              -749994000000.0,
+              249993999994.9063
+            ],
+            "context": "Silicate rock - approx 36.4 kg left - untouched\nHold F or left mouse to mine - 2-5 to stow"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-077-tool-look-up",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": true,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": "Aim at a deposit within 4 m - 2-5 to stow"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-079-tool-look-down",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": true,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": "Aim at a deposit within 4 m - 2-5 to stow"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-085-active-mining-context",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": true,
+            "equipped": true,
+            "extracted_mass_kg": 1.9199999999997885,
+            "held": true,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": {
+              "distance_meters": 3.3569314494630955,
+              "id": "Earth:16443359315117775089"
+            }
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": [
+              999999999980.0146,
+              -749994000000.0,
+              249993999994.9063
+            ],
+            "context": "Silicate rock - approx 34.5 kg left - partly mined\nMining - release F or left mouse to stop"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 1,
+            "fragment_mass_kg": 1.9199999999997885
+          }
+        }
+      },
+      {
+        "label": "step-100-partiallymined-deposit",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": true,
+            "equipped": true,
+            "extracted_mass_kg": 1.9199999999997885,
+            "held": true,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": {
+              "distance_meters": 3.3569314494630955,
+              "id": "Earth:16443359315117775089"
+            }
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": [
+              999999999980.0146,
+              -749994000000.0,
+              249993999994.9063
+            ],
+            "context": "Silicate rock - approx 34.5 kg left - partly mined\nMining - release F or left mouse to stop"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 1,
+            "fragment_mass_kg": 1.9199999999997885
+          }
+        }
+      },
+      {
+        "label": "step-133-depleted-deposit",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": true,
+            "extracted_mass_kg": 36.408960413815784,
+            "held": false,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": "Aim at a deposit within 4 m - 2-5 to stow"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 19,
+            "fragment_mass_kg": 36.40896041381627
+          }
+        }
+      },
+      {
+        "label": "step-153-tool-extreme-up",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": true,
+            "extracted_mass_kg": 36.408960413815784,
+            "held": false,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": "Aim at a deposit within 4 m - 2-5 to stow"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 19,
+            "fragment_mass_kg": 36.40896041381627
+          }
+        }
+      },
+      {
+        "label": "step-155-tool-extreme-up-yaw",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": true,
+            "extracted_mass_kg": 36.408960413815784,
+            "held": false,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": "Aim at a deposit within 4 m - 2-5 to stow"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 19,
+            "fragment_mass_kg": 36.40896041381627
+          }
+        }
+      },
+      {
+        "label": "step-157-tool-extreme-down",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": true,
+            "extracted_mass_kg": 36.408960413815784,
+            "held": false,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": "Aim at a deposit within 4 m - 2-5 to stow"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 19,
+            "fragment_mass_kg": 36.40896041381627
+          }
+        }
+      },
+      {
+        "label": "step-161-tool-extreme-stowed",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 2,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 36.408960413815784,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": null
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 19,
+            "fragment_mass_kg": 36.40896041381627
+          }
+        }
+      }
+    ]
+  },
+  {
+    "run": "final-evidence",
+    "scenario": "scenarios/evidence/mining-tool.json",
+    "status": "passed",
+    "steps_completed": 161,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "captures": [
+      {
+        "label": "step-064-deposit-context-tool-stowed",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": null,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": [
+              999999999980.0146,
+              -749994000000.0,
+              249993999994.9063
+            ],
+            "context": "Silicate rock - approx 36.4 kg left - untouched\n1 to equip mining tool"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-075-equipped-mining-tool",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": true,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": {
+              "distance_meters": 3.3569314494630955,
+              "id": "Earth:16443359315117775089"
+            }
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": [
+              999999999980.0146,
+              -749994000000.0,
+              249993999994.9063
+            ],
+            "context": "Silicate rock - approx 36.4 kg left - untouched\nHold F or left mouse to mine - 2-5 to stow"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-077-tool-look-up",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": true,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": "Aim at a deposit within 4 m - 2-5 to stow"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-079-tool-look-down",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": true,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": "Aim at a deposit within 4 m - 2-5 to stow"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-085-active-mining-context",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": true,
+            "equipped": true,
+            "extracted_mass_kg": 1.9199999999997885,
+            "held": true,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": {
+              "distance_meters": 3.3569314494630955,
+              "id": "Earth:16443359315117775089"
+            }
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": [
+              999999999980.0146,
+              -749994000000.0,
+              249993999994.9063
+            ],
+            "context": "Silicate rock - approx 34.5 kg left - partly mined\nMining - release F or left mouse to stop"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 1,
+            "fragment_mass_kg": 1.9199999999997885
+          }
+        }
+      },
+      {
+        "label": "step-100-partiallymined-deposit",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": true,
+            "equipped": true,
+            "extracted_mass_kg": 1.9199999999997885,
+            "held": true,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": {
+              "distance_meters": 3.3569314494630955,
+              "id": "Earth:16443359315117775089"
+            }
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": [
+              999999999980.0146,
+              -749994000000.0,
+              249993999994.9063
+            ],
+            "context": "Silicate rock - approx 34.5 kg left - partly mined\nMining - release F or left mouse to stop"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 1,
+            "fragment_mass_kg": 1.9199999999997885
+          }
+        }
+      },
+      {
+        "label": "step-133-depleted-deposit",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": true,
+            "extracted_mass_kg": 36.408960413815784,
+            "held": false,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": "Aim at a deposit within 4 m - 2-5 to stow"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 19,
+            "fragment_mass_kg": 36.40896041381627
+          }
+        }
+      },
+      {
+        "label": "step-153-tool-extreme-up",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": true,
+            "extracted_mass_kg": 36.408960413815784,
+            "held": false,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": "Aim at a deposit within 4 m - 2-5 to stow"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 19,
+            "fragment_mass_kg": 36.40896041381627
+          }
+        }
+      },
+      {
+        "label": "step-155-tool-extreme-up-yaw",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": true,
+            "extracted_mass_kg": 36.408960413815784,
+            "held": false,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": "Aim at a deposit within 4 m - 2-5 to stow"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 19,
+            "fragment_mass_kg": 36.40896041381627
+          }
+        }
+      },
+      {
+        "label": "step-157-tool-extreme-down",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": true,
+            "extracted_mass_kg": 36.408960413815784,
+            "held": false,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": "Aim at a deposit within 4 m - 2-5 to stow"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 19,
+            "fragment_mass_kg": 36.40896041381627
+          }
+        }
+      },
+      {
+        "label": "step-161-tool-extreme-stowed",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 2,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 36.408960413815784,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": null
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 19,
+            "fragment_mass_kg": 36.40896041381627
+          }
+        }
+      }
+    ]
+  },
+  {
+    "run": "carrying-evidence",
+    "scenario": "scenarios/evidence/carrying.json",
+    "status": "passed",
+    "steps_completed": 320,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "captures": [
+      {
+        "label": "step-004-toolbar-initial-loadout",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": null,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": null
+          },
+          "player": {
+            "location": "InsideShip"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-088-deposit-context-tool-stowed",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 5,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": [
+              999999999980.0146,
+              -749994000000.0,
+              249993999994.9063
+            ],
+            "context": "Silicate rock - approx 36.4 kg left - untouched\n1 to equip mining tool"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-106-toolbar-empty-slot-selected",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 2,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": [
+              999999999980.0146,
+              -749994000000.0,
+              249993999994.9063
+            ],
+            "context": "Silicate rock - approx 36.4 kg left - untouched\n1 to equip mining tool"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-151-toolbar-mining-tool-selected",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": true,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": {
+              "distance_meters": 3.3569314494630955,
+              "id": "Earth:16443359315117775089"
+            }
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": [
+              999999999980.0146,
+              -749994000000.0,
+              249993999994.9063
+            ],
+            "context": "Silicate rock - approx 36.4 kg left - untouched\nHold F or left mouse to mine - 2-5 to stow"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-159-active-mining-context",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": true,
+            "equipped": true,
+            "extracted_mass_kg": 1.9199999999997885,
+            "held": true,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": {
+              "distance_meters": 3.3569314494630955,
+              "id": "Earth:16443359315117775089"
+            }
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": [
+              999999999980.0146,
+              -749994000000.0,
+              249993999994.9063
+            ],
+            "context": "Silicate rock - approx 34.5 kg left - partly mined\nMining - release F or left mouse to stop"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 1,
+            "fragment_mass_kg": 1.9199999999997885
+          }
+        }
+      },
+      {
+        "label": "step-228-fragment-target-context",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": true,
+            "extracted_mass_kg": 36.408960413815784,
+            "held": false,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": "F to pick up fragment",
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": 1
+          },
+          "resource_ui": {
+            "anchor_meters": [
+              999999999980.054,
+              -749993999999.9548,
+              249993999994.22018
+            ],
+            "context": "Silicate rock fragment - approx 2.00 kg\nF to pick up fragment"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 19,
+            "fragment_mass_kg": 36.40896041381627
+          }
+        }
+      },
+      {
+        "label": "step-255-carrying-first-fragment",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": null,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 36.408960413815784,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": "Carrying fragment - F to drop",
+            "last_action_feedback": "Fragment picked up - F to drop",
+            "object_id": 1,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": [
+              999999999981.3263,
+              -749993999998.8718,
+              249993999994.72516
+            ],
+            "context": "Silicate rock fragment - approx 2.00 kg\nCarrying fragment - F to drop"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 19,
+            "fragment_mass_kg": 36.40896041381627
+          }
+        }
+      },
+      {
+        "label": "step-264-second-pickup-blocked",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": null,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 36.408960413815784,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": "Only one world object - F to drop first",
+            "last_action_feedback": "Fragment picked up - F to drop",
+            "object_id": 1,
+            "target_id": 2
+          },
+          "resource_ui": {
+            "anchor_meters": [
+              999999999981.3544,
+              -749993999998.8851,
+              249993999994.83017
+            ],
+            "context": "Silicate rock fragment - approx 2.00 kg\nOnly one world object - F to drop first"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 19,
+            "fragment_mass_kg": 36.40896041381627
+          }
+        }
+      },
+      {
+        "label": "step-279-dropped-toolbar-deselected",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": null,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 36.408960413815784,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": "F to pick up fragment",
+            "last_action_feedback": "Fragment dropped",
+            "object_id": null,
+            "target_id": 2
+          },
+          "resource_ui": {
+            "anchor_meters": [
+              999999999980.0886,
+              -749993999999.9548,
+              249993999994.62454
+            ],
+            "context": "Silicate rock fragment - approx 2.00 kg\nF to pick up fragment"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 19,
+            "fragment_mass_kg": 36.40896041381627
+          }
+        }
+      },
+      {
+        "label": "step-286-mining-tool-explicitly-reselected",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": true,
+            "extracted_mass_kg": 36.408960413815784,
+            "held": false,
+            "held_item_visible": true,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": "F to pick up fragment",
+            "last_action_feedback": "Fragment dropped",
+            "object_id": null,
+            "target_id": 2
+          },
+          "resource_ui": {
+            "anchor_meters": [
+              999999999980.0886,
+              -749993999999.9548,
+              249993999994.62454
+            ],
+            "context": "Silicate rock fragment - approx 2.00 kg\nF to pick up fragment"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 19,
+            "fragment_mass_kg": 36.40896041381627
+          }
+        }
+      },
+      {
+        "label": "step-291-fragment-placed",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 5,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 36.408960413815784,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": "F to pick up fragment",
+            "last_action_feedback": "Fragment dropped",
+            "object_id": null,
+            "target_id": 2
+          },
+          "resource_ui": {
+            "anchor_meters": [
+              999999999980.0886,
+              -749993999999.9548,
+              249993999994.62454
+            ],
+            "context": "Silicate rock fragment - approx 2.00 kg\nF to pick up fragment"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 19,
+            "fragment_mass_kg": 36.40896041381627
+          }
+        }
+      },
+      {
+        "label": "step-317-carrying-second-fragment-after-walking",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": null,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 36.408960413815784,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": "Carrying fragment - F to drop",
+            "last_action_feedback": "Fragment picked up - F to drop",
+            "object_id": 2,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": [
+              999999999981.3849,
+              -749993999998.8851,
+              249993999994.22287
+            ],
+            "context": "Silicate rock fragment - approx 2.00 kg\nCarrying fragment - F to drop"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 19,
+            "fragment_mass_kg": 36.40896041381627
+          }
+        }
+      },
+      {
+        "label": "step-320-carried-world-context",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": null,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 36.408960413815784,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": "Carrying fragment - F to drop",
+            "last_action_feedback": "Fragment picked up - F to drop",
+            "object_id": 2,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": [
+              999999999981.3849,
+              -749993999998.8851,
+              249993999994.22287
+            ],
+            "context": "Silicate rock fragment - approx 2.00 kg\nCarrying fragment - F to drop"
+          },
+          "player": {
+            "location": "Surface"
+          },
+          "world": {
+            "fragment_count": 19,
+            "fragment_mass_kg": 36.40896041381627
+          }
+        }
+      }
+    ]
+  },
+  {
+    "run": "toolbar-1x-small",
+    "scenario": "scenarios/evidence/equipment-toolbar.json",
+    "status": "passed",
+    "steps_completed": 14,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "captures": [
+      {
+        "label": "step-002-no-selection",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": null,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": null
+          },
+          "player": {
+            "location": "InsideShip"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-006-selected-slot-1",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": true,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": null
+          },
+          "player": {
+            "location": "InsideShip"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-010-selected-slot-2",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 2,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": null
+          },
+          "player": {
+            "location": "InsideShip"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-014-selected-slot-5",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 5,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": null
+          },
+          "player": {
+            "location": "InsideShip"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "run": "toolbar-1.5x",
+    "scenario": "scenarios/evidence/equipment-toolbar.json",
+    "status": "passed",
+    "steps_completed": 14,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "captures": [
+      {
+        "label": "step-002-no-selection",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": null,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": null
+          },
+          "player": {
+            "location": "InsideShip"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-006-selected-slot-1",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": true,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": null
+          },
+          "player": {
+            "location": "InsideShip"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-010-selected-slot-2",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 2,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": null
+          },
+          "player": {
+            "location": "InsideShip"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-014-selected-slot-5",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 5,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": null
+          },
+          "player": {
+            "location": "InsideShip"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "run": "toolbar-2x-reviewed",
+    "scenario": "scenarios/evidence/equipment-toolbar.json",
+    "status": "passed",
+    "steps_completed": 14,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "captures": [
+      {
+        "label": "step-002-no-selection",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": null,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": null
+          },
+          "player": {
+            "location": "InsideShip"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-006-selected-slot-1",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 1,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": true,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": null
+          },
+          "player": {
+            "location": "InsideShip"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-010-selected-slot-2",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 2,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": null
+          },
+          "player": {
+            "location": "InsideShip"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      },
+      {
+        "label": "step-014-selected-slot-5",
+        "snapshot": {
+          "equipment": {
+            "selected_slot": 5,
+            "slots": [
+              "mining_tool",
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "mining": {
+            "active": false,
+            "equipped": false,
+            "extracted_mass_kg": 0.0,
+            "held": false,
+            "held_item_visible": false,
+            "range_meters": 4.0,
+            "rate_kg_per_second": 2.0,
+            "target": null
+          },
+          "carrying": {
+            "context": null,
+            "last_action_feedback": null,
+            "object_id": null,
+            "target_id": null
+          },
+          "resource_ui": {
+            "anchor_meters": null,
+            "context": null
+          },
+          "player": {
+            "location": "InsideShip"
+          },
+          "world": {
+            "fragment_count": 0,
+            "fragment_mass_kg": -0.0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "run": "baseline",
+    "scenario": "/workspace/scratch/6eaed9ab26f4/salimon/scenarios/landed-earth.json",
+    "status": "passed",
+    "steps_completed": 110,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "captures": []
+  },
+  {
+    "run": "baseline",
+    "scenario": "/workspace/scratch/6eaed9ab26f4/salimon/scenarios/fragment-transfer.json",
+    "status": "passed",
+    "steps_completed": 253,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "captures": []
+  },
+  {
+    "run": "baseline",
+    "scenario": "/workspace/scratch/6eaed9ab26f4/salimon/scenarios/mining.json",
+    "status": "passed",
+    "steps_completed": 138,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "captures": []
+  },
+  {
+    "run": "baseline",
+    "scenario": "/workspace/scratch/6eaed9ab26f4/salimon/scenarios/resource-loop.json",
+    "status": "passed",
+    "steps_completed": 240,
+    "setup": {
+      "scenario": "resource-approach",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "captures": []
+  },
+  {
+    "run": "baseline",
+    "scenario": "/workspace/scratch/6eaed9ab26f4/salimon/scenarios/orbit-earth.json",
+    "status": "passed",
+    "steps_completed": 23,
+    "setup": {
+      "scenario": "orbit-earth",
+      "seed": 42,
+      "step_ms": 16
+    },
+    "captures": []
+  },
+  {
+    "run": "baseline",
+    "scenario": "/workspace/scratch/6eaed9ab26f4/salimon/scenarios/moving-eva.json",
+    "status": "passed",
+    "steps_completed": 93,
+    "setup": {
+      "scenario": "open-space",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "captures": []
+  },
+  {
+    "run": "baseline",
+    "scenario": "/workspace/scratch/6eaed9ab26f4/salimon/scenarios/space-airlock.json",
+    "status": "passed",
+    "steps_completed": 50,
+    "setup": {
+      "scenario": "open-space",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "captures": []
+  },
+  {
+    "run": "baseline",
+    "scenario": "/workspace/scratch/6eaed9ab26f4/salimon/scenarios/nearby-eva.json",
+    "status": "passed",
+    "steps_completed": 43,
+    "setup": {
+      "scenario": "eva-approach",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "captures": []
+  },
+  {
+    "run": "baseline",
+    "scenario": "/workspace/scratch/6eaed9ab26f4/salimon/scenarios/carrying.json",
+    "status": "passed",
+    "steps_completed": 307,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "captures": []
+  },
+  {
+    "run": "baseline",
+    "scenario": "/workspace/scratch/6eaed9ab26f4/salimon/scenarios/resource-deposits.json",
+    "status": "passed",
+    "steps_completed": 64,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "captures": []
+  },
+  {
+    "run": "baseline",
+    "scenario": "/workspace/scratch/6eaed9ab26f4/salimon/scenarios/cockpit-nose.json",
+    "status": "passed",
+    "steps_completed": 30,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "captures": []
+  },
+  {
+    "run": "baseline",
+    "scenario": "/workspace/scratch/6eaed9ab26f4/salimon/scenarios/resource-streaming.json",
+    "status": "passed",
+    "steps_completed": 135,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "captures": []
+  },
+  {
+    "run": "baseline",
+    "scenario": "/workspace/scratch/6eaed9ab26f4/salimon/scenarios/lower-cockpit-windows.json",
+    "status": "passed",
+    "steps_completed": 16,
+    "setup": {
+      "scenario": "orbit-earth",
+      "seed": 42,
+      "step_ms": 16
+    },
+    "captures": []
+  }
+]

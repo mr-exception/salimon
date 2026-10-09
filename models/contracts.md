@@ -55,7 +55,9 @@ explicit contract requires them.
 ## Visuals, collisions, sockets, and markers
 
 Visuals use exportable glTF materials and resolved textures. Blender-only shader
-nodes are not a runtime material contract. Declare per-asset triangle, primitive,
+nodes are not a runtime material contract. Shared validation checks texture/image/sampler references and requires matching
+UV accessors on every textured primitive. Consumer-specific image formats, sizes
+and shading support are documented by each asset/renderer. Declare per-asset triangle, primitive,
 material, texture, and file-size budgets; there is no shared ship-sized budget
 for all assets. Render-pass and material restrictions belong to the consumer or
 category extension. LODs must retain the same origin, orientation, and spatial

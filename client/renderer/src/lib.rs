@@ -7,6 +7,7 @@ mod cockpit_instruments;
 mod equipment_toolbar;
 mod gpu_timing;
 mod held_item;
+mod item_image;
 mod overlay;
 mod resource_mesh;
 mod ship_mesh;
@@ -810,7 +811,7 @@ impl Renderer {
         let toolbar = overlay::OverlayRenderer::new(&device, configuration.format);
         let spheres = spheres::SphereRenderer::new(&device, &queue, configuration.format);
         let ship_mesh = ship_mesh::ShipMeshRenderer::new(&device, configuration.format)?;
-        let held_item = held_item::HeldItemRenderer::new(&device, configuration.format)?;
+        let held_item = held_item::HeldItemRenderer::new(&device, &queue, configuration.format)?;
         let resource_meshes =
             resource_mesh::ResourceMeshRenderer::new(&device, configuration.format)?;
         let gpu_timer = timestamp_queries_supported.then(|| GpuTimer::new(&device, &queue));

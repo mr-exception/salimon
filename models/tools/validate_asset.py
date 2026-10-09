@@ -193,6 +193,24 @@ def validate_document(path, manifest, extension_validators=None, collision_valid
                 values = struct.unpack_from('<' + 'f'*widths[acc['type']], binary,
                                             view.get('byteOffset', 0) + offset + row*stride)
                 require(all(math.isfinite(x) for x in values), f'accessor {i}: nonfinite geometry')
+    images = doc.get('images', [])
+    textures = doc.get('textures', [])
+    for ti, texture in enumerate(textures):
+        index(texture.get('source'), images, f'texture {ti}.source')
+        if 'sampler' in texture:
+            index(texture['sampler'], doc.get('samplers', []), f'texture {ti}.sampler')
+    material_uvs = {}
+    for mi, material in enumerate(materials):
+        pbr = material.get('pbrMetallicRoughness', {})
+        uses = [pbr.get('baseColorTexture'), pbr.get('metallicRoughnessTexture'),
+                material.get('normalTexture'), material.get('occlusionTexture'),
+                material.get('emissiveTexture')]
+        material_uvs[mi] = set()
+        for use in filter(None, uses):
+            index(use.get('index'), textures, f'material {mi}.texture')
+            uv = use.get('texCoord', 0)
+            require(type(uv) is int and uv >= 0, f'material {mi}: invalid texCoord')
+            material_uvs[mi].add(f'TEXCOORD_{uv}')
     mesh_triangles = []
     primitives = 0
     for mi, mesh in enumerate(doc.get('meshes', [])):
@@ -220,6 +238,11 @@ def validate_document(path, manifest, extension_validators=None, collision_valid
             require(count % 3 == 0, f'mesh {mi}: triangle count is not divisible by three')
             if 'material' in primitive:
                 index(primitive['material'], materials, f'mesh {mi}.material')
+                for uv in material_uvs[primitive['material']]:
+                    require(uv in primitive['attributes'], f'mesh {mi}: textured material needs {uv}')
+                    acc = accessors[primitive['attributes'][uv]]
+                    require(acc['type'] == 'VEC2' and acc['componentType'] == 5126,
+                            f'mesh {mi}.{uv}: expected float VEC2')
             triangles += count // 3
             primitives += 1
         mesh_triangles.append(triangles)

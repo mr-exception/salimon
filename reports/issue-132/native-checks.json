@@ -1,0 +1,286 @@
+{
+  "base_revision": "d82db45",
+  "profile": "debug",
+  "baseline": {
+    "status": "passed",
+    "results": [
+      {
+        "scenario": "/workspace/scratch/c534ff9c8bd3/salimon/scenarios/carrying.json",
+        "status": "passed",
+        "steps_completed": 307,
+        "duration_ms": 14845
+      },
+      {
+        "scenario": "/workspace/scratch/c534ff9c8bd3/salimon/scenarios/cockpit-nose.json",
+        "status": "passed",
+        "steps_completed": 30,
+        "duration_ms": 3456
+      },
+      {
+        "scenario": "/workspace/scratch/c534ff9c8bd3/salimon/scenarios/fragment-transfer.json",
+        "status": "passed",
+        "steps_completed": 253,
+        "duration_ms": 13398
+      },
+      {
+        "scenario": "/workspace/scratch/c534ff9c8bd3/salimon/scenarios/landed-earth.json",
+        "status": "passed",
+        "steps_completed": 110,
+        "duration_ms": 7870
+      },
+      {
+        "scenario": "/workspace/scratch/c534ff9c8bd3/salimon/scenarios/lower-cockpit-windows.json",
+        "status": "passed",
+        "steps_completed": 16,
+        "duration_ms": 4323
+      },
+      {
+        "scenario": "/workspace/scratch/c534ff9c8bd3/salimon/scenarios/mining.json",
+        "status": "passed",
+        "steps_completed": 138,
+        "duration_ms": 8190
+      },
+      {
+        "scenario": "/workspace/scratch/c534ff9c8bd3/salimon/scenarios/moving-eva.json",
+        "status": "passed",
+        "steps_completed": 93,
+        "duration_ms": 4524
+      },
+      {
+        "scenario": "/workspace/scratch/c534ff9c8bd3/salimon/scenarios/nearby-eva.json",
+        "status": "passed",
+        "steps_completed": 43,
+        "duration_ms": 3555
+      },
+      {
+        "scenario": "/workspace/scratch/c534ff9c8bd3/salimon/scenarios/orbit-earth.json",
+        "status": "passed",
+        "steps_completed": 23,
+        "duration_ms": 3599
+      },
+      {
+        "scenario": "/workspace/scratch/c534ff9c8bd3/salimon/scenarios/resource-deposits.json",
+        "status": "passed",
+        "steps_completed": 64,
+        "duration_ms": 4521
+      },
+      {
+        "scenario": "/workspace/scratch/c534ff9c8bd3/salimon/scenarios/resource-loop.json",
+        "status": "passed",
+        "steps_completed": 240,
+        "duration_ms": 13910
+      },
+      {
+        "scenario": "/workspace/scratch/c534ff9c8bd3/salimon/scenarios/resource-streaming.json",
+        "status": "passed",
+        "steps_completed": 135,
+        "duration_ms": 10237
+      },
+      {
+        "scenario": "/workspace/scratch/c534ff9c8bd3/salimon/scenarios/space-airlock.json",
+        "status": "passed",
+        "steps_completed": 50,
+        "duration_ms": 3403
+      }
+    ]
+  },
+  "carrying_evidence": {
+    "status": "passed",
+    "results": [
+      {
+        "scenario": "scenarios/evidence/carrying.json",
+        "status": "passed",
+        "steps_completed": 320,
+        "duration_ms": 24322
+      }
+    ]
+  },
+  "checkpoints": [
+    {
+      "checkpoint": "toolbar-initial-loadout",
+      "step": 4,
+      "status": "passed",
+      "equipment": {
+        "selected_slot": null,
+        "slots": [
+          "mining_tool",
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "carrying": {
+        "context": null,
+        "last_action_feedback": null,
+        "object_id": null,
+        "target_id": null
+      },
+      "mining": {
+        "active": false,
+        "equipped": false,
+        "extracted_mass_kg": 0.0,
+        "held": false,
+        "held_item_visible": false,
+        "range_meters": 4.0,
+        "rate_kg_per_second": 2.0,
+        "target": null
+      },
+      "player_location": "InsideShip",
+      "fragment_count": 0
+    },
+    {
+      "checkpoint": "toolbar-empty-slot-selected",
+      "step": 106,
+      "status": "passed",
+      "equipment": {
+        "selected_slot": 2,
+        "slots": [
+          "mining_tool",
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "carrying": {
+        "context": null,
+        "last_action_feedback": null,
+        "object_id": null,
+        "target_id": null
+      },
+      "mining": {
+        "active": false,
+        "equipped": false,
+        "extracted_mass_kg": 0.0,
+        "held": false,
+        "held_item_visible": false,
+        "range_meters": 4.0,
+        "rate_kg_per_second": 2.0,
+        "target": null
+      },
+      "player_location": "Surface",
+      "fragment_count": 0
+    },
+    {
+      "checkpoint": "toolbar-mining-tool-selected",
+      "step": 151,
+      "status": "passed",
+      "equipment": {
+        "selected_slot": 1,
+        "slots": [
+          "mining_tool",
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "carrying": {
+        "context": null,
+        "last_action_feedback": null,
+        "object_id": null,
+        "target_id": null
+      },
+      "mining": {
+        "active": false,
+        "equipped": true,
+        "extracted_mass_kg": 0.0,
+        "held": false,
+        "held_item_visible": true,
+        "range_meters": 4.0,
+        "rate_kg_per_second": 2.0,
+        "target": {
+          "distance_meters": 3.3569314494630955,
+          "id": "Earth:16443359315117775089"
+        }
+      },
+      "player_location": "Surface",
+      "fragment_count": 0
+    },
+    {
+      "checkpoint": "carrying-first-fragment",
+      "step": 255,
+      "status": "passed",
+      "equipment": {
+        "selected_slot": null,
+        "slots": [
+          "mining_tool",
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "carrying": {
+        "context": "Carrying fragment - F to drop",
+        "last_action_feedback": "Fragment picked up - F to drop",
+        "object_id": 1,
+        "target_id": null
+      },
+      "mining": {
+        "active": false,
+        "equipped": false,
+        "extracted_mass_kg": 36.408960413815784,
+        "held": false,
+        "held_item_visible": false,
+        "range_meters": 4.0,
+        "rate_kg_per_second": 2.0,
+        "target": null
+      },
+      "player_location": "Surface",
+      "fragment_count": 19
+    },
+    {
+      "checkpoint": "dropped-toolbar-deselected",
+      "step": 279,
+      "status": "passed",
+      "equipment": {
+        "selected_slot": null,
+        "slots": [
+          "mining_tool",
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "carrying": {
+        "context": "F to pick up fragment",
+        "last_action_feedback": "Fragment dropped",
+        "object_id": null,
+        "target_id": 2
+      },
+      "mining": {
+        "active": false,
+        "equipped": false,
+        "extracted_mass_kg": 36.408960413815784,
+        "held": false,
+        "held_item_visible": false,
+        "range_meters": 4.0,
+        "rate_kg_per_second": 2.0,
+        "target": null
+      },
+      "player_location": "Surface",
+      "fragment_count": 19
+    }
+  ],
+  "release_carrying": {
+    "status": "passed",
+    "steps_completed": 307
+  },
+  "packaged_release": {
+    "success": true,
+    "platform": "linux",
+    "checks": [
+      "native window created:",
+      "renderer ready:",
+      "render attempt 1 completed with Presented",
+      "OS F2 switched to PrecisionTour",
+      "OS F2 switched to Gameplay",
+      "game remains playable after OS input"
+    ],
+    "duration_ms": 1054,
+    "process_exit_code": -15
+  }
+}

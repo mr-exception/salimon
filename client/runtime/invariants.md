@@ -120,3 +120,9 @@
   reticle and prompts all consume the toolbar decision. Switching slots cancels
   held input immediately; pickup cancels mouse mining without releasing the
   consumed F latch. M and the legacy equip automation key are unavailable.
+
+- The carrying baseline/evidence route protects selection and mining together:
+  all four empty slots must prevent F extraction at a reachable deposit, while
+  explicit slot 1 selection restores the held tool and extraction eligibility.
+  Evidence checkpoints observe equipped, empty-selected, carrying-deselected
+  and post-drop-deselected states without changing gameplay actions.

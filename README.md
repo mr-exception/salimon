@@ -130,7 +130,8 @@ ship velocity. Press **E** near the cockpit to enter or leave
 control instantly; press **E** near the aft door to open/close it while landed or in open space beyond the nearby-body threshold.
 Gameplay **1–5** selects one of five equipment slots (slot 1: mining tool;
 slots 2–5: empty). Pickup clears selection; carrying blocks selection, and
-dropping requires selecting a slot again. The toolbar appears at bottom center.
+dropping leaves it deselected until you explicitly press **1–5** again.
+The toolbar appears at bottom center with no initial selection.
 Slot 1 equips the mining tool; selecting an empty slot stows it and stops mining.
 
 Press **1** to equip the handheld mining tool on the surface; aim at a deposit

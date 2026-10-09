@@ -162,11 +162,11 @@ launch, resize, minimize/restore, close, and relaunch behavior.
 Gameplay materializes deterministic deposits within 120 m of the player's eye
 using the world generator and the session seed (zero for normal launch). The
 precision tour remains unchanged. `resource_presentation.rs` maps the world
-snapshot into existing renderer cuboids: orange iron ore, muted green-grey
-silicate rock, and cyan water ice, with distinct proportions. Each cuboid is
-inscribed in its deposit's spherical physical bound and centered on its f64
-surface anchor; its outward half is visible on any supported solid body.
-These are unlit greybox validation shapes, not final terrain art. The renderer
+snapshot into four authored Blender mesh variants per material. Stable deposit
+identity selects the variant; uniform scale inscribes it in the spherical
+physical bound at its absolute f64 anchor. These meshes use the renderer
+resource pipeline; see [authored presentation](architecture.md#authored-iron-deposits-86).
+The renderer
 receives only generic presentation DTOs, with no material IDs or mining state.
 Depleted deposits are omitted by the mapping. The stateless generator is reconciled with the world-owned mining session
 journal before every presentation, targeting, and inspection query. Leaving
@@ -206,8 +206,8 @@ up to 2 kg before the next piece starts; its size follows material density and
 mass. Fragments remain in the local session after stowing the tool or leaving
 the active area. Loose pieces move under gravity and contact, and follow the player while carried.
 Iron ore has an angular rust-and-graphite cluster, silicate rock a low layered
-shape, and water ice a tall cyan crystal cluster. Each uses three inexpensive
-renderer cuboids within its physical bound.
+shape, and water ice a tall cyan crystal cluster. Each uses two authored Blender
+mesh variants selected by stable fragment identity within its physical bound.
 `world.fragments` exposes nearby IDs, source-deposit IDs, material keys, mass,
 volume, side length, absolute pose, and visual extents. `world.fragment_count`
 and `world.fragment_mass_kg` inspect all session output (diagnostics, not inventory).
@@ -217,20 +217,22 @@ screenshots show both fractional output and the pieces left after depletion.
 ## Physical carrying (#46)
 
 On a planetary surface, aim the center marker at a fragment within **3 m** and
-press **E**. Fragment bounds, solid terrain, and hull/gate/engine sight proxies
+press **F**. Fragment bounds, solid terrain, and hull/gate/engine sight proxies
 validate the target. One shared domain `CarrySlot` holding `WorldObjectId` represents the permanent limit
 for all future world-object kinds; there is no upgradeable capacity or resource
-inventory. Equipped mining gear stays separate. A second pickup is rejected with
-contextual feedback and does not change either object's identity or mass.
+inventory. Equipped mining gear stays separate. Pickup clears toolbar selection;
+1–5 is ignored while carrying, and drop leaves the toolbar deselected. Aiming at
+another fragment displays the one-object limit; F releases the held object.
 
 The same physical entity follows the eye/look pose, stays visible at the player's
 left hand, and retains its material, mass, volume, provenance, and orientation.
 Collecting a partial piece seals its mass: further mining starts/grows a different
-loose piece. Press **E** again to release it from hand height. The piece falls,
+loose piece. Press **F** again to release it from hand height. The piece falls,
 bounces lightly, and settles against the ground or other fragments. Inside the
 ship, simulation uses ship-local coordinates so a settled pile travels with the hull.
 
-The `interact` automation action exercises E pickup and drop. Inspection exposes
+The `grab_drop` automation key uses contextual F pickup/drop; `interact`
+operates cockpit/door E interactions only. Inspection exposes
 `carrying.object_id`, `target_id`, `context`, and `last_action_feedback`; each
 nearby physical fragment includes `carried`, distance to player, and ship-local
 position. The final feedback is diagnostic history, while gameplay transient
@@ -301,3 +303,17 @@ reports `reference_frame: "ship"` for nearby loose ship-supported fragments and
 through pickup and release. `fragment-transfer.json` covers cabin release,
 retrieval, surface removal, and ship-local stability in flight. `resource-loop.json`
 continues from landing and mining through delivery onto the main cabin deck.
+
+## Toolbar validation (#132)
+
+The [carrying baseline](../../scenarios/carrying.json) and its
+[evidence variant](../../scenarios/evidence/carrying.json) protect the five-slot
+loadout, initially absent selection, and selection of all slots. On the surface,
+every empty slot hides the held tool and prevents extraction during an F hold;
+slot 1 restores the tool and permits mining. Equipped F pickup clears selection,
+all five keys stay blocked while carrying, and F drop leaves selection absent.
+A fresh explicit 1 press restores the tool without resuming mining.
+
+The evidence route captures equipped slot 1, selected empty slot 2, carrying
+without selection, and post-drop deselection. See the
+[runner coverage](../../scripts/README.md#toolbar-gameplay-coverage-132).

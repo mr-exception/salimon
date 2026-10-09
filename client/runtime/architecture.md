@@ -265,3 +265,12 @@ including the same view/location/equipment presentation gates, so carrying scena
 check the absence of the held tool as well as selection/extraction state.
 Baseline and evidence carrying/resource-loop scenarios cover an F miss before
 extraction, equipped pickup, lockout and explicit selection after drop.
+
+## Toolbar scenario coverage (#132)
+
+The carrying scenario executes production numeric/F routes, including all four
+empty-slot mining attempts at a reachable surface deposit. Its synchronized
+evidence variant adds equipped/empty-selected checkpoints to carrying and
+post-drop screenshots. Existing inspection fields establish loadout, selection,
+held mesh, mining eligibility and conserved output; no test-only gameplay
+mutation or new protocol action is needed. See [runner coverage](../../scripts/README.md#toolbar-gameplay-coverage-132).

@@ -1,0 +1,408 @@
+{
+  "setup": {
+    "scenario": "landed-earth",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 240000,
+  "steps": [
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "landing"
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 350,
+        "dy": 0
+      }
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": -350,
+        "dy": 0
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 110
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 36
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 40
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 45
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 40
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "left",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 92
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "left",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 120
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 1427.9966607226334,
+        "dy": 250
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": -48.94515,
+        "dy": -12.34401
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_1",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_1",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 1344.1152316573477,
+        "dy": -226.05050915394952
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 24.968032559982067,
+        "dy": 8.748065303530986
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 572
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": -0.4400516545809674,
+        "dy": 155.05117094178428
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 33
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": -0.04435802954698644,
+        "dy": 120.18171732406537
+      }
+    },
+    {
+      "screenshot": "ice-untouched"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "mine",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 1
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "mine",
+        "pressed": false
+      }
+    },
+    {
+      "screenshot": "ice-small-output"
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": -0.003112313670465888,
+        "dy": -0.023280189144820277
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "mine",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 30
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "mine",
+        "pressed": false
+      }
+    },
+    {
+      "screenshot": "ice-growing-output"
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": -0.0031124641707477394,
+        "dy": 0.020882002437519726
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "mine",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 32
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "mine",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 120
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": -91.05986437100569,
+        "dy": -25.764080214988628
+      }
+    },
+    {
+      "screenshot": "ice-full-fragment"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": false
+      }
+    },
+    {
+      "screenshot": "ice-carried"
+    }
+  ]
+}

@@ -1,0 +1,590 @@
+{
+  "ice-untouched": {
+    "player": {
+      "eye_position_meters": [
+        1000000000046.034,
+        -749993999998.2502,
+        249993999975.48428
+      ],
+      "local_ship_position_meters": null,
+      "location": "Surface",
+      "look_target_meters": [
+        1000000000046.9384,
+        -749993999998.6162,
+        249993999975.2646
+      ],
+      "nearby_body": {
+        "name": "Earth",
+        "surface_distance_meters": 1.7499825386330485
+      },
+      "relative_speed_meters_per_second": 0.0,
+      "relative_velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ship_local_eye_position_meters": [
+        46.0340576171875,
+        1.6422119140625,
+        -24.515716552734375
+      ],
+      "speed_meters_per_second": 0.0,
+      "up": [
+        7.672340871067718e-06,
+        1.0,
+        -4.085951786692021e-06
+      ],
+      "velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "mining": {
+      "active": false,
+      "equipped": true,
+      "extracted_mass_kg": 0.0,
+      "held": false,
+      "held_item_visible": true,
+      "range_meters": 4.0,
+      "rate_kg_per_second": 2.0,
+      "target": {
+        "distance_meters": 1.2590284768515598,
+        "id": "Earth:6596361633034260785"
+      }
+    },
+    "carrying": {
+      "context": null,
+      "last_action_feedback": null,
+      "object_id": null,
+      "target_id": null
+    },
+    "resource_ui": {
+      "anchor_meters": [
+        1000000000048.5061,
+        -749993999999.2504,
+        249993999974.88373
+      ],
+      "context": "Water ice - approx 12.4 kg left - untouched\nHold F or left mouse to mine - 2-5 to stow"
+    },
+    "fragments": []
+  },
+  "ice-small-output": {
+    "player": {
+      "eye_position_meters": [
+        1000000000046.034,
+        -749993999998.2502,
+        249993999975.48428
+      ],
+      "local_ship_position_meters": null,
+      "location": "Surface",
+      "look_target_meters": [
+        1000000000046.9384,
+        -749993999998.6162,
+        249993999975.2646
+      ],
+      "nearby_body": {
+        "name": "Earth",
+        "surface_distance_meters": 1.7499825386330485
+      },
+      "relative_speed_meters_per_second": 0.0,
+      "relative_velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ship_local_eye_position_meters": [
+        46.0340576171875,
+        1.6422119140625,
+        -24.515716552734375
+      ],
+      "speed_meters_per_second": 0.0,
+      "up": [
+        7.672340871067718e-06,
+        1.0,
+        -4.085951786692021e-06
+      ],
+      "velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "mining": {
+      "active": false,
+      "equipped": true,
+      "extracted_mass_kg": 0.03200000000000003,
+      "held": false,
+      "held_item_visible": true,
+      "range_meters": 4.0,
+      "rate_kg_per_second": 2.0,
+      "target": {
+        "distance_meters": 1.2590284768515598,
+        "id": "Earth:6596361633034260785"
+      }
+    },
+    "carrying": {
+      "context": null,
+      "last_action_feedback": null,
+      "object_id": null,
+      "target_id": null
+    },
+    "resource_ui": {
+      "anchor_meters": [
+        1000000000048.5061,
+        -749993999999.2504,
+        249993999974.88373
+      ],
+      "context": "Water ice - approx 12.3 kg left - partly mined\nHold F or left mouse to mine - 2-5 to stow"
+    },
+    "fragments": [
+      {
+        "carried": false,
+        "distance_to_player_meters": 4.193059529430066,
+        "id": 1,
+        "mass_kg": 0.03200000000000003,
+        "orientation_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "position_meters": [
+          1000000000048.5061,
+          -749993999998.1007,
+          249993999972.10074
+        ],
+        "reference_frame": "world",
+        "resource": "water-ice",
+        "ship_local_position_meters": [
+          48.506103515625,
+          1.791748046875,
+          -27.899261474609375
+        ],
+        "side_meters": 0.3264279846067235,
+        "source_deposit_id": "Earth:6596361633034260785",
+        "visual": {
+          "color": [
+            0.25,
+            0.8500000238418579,
+            1.0,
+            1.0
+          ],
+          "half_extents_meters": [
+            0.16321399807929993,
+            0.16321399807929993,
+            0.16321399807929993
+          ]
+        },
+        "volume_m3": 3.4782608695652205e-05
+      }
+    ]
+  },
+  "ice-growing-output": {
+    "player": {
+      "eye_position_meters": [
+        1000000000046.034,
+        -749993999998.2502,
+        249993999975.48428
+      ],
+      "local_ship_position_meters": null,
+      "location": "Surface",
+      "look_target_meters": [
+        1000000000046.9385,
+        -749993999998.6161,
+        249993999975.2646
+      ],
+      "nearby_body": {
+        "name": "Earth",
+        "surface_distance_meters": 1.7499825386330485
+      },
+      "relative_speed_meters_per_second": 0.0,
+      "relative_velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ship_local_eye_position_meters": [
+        46.0340576171875,
+        1.6422119140625,
+        -24.515716552734375
+      ],
+      "speed_meters_per_second": 0.0,
+      "up": [
+        7.672340871067718e-06,
+        1.0,
+        -4.085951786692021e-06
+      ],
+      "velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "mining": {
+      "active": false,
+      "equipped": true,
+      "extracted_mass_kg": 0.9920000000000009,
+      "held": false,
+      "held_item_visible": true,
+      "range_meters": 4.0,
+      "rate_kg_per_second": 2.0,
+      "target": {
+        "distance_meters": 1.2590284677834798,
+        "id": "Earth:6596361633034260785"
+      }
+    },
+    "carrying": {
+      "context": null,
+      "last_action_feedback": null,
+      "object_id": null,
+      "target_id": null
+    },
+    "resource_ui": {
+      "anchor_meters": [
+        1000000000048.5061,
+        -749993999999.2504,
+        249993999974.88373
+      ],
+      "context": "Water ice - approx 11.4 kg left - partly mined\nHold F or left mouse to mine - 2-5 to stow"
+    },
+    "fragments": [
+      {
+        "carried": false,
+        "distance_to_player_meters": 4.478753389700725,
+        "id": 1,
+        "mass_kg": 0.9920000000000009,
+        "orientation_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "position_meters": [
+          1000000000048.5061,
+          -749993999998.5715,
+          249993999971.7634
+        ],
+        "reference_frame": "world",
+        "resource": "water-ice",
+        "ship_local_position_meters": [
+          48.506103515625,
+          1.3209228515625,
+          -28.236602783203125
+        ],
+        "side_meters": 1.0254345552426767,
+        "source_deposit_id": "Earth:6596361633034260785",
+        "visual": {
+          "color": [
+            0.25,
+            0.8500000238418579,
+            1.0,
+            1.0
+          ],
+          "half_extents_meters": [
+            0.5127173066139221,
+            0.5127173066139221,
+            0.5127173066139221
+          ]
+        },
+        "volume_m3": 0.0010782608695652184
+      }
+    ]
+  },
+  "ice-full-fragment": {
+    "player": {
+      "eye_position_meters": [
+        1000000000047.4355,
+        -749993999998.2502,
+        249993999973.27576
+      ],
+      "local_ship_position_meters": null,
+      "location": "Surface",
+      "look_target_meters": [
+        1000000000047.8956,
+        -749993999998.7607,
+        249993999972.5493
+      ],
+      "nearby_body": {
+        "name": "Earth",
+        "surface_distance_meters": 1.7500028861686587
+      },
+      "relative_speed_meters_per_second": 0.0,
+      "relative_velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ship_local_eye_position_meters": [
+        47.435546875,
+        1.6422119140625,
+        -26.7242431640625
+      ],
+      "speed_meters_per_second": 0.0,
+      "up": [
+        7.90592184785055e-06,
+        1.0,
+        -4.454039299162105e-06
+      ],
+      "velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "mining": {
+      "active": false,
+      "equipped": true,
+      "extracted_mass_kg": 2.016000000000002,
+      "held": false,
+      "held_item_visible": true,
+      "range_meters": 4.0,
+      "rate_kg_per_second": 2.0,
+      "target": null
+    },
+    "carrying": {
+      "context": "F to pick up fragment",
+      "last_action_feedback": null,
+      "object_id": null,
+      "target_id": 1
+    },
+    "resource_ui": {
+      "anchor_meters": [
+        1000000000048.5061,
+        -749993999999.4382,
+        249993999971.58517
+      ],
+      "context": "Water ice fragment - approx 2.00 kg\nF to pick up fragment"
+    },
+    "fragments": [
+      {
+        "carried": false,
+        "distance_to_player_meters": 2.3271175533347166,
+        "id": 1,
+        "mass_kg": 2.0,
+        "orientation_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "position_meters": [
+          1000000000048.5061,
+          -749993999999.4382,
+          249993999971.58517
+        ],
+        "reference_frame": "world",
+        "resource": "water-ice",
+        "ship_local_position_meters": [
+          48.506103515625,
+          0.4542236328125,
+          -28.414825439453125
+        ],
+        "side_meters": 1.29543031539143,
+        "source_deposit_id": "Earth:6596361633034260785",
+        "visual": {
+          "color": [
+            0.25,
+            0.8500000238418579,
+            1.0,
+            1.0
+          ],
+          "half_extents_meters": [
+            0.647715151309967,
+            0.647715151309967,
+            0.647715151309967
+          ]
+        },
+        "volume_m3": 0.002173913043478261
+      },
+      {
+        "carried": false,
+        "distance_to_player_meters": 3.7730374746168995,
+        "id": 2,
+        "mass_kg": 0.01600000000000179,
+        "orientation_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "position_meters": [
+          1000000000048.5061,
+          -749993999999.8812,
+          249993999970.04626
+        ],
+        "reference_frame": "world",
+        "resource": "water-ice",
+        "ship_local_position_meters": [
+          48.506103515625,
+          0.01123046875,
+          -29.9537353515625
+        ],
+        "side_meters": 0.2590860630782956,
+        "source_deposit_id": "Earth:6596361633034260785",
+        "visual": {
+          "color": [
+            0.25,
+            0.8500000238418579,
+            1.0,
+            1.0
+          ],
+          "half_extents_meters": [
+            0.12954303622245789,
+            0.12954303622245789,
+            0.12954303622245789
+          ]
+        },
+        "volume_m3": 1.7391304347828034e-05
+      }
+    ]
+  },
+  "ice-carried": {
+    "player": {
+      "eye_position_meters": [
+        1000000000047.4355,
+        -749993999998.2502,
+        249993999973.27576
+      ],
+      "local_ship_position_meters": null,
+      "location": "Surface",
+      "look_target_meters": [
+        1000000000047.8956,
+        -749993999998.7607,
+        249993999972.5493
+      ],
+      "nearby_body": {
+        "name": "Earth",
+        "surface_distance_meters": 1.7500028861686587
+      },
+      "relative_speed_meters_per_second": 0.0,
+      "relative_velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ship_local_eye_position_meters": [
+        47.435546875,
+        1.6422119140625,
+        -26.7242431640625
+      ],
+      "speed_meters_per_second": 0.0,
+      "up": [
+        7.90592184785055e-06,
+        1.0,
+        -4.454039299162105e-06
+      ],
+      "velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "mining": {
+      "active": false,
+      "equipped": false,
+      "extracted_mass_kg": 2.016000000000002,
+      "held": false,
+      "held_item_visible": false,
+      "range_meters": 4.0,
+      "rate_kg_per_second": 2.0,
+      "target": null
+    },
+    "carrying": {
+      "context": "Carrying fragment - F to drop",
+      "last_action_feedback": "Fragment picked up - F to drop",
+      "object_id": 1,
+      "target_id": null
+    },
+    "resource_ui": {
+      "anchor_meters": [
+        1000000000048.2146,
+        -749993999999.3347,
+        249993999971.67184
+      ],
+      "context": "Water ice fragment - approx 2.00 kg\nCarrying fragment - F to drop"
+    },
+    "fragments": [
+      {
+        "carried": true,
+        "distance_to_player_meters": 2.0869927989456807,
+        "id": 1,
+        "mass_kg": 2.0,
+        "orientation_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "position_meters": [
+          1000000000048.2146,
+          -749993999999.3347,
+          249993999971.67184
+        ],
+        "reference_frame": "world",
+        "resource": "water-ice",
+        "ship_local_position_meters": [
+          48.214599609375,
+          0.5577392578125,
+          -28.328155517578125
+        ],
+        "side_meters": 1.29543031539143,
+        "source_deposit_id": "Earth:6596361633034260785",
+        "visual": {
+          "color": [
+            0.25,
+            0.8500000238418579,
+            1.0,
+            1.0
+          ],
+          "half_extents_meters": [
+            0.647715151309967,
+            0.647715151309967,
+            0.647715151309967
+          ]
+        },
+        "volume_m3": 0.002173913043478261
+      },
+      {
+        "carried": false,
+        "distance_to_player_meters": 3.7730374746168995,
+        "id": 2,
+        "mass_kg": 0.01600000000000179,
+        "orientation_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "position_meters": [
+          1000000000048.5061,
+          -749993999999.8812,
+          249993999970.04626
+        ],
+        "reference_frame": "world",
+        "resource": "water-ice",
+        "ship_local_position_meters": [
+          48.506103515625,
+          0.01123046875,
+          -29.9537353515625
+        ],
+        "side_meters": 0.2590860630782956,
+        "source_deposit_id": "Earth:6596361633034260785",
+        "visual": {
+          "color": [
+            0.25,
+            0.8500000238418579,
+            1.0,
+            1.0
+          ],
+          "half_extents_meters": [
+            0.12954303622245789,
+            0.12954303622245789,
+            0.12954303622245789
+          ]
+        },
+        "volume_m3": 1.7391304347828034e-05
+      }
+    ]
+  }
+}

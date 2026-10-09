@@ -126,3 +126,7 @@
   explicit slot 1 selection restores the held tool and extraction eligibility.
   Evidence checkpoints observe equipped, empty-selected, carrying-deselected
   and post-drop-deselected states without changing gameplay actions.
+
+- Resource gameplay dimensions use the shared world `resource_size` policy;
+  enlarged bounds never substitute for density-derived solid material volume.
+  See [resource size contract](../world/resource-contracts.md#gameplay-size-policy-144).

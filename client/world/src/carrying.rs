@@ -127,7 +127,7 @@ mod tests {
         assert_eq!(aimed_fragment(ray, &pieces[2..], None, f64::INFINITY), None);
         let miss = MiningRay::new(
             WorldPosition::new(0.0, 0.0, 0.0),
-            WorldPosition::new(0.1, 0.0, 1.0),
+            WorldPosition::new(1.0, 0.0, 1.0),
         )
         .unwrap();
         assert_eq!(aimed_fragment(miss, &pieces, None, f64::INFINITY), None);

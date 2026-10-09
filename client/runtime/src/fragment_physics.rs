@@ -75,7 +75,26 @@ pub(crate) fn advance(tool: &mut MiningTool, frame: ShipFrame, delta: Duration, 
                 ObjectState {
                     position,
                     velocity: initial,
-                    radius: salimon_world::resource_fragments::side_meters(p) * 0.5,
+                    radius: salimon_world::resource_size::fragment_contact_radius_meters(
+                        p.material(),
+                    ),
+                    ground_support_meters: {
+                        let up = if ship {
+                            frame.axes[1]
+                        } else {
+                            body.map(|b| {
+                                let radial = sub(position, b.center);
+                                let distance = length(radial);
+                                radial.map(|v| v / distance)
+                            })
+                            .unwrap_or([0.0, 1.0, 0.0])
+                        };
+                        crate::resource_presentation::fragment_mesh(p)
+                            .mesh
+                            .support_meters(up)
+                            * salimon_world::resource_fragments::side_meters(p)
+                            + 0.005
+                    },
                     surface: if ship {
                         Surface::Floor {
                             height_meters: SHIP_FLOOR_HEIGHT_METERS,
@@ -240,8 +259,12 @@ mod tests {
             );
         }
         let settled = tool.ship_fragments[&id];
-        let radius =
-            salimon_world::resource_fragments::side_meters(tool.session.fragments()[0]) * 0.5;
+        let piece = tool.session.fragments()[0];
+        let radius = crate::resource_presentation::fragment_mesh(piece)
+            .mesh
+            .support_meters([0.0, 1.0, 0.0])
+            * salimon_world::resource_fragments::side_meters(piece)
+            + 0.005;
         assert!((settled[1] - SHIP_FLOOR_HEIGHT_METERS - radius).abs() < 0.002);
     }
 
@@ -265,10 +288,21 @@ mod tests {
         }
         let a = tool.ship_fragments[&pieces[0].id()];
         let b = tool.ship_fragments[&pieces[1].id()];
-        let radius = salimon_world::resource_fragments::side_meters(pieces[0]) * 0.5;
-        assert!(a[1].min(b[1]) >= SHIP_FLOOR_HEIGHT_METERS + radius - 0.002);
+        let radius =
+            salimon_world::resource_size::fragment_contact_radius_meters(pieces[0].material());
+        let support = pieces
+            .iter()
+            .map(|p| {
+                crate::resource_presentation::fragment_mesh(*p)
+                    .mesh
+                    .support_meters([0.0, 1.0, 0.0])
+                    * salimon_world::resource_fragments::side_meters(*p)
+                    + 0.005
+            })
+            .fold(f64::INFINITY, f64::min);
+        assert!(a[1].min(b[1]) >= SHIP_FLOOR_HEIGHT_METERS + support - 0.002);
         assert!(length(sub(a, b)) >= radius * 2.0 - 0.002);
-        assert!(a[1].max(b[1]) > SHIP_FLOOR_HEIGHT_METERS + radius * 2.0);
+        assert!(a[1].max(b[1]) > SHIP_FLOOR_HEIGHT_METERS + support + radius);
     }
 
     #[test]
@@ -299,8 +333,12 @@ mod tests {
             advance(&mut tool, frame(), Duration::from_millis(16), player);
         }
         let settled = tool.session.fragments()[0].transform().position().meters();
-        let radius =
-            salimon_world::resource_fragments::side_meters(tool.session.fragments()[0]) * 0.5;
+        let piece = tool.session.fragments()[0];
+        let radius = crate::resource_presentation::fragment_mesh(piece)
+            .mesh
+            .support_meters([0.0, 1.0, 0.0])
+            * salimon_world::resource_fragments::side_meters(piece)
+            + 0.005;
         assert!(
             (length(sub(settled, body.center.meters())) - body.radius_meters - radius).abs()
                 < 0.002

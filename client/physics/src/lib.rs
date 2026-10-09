@@ -43,6 +43,8 @@ pub struct ObjectState {
     pub position: [f64; 3],
     pub velocity: [f64; 3],
     pub radius: f64,
+    /// Authored support distance along the environmental normal, in metres.
+    pub ground_support_meters: f64,
     pub surface: Surface,
 }
 
@@ -179,12 +181,15 @@ fn ground_contact(piece: &mut ObjectState) {
     let (up, penetration) = if let Surface::Floor { height_meters } = piece.surface {
         (
             [0.0, 1.0, 0.0],
-            height_meters + piece.radius - piece.position[1],
+            height_meters + piece.ground_support_meters - piece.position[1],
         )
     } else if let Some(body) = piece.surface.sphere() {
         let radial = sub(piece.position, body.center);
         let distance = length(radial);
-        (normalize(radial), body.radius + piece.radius - distance)
+        (
+            normalize(radial),
+            body.radius + piece.ground_support_meters - distance,
+        )
     } else {
         return;
     };
@@ -221,8 +226,27 @@ mod tests {
             position,
             velocity,
             radius: 0.2,
+            ground_support_meters: 0.2,
             surface: Surface::Floor { height_meters: 0.0 },
         }
+    }
+
+    #[test]
+    fn authored_support_controls_ground_while_pair_contact_keeps_conservative_radius() {
+        let mut objects = [
+            floor([0.0, 0.1, 0.0], [0.0; 3]),
+            floor([0.0, 0.1, 0.0], [0.0; 3]),
+        ];
+        for object in &mut objects {
+            object.radius = 0.8;
+            object.ground_support_meters = 0.3;
+        }
+        for _ in 0..180 {
+            advance(&mut objects, Duration::from_millis(16), |_, _| true);
+        }
+        assert!(objects.iter().all(|p| p.position[1] >= 0.3 - 1e-9));
+        assert!(objects.iter().any(|p| (p.position[1] - 0.3).abs() < 0.002));
+        assert!(length(sub(objects[0].position, objects[1].position)) >= 1.6 - 0.002);
     }
 
     #[test]
@@ -285,6 +309,7 @@ mod tests {
             position: [12.5, 0.0, 0.0],
             velocity: [0.0; 3],
             radius: 0.2,
+            ground_support_meters: 0.2,
             surface: Surface::Sphere(SphereSurface {
                 center: [10.0, 0.0, 0.0],
                 radius: 2.0,
@@ -320,6 +345,7 @@ mod tests {
             position: [0.0, 1.0, 0.0],
             velocity: [0.0; 3],
             radius: 0.2,
+            ground_support_meters: 0.2,
             surface: Surface::Sphere(SphereSurface {
                 center: [0.0; 3],
                 radius: 0.5,

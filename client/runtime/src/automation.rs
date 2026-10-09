@@ -872,7 +872,21 @@ mod tests {
                         .find(|p| p["id"].as_u64() == Some(id.0))
                         .expect("carried identity stays visible");
                     assert!(
-                        piece["distance_to_player_meters"].as_f64().unwrap() < 1.0,
+                        {
+                            let radius =
+                                piece["side_meters"].as_f64().unwrap() * 0.5 * 3.0_f64.sqrt();
+                            let eye = &state["player"]["eye_position_meters"];
+                            let up = &state["player"]["up"];
+                            let delta: [f64; 3] = std::array::from_fn(|i| {
+                                piece["position_meters"][i].as_f64().unwrap()
+                                    - eye[i].as_f64().unwrap()
+                            });
+                            let up: [f64; 3] = std::array::from_fn(|i| up[i].as_f64().unwrap());
+                            let height = salimon_math::dot(delta, up);
+                            let planar = std::array::from_fn(|i| delta[i] - up[i] * height);
+                            let distance = salimon_math::length(planar);
+                            distance > radius + 0.6 && distance < radius + 0.7
+                        },
                         "carried pose at step {index}"
                     );
                 }

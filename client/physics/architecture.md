@@ -1,7 +1,8 @@
 # Physics architecture
 
 The crate advances an ordered slice of `ObjectState` values: f64 metre position,
-m/s velocity, positive spherical radius and explicit `Surface`. It does not
+m/s velocity, positive spherical contact radius, positive ground-support distance
+and explicit `Surface`. It does not
 allocate identities or store session state. Callers validate finite state and
 positive finite surface radii, select geometry and retain orientation/material/mass.
 
@@ -25,3 +26,9 @@ Release helpers own the existing impulses; the runtime projects ship-forward
 components and supplies a stable ejection variant from fragment identity. For
 future objects, extend policy only with an explicit feature contract and tests.
 See the [canonical decision](../../docs/technical-architecture.md#physical-object-simulation-decision-114).
+
+Ground support is independent of pair-contact radius: callers can supply actual
+mesh support along the environmental normal while retaining a conservative
+sphere for object contacts and hull containment. Ground contact uses support;
+pair separation and floor containment use radius. Runtime refreshes support
+from the current frame/normal before every advance; physics owns no mesh data.

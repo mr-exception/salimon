@@ -1,0 +1,590 @@
+{
+  "iron-untouched": {
+    "player": {
+      "eye_position_meters": [
+        999999999975.5826,
+        -749993999998.2502,
+        249994000049.46017
+      ],
+      "local_ship_position_meters": null,
+      "location": "Surface",
+      "look_target_meters": [
+        999999999975.4772,
+        -749993999998.8788,
+        249994000050.23077
+      ],
+      "nearby_body": {
+        "name": "Earth",
+        "surface_distance_meters": 1.7500094026327133
+      },
+      "relative_speed_meters_per_second": 0.0,
+      "relative_velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ship_local_eye_position_meters": [
+        -24.4173583984375,
+        1.6422119140625,
+        49.460174560546875
+      ],
+      "speed_meters_per_second": 0.0,
+      "up": [
+        -4.069558599439915e-06,
+        1.0,
+        8.243359843618236e-06
+      ],
+      "velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "mining": {
+      "active": false,
+      "equipped": true,
+      "extracted_mass_kg": 0.0,
+      "held": false,
+      "held_item_visible": true,
+      "range_meters": 4.0,
+      "rate_kg_per_second": 2.0,
+      "target": {
+        "distance_meters": 2.6694642495219205,
+        "id": "Earth:18012929353344056861"
+      }
+    },
+    "carrying": {
+      "context": null,
+      "last_action_feedback": null,
+      "object_id": null,
+      "target_id": null
+    },
+    "resource_ui": {
+      "anchor_meters": [
+        999999999975.289,
+        -749994000000.0002,
+        249994000051.60565
+      ],
+      "context": "Iron ore - approx 22.2 kg left - untouched\nHold F or left mouse to mine - 2-5 to stow"
+    },
+    "fragments": []
+  },
+  "iron-small-output": {
+    "player": {
+      "eye_position_meters": [
+        999999999975.5826,
+        -749993999998.2502,
+        249994000049.46017
+      ],
+      "local_ship_position_meters": null,
+      "location": "Surface",
+      "look_target_meters": [
+        999999999975.4772,
+        -749993999998.8788,
+        249994000050.23077
+      ],
+      "nearby_body": {
+        "name": "Earth",
+        "surface_distance_meters": 1.7500094026327133
+      },
+      "relative_speed_meters_per_second": 0.0,
+      "relative_velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ship_local_eye_position_meters": [
+        -24.4173583984375,
+        1.6422119140625,
+        49.460174560546875
+      ],
+      "speed_meters_per_second": 0.0,
+      "up": [
+        -4.069558599439915e-06,
+        1.0,
+        8.243359843618236e-06
+      ],
+      "velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "mining": {
+      "active": false,
+      "equipped": true,
+      "extracted_mass_kg": 0.03200000000000003,
+      "held": false,
+      "held_item_visible": true,
+      "range_meters": 4.0,
+      "rate_kg_per_second": 2.0,
+      "target": {
+        "distance_meters": 2.6694642495219205,
+        "id": "Earth:18012929353344056861"
+      }
+    },
+    "carrying": {
+      "context": null,
+      "last_action_feedback": null,
+      "object_id": null,
+      "target_id": null
+    },
+    "resource_ui": {
+      "anchor_meters": [
+        999999999975.289,
+        -749994000000.0002,
+        249994000051.60565
+      ],
+      "context": "Iron ore - approx 22.1 kg left - partly mined\nHold F or left mouse to mine - 2-5 to stow"
+    },
+    "fragments": [
+      {
+        "carried": false,
+        "distance_to_player_meters": 2.5750503846442716,
+        "id": 1,
+        "mass_kg": 0.03200000000000003,
+        "orientation_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "position_meters": [
+          999999999975.314,
+          -749993999999.9309,
+          249994000051.39255
+        ],
+        "reference_frame": "world",
+        "resource": "iron-ore",
+        "ship_local_position_meters": [
+          -24.68603515625,
+          -0.0384521484375,
+          51.392547607421875
+        ],
+        "side_meters": 0.020910318342988416,
+        "source_deposit_id": "Earth:18012929353344056861",
+        "visual": {
+          "color": [
+            0.75,
+            0.2199999988079071,
+            0.05999999865889549,
+            1.0
+          ],
+          "half_extents_meters": [
+            0.010455159470438957,
+            0.010455159470438957,
+            0.010455159470438957
+          ]
+        },
+        "volume_m3": 9.14285714285715e-06
+      }
+    ]
+  },
+  "iron-growing-output": {
+    "player": {
+      "eye_position_meters": [
+        999999999975.5826,
+        -749993999998.2502,
+        249994000049.46017
+      ],
+      "local_ship_position_meters": null,
+      "location": "Surface",
+      "look_target_meters": [
+        999999999975.4772,
+        -749993999998.8788,
+        249994000050.23074
+      ],
+      "nearby_body": {
+        "name": "Earth",
+        "surface_distance_meters": 1.7500094026327133
+      },
+      "relative_speed_meters_per_second": 0.0,
+      "relative_velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ship_local_eye_position_meters": [
+        -24.4173583984375,
+        1.6422119140625,
+        49.460174560546875
+      ],
+      "speed_meters_per_second": 0.0,
+      "up": [
+        -4.069558599439915e-06,
+        1.0,
+        8.243359843618236e-06
+      ],
+      "velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "mining": {
+      "active": false,
+      "equipped": true,
+      "extracted_mass_kg": 0.9920000000000009,
+      "held": false,
+      "held_item_visible": true,
+      "range_meters": 4.0,
+      "rate_kg_per_second": 2.0,
+      "target": {
+        "distance_meters": 2.669464244781144,
+        "id": "Earth:18012929353344056861"
+      }
+    },
+    "carrying": {
+      "context": null,
+      "last_action_feedback": null,
+      "object_id": null,
+      "target_id": null
+    },
+    "resource_ui": {
+      "anchor_meters": [
+        999999999975.289,
+        -749994000000.0002,
+        249994000051.60565
+      ],
+      "context": "Iron ore - approx 21.2 kg left - partly mined\nHold F or left mouse to mine - 2-5 to stow"
+    },
+    "fragments": [
+      {
+        "carried": false,
+        "distance_to_player_meters": 2.408678993179193,
+        "id": 1,
+        "mass_kg": 0.9920000000000009,
+        "orientation_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "position_meters": [
+          999999999975.314,
+          -749993999999.9674,
+          249994000051.12778
+        ],
+        "reference_frame": "world",
+        "resource": "iron-ore",
+        "ship_local_position_meters": [
+          -24.68603515625,
+          -0.074951171875,
+          51.127777099609375
+        ],
+        "side_meters": 0.06568726947800865,
+        "source_deposit_id": "Earth:18012929353344056861",
+        "visual": {
+          "color": [
+            0.75,
+            0.2199999988079071,
+            0.05999999865889549,
+            1.0
+          ],
+          "half_extents_meters": [
+            0.032843634486198425,
+            0.032843634486198425,
+            0.032843634486198425
+          ]
+        },
+        "volume_m3": 0.0002834285714285717
+      }
+    ]
+  },
+  "iron-full-fragment": {
+    "player": {
+      "eye_position_meters": [
+        999999999975.5826,
+        -749993999998.2502,
+        249994000049.46017
+      ],
+      "local_ship_position_meters": null,
+      "location": "Surface",
+      "look_target_meters": [
+        999999999975.4698,
+        -749993999998.9674,
+        249994000050.14792
+      ],
+      "nearby_body": {
+        "name": "Earth",
+        "surface_distance_meters": 1.7500094026327133
+      },
+      "relative_speed_meters_per_second": 0.0,
+      "relative_velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ship_local_eye_position_meters": [
+        -24.4173583984375,
+        1.6422119140625,
+        49.460174560546875
+      ],
+      "speed_meters_per_second": 0.0,
+      "up": [
+        -4.069558599439915e-06,
+        1.0,
+        8.243359843618236e-06
+      ],
+      "velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "mining": {
+      "active": false,
+      "equipped": true,
+      "extracted_mass_kg": 2.016000000000002,
+      "held": false,
+      "held_item_visible": true,
+      "range_meters": 4.0,
+      "rate_kg_per_second": 2.0,
+      "target": null
+    },
+    "carrying": {
+      "context": "F to pick up fragment",
+      "last_action_feedback": null,
+      "object_id": null,
+      "target_id": 1
+    },
+    "resource_ui": {
+      "anchor_meters": [
+        999999999975.314,
+        -749993999999.9587,
+        249994000051.09863
+      ],
+      "context": "Iron ore fragment - approx 2.00 kg\nF to pick up fragment"
+    },
+    "fragments": [
+      {
+        "carried": false,
+        "distance_to_player_meters": 2.3823709925074508,
+        "id": 1,
+        "mass_kg": 2.0,
+        "orientation_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "position_meters": [
+          999999999975.314,
+          -749993999999.9587,
+          249994000051.09863
+        ],
+        "reference_frame": "world",
+        "resource": "iron-ore",
+        "ship_local_position_meters": [
+          -24.68603515625,
+          -0.0662841796875,
+          51.0986328125
+        ],
+        "side_meters": 0.08298265333662434,
+        "source_deposit_id": "Earth:18012929353344056861",
+        "visual": {
+          "color": [
+            0.75,
+            0.2199999988079071,
+            0.05999999865889549,
+            1.0
+          ],
+          "half_extents_meters": [
+            0.041491325944662094,
+            0.041491325944662094,
+            0.041491325944662094
+          ]
+        },
+        "volume_m3": 0.0005714285714285715
+      },
+      {
+        "carried": false,
+        "distance_to_player_meters": 2.455623599494036,
+        "id": 2,
+        "mass_kg": 0.01600000000000179,
+        "orientation_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "position_meters": [
+          999999999975.314,
+          -749993999999.992,
+          249994000051.17026
+        ],
+        "reference_frame": "world",
+        "resource": "iron-ore",
+        "ship_local_position_meters": [
+          -24.68603515625,
+          -0.0994873046875,
+          51.170257568359375
+        ],
+        "side_meters": 0.016596530667325488,
+        "source_deposit_id": "Earth:18012929353344056861",
+        "visual": {
+          "color": [
+            0.75,
+            0.2199999988079071,
+            0.05999999865889549,
+            1.0
+          ],
+          "half_extents_meters": [
+            0.008298265747725964,
+            0.008298265747725964,
+            0.008298265747725964
+          ]
+        },
+        "volume_m3": 4.571428571429083e-06
+      }
+    ]
+  },
+  "iron-carried": {
+    "player": {
+      "eye_position_meters": [
+        999999999975.5826,
+        -749993999998.2502,
+        249994000049.46017
+      ],
+      "local_ship_position_meters": null,
+      "location": "Surface",
+      "look_target_meters": [
+        999999999975.4698,
+        -749993999998.9674,
+        249994000050.14792
+      ],
+      "nearby_body": {
+        "name": "Earth",
+        "surface_distance_meters": 1.7500094026327133
+      },
+      "relative_speed_meters_per_second": 0.0,
+      "relative_velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ship_local_eye_position_meters": [
+        -24.4173583984375,
+        1.6422119140625,
+        49.460174560546875
+      ],
+      "speed_meters_per_second": 0.0,
+      "up": [
+        -4.069558599439915e-06,
+        1.0,
+        8.243359843618236e-06
+      ],
+      "velocity_meters_per_second": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "mining": {
+      "active": false,
+      "equipped": false,
+      "extracted_mass_kg": 2.016000000000002,
+      "held": false,
+      "held_item_visible": false,
+      "range_meters": 4.0,
+      "rate_kg_per_second": 2.0,
+      "target": null
+    },
+    "carrying": {
+      "context": "Carrying fragment - F to drop",
+      "last_action_feedback": "Fragment picked up - F to drop",
+      "object_id": 1,
+      "target_id": null
+    },
+    "resource_ui": {
+      "anchor_meters": [
+        999999999975.6469,
+        -749993999998.8965,
+        249994000049.92975
+      ],
+      "context": "Iron ore fragment - approx 2.00 kg\nCarrying fragment - F to drop"
+    },
+    "fragments": [
+      {
+        "carried": true,
+        "distance_to_player_meters": 0.8014043622479041,
+        "id": 1,
+        "mass_kg": 2.0,
+        "orientation_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "position_meters": [
+          999999999975.6469,
+          -749993999998.8965,
+          249994000049.92975
+        ],
+        "reference_frame": "world",
+        "resource": "iron-ore",
+        "ship_local_position_meters": [
+          -24.3531494140625,
+          0.9959716796875,
+          49.92974853515625
+        ],
+        "side_meters": 0.08298265333662434,
+        "source_deposit_id": "Earth:18012929353344056861",
+        "visual": {
+          "color": [
+            0.75,
+            0.2199999988079071,
+            0.05999999865889549,
+            1.0
+          ],
+          "half_extents_meters": [
+            0.041491325944662094,
+            0.041491325944662094,
+            0.041491325944662094
+          ]
+        },
+        "volume_m3": 0.0005714285714285715
+      },
+      {
+        "carried": false,
+        "distance_to_player_meters": 2.455623599494036,
+        "id": 2,
+        "mass_kg": 0.01600000000000179,
+        "orientation_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "position_meters": [
+          999999999975.314,
+          -749993999999.992,
+          249994000051.17026
+        ],
+        "reference_frame": "world",
+        "resource": "iron-ore",
+        "ship_local_position_meters": [
+          -24.68603515625,
+          -0.0994873046875,
+          51.170257568359375
+        ],
+        "side_meters": 0.016596530667325488,
+        "source_deposit_id": "Earth:18012929353344056861",
+        "visual": {
+          "color": [
+            0.75,
+            0.2199999988079071,
+            0.05999999865889549,
+            1.0
+          ],
+          "half_extents_meters": [
+            0.008298265747725964,
+            0.008298265747725964,
+            0.008298265747725964
+          ]
+        },
+        "volume_m3": 4.571428571429083e-06
+      }
+    ]
+  }
+}

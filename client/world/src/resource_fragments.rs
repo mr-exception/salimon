@@ -63,9 +63,9 @@ impl FragmentOutput {
     }
 }
 
-/// World-axis cube side, derived from physical solid volume rather than a presentation scale.
+/// Authoritative gameplay cube side; solid material volume remains density-derived.
 pub fn side_meters(fragment: ResourceFragment) -> f64 {
-    fragment.material().volume_m3().cbrt()
+    crate::resource_size::fragment_side_meters(fragment.material())
 }
 
 fn spawn_position(deposit: ResourceDeposit, ordinal: usize) -> WorldPosition {
@@ -92,12 +92,13 @@ fn spawn_position(deposit: ResourceDeposit, ordinal: usize) -> WorldPosition {
     let bitangent = cross(up, tangent);
     // Start at the deposit edge; runtime gives new pieces an outward impulse.
     // Reserve full-piece height while their mass grows.
-    let side = (FRAGMENT_MAX_MASS_KG
-        / deposit.material().resource().definition().density_kg_per_m3)
-        .cbrt();
-    let support = side * up.iter().map(|v| v.abs()).sum::<f64>() * 0.5 + 0.005;
-    let column = 0.20 + (ordinal % 4) as f64 * 0.025;
-    let row = ((ordinal / 4) % 3) as f64 * 0.025 - 0.025;
+    let full = RawMaterial::new(deposit.material().resource(), FRAGMENT_MAX_MASS_KG)
+        .expect("full fragment material is valid");
+    let side = crate::resource_size::fragment_side_meters(full);
+    let support = crate::resource_size::fragment_contact_radius_meters(full) + 0.005;
+    let edge = crate::resource_size::deposit_radius_meters(deposit.material());
+    let column = edge + side + (ordinal % 4) as f64 * (side + 0.05);
+    let row = (ordinal / 4) as f64 * (side + 0.05);
     deposit.position().translated(std::array::from_fn(|i| {
         up[i] * support + tangent[i] * column + bitangent[i] * row
     }))

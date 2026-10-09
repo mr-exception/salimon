@@ -24,14 +24,32 @@ pub(crate) fn nearby_deposits(
         if altitude.abs() > ACTIVE_RADIUS_METERS {
             continue;
         }
-        deposits.extend(materialize_nearby_deposits(
+        let entries = materialize_nearby_deposits(
             *body,
             &default_resource_distribution(body.id),
             seed,
             None,
             player,
             ACTIVE_RADIUS_METERS,
-        )?);
+        )?;
+        for mut entry in entries {
+            let up = entry
+                .body_local_position_meters
+                .map(|v| v / body.radius_meters);
+            let visual = deposit_mesh(entry).expect("new deposits are untouched");
+            let lift = visual.mesh.support_meters(up) * visual.side_meters + 0.005;
+            let offset = up.map(|v| v * lift);
+            entry.body_local_position_meters =
+                std::array::from_fn(|i| entry.body_local_position_meters[i] + offset[i]);
+            entry.deposit = salimon_world::resources::ResourceDeposit::new(
+                entry.deposit.id(),
+                entry.deposit.material(),
+                entry.deposit.position().translated(offset),
+                entry.deposit.remaining_mass_kg(),
+            )
+            .expect("finite terrain placement preserves deposit material and identity");
+            deposits.push(entry);
+        }
     }
     // Stable inspection order, independent of camera movement/query enumeration.
     deposits.sort_by_key(|entry| {
@@ -132,6 +150,70 @@ mod tests {
     use salimon_world::resources::{
         DepositId, FragmentId, RawMaterial, ResourceDeposit, ResourceFragment, ResourceTransform,
     };
+
+    #[test]
+    fn terrain_support_and_default_spacing_cover_enlarged_deposits() {
+        for body in CELESTIAL_BODIES
+            .iter()
+            .filter(|b| b.role == BodyRole::Solid)
+        {
+            for direction in [[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0 / 3.0_f64.sqrt(); 3]] {
+                let position = body
+                    .center
+                    .translated(direction.map(|v| v * body.radius_meters))
+                    .meters();
+                let entries = nearby_deposits(position, 0).unwrap();
+                for entry in &entries {
+                    let mesh = deposit_mesh(*entry).unwrap();
+                    let radial = entry.deposit.position().offset_from(body.center);
+                    let length = radial[0].hypot(radial[1]).hypot(radial[2]);
+                    let up = radial.map(|v| v / length);
+                    let bottom = length
+                        - body.radius_meters
+                        - mesh.mesh.support_meters(up) * mesh.side_meters;
+                    assert!((bottom - 0.005).abs() < 0.001);
+                }
+                let bounds: Vec<_> = entries
+                    .iter()
+                    .map(|entry| {
+                        let mesh = deposit_mesh(*entry).unwrap();
+                        let min: [f64; 3] = std::array::from_fn(|axis| {
+                            let mut up = [0.0; 3];
+                            up[axis] = 1.0;
+                            mesh.center_meters[axis]
+                                - mesh.mesh.support_meters(up) * mesh.side_meters
+                        });
+                        let max: [f64; 3] = std::array::from_fn(|axis| {
+                            let mut down = [0.0; 3];
+                            down[axis] = -1.0;
+                            mesh.center_meters[axis]
+                                + mesh.mesh.support_meters(down) * mesh.side_meters
+                        });
+                        (min, max)
+                    })
+                    .collect();
+                let mut overlaps = 0;
+                for (i, (min_a, max_a)) in bounds.iter().enumerate() {
+                    for (min_b, max_b) in &bounds[i + 1..] {
+                        if !(0..3)
+                            .any(|axis| max_a[axis] < min_b[axis] || max_b[axis] < min_a[axis])
+                        {
+                            overlaps += 1;
+                        }
+                    }
+                }
+                eprintln!(
+                    "spacing audit {} {:?}: {} deposits, {} possible mesh AABB overlaps",
+                    body.name,
+                    direction,
+                    entries.len(),
+                    overlaps
+                );
+                // Audit proximity without changing seeded identities or silently deleting mass.
+                assert_eq!(entries, nearby_deposits(position, 0).unwrap());
+            }
+        }
+    }
 
     #[test]
     fn authored_fragment_variants_follow_identity_and_authoritative_size() {

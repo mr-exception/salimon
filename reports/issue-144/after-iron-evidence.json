@@ -1,0 +1,408 @@
+{
+  "setup": {
+    "scenario": "landed-earth",
+    "seed": 0,
+    "step_ms": 16
+  },
+  "timeout_ms": 240000,
+  "steps": [
+    {
+      "action": {
+        "op": "thruster",
+        "direction": 1
+      }
+    },
+    {
+      "action": {
+        "op": "landing"
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 350,
+        "dy": 0
+      }
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": -350,
+        "dy": 0
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 110
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 36
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 40
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 45
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 40
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "left",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 92
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "left",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 120
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 1427.9966607226334,
+        "dy": 250
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": -48.94515,
+        "dy": -12.34401
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_1",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "slot_1",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": -603.6972859239288,
+        "dy": -229.0200248195574
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 0.044538926658059745,
+        "dy": 14.986046324206848
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 290
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 0.23882820458374113,
+        "dy": 116.57894629483808
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 17
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 0.16268450174827273,
+        "dy": 54.038732670450635
+      }
+    },
+    {
+      "screenshot": "iron-untouched"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "mine",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 1
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "mine",
+        "pressed": false
+      }
+    },
+    {
+      "screenshot": "iron-small-output"
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": -0.04108365801178754,
+        "dy": 0.01164580013744572
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "mine",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 30
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "mine",
+        "pressed": false
+      }
+    },
+    {
+      "screenshot": "iron-growing-output"
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 0.019322890397341138,
+        "dy": 0.008528765201954901
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "mine",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 32
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "mine",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 120
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 782.1610463564878,
+        "dy": 410.99273469866927
+      }
+    },
+    {
+      "screenshot": "iron-full-fragment"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": false
+      }
+    },
+    {
+      "screenshot": "iron-carried"
+    }
+  ]
+}

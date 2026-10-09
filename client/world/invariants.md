@@ -47,3 +47,7 @@
   depleted tombstones, independently of active area queries. Restoration is
   idempotent, never increases mass, and precedes extraction even for stale copies.
   Stream-out/reload never regenerates mined mass or emits duplicate fragments.
+
+- Resource gameplay dimensions use the shared world `resource_size` policy;
+  enlarged bounds never substitute for density-derived solid material volume.
+  See [resource size contract](../world/resource-contracts.md#gameplay-size-policy-144).

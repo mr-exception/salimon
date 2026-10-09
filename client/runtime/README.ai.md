@@ -93,3 +93,7 @@ Slot changes clear mining input; physical pickup clears selection and held minin
 Map toolbar contents and optional selection through `equipment::presentation`
 for gameplay redraws only. Renderer owns rasterization and message stacking;
 keep the toolbar independent of contextual action text and tool equip policy.
+
+For toolbar changes, run the carrying baseline/evidence route: it exercises all
+five selections, F mining rejection for every empty slot, equipped pickup,
+lockout and post-drop explicit selection. See [runner coverage](../../scripts/README.md#toolbar-gameplay-coverage-132).

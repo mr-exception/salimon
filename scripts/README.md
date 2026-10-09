@@ -490,3 +490,25 @@ It is false throughout carrying and after drop until explicit slot 1 selection
 on the surface. Carrying/resource-loop baseline and evidence variants check
 failed pickup preserves selection, all five inputs are blocked while carrying,
 and re-selection does not resume a previous mining hold.
+
+## Toolbar gameplay coverage (#132)
+
+`carrying.json` checks the initial five-slot loadout with no selection and all
+1–5 selection/equip decisions. At a reachable surface deposit, each empty slot
+2–5 rejects a held contextual F mining attempt without creating fragments or
+extracting mass. Slot 1 then equips the visible tool and mines through that same
+input route. Equipped pickup, all-five-slot carrying lockout, deselected drop
+and explicit re-equip are checked in the remainder of the route.
+
+The synchronized evidence variant adds `toolbar-mining-tool-selected` and
+`toolbar-empty-slot-selected`; `carrying-first-fragment` and
+`dropped-toolbar-deselected` establish the other two required states. The
+existing `equipment.slots`, `equipment.selected_slot`, `mining.equipped`,
+`mining.held_item_visible`, `mining.active` and output fields suffice.
+Both routes run through baseline discovery/resource-collection evidence in
+required Linux CI; the portable runtime also executes both JSON contracts.
+
+```sh
+python scripts/salimon-test run scenarios/carrying.json --binary artifacts/build/release/salimon-client
+python scripts/salimon-test run scenarios/evidence/carrying.json --binary artifacts/build/release/salimon-client --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
+```

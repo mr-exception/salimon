@@ -1,7 +1,7 @@
 //! Compose physical carrying with character aim and release from hand height.
 use crate::mining::MiningTool;
 use salimon_character::{CharacterLocation, CharacterSnapshot, ShipFrame};
-use salimon_math::cross;
+use salimon_math::{cross, dot, length};
 use salimon_world::carrying::{WorldObjectId, aimed_fragment};
 use salimon_world::mining::MiningRay;
 use salimon_world::resources::{FragmentId, ResourceTransform};
@@ -104,9 +104,32 @@ pub(crate) fn follow(tool: &mut MiningTool, player: CharacterSnapshot) {
         return;
     };
     let up = player.up.map(f64::from);
-    let right = cross(ray.direction, up);
+    let vertical = dot(ray.direction, up);
+    let planar = std::array::from_fn(|i| ray.direction[i] - up[i] * vertical);
+    let planar_length = length(planar);
+    if planar_length < 1e-9 {
+        return;
+    }
+    let planar = planar.map(|v| v / planar_length);
+    let right = cross(planar, up);
+    let piece = tool
+        .session
+        .fragments()
+        .iter()
+        .find(|piece| piece.id() == id)
+        .expect("carried fragment exists");
+    let clearance = salimon_world::resource_size::fragment_contact_radius_meters(piece.material());
+    // Keep the entire object ahead of the player's vertical capsule even when
+    // looking straight down; eye-only clearance would clip the torso/legs.
+    let support = crate::resource_presentation::fragment_mesh(*piece)
+        .mesh
+        .support_meters(up)
+        * salimon_world::resource_fragments::side_meters(*piece);
+    let height = (-0.18 + vertical * (0.65 + clearance))
+        .max(support + 0.005 - salimon_character::PLAYER_EYE_HEIGHT_METERS);
     let p = std::array::from_fn(|i| {
-        player.eye_position_meters[i] + ray.direction[i] * 0.65 - right[i] * 0.20 - up[i] * 0.18
+        player.eye_position_meters[i] + planar[i] * (0.65 + clearance) - right[i] * 0.20
+            + up[i] * height
     });
     if let Ok(pose) = ResourceTransform::new(position(p), orientation) {
         tool.session.move_carried(pose);
@@ -117,6 +140,7 @@ pub(crate) fn follow(tool: &mut MiningTool, player: CharacterSnapshot) {
 pub(crate) fn release_pose(
     tool: &MiningTool,
     player: CharacterSnapshot,
+    frame: ShipFrame,
 ) -> Option<ResourceTransform> {
     if !matches!(
         player.location,
@@ -129,6 +153,14 @@ pub(crate) fn release_pose(
         .fragments()
         .iter()
         .find(|piece| piece.id() == id)
+        .filter(|piece| {
+            player.location != CharacterLocation::InsideShip
+                || salimon_character::ship_floor_placement(
+                    frame.world_to_local(piece.transform().position().meters()),
+                    salimon_world::resource_size::fragment_contact_radius_meters(piece.material()),
+                )
+                .is_some()
+        })
         .map(|piece| piece.transform())
 }
 
@@ -168,6 +200,82 @@ mod tests {
         .unwrap();
         tool.session.extract(&mut deposit, Duration::from_secs(1));
         tool
+    }
+
+    #[test]
+    fn enlarged_carrying_clears_player_and_ground_at_extreme_pitch_and_rejects_unsafe_drops() {
+        for resource in [
+            ResourceId::IronOre,
+            ResourceId::SilicateRock,
+            ResourceId::WaterIce,
+        ] {
+            for mass in [0.032, 1.0, 2.0] {
+                let mut tool = MiningTool::default();
+                let mut deposit = ResourceDeposit::new(
+                    DepositId {
+                        body: CelestialBodyId::Earth,
+                        local: 1,
+                    },
+                    RawMaterial::new(resource, mass).unwrap(),
+                    position([0.0; 3]),
+                    mass,
+                )
+                .unwrap();
+                tool.session.extract(&mut deposit, Duration::from_secs(1));
+                let piece = tool.session.fragments()[0];
+                assert!(tool.session.pick_up(piece.id()));
+                let radius =
+                    salimon_world::resource_size::fragment_contact_radius_meters(piece.material());
+                for pitch in [-100.0, 0.0, 100.0] {
+                    let player = CharacterSnapshot {
+                        location: CharacterLocation::Surface,
+                        eye_position_meters: [0.0, 1.75, 0.0],
+                        look_target_meters: [1.0, 1.75 + pitch, 0.0],
+                        up: [0.0, 1.0, 0.0],
+                        local_ship_position_meters: None,
+                        doorway_blend_fraction: None,
+                    };
+                    follow(&mut tool, player);
+                    let carried = tool.session.fragments()[0];
+                    let p = carried.transform().position().meters();
+                    assert!(
+                        p[0].hypot(p[2]) > radius + 0.3,
+                        "whole object clears torso and legs"
+                    );
+                    let support = crate::resource_presentation::fragment_mesh(carried)
+                        .mesh
+                        .support_meters([0.0, 1.0, 0.0])
+                        * salimon_world::resource_fragments::side_meters(carried);
+                    assert!(p[1] - support >= 0.0049);
+                    assert_eq!(carried.id(), piece.id());
+                    assert_eq!(carried.material(), piece.material());
+                }
+                let frame = ShipFrame {
+                    origin_meters: [0.0; 3],
+                    axes: [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+                };
+                let eye = [
+                    -5.0,
+                    salimon_character::SHIP_FLOOR_HEIGHT_METERS + 1.75,
+                    0.0,
+                ];
+                let mut player = CharacterSnapshot {
+                    location: CharacterLocation::InsideShip,
+                    eye_position_meters: eye,
+                    look_target_meters: [eye[0], eye[1] - 100.0, 1.0],
+                    up: [0.0, 1.0, 0.0],
+                    local_ship_position_meters: Some(eye),
+                    doorway_blend_fraction: None,
+                };
+                follow(&mut tool, player);
+                assert!(release_pose(&tool, player, frame).is_some());
+                player.eye_position_meters[0] = -7.5;
+                player.look_target_meters = [-8.5, eye[1], 0.0];
+                follow(&mut tool, player);
+                assert!(release_pose(&tool, player, frame).is_none());
+                assert_eq!(tool.session.carried_id(), Some(piece.id()));
+            }
+        }
     }
 
     #[test]

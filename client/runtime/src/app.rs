@@ -406,7 +406,7 @@ impl ClientApplication {
             }
         } else if self.mining.session.carried_id().is_none() {
             "No world object carried"
-        } else if let Some(pose) = crate::carrying::release_pose(&self.mining, player) {
+        } else if let Some(pose) = crate::carrying::release_pose(&self.mining, player, frame) {
             let id = self
                 .mining
                 .session

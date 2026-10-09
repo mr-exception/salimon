@@ -18,7 +18,7 @@ stable key and catalog entry. Per-planet generation inputs live in `salimon_worl
 
 `RawMaterial::new` validates positive finite kilograms and derives positive
 finite solid volume as mass / density. Fragment volume does not describe a mesh
-or bounding box; later physical handling chooses a shape that fits this volume.
+or bounding box; gameplay geometry applies the separate shared size policy.
 Mass, volume, and material identity have no public mutation path.
 
 `DepositId` combines celestial-body identity with a generator-assigned local ID.
@@ -151,7 +151,7 @@ must end its participation in the output tail when #46 adds carrying.
 
 Pieces have finite absolute poses and identity orientation. They emerge near
 the source with enough height for a full-size piece. Side length is the cube
-root of solid volume. Runtime applies an ejection impulse, gravity, and
+root of solid volume multiplied by the shared gameplay scale. Runtime applies an ejection impulse, gravity, and
 fragment contacts while the world crate owns mass, identity, and provenance.
 Runtime maps the same authoritative pieces into distinct material silhouettes
 and nearby-entity inspection.
@@ -173,3 +173,29 @@ Dropping restores neither the previous slot nor a held mining input; selecting
 1–5 explicitly becomes available immediately. This affects no material, mass,
 fragment identity or persistence rule. See the
 [runtime regression contract](../runtime/architecture.md#carrying-and-equipment-regression-contract-131).
+
+## Gameplay size policy (#144)
+
+`resource_size.rs` is the single size authority: `RESOURCE_LINEAR_SCALE = 10`.
+Solid volume is still `mass / density`; fragment gameplay side is
+`10 * cbrt(solid volume)` and deposit gameplay radius is
+`10 * cbrt(3 * initial solid volume / (4π))`. All authored variants keep the
+same vertices and uniformly scale by 10, including their actual extents.
+This is a gameplay exaggeration, not a density change; mass labels, 2 kg/s yield,
+2 kg fragment cap and conservation remain unchanged.
+
+Growing fragments scale with current mass; picking up seals growth. Deposits
+retain initial bounds and placement while partly mined, then disappear at zero
+remaining mass. Runtime raises each deposit along the body normal by its actual
+variant vertex support plus 5 mm. This deterministic placement is independent
+of remaining mass and is restored alongside the same ID/variant on requery.
+Generation query membership still uses the original surface anchors; size does
+not change seed arithmetic or distribution spacing (25–80 m).
+
+Spawn lanes reserve full fragment size and scale their spacing with it rather
+than repeating tiny offsets. Runtime supplies a circumscribed cube sphere for
+pair contacts/ship containment, and actual authored support for terrain/deck
+contacts. World pickup still intersects the enlarged cube; mining and prompts
+consume the enlarged deposit sphere. Carried centers stay horizontally ahead of the player capsule by the cube
+sphere radius plus the hand offset at every pitch, and clamp to ground support. Unsafe hull/furniture floor drops retain
+the carried identity. Loose fragments remain supported in ship-local metres.

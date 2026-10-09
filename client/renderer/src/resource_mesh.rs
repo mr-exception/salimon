@@ -42,6 +42,27 @@ pub enum ResourceMesh {
     IronDepositLedge,
     IronDepositRubble,
 }
+impl ResourceMesh {
+    fn index(self) -> usize {
+        self as usize
+    }
+
+    /// Distance below the authored origin along a unit surface normal, at unit scale.
+    /// Runtime uses this geometry query for terrain/deck placement, never GPU data.
+    pub fn support_meters(self, up: [f64; 3]) -> f64 {
+        static MESHES: std::sync::LazyLock<[Vec<[f32; FLOATS]>; 18]> =
+            std::sync::LazyLock::new(|| {
+                ASSETS.map(|bytes| {
+                    geometry(bytes).expect("checked-in resource geometry passes asset validation")
+                })
+            });
+        MESHES[self.index()]
+            .iter()
+            .map(|vertex| -(0..3).map(|i| f64::from(vertex[i]) * up[i]).sum::<f64>())
+            .fold(0.0, f64::max)
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ResourceMeshInstance {
     pub mesh: ResourceMesh,
@@ -133,26 +154,7 @@ fn relative_vertices(
                 "invalid pose or side",
             ));
         }
-        let mesh = match instance.mesh {
-            ResourceMesh::IceShard => 0,
-            ResourceMesh::IceCluster => 1,
-            ResourceMesh::SilicateSlab => 2,
-            ResourceMesh::SilicateRidge => 3,
-            ResourceMesh::IronChunk => 4,
-            ResourceMesh::IronShard => 5,
-            ResourceMesh::IceDepositSpire => 6,
-            ResourceMesh::IceDepositCrown => 7,
-            ResourceMesh::IceDepositRidge => 8,
-            ResourceMesh::IceDepositShelf => 9,
-            ResourceMesh::SilicateDepositBoulder => 10,
-            ResourceMesh::SilicateDepositSlab => 11,
-            ResourceMesh::SilicateDepositRidge => 12,
-            ResourceMesh::SilicateDepositScree => 13,
-            ResourceMesh::IronDepositNodule => 14,
-            ResourceMesh::IronDepositVein => 15,
-            ResourceMesh::IronDepositLedge => 16,
-            ResourceMesh::IronDepositRubble => 17,
-        };
+        let mesh = instance.mesh.index();
         for vertex in &meshes[mesh] {
             for (axis, value) in vertex.iter().take(3).enumerate() {
                 output.push(
@@ -334,6 +336,82 @@ impl ResourceMeshRenderer {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn every_authored_variant_enlarges_actual_extents_and_reports_ground_support() {
+        let meshes = ASSETS.map(|asset| geometry(asset).unwrap());
+        let camera = CameraFrame {
+            position_meters: [1e12; 3],
+            target_meters: [1e12, 1e12, 1e12 - 1.0],
+            up: [0.0, 1.0, 0.0],
+            vertical_fov_radians: 1.0,
+            near_plane_meters: 0.1,
+        };
+        for mesh in [
+            ResourceMesh::IceShard,
+            ResourceMesh::IceCluster,
+            ResourceMesh::SilicateSlab,
+            ResourceMesh::SilicateRidge,
+            ResourceMesh::IronChunk,
+            ResourceMesh::IronShard,
+            ResourceMesh::IceDepositSpire,
+            ResourceMesh::IceDepositCrown,
+            ResourceMesh::IceDepositRidge,
+            ResourceMesh::IceDepositShelf,
+            ResourceMesh::SilicateDepositBoulder,
+            ResourceMesh::SilicateDepositSlab,
+            ResourceMesh::SilicateDepositRidge,
+            ResourceMesh::SilicateDepositScree,
+            ResourceMesh::IronDepositNodule,
+            ResourceMesh::IronDepositVein,
+            ResourceMesh::IronDepositLedge,
+            ResourceMesh::IronDepositRubble,
+        ] {
+            let instance = ResourceMeshInstance {
+                mesh,
+                center_meters: [1e12; 3],
+                side_meters: 0.1,
+            };
+            let before = relative_vertices(&meshes, &[instance], camera).unwrap();
+            let after = relative_vertices(
+                &meshes,
+                &[ResourceMeshInstance {
+                    side_meters: 1.0,
+                    ..instance
+                }],
+                camera,
+            )
+            .unwrap();
+            for axis in 0..3 {
+                let extent = |vertices: &[f32]| {
+                    let values = vertices.as_chunks::<FLOATS>().0;
+                    let min = values.iter().map(|v| v[axis]).fold(f32::INFINITY, f32::min);
+                    let max = values
+                        .iter()
+                        .map(|v| v[axis])
+                        .fold(f32::NEG_INFINITY, f32::max);
+                    f64::from(max - min)
+                };
+                assert!(extent(&before) > 0.0);
+                assert!((extent(&after) / extent(&before) - 10.0).abs() < 0.00001);
+            }
+            for up in [
+                [0.0, 1.0, 0.0],
+                [0.0, 0.0, 1.0],
+                [1.0, 0.0, 0.0],
+                [1.0 / 3.0_f64.sqrt(); 3],
+            ] {
+                let support = mesh.support_meters(up);
+                let vertices = geometry(ASSETS[mesh.index()]).unwrap();
+                let heights: Vec<_> = vertices
+                    .iter()
+                    .map(|v| support + (0..3).map(|i| f64::from(v[i]) * up[i]).sum::<f64>())
+                    .collect();
+                assert!(heights.iter().all(|h| *h >= -1e-12));
+                assert!(heights.iter().any(|h| h.abs() < 1e-12));
+            }
+        }
+    }
+
     #[test]
     fn authored_exports_are_distinct_and_bounded() {
         let meshes = ASSETS.map(|asset| geometry(asset).unwrap());

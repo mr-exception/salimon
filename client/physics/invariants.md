@@ -15,3 +15,6 @@
 - Identity, mass, material, orientation, carried state, nearby activation, world
   pose validation and frame conversion remain caller-owned.
 - No runtime, renderer, winit, GPU, world catalog or resource dependency.
+
+- Caller-supplied ground support is finite and positive, independent of contact
+  radius; terrain/floor projection uses support, pairs/containment use radius.

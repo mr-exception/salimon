@@ -1,5 +1,4 @@
 //! Stateless, bounded cube-sphere sampling. No full-planet allocation or GPU types.
-use std::f64::consts::PI;
 
 use crate::resource_distribution::BodyResourceDistribution;
 use crate::resources::{DepositId, RawMaterial, ResourceDeposit};
@@ -10,7 +9,7 @@ use crate::{BodyRole, CelestialBody, WorldPosition};
 pub struct SurfaceDeposit {
     pub deposit: ResourceDeposit,
     pub body_local_position_meters: [f64; 3],
-    /// Spherical physical bound derived from initial solid volume (not a mesh).
+    /// Enlarged gameplay bound; initial solid volume and mass remain separate.
     pub bounds_radius_meters: f64,
 }
 
@@ -152,7 +151,7 @@ pub fn materialize_nearby_deposits(
                     output.push(SurfaceDeposit {
                         deposit,
                         body_local_position_meters: position,
-                        bounds_radius_meters: (3.0 * material.volume_m3() / (4.0 * PI)).cbrt(),
+                        bounds_radius_meters: crate::resource_size::deposit_radius_meters(material),
                     });
                 }
             }

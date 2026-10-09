@@ -211,3 +211,7 @@ HUD band. Global/transient `BottomCenter` action images are converted to
 height. At tiny sizes an unfittable message is hidden; it never covers the toolbar.
 World prompts keep object-relative placement and depth visibility. Total draw
 counts include the toolbar. No inventory/tool behavior lives in this raster.
+
+Resource mesh `support_meters(up)` queries cached validated authored vertices on
+the CPU; runtime uses the result for terrain/deck placement. Mesh scale comes
+from the world gameplay size policy; material solid volume remains separate.

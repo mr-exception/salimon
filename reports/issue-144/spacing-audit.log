@@ -1,0 +1,22 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-b0102d0ece65d084)
+
+running 1 test
+spacing audit Mercury [0.0, 1.0, 0.0]: 41 deposits, 0 possible mesh AABB overlaps
+spacing audit Mercury [0.0, 0.0, 1.0]: 34 deposits, 0 possible mesh AABB overlaps
+spacing audit Mercury [0.5773502691896258, 0.5773502691896258, 0.5773502691896258]: 200 deposits, 0 possible mesh AABB overlaps
+spacing audit Venus [0.0, 1.0, 0.0]: 57 deposits, 0 possible mesh AABB overlaps
+spacing audit Venus [0.0, 0.0, 1.0]: 61 deposits, 0 possible mesh AABB overlaps
+spacing audit Venus [0.5773502691896258, 0.5773502691896258, 0.5773502691896258]: 306 deposits, 0 possible mesh AABB overlaps
+spacing audit Earth [0.0, 1.0, 0.0]: 53 deposits, 0 possible mesh AABB overlaps
+spacing audit Earth [0.0, 0.0, 1.0]: 55 deposits, 0 possible mesh AABB overlaps
+spacing audit Earth [0.5773502691896258, 0.5773502691896258, 0.5773502691896258]: 273 deposits, 2 possible mesh AABB overlaps
+spacing audit Moon [0.0, 1.0, 0.0]: 48 deposits, 0 possible mesh AABB overlaps
+spacing audit Moon [0.0, 0.0, 1.0]: 54 deposits, 0 possible mesh AABB overlaps
+spacing audit Moon [0.5773502691896258, 0.5773502691896258, 0.5773502691896258]: 257 deposits, 0 possible mesh AABB overlaps
+spacing audit Mars [0.0, 1.0, 0.0]: 33 deposits, 0 possible mesh AABB overlaps
+spacing audit Mars [0.0, 0.0, 1.0]: 39 deposits, 0 possible mesh AABB overlaps
+spacing audit Mars [0.5773502691896258, 0.5773502691896258, 0.5773502691896258]: 184 deposits, 2 possible mesh AABB overlaps
+test resource_presentation::tests::terrain_support_and_default_spacing_cover_enlarged_deposits ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 74 filtered out; finished in 0.35s

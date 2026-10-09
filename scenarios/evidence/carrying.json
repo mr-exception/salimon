@@ -1080,7 +1080,7 @@
     {
       "assert": {
         "path": "world.fragments.0.side_meters",
-        "approx": 0.0892577266776226,
+        "approx": 0.8925772667762261,
         "tolerance": 1e-09
       }
     },
@@ -1418,8 +1418,8 @@
     {
       "action": {
         "op": "look",
-        "dx": 171.38672847056907,
-        "dy": 102.04000492761612
+        "dx": 524.1676598725757,
+        "dy": -9.260359622589108
       }
     },
     {
@@ -1635,8 +1635,62 @@
     {
       "action": {
         "op": "look",
-        "dx": -99.86114406131254,
-        "dy": 12.850536126386766
+        "dx": -452.6420754633191,
+        "dy": 124.150900676592
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 583.0757113686531,
+        "dy": -206.09320291104362
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 41
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 1.1273311346871762,
+        "dy": 138.27227893907
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 6
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
       }
     },
     {
@@ -1649,6 +1703,13 @@
       "assert": {
         "path": "resource_ui.context",
         "contains": "Only one world object - F to drop first"
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 714.0,
+        "dy": 0.0
       }
     },
     {
@@ -1905,6 +1966,20 @@
       }
     },
     {
+      "action": {
+        "op": "look",
+        "dx": -714.0462609054586,
+        "dy": 41.41252863113605
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 0.01063575525530244,
+        "dy": -0.0031260926643254675
+      }
+    },
+    {
       "assert": {
         "path": "carrying.target_id",
         "equals": 2
@@ -1965,7 +2040,7 @@
     {
       "assert": {
         "path": "world.fragments.1.distance_to_player_meters",
-        "lt": 1
+        "lt": 2.2
       }
     },
     {

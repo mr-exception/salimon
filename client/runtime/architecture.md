@@ -274,3 +274,12 @@ evidence variant adds equipped/empty-selected checkpoints to carrying and
 post-drop screenshots. Existing inspection fields establish loadout, selection,
 held mesh, mining eligibility and conserved output; no test-only gameplay
 mutation or new protocol action is needed. See [runner coverage](../../scripts/README.md#toolbar-gameplay-coverage-132).
+
+## Enlarged resource geometry (#144)
+
+The world size policy scales fragments/deposits by 10 in each dimension without
+changing mass. `resource_presentation` lifts generated deposit centers using
+renderer-neutral CPU vertex support from the selected immutable mesh. The
+fragment adapter sends separate conservative contact radius and actual ground
+support to physics. Carrying clears the entire cube around the player and rejects
+ship floor drops whose enlarged footprint crosses hull/furniture proxies.

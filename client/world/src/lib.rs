@@ -17,6 +17,7 @@ pub mod mining;
 pub mod resource_distribution;
 pub mod resource_fragments;
 pub mod resource_generation;
+pub mod resource_size;
 pub mod resources;
 
 pub use camera::{CameraCommand, CameraPrototype, CameraSnapshot, TransitionPhase, WorldSnapshot};

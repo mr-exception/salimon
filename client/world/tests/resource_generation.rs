@@ -51,8 +51,11 @@ fn deterministic_bounded_surface_geometry_and_reload_identity() {
                     generated.bounds_radius_meters.is_finite()
                         && generated.bounds_radius_meters > 0.0
                 );
-                let volume =
-                    4.0 / 3.0 * std::f64::consts::PI * generated.bounds_radius_meters.powi(3);
+                let volume = 4.0 / 3.0
+                    * std::f64::consts::PI
+                    * (generated.bounds_radius_meters
+                        / salimon_world::resource_size::RESOURCE_LINEAR_SCALE)
+                        .powi(3);
                 assert!((volume - generated.deposit.material().volume_m3()).abs() < 1e-10);
                 assert_eq!(generated.deposit.position(), body.center.translated(local));
                 assert_eq!(

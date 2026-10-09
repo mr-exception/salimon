@@ -1,0 +1,101 @@
+[
+  {
+    "status": "passed",
+    "steps_completed": 143,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "scenario": "artifacts/issue144/before-mining.json",
+    "duration_ms": 12835
+  },
+  {
+    "status": "passed",
+    "steps_completed": 320,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "scenario": "artifacts/issue144/before-carrying.json",
+    "duration_ms": 23982
+  },
+  {
+    "status": "passed",
+    "steps_completed": 249,
+    "setup": {
+      "scenario": "resource-approach",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "scenario": "artifacts/issue144/before-resource-loop.json",
+    "duration_ms": 20583
+  },
+  {
+    "status": "passed",
+    "steps_completed": 249,
+    "setup": {
+      "scenario": "resource-approach",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "scenario": "/workspace/scratch/8f31dc79181b/salimon/scenarios/evidence/resource-loop.json",
+    "duration_ms": 26402
+  },
+  {
+    "status": "passed",
+    "steps_completed": 65,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "scenario": "/workspace/scratch/8f31dc79181b/salimon/scenarios/evidence/resource-deposits.json",
+    "duration_ms": 5568
+  },
+  {
+    "status": "passed",
+    "steps_completed": 141,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "scenario": "/workspace/scratch/8f31dc79181b/salimon/scenarios/evidence/resource-streaming.json",
+    "duration_ms": 18785
+  },
+  {
+    "status": "passed",
+    "steps_completed": 263,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "scenario": "/workspace/scratch/8f31dc79181b/salimon/scenarios/evidence/fragment-transfer.json",
+    "duration_ms": 21179
+  },
+  {
+    "status": "passed",
+    "steps_completed": 143,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "scenario": "/workspace/scratch/8f31dc79181b/salimon/scenarios/evidence/mining.json",
+    "duration_ms": 15822
+  },
+  {
+    "status": "passed",
+    "steps_completed": 331,
+    "setup": {
+      "scenario": "landed-earth",
+      "seed": 0,
+      "step_ms": 16
+    },
+    "scenario": "/workspace/scratch/8f31dc79181b/salimon/scenarios/evidence/carrying.json",
+    "duration_ms": 29420
+  }
+]

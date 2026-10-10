@@ -289,6 +289,14 @@ mod tests {
         let id = original.id();
         let local = [-5.8, 0.4, 0.0];
         tool.ship_fragments.insert(id, local);
+        let orientation = [0.0, 0.0, 0.3_f64.sin(), 0.3_f64.cos()];
+        tool.fragment_motion.insert(
+            id,
+            crate::fragment_physics::FragmentMotion {
+                ship_orientation: Some(orientation),
+                ..Default::default()
+            },
+        );
         for axes in [
             [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
             [[0.0, 1.0, 0.0], [-1.0, 0.0, 0.0], [0.0, 0.0, 1.0]],
@@ -303,6 +311,10 @@ mod tests {
                 assert_eq!(piece.id(), id);
                 assert_eq!(piece.source(), original.source());
                 assert_eq!(piece.material(), original.material());
+                let expected = crate::fragment_physics::to_world_orientation(frame, orientation);
+                for (actual, expected) in piece.transform().orientation_xyzw().iter().zip(expected) {
+                    assert!((actual - expected).abs() < 1e-12);
+                }
                 for (actual, expected) in frame
                     .world_to_local(piece.transform().position().meters())
                     .iter()

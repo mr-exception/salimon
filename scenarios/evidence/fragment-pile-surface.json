@@ -21,7 +21,20 @@
     {
       "action": {
         "op": "step",
-        "frames": 360
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 120,
+        "dy": 20
       }
     },
     {

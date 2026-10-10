@@ -531,7 +531,7 @@ Use the standard platform screenshot/display setup. Compare checkpoints for
 motion and contact gaps; screenshots alone do not prove conserved mass or support
 removal, which the focused world/physics/runtime regressions cover.
 
-`aim_fragment` turns the E2E camera toward the current center of an existing
+`aim_fragment` turns the E2E camera toward the current pickup bounds of an existing
 `fragment_id` using mouse-look deltas. It changes no object/player position and
 does not bypass pickup range, occlusion, or the normal F key contract. Scenario
 pickup checkpoints use it because rotated convex piles settle differently.

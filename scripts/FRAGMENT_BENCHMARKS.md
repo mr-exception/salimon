@@ -90,8 +90,15 @@ rather than skipping updates or weakening interaction gates.
   triangles cover only the resource batch (including deposits).
 - GPU durations are asynchronously completed **latest** pass values, potentially
   repeated/stale; pending/unsupported remain explicit. No blocking timing readback.
-- Every selected object is simulated. `awake_objects` is selected population;
-  `sleeping_objects` is null because there is no sleeping implementation.
+- `objects_simulated` is the selected snapshot population (legacy field name).
+  `awake_objects`/`sleeping_objects` report persistent activation after the update;
+  `integrated_objects` counts actual object-substep visits. `sleeping_observed`
+  requires the entire selected population asleep throughout the sample window.
+  `settled_observed` remains the distinct velocity-rest observation. Fully sleeping
+  solver counters are zero; snapshot/cache/writeback and rendering remain measured.
+  `physics_activation_ms` isolates cache validation and post-solve support/dwell
+  work (in-solver sweep wake is part of total solver cost).
+  The stateless pre-#156 baseline contains null sleep counters; do not synthesize them.
 - Samples include unclamped wall-frame intervals, simulation deltas, median/p95/
   p99/max and >16.67ms/>50ms spike counts. Bounded deterministic decimation reports
   retained samples/observed updates/stride. Spike counts then describe retained

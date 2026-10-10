@@ -38,6 +38,14 @@ class BenchmarkTests(unittest.TestCase):
         self.assertIsNone(summary["metrics"]["gpu_latest_ms"])
         self.assertTrue(summary["settled_observed"])
 
+    def test_sleep_counters_distinguish_velocity_rest_from_persistent_sleep(self):
+        result = self.result()
+        self.assertFalse(summarize(result)["sleeping_observed"])
+        result["samples"][0].update(awake_objects=0, sleeping_objects=1, integrated_objects=0)
+        summary = summarize(result)
+        self.assertTrue(summary["sleeping_observed"])
+        self.assertEqual(summary["metrics"]["sleeping_objects"]["median"], 1)
+
     def test_missing_samples_loss_mass_and_duplicate_identity_fail(self):
         for mutation in (lambda r: r.update(samples=[]), lambda r: r.update(accounting_preserved=False),
             lambda r: r["accounting"].update(extracted_mass_kg=3),

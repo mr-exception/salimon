@@ -13,11 +13,11 @@ from pathlib import Path
 
 COUNTS = (0, 10, 25, 50, 100, 250, 500, 1000)
 METRICS = ("frame_ms", "cpu_update_ms", "cpu_simulation_ms", "cpu_scene_prepare_ms", "physics_total_ms", "physics_adapter_ms",
-           "physics_integration_ms", "physics_contact_ms", "cpu_render_ms",
+           "physics_integration_ms", "physics_contact_ms", "physics_activation_ms", "cpu_render_ms",
            "resource_prepare_ms", "resource_upload_ms", "gpu_latest_ms", "pair_visits",
            "radius_candidates", "narrow_phase_tests", "contacts", "substeps",
            "matrix_allocations", "projection_storage_bytes", "resource_upload_bytes",
-           "resource_triangles", "draw_calls", "moving_objects", "objects_simulated")
+           "resource_triangles", "draw_calls", "moving_objects", "objects_simulated", "awake_objects", "sleeping_objects", "integrated_objects")
 
 
 def distribution(values):
@@ -46,6 +46,7 @@ def summarize(result):
             "samples_retained": len(result["samples"]), "tail_statistics_reliable": len(result["samples"]) >= 100, "updates_observed": result.get("updates_observed"),
             "sampling_stride": result.get("sampling_stride", 1), "metrics": metrics,
             "settled_observed": all(s["moving_objects"] == 0 for s in result["samples"]),
+            "sleeping_observed": all(s.get("sleeping_objects") == result["config"]["count"] for s in result["samples"]),
             "active_observed": any(s["moving_objects"] > 0 for s in result["samples"]),
             "median_interval_fps": 1000 / frame["median"] if frame and frame["median"] > 0 else None}
 

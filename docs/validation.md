@@ -106,3 +106,12 @@ exact commands, passed/failed/skipped/not-run status, OS/tool versions and
 limitations. Promote applicable screenshots plus structured state/logs and
 link the report from the issue/PR. Never claim GPU, Blender or hardware coverage
 from CPU tests alone.
+
+## Fragment profiling (#155)
+
+Use [the benchmark guide](../scripts/FRAGMENT_BENCHMARKS.md) for opt-in 500/1,000
+release matrices and reference-machine settings. CPU-only CI measurements and
+Linux software Vulkan do not establish native FPS. The ordinary workspace tests
+include large-load conservation/profiler parity/carrying/frame regressions; the
+native default suite includes `scenarios/fragment-load.json`. Record actual
+settling and sample sufficiency before applying performance gates.

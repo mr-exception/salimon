@@ -56,6 +56,7 @@ pub(crate) struct Config {
     pub(crate) scenario: Scenario,
     pub(crate) seed: u64,
     pub(crate) step: Duration,
+    pub(crate) fragment_load: Option<(usize, crate::benchmark_fixture::Layout)>,
 }
 
 pub(crate) fn parse_args(args: impl IntoIterator<Item = String>) -> Result<Option<Config>, String> {
@@ -64,6 +65,8 @@ pub(crate) fn parse_args(args: impl IntoIterator<Item = String>) -> Result<Optio
     let mut scenario = None;
     let mut seed = None;
     let mut step = None;
+    let mut fragment_count = None;
+    let mut fragment_layout = None;
     while let Some(arg) = args.next() {
         if arg == "--e2e" {
             if enabled {
@@ -93,21 +96,44 @@ pub(crate) fn parse_args(args: impl IntoIterator<Item = String>) -> Result<Optio
                 }
                 step = Some(Duration::from_millis(millis));
             }
-            "--scenario" | "--seed" | "--step-ms" => return Err(format!("{arg} specified twice")),
+            "--fragment-count" if fragment_count.is_none() => {
+                let count = value
+                    .parse::<usize>()
+                    .map_err(|_| "--fragment-count must be 0..1000")?;
+                if count > 1000 {
+                    return Err("--fragment-count must be 0..1000".into());
+                }
+                fragment_count = Some(count);
+            }
+            "--fragment-layout" if fragment_layout.is_none() => {
+                fragment_layout = Some(crate::benchmark_fixture::Layout::parse(&value)?)
+            }
+            "--scenario" | "--seed" | "--step-ms" | "--fragment-count" | "--fragment-layout" => {
+                return Err(format!("{arg} specified twice"));
+            }
             _ => return Err(format!("unknown argument '{arg}'")),
         }
     }
     if !enabled {
-        return if scenario.is_some() || seed.is_some() || step.is_some() {
+        return if scenario.is_some()
+            || seed.is_some()
+            || step.is_some()
+            || fragment_count.is_some()
+            || fragment_layout.is_some()
+        {
             Err("scenario options require --e2e".into())
         } else {
             Ok(None)
         };
     }
+    if fragment_layout.is_some() && fragment_count.is_none() {
+        return Err("--fragment-layout requires --fragment-count".into());
+    }
     Ok(Some(Config {
         scenario: scenario.unwrap_or(Scenario::LandedEarth),
         seed: seed.unwrap_or(0),
         step: step.unwrap_or(Duration::from_millis(16)),
+        fragment_load: fragment_count.map(|n| (n, fragment_layout.unwrap_or_default())),
     }))
 }
 
@@ -183,6 +209,17 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
     ) != (snapshot.flight_state == FlightState::Flying)
     {
         return Err("scenario setup failed: unexpected ship flight state".into());
+    }
+    if let Some((count, layout)) = config.fragment_load {
+        if config.scenario == Scenario::FragmentPile {
+            return Err("fragment-pile already owns its fixture".into());
+        }
+        if layout == crate::benchmark_fixture::Layout::Surface
+            && config.scenario != Scenario::LandedEarth
+        {
+            return Err("surface populations require landed-earth".into());
+        }
+        crate::benchmark_fixture::initialize(app, count, layout, config.seed, false)?;
     }
     app.update_clock.set_fixed_step(config.step);
     app.e2e_config = Some(config);
@@ -336,6 +373,7 @@ mod tests {
     #[test]
     fn same_seed_produces_same_initial_state_and_fixed_updates() {
         let config = Config {
+            fragment_load: None,
             scenario: Scenario::OrbitMoon,
             seed: 42,
             step: Duration::from_millis(20),
@@ -367,6 +405,7 @@ mod tests {
         initialize(
             &mut landed,
             Config {
+                fragment_load: None,
                 scenario: Scenario::LandedEarth,
                 seed: 0,
                 step: Duration::from_millis(16),
@@ -383,6 +422,7 @@ mod tests {
         initialize(
             &mut cockpit,
             Config {
+                fragment_load: None,
                 scenario: Scenario::CockpitEarth,
                 seed: 0,
                 step: Duration::from_millis(16),
@@ -394,6 +434,7 @@ mod tests {
         initialize(
             &mut orbit,
             Config {
+                fragment_load: None,
                 scenario: Scenario::OrbitEarth,
                 seed: 1,
                 step: Duration::from_millis(16),
@@ -404,6 +445,7 @@ mod tests {
         initialize(
             &mut orbit,
             Config {
+                fragment_load: None,
                 scenario: Scenario::OrbitEarth,
                 seed: 2,
                 step: Duration::from_millis(16),

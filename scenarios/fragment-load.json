@@ -1,0 +1,22 @@
+{
+  "setup": {"scenario": "landed-earth", "seed": 155, "step_ms": 16, "fragment_count": 500, "fragment_layout": "scattered"},
+  "timeout_ms": 120000,
+  "steps": [
+    {"assert": {"path": "world.fragment_count", "equals": 500}},
+    {"assert": {"path": "world.fragment_mass_kg", "equals": 625.0}},
+    {"assert": {"path": "world.fragments.0.id", "equals": 1}},
+    {"assert": {"path": "world.fragments.499.id", "equals": 500}},
+    {"action": {"op": "step", "frames": 1}},
+    {"assert": {"path": "world.fragment_count", "equals": 500}},
+    {"assert": {"path": "world.fragment_mass_kg", "equals": 625.0}},
+    {"assert": {"path": "world.fragments.0.reference_frame", "equals": "ship"}},
+    {"action": {"op": "look", "dx": 350, "dy": 0}},
+    {"action": {"op": "interact"}},
+    {"assert": {"path": "player.location", "equals": "Cockpit"}},
+    {"action": {"op": "landing"}},
+    {"assert": {"path": "ship.flight_state", "equals": "AssistedTakeoff { body: Earth }"}},
+    {"action": {"op": "step", "frames": 1}},
+    {"assert": {"path": "world.fragment_count", "equals": 500}},
+    {"assert": {"path": "world.fragment_mass_kg", "equals": 625.0}}
+  ]
+}

@@ -215,3 +215,14 @@ counts include the toolbar. No inventory/tool behavior lives in this raster.
 Resource mesh `support_meters(up)` queries cached validated authored vertices on
 the CPU; runtime uses the result for terrain/deck placement. Mesh scale comes
 from the world gameplay size policy; material solid volume remains separate.
+
+## Resource batch measurements (#155)
+
+`RenderStats.resource_batch` reports transformed-vertex preparation time, CPU
+encoding/queue-enqueue time, queued vertex plus projection-uniform bytes,
+submitted resource triangles and temporary transformed-vertex capacity. These
+are resource-batch measurements, not total GPU traffic/allocator totals. Vertex
+buffer growth is included in preparation; triangles include deposits and
+fragments submitted by runtime, even when hidden/behind the camera. Existing GPU
+pass readback stays asynchronous and reports the latest completed duration,
+which can be older than the current frame. No timing readback waits are added.

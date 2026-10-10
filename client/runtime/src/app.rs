@@ -53,6 +53,17 @@ const RENDER_RETRY_DELAY: Duration = Duration::from_millis(50);
 const IDLE_RETRY_DELAY: Duration = Duration::from_millis(250);
 
 pub(crate) fn run(config: Option<e2e::Config>) -> Result<(), RunError> {
+    run_config(config, None)
+}
+
+pub(crate) fn run_benchmark(config: crate::benchmark::Config) -> Result<(), RunError> {
+    run_config(None, Some(config))
+}
+
+fn run_config(
+    config: Option<e2e::Config>,
+    benchmark: Option<crate::benchmark::Config>,
+) -> Result<(), RunError> {
     let event_loop = EventLoop::new()
         .map_err(|error| RunError::new("failed to create native event loop", error))?;
     event_loop.set_control_flow(ControlFlow::Wait);
@@ -61,6 +72,11 @@ pub(crate) fn run(config: Option<e2e::Config>) -> Result<(), RunError> {
     if let Some(config) = config {
         e2e::initialize(&mut application, config)
             .map_err(|error| RunError::new("E2E setup failed", error))?;
+    }
+    if let Some(config) = benchmark {
+        crate::benchmark::initialize(&mut application, config)
+            .map_err(|error| RunError::new("benchmark fixture failed", error))?;
+        application.benchmark = Some(crate::benchmark::Recorder::new(config, &application));
     }
     event_loop
         .run_app(&mut application)
@@ -96,6 +112,7 @@ impl fmt::Display for RunError {
 impl Error for RunError {}
 
 pub(crate) struct ClientApplication {
+    pub(crate) benchmark: Option<crate::benchmark::Recorder>,
     window: Option<Arc<Window>>,
     renderer: Option<Renderer>,
     frame_clock: FrameClock,
@@ -124,6 +141,7 @@ pub(crate) struct ClientApplication {
 impl Default for ClientApplication {
     fn default() -> Self {
         Self {
+            benchmark: None,
             window: None,
             renderer: None,
             frame_clock: FrameClock::default(),
@@ -193,6 +211,7 @@ impl ClientApplication {
             self.window.as_ref().cloned().ok_or_else(|| {
                 RunError::new("failed to initialize renderer", "window is missing")
             })?;
+        let physical_size = window.inner_size();
         let size = surface_size(&window);
         let renderer = pollster::block_on(Renderer::new(window, size))
             .map_err(|error| RunError::new("failed to initialize renderer", error))?;
@@ -204,6 +223,9 @@ impl ClientApplication {
             info.device_type,
             info.timestamp_queries_supported
         );
+        if let Some(benchmark) = &mut self.benchmark {
+            benchmark.set_renderer(info, physical_size.width, physical_size.height);
+        }
         self.renderer = Some(renderer);
         if let Some(config) = self.e2e_config.filter(|_| !self.e2e_ready_sent) {
             println!(
@@ -314,6 +336,13 @@ impl ClientApplication {
         (self.view_mode == ViewMode::Gameplay)
             .then(|| self.mining.held_item(&self.equipment, player, valid_target))
             .flatten()
+    }
+
+    fn world_seed(&self) -> u64 {
+        self.benchmark.as_ref().map_or_else(
+            || self.e2e_config.map_or(0, |config| config.seed),
+            |b| b.config.seed,
+        )
     }
 
     pub(crate) fn e2e_step(&self) -> Option<Duration> {
@@ -506,16 +535,27 @@ impl ClientApplication {
                 self.character.snapshot(frame, surface_frame_for_ship(ship)),
                 frame,
                 door_passable(ship),
-                self.e2e_config.map_or(0, |config| config.seed),
+                self.world_seed(),
             );
-            crate::fragment_physics::advance(
-                &mut self.mining,
-                frame,
-                delta,
-                self.character
-                    .snapshot(frame, surface_frame_for_ship(ship))
-                    .eye_position_meters,
-            );
+            let player = self
+                .character
+                .snapshot(frame, surface_frame_for_ship(ship))
+                .eye_position_meters;
+            let measurements = if self.benchmark.is_some() {
+                crate::fragment_physics::advance_measured(
+                    &mut self.mining,
+                    frame,
+                    delta,
+                    player,
+                    true,
+                )
+            } else {
+                crate::fragment_physics::advance(&mut self.mining, frame, delta, player);
+                Default::default()
+            };
+            if let Some(benchmark) = &mut self.benchmark {
+                benchmark.latest_physics = measurements;
+            }
         }
         self.sync_carried();
         self.action_bar.advance(delta);
@@ -540,6 +580,7 @@ impl ClientApplication {
         if !update_delta.is_zero() {
             self.advance_game(update_delta);
         }
+        let simulation_time = update_started_at.elapsed();
         self.sync_carried();
         let ship_snapshot = self.ship.snapshot();
         let ship_frame = character_ship_frame(ship_snapshot.pose);
@@ -565,7 +606,7 @@ impl ClientApplication {
             character_snapshot,
             ship_frame,
             door_passable(ship_snapshot),
-            self.e2e_config.map_or(0, |config| config.seed),
+            self.world_seed(),
         );
         let fragment_interaction = interaction != Some(InteractionTarget::ExitDoor)
             && (self.mining.session.carried_id().is_some()
@@ -582,7 +623,7 @@ impl ClientApplication {
             character_snapshot,
             ship_frame,
             door_passable(ship_snapshot),
-            self.e2e_config.map_or(0, |config| config.seed),
+            self.world_seed(),
         );
         let ship_context = action_bar_context(monitor_message, interaction).map(|text| {
             crate::resource_context::Prompt {
@@ -625,10 +666,10 @@ impl ClientApplication {
             None
         };
         if self.view_mode == ViewMode::Gameplay {
-            match self.mining.nearby(
-                camera.position_meters,
-                self.e2e_config.map_or(0, |config| config.seed),
-            ) {
+            match self
+                .mining
+                .nearby(camera.position_meters, self.world_seed())
+            {
                 Ok(deposits) => {
                     resource_meshes.extend(
                         deposits
@@ -741,6 +782,28 @@ impl ClientApplication {
                         render_stats.cpu_render_time.as_secs_f64() * 1_000.0,
                         render_stats.gpu_frame_time
                     );
+                }
+                let done = self.benchmark.as_mut().is_some_and(|benchmark| {
+                    benchmark.record(
+                        update_delta,
+                        cpu_update_time,
+                        simulation_time,
+                        Some(render_stats),
+                    )
+                });
+                if done {
+                    let accounting = crate::benchmark::accounting(self);
+                    let result = self
+                        .benchmark
+                        .as_mut()
+                        .expect("active benchmark")
+                        .finish(accounting);
+                    if let Err(error) = result {
+                        self.fail(event_loop, error);
+                    } else {
+                        event_loop.exit();
+                    }
+                    return;
                 }
                 window.request_redraw();
             }

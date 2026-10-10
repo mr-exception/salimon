@@ -1,5 +1,15 @@
 //! Static authored resource meshes, batched into one opaque depth-tested draw.
 use crate::{CameraFrame, DEPTH_FORMAT, RendererError, encode_f32s};
+/// Resource batch measurements; upload time is CPU enqueue/encoding, not GPU transfer.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct ResourceBatchStats {
+    pub prepare_time: std::time::Duration,
+    pub upload_time: std::time::Duration,
+    pub upload_bytes: u64,
+    pub triangles: u32,
+    /// Capacity bytes for transformed f32 vertices (temporary CPU vector).
+    pub scratch_capacity_bytes: u64,
+}
 const FLOATS: usize = 7;
 const ASSETS: [&[u8]; 18] = [
     include_bytes!("../../assets/resources/water-ice-fragment-shard/model.glb"),
@@ -324,7 +334,8 @@ impl ResourceMeshRenderer {
         camera: CameraFrame,
         projection: [f32; 16],
         instances: &[ResourceMeshInstance],
-    ) -> Result<(), RendererError> {
+    ) -> Result<ResourceBatchStats, RendererError> {
+        let started = std::time::Instant::now();
         let vertices = relative_vertices(&self.meshes, instances, camera)?;
         self.count = u32::try_from(vertices.len() / FLOATS)
             .map_err(|e| RendererError::new("resource vertex count", e))?;
@@ -339,11 +350,21 @@ impl ResourceMeshRenderer {
                 mapped_at_creation: false,
             });
         }
+        let prepare_time = started.elapsed();
+        let scratch_capacity_bytes = (vertices.capacity() * 4) as u64;
+        let upload_bytes = 64 + (vertices.len() * 4) as u64;
+        let upload_started = std::time::Instant::now();
         queue.write_buffer(&self.uniform, 0, &encode_f32s(projection));
         if !vertices.is_empty() {
             queue.write_buffer(&self.vertices, 0, &encode_f32s(vertices));
         }
-        Ok(())
+        Ok(ResourceBatchStats {
+            prepare_time,
+            upload_time: upload_started.elapsed(),
+            upload_bytes,
+            triangles: self.count / 3,
+            scratch_capacity_bytes,
+        })
     }
     pub(crate) fn draw<'a>(&'a self, pass: &mut wgpu::RenderPass<'a>) {
         if self.count > 0 {

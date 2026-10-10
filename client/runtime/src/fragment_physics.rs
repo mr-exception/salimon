@@ -1,6 +1,6 @@
 //! Fragment/session adapter for the portable physical-object simulation.
 //! Selects geometry and frames; physical rules live in salimon-physics.
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use salimon_math::{dot, length, sub};
 
@@ -62,9 +62,30 @@ pub(crate) fn release(
 }
 
 pub(crate) fn advance(tool: &mut MiningTool, frame: ShipFrame, delta: Duration, player: [f64; 3]) {
+    advance_measured(tool, frame, delta, player, false);
+}
+
+#[derive(Clone, Copy, Debug, Default)]
+pub(crate) struct Measurements {
+    pub(crate) solver: salimon_physics::StepStats,
+    pub(crate) adapter_time: Duration,
+    pub(crate) total_time: Duration,
+    /// Threshold observation, not a sleeping flag; every selected object is simulated.
+    pub(crate) moving_objects: usize,
+}
+
+pub(crate) fn advance_measured(
+    tool: &mut MiningTool,
+    frame: ShipFrame,
+    delta: Duration,
+    player: [f64; 3],
+    profile: bool,
+) -> Measurements {
+    let started = profile.then(Instant::now);
+    let mut measurements = Measurements::default();
     let elapsed = delta.as_secs_f64();
     if elapsed <= 0.0 {
-        return;
+        return measurements;
     }
     let carried = tool.session.carried_id();
     let pieces: Vec<_> = tool
@@ -125,12 +146,27 @@ pub(crate) fn advance(tool: &mut MiningTool, frame: ShipFrame, delta: Duration, 
         })
         .collect();
     if pieces.is_empty() {
-        return;
+        if let Some(start) = started {
+            measurements.total_time = start.elapsed();
+            measurements.adapter_time = measurements.total_time;
+        }
+        return measurements;
     }
     let mut states: Vec<_> = pieces.iter().map(|(_, state)| state.clone()).collect();
-    salimon_physics::advance(&mut states, delta, |position, radius| {
-        ship_floor_placement(position, radius).is_some()
-    });
+    let solver_start = profile.then(Instant::now);
+    let contains = |position, radius| ship_floor_placement(position, radius).is_some();
+    if profile {
+        measurements.solver = salimon_physics::advance_profiled(&mut states, delta, contains);
+        measurements.moving_objects = states
+            .iter()
+            .filter(|p| length(p.velocity) >= 0.015 || length(p.angular_velocity) >= 0.015)
+            .count();
+    } else {
+        salimon_physics::advance(&mut states, delta, contains);
+    }
+    let solver_time = solver_start
+        .map(|start| start.elapsed())
+        .unwrap_or_default();
     for ((fragment, _), piece) in pieces.into_iter().zip(states) {
         tool.fragment_motion.insert(
             fragment.id(),
@@ -158,6 +194,11 @@ pub(crate) fn advance(tool: &mut MiningTool, frame: ShipFrame, delta: Duration, 
         .expect("finite fragment physics pose");
         tool.session.move_loose(fragment.id(), pose);
     }
+    if let Some(start) = started {
+        measurements.total_time = start.elapsed();
+        measurements.adapter_time = measurements.total_time.saturating_sub(solver_time);
+    }
+    measurements
 }
 
 pub(crate) fn fragment_hull(

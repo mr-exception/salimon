@@ -1,6 +1,9 @@
 //! Portable small-object motion/contact in caller-supplied metre reference frames.
 use salimon_math::{add, cross, dot, length, scale, sub};
-use std::{sync::Arc, time::Duration};
+use std::{
+    sync::Arc,
+    time::{Duration, Instant},
+};
 
 mod convex;
 pub use convex::{ConvexHull, compose, orientation_from_axes, rotate};
@@ -120,6 +123,36 @@ pub fn ejection_velocity(position: [f64; 3], body: Option<SphereSurface>, varian
     }
 }
 
+/// Opt-in observations of the unchanged production solver, accumulated per call.
+/// Counters count visits (including repeated solver passes), not unique pairs.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct StepStats {
+    pub objects: usize,
+    pub substeps: u64,
+    pub solver_passes: u64,
+    pub pair_visits: u64,
+    pub radius_candidates: u64,
+    pub narrow_phase_tests: u64,
+    pub contacts: u64,
+    pub projection_builds: u64,
+    /// Requested matrix/projection storage; excludes allocator overhead and temporaries.
+    pub projection_storage_bytes: u64,
+    /// Number of matrix Vec allocations for the current vec![vec![..]; n] implementation;
+    /// One outer Vec plus one row Vec per object. Not a process allocator counter.
+    pub matrix_allocations: u64,
+    pub integration_time: Duration,
+    pub contact_time: Duration,
+}
+
+/// Profile with per-substep clocks, never a clock or allocator hook per pair.
+pub fn advance_profiled(
+    pieces: &mut [ObjectState],
+    delta: Duration,
+    floor_contains: impl Fn([f64; 3], f64) -> bool,
+) -> StepStats {
+    advance_impl::<true>(pieces, delta, floor_contains)
+}
+
 /// Advance in stable slice order; preserve that order across updates.
 /// `floor_contains` is a pure geometry query in ship-local metres, not a response rule.
 /// Separate floor frames must be advanced in separate calls. Sphere centers distinguish
@@ -130,9 +163,21 @@ pub fn advance(
     delta: Duration,
     floor_contains: impl Fn([f64; 3], f64) -> bool,
 ) {
+    advance_impl::<false>(pieces, delta, floor_contains);
+}
+
+fn advance_impl<const PROFILE: bool>(
+    pieces: &mut [ObjectState],
+    delta: Duration,
+    floor_contains: impl Fn([f64; 3], f64) -> bool,
+) -> StepStats {
+    let mut stats = StepStats {
+        objects: pieces.len(),
+        ..StepStats::default()
+    };
     let elapsed = delta.as_secs_f64();
     if elapsed <= 0.0 {
-        return;
+        return stats;
     }
     // A fixed maximum substep prevents fast ejected pieces from tunnelling through a pile.
     let has_hulls = pieces.iter().any(|p| p.hull.is_some());
@@ -152,6 +197,7 @@ pub fn advance(
     };
     let dt = elapsed / steps as f64;
     for _ in 0..steps {
+        let integration_start = PROFILE.then(Instant::now);
         for piece in pieces.iter_mut() {
             let previous = piece.position;
             let up = piece
@@ -170,11 +216,29 @@ pub fn advance(
             }
             ground_contact(piece);
         }
+        if let Some(start) = integration_start {
+            stats.integration_time += start.elapsed();
+            stats.substeps += 1;
+            if !pieces.is_empty() {
+                stats.matrix_allocations += pieces.len() as u64 + 1;
+            }
+            stats.projection_storage_bytes += ((pieces.len() * pieces.len())
+                * std::mem::size_of::<Option<Vec<convex::Projection>>>()
+                + pieces.len() * std::mem::size_of::<Vec<Option<Vec<convex::Projection>>>>())
+                as u64;
+        }
+        let contact_start = PROFILE.then(Instant::now);
         let mut pair_geometry: Vec<Vec<Option<Vec<convex::Projection>>>> =
             vec![vec![None; pieces.len()]; pieces.len()];
         for _ in 0..if has_hulls { 16 } else { 3 } {
+            if PROFILE {
+                stats.solver_passes += 1;
+            }
             for (i, row) in pair_geometry.iter_mut().enumerate() {
                 for (j, cached) in row.iter_mut().enumerate().skip(i + 1) {
+                    if PROFILE {
+                        stats.pair_visits += 1;
+                    }
                     let (left, right) = pieces.split_at_mut(j);
                     let a = &mut left[i];
                     let b = &mut right[0];
@@ -192,11 +256,26 @@ pub fn advance(
                     if distance >= minimum {
                         continue;
                     }
+                    if PROFILE {
+                        stats.radius_candidates += 1;
+                    }
                     let (normal, depth) = if a.hull.is_some() && b.hull.is_some() {
+                        if PROFILE {
+                            stats.narrow_phase_tests += 1;
+                        }
                         if cached.is_none() && convex::separated_by_faces(a, b) {
                             continue;
                         }
-                        let geometry = cached.get_or_insert_with(|| convex::projections(a, b));
+                        let geometry = cached.get_or_insert_with(|| {
+                            let projections = convex::projections(a, b);
+                            if PROFILE {
+                                stats.projection_builds += 1;
+                                stats.projection_storage_bytes += (projections.capacity()
+                                    * std::mem::size_of::<convex::Projection>())
+                                    as u64;
+                            }
+                            projections
+                        });
                         let Some(contact) = convex::projected_contact(geometry, separation) else {
                             continue;
                         };
@@ -211,6 +290,9 @@ pub fn advance(
                             minimum - distance,
                         )
                     };
+                    if PROFILE {
+                        stats.contacts += 1;
+                    }
                     let inverse_a = 1.0 / a.mass_kg;
                     let inverse_b = 1.0 / b.mass_kg;
                     let correction = scale(normal, (depth + 0.00001) / (inverse_a + inverse_b));
@@ -232,6 +314,9 @@ pub fn advance(
                 }
             }
         }
+        if let Some(start) = contact_start {
+            stats.contact_time += start.elapsed();
+        }
         for piece in pieces.iter_mut() {
             piece.velocity = scale(piece.velocity, 0.995);
             piece.angular_velocity = scale(piece.angular_velocity, 0.98);
@@ -243,6 +328,7 @@ pub fn advance(
             }
         }
     }
+    stats
 }
 
 fn ground_contact(piece: &mut ObjectState) {

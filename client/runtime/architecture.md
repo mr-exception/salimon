@@ -323,3 +323,26 @@ server deadline, matching the resource-collection scenario budget. The stdin
 reader and native request expiry use the same command-specific duration.
 Malformed/out-of-range requests and ordinary inputs/inspection stay at 5 seconds.
 Scenario overall deadlines remain independent; no fixed steps are skipped.
+
+## Fragment load benchmarks (#155)
+
+`benchmark_fixture.rs` creates bounded opt-in test populations through normal
+source extraction, validates mass/IDs/deck containment and selects mixed authored
+variants and sizes. It changes initial conditions only. `--e2e --fragment-count`
+and optional `--fragment-layout` extend scenario setup; all subsequent fixed
+steps/inputs retain production controllers and gates. Normal launches reject
+these options. The 1,000 limit belongs to the fixture, not gameplay cargo.
+
+`benchmark.rs` owns benchmark launch parsing, accounting, bounded sample storage
+and JSON output. `--benchmark` native runs keep the ordinary monotonic update
+clock and renderer; they never enable stdin automation. Physics-only runs time
+production fragment adapters at 16ms simulation deltas with no window, renderer
+or FPS claim. Samples record actual moving-object counts; a requested settled
+fixture does not prove a settled sample. No sleeping mechanism exists.
+
+Frame intervals use a separate uncapped monotonic clock, preserving long spikes
+hidden by rolling diagnostics' 250ms display clamp. Normal update-delta clamping
+is unchanged and reported. Samples are retained in memory and written once at
+completion; high-frequency CPU runs decimate deterministically to bounded storage
+and report stride/observed count. Native early closure must produce no successful
+benchmark result. See the [benchmark guide](../../scripts/FRAGMENT_BENCHMARKS.md).

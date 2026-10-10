@@ -48,3 +48,18 @@ and a stable speed lane. Its outward 2.0–2.6 m/s plus 1.8 m/s radial lift is
 combined with 1.8 m/s lateral escape and a bounded ±0.4 m/s fan is
 one-shot creation motion; gravity/contact take over immediately. The caller,
 not a missing velocity cache entry, decides whether an object is new.
+
+## Opt-in solver observations (#155)
+
+`advance_profiled` uses the same const-specialized solver as `advance`, preserving
+operation order and results. Normal calls compile out counters/clocks. `StepStats`
+counts substeps, passes, all pair visits, radius candidates, convex narrow-phase
+visits, resolved contacts and projection builds. Visits include repeated passes.
+Integration includes initial environmental contacts; contact time includes matrix
+allocation, pair resolution and repeated ground projection. Damping and matrix
+teardown remain in total adapter-call time.
+
+Matrix Vec allocations and requested matrix/projection capacity bytes are
+structural allocation observations, with one outer vector and one vector per row, not
+process-wide allocator totals. Convex temporary vertices/axes/ground arms and
+allocator overhead are excluded. See the [benchmark guide](../../scripts/FRAGMENT_BENCHMARKS.md).

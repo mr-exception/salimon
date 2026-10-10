@@ -129,3 +129,8 @@
 - Resource gameplay dimensions use the shared world `resource_size` policy;
   enlarged bounds never substitute for density-derived solid material volume.
   See [resource size contract](../world/resource-contracts.md#gameplay-size-policy-144).
+
+- Mining emission starts on an exposed authored deposit facet, reserving full
+  growth support plus 5 mm and checking ground/player/existing pieces. There
+  are no rows/grids. Only successful new-identity allocation installs an impulse;
+  existing/growing/streamed objects are never implicitly re-ejected.

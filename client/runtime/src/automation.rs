@@ -1010,6 +1010,14 @@ mod tests {
         );
     }
 
+    #[test]
+    fn mining_emission_walkthrough_preserves_rate_and_repeated_output() {
+        assert_gameplay_scenario(
+            Scenario::LandedEarth,
+            include_str!("../../../scenarios/mining-emission.json"),
+        );
+    }
+
     fn assert_gameplay_scenario(initial: Scenario, source: &str) {
         let mut test = app(initial);
         let scenario: Value = serde_json::from_str(source).unwrap();

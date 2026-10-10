@@ -1,0 +1,27 @@
+   Compiling salimon-physics v0.1.0 (/workspace/scratch/2c33e0ef432d/salimon/client/physics)
+   Compiling salimon-client v0.1.0 (/workspace/scratch/2c33e0ef432d/salimon/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.20s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-60c77d4b014ec231)
+
+running 4 tests
+test mining_emission::tests::player_capsule_blocks_emission_on_crowded_surface ... ok
+test mining_emission::tests::occupied_facets_wait_without_hidden_mass_and_retry_same_identity ... ok
+test mining_emission::tests::all_deposit_variants_emit_from_real_facets_with_full_growth_clearance ... ok
+test automation::tests::mining_emission_walkthrough_preserves_rate_and_repeated_output ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 79 filtered out; finished in 1.39s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-60c77d4b014ec231)
+
+running 7 tests
+test fragment_physics::tests::adapter_excludes_carried_and_distant_fragments ... ok
+test fragment_physics::tests::missing_or_restored_motion_never_receives_an_implicit_ejection ... ok
+test fragment_physics::tests::adapter_preserves_entity_contract_and_maps_rotated_ship_frame ... ok
+test fragment_physics::tests::freshly_mined_fragment_ejects_then_returns_to_surface ... ok
+test fragment_physics::tests::released_fragment_falls_from_hand_and_settles_on_deck ... ok
+test fragment_physics::tests::all_authored_variants_settle_rotated_at_current_scale_and_preserve_mass ... ok
+test fragment_physics::tests::two_fragments_contact_and_stack_on_the_deck ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 76 filtered out; finished in 0.08s
+

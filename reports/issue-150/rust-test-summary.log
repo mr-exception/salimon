@@ -1,0 +1,42 @@
+     Running unittests src/lib.rs (target/debug/deps/salimon_character-0f7f29cc3c8196d6)
+test result: ok. 60 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-60c77d4b014ec231)
+test result: ok. 83 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 59.88s
+     Running unittests src/lib.rs (target/debug/deps/salimon_diagnostics-26cbc9b1d367ca0a)
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+     Running unittests src/lib.rs (target/debug/deps/salimon_math-6f74355b7c2d8a7c)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (target/debug/deps/salimon_physics-32257bd3488c84b0)
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+     Running unittests src/lib.rs (target/debug/deps/salimon_renderer-d25cdd51b139115d)
+test result: ok. 50 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 2.24s
+     Running unittests src/lib.rs (target/debug/deps/salimon_ship-d85ffb6329aed1f3)
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+     Running unittests src/lib.rs (target/debug/deps/salimon_world-0621a91a21a92c48)
+test result: ok. 31 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/mining.rs (target/debug/deps/mining-038c34b343b798ec)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/resource_distribution.rs (target/debug/deps/resource_distribution-b133a87e04873a0b)
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/resource_fragments.rs (target/debug/deps/resource_fragments-56733cb8a8aa0186)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/resource_generation.rs (target/debug/deps/resource_generation-ed26802c3708c011)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+     Running tests/resource_streaming.rs (target/debug/deps/resource_streaming-5e0413eb79d9e632)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/resources.rs (target/debug/deps/resources-2a13349fefbd23bc)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests salimon_character
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests salimon_diagnostics
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests salimon_math
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests salimon_physics
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests salimon_renderer
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests salimon_ship
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests salimon_world
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

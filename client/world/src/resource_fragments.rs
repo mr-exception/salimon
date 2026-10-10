@@ -27,7 +27,13 @@ impl FragmentOutput {
         self.sealed.insert(id);
     }
 
-    pub(crate) fn emit(&mut self, deposit: ResourceDeposit, mut mass: f64) {
+    pub(crate) fn emit(
+        &mut self,
+        deposit: ResourceDeposit,
+        mut mass: f64,
+        mut spawn: impl FnMut(FragmentId, RawMaterial, &[ResourceFragment]) -> Option<ResourceTransform>,
+    ) -> f64 {
+        let requested = mass;
         while mass > 0.0 {
             let tail = self.fragments.iter().rposition(|piece| {
                 piece.source() == deposit.id() && !self.sealed.contains(&piece.id())
@@ -43,23 +49,16 @@ impl FragmentOutput {
                 self.fragments[index] =
                     ResourceFragment::new(piece.id(), piece.source(), material, piece.transform());
             } else {
-                let ordinal = self
-                    .fragments
-                    .iter()
-                    .filter(|piece| piece.source() == deposit.id())
-                    .count();
-                let pose =
-                    ResourceTransform::new(spawn_position(deposit, ordinal), [0.0, 0.0, 0.0, 1.0])
-                        .expect("surface fragment anchor is finite");
-                self.fragments.push(ResourceFragment::new(
-                    FragmentId(self.fragments.len() as u64 + 1),
-                    deposit.id(),
-                    material,
-                    pose,
-                ));
+                let id = FragmentId(self.fragments.len() as u64 + 1);
+                let Some(pose) = spawn(id, material, &self.fragments) else {
+                    break;
+                };
+                self.fragments
+                    .push(ResourceFragment::new(id, deposit.id(), material, pose));
             }
             mass -= added;
         }
+        requested - mass
     }
 }
 
@@ -68,7 +67,7 @@ pub fn side_meters(fragment: ResourceFragment) -> f64 {
     crate::resource_size::fragment_side_meters(fragment.material())
 }
 
-fn spawn_position(deposit: ResourceDeposit, ordinal: usize) -> WorldPosition {
+pub(crate) fn spawn_position(deposit: ResourceDeposit) -> WorldPosition {
     let body = CELESTIAL_BODIES
         .iter()
         .find(|body| body.id == deposit.id().body)
@@ -81,33 +80,13 @@ fn spawn_position(deposit: ResourceDeposit, ordinal: usize) -> WorldPosition {
     } else {
         [0.0, 1.0, 0.0]
     };
-    let axis = if up[1].abs() < 0.9 {
-        [0.0, 1.0, 0.0]
-    } else {
-        [1.0, 0.0, 0.0]
-    };
-    let tangent = cross(up, axis);
-    let norm = tangent.iter().map(|v| v * v).sum::<f64>().sqrt();
-    let tangent = tangent.map(|v| v / norm);
-    let bitangent = cross(up, tangent);
-    // Start at the deposit edge; runtime gives new pieces an outward impulse.
-    // Reserve full-piece height while their mass grows.
+    // Geometry-free callers use the top of the conservative deposit bound.
+    // Native mining supplies the authored surface via extract_with_spawn.
     let full = RawMaterial::new(deposit.material().resource(), FRAGMENT_MAX_MASS_KG)
         .expect("full fragment material is valid");
-    let side = crate::resource_size::fragment_side_meters(full);
     let support = crate::resource_size::fragment_contact_radius_meters(full) + 0.005;
     let edge = crate::resource_size::deposit_radius_meters(deposit.material());
-    let column = edge + side + (ordinal % 4) as f64 * (side + 0.05);
-    let row = (ordinal / 4) as f64 * (side + 0.05);
-    deposit.position().translated(std::array::from_fn(|i| {
-        up[i] * support + tangent[i] * column + bitangent[i] * row
-    }))
-}
-
-fn cross(a: [f64; 3], b: [f64; 3]) -> [f64; 3] {
-    [
-        a[1] * b[2] - a[2] * b[1],
-        a[2] * b[0] - a[0] * b[2],
-        a[0] * b[1] - a[1] * b[0],
-    ]
+    deposit
+        .position()
+        .translated(up.map(|v| v * (edge + support)))
 }

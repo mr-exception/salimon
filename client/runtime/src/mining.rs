@@ -135,7 +135,29 @@ impl MiningTool {
             .iter_mut()
             .find(|entry| entry.deposit.id() == target.id)
             .expect("target comes from the same deterministic query");
-        self.session.extract(&mut entry.deposit, delta);
+        let ray = MiningRay::new(
+            position(player.eye_position_meters),
+            position(player.look_target_meters),
+        )
+        .expect("target has a valid mining ray");
+        let source = *entry;
+        let mut emission = None;
+        let motion = &mut self.fragment_motion;
+        self.session
+            .extract_with_spawn(&mut entry.deposit, delta, |id, material, existing| {
+                let emission = emission.get_or_insert_with(|| {
+                    crate::mining_emission::EmissionSurface::new(source, ray, player)
+                });
+                let (pose, velocity) = emission.spawn(id, material, existing)?;
+                motion.insert(
+                    id,
+                    crate::fragment_physics::FragmentMotion {
+                        velocity,
+                        ..Default::default()
+                    },
+                );
+                Some(pose)
+            });
     }
 
     /// Equip/location gates and active feedback for the authored visual.

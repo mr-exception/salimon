@@ -3,7 +3,7 @@
 SHIP_EVA = ("cockpit-nose.json", "space-airlock.json", "moving-eva.json", "nearby-eva.json")
 
 RESOURCE_COLLECTION = (
-    "resource-deposits.json", "mining.json", "carrying.json",
+    "resource-deposits.json", "mining.json", "mining-emission.json", "carrying.json",
     "fragment-transfer.json", "resource-streaming.json", "resource-loop.json",
 )
 GROUPS = {"ship-eva": SHIP_EVA, "resource-collection": RESOURCE_COLLECTION}

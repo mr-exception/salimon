@@ -134,7 +134,8 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
             let fragment = command.get("fragment_id").and_then(Value::as_u64)
                 .and_then(|id| app.mining.session.fragments().iter().find(|piece| piece.id().0 == id));
             if let Some(fragment) = fragment {
-                use salimon_math::{cross, dot, normalize};
+                use salimon_math::{cross, dot, length};
+                let normalize = |v: [f64; 3]| { let magnitude = length(v).max(1e-12); v.map(|x| x / magnitude) };
                 let ship = app.ship.snapshot();
                 let player = app.character.snapshot(character_ship_frame(ship.pose), surface_frame_for_ship(ship));
                 let up = player.up.map(f64::from);

@@ -169,24 +169,44 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
                         player.look_target_meters[i] - player.eye_position_meters[i]
                     }));
                     let local = std::array::from_fn(|axis| {
-                        if candidate == 0 { 0.0 } else if (candidate - 1) & (1 << axis) == 0 { -0.35 * side } else { 0.35 * side }
+                        if candidate == 0 {
+                            0.0
+                        } else if (candidate - 1) & (1 << axis) == 0 {
+                            -0.35 * side
+                        } else {
+                            0.35 * side
+                        }
                     });
-                    let offset = salimon_physics::rotate(fragment.transform().orientation_xyzw(), local);
+                    let offset =
+                        salimon_physics::rotate(fragment.transform().orientation_xyzw(), local);
                     let target = normalize(std::array::from_fn(|i| {
-                        fragment.transform().position().meters()[i] - player.eye_position_meters[i] + offset[i]
+                        fragment.transform().position().meters()[i] - player.eye_position_meters[i]
+                            + offset[i]
                     }));
-                    let planar = |direction: [f64; 3]| normalize(std::array::from_fn(|i| direction[i] - up[i] * dot(direction, up)));
+                    let planar = |direction: [f64; 3]| {
+                        normalize(std::array::from_fn(|i| {
+                            direction[i] - up[i] * dot(direction, up)
+                        }))
+                    };
                     let a = planar(current);
                     let b = planar(target);
                     let yaw = (-dot(cross(a, b), up)).atan2(dot(a, b));
-                    let pitch = dot(target, up).clamp(-1.0, 1.0).asin() - dot(current, up).clamp(-1.0, 1.0).asin();
+                    let pitch = dot(target, up).clamp(-1.0, 1.0).asin()
+                        - dot(current, up).clamp(-1.0, 1.0).asin();
                     let delta = [yaw / 0.0022, -pitch / 0.0022];
                     app.character.apply_mouse_delta(delta[0], delta[1]);
                     total[0] += delta[0];
                     total[1] += delta[1];
                     app.sync_carried();
                     let player = app.character.snapshot(frame, surface_frame_for_ship(ship));
-                    if crate::carrying::target(&app.mining, player, frame, ship.door_state == salimon_ship::DoorState::Open && ship.door_open_fraction >= 0.95) == Some(fragment.id()) {
+                    if crate::carrying::target(
+                        &app.mining,
+                        player,
+                        frame,
+                        ship.door_state == salimon_ship::DoorState::Open
+                            && ship.door_open_fraction >= 0.95,
+                    ) == Some(fragment.id())
+                    {
                         break;
                     }
                 }

@@ -31,3 +31,17 @@ unsafe_code = "deny"
 
 [workspace.lints.clippy]
 all = "warn"
+
+# Keep authored convex contact loops responsive in debug gameplay and tests.
+# Debug assertions and debug information remain enabled.
+[profile.dev.package.salimon-physics]
+opt-level = 2
+
+[profile.dev.package.salimon-math]
+opt-level = 2
+
+[profile.test.package.salimon-physics]
+opt-level = 2
+
+[profile.test.package.salimon-math]
+opt-level = 2

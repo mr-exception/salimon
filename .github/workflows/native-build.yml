@@ -62,12 +62,6 @@ jobs:
           python -m unittest discover -s models/tests -v
       - name: Build script and E2E runner contract tests
         run: python -m unittest discover -s scripts -p 'test_*.py'
-      - name: Rust quality gates
-        shell: bash
-        run: |
-          cargo fmt --all
-          cargo clippy --workspace --all-targets --locked -- -D warnings
-          cargo test --workspace --locked
       - name: Stage debug executable
         if: always()
         run: python scripts/build_game.py --profile debug --output artifacts/build/debug
@@ -90,6 +84,17 @@ jobs:
             xvfb-run -a -s '-screen 0 1280x800x24' python scripts/salimon-test run scenarios/evidence/fragment-pile-$surface.json --binary artifacts/issue-148/salimon-client-before --artifacts artifacts/issue-148/before-$surface --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
             xvfb-run -a -s '-screen 0 1280x800x24' python scripts/salimon-test run scenarios/evidence/fragment-pile-$surface.json --binary artifacts/build/release/salimon-client --artifacts artifacts/issue-148/after-$surface --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
           done
+      - uses: actions/upload-artifact@v4
+        if: always() && runner.os == 'Linux'
+        with:
+          name: issue-148-pile-evidence
+          path: artifacts/issue-148/
+      - name: Rust quality gates
+        shell: bash
+        run: |
+          cargo fmt --all
+          cargo clippy --workspace --all-targets --locked -- -D warnings
+          cargo test --workspace --locked
       - name: Linux deterministic E2E baseline (Mesa software Vulkan)
         if: runner.os == 'Linux'
         timeout-minutes: 10

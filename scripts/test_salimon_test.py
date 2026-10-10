@@ -7,7 +7,7 @@ import time
 import unittest
 from pathlib import Path
 
-from salimon_test import Game, ScenarioError, matches, parse_scenario, run
+from salimon_test import Game, ScenarioError, matches, parse_scenario, result_summary, run
 
 
 FAKE = '''import json, os, sys, time
@@ -73,6 +73,21 @@ class RunnerTests(unittest.TestCase):
             self.assertIsNone(game.process.poll())
             game.request({"op": "inspect"})
         self.assertIsNotNone(game.process.poll())
+
+    def test_console_summary_preserves_evidence_and_failure_diagnostics(self):
+        for expected in (4, 8):
+            self.data["steps"] = [{"assert": {"path": "ship.speed", "equals": expected}}]
+            self.save()
+            result = self.execute()
+            summary = result_summary(result)
+            self.assertEqual(summary["status"], "passed" if expected == 4 else "failed")
+            self.assertNotIn("steps", summary)
+            self.assertNotIn("setup", summary)
+            persisted = json.loads(Path(summary["result_file"]).read_text())
+            self.assertEqual(persisted, result)
+            self.assertEqual(persisted["steps"][0]["state"]["ship"]["speed"], 4)
+            if expected == 8:
+                self.assertEqual(summary["error"], result["error"])
 
     def test_fragment_load_startup_and_argument_forwarding(self):
         self.data["setup"].update(fragment_count=500, fragment_layout="scattered")

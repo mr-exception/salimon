@@ -7,7 +7,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from salimon_test import run
+from salimon_test import result_summary, run
 from scenario_suites import GROUPS, select_scenarios
 
 
@@ -19,6 +19,8 @@ def main():
     parser.add_argument("--binary", type=Path, help="prebuilt salimon-client executable")
     parser.add_argument("--group", choices=sorted(GROUPS), help="named gameplay suite (suite only)")
     parser.add_argument("--evidence", action="store_true", help="run screenshot variants (suite only)")
+    parser.add_argument("--summary", action="store_true",
+                        help="print compact result metadata; full evidence remains in artifact files")
     parser.add_argument("--artifacts", type=Path, default=root / "artifacts" / "e2e",
                         help="root for isolated per-scenario result directories")
     parser.add_argument("--screenshot-command", help='JSON argv array with a {path} placeholder; [] disables capture')
@@ -55,7 +57,8 @@ def main():
         binary = root / "target" / "debug" / ("salimon-client.exe" if sys.platform == "win32" else "salimon-client")
     results = [run(path, [str(binary)], args.artifacts, screenshot_command) for path in paths]
     status = "passed" if all(item["status"] == "passed" for item in results) else "failed"
-    print(json.dumps({"status": status, "results": results}))
+    output = [result_summary(item) for item in results] if args.summary else results
+    print(json.dumps({"status": status, "results": output}))
     return 0 if status == "passed" else 1
 
 

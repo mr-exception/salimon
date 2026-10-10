@@ -203,11 +203,16 @@ enabled throughout the suite.
 
 The runner's nonzero exit status propagates through `tee` using Bash
 `pipefail`. `baseline.log` contains the aggregate report, including the failed
-scenario/step reason. The always-run artifact upload preserves all
+scenario/step reason. CI uses `--summary` to print only status, duration, errors
+and evidence paths; full step snapshots remain in each `result.json`. Default
+CLI output still includes full results. The always-run artifact upload preserves all
 `artifacts/e2e/` results, per-step state, protocol/process logs, failure state
 and available failure screenshots in `salimon-ubuntu-24.04`, alongside runnable
 builds and packaged smoke evidence. Each native scenario has a bounded timeout;
-the CI step also has a ten-minute limit. Inspect `result.json` for the first
+the baseline and resource evidence steps each have a ten-minute limit, cockpit
+window evidence has three minutes, and ship/EVA evidence has five minutes. These
+required suites run in separate Xvfb steps so their time and console output do
+not consume a single shared deadline. Inspect `result.json` for the first
 failed step before checking its logs and screenshots.
 
 The fast required baseline has no successful-run screenshot checkpoints. For

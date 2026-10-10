@@ -312,11 +312,7 @@ mod tests {
                 assert_eq!(piece.source(), original.source());
                 assert_eq!(piece.material(), original.material());
                 let expected = crate::fragment_physics::to_world_orientation(frame, orientation);
-                for (actual, expected) in piece
-                    .transform()
-                    .orientation_xyzw()
-                    .iter()
-                    .zip(expected)
+                for (actual, expected) in piece.transform().orientation_xyzw().iter().zip(expected)
                 {
                     assert!((actual - expected).abs() < 1e-12);
                 }

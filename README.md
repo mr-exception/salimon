@@ -135,11 +135,10 @@ The toolbar appears at bottom center with no initial selection.
 Slot 1 equips the mining tool; selecting an empty slot stows it and stops mining.
 
 Press **1** to equip the handheld mining tool on the surface; aim at a deposit
-within 4 m and hold **F** or left mouse to extract at 2 kg/s. Press **2–5** to stow.
+within 4 m and hold left mouse to extract at 2 kg/s. Press **2–5** to stow.
 Aim at a physical fragment within 3 m and press **F** to pick it up. You can
 carry one world object at a time; equipped gear remains separate. Press **F**
-again to release it from your hand. Grab/drop consumes that F press; otherwise
-held F mines. Release F before another action. E only operates cockpit/door interactions. Gravity and contact make fragments fall and pile up.
+again to release it from your hand. F only grabs/drops and never starts mining. Release F before another action. E only operates cockpit/door interactions. Gravity and contact make fragments fall and pile up.
 Object-specific prompts appear just above their cockpit, door, deposit or fragment.
 They follow the target as you look or move and hide outside the view or behind
 closer geometry. Flight/tool guidance and short blocked-action feedback remain

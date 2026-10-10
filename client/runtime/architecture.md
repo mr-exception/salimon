@@ -214,12 +214,14 @@ with their owning domain. See the canonical
 ## Physical interaction input (#126)
 
 E routes only cockpit/door interactions. `automation_key` shares the native F
-route: on an initial press, carrying wins if an object is held or a reachable
-object is aimed at; otherwise it starts keyboard mining. MiningTool latches F
-until release, preventing a consumed grab/drop press from mining or repeating.
-Independent mouse and keyboard mining state is combined into `held`; lifecycle
-resets and stowing clear both and the latch. Automation `grab_drop` plus legacy
-`mine`/`pickup`/`drop` names map to F with identical contextual semantics.
+route: an initial press grabs an aimed reachable object or drops the carried
+object; a miss never starts mining. MiningTool latches F until release to prevent
+repeat grab/drop. Only left mouse controls `held`; releasing F never changes it.
+Lifecycle resets and stowing clear mining input and the latch. Automation
+`grab_drop` plus legacy `pickup`/`drop` names map to F. The old `mine` key alias
+is rejected. Automation `mouse` with `button:left` and boolean `pressed` shares
+`mining_mouse_input` with native left-button events, preserving gameplay,
+equipment and carrying gates; native events additionally require cursor capture.
 
 ## Equipment toolbar state (#128)
 
@@ -257,7 +259,7 @@ A failed pickup leaves the selected slot and held mining input unchanged. A
 successful pickup stows the tool and cancels extraction in the same F edge;
 all five slot inputs stay blocked until release. Drop leaves no selection and
 no held mining input. An explicit slot 1 selection equips again without resuming
-an old keyboard/mouse hold. The toolbar remains visible with its usual five
+an old mouse hold. The toolbar remains visible with its usual five
 slots and no highlight while carrying; carrying never creates a sixth slot.
 
 Automation inspection exposes `mining.held_item_visible` from the shared `ClientApplication::held_item` DTO helper used by redraw,
@@ -268,7 +270,7 @@ extraction, equipped pickup, lockout and explicit selection after drop.
 
 ## Toolbar scenario coverage (#132)
 
-The carrying scenario executes production numeric/F routes, including all four
+The carrying scenario executes production numeric/F/mouse routes, including all four
 empty-slot mining attempts at a reachable surface deposit. Its synchronized
 evidence variant adds equipped/empty-selected checkpoints to carrying and
 post-drop screenshots. Existing inspection fields establish loadout, selection,

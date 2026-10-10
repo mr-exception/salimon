@@ -39,7 +39,7 @@ timeout. A step can specify its own `timeout_ms`. Example:
 ```
 
 `action` takes any operation and its parameters from the native command
-protocol: `inspect`, `step`, `key`, `look`, `aim_fragment`, `restore_look`, `interact`, `landing`, or `thruster`.
+protocol: `inspect`, `step`, `key`, `mouse`, `look`, `aim_fragment`, `restore_look`, `interact`, `landing`, or `thruster`.
 `assert` inspects state once; `wait` inspects until matched, advancing the
 simulation by `frames` (1–600, default 1) between checks. Condition `path`
 uses dot-separated object keys and zero-based array indices, such as
@@ -155,7 +155,7 @@ The default `suite` discovers every baseline scenario, including these routes:
 | `orbit-earth.json` | Known seeded orbit pose; thruster changes; starting assisted landing; repeated landing action cannot cancel it; leaving cockpit control during landing; autonomous completion with zero ship velocity. |
 
 These files use only the existing `key`, `look`, `interact`, `thruster`,
-`landing`, mining equip/hold keys, and fixed `step` operations after fixture setup. They never set
+`landing`, equipment keys, left-mouse hold/release, and fixed `step` operations after fixture setup. They never set
 expected end states. Held movement keys are released before interacting so
 cockpit authority changes cannot redirect an outstanding movement key.
 Door collision checks assert both location and ship-relative eye position;
@@ -342,8 +342,9 @@ retained only until the world/session ends, without disk or backend persistence.
 ## Physical pickup/drop (#46)
 
 `scenarios/carrying.json` follows the real mining route, approaches and aims at
-physical pieces, and uses `grab_drop` (F). Legacy `pickup`/`drop`/`mine`
-aliases also route contextual F. It verifies E cannot grab/drop, held-F repeat
+physical pieces, and uses `grab_drop` (F). Legacy `pickup`/`drop` aliases also route contextual F. Mining uses
+`{"op":"mouse","button":"left","pressed":true}` (false to release);
+the old `mine` keyboard alias is rejected. It verifies E cannot grab/drop, held-F repeat
 suppression, material/mass/identity preservation, tool independence, release,
 subsequent pickup, and carried entity proximity after movement. The evidence
 variant adds first pickup, repeated-F suppression, placement and moving carry
@@ -495,9 +496,9 @@ and re-selection does not resume a previous mining hold.
 
 `carrying.json` checks the initial five-slot loadout with no selection and all
 1–5 selection/equip decisions. At a reachable surface deposit, each empty slot
-2–5 rejects a held contextual F mining attempt without creating fragments or
+2–5 rejects a held left-mouse mining attempt without creating fragments or
 extracting mass. Slot 1 then equips the visible tool and mines through that same
-input route. Equipped pickup, all-five-slot carrying lockout, deselected drop
+mouse route. Equipped pickup, all-five-slot carrying lockout, deselected drop
 and explicit re-equip are checked in the remainder of the route.
 
 The synchronized evidence variant adds `toolbar-mining-tool-selected` and

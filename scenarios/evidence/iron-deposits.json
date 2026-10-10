@@ -467,8 +467,8 @@
     },
     {
       "action": {
-        "op": "key",
-        "key": "mine",
+        "op": "mouse",
+        "button": "left",
         "pressed": true
       }
     },
@@ -502,8 +502,8 @@
     },
     {
       "action": {
-        "op": "key",
-        "key": "mine",
+        "op": "mouse",
+        "button": "left",
         "pressed": false
       }
     }

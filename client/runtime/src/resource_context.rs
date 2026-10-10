@@ -63,9 +63,9 @@ pub(crate) fn context(
         let prompt = if !equipment.mining_equipped() {
             "1 to equip mining tool"
         } else if tool.held {
-            "Mining - release F or left mouse to stop"
+            "Mining - release left mouse to stop"
         } else {
-            "Hold F or left mouse to mine - 2-5 to stow"
+            "Hold left mouse to mine - 2-5 to stow"
         };
         return Some(Prompt {
             placement: salimon_renderer::OverlayPlacement::World {

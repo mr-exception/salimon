@@ -1,0 +1,378 @@
+[
+  {
+    "label": "deposit-context-tool-stowed",
+    "mining": {
+      "active": false,
+      "equipped": false,
+      "extracted_mass_kg": 0.0,
+      "held": false,
+      "held_item_visible": false,
+      "range_meters": 4.0,
+      "rate_kg_per_second": 2.0,
+      "target": null
+    },
+    "equipment": {
+      "selected_slot": null,
+      "slots": [
+        "mining_tool",
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "carrying": {
+      "context": null,
+      "last_action_feedback": null,
+      "object_id": null,
+      "target_id": null
+    },
+    "nearest_deposit": {
+      "authored_visual": {
+        "center_meters": [
+          999999999980.0146,
+          -749993999999.3379,
+          249993999994.9063
+        ],
+        "mesh": "SilicateDepositSlab",
+        "side_meters": 1.7760292076143895
+      },
+      "body_local_position_meters": [
+        -19.985343022233323,
+        6000000.662076159,
+        -5.093692544940133
+      ],
+      "bounds_radius_meters": 1.4765629551909198,
+      "distance_to_player_meters": 3.225389903830639,
+      "id": "Earth:16443359315117775089",
+      "position_meters": [
+        999999999980.0146,
+        -749993999999.3379,
+        249993999994.9063
+      ],
+      "remaining_mass_kg": 36.40896041381627,
+      "resource": "silicate-rock",
+      "ship_local_position_meters": [
+        -19.9853515625,
+        0.5545654296875,
+        -5.09368896484375
+      ],
+      "state": "Untouched",
+      "visual": null
+    }
+  },
+  {
+    "label": "f-held-no-extraction",
+    "mining": {
+      "active": false,
+      "equipped": true,
+      "extracted_mass_kg": 0.0,
+      "held": false,
+      "held_item_visible": true,
+      "range_meters": 4.0,
+      "rate_kg_per_second": 2.0,
+      "target": {
+        "distance_meters": 1.8134438977773752,
+        "id": "Earth:16443359315117775089"
+      }
+    },
+    "equipment": {
+      "selected_slot": 1,
+      "slots": [
+        "mining_tool",
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "carrying": {
+      "context": null,
+      "last_action_feedback": null,
+      "object_id": null,
+      "target_id": null
+    },
+    "nearest_deposit": {
+      "authored_visual": {
+        "center_meters": [
+          999999999980.0146,
+          -749993999999.3379,
+          249993999994.9063
+        ],
+        "mesh": "SilicateDepositSlab",
+        "side_meters": 1.7760292076143895
+      },
+      "body_local_position_meters": [
+        -19.985343022233323,
+        6000000.662076159,
+        -5.093692544940133
+      ],
+      "bounds_radius_meters": 1.4765629551909198,
+      "distance_to_player_meters": 3.225389903830639,
+      "id": "Earth:16443359315117775089",
+      "position_meters": [
+        999999999980.0146,
+        -749993999999.3379,
+        249993999994.9063
+      ],
+      "remaining_mass_kg": 36.40896041381627,
+      "resource": "silicate-rock",
+      "ship_local_position_meters": [
+        -19.9853515625,
+        0.5545654296875,
+        -5.09368896484375
+      ],
+      "state": "Untouched",
+      "visual": null
+    }
+  },
+  {
+    "label": "equipped-mining-tool",
+    "mining": {
+      "active": false,
+      "equipped": true,
+      "extracted_mass_kg": 0.0,
+      "held": false,
+      "held_item_visible": true,
+      "range_meters": 4.0,
+      "rate_kg_per_second": 2.0,
+      "target": {
+        "distance_meters": 1.8134438977773752,
+        "id": "Earth:16443359315117775089"
+      }
+    },
+    "equipment": {
+      "selected_slot": 1,
+      "slots": [
+        "mining_tool",
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "carrying": {
+      "context": null,
+      "last_action_feedback": null,
+      "object_id": null,
+      "target_id": null
+    },
+    "nearest_deposit": {
+      "authored_visual": {
+        "center_meters": [
+          999999999980.0146,
+          -749993999999.3379,
+          249993999994.9063
+        ],
+        "mesh": "SilicateDepositSlab",
+        "side_meters": 1.7760292076143895
+      },
+      "body_local_position_meters": [
+        -19.985343022233323,
+        6000000.662076159,
+        -5.093692544940133
+      ],
+      "bounds_radius_meters": 1.4765629551909198,
+      "distance_to_player_meters": 3.225389903830639,
+      "id": "Earth:16443359315117775089",
+      "position_meters": [
+        999999999980.0146,
+        -749993999999.3379,
+        249993999994.9063
+      ],
+      "remaining_mass_kg": 36.40896041381627,
+      "resource": "silicate-rock",
+      "ship_local_position_meters": [
+        -19.9853515625,
+        0.5545654296875,
+        -5.09368896484375
+      ],
+      "state": "Untouched",
+      "visual": null
+    }
+  },
+  {
+    "label": "active-mining-context",
+    "mining": {
+      "active": true,
+      "equipped": true,
+      "extracted_mass_kg": 1.9199999999997885,
+      "held": true,
+      "held_item_visible": true,
+      "range_meters": 4.0,
+      "rate_kg_per_second": 2.0,
+      "target": {
+        "distance_meters": 1.8134438977773752,
+        "id": "Earth:16443359315117775089"
+      }
+    },
+    "equipment": {
+      "selected_slot": 1,
+      "slots": [
+        "mining_tool",
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "carrying": {
+      "context": null,
+      "last_action_feedback": null,
+      "object_id": null,
+      "target_id": null
+    },
+    "nearest_deposit": {
+      "authored_visual": {
+        "center_meters": [
+          999999999980.0146,
+          -749993999999.3379,
+          249993999994.9063
+        ],
+        "mesh": "SilicateDepositSlab",
+        "side_meters": 1.7760292076143895
+      },
+      "body_local_position_meters": [
+        -19.985343022233323,
+        6000000.662076159,
+        -5.093692544940133
+      ],
+      "bounds_radius_meters": 1.4765629551909198,
+      "distance_to_player_meters": 3.225389903830639,
+      "id": "Earth:16443359315117775089",
+      "position_meters": [
+        999999999980.0146,
+        -749993999999.3379,
+        249993999994.9063
+      ],
+      "remaining_mass_kg": 34.48896041381648,
+      "resource": "silicate-rock",
+      "ship_local_position_meters": [
+        -19.9853515625,
+        0.5545654296875,
+        -5.09368896484375
+      ],
+      "state": "PartiallyMined",
+      "visual": null
+    }
+  },
+  {
+    "label": "partiallymined-deposit",
+    "mining": {
+      "active": true,
+      "equipped": true,
+      "extracted_mass_kg": 1.9199999999997885,
+      "held": true,
+      "held_item_visible": true,
+      "range_meters": 4.0,
+      "rate_kg_per_second": 2.0,
+      "target": {
+        "distance_meters": 1.8134438977773752,
+        "id": "Earth:16443359315117775089"
+      }
+    },
+    "equipment": {
+      "selected_slot": 1,
+      "slots": [
+        "mining_tool",
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "carrying": {
+      "context": null,
+      "last_action_feedback": null,
+      "object_id": null,
+      "target_id": null
+    },
+    "nearest_deposit": {
+      "authored_visual": {
+        "center_meters": [
+          999999999980.0146,
+          -749993999999.3379,
+          249993999994.9063
+        ],
+        "mesh": "SilicateDepositSlab",
+        "side_meters": 1.7760292076143895
+      },
+      "body_local_position_meters": [
+        -19.985343022233323,
+        6000000.662076159,
+        -5.093692544940133
+      ],
+      "bounds_radius_meters": 1.4765629551909198,
+      "distance_to_player_meters": 3.225389903830639,
+      "id": "Earth:16443359315117775089",
+      "position_meters": [
+        999999999980.0146,
+        -749993999999.3379,
+        249993999994.9063
+      ],
+      "remaining_mass_kg": 34.48896041381648,
+      "resource": "silicate-rock",
+      "ship_local_position_meters": [
+        -19.9853515625,
+        0.5545654296875,
+        -5.09368896484375
+      ],
+      "state": "PartiallyMined",
+      "visual": null
+    }
+  },
+  {
+    "label": "depleted-deposit",
+    "mining": {
+      "active": false,
+      "equipped": true,
+      "extracted_mass_kg": 36.408960413815784,
+      "held": false,
+      "held_item_visible": true,
+      "range_meters": 4.0,
+      "rate_kg_per_second": 2.0,
+      "target": null
+    },
+    "equipment": {
+      "selected_slot": 1,
+      "slots": [
+        "mining_tool",
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "carrying": {
+      "context": null,
+      "last_action_feedback": null,
+      "object_id": null,
+      "target_id": null
+    },
+    "nearest_deposit": {
+      "authored_visual": null,
+      "body_local_position_meters": [
+        -19.985343022233323,
+        6000000.662076159,
+        -5.093692544940133
+      ],
+      "bounds_radius_meters": 1.4765629551909198,
+      "distance_to_player_meters": 3.225389903830639,
+      "id": "Earth:16443359315117775089",
+      "position_meters": [
+        999999999980.0146,
+        -749993999999.3379,
+        249993999994.9063
+      ],
+      "remaining_mass_kg": 0.0,
+      "resource": "silicate-rock",
+      "ship_local_position_meters": [
+        -19.9853515625,
+        0.5545654296875,
+        -5.09368896484375
+      ],
+      "state": "Depleted",
+      "visual": null
+    }
+  }
+]

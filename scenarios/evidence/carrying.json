@@ -568,8 +568,8 @@
     },
     {
       "action": {
-        "op": "key",
-        "key": "mine",
+        "op": "mouse",
+        "button": "left",
         "pressed": true
       }
     },
@@ -581,8 +581,8 @@
     },
     {
       "action": {
-        "op": "key",
-        "key": "mine",
+        "op": "mouse",
+        "button": "left",
         "pressed": false
       }
     },
@@ -975,13 +975,71 @@
     {
       "assert": {
         "path": "resource_ui.context",
-        "contains": "Hold F or left mouse to mine"
+        "contains": "Hold left mouse to mine"
       }
     },
     {
       "action": {
         "op": "key",
-        "key": "mine",
+        "key": "grab_drop",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 60
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.held",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.extracted_mass_kg",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 0
+      }
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "left",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.held",
+        "equals": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
         "pressed": true
       }
     },
@@ -1000,7 +1058,7 @@
     {
       "assert": {
         "path": "resource_ui.context",
-        "contains": "Mining - release F or left mouse to stop"
+        "contains": "Mining - release left mouse to stop"
       }
     },
     {
@@ -1138,8 +1196,21 @@
     },
     {
       "action": {
+        "op": "mouse",
+        "button": "left",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.held",
+        "equals": false
+      }
+    },
+    {
+      "action": {
         "op": "key",
-        "key": "mine",
+        "key": "grab_drop",
         "pressed": false
       }
     },
@@ -1178,8 +1249,8 @@
     },
     {
       "action": {
-        "op": "key",
-        "key": "mine",
+        "op": "mouse",
+        "button": "left",
         "pressed": true
       }
     },
@@ -1204,8 +1275,8 @@
     },
     {
       "action": {
-        "op": "key",
-        "key": "mine",
+        "op": "mouse",
+        "button": "left",
         "pressed": false
       }
     },
@@ -1237,8 +1308,8 @@
     },
     {
       "action": {
-        "op": "key",
-        "key": "mine",
+        "op": "mouse",
+        "button": "left",
         "pressed": true
       }
     },
@@ -1256,8 +1327,8 @@
     },
     {
       "action": {
-        "op": "key",
-        "key": "mine",
+        "op": "mouse",
+        "button": "left",
         "pressed": false
       }
     },
@@ -1326,8 +1397,8 @@
     },
     {
       "action": {
-        "op": "key",
-        "key": "mine",
+        "op": "mouse",
+        "button": "left",
         "pressed": true
       }
     },
@@ -1339,8 +1410,8 @@
     },
     {
       "action": {
-        "op": "key",
-        "key": "mine",
+        "op": "mouse",
+        "button": "left",
         "pressed": false
       }
     },

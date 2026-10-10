@@ -68,7 +68,7 @@ not reorder it or move domain rules into runtime mapping.
 - Update this guide and the component architecture/invariants when ownership or
   behavior intentionally changes.
 
-F grab/drop priority and independent keyboard/mouse held state are runtime
+F grab/drop latching and left-mouse mining held state are runtime
 composition in `app.rs`/`app/input.rs` and `mining.rs`; see runtime invariants.
 Automation must share that route. Mining input/presentation is runtime composition; keep target validation, rate,
 source mass mutation, and session state in `salimon_world::mining`.
@@ -95,5 +95,5 @@ for gameplay redraws only. Renderer owns rasterization and message stacking;
 keep the toolbar independent of contextual action text and tool equip policy.
 
 For toolbar changes, run the carrying baseline/evidence route: it exercises all
-five selections, F mining rejection for every empty slot, equipped pickup,
+five selections, left-mouse mining rejection for every empty slot, equipped pickup,
 lockout and post-drop explicit selection. See [runner coverage](../../scripts/README.md#toolbar-gameplay-coverage-132).

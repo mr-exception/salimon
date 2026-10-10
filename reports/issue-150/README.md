@@ -83,3 +83,13 @@ actions retain 5 seconds, scenario deadlines are unchanged, and no frame count,
 physics behavior or gameplay assertion was removed. The evidence pairing and
 runner contract tests validate these scenario changes. Native CI will rerun on
 the updated PR; local X11 restrictions still apply.
+
+Run [184](https://github.com/mr-exception/salimon/actions/runs/38068699496)
+then exposed the independent server-side 5-second reply/queue deadline: long
+batches returned `command timed out` despite the longer runner deadline.
+The server now gives valid protocol-1 batches of 300–600 frames the same bounded
+30 seconds for queue expiry and reply waiting. Ordinary and invalid commands
+retain 5 seconds. A focused regression covers the range endpoints, ordinary
+requests, malformed JSON, wrong protocol and invalid frame counts/types.
+Formatting, workspace Clippy and the focused deadline test passed; a fresh
+full native CI run validates the coordinated deadlines.

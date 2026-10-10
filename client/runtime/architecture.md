@@ -314,3 +314,12 @@ mass. Normal convex physics then supplies motion; runtime installs
 `surface_ejection_velocity` only in the successful creation callback. Missing
 motion defaults to rest rather than inferring newness from map membership.
 See the canonical [surface emission contract](../world/resource-contracts.md#surface-emission-150).
+
+## Automation command deadlines
+
+The ready event advertises the ordinary 5-second command deadline. Valid
+protocol-1 `step` batches of 300–600 frames receive a bounded 30-second
+server deadline, matching the resource-collection scenario budget. The stdin
+reader and native request expiry use the same command-specific duration.
+Malformed/out-of-range requests and ordinary inputs/inspection stay at 5 seconds.
+Scenario overall deadlines remain independent; no fixed steps are skipped.

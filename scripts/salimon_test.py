@@ -36,13 +36,19 @@ def parse_scenario(path):
     if not isinstance(data, dict) or set(data) - {"setup", "timeout_ms", "steps"}:
         raise ScenarioError("scenario must be an object with setup, timeout_ms, and steps")
     setup = data.get("setup", {})
-    if not isinstance(setup, dict) or set(setup) - {"scenario", "seed", "step_ms"}:
-        raise ScenarioError("setup must contain only scenario, seed, and step_ms")
+    if not isinstance(setup, dict) or set(setup) - {"scenario", "seed", "step_ms", "fragment_count", "fragment_layout"}:
+        raise ScenarioError("setup contains unknown fields")
     name = setup.get("scenario", "landed-earth")
     seed = setup.get("seed", 0)
     step_ms = setup.get("step_ms", 16)
     if name not in SETUPS or type(seed) is not int or not 0 <= seed < 2**64 or type(step_ms) is not int or not 1 <= step_ms <= 100:
         raise ScenarioError("invalid setup scenario, seed, or step_ms")
+    count = setup.get("fragment_count")
+    layout = setup.get("fragment_layout", "scattered")
+    if "fragment_count" in setup and (type(count) is not int or not 0 <= count <= 1000):
+        raise ScenarioError("fragment_count must be 0..1000")
+    if not isinstance(layout, str) or layout not in {"scattered", "dense", "surface"} or ("fragment_layout" in setup and count is None):
+        raise ScenarioError("fragment_layout requires fragment_count and a known layout")
     timeout = positive_int(data.get("timeout_ms", 60000), "timeout_ms")
     steps = data.get("steps")
     if not isinstance(steps, list) or not steps:
@@ -78,7 +84,12 @@ def parse_scenario(path):
                 frames = positive_int(step.get("frames", 1), f"step {index} frames")
                 if frames > 600:
                     raise ScenarioError(f"step {index}: frames must be <= 600")
-    return {"setup": {"scenario": name, "seed": seed, "step_ms": step_ms}, "timeout_ms": timeout, "steps": steps}
+    normalized_setup = {"scenario": name, "seed": seed, "step_ms": step_ms}
+    if count is not None:
+        if name == "fragment-pile" or (layout == "surface" and name != "landed-earth"):
+            raise ScenarioError("invalid fragment population for this scenario")
+        normalized_setup.update(fragment_count=count, fragment_layout=layout)
+    return {"setup": normalized_setup, "timeout_ms": timeout, "steps": steps}
 
 
 MISSING = object()
@@ -135,9 +146,13 @@ class Game:
         self.next_id = 0
 
     def __enter__(self):
+        population_args = []
+        if "fragment_count" in self.setup:
+            population_args = ["--fragment-count", str(self.setup["fragment_count"]),
+                               "--fragment-layout", self.setup["fragment_layout"]]
         self.process = subprocess.Popen(
             self.command + ["--e2e", "--scenario", self.setup["scenario"],
-                            "--seed", str(self.setup["seed"]), "--step-ms", str(self.setup["step_ms"])],
+                            "--seed", str(self.setup["seed"]), "--step-ms", str(self.setup["step_ms"])] + population_args,
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             text=True, bufsize=1,
         )
@@ -151,8 +166,9 @@ class Game:
             if first != expected:
                 raise ScenarioError(f"unexpected ready signal: {first[:200]}")
             ready = self._json(self._receive("ready event"))
-            if ready != {"protocol": PROTOCOL, "event": "ready", **self.setup, "timeout_ms": 5000}:
-                # The event calls the scenario field 'scenario', just like setup.
+            ready_setup = {key: self.setup[key] for key in ("scenario", "seed", "step_ms")}
+            if ready != {"protocol": PROTOCOL, "event": "ready", **ready_setup, "timeout_ms": 5000}:
+                # Fixture options are launch arguments, not protocol-1 ready fields.
                 raise ScenarioError(f"invalid ready event: {ready}")
             return self
         except BaseException:

@@ -563,3 +563,10 @@ The game automation server also grants protocol-1 `step` requests of 300–600
 frames a 30-second deadline for both queue expiry and reply waiting. The ready
 event's `timeout_ms: 5000` continues to describe ordinary commands. A longer
 scenario budget alone does not extend the server deadline for other commands.
+
+## Fragment load benchmarks (#155)
+
+See [FRAGMENT_BENCHMARKS.md](FRAGMENT_BENCHMARKS.md) for native release and CPU-only
+matrices, fixture setup, measurement scopes and baseline-relative gates. The
+500-fragment correctness scenario runs in the standard baseline; benchmark
+wall-clock sampling remains separate from fixed-step automation.

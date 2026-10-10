@@ -166,6 +166,7 @@ pub struct GpuMemoryMetrics {
 /// Measurements associated with one successfully presented renderer frame.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct RenderStats {
+    pub resource_batch: resource_mesh::ResourceBatchStats,
     pub cpu_render_time: Duration,
     pub gpu_frame_time: GpuFrameTime,
     pub visible_objects: u32,
@@ -931,7 +932,7 @@ impl Renderer {
             .prepare(&self.queue, scene, prepared_scene.view_projection)?;
         self.held_item
             .prepare(&self.queue, scene.camera, aspect_ratio, scene.held_item)?;
-        self.resource_meshes.prepare(
+        let resource_batch = self.resource_meshes.prepare(
             &self.device,
             &self.queue,
             scene.camera,
@@ -1131,6 +1132,7 @@ impl Renderer {
             + self.held_item.count()
             + self.resource_meshes.object_count();
         Ok(RenderOutcome::Presented(RenderStats {
+            resource_batch,
             cpu_render_time,
             gpu_frame_time,
             visible_objects: object_count,

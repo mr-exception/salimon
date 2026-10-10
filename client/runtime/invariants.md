@@ -134,3 +134,11 @@
   growth support plus 5 mm and checking ground/player/existing pieces. There
   are no rows/grids. Only successful new-identity allocation installs an impulse;
   existing/growing/streamed objects are never implicitly re-ejected.
+
+- Benchmark populations are opt-in initial conditions from production extraction;
+  subsequent updates, carrying and support queries retain production behavior.
+  Benchmark observations never change IDs, mass, poses or collision ordering.
+- Native wall-clock benchmark results and fixed-step correctness/CPU costs remain
+  distinct. Raw benchmark frame intervals preserve spikes; missing GPU/sleep data
+  is null/explicit rather than synthesized. Requested settled state must be checked
+  against observed moving-object counts.

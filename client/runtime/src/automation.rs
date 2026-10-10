@@ -495,6 +495,7 @@ mod tests {
         e2e::initialize(
             &mut app,
             Config {
+                fragment_load: None,
                 scenario,
                 seed: 7,
                 step: Duration::from_millis(20),
@@ -510,6 +511,7 @@ mod tests {
         e2e::initialize(
             &mut test,
             Config {
+                fragment_load: None,
                 scenario: Scenario::LandedEarth,
                 seed: 0,
                 step: Duration::from_millis(16),
@@ -577,6 +579,7 @@ mod tests {
         e2e::initialize(
             &mut test,
             Config {
+                fragment_load: None,
                 scenario: Scenario::LandedEarth,
                 seed: 0,
                 step: Duration::from_millis(16),
@@ -642,6 +645,7 @@ mod tests {
         e2e::initialize(
             &mut test,
             Config {
+                fragment_load: None,
                 scenario: Scenario::LandedEarth,
                 seed: 0,
                 step: Duration::from_millis(16),
@@ -717,6 +721,7 @@ mod tests {
         e2e::initialize(
             &mut test,
             Config {
+                fragment_load: None,
                 scenario: Scenario::LandedEarth,
                 seed: 0,
                 step: Duration::from_millis(16),
@@ -789,6 +794,7 @@ mod tests {
         e2e::initialize(
             &mut test,
             Config {
+                fragment_load: None,
                 scenario: Scenario::LandedEarth,
                 seed: 0,
                 step: Duration::from_millis(16),
@@ -857,6 +863,7 @@ mod tests {
         e2e::initialize(
             &mut test,
             Config {
+                fragment_load: None,
                 scenario: Scenario::LandedEarth,
                 seed: 0,
                 step: Duration::from_millis(16),
@@ -945,6 +952,7 @@ mod tests {
         e2e::initialize(
             &mut test,
             Config {
+                fragment_load: None,
                 scenario: Scenario::LandedEarth,
                 seed: 0,
                 step: Duration::from_millis(16),
@@ -1071,6 +1079,7 @@ mod tests {
         e2e::initialize(
             &mut test,
             Config {
+                fragment_load: None,
                 scenario: initial,
                 seed: scenario["setup"]["seed"].as_u64().unwrap(),
                 step: Duration::from_millis(scenario["setup"]["step_ms"].as_u64().unwrap()),

@@ -54,6 +54,10 @@ jobs:
         run: python scripts/build_game.py --profile debug --output artifacts/build/debug
       - name: Stage release executable
         run: python scripts/build_game.py --profile release --output artifacts/build/release
+      - name: Fragment stress measurements (CPU-only; no hardware FPS assertions)
+        if: runner.os == 'Linux'
+        timeout-minutes: 5
+        run: python scripts/benchmark_fragments.py --binary artifacts/build/release/salimon-client --mode physics --counts 500 1000 --layouts scattered --states settled --warmup-seconds 0 --sample-seconds 1 --timeout 120 --machine-label github-actions-cpu-only --output artifacts/fragment-benchmarks
       - name: Linux deterministic E2E baseline (Mesa software Vulkan)
         if: runner.os == 'Linux'
         timeout-minutes: 10
@@ -102,5 +106,6 @@ jobs:
           path: |
             artifacts/build/
             artifacts/e2e/
+            artifacts/fragment-benchmarks/
             artifacts/packaged-smoke/
           if-no-files-found: warn

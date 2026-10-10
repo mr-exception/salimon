@@ -166,8 +166,9 @@ class Game:
             if first != expected:
                 raise ScenarioError(f"unexpected ready signal: {first[:200]}")
             ready = self._json(self._receive("ready event"))
-            if ready != {"protocol": PROTOCOL, "event": "ready", **self.setup, "timeout_ms": 5000}:
-                # The event calls the scenario field 'scenario', just like setup.
+            ready_setup = {key: self.setup[key] for key in ("scenario", "seed", "step_ms")}
+            if ready != {"protocol": PROTOCOL, "event": "ready", **ready_setup, "timeout_ms": 5000}:
+                # Fixture options are launch arguments, not protocol-1 ready fields.
                 raise ScenarioError(f"invalid ready event: {ready}")
             return self
         except BaseException:

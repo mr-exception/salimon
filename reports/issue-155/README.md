@@ -118,6 +118,22 @@ or screenshots are claimed. Native graphical baseline, packaged smoke and actual
 M1 reference matrix are not validated locally. CI must exercise graphical setup;
 reference hardware evidence must be recorded separately.
 
+## PR CI startup correction
+
+The first PR run (#162, Actions run 38079698725) passed Windows/macOS and
+Linux build, quality and CPU stress checks. Linux graphical E2E failed before
+the first `fragment-load.json` assertion: the runner compared the native
+protocol-1 ready event with all setup options, including `fragment_count` and
+`fragment_layout`, which are not fields in that event. Other baseline scenarios
+passed in the saved results.
+
+The runner now checks the protocol's three advertised setup fields while still
+passing fixture options to the executable. A process-level regression test
+requires both population arguments and the existing ready-event format.
+`python -m unittest discover -s scripts -p 'test_*.py'` passes all 41 tests;
+`git diff --check` passes. Graphical verification remains delegated to CI due to
+the local Xvfb limitation documented above.
+
 ## Remaining acceptance work
 
 Run the full reference matrix with sufficient verified settling and ≥100 samples

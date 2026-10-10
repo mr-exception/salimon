@@ -74,6 +74,16 @@ class RunnerTests(unittest.TestCase):
             game.request({"op": "inspect"})
         self.assertIsNotNone(game.process.poll())
 
+    def test_fragment_load_startup_and_argument_forwarding(self):
+        self.data["setup"].update(fragment_count=500, fragment_layout="scattered")
+        self.save()
+        self.fake.write_text(FAKE.replace(
+            'print("SALIMON_E2E_READY',
+            'assert setup["--fragment-count"] == "500"\n'
+            'assert setup["--fragment-layout"] == "scattered"\n'
+            'print("SALIMON_E2E_READY', 1))
+        self.assertEqual(self.execute()["status"], "passed")
+
     def test_failed_assertion_and_missing_path(self):
         self.data["steps"] = [{"assert": {"path": "ship.speed", "equals": 8}}]
         self.save()

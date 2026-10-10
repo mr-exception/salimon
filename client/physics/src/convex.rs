@@ -201,6 +201,10 @@ pub(crate) struct Projection {
 /// Reject common sphere-overlapping but hull-separated pairs before constructing
 /// crossed-edge axes. Recheck each pass because other contacts can move centers.
 pub(crate) fn separated_by_faces(a: &super::ObjectState, b: &super::ObjectState) -> bool {
+    separated_by_faces_with_gap(a, b, 0.0)
+}
+
+fn separated_by_faces_with_gap(a: &super::ObjectState, b: &super::ObjectState, gap: f64) -> bool {
     let ah = a.hull.as_ref().expect("convex caller");
     let bh = b.hull.as_ref().expect("convex caller");
     let separation = sub(b.position, a.position);
@@ -213,9 +217,11 @@ pub(crate) fn separated_by_faces(a: &super::ObjectState, b: &super::ObjectState)
             offset
                 > ah.support(a.orientation, a.side_meters, axis)
                     + bh.support(b.orientation, b.side_meters, scale(axis, -1.0))
+                    + gap
                 || -offset
                     > ah.support(a.orientation, a.side_meters, scale(axis, -1.0))
                         + bh.support(b.orientation, b.side_meters, axis)
+                        + gap
         })
 }
 
@@ -273,6 +279,18 @@ pub(crate) fn projections(a: &super::ObjectState, b: &super::ObjectState) -> Vec
             }
         })
         .collect()
+}
+
+/// Full SAT with a small support-gap tolerance; spheres alone never anchor sleep.
+pub(crate) fn near_contact(a: &super::ObjectState, b: &super::ObjectState, gap: f64) -> bool {
+    if separated_by_faces_with_gap(a, b, gap) {
+        return false;
+    }
+    let offset = sub(b.position, a.position);
+    projections(a, b).iter().all(|p| {
+        let shift = dot(offset, p.axis);
+        p.forward - shift >= -gap && p.backward + shift >= -gap
+    })
 }
 
 /// Minimum translation of B relative to A, with universe-scale-safe subtraction.

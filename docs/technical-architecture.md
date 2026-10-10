@@ -131,7 +131,9 @@ objects should use this boundary for compatible motion/contact. Their feature
 owners adapt identity/state and environment here, extending physics with focused
 contracts/tests when new rules are actually required. Do not add unrelated
 physical rules to runtime. Character locomotion and ship flight retain their
-existing domain controllers. The #148 solver uses authored convex envelopes, mass-weighted contacts and angular response with approximate isotropic inertia. Broad-phase pairs remain quadratic; this is a small-object custom solver, not a general rigid-body engine.
+existing domain controllers. The #148 solver uses authored convex envelopes, mass-weighted contacts and angular response with approximate isotropic inertia. The stable-ID activation cache sleeps supported quiet contact islands and wakes
+connected supports; see the [sleep contract](../client/physics/architecture.md#persistent-contact-island-sleep-156).
+Active broad-phase pairs remain quadratic; this is a small-object custom solver, not a general rigid-body engine.
 Multiple ship frames must be stepped separately; the current single-ship adapter
 preserves frame grouping and deterministic order; convex substeps adapt to scale and speed.
 See [physics architecture](../client/physics/architecture.md) and

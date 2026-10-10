@@ -142,3 +142,8 @@
   distinct. Raw benchmark frame intervals preserve spikes; missing GPU/sleep data
   is null/explicit rather than synthesized. Requested settled state must be checked
   against observed moving-object counts.
+
+- Fragment activation follows stable IDs at the portable physics boundary.
+  Sleeping objects stay in session presentation/picking/collision; omission wakes
+  dependent contacts and streaming return rebuilds support. Ship-local rigid
+  movement preserves sleep and f64 world writeback. See the [activation adapter](architecture.md#fragment-activation-adapter-156).

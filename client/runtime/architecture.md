@@ -338,7 +338,7 @@ and JSON output. `--benchmark` native runs keep the ordinary monotonic update
 clock and renderer; they never enable stdin automation. Physics-only runs time
 production fragment adapters at 16ms simulation deltas with no window, renderer
 or FPS claim. Samples record actual moving-object counts; a requested settled
-fixture does not prove a settled sample. No sleeping mechanism exists.
+fixture does not prove a settled sample. Persistent awake/sleeping counters are supplied by the physics activation cache.
 
 Frame intervals use a separate uncapped monotonic clock, preserving long spikes
 hidden by rolling diagnostics' 250ms display clamp. Normal update-delta clamping
@@ -346,3 +346,22 @@ is unchanged and reported. Samples are retained in memory and written once at
 completion; high-frequency CPU runs decimate deterministically to bounded storage
 and report stride/observed count. Native early closure must produce no successful
 benchmark result. See the [benchmark guide](../../scripts/FRAGMENT_BENCHMARKS.md).
+
+
+## Fragment activation adapter (#156)
+
+`MiningTool.fragment_sleep` owns the in-memory `SleepTracker<FragmentId>` lifetime.
+The adapter supplies stable IDs alongside current frame-local snapshots; selection
+omission (carrying or distant streaming) invalidates cached support, including
+an entirely empty selection. Return starts awake without changing session IDs,
+mass or local anchors. Growth/release/frame transfer changes snapshot fields and
+wakes old contact neighbors. Ship-local rigid motion leaves sleep intact; world
+presentation still synchronizes every sleeping pose/orientation through f64
+frame conversion. Current interior gravity abstracts ship acceleration, so
+flight itself introduces no new local force. Future force/support policies must
+change snapshots or explicitly invalidate activation.
+
+Physics owns thresholds, contact support and waking. Runtime/benchmark map
+awake/sleeping/integrated counters; renderer and interaction continue consuming
+the complete session, including sleeping pieces. No cargo cap/deletion or disk
+persistence is introduced. See the [sleep contract](../physics/architecture.md#persistent-contact-island-sleep-156).

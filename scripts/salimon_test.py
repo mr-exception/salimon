@@ -134,6 +134,13 @@ def matches(state, condition):
         raise ScenarioError(f"invalid comparison at {condition['path']}: {exc}") from exc
 
 
+def result_summary(result):
+    """Console metadata only; full state and diagnostics stay in result.json."""
+    fields = ("scenario", "status", "steps_completed", "duration_ms", "error",
+              "artifact_error", "artifact_directory", "result_file")
+    return {key: result[key] for key in fields if key in result}
+
+
 class Game:
     def __init__(self, command, setup, deadline, artifacts=None):
         self.command = command

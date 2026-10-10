@@ -35,6 +35,23 @@ class ScenarioSuiteTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             select_scenarios(Path("scenarios"), "typo")
 
+    def test_summary_cli_retains_failure_exit_and_artifact_paths(self):
+        root = Path(__file__).resolve().parents[1]
+        with tempfile.TemporaryDirectory() as temp:
+            completed = subprocess.run(
+                [sys.executable, str(root / "scripts/salimon-test"), "suite",
+                 "--group", "ship-eva", "--summary", "--binary", str(Path(temp) / "missing"),
+                 "--artifacts", str(Path(temp) / "evidence"), "--screenshot-command", "[]"],
+                capture_output=True, text=True, timeout=30)
+            self.assertEqual(completed.returncode, 1)
+            report = json.loads(completed.stdout)
+            self.assertEqual(report["status"], "failed")
+            self.assertEqual(len(report["results"]), len(GROUPS["ship-eva"]))
+            for result in report["results"]:
+                self.assertTrue(result["error"])
+                self.assertNotIn("steps", result)
+                self.assertTrue(Path(result["result_file"]).is_file())
+
 
     def test_resource_cli_preserves_each_failed_launch(self):
         root = Path(__file__).resolve().parent.parent

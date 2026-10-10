@@ -1,0 +1,242 @@
+{
+  "run_id": 38086122402,
+  "head_sha": "0ab22043524cfdd5565f7d757d570821d2709bda",
+  "completed_scenarios": 29,
+  "completed_duration_ms": 589946,
+  "baseline_log_bytes": 218809919,
+  "summary_json_bytes": 9425,
+  "results": [
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/orbit-earth.json",
+      "status": "passed",
+      "steps_completed": 23,
+      "duration_ms": 2135,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-1usfhq3c",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-1usfhq3c/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/nearby-eva.json",
+      "status": "passed",
+      "steps_completed": 43,
+      "duration_ms": 2476,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-lygrdk4r",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-lygrdk4r/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/lower-cockpit-windows.json",
+      "status": "passed",
+      "steps_completed": 16,
+      "duration_ms": 3084,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-kv4pkis8",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-kv4pkis8/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/resource-streaming.json",
+      "status": "passed",
+      "steps_completed": 140,
+      "duration_ms": 59846,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-ebf_ak1b",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-ebf_ak1b/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/moving-eva.json",
+      "status": "passed",
+      "steps_completed": 93,
+      "duration_ms": 3915,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-846utmhv",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-846utmhv/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/fragment-transfer.json",
+      "status": "passed",
+      "steps_completed": 282,
+      "duration_ms": 47236,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-_l6dceff",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-_l6dceff/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/cockpit-nose.json",
+      "status": "passed",
+      "steps_completed": 30,
+      "duration_ms": 1508,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-ju897gen",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-ju897gen/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/fragment-transfer.json",
+      "status": "passed",
+      "steps_completed": 277,
+      "duration_ms": 44217,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-n4k0ubad",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-n4k0ubad/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/carrying.json",
+      "status": "passed",
+      "steps_completed": 331,
+      "duration_ms": 41833,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-resfkd7n",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-resfkd7n/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/mining-emission.json",
+      "status": "passed",
+      "steps_completed": 107,
+      "duration_ms": 5360,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-mwjv8c7b",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-mwjv8c7b/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/resource-deposits.json",
+      "status": "passed",
+      "steps_completed": 64,
+      "duration_ms": 3070,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-0vphbykh",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-0vphbykh/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/mining-emission.json",
+      "status": "passed",
+      "steps_completed": 116,
+      "duration_ms": 14494,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-6z_sw58g",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-6z_sw58g/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/cockpit-nose.json",
+      "status": "passed",
+      "steps_completed": 31,
+      "duration_ms": 2703,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-cnsg_ay_",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-cnsg_ay_/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/fragment-pile-floor.json",
+      "status": "passed",
+      "steps_completed": 6,
+      "duration_ms": 8119,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-fhmtx_j4",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-fhmtx_j4/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/space-airlock.json",
+      "status": "passed",
+      "steps_completed": 54,
+      "duration_ms": 5532,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-4n3ff2u1",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-4n3ff2u1/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/resource-streaming.json",
+      "status": "passed",
+      "steps_completed": 134,
+      "duration_ms": 54543,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-81bx9tzj",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-81bx9tzj/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/carrying.json",
+      "status": "passed",
+      "steps_completed": 344,
+      "duration_ms": 50680,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-6lcmsv0x",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-6lcmsv0x/result.json"
+    },
+    {
+      "scenario": "scenarios/evidence/lower-cockpit-windows.json",
+      "status": "passed",
+      "steps_completed": 24,
+      "duration_ms": 10319,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-06hr29gi",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-06hr29gi/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/landed-earth.json",
+      "status": "passed",
+      "steps_completed": 110,
+      "duration_ms": 6586,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-oe1kgglc",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-oe1kgglc/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/resource-deposits.json",
+      "status": "passed",
+      "steps_completed": 65,
+      "duration_ms": 4619,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-wdzw8u9g",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-wdzw8u9g/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/fragment-load.json",
+      "status": "passed",
+      "steps_completed": 16,
+      "duration_ms": 2261,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-l58fcvqh",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-l58fcvqh/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/mining.json",
+      "status": "passed",
+      "steps_completed": 148,
+      "duration_ms": 28339,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-3voob1c2",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-3voob1c2/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/fragment-pile-surface.json",
+      "status": "passed",
+      "steps_completed": 6,
+      "duration_ms": 5017,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-w_xidvc_",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-w_xidvc_/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/resource-loop.json",
+      "status": "passed",
+      "steps_completed": 267,
+      "duration_ms": 68915,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-040cgzw1",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-040cgzw1/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/resource-loop.json",
+      "status": "passed",
+      "steps_completed": 258,
+      "duration_ms": 62779,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-6u9x39z_",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-6u9x39z_/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/mining.json",
+      "status": "passed",
+      "steps_completed": 154,
+      "duration_ms": 35203,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-19ritrke",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-19ritrke/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/space-airlock.json",
+      "status": "passed",
+      "steps_completed": 50,
+      "duration_ms": 2114,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-t91bm1go",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-t91bm1go/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/moving-eva.json",
+      "status": "passed",
+      "steps_completed": 96,
+      "duration_ms": 6737,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-el08h4dt",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-el08h4dt/result.json"
+    },
+    {
+      "scenario": "/home/runner/work/salimon/salimon/scenarios/evidence/nearby-eva.json",
+      "status": "passed",
+      "steps_completed": 46,
+      "duration_ms": 6306,
+      "artifact_directory": "/home/runner/work/salimon/salimon/artifacts/e2e/run-7jiany00",
+      "result_file": "/home/runner/work/salimon/salimon/artifacts/e2e/run-7jiany00/result.json"
+    }
+  ]
+}

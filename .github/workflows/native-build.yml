@@ -71,11 +71,26 @@ jobs:
           command -v import
           xvfb-run -a -s '-screen 0 1280x800x24' bash -euo pipefail -c '
             import -window root artifacts/e2e/display-ready.png
-            python scripts/salimon-test suite --binary artifacts/build/release/salimon-client
-            python scripts/salimon-test run scenarios/evidence/lower-cockpit-windows.json --binary artifacts/build/release/salimon-client --screenshot-command "[\"python\", \"scripts/capture_settled.py\", \"{path}\"]"
-            python scripts/salimon-test suite --group resource-collection --evidence --binary artifacts/build/release/salimon-client --screenshot-command "[\"python\", \"scripts/capture_settled.py\", \"{path}\"]"
-            python scripts/salimon-test suite --group ship-eva --evidence --binary artifacts/build/release/salimon-client --screenshot-command "[\"python\", \"scripts/capture_settled.py\", \"{path}\"]"
+            python scripts/salimon-test suite --summary --binary artifacts/build/release/salimon-client
           ' 2>&1 | tee artifacts/e2e/baseline.log
+      - name: Linux cockpit window evidence (Mesa software Vulkan)
+        if: runner.os == 'Linux'
+        timeout-minutes: 3
+        env:
+          WGPU_BACKEND: vulkan
+        run: xvfb-run -a -s '-screen 0 1280x800x24' python scripts/salimon-test run scenarios/evidence/lower-cockpit-windows.json --summary --binary artifacts/build/release/salimon-client --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
+      - name: Linux resource evidence (Mesa software Vulkan)
+        if: runner.os == 'Linux'
+        timeout-minutes: 10
+        env:
+          WGPU_BACKEND: vulkan
+        run: xvfb-run -a -s '-screen 0 1280x800x24' python scripts/salimon-test suite --group resource-collection --evidence --summary --binary artifacts/build/release/salimon-client --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
+      - name: Linux ship and EVA evidence (Mesa software Vulkan)
+        if: runner.os == 'Linux'
+        timeout-minutes: 5
+        env:
+          WGPU_BACKEND: vulkan
+        run: xvfb-run -a -s '-screen 0 1280x800x24' python scripts/salimon-test suite --group ship-eva --evidence --summary --binary artifacts/build/release/salimon-client --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
       - name: Linux optional visual checkpoints (Mesa software Vulkan)
         if: runner.os == 'Linux' && inputs.visual_evidence == true
         timeout-minutes: 10
@@ -86,7 +101,7 @@ jobs:
           set -euo pipefail
           xvfb-run -a -s '-screen 0 1280x800x24' bash -euo pipefail -c '
             for scenario in scenarios/evidence/*.json; do
-              python scripts/salimon-test run "$scenario" --binary artifacts/build/release/salimon-client
+              python scripts/salimon-test run "$scenario" --summary --binary artifacts/build/release/salimon-client
             done
           ' 2>&1 | tee artifacts/e2e/visual.log
       - name: Record native graphics coverage on macOS and Windows

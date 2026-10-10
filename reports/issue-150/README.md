@@ -67,3 +67,19 @@ python scripts/salimon-test run scenarios/evidence/mining-emission.json --binary
 Promote reviewed origin/ejection/repetition/settling PNGs and their authoritative
 states beside this report. The issue stays open for review/merge and completion
 of native visual evidence.
+
+## CI timeout correction
+
+Run [183](https://github.com/mr-exception/salimon/actions/runs/38067902185)
+passed Rust/Python/model/build gates on all three OSes. Linux native baseline
+passed the new emission route and both pile fixtures, but five existing mining
+scenarios exhausted the runner's default **shared 5-second action + inspection
+budget** during 600-frame physics batches (9.6 seconds of simulated time).
+Failures were request deadlines, not failed mass, interaction or pose assertions.
+
+Mining, carrying, transfer, resource-loop and streaming baseline/evidence pairs
+now explicitly allow 30 seconds for batches of at least 300 frames. Ordinary
+actions retain 5 seconds, scenario deadlines are unchanged, and no frame count,
+physics behavior or gameplay assertion was removed. The evidence pairing and
+runner contract tests validate these scenario changes. Native CI will rerun on
+the updated PR; local X11 restrictions still apply.

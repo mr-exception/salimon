@@ -562,25 +562,29 @@
       "action": {
         "op": "step",
         "frames": 600
-      }
+      },
+      "timeout_ms": 30000
     },
     {
       "action": {
         "op": "step",
         "frames": 600
-      }
+      },
+      "timeout_ms": 30000
     },
     {
       "action": {
         "op": "step",
         "frames": 600
-      }
+      },
+      "timeout_ms": 30000
     },
     {
       "action": {
         "op": "step",
         "frames": 600
-      }
+      },
+      "timeout_ms": 30000
     },
     {
       "action": {
@@ -618,25 +622,29 @@
       "action": {
         "op": "step",
         "frames": 600
-      }
+      },
+      "timeout_ms": 30000
     },
     {
       "action": {
         "op": "step",
         "frames": 600
-      }
+      },
+      "timeout_ms": 30000
     },
     {
       "action": {
         "op": "step",
         "frames": 600
-      }
+      },
+      "timeout_ms": 30000
     },
     {
       "action": {
         "op": "step",
         "frames": 600
-      }
+      },
+      "timeout_ms": 30000
     },
     {
       "action": {
@@ -694,13 +702,15 @@
       "action": {
         "op": "step",
         "frames": 600
-      }
+      },
+      "timeout_ms": 30000
     },
     {
       "action": {
         "op": "step",
         "frames": 600
-      }
+      },
+      "timeout_ms": 30000
     },
     {
       "action": {
@@ -726,25 +736,29 @@
       "action": {
         "op": "step",
         "frames": 600
-      }
+      },
+      "timeout_ms": 30000
     },
     {
       "action": {
         "op": "step",
         "frames": 600
-      }
+      },
+      "timeout_ms": 30000
     },
     {
       "action": {
         "op": "step",
         "frames": 600
-      }
+      },
+      "timeout_ms": 30000
     },
     {
       "action": {
         "op": "step",
         "frames": 600
-      }
+      },
+      "timeout_ms": 30000
     },
     {
       "action": {
@@ -782,25 +796,29 @@
       "action": {
         "op": "step",
         "frames": 600
-      }
+      },
+      "timeout_ms": 30000
     },
     {
       "action": {
         "op": "step",
         "frames": 600
-      }
+      },
+      "timeout_ms": 30000
     },
     {
       "action": {
         "op": "step",
         "frames": 600
-      }
+      },
+      "timeout_ms": 30000
     },
     {
       "action": {
         "op": "step",
         "frames": 600
-      }
+      },
+      "timeout_ms": 30000
     },
     {
       "action": {

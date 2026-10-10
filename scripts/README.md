@@ -552,3 +552,9 @@ discovery/portable runtime contracts.
 ```sh
 python scripts/salimon-test run scenarios/evidence/mining-emission.json --binary target/debug/salimon-client --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
 ```
+
+Long resource-collection fixed-step batches (300–600 frames) explicitly use
+`timeout_ms: 30000` for the combined action and following inspection. The
+default 5-second budget still applies to ordinary inputs/assertions; whole
+scenario deadlines remain bounded. This accommodates complete convex piles
+on shared software-rendered CI without changing fixed steps or assertions.

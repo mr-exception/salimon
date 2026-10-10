@@ -239,7 +239,7 @@ mod tests {
     fn dynamic_multiline_context_updates_mass_and_renders_both_rows() {
         let mut bar = ActionBar::default();
         bar.set_contextual(Some(
-            "Silicate rock - approx 10.5 kg left\nHold F to mine".to_owned(),
+            "Silicate rock - approx 10.5 kg left\nHold left mouse to mine".to_owned(),
         ));
         let first = bar.image(true).unwrap();
         let revision = first.revision;
@@ -253,7 +253,7 @@ mod tests {
         assert!(text_pixels_on_row(12));
         assert!(text_pixels_on_row(48));
         bar.set_contextual(Some(
-            "Silicate rock - approx 9.5 kg left\nHold F to mine".to_owned(),
+            "Silicate rock - approx 9.5 kg left\nHold left mouse to mine".to_owned(),
         ));
         assert!(bar.image(true).unwrap().revision > revision);
         bar.show_transient("Only one world object - G to place/drop first");

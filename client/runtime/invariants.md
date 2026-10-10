@@ -94,13 +94,13 @@
   `salimon-physics`; runtime supplies geometry and frame conversions only.
 
 - F initial presses grab an aimed reachable world object, or release the carried
-  object. Carrying wins over keyboard mining for that entire press; repeated or
-  synthetic native presses cannot repeat the action. E never changes carrying.
-- Held F mines only when its initial press had no carrying action. Left mouse
-  mining has independent held state; releasing either input preserves the other.
-  Focus loss, cursor release, view switch and stow clear both inputs and F latch.
-- Automation `grab_drop` and legacy `mine`/`pickup`/`drop` aliases all use the
-  production contextual F route; no Q/G item-specific carrying route exists.
+  object. A miss never starts mining; repeated or synthetic native presses cannot
+  repeat the action. E never changes carrying.
+- Only left mouse controls held mining. F press/repeat/release never activates
+  the tool or sustains extraction after mouse release. Successful pickup cancels
+  mining. Focus loss, cursor release, view switch and stow clear input and F latch.
+- Automation `grab_drop` and legacy `pickup`/`drop` aliases use the production F
+  route. Mining uses the shared left-mouse route; the old `mine` key is rejected.
 
 - Equipment toolbar state has exactly five slots, initially mining tool then four
   empty slots, and zero or one selected slot (initially none). Empty selection
@@ -121,7 +121,7 @@
   consumed F latch. M and the legacy equip automation key are unavailable.
 
 - The carrying baseline/evidence route protects selection and mining together:
-  all four empty slots must prevent F extraction at a reachable deposit, while
+  all four empty slots must prevent left-mouse extraction at a reachable deposit, while
   explicit slot 1 selection restores the held tool and extraction eligibility.
   Evidence checkpoints observe equipped, empty-selected, carrying-deselected
   and post-drop-deselected states without changing gameplay actions.

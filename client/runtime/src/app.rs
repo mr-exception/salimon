@@ -376,8 +376,6 @@ impl ClientApplication {
                         .is_some()
                 {
                     self.carry_action(pickup);
-                } else if self.equipment.mining_equipped() {
-                    self.mining.start_f_mining();
                 }
             }
             return;
@@ -387,6 +385,16 @@ impl ClientApplication {
         } else {
             update_movement_input(&mut self.movement_input, key, pressed);
         }
+    }
+
+    /// Shared native/automation left-button route; only equipment enables mining.
+    pub(crate) fn mining_mouse_input(&mut self, pressed: bool) {
+        self.mining.set_mouse_held(
+            pressed
+                && self.view_mode == ViewMode::Gameplay
+                && self.equipment.mining_equipped()
+                && self.mining.session.carried_id().is_none(),
+        );
     }
 
     fn carry_action(&mut self, pickup: bool) {
@@ -887,42 +895,33 @@ impl ApplicationHandler for ClientApplication {
                 button: MouseButton::Left,
                 ..
             } => {
-                self.mining.set_mouse_held(
-                    self.cursor_captured
-                        && self.equipment.mining_equipped()
-                        && state == ElementState::Pressed,
-                );
+                self.mining_mouse_input(self.cursor_captured && state == ElementState::Pressed);
             }
             WindowEvent::KeyboardInput {
                 event,
                 is_synthetic,
                 ..
-            } if event.physical_key == PhysicalKey::Code(KeyCode::KeyF) => {
-                if self.cursor_captured
-                    && tool_key_event(event.repeat, is_synthetic, event.physical_key)
-                {
-                    self.automation_key(event.physical_key, event.state == ElementState::Pressed);
-                    window.request_redraw();
-                }
+            } if self.cursor_captured
+                && tool_key_event(event.repeat, is_synthetic, event.physical_key) =>
+            {
+                self.automation_key(event.physical_key, event.state == ElementState::Pressed);
+                window.request_redraw();
             }
             WindowEvent::KeyboardInput {
                 event,
                 is_synthetic,
                 ..
             } if self.view_mode == ViewMode::Gameplay
-                && toolbar_slot(event.physical_key).is_some() =>
+                && self.cursor_captured
+                && toolbar_selection_pressed(
+                    event.state,
+                    event.repeat,
+                    event.physical_key,
+                    is_synthetic,
+                ) =>
             {
-                if self.cursor_captured
-                    && toolbar_selection_pressed(
-                        event.state,
-                        event.repeat,
-                        event.physical_key,
-                        is_synthetic,
-                    )
-                {
-                    self.automation_key(event.physical_key, true);
-                    window.request_redraw();
-                }
+                self.automation_key(event.physical_key, true);
+                window.request_redraw();
             }
             WindowEvent::KeyboardInput { event, .. }
                 if interaction_pressed(event.state, event.repeat, event.physical_key) =>

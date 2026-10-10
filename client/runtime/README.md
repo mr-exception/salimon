@@ -188,15 +188,17 @@ unloaded areas and restored deposits.
 ## Handheld mining (#44)
 
 Press **1** to equip the mining tool; **2–5** selects empty slots and stows it. On a planetary surface, aim the center
-marker at a deposit within **4 m**, then hold **F** or the **left mouse button**.
+marker at a deposit within **4 m**, then hold the **left mouse button**.
 The tool removes **2 kg/s** while aim, range, line of sight, and remaining mass
 are valid. Release to stop; changing view, releasing the cursor, or losing focus
 clears held input. Hull/gate/engine proxies and the solid planet obstruct mining.
 An authored tool and illuminated indicator show equipped/active state; contextual
 prompts explain equip/use. Tool gear does not occupy world-object carry capacity.
 
-Automation keys `slot_1` (equip), `slot_2`–`slot_5` (stow) and `mine` (held press/release)
-use the same input path. `inspect` exposes `mining.equipped`, `held`, `active`,
+Automation keys `slot_1` (equip) and `slot_2`–`slot_5` (stow) share native selection.
+Mining uses `{"op":"mouse","button":"left","pressed":true}` and the corresponding
+release (`pressed:false`) through the shared native mouse route. The old `mine`
+keyboard alias is rejected; F only grabs/drops. `inspect` exposes `mining.equipped`, `held`, `active`,
 `target`, `range_meters`, `rate_kg_per_second`, and diagnostic
 `extracted_mass_kg`. Deposit inspection and visuals read world-owned session
 mass deltas. Extraction is advanced only by simulation steps in E2E mode.

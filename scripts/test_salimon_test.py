@@ -61,6 +61,12 @@ class RunnerTests(unittest.TestCase):
         with self.assertRaises(ScenarioError):
             parse_scenario(self.scenario)
 
+    def test_left_mouse_action_is_accepted_and_forwarded(self):
+        self.data["steps"] = [{"action": {"op": "mouse", "button": "left", "pressed": True}},
+                              {"action": {"op": "mouse", "button": "left", "pressed": False}}]
+        self.save()
+        self.assertEqual(self.execute()["status"], "passed")
+
     def test_success_and_process_cleanup(self):
         self.assertEqual(self.execute()["status"], "passed")
         with Game([sys.executable, str(self.fake)], parse_scenario(self.scenario)["setup"], time.monotonic() + 2) as game:

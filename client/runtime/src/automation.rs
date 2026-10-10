@@ -227,6 +227,21 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
                 _ => Err(("invalid_argument", "known key and boolean pressed required")),
             }
         }
+        Some("mouse") => {
+            match (
+                command.get("button").and_then(Value::as_str),
+                command.get("pressed").and_then(Value::as_bool),
+            ) {
+                (Some("left"), Some(pressed)) => {
+                    app.mining_mouse_input(pressed);
+                    Ok(json!({"button": "left", "pressed": pressed}))
+                }
+                _ => Err((
+                    "invalid_argument",
+                    "left button and boolean pressed required",
+                )),
+            }
+        }
         Some("interact") => {
             app.interact();
             Ok(json!({"applied": true}))
@@ -246,7 +261,7 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
         },
         _ => Err((
             "unknown_op",
-            "expected inspect, step, look, aim_fragment, restore_look, key, interact, landing, or thruster",
+            "expected inspect, step, look, aim_fragment, restore_look, key, mouse, interact, landing, or thruster",
         )),
     };
     match result {
@@ -269,7 +284,7 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "4" | "slot_4" => Some(KeyCode::Digit4),
         "5" | "slot_5" => Some(KeyCode::Digit5),
         "6" => Some(KeyCode::Digit6),
-        "grab_drop" | "pickup" | "drop" | "mine" => Some(KeyCode::KeyF),
+        "grab_drop" | "pickup" | "drop" => Some(KeyCode::KeyF),
         "roll_left" => Some(KeyCode::ArrowLeft),
         "roll_right" => Some(KeyCode::ArrowRight),
         _ => None,
@@ -639,7 +654,7 @@ mod tests {
             );
             assert!(!test.mining.held, "selection must not restart held mining");
             assert!(test.mining.press_f());
-            test.mining.start_f_mining();
+            test.mining_mouse_input(true);
         }
         assert_eq!(key_code("equip_mining_tool"), None);
         test.automation_key(PhysicalKey::Code(KeyCode::KeyM), true);
@@ -647,6 +662,70 @@ mod tests {
             test.equipment.mining_equipped(),
             "M cannot toggle selection"
         );
+    }
+
+    #[test]
+    fn f_isolation_and_mouse_reset_use_shared_production_routes() {
+        let mut test = app(Scenario::LandedEarth);
+        e2e::initialize(
+            &mut test,
+            Config {
+                scenario: Scenario::LandedEarth,
+                seed: 0,
+                step: Duration::from_millis(16),
+            },
+        )
+        .unwrap();
+        let scenario: Value =
+            serde_json::from_str(include_str!("../../../scenarios/mining.json")).unwrap();
+        for step in scenario["steps"].as_array().unwrap() {
+            if step
+                .get("assert")
+                .and_then(|check| check["contains"].as_str())
+                == Some("Hold left mouse to mine")
+            {
+                break;
+            }
+            if let Some(action) = step.get("action") {
+                let mut command = action.clone();
+                command["protocol"] = json!(1);
+                command["id"] = json!(1);
+                assert_eq!(execute(&mut test, &command.to_string())["ok"], true);
+            }
+        }
+        assert!(inspect(&test)["mining"]["target"].is_object());
+        assert_eq!(key_code("mine"), None);
+        let old_mine = json!({"protocol": 1, "id": 1, "op": "key", "key": "mine", "pressed": true});
+        assert_eq!(execute(&mut test, &old_mine.to_string())["ok"], false);
+        let f = PhysicalKey::Code(KeyCode::KeyF);
+        for _ in 0..3 {
+            test.automation_key(f, true);
+            test.advance_game(Duration::from_millis(16));
+            assert!(!test.mining.held);
+            assert_eq!(test.mining.session.extracted_mass_kg(), 0.0);
+        }
+        test.mining_mouse_input(true);
+        test.automation_key(f, false);
+        assert!(test.mining.held, "F release preserves mouse mining");
+        test.advance_game(Duration::from_millis(16));
+        assert!(test.mining.session.extracted_mass_kg() > 0.0);
+        test.automation_key(f, true);
+        test.mining_mouse_input(false);
+        assert!(!test.mining.held, "held F cannot sustain mouse mining");
+        let mass = test.mining.session.extracted_mass_kg();
+        test.advance_game(Duration::from_millis(16));
+        assert_eq!(test.mining.session.extracted_mass_kg(), mass);
+        test.mining_mouse_input(true);
+        test.mining.clear_input(); // Native focus loss/cursor release use this reset.
+        test.automation_key(f, true);
+        assert!(!test.mining.held);
+        test.mining_mouse_input(true);
+        test.automation_key(PhysicalKey::Code(KeyCode::Digit2), true);
+        assert!(!test.mining.held);
+        test.mining_mouse_input(true);
+        assert!(!test.mining.held, "empty selection rejects mouse input");
+        test.automation_key(PhysicalKey::Code(KeyCode::Digit1), true);
+        assert!(!test.mining.held, "re-equip never resumes old input");
     }
 
     #[test]

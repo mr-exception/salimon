@@ -18,8 +18,6 @@ pub(crate) struct MiningTool {
     pub(crate) carry_feedback: Option<&'static str>,
     pub(crate) held: bool,
     f_down: bool,
-    f_mining: bool,
-    mouse_held: bool,
     pub(crate) session: MiningSession,
 }
 
@@ -33,26 +31,16 @@ impl MiningTool {
         true
     }
 
-    pub(crate) fn start_f_mining(&mut self) {
-        self.f_mining = true;
-        self.held = true;
-    }
-
     pub(crate) fn release_f(&mut self) {
         self.f_down = false;
-        self.f_mining = false;
-        self.held = self.mouse_held;
     }
 
     pub(crate) fn set_mouse_held(&mut self, pressed: bool) {
-        self.mouse_held = pressed;
-        self.held = self.f_mining || self.mouse_held;
+        self.held = pressed;
     }
 
     /// Cancel extraction while preserving a contextual F press consumed by pickup.
     pub(crate) fn stop_mining(&mut self) {
-        self.f_mining = false;
-        self.mouse_held = false;
         self.held = false;
     }
 
@@ -187,16 +175,18 @@ mod tests {
         tool.release_f();
         assert!(tool.held, "F release must preserve left mouse mining");
         assert!(tool.press_f());
-        tool.start_f_mining();
         tool.set_mouse_held(false);
-        assert!(tool.held, "mouse release must preserve F mining");
-        tool.clear_input();
+        assert!(
+            !tool.held,
+            "held F cannot sustain mining after mouse release"
+        );
+        tool.set_mouse_held(true);
+        tool.stop_mining();
         assert!(!tool.held);
-        assert!(tool.press_f(), "reset clears the F latch");
-        tool.start_f_mining();
+        assert!(!tool.press_f(), "pickup cancellation preserves the F latch");
         tool.clear_input();
-        assert!(!tool.held);
-        assert!(tool.press_f(), "stow clears the F latch too");
+        assert!(tool.press_f(), "input reset clears the F latch");
+        assert!(!tool.held, "F after reset cannot start mining");
     }
 
     #[test]

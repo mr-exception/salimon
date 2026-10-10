@@ -82,11 +82,11 @@ pub(crate) fn advance(tool: &mut MiningTool, frame: ShipFrame, delta: Duration, 
                 p.transform().position().meters()
             };
             let body = if ship { None } else { nearest_body(position) };
-            let initial = if tool.fragment_motion.contains_key(&p.id()) {
-                tool.fragment_motion[&p.id()].velocity
-            } else {
-                salimon_physics::ejection_velocity(position, body, (p.id().0 % 3) as u8)
-            };
+            // Only creation installs an ejection. Missing/restored motion is at rest.
+            let initial = tool
+                .fragment_motion
+                .get(&p.id())
+                .map_or([0.0; 3], |m| m.velocity);
             (
                 p,
                 ObjectState {
@@ -447,6 +447,18 @@ mod tests {
         .unwrap();
         let mut tool = MiningTool::default();
         tool.session.extract(&mut deposit, Duration::from_secs(1));
+        let id = tool.session.fragments()[0].id();
+        tool.fragment_motion.insert(
+            id,
+            FragmentMotion {
+                velocity: salimon_physics::surface_ejection_velocity(
+                    [0.0, 1.0, 0.0],
+                    [0.0, 1.0, 0.0],
+                    1,
+                ),
+                ..Default::default()
+            },
+        );
         let before = tool.session.fragments()[0].transform().position().meters();
         let player = deposit.position().translated([0.0, 1.7, 0.0]).meters();
         advance(&mut tool, frame(), Duration::from_millis(50), player);
@@ -463,5 +475,48 @@ mod tests {
             (length(sub(settled, body.center.meters())) - body.radius_meters - radius).abs()
                 < 0.002
         );
+    }
+
+    #[test]
+    fn missing_or_restored_motion_never_receives_an_implicit_ejection() {
+        let mut tool = mined(0.5);
+        let piece = tool.session.fragments()[0];
+        let body = CELESTIAL_BODIES
+            .iter()
+            .find(|b| b.id == CelestialBodyId::Earth)
+            .unwrap();
+        let position = body.center.translated([0.0, body.radius_meters + 3.0, 0.0]);
+        tool.session.move_loose(
+            piece.id(),
+            ResourceTransform::new(position, [0.0, 0.0, 0.0, 1.0]).unwrap(),
+        );
+        advance(
+            &mut tool,
+            frame(),
+            Duration::from_millis(16),
+            position.meters(),
+        );
+        let velocity = tool.fragment_motion[&piece.id()].velocity;
+        assert!(velocity[1] < 0.0);
+        assert_eq!(velocity[0], 0.0);
+        assert_eq!(velocity[2], 0.0);
+        let before = tool.session.fragments()[0].transform();
+        // Growing the same piece preserves its current pose and motion.
+        let mut deposit = ResourceDeposit::new(
+            DepositId {
+                body: body.id,
+                local: 1,
+            },
+            RawMaterial::new(ResourceId::SilicateRock, 1.0).unwrap(),
+            WorldPosition::new(0.0, 0.0, 0.0),
+            1.0,
+        )
+        .unwrap();
+        tool.session
+            .extract_with_spawn(&mut deposit, Duration::from_millis(16), |_, _, _| {
+                panic!("growth cannot spawn")
+            });
+        assert_eq!(tool.session.fragments()[0].transform(), before);
+        assert_eq!(tool.fragment_motion[&piece.id()].velocity, velocity);
     }
 }

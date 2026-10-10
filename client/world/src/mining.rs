@@ -120,12 +120,36 @@ impl MiningSession {
     }
 
     pub fn extract(&mut self, deposit: &mut ResourceDeposit, delta: Duration) -> f64 {
+        let pose = crate::resources::ResourceTransform::new(
+            crate::resource_fragments::spawn_position(*deposit),
+            [0.0, 0.0, 0.0, 1.0],
+        )
+        .expect("finite surface anchor");
+        self.extract_with_spawn(deposit, delta, |_, _, _| Some(pose))
+    }
+
+    /// Resolve a new entity's pose before debiting its mass. Returning None pauses
+    /// emission without consuming mass or identity. Growth never calls spawn.
+    pub fn extract_with_spawn(
+        &mut self,
+        deposit: &mut ResourceDeposit,
+        delta: Duration,
+        spawn: impl FnMut(
+            crate::resources::FragmentId,
+            crate::resources::RawMaterial,
+            &[ResourceFragment],
+        ) -> Option<crate::resources::ResourceTransform>,
+    ) -> f64 {
         // Freshly generated or stale active copies must reconcile before extraction,
         // so they cannot replenish the journal or emit already removed mass again.
         self.restore(deposit);
-        let removed = extract(deposit, delta);
+        let requested =
+            (MINING_RATE_KG_PER_SECOND * delta.as_secs_f64()).min(deposit.remaining_mass_kg());
+        let removed = self.fragments.emit(*deposit, requested, spawn);
         if removed > 0.0 {
-            self.fragments.emit(*deposit, removed);
+            deposit
+                .set_remaining_mass_kg(deposit.remaining_mass_kg() - removed)
+                .expect("bounded output only decreases mass");
             self.remaining
                 .insert(deposit.id(), deposit.remaining_mass_kg());
             self.extracted_mass_kg += removed;

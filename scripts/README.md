@@ -322,8 +322,8 @@ native capture helper to inspect the greybox handheld tool and removed deposit.
 Its baseline is automatically included in CI's default suite. Both variants
 assert physical fragment identity, material, mass, volume, pose, and bounded
 output after depletion. Extraction totals and session fragment totals are
-diagnostics only, never inventory. The partial/depleted screenshots show the
-physical cubes left beside the deposit.
+diagnostics only, never inventory. Current authored fragments emit from exposed deposit facets and settle through
+physics; see the surface-emission sequence below.
 Linux's required baseline job runs this mining evidence variant; capture errors
 fail the job. Checked-in [issue #45 evidence](../reports/issue-45/README.md) records
 the initial Linux validation.
@@ -521,7 +521,7 @@ python scripts/salimon-test run scenarios/evidence/carrying.json --binary artifa
 (two variants of each material) start above one area; production fixed steps
 settle them for 5.76 seconds, then continue for 2.88 seconds. Evidence variants
 capture both checkpoints. These fixtures exercise contacts independently of
-mining ejection lanes; normal carrying/transfer scenarios still test F actions.
+mining surface emission; normal carrying/transfer scenarios still test F actions.
 
 ```sh
 python scripts/salimon-test run scenarios/evidence/fragment-pile-floor.json --binary artifacts/build/release/salimon-client
@@ -539,3 +539,27 @@ pickup checkpoints use it because rotated convex piles settle differently.
 
 `restore_look` reverses the preceding `aim_fragment` camera deltas so a scripted
 walking route keeps its intended heading after the pickup checkpoint.
+
+## Surface emission sequence (#150)
+
+`mining-emission.json` shares the real mining walkthrough and splits the first
+second into 1/10/49 fixed-frame steps. Its evidence variant captures surface
+origin, outward ejection, three repeated pieces and settling after release;
+state assertions protect 2 kg/s, stable IDs and conserved 5.76 kg output. Both
+are included in the resource-collection group, and the baseline in default
+discovery/portable runtime contracts.
+
+```sh
+python scripts/salimon-test run scenarios/evidence/mining-emission.json --binary target/debug/salimon-client --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
+```
+
+Long resource-collection fixed-step batches (300–600 frames) explicitly use
+`timeout_ms: 30000` for the combined action and following inspection. The
+default 5-second budget still applies to ordinary inputs/assertions; whole
+scenario deadlines remain bounded. This accommodates complete convex piles
+on shared software-rendered CI without changing fixed steps or assertions.
+
+The game automation server also grants protocol-1 `step` requests of 300–600
+frames a 30-second deadline for both queue expiry and reply waiting. The ready
+event's `timeout_ms: 5000` continues to describe ordinary commands. A longer
+scenario budget alone does not extend the server deadline for other commands.

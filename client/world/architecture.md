@@ -69,8 +69,9 @@ then applies session deltas to freshly generated candidates for inspection and
 presentation. No renderer types, input events, or abstract inventory enter world.
 
 `resource_fragments` receives the actual extracted mass inside `MiningSession`
-and owns physical output, stable session IDs, bounded pieces, and deterministic
-surface placement. Fragment queries are read-only and independent of deposit
+and owns physical output, stable session IDs and bounded pieces. Its optional
+placement callback accepts a new finite pose before debiting output mass; blocked
+placement preserves unconsumed mass and identity. Growth never invokes placement. Fragment queries are read-only and independent of deposit
 streaming. Runtime maps these domain objects into nearby inspection and authored mesh DTOs.
 
 ## Carrying and session lifetime

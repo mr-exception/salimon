@@ -9,6 +9,7 @@ mod equipment;
 mod fragment_physics;
 mod frame_clock;
 mod mining;
+mod mining_emission;
 mod resource_context;
 mod resource_presentation;
 mod reticle;

@@ -14,6 +14,7 @@ use salimon_world::CELESTIAL_BODIES;
 
 const PROTOCOL: u8 = 1;
 const TIMEOUT: Duration = Duration::from_secs(5);
+const LONG_STEP_TIMEOUT: Duration = Duration::from_secs(30);
 const MAX_LINE: usize = 16 * 1024;
 
 pub(crate) struct Request {
@@ -42,21 +43,41 @@ pub(crate) fn start() -> Receiver<Request> {
                 continue;
             }
             let (reply, answer) = mpsc::channel();
+            let timeout = command_timeout(&line);
             let request = Request {
                 line,
-                deadline: Instant::now() + TIMEOUT,
+                deadline: Instant::now() + timeout,
                 reply,
             };
             if sender.send(request).is_err() {
                 break;
             }
-            match answer.recv_timeout(TIMEOUT) {
+            match answer.recv_timeout(timeout) {
                 Ok(value) => write_response(&value),
                 Err(_) => write_response(&error(Value::Null, "timeout", "command timed out")),
             }
         }
     });
     receiver
+}
+
+/// Long fixed-step batches share the scenario's bounded CI budget. Ordinary
+/// commands and malformed/out-of-range requests retain the default deadline.
+fn command_timeout(line: &str) -> Duration {
+    let Ok(command) = serde_json::from_str::<Value>(line) else {
+        return TIMEOUT;
+    };
+    if command.get("protocol").and_then(Value::as_u64) == Some(u64::from(PROTOCOL))
+        && command.get("op").and_then(Value::as_str) == Some("step")
+        && matches!(
+            command.get("frames").and_then(Value::as_u64),
+            Some(300..=600)
+        )
+    {
+        LONG_STEP_TIMEOUT
+    } else {
+        TIMEOUT
+    }
 }
 
 pub(crate) fn ready(scenario: &str, seed: u64, step_ms: u128) {
@@ -441,6 +462,32 @@ fn inspect(app: &ClientApplication) -> Value {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn long_step_deadlines_are_bounded_and_ordinary_requests_stay_short() {
+        for frames in [300, 600] {
+            assert_eq!(
+                command_timeout(
+                    &json!({"protocol":1,"id":1,"op":"step","frames":frames}).to_string()
+                ),
+                Duration::from_secs(30)
+            );
+        }
+        for request in [
+            json!({"protocol":1,"id":1,"op":"inspect"}),
+            json!({"protocol":1,"id":1,"op":"step","frames":299}),
+            json!({"protocol":1,"id":1,"op":"step","frames":601}),
+            json!({"protocol":2,"id":1,"op":"step","frames":600}),
+            json!({"protocol":1,"id":1,"op":"step","frames":"600"}),
+        ] {
+            assert_eq!(
+                command_timeout(&request.to_string()),
+                Duration::from_secs(5)
+            );
+        }
+        assert_eq!(command_timeout("{"), Duration::from_secs(5));
+    }
+
     use crate::e2e::{self, Config, Scenario};
 
     fn app(scenario: Scenario) -> ClientApplication {
@@ -1007,6 +1054,14 @@ mod tests {
         assert_gameplay_scenario(
             Scenario::ResourceApproach,
             include_str!("../../../scenarios/resource-loop.json"),
+        );
+    }
+
+    #[test]
+    fn mining_emission_walkthrough_preserves_rate_and_repeated_output() {
+        assert_gameplay_scenario(
+            Scenario::LandedEarth,
+            include_str!("../../../scenarios/mining-emission.json"),
         );
     }
 

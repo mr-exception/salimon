@@ -42,3 +42,9 @@ legacy motion regressions remain in `lib.rs`.
 
 Development and test profiles optimize only the physics/math crates at level 2
 to keep faceted contact loops responsive; debug assertions and information remain.
+
+`surface_ejection_velocity` accepts caller-selected unit facet normal/radial up
+and a stable speed lane. Its outward 2.0–2.6 m/s plus 1.8 m/s radial lift is
+combined with 1.8 m/s lateral escape and a bounded ±0.4 m/s fan is
+one-shot creation motion; gravity/contact take over immediately. The caller,
+not a missing velocity cache entry, decides whether an object is new.

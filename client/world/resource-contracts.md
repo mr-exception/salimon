@@ -192,9 +192,31 @@ of remaining mass and is restored alongside the same ID/variant on requery.
 Generation query membership still uses the original surface anchors; size does
 not change seed arithmetic or distribution spacing (25–80 m).
 
-Spawn lanes reserve full fragment size and scale their spacing with it rather
-than repeating tiny offsets. Runtime supplies a circumscribed cube sphere for
+Native emission reserves the full growing fragment envelope at an exposed authored facet;
+there are no spawn lanes or ordinal position offsets. Runtime supplies a circumscribed cube sphere for
 broad-phase/ship containment only. Authored convex envelopes, rotated by the physical pose, define pair and terrain/deck contacts. World pickup intersects the oriented conservative cube; mining and prompts
 consume the enlarged deposit sphere. Carried centers stay horizontally ahead of the player capsule by the cube
 sphere radius plus the hand offset at every pitch, and clamp to ground support. Unsafe hull/furniture floor drops retain
 the carried identity. Loose fragments remain supported in ship-local metres.
+
+## Surface emission (#150)
+
+`MiningSession::extract_with_spawn` invokes the caller only for a new FragmentId,
+passing its initial material and current ordered physical pieces. A validated
+pose accepts that piece; `None` stops this step's emission before consuming its
+mass or identity. Growth of the unsealed tail skips placement and preserves pose.
+Already accepted pieces/growth are retained if a later piece is blocked in a
+large step. No output mass is buffered: only accepted physical mass is debited
+from the restored deposit and credited to the diagnostic total. The rate remains
+2 kg/s when emission is clear; blocked time is not banked. Geometry-free
+`extract` uses the radial top of the conservative bound, without rows/grids.
+
+Runtime chooses exposed eye-facing triangles from the immutable authored mesh,
+first the mining ray contact, then actual facet centers ordered by distance to
+the aimed visible triangle contact (bound contact on a visual miss). It reserves the selected fragment variant's full 2 kg
+convex support along the facet normal plus 5 mm; ground support is checked with
+the body's radial up. Conservative player-capsule and existing-fragment envelope
+checks reject unsafe candidates. Only creation installs an outward/radial impulse;
+growth, requery, streaming and missing/restored motion do not re-eject pieces.
+The same physical ID/pose then follows normal gravity/contact, carrying and
+streaming. No scatter positions are assigned by ordinal or teleported later.

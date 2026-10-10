@@ -75,7 +75,33 @@ pub fn floor_release_velocity(local_forward: [f64; 3]) -> [f64; 3] {
     [local_forward[0] * 1.1, 0.35, local_forward[2] * 1.1]
 }
 
-/// New-piece ejection. Caller supplies a stable variant (fragment ID modulo 3).
+/// One-shot emission impulse from an exposed facet, with bounded stable speed
+/// variation and radial lift. Caller supplies unit world normal and gravity up.
+pub fn surface_ejection_velocity(normal: [f64; 3], up: [f64; 3], variant: u8) -> [f64; 3] {
+    let planar = sub(normal, scale(up, dot(normal, up)));
+    let tangent = if length(planar) > 1e-6 {
+        normalize(planar)
+    } else {
+        let axis = if up[1].abs() < 0.9 {
+            [0.0, 1.0, 0.0]
+        } else {
+            [1.0, 0.0, 0.0]
+        };
+        normalize(cross(up, axis))
+    };
+    // Top facets need lateral escape too, rather than falling straight back into
+    // the source. Stable small fan variation changes motion, never spawn positions.
+    let scatter = scale(cross(up, tangent), (f64::from(variant % 5) - 2.0) * 0.2);
+    add(
+        add(
+            scale(normal, 2.0 + f64::from(variant % 5) * 0.15),
+            scale(up, 1.8),
+        ),
+        add(scale(tangent, 1.8), scatter),
+    )
+}
+
+/// Legacy geometry-free ejection with a stable variant (ID modulo 3).
 pub fn ejection_velocity(position: [f64; 3], body: Option<SphereSurface>, variant: u8) -> [f64; 3] {
     if let Some(body) = body {
         let up = normalize(sub(position, body.center));

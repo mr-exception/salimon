@@ -4,12 +4,18 @@
     "seed": 0,
     "step_ms": 16
   },
-  "timeout_ms": 180000,
+  "timeout_ms": 120000,
   "steps": [
     {
       "assert": {
         "path": "player.location",
         "equals": "InsideShip"
+      }
+    },
+    {
+      "assert": {
+        "path": "resource_ui.context",
+        "equals": null
       }
     },
     {
@@ -389,6 +395,21 @@
       }
     },
     {
+      "assert": {
+        "path": "resource_ui.context",
+        "contains": "Silicate rock - approx"
+      }
+    },
+    {
+      "assert": {
+        "path": "resource_ui.context",
+        "contains": "kg left - untouched\n1 to equip mining tool"
+      }
+    },
+    {
+      "screenshot": "deposit-context-tool-stowed"
+    },
+    {
       "action": {
         "op": "mouse",
         "button": "left",
@@ -447,9 +468,22 @@
       }
     },
     {
+      "assert": {
+        "path": "resource_ui.context",
+        "contains": "Hold left mouse to mine"
+      }
+    },
+    {
       "action": {
-        "op": "mouse",
-        "button": "left",
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
         "pressed": true
       }
     },
@@ -461,9 +495,93 @@
     },
     {
       "assert": {
+        "path": "mining.held",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.extracted_mass_kg",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 0
+      }
+    },
+    {
+      "screenshot": "f-held-no-extraction"
+    },
+    {
+      "screenshot": "equipped-mining-tool"
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "left",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.held",
+        "equals": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 1
+      }
+    },
+    {
+      "screenshot": "surface-origin"
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 10
+      }
+    },
+    {
+      "screenshot": "outward-ejection"
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 49
+      }
+    },
+    {
+      "assert": {
         "path": "mining.active",
         "equals": true
       }
+    },
+    {
+      "assert": {
+        "path": "resource_ui.context",
+        "contains": "Mining - release left mouse to stop"
+      }
+    },
+    {
+      "screenshot": "active-mining-context"
     },
     {
       "assert": {
@@ -483,6 +601,12 @@
       "assert": {
         "path": "world.nearest_deposit.state",
         "equals": "PartiallyMined"
+      }
+    },
+    {
+      "assert": {
+        "path": "resource_ui.context",
+        "contains": "Silicate rock - approx 34.5 kg left - partly mined"
       }
     },
     {
@@ -545,6 +669,24 @@
       }
     },
     {
+      "screenshot": "partiallymined-deposit"
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 120
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 3
+      }
+    },
+    {
+      "screenshot": "repeated-emission"
+    },
+    {
       "action": {
         "op": "mouse",
         "button": "left",
@@ -553,328 +695,25 @@
     },
     {
       "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
         "op": "step",
-        "frames": 600
-      },
-      "timeout_ms": 30000
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 600
-      },
-      "timeout_ms": 30000
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 600
-      },
-      "timeout_ms": 30000
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 600
-      },
-      "timeout_ms": 30000
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": false
+        "frames": 240
       }
     },
     {
-      "assert": {
-        "path": "world.deposit_query_error",
-        "equals": null
-      }
-    },
-    {
-      "assert": {
-        "path": "world.deposits_by_id.Earth:16443359315117775089",
-        "exists": false
-      }
-    },
-    {
-      "assert": {
-        "path": "world.fragment_count",
-        "equals": 1
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "backward",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 600
-      },
-      "timeout_ms": 30000
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 600
-      },
-      "timeout_ms": 30000
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 600
-      },
-      "timeout_ms": 30000
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 600
-      },
-      "timeout_ms": 30000
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "backward",
-        "pressed": false
-      }
-    },
-    {
-      "assert": {
-        "path": "world.nearest_deposit.id",
-        "equals": "Earth:16443359315117775089"
-      }
-    },
-    {
-      "assert": {
-        "path": "world.nearest_deposit.state",
-        "equals": "PartiallyMined"
-      }
-    },
-    {
-      "assert": {
-        "path": "world.nearest_deposit.remaining_mass_kg",
-        "approx": 34.48896041381627,
-        "tolerance": 1e-09
-      }
-    },
-    {
-      "assert": {
-        "path": "world.fragment_count",
-        "equals": 1
-      }
+      "screenshot": "settled-fragments"
     },
     {
       "assert": {
         "path": "world.fragment_mass_kg",
-        "approx": 1.9199999999999946,
+        "approx": 5.76,
         "tolerance": 1e-08
       }
     },
     {
-      "assert": {
-        "path": "mining.target.id",
-        "equals": "Earth:16443359315117775089"
-      }
-    },
-    {
       "action": {
-        "op": "mouse",
-        "button": "left",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 600
-      },
-      "timeout_ms": 30000
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 600
-      },
-      "timeout_ms": 30000
-    },
-    {
-      "action": {
-        "op": "mouse",
-        "button": "left",
+        "op": "key",
+        "key": "grab_drop",
         "pressed": false
-      }
-    },
-    {
-      "assert": {
-        "path": "world.nearest_deposit.state",
-        "equals": "Depleted"
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 600
-      },
-      "timeout_ms": 30000
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 600
-      },
-      "timeout_ms": 30000
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 600
-      },
-      "timeout_ms": 30000
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 600
-      },
-      "timeout_ms": 30000
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "forward",
-        "pressed": false
-      }
-    },
-    {
-      "assert": {
-        "path": "world.deposit_query_error",
-        "equals": null
-      }
-    },
-    {
-      "assert": {
-        "path": "world.deposits_by_id.Earth:16443359315117775089",
-        "exists": false
-      }
-    },
-    {
-      "assert": {
-        "path": "world.fragment_count",
-        "equals": 19
-      }
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "backward",
-        "pressed": true
-      }
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 600
-      },
-      "timeout_ms": 30000
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 600
-      },
-      "timeout_ms": 30000
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 600
-      },
-      "timeout_ms": 30000
-    },
-    {
-      "action": {
-        "op": "step",
-        "frames": 600
-      },
-      "timeout_ms": 30000
-    },
-    {
-      "action": {
-        "op": "key",
-        "key": "backward",
-        "pressed": false
-      }
-    },
-    {
-      "assert": {
-        "path": "world.nearest_deposit.id",
-        "equals": "Earth:16443359315117775089"
-      }
-    },
-    {
-      "assert": {
-        "path": "world.nearest_deposit.state",
-        "equals": "Depleted"
-      }
-    },
-    {
-      "assert": {
-        "path": "world.nearest_deposit.remaining_mass_kg",
-        "approx": 0,
-        "tolerance": 1e-09
-      }
-    },
-    {
-      "assert": {
-        "path": "world.fragment_count",
-        "equals": 19
-      }
-    },
-    {
-      "assert": {
-        "path": "world.fragment_mass_kg",
-        "approx": 36.40896041381627,
-        "tolerance": 1e-08
-      }
-    },
-    {
-      "assert": {
-        "path": "world.nearest_deposit.visual",
-        "equals": null
-      }
-    },
-    {
-      "assert": {
-        "path": "world.nearest_deposit.authored_visual",
-        "equals": null
-      }
-    },
-    {
-      "assert": {
-        "path": "mining.target",
-        "equals": null
       }
     }
   ]

@@ -1,0 +1,9 @@
+..Building: cargo build --locked -p salimon-client --target x86_64-unknown-linux-gnu --message-format json-render-diagnostics
+Building: cargo build --locked -p salimon-client --target x86_64-unknown-linux-gnu --message-format json-render-diagnostics --release
+.Building: cargo build --locked -p salimon-client --target x86_64-unknown-linux-gnu --message-format json-render-diagnostics
+Building: cargo build --locked -p salimon-client --target x86_64-unknown-linux-gnu --message-format json-render-diagnostics
+................................
+----------------------------------------------------------------------
+Ran 35 tests in 3.516s
+
+OK

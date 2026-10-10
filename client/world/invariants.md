@@ -51,3 +51,7 @@
 - Resource gameplay dimensions use the shared world `resource_size` policy;
   enlarged bounds never substitute for density-derived solid material volume.
   See [resource size contract](../world/resource-contracts.md#gameplay-size-policy-144).
+
+- New-piece placement can reject a crowded surface before mass/ID allocation;
+  accepted growth and earlier pieces remain conserved. Placement runs once per
+  new identity, never on growth, pickup/drop or streaming restoration.

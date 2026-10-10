@@ -11,6 +11,7 @@ use crate::app::ClientApplication;
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum Scenario {
     LandedEarth,
+    FragmentPile,
     CockpitEarth,
     OrbitEarth,
     ResourceApproach,
@@ -22,6 +23,7 @@ pub(crate) enum Scenario {
 impl Scenario {
     fn parse(value: &str) -> Result<Self, String> {
         match value {
+            "fragment-pile" => Ok(Self::FragmentPile),
             "landed-earth" => Ok(Self::LandedEarth),
             "cockpit-earth" => Ok(Self::CockpitEarth),
             "orbit-earth" => Ok(Self::OrbitEarth),
@@ -37,6 +39,7 @@ impl Scenario {
 
     pub(crate) const fn name(self) -> &'static str {
         match self {
+            Self::FragmentPile => "fragment-pile",
             Self::LandedEarth => "landed-earth",
             Self::CockpitEarth => "cockpit-earth",
             Self::OrbitEarth => "orbit-earth",
@@ -115,6 +118,7 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
     app.ship = ShipController::default();
     match config.scenario {
         Scenario::LandedEarth => {}
+        Scenario::FragmentPile => initialize_fragment_pile(app, config.seed),
         Scenario::CockpitEarth => app.character.enter_cockpit(),
         Scenario::ResourceApproach
         | Scenario::OrbitEarth
@@ -183,6 +187,57 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
     app.update_clock.set_fixed_step(config.step);
     app.e2e_config = Some(config);
     Ok(())
+}
+
+/// Deterministic initial loose objects; subsequent stepping uses production physics.
+/// Seed parity selects cabin or planetary support. No gameplay protocol mutation.
+fn initialize_fragment_pile(app: &mut ClientApplication, seed: u64) {
+    use salimon_character::{MovementInput, ShipFrame, SurfaceFrame};
+    use salimon_world::{WorldPosition, resources::{DepositId, RawMaterial, ResourceDeposit, ResourceId, ResourceTransform}};
+    let earth = CELESTIAL_BODIES.iter().find(|b| b.id == CelestialBodyId::Earth).expect("Earth fixture");
+    let ship = app.ship.snapshot();
+    let frame = ShipFrame { origin_meters: ship.pose.position_meters, axes: ship.pose.axes() };
+    let surface = SurfaceFrame { body_center_meters: earth.center.meters(), radius_meters: earth.radius_meters };
+    let step = Duration::from_millis(16);
+    for _ in 0..90 {
+        app.character.advance(step, MovementInput { backward: true, ..Default::default() }, frame, surface, false, true);
+    }
+    for _ in 0..36 {
+        app.character.advance(step, MovementInput { right: true, ..Default::default() }, frame, surface, false, true);
+    }
+    let outside = seed % 2 == 1;
+    if outside {
+        app.ship.toggle_door();
+        app.ship.advance(Duration::from_secs(1));
+        for _ in 0..160 {
+            app.character.advance(step, MovementInput { backward: true, ..Default::default() }, frame, surface, true, true);
+        }
+        app.character.apply_mouse_delta(std::f64::consts::PI / 0.0022, 0.0);
+    }
+    app.character.apply_mouse_delta(0.0, 260.0);
+    let eye = app.character.snapshot(frame, surface).eye_position_meters;
+    let mut center = frame.world_to_local(eye);
+    center[0] += if outside { -1.8 } else { 1.8 };
+    center[1] = if outside {
+        let world = frame.local_to_world(center);
+        let radial = world.iter().zip(earth.center.meters()).map(|(a,b)| (a-b)*(a-b)).sum::<f64>().sqrt();
+        center[1] - (radial - earth.radius_meters)
+    } else { salimon_character::SHIP_FLOOR_HEIGHT_METERS };
+    for (index, resource) in [ResourceId::IronOre, ResourceId::SilicateRock, ResourceId::WaterIce].into_iter().enumerate() {
+        let world = frame.local_to_world(center);
+        let mut deposit = ResourceDeposit::new(DepositId { body: earth.id, local: 9000 + index as u64 },
+            RawMaterial::new(resource, 4.0).expect("positive fixture mass"), WorldPosition::new(world[0], world[1], world[2]), 4.0).expect("finite fixture deposit");
+        app.mining.session.extract(&mut deposit, Duration::from_secs(2));
+    }
+    let pieces = app.mining.session.fragments().to_vec();
+    for (index, piece) in pieces.into_iter().enumerate() {
+        let local = [center[0] + (index % 2) as f64 * 0.08, center[1] + 0.5 + index as f64 * 0.45, center[2] + (index % 3) as f64 * 0.06];
+        let world = frame.local_to_world(local);
+        let pose = ResourceTransform::new(WorldPosition::new(world[0], world[1], world[2]), [0.0, 0.0, 0.0, 1.0]).expect("fixture pose");
+        app.mining.session.move_loose(piece.id(), pose);
+        if !outside { app.mining.ship_fragments.insert(piece.id(), local); }
+        app.mining.fragment_motion.insert(piece.id(), crate::fragment_physics::FragmentMotion::default());
+    }
 }
 
 fn mix(mut value: u64) -> u64 {

@@ -21,7 +21,7 @@ impl ConvexHull {
         }
         assert!(vertices.len() >= 4, "convex geometry needs a solid vertex set");
         let mut normals = Vec::new();
-        let mut planes = Vec::new();
+        let mut planes: Vec<([f64; 3], f64)> = Vec::new();
         for i in 0..vertices.len() {
             for j in i + 1..vertices.len() {
                 for k in j + 1..vertices.len() {

@@ -25,16 +25,10 @@
       }
     },
     {
-      "screenshot": "settled-pile"
-    },
-    {
       "action": {
         "op": "step",
         "frames": 180
       }
-    },
-    {
-      "screenshot": "pile-after-three-more-seconds"
     }
   ]
 }

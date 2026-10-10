@@ -512,3 +512,21 @@ required Linux CI; the portable runtime also executes both JSON contracts.
 python scripts/salimon-test run scenarios/carrying.json --binary artifacts/build/release/salimon-client
 python scripts/salimon-test run scenarios/evidence/carrying.json --binary artifacts/build/release/salimon-client --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
 ```
+
+## Fragment pile geometry regression (#148)
+
+`fragment-pile-floor.json` and `fragment-pile-surface.json` share the opt-in
+`fragment-pile` initial fixture with seeds 0 and 1. Six physical 2 kg fragments
+(two variants of each material) start above one area; production fixed steps
+settle them for 5.76 seconds, then continue for 2.88 seconds. Evidence variants
+capture both checkpoints. These fixtures exercise contacts independently of
+mining ejection lanes; normal carrying/transfer scenarios still test F actions.
+
+```sh
+python scripts/salimon-test run scenarios/evidence/fragment-pile-floor.json --binary artifacts/build/release/salimon-client
+python scripts/salimon-test run scenarios/evidence/fragment-pile-surface.json --binary artifacts/build/release/salimon-client
+```
+
+Use the standard platform screenshot/display setup. Compare checkpoints for
+motion and contact gaps; screenshots alone do not prove conserved mass or support
+removal, which the focused world/physics/runtime regressions cover.

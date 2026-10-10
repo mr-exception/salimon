@@ -251,7 +251,10 @@ mod tests {
                     assert_eq!(visual.mesh, expected);
                     let old_side = fragment.material().volume_m3().cbrt() * 10.0;
                     assert_eq!(visual.side_meters, old_side * 0.5);
-                    assert_eq!(visual.orientation_xyzw, fragment.transform().orientation_xyzw());
+                    assert_eq!(
+                        visual.orientation_xyzw,
+                        fragment.transform().orientation_xyzw()
+                    );
                     assert_eq!(
                         visual.side_meters,
                         salimon_world::resource_fragments::side_meters(fragment)

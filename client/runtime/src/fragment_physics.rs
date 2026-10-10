@@ -245,25 +245,58 @@ mod tests {
 
     #[test]
     fn all_authored_variants_settle_rotated_at_current_scale_and_preserve_mass() {
-        for resource in [ResourceId::IronOre, ResourceId::SilicateRock, ResourceId::WaterIce] {
+        for resource in [
+            ResourceId::IronOre,
+            ResourceId::SilicateRock,
+            ResourceId::WaterIce,
+        ] {
             let mut tool = MiningTool::default();
-            let mut deposit = ResourceDeposit::new(DepositId { body: CelestialBodyId::Earth, local: 99 },
-                RawMaterial::new(resource, 4.0).unwrap(), WorldPosition::new(0.0, 0.0, 0.0), 4.0).unwrap();
+            let mut deposit = ResourceDeposit::new(
+                DepositId {
+                    body: CelestialBodyId::Earth,
+                    local: 99,
+                },
+                RawMaterial::new(resource, 4.0).unwrap(),
+                WorldPosition::new(0.0, 0.0, 0.0),
+                4.0,
+            )
+            .unwrap();
             tool.session.extract(&mut deposit, Duration::from_secs(2));
             let initial = tool.session.fragments().to_vec();
             for (index, p) in initial.iter().enumerate() {
                 let local = [-5.0, 1.3, index as f64 * 1.5 - 0.75];
-                tool.session.move_loose(p.id(), ResourceTransform::new(WorldPosition::new(local[0], local[1], local[2]),
-                    [0.0, 0.0, 0.35_f64.sin(), 0.35_f64.cos()]).unwrap());
+                tool.session.move_loose(
+                    p.id(),
+                    ResourceTransform::new(
+                        WorldPosition::new(local[0], local[1], local[2]),
+                        [0.0, 0.0, 0.35_f64.sin(), 0.35_f64.cos()],
+                    )
+                    .unwrap(),
+                );
                 tool.ship_fragments.insert(p.id(), local);
-                tool.fragment_motion.insert(p.id(), FragmentMotion::default());
+                tool.fragment_motion
+                    .insert(p.id(), FragmentMotion::default());
             }
-            for _ in 0..500 { advance(&mut tool, frame(), Duration::from_millis(16), [-5.0, 2.0, 0.0]); }
+            for _ in 0..500 {
+                advance(
+                    &mut tool,
+                    frame(),
+                    Duration::from_millis(16),
+                    [-5.0, 2.0, 0.0],
+                );
+            }
             for (before, p) in initial.iter().zip(tool.session.fragments()) {
-                assert_eq!(before.id(), p.id()); assert_eq!(before.material(), p.material());
-                let gap = tool.ship_fragments[&p.id()][1] - SHIP_FLOOR_HEIGHT_METERS - support(*p, [0.0, 1.0, 0.0]);
+                assert_eq!(before.id(), p.id());
+                assert_eq!(before.material(), p.material());
+                let gap = tool.ship_fragments[&p.id()][1]
+                    - SHIP_FLOOR_HEIGHT_METERS
+                    - support(*p, [0.0, 1.0, 0.0]);
                 assert!(gap.abs() < 0.003, "{resource:?} {:?}: gap {gap}", p.id());
-                assert!(length(tool.fragment_motion[&p.id()].velocity) < 0.05, "{resource:?}: {:?}", tool.fragment_motion[&p.id()]);
+                assert!(
+                    length(tool.fragment_motion[&p.id()].velocity) < 0.05,
+                    "{resource:?}: {:?}",
+                    tool.fragment_motion[&p.id()]
+                );
             }
         }
     }

@@ -149,7 +149,7 @@ source, material key, and pose, and derives the new solid volume from density.
 Finished pieces are unchanged by later extraction. Picking up a growing piece
 must end its participation in the output tail when #46 adds carrying.
 
-Pieces have finite absolute poses and identity orientation. They emerge near
+Pieces start with finite absolute poses and identity orientation; #148 physical contacts subsequently update their unit quaternion. They emerge near
 the source with enough height for a full-size piece. Side length is the cube
 root of solid volume multiplied by the shared gameplay scale. Runtime applies an ejection impulse, gravity, and
 fragment contacts while the world crate owns mass, identity, and provenance.

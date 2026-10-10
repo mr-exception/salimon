@@ -32,7 +32,7 @@ impl Scenario {
             "open-space" => Ok(Self::OpenSpace),
             "eva-approach" => Ok(Self::EvaApproach),
             _ => Err(format!(
-                "unknown scenario '{value}'; expected landed-earth, cockpit-earth, resource-approach, orbit-earth, orbit-moon, open-space, or eva-approach"
+                "unknown scenario '{value}'; expected fragment-pile, landed-earth, cockpit-earth, resource-approach, orbit-earth, orbit-moon, open-space, or eva-approach"
             )),
         }
     }

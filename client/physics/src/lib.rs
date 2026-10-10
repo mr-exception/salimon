@@ -167,8 +167,7 @@ pub fn advance(
                         continue;
                     }
                     let (normal, depth) = if a.hull.is_some() && b.hull.is_some() {
-                        let geometry =
-                            cached.get_or_insert_with(|| convex::projections(a, b));
+                        let geometry = cached.get_or_insert_with(|| convex::projections(a, b));
                         let Some(contact) = convex::projected_contact(geometry, separation) else {
                             continue;
                         };

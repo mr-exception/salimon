@@ -50,6 +50,9 @@ legacy ready line is not a JSON response. Example:
 `key` accepts `forward`, `backward`, `left`, `right`, `jump`/`ascend`, `descend`, `roll_left`, and
 `roll_right`. Held forward/backward/left/right steer the ship when seated, and
 move the character otherwise. `look` accepts finite pixel deltas `dx` and `dy`.
+`aim_fragment` accepts an existing `fragment_id` and computes mouse-look deltas
+toward its current pickup bounds. It changes only camera aim; pickup still requires the
+normal range, line of sight, and F key, and no player or object is teleported.
 `interact` uses the same aimed/range interaction as E, so walking and looking at
 the cockpit seat is required to enter it; interacting again leaves it. `landing`
 uses the same L action and its cockpit and proximity gates. `thruster` accepts a
@@ -317,3 +320,6 @@ A fresh explicit 1 press restores the tool without resuming mining.
 The evidence route captures equipped slot 1, selected empty slot 2, carrying
 without selection, and post-drop deselection. See the
 [runner coverage](../../scripts/README.md#toolbar-gameplay-coverage-132).
+
+`restore_look` reverses the preceding `aim_fragment` camera deltas so a scripted
+walking route keeps its intended heading after the pickup checkpoint.

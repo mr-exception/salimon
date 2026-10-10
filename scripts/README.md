@@ -39,7 +39,7 @@ timeout. A step can specify its own `timeout_ms`. Example:
 ```
 
 `action` takes any operation and its parameters from the native command
-protocol: `inspect`, `step`, `key`, `look`, `interact`, `landing`, or `thruster`.
+protocol: `inspect`, `step`, `key`, `look`, `aim_fragment`, `restore_look`, `interact`, `landing`, or `thruster`.
 `assert` inspects state once; `wait` inspects until matched, advancing the
 simulation by `frames` (1–600, default 1) between checks. Condition `path`
 uses dot-separated object keys and zero-based array indices, such as
@@ -512,3 +512,29 @@ required Linux CI; the portable runtime also executes both JSON contracts.
 python scripts/salimon-test run scenarios/carrying.json --binary artifacts/build/release/salimon-client
 python scripts/salimon-test run scenarios/evidence/carrying.json --binary artifacts/build/release/salimon-client --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
 ```
+
+## Fragment pile geometry regression (#148)
+
+`fragment-pile-floor.json` and `fragment-pile-surface.json` share the opt-in
+`fragment-pile` initial fixture with seeds 0 and 1. Six physical 2 kg fragments
+(two variants of each material) start above one area; production fixed steps
+settle them for 5.76 seconds, then continue for 2.88 seconds. Evidence variants
+capture both checkpoints. These fixtures exercise contacts independently of
+mining ejection lanes; normal carrying/transfer scenarios still test F actions.
+
+```sh
+python scripts/salimon-test run scenarios/evidence/fragment-pile-floor.json --binary artifacts/build/release/salimon-client
+python scripts/salimon-test run scenarios/evidence/fragment-pile-surface.json --binary artifacts/build/release/salimon-client
+```
+
+Use the standard platform screenshot/display setup. Compare checkpoints for
+motion and contact gaps; screenshots alone do not prove conserved mass or support
+removal, which the focused world/physics/runtime regressions cover.
+
+`aim_fragment` turns the E2E camera toward the current pickup bounds of an existing
+`fragment_id` using mouse-look deltas. It changes no object/player position and
+does not bypass pickup range, occlusion, or the normal F key contract. Scenario
+pickup checkpoints use it because rotated convex piles settle differently.
+
+`restore_look` reverses the preceding `aim_fragment` camera deltas so a scripted
+walking route keeps its intended heading after the pickup checkpoint.

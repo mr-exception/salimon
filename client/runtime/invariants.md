@@ -89,9 +89,8 @@
   it. No world-space aim cuboid is emitted; interaction/mining rays are unchanged.
 
 - Loose-fragment simulation preserves session iteration order, excludes the carried
-  ID and objects at least 125 m from the player, and preserves IDs/mass/material/
-  orientation during pose writeback. Ship anchors/velocities use ship-local metres;
-  surface objects use absolute metres. Physical response is owned by
+  ID and objects at least 125 m from the player, and preserves IDs/mass/material during pose writeback; physics updates the normalized orientation. Ship anchors/velocities use ship-local metres;
+  surface objects use absolute metres; orientation/angular motion follows the same frame. Physical response is owned by
   `salimon-physics`; runtime supplies geometry and frame conversions only.
 
 - F initial presses grab an aimed reachable world object, or release the carried

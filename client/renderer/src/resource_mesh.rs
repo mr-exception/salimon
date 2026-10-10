@@ -50,16 +50,23 @@ impl ResourceMesh {
     /// Distance below the authored origin along a unit surface normal, at unit scale.
     /// Runtime uses this geometry query for terrain/deck placement, never GPU data.
     pub fn support_meters(self, up: [f64; 3]) -> f64 {
-        static MESHES: std::sync::LazyLock<[Vec<[f32; FLOATS]>; 18]> =
-            std::sync::LazyLock::new(|| {
-                ASSETS.map(|bytes| {
-                    geometry(bytes).expect("checked-in resource geometry passes asset validation")
-                })
-            });
-        MESHES[self.index()]
+        self.unit_vertices()
             .iter()
-            .map(|vertex| -(0..3).map(|i| f64::from(vertex[i]) * up[i]).sum::<f64>())
+            .map(|vertex| -(0..3).map(|i| vertex[i] * up[i]).sum::<f64>())
             .fold(0.0, f64::max)
+    }
+    /// Immutable CPU positions from the same validated triangles as the GPU batch.
+    pub fn unit_vertices(self) -> &'static [[f64; 3]] {
+        static MESHES: std::sync::LazyLock<[Vec<[f64; 3]>; 18]> = std::sync::LazyLock::new(|| {
+            ASSETS.map(|bytes| {
+                geometry(bytes)
+                    .expect("validated checked-in geometry")
+                    .into_iter()
+                    .map(|v| [f64::from(v[0]), f64::from(v[1]), f64::from(v[2])])
+                    .collect()
+            })
+        });
+        &MESHES[self.index()]
     }
 }
 
@@ -70,6 +77,7 @@ pub struct ResourceMeshInstance {
     /// Uniform visual scale; runtime inscribes deposits in their authoritative sphere.
     /// Fragments use their authoritative bounding cube side.
     pub side_meters: f64,
+    pub orientation_xyzw: [f64; 4],
 }
 fn geometry(bytes: &[u8]) -> Result<Vec<[f32; FLOATS]>, RendererError> {
     let fail = |message: &str| RendererError::new("load resource mesh", message);
@@ -148,6 +156,8 @@ fn relative_vertices(
         if !instance.side_meters.is_finite()
             || instance.side_meters <= 0.0
             || instance.center_meters.iter().any(|v| !v.is_finite())
+            || instance.orientation_xyzw.iter().any(|v| !v.is_finite())
+            || (instance.orientation_xyzw.iter().map(|v| v * v).sum::<f64>() - 1.0).abs() > 1e-9
         {
             return Err(RendererError::new(
                 "prepare resource mesh",
@@ -156,10 +166,27 @@ fn relative_vertices(
         }
         let mesh = instance.mesh.index();
         for vertex in &meshes[mesh] {
-            for (axis, value) in vertex.iter().take(3).enumerate() {
+            let q = instance.orientation_xyzw;
+            let p = [
+                f64::from(vertex[0]),
+                f64::from(vertex[1]),
+                f64::from(vertex[2]),
+            ];
+            let v = [q[0], q[1], q[2]];
+            let cross = |a: [f64; 3], b: [f64; 3]| {
+                [
+                    a[1] * b[2] - a[2] * b[1],
+                    a[2] * b[0] - a[0] * b[2],
+                    a[0] * b[1] - a[1] * b[0],
+                ]
+            };
+            let t = cross(v, [p[0], p[1], p[2]]).map(|v| v * 2.0);
+            let c = cross(v, t);
+            for axis in 0..3 {
+                let rotated = p[axis] + q[3] * t[axis] + c[axis];
                 output.push(
                     ((instance.center_meters[axis] - camera.position_meters[axis])
-                        + f64::from(*value) * instance.side_meters) as f32,
+                        + rotated * instance.side_meters) as f32,
                 );
             }
             output.extend_from_slice(&vertex[3..]);
@@ -370,6 +397,7 @@ mod tests {
                 mesh,
                 center_meters: [1e12; 3],
                 side_meters: 0.1,
+                orientation_xyzw: [0.0, 0.0, 0.0, 1.0],
             };
             let before = relative_vertices(&meshes, &[instance], camera).unwrap();
             let after = relative_vertices(
@@ -460,6 +488,7 @@ mod tests {
                     mesh,
                     center_meters: [1e12; 3],
                     side_meters: side,
+                    orientation_xyzw: [0.0, 0.0, 0.0, 1.0],
                 };
                 let vertices = relative_vertices(&meshes, &[instance], camera).unwrap();
                 assert!(

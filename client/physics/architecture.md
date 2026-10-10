@@ -1,34 +1,44 @@
 # Physics architecture
 
-The crate advances an ordered slice of `ObjectState` values: f64 metre position,
-m/s velocity, positive spherical contact radius, positive ground-support distance
-and explicit `Surface`. It does not
-allocate identities or store session state. Callers validate finite state and
-positive finite surface radii, select geometry and retain orientation/material/mass.
+`ObjectState` is an ordered, caller-owned snapshot with f64 metre position,
+linear velocity, unit XYZW orientation, angular velocity, mass, uniform scale,
+conservative radius, optional shared immutable convex hull and explicit surface.
+Physics advances motion and returns poses without allocating identities or
+reading assets, native events, renderer state or resource sessions.
 
-`Surface::Sphere` supplies radial gravity and ground geometry in the object's
-absolute or relative frame. `Surface::Floor` supplies a +Y floor height in one
-shared local frame; a pure containment callback supplies hull/furniture bounds.
-Physics owns rejection/bounce and pile correction, not the callback. Unsupported
-objects preserve legacy -Y gravity without ground contact. The caller must use
-separate calls for different ship-local frames. Sphere centers distinguish
-planet contact groups; unsupported and sphere objects retain the legacy shared
-non-floor contact group when only one has a body.
+`convex.rs` constructs convex envelopes once from finite authored vertex sets.
+Duplicate vertices and coplanar faces are merged; supporting face normals and
+true edge directions supply the separating-axis test. Pair projections subtract
+centers in f64 before testing axes. Radii only reject distant pairs and constrain
+ship hull clearance; they do not determine convex pair separation. A missing
+hull retains the previous sphere response for compatible callers.
 
-`advance` integrates velocity/position, resolves ground/hull contact, performs
-three ordered pair passes and damps velocity per substep. Equal-weight spherical
-contacts intentionally do not consume mass. Orientation does not spin. The
-1/90 s target is capped at 48 substeps, with all elapsed time distributed across
-them; this preserves the existing large-delta limitation, not guaranteed CCD.
-There is no physics engine, ECS, platform service or presentation dependency.
+`Surface::Sphere` supplies radial 9.81 m/s² gravity and local tangent support.
+`Floor` supplies +Y gravity and one ship-local deck height; a pure containment
+callback retains hull/furniture policy with the caller. Hull support is refreshed
+from current orientation during every ground pass. Unsupported objects receive
+-Y gravity without terrain projection. Floor/non-floor groups and separate
+planet centers do not contact. Different ship frames require separate calls.
 
-Release helpers own the existing impulses; the runtime projects ship-forward
-components and supplies a stable ejection variant from fragment identity. For
-future objects, extend policy only with an explicit feature contract and tests.
-See the [canonical decision](../../docs/technical-architecture.md#physical-object-simulation-decision-114).
+The solver integrates orientation and motion, performs 16 ordered convex contact
+passes, projects penetration and applies mass-weighted normal/friction impulses
+with angular response. Inertia is an isotropic approximation from mass and
+bounding radius, not an exact volume integral. Ground contacts use authored
+support points, allowing tilted objects to tip; damping bounds residual motion.
+Geometry growth is safe because the hull stays immutable and each snapshot
+supplies current mass/scale. No cached sleep state can retain removed supports.
 
-Ground support is independent of pair-contact radius: callers can supply actual
-mesh support along the environmental normal while retaining a conservative
-sphere for object contacts and hull containment. Ground contact uses support;
-pair separation and floor containment use radius. Runtime refreshes support
-from the current frame/normal before every advance; physics owns no mesh data.
+Convex objects adapt substeps to scale and linear/angular speed, at most 1/90 s
+and capped at 4096 steps; the minimum target is 10 µs. This limits ordinary drop
+and ejection tunneling, but is not general continuous collision detection.
+Legacy sphere-only calls retain the 48-step cap and three contact passes. Both
+paths distribute all elapsed time. Convex envelopes intentionally bridge local
+concavities, notably the clustered ice asset.
+
+Release helpers retain existing impulses. Identity, material, lifetime, carried
+exclusion, activation and frame conversions stay with the caller. Tests in
+`convex.rs` protect narrow phase, rotation, settling, support removal and tipping;
+legacy motion regressions remain in `lib.rs`.
+
+Development and test profiles optimize only the physics/math crates at level 2
+to keep faceted contact loops responsive; debug assertions and information remain.

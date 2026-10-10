@@ -144,10 +144,10 @@ synchronization maps loose anchors through the current ship frame. The same worl
 session owns every entity and its immutable mass/material/source throughout.
 `fragment_physics.rs` adapts loose session fragments to `salimon-physics` in
 ship-local or absolute planet coordinates. It supplies selected body geometry,
-character-owned floor containment, stable object order and mass-derived radius,
+character-owned floor containment, stable object order and mass-derived scale/radius plus cached authored convex geometry,
 then writes velocity/pose results through existing IDs. Carried pieces are
-excluded. Gravity, release/ejection, restitution, deck/hull response, spherical
-contacts and substeps live in the portable physics crate. World retains identity,
+excluded. Gravity, release/ejection, restitution, deck/hull response, convex
+contacts, angular motion and substeps live in the portable physics crate. World retains identity,
 material, mass, orientation and validated poses; runtime retains cross-domain
 frame/session sequencing. See the canonical
 [ownership decision](../../docs/technical-architecture.md#physical-object-simulation-decision-114).
@@ -168,9 +168,9 @@ so the existing overlay texture cache uploads only on state changes.
 stable fragment ID parity and supplies the world-owned position/physical side.
 All materials emit authored meshes without procedural fragment cuboids. Iron
 uses the evolved original chunk and a taller shard; silicate uses slab/ridge
-variants. Each follows the same stable identity and authoritative-size rules. Rotation remains presentation-independent as before;
+variants. Each follows the same stable identity and authoritative-size rules. The world pose quaternion drives the rendered rotation;
 carried, dropped, ship-local and streamed pieces use the same identity mapping.
-World mass/volume and runtime contact/carrying controllers are unchanged.
+World mass/volume and one-object carrying remain unchanged; #148 adds orientation-aware convex contacts.
 
 ## Authored water-ice deposits (#88)
 
@@ -280,6 +280,23 @@ mutation or new protocol action is needed. See [runner coverage](../../scripts/R
 The world size policy scales fragments/deposits by 10 in each dimension without
 changing mass. `resource_presentation` lifts generated deposit centers using
 renderer-neutral CPU vertex support from the selected immutable mesh. The
-fragment adapter sends separate conservative contact radius and actual ground
-support to physics. Carrying clears the entire cube around the player and rejects
+fragment adapter sends conservative broad-phase radius, current mass/scale/orientation and an immutable authored convex hull to physics. Carrying clears the entire cube around the player and rejects
 ship floor drops whose enlarged footprint crosses hull/furniture proxies.
+
+## Authored convex fragment contacts (#148)
+
+`fragment_physics` caches six convex envelopes from renderer-neutral CPU vertices,
+using the same stable variant selection as presentation. Every snapshot refreshes
+scale and mass, preserving growing piece identity. Planet objects use absolute
+world poses; ship objects use local orientation/angular velocity, mapped through
+the current ship basis at synchronization and writeback. Carried objects remain
+excluded and release resets angular motion. Physics owns all response rules.
+Rendering and oriented pickup cubes consume the same world quaternion; hand
+support is queried on the rotated geometry. Circumscribed spheres remain only
+broad-phase and conservative player/hull clearance.
+
+The opt-in `fragment-pile` initial fixture (seed 0 cabin, seed 1 surface) creates
+six 2 kg pieces through normal extraction, then releases them from deterministic
+initial poses. Subsequent fixed steps use production controllers and contacts;
+no protocol operation teleports objects. Baseline/evidence scenarios compare
+settled poses across two checkpoints.

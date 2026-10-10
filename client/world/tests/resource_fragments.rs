@@ -61,7 +61,7 @@ fn physical_output_conserves_every_material_for_small_and_large_steps() {
                         && piece.material().mass_kg() <= FRAGMENT_MAX_MASS_KG
                 );
                 assert!(
-                    ((side_meters(*piece) / salimon_world::resource_size::RESOURCE_LINEAR_SCALE)
+                    ((side_meters(*piece) / salimon_world::resource_size::FRAGMENT_LINEAR_SCALE)
                         .powi(3)
                         - piece.material().volume_m3())
                     .abs()

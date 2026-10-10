@@ -1,0 +1,1424 @@
+{
+  "before_revision": "8cc50660f8b4946c23448fb317745adbc90db28d",
+  "after_revision": "8fe59c5b9d0015fea31c3680679d5a473574c979",
+  "capture_workflow": "https://github.com/mr-exception/salimon/actions/runs/38043741358",
+  "step_ms": 16,
+  "checkpoint_seconds": [
+    19.2,
+    22.08
+  ],
+  "cases": {
+    "after-surface": {
+      "max_translation_over_2_88_seconds_meters": 0.0025078320012270213,
+      "checkpoints": [
+        {
+          "seconds": 19.2,
+          "image": "after-surface-1920.png",
+          "fragments": [
+            {
+              "id": 1,
+              "source_deposit_id": "Earth:9000",
+              "resource": "iron-ore",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0005714285714285715,
+              "side_meters": 0.41491326668312173,
+              "position_meters": [
+                999999999983.7112,
+                -749993999999.9095,
+                249993999999.9761
+              ],
+              "ship_local_position_meters": [
+                -16.288818359375,
+                -0.01708984375,
+                -0.023895263671875
+              ],
+              "orientation_xyzw": [
+                0.1697539507089681,
+                -0.02741440045062016,
+                -0.636722794668393,
+                0.7516755481032371
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "iron-fragment-shard",
+              "signed_ground_gap_meters": -2.6595880600110977e-05
+            },
+            {
+              "id": 2,
+              "source_deposit_id": "Earth:9000",
+              "resource": "iron-ore",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0005714285714285715,
+              "side_meters": 0.41491326668312173,
+              "position_meters": [
+                999999999984.0664,
+                -749993999999.8767,
+                249994000000.2999
+              ],
+              "ship_local_position_meters": [
+                -15.93359375,
+                0.0157470703125,
+                0.299896240234375
+              ],
+              "orientation_xyzw": [
+                0.4742010951623137,
+                -0.09185648516092726,
+                0.24229414077708752,
+                0.8414209747955156
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "iron-fragment",
+              "signed_ground_gap_meters": -4.5618503254490905e-06
+            },
+            {
+              "id": 3,
+              "source_deposit_id": "Earth:9001",
+              "resource": "silicate-rock",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0007407407407407407,
+              "side_meters": 0.45240293609915105,
+              "position_meters": [
+                999999999983.5344,
+                -749993999999.8994,
+                249994000000.51035
+              ],
+              "ship_local_position_meters": [
+                -16.465576171875,
+                -0.0069580078125,
+                0.510345458984375
+              ],
+              "orientation_xyzw": [
+                0.7138217180819358,
+                -0.3366806224412477,
+                0.4120584216485601,
+                0.4553159017820758
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "silicate-fragment-ridge",
+              "signed_ground_gap_meters": 4.128968054985249e-05
+            },
+            {
+              "id": 4,
+              "source_deposit_id": "Earth:9001",
+              "resource": "silicate-rock",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0007407407407407407,
+              "side_meters": 0.45240293609915105,
+              "position_meters": [
+                999999999983.2223,
+                -749993999999.8711,
+                249993999999.91788
+              ],
+              "ship_local_position_meters": [
+                -16.7777099609375,
+                0.0213623046875,
+                -0.082122802734375
+              ],
+              "orientation_xyzw": [
+                -0.4438673387935234,
+                -0.18403461100395466,
+                0.8392961951230737,
+                0.2543520087534403
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "silicate-fragment-slab",
+              "signed_ground_gap_meters": 2.6503094277902095e-05
+            },
+            {
+              "id": 5,
+              "source_deposit_id": "Earth:9002",
+              "resource": "water-ice",
+              "mass_kg": 2.0,
+              "volume_m3": 0.002173913043478261,
+              "side_meters": 0.647715157695715,
+              "position_meters": [
+                999999999982.5247,
+                -749993999999.8018,
+                249994000000.03583
+              ],
+              "ship_local_position_meters": [
+                -17.475341796875,
+                0.0906982421875,
+                0.03582763671875
+              ],
+              "orientation_xyzw": [
+                0.6627322896103682,
+                0.5126914333860957,
+                -0.007785756505837721,
+                0.5457772333433684
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "water-ice-fragment-cluster",
+              "signed_ground_gap_meters": 5.82357509230913e-05
+            },
+            {
+              "id": 6,
+              "source_deposit_id": "Earth:9002",
+              "resource": "water-ice",
+              "mass_kg": 2.0,
+              "volume_m3": 0.002173913043478261,
+              "side_meters": 0.647715157695715,
+              "position_meters": [
+                999999999983.376,
+                -749993999999.8685,
+                249994000000.23926
+              ],
+              "ship_local_position_meters": [
+                -16.6240234375,
+                0.02392578125,
+                0.2392578125
+              ],
+              "orientation_xyzw": [
+                -0.3376006641975101,
+                0.004094999795155274,
+                -0.577373291369417,
+                0.743403729425219
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "water-ice-fragment-shard",
+              "signed_ground_gap_meters": -4.8413779862838124e-05
+            }
+          ]
+        },
+        {
+          "seconds": 22.08,
+          "image": "after-surface-2208.png",
+          "fragments": [
+            {
+              "id": 1,
+              "source_deposit_id": "Earth:9000",
+              "resource": "iron-ore",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0005714285714285715,
+              "side_meters": 0.41491326668312173,
+              "position_meters": [
+                999999999983.7112,
+                -749993999999.9095,
+                249993999999.9761
+              ],
+              "ship_local_position_meters": [
+                -16.288818359375,
+                -0.01708984375,
+                -0.023895263671875
+              ],
+              "orientation_xyzw": [
+                0.1697539507089681,
+                -0.02741440045062016,
+                -0.636722794668393,
+                0.7516755481032371
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "iron-fragment-shard",
+              "signed_ground_gap_meters": -2.6595880600110977e-05
+            },
+            {
+              "id": 2,
+              "source_deposit_id": "Earth:9000",
+              "resource": "iron-ore",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0005714285714285715,
+              "side_meters": 0.41491326668312173,
+              "position_meters": [
+                999999999984.0664,
+                -749993999999.8767,
+                249994000000.2999
+              ],
+              "ship_local_position_meters": [
+                -15.93359375,
+                0.0157470703125,
+                0.299896240234375
+              ],
+              "orientation_xyzw": [
+                0.4742010951623137,
+                -0.09185648516092726,
+                0.24229414077708752,
+                0.8414209747955156
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "iron-fragment",
+              "signed_ground_gap_meters": -4.5618503254490905e-06
+            },
+            {
+              "id": 3,
+              "source_deposit_id": "Earth:9001",
+              "resource": "silicate-rock",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0007407407407407407,
+              "side_meters": 0.45240293609915105,
+              "position_meters": [
+                999999999983.5344,
+                -749993999999.8994,
+                249994000000.51035
+              ],
+              "ship_local_position_meters": [
+                -16.465576171875,
+                -0.0069580078125,
+                0.510345458984375
+              ],
+              "orientation_xyzw": [
+                0.7138217180819358,
+                -0.3366806224412477,
+                0.4120584216485601,
+                0.4553159017820758
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "silicate-fragment-ridge",
+              "signed_ground_gap_meters": 4.128968054985249e-05
+            },
+            {
+              "id": 4,
+              "source_deposit_id": "Earth:9001",
+              "resource": "silicate-rock",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0007407407407407407,
+              "side_meters": 0.45240293609915105,
+              "position_meters": [
+                999999999983.2223,
+                -749993999999.8711,
+                249993999999.91788
+              ],
+              "ship_local_position_meters": [
+                -16.7777099609375,
+                0.0213623046875,
+                -0.082122802734375
+              ],
+              "orientation_xyzw": [
+                -0.4438673387935234,
+                -0.18403461100395466,
+                0.8392961951230737,
+                0.2543520087534403
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "silicate-fragment-slab",
+              "signed_ground_gap_meters": 2.6503094277902095e-05
+            },
+            {
+              "id": 5,
+              "source_deposit_id": "Earth:9002",
+              "resource": "water-ice",
+              "mass_kg": 2.0,
+              "volume_m3": 0.002173913043478261,
+              "side_meters": 0.647715157695715,
+              "position_meters": [
+                999999999982.5247,
+                -749993999999.8018,
+                249994000000.03583
+              ],
+              "ship_local_position_meters": [
+                -17.475341796875,
+                0.0906982421875,
+                0.03582763671875
+              ],
+              "orientation_xyzw": [
+                0.6627322896103682,
+                0.5126914333860957,
+                -0.007785756505837721,
+                0.5457772333433684
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "water-ice-fragment-cluster",
+              "signed_ground_gap_meters": 5.82357509230913e-05
+            },
+            {
+              "id": 6,
+              "source_deposit_id": "Earth:9002",
+              "resource": "water-ice",
+              "mass_kg": 2.0,
+              "volume_m3": 0.002173913043478261,
+              "side_meters": 0.647715157695715,
+              "position_meters": [
+                999999999983.3737,
+                -749993999999.8684,
+                249994000000.2402
+              ],
+              "ship_local_position_meters": [
+                -16.6263427734375,
+                0.0240478515625,
+                0.240203857421875
+              ],
+              "orientation_xyzw": [
+                -0.33777297278541785,
+                0.004093306670987154,
+                -0.5776679785069073,
+                0.7430964744257249
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "water-ice-fragment-shard",
+              "signed_ground_gap_meters": -4.0796780589741344e-05
+            }
+          ]
+        }
+      ]
+    },
+    "before-floor": {
+      "max_translation_over_2_88_seconds_meters": 0.0,
+      "checkpoints": [
+        {
+          "seconds": 19.2,
+          "image": "before-floor-1920.png",
+          "fragments": [
+            {
+              "id": 1,
+              "source_deposit_id": "Earth:9000",
+              "resource": "iron-ore",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0005714285714285715,
+              "side_meters": 0.8298265333662435,
+              "position_meters": [
+                999999999995.6586,
+                -749993999999.2897,
+                249993999999.4653
+              ],
+              "ship_local_position_meters": [
+                -4.3414306640625,
+                0.602783203125,
+                -0.534698486328125
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "iron-fragment-shard",
+              "signed_ground_gap_meters": 0.00495262464267382
+            },
+            {
+              "id": 2,
+              "source_deposit_id": "Earth:9000",
+              "resource": "iron-ore",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0005714285714285715,
+              "side_meters": 0.8298265333662435,
+              "position_meters": [
+                999999999997.0414,
+                -749993999999.3663,
+                249994000000.2487
+              ],
+              "ship_local_position_meters": [
+                -2.9586181640625,
+                0.526123046875,
+                0.248687744140625
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "iron-fragment",
+              "signed_ground_gap_meters": 0.004968452025616965
+            },
+            {
+              "id": 3,
+              "source_deposit_id": "Earth:9001",
+              "resource": "silicate-rock",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0007407407407407407,
+              "side_meters": 0.9048058721983021,
+              "position_meters": [
+                999999999995.3456,
+                -749993999999.3687,
+                249994000000.9389
+              ],
+              "ship_local_position_meters": [
+                -4.6544189453125,
+                0.5238037109375,
+                0.93890380859375
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "silicate-fragment-ridge",
+              "signed_ground_gap_meters": 0.00505011053489357
+            },
+            {
+              "id": 4,
+              "source_deposit_id": "Earth:9001",
+              "resource": "silicate-rock",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0007407407407407407,
+              "side_meters": 0.9048058721983021,
+              "position_meters": [
+                999999999996.9683,
+                -749993999999.441,
+                249993999998.6738
+              ],
+              "ship_local_position_meters": [
+                -3.03173828125,
+                0.451416015625,
+                -1.326202392578125
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "silicate-fragment-slab",
+              "signed_ground_gap_meters": 0.005046896862996947
+            },
+            {
+              "id": 5,
+              "source_deposit_id": "Earth:9002",
+              "resource": "water-ice",
+              "mass_kg": 2.0,
+              "volume_m3": 0.002173913043478261,
+              "side_meters": 1.29543031539143,
+              "position_meters": [
+                999999999993.8998,
+                -749993999999.0831,
+                249993999997.6351
+              ],
+              "ship_local_position_meters": [
+                -6.1002197265625,
+                0.809326171875,
+                -2.364898681640625
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "water-ice-fragment-cluster",
+              "signed_ground_gap_meters": 0.00497929903405625
+            },
+            {
+              "id": 6,
+              "source_deposit_id": "Earth:9002",
+              "resource": "water-ice",
+              "mass_kg": 2.0,
+              "volume_m3": 0.002173913043478261,
+              "side_meters": 1.29543031539143,
+              "position_meters": [
+                999999999996.908,
+                -749993999997.5359,
+                249994000000.1088
+              ],
+              "ship_local_position_meters": [
+                -3.092041015625,
+                2.3565673828125,
+                0.108795166015625
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "water-ice-fragment-shard",
+              "signed_ground_gap_meters": 1.5392662191718283
+            }
+          ]
+        },
+        {
+          "seconds": 22.08,
+          "image": "before-floor-2208.png",
+          "fragments": [
+            {
+              "id": 1,
+              "source_deposit_id": "Earth:9000",
+              "resource": "iron-ore",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0005714285714285715,
+              "side_meters": 0.8298265333662435,
+              "position_meters": [
+                999999999995.6586,
+                -749993999999.2897,
+                249993999999.4653
+              ],
+              "ship_local_position_meters": [
+                -4.3414306640625,
+                0.602783203125,
+                -0.534698486328125
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "iron-fragment-shard",
+              "signed_ground_gap_meters": 0.00495262464267382
+            },
+            {
+              "id": 2,
+              "source_deposit_id": "Earth:9000",
+              "resource": "iron-ore",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0005714285714285715,
+              "side_meters": 0.8298265333662435,
+              "position_meters": [
+                999999999997.0414,
+                -749993999999.3663,
+                249994000000.2487
+              ],
+              "ship_local_position_meters": [
+                -2.9586181640625,
+                0.526123046875,
+                0.248687744140625
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "iron-fragment",
+              "signed_ground_gap_meters": 0.004968452025616965
+            },
+            {
+              "id": 3,
+              "source_deposit_id": "Earth:9001",
+              "resource": "silicate-rock",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0007407407407407407,
+              "side_meters": 0.9048058721983021,
+              "position_meters": [
+                999999999995.3456,
+                -749993999999.3687,
+                249994000000.9389
+              ],
+              "ship_local_position_meters": [
+                -4.6544189453125,
+                0.5238037109375,
+                0.93890380859375
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "silicate-fragment-ridge",
+              "signed_ground_gap_meters": 0.00505011053489357
+            },
+            {
+              "id": 4,
+              "source_deposit_id": "Earth:9001",
+              "resource": "silicate-rock",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0007407407407407407,
+              "side_meters": 0.9048058721983021,
+              "position_meters": [
+                999999999996.9683,
+                -749993999999.441,
+                249993999998.6738
+              ],
+              "ship_local_position_meters": [
+                -3.03173828125,
+                0.451416015625,
+                -1.326202392578125
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "silicate-fragment-slab",
+              "signed_ground_gap_meters": 0.005046896862996947
+            },
+            {
+              "id": 5,
+              "source_deposit_id": "Earth:9002",
+              "resource": "water-ice",
+              "mass_kg": 2.0,
+              "volume_m3": 0.002173913043478261,
+              "side_meters": 1.29543031539143,
+              "position_meters": [
+                999999999993.8998,
+                -749993999999.0831,
+                249993999997.6351
+              ],
+              "ship_local_position_meters": [
+                -6.1002197265625,
+                0.809326171875,
+                -2.364898681640625
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "water-ice-fragment-cluster",
+              "signed_ground_gap_meters": 0.00497929903405625
+            },
+            {
+              "id": 6,
+              "source_deposit_id": "Earth:9002",
+              "resource": "water-ice",
+              "mass_kg": 2.0,
+              "volume_m3": 0.002173913043478261,
+              "side_meters": 1.29543031539143,
+              "position_meters": [
+                999999999996.908,
+                -749993999997.5359,
+                249994000000.1088
+              ],
+              "ship_local_position_meters": [
+                -3.092041015625,
+                2.3565673828125,
+                0.108795166015625
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "water-ice-fragment-shard",
+              "signed_ground_gap_meters": 1.5392662191718283
+            }
+          ]
+        }
+      ]
+    },
+    "after-floor": {
+      "max_translation_over_2_88_seconds_meters": 0.0,
+      "checkpoints": [
+        {
+          "seconds": 19.2,
+          "image": "after-floor-1920.png",
+          "fragments": [
+            {
+              "id": 1,
+              "source_deposit_id": "Earth:9000",
+              "resource": "iron-ore",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0005714285714285715,
+              "side_meters": 0.41491326668312173,
+              "position_meters": [
+                999999999997.069,
+                -749993999999.55,
+                249994000000.02896
+              ],
+              "ship_local_position_meters": [
+                -2.9310302734375,
+                0.3424072265625,
+                0.028961181640625
+              ],
+              "orientation_xyzw": [
+                0.5704180826950018,
+                0.03778542371122786,
+                -0.26034774651098136,
+                0.7780838795246786
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "iron-fragment-shard",
+              "signed_ground_gap_meters": 4.8786051517091256e-05
+            },
+            {
+              "id": 2,
+              "source_deposit_id": "Earth:9000",
+              "resource": "iron-ore",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0005714285714285715,
+              "side_meters": 0.41491326668312173,
+              "position_meters": [
+                999999999997.3933,
+                -749993999999.5214,
+                249994000000.26776
+              ],
+              "ship_local_position_meters": [
+                -2.606689453125,
+                0.37109375,
+                0.26776123046875
+              ],
+              "orientation_xyzw": [
+                0.47517935877610673,
+                -0.16298750311371843,
+                0.13798354635456678,
+                0.8535808056401578
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "iron-fragment",
+              "signed_ground_gap_meters": -2.9475236807519067e-05
+            },
+            {
+              "id": 3,
+              "source_deposit_id": "Earth:9001",
+              "resource": "silicate-rock",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0007407407407407407,
+              "side_meters": 0.45240293609915105,
+              "position_meters": [
+                999999999996.8916,
+                -749993999999.5265,
+                249994000000.68707
+              ],
+              "ship_local_position_meters": [
+                -3.1083984375,
+                0.365966796875,
+                0.68707275390625
+              ],
+              "orientation_xyzw": [
+                0.7983242501291691,
+                -0.5923437505103507,
+                0.03865932938324415,
+                -0.10155160825250115
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "silicate-fragment-ridge",
+              "signed_ground_gap_meters": -2.0798458259516095e-05
+            },
+            {
+              "id": 4,
+              "source_deposit_id": "Earth:9001",
+              "resource": "silicate-rock",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0007407407407407407,
+              "side_meters": 0.45240293609915105,
+              "position_meters": [
+                999999999996.5087,
+                -749993999999.5162,
+                249993999999.86346
+              ],
+              "ship_local_position_meters": [
+                -3.4913330078125,
+                0.376220703125,
+                -0.13653564453125
+              ],
+              "orientation_xyzw": [
+                -0.4370768216388343,
+                -0.18194302497684012,
+                0.8427939458424194,
+                0.25604482517664123
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "silicate-fragment-slab",
+              "signed_ground_gap_meters": -2.6456874616220816e-05
+            },
+            {
+              "id": 5,
+              "source_deposit_id": "Earth:9002",
+              "resource": "water-ice",
+              "mass_kg": 2.0,
+              "volume_m3": 0.002173913043478261,
+              "side_meters": 0.647715157695715,
+              "position_meters": [
+                999999999995.8425,
+                -749993999999.4277,
+                249993999999.94055
+              ],
+              "ship_local_position_meters": [
+                -4.157470703125,
+                0.4647216796875,
+                -0.0594482421875
+              ],
+              "orientation_xyzw": [
+                0.5906592409051938,
+                0.3575448474528393,
+                -0.3263844984113187,
+                0.6455668070695844
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "water-ice-fragment-cluster",
+              "signed_ground_gap_meters": 7.47102001294464e-06
+            },
+            {
+              "id": 6,
+              "source_deposit_id": "Earth:9002",
+              "resource": "water-ice",
+              "mass_kg": 2.0,
+              "volume_m3": 0.002173913043478261,
+              "side_meters": 0.647715157695715,
+              "position_meters": [
+                999999999996.7228,
+                -749993999999.5135,
+                249994000000.19894
+              ],
+              "ship_local_position_meters": [
+                -3.2772216796875,
+                0.37890625,
+                0.198944091796875
+              ],
+              "orientation_xyzw": [
+                -0.36428876502088503,
+                0.03897856457037851,
+                -0.5608640231249833,
+                0.7424324310990527
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "water-ice-fragment-shard",
+              "signed_ground_gap_meters": 1.9030946310505392e-05
+            }
+          ]
+        },
+        {
+          "seconds": 22.08,
+          "image": "after-floor-2208.png",
+          "fragments": [
+            {
+              "id": 1,
+              "source_deposit_id": "Earth:9000",
+              "resource": "iron-ore",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0005714285714285715,
+              "side_meters": 0.41491326668312173,
+              "position_meters": [
+                999999999997.069,
+                -749993999999.55,
+                249994000000.02896
+              ],
+              "ship_local_position_meters": [
+                -2.9310302734375,
+                0.3424072265625,
+                0.028961181640625
+              ],
+              "orientation_xyzw": [
+                0.5704180826950018,
+                0.03778542371122786,
+                -0.26034774651098136,
+                0.7780838795246786
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "iron-fragment-shard",
+              "signed_ground_gap_meters": 4.8786051517091256e-05
+            },
+            {
+              "id": 2,
+              "source_deposit_id": "Earth:9000",
+              "resource": "iron-ore",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0005714285714285715,
+              "side_meters": 0.41491326668312173,
+              "position_meters": [
+                999999999997.3933,
+                -749993999999.5214,
+                249994000000.26776
+              ],
+              "ship_local_position_meters": [
+                -2.606689453125,
+                0.37109375,
+                0.26776123046875
+              ],
+              "orientation_xyzw": [
+                0.47517935877610673,
+                -0.16298750311371843,
+                0.13798354635456678,
+                0.8535808056401578
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "iron-fragment",
+              "signed_ground_gap_meters": -2.9475236807519067e-05
+            },
+            {
+              "id": 3,
+              "source_deposit_id": "Earth:9001",
+              "resource": "silicate-rock",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0007407407407407407,
+              "side_meters": 0.45240293609915105,
+              "position_meters": [
+                999999999996.8916,
+                -749993999999.5265,
+                249994000000.68707
+              ],
+              "ship_local_position_meters": [
+                -3.1083984375,
+                0.365966796875,
+                0.68707275390625
+              ],
+              "orientation_xyzw": [
+                0.7983242501291691,
+                -0.5923437505103507,
+                0.03865932938324415,
+                -0.10155160825250115
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "silicate-fragment-ridge",
+              "signed_ground_gap_meters": -2.0798458259516095e-05
+            },
+            {
+              "id": 4,
+              "source_deposit_id": "Earth:9001",
+              "resource": "silicate-rock",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0007407407407407407,
+              "side_meters": 0.45240293609915105,
+              "position_meters": [
+                999999999996.5087,
+                -749993999999.5162,
+                249993999999.86346
+              ],
+              "ship_local_position_meters": [
+                -3.4913330078125,
+                0.376220703125,
+                -0.13653564453125
+              ],
+              "orientation_xyzw": [
+                -0.4370768216388343,
+                -0.18194302497684012,
+                0.8427939458424194,
+                0.25604482517664123
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "silicate-fragment-slab",
+              "signed_ground_gap_meters": -2.6456874616220816e-05
+            },
+            {
+              "id": 5,
+              "source_deposit_id": "Earth:9002",
+              "resource": "water-ice",
+              "mass_kg": 2.0,
+              "volume_m3": 0.002173913043478261,
+              "side_meters": 0.647715157695715,
+              "position_meters": [
+                999999999995.8425,
+                -749993999999.4277,
+                249993999999.94055
+              ],
+              "ship_local_position_meters": [
+                -4.157470703125,
+                0.4647216796875,
+                -0.0594482421875
+              ],
+              "orientation_xyzw": [
+                0.5906592409051938,
+                0.3575448474528393,
+                -0.3263844984113187,
+                0.6455668070695844
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "water-ice-fragment-cluster",
+              "signed_ground_gap_meters": 7.47102001294464e-06
+            },
+            {
+              "id": 6,
+              "source_deposit_id": "Earth:9002",
+              "resource": "water-ice",
+              "mass_kg": 2.0,
+              "volume_m3": 0.002173913043478261,
+              "side_meters": 0.647715157695715,
+              "position_meters": [
+                999999999996.7228,
+                -749993999999.5135,
+                249994000000.19894
+              ],
+              "ship_local_position_meters": [
+                -3.2772216796875,
+                0.37890625,
+                0.198944091796875
+              ],
+              "orientation_xyzw": [
+                -0.36428876502088503,
+                0.03897856457037851,
+                -0.5608640231249833,
+                0.7424324310990527
+              ],
+              "carried": false,
+              "reference_frame": "ship",
+              "authored_mesh": "water-ice-fragment-shard",
+              "signed_ground_gap_meters": 1.9030946310505392e-05
+            }
+          ]
+        }
+      ]
+    },
+    "before-surface": {
+      "max_translation_over_2_88_seconds_meters": 0.0,
+      "checkpoints": [
+        {
+          "seconds": 19.2,
+          "image": "before-surface-1920.png",
+          "fragments": [
+            {
+              "id": 1,
+              "source_deposit_id": "Earth:9000",
+              "resource": "iron-ore",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0005714285714285715,
+              "side_meters": 0.8298265333662435,
+              "position_meters": [
+                999999999982.3424,
+                -749993999999.6445,
+                249993999999.8844
+              ],
+              "ship_local_position_meters": [
+                -17.6575927734375,
+                0.2479248046875,
+                -0.1156005859375
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "iron-fragment-shard",
+              "signed_ground_gap_meters": 0.00497615331289486
+            },
+            {
+              "id": 2,
+              "source_deposit_id": "Earth:9000",
+              "resource": "iron-ore",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0005714285714285715,
+              "side_meters": 0.8298265333662435,
+              "position_meters": [
+                999999999985.1818,
+                -749993999999.7212,
+                249994000001.12064
+              ],
+              "ship_local_position_meters": [
+                -14.8182373046875,
+                0.1712646484375,
+                1.120635986328125
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "iron-fragment",
+              "signed_ground_gap_meters": 0.0049842538277964366
+            },
+            {
+              "id": 3,
+              "source_deposit_id": "Earth:9001",
+              "resource": "silicate-rock",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0007407407407407407,
+              "side_meters": 0.9048058721983021,
+              "position_meters": [
+                999999999981.6809,
+                -749993999999.7236,
+                249994000001.23093
+              ],
+              "ship_local_position_meters": [
+                -18.319091796875,
+                0.1688232421875,
+                1.230926513671875
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "silicate-fragment-ridge",
+              "signed_ground_gap_meters": 0.004954425163875009
+            },
+            {
+              "id": 4,
+              "source_deposit_id": "Earth:9001",
+              "resource": "silicate-rock",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0007407407407407407,
+              "side_meters": 0.9048058721983021,
+              "position_meters": [
+                999999999984.4098,
+                -749993999999.796,
+                249993999997.73932
+              ],
+              "ship_local_position_meters": [
+                -15.5902099609375,
+                0.096435546875,
+                -2.26068115234375
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "silicate-fragment-slab",
+              "signed_ground_gap_meters": 0.004944001431191336
+            },
+            {
+              "id": 5,
+              "source_deposit_id": "Earth:9002",
+              "resource": "water-ice",
+              "mass_kg": 2.0,
+              "volume_m3": 0.002173913043478261,
+              "side_meters": 1.29543031539143,
+              "position_meters": [
+                999999999984.1577,
+                -749993999999.438,
+                249993999999.6073
+              ],
+              "ship_local_position_meters": [
+                -15.84228515625,
+                0.4544677734375,
+                -0.3927001953125
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "water-ice-fragment-cluster",
+              "signed_ground_gap_meters": 0.004997669438309593
+            },
+            {
+              "id": 6,
+              "source_deposit_id": "Earth:9002",
+              "resource": "water-ice",
+              "mass_kg": 2.0,
+              "volume_m3": 0.002173913043478261,
+              "side_meters": 1.29543031539143,
+              "position_meters": [
+                999999999983.4847,
+                -749993999999.425,
+                249994000002.05258
+              ],
+              "ship_local_position_meters": [
+                -16.5152587890625,
+                0.4674072265625,
+                2.052581787109375
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "water-ice-fragment-shard",
+              "signed_ground_gap_meters": 0.0049842681984895165
+            }
+          ]
+        },
+        {
+          "seconds": 22.08,
+          "image": "before-surface-2208.png",
+          "fragments": [
+            {
+              "id": 1,
+              "source_deposit_id": "Earth:9000",
+              "resource": "iron-ore",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0005714285714285715,
+              "side_meters": 0.8298265333662435,
+              "position_meters": [
+                999999999982.3424,
+                -749993999999.6445,
+                249993999999.8844
+              ],
+              "ship_local_position_meters": [
+                -17.6575927734375,
+                0.2479248046875,
+                -0.1156005859375
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "iron-fragment-shard",
+              "signed_ground_gap_meters": 0.00497615331289486
+            },
+            {
+              "id": 2,
+              "source_deposit_id": "Earth:9000",
+              "resource": "iron-ore",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0005714285714285715,
+              "side_meters": 0.8298265333662435,
+              "position_meters": [
+                999999999985.1818,
+                -749993999999.7212,
+                249994000001.12064
+              ],
+              "ship_local_position_meters": [
+                -14.8182373046875,
+                0.1712646484375,
+                1.120635986328125
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "iron-fragment",
+              "signed_ground_gap_meters": 0.0049842538277964366
+            },
+            {
+              "id": 3,
+              "source_deposit_id": "Earth:9001",
+              "resource": "silicate-rock",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0007407407407407407,
+              "side_meters": 0.9048058721983021,
+              "position_meters": [
+                999999999981.6809,
+                -749993999999.7236,
+                249994000001.23093
+              ],
+              "ship_local_position_meters": [
+                -18.319091796875,
+                0.1688232421875,
+                1.230926513671875
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "silicate-fragment-ridge",
+              "signed_ground_gap_meters": 0.004954425163875009
+            },
+            {
+              "id": 4,
+              "source_deposit_id": "Earth:9001",
+              "resource": "silicate-rock",
+              "mass_kg": 2.0,
+              "volume_m3": 0.0007407407407407407,
+              "side_meters": 0.9048058721983021,
+              "position_meters": [
+                999999999984.4098,
+                -749993999999.796,
+                249993999997.73932
+              ],
+              "ship_local_position_meters": [
+                -15.5902099609375,
+                0.096435546875,
+                -2.26068115234375
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "silicate-fragment-slab",
+              "signed_ground_gap_meters": 0.004944001431191336
+            },
+            {
+              "id": 5,
+              "source_deposit_id": "Earth:9002",
+              "resource": "water-ice",
+              "mass_kg": 2.0,
+              "volume_m3": 0.002173913043478261,
+              "side_meters": 1.29543031539143,
+              "position_meters": [
+                999999999984.1577,
+                -749993999999.438,
+                249993999999.6073
+              ],
+              "ship_local_position_meters": [
+                -15.84228515625,
+                0.4544677734375,
+                -0.3927001953125
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "water-ice-fragment-cluster",
+              "signed_ground_gap_meters": 0.004997669438309593
+            },
+            {
+              "id": 6,
+              "source_deposit_id": "Earth:9002",
+              "resource": "water-ice",
+              "mass_kg": 2.0,
+              "volume_m3": 0.002173913043478261,
+              "side_meters": 1.29543031539143,
+              "position_meters": [
+                999999999983.4847,
+                -749993999999.425,
+                249994000002.05258
+              ],
+              "ship_local_position_meters": [
+                -16.5152587890625,
+                0.4674072265625,
+                2.052581787109375
+              ],
+              "orientation_xyzw": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "carried": false,
+              "reference_frame": "world",
+              "authored_mesh": "water-ice-fragment-shard",
+              "signed_ground_gap_meters": 0.0049842681984895165
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

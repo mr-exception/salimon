@@ -149,7 +149,7 @@ source, material key, and pose, and derives the new solid volume from density.
 Finished pieces are unchanged by later extraction. Picking up a growing piece
 must end its participation in the output tail when #46 adds carrying.
 
-Pieces have finite absolute poses and identity orientation. They emerge near
+Pieces start with finite absolute poses and identity orientation; #148 physical contacts subsequently update their unit quaternion. They emerge near
 the source with enough height for a full-size piece. Side length is the cube
 root of solid volume multiplied by the shared gameplay scale. Runtime applies an ejection impulse, gravity, and
 fragment contacts while the world crate owns mass, identity, and provenance.
@@ -176,11 +176,11 @@ fragment identity or persistence rule. See the
 
 ## Gameplay size policy (#144)
 
-`resource_size.rs` is the single size authority: `RESOURCE_LINEAR_SCALE = 10`.
+`resource_size.rs` is the single size authority: deposits use `RESOURCE_LINEAR_SCALE = 10`; fragments use `FRAGMENT_LINEAR_SCALE = 5` after #148.
 Solid volume is still `mass / density`; fragment gameplay side is
-`10 * cbrt(solid volume)` and deposit gameplay radius is
+`5 * cbrt(solid volume)` and deposit gameplay radius is
 `10 * cbrt(3 * initial solid volume / (4π))`. All authored variants keep the
-same vertices and uniformly scale by 10, including their actual extents.
+same vertices; fragments now measure half the previous linear dimensions at equal mass, including growing pieces and all six variants. Deposit dimensions are unchanged.
 This is a gameplay exaggeration, not a density change; mass labels, 2 kg/s yield,
 2 kg fragment cap and conservation remain unchanged.
 
@@ -194,8 +194,7 @@ not change seed arithmetic or distribution spacing (25–80 m).
 
 Spawn lanes reserve full fragment size and scale their spacing with it rather
 than repeating tiny offsets. Runtime supplies a circumscribed cube sphere for
-pair contacts/ship containment, and actual authored support for terrain/deck
-contacts. World pickup still intersects the enlarged cube; mining and prompts
+broad-phase/ship containment only. Authored convex envelopes, rotated by the physical pose, define pair and terrain/deck contacts. World pickup intersects the oriented conservative cube; mining and prompts
 consume the enlarged deposit sphere. Carried centers stay horizontally ahead of the player capsule by the cube
 sphere radius plus the hand offset at every pitch, and clamp to ground support. Unsafe hull/furniture floor drops retain
 the carried identity. Loose fragments remain supported in ship-local metres.

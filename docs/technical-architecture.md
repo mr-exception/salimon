@@ -18,7 +18,7 @@ dependencies; each crate's architecture/invariants defines its local contracts.
 | `client/runtime/` | Native lifecycle, input, clocks, domain composition, automation, resource presentation and physical-object frame/session adapters |
 | `client/world/` | Static six-body compressed catalog, `f64` coordinates/camera tour, resource contracts, generation, extraction/session deltas, fragments and one-object carrying |
 | `client/ship/` | Pose, cockpit authority, direct flight, uncancellable landing/takeoff, airlock interlocks and live telemetry |
-| `client/physics/` | Portable small-object gravity, ejection/release velocity, spherical contacts, restitution and deterministic substeps; caller-supplied surfaces/geometry |
+| `client/physics/` | Portable small-object gravity, ejection/release velocity, authored convex contacts and angular motion, restitution and deterministic substeps; caller-supplied surfaces/geometry |
 | `client/math/` | Dependency-free `f64` vector component arithmetic; no domain/frame ownership |
 | `client/character/` | Portable movement, collision, gravity, cockpit transitions and open-space/nearby-body EVA |
 | `client/renderer/` | GPU resources, GLB loading, sphere/ship/image pipelines, reverse-Z, instruments and measurements through renderer-neutral DTOs |
@@ -131,10 +131,9 @@ objects should use this boundary for compatible motion/contact. Their feature
 owners adapt identity/state and environment here, extending physics with focused
 contracts/tests when new rules are actually required. Do not add unrelated
 physical rules to runtime. Character locomotion and ship flight retain their
-existing domain controllers. The current solver uses equal contact weighting,
-spherical proxies and quadratic pairs; it is not a mass-aware rigid-body engine.
+existing domain controllers. The #148 solver uses authored convex envelopes, mass-weighted contacts and angular response with approximate isotropic inertia. Broad-phase pairs remain quadratic; this is a small-object custom solver, not a general rigid-body engine.
 Multiple ship frames must be stepped separately; the current single-ship adapter
-preserves the old grouping, constants, iteration order and 48-substep cap.
+preserves frame grouping and deterministic order; convex substeps adapt to scale and speed.
 See [physics architecture](../client/physics/architecture.md) and
 [invariants](../client/physics/invariants.md) before extending it.
 

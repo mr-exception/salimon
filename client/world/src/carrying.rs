@@ -36,7 +36,7 @@ impl CarrySlot {
     }
 }
 
-/// Target the actual world-axis cube, excluding the carried object. Hull and terrain
+/// Target the oriented conservative cube, excluding the carried object. Hull and terrain
 /// occlusion are supplied by composition; equal-distance ties use stable identity.
 pub fn aimed_fragment(
     ray: MiningRay,
@@ -50,12 +50,18 @@ pub fn aimed_fragment(
             if carried == Some(WorldObjectId::ResourceFragment(piece.id())) {
                 return None;
             }
-            let center = piece.transform().position().offset_from(ray.origin);
+            let q = piece.transform().orientation_xyzw();
+            let inverse = [-q[0], -q[1], -q[2], q[3]];
+            let center = rotate(
+                inverse,
+                piece.transform().position().offset_from(ray.origin),
+            );
+            let direction = rotate(inverse, ray.direction);
             let half = side_meters(*piece) * 0.5;
             let mut near: f64 = 0.0;
             let mut far = PICKUP_RANGE_METERS.min(blocked_at);
             for (axis, component) in center.iter().enumerate() {
-                let direction = ray.direction[axis];
+                let direction = direction[axis];
                 if direction.abs() < 1e-12 {
                     if component.abs() > half {
                         return None;
@@ -71,6 +77,20 @@ pub fn aimed_fragment(
         })
         .min_by(|a, b| a.1.total_cmp(&b.1).then_with(|| a.0.0.cmp(&b.0.0)))
         .map(|target| target.0)
+}
+
+fn rotate(q: [f64; 4], p: [f64; 3]) -> [f64; 3] {
+    let v = [q[0], q[1], q[2]];
+    let cross = |a: [f64; 3], b: [f64; 3]| {
+        [
+            a[1] * b[2] - a[2] * b[1],
+            a[2] * b[0] - a[0] * b[2],
+            a[0] * b[1] - a[1] * b[0],
+        ]
+    };
+    let t = cross(v, p).map(|v| v * 2.0);
+    let c = cross(v, t);
+    std::array::from_fn(|i| p[i] + q[3] * t[i] + c[i])
 }
 
 #[cfg(test)]

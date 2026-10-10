@@ -130,9 +130,9 @@ policy stays in runtime. Total draw calls include the visible reticle draw.
 
 `resource_mesh.rs` loads checked-in water-ice, silicate and iron fragment GLBs at initialization and
 validates their baked identity transforms and ±0.48 m local bounds. Runtime maps
-stable variant choice, absolute center and authoritative side into
+stable variant choice, absolute center, unit orientation and authoritative side into
 `ResourceMeshInstance`; the renderer subtracts camera position in `f64` before
-narrowing scaled vertices. All authored variants share one opaque reverse-Z draw with
+narrowing rotated/scaled vertices. Its cached CPU unit vertices come from the same GLB triangles and are exposed for immutable collision proxies, without importing gameplay policy. All authored variants share one opaque reverse-Z draw with
 flat material colors and inexpensive local facet shading. No transparency,
 textures or gameplay-domain dependency is added. Geometry buffers grow only
 when needed; diagnostics count individual resource instances and the single batch draw.

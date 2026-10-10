@@ -12,8 +12,8 @@ from e2e_artifacts import Artifacts
 
 
 PROTOCOL = 1
-SETUPS = {"resource-approach", "landed-earth", "cockpit-earth", "orbit-earth", "orbit-moon", "open-space", "eva-approach"}
-OPS = {"inspect", "step", "look", "key", "interact", "landing", "thruster"}
+SETUPS = {"fragment-pile", "resource-approach", "landed-earth", "cockpit-earth", "orbit-earth", "orbit-moon", "open-space", "eva-approach"}
+OPS = {"inspect", "step", "look", "aim_fragment", "restore_look", "key", "interact", "landing", "thruster"}
 COMPARISONS = {"equals", "not_equals", "gt", "gte", "lt", "lte", "approx", "exists", "contains"}
 
 

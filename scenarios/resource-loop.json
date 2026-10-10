@@ -531,19 +531,8 @@
     {
       "assert": {
         "path": "world.fragments.0.side_meters",
-        "approx": 0.8925772667762261,
+        "approx": 0.44628863338811303,
         "tolerance": 1e-09
-      }
-    },
-    {
-      "assert": {
-        "path": "world.fragments.0.orientation_xyzw",
-        "equals": [
-          0.0,
-          0.0,
-          0.0,
-          1.0
-        ]
       }
     },
     {
@@ -1183,6 +1172,32 @@
       }
     },
     {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 4
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "aim_fragment",
+        "fragment_id": 1
+      }
+    },
+    {
       "assert": {
         "path": "carrying.target_id",
         "equals": 1
@@ -1348,6 +1363,31 @@
       "assert": {
         "path": "mining.equipped",
         "equals": false
+      }
+    },
+    {
+      "action": {
+        "op": "restore_look"
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 4
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
       }
     },
     {

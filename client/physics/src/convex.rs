@@ -84,10 +84,9 @@ impl ConvexHull {
     }
 
     pub fn support(&self, orientation: [f64; 4], side: f64, direction: [f64; 3]) -> f64 {
-        self.vertices
-            .iter()
-            .map(|v| dot(rotate(orientation, scale(*v, side)), direction))
-            .fold(f64::NEG_INFINITY, f64::max)
+        let inverse = [-orientation[0], -orientation[1], -orientation[2], orientation[3]];
+        let local = rotate(inverse, direction);
+        self.vertices.iter().map(|v| dot(*v, local) * side).fold(f64::NEG_INFINITY, f64::max)
     }
 
     /// Closest point of the supporting feature to the center-of-mass projection.
@@ -203,26 +202,26 @@ pub(crate) fn projections(a: &super::ObjectState, b: &super::ObjectState) -> Vec
     for n in &bh.normals {
         push_axis(&mut axes, rotate(b.orientation, *n));
     }
-    for ae in &ah.edges {
-        for be in &bh.edges {
-            push_axis(
-                &mut axes,
-                cross(rotate(a.orientation, *ae), rotate(b.orientation, *be)),
-            );
+    // Cross-edge directions need no O(axis_count²) duplicate search. Repeated
+    // separating axes are harmless and cheaper than deduplication on faceted ore.
+    let ae: Vec<_> = ah.edges.iter().map(|v| rotate(a.orientation, *v)).collect();
+    let be: Vec<_> = bh.edges.iter().map(|v| rotate(b.orientation, *v)).collect();
+    for a in &ae {
+        for b in &be {
+            let axis = cross(*a, *b);
+            let size = length(axis);
+            if size > 1e-10 { axes.push(scale(axis, 1.0 / size)); }
         }
     }
-    axes.into_iter()
-        .map(|axis| {
-            let opposite = scale(axis, -1.0);
-            Projection {
-                axis,
-                forward: ah.support(a.orientation, a.side_meters, axis)
-                    + bh.support(b.orientation, b.side_meters, opposite),
-                backward: bh.support(b.orientation, b.side_meters, axis)
-                    + ah.support(a.orientation, a.side_meters, opposite),
-            }
-        })
-        .collect()
+    let av: Vec<_> = ah.vertices.iter().map(|v| rotate(a.orientation, scale(*v, a.side_meters))).collect();
+    let bv: Vec<_> = bh.vertices.iter().map(|v| rotate(b.orientation, scale(*v, b.side_meters))).collect();
+    let span = |vertices: &[[f64; 3]], axis| vertices.iter().map(|v| dot(*v, axis))
+        .fold((f64::INFINITY, f64::NEG_INFINITY), |(lo,hi), x| (lo.min(x), hi.max(x)));
+    axes.into_iter().map(|axis| {
+        let (amin, amax) = span(&av, axis);
+        let (bmin, bmax) = span(&bv, axis);
+        Projection { axis, forward: amax - bmin, backward: bmax - amin }
+    }).collect()
 }
 
 /// Minimum translation of B relative to A, with universe-scale-safe subtraction.

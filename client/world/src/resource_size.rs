@@ -35,9 +35,7 @@ mod tests {
                 let solid_volume = mass / resource.density_kg_per_m3;
                 assert_eq!(material.mass_kg(), mass);
                 assert_eq!(material.volume_m3(), solid_volume);
-                assert!(
-                    (fragment_side_meters(material) / solid_volume.cbrt() - 5.0).abs() < 1e-12
-                );
+                assert!((fragment_side_meters(material) / solid_volume.cbrt() - 5.0).abs() < 1e-12);
                 let original_radius = (3.0 * solid_volume / (4.0 * std::f64::consts::PI)).cbrt();
                 assert!((deposit_radius_meters(material) / original_radius - 10.0).abs() < 1e-12);
                 assert!(

@@ -43,12 +43,22 @@ pub(crate) fn release(
             .meters();
         salimon_physics::release_velocity(player_forward, position, nearest_body(position))
     };
-    let world_orientation = tool.session.fragments().iter().find(|p| p.id() == id).expect("released fragment").transform().orientation_xyzw();
-    tool.fragment_motion.insert(id, FragmentMotion {
-        velocity,
-        angular_velocity: [0.0; 3],
-        ship_orientation: inside.then(|| to_local_orientation(frame, world_orientation)),
-    });
+    let world_orientation = tool
+        .session
+        .fragments()
+        .iter()
+        .find(|p| p.id() == id)
+        .expect("released fragment")
+        .transform()
+        .orientation_xyzw();
+    tool.fragment_motion.insert(
+        id,
+        FragmentMotion {
+            velocity,
+            angular_velocity: [0.0; 3],
+            ship_orientation: inside.then(|| to_local_orientation(frame, world_orientation)),
+        },
+    );
 }
 
 pub(crate) fn advance(tool: &mut MiningTool, frame: ShipFrame, delta: Duration, player: [f64; 3]) {
@@ -89,10 +99,19 @@ pub(crate) fn advance(tool: &mut MiningTool, frame: ShipFrame, delta: Duration, 
                     hull: Some(fragment_hull(p)),
                     side_meters: salimon_world::resource_fragments::side_meters(p),
                     orientation: if ship {
-                        tool.fragment_motion.get(&p.id()).and_then(|m| m.ship_orientation)
-                            .unwrap_or_else(|| to_local_orientation(frame, p.transform().orientation_xyzw()))
-                    } else { p.transform().orientation_xyzw() },
-                    angular_velocity: tool.fragment_motion.get(&p.id()).map_or([0.0; 3], |m| m.angular_velocity),
+                        tool.fragment_motion
+                            .get(&p.id())
+                            .and_then(|m| m.ship_orientation)
+                            .unwrap_or_else(|| {
+                                to_local_orientation(frame, p.transform().orientation_xyzw())
+                            })
+                    } else {
+                        p.transform().orientation_xyzw()
+                    },
+                    angular_velocity: tool
+                        .fragment_motion
+                        .get(&p.id())
+                        .map_or([0.0; 3], |m| m.angular_velocity),
                     mass_kg: p.material().mass_kg(),
                     surface: if ship {
                         Surface::Floor {
@@ -118,7 +137,8 @@ pub(crate) fn advance(tool: &mut MiningTool, frame: ShipFrame, delta: Duration, 
             FragmentMotion {
                 velocity: piece.velocity,
                 angular_velocity: piece.angular_velocity,
-                ship_orientation: matches!(piece.surface, Surface::Floor { .. }).then_some(piece.orientation),
+                ship_orientation: matches!(piece.surface, Surface::Floor { .. })
+                    .then_some(piece.orientation),
             },
         );
         let position = if matches!(piece.surface, Surface::Floor { .. }) {
@@ -131,20 +151,35 @@ pub(crate) fn advance(tool: &mut MiningTool, frame: ShipFrame, delta: Duration, 
             WorldPosition::new(position[0], position[1], position[2]),
             if matches!(piece.surface, Surface::Floor { .. }) {
                 to_world_orientation(frame, piece.orientation)
-            } else { piece.orientation },
+            } else {
+                piece.orientation
+            },
         )
         .expect("finite fragment physics pose");
         tool.session.move_loose(fragment.id(), pose);
     }
 }
 
-pub(crate) fn fragment_hull(fragment: salimon_world::resources::ResourceFragment) -> std::sync::Arc<salimon_physics::ConvexHull> {
+pub(crate) fn fragment_hull(
+    fragment: salimon_world::resources::ResourceFragment,
+) -> std::sync::Arc<salimon_physics::ConvexHull> {
     use salimon_renderer::ResourceMesh;
-    static HULLS: std::sync::LazyLock<[std::sync::Arc<salimon_physics::ConvexHull>; 6]> = std::sync::LazyLock::new(|| {
-        [ResourceMesh::IceShard, ResourceMesh::IceCluster, ResourceMesh::SilicateSlab,
-         ResourceMesh::SilicateRidge, ResourceMesh::IronChunk, ResourceMesh::IronShard]
-            .map(|mesh| std::sync::Arc::new(salimon_physics::ConvexHull::new(mesh.unit_vertices().iter().copied())))
-    });
+    static HULLS: std::sync::LazyLock<[std::sync::Arc<salimon_physics::ConvexHull>; 6]> =
+        std::sync::LazyLock::new(|| {
+            [
+                ResourceMesh::IceShard,
+                ResourceMesh::IceCluster,
+                ResourceMesh::SilicateSlab,
+                ResourceMesh::SilicateRidge,
+                ResourceMesh::IronChunk,
+                ResourceMesh::IronShard,
+            ]
+            .map(|mesh| {
+                std::sync::Arc::new(salimon_physics::ConvexHull::new(
+                    mesh.unit_vertices().iter().copied(),
+                ))
+            })
+        });
     HULLS[crate::resource_presentation::fragment_mesh(fragment).mesh as usize].clone()
 }
 
@@ -157,8 +192,11 @@ fn to_local_orientation(frame: ShipFrame, world: [f64; 4]) -> [f64; 4] {
 }
 
 pub(crate) fn support(fragment: salimon_world::resources::ResourceFragment, up: [f64; 3]) -> f64 {
-    fragment_hull(fragment).support(fragment.transform().orientation_xyzw(),
-        salimon_world::resource_fragments::side_meters(fragment), up.map(|v| -v))
+    fragment_hull(fragment).support(
+        fragment.transform().orientation_xyzw(),
+        salimon_world::resource_fragments::side_meters(fragment),
+        up.map(|v| -v),
+    )
 }
 
 fn nearest_body(position: [f64; 3]) -> Option<SphereSurface> {
@@ -206,6 +244,31 @@ mod tests {
     }
 
     #[test]
+    fn all_authored_variants_settle_rotated_at_current_scale_and_preserve_mass() {
+        for resource in [ResourceId::IronOre, ResourceId::SilicateRock, ResourceId::WaterIce] {
+            let mut tool = MiningTool::default();
+            let mut deposit = ResourceDeposit::new(DepositId { body: CelestialBodyId::Earth, local: 99 },
+                RawMaterial::new(resource, 4.0).unwrap(), WorldPosition::new(0.0, 0.0, 0.0), 4.0).unwrap();
+            tool.session.extract(&mut deposit, Duration::from_secs(2));
+            let initial = tool.session.fragments().to_vec();
+            for (index, p) in initial.iter().enumerate() {
+                let local = [-5.0, 1.3, index as f64 * 1.5 - 0.75];
+                tool.session.move_loose(p.id(), ResourceTransform::new(WorldPosition::new(local[0], local[1], local[2]),
+                    [0.0, 0.0, 0.35_f64.sin(), 0.35_f64.cos()]).unwrap());
+                tool.ship_fragments.insert(p.id(), local);
+                tool.fragment_motion.insert(p.id(), FragmentMotion::default());
+            }
+            for _ in 0..500 { advance(&mut tool, frame(), Duration::from_millis(16), [-5.0, 2.0, 0.0]); }
+            for (before, p) in initial.iter().zip(tool.session.fragments()) {
+                assert_eq!(before.id(), p.id()); assert_eq!(before.material(), p.material());
+                let gap = tool.ship_fragments[&p.id()][1] - SHIP_FLOOR_HEIGHT_METERS - support(*p, [0.0, 1.0, 0.0]);
+                assert!(gap.abs() < 0.003, "{resource:?} {:?}: gap {gap}", p.id());
+                assert!(length(tool.fragment_motion[&p.id()].velocity) < 0.05, "{resource:?}: {:?}", tool.fragment_motion[&p.id()]);
+            }
+        }
+    }
+
+    #[test]
     fn adapter_excludes_carried_and_distant_fragments() {
         let mut tool = mined(4.0);
         let ids: Vec<_> = tool.session.fragments().iter().map(|p| p.id()).collect();
@@ -250,7 +313,17 @@ mod tests {
         assert_eq!(after.id(), before.id());
         assert_eq!(after.source(), before.source());
         assert_eq!(after.material(), before.material());
-        assert!((after.transform().orientation_xyzw().iter().map(|v| v * v).sum::<f64>() - 1.0).abs() < 1e-9);
+        assert!(
+            (after
+                .transform()
+                .orientation_xyzw()
+                .iter()
+                .map(|v| v * v)
+                .sum::<f64>()
+                - 1.0)
+                .abs()
+                < 1e-9
+        );
         assert_eq!(
             after.transform().position().meters(),
             frame.local_to_world(tool.ship_fragments[&id])
@@ -310,8 +383,17 @@ mod tests {
         // Broad-phase spheres may overlap; visible authored hulls define the pile.
         assert!(a[1].min(b[1]) >= SHIP_FLOOR_HEIGHT_METERS);
         assert!(length(sub(a, b)) > 0.05);
-        assert!(length(sub(a, b)) < pieces.iter().map(|p| salimon_world::resource_size::fragment_contact_radius_meters(p.material())).sum::<f64>());
-
+        assert!(
+            length(sub(a, b))
+                < pieces
+                    .iter()
+                    .map(
+                        |p| salimon_world::resource_size::fragment_contact_radius_meters(
+                            p.material()
+                        )
+                    )
+                    .sum::<f64>()
+        );
     }
 
     #[test]

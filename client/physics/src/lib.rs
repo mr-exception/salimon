@@ -3,7 +3,7 @@ use salimon_math::{add, cross, dot, length, scale, sub};
 use std::{sync::Arc, time::Duration};
 
 mod convex;
-pub use convex::{ConvexHull, compose, rotate, orientation_from_axes};
+pub use convex::{ConvexHull, compose, orientation_from_axes, rotate};
 
 const GRAVITY: f64 = 9.81;
 const RESTITUTION: f64 = 0.12;
@@ -110,9 +110,15 @@ pub fn advance(
     }
     // A fixed maximum substep prevents fast ejected pieces from tunnelling through a pile.
     let has_hulls = pieces.iter().any(|p| p.hull.is_some());
-    let motion_step = pieces.iter().filter(|p| p.hull.is_some()).map(|p| {
-        (0.15 * p.side_meters / (length(p.velocity) + length(p.angular_velocity) * p.radius + 1.0)).min(MAX_STEP)
-    }).fold(MAX_STEP, f64::min);
+    let motion_step = pieces
+        .iter()
+        .filter(|p| p.hull.is_some())
+        .map(|p| {
+            (0.15 * p.side_meters
+                / (length(p.velocity) + length(p.angular_velocity) * p.radius + 1.0))
+                .min(MAX_STEP)
+        })
+        .fold(MAX_STEP, f64::min);
     let steps = if has_hulls {
         (elapsed / motion_step.max(1e-5)).ceil().clamp(1.0, 4096.0) as usize
     } else {
@@ -138,10 +144,11 @@ pub fn advance(
             }
             ground_contact(piece);
         }
-        let mut pair_geometry: Vec<Vec<Option<Vec<convex::Projection>>>> = vec![vec![None; pieces.len()]; pieces.len()];
+        let mut pair_geometry: Vec<Vec<Option<Vec<convex::Projection>>>> =
+            vec![vec![None; pieces.len()]; pieces.len()];
         for _ in 0..if has_hulls { 16 } else { 3 } {
-            for i in 0..pieces.len() {
-                for j in i + 1..pieces.len() {
+            for (i, row) in pair_geometry.iter_mut().enumerate() {
+                for (j, cached) in row.iter_mut().enumerate().skip(i + 1) {
                     let (left, right) = pieces.split_at_mut(j);
                     let a = &mut left[i];
                     let b = &mut right[0];
@@ -160,11 +167,21 @@ pub fn advance(
                         continue;
                     }
                     let (normal, depth) = if a.hull.is_some() && b.hull.is_some() {
-                        let geometry = pair_geometry[i][j].get_or_insert_with(|| convex::projections(a, b));
-                        let Some(contact) = convex::projected_contact(geometry, separation) else { continue; };
+                        let geometry =
+                            cached.get_or_insert_with(|| convex::projections(a, b));
+                        let Some(contact) = convex::projected_contact(geometry, separation) else {
+                            continue;
+                        };
                         contact
                     } else {
-                        (if distance > 1e-9 { scale(separation, 1.0 / distance) } else { [0.0, 1.0, 0.0] }, minimum - distance)
+                        (
+                            if distance > 1e-9 {
+                                scale(separation, 1.0 / distance)
+                            } else {
+                                [0.0, 1.0, 0.0]
+                            },
+                            minimum - distance,
+                        )
                     };
                     let inverse_a = 1.0 / a.mass_kg;
                     let inverse_b = 1.0 / b.mass_kg;
@@ -174,10 +191,12 @@ pub fn advance(
                     a.position = sub(a.position, scale(correction, inverse_a));
                     b.position = add(b.position, scale(correction, inverse_b));
                     if a.surface.is_floor() && !floor_contains(a.position, a.radius) {
-                        a.position[0] = old_a[0]; a.position[2] = old_a[2];
+                        a.position[0] = old_a[0];
+                        a.position[2] = old_a[2];
                     }
                     if b.surface.is_floor() && !floor_contains(b.position, b.radius) {
-                        b.position[0] = old_b[0]; b.position[2] = old_b[2];
+                        b.position[0] = old_b[0];
+                        b.position[2] = old_b[2];
                     }
                     pair_impulse(a, b, normal);
                     ground_contact(a);
@@ -188,7 +207,9 @@ pub fn advance(
         for piece in pieces.iter_mut() {
             piece.velocity = scale(piece.velocity, 0.995);
             piece.angular_velocity = scale(piece.angular_velocity, 0.98);
-            if length(piece.angular_velocity) < 0.015 { piece.angular_velocity = [0.0; 3]; }
+            if length(piece.angular_velocity) < 0.015 {
+                piece.angular_velocity = [0.0; 3];
+            }
             if length(piece.velocity) < 0.015 {
                 piece.velocity = [0.0; 3];
             }
@@ -197,9 +218,14 @@ pub fn advance(
 }
 
 fn ground_contact(piece: &mut ObjectState) {
-    let normal = piece.surface.sphere().map(|b| normalize(sub(piece.position, b.center))).unwrap_or([0.0, 1.0, 0.0]);
+    let normal = piece
+        .surface
+        .sphere()
+        .map(|b| normalize(sub(piece.position, b.center)))
+        .unwrap_or([0.0, 1.0, 0.0]);
     if let Some(hull) = &piece.hull {
-        piece.ground_support_meters = hull.support(piece.orientation, piece.side_meters, scale(normal, -1.0));
+        piece.ground_support_meters =
+            hull.support(piece.orientation, piece.side_meters, scale(normal, -1.0));
     }
     let (up, penetration) = if let Surface::Floor { height_meters } = piece.surface {
         (
@@ -225,14 +251,16 @@ fn ground_contact(piece: &mut ObjectState) {
         let contact_velocity = add(piece.velocity, cross(piece.angular_velocity, arm));
         let approach = dot(contact_velocity, up);
         if approach < 0.0 {
-            let denominator = 1.0 / piece.mass_kg + dot(cross(arm, up), cross(arm, up)) * inverse_inertia(piece);
+            let denominator =
+                1.0 / piece.mass_kg + dot(cross(arm, up), cross(arm, up)) * inverse_inertia(piece);
             apply_impulse(piece, arm, scale(up, -approach / denominator));
         }
         let tangent = sub(contact_velocity, scale(up, dot(contact_velocity, up)));
         let speed = length(tangent);
         if speed > 1e-9 {
             let direction = scale(tangent, 1.0 / speed);
-            let denominator = 1.0 / piece.mass_kg + dot(cross(arm, direction), cross(arm, direction)) * inverse_inertia(piece);
+            let denominator = 1.0 / piece.mass_kg
+                + dot(cross(arm, direction), cross(arm, direction)) * inverse_inertia(piece);
             let friction = (speed / denominator).min(piece.mass_kg * GRAVITY * MAX_STEP * 0.65);
             apply_impulse(piece, arm, scale(direction, -friction));
         }
@@ -250,30 +278,53 @@ fn ground_contact(piece: &mut ObjectState) {
 }
 
 fn inverse_inertia(piece: &ObjectState) -> f64 {
-    if piece.hull.is_some() { 1.0 / (0.4 * piece.mass_kg * piece.radius * piece.radius) } else { 0.0 }
+    if piece.hull.is_some() {
+        1.0 / (0.4 * piece.mass_kg * piece.radius * piece.radius)
+    } else {
+        0.0
+    }
 }
 fn apply_impulse(piece: &mut ObjectState, arm: [f64; 3], impulse: [f64; 3]) {
     piece.velocity = add(piece.velocity, scale(impulse, 1.0 / piece.mass_kg));
-    piece.angular_velocity = add(piece.angular_velocity, scale(cross(arm, impulse), inverse_inertia(piece)));
+    piece.angular_velocity = add(
+        piece.angular_velocity,
+        scale(cross(arm, impulse), inverse_inertia(piece)),
+    );
 }
 fn pair_impulse(a: &mut ObjectState, b: &mut ObjectState, normal: [f64; 3]) {
     let (aa, ba) = if a.hull.is_some() && b.hull.is_some() {
         convex::contact_arms(a, b, normal)
-    } else { (scale(normal, a.radius), scale(normal, -b.radius)) };
-    let relative = sub(add(b.velocity, cross(b.angular_velocity, ba)), add(a.velocity, cross(a.angular_velocity, aa)));
+    } else {
+        (scale(normal, a.radius), scale(normal, -b.radius))
+    };
+    let relative = sub(
+        add(b.velocity, cross(b.angular_velocity, ba)),
+        add(a.velocity, cross(a.angular_velocity, aa)),
+    );
     let approach = dot(relative, normal);
-    if approach >= 0.0 { return; }
-    let denom = |direction| 1.0 / a.mass_kg + 1.0 / b.mass_kg
-        + dot(cross(aa, direction), cross(aa, direction)) * inverse_inertia(a)
-        + dot(cross(ba, direction), cross(ba, direction)) * inverse_inertia(b);
-    let restitution = if a.hull.is_none() || approach < -0.5 { RESTITUTION } else { 0.0 };
+    if approach >= 0.0 {
+        return;
+    }
+    let denom = |direction| {
+        1.0 / a.mass_kg
+            + 1.0 / b.mass_kg
+            + dot(cross(aa, direction), cross(aa, direction)) * inverse_inertia(a)
+            + dot(cross(ba, direction), cross(ba, direction)) * inverse_inertia(b)
+    };
+    let restitution = if a.hull.is_none() || approach < -0.5 {
+        RESTITUTION
+    } else {
+        0.0
+    };
     let magnitude = -(1.0 + restitution) * approach / denom(normal);
     let tangent = sub(relative, scale(normal, approach));
     let speed = length(tangent);
     let friction = if speed > 1e-9 {
         let direction = scale(tangent, 1.0 / speed);
         scale(direction, -(speed / denom(direction)).min(magnitude * 0.65))
-    } else { [0.0; 3] };
+    } else {
+        [0.0; 3]
+    };
     let impulse = add(scale(normal, magnitude), friction);
     apply_impulse(a, aa, scale(impulse, -1.0));
     apply_impulse(b, ba, impulse);
@@ -444,7 +495,11 @@ mod tests {
             }),
             ..sphere.clone()
         };
-        let mut objects = [sphere.clone(), other, floor(sphere.position, sphere.velocity)];
+        let mut objects = [
+            sphere.clone(),
+            other,
+            floor(sphere.position, sphere.velocity),
+        ];
         let mut isolated = objects.clone();
         advance(&mut objects, Duration::from_millis(16), |_, _| true);
         for p in &mut isolated {

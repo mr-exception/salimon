@@ -52,7 +52,10 @@ pub fn aimed_fragment(
             }
             let q = piece.transform().orientation_xyzw();
             let inverse = [-q[0], -q[1], -q[2], q[3]];
-            let center = rotate(inverse, piece.transform().position().offset_from(ray.origin));
+            let center = rotate(
+                inverse,
+                piece.transform().position().offset_from(ray.origin),
+            );
             let direction = rotate(inverse, ray.direction);
             let half = side_meters(*piece) * 0.5;
             let mut near: f64 = 0.0;
@@ -78,7 +81,13 @@ pub fn aimed_fragment(
 
 fn rotate(q: [f64; 4], p: [f64; 3]) -> [f64; 3] {
     let v = [q[0], q[1], q[2]];
-    let cross = |a: [f64; 3], b: [f64; 3]| [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
+    let cross = |a: [f64; 3], b: [f64; 3]| {
+        [
+            a[1] * b[2] - a[2] * b[1],
+            a[2] * b[0] - a[0] * b[2],
+            a[0] * b[1] - a[1] * b[0],
+        ]
+    };
     let t = cross(v, p).map(|v| v * 2.0);
     let c = cross(v, t);
     std::array::from_fn(|i| p[i] + q[3] * t[i] + c[i])

@@ -58,12 +58,16 @@ impl ResourceMesh {
     /// Immutable CPU positions from the same validated triangles as the GPU batch.
     pub fn unit_vertices(self) -> &'static [[f64; 3]] {
         static MESHES: std::sync::LazyLock<[Vec<[f64; 3]>; 18]> = std::sync::LazyLock::new(|| {
-            ASSETS.map(|bytes| geometry(bytes).expect("validated checked-in geometry")
-                .into_iter().map(|v| [f64::from(v[0]), f64::from(v[1]), f64::from(v[2])]).collect())
+            ASSETS.map(|bytes| {
+                geometry(bytes)
+                    .expect("validated checked-in geometry")
+                    .into_iter()
+                    .map(|v| [f64::from(v[0]), f64::from(v[1]), f64::from(v[2])])
+                    .collect()
+            })
         });
         &MESHES[self.index()]
     }
-
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -163,14 +167,27 @@ fn relative_vertices(
         let mesh = instance.mesh.index();
         for vertex in &meshes[mesh] {
             let q = instance.orientation_xyzw;
-            let p = [f64::from(vertex[0]), f64::from(vertex[1]), f64::from(vertex[2])];
+            let p = [
+                f64::from(vertex[0]),
+                f64::from(vertex[1]),
+                f64::from(vertex[2]),
+            ];
             let v = [q[0], q[1], q[2]];
-            let cross = |a: [f64; 3], b: [f64; 3]| [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
+            let cross = |a: [f64; 3], b: [f64; 3]| {
+                [
+                    a[1] * b[2] - a[2] * b[1],
+                    a[2] * b[0] - a[0] * b[2],
+                    a[0] * b[1] - a[1] * b[0],
+                ]
+            };
             let t = cross(v, [p[0], p[1], p[2]]).map(|v| v * 2.0);
             let c = cross(v, t);
             for axis in 0..3 {
                 let rotated = p[axis] + q[3] * t[axis] + c[axis];
-                output.push(((instance.center_meters[axis] - camera.position_meters[axis]) + rotated * instance.side_meters) as f32);
+                output.push(
+                    ((instance.center_meters[axis] - camera.position_meters[axis])
+                        + rotated * instance.side_meters) as f32,
+                );
             }
             output.extend_from_slice(&vertex[3..]);
         }

@@ -168,10 +168,16 @@ pub(crate) fn sync_ship_fragments(tool: &mut MiningTool, frame: ShipFrame) {
         tool.ship_fragments.remove(&id);
     }
     for (&id, &local) in &tool.ship_fragments {
-        if let Ok(pose) =
-            ResourceTransform::new(position(frame.local_to_world(local)),
-                crate::fragment_physics::to_world_orientation(frame, tool.fragment_motion.get(&id).and_then(|m| m.ship_orientation).unwrap_or([0.0, 0.0, 0.0, 1.0])))
-        {
+        if let Ok(pose) = ResourceTransform::new(
+            position(frame.local_to_world(local)),
+            crate::fragment_physics::to_world_orientation(
+                frame,
+                tool.fragment_motion
+                    .get(&id)
+                    .and_then(|m| m.ship_orientation)
+                    .unwrap_or([0.0, 0.0, 0.0, 1.0]),
+            ),
+        ) {
             tool.session.move_loose(id, pose);
         }
     }

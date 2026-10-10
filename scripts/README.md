@@ -39,7 +39,7 @@ timeout. A step can specify its own `timeout_ms`. Example:
 ```
 
 `action` takes any operation and its parameters from the native command
-protocol: `inspect`, `step`, `key`, `look`, `interact`, `landing`, or `thruster`.
+protocol: `inspect`, `step`, `key`, `look`, `aim_fragment`, `interact`, `landing`, or `thruster`.
 `assert` inspects state once; `wait` inspects until matched, advancing the
 simulation by `frames` (1–600, default 1) between checks. Condition `path`
 uses dot-separated object keys and zero-based array indices, such as
@@ -530,3 +530,8 @@ python scripts/salimon-test run scenarios/evidence/fragment-pile-surface.json --
 Use the standard platform screenshot/display setup. Compare checkpoints for
 motion and contact gaps; screenshots alone do not prove conserved mass or support
 removal, which the focused world/physics/runtime regressions cover.
+
+`aim_fragment` turns the E2E camera toward the current center of an existing
+`fragment_id` using mouse-look deltas. It changes no object/player position and
+does not bypass pickup range, occlusion, or the normal F key contract. Scenario
+pickup checkpoints use it because rotated convex piles settle differently.

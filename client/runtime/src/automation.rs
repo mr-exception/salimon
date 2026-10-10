@@ -130,6 +130,28 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
                 _ => Err(("invalid_argument", "finite dx and dy numbers required")),
             }
         }
+        Some("aim_fragment") => {
+            let fragment = command.get("fragment_id").and_then(Value::as_u64)
+                .and_then(|id| app.mining.session.fragments().iter().find(|piece| piece.id().0 == id));
+            if let Some(fragment) = fragment {
+                use salimon_math::{cross, dot, normalize};
+                let ship = app.ship.snapshot();
+                let player = app.character.snapshot(character_ship_frame(ship.pose), surface_frame_for_ship(ship));
+                let up = player.up.map(f64::from);
+                let current = normalize(std::array::from_fn(|i| player.look_target_meters[i] - player.eye_position_meters[i]));
+                let target = normalize(std::array::from_fn(|i| fragment.transform().position().meters()[i] - player.eye_position_meters[i]));
+                let planar = |direction: [f64; 3]| normalize(std::array::from_fn(|i| direction[i] - up[i] * dot(direction, up)));
+                let a = planar(current);
+                let b = planar(target);
+                let yaw = (-dot(cross(a, b), up)).atan2(dot(a, b));
+                let pitch = dot(target, up).clamp(-1.0, 1.0).asin() - dot(current, up).clamp(-1.0, 1.0).asin();
+                app.character.apply_mouse_delta(yaw / 0.0022, -pitch / 0.0022);
+                app.sync_carried();
+                Ok(json!({"applied": true}))
+            } else {
+                Err(("invalid_argument", "existing fragment_id required"))
+            }
+        }
         Some("key") => {
             let key = command.get("key").and_then(Value::as_str);
             let pressed = command.get("pressed").and_then(Value::as_bool);
@@ -160,7 +182,7 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
         },
         _ => Err((
             "unknown_op",
-            "expected inspect, step, look, key, interact, landing, or thruster",
+            "expected inspect, step, look, aim_fragment, key, interact, landing, or thruster",
         )),
     };
     match result {

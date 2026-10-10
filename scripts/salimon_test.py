@@ -13,7 +13,7 @@ from e2e_artifacts import Artifacts
 
 PROTOCOL = 1
 SETUPS = {"fragment-pile", "resource-approach", "landed-earth", "cockpit-earth", "orbit-earth", "orbit-moon", "open-space", "eva-approach"}
-OPS = {"inspect", "step", "look", "key", "interact", "landing", "thruster"}
+OPS = {"inspect", "step", "look", "aim_fragment", "key", "interact", "landing", "thruster"}
 COMPARISONS = {"equals", "not_equals", "gt", "gte", "lt", "lte", "approx", "exists", "contains"}
 
 

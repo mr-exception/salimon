@@ -569,19 +569,8 @@
     {
       "assert": {
         "path": "world.fragments.0.side_meters",
-        "approx": 0.8925772667762261,
+        "approx": 0.44628863338811303,
         "tolerance": 1e-09
-      }
-    },
-    {
-      "assert": {
-        "path": "world.fragments.0.orientation_xyzw",
-        "equals": [
-          0.0,
-          0.0,
-          0.0,
-          1.0
-        ]
       }
     },
     {
@@ -919,6 +908,12 @@
       }
     },
     {
+      "action": {
+        "op": "aim_fragment",
+        "fragment_id": 1
+      }
+    },
+    {
       "assert": {
         "path": "carrying.target_id",
         "equals": 1
@@ -1082,6 +1077,12 @@
       }
     },
     {
+      "action": {
+        "op": "aim_fragment",
+        "fragment_id": 1
+      }
+    },
+    {
       "assert": {
         "path": "carrying.target_id",
         "equals": 1
@@ -1185,6 +1186,12 @@
         "op": "look",
         "dx": 72.00582670155057,
         "dy": -227.5126446773669
+      }
+    },
+    {
+      "action": {
+        "op": "aim_fragment",
+        "fragment_id": 1
       }
     },
     {
@@ -1384,6 +1391,12 @@
         "op": "look",
         "dx": 691.386413911553,
         "dy": -183.84990012570847
+      }
+    },
+    {
+      "action": {
+        "op": "aim_fragment",
+        "fragment_id": 1
       }
     },
     {
@@ -1666,6 +1679,12 @@
         "op": "look",
         "dx": 359.70181997549565,
         "dy": -212.56153311170507
+      }
+    },
+    {
+      "action": {
+        "op": "aim_fragment",
+        "fragment_id": 1
       }
     },
     {

@@ -84,9 +84,17 @@ impl ConvexHull {
     }
 
     pub fn support(&self, orientation: [f64; 4], side: f64, direction: [f64; 3]) -> f64 {
-        let inverse = [-orientation[0], -orientation[1], -orientation[2], orientation[3]];
+        let inverse = [
+            -orientation[0],
+            -orientation[1],
+            -orientation[2],
+            orientation[3],
+        ];
         let local = rotate(inverse, direction);
-        self.vertices.iter().map(|v| dot(*v, local) * side).fold(f64::NEG_INFINITY, f64::max)
+        self.vertices
+            .iter()
+            .map(|v| dot(*v, local) * side)
+            .fold(f64::NEG_INFINITY, f64::max)
     }
 
     /// Closest point of the supporting feature to the center-of-mass projection.
@@ -210,18 +218,40 @@ pub(crate) fn projections(a: &super::ObjectState, b: &super::ObjectState) -> Vec
         for b in &be {
             let axis = cross(*a, *b);
             let size = length(axis);
-            if size > 1e-10 { axes.push(scale(axis, 1.0 / size)); }
+            if size > 1e-10 {
+                axes.push(scale(axis, 1.0 / size));
+            }
         }
     }
-    let av: Vec<_> = ah.vertices.iter().map(|v| rotate(a.orientation, scale(*v, a.side_meters))).collect();
-    let bv: Vec<_> = bh.vertices.iter().map(|v| rotate(b.orientation, scale(*v, b.side_meters))).collect();
-    let span = |vertices: &[[f64; 3]], axis| vertices.iter().map(|v| dot(*v, axis))
-        .fold((f64::INFINITY, f64::NEG_INFINITY), |(lo,hi), x| (lo.min(x), hi.max(x)));
-    axes.into_iter().map(|axis| {
-        let (amin, amax) = span(&av, axis);
-        let (bmin, bmax) = span(&bv, axis);
-        Projection { axis, forward: amax - bmin, backward: bmax - amin }
-    }).collect()
+    let av: Vec<_> = ah
+        .vertices
+        .iter()
+        .map(|v| rotate(a.orientation, scale(*v, a.side_meters)))
+        .collect();
+    let bv: Vec<_> = bh
+        .vertices
+        .iter()
+        .map(|v| rotate(b.orientation, scale(*v, b.side_meters)))
+        .collect();
+    let span = |vertices: &[[f64; 3]], axis| {
+        vertices
+            .iter()
+            .map(|v| dot(*v, axis))
+            .fold((f64::INFINITY, f64::NEG_INFINITY), |(lo, hi), x| {
+                (lo.min(x), hi.max(x))
+            })
+    };
+    axes.into_iter()
+        .map(|axis| {
+            let (amin, amax) = span(&av, axis);
+            let (bmin, bmax) = span(&bv, axis);
+            Projection {
+                axis,
+                forward: amax - bmin,
+                backward: bmax - amin,
+            }
+        })
+        .collect()
 }
 
 /// Minimum translation of B relative to A, with universe-scale-safe subtraction.
@@ -427,12 +457,17 @@ mod tests {
     }
     #[test]
     fn growth_refreshes_contacts_without_changing_the_shared_hull() {
-        let mut pieces = [object([0.0, 0.1, 0.0], [0.3, 0.1, 0.3]), object([0.0, 0.3, 0.0], [0.2, 0.1, 0.2])];
+        let mut pieces = [
+            object([0.0, 0.1, 0.0], [0.3, 0.1, 0.3]),
+            object([0.0, 0.3, 0.0], [0.2, 0.1, 0.2]),
+        ];
         let hull = pieces[1].hull.clone().unwrap();
         pieces[1].side_meters = 1.5;
         pieces[1].radius *= 1.5;
         pieces[1].mass_kg = 3.0;
-        for _ in 0..120 { advance(&mut pieces, Duration::from_millis(16), |_, _| true); }
+        for _ in 0..120 {
+            advance(&mut pieces, Duration::from_millis(16), |_, _| true);
+        }
         assert!(Arc::ptr_eq(&hull, pieces[1].hull.as_ref().unwrap()));
         assert!((pieces[0].position[1] - 0.1).abs() < 0.003);
         assert!((pieces[1].position[1] - 0.35).abs() < 0.003);

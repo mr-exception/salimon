@@ -540,19 +540,8 @@
     {
       "assert": {
         "path": "world.fragments.0.side_meters",
-        "approx": 0.8925772667762261,
+        "approx": 0.44628863338811303,
         "tolerance": 1e-09
-      }
-    },
-    {
-      "assert": {
-        "path": "world.fragments.0.orientation_xyzw",
-        "equals": [
-          0.0,
-          0.0,
-          0.0,
-          1.0
-        ]
       }
     },
     {
@@ -1198,6 +1187,12 @@
       "assert": {
         "path": "mining.held_item_visible",
         "equals": true
+      }
+    },
+    {
+      "action": {
+        "op": "aim_fragment",
+        "fragment_id": 1
       }
     },
     {

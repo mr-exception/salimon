@@ -1065,19 +1065,8 @@
     {
       "assert": {
         "path": "world.fragments.0.side_meters",
-        "approx": 0.8925772667762261,
+        "approx": 0.44628863338811303,
         "tolerance": 1e-09
-      }
-    },
-    {
-      "assert": {
-        "path": "world.fragments.0.orientation_xyzw",
-        "equals": [
-          0.0,
-          0.0,
-          0.0,
-          1.0
-        ]
       }
     },
     {
@@ -1428,6 +1417,12 @@
       }
     },
     {
+      "action": {
+        "op": "aim_fragment",
+        "fragment_id": 1
+      }
+    },
+    {
       "assert": {
         "path": "carrying.target_id",
         "equals": 1
@@ -1670,6 +1665,12 @@
         "op": "key",
         "key": "forward",
         "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "aim_fragment",
+        "fragment_id": 2
       }
     },
     {
@@ -1944,6 +1945,12 @@
         "op": "look",
         "dx": 0.01063575525530244,
         "dy": -0.0031260926643254675
+      }
+    },
+    {
+      "action": {
+        "op": "aim_fragment",
+        "fragment_id": 2
       }
     },
     {

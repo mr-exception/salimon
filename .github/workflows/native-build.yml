@@ -69,11 +69,13 @@ jobs:
           cargo clippy --workspace --all-targets --locked -- -D warnings
           cargo test --workspace --locked
       - name: Stage debug executable
+        if: always()
         run: python scripts/build_game.py --profile debug --output artifacts/build/debug
       - name: Stage release executable
+        if: always()
         run: python scripts/build_game.py --profile release --output artifacts/build/release
       - name: Issue 148 before and after pile evidence
-        if: runner.os == 'Linux'
+        if: always() && runner.os == 'Linux'
         env:
           WGPU_BACKEND: vulkan
         run: |

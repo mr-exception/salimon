@@ -39,7 +39,7 @@ timeout. A step can specify its own `timeout_ms`. Example:
 ```
 
 `action` takes any operation and its parameters from the native command
-protocol: `inspect`, `step`, `key`, `look`, `aim_fragment`, `interact`, `landing`, or `thruster`.
+protocol: `inspect`, `step`, `key`, `look`, `aim_fragment`, `restore_look`, `interact`, `landing`, or `thruster`.
 `assert` inspects state once; `wait` inspects until matched, advancing the
 simulation by `frames` (1–600, default 1) between checks. Condition `path`
 uses dot-separated object keys and zero-based array indices, such as

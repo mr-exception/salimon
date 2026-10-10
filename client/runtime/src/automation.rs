@@ -682,14 +682,14 @@ mod tests {
                             Value::String(text) => text.contains(expected.as_str().unwrap()),
                             _ => panic!("unsupported contains at step {index}: {path}"),
                         },
-                        "step {index}: {path}: {value}; fragment poses: {:?}", state["world"]["fragments"].as_array().map(|pieces| pieces.iter().map(|p| (&p["id"], &p["ship_local_position_meters"])).collect::<Vec<_>>())
+                        "step {index}: {path}: {value}"
                     );
                 }
                 if let Some(expected) = check.get("approx") {
                     assert!(
                         (value.as_f64().unwrap() - expected.as_f64().unwrap()).abs()
                             <= check["tolerance"].as_f64().unwrap(),
-                        "step {index}: {path}: {value}; fragment poses: {:?}", state["world"]["fragments"].as_array().map(|pieces| pieces.iter().map(|p| (&p["id"], &p["ship_local_position_meters"])).collect::<Vec<_>>())
+                        "step {index}: {path}: {value}"
                     );
                 }
             }
@@ -747,17 +747,17 @@ mod tests {
                     assert!(
                         (value.as_f64().unwrap() - expected.as_f64().unwrap()).abs()
                             <= check["tolerance"].as_f64().unwrap(),
-                        "step {index}: {path}: {value}; fragment poses: {:?}", state["world"]["fragments"].as_array().map(|pieces| pieces.iter().map(|p| (&p["id"], &p["ship_local_position_meters"])).collect::<Vec<_>>())
+                        "step {index}: {path}: {value}"
                     );
                 } else if let Some(expected) = check.get("gt") {
                     assert!(
                         value.as_f64().unwrap() > expected.as_f64().unwrap(),
-                        "step {index}: {path}: {value}; fragment poses: {:?}", state["world"]["fragments"].as_array().map(|pieces| pieces.iter().map(|p| (&p["id"], &p["ship_local_position_meters"])).collect::<Vec<_>>())
+                        "step {index}: {path}: {value}"
                     );
                 } else if let Some(expected) = check.get("lt") {
                     assert!(
                         value.as_f64().unwrap() < expected.as_f64().unwrap(),
-                        "step {index}: {path}: {value}; fragment poses: {:?}", state["world"]["fragments"].as_array().map(|pieces| pieces.iter().map(|p| (&p["id"], &p["ship_local_position_meters"])).collect::<Vec<_>>())
+                        "step {index}: {path}: {value}"
                     );
                 } else {
                     panic!("unhandled check at step {index}");
@@ -979,23 +979,23 @@ mod tests {
                             Value::String(text) => text.contains(expected.as_str().unwrap()),
                             _ => panic!("unsupported contains at step {index}: {path}"),
                         },
-                        "step {index}: {path}: {value}; fragment poses: {:?}", state["world"]["fragments"].as_array().map(|pieces| pieces.iter().map(|p| (&p["id"], &p["ship_local_position_meters"])).collect::<Vec<_>>())
+                        "step {index}: {path}: {value}"
                     );
                 } else if let Some(expected) = check.get("approx") {
                     assert!(
                         (value.as_f64().unwrap() - expected.as_f64().unwrap()).abs()
                             <= check["tolerance"].as_f64().unwrap(),
-                        "step {index}: {path}: {value}; fragment poses: {:?}", state["world"]["fragments"].as_array().map(|pieces| pieces.iter().map(|p| (&p["id"], &p["ship_local_position_meters"])).collect::<Vec<_>>())
+                        "step {index}: {path}: {value}"
                     );
                 } else if let Some(expected) = check.get("gt") {
                     assert!(
                         value.as_f64().unwrap() > expected.as_f64().unwrap(),
-                        "step {index}: {path}: {value}; fragment poses: {:?}", state["world"]["fragments"].as_array().map(|pieces| pieces.iter().map(|p| (&p["id"], &p["ship_local_position_meters"])).collect::<Vec<_>>())
+                        "step {index}: {path}: {value}"
                     );
                 } else if let Some(expected) = check.get("lt") {
                     assert!(
                         value.as_f64().unwrap() < expected.as_f64().unwrap(),
-                        "step {index}: {path}: {value}; fragment poses: {:?}", state["world"]["fragments"].as_array().map(|pieces| pieces.iter().map(|p| (&p["id"], &p["ship_local_position_meters"])).collect::<Vec<_>>())
+                        "step {index}: {path}: {value}"
                     );
                 } else {
                     panic!("unhandled check at step {index}");

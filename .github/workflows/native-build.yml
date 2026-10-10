@@ -15,24 +15,6 @@ permissions:
   contents: read
 
 jobs:
-  fragment-validation:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, clippy
-      - run: cargo fmt --all
-      - run: cargo test -p salimon-physics -p salimon-world --locked
-      - run: cargo clippy -p salimon-physics -p salimon-world --all-targets --locked -- -D warnings
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: issue-148-formatted-sources
-          path: |
-            client/**/src/*.rs
-            client/**/tests/*.rs
-
   build:
     strategy:
       fail-fast: false
@@ -62,39 +44,16 @@ jobs:
           python -m unittest discover -s models/tests -v
       - name: Build script and E2E runner contract tests
         run: python -m unittest discover -s scripts -p 'test_*.py'
-      - name: Stage debug executable
-        if: always()
-        run: python scripts/build_game.py --profile debug --output artifacts/build/debug
-      - name: Stage release executable
-        if: always()
-        run: python scripts/build_game.py --profile release --output artifacts/build/release
-      - name: Issue 148 before and after pile evidence
-        if: always() && runner.os == 'Linux'
-        env:
-          WGPU_BACKEND: vulkan
-        run: |
-          mkdir -p artifacts/issue-148
-          git fetch origin 8cc50660f8b4946c23448fb317745adbc90db28d --depth=1
-          git worktree add /tmp/salimon-before 8cc50660f8b4946c23448fb317745adbc90db28d
-          cp client/runtime/src/e2e.rs /tmp/salimon-before/client/runtime/src/e2e.rs
-          cp scenarios/evidence/fragment-pile-*.json /tmp/salimon-before/scenarios/evidence/
-          (cd /tmp/salimon-before && cargo build --locked --release -p salimon-client --target-dir "$GITHUB_WORKSPACE/target")
-          cp target/release/salimon-client artifacts/issue-148/salimon-client-before
-          for surface in floor surface; do
-            xvfb-run -a -s '-screen 0 1280x800x24' python scripts/salimon-test run scenarios/evidence/fragment-pile-$surface.json --binary artifacts/issue-148/salimon-client-before --artifacts artifacts/issue-148/before-$surface --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
-            xvfb-run -a -s '-screen 0 1280x800x24' python scripts/salimon-test run scenarios/evidence/fragment-pile-$surface.json --binary artifacts/build/release/salimon-client --artifacts artifacts/issue-148/after-$surface --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
-          done
-      - uses: actions/upload-artifact@v4
-        if: always() && runner.os == 'Linux'
-        with:
-          name: issue-148-pile-evidence
-          path: artifacts/issue-148/
       - name: Rust quality gates
         shell: bash
         run: |
-          cargo fmt --all
+          cargo fmt --all -- --check
           cargo clippy --workspace --all-targets --locked -- -D warnings
           cargo test --workspace --locked
+      - name: Stage debug executable
+        run: python scripts/build_game.py --profile debug --output artifacts/build/debug
+      - name: Stage release executable
+        run: python scripts/build_game.py --profile release --output artifacts/build/release
       - name: Linux deterministic E2E baseline (Mesa software Vulkan)
         if: runner.os == 'Linux'
         timeout-minutes: 10
@@ -141,10 +100,7 @@ jobs:
         with:
           name: salimon-${{ matrix.os }}
           path: |
-            client/**/src/*.rs
-            client/**/tests/*.rs
             artifacts/build/
-            artifacts/issue-148/
             artifacts/e2e/
             artifacts/packaged-smoke/
           if-no-files-found: warn

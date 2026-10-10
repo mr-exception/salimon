@@ -39,3 +39,6 @@ Release helpers retain existing impulses. Identity, material, lifetime, carried
 exclusion, activation and frame conversions stay with the caller. Tests in
 `convex.rs` protect narrow phase, rotation, settling, support removal and tipping;
 legacy motion regressions remain in `lib.rs`.
+
+Development and test profiles optimize only the physics/math crates at level 2
+to keep faceted contact loops responsive; debug assertions and information remain.

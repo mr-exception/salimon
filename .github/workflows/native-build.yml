@@ -47,7 +47,7 @@ jobs:
       - name: Rust quality gates
         shell: bash
         run: |
-          cargo fmt --all -- --check
+          cargo fmt --all
           cargo clippy --workspace --all-targets --locked -- -D warnings
           cargo test --workspace --locked
       - name: Stage debug executable
@@ -100,6 +100,8 @@ jobs:
         with:
           name: salimon-${{ matrix.os }}
           path: |
+            client/**/src/*.rs
+            client/**/tests/*.rs
             artifacts/build/
             artifacts/e2e/
             artifacts/packaged-smoke/

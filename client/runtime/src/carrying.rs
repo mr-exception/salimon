@@ -121,10 +121,7 @@ pub(crate) fn follow(tool: &mut MiningTool, player: CharacterSnapshot) {
     let clearance = salimon_world::resource_size::fragment_contact_radius_meters(piece.material());
     // Keep the entire object ahead of the player's vertical capsule even when
     // looking straight down; eye-only clearance would clip the torso/legs.
-    let support = crate::resource_presentation::fragment_mesh(*piece)
-        .mesh
-        .support_meters(up)
-        * salimon_world::resource_fragments::side_meters(*piece);
+    let support = crate::fragment_physics::support(*piece, up);
     let height = (-0.18 + vertical * (0.65 + clearance))
         .max(support + 0.005 - salimon_character::PLAYER_EYE_HEIGHT_METERS);
     let p = std::array::from_fn(|i| {
@@ -172,7 +169,8 @@ pub(crate) fn sync_ship_fragments(tool: &mut MiningTool, frame: ShipFrame) {
     }
     for (&id, &local) in &tool.ship_fragments {
         if let Ok(pose) =
-            ResourceTransform::new(position(frame.local_to_world(local)), [0.0, 0.0, 0.0, 1.0])
+            ResourceTransform::new(position(frame.local_to_world(local)),
+                crate::fragment_physics::to_world_orientation(frame, tool.fragment_motion.get(&id).and_then(|m| m.ship_orientation).unwrap_or([0.0, 0.0, 0.0, 1.0])))
         {
             tool.session.move_loose(id, pose);
         }

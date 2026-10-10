@@ -93,6 +93,7 @@ pub(crate) fn deposit_mesh(entry: SurfaceDeposit) -> Option<ResourceMeshInstance
         // Every baked vertex fits +/-0.48 m. Inscribe its cube in the
         // authoritative sphere without relying on orientation or geometry shape.
         side_meters: entry.bounds_radius_meters / (0.48 * 3.0_f64.sqrt()),
+        orientation_xyzw: [0.0, 0.0, 0.0, 1.0],
     })
 }
 
@@ -140,6 +141,7 @@ pub(crate) fn fragment_mesh(fragment: ResourceFragment) -> ResourceMeshInstance 
         mesh,
         center_meters: fragment.transform().position().meters(),
         side_meters: salimon_world::resource_fragments::side_meters(fragment),
+        orientation_xyzw: fragment.transform().orientation_xyzw(),
     }
 }
 

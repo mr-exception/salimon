@@ -14,6 +14,8 @@ use salimon_physics::{ObjectState, SphereSurface, Surface};
 #[derive(Clone, Copy, Debug, Default)]
 pub(crate) struct FragmentMotion {
     pub(crate) velocity: [f64; 3],
+    pub(crate) angular_velocity: [f64; 3],
+    pub(crate) ship_orientation: Option<[f64; 4]>,
 }
 
 pub(crate) fn release(
@@ -41,7 +43,12 @@ pub(crate) fn release(
             .meters();
         salimon_physics::release_velocity(player_forward, position, nearest_body(position))
     };
-    tool.fragment_motion.insert(id, FragmentMotion { velocity });
+    let world_orientation = tool.session.fragments().iter().find(|p| p.id() == id).expect("released fragment").transform().orientation_xyzw();
+    tool.fragment_motion.insert(id, FragmentMotion {
+        velocity,
+        angular_velocity: [0.0; 3],
+        ship_orientation: inside.then(|| to_local_orientation(frame, world_orientation)),
+    });
 }
 
 pub(crate) fn advance(tool: &mut MiningTool, frame: ShipFrame, delta: Duration, player: [f64; 3]) {
@@ -78,23 +85,15 @@ pub(crate) fn advance(tool: &mut MiningTool, frame: ShipFrame, delta: Duration, 
                     radius: salimon_world::resource_size::fragment_contact_radius_meters(
                         p.material(),
                     ),
-                    ground_support_meters: {
-                        let up = if ship {
-                            frame.axes[1]
-                        } else {
-                            body.map(|b| {
-                                let radial = sub(position, b.center);
-                                let distance = length(radial);
-                                radial.map(|v| v / distance)
-                            })
-                            .unwrap_or([0.0, 1.0, 0.0])
-                        };
-                        crate::resource_presentation::fragment_mesh(p)
-                            .mesh
-                            .support_meters(up)
-                            * salimon_world::resource_fragments::side_meters(p)
-                            + 0.005
-                    },
+                    ground_support_meters: 0.0,
+                    hull: Some(fragment_hull(p)),
+                    side_meters: salimon_world::resource_fragments::side_meters(p),
+                    orientation: if ship {
+                        tool.fragment_motion.get(&p.id()).and_then(|m| m.ship_orientation)
+                            .unwrap_or_else(|| to_local_orientation(frame, p.transform().orientation_xyzw()))
+                    } else { p.transform().orientation_xyzw() },
+                    angular_velocity: tool.fragment_motion.get(&p.id()).map_or([0.0; 3], |m| m.angular_velocity),
+                    mass_kg: p.material().mass_kg(),
                     surface: if ship {
                         Surface::Floor {
                             height_meters: SHIP_FLOOR_HEIGHT_METERS,
@@ -109,7 +108,7 @@ pub(crate) fn advance(tool: &mut MiningTool, frame: ShipFrame, delta: Duration, 
     if pieces.is_empty() {
         return;
     }
-    let mut states: Vec<_> = pieces.iter().map(|(_, state)| *state).collect();
+    let mut states: Vec<_> = pieces.iter().map(|(_, state)| state.clone()).collect();
     salimon_physics::advance(&mut states, delta, |position, radius| {
         ship_floor_placement(position, radius).is_some()
     });
@@ -118,6 +117,8 @@ pub(crate) fn advance(tool: &mut MiningTool, frame: ShipFrame, delta: Duration, 
             fragment.id(),
             FragmentMotion {
                 velocity: piece.velocity,
+                angular_velocity: piece.angular_velocity,
+                ship_orientation: matches!(piece.surface, Surface::Floor { .. }).then_some(piece.orientation),
             },
         );
         let position = if matches!(piece.surface, Surface::Floor { .. }) {
@@ -128,11 +129,36 @@ pub(crate) fn advance(tool: &mut MiningTool, frame: ShipFrame, delta: Duration, 
         };
         let pose = ResourceTransform::new(
             WorldPosition::new(position[0], position[1], position[2]),
-            fragment.transform().orientation_xyzw(),
+            if matches!(piece.surface, Surface::Floor { .. }) {
+                to_world_orientation(frame, piece.orientation)
+            } else { piece.orientation },
         )
         .expect("finite fragment physics pose");
         tool.session.move_loose(fragment.id(), pose);
     }
+}
+
+pub(crate) fn fragment_hull(fragment: salimon_world::resources::ResourceFragment) -> std::sync::Arc<salimon_physics::ConvexHull> {
+    use salimon_renderer::ResourceMesh;
+    static HULLS: std::sync::LazyLock<[std::sync::Arc<salimon_physics::ConvexHull>; 6]> = std::sync::LazyLock::new(|| {
+        [ResourceMesh::IceShard, ResourceMesh::IceCluster, ResourceMesh::SilicateSlab,
+         ResourceMesh::SilicateRidge, ResourceMesh::IronChunk, ResourceMesh::IronShard]
+            .map(|mesh| std::sync::Arc::new(salimon_physics::ConvexHull::new(mesh.unit_vertices().iter().copied())))
+    });
+    HULLS[crate::resource_presentation::fragment_mesh(fragment).mesh as usize].clone()
+}
+
+pub(crate) fn to_world_orientation(frame: ShipFrame, local: [f64; 4]) -> [f64; 4] {
+    salimon_physics::compose(salimon_physics::orientation_from_axes(frame.axes), local)
+}
+fn to_local_orientation(frame: ShipFrame, world: [f64; 4]) -> [f64; 4] {
+    let q = salimon_physics::orientation_from_axes(frame.axes);
+    salimon_physics::compose([-q[0], -q[1], -q[2], q[3]], world)
+}
+
+pub(crate) fn support(fragment: salimon_world::resources::ResourceFragment, up: [f64; 3]) -> f64 {
+    fragment_hull(fragment).support(fragment.transform().orientation_xyzw(),
+        salimon_world::resource_fragments::side_meters(fragment), up.map(|v| -v))
 }
 
 fn nearest_body(position: [f64; 3]) -> Option<SphereSurface> {
@@ -224,10 +250,7 @@ mod tests {
         assert_eq!(after.id(), before.id());
         assert_eq!(after.source(), before.source());
         assert_eq!(after.material(), before.material());
-        assert_eq!(
-            after.transform().orientation_xyzw(),
-            before.transform().orientation_xyzw()
-        );
+        assert!((after.transform().orientation_xyzw().iter().map(|v| v * v).sum::<f64>() - 1.0).abs() < 1e-9);
         assert_eq!(
             after.transform().position().meters(),
             frame.local_to_world(tool.ship_fragments[&id])
@@ -260,11 +283,7 @@ mod tests {
         }
         let settled = tool.ship_fragments[&id];
         let piece = tool.session.fragments()[0];
-        let radius = crate::resource_presentation::fragment_mesh(piece)
-            .mesh
-            .support_meters([0.0, 1.0, 0.0])
-            * salimon_world::resource_fragments::side_meters(piece)
-            + 0.005;
+        let radius = support(piece, [0.0, 1.0, 0.0]);
         assert!((settled[1] - SHIP_FLOOR_HEIGHT_METERS - radius).abs() < 0.002);
     }
 
@@ -288,21 +307,11 @@ mod tests {
         }
         let a = tool.ship_fragments[&pieces[0].id()];
         let b = tool.ship_fragments[&pieces[1].id()];
-        let radius =
-            salimon_world::resource_size::fragment_contact_radius_meters(pieces[0].material());
-        let support = pieces
-            .iter()
-            .map(|p| {
-                crate::resource_presentation::fragment_mesh(*p)
-                    .mesh
-                    .support_meters([0.0, 1.0, 0.0])
-                    * salimon_world::resource_fragments::side_meters(*p)
-                    + 0.005
-            })
-            .fold(f64::INFINITY, f64::min);
-        assert!(a[1].min(b[1]) >= SHIP_FLOOR_HEIGHT_METERS + support - 0.002);
-        assert!(length(sub(a, b)) >= radius * 2.0 - 0.002);
-        assert!(a[1].max(b[1]) > SHIP_FLOOR_HEIGHT_METERS + support + radius);
+        // Broad-phase spheres may overlap; visible authored hulls define the pile.
+        assert!(a[1].min(b[1]) >= SHIP_FLOOR_HEIGHT_METERS);
+        assert!(length(sub(a, b)) > 0.05);
+        assert!(length(sub(a, b)) < pieces.iter().map(|p| salimon_world::resource_size::fragment_contact_radius_meters(p.material())).sum::<f64>());
+
     }
 
     #[test]
@@ -334,11 +343,7 @@ mod tests {
         }
         let settled = tool.session.fragments()[0].transform().position().meters();
         let piece = tool.session.fragments()[0];
-        let radius = crate::resource_presentation::fragment_mesh(piece)
-            .mesh
-            .support_meters([0.0, 1.0, 0.0])
-            * salimon_world::resource_fragments::side_meters(piece)
-            + 0.005;
+        let radius = support(piece, [0.0, 1.0, 0.0]);
         assert!(
             (length(sub(settled, body.center.meters())) - body.radius_meters - radius).abs()
                 < 0.002

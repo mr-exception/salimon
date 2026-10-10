@@ -15,6 +15,24 @@ permissions:
   contents: read
 
 jobs:
+  fragment-validation:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - run: cargo fmt --all
+      - run: cargo test -p salimon-physics -p salimon-world --locked
+      - run: cargo clippy -p salimon-physics -p salimon-world --all-targets --locked -- -D warnings
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: issue-148-formatted-sources
+          path: |
+            client/**/src/*.rs
+            client/**/tests/*.rs
+
   build:
     strategy:
       fail-fast: false

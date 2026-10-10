@@ -58,18 +58,42 @@ impl ConvexHull {
         self.vertices.iter().map(|v| dot(rotate(orientation, scale(*v, side)), direction)).fold(f64::NEG_INFINITY, f64::max)
     }
 
-    pub(crate) fn support_point(&self, orientation: [f64; 4], side: f64, direction: [f64; 3]) -> [f64; 3] {
+    /// Closest point of the supporting feature to the center-of-mass projection.
+    /// A resting face distributes reaction beneath the COM instead of applying
+    /// a torque at its geometric centroid. The 0.2 mm/unit tolerance prevents
+    /// facet-edge chatter while retaining visibly close terrain contact.
+    pub(crate) fn ground_arm(&self, orientation: [f64; 4], side: f64, direction: [f64; 3]) -> [f64; 3] {
         let extreme = self.support(orientation, side, direction);
-        let mut sum = [0.0; 3];
-        let mut count = 0.0;
-        for v in &self.vertices {
-            let p = rotate(orientation, scale(*v, side));
-            if dot(p, direction) >= extreme - 1e-7 * side {
-                sum = add(sum, p); count += 1.0;
+        let points: Vec<_> = self.vertices.iter().map(|v| rotate(orientation, scale(*v, side)))
+            .filter(|p| dot(*p, direction) >= extreme - 0.0002 * side).collect();
+        let target = scale(direction, extreme);
+        let mut nearest = points[0];
+        for &a in &points {
+            for &b in &points {
+                let ab = sub(b, a);
+                let squared = dot(ab, ab);
+                if squared > 1e-16 {
+                    let p = add(a, scale(ab, (dot(sub(target, a), ab) / squared).clamp(0.0, 1.0)));
+                    if length(sub(p, target)) < length(sub(nearest, target)) { nearest = p; }
+                }
+                for &c in &points {
+                    let ac = sub(c, a);
+                    let at = sub(target, a);
+                    let d00 = dot(ab, ab); let d01 = dot(ab, ac); let d11 = dot(ac, ac);
+                    let denom = d00 * d11 - d01 * d01;
+                    if denom < 1e-16 { continue; }
+                    let u = (d11 * dot(at, ab) - d01 * dot(at, ac)) / denom;
+                    let v = (d00 * dot(at, ac) - d01 * dot(at, ab)) / denom;
+                    if u >= 0.0 && v >= 0.0 && u + v <= 1.0 {
+                        let p = add(a, add(scale(ab, u), scale(ac, v)));
+                        if length(sub(p, target)) < length(sub(nearest, target)) { nearest = p; }
+                    }
+                }
             }
         }
-        scale(sum, 1.0 / count)
+        nearest
     }
+
 }
 
 fn push_axis(axes: &mut Vec<[f64; 3]>, axis: [f64; 3]) {
@@ -103,11 +127,18 @@ pub(crate) fn integrate(q: [f64; 4], omega: [f64; 3], dt: f64) -> [f64; 4] {
     result.map(|v| v / norm)
 }
 
-/// Minimum separating translation of B relative to A. Projection is relative to
-/// A's origin to preserve precision at universe-scale coordinates.
-pub(crate) fn contact(a: &super::ObjectState, b: &super::ObjectState) -> Option<([f64; 3], f64)> {
-    let (Some(ah), Some(bh)) = (&a.hull, &b.hull) else { return None; };
-    let offset = sub(b.position, a.position);
+#[derive(Clone)]
+pub(crate) struct Projection {
+    axis: [f64; 3],
+    forward: f64,
+    backward: f64,
+}
+
+/// Orientation/scale are constant through the contact iterations in a substep.
+/// Cache relative projections once rather than rotating vertices in every pass.
+pub(crate) fn projections(a: &super::ObjectState, b: &super::ObjectState) -> Vec<Projection> {
+    let ah = a.hull.as_ref().expect("convex caller");
+    let bh = b.hull.as_ref().expect("convex caller");
     let mut axes = Vec::new();
     for n in &ah.normals { push_axis(&mut axes, rotate(a.orientation, *n)); }
     for n in &bh.normals { push_axis(&mut axes, rotate(b.orientation, *n)); }
@@ -116,21 +147,62 @@ pub(crate) fn contact(a: &super::ObjectState, b: &super::ObjectState) -> Option<
             push_axis(&mut axes, cross(rotate(a.orientation, *ae), rotate(b.orientation, *be)));
         }
     }
-    let mut best = ([0.0, 1.0, 0.0], f64::INFINITY);
-    for axis in axes {
+    axes.into_iter().map(|axis| {
         let opposite = scale(axis, -1.0);
-        let amax = ah.support(a.orientation, a.side_meters, axis);
-        let amin = -ah.support(a.orientation, a.side_meters, opposite);
-        let shift = dot(offset, axis);
-        let bmax = bh.support(b.orientation, b.side_meters, axis) + shift;
-        let bmin = -bh.support(b.orientation, b.side_meters, opposite) + shift;
-        let forward = amax - bmin;
-        let backward = bmax - amin;
+        Projection {
+            axis,
+            forward: ah.support(a.orientation, a.side_meters, axis) + bh.support(b.orientation, b.side_meters, opposite),
+            backward: bh.support(b.orientation, b.side_meters, axis) + ah.support(a.orientation, a.side_meters, opposite),
+        }
+    }).collect()
+}
+
+/// Minimum translation of B relative to A, with universe-scale-safe subtraction.
+pub(crate) fn projected_contact(projections: &[Projection], offset: [f64; 3]) -> Option<([f64; 3], f64)> {
+    let mut best = ([0.0, 1.0, 0.0], f64::INFINITY);
+    for p in projections {
+        let shift = dot(offset, p.axis);
+        let forward = p.forward - shift;
+        let backward = p.backward + shift;
         if forward < 0.0 || backward < 0.0 { return None; }
-        let candidate = if forward <= backward { (axis, forward) } else { (opposite, backward) };
+        let candidate = if forward <= backward { (p.axis, forward) } else { (scale(p.axis, -1.0), backward) };
         if candidate.1 < best.1 { best = candidate; }
     }
     Some(best)
+}
+
+#[cfg(test)]
+fn contact(a: &super::ObjectState, b: &super::ObjectState) -> Option<([f64; 3], f64)> {
+    projected_contact(&projections(a, b), sub(b.position, a.position))
+}
+
+/// Approximate manifold center from overlapping support-feature tangent bounds.
+/// A face against a vertex uses the incident vertex rather than the face centroid,
+/// so an off-center contact has the correct torque arm. Coordinates are relative to A.
+pub(crate) fn contact_arms(a: &super::ObjectState, b: &super::ObjectState, normal: [f64; 3]) -> ([f64; 3], [f64; 3]) {
+    let offset = sub(b.position, a.position);
+    let ah = a.hull.as_ref().expect("convex caller");
+    let bh = b.hull.as_ref().expect("convex caller");
+    let feature = |h: &ConvexHull, q, side, direction| {
+        let support = h.support(q, side, direction);
+        h.vertices.iter().map(|v| rotate(q, scale(*v, side))).filter(|p| dot(*p, direction) >= support - side * 1e-7).collect::<Vec<_>>()
+    };
+    let av = feature(ah, a.orientation, a.side_meters, normal);
+    let bv: Vec<_> = feature(bh, b.orientation, b.side_meters, scale(normal, -1.0)).into_iter().map(|v| add(v, offset)).collect();
+    let seed = if normal[1].abs() < 0.9 { [0.0, 1.0, 0.0] } else { [1.0, 0.0, 0.0] };
+    let tangent = cross(normal, seed);
+    let tangent = scale(tangent, 1.0 / length(tangent));
+    let bitangent = cross(normal, tangent);
+    let interval = |vertices: &[[f64; 3]], axis| {
+        vertices.iter().map(|v| dot(*v, axis)).fold((f64::INFINITY, f64::NEG_INFINITY), |(lo,hi), v| (lo.min(v), hi.max(v)))
+    };
+    let middle = |axis| {
+        let (al,ah) = interval(&av, axis); let (bl,bh) = interval(&bv, axis);
+        (al.max(bl) + ah.min(bh)) * 0.5
+    };
+    let height = (dot(av[0], normal) + dot(bv[0], normal)) * 0.5;
+    let point = add(scale(normal, height), add(scale(tangent, middle(tangent)), scale(bitangent, middle(bitangent))));
+    (point, sub(point, offset))
 }
 
 /// Unit quaternion from right-handed orthonormal basis columns.

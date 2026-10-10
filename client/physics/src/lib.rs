@@ -40,7 +40,7 @@ impl Surface {
 }
 
 /// Caller-validated finite pose, velocity (m/s) and positive spherical radius (m).
-/// Identity, orientation, material and mass stay with the caller.
+/// Identity/material stay with the caller; physics updates position/orientation.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ObjectState {
     pub position: [f64; 3],
@@ -97,8 +97,8 @@ pub fn ejection_velocity(position: [f64; 3], body: Option<SphereSurface>, varian
 /// Advance in stable slice order; preserve that order across updates.
 /// `floor_contains` is a pure geometry query in ship-local metres, not a response rule.
 /// Separate floor frames must be advanced in separate calls. Sphere centers distinguish
-/// planetary contact groups. Substeps retain the legacy 1/90 s target and 48-step cap;
-/// an unusually large delta can exceed that target. No time is discarded.
+/// planetary contact groups. Convex substeps adapt to scale/speed; sphere-only
+/// calls retain the legacy 48-step cap. No elapsed time is discarded.
 pub fn advance(
     pieces: &mut [ObjectState],
     delta: Duration,
@@ -138,6 +138,7 @@ pub fn advance(
             }
             ground_contact(piece);
         }
+        let mut pair_geometry: Vec<Vec<Option<Vec<convex::Projection>>>> = vec![vec![None; pieces.len()]; pieces.len()];
         for _ in 0..if has_hulls { 16 } else { 3 } {
             for i in 0..pieces.len() {
                 for j in i + 1..pieces.len() {
@@ -159,7 +160,8 @@ pub fn advance(
                         continue;
                     }
                     let (normal, depth) = if a.hull.is_some() && b.hull.is_some() {
-                        let Some(contact) = convex::contact(a, b) else { continue; };
+                        let geometry = pair_geometry[i][j].get_or_insert_with(|| convex::projections(a, b));
+                        let Some(contact) = convex::projected_contact(geometry, separation) else { continue; };
                         contact
                     } else {
                         (if distance > 1e-9 { scale(separation, 1.0 / distance) } else { [0.0, 1.0, 0.0] }, minimum - distance)
@@ -219,7 +221,7 @@ fn ground_contact(piece: &mut ObjectState) {
     }
     piece.position = add(piece.position, scale(up, penetration.max(0.0)));
     if let Some(hull) = &piece.hull {
-        let arm = hull.support_point(piece.orientation, piece.side_meters, scale(up, -1.0));
+        let arm = hull.ground_arm(piece.orientation, piece.side_meters, scale(up, -1.0));
         let contact_velocity = add(piece.velocity, cross(piece.angular_velocity, arm));
         let approach = dot(contact_velocity, up);
         if approach < 0.0 {
@@ -255,11 +257,9 @@ fn apply_impulse(piece: &mut ObjectState, arm: [f64; 3], impulse: [f64; 3]) {
     piece.angular_velocity = add(piece.angular_velocity, scale(cross(arm, impulse), inverse_inertia(piece)));
 }
 fn pair_impulse(a: &mut ObjectState, b: &mut ObjectState, normal: [f64; 3]) {
-    let aa = a.hull.as_ref().map(|h| h.support_point(a.orientation, a.side_meters, normal)).unwrap_or(scale(normal, a.radius));
-    let ba = b.hull.as_ref().map(|h| h.support_point(b.orientation, b.side_meters, scale(normal, -1.0))).unwrap_or(scale(normal, -b.radius));
-    let point = scale(add(add(a.position, aa), add(b.position, ba)), 0.5);
-    let aa = sub(point, a.position);
-    let ba = sub(point, b.position);
+    let (aa, ba) = if a.hull.is_some() && b.hull.is_some() {
+        convex::contact_arms(a, b, normal)
+    } else { (scale(normal, a.radius), scale(normal, -b.radius)) };
     let relative = sub(add(b.velocity, cross(b.angular_velocity, ba)), add(a.velocity, cross(a.angular_velocity, aa)));
     let approach = dot(relative, normal);
     if approach >= 0.0 { return; }

@@ -959,6 +959,11 @@
     },
     {
       "action": {
+        "op": "restore_look"
+      }
+    },
+    {
+      "action": {
         "op": "look",
         "dx": -1614.4434515671883,
         "dy": -219.44939804254633
@@ -1110,6 +1115,11 @@
     },
     {
       "action": {
+        "op": "restore_look"
+      }
+    },
+    {
+      "action": {
         "op": "look",
         "dx": -1500.0027110464198,
         "dy": -296.55502839103065
@@ -1218,6 +1228,11 @@
       "assert": {
         "path": "carrying.object_id",
         "equals": 1
+      }
+    },
+    {
+      "action": {
+        "op": "restore_look"
       }
     },
     {
@@ -1403,6 +1418,11 @@
       "assert": {
         "path": "carrying.target_id",
         "equals": 1
+      }
+    },
+    {
+      "action": {
+        "op": "restore_look"
       }
     },
     {

@@ -204,14 +204,18 @@ pub(crate) fn separated_by_faces(a: &super::ObjectState, b: &super::ObjectState)
     let ah = a.hull.as_ref().expect("convex caller");
     let bh = b.hull.as_ref().expect("convex caller");
     let separation = sub(b.position, a.position);
-    ah.normals.iter().map(|n| rotate(a.orientation, *n))
+    ah.normals
+        .iter()
+        .map(|n| rotate(a.orientation, *n))
         .chain(bh.normals.iter().map(|n| rotate(b.orientation, *n)))
         .any(|axis| {
             let offset = dot(separation, axis);
-            offset > ah.support(a.orientation, a.side_meters, axis)
-                + bh.support(b.orientation, b.side_meters, scale(axis, -1.0))
-                || -offset > ah.support(a.orientation, a.side_meters, scale(axis, -1.0))
-                    + bh.support(b.orientation, b.side_meters, axis)
+            offset
+                > ah.support(a.orientation, a.side_meters, axis)
+                    + bh.support(b.orientation, b.side_meters, scale(axis, -1.0))
+                || -offset
+                    > ah.support(a.orientation, a.side_meters, scale(axis, -1.0))
+                        + bh.support(b.orientation, b.side_meters, axis)
         })
 }
 

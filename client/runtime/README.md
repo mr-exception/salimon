@@ -320,3 +320,6 @@ A fresh explicit 1 press restores the tool without resuming mining.
 The evidence route captures equipped slot 1, selected empty slot 2, carrying
 without selection, and post-drop deselection. See the
 [runner coverage](../../scripts/README.md#toolbar-gameplay-coverage-132).
+
+`restore_look` reverses the preceding `aim_fragment` camera deltas so a scripted
+walking route keeps its intended heading after the pickup checkpoint.

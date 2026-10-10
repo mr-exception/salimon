@@ -1629,6 +1629,11 @@
     },
     {
       "action": {
+        "op": "restore_look"
+      }
+    },
+    {
+      "action": {
         "op": "look",
         "dx": -452.6420754633191,
         "dy": 124.150900676592
@@ -1704,6 +1709,11 @@
       "assert": {
         "path": "resource_ui.context",
         "contains": "Only one world object - F to drop first"
+      }
+    },
+    {
+      "action": {
+        "op": "restore_look"
       }
     },
     {
@@ -2022,6 +2032,11 @@
       "assert": {
         "path": "world.fragment_count",
         "equals": 19
+      }
+    },
+    {
+      "action": {
+        "op": "restore_look"
       }
     },
     {

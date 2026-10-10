@@ -535,3 +535,6 @@ removal, which the focused world/physics/runtime regressions cover.
 `fragment_id` using mouse-look deltas. It changes no object/player position and
 does not bypass pickup range, occlusion, or the normal F key contract. Scenario
 pickup checkpoints use it because rotated convex piles settle differently.
+
+`restore_look` reverses the preceding `aim_fragment` camera deltas so a scripted
+walking route keeps its intended heading after the pickup checkpoint.

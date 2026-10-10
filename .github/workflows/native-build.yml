@@ -82,9 +82,10 @@ jobs:
           git worktree add /tmp/salimon-before 8cc50660f8b4946c23448fb317745adbc90db28d
           cp client/runtime/src/e2e.rs /tmp/salimon-before/client/runtime/src/e2e.rs
           cp scenarios/evidence/fragment-pile-*.json /tmp/salimon-before/scenarios/evidence/
-          (cd /tmp/salimon-before && cargo build --locked --release -p salimon-client)
+          (cd /tmp/salimon-before && cargo build --locked --release -p salimon-client --target-dir "$GITHUB_WORKSPACE/target")
+          cp target/release/salimon-client artifacts/issue-148/salimon-client-before
           for surface in floor surface; do
-            xvfb-run -a -s '-screen 0 1280x800x24' python scripts/salimon-test run scenarios/evidence/fragment-pile-$surface.json --binary /tmp/salimon-before/target/release/salimon-client --artifacts artifacts/issue-148/before-$surface --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
+            xvfb-run -a -s '-screen 0 1280x800x24' python scripts/salimon-test run scenarios/evidence/fragment-pile-$surface.json --binary artifacts/issue-148/salimon-client-before --artifacts artifacts/issue-148/before-$surface --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
             xvfb-run -a -s '-screen 0 1280x800x24' python scripts/salimon-test run scenarios/evidence/fragment-pile-$surface.json --binary artifacts/build/release/salimon-client --artifacts artifacts/issue-148/after-$surface --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
           done
       - name: Linux deterministic E2E baseline (Mesa software Vulkan)

@@ -426,6 +426,20 @@ mod tests {
         assert!(pieces[0].orientation.iter().all(|v| v.is_finite()));
     }
     #[test]
+    fn growth_refreshes_contacts_without_changing_the_shared_hull() {
+        let mut pieces = [object([0.0, 0.1, 0.0], [0.3, 0.1, 0.3]), object([0.0, 0.3, 0.0], [0.2, 0.1, 0.2])];
+        let hull = pieces[1].hull.clone().unwrap();
+        pieces[1].side_meters = 1.5;
+        pieces[1].radius *= 1.5;
+        pieces[1].mass_kg = 3.0;
+        for _ in 0..120 { advance(&mut pieces, Duration::from_millis(16), |_, _| true); }
+        assert!(Arc::ptr_eq(&hull, pieces[1].hull.as_ref().unwrap()));
+        assert!((pieces[0].position[1] - 0.1).abs() < 0.003);
+        assert!((pieces[1].position[1] - 0.35).abs() < 0.003);
+        assert!(contact(&pieces[0], &pieces[1]).is_none_or(|(_, depth)| depth < 0.001));
+    }
+
+    #[test]
     fn ship_basis_orientation_roundtrips_vectors() {
         let axes = [[0.0, 0.0, -1.0], [0.0, 1.0, 0.0], [1.0, 0.0, 0.0]];
         let q = orientation_from_axes(axes);

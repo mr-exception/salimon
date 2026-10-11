@@ -6,7 +6,9 @@ use std::{
 };
 
 mod convex;
+mod sleep;
 pub use convex::{ConvexHull, compose, orientation_from_axes, rotate};
+pub use sleep::SleepTracker;
 
 const GRAVITY: f64 = 9.81;
 const RESTITUTION: f64 = 0.12;
@@ -128,6 +130,9 @@ pub fn ejection_velocity(position: [f64; 3], body: Option<SphereSurface>, varian
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct StepStats {
     pub objects: usize,
+    pub awake_objects: usize,
+    pub sleeping_objects: usize,
+    pub integrated_objects: u64,
     pub substeps: u64,
     pub solver_passes: u64,
     pub pair_visits: u64,
@@ -140,6 +145,8 @@ pub struct StepStats {
     /// Number of matrix Vec allocations for the current vec![vec![..]; n] implementation;
     /// One outer Vec plus one row Vec per object. Not a process allocator counter.
     pub matrix_allocations: u64,
+    /// Stable-ID validation and post-solve support graph/dwell processing.
+    pub activation_time: Duration,
     pub integration_time: Duration,
     pub contact_time: Duration,
 }
@@ -150,7 +157,7 @@ pub fn advance_profiled(
     delta: Duration,
     floor_contains: impl Fn([f64; 3], f64) -> bool,
 ) -> StepStats {
-    advance_impl::<true>(pieces, delta, floor_contains)
+    advance_impl::<true>(pieces, delta, floor_contains, None)
 }
 
 /// Advance in stable slice order; preserve that order across updates.
@@ -163,20 +170,60 @@ pub fn advance(
     delta: Duration,
     floor_contains: impl Fn([f64; 3], f64) -> bool,
 ) {
-    advance_impl::<false>(pieces, delta, floor_contains);
+    advance_impl::<false>(pieces, delta, floor_contains, None);
+}
+
+/// Stateful activation path. IDs follow the snapshot order and must be unique.
+/// `profile` controls wall clocks/counters; sleep behavior is identical either way.
+pub fn advance_with_sleep<K: Copy + Eq + std::hash::Hash>(
+    tracker: &mut SleepTracker<K>,
+    ids: &[K],
+    pieces: &mut [ObjectState],
+    delta: Duration,
+    floor_contains: impl Fn([f64; 3], f64) -> bool,
+    profile: bool,
+) -> StepStats {
+    if delta.is_zero() {
+        return StepStats::default();
+    }
+    let activation_start = profile.then(Instant::now);
+    let mut activation = tracker.prepare(ids, pieces);
+    for (i, piece) in pieces.iter().enumerate() {
+        if piece.surface.is_floor() && !floor_contains(piece.position, piece.radius) {
+            activation.wake(i);
+        }
+    }
+    let prepare_time = activation_start.map(|s| s.elapsed()).unwrap_or_default();
+    let mut stats = if profile {
+        advance_impl::<true>(pieces, delta, &floor_contains, Some(&mut activation))
+    } else {
+        advance_impl::<false>(pieces, delta, &floor_contains, Some(&mut activation))
+    };
+    let finish_start = profile.then(Instant::now);
+    tracker.finish(ids, pieces, delta, &mut activation, floor_contains);
+    stats.activation_time = prepare_time + finish_start.map(|s| s.elapsed()).unwrap_or_default();
+    stats.sleeping_objects = activation.sleeping.iter().filter(|s| **s).count();
+    stats.awake_objects = pieces.len() - stats.sleeping_objects;
+    stats
 }
 
 fn advance_impl<const PROFILE: bool>(
     pieces: &mut [ObjectState],
     delta: Duration,
     floor_contains: impl Fn([f64; 3], f64) -> bool,
+    mut activation: Option<&mut sleep::Activation>,
 ) -> StepStats {
     let mut stats = StepStats {
         objects: pieces.len(),
+        awake_objects: pieces.len(),
         ..StepStats::default()
     };
     let elapsed = delta.as_secs_f64();
-    if elapsed <= 0.0 {
+    if elapsed <= 0.0
+        || activation
+            .as_ref()
+            .is_some_and(|a| a.sleeping.iter().all(|s| *s))
+    {
         return stats;
     }
     // A fixed maximum substep prevents fast ejected pieces from tunnelling through a pile.
@@ -197,8 +244,17 @@ fn advance_impl<const PROFILE: bool>(
     };
     let dt = elapsed / steps as f64;
     for _ in 0..steps {
+        if let Some(a) = &mut activation {
+            a.impacts(pieces, dt);
+        }
         let integration_start = PROFILE.then(Instant::now);
-        for piece in pieces.iter_mut() {
+        for (i, piece) in pieces.iter_mut().enumerate() {
+            if activation.as_ref().is_some_and(|a| a.sleeping[i]) {
+                continue;
+            }
+            if PROFILE {
+                stats.integrated_objects += 1;
+            }
             let previous = piece.position;
             let up = piece
                 .surface
@@ -227,6 +283,9 @@ fn advance_impl<const PROFILE: bool>(
                 + pieces.len() * std::mem::size_of::<Vec<Option<Vec<convex::Projection>>>>())
                 as u64;
         }
+        if let Some(a) = &mut activation {
+            a.impacts(pieces, 0.0);
+        }
         let contact_start = PROFILE.then(Instant::now);
         let mut pair_geometry: Vec<Vec<Option<Vec<convex::Projection>>>> =
             vec![vec![None; pieces.len()]; pieces.len()];
@@ -236,6 +295,12 @@ fn advance_impl<const PROFILE: bool>(
             }
             for (i, row) in pair_geometry.iter_mut().enumerate() {
                 for (j, cached) in row.iter_mut().enumerate().skip(i + 1) {
+                    if activation
+                        .as_ref()
+                        .is_some_and(|a| a.sleeping[i] && a.sleeping[j])
+                    {
+                        continue;
+                    }
                     if PROFILE {
                         stats.pair_visits += 1;
                     }
@@ -293,6 +358,10 @@ fn advance_impl<const PROFILE: bool>(
                     if PROFILE {
                         stats.contacts += 1;
                     }
+                    if let Some(activation) = &mut activation {
+                        activation.wake(i);
+                        activation.wake(j);
+                    }
                     let inverse_a = 1.0 / a.mass_kg;
                     let inverse_b = 1.0 / b.mass_kg;
                     let correction = scale(normal, (depth + 0.00001) / (inverse_a + inverse_b));
@@ -317,7 +386,10 @@ fn advance_impl<const PROFILE: bool>(
         if let Some(start) = contact_start {
             stats.contact_time += start.elapsed();
         }
-        for piece in pieces.iter_mut() {
+        for (i, piece) in pieces.iter_mut().enumerate() {
+            if activation.as_ref().is_some_and(|a| a.sleeping[i]) {
+                continue;
+            }
             piece.velocity = scale(piece.velocity, 0.995);
             piece.angular_velocity = scale(piece.angular_velocity, 0.98);
             if length(piece.angular_velocity) < 0.015 {

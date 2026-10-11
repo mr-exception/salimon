@@ -13,3 +13,10 @@ selection with their caller. Tests in `src/lib.rs` and `src/convex.rs` protect m
 runtime fragment tests protect integration with the existing resource session.
 Run `cargo test -p salimon-physics --locked` while iterating and workspace gates
 for contract changes. Record task evidence under root `reports/`.
+
+
+Persistent activation policy lives in `src/sleep.rs`; its stable-ID cache is
+owned by each caller. Read the [sleep contract](architecture.md#persistent-contact-island-sleep-156).
+`cargo run --release --locked -p salimon-physics --example sleep_cost` isolates
+sleep/active solver work on identical supported cube snapshots (500/1,000,
+100 samples, mixed masses). It does not replace authored cargo/native #155 runs.

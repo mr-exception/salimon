@@ -70,7 +70,7 @@ pub(crate) struct Measurements {
     pub(crate) solver: salimon_physics::StepStats,
     pub(crate) adapter_time: Duration,
     pub(crate) total_time: Duration,
-    /// Threshold observation, not a sleeping flag; every selected object is simulated.
+    /// Velocity threshold observation, separate from persistent activation.
     pub(crate) moving_objects: usize,
 }
 
@@ -146,6 +146,7 @@ pub(crate) fn advance_measured(
         })
         .collect();
     if pieces.is_empty() {
+        tool.fragment_sleep = salimon_physics::SleepTracker::default();
         if let Some(start) = started {
             measurements.total_time = start.elapsed();
             measurements.adapter_time = measurements.total_time;
@@ -155,14 +156,20 @@ pub(crate) fn advance_measured(
     let mut states: Vec<_> = pieces.iter().map(|(_, state)| state.clone()).collect();
     let solver_start = profile.then(Instant::now);
     let contains = |position, radius| ship_floor_placement(position, radius).is_some();
+    let ids: Vec<_> = pieces.iter().map(|(p, _)| p.id()).collect();
+    measurements.solver = salimon_physics::advance_with_sleep(
+        &mut tool.fragment_sleep,
+        &ids,
+        &mut states,
+        delta,
+        contains,
+        profile,
+    );
     if profile {
-        measurements.solver = salimon_physics::advance_profiled(&mut states, delta, contains);
         measurements.moving_objects = states
             .iter()
             .filter(|p| length(p.velocity) >= 0.015 || length(p.angular_velocity) >= 0.015)
             .count();
-    } else {
-        salimon_physics::advance(&mut states, delta, contains);
     }
     let solver_time = solver_start
         .map(|start| start.elapsed())
@@ -326,6 +333,14 @@ mod tests {
                     [-5.0, 2.0, 0.0],
                 );
             }
+            let stats = advance_measured(
+                &mut tool,
+                frame(),
+                Duration::from_millis(16),
+                [-5.0, 2.0, 0.0],
+                true,
+            );
+            assert_eq!(stats.solver.sleeping_objects, 2, "{resource:?}");
             for (before, p) in initial.iter().zip(tool.session.fragments()) {
                 assert_eq!(before.id(), p.id());
                 assert_eq!(before.material(), p.material());
@@ -340,6 +355,66 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn sleeping_ship_fragment_follows_rigid_motion_and_streaming_return_wakes_safely() {
+        let mut tool = mined(2.0);
+        let id = tool.session.fragments()[0].id();
+        tool.ship_fragments.insert(id, [-5.0, 1.3, 0.0]);
+        tool.fragment_motion.insert(id, FragmentMotion::default());
+        for _ in 0..500 {
+            advance(
+                &mut tool,
+                frame(),
+                Duration::from_millis(16),
+                [-5.0, 2.0, 0.0],
+            );
+        }
+        let stats = advance_measured(
+            &mut tool,
+            frame(),
+            Duration::from_millis(16),
+            [-5.0, 2.0, 0.0],
+            true,
+        );
+        assert_eq!(
+            stats.solver.sleeping_objects, 1,
+            "{:?}",
+            tool.fragment_sleep
+        );
+        let local = tool.ship_fragments[&id];
+        let moving = ShipFrame {
+            origin_meters: [1.0e12, 2.0e12, -3.0e12],
+            axes: [[0.0, 0.0, -1.0], [0.0, 1.0, 0.0], [1.0, 0.0, 0.0]],
+        };
+        crate::carrying::sync_ship_fragments(&mut tool, moving);
+        let stats = advance_measured(
+            &mut tool,
+            moving,
+            Duration::from_millis(16),
+            moving.local_to_world([-5.0, 2.0, 0.0]),
+            true,
+        );
+        assert_eq!(stats.solver.sleeping_objects, 1);
+        assert_eq!(stats.solver.integrated_objects, 0);
+        assert_eq!(tool.ship_fragments[&id], local);
+        assert_eq!(
+            tool.session.fragments()[0].transform().position().meters(),
+            moving.local_to_world(local)
+        );
+        // Leaving the selected set invalidates contacts; returning retains identity/mass.
+        advance(&mut tool, moving, Duration::from_millis(16), [0.0; 3]);
+        let stats = advance_measured(
+            &mut tool,
+            moving,
+            Duration::from_millis(16),
+            moving.local_to_world([-5.0, 2.0, 0.0]),
+            true,
+        );
+        assert!(stats.solver.integrated_objects > 0);
+        assert_eq!(tool.session.fragments()[0].id(), id);
+        assert_eq!(tool.session.fragments()[0].material().mass_kg(), 2.0);
     }
 
     #[test]

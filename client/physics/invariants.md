@@ -23,3 +23,11 @@
 - Physics owns motion/contact rules only. Caller retains IDs/material/session,
   nearby/carried policy, pose validation and frame conversion. No renderer,
   runtime, GPU, world catalog or asset loader dependency enters this crate.
+- Stateful sleep requires a supported contact island, low linear/angular motion,
+  stable pose and 0.5 seconds dwell; airborne rest is never sleep. See the
+  [canonical sleep policy](architecture.md#persistent-contact-island-sleep-156).
+- Sleeping objects retain visible/pickable/collision poses. Contact-island waking
+  precedes collision response; removed/changed supports cannot remain cached.
+- Stable IDs belong to the caller. Omitted snapshots invalidate cached sleep;
+  explicit environmental/force changes outside snapshot fields call `wake_all`.
+  Rigid movement of an unchanged local frame does not wake its contents.

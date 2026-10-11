@@ -12,6 +12,13 @@
   rotated hull each pass. Penetration correction uses a 10 µm separation bias.
   Supported convex deck bodies cannot take downward positional corrections;
   the neighbor receives unavailable normal separation. Mass/impulses stay unchanged.
+  Pair velocity contacts admit a 20 µm skin; negative depth never attracts bodies.
+  Resting faces use unilateral corner constraints on the actual overlapping
+  support polygon (ground faces use supporting vertices), with 16 local iterations.
+  Corner impulses can decrease but their accumulated totals remain nonnegative.
+  Distributed tangential impulses use 16 local iterations and a per-point
+  Coulomb disk with radius 0.65 times its solved normal impulse; resting faces
+  and edges therefore resist twist. Sphere fallback friction stays unchanged.
 - Convex contacts use mass-weighted impulses, angular response and Coulomb friction
   capped at 0.65 of normal impulse. Low-speed convex impacts have no restitution;
   faster pair impacts use 0.12. Convex ground contacts are inelastic.

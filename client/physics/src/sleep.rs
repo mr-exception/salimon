@@ -43,6 +43,9 @@ pub(crate) struct Activation {
     pub(crate) sleeping: Vec<bool>,
     neighbors: Vec<Vec<usize>>,
     woken: Vec<bool>,
+    // Last substep's exact SAT spans remain valid: contact iterations only move
+    // centers; damping does not rotate hulls. Reuse them for the support graph.
+    pub(crate) geometry: Option<Vec<Vec<Option<Vec<convex::Projection>>>>>,
 }
 impl Activation {
     pub(crate) fn wake(&mut self, index: usize) {
@@ -95,6 +98,24 @@ impl<K: Copy + Eq + Hash> SleepTracker<K> {
         self.entries.get(&id).is_some_and(|entry| entry.sleeping)
     }
 
+    /// Contact identities from the last completed update; absent entries have none.
+    pub fn contact_neighbors(&self, id: K) -> &[K] {
+        self.entries
+            .get(&id)
+            .map_or(&[], |entry| entry.neighbors.as_slice())
+    }
+
+    /// Observe actual environmental support in the last completed snapshot.
+    pub fn environment_supported(
+        &self,
+        id: K,
+        floor_contains: impl Fn([f64; 3], f64) -> bool,
+    ) -> bool {
+        self.entries
+            .get(&id)
+            .is_some_and(|entry| grounded(&entry.state, &floor_contains))
+    }
+
     pub(crate) fn quiet_objects(&self) -> usize {
         self.entries
             .values()
@@ -115,6 +136,7 @@ impl<K: Copy + Eq + Hash> SleepTracker<K> {
         let indices: HashMap<_, _> = ids.iter().enumerate().map(|(i, id)| (*id, i)).collect();
         assert_eq!(indices.len(), ids.len(), "unique simulation identities");
         let mut activation = Activation {
+            geometry: None,
             woken: vec![false; ids.len()],
             sleeping: ids
                 .iter()
@@ -170,6 +192,19 @@ impl<K: Copy + Eq + Hash> SleepTracker<K> {
             for j in i + 1..pieces.len() {
                 let contact = if activation.sleeping[i] && activation.sleeping[j] {
                     before_neighbors[i].contains(&j)
+                } else if let Some(geometry) = activation
+                    .geometry
+                    .as_ref()
+                    .and_then(|rows| rows[i][j].as_ref())
+                {
+                    same_environment(&pieces[i], &pieces[j])
+                        && length(sub(pieces[j].position, pieces[i].position))
+                            <= pieces[i].radius + pieces[j].radius + CONTACT_GAP_METERS
+                        && convex::near_projected_contact(
+                            geometry,
+                            sub(pieces[j].position, pieces[i].position),
+                            CONTACT_GAP_METERS,
+                        )
                 } else {
                     near_contact(&pieces[i], &pieces[j])
                 };
@@ -346,6 +381,10 @@ mod tests {
         let mut objects = vec![cube(0.0, 0.1), cube(0.0, 0.30001), cube(2.0, 0.1)];
         let mut tracker = SleepTracker::default();
         settle(&[10, 20, 30], &mut objects, &mut tracker);
+        assert_eq!(tracker.contact_neighbors(10), &[20]);
+        assert!(tracker.environment_supported(10, |_, _| true));
+        assert!(!tracker.environment_supported(20, |_, _| true));
+        assert!(!tracker.environment_supported(999, |_, _| true));
         let isolated = objects[2].clone();
         let mut remaining = vec![objects[2].clone(), objects[1].clone()];
         let stats = advance_with_sleep(

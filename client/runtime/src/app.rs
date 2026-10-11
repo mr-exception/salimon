@@ -801,7 +801,13 @@ impl ClientApplication {
                     match result {
                         Err(error) => self.fail(event_loop, error),
                         Ok(true) => event_loop.exit(),
-                        Ok(false) => window.request_redraw(),
+                        Ok(false) => {
+                            if self.benchmark.as_ref().is_some_and(|b| b.switch_camera()) {
+                                self.character
+                                    .apply_mouse_delta(std::f64::consts::PI / 0.0022, 0.0);
+                            }
+                            window.request_redraw();
+                        }
                     }
                     return;
                 }

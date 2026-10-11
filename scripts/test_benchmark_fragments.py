@@ -1,12 +1,13 @@
 """Benchmark reporting contracts, including incompatible/failed baseline rejection."""
 import copy
+import sys
 import unittest
 import json
 import tempfile
 from unittest.mock import patch
 from pathlib import Path
 from salimon_test import parse_scenario, ScenarioError
-from benchmark_fragments import compare, distribution, summarize, main
+from benchmark_fragments import compare, distribution, summarize, main, prepared_batch
 
 
 class BenchmarkTests(unittest.TestCase):
@@ -132,3 +133,34 @@ class BenchmarkTests(unittest.TestCase):
         current["cases"][0]["config"]["count"] = 10
         with self.assertRaises(ValueError):
             compare(current, baseline, .2)
+
+
+class PreparationLifecycleTests(unittest.TestCase):
+    def test_all_preparations_finish_before_any_measurement_starts(self):
+        script = """import sys, time
+from pathlib import Path
+path, name, delay = sys.argv[1:4]
+time.sleep(float(delay))
+with Path(path).open('a') as log: log.write(name + ':ready\\n')
+print('SALIMON_BENCHMARK_PREPARED', file=sys.stderr, flush=True)
+assert sys.stdin.readline().strip() == 'SALIMON_BENCHMARK_START'
+with Path(path).open('a') as log: log.write(name + ':start\\n')
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            log = root / 'events'
+            jobs = [{'name': name, 'command': [sys.executable, '-c', script, str(log), name, delay]}
+                    for name, delay in [('a', '0'), ('b', '.1')]]
+            self.assertEqual(prepared_batch(jobs, root, 5), {'a': None, 'b': None})
+            events = log.read_text().splitlines()
+            self.assertEqual(set(events[:2]), {'a:ready', 'b:ready'})
+            self.assertEqual(events[2:], ['a:start', 'b:start'])
+
+    def test_early_exit_and_readiness_timeout_are_failures(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            jobs = [{'name': 'exit', 'command': [sys.executable, '-c', 'raise SystemExit(2)']},
+                    {'name': 'stall', 'command': [sys.executable, '-c', 'import time; time.sleep(30)']}]
+            outcomes = prepared_batch(jobs, root, .2)
+            self.assertIn('exited 2 before native readiness', outcomes['exit'])
+            self.assertIn('preparation exceeded', outcomes['stall'])

@@ -87,9 +87,78 @@ pub(crate) fn advance_measured(
     if elapsed <= 0.0 {
         return measurements;
     }
+    let pieces = snapshots(tool, frame, player);
+    if pieces.is_empty() {
+        tool.fragment_sleep = salimon_physics::SleepTracker::default();
+        if let Some(start) = started {
+            measurements.total_time = start.elapsed();
+            measurements.adapter_time = measurements.total_time;
+        }
+        return measurements;
+    }
+    let mut states: Vec<_> = pieces.iter().map(|(_, state)| state.clone()).collect();
+    let solver_start = profile.then(Instant::now);
+    let contains = |position, radius| ship_floor_placement(position, radius).is_some();
+    let ids: Vec<_> = pieces.iter().map(|(p, _)| p.id()).collect();
+    measurements.solver = salimon_physics::advance_with_sleep(
+        &mut tool.fragment_sleep,
+        &ids,
+        &mut states,
+        delta,
+        contains,
+        profile,
+    );
+    if profile {
+        measurements.moving_objects = states
+            .iter()
+            .filter(|p| length(p.velocity) >= 0.015 || length(p.angular_velocity) >= 0.015)
+            .count();
+    }
+    let solver_time = solver_start
+        .map(|start| start.elapsed())
+        .unwrap_or_default();
+    for ((fragment, _), piece) in pieces.into_iter().zip(states) {
+        tool.fragment_motion.insert(
+            fragment.id(),
+            FragmentMotion {
+                velocity: piece.velocity,
+                angular_velocity: piece.angular_velocity,
+                ship_orientation: matches!(piece.surface, Surface::Floor { .. })
+                    .then_some(piece.orientation),
+            },
+        );
+        let position = if matches!(piece.surface, Surface::Floor { .. }) {
+            tool.ship_fragments.insert(fragment.id(), piece.position);
+            frame.local_to_world(piece.position)
+        } else {
+            piece.position
+        };
+        let pose = ResourceTransform::new(
+            WorldPosition::new(position[0], position[1], position[2]),
+            if matches!(piece.surface, Surface::Floor { .. }) {
+                to_world_orientation(frame, piece.orientation)
+            } else {
+                piece.orientation
+            },
+        )
+        .expect("finite fragment physics pose");
+        tool.session.move_loose(fragment.id(), pose);
+    }
+    if let Some(start) = started {
+        measurements.total_time = start.elapsed();
+        measurements.adapter_time = measurements.total_time.saturating_sub(solver_time);
+    }
+    measurements
+}
+
+/// Canonical production adapter input; also used for identical-snapshot solver replay.
+pub(crate) fn snapshots(
+    tool: &MiningTool,
+    frame: ShipFrame,
+    player: [f64; 3],
+) -> Vec<(salimon_world::resources::ResourceFragment, ObjectState)> {
     let carried = tool.session.carried_id();
-    let pieces: Vec<_> = tool
-        .session
+    tool.session
         .fragments()
         .iter()
         .copied()
@@ -153,68 +222,7 @@ pub(crate) fn advance_measured(
                 },
             )
         })
-        .collect();
-    if pieces.is_empty() {
-        tool.fragment_sleep = salimon_physics::SleepTracker::default();
-        if let Some(start) = started {
-            measurements.total_time = start.elapsed();
-            measurements.adapter_time = measurements.total_time;
-        }
-        return measurements;
-    }
-    let mut states: Vec<_> = pieces.iter().map(|(_, state)| state.clone()).collect();
-    let solver_start = profile.then(Instant::now);
-    let contains = |position, radius| ship_floor_placement(position, radius).is_some();
-    let ids: Vec<_> = pieces.iter().map(|(p, _)| p.id()).collect();
-    measurements.solver = salimon_physics::advance_with_sleep(
-        &mut tool.fragment_sleep,
-        &ids,
-        &mut states,
-        delta,
-        contains,
-        profile,
-    );
-    if profile {
-        measurements.moving_objects = states
-            .iter()
-            .filter(|p| length(p.velocity) >= 0.015 || length(p.angular_velocity) >= 0.015)
-            .count();
-    }
-    let solver_time = solver_start
-        .map(|start| start.elapsed())
-        .unwrap_or_default();
-    for ((fragment, _), piece) in pieces.into_iter().zip(states) {
-        tool.fragment_motion.insert(
-            fragment.id(),
-            FragmentMotion {
-                velocity: piece.velocity,
-                angular_velocity: piece.angular_velocity,
-                ship_orientation: matches!(piece.surface, Surface::Floor { .. })
-                    .then_some(piece.orientation),
-            },
-        );
-        let position = if matches!(piece.surface, Surface::Floor { .. }) {
-            tool.ship_fragments.insert(fragment.id(), piece.position);
-            frame.local_to_world(piece.position)
-        } else {
-            piece.position
-        };
-        let pose = ResourceTransform::new(
-            WorldPosition::new(position[0], position[1], position[2]),
-            if matches!(piece.surface, Surface::Floor { .. }) {
-                to_world_orientation(frame, piece.orientation)
-            } else {
-                piece.orientation
-            },
-        )
-        .expect("finite fragment physics pose");
-        tool.session.move_loose(fragment.id(), pose);
-    }
-    if let Some(start) = started {
-        measurements.total_time = start.elapsed();
-        measurements.adapter_time = measurements.total_time.saturating_sub(solver_time);
-    }
-    measurements
+        .collect()
 }
 
 pub(crate) fn fragment_hull(

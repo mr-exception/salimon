@@ -578,5 +578,8 @@ wall-clock sampling remains separate from fixed-step automation.
 Loaded acceptance scenarios may add `fragment_settle_steps` to setup, using the
 same production preparation as settled benchmarks before renderer readiness.
 `world.sleeping_fragment_count` and per-fragment `sleeping` observe the last
-completed update; carrying is excluded. See the benchmark guide for limits and
+completed update; carrying is excluded. `contact_fragment_ids` and
+`environment_supported` expose that completed support snapshot; they are observers,
+not controls. Ship-local positions use stored anchors to avoid round-trip world
+precision loss in inspection. See the benchmark guide for limits and
 startup-deadline requirements.

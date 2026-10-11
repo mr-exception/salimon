@@ -15,7 +15,11 @@ hull retains the previous sphere response for compatible callers.
 Pair projection axes remove numerical parallel repeats in generation order with
 1e-9 component bins. Support-graph queries test the same face/crossed-edge SAT
 axes, stopping at the first separating axis without allocating a response
-manifold. These preserve convex separation; no sphere approximation is introduced.
+manifold. Support detection reuses the last substep's cached SAT spans when
+available: orientation and scale remain constant through positional contact
+corrections, and the final graph checks the updated center separation. Missing
+cached pairs still use full SAT. These preserve convex separation; no sphere
+approximation is introduced.
 
 `Surface::Sphere` supplies radial 9.81 m/s² gravity and local tangent support.
 `Floor` supplies +Y gravity and one ship-local deck height; a pure containment
@@ -29,6 +33,19 @@ passes, projects penetration and applies mass-weighted normal/friction impulses
 with angular response. Inertia is an isotropic approximation from mass and
 bounding radius, not an exact volume integral. Ground contacts use authored
 support points, allowing tilted objects to tip; damping bounds residual motion.
+Supporting ground faces use their near-coplanar vertices. Pair face contacts
+clip the two support polygons in the contact tangent plane, then solve normal
+constraints at the intersection corners. Sixteen local projected iterations
+accumulate nonnegative impulses and can undo an excess corner impulse; a single
+center reaction cannot balance an off-center load in a stack. Face/edge contacts retain the clipped segment's endpoints; vertex contacts
+retain one reaction arm. Ground edges use both supporting vertices. Distributed
+friction uses the updated contact velocity at each point, with 16 local projected
+iterations and a Coulomb disk capped at 0.65 of that point's accumulated normal
+impulse. Faces and edges resist twist as well as translation. Ground friction
+uses the solved normal load, including supported cargo, rather than only the
+body's own weight. The legacy sphere response is unchanged. Pair velocity constraints remain active across a 20 µm
+contact skin around the 10 µm positional bias, preventing correction from
+prematurely dropping a loaded velocity constraint.
 Positional separation respects a convex body's existing deck support: downward
 correction is projected onto its available horizontal directions, and remaining
 normal separation goes to its neighbor. This prevents subsequent deck projection
@@ -115,6 +132,10 @@ identities; input/adjacency order determines stepping and island traversal.
 `StepStats.activation_time` separates stable-ID validation plus post-solve
 contact graph/dwell work from integration and contact response. Swept wake
 checks within the solver remain included in total solver wall cost.
+`contact_neighbors(id)` and `environment_supported(id, floor_contains)` observe
+the last completed contact/support snapshot without changing it; absent entries
+have no contacts or support. E2E uses these to choose an actual single-support
+removal, rather than guessing from bounding distances.
 `quiet_objects` reports bodies that passed dwell, including those kept awake by
 another unstable island member. `is_sleeping(id)` observes the last completed
 update; absent identities report false.

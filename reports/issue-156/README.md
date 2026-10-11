@@ -29,10 +29,40 @@ Native work identified and fixes:
 - Deduplicate numerical parallel SAT axes and short-circuit support-graph SAT.
   Native sampling identified projection/face/graph work as the dominant cost.
 
-Quality checks passed on this machine: 425 Rust tests, one existing ignored GPU
-backend test; 46 Python runner tests; workspace build, formatting and Clippy.
-A prior native build passed all 17 standard scenarios / 1,712 steps. Final native
-matrix and loaded-route results will replace this pending status after validation.
+Current workspace gates: **334 Rust tests passed, one existing ignored GPU
+backend test**, 48 Python runner tests, release build, formatting and Clippy.
+The current physics owner has 35 passing tests. The preceding native build
+passed all 17 standard scenarios / 1,712 steps; the final build's suite is running.
+Native two-camera/repeat/barrier smoke checks passed all eight 0/10 windows;
+100 identical-snapshot 10-fragment solver replays retained full sleep, zero
+integration and zero pair visits against 1,440 stateless pair visits per replay.
+These small-load checks validate tooling, not the required 500/1,000 acceptance.
+
+Additional native investigation repaired loaded-face constraints: a three-body
+off-center stack failed to sleep with one pair reaction point. Clipped face/edge
+normal constraints fix that regression. A separate twist regression proved that
+center-only friction left yaw unaffected except for damping; per-point Coulomb
+friction now resists twist while preserving momentum and dissipating energy.
+The support graph reuses the final substep's SAT spans for unchanged orientation
+and scale, testing final center separation rather than rebuilding those spans.
+
+The 100-fragment authored dense fixture reached complete natural sleep after
+972 x 16 ms production updates (15.552 simulation seconds) on the intermediate
+build. Fast rotating flight/landing/takeoff passed for 10 naturally sleeping
+native fragments. These are progress checks; neither substitutes for a verified
+settled dense 500/1,000 native window. Large-load preparation remains the blocker.
+[Native 100-fragment loaded correctness](native-100-acceptance.json) now passes:
+fast rotating 25,000 m/s flight, landing/takeoff, zero stored-anchor drift,
+real F removal of support ID 2 with dependent ID 78 falling, an unrelated
+sleeping island, mining lockout, three pickup/drop cycles and unchanged IDs/mass.
+Support candidates come from the completed physics contact graph and actual
+environmental support, not a nearby-above distance guess. This is fixed-delta
+correctness through the native application; it is not an FPS measurement or
+500/1,000 loaded acceptance.
+
+No unsuccessful, killed, or incomplete preparation is reported as a passed
+benchmark. The final native matrix and loaded-route results must replace this
+pending status before #156 can close.
 
 The original implementation report below is historical container evidence from
 PR #164 / `b52f2f0`, recorded 2026-10-10; it is not current native acceptance.

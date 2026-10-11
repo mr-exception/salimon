@@ -15,11 +15,20 @@ pub(crate) struct Config {
     pub(crate) seed: u64,
     pub(crate) active: bool,
     pub(crate) away: bool,
+    pub(crate) both_cameras: bool,
     pub(crate) headless: bool,
     pub(crate) warmup_seconds: u64,
     pub(crate) sample_seconds: u64,
     pub(crate) settle_steps: u64,
     pub(crate) repeats: usize,
+    pub(crate) defer_start: bool,
+    pub(crate) baseline_samples: usize,
+}
+
+impl Config {
+    fn windows(self) -> usize {
+        self.repeats * if self.both_cameras { 2 } else { 1 }
+    }
 }
 
 pub(crate) fn parse(args: &[String]) -> Result<Config, String> {
@@ -29,11 +38,14 @@ pub(crate) fn parse(args: &[String]) -> Result<Config, String> {
         seed: 155,
         active: false,
         away: false,
+        both_cameras: false,
         headless: false,
         warmup_seconds: 10,
         sample_seconds: 30,
         settle_steps: 0,
         repeats: 1,
+        defer_start: false,
+        baseline_samples: 0,
     };
     let mut seen = std::collections::BTreeSet::new();
     let mut args = args.iter();
@@ -70,10 +82,11 @@ pub(crate) fn parse(args: &[String]) -> Result<Config, String> {
                 }
             }
             "--camera" => {
+                config.both_cameras = value == "both";
                 config.away = match value.as_str() {
-                    "facing" => false,
+                    "facing" | "both" => false,
                     "away" => true,
-                    _ => return Err("camera must be facing or away".into()),
+                    _ => return Err("camera must be facing, away or both".into()),
                 }
             }
             "--mode" => {
@@ -108,6 +121,20 @@ pub(crate) fn parse(args: &[String]) -> Result<Config, String> {
                 }
                 config.repeats = repeats as usize;
             }
+            "--defer-start" => {
+                config.defer_start = match value.as_str() {
+                    "true" => true,
+                    "false" => false,
+                    _ => return Err("defer start must be true or false".into()),
+                }
+            }
+            "--baseline-samples" => {
+                let samples = integer()?;
+                if samples > 1000 {
+                    return Err("baseline samples must be 0..1000".into());
+                }
+                config.baseline_samples = samples as usize;
+            }
             _ => return Err(format!("unknown benchmark option {key}")),
         }
     }
@@ -116,6 +143,14 @@ pub(crate) fn parse(args: &[String]) -> Result<Config, String> {
     }
     if config.active && config.repeats != 1 {
         return Err("active initial conditions require separate fresh-process repeats".into());
+    }
+    if config.both_cameras && (config.active || config.headless) {
+        return Err("both cameras requires a settled native population".into());
+    }
+    if config.baseline_samples > 0
+        && (config.active || config.settle_steps == 0 || config.count == 0)
+    {
+        return Err("solver baseline requires a naturally pre-settled nonempty population".into());
     }
     Ok(config)
 }
@@ -129,6 +164,19 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
             .apply_mouse_delta(std::f64::consts::PI / 0.0022, 0.0);
     }
     app.character.apply_mouse_delta(0.0, 220.0);
+    if config.defer_start {
+        // Explicit runner barrier before creating a native window or starting
+        // clocks. Other fixtures can prepare concurrently, then all CPU work
+        // stops while each real native sampling window runs alone.
+        eprintln!("SALIMON_BENCHMARK_PREPARED");
+        let mut input = String::new();
+        std::io::stdin()
+            .read_line(&mut input)
+            .map_err(|e| format!("benchmark start: {e}"))?;
+        if input.trim_end() != "SALIMON_BENCHMARK_START" {
+            return Err("expected SALIMON_BENCHMARK_START on stdin".into());
+        }
+    }
     Ok(())
 }
 
@@ -154,9 +202,13 @@ pub(crate) struct Recorder {
     observed: usize,
     stride: usize,
     completed: Vec<Value>,
+    baseline: Option<Value>,
 }
 
 impl Recorder {
+    pub(crate) fn switch_camera(&self) -> bool {
+        self.config.both_cameras && self.completed.len() == self.config.repeats
+    }
     pub(crate) fn new(config: Config, app: &ClientApplication) -> Self {
         Self {
             config,
@@ -170,6 +222,7 @@ impl Recorder {
             observed: 0,
             stride: 1,
             completed: Vec::new(),
+            baseline: solver_baseline(config, app),
         }
     }
     pub(crate) fn set_renderer(
@@ -189,6 +242,11 @@ impl Recorder {
         simulation: Duration,
         render: Option<RenderStats>,
     ) -> bool {
+        // The first redraw can have zero simulation delta and no completed
+        // physics observation. Do not report default zero counters as a wake.
+        if delta.is_zero() {
+            return false;
+        }
         let now = Instant::now();
         let start = *self.started.get_or_insert(now);
         let interval = self
@@ -250,17 +308,18 @@ impl Recorder {
         let output = json!({"schema": 1, "mode": if self.config.headless { "physics_wall_clock" } else { "native_wall_clock" },
             "config": {"count": self.config.count, "layout": self.config.layout.name(), "seed": self.config.seed,
                 "initial_state": if self.config.active { "active" } else { "settled_requested" },
-                "camera": if self.config.away { "away" } else { "facing" },
+                "camera": if self.config.away || (self.config.both_cameras && self.completed.len() >= self.config.repeats) { "away" } else { "facing" },
                 "warmup_seconds": self.config.warmup_seconds, "sample_seconds": self.config.sample_seconds,
                 "settle_steps_limit": self.config.settle_steps},
             "renderer": self.info, "accounting": self.initial, "accounting_preserved": true,
+            "solver_baseline": self.baseline,
             "updates_observed": self.observed, "sampling_stride": self.stride,
             "elapsed_seconds": self.started.map(|s| s.elapsed().as_secs_f64()),
             "samples": samples});
         self.completed.push(output);
-        self.finished = self.completed.len() == self.config.repeats;
+        self.finished = self.completed.len() == self.config.windows();
         if self.finished {
-            if self.config.repeats == 1 {
+            if self.config.windows() == 1 {
                 println!("{}", self.completed[0]);
             } else {
                 println!("{}", json!({"schema": 2, "runs": self.completed}));
@@ -274,6 +333,67 @@ impl Recorder {
         }
         Ok(self.finished)
     }
+}
+
+fn solver_baseline(config: Config, app: &ClientApplication) -> Option<Value> {
+    if config.baseline_samples == 0 {
+        return None;
+    }
+    let frame = character_ship_frame(app.ship.snapshot().pose);
+    let eye = app
+        .character
+        .snapshot(frame, surface_frame_for_ship(app.ship.snapshot()))
+        .eye_position_meters;
+    let snapshots = crate::fragment_physics::snapshots(&app.mining, frame, eye);
+    assert_eq!(snapshots.len(), config.count);
+    let ids: Vec<_> = snapshots.iter().map(|(p, _)| p.id()).collect();
+    assert!(
+        ids.iter()
+            .all(|id| app.mining.fragment_sleep.is_sleeping(*id))
+    );
+    let initial: Vec<_> = snapshots.iter().map(|(_, p)| p.clone()).collect();
+    let contains =
+        |position, radius| salimon_character::ship_floor_placement(position, radius).is_some();
+    let mut samples = Vec::with_capacity(config.baseline_samples);
+    for _ in 0..config.baseline_samples {
+        // Identical naturally settled authored snapshot on both paths. Cloning
+        // replay inputs/cache is outside both timers and never mutates the game.
+        let mut baseline = initial.clone();
+        let mut sleeping = initial.clone();
+        let mut tracker = app.mining.fragment_sleep.clone();
+        let started = Instant::now();
+        let before =
+            salimon_physics::advance_profiled(&mut baseline, Duration::from_millis(16), contains);
+        let before_ms = ms(started.elapsed());
+        let started = Instant::now();
+        let after = salimon_physics::advance_with_sleep(
+            &mut tracker,
+            &ids,
+            &mut sleeping,
+            Duration::from_millis(16),
+            contains,
+            true,
+        );
+        let after_ms = ms(started.elapsed());
+        assert_eq!(sleeping, initial);
+        assert_eq!(after.sleeping_objects, config.count);
+        samples.push(json!({"stateless_ms": before_ms, "sleep_ms": after_ms,
+            "stateless_integrated_objects": before.integrated_objects, "sleep_integrated_objects": after.integrated_objects,
+            "stateless_pair_visits": before.pair_visits, "sleep_pair_visits": after.pair_visits,
+            "stateless_matrix_allocations": before.matrix_allocations, "sleep_matrix_allocations": after.matrix_allocations,
+            "sleeping_objects": after.sleeping_objects}));
+    }
+    eprintln!(
+        "solver baseline: {} identical-snapshot samples, 16 ms simulation delta",
+        samples.len()
+    );
+    Some(
+        json!({"mode": "cpu_solver_replay", "simulation_delta_ms": 16,
+        "cloning_timed": false, "samples": samples,
+        "initial_snapshot": snapshots.iter().map(|(p, s)| json!({"id":p.id().0,
+            "position":s.position,"orientation":s.orientation,"velocity":s.velocity,
+            "angular_velocity":s.angular_velocity,"side_meters":s.side_meters,"mass_kg":s.mass_kg})).collect::<Vec<_>>()}),
+    )
 }
 
 pub(crate) fn accounting(app: &ClientApplication) -> Value {
@@ -349,6 +469,53 @@ mod tests {
         assert!(recorder.finished);
     }
     #[test]
+    fn zero_delta_redraw_does_not_report_default_physics_counters() {
+        let config = parse(&[
+            "--benchmark".into(),
+            "--count".into(),
+            "0".into(),
+            "--warmup-seconds".into(),
+            "0".into(),
+        ])
+        .unwrap();
+        let mut recorder = Recorder::new(config, &ClientApplication::default());
+        assert!(!recorder.record(Duration::ZERO, Duration::ZERO, Duration::ZERO, None));
+        assert!(recorder.samples.is_empty());
+        assert!(recorder.started.is_none());
+    }
+
+    #[test]
+    fn both_cameras_get_separate_windows_and_one_transition() {
+        let config = parse(&[
+            "--benchmark".into(),
+            "--count".into(),
+            "0".into(),
+            "--repeats".into(),
+            "2".into(),
+            "--camera".into(),
+            "both".into(),
+            "--warmup-seconds".into(),
+            "0".into(),
+        ])
+        .unwrap();
+        let app = ClientApplication::default();
+        let mut recorder = Recorder::new(config, &app);
+        for index in 0..4 {
+            recorder.record(
+                Duration::from_millis(16),
+                Duration::ZERO,
+                Duration::ZERO,
+                None,
+            );
+            assert_eq!(recorder.finish(accounting(&app)).unwrap(), index == 3);
+            assert_eq!(recorder.switch_camera(), index == 1);
+            assert_eq!(
+                recorder.completed[index]["config"]["camera"],
+                if index < 2 { "facing" } else { "away" }
+            );
+        }
+    }
+    #[test]
     fn authored_dense_preparation_requires_natural_sleep_and_preserves_accounting() {
         let mut config = parse(&[
             "--benchmark".into(),
@@ -370,6 +537,16 @@ mod tests {
         config.settle_steps = 1200;
         initialize(&mut app, config).unwrap();
         assert_eq!(accounting(&app), expected);
+        config.baseline_samples = 2;
+        let baseline = solver_baseline(config, &app).unwrap();
+        assert_eq!(baseline["samples"].as_array().unwrap().len(), 2);
+        for sample in baseline["samples"].as_array().unwrap() {
+            assert_eq!(sample["sleeping_objects"], 10);
+            assert_eq!(sample["sleep_integrated_objects"], 0);
+            assert_eq!(sample["sleep_pair_visits"], 0);
+            assert!(sample["stateless_integrated_objects"].as_u64().unwrap() > 0);
+            assert!(sample["stateless_pair_visits"].as_u64().unwrap() > 0);
+        }
         let frame = character_ship_frame(app.ship.snapshot().pose);
         let eye = app
             .character
@@ -439,6 +616,9 @@ mod tests {
             vec!["--benchmark", "--repeats", "0"],
             vec!["--benchmark", "--repeats", "11"],
             vec!["--benchmark", "--repeats", "2", "--state", "active"],
+            vec!["--benchmark", "--camera", "both", "--state", "active"],
+            vec!["--benchmark", "--camera", "both", "--mode", "physics"],
+            vec!["--benchmark", "--defer-start", "yes"],
         ] {
             assert!(parse(&args.into_iter().map(str::to_owned).collect::<Vec<_>>()).is_err());
         }

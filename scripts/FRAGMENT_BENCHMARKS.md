@@ -53,6 +53,31 @@ checks the original IDs/mass, and appears separately in the summary with a
 retains schema 1. Active rows instead launch three fresh processes to repeat
 their initial moving state. Incomplete windows fail as a whole case.
 
+Native settled `--camera both` measures all facing repeats followed by all away
+repeats from the same naturally prepared population. Each camera gets its own
+warmup/sample windows. Active windows use fresh processes, so `both` is rejected
+for active and CPU-only launches.
+
+The matrix helper's `--prepare-workers 1..4` can prepare several native fixtures
+concurrently, then measure them **one at a time after all preparations finish**.
+Other prepared processes wait on stdin before creating a native window or
+starting clocks. Direct `--defer-start true` emits `SALIMON_BENCHMARK_PREPARED`
+and requires the exact stdin line `SALIMON_BENCHMARK_START`; default false keeps
+ordinary CLI behavior. Deadlines include preparation, the barrier and recording.
+This saves duplicated preparation without concurrent physics work contaminating
+native sample windows. `--capture-binary` may select the identical SHA-256 binary
+inside a local app bundle for the dense 500 capture surface.
+
+Optional matrix `--solver-baseline-samples 1..1000` replays the naturally settled
+dense 500/1000 snapshots through both stateless and cached solvers before native
+sampling. Direct CLI `--baseline-samples` also accepts smaller prepared fixtures
+for smoke checks. Each replay resets cloned input state outside its timer; the
+cached path must preserve exact poses and report all objects asleep. Raw
+`solver_baseline` includes authored snapshots, wall times, integration/pair/matrix
+counters and sleeping counts. This isolates solver work on identical geometry;
+it is a CPU comparison on the host, and does not provide a baseline native FPS.
+
+
 ## CPU wall-clock diagnosis and CI
 
 Without a native display:
@@ -147,3 +172,21 @@ CI checks deterministic accounting/order/counters, not hardware timing threshold
 Before/after optimization reports should compare pair/candidate counts separately
 from storage/allocation counters so allocation removal and filtering remain
 attributable. A dense pile can still require quadratic contact work.
+
+
+## Native loaded sleep acceptance (#156)
+
+`scripts/fragment_sleep_acceptance.py` uses the normal protocol-1 controller
+routes after bounded natural preparation. It verifies fast rotating flight,
+landing/takeoff, stable anchors, IDs/material/mass and full sleep. `--carrying`
+also requires actual F removal of a single-support bottom body, dependent fall,
+an unrelated sleeping island, mining lockout and three pickup/drop cycles. It
+walks through the controller to reach cargo; no poses or sleep flags are installed.
+Failures remain failures in its JSON summary and process exit status.
+
+```sh
+python3 scripts/fragment_sleep_acceptance.py --binary artifacts/build/release/salimon-client --counts 500 1000 --layout dense --settle-steps 2400 --timeout 14400 --carrying --output artifacts/fragment-sleep-acceptance
+```
+
+This opt-in route does not replace the standard native suite or benchmark matrix.
+Inspect protocol logs and exact counters before promoting a run as evidence.

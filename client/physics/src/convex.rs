@@ -156,6 +156,30 @@ impl ConvexHull {
         }
         nearest
     }
+
+    /// A resting face needs several normal constraints to resist pitch/roll
+    /// under an off-center load. A single reaction beneath its own COM cannot
+    /// oppose that torque. Faces/edges use their actual near-coplanar vertices;
+    /// a vertex retains the existing reaction arm and can still tip.
+    pub(crate) fn ground_arms(
+        &self,
+        orientation: [f64; 4],
+        side: f64,
+        direction: [f64; 3],
+    ) -> Vec<[f64; 3]> {
+        let extreme = self.support(orientation, side, direction);
+        let points: Vec<_> = self
+            .vertices
+            .iter()
+            .map(|v| rotate(orientation, scale(*v, side)))
+            .filter(|p| dot(*p, direction) >= extreme - SUPPORT_FEATURE_TOLERANCE * side)
+            .collect();
+        if points.len() < 2 {
+            vec![self.ground_arm(orientation, side, direction)]
+        } else {
+            points
+        }
+    }
 }
 
 fn push_axis(axes: &mut Vec<[f64; 3]>, axis: [f64; 3]) {
@@ -298,6 +322,18 @@ pub(crate) fn projections(a: &super::ObjectState, b: &super::ObjectState) -> Vec
         .collect()
 }
 
+/// Reuse orientation/scale spans after center-only contact corrections.
+pub(crate) fn near_projected_contact(
+    projections: &[Projection],
+    offset: [f64; 3],
+    gap: f64,
+) -> bool {
+    projections.iter().all(|p| {
+        let shift = dot(offset, p.axis);
+        p.forward - shift >= -gap && p.backward + shift >= -gap
+    })
+}
+
 /// Full SAT with a small support-gap tolerance; spheres alone never anchor sleep.
 pub(crate) fn near_contact(a: &super::ObjectState, b: &super::ObjectState, gap: f64) -> bool {
     if separated_by_faces_with_gap(a, b, gap) {
@@ -356,7 +392,12 @@ pub(crate) fn projected_contact(
         let shift = dot(offset, p.axis);
         let forward = p.forward - shift;
         let backward = p.backward + shift;
-        if forward < 0.0 || backward < 0.0 {
+        // Position separation leaves a 10 um bias. Keep velocity constraints
+        // participating across that bias during later passes; otherwise a light
+        // supported body receives only one impulse from a heavy upper body and
+        // the upper body retains an artificial downward terminal velocity.
+        let skin = 2.0 * crate::CONTACT_BIAS_METERS;
+        if forward < -skin || backward < -skin {
             return None;
         }
         let candidate = if forward <= backward {
@@ -432,6 +473,125 @@ pub(crate) fn contact_arms(
     (point, sub(point, offset))
 }
 
+/// Intersect the two supporting faces in the contact tangent plane. Normal
+/// constraints at the actual polygon corners balance loads without inventing
+/// support outside either hull. A face/edge intersection keeps both segment
+/// endpoints; vertex contacts retain one reaction arm.
+pub(crate) fn contact_manifold(
+    a: &super::ObjectState,
+    b: &super::ObjectState,
+    normal: [f64; 3],
+) -> Vec<([f64; 3], [f64; 3])> {
+    let offset = sub(b.position, a.position);
+    let seed = if normal[1].abs() < 0.9 {
+        [0.0, 1.0, 0.0]
+    } else {
+        [1.0, 0.0, 0.0]
+    };
+    let tangent = cross(normal, seed);
+    let tangent = scale(tangent, 1.0 / length(tangent));
+    let bitangent = cross(normal, tangent);
+    let feature = |p: &super::ObjectState, direction| {
+        let hull = p.hull.as_ref().expect("convex caller");
+        let support = hull.support(p.orientation, p.side_meters, direction);
+        hull.vertices
+            .iter()
+            .map(|v| rotate(p.orientation, scale(*v, p.side_meters)))
+            .filter(|v| dot(*v, direction) >= support - p.side_meters * SUPPORT_FEATURE_TOLERANCE)
+            .collect::<Vec<_>>()
+    };
+    let av = feature(a, normal);
+    let bv: Vec<_> = feature(b, scale(normal, -1.0))
+        .into_iter()
+        .map(|v| add(v, offset))
+        .collect();
+    let fallback = || vec![contact_arms(a, b, normal)];
+    if av.len() < 2 || bv.len() < 2 {
+        return fallback();
+    }
+    let project = |v| [dot(v, tangent), dot(v, bitangent)];
+    let mut polygon = tangent_hull(av.iter().copied().map(project).collect());
+    let mut clip = tangent_hull(bv.iter().copied().map(project).collect());
+    if clip.len() == 2 && polygon.len() >= 3 {
+        std::mem::swap(&mut polygon, &mut clip);
+    }
+    if polygon.len() < 2 || clip.len() < 3 {
+        return fallback();
+    }
+    for i in 0..clip.len() {
+        let start = clip[i];
+        let end = clip[(i + 1) % clip.len()];
+        let distance = |p| cross2(start, end, p);
+        let input = std::mem::take(&mut polygon);
+        if input.is_empty() {
+            return fallback();
+        }
+        let mut previous = *input.last().expect("nonempty polygon");
+        let mut previous_distance = distance(previous);
+        for current in input {
+            let current_distance = distance(current);
+            if (current_distance >= 0.0) != (previous_distance >= 0.0) {
+                let t = previous_distance / (previous_distance - current_distance);
+                polygon.push(std::array::from_fn(|axis| {
+                    previous[axis] + t * (current[axis] - previous[axis])
+                }));
+            }
+            if current_distance >= 0.0 {
+                polygon.push(current);
+            }
+            previous = current;
+            previous_distance = current_distance;
+        }
+    }
+    polygon = tangent_hull(polygon);
+    if polygon.len() < 2 {
+        return fallback();
+    }
+    let height = (dot(av[0], normal) + dot(bv[0], normal)) * 0.5;
+    polygon
+        .into_iter()
+        .map(|p| {
+            let point = add(
+                scale(normal, height),
+                add(scale(tangent, p[0]), scale(bitangent, p[1])),
+            );
+            (point, sub(point, offset))
+        })
+        .collect()
+}
+
+fn cross2(a: [f64; 2], b: [f64; 2], c: [f64; 2]) -> f64 {
+    (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
+}
+
+fn tangent_hull(mut points: Vec<[f64; 2]>) -> Vec<[f64; 2]> {
+    points.sort_by(|a, b| a[0].total_cmp(&b[0]).then(a[1].total_cmp(&b[1])));
+    points.dedup_by(|a, b| (a[0] - b[0]).abs() < 1e-12 && (a[1] - b[1]).abs() < 1e-12);
+    if points.len() < 3 {
+        return points;
+    }
+    let mut lower = Vec::new();
+    let mut upper = Vec::new();
+    for &p in &points {
+        while lower.len() >= 2 && cross2(lower[lower.len() - 2], lower[lower.len() - 1], p) <= 1e-14
+        {
+            lower.pop();
+        }
+        lower.push(p);
+    }
+    for &p in points.iter().rev() {
+        while upper.len() >= 2 && cross2(upper[upper.len() - 2], upper[upper.len() - 1], p) <= 1e-14
+        {
+            upper.pop();
+        }
+        upper.push(p);
+    }
+    lower.pop();
+    upper.pop();
+    lower.extend(upper);
+    lower
+}
+
 /// Unit quaternion from right-handed orthonormal basis columns.
 pub fn orientation_from_axes(axes: [[f64; 3]; 3]) -> [f64; 4] {
     let m = |row: usize, column: usize| axes[column][row];
@@ -504,9 +664,188 @@ mod tests {
         advance(&mut pieces, Duration::from_millis(1), |_, _| true);
         assert!((pieces[0].position[1] - 0.2).abs() < 1e-9);
         assert!((pieces[1].position[1] - 0.60001).abs() < 1e-6);
-        assert!(contact(&pieces[0], &pieces[1]).is_none());
+        assert!(!near_contact(&pieces[0], &pieces[1], 0.0));
+        // The velocity solver retains contact across its separation bias.
+        assert!(contact(&pieces[0], &pieces[1]).unwrap().1 <= 0.0);
         assert_eq!(pieces[0].mass_kg, 0.5);
         assert_eq!(pieces[1].mass_kg, 2.0);
+    }
+
+    #[test]
+    fn resting_face_balances_an_off_center_load_without_rocking() {
+        let mut bottom = object([0.0, 0.1, 0.0], [0.3, 0.1, 0.3]);
+        bottom.mass_kg = 0.5;
+        let top = object([0.15, 0.35, 0.0], [0.1; 3]);
+        let mut pieces = [bottom, top];
+        let mut tracker = crate::SleepTracker::default();
+        for _ in 0..360 {
+            crate::advance_with_sleep(
+                &mut tracker,
+                &[1, 2],
+                &mut pieces,
+                Duration::from_millis(16),
+                |_, _| true,
+                false,
+            );
+        }
+        assert!(
+            tracker.is_sleeping(1) && tracker.is_sleeping(2),
+            "{:?}",
+            pieces
+                .iter()
+                .map(|p| (p.position, p.velocity, p.angular_velocity, p.orientation))
+                .collect::<Vec<_>>()
+        );
+        assert!(pieces[0].orientation[0].abs() < 0.005);
+        assert!(pieces[0].orientation[2].abs() < 0.005);
+        assert!((pieces[0].position[1] - 0.1).abs() < 0.001);
+        assert!((pieces[1].position[1] - 0.3).abs() < 0.002);
+    }
+
+    #[test]
+    fn asymmetric_resting_face_supports_its_center_of_mass() {
+        let bottom = object([0.0, 0.1, 0.0], [0.5, 0.1, 0.5]);
+        let mut top = object([0.0, 0.35, 0.0], [0.4; 3]);
+        top.hull =
+            Some(Arc::new(ConvexHull::new([-0.1, 0.1].into_iter().flat_map(
+                |y| [[-0.1, y, -0.2], [0.3, y, -0.2], [0.05, y, 0.4]],
+            ))));
+        let mut pieces = [bottom, top];
+        let mut tracker = crate::SleepTracker::default();
+        for _ in 0..360 {
+            crate::advance_with_sleep(
+                &mut tracker,
+                &[1, 2],
+                &mut pieces,
+                Duration::from_millis(16),
+                |_, _| true,
+                false,
+            );
+        }
+        assert!(tracker.is_sleeping(1) && tracker.is_sleeping(2));
+        assert!(pieces[1].orientation[0].abs() < 0.005);
+        assert!(pieces[1].orientation[2].abs() < 0.005);
+        assert!((pieces[1].position[1] - 0.3).abs() < 0.002);
+    }
+
+    #[test]
+    fn supported_face_in_a_stack_balances_an_off_center_load() {
+        let bottom = object([0.0, 0.1, 0.0], [0.5, 0.1, 0.5]);
+        let mut middle = object([0.0, 0.3, 0.0], [0.3, 0.1, 0.3]);
+        middle.mass_kg = 0.5;
+        let top = object([0.15, 0.55, 0.0], [0.1; 3]);
+        let mut pieces = [bottom, middle, top];
+        let mut tracker = crate::SleepTracker::default();
+        for _ in 0..360 {
+            crate::advance_with_sleep(
+                &mut tracker,
+                &[1, 2, 3],
+                &mut pieces,
+                Duration::from_millis(16),
+                |_, _| true,
+                false,
+            );
+        }
+        assert!((1..=3).all(|id| tracker.is_sleeping(id)), "{:?}", pieces);
+        assert!(pieces[1].orientation[0].abs() < 0.005);
+        assert!(pieces[1].orientation[2].abs() < 0.005);
+        assert!((pieces[2].position[1] - 0.5).abs() < 0.002);
+    }
+
+    #[test]
+    fn face_manifold_corners_stay_inside_both_rotated_support_faces() {
+        let a = object([0.0, 0.1, 0.0], [0.3, 0.1, 0.3]);
+        let mut b = object([0.15, 0.3, 0.05], [0.25, 0.1, 0.2]);
+        b.orientation = [0.0, 0.37_f64.sin(), 0.0, 0.37_f64.cos()];
+        let arms = contact_manifold(&a, &b, [0.0, 1.0, 0.0]);
+        assert!(arms.len() >= 3);
+        for (aa, ba) in arms {
+            assert!(aa[0].abs() <= 0.3 + 1e-12 && aa[2].abs() <= 0.3 + 1e-12);
+            let local_b = rotate([0.0, -b.orientation[1], 0.0, b.orientation[3]], ba);
+            assert!(local_b[0].abs() <= 0.25 + 1e-12 && local_b[2].abs() <= 0.2 + 1e-12);
+            assert!(length(sub(add(a.position, aa), add(b.position, ba))) < 1e-12);
+        }
+    }
+
+    #[test]
+    fn supporting_edge_balances_a_load_along_its_length() {
+        let mut bottom = object([0.0, 0.2, 0.0], [0.5, 0.2, 0.5]);
+        bottom.hull =
+            Some(Arc::new(ConvexHull::new([-0.5, 0.5].into_iter().flat_map(
+                |z| [[-0.5, -0.2, z], [0.5, -0.2, z], [0.0, 0.2, z]],
+            ))));
+        let mut middle = object([0.0, 0.5, 0.0], [0.3, 0.1, 0.3]);
+        middle.mass_kg = 0.5;
+        let top = object([0.0, 0.75, 0.15], [0.1; 3]);
+        let mut pieces = [bottom, middle, top];
+        let mut tracker = crate::SleepTracker::default();
+        for _ in 0..360 {
+            crate::advance_with_sleep(
+                &mut tracker,
+                &[1, 2, 3],
+                &mut pieces,
+                Duration::from_millis(16),
+                |_, _| true,
+                false,
+            );
+        }
+        assert!(
+            (1..=3).all(|id| tracker.is_sleeping(id)),
+            "{:?}",
+            pieces
+                .iter()
+                .map(|p| (p.position, p.velocity, p.angular_velocity, p.orientation))
+                .collect::<Vec<_>>()
+        );
+        assert!(pieces[1].orientation[0].abs() < 0.005);
+        assert!((pieces[2].position[1] - 0.7).abs() < 0.002);
+    }
+
+    #[test]
+    fn resting_face_friction_resists_twist() {
+        let bottom = object([0.0, 0.1, 0.0], [0.5, 0.1, 0.5]);
+        let mut top = object([0.0, 0.3, 0.0], [0.2, 0.1, 0.2]);
+        top.angular_velocity = [0.0, 0.4, 0.0];
+        let mut pieces = [bottom, top];
+        advance(&mut pieces, Duration::from_millis(16), |_, _| true);
+        assert!(
+            pieces[1].angular_velocity[1].abs() < 0.35,
+            "{:?}",
+            pieces[1].angular_velocity
+        );
+    }
+
+    #[test]
+    fn distributed_friction_preserves_momentum_and_dissipates_energy() {
+        let mut a = object([0.0, 0.1, 0.0], [0.4, 0.1, 0.4]);
+        a.mass_kg = 0.5;
+        let mut b = object([0.1, 0.3, 0.0], [0.2, 0.1, 0.2]);
+        b.velocity = [0.3, -0.2, 0.1];
+        b.angular_velocity = [0.1, 0.5, -0.2];
+        let momentum = |p: &ObjectState| scale(p.velocity, p.mass_kg);
+        let angular = |p: &ObjectState| {
+            add(
+                cross(p.position, momentum(p)),
+                scale(p.angular_velocity, 0.4 * p.mass_kg * p.radius * p.radius),
+            )
+        };
+        let energy = |p: &ObjectState| {
+            0.5 * p.mass_kg * dot(p.velocity, p.velocity)
+                + 0.2
+                    * p.mass_kg
+                    * p.radius
+                    * p.radius
+                    * dot(p.angular_velocity, p.angular_velocity)
+        };
+        let before = (
+            add(momentum(&a), momentum(&b)),
+            add(angular(&a), angular(&b)),
+            energy(&a) + energy(&b),
+        );
+        crate::pair_impulse(&mut a, &mut b, [0.0, 1.0, 0.0]);
+        assert!(length(sub(add(momentum(&a), momentum(&b)), before.0)) < 1e-12);
+        assert!(length(sub(add(angular(&a), angular(&b)), before.1)) < 1e-12);
+        assert!(energy(&a) + energy(&b) <= before.2 + 1e-12);
     }
 
     fn box_hull(half: [f64; 3]) -> Arc<ConvexHull> {

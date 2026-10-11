@@ -225,6 +225,24 @@ pub(crate) fn settle(app: &mut ClientApplication, count: usize, limit: u64) -> R
             );
             sleeping = measurements.solver.sleeping_objects;
             if step % 50 == 0 {
+                let states = crate::fragment_physics::snapshots(&app.mining, frame, eye);
+                let mut speeds: Vec<_> = states
+                    .iter()
+                    .map(|(_, p)| salimon_math::length(p.velocity))
+                    .collect();
+                let mut spins: Vec<_> = states
+                    .iter()
+                    .map(|(_, p)| salimon_math::length(p.angular_velocity))
+                    .collect();
+                speeds.sort_by(f64::total_cmp);
+                spins.sort_by(f64::total_cmp);
+                eprintln!(
+                    "motion: speed p50/p95 {:.5}/{:.5} m/s, spin p50/p95 {:.5}/{:.5} rad/s",
+                    speeds[count / 2],
+                    speeds[count * 95 / 100],
+                    spins[count / 2],
+                    spins[count * 95 / 100]
+                );
                 eprintln!(
                     "fixture preparation: {step} steps, {sleeping}/{} asleep, {} quiet, {} moving, {:.3} wall seconds",
                     count,

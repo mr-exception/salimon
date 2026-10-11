@@ -348,6 +348,12 @@ initial conditions reject preparation. The matrix runner rejects prepared cases
 that wake during their sample window.
 Settled `--repeats` resets independent bounded sampling windows on that same
 population and validates accounting each time; active repeats use fresh processes.
+Native `--camera both` switches after the facing repeats and independently warms
+all away windows. Optional stdin preparation barriers permit concurrent fixture
+preparation followed by isolated native recording; no window/clocks start until
+the explicit start marker. Optional baseline replays use the canonical adapter
+snapshots and cloned state/cache before recording, without changing live cargo.
+See the benchmark guide for limits, counter meanings and CPU-only interpretation.
 E2E setup's `fragment_settle_steps` uses the same fixture preparation before
 readiness. Inspection reads cache activation by stable identity, excluding
 carried pieces, through aggregate/per-fragment sleeping fields. Preparation is

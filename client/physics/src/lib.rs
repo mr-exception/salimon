@@ -13,6 +13,7 @@ pub use sleep::SleepTracker;
 const GRAVITY: f64 = 9.81;
 const RESTITUTION: f64 = 0.12;
 const MAX_STEP: f64 = 1.0 / 90.0;
+const CONTACT_BIAS_METERS: f64 = 0.00001;
 
 /// Spherical ground geometry in the same frame as its objects.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -248,7 +249,7 @@ fn advance_impl<const PROFILE: bool>(
         (elapsed / MAX_STEP).ceil().clamp(1.0, 48.0) as usize
     };
     let dt = elapsed / steps as f64;
-    for _ in 0..steps {
+    for step in 0..steps {
         if let Some(a) = &mut activation {
             a.impacts(pieces, dt);
         }
@@ -373,7 +374,7 @@ fn advance_impl<const PROFILE: bool>(
                     let direction_b = correction_direction(b, normal);
                     let available = -dot(direction_a, normal) * inverse_a
                         + dot(direction_b, normal) * inverse_b;
-                    let correction = (depth + 0.00001) / available;
+                    let correction = (depth + CONTACT_BIAS_METERS).max(0.0) / available;
                     let old_a = a.position;
                     let old_b = b.position;
                     a.position = add(a.position, scale(direction_a, correction * inverse_a));
@@ -394,6 +395,11 @@ fn advance_impl<const PROFILE: bool>(
         }
         if let Some(start) = contact_start {
             stats.contact_time += start.elapsed();
+        }
+        if step + 1 == steps
+            && let Some(activation) = &mut activation
+        {
+            activation.geometry = Some(pair_geometry);
         }
         for (i, piece) in pieces.iter_mut().enumerate() {
             if activation.as_ref().is_some_and(|a| a.sleeping[i]) {
@@ -437,27 +443,43 @@ fn ground_contact(piece: &mut ObjectState) {
     } else {
         return;
     };
-    if penetration < -0.00001 {
+    if penetration < -CONTACT_BIAS_METERS {
         return;
     }
     piece.position = add(piece.position, scale(up, penetration.max(0.0)));
     if let Some(hull) = &piece.hull {
-        let arm = hull.ground_arm(piece.orientation, piece.side_meters, scale(up, -1.0));
-        let contact_velocity = add(piece.velocity, cross(piece.angular_velocity, arm));
-        let approach = dot(contact_velocity, up);
-        if approach < 0.0 {
-            let denominator =
-                1.0 / piece.mass_kg + dot(cross(arm, up), cross(arm, up)) * inverse_inertia(piece);
-            apply_impulse(piece, arm, scale(up, -approach / denominator));
+        let arms = hull.ground_arms(piece.orientation, piece.side_meters, scale(up, -1.0));
+        let mut normal_impulses = vec![0.0; arms.len()];
+        // Accumulate unilateral impulses within this face solve. Later corners
+        // can undo excess impulses while every corner's total stays nonnegative.
+        // Positive-only corner impulses otherwise eject and rock resting faces.
+        for _ in 0..if arms.len() > 1 { 16 } else { 1 } {
+            for (index, &arm) in arms.iter().enumerate() {
+                let approach = dot(add(piece.velocity, cross(piece.angular_velocity, arm)), up);
+                let denominator = 1.0 / piece.mass_kg
+                    + dot(cross(arm, up), cross(arm, up)) * inverse_inertia(piece);
+                let previous = normal_impulses[index];
+                normal_impulses[index] = (previous - approach / denominator).max(0.0);
+                apply_impulse(piece, arm, scale(up, normal_impulses[index] - previous));
+            }
         }
-        let tangent = sub(contact_velocity, scale(up, dot(contact_velocity, up)));
-        let speed = length(tangent);
-        if speed > 1e-9 {
-            let direction = scale(tangent, 1.0 / speed);
-            let denominator = 1.0 / piece.mass_kg
-                + dot(cross(arm, direction), cross(arm, direction)) * inverse_inertia(piece);
-            let friction = (speed / denominator).min(piece.mass_kg * GRAVITY * MAX_STEP * 0.65);
-            apply_impulse(piece, arm, scale(direction, -friction));
+        let mut friction_impulses = vec![[0.0; 3]; arms.len()];
+        for _ in 0..16 {
+            for (i, &arm) in arms.iter().enumerate() {
+                let velocity = add(piece.velocity, cross(piece.angular_velocity, arm));
+                let denominator = |direction| {
+                    1.0 / piece.mass_kg
+                        + dot(cross(arm, direction), cross(arm, direction)) * inverse_inertia(piece)
+                };
+                let impulse = friction_delta(
+                    velocity,
+                    up,
+                    &mut friction_impulses[i],
+                    normal_impulses[i] * 0.65,
+                    denominator,
+                );
+                apply_impulse(piece, arm, impulse);
+            }
         }
         return;
     }
@@ -481,7 +503,7 @@ fn ground_contact(piece: &mut ObjectState) {
 fn correction_direction(piece: &ObjectState, direction: [f64; 3]) -> [f64; 3] {
     if piece.hull.is_some()
         && let Surface::Floor { height_meters } = piece.surface
-        && piece.position[1] - height_meters - piece.ground_support_meters <= 0.00001
+        && piece.position[1] - height_meters - piece.ground_support_meters <= CONTACT_BIAS_METERS
         && direction[1] < 0.0
     {
         [direction[0], 0.0, direction[2]]
@@ -504,7 +526,95 @@ fn apply_impulse(piece: &mut ObjectState, arm: [f64; 3], impulse: [f64; 3]) {
         scale(cross(arm, impulse), inverse_inertia(piece)),
     );
 }
+// Project each accumulated tangential impulse onto its Coulomb disk. Distributed
+// contacts resist twist as well as translation; later iterations can undo an
+// earlier corner's excess impulse without exceeding its normal-load budget.
+fn friction_delta(
+    relative: [f64; 3],
+    normal: [f64; 3],
+    previous: &mut [f64; 3],
+    limit: f64,
+    denominator: impl Fn([f64; 3]) -> f64,
+) -> [f64; 3] {
+    let tangent = sub(relative, scale(normal, dot(relative, normal)));
+    let speed = length(tangent);
+    let mut candidate = *previous;
+    if speed > 1e-9 {
+        candidate = sub(
+            candidate,
+            scale(tangent, 1.0 / denominator(scale(tangent, 1.0 / speed))),
+        );
+    }
+    let magnitude = length(candidate);
+    if magnitude > limit {
+        candidate = scale(candidate, limit / magnitude);
+    }
+    let delta = sub(candidate, *previous);
+    *previous = candidate;
+    delta
+}
+
 fn pair_impulse(a: &mut ObjectState, b: &mut ObjectState, normal: [f64; 3]) {
+    if a.hull.is_some() && b.hull.is_some() {
+        let arms = convex::contact_manifold(a, b, normal);
+        if arms.len() > 1 {
+            let relative = |a: &ObjectState, b: &ObjectState, aa, ba| {
+                sub(
+                    add(b.velocity, cross(b.angular_velocity, ba)),
+                    add(a.velocity, cross(a.angular_velocity, aa)),
+                )
+            };
+            let targets: Vec<_> = arms
+                .iter()
+                .map(|&(aa, ba)| {
+                    let approach = dot(relative(a, b, aa, ba), normal);
+                    if approach < -0.5 {
+                        -RESTITUTION * approach
+                    } else {
+                        0.0
+                    }
+                })
+                .collect();
+            let mut impulses = vec![0.0; arms.len()];
+            for _ in 0..16 {
+                for (i, &(aa, ba)) in arms.iter().enumerate() {
+                    let denominator = 1.0 / a.mass_kg
+                        + 1.0 / b.mass_kg
+                        + dot(cross(aa, normal), cross(aa, normal)) * inverse_inertia(a)
+                        + dot(cross(ba, normal), cross(ba, normal)) * inverse_inertia(b);
+                    let previous = impulses[i];
+                    impulses[i] = (previous
+                        + (targets[i] - dot(relative(a, b, aa, ba), normal)) / denominator)
+                        .max(0.0);
+                    let impulse = scale(normal, impulses[i] - previous);
+                    apply_impulse(a, aa, scale(impulse, -1.0));
+                    apply_impulse(b, ba, impulse);
+                }
+            }
+            let mut friction_impulses = vec![[0.0; 3]; arms.len()];
+            for _ in 0..16 {
+                for (i, &(aa, ba)) in arms.iter().enumerate() {
+                    let velocity = relative(a, b, aa, ba);
+                    let denominator = |direction| {
+                        1.0 / a.mass_kg
+                            + 1.0 / b.mass_kg
+                            + dot(cross(aa, direction), cross(aa, direction)) * inverse_inertia(a)
+                            + dot(cross(ba, direction), cross(ba, direction)) * inverse_inertia(b)
+                    };
+                    let impulse = friction_delta(
+                        velocity,
+                        normal,
+                        &mut friction_impulses[i],
+                        impulses[i] * 0.65,
+                        denominator,
+                    );
+                    apply_impulse(a, aa, scale(impulse, -1.0));
+                    apply_impulse(b, ba, impulse);
+                }
+            }
+            return;
+        }
+    }
     let (aa, ba) = if a.hull.is_some() && b.hull.is_some() {
         convex::contact_arms(a, b, normal)
     } else {

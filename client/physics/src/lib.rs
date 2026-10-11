@@ -132,6 +132,8 @@ pub struct StepStats {
     pub objects: usize,
     pub awake_objects: usize,
     pub sleeping_objects: usize,
+    /// Bodies satisfying dwell criteria; an unstable island member can keep them awake.
+    pub quiet_objects: usize,
     pub integrated_objects: u64,
     pub substeps: u64,
     pub solver_passes: u64,
@@ -204,6 +206,9 @@ pub fn advance_with_sleep<K: Copy + Eq + std::hash::Hash>(
     stats.activation_time = prepare_time + finish_start.map(|s| s.elapsed()).unwrap_or_default();
     stats.sleeping_objects = activation.sleeping.iter().filter(|s| **s).count();
     stats.awake_objects = pieces.len() - stats.sleeping_objects;
+    if profile {
+        stats.quiet_objects = tracker.quiet_objects();
+    }
     stats
 }
 
@@ -364,11 +369,15 @@ fn advance_impl<const PROFILE: bool>(
                     }
                     let inverse_a = 1.0 / a.mass_kg;
                     let inverse_b = 1.0 / b.mass_kg;
-                    let correction = scale(normal, (depth + 0.00001) / (inverse_a + inverse_b));
+                    let direction_a = correction_direction(a, scale(normal, -1.0));
+                    let direction_b = correction_direction(b, normal);
+                    let available = -dot(direction_a, normal) * inverse_a
+                        + dot(direction_b, normal) * inverse_b;
+                    let correction = (depth + 0.00001) / available;
                     let old_a = a.position;
                     let old_b = b.position;
-                    a.position = sub(a.position, scale(correction, inverse_a));
-                    b.position = add(b.position, scale(correction, inverse_b));
+                    a.position = add(a.position, scale(direction_a, correction * inverse_a));
+                    b.position = add(b.position, scale(direction_b, correction * inverse_b));
                     if a.surface.is_floor() && !floor_contains(a.position, a.radius) {
                         a.position[0] = old_a[0];
                         a.position[2] = old_a[2];
@@ -461,6 +470,24 @@ fn ground_contact(piece: &mut ObjectState) {
         scale(sub(piece.velocity, scale(up, normal_speed)), 0.88),
         scale(up, normal_speed),
     );
+}
+
+// A convex body already supported by a rigid deck cannot resolve another
+// contact by moving down through that deck. Project the positional response
+// onto its available directions and give the remaining separation to its
+// neighbor. Previously ground projection undid that share of every correction,
+// leaving loaded stacks to compact and chatter over repeated passes. Physical
+// mass/inertia and velocity impulses are unchanged; this is a support constraint.
+fn correction_direction(piece: &ObjectState, direction: [f64; 3]) -> [f64; 3] {
+    if piece.hull.is_some()
+        && let Surface::Floor { height_meters } = piece.surface
+        && piece.position[1] - height_meters - piece.ground_support_meters <= 0.00001
+        && direction[1] < 0.0
+    {
+        [direction[0], 0.0, direction[2]]
+    } else {
+        direction
+    }
 }
 
 fn inverse_inertia(piece: &ObjectState) -> f64 {

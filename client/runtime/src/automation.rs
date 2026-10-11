@@ -376,6 +376,7 @@ fn inspect(app: &ClientApplication) -> Value {
                 "id": piece.id().0,
                 "reference_frame": if app.mining.ship_fragments.contains_key(&piece.id()) { "ship" } else { "world" },
                 "carried": app.mining.session.carried_id() == Some(piece.id()),
+                "sleeping": app.mining.session.carried_id() != Some(piece.id()) && app.mining.fragment_sleep.is_sleeping(piece.id()),
                 "distance_to_player_meters": piece.transform().position().offset_from(salimon_world::WorldPosition::new(character.eye_position_meters[0], character.eye_position_meters[1], character.eye_position_meters[2])).iter().map(|v| v * v).sum::<f64>().sqrt(),
                 "ship_local_position_meters": frame.world_to_local(piece.transform().position().meters()),
                 "source_deposit_id": format!("{:?}:{}", piece.source().body, piece.source().local),
@@ -454,6 +455,7 @@ fn inspect(app: &ClientApplication) -> Value {
         "interaction": interaction,
         "world": {"fragments": fragments,
             "fragment_count": app.mining.session.fragments().len(),
+            "sleeping_fragment_count": app.mining.session.fragments().iter().filter(|piece| app.mining.session.carried_id() != Some(piece.id()) && app.mining.fragment_sleep.is_sleeping(piece.id())).count(),
             "fragment_mass_kg": app.mining.session.fragments().iter().map(|piece| piece.material().mass_kg()).sum::<f64>(),
             "nearest_deposit": nearest_deposit, "resource_types": resource_types, "deposits": deposits, "deposits_by_id": deposits_by_id, "deposit_query_error": deposit_error, "bodies": bodies, "camera_phase": format!("{:?}", app.camera_phase())}
     })

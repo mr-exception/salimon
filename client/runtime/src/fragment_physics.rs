@@ -94,7 +94,16 @@ pub(crate) fn advance_measured(
         .iter()
         .copied()
         .filter(|p| Some(p.id()) != carried)
-        .filter(|p| length(sub(p.transform().position().meters(), player)) < 125.0)
+        .filter(|p| {
+            // Ship advancement precedes final session-pose synchronization.
+            // Select anchored contents in the current frame, not last frame's
+            // world pose (which may be hundreds of metres behind in flight).
+            let position = tool.ship_fragments.get(&p.id()).map_or_else(
+                || p.transform().position().meters(),
+                |local| frame.local_to_world(*local),
+            );
+            length(sub(position, player)) < 125.0
+        })
         .map(|p| {
             let ship = tool.ship_fragments.contains_key(&p.id());
             let position = if ship {
@@ -388,7 +397,6 @@ mod tests {
             origin_meters: [1.0e12, 2.0e12, -3.0e12],
             axes: [[0.0, 0.0, -1.0], [0.0, 1.0, 0.0], [1.0, 0.0, 0.0]],
         };
-        crate::carrying::sync_ship_fragments(&mut tool, moving);
         let stats = advance_measured(
             &mut tool,
             moving,

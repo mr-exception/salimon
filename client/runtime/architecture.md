@@ -339,6 +339,19 @@ clock and renderer; they never enable stdin automation. Physics-only runs time
 production fragment adapters at 16ms simulation deltas with no window, renderer
 or FPS claim. Samples record actual moving-object counts; a requested settled
 fixture does not prove a settled sample. Persistent awake/sleeping counters are supplied by the physics activation cache.
+Optional `--settle-steps` prepares requested settled fixtures through the same
+production adapter at 16 ms simulation deltas before renderer startup. It stops
+only on full persistent sleep and fails at its explicit limit otherwise; it
+never installs sleep flags or settled poses. Preparation steps/simulation/wall
+duration are logged separately from measured native warmup and samples. Active
+initial conditions reject preparation. The matrix runner rejects prepared cases
+that wake during their sample window.
+Settled `--repeats` resets independent bounded sampling windows on that same
+population and validates accounting each time; active repeats use fresh processes.
+E2E setup's `fragment_settle_steps` uses the same fixture preparation before
+readiness. Inspection reads cache activation by stable identity, excluding
+carried pieces, through aggregate/per-fragment sleeping fields. Preparation is
+initial-condition work; later interactions retain production gates and stepping.
 
 Frame intervals use a separate uncapped monotonic clock, preserving long spikes
 hidden by rolling diagnostics' 250ms display clamp. Normal update-delta clamping
@@ -352,7 +365,9 @@ benchmark result. See the [benchmark guide](../../scripts/FRAGMENT_BENCHMARKS.md
 
 `MiningTool.fragment_sleep` owns the in-memory `SleepTracker<FragmentId>` lifetime.
 The adapter supplies stable IDs alongside current frame-local snapshots; selection
-omission (carrying or distant streaming) invalidates cached support, including
+uses current-frame world positions for ship anchors even before final pose
+synchronization, so high-speed flight cannot omit last frame's trailing cargo.
+Selection omission (carrying or distant streaming) invalidates cached support, including
 an entirely empty selection. Return starts awake without changing session IDs,
 mass or local anchors. Growth/release/frame transfer changes snapshot fields and
 wakes old contact neighbors. Ship-local rigid motion leaves sleep intact; world

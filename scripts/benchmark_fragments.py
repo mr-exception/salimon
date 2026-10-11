@@ -17,7 +17,7 @@ METRICS = ("frame_ms", "cpu_update_ms", "cpu_simulation_ms", "cpu_scene_prepare_
            "resource_prepare_ms", "resource_upload_ms", "gpu_latest_ms", "pair_visits",
            "radius_candidates", "narrow_phase_tests", "contacts", "substeps",
            "matrix_allocations", "projection_storage_bytes", "resource_upload_bytes",
-           "resource_triangles", "draw_calls", "moving_objects", "objects_simulated", "awake_objects", "sleeping_objects", "integrated_objects")
+           "resource_triangles", "draw_calls", "moving_objects", "objects_simulated", "awake_objects", "sleeping_objects", "quiet_objects", "integrated_objects")
 
 
 def distribution(values):
@@ -95,12 +95,16 @@ def main(argv=None):
     parser.add_argument("--seed", type=int, default=155)
     parser.add_argument("--warmup-seconds", type=int, default=10)
     parser.add_argument("--sample-seconds", type=int, default=30)
+    parser.add_argument("--settle-steps", type=int, default=0,
+                        help="prepare settled cases using up to this many production 16ms updates; fails unless all objects sleep")
+    parser.add_argument("--repeats", type=int, default=1,
+                        help="settled sampling windows in one process; active rows use fresh-process runs")
     parser.add_argument("--timeout", type=int, default=300, help="per case; failures preserve stdout/stderr")
     parser.add_argument("--machine-label", required=True, help="explicit hardware/configuration label; use software-vulkan for lavapipe")
     parser.add_argument("--baseline", type=Path)
     parser.add_argument("--tolerance", type=float, default=.2)
     args = parser.parse_args(argv)
-    if any(n < 0 or n > 1000 for n in args.counts) or not 0 <= args.seed < 2**64 or not 0 <= args.warmup_seconds <= 600 or not 1 <= args.sample_seconds <= 600 or args.timeout <= 0 or not 0 <= args.tolerance <= 1:
+    if any(n < 0 or n > 1000 for n in args.counts) or not 0 <= args.seed < 2**64 or not 0 <= args.warmup_seconds <= 600 or not 1 <= args.sample_seconds <= 600 or not 0 <= args.settle_steps <= 37500 or not 1 <= args.repeats <= 10 or args.timeout <= 0 or not 0 <= args.tolerance <= 1:
         parser.error("invalid population, duration, seed, timeout or tolerance")
     root = Path(__file__).resolve().parents[1]
     binary = args.binary.resolve()
@@ -118,24 +122,41 @@ def main(argv=None):
         for layout in args.layouts:
             for state in args.states:
                 for camera in cameras:
-                    name = f"{args.mode}-{count}-{layout}-{state}-{camera}"
-                    command = [str(binary), "--benchmark", "--count", str(count), "--layout", layout,
-                        "--state", state, "--camera", camera, "--mode", args.mode, "--seed", str(args.seed),
-                        "--warmup-seconds", str(args.warmup_seconds), "--sample-seconds", str(args.sample_seconds)]
-                    print(f"Running {name}", file=sys.stderr, flush=True)
-                    try:
-                        # File-backed capture avoids buffering unbounded process logs.
-                        with (args.output / f"{name}.stdout").open("w") as stdout, (args.output / f"{name}.stderr").open("w") as stderr:
-                            completed = subprocess.run(command, cwd=root, stdout=stdout, stderr=stderr, timeout=args.timeout, check=False)
-                        if completed.returncode:
-                            raise ValueError(f"benchmark exited {completed.returncode}")
-                        result = json.loads((args.output / f"{name}.stdout").read_text())
-                        case = summarize(result)
-                        case["raw_file"] = f"{name}.stdout"
-                        summary["cases"].append(case)
-                    except (OSError, subprocess.TimeoutExpired, ValueError, KeyError) as exc:
-                        summary["failures"].append({"case": name, "error": str(exc)})
-                    (args.output / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+                    for trial in range(args.repeats if state == "active" else 1):
+                        name = f"{args.mode}-{count}-{layout}-{state}-{camera}"
+                        if state == "active" and args.repeats > 1:
+                            name += f"-repeat-{trial + 1}"
+                        command = [str(binary), "--benchmark", "--count", str(count), "--layout", layout,
+                            "--state", state, "--camera", camera, "--mode", args.mode, "--seed", str(args.seed),
+                            "--warmup-seconds", str(args.warmup_seconds), "--sample-seconds", str(args.sample_seconds)]
+                        if state == "settled" and args.settle_steps:
+                            command += ["--settle-steps", str(args.settle_steps)]
+                        if state == "settled" and args.repeats != 1:
+                            command += ["--repeats", str(args.repeats)]
+                        print(f"Running {name}", file=sys.stderr, flush=True)
+                        try:
+                            # File-backed capture avoids buffering unbounded process logs.
+                            with (args.output / f"{name}.stdout").open("w") as stdout, (args.output / f"{name}.stderr").open("w") as stderr:
+                                completed = subprocess.run(command, cwd=root, stdout=stdout, stderr=stderr, timeout=args.timeout, check=False)
+                            if completed.returncode:
+                                raise ValueError(f"benchmark exited {completed.returncode}")
+                            output = json.loads((args.output / f"{name}.stdout").read_text())
+                            runs = output["runs"] if output.get("schema") == 2 else [output]
+                            expected_runs = args.repeats if state == "settled" else 1
+                            if len(runs) != expected_runs:
+                                raise ValueError("incomplete repeat windows")
+                            cases = []
+                            for index, result in enumerate(runs):
+                                case = summarize(result)
+                                if state == "settled" and args.settle_steps and not case["sleeping_observed"]:
+                                    raise ValueError("prepared settled population woke during the measured window")
+                                case["config"]["repeat"] = index + 1 if state == "settled" else trial + 1
+                                case["raw_file"] = f"{name}.stdout"
+                                cases.append(case)
+                            summary["cases"].extend(cases)
+                        except (OSError, subprocess.TimeoutExpired, ValueError, KeyError) as exc:
+                            summary["failures"].append({"case": name, "error": str(exc)})
+                        (args.output / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     if args.baseline:
         summary["regressions"] = compare(summary, json.loads(args.baseline.read_text()), args.tolerance)
     (args.output / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")

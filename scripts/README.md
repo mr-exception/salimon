@@ -575,3 +575,8 @@ See [FRAGMENT_BENCHMARKS.md](FRAGMENT_BENCHMARKS.md) for native release and CPU-
 matrices, fixture setup, measurement scopes and baseline-relative gates. The
 500-fragment correctness scenario runs in the standard baseline; benchmark
 wall-clock sampling remains separate from fixed-step automation.
+Loaded acceptance scenarios may add `fragment_settle_steps` to setup, using the
+same production preparation as settled benchmarks before renderer readiness.
+`world.sleeping_fragment_count` and per-fragment `sleeping` observe the last
+completed update; carrying is excluded. See the benchmark guide for limits and
+startup-deadline requirements.

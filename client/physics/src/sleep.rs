@@ -10,8 +10,8 @@ const DWELL_SECONDS: f64 = 0.5;
 // Authored faceted ground response has bounded residual chatter above damping's
 // zero cutoff. A dwell-wide pose envelope prevents these velocity tolerances
 // from sleeping a slowly sliding/tipping object.
-const QUIET_SPEED: f64 = 0.05;
-const QUIET_ANGULAR_SPEED: f64 = 0.2;
+const QUIET_SPEED: f64 = 0.15;
+const QUIET_ANGULAR_SPEED: f64 = 1.0;
 
 #[derive(Clone, Debug)]
 struct Entry<K> {
@@ -65,14 +65,22 @@ impl Activation {
             .filter_map(|(i, asleep)| (!asleep).then_some(i))
             .collect();
         for i in active {
+            let reach = length(pieces[i].velocity) * dt
+                + length(pieces[i].angular_velocity) * pieces[i].radius * dt
+                + 0.5 * crate::GRAVITY * dt * dt;
             for j in 0..pieces.len() {
                 if self.sleeping[j]
                     && same_environment(&pieces[i], &pieces[j])
                     && length(sub(pieces[i].position, pieces[j].position))
                         <= pieces[i].radius
                             + pieces[j].radius
-                            + length(pieces[i].velocity) * dt
-                            + 0.5 * crate::GRAVITY * dt * dt
+                            + reach
+                    // Bounding spheres of faceted objects can overlap at rest
+                    // without touching. Expand the SAT gap by swept motion so
+                    // fast impacts still wake before integration.
+                    && (pieces[i].hull.is_none()
+                        || pieces[j].hull.is_none()
+                        || convex::near_contact(&pieces[i], &pieces[j], reach))
                 {
                     self.wake(j);
                 }
@@ -82,6 +90,18 @@ impl Activation {
 }
 
 impl<K: Copy + Eq + Hash> SleepTracker<K> {
+    /// Activation from the most recent completed update; absent identities are awake.
+    pub fn is_sleeping(&self, id: K) -> bool {
+        self.entries.get(&id).is_some_and(|entry| entry.sleeping)
+    }
+
+    pub(crate) fn quiet_objects(&self) -> usize {
+        self.entries
+            .values()
+            .filter(|entry| entry.quiet_seconds >= DWELL_SECONDS)
+            .count()
+    }
+
     /// Explicitly invalidate support/forces not represented by ObjectState fields.
     pub fn wake_all(&mut self) {
         for entry in self.entries.values_mut() {
@@ -491,6 +511,63 @@ mod tests {
         );
         assert!(stats.integrated_objects > 0);
         assert_eq!(stats.sleeping_objects, 0);
+    }
+
+    #[test]
+    fn overlapping_bounds_of_separated_hulls_do_not_wake_resting_neighbors() {
+        let mut tracker = SleepTracker::default();
+        let mut objects = vec![cube(0.0, 0.1)];
+        settle(&[1], &mut objects, &mut tracker);
+        // 0.1 m hull gap, but 0.36 m combined bounding radius.
+        let resting = objects[0].clone();
+        objects.push(cube(0.3, 0.1));
+        objects[1].velocity = [0.06, 0.0, 0.0];
+        for _ in 0..10 {
+            let stats = advance_with_sleep(
+                &mut tracker,
+                &[1, 2],
+                &mut objects,
+                Duration::from_millis(16),
+                |_, _| true,
+                true,
+            );
+            assert!(stats.sleeping_objects >= 1);
+            assert_eq!(objects[0], resting);
+        }
+    }
+
+    #[test]
+    fn dwell_envelope_rejects_slow_sliding_and_tipping_despite_quiet_speeds() {
+        for tipping in [false, true] {
+            let mut tracker = SleepTracker::default();
+            let mut objects = vec![cube(0.0, 0.1)];
+            let mut activation = tracker.prepare(&[1], &objects);
+            // Isolate the post-solver dwell contract with prescribed poses;
+            // speeds remain below the chatter guards throughout this window.
+            for step in 0..100 {
+                if tipping {
+                    let angle = step as f64 * 0.0005;
+                    objects[0].orientation = [angle.sin(), 0.0, 0.0, angle.cos()];
+                    objects[0].position[1] = objects[0].hull.as_ref().unwrap().support(
+                        objects[0].orientation,
+                        0.2,
+                        [0.0, -1.0, 0.0],
+                    );
+                    objects[0].angular_velocity = [0.0625, 0.0, 0.0];
+                } else {
+                    objects[0].position[0] += 0.0001;
+                    objects[0].velocity = [0.00625, 0.0, 0.0];
+                }
+                tracker.finish(
+                    &[1],
+                    &mut objects,
+                    Duration::from_millis(16),
+                    &mut activation,
+                    |_, _| true,
+                );
+                assert!(!activation.sleeping[0], "tipping={tipping}, step={step}");
+            }
+        }
     }
 
     #[test]

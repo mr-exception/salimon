@@ -12,6 +12,10 @@ true edge directions supply the separating-axis test. Pair projections subtract
 centers in f64 before testing axes. Radii only reject distant pairs and constrain
 ship hull clearance; they do not determine convex pair separation. A missing
 hull retains the previous sphere response for compatible callers.
+Pair projection axes remove numerical parallel repeats in generation order with
+1e-9 component bins. Support-graph queries test the same face/crossed-edge SAT
+axes, stopping at the first separating axis without allocating a response
+manifold. These preserve convex separation; no sphere approximation is introduced.
 
 `Surface::Sphere` supplies radial 9.81 m/s² gravity and local tangent support.
 `Floor` supplies +Y gravity and one ship-local deck height; a pure containment
@@ -25,6 +29,16 @@ passes, projects penetration and applies mass-weighted normal/friction impulses
 with angular response. Inertia is an isotropic approximation from mass and
 bounding radius, not an exact volume integral. Ground contacts use authored
 support points, allowing tilted objects to tip; damping bounds residual motion.
+Positional separation respects a convex body's existing deck support: downward
+correction is projected onto its available horizontal directions, and remaining
+normal separation goes to its neighbor. This prevents subsequent deck projection
+from undoing pair separation in loaded stacks. Mass, inertia and velocity impulses
+remain physical; this constraint does not apply to unsupported or sphere-fallback
+bodies.
+Ground and pair reaction arms include vertices within 1 mm per unit scale of
+the extreme supporting feature. This submillimetre tolerance at normal fragment
+sizes avoids switching to a lone vertex under resting-face contact noise while
+retaining off-center tipping and exact SAT separation.
 Geometry growth is safe because the hull stays immutable and each snapshot
 supplies current mass/scale. Stateful activation invalidates removed supports through stable caller IDs.
 
@@ -70,10 +84,12 @@ allocator overhead are excluded. See the [benchmark guide](../../scripts/FRAGMEN
 identity types do not enter physics. `advance_with_sleep` restores activation
 beside ordered snapshots. The stateless `advance` path remains available as the
 baseline. An island sleeps only after every member has linear/angular speeds
-below 0.05 m/s and 0.2 rad/s, position within 1 mm and quaternion components
+below 0.15 m/s and 1.0 rad/s, position within 1 mm and quaternion components
 within 0.005 of a fixed dwell anchor for 0.5 simulation seconds. The dwell-wide
 pose envelope rejects slow sliding/tipping while allowing bounded faceted-contact
-chatter (observed residual velocities can exceed the solver's 0.015 cutoff). At least one member must have
+chatter (loaded faceted contacts can briefly exceed the solver's 0.015 cutoff).
+The dwell-wide envelope remains mandatory: slow sliding/tipping cannot sleep
+even when instantaneous speeds are below these chatter guards. At least one member must have
 actual environmental support within 1 mm. Fast face rejection followed by full convex SAT with the same 1 mm
 gap forms contact edges; bounding-sphere overlap alone cannot anchor an island.
 
@@ -86,7 +102,10 @@ Tracker validation, snapshot adaptation and rendering still cost work.
 Wake previous contact-connected neighbors on removal, pickup/selection omission,
 changed pose, velocities, mass, scale, hull or surface. Swept conservative spheres
 wake contact islands before a fast object's substep; actual contacts also wake
-before applying response. This wake bound does not add a CCD guarantee. Missing
+before applying response. For convex hulls the pre-integration wake also requires
+SAT proximity expanded by linear/angular travel and gravity over the substep;
+overlapping conservative spheres alone cannot repeatedly wake separated hulls.
+This wake bound does not add a CCD guarantee. Missing
 identities are pruned; streaming return starts awake and reestablishes support.
 Floor containment is checked even for sleepers. Call `wake_all` when a force or
 external environmental policy changes without changing a snapshot field.
@@ -96,3 +115,6 @@ identities; input/adjacency order determines stepping and island traversal.
 `StepStats.activation_time` separates stable-ID validation plus post-solve
 contact graph/dwell work from integration and contact response. Swept wake
 checks within the solver remain included in total solver wall cost.
+`quiet_objects` reports bodies that passed dwell, including those kept awake by
+another unstable island member. `is_sleeping(id)` observes the last completed
+update; absent identities report false.

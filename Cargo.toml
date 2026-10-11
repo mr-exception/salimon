@@ -10,7 +10,12 @@ members = [
     "client/world",
 ]
 default-members = ["client/runtime"]
+exclude = ["vendor/wgpu-hal"]
 resolver = "3"
+
+# Backport upstream Metal first-frame visibility fix; see vendor/README.md.
+[patch.crates-io]
+wgpu-hal = { path = "vendor/wgpu-hal" }
 
 [workspace.package]
 version = "0.1.0"

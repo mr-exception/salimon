@@ -18,6 +18,8 @@ pub(crate) struct Config {
     pub(crate) headless: bool,
     pub(crate) warmup_seconds: u64,
     pub(crate) sample_seconds: u64,
+    pub(crate) settle_steps: u64,
+    pub(crate) repeats: usize,
 }
 
 pub(crate) fn parse(args: &[String]) -> Result<Config, String> {
@@ -30,6 +32,8 @@ pub(crate) fn parse(args: &[String]) -> Result<Config, String> {
         headless: false,
         warmup_seconds: 10,
         sample_seconds: 30,
+        settle_steps: 0,
+        repeats: 1,
     };
     let mut seen = std::collections::BTreeSet::new();
     let mut args = args.iter();
@@ -91,14 +95,34 @@ pub(crate) fn parse(args: &[String]) -> Result<Config, String> {
                     return Err("sample must be 1..600 seconds".into());
                 }
             }
+            "--settle-steps" => {
+                config.settle_steps = integer()?;
+                if config.settle_steps > 37500 {
+                    return Err("settle steps must be 0..37500 (600 simulation seconds)".into());
+                }
+            }
+            "--repeats" => {
+                let repeats = integer()?;
+                if !(1..=10).contains(&repeats) {
+                    return Err("repeats must be 1..10".into());
+                }
+                config.repeats = repeats as usize;
+            }
             _ => return Err(format!("unknown benchmark option {key}")),
         }
+    }
+    if config.active && config.settle_steps != 0 {
+        return Err("active initial conditions cannot be pre-settled".into());
+    }
+    if config.active && config.repeats != 1 {
+        return Err("active initial conditions require separate fresh-process repeats".into());
     }
     Ok(config)
 }
 
 pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<(), String> {
     benchmark_fixture::initialize(app, config.count, config.layout, config.seed, config.active)?;
+    benchmark_fixture::settle(app, config.count, config.settle_steps)?;
     // Camera remains a production character camera, facing the aft population.
     if !config.away {
         app.character
@@ -129,6 +153,7 @@ pub(crate) struct Recorder {
     finished: bool,
     observed: usize,
     stride: usize,
+    completed: Vec<Value>,
 }
 
 impl Recorder {
@@ -144,6 +169,7 @@ impl Recorder {
             finished: false,
             observed: 0,
             stride: 1,
+            completed: Vec::new(),
         }
     }
     pub(crate) fn set_renderer(
@@ -190,11 +216,10 @@ impl Recorder {
         now.duration_since(start)
             >= Duration::from_secs(self.config.warmup_seconds + self.config.sample_seconds)
     }
-    pub(crate) fn finish(&mut self, app_accounting: Value) -> Result<(), String> {
+    pub(crate) fn finish(&mut self, app_accounting: Value) -> Result<bool, String> {
         if self.finished {
             return Err("benchmark already finished".into());
         }
-        self.finished = true;
         if self.samples.is_empty() {
             return Err("benchmark recorded no samples".into());
         }
@@ -209,7 +234,7 @@ impl Recorder {
                 "cpu_update_ms": s.update_ms, "cpu_simulation_ms": s.simulation_ms, "cpu_scene_prepare_ms": (s.update_ms - s.simulation_ms).max(0.0), "physics_total_ms": ms(s.physics.total_time),
                 "physics_adapter_ms": ms(s.physics.adapter_time), "physics_integration_ms": ms(p.integration_time),
                 "physics_contact_ms": ms(p.contact_time), "physics_activation_ms": ms(p.activation_time), "objects_simulated": p.objects,
-                "moving_objects": s.physics.moving_objects, "awake_objects": p.awake_objects, "sleeping_objects": p.sleeping_objects, "integrated_objects": p.integrated_objects,
+                "moving_objects": s.physics.moving_objects, "awake_objects": p.awake_objects, "sleeping_objects": p.sleeping_objects, "quiet_objects": p.quiet_objects, "integrated_objects": p.integrated_objects,
                 "substeps": p.substeps, "solver_passes": p.solver_passes, "pair_visits": p.pair_visits,
                 "radius_candidates": p.radius_candidates, "narrow_phase_tests": p.narrow_phase_tests,
                 "contacts": p.contacts, "projection_builds": p.projection_builds,
@@ -226,13 +251,28 @@ impl Recorder {
             "config": {"count": self.config.count, "layout": self.config.layout.name(), "seed": self.config.seed,
                 "initial_state": if self.config.active { "active" } else { "settled_requested" },
                 "camera": if self.config.away { "away" } else { "facing" },
-                "warmup_seconds": self.config.warmup_seconds, "sample_seconds": self.config.sample_seconds},
+                "warmup_seconds": self.config.warmup_seconds, "sample_seconds": self.config.sample_seconds,
+                "settle_steps_limit": self.config.settle_steps},
             "renderer": self.info, "accounting": self.initial, "accounting_preserved": true,
             "updates_observed": self.observed, "sampling_stride": self.stride,
             "elapsed_seconds": self.started.map(|s| s.elapsed().as_secs_f64()),
             "samples": samples});
-        println!("{output}");
-        Ok(())
+        self.completed.push(output);
+        self.finished = self.completed.len() == self.config.repeats;
+        if self.finished {
+            if self.config.repeats == 1 {
+                println!("{}", self.completed[0]);
+            } else {
+                println!("{}", json!({"schema": 2, "runs": self.completed}));
+            }
+        } else {
+            self.started = None;
+            self.last_presented = None;
+            self.samples.clear();
+            self.observed = 0;
+            self.stride = 1;
+        }
+        Ok(self.finished)
     }
 }
 
@@ -263,8 +303,10 @@ pub(crate) fn run_headless(config: Config) -> Result<(), String> {
         recorder.latest_physics =
             crate::fragment_physics::advance_measured(&mut app.mining, frame, delta, player, true);
         let update_time = started.elapsed();
-        if recorder.record(delta, update_time, update_time, None) {
-            return recorder.finish(accounting(&app));
+        if recorder.record(delta, update_time, update_time, None)
+            && recorder.finish(accounting(&app))?
+        {
+            return Ok(());
         }
     }
 }
@@ -273,12 +315,130 @@ pub(crate) fn run_headless(config: Config) -> Result<(), String> {
 mod tests {
     use super::*;
     #[test]
+    fn repeat_windows_keep_accounting_and_fail_without_samples() {
+        let config = parse(&[
+            "--benchmark".into(),
+            "--count".into(),
+            "0".into(),
+            "--repeats".into(),
+            "3".into(),
+            "--warmup-seconds".into(),
+            "0".into(),
+        ])
+        .unwrap();
+        let app = ClientApplication::default();
+        let mut recorder = Recorder::new(config, &app);
+        assert!(recorder.finish(accounting(&app)).is_err());
+        for index in 0..3 {
+            recorder.record(
+                Duration::from_millis(16),
+                Duration::ZERO,
+                Duration::ZERO,
+                None,
+            );
+            assert_eq!(recorder.finish(accounting(&app)).unwrap(), index == 2);
+            assert_eq!(recorder.completed.len(), index + 1);
+            assert_eq!(
+                recorder.completed[index]["samples"]
+                    .as_array()
+                    .unwrap()
+                    .len(),
+                1
+            );
+        }
+        assert!(recorder.finished);
+    }
+    #[test]
+    fn authored_dense_preparation_requires_natural_sleep_and_preserves_accounting() {
+        let mut config = parse(&[
+            "--benchmark".into(),
+            "--count".into(),
+            "10".into(),
+            "--layout".into(),
+            "dense".into(),
+        ])
+        .unwrap();
+        let mut app = ClientApplication::default();
+        config.settle_steps = 1;
+        assert!(
+            initialize(&mut app, config)
+                .unwrap_err()
+                .contains("did not sleep")
+        );
+        let expected = accounting(&app);
+        let mut app = ClientApplication::default();
+        config.settle_steps = 1200;
+        initialize(&mut app, config).unwrap();
+        assert_eq!(accounting(&app), expected);
+        let frame = character_ship_frame(app.ship.snapshot().pose);
+        let eye = app
+            .character
+            .snapshot(frame, surface_frame_for_ship(app.ship.snapshot()))
+            .eye_position_meters;
+        let before = app.mining.session.fragments().to_vec();
+        for _ in 0..100 {
+            let stats = crate::fragment_physics::advance_measured(
+                &mut app.mining,
+                frame,
+                Duration::from_millis(16),
+                eye,
+                true,
+            );
+            assert_eq!(stats.solver.sleeping_objects, 10);
+            assert_eq!(stats.solver.integrated_objects, 0);
+            assert_eq!(stats.solver.pair_visits, 0);
+            assert_eq!(app.mining.session.fragments(), before);
+        }
+    }
+
+    #[test]
+    fn full_game_high_speed_flight_keeps_sleep_and_ship_local_poses() {
+        use winit::keyboard::{KeyCode, PhysicalKey};
+        let mut app = ClientApplication::default();
+        crate::e2e::initialize(
+            &mut app,
+            crate::e2e::Config {
+                scenario: crate::e2e::Scenario::OrbitEarth,
+                seed: 155,
+                step: Duration::from_millis(16),
+                fragment_load: Some((10, Layout::Dense, 1200)),
+            },
+        )
+        .unwrap();
+        let initial = accounting(&app);
+        let anchors = app.mining.ship_fragments.clone();
+        let response = crate::automation::execute(
+            &mut app,
+            r#"{"protocol":1,"id":1,"op":"thruster","direction":1}"#,
+        );
+        assert_eq!(response["ok"], true);
+        app.automation_key(PhysicalKey::Code(KeyCode::KeyA), true);
+        for _ in 0..100 {
+            app.advance_game(Duration::from_millis(16));
+            assert_eq!(app.mining.ship_fragments, anchors);
+            assert!(
+                app.mining
+                    .session
+                    .fragments()
+                    .iter()
+                    .all(|piece| app.mining.fragment_sleep.is_sleeping(piece.id()))
+            );
+            assert_eq!(accounting(&app), initial);
+        }
+        assert!((app.ship.snapshot().speed_meters_per_second - 25_000.0).abs() < 1e-6);
+    }
+    #[test]
     fn rejects_invalid_and_duplicate_options() {
         for args in [
             vec!["--benchmark", "--count", "1001"],
             vec!["--benchmark", "--sample-seconds", "0"],
             vec!["--benchmark", "--state", "sleeping"],
             vec!["--benchmark", "--count", "5", "--count", "5"],
+            vec!["--benchmark", "--settle-steps", "37501"],
+            vec!["--benchmark", "--settle-steps", "10", "--state", "active"],
+            vec!["--benchmark", "--repeats", "0"],
+            vec!["--benchmark", "--repeats", "11"],
+            vec!["--benchmark", "--repeats", "2", "--state", "active"],
         ] {
             assert!(parse(&args.into_iter().map(str::to_owned).collect::<Vec<_>>()).is_err());
         }
@@ -292,7 +452,7 @@ mod tests {
                 scenario: crate::e2e::Scenario::LandedEarth,
                 seed: 155,
                 step: Duration::from_millis(16),
-                fragment_load: Some((500, Layout::Scattered)),
+                fragment_load: Some((500, Layout::Scattered, 0)),
             },
         )
         .unwrap();

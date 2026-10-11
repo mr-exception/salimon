@@ -1,5 +1,42 @@
 # Issue #156 — persistent fragment sleep and contact-island waking
 
+## Native continuation — 2026-10-11
+
+The continuation runs on the reference iMac21,1: Apple M1 (8 CPU / 8 GPU cores),
+16 GB RAM, macOS 26.2 (25C56), Rust 1.89.0, native Metal, 1920×1080 drawable,
+scale 1, AutoVsync, diagnostics off. The external display is 1920×1080 at 75 Hz;
+the built-in display is 4480×2520. `pmset -g therm` reports no thermal/power warning.
+No software GPU or container substitutes for this native evidence.
+
+**Validation is still running; this section does not claim completion.** Large
+fixtures now prepare through bounded production 16 ms updates and must reach
+complete persistent sleep before measured windows. Three settled windows reuse
+that naturally settled population; active repeats start fresh processes. E2E
+inspection exposes stable-ID sleep for loaded flight/support checks.
+
+Native work identified and fixes:
+
+- Backport wgpu's [Metal first-frame visibility fix](../../vendor/README.md).
+  Repeated native launches otherwise remained blank and returned `Occluded`.
+- Select ship cargo in the current frame before final world-pose synchronization;
+  the old selection omitted fast-moving cargo and cleared its sleep state.
+- Filter swept waking by convex proximity as well as conservative spheres.
+- Stabilize nearly coplanar reaction features while retaining exact hull support,
+  and require the unchanged fixed 1 mm / quaternion 0.005 dwell envelope even
+  with documented chatter velocity guards.
+- Respect existing deck support during positional pair separation; deck projection
+  previously undid the supported body's share of separation in loaded stacks.
+- Deduplicate numerical parallel SAT axes and short-circuit support-graph SAT.
+  Native sampling identified projection/face/graph work as the dominant cost.
+
+Quality checks passed on this machine: 425 Rust tests, one existing ignored GPU
+backend test; 46 Python runner tests; workspace build, formatting and Clippy.
+A prior native build passed all 17 standard scenarios / 1,712 steps. Final native
+matrix and loaded-route results will replace this pending status after validation.
+
+The original implementation report below is historical container evidence from
+PR #164 / `b52f2f0`, recorded 2026-10-10; it is not current native acceptance.
+
 ## Outcome
 
 Reviewable implementation of stable-ID sleep at the portable physics boundary,

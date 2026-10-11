@@ -798,10 +798,10 @@ impl ClientApplication {
                         .as_mut()
                         .expect("active benchmark")
                         .finish(accounting);
-                    if let Err(error) = result {
-                        self.fail(event_loop, error);
-                    } else {
-                        event_loop.exit();
+                    match result {
+                        Err(error) => self.fail(event_loop, error),
+                        Ok(true) => event_loop.exit(),
+                        Ok(false) => window.request_redraw(),
                     }
                     return;
                 }

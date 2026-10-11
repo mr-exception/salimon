@@ -1,12 +1,12 @@
 //! Deterministic initial populations only; all later updates use production state.
-use crate::app::{ClientApplication, character_ship_frame};
+use crate::app::{ClientApplication, character_ship_frame, surface_frame_for_ship};
 use crate::fragment_physics::{FragmentMotion, fragment_hull};
 use salimon_character::SHIP_FLOOR_HEIGHT_METERS;
 use salimon_world::{
     CelestialBodyId, WorldPosition,
     resources::{DepositId, RawMaterial, ResourceDeposit, ResourceId, ResourceTransform},
 };
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub(crate) enum Layout {
@@ -197,6 +197,57 @@ pub(crate) fn initialize(
     }
     if app.mining.session.fragments().len() != count {
         return Err("fixture count mismatch".into());
+    }
+    Ok(())
+}
+
+/// Prepare a fixture only through production updates; never install rest poses or flags.
+pub(crate) fn settle(app: &mut ClientApplication, count: usize, limit: u64) -> Result<(), String> {
+    // Settled fixture preparation uses the real adapter at explicit 16 ms deltas,
+    // before starting the native wall-clock measurement. No sleep flags/poses
+    // are installed. This avoids a slow initial fall feeding large native deltas
+    // back into a load intended to measure already settled cargo.
+    if limit > 0 && count > 0 {
+        let frame = character_ship_frame(app.ship.snapshot().pose);
+        let eye = app
+            .character
+            .snapshot(frame, surface_frame_for_ship(app.ship.snapshot()))
+            .eye_position_meters;
+        let started = Instant::now();
+        let mut sleeping = 0;
+        for step in 1..=limit {
+            let measurements = crate::fragment_physics::advance_measured(
+                &mut app.mining,
+                frame,
+                Duration::from_millis(16),
+                eye,
+                true,
+            );
+            sleeping = measurements.solver.sleeping_objects;
+            if step % 50 == 0 {
+                eprintln!(
+                    "fixture preparation: {step} steps, {sleeping}/{} asleep, {} quiet, {} moving, {:.3} wall seconds",
+                    count,
+                    measurements.solver.quiet_objects,
+                    measurements.moving_objects,
+                    started.elapsed().as_secs_f64()
+                );
+            }
+            if sleeping == count {
+                eprintln!(
+                    "fixture settled naturally after {step} steps ({:.3} simulation seconds, {:.3} wall seconds)",
+                    step as f64 * 0.016,
+                    started.elapsed().as_secs_f64()
+                );
+                break;
+            }
+        }
+        if sleeping != count {
+            return Err(format!(
+                "fixture did not sleep within {} production steps: {sleeping}/{} asleep",
+                limit, count
+            ));
+        }
     }
     Ok(())
 }

@@ -34,6 +34,25 @@ when investigating initial drops. Never describe a requested state as verified
 when its counters disagree. Dense 1,000 loads are deliberately overfull: current
 physics constrains horizontal footprint/floor but has no fragment ceiling solver.
 
+`--settle-steps N` optionally prepares **settled cases only** with up to N actual
+production 16 ms updates before opening the native window. It exits on complete
+persistent sleep, prints actual steps/simulation/wall time to the case stderr,
+and fails rather than measuring an unsettled fixture when the limit is reached.
+The native warmup/sample clocks then run normally; the matrix runner also rejects
+any prepared case that wakes during measurement. This avoids expensive initial
+falls feeding larger wall-clock deltas back into an already-settled-load probe.
+Active rows retain their original initial motion and do not use preparation.
+Preparation and compiler runs must finish before collecting performance samples;
+increase per-case `--timeout` to include preparation. Record `settle_steps_limit`
+with the other configuration fields when comparing baselines.
+
+`--repeats 3` collects three independent warmup/sample windows from one naturally
+settled population. Each window resets clocks, retained samples and decimation,
+checks the original IDs/mass, and appears separately in the summary with a
+`repeat` index. The raw output uses schema 2 with schema-1 `runs`; one repeat
+retains schema 1. Active rows instead launch three fresh processes to repeat
+their initial moving state. Incomplete windows fail as a whole case.
+
 ## CPU wall-clock diagnosis and CI
 
 Without a native display:
@@ -64,6 +83,12 @@ There is no test-only teleport operation after initialization.
 Scenario `setup` can add `fragment_count: 0..1000` and `fragment_layout:
 scattered|dense|surface`. Layout without count is rejected. Surface fixtures
 require `landed-earth`; `fragment-pile` cannot also request a population.
+Optional `fragment_settle_steps: 0..37500` requires a population and performs the
+same bounded production preparation before E2E readiness. Increase the overall
+scenario deadline for preparation; ordinary input deadlines are unchanged.
+Inspection exposes `world.sleeping_fragment_count` and each fragment's `sleeping`
+flag from the last completed update, excluding the carried object. These allow
+loaded routes to assert real activation rather than infer it from screenshots.
 For longer loaded flight/landing/takeoff or streaming-return walkthroughs, copy
 an existing authoritative scenario, add these initial population fields and
 update accounting expectations to include fixture mass. Keep production input
@@ -92,6 +117,8 @@ rather than skipping updates or weakening interaction gates.
   repeated/stale; pending/unsupported remain explicit. No blocking timing readback.
 - `objects_simulated` is the selected snapshot population (legacy field name).
   `awake_objects`/`sleeping_objects` report persistent activation after the update;
+  `quiet_objects` counts bodies that passed dwell, including bodies still awake
+  because another member of their supported contact island is unstable;
   `integrated_objects` counts actual object-substep visits. `sleeping_observed`
   requires the entire selected population asleep throughout the sample window.
   `settled_observed` remains the distinct velocity-rest observation. Fully sleeping

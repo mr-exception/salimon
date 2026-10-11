@@ -10,6 +10,8 @@
 - Convex face and edge axes determine final pair contact; bounding spheres only
   provide broad phase and conservative containment. Ground support follows the
   rotated hull each pass. Penetration correction uses a 10 µm separation bias.
+  Supported convex deck bodies cannot take downward positional corrections;
+  the neighbor receives unavailable normal separation. Mass/impulses stay unchanged.
 - Convex contacts use mass-weighted impulses, angular response and Coulomb friction
   capped at 0.65 of normal impulse. Low-speed convex impacts have no restitution;
   faster pair impacts use 0.12. Convex ground contacts are inelastic.

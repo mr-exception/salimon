@@ -1,6 +1,10 @@
 //! Immutable convex proxies derived from authored vertices; no asset/platform dependencies.
 use salimon_math::{add, cross, dot, length, scale, sub};
 
+// Include a nearly coplanar supporting feature rather than switching between
+// individual vertices as a resting face rocks by floating-point/contact noise.
+const SUPPORT_FEATURE_TOLERANCE: f64 = 0.001;
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct ConvexHull {
     pub(crate) vertices: Vec<[f64; 3]>,
@@ -99,7 +103,7 @@ impl ConvexHull {
 
     /// Closest point of the supporting feature to the center-of-mass projection.
     /// A resting face distributes reaction beneath the COM instead of applying
-    /// a torque at its geometric centroid. The 0.2 mm/unit tolerance prevents
+    /// a torque at its geometric centroid. The 1 mm/unit tolerance prevents
     /// facet-edge chatter while retaining visibly close terrain contact.
     pub(crate) fn ground_arm(
         &self,
@@ -112,7 +116,7 @@ impl ConvexHull {
             .vertices
             .iter()
             .map(|v| rotate(orientation, scale(*v, side)))
-            .filter(|p| dot(*p, direction) >= extreme - 0.0002 * side)
+            .filter(|p| dot(*p, direction) >= extreme - SUPPORT_FEATURE_TOLERANCE * side)
             .collect();
         let target = scale(direction, extreme);
         let mut nearest = points[0];
@@ -237,8 +241,9 @@ pub(crate) fn projections(a: &super::ObjectState, b: &super::ObjectState) -> Vec
     for n in &bh.normals {
         push_axis(&mut axes, rotate(b.orientation, *n));
     }
-    // Cross-edge directions need no O(axis_count²) duplicate search. Repeated
-    // separating axes are harmless and cheaper than deduplication on faceted ore.
+    // Keep crossed-edge axes without a quadratic duplicate search. Native dense
+    // profiling shows repeated parallel axes dominate projection/graph work;
+    // quantized membership below removes those repeats in deterministic order.
     let ae: Vec<_> = ah.edges.iter().map(|v| rotate(a.orientation, *v)).collect();
     let be: Vec<_> = bh.edges.iter().map(|v| rotate(b.orientation, *v)).collect();
     for a in &ae {
@@ -250,6 +255,18 @@ pub(crate) fn projections(a: &super::ObjectState, b: &super::ObjectState) -> Vec
             }
         }
     }
+    let mut seen = std::collections::HashSet::with_capacity(axes.len());
+    axes.retain(|axis| {
+        // Opposite axes describe the same separating planes. 1e-9 component
+        // bins merge only numerical parallel repeats (sub-nanometre projection
+        // error at fragment scales, far below the 10 micrometre separation bias).
+        let sign = axis
+            .iter()
+            .find(|v| v.abs() > 1e-9)
+            .map_or(1.0, |v| v.signum());
+        let key: [i64; 3] = axis.map(|v| (v * sign * 1e9).round() as i64);
+        seen.insert(key)
+    });
     let av: Vec<_> = ah
         .vertices
         .iter()
@@ -286,11 +303,47 @@ pub(crate) fn near_contact(a: &super::ObjectState, b: &super::ObjectState, gap: 
     if separated_by_faces_with_gap(a, b, gap) {
         return false;
     }
+    // Faces have already passed. Test crossed edges directly and stop at the
+    // first separating axis; the support graph needs a boolean, not a cached
+    // minimum-translation manifold. Rotated vertices are shared across axes.
+    let ah = a.hull.as_ref().expect("convex caller");
+    let bh = b.hull.as_ref().expect("convex caller");
     let offset = sub(b.position, a.position);
-    projections(a, b).iter().all(|p| {
-        let shift = dot(offset, p.axis);
-        p.forward - shift >= -gap && p.backward + shift >= -gap
-    })
+    let vertices = |h: &ConvexHull, orientation, side| {
+        h.vertices
+            .iter()
+            .map(|v| rotate(orientation, scale(*v, side)))
+            .collect::<Vec<_>>()
+    };
+    let av = vertices(ah, a.orientation, a.side_meters);
+    let bv = vertices(bh, b.orientation, b.side_meters);
+    let span = |vertices: &[[f64; 3]], axis| {
+        vertices
+            .iter()
+            .map(|v| dot(*v, axis))
+            .fold((f64::INFINITY, f64::NEG_INFINITY), |(lo, hi), x| {
+                (lo.min(x), hi.max(x))
+            })
+    };
+    let be: Vec<_> = bh.edges.iter().map(|v| rotate(b.orientation, *v)).collect();
+    for edge in &ah.edges {
+        let ae = rotate(a.orientation, *edge);
+        for &be in &be {
+            let axis = cross(ae, be);
+            let size = length(axis);
+            if size <= 1e-10 {
+                continue;
+            }
+            let axis = scale(axis, 1.0 / size);
+            let (amin, amax) = span(&av, axis);
+            let (bmin, bmax) = span(&bv, axis);
+            let shift = dot(offset, axis);
+            if amax - bmin - shift < -gap || bmax - amin + shift < -gap {
+                return false;
+            }
+        }
+    }
+    true
 }
 
 /// Minimum translation of B relative to A, with universe-scale-safe subtraction.
@@ -339,7 +392,7 @@ pub(crate) fn contact_arms(
         h.vertices
             .iter()
             .map(|v| rotate(q, scale(*v, side)))
-            .filter(|p| dot(*p, direction) >= support - side * 1e-7)
+            .filter(|p| dot(*p, direction) >= support - side * SUPPORT_FEATURE_TOLERANCE)
             .collect::<Vec<_>>()
     };
     let av = feature(ah, a.orientation, a.side_meters, normal);
@@ -415,6 +468,47 @@ mod tests {
     use crate::{ObjectState, Surface, advance};
     use std::{sync::Arc, time::Duration};
 
+    #[test]
+    fn support_graph_short_circuit_matches_full_sat() {
+        for index in 0..400 {
+            let mut a = object([0.0; 3], [0.3, 0.5, 0.2]);
+            let mut b = object(
+                [
+                    0.1 * (index % 13) as f64,
+                    0.03 * (index % 7) as f64,
+                    0.02 * (index % 11) as f64,
+                ],
+                [0.4, 0.2, 0.3],
+            );
+            let angle = index as f64 * 0.17;
+            a.orientation = [0.0, (angle / 2.0).sin(), 0.0, (angle / 2.0).cos()];
+            b.orientation = [(angle / 3.0).sin(), 0.0, 0.0, (angle / 3.0).cos()];
+            for gap in [0.0, 0.001, 0.05] {
+                let offset = sub(b.position, a.position);
+                let reference = projections(&a, &b).iter().all(|p| {
+                    let shift = dot(offset, p.axis);
+                    p.forward - shift >= -gap && p.backward + shift >= -gap
+                });
+                assert_eq!(near_contact(&a, &b, gap), reference, "{index} {gap}");
+            }
+        }
+    }
+
+    #[test]
+    fn loaded_deck_support_does_not_undo_pair_separation() {
+        let mut bottom = object([0.0, 0.2, 0.0], [0.2; 3]);
+        let mut top = object([0.0, 0.45, 0.0], [0.2; 3]);
+        bottom.mass_kg = 0.5;
+        top.mass_kg = 2.0;
+        let mut pieces = [bottom, top];
+        advance(&mut pieces, Duration::from_millis(1), |_, _| true);
+        assert!((pieces[0].position[1] - 0.2).abs() < 1e-9);
+        assert!((pieces[1].position[1] - 0.60001).abs() < 1e-6);
+        assert!(contact(&pieces[0], &pieces[1]).is_none());
+        assert_eq!(pieces[0].mass_kg, 0.5);
+        assert_eq!(pieces[1].mass_kg, 2.0);
+    }
+
     fn box_hull(half: [f64; 3]) -> Arc<ConvexHull> {
         Arc::new(ConvexHull::new((0..8).map(|i| {
             std::array::from_fn(|axis| half[axis] * if i & (1 << axis) == 0 { -1.0 } else { 1.0 })
@@ -449,6 +543,23 @@ mod tests {
             (std::f64::consts::FRAC_PI_4).cos(),
         ];
         assert!(contact(&a, &b).unwrap().1 > 0.05);
+    }
+
+    #[test]
+    fn repeated_edge_axes_keep_rotated_box_separation_and_support_gap() {
+        for angle in [0.0_f64, 0.17, 0.73] {
+            let mut a = object([0.0, 0.1, 0.0], [0.3, 0.1, 0.2]);
+            a.orientation = [0.0, angle.sin(), 0.0, angle.cos()];
+            let mut b = a.clone();
+            b.position[1] = 0.3;
+            assert_eq!(projections(&a, &b).len(), 3);
+            assert!(contact(&a, &b).unwrap().1.abs() < 1e-12);
+            b.position[1] += 0.0005;
+            assert!(contact(&a, &b).is_none());
+            assert!(near_contact(&a, &b, 0.001));
+            b.position[1] += 0.001;
+            assert!(!near_contact(&a, &b, 0.001));
+        }
     }
     #[test]
     fn convex_pile_settles_and_support_removal_reactivates_gravity() {

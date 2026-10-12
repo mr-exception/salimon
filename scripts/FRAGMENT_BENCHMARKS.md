@@ -46,6 +46,12 @@ Preparation and compiler runs must finish before collecting performance samples;
 increase per-case `--timeout` to include preparation. Record `settle_steps_limit`
 with the other configuration fields when comparing baselines.
 
+Set `SALIMON_FIXTURE_CHECKPOINT` to a local JSON file to retain the last production
+preparation state on success or failure. The read-only diagnostic export runs at
+initialization, every 50 updates and completion, and replaces that file with the
+actual step, stable IDs, poses, velocities, sizes, masses, hulls and sleep flags.
+Use it for diagnosis; it is not a native sampling or acceptance result.
+
 `--repeats 3` collects three independent warmup/sample windows from one naturally
 settled population. Each window resets clocks, retained samples and decimation,
 checks the original IDs/mass, and appears separately in the summary with a
@@ -131,7 +137,10 @@ rather than skipping updates or weakening interaction gates.
   time splits integration/environment contacts from matrix/pair/ground work.
 - Matrix Vec allocation counts and requested projection/matrix capacity bytes
   are structural samples, not total heap allocations; ground-arm/axis/vertex
-  scratch and allocator overhead are excluded. Resource scratch bytes similarly
+  scratch, contact-response multiplier vectors and allocator overhead are excluded.
+  Geometry-record and SAT candidate-index capacities are included. Retained
+  matrix/projection capacity is not counted again in a later call; these counters
+  do not measure resident memory. Resource scratch bytes similarly
   describe only transformed vertex capacity. Use a native allocator profiler to
   complement these counters before claiming total allocation reduction.
 - Renderer CPU time excludes surface acquisition/presentation; raw frame intervals

@@ -1,5 +1,105 @@
 # Issue #156 — persistent fragment sleep and contact-island waking
 
+## Continuation status — 2026-10-12
+
+**Incomplete: the required native dense 500/1,000 settled windows have not passed.**
+The final committed build (`f5f03c2`) passed all 17 native scenarios / 1,712 steps,
+and the native 100-fragment loaded route described below passed. The attempted
+native dense 500 preparation failed after 2,400 production updates (38.4 simulation
+seconds): only 7/500 fragments slept, 56 met quiet dwell, and 138 still moved.
+Preparation took 7,792.544 wall-clock seconds (about 130 minutes). It exited before
+readiness, baseline replay or native sampling, so it provides no settled FPS result.
+Raw local stderr: `artifacts/fragment-benchmarks/issue156-dense500-friction-native.stderr`.
+
+Further solver changes are under investigation and remain uncommitted. Passing
+small-load or diagnostic replay checks do not satisfy the large-load acceptance.
+The next native 500 attempt also failed: 40/500 asleep after 1,200 updates
+(19.2 simulation seconds, 2,273.509 wall seconds). The simultaneous 1,000 attempt
+was terminated before readiness after 4,550 wall seconds; its last checkpoint
+was 27/1,000 asleep at 850 updates. Neither attempt produced settled sampling
+or loaded interaction evidence. Raw results are in
+`artifacts/issue156-native-rolling10-500` and
+`artifacts/issue156-native-rolling10-1000`.
+
+Read-only preparation checkpoints now retain canonical states for diagnosis.
+The runtime adapter continuity regression passed. Moving the convex rest cutoff
+after all contact iterations passed 47 physics tests and a fresh native 100
+preparation (all sleeping after 202 updates / 3.232 simulation seconds).
+The corresponding 500 preparation was stopped after retaining its state at
+600 updates: 42/500 asleep, 427 quiet and 23 moving (1,216.276 wall seconds at
+that checkpoint). It did not reach readiness or the loaded route. These are
+intermediate results, not completion.
+The staged end-cutoff build also passed all 347 workspace Rust tests (one existing
+GPU test ignored), all 48 Python tests, workspace Clippy, and all 17 native
+scenarios / 1,712 steps. Formatting and diff checks passed.
+The [dated validation manifest](native-validation-2026-10-12.json) records the
+binary SHA-256 and per-scenario results; the large-load gate remains pending.
+
+The next change retains exact SAT projections across substeps/updates when
+orientations, shapes and identities are unchanged; rotating pairs and external
+changes invalidate them. An exact-state regression matches fresh projection
+rebuilds and verifies invalidation. Fully sleeping groups release the matrix.
+A first cache trial was stopped at its 450-update retained state (47/500 asleep)
+while correcting first-use face rejection and pending reaction handling. It is
+excluded from acceptance. The corrected cache matched fresh substep projection
+rebuilding exactly for 20 updates of the actual authored initial 500 fixture and
+20 updates of the retained 600-update native state. These are diagnostic
+equivalence checks, not native acceptance. Local logs:
+`artifacts/fragment-benchmarks/cache-probe/actual500-equivalence.log` and
+`artifacts/fragment-benchmarks/cache-probe/actual600-equivalence.log`.
+A fresh native 500 preparation with the corrected optimization failed after
+2,400 updates (38.4 simulation seconds): 31/500 asleep, 472 quiet and 14 moving.
+It took 4,044.787 wall seconds and exited before readiness or native sampling.
+Raw result: `artifacts/issue156-native-prefilter-500/summary.json`.
+The corrected build passed 348 workspace Rust tests (one existing GPU test
+ignored), Clippy, formatting/diff checks and all 17 native scenarios / 1,712 steps;
+unchanged Python tooling passed its 48 tests. The
+[corrected cache validation manifest](native-validation-2026-10-12-cached.json)
+records its distinct binary hash. It reproduces the earlier native 50/100-update
+motion and sleep counters. The required large settled loads remain unverified.
+The retained 600-update state has no deep penetration: full SAT found 614
+contacts, no overlap exceeding 1 mm, and a maximum depth of 4.460 micrometres.
+Separate velocity-stage experiments are diagnostic only and are not installed
+in this production build.
+Those experiments did not improve settling and were rejected. Diagnostic
+per-body observation failures at the retained 1,100-update native state identify
+34 kinetic-displacement, 23 projection, 44 angular-drift and 21 angular-chatter
+failures (criteria overlap), plus two speed failures, one short window and one
+support failure. Fixed-reference point observation reached 492 quiet bodies but
+did not sleep the main island. Growing material-point envelopes subsequently
+reached all 500 asleep in a diagnostic continuation (51 updates / 86.940 wall
+seconds from the preceding replay state). This is not a fresh native fixture
+or native acceptance result.
+
+The production observation rule now tracks actual proxy-vertex trajectories
+with the documented 15 mm enclosing-radius / 0.5 s rest budget. It replaces the
+axis-dependent quaternion and terminal-velocity displacement estimates. A first
+sample receives no prior-time credit. Tests deliberately cover supported motion
+inside the envelope and translation/tipping above it, loss of support, first
+long updates and quaternion sign equivalence. All 50 physics tests and Clippy
+passed. The same build passed 350 workspace Rust tests (one existing GPU test
+ignored) and all 17 native scenarios / 1,712 steps. The
+[point-envelope validation manifest](native-validation-2026-10-12-point.json)
+records the binary and checks. Fresh native 500 loaded acceptance is running;
+the issue remains incomplete until the required native gates pass.
+The first replay probes in this continuation accidentally linked an older staged
+physics library; their results are excluded. Subsequent probes build with explicit
+`--target aarch64-apple-darwin` and link that target's matching libraries.
+A 32-update trace showed median half-window pose displacement of 2.109 mm.
+Further checks separated numerical projection from terminal kinetic motion.
+The current observation-window criteria are documented in the physics
+[canonical policy](../../client/physics/architecture.md#persistent-contact-island-sleep-156).
+They retain genuine slow-slide/turn rejection, require support throughout the
+window, and bound projection and residual overlap. Unsuccessful static-deck,
+extra-pass and independent-cutoff experiments are excluded from acceptance.
+
+Before the latest warm-starting experiment, the updated solver passed 339 Rust
+tests (one existing GPU test ignored), workspace Clippy, formatting and all 17
+native scenarios. Current warm-starting safety tests pass, including identity
+reordering, removed support, changed mass/pose/velocity/environment and explicit
+force invalidation. Final workspace/native gates must be rerun after the solver
+stabilizes; these intermediate checks are not acceptance completion.
+
 ## Native continuation — 2026-10-11
 
 The continuation runs on the reference iMac21,1: Apple M1 (8 CPU / 8 GPU cores),
@@ -32,7 +132,7 @@ Native work identified and fixes:
 Current workspace gates: **334 Rust tests passed, one existing ignored GPU
 backend test**, 48 Python runner tests, release build, formatting and Clippy.
 The current physics owner has 35 passing tests. The preceding native build
-passed all 17 standard scenarios / 1,712 steps; the final build's suite is running.
+passed all 17 standard scenarios / 1,712 steps; the final committed build also passed all 17 scenarios / 1,712 steps.
 Native two-camera/repeat/barrier smoke checks passed all eight 0/10 windows;
 100 identical-snapshot 10-fragment solver replays retained full sleep, zero
 integration and zero pair visits against 1,440 stateless pair visits per replay.

@@ -28,22 +28,47 @@ from current orientation during every ground pass. Unsupported objects receive
 -Y gravity without terrain projection. Floor/non-floor groups and separate
 planet centers do not contact. Different ship frames require separate calls.
 
-The solver integrates orientation and motion, performs 16 ordered convex contact
-passes, projects penetration and applies mass-weighted normal/friction impulses
-with angular response. Inertia is an isotropic approximation from mass and
+For convex objects the solver applies gravity and current-pose contacts before
+advancing position/orientation. Sixteen ordered contact passes solve each current
+pose; a moved pose receives another sixteen passes after integration. Rotation
+invalidates affected SAT caches. Penetration projection and mass-weighted
+normal/friction impulses include angular response. Inertia is an isotropic approximation from mass and
 bounding radius, not an exact volume integral. Ground contacts use authored
 support points, allowing tilted objects to tip; damping bounds residual motion.
+Convex rest requires an upward reaction exceeding half the substep gravity
+impulse and combined surface speed `|v| + |angular velocity| * radius` below
+0.015 m/s. Both velocities then become zero, after all contact passes for the
+substep. Cutting between passes would invalidate accumulated constraint impulses.
+Translation is not cut separately
+while rolling remains meaningful; unsupported bodies accumulate gravity even
+with very short updates. The existing standalone 0.015 rad/s angular cutoff and
+0.995 / 0.98 linear/angular damping remain.
 Supporting ground faces use their near-coplanar vertices. Pair face contacts
 clip the two support polygons in the contact tangent plane, then solve normal
 constraints at the intersection corners. Sixteen local projected iterations
 accumulate nonnegative impulses and can undo an excess corner impulse; a single
 center reaction cannot balance an off-center load in a stack. Face/edge contacts retain the clipped segment's endpoints; vertex contacts
-retain one reaction arm. Ground edges use both supporting vertices. Distributed
-friction uses the updated contact velocity at each point, with 16 local projected
-iterations and a Coulomb disk capped at 0.65 of that point's accumulated normal
-impulse. Faces and edges resist twist as well as translation. Ground friction
+retain one reaction arm. Parallel edge contacts use both overlap endpoints;
+crossing edges use the actual closest points rather than the midpoint of their
+tangent bounding boxes. Ground edges use both supporting vertices. Distributed
+friction uses the updated contact velocity at each point. Sixteen local projected
+iterations alternate normal and tangent constraints, with a Coulomb disk capped
+at 0.65 of that point's accumulated normal impulse. Normal/tangent multipliers
+persist across global passes within a substep while the normal is unchanged
+(to 1e-8) and both arms remain within 100 µm of their saved feature; changed
+features start fresh. Ground constraints retain multipliers in the same way.
+Across substeps, warm starting transports saved impulses to the current normal
+and arms only when the normal dot product exceeds 0.999 and both arms move less
+than 1 mm. Tangent impulses are projected onto the new tangent plane and clamped
+to the current Coulomb disk. The same transport retains pre-advancement pressure
+through the post-advancement solve while rotated SAT geometry is rebuilt exactly.
+These response matching tolerances do not change SAT separation or hull geometry. Faces and edges resist twist as well as translation. Ground friction
 uses the solved normal load, including supported cargo, rather than only the
-body's own weight. The legacy sphere response is unchanged. Pair velocity constraints remain active across a 20 µm
+body's own weight. Rough contact rolling/spin loss is a separate accumulated
+angular impulse capped at 0.1 times normal impulse times bounding radius (the
+smaller radius for pairs). It exchanges equal/opposite pair torques and requires
+a current contact load; unsupported objects receive no rolling drag. This is a
+uniform approximate contact law, not a material-specific deformation model. The legacy sphere response is unchanged. Pair velocity constraints remain active across a 20 µm
 contact skin around the 10 µm positional bias, preventing correction from
 prematurely dropping a loaded velocity constraint.
 Positional separation respects a convex body's existing deck support: downward
@@ -52,6 +77,16 @@ normal separation goes to its neighbor. This prevents subsequent deck projection
 from undoing pair separation in loaded stacks. Mass, inertia and velocity impulses
 remain physical; this constraint does not apply to unsupported or sphere-fallback
 bodies.
+The pair minimum-axis cache retains a candidate set and only skips excluded
+axes when a displacement bound proves they cannot become the minimum. It
+falls back to the full exact SAT scan whenever the bound is inconclusive.
+The stateful solver retains the exact projection matrix across substeps and
+updates. Rotating a body invalidates its affected pairs; external changes,
+reordered/omitted IDs or even an orientation ULP rebuild the retained matrix.
+Fully sleeping islands release it. This reuses unchanged geometry without
+changing SAT axes, contact response, iteration order or physical poses.
+Retained pairs rerun the first-use face rejection in each substep; unused
+records neither replace pending reactions nor enter the cached support path.
 Ground and pair reaction arms include vertices within 1 mm per unit scale of
 the extreme supporting feature. This submillimetre tolerance at normal fragment
 sizes avoids switching to a lone vertex under resting-face contact noise while
@@ -86,29 +121,60 @@ not a missing velocity cache entry, decides whether an object is new.
 operation order and results. Normal calls compile out counters/clocks. `StepStats`
 counts substeps, passes, all pair visits, radius candidates, convex narrow-phase
 visits, resolved contacts and projection builds. Visits include repeated passes.
-Integration includes initial environmental contacts; contact time includes matrix
-allocation, pair resolution and repeated ground projection. Damping and matrix
-teardown remain in total adapter-call time.
+Integration includes gravity, pose advancement, damping and environmental contacts;
+contact time includes pair resolution and repeated ground projection. Matrix
+allocation, cache invalidation and teardown remain in total adapter-call time.
 
 Matrix Vec allocations and requested matrix/projection capacity bytes are
 structural allocation observations, with one outer vector and one vector per row, not
-process-wide allocator totals. Convex temporary vertices/axes/ground arms and
-allocator overhead are excluded. See the [benchmark guide](../../scripts/FRAGMENT_BENCHMARKS.md).
+process-wide allocator totals. Convex temporary vertices/axes/ground arms, response-multiplier/motion-window vectors and
+allocator overhead are excluded. The matrix stores boxed geometry handles;
+reported geometry bytes include the boxed record and requested SAT candidate-index
+capacity in addition to projection spans. These are new allocation requests in
+the measured call; retained matrix/projection capacity is not re-counted and
+these counters are not total resident memory. See the [benchmark guide](../../scripts/FRAGMENT_BENCHMARKS.md).
 
 ## Persistent contact-island sleep (#156)
+
+The tracker also retains solved ground/pair reactions by stable identity for warm
+starting. Matching body snapshots are required; changed pose, velocity, angular
+velocity, mass, scale, hull or environment discards affected reactions. Omitted
+IDs and `wake_all` invalidate them; rejected floor support clears affected cached
+reactions. Reordered pairs start fresh when their ordered direction reverses.
+Each substep scales previous impulses by its duration ratio, capped at 2, and
+applies them once before solving. New/current SAT and ground support still gate
+every reaction. Fully asleep updates do not apply cached reactions or integrate.
+
 
 `SleepTracker<K>` is caller-owned and keyed by stable identity; native/world
 identity types do not enter physics. `advance_with_sleep` restores activation
 beside ordered snapshots. The stateless `advance` path remains available as the
-baseline. An island sleeps only after every member has linear/angular speeds
-below 0.15 m/s and 1.0 rad/s, position within 1 mm and quaternion components
-within 0.005 of a fixed dwell anchor for 0.5 simulation seconds. The dwell-wide
-pose envelope rejects slow sliding/tipping while allowing bounded faceted-contact
-chatter (loaded faceted contacts can briefly exceed the solver's 0.015 cutoff).
-The dwell-wide envelope remains mandatory: slow sliding/tipping cannot sleep
-even when instantaneous speeds are below these chatter guards. At least one member must have
-actual environmental support within 1 mm. Fast face rejection followed by full convex SAT with the same 1 mm
-gap forms contact edges; bounding-sphere overlap alone cannot anchor an island.
+baseline. Each member of a supported island must pass a 0.5 simulation-second
+observation window. Every observation remains below 0.15 m/s / 1.0 rad/s and
+belongs to a component with actual environmental support within 1 mm. Full
+convex SAT with a 1 mm gap forms contact edges; bounding-sphere overlap alone
+cannot anchor an island. Convex pair penetration above 1 mm prevents sleep.
+
+Rest observation tracks the center and every authored convex-proxy vertex
+(six axial surface points for the legacy sphere fallback). Each point's actual
+position history must fit a growing enclosing sphere with radius below
+`0.03 m/s * 0.5 s = 15 mm`. A moving enclosure accommodates bounded contact
+chatter while translation and rotation share one geometric, scale-aware rule.
+This is a radius-growth budget: steady travel spanning 30 mm in the window
+reaches the limit. Quaternion-component thresholds and post-solver velocity
+integration are not used to infer pose movement. Measurements use relative
+coordinates to retain large-world precision; boundary quaternion interpolation
+uses the shortest sign and unit normalization.
+
+The 0.03 m/s / 0.5 s reference follows the point-envelope approach described by
+[Jolt's sleep settings](https://github.com/jrouwe/JoltPhysics/blob/master/Jolt/Physics/PhysicsSettings.h)
+and [body sleep test](https://github.com/jrouwe/JoltPhysics/blob/master/Jolt/Physics/Body/Body.cpp).
+The implementation here uses actual proxy vertices and the existing custom
+Rust solver, support graph and velocity guards. No engine dependency is added.
+Motion above the envelope, unsupported observations and speed failures keep the
+island awake. A first observation receives no preceding quiet-time credit.
+Changed snapshots and explicit waking restart the window. Enclosing centers
+are diagnostics only; simulation poses are never replaced by them.
 
 Sleeping poses stay in the solver snapshot as collision participants. Skip their
 integration/damping and sleeping-to-sleeping contacts. A fully sleeping update

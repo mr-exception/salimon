@@ -215,7 +215,10 @@ pub(crate) fn settle(app: &mut ClientApplication, count: usize, limit: u64) -> R
             .eye_position_meters;
         let started = Instant::now();
         let mut sleeping = 0;
+        let mut last_step = 0;
+        checkpoint(app, frame, eye, 0)?;
         for step in 1..=limit {
+            last_step = step;
             let measurements = crate::fragment_physics::advance_measured(
                 &mut app.mining,
                 frame,
@@ -225,6 +228,7 @@ pub(crate) fn settle(app: &mut ClientApplication, count: usize, limit: u64) -> R
             );
             sleeping = measurements.solver.sleeping_objects;
             if step % 50 == 0 {
+                checkpoint(app, frame, eye, step)?;
                 let states = crate::fragment_physics::snapshots(&app.mining, frame, eye);
                 let mut speeds: Vec<_> = states
                     .iter()
@@ -260,6 +264,7 @@ pub(crate) fn settle(app: &mut ClientApplication, count: usize, limit: u64) -> R
                 break;
             }
         }
+        checkpoint(app, frame, eye, last_step)?;
         if sleeping != count {
             return Err(format!(
                 "fixture did not sleep within {} production steps: {sleeping}/{} asleep",
@@ -268,6 +273,30 @@ pub(crate) fn settle(app: &mut ClientApplication, count: usize, limit: u64) -> R
         }
     }
     Ok(())
+}
+
+/// Optional diagnostic export; never changes the fixture or activation state.
+/// Each checkpoint replaces the file so failed preparation retains its last state.
+fn checkpoint(
+    app: &ClientApplication,
+    frame: salimon_character::ShipFrame,
+    eye: [f64; 3],
+    step: u64,
+) -> Result<(), String> {
+    let Some(path) = std::env::var_os("SALIMON_FIXTURE_CHECKPOINT") else {
+        return Ok(());
+    };
+    let states = crate::fragment_physics::snapshots(&app.mining, frame, eye);
+    let data = serde_json::json!({"step":step, "states":states.iter().map(|(piece, p)| {
+        serde_json::json!({"id":piece.id().0, "position":p.position,
+            "orientation":p.orientation, "velocity":p.velocity,
+            "angular_velocity":p.angular_velocity, "radius":p.radius,
+            "mass_kg":p.mass_kg, "side_meters":p.side_meters,
+            "sleeping":app.mining.fragment_sleep.is_sleeping(piece.id()),
+            "vertices":crate::resource_presentation::fragment_mesh(*piece).mesh.unit_vertices()})
+    }).collect::<Vec<_>>()});
+    std::fs::write(path, serde_json::to_vec(&data).map_err(|e| e.to_string())?)
+        .map_err(|e| format!("fixture checkpoint: {e}"))
 }
 
 #[cfg(test)]

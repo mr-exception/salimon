@@ -12,6 +12,7 @@ pub use sleep::SleepTracker;
 
 const GRAVITY: f64 = 9.81;
 const RESTITUTION: f64 = 0.12;
+const ROLLING_RESISTANCE: f64 = 0.1;
 const MAX_STEP: f64 = 1.0 / 90.0;
 const CONTACT_BIAS_METERS: f64 = 0.00001;
 
@@ -194,6 +195,7 @@ pub fn advance_with_sleep<K: Copy + Eq + std::hash::Hash>(
     for (i, piece) in pieces.iter().enumerate() {
         if piece.surface.is_floor() && !floor_contains(piece.position, piece.radius) {
             activation.wake(i);
+            activation.invalidate_support(i);
         }
     }
     let prepare_time = activation_start.map(|s| s.elapsed()).unwrap_or_default();
@@ -249,11 +251,32 @@ fn advance_impl<const PROFILE: bool>(
         (elapsed / MAX_STEP).ceil().clamp(1.0, 48.0) as usize
     };
     let dt = elapsed / steps as f64;
-    for step in 0..steps {
+    for _ in 0..steps {
         if let Some(a) = &mut activation {
             a.impacts(pieces, dt);
         }
+        let mut ground_responses = vec![ContactResponse::default(); pieces.len()];
+        let mut warm_pairs = activation
+            .as_mut()
+            .map(|a| std::mem::take(&mut a.warm_pairs))
+            .unwrap_or_default();
+        if let Some(a) = &mut activation {
+            let ratio = if a.warm_dt > 0.0 {
+                (dt / a.warm_dt).clamp(0.0, 2.0)
+            } else {
+                0.0
+            };
+            for response in warm_pairs.values_mut() {
+                response.rearm(ratio);
+            }
+            for (index, mut response) in a.warm_ground.drain() {
+                response.rearm(ratio);
+                ground_responses[index] = response;
+            }
+        }
         let integration_start = PROFILE.then(Instant::now);
+        let mut gravity_velocities = vec![[0.0; 3]; pieces.len()];
+        let mut gravity_ups = vec![[0.0, 1.0, 0.0]; pieces.len()];
         for (i, piece) in pieces.iter_mut().enumerate() {
             if activation.as_ref().is_some_and(|a| a.sleeping[i]) {
                 continue;
@@ -268,157 +291,430 @@ fn advance_impl<const PROFILE: bool>(
                 .map(|body| normalize(sub(piece.position, body.center)))
                 .unwrap_or([0.0, 1.0, 0.0]);
             piece.velocity = sub(piece.velocity, scale(up, GRAVITY * dt));
-            piece.position = add(piece.position, scale(piece.velocity, dt));
-            piece.orientation = convex::integrate(piece.orientation, piece.angular_velocity, dt);
+            gravity_velocities[i] = piece.velocity;
+            gravity_ups[i] = up;
+            if !has_hulls {
+                piece.position = add(piece.position, scale(piece.velocity, dt));
+                piece.orientation =
+                    convex::integrate(piece.orientation, piece.angular_velocity, dt);
+            }
             if piece.surface.is_floor() && !floor_contains(piece.position, piece.radius) {
                 piece.position[0] = previous[0];
                 piece.position[2] = previous[2];
                 piece.velocity[0] *= -0.15;
                 piece.velocity[2] *= -0.15;
             }
-            ground_contact(piece);
+            ground_contact_cached(piece, &mut ground_responses[i]);
         }
         if let Some(start) = integration_start {
             stats.integration_time += start.elapsed();
             stats.substeps += 1;
-            if !pieces.is_empty() {
-                stats.matrix_allocations += pieces.len() as u64 + 1;
-            }
-            stats.projection_storage_bytes += ((pieces.len() * pieces.len())
-                * std::mem::size_of::<Option<Vec<convex::Projection>>>()
-                + pieces.len() * std::mem::size_of::<Vec<Option<Vec<convex::Projection>>>>())
-                as u64;
         }
         if let Some(a) = &mut activation {
             a.impacts(pieces, 0.0);
         }
         let contact_start = PROFILE.then(Instant::now);
-        let mut pair_geometry: Vec<Vec<Option<Vec<convex::Projection>>>> =
-            vec![vec![None; pieces.len()]; pieces.len()];
-        for _ in 0..if has_hulls { 16 } else { 3 } {
-            if PROFILE {
-                stats.solver_passes += 1;
+        let reused_geometry = activation.as_mut().and_then(|a| a.geometry.take());
+        if PROFILE && reused_geometry.is_none() {
+            if !pieces.is_empty() {
+                stats.matrix_allocations += pieces.len() as u64 + 1;
             }
-            for (i, row) in pair_geometry.iter_mut().enumerate() {
-                for (j, cached) in row.iter_mut().enumerate().skip(i + 1) {
-                    if activation
-                        .as_ref()
-                        .is_some_and(|a| a.sleeping[i] && a.sleeping[j])
-                    {
-                        continue;
-                    }
-                    if PROFILE {
-                        stats.pair_visits += 1;
-                    }
-                    let (left, right) = pieces.split_at_mut(j);
-                    let a = &mut left[i];
-                    let b = &mut right[0];
-                    if a.surface.is_floor() != b.surface.is_floor()
-                        || (a.surface.sphere().is_some()
-                            && b.surface.sphere().is_some()
-                            && a.surface.sphere().unwrap().center
-                                != b.surface.sphere().unwrap().center)
-                    {
-                        continue;
-                    }
-                    let separation = sub(b.position, a.position);
-                    let distance = length(separation);
-                    let minimum = a.radius + b.radius;
-                    if distance >= minimum {
-                        continue;
-                    }
-                    if PROFILE {
-                        stats.radius_candidates += 1;
-                    }
-                    let (normal, depth) = if a.hull.is_some() && b.hull.is_some() {
-                        if PROFILE {
-                            stats.narrow_phase_tests += 1;
-                        }
-                        if cached.is_none() && convex::separated_by_faces(a, b) {
-                            continue;
-                        }
-                        let geometry = cached.get_or_insert_with(|| {
-                            let projections = convex::projections(a, b);
-                            if PROFILE {
-                                stats.projection_builds += 1;
-                                stats.projection_storage_bytes += (projections.capacity()
-                                    * std::mem::size_of::<convex::Projection>())
-                                    as u64;
-                            }
-                            projections
-                        });
-                        let Some(contact) = convex::projected_contact(geometry, separation) else {
-                            continue;
-                        };
-                        contact
-                    } else {
-                        (
-                            if distance > 1e-9 {
-                                scale(separation, 1.0 / distance)
-                            } else {
-                                [0.0, 1.0, 0.0]
-                            },
-                            minimum - distance,
-                        )
-                    };
-                    if PROFILE {
-                        stats.contacts += 1;
-                    }
-                    if let Some(activation) = &mut activation {
-                        activation.wake(i);
-                        activation.wake(j);
-                    }
-                    let inverse_a = 1.0 / a.mass_kg;
-                    let inverse_b = 1.0 / b.mass_kg;
-                    let direction_a = correction_direction(a, scale(normal, -1.0));
-                    let direction_b = correction_direction(b, normal);
-                    let available = -dot(direction_a, normal) * inverse_a
-                        + dot(direction_b, normal) * inverse_b;
-                    let correction = (depth + CONTACT_BIAS_METERS).max(0.0) / available;
-                    let old_a = a.position;
-                    let old_b = b.position;
-                    a.position = add(a.position, scale(direction_a, correction * inverse_a));
-                    b.position = add(b.position, scale(direction_b, correction * inverse_b));
-                    if a.surface.is_floor() && !floor_contains(a.position, a.radius) {
-                        a.position[0] = old_a[0];
-                        a.position[2] = old_a[2];
-                    }
-                    if b.surface.is_floor() && !floor_contains(b.position, b.radius) {
-                        b.position[0] = old_b[0];
-                        b.position[2] = old_b[2];
-                    }
-                    pair_impulse(a, b, normal);
-                    ground_contact(a);
-                    ground_contact(b);
-                }
-            }
+            stats.projection_storage_bytes += ((pieces.len() * pieces.len())
+                * std::mem::size_of::<Option<Box<convex::ContactGeometry>>>()
+                + pieces.len() * std::mem::size_of::<Vec<Option<Box<convex::ContactGeometry>>>>())
+                as u64;
         }
+        let mut pair_geometry =
+            reused_geometry.unwrap_or_else(|| vec![vec![None; pieces.len()]; pieces.len()]);
+        for geometry in pair_geometry.iter_mut().flatten().flatten() {
+            geometry.used_this_substep = false;
+        }
+        solve_contacts::<PROFILE>(
+            pieces,
+            &mut activation,
+            &mut pair_geometry,
+            &mut ground_responses,
+            &mut warm_pairs,
+            &floor_contains,
+            &mut stats,
+        );
         if let Some(start) = contact_start {
             stats.contact_time += start.elapsed();
         }
-        if step + 1 == steps
-            && let Some(activation) = &mut activation
-        {
-            activation.geometry = Some(pair_geometry);
-        }
+        let pose_start = PROFILE.then(Instant::now);
+        let mut moved = false;
+        let mut rotated = vec![false; pieces.len()];
+        let mut support_reactions = vec![false; pieces.len()];
+        let mut before_post_contact = vec![[0.0; 3]; pieces.len()];
         for (i, piece) in pieces.iter_mut().enumerate() {
             if activation.as_ref().is_some_and(|a| a.sleeping[i]) {
                 continue;
             }
+            let supported_reaction =
+                dot(sub(piece.velocity, gravity_velocities[i]), gravity_ups[i])
+                    > 0.5 * GRAVITY * dt;
+            support_reactions[i] = supported_reaction;
             piece.velocity = scale(piece.velocity, 0.995);
             piece.angular_velocity = scale(piece.angular_velocity, 0.98);
-            if length(piece.angular_velocity) < 0.015 {
-                piece.angular_velocity = [0.0; 3];
+            if !has_hulls {
+                if length(piece.angular_velocity) < 0.015 {
+                    piece.angular_velocity = [0.0; 3];
+                }
+                if length(piece.velocity) < 0.015 {
+                    piece.velocity = [0.0; 3];
+                }
             }
-            if length(piece.velocity) < 0.015 {
-                piece.velocity = [0.0; 3];
+            if has_hulls {
+                let previous = piece.position;
+                let orientation = piece.orientation;
+                piece.position = add(piece.position, scale(piece.velocity, dt));
+                piece.orientation =
+                    convex::integrate(piece.orientation, piece.angular_velocity, dt);
+                if piece.surface.is_floor() && !floor_contains(piece.position, piece.radius) {
+                    piece.position[0] = previous[0];
+                    piece.position[2] = previous[2];
+                    piece.velocity[0] *= -0.15;
+                    piece.velocity[2] *= -0.15;
+                }
+                let before_ground = piece.velocity;
+                if piece.orientation != orientation {
+                    ground_responses[i].transport_response = true;
+                }
+                ground_contact_cached(piece, &mut ground_responses[i]);
+                support_reactions[i] |=
+                    dot(sub(piece.velocity, before_ground), gravity_ups[i]) > 0.5 * GRAVITY * dt;
+                before_post_contact[i] = piece.velocity;
+                moved |= piece.position != previous || piece.orientation != orientation;
+                rotated[i] = piece.orientation != orientation;
             }
+        }
+        if let Some(start) = pose_start {
+            stats.integration_time += start.elapsed();
+        }
+        if has_hulls && moved {
+            for (i, row) in pair_geometry.iter_mut().enumerate() {
+                for (j, cache) in row.iter_mut().enumerate().skip(i + 1) {
+                    if rotated[i] || rotated[j] {
+                        if let Some(geometry) = cache.as_mut()
+                            && geometry.used_this_substep
+                        {
+                            let mut response = std::mem::take(&mut geometry.response);
+                            response.transport_response = true;
+                            warm_pairs.insert((i, j), response);
+                        }
+                        *cache = None;
+                    }
+                }
+            }
+            if let Some(a) = &mut activation {
+                a.impacts(pieces, 0.0);
+            }
+            let started = PROFILE.then(Instant::now);
+            solve_contacts::<PROFILE>(
+                pieces,
+                &mut activation,
+                &mut pair_geometry,
+                &mut ground_responses,
+                &mut warm_pairs,
+                &floor_contains,
+                &mut stats,
+            );
+            if let Some(started) = started {
+                stats.contact_time += started.elapsed();
+            }
+        }
+        // Apply rest cutoff only after all constraint iterations. Clearing
+        // velocities between solves invalidates their accumulated impulses.
+        if has_hulls {
+            for (i, piece) in pieces.iter_mut().enumerate() {
+                if activation.as_ref().is_some_and(|a| a.sleeping[i]) {
+                    continue;
+                }
+                let reaction = support_reactions[i]
+                    || dot(sub(piece.velocity, before_post_contact[i]), gravity_ups[i])
+                        > 0.5 * GRAVITY * dt;
+                let surface_speed =
+                    length(piece.velocity) + length(piece.angular_velocity) * piece.radius;
+                if reaction && surface_speed < 0.015 {
+                    piece.velocity = [0.0; 3];
+                    piece.angular_velocity = [0.0; 3];
+                } else if length(piece.angular_velocity) < 0.015 {
+                    piece.angular_velocity = [0.0; 3];
+                }
+            }
+        }
+        if let Some(a) = &mut activation {
+            a.warm_dt = dt;
+            a.warm_pairs.clear();
+            for (i, row) in pair_geometry.iter_mut().enumerate() {
+                for (j, geometry) in row.iter_mut().enumerate().skip(i + 1) {
+                    if let Some(geometry) = geometry
+                        && !geometry.response.arms.is_empty()
+                    {
+                        a.warm_pairs
+                            .insert((i, j), std::mem::take(&mut geometry.response));
+                    }
+                }
+            }
+            a.warm_ground = ground_responses
+                .into_iter()
+                .enumerate()
+                .filter(|(_, response)| !response.arms.is_empty())
+                .collect();
+            a.geometry = Some(pair_geometry);
         }
     }
     stats
 }
 
+fn solve_contacts<const PROFILE: bool>(
+    pieces: &mut [ObjectState],
+    activation: &mut Option<&mut sleep::Activation>,
+    pair_geometry: &mut convex::PairGeometry,
+    ground_responses: &mut [ContactResponse],
+    warm_pairs: &mut std::collections::HashMap<(usize, usize), ContactResponse>,
+    floor_contains: impl Fn([f64; 3], f64) -> bool,
+    stats: &mut StepStats,
+) {
+    let has_hulls = pieces.iter().any(|piece| piece.hull.is_some());
+    for _ in 0..if has_hulls { 16 } else { 3 } {
+        if PROFILE {
+            stats.solver_passes += 1;
+        }
+        for (i, row) in pair_geometry.iter_mut().enumerate() {
+            for (j, cached) in row.iter_mut().enumerate().skip(i + 1) {
+                if activation
+                    .as_ref()
+                    .is_some_and(|a| a.sleeping[i] && a.sleeping[j])
+                {
+                    continue;
+                }
+                if PROFILE {
+                    stats.pair_visits += 1;
+                }
+                let (left, right) = pieces.split_at_mut(j);
+                let a = &mut left[i];
+                let b = &mut right[0];
+                if a.surface.is_floor() != b.surface.is_floor()
+                    || (a.surface.sphere().is_some()
+                        && b.surface.sphere().is_some()
+                        && a.surface.sphere().unwrap().center != b.surface.sphere().unwrap().center)
+                {
+                    continue;
+                }
+                let separation = sub(b.position, a.position);
+                let distance = length(separation);
+                let minimum = a.radius + b.radius;
+                let convex_pair = a.hull.is_some() && b.hull.is_some();
+                if if convex_pair {
+                    distance > minimum + 2.0 * CONTACT_BIAS_METERS
+                } else {
+                    distance >= minimum
+                } {
+                    continue;
+                }
+                if PROFILE {
+                    stats.radius_candidates += 1;
+                }
+                let (normal, depth) = if a.hull.is_some() && b.hull.is_some() {
+                    if PROFILE {
+                        stats.narrow_phase_tests += 1;
+                    }
+                    if !cached.as_ref().is_some_and(|g| g.used_this_substep)
+                        && convex::separated_by_faces(a, b)
+                    {
+                        continue;
+                    }
+                    let geometry = cached.get_or_insert_with(|| {
+                        let projections = convex::projections(a, b);
+                        if PROFILE {
+                            stats.projection_builds += 1;
+                            stats.projection_storage_bytes += (projections.capacity()
+                                * std::mem::size_of::<convex::Projection>())
+                                as u64;
+                        }
+                        if PROFILE {
+                            stats.projection_storage_bytes +=
+                                std::mem::size_of::<convex::ContactGeometry>() as u64;
+                        }
+                        Box::new(convex::ContactGeometry::new(projections))
+                    });
+                    geometry.used_this_substep = true;
+                    if geometry.response.arms.is_empty()
+                        && let Some(response) = warm_pairs.remove(&(i, j))
+                    {
+                        geometry.response = response;
+                    }
+                    let (contact, requested_bytes) = geometry.contact(separation);
+                    if PROFILE {
+                        stats.projection_storage_bytes += requested_bytes as u64;
+                    }
+                    let Some(contact) = contact else {
+                        continue;
+                    };
+                    contact
+                } else {
+                    (
+                        if distance > 1e-9 {
+                            scale(separation, 1.0 / distance)
+                        } else {
+                            [0.0, 1.0, 0.0]
+                        },
+                        minimum - distance,
+                    )
+                };
+                if PROFILE {
+                    stats.contacts += 1;
+                }
+                if let Some(activation) = activation.as_mut() {
+                    activation.wake(i);
+                    activation.wake(j);
+                }
+                let inverse_a = 1.0 / a.mass_kg;
+                let inverse_b = 1.0 / b.mass_kg;
+                let direction_a = correction_direction(a, scale(normal, -1.0));
+                let direction_b = correction_direction(b, normal);
+                let available =
+                    -dot(direction_a, normal) * inverse_a + dot(direction_b, normal) * inverse_b;
+                let correction = (depth + CONTACT_BIAS_METERS).max(0.0) / available;
+                let old_a = a.position;
+                let old_b = b.position;
+                a.position = add(a.position, scale(direction_a, correction * inverse_a));
+                b.position = add(b.position, scale(direction_b, correction * inverse_b));
+                if a.surface.is_floor() && !floor_contains(a.position, a.radius) {
+                    a.position[0] = old_a[0];
+                    a.position[2] = old_a[2];
+                }
+                if b.surface.is_floor() && !floor_contains(b.position, b.radius) {
+                    b.position[0] = old_b[0];
+                    b.position[2] = old_b[2];
+                }
+                // The constrained positional correction need not move along
+                // the original SAT axis. Re-evaluate the actual contact before
+                // applying velocity impulses at a potentially separated feature.
+                let normal = if a.hull.is_some() && b.hull.is_some() {
+                    let geometry = cached.as_mut().expect("convex geometry");
+                    let (contact, requested_bytes) = geometry.contact(sub(b.position, a.position));
+                    if PROFILE {
+                        stats.projection_storage_bytes += requested_bytes as u64;
+                    }
+                    let Some((normal, _)) = contact else {
+                        ground_contact_cached(a, &mut ground_responses[i]);
+                        ground_contact_cached(b, &mut ground_responses[j]);
+                        continue;
+                    };
+                    normal
+                } else {
+                    normal
+                };
+                if let Some(geometry) = cached {
+                    pair_impulse_cached(a, b, normal, &mut geometry.response);
+                } else {
+                    pair_impulse(a, b, normal);
+                }
+                ground_contact_cached(a, &mut ground_responses[i]);
+                ground_contact_cached(b, &mut ground_responses[j]);
+            }
+        }
+    }
+}
+
+#[derive(Clone, Debug, Default)]
+struct ContactResponse {
+    pending_warm_start: bool,
+    transport_response: bool,
+    normal: [f64; 3],
+    arms: Vec<([f64; 3], [f64; 3])>,
+    impulses: Vec<f64>,
+    friction: Vec<[f64; 3]>,
+    rolling: [f64; 3],
+    targets: Vec<f64>,
+}
+impl ContactResponse {
+    fn rearm(&mut self, ratio: f64) {
+        for impulse in &mut self.impulses {
+            *impulse *= ratio;
+        }
+        for impulse in &mut self.friction {
+            *impulse = scale(*impulse, ratio);
+        }
+        self.rolling = scale(self.rolling, ratio);
+        self.targets.fill(0.0);
+        self.pending_warm_start = true;
+    }
+    fn prepare(
+        &mut self,
+        normal: [f64; 3],
+        arms: &[([f64; 3], [f64; 3])],
+        targets: impl Fn(usize) -> f64,
+    ) {
+        let transport = self.pending_warm_start || self.transport_response;
+        let max_arm_change = if transport { 0.001 } else { 0.0001 };
+        let normal_matches = if transport {
+            dot(self.normal, normal) > 0.999
+        } else {
+            length(sub(self.normal, normal)) < 1e-8
+        };
+        let unchanged = normal_matches
+            && self.arms.len() == arms.len()
+            && self.arms.iter().zip(arms).all(|(old, new)| {
+                length(sub(old.0, new.0)) < max_arm_change
+                    && length(sub(old.1, new.1)) < max_arm_change
+            });
+        if unchanged && transport {
+            let normal_factor = dot(self.normal, normal).max(0.0);
+            for i in 0..self.impulses.len() {
+                self.impulses[i] *= normal_factor;
+                self.friction[i] = sub(
+                    self.friction[i],
+                    scale(normal, dot(self.friction[i], normal)),
+                );
+                let magnitude = length(self.friction[i]);
+                let limit = self.impulses[i] * 0.65;
+                if magnitude > limit {
+                    self.friction[i] = scale(self.friction[i], limit / magnitude);
+                }
+            }
+            self.normal = normal;
+            self.arms.clear();
+            self.arms.extend_from_slice(arms);
+        }
+        self.transport_response = false;
+        if !unchanged {
+            self.pending_warm_start = false;
+            self.normal = normal;
+            self.arms = arms.to_vec();
+            self.impulses = vec![0.0; arms.len()];
+            self.friction = vec![[0.0; 3]; arms.len()];
+            self.rolling = [0.0; 3];
+            self.targets = (0..arms.len()).map(targets).collect();
+        }
+    }
+}
+
+// A bounded contact torque models energy lost to rough-contact rolling/spin.
+// Its limit is 10% of normal impulse times bounding radius; no load means no drag.
+fn rolling_delta(
+    relative: [f64; 3],
+    previous: &mut [f64; 3],
+    limit: f64,
+    inverse_angular_mass: f64,
+) -> [f64; 3] {
+    let mut candidate = sub(*previous, scale(relative, 1.0 / inverse_angular_mass));
+    let magnitude = length(candidate);
+    if magnitude > limit {
+        candidate = scale(candidate, limit / magnitude);
+    }
+    let delta = sub(candidate, *previous);
+    *previous = candidate;
+    delta
+}
+
+#[cfg(test)]
 fn ground_contact(piece: &mut ObjectState) {
+    ground_contact_cached(piece, &mut ContactResponse::default());
+}
+fn ground_contact_cached(piece: &mut ObjectState, response: &mut ContactResponse) {
     let normal = piece
         .surface
         .sphere()
@@ -441,19 +737,37 @@ fn ground_contact(piece: &mut ObjectState) {
             body.radius + piece.ground_support_meters - distance,
         )
     } else {
+        *response = ContactResponse::default();
         return;
     };
     if penetration < -CONTACT_BIAS_METERS {
+        *response = ContactResponse::default();
         return;
     }
     piece.position = add(piece.position, scale(up, penetration.max(0.0)));
     if let Some(hull) = &piece.hull {
         let arms = hull.ground_arms(piece.orientation, piece.side_meters, scale(up, -1.0));
-        let mut normal_impulses = vec![0.0; arms.len()];
+        let paired_arms: Vec<_> = arms.iter().map(|&arm| (arm, [0.0; 3])).collect();
+        response.prepare(up, &paired_arms, |_| 0.0);
+        if std::mem::take(&mut response.pending_warm_start) {
+            piece.angular_velocity = add(
+                piece.angular_velocity,
+                scale(response.rolling, inverse_inertia(piece)),
+            );
+            for (i, &arm) in arms.iter().enumerate() {
+                apply_impulse(
+                    piece,
+                    arm,
+                    add(scale(up, response.impulses[i]), response.friction[i]),
+                );
+            }
+        }
+        let normal_impulses = &mut response.impulses;
         // Accumulate unilateral impulses within this face solve. Later corners
         // can undo excess impulses while every corner's total stays nonnegative.
         // Positive-only corner impulses otherwise eject and rock resting faces.
-        for _ in 0..if arms.len() > 1 { 16 } else { 1 } {
+        let friction_impulses = &mut response.friction;
+        for _ in 0..16 {
             for (index, &arm) in arms.iter().enumerate() {
                 let approach = dot(add(piece.velocity, cross(piece.angular_velocity, arm)), up);
                 let denominator = 1.0 / piece.mass_kg
@@ -462,9 +776,6 @@ fn ground_contact(piece: &mut ObjectState) {
                 normal_impulses[index] = (previous - approach / denominator).max(0.0);
                 apply_impulse(piece, arm, scale(up, normal_impulses[index] - previous));
             }
-        }
-        let mut friction_impulses = vec![[0.0; 3]; arms.len()];
-        for _ in 0..16 {
             for (i, &arm) in arms.iter().enumerate() {
                 let velocity = add(piece.velocity, cross(piece.angular_velocity, arm));
                 let denominator = |direction| {
@@ -480,6 +791,16 @@ fn ground_contact(piece: &mut ObjectState) {
                 );
                 apply_impulse(piece, arm, impulse);
             }
+            let torque = rolling_delta(
+                piece.angular_velocity,
+                &mut response.rolling,
+                ROLLING_RESISTANCE * normal_impulses.iter().sum::<f64>() * piece.radius,
+                inverse_inertia(piece),
+            );
+            piece.angular_velocity = add(
+                piece.angular_velocity,
+                scale(torque, inverse_inertia(piece)),
+            );
         }
         return;
     }
@@ -555,33 +876,54 @@ fn friction_delta(
 }
 
 fn pair_impulse(a: &mut ObjectState, b: &mut ObjectState, normal: [f64; 3]) {
+    pair_impulse_cached(a, b, normal, &mut ContactResponse::default());
+}
+
+fn pair_impulse_cached(
+    a: &mut ObjectState,
+    b: &mut ObjectState,
+    normal: [f64; 3],
+    response: &mut ContactResponse,
+) {
+    let inverse_mass_a = 1.0 / a.mass_kg;
+    let inverse_mass_b = 1.0 / b.mass_kg;
+    let inertia_a = inverse_inertia(a);
+    let inertia_b = inverse_inertia(b);
     if a.hull.is_some() && b.hull.is_some() {
         let arms = convex::contact_manifold(a, b, normal);
-        if arms.len() > 1 {
+        if !arms.is_empty() {
             let relative = |a: &ObjectState, b: &ObjectState, aa, ba| {
                 sub(
                     add(b.velocity, cross(b.angular_velocity, ba)),
                     add(a.velocity, cross(a.angular_velocity, aa)),
                 )
             };
-            let targets: Vec<_> = arms
-                .iter()
-                .map(|&(aa, ba)| {
-                    let approach = dot(relative(a, b, aa, ba), normal);
-                    if approach < -0.5 {
-                        -RESTITUTION * approach
-                    } else {
-                        0.0
-                    }
-                })
-                .collect();
-            let mut impulses = vec![0.0; arms.len()];
+            response.prepare(normal, &arms, |i| {
+                let approach = dot(relative(a, b, arms[i].0, arms[i].1), normal);
+                if approach < -0.5 {
+                    -RESTITUTION * approach
+                } else {
+                    0.0
+                }
+            });
+            if std::mem::take(&mut response.pending_warm_start) {
+                a.angular_velocity = sub(a.angular_velocity, scale(response.rolling, inertia_a));
+                b.angular_velocity = add(b.angular_velocity, scale(response.rolling, inertia_b));
+                for (i, &(aa, ba)) in arms.iter().enumerate() {
+                    let impulse = add(scale(normal, response.impulses[i]), response.friction[i]);
+                    apply_impulse(a, aa, scale(impulse, -1.0));
+                    apply_impulse(b, ba, impulse);
+                }
+            }
+            let targets = &response.targets;
+            let impulses = &mut response.impulses;
+            let friction_impulses = &mut response.friction;
             for _ in 0..16 {
                 for (i, &(aa, ba)) in arms.iter().enumerate() {
-                    let denominator = 1.0 / a.mass_kg
-                        + 1.0 / b.mass_kg
-                        + dot(cross(aa, normal), cross(aa, normal)) * inverse_inertia(a)
-                        + dot(cross(ba, normal), cross(ba, normal)) * inverse_inertia(b);
+                    let denominator = inverse_mass_a
+                        + inverse_mass_b
+                        + dot(cross(aa, normal), cross(aa, normal)) * inertia_a
+                        + dot(cross(ba, normal), cross(ba, normal)) * inertia_b;
                     let previous = impulses[i];
                     impulses[i] = (previous
                         + (targets[i] - dot(relative(a, b, aa, ba), normal)) / denominator)
@@ -590,16 +932,13 @@ fn pair_impulse(a: &mut ObjectState, b: &mut ObjectState, normal: [f64; 3]) {
                     apply_impulse(a, aa, scale(impulse, -1.0));
                     apply_impulse(b, ba, impulse);
                 }
-            }
-            let mut friction_impulses = vec![[0.0; 3]; arms.len()];
-            for _ in 0..16 {
                 for (i, &(aa, ba)) in arms.iter().enumerate() {
                     let velocity = relative(a, b, aa, ba);
                     let denominator = |direction| {
-                        1.0 / a.mass_kg
-                            + 1.0 / b.mass_kg
-                            + dot(cross(aa, direction), cross(aa, direction)) * inverse_inertia(a)
-                            + dot(cross(ba, direction), cross(ba, direction)) * inverse_inertia(b)
+                        inverse_mass_a
+                            + inverse_mass_b
+                            + dot(cross(aa, direction), cross(aa, direction)) * inertia_a
+                            + dot(cross(ba, direction), cross(ba, direction)) * inertia_b
                     };
                     let impulse = friction_delta(
                         velocity,
@@ -611,6 +950,14 @@ fn pair_impulse(a: &mut ObjectState, b: &mut ObjectState, normal: [f64; 3]) {
                     apply_impulse(a, aa, scale(impulse, -1.0));
                     apply_impulse(b, ba, impulse);
                 }
+                let torque = rolling_delta(
+                    sub(b.angular_velocity, a.angular_velocity),
+                    &mut response.rolling,
+                    ROLLING_RESISTANCE * impulses.iter().sum::<f64>() * a.radius.min(b.radius),
+                    inertia_a + inertia_b,
+                );
+                a.angular_velocity = sub(a.angular_velocity, scale(torque, inertia_a));
+                b.angular_velocity = add(b.angular_velocity, scale(torque, inertia_b));
             }
             return;
         }
@@ -629,10 +976,10 @@ fn pair_impulse(a: &mut ObjectState, b: &mut ObjectState, normal: [f64; 3]) {
         return;
     }
     let denom = |direction| {
-        1.0 / a.mass_kg
-            + 1.0 / b.mass_kg
-            + dot(cross(aa, direction), cross(aa, direction)) * inverse_inertia(a)
-            + dot(cross(ba, direction), cross(ba, direction)) * inverse_inertia(b)
+        inverse_mass_a
+            + inverse_mass_b
+            + dot(cross(aa, direction), cross(aa, direction)) * inertia_a
+            + dot(cross(ba, direction), cross(ba, direction)) * inertia_b
     };
     let restitution = if a.hull.is_none() || approach < -0.5 {
         RESTITUTION

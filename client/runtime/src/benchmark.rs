@@ -786,6 +786,49 @@ mod tests {
     }
 
     #[test]
+    fn canonical_adapter_retains_uninterrupted_solver_states_between_updates() {
+        let mut app = ClientApplication::default();
+        benchmark_fixture::initialize(&mut app, 100, Layout::Dense, 155, false).unwrap();
+        let frame = character_ship_frame(app.ship.snapshot().pose);
+        let eye = app
+            .character
+            .snapshot(frame, surface_frame_for_ship(app.ship.snapshot()))
+            .eye_position_meters;
+        let initial = crate::fragment_physics::snapshots(&app.mining, frame, eye);
+        let ids: Vec<_> = initial.iter().map(|(fragment, _)| fragment.id()).collect();
+        let mut direct: Vec<_> = initial.into_iter().map(|(_, state)| state).collect();
+        let mut tracker = salimon_physics::SleepTracker::default();
+        for step in 0..10 {
+            salimon_physics::advance_with_sleep(
+                &mut tracker,
+                &ids,
+                &mut direct,
+                Duration::from_millis(16),
+                |position, radius| {
+                    salimon_character::ship_floor_placement(position, radius).is_some()
+                },
+                false,
+            );
+            crate::fragment_physics::advance(
+                &mut app.mining,
+                frame,
+                Duration::from_millis(16),
+                eye,
+            );
+            let rebuilt = crate::fragment_physics::snapshots(&app.mining, frame, eye);
+            for (expected, (fragment, actual)) in direct.iter().zip(rebuilt) {
+                let mut expected = expected.clone();
+                expected.ground_support_meters = 0.0;
+                assert_eq!(actual, expected, "step={step} id={:?}", fragment.id());
+                assert_eq!(
+                    app.mining.fragment_sleep.is_sleeping(fragment.id()),
+                    tracker.is_sleeping(fragment.id())
+                );
+            }
+        }
+    }
+
+    #[test]
     fn instrumentation_does_not_change_production_poses_or_accounting() {
         let config = parse(&["--benchmark".into(), "--count".into(), "12".into()]).unwrap();
         let mut a = ClientApplication::default();
@@ -798,7 +841,7 @@ mod tests {
             .character
             .snapshot(frame, surface_frame_for_ship(a.ship.snapshot()))
             .eye_position_meters;
-        for _ in 0..3 {
+        for update in 0..3 {
             crate::fragment_physics::advance(&mut a.mining, frame, Duration::from_millis(16), eye);
             let stats = crate::fragment_physics::advance_measured(
                 &mut b.mining,
@@ -808,8 +851,11 @@ mod tests {
                 true,
             );
             assert_eq!(stats.solver.objects, 12);
-            assert_eq!(stats.solver.pair_visits, stats.solver.substeps * 16 * 66);
-            assert_eq!(stats.solver.matrix_allocations, stats.solver.substeps * 13);
+            assert_eq!(stats.solver.pair_visits, stats.solver.solver_passes * 66);
+            assert_eq!(
+                stats.solver.matrix_allocations,
+                if update == 0 { 13 } else { 0 }
+            );
         }
         assert_eq!(a.mining.session.fragments(), b.mining.session.fragments());
         assert_eq!(original, accounting(&b));

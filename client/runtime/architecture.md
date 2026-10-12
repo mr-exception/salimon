@@ -318,8 +318,8 @@ See the canonical [surface emission contract](../world/resource-contracts.md#sur
 ## Automation command deadlines
 
 The ready event advertises the ordinary 5-second command deadline. Valid
-protocol-1 `step` batches of 300–600 frames receive a bounded 30-second
-server deadline, matching the resource-collection scenario budget. The stdin
+protocol-1 `step` requests of 1–600 frames receive a bounded 120-second
+server deadline: even one update can rebuild a large loaded contact island. The stdin
 reader and native request expiry use the same command-specific duration.
 Malformed/out-of-range requests and ordinary inputs/inspection stay at 5 seconds.
 Scenario overall deadlines remain independent; no fixed steps are skipped.
@@ -353,6 +353,11 @@ all away windows. Optional stdin preparation barriers permit concurrent fixture
 preparation followed by isolated native recording; no window/clocks start until
 the explicit start marker. Optional baseline replays use the canonical adapter
 snapshots and cloned state/cache before recording, without changing live cargo.
+Native benchmark windows do not capture the pointer and ignore gameplay mouse/
+keyboard input. Their titles identify count, layout, requested state, camera and
+repeat. Native timing and production updates remain unchanged. Recorded renderer
+metadata includes DPI scale. Occlusion or changed surface configuration after
+recording begins fails the run; closing before completion also fails.
 See the benchmark guide for limits, counter meanings and CPU-only interpretation.
 Optional `--minimum-samples` requires both elapsed sampling duration and a retained
 sample count before a window completes. Native mode counts completed frame

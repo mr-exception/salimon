@@ -45,10 +45,12 @@ def run(binary, count, layout, settle_steps, timeout, output, carrying, request_
                 result = game.request({'op': op, **fields}, time.monotonic() + request_timeout)
                 return result if op == 'inspect' else game.request({'op': 'inspect'}, time.monotonic() + request_timeout)
             def key(name, pressed):
-                return request('key', key=name, pressed=pressed)
+                return game.request({'op': 'key', 'key': name, 'pressed': pressed},
+                                    time.monotonic() + request_timeout)
             def press(name):
                 key(name, True)
-                return key(name, False)
+                key(name, False)
+                return request('inspect')
             initial = request('inspect')
             identity = population(initial)
             assert len(identity) == count and len({p[0] for p in identity}) == count
@@ -101,15 +103,33 @@ def run(binary, count, layout, settle_steps, timeout, output, carrying, request_
                     # Walk through the normal controller; no player/cargo pose
                     # overrides are available through this acceptance harness.
                     for _ in range(40):
-                        current = next(p for p in state['world']['fragments'] if p['id'] == piece['id'])
-                        if current['distance_to_player_meters'] < 2.5:
+                        state = request('aim_fragment', fragment_id=piece['id'])
+                        if state['carrying']['target_id'] == piece['id']:
                             break
-                        request('aim_fragment', fragment_id=piece['id'])
+                        eye = state['player']['local_ship_position_meters']
+                        position = piece['ship_local_position_meters']
+                        if math.hypot(eye[0] - position[0], eye[2] - position[2]) < .55:
+                            state = request('restore_look')
+                            break
                         key('forward', True)
-                        state = request('step', frames=10)
+                        state = request('step', frames=4)
                         key('forward', False)
+                        state = request('restore_look')
+                        if math.dist(eye, state['player']['local_ship_position_meters']) < .005:
+                            break
+                    if state['carrying']['target_id'] != piece['id']:
+                        state = request('aim_fragment', fragment_id=piece['id'])
+                    # A root can be obstructed from its center-distance cutoff.
+                    # Walk around it through the ordinary strafe controller and
+                    # accept only the actual production reticle target.
+                    for _ in range(8):
+                        if state['carrying']['target_id'] == piece['id']:
+                            break
+                        key('left', True)
+                        state = request('step', frames=8)
+                        key('left', False)
                         request('restore_look')
-                    state = request('aim_fragment', fragment_id=piece['id'])
+                        state = request('aim_fragment', fragment_id=piece['id'])
                     if state['carrying']['target_id'] != piece['id']:
                         request('restore_look')
                         continue
@@ -119,25 +139,52 @@ def run(binary, count, layout, settle_steps, timeout, output, carrying, request_
                         break
                     request('restore_look')
                 assert picked is not None, 'no reachable loaded bottom support'
+                dependents = {p['id'] for p in before.values() if dependent_on(p, before[picked])}
+                component, pending = set(), [picked]
+                while pending:
+                    id = pending.pop()
+                    if id not in component:
+                        component.add(id)
+                        pending.extend(before[id]['contact_fragment_ids'])
                 assert sum(p['carried'] for p in state['world']['fragments']) == 1
                 press('slot_1')
                 assert request('inspect')['mining']['equipped'] is False
                 fallen = []
                 for _ in range(40):
                     state = request('step', frames=1)
-                    fallen = [p['id'] for p in state['world']['fragments'] if p['id'] != picked
+                    fallen = [p['id'] for p in state['world']['fragments'] if p['id'] in dependents
                               and before[p['id']]['ship_local_position_meters'][1]
                               - p['ship_local_position_meters'][1] > .01]
                     if fallen:
                         break
                 assert fallen, 'bottom removal did not make a dependent body fall'
-                assert state['world']['sleeping_fragment_count'] > 0, 'no unrelated sleeping island remained'
+                unrelated = [p['id'] for p in state['world']['fragments']
+                             if p['id'] not in component and p['sleeping']]
+                assert unrelated, 'no unrelated sleeping island remained'
                 check(state, 'support_removed', asleep=False)
                 result['removed_support_id'] = picked
                 result['fallen_ids'] = fallen
+                result['dependent_ids_before_pickup'] = sorted(dependents)
+                result['unrelated_sleeping_ids'] = unrelated
                 request('restore_look')
                 request('look', dx=0, dy=400)
                 state = press('grab_drop')
+                # A closer viewpoint may put the player inside a packed pile.
+                # Walk toward the original restored forward view to clear floor;
+                # release still goes through the production placement validator.
+                for attempt in range(40):
+                    if state['carrying']['object_id'] is None:
+                        break
+                    request('look', dx=0, dy=-400)
+                    key('forward', True)
+                    state = request('step', frames=4)
+                    key('forward', False)
+                    if attempt % 5 == 4:
+                        key('left', True)
+                        state = request('step', frames=8)
+                        key('left', False)
+                    request('look', dx=0, dy=400)
+                    state = press('grab_drop')
                 assert state['carrying']['object_id'] is None, 'production placement rejected release'
                 for cycle in range(3):
                     state = request('step', frames=1)

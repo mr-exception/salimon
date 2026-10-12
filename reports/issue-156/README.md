@@ -11,17 +11,38 @@ production updates (16.896 simulation seconds / 1,733.795 wall seconds). Loaded
 The [partial native result](native-500-partial-2026-10-12.json) retains these
 checks and the failure: after successful F pickup of support 162, the first
 physics update exceeded the harness's five-second response deadline. The full
-route remains failed. Requests now have a documented 120-second limit capped
-by the total run deadline, and a fresh 500 rerun is preparing. The original
-1,000 preparation is still running. No large-load FPS result or successful
-complete loaded interaction route is claimed.
+route remains failed. A fresh 500 retry reproduced complete sleep and rigid
+flight checks, but exposed a second five-second deadline in the native server.
+The server and Python harness now both allow 120 seconds for valid fixed-step
+requests, bounded by the total run deadline. Corrected large-load interaction
+reruns remain pending.
 
-Current checks passed: 350 workspace Rust tests (one existing GPU test ignored),
-50 physics tests, workspace Clippy with warnings denied, formatting/diff checks,
-48 unchanged Python tooling tests, and all 17 native scenarios / 1,712 steps.
-The [current validation manifest](native-validation-2026-10-12-point.json) records
-the build hash and results. Its source-base/dirty metadata reflects the build
-before commit `047105c`; the committed production sources match that build.
+The fresh 1,000 route also reached complete sleep: 1,586 production updates
+(25.376 simulation seconds / 7,628.898 wall seconds). Fast rotating flight,
+landing and takeoff preserved all IDs, 1,250 kg and exactly zero local drift.
+Its carrying route failed to acquire a reachable bottom support. The
+[partial 1,000 result](native-1000-partial-2026-10-12.json) records that failure;
+the ordinary walking/viewpoint search has been revised for a fresh rerun.
+No successful complete large-load interaction route is claimed.
+
+The first 500 native timing attempt is excluded: desktop input changed the
+camera and picked up a fragment while another game was running. The
+[initial view](native-500-facing.png) and
+[input-interference view](native-500-input-interference.png) document this
+failed attempt, not accepted FPS evidence. Benchmark mode now ignores gameplay
+input and rejects mid-collection occlusion or surface configuration changes.
+After the user confirmed the iMac was idle, the already naturally prepared
+1,000 native timing run began its isolated baseline and six sampling windows.
+Its executable is the sampling build below; replacing the staged file does
+not change that already-running process. Results remain pending.
+
+The latest staged isolation build passed 351 workspace Rust tests (one existing
+GPU test ignored), 50 Python tooling tests, workspace Clippy with warnings
+denied, formatting/diff checks and all 17 native scenarios / 1,712 steps.
+The [isolation validation manifest](native-validation-2026-10-12-isolation.json)
+records its distinct executable hash and source/build limits. The earlier
+[point-envelope validation manifest](native-validation-2026-10-12-point.json)
+records the production physics build used for the partial loaded routes above.
 
 Remaining acceptance requires naturally settled dense 500/1,000 populations,
 loaded flight and support-removal/carrying checks, identical-snapshot physics
@@ -36,7 +57,8 @@ production physics and update timing are unchanged. The
 [sampling-build validation manifest](native-validation-2026-10-12-sampling.json)
 records its distinct hash, 351 passing Rust tests (one existing ignored GPU test),
 50 Python tests, Clippy/format checks and 17 native scenarios / 1,712 steps.
-Loaded correctness still uses the point-envelope binary identified above.
+The partial loaded correctness results above use the point-envelope binary;
+the corrected reruns will use the isolation build, whose physics is unchanged.
 
 ## Intermediate native investigations — 2026-10-12
 

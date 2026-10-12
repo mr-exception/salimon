@@ -191,6 +191,12 @@ from storage/allocation counters so allocation removal and filtering remain
 attributable. A dense pile can still require quadratic contact work.
 
 
+Native benchmark gameplay input is disabled, the mouse remains uncaptured, and
+window titles identify the exact case/repeat. Keep the window visible and its
+resolution/DPI unchanged throughout collection. Interrupted/occluded/resized
+collection fails. Renderer metadata records the actual DPI scale; screenshots
+must show the matching benchmark title and be taken from a live process.
+
 ## Native loaded sleep acceptance (#156)
 
 `scripts/fragment_sleep_acceptance.py` uses the normal protocol-1 controller
@@ -198,12 +204,16 @@ routes after bounded natural preparation. It verifies fast rotating flight,
 landing/takeoff, stable anchors, IDs/material/mass and full sleep. `--carrying`
 also requires actual F removal of a single-support bottom body, dependent fall,
 an unrelated sleeping island, mining lockout and three pickup/drop cycles. It
-walks through the controller to reach cargo; no poses or sleep flags are installed.
+walks closer and tries lateral viewpoints through the controller to reach cargo;
+no poses or sleep flags are installed. Fall checks identify the selected root's
+previous dependents, and unrelated sleep is checked outside its old component.
 Failures remain failures in its JSON summary and process exit status.
 Loaded requests use a 120-second limit (`--request-timeout`), also capped by the
 whole-run `--timeout`. This allows expensive real contact rebuilding after support
 removal; it changes neither the production timestep nor the acceptance assertions.
-The request limit is recorded in each result.
+The request limit is recorded in each result. Valid native protocol fixed-step
+requests also have a 120-second server limit; extending the Python deadline
+alone cannot extend an older binary's five-second single-step limit.
 
 ```sh
 python3 scripts/fragment_sleep_acceptance.py --binary artifacts/build/release/salimon-client --counts 500 1000 --layout dense --settle-steps 2400 --timeout 14400 --carrying --output artifacts/fragment-sleep-acceptance

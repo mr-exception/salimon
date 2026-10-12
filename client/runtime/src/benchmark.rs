@@ -215,6 +215,31 @@ pub(crate) struct Recorder {
 }
 
 impl Recorder {
+    pub(crate) fn recording_started(&self) -> bool {
+        self.started.is_some()
+    }
+    pub(crate) fn matches_surface(&self, width: u32, height: u32, scale: f64) -> bool {
+        self.info["width"].as_u64() == Some(u64::from(width))
+            && self.info["height"].as_u64() == Some(u64::from(height))
+            && self.info["scale_factor"].as_f64() == Some(scale)
+    }
+    pub(crate) fn window_title(&self) -> String {
+        let away = self.config.away
+            || (self.config.both_cameras && self.completed.len() >= self.config.repeats);
+        format!(
+            "Salimon — benchmark: {} {} {} {} {}/{}",
+            self.config.count,
+            self.config.layout.name(),
+            if self.config.active {
+                "active initial"
+            } else {
+                "settled requested"
+            },
+            if away { "away" } else { "facing" },
+            self.completed.len() % self.config.repeats + 1,
+            self.config.repeats,
+        )
+    }
     pub(crate) fn switch_camera(&self) -> bool {
         self.config.both_cameras && self.completed.len() == self.config.repeats
     }
@@ -239,10 +264,11 @@ impl Recorder {
         info: &salimon_renderer::RendererInfo,
         width: u32,
         height: u32,
+        scale_factor: f64,
     ) {
         self.info = json!({"adapter": info.adapter_name, "backend": info.backend,
             "device_type": info.device_type, "gpu_timestamps_supported": info.timestamp_queries_supported,
-            "width": width, "height": height, "present_mode": "AutoVsync"});
+            "width": width, "height": height, "scale_factor": scale_factor, "present_mode": "AutoVsync"});
     }
     pub(crate) fn record(
         &mut self,
@@ -562,6 +588,16 @@ mod tests {
         let app = ClientApplication::default();
         let mut recorder = Recorder::new(config, &app);
         for index in 0..4 {
+            assert!(
+                recorder
+                    .window_title()
+                    .contains(if index < 2 { "facing" } else { "away" })
+            );
+            assert!(
+                recorder
+                    .window_title()
+                    .ends_with(&format!("{}/2", index % 2 + 1))
+            );
             recorder.record(
                 Duration::from_millis(16),
                 Duration::ZERO,

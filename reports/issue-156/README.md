@@ -1,9 +1,31 @@
 # Issue #156 — persistent fragment sleep and contact-island waking
 
-## Continuation status — 2026-10-12
+## Current status — 2026-10-12
+
+**Incomplete: native dense 500/1,000 loaded acceptance and the reference matrix
+remain pending.** Current implementation commit: `047105c`; staged native binary
+SHA-256: `70d36bfd5dc2437603028b469eb0a4da5b300c4103e91db3f6ff0f13c17a1e16`.
+Fresh authored dense 500 and 1,000 preparations are running through production
+16 ms updates. Neither has reached readiness yet. No large-load FPS result or
+successful loaded interaction route is claimed.
+
+Current checks passed: 350 workspace Rust tests (one existing GPU test ignored),
+50 physics tests, workspace Clippy with warnings denied, formatting/diff checks,
+48 unchanged Python tooling tests, and all 17 native scenarios / 1,712 steps.
+The [current validation manifest](native-validation-2026-10-12-point.json) records
+the build hash and results. Its source-base/dirty metadata reflects the build
+before commit `047105c`; the committed production sources match that build.
+
+Remaining acceptance requires naturally settled dense 500/1,000 populations,
+loaded flight and support-removal/carrying checks, identical-snapshot physics
+baseline comparison, native screenshots, and all 96 reference matrix cases
+with three windows and at least 100 retained samples per window. Diagnostic
+continuations, partial preparations and timeouts do not satisfy those gates.
+
+## Intermediate native investigations — 2026-10-12
 
 **Incomplete: the required native dense 500/1,000 settled windows have not passed.**
-The final committed build (`f5f03c2`) passed all 17 native scenarios / 1,712 steps,
+The earlier committed build (`f5f03c2`) passed all 17 native scenarios / 1,712 steps,
 and the native 100-fragment loaded route described below passed. The attempted
 native dense 500 preparation failed after 2,400 production updates (38.4 simulation
 seconds): only 7/500 fragments slept, 56 met quiet dwell, and 138 still moved.
@@ -11,8 +33,8 @@ Preparation took 7,792.544 wall-clock seconds (about 130 minutes). It exited bef
 readiness, baseline replay or native sampling, so it provides no settled FPS result.
 Raw local stderr: `artifacts/fragment-benchmarks/issue156-dense500-friction-native.stderr`.
 
-Further solver changes are under investigation and remain uncommitted. Passing
-small-load or diagnostic replay checks do not satisfy the large-load acceptance.
+Subsequent solver changes are committed in `047105c`. Passing small-load or
+diagnostic replay checks do not satisfy the large-load acceptance.
 The next native 500 attempt also failed: 40/500 asleep after 1,200 updates
 (19.2 simulation seconds, 2,273.509 wall seconds). The simultaneous 1,000 attempt
 was terminated before readiness after 4,550 wall seconds; its last checkpoint
@@ -80,7 +102,7 @@ long updates and quaternion sign equivalence. All 50 physics tests and Clippy
 passed. The same build passed 350 workspace Rust tests (one existing GPU test
 ignored) and all 17 native scenarios / 1,712 steps. The
 [point-envelope validation manifest](native-validation-2026-10-12-point.json)
-records the binary and checks. Fresh native 500 loaded acceptance is running;
+records the binary and checks. Fresh native 500 and 1,000 loaded acceptance is running;
 the issue remains incomplete until the required native gates pass.
 The first replay probes in this continuation accidentally linked an older staged
 physics library; their results are excluded. Subsequent probes build with explicit
@@ -97,8 +119,8 @@ Before the latest warm-starting experiment, the updated solver passed 339 Rust
 tests (one existing GPU test ignored), workspace Clippy, formatting and all 17
 native scenarios. Current warm-starting safety tests pass, including identity
 reordering, removed support, changed mass/pose/velocity/environment and explicit
-force invalidation. Final workspace/native gates must be rerun after the solver
-stabilizes; these intermediate checks are not acceptance completion.
+force invalidation. These checks precede the current 350-test/17-scenario validation above; they
+are historical intermediate checks, not acceptance completion.
 
 ## Native continuation — 2026-10-11
 
@@ -167,7 +189,7 @@ pending status before #156 can close.
 The original implementation report below is historical container evidence from
 PR #164 / `b52f2f0`, recorded 2026-10-10; it is not current native acceptance.
 
-## Outcome
+## Historical container outcome — 2026-10-10
 
 Reviewable implementation of stable-ID sleep at the portable physics boundary,
 composed into production fragment updates. Visible/pickable session entities,
@@ -180,7 +202,7 @@ native matrix and verified settled dense 500/1,000 cargo windows are recorded;
 the PR relates to the issue without automatic closure. CPU isolation evidence
 below establishes work reduction, not native FPS or whole-cabin settling.
 
-## Changes and correctness
+## Historical container changes and correctness
 
 - Physics owns `SleepTracker<K>` keyed by caller identities and deterministic
   ordered contact graphs. The [canonical policy](../../client/physics/architecture.md#persistent-contact-island-sleep-156)

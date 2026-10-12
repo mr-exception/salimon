@@ -74,10 +74,10 @@ no accepted timing result. Later bundled and bare short-window attempts were
 rejected when occlusion arrived during sampling; their empty stdout is excluded.
 Initial occlusion before retained frame intervals now restarts the full warm-up;
 the focused regression passed. Original focus/cursor behavior is retained while
-gameplay events are ignored. The corrected 500/1,000 interaction reruns and
-fresh 500 timing preparation are running with executable SHA-256
+gameplay events are ignored. The corrected 500/1,000 interaction attempts used
+executable SHA-256
 `afb221ebebecc1652b6f9ee6329c0bf7289bb2a82b581d5a0c73c5cce1cc9cb1`;
-500 timing remains behind its stdin barrier until other CPU-heavy jobs finish.
+the original 1,000 interaction attempt remains in preparation.
 The [visibility validation manifest](native-validation-2026-10-12-visibility.json)
 distinguishes current build/lint/format checks and 13 focused benchmark tests from
 the earlier complete workspace/native suite. Python tooling passed all 50 tests
@@ -100,17 +100,67 @@ Concurrent large-scene CPU preparations exclude this smoke from performance
 claims and the required three-repeat matrix. It verifies the final native
 measurement guards without presenting its FPS as reference evidence.
 
-The latest staged isolation build passed 351 workspace Rust tests (one existing
-GPU test ignored), 50 Python tooling tests, workspace Clippy with warnings
-denied, formatting/diff checks and all 17 native scenarios / 1,712 steps.
-The [isolation validation manifest](native-validation-2026-10-12-isolation.json)
-records its distinct executable hash and source/build limits. The earlier
+### Primary 500 native results and remaining interaction gap
+
+The fresh 500 fixture settled naturally after 1,056 updates (16.896 simulation
+seconds / 2,310.719 wall seconds). The 1,000 preparation was suspended with
+SIGSTOP during the isolated 500 baseline and six native windows, then resumed;
+its preparation wall duration includes that pause, which grants no simulated
+rest time. All 500 fragments remained asleep and IDs/material/mass were
+preserved in every window, with 1,801–1,802 retained intervals per window.
+Facing median intervals were 16.739–16.758 ms (59.67–59.74 FPS), away
+16.731–16.744 ms (59.72–59.77 FPS). Across windows, p95 was 18.263–18.599 ms,
+p99 19.502–19.716 ms and the maximum 20.551 ms. This is approximately the
+proposed 60 FPS target, not a strict 60 FPS floor. Actual renderer metadata was
+Apple M1 Metal, 1920×1080, DPI 2, AutoVsync. Its cadence differs from the earlier
+1,000 dataset; FPS is not treated as a same-display comparison between loads.
+
+One hundred identical-snapshot solver comparisons measured median stateless
+time 2,518.251 ms versus sleeping time 0.198813 ms. Sleeping integration, pair
+visits and matrix allocations were zero, versus stateless medians of 1,000,
+7,984,000 and 1,002 respectively. Native physics medians were 0.437–0.443 ms,
+CPU rendering 3.488–3.521 ms and asynchronous GPU timestamps 2.155–2.310 ms.
+The [six-window summary](native-500-dense-settled-2026-10-12-summary.json) and
+[complete compressed raw samples](native-500-dense-settled-2026-10-12.json.gz)
+retain the measurements, counters and accounting. Dense settled 500 and 1,000
+now supply all twelve required primary/stress windows; the other 92 matrix
+cases remain pending.
+
+The fresh 500 interaction route separately reached all sleeping at 1,056 updates
+(2,313.753 preparation wall seconds). Loaded flight/landing/takeoff preserved
+exactly zero local drift and all 625 kg. F pickup removed support 162; dependent
+238 fell over 1 cm, and all 34 objects outside the original component remained
+asleep. The [support-removal partial](native-500-support-partial-2026-10-12.json)
+retains those successful checks and the subsequent failed release. The blind
+forward/left walking search reached the narrow nose/outer hull, where the
+production placement validator rejected the carried footprint.
+The complete carrying route remains failed.
+
+The harness now computes ordinary look inputs toward ship-local waypoints from
+actual inspection data, walks around the Core, tries both strafe directions,
+and faces a floor gap before every release. It never installs player or
+fragment poses or sleep flags. Five analytic look/axis/precision regressions
+bring Python tooling to 55 passing tests. A first 100-fragment probe released
+successfully but failed a repeat release; correcting the held-offset view reset
+then passed the [full native 100 route](native-100-floor-navigation-2026-10-12.json)
+with all three cycles. A fresh 500 interaction route is now preparing on the
+final surface build with this corrected harness; its outcome is still pending.
+
+The latest staged surface build passed 353 workspace Rust tests (one existing
+GPU test ignored), 55 Python tooling tests, workspace Clippy with warnings
+denied and formatting/diff checks. All 17 native scenarios / 1,712 steps passed
+after rerunning two first-sweep assertion failures. The
+[surface validation manifest](native-validation-2026-10-12-surface.json) records
+its distinct executable hash, failed first attempts, retries and build limits.
+The earlier [isolation validation manifest](native-validation-2026-10-12-isolation.json)
+retains that build's separate provenance. The earlier
 [point-envelope validation manifest](native-validation-2026-10-12-point.json)
 records the production physics build used for the partial loaded routes above.
 
-Remaining acceptance requires naturally settled dense 500/1,000 populations,
-loaded flight and support-removal/carrying checks, identical-snapshot physics
-baseline comparison, native screenshots, and all 96 reference matrix cases
+Remaining acceptance requires complete loaded carrying routes and the other
+92 reference matrix cases, including active windows. Dense 500/1,000 natural
+sleep, loaded rigid flight and identical-snapshot baseline comparisons are now
+retained above. The complete matrix still requires all 96 cases
 with three windows and at least 100 retained samples per window. Diagnostic
 continuations, partial preparations and timeouts do not satisfy those gates.
 
@@ -121,8 +171,9 @@ production physics and update timing are unchanged. The
 [sampling-build validation manifest](native-validation-2026-10-12-sampling.json)
 records its distinct hash, 351 passing Rust tests (one existing ignored GPU test),
 50 Python tests, Clippy/format checks and 17 native scenarios / 1,712 steps.
-The partial loaded correctness results above use the point-envelope binary;
-the corrected reruns will use the isolation build, whose physics is unchanged.
+The original partial loaded results use the point-envelope binary. Subsequent
+sampling, isolation and surface builds retain that physics implementation;
+each dataset above identifies its own executable and harness revision.
 
 ## Intermediate native investigations — 2026-10-12
 

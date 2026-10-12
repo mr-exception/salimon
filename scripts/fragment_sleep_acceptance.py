@@ -11,6 +11,38 @@ from e2e_artifacts import Artifacts
 from salimon_test import Game, ScenarioError
 
 
+def ship_point_look_delta(state, point):
+    """Aim through protocol look inputs, without installing player/object poses.
+
+    Match automation.rs's aim_fragment mouse conversion. Subtract in ship-local
+    coordinates before rotating, retaining precision at the 1e12 m world anchor.
+    """
+    def dot(a, b):
+        return sum(x * y for x, y in zip(a, b))
+    def cross(a, b):
+        return [a[1]*b[2] - a[2]*b[1], a[2]*b[0] - a[0]*b[2], a[0]*b[1] - a[1]*b[0]]
+    def normalize(vector):
+        magnitude = math.sqrt(dot(vector, vector))
+        if not math.isfinite(magnitude) or magnitude < 1e-9:
+            raise ValueError('cannot aim along a degenerate direction')
+        return [value / magnitude for value in vector]
+    player = state['player']
+    local = [goal - eye for goal, eye in zip(point, player['ship_local_eye_position_meters'])]
+    q = state['ship']['orientation']
+    twice_cross = [2 * value for value in cross(q[:3], local)]
+    correction = cross(q[:3], twice_cross)
+    target = normalize([local[i] + q[3] * twice_cross[i] + correction[i] for i in range(3)])
+    current = normalize([goal - eye for goal, eye in zip(player['look_target_meters'], player['eye_position_meters'])])
+    up = normalize(player['up'])
+    def planar(direction):
+        vertical = dot(direction, up)
+        return normalize([direction[i] - up[i] * vertical for i in range(3)])
+    a, b = planar(current), planar(target)
+    yaw = math.atan2(-dot(cross(a, b), up), dot(a, b))
+    pitch = math.asin(max(-1, min(1, dot(target, up)))) - math.asin(max(-1, min(1, dot(current, up))))
+    return yaw / .0022, -pitch / .0022
+
+
 def population(state):
     return sorted((p['id'], p['resource'], p['mass_kg'], p['source_deposit_id'])
                   for p in state['world']['fragments'])
@@ -51,6 +83,21 @@ def run(binary, count, layout, settle_steps, timeout, output, carrying, request_
                 key(name, True)
                 key(name, False)
                 return request('inspect')
+            def face_point(state, point):
+                dx, dy = ship_point_look_delta(state, point)
+                return request('look', dx=dx, dy=dy)
+            def walk_to(state, x, z, batches=80):
+                for _ in range(batches):
+                    eye = state['player']['ship_local_eye_position_meters']
+                    if math.hypot(x - eye[0], z - eye[2]) < .16:
+                        break
+                    state = face_point(state, [x, eye[1], z])
+                    key('forward', True)
+                    state = request('step', frames=2)
+                    key('forward', False)
+                    if math.dist(eye, state['player']['ship_local_eye_position_meters']) < .005:
+                        break
+                return state
             initial = request('inspect')
             identity = population(initial)
             assert len(identity) == count and len({p[0] for p in identity}) == count
@@ -100,6 +147,13 @@ def run(binary, count, layout, settle_steps, timeout, output, carrying, request_
                     key=lambda p: p['distance_to_player_meters'])
                 picked = None
                 for piece in candidates:
+                    eye = state['player']['ship_local_eye_position_meters']
+                    if piece['ship_local_position_meters'][0] < -2.24 and eye[0] > -2.24:
+                        # Authored Core clearance: take the outside aisle before
+                        # walking aft, rather than cutting through its pedestal.
+                        aisle = -1.8 if eye[2] <= 0 else 1.8
+                        state = walk_to(state, eye[0], aisle)
+                        state = walk_to(state, -2.5, aisle)
                     # Walk through the normal controller; no player/cargo pose
                     # overrides are available through this acceptance harness.
                     for _ in range(40):
@@ -122,12 +176,13 @@ def run(binary, count, layout, settle_steps, timeout, output, carrying, request_
                     # A root can be obstructed from its center-distance cutoff.
                     # Walk around it through the ordinary strafe controller and
                     # accept only the actual production reticle target.
-                    for _ in range(8):
+                    for attempt in range(16):
                         if state['carrying']['target_id'] == piece['id']:
                             break
-                        key('left', True)
+                        direction = 'left' if attempt < 8 else 'right'
+                        key(direction, True)
                         state = request('step', frames=8)
-                        key('left', False)
+                        key(direction, False)
                         request('restore_look')
                         state = request('aim_fragment', fragment_id=piece['id'])
                     if state['carrying']['target_id'] != piece['id']:
@@ -167,30 +222,33 @@ def run(binary, count, layout, settle_steps, timeout, output, carrying, request_
                 result['dependent_ids_before_pickup'] = sorted(dependents)
                 result['unrelated_sleeping_ids'] = unrelated
                 request('restore_look')
-                request('look', dx=0, dy=400)
-                state = press('grab_drop')
-                # A closer viewpoint may put the player inside a packed pile.
-                # Walk toward the original restored forward view to clear floor;
-                # release still goes through the production placement validator.
-                for attempt in range(40):
+                state = request('inspect')
+                eye = state['player']['ship_local_eye_position_meters']
+                aisle = -1.8 if eye[2] <= 0 else 1.8
+                state = walk_to(state, eye[0], aisle)
+                state = walk_to(state, .76, aisle)
+                # The authored gap between Core and pilot chair is clear floor.
+                # Face it explicitly; the pre-pickup view need not point toward
+                # that floor. Every release still uses the production validator.
+                release_point = [.65 if aisle < 0 else 1.24, .8, 0]
+                for _ in range(12):
+                    # The carried object sits left of the ray. Aim across that
+                    # offset so its footprint, rather than just the reticle,
+                    # fits between the body-expanded furniture proxies.
+                    state = face_point(state, release_point)
+                    state = press('grab_drop')
                     if state['carrying']['object_id'] is None:
                         break
-                    request('look', dx=0, dy=-400)
                     key('forward', True)
-                    state = request('step', frames=4)
+                    state = request('step', frames=1)
                     key('forward', False)
-                    if attempt % 5 == 4:
-                        key('left', True)
-                        state = request('step', frames=8)
-                        key('left', False)
-                    request('look', dx=0, dy=400)
-                    state = press('grab_drop')
                 assert state['carrying']['object_id'] is None, 'production placement rejected release'
                 for cycle in range(3):
                     state = request('step', frames=1)
                     request('aim_fragment', fragment_id=picked)
                     state = press('grab_drop')
                     assert state['carrying']['object_id'] == picked, 'repeat pickup changed identity'
+                    state = face_point(state, release_point)
                     state = press('grab_drop')
                     assert state['carrying']['object_id'] is None, 'repeat release rejected'
                     check(state, f'pickup_drop_{cycle + 1}', asleep=False)

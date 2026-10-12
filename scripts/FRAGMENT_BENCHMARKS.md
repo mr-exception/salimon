@@ -205,7 +205,9 @@ routes after bounded natural preparation. It verifies fast rotating flight,
 landing/takeoff, stable anchors, IDs/material/mass and full sleep. `--carrying`
 also requires actual F removal of a single-support bottom body, dependent fall,
 an unrelated sleeping island, mining lockout and three pickup/drop cycles. It
-walks closer and tries lateral viewpoints through the controller to reach cargo;
+walks around the authored Core and tries both lateral viewpoints through the
+controller to reach cargo. Release navigation faces clear floor while accounting
+for the held object's side offset, including after each repeated pickup;
 no poses or sleep flags are installed. Fall checks identify the selected root's
 previous dependents, and unrelated sleep is checked outside its old component.
 Failures remain failures in its JSON summary and process exit status.

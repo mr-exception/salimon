@@ -192,6 +192,10 @@ also requires actual F removal of a single-support bottom body, dependent fall,
 an unrelated sleeping island, mining lockout and three pickup/drop cycles. It
 walks through the controller to reach cargo; no poses or sleep flags are installed.
 Failures remain failures in its JSON summary and process exit status.
+Loaded requests use a 120-second limit (`--request-timeout`), also capped by the
+whole-run `--timeout`. This allows expensive real contact rebuilding after support
+removal; it changes neither the production timestep nor the acceptance assertions.
+The request limit is recorded in each result.
 
 ```sh
 python3 scripts/fragment_sleep_acceptance.py --binary artifacts/build/release/salimon-client --counts 500 1000 --layout dense --settle-steps 2400 --timeout 14400 --carrying --output artifacts/fragment-sleep-acceptance

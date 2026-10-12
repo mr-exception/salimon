@@ -27,11 +27,12 @@ def checkpoint(state):
                           for p in state['world']['fragments']]}
 
 
-def run(binary, count, layout, settle_steps, timeout, output, carrying):
+def run(binary, count, layout, settle_steps, timeout, output, carrying, request_timeout=120):
     artifacts = Artifacts({'source': 'fragment_sleep_acceptance'}, output)
     artifacts.open_logs()
     result = {'count': count, 'layout': layout, 'status': 'failed',
-              'artifact_directory': str(artifacts.directory), 'checkpoints': {}}
+              'artifact_directory': str(artifacts.directory), 'checkpoints': {},
+              'request_timeout_seconds': request_timeout}
     setup = {'scenario': 'orbit-earth', 'seed': 155, 'step_ms': 16,
              'fragment_count': count, 'fragment_layout': layout,
              'fragment_settle_steps': settle_steps}
@@ -39,8 +40,10 @@ def run(binary, count, layout, settle_steps, timeout, output, carrying):
     try:
         with Game([str(binary)], setup, started + timeout, artifacts) as game:
             def request(op, **fields):
-                result = game.request({'op': op, **fields}, time.monotonic() + 5)
-                return result if op == 'inspect' else game.request({'op': 'inspect'}, time.monotonic() + 5)
+                # Loaded support removal rebuilds and solves genuine contacts.
+                # Game also caps this deadline by the entire run's deadline.
+                result = game.request({'op': op, **fields}, time.monotonic() + request_timeout)
+                return result if op == 'inspect' else game.request({'op': 'inspect'}, time.monotonic() + request_timeout)
             def key(name, pressed):
                 return request('key', key=name, pressed=pressed)
             def press(name):
@@ -162,17 +165,19 @@ def main():
     parser.add_argument('--layout', choices=['scattered', 'dense'], default='dense')
     parser.add_argument('--settle-steps', type=int, default=1200)
     parser.add_argument('--timeout', type=int, default=7200)
+    parser.add_argument('--request-timeout', type=int, default=120,
+                        help='per-request deadline in seconds, also bounded by --timeout')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--carrying', action='store_true', help='also require real F bottom removal and repeated pickup/drop')
     args = parser.parse_args()
-    if any(not 1 <= count <= 1000 for count in args.counts) or not 1 <= args.settle_steps <= 37500 or args.timeout <= 0:
+    if any(not 1 <= count <= 1000 for count in args.counts) or not 1 <= args.settle_steps <= 37500 or args.timeout <= 0 or args.request_timeout <= 0:
         parser.error('invalid population, preparation limit or deadline')
     binary = args.binary.resolve()
     args.output.mkdir(parents=True, exist_ok=True)
     result = {'revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
               'binary_sha256': binary_hash(binary), 'setup_seed': 155, 'step_ms': 16,
               'settle_steps_limit': args.settle_steps,
-              'runs': [run(binary, count, args.layout, args.settle_steps, args.timeout, args.output, args.carrying)
+              'runs': [run(binary, count, args.layout, args.settle_steps, args.timeout, args.output, args.carrying, args.request_timeout)
                        for count in args.counts]}
     (args.output / 'summary.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({key: value for key, value in result.items() if key != 'runs'} |

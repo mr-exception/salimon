@@ -5,9 +5,16 @@
 **Incomplete: native dense 500/1,000 loaded acceptance and the reference matrix
 remain pending.** Current implementation commit: `047105c`; staged native binary
 SHA-256: `70d36bfd5dc2437603028b469eb0a4da5b300c4103e91db3f6ff0f13c17a1e16`.
-Fresh authored dense 500 and 1,000 preparations are running through production
-16 ms updates. Neither has reached readiness yet. No large-load FPS result or
-successful loaded interaction route is claimed.
+Fresh authored dense 500 preparation reached all 500 sleeping after 1,056
+production updates (16.896 simulation seconds / 1,733.795 wall seconds). Loaded
+25,000 m/s rotating flight, landing and takeoff passed with zero local drift.
+The [partial native result](native-500-partial-2026-10-12.json) retains these
+checks and the failure: after successful F pickup of support 162, the first
+physics update exceeded the harness's five-second response deadline. The full
+route remains failed. Requests now have a documented 120-second limit capped
+by the total run deadline, and a fresh 500 rerun is preparing. The original
+1,000 preparation is still running. No large-load FPS result or successful
+complete loaded interaction route is claimed.
 
 Current checks passed: 350 workspace Rust tests (one existing GPU test ignored),
 50 physics tests, workspace Clippy with warnings denied, formatting/diff checks,

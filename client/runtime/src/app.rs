@@ -944,8 +944,7 @@ impl ApplicationHandler for ClientApplication {
             WindowEvent::Resized(_) => {
                 let size = window.inner_size();
                 if self.benchmark.as_ref().is_some_and(|b| {
-                    b.recording_started()
-                        && !b.matches_surface(size.width, size.height, window.scale_factor())
+                    b.surface_changed(size.width, size.height, window.scale_factor())
                 }) {
                     self.fail(event_loop, "benchmark surface configuration changed");
                     return;
@@ -955,8 +954,7 @@ impl ApplicationHandler for ClientApplication {
             WindowEvent::ScaleFactorChanged { .. } => {
                 let size = window.inner_size();
                 if self.benchmark.as_ref().is_some_and(|b| {
-                    b.recording_started()
-                        && !b.matches_surface(size.width, size.height, window.scale_factor())
+                    b.surface_changed(size.width, size.height, window.scale_factor())
                 }) {
                     self.fail(event_loop, "benchmark surface configuration changed");
                     return;

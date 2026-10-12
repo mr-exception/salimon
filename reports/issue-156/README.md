@@ -52,6 +52,12 @@ solver replay timings are distinct from native frame timings. The
 retain counters, distributions and accounting. This earlier executable did not
 record DPI scale; drawable resolution was 1920×1080, native Apple M1 Metal,
 AutoVsync. This passes only the dense settled 1,000 case, not the whole matrix.
+Measured median native physics time was 1.143–1.184 ms, total CPU update
+1.760–1.828 ms, CPU rendering 2.788–3.826 ms, and latest asynchronous GPU
+timestamps 0.793–1.349 ms. CPU resource preparation/upload remained measurable
+after sleeping physics was skipped. The roughly 75 FPS cadence is consistent
+with the 75 Hz display and AutoVsync; these results do not establish uncapped
+throughput or an active-interaction budget.
 
 The corrected harness subsequently passed the full native dense 100 route:
 support 10 removal made dependent 86 fall; all 98 objects outside that original
@@ -76,6 +82,23 @@ The [visibility validation manifest](native-validation-2026-10-12-visibility.jso
 distinguishes current build/lint/format checks and 13 focused benchmark tests from
 the earlier complete workspace/native suite. Python tooling passed all 50 tests
 again after the final helper changes.
+The final [surface validation manifest](native-validation-2026-10-12-surface.json)
+records executable `95e662d5aeea7cec6a8913ba59adbfe51f84d70eaf5f3cfeb6315bf106cc2d68`,
+353 passing Rust tests (one existing ignored GPU test), 50 Python tests, Clippy,
+formatting and 17 native scenarios / 1,712 steps ultimately passed. The first
+native sweep passed 15 cases and failed carrying/resource-loop assertions;
+both failed cases passed unchanged-binary reruns. Their cause was not isolated,
+and the manifest retains the initial failures and retries.
+
+After the user confirmed the benchmark could stay visible, a two-camera native
+10-fragment tooling smoke completed with 601 intervals per window, all ten
+objects sleeping and accounting preserved. Native F/W/F2/Escape input was sent
+during that live run; the intended camera switch and
+[live away view](native-benchmark-input-isolation-live.png) remained correct.
+Actual metadata: Apple M1 Metal, 1920×1080 drawable, DPI scale 2, AutoVsync.
+Concurrent large-scene CPU preparations exclude this smoke from performance
+claims and the required three-repeat matrix. It verifies the final native
+measurement guards without presenting its FPS as reference evidence.
 
 The latest staged isolation build passed 351 workspace Rust tests (one existing
 GPU test ignored), 50 Python tooling tests, workspace Clippy with warnings

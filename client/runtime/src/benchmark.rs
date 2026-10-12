@@ -215,9 +215,6 @@ pub(crate) struct Recorder {
 }
 
 impl Recorder {
-    pub(crate) fn recording_started(&self) -> bool {
-        self.started.is_some()
-    }
     pub(crate) fn restart_before_sampling(&mut self) -> bool {
         if self
             .samples
@@ -235,10 +232,11 @@ impl Recorder {
         self.stride = 1;
         true
     }
-    pub(crate) fn matches_surface(&self, width: u32, height: u32, scale: f64) -> bool {
-        self.info["width"].as_u64() == Some(u64::from(width))
-            && self.info["height"].as_u64() == Some(u64::from(height))
-            && self.info["scale_factor"].as_f64() == Some(scale)
+    pub(crate) fn surface_changed(&self, width: u32, height: u32, scale: f64) -> bool {
+        self.info.get("width").is_some()
+            && !(self.info["width"].as_u64() == Some(u64::from(width))
+                && self.info["height"].as_u64() == Some(u64::from(height))
+                && self.info["scale_factor"].as_f64() == Some(scale))
     }
     pub(crate) fn window_title(&self) -> String {
         let away = self.config.away
@@ -495,6 +493,20 @@ pub(crate) fn run_headless(config: Config) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn surface_metadata_cannot_change_during_startup_or_warmup() {
+        let config = parse(&["--benchmark".into()]).unwrap();
+        let mut recorder = Recorder::new(config, &ClientApplication::default());
+        assert!(!recorder.surface_changed(1920, 1080, 2.0));
+        recorder.info = json!({"width":1920,"height":1080,"scale_factor":2.0});
+        for started in [None, Some(Instant::now())] {
+            recorder.started = started;
+            assert!(!recorder.surface_changed(1920, 1080, 2.0));
+            assert!(recorder.surface_changed(1280, 1080, 2.0));
+            assert!(recorder.surface_changed(1920, 800, 2.0));
+            assert!(recorder.surface_changed(1920, 1080, 1.0));
+        }
+    }
     #[test]
     fn startup_occlusion_restarts_warmup_but_retained_intervals_fail() {
         let config = parse(&["--benchmark".into()]).unwrap();

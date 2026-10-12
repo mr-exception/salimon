@@ -358,7 +358,7 @@ mouse/keyboard input. Their titles identify count, layout, requested state, came
 repeat. Native timing and production updates remain unchanged. Recorded renderer
 metadata includes DPI scale. Initial occlusion before any retained frame interval
 restarts the full warm-up. Occlusion during measured sampling or changed surface
-configuration after recording begins fails; closing before completion also fails.
+configuration after renderer initialization fails; closing before completion also fails.
 See the benchmark guide for limits, counter meanings and CPU-only interpretation.
 Optional `--minimum-samples` requires both elapsed sampling duration and a retained
 sample count before a window completes. Native mode counts completed frame

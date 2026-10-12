@@ -2,9 +2,13 @@
 
 ## Current status — 2026-10-12
 
-**Incomplete: native dense 500/1,000 loaded acceptance and the reference matrix
-remain pending.** Current implementation commit: `047105c`; staged native binary
-SHA-256: `70d36bfd5dc2437603028b469eb0a4da5b300c4103e91db3f6ff0f13c17a1e16`.
+**Incomplete: complete native 500/1,000 interaction routes and the remaining
+reference matrix remain pending.** Dense settled 500/1,000 performance windows
+have passed, as recorded below. Current production physics is `047105c`; the
+current staged surface/measurement executable SHA-256 is
+`95e662d5aeea7cec6a8913ba59adbfe51f84d70eaf5f3cfeb6315bf106cc2d68`.
+The first point-envelope interaction attempt used executable SHA-256
+`70d36bfd5dc2437603028b469eb0a4da5b300c4103e91db3f6ff0f13c17a1e16`.
 Fresh authored dense 500 preparation reached all 500 sleeping after 1,056
 production updates (16.896 simulation seconds / 1,733.795 wall seconds). Loaded
 25,000 m/s rotating flight, landing and takeoff passed with zero local drift.
@@ -157,8 +161,31 @@ retains that build's separate provenance. The earlier
 [point-envelope validation manifest](native-validation-2026-10-12-point.json)
 records the production physics build used for the partial loaded routes above.
 
+The additional [settled low-load summary](native-matrix-settled-low-2026-10-12-summary.json)
+and [compressed complete raw data](native-matrix-settled-low-2026-10-12.json.gz)
+record 108 passing windows: counts 0/10/25/50/100/250, all three layouts,
+both cameras and three repeats. Every window retained at least 100 frame
+intervals, preserved accounting and retained the complete population asleep.
+The final surface executable was used, with 1 s warmup, 5 s requested sampling,
+natural preparation bounded by 2,400 production updates, and isolated sequential
+measurement after each preparation batch. The two large interaction preparation
+processes were suspended during collection; that pause grants no simulation
+time and remains included in their total wall-clock deadlines.
+
+The [active low-load summary](native-matrix-active-low-2026-10-12-summary.json)
+and [compressed complete raw data](native-matrix-active-low-2026-10-12.json.gz)
+record 90 passing fresh-process windows: counts 0/10/25/50/100, all layouts,
+both cameras, three repeats, zero warmup and 5 s requested sampling. Accounting
+and at least 100 native frame intervals passed for every window. These fixtures
+naturally settle during collection: all 72 nonempty windows were mixed, retaining
+30–98 moving samples each. Moving/resting counts in the summary constrain
+interpretation of their full-window distributions; fewer than 100 moving samples
+do not establish reliable active-only tails. The suspended interaction preparations resumed
+after these isolated windows completed.
+
+Together the retained native datasets cover 70 distinct cases / 210 windows.
 Remaining acceptance requires complete loaded carrying routes and the other
-92 reference matrix cases, including active windows. Dense 500/1,000 natural
+26 reference matrix cases, including high-load active windows. Dense 500/1,000 natural
 sleep, loaded rigid flight and identical-snapshot baseline comparisons are now
 retained above. The complete matrix still requires all 96 cases
 with three windows and at least 100 retained samples per window. Diagnostic

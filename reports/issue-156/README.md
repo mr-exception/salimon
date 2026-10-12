@@ -34,7 +34,48 @@ input and rejects mid-collection occlusion or surface configuration changes.
 After the user confirmed the iMac was idle, the already naturally prepared
 1,000 native timing run began its isolated baseline and six sampling windows.
 Its executable is the sampling build below; replacing the staged file does
-not change that already-running process. Results remain pending.
+not change that already-running process. That run completed successfully:
+all six windows retained 2,243–2,251 frame intervals and all 1,000 fragments
+remained asleep, with accounting preserved. Facing median intervals were
+13.289–13.337 ms (74.98–75.25 FPS); away medians were 13.248–13.256 ms
+(75.44–75.48 FPS). Across windows, p95 intervals were 16.253–16.696 ms;
+the largest interval was 42.116 ms. This does not prove a per-frame 60 FPS floor.
+
+One hundred identical naturally settled snapshot comparisons measured median
+stateless solver time 7,069.035 ms versus sleeping solver time 0.460667 ms.
+Sleeping integration, pair visits and matrix allocations were all zero;
+stateless medians were 2,000 integrated-object visits, 31,968,000 pair visits
+and 2,002 matrix allocations. Cloning was excluded from both timers. These
+solver replay timings are distinct from native frame timings. The
+[six-window summary](native-1000-dense-settled-2026-10-12-summary.json) and
+[compressed complete raw samples](native-1000-dense-settled-2026-10-12.json.gz)
+retain counters, distributions and accounting. This earlier executable did not
+record DPI scale; drawable resolution was 1920×1080, native Apple M1 Metal,
+AutoVsync. This passes only the dense settled 1,000 case, not the whole matrix.
+
+The corrected harness subsequently passed the full native dense 100 route:
+support 10 removal made dependent 86 fall; all 98 objects outside that original
+component remained asleep; three real pickup/drop cycles passed. It used the
+visibility build `c0a262da0e4ce092d6f99743c40e4400e1335c7ffca161aa8505d02bc76c72af`.
+Local full evidence: `artifacts/issue156-native-corrected-100/summary.json`.
+The [retained corrected route](native-100-corrected-2026-10-12.json) records
+its checks, support/dependent IDs, unrelated islands and checkpoint hashes.
+The [benchmark screenshot](native-benchmark-input-isolation.png) shows the
+10-fragment camera and pickup prompt. F, W, F2 and Escape were sent through
+native UI controls, but the window was paused by startup occlusion: the unchanged
+image alone does not prove input isolation. It was explicitly closed and supplies
+no accepted timing result. Later bundled and bare short-window attempts were
+rejected when occlusion arrived during sampling; their empty stdout is excluded.
+Initial occlusion before retained frame intervals now restarts the full warm-up;
+the focused regression passed. Original focus/cursor behavior is retained while
+gameplay events are ignored. The corrected 500/1,000 interaction reruns and
+fresh 500 timing preparation are running with executable SHA-256
+`afb221ebebecc1652b6f9ee6329c0bf7289bb2a82b581d5a0c73c5cce1cc9cb1`;
+500 timing remains behind its stdin barrier until other CPU-heavy jobs finish.
+The [visibility validation manifest](native-validation-2026-10-12-visibility.json)
+distinguishes current build/lint/format checks and 13 focused benchmark tests from
+the earlier complete workspace/native suite. Python tooling passed all 50 tests
+again after the final helper changes.
 
 The latest staged isolation build passed 351 workspace Rust tests (one existing
 GPU test ignored), 50 Python tooling tests, workspace Clippy with warnings

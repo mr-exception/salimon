@@ -218,6 +218,23 @@ impl Recorder {
     pub(crate) fn recording_started(&self) -> bool {
         self.started.is_some()
     }
+    pub(crate) fn restart_before_sampling(&mut self) -> bool {
+        if self
+            .samples
+            .iter()
+            .any(|sample| self.config.headless || sample.frame_ms.is_some())
+        {
+            return false;
+        }
+        // macOS can report initial occlusion after the first drawable. No
+        // retained frame interval may span that gap; restart the full warm-up.
+        self.started = None;
+        self.last_presented = None;
+        self.samples.clear();
+        self.observed = 0;
+        self.stride = 1;
+        true
+    }
     pub(crate) fn matches_surface(&self, width: u32, height: u32, scale: f64) -> bool {
         self.info["width"].as_u64() == Some(u64::from(width))
             && self.info["height"].as_u64() == Some(u64::from(height))
@@ -478,6 +495,33 @@ pub(crate) fn run_headless(config: Config) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn startup_occlusion_restarts_warmup_but_retained_intervals_fail() {
+        let config = parse(&["--benchmark".into()]).unwrap();
+        let mut recorder = Recorder::new(config, &ClientApplication::default());
+        recorder.started = Some(Instant::now());
+        recorder.last_presented = recorder.started;
+        recorder.observed = 1;
+        assert!(recorder.restart_before_sampling());
+        assert!(recorder.started.is_none() && recorder.last_presented.is_none());
+        assert_eq!(recorder.observed, 0);
+        let sample = Sample {
+            frame_ms: Some(16.0),
+            simulation_delta_ms: 16.0,
+            update_ms: 1.0,
+            simulation_ms: 1.0,
+            physics: Default::default(),
+            render: None,
+        };
+        recorder.samples.push(sample);
+        assert!(!recorder.restart_before_sampling());
+        assert_eq!(recorder.samples.len(), 1);
+        // A preliminary redraw without a completed presentation interval is
+        // discarded when native visibility arrives after that redraw.
+        recorder.samples[0].frame_ms = None;
+        assert!(recorder.restart_before_sampling());
+        assert!(recorder.samples.is_empty());
+    }
     #[test]
     fn minimum_samples_requires_elapsed_time_and_completed_native_intervals() {
         let config = parse(&[

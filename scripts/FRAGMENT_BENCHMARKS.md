@@ -191,10 +191,11 @@ from storage/allocation counters so allocation removal and filtering remain
 attributable. A dense pile can still require quadratic contact work.
 
 
-Native benchmark gameplay input is disabled, the mouse remains uncaptured, and
+Native benchmark gameplay input is disabled, normal cursor capture is retained, and
 window titles identify the exact case/repeat. Keep the window visible and its
 resolution/DPI unchanged throughout collection. Interrupted/occluded/resized
-collection fails. Renderer metadata records the actual DPI scale; screenshots
+collection fails. Initial occlusion before retained intervals restarts the full
+warm-up. Renderer metadata records the actual DPI scale; screenshots
 must show the matching benchmark title and be taken from a live process.
 
 ## Native loaded sleep acceptance (#156)

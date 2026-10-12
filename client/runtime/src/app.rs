@@ -186,8 +186,7 @@ impl ClientApplication {
             return Ok(());
         }
 
-        let mut attributes =
-            window_attributes(self.e2e_config.is_some()).with_active(self.benchmark.is_none());
+        let mut attributes = window_attributes(self.e2e_config.is_some());
         if let Some(benchmark) = &self.benchmark {
             attributes = attributes.with_title(benchmark.window_title());
         }
@@ -195,10 +194,8 @@ impl ClientApplication {
             .create_window(attributes)
             .map_err(|error| RunError::new("failed to create native window", error))?;
         window.set_visible(true);
-        if self.benchmark.is_none() {
-            window.focus_window();
-            self.cursor_captured = capture_cursor(&window);
-        }
+        window.focus_window();
+        self.cursor_captured = capture_cursor(&window);
         let size = window.inner_size();
         log::info!(
             "native window created: physical_size={}x{} scale_factor={:.2}",
@@ -972,8 +969,8 @@ impl ApplicationHandler for ClientApplication {
                 if is_occluded
                     && self
                         .benchmark
-                        .as_ref()
-                        .is_some_and(|b| b.recording_started())
+                        .as_mut()
+                        .is_some_and(|b| !b.restart_before_sampling())
                 {
                     self.fail(event_loop, "benchmark window occluded during collection");
                     return;
@@ -992,7 +989,7 @@ impl ApplicationHandler for ClientApplication {
                 }
             }
             WindowEvent::Focused(focused) => {
-                if focused && self.benchmark.is_none() {
+                if focused {
                     self.cursor_captured = capture_cursor(&window);
                 } else {
                     self.movement_input = MovementInput::default();

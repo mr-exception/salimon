@@ -41,10 +41,18 @@ def summarize(result):
         raise ValueError("fragment mass is not conserved")
     metrics = {key: distribution([s[key] for s in result["samples"] if s.get(key) is not None]) for key in METRICS}
     frame = metrics["frame_ms"]
+    frame_samples = sum(s.get("frame_ms") is not None for s in result["samples"])
+    retained = frame_samples if result["mode"] == "native_wall_clock" else len(result["samples"])
+    if retained < result["config"].get("minimum_samples", 0):
+        raise ValueError("benchmark did not retain its requested minimum samples")
     metrics["frames_over_16_67ms"] = sum(s.get("frame_ms") is not None and s["frame_ms"] > 1000 / 60 for s in result["samples"])
     metrics["frames_over_50ms"] = sum(s.get("frame_ms") is not None and s["frame_ms"] > 50 for s in result["samples"])
     return {"config": result["config"], "mode": result["mode"], "renderer": result["renderer"],
             "samples_retained": len(result["samples"]), "tail_statistics_reliable": len(result["samples"]) >= 100, "updates_observed": result.get("updates_observed"),
+            "frame_samples_retained": frame_samples,
+            "sample_wall_seconds": result.get("sample_wall_seconds"),
+            "moving_samples": sum(s["moving_objects"] > 0 for s in result["samples"]),
+            "resting_samples": sum(s["moving_objects"] == 0 for s in result["samples"]),
             "sampling_stride": result.get("sampling_stride", 1), "metrics": metrics,
             "settled_observed": all(s["moving_objects"] == 0 for s in result["samples"]),
             "sleeping_observed": all(s.get("sleeping_objects") == result["config"]["count"] for s in result["samples"]),
@@ -162,6 +170,8 @@ def main(argv=None):
     parser.add_argument("--seed", type=int, default=155)
     parser.add_argument("--warmup-seconds", type=int, default=10)
     parser.add_argument("--sample-seconds", type=int, default=30)
+    parser.add_argument("--minimum-samples", type=int, default=0,
+                        help="0..1000 retained samples per window; native counts completed frame intervals")
     parser.add_argument("--settle-steps", type=int, default=0,
                         help="prepare settled cases using up to this many production 16ms updates; fails unless all objects sleep")
     parser.add_argument("--repeats", type=int, default=1,
@@ -181,6 +191,8 @@ def main(argv=None):
         parser.error("invalid population, duration, seed, timeout or tolerance")
     if args.prepare_workers > 1 and args.mode != "native":
         parser.error("concurrent preparation is for native windows only")
+    if not 0 <= args.minimum_samples <= 1000:
+        parser.error("minimum samples must be 0..1000")
     if args.solver_baseline_samples and not args.settle_steps:
         parser.error("solver baseline requires natural preparation")
     if any(len(set(values)) != len(values) for values in (args.counts, args.layouts, args.states, args.cameras)):
@@ -214,6 +226,8 @@ def main(argv=None):
                         command = [str(executable), "--benchmark", "--count", str(count), "--layout", layout,
                             "--state", state, "--camera", camera, "--mode", args.mode, "--seed", str(args.seed),
                             "--warmup-seconds", str(args.warmup_seconds), "--sample-seconds", str(args.sample_seconds)]
+                        if args.minimum_samples:
+                            command += ["--minimum-samples", str(args.minimum_samples)]
                         if state == "settled" and args.settle_steps:
                             command += ["--settle-steps", str(args.settle_steps)]
                         if state == "settled" and args.repeats != 1:
@@ -247,6 +261,8 @@ def main(argv=None):
                     raise ValueError("incomplete repeat windows")
                 cases = []
                 for index, result in enumerate(runs):
+                    if result['config'].get('minimum_samples', 0) != args.minimum_samples:
+                        raise ValueError('benchmark minimum-sample configuration mismatch')
                     case = summarize(result)
                     if job["state"] == "settled" and args.settle_steps and not case["sleeping_observed"]:
                         raise ValueError("prepared settled population woke during the measured window")

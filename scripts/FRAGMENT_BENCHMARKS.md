@@ -25,6 +25,14 @@ failure/timeout is retained and makes the runner exit nonzero. No partial case i
 reported as a successful measurement. Reports store binary SHA-256, source base
 revision/dirty flag, CPU/OS label, adapter/backend/type, resolution and settings.
 
+For baseline collection, pass `--minimum-samples 100`: each window must meet both
+its requested duration and retained sample count. Native mode counts completed
+frame intervals; CPU mode counts updates. Expensive updates can extend actual
+sampling beyond `--sample-seconds`; `sample_wall_seconds` records that duration,
+and the process deadline still bounds the run. `moving_samples` / `resting_samples`
+identify windows that naturally settle during collection. Such mixed windows do
+not establish reliable active-only tails from their later resting frames.
+
 The active fixture starts above support with linear/angular motion. It naturally
 settles; it is not a perpetual externally driven stress loop. Requested settled
 loads start at support, but layered piles and faceted hulls can still move. Check

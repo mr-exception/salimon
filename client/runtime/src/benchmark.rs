@@ -19,6 +19,7 @@ pub(crate) struct Config {
     pub(crate) headless: bool,
     pub(crate) warmup_seconds: u64,
     pub(crate) sample_seconds: u64,
+    pub(crate) minimum_samples: usize,
     pub(crate) settle_steps: u64,
     pub(crate) repeats: usize,
     pub(crate) defer_start: bool,
@@ -42,6 +43,7 @@ pub(crate) fn parse(args: &[String]) -> Result<Config, String> {
         headless: false,
         warmup_seconds: 10,
         sample_seconds: 30,
+        minimum_samples: 0,
         settle_steps: 0,
         repeats: 1,
         defer_start: false,
@@ -113,6 +115,13 @@ pub(crate) fn parse(args: &[String]) -> Result<Config, String> {
                 if config.settle_steps > 37500 {
                     return Err("settle steps must be 0..37500 (600 simulation seconds)".into());
                 }
+            }
+            "--minimum-samples" => {
+                let samples = integer()?;
+                if samples > 1000 {
+                    return Err("minimum samples must be 0..1000".into());
+                }
+                config.minimum_samples = samples as usize;
             }
             "--repeats" => {
                 let repeats = integer()?;
@@ -273,6 +282,12 @@ impl Recorder {
         }
         now.duration_since(start)
             >= Duration::from_secs(self.config.warmup_seconds + self.config.sample_seconds)
+            && self
+                .samples
+                .iter()
+                .filter(|s| self.config.headless || s.frame_ms.is_some())
+                .count()
+                >= self.config.minimum_samples
     }
     pub(crate) fn finish(&mut self, app_accounting: Value) -> Result<bool, String> {
         if self.finished {
@@ -310,7 +325,10 @@ impl Recorder {
                 "initial_state": if self.config.active { "active" } else { "settled_requested" },
                 "camera": if self.config.away || (self.config.both_cameras && self.completed.len() >= self.config.repeats) { "away" } else { "facing" },
                 "warmup_seconds": self.config.warmup_seconds, "sample_seconds": self.config.sample_seconds,
+                "minimum_samples": self.config.minimum_samples,
                 "settle_steps_limit": self.config.settle_steps},
+            "sample_wall_seconds": self.last_presented.zip(self.started).map(|(end, start)|
+                end.duration_since(start).as_secs_f64() - self.config.warmup_seconds as f64),
             "renderer": self.info, "accounting": self.initial, "accounting_preserved": true,
             "solver_baseline": self.baseline,
             "updates_observed": self.observed, "sampling_stride": self.stride,
@@ -434,6 +452,49 @@ pub(crate) fn run_headless(config: Config) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn minimum_samples_requires_elapsed_time_and_completed_native_intervals() {
+        let config = parse(&[
+            "--benchmark".into(),
+            "--warmup-seconds".into(),
+            "0".into(),
+            "--sample-seconds".into(),
+            "1".into(),
+            "--minimum-samples".into(),
+            "2".into(),
+        ])
+        .unwrap();
+        let mut recorder = Recorder::new(config, &ClientApplication::default());
+        recorder.started = Some(Instant::now() - Duration::from_secs(2));
+        let render = Some(RenderStats {
+            resource_batch: Default::default(),
+            cpu_render_time: Duration::ZERO,
+            gpu_frame_time: GpuFrameTime::Pending,
+            visible_objects: 0,
+            rendered_objects: 0,
+            scene_draw_calls: 0,
+            total_draw_calls: 0,
+            gpu_memory: None,
+        });
+        let delta = Duration::from_millis(16);
+        assert!(!recorder.record(delta, Duration::ZERO, Duration::ZERO, render));
+        assert!(!recorder.record(delta, Duration::ZERO, Duration::ZERO, None));
+        assert!(!recorder.record(delta, Duration::ZERO, Duration::ZERO, render));
+        assert!(recorder.record(delta, Duration::ZERO, Duration::ZERO, render));
+        // Even a sufficient count cannot end a window before its duration.
+        recorder.started = Some(Instant::now());
+        assert!(!recorder.record(delta, Duration::ZERO, Duration::ZERO, render));
+        let mut cpu = Recorder::new(
+            Config {
+                headless: true,
+                ..config
+            },
+            &ClientApplication::default(),
+        );
+        cpu.started = Some(Instant::now() - Duration::from_secs(2));
+        assert!(!cpu.record(delta, Duration::ZERO, Duration::ZERO, None));
+        assert!(cpu.record(delta, Duration::ZERO, Duration::ZERO, None));
+    }
     #[test]
     fn repeat_windows_keep_accounting_and_fail_without_samples() {
         let config = parse(&[

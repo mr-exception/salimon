@@ -354,6 +354,11 @@ preparation followed by isolated native recording; no window/clocks start until
 the explicit start marker. Optional baseline replays use the canonical adapter
 snapshots and cloned state/cache before recording, without changing live cargo.
 See the benchmark guide for limits, counter meanings and CPU-only interpretation.
+Optional `--minimum-samples` requires both elapsed sampling duration and a retained
+sample count before a window completes. Native mode counts completed frame
+intervals; CPU mode counts updates. Actual sample wall time is reported, including
+extensions for expensive production updates. The process deadline remains the
+outer bound. This does not change simulation delta or drive artificial motion.
 E2E setup's `fragment_settle_steps` uses the same fixture preparation before
 readiness. Inspection reads cache activation by stable identity, excluding
 carried pieces, through aggregate/per-fragment sleeping fields. Preparation is

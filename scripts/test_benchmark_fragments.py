@@ -36,11 +36,50 @@ class BenchmarkTests(unittest.TestCase):
         self.assertEqual(distribution(list(range(1, 101))), {"median": 50.5, "p95": 95, "p99": 99, "max": 100})
         self.assertIsNone(distribution([]))
 
+    def test_minimum_native_samples_counts_intervals_and_reports_mixed_motion(self):
+        result = self.result()
+        result['mode'] = 'native_wall_clock'
+        result['config']['minimum_samples'] = 3
+        result['sample_wall_seconds'] = 45.5
+        result['samples'] = [dict(result['samples'][0], frame_ms=frame, moving_objects=moving)
+                             for frame, moving in ((None, 1), (10, 1), (10, 0))]
+        with self.assertRaisesRegex(ValueError, 'minimum samples'):
+            summarize(result)
+        result['samples'].append(dict(result['samples'][0], frame_ms=10, moving_objects=0))
+        summary = summarize(result)
+        self.assertEqual(summary['frame_samples_retained'], 3)
+        self.assertEqual(summary['sample_wall_seconds'], 45.5)
+        self.assertEqual((summary['moving_samples'], summary['resting_samples']), (2, 2))
+
     def test_cpu_cost_never_becomes_fps_or_gpu_time(self):
         summary = summarize(self.result())
         self.assertIsNone(summary["median_interval_fps"])
         self.assertIsNone(summary["metrics"]["gpu_latest_ms"])
         self.assertTrue(summary["settled_observed"])
+
+    def test_runner_forwards_and_enforces_requested_minimum(self):
+        for retained in (2, 3):
+            commands = []
+            def run(command, **kwargs):
+                commands.append(command)
+                result = self.result()
+                result['config']['minimum_samples'] = 3
+                result['samples'] *= retained
+                kwargs['stdout'].write(json.dumps(result))
+                return type('Completed', (), {'returncode': 0})()
+            with tempfile.TemporaryDirectory() as temp:
+                binary = Path(temp) / 'binary'
+                binary.write_bytes(b'fixture')
+                with patch('benchmark_fragments.command_output', return_value='revision'), \
+                     patch('benchmark_fragments.platform.platform', return_value='test'), \
+                     patch('benchmark_fragments.platform.processor', return_value='test'), \
+                     patch('benchmark_fragments.subprocess.run', side_effect=run):
+                    code = main(['--binary', str(binary), '--output', str(Path(temp) / 'output'),
+                                 '--counts', '1', '--layouts', 'dense', '--states', 'active',
+                                 '--mode', 'physics', '--minimum-samples', '3', '--machine-label', 'test'])
+                self.assertEqual(code, int(retained < 3))
+                index = commands[0].index('--minimum-samples')
+                self.assertEqual(commands[0][index + 1], '3')
 
     def test_sleep_counters_distinguish_velocity_rest_from_persistent_sleep(self):
         result = self.result()

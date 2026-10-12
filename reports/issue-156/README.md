@@ -29,6 +29,15 @@ baseline comparison, native screenshots, and all 96 reference matrix cases
 with three windows and at least 100 retained samples per window. Diagnostic
 continuations, partial preparations and timeouts do not satisfy those gates.
 
+The benchmark build adds optional `--minimum-samples 100`, requiring both the
+requested wall duration and 100 retained native frame intervals before a window
+completes. It records actual sample duration and moving/resting sample counts;
+production physics and update timing are unchanged. The
+[sampling-build validation manifest](native-validation-2026-10-12-sampling.json)
+records its distinct hash, 351 passing Rust tests (one existing ignored GPU test),
+50 Python tests, Clippy/format checks and 17 native scenarios / 1,712 steps.
+Loaded correctness still uses the point-envelope binary identified above.
+
 ## Intermediate native investigations — 2026-10-12
 
 **Incomplete: the required native dense 500/1,000 settled windows have not passed.**

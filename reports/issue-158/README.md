@@ -121,3 +121,33 @@ This container's display/socket boundary prevents native screenshots/gameplay
 launch. No successful native E2E, packaged smoke, Metal/Windows rendering or M1
 reference benchmark is claimed locally. PR CI runs the existing graphical suites.
 No assets were edited, so Blender regeneration/model checks were not applicable.
+
+## Conflict resolution after PR #166
+
+Merged `main` at `2d2e071` into this PR after the #156 native-completion changes.
+The conflict was limited to `scripts/FRAGMENT_BENCHMARKS.md`: preserve the new
+physics allocation definitions, native collection controls and loaded-sleep
+acceptance route alongside #158's instance scratch definition and renderer
+comparison commands. The renderer architecture also retains the upstream Metal
+startup backport documentation. No instancing implementation was discarded.
+
+The original measurements/limitations above describe the pre-merge revision;
+#166 now supplies native 500-fragment evidence and defers 1,000-fragment stress
+acceptance. That evidence is an upstream baseline, not a before/after hardware
+measurement of this renderer change. No new native performance result is claimed
+by this merge. Validation results for the merged branch are recorded below.
+
+Merge validation (2026-10-13 UTC):
+
+- `cargo fmt --all -- --check`: passed.
+- `cargo clippy --workspace --all-targets --locked -- -D warnings`: passed.
+- `cargo test --workspace --locked`: all 356 unit/integration tests passed;
+  the renderer doctest phase encountered a missing dependency archive during
+  local cache repair. `cargo test --workspace --doc --locked` then passed.
+- `python -m unittest discover -s scripts -p 'test_*.py'`: 55 passed.
+- Explicit `headless_resource` Vulkan tests with the local Mesa environment
+  documented above: 2 passed, raster difference still 0/65,536. Initial GPU
+  compilation encountered an invalid dependency object/archive; rebuilding
+  `wgpu-core` resolved it without source changes.
+- `git diff --cached origin/main --check`: passed; no conflict markers remain.
+  Existing upstream vendored whitespace was preserved.

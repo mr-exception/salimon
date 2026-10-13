@@ -8,4 +8,3 @@ resource raster: colored=9522 differing=0/65536
 test resource_mesh::gpu_tests::headless_resource_raster_parity ... ok
 
 test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 54 filtered out; finished in 0.26s
-

@@ -8,6 +8,11 @@ render pipelines, command encoding, camera-relative GPU conversion,
 renderer-owned projection and depth, generic overlay composition, and frame
 presentation for textured spheres, authored ship/resource/item meshes and instrumentation.
 
+The temporary [wgpu-hal backport](../../vendor/README.md) permits the first Metal
+drawable before AppKit has reported window visibility. Once the window has been
+visible, the dependency retains its normal occlusion protection. This fixes
+native startup; it changes no shader, render setting or timing observation.
+
 ```text
 salimon-world absolute f64 snapshot
     -> runtime maps domain types to renderer DTOs (no rebasing)

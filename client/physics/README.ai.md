@@ -16,7 +16,10 @@ for contract changes. Record task evidence under root `reports/`.
 
 
 Persistent activation policy lives in `src/sleep.rs`; its stable-ID cache is
-owned by each caller. Read the [sleep contract](architecture.md#persistent-contact-island-sleep-156).
+owned by each caller. It also owns stable-ID warm contact reactions; changes to
+snapshot matching, support invalidation or substep timing must preserve both
+activation, reaction-cache safety and exact retained-projection equivalence.
+Read the [sleep contract](architecture.md#persistent-contact-island-sleep-156).
 `cargo run --release --locked -p salimon-physics --example sleep_cost` isolates
 sleep/active solver work on identical supported cube snapshots (500/1,000,
 100 samples, mixed masses). It does not replace authored cargo/native #155 runs.

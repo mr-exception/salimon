@@ -564,8 +564,10 @@ default 5-second budget still applies to ordinary inputs/assertions; whole
 scenario deadlines remain bounded. This accommodates complete convex piles
 on shared software-rendered CI without changing fixed steps or assertions.
 
-The game automation server also grants protocol-1 `step` requests of 300–600
-frames a 30-second deadline for both queue expiry and reply waiting. The ready
+The game automation server grants valid protocol-1 `step` requests of 1–600
+frames a 120-second deadline for both queue expiry and reply waiting. A single
+loaded support-removal update can rebuild hundreds of contacts; client/scenario
+deadlines still impose their own shorter limits. The ready
 event's `timeout_ms: 5000` continues to describe ordinary commands. A longer
 scenario budget alone does not extend the server deadline for other commands.
 
@@ -575,3 +577,11 @@ See [FRAGMENT_BENCHMARKS.md](FRAGMENT_BENCHMARKS.md) for native release and CPU-
 matrices, fixture setup, measurement scopes and baseline-relative gates. The
 500-fragment correctness scenario runs in the standard baseline; benchmark
 wall-clock sampling remains separate from fixed-step automation.
+Loaded acceptance scenarios may add `fragment_settle_steps` to setup, using the
+same production preparation as settled benchmarks before renderer readiness.
+`world.sleeping_fragment_count` and per-fragment `sleeping` observe the last
+completed update; carrying is excluded. `contact_fragment_ids` and
+`environment_supported` expose that completed support snapshot; they are observers,
+not controls. Ship-local positions use stored anchors to avoid round-trip world
+precision loss in inspection. See the benchmark guide for limits and
+startup-deadline requirements.

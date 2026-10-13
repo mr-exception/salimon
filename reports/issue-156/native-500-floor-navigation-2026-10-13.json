@@ -1,0 +1,140 @@
+{
+  "revision": "0b28719d871307e58406b1a16b271d2b5742f780",
+  "binary_sha256": "95e662d5aeea7cec6a8913ba59adbfe51f84d70eaf5f3cfeb6315bf106cc2d68",
+  "setup_seed": 155,
+  "step_ms": 16,
+  "settle_steps_limit": 2400,
+  "runs": [
+    {
+      "count": 500,
+      "layout": "dense",
+      "status": "passed",
+      "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-floor-navigation-500/run-youn6n74",
+      "request_timeout_seconds": 120,
+      "maximum_rigid_motion_drift_meters": 0,
+      "removed_support_id": 162,
+      "fallen_ids": [
+        238
+      ],
+      "dependent_ids_before_pickup": [
+        238
+      ],
+      "unrelated_sleeping_ids": [
+        4,
+        7,
+        75,
+        84,
+        115,
+        151,
+        152,
+        158,
+        160,
+        187,
+        198,
+        228,
+        235,
+        236,
+        271,
+        274,
+        303,
+        304,
+        313,
+        328,
+        364,
+        377,
+        379,
+        380,
+        388,
+        389,
+        397,
+        446,
+        449,
+        454,
+        459,
+        461,
+        464,
+        466
+      ],
+      "repeated_pickup_drop_cycles": 3,
+      "duration_seconds": 4420.07160575001,
+      "checkpoint_summary": {
+        "initial_sleep": {
+          "sleeping": 500,
+          "mass_kg": 625.0,
+          "carried_id": null,
+          "fragment_count": 500,
+          "checkpoint_sha256": "14bc01202d90abb14ca40b9d406e84d61301bba165a692bf63b9daa96603ddd8"
+        },
+        "fast_rotating_flight": {
+          "sleeping": 500,
+          "mass_kg": 625.0,
+          "carried_id": null,
+          "fragment_count": 500,
+          "checkpoint_sha256": "08f80036671fb78042d5a2ab41b12a12331acb6cb32dd384313f406631861769"
+        },
+        "landing_progress": {
+          "sleeping": 500,
+          "mass_kg": 625.0,
+          "carried_id": null,
+          "fragment_count": 500,
+          "checkpoint_sha256": "12c4bc10849cc101fcf63f83b76a26e094c8d15ff541ebdea8225c489d0b05a2"
+        },
+        "landing": {
+          "sleeping": 500,
+          "mass_kg": 625.0,
+          "carried_id": null,
+          "fragment_count": 500,
+          "checkpoint_sha256": "12c4bc10849cc101fcf63f83b76a26e094c8d15ff541ebdea8225c489d0b05a2"
+        },
+        "takeoff_progress": {
+          "sleeping": 500,
+          "mass_kg": 625.0,
+          "carried_id": null,
+          "fragment_count": 500,
+          "checkpoint_sha256": "cdf6e16100dd0220c96eaf23ffee9917be1b35e68a6df83c2c026197b4e9561c"
+        },
+        "takeoff": {
+          "sleeping": 500,
+          "mass_kg": 625.0,
+          "carried_id": null,
+          "fragment_count": 500,
+          "checkpoint_sha256": "cdf6e16100dd0220c96eaf23ffee9917be1b35e68a6df83c2c026197b4e9561c"
+        },
+        "support_removed": {
+          "sleeping": 34,
+          "mass_kg": 625.0,
+          "carried_id": 162,
+          "fragment_count": 500,
+          "checkpoint_sha256": "b1ff42881edac7ba3e07a0edbe05bfc7777bda345d9052b9940e9d746e6bab34"
+        },
+        "pickup_drop_1": {
+          "sleeping": 30,
+          "mass_kg": 625.0,
+          "carried_id": null,
+          "fragment_count": 500,
+          "checkpoint_sha256": "9717eef42193b600304e7ad95a125bd53b6b94b81954d0aafd079bb61403262a"
+        },
+        "pickup_drop_2": {
+          "sleeping": 30,
+          "mass_kg": 625.0,
+          "carried_id": null,
+          "fragment_count": 500,
+          "checkpoint_sha256": "dff387337634ed8777c2cab9b5d77ed098c84978e059456ef08aa8abc8569f54"
+        },
+        "pickup_drop_3": {
+          "sleeping": 30,
+          "mass_kg": 625.0,
+          "carried_id": null,
+          "fragment_count": 500,
+          "checkpoint_sha256": "d180bc42307801024789b514bd87e5320b72fda8302e3cd4a22752c434142bd0"
+        }
+      }
+    }
+  ],
+  "scope": "Actual fixed-step native route outcome; failures and partial checks do not imply acceptance.",
+  "raw_archive": {
+    "file": "native-500-floor-navigation-2026-10-13.json.gz",
+    "sha256": "f04782662fe09c10c2c2455cf50bf38ef092ae497ab150d8d5eba6266100d949",
+    "uncompressed_sha256": "3187466403bea8b7947bb8721bb57604c4481bb48987fa08e5eece6d741ba59f"
+  }
+}

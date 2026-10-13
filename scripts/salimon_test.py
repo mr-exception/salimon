@@ -36,7 +36,7 @@ def parse_scenario(path):
     if not isinstance(data, dict) or set(data) - {"setup", "timeout_ms", "steps"}:
         raise ScenarioError("scenario must be an object with setup, timeout_ms, and steps")
     setup = data.get("setup", {})
-    if not isinstance(setup, dict) or set(setup) - {"scenario", "seed", "step_ms", "fragment_count", "fragment_layout"}:
+    if not isinstance(setup, dict) or set(setup) - {"scenario", "seed", "step_ms", "fragment_count", "fragment_layout", "fragment_settle_steps"}:
         raise ScenarioError("setup contains unknown fields")
     name = setup.get("scenario", "landed-earth")
     seed = setup.get("seed", 0)
@@ -49,6 +49,9 @@ def parse_scenario(path):
         raise ScenarioError("fragment_count must be 0..1000")
     if not isinstance(layout, str) or layout not in {"scattered", "dense", "surface"} or ("fragment_layout" in setup and count is None):
         raise ScenarioError("fragment_layout requires fragment_count and a known layout")
+    settle_steps = setup.get("fragment_settle_steps", 0)
+    if type(settle_steps) is not int or not 0 <= settle_steps <= 37500 or ("fragment_settle_steps" in setup and count is None):
+        raise ScenarioError("fragment_settle_steps requires fragment_count and 0..37500")
     timeout = positive_int(data.get("timeout_ms", 60000), "timeout_ms")
     steps = data.get("steps")
     if not isinstance(steps, list) or not steps:
@@ -89,6 +92,8 @@ def parse_scenario(path):
         if name == "fragment-pile" or (layout == "surface" and name != "landed-earth"):
             raise ScenarioError("invalid fragment population for this scenario")
         normalized_setup.update(fragment_count=count, fragment_layout=layout)
+        if "fragment_settle_steps" in setup:
+            normalized_setup["fragment_settle_steps"] = settle_steps
     return {"setup": normalized_setup, "timeout_ms": timeout, "steps": steps}
 
 
@@ -157,6 +162,8 @@ class Game:
         if "fragment_count" in self.setup:
             population_args = ["--fragment-count", str(self.setup["fragment_count"]),
                                "--fragment-layout", self.setup["fragment_layout"]]
+            if "fragment_settle_steps" in self.setup:
+                population_args += ["--fragment-settle-steps", str(self.setup["fragment_settle_steps"])]
         self.process = subprocess.Popen(
             self.command + ["--e2e", "--scenario", self.setup["scenario"],
                             "--seed", str(self.setup["seed"]), "--step-ms", str(self.setup["step_ms"])] + population_args,

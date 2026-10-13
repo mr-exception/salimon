@@ -90,12 +90,13 @@ class RunnerTests(unittest.TestCase):
                 self.assertEqual(summary["error"], result["error"])
 
     def test_fragment_load_startup_and_argument_forwarding(self):
-        self.data["setup"].update(fragment_count=500, fragment_layout="scattered")
+        self.data["setup"].update(fragment_count=500, fragment_layout="scattered", fragment_settle_steps=1200)
         self.save()
         self.fake.write_text(FAKE.replace(
             'print("SALIMON_E2E_READY',
             'assert setup["--fragment-count"] == "500"\n'
             'assert setup["--fragment-layout"] == "scattered"\n'
+            'assert setup["--fragment-settle-steps"] == "1200"\n'
             'print("SALIMON_E2E_READY', 1))
         self.assertEqual(self.execute()["status"], "passed")
 

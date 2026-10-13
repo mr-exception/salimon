@@ -1,0 +1,115 @@
+{
+  "binary": {
+    "schema_version": 1,
+    "host": "aarch64-apple-darwin",
+    "profile": "release",
+    "rust": "rustc 1.89.0 (29483883e 2025-08-04)",
+    "executable": "salimon-client",
+    "sha256": "70d36bfd5dc2437603028b469eb0a4da5b300c4103e91db3f6ff0f13c17a1e16"
+  },
+  "source_base": "f5f03c2bd5399ba9bcf2dbcee971c026504b4892",
+  "source_dirty": true,
+  "source_description": "supported material-point envelopes with exact retained SAT projections",
+  "rust": {
+    "passed": 350,
+    "failed": 0,
+    "ignored": 1
+  },
+  "python": {
+    "passed": 48,
+    "source_unchanged_since_end_cutoff_checks": true
+  },
+  "clippy": "passed",
+  "native_suite": {
+    "status": "passed",
+    "steps": 1712,
+    "scenarios": [
+      {
+        "scenario": "carrying.json",
+        "status": "passed",
+        "steps_completed": 331
+      },
+      {
+        "scenario": "cockpit-nose.json",
+        "status": "passed",
+        "steps_completed": 30
+      },
+      {
+        "scenario": "fragment-load.json",
+        "status": "passed",
+        "steps_completed": 16
+      },
+      {
+        "scenario": "fragment-pile-floor.json",
+        "status": "passed",
+        "steps_completed": 6
+      },
+      {
+        "scenario": "fragment-pile-surface.json",
+        "status": "passed",
+        "steps_completed": 6
+      },
+      {
+        "scenario": "fragment-transfer.json",
+        "status": "passed",
+        "steps_completed": 277
+      },
+      {
+        "scenario": "landed-earth.json",
+        "status": "passed",
+        "steps_completed": 110
+      },
+      {
+        "scenario": "lower-cockpit-windows.json",
+        "status": "passed",
+        "steps_completed": 16
+      },
+      {
+        "scenario": "mining-emission.json",
+        "status": "passed",
+        "steps_completed": 107
+      },
+      {
+        "scenario": "mining.json",
+        "status": "passed",
+        "steps_completed": 148
+      },
+      {
+        "scenario": "moving-eva.json",
+        "status": "passed",
+        "steps_completed": 93
+      },
+      {
+        "scenario": "nearby-eva.json",
+        "status": "passed",
+        "steps_completed": 43
+      },
+      {
+        "scenario": "orbit-earth.json",
+        "status": "passed",
+        "steps_completed": 23
+      },
+      {
+        "scenario": "resource-deposits.json",
+        "status": "passed",
+        "steps_completed": 64
+      },
+      {
+        "scenario": "resource-loop.json",
+        "status": "passed",
+        "steps_completed": 258
+      },
+      {
+        "scenario": "resource-streaming.json",
+        "status": "passed",
+        "steps_completed": 134
+      },
+      {
+        "scenario": "space-airlock.json",
+        "status": "passed",
+        "steps_completed": 50
+      }
+    ]
+  },
+  "large_load_acceptance": "pending"
+}

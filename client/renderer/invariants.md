@@ -48,12 +48,12 @@
     door offset is 4.50 m and no compensating runtime mesh scale is applied.
 
 19. Cockpit instruments consume only renderer-facing speed/power, Core-energy,
-    and optional nearby-body DTO values. The center speed, port Core, and
-    starboard proximity/radial panels use one cached atlas in the existing opaque
-    ship draw, never screen-space overlays or separate scene cameras. Both side
-    panels retain common thruster power. Only changed displayed values rebuild
-    and upload their atlas panels; no target renders an explicit out-of-range state.
-    Monitor UVs use top-left (0, 0); each named surface is exactly two triangles.
+    and optional nearby-body DTO values. One wide `Monitor_Wide` quad shows
+    flight, Core energy and navigation simultaneously using one cached texture
+    in the existing opaque ship draw. The shared thruster command appears once.
+    Only changed displayed values rebuild their regions and upload the texture;
+    no target renders an explicit out-of-range state. UVs use top-left (0, 0);
+    the one named surface is exactly two triangles.
 
 20. Center-placed overlays use the current drawable dimensions, place their
     midpoint at NDC (0, 0), and ignore scene occlusion. The renderer consumes

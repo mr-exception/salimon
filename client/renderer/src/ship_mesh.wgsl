@@ -21,7 +21,7 @@ struct VertexOutput {
     @location(1) light: vec3<f32>,
     @location(2) emissive: vec3<f32>,
     @location(3) screen_uv: vec2<f32>,
-    @location(4) @interpolate(flat) display_panel: u32,
+    @location(4) @interpolate(flat) display_flag: u32,
 };
 
 @vertex
@@ -71,20 +71,19 @@ fn vs_main(
     output.light = mix(exterior_light, cabin_light, interior_flag);
     output.emissive = emissive;
     output.screen_uv = display.xy;
-    output.display_panel = u32(display.z);
+    output.display_flag = u32(display.z);
     return output;
 }
 
 @fragment
 fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
-    if input.display_panel > 0u {
-        // Clamp inside each atlas tile to prevent sampling its neighbor at an
+    if input.display_flag > 0u {
+        // Clamp inside the single display texture at an
         // edge. Explicit LOD permits sampling in this per-surface branch.
         let size = vec2<f32>(textureDimensions(instruments));
-        let tile_size = vec2<f32>(size.x, size.y / 3.0);
         let pixel = vec2<f32>(0.5) + clamp(input.screen_uv, vec2<f32>(0.0), vec2<f32>(1.0))
-            * (tile_size - vec2<f32>(1.0));
-        let uv = (pixel + vec2<f32>(0.0, f32(input.display_panel - 1u) * tile_size.y)) / size;
+            * (size - vec2<f32>(1.0));
+        let uv = pixel / size;
         return textureSampleLevel(instruments, instrument_sampler, uv, 0.0);
     }
     // Keep lamps, displays, and engine/core accents self-lit instead of

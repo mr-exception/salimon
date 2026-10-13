@@ -96,15 +96,14 @@ Run the library through `cargo run --locked -p salimon-client`. See
 [README.ai.md](README.ai.md), [architecture.md](architecture.md), and
 [invariants.md](invariants.md) before changing its contract.
 
-The cockpit includes three physical instrument screens: a central metric speed
-readout, a port Core stored/capacity panel, and a starboard nearby-body panel
-with surface distance plus approaching/receding/zero radial speed. Both side
-panels retain the synchronized thruster percentage. The runtime supplies
-`CockpitInstruments` on `ShipMeshInstance` every gameplay frame, including while
-the player walks around. A cached 512 × 768 sRGB atlas supplies crisp self-lit
-text and segmented bars in the existing opaque ship draw. Only display changes
-trigger rasterization/upload; the opaque/glass submission remains two draws.
-The renderer retains no ship control or simulation dependency.
+The cockpit uses one physical `Monitor_Wide` screen with labeled flight,
+Core stored/capacity and nearby-body distance/radial regions. The shared thruster
+percentage appears once. Runtime supplies `CockpitInstruments` every gameplay
+frame, including while walking. One cached 1536 × 256 sRGB texture renders the
+simultaneous dashboard in the existing opaque ship draw. Rounded display keys
+skip unchanged frames and changed fields redraw only their region; the
+opaque/glass submission remains two draws. The renderer has no ship-control
+or simulation dependency.
 
 The runtime also maps nearby generated planetary deposits into the existing
 instanced cuboid draw. Material-specific colors/proportions live at the

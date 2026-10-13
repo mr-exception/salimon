@@ -1,8 +1,8 @@
 {
   "extras": {
     "salimon": {
-      "drawPrimitiveCount": 118,
-      "triangleCount": 6224,
+      "drawPrimitiveCount": 115,
+      "triangleCount": 6100,
       "materialCount": 13,
       "externalAssetDependencies": 0,
       "scaleFromTask7Baseline": [
@@ -38,21 +38,14 @@
       "humanBodyHeightMeters": 1.8,
       "humanEyeHeightMeters": 1.75,
       "cockpitInstruments": {
-        "speedNode": "Monitor_Center",
-        "powerNodes": [
-          "Monitor_Port",
-          "Monitor_Starboard"
-        ],
         "uvOrigin": "top-left",
         "powerSource": "shared-thruster-command",
-        "surfaceTriangles": 6,
+        "surfaceTriangles": 2,
         "additionalDraws": 0,
         "unifiedConsole": {
           "collisionNode": "COLLIDER_CockpitCenterConsole",
           "monitorNodes": [
-            "Monitor_Port",
-            "Monitor_Center",
-            "Monitor_Starboard"
+            "Monitor_Wide"
           ],
           "boundsMeters": {
             "min": [
@@ -68,6 +61,25 @@
           },
           "walkingSide": "both",
           "noseDeckForwardMeters": 7.85
+        },
+        "monitorNode": "Monitor_Wide",
+        "textureSizePixels": [
+          1536,
+          256
+        ],
+        "surfaceBoundsMeters": {
+          "Monitor_Wide": {
+            "min": [
+              4.42,
+              0.8735,
+              -0.99
+            ],
+            "max": [
+              4.42,
+              1.2067,
+              0.99
+            ]
+          }
         }
       },
       "cockpitWindows": {

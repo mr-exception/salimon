@@ -53,15 +53,15 @@ styles identify presentation choices. `SceneFrame` conveys no celestial IDs,
 landing volumes, world catalog ownership, or simulation behavior. The GLB loader
 expands the checked-in ship mesh once at renderer initialization; material colors
 and a door-vertex flag are retained in the GPU vertex stream. Opaque ship
-geometry writes reverse-Z depth first. Three monitor quads carry UVs and a
-flat panel index. Their fragment branch samples a shared, linearly filtered
-512 × 768 sRGB atlas without a separate draw or light pass.
+geometry writes reverse-Z depth first. One `Monitor_Wide` quad carries top-left UVs and a
+flat display flag. Its fragment branch samples a linearly filtered
+1536 × 256 sRGB texture without a separate draw or light pass.
 `CockpitInstruments` carries presentation-only speed, shared power, Core energy,
 and optional nearby-body surface-distance/radial values;
 `cockpit_instruments.rs` caches rounded display keys before formatting or
 rasterizing. Unchanged frames allocate no instrument images and upload no
 instrument pixels. One atlas occupies 1.5 MiB on the CPU and GPU each.
-The screens remain attached to the ship and obey normal occlusion/free-look.
+The screen remains attached to the ship and obey normal occlusion/free-look.
 The double-sided cockpit glass then uses
 one alpha-blended draw with depth testing but no depth writes, shadows, sorting,
 or post effects.

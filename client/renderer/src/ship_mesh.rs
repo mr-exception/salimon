@@ -57,10 +57,8 @@ fn load_geometry() -> Result<ShipGeometry, RendererError> {
             _ => 0.0,
         };
         let interior_flag = f32::from(interior_nodes[node.index()]);
-        let display_panel = match node.name() {
-            Some("Monitor_Center") => 1.0,
-            Some("Monitor_Port") => 2.0,
-            Some("Monitor_Starboard") => 3.0,
+        let display_flag = match node.name() {
+            Some("Monitor_Wide") => 1.0,
             _ => 0.0,
         };
         let matrix = node.transform().matrix();
@@ -91,7 +89,7 @@ fn load_geometry() -> Result<ShipGeometry, RendererError> {
                 .read_tex_coords(0)
                 .map(|coordinates| coordinates.into_f32().collect())
                 .unwrap_or_default();
-            if display_panel > 0.0 && texcoords.len() != positions.len() {
+            if display_flag > 0.0 && texcoords.len() != positions.len() {
                 return Err(RendererError::new(
                     "failed to load cockpit display",
                     "display surfaces require one UV coordinate per vertex",
@@ -156,7 +154,7 @@ fn load_geometry() -> Result<ShipGeometry, RendererError> {
                     interior_flag,
                     uv[0],
                     uv[1],
-                    display_panel,
+                    display_flag,
                 ]);
             }
         }
@@ -367,7 +365,7 @@ impl ShipMeshRenderer {
                 },
             ],
         });
-        // One small, cached atlas serves all three panels in the existing opaque
+        // One small, cached atlas serves the wide display in the existing opaque
         // draw. The mesh and all other ship materials remain immutable.
         let instrument_texture = device.create_texture(&wgpu::TextureDescriptor {
             label: Some("Salimon cockpit instrument atlas"),
@@ -676,42 +674,20 @@ mod tests {
     }
 
     #[test]
-    fn cockpit_panels_are_three_textured_quads_in_the_opaque_draw() {
+    fn cockpit_monitor_is_one_wide_textured_quad_in_the_opaque_draw() {
         let geometry = load_geometry().expect("ship display contract must load");
-        // The three live quads sit on one centered console. The renderer
-        // consumes their final authored positions in meters.
-        for (panel, center, width, height, normal) in [
-            (
-                1.0,
-                [4.42, 1.0401, 0.075],
-                0.662_429_45,
-                0.3332,
-                normalize([-1.66, 0.0, -0.075]),
-            ),
-            (
-                2.0,
-                [4.28, 1.0625, 0.8025],
-                0.529_898_46,
-                0.315,
-                normalize([-1.52, 0.0, -0.8025]),
-            ),
-            (
-                3.0,
-                [4.28, 1.0625, -0.915],
-                0.539_714,
-                0.315,
-                normalize([-1.52, 0.0, 0.915]),
-            ),
-        ] {
+        let (center, width, height, normal) = ([4.42, 1.0401, 0.0], 1.98, 0.3332, [-1.0, 0.0, 0.0]);
+        {
             let vertices: Vec<_> = geometry
                 .opaque_vertices
                 .as_chunks::<VERTEX_FLOATS>()
                 .0
                 .iter()
-                .filter(|vertex| vertex[17] == panel)
+                .filter(|vertex| vertex[17] > 0.0)
                 .collect();
             assert_eq!(vertices.len(), 6, "each screen is exactly two triangles");
             for vertex in &vertices {
+                assert_eq!(vertex[17], 1.0, "single display flag");
                 assert_eq!(vertex[14], 1.0, "screens are interior surfaces");
                 assert!(vertex[15..17].iter().all(|uv| (0.0..=1.0).contains(uv)));
                 let horizontal_offset = (vertex[15] - 0.5) * width;
@@ -723,13 +699,13 @@ mod tests {
                 for (axis, expected) in expected_position.into_iter().enumerate() {
                     assert!(
                         (vertex[axis] - expected).abs() < 1.0e-4,
-                        "panel {panel} axis {axis} must preserve its authored dimensions and top-left UV fit"
+                        "monitor axis {axis} must preserve its authored dimensions and top-left UV fit"
                     );
                 }
                 for (axis, expected) in normal.into_iter().enumerate() {
                     assert!(
                         (vertex[axis + 3] - expected).abs() < 1.0e-4,
-                        "panel {panel} must retain its pilot-facing normal"
+                        "monitor must retain its pilot-facing normal"
                     );
                 }
             }

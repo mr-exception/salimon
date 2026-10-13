@@ -85,13 +85,13 @@ def assert_vectors_close(actual: list[float], expected: list[float]) -> None:
 
 
 def validate_unified_console(document: dict, binary: bytes, manifest: dict) -> None:
-    """Keep three authored live quads together within one centered collision proxy."""
+    """Keep one authored live quad within one centered collision proxy."""
     contract = json.loads((SCOUT / "monitor-contract.json").read_text())["monitorVertices"]
     metadata = document["extras"]["salimon"]["cockpitInstruments"]["unifiedConsole"]
     require(metadata == manifest["cockpitInstruments"]["unifiedConsole"],
             "unified console metadata differs from the ship manifest")
-    require(metadata["monitorNodes"] == ["Monitor_Port", "Monitor_Center", "Monitor_Starboard"],
-            "unified console must retain the three live displays")
+    require(metadata["monitorNodes"] == ["Monitor_Wide"],
+            "unified console must contain one wide live display")
     require(metadata["walkingSide"] == "both", "center console must leave both side routes")
     require(abs(metadata["noseDeckForwardMeters"] - 7.85) < 1e-6,
             "shortened nose deck must end at X=7.85 m")
@@ -116,12 +116,9 @@ def validate_unified_console(document: dict, binary: bytes, manifest: dict) -> N
         require(all(lower[axis] - 1e-6 <= point[axis] <= upper[axis] + 1e-6
                     for point in positions for axis in range(3)), f"{name}: outside console proxy")
         center_side = sum(point[2] for point in positions) / len(positions)
-        if name == "Monitor_Center":
-            require(abs(center_side) < .2, "center display left the cockpit centerline")
-        elif name == "Monitor_Port":
-            require(center_side > .5, "port display left the port side of the station")
-        else:
-            require(center_side < -.5, "starboard display left the starboard side of the station")
+        require(abs(center_side) < .01, "wide display left the cockpit centerline")
+    require(not any(n["name"] in ("Monitor_Center", "Monitor_Port", "Monitor_Starboard")
+                    for n in document["nodes"]), "retired monitor nodes remain")
     # The visible base and its display housings are one physical station.
     for name in ("Cockpit_Console_Center", "Cockpit_Monitor_Housings",
                  "Cockpit_Monitor_Bezels"):
@@ -191,15 +188,12 @@ def validate_sightlines(document: dict, binary: bytes) -> None:
     # Live cockpit surfaces must present an unobstructed rectangle from the
     # actual seated eye, with top-left UVs and normals toward the pilot.
     seated_eye=(2.76,1.799032258064516,0.)
-    for label, role in (("Center","speed"), ("Port","thruster-power"),
-                        ("Starboard","thruster-power")):
-        name=f"Monitor_{label}"
+    for name, role in (("Monitor_Wide", "multifunction"),):
         monitor=node(document,name)
         metadata=monitor["extras"]["salimon"]
         require(metadata["displayRole"] == role, 'metadata["displayRole"] == role')
         require(metadata["uvOrigin"] == "top-left", 'metadata["uvOrigin"] == "top-left"')
-        if label != "Center":
-            require(metadata["powerSource"] == "shared-thruster-command", 'metadata["powerSource"] == "shared-thruster-command"')
+        require(metadata["powerSource"] == "shared-thruster-command", 'metadata["powerSource"] == "shared-thruster-command"')
         primitive=document["meshes"][monitor["mesh"]]["primitives"][0]
         positions=values(primitive["attributes"]["POSITION"])
         normals=values(primitive["attributes"]["NORMAL"])
@@ -502,10 +496,7 @@ def validate_scout(context, data):
     require(metrics["cockpitInstruments"]["additionalDraws"] == 0, 'metrics["cockpitInstruments"]["additionalDraws"] == 0')
     instruments = manifest["cockpitInstruments"]
     assert_vectors_close(instruments["pilotFacingTargetMeters"], windows["seatedViewpointMeters"])
-    for label in ("Center", "Port", "Starboard"):
-        name = f"Monitor_{label}"
-        if label != "Center":
-            require(instruments["sideYawDegrees"][name] == node(document, name)["extras"]["salimon"]["pilotFacingYawDegrees"], 'instruments["sideYawDegrees"][name] == node(document, name)["extras"]["salimon"]["pilotFacingYawDegrees"]')
+    for name in ("Monitor_Wide",):
         lower, upper = node_position_bounds(document, geometry, name)
         assert_vectors_close(instruments["surfaceBoundsMeters"][name]["min"], lower)
         assert_vectors_close(instruments["surfaceBoundsMeters"][name]["max"], upper)

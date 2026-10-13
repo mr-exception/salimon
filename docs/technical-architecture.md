@@ -104,7 +104,7 @@ monitor UVs, door metadata, budgets and licenses. Read the
 for commands and generated files; normal builds never require Blender.
 
 The current scout removes the dedicated cargo module, shortens the nose/glazing
-and uses three monitors on one center console with walking routes on both sides.
+and uses one wide multifunction monitor on the center console with walking routes on both sides.
 Loose fragments use the cabin deck. Historical cargo and migration evidence in
 [reports/](../reports/README.md) describes earlier revisions. The mining tool now renders a Blender-authored GLB with a camera-local grip
 and status material. Iron, silicate and water-ice fragments each use two Blender-authored variants selected by stable identity. All three deposit materials use four authored variants; see [renderer architecture](../client/renderer/architecture.md) for selection and bounds contracts.

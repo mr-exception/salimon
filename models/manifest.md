@@ -77,7 +77,7 @@ not permission to duplicate it. Sockets, markers, and colliders must not overlap
 with one another. Material names inhabit the material namespace.
 
 `requiredExtras` entries pair a node name with a dot-separated glTF extras path,
-e.g. `{ "node": "Monitor_Center", "path": "salimon.displayRole" }`.
+e.g. `{ "node": "Monitor_Wide", "path": "salimon.displayRole" }`.
 `salimon` alone requires the namespace object. Exporters preserve custom metadata;
 validators check presence and category-specific value/transform semantics.
 

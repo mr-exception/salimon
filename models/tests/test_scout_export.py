@@ -65,7 +65,7 @@ class ScoutExportTests(unittest.TestCase):
     def test_non_spatial_legacy_contract_changes_are_rejected(self):
         for name, mutate in (
             ('Exit_Door', lambda n: n.update(extras={})),
-            ('Monitor_Port', lambda n: n.update(rotation=[0, 0, 1, 0])),
+            ('Monitor_Wide', lambda n: n.update(rotation=[0, 0, 1, 0])),
         ):
             with self.subTest(node=name):
                 doc = copy.deepcopy(self.document)

@@ -1,12 +1,12 @@
-//! Small, persistent instrument atlas for the cockpit's three physical displays.
+//! Small, persistent instrument atlas for the cockpit's single wide physical display.
 //!
 //! The atlas changes only when a displayed value changes. All drawing is CPU-side
 //! into one allocation; the renderer can skip both rasterization and GPU uploads
 //! for unchanged frames.
 
-pub(crate) const ATLAS_WIDTH: u32 = 512;
-pub(crate) const PANEL_HEIGHT: u32 = 256;
-pub(crate) const ATLAS_HEIGHT: u32 = PANEL_HEIGHT * 3;
+const SECTION_WIDTH: u32 = 512;
+pub(crate) const ATLAS_WIDTH: u32 = SECTION_WIDTH * 3;
+pub(crate) const ATLAS_HEIGHT: u32 = 256;
 
 /// Renderer-neutral values shown on the ship's physical cockpit monitors.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
@@ -185,6 +185,7 @@ struct DisplayKey {
 pub(crate) struct InstrumentAtlas {
     pub(crate) pixels: Vec<u8>,
     displayed: Option<DisplayKey>,
+    section_x: u32,
 }
 
 impl InstrumentAtlas {
@@ -192,6 +193,7 @@ impl InstrumentAtlas {
         Self {
             pixels: BACKGROUND.repeat((ATLAS_WIDTH * ATLAS_HEIGHT) as usize),
             displayed: None,
+            section_x: 0,
         }
     }
 
@@ -208,8 +210,8 @@ impl InstrumentAtlas {
             return false;
         }
 
-        // The center includes both readings, keeping power visible while the
-        // pilot looks forward. Speed-only updates leave side panels untouched.
+        // The flight region includes the shared power command once. Independent
+        // energy/navigation changes leave the other regions untouched.
         if self
             .displayed
             .is_none_or(|previous| previous.speed != next.speed || previous.power != next.power)
@@ -217,75 +219,71 @@ impl InstrumentAtlas {
             self.draw_speed(next.speed, next.power);
         }
         if self.displayed.is_none_or(|previous| {
-            previous.core_capacity != next.core_capacity
-                || previous.core_stored != next.core_stored
-                || previous.power != next.power
+            previous.core_capacity != next.core_capacity || previous.core_stored != next.core_stored
         }) {
-            self.draw_core(next.core_stored, next.core_capacity, next.power);
+            self.draw_core(next.core_stored, next.core_capacity);
         }
         if self
             .displayed
-            .is_none_or(|previous| previous.nearby != next.nearby || previous.power != next.power)
+            .is_none_or(|previous| previous.nearby != next.nearby)
         {
-            self.draw_nearby(next.nearby, next.power);
+            self.draw_nearby(next.nearby);
         }
         self.displayed = Some(next);
         true
     }
 
     fn draw_speed(&mut self, speed: SpeedDisplay, percentage: u8) {
-        self.panel_frame(0, "SPEED", Some("NAV 01"));
+        self.section_frame(0, "SPEED");
         let (number, unit, color) = speed_text(speed);
         self.text(28, 80, &number, 10, color);
         self.text(392, 119, unit, 3, CYAN);
-        self.rect(28, 175, 456, 2, RULE);
-        self.rect(28, 175, 48, 2, CYAN);
-        self.text(28, 194, "THRUSTER POWER", 1, MUTED);
-        self.text(28, 212, &format!("{percentage}%"), 3, CYAN);
-        for segment in 0..20 {
-            let x = 116 + segment * 10;
-            self.rect(x, 212, 8, 20, RULE);
-            let filled = u32::from(percentage).saturating_sub(segment * 5).min(5);
-            if filled > 0 {
-                self.rect(x, 212, (8 * filled).div_ceil(5), 20, CYAN);
-            }
-        }
-        self.text(340, 194, "DIRECT SPEED", 1, MUTED);
         self.text(
             340,
-            216,
+            156,
             match speed {
                 SpeedDisplay::Unavailable => "NO READING",
                 SpeedDisplay::AboveRange => "ABOVE RANGE",
                 SpeedDisplay::Value { .. } => "METRIC UNITS",
             },
-            1,
+            2,
             if color == AMBER { AMBER } else { MUTED },
         );
+        self.rect(28, 175, 456, 2, RULE);
+        self.rect(28, 175, 48, 2, CYAN);
+        self.text(28, 194, "THRUSTER POWER", 2, MUTED);
+        self.text(28, 212, &format!("{percentage}%"), 4, CYAN);
+        for segment in 0..20 {
+            let x = 160 + segment * 15;
+            self.rect(x, 212, 12, 28, RULE);
+            let filled = u32::from(percentage).saturating_sub(segment * 5).min(5);
+            if filled > 0 {
+                self.rect(x, 212, (12 * filled).div_ceil(5), 28, CYAN);
+            }
+        }
     }
 
-    fn draw_core(&mut self, stored: EnergyDisplay, capacity: EnergyDisplay, power: u8) {
-        let base = PANEL_HEIGHT;
-        self.panel_frame(1, "CORE ENERGY", Some("CORE / 02"));
-        self.text(28, base + 70, "STORED", 1, MUTED);
-        self.text(28, base + 91, &stored.number(), 6, IVORY);
-        self.text(276, base + 112, stored.unit.label(), 2, CYAN);
-        self.text(28, base + 157, "CAPACITY", 1, MUTED);
-        self.text(140, base + 157, &capacity.number(), 2, IVORY);
-        self.text(292, base + 157, capacity.unit.label(), 2, CYAN);
-        self.draw_compact_power(1, power, "PORT LIVE");
+    fn draw_core(&mut self, stored: EnergyDisplay, capacity: EnergyDisplay) {
+        self.section_frame(1, "CORE ENERGY");
+        self.text(28, 70, "STORED", 2, MUTED);
+        let stored_number = stored.number();
+        let scale = (360 / (stored_number.len() as u32 * 6)).clamp(2, 6);
+        self.text(28, 91, &stored_number, scale, IVORY);
+        self.text(408, 112, stored.unit.label(), 2, CYAN);
+        self.text(28, 157, "CAPACITY", 2, MUTED);
+        self.text(140, 157, &capacity.number(), 3, IVORY);
+        self.text(408, 157, capacity.unit.label(), 2, CYAN);
     }
 
-    fn draw_nearby(&mut self, nearby: Option<NearbyDisplay>, power: u8) {
-        let base = PANEL_HEIGHT * 2;
-        self.panel_frame(2, "NEARBY BODY", Some("NAV / 03"));
+    fn draw_nearby(&mut self, nearby: Option<NearbyDisplay>) {
+        self.section_frame(2, "NEARBY BODY");
         match nearby {
             Some(nearby) => {
-                self.text(28, base + 70, nearby.name, 3, IVORY);
-                let (distance, unit, _) = speed_text(nearby.distance);
-                self.text(28, base + 108, "DIST", 1, MUTED);
-                self.text(94, base + 103, &distance, 3, IVORY);
-                self.text(352, base + 108, unit, 2, CYAN);
+                self.text(28, 70, &nearby.name.to_ascii_uppercase(), 3, IVORY);
+                let (distance, _, _) = speed_text(nearby.distance);
+                self.text(28, 108, "DIST", 2, MUTED);
+                self.text(110, 103, &distance, 3, IVORY);
+                self.text(352, 108, distance_unit(nearby.distance), 2, CYAN);
                 let (radial, radial_unit, _) = speed_text(nearby.radial_speed);
                 let direction = match nearby.direction {
                     RadialDirection::Approaching => "APPROACHING",
@@ -295,56 +293,45 @@ impl InstrumentAtlas {
                 };
                 self.text(
                     28,
-                    base + 150,
+                    150,
                     direction,
-                    2,
+                    3,
                     match nearby.direction {
                         RadialDirection::Approaching => CYAN,
                         RadialDirection::Receding => AMBER,
                         _ => MUTED,
                     },
                 );
-                self.text(28, base + 177, &radial, 2, IVORY);
-                self.text(220, base + 177, radial_unit, 2, MUTED);
+                self.text(28, 177, &radial, 3, IVORY);
+                self.text(220, 177, radial_unit, 3, MUTED);
             }
             None => {
-                self.text(28, base + 83, "NO TARGET", 5, AMBER);
-                self.text(28, base + 133, "OUT OF 3.00 Mm RANGE", 2, MUTED);
-                self.text(28, base + 169, "DIST --   RADIAL --", 2, MUTED);
+                self.text(28, 83, "NO TARGET", 5, AMBER);
+                self.text(28, 133, "OUT OF 3.00 Mm RANGE", 2, MUTED);
+                self.text(28, 169, "DIST --   RADIAL --", 2, MUTED);
             }
         }
-        self.draw_compact_power(2, power, "STBD LIVE");
     }
 
-    fn draw_compact_power(&mut self, panel: u32, percentage: u8, label: &str) {
-        let base = panel * PANEL_HEIGHT;
-        self.rect(28, base + 207, 456, 1, RULE);
-        self.text(28, base + 222, "THR", 1, MUTED);
-        self.text(76, base + 218, &format!("{percentage}%"), 2, CYAN);
-        self.text(376, base + 222, label, 1, MUTED);
-    }
-
-    fn panel_frame(&mut self, panel: u32, title: &str, identifier: Option<&str>) {
-        let base = panel * PANEL_HEIGHT;
-        self.rect(0, base, ATLAS_WIDTH, PANEL_HEIGHT, BACKGROUND);
-        self.rect(12, base + 12, 488, 232, INSET);
-        self.rect(12, base + 12, 3, 16, CYAN);
-        self.rect(12, base + 12, 16, 3, CYAN);
-        self.rect(484, base + 241, 16, 3, RULE);
-        self.rect(497, base + 228, 3, 16, RULE);
-        self.text(28, base + 25, title, 2, IVORY);
-        if let Some(identifier) = identifier {
-            self.text(114, base + 29, identifier, 1, MUTED);
+    fn section_frame(&mut self, section: u32, title: &str) {
+        self.section_x = section * SECTION_WIDTH;
+        self.rect(0, 0, SECTION_WIDTH, ATLAS_HEIGHT, INSET);
+        if section > 0 {
+            self.rect(0, 20, 2, 216, RULE);
         }
-        self.rect(423, base + 28, 6, 6, CYAN);
-        self.text(440, base + 28, "LIVE", 1, CYAN);
-        self.rect(28, base + 51, 456, 1, RULE);
-        self.rect(28, base + 50, 52, 3, CYAN);
+        self.text(28, 25, title, 3, IVORY);
+        self.rect(423, 28, 6, 6, CYAN);
+        self.text(432, 28, "LIVE", 2, CYAN);
+        self.rect(28, 51, 456, 1, RULE);
+        self.rect(28, 50, 52, 3, CYAN);
     }
 
     fn rect(&mut self, x: u32, y: u32, width: u32, height: u32, color: [u8; 4]) {
+        let x = self.section_x + x;
         for row in y.min(ATLAS_HEIGHT)..y.saturating_add(height).min(ATLAS_HEIGHT) {
-            for column in x.min(ATLAS_WIDTH)..x.saturating_add(width).min(ATLAS_WIDTH) {
+            for column in
+                x.min(ATLAS_WIDTH)..x.saturating_add(width).min(self.section_x + SECTION_WIDTH)
+            {
                 let offset = ((row * ATLAS_WIDTH + column) * 4) as usize;
                 self.pixels[offset..offset + 4].copy_from_slice(&color);
             }
@@ -387,6 +374,21 @@ fn speed_text(speed: SpeedDisplay) -> (String, &'static str, [u8; 4]) {
             )
         }
         SpeedDisplay::AboveRange => (">999".to_owned(), "Mm/s", AMBER),
+    }
+}
+
+fn distance_unit(distance: SpeedDisplay) -> &'static str {
+    match distance {
+        SpeedDisplay::Value {
+            unit: SpeedUnit::Meters,
+            ..
+        }
+        | SpeedDisplay::Unavailable => "m",
+        SpeedDisplay::Value {
+            unit: SpeedUnit::Kilometers,
+            ..
+        } => "km",
+        _ => "Mm",
     }
 }
 
@@ -449,6 +451,19 @@ pub(crate) fn glyph_rows(character: char) -> [u8; 7] {
 mod tests {
     use super::*;
 
+    fn regions(pixels: &[u8]) -> Vec<u8> {
+        (0..3)
+            .flat_map(|section| {
+                (0..ATLAS_HEIGHT).flat_map(move |y| {
+                    let start = ((y * ATLAS_WIDTH + section * SECTION_WIDTH) * 4) as usize;
+                    pixels[start..start + (SECTION_WIDTH * 4) as usize]
+                        .iter()
+                        .copied()
+                })
+            })
+            .collect()
+    }
+
     #[test]
     fn speed_rounds_and_promotes_metric_units_without_long_digits() {
         for (speed, minor_units, unit) in [
@@ -492,41 +507,51 @@ mod tests {
         };
         let allocation = atlas.pixels.as_ptr();
         assert!(atlas.update(values));
-        let original = atlas.pixels.clone();
+        let original = regions(&atlas.pixels);
         assert!(!atlas.update(values));
         assert!(!atlas.update(CockpitInstruments {
             speed_meters_per_second: 10.04,
             ..values
         }));
-        assert_eq!(atlas.pixels, original);
+        assert_eq!(regions(&atlas.pixels), original);
         assert_eq!(atlas.pixels.as_ptr(), allocation);
         assert!(atlas.update(CockpitInstruments {
             speed_meters_per_second: 10.06,
             ..values
         }));
-        let panel_bytes = (ATLAS_WIDTH * PANEL_HEIGHT * 4) as usize;
-        assert_ne!(atlas.pixels[..panel_bytes], original[..panel_bytes]);
-        assert_eq!(atlas.pixels[panel_bytes..], original[panel_bytes..]);
+        let panel_bytes = (SECTION_WIDTH * ATLAS_HEIGHT * 4) as usize;
+        assert_ne!(
+            regions(&atlas.pixels)[..panel_bytes],
+            original[..panel_bytes]
+        );
+        assert_eq!(
+            regions(&atlas.pixels)[panel_bytes..],
+            original[panel_bytes..]
+        );
     }
 
     #[test]
-    fn changed_power_updates_all_three_displays() {
+    fn changed_power_updates_only_flight_region() {
         let mut atlas = InstrumentAtlas::new();
         assert!(atlas.update(CockpitInstruments::default()));
-        let original = atlas.pixels.clone();
+        let original = regions(&atlas.pixels);
         assert!(atlas.update(CockpitInstruments {
             thruster_percentage: 1,
             ..CockpitInstruments::default()
         }));
-        let panel_bytes = (ATLAS_WIDTH * PANEL_HEIGHT * 4) as usize;
-        for panel in 0..3 {
-            let range = panel * panel_bytes..(panel + 1) * panel_bytes;
-            assert_ne!(atlas.pixels[range.clone()], original[range]);
-        }
+        let panel_bytes = (SECTION_WIDTH * ATLAS_HEIGHT * 4) as usize;
+        assert_ne!(
+            regions(&atlas.pixels)[..panel_bytes],
+            original[..panel_bytes]
+        );
+        assert_eq!(
+            regions(&atlas.pixels)[panel_bytes..],
+            original[panel_bytes..]
+        );
     }
 
     #[test]
-    fn compact_power_reading_updates_both_side_panels() {
+    fn power_clamps_and_all_pixels_remain_opaque() {
         let mut atlas = InstrumentAtlas::new();
         for percentage in [0, 1, 100] {
             assert!(atlas.update(CockpitInstruments {
@@ -551,7 +576,7 @@ mod tests {
     }
 
     #[test]
-    fn energy_only_changes_the_port_panel_at_visible_precision() {
+    fn energy_only_changes_the_energy_region_at_visible_precision() {
         let mut atlas = InstrumentAtlas::new();
         let values = CockpitInstruments {
             core_energy_capacity_joules: 1_000_000_000_000,
@@ -559,7 +584,7 @@ mod tests {
             ..CockpitInstruments::default()
         };
         assert!(atlas.update(values));
-        let original = atlas.pixels.clone();
+        let original = regions(&atlas.pixels);
         assert!(!atlas.update(CockpitInstruments {
             core_energy_stored_joules: values.core_energy_stored_joules + 1,
             ..values
@@ -568,17 +593,23 @@ mod tests {
             core_energy_stored_joules: 500_000_000_000,
             ..values
         }));
-        let panel_bytes = (ATLAS_WIDTH * PANEL_HEIGHT * 4) as usize;
-        assert_eq!(atlas.pixels[..panel_bytes], original[..panel_bytes]);
+        let panel_bytes = (SECTION_WIDTH * ATLAS_HEIGHT * 4) as usize;
+        assert_eq!(
+            regions(&atlas.pixels)[..panel_bytes],
+            original[..panel_bytes]
+        );
         assert_ne!(
-            atlas.pixels[panel_bytes..panel_bytes * 2],
+            regions(&atlas.pixels)[panel_bytes..panel_bytes * 2],
             original[panel_bytes..panel_bytes * 2]
         );
-        assert_eq!(atlas.pixels[panel_bytes * 2..], original[panel_bytes * 2..]);
+        assert_eq!(
+            regions(&atlas.pixels)[panel_bytes * 2..],
+            original[panel_bytes * 2..]
+        );
     }
 
     #[test]
-    fn nearby_target_and_radial_direction_only_change_starboard_panel() {
+    fn nearby_target_and_radial_direction_only_change_navigation_region() {
         let mut atlas = InstrumentAtlas::new();
         let values = CockpitInstruments {
             nearby_body: Some(NearbyBodyInstruments {
@@ -589,7 +620,7 @@ mod tests {
             ..CockpitInstruments::default()
         };
         assert!(atlas.update(values));
-        let approaching = atlas.pixels.clone();
+        let approaching = regions(&atlas.pixels);
         assert!(atlas.update(CockpitInstruments {
             nearby_body: Some(NearbyBodyInstruments {
                 radial_speed_meters_per_second: 25.0,
@@ -597,8 +628,8 @@ mod tests {
             }),
             ..values
         }));
-        let receding = atlas.pixels.clone();
-        let panel_bytes = (ATLAS_WIDTH * PANEL_HEIGHT * 4) as usize;
+        let receding = regions(&atlas.pixels);
+        let panel_bytes = (SECTION_WIDTH * ATLAS_HEIGHT * 4) as usize;
         assert_eq!(approaching[..panel_bytes * 2], receding[..panel_bytes * 2]);
         assert_ne!(approaching[panel_bytes * 2..], receding[panel_bytes * 2..]);
 
@@ -606,7 +637,88 @@ mod tests {
             nearby_body: None,
             ..values
         }));
-        assert_ne!(atlas.pixels[panel_bytes * 2..], receding[panel_bytes * 2..]);
+        assert_ne!(
+            regions(&atlas.pixels)[panel_bytes * 2..],
+            receding[panel_bytes * 2..]
+        );
+    }
+
+    #[test]
+    fn capacity_and_navigation_fields_invalidate_only_their_region() {
+        let mut atlas = InstrumentAtlas::new();
+        let base = CockpitInstruments {
+            core_energy_capacity_joules: 1_000_000_000_000,
+            nearby_body: Some(NearbyBodyInstruments {
+                name: "Earth",
+                surface_distance_meters: 0.0,
+                radial_speed_meters_per_second: 0.0,
+            }),
+            ..CockpitInstruments::default()
+        };
+        assert!(atlas.update(base));
+        let bytes = (SECTION_WIDTH * ATLAS_HEIGHT * 4) as usize;
+        for (values, changed) in [
+            (
+                CockpitInstruments {
+                    core_energy_capacity_joules: u64::MAX,
+                    ..base
+                },
+                1,
+            ),
+            (
+                CockpitInstruments {
+                    nearby_body: Some(NearbyBodyInstruments {
+                        name: "Mars",
+                        ..base.nearby_body.unwrap()
+                    }),
+                    ..base
+                },
+                2,
+            ),
+            (
+                CockpitInstruments {
+                    nearby_body: Some(NearbyBodyInstruments {
+                        surface_distance_meters: f64::NAN,
+                        ..base.nearby_body.unwrap()
+                    }),
+                    ..base
+                },
+                2,
+            ),
+            (
+                CockpitInstruments {
+                    nearby_body: Some(NearbyBodyInstruments {
+                        radial_speed_meters_per_second: f64::INFINITY,
+                        ..base.nearby_body.unwrap()
+                    }),
+                    ..base
+                },
+                2,
+            ),
+        ] {
+            atlas.update(base);
+            let before = regions(&atlas.pixels);
+            assert!(atlas.update(values));
+            let after = regions(&atlas.pixels);
+            for section in 0..3 {
+                let range = section * bytes..(section + 1) * bytes;
+                assert_eq!(before[range.clone()] == after[range], section != changed);
+            }
+            assert!(!atlas.update(values));
+        }
+        assert_eq!(atlas.pixels.len(), 1536 * 256 * 4);
+        assert_eq!(
+            distance_unit(SpeedDisplay::from_meters_per_second(0.0)),
+            "m"
+        );
+        assert_eq!(
+            distance_unit(SpeedDisplay::from_meters_per_second(2000.0)),
+            "km"
+        );
+        assert_eq!(
+            distance_unit(SpeedDisplay::from_meters_per_second(2_000_000.0)),
+            "Mm"
+        );
     }
 
     #[test]

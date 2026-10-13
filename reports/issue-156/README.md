@@ -2,6 +2,33 @@
 
 ## Current status — 2026-10-13
 
+**Focused 50-fragment continuation completed.** The user requested a smaller
+check rather than restarting expensive large-load work. The native 50 fixture
+settled naturally after 37 updates (0.592 simulation seconds / 0.262 preparation
+wall seconds). Its flight/landing/takeoff route passed in 1.011 s, preserving all
+50 IDs/materials, 64 kg, complete sleep and exactly zero local drift through
+25,000 m/s rotating flight. The first `--carrying` attempt completed those checks
+but failed the loaded-support precondition: all 50 fragments directly touch the
+environment and there are zero bottom/dependent candidates. No 50-fragment
+loaded support-removal or pickup/drop pass is claimed. Two existing small-pile
+support-removal regressions and one fast-impact/unrelated-island regression
+passed separately. [Focused summary](native-focused-50-2026-10-13.json),
+[full checkpoint archive](native-focused-50-2026-10-13.json.gz),
+[support tests](focused-50-support-tests-2026-10-13.log), and
+[impact test](focused-50-impact-test-2026-10-13.log) retain the evidence.
+
+Exact checks (unchanged staged executable and source):
+
+```sh
+python3 scripts/fragment_sleep_acceptance.py --binary artifacts/build/native-matrix/salimon-client --counts 50 --layout dense --settle-steps 2400 --timeout 180 --request-timeout 120 --carrying --output artifacts/issue156-native-focused-50
+python3 scripts/fragment_sleep_acceptance.py --binary artifacts/build/native-matrix/salimon-client --counts 50 --layout dense --settle-steps 2400 --timeout 180 --request-timeout 120 --output artifacts/issue156-native-focused-50-flight
+cargo test -p salimon-physics --locked support_removal
+cargo test -p salimon-physics --locked fast_impact_wakes_whole_island_without_waking_unrelated_support
+```
+
+This reduced check is complete; the original issue acceptance below remains
+incomplete. No new performance measurement or large-load run was started.
+
 **Stopped at the user's request.** Resume instructions and the exact remaining
 matrix are in the root [handoff](../../ISSUE-156-HANDOFF.md). All task processes
 have been stopped. The latest 1,000 preparation ended with SIGTERM before

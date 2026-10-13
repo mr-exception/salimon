@@ -1,5 +1,14 @@
 # Issue #156 native continuation handoff
 
+The user subsequently resumed a **focused 50-fragment check only**. That check
+is complete: natural sleep, all 50 IDs/materials and 64 kg retained, zero drift
+through fast rotating flight/landing/takeoff, and three small support/impact
+regressions passed. The 50 fixture has no loaded bottom/dependent pair, so its
+stack-removal/carrying precondition could not pass. Details and exact commands
+are at the top of [the report](reports/issue-156/README.md). No large-load jobs
+were restarted; original #156 acceptance remains incomplete. No source changes
+were necessary for this focused continuation.
+
 Updated 2026-10-13 (Asia/Nicosia). **Stopped at the user's request; issue #156 is
 unfinished and must remain open.** All task-owned native jobs and waiting matrix
 orchestrators were stopped. Resume only when the user requests continuation.

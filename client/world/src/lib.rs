@@ -19,6 +19,7 @@ pub mod resource_fragments;
 pub mod resource_generation;
 pub mod resource_size;
 pub mod resources;
+pub mod terrain;
 
 pub use camera::{CameraCommand, CameraPrototype, CameraSnapshot, TransitionPhase, WorldSnapshot};
 pub use catalog::{

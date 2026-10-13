@@ -58,3 +58,10 @@ Follow the root [coding conventions](../../docs/coding-conventions.md),
 [validation matrix](../../docs/validation.md) and
 [feature map](../../docs/maintenance-map.md). Update affected contracts/guides
 with behavior changes and record completion evidence under root `reports/`.
+
+## Opt-in terrain
+
+`src/terrain/` owns the stage-1 #170 definition/query/codec. Read
+[terrain-contract.md](terrain-contract.md) before changing evaluation or integrating
+consumers; run world terrain/golden/codec tests. Do not activate a height-only or
+rendering-only surface while walking/landing/resources still use nominal spheres.

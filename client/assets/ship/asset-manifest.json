@@ -100,15 +100,10 @@
     "coreRole": "Energy storage and recoverable ship heart; Phase0 exposes a noncanonical bounded telemetry fixture without production energy simulation",
     "coreDesign": "Segmented cyan energy cells, copper containment rings, graphite cage, ceramic armor, service vents and charge gauge",
     "palette": "Warm ivory, copper, terracotta, honey wood and petrol teal with amber emissive lamps",
-    "cockpitDesign": "One centered console holds three seated-facing live displays; walking lanes remain on both sides.",
+    "cockpitDesign": "One centered console holds one wide seated-facing multifunction display; walking lanes remain on both sides.",
     "aftDoorDesign": "Sealed pressure leaf rotates upward around its top hinge above the aft doorway."
   },
   "cockpitInstruments": {
-    "speedNode": "Monitor_Center",
-    "powerNodes": [
-      "Monitor_Port",
-      "Monitor_Starboard"
-    ],
     "uvOrigin": "top-left",
     "powerSource": "shared-thruster-command",
     "pilotFacingTargetMeters": [
@@ -116,56 +111,26 @@
       1.799032258064516,
       0.0
     ],
-    "sideYawDegrees": {
-      "Monitor_Port": -27.832284266922432,
-      "Monitor_Starboard": 31.0468333905784
-    },
-    "surfaceTriangles": 6,
+    "surfaceTriangles": 2,
     "additionalDraws": 0,
     "surfaceBoundsMeters": {
-      "Monitor_Center": {
+      "Monitor_Wide": {
         "min": [
-          4.405050754547119,
-          0.8734999895095825,
-          -0.25587713718414307
+          4.42,
+          0.8735,
+          -0.99
         ],
         "max": [
-          4.434948921203613,
-          1.2066999673843384,
-          0.4058772325515747
-        ]
-      },
-      "Monitor_Port": {
-        "min": [
-          4.156299114227295,
-          0.9049999713897705,
-          0.5682005882263184
-        ],
-        "max": [
-          4.403700828552246,
-          1.2200000286102295,
-          1.0367993116378784
-        ]
-      },
-      "Monitor_Starboard": {
-        "min": [
-          4.140824317932129,
-          0.9049999713897705,
-          -1.1461988687515259
-        ],
-        "max": [
-          4.419175624847412,
-          1.2200000286102295,
-          -0.6838010549545288
+          4.42,
+          1.2067,
+          0.99
         ]
       }
     },
     "unifiedConsole": {
       "collisionNode": "COLLIDER_CockpitCenterConsole",
       "monitorNodes": [
-        "Monitor_Port",
-        "Monitor_Center",
-        "Monitor_Starboard"
+        "Monitor_Wide"
       ],
       "boundsMeters": {
         "min": [
@@ -181,7 +146,12 @@
       },
       "walkingSide": "both",
       "noseDeckForwardMeters": 7.85
-    }
+    },
+    "monitorNode": "Monitor_Wide",
+    "textureSizePixels": [
+      1536,
+      256
+    ]
   },
   "exportCommand": "python3 models/assets/ships/salimon-scout/export.py"
 }

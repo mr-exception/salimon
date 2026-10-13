@@ -58,8 +58,8 @@ class ScoutValidationTests(unittest.TestCase):
 
     def test_uv_normals_unified_console_and_real_dimensions(self):
         cases = (
-            ('Monitor_Center', 'TEXCOORD_0', lambda p: (p[0], 1-p[1])),
-            ('Monitor_Port', 'NORMAL', lambda p: tuple(-v for v in p)),
+            ('Monitor_Wide', 'TEXCOORD_0', lambda p: (p[0], 1-p[1])),
+            ('Monitor_Wide', 'NORMAL', lambda p: tuple(-v for v in p)),
             ('Cockpit_Monitor_Housings', 'POSITION', lambda p: (p[0], p[1], p[2] + 5)),
             ('Hull_Nose', 'POSITION', lambda p: (p[0] + 1, p[1], p[2])),
             ('Cockpit_Glazing', 'POSITION', lambda p: (p[0] + 1, p[1], p[2])),
@@ -88,7 +88,7 @@ class ScoutValidationTests(unittest.TestCase):
                                7.85, places=3)
         console = metadata['cockpitInstruments']['unifiedConsole']
         self.assertEqual(console['monitorNodes'],
-                         ['Monitor_Port', 'Monitor_Center', 'Monitor_Starboard'])
+                         ['Monitor_Wide'])
         self.assertEqual(console['collisionNode'], 'COLLIDER_CockpitCenterConsole')
         self.assertEqual(console['walkingSide'], 'both')
         self.assertEqual(console['noseDeckForwardMeters'], 7.85)
@@ -96,8 +96,9 @@ class ScoutValidationTests(unittest.TestCase):
                                -console['boundsMeters']['max'][2])
         centers = [sum(bound[2] for bound in node_position_bounds(self.document, self.binary, name)) / 2
                    for name in console['monitorNodes']]
-        self.assertGreater(centers[0], centers[1])
-        self.assertGreater(centers[1], centers[2])
+        self.assertAlmostEqual(centers[0], 0.0)
+        self.assertFalse(any(n["name"] in ("Monitor_Center", "Monitor_Port", "Monitor_Starboard")
+                             for n in self.document["nodes"]))
         self.assertEqual(len(self.manifest['contracts']['colliders']), 28)
         self.assertNotIn('cargoRoom', metadata)
         self.assertNotIn('cargoRoom', self.document['asset']['extras']['salimon'])
@@ -145,7 +146,7 @@ class ScoutValidationTests(unittest.TestCase):
         paths.extend(REPO / 'client/character/src' / n for n in ('spatial_contracts.rs',))
         before = {p: p.read_bytes() for p in paths}
         def blender(command, **kwargs):
-            document, binary = self.vertex_edit('Monitor_Center', 'TEXCOORD_0', lambda p: (p[0], 1-p[1]))
+            document, binary = self.vertex_edit('Monitor_Wide', 'TEXCOORD_0', lambda p: (p[0], 1-p[1]))
             Path(command[-1]).write_bytes(scout.encode_glb(document, binary))
         with patch.object(scout.shutil, 'which', return_value='/mock/blender'), \
              patch.object(scout.subprocess, 'run', side_effect=blender):

@@ -47,9 +47,7 @@
     ],
     "nodes": [
       "Exit_Door",
-      "Monitor_Center",
-      "Monitor_Port",
-      "Monitor_Starboard"
+      "Monitor_Wide"
     ],
     "materials": [
       "Hull Graphite",
@@ -133,15 +131,7 @@
         "path": "salimon"
       },
       {
-        "node": "Monitor_Center",
-        "path": "salimon"
-      },
-      {
-        "node": "Monitor_Port",
-        "path": "salimon"
-      },
-      {
-        "node": "Monitor_Starboard",
+        "node": "Monitor_Wide",
         "path": "salimon"
       },
       {
@@ -314,9 +304,7 @@
         "legacyManifest": "client/assets/ship/asset-manifest.json",
         "movingDoor": "Exit_Door",
         "monitors": {
-          "Monitor_Center": "speed",
-          "Monitor_Port": "thruster-power",
-          "Monitor_Starboard": "thruster-power"
+          "Monitor_Wide": "multifunction"
         },
         "monitorUvOrigin": "top-left",
         "glassMaterial": "Cockpit Glass",

@@ -106,14 +106,14 @@ as contract changes, not cosmetic edits.
 
 The scout's [current contract](../client/assets/ship/README.md#runtime-contract)
 retains `Exterior`, `Interior`, `Collision_Proxies`, `Interaction_Markers`,
-`Exit_Door`, `Monitor_Center`, `Monitor_Port`, `Monitor_Starboard`, material roles
+`Exit_Door`, `Monitor_Wide`, material roles
 and `extras.salimon` metadata. Its baked coordinates, identity transforms,
 pilot-facing monitor normals/top-left UVs and glazing behavior remain validated.
-The three monitors share a unified starboard console, and an authored nose-floor
-proxy supports a port-side walking route. The shortened nose and canopy must
+The wide monitor occupies the centered console, and an authored nose-floor
+proxy supports a walking route on both sides. The shortened nose and canopy must
 keep seated forward and downward visibility. The retired dedicated cargo room
 has no collider, spatial anchor or storage-volume contract. The cabin bench and
-storage assembly are removed. The aft pressure door parks to port when open.
+storage assembly are removed. The aft pressure door lowers into the boarding ramp when open.
 
 `Exit_Door` and monitor names are consumed directly by
 `client/renderer/src/ship_mesh.rs`; renaming them would change behavior. Do not

@@ -641,11 +641,6 @@
       "visual": true
     },
     {
-      "name": "Cockpit_Center_Monitor_Bridge",
-      "parent": "Interior",
-      "visual": true
-    },
-    {
       "name": "Cockpit_Console_Center",
       "parent": "Interior",
       "visual": true
@@ -818,66 +813,6 @@
           "extensionTravelMeters": 2.13118279595699,
           "extensionFaceOffsetMeters": 0.08,
           "rampHalfWidthMeters": 1.4
-        }
-      }
-    },
-    {
-      "name": "Monitor_Center",
-      "parent": "Interior",
-      "visual": true,
-      "extras": {
-        "salimon": {
-          "interactive": "cockpit-monitor",
-          "displayRole": "speed",
-          "thrusterSide": "none",
-          "uvOrigin": "top-left",
-          "powerSource": "none",
-          "pilotFacingTargetMeters": [
-            2.76,
-            1.799032258064516,
-            0.0
-          ],
-          "pilotFacingYawDegrees": -2.586907374210613
-        }
-      }
-    },
-    {
-      "name": "Monitor_Port",
-      "parent": "Interior",
-      "visual": true,
-      "extras": {
-        "salimon": {
-          "interactive": "cockpit-monitor",
-          "displayRole": "thruster-power",
-          "thrusterSide": "port",
-          "uvOrigin": "top-left",
-          "powerSource": "shared-thruster-command",
-          "pilotFacingTargetMeters": [
-            2.76,
-            1.799032258064516,
-            0.0
-          ],
-          "pilotFacingYawDegrees": -27.832284266922432
-        }
-      }
-    },
-    {
-      "name": "Monitor_Starboard",
-      "parent": "Interior",
-      "visual": true,
-      "extras": {
-        "salimon": {
-          "interactive": "cockpit-monitor",
-          "displayRole": "thruster-power",
-          "thrusterSide": "starboard",
-          "uvOrigin": "top-left",
-          "powerSource": "shared-thruster-command",
-          "pilotFacingTargetMeters": [
-            2.76,
-            1.799032258064516,
-            0.0
-          ],
-          "pilotFacingYawDegrees": 31.0468333905784
         }
       }
     },
@@ -1365,6 +1300,25 @@
       "extras": {
         "salimon": {
           "interactive": "exit-ramp-tip"
+        }
+      }
+    },
+    {
+      "name": "Monitor_Wide",
+      "parent": "Interior",
+      "visual": true,
+      "extras": {
+        "salimon": {
+          "interactive": "cockpit-monitor",
+          "displayRole": "multifunction",
+          "uvOrigin": "top-left",
+          "powerSource": "shared-thruster-command",
+          "pilotFacingTargetMeters": [
+            2.76,
+            1.799032258064516,
+            0.0
+          ],
+          "pilotFacingYawDegrees": 0.0
         }
       }
     }

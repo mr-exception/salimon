@@ -28,13 +28,12 @@ ship. The runtime supplies a bounded live stored/capacity telemetry fixture for 
 monitors, but no consumption, generation, damage, fuel, repair, or production
 energy simulation.
 
-The pilot station has one center console with three flat physical monitors,
-recessed housings, ivory bezels, copper fasteners, tactile keys, service vents
-and deck pedals. The screens retain their distinct live runtime instrument
-artwork: speed and common thrust, Core energy, and nearby-body distance/radial
-state. Both sides stay open as walking routes from the cabin past the
-console into the cockpit nose. Monitor faces, collision and the walkable floor
-must remain aligned in the authored source and exported asset.
+The pilot station has one center console with a single wide physical monitor,
+a recessed graphite housing, continuous ivory rim, tactile keys, service vents
+and deck pedals. Three labeled regions show speed/shared thrust, Core stored
+energy/capacity, and nearby-body distance/radial state simultaneously. Both
+walking routes remain open. The screen, collision and floor stay aligned in the
+linked source and validated export.
 
 The pilot chair is a contoured bucket with a reclined tapered back, split
 terracotta cushions, side bolsters, compact headrest, armrests, a short stick and
@@ -96,7 +95,7 @@ Spatial Rust layouts are derived from authored proxies/markers.
   balanced hull without the cargo section.
 - [Current cockpit frame](previews/current-cockpit-frame.jpg) shows the slimmer
   canopy posts, top bar, and lower-pane trim.
-- [Current console](previews/current-console.jpg) shows the three displays on one
+- [Current console](previews/current-console.jpg) is a historical preview of the previous three-display
   center console and the routes on both sides into the nose. The glass is hidden
   in this view to expose the controls.
 - [Closed pressure door](previews/current-door-closed.jpg),
@@ -166,19 +165,21 @@ window panes into a second draw; it preserves emissive color separately and
 applies a warm fill to `Interior` descendants. There are no dynamic shadows,
 post effects, additional light passes or per-frame geometry generation.
 
-`Monitor_Center`, `Monitor_Port` and `Monitor_Starboard` are single quads, with
-`TEXCOORD_0` `(0,0)` at the pilot-facing top-left and `(1,1)` at bottom-right.
-All three surfaces sit on one center console and face the seated pilot. Node
-extras retain `displayRole`, `uvOrigin`, and the shared-thruster-command power
-source. Six triangles provide the complete live instrument surface without extra
-ship draws. Keep the three stable monitor names because the renderer uses them.
-`Port` and `Starboard` in those names identify the display positions on the
-center console. The console collision proxy must fit the visible assembly while leaving
-body-clear routes on both sides into the shortened nose. Exported bounds and
-the portable character-controller footprints must agree.
+`Monitor_Wide` is one 1.98 × 0.3332 m quad facing the seated pilot, with
+`TEXCOORD_0` `(0,0)` at top-left and `(1,1)` at bottom-right. Its node extras
+use `displayRole: multifunction`, `uvOrigin: top-left` and
+`powerSource: shared-thruster-command`. The retired Center/Port/Starboard nodes
+are absent. Two triangles sample the whole cached 1536 × 256 texture, with no
+extra ship draw. Flight, energy and navigation occupy labeled regions separated
+by fine rules within one continuous screen. Rounded keys skip unchanged frames;
+changed fields redraw only their region before one texture upload. The texture
+still occupies 1.5 MiB each on CPU/GPU. The console proxy retains its dimensions
+and body-clear routes on both sides.
 
-`scenarios/cockpit-nose.json` walks the side route into and back out of the
-nose. Its evidence variant captures the nose approach.
+`scenarios/cockpit-nose.json` and `cockpit-nose-starboard.json` walk both side
+routes into and back out of the nose. The former has an evidence variant.
+`scenarios/evidence/cockpit-wide-monitor{,-space}.json` captures the simultaneous
+dashboard at zero speed, changing thrust, approach/landing and no nearby target.
 
 ## Budgets and verification
 
@@ -194,7 +195,7 @@ The validator checks exports agree, buffer/GLB structure, hierarchy, material
 budgets, measured bounds, floor alignment, Core metadata and housing containment
 inside its collider, shaped chair components, monitor planes/normals/UVs and
 pilot-facing orientation, the unified console collider and body-clear routes
-on both sides, unobstructed seated-eye rays over the three displays, seat height
+on both sides, unobstructed seated-eye rays over the wide display, seat height
 and actual triangle ray intersections for forward seated/standing and side/rear
 window sightlines, retained downward glazing, unoccluded recessed engine emitters,
 and source-aligned thruster proxies in both exports and the controller. Rust
@@ -204,7 +205,7 @@ transitions, cockpit access and collision radius.
 Native smoke validation should include walking around both sides of the Core,
 viewing forward from behind the chair, inspecting side and rear windows,
 opening/closing and crossing the aft doorway, boarding/leaving the seat, inspecting
-all three live instruments on the center console while changing throttle/speed,
+all live readings on the center console while changing throttle/speed,
 following the side route into the cockpit nose, inspecting seated downward views,
 jumping, and walking outside to inspect both nozzles and the streamlined
 silhouette without a cargo module. Also run

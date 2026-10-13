@@ -282,3 +282,14 @@ backlog; see [the shared-clock contract](../runtime/architecture.md#bounded-game
 The portable standalone APIs retain complete caller delta semantics and the
 existing 4096/48 safeguards, so very large standalone calls can still enlarge
 substeps at the cap. Neither path is general continuous collision detection.
+
+## Solver selection (#161)
+
+Keep the custom solver for the accepted Phase 0 settled 500-cargo iteration.
+The [evaluation decision](../../reports/issue-161/README.md) defers Rapier's
+isolated comparison and adoption; it does not establish superiority, current
+reference-machine budgets or efficient dense active behavior. No prototype or
+dependency is introduced. Reopen comparison on repeated active-budget failures,
+ordinary interaction stalls, CCD/stability requirements or excessive solver
+maintenance. Preserve authored support accuracy, stable caller IDs, one-object
+carrying and frame/session ownership when comparing an f64 candidate.

@@ -2,6 +2,13 @@
 
 ## Current status — 2026-10-13
 
+**Stopped at the user's request.** Resume instructions and the exact remaining
+matrix are in the root [handoff](../../ISSUE-156-HANDOFF.md). All task processes
+have been stopped. The latest 1,000 preparation ended with SIGTERM before
+readiness; its [stopped result](native-1000-preparation-stopped-2026-10-13.json)
+provides no additional acceptance evidence. The final high-load gate retry also
+lost its native children before collection. Neither attempt is a passed run.
+
 **Incomplete: the complete native 1,000 interaction route and the remaining
 reference matrix remain pending.** The complete 500 interaction route and dense settled 500/1,000 performance windows
 have passed, as recorded below. Current production physics is `047105c`; the
@@ -168,8 +175,9 @@ rigid flight/landing/takeoff, real F removal of support 515, falling dependent
 another identity, so the **complete route failed**. Its
 [partial summary](native-1000-support-partial-2026-10-13.json) and
 [full checkpoint archive](native-1000-support-partial-2026-10-13.json.gz)
-preserve that failure. A fresh 1,000 route now uses the floor-navigation harness
-that passed the complete 500 route; it is not claimed passed before completion.
+preserve that failure. A fresh 1,000 route used the floor-navigation harness
+that passed the complete 500 route, but its preparation was terminated before
+readiness. It remains unverified at 1,000.
 
 The latest staged surface build passed 353 workspace Rust tests (one existing
 GPU test ignored), 55 Python tooling tests, workspace Clippy with warnings
@@ -233,9 +241,28 @@ waiting for an idle display. The ordinary simulation clock and sleep criteria
 are unchanged. The active 250 group also remains incomplete: the resumed
 windows were occluded, and League of Legends was again using substantial CPU/GPU.
 Even its resumed window that did not report occlusion is excluded from reference
-claims because of that concurrent game. Further performance collection waits
-for the user to confirm an idle desktop again; fixed-step correctness preparation
-can continue meanwhile.
+claims because of that concurrent game. Further performance collection requires
+an idle desktop. The user subsequently stopped the task, so no preparation or
+measurement remains running.
+
+### Exact completed native invocations
+
+These commands used the local app-bundle copy of the staged executable with
+SHA-256 `95e662d5aeea7cec6a8913ba59adbfe51f84d70eaf5f3cfeb6315bf106cc2d68`.
+The bundle permits native UI inspection; the executable bytes match staging.
+Other preparing Salimon processes were suspended during measured windows.
+
+```sh
+python3 scripts/benchmark_fragments.py --binary artifacts/SalimonAcceptance.app/Contents/MacOS/salimon-client --machine-label apple-m1-imac-reference --mode native --seed 155 --counts 0 10 25 50 100 250 --layouts scattered dense surface --states settled --cameras facing away --repeats 3 --warmup-seconds 1 --sample-seconds 5 --minimum-samples 100 --settle-steps 2400 --prepare-workers 4 --timeout 14400 --output artifacts/fragment-benchmarks/issue156-matrix-settled-low-bundled
+python3 scripts/benchmark_fragments.py --binary artifacts/SalimonAcceptance.app/Contents/MacOS/salimon-client --machine-label apple-m1-imac-reference --mode native --seed 155 --counts 0 10 25 50 100 --layouts scattered dense surface --states active --cameras facing away --repeats 3 --warmup-seconds 0 --sample-seconds 5 --minimum-samples 100 --prepare-workers 1 --timeout 14400 --output artifacts/fragment-benchmarks/issue156-matrix-active-low-bundled
+python3 scripts/fragment_sleep_acceptance.py --binary artifacts/SalimonAcceptance.app/Contents/MacOS/salimon-client --counts 500 --layout dense --settle-steps 2400 --timeout 14400 --request-timeout 120 --carrying --output artifacts/issue156-native-floor-navigation-500
+```
+
+Results: 108 settled windows passed; 90 active low-load windows passed; complete
+500 loaded correctness passed. The active 250 invocation used the same active
+options with `--counts 250`; only its eleven explicitly retained isolated
+windows count, not the complete invocation. Pending high-load measurement and
+1,000 correctness retries are not completed commands.
 
 The benchmark build adds optional `--minimum-samples 100`, requiring both the
 requested wall duration and 100 retained native frame intervals before a window

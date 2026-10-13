@@ -14,7 +14,8 @@ from validate_asset import (ValidationError, accessor_values, position_bounds, r
 from spatial_contracts import build_spatial_contracts
 
 TASK7_BASELINE_DIMENSIONS = [10.15, 3.72, 8.30]
-CURRENT_DIMENSIONS = [18.33, 4.00, 20.00]
+HULL_DIMENSIONS = [18.33, 4.00, 20.00]
+CURRENT_DIMENSIONS = [18.33, 6.00, 20.00]
 TASK10_REVISED_SCALE = [2.0, 4.0 / 3.72, 2.0]
 
 def validate_preservation(context, data):
@@ -257,7 +258,7 @@ def validate_scout(context, data):
     node_names = [n["name"] for n in document["nodes"]]
     material_names = [m["name"] for m in document["materials"]]
     for mesh in document["meshes"]:
-        if mesh["name"] not in ("Exit_Door", "Door_Frame", "Aft_Bulkhead_Header"):
+        if not mesh["name"].startswith("Landing_Gear_") and mesh["name"] not in ("Exit_Door", "Door_Frame", "Aft_Bulkhead_Header"):
             require(len(mesh["primitives"]) == 1, f"{mesh['name']}: expected one primitive")
         for primitive in mesh["primitives"]:
             attributes = set(primitive["attributes"])
@@ -273,9 +274,26 @@ def validate_scout(context, data):
                 require(accessor["type"] == kind and accessor["componentType"] == 5126,
                         f"{mesh['name']}: {semantic} must be float {kind}")
     preservation = json.loads((SCOUT / "preservation.json").read_text())
-    spatial = build_spatial_contracts(document, preservation)
+    spatial = build_spatial_contracts(document, preservation, geometry)
     if "spatialContracts" in document["extras"]["salimon"]:
         require(document["extras"]["salimon"]["spatialContracts"] == spatial, "embedded spatial contracts are stale")
+    support = spatial["landingSupport"]
+    for position in ("Aft", "Forward"):
+        for side in ("Port", "Starboard"):
+            suffix = f"{position}_{side}"
+            low, high = node_position_bounds(document, geometry, "Landing_Gear_" + suffix)
+            foot = spatial["colliders"]["COLLIDER_Landing_" + suffix + "_Foot"]
+            leg = spatial["colliders"]["COLLIDER_Landing_" + suffix + "_Leg"]
+            require(abs(low[1] - support["footContactLocalYMeters"]) < 1e-6,
+                    suffix + ": all soles must share the support plane")
+            require(abs(foot["lowerMeters"][1] - low[1]) < 1e-6,
+                    suffix + ": foot proxy must meet its visible sole")
+            for axis in range(3):
+                require(low[axis] >= min(foot["lowerMeters"][axis], leg["lowerMeters"][axis]) - 1e-6
+                        and high[axis] <= max(foot["upperMeters"][axis], leg["upperMeters"][axis]) + 1e-6,
+                        suffix + ": landing proxies must enclose visible support")
+            require(abs(foot["centerMeters"][2]) - foot["sizeMeters"][2] / 2 > 2.5,
+                    suffix + ": support obstructs the reserved aft ramp corridor")
     collision_group = node(document, "Collision_Proxies")
     for name in ("COLLIDER_Engine_Port_Body", "COLLIDER_Engine_Port_SweptFin",
                  "COLLIDER_Engine_Starboard_Body", "COLLIDER_Engine_Starboard_SweptFin"):
@@ -341,7 +359,7 @@ def validate_scout(context, data):
     assert_vectors_close(exterior_collider["translation"], [-.635, 1.76*4/3.72, 0.0])
     assert_vectors_close(
         exterior_collider["extras"]["salimon"]["sizeMeters"],
-        CURRENT_DIMENSIONS,
+        HULL_DIMENSIONS,
     )
     require(metrics["externalAssetDependencies"] == 0, 'metrics["externalAssetDependencies"] == 0')
 
@@ -355,11 +373,11 @@ def validate_scout(context, data):
     require(any(normal[1] > .99 for normal in lower_normals), "floor panes face upward")
     require(any(normal[1] < -.9 for normal in lower_normals), "nose pane faces downward")
 
-    require(manifest["budgets"]["maximumTriangles"] == 6000, 'manifest["budgets"]["maximumTriangles"] == 6000')
+    require(manifest["budgets"]["maximumTriangles"] == 6500, 'manifest["budgets"]["maximumTriangles"] == 6500')
     require(context["metrics"]["maxTriangles"] == metrics["triangleCount"], 'context["metrics"]["maxTriangles"] == metrics["triangleCount"]')
     require(context["metrics"]["maxPrimitives"] == metrics["drawPrimitiveCount"], 'context["metrics"]["maxPrimitives"] == metrics["drawPrimitiveCount"]')
     require(context["metrics"]["maxMaterials"] == metrics["materialCount"], 'context["metrics"]["maxMaterials"] == metrics["materialCount"]')
-    assert_vectors_close(manifest["task10Scale"]["dimensionsMeters"], measured_dimensions)
+    assert_vectors_close(manifest["task10Scale"]["dimensionsMeters"], HULL_DIMENSIONS)
     require(metrics["walkableInteriorClearanceMeters"]["width"] == 9.2, 'metrics["walkableInteriorClearanceMeters"]["width"] == 9.2')
     floor = node(document, "COLLIDER_InteriorFloor")
     floor_top = floor["translation"][1] + floor["extras"]["salimon"]["sizeMeters"][1] / 2
@@ -514,11 +532,13 @@ def main(export=None):
     require((export / "salimon_phase0_ship.bin").read_bytes() == binary,
             "glTF and GLB geometry payloads differ")
     if export == ROOT / "export":
-        from spatial_contracts import sidecar_json, spatial_rust_source
-        spatial = build_spatial_contracts(document, json.loads((SCOUT / "preservation.json").read_text()))
+        from spatial_contracts import sidecar_json, spatial_rust_source, landing_rust_source
+        spatial = build_spatial_contracts(document, json.loads((SCOUT / "preservation.json").read_text()), binary)
         require((ROOT / "spatial-contracts.json").read_text() == sidecar_json(spatial), "spatial sidecar is stale")
         require((REPO / "client/character/src/spatial_contracts.rs").read_text() == spatial_rust_source(spatial),
                 "spatial_contracts.rs: generated layout is stale")
+        require((REPO / "client/ship/src/landing_geometry.rs").read_text() == landing_rust_source(spatial["landingSupport"]),
+                "landing_geometry.rs: generated support contract is stale")
     print(json.dumps({"asset": "ship.salimon-scout", "status": "passed", "metrics": metrics}, sort_keys=True))
 
 

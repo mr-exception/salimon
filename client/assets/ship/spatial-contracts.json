@@ -441,6 +441,198 @@
         -4.6000000000000005
       ]
     },
+    "COLLIDER_Landing_Aft_Port_Foot": {
+      "centerMeters": [
+        -5.599999904632568,
+        -1.9875268936157227,
+        3.5999999046325684
+      ],
+      "lowerMeters": [
+        -6.274999904632568,
+        -2.1075268936157228,
+        3.0499999046325685
+      ],
+      "purpose": "exterior-landing-gear",
+      "shape": "box",
+      "sizeMeters": [
+        1.35,
+        0.24,
+        1.1
+      ],
+      "upperMeters": [
+        -4.9249999046325685,
+        -1.8675268936157225,
+        4.149999904632568
+      ]
+    },
+    "COLLIDER_Landing_Aft_Port_Leg": {
+      "centerMeters": [
+        -5.599999904632568,
+        -0.827526867389679,
+        3.5999999046325684
+      ],
+      "lowerMeters": [
+        -6.0499999046325685,
+        -2.107526867389679,
+        3.189999904632568
+      ],
+      "purpose": "exterior-landing-gear",
+      "shape": "box",
+      "sizeMeters": [
+        0.9,
+        2.56,
+        0.82
+      ],
+      "upperMeters": [
+        -5.149999904632568,
+        0.45247313261032107,
+        4.0099999046325685
+      ]
+    },
+    "COLLIDER_Landing_Aft_Starboard_Foot": {
+      "centerMeters": [
+        -5.599999904632568,
+        -1.9875268936157227,
+        -3.5999999046325684
+      ],
+      "lowerMeters": [
+        -6.274999904632568,
+        -2.1075268936157228,
+        -4.149999904632568
+      ],
+      "purpose": "exterior-landing-gear",
+      "shape": "box",
+      "sizeMeters": [
+        1.35,
+        0.24,
+        1.1
+      ],
+      "upperMeters": [
+        -4.9249999046325685,
+        -1.8675268936157225,
+        -3.0499999046325685
+      ]
+    },
+    "COLLIDER_Landing_Aft_Starboard_Leg": {
+      "centerMeters": [
+        -5.599999904632568,
+        -0.827526867389679,
+        -3.5999999046325684
+      ],
+      "lowerMeters": [
+        -6.0499999046325685,
+        -2.107526867389679,
+        -4.0099999046325685
+      ],
+      "purpose": "exterior-landing-gear",
+      "shape": "box",
+      "sizeMeters": [
+        0.9,
+        2.56,
+        0.82
+      ],
+      "upperMeters": [
+        -5.149999904632568,
+        0.45247313261032107,
+        -3.189999904632568
+      ]
+    },
+    "COLLIDER_Landing_Forward_Port_Foot": {
+      "centerMeters": [
+        4.800000190734863,
+        -1.9875268936157227,
+        3.5999999046325684
+      ],
+      "lowerMeters": [
+        4.1250001907348635,
+        -2.1075268936157228,
+        3.0499999046325685
+      ],
+      "purpose": "exterior-landing-gear",
+      "shape": "box",
+      "sizeMeters": [
+        1.35,
+        0.24,
+        1.1
+      ],
+      "upperMeters": [
+        5.475000190734863,
+        -1.8675268936157225,
+        4.149999904632568
+      ]
+    },
+    "COLLIDER_Landing_Forward_Port_Leg": {
+      "centerMeters": [
+        4.800000190734863,
+        -0.827526867389679,
+        3.5999999046325684
+      ],
+      "lowerMeters": [
+        4.350000190734863,
+        -2.107526867389679,
+        3.189999904632568
+      ],
+      "purpose": "exterior-landing-gear",
+      "shape": "box",
+      "sizeMeters": [
+        0.9,
+        2.56,
+        0.82
+      ],
+      "upperMeters": [
+        5.2500001907348635,
+        0.45247313261032107,
+        4.0099999046325685
+      ]
+    },
+    "COLLIDER_Landing_Forward_Starboard_Foot": {
+      "centerMeters": [
+        4.800000190734863,
+        -1.9875268936157227,
+        -3.5999999046325684
+      ],
+      "lowerMeters": [
+        4.1250001907348635,
+        -2.1075268936157228,
+        -4.149999904632568
+      ],
+      "purpose": "exterior-landing-gear",
+      "shape": "box",
+      "sizeMeters": [
+        1.35,
+        0.24,
+        1.1
+      ],
+      "upperMeters": [
+        5.475000190734863,
+        -1.8675268936157225,
+        -3.0499999046325685
+      ]
+    },
+    "COLLIDER_Landing_Forward_Starboard_Leg": {
+      "centerMeters": [
+        4.800000190734863,
+        -0.827526867389679,
+        -3.5999999046325684
+      ],
+      "lowerMeters": [
+        4.350000190734863,
+        -2.107526867389679,
+        -4.0099999046325685
+      ],
+      "purpose": "exterior-landing-gear",
+      "shape": "box",
+      "sizeMeters": [
+        0.9,
+        2.56,
+        0.82
+      ],
+      "upperMeters": [
+        5.2500001907348635,
+        0.45247313261032107,
+        -3.189999904632568
+      ]
+    },
     "COLLIDER_PilotChair": {
       "centerMeters": [
         2.535,
@@ -513,6 +705,12 @@
         -4.6
       ]
     }
+  },
+  "landingSupport": {
+    "fixedDeployed": true,
+    "footContactLocalYMeters": -2.1075267791748047,
+    "hullClearanceMeters": 2,
+    "hullLowestLocalYMeters": -0.10752688348293304
   },
   "markers": {
     "MARKER_CockpitSeat": {

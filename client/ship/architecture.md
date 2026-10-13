@@ -48,8 +48,10 @@ with zero velocity at phase boundaries. Captured radial waypoints and elapsed
 position error. Automatic sequences consume the full supplied delta; the
 100 ms direct-flight integration clamp remains separate. Runtime maps the active body's frame to
 character traversal and owns only the contextual `L` key translation.
-The default landed pose derives its vertical clearance from the enlarged asset's
-lowest local-Y point, keeping visible geometry tangent to Earth's nominal surface.
+The default and assisted landed poses use the generated landing-foot offset.
+The non-gear hull remains 2 m above the nominal tangent surface; fixed deployed
+feet contact it. `landing_geometry.rs` is generated from the same authored GLB
+as the character collision layout.
 The current 18.33 × 4.00 × 20.00 m hull uses a conservative 16 m collision sphere;
 this same clearance is included when completing automatic takeoff.
 Snapshot velocity reflects direct flight or the analytic derivative of the active

@@ -16,8 +16,11 @@ pub use controller::cockpit::CockpitMessage;
 pub use controller::telemetry::{EnergyCoreState, NearbyBodyTelemetry};
 pub use state::{DoorState, FlightState, ShipPose, ShipSnapshot, SteeringInput};
 
-/// Lowest point of the revised 4 m-tall Task 10 runtime mesh in ship-local Y.
-pub const LOWEST_LOCAL_Y_METERS: f64 = -0.107_526_881_720_430_11;
+mod landing_geometry;
+pub use landing_geometry::{
+    LANDED_HULL_CLEARANCE_METERS, LANDED_ORIGIN_HEIGHT_METERS, LANDING_FOOT_LOCAL_Y_METERS,
+    LOWEST_LOCAL_Y_METERS,
+};
 /// Phase 0 steering rate after the short presentation ramp has settled.
 pub const STEERING_RATE_RADIANS_PER_SECOND: f64 = 5.0_f64.to_radians();
 /// Time for a steering axis to ramp fully on or off. This is not inertia.

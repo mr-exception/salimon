@@ -10,6 +10,7 @@
     {"assert": {"path": "ship.speed_meters_per_second", "equals": 0}},
     {"assert": {"path": "world.bodies.3.name", "equals": "Earth"}},
     {"assert": {"path": "ship.nearby_body.name", "equals": "Earth"}},
+    {"assert": {"path": "ship.nearby_body.surface_distance_meters", "approx": 2.1075267791748047, "tolerance": 0.001}},
     {"assert": {"path": "ship.orientation", "equals": [0, 0, 0, 1]}},
     {"screenshot": "initialized-cabin"},
     {"action": {"op": "thruster", "direction": 1}},

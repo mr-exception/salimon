@@ -80,3 +80,8 @@ See the [source ownership table](architecture.md#internal-ownership).
     retains gameplay policy; never reintroduce manual ship dimensions.
     The source [geometry/policy mapping](../../models/assets/ships/salimon-scout/README.md#geometry-and-gameplay-policy)
     defines the coarse proxy semantics and supported symmetry/level-floor assumptions.
+
+24. Fixed landing feet/legs have generated finite-height collision boxes. Raised
+    hull clearance does not become an invisible solid wall beneath the ship.
+    The aft boarding corridor remains body-clear, closed-door gated and restricted
+    to the existing doorway; ramp geometry/traversal belongs to its follow-up.

@@ -3,8 +3,8 @@
 use super::ShipController;
 use crate::orientation::{normalize_or, quaternion_slerp, surface_aligned_orientation};
 use crate::{
-    COLLISION_RADIUS_METERS, CockpitMessage, DoorState, FlightState, LANDING_ASSIST_DURATION,
-    LANDING_RANGE_RADIUS_FRACTION, LOWEST_LOCAL_Y_METERS, ShipPose, SteeringInput,
+    COLLISION_RADIUS_METERS, CockpitMessage, DoorState, FlightState, LANDED_ORIGIN_HEIGHT_METERS,
+    LANDING_ASSIST_DURATION, LANDING_RANGE_RADIUS_FRACTION, ShipPose, SteeringInput,
     TAKEOFF_ASSIST_DURATION,
 };
 use salimon_math::{add, length as vector_length, scale, sub};
@@ -35,7 +35,7 @@ impl AssistTransition {
         let start_distance = vector_length(offset);
         let surface_normal = normalize_or(offset, pose.axes()[1]);
         let destination_distance = if landing {
-            body.radius_meters - LOWEST_LOCAL_Y_METERS
+            body.radius_meters + LANDED_ORIGIN_HEIGHT_METERS
         } else {
             body.radius_meters * (1.0 + LANDING_RANGE_RADIUS_FRACTION) + COLLISION_RADIUS_METERS
         };
@@ -309,7 +309,7 @@ mod tests {
                     assert!(dot(ship.snapshot().pose.axes()[1], normal) > 1.0 - 1.0e-10);
                     assert_eq!(ship.snapshot().pose.position_meters, start.position_meters);
 
-                    let destination = body.radius_meters - LOWEST_LOCAL_Y_METERS;
+                    let destination = body.radius_meters + LANDED_ORIGIN_HEIGHT_METERS;
                     let mut previous_distance = body.radius_meters + altitude;
                     for _ in 0..599 {
                         ship.advance(Duration::from_millis(10));
@@ -338,6 +338,39 @@ mod tests {
                             < 1.0e-3
                     );
 
+                    let height =
+                        vector_length(sub(landed.pose.position_meters, body.center.meters()))
+                            - body.radius_meters;
+                    assert!(
+                        (height + crate::LOWEST_LOCAL_Y_METERS
+                            - crate::LANDED_HULL_CLEARANCE_METERS)
+                            .abs()
+                            < 1e-3
+                    );
+                    assert!((height + crate::LANDING_FOOT_LOCAL_Y_METERS).abs() < 1e-3);
+                    // Feet at the four authored support positions are tangent to the
+                    // nominal sphere; catalog curvature/anchor quantization is <1 mm.
+                    for x in [-5.6, 4.8] {
+                        for z in [-3.6, 3.6] {
+                            let axes = landed.pose.axes();
+                            let foot = add(
+                                landed.pose.position_meters,
+                                add(
+                                    scale(axes[0], x),
+                                    add(
+                                        scale(axes[1], crate::LANDING_FOOT_LOCAL_Y_METERS),
+                                        scale(axes[2], z),
+                                    ),
+                                ),
+                            );
+                            assert!(
+                                (vector_length(sub(foot, body.center.meters()))
+                                    - body.radius_meters)
+                                    .abs()
+                                    < 1e-3
+                            );
+                        }
+                    }
                     ship.trigger_landing_action();
                     assert_eq!(ship.snapshot().pose, landed.pose);
                     ship.advance(Duration::from_secs(1));

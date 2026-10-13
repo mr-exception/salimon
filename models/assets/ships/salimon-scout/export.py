@@ -21,6 +21,7 @@ from validate_asset import read_document, validate_manifest
 from validate import REGISTRIES, validate_preservation
 from spatial_contracts import (
     build_spatial_contracts,
+    landing_rust_source,
     sidecar_json,
     spatial_rust_source,
 )
@@ -57,7 +58,8 @@ def export(blender=None):
                         str(manifest_path), str(temporary)], cwd=REPO, check=True)
         doc, binary = read_document(temporary)
         preservation = json.loads((ASSET / 'preservation.json').read_text())
-        spatial = build_spatial_contracts(doc, preservation)
+        spatial = build_spatial_contracts(doc, preservation, binary)
+        support = spatial["landingSupport"]
         # Geometry/materials stay entirely Blender-owned. Only legacy nonvisual
         # asset metadata is carried forward; no generator is invoked here.
         doc['extras'] = copy.deepcopy(metadata['extras'])
@@ -83,6 +85,7 @@ def export(blender=None):
         for suffix in ('.bin', '.gltf', '.glb'):
             destination = output.with_suffix(suffix)
             os.replace(staged / destination.name, destination)
+        (REPO / 'client/ship/src/landing_geometry.rs').write_text(landing_rust_source(support))
         (ASSET / 'export-report.json').write_text(json.dumps(report, indent=2) + '\n')
         return report
 

@@ -9,8 +9,8 @@
 5. Flying direct-speed motion continues while cockpit control is inactive.
 6. Authoritative position and orientation math remains CPU-side `f64`.
 7. The crate owns no platform input, GPU resources, or character state.
-8. The default Earth pose places the authored scout mesh's lowest local-Y point on the
-   nominal surface with local `+Y` aligned to the outward normal.
+8. The default Earth pose places the authored feet on the nominal surface with
+   local `+Y` aligned to the outward normal and 2 m non-gear hull clearance.
 9. Sustained pitch, yaw, and roll each use exactly 5 degrees/second after a
    0.12-second start/stop presentation ramp; leaving the cockpit clears input.
 10. Thruster adjustments require cockpit authority, change by explicit integer

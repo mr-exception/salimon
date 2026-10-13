@@ -1124,6 +1124,234 @@
           "facing": "-X"
         }
       }
+    },
+    {
+      "name": "COLLIDER_Landing_Aft_Port_Foot",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -5.599999904632568,
+        -1.9875268936157227,
+        3.5999999046325684
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            1.35,
+            0.24,
+            1.1
+          ],
+          "purpose": "exterior-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Landing_Aft_Port_Leg",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -5.599999904632568,
+        -0.827526867389679,
+        3.5999999046325684
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            0.9,
+            2.56,
+            0.82
+          ],
+          "purpose": "exterior-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Landing_Aft_Starboard_Foot",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -5.599999904632568,
+        -1.9875268936157227,
+        -3.5999999046325684
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            1.35,
+            0.24,
+            1.1
+          ],
+          "purpose": "exterior-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Landing_Aft_Starboard_Leg",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -5.599999904632568,
+        -0.827526867389679,
+        -3.5999999046325684
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            0.9,
+            2.56,
+            0.82
+          ],
+          "purpose": "exterior-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Landing_Forward_Port_Foot",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        4.800000190734863,
+        -1.9875268936157227,
+        3.5999999046325684
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            1.35,
+            0.24,
+            1.1
+          ],
+          "purpose": "exterior-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Landing_Forward_Port_Leg",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        4.800000190734863,
+        -0.827526867389679,
+        3.5999999046325684
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            0.9,
+            2.56,
+            0.82
+          ],
+          "purpose": "exterior-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Landing_Forward_Starboard_Foot",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        4.800000190734863,
+        -1.9875268936157227,
+        -3.5999999046325684
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            1.35,
+            0.24,
+            1.1
+          ],
+          "purpose": "exterior-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Landing_Forward_Starboard_Leg",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        4.800000190734863,
+        -0.827526867389679,
+        -3.5999999046325684
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            0.9,
+            2.56,
+            0.82
+          ],
+          "purpose": "exterior-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "Landing_Gear_Aft_Port",
+      "parent": "Exterior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "fixed-deployed-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "Landing_Gear_Aft_Starboard",
+      "parent": "Exterior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "fixed-deployed-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "Landing_Gear_Forward_Port",
+      "parent": "Exterior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "fixed-deployed-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "Landing_Gear_Forward_Starboard",
+      "parent": "Exterior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "fixed-deployed-landing-gear"
+        }
+      }
     }
   ],
   "materials": [

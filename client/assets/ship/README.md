@@ -211,3 +211,11 @@ Reference performance measurements require an optimized build at fixed
 recorded under the [validation policy](../../../docs/validation.md#native-graphical-gates).
 The dated [Phase 0 evaluation](../../../docs/phase-0-evaluation.md) did not prove
 a strict 60 FPS floor; asset complexity alone establishes no performance result.
+
+## Landing support
+
+The fixed deployed legs and broad feet support the non-gear hull at 2 m clearance.
+See the [authored support contract](../../../models/assets/ships/salimon-scout/README.md#landing-support-168)
+for regeneration, proxy ownership and the aft threshold/ramp reservation.
+The exported ship envelope is 18.33 × 6 × 20 m including the legs; the original
+non-gear envelope stays 18.33 × 4 × 20 m. Two GPU draws and 13 materials remain.

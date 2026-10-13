@@ -655,13 +655,13 @@ mod tests {
     fn checked_in_ship_stays_within_the_lightweight_asset_budget() {
         let geometry = load_geometry().expect("checked-in ship must load");
         let gltf = gltf::Gltf::from_slice(SHIP_GLB).expect("checked-in GLB must parse");
-        assert!(SHIP_GLB.len() <= 512 * 1024);
-        assert!((geometry.opaque_vertex_count + geometry.glass_vertex_count) / 3 <= 6_000);
+        assert!(SHIP_GLB.len() <= 544 * 1024);
+        assert!((geometry.opaque_vertex_count + geometry.glass_vertex_count) / 3 <= 6_500);
         assert!(
             gltf.meshes()
                 .map(|mesh| mesh.primitives().len())
                 .sum::<usize>()
-                <= 120
+                <= 124
         );
         assert!(gltf.materials().len() <= 13);
     }

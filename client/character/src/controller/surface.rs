@@ -14,7 +14,7 @@ impl CharacterController {
 
         let mut previous = ship.world_to_local(world);
         if !doorway_passable
-            && overlaps_exterior_hull(previous)
+            && overlaps_boarding_gate(previous)
             && previous[0] > EXTERIOR_AFT
             && previous[0] < DOORWAY_FORWARD + PLAYER_RADIUS_METERS
             && previous[2].abs() <= DOORWAY_SIDE_LIMIT + world_round_trip_tolerance(world)
@@ -40,10 +40,11 @@ impl CharacterController {
 
         let proposed = ship.world_to_local(world);
         let overlaps_hull = overlaps_exterior_hull(proposed);
+        let overlaps_gate = overlaps_boarding_gate(proposed);
         let mut local = proposed;
         if overlaps_hull {
             local = slide_around_obstacles(previous, local, &EXTERIOR_OBSTACLES);
-            if !doorway_passable {
+            if !doorway_passable && !overlaps_gate {
                 local = slide_around_obstacles(previous, local, &CLOSED_GATE_OBSTACLE);
             }
             if local[0] != proposed[0] || local[2] != proposed[2] {
@@ -54,12 +55,19 @@ impl CharacterController {
                 local = ship.world_to_local(world);
             }
         }
+        if !doorway_passable && overlaps_gate {
+            let before_gate = local;
+            local = slide_around_obstacles(previous, local, &CLOSED_GATE_OBSTACLE);
+            if local[0] != before_gate[0] || local[2] != before_gate[2] {
+                world = surface_eye_at_ship_planar_position(local, ship, surface);
+            }
+        }
         let before_appendages = local;
         local = slide_around_appendages(previous, local, world_round_trip_tolerance(world));
         if local[0] != before_appendages[0] || local[2] != before_appendages[2] {
             world = surface_eye_at_ship_planar_position(local, ship, surface);
         }
-        let through_gate = overlaps_hull
+        let through_gate = overlaps_gate
             && previous[0] < DOORWAY_FORWARD
             && local[0] > EXTERIOR_AFT
             && local[0] <= DOORWAY_FORWARD + COLLISION_EPSILON

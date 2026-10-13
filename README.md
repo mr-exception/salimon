@@ -218,8 +218,8 @@ automated tests:
    all remain solid. Slide around an aft corner and re-enter through the gate;
    confirm the jambs still require full body clearance.
    Confirm the 0.25-second gravity transition is smooth, inspect the custom
-   exterior/material variation, confirm its lowest point rests on Earth without
-   a visible gap or penetration, then re-enter and close the door.
+   exterior/material variation, confirm its feet rest on Earth and its non-gear hull has 2 m clearance
+   without visible foot sinking or floating, then re-enter and close the door.
 3. From cockpit control, approach Mercury, Venus, Earth, Moon, and Mars from
    representative non-polar directions. Confirm `Press L to land` appears only
    inside `1.15R`; press L at high speed/poor orientation, leave the cockpit,

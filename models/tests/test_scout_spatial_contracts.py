@@ -27,11 +27,12 @@ from test_scout_export import scout
 class ScoutSpatialContractsTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        document, _ = read_document(REPO / "client/assets/ship/export/salimon_phase0_ship.glb")
+        document, binary = read_document(REPO / "client/assets/ship/export/salimon_phase0_ship.glb")
         preservation = json.loads((SCOUT / "preservation.json").read_text())
+        cls.binary = binary
         cls.document = document
         cls.preservation = preservation
-        cls.contracts = build_spatial_contracts(document, preservation)
+        cls.contracts = build_spatial_contracts(document, preservation, binary)
 
     def test_missing_or_renamed_spatial_contracts_are_rejected(self):
         for name in ("COLLIDER_CockpitNoseFloor", "COLLIDER_CockpitCenterConsole",
@@ -59,7 +60,7 @@ class ScoutSpatialContractsTests(unittest.TestCase):
                 else:
                     proxy["extras"]["salimon"][field] = value
                 with self.assertRaisesRegex(ValueError, message):
-                    build_spatial_contracts(document, self.preservation)
+                    build_spatial_contracts(document, self.preservation, self.binary)
 
     def test_authored_engine_and_seat_edits_reach_runtime_layouts(self):
         document = copy.deepcopy(self.document)
@@ -68,7 +69,7 @@ class ScoutSpatialContractsTests(unittest.TestCase):
         engine["translation"][0] += 1.0
         seat = next(node for node in document["nodes"] if node["name"] == "MARKER_CockpitSeat")
         seat["translation"][1] += 0.1
-        edited = build_spatial_contracts(document, self.preservation)
+        edited = build_spatial_contracts(document, self.preservation, self.binary)
         self.assertAlmostEqual(edited["anchors"]["enginePort"][0],
                                self.contracts["anchors"]["enginePort"][0] + 1.0,
                                delta=1e-6)
@@ -79,7 +80,7 @@ class ScoutSpatialContractsTests(unittest.TestCase):
         self.assertNotEqual(sidecar_json(edited), sidecar_json(self.contracts))
 
     def test_authored_contract_inventory_and_semantics(self):
-        self.assertEqual(len(self.contracts["colliders"]), 20)
+        self.assertEqual(len(self.contracts["colliders"]), 28)
         self.assertNotIn("cargoRoom", self.contracts)
         self.assertNotIn("cargoCenter", self.contracts["anchors"])
         self.assertFalse(any(name.startswith("COLLIDER_Cargo_")
@@ -104,7 +105,7 @@ class ScoutSpatialContractsTests(unittest.TestCase):
                 document = copy.deepcopy(self.document)
                 next(node for node in document["nodes"] if node["name"] == name)["name"] += "_renamed"
                 with self.assertRaisesRegex(ValueError, name):
-                    build_spatial_contracts(document, self.preservation)
+                    build_spatial_contracts(document, self.preservation, self.binary)
 
     def test_nonfinite_malformed_or_parent_relative_contracts_fail(self):
         for name in ("COLLIDER_CabinTraversalEnvelope", "MARKER_DoorwayTransition"):
@@ -113,18 +114,18 @@ class ScoutSpatialContractsTests(unittest.TestCase):
                     document = copy.deepcopy(self.document)
                     next(n for n in document["nodes"] if n["name"] == name)["translation"] = translation
                     with self.assertRaisesRegex(ValueError, name):
-                        build_spatial_contracts(document, self.preservation)
+                        build_spatial_contracts(document, self.preservation, self.binary)
         for size in ([1, float("inf"), 1], [1, float("nan"), 1], [1, -1, 1], [1, True, 1]):
             document = copy.deepcopy(self.document)
             proxy = next(n for n in document["nodes"] if n["name"] == "COLLIDER_PilotChair")
             proxy["extras"]["salimon"]["sizeMeters"] = size
             with self.assertRaisesRegex(ValueError, "sizeMeters"):
-                build_spatial_contracts(document, self.preservation)
+                build_spatial_contracts(document, self.preservation, self.binary)
         for group in ("Collision_Proxies", "Interaction_Markers", "Salimon_Phase0_Scout"):
             document = copy.deepcopy(self.document)
             next(n for n in document["nodes"] if n["name"] == group)["translation"] = [1, 0, 0]
             with self.assertRaisesRegex(ValueError, "identity translation"):
-                build_spatial_contracts(document, self.preservation)
+                build_spatial_contracts(document, self.preservation, self.binary)
 
     def test_each_authored_layout_box_edit_changes_its_generated_bounds(self):
         # Covers floor/door/Core/console/chair/nose/hull and both envelopes,
@@ -134,7 +135,7 @@ class ScoutSpatialContractsTests(unittest.TestCase):
                 document = copy.deepcopy(self.document)
                 proxy = next(n for n in document["nodes"] if n["name"] == name)
                 proxy["translation"][0] += 0.25
-                edited = build_spatial_contracts(document, self.preservation)
+                edited = build_spatial_contracts(document, self.preservation, self.binary)
                 for key in ("lowerMeters", "upperMeters"):
                     self.assertAlmostEqual(edited["colliders"][name][key][0],
                                            self.contracts["colliders"][name][key][0] + 0.25,
@@ -151,13 +152,13 @@ class ScoutSpatialContractsTests(unittest.TestCase):
             document = copy.deepcopy(self.document)
             next(n for n in document["nodes"] if n["name"] == name)["translation"][axis] += 0.1
             with self.assertRaisesRegex(ValueError, message):
-                build_spatial_contracts(document, self.preservation)
+                build_spatial_contracts(document, self.preservation, self.binary)
 
     def test_doorway_transition_edit_reaches_generated_crossing_plane(self):
         document = copy.deepcopy(self.document)
         marker = next(n for n in document["nodes"] if n["name"] == "MARKER_DoorwayTransition")
         marker["translation"][0] += 0.25
-        edited = build_spatial_contracts(document, self.preservation)
+        edited = build_spatial_contracts(document, self.preservation, self.binary)
         self.assertAlmostEqual(edited["anchors"]["doorwayTransition"][0], -6.79, delta=1e-6)
         self.assertNotEqual(spatial_rust_source(edited), spatial_rust_source(self.contracts))
 

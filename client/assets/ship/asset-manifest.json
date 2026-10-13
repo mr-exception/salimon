@@ -32,10 +32,10 @@
     "designRevision": "Centered cockpit station, cleared floor seams, collidable wings and top-hinged aft hatch."
   },
   "budgets": {
-    "maximumTriangles": 6000,
-    "maximumPrimitives": 120,
+    "maximumTriangles": 6500,
+    "maximumPrimitives": 124,
     "maximumMaterials": 13,
-    "maximumGlbBytes": 524288,
+    "maximumGlbBytes": 557056,
     "runtimeShipDraws": 2
   },
   "cockpitWindows": {

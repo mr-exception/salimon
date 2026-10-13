@@ -1,9 +1,9 @@
 {
-  "$schema": "../asset-manifest.schema.json",
+  "$schema": "../../../asset-manifest.schema.json",
   "schemaVersion": 1,
   "assetId": "ship.salimon-scout",
   "category": "ships",
-  "source": "models/assets/ships/salimon-scout/source.blend",
+  "source": "models/assets/ships/salimon-scout/assembly/salimon-scout.blend",
   "runtime": "client/assets/ship/export/salimon_phase0_ship.glb",
   "coordinates": {
     "units": "meters",
@@ -21,11 +21,11 @@
   },
   "profile": "legacy-scout-v1",
   "budgets": {
-    "maxTriangles": 6000,
-    "maxPrimitives": 120,
+    "maxTriangles": 6500,
+    "maxPrimitives": 124,
     "maxMaterials": 13,
     "maxTextureBytes": 65536,
-    "maxGlbBytes": 524288
+    "maxGlbBytes": 557056
   },
   "collision": {
     "policy": "authored-proxies",
@@ -93,7 +93,15 @@
       "COLLIDER_CabinExteriorEnvelope",
       "COLLIDER_PilotChair",
       "COLLIDER_CockpitPortHull",
-      "COLLIDER_CockpitStarboardHull"
+      "COLLIDER_CockpitStarboardHull",
+      "COLLIDER_Landing_Aft_Port_Foot",
+      "COLLIDER_Landing_Aft_Port_Leg",
+      "COLLIDER_Landing_Aft_Starboard_Foot",
+      "COLLIDER_Landing_Aft_Starboard_Leg",
+      "COLLIDER_Landing_Forward_Port_Foot",
+      "COLLIDER_Landing_Forward_Port_Leg",
+      "COLLIDER_Landing_Forward_Starboard_Foot",
+      "COLLIDER_Landing_Forward_Starboard_Leg"
     ],
     "requiredExtras": [
       {
@@ -243,6 +251,54 @@
       {
         "node": "MARKER_DoorwayTransition",
         "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Landing_Aft_Port_Foot",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Landing_Aft_Port_Leg",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Landing_Aft_Starboard_Foot",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Landing_Aft_Starboard_Leg",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Landing_Forward_Port_Foot",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Landing_Forward_Port_Leg",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Landing_Forward_Starboard_Foot",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Landing_Forward_Starboard_Leg",
+        "path": "salimon"
+      },
+      {
+        "node": "Landing_Gear_Aft_Port",
+        "path": "salimon"
+      },
+      {
+        "node": "Landing_Gear_Aft_Starboard",
+        "path": "salimon"
+      },
+      {
+        "node": "Landing_Gear_Forward_Port",
+        "path": "salimon"
+      },
+      {
+        "node": "Landing_Gear_Forward_Starboard",
+        "path": "salimon"
       }
     ]
   },
@@ -254,18 +310,19 @@
         "legacyManifest": "client/assets/ship/asset-manifest.json",
         "movingDoor": "Exit_Door",
         "monitors": {
-          "Monitor_Center": "flight",
-          "Monitor_Port": "energy",
-          "Monitor_Starboard": "navigation"
+          "Monitor_Center": "speed",
+          "Monitor_Port": "thruster-power",
+          "Monitor_Starboard": "thruster-power"
         },
-        "monitorUvOrigin": "pilot-facing-top-left",
+        "monitorUvOrigin": "top-left",
         "glassMaterial": "Cockpit Glass",
         "maxRuntimeDraws": 2,
         "dimensionsMeters": [
           18.33,
-          4.0,
-          20.0
-        ]
+          6,
+          20
+        ],
+        "spatialContracts": "client/assets/ship/spatial-contracts.json"
       }
     }
   }

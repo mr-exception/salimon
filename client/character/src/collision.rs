@@ -1,6 +1,6 @@
 //! Body-expanded hull, fixture and appendage collision.
 use crate::layout::*;
-use crate::spatial_contracts::{THRUSTER_COLLIDERS, WING_COLLIDERS};
+use crate::spatial_contracts::{LANDING_COLLIDERS, THRUSTER_COLLIDERS, WING_COLLIDERS};
 use crate::{PLAYER_BODY_HEIGHT_METERS, PLAYER_EYE_HEIGHT_METERS};
 pub(crate) fn overlaps_exterior_hull(local: [f64; 3]) -> bool {
     local[1] + (PLAYER_BODY_HEIGHT_METERS - PLAYER_EYE_HEIGHT_METERS) > EXTERIOR_BOTTOM
@@ -24,8 +24,10 @@ pub(crate) fn slide_around_appendages(
     mut proposed: [f64; 3],
     tolerance: f64,
 ) -> [f64; 3] {
-    for [x_min, x_max, y_min, y_max, z_min, z_max] in
-        THRUSTER_COLLIDERS.into_iter().chain(WING_COLLIDERS)
+    for [x_min, x_max, y_min, y_max, z_min, z_max] in THRUSTER_COLLIDERS
+        .into_iter()
+        .chain(WING_COLLIDERS)
+        .chain(LANDING_COLLIDERS)
     {
         // Test the entire body, so a raised foot or a low surface approach
         // cannot cross a thruster merely because the eye is outside its box.
@@ -94,5 +96,37 @@ pub(crate) fn stop_at_obstacle(
         maximum
     } else {
         proposed
+    }
+}
+
+// Reach the raised aft threshold through the existing gravity transition only
+// within the narrow gate. Side hulls retain their finite authored height.
+pub(crate) fn overlaps_boarding_gate(local: [f64; 3]) -> bool {
+    local[1] + (PLAYER_BODY_HEIGHT_METERS - PLAYER_EYE_HEIGHT_METERS) > LANDING_COLLIDERS[0][2]
+        && local[1] - PLAYER_EYE_HEIGHT_METERS < DOORWAY_CEILING_HEIGHT
+}
+
+#[cfg(test)]
+mod landing_tests {
+    use super::*;
+
+    #[test]
+    fn landing_supports_block_surface_bodies_and_leave_under_hull_and_gate_clear() {
+        for [xmin, xmax, ymin, _ymax, zmin, zmax] in LANDING_COLLIDERS.into_iter().step_by(2) {
+            let y = ymin + PLAYER_EYE_HEIGHT_METERS;
+            let z = (zmin + zmax) * 0.5;
+            let before = [xmin - 1.0, y, z];
+            let after = slide_around_appendages(before, [xmax + 1.0, y, z], COLLISION_EPSILON);
+            assert!((after[0] - (xmin - PLAYER_RADIUS_METERS)).abs() < 1e-9);
+            let above = 100.0;
+            let start = [xmin - 1.0, above, z];
+            let end = [xmax + 1.0, above, z];
+            assert_eq!(slide_around_appendages(start, end, COLLISION_EPSILON), end);
+        }
+        let start = [-10.0, -0.35, 0.0];
+        let end = [-7.0, -0.35, 0.0];
+        assert_eq!(slide_around_appendages(start, end, COLLISION_EPSILON), end);
+        assert!(!overlaps_exterior_hull(start));
+        assert!(overlaps_boarding_gate(start));
     }
 }

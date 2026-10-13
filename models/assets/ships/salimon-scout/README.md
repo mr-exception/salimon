@@ -35,7 +35,7 @@ objects and linked shared hierarchy/materials. All use the same ship-local frame
 
 | Component | Ownership |
 | --- | --- |
-| hull | Hull panels, spine, roof details, broad hull and cabin exterior envelope |
+| hull | Hull panels, spine, roof details, broad hull/cabin envelope, fixed landing legs/feet and their proxies |
 | cockpit | Cockpit and cabin glazing, window frame, nose-floor collider and cockpit side-hull proxies |
 | wings | Both wings, armor/accents and their colliders |
 | engines | Both pods, fins, intake/nozzle details and engine colliders |
@@ -112,7 +112,7 @@ profile. Do not rename this ship to the new `ASSET_`/`Visual` conventions.
 | Monitor semantics | Runtime artwork additionally shows Core energy on port and nearby-body navigation on starboard; these UI roles do not replace the legacy extras values |
 | Pilot/Core | `Pilot_Seat_Back`, `Core_Pedestal`, `Energy_Core` retain their interactive/purpose/design extras; energy metadata is still visual-only, not simulation policy |
 | Markers | `MARKER_CockpitSeat`, `MARKER_ExitDoor`, `MARKER_PlayerStart` retain transforms and purpose/facing metadata |
-| Budgets | 6,000 triangles, 120 primitives, 13 materials, 512 KiB GLB; current measured values are in `export-report.json` |
+| Budgets | 6,500 triangles, 124 primitives, 13 materials, 544 KiB GLB; current measured values are in `export-report.json` |
 
 Preserve pilot-facing screen planes/normals, clear monitor rays, the lower
 cockpit/window sightlines and the walking routes on both sides checked by the scout
@@ -194,7 +194,7 @@ The scout adapter emits one `client/character/src/spatial_contracts.rs`, replaci
 `ship_anchors.rs` and `thruster_collision.rs`. Raw bounds use
 `[forward min, forward max, up min, up max, port min, port max]` in runtime meters.
 Anchors and selected traversal boxes plus engine/wing arrays come from the same
-20-box/four-marker inventory as the sidecar and embedded GLB contract. Rustfmt
+28-box/four-marker inventory as the sidecar and embedded GLB contract. Rustfmt
 must be on PATH for offline export/validation of the generated Rust module.
 Normal runtime builds consume checked-in artifacts without Blender or Python.
 
@@ -226,3 +226,26 @@ Player dimensions, seated eye offset, view pitch/sensitivity, gravity, timing,
 door permissions, movement/carrying rules and interaction ranges remain Rust
 policy. Existing fixture sight occlusion still spans floor to ceiling; the raw
 fixture Y bounds do not change that conservative query rule in this migration.
+
+## Landing support (#168)
+
+Four fixed deployed supports belong to `components/hull/source.blend`, centered
+at runtime (X,Z) = (-5.6, ±3.6) and (4.8, ±3.6) m. Each has a reinforced mount,
+telescopic column, copper compression collars and a 1.35 × 1.10 m broad sole.
+The feet lie 2 m below the lowest non-gear mesh. They remain deployed in flight;
+no animations, new materials, runtime nodes per frame or extra draws are added.
+Eight finite boxes cover feet and columns, consumed by movement and sight/placement.
+
+The exporter measures hull/foot minimum Y, rejects a clearance other than 2 m,
+and generates `client/ship/src/landing_geometry.rs`. Both Earth spawn and assisted
+landing use the negative foot Y as their origin altitude. The existing coarse
+hull proxy retains its non-gear bounds; it must not become a solid box spanning
+all the space below the hull. Catalog sphere curvature over the support footprint
+and f64 anchor quantization stay below 1 mm; terrain adaptation is future work.
+
+The aft threshold top is local Y = 0.275 m, therefore 2.382527 m above
+nominal ground at rest (the deck is 2.354839 m above ground). Reserve the centered aft gate
+and its outward approach for #169's bottom-hinged ramp. This task preserves the
+legacy 250 ms doorway gravity transition through that narrow corridor, including
+closed-door gating, until ramp traversal replaces it. Under-hull walking remains
+free away from the solid supports; the legs do not obstruct cabin routes/glazing.

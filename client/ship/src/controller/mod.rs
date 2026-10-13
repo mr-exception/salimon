@@ -1,7 +1,7 @@
 //! Authoritative private ship state and update dispatch.
 
 use crate::{
-    CockpitMessage, DoorState, EnergyCoreState, FlightState, LOWEST_LOCAL_Y_METERS, ShipPose,
+    CockpitMessage, DoorState, EnergyCoreState, FlightState, LANDED_ORIGIN_HEIGHT_METERS, ShipPose,
     ShipSnapshot, SteeringInput,
 };
 use salimon_world::{CELESTIAL_BODIES, CelestialBodyId};
@@ -37,7 +37,7 @@ impl Default for ShipController {
             .find(|body| body.id == CelestialBodyId::Earth)
             .expect("world catalog always contains Earth");
         let mut position_meters = earth.center.meters();
-        position_meters[1] += earth.radius_meters - LOWEST_LOCAL_Y_METERS;
+        position_meters[1] += earth.radius_meters + LANDED_ORIGIN_HEIGHT_METERS;
         Self {
             pose: ShipPose {
                 position_meters,
@@ -130,7 +130,8 @@ mod tests {
             .unwrap();
         assert_eq!(snapshot.pose.orientation, [0.0, 0.0, 0.0, 1.0]);
         assert!(
-            (snapshot.pose.position_meters[1] + LOWEST_LOCAL_Y_METERS
+            (snapshot.pose.position_meters[1]
+                - LANDED_ORIGIN_HEIGHT_METERS
                 - (earth.center.meters()[1] + earth.radius_meters))
                 .abs()
                 < 1.0e-9

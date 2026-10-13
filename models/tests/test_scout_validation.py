@@ -74,11 +74,11 @@ class ScoutValidationTests(unittest.TestCase):
     def test_compact_nose_unified_console_and_retired_cargo_contract(self):
         metadata = self.document['extras']['salimon']
         self.assertEqual(self.manifest['extensions']['ship']['data']['dimensionsMeters'],
-                         [18.33, 4, 20])
-        self.assertEqual(metadata['overallDimensionsMeters'], [18.33, 4, 20])
+                         [18.33, 6, 20])
+        self.assertEqual(metadata['overallDimensionsMeters'], [18.33, 6, 20])
         overall_min, overall_max = overall_position_bounds(self.document, self.binary)
         self.assertAlmostEqual(overall_max[0] - overall_min[0], 18.33, places=3)
-        self.assertAlmostEqual(overall_max[1] - overall_min[1], 4, places=3)
+        self.assertAlmostEqual(overall_max[1] - overall_min[1], 6, places=3)
         self.assertAlmostEqual(overall_max[2] - overall_min[2], 20, places=3)
         self.assertAlmostEqual(node_position_bounds(self.document, self.binary, 'Hull_Nose')[1][0],
                                8.53, places=3)
@@ -98,7 +98,7 @@ class ScoutValidationTests(unittest.TestCase):
                    for name in console['monitorNodes']]
         self.assertGreater(centers[0], centers[1])
         self.assertGreater(centers[1], centers[2])
-        self.assertEqual(len(self.manifest['contracts']['colliders']), 20)
+        self.assertEqual(len(self.manifest['contracts']['colliders']), 28)
         self.assertNotIn('cargoRoom', metadata)
         self.assertNotIn('cargoRoom', self.document['asset']['extras']['salimon'])
         self.assertFalse(any('Cargo' in node['name'] for node in self.document['nodes']))

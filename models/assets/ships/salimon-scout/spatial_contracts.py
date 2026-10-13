@@ -13,6 +13,11 @@ THRUSTER_COLLIDERS = (
     "COLLIDER_Engine_Starboard_Body",
     "COLLIDER_Engine_Starboard_SweptFin",
 )
+LANDING_COLLIDERS = tuple(
+    f"COLLIDER_Landing_{position}_{side}_{part}"
+    for position in ("Aft", "Forward") for side in ("Port", "Starboard")
+    for part in ("Foot", "Leg")
+)
 WING_COLLIDERS = ("COLLIDER_Wing_Port", "COLLIDER_Wing_Starboard")
 MARKERS = ("MARKER_CockpitSeat", "MARKER_ExitDoor", "MARKER_PlayerStart",
            "MARKER_DoorwayTransition")
@@ -28,7 +33,7 @@ LAYOUT_BOXES = {
     "COCKPIT_PORT_HULL_BOUNDS": "COLLIDER_CockpitPortHull",
     "COCKPIT_STARBOARD_HULL_BOUNDS": "COLLIDER_CockpitStarboardHull",
 }
-REQUIRED_COLLIDERS = set(LAYOUT_BOXES.values()) | set(THRUSTER_COLLIDERS) | set(WING_COLLIDERS) | {
+REQUIRED_COLLIDERS = set(LAYOUT_BOXES.values()) | set(THRUSTER_COLLIDERS) | set(WING_COLLIDERS) | set(LANDING_COLLIDERS) | {
     "COLLIDER_InteriorPortWall", "COLLIDER_InteriorStarboardWall",
     "COLLIDER_InteriorCeiling", "COLLIDER_ExteriorHull",
 }
@@ -124,7 +129,7 @@ def _marker(nodes, baseline, name):
     }
 
 
-def build_spatial_contracts(document, preservation=None):
+def build_spatial_contracts(document, preservation=None, binary=None):
     nodes = _nodes(document)
     baseline = _baseline_nodes(preservation)
     collider_names = sorted(name for name in nodes if name.startswith("COLLIDER_"))
@@ -150,7 +155,7 @@ def build_spatial_contracts(document, preservation=None):
         expected_purpose = baseline.get(name, {}).get("extras", {}).get("salimon", {}).get("purpose")
         if expected_purpose is not None and colliders[name]["purpose"] != expected_purpose:
             raise ValueError(f"{name}: spatial purpose changed")
-    return {
+    result = {
         "schemaVersion": 1,
         "assetId": "ship.salimon-scout",
         "source": "Blender-authored GLTF node transforms and salimon extras",
@@ -166,6 +171,36 @@ def build_spatial_contracts(document, preservation=None):
         },
     }
 
+    if binary is not None:
+        result["landingSupport"] = landing_support_contract(document, binary)
+    return result
+
+
+def landing_support_contract(document, binary):
+    from validate_asset import accessor_values
+    hull = []
+    feet = []
+    for node in document['nodes']:
+        if 'mesh' not in node:
+            continue
+        target = feet if node['name'].startswith('Landing_Gear_') else hull
+        for primitive in document['meshes'][node['mesh']]['primitives']:
+            target.extend(p[1] for p in accessor_values(document, binary, primitive['attributes']['POSITION']))
+    if not hull or not feet:
+        raise ValueError('landing support needs authored hull and gear geometry')
+    hull_bottom, foot_bottom = min(hull), min(feet)
+    if abs(hull_bottom - foot_bottom - 2.0) > 1e-6:
+        raise ValueError('authored feet must support the non-gear hull at 2 m clearance')
+    return {'hullLowestLocalYMeters': hull_bottom, 'footContactLocalYMeters': foot_bottom,
+            'hullClearanceMeters': 2.0, 'fixedDeployed': True}
+
+
+def landing_rust_source(contract):
+    return ('// Generated from authored scout geometry; do not edit by hand.\n'
+            + f"pub const LOWEST_LOCAL_Y_METERS: f64 = {contract['hullLowestLocalYMeters']!r};\n"
+            + f"pub const LANDING_FOOT_LOCAL_Y_METERS: f64 = {contract['footContactLocalYMeters']!r};\n"
+            + 'pub const LANDED_HULL_CLEARANCE_METERS: f64 = 2.0;\n'
+            + 'pub const LANDED_ORIGIN_HEIGHT_METERS: f64 = -LANDING_FOOT_LOCAL_Y_METERS;\n')
 
 def _rust_number(value):
     value = float(value)
@@ -208,7 +243,8 @@ def spatial_rust_source(contracts):
         lines.append(f"// {name}")
         lines.append(f"pub(crate) const {rust_name}: [f64; 6] = {_rust_array(_bounds(contracts['colliders'][name]))};")
     for rust_name, names in (("THRUSTER_COLLIDERS", THRUSTER_COLLIDERS),
-                             ("WING_COLLIDERS", WING_COLLIDERS)):
+                             ("WING_COLLIDERS", WING_COLLIDERS),
+                             ("LANDING_COLLIDERS", LANDING_COLLIDERS)):
         lines.append(f"pub(crate) const {rust_name}: [[f64; 6]; {len(names)}] = [")
         for name in names:
             lines.append(f"    // {name}")

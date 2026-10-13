@@ -141,3 +141,11 @@ selection, carrying blocks numeric selection, and release requires an explicit
 new selection. Failed pickup does not stow equipment. See the
 [runtime contract](../runtime/architecture.md#carrying-and-equipment-regression-contract-131)
 and carrying/resource-loop scenarios; no character movement rule changes.
+
+## Raised landing supports (#168)
+
+Generated `LANDING_COLLIDERS` supply finite foot/column boxes to exterior walking,
+visibility and placement queries. Hull contact retains its original finite Y
+extent, permitting walking under the raised fuselage. The centered aft gate
+extends its legacy boarding/closed-door transition reach down to the foot plane;
+this corridor preserves existing routes while #169 adds the physical ramp.

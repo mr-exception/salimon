@@ -1,8 +1,8 @@
 {
   "extras": {
     "salimon": {
-      "drawPrimitiveCount": 109,
-      "triangleCount": 5890,
+      "drawPrimitiveCount": 121,
+      "triangleCount": 6322,
       "materialCount": 13,
       "externalAssetDependencies": 0,
       "scaleFromTask7Baseline": [
@@ -17,15 +17,15 @@
       ],
       "overallDimensionsMeters": [
         18.33,
-        4.0,
-        20.0
+        6,
+        20
       ],
-      "lowestLocalYMeters": -0.10752688172043011,
+      "lowestLocalYMeters": -2.10752688172043,
       "walkableInteriorClearanceMeters": {
         "width": 9.2,
         "height": 2.5591397849462365
       },
-      "designRevision": "centered-console-hinged-aft-hatch-wing-collision",
+      "designRevision": "fixed-landing-supports-2m-hull-clearance",
       "energyCore": {
         "centerMeters": [
           -1.0,

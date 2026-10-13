@@ -1,6 +1,6 @@
 //! Ship-local floor placement and sight queries over traversal proxies.
 use crate::layout::*;
-use crate::spatial_contracts::{THRUSTER_COLLIDERS, WING_COLLIDERS};
+use crate::spatial_contracts::{LANDING_COLLIDERS, THRUSTER_COLLIDERS, WING_COLLIDERS};
 use salimon_math::{dot, scale, sub};
 /// A conservative physical cube placement on the cabin and narrow nose deck.
 /// Uses the traversal proxies; furniture and hull edges stay solid.
@@ -155,6 +155,7 @@ pub fn ship_sight_obstruction(eye: [f64; 3], target: [f64; 3], door_open: bool) 
     }
     boxes.extend(THRUSTER_COLLIDERS);
     boxes.extend(WING_COLLIDERS);
+    boxes.extend(LANDING_COLLIDERS);
     boxes
         .into_iter()
         .filter_map(|b| {

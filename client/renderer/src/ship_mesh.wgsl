@@ -34,11 +34,12 @@ fn vs_main(
     @location(5) interior_flag: f32,
     @location(6) display: vec3<f32>,
 ) -> VertexOutput {
-    let angle = ship.door_pose.x * door_flag;
+    let angle = ship.door_pose.x * min(door_flag, 1.0);
     let cosine = cos(angle);
     let sine = sin(angle);
     let hinge = ship.door_pose.yz;
-    let offset = local_position.xy - hinge;
+    let tip = select(0.0, 1.0, door_flag > 1.5);
+    let offset = local_position.xy + ship.padding.yx * tip - hinge;
     let local = vec3<f32>(
         hinge.x + cosine * offset.x - sine * offset.y,
         hinge.y + sine * offset.x + cosine * offset.y,

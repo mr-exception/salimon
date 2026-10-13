@@ -9,10 +9,12 @@ const SHIP_GLB: &[u8] = include_bytes!("../../assets/ship/export/salimon_phase0_
 const VERTEX_FLOATS: usize = 18;
 const VERTEX_STRIDE: u64 = (VERTEX_FLOATS * size_of::<f32>()) as u64;
 const UNIFORM_SIZE: u64 = 160;
-// The sealed aft leaf rotates outward and upward around its top edge.
-const OPEN_DOOR_ANGLE_RADIANS: f32 = -1.919_862_2;
-const DOOR_HINGE_X_METERS: f32 = -7.68;
-const DOOR_HINGE_Y_METERS: f32 = 2.516_129;
+use crate::ramp_geometry::{
+    RAMP_ANGLE_RADIANS, RAMP_EXTENSION_METERS, RAMP_FACE_OFFSET_METERS, RAMP_HINGE,
+};
+const OPEN_DOOR_ANGLE_RADIANS: f32 = RAMP_ANGLE_RADIANS as f32;
+const DOOR_HINGE_X_METERS: f32 = RAMP_HINGE[0] as f32;
+const DOOR_HINGE_Y_METERS: f32 = RAMP_HINGE[1] as f32;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ShipMeshInstance {
@@ -49,7 +51,11 @@ fn load_geometry() -> Result<ShipGeometry, RendererError> {
 
     for node in gltf.document.nodes() {
         let Some(mesh) = node.mesh() else { continue };
-        let door_flag = f32::from(node.name() == Some("Exit_Door"));
+        let door_flag = match node.name() {
+            Some("Exit_Door") => 1.0,
+            Some("Exit_Ramp_Tip") => 2.0,
+            _ => 0.0,
+        };
         let interior_flag = f32::from(interior_nodes[node.index()]);
         let display_panel = match node.name() {
             Some("Monitor_Center") => 1.0,
@@ -492,7 +498,10 @@ impl ShipMeshRenderer {
         let mut values = Vec::with_capacity(40);
         values.extend_from_slice(&view_projection);
         let fraction = ship.door_open_fraction;
-        let eased_fraction = fraction * fraction * (3.0 - 2.0 * fraction);
+        let hinge_fraction = (fraction / 0.6).clamp(0.0, 1.0);
+        let eased_fraction = hinge_fraction * hinge_fraction * (3.0 - 2.0 * hinge_fraction);
+        let tip_fraction = ((fraction - 0.6) / 0.4).clamp(0.0, 1.0);
+        let extension_fraction = tip_fraction * tip_fraction * (3.0 - 2.0 * tip_fraction);
         values.extend_from_slice(&[
             center[0],
             center[1],
@@ -514,8 +523,8 @@ impl ShipMeshRenderer {
             DOOR_HINGE_X_METERS,
             DOOR_HINGE_Y_METERS,
             0.0,
-            0.0,
-            0.0,
+            RAMP_EXTENSION_METERS as f32 * extension_fraction,
+            RAMP_FACE_OFFSET_METERS as f32 * extension_fraction,
             0.0,
             0.0,
         ]);
@@ -739,12 +748,23 @@ mod tests {
     }
 
     #[test]
-    fn aft_door_hinges_outward_above_the_aperture() {
-        let bottom = [-7.68_f32, 0.24731183_f32];
-        let relative_y = bottom[1] - DOOR_HINGE_Y_METERS;
-        let opened_x = DOOR_HINGE_X_METERS - relative_y * OPEN_DOOR_ANGLE_RADIANS.sin();
-        let opened_y = DOOR_HINGE_Y_METERS + relative_y * OPEN_DOOR_ANGLE_RADIANS.cos();
-        assert!(opened_x < -9.5);
-        assert!(opened_y > 3.0);
+    fn aft_ramp_hinges_down_to_the_landing_foot_plane() {
+        let tip =
+            RAMP_HINGE[1] + crate::ramp_geometry::RAMP_LENGTH_METERS * RAMP_ANGLE_RADIANS.cos();
+        assert!((tip + 2.10752688172043).abs() < 1.0e-6);
+        let geometry = load_geometry().unwrap();
+        let tray_top = geometry
+            .opaque_vertices
+            .as_chunks::<VERTEX_FLOATS>()
+            .0
+            .iter()
+            .filter(|v| v[10] == 2.0)
+            .map(|v| v[1])
+            .reduce(f32::max)
+            .unwrap();
+        let deployed_top = DOOR_HINGE_Y_METERS
+            + (tray_top + RAMP_EXTENSION_METERS as f32 - DOOR_HINGE_Y_METERS)
+                * OPEN_DOOR_ANGLE_RADIANS.cos();
+        assert!((deployed_top + 2.107_526_8).abs() < 1e-5);
     }
 }

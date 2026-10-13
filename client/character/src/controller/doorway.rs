@@ -39,36 +39,32 @@ impl CharacterController {
             };
             return;
         }
+        let previous = ship.world_to_local(world);
         let movement = ship_planar_movement(input, self.yaw_radians);
-        world = add(
-            world,
-            scale(
-                add(
-                    scale(ship.axes[0], movement[0]),
-                    scale(ship.axes[2], movement[1]),
-                ),
-                WALK_SPEED_METERS_PER_SECOND * seconds,
-            ),
-        );
-        // Keep body clearance while oblique movement slides along the jamb.
-        let mut local = ship.world_to_local(world);
-        local[2] = local[2].clamp(-DOORWAY_SIDE_LIMIT, DOORWAY_SIDE_LIMIT);
+        let mut local = previous;
+        // Normalize travel along the sloping support, not its horizontal shadow.
+        let slope = crate::ramp_geometry::RAMP_ANGLE_RADIANS.cos()
+            / crate::ramp_geometry::RAMP_ANGLE_RADIANS.sin();
+        let speed_scale = if previous[0] < crate::ramp_geometry::RAMP_HINGE[0] {
+            (1.0 + movement[0] * movement[0] * slope * slope).sqrt()
+        } else {
+            1.0
+        };
+        local[0] += movement[0] * WALK_SPEED_METERS_PER_SECOND * seconds / speed_scale;
+        local[2] = (local[2] + movement[1] * WALK_SPEED_METERS_PER_SECOND * seconds / speed_scale)
+            .clamp(-crate::ramp::side_limit(), crate::ramp::side_limit());
+        // Contact changes with distance along the deployed mesh. A stopped
+        // walker never completes a timer and drops from the elevated threshold.
+        local[1] = crate::ramp::floor_at(local[0]) + PLAYER_EYE_HEIGHT_METERS;
+        self.vertical_speed = 0.0;
         world = ship.local_to_world(local);
         elapsed = elapsed.saturating_add(delta);
-        // A slow/diagonal entry may finish its gravity blend while still
-        // in the gate. Keep walking through it before selecting the cabin
-        // state; otherwise the next interior tick treats it as a new exit.
-        let reached_destination =
-            leaving_ship || local[0] >= DOORWAY_FORWARD || local[0] < EXTERIOR_AFT;
-        if elapsed >= DOORWAY_GRAVITY_BLEND_DURATION && reached_destination {
-            if local[0] < DOORWAY_FORWARD {
-                self.position = PositionState::Surface {
-                    world: project_eye_to_surface(world, surface),
-                };
-            } else {
-                local[1] = PLAYER_EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT;
-                self.position = PositionState::Inside { local };
-            }
+        if local[0] <= crate::ramp::tip_x() {
+            self.position = PositionState::Surface {
+                world: surface_eye_at_ship_planar_position(local, ship, surface),
+            };
+        } else if local[0] >= DOORWAY_FORWARD {
+            self.position = PositionState::Inside { local };
         } else {
             self.position = PositionState::Doorway {
                 world,
@@ -160,53 +156,6 @@ mod tests {
     }
 
     #[test]
-    fn surface_reentry_uses_same_clear_doorway_and_reaches_cabin_floor() {
-        for side in [-1.30_f64, -1.15, 1.15, 1.30] {
-            let mut controller = CharacterController {
-                position: PositionState::Surface {
-                    world: project_eye_to_surface(
-                        frame().local_to_world([-8.0, PLAYER_START[1], side]),
-                        surface(),
-                    ),
-                },
-                ..CharacterController::default()
-            };
-            let input = MovementInput {
-                forward: true,
-                ..MovementInput::default()
-            };
-            controller.advance(
-                Duration::from_millis(100),
-                input,
-                frame(),
-                surface(),
-                true,
-                true,
-            );
-            if side.abs() > DOORWAY_SIDE_LIMIT {
-                assert_eq!(controller.location(), CharacterLocation::Surface);
-            } else {
-                assert_eq!(controller.location(), CharacterLocation::DoorwayBlend);
-                for _ in 0..16 {
-                    controller.advance(
-                        Duration::from_millis(16),
-                        input,
-                        frame(),
-                        surface(),
-                        true,
-                        true,
-                    );
-                }
-                assert_eq!(controller.location(), CharacterLocation::InsideShip);
-                let local = controller.local_ship_position().unwrap();
-                assert!(local[0] > DOORWAY_FORWARD);
-                assert!(local[2].abs() < DOORWAY_SIDE_LIMIT);
-                assert_eq!(local[1], PLAYER_START[1]);
-            }
-        }
-    }
-
-    #[test]
     fn closed_or_unlanded_gate_blocks_surface_entry() {
         for (door_open, landed) in [(false, true), (true, false)] {
             let mut controller = CharacterController {
@@ -235,60 +184,6 @@ mod tests {
             let local =
                 frame().world_to_local(controller.snapshot(frame(), surface()).eye_position_meters);
             assert!((local[0] + 8.16).abs() < 1.0e-9);
-        }
-    }
-
-    #[test]
-    fn closing_after_a_short_exit_clears_the_gate_before_surface_movement() {
-        let mut controller = inside_at(-7.0, 0.0);
-        controller.advance(
-            Duration::from_millis(50),
-            MovementInput {
-                backward: true,
-                ..MovementInput::default()
-            },
-            frame(),
-            surface(),
-            true,
-            true,
-        );
-        controller.advance(
-            DOORWAY_GRAVITY_BLEND_DURATION,
-            MovementInput::default(),
-            frame(),
-            surface(),
-            true,
-            true,
-        );
-        assert_eq!(controller.location(), CharacterLocation::Surface);
-        let outside = controller.snapshot(frame(), surface());
-        assert!(frame().world_to_local(outside.eye_position_meters)[0] > EXTERIOR_AFT);
-
-        for step in 0..30 {
-            controller.advance(
-                Duration::from_millis(16),
-                MovementInput {
-                    forward: true,
-                    jump: step % 2 == 0,
-                    ..MovementInput::default()
-                },
-                frame(),
-                surface(),
-                false,
-                true,
-            );
-            let snapshot = controller.snapshot(frame(), surface());
-            let local = frame().world_to_local(snapshot.eye_position_meters);
-            assert_eq!(snapshot.location, CharacterLocation::Surface);
-            assert_eq!(snapshot.doorway_blend_fraction, None);
-            assert!(local[0] <= EXTERIOR_AFT + COLLISION_EPSILON, "{local:?}");
-            let radial = sub(snapshot.eye_position_meters, surface().body_center_meters);
-            assert!(
-                (dot(radial, radial).sqrt() - surface().radius_meters - PLAYER_EYE_HEIGHT_METERS)
-                    .abs()
-                    < 1.0e-9
-            );
-            assert_eq!(snapshot.up, normalize(radial).map(|axis| axis as f32));
         }
     }
 
@@ -325,93 +220,6 @@ mod tests {
                 );
                 controller.enter_cockpit();
                 assert_eq!(controller.location(), CharacterLocation::Surface);
-            }
-        }
-    }
-
-    #[test]
-    fn closed_gate_remains_solid_in_a_rotated_frame_at_catalog_coordinates() {
-        let (ship, surface) = rotated_catalog_frames();
-        let mut controller = CharacterController::default();
-        for (steps, milliseconds, input) in [
-            (
-                18,
-                100,
-                MovementInput {
-                    backward: true,
-                    ..MovementInput::default()
-                },
-            ),
-            (
-                6,
-                100,
-                MovementInput {
-                    right: true,
-                    ..MovementInput::default()
-                },
-            ),
-            (
-                2,
-                100,
-                MovementInput {
-                    backward: true,
-                    ..MovementInput::default()
-                },
-            ),
-            (
-                10,
-                16,
-                MovementInput {
-                    backward: true,
-                    ..MovementInput::default()
-                },
-            ),
-            (20, 16, MovementInput::default()),
-        ] {
-            for _ in 0..steps {
-                controller.advance(
-                    Duration::from_millis(milliseconds),
-                    input,
-                    ship,
-                    surface,
-                    true,
-                    true,
-                );
-            }
-        }
-        assert_eq!(controller.location(), CharacterLocation::Surface);
-        let outside = controller.clone();
-        for side in [-DOORWAY_SIDE_LIMIT, 0.08, DOORWAY_SIDE_LIMIT] {
-            let mut controller = outside.clone();
-            let mut local =
-                ship.world_to_local(controller.snapshot(ship, surface).eye_position_meters);
-            local[2] = side;
-            controller.position = PositionState::Surface {
-                world: surface_eye_at_ship_planar_position(local, ship, surface),
-            };
-            for step in 0..100 {
-                controller.advance(
-                    Duration::from_millis(16),
-                    MovementInput {
-                        forward: step > 0,
-                        jump: step % 2 == 0,
-                        ..MovementInput::default()
-                    },
-                    ship,
-                    surface,
-                    false,
-                    true,
-                );
-                let snapshot = controller.snapshot(ship, surface);
-                let local = ship.world_to_local(snapshot.eye_position_meters);
-                assert_eq!(snapshot.location, CharacterLocation::Surface);
-                assert_eq!(snapshot.doorway_blend_fraction, None);
-                // At 1e12 m, a world-coordinate ULP is about 0.12 mm. The gate
-                // must remain stable within that precision, never admit a walk step.
-                assert!(
-                    (local[0] - EXTERIOR_AFT).abs() < 0.001,
-                    "step {step}: {local:?}"
-                );
             }
         }
     }
@@ -490,149 +298,6 @@ mod tests {
     }
 
     #[test]
-    fn repeated_door_cycles_restore_entry_and_exit_at_center_and_edges() {
-        for side in [-1.15, 0.0, 1.15] {
-            let mut controller = inside_at(-7.0, side);
-            for _ in 0..3 {
-                for _ in 0..6 {
-                    controller.advance(
-                        Duration::from_millis(100),
-                        MovementInput {
-                            backward: true,
-                            ..MovementInput::default()
-                        },
-                        frame(),
-                        surface(),
-                        true,
-                        true,
-                    );
-                }
-                assert_eq!(controller.location(), CharacterLocation::Surface);
-
-                for step in 0..40 {
-                    controller.advance(
-                        Duration::from_millis(16),
-                        MovementInput {
-                            forward: true,
-                            jump: step % 2 == 0,
-                            ..MovementInput::default()
-                        },
-                        frame(),
-                        surface(),
-                        false,
-                        true,
-                    );
-                    let snapshot = controller.snapshot(frame(), surface());
-                    assert_eq!(snapshot.location, CharacterLocation::Surface);
-                    assert_eq!(snapshot.doorway_blend_fraction, None);
-                    assert!(
-                        frame().world_to_local(snapshot.eye_position_meters)[0]
-                            <= EXTERIOR_AFT + COLLISION_EPSILON
-                    );
-                }
-                let mut entered_blend = false;
-                for _ in 0..40 {
-                    controller.advance(
-                        Duration::from_millis(16),
-                        MovementInput {
-                            forward: true,
-                            ..MovementInput::default()
-                        },
-                        frame(),
-                        surface(),
-                        true,
-                        true,
-                    );
-                    let snapshot = controller.snapshot(frame(), surface());
-                    if !entered_blend && snapshot.location == CharacterLocation::DoorwayBlend {
-                        assert_eq!(snapshot.doorway_blend_fraction, Some(0.0));
-                        entered_blend = true;
-                    }
-                    if snapshot.location == CharacterLocation::InsideShip {
-                        break;
-                    }
-                }
-                assert!(entered_blend);
-                assert_eq!(controller.location(), CharacterLocation::InsideShip);
-                for _ in 0..10 {
-                    controller.advance(
-                        Duration::from_millis(16),
-                        MovementInput {
-                            backward: true,
-                            ..MovementInput::default()
-                        },
-                        frame(),
-                        surface(),
-                        false,
-                        true,
-                    );
-                    assert_eq!(controller.location(), CharacterLocation::InsideShip);
-                }
-            }
-        }
-    }
-
-    #[test]
-    fn surface_walkers_can_round_the_hull_and_enter_only_at_the_open_gate() {
-        for side in [-1.0, 1.0] {
-            let ship = frame();
-            let surface = SurfaceFrame {
-                body_center_meters: sub(ship.origin_meters, [0.0, 6_000_000.0, 0.0]),
-                radius_meters: 6_000_000.0,
-            };
-            let mut controller = CharacterController {
-                position: PositionState::Surface {
-                    world: project_eye_to_surface(
-                        ship.local_to_world([0.0, PLAYER_START[1], side * 6.0]),
-                        surface,
-                    ),
-                },
-                yaw_radians: -side * 3.0 * std::f64::consts::FRAC_PI_4,
-                ..CharacterController::default()
-            };
-            let input = MovementInput {
-                forward: true,
-                ..MovementInput::default()
-            };
-            // Push diagonally against the side, slide aft, and round the corner.
-            for _ in 0..40 {
-                controller.advance(Duration::from_millis(100), input, ship, surface, true, true);
-                assert_eq!(controller.location(), CharacterLocation::Surface);
-                let local =
-                    ship.world_to_local(controller.snapshot(ship, surface).eye_position_meters);
-                assert!(local[0] <= -8.16 + 1.0e-7 || local[2].abs() >= 5.34 - 1.0e-7);
-            }
-            controller.yaw_radians = -side * FRAC_PI_2;
-            for _ in 0..100 {
-                let local =
-                    ship.world_to_local(controller.snapshot(ship, surface).eye_position_meters);
-                if local[2].abs() < 0.05 {
-                    break;
-                }
-                controller.advance(Duration::from_millis(16), input, ship, surface, true, true);
-                assert_eq!(controller.location(), CharacterLocation::Surface);
-            }
-            controller.yaw_radians = 0.0;
-            let mut entered = false;
-            for _ in 0..100 {
-                controller.advance(Duration::from_millis(16), input, ship, surface, true, true);
-                let local =
-                    ship.world_to_local(controller.snapshot(ship, surface).eye_position_meters);
-                if controller.location() == CharacterLocation::InsideShip {
-                    entered = true;
-                    assert!(local[0] >= DOORWAY_FORWARD);
-                } else {
-                    assert!(
-                        !entered,
-                        "held entry movement must not start another exit blend"
-                    );
-                }
-            }
-            assert!(entered);
-        }
-    }
-
-    #[test]
     fn open_gate_cannot_capture_surface_walkers_below_the_ship() {
         let ship = ShipFrame {
             origin_meters: add(frame().origin_meters, [0.0, 50.0, 0.0]),
@@ -663,72 +328,6 @@ mod tests {
         }
         let local = ship.world_to_local(controller.snapshot(ship, surface()).eye_position_meters);
         assert!(local[0] > 10.0);
-    }
-
-    #[test]
-    fn doorway_exit_follows_held_wasd_across_ship_orientations() {
-        let inputs = [
-            (
-                std::f64::consts::PI,
-                MovementInput {
-                    forward: true,
-                    ..MovementInput::default()
-                },
-            ),
-            (
-                0.0,
-                MovementInput {
-                    backward: true,
-                    ..MovementInput::default()
-                },
-            ),
-            (
-                FRAC_PI_2,
-                MovementInput {
-                    right: true,
-                    ..MovementInput::default()
-                },
-            ),
-            (
-                -FRAC_PI_2,
-                MovementInput {
-                    left: true,
-                    ..MovementInput::default()
-                },
-            ),
-        ];
-        for axes in [
-            frame().axes,
-            [[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]],
-        ] {
-            let ship = ShipFrame { axes, ..frame() };
-            let surface = SurfaceFrame {
-                body_center_meters: sub(ship.origin_meters, scale(ship.axes[1], 6_000_000.0)),
-                radius_meters: 6_000_000.0,
-            };
-            for (yaw_radians, input) in inputs {
-                let mut controller = CharacterController {
-                    yaw_radians,
-                    ..inside_at(-7.0, 0.0)
-                };
-                let mut previous_forward = -7.0;
-                let mut crossed_doorway = false;
-                for _ in 0..60 {
-                    controller.advance(Duration::from_millis(16), input, ship, surface, true, true);
-                    let local =
-                        ship.world_to_local(controller.snapshot(ship, surface).eye_position_meters);
-                    assert!(
-                        local[0] < previous_forward,
-                        "held exit input must keep moving aft, including during the blend"
-                    );
-                    previous_forward = local[0];
-                    crossed_doorway |= controller.location() == CharacterLocation::DoorwayBlend;
-                }
-                assert!(crossed_doorway);
-                assert_eq!(controller.location(), CharacterLocation::Surface);
-                assert!(previous_forward < -10.0);
-            }
-        }
     }
 
     #[test]
@@ -769,153 +368,6 @@ mod tests {
     }
 
     #[test]
-    fn oblique_doorway_crossings_slide_along_both_jambs() {
-        let ship = ShipFrame {
-            axes: [[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]],
-            ..frame()
-        };
-        let surface = SurfaceFrame {
-            body_center_meters: sub(ship.origin_meters, scale(ship.axes[1], 6_000_000.0)),
-            radius_meters: 6_000_000.0,
-        };
-        let input = MovementInput {
-            forward: true,
-            ..MovementInput::default()
-        };
-        for side in [-1.0, 1.0] {
-            for leaving_ship in [false, true] {
-                let position = if leaving_ship {
-                    PositionState::Inside {
-                        local: [-7.0, PLAYER_START[1], side * 1.10],
-                    }
-                } else {
-                    PositionState::Surface {
-                        world: project_eye_to_surface(
-                            ship.local_to_world([-7.5, PLAYER_START[1], side * 1.10]),
-                            surface,
-                        ),
-                    }
-                };
-                let mut controller = CharacterController {
-                    position,
-                    yaw_radians: side * FRAC_PI_2 * if leaving_ship { 1.5 } else { 0.5 },
-                    ..CharacterController::default()
-                };
-                controller.advance(Duration::from_millis(16), input, ship, surface, true, true);
-                assert_eq!(controller.location(), CharacterLocation::DoorwayBlend);
-
-                let mut touched_jamb = false;
-                for _ in 0..16 {
-                    controller.advance(Duration::from_millis(16), input, ship, surface, true, true);
-                    let local =
-                        ship.world_to_local(controller.snapshot(ship, surface).eye_position_meters);
-                    assert!(
-                        local[2].abs() <= DOORWAY_SIDE_LIMIT + 1.0e-9,
-                        "the complete player body must remain clear of the jamb during a blend"
-                    );
-                    touched_jamb |= (local[2].abs() - DOORWAY_SIDE_LIMIT).abs() < 1.0e-9;
-                }
-                assert!(touched_jamb, "oblique movement must slide along the jamb");
-                if leaving_ship {
-                    assert_eq!(controller.location(), CharacterLocation::Surface);
-                } else {
-                    assert_eq!(controller.location(), CharacterLocation::InsideShip);
-                    let local = controller.local_ship_position().unwrap();
-                    assert!(local[0] > DOORWAY_FORWARD);
-                    assert_eq!(local[1], PLAYER_START[1]);
-                }
-            }
-        }
-    }
-
-    #[test]
-    fn surface_reentry_depends_on_ship_relative_direction_instead_of_key() {
-        let cases = [
-            (
-                0.0,
-                MovementInput {
-                    forward: true,
-                    ..MovementInput::default()
-                },
-            ),
-            (
-                std::f64::consts::PI,
-                MovementInput {
-                    backward: true,
-                    ..MovementInput::default()
-                },
-            ),
-            (
-                -FRAC_PI_2,
-                MovementInput {
-                    right: true,
-                    ..MovementInput::default()
-                },
-            ),
-            (
-                FRAC_PI_2,
-                MovementInput {
-                    left: true,
-                    ..MovementInput::default()
-                },
-            ),
-        ];
-        for (inward_yaw, input) in cases {
-            for entering in [false, true] {
-                let mut controller = CharacterController {
-                    position: PositionState::Surface {
-                        world: project_eye_to_surface(
-                            frame().local_to_world([-7.5, PLAYER_START[1], 0.0]),
-                            surface(),
-                        ),
-                    },
-                    yaw_radians: inward_yaw + if entering { 0.0 } else { std::f64::consts::PI },
-                    ..CharacterController::default()
-                };
-                controller.advance(
-                    Duration::from_millis(16),
-                    input,
-                    frame(),
-                    surface(),
-                    true,
-                    true,
-                );
-                assert_eq!(
-                    controller.location(),
-                    if entering {
-                        CharacterLocation::DoorwayBlend
-                    } else {
-                        CharacterLocation::Surface
-                    }
-                );
-                for _ in 0..16 {
-                    controller.advance(
-                        Duration::from_millis(16),
-                        input,
-                        frame(),
-                        surface(),
-                        true,
-                        true,
-                    );
-                }
-                assert_eq!(
-                    controller.location(),
-                    if entering {
-                        CharacterLocation::InsideShip
-                    } else {
-                        CharacterLocation::Surface
-                    }
-                );
-                if entering {
-                    let local = controller.local_ship_position().unwrap();
-                    assert!(local[0] > DOORWAY_FORWARD);
-                    assert_eq!(local[1], PLAYER_START[1]);
-                }
-            }
-        }
-    }
-
-    #[test]
     fn surface_parallel_or_idle_movement_does_not_trigger_reentry() {
         for input in [
             MovementInput::default(),
@@ -946,44 +398,254 @@ mod tests {
         }
     }
 
+    fn raised_frames(rotated: bool) -> (ShipFrame, SurfaceFrame) {
+        let ship = if rotated {
+            rotated_catalog_frames().0
+        } else {
+            frame()
+        };
+        let body = SurfaceFrame {
+            body_center_meters: sub(
+                ship.origin_meters,
+                scale(ship.axes[1], 6_000_000.0 + 2.10752688172043),
+            ),
+            radius_meters: 6_000_000.0,
+        };
+        (ship, body)
+    }
+
     #[test]
-    fn landed_open_door_starts_exact_quarter_second_gravity_blend() {
-        let mut controller = CharacterController {
-            position: PositionState::Inside {
-                local: [-7.0, PLAYER_START[1], 0.0],
+    fn ramp_support_is_continuous_both_directions_at_all_edges_and_rotated_anchor() {
+        for rotated in [false, true] {
+            let (ship, body) = raised_frames(rotated);
+            for z in [-1.15, 0.0, 1.15] {
+                for (yaw, input) in [
+                    (
+                        0.0,
+                        MovementInput {
+                            backward: true,
+                            ..MovementInput::default()
+                        },
+                    ),
+                    (
+                        std::f64::consts::PI,
+                        MovementInput {
+                            forward: true,
+                            ..MovementInput::default()
+                        },
+                    ),
+                    (
+                        FRAC_PI_2,
+                        MovementInput {
+                            right: true,
+                            ..MovementInput::default()
+                        },
+                    ),
+                    (
+                        -FRAC_PI_2,
+                        MovementInput {
+                            left: true,
+                            ..MovementInput::default()
+                        },
+                    ),
+                ] {
+                    let mut player = inside_at(-7.0, z);
+                    player.yaw_radians = yaw;
+                    let mut previous = player.snapshot(ship, body).eye_position_meters;
+                    let mut saw_ramp = false;
+                    for _ in 0..100 {
+                        player.advance(Duration::from_millis(16), input, ship, body, true, true);
+                        let snap = player.snapshot(ship, body);
+                        let distance =
+                            salimon_math::length(sub(snap.eye_position_meters, previous));
+                        assert!(distance < 0.072, "no doorway drop: {distance}");
+                        previous = snap.eye_position_meters;
+                        if snap.location == CharacterLocation::DoorwayBlend {
+                            saw_ramp = true;
+                            let local = ship.world_to_local(previous);
+                            assert!(
+                                (local[1]
+                                    - PLAYER_EYE_HEIGHT_METERS
+                                    - crate::ramp::floor_at(local[0]))
+                                .abs()
+                                    < 0.001
+                            );
+                            assert!(local[2].abs() < 1.161);
+                        }
+                    }
+                    assert!(saw_ramp);
+                    assert_eq!(player.location(), CharacterLocation::Surface);
+                    // Reverse the same camera-relative direction and return.
+                    player.yaw_radians = (yaw + std::f64::consts::PI).rem_euclid(TAU);
+                    for _ in 0..105 {
+                        player.advance(Duration::from_millis(16), input, ship, body, true, true);
+                        let snap = player.snapshot(ship, body);
+                        assert!(
+                            salimon_math::length(sub(snap.eye_position_meters, previous)) < 0.072
+                        );
+                        previous = snap.eye_position_meters;
+                    }
+                    assert_eq!(player.location(), CharacterLocation::InsideShip);
+                    assert!(
+                        (player.local_ship_position().unwrap()[1] - PLAYER_START[1]).abs() < 1e-9
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn idle_ramp_contact_never_completes_a_timer_or_falls_to_ground() {
+        let (ship, body) = raised_frames(false);
+        let x = (crate::ramp::tip_x() + crate::ramp_geometry::RAMP_HINGE[0]) / 2.0;
+        let world =
+            ship.local_to_world([x, crate::ramp::floor_at(x) + PLAYER_EYE_HEIGHT_METERS, 0.0]);
+        let mut player = CharacterController {
+            position: PositionState::Doorway {
+                world,
+                elapsed: Duration::ZERO,
+                leaving_ship: true,
             },
             ..CharacterController::default()
         };
-        let leave = MovementInput {
-            backward: true,
-            ..MovementInput::default()
+        for _ in 0..100 {
+            player.advance(
+                Duration::from_millis(100),
+                MovementInput::default(),
+                ship,
+                body,
+                true,
+                true,
+            );
+        }
+        assert_eq!(player.location(), CharacterLocation::DoorwayBlend);
+        assert_eq!(player.snapshot(ship, body).eye_position_meters, world);
+        assert!(crate::boarding_ramp_occupied(ship.world_to_local(world)));
+    }
+
+    #[test]
+    fn ramp_side_edges_slide_and_surface_side_approach_cannot_teleport_to_deck() {
+        let (ship, body) = raised_frames(false);
+        let x = -9.5;
+        let world =
+            ship.local_to_world([x, crate::ramp::floor_at(x) + PLAYER_EYE_HEIGHT_METERS, 0.0]);
+        let mut player = CharacterController {
+            position: PositionState::Doorway {
+                world,
+                elapsed: Duration::ZERO,
+                leaving_ship: true,
+            },
+            ..CharacterController::default()
         };
-        controller.advance(
-            Duration::from_millis(50),
-            leave,
-            frame(),
-            surface(),
-            true,
-            true,
+        for _ in 0..50 {
+            player.advance(
+                Duration::from_millis(16),
+                MovementInput {
+                    right: true,
+                    ..MovementInput::default()
+                },
+                ship,
+                body,
+                true,
+                true,
+            );
+        }
+        let local = ship.world_to_local(player.snapshot(ship, body).eye_position_meters);
+        assert!((local[2] - crate::ramp::side_limit()).abs() < 1e-9);
+        assert_eq!(local[0], x);
+        let mut ground = CharacterController {
+            position: PositionState::Surface {
+                world: surface_eye_at_ship_planar_position([x, 0.0, 3.0], ship, body),
+            },
+            ..CharacterController::default()
+        };
+        for _ in 0..100 {
+            ground.advance(
+                Duration::from_millis(16),
+                MovementInput {
+                    left: true,
+                    ..MovementInput::default()
+                },
+                ship,
+                body,
+                true,
+                true,
+            );
+        }
+        assert_eq!(ground.location(), CharacterLocation::Surface);
+        assert!(
+            ship.world_to_local(ground.snapshot(ship, body).eye_position_meters)[2] >= 1.64 - 1e-6
         );
-        assert_eq!(controller.location(), CharacterLocation::DoorwayBlend);
-        controller.advance(
-            Duration::from_millis(249),
-            leave,
-            frame(),
-            surface(),
-            true,
-            true,
+    }
+
+    #[test]
+    fn closed_gate_is_solid_after_continuous_ramp_exit_at_distant_rotated_anchor() {
+        let (ship, body) = raised_frames(true);
+        let mut player = inside_at(-7.0, 0.0);
+        for _ in 0..100 {
+            player.advance(
+                Duration::from_millis(16),
+                MovementInput {
+                    backward: true,
+                    ..MovementInput::default()
+                },
+                ship,
+                body,
+                true,
+                true,
+            );
+        }
+        assert_eq!(player.location(), CharacterLocation::Surface);
+        for _ in 0..200 {
+            player.advance(
+                Duration::from_millis(16),
+                MovementInput {
+                    forward: true,
+                    jump: true,
+                    ..MovementInput::default()
+                },
+                ship,
+                body,
+                false,
+                true,
+            );
+        }
+        assert_eq!(player.location(), CharacterLocation::Surface);
+        let local = ship.world_to_local(player.snapshot(ship, body).eye_position_meters);
+        assert!((local[0] - EXTERIOR_AFT).abs() < 0.001);
+    }
+
+    #[test]
+    fn animated_ramp_envelope_blocks_surface_entry_before_contact_is_ready() {
+        let (ship, body) = raised_frames(false);
+        let mut player = CharacterController {
+            position: PositionState::Surface {
+                world: surface_eye_at_ship_planar_position(
+                    [crate::ramp::tip_x() - 1.0, 0.0, 0.0],
+                    ship,
+                    body,
+                ),
+            },
+            ..CharacterController::default()
+        };
+        player.set_ramp_moving(true);
+        for _ in 0..100 {
+            player.advance(
+                Duration::from_millis(16),
+                MovementInput {
+                    forward: true,
+                    ..MovementInput::default()
+                },
+                ship,
+                body,
+                false,
+                true,
+            );
+        }
+        assert_eq!(player.location(), CharacterLocation::Surface);
+        assert!(
+            ship.world_to_local(player.snapshot(ship, body).eye_position_meters)[0]
+                <= crate::ramp::tip_x() + 1e-6
         );
-        assert_eq!(controller.location(), CharacterLocation::DoorwayBlend);
-        controller.advance(
-            Duration::from_millis(1),
-            leave,
-            frame(),
-            surface(),
-            true,
-            true,
-        );
-        assert_eq!(controller.location(), CharacterLocation::Surface);
     }
 }

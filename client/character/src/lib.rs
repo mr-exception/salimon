@@ -3,13 +3,16 @@
 //! This crate consumes typed input and reference-frame descriptions. It has no
 //! dependency on native window events, rendering, or ship simulation state.
 
-use std::time::Duration;
 mod collision;
 mod controller;
 mod input;
 mod layout;
 mod math;
 mod queries;
+mod ramp;
+#[allow(dead_code)] // Shared generated geometry; character consumes support dimensions.
+mod ramp_geometry;
+pub use ramp::{boarding_ramp_occupied, boarding_ramp_tip_meters};
 mod spatial_contracts;
 mod state;
 
@@ -28,7 +31,6 @@ pub const EXIT_DOOR_MARKER_DEPTH_METERS: f64 =
     EXIT_DOOR_MARKER_METERS[0] - spatial_contracts::AFT_DOOR_BOUNDS[0];
 
 pub const FIXED_GRAVITY_METERS_PER_SECOND_SQUARED: f64 = 9.81;
-pub const DOORWAY_GRAVITY_BLEND_DURATION: Duration = Duration::from_millis(250);
 pub const PLAYER_BODY_HEIGHT_METERS: f64 = 1.80;
 pub const PLAYER_EYE_HEIGHT_METERS: f64 = 1.75;
 pub const SHIP_FLOOR_HEIGHT_METERS: f64 = spatial_contracts::INTERIOR_FLOOR_BOUNDS[3];

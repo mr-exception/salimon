@@ -1,13 +1,13 @@
 {
   "assetId": "ship.salimon-scout",
   "sourceSha256": "6231b3c46aa40340f2191ac9524ceb0efa0c25ad2851134bbe099acf48500904",
-  "runtimeSha256": "74aa8e9f4a8b71ac391b9b839166e1171aaa3842156b240a1ffa7c2d3705500d",
+  "runtimeSha256": "c7aa9607008dd4cc5801786ce9ec83dee0a3860f3ebff9ef8e5fd8c86f23cb69",
   "metrics": {
-    "maxTriangles": 6322,
-    "maxPrimitives": 121,
+    "maxTriangles": 6224,
+    "maxPrimitives": 118,
     "maxMaterials": 13,
     "maxTextureBytes": 116,
-    "maxGlbBytes": 526104
+    "maxGlbBytes": 523876
   },
   "authoringSha256": {
     "assembly/salimon-scout.blend": "6231b3c46aa40340f2191ac9524ceb0efa0c25ad2851134bbe099acf48500904",
@@ -17,7 +17,7 @@
     "components/cockpit-console/source.blend": "2e118b77e535d38dea12bd61f919722b8828af1b14efded145a48ffd985f8bd6",
     "components/energy-core/source.blend": "9460860e8f663f7ccc319d2dfbae927f8b934cff33f28b50cfaa37737f360adf",
     "components/engines/source.blend": "85918965936b2344f272d05b8f26aae213044709f98869356693275f47ba59e3",
-    "components/exit-door/source.blend": "c6cb0f33045796707d6563251cef92a3905ffea45d8075ea5b79c78e95ae6c8a",
+    "components/exit-door/source.blend": "c9973de9aed293a3436bd0b31b287981324b14d6dc64221f283f9534f5337061",
     "components/hull/source.blend": "f20a41f35f00a3722dad600c845698822d8da8f81f7ac7f60f1fe79b2fcb546c",
     "components/pilot-seat/source.blend": "f79b97d7bb0ebf032f2b567cf3794c87e7c9f831c236994fea9eb06a69407424",
     "components/wings/source.blend": "e67c095eefe22aafaefe81698db50984fb4e615df7301ef9c290be82e1741ac6"

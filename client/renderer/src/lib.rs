@@ -9,6 +9,8 @@ mod gpu_timing;
 mod held_item;
 mod item_image;
 mod overlay;
+#[allow(dead_code)] // Shared generated geometry; renderer consumes only animation dimensions.
+mod ramp_geometry;
 mod resource_mesh;
 mod ship_mesh;
 mod spheres;

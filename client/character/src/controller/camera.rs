@@ -33,15 +33,13 @@ impl CharacterController {
                 elapsed,
                 leaving_ship,
             } => {
-                let fraction = (elapsed.as_secs_f64()
-                    / DOORWAY_GRAVITY_BLEND_DURATION.as_secs_f64())
+                let _ = (elapsed, leaving_ship);
+                let x = ship.world_to_local(world)[0];
+                let fraction = ((crate::ramp_geometry::RAMP_HINGE[0] - x)
+                    / (crate::ramp_geometry::RAMP_HINGE[0] - crate::ramp::tip_x()))
                 .clamp(0.0, 1.0);
                 let surface_up = normalize(sub(world, surface.body_center_meters));
-                let amount = if leaving_ship {
-                    fraction
-                } else {
-                    1.0 - fraction
-                };
+                let amount = fraction;
                 (
                     world,
                     normalize(lerp(ship.axes[1], surface_up, amount)),

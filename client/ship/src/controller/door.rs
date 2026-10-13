@@ -6,6 +6,15 @@ use std::time::Duration;
 
 impl ShipController {
     pub fn toggle_door(&mut self) {
+        self.toggle_door_with_clearance(true);
+    }
+
+    /// Composition supplies occupancy of the physical deployment envelope.
+    pub fn toggle_door_with_clearance(&mut self, clear: bool) {
+        if !clear {
+            self.cockpit_message = Some(CockpitMessage::DoorObstructed);
+            return;
+        }
         self.cockpit_message = None;
         match self.flight_state {
             state
@@ -40,6 +49,31 @@ mod tests {
     use salimon_world::{CELESTIAL_BODIES, CelestialBodyId};
 
     #[test]
+    fn occupied_ramp_cannot_toggle_or_reverse_its_motion() {
+        let mut ship = ShipController::default();
+        ship.toggle_door_with_clearance(false);
+        assert_eq!(ship.snapshot().door_state, DoorState::Closed);
+        assert_eq!(
+            ship.snapshot().cockpit_message,
+            Some(CockpitMessage::DoorObstructed)
+        );
+        ship.toggle_door_with_clearance(true);
+        ship.advance(DOOR_HINGE_ANIMATION_DURATION / 2);
+        ship.toggle_door_with_clearance(false);
+        assert_eq!(ship.snapshot().door_state, DoorState::Open);
+        assert_eq!(ship.snapshot().door_open_fraction, 0.5);
+        ship.advance(DOOR_HINGE_ANIMATION_DURATION / 2);
+        ship.toggle_door_with_clearance(false);
+        assert_eq!(ship.snapshot().door_state, DoorState::Open);
+        ship.set_cockpit_control(true);
+        ship.trigger_landing_action();
+        assert_eq!(
+            ship.snapshot().cockpit_message,
+            Some(CockpitMessage::CloseDoorBeforeTakeoff)
+        );
+    }
+
+    #[test]
     fn landed_and_open_space_doors_toggle_but_nearby_flight_is_locked() {
         let mut landed = ShipController::default();
         landed.toggle_door();
@@ -62,7 +96,7 @@ mod tests {
     }
 
     #[test]
-    fn top_hinged_door_advances_reverses_and_blocks_takeoff_until_closed() {
+    fn bottom_hinged_ramp_advances_reverses_and_blocks_takeoff_until_closed() {
         let mut ship = ShipController::default();
         ship.toggle_door();
         assert_eq!(ship.snapshot().door_open_fraction, 0.0);

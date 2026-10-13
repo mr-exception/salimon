@@ -438,3 +438,17 @@ render and retain the final activation counts. Zero-tick renders record zero new
 work while retaining the last activation observation. Samples include `game_ticks`,
 `game_backlog_ms` and cumulative `lifecycle_excluded_ms`; CPU-only samples have no
 native scheduler observation. Periodic frame debug logs include ticks/backlog.
+
+## Bottom-hinged boarding ramp (#169)
+
+The [authored ramp contract](../../models/assets/ships/salimon-scout/README.md#boarding-ramp-169)
+owns geometry and generated dimensions. Runtime enables traversal only when the
+700 ms animation is fully deployed, supplies movement-envelope collision and
+rejects E while the player's body occupies the sweep. Ship's
+`toggle_door_with_clearance` rejects an obstructed toggle without reversing the
+target state; takeoff retains its closed-state/zero-fraction interlock.
+Open-space EVA retains the same flight permission and inherited drift rules;
+there is no planetary support on the lowered door in space. Renderer tags the
+leaf and tray separately, using one uniform for phased lowering/extension in
+the existing opaque batch. Character contact follows the complete sloping
+surface, supports a stopped or carrying walker, and joins radial ground at its tip.

@@ -12,7 +12,7 @@ new crate dependencies or native/platform types.
 | `input.rs` | Portable movement flags and normalized planar controls |
 | `controller/mod.rs` | Private mutable controller fields, default state, inspection and one-mode update dispatch |
 | `controller/interior.rs` | Ship-local walking/jumping and instant cockpit transitions |
-| `controller/doorway.rs` | Gate clearance/recovery and exact 250 ms gravity transition |
+| `controller/doorway.rs` | Continuous sloping ramp support, edge sliding and gate recovery |
 | `controller/surface.rs` | Radial walking, shared yaw tangent basis and eye-height projection |
 | `controller/eva.rs` | Independent inherited drift, 3D assist, nearby-body influence and re-entry/contact |
 | `controller/camera.rs` | Mouse look and snapshots for all modes |
@@ -33,40 +33,24 @@ controller mutation so both traversal and placement/sight consume its proxies.
 ## Movement and presentation
 
 
-The controller stores one portable position state: cockpit, ship-local interior,
-world-space doorway blend, or world-space surface. Ship-local positions move with
-the ship without copying ship simulation into this crate. Doorway and surface
-states use world coordinates so the gravity transition and radial projection are
-explicit. Interior and doorway movement share the same normalized, yaw-relative
-ship-plane direction; the doorway converts both planar axes into world space.
-During the blend, lateral movement slides along the body-clear doorway limits.
-Surface re-entry uses the movement tangent's component along ship-forward, so
-walking away or parallel to the door cannot trigger an entering blend.
-Surface walking also collides with a conservative, body-expanded cabin/nose
-envelope. Overlapping aft wall proxies leave only the actual gate aperture;
-closed or unlanded gates fill that opening. Entry requires inward movement from
-the exterior into this aperture with vertical hull overlap. Collision slides
-along the exterior and solves surface height without changing the resolved
-ship-local planar coordinates, so radial projection cannot push a walker back
-through the hull. The hull proxies have finite height, and source-derived wing
-boxes block exterior movement at wing height. Each engine has source-derived body and raised-fin boxes with separate
-height checks and body-radius expansion. These ship-local boxes follow the landed
-ship frame and leave the aft gate clear. A completed entry gravity blend stays in the doorway
-until the player reaches the cabin, preserving slow and diagonal crossings.
-Doorway movement rechecks the landed/open rule before each update. When the gate
-becomes impassable, the blend ends immediately and an overlapping character
-resolves to the nearer of the interior and exterior stopping planes. Existing
-surface state always stays outside: a short or stopped exit may leave it within
-the gate volume, so closure clears that overlap before the usual movement sweep.
-The recovery is restricted to the aperture and vertical hull overlap to preserve
-side-wall sliding and movement below the ship. Surface recovery solves eye height
-at the resolved ship-local planar coordinates, retaining body clearance.
-The following movement sweep retains the exact resolved local stopping plane;
-decoding it from quantized world coordinates could falsely treat contact as an
-existing penetration. Aperture-overlap recognition allows a few world-coordinate
-ULPs at the catalog's 1e12 m anchor, without widening the passable aperture.
-Closure restores the doorway's exact lateral bounds before choosing the next
-state, so a rounded jamb contact cannot become an interior aft-wall overlap.
+The controller stores cockpit, ship-local interior, world-space ramp/doorway,
+surface or EVA position. Interior movement is camera-relative and enters the
+fully deployed ramp through the body-clear doorway. Ramp support follows the
+authored sloping plane with normalized 3D walking speed; lateral movement slides
+at the full-body edge limit. Gravity/camera up blends by distance along the ramp,
+never by an elapsed completion timer. A stopped walker stays supported indefinitely.
+At the tip, surface contact preserves the ship-local planar point and adopts
+radial gravity. Ground entry requires inward motion across the tip, so side and
+under-hull approaches cannot jump to the cabin. Jump input cannot bypass ramp
+contact or its side edges. The protocol retains `DoorwayBlend` and
+`doorway_blend_fraction` names for ramp location/progress compatibility.
+
+Hull, wing, engine and landing foot/leg proxies retain their existing finite
+height/body expansion and sweep/slide policy. A closed gate stays solid. Runtime
+supplies the moving-ramp flag; its swept footprint is reserved during motion and
+the open ramp's side edges block ground walkers. Forced environmental gate loss
+still resolves a doorway overlap to the nearer safe side, but normal runtime
+closing is rejected before state mutation whenever a body occupies the sweep.
 
 The ship interior uses a body-radius-inset walking envelope and simple planar
 collision proxies for the central Core pedestal, pilot chair,
@@ -146,6 +130,5 @@ and carrying/resource-loop scenarios; no character movement rule changes.
 
 Generated `LANDING_COLLIDERS` supply finite foot/column boxes to exterior walking,
 visibility and placement queries. Hull contact retains its original finite Y
-extent, permitting walking under the raised fuselage. The centered aft gate
-extends its legacy boarding/closed-door transition reach down to the foot plane;
-this corridor preserves existing routes while #169 adds the physical ramp.
+extent, permitting walking under the raised fuselage. The centered aft gate connects to the generated boarding ramp support and
+retains closed-door collision down to the landing foot plane.

@@ -22,6 +22,7 @@ from validate import REGISTRIES, validate_preservation
 from spatial_contracts import (
     build_spatial_contracts,
     landing_rust_source,
+    ramp_rust_source,
     sidecar_json,
     spatial_rust_source,
 )
@@ -86,6 +87,8 @@ def export(blender=None):
             destination = output.with_suffix(suffix)
             os.replace(staged / destination.name, destination)
         (REPO / 'client/ship/src/landing_geometry.rs').write_text(landing_rust_source(support))
+        for crate in ('character', 'renderer'):
+            (REPO / f'client/{crate}/src/ramp_geometry.rs').write_text(ramp_rust_source(spatial['boardingRamp']))
         (ASSET / 'export-report.json').write_text(json.dumps(report, indent=2) + '\n')
         return report
 

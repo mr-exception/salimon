@@ -177,7 +177,7 @@ enum ViewMode {
 }
 
 fn door_passable(ship: ShipSnapshot) -> bool {
-    ship.door_state == DoorState::Open && ship.door_open_fraction >= 0.95
+    ship.door_state == DoorState::Open && ship.door_open_fraction >= 1.0
 }
 
 impl ClientApplication {
@@ -321,9 +321,15 @@ impl ClientApplication {
                         }
                     }
                     Some(InteractionTarget::ExitDoor) => {
-                        self.ship.toggle_door();
+                        let clear = self.character.location() != CharacterLocation::DoorwayBlend
+                            && !salimon_character::boarding_ramp_occupied(local_eye);
+                        self.ship.toggle_door_with_clearance(clear);
                         if let Some(message) = self.ship.snapshot().cockpit_message {
-                            if message == CockpitMessage::DoorLockedWhileInFlight {
+                            if matches!(
+                                message,
+                                CockpitMessage::DoorLockedWhileInFlight
+                                    | CockpitMessage::DoorObstructed
+                            ) {
                                 self.action_bar.show_transient(message.text());
                             }
                             log::info!("cockpit monitor: {}", message.text());
@@ -530,6 +536,8 @@ impl ClientApplication {
                 )
                 .eye_position_meters;
             self.character.set_nearby_surface(nearby_surface_at(eye));
+            self.character
+                .set_ramp_moving(ship.door_open_fraction > 0.0 && ship.door_open_fraction < 1.0);
             self.character.advance_with_motion(
                 delta,
                 self.movement_input,

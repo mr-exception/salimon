@@ -277,7 +277,7 @@
     {
       "action": {
         "op": "step",
-        "frames": 40
+        "frames": 100
       }
     },
     {

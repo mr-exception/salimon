@@ -260,3 +260,17 @@ The opt-in [#160 geometry probes](../../scripts/FRAGMENT_BENCHMARKS.md#resource-
 inventory every authored variant and isolate resource-only GPU pass timestamps.
 These are evaluation tools; no resource mesh LOD or collision proxy replacement
 is enabled by them.
+
+## Bottom-hinged boarding ramp (#169)
+
+The [authored ramp contract](../../models/assets/ships/salimon-scout/README.md#boarding-ramp-169)
+owns geometry and generated dimensions. Runtime enables traversal only when the
+700 ms animation is fully deployed, supplies movement-envelope collision and
+rejects E while the player's body occupies the sweep. Ship's
+`toggle_door_with_clearance` rejects an obstructed toggle without reversing the
+target state; takeoff retains its closed-state/zero-fraction interlock.
+Open-space EVA retains the same flight permission and inherited drift rules;
+there is no planetary support on the lowered door in space. Renderer tags the
+leaf and tray separately, using one uniform for phased lowering/extension in
+the existing opaque batch. Character contact follows the complete sloping
+surface, supports a stopped or carrying walker, and joins radial ground at its tip.

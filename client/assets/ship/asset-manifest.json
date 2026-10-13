@@ -1,6 +1,6 @@
 {
   "name": "Salimon Phase 0 Scout",
-  "assetVersion": 12,
+  "assetVersion": 13,
   "source": "../../../models/assets/ships/salimon-scout/source.blend",
   "editableInterchange": "export/salimon_phase0_ship.gltf",
   "runtimeAsset": "export/salimon_phase0_ship.glb",

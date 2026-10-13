@@ -78,3 +78,9 @@
     bottom-center global/transient messages stack above its reserved band.
     Mining icon placement uses visible alpha bounds so asymmetric canvas padding
     cannot shift artwork from the slot center; glyphs/borders remain legible.
+
+24. Authored resource vertex/index geometry is immutable on the GPU. Resources
+    upload camera-relative 32-byte pose records grouped by stable mesh variant;
+    draw calls scale with visible variants, not fragments. Conservative enclosing
+    sphere culling affects rendering only. Material colors/facet fill, unit-pose
+    validation, subtract-before-cast precision and reverse-Z remain intact.

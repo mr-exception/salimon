@@ -148,8 +148,10 @@ rather than skipping updates or weakening interaction gates.
   scratch, contact-response multiplier vectors and allocator overhead are excluded.
   Geometry-record and SAT candidate-index capacities are included. Retained
   matrix/projection capacity is not counted again in a later call; these counters
-  do not measure resident memory. Resource scratch bytes similarly
-  describe only transformed vertex capacity. Use a native allocator profiler to
+  do not measure resident memory. Resource scratch bytes now describe retained
+  instance staging plus last-uploaded byte capacities (#158); historical
+  pre-instancing measurements described transformed vertex capacity. These values
+  are not directly comparable. Use a native allocator profiler to
   complement these counters before claiming total allocation reduction.
 - Renderer CPU time excludes surface acquisition/presentation; raw frame intervals
   include their effects. Resource prepare/upload time isolates transformation/
@@ -224,3 +226,33 @@ python3 scripts/fragment_sleep_acceptance.py --binary artifacts/build/release/sa
 
 This opt-in route does not replace the standard native suite or benchmark matrix.
 Inspect protocol logs and exact counters before promoting a run as evidence.
+
+## Resident resource preparation comparison (#158)
+
+Run the opt-in CPU preparation comparison:
+
+```sh
+cargo test --release -p salimon-renderer resource_preparation_benchmark --locked -- --ignored --nocapture
+```
+
+It compares the preserved test-only pre-#158 CPU vertex expansion with production
+instance staging/culling for 500/1,000 mixed fragment variants, facing/away and
+fixed/active transforms (50 warm-up + 200 samples). Active transforms vary center
+and quaternion deterministically; this microbenchmark does not run physics and
+its fixed transforms do not establish a verified settled gameplay window. It
+prints preparation median/p95 and old/max-new upload bytes. Unchanged production
+batches actually upload only the 64-byte camera uniform. It excludes enqueue/GPU,
+other runtime preparation and vsync, so it cannot establish FPS or native budgets.
+Use the native matrix above for actual settled/active gameplay performance.
+
+For indexed instancing/buffer growth/cache/draw validation on a GPU backend:
+
+```sh
+cargo test -p salimon-renderer headless_resource --locked -- --ignored
+```
+
+This also compares all 18 variants against the CPU-expanded offscreen raster.
+`SALIMON_RESOURCE_EVIDENCE_DIR` optionally writes PNGs; use an absolute path.
+This explicitly requires a GPU adapter; Linux lavapipe is correctness coverage,
+not the Apple M1 native reference. CPU tests also compare all 18 indexed variants
+and quaternion transforms at distant origins and keep rotated frustum crossings.

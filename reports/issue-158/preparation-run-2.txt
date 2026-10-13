@@ -1,7 +1,8 @@
-count=500 state=settled-transforms camera=facing samples=200 old_median_ns=592033 old_p95_ns=842211 new_median_ns=13270 new_p95_ns=18027 old_upload_bytes=2227912 max_new_upload_bytes=16064
-count=500 state=settled-transforms camera=away samples=200 old_median_ns=594066 old_p95_ns=1341073 new_median_ns=6110 new_p95_ns=6710 old_upload_bytes=2227912 max_new_upload_bytes=64
-count=500 state=active-transforms camera=facing samples=200 old_median_ns=590621 old_p95_ns=906607 new_median_ns=13260 new_p95_ns=16125 old_upload_bytes=2227912 max_new_upload_bytes=16064
-count=500 state=active-transforms camera=away samples=200 old_median_ns=619255 old_p95_ns=995081 new_median_ns=6150 new_p95_ns=6820 old_upload_bytes=2227912 max_new_upload_bytes=64
-count=1000 state=settled-transforms camera=facing samples=200 old_median_ns=1273390 old_p95_ns=2374477 new_median_ns=26510 new_p95_ns=29044 old_upload_bytes=4447528 max_new_upload_bytes=32064
-count=1000 state=settled-transforms camera=away samples=200 old_median_ns=1315014 old_p95_ns=2590608 new_median_ns=12128 new_p95_ns=12939 old_upload_bytes=4447528 max_new_upload_bytes=64
-count=1000 state=active-transforms camera=facing samples=200 old_median_ns=1288974 old_p95_ns=2473411 new_median_ns=26600 new_p95_ns=42324 old_upload_bytes=4447528 max_new_upload_bytes=32064
+count=500 state=settled-transforms camera=facing samples=200 old_median_ns=579224 old_p95_ns=729030 new_median_ns=13220 new_p95_ns=14442 old_upload_bytes=2227912 max_new_upload_bytes=16064
+count=500 state=settled-transforms camera=away samples=200 old_median_ns=615940 old_p95_ns=828681 new_median_ns=6149 new_p95_ns=10375 old_upload_bytes=2227912 max_new_upload_bytes=64
+count=500 state=active-transforms camera=facing samples=200 old_median_ns=575067 old_p95_ns=696812 new_median_ns=13250 new_p95_ns=14532 old_upload_bytes=2227912 max_new_upload_bytes=16064
+count=500 state=active-transforms camera=away samples=200 old_median_ns=578813 old_p95_ns=760137 new_median_ns=6119 new_p95_ns=6550 old_upload_bytes=2227912 max_new_upload_bytes=64
+count=1000 state=settled-transforms camera=facing samples=200 old_median_ns=1254352 old_p95_ns=1908890 new_median_ns=26390 new_p95_ns=43646 old_upload_bytes=4447528 max_new_upload_bytes=32064
+count=1000 state=settled-transforms camera=away samples=200 old_median_ns=1216095 old_p95_ns=1584111 new_median_ns=12048 new_p95_ns=13000 old_upload_bytes=4447528 max_new_upload_bytes=64
+count=1000 state=active-transforms camera=facing samples=200 old_median_ns=1250737 old_p95_ns=1601887 new_median_ns=26400 new_p95_ns=29735 old_upload_bytes=4447528 max_new_upload_bytes=32064
+count=1000 state=active-transforms camera=away samples=200 old_median_ns=1226280 old_p95_ns=1509007 new_median_ns=12069 new_p95_ns=15904 old_upload_bytes=4447528 max_new_upload_bytes=64

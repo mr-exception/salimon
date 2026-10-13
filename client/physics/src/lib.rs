@@ -8,7 +8,7 @@ use std::{
 mod broad_phase;
 mod convex;
 mod sleep;
-pub use convex::{ConvexHull, compose, orientation_from_axes, rotate};
+pub use convex::{ConvexHull, ConvexHullComplexity, compose, orientation_from_axes, rotate};
 pub use sleep::SleepTracker;
 
 const GRAVITY: f64 = 9.81;

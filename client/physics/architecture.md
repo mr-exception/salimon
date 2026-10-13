@@ -123,6 +123,19 @@ not a missing velocity cache entry, decides whether an object is new.
 
 ## Opt-in solver observations (#155)
 
+`ConvexHull::complexity` exposes immutable vertex, supporting-face, unique
+face-axis and unique edge-axis counts for geometry audits. Faces and face axes
+differ when facets are parallel. For hulls A/B, the raw pair SAT axis upper bound
+is A.face_axes + B.face_axes + A.edge_axes * B.edge_axes; parallel deduplication,
+early rejection and retained projections reduce actual work. These counts do
+not change contact geometry or measure per-frame projection work.
+
+The [#160 evaluation](../../reports/issue-160/README.md) retains today's authored
+envelopes. Extent-derived eight-vertex box controls reduce active pair cost but
+introduce unacceptable additional support clearance. No replacement collision
+proxy or visibility-dependent simulation policy is adopted; smaller authored
+proxies need a declared accuracy budget and measured benefit before selection.
+
 `advance_profiled` uses the same const-specialized solver as `advance`, preserving
 operation order and results. Normal calls compile out counters/clocks. `StepStats`
 counts substeps, passes, all pair visits, radius candidates, convex narrow-phase

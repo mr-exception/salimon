@@ -1,0 +1,11 @@
+{
+  "source_baseline": "f538d4e6efcf6993001c280cfa8d1dd9572040ce",
+  "os": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "rust": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "python": "3.12.14",
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
+  "visible_cpus": 9,
+  "runtime_probe_sha256": "e7c248eefe9e355a48490b35103d83c8b8900265f9e50f99b193d3145e7dbdcc",
+  "m1_verification": "skipped at user request",
+  "renderer_probe_sha256": "0e63698ccd12c4650322fae950dfa62ae2887c2791e0b3edabcb804483af4a08"
+}

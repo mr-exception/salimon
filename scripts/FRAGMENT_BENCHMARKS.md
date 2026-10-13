@@ -297,3 +297,53 @@ then 100 independently reset timed replays at 16 ms; clone/setup is outside the
 timer. It reports median/p95/p99 plus work and sleep counters. Run revisions
 sequentially without competing validation jobs. This is a CPU mechanism probe,
 not authored dense/native reference-matrix acceptance or an FPS comparison.
+
+## Resource geometry evaluation (#160)
+
+```sh
+cargo test --release -p salimon-renderer resource_geometry_inventory --locked -- --ignored --nocapture
+SALIMON_GEOMETRY_EVIDENCE=/absolute/path/to/geometry.json cargo test --release -p salimon-client resource_geometry_evaluation --locked -- --ignored --nocapture
+cargo test --release -p salimon-renderer resource_geometry_gpu_cost --locked -- --ignored --nocapture
+```
+
+The inventory reports triangle corners, resident position/material vertices and
+triangles for all 18 authored variants. The runtime probe builds the production
+convex envelopes, reports unique stored positions, supporting faces, face axes,
+edge axes and raw same-variant SAT bounds. Deposits are audited for completeness;
+only the six fragment envelopes participate in loose-object collision.
+
+The CPU probe compares authored shapes with diagnostic eight-vertex boxes made
+from their local authored extents. These boxes are neither exported assets nor
+approved gameplay proxies. A 1,024-direction support scan records a sampled
+lower bound on their largest outward discrepancy per unit side. Multiply by the
+actual fragment side for world metres; the reported 0.4 m side is a control scale.
+Convex envelopes already bridge concavities, so this comparison measures extra
+error relative to today's collision envelope, not fidelity inside concavities.
+
+Each CPU row replays a 16 ms production solver call excluding cloning. Settled
+and active floor rows use ten warm-up and 100 timed replays; expensive active
+pair rows use two warm-up and 20 timed replays with unreliable tails flagged.
+Six shapes first settle naturally, then their
+poses are tiled onto an unbounded floor and observed through production sleep
+dwell. Settled rows require all 500/1,000 bodies asleep and exact pose retention.
+Active floor rows perturb every body; active pair rows additionally place
+isolated two-body stacks at supporting extents for SAT/manifold cost. Box/authored controls naturally settle to
+different poses, so this measures geometry workload, not exact-pose parity or
+dense ship cargo acceptance. IDs/order/mass are held constant. Run probes and
+repeats sequentially without concurrent builds.
+
+The GPU probe times only the resource pass at 1920×1080 with asynchronous
+production timestamp machinery. This offscreen test drains each submission to
+attribute every sample; native presentation retains its nonblocking readback.
+It uses 500/1,000 mixed fragments at a `1e12` m origin, fixed or changing
+quaternions, facing/away, ten warm-up and 100 retained samples. Clear/depth work
+is included; physics, ship, planets, UI, uploads and presentation are excluded.
+Static transforms do not prove gameplay sleep. Unsupported timestamps are
+explicitly reported. Software Vulkan results cannot establish hardware GPU
+budgets or justify a native LOD choice.
+
+See [the decision and evidence](../reports/issue-160/README.md). Reconsider
+authored proxies only with an accepted contact error budget and measured native
+benefit; reconsider projected-size LOD/hysteresis only with resource-specific GPU
+evidence. Any selected shapes/LODs must follow the existing `models/` source,
+export and validation workflow, while visibility must never suspend physics.

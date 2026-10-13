@@ -247,11 +247,16 @@ from the world gameplay size policy; material solid volume remains separate.
 
 ## Resource batch measurements (#155)
 
-`RenderStats.resource_batch` reports transformed-vertex preparation time, CPU
-encoding/queue-enqueue time, queued vertex plus projection-uniform bytes,
-submitted resource triangles and temporary transformed-vertex capacity. These
-are resource-batch measurements, not total GPU traffic/allocator totals. Vertex
-buffer growth is included in preparation; triangles include deposits and
-fragments submitted by runtime, even when hidden/behind the camera. Existing GPU
+`RenderStats.resource_batch` reports culled instance preparation time, CPU
+encoding/queue-enqueue time, changed instance plus projection-uniform bytes,
+submitted resource triangles and retained instance staging/upload capacity. These
+are resource-batch measurements, not total GPU traffic/allocator totals. Instance
+buffer growth is included in preparation; triangles include only visible deposits
+and fragments after conservative frustum rejection. Existing GPU
 pass readback stays asynchronous and reports the latest completed duration,
 which can be older than the current frame. No timing readback waits are added.
+
+The opt-in [#160 geometry probes](../../scripts/FRAGMENT_BENCHMARKS.md#resource-geometry-evaluation-160)
+inventory every authored variant and isolate resource-only GPU pass timestamps.
+These are evaluation tools; no resource mesh LOD or collision proxy replacement
+is enabled by them.

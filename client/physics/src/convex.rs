@@ -10,6 +10,16 @@ pub struct ConvexHull {
     pub(crate) vertices: Vec<[f64; 3]>,
     normals: Vec<[f64; 3]>,
     edges: Vec<[f64; 3]>,
+    face_count: usize,
+}
+
+/// Immutable geometry counts, independent of pose and cached pair projections.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct ConvexHullComplexity {
+    pub vertices: usize,
+    pub faces: usize,
+    pub face_axes: usize,
+    pub edge_axes: usize,
 }
 
 impl ConvexHull {
@@ -84,6 +94,19 @@ impl ConvexHull {
             vertices,
             normals,
             edges,
+            face_count: planes.len(),
+        }
+    }
+
+    /// Audit authored proxy complexity without exposing mutable geometry.
+    /// A pair's raw SAT axis bound is A.face_axes + B.face_axes +
+    /// A.edge_axes * B.edge_axes; parallel removal and early rejection reduce it.
+    pub fn complexity(&self) -> ConvexHullComplexity {
+        ConvexHullComplexity {
+            vertices: self.vertices.len(),
+            faces: self.face_count,
+            face_axes: self.normals.len(),
+            edge_axes: self.edges.len(),
         }
     }
 
@@ -890,6 +913,22 @@ pub fn orientation_from_axes(axes: [[f64; 3]; 3]) -> [f64; 4] {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn geometry_complexity_counts_faces_separately_from_parallel_axes() {
+        let hull =
+            super::ConvexHull::new((0..8).map(|i| {
+                std::array::from_fn(|axis| if i & (1 << axis) == 0 { -0.5 } else { 0.5 })
+            }));
+        assert_eq!(
+            hull.complexity(),
+            super::ConvexHullComplexity {
+                vertices: 8,
+                faces: 6,
+                face_axes: 3,
+                edge_axes: 3,
+            }
+        );
+    }
     use super::*;
     use crate::{ObjectState, Surface, advance};
     use std::{sync::Arc, time::Duration};

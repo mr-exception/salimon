@@ -347,3 +347,15 @@ authored proxies only with an accepted contact error budget and measured native
 benefit; reconsider projected-size LOD/hysteresis only with resource-specific GPU
 evidence. Any selected shapes/LODs must follow the existing `models/` source,
 export and validation workflow, while visibility must never suspend physics.
+
+## Solver replacement decision (#161)
+
+The [keep/defer evaluation](../reports/issue-161/README.md) retains the custom
+solver for accepted settled 500 cargo and defers the Rapier comparison. It
+contains historical evidence, an untested candidate behavior matrix and explicit
+reopening gates; no head-to-head speedup or active budget is established.
+A reopened comparison must reuse this guide's authored fixtures, reference
+configuration, naturally verified sleep and 100/500/1,000 populations, with
+separate settled/active samples and full adapter/writeback timing. Measure memory
+and platform impact separately from structural pair-capacity counters. Adoption
+and production dependencies require a subsequent reviewable implementation.

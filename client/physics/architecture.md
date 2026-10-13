@@ -80,9 +80,9 @@ bodies.
 The pair minimum-axis cache retains a candidate set and only skips excluded
 axes when a displacement bound proves they cannot become the minimum. It
 falls back to the full exact SAT scan whenever the bound is inconclusive.
-The stateful solver retains the exact projection matrix across substeps and
+The stateful solver retains sparse exact pair projections across substeps and
 updates. Rotating a body invalidates its affected pairs; external changes,
-reordered/omitted IDs or even an orientation ULP rebuild the retained matrix.
+reordered/omitted IDs or even an orientation ULP rebuild the retained pair cache.
 Fully sleeping islands release it. This reuses unchanged geometry without
 changing SAT axes, contact response, iteration order or physical poses.
 Retained pairs rerun the first-use face rejection in each substep; unused
@@ -122,17 +122,55 @@ operation order and results. Normal calls compile out counters/clocks. `StepStat
 counts substeps, passes, all pair visits, radius candidates, convex narrow-phase
 visits, resolved contacts and projection builds. Visits include repeated passes.
 Integration includes gravity, pose advancement, damping and environmental contacts;
-contact time includes pair resolution and repeated ground projection. Matrix
-allocation, cache invalidation and teardown remain in total adapter-call time.
+contact time includes spatial queries, pair resolution and repeated ground projection.
+Cache invalidation and teardown remain in total adapter-call time.
 
-Matrix Vec allocations and requested matrix/projection capacity bytes are
-structural allocation observations, with one outer vector and one vector per row, not
-process-wide allocator totals. Convex temporary vertices/axes/ground arms, response-multiplier/motion-window vectors and
-allocator overhead are excluded. The matrix stores boxed geometry handles;
-reported geometry bytes include the boxed record and requested SAT candidate-index
-capacity in addition to projection spans. These are new allocation requests in
-the measured call; retained matrix/projection capacity is not re-counted and
-these counters are not total resident memory. See the [benchmark guide](../../scripts/FRAGMENT_BENCHMARKS.md).
+The legacy `matrix_allocations` field now counts sparse pair-table capacity growth
+at solve boundaries; `projection_storage_bytes` counts requested pair-entry,
+boxed geometry, projection-span and SAT candidate-index capacity growth. Hash
+control bytes, grid buckets, transformed hulls, ground/response/motion scratch and
+allocator overhead are excluded. These are structural observations, not total
+allocator counts or resident memory. Retained capacity is not counted again.
+Historical matrix measurements have a different representation; compare work,
+individual storage components and wall times separately. See the
+[benchmark guide](../../scripts/FRAGMENT_BENCHMARKS.md).
+
+## Deterministic spatial candidates (#157)
+
+`broad_phase.rs` uses conservative radius AABBs and a uniform grid with cell width
+of twice the population's median radius. Queries check actual AABB overlap,
+sort/deduplicate input indices and resolve `(i,j)` in the original lexicographic
+snapshot order. The caller keeps stable identity order. Separate ship frames use
+separate calls; the existing surface/planet-center gates still apply. Grid
+coordinates subtract a local origin in f64; radii include contact skin and a
+conservative rounding guard. Rotations remain covered by the bounding radius.
+Very large bodies or swept query regions (over 512 cells) use an exact linear
+fallback instead of enumerating unbounded cells; there is no population cap.
+
+Every current-pose solve rebuilds membership, retaining bucket/vector capacity.
+Every pair's positional/ground corrections immediately update affected bounds
+and requery the current row for later IDs. Correction-created contacts are
+therefore visited in the same pass as brute force; earlier pairs wait until the
+next pass. Integrated poses get refreshed membership before the post-motion
+solve. This preserves adaptive-substep behavior without claiming CCD. Wake
+queries expand bounds by linear/angular/gravity travel before integration;
+support graphs query the final pose with the existing 1 mm contact gap.
+
+Pair geometry is stored only for surviving convex candidates, pruned on pose
+refresh and solve completion. Candidate buffers, grid buckets, transformed hull
+vertices/normals/edges and SAT minimum-axis indices reuse capacity. Exact
+orientation/scale/hull-pointer changes rebuild transformed geometry; rotation
+invalidates affected pair spans while transporting warm reactions as before.
+Center corrections retain relative projections. Stable-ID snapshot validation
+invalidates external pose/support/topology changes. Hash iteration never controls
+contact order. Fully sleeping islands release projection storage.
+
+Sparse/separated populations avoid all-pairs scans/storage. Dense piles and
+oversize fallbacks can still require quadratic work; exact correction refresh
+adds work per moved contact. Ground/manifold/response temporary allocation is
+not eliminated. Tests retain the old projection arithmetic and an all-pairs
+candidate oracle, comparing exact poses through dense/random/rotated/mixed-size,
+fast and correction-created-contact cases.
 
 ## Persistent contact-island sleep (#156)
 
@@ -178,8 +216,8 @@ are diagnostics only; simulation poses are never replaced by them.
 
 Sleeping poses stay in the solver snapshot as collision participants. Skip their
 integration/damping and sleeping-to-sleeping contacts. A fully sleeping update
-allocates no contact matrix and performs no solver passes. Mixed updates retain
-the existing matrix and ordered pair loop; this is not a broad-phase replacement.
+allocates no pair projection storage and performs no solver passes. Mixed updates use the spatial candidates above while keeping sleeping objects
+in the bounds and collision snapshot.
 Tracker validation, snapshot adaptation and rendering still cost work.
 
 Wake previous contact-connected neighbors on removal, pickup/selection omission,

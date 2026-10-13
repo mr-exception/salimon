@@ -52,7 +52,12 @@
   precedes collision response; removed/changed supports cannot remain cached.
 - Stable IDs belong to the caller. Omitted snapshots invalidate cached sleep;
   retained SAT spans require unchanged exact orientation/shape and ID order.
-  Rotation invalidates affected pairs; external changes rebuild the matrix.
+  Rotation invalidates affected pairs; external changes rebuild the sparse cache.
   Fully sleeping groups release retained projection storage.
   explicit environmental/force changes outside snapshot fields call `wake_all`.
   Rigid movement of an unchanged local frame does not wake its contents.
+
+- Spatial candidates must conservatively cover current contacts and swept wake
+  reach. Corrections update membership before selecting the next ordered pair.
+  Candidate filtering cannot reorder input identities or change exact SAT/response.
+  Dense populations and oversize fallbacks retain quadratic worst-case cost.

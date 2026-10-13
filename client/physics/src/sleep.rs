@@ -160,6 +160,8 @@ pub struct SleepTracker<K> {
     warm_pairs: HashMap<(K, K), crate::ContactResponse>,
     warm_ground: HashMap<K, crate::ContactResponse>,
     warm_dt: f64,
+    spatial: crate::broad_phase::Grid,
+    candidates: Vec<usize>,
 }
 impl<K> Default for SleepTracker<K> {
     fn default() -> Self {
@@ -170,11 +172,15 @@ impl<K> Default for SleepTracker<K> {
             warm_pairs: HashMap::new(),
             warm_ground: HashMap::new(),
             warm_dt: 0.0,
+            spatial: Default::default(),
+            candidates: Vec::new(),
         }
     }
 }
 
 pub(crate) struct Activation {
+    spatial: crate::broad_phase::Grid,
+    candidates: Vec<usize>,
     pub(crate) warm_pairs: HashMap<(usize, usize), crate::ContactResponse>,
     pub(crate) warm_ground: HashMap<usize, crate::ContactResponse>,
     pub(crate) warm_dt: f64,
@@ -210,11 +216,14 @@ impl Activation {
             .enumerate()
             .filter_map(|(i, asleep)| (!asleep).then_some(i))
             .collect();
+        self.spatial.reset(pieces, 0.0);
         for i in active {
             let reach = length(pieces[i].velocity) * dt
                 + length(pieces[i].angular_velocity) * pieces[i].radius * dt
                 + 0.5 * crate::GRAVITY * dt * dt;
-            for j in 0..pieces.len() {
+            self.spatial.query(i, reach, &mut self.candidates);
+            for index in 0..self.candidates.len() {
+                let j = self.candidates[index];
                 if self.sleeping[j]
                     && same_environment(&pieces[i], &pieces[j])
                     && length(sub(pieces[i].position, pieces[j].position))
@@ -314,6 +323,8 @@ impl<K: Copy + Eq + Hash> SleepTracker<K> {
         self.warm_ground
             .retain(|id, _| indices.get(id).is_some_and(|&i| valid_warm[i]));
         let mut activation = Activation {
+            spatial: std::mem::take(&mut self.spatial),
+            candidates: std::mem::take(&mut self.candidates),
             warm_pairs: HashMap::new(),
             warm_ground: HashMap::new(),
             warm_dt: self.warm_dt,
@@ -391,14 +402,16 @@ impl<K: Copy + Eq + Hash> SleepTracker<K> {
         let before_neighbors = std::mem::take(&mut activation.neighbors);
         let mut neighbors = vec![Vec::new(); pieces.len()];
         let mut deep_contact = vec![false; pieces.len()];
+        activation.spatial.reset(pieces, CONTACT_GAP_METERS);
         for i in 0..pieces.len() {
-            for j in i + 1..pieces.len() {
+            activation.spatial.query(i, 0.0, &mut activation.candidates);
+            for &j in activation.candidates.iter().filter(|&&j| j > i) {
                 let contact = if activation.sleeping[i] && activation.sleeping[j] {
                     before_neighbors[i].contains(&j)
                 } else if let Some(geometry) = activation
                     .geometry
                     .as_ref()
-                    .and_then(|rows| rows[i][j].as_ref())
+                    .and_then(|cache| cache.pairs.get(&(i, j)).and_then(Option::as_ref))
                     .filter(|geometry| geometry.used_this_substep)
                 {
                     same_environment(&pieces[i], &pieces[j])
@@ -423,7 +436,7 @@ impl<K: Copy + Eq + Hash> SleepTracker<K> {
                         let depth = if let Some(geometry) = activation
                             .geometry
                             .as_ref()
-                            .and_then(|rows| rows[i][j].as_ref())
+                            .and_then(|cache| cache.pairs.get(&(i, j)).and_then(Option::as_ref))
                             .filter(|geometry| geometry.used_this_substep)
                         {
                             convex::projected_contact(&geometry.projections, offset)
@@ -525,6 +538,8 @@ impl<K: Copy + Eq + Hash> SleepTracker<K> {
             );
         }
         activation.neighbors = neighbors;
+        self.spatial = std::mem::take(&mut activation.spatial);
+        self.candidates = std::mem::take(&mut activation.candidates);
         self.geometry_ids = ids.to_vec();
         self.geometry = if activation.sleeping.iter().all(|s| *s) {
             None
@@ -843,7 +858,8 @@ mod tests {
             assert_eq!(objects, before);
             let mut baseline = objects.clone();
             let baseline = advance_profiled(&mut baseline, Duration::from_millis(16), |_, _| true);
-            assert!(baseline.pair_visits >= (count * (count - 1) / 2) as u64);
+            assert_eq!(baseline.pair_visits, 0);
+            assert!(baseline.integrated_objects > 0);
         }
     }
     #[test]

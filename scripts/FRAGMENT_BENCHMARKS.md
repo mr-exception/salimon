@@ -143,11 +143,14 @@ rather than skipping updates or weakening interaction gates.
   work, including repetitions over passes/substeps. They are not unique pairs.
 - Adapter time includes snapshot selection, cloning and pose writeback; solver
   time splits integration/environment contacts from matrix/pair/ground work.
-- Matrix Vec allocation counts and requested projection/matrix capacity bytes
-  are structural samples, not total heap allocations; ground-arm/axis/vertex
+- The legacy `matrix_allocations` field now counts sparse pair-table growth (#157);
+  requested projection storage includes pair-entry/geometry/SAT capacity growth.
+  Historical pre-#157 values counted outer/row matrix vectors. Both representations
+  are structural samples, not total heap allocations; hash control bytes,
+  spatial grid/transformed-hull buffers, ground-arm/axis/vertex
   scratch, contact-response multiplier vectors and allocator overhead are excluded.
   Geometry-record and SAT candidate-index capacities are included. Retained
-  matrix/projection capacity is not counted again in a later call; these counters
+  pair-table/projection capacity is not counted again in a later call; these counters
   do not measure resident memory. Resource scratch bytes now describe retained
   instance staging plus last-uploaded byte capacities (#158); historical
   pre-instancing measurements described transformed vertex capacity. These values
@@ -256,3 +259,19 @@ This also compares all 18 variants against the CPU-expanded offscreen raster.
 This explicitly requires a GPU adapter; Linux lavapipe is correctness coverage,
 not the Apple M1 native reference. CPU tests also compare all 18 indexed variants
 and quaternion transforms at distant origins and keep rotated frustum crossings.
+
+## Spatial candidate attribution (#157)
+
+```sh
+cargo test --release -p salimon-physics candidate_filtering_cost --locked -- --ignored --nocapture
+cargo run --release --locked -p salimon-physics --example sleep_cost
+```
+
+The first compares sparse all-pairs (test-only candidate oracle) with spatial
+filtering on identical separated 500/1,000 cube snapshots, settled on a floor
+versus active in air. It uses 20 replay samples; this isolates filtering after
+matrix removal, not authored cargo or native FPS. The second uses 100 samples
+and actual sleep dwell; its CSV also reports requested pair-storage growth.
+Compare the same example at a pre-#157 revision for matrix/storage attribution.
+Native authored matrix, dense piles and active interactions still require the
+reference commands above. The spatial grid does not imply linear dense-pile cost.

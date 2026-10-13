@@ -95,7 +95,13 @@ Geometry growth is safe because the hull stays immutable and each snapshot
 supplies current mass/scale. Stateful activation invalidates removed supports through stable caller IDs.
 
 Convex objects adapt substeps to scale and linear/angular speed, at most 1/90 s
-and capped at 4096 steps; the minimum target is 10 µs. This limits ordinary drop
+and capped at 4096 steps; the minimum target is 10 µs. The convex motion target
+is recomputed after each substep using current awake linear/angular motion plus
+a conservative gravity-speed increment. A fast impact can therefore release
+its initial timestep pressure during the same update. The base subdivision
+remains at most 1/90 s, with identical 8 ms subdivisions for ordinary 16 ms
+updates. Sleeping objects constrain no motion until waking; swept wake/contact
+checks and shared time progression remain in every substep. This limits ordinary drop
 and ejection tunneling, but is not general continuous collision detection.
 Legacy sphere-only calls retain the 48-step cap and three contact passes. Both
 paths distribute all elapsed time. Convex envelopes intentionally bridge local
@@ -243,3 +249,23 @@ removal, rather than guessing from bounding distances.
 `quiet_objects` reports bodies that passed dwell, including those kept awake by
 another unstable island member. `is_sleeping(id)` observes the last completed
 update; absent identities report false.
+
+## Active-group evaluation (#159)
+
+Independently stepping a previous contact island is not safe here: swept travel
+can join islands, and exact positional corrections can create new contacts in
+the same pass. A fixed expansion of initial contact AABBs does not bound arbitrary
+loaded-pile corrections. A safe island scheduler would need conservative swept
+components, correction-driven merges and cache/index remapping, or rollback.
+This change retains synchronized progression and correction-refresh semantics.
+Sleeping islands skip integration and sleeping-to-sleeping response; recomputed
+motion targets stop a fast impact from imposing its *initial* subdivision after
+its response has slowed it. An unrelated awake object still shares the minimum
+current target. No independent active-island stepping or dense-pile linear-cost
+claim is made. This remains a candidate for a separately measured follow-up.
+
+Runtime bounds native calls to 16 ms and at most two calls/render, with explicit
+backlog; see [the shared-clock contract](../runtime/architecture.md#bounded-gameplay-ticks-and-fragment-interpolation-159).
+The portable standalone APIs retain complete caller delta semantics and the
+existing 4096/48 safeguards, so very large standalone calls can still enlarge
+substeps at the cap. Neither path is general continuous collision detection.

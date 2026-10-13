@@ -189,6 +189,13 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
     Ok(())
 }
 
+#[derive(Clone, Copy, Debug, Default)]
+pub(crate) struct SchedulerSample {
+    pub(crate) ticks: usize,
+    pub(crate) backlog: Duration,
+    pub(crate) lifecycle_excluded: Duration,
+}
+
 #[derive(Clone, Copy)]
 struct Sample {
     frame_ms: Option<f64>,
@@ -196,6 +203,7 @@ struct Sample {
     update_ms: f64,
     simulation_ms: f64,
     physics: Measurements,
+    scheduler: SchedulerSample,
     render: Option<RenderStats>,
 }
 
@@ -205,6 +213,7 @@ pub(crate) struct Recorder {
     last_presented: Option<Instant>,
     samples: Vec<Sample>,
     pub(crate) latest_physics: Measurements,
+    pub(crate) latest_scheduler: SchedulerSample,
     info: Value,
     initial: Value,
     finished: bool,
@@ -265,6 +274,7 @@ impl Recorder {
             last_presented: None,
             samples: Vec::with_capacity(4096),
             latest_physics: Measurements::default(),
+            latest_scheduler: SchedulerSample::default(),
             info: Value::Null,
             initial: accounting(app),
             finished: false,
@@ -294,7 +304,7 @@ impl Recorder {
     ) -> bool {
         // The first redraw can have zero simulation delta and no completed
         // physics observation. Do not report default zero counters as a wake.
-        if delta.is_zero() {
+        if delta.is_zero() && self.started.is_none() {
             return false;
         }
         let now = Instant::now();
@@ -317,6 +327,7 @@ impl Recorder {
                     update_ms: ms(update),
                     simulation_ms: ms(simulation),
                     physics: self.latest_physics,
+                    scheduler: self.latest_scheduler,
                     render,
                 });
             }
@@ -345,7 +356,7 @@ impl Recorder {
             let r = s.render;
             let batch = r.map(|r| r.resource_batch);
             json!({"frame_ms": s.frame_ms, "simulation_delta_ms": s.simulation_delta_ms,
-                "cpu_update_ms": s.update_ms, "cpu_simulation_ms": s.simulation_ms, "cpu_scene_prepare_ms": (s.update_ms - s.simulation_ms).max(0.0), "physics_total_ms": ms(s.physics.total_time),
+                "game_ticks": (!self.config.headless).then_some(s.scheduler.ticks), "game_backlog_ms": (!self.config.headless).then_some(ms(s.scheduler.backlog)), "lifecycle_excluded_ms": (!self.config.headless).then_some(ms(s.scheduler.lifecycle_excluded)), "cpu_update_ms": s.update_ms, "cpu_simulation_ms": s.simulation_ms, "cpu_scene_prepare_ms": (s.update_ms - s.simulation_ms).max(0.0), "physics_total_ms": ms(s.physics.total_time),
                 "physics_adapter_ms": ms(s.physics.adapter_time), "physics_integration_ms": ms(p.integration_time),
                 "physics_contact_ms": ms(p.contact_time), "physics_activation_ms": ms(p.activation_time), "objects_simulated": p.objects,
                 "moving_objects": s.physics.moving_objects, "awake_objects": p.awake_objects, "sleeping_objects": p.sleeping_objects, "quiet_objects": p.quiet_objects, "integrated_objects": p.integrated_objects,
@@ -518,6 +529,7 @@ mod tests {
         assert!(recorder.started.is_none() && recorder.last_presented.is_none());
         assert_eq!(recorder.observed, 0);
         let sample = Sample {
+            scheduler: SchedulerSample::default(),
             frame_ms: Some(16.0),
             simulation_delta_ms: 16.0,
             update_ms: 1.0,

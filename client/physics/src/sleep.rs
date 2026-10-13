@@ -743,6 +743,35 @@ mod tests {
         assert_eq!(stats.sleeping_objects, 1);
         assert_eq!(objects[2], isolated);
     }
+
+    #[test]
+    fn fast_deck_impact_releases_substep_pressure_without_waking_remote_cargo() {
+        for count in [500, 1000] {
+            let ids: Vec<u64> = (0..=count as u64).collect();
+            let mut objects: Vec<_> = (0..count).map(|i| cube(i as f64 * 0.5, 0.1)).collect();
+            let mut tracker = SleepTracker::default();
+            settle(&ids[..count], &mut objects, &mut tracker);
+            let settled = objects.clone();
+            let mut drop = cube(-2.0, 0.1);
+            drop.velocity = [0.0, -40.0, 0.0];
+            objects.push(drop);
+            let stats = advance_with_sleep(
+                &mut tracker,
+                &ids,
+                &mut objects,
+                Duration::from_millis(16),
+                |_, _| true,
+                true,
+            );
+            assert_eq!(&objects[..count], &settled);
+            assert_eq!(stats.sleeping_objects, count);
+            // The old frame-wide speed selection requested 22 substeps even
+            // though the first deck reaction removes the drop's downward speed.
+            assert!(stats.substeps < 10, "{stats:?}");
+            assert_eq!(stats.integrated_objects, stats.substeps);
+            assert!(objects[count].position[1] >= 0.1 - 1e-6);
+        }
+    }
     #[test]
     fn geometry_force_frame_and_streaming_changes_invalidate_sleep() {
         for change in 0..6 {

@@ -275,3 +275,25 @@ and actual sleep dwell; its CSV also reports requested pair-storage growth.
 Compare the same example at a pre-#157 revision for matrix/storage attribution.
 Native authored matrix, dense piles and active interactions still require the
 reference commands above. The spatial grid does not imply linear dense-pile cost.
+
+
+## Tick/backlog diagnosis (#159)
+
+Native samples report `game_ticks` (0–2), `game_backlog_ms` (retained elapsed
+simulation debt) and cumulative `lifecycle_excluded_ms` (debt explicitly cleared
+at lifecycle resets). Interpret FPS alongside debt: an overloaded shared-clock
+simulation can stay behind wall time without doing an unbounded catch-up update.
+Simulation delta is the sum of completed 16 ms ticks; solver times/work include
+both calls when two ticks ran. Zero-tick presented frames retain activation
+observations but report zero new solver work. CPU-only samples have null scheduler
+fields and still use their explicit fixed delta. Fixed-time correctness is unchanged.
+For ordinary native launches, `RUST_LOG=salimon_client::frame=debug cargo run --release
+--locked` includes tick count/backlog in the periodic frame log.
+
+`cargo run --release --locked -p salimon-physics --example tick_cost` isolates
+500/1,000 scattered mixed-mass cube snapshots: naturally settled, one fast deck
+impact among sleepers, and all active drops. Each row uses 10 unrecorded replays
+then 100 independently reset timed replays at 16 ms; clone/setup is outside the
+timer. It reports median/p95/p99 plus work and sleep counters. Run revisions
+sequentially without competing validation jobs. This is a CPU mechanism probe,
+not authored dense/native reference-matrix acceptance or an FPS comparison.

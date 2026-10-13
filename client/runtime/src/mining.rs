@@ -9,6 +9,10 @@ use salimon_world::resource_generation::{GenerationError, SurfaceDeposit};
 
 #[derive(Default)]
 pub(crate) struct MiningTool {
+    pub(crate) fragment_previous: std::collections::HashMap<
+        salimon_world::resources::FragmentId,
+        salimon_physics::ObjectState,
+    >,
     pub(crate) fragment_sleep: salimon_physics::SleepTracker<salimon_world::resources::FragmentId>,
     pub(crate) ship_fragments:
         std::collections::HashMap<salimon_world::resources::FragmentId, [f64; 3]>,

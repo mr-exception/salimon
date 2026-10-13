@@ -1,0 +1,20 @@
+{
+  "baseline_commit": "421500d6519765db4b780ea84847fa257ab531b5",
+  "baseline_solver_sha256": "25da4baa0e8200c85e15f418a0d9cf22d308e4ac396994b68a9c5cf8cab7f5d1",
+  "after_solver_sha256": "b5eacc59eeda1fbc87bc259123a53738855a75bbdb9505c70dd5d7ec4a48a4a9",
+  "example_sha256": "67ae7eb5e93a1274c3e4ef3c8752d35173829a386380c31b9259d97a1259f9d3",
+  "baseline_executable_sha256": "622ec2e55f7c3b847e1adc303cb153aa1843caee392f714deb1d6871b0cfc4b9",
+  "after_executable_sha256": "c598df4d4e8193bc49996cc1ba4ee5cabc1a698e7d27f4b9c106699ef35d0859",
+  "os": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "cpu": "AMD EPYC 9V74 virtual CPU, 9 visible logical CPUs",
+  "rust": "1.99.0 (b940084d7 2026-09-28)",
+  "date_utc": "2026-10-13",
+  "backend": null,
+  "resolution": null,
+  "warmup_replays": 10,
+  "measured_replays_per_row": 100,
+  "delta_ms": 16,
+  "fixture": "scattered mixed-mass production convex cubes, naturally sleeping supported state, one -40m/s deck impact, all -40m/s airborne drops",
+  "collection": "isolated local runs sequentially; no competing local builds/tests/benchmarks in these retained windows; shared host noise remains",
+  "reference_native_matrix_verified": false
+}

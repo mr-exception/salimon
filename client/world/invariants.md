@@ -55,3 +55,9 @@
 - New-piece placement can reject a crowded surface before mass/ID allocation;
   accepted growth and earlier pieces remain conserved. Placement runs once per
   new identity, never on growth, pickup/drop or streaming restoration.
+
+- Opt-in terrain definitions are immutable, versioned, bounded and body-local.
+  Identical definitions/directions give order-independent heights; conservative
+  extrema stay within ±0.01R. Sun has no terrain. See [terrain contract](terrain-contract.md)
+  for codec limits and numerical compatibility. Existing sphere rules above remain
+  active until all rendering/contact consumers are integrated.

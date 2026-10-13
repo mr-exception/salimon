@@ -8,6 +8,7 @@ non-resource implementation modules remain private.
 | Source | Responsibility and existing tests |
 | --- | --- |
 | `src/coordinates.rs` | `WorldPosition`, absolute `f64` arithmetic and subtract-before-cast regression |
+| `src/terrain/` | Opt-in validated/versioned terrain definitions, binary codec, pure height/normal queries and reproducibility tests; [contract](terrain-contract.md) |
 | `src/catalog.rs` | Body IDs/roles/definitions, ordered static catalog, anchor/reference speed, membership and travel tuning tests |
 | `src/geometry.rs` | Body surface/landing distances, radial speed, sphere separation and landing-volume tests |
 | `src/proximity.rs` | Nearest-surface and nearby-solid selection, inclusive threshold and influence tests |
@@ -82,3 +83,9 @@ on pickup. Runtime composes hand poses, ship support and fragment motion/contact
 with character collision geometry. Generated deposits can stream out and back
 in without losing modified mass; fragments remain the same physical entities.
 All retention is in memory for the current session, with no disk/backend save.
+
+## Terrain contract (stage 1 of #170)
+
+Portable terrain queries live in `terrain`; read [terrain-contract.md](terrain-contract.md)
+before integrating. They are opt-in and not consumed by nominal-sphere gameplay
+or presentation yet. Rendering/physical-contact activation is sequenced in #179–#181.

@@ -218,3 +218,10 @@ for gameplay; precision tour omits it. Renderer rasterizes/caches numbered slots
 mining-tool silhouette and optional highlight, and stacks global/transient
 messages above the fitted bottom-center toolbar. DPI follows bounded native
 scale-factor handling. See the [renderer contract](../client/renderer/architecture.md#equipment-toolbar-hud-129).
+
+## Opt-in terrain definition (#170 stage 1)
+
+World owns a bounded, versioned [terrain contract](../client/world/terrain-contract.md)
+with body-local height/normal queries and a compact codec. It is not yet activated:
+renderer and physical consumers remain spherical until #179/#180 integration.
+#181 owns native/reference-machine acceptance; #170 remains open across stages.

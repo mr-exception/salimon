@@ -1,5 +1,17 @@
 # Issue #156 native continuation handoff
 
+## Current disposition for #165 — 2026-10-13
+
+The user explicitly requested skipping M1 verification while preparing #165's
+review PR, with closure stated in its description. The remaining 1,000 route
+and 67 reference windows are waived for closure on merge, **not passed**.
+See the [#165 disposition report](reports/issue-165/README.md) for the preserved
+limits and future resumption conditions. No large-load jobs were restarted.
+
+All scope/continuation instructions below describe the earlier #156/#165 work.
+They preserve useful history and commands; they do not require new native runs
+or keeping #165 open after its waiver PR merges.
+
 ## Scope revision — 2026-10-13
 
 The user approved the verified dense **500-fragment** route and settled timing

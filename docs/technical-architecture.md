@@ -150,7 +150,7 @@ they are not dependencies or scaffolding requirements for current work:
 | --- | --- |
 | Web/WASM and WIT Component Model | Portable Rust reuse and versioned capability interfaces where useful; no component host or WIT boundary currently shipped |
 | ECS | Standalone `bevy_ecs` may be evaluated; no canonical ECS or Bevy engine adoption |
-| Physics | [#161 decision](../reports/issue-161/README.md): keep the custom solver for accepted settled 500 cargo; defer Rapier comparison/adoption. Active budgets and full stress acceptance remain unresolved; Rapier is the first alternative if replacement is justified |
+| Physics | [#161 decision](../reports/issue-161/README.md): keep the custom solver for accepted settled 500 cargo; defer Rapier comparison/adoption. Active budgets and full stress acceptance remain unresolved; [#165 disposition](../reports/issue-165/README.md) records the user-waived remaining M1 validation, not a full-matrix pass. Rapier is the first alternative if replacement is justified |
 | Workers/scheduler/event bus | Evaluate for measured simulation needs; no worker infrastructure required by current native composition |
 | Streaming/storage | Larger spatial hierarchies and storage interfaces remain future work; IndexedDB is the browser cache direction, native storage needs a platform implementation |
 | Networking/server | Authoritative multiplayer server and shared deterministic domain reuse are future architecture |

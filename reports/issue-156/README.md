@@ -1,6 +1,40 @@
 # Issue #156 — persistent fragment sleep and contact-island waking
 
-## Current status — 2026-10-13
+## Accepted scope — 2026-10-13
+
+The user approved the verified **dense 500-fragment** test as sufficient for
+this iteration and requested a review PR. Issue #156's acceptance now uses the
+complete native 500 correctness route and six dense settled 500 timing windows,
+plus the retained sleep/wake/material/frame/streaming regressions. This scope
+change is ready for review; #156 remains open until the PR is merged.
+
+- Full native 500 route passed: natural sleep, fast rotating flight,
+  landing/takeoff, zero local drift, real support removal/dependent falling,
+  unrelated sleeping islands, three pickup/drop cycles, stable IDs and 625 kg.
+- Six settled 500 windows passed with 1,801–1,802 intervals each. Facing median
+  FPS was 59.67–59.74; away was 59.72–59.77. These are approximately 60 FPS
+  medians, not a strict frame-time floor.
+- The same naturally settled snapshot measured median solver time
+  2,518.251 ms stateless versus 0.198813 ms sleeping, with zero sleeping
+  integration/pair visits. This replay excludes cloning and is separate from
+  native frame timing.
+- Active dense contact work remains expensive. The full 1,000 interaction route
+  and 67 missing reference windows (including other 500 cases) are deferred to
+  [#165](https://github.com/mr-exception/salimon/issues/165).
+  [#157](https://github.com/mr-exception/salimon/issues/157) owns candidate and
+  allocation optimization.
+
+This scope update changes documentation and issue acceptance only; it adds no
+cargo cap, deletes no fragments and changes no runtime behavior. The previously
+recorded 353 Rust tests, 55 Python tests, Clippy/format checks and 17 native
+scenarios remain the source validation evidence. No native runs or code tests
+were repeated for this documentation-only update. Relative report/evidence
+links and the retained result summaries were checked; historical measurements
+and failed attempts below are preserved unchanged. Historical statements that
+the original acceptance is incomplete refer to the superseded full-matrix
+requirement, not the revised 500-fragment acceptance.
+
+## Historical continuation status — prior to scope reduction
 
 **Focused 50-fragment continuation completed.** The user requested a smaller
 check rather than restarting expensive large-load work. The native 50 fixture

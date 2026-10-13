@@ -1,5 +1,21 @@
 # Issue #156 native continuation handoff
 
+## Scope revision — 2026-10-13
+
+The user approved the verified dense **500-fragment** route and settled timing
+windows as sufficient for #156 now, and requested a review PR. The revised
+acceptance is satisfied by the retained evidence; keep #156 open until merge.
+The complete 1,000 route and remaining matrix are deferred to
+[#165](https://github.com/mr-exception/salimon/issues/165); active collision
+optimization remains in [#157](https://github.com/mr-exception/salimon/issues/157).
+No large-load jobs need restarting for this PR. See the current decision at the
+top of [the report](reports/issue-156/README.md).
+
+The continuation instructions below are retained as historical handoff for
+#165. Their “unfinished” and “remain open” statements describe the former full
+matrix scope. The later user instruction authorizes the review PR and closure
+of #156 on merge under its revised acceptance.
+
 The user subsequently resumed a **focused 50-fragment check only**. That check
 is complete: natural sleep, all 50 IDs/materials and 64 kg retained, zero drift
 through fast rotating flight/landing/takeoff, and three small support/impact

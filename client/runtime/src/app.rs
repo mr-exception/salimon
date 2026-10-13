@@ -186,7 +186,10 @@ impl ClientApplication {
             return Ok(());
         }
 
-        let attributes = window_attributes(self.e2e_config.is_some());
+        let mut attributes = window_attributes(self.e2e_config.is_some());
+        if let Some(benchmark) = &self.benchmark {
+            attributes = attributes.with_title(benchmark.window_title());
+        }
         let window = event_loop
             .create_window(attributes)
             .map_err(|error| RunError::new("failed to create native window", error))?;
@@ -212,6 +215,7 @@ impl ClientApplication {
                 RunError::new("failed to initialize renderer", "window is missing")
             })?;
         let physical_size = window.inner_size();
+        let scale_factor = window.scale_factor();
         let size = surface_size(&window);
         let renderer = pollster::block_on(Renderer::new(window, size))
             .map_err(|error| RunError::new("failed to initialize renderer", error))?;
@@ -224,7 +228,12 @@ impl ClientApplication {
             info.timestamp_queries_supported
         );
         if let Some(benchmark) = &mut self.benchmark {
-            benchmark.set_renderer(info, physical_size.width, physical_size.height);
+            benchmark.set_renderer(
+                info,
+                physical_size.width,
+                physical_size.height,
+                scale_factor,
+            );
         }
         self.renderer = Some(renderer);
         if let Some(config) = self.e2e_config.filter(|_| !self.e2e_ready_sent) {
@@ -652,7 +661,10 @@ impl ClientApplication {
             .map_or(OverlayPlacement::BottomCenter, |prompt| prompt.placement);
         self.action_bar
             .set_contextual(contextual_action.map(|prompt| prompt.text));
-        window.set_title(&gameplay_window_title(monitor_message, interaction));
+        window.set_title(&self.benchmark.as_ref().map_or_else(
+            || gameplay_window_title(monitor_message, interaction),
+            crate::benchmark::Recorder::window_title,
+        ));
         let ship_mesh = if self.view_mode == ViewMode::Gameplay {
             camera = CameraFrame {
                 position_meters: character_snapshot.eye_position_meters,
@@ -798,10 +810,16 @@ impl ClientApplication {
                         .as_mut()
                         .expect("active benchmark")
                         .finish(accounting);
-                    if let Err(error) = result {
-                        self.fail(event_loop, error);
-                    } else {
-                        event_loop.exit();
+                    match result {
+                        Err(error) => self.fail(event_loop, error),
+                        Ok(true) => event_loop.exit(),
+                        Ok(false) => {
+                            if self.benchmark.as_ref().is_some_and(|b| b.switch_camera()) {
+                                self.character
+                                    .apply_mouse_delta(std::f64::consts::PI / 0.0022, 0.0);
+                            }
+                            window.request_redraw();
+                        }
                     }
                     return;
                 }
@@ -839,7 +857,8 @@ impl ApplicationHandler for ClientApplication {
         _device_id: DeviceId,
         event: DeviceEvent,
     ) {
-        if self.view_mode == ViewMode::Gameplay
+        if self.benchmark.is_none()
+            && self.view_mode == ViewMode::Gameplay
             && self.cursor_captured
             && let DeviceEvent::MouseMotion { delta } = event
         {
@@ -894,9 +913,25 @@ impl ApplicationHandler for ClientApplication {
         if window.id() != window_id {
             return;
         }
+        // Benchmark cameras and population are deterministic initial conditions.
+        // Keep native timing/rendering, while desktop input cannot mutate them.
+        if self.benchmark.is_some()
+            && matches!(
+                event,
+                WindowEvent::KeyboardInput { .. } | WindowEvent::MouseInput { .. }
+            )
+        {
+            return;
+        }
 
         match event {
-            WindowEvent::CloseRequested => event_loop.exit(),
+            WindowEvent::CloseRequested => {
+                if self.benchmark.is_some() {
+                    self.fail(event_loop, "benchmark window closed before completion");
+                } else {
+                    event_loop.exit();
+                }
+            }
             WindowEvent::Destroyed => {
                 self.renderer = None;
                 self.window = None;
@@ -907,14 +942,37 @@ impl ApplicationHandler for ClientApplication {
                 event_loop.exit();
             }
             WindowEvent::Resized(_) => {
+                let size = window.inner_size();
+                if self.benchmark.as_ref().is_some_and(|b| {
+                    b.surface_changed(size.width, size.height, window.scale_factor())
+                }) {
+                    self.fail(event_loop, "benchmark surface configuration changed");
+                    return;
+                }
                 self.resize_renderer(event_loop, &window);
             }
             WindowEvent::ScaleFactorChanged { .. } => {
+                let size = window.inner_size();
+                if self.benchmark.as_ref().is_some_and(|b| {
+                    b.surface_changed(size.width, size.height, window.scale_factor())
+                }) {
+                    self.fail(event_loop, "benchmark surface configuration changed");
+                    return;
+                }
                 self.diagnostics.set_scale_factor(window.scale_factor());
                 self.action_bar.set_scale_factor(window.scale_factor());
                 self.resize_renderer(event_loop, &window);
             }
             WindowEvent::Occluded(is_occluded) => {
+                if is_occluded
+                    && self
+                        .benchmark
+                        .as_mut()
+                        .is_some_and(|b| !b.restart_before_sampling())
+                {
+                    self.fail(event_loop, "benchmark window occluded during collection");
+                    return;
+                }
                 log::debug!("native window occluded: {is_occluded}");
                 self.occluded = is_occluded;
                 self.retry_at = None;

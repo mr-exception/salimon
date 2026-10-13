@@ -56,7 +56,7 @@ pub(crate) struct Config {
     pub(crate) scenario: Scenario,
     pub(crate) seed: u64,
     pub(crate) step: Duration,
-    pub(crate) fragment_load: Option<(usize, crate::benchmark_fixture::Layout)>,
+    pub(crate) fragment_load: Option<(usize, crate::benchmark_fixture::Layout, u64)>,
 }
 
 pub(crate) fn parse_args(args: impl IntoIterator<Item = String>) -> Result<Option<Config>, String> {
@@ -67,6 +67,7 @@ pub(crate) fn parse_args(args: impl IntoIterator<Item = String>) -> Result<Optio
     let mut step = None;
     let mut fragment_count = None;
     let mut fragment_layout = None;
+    let mut fragment_settle_steps = None;
     while let Some(arg) = args.next() {
         if arg == "--e2e" {
             if enabled {
@@ -108,7 +109,21 @@ pub(crate) fn parse_args(args: impl IntoIterator<Item = String>) -> Result<Optio
             "--fragment-layout" if fragment_layout.is_none() => {
                 fragment_layout = Some(crate::benchmark_fixture::Layout::parse(&value)?)
             }
-            "--scenario" | "--seed" | "--step-ms" | "--fragment-count" | "--fragment-layout" => {
+            "--fragment-settle-steps" if fragment_settle_steps.is_none() => {
+                let steps = value
+                    .parse::<u64>()
+                    .map_err(|_| "--fragment-settle-steps must be 0..37500")?;
+                if steps > 37500 {
+                    return Err("--fragment-settle-steps must be 0..37500".into());
+                }
+                fragment_settle_steps = Some(steps);
+            }
+            "--scenario"
+            | "--seed"
+            | "--step-ms"
+            | "--fragment-count"
+            | "--fragment-layout"
+            | "--fragment-settle-steps" => {
                 return Err(format!("{arg} specified twice"));
             }
             _ => return Err(format!("unknown argument '{arg}'")),
@@ -120,20 +135,27 @@ pub(crate) fn parse_args(args: impl IntoIterator<Item = String>) -> Result<Optio
             || step.is_some()
             || fragment_count.is_some()
             || fragment_layout.is_some()
+            || fragment_settle_steps.is_some()
         {
             Err("scenario options require --e2e".into())
         } else {
             Ok(None)
         };
     }
-    if fragment_layout.is_some() && fragment_count.is_none() {
-        return Err("--fragment-layout requires --fragment-count".into());
+    if (fragment_layout.is_some() || fragment_settle_steps.is_some()) && fragment_count.is_none() {
+        return Err("fragment layout/preparation requires --fragment-count".into());
     }
     Ok(Some(Config {
         scenario: scenario.unwrap_or(Scenario::LandedEarth),
         seed: seed.unwrap_or(0),
         step: step.unwrap_or(Duration::from_millis(16)),
-        fragment_load: fragment_count.map(|n| (n, fragment_layout.unwrap_or_default())),
+        fragment_load: fragment_count.map(|n| {
+            (
+                n,
+                fragment_layout.unwrap_or_default(),
+                fragment_settle_steps.unwrap_or(0),
+            )
+        }),
     }))
 }
 
@@ -210,7 +232,7 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
     {
         return Err("scenario setup failed: unexpected ship flight state".into());
     }
-    if let Some((count, layout)) = config.fragment_load {
+    if let Some((count, layout, settle_steps)) = config.fragment_load {
         if config.scenario == Scenario::FragmentPile {
             return Err("fragment-pile already owns its fixture".into());
         }
@@ -220,6 +242,7 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
             return Err("surface populations require landed-earth".into());
         }
         crate::benchmark_fixture::initialize(app, count, layout, config.seed, false)?;
+        crate::benchmark_fixture::settle(app, count, settle_steps)?;
     }
     app.update_clock.set_fixed_step(config.step);
     app.e2e_config = Some(config);
@@ -465,6 +488,18 @@ mod tests {
         assert_eq!(parse_args([]).unwrap(), None);
         assert!(parse_args(["--scenario".into(), "orbit-earth".into()]).is_err());
         assert!(parse_args(["--e2e".into(), "--step-ms".into(), "0".into()]).is_err());
+        for args in [
+            vec!["--e2e", "--fragment-settle-steps", "10"],
+            vec![
+                "--e2e",
+                "--fragment-count",
+                "10",
+                "--fragment-settle-steps",
+                "37501",
+            ],
+        ] {
+            assert!(parse_args(args.into_iter().map(str::to_owned)).is_err());
+        }
         let mut app = ClientApplication::default();
         assert_eq!(
             app.ship.snapshot().flight_state,

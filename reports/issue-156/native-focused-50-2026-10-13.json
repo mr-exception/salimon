@@ -1,0 +1,121 @@
+{
+  "revision": "b9cd618dd4b0c0e3b0aaeb0aebcd05d9a56b8918",
+  "binary_sha256": "95e662d5aeea7cec6a8913ba59adbfe51f84d70eaf5f3cfeb6315bf106cc2d68",
+  "scope": "User-requested focused 50-fragment continuation; original 500/1000 acceptance remains incomplete. No new performance claim.",
+  "runs": [
+    {
+      "count": 50,
+      "layout": "dense",
+      "status": "failed",
+      "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-focused-50/run-g02cc73s",
+      "request_timeout_seconds": 120,
+      "maximum_rigid_motion_drift_meters": 0,
+      "error": "no reachable loaded bottom support",
+      "duration_seconds": 1.0563379579980392,
+      "checkpoint_summary": {
+        "initial_sleep": {
+          "sleeping": 50,
+          "mass_kg": 64.0,
+          "fragment_count": 50,
+          "sha256": "d84d8195ab73c0b66cdced66c6b66d925f650206f943f531c1709a5c83633a7c"
+        },
+        "fast_rotating_flight": {
+          "sleeping": 50,
+          "mass_kg": 64.0,
+          "fragment_count": 50,
+          "sha256": "3b3a036991af4275cec7b1dd8ebfcc2d750ee755797dc1a5ed7bcd34766d85b1"
+        },
+        "landing_progress": {
+          "sleeping": 50,
+          "mass_kg": 64.0,
+          "fragment_count": 50,
+          "sha256": "eaf62d835233756e99af927cd3bcce27ae9ef6721dd270de16fc067f76bd87ec"
+        },
+        "landing": {
+          "sleeping": 50,
+          "mass_kg": 64.0,
+          "fragment_count": 50,
+          "sha256": "eaf62d835233756e99af927cd3bcce27ae9ef6721dd270de16fc067f76bd87ec"
+        },
+        "takeoff_progress": {
+          "sleeping": 50,
+          "mass_kg": 64.0,
+          "fragment_count": 50,
+          "sha256": "e7ae410fc5f2415300e88490f73247222c644e2ce3d5ec2f4f461db5e7bc2d78"
+        },
+        "takeoff": {
+          "sleeping": 50,
+          "mass_kg": 64.0,
+          "fragment_count": 50,
+          "sha256": "e7ae410fc5f2415300e88490f73247222c644e2ce3d5ec2f4f461db5e7bc2d78"
+        }
+      },
+      "scope": "sleep, flight, landing, takeoff, IDs/material/mass conservation; no performance timing"
+    },
+    {
+      "count": 50,
+      "layout": "dense",
+      "status": "passed",
+      "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-focused-50-flight/run-v90f6p5_",
+      "request_timeout_seconds": 120,
+      "maximum_rigid_motion_drift_meters": 0,
+      "duration_seconds": 1.010587333003059,
+      "checkpoint_summary": {
+        "initial_sleep": {
+          "sleeping": 50,
+          "mass_kg": 64.0,
+          "fragment_count": 50,
+          "sha256": "d84d8195ab73c0b66cdced66c6b66d925f650206f943f531c1709a5c83633a7c"
+        },
+        "fast_rotating_flight": {
+          "sleeping": 50,
+          "mass_kg": 64.0,
+          "fragment_count": 50,
+          "sha256": "3b3a036991af4275cec7b1dd8ebfcc2d750ee755797dc1a5ed7bcd34766d85b1"
+        },
+        "landing_progress": {
+          "sleeping": 50,
+          "mass_kg": 64.0,
+          "fragment_count": 50,
+          "sha256": "eaf62d835233756e99af927cd3bcce27ae9ef6721dd270de16fc067f76bd87ec"
+        },
+        "landing": {
+          "sleeping": 50,
+          "mass_kg": 64.0,
+          "fragment_count": 50,
+          "sha256": "eaf62d835233756e99af927cd3bcce27ae9ef6721dd270de16fc067f76bd87ec"
+        },
+        "takeoff_progress": {
+          "sleeping": 50,
+          "mass_kg": 64.0,
+          "fragment_count": 50,
+          "sha256": "e7ae410fc5f2415300e88490f73247222c644e2ce3d5ec2f4f461db5e7bc2d78"
+        },
+        "takeoff": {
+          "sleeping": 50,
+          "mass_kg": 64.0,
+          "fragment_count": 50,
+          "sha256": "e7ae410fc5f2415300e88490f73247222c644e2ce3d5ec2f4f461db5e7bc2d78"
+        }
+      },
+      "scope": "sleep, flight, landing, takeoff, IDs/material/mass conservation; no performance timing"
+    }
+  ],
+  "stack_check_limitation": {
+    "loaded_support_candidates": 0,
+    "environment_supported_fragments": 50,
+    "reason": "All 50 fixture fragments rest directly on the environment; no bottom/dependent pair exists for this harness."
+  },
+  "focused_physics_tests": {
+    "support_removal": {
+      "passed": 2
+    },
+    "fast_impact_wakes_whole_island_without_waking_unrelated_support": {
+      "passed": 1
+    }
+  },
+  "raw_archive": {
+    "file": "native-focused-50-2026-10-13.json.gz",
+    "sha256": "edf3f68a873df8b319a96b63ccad56031ee19d4658b0873882f0f7480c80c1f7"
+  }
+}

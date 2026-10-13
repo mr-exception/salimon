@@ -25,6 +25,14 @@ failure/timeout is retained and makes the runner exit nonzero. No partial case i
 reported as a successful measurement. Reports store binary SHA-256, source base
 revision/dirty flag, CPU/OS label, adapter/backend/type, resolution and settings.
 
+For baseline collection, pass `--minimum-samples 100`: each window must meet both
+its requested duration and retained sample count. Native mode counts completed
+frame intervals; CPU mode counts updates. Expensive updates can extend actual
+sampling beyond `--sample-seconds`; `sample_wall_seconds` records that duration,
+and the process deadline still bounds the run. `moving_samples` / `resting_samples`
+identify windows that naturally settle during collection. Such mixed windows do
+not establish reliable active-only tails from their later resting frames.
+
 The active fixture starts above support with linear/angular motion. It naturally
 settles; it is not a perpetual externally driven stress loop. Requested settled
 loads start at support, but layered piles and faceted hulls can still move. Check
@@ -33,6 +41,56 @@ warm-up until settled, and capture short active windows with explicit 0s warm-up
 when investigating initial drops. Never describe a requested state as verified
 when its counters disagree. Dense 1,000 loads are deliberately overfull: current
 physics constrains horizontal footprint/floor but has no fragment ceiling solver.
+
+`--settle-steps N` optionally prepares **settled cases only** with up to N actual
+production 16 ms updates before opening the native window. It exits on complete
+persistent sleep, prints actual steps/simulation/wall time to the case stderr,
+and fails rather than measuring an unsettled fixture when the limit is reached.
+The native warmup/sample clocks then run normally; the matrix runner also rejects
+any prepared case that wakes during measurement. This avoids expensive initial
+falls feeding larger wall-clock deltas back into an already-settled-load probe.
+Active rows retain their original initial motion and do not use preparation.
+Preparation and compiler runs must finish before collecting performance samples;
+increase per-case `--timeout` to include preparation. Record `settle_steps_limit`
+with the other configuration fields when comparing baselines.
+
+Set `SALIMON_FIXTURE_CHECKPOINT` to a local JSON file to retain the last production
+preparation state on success or failure. The read-only diagnostic export runs at
+initialization, every 50 updates and completion, and replaces that file with the
+actual step, stable IDs, poses, velocities, sizes, masses, hulls and sleep flags.
+Use it for diagnosis; it is not a native sampling or acceptance result.
+
+`--repeats 3` collects three independent warmup/sample windows from one naturally
+settled population. Each window resets clocks, retained samples and decimation,
+checks the original IDs/mass, and appears separately in the summary with a
+`repeat` index. The raw output uses schema 2 with schema-1 `runs`; one repeat
+retains schema 1. Active rows instead launch three fresh processes to repeat
+their initial moving state. Incomplete windows fail as a whole case.
+
+Native settled `--camera both` measures all facing repeats followed by all away
+repeats from the same naturally prepared population. Each camera gets its own
+warmup/sample windows. Active windows use fresh processes, so `both` is rejected
+for active and CPU-only launches.
+
+The matrix helper's `--prepare-workers 1..4` can prepare several native fixtures
+concurrently, then measure them **one at a time after all preparations finish**.
+Other prepared processes wait on stdin before creating a native window or
+starting clocks. Direct `--defer-start true` emits `SALIMON_BENCHMARK_PREPARED`
+and requires the exact stdin line `SALIMON_BENCHMARK_START`; default false keeps
+ordinary CLI behavior. Deadlines include preparation, the barrier and recording.
+This saves duplicated preparation without concurrent physics work contaminating
+native sample windows. `--capture-binary` may select the identical SHA-256 binary
+inside a local app bundle for the dense 500 capture surface.
+
+Optional matrix `--solver-baseline-samples 1..1000` replays the naturally settled
+dense 500/1000 snapshots through both stateless and cached solvers before native
+sampling. Direct CLI `--baseline-samples` also accepts smaller prepared fixtures
+for smoke checks. Each replay resets cloned input state outside its timer; the
+cached path must preserve exact poses and report all objects asleep. Raw
+`solver_baseline` includes authored snapshots, wall times, integration/pair/matrix
+counters and sleeping counts. This isolates solver work on identical geometry;
+it is a CPU comparison on the host, and does not provide a baseline native FPS.
+
 
 ## CPU wall-clock diagnosis and CI
 
@@ -64,6 +122,12 @@ There is no test-only teleport operation after initialization.
 Scenario `setup` can add `fragment_count: 0..1000` and `fragment_layout:
 scattered|dense|surface`. Layout without count is rejected. Surface fixtures
 require `landed-earth`; `fragment-pile` cannot also request a population.
+Optional `fragment_settle_steps: 0..37500` requires a population and performs the
+same bounded production preparation before E2E readiness. Increase the overall
+scenario deadline for preparation; ordinary input deadlines are unchanged.
+Inspection exposes `world.sleeping_fragment_count` and each fragment's `sleeping`
+flag from the last completed update, excluding the carried object. These allow
+loaded routes to assert real activation rather than infer it from screenshots.
 For longer loaded flight/landing/takeoff or streaming-return walkthroughs, copy
 an existing authoritative scenario, add these initial population fields and
 update accounting expectations to include fixture mass. Keep production input
@@ -81,7 +145,10 @@ rather than skipping updates or weakening interaction gates.
   time splits integration/environment contacts from matrix/pair/ground work.
 - Matrix Vec allocation counts and requested projection/matrix capacity bytes
   are structural samples, not total heap allocations; ground-arm/axis/vertex
-  scratch and allocator overhead are excluded. Resource scratch bytes similarly
+  scratch, contact-response multiplier vectors and allocator overhead are excluded.
+  Geometry-record and SAT candidate-index capacities are included. Retained
+  matrix/projection capacity is not counted again in a later call; these counters
+  do not measure resident memory. Resource scratch bytes similarly
   describe only transformed vertex capacity. Use a native allocator profiler to
   complement these counters before claiming total allocation reduction.
 - Renderer CPU time excludes surface acquisition/presentation; raw frame intervals
@@ -92,6 +159,8 @@ rather than skipping updates or weakening interaction gates.
   repeated/stale; pending/unsupported remain explicit. No blocking timing readback.
 - `objects_simulated` is the selected snapshot population (legacy field name).
   `awake_objects`/`sleeping_objects` report persistent activation after the update;
+  `quiet_objects` counts bodies that passed dwell, including bodies still awake
+  because another member of their supported contact island is unstable;
   `integrated_objects` counts actual object-substep visits. `sleeping_observed`
   requires the entire selected population asleep throughout the sample window.
   `settled_observed` remains the distinct velocity-rest observation. Fully sleeping
@@ -120,3 +189,38 @@ CI checks deterministic accounting/order/counters, not hardware timing threshold
 Before/after optimization reports should compare pair/candidate counts separately
 from storage/allocation counters so allocation removal and filtering remain
 attributable. A dense pile can still require quadratic contact work.
+
+
+Native benchmark gameplay input is disabled, normal cursor capture is retained, and
+window titles identify the exact case/repeat. Keep the window visible and its
+resolution/DPI unchanged throughout collection. Interrupted/occluded/resized
+collection fails. Initial occlusion before retained intervals restarts the full
+warm-up. Renderer metadata records the actual DPI scale; screenshots
+must show the matching benchmark title and be taken from a live process.
+
+## Native loaded sleep acceptance (#156)
+
+`scripts/fragment_sleep_acceptance.py` uses the normal protocol-1 controller
+routes after bounded natural preparation. It verifies fast rotating flight,
+landing/takeoff, stable anchors, IDs/material/mass and full sleep. `--carrying`
+also requires actual F removal of a single-support bottom body, dependent fall,
+an unrelated sleeping island, mining lockout and three pickup/drop cycles. It
+walks around the authored Core and tries both lateral viewpoints through the
+controller to reach cargo. Release navigation faces clear floor while accounting
+for the held object's side offset, including after each repeated pickup;
+no poses or sleep flags are installed. Fall checks identify the selected root's
+previous dependents, and unrelated sleep is checked outside its old component.
+Failures remain failures in its JSON summary and process exit status.
+Loaded requests use a 120-second limit (`--request-timeout`), also capped by the
+whole-run `--timeout`. This allows expensive real contact rebuilding after support
+removal; it changes neither the production timestep nor the acceptance assertions.
+The request limit is recorded in each result. Valid native protocol fixed-step
+requests also have a 120-second server limit; extending the Python deadline
+alone cannot extend an older binary's five-second single-step limit.
+
+```sh
+python3 scripts/fragment_sleep_acceptance.py --binary artifacts/build/release/salimon-client --counts 500 1000 --layout dense --settle-steps 2400 --timeout 14400 --carrying --output artifacts/fragment-sleep-acceptance
+```
+
+This opt-in route does not replace the standard native suite or benchmark matrix.
+Inspect protocol logs and exact counters before promoting a run as evidence.

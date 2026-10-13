@@ -318,8 +318,8 @@ See the canonical [surface emission contract](../world/resource-contracts.md#sur
 ## Automation command deadlines
 
 The ready event advertises the ordinary 5-second command deadline. Valid
-protocol-1 `step` batches of 300–600 frames receive a bounded 30-second
-server deadline, matching the resource-collection scenario budget. The stdin
+protocol-1 `step` requests of 1–600 frames receive a bounded 120-second
+server deadline: even one update can rebuild a large loaded contact island. The stdin
 reader and native request expiry use the same command-specific duration.
 Malformed/out-of-range requests and ordinary inputs/inspection stay at 5 seconds.
 Scenario overall deadlines remain independent; no fixed steps are skipped.
@@ -339,6 +339,36 @@ clock and renderer; they never enable stdin automation. Physics-only runs time
 production fragment adapters at 16ms simulation deltas with no window, renderer
 or FPS claim. Samples record actual moving-object counts; a requested settled
 fixture does not prove a settled sample. Persistent awake/sleeping counters are supplied by the physics activation cache.
+Optional `--settle-steps` prepares requested settled fixtures through the same
+production adapter at 16 ms simulation deltas before renderer startup. It stops
+only on full persistent sleep and fails at its explicit limit otherwise; it
+never installs sleep flags or settled poses. Preparation steps/simulation/wall
+duration are logged separately from measured native warmup and samples. Active
+initial conditions reject preparation. The matrix runner rejects prepared cases
+that wake during their sample window.
+Settled `--repeats` resets independent bounded sampling windows on that same
+population and validates accounting each time; active repeats use fresh processes.
+Native `--camera both` switches after the facing repeats and independently warms
+all away windows. Optional stdin preparation barriers permit concurrent fixture
+preparation followed by isolated native recording; no window/clocks start until
+the explicit start marker. Optional baseline replays use the canonical adapter
+snapshots and cloned state/cache before recording, without changing live cargo.
+Native benchmark windows retain normal focus/cursor capture but ignore gameplay
+mouse/keyboard input. Their titles identify count, layout, requested state, camera and
+repeat. Native timing and production updates remain unchanged. Recorded renderer
+metadata includes DPI scale. Initial occlusion before any retained frame interval
+restarts the full warm-up. Occlusion during measured sampling or changed surface
+configuration after renderer initialization fails; closing before completion also fails.
+See the benchmark guide for limits, counter meanings and CPU-only interpretation.
+Optional `--minimum-samples` requires both elapsed sampling duration and a retained
+sample count before a window completes. Native mode counts completed frame
+intervals; CPU mode counts updates. Actual sample wall time is reported, including
+extensions for expensive production updates. The process deadline remains the
+outer bound. This does not change simulation delta or drive artificial motion.
+E2E setup's `fragment_settle_steps` uses the same fixture preparation before
+readiness. Inspection reads cache activation by stable identity, excluding
+carried pieces, through aggregate/per-fragment sleeping fields. Preparation is
+initial-condition work; later interactions retain production gates and stepping.
 
 Frame intervals use a separate uncapped monotonic clock, preserving long spikes
 hidden by rolling diagnostics' 250ms display clamp. Normal update-delta clamping
@@ -352,7 +382,9 @@ benchmark result. See the [benchmark guide](../../scripts/FRAGMENT_BENCHMARKS.md
 
 `MiningTool.fragment_sleep` owns the in-memory `SleepTracker<FragmentId>` lifetime.
 The adapter supplies stable IDs alongside current frame-local snapshots; selection
-omission (carrying or distant streaming) invalidates cached support, including
+uses current-frame world positions for ship anchors even before final pose
+synchronization, so high-speed flight cannot omit last frame's trailing cargo.
+Selection omission (carrying or distant streaming) invalidates cached support, including
 an entirely empty selection. Return starts awake without changing session IDs,
 mass or local anchors. Growth/release/frame transfer changes snapshot fields and
 wakes old contact neighbors. Ship-local rigid motion leaves sleep intact; world

@@ -14,7 +14,7 @@ use salimon_world::CELESTIAL_BODIES;
 
 const PROTOCOL: u8 = 1;
 const TIMEOUT: Duration = Duration::from_secs(5);
-const LONG_STEP_TIMEOUT: Duration = Duration::from_secs(30);
+const STEP_TIMEOUT: Duration = Duration::from_secs(120);
 const MAX_LINE: usize = 16 * 1024;
 
 pub(crate) struct Request {
@@ -61,20 +61,22 @@ pub(crate) fn start() -> Receiver<Request> {
     receiver
 }
 
-/// Long fixed-step batches share the scenario's bounded CI budget. Ordinary
-/// commands and malformed/out-of-range requests retain the default deadline.
+/// Even one loaded support-removal update can rebuild a large contact island.
+/// Valid fixed steps have a bounded extended deadline; other commands and
+/// malformed/out-of-range requests retain the default deadline. Client/scenario
+/// budgets can still impose a shorter limit.
 fn command_timeout(line: &str) -> Duration {
     let Ok(command) = serde_json::from_str::<Value>(line) else {
         return TIMEOUT;
     };
     if command.get("protocol").and_then(Value::as_u64) == Some(u64::from(PROTOCOL))
+        && command
+            .get("id")
+            .is_some_and(|id| id.is_string() || id.is_number())
         && command.get("op").and_then(Value::as_str) == Some("step")
-        && matches!(
-            command.get("frames").and_then(Value::as_u64),
-            Some(300..=600)
-        )
+        && matches!(command.get("frames").and_then(Value::as_u64), Some(1..=600))
     {
-        LONG_STEP_TIMEOUT
+        STEP_TIMEOUT
     } else {
         TIMEOUT
     }
@@ -376,8 +378,11 @@ fn inspect(app: &ClientApplication) -> Value {
                 "id": piece.id().0,
                 "reference_frame": if app.mining.ship_fragments.contains_key(&piece.id()) { "ship" } else { "world" },
                 "carried": app.mining.session.carried_id() == Some(piece.id()),
+                "sleeping": app.mining.session.carried_id() != Some(piece.id()) && app.mining.fragment_sleep.is_sleeping(piece.id()),
                 "distance_to_player_meters": piece.transform().position().offset_from(salimon_world::WorldPosition::new(character.eye_position_meters[0], character.eye_position_meters[1], character.eye_position_meters[2])).iter().map(|v| v * v).sum::<f64>().sqrt(),
-                "ship_local_position_meters": frame.world_to_local(piece.transform().position().meters()),
+                "ship_local_position_meters": app.mining.ship_fragments.get(&piece.id()).copied().unwrap_or_else(|| frame.world_to_local(piece.transform().position().meters())),
+                "contact_fragment_ids": if app.mining.session.carried_id() == Some(piece.id()) { Vec::new() } else { app.mining.fragment_sleep.contact_neighbors(piece.id()).iter().map(|id| id.0).collect::<Vec<_>>() },
+                "environment_supported": app.mining.session.carried_id() != Some(piece.id()) && app.mining.fragment_sleep.environment_supported(piece.id(), |position, radius| salimon_character::ship_floor_placement(position, radius).is_some()),
                 "source_deposit_id": format!("{:?}:{}", piece.source().body, piece.source().local),
                 "resource": piece.material().resource().key(),
                 "mass_kg": piece.material().mass_kg(), "volume_m3": piece.material().volume_m3(),
@@ -454,6 +459,7 @@ fn inspect(app: &ClientApplication) -> Value {
         "interaction": interaction,
         "world": {"fragments": fragments,
             "fragment_count": app.mining.session.fragments().len(),
+            "sleeping_fragment_count": app.mining.session.fragments().iter().filter(|piece| app.mining.session.carried_id() != Some(piece.id()) && app.mining.fragment_sleep.is_sleeping(piece.id())).count(),
             "fragment_mass_kg": app.mining.session.fragments().iter().map(|piece| piece.material().mass_kg()).sum::<f64>(),
             "nearest_deposit": nearest_deposit, "resource_types": resource_types, "deposits": deposits, "deposits_by_id": deposits_by_id, "deposit_query_error": deposit_error, "bodies": bodies, "camera_phase": format!("{:?}", app.camera_phase())}
     })
@@ -464,21 +470,23 @@ mod tests {
     use super::*;
 
     #[test]
-    fn long_step_deadlines_are_bounded_and_ordinary_requests_stay_short() {
-        for frames in [300, 600] {
+    fn loaded_step_deadlines_are_bounded_and_ordinary_requests_stay_short() {
+        for frames in [1, 299, 300, 600] {
             assert_eq!(
                 command_timeout(
                     &json!({"protocol":1,"id":1,"op":"step","frames":frames}).to_string()
                 ),
-                Duration::from_secs(30)
+                Duration::from_secs(120)
             );
         }
         for request in [
             json!({"protocol":1,"id":1,"op":"inspect"}),
-            json!({"protocol":1,"id":1,"op":"step","frames":299}),
+            json!({"protocol":1,"id":1,"op":"step","frames":0}),
             json!({"protocol":1,"id":1,"op":"step","frames":601}),
             json!({"protocol":2,"id":1,"op":"step","frames":600}),
             json!({"protocol":1,"id":1,"op":"step","frames":"600"}),
+            json!({"protocol":1,"op":"step","frames":1}),
+            json!({"protocol":1,"id":false,"op":"step","frames":1}),
         ] {
             assert_eq!(
                 command_timeout(&request.to_string()),

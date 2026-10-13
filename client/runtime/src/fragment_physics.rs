@@ -87,64 +87,7 @@ pub(crate) fn advance_measured(
     if elapsed <= 0.0 {
         return measurements;
     }
-    let carried = tool.session.carried_id();
-    let pieces: Vec<_> = tool
-        .session
-        .fragments()
-        .iter()
-        .copied()
-        .filter(|p| Some(p.id()) != carried)
-        .filter(|p| length(sub(p.transform().position().meters(), player)) < 125.0)
-        .map(|p| {
-            let ship = tool.ship_fragments.contains_key(&p.id());
-            let position = if ship {
-                tool.ship_fragments[&p.id()]
-            } else {
-                p.transform().position().meters()
-            };
-            let body = if ship { None } else { nearest_body(position) };
-            // Only creation installs an ejection. Missing/restored motion is at rest.
-            let initial = tool
-                .fragment_motion
-                .get(&p.id())
-                .map_or([0.0; 3], |m| m.velocity);
-            (
-                p,
-                ObjectState {
-                    position,
-                    velocity: initial,
-                    radius: salimon_world::resource_size::fragment_contact_radius_meters(
-                        p.material(),
-                    ),
-                    ground_support_meters: 0.0,
-                    hull: Some(fragment_hull(p)),
-                    side_meters: salimon_world::resource_fragments::side_meters(p),
-                    orientation: if ship {
-                        tool.fragment_motion
-                            .get(&p.id())
-                            .and_then(|m| m.ship_orientation)
-                            .unwrap_or_else(|| {
-                                to_local_orientation(frame, p.transform().orientation_xyzw())
-                            })
-                    } else {
-                        p.transform().orientation_xyzw()
-                    },
-                    angular_velocity: tool
-                        .fragment_motion
-                        .get(&p.id())
-                        .map_or([0.0; 3], |m| m.angular_velocity),
-                    mass_kg: p.material().mass_kg(),
-                    surface: if ship {
-                        Surface::Floor {
-                            height_meters: SHIP_FLOOR_HEIGHT_METERS,
-                        }
-                    } else {
-                        body.map(Surface::Sphere).unwrap_or(Surface::Unsupported)
-                    },
-                },
-            )
-        })
-        .collect();
+    let pieces = snapshots(tool, frame, player);
     if pieces.is_empty() {
         tool.fragment_sleep = salimon_physics::SleepTracker::default();
         if let Some(start) = started {
@@ -206,6 +149,80 @@ pub(crate) fn advance_measured(
         measurements.adapter_time = measurements.total_time.saturating_sub(solver_time);
     }
     measurements
+}
+
+/// Canonical production adapter input; also used for identical-snapshot solver replay.
+pub(crate) fn snapshots(
+    tool: &MiningTool,
+    frame: ShipFrame,
+    player: [f64; 3],
+) -> Vec<(salimon_world::resources::ResourceFragment, ObjectState)> {
+    let carried = tool.session.carried_id();
+    tool.session
+        .fragments()
+        .iter()
+        .copied()
+        .filter(|p| Some(p.id()) != carried)
+        .filter(|p| {
+            // Ship advancement precedes final session-pose synchronization.
+            // Select anchored contents in the current frame, not last frame's
+            // world pose (which may be hundreds of metres behind in flight).
+            let position = tool.ship_fragments.get(&p.id()).map_or_else(
+                || p.transform().position().meters(),
+                |local| frame.local_to_world(*local),
+            );
+            length(sub(position, player)) < 125.0
+        })
+        .map(|p| {
+            let ship = tool.ship_fragments.contains_key(&p.id());
+            let position = if ship {
+                tool.ship_fragments[&p.id()]
+            } else {
+                p.transform().position().meters()
+            };
+            let body = if ship { None } else { nearest_body(position) };
+            // Only creation installs an ejection. Missing/restored motion is at rest.
+            let initial = tool
+                .fragment_motion
+                .get(&p.id())
+                .map_or([0.0; 3], |m| m.velocity);
+            (
+                p,
+                ObjectState {
+                    position,
+                    velocity: initial,
+                    radius: salimon_world::resource_size::fragment_contact_radius_meters(
+                        p.material(),
+                    ),
+                    ground_support_meters: 0.0,
+                    hull: Some(fragment_hull(p)),
+                    side_meters: salimon_world::resource_fragments::side_meters(p),
+                    orientation: if ship {
+                        tool.fragment_motion
+                            .get(&p.id())
+                            .and_then(|m| m.ship_orientation)
+                            .unwrap_or_else(|| {
+                                to_local_orientation(frame, p.transform().orientation_xyzw())
+                            })
+                    } else {
+                        p.transform().orientation_xyzw()
+                    },
+                    angular_velocity: tool
+                        .fragment_motion
+                        .get(&p.id())
+                        .map_or([0.0; 3], |m| m.angular_velocity),
+                    mass_kg: p.material().mass_kg(),
+                    surface: if ship {
+                        Surface::Floor {
+                            height_meters: SHIP_FLOOR_HEIGHT_METERS,
+                        }
+                    } else {
+                        body.map(Surface::Sphere).unwrap_or(Surface::Unsupported)
+                    },
+                },
+            )
+        })
+        .collect()
 }
 
 pub(crate) fn fragment_hull(
@@ -388,7 +405,6 @@ mod tests {
             origin_meters: [1.0e12, 2.0e12, -3.0e12],
             axes: [[0.0, 0.0, -1.0], [0.0, 1.0, 0.0], [1.0, 0.0, 0.0]],
         };
-        crate::carrying::sync_ship_fragments(&mut tool, moving);
         let stats = advance_measured(
             &mut tool,
             moving,

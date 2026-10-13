@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.15s
+     Running unittests src/lib.rs (target/debug/deps/salimon_physics-4908311ad7491184)
+
+running 2 tests
+test sleep::tests::support_removal_wakes_only_the_connected_pile_and_reordering_keeps_identity ... ok
+test convex::tests::convex_pile_settles_and_support_removal_reactivates_gravity ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 48 filtered out; finished in 1.39s
+

@@ -1,0 +1,252 @@
+{
+  "binary": {
+    "schema_version": 1,
+    "host": "aarch64-apple-darwin",
+    "profile": "release",
+    "rust": "rustc 1.89.0 (29483883e 2025-08-04)",
+    "executable": "salimon-client",
+    "sha256": "95e662d5aeea7cec6a8913ba59adbfe51f84d70eaf5f3cfeb6315bf106cc2d68"
+  },
+  "source_base": "8f8fe61",
+  "source_dirty": true,
+  "source_description": "surface/DPI guard applies from renderer initialization; physics unchanged from 047105c",
+  "rust": {
+    "passed": 353,
+    "failed": 0,
+    "ignored": 1
+  },
+  "python": {
+    "passed": 50,
+    "failed": 0
+  },
+  "clippy": "passed",
+  "formatting": "passed",
+  "native_suite": {
+    "status": "passed_with_retries",
+    "steps_completed": 1712,
+    "first_attempt": {
+      "status": "failed",
+      "results": [
+        {
+          "scenario": "/Users/mrexception/Documents/Projects/Salimon/salimon/scenarios/carrying.json",
+          "status": "failed",
+          "steps_completed": 178,
+          "duration_ms": 6131,
+          "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-qeqiczn9",
+          "result_file": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-qeqiczn9/result.json"
+        },
+        {
+          "scenario": "/Users/mrexception/Documents/Projects/Salimon/salimon/scenarios/cockpit-nose.json",
+          "status": "passed",
+          "steps_completed": 30,
+          "duration_ms": 1989,
+          "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-ytl_gxn3",
+          "result_file": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-ytl_gxn3/result.json"
+        },
+        {
+          "scenario": "/Users/mrexception/Documents/Projects/Salimon/salimon/scenarios/fragment-load.json",
+          "status": "passed",
+          "steps_completed": 16,
+          "duration_ms": 1989,
+          "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-5uvr069x",
+          "result_file": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-5uvr069x/result.json"
+        },
+        {
+          "scenario": "/Users/mrexception/Documents/Projects/Salimon/salimon/scenarios/fragment-pile-floor.json",
+          "status": "passed",
+          "steps_completed": 6,
+          "duration_ms": 1521,
+          "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-vgx82886",
+          "result_file": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-vgx82886/result.json"
+        },
+        {
+          "scenario": "/Users/mrexception/Documents/Projects/Salimon/salimon/scenarios/fragment-pile-surface.json",
+          "status": "passed",
+          "steps_completed": 6,
+          "duration_ms": 1557,
+          "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-tq3ly859",
+          "result_file": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-tq3ly859/result.json"
+        },
+        {
+          "scenario": "/Users/mrexception/Documents/Projects/Salimon/salimon/scenarios/fragment-transfer.json",
+          "status": "passed",
+          "steps_completed": 277,
+          "duration_ms": 22908,
+          "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-fonpv9az",
+          "result_file": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-fonpv9az/result.json"
+        },
+        {
+          "scenario": "/Users/mrexception/Documents/Projects/Salimon/salimon/scenarios/landed-earth.json",
+          "status": "passed",
+          "steps_completed": 110,
+          "duration_ms": 3861,
+          "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-93b3mtml",
+          "result_file": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-93b3mtml/result.json"
+        },
+        {
+          "scenario": "/Users/mrexception/Documents/Projects/Salimon/salimon/scenarios/lower-cockpit-windows.json",
+          "status": "passed",
+          "steps_completed": 16,
+          "duration_ms": 2168,
+          "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-obt9bwm2",
+          "result_file": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-obt9bwm2/result.json"
+        },
+        {
+          "scenario": "/Users/mrexception/Documents/Projects/Salimon/salimon/scenarios/mining-emission.json",
+          "status": "passed",
+          "steps_completed": 107,
+          "duration_ms": 2730,
+          "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-sg19csia",
+          "result_file": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-sg19csia/result.json"
+        },
+        {
+          "scenario": "/Users/mrexception/Documents/Projects/Salimon/salimon/scenarios/mining.json",
+          "status": "passed",
+          "steps_completed": 148,
+          "duration_ms": 20050,
+          "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-eafjsey2",
+          "result_file": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-eafjsey2/result.json"
+        },
+        {
+          "scenario": "/Users/mrexception/Documents/Projects/Salimon/salimon/scenarios/moving-eva.json",
+          "status": "passed",
+          "steps_completed": 93,
+          "duration_ms": 2798,
+          "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-k3z4mfpb",
+          "result_file": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-k3z4mfpb/result.json"
+        },
+        {
+          "scenario": "/Users/mrexception/Documents/Projects/Salimon/salimon/scenarios/nearby-eva.json",
+          "status": "passed",
+          "steps_completed": 43,
+          "duration_ms": 1718,
+          "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-o2veaoh8",
+          "result_file": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-o2veaoh8/result.json"
+        },
+        {
+          "scenario": "/Users/mrexception/Documents/Projects/Salimon/salimon/scenarios/orbit-earth.json",
+          "status": "passed",
+          "steps_completed": 23,
+          "duration_ms": 1119,
+          "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-gmm5tp_l",
+          "result_file": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-gmm5tp_l/result.json"
+        },
+        {
+          "scenario": "/Users/mrexception/Documents/Projects/Salimon/salimon/scenarios/resource-deposits.json",
+          "status": "passed",
+          "steps_completed": 64,
+          "duration_ms": 2545,
+          "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-wfe90mxb",
+          "result_file": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-wfe90mxb/result.json"
+        },
+        {
+          "scenario": "/Users/mrexception/Documents/Projects/Salimon/salimon/scenarios/resource-loop.json",
+          "status": "failed",
+          "steps_completed": 144,
+          "duration_ms": 11977,
+          "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-2tv_x9rx",
+          "result_file": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-2tv_x9rx/result.json"
+        },
+        {
+          "scenario": "/Users/mrexception/Documents/Projects/Salimon/salimon/scenarios/resource-streaming.json",
+          "status": "passed",
+          "steps_completed": 134,
+          "duration_ms": 20751,
+          "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-2ws9dj7k",
+          "result_file": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-2ws9dj7k/result.json"
+        },
+        {
+          "scenario": "/Users/mrexception/Documents/Projects/Salimon/salimon/scenarios/space-airlock.json",
+          "status": "passed",
+          "steps_completed": 50,
+          "duration_ms": 1690,
+          "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-6e2zdz91",
+          "result_file": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-suite/run-6e2zdz91/result.json"
+        }
+      ]
+    },
+    "retries": [
+      {
+        "scenario": "scenarios/carrying.json",
+        "status": "passed",
+        "steps_completed": 331,
+        "duration_ms": 24694,
+        "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-retry/run-m7jwfll6",
+        "result_file": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-retry/run-m7jwfll6/result.json"
+      },
+      {
+        "scenario": "scenarios/resource-loop.json",
+        "status": "passed",
+        "steps_completed": 258,
+        "duration_ms": 23502,
+        "artifact_directory": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-retry/run-cflwvwtn",
+        "result_file": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/issue156-native-final-retry/run-cflwvwtn/result.json"
+      }
+    ],
+    "limitation": "Two first-sweep assertion failures passed unchanged-binary reruns; their cause was not isolated. Desktop input/focus remained live in E2E mode."
+  },
+  "native_benchmark_ui_smoke": {
+    "status": "passed",
+    "purpose": "tooling and input isolation only; concurrent CPU preparations exclude FPS claims",
+    "binary_sha256": "95e662d5aeea7cec6a8913ba59adbfe51f84d70eaf5f3cfeb6315bf106cc2d68",
+    "cases": [
+      {
+        "config": {
+          "camera": "facing",
+          "count": 10,
+          "initial_state": "settled_requested",
+          "layout": "dense",
+          "minimum_samples": 100,
+          "sample_seconds": 10,
+          "seed": 155,
+          "settle_steps_limit": 2400,
+          "warmup_seconds": 10,
+          "repeat": 1
+        },
+        "renderer": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "device_type": "IntegratedGpu",
+          "gpu_timestamps_supported": true,
+          "height": 1080,
+          "present_mode": "AutoVsync",
+          "scale_factor": 2.0,
+          "width": 1920
+        },
+        "frame_samples_retained": 601,
+        "sleeping_observed": true,
+        "settled_observed": true
+      },
+      {
+        "config": {
+          "camera": "away",
+          "count": 10,
+          "initial_state": "settled_requested",
+          "layout": "dense",
+          "minimum_samples": 100,
+          "sample_seconds": 10,
+          "seed": 155,
+          "settle_steps_limit": 2400,
+          "warmup_seconds": 10,
+          "repeat": 1
+        },
+        "renderer": {
+          "adapter": "Apple M1",
+          "backend": "Metal",
+          "device_type": "IntegratedGpu",
+          "gpu_timestamps_supported": true,
+          "height": 1080,
+          "present_mode": "AutoVsync",
+          "scale_factor": 2.0,
+          "width": 1920
+        },
+        "frame_samples_retained": 601,
+        "sleeping_observed": true,
+        "settled_observed": true
+      }
+    ],
+    "screenshot": "native-benchmark-input-isolation-live.png"
+  },
+  "large_load_acceptance": "500/1000 corrected interaction runs pending on afb221e; 500 timing preparation waits for isolated collection",
+  "matrix": "dense settled 1000 accepted on a626c3; remaining 94 distinct cases pending"
+}

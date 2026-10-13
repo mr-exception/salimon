@@ -253,7 +253,7 @@ impl ClientApplication {
         self.render_attempts = 0;
         self.retry_at = None;
         self.frame_clock.reset_interval();
-        self.update_clock.reset();
+        self.reset_update_clock();
         self.diagnostics.reset_frame_window();
         Ok(())
     }
@@ -280,7 +280,7 @@ impl ClientApplication {
         } else {
             event_loop.set_control_flow(ControlFlow::Wait);
             self.frame_clock.reset_interval();
-            self.update_clock.reset();
+            self.reset_update_clock();
             self.diagnostics.reset_frame_window();
         }
     }
@@ -500,8 +500,22 @@ impl ClientApplication {
         );
     }
 
+    fn reset_update_clock(&mut self) {
+        self.update_clock.reset();
+        self.mining.fragment_previous.clear();
+    }
+
     /// The same portable gameplay update runs on redraw and on explicit E2E steps.
     pub(crate) fn advance_game(&mut self, delta: Duration) {
+        if self.e2e_config.is_none() {
+            let ship = self.ship.snapshot();
+            let frame = character_ship_frame(ship.pose);
+            let player = self
+                .character
+                .snapshot(frame, surface_frame_for_ship(ship))
+                .eye_position_meters;
+            crate::fragment_physics::capture_previous(&mut self.mining, frame, player);
+        }
         self.camera_prototype.advance(delta);
         self.ship
             .set_steering_input(self.ship_control_input.steering());
@@ -563,17 +577,48 @@ impl ClientApplication {
                 Default::default()
             };
             if let Some(benchmark) = &mut self.benchmark {
-                benchmark.latest_physics = measurements;
+                benchmark.latest_physics.accumulate(measurements);
             }
         }
         self.sync_carried();
         self.action_bar.advance(delta);
     }
 
+    fn advance_native(&mut self, elapsed: Duration) -> (Duration, usize) {
+        let started = Instant::now();
+        self.update_clock.accumulate(elapsed);
+        if let Some(benchmark) = &mut self.benchmark {
+            benchmark.latest_physics.clear_work();
+        }
+        let mut update_delta = Duration::ZERO;
+        let mut ticks = 0;
+        for _ in 0..crate::update_clock::MAX_TICKS_PER_RENDER {
+            // Always allow one tick; subsequent catch-up is allowed only while
+            // within the budget. An individual dense contact solve is not preemptible.
+            if ticks > 0 && started.elapsed() >= crate::update_clock::CATCH_UP_BUDGET {
+                break;
+            }
+            let Some(tick) = self.update_clock.take_tick() else {
+                break;
+            };
+            self.advance_game(tick);
+            update_delta += tick;
+            ticks += 1;
+        }
+        if let Some(benchmark) = &mut self.benchmark {
+            benchmark.latest_scheduler = crate::benchmark::SchedulerSample {
+                ticks,
+                backlog: self.update_clock.backlog(),
+                lifecycle_excluded: self.update_clock.lifecycle_excluded(),
+            };
+        }
+        (update_delta, ticks)
+    }
+
     fn redraw(&mut self, event_loop: &ActiveEventLoop, window: Arc<Window>) {
         if self.occluded {
             self.frame_clock.reset_interval();
-            self.update_clock.reset();
+            self.reset_update_clock();
             self.diagnostics.reset_frame_window();
             return;
         }
@@ -581,14 +626,12 @@ impl ClientApplication {
         self.render_attempts = self.render_attempts.saturating_add(1);
         let render_started_at = Instant::now();
         let update_started_at = Instant::now();
-        let update_delta = if self.automation.is_some() {
+        let elapsed = if self.automation.is_some() {
             Duration::ZERO
         } else {
             self.update_clock.step(update_started_at)
         };
-        if !update_delta.is_zero() {
-            self.advance_game(update_delta);
-        }
+        let (update_delta, ticks) = self.advance_native(elapsed);
         let simulation_time = update_started_at.elapsed();
         self.sync_carried();
         let ship_snapshot = self.ship.snapshot();
@@ -695,7 +738,16 @@ impl ClientApplication {
         }
         if self.view_mode == ViewMode::Gameplay {
             for fragment in self.mining.nearby_fragments(camera.position_meters) {
-                resource_meshes.push(crate::resource_presentation::fragment_mesh(fragment));
+                resource_meshes.push(if self.e2e_config.is_some() {
+                    crate::resource_presentation::fragment_mesh(fragment)
+                } else {
+                    crate::fragment_physics::interpolated_mesh(
+                        &self.mining,
+                        fragment,
+                        ship_frame,
+                        self.update_clock.interpolation(),
+                    )
+                });
             }
         }
         let body_distances = camera_body_distances_from(world_snapshot, camera.position_meters);
@@ -786,13 +838,15 @@ impl ClientApplication {
                 {
                     log::debug!(
                         target: "salimon_client::frame",
-                        "frame={} interval_ms={:.3} present_wall_ms={:.3} cpu_update_ms={:.3} cpu_render_ms={:.3} gpu_time={:?}",
+                        "frame={} interval_ms={:.3} present_wall_ms={:.3} cpu_update_ms={:.3} cpu_render_ms={:.3} gpu_time={:?} ticks={} backlog_ms={:.3}",
                         timing.frame_number,
                         timing.frame_interval.as_secs_f64() * 1_000.0,
                         timing.submission_wall_time.as_secs_f64() * 1_000.0,
                         cpu_update_time.as_secs_f64() * 1_000.0,
                         render_stats.cpu_render_time.as_secs_f64() * 1_000.0,
-                        render_stats.gpu_frame_time
+                        render_stats.gpu_frame_time,
+                        ticks,
+                        self.update_clock.backlog().as_secs_f64() * 1_000.0
                     );
                 }
                 let done = self.benchmark.as_mut().is_some_and(|benchmark| {
@@ -828,7 +882,7 @@ impl ClientApplication {
             RenderOutcome::Retry => self.schedule_retry(event_loop, RENDER_RETRY_DELAY),
             RenderOutcome::Idle => {
                 self.frame_clock.reset_interval();
-                self.update_clock.reset();
+                self.reset_update_clock();
                 self.diagnostics.reset_frame_window();
                 if surface_size(&window).is_drawable() {
                     self.schedule_retry(event_loop, IDLE_RETRY_DELAY);
@@ -895,7 +949,7 @@ impl ApplicationHandler for ClientApplication {
         self.renderer = None;
         self.retry_at = None;
         self.frame_clock.reset_interval();
-        self.update_clock.reset();
+        self.reset_update_clock();
         self.diagnostics.reset_frame_window();
         self.mining.clear_input();
         log::info!("application suspended; GPU presentation resources released");
@@ -937,7 +991,7 @@ impl ApplicationHandler for ClientApplication {
                 self.window = None;
                 self.retry_at = None;
                 self.frame_clock.reset_interval();
-                self.update_clock.reset();
+                self.reset_update_clock();
                 self.diagnostics.reset_frame_window();
                 event_loop.exit();
             }
@@ -977,7 +1031,7 @@ impl ApplicationHandler for ClientApplication {
                 self.occluded = is_occluded;
                 self.retry_at = None;
                 self.frame_clock.reset_interval();
-                self.update_clock.reset();
+                self.reset_update_clock();
                 self.diagnostics.reset_frame_window();
                 if is_occluded {
                     event_loop.set_control_flow(ControlFlow::Wait);
@@ -1214,6 +1268,47 @@ mod toolbar_tests {
     use super::*;
     use crate::equipment::ToolbarSlot;
     use salimon_world::{CameraCommand, CelestialBodyId};
+
+    #[test]
+    fn stalled_native_scheduler_matches_shared_fixed_gameplay_ticks() {
+        let mut app = ClientApplication::default();
+        let mut reference = ClientApplication::default();
+        for instance in [&mut app, &mut reference] {
+            crate::benchmark_fixture::initialize(
+                instance,
+                6,
+                crate::benchmark_fixture::Layout::Dense,
+                159,
+                true,
+            )
+            .unwrap();
+        }
+        let mut input = Duration::from_secs(2);
+        let mut advanced = Duration::ZERO;
+        loop {
+            let (delta, ticks) = app.advance_native(input);
+            input = Duration::ZERO;
+            assert!((1..=crate::update_clock::MAX_TICKS_PER_RENDER).contains(&ticks));
+            assert_eq!(delta, crate::update_clock::GAME_TICK * ticks as u32);
+            for _ in 0..ticks {
+                reference.advance_game(crate::update_clock::GAME_TICK);
+            }
+            advanced += delta;
+            assert_eq!(
+                advanced + app.update_clock.backlog(),
+                Duration::from_secs(2)
+            );
+            assert_eq!(app.ship.snapshot().pose, reference.ship.snapshot().pose);
+            assert_eq!(
+                app.mining.session.fragments(),
+                reference.mining.session.fragments()
+            );
+            if app.update_clock.backlog() < crate::update_clock::GAME_TICK {
+                break;
+            }
+        }
+        assert_eq!(advanced, Duration::from_secs(2));
+    }
 
     #[test]
     fn numeric_inputs_select_gameplay_slots_without_changing_the_tour() {

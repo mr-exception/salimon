@@ -25,6 +25,7 @@ pub(crate) fn release(
     frame: ShipFrame,
     inside: bool,
 ) {
+    tool.fragment_previous.remove(&id);
     let velocity = if inside {
         salimon_physics::floor_release_velocity([
             dot(player_forward, frame.axes[0]),
@@ -61,6 +62,78 @@ pub(crate) fn release(
     );
 }
 
+/// Save presentation history before a native gameplay tick, in each object's
+/// simulation frame. New/growing/transferred/released objects bypass history.
+pub(crate) fn capture_previous(tool: &mut MiningTool, frame: ShipFrame, player: [f64; 3]) {
+    let pieces = snapshots(tool, frame, player);
+    tool.fragment_previous.clear();
+    tool.fragment_previous.extend(
+        pieces
+            .into_iter()
+            .map(|(fragment, state)| (fragment.id(), state)),
+    );
+}
+
+pub(crate) fn interpolated_mesh(
+    tool: &MiningTool,
+    fragment: salimon_world::resources::ResourceFragment,
+    frame: ShipFrame,
+    alpha: f64,
+) -> salimon_renderer::ResourceMeshInstance {
+    let mut mesh = crate::resource_presentation::fragment_mesh(fragment);
+    let Some(previous) = tool.fragment_previous.get(&fragment.id()) else {
+        return mesh;
+    };
+    let local = tool.ship_fragments.get(&fragment.id());
+    if alpha >= 1.0
+        || Some(fragment.id()) == tool.session.carried_id()
+        || matches!(previous.surface, Surface::Floor { .. }) != local.is_some()
+        || previous.side_meters != mesh.side_meters
+        || previous.mass_kg != fragment.material().mass_kg()
+    {
+        return mesh;
+    }
+    let current = local.copied().unwrap_or(mesh.center_meters);
+    let position =
+        std::array::from_fn(|i| previous.position[i] + (current[i] - previous.position[i]) * alpha);
+    let current_q = if local.is_some() {
+        tool.fragment_motion
+            .get(&fragment.id())
+            .and_then(|m| m.ship_orientation)
+            .unwrap_or_else(|| to_local_orientation(frame, mesh.orientation_xyzw))
+    } else {
+        mesh.orientation_xyzw
+    };
+    let sign = if previous
+        .orientation
+        .iter()
+        .zip(current_q)
+        .map(|(a, b)| a * b)
+        .sum::<f64>()
+        < 0.0
+    {
+        -1.0
+    } else {
+        1.0
+    };
+    let q: [f64; 4] = std::array::from_fn(|i| {
+        previous.orientation[i] + (sign * current_q[i] - previous.orientation[i]) * alpha
+    });
+    let norm = q.iter().map(|v| v * v).sum::<f64>().sqrt();
+    let q = q.map(|v| v / norm);
+    mesh.center_meters = if local.is_some() {
+        frame.local_to_world(position)
+    } else {
+        position
+    };
+    mesh.orientation_xyzw = if local.is_some() {
+        to_world_orientation(frame, q)
+    } else {
+        q
+    };
+    mesh
+}
+
 pub(crate) fn advance(tool: &mut MiningTool, frame: ShipFrame, delta: Duration, player: [f64; 3]) {
     advance_measured(tool, frame, delta, player, false);
 }
@@ -72,6 +145,53 @@ pub(crate) struct Measurements {
     pub(crate) total_time: Duration,
     /// Velocity threshold observation, separate from persistent activation.
     pub(crate) moving_objects: usize,
+}
+
+impl Measurements {
+    /// Keep population/activation observations on renders without a game tick,
+    /// but never count the previous tick's work again.
+    pub(crate) fn clear_work(&mut self) {
+        let old = self.solver;
+        *self = Self {
+            solver: salimon_physics::StepStats {
+                objects: old.objects,
+                awake_objects: old.awake_objects,
+                sleeping_objects: old.sleeping_objects,
+                quiet_objects: old.quiet_objects,
+                ..Default::default()
+            },
+            moving_objects: self.moving_objects,
+            ..Default::default()
+        };
+    }
+
+    /// Work totals cover every tick in the rendered frame; state counts observe
+    /// the final tick. Native catch-up must not hide its first solver call.
+    pub(crate) fn accumulate(&mut self, next: Self) {
+        let old = self.solver;
+        self.solver = next.solver;
+        macro_rules! sum {
+            ($($field:ident),*) => { $(self.solver.$field += old.$field;)* };
+        }
+        sum!(
+            integrated_objects,
+            substeps,
+            solver_passes,
+            pair_visits,
+            radius_candidates,
+            narrow_phase_tests,
+            contacts,
+            projection_builds,
+            projection_storage_bytes,
+            matrix_allocations,
+            activation_time,
+            integration_time,
+            contact_time
+        );
+        self.adapter_time += next.adapter_time;
+        self.total_time += next.total_time;
+        self.moving_objects = next.moving_objects;
+    }
 }
 
 pub(crate) fn advance_measured(
@@ -306,6 +426,97 @@ mod tests {
         tool.session
             .extract(&mut deposit, Duration::from_secs_f64(mass / 2.0));
         tool
+    }
+
+    #[test]
+    fn interpolation_is_local_to_ship_and_release_has_no_history_lag() {
+        let mut tool = mined(2.0);
+        let id = tool.session.fragments()[0].id();
+        tool.ship_fragments.insert(id, [-5.0, 1.3, 0.0]);
+        capture_previous(&mut tool, frame(), [-5.0, 2.0, 0.0]);
+        let moving = ShipFrame {
+            origin_meters: [1e12, 2e12, -3e12],
+            ..frame()
+        };
+        advance(
+            &mut tool,
+            moving,
+            Duration::from_millis(16),
+            moving.local_to_world([-5.0, 2.0, 0.0]),
+        );
+        let fragment = tool.session.fragments()[0];
+        let start = interpolated_mesh(&tool, fragment, moving, 0.0);
+        assert_eq!(start.center_meters, moving.local_to_world([-5.0, 1.3, 0.0]));
+        let midpoint = interpolated_mesh(&tool, fragment, moving, 0.5);
+        let local = tool.ship_fragments[&id];
+        assert_eq!(
+            midpoint.center_meters,
+            moving.local_to_world([-5.0, (1.3 + local[1]) * 0.5, 0.0])
+        );
+        assert!((midpoint.orientation_xyzw.iter().map(|v| v * v).sum::<f64>() - 1.0).abs() < 1e-12);
+        let authoritative = crate::resource_presentation::fragment_mesh(fragment);
+        assert_eq!(
+            interpolated_mesh(&tool, fragment, moving, 1.0).center_meters,
+            authoritative.center_meters
+        );
+        release(&mut tool, id, moving.axes[0], moving, true);
+        assert!(!tool.fragment_previous.contains_key(&id));
+        assert_eq!(
+            interpolated_mesh(&tool, fragment, moving, 0.0).center_meters,
+            authoritative.center_meters
+        );
+    }
+
+    #[test]
+    fn changed_size_or_frame_and_carried_objects_bypass_interpolation() {
+        let mut tool = mined(2.0);
+        let fragment = tool.session.fragments()[0];
+        let id = fragment.id();
+        tool.ship_fragments.insert(id, [-5.0, 1.3, 0.0]);
+        capture_previous(&mut tool, frame(), [-5.0, 2.0, 0.0]);
+        let expected = crate::resource_presentation::fragment_mesh(fragment).center_meters;
+        tool.fragment_previous.get_mut(&id).unwrap().side_meters *= 0.5;
+        assert_eq!(
+            interpolated_mesh(&tool, fragment, frame(), 0.0).center_meters,
+            expected
+        );
+        capture_previous(&mut tool, frame(), [-5.0, 2.0, 0.0]);
+        tool.ship_fragments.remove(&id);
+        assert_eq!(
+            interpolated_mesh(&tool, fragment, frame(), 0.0).center_meters,
+            expected
+        );
+        tool.ship_fragments.insert(id, [-5.0, 1.3, 0.0]);
+        assert!(tool.session.pick_up(id));
+        assert_eq!(
+            interpolated_mesh(&tool, fragment, frame(), 0.0).center_meters,
+            expected
+        );
+    }
+
+    #[test]
+    fn measured_frame_sums_work_and_keeps_latest_activation() {
+        let mut frame = Measurements::default();
+        for sleeping in [10, 11] {
+            frame.accumulate(Measurements {
+                solver: salimon_physics::StepStats {
+                    substeps: 2,
+                    integrated_objects: 3,
+                    sleeping_objects: sleeping,
+                    ..Default::default()
+                },
+                total_time: Duration::from_millis(5),
+                ..Default::default()
+            });
+        }
+        assert_eq!(frame.solver.substeps, 4);
+        assert_eq!(frame.solver.integrated_objects, 6);
+        assert_eq!(frame.solver.sleeping_objects, 11);
+        assert_eq!(frame.total_time, Duration::from_millis(10));
+        frame.clear_work();
+        assert_eq!(frame.solver.substeps, 0);
+        assert_eq!(frame.total_time, Duration::ZERO);
+        assert_eq!(frame.solver.sleeping_objects, 11);
     }
 
     #[test]

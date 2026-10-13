@@ -58,7 +58,7 @@ to run on the native event thread with explicit fixed steps and production gates
 3. Schedule redraws while the application has a live, drawable window, and use a
    short delayed retry when the presentation surface is temporarily unavailable.
 4. Before each drawable render attempt, advance portable character/ship/camera
-   state with a bounded monotonic delta. Map the six catalog bodies to `f64` sphere/material
+   state with the shared bounded tick scheduler below. Map the six catalog bodies to `f64` sphere/material
    DTOs, map Sun lighting, preserve separate marker cuboids, calculate camera-to-surface
    distances, and measure that real update work. In gameplay view, map the ship's
    pose, door state, and latest speed/thruster snapshot into `ShipMeshInstance`.
@@ -373,8 +373,8 @@ carried pieces, through aggregate/per-fragment sleeping fields. Preparation is
 initial-condition work; later interactions retain production gates and stepping.
 
 Frame intervals use a separate uncapped monotonic clock, preserving long spikes
-hidden by rolling diagnostics' 250ms display clamp. Normal update-delta clamping
-is unchanged and reported. Samples are retained in memory and written once at
+hidden by rolling diagnostics' 250ms display clamp. Native gameplay uses the shared bounded tick scheduler below; simulation delta
+is the sum of completed 16 ms ticks and backlog is reported separately. Samples are retained in memory and written once at
 completion; high-frequency CPU runs decimate deterministically to bounded storage
 and report stride/observed count. Native early closure must produce no successful
 benchmark result. See the [benchmark guide](../../scripts/FRAGMENT_BENCHMARKS.md).
@@ -399,3 +399,42 @@ Physics owns thresholds, contact support and waking. Runtime/benchmark map
 awake/sleeping/integrated counters; renderer and interaction continue consuming
 the complete session, including sleeping pieces. No cargo cap/deletion or disk
 persistence is introduced. See the [sleep contract](../physics/architecture.md#persistent-contact-island-sleep-156).
+
+## Bounded gameplay ticks and fragment interpolation (#159)
+
+`update_clock` retains every observed monotonic interval during drawable gameplay
+in a `Duration` backlog. Redraw runs at most two **16 ms** `advance_game` calls,
+with a **4 ms** catch-up admission budget checked after the first tick. A single
+contact solve is not preemptible; the budget is not a hard wall-time guarantee.
+Camera tour, ship, character, mining, fragment physics and action expiry all
+receive the same completed tick durations. No solver-only time clamp or enlarged
+catch-up tick is used. Native input takes effect on the next tick using current
+held state; backlog is elapsed-time debt, not a recorded input event replay.
+
+Overload retains debt and slows the entire gameplay simulation relative to wall
+time. Recovery drains it in bounded batches. A long unreported stall is no longer
+silently clamped to 250 ms. Lifecycle resets (occlusion, suspension, zero drawable,
+renderer reconstruction) deliberately exclude the gap and clear already queued
+debt plus interpolation history; cleared debt is added to `lifecycle_excluded`.
+Unobserved lifecycle gap duration is not represented as gameplay debt. Saturating
+`Duration` arithmetic bounds representation, not a gameplay cargo/time cap.
+Automation still advances the exact requested fixed delta directly, and renders
+current authoritative state; it never uses native backlog or interpolation.
+
+Before each native tick, runtime captures selected loose fragment poses in their
+simulation frames. Presentation blends previous/current centers in f64 and uses
+normalized shortest-sign quaternion interpolation. Ship-local history maps
+through the current ship frame, avoiding interpolation across rigid world-space
+ship travel. The alpha is backlog / tick, clamped to 1 under overload; using a
+modulo remainder would produce a backward sawtooth. New/growing/frame-transferred,
+carried and just-released objects bypass incompatible history. Release invalidates
+history immediately; held/drop/pickup authority and interaction queries never use
+interpolated poses. Interpolation adds up to one tick of loose-object visual delay;
+native visual quality is a separate graphical gate. Ship/camera/controller poses
+remain authoritative; this change does not smooth all native controller motion.
+
+Native benchmark samples sum solver work/time across all completed ticks in a
+render and retain the final activation counts. Zero-tick renders record zero new
+work while retaining the last activation observation. Samples include `game_ticks`,
+`game_backlog_ms` and cumulative `lifecycle_excluded_ms`; CPU-only samples have no
+native scheduler observation. Periodic frame debug logs include ticks/backlog.

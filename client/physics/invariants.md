@@ -35,7 +35,8 @@
   remains 0.015 rad/s. Unsupported
   short updates cannot erase gravity. Convex contacts receive 16 passes before
   advancement and another 16 when the pose moves. Substeps adapt to scale and speed, target at most
-  1/90 s and cap at 4096; all elapsed time is retained. No CCD guarantee is made.
+  1/90 s and cap at 4096; the awake motion target is reevaluated after each
+  response, including gravity speed. All elapsed time is retained. No CCD guarantee is made.
 - The optional sphere fallback preserves three passes, the 48-step cap and
   original ground restitution/tangent damping. Missing hulls never spin.
 - Floor/non-floor groups and distinct sphere centers do not contact. One floor

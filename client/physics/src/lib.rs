@@ -238,23 +238,45 @@ fn advance_impl<const PROFILE: bool>(
     }
     // A fixed maximum substep prevents fast ejected pieces from tunnelling through a pile.
     let has_hulls = pieces.iter().any(|p| p.hull.is_some());
-    let motion_step = pieces
-        .iter()
-        .filter(|p| p.hull.is_some())
-        .map(|p| {
-            (0.15 * p.side_meters
-                / (length(p.velocity) + length(p.angular_velocity) * p.radius + 1.0))
-                .min(MAX_STEP)
-        })
-        .fold(MAX_STEP, f64::min);
-    let steps = if has_hulls {
-        (elapsed / motion_step.max(1e-5)).ceil().clamp(1.0, 4096.0) as usize
-    } else {
-        (elapsed / MAX_STEP).ceil().clamp(1.0, 48.0) as usize
-    };
-    let dt = elapsed / steps as f64;
+    let base_steps = (elapsed / MAX_STEP)
+        .ceil()
+        .clamp(1.0, if has_hulls { 4096.0 } else { 48.0 }) as usize;
+    let base_dt = elapsed / base_steps as f64;
+    let mut remaining = elapsed;
+    let mut completed = 0;
     let mut local_geometry = convex::PairGeometry::default();
-    for _ in 0..steps {
+    while remaining > 0.0 {
+        // Reevaluate after each response: a fast ejection that lands must not
+        // impose its initial timestep on the rest of this update. Sleeping
+        // objects do not constrain motion until impact/support changes wake them.
+        let motion_step = pieces
+            .iter()
+            .enumerate()
+            .filter(|(i, p)| {
+                p.hull.is_some() && !activation.as_ref().is_some_and(|a| a.sleeping[*i])
+            })
+            .map(|(_, p)| {
+                0.15 * p.side_meters
+                    / (length(p.velocity)
+                        + length(p.angular_velocity) * p.radius
+                        + 1.0
+                        + GRAVITY * base_dt)
+            })
+            .fold(base_dt, f64::min)
+            .max(1e-5);
+        let available = if has_hulls { 4096 } else { base_steps } - completed;
+        let dt = if has_hulls {
+            let steps = (remaining / motion_step)
+                .ceil()
+                .clamp(1.0, available as f64);
+            (remaining / steps)
+                .min(base_dt)
+                .max(remaining / available as f64)
+        } else {
+            remaining / available as f64
+        };
+        remaining = (remaining - dt).max(0.0);
+        completed += 1;
         if let Some(a) = &mut activation {
             a.impacts(pieces, dt);
         }

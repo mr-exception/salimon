@@ -6,8 +6,10 @@
    a GPU surface.
 3. Every accepted nonzero resize reaches the renderer before the next presented
    frame.
-4. Frame and update intervals come from monotonic clocks and clamp unreported
-   long OS stalls; the renderer never owns or advances simulation time.
+4. Frame and update intervals come from monotonic clocks. Native gameplay retains
+   observed elapsed time as backlog and advances all domains in bounded 16 ms
+   ticks; diagnostics may clamp display intervals. The renderer never advances
+   simulation time. Lifecycle exclusions are explicit; see the tick contract.
 5. Recoverable surface loss rebuilds or reconfigures rendering state. A transient
    surface acquisition failure is delayed and does not crash or hot-loop the
    application.

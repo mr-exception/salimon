@@ -11,6 +11,9 @@ use salimon_world::{BodyRole, CELESTIAL_BODIES, WorldPosition};
 
 use salimon_physics::{ObjectState, SphereSurface, Surface};
 
+#[cfg(test)]
+mod geometry_evaluation;
+
 #[derive(Clone, Copy, Debug, Default)]
 pub(crate) struct FragmentMotion {
     pub(crate) velocity: [f64; 3],

@@ -779,6 +779,26 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "opt-in authored geometry inventory; no GPU timing"]
+    fn resource_geometry_inventory() {
+        let meshes = ASSETS.map(|asset| geometry(asset).unwrap());
+        let (_, indices, ranges) = indexed_geometry(&meshes);
+        println!("mesh,triangle_corners,indexed_vertices,triangles");
+        for (i, mesh) in ALL_MESHES.iter().enumerate() {
+            let unique: std::collections::BTreeSet<_> = indices
+                [ranges[i].start as usize..ranges[i].end as usize]
+                .iter()
+                .collect();
+            println!(
+                "{mesh:?},{},{},{}",
+                meshes[i].len(),
+                unique.len(),
+                meshes[i].len() / 3
+            );
+        }
+    }
+
+    #[test]
     fn every_authored_variant_enlarges_actual_extents_and_reports_ground_support() {
         let meshes = ASSETS.map(|asset| geometry(asset).unwrap());
         let camera = CameraFrame {
@@ -921,6 +941,8 @@ mod tests {
 #[cfg(test)]
 mod gpu_tests {
     use super::*;
+
+    mod geometry_evaluation;
 
     fn block_on<F: std::future::Future>(future: F) -> F::Output {
         let mut future = std::pin::pin!(future);

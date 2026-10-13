@@ -85,6 +85,11 @@ entities/environment, supplies geometry and sequences the solver; keep restituti
 gravity, contact response and substeps out of the native adapter. See the
 [ownership decision](../../docs/technical-architecture.md#physical-object-simulation-decision-114).
 
+`fragment_physics/geometry_evaluation.rs` is an opt-in geometry audit and CPU
+control experiment, not gameplay fixtures or replacement collision geometry.
+Run the commands and interpret limitations in the
+[benchmark guide](../../scripts/FRAGMENT_BENCHMARKS.md#resource-geometry-evaluation-160).
+
 Equipment toolbar state lives in `equipment.rs`, composed in `app.rs`. Keep
 world-session carrying checks and native/automation view gates aligned. Its
 selection is the sole equipment authority for mining, held presentation and reticle.

@@ -14,6 +14,10 @@ runtime fragment tests protect integration with the existing resource session.
 Run `cargo test -p salimon-physics --locked` while iterating and workspace gates
 for contract changes. Record task evidence under root `reports/`.
 
+`ConvexHull::complexity` is read-only geometry instrumentation. The runtime's
+opt-in [geometry evaluation](../../scripts/FRAGMENT_BENCHMARKS.md#resource-geometry-evaluation-160)
+combines these counts with authored vertices; asset loading remains outside physics.
+
 
 Persistent activation policy lives in `src/sleep.rs`; its stable-ID cache is
 owned by each caller. It also owns stable-ID warm contact reactions; changes to

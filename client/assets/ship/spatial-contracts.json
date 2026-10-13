@@ -32,28 +32,40 @@
     ]
   },
   "assetId": "ship.salimon-scout",
+  "boardingRamp": {
+    "extensionFaceOffsetMeters": 0.08,
+    "extensionTravelMeters": 2.13118279595699,
+    "openAngleRadians": 2.1355297104231683,
+    "pivot": [
+      -7.68,
+      0.24731182795698925,
+      0
+    ],
+    "rampHalfWidthMeters": 1.4,
+    "rampLengthMeters": 4.4
+  },
   "colliders": {
     "COLLIDER_AftDoor": {
       "centerMeters": [
-        -7.68,
-        1.3817204301075268,
+        -7.78,
+        1.3817204299784946,
         0
       ],
       "lowerMeters": [
-        -7.819999999999999,
-        0.24731182795698925,
+        -7.88,
+        0.24731182795698947,
         -1.4
       ],
       "purpose": "interactive-door",
       "shape": "box",
       "sizeMeters": [
-        0.28,
-        2.268817204301075,
+        0.2,
+        2.2688172040430103,
         2.8
       ],
       "upperMeters": [
-        -7.54,
-        2.516129032258064,
+        -7.680000000000001,
+        2.516129032,
         1.4
       ]
     },

@@ -258,7 +258,7 @@
     {
       "action": {
         "op": "step",
-        "frames": 40
+        "frames": 100
       }
     },
     {
@@ -322,7 +322,7 @@
     {
       "action": {
         "op": "step",
-        "frames": 120
+        "frames": 70
       }
     },
     {
@@ -1208,7 +1208,7 @@
     {
       "action": {
         "op": "step",
-        "frames": 85
+        "frames": 145
       }
     },
     {
@@ -1325,7 +1325,7 @@
     {
       "action": {
         "op": "step",
-        "frames": 85
+        "frames": 166
       }
     },
     {
@@ -1450,7 +1450,7 @@
     {
       "assert": {
         "path": "world.fragments.0.ship_local_position_meters.0",
-        "approx": -5.6458740234375,
+        "approx": -5.488603714867827,
         "tolerance": 0.02
       }
     },
@@ -1464,7 +1464,7 @@
     {
       "assert": {
         "path": "world.fragments.0.ship_local_position_meters.2",
-        "approx": -2.3327877236623005,
+        "approx": -2.434869022484248,
         "tolerance": 0.02
       }
     },
@@ -1668,7 +1668,7 @@
     {
       "assert": {
         "path": "world.fragments.0.ship_local_position_meters.0",
-        "approx": -5.6458740234375,
+        "approx": -5.488603714867827,
         "tolerance": 0.02
       }
     },
@@ -1682,7 +1682,7 @@
     {
       "assert": {
         "path": "world.fragments.0.ship_local_position_meters.2",
-        "approx": -2.3327877236623005,
+        "approx": -2.434869022484248,
         "tolerance": 0.02
       }
     },

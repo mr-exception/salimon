@@ -237,7 +237,10 @@
       }
     },
     {
-      "action": {"op": "step", "frames": 45}
+      "action": {
+        "op": "step",
+        "frames": 45
+      }
     },
     {
       "action": {
@@ -249,7 +252,7 @@
     {
       "action": {
         "op": "step",
-        "frames": 40
+        "frames": 100
       }
     },
     {

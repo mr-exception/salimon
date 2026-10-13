@@ -62,6 +62,9 @@ impl CharacterController {
                 local = slide_around_obstacles(previous, local, &CLOSED_GATE_OBSTACLE);
             }
         }
+        if self.ramp_moving {
+            local = crate::ramp::resolve_moving_sweep(previous, local);
+        }
         local = slide_around_appendages(previous, local, world_round_trip_tolerance(world));
         let through_gate = previous[0] < DOORWAY_FORWARD
             && local[0] >= DOORWAY_FORWARD - COLLISION_EPSILON

@@ -53,7 +53,11 @@ impl CharacterController {
             };
         } else if local[0] < DOORWAY_FORWARD && within_doorway && doorway_passable {
             self.position = PositionState::Doorway {
-                world: ship.local_to_world(local),
+                world: ship.local_to_world([
+                    local[0],
+                    crate::ramp::floor_at(local[0]) + PLAYER_EYE_HEIGHT_METERS,
+                    local[2],
+                ]),
                 elapsed: Duration::ZERO,
                 leaving_ship: true,
             };

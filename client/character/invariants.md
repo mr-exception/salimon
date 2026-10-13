@@ -4,10 +4,10 @@
 2. Ship gravity completely owns the character while the controller is inside or
    seated, irrespective of the nearby planetary surface.
 3. A closed door blocks passage in either direction. An open flying airlock
-   admits space EVA; landed crossings use the doorway gravity blend. Closing
+   admits space EVA; landed crossings use continuous ramp support. Closing
    during a doorway blend ends it before movement and resolves overlap to the
    nearer physical side; an existing surface walker always remains outside.
-4. A landed open-door crossing blends gravity direction for exactly 250 ms.
+4. A landed fully deployed ramp blends up by distance along the support, retaining contact indefinitely at rest.
    WASD stays camera-relative throughout the blend; re-entry requires movement
    toward the cabin rather than a particular key.
 5. Surface positions remain at body radius plus eye height and support traversal
@@ -26,7 +26,7 @@
     body-radius clearance and edge sliding. The aisles on both sides reach the nose.
 12. Rear window bulkheads remain solid with the door open. Doorway crossings
     require enough lateral clearance for the player's complete body, including
-    oblique movement throughout the gravity blend.
+    oblique movement throughout ramp traversal.
 13. Spawn and cockpit exit place the player in the starboard aisle without
     intersecting the Core, chair, or walking boundary.
 14. Jumping keeps the complete player body below the ceiling fixtures and the
@@ -45,7 +45,7 @@
 18. Closing around a surface walker in the gate clears the overlap before
     walking or jump input is processed. A closed gate cannot grant ship gravity,
     interior state, or cockpit entry. Repeated reopening restores the ordinary
-    250 ms blend and body-clear passage in either direction.
+    distance-based up blend and body-clear ramp passage in either direction.
 19. Both engine bodies and their raised fins block exterior surface movement
     from all planar approaches while vertically overlapping the player's body.
     Their boxes follow the ship frame and leave clearance beyond their bounds.
@@ -84,4 +84,4 @@ See the [source ownership table](architecture.md#internal-ownership).
 24. Fixed landing feet/legs have generated finite-height collision boxes. Raised
     hull clearance does not become an invisible solid wall beneath the ship.
     The aft boarding corridor remains body-clear, closed-door gated and restricted
-    to the existing doorway; ramp geometry/traversal belongs to its follow-up.
+    to the existing doorway; the authored bottom-hinged ramp supplies continuous sloping support.

@@ -71,7 +71,7 @@ upward floor panes and downward nose glazing. The manifest records validated
 downward pitch/yaw samples from the seated eye. Exported-triangle
 rays must hit lower glazing and no opaque mesh; they cover the actual deck,
 belly, consoles, trim and hull rather than only pane bounds. The asset remains
-within 6,000 triangles, 120 primitives, 13 materials and the 512 KiB GLB budget.
+within 6,500 triangles, 124 primitives, 13 materials and the 512 KiB GLB budget.
 
 The native visual scenario follows free-look, assisted landing, low-altitude
 approach, landed inspection, takeoff and cockpit exit. See
@@ -100,7 +100,7 @@ Spatial Rust layouts are derived from authored proxies/markers.
   center console and the routes on both sides into the nose. The glass is hidden
   in this view to expose the controls.
 - [Closed pressure door](previews/current-door-closed.jpg),
-  [partway through the top-hinge motion](previews/current-door-opening.jpg), and
+  [historical upward hinge motion (superseded by #169)](previews/current-door-opening.jpg), and
   [open doorway](previews/current-door-open.jpg) show the revised aft exit.
   [Exterior door face](previews/current-door-exterior-closed.jpg) shows the
   recessed backing and raised graphite plate without overlapping surfaces.
@@ -154,10 +154,13 @@ the same derived geometry. The human is 1.80 m tall with a 1.75 m eye height;
 these dimensions, the seated eye offset and permissions are Rust gameplay policy.
 Keep spawn/cockpit exit in a clear aisle. Runtime Cargo builds need no Blender.
 
-Only `Exit_Door` moves for the door state. Its sealed leaf rotates 110 degrees
-outward and upward about the top hinge over 700 ms, leaving the 2.8 m doorway
-clear; the hinge housing and lugs remain attached to the frame. Its exterior graphite plate
-sits 25 mm proud of the teal backing to avoid depth flicker. Only the `Cockpit Glass` material uses
+`Exit_Door` lowers about its bottom edge and `Exit_Ramp_Tip` telescopes after
+lowering, producing a continuous 4.4 m boarding surface from the flush threshold
+to the landed foot plane. The authored dimensions, staged reversible animation,
+collision policy and regeneration recipe are in the
+[boarding ramp contract](../../../models/assets/ships/salimon-scout/README.md#boarding-ramp-169).
+Both meshes remain in the existing opaque draw. Graphite and teal faces remain
+separated to avoid depth flicker. Only the `Cockpit Glass` material uses
 alpha blending. The renderer combines opaque geometry into one draw and all
 window panes into a second draw; it preserves emissive color separately and
 applies a warm fill to `Interior` descendants. There are no dynamic shadows,
@@ -180,7 +183,7 @@ nose. Its evidence variant captures the nose approach.
 ## Budgets and verification
 
 Measured export counts and dimensions are recorded by `export-report.json`.
-Hard caps: 6,000 triangles, 120 primitives, 13 materials, 512 KiB GLB; runtime ship
+Hard caps: 6,500 triangles, 124 primitives, 13 materials, 512 KiB GLB; runtime ship
 submission remains two draws. This is a deliberate increase from the initial
 620-triangle greybox to allow the requested design detail, while remaining small.
 The original texture is included for DCC interchange; the native ship shader

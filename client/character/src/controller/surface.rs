@@ -62,25 +62,37 @@ impl CharacterController {
                 world = surface_eye_at_ship_planar_position(local, ship, surface);
             }
         }
+        if (self.ramp_moving && step.ship_landed)
+            || (doorway_passable && !approaching_ramp_tip(previous, local))
+        {
+            let obstacles = [[
+                crate::ramp::tip_x(),
+                crate::ramp_geometry::RAMP_HINGE[0],
+                -crate::ramp_geometry::RAMP_HALF_WIDTH_METERS - PLAYER_RADIUS_METERS,
+                crate::ramp_geometry::RAMP_HALF_WIDTH_METERS + PLAYER_RADIUS_METERS,
+            ]];
+            let before = local;
+            local = slide_around_obstacles(previous, local, &obstacles);
+            if local[0] != before[0] || local[2] != before[2] {
+                world = surface_eye_at_ship_planar_position(local, ship, surface);
+            }
+        }
         let before_appendages = local;
         local = slide_around_appendages(previous, local, world_round_trip_tolerance(world));
         if local[0] != before_appendages[0] || local[2] != before_appendages[2] {
             world = surface_eye_at_ship_planar_position(local, ship, surface);
         }
-        let through_gate = overlaps_gate
-            && previous[0] < DOORWAY_FORWARD
-            && local[0] > EXTERIOR_AFT
-            && local[0] <= DOORWAY_FORWARD + COLLISION_EPSILON
-            && previous[2].abs() <= DOORWAY_SIDE_LIMIT + COLLISION_EPSILON
-            && local[2].abs() <= DOORWAY_SIDE_LIMIT + COLLISION_EPSILON
-            && local[1]
-                <= DOORWAY_CEILING_HEIGHT - (PLAYER_BODY_HEIGHT_METERS - PLAYER_EYE_HEIGHT_METERS);
-        // Re-entry follows actual inward movement, regardless of which
-        // key produces it. Ignore rounding noise from parallel strafing.
+        let tip = crate::ramp::tip_x();
         let moving_into_ship = dot(tangent, ship.axes[0]) > 1.0e-6;
-        if doorway_passable && through_gate && moving_into_ship {
+        let approaching_tip = previous[0] <= tip + world_round_trip_tolerance(world)
+            && local[0] > tip
+            && previous[2].abs() <= crate::ramp::side_limit()
+            && local[2].abs() <= crate::ramp::side_limit()
+            && (local[1] - PLAYER_EYE_HEIGHT_METERS - crate::ramp::floor_at(tip)).abs() < 0.3;
+        if doorway_passable && approaching_tip && moving_into_ship {
+            local[1] = crate::ramp::floor_at(local[0]) + PLAYER_EYE_HEIGHT_METERS;
             self.position = PositionState::Doorway {
-                world,
+                world: ship.local_to_world(local),
                 elapsed: Duration::ZERO,
                 leaving_ship: false,
             };
@@ -88,6 +100,12 @@ impl CharacterController {
             self.position = PositionState::Surface { world };
         }
     }
+}
+
+fn approaching_ramp_tip(previous: [f64; 3], proposed: [f64; 3]) -> bool {
+    previous[0] <= crate::ramp::tip_x() + 0.001
+        && previous[2].abs() <= crate::ramp::side_limit()
+        && proposed[2].abs() <= crate::ramp::side_limit()
 }
 
 pub(super) fn surface_view_basis(

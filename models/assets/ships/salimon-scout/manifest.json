@@ -299,6 +299,10 @@
       {
         "node": "Landing_Gear_Forward_Starboard",
         "path": "salimon"
+      },
+      {
+        "node": "Exit_Ramp_Tip",
+        "path": "salimon"
       }
     ]
   },

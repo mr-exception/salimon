@@ -173,7 +173,22 @@ def build_spatial_contracts(document, preservation=None, binary=None):
 
     if binary is not None:
         result["landingSupport"] = landing_support_contract(document, binary)
+    door = nodes['Exit_Door']['extras']['salimon']
+    result['boardingRamp'] = {key: door[key] for key in
+        ('pivot', 'openAngleRadians', 'rampLengthMeters', 'extensionTravelMeters',
+         'extensionFaceOffsetMeters', 'rampHalfWidthMeters')}
     return result
+
+
+def ramp_rust_source(contract):
+    return ('// Generated from Blender-authored boarding ramp; do not edit by hand.\n'
+        + f"pub const RAMP_HINGE: [f64; 3] = {contract['pivot']!r};\n"
+        + ''.join(f"pub const {name}: f64 = {contract[key]!r};\n" for name, key in (
+            ('RAMP_ANGLE_RADIANS', 'openAngleRadians'),
+            ('RAMP_LENGTH_METERS', 'rampLengthMeters'),
+            ('RAMP_EXTENSION_METERS', 'extensionTravelMeters'),
+            ('RAMP_FACE_OFFSET_METERS', 'extensionFaceOffsetMeters'),
+            ('RAMP_HALF_WIDTH_METERS', 'rampHalfWidthMeters'))))
 
 
 def landing_support_contract(document, binary):

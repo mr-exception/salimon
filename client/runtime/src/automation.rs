@@ -1058,6 +1058,14 @@ mod tests {
     }
 
     #[test]
+    fn boarding_ramp_walkthrough_preserves_contact_and_rejects_occupied_closure() {
+        assert_gameplay_scenario(
+            Scenario::LandedEarth,
+            include_str!("../../../scenarios/boarding-ramp.json"),
+        );
+    }
+
+    #[test]
     fn cockpit_nose_walkthrough_uses_real_gameplay_actions() {
         assert_gameplay_scenario(
             Scenario::LandedEarth,

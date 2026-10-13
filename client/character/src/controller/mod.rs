@@ -5,9 +5,8 @@ use crate::layout::*;
 use crate::math::{lerp, normalize, normalize_or, orthogonal_tangent, reject};
 use crate::state::PositionState;
 use crate::{
-    CharacterLocation, CharacterSnapshot, DOORWAY_GRAVITY_BLEND_DURATION,
-    FIXED_GRAVITY_METERS_PER_SECOND_SQUARED, MovementInput, PLAYER_BODY_HEIGHT_METERS,
-    PLAYER_EYE_HEIGHT_METERS, ShipFrame, SurfaceFrame,
+    CharacterLocation, CharacterSnapshot, FIXED_GRAVITY_METERS_PER_SECOND_SQUARED, MovementInput,
+    PLAYER_BODY_HEIGHT_METERS, PLAYER_EYE_HEIGHT_METERS, ShipFrame, SurfaceFrame,
 };
 use salimon_math::{add, cross, dot, scale, sub};
 use std::f64::consts::{FRAC_PI_2, TAU};
@@ -49,6 +48,7 @@ pub struct CharacterController {
     eva_control_velocity: [f64; 3],
     eva_axes: [[f64; 3]; 3],
     nearby_surface: Option<SurfaceFrame>,
+    ramp_moving: bool,
 }
 
 impl Default for CharacterController {
@@ -65,11 +65,17 @@ impl Default for CharacterController {
             eva_control_velocity: [0.0; 3],
             eva_axes: [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
             nearby_surface: None,
+            ramp_moving: false,
         }
     }
 }
 
 impl CharacterController {
+    /// Runtime supplies animated-door occupancy policy alongside sampled frames.
+    pub fn set_ramp_moving(&mut self, moving: bool) {
+        self.ramp_moving = moving;
+    }
+
     #[must_use]
     pub const fn location(&self) -> CharacterLocation {
         match self.position {

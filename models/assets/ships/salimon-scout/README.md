@@ -104,7 +104,7 @@ profile. Do not rename this ship to the new `ASSET_`/`Visual` conventions.
 | --- | --- |
 | Root/hierarchy | `Salimon_Phase0_Scout` with `Exterior`, `Interior`, `Collision_Proxies`, `Interaction_Markers`; interior ancestry controls warm renderer fill |
 | Dimensions/pivot | Runtime +Y up, +X forward, -Z starboard; current envelope, lowest point and deck height are recorded in the manifests and spatial contracts |
-| Door | `Exit_Door` is the only door-state moving mesh; it rotates 110 degrees outward and upward about its top hinge. Preserve `salimon.interactive=exit-door` and runtime-frame `pivot` metadata; do not bake a new door pivot |
+| Door | `Exit_Door` rotates down/out about its bottom edge; `Exit_Ramp_Tip` then slides out to form the 4.4 m boarding ramp. Preserve authored runtime-axis pivot/angle/travel metadata; the exporter generates character and renderer ramp dimensions |
 | Glass | `Cockpit Glass` is the only alpha-blended, double-sided material; all glazing retains its exterior-visibility metadata and sightlines |
 | Rendering | One combined opaque draw and one glass draw; preserve base colors, metallic/roughness, alpha, double-sided and emissive factors in the frozen material definitions |
 | Monitors | `Monitor_Center`, `Monitor_Port`, `Monitor_Starboard` share one center console; their stable names denote display roles rather than new physical sides; each remains a two-triangle quad with TEXCOORD_0 at pilot-facing top-left (0,0), bottom-right (1,1) |
@@ -245,7 +245,32 @@ and f64 anchor quantization stay below 1 mm; terrain adaptation is future work.
 
 The aft threshold top is local Y = 0.275 m, therefore 2.382527 m above
 nominal ground at rest (the deck is 2.354839 m above ground). Reserve the centered aft gate
-and its outward approach for #169's bottom-hinged ramp. This task preserves the
-legacy 250 ms doorway gravity transition through that narrow corridor, including
-closed-door gating, until ramp traversal replaces it. Under-hull walking remains
+and its outward approach for #169's bottom-hinged ramp. The #169 ramp now supplies continuous sloping contact through that corridor,
+with closed-door gating and an occupied-sweep interlock. Under-hull walking remains
 free away from the solid supports; the legs do not obstruct cabin routes/glazing.
+
+## Boarding ramp (#169)
+
+The authoritative exit-door component has a flush cabin threshold at Y
+0.24731182796 m, bottom pivot X -7.68 m, 2.268817 m sealed leaf, and nested
+2.131183 m travel tray with 0.137635 m overlap at full deployment. Its 4.4 m
+support plane descends 2.354839 m at 32.36 degrees below horizontal to the fixed
+landing foot plane. Full leaf rotation is 122.36 degrees, not the old 110-degree
+upward swing. Closed tray geometry is concealed within the pressure leaf.
+The inner faces align at full extension; trim/treads stay behind the walking plane.
+The 2.8 m width retains 1.16 m center clearance on either side for a 0.24 m body.
+
+`author_ramp.py` is the repeatable Blender editing recipe for this component.
+Run it with `blender --background --python-exit-code 1 --python
+models/assets/ships/salimon-scout/author_ramp.py`, then the normal scout exporter.
+`boardingRamp` in the spatial sidecar comes from `Exit_Door.salimon`; the exporter
+writes both character and renderer `ramp_geometry.rs`. Neither consumer hard-codes
+a second set of dimensions. Validation checks tip contact, walking-face alignment,
+leaf/tray overlap, flush threshold, pivot and the unchanged draw policy.
+
+A 700 ms reversible pose parameter lowers the leaf during the first 60% and
+extends the tray during the final 40%, using smoothstep in each phase. Reversal
+retracts the tray before raising the leaf. The gate is walkable only at 100%.
+Nominal spherical surfaces differ from the tangent foot plane by micrometers at
+this footprint. Terrain-aware ramp endpoints remain dependent on future terrain
+support; this contract targets the current nominal spherical bodies.

@@ -417,10 +417,27 @@ def validate_scout(context, data):
     require("Cockpit_Deck_Edge_Trim" not in node_names,
             "removed flickering cockpit floor rectangle remains")
     threshold_top = node_position_bounds(document, geometry, "Door_Threshold")[1][1]
-    require(threshold_top - floor_top >= .02,
-            "door threshold top must sit visibly above the deck")
+    require(abs(threshold_top - floor_top) < 1e-6,
+            "boarding threshold must be flush with the cabin deck")
     door = node(document, "Exit_Door")
-    assert_vectors_close(door["extras"]["salimon"]["pivot"], [-7.68, 2.516129032, 0.0])
+    assert_vectors_close(door["extras"]["salimon"]["pivot"], [-7.68, floor_top, 0.0])
+    ramp = door['extras']['salimon']
+    angle, length = ramp['openAngleRadians'], ramp['rampLengthMeters']
+    require(math.pi / 2 < angle < math.radians(125), 'ramp slope must remain walkable')
+    foot = min(node_position_bounds(document, geometry, n['name'])[0][1]
+               for n in document['nodes'] if n['name'].startswith('Landing_Gear_') and 'mesh' in n)
+    require(abs(floor_top + length * math.cos(angle) - foot) < 1e-6,
+            'deployed ramp must reach the landing foot plane')
+    leaf_min, leaf_max = node_position_bounds(document, geometry, 'Exit_Door')
+    tip_min, tip_max = node_position_bounds(document, geometry, 'Exit_Ramp_Tip')
+    require(abs(length - ramp['extensionTravelMeters'] - (leaf_max[1] - floor_top)) < 1e-6,
+            'tip endpoint must match the declared deployed length')
+    require(tip_min[1] + ramp['extensionTravelMeters'] < leaf_max[1] - .1,
+            'extended tray needs structural overlap with leaf')
+    require(abs(tip_max[0] + ramp['extensionFaceOffsetMeters'] - ramp['pivot'][0]) < 1e-6,
+            'deployed tray face must match ramp support plane')
+    require(abs(leaf_max[0] - ramp['pivot'][0]) < 1e-6,
+            'door walking face must match hinge support plane')
     door_box = node(document, "COLLIDER_AftDoor")
     center = door_box["translation"]
     size = door_box["extras"]["salimon"]["sizeMeters"]
@@ -435,8 +452,8 @@ def validate_scout(context, data):
             position_bounds(document, geometry, primitive["attributes"]["POSITION"])
         for primitive in document["meshes"][door["mesh"]]["primitives"]
     }
-    require(door_material_bounds["Petrol Teal"][0][0] -
-            door_material_bounds["Hull Graphite"][0][0] >= 0.02,
+    require(door_material_bounds["Hull Graphite"][0][0] -
+            door_material_bounds["Petrol Teal"][0][0] >= 0.019,
             "door exterior backing and plate must not be coplanar")
     # The balanced hull has matching sides and the rebuilt port window.
     for port_name, starboard_name in (("Wing_Port", "Wing_Starboard"),

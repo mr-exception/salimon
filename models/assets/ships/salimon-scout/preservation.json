@@ -19,16 +19,16 @@
       "parent": "Collision_Proxies",
       "visual": false,
       "translation": [
-        -7.68,
-        1.3817204301075268,
-        0.0
+        -7.78,
+        1.3817204299784946,
+        0
       ],
       "extras": {
         "salimon": {
           "collisionShape": "box",
           "sizeMeters": [
-            0.28,
-            2.268817204301075,
+            0.2,
+            2.2688172040430103,
             2.8
           ],
           "purpose": "interactive-door"
@@ -810,9 +810,14 @@
           "interactive": "exit-door",
           "pivot": [
             -7.68,
-            2.516129032,
+            0.24731182795698925,
             0.0
-          ]
+          ],
+          "openAngleRadians": 2.1355297104231683,
+          "rampLengthMeters": 4.4,
+          "extensionTravelMeters": 2.13118279595699,
+          "extensionFaceOffsetMeters": 0.08,
+          "rampHalfWidthMeters": 1.4
         }
       }
     },
@@ -1350,6 +1355,16 @@
       "extras": {
         "salimon": {
           "purpose": "fixed-deployed-landing-gear"
+        }
+      }
+    },
+    {
+      "name": "Exit_Ramp_Tip",
+      "parent": "Interior",
+      "visual": true,
+      "extras": {
+        "salimon": {
+          "interactive": "exit-ramp-tip"
         }
       }
     }

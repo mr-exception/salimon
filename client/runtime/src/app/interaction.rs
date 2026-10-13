@@ -51,7 +51,11 @@ fn interaction_target(
 
     if cockpit_is_aimed_at {
         Some(InteractionTarget::Cockpit)
-    } else if (local_eye_position[0] + 7.10).abs() < 2.7 && local_eye_position[2].abs() < 2.3 {
+    } else if ((local_eye_position[0] + 7.10).abs() < 2.7
+        || (local_eye_position[0] >= salimon_character::boarding_ramp_tip_meters()[0] - 1.5
+            && local_eye_position[0] < -7.10))
+        && local_eye_position[2].abs() < 2.3
+    {
         Some(InteractionTarget::ExitDoor)
     } else {
         None

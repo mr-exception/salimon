@@ -204,15 +204,27 @@ interpretation of their full-window distributions; fewer than 100 moving samples
 do not establish reliable active-only tails. The suspended interaction preparations resumed
 after these isolated windows completed.
 
-Together the retained native datasets cover 70 distinct cases / 210 windows.
-Remaining acceptance requires the complete 1,000 carrying route and the other
-26 reference matrix cases, including high-load active windows. Dense 500/1,000 natural
+The [active 250 partial summary](native-matrix-active-250-partial-2026-10-13-summary.json)
+and [raw archive](native-matrix-active-250-partial-2026-10-13.json.gz) retain
+11 completed isolated windows from before the scheduler pause: three repeats
+for each scattered view and dense facing, plus two dense-away repeats. The
+later resumed windows are excluded because of occlusion and concurrent gaming.
+Dense moving contact work is expensive: the first two facing repeats took
+119.383 and 214.170 s to retain 100 frame intervals, with p95 frame intervals
+5,245.295 and 4,862.117 ms dominated by physics. Their near-60-FPS medians after
+settling do not describe initial-motion responsiveness.
+
+Together the retained datasets cover 73 complete distinct cases / 219 windows,
+plus two completed windows of one still-incomplete case (221 valid windows
+total). Remaining acceptance requires the complete 1,000 carrying route and
+23 reference matrix cases, one already having two repeats. Dense 500/1,000 natural
 sleep, loaded rigid flight and identical-snapshot baseline comparisons are now
 retained above. The complete matrix still requires all 96 cases
 with three windows and at least 100 retained samples per window. Diagnostic
 continuations, partial preparations and timeouts do not satisfy those gates.
 
-The first local high-load matrix start gate failed on end-of-input after its
+The [first local high-load start-gate failure](native-matrix-start-gate-failure-2026-10-13.json)
+records end-of-input after its
 four fixtures had naturally prepared, before any native measurement window.
 That scheduling failure supplies no performance result. Interactive stdin was
 then verified with a real `MATRIX_START` round-trip and the retry uses a PTY,

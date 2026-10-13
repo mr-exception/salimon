@@ -226,7 +226,54 @@ pub(crate) struct Projection {
     backward: f64,
 }
 
-pub(crate) type PairGeometry = Vec<Vec<Option<Box<ContactGeometry>>>>;
+#[derive(Clone, Debug, Default)]
+pub(crate) struct PairGeometry {
+    pub(crate) pairs: std::collections::HashMap<(usize, usize), Option<Box<ContactGeometry>>>,
+    pub(crate) grid: crate::broad_phase::Grid,
+    pub(crate) candidates: Vec<usize>,
+    pub(crate) transformed: Vec<TransformedHull>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub(crate) struct TransformedHull {
+    orientation: [f64; 4],
+    side: f64,
+    hull: Option<std::sync::Arc<ConvexHull>>,
+    vertices: Vec<[f64; 3]>,
+    normals: Vec<[f64; 3]>,
+    edges: Vec<[f64; 3]>,
+}
+impl TransformedHull {
+    pub(crate) fn refresh(&mut self, p: &super::ObjectState) {
+        if self.orientation == p.orientation
+            && self.side == p.side_meters
+            && match (&self.hull, &p.hull) {
+                (Some(a), Some(b)) => std::sync::Arc::ptr_eq(a, b),
+                (None, None) => true,
+                _ => false,
+            }
+        {
+            return;
+        }
+        self.orientation = p.orientation;
+        self.side = p.side_meters;
+        self.hull = p.hull.clone();
+        self.vertices.clear();
+        self.normals.clear();
+        self.edges.clear();
+        if let Some(h) = &p.hull {
+            self.vertices.extend(
+                h.vertices
+                    .iter()
+                    .map(|v| rotate(p.orientation, scale(*v, p.side_meters))),
+            );
+            self.normals
+                .extend(h.normals.iter().map(|v| rotate(p.orientation, *v)));
+            self.edges
+                .extend(h.edges.iter().map(|v| rotate(p.orientation, *v)));
+        }
+    }
+}
 
 /// Exact SAT spans plus a conservative candidate set for center-only motion.
 /// Excluded axis depths can decrease by at most the center displacement. Scan
@@ -285,18 +332,19 @@ impl ContactGeometry {
             );
             // This margin controls cache efficiency only, never collision tolerance.
             let threshold = best.1 + 0.005;
-            let mut indices = Vec::new();
+            let old_capacity = self.candidates.capacity();
+            self.candidates.clear();
             let mut excluded = f64::INFINITY;
             for (i, p) in self.projections.iter().enumerate() {
                 let depth = candidate(p).1;
                 if depth <= threshold {
-                    indices.push(i);
+                    self.candidates.push(i);
                 } else {
                     excluded = excluded.min(depth);
                 }
             }
-            requested_bytes = indices.capacity() * std::mem::size_of::<usize>();
-            self.candidates = indices;
+            requested_bytes = self.candidates.capacity().saturating_sub(old_capacity)
+                * std::mem::size_of::<usize>();
             self.excluded_depth = excluded;
             self.reference_offset = offset;
             self.initialized = true;
@@ -336,22 +384,26 @@ fn separated_by_faces_with_gap(a: &super::ObjectState, b: &super::ObjectState, g
 /// Orientation/scale are constant through the contact iterations in a substep.
 /// Cache relative projections once rather than rotating vertices in every pass.
 pub(crate) fn projections(a: &super::ObjectState, b: &super::ObjectState) -> Vec<Projection> {
-    let ah = a.hull.as_ref().expect("convex caller");
-    let bh = b.hull.as_ref().expect("convex caller");
+    let mut ah = TransformedHull::default();
+    let mut bh = TransformedHull::default();
+    ah.refresh(a);
+    bh.refresh(b);
+    transformed_projections(&ah, &bh)
+}
+
+pub(crate) fn transformed_projections(
+    ah: &TransformedHull,
+    bh: &TransformedHull,
+) -> Vec<Projection> {
     let mut axes = Vec::new();
-    for n in &ah.normals {
-        push_axis(&mut axes, rotate(a.orientation, *n));
+    for &n in &ah.normals {
+        push_axis(&mut axes, n);
     }
-    for n in &bh.normals {
-        push_axis(&mut axes, rotate(b.orientation, *n));
+    for &n in &bh.normals {
+        push_axis(&mut axes, n);
     }
-    // Keep crossed-edge axes without a quadratic duplicate search. Native dense
-    // profiling shows repeated parallel axes dominate projection/graph work;
-    // quantized membership below removes those repeats in deterministic order.
-    let ae: Vec<_> = ah.edges.iter().map(|v| rotate(a.orientation, *v)).collect();
-    let be: Vec<_> = bh.edges.iter().map(|v| rotate(b.orientation, *v)).collect();
-    for a in &ae {
-        for b in &be {
+    for a in &ah.edges {
+        for b in &bh.edges {
             let axis = cross(*a, *b);
             let size = length(axis);
             if size > 1e-10 {
@@ -371,16 +423,6 @@ pub(crate) fn projections(a: &super::ObjectState, b: &super::ObjectState) -> Vec
         let key: [i64; 3] = axis.map(|v| (v * sign * 1e9).round() as i64);
         seen.insert(key)
     });
-    let av: Vec<_> = ah
-        .vertices
-        .iter()
-        .map(|v| rotate(a.orientation, scale(*v, a.side_meters)))
-        .collect();
-    let bv: Vec<_> = bh
-        .vertices
-        .iter()
-        .map(|v| rotate(b.orientation, scale(*v, b.side_meters)))
-        .collect();
     let span = |vertices: &[[f64; 3]], axis| {
         vertices
             .iter()
@@ -391,8 +433,8 @@ pub(crate) fn projections(a: &super::ObjectState, b: &super::ObjectState) -> Vec
     };
     axes.into_iter()
         .map(|axis| {
-            let (amin, amax) = span(&av, axis);
-            let (bmin, bmax) = span(&bv, axis);
+            let (amin, amax) = span(&ah.vertices, axis);
+            let (bmin, bmax) = span(&bh.vertices, axis);
             Projection {
                 axis,
                 forward: amax - bmin,
@@ -851,6 +893,103 @@ mod tests {
     use super::*;
     use crate::{ObjectState, Surface, advance};
     use std::{sync::Arc, time::Duration};
+
+    fn reference_projections(a: &ObjectState, b: &ObjectState) -> Vec<Projection> {
+        let ah = a.hull.as_ref().expect("convex caller");
+        let bh = b.hull.as_ref().expect("convex caller");
+        let mut axes = Vec::new();
+        for n in &ah.normals {
+            push_axis(&mut axes, rotate(a.orientation, *n));
+        }
+        for n in &bh.normals {
+            push_axis(&mut axes, rotate(b.orientation, *n));
+        }
+        // Keep crossed-edge axes without a quadratic duplicate search. Native dense
+        // profiling shows repeated parallel axes dominate projection/graph work;
+        // quantized membership below removes those repeats in deterministic order.
+        let ae: Vec<_> = ah.edges.iter().map(|v| rotate(a.orientation, *v)).collect();
+        let be: Vec<_> = bh.edges.iter().map(|v| rotate(b.orientation, *v)).collect();
+        for a in &ae {
+            for b in &be {
+                let axis = cross(*a, *b);
+                let size = length(axis);
+                if size > 1e-10 {
+                    axes.push(scale(axis, 1.0 / size));
+                }
+            }
+        }
+        let mut seen = std::collections::HashSet::with_capacity(axes.len());
+        axes.retain(|axis| {
+            // Opposite axes describe the same separating planes. 1e-9 component
+            // bins merge only numerical parallel repeats (sub-nanometre projection
+            // error at fragment scales, far below the 10 micrometre separation bias).
+            let sign = axis
+                .iter()
+                .find(|v| v.abs() > 1e-9)
+                .map_or(1.0, |v| v.signum());
+            let key: [i64; 3] = axis.map(|v| (v * sign * 1e9).round() as i64);
+            seen.insert(key)
+        });
+        let av: Vec<_> = ah
+            .vertices
+            .iter()
+            .map(|v| rotate(a.orientation, scale(*v, a.side_meters)))
+            .collect();
+        let bv: Vec<_> = bh
+            .vertices
+            .iter()
+            .map(|v| rotate(b.orientation, scale(*v, b.side_meters)))
+            .collect();
+        let span = |vertices: &[[f64; 3]], axis| {
+            vertices
+                .iter()
+                .map(|v| dot(*v, axis))
+                .fold((f64::INFINITY, f64::NEG_INFINITY), |(lo, hi), x| {
+                    (lo.min(x), hi.max(x))
+                })
+        };
+        axes.into_iter()
+            .map(|axis| {
+                let (amin, amax) = span(&av, axis);
+                let (bmin, bmax) = span(&bv, axis);
+                Projection {
+                    axis,
+                    forward: amax - bmin,
+                    backward: bmax - amin,
+                }
+            })
+            .collect()
+    }
+
+    #[test]
+    fn transformed_cache_matches_original_projection_arithmetic_and_refreshes_shape() {
+        let mut a = object([1e12, 0.2, 0.0], [0.3, 0.2, 0.1]);
+        let mut b = object([1e12 + 0.3, 0.5, 0.0], [0.2; 3]);
+        let mut ac = TransformedHull::default();
+        let mut bc = TransformedHull::default();
+        for step in 0..40 {
+            let angle = step as f64 * 0.13;
+            b.orientation = [0.0, 0.0, (angle / 2.0).sin(), (angle / 2.0).cos()];
+            if step == 10 {
+                a.side_meters = 1.5;
+            }
+            if step == 20 {
+                a.hull = b.hull.clone();
+            }
+            a.position[0] += 0.01;
+            ac.refresh(&a);
+            bc.refresh(&b);
+            let expected = reference_projections(&a, &b);
+            let actual = transformed_projections(&ac, &bc);
+            assert_eq!(actual.len(), expected.len());
+            for (actual, expected) in actual.iter().zip(expected.iter()) {
+                assert_eq!(
+                    (actual.axis, actual.forward, actual.backward),
+                    (expected.axis, expected.forward, expected.backward)
+                );
+            }
+        }
+    }
 
     #[test]
     fn support_graph_short_circuit_matches_full_sat() {

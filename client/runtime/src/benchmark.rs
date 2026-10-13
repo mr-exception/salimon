@@ -994,7 +994,7 @@ mod tests {
             .character
             .snapshot(frame, surface_frame_for_ship(a.ship.snapshot()))
             .eye_position_meters;
-        for update in 0..3 {
+        for _ in 0..3 {
             crate::fragment_physics::advance(&mut a.mining, frame, Duration::from_millis(16), eye);
             let stats = crate::fragment_physics::advance_measured(
                 &mut b.mining,
@@ -1004,11 +1004,13 @@ mod tests {
                 true,
             );
             assert_eq!(stats.solver.objects, 12);
-            assert_eq!(stats.solver.pair_visits, stats.solver.solver_passes * 66);
-            assert_eq!(
-                stats.solver.matrix_allocations,
-                if update == 0 { 13 } else { 0 }
-            );
+            assert!(stats.solver.pair_visits < stats.solver.solver_passes * 66);
+            assert!(stats.solver.radius_candidates <= stats.solver.pair_visits);
+            assert!(stats.solver.narrow_phase_tests <= stats.solver.radius_candidates);
+            if stats.solver.projection_builds > 0 {
+                assert!(stats.solver.projection_storage_bytes > 0);
+            }
+            assert_eq!(a.mining.session.fragments(), b.mining.session.fragments());
         }
         assert_eq!(a.mining.session.fragments(), b.mining.session.fragments());
         assert_eq!(original, accounting(&b));

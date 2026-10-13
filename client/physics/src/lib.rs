@@ -5,6 +5,7 @@ use std::{
     time::{Duration, Instant},
 };
 
+mod broad_phase;
 mod convex;
 mod sleep;
 pub use convex::{ConvexHull, compose, orientation_from_axes, rotate};
@@ -127,7 +128,7 @@ pub fn ejection_velocity(position: [f64; 3], body: Option<SphereSurface>, varian
     }
 }
 
-/// Opt-in observations of the unchanged production solver, accumulated per call.
+/// Opt-in observations of the production solver, accumulated per call.
 /// Counters count visits (including repeated solver passes), not unique pairs.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct StepStats {
@@ -144,10 +145,11 @@ pub struct StepStats {
     pub narrow_phase_tests: u64,
     pub contacts: u64,
     pub projection_builds: u64,
-    /// Requested matrix/projection storage; excludes allocator overhead and temporaries.
+    /// Requested sparse pair-table/projection growth; excludes hash control bytes,
+    /// allocator overhead, grid/transformed-hull/response scratch and temporaries.
     pub projection_storage_bytes: u64,
-    /// Number of matrix Vec allocations for the current vec![vec![..]; n] implementation;
-    /// One outer Vec plus one row Vec per object. Not a process allocator counter.
+    /// Sparse pair-table growth events (legacy metric name for benchmark compatibility).
+    /// Not a process allocator counter or a count of grid/scratch allocations.
     pub matrix_allocations: u64,
     /// Stable-ID validation and post-solve support graph/dwell processing.
     pub activation_time: Duration,
@@ -251,6 +253,7 @@ fn advance_impl<const PROFILE: bool>(
         (elapsed / MAX_STEP).ceil().clamp(1.0, 48.0) as usize
     };
     let dt = elapsed / steps as f64;
+    let mut local_geometry = convex::PairGeometry::default();
     for _ in 0..steps {
         if let Some(a) = &mut activation {
             a.impacts(pieces, dt);
@@ -315,18 +318,9 @@ fn advance_impl<const PROFILE: bool>(
         }
         let contact_start = PROFILE.then(Instant::now);
         let reused_geometry = activation.as_mut().and_then(|a| a.geometry.take());
-        if PROFILE && reused_geometry.is_none() {
-            if !pieces.is_empty() {
-                stats.matrix_allocations += pieces.len() as u64 + 1;
-            }
-            stats.projection_storage_bytes += ((pieces.len() * pieces.len())
-                * std::mem::size_of::<Option<Box<convex::ContactGeometry>>>()
-                + pieces.len() * std::mem::size_of::<Vec<Option<Box<convex::ContactGeometry>>>>())
-                as u64;
-        }
         let mut pair_geometry =
-            reused_geometry.unwrap_or_else(|| vec![vec![None; pieces.len()]; pieces.len()]);
-        for geometry in pair_geometry.iter_mut().flatten().flatten() {
+            reused_geometry.unwrap_or_else(|| std::mem::take(&mut local_geometry));
+        for geometry in pair_geometry.pairs.values_mut().flatten() {
             geometry.used_this_substep = false;
         }
         solve_contacts::<PROFILE>(
@@ -392,20 +386,20 @@ fn advance_impl<const PROFILE: bool>(
             stats.integration_time += start.elapsed();
         }
         if has_hulls && moved {
-            for (i, row) in pair_geometry.iter_mut().enumerate() {
-                for (j, cache) in row.iter_mut().enumerate().skip(i + 1) {
-                    if rotated[i] || rotated[j] {
-                        if let Some(geometry) = cache.as_mut()
-                            && geometry.used_this_substep
-                        {
-                            let mut response = std::mem::take(&mut geometry.response);
-                            response.transport_response = true;
-                            warm_pairs.insert((i, j), response);
-                        }
-                        *cache = None;
+            pair_geometry.pairs.retain(|&(i, j), cache| {
+                if rotated[i] || rotated[j] {
+                    if let Some(geometry) = cache.as_mut()
+                        && geometry.used_this_substep
+                    {
+                        let mut response = std::mem::take(&mut geometry.response);
+                        response.transport_response = true;
+                        warm_pairs.insert((i, j), response);
                     }
+                    false
+                } else {
+                    true
                 }
-            }
+            });
             if let Some(a) = &mut activation {
                 a.impacts(pieces, 0.0);
             }
@@ -446,14 +440,13 @@ fn advance_impl<const PROFILE: bool>(
         if let Some(a) = &mut activation {
             a.warm_dt = dt;
             a.warm_pairs.clear();
-            for (i, row) in pair_geometry.iter_mut().enumerate() {
-                for (j, geometry) in row.iter_mut().enumerate().skip(i + 1) {
-                    if let Some(geometry) = geometry
-                        && !geometry.response.arms.is_empty()
-                    {
-                        a.warm_pairs
-                            .insert((i, j), std::mem::take(&mut geometry.response));
-                    }
+            for (&pair, geometry) in &mut pair_geometry.pairs {
+                if let Some(geometry) = geometry
+                    && geometry.used_this_substep
+                    && !geometry.response.arms.is_empty()
+                {
+                    a.warm_pairs
+                        .insert(pair, std::mem::take(&mut geometry.response));
                 }
             }
             a.warm_ground = ground_responses
@@ -462,6 +455,8 @@ fn advance_impl<const PROFILE: bool>(
                 .filter(|(_, response)| !response.arms.is_empty())
                 .collect();
             a.geometry = Some(pair_geometry);
+        } else {
+            local_geometry = pair_geometry;
         }
     }
     stats
@@ -477,146 +472,233 @@ fn solve_contacts<const PROFILE: bool>(
     stats: &mut StepStats,
 ) {
     let has_hulls = pieces.iter().any(|piece| piece.hull.is_some());
+    let old_capacity = pair_geometry.pairs.capacity();
+    pair_geometry.grid.reset(pieces, 2.0 * CONTACT_BIAS_METERS);
+    pair_geometry
+        .pairs
+        .retain(|&(i, j), g| g.is_some() && pair_geometry.grid.overlaps(i, j));
+    pair_geometry
+        .transformed
+        .resize_with(pieces.len(), Default::default);
+    for (cache, p) in pair_geometry.transformed.iter_mut().zip(pieces.iter()) {
+        cache.refresh(p);
+    }
     for _ in 0..if has_hulls { 16 } else { 3 } {
         if PROFILE {
             stats.solver_passes += 1;
         }
-        for (i, row) in pair_geometry.iter_mut().enumerate() {
-            for (j, cached) in row.iter_mut().enumerate().skip(i + 1) {
-                if activation
-                    .as_ref()
-                    .is_some_and(|a| a.sleeping[i] && a.sleeping[j])
-                {
-                    continue;
-                }
-                if PROFILE {
-                    stats.pair_visits += 1;
-                }
-                let (left, right) = pieces.split_at_mut(j);
-                let a = &mut left[i];
-                let b = &mut right[0];
-                if a.surface.is_floor() != b.surface.is_floor()
-                    || (a.surface.sphere().is_some()
-                        && b.surface.sphere().is_some()
-                        && a.surface.sphere().unwrap().center != b.surface.sphere().unwrap().center)
-                {
-                    continue;
-                }
-                let separation = sub(b.position, a.position);
-                let distance = length(separation);
-                let minimum = a.radius + b.radius;
-                let convex_pair = a.hull.is_some() && b.hull.is_some();
-                if if convex_pair {
-                    distance > minimum + 2.0 * CONTACT_BIAS_METERS
-                } else {
-                    distance >= minimum
-                } {
-                    continue;
-                }
-                if PROFILE {
-                    stats.radius_candidates += 1;
-                }
-                let (normal, depth) = if a.hull.is_some() && b.hull.is_some() {
-                    if PROFILE {
-                        stats.narrow_phase_tests += 1;
-                    }
-                    if !cached.as_ref().is_some_and(|g| g.used_this_substep)
-                        && convex::separated_by_faces(a, b)
-                    {
-                        continue;
-                    }
-                    let geometry = cached.get_or_insert_with(|| {
-                        let projections = convex::projections(a, b);
-                        if PROFILE {
-                            stats.projection_builds += 1;
-                            stats.projection_storage_bytes += (projections.capacity()
-                                * std::mem::size_of::<convex::Projection>())
-                                as u64;
-                        }
-                        if PROFILE {
-                            stats.projection_storage_bytes +=
-                                std::mem::size_of::<convex::ContactGeometry>() as u64;
-                        }
-                        Box::new(convex::ContactGeometry::new(projections))
-                    });
-                    geometry.used_this_substep = true;
-                    if geometry.response.arms.is_empty()
-                        && let Some(response) = warm_pairs.remove(&(i, j))
-                    {
-                        geometry.response = response;
-                    }
-                    let (contact, requested_bytes) = geometry.contact(separation);
-                    if PROFILE {
-                        stats.projection_storage_bytes += requested_bytes as u64;
-                    }
-                    let Some(contact) = contact else {
-                        continue;
-                    };
-                    contact
-                } else {
-                    (
-                        if distance > 1e-9 {
-                            scale(separation, 1.0 / distance)
-                        } else {
-                            [0.0, 1.0, 0.0]
-                        },
-                        minimum - distance,
-                    )
+        for i in 0..pieces.len() {
+            pair_geometry
+                .grid
+                .query(i, 0.0, &mut pair_geometry.candidates);
+            let mut after = i;
+            loop {
+                let next_index = pair_geometry.candidates.partition_point(|&j| j <= after);
+                let next = pair_geometry.candidates.get(next_index).copied();
+                let Some(j) = next else {
+                    break;
                 };
-                if PROFILE {
-                    stats.contacts += 1;
+                after = j;
+                let before = (pieces[i].position, pieces[j].position);
+                // Sparse lookup order never affects resolution order.
+                resolve_candidate::<PROFILE>(
+                    pieces,
+                    i,
+                    j,
+                    activation,
+                    &mut pair_geometry.pairs,
+                    &pair_geometry.transformed,
+                    ground_responses,
+                    warm_pairs,
+                    &floor_contains,
+                    stats,
+                );
+                let changed_i = pieces[i].position != before.0;
+                let changed_j = pieces[j].position != before.1;
+                if changed_i {
+                    pair_geometry
+                        .grid
+                        .update(i, &pieces[i], 2.0 * CONTACT_BIAS_METERS);
                 }
-                if let Some(activation) = activation.as_mut() {
-                    activation.wake(i);
-                    activation.wake(j);
+                if changed_j {
+                    pair_geometry
+                        .grid
+                        .update(j, &pieces[j], 2.0 * CONTACT_BIAS_METERS);
                 }
-                let inverse_a = 1.0 / a.mass_kg;
-                let inverse_b = 1.0 / b.mass_kg;
-                let direction_a = correction_direction(a, scale(normal, -1.0));
-                let direction_b = correction_direction(b, normal);
-                let available =
-                    -dot(direction_a, normal) * inverse_a + dot(direction_b, normal) * inverse_b;
-                let correction = (depth + CONTACT_BIAS_METERS).max(0.0) / available;
-                let old_a = a.position;
-                let old_b = b.position;
-                a.position = add(a.position, scale(direction_a, correction * inverse_a));
-                b.position = add(b.position, scale(direction_b, correction * inverse_b));
-                if a.surface.is_floor() && !floor_contains(a.position, a.radius) {
-                    a.position[0] = old_a[0];
-                    a.position[2] = old_a[2];
+                if changed_i || changed_j {
+                    // Match brute-force semantics: newly reachable later IDs are
+                    // visited this pass; earlier IDs wait until the next pass.
+                    pair_geometry
+                        .grid
+                        .query(i, 0.0, &mut pair_geometry.candidates);
                 }
-                if b.surface.is_floor() && !floor_contains(b.position, b.radius) {
-                    b.position[0] = old_b[0];
-                    b.position[2] = old_b[2];
-                }
-                // The constrained positional correction need not move along
-                // the original SAT axis. Re-evaluate the actual contact before
-                // applying velocity impulses at a potentially separated feature.
-                let normal = if a.hull.is_some() && b.hull.is_some() {
-                    let geometry = cached.as_mut().expect("convex geometry");
-                    let (contact, requested_bytes) = geometry.contact(sub(b.position, a.position));
-                    if PROFILE {
-                        stats.projection_storage_bytes += requested_bytes as u64;
-                    }
-                    let Some((normal, _)) = contact else {
-                        ground_contact_cached(a, &mut ground_responses[i]);
-                        ground_contact_cached(b, &mut ground_responses[j]);
-                        continue;
-                    };
-                    normal
-                } else {
-                    normal
-                };
-                if let Some(geometry) = cached {
-                    pair_impulse_cached(a, b, normal, &mut geometry.response);
-                } else {
-                    pair_impulse(a, b, normal);
-                }
-                ground_contact_cached(a, &mut ground_responses[i]);
-                ground_contact_cached(b, &mut ground_responses[j]);
             }
         }
     }
+    pair_geometry
+        .pairs
+        .retain(|&(i, j), g| g.is_some() && pair_geometry.grid.overlaps(i, j));
+    if PROFILE && pair_geometry.pairs.capacity() > old_capacity {
+        stats.matrix_allocations += 1;
+        stats.projection_storage_bytes += ((pair_geometry.pairs.capacity() - old_capacity)
+            * std::mem::size_of::<((usize, usize), Option<Box<convex::ContactGeometry>>)>())
+            as u64;
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn resolve_candidate<const PROFILE: bool>(
+    pieces: &mut [ObjectState],
+    i: usize,
+    j: usize,
+    activation: &mut Option<&mut sleep::Activation>,
+    pairs: &mut std::collections::HashMap<(usize, usize), Option<Box<convex::ContactGeometry>>>,
+    transformed: &[convex::TransformedHull],
+    ground_responses: &mut [ContactResponse],
+    warm_pairs: &mut std::collections::HashMap<(usize, usize), ContactResponse>,
+    floor_contains: impl Fn([f64; 3], f64) -> bool,
+    stats: &mut StepStats,
+) {
+    if activation
+        .as_ref()
+        .is_some_and(|a| a.sleeping[i] && a.sleeping[j])
+    {
+        return;
+    }
+    if PROFILE {
+        stats.pair_visits += 1;
+    }
+    let (left, right) = pieces.split_at_mut(j);
+    let a = &mut left[i];
+    let b = &mut right[0];
+    if a.surface.is_floor() != b.surface.is_floor()
+        || (a.surface.sphere().is_some()
+            && b.surface.sphere().is_some()
+            && a.surface.sphere().unwrap().center != b.surface.sphere().unwrap().center)
+    {
+        return;
+    }
+    let separation = sub(b.position, a.position);
+    let distance = length(separation);
+    let minimum = a.radius + b.radius;
+    let convex_pair = a.hull.is_some() && b.hull.is_some();
+    if if convex_pair {
+        distance > minimum + 2.0 * CONTACT_BIAS_METERS
+    } else {
+        distance >= minimum
+    } {
+        return;
+    }
+    if PROFILE {
+        stats.radius_candidates += 1;
+    }
+    if PROFILE && convex_pair {
+        stats.narrow_phase_tests += 1;
+    }
+    // Do not allocate a sparse slot for rejected AABB/radius/face candidates.
+    if convex_pair
+        && !pairs
+            .get(&(i, j))
+            .and_then(Option::as_ref)
+            .is_some_and(|g| g.used_this_substep)
+        && convex::separated_by_faces(a, b)
+    {
+        return;
+    }
+    let mut sphere_cache = None;
+    let cached = if convex_pair {
+        pairs.entry((i, j)).or_default()
+    } else {
+        &mut sphere_cache
+    };
+    let (normal, depth) = if a.hull.is_some() && b.hull.is_some() {
+        let geometry = cached.get_or_insert_with(|| {
+            let projections = convex::transformed_projections(&transformed[i], &transformed[j]);
+            if PROFILE {
+                stats.projection_builds += 1;
+                stats.projection_storage_bytes +=
+                    (projections.capacity() * std::mem::size_of::<convex::Projection>()) as u64;
+            }
+            if PROFILE {
+                stats.projection_storage_bytes +=
+                    std::mem::size_of::<convex::ContactGeometry>() as u64;
+            }
+            Box::new(convex::ContactGeometry::new(projections))
+        });
+        geometry.used_this_substep = true;
+        if geometry.response.arms.is_empty()
+            && let Some(response) = warm_pairs.remove(&(i, j))
+        {
+            geometry.response = response;
+        }
+        let (contact, requested_bytes) = geometry.contact(separation);
+        if PROFILE {
+            stats.projection_storage_bytes += requested_bytes as u64;
+        }
+        let Some(contact) = contact else {
+            return;
+        };
+        contact
+    } else {
+        (
+            if distance > 1e-9 {
+                scale(separation, 1.0 / distance)
+            } else {
+                [0.0, 1.0, 0.0]
+            },
+            minimum - distance,
+        )
+    };
+    if PROFILE {
+        stats.contacts += 1;
+    }
+    if let Some(activation) = activation.as_mut() {
+        activation.wake(i);
+        activation.wake(j);
+    }
+    let inverse_a = 1.0 / a.mass_kg;
+    let inverse_b = 1.0 / b.mass_kg;
+    let direction_a = correction_direction(a, scale(normal, -1.0));
+    let direction_b = correction_direction(b, normal);
+    let available = -dot(direction_a, normal) * inverse_a + dot(direction_b, normal) * inverse_b;
+    let correction = (depth + CONTACT_BIAS_METERS).max(0.0) / available;
+    let old_a = a.position;
+    let old_b = b.position;
+    a.position = add(a.position, scale(direction_a, correction * inverse_a));
+    b.position = add(b.position, scale(direction_b, correction * inverse_b));
+    if a.surface.is_floor() && !floor_contains(a.position, a.radius) {
+        a.position[0] = old_a[0];
+        a.position[2] = old_a[2];
+    }
+    if b.surface.is_floor() && !floor_contains(b.position, b.radius) {
+        b.position[0] = old_b[0];
+        b.position[2] = old_b[2];
+    }
+    // The constrained positional correction need not move along
+    // the original SAT axis. Re-evaluate the actual contact before
+    // applying velocity impulses at a potentially separated feature.
+    let normal = if a.hull.is_some() && b.hull.is_some() {
+        let geometry = cached.as_mut().expect("convex geometry");
+        let (contact, requested_bytes) = geometry.contact(sub(b.position, a.position));
+        if PROFILE {
+            stats.projection_storage_bytes += requested_bytes as u64;
+        }
+        let Some((normal, _)) = contact else {
+            ground_contact_cached(a, &mut ground_responses[i]);
+            ground_contact_cached(b, &mut ground_responses[j]);
+            return;
+        };
+        normal
+    } else {
+        normal
+    };
+    if let Some(geometry) = cached {
+        pair_impulse_cached(a, b, normal, &mut geometry.response);
+    } else {
+        pair_impulse(a, b, normal);
+    }
+    ground_contact_cached(a, &mut ground_responses[i]);
+    ground_contact_cached(b, &mut ground_responses[j]);
 }
 
 #[derive(Clone, Debug, Default)]

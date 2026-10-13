@@ -20,7 +20,9 @@ fn main() {
         std::array::from_fn(|axis| if i & (1 << axis) == 0 { -0.5 } else { 0.5 })
     })));
     let delta = Duration::from_millis(16);
-    println!("count,state,path,samples,median_ms,p95_ms,p99_ms,awake,sleeping,integrated,pairs");
+    println!(
+        "count,state,path,samples,median_ms,p95_ms,p99_ms,awake,sleeping,integrated,pairs,storage_bytes,storage_growth"
+    );
     for count in [500, 1000] {
         for settled in [true, false] {
             let initial: Vec<_> = (0..count)
@@ -83,12 +85,14 @@ fn main() {
             ] {
                 let [median, p95, p99] = distribution(values);
                 println!(
-                    "{count},{},{path},100,{median:.6},{p95:.6},{p99:.6},{},{},{},{}",
+                    "{count},{},{path},100,{median:.6},{p95:.6},{p99:.6},{},{},{},{},{},{}",
                     if settled { "settled" } else { "active" },
                     stats.awake_objects,
                     stats.sleeping_objects,
                     stats.integrated_objects,
-                    stats.pair_visits
+                    stats.pair_visits,
+                    stats.projection_storage_bytes,
+                    stats.matrix_allocations
                 );
             }
         }

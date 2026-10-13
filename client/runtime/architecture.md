@@ -360,6 +360,8 @@ metadata includes DPI scale. Initial occlusion before any retained frame interva
 restarts the full warm-up. Occlusion during measured sampling or changed surface
 configuration after renderer initialization fails; closing before completion also fails.
 See the benchmark guide for limits, counter meanings and CPU-only interpretation.
+Physics #157 changes pair visits to spatial candidates and the legacy matrix
+allocation metric to sparse-table growth; historical matrix capacities differ.
 Optional `--minimum-samples` requires both elapsed sampling duration and a retained
 sample count before a window completes. Native mode counts completed frame
 intervals; CPU mode counts updates. Actual sample wall time is reported, including

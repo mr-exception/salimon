@@ -128,14 +128,38 @@ policy stays in runtime. Total draw calls include the visible reticle draw.
 
 ## Authored resource fragments
 
-`resource_mesh.rs` loads checked-in water-ice, silicate and iron fragment GLBs at initialization and
-validates their baked identity transforms and ±0.48 m local bounds. Runtime maps
-stable variant choice, absolute center, unit orientation and authoritative side into
-`ResourceMeshInstance`; the renderer subtracts camera position in `f64` before
-narrowing rotated/scaled vertices. Its cached CPU unit vertices come from the same GLB triangles and are exposed for immutable collision proxies, without importing gameplay policy. All authored variants share one opaque reverse-Z draw with
-flat material colors and inexpensive local facet shading. No transparency,
-textures or gameplay-domain dependency is added. Geometry buffers grow only
-when needed; diagnostics count individual resource instances and the single batch draw.
+`resource_mesh.rs` validates all 18 checked-in fragment/deposit GLBs once
+(baked identity transforms, opaque materials, ±0.48 m local bounds), deduplicates
+position/color vertices and retains immutable GPU vertex/index buffers. Authored
+material factors and local facet fill remain baked in the vertex colors. The
+immutable CPU triangle positions used by collision/support queries are unchanged.
+
+Runtime supplies stable variant choice, absolute center, unit quaternion and
+uniform side through `ResourceMeshInstance`. Each frame the renderer validates
+poses, subtracts the camera origin in `f64`, then narrows centers to `f32`.
+A rotation-independent enclosing sphere (±0.481 cube, slightly inflated for
+rounding) conservatively rejects resources outside the near/side frustum planes
+before staging. Near-plane crossings and carried fragments use the same path;
+culling changes presentation counters only, never picking, physics or session data.
+
+Visible resources are grouped by mesh variant; material roles remain in that
+variant's resident geometry. A 32-byte record contains center/scale and quaternion
+as two `vec4<f32>` instance attributes. WGSL rotates/scales local vertices and
+adds the relative center before the existing view/infinite reverse-Z projection.
+There is one indexed instanced draw per nonempty variant: 0–18 draws (up to six
+for fragment-only cargo), versus the former one CPU-expanded batch. Draw counts
+and triangles reflect the submitted work, not the full gameplay population.
+
+Per-variant CPU staging/last-upload caches and GPU instance buffers retain capacity;
+GPU buffers grow geometrically. Only changed visible variant records upload.
+Turning the camera changes the uniform/culling; translation or ship motion may
+refresh compact instance records but never reuploads mesh geometry. An unchanged
+visible batch uploads only the 64-byte camera uniform; a fully changed batch
+uploads at most `64 + 32 * visible_count` bytes. The existing scratch counter now
+reports retained staging plus last-uploaded byte capacities, not temporary
+expanded vertices or total allocator traffic. See the
+[benchmark guide](../../scripts/FRAGMENT_BENCHMARKS.md) and
+[issue #158 evidence](../../reports/issue-158/README.md).
 
 ## Authored water-ice deposits (#88)
 

@@ -54,6 +54,17 @@ jobs:
         run: python scripts/build_game.py --profile debug --output artifacts/build/debug
       - name: Stage release executable
         run: python scripts/build_game.py --profile release --output artifacts/build/release
+      - name: Resident resource instancing contracts and CPU comparison
+        if: runner.os == 'Linux'
+        timeout-minutes: 5
+        shell: bash
+        env:
+          WGPU_BACKEND: vulkan
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/fragment-benchmarks
+          cargo test -p salimon-renderer headless_resource --locked -- --ignored
+          cargo test --release -p salimon-renderer resource_preparation_benchmark --locked -- --ignored --nocapture | tee artifacts/fragment-benchmarks/resource-preparation.txt
       - name: Fragment stress measurements (CPU-only; no hardware FPS assertions)
         if: runner.os == 'Linux'
         timeout-minutes: 5

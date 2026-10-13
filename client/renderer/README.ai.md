@@ -88,3 +88,9 @@ and active gates; the asset README defines the baked grip contract.
 `EquipmentIcon` and `EquipmentSlot`. Runtime supplies visibility/state/DPI;
 renderer owns bottom-band layout and message stacking through `overlay.rs`.
 See [toolbar contract](architecture.md#equipment-toolbar-hud-129) and CPU tests.
+
+`resource_mesh.rs` / `resource_mesh.wgsl` own immutable authored resource geometry,
+per-variant indexed instancing, pose validation, conservative resource culling and
+retained compact upload caches. CPU unit triangles remain available independently
+for collision/support queries. See [resource contract](architecture.md#authored-resource-fragments)
+before changing instance layout, material colors, precision or counters.

@@ -1,9 +1,13 @@
 struct Camera { view_projection: mat4x4<f32>, };
 @group(0) @binding(0) var<uniform> camera: Camera;
 struct Output { @builtin(position) position: vec4<f32>, @location(0) color: vec4<f32>, };
-@vertex fn vs_main(@location(0) position: vec3<f32>, @location(1) color: vec4<f32>) -> Output {
+@vertex fn vs_main(@location(0) position: vec3<f32>, @location(1) color: vec4<f32>,
+    @location(2) center_scale: vec4<f32>, @location(3) orientation: vec4<f32>) -> Output {
     var output: Output;
-    output.position = camera.view_projection * vec4<f32>(position, 1.0);
+    let t = 2.0 * cross(orientation.xyz, position);
+    let rotated = position + orientation.w * t + cross(orientation.xyz, t);
+    let relative = center_scale.xyz + rotated * center_scale.w;
+    output.position = camera.view_projection * vec4<f32>(relative, 1.0);
     output.color = color;
     return output;
 }

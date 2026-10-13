@@ -937,6 +937,7 @@ impl Renderer {
             &self.queue,
             scene.camera,
             prepared_scene.view_projection,
+            aspect_ratio,
             scene.resource_meshes,
         )?;
         self.ensure_instance_capacity(prepared_scene.instances.len())?;

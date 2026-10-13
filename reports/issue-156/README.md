@@ -1,9 +1,9 @@
 # Issue #156 — persistent fragment sleep and contact-island waking
 
-## Current status — 2026-10-12
+## Current status — 2026-10-13
 
-**Incomplete: complete native 500/1,000 interaction routes and the remaining
-reference matrix remain pending.** Dense settled 500/1,000 performance windows
+**Incomplete: the complete native 1,000 interaction route and the remaining
+reference matrix remain pending.** The complete 500 interaction route and dense settled 500/1,000 performance windows
 have passed, as recorded below. Current production physics is `047105c`; the
 current staged surface/measurement executable SHA-256 is
 `95e662d5aeea7cec6a8913ba59adbfe51f84d70eaf5f3cfeb6315bf106cc2d68`.
@@ -18,8 +18,8 @@ physics update exceeded the harness's five-second response deadline. The full
 route remains failed. A fresh 500 retry reproduced complete sleep and rigid
 flight checks, but exposed a second five-second deadline in the native server.
 The server and Python harness now both allow 120 seconds for valid fixed-step
-requests, bounded by the total run deadline. Corrected large-load interaction
-reruns remain pending.
+requests, bounded by the total run deadline. Subsequent corrected large-load
+interaction outcomes are recorded below.
 
 The fresh 1,000 route also reached complete sleep: 1,586 production updates
 (25.376 simulation seconds / 7,628.898 wall seconds). Fast rotating flight,
@@ -81,7 +81,8 @@ the focused regression passed. Original focus/cursor behavior is retained while
 gameplay events are ignored. The corrected 500/1,000 interaction attempts used
 executable SHA-256
 `afb221ebebecc1652b6f9ee6329c0bf7289bb2a82b581d5a0c73c5cce1cc9cb1`;
-the original 1,000 interaction attempt remains in preparation.
+the older-harness 1,000 retry later completed with the failed repeat-pickup
+outcome recorded below.
 The [visibility validation manifest](native-validation-2026-10-12-visibility.json)
 distinguishes current build/lint/format checks and 13 focused benchmark tests from
 the earlier complete workspace/native suite. Python tooling passed all 50 tests
@@ -127,8 +128,8 @@ CPU rendering 3.488–3.521 ms and asynchronous GPU timestamps 2.155–2.310 ms.
 The [six-window summary](native-500-dense-settled-2026-10-12-summary.json) and
 [complete compressed raw samples](native-500-dense-settled-2026-10-12.json.gz)
 retain the measurements, counters and accounting. Dense settled 500 and 1,000
-now supply all twelve required primary/stress windows; the other 92 matrix
-cases remain pending.
+now supply all twelve required primary/stress windows. Subsequent low-load
+matrix results and the remaining case count are recorded below.
 
 The fresh 500 interaction route separately reached all sleeping at 1,056 updates
 (2,313.753 preparation wall seconds). Loaded flight/landing/takeoff preserved
@@ -147,8 +148,28 @@ fragment poses or sleep flags. Five analytic look/axis/precision regressions
 bring Python tooling to 55 passing tests. A first 100-fragment probe released
 successfully but failed a repeat release; correcting the held-offset view reset
 then passed the [full native 100 route](native-100-floor-navigation-2026-10-12.json)
-with all three cycles. A fresh 500 interaction route is now preparing on the
-final surface build with this corrected harness; its outcome is still pending.
+with all three cycles. A fresh 500 interaction route then used the final surface
+build with this corrected harness; its completed outcome follows.
+
+That 500 route subsequently **passed**: all 500 settled naturally after 1,056
+updates, loaded fast rotating flight/landing/takeoff preserved all IDs, 625 kg
+and zero local drift, real F removal of support 162 made dependent 238 fall,
+all 34 fragments outside the original component stayed asleep, and three
+pickup/drop cycles preserved identity and accounting. Preparation wall time
+4,384.476 s and total route time 4,420.072 s include the earlier measurement
+pauses; simulation settling remained 16.896 s. The
+[complete retained route summary](native-500-floor-navigation-2026-10-13.json)
+and [full checkpoint archive](native-500-floor-navigation-2026-10-13.json.gz)
+retain the actual state evidence and hashes.
+
+The older-harness 1,000 retry reached natural sleep at 1,586 updates and passed
+rigid flight/landing/takeoff, real F removal of support 515, falling dependent
+743 and all 11 unrelated fragments remaining asleep. A repeat pickup selected
+another identity, so the **complete route failed**. Its
+[partial summary](native-1000-support-partial-2026-10-13.json) and
+[full checkpoint archive](native-1000-support-partial-2026-10-13.json.gz)
+preserve that failure. A fresh 1,000 route now uses the floor-navigation harness
+that passed the complete 500 route; it is not claimed passed before completion.
 
 The latest staged surface build passed 353 workspace Rust tests (one existing
 GPU test ignored), 55 Python tooling tests, workspace Clippy with warnings
@@ -184,12 +205,25 @@ do not establish reliable active-only tails. The suspended interaction preparati
 after these isolated windows completed.
 
 Together the retained native datasets cover 70 distinct cases / 210 windows.
-Remaining acceptance requires complete loaded carrying routes and the other
+Remaining acceptance requires the complete 1,000 carrying route and the other
 26 reference matrix cases, including high-load active windows. Dense 500/1,000 natural
 sleep, loaded rigid flight and identical-snapshot baseline comparisons are now
 retained above. The complete matrix still requires all 96 cases
 with three windows and at least 100 retained samples per window. Diagnostic
 continuations, partial preparations and timeouts do not satisfy those gates.
+
+The first local high-load matrix start gate failed on end-of-input after its
+four fixtures had naturally prepared, before any native measurement window.
+That scheduling failure supplies no performance result. Interactive stdin was
+then verified with a real `MATRIX_START` round-trip and the retry uses a PTY,
+with a 86,400 s per-case orchestration deadline to retain prepared fixtures while
+waiting for an idle display. The ordinary simulation clock and sleep criteria
+are unchanged. The active 250 group also remains incomplete: the resumed
+windows were occluded, and League of Legends was again using substantial CPU/GPU.
+Even its resumed window that did not report occlusion is excluded from reference
+claims because of that concurrent game. Further performance collection waits
+for the user to confirm an idle desktop again; fixed-step correctness preparation
+can continue meanwhile.
 
 The benchmark build adds optional `--minimum-samples 100`, requiring both the
 requested wall duration and 100 retained native frame intervals before a window

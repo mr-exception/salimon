@@ -549,7 +549,7 @@ mod tests {
                         continue;
                     }
                     let p = generate(b, d, key(*c, b, d, &leaves));
-                    for tri in p.indices.chunks_exact(3) {
+                    for tri in p.indices.as_chunks::<3>().0 {
                         let local: [f64; 3] = std::array::from_fn(|i| {
                             p.anchor_meters[i]
                                 + tri
@@ -654,7 +654,7 @@ mod topology_tests {
             for cell in &leaves {
                 let patch = generate(body, definition, key(*cell, body, definition, &leaves));
                 let mut local = std::collections::HashMap::<[u32; 2], u32>::new();
-                for tri in patch.indices.chunks_exact(3) {
+                for tri in patch.indices.as_chunks::<3>().0 {
                     for i in 0..3 {
                         let mut edge = [tri[i], tri[(i + 1) % 3]];
                         edge.sort();

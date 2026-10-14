@@ -583,3 +583,14 @@ The 500-piece fixture uses 0.032 kg authored iron fragments inside the aft cabin
 checks compare the live ledger with actual physical identities, including Core
 consumption, rather than assuming every overfull stress-fixture piece is onboard.
 See the [runner commands](../../scripts/README.md#realistic-flight-regression-195).
+
+## Flight/cargo CPU profiling (#196)
+
+`flight_profile.rs` composes fresh production E2E/contained-cargo fixtures and
+measures fixed-count event-ledger, boundary, moving powered/zero-G, transition
+and dense-contact workloads in release mode. Observations and identity/mass
+checks run outside each timed region. Reports retain update distributions and
+motion counts; no presented frames or hardware FPS are synthesized. The
+[runner](../../scripts/FRAGMENT_BENCHMARKS.md#flight-mass-and-cabin-power-cpu-profiles-196)
+validates report completeness/raw statistics and applies explicit baseline/absolute
+limits in CI. This path introduces no gameplay timing or physics shortcuts.

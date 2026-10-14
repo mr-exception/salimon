@@ -359,3 +359,39 @@ configuration, naturally verified sleep and 100/500/1,000 populations, with
 separate settled/active samples and full adapter/writeback timing. Measure memory
 and platform impact separately from structural pair-capacity counters. Adoption
 and production dependencies require a subsequent reviewable implementation.
+
+## Flight, mass and cabin power CPU profiles (#196)
+
+Build release, then run:
+
+```sh
+python scripts/profile_flight.py --binary target/release/salimon-client --samples 20 --output artifacts/flight-profile.json --baseline reports/issue-196/baseline.json
+```
+
+The opt-in `--flight-profile` CLI runs fresh deterministic 0/500 populations for
+idle event-driven mass reads, boundary exit/re-entry, moving powered ship/cargo,
+moving zero-G cargo, alternating power transitions and dense falling contacts.
+Every row checks stable IDs and physically onboard mass outside its timed window.
+The contained fixture has 500 authored iron fragments, 0.032 kg each (16 kg total),
+not 500 large pieces piled outside the hull. Dense rows place a supported single layer of authored hulls at 12 cm spacing;
+ordinary rows spread across the aft deck. Multilayer pile stress remains the
+optional `--stacked` variant (ten by ten by five, non-overlapping 12 cm
+spacing), and the existing `--benchmark --layout dense` workload. The bounded
+CI deck suite does not claim their performance acceptance. The recorded stacked
+run fails its p95 ceiling; pass `--stacked` without the deck `--baseline` to
+reproduce that stress result. Different fixture baselines cannot be compared. Each measured update is 16 ms; no
+warmup hides initial collision work. Per-sample moving counts reveal settling.
+
+Reports retain raw CPU update times and p50/p95/p99/max distributions, binary
+SHA-256 and source/machine metadata. `mass-idle` isolates the event drain/ledger;
+`mass-crossing` includes one validated round-trip per sample. Movement/contact
+rows time the production `advance_game` composition. These are CPU work samples,
+not presented frames; GPU time/FPS and Apple M1 acceptance are not claimed.
+
+The Python runner rejects incomplete/duplicate/nonfinite rows, offboard cargo
+and summaries that disagree with raw samples. Limits are explicit in
+`profile_flight.py`: p95 must satisfy both the absolute ceiling and 4× baseline
+plus a workload-specific noise allowance. Missing workload rows fail. Compare
+like builds/sample counts/machines when interpreting changes; CI uses permissive
+portable regression guards, not a 60 FPS target. Update a baseline deliberately
+with report evidence; do not regenerate it automatically on failure.

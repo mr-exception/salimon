@@ -85,7 +85,7 @@ impl ShipController {
 
     pub fn advance(&mut self, delta: Duration) {
         self.advance_door(delta);
-        let seconds = delta.as_secs_f64().min(0.1);
+        let seconds = delta.as_secs_f64();
         self.advance_steering(seconds);
         match self.flight_state {
             FlightState::Flying => self.advance_flight(seconds),

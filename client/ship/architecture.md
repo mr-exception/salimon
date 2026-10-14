@@ -46,7 +46,7 @@ normal, lifting 15 m over 2 seconds before clearing the landing volume over
 with zero velocity at phase boundaries. Captured radial waypoints and elapsed
 `Duration` make sampling independent of frame partition, without accumulated
 position error. Automatic sequences consume the full supplied delta; the
-100 ms direct-flight integration clamp remains separate. Runtime maps the active body's frame to
+runtime supplies shared 16 ms gameplay ticks. Runtime maps the active body's frame to
 character traversal and owns only the contextual `L` key translation.
 The default and assisted landed poses use the generated landing-foot offset.
 Flat fixtures place the non-gear hull 2 m above the nominal tangent surface.

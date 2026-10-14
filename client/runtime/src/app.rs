@@ -623,7 +623,17 @@ impl ClientApplication {
         self.mining.fragment_previous.clear();
     }
 
-    /// The same portable gameplay update runs on redraw and on explicit E2E steps.
+    /// Admit deterministic E2E elapsed time to the same fixed-tick accumulator.
+    /// Explicit commands drain all admitted ticks without a wall-clock budget;
+    /// the fractional remainder stays queued for the next command.
+    pub(crate) fn advance_automation(&mut self, elapsed: Duration) {
+        self.update_clock.accumulate(elapsed);
+        while let Some(tick) = self.update_clock.take_tick() {
+            self.advance_game(tick);
+        }
+    }
+
+    /// One completed gameplay tick, shared by native and automation scheduling.
     pub(crate) fn advance_game(&mut self, delta: Duration) {
         if self.e2e_config.is_none() {
             let ship = self.ship.snapshot();
@@ -1421,6 +1431,28 @@ mod toolbar_tests {
     use super::*;
     use crate::equipment::ToolbarSlot;
     use salimon_world::{CameraCommand, CelestialBodyId};
+
+    #[test]
+    fn automation_partitions_preserve_elapsed_and_match_native_ticks() {
+        let mut whole = ClientApplication::default();
+        let mut partitioned = ClientApplication::default();
+        let pose = salimon_ship::ShipPose {
+            position_meters: [0.0; 3],
+            orientation: [0.0, 0.0, 0.0, 1.0],
+        };
+        whole.ship = salimon_ship::ShipController::flying(pose, 10);
+        partitioned.ship = whole.ship.clone();
+        whole.advance_automation(Duration::from_millis(1003));
+        for ms in [7, 201, 1, 394, 400] {
+            partitioned.advance_automation(Duration::from_millis(ms));
+        }
+        assert_eq!(whole.ship.snapshot(), partitioned.ship.snapshot());
+        assert_eq!(whole.update_clock.backlog(), Duration::from_millis(11));
+        assert_eq!(
+            whole.update_clock.backlog(),
+            partitioned.update_clock.backlog()
+        );
+    }
 
     #[test]
     fn stalled_native_scheduler_matches_shared_fixed_gameplay_ticks() {

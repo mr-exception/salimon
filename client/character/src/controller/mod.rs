@@ -129,9 +129,26 @@ impl CharacterController {
         door_open: bool,
         ship_landed: bool,
     ) {
+        let mut remaining = delta;
+        while !remaining.is_zero() {
+            let tick = remaining.min(Duration::from_millis(100));
+            self.advance_tick(tick, input, ship_motion, surface, door_open, ship_landed);
+            remaining -= tick;
+        }
+    }
+
+    fn advance_tick(
+        &mut self,
+        delta: Duration,
+        input: MovementInput,
+        ship_motion: (ShipFrame, [f64; 3]),
+        surface: SurfaceFrame,
+        door_open: bool,
+        ship_landed: bool,
+    ) {
         let surface = self.nearby_surface.unwrap_or(surface);
         let (ship, ship_velocity) = ship_motion;
-        let seconds = delta.as_secs_f64().min(0.1);
+        let seconds = delta.as_secs_f64();
         if seconds <= 0.0 {
             return;
         }
@@ -162,5 +179,47 @@ impl CharacterController {
             PositionState::Space { world } => self.advance_eva(world, &step),
             PositionState::Surface { world } => self.advance_surface(world, &step),
         }
+    }
+}
+
+#[cfg(test)]
+mod timing_tests {
+    use super::test_support::{frame, surface};
+    use super::*;
+
+    #[test]
+    fn long_eva_interval_retains_inherited_travel() {
+        let mut whole = CharacterController {
+            position: PositionState::Space {
+                world: [1000.0, 1000.0, 1000.0],
+            },
+            eva_inherited_velocity: [10.0, 0.0, 0.0],
+            ..CharacterController::default()
+        };
+        let mut partitioned = whole.clone();
+        whole.advance(
+            Duration::from_secs(2),
+            MovementInput::default(),
+            frame(),
+            surface(),
+            true,
+            false,
+        );
+        for _ in 0..20 {
+            partitioned.advance(
+                Duration::from_millis(100),
+                MovementInput::default(),
+                frame(),
+                surface(),
+                true,
+                false,
+            );
+        }
+        let after = whole.snapshot(frame(), surface());
+        assert_eq!(
+            after.eye_position_meters,
+            partitioned.snapshot(frame(), surface()).eye_position_meters
+        );
+        assert_eq!(after.eye_position_meters[0], 1020.0);
     }
 }

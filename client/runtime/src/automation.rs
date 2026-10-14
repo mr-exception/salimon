@@ -166,7 +166,7 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
                 let step = app.e2e_step().expect("automation only runs in E2E mode");
                 let started = Instant::now();
                 for _ in 0..frames {
-                    app.advance_game(step);
+                    app.advance_automation(step);
                 }
                 Ok(json!({"frames": frames,"elapsed_ms":started.elapsed().as_secs_f64()*1000.0}))
             }

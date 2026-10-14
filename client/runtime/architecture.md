@@ -477,3 +477,12 @@ The `eva-approach` fixture seeds -25,000 m/s world Y momentum at zero
 throttle for deterministic nearby-body influence crossings.
 `coasting-orbit` seeds the same +X momentum near Earth for the existing loaded
 cargo sleep/assist acceptance route, retaining its high-speed coverage.
+
+## Held throttle routing (#186)
+
+Native Up/Down and E2E `key` values `thruster_up`/`thruster_down` share the typed
+ship edge API. Synthetic press replay and OS repeats are ignored, releases always
+clear holds. Focus/cursor loss, view changes and lifecycle clock resets clear
+held throttle. The existing `thruster` command remains a gated one-point action
+and reports whether the powered flight authority accepted it. Renderer DTOs and
+the cached cockpit atlas retain signed percentages and show reverse magnitude.

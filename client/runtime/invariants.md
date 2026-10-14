@@ -50,8 +50,10 @@
 20. Cockpit W/S, A/D, and Left/Right Arrow state maps to typed pitch, yaw, and
     roll without changing the independent character mouse-look state; A turns
     left and D turns right in the rendered cockpit view.
-21. Up/Down Arrow changes thruster only on an initial press, never key repeat or
-    release; leaving cockpit or losing focus clears held steering input.
+21. Up/Down Arrow forwards real press/release edges to ship-owned signed
+    throttle and its 100 ms simulation-time repeat cadence. OS repeat and
+    synthetic focus presses are ignored. Exit, focus/lifecycle/view changes clear
+    held controls while preserving selected throttle.
 22. L is translated to the ship domain only on an initial press; the runtime
     cannot cancel or steer an active assisted landing/takeoff sequence.
 23. Character surface traversal receives the body frame stored by landed or

@@ -18,7 +18,7 @@ pub(super) struct OwnedDomainMetrics {
     pub(super) ship_position: Option<[f64; 3]>,
     pub(super) ship_velocity: Option<[f64; 3]>,
     pub(super) ship_speed_mps: Option<f64>,
-    pub(super) thruster_percent: Option<u8>,
+    pub(super) thruster_percent: Option<i8>,
     pub(super) nearby_bodies: Vec<OwnedBodyDistance>,
 }
 
@@ -43,7 +43,9 @@ impl From<DomainMetrics<'_>> for OwnedDomainMetrics {
             ship_position: valid_vector(metrics.ship_position),
             ship_velocity: valid_vector(metrics.ship_velocity),
             ship_speed_mps: valid_speed(metrics.ship_speed_mps),
-            thruster_percent: metrics.thruster_percent.filter(|percent| *percent <= 100),
+            thruster_percent: metrics
+                .thruster_percent
+                .filter(|percent| (-100..=100).contains(percent)),
             nearby_bodies: metrics
                 .nearby_bodies
                 .iter()

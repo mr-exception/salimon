@@ -1,7 +1,7 @@
 //! Native physical-key translation and held control state.
 
 use salimon_character::MovementInput;
-use salimon_ship::SteeringInput;
+use salimon_ship::{SteeringInput, ThrottleDirection};
 use salimon_world::{CameraCommand, CelestialBodyId};
 use winit::event::ElementState;
 use winit::keyboard::{KeyCode, PhysicalKey};
@@ -129,15 +129,17 @@ pub(super) fn update_ship_control_input(
     }
 }
 
-pub(super) fn thruster_step(state: ElementState, repeat: bool, key: PhysicalKey) -> Option<i8> {
-    if state != ElementState::Pressed || repeat {
-        return None;
-    }
+pub(super) fn throttle_direction(key: PhysicalKey) -> Option<ThrottleDirection> {
     match key {
-        PhysicalKey::Code(KeyCode::ArrowUp) => Some(1),
-        PhysicalKey::Code(KeyCode::ArrowDown) => Some(-1),
+        PhysicalKey::Code(KeyCode::ArrowUp) => Some(ThrottleDirection::Up),
+        PhysicalKey::Code(KeyCode::ArrowDown) => Some(ThrottleDirection::Down),
         _ => None,
     }
+}
+
+/// Synthetic focus replay and OS repeats never generate throttle press edges.
+pub(super) fn throttle_event(state: ElementState, repeat: bool, synthetic: bool) -> bool {
+    state == ElementState::Released || (!repeat && !synthetic)
 }
 
 fn movement_key(key: PhysicalKey) -> Option<MovementKey> {
@@ -473,12 +475,18 @@ mod tests {
     }
 
     #[test]
-    fn thruster_keys_accept_only_initial_arrow_presses() {
-        let up = PhysicalKey::Code(KeyCode::ArrowUp);
-        let down = PhysicalKey::Code(KeyCode::ArrowDown);
-        assert_eq!(thruster_step(ElementState::Pressed, false, up), Some(1));
-        assert_eq!(thruster_step(ElementState::Pressed, false, down), Some(-1));
-        assert_eq!(thruster_step(ElementState::Pressed, true, up), None);
-        assert_eq!(thruster_step(ElementState::Released, false, down), None);
+    fn throttle_keys_map_both_edges_and_ignore_repeat_and_focus_replay() {
+        assert_eq!(
+            throttle_direction(PhysicalKey::Code(KeyCode::ArrowUp)),
+            Some(ThrottleDirection::Up)
+        );
+        assert_eq!(
+            throttle_direction(PhysicalKey::Code(KeyCode::ArrowDown)),
+            Some(ThrottleDirection::Down)
+        );
+        assert!(throttle_event(ElementState::Pressed, false, false));
+        assert!(!throttle_event(ElementState::Pressed, true, false));
+        assert!(!throttle_event(ElementState::Pressed, false, true));
+        assert!(throttle_event(ElementState::Released, false, true));
     }
 }

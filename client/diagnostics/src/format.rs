@@ -365,6 +365,25 @@ mod tests {
     }
 
     #[test]
+    fn reverse_throttle_preserves_sign_in_observed_text() {
+        let mut diagnostics = Diagnostics::default();
+        diagnostics.toggle();
+        diagnostics.record_presented(
+            sample(1, Duration::from_millis(16), GpuTime::Pending),
+            DomainMetrics {
+                thruster_percent: Some(-100),
+                ..DomainMetrics::default()
+            },
+        );
+        assert!(
+            diagnostics
+                .overlay_text()
+                .unwrap()
+                .contains("THRUSTER         -100%")
+        );
+    }
+
+    #[test]
     fn invalid_domain_values_remain_unavailable() {
         let mut diagnostics = Diagnostics::default();
         diagnostics.toggle();

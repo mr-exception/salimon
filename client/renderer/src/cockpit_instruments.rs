@@ -12,7 +12,7 @@ pub(crate) const ATLAS_HEIGHT: u32 = 256;
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct CockpitInstruments {
     pub speed_meters_per_second: f64,
-    pub thruster_percentage: u8,
+    pub thruster_percentage: i8,
     pub core_energy_capacity_joules: u64,
     pub core_energy_stored_joules: u64,
     pub nearby_body: Option<NearbyBodyInstruments>,
@@ -176,7 +176,7 @@ impl SpeedDisplay {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct DisplayKey {
     speed: SpeedDisplay,
-    power: u8,
+    power: i8,
     core_capacity: EnergyDisplay,
     core_stored: EnergyDisplay,
     nearby: Option<NearbyDisplay>,
@@ -201,7 +201,7 @@ impl InstrumentAtlas {
     pub(crate) fn update(&mut self, values: CockpitInstruments) -> bool {
         let next = DisplayKey {
             speed: SpeedDisplay::from_meters_per_second(values.speed_meters_per_second),
-            power: values.thruster_percentage.min(100),
+            power: values.thruster_percentage.clamp(-100, 100),
             core_capacity: EnergyDisplay::from_joules(values.core_energy_capacity_joules),
             core_stored: EnergyDisplay::from_joules(values.core_energy_stored_joules),
             nearby: values.nearby_body.map(NearbyDisplay::from_instruments),
@@ -233,7 +233,7 @@ impl InstrumentAtlas {
         true
     }
 
-    fn draw_speed(&mut self, speed: SpeedDisplay, percentage: u8) {
+    fn draw_speed(&mut self, speed: SpeedDisplay, percentage: i8) {
         self.section_frame(0, "SPEED");
         let (number, unit, color) = speed_text(speed);
         self.text(28, 80, &number, 10, color);
@@ -256,7 +256,9 @@ impl InstrumentAtlas {
         for segment in 0..20 {
             let x = 160 + segment * 15;
             self.rect(x, 212, 12, 28, RULE);
-            let filled = u32::from(percentage).saturating_sub(segment * 5).min(5);
+            let filled = u32::from(percentage.unsigned_abs())
+                .saturating_sub(segment * 5)
+                .min(5);
             if filled > 0 {
                 self.rect(x, 212, (12 * filled).div_ceil(5), 28, CYAN);
             }
@@ -553,7 +555,7 @@ mod tests {
     #[test]
     fn power_clamps_and_all_pixels_remain_opaque() {
         let mut atlas = InstrumentAtlas::new();
-        for percentage in [0, 1, 100] {
+        for percentage in [-100, -1, 0, 1, 100] {
             assert!(atlas.update(CockpitInstruments {
                 speed_meters_per_second: f64::NAN,
                 thruster_percentage: percentage,
@@ -570,7 +572,18 @@ mod tests {
         }
         assert!(!atlas.update(CockpitInstruments {
             speed_meters_per_second: f64::NAN,
-            thruster_percentage: u8::MAX,
+            thruster_percentage: i8::MAX,
+            ..CockpitInstruments::default()
+        }));
+        assert!(atlas.update(CockpitInstruments {
+            speed_meters_per_second: f64::NAN,
+            thruster_percentage: i8::MIN,
+            ..CockpitInstruments::default()
+        }));
+        assert_eq!(atlas.displayed.unwrap().power, -100);
+        assert!(!atlas.update(CockpitInstruments {
+            speed_meters_per_second: f64::NAN,
+            thruster_percentage: -100,
             ..CockpitInstruments::default()
         }));
     }

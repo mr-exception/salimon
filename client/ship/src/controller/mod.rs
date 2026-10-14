@@ -13,6 +13,7 @@ mod door;
 mod flight;
 mod steering;
 pub(crate) mod telemetry;
+pub mod throttle;
 use assist::AssistTransition;
 
 #[derive(Clone, Debug)]
@@ -26,7 +27,8 @@ pub struct ShipController {
     door_state: DoorState,
     door_open_fraction: f64,
     cockpit_control_active: bool,
-    pub(crate) thruster_percentage: u8,
+    pub(crate) thruster_percentage: i8,
+    throttle_input: throttle::HeldThrottle,
     energy_core: EnergyCoreState,
     cockpit_message: Option<CockpitMessage>,
     steering_target: SteeringInput,
@@ -57,6 +59,7 @@ impl Default for ShipController {
             door_state: DoorState::Closed,
             door_open_fraction: 0.0,
             cockpit_control_active: false,
+            throttle_input: throttle::HeldThrottle::default(),
             thruster_percentage: 0,
             energy_core: EnergyCoreState::default(),
             cockpit_message: None,
@@ -69,7 +72,7 @@ impl Default for ShipController {
 
 impl ShipController {
     #[must_use]
-    pub fn flying(pose: ShipPose, thruster_percentage: u8) -> Self {
+    pub fn flying(pose: ShipPose, thruster_percentage: i8) -> Self {
         Self {
             velocity: [0.0; 3],
             propulsion: crate::Propulsion::default(),
@@ -80,7 +83,8 @@ impl ShipController {
             door_state: DoorState::Closed,
             door_open_fraction: 0.0,
             cockpit_control_active: true,
-            thruster_percentage: thruster_percentage.min(100),
+            throttle_input: throttle::HeldThrottle::default(),
+            thruster_percentage: thruster_percentage.clamp(-100, 100),
             energy_core: EnergyCoreState::default(),
             cockpit_message: None,
             steering_target: SteeringInput::default(),
@@ -92,7 +96,7 @@ impl ShipController {
     /// A scenario/import boundary; selected throttle never implies initial speed.
     pub fn flying_with_velocity(
         pose: ShipPose,
-        throttle: u8,
+        throttle: i8,
         velocity: [f64; 3],
     ) -> Result<Self, crate::InvalidFlightMotion> {
         if !velocity.iter().all(|v| v.is_finite()) {
@@ -110,6 +114,7 @@ impl ShipController {
 
     pub fn advance(&mut self, delta: Duration) {
         self.advance_door(delta);
+        self.advance_throttle(delta);
         let seconds = delta.as_secs_f64();
         self.advance_steering(seconds);
         match self.flight_state {

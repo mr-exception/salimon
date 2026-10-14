@@ -32,9 +32,12 @@ pub struct NearbyBodyTelemetry {
 }
 
 impl ShipController {
-    /// Changes only the Phase 0 telemetry fixture; no power simulation is run.
+    /// Updates the bounded fixture and clears held controls on power loss; no consumption simulation.
     pub fn set_stored_core_energy_joules(&mut self, stored_joules: u64) {
         self.energy_core.stored_joules = stored_joules.min(self.energy_core.capacity_joules);
+        if self.energy_core.stored_joules == 0 {
+            self.clear_throttle_input();
+        }
     }
 
     pub(super) fn nearby_body_telemetry(

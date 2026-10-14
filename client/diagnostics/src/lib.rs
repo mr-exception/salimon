@@ -67,7 +67,7 @@ pub struct DomainMetrics<'a> {
     pub ship_position: Option<[f64; 3]>,
     pub ship_velocity: Option<[f64; 3]>,
     pub ship_speed_mps: Option<f64>,
-    pub thruster_percent: Option<u8>,
+    pub thruster_percent: Option<i8>,
     pub nearby_bodies: &'a [BodyDistance<'a>],
 }
 

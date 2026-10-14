@@ -89,6 +89,7 @@ impl ShipController {
         if !self.cockpit_control_active {
             return;
         }
+        self.clear_throttle_input();
         self.cockpit_message = None;
         match self.flight_state {
             FlightState::Flying => {

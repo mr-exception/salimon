@@ -1,7 +1,7 @@
 # Ship
 
 `salimon-ship` owns portable ship state. It provides the landed-on-Earth
-starting pose, cockpit-control authority, persistent direct-speed motion,
+starting pose, cockpit-control authority, persistent inertial motion,
 steering/thruster controls, solid-body boundary correction,
 timed assisted landing/takeoff, and the
 landed/open-space door rule. Opening or closing the exit uses a typed action.
@@ -11,11 +11,13 @@ threshold. Nearby flight and assisted sequences retain the `Door locked while
 in flight` message. No pressure or survival simulation is implemented.
 
 Leaving the cockpit changes only control authority. A flying ship keeps its pose,
-orientation, selected thruster percentage, and direct-speed motion. Steering
+orientation, selected thruster percentage, and inertial motion. Steering
 ramps on/off over 0.12 seconds and settles at 5 degrees/second; this smoothing is
-presentation feel, not inertia. Thruster changes are clamped to 0–100% and map
-directly to speed. The runtime supplies typed held axes and discrete percentage
-steps. `L` starts an uncancellable automatic landing at the current approach
+presentation feel, not inertia. Throttle selection is signed −100..+100%; force divided by cached total mass
+accelerates persistent world-space velocity. Zero throttle coasts. Up/Down
+presses change one point and repeat every 100 ms held, independently of OS repeats.
+The runtime supplies typed held edges; only powered cockpit free flight accepts
+changes. Exit clears holds while preserving selection; landing/collision resets it. `L` starts an uncancellable automatic landing at the current approach
 normal inside a body's `1.15R` volume, or an automatic takeoff while landed.
 Both sequences continue without cockpit authority; an open door blocks takeoff
 with `Close door before takeoff`.
@@ -32,7 +34,7 @@ no orientation or position change occurs on activation.
 Each snapshot also carries a bounded Energy Core telemetry fixture and
 the nearest catalog body within an inclusive 3,000,000 m surface distance. The
 fixture starts at 750 GJ stored in a 1 TJ capacity and has no consumption,
-generation, persistence, or gameplay consequences. Nearby telemetry includes
+generation or persistence. Nonzero stored fixture energy gates throttle changes. Nearby telemetry includes
 the body's name, surface distance, and signed radial speed: negative approaches,
 positive recedes, and zero is stationary.
 

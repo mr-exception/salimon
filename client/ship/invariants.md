@@ -13,8 +13,8 @@
    local `+Y` aligned to the outward normal and 2 m non-gear hull clearance.
 9. Sustained pitch, yaw, and roll each use exactly 5 degrees/second after a
    0.12-second start/stop presentation ramp; leaving the cockpit clears input.
-10. Thruster adjustments require cockpit authority, change by explicit integer
-    percentage points, clamp to 0–100%, and select forward thrust capacity (signed selection follows in #186).
+10. Thruster adjustments require powered cockpit authority, change by explicit integer
+    percentage points, clamp to −100..+100%, and select forward/reverse thrust capacity.
 11. Flying ships use the conservative collision radius against the sampled local
     surface, with extrema only as a broad bound. Flat fixtures keep their original
     sphere rule; the visual-only Sun is ignored.
@@ -56,3 +56,9 @@ and their consumers aligned; flat deterministic fixtures are explicit.
     cockpit authority never reset it. Zero throttle coasts without drag or a cap.
 21. Validated cached mass/force inputs determine acceleration; speed telemetry is
     the actual velocity magnitude, including captured assist paths.
+
+22. Up/Down presses change one signed percentage point immediately and repeat
+    every 100 ms of simulation time while held. OS repeats/focus replay do not
+    create edges. Opposing held keys suspend repeats. Exit, focus/lifecycle loss,
+    power loss and assists clear held input; selection persists until landing
+    completion or collision resets it to zero.

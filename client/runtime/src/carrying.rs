@@ -263,6 +263,41 @@ mod tests {
     }
 
     #[test]
+    fn held_fragment_follows_weightless_player_and_can_bootstrap_core() {
+        let mut tool = mined();
+        let id = tool.session.fragments()[0].id();
+        assert!(tool.session.pick_up(id));
+        let mut ship = salimon_ship::ShipController::default();
+        ship.set_stored_core_energy_joules(0);
+        let frame = crate::app::character_ship_frame(ship.snapshot().pose);
+        let surface = crate::app::surface_frame_for_ship(ship.snapshot());
+        let mut player = salimon_character::CharacterController::default();
+        player.set_ship_gravity_enabled(false);
+        follow(&mut tool, player.snapshot(frame, surface));
+        let before = tool.session.fragments()[0].transform();
+        player.advance(
+            Duration::from_millis(100),
+            salimon_character::MovementInput {
+                backward: true,
+                ..Default::default()
+            },
+            frame,
+            surface,
+            false,
+            true,
+        );
+        follow(&mut tool, player.snapshot(frame, surface));
+        assert_ne!(tool.session.fragments()[0].transform(), before);
+        assert_eq!(tool.session.carried_id(), Some(id));
+        assert_eq!(
+            ship.intake_carried_fragment(&mut tool.session),
+            salimon_ship::IntakeResult::Accepted
+        );
+        ship.advance(Duration::from_secs(1));
+        assert!(ship.snapshot().power_available);
+    }
+
+    #[test]
     fn enlarged_carrying_clears_player_and_ground_at_extreme_pitch_and_rejects_unsafe_drops() {
         for resource in [
             ResourceId::IronOre,

@@ -351,6 +351,7 @@ pub(crate) fn snapshots(
                         if tool.ship_gravity_disabled {
                             Surface::UnpoweredFloor {
                                 height_meters: SHIP_FLOOR_HEIGHT_METERS,
+                                ceiling_meters: salimon_character::SHIP_CEILING_HEIGHT_METERS,
                             }
                         } else {
                             Surface::Floor {

@@ -211,3 +211,12 @@ cargo mass. One fragment processes at a time, automatically, wherever the player
 is. Conversion defaults to 200 MJ/s with material-specific configurable yields
 (iron 1 GJ/kg, rock 0.5 GJ/kg, ice 2 GJ/kg). Discharge continues during conversion;
 excess energy above capacity is wasted and processing never pauses at full charge.
+
+## Interior blackout movement (#191)
+
+Without artificial gravity, indoor WASD and Space/Control translate in three
+dimensions. Releasing controls retains drift until contact. Power return restores
+walking/deck gravity from the current position. Loose cargo becomes weightless,
+retains velocity, contacts other fragments and stays bounded by cabin geometry.
+Nearby planets do not pull crew/cargo while inside. Carrying and mechanical Core
+intake remain available. Detailed acceleration-induced cabin forces are deferred.

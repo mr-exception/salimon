@@ -16,6 +16,10 @@ impl CharacterController {
         } = *step;
 
         let previous = local;
+        if !self.ship_gravity_enabled {
+            self.advance_weightless_interior(local, step);
+            return;
+        }
         let movement = ship_planar_movement(input, self.yaw_radians);
         local[0] += movement[0] * WALK_SPEED_METERS_PER_SECOND * seconds;
         local[2] += movement[1] * WALK_SPEED_METERS_PER_SECOND * seconds;
@@ -46,6 +50,11 @@ impl CharacterController {
             local[1] = maximum_eye;
             self.vertical_speed = self.vertical_speed.min(0.0);
         }
+        self.interior_velocity = [
+            (local[0] - previous[0]) / seconds,
+            self.vertical_speed,
+            (local[2] - previous[2]) / seconds,
+        ];
         let within_doorway = local[2].abs() <= DOORWAY_SIDE_LIMIT;
         if local[0] < DOORWAY_FORWARD && within_doorway && door_open && !ship_landed {
             self.vertical_speed = 0.0;
@@ -76,6 +85,86 @@ impl CharacterController {
             self.position = PositionState::Inside { local };
         }
     }
+    fn advance_weightless_interior(&mut self, previous: [f64; 3], step: &Step) {
+        // Ship-local translation deliberately excludes exterior planetary gravity
+        // and acceleration-induced cabin forces. Controls accelerate; release coasts.
+        let forward = [
+            self.pitch_radians.cos() * self.yaw_radians.cos(),
+            self.pitch_radians.sin(),
+            self.pitch_radians.cos() * self.yaw_radians.sin(),
+        ];
+        let right = [-self.yaw_radians.sin(), 0.0, self.yaw_radians.cos()];
+        let movement = add(
+            add(
+                scale(forward, axis(step.input.forward, step.input.backward)),
+                scale(right, axis(step.input.right, step.input.left)),
+            ),
+            [0.0, axis(step.input.jump, step.input.descend), 0.0],
+        );
+        let acceleration = scale(
+            movement,
+            WALK_SPEED_METERS_PER_SECOND / dot(movement, movement).sqrt().max(1.0),
+        );
+        let next_velocity = add(self.interior_velocity, scale(acceleration, step.seconds));
+        let speed = dot(next_velocity, next_velocity).sqrt();
+        let limit = dot(self.interior_velocity, self.interior_velocity)
+            .sqrt()
+            .max(WALK_SPEED_METERS_PER_SECOND);
+        let next_velocity = scale(next_velocity, (limit / speed.max(limit)).min(1.0));
+        let proposed = add(
+            previous,
+            scale(
+                add(self.interior_velocity, next_velocity),
+                step.seconds * 0.5,
+            ),
+        );
+        self.interior_velocity = next_velocity;
+        let mut local = proposed;
+        local[2] = local[2].clamp(-INTERIOR_SIDE_LIMIT, INTERIOR_SIDE_LIMIT);
+        local[0] = local[0].min(INTERIOR_FORWARD_MAX);
+        local = slide_around_fixtures(previous, local);
+        let within_doorway = local[2].abs() <= DOORWAY_SIDE_LIMIT;
+        let ceiling = if local[0] < -6.88 && local[2].abs() < 1.84 {
+            DOORWAY_CEILING_HEIGHT
+        } else {
+            SHIP_CEILING_HEIGHT
+        };
+        local[1] = local[1].clamp(
+            PLAYER_EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT,
+            ceiling - (PLAYER_BODY_HEIGHT_METERS - PLAYER_EYE_HEIGHT_METERS),
+        );
+        if local[0] < DOORWAY_FORWARD && within_doorway && step.door_open && !step.ship_landed {
+            self.eva_inherited_velocity = add(
+                step.ship_velocity,
+                add(
+                    add(
+                        scale(step.ship.axes[0], self.interior_velocity[0]),
+                        scale(step.ship.axes[1], self.interior_velocity[1]),
+                    ),
+                    scale(step.ship.axes[2], self.interior_velocity[2]),
+                ),
+            );
+            self.eva_control_velocity = [0.0; 3];
+            self.eva_axes = step.ship.axes;
+            self.nearby_surface = None;
+            self.position = PositionState::Space {
+                world: step.ship.local_to_world(local),
+            };
+            return;
+        }
+        local[0] = local[0].max(if within_doorway {
+            INTERIOR_FORWARD_MIN
+        } else {
+            AFT_WALL_FORWARD_MIN
+        });
+        for axis in 0..3 {
+            if (local[axis] - proposed[axis]).abs() > 1e-12 {
+                self.interior_velocity[axis] = 0.0;
+            }
+        }
+        self.vertical_speed = self.interior_velocity[1];
+        self.position = PositionState::Inside { local };
+    }
 }
 
 impl CharacterController {
@@ -83,6 +172,7 @@ impl CharacterController {
         if matches!(self.position, PositionState::Inside { .. }) {
             self.position = PositionState::Cockpit;
             self.vertical_speed = 0.0;
+            self.interior_velocity = [0.0; 3];
         }
     }
 
@@ -702,6 +792,72 @@ mod tests {
 mod energy_tests {
     use super::super::test_support::*;
     use super::*;
+    #[test]
+    fn weightless_translation_coasts_contacts_and_restores_without_teleportation() {
+        let mut player = CharacterController {
+            position: PositionState::Inside {
+                local: [-5.0, 2.1, 0.0],
+            },
+            ..Default::default()
+        };
+        player.set_ship_gravity_enabled(false);
+        player.advance(
+            Duration::from_millis(100),
+            MovementInput {
+                forward: true,
+                jump: true,
+                ..Default::default()
+            },
+            frame(),
+            surface(),
+            false,
+            true,
+        );
+        let before = player.local_ship_position().unwrap();
+        assert!(before[0] > -5.0 && before[1] > 2.1);
+        player.advance(
+            Duration::from_millis(100),
+            MovementInput::default(),
+            frame(),
+            surface(),
+            false,
+            true,
+        );
+        let coasted = player.local_ship_position().unwrap();
+        assert!(coasted[0] > before[0] && coasted[1] > before[1]);
+        player.set_ship_gravity_enabled(true);
+        assert_eq!(player.local_ship_position().unwrap(), coasted);
+        player.advance(
+            Duration::from_secs(2),
+            MovementInput::default(),
+            frame(),
+            surface(),
+            false,
+            true,
+        );
+        assert_eq!(player.local_ship_position().unwrap()[1], PLAYER_START[1]);
+        player.set_ship_gravity_enabled(false);
+        player.advance(
+            Duration::from_secs(10),
+            MovementInput {
+                jump: true,
+                right: true,
+                ..Default::default()
+            },
+            frame(),
+            surface(),
+            false,
+            true,
+        );
+        let bounded = player.local_ship_position().unwrap();
+        assert!(bounded[2] <= INTERIOR_SIDE_LIMIT);
+        assert!(
+            bounded[1]
+                <= SHIP_CEILING_HEIGHT - (PLAYER_BODY_HEIGHT_METERS - PLAYER_EYE_HEIGHT_METERS)
+        );
+        assert_eq!(player.location(), CharacterLocation::InsideShip);
+    }
+
     #[test]
     fn unpowered_cabin_preserves_vertical_motion_without_planetary_fallback() {
         let mut player = CharacterController {

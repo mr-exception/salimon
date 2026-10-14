@@ -35,6 +35,8 @@ pub const EXIT_DOOR_MARKER_DEPTH_METERS: f64 =
 pub const FIXED_GRAVITY_METERS_PER_SECOND_SQUARED: f64 = 9.81;
 pub const PLAYER_BODY_HEIGHT_METERS: f64 = 1.80;
 pub const PLAYER_EYE_HEIGHT_METERS: f64 = 1.75;
+pub const SHIP_CEILING_HEIGHT_METERS: f64 = spatial_contracts::CABIN_TRAVERSAL_BOUNDS[3];
+
 pub const SHIP_FLOOR_HEIGHT_METERS: f64 = spatial_contracts::INTERIOR_FLOOR_BOUNDS[3];
 
 /// Authored sole grids for footprint-aware landing; generated boxes remain canonical.

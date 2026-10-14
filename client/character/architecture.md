@@ -152,3 +152,21 @@ Runtime supplies `set_ship_gravity_enabled` from authoritative Core power.
 Disabled artificial gravity preserves interior vertical motion and contact/hull
 constraints without planetary fallback. Jump requires powered gravity; full
 cabin inertial dynamics remain deferred. External surface/EVA gravity is unchanged.
+
+## Interior zero-G (#191)
+
+On outage, interior character movement uses ship-local view-relative three-axis
+acceleration (WASD, Space up, Shift down), retaining walking/jump momentum.
+Released controls coast; controlled speed is bounded by the existing 3.8 m/s
+movement speed without reducing faster inherited momentum. Body-clear fixture/wall/deck/ceiling contacts remove blocked
+velocity components. Exterior planetary gravity never enters this path. Power
+return preserves position and vertical velocity before ordinary deck gravity
+settles the player. Airlock EVA inherits ship plus local drift; seated occupancy
+remains mechanically fixed. Held fragments follow existing carrying rules in
+both powered and weightless interior modes.
+
+Loose cargo's unpowered surface preserves velocity without ambient damping and
+adds conservative radius-based ceiling containment; horizontal hull/fixture
+containment and precise deck support remain unchanged. Surface changes invalidate
+sleep support through existing snapshot matching. No acceleration-induced cabin
+forces, crew inertial simulation or new contact engine is introduced.

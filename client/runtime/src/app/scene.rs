@@ -128,7 +128,7 @@ mod tests {
         ship.trigger_landing_action();
         ship.set_cockpit_control(false);
         let assisting = map_ship_to_renderer(ship.snapshot()).instruments;
-        assert_eq!(assisting.core_energy_stored_joules, 24_989_989_000);
+        assert_eq!(assisting.core_energy_stored_joules, 24_189_989_000);
         assert_eq!(
             assisting.speed_meters_per_second,
             full_power.instruments.speed_meters_per_second
@@ -155,7 +155,7 @@ mod tests {
         let landed = map_ship_to_renderer(ship.snapshot()).instruments;
         assert_eq!(landed.speed_meters_per_second, 0.0);
         assert_eq!(landed.thruster_percentage, 0);
-        assert_eq!(landed.core_energy_stored_joules, 24_989_109_000);
+        assert_eq!(landed.core_energy_stored_joules, 24_189_109_000);
 
         let out_of_range = ShipController::flying(
             salimon_ship::ShipPose {

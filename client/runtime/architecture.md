@@ -458,3 +458,14 @@ surface, supports a stopped or carrying walker, and joins radial ground at its t
 Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
 and [world definition contract](../world/terrain-contract.md). Keep local rules
 and their consumers aligned; flat deterministic fixtures are explicit.
+
+## Shared elapsed-time admission (#185)
+
+Native redraws and E2E `step` commands admit elapsed time to `UpdateClock`'s
+16 ms accumulator. Native catch-up retains its two-tick/4 ms budget and keeps
+all remaining backlog. Automation drains admitted whole ticks deterministically
+and retains fractional time across commands. Every completed tick advances ship,
+character, mining, fragments and feedback in the same order. Lifecycle reset
+explicitly pauses across the gap and accounts for queued time as excluded.
+Ship updates no longer truncate direct travel to 100 ms; character callers
+with longer intervals use bounded slices rather than silently losing time.

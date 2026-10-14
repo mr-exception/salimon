@@ -30,7 +30,7 @@
     3,000,000 m threshold and reports actual signed radial velocity: negative
     approaching, positive receding, and zero stationary/tangential.
 17. Landing lasts 8 seconds and takeoff 6 seconds of supplied update time,
-    independent of frame partition or the direct-flight 100 ms clamp.
+    independent of frame partition or the render frame partition.
 18. Assist activation preserves the pose. Landing levels smoothly over 2 seconds
     before descending; takeoff preserves landed orientation. Every radial phase
     begins and ends at rest, and the final pose is sampled exactly once at completion.

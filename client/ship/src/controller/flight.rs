@@ -108,6 +108,22 @@ mod tests {
     use std::time::Duration;
 
     #[test]
+    fn long_direct_updates_do_not_discard_travel() {
+        let pose = ShipPose {
+            position_meters: [0.0; 3],
+            orientation: [0.0, 0.0, 0.0, 1.0],
+        };
+        let mut whole = ShipController::flying(pose, 10);
+        let mut split = whole.clone();
+        whole.advance(Duration::from_secs(2));
+        for _ in 0..20 {
+            split.advance(Duration::from_millis(100));
+        }
+        assert_eq!(whole.snapshot().pose, split.snapshot().pose);
+        assert!(whole.snapshot().pose.position_meters[0] > 0.0);
+    }
+
+    #[test]
     fn leaving_cockpit_does_not_change_flying_motion_or_thruster() {
         let mut ship = ShipController::flying(
             ShipPose {

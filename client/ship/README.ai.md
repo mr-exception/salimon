@@ -21,7 +21,7 @@ the path from elapsed `Duration`. Landing is 8 seconds (2 alignment, 4 approach,
 2 touchdown); takeoff is 6 seconds (2 local lift, 4 clearance). Keep the local
 15 m phases readable across every catalog radius and preserve smooth position,
 orientation, and velocity at phase boundaries. Assist timing must consume the
-full supplied delta independently of the existing 100 ms direct-flight clamp.
+full supplied delta independently of the shared runtime fixed-tick scheduler.
 Tests cover every solid body, multiple normals and starting heights, frame
 partitioning, exact completion, controls/interlocks, and velocity derivatives.
 Allow for submillimeter `f64` position quantization at the catalog's 1e12 m anchor.

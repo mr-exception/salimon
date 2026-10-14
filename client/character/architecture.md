@@ -24,7 +24,7 @@ new crate dependencies or native/platform types.
 Controller mode modules are children of the controller owner so private fields
 remain private. A private `Step` samples the existing input edge and environmental
 frames once per update; dispatch selects exactly one movement mode. It retains
-the original capped integration seconds and uncapped doorway elapsed duration.
+the bounded 100 ms fallback integration slices (runtime supplies 16 ms ticks) without discarding elapsed duration.
 Tests live with mode/query/math owners; shared test-only frames and constructors
 live in `controller/test_support.rs`, and hull/appendage controller regressions
 live in `controller/collision_tests.rs`. Shared geometry remains independent of

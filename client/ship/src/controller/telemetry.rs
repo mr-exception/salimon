@@ -68,11 +68,12 @@ pub enum BrakingEstimate {
 
 impl ShipController {
     pub(super) fn navigation_telemetry(&self) -> NavigationTelemetry {
-        use salimon_math::{dot, scale};
+        use salimon_math::dot;
         let velocity = self.velocity_meters_per_second();
         let speed = self.speed_meters_per_second();
         let axes = self.pose.axes();
-        let direction = (speed > 0.0 && speed.is_finite()).then(|| scale(velocity, 1.0 / speed));
+        let direction =
+            (speed > 0.0 && speed.is_finite()).then(|| velocity.map(|component| component / speed));
         let local = direction.map(|v| axes.map(|axis| dot(v, axis)));
         let free = self.flight_state == crate::FlightState::Flying;
         let powered = self.energy_core.powered();
@@ -417,5 +418,25 @@ mod navigation_tests {
             moving([f64::MAX, 0.0, 0.0]).snapshot().navigation.braking,
             BrakingEstimate::Unavailable
         );
+    }
+}
+
+#[cfg(test)]
+mod tiny_velocity_test {
+    use crate::{ShipController, ShipPose};
+    #[test]
+    fn subnormal_velocity_has_a_finite_direction() {
+        let ship = ShipController::flying_with_velocity(
+            ShipPose {
+                position_meters: [0.0; 3],
+                orientation: [0.0, 0.0, 0.0, 1.0],
+            },
+            0,
+            [1e-320, 0.0, 0.0],
+        )
+        .unwrap();
+        let n = ship.snapshot().navigation;
+        assert_eq!(n.velocity_direction_local, Some([1.0, 0.0, 0.0]));
+        assert_eq!(n.heading_velocity_angle_degrees, Some(0.0));
     }
 }

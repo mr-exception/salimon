@@ -274,3 +274,23 @@ retain normal distant-anchor f64 quantization. Door interlocks are unchanged.
 
 Future landing upgrades may increase activation speed/range or reduce energy
 cost; upgrade progression and modifiers are documentation only in this wave.
+
+## Vector navigation and braking (#193)
+
+Ship snapshots own ship-local unit velocity direction (undefined at rest),
+heading/velocity angle, signed instantaneous engine acceleration and an explicit
+reverse-stop estimate. Free-flight power and cached total mass determine actual
+engine acceleration; assists/crash states report it unavailable. Static catalog
+bodies have zero velocity, so nearby total relative speed equals vector magnitude.
+Full reverse estimates use configured reverse force, mass and watts including idle
+loads. They require nose alignment within 1e-9 transverse unit-vector magnitude;
+misalignment, no power, non-flight and zero reverse force never claim a stop.
+Required energy is compared with unreserved fractional storage; future conversion
+is not credited. Estimates assume unchanged heading/mass and collision-free travel,
+and never command steering or braking.
+
+The existing wide console shows velocity XYZ in ship-local axes (+X forward,
++Y up, -Z starboard), angle, signed throttle/acceleration, kg mass, nearby total
+speed and reverse duration/distance/GJ. Unavailable readings use --; insufficient
+energy and alignment have explicit status. Rounded strings independently cache
+flight/braking/navigation regions. Core-local screen ownership is unchanged.

@@ -26,7 +26,9 @@ mod state;
 pub use controller::ShipController;
 pub use controller::assist::{AssistConfig, InvalidAssistConfig};
 pub use controller::cockpit::CockpitMessage;
-pub use controller::telemetry::{CoreStatus, EnergyCoreState, NearbyBodyTelemetry};
+pub use controller::telemetry::{
+    BrakingEstimate, CoreStatus, EnergyCoreState, NavigationTelemetry, NearbyBodyTelemetry,
+};
 pub use controller::throttle::{THROTTLE_REPEAT_INTERVAL, ThrottleDirection};
 pub use state::{DoorState, FlightState, ShipPose, ShipSnapshot, SteeringInput};
 

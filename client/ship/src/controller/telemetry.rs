@@ -42,7 +42,82 @@ pub struct CoreStatus {
     pub low_energy: bool,
 }
 
+/// Observational navigation in ship-local axes (+X forward, +Y up, -Z starboard).
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct NavigationTelemetry {
+    pub velocity_direction_local: Option<[f64; 3]>,
+    pub heading_velocity_angle_degrees: Option<f64>,
+    /// Instantaneous powered engine acceleration; unavailable during captured assists/crashes.
+    pub acceleration_meters_per_second_squared: Option<f64>,
+    pub braking: BrakingEstimate,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum BrakingEstimate {
+    Stationary,
+    /// Full reverse at the current heading, with no steering or future conversion credited.
+    Aligned {
+        seconds: f64,
+        distance_meters: f64,
+        energy_joules: f64,
+        sufficient_energy: bool,
+    },
+    AlignHeading,
+    Unavailable,
+}
+
 impl ShipController {
+    pub(super) fn navigation_telemetry(&self) -> NavigationTelemetry {
+        use salimon_math::{dot, scale};
+        let velocity = self.velocity_meters_per_second();
+        let speed = self.speed_meters_per_second();
+        let axes = self.pose.axes();
+        let direction = (speed > 0.0 && speed.is_finite()).then(|| scale(velocity, 1.0 / speed));
+        let local = direction.map(|v| axes.map(|axis| dot(v, axis)));
+        let free = self.flight_state == crate::FlightState::Flying;
+        let powered = self.energy_core.powered();
+        let acceleration = free.then(|| {
+            if powered {
+                self.propulsion
+                    .acceleration_meters_per_second_squared(self.thruster_percentage)
+            } else {
+                0.0
+            }
+        });
+        let reverse_acceleration = -self.propulsion.acceleration_meters_per_second_squared(-100);
+        let braking = if speed == 0.0 {
+            BrakingEstimate::Stationary
+        } else if !free || !powered || !speed.is_finite() || reverse_acceleration <= 0.0 {
+            BrakingEstimate::Unavailable
+        } else if local.is_none_or(|v| v[0] <= 0.0 || v[1].hypot(v[2]) > 1e-9) {
+            BrakingEstimate::AlignHeading
+        } else {
+            let seconds = speed / reverse_acceleration;
+            let distance_meters = 0.5 * speed * seconds;
+            let energy_joules = seconds * self.energy_core.config().demand_watts(-100, true);
+            if [seconds, distance_meters, energy_joules]
+                .iter()
+                .all(|v| v.is_finite())
+            {
+                BrakingEstimate::Aligned {
+                    seconds,
+                    distance_meters,
+                    energy_joules,
+                    sufficient_energy: energy_joules <= self.energy_core.stored_joules(),
+                }
+            } else {
+                BrakingEstimate::Unavailable
+            }
+        };
+        NavigationTelemetry {
+            velocity_direction_local: local,
+            heading_velocity_angle_degrees: local
+                .map(|v| v[0].clamp(-1.0, 1.0).acos().to_degrees()),
+            acceleration_meters_per_second_squared: acceleration,
+            braking,
+        }
+    }
+
     pub(super) fn core_status(&self) -> CoreStatus {
         let demand = self.energy_core.config().demand_watts(
             self.thruster_percentage,
@@ -241,5 +316,106 @@ mod core_status_tests {
         ship.exchange_core_energy_joules(1000.0, 0.0).unwrap();
         assert!(!ship.snapshot().core_status.low_energy);
         assert_eq!(ship.snapshot().core_status.depletion_seconds, Some(100.0));
+    }
+}
+
+#[cfg(test)]
+mod navigation_tests {
+    use super::*;
+    use crate::{FlightState, Propulsion, ShipPose};
+    fn moving(v: [f64; 3]) -> ShipController {
+        let mut ship = ShipController::flying(
+            ShipPose {
+                position_meters: [0.0; 3],
+                orientation: [0.0, 0.0, 0.0, 1.0],
+            },
+            0,
+        );
+        ship.velocity = v;
+        ship
+    }
+    #[test]
+    fn vector_angle_and_reverse_budget_use_full_velocity_and_mass() {
+        let mut ship = moving([100.0, 0.0, 0.0]);
+        ship.propulsion = Propulsion::default().with_total_mass(200_000.0).unwrap();
+        ship.thruster_percentage = -50;
+        let n = ship.snapshot().navigation;
+        assert_eq!(n.velocity_direction_local, Some([1.0, 0.0, 0.0]));
+        assert_eq!(n.heading_velocity_angle_degrees, Some(0.0));
+        assert_eq!(n.acceleration_meters_per_second_squared, Some(-5.0));
+        assert_eq!(
+            n.braking,
+            BrakingEstimate::Aligned {
+                seconds: 10.0,
+                distance_meters: 500.0,
+                energy_joules: 501_100_000.0,
+                sufficient_energy: true
+            }
+        );
+        ship.set_stored_core_energy_joules(1);
+        assert!(matches!(
+            ship.snapshot().navigation.braking,
+            BrakingEstimate::Aligned {
+                sufficient_energy: false,
+                ..
+            }
+        ));
+        ship.set_stored_core_energy_joules(0);
+        assert_eq!(
+            ship.snapshot().navigation.braking,
+            BrakingEstimate::Unavailable
+        );
+        assert_eq!(
+            ship.snapshot()
+                .navigation
+                .acceleration_meters_per_second_squared,
+            Some(0.0)
+        );
+    }
+    #[test]
+    fn tangential_and_backward_motion_never_claim_a_reverse_stop() {
+        for velocity in [[100.0, 1.0, 0.0], [0.0, 100.0, 0.0], [-100.0, 0.0, 0.0]] {
+            assert_eq!(
+                moving(velocity).snapshot().navigation.braking,
+                BrakingEstimate::AlignHeading
+            );
+        }
+        let mut ship = moving([100.0, 0.0, 0.0]);
+        ship.pose.orientation = [
+            0.0,
+            0.0,
+            std::f64::consts::FRAC_1_SQRT_2,
+            std::f64::consts::FRAC_1_SQRT_2,
+        ];
+        let n = ship.snapshot().navigation;
+        assert!((n.heading_velocity_angle_degrees.unwrap() - 90.0).abs() < 1e-10);
+        assert_eq!(n.braking, BrakingEstimate::AlignHeading);
+        assert_eq!(ship.snapshot().speed_meters_per_second, 100.0);
+    }
+    #[test]
+    fn zero_unsupported_and_overflow_are_explicit() {
+        let n = moving([0.0; 3]).snapshot().navigation;
+        assert_eq!(n.velocity_direction_local, None);
+        assert_eq!(n.heading_velocity_angle_degrees, None);
+        assert_eq!(n.braking, BrakingEstimate::Stationary);
+        let mut ship = moving([100.0, 0.0, 0.0]);
+        ship.propulsion = Propulsion::new(100_000.0, 4e6, 0.0).unwrap();
+        assert_eq!(
+            ship.snapshot().navigation.braking,
+            BrakingEstimate::Unavailable
+        );
+        ship.flight_state = FlightState::Bouncing {
+            body: salimon_world::CelestialBodyId::Earth,
+        };
+        assert_eq!(
+            ship.snapshot()
+                .navigation
+                .acceleration_meters_per_second_squared,
+            None
+        );
+        assert_eq!(
+            moving([f64::MAX, 0.0, 0.0]).snapshot().navigation.braking,
+            BrakingEstimate::Unavailable
+        );
     }
 }

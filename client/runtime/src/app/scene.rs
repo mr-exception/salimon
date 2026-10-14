@@ -1,8 +1,8 @@
 //! Domain snapshots mapped to renderer-owned, absolute-metre DTOs.
 
 use salimon_renderer::{
-    CameraFrame, CockpitInstruments, CoreInstruments, NearbyBodyInstruments, PointLight,
-    SceneInstance, ShipMeshInstance, SphereInstance, SurfaceMaterial,
+    CameraFrame, CockpitInstruments, CoreInstruments, NavigationInstruments, NearbyBodyInstruments,
+    PointLight, SceneInstance, ShipMeshInstance, SphereInstance, SurfaceMaterial,
 };
 use salimon_ship::ShipSnapshot;
 use salimon_world::{CelestialBodyId, WorldSnapshot};
@@ -13,6 +13,35 @@ pub(super) fn map_ship_to_renderer(ship: ShipSnapshot) -> ShipMeshInstance {
         orientation: ship.pose.orientation.map(|value| value as f32),
         door_open_fraction: ship.door_open_fraction as f32,
         instruments: CockpitInstruments {
+            navigation: NavigationInstruments {
+                direction_local: ship.navigation.velocity_direction_local,
+                angle_degrees: ship.navigation.heading_velocity_angle_degrees,
+                acceleration: ship.navigation.acceleration_meters_per_second_squared,
+                mass_kg: ship.total_mass_kg,
+                relative_speed: ship.nearby_body.map(|_| ship.speed_meters_per_second),
+                braking: match ship.navigation.braking {
+                    salimon_ship::BrakingEstimate::Aligned {
+                        seconds,
+                        distance_meters,
+                        energy_joules,
+                        ..
+                    } => Some([seconds, distance_meters, energy_joules]),
+                    _ => None,
+                },
+                braking_status: match ship.navigation.braking {
+                    salimon_ship::BrakingEstimate::Stationary => "STOPPED",
+                    salimon_ship::BrakingEstimate::Aligned {
+                        sufficient_energy: true,
+                        ..
+                    } => "AVAILABLE",
+                    salimon_ship::BrakingEstimate::Aligned {
+                        sufficient_energy: false,
+                        ..
+                    } => "LOW ENERGY",
+                    salimon_ship::BrakingEstimate::AlignHeading => "ALIGN NOSE TO VELOCITY",
+                    salimon_ship::BrakingEstimate::Unavailable => "UNAVAILABLE",
+                },
+            },
             power_off: !ship.power_available,
             core_status: CoreInstruments {
                 consumption_watts: ship.core_status.consumption_watts,

@@ -18,6 +18,61 @@ pub struct CockpitInstruments {
     pub core_energy_stored_joules: u64,
     pub nearby_body: Option<NearbyBodyInstruments>,
     pub core_status: CoreInstruments,
+    pub navigation: NavigationInstruments,
+}
+
+/// Renderer-only navigation values; the ship owns braking feasibility.
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct NavigationInstruments {
+    pub direction_local: Option<[f64; 3]>,
+    pub angle_degrees: Option<f64>,
+    pub acceleration: Option<f64>,
+    pub mass_kg: f64,
+    pub relative_speed: Option<f64>,
+    pub braking: Option<[f64; 3]>, // seconds, meters, joules
+    pub braking_status: &'static str,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct NavigationDisplay {
+    flight: [String; 3],
+    brake: [String; 3],
+    relative_speed: String,
+}
+fn reading(value: Option<f64>) -> String {
+    value
+        .filter(|v| v.is_finite() && v.abs() < 1e12)
+        .map_or_else(|| "--".to_owned(), |v| format!("{v:.1}"))
+}
+impl From<NavigationInstruments> for NavigationDisplay {
+    fn from(v: NavigationInstruments) -> Self {
+        Self {
+            flight: [
+                format!(
+                    "V XYZ {} {} {}",
+                    reading(v.direction_local.map(|d| d[0])),
+                    reading(v.direction_local.map(|d| d[1])),
+                    reading(v.direction_local.map(|d| d[2]))
+                ),
+                format!(
+                    "ANGLE {} DEG  A {} m/s2",
+                    reading(v.angle_degrees),
+                    reading(v.acceleration)
+                ),
+                format!("MASS {} kg", reading(Some(v.mass_kg))),
+            ],
+            brake: [
+                format!("REVERSE {}", v.braking_status),
+                format!(
+                    "T {} s  D {} m",
+                    reading(v.braking.map(|b| b[0])),
+                    reading(v.braking.map(|b| b[1]))
+                ),
+                format!("ENERGY {} GJ", reading(v.braking.map(|b| b[2] / 1e9))),
+            ],
+            relative_speed: format!("TOTAL {} m/s", reading(v.relative_speed)),
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -210,7 +265,7 @@ impl SpeedDisplay {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 struct DisplayKey {
     power_off: bool,
     speed: SpeedDisplay,
@@ -219,6 +274,7 @@ struct DisplayKey {
     core_stored: EnergyDisplay,
     nearby: Option<NearbyDisplay>,
     core_status: CoreDisplay,
+    navigation: NavigationDisplay,
 }
 
 pub(crate) struct InstrumentAtlas {
@@ -246,9 +302,14 @@ impl InstrumentAtlas {
             core_stored: EnergyDisplay::from_joules(values.core_energy_stored_joules),
             nearby: values.nearby_body.map(NearbyDisplay::from_instruments),
             core_status: values.core_status.into(),
+            navigation: values.navigation.into(),
         };
         if next.power_off {
-            if self.displayed.is_some_and(|previous| previous.power_off) {
+            if self
+                .displayed
+                .as_ref()
+                .is_some_and(|previous| previous.power_off)
+            {
                 return false;
             }
             for pixel in self.pixels.as_chunks_mut::<4>().0 {
@@ -257,43 +318,49 @@ impl InstrumentAtlas {
             self.displayed = Some(next);
             return true;
         }
-        if self.displayed == Some(next) {
+        if self.displayed.as_ref() == Some(&next) {
             return false;
         }
 
         // The flight region includes the shared power command once. Independent
         // energy/navigation changes leave the other regions untouched.
-        if self.displayed.is_none_or(|previous| {
-            previous.power_off || previous.speed != next.speed || previous.power != next.power
+        if self.displayed.as_ref().is_none_or(|previous| {
+            previous.power_off
+                || previous.speed != next.speed
+                || previous.power != next.power
+                || previous.navigation.flight != next.navigation.flight
         }) {
-            self.draw_speed(next.speed, next.power);
+            self.draw_speed(next.speed, next.power, &next.navigation);
         }
-        if self.displayed.is_none_or(|previous| {
+        if self.displayed.as_ref().is_none_or(|previous| {
             previous.power_off
                 || previous.core_capacity != next.core_capacity
                 || previous.core_stored != next.core_stored
+                || previous.navigation.brake != next.navigation.brake
         }) {
-            self.draw_core(next.core_stored, next.core_capacity);
+            self.draw_core(next.core_stored, next.core_capacity, &next.navigation);
         }
-        if self
-            .displayed
-            .is_none_or(|previous| previous.power_off || previous.nearby != next.nearby)
-        {
+        if self.displayed.as_ref().is_none_or(|previous| {
+            previous.power_off
+                || previous.nearby != next.nearby
+                || previous.navigation.relative_speed != next.navigation.relative_speed
+        }) {
             self.draw_nearby(next.nearby);
+            self.text(28, 222, &next.navigation.relative_speed, 2, CYAN);
         }
-        if self.displayed.is_none_or(|previous| {
+        if self.displayed.as_ref().is_none_or(|previous| {
             previous.power_off
                 || previous.core_status != next.core_status
                 || previous.core_capacity != next.core_capacity
                 || previous.core_stored != next.core_stored
         }) {
-            self.draw_core_status(next);
+            self.draw_core_status(&next);
         }
         self.displayed = Some(next);
         true
     }
 
-    fn draw_core_status(&mut self, key: DisplayKey) {
+    fn draw_core_status(&mut self, key: &DisplayKey) {
         self.section_frame(3, "ENERGY CORE");
         let status = key.core_status;
         let color = if status.low_energy { AMBER } else { CYAN };
@@ -357,48 +424,40 @@ impl InstrumentAtlas {
         );
     }
 
-    fn draw_speed(&mut self, speed: SpeedDisplay, percentage: i8) {
-        self.section_frame(0, "SPEED");
+    fn draw_speed(&mut self, speed: SpeedDisplay, percentage: i8, nav: &NavigationDisplay) {
+        self.section_frame(0, "INERTIAL FLIGHT");
         let (number, unit, color) = speed_text(speed);
-        self.text(28, 80, &number, 10, color);
-        self.text(392, 119, unit, 3, CYAN);
-        self.text(
-            340,
-            156,
-            match speed {
-                SpeedDisplay::Unavailable => "NO READING",
-                SpeedDisplay::AboveRange => "ABOVE RANGE",
-                SpeedDisplay::Value { .. } => "METRIC UNITS",
-            },
-            2,
-            if color == AMBER { AMBER } else { MUTED },
-        );
-        self.rect(28, 175, 456, 2, RULE);
-        self.rect(28, 175, 48, 2, CYAN);
-        self.text(28, 194, "THRUSTER POWER", 2, MUTED);
-        self.text(28, 212, &format!("{percentage}%"), 4, CYAN);
-        for segment in 0..20 {
-            let x = 160 + segment * 15;
-            self.rect(x, 212, 12, 28, RULE);
-            let filled = u32::from(percentage.unsigned_abs())
-                .saturating_sub(segment * 5)
-                .min(5);
-            if filled > 0 {
-                self.rect(x, 212, (12 * filled).div_ceil(5), 28, CYAN);
-            }
+        self.text(28, 66, &format!("{number} {unit}"), 4, color);
+        self.text(28, 112, &format!("THROTTLE {percentage}%"), 3, CYAN);
+        for (i, row) in nav.flight.iter().enumerate() {
+            self.text(28, 153 + i as u32 * 28, row, 2, IVORY);
         }
     }
 
-    fn draw_core(&mut self, stored: EnergyDisplay, capacity: EnergyDisplay) {
-        self.section_frame(1, "CORE ENERGY");
-        self.text(28, 70, "STORED", 2, MUTED);
-        let stored_number = stored.number();
-        let scale = (360 / (stored_number.len() as u32 * 6)).clamp(2, 6);
-        self.text(28, 91, &stored_number, scale, IVORY);
-        self.text(408, 112, stored.unit.label(), 2, CYAN);
-        self.text(28, 157, "CAPACITY", 2, MUTED);
-        self.text(140, 157, &capacity.number(), 3, IVORY);
-        self.text(408, 157, capacity.unit.label(), 2, CYAN);
+    fn draw_core(
+        &mut self,
+        stored: EnergyDisplay,
+        capacity: EnergyDisplay,
+        nav: &NavigationDisplay,
+    ) {
+        self.section_frame(1, "CORE / BRAKING");
+        self.text(
+            28,
+            70,
+            &format!(
+                "{} {} / {} {}",
+                stored.number(),
+                stored.unit.label(),
+                capacity.number(),
+                capacity.unit.label()
+            ),
+            2,
+            IVORY,
+        );
+        for (i, row) in nav.brake.iter().enumerate() {
+            self.text(28, 115 + i as u32 * 32, row, 2, CYAN);
+        }
+        self.text(28, 225, "FIXED HEADING - NO AUTOBRAKE", 2, MUTED);
     }
 
     fn draw_nearby(&mut self, nearby: Option<NearbyDisplay>) {
@@ -704,7 +763,7 @@ mod tests {
             thruster_percentage: i8::MIN,
             ..CockpitInstruments::default()
         }));
-        assert_eq!(atlas.displayed.unwrap().power, -100);
+        assert_eq!(atlas.displayed.as_ref().unwrap().power, -100);
         assert!(!atlas.update(CockpitInstruments {
             speed_meters_per_second: f64::NAN,
             thruster_percentage: -100,
@@ -964,5 +1023,49 @@ mod core_display_tests {
             ..values
         }));
         assert!(!atlas.update(values));
+    }
+}
+
+#[cfg(test)]
+mod navigation_display_tests {
+    use super::*;
+    #[test]
+    fn rounded_navigation_updates_owning_regions_and_rejects_nonfinite_readings() {
+        let mut atlas = InstrumentAtlas::new();
+        let base = CockpitInstruments::default();
+        atlas.update(base);
+        let before = super::tests::regions(&atlas.pixels);
+        let v = CockpitInstruments {
+            navigation: NavigationInstruments {
+                mass_kg: 100_000.0,
+                acceleration: Some(-20.0),
+                direction_local: Some([1.0, 0.0, 0.0]),
+                angle_degrees: Some(0.0),
+                ..Default::default()
+            },
+            ..base
+        };
+        assert!(atlas.update(v));
+        let after = super::tests::regions(&atlas.pixels);
+        let bytes = (SECTION_WIDTH * ATLAS_HEIGHT * 4) as usize;
+        assert_ne!(before[..bytes], after[..bytes]);
+        assert_eq!(before[bytes..], after[bytes..]);
+        assert!(!atlas.update(CockpitInstruments {
+            navigation: NavigationInstruments {
+                mass_kg: 100_000.01,
+                ..v.navigation
+            },
+            ..v
+        }));
+        assert_eq!(reading(Some(f64::NAN)), "--");
+        assert_eq!(reading(Some(f64::INFINITY)), "--");
+        for row in NavigationDisplay::from(NavigationInstruments {
+            braking_status: "ALIGN NOSE TO VELOCITY",
+            ..v.navigation
+        })
+        .flight
+        {
+            assert!(row.len() <= 38);
+        }
     }
 }

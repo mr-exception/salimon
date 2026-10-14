@@ -1,14 +1,16 @@
 //! Inertial force-based flight and solid-body collision correction.
 
 use super::ShipController;
-use crate::{COLLISION_RADIUS_METERS, FlightState};
-use salimon_math::{add, length as vector_length, scale};
-use salimon_world::{BodyRole, CELESTIAL_BODIES};
+use crate::FlightState;
+use salimon_math::{add, scale};
+use std::time::Duration;
 
 impl ShipController {
-    pub(super) fn advance_flight(&mut self, seconds: f64) {
-        self.integrate_thrust(seconds, self.thruster_percentage);
-        self.resolve_solid_body_collisions();
+    pub(super) fn advance_flight(&mut self, delta: Duration) {
+        let start = self.pose.position_meters;
+        let velocity = self.velocity;
+        self.integrate_thrust(delta.as_secs_f64(), self.thruster_percentage);
+        self.sweep_contact(start, self.pose.position_meters, velocity, delta);
     }
 
     fn integrate_thrust(&mut self, seconds: f64, throttle: i8) {
@@ -36,73 +38,12 @@ impl ShipController {
     #[must_use]
     pub fn velocity_meters_per_second(&self) -> [f64; 3] {
         match self.flight_state {
-            FlightState::Flying => self.velocity,
+            FlightState::Flying | FlightState::Bouncing { .. } => self.velocity,
             FlightState::AssistedLanding { .. } | FlightState::AssistedTakeoff { .. } => {
                 let assist = self.assist.as_ref().expect("active assistance has a path");
                 scale(assist.surface_normal, assist.radial_speed_meters_per_second)
             }
-            FlightState::Landed { .. } => [0.0; 3],
-        }
-    }
-
-    pub(super) fn resolve_solid_body_collisions(&mut self) {
-        for body in CELESTIAL_BODIES
-            .iter()
-            .filter(|body| body.role == BodyRole::Solid)
-        {
-            let center = body.center.meters();
-            let offset = [
-                self.pose.position_meters[0] - center[0],
-                self.pose.position_meters[1] - center[1],
-                self.pose.position_meters[2] - center[2],
-            ];
-            let distance = vector_length(offset);
-            let minimum = body.radius_meters
-                + self.terrain.elevation_bounds(*body)[1]
-                + COLLISION_RADIUS_METERS;
-            if self.terrain != salimon_world::terrain::TerrainMode::Flat {
-                if distance < minimum {
-                    // Extrema are only the broad bound. Contact projects the
-                    // conservative ship sphere against the shared local query.
-                    for _ in 0..4 {
-                        let local = salimon_math::sub(self.pose.position_meters, center);
-                        let direction =
-                            crate::orientation::normalize_or(local, self.pose.axes()[1]);
-                        let ground = self.terrain.sample(*body, direction);
-                        let gap = salimon_math::dot(
-                            salimon_math::sub(local, ground.body_local_position_meters),
-                            ground.outward_normal,
-                        );
-                        if gap >= COLLISION_RADIUS_METERS {
-                            break;
-                        }
-                        self.thruster_percentage = 0;
-                        self.clear_throttle_input();
-                        self.pose.position_meters = salimon_math::add(
-                            self.pose.position_meters,
-                            scale(
-                                ground.outward_normal,
-                                COLLISION_RADIUS_METERS - gap + 0.0002,
-                            ),
-                        );
-                    }
-                }
-                continue;
-            }
-            if distance < minimum {
-                self.thruster_percentage = 0;
-                self.clear_throttle_input();
-                let normal = if distance > 1.0e-9 {
-                    offset.map(|value| value / distance)
-                } else {
-                    self.pose.axes()[0].map(|value| -value)
-                };
-                self.pose.position_meters = [
-                    center[0] + normal[0] * minimum,
-                    center[1] + normal[1] * minimum,
-                    center[2] + normal[2] * minimum,
-                ];
-            }
+            FlightState::Landed { .. } | FlightState::GroundedAfterCrash { .. } => [0.0; 3],
         }
     }
 }
@@ -110,7 +51,9 @@ impl ShipController {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ShipPose;
+    use crate::{COLLISION_RADIUS_METERS, ShipPose};
+    use salimon_math::length as vector_length;
+    use salimon_world::CELESTIAL_BODIES;
     use salimon_world::CelestialBodyId;
     use std::time::Duration;
 

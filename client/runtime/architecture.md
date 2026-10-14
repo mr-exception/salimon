@@ -486,3 +486,7 @@ clear holds. Focus/cursor loss, view changes and lifecycle clock resets clear
 held throttle. The existing `thruster` command remains a gated one-point action
 and reports whether the powered flight authority accepted it. Renderer DTOs and
 the cached cockpit atlas retain signed percentages and show reverse magnitude.
+
+`Bouncing` and `GroundedAfterCrash` map their selected solid body's surface frame
+and ship-owned velocity/telemetry. They do not satisfy ordinary `Landed` ramp
+or takeoff gates. Automation inspection retains the distinct flight-state names.

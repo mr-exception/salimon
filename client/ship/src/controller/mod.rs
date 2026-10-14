@@ -9,6 +9,7 @@ use std::time::Duration;
 
 pub(crate) mod assist;
 pub(crate) mod cockpit;
+mod collision;
 mod door;
 mod flight;
 mod steering;
@@ -34,6 +35,7 @@ pub struct ShipController {
     steering_target: SteeringInput,
     steering: SteeringInput,
     pub(crate) assist: Option<AssistTransition>,
+    bounce: Option<collision::Bounce>,
 }
 
 impl Default for ShipController {
@@ -66,6 +68,7 @@ impl Default for ShipController {
             steering_target: SteeringInput::default(),
             steering: SteeringInput::default(),
             assist: None,
+            bounce: None,
         }
     }
 }
@@ -90,6 +93,7 @@ impl ShipController {
             steering_target: SteeringInput::default(),
             steering: SteeringInput::default(),
             assist: None,
+            bounce: None,
         }
     }
 
@@ -118,10 +122,11 @@ impl ShipController {
         let seconds = delta.as_secs_f64();
         self.advance_steering(seconds);
         match self.flight_state {
-            FlightState::Flying => self.advance_flight(seconds),
+            FlightState::Flying => self.advance_flight(delta),
             FlightState::AssistedLanding { body } => self.advance_landing(body, delta),
             FlightState::AssistedTakeoff { body } => self.advance_takeoff(body, delta),
-            FlightState::Landed { .. } => {}
+            FlightState::Bouncing { body } => self.advance_bounce(body, delta),
+            FlightState::Landed { .. } | FlightState::GroundedAfterCrash { .. } => {}
         }
     }
 

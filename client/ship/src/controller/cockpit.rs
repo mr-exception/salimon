@@ -6,6 +6,8 @@ use crate::{FlightState, SteeringInput};
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CockpitMessage {
     DoorLockedWhileInFlight,
+    CollisionSettling,
+    GroundedAfterCrash,
     DoorObstructed,
     UnsafeLandingSite,
     PressToLand,
@@ -19,6 +21,8 @@ impl CockpitMessage {
     #[must_use]
     pub const fn text(self) -> &'static str {
         match self {
+            Self::CollisionSettling => "Collision settling in progress",
+            Self::GroundedAfterCrash => "Ship grounded after collision",
             Self::UnsafeLandingSite => "Unsafe terrain: choose another landing site",
             Self::DoorObstructed => "Move clear of the boarding ramp",
             Self::DoorLockedWhileInFlight => "Door locked while in flight",
@@ -50,6 +54,8 @@ impl ShipController {
             return Some(message);
         }
         match self.flight_state {
+            FlightState::Bouncing { .. } => Some(CockpitMessage::CollisionSettling),
+            FlightState::GroundedAfterCrash { .. } => Some(CockpitMessage::GroundedAfterCrash),
             FlightState::AssistedLanding { .. } => Some(CockpitMessage::LandingInProgress),
             FlightState::AssistedTakeoff { .. } => Some(CockpitMessage::TakeoffInProgress),
             FlightState::Landed { .. } if self.cockpit_control_active => {

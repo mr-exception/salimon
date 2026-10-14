@@ -25,7 +25,10 @@ impl ShipController {
     }
 
     pub(super) fn advance_steering(&mut self, seconds: f64) {
-        if !self.energy_core.powered() {
+        if seconds <= 0.0 {
+            return;
+        }
+        if !self.cockpit_control_active {
             self.steering_target = SteeringInput::default();
             self.steering = SteeringInput::default();
             return;
@@ -72,6 +75,8 @@ mod tests {
             pitch: 1.0,
             ..SteeringInput::default()
         });
+        // A conversion-free/zero-duration step must not discard pending input.
+        ship.advance(Duration::ZERO);
         ship.advance(Duration::from_millis(60));
         assert_eq!(ship.snapshot().steering.pitch, 0.5);
         ship.advance(Duration::from_millis(60));

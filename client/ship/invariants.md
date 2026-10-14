@@ -109,3 +109,14 @@ and a positive finite rate. Zero yield consumes immediately. Generated joules
 settle with ordinary discharge before capacity clipping; excess is wasted and
 full batteries keep processing to completion. Updates split at process completion
 so later idle time is not incorrectly charged by an already finished fragment.
+
+## Cockpit blackout authority (#192)
+
+Cockpit occupancy is physical; commands require powered cockpit ownership and
+free flight. Steering uses the exact powered interval, stops at energy depletion,
+and clears target/ramp/held-key residue at outage or cockpit exit. Signed throttle,
+heading and momentum persist. Charging/conversion automatically resumes selected
+nonzero thrust, including while the cockpit is empty; manual control still needs
+a powered pilot. Assists remain authoritative and reject manual overrides.
+Native and automation steering share gates; blackout/assist/exit clears the runtime
+latch, and OS repeat/focus replay cannot reinstall a stale steering press.

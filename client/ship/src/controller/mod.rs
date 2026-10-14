@@ -148,16 +148,17 @@ impl ShipController {
         }
         self.advance_door(delta);
         self.advance_throttle(delta);
-        let seconds = delta.as_secs_f64();
-        self.advance_steering(seconds);
         let powered_seconds = self.energy_core.advance_with_input(
             delta,
             self.thruster_percentage,
             self.flight_state == FlightState::Flying,
             incoming_joules,
         )?;
+        // Integrate steering only over the powered part of the interval, then
+        // clear input residue at blackout so restoration preserves the heading.
+        self.advance_steering(powered_seconds);
         if !self.energy_core.powered() {
-            self.clear_throttle_input();
+            self.clear_flight_control_input();
         }
         self.settle_assist_energy(delta);
         match self.flight_state {

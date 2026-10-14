@@ -113,6 +113,20 @@ pub(super) fn is_ship_control_key(key: PhysicalKey) -> bool {
     ship_control_key(key).is_some()
 }
 
+/// Denied input is cleared instead of retained for replay after power/assist return.
+pub(super) fn update_powered_ship_control_input(
+    input: &mut ShipControlInput,
+    key: PhysicalKey,
+    pressed: bool,
+    allowed: bool,
+) {
+    if allowed {
+        update_ship_control_input(input, key, pressed);
+    } else {
+        *input = ShipControlInput::default();
+    }
+}
+
 pub(super) fn update_ship_control_input(
     input: &mut ShipControlInput,
     key: PhysicalKey,
@@ -230,6 +244,18 @@ pub(super) fn camera_command(
 mod tests {
     use super::*;
     use salimon_world::CameraCommand;
+    #[test]
+    fn denied_steering_is_not_replayed_after_power_returns() {
+        let mut input = ShipControlInput::default();
+        let key = PhysicalKey::Code(KeyCode::KeyW);
+        update_powered_ship_control_input(&mut input, key, true, true);
+        assert_ne!(input.steering(), SteeringInput::default());
+        update_powered_ship_control_input(&mut input, key, true, false);
+        assert_eq!(input.steering(), SteeringInput::default());
+        update_powered_ship_control_input(&mut input, key, false, true);
+        assert_eq!(input.steering(), SteeringInput::default());
+    }
+
     #[test]
     fn toolbar_keys_are_real_initial_edges_and_tour_numbers_are_gated() {
         for (index, key) in [

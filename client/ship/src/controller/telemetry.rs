@@ -39,7 +39,7 @@ impl ShipController {
     ) -> Result<(), crate::InvalidEnergy> {
         self.energy_core = crate::EnergyCore::new(config, stored_joules)?;
         if !self.energy_core.powered() {
-            self.clear_throttle_input();
+            self.clear_flight_control_input();
         }
         Ok(())
     }
@@ -50,7 +50,7 @@ impl ShipController {
             .set_stored_joules(stored_joules as f64)
             .expect("u64 joules are finite and nonnegative");
         if !self.energy_core.powered() {
-            self.clear_throttle_input();
+            self.clear_flight_control_input();
         }
     }
 
@@ -63,7 +63,7 @@ impl ShipController {
     ) -> Result<f64, crate::InvalidEnergy> {
         let delivered = self.energy_core.exchange_joules(incoming, requested)?;
         if !self.energy_core.powered() {
-            self.clear_throttle_input();
+            self.clear_flight_control_input();
         }
         Ok(delivered)
     }

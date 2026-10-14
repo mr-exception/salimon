@@ -35,7 +35,7 @@ use input::{
     ShipControlInput, camera_command, interaction_pressed, is_diagnostics_toggle, is_movement_key,
     is_ship_control_key, landing_action_pressed, release_cursor_pressed, throttle_direction,
     throttle_event, tool_key_event, toolbar_selection_pressed, toolbar_slot, update_movement_input,
-    update_ship_control_input, view_toggle_pressed,
+    update_powered_ship_control_input, view_toggle_pressed,
 };
 use interaction::{
     InteractionTarget, action_bar_context, available_interaction_target, gameplay_window_title,
@@ -569,7 +569,15 @@ impl ClientApplication {
             return;
         }
         if self.character.location() == CharacterLocation::Cockpit && is_ship_control_key(key) {
-            update_ship_control_input(&mut self.ship_control_input, key, pressed);
+            let ship = self.ship.snapshot();
+            update_powered_ship_control_input(
+                &mut self.ship_control_input,
+                key,
+                pressed,
+                ship.power_available
+                    && ship.cockpit_control_active
+                    && ship.flight_state == FlightState::Flying,
+            );
         } else {
             update_movement_input(&mut self.movement_input, key, pressed);
         }
@@ -682,6 +690,12 @@ impl ClientApplication {
             .set_steering_input(self.ship_control_input.steering());
         self.ship.advance(delta);
         let ship = self.ship.snapshot();
+        if !ship.power_available
+            || !ship.cockpit_control_active
+            || ship.flight_state != FlightState::Flying
+        {
+            self.ship_control_input = ShipControlInput::default();
+        }
         self.character
             .set_ship_gravity_enabled(ship.power_available);
         self.mining.ship_gravity_disabled = !ship.power_available;
@@ -1335,15 +1349,16 @@ impl ApplicationHandler for ClientApplication {
                 self.toggle_view();
                 window.request_redraw();
             }
-            WindowEvent::KeyboardInput { event, .. }
-                if self.character.location() == CharacterLocation::Cockpit
-                    && is_ship_control_key(event.physical_key) =>
+            WindowEvent::KeyboardInput {
+                event,
+                is_synthetic,
+                ..
+            } if self.character.location() == CharacterLocation::Cockpit
+                && is_ship_control_key(event.physical_key) =>
             {
-                update_ship_control_input(
-                    &mut self.ship_control_input,
-                    event.physical_key,
-                    event.state == ElementState::Pressed,
-                );
+                if throttle_event(event.state, event.repeat, is_synthetic) {
+                    self.automation_key(event.physical_key, event.state == ElementState::Pressed);
+                }
                 window.request_redraw();
             }
             WindowEvent::KeyboardInput {

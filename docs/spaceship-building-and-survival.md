@@ -220,3 +220,11 @@ walking/deck gravity from the current position. Loose cargo becomes weightless,
 retains velocity, contacts other fragments and stays bounded by cabin geometry.
 Nearby planets do not pull crew/cargo while inside. Carrying and mechanical Core
 intake remain available. Detailed acceleration-induced cabin forces are deferred.
+
+## Cockpit blackout authority (#192)
+
+An unpowered cockpit has no mechanical flight-control backup. Selected signed
+throttle and heading survive outage; the ship coasts until conversion restores
+power, then selected nonzero thrust automatically returns even without a seated
+pilot. Steering stops at exhaustion and needs fresh powered input after outage.
+Assisted sequences retain their reserved energy and cannot be overridden.

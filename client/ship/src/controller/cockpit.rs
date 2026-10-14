@@ -35,6 +35,7 @@ impl ShipController {
     pub fn set_cockpit_control(&mut self, active: bool) {
         self.cockpit_control_active = active;
         if !active {
+            self.clear_throttle_input();
             self.steering_target = SteeringInput::default();
         }
     }

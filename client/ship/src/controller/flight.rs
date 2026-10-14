@@ -7,7 +7,7 @@ use salimon_world::{BodyRole, CELESTIAL_BODIES};
 
 impl ShipController {
     pub(super) fn advance_flight(&mut self, seconds: f64) {
-        self.integrate_thrust(seconds, self.thruster_percentage as i8);
+        self.integrate_thrust(seconds, self.thruster_percentage);
         self.resolve_solid_body_collisions();
     }
 
@@ -25,15 +25,6 @@ impl ShipController {
             ),
         );
         self.velocity = add(self.velocity, scale(acceleration, seconds));
-    }
-
-    pub fn adjust_thruster(&mut self, percentage_points: i8) {
-        if !self.cockpit_control_active || self.flight_state != FlightState::Flying {
-            return;
-        }
-        self.thruster_percentage = i16::from(self.thruster_percentage)
-            .saturating_add(i16::from(percentage_points))
-            .clamp(0, 100) as u8;
     }
 
     #[must_use]
@@ -85,6 +76,8 @@ impl ShipController {
                         if gap >= COLLISION_RADIUS_METERS {
                             break;
                         }
+                        self.thruster_percentage = 0;
+                        self.clear_throttle_input();
                         self.pose.position_meters = salimon_math::add(
                             self.pose.position_meters,
                             scale(
@@ -97,6 +90,8 @@ impl ShipController {
                 continue;
             }
             if distance < minimum {
+                self.thruster_percentage = 0;
+                self.clear_throttle_input();
                 let normal = if distance > 1.0e-9 {
                     offset.map(|value| value / distance)
                 } else {
@@ -210,7 +205,7 @@ mod inertial_tests {
     use crate::{Propulsion, ShipPose, SteeringInput};
     use std::time::Duration;
 
-    fn ship(throttle: u8, velocity: [f64; 3]) -> ShipController {
+    fn ship(throttle: i8, velocity: [f64; 3]) -> ShipController {
         ShipController::flying_with_velocity(
             ShipPose {
                 position_meters: [0.0; 3],

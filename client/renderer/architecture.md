@@ -280,3 +280,7 @@ surface, supports a stopped or carrying walker, and joins radial ground at its t
 Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
 and [world definition contract](../world/terrain-contract.md). Keep local rules
 and their consumers aligned; flat deterministic fixtures are explicit.
+
+Cockpit throttle DTO/cache percentages are signed i8, clamped to −100..+100
+for display. The label preserves the sign and the bar shows absolute magnitude
+for reverse/forward selection; rasterization never controls ship authority.

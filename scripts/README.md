@@ -407,8 +407,8 @@ velocity inheritance and free 3D EVA are #37, and nearby-body transitions #36.
 
 ## Moving-ship EVA (#37)
 
-`moving-eva.json` sets one thruster increment through normal cockpit controls,
-then follows the airlock route at 25,000 m/s. It verifies inherited world velocity,
+`moving-eva.json` starts from the `coasting-space` fixture with explicit
+25,000 m/s world +X momentum and zero throttle, then follows the airlock route. It verifies inherited world velocity,
 no-input ship-relative stability over 600 fixed frames, Space/Shift vertical
 translation, pitched/yawed view-relative translation, assisted stop, closed-gate
 collision, and clean interior re-entry. The baseline runs in the default suite;
@@ -585,3 +585,9 @@ completed update; carrying is excluded. `contact_fragment_ids` and
 not controls. Ship-local positions use stored anchors to avoid round-trip world
 precision loss in inspection. See the benchmark guide for limits and
 startup-deadline requirements.
+
+Signed throttle automation uses `key` values `thruster_up` and `thruster_down`
+with press/release booleans. Holding either repeats each 100 ms of simulation
+time, with one point immediately on the press edge. The `thruster` action is a
+single powered-cockpit percentage-point command; negative settings use reverse
+thrust and do not directly assign speed.

@@ -100,3 +100,14 @@ applied. Snapshot speed is the magnitude of actual velocity, including assists.
 `flying` starts at rest; `flying_with_velocity` explicitly seeds finite momentum.
 Assisted landing/takeoff retain captured paths and finish at rest. Collision
 correction is still the pre-#202 endpoint policy in this incremental change.
+
+## Signed held throttle (#186)
+
+Selection is an i8 percentage clamped to −100..+100. Positive/negative values
+use forward/reverse force capacity; zero coasts. `set_throttle_key` consumes typed
+Up/Down edges, increments one point immediately, then repeats each 100 ms of
+simulation time. Repeated presses are idempotent and simultaneous keys cancel
+repeat. Release/direction changes reset cadence. Cockpit authority, Flying state
+and nonzero Core fixture energy gate changes; power consumption remains E01.
+Leaving the cockpit preserves selection and momentum while clearing held keys.
+Assists clear holds and reject changes; landing completion/collision zero selection.

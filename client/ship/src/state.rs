@@ -67,7 +67,7 @@ pub struct ShipSnapshot {
     /// 0 is closed; 1 is raised clear of the aft doorway.
     pub door_open_fraction: f64,
     pub cockpit_control_active: bool,
-    pub thruster_percentage: u8,
+    pub thruster_percentage: i8,
     pub total_mass_kg: f64,
     pub speed_meters_per_second: f64,
     pub velocity_meters_per_second: [f64; 3],

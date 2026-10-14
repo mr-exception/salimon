@@ -73,3 +73,6 @@ capacity. Formatting and domain-name copies happen at overlay refresh cadence,
 not on every frame. Pixel rasterization happens only while visible or after an
 explicit visible-state change. The renderer receives borrowed pixels, so this
 crate performs no GPU allocation or synchronization.
+
+Throttle observations are signed i8 percentages. Values outside −100..+100
+are unavailable; valid reverse values retain their minus sign in the overlay.

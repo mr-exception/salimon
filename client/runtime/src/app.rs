@@ -33,8 +33,8 @@ use diagnostics::{
 pub(crate) use frames::{character_ship_frame, surface_frame_for_ship};
 use input::{
     ShipControlInput, camera_command, interaction_pressed, is_diagnostics_toggle, is_movement_key,
-    is_ship_control_key, landing_action_pressed, release_cursor_pressed, thruster_step,
-    tool_key_event, toolbar_selection_pressed, toolbar_slot, update_movement_input,
+    is_ship_control_key, landing_action_pressed, release_cursor_pressed, throttle_direction,
+    throttle_event, tool_key_event, toolbar_selection_pressed, toolbar_slot, update_movement_input,
     update_ship_control_input, view_toggle_pressed,
 };
 use interaction::{
@@ -359,6 +359,7 @@ impl ClientApplication {
                 self.character.leave_cockpit();
                 self.ship.set_cockpit_control(false);
                 self.ship_control_input = ShipControlInput::default();
+                self.ship.clear_throttle_input();
                 log::info!("left cockpit control; ship motion remains autonomous");
             }
             CharacterLocation::InsideShip
@@ -445,6 +446,7 @@ impl ClientApplication {
             ViewMode::PrecisionTour => ViewMode::Gameplay,
         };
         self.mining.clear_input();
+        self.ship.clear_throttle_input();
         log::info!("view mode changed to {:?} (F2 toggles)", self.view_mode);
     }
     pub(crate) fn view_name(&self) -> &'static str {
@@ -507,6 +509,14 @@ impl ClientApplication {
                 true,
             ) {
                 self.camera_prototype.apply_command(command);
+            }
+            return;
+        }
+        if let Some(direction) = throttle_direction(key) {
+            if self.character.location() == CharacterLocation::Cockpit {
+                self.ship.set_throttle_key(direction, pressed);
+            } else {
+                self.ship.clear_throttle_input();
             }
             return;
         }
@@ -620,6 +630,7 @@ impl ClientApplication {
 
     fn reset_update_clock(&mut self) {
         self.update_clock.reset();
+        self.ship.clear_throttle_input();
         self.mining.fragment_previous.clear();
     }
 
@@ -1214,6 +1225,7 @@ impl ApplicationHandler for ClientApplication {
                 } else {
                     self.movement_input = MovementInput::default();
                     self.ship_control_input = ShipControlInput::default();
+                    self.ship.clear_throttle_input();
                     self.cursor_captured = false;
                     self.mining.clear_input();
                 }
@@ -1231,6 +1243,7 @@ impl ApplicationHandler for ClientApplication {
                 self.cursor_captured = false;
                 self.movement_input = MovementInput::default();
                 self.ship_control_input = ShipControlInput::default();
+                self.ship.clear_throttle_input();
                 self.mining.clear_input();
             }
             WindowEvent::MouseInput {
@@ -1306,20 +1319,22 @@ impl ApplicationHandler for ClientApplication {
                 );
                 window.request_redraw();
             }
-            WindowEvent::KeyboardInput { event, .. }
-                if self.character.location() == CharacterLocation::Cockpit
-                    && thruster_step(event.state, event.repeat, event.physical_key).is_some() =>
-            {
-                self.ship.adjust_thruster(
-                    thruster_step(event.state, event.repeat, event.physical_key)
-                        .expect("guard accepts only thruster steps"),
-                );
-                let snapshot = self.ship.snapshot();
-                log::info!(
-                    "cockpit monitor: {} / {}%",
-                    format_metric_speed(snapshot.speed_meters_per_second),
-                    snapshot.thruster_percentage
-                );
+            WindowEvent::KeyboardInput {
+                event,
+                is_synthetic,
+                ..
+            } if throttle_direction(event.physical_key).is_some() => {
+                if throttle_event(event.state, event.repeat, is_synthetic) {
+                    self.automation_key(event.physical_key, event.state == ElementState::Pressed);
+                    if event.state == ElementState::Pressed {
+                        let snapshot = self.ship.snapshot();
+                        log::info!(
+                            "cockpit monitor: {} / {}%",
+                            format_metric_speed(snapshot.speed_meters_per_second),
+                            snapshot.thruster_percentage
+                        );
+                    }
+                }
                 window.request_redraw();
             }
             WindowEvent::KeyboardInput { event, .. } if is_movement_key(event.physical_key) => {

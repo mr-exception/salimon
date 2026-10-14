@@ -20,6 +20,7 @@ mod state;
 pub use controller::ShipController;
 pub use controller::cockpit::CockpitMessage;
 pub use controller::telemetry::{EnergyCoreState, NearbyBodyTelemetry};
+pub use controller::throttle::{THROTTLE_REPEAT_INTERVAL, ThrottleDirection};
 pub use state::{DoorState, FlightState, ShipPose, ShipSnapshot, SteeringInput};
 
 mod terrain_landing;

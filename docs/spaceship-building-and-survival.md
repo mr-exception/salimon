@@ -154,3 +154,8 @@ coasts. Acceleration is force divided by cached total mass. Steering remains
 5°/s with its existing presentation ramp. There is no drag, speed cap or
 planetary gravity in this flight wave. Core energy remains a telemetry fixture
 until its separate implementation.
+
+Up/Down select signed −100..+100% throttle, one percentage point on press and
+one more per 100 ms held. Selection persists when leaving the cockpit. Only
+a powered cockpit in free flight can change it; assists reject input. Landing
+completion and contact reset selection to zero.

@@ -309,10 +309,9 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
         }
         Some("thruster") => match command.get("direction").and_then(Value::as_i64) {
             Some(direction @ -1..=1) if direction != 0 => {
-                if app.character.location() == CharacterLocation::Cockpit {
-                    app.ship.adjust_thruster(direction as i8);
-                }
-                Ok(json!({"applied": app.character.location() == CharacterLocation::Cockpit}))
+                let applied = app.character.location() == CharacterLocation::Cockpit
+                    && app.ship.adjust_thruster(direction as i8);
+                Ok(json!({"applied": applied}))
             }
             _ => Err(("invalid_argument", "direction must be -1 or 1")),
         },
@@ -332,6 +331,8 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "view" => Some(KeyCode::F2),
         "diagnostics" => Some(KeyCode::F3),
         "near" => Some(KeyCode::KeyN),
+        "thruster_up" => Some(KeyCode::ArrowUp),
+        "thruster_down" => Some(KeyCode::ArrowDown),
         "forward" => Some(KeyCode::KeyW),
         "backward" => Some(KeyCode::KeyS),
         "left" => Some(KeyCode::KeyA),
@@ -1091,6 +1092,42 @@ mod tests {
             Scenario::OpenSpace,
             include_str!("../../../scenarios/space-airlock.json"),
         );
+    }
+
+    #[test]
+    fn signed_held_throttle_uses_gameplay_keys_and_fixed_simulation_time() {
+        let mut app = app(Scenario::OpenSpace);
+        let key = |app: &mut ClientApplication, pressed| {
+            execute(
+                app,
+                &json!({"protocol":1,"id":1,"op":"key","key":"thruster_down","pressed":pressed})
+                    .to_string(),
+            )
+        };
+        assert_eq!(key(&mut app, true)["ok"], true);
+        key(&mut app, true);
+        assert_eq!(app.ship.snapshot().thruster_percentage, -1);
+        execute(
+            &mut app,
+            r#"{"protocol":1,"id":2,"op":"step","frames":100}"#,
+        );
+        assert_eq!(app.ship.snapshot().thruster_percentage, -21);
+        assert!(app.ship.snapshot().velocity_meters_per_second[0] < 0.0);
+        key(&mut app, false);
+        execute(
+            &mut app,
+            r#"{"protocol":1,"id":3,"op":"step","frames":100}"#,
+        );
+        assert_eq!(app.ship.snapshot().thruster_percentage, -21);
+        execute(&mut app, r#"{"protocol":1,"id":4,"op":"interact"}"#);
+        let response = execute(
+            &mut app,
+            r#"{"protocol":1,"id":5,"op":"thruster","direction":1}"#,
+        );
+        assert_eq!(response["result"]["applied"], false);
+        key(&mut app, true);
+        app.advance_automation(Duration::from_secs(1));
+        assert_eq!(app.ship.snapshot().thruster_percentage, -21);
     }
 
     #[test]

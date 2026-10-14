@@ -20,6 +20,8 @@ const TAKEOFF_CLEARANCE_SECONDS: f64 = 4.0;
 #[derive(Clone, Debug)]
 pub(crate) struct AssistTransition {
     elapsed: Duration,
+    reservation: Option<crate::energy::AssistEnergyReservation>,
+    energy_watts: f64,
     start_pose: ShipPose,
     pub(super) surface_normal: [f64; 3],
     aligned_orientation: [f64; 4],
@@ -49,6 +51,8 @@ impl AssistTransition {
         };
         Self {
             elapsed: Duration::ZERO,
+            reservation: None,
+            energy_watts: 0.0,
             landing_pose: None,
             start_pose: pose,
             surface_normal,
@@ -118,6 +122,9 @@ impl ShipController {
                         assist.aligned_orientation = pose.orientation;
                         assist.landing_pose = Some(pose);
                     }
+                    if !self.reserve_assist_energy(&mut assist, LANDING_ASSIST_DURATION) {
+                        return;
+                    }
                     self.assist = Some(assist);
                     self.steering_target = SteeringInput::default();
                     self.steering = SteeringInput::default();
@@ -128,11 +135,11 @@ impl ShipController {
                 if self.door_state == DoorState::Open || self.door_open_fraction > 0.0 {
                     self.cockpit_message = Some(CockpitMessage::CloseDoorBeforeTakeoff);
                 } else {
-                    self.assist = Some(AssistTransition::new(
-                        self.pose,
-                        body_definition(body),
-                        false,
-                    ));
+                    let mut assist = AssistTransition::new(self.pose, body_definition(body), false);
+                    if !self.reserve_assist_energy(&mut assist, TAKEOFF_ASSIST_DURATION) {
+                        return;
+                    }
+                    self.assist = Some(assist);
                     self.flight_state = FlightState::AssistedTakeoff { body };
                 }
             }
@@ -140,6 +147,45 @@ impl ShipController {
             | FlightState::AssistedTakeoff { .. }
             | FlightState::Bouncing { .. }
             | FlightState::GroundedAfterCrash { .. } => {}
+        }
+    }
+
+    fn reserve_assist_energy(&mut self, assist: &mut AssistTransition, duration: Duration) -> bool {
+        // Captured kinematic paths use a conservative full forward-power estimate.
+        // Idle consumers stay on the ordinary bus and cannot spend this budget.
+        assist.energy_watts = self.energy_core.config().forward_watts;
+        assist.reservation = self
+            .energy_core
+            .reserve_assist(assist.energy_watts * duration.as_secs_f64());
+        if assist.reservation.is_none() {
+            self.cockpit_message = Some(CockpitMessage::InsufficientAssistEnergy);
+            return false;
+        }
+        true
+    }
+
+    pub(super) fn settle_assist_energy(&mut self, delta: Duration) {
+        let Some(assist) = self.assist.as_mut() else {
+            return;
+        };
+        let duration = match self.flight_state {
+            FlightState::AssistedLanding { .. } => LANDING_ASSIST_DURATION,
+            FlightState::AssistedTakeoff { .. } => TAKEOFF_ASSIST_DURATION,
+            _ => return,
+        };
+        let remaining = duration.saturating_sub(assist.elapsed);
+        if let Some(budget) = assist.reservation.as_mut() {
+            budget.spend(assist.energy_watts * delta.min(remaining).as_secs_f64());
+        }
+    }
+
+    fn finish_assist_energy(&mut self) {
+        if let Some(budget) = self
+            .assist
+            .as_mut()
+            .and_then(|assist| assist.reservation.take())
+        {
+            self.energy_core.refund_assist(budget);
         }
     }
 
@@ -199,6 +245,7 @@ impl ShipController {
             self.velocity = [0.0; 3];
             self.flight_state = FlightState::Landed { body: body_id };
             self.thruster_percentage = 0;
+            self.finish_assist_energy();
             self.assist = None;
         }
     }
@@ -239,6 +286,7 @@ impl ShipController {
         if assist.elapsed == TAKEOFF_ASSIST_DURATION {
             self.velocity = [0.0; 3];
             self.flight_state = FlightState::Flying;
+            self.finish_assist_energy();
             self.assist = None;
         }
     }
@@ -249,6 +297,30 @@ mod tests {
     use super::*;
     use crate::orientation::axis_angle_quaternion;
     use salimon_math::dot;
+
+    #[test]
+    fn reservation_rejection_and_bus_blackout_do_not_restart_or_cancel_assist() {
+        let mut ship = ShipController::default();
+        ship.set_cockpit_control(true);
+        ship.set_stored_core_energy_joules(599_999_999);
+        let before = ship.snapshot();
+        ship.trigger_landing_action();
+        assert_eq!(ship.snapshot().flight_state, before.flight_state);
+        assert_eq!(ship.snapshot().energy_core, before.energy_core);
+        assert_eq!(
+            ship.snapshot().cockpit_message,
+            Some(CockpitMessage::InsufficientAssistEnergy)
+        );
+        ship.set_stored_core_energy_joules(600_000_000);
+        ship.trigger_landing_action();
+        assert_eq!(ship.snapshot().energy_core.stored_joules, 0);
+        assert!(!ship.snapshot().power_available);
+        ship.trigger_landing_action();
+        ship.set_cockpit_control(false);
+        ship.advance(TAKEOFF_ASSIST_DURATION);
+        assert_eq!(ship.snapshot().flight_state, FlightState::Flying);
+        assert_eq!(ship.snapshot().energy_core.stored_joules, 0);
+    }
 
     #[test]
     fn every_solid_body_supports_uncancellable_arbitrary_point_landing() {

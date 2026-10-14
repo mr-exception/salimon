@@ -16,6 +16,7 @@ const COCKPIT_INTERACTION_PROMPT: &str = "Press E to use";
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(super) enum InteractionTarget {
     Cockpit,
+    Core,
     ExitDoor,
 }
 
@@ -24,6 +25,7 @@ pub(super) fn prompt_placement(
     frame: salimon_character::ShipFrame,
 ) -> salimon_renderer::OverlayPlacement {
     let (local, radius_meters) = match target {
+        InteractionTarget::Core => (salimon_character::CORE_INTERACTION_POSITION_METERS, 0.2),
         InteractionTarget::Cockpit => (COCKPIT_INTERACTION_POSITION_METERS, 0.1),
         InteractionTarget::ExitDoor => (
             salimon_character::EXIT_DOOR_MARKER_METERS,
@@ -49,7 +51,19 @@ fn interaction_target(
             / (cockpit_distance * vector_length(look_direction)).max(f64::EPSILON)
             >= COCKPIT_INTERACTION_MINIMUM_AIM_DOT;
 
-    if cockpit_is_aimed_at {
+    let to_core = subtract(
+        salimon_character::CORE_INTERACTION_POSITION_METERS,
+        local_eye_position,
+    );
+    let core_distance = vector_length(to_core);
+    let core_aimed = core_distance > f64::EPSILON
+        && core_distance <= 3.0
+        && dot(to_core, look_direction)
+            / (core_distance * vector_length(look_direction)).max(f64::EPSILON)
+            >= COCKPIT_INTERACTION_MINIMUM_AIM_DOT;
+    if core_aimed {
+        Some(InteractionTarget::Core)
+    } else if cockpit_is_aimed_at {
         Some(InteractionTarget::Cockpit)
     } else if ((local_eye_position[0] + 7.10).abs() < 2.7
         || (local_eye_position[0] >= salimon_character::boarding_ramp_tip_meters()[0] - 1.5
@@ -68,7 +82,11 @@ pub(super) fn available_interaction_target(
     local_look_target: [f64; 3],
 ) -> Option<InteractionTarget> {
     match interaction_target(local_eye_position, local_look_target) {
-        Some(InteractionTarget::Cockpit) if location != CharacterLocation::InsideShip => None,
+        Some(InteractionTarget::Cockpit | InteractionTarget::Core)
+            if location != CharacterLocation::InsideShip =>
+        {
+            None
+        }
         target => target,
     }
 }
@@ -106,6 +124,7 @@ pub(super) fn action_bar_context(
         .filter(|message| *message != CockpitMessage::DoorLockedWhileInFlight)
         .map(CockpitMessage::text)
         .or(match interaction {
+            Some(InteractionTarget::Core) => Some("E to feed carried fragment to Core"),
             Some(InteractionTarget::Cockpit) => Some(COCKPIT_INTERACTION_PROMPT),
             Some(InteractionTarget::ExitDoor) => Some("E to open/close exit door"),
             None => None,
@@ -117,6 +136,24 @@ mod tests {
     use super::*;
     use salimon_ship::{FlightState, ShipController};
     use salimon_world::CelestialBodyId;
+    #[test]
+    fn core_uses_authored_center_and_requires_nearby_interior_aim() {
+        let core = salimon_character::CORE_INTERACTION_POSITION_METERS;
+        let eye = [-1.0, 2.0, -2.2];
+        assert_eq!(
+            available_interaction_target(CharacterLocation::InsideShip, eye, core),
+            Some(InteractionTarget::Core)
+        );
+        assert_eq!(
+            available_interaction_target(CharacterLocation::Space, eye, core),
+            None
+        );
+        assert_ne!(
+            available_interaction_target(CharacterLocation::InsideShip, [-1.0, 2.0, -5.0], core),
+            Some(InteractionTarget::Core)
+        );
+    }
+
     #[test]
     fn prompt_anchors_follow_authored_markers_through_ship_translation_and_rotation() {
         let frame = salimon_character::ShipFrame {

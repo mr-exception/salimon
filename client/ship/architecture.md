@@ -194,3 +194,43 @@ powered recovery are separate follow-ups, not implemented by E02.
 step boundary with that step's normal idle/propulsion consumers before storage
 clipping. It preserves exact powered-thrust duration. Conversion timing/rate is
 owned by E03; no continuous charging source is assumed by this task.
+
+## Assisted energy reservation (#203)
+
+Activation atomically removes full forward watts × captured assist duration from
+the ordinary Core bus (starter landing 800 MJ, takeoff 600 MJ). This is a
+conservative configurable tuning estimate for the current kinematic paths, not
+a physical work calculation. Only the active assist spends the isolated budget;
+idle drains and conversion use ordinary storage. Bus blackout cannot cancel the
+sequence. Completion refunds unused budget with capacity clipping. Repeated
+activation does not reserve twice; insufficient storage rejects before changing
+the path/flight state. The same portable reservation contract is available to
+the future recovery path; recovery flight itself remains its separate issue.
+
+## Mechanical Core intake and conversion (#189)
+
+Normal E targeting within 3 m of the authored Core center, aimed within 30°,
+accepts the one carried fragment indoors, including blackout/zero-G. No
+cockpit authority or electricity is required. Ship validates finite mass ×
+material yield before removing the stable identity from the world session;
+runtime immediately drains removal events into the mass ledger and clears
+physical/presentation caches. Busy intake leaves the next fragment untouched.
+
+Ship owns a single automatic process, 200 MJ/s by default. Catalog gameplay
+yields default to 1 GJ/kg iron, 0.5 GJ/kg silicate, 2 GJ/kg ice; these are tuning
+values, not chemistry. `ConversionConfig` permits finite nonnegative yields
+and a positive finite rate. Zero yield consumes immediately. Generated joules
+settle with ordinary discharge before capacity clipping; excess is wasted and
+full batteries keep processing to completion. Updates split at process completion
+so later idle time is not incorrectly charged by an already finished fragment.
+
+## Cockpit blackout authority (#192)
+
+Cockpit occupancy is physical; commands require powered cockpit ownership and
+free flight. Steering uses the exact powered interval, stops at energy depletion,
+and clears target/ramp/held-key residue at outage or cockpit exit. Signed throttle,
+heading and momentum persist. Charging/conversion automatically resumes selected
+nonzero thrust, including while the cockpit is empty; manual control still needs
+a powered pilot. Assists remain authoritative and reject manual overrides.
+Native and automation steering share gates; blackout/assist/exit clears the runtime
+latch, and OS repeat/focus replay cannot reinstall a stale steering press.

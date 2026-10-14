@@ -43,6 +43,7 @@ pub struct CharacterController {
     yaw_radians: f64,
     pitch_radians: f64,
     vertical_speed: f64,
+    interior_velocity: [f64; 3],
     jump_was_down: bool,
     eva_inherited_velocity: [f64; 3],
     eva_control_velocity: [f64; 3],
@@ -61,6 +62,7 @@ impl Default for CharacterController {
             yaw_radians: 0.0,
             pitch_radians: 0.0,
             vertical_speed: 0.0,
+            interior_velocity: [0.0; 3],
             jump_was_down: false,
             eva_inherited_velocity: [0.0; 3],
             eva_control_velocity: [0.0; 3],
@@ -74,6 +76,13 @@ impl Default for CharacterController {
 
 impl CharacterController {
     pub fn set_ship_gravity_enabled(&mut self, enabled: bool) {
+        if matches!(self.position, PositionState::Inside { .. }) {
+            if self.ship_gravity_enabled && !enabled {
+                self.interior_velocity[1] = self.vertical_speed;
+            } else if !self.ship_gravity_enabled && enabled {
+                self.vertical_speed = self.interior_velocity[1];
+            }
+        }
         self.ship_gravity_enabled = enabled;
     }
 

@@ -517,3 +517,49 @@ cabin motion, arbitrary future physical items and Core intake are separate tasks
 Runtime maps `ShipSnapshot::power_available` to character artificial gravity,
 fragment floor power and renderer `CockpitInstruments::power_off`. Physical
 cockpit occupancy is independent of power. No runtime energy arithmetic is added.
+
+## Mechanical Core intake and conversion (#189)
+
+Normal E targeting within 3 m of the authored Core center, aimed within 30°,
+accepts the one carried fragment indoors, including blackout/zero-G. No
+cockpit authority or electricity is required. Ship validates finite mass ×
+material yield before removing the stable identity from the world session;
+runtime immediately drains removal events into the mass ledger and clears
+physical/presentation caches. Busy intake leaves the next fragment untouched.
+
+Ship owns a single automatic process, 200 MJ/s by default. Catalog gameplay
+yields default to 1 GJ/kg iron, 0.5 GJ/kg silicate, 2 GJ/kg ice; these are tuning
+values, not chemistry. `ConversionConfig` permits finite nonnegative yields
+and a positive finite rate. Zero yield consumes immediately. Generated joules
+settle with ordinary discharge before capacity clipping; excess is wasted and
+full batteries keep processing to completion. Updates split at process completion
+so later idle time is not incorrectly charged by an already finished fragment.
+
+## Interior zero-G (#191)
+
+On outage, interior character movement uses ship-local view-relative three-axis
+acceleration (WASD, Space up, Shift down), retaining walking/jump momentum.
+Released controls coast; controlled speed is bounded by the existing 3.8 m/s
+movement speed without reducing faster inherited momentum. Body-clear fixture/wall/deck/ceiling contacts remove blocked
+velocity components. Exterior planetary gravity never enters this path. Power
+return preserves position and vertical velocity before ordinary deck gravity
+settles the player. Airlock EVA inherits ship plus local drift; seated occupancy
+remains mechanically fixed. Held fragments follow existing carrying rules in
+both powered and weightless interior modes.
+
+Loose cargo's unpowered surface preserves velocity without ambient damping and
+adds conservative radius-based ceiling containment; horizontal hull/fixture
+containment and precise deck support remain unchanged. Surface changes invalidate
+sleep support through existing snapshot matching. No acceleration-induced cabin
+forces, crew inertial simulation or new contact engine is introduced.
+
+## Cockpit blackout authority (#192)
+
+Cockpit occupancy is physical; commands require powered cockpit ownership and
+free flight. Steering uses the exact powered interval, stops at energy depletion,
+and clears target/ramp/held-key residue at outage or cockpit exit. Signed throttle,
+heading and momentum persist. Charging/conversion automatically resumes selected
+nonzero thrust, including while the cockpit is empty; manual control still needs
+a powered pilot. Assists remain authoritative and reject manual overrides.
+Native and automation steering share gates; blackout/assist/exit clears the runtime
+latch, and OS repeat/focus replay cannot reinstall a stale steering press.

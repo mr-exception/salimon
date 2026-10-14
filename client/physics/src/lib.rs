@@ -33,6 +33,7 @@ pub enum Surface {
     /// Same physical deck/contact/frame, without artificial gravity.
     UnpoweredFloor {
         height_meters: f64,
+        ceiling_meters: f64,
     },
     Sphere(SphereSurface),
     /// Pure caller-owned heightfield query; gravity remains radial to body.center.
@@ -76,11 +77,17 @@ pub type GroundPointQuery = fn(SphereSurface, [f64; 3]) -> [f64; 3];
 impl PartialEq for Surface {
     fn eq(&self, other: &Self) -> bool {
         match (*self, *other) {
-            (Self::Floor { height_meters: a }, Self::Floor { height_meters: b })
-            | (
-                Self::UnpoweredFloor { height_meters: a },
-                Self::UnpoweredFloor { height_meters: b },
-            ) => a == b,
+            (Self::Floor { height_meters: a }, Self::Floor { height_meters: b }) => a == b,
+            (
+                Self::UnpoweredFloor {
+                    height_meters: a,
+                    ceiling_meters: ca,
+                },
+                Self::UnpoweredFloor {
+                    height_meters: b,
+                    ceiling_meters: cb,
+                },
+            ) => a == b && ca == cb,
             (Self::Sphere(a), Self::Sphere(b)) => a == b,
             (
                 Self::Sampled {
@@ -102,7 +109,7 @@ impl PartialEq for Surface {
 impl Surface {
     pub(crate) fn ground(self, position: [f64; 3]) -> Option<GroundSample> {
         match self {
-            Self::Floor { height_meters } | Self::UnpoweredFloor { height_meters } => {
+            Self::Floor { height_meters } | Self::UnpoweredFloor { height_meters, .. } => {
                 Some(GroundSample {
                     point: [position[0], height_meters, position[2]],
                     normal: [0.0, 1.0, 0.0],
@@ -444,9 +451,11 @@ fn advance_impl<const PROFILE: bool>(
                 dot(sub(piece.velocity, gravity_velocities[i]), gravity_ups[i])
                     > 0.5 * GRAVITY * dt;
             support_reactions[i] = supported_reaction;
-            piece.velocity = scale(piece.velocity, 0.995);
-            piece.angular_velocity = scale(piece.angular_velocity, 0.98);
-            if !has_hulls {
+            if !matches!(piece.surface, Surface::UnpoweredFloor { .. }) {
+                piece.velocity = scale(piece.velocity, 0.995);
+                piece.angular_velocity = scale(piece.angular_velocity, 0.98);
+            }
+            if !has_hulls && !matches!(piece.surface, Surface::UnpoweredFloor { .. }) {
                 if length(piece.angular_velocity) < 0.015 {
                     piece.angular_velocity = [0.0; 3];
                 }
@@ -888,8 +897,22 @@ fn rolling_delta(
     delta
 }
 
+fn weightless_ceiling_contact(piece: &mut ObjectState) {
+    if let Surface::UnpoweredFloor { ceiling_meters, .. } = piece.surface {
+        // Conservative bounding support contains rotating cargo at the ceiling.
+        let maximum_center = ceiling_meters - piece.radius;
+        if piece.position[1] > maximum_center {
+            piece.position[1] = maximum_center;
+            if piece.velocity[1] > 0.0 {
+                piece.velocity[1] *= -RESTITUTION;
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 fn ground_contact(piece: &mut ObjectState) {
+    weightless_ceiling_contact(piece);
     ground_contact_cached(piece, &mut ContactResponse::default());
 }
 struct SampledContact {
@@ -935,6 +958,7 @@ fn sampled_contact(piece: &ObjectState) -> Option<SampledContact> {
     })
 }
 fn ground_contact_cached(piece: &mut ObjectState, response: &mut ContactResponse) {
+    weightless_ceiling_contact(piece);
     let Some(ground) = piece.surface.ground(piece.position) else {
         *response = ContactResponse::default();
         return;
@@ -1046,7 +1070,7 @@ fn ground_contact_cached(piece: &mut ObjectState, response: &mut ContactResponse
 // mass/inertia and velocity impulses are unchanged; this is a support constraint.
 fn correction_direction(piece: &ObjectState, direction: [f64; 3]) -> [f64; 3] {
     if piece.hull.is_some()
-        && let Surface::Floor { height_meters } | Surface::UnpoweredFloor { height_meters } =
+        && let Surface::Floor { height_meters } | Surface::UnpoweredFloor { height_meters, .. } =
             piece.surface
         && piece.position[1] - height_meters - piece.ground_support_meters <= CONTACT_BIAS_METERS
         && direction[1] < 0.0
@@ -1238,9 +1262,53 @@ mod tests {
     use super::*;
 
     #[test]
+    fn weightless_cargo_retains_drift_and_bounces_below_ceiling() {
+        let mut piece = ObjectState {
+            position: [0.0, 1.0, 0.0],
+            velocity: [1.0, 0.0, 0.0],
+            radius: 0.1,
+            ground_support_meters: 0.0,
+            hull: None,
+            side_meters: 0.2,
+            orientation: [0.0, 0.0, 0.0, 1.0],
+            angular_velocity: [0.0; 3],
+            mass_kg: 1.0,
+            surface: Surface::UnpoweredFloor {
+                height_meters: 0.0,
+                ceiling_meters: 3.0,
+            },
+        };
+        advance(
+            std::slice::from_mut(&mut piece),
+            Duration::from_secs(1),
+            |_, _| true,
+        );
+        assert!((piece.position[0] - 1.0).abs() < 1e-10);
+        assert_eq!(piece.velocity, [1.0, 0.0, 0.0]);
+        piece.velocity = [0.0, 10.0, 0.0];
+        advance(
+            std::slice::from_mut(&mut piece),
+            Duration::from_millis(250),
+            |_, _| true,
+        );
+        assert!(piece.position[1] <= 2.9);
+        assert!(piece.velocity[1] < 0.0);
+        piece.surface = Surface::Floor { height_meters: 0.0 };
+        advance(
+            std::slice::from_mut(&mut piece),
+            Duration::from_secs(10),
+            |_, _| true,
+        );
+        assert!(piece.position[1] <= 0.101);
+    }
+
+    #[test]
     fn unpowered_deck_keeps_contacts_but_disables_gravity() {
         let mut piece = floor([0.0, 2.0, 0.0], [0.0; 3]);
-        piece.surface = Surface::UnpoweredFloor { height_meters: 0.0 };
+        piece.surface = Surface::UnpoweredFloor {
+            height_meters: 0.0,
+            ceiling_meters: 3.0,
+        };
         advance(
             std::slice::from_mut(&mut piece),
             Duration::from_millis(100),

@@ -31,6 +31,7 @@ pub struct ShipController {
     pub(crate) thruster_percentage: i8,
     throttle_input: throttle::HeldThrottle,
     energy_core: crate::EnergyCore,
+    pub(crate) conversion: crate::conversion::Conversion,
     cockpit_message: Option<CockpitMessage>,
     steering_target: SteeringInput,
     steering: SteeringInput,
@@ -64,6 +65,7 @@ impl Default for ShipController {
             throttle_input: throttle::HeldThrottle::default(),
             thruster_percentage: 0,
             energy_core: crate::EnergyCore::default(),
+            conversion: crate::conversion::Conversion::default(),
             cockpit_message: None,
             steering_target: SteeringInput::default(),
             steering: SteeringInput::default(),
@@ -89,6 +91,7 @@ impl ShipController {
             throttle_input: throttle::HeldThrottle::default(),
             thruster_percentage: thruster_percentage.clamp(-100, 100),
             energy_core: crate::EnergyCore::default(),
+            conversion: crate::conversion::Conversion::default(),
             cockpit_message: None,
             steering_target: SteeringInput::default(),
             steering: SteeringInput::default(),
@@ -123,8 +126,14 @@ impl ShipController {
     }
 
     pub fn advance(&mut self, delta: Duration) {
-        self.advance_with_core_input(delta, 0.0)
-            .expect("zero Core input is valid");
+        let converting = self.conversion.remaining_duration().min(delta);
+        let incoming = self.conversion.advance(converting);
+        self.advance_with_core_input(converting, incoming)
+            .expect("validated conversion supplies finite joules");
+        if converting < delta {
+            self.advance_with_core_input(delta - converting, 0.0)
+                .expect("zero Core input is valid");
+        }
     }
 
     /// Incoming converted joules at the step boundary, settled against this step
@@ -139,17 +148,19 @@ impl ShipController {
         }
         self.advance_door(delta);
         self.advance_throttle(delta);
-        let seconds = delta.as_secs_f64();
-        self.advance_steering(seconds);
         let powered_seconds = self.energy_core.advance_with_input(
             delta,
             self.thruster_percentage,
             self.flight_state == FlightState::Flying,
             incoming_joules,
         )?;
+        // Integrate steering only over the powered part of the interval, then
+        // clear input residue at blackout so restoration preserves the heading.
+        self.advance_steering(powered_seconds);
         if !self.energy_core.powered() {
-            self.clear_throttle_input();
+            self.clear_flight_control_input();
         }
+        self.settle_assist_energy(delta);
         match self.flight_state {
             FlightState::Flying => self.advance_powered_flight(delta, powered_seconds),
             FlightState::AssistedLanding { body } => self.advance_landing(body, delta),

@@ -7,6 +7,8 @@
 use salimon_world::LANDING_RANGE_ALTITUDE_RADIUS_FACTOR;
 use std::time::Duration;
 
+mod conversion;
+pub use conversion::{ConversionConfig, IntakeResult};
 mod energy;
 pub use energy::{EnergyConfig, EnergyCore, InvalidEnergy};
 mod mass;

@@ -41,6 +41,8 @@ pub struct ResourceDefinition {
     pub name: &'static str,
     /// Effective raw-material density, a gameplay approximation rather than ore purity.
     pub density_kg_per_m3: f64,
+    /// Core conversion gameplay yield, unrelated to chemical heating values.
+    pub energy_joules_per_kg: f64,
 }
 
 /// Small immutable starting catalog. No colors, meshes, shaders, or texture handles.
@@ -49,16 +51,19 @@ pub static RESOURCE_CATALOG: &[ResourceDefinition] = &[
         id: ResourceId::IronOre,
         name: "Iron ore",
         density_kg_per_m3: 3_500.0,
+        energy_joules_per_kg: 1_000_000_000.0,
     },
     ResourceDefinition {
         id: ResourceId::SilicateRock,
         name: "Silicate rock",
         density_kg_per_m3: 2_700.0,
+        energy_joules_per_kg: 500_000_000.0,
     },
     ResourceDefinition {
         id: ResourceId::WaterIce,
         name: "Water ice",
         density_kg_per_m3: 920.0,
+        energy_joules_per_kg: 2_000_000_000.0,
     },
 ];
 

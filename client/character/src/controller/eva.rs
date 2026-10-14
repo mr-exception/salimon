@@ -77,6 +77,12 @@ impl CharacterController {
             local[0] = local[0].max(DOORWAY_FORWARD);
             self.vertical_speed = 0.0;
             self.nearby_surface = None;
+            let relative = sub(
+                add(self.eva_inherited_velocity, self.eva_control_velocity),
+                step.ship_velocity,
+            );
+            self.interior_velocity = std::array::from_fn(|axis| dot(relative, ship.axes[axis]));
+            self.vertical_speed = self.interior_velocity[1];
             self.eva_control_velocity = [0.0; 3];
             // Preserve the world look direction when adopting ship gravity.
             self.yaw_radians = dot(forward, ship.axes[2])

@@ -192,10 +192,39 @@ preserving throttle selection and velocity. Inside gravity never falls back to
 planetary gravity. Charge restoration resumes selected throttle automatically.
 Core transactions can charge and discharge together; requested loads receive
 incoming energy before surplus storage is capped. Fractional joules are retained
-internally. Physical fragment intake/conversion, assist reservation/refunds and
-recovery landing remain follow-up tasks; active captured assists still complete.
+internally. Physical fragment intake/conversion and recovery landing remain follow-up tasks.
+Assist activation reserves forward watts × duration atomically (800 MJ landing,
+600 MJ takeoff at starter tuning). Reserved energy is isolated from ordinary
+consumers; bus blackout cannot cancel the path. Unused budget is refunded on
+completion, clipped to capacity. Insufficient energy rejects activation.
 
 `advance_with_core_input(delta, incoming_joules)` settles converted energy at a
 step boundary with that step's normal idle/propulsion consumers before storage
 clipping. It preserves exact powered-thrust duration. Conversion timing/rate is
 owned by E03; no continuous charging source is assumed by this task.
+
+## Physical Core fueling (#189)
+
+Carry one fragment to the Core, aim at it within 3 m and press E. Mechanical
+intake works without power, immediately consumes the fragment and removes its
+cargo mass. One fragment processes at a time, automatically, wherever the player
+is. Conversion defaults to 200 MJ/s with material-specific configurable yields
+(iron 1 GJ/kg, rock 0.5 GJ/kg, ice 2 GJ/kg). Discharge continues during conversion;
+excess energy above capacity is wasted and processing never pauses at full charge.
+
+## Interior blackout movement (#191)
+
+Without artificial gravity, indoor WASD and Space/Control translate in three
+dimensions. Releasing controls retains drift until contact. Power return restores
+walking/deck gravity from the current position. Loose cargo becomes weightless,
+retains velocity, contacts other fragments and stays bounded by cabin geometry.
+Nearby planets do not pull crew/cargo while inside. Carrying and mechanical Core
+intake remain available. Detailed acceleration-induced cabin forces are deferred.
+
+## Cockpit blackout authority (#192)
+
+An unpowered cockpit has no mechanical flight-control backup. Selected signed
+throttle and heading survive outage; the ship coasts until conversion restores
+power, then selected nonzero thrust automatically returns even without a seated
+pilot. Steering stops at exhaustion and needs fresh powered input after outage.
+Assisted sequences retain their reserved energy and cannot be overridden.

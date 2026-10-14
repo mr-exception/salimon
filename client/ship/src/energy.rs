@@ -64,6 +64,18 @@ impl EnergyConfig {
     }
 }
 
+/// An isolated assist budget. Only the Core can reserve/refund it; consumers
+/// cannot borrow from it. It is crate-private to prevent duplicated spending.
+#[derive(Clone, Debug)]
+pub(crate) struct AssistEnergyReservation {
+    remaining_joules: f64,
+}
+impl AssistEnergyReservation {
+    pub(crate) fn spend(&mut self, joules: f64) {
+        self.remaining_joules = (self.remaining_joules - joules).max(0.0);
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct EnergyCore {
     config: EnergyConfig,
@@ -88,6 +100,20 @@ impl EnergyCore {
             config,
             stored_joules: stored_joules.min(config.capacity_joules as f64),
         })
+    }
+    pub(crate) fn reserve_assist(&mut self, joules: f64) -> Option<AssistEnergyReservation> {
+        if !joules.is_finite() || joules < 0.0 || joules > self.stored_joules {
+            return None;
+        }
+        self.stored_joules -= joules;
+        Some(AssistEnergyReservation {
+            remaining_joules: joules,
+        })
+    }
+    pub(crate) fn refund_assist(&mut self, reservation: AssistEnergyReservation) {
+        // Capacity clipping applies even if conversion filled the bus during assist.
+        self.stored_joules = (self.stored_joules + reservation.remaining_joules)
+            .min(self.config.capacity_joules as f64);
     }
     pub fn config(&self) -> EnergyConfig {
         self.config
@@ -261,5 +287,26 @@ mod tests {
         }
         assert!((core.stored_joules() - 0.9).abs() < 1e-12);
         assert!(core.powered());
+    }
+}
+
+#[cfg(test)]
+mod reservation_tests {
+    use super::*;
+    #[test]
+    fn reservation_is_atomic_isolated_and_refunds_only_unused_energy() {
+        let mut core = EnergyCore::new(EnergyConfig::default(), 100.0).unwrap();
+        assert!(core.reserve_assist(101.0).is_none());
+        assert_eq!(core.stored_joules(), 100.0);
+        let mut budget = core.reserve_assist(80.0).unwrap();
+        assert!(core.reserve_assist(30.0).is_none());
+        assert_eq!(core.exchange_joules(0.0, 100.0).unwrap(), 20.0);
+        budget.spend(30.0);
+        core.refund_assist(budget);
+        assert_eq!(core.stored_joules(), 50.0);
+        for invalid in [f64::NAN, f64::INFINITY, -1.0] {
+            assert!(core.reserve_assist(invalid).is_none());
+            assert_eq!(core.stored_joules(), 50.0);
+        }
     }
 }

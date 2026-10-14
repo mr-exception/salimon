@@ -115,6 +115,8 @@
     {"wait": {"path": "ship.flight_state", "equals": "Flying"}, "frames": 25, "timeout_ms": 10000},
     {"assert": {"path": "player.location", "equals": "Cockpit"}},
     {"assert": {"path": "ship.door_state", "equals": "Closed"}},
-    {"assert": {"path": "ship.nearby_body.surface_distance_meters", "gt": 100}}
+    {"assert": {"path": "ship.nearby_body.surface_distance_meters", "gt": 100}},
+    {"assert": {"path": "ship.speed_meters_per_second", "gt": 0}},
+    {"assert": {"path": "ship.thruster_percentage", "equals": 0}}
   ]
 }

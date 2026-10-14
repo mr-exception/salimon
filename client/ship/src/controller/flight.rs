@@ -42,7 +42,7 @@ impl ShipController {
             FlightState::Flying | FlightState::Bouncing { .. } => self.velocity,
             FlightState::AssistedLanding { .. } | FlightState::AssistedTakeoff { .. } => {
                 let assist = self.assist.as_ref().expect("active assistance has a path");
-                scale(assist.surface_normal, assist.radial_speed_meters_per_second)
+                assist.velocity_meters_per_second
             }
             FlightState::Landed { .. } | FlightState::GroundedAfterCrash { .. } => [0.0; 3],
         }

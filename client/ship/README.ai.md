@@ -18,7 +18,8 @@ continuous collision and crash settling with unit tests.
 
 Each timed assist captures its starting pose and radial waypoints, then evaluates
 the path from elapsed `Duration`. Landing is 8 seconds (2 alignment, 4 approach,
-2 touchdown); takeoff is 6 seconds (2 local lift, 4 clearance). Keep the local
+2 touchdown); takeoff is 6 seconds (2 local lift, 4 accelerating clearance).
+Recovery adds 2 seconds of safe lift and 2 seconds of reposition before landing. Keep the local
 15 m phases readable across every catalog radius and preserve smooth position,
 orientation, and velocity at phase boundaries. Assist timing must consume the
 full supplied delta independently of the shared runtime fixed-tick scheduler.

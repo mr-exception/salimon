@@ -568,3 +568,7 @@ The Core-local display maps `ShipSnapshot::core_status` field-for-field to
 `CoreInstruments` alongside explicit bus power. Display formatting/cache and
 physical surface routing belong to renderer; mechanical intake remains
 available without power.
+
+Crash-grounded L input routes through the same ship-domain assisted action as
+normal landing. Automation uses that production route; tests cover lift/recovery
+and safe relocation on representative terrain with authored support geometry.

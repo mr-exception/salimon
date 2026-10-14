@@ -247,6 +247,73 @@ mod tests {
         assert_eq!(ship.snapshot().flight_state, FlightState::Flying);
     }
     #[test]
+    fn crashed_ship_repositions_from_unsafe_crater_and_lands_on_supported_feet() {
+        let body = *CELESTIAL_BODIES
+            .iter()
+            .find(|b| b.id == salimon_world::CelestialBodyId::Moon)
+            .unwrap();
+        let direction = scale(
+            [100.0, 0.0, body.radius_meters],
+            1.0 / length([100.0, 0.0, body.radius_meters]),
+        );
+        let mode = TerrainMode::Representative;
+        let height = mode.sample(body, direction).elevation_meters;
+        let mut ship = ShipController::flying_with_velocity(
+            ShipPose {
+                position_meters: body
+                    .center
+                    .translated(scale(direction, body.radius_meters + height + 100.0))
+                    .meters(),
+                orientation: [0.0, 0.0, 0.0, 1.0],
+            },
+            0,
+            scale(direction, -1000.0),
+        )
+        .unwrap();
+        ship.configure_terrain(mode, footprint());
+        ship.advance(Duration::from_secs(1));
+        ship.advance(Duration::from_secs(5));
+        assert!(matches!(
+            ship.snapshot().flight_state,
+            FlightState::GroundedAfterCrash { .. }
+        ));
+        let crashed = ship.snapshot().pose;
+        ship.trigger_landing_action();
+        assert!(matches!(
+            ship.snapshot().flight_state,
+            FlightState::AssistedLanding { .. }
+        ));
+        let mut whole = ship.clone();
+        whole.advance(Duration::from_secs(12));
+        for _ in 0..1200 {
+            ship.advance(Duration::from_millis(10));
+        }
+        assert_eq!(ship.snapshot(), whole.snapshot());
+        let landed = ship.snapshot();
+        assert_eq!(landed.flight_state, FlightState::Landed { body: body.id });
+        let start_direction = scale(
+            sub(crashed.position_meters, body.center.meters()),
+            1.0 / length(sub(crashed.position_meters, body.center.meters())),
+        );
+        let end_direction = scale(
+            sub(landed.pose.position_meters, body.center.meters()),
+            1.0 / length(sub(landed.pose.position_meters, body.center.meters())),
+        );
+        assert!(length(sub(start_direction, end_direction)) > 1e-6);
+        let frame = crate::app::character_ship_frame(landed.pose);
+        for local in footprint().feet.iter().chain(&footprint().ramp) {
+            let world = frame.local_to_world(*local);
+            let relative = sub(world, body.center.meters());
+            let sample = mode.sample(body, scale(relative, 1.0 / length(relative)));
+            let gap = salimon_math::dot(
+                sub(relative, sample.body_local_position_meters),
+                landed.pose.axes()[1],
+            );
+            assert!((-0.001..=salimon_ship::MAX_SUPPORT_GAP_METERS + 0.001).contains(&gap));
+        }
+    }
+
+    #[test]
     fn steep_crater_footprints_reject_landing_without_starting_an_assist() {
         let body = *CELESTIAL_BODIES
             .iter()

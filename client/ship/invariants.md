@@ -18,7 +18,8 @@
 11. Flying movement segments sweep all solid bodies and terrain using the
     conservative collision radius. Terrain extrema are broad bounds only;
     local-normal clearance remains precise. The visual-only Sun is ignored.
-12. Landing is offered only with cockpit authority inside exactly `1.15R`, works
+12. Landing is offered only with powered cockpit authority inside inclusive starter `1.15R`
+    and total body-relative speed ≤20 m/s (including tangential motion), works
     for every solid catalog body, and preserves the captured approach location.
 13. Landing and takeoff automation cannot be cancelled and continues after the
     cockpit is left; steering and thruster input cannot override it.
@@ -30,10 +31,11 @@
     3,000,000 m threshold and reports actual signed radial velocity: negative
     approaching, positive receding, and zero stationary/tangential.
 17. Landing lasts 8 seconds and takeoff 6 seconds of supplied update time,
-    independent of frame partition or the render frame partition.
+    independent of frame partition or the render frame partition; recovery takes 12 seconds.
 18. Assist activation preserves the pose. Landing levels smoothly over 2 seconds
     before descending; takeoff preserves landed orientation. Every radial phase
-    begins and ends at rest, and the final pose is sampled exactly once at completion.
+    joins at rest except takeoff clearance, whose terminal analytic velocity
+    is handed to inertial flight with throttle zero. Completion consumes leftover time.
 19. Landing reserves 2 seconds for its last 15 m or less; takeoff reserves 2 seconds
     for its first 15 m, so local surface motion stays readable on every solid body.
 
@@ -91,7 +93,7 @@ idle drains and conversion use ordinary storage. Bus blackout cannot cancel the
 sequence. Completion refunds unused budget with capacity clipping. Repeated
 activation does not reserve twice; insufficient storage rejects before changing
 the path/flight state. The same portable reservation contract is available to
-the future recovery path; recovery flight itself remains its separate issue.
+the powered recovery path; the full 12-second reservation is 1.2 GJ by default.
 
 ## Mechanical Core intake and conversion (#189)
 
@@ -130,3 +132,30 @@ assumes unchanged loads and the currently accepted fragment only, accounts for
 finite conversion and wasted surplus at capacity, and excludes reserved assist
 joules from ordinary storage. Zero drain has no depletion estimate. Fractional
 storage powers the display even when whole-joule telemetry rounds to zero.
+
+## Safe assisted landing and recovery (#190)
+
+`AssistConfig` validates configurable activation range (starter 0.15R above the
+nominal surface) and total planet-relative speed limit (starter 20 m/s). Static
+catalog bodies have zero velocity, so total world velocity is planet-relative.
+Tangential motion counts; heading does not. Only powered cockpit authority may
+activate; full energy is reserved before state/path changes. Active sequences
+continue through cockpit exit and ordinary-bus outage.
+
+Crash-grounded recovery reserves 12 seconds: 2 seconds lifting with unchanged
+orientation, 2 seconds relocating on a spherical shell above the body's maximum
+terrain plus the conservative 16 m ship radius and 15 m margin, then standard
+8-second alignment/approach/touchdown. The immutable existing bounded site search
+checks authored feet/ramp/hull support at a 25 m grid over ±500 m in each tangent
+axis (at most 1681 candidates). No safe site rejects before energy debit; no
+power leaves the ship grounded. Rotation begins only after clearance.
+
+All assistance snapshots report analytic vector velocity, including relocation.
+Landing completes Landed with velocity and throttle zero. Takeoff clearance
+accelerates smoothly from rest and hands its analytic terminal outward velocity
+to Flying, throttle zero. Updates split at completion and apply remaining time
+to normal flight/idle consumption; partitioned inertial world-coordinate updates
+retain normal distant-anchor f64 quantization. Door interlocks are unchanged.
+
+Future landing upgrades may increase activation speed/range or reduce energy
+cost; upgrade progression and modifiers are documentation only in this wave.

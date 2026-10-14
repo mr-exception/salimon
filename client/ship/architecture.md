@@ -45,7 +45,9 @@ approaches over 4 seconds, then spends 2 seconds descending the last 15 m or
 less to the corresponding tangent surface pose. Takeoff follows that same
 normal, lifting 15 m over 2 seconds before clearing the landing volume over
 4 seconds. Smoothstep radial segments provide continuous position and velocity,
-with zero velocity at phase boundaries. Captured radial waypoints and elapsed
+with zero velocity at internal phase boundaries. Takeoff clearance uses an
+accelerating quadratic segment and hands its nonzero analytic terminal velocity
+to free flight with throttle zero. Captured radial waypoints and elapsed
 `Duration` make sampling independent of frame partition, without accumulated
 position error. Automatic sequences consume the full supplied delta; the
 runtime supplies shared 16 ms gameplay ticks. Runtime maps the active body's frame to
@@ -138,10 +140,11 @@ the ship becomes `GroundedAfterCrash` at zero velocity; captures/timing make
 bounce sampling independent of elapsed-time partition. No damage is applied.
 
 `Bouncing { body }` and `GroundedAfterCrash { body }` remain distinct from
-`Landed`: ordinary landing/takeoff and throttle commands cannot activate there.
+`Landed`: ordinary takeoff and throttle commands cannot activate there.
 Contextual messages identify settling/crash grounding; runtime maps their
 selected body's surface frame without treating the ship as properly landed.
-Powered recovery landing belongs to its later issue; #198 owns native M1 smoke.
+A powered cockpit L action starts reserved recovery after crash grounding;
+settling remains locked. #198 owns native M1 collision smoke.
 
 ## Physical mass accounting (#187)
 
@@ -187,8 +190,8 @@ transaction, not a persistent charging-rate assumption. Idle/propulsion draw is
 performed by `advance`; callers must not debit those consumers a second time.
 Invalid config/transactions leave previous state intact. Whole-joule snapshots
 truncate fractional energy; `power_available` is authoritative even below 1 J.
-Current captured assists remain uncancellable; their reserved budgets and
-powered recovery are separate follow-ups, not implemented by E02.
+Captured assists remain uncancellable, with isolated reserved budgets and
+powered crash recovery as described below.
 
 `advance_with_core_input(delta, incoming_joules)` settles converted energy at a
 step boundary with that step's normal idle/propulsion consumers before storage
@@ -205,7 +208,7 @@ idle drains and conversion use ordinary storage. Bus blackout cannot cancel the
 sequence. Completion refunds unused budget with capacity clipping. Repeated
 activation does not reserve twice; insufficient storage rejects before changing
 the path/flight state. The same portable reservation contract is available to
-the future recovery path; recovery flight itself remains its separate issue.
+the powered recovery path, which reserves 12 seconds (starter 1.2 GJ).
 
 ## Mechanical Core intake and conversion (#189)
 
@@ -244,3 +247,30 @@ assumes unchanged loads and the currently accepted fragment only, accounts for
 finite conversion and wasted surplus at capacity, and excludes reserved assist
 joules from ordinary storage. Zero drain has no depletion estimate. Fractional
 storage powers the display even when whole-joule telemetry rounds to zero.
+
+## Safe assisted landing and recovery (#190)
+
+`AssistConfig` validates configurable activation range (starter 0.15R above the
+nominal surface) and total planet-relative speed limit (starter 20 m/s). Static
+catalog bodies have zero velocity, so total world velocity is planet-relative.
+Tangential motion counts; heading does not. Only powered cockpit authority may
+activate; full energy is reserved before state/path changes. Active sequences
+continue through cockpit exit and ordinary-bus outage.
+
+Crash-grounded recovery reserves 12 seconds: 2 seconds lifting with unchanged
+orientation, 2 seconds relocating on a spherical shell above the body's maximum
+terrain plus the conservative 16 m ship radius and 15 m margin, then standard
+8-second alignment/approach/touchdown. The immutable existing bounded site search
+checks authored feet/ramp/hull support at a 25 m grid over ±500 m in each tangent
+axis (at most 1681 candidates). No safe site rejects before energy debit; no
+power leaves the ship grounded. Rotation begins only after clearance.
+
+All assistance snapshots report analytic vector velocity, including relocation.
+Landing completes Landed with velocity and throttle zero. Takeoff clearance
+accelerates smoothly from rest and hands its analytic terminal outward velocity
+to Flying, throttle zero. Updates split at completion and apply remaining time
+to normal flight/idle consumption; partitioned inertial world-coordinate updates
+retain normal distant-anchor f64 quantization. Door interlocks are unchanged.
+
+Future landing upgrades may increase activation speed/range or reduce energy
+cost; upgrade progression and modifiers are documentation only in this wave.

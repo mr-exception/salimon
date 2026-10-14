@@ -80,7 +80,7 @@ impl Readback {
             .map_err(|e| fail(e.to_string()))?;
         let mut rgba = Vec::with_capacity((self.width * self.height * 4) as usize);
         for row in mapped.chunks_exact(self.stride as usize) {
-            for pixel in row[..self.width as usize * 4].chunks_exact(4) {
+            for pixel in row[..self.width as usize * 4].as_chunks::<4>().0 {
                 rgba.extend(if self.bgra {
                     [pixel[2], pixel[1], pixel[0], pixel[3]]
                 } else {

@@ -150,6 +150,7 @@ impl ShipController {
         if !self.energy_core.powered() {
             self.clear_throttle_input();
         }
+        self.settle_assist_energy(delta);
         match self.flight_state {
             FlightState::Flying => self.advance_powered_flight(delta, powered_seconds),
             FlightState::AssistedLanding { body } => self.advance_landing(body, delta),

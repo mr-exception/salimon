@@ -80,3 +80,15 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 27. Empty Core powers down cockpit controls/display and artificial cabin gravity;
     no planetary gravity takes over inside. Atomic exchanges debit consumers
     before clamping surplus to capacity. Invalid energy inputs are transactional.
+
+## Assisted energy reservation (#203)
+
+Activation atomically removes full forward watts × captured assist duration from
+the ordinary Core bus (starter landing 800 MJ, takeoff 600 MJ). This is a
+conservative configurable tuning estimate for the current kinematic paths, not
+a physical work calculation. Only the active assist spends the isolated budget;
+idle drains and conversion use ordinary storage. Bus blackout cannot cancel the
+sequence. Completion refunds unused budget with capacity clipping. Repeated
+activation does not reserve twice; insufficient storage rejects before changing
+the path/flight state. The same portable reservation contract is available to
+the future recovery path; recovery flight itself remains its separate issue.

@@ -10,6 +10,7 @@ pub enum CockpitMessage {
     GroundedAfterCrash,
     DoorObstructed,
     UnsafeLandingSite,
+    InsufficientAssistEnergy,
     PressToLand,
     PressToTakeOff,
     CloseDoorBeforeTakeoff,
@@ -23,6 +24,7 @@ impl CockpitMessage {
         match self {
             Self::CollisionSettling => "Collision settling in progress",
             Self::GroundedAfterCrash => "Ship grounded after collision",
+            Self::InsufficientAssistEnergy => "Insufficient Core energy for assistance",
             Self::UnsafeLandingSite => "Unsafe terrain: choose another landing site",
             Self::DoorObstructed => "Move clear of the boarding ramp",
             Self::DoorLockedWhileInFlight => "Door locked while in flight",

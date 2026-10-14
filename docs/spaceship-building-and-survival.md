@@ -192,8 +192,11 @@ preserving throttle selection and velocity. Inside gravity never falls back to
 planetary gravity. Charge restoration resumes selected throttle automatically.
 Core transactions can charge and discharge together; requested loads receive
 incoming energy before surplus storage is capped. Fractional joules are retained
-internally. Physical fragment intake/conversion, assist reservation/refunds and
-recovery landing remain follow-up tasks; active captured assists still complete.
+internally. Physical fragment intake/conversion and recovery landing remain follow-up tasks.
+Assist activation reserves forward watts × duration atomically (800 MJ landing,
+600 MJ takeoff at starter tuning). Reserved energy is isolated from ordinary
+consumers; bus blackout cannot cancel the path. Unused budget is refunded on
+completion, clipped to capacity. Insufficient energy rejects activation.
 
 `advance_with_core_input(delta, incoming_joules)` settles converted energy at a
 step boundary with that step's normal idle/propulsion consumers before storage

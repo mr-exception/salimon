@@ -194,3 +194,15 @@ powered recovery are separate follow-ups, not implemented by E02.
 step boundary with that step's normal idle/propulsion consumers before storage
 clipping. It preserves exact powered-thrust duration. Conversion timing/rate is
 owned by E03; no continuous charging source is assumed by this task.
+
+## Assisted energy reservation (#203)
+
+Activation atomically removes full forward watts × captured assist duration from
+the ordinary Core bus (starter landing 800 MJ, takeoff 600 MJ). This is a
+conservative configurable tuning estimate for the current kinematic paths, not
+a physical work calculation. Only the active assist spends the isolated budget;
+idle drains and conversion use ordinary storage. Bus blackout cannot cancel the
+sequence. Completion refunds unused budget with capacity clipping. Repeated
+activation does not reserve twice; insufficient storage rejects before changing
+the path/flight state. The same portable reservation contract is available to
+the future recovery path; recovery flight itself remains its separate issue.

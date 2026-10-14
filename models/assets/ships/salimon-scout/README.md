@@ -287,3 +287,14 @@ runtime corners. Preservation, manifest and runtime metadata use only
 `Monitor_Wide` with multifunction semantics. Export then run source/modular,
 asset, renderer and character checks as above; inspect native screenshots in
 [issue #171 evidence](../../../../reports/issue-171/README.md).
+
+## Core-local monitor (#194)
+
+`author_core_monitor.py` edits the energy-core component in Blender 4.5.3.
+`Core_Monitor` is a 1.30 × 0.65 m starboard-facing UV quad inside the existing
+Core collider, reusing `Cyan Display`; its dark margin is part of the live atlas.
+Export/verify source and modular ownership using the commands above. The
+validator checks exact corners, facing, UV fit and a two-triangle budget. The
+runtime renders live energy/consumption/conversion/depletion/warnings here,
+independently of the cockpit console. It blanks at outage; mechanical intake
+stays usable. Apple M1 visual signoff belongs to the separate native work.

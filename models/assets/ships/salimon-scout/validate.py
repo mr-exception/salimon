@@ -391,6 +391,19 @@ def validate_scout(context, data):
             for axis in range(3):
                 require(core_min[axis] >= core_center[axis]-core_size[axis]/2-1e-6, name)
                 require(core_max[axis] <= core_center[axis]+core_size[axis]/2+1e-6, name)
+    monitor = node(document, "Core_Monitor")
+    require(monitor["extras"]["salimon"]["displayRole"] == "energy-core", "Core monitor role")
+    primitive = document["meshes"][monitor["mesh"]]["primitives"][0]
+    require(document["accessors"][primitive["indices"]]["count"] == 6, "Core monitor quad budget")
+    uv = accessor_values(document, geometry, primitive["attributes"]["TEXCOORD_0"])
+    require({tuple(v) for v in uv} == {(0,0),(0,1),(1,0),(1,1)}, "Core monitor UV fit")
+    positions = accessor_values(document, geometry, primitive["attributes"]["POSITION"])
+    corners = {tuple(t): p for t, p in zip(uv, positions)}
+    for t, expected in { (0,0):[-.35,1.9,-.999], (0,1):[-.35,1.25,-.999],
+                         (1,0):[-1.65,1.9,-.999], (1,1):[-1.65,1.25,-.999] }.items():
+        assert_vectors_close(corners[t], expected)
+    normals = accessor_values(document, geometry, primitive["attributes"]["NORMAL"])
+    require(all(n[2] < -.999 for n in normals), "Core monitor must face starboard walkway")
     for collider_name, mesh_name in (("COLLIDER_AftDoor", "Exit_Door"),
                                      ("COLLIDER_InteriorCeiling", "Ceiling_Inner")):
         collider = node(document, collider_name)

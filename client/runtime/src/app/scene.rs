@@ -1,8 +1,8 @@
 //! Domain snapshots mapped to renderer-owned, absolute-metre DTOs.
 
 use salimon_renderer::{
-    CameraFrame, CockpitInstruments, NearbyBodyInstruments, PointLight, SceneInstance,
-    ShipMeshInstance, SphereInstance, SurfaceMaterial,
+    CameraFrame, CockpitInstruments, CoreInstruments, NearbyBodyInstruments, PointLight,
+    SceneInstance, ShipMeshInstance, SphereInstance, SurfaceMaterial,
 };
 use salimon_ship::ShipSnapshot;
 use salimon_world::{CelestialBodyId, WorldSnapshot};
@@ -14,6 +14,13 @@ pub(super) fn map_ship_to_renderer(ship: ShipSnapshot) -> ShipMeshInstance {
         door_open_fraction: ship.door_open_fraction as f32,
         instruments: CockpitInstruments {
             power_off: !ship.power_available,
+            core_status: CoreInstruments {
+                consumption_watts: ship.core_status.consumption_watts,
+                conversion_watts: ship.core_status.conversion_watts,
+                conversion_remaining_joules: ship.core_status.conversion_remaining_joules,
+                depletion_seconds: ship.core_status.depletion_seconds,
+                low_energy: ship.core_status.low_energy,
+            },
             speed_meters_per_second: ship.speed_meters_per_second,
             thruster_percentage: ship.thruster_percentage,
             core_energy_capacity_joules: ship.energy_core.capacity_joules,

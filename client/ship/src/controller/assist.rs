@@ -150,6 +150,12 @@ impl ShipController {
         }
     }
 
+    pub(super) fn active_assist_watts(&self) -> f64 {
+        self.assist
+            .as_ref()
+            .map_or(0.0, |assist| assist.energy_watts)
+    }
+
     fn reserve_assist_energy(&mut self, assist: &mut AssistTransition, duration: Duration) -> bool {
         // Captured kinematic paths use a conservative full forward-power estimate.
         // Idle consumers stay on the ordinary bus and cannot spend this budget.

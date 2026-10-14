@@ -120,3 +120,13 @@ nonzero thrust, including while the cockpit is empty; manual control still needs
 a powered pilot. Assists remain authoritative and reject manual overrides.
 Native and automation steering share gates; blackout/assist/exit clears the runtime
 latch, and OS repeat/focus replay cannot reinstall a stale steering press.
+
+## Physical Core status (#194)
+
+`ShipSnapshot::core_status` owns live ordinary-bus consumption plus isolated
+assist consumption, current conversion watts/yield remaining, low-energy state
+(10% or less), and the estimate of ordinary-bus time to depletion. The estimate
+assumes unchanged loads and the currently accepted fragment only, accounts for
+finite conversion and wasted surplus at capacity, and excludes reserved assist
+joules from ordinary storage. Zero drain has no depletion estimate. Fractional
+storage powers the display even when whole-joule telemetry rounds to zero.

@@ -75,7 +75,7 @@ def verify(document):
         for primitive in primitives:
             material = document['materials'][primitive['material']]['name']
             assert sum(mesh.materials[t.material_index].name == material for t in mesh.loop_triangles) == document['accessors'][primitive['indices']]['count']//3, name
-        if name == 'Monitor_Wide':
+        if name in ('Monitor_Wide', 'Core_Monitor'):
             assert count == 2 and len(mesh.uv_layers) == 1, name
             primitive = primitives[0]
             source_positions = accessor(primitive['attributes']['POSITION'])

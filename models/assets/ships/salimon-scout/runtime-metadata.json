@@ -1,8 +1,8 @@
 {
   "extras": {
     "salimon": {
-      "drawPrimitiveCount": 115,
-      "triangleCount": 6100,
+      "drawPrimitiveCount": 116,
+      "triangleCount": 6102,
       "materialCount": 13,
       "externalAssetDependencies": 0,
       "scaleFromTask7Baseline": [
@@ -126,6 +126,16 @@
         ],
         "dynamicShadows": false,
         "postEffects": false
+      },
+      "coreMonitor": {
+        "node": "Core_Monitor",
+        "textureRegionPixels": [
+          1536,
+          0,
+          512,
+          256
+        ],
+        "additionalDraws": 0
       }
     }
   },

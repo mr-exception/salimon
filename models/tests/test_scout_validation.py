@@ -60,6 +60,8 @@ class ScoutValidationTests(unittest.TestCase):
         cases = (
             ('Monitor_Wide', 'TEXCOORD_0', lambda p: (p[0], 1-p[1])),
             ('Monitor_Wide', 'NORMAL', lambda p: tuple(-v for v in p)),
+            ('Core_Monitor', 'NORMAL', lambda p: tuple(-v for v in p)),
+            ('Core_Monitor', 'TEXCOORD_0', lambda p: (p[0], 1-p[1])),
             ('Cockpit_Monitor_Housings', 'POSITION', lambda p: (p[0], p[1], p[2] + 5)),
             ('Hull_Nose', 'POSITION', lambda p: (p[0] + 1, p[1], p[2])),
             ('Cockpit_Glazing', 'POSITION', lambda p: (p[0] + 1, p[1], p[2])),

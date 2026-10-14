@@ -5,7 +5,7 @@
 //! for unchanged frames.
 
 const SECTION_WIDTH: u32 = 512;
-pub(crate) const ATLAS_WIDTH: u32 = SECTION_WIDTH * 3;
+pub(crate) const ATLAS_WIDTH: u32 = SECTION_WIDTH * 4;
 pub(crate) const ATLAS_HEIGHT: u32 = 256;
 
 /// Renderer-neutral values shown on the ship's physical cockpit monitors.
@@ -17,6 +17,7 @@ pub struct CockpitInstruments {
     pub core_energy_capacity_joules: u64,
     pub core_energy_stored_joules: u64,
     pub nearby_body: Option<NearbyBodyInstruments>,
+    pub core_status: CoreInstruments,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -25,6 +26,41 @@ pub struct NearbyBodyInstruments {
     pub surface_distance_meters: f64,
     /// Negative approaches, positive recedes, and zero is stationary.
     pub radial_speed_meters_per_second: f64,
+}
+
+/// Values for the distinct physical Core display; power comes from the bus DTO.
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct CoreInstruments {
+    pub consumption_watts: f64,
+    pub conversion_watts: f64,
+    pub conversion_remaining_joules: f64,
+    pub depletion_seconds: Option<f64>,
+    pub low_energy: bool,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct CoreDisplay {
+    consumption_kw: u64,
+    conversion_kw: u64,
+    remaining: EnergyDisplay,
+    depletion_seconds: Option<u64>,
+    converting: bool,
+    low_energy: bool,
+}
+impl From<CoreInstruments> for CoreDisplay {
+    fn from(v: CoreInstruments) -> Self {
+        Self {
+            consumption_kw: (v.consumption_watts.max(0.0) / 1000.0).round() as u64,
+            conversion_kw: (v.conversion_watts.max(0.0) / 1000.0).round() as u64,
+            remaining: EnergyDisplay::from_joules(v.conversion_remaining_joules.max(0.0) as u64),
+            depletion_seconds: v
+                .depletion_seconds
+                .filter(|s| s.is_finite() && *s >= 0.0)
+                .map(|s| s.ceil() as u64),
+            converting: v.conversion_remaining_joules > 0.0,
+            low_energy: v.low_energy,
+        }
+    }
 }
 
 const BACKGROUND: [u8; 4] = [6, 17, 23, 255];
@@ -182,6 +218,7 @@ struct DisplayKey {
     core_capacity: EnergyDisplay,
     core_stored: EnergyDisplay,
     nearby: Option<NearbyDisplay>,
+    core_status: CoreDisplay,
 }
 
 pub(crate) struct InstrumentAtlas {
@@ -208,6 +245,7 @@ impl InstrumentAtlas {
             core_capacity: EnergyDisplay::from_joules(values.core_energy_capacity_joules),
             core_stored: EnergyDisplay::from_joules(values.core_energy_stored_joules),
             nearby: values.nearby_body.map(NearbyDisplay::from_instruments),
+            core_status: values.core_status.into(),
         };
         if next.power_off {
             if self.displayed.is_some_and(|previous| previous.power_off) {
@@ -243,8 +281,80 @@ impl InstrumentAtlas {
         {
             self.draw_nearby(next.nearby);
         }
+        if self.displayed.is_none_or(|previous| {
+            previous.power_off
+                || previous.core_status != next.core_status
+                || previous.core_capacity != next.core_capacity
+                || previous.core_stored != next.core_stored
+        }) {
+            self.draw_core_status(next);
+        }
         self.displayed = Some(next);
         true
+    }
+
+    fn draw_core_status(&mut self, key: DisplayKey) {
+        self.section_frame(3, "ENERGY CORE");
+        let status = key.core_status;
+        let color = if status.low_energy { AMBER } else { CYAN };
+        self.text(
+            28,
+            66,
+            &format!(
+                "{} {} / {} {}",
+                key.core_stored.number(),
+                key.core_stored.unit.label(),
+                key.core_capacity.number(),
+                key.core_capacity.unit.label()
+            ),
+            3,
+            IVORY,
+        );
+        self.text(
+            28,
+            98,
+            &format!("DRAW {} kW", status.consumption_kw),
+            3,
+            CYAN,
+        );
+        self.text(
+            28,
+            132,
+            if status.converting {
+                "CONVERTING"
+            } else {
+                "INTAKE READY"
+            },
+            3,
+            CYAN,
+        );
+        self.text(
+            28,
+            159,
+            &format!(
+                "{} kW  {} {} LEFT",
+                status.conversion_kw,
+                status.remaining.number(),
+                status.remaining.unit.label()
+            ),
+            2,
+            MUTED,
+        );
+        let time = status
+            .depletion_seconds
+            .map_or("--".to_owned(), |s| format!("{s}s"));
+        self.text(28, 190, &format!("DEPLETION {time}"), 3, color);
+        self.text(
+            28,
+            226,
+            if status.low_energy {
+                "LOW ENERGY - REFUEL"
+            } else {
+                "POWER AVAILABLE"
+            },
+            2,
+            color,
+        );
     }
 
     fn draw_speed(&mut self, speed: SpeedDisplay, percentage: i8) {
@@ -467,7 +577,7 @@ pub(crate) fn glyph_rows(character: char) -> [u8; 7] {
 mod tests {
     use super::*;
 
-    fn regions(pixels: &[u8]) -> Vec<u8> {
+    pub(super) fn regions(pixels: &[u8]) -> Vec<u8> {
         (0..3)
             .flat_map(|section| {
                 (0..ATLAS_HEIGHT).flat_map(move |y| {
@@ -630,8 +740,8 @@ mod tests {
             original[panel_bytes..panel_bytes * 2]
         );
         assert_eq!(
-            regions(&atlas.pixels)[panel_bytes * 2..],
-            original[panel_bytes * 2..]
+            regions(&atlas.pixels)[panel_bytes * 2..panel_bytes * 3],
+            original[panel_bytes * 2..panel_bytes * 3]
         );
     }
 
@@ -733,7 +843,7 @@ mod tests {
             }
             assert!(!atlas.update(values));
         }
-        assert_eq!(atlas.pixels.len(), 1536 * 256 * 4);
+        assert_eq!(atlas.pixels.len(), 2048 * 256 * 4);
         assert_eq!(
             distance_unit(SpeedDisplay::from_meters_per_second(0.0)),
             "m"
@@ -810,5 +920,49 @@ mod power_tests {
         }));
         assert!(atlas.update(values));
         assert_eq!(atlas.pixels, before);
+    }
+}
+
+#[cfg(test)]
+mod core_display_tests {
+    use super::*;
+    fn core_region(atlas: &InstrumentAtlas) -> Vec<u8> {
+        (0..ATLAS_HEIGHT)
+            .flat_map(|y| {
+                let start = ((y * ATLAS_WIDTH + 3 * SECTION_WIDTH) * 4) as usize;
+                atlas.pixels[start..start + (SECTION_WIDTH * 4) as usize]
+                    .iter()
+                    .copied()
+            })
+            .collect()
+    }
+    #[test]
+    fn core_changes_preserve_console_and_cache_visible_precision() {
+        let mut atlas = InstrumentAtlas::new();
+        let base = CockpitInstruments::default();
+        atlas.update(base);
+        let console = super::tests::regions(&atlas.pixels);
+        let before = core_region(&atlas);
+        let values = CockpitInstruments {
+            core_status: CoreInstruments {
+                consumption_watts: 100_000_000.0,
+                conversion_watts: 200_000_000.0,
+                conversion_remaining_joules: 1_000_000_000.0,
+                depletion_seconds: Some(100.0),
+                low_energy: true,
+            },
+            ..base
+        };
+        assert!(atlas.update(values));
+        assert_eq!(super::tests::regions(&atlas.pixels), console);
+        assert_ne!(core_region(&atlas), before);
+        assert!(!atlas.update(CockpitInstruments {
+            core_status: CoreInstruments {
+                consumption_watts: 100_000_001.0,
+                ..values.core_status
+            },
+            ..values
+        }));
+        assert!(!atlas.update(values));
     }
 }

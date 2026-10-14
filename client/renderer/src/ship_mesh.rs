@@ -59,6 +59,7 @@ fn load_geometry() -> Result<ShipGeometry, RendererError> {
         let interior_flag = f32::from(interior_nodes[node.index()]);
         let display_flag = match node.name() {
             Some("Monitor_Wide") => 1.0,
+            Some("Core_Monitor") => 2.0,
             _ => 0.0,
         };
         let matrix = node.transform().matrix();
@@ -683,7 +684,7 @@ mod tests {
                 .as_chunks::<VERTEX_FLOATS>()
                 .0
                 .iter()
-                .filter(|vertex| vertex[17] > 0.0)
+                .filter(|vertex| vertex[17] == 1.0)
                 .collect();
             assert_eq!(vertices.len(), 6, "each screen is exactly two triangles");
             for vertex in &vertices {

@@ -38,8 +38,7 @@ resource mining, one-fragment carrying, planet/ship transfer and custom fragment
 motion/contact. Mining session deltas and physical fragments survive nearby
 streaming **in memory for the current session**. This is not disk/backend
 persistence. No orbital simulation, multiplayer or production survival is implemented.
-Core joule storage, watt consumers and power authority are implemented; assist reservations are implemented; physical Core intake/conversion remains
-a separate follow-up.
+Core joule storage, watt consumers and power authority are implemented; assist reservations are implemented; physical Core intake/conversion and a distinct Core-local status display are implemented.
 
 ## Accepted constraints
 

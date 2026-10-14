@@ -52,6 +52,17 @@ pub(crate) struct Conversion {
     remaining_joules: f64,
 }
 impl Conversion {
+    pub(crate) fn remaining_joules(&self) -> f64 {
+        self.remaining_joules
+    }
+    pub(crate) fn active_watts(&self) -> f64 {
+        if self.remaining_joules > 0.0 {
+            self.config.joules_per_second
+        } else {
+            0.0
+        }
+    }
+
     pub(crate) fn remaining_duration(&self) -> Duration {
         Duration::try_from_secs_f64(self.remaining_joules / self.config.joules_per_second)
             .unwrap_or(Duration::MAX)
@@ -183,6 +194,36 @@ mod tests {
             ship.snapshot().energy_core.capacity_joules
         );
     }
+    #[test]
+    fn depletion_estimate_accounts_for_finite_conversion_and_capacity_waste() {
+        let mut ship = ShipController::default();
+        ship.configure_energy_core(
+            crate::EnergyConfig {
+                capacity_joules: 1000,
+                forward_watts: 100.0,
+                reverse_watts: 50.0,
+                gravity_idle_watts: 10.0,
+                cockpit_idle_watts: 0.0,
+            },
+            1000.0,
+        )
+        .unwrap();
+        ship.configure_conversion(ConversionConfig {
+            joules_per_second: 200.0,
+            iron_joules_per_kg: 1000.0,
+            ..Default::default()
+        })
+        .unwrap();
+        ship.intake_carried_fragment(&mut carried(ResourceId::IronOre, 1.0));
+        let status = ship.snapshot().core_status;
+        assert_eq!(status.conversion_watts, 200.0);
+        assert_eq!(status.conversion_remaining_joules, 1000.0);
+        assert_eq!(status.depletion_seconds, Some(105.0));
+        ship.advance(Duration::from_secs(5));
+        assert_eq!(ship.snapshot().core_status.conversion_watts, 0.0);
+        assert_eq!(ship.snapshot().core_status.depletion_seconds, Some(100.0));
+    }
+
     #[test]
     fn zero_yield_is_consumed_and_invalid_config_preserves_state() {
         let mut ship = ShipController::default();

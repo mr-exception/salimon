@@ -185,6 +185,7 @@ impl ShipController {
             speed_meters_per_second: self.speed_meters_per_second(),
             velocity_meters_per_second,
             energy_core: self.energy_core.snapshot(),
+            core_status: self.core_status(),
             power_available: self.energy_core.powered(),
             nearby_body: self.nearby_body_telemetry(velocity_meters_per_second),
             cockpit_message: self.cockpit_message,

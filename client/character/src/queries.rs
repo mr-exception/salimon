@@ -194,3 +194,37 @@ mod sight_tests {
         assert!(ship_sight_obstruction([-10.0, 1.0, 0.0], [-11.0, 1.0, 0.0], false).is_none());
     }
 }
+
+/// Physical onboard membership uses the object's center in the authored cabin/nose.
+/// Inclusive boundaries are independent of door animation, furniture and handling mode.
+pub fn ship_contains_object(local: [f64; 3]) -> bool {
+    use crate::spatial_contracts::{CABIN_TRAVERSAL_BOUNDS, NOSE_FLOOR_BOUNDS};
+    let cabin = CABIN_TRAVERSAL_BOUNDS;
+    let nose = NOSE_FLOOR_BOUNDS;
+    local.iter().all(|v| v.is_finite())
+        && local[1] >= SHIP_FLOOR_HEIGHT
+        && local[1] <= SHIP_CEILING_HEIGHT
+        && ((local[0] >= cabin[0]
+            && local[0] <= cabin[1]
+            && local[2] >= cabin[4]
+            && local[2] <= cabin[5])
+            || (local[0] >= nose[0]
+                && local[0] <= nose[1]
+                && local[2] >= nose[4]
+                && local[2] <= nose[5]))
+}
+
+#[cfg(test)]
+mod containment_tests {
+    use super::*;
+    #[test]
+    fn authored_gate_nose_and_vertical_edges_define_membership() {
+        assert!(ship_contains_object([-7.24, 1.0, 0.0]));
+        assert!(!ship_contains_object([-7.240001, 1.0, 0.0]));
+        assert!(ship_contains_object([7.0, 1.0, 1.0]));
+        assert!(!ship_contains_object([7.0, 1.0, 1.2]));
+        assert!(!ship_contains_object([-5.0, 10.0, 0.0]));
+        assert!(!ship_contains_object([0.0, -1.0, 0.0]));
+        assert!(!ship_contains_object([f64::NAN, 1.0, 0.0]));
+    }
+}

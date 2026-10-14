@@ -144,7 +144,7 @@ it; releasing outside lets it fall onto radial ground.
 Identity, material, mass, and source stay unchanged through repeated trips.
 Current greybox cubes retain world-axis orientation with conservative clearance
 for rotated decks. This adds no abstract inventory, container system, cargo
-counting, rigid-body dynamics, or backend persistence.
+containers or backend persistence. Physical fragments now contribute to cached ship mass; see below.
 
 ## Implemented starter flight (#201)
 
@@ -168,3 +168,14 @@ rests in `GroundedAfterCrash`. This is separate from a proper assisted landing;
 ordinary L landing/takeoff cannot activate in crash states. No damage is applied.
 The current conservative collider remains; exact hull/contact physics and
 powered recovery landing are separate work.
+
+## Implemented physical ship mass (#187)
+
+Total mass includes the 100,000 kg dry hull and each positive-mass physical object
+whose center is in the authored cabin/nose, including carried and loose cargo.
+Installed equipment uses separate stable ledger identities when configured;
+current authored fixtures have no separate equipment weight definition. Pickup,
+release, growth, boundary crossings and despawn/consumption update the cache once
+per identity. Mass changes affect force/mass acceleration and preserve velocity.
+The lowered ramp outside the cabin is outside onboard containment. Session
+streaming never removes physical cargo. This does not add abstract inventories.

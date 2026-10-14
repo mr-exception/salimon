@@ -67,3 +67,7 @@
 Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
 and [world definition contract](../world/terrain-contract.md). Keep local rules
 and their consumers aligned; flat deterministic fixtures are explicit.
+
+- Physical fragment mutations emit coalesced stable-ID events; despawn/Core
+  consumption releases carrying and IDs are never reused. Querying/streaming
+  does not mutate or remove cargo. Historical extracted mass remains diagnostic.

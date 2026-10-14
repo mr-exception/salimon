@@ -111,7 +111,13 @@ impl ShipController {
         Ok(ship)
     }
 
-    /// Event-driven cached mass/thrust update. Does not scan cargo or reset momentum.
+    /// Event-driven cached mass update preserving thrust capacities and velocity.
+    pub fn set_total_mass_kg(&mut self, mass_kg: f64) -> Result<(), crate::InvalidFlightMotion> {
+        self.propulsion = self.propulsion.with_total_mass(mass_kg)?;
+        Ok(())
+    }
+
+    /// Validated scenario/tuning boundary. Does not scan cargo or reset velocity.
     pub fn set_propulsion(&mut self, propulsion: crate::Propulsion) {
         self.propulsion = propulsion;
     }

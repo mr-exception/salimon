@@ -159,3 +159,8 @@
 Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
 and [world definition contract](../world/terrain-contract.md). Keep local rules
 and their consumers aligned; flat deterministic fixtures are explicit.
+
+- Cargo mass composition drains physical mutation events after carrying/physics
+  synchronization. Centers use current authored ship bounds independent of door
+  animation; carried and loose objects share one identity. No extra per-tick
+  cargo scan determines propulsion mass.

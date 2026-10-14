@@ -7,6 +7,8 @@
 use salimon_world::LANDING_RANGE_ALTITUDE_RADIUS_FACTOR;
 use std::time::Duration;
 
+mod mass;
+pub use mass::{MassObjectId, ShipMass};
 mod propulsion;
 pub use propulsion::{
     InvalidFlightMotion, Propulsion, STARTER_DRY_MASS_KG, STARTER_FORWARD_FORCE_NEWTONS,

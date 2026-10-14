@@ -31,7 +31,51 @@ pub struct NearbyBodyTelemetry {
     pub radial_speed_meters_per_second: f64,
 }
 
+/// Core-local observation. Depletion assumes unchanged ordinary bus demand and
+/// includes only the currently accepted fragment, not future refueling.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct CoreStatus {
+    pub consumption_watts: f64,
+    pub conversion_watts: f64,
+    pub conversion_remaining_joules: f64,
+    pub depletion_seconds: Option<f64>,
+    pub low_energy: bool,
+}
+
 impl ShipController {
+    pub(super) fn core_status(&self) -> CoreStatus {
+        let demand = self.energy_core.config().demand_watts(
+            self.thruster_percentage,
+            self.flight_state == crate::FlightState::Flying,
+        );
+        let stored = self.energy_core.stored_joules();
+        let conversion = self.conversion.remaining_joules();
+        let rate = self.conversion.active_watts();
+        let depletion_seconds = if demand == 0.0 {
+            None
+        } else if rate < demand
+            && stored / (demand - rate) <= self.conversion.remaining_duration().as_secs_f64()
+        {
+            Some(stored / (demand - rate))
+        } else {
+            let duration = self.conversion.remaining_duration().as_secs_f64();
+            let after = (stored + conversion - demand * duration)
+                .clamp(0.0, self.energy_core.config().capacity_joules as f64);
+            Some(duration + after / demand)
+        };
+        CoreStatus {
+            consumption_watts: if self.energy_core.powered() {
+                demand
+            } else {
+                0.0
+            } + self.active_assist_watts(),
+            conversion_watts: rate,
+            conversion_remaining_joules: conversion,
+            depletion_seconds,
+            low_energy: stored / self.energy_core.config().capacity_joules as f64 <= 0.10,
+        }
+    }
+
     pub fn configure_energy_core(
         &mut self,
         config: crate::EnergyConfig,
@@ -164,5 +208,38 @@ mod tests {
 
         ship.pose.position_meters[0] += 1.0;
         assert!(ship.snapshot().nearby_body.is_none());
+    }
+}
+
+#[cfg(test)]
+mod core_status_tests {
+    use super::*;
+    use crate::EnergyConfig;
+    #[test]
+    fn core_status_uses_fractional_authority_and_idle_demand() {
+        let mut ship = ShipController::default();
+        ship.configure_energy_core(
+            EnergyConfig {
+                capacity_joules: 1000,
+                forward_watts: 100.0,
+                reverse_watts: 50.0,
+                gravity_idle_watts: 10.0,
+                cockpit_idle_watts: 0.0,
+            },
+            0.5,
+        )
+        .unwrap();
+        let snapshot = ship.snapshot();
+        assert_eq!(snapshot.energy_core.stored_joules, 0);
+        assert!(snapshot.power_available);
+        assert_eq!(snapshot.core_status.consumption_watts, 10.0);
+        assert_eq!(snapshot.core_status.depletion_seconds, Some(0.05));
+        assert!(snapshot.core_status.low_energy);
+        ship.set_stored_core_energy_joules(0);
+        assert!(!ship.snapshot().power_available);
+        assert_eq!(ship.snapshot().core_status.consumption_watts, 0.0);
+        ship.exchange_core_energy_joules(1000.0, 0.0).unwrap();
+        assert!(!ship.snapshot().core_status.low_energy);
+        assert_eq!(ship.snapshot().core_status.depletion_seconds, Some(100.0));
     }
 }

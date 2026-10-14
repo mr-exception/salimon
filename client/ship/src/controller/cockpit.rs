@@ -23,7 +23,7 @@ impl CockpitMessage {
     pub const fn text(self) -> &'static str {
         match self {
             Self::CollisionSettling => "Collision settling in progress",
-            Self::GroundedAfterCrash => "Ship grounded after collision",
+            Self::GroundedAfterCrash => "Ship grounded after collision - press L to recover",
             Self::InsufficientAssistEnergy => "Insufficient Core energy for assistance",
             Self::UnsafeLandingSite => "Unsafe terrain: choose another landing site",
             Self::DoorObstructed => "Move clear of the boarding ramp",

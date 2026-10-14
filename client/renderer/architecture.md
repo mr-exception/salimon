@@ -291,3 +291,13 @@ for reverse/forward selection; rasterization never controls ship authority.
 black once. Values changing while off cause no uploads; restoration redraws all
 three regions. The renderer consumes a power DTO, never derives gameplay power
 from rounded stored-joule telemetry.
+
+## Core-local monitor (#194)
+
+`Core_Monitor` is an authored two-triangle, starboard-facing screen in the
+energy-core component, distinct from `Monitor_Wide`. The existing opaque draw
+samples a cached 2048 × 256 atlas: the console occupies the first three 512 px
+regions and the Core the fourth. No extra draws/materials/pipelines. Both
+screens blank once on explicit bus power loss and redraw automatically at
+restoration. The Core region independently caches rounded kW, energy, seconds
+and warning/conversion state. Runtime maps domain status without deriving rules.

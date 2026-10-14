@@ -81,8 +81,11 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
         // Clamp inside the single display texture at an
         // edge. Explicit LOD permits sampling in this per-surface branch.
         let size = vec2<f32>(textureDimensions(instruments));
-        let pixel = vec2<f32>(0.5) + clamp(input.screen_uv, vec2<f32>(0.0), vec2<f32>(1.0))
-            * (size - vec2<f32>(1.0));
+        let core = input.display_flag == 2u;
+        let region = vec2<f32>(select(size.x * 0.75, size.x * 0.25, core), size.y);
+        let origin = vec2<f32>(select(0.0, size.x * 0.75, core), 0.0);
+        let pixel = origin + vec2<f32>(0.5) + clamp(input.screen_uv, vec2<f32>(0.0), vec2<f32>(1.0))
+            * (region - vec2<f32>(1.0));
         let uv = pixel / size;
         return textureSampleLevel(instruments, instrument_sampler, uv, 0.0);
     }

@@ -11,6 +11,40 @@ use salimon_math::{add, length as vector_length, scale, sub};
 use salimon_world::{BodyRole, CELESTIAL_BODIES, CelestialBody, CelestialBodyId};
 use std::time::Duration;
 
+/// Starter eligibility tuning. Future upgrades remain documentation only.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct AssistConfig {
+    pub landing_range_radius_fraction: f64,
+    pub maximum_landing_speed_meters_per_second: f64,
+}
+impl Default for AssistConfig {
+    fn default() -> Self {
+        Self {
+            landing_range_radius_fraction: LANDING_RANGE_RADIUS_FRACTION,
+            maximum_landing_speed_meters_per_second: 20.0,
+        }
+    }
+}
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct InvalidAssistConfig;
+impl std::fmt::Display for InvalidAssistConfig {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("assist range must be finite in (0, 1]; speed must be finite and nonnegative")
+    }
+}
+impl std::error::Error for InvalidAssistConfig {}
+
+const RECOVERY_LIFT_SECONDS: f64 = 2.0;
+const RECOVERY_REPOSITION_SECONDS: f64 = 2.0;
+const RECOVERY_DURATION: Duration = Duration::from_secs(12);
+
+#[derive(Clone, Debug)]
+struct RecoveryPath {
+    start_normal: [f64; 3],
+    start_distance: f64,
+    clearance_distance: f64,
+}
+
 const LANDING_ALIGNMENT_SECONDS: f64 = 2.0;
 const LANDING_APPROACH_SECONDS: f64 = 4.0;
 const LANDING_TOUCHDOWN_SECONDS: f64 = 2.0;
@@ -20,6 +54,9 @@ const TAKEOFF_CLEARANCE_SECONDS: f64 = 4.0;
 #[derive(Clone, Debug)]
 pub(crate) struct AssistTransition {
     elapsed: Duration,
+    duration: Duration,
+    recovery: Option<RecoveryPath>,
+    pub(super) velocity_meters_per_second: [f64; 3],
     reservation: Option<crate::energy::AssistEnergyReservation>,
     energy_watts: f64,
     start_pose: ShipPose,
@@ -29,18 +66,17 @@ pub(crate) struct AssistTransition {
     start_distance: f64,
     intermediate_distance: f64,
     destination_distance: f64,
-    pub(super) radial_speed_meters_per_second: f64,
 }
 
 impl AssistTransition {
-    fn new(pose: ShipPose, body: &CelestialBody, landing: bool) -> Self {
+    fn new(pose: ShipPose, body: &CelestialBody, landing: bool, range: f64) -> Self {
         let offset = sub(pose.position_meters, body.center.meters());
         let start_distance = vector_length(offset);
         let surface_normal = normalize_or(offset, pose.axes()[1]);
         let destination_distance = if landing {
             body.radius_meters + LANDED_ORIGIN_HEIGHT_METERS
         } else {
-            body.radius_meters * (1.0 + LANDING_RANGE_RADIUS_FRACTION) + COLLISION_RADIUS_METERS
+            body.radius_meters + body.radius_meters * range + COLLISION_RADIUS_METERS
         };
         let intermediate_distance = if landing {
             // Reserve visible local motion for touchdown even on the largest body.
@@ -51,6 +87,13 @@ impl AssistTransition {
         };
         Self {
             elapsed: Duration::ZERO,
+            duration: if landing {
+                LANDING_ASSIST_DURATION
+            } else {
+                TAKEOFF_ASSIST_DURATION
+            },
+            recovery: None,
+            velocity_meters_per_second: [0.0; 3],
             reservation: None,
             energy_watts: 0.0,
             landing_pose: None,
@@ -60,7 +103,6 @@ impl AssistTransition {
             start_distance,
             intermediate_distance,
             destination_distance,
-            radial_speed_meters_per_second: 0.0,
         }
     }
 }
@@ -87,6 +129,28 @@ fn eased_radial_segment(start: f64, end: f64, seconds: f64, duration: f64) -> (f
 }
 
 impl ShipController {
+    pub fn configure_assistance(
+        &mut self,
+        config: AssistConfig,
+    ) -> Result<(), InvalidAssistConfig> {
+        if !config.landing_range_radius_fraction.is_finite()
+            || config.landing_range_radius_fraction <= 0.0
+            || config.landing_range_radius_fraction > 1.0
+            || !config.maximum_landing_speed_meters_per_second.is_finite()
+            || config.maximum_landing_speed_meters_per_second < 0.0
+        {
+            return Err(InvalidAssistConfig);
+        }
+        self.assist_config = config;
+        Ok(())
+    }
+
+    pub(super) fn assist_remaining(&self) -> Option<Duration> {
+        self.assist
+            .as_ref()
+            .map(|assist| assist.duration.saturating_sub(assist.elapsed))
+    }
+
     /// Performs the contextual `L` action. Automatic sequences deliberately do
     /// nothing here, making them uncancellable once started.
     pub fn trigger_landing_action(&mut self) {
@@ -98,44 +162,26 @@ impl ShipController {
         match self.flight_state {
             FlightState::Flying => {
                 if let Some(body) = self.landing_target() {
-                    let mut assist = AssistTransition::new(self.pose, body, true);
-                    if self.terrain != salimon_world::terrain::TerrainMode::Flat {
-                        let Some(footprint) = &self.landing_footprint else {
-                            return;
-                        };
-                        let Some(pose) = crate::terrain_landing::landing_pose(
-                            *body,
-                            assist.surface_normal,
-                            self.pose.axes()[0],
-                            self.terrain,
-                            footprint,
-                        ) else {
-                            self.cockpit_message = Some(CockpitMessage::UnsafeLandingSite);
-                            return;
-                        };
-                        assist.destination_distance =
-                            vector_length(sub(pose.position_meters, body.center.meters()));
-                        assist.intermediate_distance = assist.destination_distance
-                            + ((assist.start_distance - assist.destination_distance).max(0.0)
-                                * 0.25)
-                                .min(15.0);
-                        assist.aligned_orientation = pose.orientation;
-                        assist.landing_pose = Some(pose);
-                    }
-                    if !self.reserve_assist_energy(&mut assist, LANDING_ASSIST_DURATION) {
-                        return;
-                    }
-                    self.assist = Some(assist);
-                    self.steering_target = SteeringInput::default();
-                    self.steering = SteeringInput::default();
-                    self.flight_state = FlightState::AssistedLanding { body: body.id };
+                    self.start_landing(body, false);
+                }
+            }
+            FlightState::GroundedAfterCrash { body } => {
+                if self.speed_meters_per_second()
+                    <= self.assist_config.maximum_landing_speed_meters_per_second
+                {
+                    self.start_landing(body_definition(body), true);
                 }
             }
             FlightState::Landed { body } => {
                 if self.door_state == DoorState::Open || self.door_open_fraction > 0.0 {
                     self.cockpit_message = Some(CockpitMessage::CloseDoorBeforeTakeoff);
                 } else {
-                    let mut assist = AssistTransition::new(self.pose, body_definition(body), false);
+                    let mut assist = AssistTransition::new(
+                        self.pose,
+                        body_definition(body),
+                        false,
+                        self.assist_config.landing_range_radius_fraction,
+                    );
                     if !self.reserve_assist_energy(&mut assist, TAKEOFF_ASSIST_DURATION) {
                         return;
                     }
@@ -145,9 +191,88 @@ impl ShipController {
             }
             FlightState::AssistedLanding { .. }
             | FlightState::AssistedTakeoff { .. }
-            | FlightState::Bouncing { .. }
-            | FlightState::GroundedAfterCrash { .. } => {}
+            | FlightState::Bouncing { .. } => {}
         }
+    }
+
+    fn start_landing(&mut self, body: &CelestialBody, recovering: bool) {
+        let mut assist = AssistTransition::new(
+            self.pose,
+            body,
+            true,
+            self.assist_config.landing_range_radius_fraction,
+        );
+        if self.terrain != salimon_world::terrain::TerrainMode::Flat {
+            let Some(footprint) = &self.landing_footprint else {
+                return;
+            };
+            let pose = if recovering {
+                crate::terrain_landing::nearby_landing_pose(
+                    *body,
+                    assist.surface_normal,
+                    self.terrain,
+                    footprint,
+                )
+            } else {
+                crate::terrain_landing::landing_pose(
+                    *body,
+                    assist.surface_normal,
+                    self.pose.axes()[0],
+                    self.terrain,
+                    footprint,
+                )
+            };
+            let Some(pose) = pose else {
+                self.cockpit_message = Some(CockpitMessage::UnsafeLandingSite);
+                return;
+            };
+            assist.destination_distance =
+                vector_length(sub(pose.position_meters, body.center.meters()));
+            assist.aligned_orientation = pose.orientation;
+            assist.landing_pose = Some(pose);
+        }
+        if recovering {
+            let start_normal = assist.surface_normal;
+            // A spherical shell above the maximum terrain and conservative ship
+            // radius keeps the unchanged crash orientation clear during relocation.
+            let clearance_distance = (body.radius_meters
+                + self.terrain.elevation_bounds(*body)[1]
+                + COLLISION_RADIUS_METERS
+                + 15.0)
+                .max(assist.start_distance);
+            assist.recovery = Some(RecoveryPath {
+                start_normal,
+                start_distance: assist.start_distance,
+                clearance_distance,
+            });
+            if let Some(pose) = assist.landing_pose {
+                assist.surface_normal = normalize_or(
+                    sub(pose.position_meters, body.center.meters()),
+                    start_normal,
+                );
+            }
+            assist.start_distance = clearance_distance;
+            assist.duration = RECOVERY_DURATION;
+        }
+        assist.intermediate_distance = assist.destination_distance
+            + ((assist.start_distance - assist.destination_distance).max(0.0) * 0.25).min(15.0);
+        let duration = assist.duration;
+        if !self.reserve_assist_energy(&mut assist, duration) {
+            return;
+        }
+        self.assist = Some(assist);
+        self.bounce = None;
+        self.velocity = [0.0; 3];
+        self.thruster_percentage = 0;
+        self.steering_target = SteeringInput::default();
+        self.steering = SteeringInput::default();
+        self.flight_state = FlightState::AssistedLanding { body: body.id };
+    }
+
+    pub(super) fn active_assist_watts(&self) -> f64 {
+        self.assist
+            .as_ref()
+            .map_or(0.0, |assist| assist.energy_watts)
     }
 
     fn reserve_assist_energy(&mut self, assist: &mut AssistTransition, duration: Duration) -> bool {
@@ -168,12 +293,7 @@ impl ShipController {
         let Some(assist) = self.assist.as_mut() else {
             return;
         };
-        let duration = match self.flight_state {
-            FlightState::AssistedLanding { .. } => LANDING_ASSIST_DURATION,
-            FlightState::AssistedTakeoff { .. } => TAKEOFF_ASSIST_DURATION,
-            _ => return,
-        };
-        let remaining = duration.saturating_sub(assist.elapsed);
+        let remaining = assist.duration.saturating_sub(assist.elapsed);
         if let Some(budget) = assist.reservation.as_mut() {
             budget.spend(assist.energy_watts * delta.min(remaining).as_secs_f64());
         }
@@ -190,10 +310,16 @@ impl ShipController {
     }
 
     pub(super) fn landing_target(&self) -> Option<&'static CelestialBody> {
+        if self.speed_meters_per_second()
+            > self.assist_config.maximum_landing_speed_meters_per_second
+        {
+            return None;
+        }
         CELESTIAL_BODIES.iter().find(|body| {
             body.role == BodyRole::Solid
                 && vector_length(sub(self.pose.position_meters, body.center.meters()))
-                    <= body.radius_meters * (1.0 + LANDING_RANGE_RADIUS_FRACTION)
+                    <= body.radius_meters
+                        + body.radius_meters * self.assist_config.landing_range_radius_fraction
         })
     }
 
@@ -202,11 +328,51 @@ impl ShipController {
             .assist
             .as_mut()
             .expect("landing captures an assist path");
-        assist.elapsed = assist
-            .elapsed
-            .saturating_add(delta)
-            .min(LANDING_ASSIST_DURATION);
-        let seconds = assist.elapsed.as_secs_f64();
+        assist.elapsed = assist.elapsed.saturating_add(delta).min(assist.duration);
+        let elapsed = assist.elapsed.as_secs_f64();
+        if let Some(recovery) = &assist.recovery {
+            if elapsed <= RECOVERY_LIFT_SECONDS {
+                let (distance, speed) = eased_radial_segment(
+                    recovery.start_distance,
+                    recovery.clearance_distance,
+                    elapsed,
+                    RECOVERY_LIFT_SECONDS,
+                );
+                self.pose.position_meters = add(
+                    body_definition(body_id).center.meters(),
+                    scale(recovery.start_normal, distance),
+                );
+                assist.velocity_meters_per_second = scale(recovery.start_normal, speed);
+                return;
+            }
+            if elapsed <= RECOVERY_LIFT_SECONDS + RECOVERY_REPOSITION_SECONDS {
+                let amount = ((elapsed - RECOVERY_LIFT_SECONDS) / RECOVERY_REPOSITION_SECONDS)
+                    .clamp(0.0, 1.0);
+                let difference = sub(assist.surface_normal, recovery.start_normal);
+                let direction = add(recovery.start_normal, scale(difference, smoothstep(amount)));
+                let normal = normalize_or(direction, assist.surface_normal);
+                let derivative = scale(
+                    sub(
+                        difference,
+                        scale(normal, salimon_math::dot(normal, difference)),
+                    ),
+                    6.0 * amount * (1.0 - amount)
+                        / (RECOVERY_REPOSITION_SECONDS * vector_length(direction)),
+                );
+                self.pose.position_meters = add(
+                    body_definition(body_id).center.meters(),
+                    scale(normal, recovery.clearance_distance),
+                );
+                assist.velocity_meters_per_second = scale(derivative, recovery.clearance_distance);
+                return;
+            }
+        }
+        let seconds = elapsed
+            - if assist.recovery.is_some() {
+                RECOVERY_LIFT_SECONDS + RECOVERY_REPOSITION_SECONDS
+            } else {
+                0.0
+            };
         let alignment = smoothstep(seconds / LANDING_ALIGNMENT_SECONDS);
         self.pose.orientation = quaternion_slerp(
             assist.start_pose.orientation,
@@ -215,6 +381,13 @@ impl ShipController {
         );
         // Hold the exact starting position while leveling the hull.
         if seconds <= LANDING_ALIGNMENT_SECONDS {
+            if assist.recovery.is_some() {
+                self.pose.position_meters = add(
+                    body_definition(body_id).center.meters(),
+                    scale(assist.surface_normal, assist.start_distance),
+                );
+            }
+            assist.velocity_meters_per_second = [0.0; 3];
             return;
         }
         let approach_elapsed = seconds - LANDING_ALIGNMENT_SECONDS;
@@ -233,12 +406,12 @@ impl ShipController {
                 LANDING_TOUCHDOWN_SECONDS,
             )
         };
-        assist.radial_speed_meters_per_second = speed;
+        assist.velocity_meters_per_second = scale(assist.surface_normal, speed);
         self.pose.position_meters = add(
             body_definition(body_id).center.meters(),
             scale(assist.surface_normal, distance),
         );
-        if assist.elapsed == LANDING_ASSIST_DURATION {
+        if assist.elapsed == assist.duration {
             if let Some(pose) = assist.landing_pose {
                 self.pose = pose;
             }
@@ -271,20 +444,21 @@ impl ShipController {
                 TAKEOFF_LIFT_SECONDS,
             )
         } else {
-            eased_radial_segment(
-                assist.intermediate_distance,
-                assist.destination_distance,
-                seconds - TAKEOFF_LIFT_SECONDS,
-                TAKEOFF_CLEARANCE_SECONDS,
+            let t = ((seconds - TAKEOFF_LIFT_SECONDS) / TAKEOFF_CLEARANCE_SECONDS).clamp(0.0, 1.0);
+            let travel = assist.destination_distance - assist.intermediate_distance;
+            (
+                assist.intermediate_distance + travel * t * t,
+                2.0 * travel * t / TAKEOFF_CLEARANCE_SECONDS,
             )
         };
-        assist.radial_speed_meters_per_second = speed;
+        assist.velocity_meters_per_second = scale(assist.surface_normal, speed);
         self.pose.position_meters = add(
             body_definition(body_id).center.meters(),
             scale(assist.surface_normal, distance),
         );
         if assist.elapsed == TAKEOFF_ASSIST_DURATION {
-            self.velocity = [0.0; 3];
+            self.velocity = assist.velocity_meters_per_second;
+            self.thruster_percentage = 0;
             self.flight_state = FlightState::Flying;
             self.finish_assist_energy();
             self.assist = None;
@@ -510,7 +684,13 @@ mod tests {
                     ship.advance(Duration::from_millis(10));
                     let flying = ship.snapshot();
                     assert_eq!(flying.flight_state, FlightState::Flying);
-                    assert_eq!(flying.velocity_meters_per_second, [0.0; 3]);
+                    let final_speed = 2.0
+                        * (clearance - (body.radius_meters + LANDED_ORIGIN_HEIGHT_METERS + 15.0))
+                        / TAKEOFF_CLEARANCE_SECONDS;
+                    assert!(
+                        (dot(flying.velocity_meters_per_second, normal) - final_speed).abs() < 1e-3
+                    );
+                    assert_eq!(flying.thruster_percentage, 0);
                     assert!(
                         (vector_length(sub(flying.pose.position_meters, body.center.meters()))
                             - clearance)
@@ -553,7 +733,23 @@ mod tests {
                 ] {
                     let mut partitioned = starting.clone();
                     advance_for(&mut partitioned, elapsed, step);
-                    assert_eq!(partitioned.snapshot(), reference.snapshot());
+                    if elapsed <= duration {
+                        assert_eq!(partitioned.snapshot(), reference.snapshot());
+                    } else {
+                        // Inertial continuation adds world-space f64 positions
+                        // at a 1e12 m anchor: up to 625 additions can accumulate
+                        // less than 0.1 m of coordinate quantization.
+                        let mut observed = partitioned.snapshot();
+                        let expected = reference.snapshot();
+                        assert!(
+                            vector_length(sub(
+                                observed.pose.position_meters,
+                                expected.pose.position_meters
+                            )) < 0.1
+                        );
+                        observed.pose.position_meters = expected.pose.position_meters;
+                        assert_eq!(observed, expected);
+                    }
                 }
                 if elapsed < duration {
                     assert_eq!(
@@ -580,7 +776,7 @@ mod tests {
         takeoff.trigger_landing_action();
         for (starting, phases, samples) in [
             (landing, [0, 2, 6, 8], [0.7, 2.1, 3.2, 6.1, 7.4]),
-            (takeoff, [0, 2, 6, 6], [0.7, 1.9, 2.1, 3.2, 5.4]),
+            (takeoff, [0, 2, 2, 2], [0.7, 1.9, 2.1, 3.2, 5.4]),
         ] {
             for seconds in phases {
                 let mut ship = starting.clone();
@@ -705,5 +901,144 @@ mod tests {
             ship.advance(Duration::from_millis(100));
         }
         assert_eq!(ship.snapshot().flight_state, FlightState::Flying);
+    }
+}
+
+#[cfg(test)]
+mod safety_tests {
+    use super::*;
+    use crate::orientation::axis_angle_quaternion;
+    use salimon_math::{dot, length};
+
+    #[test]
+    fn full_speed_including_tangential_motion_range_and_authority_gate_landing() {
+        let body = body_definition(CelestialBodyId::Earth);
+        let pose = ShipPose {
+            position_meters: add(body.center.meters(), [0.0, body.radius_meters * 1.15, 0.0]),
+            // Deliberately point sideways: heading never gates activation.
+            orientation: axis_angle_quaternion([0.0, 0.0, 1.0], 1.3),
+        };
+        for velocity in [[20.0, 0.0, 0.0], [0.0, -20.0, 0.0], [12.0, 16.0, 0.0]] {
+            let mut ship = ShipController::flying_with_velocity(pose, 100, velocity).unwrap();
+            ship.trigger_landing_action();
+            assert!(matches!(
+                ship.flight_state,
+                FlightState::AssistedLanding { .. }
+            ));
+        }
+        for velocity in [[20.001, 0.0, 0.0], [0.0, -20.001, 0.0], [15.0, 15.0, 0.0]] {
+            let mut ship = ShipController::flying_with_velocity(pose, 0, velocity).unwrap();
+            let before = ship.snapshot();
+            ship.trigger_landing_action();
+            assert_eq!(ship.snapshot(), before);
+            assert_eq!(ship.contextual_cockpit_message(), None);
+        }
+        let mut ship = ShipController::flying(pose, 0);
+        ship.set_cockpit_control(false);
+        ship.trigger_landing_action();
+        assert_eq!(ship.flight_state, FlightState::Flying);
+        ship.set_cockpit_control(true);
+        ship.pose.position_meters[1] += 0.01;
+        ship.trigger_landing_action();
+        assert_eq!(ship.flight_state, FlightState::Flying);
+        ship.configure_assistance(AssistConfig {
+            landing_range_radius_fraction: 0.2,
+            ..Default::default()
+        })
+        .unwrap();
+        ship.trigger_landing_action();
+        assert!(matches!(
+            ship.flight_state,
+            FlightState::AssistedLanding { .. }
+        ));
+        assert!(
+            ship.configure_assistance(AssistConfig {
+                maximum_landing_speed_meters_per_second: f64::NAN,
+                ..Default::default()
+            })
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn recovery_is_powered_reserved_uncancellable_and_safe_on_all_solids() {
+        for body in CELESTIAL_BODIES
+            .iter()
+            .filter(|b| b.role == BodyRole::Solid)
+        {
+            let normal = normalize_or([0.31, 0.72, -0.62], [0.0, 1.0, 0.0]);
+            let pose = ShipPose {
+                position_meters: add(
+                    body.center.meters(),
+                    scale(normal, body.radius_meters + COLLISION_RADIUS_METERS),
+                ),
+                orientation: axis_angle_quaternion([1.0, 0.0, 0.0], 1.7),
+            };
+            let mut ship = ShipController::flying(pose, 0);
+            ship.flight_state = FlightState::GroundedAfterCrash { body: body.id };
+            ship.set_stored_core_energy_joules(0);
+            ship.trigger_landing_action();
+            assert_eq!(ship.pose, pose);
+            assert!(matches!(
+                ship.flight_state,
+                FlightState::GroundedAfterCrash { .. }
+            ));
+            ship.set_stored_core_energy_joules(1_199_999_999);
+            ship.trigger_landing_action();
+            assert!(matches!(
+                ship.flight_state,
+                FlightState::GroundedAfterCrash { .. }
+            ));
+            assert_eq!(ship.snapshot().energy_core.stored_joules, 1_199_999_999);
+            ship.set_stored_core_energy_joules(1_200_000_000);
+            ship.trigger_landing_action();
+            assert_eq!(ship.snapshot().energy_core.stored_joules, 0);
+            assert_eq!(ship.pose, pose);
+            assert!(matches!(
+                ship.flight_state,
+                FlightState::AssistedLanding { .. }
+            ));
+            let mut whole = ship.clone();
+            whole.advance(RECOVERY_DURATION);
+            ship.trigger_landing_action();
+            ship.set_cockpit_control(false);
+            for _ in 0..400 {
+                ship.advance(Duration::from_millis(10));
+                assert_eq!(ship.pose.orientation, pose.orientation);
+                assert!(
+                    length(sub(ship.pose.position_meters, body.center.meters()))
+                        >= body.radius_meters + COLLISION_RADIUS_METERS - 0.001
+                );
+            }
+            for _ in 0..800 {
+                ship.advance(Duration::from_millis(10));
+            }
+            assert_eq!(ship.pose, whole.pose);
+            assert_eq!(ship.flight_state, FlightState::Landed { body: body.id });
+            assert_eq!(ship.velocity_meters_per_second(), [0.0; 3]);
+            assert_eq!(ship.thruster_percentage, 0);
+            assert!(dot(ship.pose.axes()[1], normal) > 1.0 - 1e-10);
+            assert!(ship.assist.is_none());
+        }
+    }
+
+    #[test]
+    fn takeoff_hands_velocity_to_inertial_flight_and_consumes_leftover_time() {
+        let mut ship = ShipController::default();
+        ship.set_cockpit_control(true);
+        ship.trigger_landing_action();
+        let mut whole = ship.clone();
+        ship.advance(TAKEOFF_ASSIST_DURATION);
+        let finish = ship.snapshot();
+        assert!(finish.speed_meters_per_second > 0.0);
+        assert_eq!(finish.thruster_percentage, 0);
+        ship.advance(Duration::from_secs(1));
+        let expected = add(
+            finish.pose.position_meters,
+            finish.velocity_meters_per_second,
+        );
+        assert!(length(sub(ship.pose.position_meters, expected)) < 0.001);
+        whole.advance(TAKEOFF_ASSIST_DURATION + Duration::from_secs(1));
+        assert_eq!(whole.snapshot(), ship.snapshot());
     }
 }

@@ -1095,7 +1095,7 @@ mod tests {
     }
 
     #[test]
-    fn crash_states_survive_runtime_mapping_and_cannot_activate_ordinary_assists() {
+    fn crash_states_map_to_powered_recovery_through_normal_landing_action() {
         let mut app = app(Scenario::OrbitEarth);
         let earth = salimon_world::CELESTIAL_BODIES
             .iter()
@@ -1134,11 +1134,17 @@ mod tests {
         let resting = app.ship.snapshot().pose;
         execute(&mut app, r#"{"protocol":1,"id":4,"op":"landing"}"#);
         app.advance_automation(Duration::from_secs(1));
-        assert_eq!(app.ship.snapshot().pose, resting);
+        assert!(app.ship.snapshot().pose.position_meters[1] > resting.position_meters[1]);
         assert_eq!(
             inspect(&app)["ship"]["flight_state"],
-            "GroundedAfterCrash { body: Earth }"
+            "AssistedLanding { body: Earth }"
         );
+        app.advance_automation(Duration::from_secs(11));
+        assert_eq!(
+            inspect(&app)["ship"]["flight_state"],
+            "Landed { body: Earth }"
+        );
+        assert_eq!(inspect(&app)["ship"]["speed_meters_per_second"], 0.0);
     }
 
     #[test]
@@ -1225,6 +1231,18 @@ mod tests {
         );
     }
 
+    #[test]
+    fn assisted_baselines_preserve_landing_and_handoff_to_inertial_takeoff() {
+        assert_gameplay_scenario(
+            Scenario::OrbitEarth,
+            include_str!("../../../scenarios/orbit-earth.json"),
+        );
+        assert_gameplay_scenario(
+            Scenario::LandedEarth,
+            include_str!("../../../scenarios/landed-earth.json"),
+        );
+    }
+
     fn assert_gameplay_scenario(initial: Scenario, source: &str) {
         let mut test = app(initial);
         let scenario: Value = serde_json::from_str(source).unwrap();
@@ -1239,7 +1257,32 @@ mod tests {
         )
         .unwrap();
         for (index, step) in scenario["steps"].as_array().unwrap().iter().enumerate() {
-            if let Some(action) = step.get("action") {
+            if let Some(wait) = step.get("wait") {
+                let path = wait["path"].as_str().unwrap();
+                let interval_ms = scenario["setup"]["step_ms"].as_u64().unwrap()
+                    * step["frames"].as_u64().unwrap();
+                let timeout_ms = step["timeout_ms"].as_u64().unwrap();
+                let mut elapsed = 0;
+                loop {
+                    let state = inspect(&test);
+                    let value = path.split('.').fold(&state, |value, key| {
+                        if value.is_array() {
+                            &value[key.parse::<usize>().unwrap()]
+                        } else {
+                            &value[key]
+                        }
+                    });
+                    if value == &wait["equals"] {
+                        break;
+                    }
+                    assert!(
+                        elapsed < timeout_ms,
+                        "wait at step {index}: {path}: {value}"
+                    );
+                    test.advance_automation(Duration::from_millis(interval_ms));
+                    elapsed += interval_ms;
+                }
+            } else if let Some(action) = step.get("action") {
                 let mut command = action.clone();
                 command["protocol"] = json!(1);
                 command["id"] = json!(index);
@@ -1293,6 +1336,21 @@ mod tests {
                 if let Some(expected) = check.get("equals") {
                     if value.is_number() && expected.is_number() {
                         assert_eq!(value.as_f64(), expected.as_f64(), "step {index}: {path}");
+                    } else if let (Some(actual), Some(expected)) =
+                        (value.as_array(), expected.as_array())
+                    {
+                        assert_eq!(actual.len(), expected.len(), "step {index}: {path}");
+                        for (actual, expected) in actual.iter().zip(expected) {
+                            if actual.is_number() && expected.is_number() {
+                                assert_eq!(
+                                    actual.as_f64(),
+                                    expected.as_f64(),
+                                    "step {index}: {path}"
+                                );
+                            } else {
+                                assert_eq!(actual, expected, "step {index}: {path}");
+                            }
+                        }
                     } else {
                         assert_eq!(value, expected, "step {index}: {path}");
                     }

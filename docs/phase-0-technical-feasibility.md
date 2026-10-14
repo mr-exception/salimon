@@ -96,9 +96,9 @@ salimon/
 - The player can travel between the included celestial bodies.
 ### Assisted landing
 - Phase 0 includes an **assisted landing mode** rather than requiring a realistic manual landing simulation.
-- When the ship enters landing range of a solid body, show **Press L to land** on the cockpit monitor while the player is actively controlling the ship. Landing range is defined as **0.15 × the target body's radius above its surface**. The prompt/assist is available regardless of the ship's current speed or orientation; Phase 0 does not require the player to slow down or align manually before engaging landing assist. Assisted landing can only be triggered while the player is actively controlling the ship from the cockpit.
+- When the ship enters landing range of a solid body, show **Press L to land** on the cockpit monitor while the player is actively controlling the ship. Landing range is defined as **0.15 × the target body's radius above its surface**. The prompt/assist requires total planet-relative speed ≤20 m/s including tangential motion. Heading is unrestricted; range and speed are configurable starter tuning. Assisted landing can only be triggered while the player is actively controlling the ship from the cockpit.
 - Assisted landing is not limited to predefined landing sites. Once within landing range, the player can initiate landing based on the current approach location and land at the corresponding valid point on the planet/Moon surface.
-- Activating landing assist immediately takes authority over the ship regardless of its prior speed/orientation, auto-aligns it to the local surface, reduces/normalizes motion as needed, descends at a controlled speed, and transitions into a stable landed state. Once assisted landing starts, it **cannot be cancelled in Phase 0** and must run to completion.
+- Activating landing assist immediately takes authority over the ship after the speed/range/energy eligibility checks, regardless of prior orientation, auto-aligns it to the local surface, reduces/normalizes motion as needed, descends at a controlled speed, and transitions into a stable landed state. Once assisted landing starts, it **cannot be cancelled in Phase 0** and must run to completion.
 - Surface walking uses a **single fixed gravity strength** on every solid Phase 0 body rather than planet-specific gravity values. This is the same fixed strength used by ship artificial gravity. For full-sphere walking, gravity direction follows the local surface normal toward the body's center while its strength remains constant everywhere.
 - The player can walk around the **entire spherical surface** of each supported solid body; Phase 0 does not simulate different gravitational strengths for Mercury, Venus, Earth, Mars, or the Moon.
 - Assisted landing and assisted takeoff must work on **every solid Phase 0 body: Mercury, Venus, Earth, Mars, and the Moon**.
@@ -236,3 +236,7 @@ The previously completed first-person character and walkable ship shell is now T
 1. Run the seven-scenario interactive benchmark on the reference M1 iMac at fixed 1920×1080 and confirm the 60 FPS hard floor.
 2. Record measured limitations/bottlenecks and complete the final go/revise/stop evaluation for the Rust/`wgpu` architecture.
 Phase 0 should therefore be treated as **implementation-complete, but not formally closed** until these two closure items are finished.
+
+Powered crash recovery and inertial takeoff now follow the maintained
+[ship assistance contract](../client/ship/architecture.md#safe-assisted-landing-and-recovery-190).
+Future upgrades to landing speed/range/energy cost remain documentation only.

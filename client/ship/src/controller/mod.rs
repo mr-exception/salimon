@@ -36,6 +36,7 @@ pub struct ShipController {
     steering_target: SteeringInput,
     steering: SteeringInput,
     pub(crate) assist: Option<AssistTransition>,
+    assist_config: crate::AssistConfig,
     bounce: Option<collision::Bounce>,
 }
 
@@ -70,6 +71,7 @@ impl Default for ShipController {
             steering_target: SteeringInput::default(),
             steering: SteeringInput::default(),
             assist: None,
+            assist_config: crate::AssistConfig::default(),
             bounce: None,
         }
     }
@@ -96,6 +98,7 @@ impl ShipController {
             steering_target: SteeringInput::default(),
             steering: SteeringInput::default(),
             assist: None,
+            assist_config: crate::AssistConfig::default(),
             bounce: None,
         }
     }
@@ -146,6 +149,15 @@ impl ShipController {
         if !incoming_joules.is_finite() || incoming_joules < 0.0 {
             return Err(crate::InvalidEnergy);
         }
+        if let Some(remaining) = self.assist_remaining()
+            && delta > remaining
+            && !remaining.is_zero()
+        {
+            let fraction = remaining.as_secs_f64() / delta.as_secs_f64();
+            let first_input = incoming_joules * fraction;
+            self.advance_with_core_input(remaining, first_input)?;
+            return self.advance_with_core_input(delta - remaining, incoming_joules - first_input);
+        }
         self.advance_door(delta);
         self.advance_throttle(delta);
         let powered_seconds = self.energy_core.advance_with_input(
@@ -185,6 +197,7 @@ impl ShipController {
             speed_meters_per_second: self.speed_meters_per_second(),
             velocity_meters_per_second,
             energy_core: self.energy_core.snapshot(),
+            core_status: self.core_status(),
             power_available: self.energy_core.powered(),
             nearby_body: self.nearby_body_telemetry(velocity_meters_per_second),
             cockpit_message: self.cockpit_message,

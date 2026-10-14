@@ -303,7 +303,7 @@ mod tests {
     }
 
     #[test]
-    fn low_speed_contact_decays_and_crash_cannot_start_ordinary_assists() {
+    fn low_speed_contact_decays_and_powerless_crash_stays_grounded() {
         let earth = *body_definition(CelestialBodyId::Earth);
         let mut ship = falling(earth, COLLISION_RADIUS_METERS + 1.0, 2.0, TerrainMode::Flat);
         ship.advance(Duration::from_millis(600));
@@ -325,6 +325,7 @@ mod tests {
         assert_eq!(ship.velocity_meters_per_second(), [0.0; 3]);
         assert_eq!(ship.speed_meters_per_second(), 0.0);
         let resting = ship.pose;
+        ship.set_stored_core_energy_joules(0);
         ship.trigger_landing_action();
         ship.advance(Duration::from_secs(20));
         assert_eq!(ship.pose, resting);
@@ -332,10 +333,7 @@ mod tests {
             ship.flight_state,
             FlightState::GroundedAfterCrash { body: earth.id }
         );
-        assert_eq!(
-            ship.contextual_cockpit_message(),
-            Some(CockpitMessage::GroundedAfterCrash)
-        );
+        assert_eq!(ship.contextual_cockpit_message(), None);
     }
 
     #[test]

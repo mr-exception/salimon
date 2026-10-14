@@ -1321,6 +1321,23 @@
           "pilotFacingYawDegrees": 0.0
         }
       }
+    },
+    {
+      "name": "Core_Monitor",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "interactive": "core-monitor",
+          "displayRole": "energy-core",
+          "uvOrigin": "top-left"
+        }
+      }
     }
   ],
   "materials": [

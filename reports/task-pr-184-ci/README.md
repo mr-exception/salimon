@@ -4,6 +4,8 @@
 
 All three jobs in [run 38518088509](https://github.com/mr-exception/salimon/actions/runs/38518088509) failed at the same Rust 1.99 Clippy diagnostic: `chunks_exact_to_as_chunks` in `client/renderer/src/capture.rs:83`.
 
+After repairing capture, [run 38524643440](https://github.com/mr-exception/salimon/actions/runs/38524643440) exposed the same lint in two terrain test triangle loops (`terrain_patches.rs:552` and `:657`). Both now use `as_chunks::<3>().0`, preserving complete-triangle iteration and test assertions.
+
 The capture pixel loop now uses `as_chunks::<4>().0`, as suggested by Clippy. Rows are already sliced to `width * 4` bytes, so no remainder is possible. Row-padding removal, RGBA/BGRA channel order and PNG encoding remain unchanged. The dynamic row-stride `chunks_exact` loop stays intact. No lint suppression or quality-gate relaxation was added.
 
 ## Validation

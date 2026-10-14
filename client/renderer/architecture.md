@@ -55,7 +55,7 @@ expands the checked-in ship mesh once at renderer initialization; material color
 and a door-vertex flag are retained in the GPU vertex stream. Opaque ship
 geometry writes reverse-Z depth first. One `Monitor_Wide` quad carries top-left UVs and a
 flat display flag. Its fragment branch samples a linearly filtered
-1536 × 256 sRGB texture without a separate draw or light pass.
+2048 × 256 sRGB atlas (three console regions plus one Core region) without a separate draw or light pass.
 `CockpitInstruments` carries presentation-only speed, shared power, Core energy,
 and optional nearby-body surface-distance/radial values;
 `cockpit_instruments.rs` caches rounded display keys before formatting or
@@ -304,17 +304,8 @@ and warning/conversion state. Runtime maps domain status without deriving rules.
 
 ## Vector navigation and braking (#193)
 
-Ship snapshots own ship-local unit velocity direction (undefined at rest),
-heading/velocity angle, signed instantaneous engine acceleration and an explicit
-reverse-stop estimate. Free-flight power and cached total mass determine actual
-engine acceleration; assists/crash states report it unavailable. Static catalog
-bodies have zero velocity, so nearby total relative speed equals vector magnitude.
-Full reverse estimates use configured reverse force, mass and watts including idle
-loads. They require nose alignment within 1e-9 transverse unit-vector magnitude;
-misalignment, no power, non-flight and zero reverse force never claim a stop.
-Required energy is compared with unreserved fractional storage; future conversion
-is not credited. Estimates assume unchanged heading/mass and collision-free travel,
-and never command steering or braking.
+Ship owns the [navigation feasibility contract](../ship/architecture.md#vector-navigation-and-braking-193).
+Runtime maps it without deriving rules; renderer formats observation DTOs only.
 
 The existing wide console shows velocity XYZ in ship-local axes (+X forward,
 +Y up, -Z starboard), angle, signed throttle/acceleration, kg mass, nearby total

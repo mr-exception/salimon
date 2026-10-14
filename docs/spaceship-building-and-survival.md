@@ -11,7 +11,7 @@ The spaceship is the player's **primary home, vehicle, survival system, workshop
 - Other systems such as railguns, laser weapons, fabrication, charging, processing, maintenance, and life-support functions should exist at distinct physical locations.
 - Other players aboard the ship may operate all modules except owner-only navigation.
 - The initial scout has a walkable cabin, cockpit, and aft airlock. Its separate port cargo room and protruding cargo hull module are removed to keep the exterior silhouette coherent.
-- The cockpit has a shorter nose and shorter canopy glazing. One center console carries three physical monitors, with a clear walking routes on both sides from the cabin past the console into the cockpit nose. Seated forward and downward visibility remains usable.
+- The cockpit has a shorter nose and shorter canopy glazing. One center console carries one wide multifunction monitor, with clear walking routes on both sides from the cabin past the console into the cockpit nose. Seated forward and downward visibility remains usable.
 - Loose physical fragments can be dropped on the main-cabin deck and travel with the ship. The initial scout has no dedicated cargo room or designated storage volume; its cabin bench and storage cabinet are removed. Future dedicated physical storage is an open design question in [Project Q&A](project-qa.md).
 
 ## Construction
@@ -164,9 +164,11 @@ completion and contact reset selection to zero.
 Free flight sweeps solid bodies/terrain to prevent high-speed tunneling. Contact
 zeros throttle and produces bounded, progressively damped normal rebounds, then
 rests in `GroundedAfterCrash`. This is separate from a proper assisted landing;
-ordinary L landing/takeoff cannot activate in crash states. No damage is applied.
-The current conservative collider remains; exact hull/contact physics and
-powered recovery landing are separate work.
+L requests powered recovery from a settled crash through the same cockpit action.
+Recovery reserves 12 seconds of power for lift, safe relocation and standard
+landing; without sufficient energy the ship stays grounded. It does not count
+as Landed until completion. No damage is applied. The current conservative
+collider remains; exact hull/contact physics is future work.
 
 ## Implemented physical ship mass (#187)
 
@@ -192,7 +194,7 @@ preserving throttle selection and velocity. Inside gravity never falls back to
 planetary gravity. Charge restoration resumes selected throttle automatically.
 Core transactions can charge and discharge together; requested loads receive
 incoming energy before surplus storage is capped. Fractional joules are retained
-internally. Physical fragment intake/conversion and recovery landing remain follow-up tasks.
+internally. Physical fragment intake/conversion and powered recovery are implemented.
 Assist activation reserves forward watts × duration atomically (800 MJ landing,
 600 MJ takeoff at starter tuning). Reserved energy is isolated from ordinary
 consumers; bus blackout cannot cancel the path. Unused budget is refunded on
@@ -214,7 +216,7 @@ excess energy above capacity is wasted and processing never pauses at full charg
 
 ## Interior blackout movement (#191)
 
-Without artificial gravity, indoor WASD and Space/Control translate in three
+Without artificial gravity, indoor WASD and Space/Shift translate in three
 dimensions. Releasing controls retains drift until contact. Power return restores
 walking/deck gravity from the current position. Loose cargo becomes weightless,
 retains velocity, contacts other fragments and stays bounded by cabin geometry.
@@ -228,3 +230,92 @@ throttle and heading survive outage; the ship coasts until conversion restores
 power, then selected nonzero thrust automatically returns even without a seated
 pilot. Steering stops at exhaustion and needs fresh powered input after outage.
 Assisted sequences retain their reserved energy and cannot be overridden.
+
+## Accepted propulsion and Core review (2026-10-14)
+
+These numbered references reconcile the 15-round, 84-decision review with the
+owning gameplay rules above. They supersede the original direct-speed/no-energy
+Phase 0 baseline; historical evidence remains evidence of its original revision.
+The [ship architecture](../client/ship/architecture.md) owns numerical contracts,
+and [technical architecture](technical-architecture.md#flight-update-and-validation-decisions-197)
+owns timing, validation and implementation boundaries.
+
+- **1–8:** Velocity persists independently of orientation, with no speed cap.
+  Ship-local forward/reverse force changes world velocity through total mass;
+  turning alone does not redirect travel. Signed −100..+100% throttle persists
+  after release/seat exit. Reverse is deliberately weaker.
+- **9–13:** This wave has no planetary ship gravity or orbital simulation.
+  Braking is manual reverse thrust; landing requires safe total speed; takeoff
+  retains terminal velocity. Mass affects translation only, not steering inertia.
+  Existing nearby-body EVA gravity remains a distinct character feature.
+- **14–18:** Count dry hull, configured equipment and all physical cargo.
+  Reverse force is 50% of forward; arrows change 1% and repeat while held.
+  Propulsion consumes Core energy; no reaction-mass fuel tank is introduced.
+- **19–24:** Every velocity component counts toward the starter 20 m/s landing
+  limit. Future upgrades may increase it. Show vector/relative speed and braking
+  distance/time. Empty energy prevents thrust/new assistance; watt draw scales
+  with absolute throttle and forward/reverse capacity. Fuel with physical
+  fragments using resource-specific energy ratios.
+- **25–30:** Interact with the Core while carrying one fragment. Its yield is
+  J/kg × material mass, converted at a configurable rate; over-capacity energy
+  is discarded. Reserve assistance energy up front. Future upgrades may improve
+  consumption; no progression/modifier system is implemented here.
+- **31–36:** Loose, held and future stored onboard objects count once. Mass
+  changes immediately affect acceleration without changing velocity or adding
+  recoil. Keep existing physical cargo contacts and permanent one-object carry.
+  Intake accepts one process at a time and keeps processing at full charge,
+  wasting excess. EVA inherits velocity once at exit; later ship acceleration
+  does not tow the player.
+- **37–41, 43–48:** Starter hull is 100 tonnes; 4 MN forward gives 40 m/s² dry,
+  with 2 MN reverse. Watt demand and resource J/kg are configuration, not physics
+  constants. Forward draw is 100 MW and reverse 50 MW; battery capacity is 60 GJ,
+  initially 75% (45 GJ). Ten minutes at full charge/max forward is a rough tuning
+  estimate excluding idle, not guaranteed endurance. Thrusters, assistance,
+  artificial gravity and cockpit consume power. Accepted fragments become energy
+  and cease to exist physically. Fixed stepping (42) belongs to technical architecture.
+- **49–54:** Accepted fragments disappear immediately; conversion transfers
+  joules gradually and continues without a nearby/seated player. Gravity and
+  cockpit have independent configurable idle loads. Depletion switches off
+  powered systems while preserving heading, signed throttle and coasting.
+  Restored power automatically resumes the selected nonzero throttle.
+- **55–60:** Without cabin gravity the player floats using EVA-like controls,
+  retaining momentum; loose fragments retain velocity and collide. Cockpit
+  controls wait for power; throttle persists. Manual power management is deferred
+  (58). Charging/discharging operate together on net available energy. A physical
+  Core-local status display includes remaining-runtime information.
+- **61–66:** The Core display blanks at depletion and restarts with power.
+  Interior movement retains momentum; detailed acceleration-induced cabin
+  forces are deferred. Contacts prevent penetration; ship contact response is
+  refined by decisions 74/79 below, with no damage. There are no powerless
+  alternative flight controls. Show velocity magnitude/vector and heading versus
+  travel angle on the cockpit console.
+- **67–71:** Landing/contact reset throttle to zero. Landing permits any heading
+  at total relative speed ≤20 m/s. Normal engine thrust is disabled during
+  assistance and stays zero afterward until changed. Braking estimates use the
+  full vector, orientation, reverse force and cached total mass; misaligned
+  reverse thrust cannot promise a stop. Sweep travel continuously against bodies
+  and terrain to prevent high-speed tunneling.
+- **73–77:** Endurance is an estimate, not a fixed core mechanic. A crash bounces
+  and settles without damage; the pilot requests recovery to standardize the
+  landed pose for takeoff. Proper landing finishes stationary, throttle zero.
+  Float to the Core and insert the carried fragment through normal interaction.
+  Cache mass from entry/exit/consumption events and reconcile explicitly for
+  validation, rather than scanning every flight tick.
+- **79–83 (final collision/recovery clarification):** Rebounds lose velocity until
+  resting in GroundedAfterCrash, distinct from Landed. L requests powered lift,
+  alignment and proper touchdown; the 20 m/s limit still applies. Insufficient
+  energy leaves the ship grounded until refueled. Deduct the entire assistance
+  budget atomically on activation, isolate it from other consumers, and refund
+  unused joules if applicable. Mechanical intake works without electricity and
+  can bootstrap the Core. These final clarifications supersede earlier shorthand
+  about stopping immediately or calling crash contact a stable Landed state.
+
+## Future upgrades and systems — OUT OF SCOPE for this wave
+
+Future thruster upgrades may change force/efficiency; landing upgrades may raise
+safe speed/range or reduce reserved cost. Future physical modules may add energy
+loads. Full cabin acceleration/inertial forces, gravity/orbits, manual per-system
+power management, damage, fuel reaction mass and survival consequences are not
+implemented by this wave. Existing configuration seams do not constitute an
+upgrade/progression system. Owner-only multiplayer navigation is a future rule;
+current client-only authority means the powered occupied cockpit.

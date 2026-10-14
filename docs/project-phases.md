@@ -52,7 +52,7 @@ Implemented beyond the navigation baseline:
 
 Modified deposits and physical fragments survive local streaming **in memory for
 the current session**. This is not disk/backend persistence. Production survival,
-energy/fuel management, crafting, NPCs, networking, multiplayer, economy and
+crafting, NPCs, networking, multiplayer, economy and
 orbital simulation remain deferred. `core/` remains a documentation-only backend
 boundary. The [technical architecture](technical-architecture.md) and
 [feature maintenance map](maintenance-map.md) define implemented owners/contracts.
@@ -65,3 +65,20 @@ not a current queue. Later small phases can extend physical cargo and ship
 interaction, then survival/ship systems, persistence/backend authority, ship
 modification, NPC interaction/economy and shared-universe capabilities. Exact
 ordering and phase completion criteria require their own decisions/issues.
+
+## Realistic flight/Core wave (#185–#197)
+
+The original baseline's direct-speed flight and no-energy exclusions are historical
+and explicitly superseded by inertial propulsion, signed throttle, event-driven
+mass, Core storage/conversion/reservations, power-dependent cabin gravity,
+blackout controls, swept crashes/recovery and physical instrumentation. This does
+not close or renumber Phase 0. See the [accepted gameplay decisions](spaceship-building-and-survival.md#accepted-propulsion-and-core-review-2026-10-14).
+
+Review decisions **9, 58, 63, 72, 84** constrain scope/workflow: ship gravity/orbits,
+manual power management and detailed inertial cabin forces remain OUT OF SCOPE;
+implementation uses small dependency-aware issues. The earlier instruction to
+hold issue creation was superseded by the later explicit request to create the
+GitHub queue. Update existing owned documents only, without a new central spec.
+Future thruster/landing upgrades and module loads remain documentation-only.
+Cloud unit/E2E/profiling work is #195/#196; Apple M1 physical signoff is isolated
+in native-labeled #198–#200 and is not established by cloud software rendering.

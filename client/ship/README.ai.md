@@ -43,3 +43,9 @@ with behavior changes and record completion evidence under root `reports/`.
 Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
 and [world definition contract](../world/terrain-contract.md). Keep local rules
 and their consumers aligned; flat deterministic fixtures are explicit.
+
+
+For approved flight/Core choices and historical supersession, follow the
+[owned review](../../docs/spaceship-building-and-survival.md#accepted-propulsion-and-core-review-2026-10-14).
+Future upgrade/module-load/inertial-cabin/orbit/manual-power features remain out
+of scope; do not interpret tuning setters as progression mechanics.

@@ -67,7 +67,8 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 
 23. Contact zeros throttle and starts bounded normal rebounds, then stable
     `GroundedAfterCrash` at rest. Crash states never count as an ordinary landed
-    ship and cannot trigger landing/takeoff through the existing L action.
+    ship; L can start powered recovery from GroundedAfterCrash, while ordinary
+    takeoff requires a completed proper landing.
 24. Collision work is bounded and conservative on unresolved terrain intervals.
     Rebound speed decreases monotonically; at most four captured rebounds occur.
     Contact settling introduces neither damage nor free-flight planetary gravity.
@@ -179,3 +180,10 @@ The existing wide console shows velocity XYZ in ship-local axes (+X forward,
 speed and reverse duration/distance/GJ. Unavailable readings use --; insufficient
 energy and alignment have explicit status. Rounded strings independently cache
 flight/braking/navigation regions. Core-local screen ownership is unchanged.
+
+
+The [accepted review](../../docs/spaceship-building-and-survival.md#accepted-propulsion-and-core-review-2026-10-14)
+supersedes historical direct-speed/no-energy baseline prose. Force/energy tuning
+is configurable; no ten-minute endurance invariant, steering inertia, reaction
+mass, upgrade system or orbital gravity is implied. GroundedAfterCrash and Landed
+remain distinct until powered recovery completes (final decisions 79–83).

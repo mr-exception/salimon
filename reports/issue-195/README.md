@@ -20,3 +20,11 @@ Validation (Linux x86_64, Rust 1.99.0):
 - Formatting, diff checks and workspace Clippy passed before handoff (same build environment).
 - Native software-rendered route results and any remaining environment limits are
   recorded below. Apple M1 hardware signoff remains in separate native tasks.
+
+## CI follow-up (2026-10-14)
+
+[Native builds run](https://github.com/mr-exception/salimon/actions/runs/38614292870)
+passed Linux, macOS and Windows at `3fdc74f902e78786253d39e866d7e69e0f243eb4`. Linux included Mesa software-Vulkan
+baseline/evidence routes and packaged-input smoke. This evidence predates the
+small subnormal-velocity normalization regression added to #193; its focused
+ship check passes separately. It does not establish physical Apple M1 signoff.

@@ -27,7 +27,8 @@ position, 4 seconds to approach a low hover, and 2 seconds to touch down. The
 final descent covers at most 15 m (a quarter of the available height for a close
 approach). Takeoff takes 6 seconds: a readable 15 m lift over 2 seconds, then
 4 seconds to clear the landing volume plus the collision radius. Each movement
-phase eases out of and into rest, and alignment follows the shortest quaternion
+phase joins at rest except final takeoff clearance, which hands its analytic
+terminal velocity into inertial flight. Alignment follows the shortest quaternion
 arc. Timing uses supplied elapsed time, including frames longer than 100 ms;
 no orientation or position change occurs on activation.
 
@@ -37,18 +38,25 @@ The configurable starter Core stores 45 GJ in a 60 GJ capacity. Forward/reverse
 thrust consumes up to 100 MW/50 MW plus independent gravity/cockpit idle loads.
 Power loss stops thrust, cockpit controls/display and artificial gravity while
 preserving throttle and velocity; charging resumes selected throttle. Fractional
-joules remain internal. Physical conversion/intake and persistence are separate
-work. See [Core power](architecture.md#authoritative-core-power-188). Nearby telemetry includes
+joules remain internal. Physical conversion/intake is implemented; persistence
+remains deferred. See [Core power](architecture.md#authoritative-core-power-188). Nearby telemetry includes
 the body's name, surface distance, and signed radial speed: negative approaches,
 positive recedes, and zero is stationary.
 
 The current scout uses a conservative 16 m collision radius for its
 18.33 × 4.00 × 20.00 m exterior. The landed pose places the authored runtime
-mesh's `-0.108 m` lowest local-Y point on Earth's nominal surface and preserves
-identity orientation so local `+Y` follows
-the starting surface normal.
+feet on the sampled surface with 2 m non-gear hull clearance and aligns local
+`+Y` with the starting surface normal.
 The custom source and runtime model remain under
 [`client/assets/ship`](../assets/ship/README.md).
 
 See [README.ai.md](README.ai.md), [architecture.md](architecture.md), and
 [invariants.md](invariants.md) before extending flight behavior.
+
+The starter assistance gate is total planet-relative speed ≤20 m/s, regardless
+of heading, plus cockpit authority and sufficient reserved energy. A settled
+crash remains GroundedAfterCrash until powered L recovery completes; it cannot
+take off directly. See [safe recovery](architecture.md#safe-assisted-landing-and-recovery-190)
+and [navigation](architecture.md#vector-navigation-and-braking-193).
+Future propulsion/landing upgrades and additional module power loads are OUT OF
+SCOPE; configuration APIs do not implement a progression system.

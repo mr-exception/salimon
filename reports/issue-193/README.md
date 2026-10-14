@@ -20,3 +20,11 @@ Validation (Linux x86_64, Rust 1.99.0):
 - Single codegen unit works around this container's archive builder producing empty object files with defaults.
 - Graphical cockpit evidence is not run at this point; shader/asset geometry is unchanged.
 - Apple M1 manual visual/performance signoff is outside this cloud issue.
+
+## CI follow-up (2026-10-14)
+
+[Native builds run](https://github.com/mr-exception/salimon/actions/runs/38613645207)
+passed Linux, macOS and Windows at `ef9d47f0cf6d4f3d97c010d1c1210d7471e76bde`. Linux included Mesa software-Vulkan
+baseline/evidence routes and packaged-input smoke. This evidence predates the
+small subnormal-velocity normalization regression added to #193; its focused
+ship check passes separately. It does not establish physical Apple M1 signoff.

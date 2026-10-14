@@ -230,3 +230,31 @@ legacy flat scenarios and F2 precision markers retain their fixtures. Read
 [the integration guide](terrain-validation.md) for budgets, approximation limits,
 physical policy and native/reference validation. Networking, persistence and
 volumetric terrain remain deferred.
+
+## Flight update and validation decisions (#197)
+
+Accepted review decisions **42 and 78** require deterministic bounded fixed ticks
+and explicit accumulated-time handling. Runtime admits elapsed time and drains
+16 ms ticks with a wall-clock catch-up budget; remaining backlog is retained.
+E2E explicit stepping drains admitted ticks without that wall-clock budget.
+Ship direct API updates split at energy/conversion/assist boundaries so force
+never extends beyond available power and takeoff consumes leftover elapsed time.
+No per-frame cargo scan determines propulsion mass: physical mutation/boundary
+events feed the cached ledger; explicit reconciliation is diagnostic only (77).
+
+Ship owns mass/force, fractional joules, single-fragment conversion, isolated
+assistance budgets and full-vector observational telemetry. Runtime supplies
+physical intake, containment and power snapshots to character/fragment adapters.
+Renderer receives observation DTOs only; it neither estimates stop feasibility
+nor commands thrust. See [ship contracts](../client/ship/architecture.md),
+[accepted gameplay decisions](spaceship-building-and-survival.md#accepted-propulsion-and-core-review-2026-10-14),
+[portable E2E](../scripts/README.md#realistic-flight-regression-195) and
+[500-cargo CPU profiling](../scripts/FRAGMENT_BENCHMARKS.md#flight-mass-and-cabin-power-cpu-profiles-196).
+
+Issue owners: #201 inertial force, #186 throttle, #202 swept crash, #187 cached
+mass, #188 Core, #189 intake, #203 reservations, #190 safe assist/recovery,
+#191 interior gravity, #192 blackout controls, #193 navigation, #194 Core display,
+#195 regressions, #196 profiling, #197 documentation. Hardware-only #198–#200
+remain native tasks; passing cloud checks does not imply M1/60 FPS validation.
+Future thruster/landing upgrades, extra module loads, full cabin inertial physics,
+ship gravity/orbits and manual power management are explicitly OUT OF SCOPE.

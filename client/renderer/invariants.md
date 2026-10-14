@@ -106,17 +106,8 @@ and warning/conversion state. Runtime maps domain status without deriving rules.
 
 ## Vector navigation and braking (#193)
 
-Ship snapshots own ship-local unit velocity direction (undefined at rest),
-heading/velocity angle, signed instantaneous engine acceleration and an explicit
-reverse-stop estimate. Free-flight power and cached total mass determine actual
-engine acceleration; assists/crash states report it unavailable. Static catalog
-bodies have zero velocity, so nearby total relative speed equals vector magnitude.
-Full reverse estimates use configured reverse force, mass and watts including idle
-loads. They require nose alignment within 1e-9 transverse unit-vector magnitude;
-misalignment, no power, non-flight and zero reverse force never claim a stop.
-Required energy is compared with unreserved fractional storage; future conversion
-is not credited. Estimates assume unchanged heading/mass and collision-free travel,
-and never command steering or braking.
+Ship owns the [navigation feasibility contract](../ship/architecture.md#vector-navigation-and-braking-193).
+Runtime maps it without deriving rules; renderer formats observation DTOs only.
 
 The existing wide console shows velocity XYZ in ship-local axes (+X forward,
 +Y up, -Z starboard), angle, signed throttle/acceleration, kg mass, nearby total

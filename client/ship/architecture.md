@@ -294,3 +294,15 @@ The existing wide console shows velocity XYZ in ship-local axes (+X forward,
 speed and reverse duration/distance/GJ. Unavailable readings use --; insufficient
 energy and alignment have explicit status. Rounded strings independently cache
 flight/braking/navigation regions. Core-local screen ownership is unchanged.
+
+
+## Accepted review and future boundaries (#197)
+
+The [2026-10-14 gameplay review](../../docs/spaceship-building-and-survival.md#accepted-propulsion-and-core-review-2026-10-14)
+records all gameplay choices and final supersessions. Review decisions 42/78
+belong to the [timing contract](../../docs/technical-architecture.md#flight-update-and-validation-decisions-197).
+Mass has no steering/recoil effect; starter tuning is configurable rather than
+an endurance guarantee. Future force/efficiency upgrades, landing speed/range/
+cost upgrades, extra module consumers, gravity/orbits, manual power management
+and detailed inertial cabin forces are OUT OF SCOPE. Existing setters are
+integration/tuning seams, not shipped upgrade mechanics.

@@ -101,15 +101,14 @@ impl EnergyCore {
             stored_joules: stored_joules.min(config.capacity_joules as f64),
         })
     }
-    pub(crate) fn reserve_assist(
-        &mut self,
-        joules: f64,
-    ) -> Option<AssistEnergyReservation> {
+    pub(crate) fn reserve_assist(&mut self, joules: f64) -> Option<AssistEnergyReservation> {
         if !joules.is_finite() || joules < 0.0 || joules > self.stored_joules {
             return None;
         }
         self.stored_joules -= joules;
-        Some(AssistEnergyReservation { remaining_joules: joules })
+        Some(AssistEnergyReservation {
+            remaining_joules: joules,
+        })
     }
     pub(crate) fn refund_assist(&mut self, reservation: AssistEnergyReservation) {
         // Capacity clipping applies even if conversion filled the bus during assist.

@@ -154,9 +154,9 @@ impl ShipController {
         // Captured kinematic paths use a conservative full forward-power estimate.
         // Idle consumers stay on the ordinary bus and cannot spend this budget.
         assist.energy_watts = self.energy_core.config().forward_watts;
-        assist.reservation = self.energy_core.reserve_assist(
-            assist.energy_watts * duration.as_secs_f64(),
-        );
+        assist.reservation = self
+            .energy_core
+            .reserve_assist(assist.energy_watts * duration.as_secs_f64());
         if assist.reservation.is_none() {
             self.cockpit_message = Some(CockpitMessage::InsufficientAssistEnergy);
             return false;
@@ -165,7 +165,9 @@ impl ShipController {
     }
 
     pub(super) fn settle_assist_energy(&mut self, delta: Duration) {
-        let Some(assist) = self.assist.as_mut() else { return; };
+        let Some(assist) = self.assist.as_mut() else {
+            return;
+        };
         let duration = match self.flight_state {
             FlightState::AssistedLanding { .. } => LANDING_ASSIST_DURATION,
             FlightState::AssistedTakeoff { .. } => TAKEOFF_ASSIST_DURATION,
@@ -178,7 +180,11 @@ impl ShipController {
     }
 
     fn finish_assist_energy(&mut self) {
-        if let Some(budget) = self.assist.as_mut().and_then(|assist| assist.reservation.take()) {
+        if let Some(budget) = self
+            .assist
+            .as_mut()
+            .and_then(|assist| assist.reservation.take())
+        {
             self.energy_core.refund_assist(budget);
         }
     }
@@ -301,7 +307,10 @@ mod tests {
         ship.trigger_landing_action();
         assert_eq!(ship.snapshot().flight_state, before.flight_state);
         assert_eq!(ship.snapshot().energy_core, before.energy_core);
-        assert_eq!(ship.snapshot().cockpit_message, Some(CockpitMessage::InsufficientAssistEnergy));
+        assert_eq!(
+            ship.snapshot().cockpit_message,
+            Some(CockpitMessage::InsufficientAssistEnergy)
+        );
         ship.set_stored_core_energy_joules(600_000_000);
         ship.trigger_landing_action();
         assert_eq!(ship.snapshot().energy_core.stored_joules, 0);

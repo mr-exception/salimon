@@ -5,8 +5,8 @@
    nearby flight and active assists lock it closed on interaction.
 3. A locked door interaction emits exactly `Door locked while in flight` through
    typed cockpit-message state.
-4. Leaving cockpit control never changes orientation, thruster, or current speed.
-5. Flying direct-speed motion continues while cockpit control is inactive.
+4. Leaving cockpit control never changes orientation, thruster, or current velocity.
+5. Flying inertial motion continues while cockpit control is inactive.
 6. Authoritative position and orientation math remains CPU-side `f64`.
 7. The crate owns no platform input, GPU resources, or character state.
 8. The flat default fixture places the authored feet on the nominal surface with
@@ -14,7 +14,7 @@
 9. Sustained pitch, yaw, and roll each use exactly 5 degrees/second after a
    0.12-second start/stop presentation ramp; leaving the cockpit clears input.
 10. Thruster adjustments require cockpit authority, change by explicit integer
-    percentage points, clamp to 0–100%, and map directly to speed.
+    percentage points, clamp to 0–100%, and select forward thrust capacity (signed selection follows in #186).
 11. Flying ships use the conservative collision radius against the sampled local
     surface, with extrema only as a broad bound. Flat fixtures keep their original
     sphere rule; the visual-only Sun is ignored.
@@ -51,3 +51,8 @@ owners. Orientation policies and regressions live in `orientation.rs`. See
 Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
 and [world definition contract](../world/terrain-contract.md). Keep local rules
 and their consumers aligned; flat deterministic fixtures are explicit.
+
+20. Flying velocity is authoritative world-space f64 momentum; orientation and
+    cockpit authority never reset it. Zero throttle coasts without drag or a cap.
+21. Validated cached mass/force inputs determine acceleration; speed telemetry is
+    the actual velocity magnitude, including captured assist paths.

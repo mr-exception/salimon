@@ -1,11 +1,17 @@
 //! Portable Phase 0 ship state and interaction rules.
 //!
-//! This crate owns direct-speed flight, smoothed steering, cockpit authority,
+//! This crate owns inertial force-based flight, smoothed steering, cockpit authority,
 //! solid-body collision correction, and landed/open-space airlock access without
 //! depending on platform input or GPU presentation.
 
 use salimon_world::LANDING_RANGE_ALTITUDE_RADIUS_FACTOR;
 use std::time::Duration;
+
+mod propulsion;
+pub use propulsion::{
+    InvalidFlightMotion, Propulsion, STARTER_DRY_MASS_KG, STARTER_FORWARD_FORCE_NEWTONS,
+    STARTER_REVERSE_FORCE_NEWTONS,
+};
 
 mod controller;
 mod orientation;

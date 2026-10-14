@@ -192,6 +192,7 @@ impl ShipController {
             if let Some(pose) = assist.landing_pose {
                 self.pose = pose;
             }
+            self.velocity = [0.0; 3];
             self.flight_state = FlightState::Landed { body: body_id };
             self.thruster_percentage = 0;
             self.assist = None;
@@ -232,6 +233,7 @@ impl ShipController {
             scale(assist.surface_normal, distance),
         );
         if assist.elapsed == TAKEOFF_ASSIST_DURATION {
+            self.velocity = [0.0; 3];
             self.flight_state = FlightState::Flying;
             self.assist = None;
         }

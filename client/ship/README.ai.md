@@ -10,10 +10,10 @@ constructors, update ordering and snapshots. Change rules in the focused
 `controller/{flight,steering,assist,door,cockpit,telemetry}.rs` owner and keep its
 regressions alongside it. `orientation.rs` owns local quaternion/vector policy.
 
-The portable assisted-landing/takeoff state machine builds on direct-speed
+The portable assisted-landing/takeoff state machine builds on inertial
 flight motion. Protect cockpit-only activation, exact landing range, arbitrary
 surface normals, uncancellable automatic completion, door-interlocked takeoff,
-cockpit exit, monitor-message routing, direct-speed continuation, steering, and
+cockpit exit, monitor-message routing, inertial continuation, steering, and
 collision correction with unit tests.
 
 Each timed assist captures its starting pose and radial waypoints, then evaluates

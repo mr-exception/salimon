@@ -13,7 +13,7 @@ that same controller, without adding controllers, crates or framework layers:
 
 | Module | Ownership and adjacent regression coverage |
 | --- | --- |
-| `flight.rs` | Thruster authority, direct speed/velocity, motion and solid-body correction |
+| `flight.rs` | Thruster authority, force-based acceleration and persistent velocity, motion and solid-body correction |
 | `steering.rs` | Input clamps, cockpit/flight gate, ramps and local-axis rotations |
 | `assist.rs` | Landing range, captured paths, timing/derivatives, takeoff interlocks and all-body assists |
 | `door.rs` | Landed/open-space permissions, locked interactions and reversible hinge animation |
@@ -33,7 +33,7 @@ renderer mapping.
 
 Orientation is a normalized local-to-world quaternion. `ShipPose::axes` exposes
 forward/up/port axes without leaking a math or engine dependency. The current
-advance step applies local-axis quaternion steering, direct speed along local +X,
+advance step applies local-axis quaternion steering, force-based acceleration along local +X,
 and nearest-valid-position correction against every solid catalog body while
 flying. Steering target and smoothed values are portable numeric state; platform
 key state remains outside this crate.
@@ -86,3 +86,17 @@ surface, supports a stopped or carrying walker, and joins radial ground at its t
 Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
 and [world definition contract](../world/terrain-contract.md). Keep local rules
 and their consumers aligned; flat deterministic fixtures are explicit.
+
+## Inertial propulsion (#201)
+
+Flying ships own persistent world-space f64 velocity independent of orientation.
+The starter dry hull is 100,000 kg; forward/reverse capacities are 4 MN/2 MN.
+`Propulsion` validates cached total mass and force capacities and computes signed
+local +X acceleration as force/mass. `set_propulsion` is an event-driven handoff
+for future E01 energy/cargo composition, with no per-tick cargo scans. Constant
+acceleration uses v*dt + 0.5*a*dt² and v += a*dt. Zero throttle coasts, steering
+changes only future thrust direction, and no drag, speed cap or body gravity is
+applied. Snapshot speed is the magnitude of actual velocity, including assists.
+`flying` starts at rest; `flying_with_velocity` explicitly seeds finite momentum.
+Assisted landing/takeoff retain captured paths and finish at rest. Collision
+correction is still the pre-#202 endpoint policy in this incremental change.

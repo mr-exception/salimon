@@ -1,6 +1,6 @@
 {
   "setup": {
-    "scenario": "orbit-earth",
+    "scenario": "coasting-orbit",
     "seed": 155,
     "step_ms": 16,
     "fragment_count": 1000,
@@ -25,12 +25,6 @@
       "assert": {
         "path": "world.sleeping_fragment_count",
         "equals": 1000
-      }
-    },
-    {
-      "action": {
-        "op": "thruster",
-        "direction": 1
       }
     },
     {
@@ -76,12 +70,6 @@
       "assert": {
         "path": "world.sleeping_fragment_count",
         "equals": 1000
-      }
-    },
-    {
-      "action": {
-        "op": "thruster",
-        "direction": -1
       }
     },
     {

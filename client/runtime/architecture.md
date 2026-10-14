@@ -469,3 +469,11 @@ character, mining, fragments and feedback in the same order. Lifecycle reset
 explicitly pauses across the gap and accounts for queued time as excluded.
 Ship updates no longer truncate direct travel to 100 ms; character callers
 with longer intervals use bounded slices rather than silently losing time.
+
+The `coasting-space` E2E fixture explicitly seeds 25,000 m/s world +X momentum
+and zero throttle for moving EVA. `open-space` continues to start at rest.
+Selected throttle no longer instantly assigns speed.
+The `eva-approach` fixture seeds -25,000 m/s world Y momentum at zero
+throttle for deterministic nearby-body influence crossings.
+`coasting-orbit` seeds the same +X momentum near Earth for the existing loaded
+cargo sleep/assist acceptance route, retaining its high-speed coverage.

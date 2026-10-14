@@ -1,10 +1,9 @@
 {
-  "setup": {"scenario": "open-space", "seed": 0, "step_ms": 16},
+  "setup": {"scenario": "coasting-space", "seed": 0, "step_ms": 16},
   "timeout_ms": 120000,
   "steps": [
     {"assert": {"path": "ship.nearby_body", "equals": null}},
     {"assert": {"path": "ship.flight_state", "equals": "Flying"}},
-    {"action": {"op": "thruster", "direction": 1}},
     {"action": {"op": "interact"}},
     {"action": {"op": "key", "key": "backward", "pressed": true}},
     {"action": {"op": "step", "frames": 110}},

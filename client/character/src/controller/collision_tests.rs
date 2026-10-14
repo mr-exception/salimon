@@ -145,6 +145,7 @@ fn surface_walkers_cannot_enter_through_the_hull_with_either_door_state() {
             origin_meters: [60_000_000.0, 7_000_000.0, -3_000_000.0],
         };
         let surface = SurfaceFrame {
+            query: None,
             body_center_meters: sub(ship.origin_meters, scale(ship.axes[1], 6_000_000.0)),
             radius_meters: 6_000_000.0,
         };

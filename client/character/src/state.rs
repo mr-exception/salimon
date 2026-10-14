@@ -30,10 +30,12 @@ impl ShipFrame {
         ]
     }
 }
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug)]
 pub struct SurfaceFrame {
     pub body_center_meters: [f64; 3],
     pub radius_meters: f64,
+    /// Pure caller query in absolute metres; None retains the flat sphere fixture.
+    pub query: Option<GroundQuery>,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -73,4 +75,57 @@ pub(crate) enum PositionState {
     Space {
         world: [f64; 3],
     },
+}
+
+/// Ground point and outward unit normal in the caller's absolute frame.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct GroundSample {
+    pub position_meters: [f64; 3],
+    pub normal: [f64; 3],
+    pub slope: f64,
+}
+pub type GroundQuery = fn(SurfaceFrame, [f64; 3]) -> GroundSample;
+
+impl PartialEq for SurfaceFrame {
+    fn eq(&self, other: &Self) -> bool {
+        self.body_center_meters == other.body_center_meters
+            && self.radius_meters == other.radius_meters
+            && match (self.query, other.query) {
+                (None, None) => true,
+                (Some(a), Some(b)) => std::ptr::fn_addr_eq(a, b),
+                _ => false,
+            }
+    }
+}
+impl SurfaceFrame {
+    pub fn sample(self, world: [f64; 3]) -> GroundSample {
+        if let Some(query) = self.query {
+            return query(self, world);
+        }
+        let relative = sub(world, self.body_center_meters);
+        let magnitude = dot(relative, relative).sqrt();
+        let normal = if magnitude > 1e-12 {
+            scale(relative, 1.0 / magnitude)
+        } else {
+            [0.0, 1.0, 0.0]
+        };
+        GroundSample {
+            position_meters: add(self.body_center_meters, scale(normal, self.radius_meters)),
+            normal,
+            slope: 0.0,
+        }
+    }
+    pub fn eye_on_ground(self, world: [f64; 3]) -> [f64; 3] {
+        let radial = crate::math::normalize(sub(world, self.body_center_meters));
+        if self.query.is_none() {
+            return add(
+                self.body_center_meters,
+                scale(radial, self.radius_meters + crate::PLAYER_EYE_HEIGHT_METERS),
+            );
+        }
+        add(
+            self.sample(world).position_meters,
+            scale(radial, crate::PLAYER_EYE_HEIGHT_METERS),
+        )
+    }
 }

@@ -1,6 +1,10 @@
 //! Radial surface walking, camera tangents and collision-resolved eye height.
 use super::*;
 
+/// 40 degrees, measured by the shared ground query.
+pub const MAX_TRAVERSABLE_SLOPE: f64 = 0.839_099_631_177_28;
+pub const MAX_STEP_HEIGHT_METERS: f64 = 0.3;
+
 impl CharacterController {
     pub(super) fn advance_surface(&mut self, mut world: [f64; 3], step: &Step) {
         let Step {
@@ -28,6 +32,7 @@ impl CharacterController {
             // coordinates, a world round-trip can decode just inside
             // it and incorrectly admit the next inward walk step.
         }
+        let old_world = world;
         let up = normalize(sub(world, surface.body_center_meters));
         let (forward, right) = surface_view_basis(ship.axes, up, self.yaw_radians);
         let movement = movement_axes(input);
@@ -36,7 +41,41 @@ impl CharacterController {
             world,
             scale(tangent, WALK_SPEED_METERS_PER_SECOND * seconds),
         );
-        world = project_eye_to_surface(world, surface);
+        let ground = surface.sample(world);
+        let previous_ground = surface.sample(old_world);
+        let rise = dot(
+            sub(ground.position_meters, previous_ground.position_meters),
+            up,
+        );
+        if surface.query.is_some()
+            && ((ground.slope > MAX_TRAVERSABLE_SLOPE && rise >= -0.001)
+                || rise > MAX_STEP_HEIGHT_METERS)
+        {
+            world = old_world;
+        }
+        if surface.query.is_none() {
+            // The old deterministic sphere fixtures retain their pre-terrain walking policy.
+            world = project_eye_to_surface(world, surface);
+        } else {
+            let old_height = dot(sub(old_world, surface.eye_on_ground(old_world)), up).max(0.0);
+            if step.jump_started && self.vertical_speed == 0.0 && old_height < 0.001 {
+                self.vertical_speed = JUMP_SPEED_METERS_PER_SECOND;
+            }
+            let on_ground =
+                old_height < 0.001 && self.vertical_speed == 0.0 && rise >= -MAX_STEP_HEIGHT_METERS;
+            let height = if on_ground {
+                0.0
+            } else {
+                (dot(sub(world, surface.eye_on_ground(world)), up) + self.vertical_speed * seconds
+                    - 0.5 * FIXED_GRAVITY_METERS_PER_SECOND_SQUARED * seconds * seconds)
+                    .max(0.0)
+            };
+            self.vertical_speed -= FIXED_GRAVITY_METERS_PER_SECOND_SQUARED * seconds;
+            if height == 0.0 {
+                self.vertical_speed = 0.0;
+            }
+            world = add(project_eye_to_surface(world, surface), scale(up, height));
+        }
 
         let proposed = ship.world_to_local(world);
         let overlaps_hull = overlaps_exterior_hull(proposed);
@@ -126,13 +165,7 @@ pub(super) fn surface_view_basis(
     (forward, right)
 }
 pub(super) fn project_eye_to_surface(world: [f64; 3], surface: SurfaceFrame) -> [f64; 3] {
-    add(
-        surface.body_center_meters,
-        scale(
-            normalize(sub(world, surface.body_center_meters)),
-            surface.radius_meters + PLAYER_EYE_HEIGHT_METERS,
-        ),
-    )
+    surface.eye_on_ground(world)
 }
 
 pub(super) fn surface_eye_at_ship_planar_position(
@@ -140,6 +173,19 @@ pub(super) fn surface_eye_at_ship_planar_position(
     ship: ShipFrame,
     surface: SurfaceFrame,
 ) -> [f64; 3] {
+    if surface.query.is_some() {
+        for _ in 0..6 {
+            let world = ship.local_to_world(local);
+            let eye = surface.eye_on_ground(world);
+            let normal = surface.sample(world).normal;
+            let denominator = dot(ship.axes[1], normal);
+            if denominator.abs() < 0.1 {
+                return eye;
+            }
+            local[1] -= dot(sub(world, eye), normal) / denominator;
+        }
+        return ship.local_to_world(local);
+    }
     let center = ship.world_to_local(surface.body_center_meters);
     let radius = surface.radius_meters + PLAYER_EYE_HEIGHT_METERS;
     let forward = local[0] - center[0];
@@ -156,6 +202,7 @@ pub(super) fn surface_eye_at_ship_planar_position(
 mod tests {
     use super::super::test_support::*;
     use super::*;
+
     #[test]
     fn surface_motion_stays_on_full_sphere_with_fixed_eye_height() {
         let mut controller = CharacterController {
@@ -165,6 +212,7 @@ mod tests {
             ..CharacterController::default()
         };
         let small_surface = SurfaceFrame {
+            query: None,
             body_center_meters: [0.0, 0.0, 0.0],
             radius_meters: 10.0,
         };
@@ -230,6 +278,7 @@ mod tests {
 
         for (body, radius_meters, up, yaw_radians) in cases {
             let surface = SurfaceFrame {
+                query: None,
                 body_center_meters: [125.0, -80.0, 45.0],
                 radius_meters,
             };
@@ -289,6 +338,7 @@ mod tests {
     #[test]
     fn surface_forward_direction_tracks_camera_yaw_changes() {
         let surface = SurfaceFrame {
+            query: None,
             body_center_meters: [0.0, 0.0, 0.0],
             radius_meters: 100.0,
         };
@@ -335,5 +385,144 @@ mod tests {
             sub(turned, start)[2] > 0.0,
             "positive yaw should rotate surface-forward movement toward screen right"
         );
+    }
+}
+
+#[cfg(test)]
+mod terrain_tests {
+    use super::*;
+    use crate::GroundSample;
+    fn plane(_: SurfaceFrame, p: [f64; 3]) -> GroundSample {
+        GroundSample {
+            position_meters: [p[0], 0.4 * p[0], p[2]],
+            normal: normalize([-0.4, 1.0, 0.0]),
+            slope: 0.4,
+        }
+    }
+    fn steep(_: SurfaceFrame, p: [f64; 3]) -> GroundSample {
+        GroundSample {
+            position_meters: [p[0], 2.0 * p[0], p[2]],
+            normal: normalize([-2.0, 1.0, 0.0]),
+            slope: 2.0,
+        }
+    }
+    fn ledge(_: SurfaceFrame, p: [f64; 3]) -> GroundSample {
+        GroundSample {
+            position_meters: [p[0], if p[0] > 50.04 { 1.0 } else { 0.0 }, p[2]],
+            normal: [0.0, 1.0, 0.0],
+            slope: 0.0,
+        }
+    }
+    fn setup(query: crate::GroundQuery) -> (CharacterController, ShipFrame, SurfaceFrame) {
+        let surface = SurfaceFrame {
+            body_center_meters: [0.0, -1e12, 0.0],
+            radius_meters: 1e12,
+            query: Some(query),
+        };
+        let ship = ShipFrame {
+            origin_meters: [10000.0; 3],
+            axes: [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+        };
+        let world = surface.eye_on_ground([50.0, 0.0, 0.0]);
+        (
+            CharacterController {
+                position: PositionState::Surface { world },
+                ..CharacterController::default()
+            },
+            ship,
+            surface,
+        )
+    }
+    #[test]
+    fn walking_tracks_actual_ground_and_blocks_steep_uphill_and_large_steps() {
+        let (mut c, ship, s) = setup(plane);
+        for _ in 0..100 {
+            c.advance(
+                Duration::from_millis(16),
+                MovementInput {
+                    forward: true,
+                    ..MovementInput::default()
+                },
+                ship,
+                s,
+                false,
+                true,
+            );
+        }
+        let p = c.snapshot(ship, s).eye_position_meters;
+        assert!(p[0] > 55.0);
+        assert!((p[1] - 0.4 * p[0] - PLAYER_EYE_HEIGHT_METERS).abs() < 1e-6);
+        for query in [steep as crate::GroundQuery, ledge] {
+            let (mut c, ship, s) = setup(query);
+            let before = c.snapshot(ship, s).eye_position_meters;
+            for _ in 0..100 {
+                c.advance(
+                    Duration::from_millis(16),
+                    MovementInput {
+                        forward: true,
+                        ..MovementInput::default()
+                    },
+                    ship,
+                    s,
+                    false,
+                    true,
+                );
+            }
+            assert!(
+                salimon_math::length(sub(c.snapshot(ship, s).eye_position_meters, before)) < 1e-6
+            );
+        }
+        let (mut c, ship, s) = setup(steep);
+        for _ in 0..100 {
+            c.advance(
+                Duration::from_millis(16),
+                MovementInput {
+                    backward: true,
+                    ..MovementInput::default()
+                },
+                ship,
+                s,
+                false,
+                true,
+            );
+        }
+        assert!(
+            c.snapshot(ship, s).eye_position_meters[0] < 45.0,
+            "downhill escape remains possible"
+        );
+    }
+    #[test]
+    fn terrain_jump_is_ballistic_and_held_input_cannot_relaunch() {
+        let (mut c, ship, s) = setup(plane);
+        for _ in 0..20 {
+            c.advance(
+                Duration::from_millis(16),
+                MovementInput {
+                    jump: true,
+                    ..MovementInput::default()
+                },
+                ship,
+                s,
+                false,
+                true,
+            );
+        }
+        let p = c.snapshot(ship, s).eye_position_meters;
+        assert!(p[1] - 0.4 * p[0] - PLAYER_EYE_HEIGHT_METERS > 0.8);
+        for _ in 0..100 {
+            c.advance(
+                Duration::from_millis(16),
+                MovementInput {
+                    jump: true,
+                    ..MovementInput::default()
+                },
+                ship,
+                s,
+                false,
+                true,
+            );
+        }
+        let p = c.snapshot(ship, s).eye_position_meters;
+        assert!((p[1] - 0.4 * p[0] - PLAYER_EYE_HEIGHT_METERS).abs() < 1e-6);
     }
 }

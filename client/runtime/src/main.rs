@@ -15,6 +15,9 @@ mod mining_emission;
 mod resource_context;
 mod resource_presentation;
 mod reticle;
+mod terrain;
+mod terrain_observations;
+mod terrain_patches;
 mod update_clock;
 
 use std::process::ExitCode;

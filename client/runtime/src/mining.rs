@@ -4,11 +4,13 @@ use std::time::Duration;
 use salimon_character::{CharacterLocation, CharacterSnapshot, ShipFrame};
 use salimon_renderer::HeldItemInstance;
 use salimon_world::WorldPosition;
-use salimon_world::mining::{MiningRay, MiningSession, MiningTarget, aimed_deposit};
+use salimon_world::mining::{MiningRay, MiningSession, MiningTarget, aimed_deposit_with_terrain};
 use salimon_world::resource_generation::{GenerationError, SurfaceDeposit};
 
 #[derive(Default)]
 pub(crate) struct MiningTool {
+    pub(crate) terrain: salimon_world::terrain::TerrainMode,
+    placements: std::cell::RefCell<crate::resource_presentation::PlacementCache>,
     pub(crate) fragment_previous: std::collections::HashMap<
         salimon_world::resources::FragmentId,
         salimon_physics::ObjectState,
@@ -59,7 +61,12 @@ impl MiningTool {
         position: [f64; 3],
         seed: u64,
     ) -> Result<Vec<SurfaceDeposit>, GenerationError> {
-        let mut entries = crate::resource_presentation::nearby_deposits(position, seed)?;
+        let mut entries = crate::resource_presentation::nearby_deposits_cached(
+            position,
+            seed,
+            self.terrain,
+            &self.placements,
+        )?;
         self.session.apply_to(&mut entries);
         Ok(entries)
     }
@@ -96,10 +103,11 @@ impl MiningTool {
             frame.world_to_local(player.look_target_meters),
             door_open,
         );
-        aimed_deposit(
+        aimed_deposit_with_terrain(
             ray,
             &self.nearby(player.eye_position_meters, seed).ok()?,
             obstruction,
+            self.terrain,
         )
     }
 
@@ -151,7 +159,12 @@ impl MiningTool {
         self.session
             .extract_with_spawn(&mut entry.deposit, delta, |id, material, existing| {
                 let emission = emission.get_or_insert_with(|| {
-                    crate::mining_emission::EmissionSurface::new(source, ray, player)
+                    crate::mining_emission::EmissionSurface::with_terrain(
+                        source,
+                        ray,
+                        player,
+                        self.terrain,
+                    )
                 });
                 let (pose, velocity) = emission.spawn(id, material, existing)?;
                 motion.insert(

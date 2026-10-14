@@ -94,11 +94,9 @@ impl CharacterController {
             let next = ship.local_to_world(local);
             if self.nearby_surface.is_some()
                 && dot(
-                    sub(next, surface.body_center_meters),
-                    sub(next, surface.body_center_meters),
-                )
-                .sqrt()
-                    <= surface.radius_meters + PLAYER_EYE_HEIGHT_METERS
+                    sub(next, surface.eye_on_ground(next)),
+                    surface.sample(next).normal,
+                ) <= 0.0
             {
                 self.yaw_radians = dot(forward, ship.axes[2])
                     .atan2(dot(forward, ship.axes[0]))
@@ -165,6 +163,7 @@ mod nearby_eva_tests {
 
     fn body() -> SurfaceFrame {
         SurfaceFrame {
+            query: None,
             body_center_meters: [0.0; 3],
             radius_meters: 6_000_000.0,
         }
@@ -276,6 +275,7 @@ mod nearby_eva_tests {
         }
         assert_eq!(p.location(), CharacterLocation::Surface);
         let other = SurfaceFrame {
+            query: None,
             radius_meters: 1.0,
             ..body()
         };

@@ -1,0 +1,5 @@
+    Checking salimon-world v0.1.0 (<repo>/client/world)
+    Checking salimon-renderer v0.1.0 (<repo>/client/renderer)
+    Checking salimon-ship v0.1.0 (<repo>/client/ship)
+    Checking salimon-client v0.1.0 (<repo>/client/runtime)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.41s

@@ -1,0 +1,9 @@
+   Compiling salimon-math v0.1.0 (<repo>/client/math)
+   Compiling salimon-world v0.1.0 (<repo>/client/world)
+   Compiling salimon-renderer v0.1.0 (<repo>/client/renderer)
+   Compiling salimon-diagnostics v0.1.0 (<repo>/client/diagnostics)
+   Compiling salimon-physics v0.1.0 (<repo>/client/physics)
+   Compiling salimon-character v0.1.0 (<repo>/client/character)
+   Compiling salimon-ship v0.1.0 (<repo>/client/ship)
+   Compiling salimon-client v0.1.0 (<repo>/client/runtime)
+    Finished `release` profile [optimized] target(s) in 8.12s

@@ -2,7 +2,7 @@
 
 use salimon_character::{ShipFrame, SurfaceFrame};
 use salimon_ship::{FlightState, ShipPose, ShipSnapshot};
-use salimon_world::{CELESTIAL_BODIES, WorldPosition};
+use salimon_world::CELESTIAL_BODIES;
 
 pub(crate) fn character_ship_frame(pose: ShipPose) -> ShipFrame {
     ShipFrame {
@@ -34,18 +34,10 @@ pub(crate) fn surface_frame_for_ship(ship: ShipSnapshot) -> SurfaceFrame {
         .find(|body| body.id == body_id)
         .expect("ship body identifier belongs to the world catalog");
     SurfaceFrame {
+        query: None,
         body_center_meters: body.center.meters(),
         radius_meters: body.radius_meters,
     }
-}
-
-pub(crate) fn nearby_surface_at(eye: [f64; 3]) -> Option<SurfaceFrame> {
-    salimon_world::nearby_solid_body(WorldPosition::new(eye[0], eye[1], eye[2])).map(|(body, _)| {
-        SurfaceFrame {
-            body_center_meters: body.center.meters(),
-            radius_meters: body.radius_meters,
-        }
-    })
 }
 
 fn distance_squared(left: [f64; 3], right: [f64; 3]) -> f64 {

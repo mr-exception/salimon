@@ -1,0 +1,34 @@
+   Compiling salimon-client v0.1.0 (<repo>/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.91s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-df521c85aecb1550)
+
+running 4 tests
+Earth [0.0, 1.0, 0.0]: 332 patches
+Earth [0.0, 0.0, 1.0]: 332 patches
+Earth [0.7071067811865475, 0.7071067811865475, 0.0]: 456 patches
+Earth [0.5773502691896258, 0.5773502691896258, 0.5773502691896258]: 378 patches
+Earth [-0.5773502691896258, -0.5773502691896258, -0.5773502691896258]: 378 patches
+Moon [0.0, 1.0, 0.0]: 320 patches
+Moon [0.0, 0.0, 1.0]: 320 patches
+Moon [0.7071067811865475, 0.7071067811865475, 0.0]: 444 patches
+Moon [0.5773502691896258, 0.5773502691896258, 0.5773502691896258]: 372 patches
+Moon [-0.5773502691896258, -0.5773502691896258, -0.5773502691896258]: 372 patches
+Mars [0.0, 1.0, 0.0]: 320 patches
+Mars [0.0, 0.0, 1.0]: 320 patches
+Mars [0.7071067811865475, 0.7071067811865475, 0.0]: 436 patches
+Mars [0.5773502691896258, 0.5773502691896258, 0.5773502691896258]: 369 patches
+Mars [-0.5773502691896258, -0.5773502691896258, -0.5773502691896258]: 369 patches
+test terrain_patches::tests::cap_covers_poles_face_edges_and_corners_with_balanced_lod ... ok
+Earth [0.0, 1.0, 0.0]: 17276 near triangle centers, max error 0.002054072916507773 m
+Earth [0.0, 0.0, 1.0]: 17276 near triangle centers, max error 0.015133284032345774 m
+316 active, 166572 triangles, 7292016 CPU bytes, 316 generated
+Moon [0.0, 1.0, 0.0]: 15176 near triangle centers, max error 0.0002563335012514023 m
+Moon [0.0, 0.0, 1.0]: 15176 near triangle centers, max error 0.03787255613134842 m
+Mars [0.0, 1.0, 0.0]: 12704 near triangle centers, max error 0.001363669523343934 m
+test terrain_patches::tests::stream_generation_memory_and_revisit_identity_are_bounded ... ok
+Mars [0.0, 0.0, 1.0]: 12704 near triangle centers, max error 0.02980977809056941 m
+test terrain_patches::tests::mesh_contact_tolerance_is_measured_at_all_profile_craters_and_plain_spawns ... ok
+border vertices max query error 0.00007194320338831774 m, 13101 shared nodes
+test terrain_patches::tests::patch_vertices_and_stitched_borders_follow_authoritative_query ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 112 filtered out; finished in 9.78s

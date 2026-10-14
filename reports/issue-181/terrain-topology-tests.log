@@ -1,0 +1,10 @@
+   Compiling salimon-physics v0.1.0 (<repo>/client/physics)
+   Compiling salimon-character v0.1.0 (<repo>/client/character)
+   Compiling salimon-client v0.1.0 (<repo>/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.08s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-df521c85aecb1550)
+
+running 1 test
+test terrain_patches::topology_tests::mixed_lod_and_cross_face_segments_have_no_open_edges_inside_the_mask ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 116 filtered out; finished in 11.35s

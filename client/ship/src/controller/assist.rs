@@ -18,11 +18,12 @@ const TAKEOFF_LIFT_SECONDS: f64 = 2.0;
 const TAKEOFF_CLEARANCE_SECONDS: f64 = 4.0;
 /// Captured path data prevents accumulated position or frame-rate-dependent timing.
 #[derive(Clone, Debug)]
-pub(super) struct AssistTransition {
+pub(crate) struct AssistTransition {
     elapsed: Duration,
     start_pose: ShipPose,
     pub(super) surface_normal: [f64; 3],
     aligned_orientation: [f64; 4],
+    landing_pose: Option<ShipPose>,
     start_distance: f64,
     intermediate_distance: f64,
     destination_distance: f64,
@@ -48,6 +49,7 @@ impl AssistTransition {
         };
         Self {
             elapsed: Duration::ZERO,
+            landing_pose: None,
             start_pose: pose,
             surface_normal,
             aligned_orientation: surface_aligned_orientation(surface_normal, pose.axes()[0]),
@@ -91,7 +93,31 @@ impl ShipController {
         match self.flight_state {
             FlightState::Flying => {
                 if let Some(body) = self.landing_target() {
-                    self.assist = Some(AssistTransition::new(self.pose, body, true));
+                    let mut assist = AssistTransition::new(self.pose, body, true);
+                    if self.terrain != salimon_world::terrain::TerrainMode::Flat {
+                        let Some(footprint) = &self.landing_footprint else {
+                            return;
+                        };
+                        let Some(pose) = crate::terrain_landing::landing_pose(
+                            *body,
+                            assist.surface_normal,
+                            self.pose.axes()[0],
+                            self.terrain,
+                            footprint,
+                        ) else {
+                            self.cockpit_message = Some(CockpitMessage::UnsafeLandingSite);
+                            return;
+                        };
+                        assist.destination_distance =
+                            vector_length(sub(pose.position_meters, body.center.meters()));
+                        assist.intermediate_distance = assist.destination_distance
+                            + ((assist.start_distance - assist.destination_distance).max(0.0)
+                                * 0.25)
+                                .min(15.0);
+                        assist.aligned_orientation = pose.orientation;
+                        assist.landing_pose = Some(pose);
+                    }
+                    self.assist = Some(assist);
                     self.steering_target = SteeringInput::default();
                     self.steering = SteeringInput::default();
                     self.flight_state = FlightState::AssistedLanding { body: body.id };
@@ -163,6 +189,9 @@ impl ShipController {
             scale(assist.surface_normal, distance),
         );
         if assist.elapsed == LANDING_ASSIST_DURATION {
+            if let Some(pose) = assist.landing_pose {
+                self.pose = pose;
+            }
             self.flight_state = FlightState::Landed { body: body_id };
             self.thruster_percentage = 0;
             self.assist = None;

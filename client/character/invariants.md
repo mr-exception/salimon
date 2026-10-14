@@ -10,8 +10,9 @@
 4. A landed fully deployed ramp blends up by distance along the support, retaining contact indefinitely at rest.
    WASD stays camera-relative throughout the blend; re-entry requires movement
    toward the cabin rather than a particular key.
-5. Surface positions remain at body radius plus eye height and support traversal
-   around the complete sphere.
+5. Grounded surface positions use the supplied ground query plus radial eye height.
+   Terrain jumping/traversal obey the canonical integration policy; flat fixtures
+   preserve their original complete-sphere projection.
 6. Cockpit entry/exit is instant and does not mutate ship velocity or orientation.
 7. The crate receives no native events and exposes no GPU types.
 8. Positive horizontal mouse delta turns toward the camera's screen-right direction;
@@ -85,3 +86,9 @@ See the [source ownership table](architecture.md#internal-ownership).
     hull clearance does not become an invisible solid wall beneath the ship.
     The aft boarding corridor remains body-clear, closed-door gated and restricted
     to the existing doorway; the authored bottom-hinged ramp supplies continuous sloping support.
+
+## Terrain integration (#179–#181)
+
+Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
+and [world definition contract](../world/terrain-contract.md). Keep local rules
+and their consumers aligned; flat deterministic fixtures are explicit.

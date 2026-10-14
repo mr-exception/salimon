@@ -5,7 +5,7 @@ use wgpu::util::DeviceExt;
 use crate::surface_textures;
 use crate::{CameraFrame, DEPTH_FORMAT, RendererError, SceneFrame, camera_basis, encode_f32s};
 
-const INSTANCE_STRIDE: u64 = 96;
+const INSTANCE_STRIDE: u64 = 112;
 const CAMERA_SIZE: u64 = 64;
 
 /// Renderer-owned generic material styles; these are not celestial identities.
@@ -43,6 +43,7 @@ struct PreparedSphere {
     light_position: [f32; 4],
     light_color: [f32; 4],
     detail_origin: [f32; 4],
+    terrain_mask: [f32; 4],
 }
 
 impl PreparedSphere {
@@ -54,6 +55,7 @@ impl PreparedSphere {
             self.light_position,
             self.light_color,
             self.detail_origin,
+            self.terrain_mask,
         ]
         .into_iter()
         .flatten()
@@ -136,6 +138,7 @@ fn prepare_sphere(
     });
     let light_color = light.map_or([0.0; 3], |light| light.color);
     let prepared = PreparedSphere {
+        terrain_mask: [0.0; 4],
         bounds: bounds.map(|v| v as f32),
         direction_radius: [
             direction[0] as f32,
@@ -175,6 +178,9 @@ pub(crate) struct SphereRenderer {
     pipeline: wgpu::RenderPipeline,
     bind_group: wgpu::BindGroup,
     camera_buffer: wgpu::Buffer,
+    pub(crate) material_view: wgpu::TextureView,
+    pub(crate) material_sampler: wgpu::Sampler,
+    pub(crate) detail_sampler: wgpu::Sampler,
     instances: wgpu::Buffer,
     capacity: usize,
     count: u32,
@@ -323,7 +329,7 @@ impl SphereRenderer {
             bind_group_layouts: &[Some(&layout)],
             immediate_size: 0,
         });
-        let attributes: [wgpu::VertexAttribute; 6] =
+        let attributes: [wgpu::VertexAttribute; 7] =
             std::array::from_fn(|i| wgpu::VertexAttribute {
                 format: wgpu::VertexFormat::Float32x4,
                 offset: i as u64 * 16,
@@ -373,6 +379,9 @@ impl SphereRenderer {
             pipeline,
             bind_group,
             camera_buffer,
+            material_view: view,
+            material_sampler: sampler,
+            detail_sampler,
             instances,
             capacity: 1,
             count: 0,
@@ -389,9 +398,20 @@ impl SphereRenderer {
     ) -> Result<(), RendererError> {
         let mut prepared = Vec::with_capacity(scene.spheres.len());
         for sphere in scene.spheres {
-            if let Some(sphere) = prepare_sphere(*sphere, scene.light, scene.camera, width, height)?
+            if let Some(mut prepared_sphere) =
+                prepare_sphere(*sphere, scene.light, scene.camera, width, height)?
             {
-                prepared.push(sphere);
+                if let Some(mask) = scene.terrain_mask
+                    && sphere.center_meters == mask.body_center_meters
+                {
+                    let offset: [f32; 3] = std::array::from_fn(|i| {
+                        ((mask.body_center_meters[i] - scene.camera.position_meters[i])
+                            + mask.anchor_meters[i]) as f32
+                    });
+                    prepared_sphere.terrain_mask =
+                        [offset[0], offset[1], offset[2], mask.radius_meters as f32];
+                }
+                prepared.push(prepared_sphere);
             }
         }
         self.count = u32::try_from(prepared.len()).map_err(invalid)?;

@@ -2,10 +2,10 @@
 use crate::mining::MiningTool;
 use salimon_character::{CharacterLocation, CharacterSnapshot, ShipFrame};
 use salimon_math::{cross, dot, length};
+use salimon_world::WorldPosition;
 use salimon_world::carrying::{WorldObjectId, aimed_fragment};
 use salimon_world::mining::MiningRay;
 use salimon_world::resources::{FragmentId, ResourceTransform};
-use salimon_world::{BodyRole, CELESTIAL_BODIES, WorldPosition};
 
 fn position(p: [f64; 3]) -> WorldPosition {
     WorldPosition::new(p[0], p[1], p[2])
@@ -44,10 +44,8 @@ pub(crate) fn target(
         return None;
     }
     let ray = ray(player)?;
-    let blocked_at = CELESTIAL_BODIES
-        .iter()
-        .filter(|body| body.role == BodyRole::Solid)
-        .filter_map(|body| ray.sphere_distance(body.center, body.radius_meters))
+    let blocked_at = salimon_world::mining::terrain_obstruction(ray, tool.terrain, 4.0)
+        .into_iter()
         .chain(hull_obstruction(
             player,
             frame,
@@ -124,10 +122,41 @@ pub(crate) fn follow(tool: &mut MiningTool, player: CharacterSnapshot) {
     let support = crate::fragment_physics::support(*piece, up);
     let height = (-0.18 + vertical * (0.65 + clearance))
         .max(support + 0.005 - salimon_character::PLAYER_EYE_HEIGHT_METERS);
-    let p = std::array::from_fn(|i| {
+    let mut p: [f64; 3] = std::array::from_fn(|i| {
         player.eye_position_meters[i] + planar[i] * (0.65 + clearance) - right[i] * 0.20
             + up[i] * height
     });
+    if tool.terrain == salimon_world::terrain::TerrainMode::Representative
+        && player.location == CharacterLocation::Surface
+        && let Some((body, _)) = tool.terrain.nearest_body(
+            p,
+            salimon_world::NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS,
+            true,
+        )
+    {
+        let mesh = crate::resource_presentation::fragment_mesh(*piece);
+        for _ in 0..3 {
+            let local = salimon_math::sub(p, body.center.meters());
+            let mut lift = 0.0_f64;
+            for vertex in mesh.mesh.unit_vertices() {
+                let point = salimon_math::add(
+                    local,
+                    salimon_physics::rotate(
+                        orientation,
+                        salimon_math::scale(*vertex, mesh.side_meters),
+                    ),
+                );
+                let radius = length(point);
+                let radial = salimon_math::scale(point, 1.0 / radius);
+                let gap = radius - body.radius_meters - tool.terrain.height(*body, radial);
+                lift = lift.max((0.005 - gap) / dot(up, radial).max(0.1));
+            }
+            if lift < 0.00001 {
+                break;
+            }
+            p = salimon_math::add(p, salimon_math::scale(up, lift));
+        }
+    }
     if let Ok(pose) = ResourceTransform::new(position(p), orientation) {
         tool.session.move_carried(pose);
     }

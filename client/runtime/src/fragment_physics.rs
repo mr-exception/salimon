@@ -340,7 +340,18 @@ pub(crate) fn snapshots(
                             height_meters: SHIP_FLOOR_HEIGHT_METERS,
                         }
                     } else {
-                        body.map(Surface::Sphere).unwrap_or(Surface::Unsupported)
+                        body.map(|body| {
+                            if tool.terrain == salimon_world::terrain::TerrainMode::Representative {
+                                Surface::Sampled {
+                                    body,
+                                    query: crate::terrain::physics_ground,
+                                    point_query: crate::terrain::physics_ground_point,
+                                }
+                            } else {
+                                Surface::Sphere(body)
+                            }
+                        })
+                        .unwrap_or(Surface::Unsupported)
                     },
                 },
             )

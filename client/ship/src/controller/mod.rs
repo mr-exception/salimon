@@ -17,17 +17,19 @@ use assist::AssistTransition;
 
 #[derive(Clone, Debug)]
 pub struct ShipController {
-    pose: ShipPose,
-    flight_state: FlightState,
+    pub(crate) pose: ShipPose,
+    pub(crate) terrain: salimon_world::terrain::TerrainMode,
+    pub(crate) landing_footprint: Option<crate::LandingFootprint>,
+    pub(crate) flight_state: FlightState,
     door_state: DoorState,
     door_open_fraction: f64,
     cockpit_control_active: bool,
-    thruster_percentage: u8,
+    pub(crate) thruster_percentage: u8,
     energy_core: EnergyCoreState,
     cockpit_message: Option<CockpitMessage>,
     steering_target: SteeringInput,
     steering: SteeringInput,
-    assist: Option<AssistTransition>,
+    pub(crate) assist: Option<AssistTransition>,
 }
 
 impl Default for ShipController {
@@ -39,6 +41,8 @@ impl Default for ShipController {
         let mut position_meters = earth.center.meters();
         position_meters[1] += earth.radius_meters + LANDED_ORIGIN_HEIGHT_METERS;
         Self {
+            terrain: salimon_world::terrain::TerrainMode::Flat,
+            landing_footprint: None,
             pose: ShipPose {
                 position_meters,
                 orientation: [0.0, 0.0, 0.0, 1.0],
@@ -63,6 +67,8 @@ impl ShipController {
     #[must_use]
     pub fn flying(pose: ShipPose, thruster_percentage: u8) -> Self {
         Self {
+            terrain: salimon_world::terrain::TerrainMode::Flat,
+            landing_footprint: None,
             pose,
             flight_state: FlightState::Flying,
             door_state: DoorState::Closed,

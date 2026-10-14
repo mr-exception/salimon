@@ -5,9 +5,7 @@ use crate::{
     DEFAULT_CORE_ENERGY_CAPACITY_JOULES, DEFAULT_CORE_ENERGY_STORED_JOULES,
     NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS,
 };
-use salimon_world::{
-    CELESTIAL_BODIES, WorldPosition, nearest_celestial_body_within_surface_distance,
-};
+use salimon_world::WorldPosition;
 
 /// Bounded Energy Core telemetry fixture. Phase 0 does not consume or generate it.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -48,17 +46,18 @@ impl ShipController {
             self.pose.position_meters[1],
             self.pose.position_meters[2],
         );
-        nearest_celestial_body_within_surface_distance(
-            CELESTIAL_BODIES,
-            position,
-            NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS,
-        )
-        .map(|(body, surface_distance_meters)| NearbyBodyTelemetry {
-            name: body.name,
-            surface_distance_meters,
-            radial_speed_meters_per_second: body
-                .radial_speed_meters_per_second(position, velocity_meters_per_second),
-        })
+        self.terrain
+            .nearest_body(
+                self.pose.position_meters,
+                NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS,
+                false,
+            )
+            .map(|(body, surface_distance_meters)| NearbyBodyTelemetry {
+                name: body.name,
+                surface_distance_meters,
+                radial_speed_meters_per_second: body
+                    .radial_speed_meters_per_second(position, velocity_meters_per_second),
+            })
     }
 }
 

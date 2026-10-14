@@ -2131,7 +2131,13 @@
     {
       "assert": {
         "path": "resource_ui.context",
-        "contains": "Carrying fragment - F to drop"
+        "contains": "F to drop"
+      }
+    },
+    {
+      "assert": {
+        "path": "carrying.object_id",
+        "equals": 2
       }
     }
   ]

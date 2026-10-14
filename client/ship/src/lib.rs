@@ -16,6 +16,8 @@ pub use controller::cockpit::CockpitMessage;
 pub use controller::telemetry::{EnergyCoreState, NearbyBodyTelemetry};
 pub use state::{DoorState, FlightState, ShipPose, ShipSnapshot, SteeringInput};
 
+mod terrain_landing;
+pub use terrain_landing::{LandingFootprint, MAX_LANDING_SLOPE, MAX_SUPPORT_GAP_METERS};
 mod landing_geometry;
 pub use landing_geometry::{
     LANDED_HULL_CLEARANCE_METERS, LANDED_ORIGIN_HEIGHT_METERS, LANDING_FOOT_LOCAL_Y_METERS,

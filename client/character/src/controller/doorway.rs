@@ -405,6 +405,7 @@ mod tests {
             frame()
         };
         let body = SurfaceFrame {
+            query: None,
             body_center_meters: sub(
                 ship.origin_meters,
                 scale(ship.axes[1], 6_000_000.0 + 2.10752688172043),

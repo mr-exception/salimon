@@ -12,8 +12,8 @@ from e2e_artifacts import Artifacts
 
 
 PROTOCOL = 1
-SETUPS = {"fragment-pile", "resource-approach", "landed-earth", "cockpit-earth", "orbit-earth", "orbit-moon", "open-space", "eva-approach"}
-OPS = {"inspect", "step", "look", "aim_fragment", "restore_look", "key", "mouse", "interact", "landing", "thruster"}
+SETUPS = {"fragment-pile", "resource-approach", "landed-earth", "cockpit-earth", "orbit-earth", "orbit-moon", "open-space", "eva-approach", "terrain-earth-approach", "terrain-moon-approach", "terrain-mars-approach", "terrain-moon-steep", "terrain-earth", "terrain-moon", "terrain-mars", "terrain-earth-crater", "terrain-moon-crater", "terrain-mars-crater"}
+OPS = {"window", "performance_reset", "inspect", "step", "look", "aim_fragment", "restore_look", "key", "mouse", "interact", "landing", "thruster"}
 COMPARISONS = {"equals", "not_equals", "gt", "gte", "lt", "lte", "approx", "exists", "contains"}
 
 
@@ -266,6 +266,22 @@ class Game:
         self.process.stderr.close()
 
 
+def native_capture(game, artifacts, name, deadline):
+    """Capture the actual completed GPU color surface, without unrelated desktop pixels."""
+    path = artifacts.directory / f"{name}.png"
+    game.request({"op": "capture", "path": str(path)}, deadline)
+    while time.monotonic() < deadline:
+        status = game.request({"op": "inspect"}, deadline).get("capture_status", "idle")
+        if status == "captured":
+            if not path.is_file() or path.read_bytes()[:8] != b"\x89PNG\r\n\x1a\n":
+                return {"status": "failed", "reason": "native capture did not produce a PNG"}
+            return {"status": "captured", "path": str(path), "source": "GPU color surface"}
+        if status.startswith("failed:"):
+            return {"status": "failed", "reason": status}
+        time.sleep(0.02)
+    return {"status": "failed", "reason": "native capture timed out"}
+
+
 def run(path, command, artifact_root="artifacts/e2e", screenshot_command=None):
     start = time.monotonic()
     result = {"schema_version": 1, "scenario": str(path), "status": "failed",
@@ -296,8 +312,12 @@ def run(path, command, artifact_root="artifacts/e2e", screenshot_command=None):
                             record["state"] = game.request({"op": "inspect"}, step_deadline)
                         elif "screenshot" in step:
                             record["state"] = game.request({"op": "inspect"}, step_deadline)
-                            record["screenshot"] = artifacts.screenshot(
-                                f"step-{index:03d}-{step['screenshot']}", max(0.001, step_deadline - time.monotonic()))
+                            name = f"step-{index:03d}-{step['screenshot']}"
+                            if screenshot_command == ["native"]:
+                                record["screenshot"] = native_capture(game, artifacts, name, step_deadline)
+                            else:
+                                record["screenshot"] = artifacts.screenshot(
+                                    name, max(0.001, step_deadline - time.monotonic()))
                             if record["screenshot"]["status"] != "captured":
                                 raise ScenarioError(f"screenshot {step['screenshot']}: {record['screenshot']}")
                         else:

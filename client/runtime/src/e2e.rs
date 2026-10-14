@@ -11,6 +11,16 @@ use crate::app::ClientApplication;
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum Scenario {
     LandedEarth,
+    TerrainEarth,
+    TerrainEarthApproach,
+    TerrainMoonApproach,
+    TerrainMarsApproach,
+    TerrainMoonSteep,
+    TerrainMoon,
+    TerrainMars,
+    TerrainEarthCrater,
+    TerrainMoonCrater,
+    TerrainMarsCrater,
     FragmentPile,
     CockpitEarth,
     OrbitEarth,
@@ -23,6 +33,16 @@ pub(crate) enum Scenario {
 impl Scenario {
     fn parse(value: &str) -> Result<Self, String> {
         match value {
+            "terrain-earth-approach" => Ok(Self::TerrainEarthApproach),
+            "terrain-moon-approach" => Ok(Self::TerrainMoonApproach),
+            "terrain-mars-approach" => Ok(Self::TerrainMarsApproach),
+            "terrain-moon-steep" => Ok(Self::TerrainMoonSteep),
+            "terrain-earth" => Ok(Self::TerrainEarth),
+            "terrain-moon" => Ok(Self::TerrainMoon),
+            "terrain-mars" => Ok(Self::TerrainMars),
+            "terrain-earth-crater" => Ok(Self::TerrainEarthCrater),
+            "terrain-moon-crater" => Ok(Self::TerrainMoonCrater),
+            "terrain-mars-crater" => Ok(Self::TerrainMarsCrater),
             "fragment-pile" => Ok(Self::FragmentPile),
             "landed-earth" => Ok(Self::LandedEarth),
             "cockpit-earth" => Ok(Self::CockpitEarth),
@@ -39,6 +59,16 @@ impl Scenario {
 
     pub(crate) const fn name(self) -> &'static str {
         match self {
+            Self::TerrainEarthApproach => "terrain-earth-approach",
+            Self::TerrainMoonApproach => "terrain-moon-approach",
+            Self::TerrainMarsApproach => "terrain-mars-approach",
+            Self::TerrainMoonSteep => "terrain-moon-steep",
+            Self::TerrainEarth => "terrain-earth",
+            Self::TerrainMoon => "terrain-moon",
+            Self::TerrainMars => "terrain-mars",
+            Self::TerrainEarthCrater => "terrain-earth-crater",
+            Self::TerrainMoonCrater => "terrain-moon-crater",
+            Self::TerrainMarsCrater => "terrain-mars-crater",
             Self::FragmentPile => "fragment-pile",
             Self::LandedEarth => "landed-earth",
             Self::CockpitEarth => "cockpit-earth",
@@ -166,6 +196,73 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
     app.ship = ShipController::default();
     match config.scenario {
         Scenario::LandedEarth => {}
+        Scenario::TerrainEarthApproach
+        | Scenario::TerrainMoonApproach
+        | Scenario::TerrainMarsApproach
+        | Scenario::TerrainMoonSteep => {
+            let id = match config.scenario {
+                Scenario::TerrainMoonApproach | Scenario::TerrainMoonSteep => CelestialBodyId::Moon,
+                Scenario::TerrainMarsApproach => CelestialBodyId::Mars,
+                _ => CelestialBodyId::Earth,
+            };
+            let body = *CELESTIAL_BODIES
+                .iter()
+                .find(|b| b.id == id)
+                .expect("terrain approach body");
+            app.enable_terrain(body, [0.0, 1.0, 0.0])?;
+            let pose = app.ship.snapshot().pose;
+            let relative = salimon_math::sub(pose.position_meters, body.center.meters());
+            let radial = salimon_math::scale(relative, 1.0 / salimon_math::length(relative));
+            let position_meters = if config.scenario == Scenario::TerrainMoonSteep {
+                let d = [100.0, 0.0, body.radius_meters];
+                let n = salimon_math::length(d);
+                body.center
+                    .translated(d.map(|v| v / n * (body.radius_meters + 1000.0)))
+                    .meters()
+            } else {
+                salimon_math::add(pose.position_meters, salimon_math::scale(radial, 1000.0))
+            };
+            app.ship = ShipController::flying(
+                ShipPose {
+                    position_meters,
+                    orientation: pose.orientation,
+                },
+                0,
+            );
+            app.ship.configure_terrain(
+                salimon_world::terrain::TerrainMode::Representative,
+                crate::terrain::landing_footprint(),
+            );
+            app.character.enter_cockpit();
+        }
+
+        Scenario::TerrainEarth
+        | Scenario::TerrainMoon
+        | Scenario::TerrainMars
+        | Scenario::TerrainEarthCrater
+        | Scenario::TerrainMoonCrater
+        | Scenario::TerrainMarsCrater => {
+            let id = match config.scenario {
+                Scenario::TerrainMoon | Scenario::TerrainMoonCrater => CelestialBodyId::Moon,
+                Scenario::TerrainMars | Scenario::TerrainMarsCrater => CelestialBodyId::Mars,
+                _ => CelestialBodyId::Earth,
+            };
+            let body = *CELESTIAL_BODIES
+                .iter()
+                .find(|b| b.id == id)
+                .expect("terrain fixture");
+            let direction = if matches!(
+                config.scenario,
+                Scenario::TerrainEarthCrater
+                    | Scenario::TerrainMoonCrater
+                    | Scenario::TerrainMarsCrater
+            ) {
+                [0.0, 0.0, 1.0]
+            } else {
+                [0.0, 1.0, 0.0]
+            };
+            app.enable_terrain(body, direction)?;
+        }
         Scenario::FragmentPile => initialize_fragment_pile(app, config.seed),
         Scenario::CockpitEarth => app.character.enter_cockpit(),
         Scenario::ResourceApproach
@@ -223,7 +320,11 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
     let snapshot = app.ship.snapshot();
     if matches!(
         config.scenario,
-        Scenario::ResourceApproach
+        Scenario::TerrainEarthApproach
+            | Scenario::TerrainMoonApproach
+            | Scenario::TerrainMarsApproach
+            | Scenario::TerrainMoonSteep
+            | Scenario::ResourceApproach
             | Scenario::OrbitEarth
             | Scenario::OrbitMoon
             | Scenario::OpenSpace
@@ -267,6 +368,7 @@ fn initialize_fragment_pile(app: &mut ClientApplication, seed: u64) {
         axes: ship.pose.axes(),
     };
     let surface = SurfaceFrame {
+        query: None,
         body_center_meters: earth.center.meters(),
         radius_meters: earth.radius_meters,
     };

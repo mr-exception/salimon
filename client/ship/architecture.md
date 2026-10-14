@@ -49,8 +49,9 @@ position error. Automatic sequences consume the full supplied delta; the
 100 ms direct-flight integration clamp remains separate. Runtime maps the active body's frame to
 character traversal and owns only the contextual `L` key translation.
 The default and assisted landed poses use the generated landing-foot offset.
-The non-gear hull remains 2 m above the nominal tangent surface; fixed deployed
-feet contact it. `landing_geometry.rs` is generated from the same authored GLB
+Flat fixtures place the non-gear hull 2 m above the nominal tangent surface.
+Enabled terrain uses terrain_landing.rs and runtime-supplied authored footprint
+samples to preserve that clearance and reject unsupported fixed feet/ramp sites. `landing_geometry.rs` is generated from the same authored GLB
 as the character collision layout.
 The current 18.33 × 4.00 × 20.00 m hull uses a conservative 16 m collision sphere;
 this same clearance is included when completing automatic takeoff.
@@ -79,3 +80,9 @@ there is no planetary support on the lowered door in space. Renderer tags the
 leaf and tray separately, using one uniform for phased lowering/extension in
 the existing opaque batch. Character contact follows the complete sloping
 surface, supports a stopped or carrying walker, and joins radial ground at its tip.
+
+## Terrain integration (#179–#181)
+
+Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
+and [world definition contract](../world/terrain-contract.md). Keep local rules
+and their consumers aligned; flat deterministic fixtures are explicit.

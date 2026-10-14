@@ -1,0 +1,634 @@
+{
+  "setup": {
+    "scenario": "terrain-moon",
+    "seed": 181,
+    "step_ms": 16
+  },
+  "timeout_ms": 240000,
+  "steps": [
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 110
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 36
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 40
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "InsideShip"
+      }
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 20
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 25
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 25
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "DoorwayBlend"
+      }
+    },
+    {
+      "assert": {
+        "path": "player.ship_local_eye_position_meters.1",
+        "gt": 0.4
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 120
+      }
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "DoorwayBlend"
+      }
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.door_state",
+        "equals": "Open"
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.cockpit_message",
+        "equals": "Move clear of the boarding ramp"
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 75
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "Surface"
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": -1203.0870743344533,
+        "dy": 70.5354874730157
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 44
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": -0.25273047649083985,
+        "dy": 42.795411927679105
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "1",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "1",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.target.id",
+        "equals": "Moon:376084701777432483"
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "jump",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 20
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "jump",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 80
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": -0.01564302775414696,
+        "dy": 0.018809369837237536
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.target.id",
+        "equals": "Moon:376084701777432483"
+      }
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "left",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 125
+      }
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "left",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.extracted_mass_kg",
+        "gt": 3.5
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "gt": 1
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 300
+      }
+    },
+    {
+      "action": {
+        "op": "aim_fragment",
+        "fragment_id": 1
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "carrying.object_id",
+        "equals": 1
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "carrying.object_id",
+        "equals": null
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 200
+      }
+    },
+    {
+      "action": {
+        "op": "restore_look"
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "world.deposits_by_id.Moon:376084701777432483",
+        "exists": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.extracted_mass_kg",
+        "gt": 3.5
+      }
+    },
+    {
+      "assert": {
+        "path": "world.deposits_by_id.Moon:376084701777432483.remaining_mass_kg",
+        "equals": 27.832688622481268
+      }
+    }
+  ]
+}

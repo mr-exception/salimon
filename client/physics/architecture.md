@@ -293,3 +293,9 @@ dependency is introduced. Reopen comparison on repeated active-budget failures,
 ordinary interaction stalls, CCD/stability requirements or excessive solver
 maintenance. Preserve authored support accuracy, stable caller IDs, one-object
 carrying and frame/session ownership when comparing an f64 candidate.
+
+## Terrain integration (#179–#181)
+
+Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
+and [world definition contract](../world/terrain-contract.md). Keep local rules
+and their consumers aligned; flat deterministic fixtures are explicit.

@@ -219,9 +219,14 @@ mining-tool silhouette and optional highlight, and stacks global/transient
 messages above the fitted bottom-center toolbar. DPI follows bounded native
 scale-factor handling. See the [renderer contract](../client/renderer/architecture.md#equipment-toolbar-hud-129).
 
-## Opt-in terrain definition (#170 stage 1)
+## Integrated terrain (#170, #179–#181)
 
-World owns a bounded, versioned [terrain contract](../client/world/terrain-contract.md)
-with body-local height/normal queries and a compact codec. It is not yet activated:
-renderer and physical consumers remain spherical until #179/#180 integration.
-#181 owns native/reference-machine acceptance; #170 remains open across stages.
+World owns the immutable versioned [terrain definition/query/codec](../client/world/terrain-contract.md).
+Runtime composes shared ground queries, authored landing footprints and resource
+anchoring with bounded cube-sphere patch generation. Renderer owns immutable
+patch buffers, a uniform arena and near/far presentation through renderer-neutral
+DTOs, with no world dependency. Normal native gameplay enables Earth/Moon/Mars;
+legacy flat scenarios and F2 precision markers retain their fixtures. Read
+[the integration guide](terrain-validation.md) for budgets, approximation limits,
+physical policy and native/reference validation. Networking, persistence and
+volumetric terrain remain deferred.

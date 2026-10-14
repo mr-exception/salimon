@@ -5,7 +5,7 @@
   orientations are unit XYZW quaternions and immutable hull vertices are finite.
 - Ordered input controls every contact pass. Zero delta changes nothing;
   identical inputs and deltas produce identical outputs.
-- Gravity is 9.81 m/s², radial for spheres and -Y otherwise. Floor containment
+- Gravity is 9.81 m/s², radial for spheres/sampled planetary surfaces and -Y otherwise. Floor containment
   is a pure caller query, with horizontal hull bounce -0.15.
 - Convex face and edge axes determine final pair contact; bounding spheres only
   provide broad phase and conservative containment. Ground support follows the
@@ -62,3 +62,9 @@
   reach. Corrections update membership before selecting the next ordered pair.
   Candidate filtering cannot reorder input identities or change exact SAT/response.
   Dense populations and oversize fallbacks retain quadratic worst-case cost.
+
+## Terrain integration (#179–#181)
+
+Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
+and [world definition contract](../world/terrain-contract.md). Keep local rules
+and their consumers aligned; flat deterministic fixtures are explicit.

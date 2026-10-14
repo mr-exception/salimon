@@ -23,7 +23,9 @@ pub use spatial_contracts::{
     COCKPIT_SEAT_MARKER_METERS, ENGINE_PORT_ANCHOR_METERS, ENGINE_STARBOARD_ANCHOR_METERS,
     EXIT_DOOR_MARKER_METERS, PLAYER_START_MARKER_METERS,
 };
-pub use state::{CharacterLocation, CharacterSnapshot, ShipFrame, SurfaceFrame};
+pub use state::{
+    CharacterLocation, CharacterSnapshot, GroundQuery, GroundSample, ShipFrame, SurfaceFrame,
+};
 
 /// Depth from the authored door interaction marker to the closed door's aft face.
 /// Presentation may use this bound to avoid hiding the marker behind its own door.
@@ -34,3 +36,56 @@ pub const FIXED_GRAVITY_METERS_PER_SECOND_SQUARED: f64 = 9.81;
 pub const PLAYER_BODY_HEIGHT_METERS: f64 = 1.80;
 pub const PLAYER_EYE_HEIGHT_METERS: f64 = 1.75;
 pub const SHIP_FLOOR_HEIGHT_METERS: f64 = spatial_contracts::INTERIOR_FLOOR_BOUNDS[3];
+
+/// Authored sole grids for footprint-aware landing; generated boxes remain canonical.
+pub fn landing_sole_samples() -> Vec<[f64; 3]> {
+    let mut samples = Vec::new();
+    for bounds in spatial_contracts::LANDING_COLLIDERS {
+        // Foot boxes are the thin, lowest colliders; legs share their bottom.
+        if bounds[3] - bounds[2] > 0.5 {
+            continue;
+        }
+        for x in 0..=4 {
+            for z in 0..=4 {
+                samples.push([
+                    bounds[0] + (bounds[1] - bounds[0]) * f64::from(x) / 4.0,
+                    bounds[2],
+                    bounds[4] + (bounds[5] - bounds[4]) * f64::from(z) / 4.0,
+                ]);
+            }
+        }
+    }
+    samples
+}
+/// Ground-facing deployed ramp tip, sampled across its authored width.
+pub fn ramp_tip_support_samples() -> Vec<[f64; 3]> {
+    (0..=8)
+        .map(|i| {
+            [
+                ramp::tip_x(),
+                ramp::floor_at(ramp::tip_x()),
+                ramp_geometry::RAMP_HALF_WIDTH_METERS * (f64::from(i) / 4.0 - 1.0),
+            ]
+        })
+        .collect()
+}
+/// Conservative lowest non-gear hull plane over the authored exterior envelope.
+pub fn hull_ground_samples() -> Vec<[f64; 3]> {
+    let mut samples = Vec::new();
+    for bounds in [spatial_contracts::CABIN_EXTERIOR_BOUNDS]
+        .into_iter()
+        .chain(spatial_contracts::WING_COLLIDERS)
+        .chain(spatial_contracts::THRUSTER_COLLIDERS)
+    {
+        for x in 0..=20 {
+            for z in 0..=20 {
+                samples.push([
+                    bounds[0] + (bounds[1] - bounds[0]) * f64::from(x) / 20.0,
+                    bounds[2],
+                    bounds[4] + (bounds[5] - bounds[4]) * f64::from(z) / 20.0,
+                ]);
+            }
+        }
+    }
+    samples
+}

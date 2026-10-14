@@ -8,7 +8,7 @@ use std::time::{Duration, Instant};
 use serde_json::{Value, json};
 use winit::keyboard::{KeyCode, PhysicalKey};
 
-use crate::app::{ClientApplication, character_ship_frame, surface_frame_for_ship};
+use crate::app::{ClientApplication, character_ship_frame};
 use salimon_character::CharacterLocation;
 use salimon_world::CELESTIAL_BODIES;
 
@@ -128,13 +128,47 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
     }
     let result = match command.get("op").and_then(Value::as_str) {
         Some("inspect") => Ok(inspect(app)),
+        Some("window") => {
+            let action = command.get("action").and_then(Value::as_str).unwrap_or("");
+            let size = command
+                .get("width")
+                .and_then(Value::as_u64)
+                .zip(command.get("height").and_then(Value::as_u64))
+                .and_then(|(w, h)| u32::try_from(w).ok().zip(u32::try_from(h).ok()))
+                .map(|(w, h)| [w, h]);
+            app.automation_window(action, size)
+                .map(|()| json!({"requested":true}))
+                .map_err(|_| {
+                    (
+                        "invalid_window",
+                        "native window action or dimensions invalid",
+                    )
+                })
+        }
+        Some("capture") => match command.get("path").and_then(Value::as_str) {
+            Some(path) => app
+                .request_capture(path)
+                .map(|()| json!({"scheduled":true}))
+                .map_err(|_| {
+                    (
+                        "invalid_capture",
+                        "new absolute .png path and capture-capable surface required",
+                    )
+                }),
+            None => Err(("invalid_capture", "path is required")),
+        },
+        Some("performance_reset") => {
+            app.observations.clear();
+            Ok(json!({"reset":true}))
+        }
         Some("step") => match command.get("frames").and_then(Value::as_u64) {
             Some(frames @ 1..=600) => {
                 let step = app.e2e_step().expect("automation only runs in E2E mode");
+                let started = Instant::now();
                 for _ in 0..frames {
                     app.advance_game(step);
                 }
-                Ok(json!({"frames": frames}))
+                Ok(json!({"frames": frames,"elapsed_ms":started.elapsed().as_secs_f64()*1000.0}))
             }
             _ => Err((
                 "invalid_argument",
@@ -186,7 +220,7 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
                 // Try the center first, then points inside the oriented pickup
                 // cube. A pile can obscure its center while exposing a corner.
                 for candidate in 0..9 {
-                    let player = app.character.snapshot(frame, surface_frame_for_ship(ship));
+                    let player = app.character.snapshot(frame, app.terrain_frame(ship));
                     let up = player.up.map(f64::from);
                     let current = normalize(std::array::from_fn(|i| {
                         player.look_target_meters[i] - player.eye_position_meters[i]
@@ -221,7 +255,7 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
                     total[0] += delta[0];
                     total[1] += delta[1];
                     app.sync_carried();
-                    let player = app.character.snapshot(frame, surface_frame_for_ship(ship));
+                    let player = app.character.snapshot(frame, app.terrain_frame(ship));
                     if crate::carrying::target(
                         &app.mining,
                         player,
@@ -295,6 +329,9 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
 
 fn key_code(name: &str) -> Option<KeyCode> {
     match name {
+        "view" => Some(KeyCode::F2),
+        "diagnostics" => Some(KeyCode::F3),
+        "near" => Some(KeyCode::KeyN),
         "forward" => Some(KeyCode::KeyW),
         "backward" => Some(KeyCode::KeyS),
         "left" => Some(KeyCode::KeyA),
@@ -317,7 +354,7 @@ fn key_code(name: &str) -> Option<KeyCode> {
 fn inspect(app: &ClientApplication) -> Value {
     let ship = app.ship.snapshot();
     let frame = character_ship_frame(ship.pose);
-    let character = app.character.snapshot(frame, surface_frame_for_ship(ship));
+    let character = app.character.snapshot(frame, app.terrain_frame(ship));
     let local_eye = frame.world_to_local(character.eye_position_meters);
     let local_look = frame.world_to_local(character.look_target_meters);
     let interaction = app.automation_interaction(local_eye, local_look);
@@ -343,7 +380,7 @@ fn inspect(app: &ClientApplication) -> Value {
             "distance_to_player_meters": entry.deposit.position().offset_from(salimon_world::WorldPosition::new(character.eye_position_meters[0], character.eye_position_meters[1], character.eye_position_meters[2])).iter().map(|v| v * v).sum::<f64>().sqrt(),
             "state": format!("{:?}", entry.deposit.state()),
             "visual": Value::Null,
-            "authored_visual": crate::resource_presentation::deposit_mesh(entry).map(|mesh| json!({"mesh": format!("{:?}", mesh.mesh), "center_meters": mesh.center_meters, "side_meters": mesh.side_meters}))
+            "authored_visual": crate::resource_presentation::deposit_mesh_with_terrain(entry, app.mining.terrain).map(|mesh| json!({"mesh": format!("{:?}", mesh.mesh), "center_meters": mesh.center_meters, "side_meters": mesh.side_meters}))
         })).collect::<Vec<_>>(), None),
         Err(error) => (Vec::new(), Some(format!("{error:?}"))),
     };
@@ -413,7 +450,22 @@ fn inspect(app: &ClientApplication) -> Value {
         .unwrap_or(ship.velocity_meters_per_second);
     let relative_velocity =
         std::array::from_fn::<_, 3, _>(|i| player_velocity[i] - ship.velocity_meters_per_second[i]);
+    let (uploaded_bytes, peak_upload_bytes) = app.terrain_uploads();
+    let (ground_entries, ground_hits, ground_misses) = crate::terrain::ground_cache_stats();
     json!({
+        "ground_cache": {"entries":ground_entries,"hits":ground_hits,"misses":ground_misses},
+        "view_mode": app.view_name(),
+        "window": app.window_state(),
+        "capture_status": app.capture_status,
+        "performance": app.observations.snapshot(),
+        "terrain": { "mode": format!("{:?}", app.mining.terrain), "active_patches": app.terrain_stream.active.len(),
+            "cache_patches": app.terrain_stream.cached(), "pending_patches": app.terrain_stream.pending,
+            "gpu_ready": app.terrain_gpu_ready(), "presentation_ready":app.terrain_presentation_ready(), "triangles": app.terrain_stream.triangles(), "cpu_cache_bytes": app.terrain_stream.cpu_bytes(),
+            "gpu_cache_bytes": app.terrain_gpu_bytes(), "generated_last_frame": app.terrain_stream.generated,
+            "generation_last_frame_micros": app.terrain_stream.generation_micros,
+            "generation_peak_micros":app.terrain_stream.generation_peak_micros,
+            "generation_total_micros":app.terrain_stream.generation_total_micros,
+            "generated_peak":app.terrain_stream.generated_peak, "uploaded_last_frame_bytes":uploaded_bytes, "peak_upload_bytes":peak_upload_bytes, "total_generated": app.terrain_stream.total_generated },
         "resource_ui": {
             "context": resource_context.as_ref().map(|prompt| &prompt.text),
             "anchor_meters": resource_context.as_ref().and_then(|prompt| match prompt.placement {
@@ -435,7 +487,7 @@ fn inspect(app: &ClientApplication) -> Value {
             "range_meters": salimon_world::mining::MINING_RANGE_METERS,
             "rate_kg_per_second": salimon_world::mining::MINING_RATE_KG_PER_SECOND,
             "target": mining_target.map(|target| json!({"id": format!("{:?}:{}", target.id.body, target.id.local), "distance_meters": target.distance_meters})) },
-        "player": {"nearby_body": salimon_world::nearby_solid_body(salimon_world::WorldPosition::new(character.eye_position_meters[0], character.eye_position_meters[1], character.eye_position_meters[2])).map(|(body, distance)| json!({"name": body.name, "surface_distance_meters": distance})),
+        "player": {"nearby_body": app.mining.terrain.nearest_body(character.eye_position_meters, salimon_world::NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS, true).map(|(body, distance)| json!({"name": body.name, "surface_distance_meters": distance})),
             "velocity_meters_per_second": player_velocity,
             "speed_meters_per_second": player_velocity.iter().map(|v| v*v).sum::<f64>().sqrt(),
             "relative_velocity_meters_per_second": relative_velocity,
@@ -678,7 +730,7 @@ mod tests {
         assert_eq!(inspect(&test)["mining"]["active"], true);
         let ship = test.ship.snapshot();
         let frame = character_ship_frame(ship.pose);
-        let player = test.character.snapshot(frame, surface_frame_for_ship(ship));
+        let player = test.character.snapshot(frame, test.terrain_frame(ship));
         for key in [
             KeyCode::Digit2,
             KeyCode::Digit3,

@@ -3,6 +3,7 @@
 //! This crate owns `wgpu` resources and surface presentation. It deliberately
 //! has no dependency on world, character, or ship state.
 
+mod capture;
 mod cockpit_instruments;
 mod equipment_toolbar;
 mod gpu_timing;
@@ -14,6 +15,8 @@ mod ramp_geometry;
 mod resource_mesh;
 mod ship_mesh;
 mod spheres;
+mod terrain;
+pub use terrain::{TerrainMask, TerrainPatch, TerrainPatchKey, TerrainVertex};
 mod surface_textures;
 
 use std::error::Error;
@@ -114,6 +117,8 @@ pub struct SceneFrame<'a> {
     pub instances: &'a [SceneInstance],
     pub resource_meshes: &'a [ResourceMeshInstance],
     pub spheres: &'a [SphereInstance],
+    pub terrain: &'a [std::sync::Arc<TerrainPatch>],
+    pub terrain_mask: Option<TerrainMask>,
     pub light: Option<PointLight>,
     pub ship: Option<ShipMeshInstance>,
     pub held_item: Option<HeldItemInstance>,
@@ -623,6 +628,7 @@ pub struct Renderer {
     toolbar: overlay::OverlayRenderer,
     toolbar_raster: equipment_toolbar::ToolbarRaster,
     spheres: spheres::SphereRenderer,
+    terrain: terrain::TerrainRenderer,
     ship_mesh: ship_mesh::ShipMeshRenderer,
     held_item: held_item::HeldItemRenderer,
     resource_meshes: resource_mesh::ResourceMeshRenderer,
@@ -631,9 +637,43 @@ pub struct Renderer {
     presented_frames: u64,
     drawable: bool,
     info: RendererInfo,
+    capture_requested: bool,
+    capture_result: Option<Result<Vec<u8>, RendererError>>,
 }
 
 impl Renderer {
+    pub fn request_capture(&mut self) -> Result<(), RendererError> {
+        if !self
+            .configuration
+            .usage
+            .contains(wgpu::TextureUsages::COPY_SRC)
+        {
+            return Err(RendererError::new(
+                "frame capture failed",
+                "surface does not support COPY_SRC",
+            ));
+        }
+        self.capture_requested = true;
+        self.capture_result = None;
+        Ok(())
+    }
+    pub fn take_capture(&mut self) -> Option<Result<Vec<u8>, RendererError>> {
+        self.capture_result.take()
+    }
+
+    pub fn terrain_presentation_ready(&self, patches: &[std::sync::Arc<TerrainPatch>]) -> bool {
+        self.terrain.presentation_ready(patches)
+    }
+    pub fn terrain_uploads(&self) -> (usize, usize) {
+        self.terrain.uploads()
+    }
+    pub fn terrain_gpu_bytes(&self) -> usize {
+        self.terrain.bytes()
+    }
+    pub fn terrain_ready(&self, patches: &[std::sync::Arc<TerrainPatch>]) -> bool {
+        self.terrain.ready(patches)
+    }
+
     /// Creates a renderer for an owned native surface target.
     ///
     /// Passing an owned target (for example `Arc<winit::window::Window>`) gives
@@ -695,6 +735,13 @@ impl Renderer {
                     "adapter exposes no compatible surface format",
                 )
             })?;
+        if surface
+            .get_capabilities(&adapter)
+            .usages
+            .contains(wgpu::TextureUsages::COPY_SRC)
+        {
+            configuration.usage |= wgpu::TextureUsages::COPY_SRC;
+        }
         configuration.present_mode = wgpu::PresentMode::AutoVsync;
         configuration.desired_maximum_frame_latency = 2;
 
@@ -813,6 +860,7 @@ impl Renderer {
         let reticle = overlay::OverlayRenderer::new(&device, configuration.format);
         let toolbar = overlay::OverlayRenderer::new(&device, configuration.format);
         let spheres = spheres::SphereRenderer::new(&device, &queue, configuration.format);
+        let terrain = terrain::TerrainRenderer::new(&device, configuration.format, &spheres);
         let ship_mesh = ship_mesh::ShipMeshRenderer::new(&device, configuration.format)?;
         let held_item = held_item::HeldItemRenderer::new(&device, &queue, configuration.format)?;
         let resource_meshes =
@@ -837,6 +885,7 @@ impl Renderer {
             toolbar,
             toolbar_raster: equipment_toolbar::ToolbarRaster::default(),
             spheres,
+            terrain,
             ship_mesh,
             held_item,
             resource_meshes,
@@ -845,6 +894,8 @@ impl Renderer {
             presented_frames: 0,
             drawable: false,
             info,
+            capture_requested: false,
+            capture_result: None,
         };
         renderer.resize(initial_size);
         Ok(renderer)
@@ -923,13 +974,24 @@ impl Renderer {
         let aspect_ratio = self.configuration.width as f32 / self.configuration.height as f32;
         let prepared_scene = prepare_scene(scene, aspect_ratio)
             .map_err(|error| RendererError::new("failed to prepare scene", error))?;
-        self.spheres.prepare(
+        self.terrain.prepare(
             &self.device,
             &self.queue,
             scene,
+            prepared_scene.view_projection,
+        )?;
+        let mut sphere_scene = scene;
+        if !self.terrain.ready(scene.terrain) {
+            sphere_scene.terrain_mask = None;
+        }
+        self.spheres.prepare(
+            &self.device,
+            &self.queue,
+            sphere_scene,
             self.configuration.width,
             self.configuration.height,
         )?;
+
         self.ship_mesh
             .prepare(&self.queue, scene, prepared_scene.view_projection)?;
         self.held_item
@@ -1062,6 +1124,7 @@ impl Renderer {
                 render_pass.draw(0..CUBE_VERTEX_COUNT, 0..prepared_scene.instance_count);
             }
             self.spheres.draw(&mut render_pass);
+            self.terrain.draw(&mut render_pass);
             self.ship_mesh.draw(&mut render_pass);
             self.resource_meshes.draw(&mut render_pass);
             self.held_item.draw(&mut render_pass);
@@ -1099,7 +1162,19 @@ impl Renderer {
             gpu_timer.resolve_and_map(&mut encoder, slot_index);
         }
 
+        let readback = if std::mem::take(&mut self.capture_requested) {
+            Some(capture::Readback::encode(
+                &self.device,
+                &mut encoder,
+                &frame.texture,
+            ))
+        } else {
+            None
+        };
         self.queue.submit([encoder.finish()]);
+        if let Some(readback) = readback {
+            self.capture_result = Some(readback.and_then(|r| r.finish(&self.device)));
+        }
         let cpu_render_time = cpu_render_started_at.elapsed();
         before_present();
         self.queue.present(frame);
@@ -1126,11 +1201,13 @@ impl Renderer {
             + u32::from(self.toolbar.is_visible());
         let scene_draw_calls = scene_draw_calls(prepared_scene.instance_count)
             + scene_draw_calls(self.spheres.count())
+            + self.terrain.count()
             + self.ship_mesh.draw_count()
             + self.held_item.count()
             + self.resource_meshes.draw_count();
         let object_count = prepared_scene.instance_count
             + self.spheres.count()
+            + self.terrain.count()
             + self.ship_mesh.count()
             + self.held_item.count()
             + self.resource_meshes.object_count();
@@ -1252,6 +1329,8 @@ mod tests {
                 resource_meshes: &[],
                 instances: &local_instances,
                 spheres: &[],
+                terrain: &[],
+                terrain_mask: None,
                 light: None,
                 ship: None,
                 held_item: None,
@@ -1272,6 +1351,8 @@ mod tests {
                 resource_meshes: &[],
                 instances: &translated_instances,
                 spheres: &[],
+                terrain: &[],
+                terrain_mask: None,
                 light: None,
                 ship: None,
                 held_item: None,
@@ -1317,6 +1398,8 @@ mod tests {
                     resource_meshes: &[],
                     instances: &[],
                     spheres: &[],
+                    terrain: &[],
+                    terrain_mask: None,
                     light: None,
                     ship: None,
                     held_item: None,
@@ -1338,6 +1421,8 @@ mod tests {
                     resource_meshes: &[],
                     instances: &invalid_instances,
                     spheres: &[],
+                    terrain: &[],
+                    terrain_mask: None,
                     light: None,
                     ship: None,
                     held_item: None,
@@ -1378,6 +1463,8 @@ mod tests {
                 resource_meshes: &[],
                 instances: &instances,
                 spheres: &[],
+                terrain: &[],
+                terrain_mask: None,
                 light: None,
                 ship: None,
                 held_item: None,

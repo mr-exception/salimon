@@ -84,3 +84,9 @@
     draw calls scale with visible variants, not fragments. Conservative enclosing
     sphere culling affects rendering only. Material colors/facet fill, unit-pose
     validation, subtract-before-cast precision and reverse-Z remain intact.
+
+## Terrain integration (#179–#181)
+
+Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
+and [world definition contract](../world/terrain-contract.md). Keep local rules
+and their consumers aligned; flat deterministic fixtures are explicit.

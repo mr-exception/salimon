@@ -1,0 +1,17 @@
+   Compiling salimon-renderer v0.1.0 (<repo>/client/renderer)
+   Compiling salimon-client v0.1.0 (<repo>/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.16s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-df521c85aecb1550)
+
+running 3 tests
+test terrain::tests::steep_crater_footprints_reject_landing_without_starting_an_assist ... ok
+Earth [0.0, 1.0, 0.0] safe spawn: max fixed support gap 0.030029296823436726 m
+test terrain::tests::terrain_touchdown_is_partition_independent_and_uncancellable ... ok
+Earth [0.0, 0.0, 1.0] safe spawn: max fixed support gap 0.03941975957869414 m
+Moon [0.0, 1.0, 0.0] safe spawn: max fixed support gap 0.013549804687097274 m
+Moon [0.0, 0.0, 1.0] safe spawn: max fixed support gap 0.008361670915418205 m
+Mars [0.0, 1.0, 0.0] safe spawn: max fixed support gap 0.013671874994398762 m
+Mars [0.0, 0.0, 1.0] safe spawn: max fixed support gap 0.01622286767029423 m
+test terrain::tests::every_profile_has_safe_plain_and_crater_spawn_with_authored_support ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 111 filtered out; finished in 14.62s

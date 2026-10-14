@@ -511,3 +511,9 @@ containment. Existing physics visits and anchored frame writebacks provide pose
 events even for sleeping contents; no extra full scene scan computes mass each
 tick. Explicit scene reconciliation is available for validation. Full inertial
 cabin motion, arbitrary future physical items and Core intake are separate tasks.
+
+## Core power integration (#188)
+
+Runtime maps `ShipSnapshot::power_available` to character artificial gravity,
+fragment floor power and renderer `CockpitInstruments::power_off`. Physical
+cockpit occupancy is independent of power. No runtime energy arithmetic is added.

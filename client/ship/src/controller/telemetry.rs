@@ -1,4 +1,4 @@
-//! Bounded Core fixture and nearby-body observation.
+//! Core snapshot and nearby-body observation.
 
 use super::ShipController;
 use crate::{
@@ -7,7 +7,7 @@ use crate::{
 };
 use salimon_world::WorldPosition;
 
-/// Bounded Energy Core telemetry fixture. Phase 0 does not consume or generate it.
+/// Whole-joule display snapshot; authoritative storage retains fractional joules.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct EnergyCoreState {
     pub capacity_joules: u64,
@@ -32,12 +32,40 @@ pub struct NearbyBodyTelemetry {
 }
 
 impl ShipController {
-    /// Updates the bounded fixture and clears held controls on power loss; no consumption simulation.
-    pub fn set_stored_core_energy_joules(&mut self, stored_joules: u64) {
-        self.energy_core.stored_joules = stored_joules.min(self.energy_core.capacity_joules);
-        if self.energy_core.stored_joules == 0 {
+    pub fn configure_energy_core(
+        &mut self,
+        config: crate::EnergyConfig,
+        stored_joules: f64,
+    ) -> Result<(), crate::InvalidEnergy> {
+        self.energy_core = crate::EnergyCore::new(config, stored_joules)?;
+        if !self.energy_core.powered() {
             self.clear_throttle_input();
         }
+        Ok(())
+    }
+
+    /// Scenario/import boundary, bounded by configured capacity.
+    pub fn set_stored_core_energy_joules(&mut self, stored_joules: u64) {
+        self.energy_core
+            .set_stored_joules(stored_joules as f64)
+            .expect("u64 joules are finite and nonnegative");
+        if !self.energy_core.powered() {
+            self.clear_throttle_input();
+        }
+    }
+
+    /// Atomic E03 conversion/consumer handoff; positive charge automatically resumes
+    /// the selected throttle on the next advancement, without resetting velocity.
+    pub fn exchange_core_energy_joules(
+        &mut self,
+        incoming: f64,
+        requested: f64,
+    ) -> Result<f64, crate::InvalidEnergy> {
+        let delivered = self.energy_core.exchange_joules(incoming, requested)?;
+        if !self.energy_core.powered() {
+            self.clear_throttle_input();
+        }
+        Ok(delivered)
     }
 
     pub(super) fn nearby_body_telemetry(
@@ -73,12 +101,12 @@ mod tests {
     use salimon_world::CelestialBodyId;
 
     #[test]
-    fn core_energy_fixture_is_bounded_and_updates_live_snapshots() {
+    fn core_energy_is_bounded_and_updates_live_snapshots() {
         let mut ship = ShipController::default();
         assert_eq!(ship.snapshot().energy_core, EnergyCoreState::default());
 
-        ship.set_stored_core_energy_joules(125_000_000_000);
-        assert_eq!(ship.snapshot().energy_core.stored_joules, 125_000_000_000);
+        ship.set_stored_core_energy_joules(25_000_000_000);
+        assert_eq!(ship.snapshot().energy_core.stored_joules, 25_000_000_000);
         ship.set_stored_core_energy_joules(u64::MAX);
         assert_eq!(
             ship.snapshot().energy_core.stored_joules,

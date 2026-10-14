@@ -284,3 +284,10 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 Cockpit throttle DTO/cache percentages are signed i8, clamped to −100..+100
 for display. The label preserves the sign and the bar shows absolute magnitude
 for reverse/forward selection; rasterization never controls ship authority.
+
+## Core power integration (#188)
+
+`CockpitInstruments::power_off` blanks the cached physical display to opaque
+black once. Values changing while off cause no uploads; restoration redraws all
+three regions. The renderer consumes a power DTO, never derives gameplay power
+from rounded stored-joule telemetry.

@@ -164,3 +164,6 @@ and their consumers aligned; flat deterministic fixtures are explicit.
   synchronization. Centers use current authored ship bounds independent of door
   animation; carried and loose objects share one identity. No extra per-tick
   cargo scan determines propulsion mass.
+
+- Core power snapshot gates character/fragment artificial gravity and blanks the
+  physical monitor. No planetary fallback applies inside the unpowered cabin.

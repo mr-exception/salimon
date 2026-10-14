@@ -20,7 +20,7 @@ that same controller, without adding controllers, crates or framework layers:
 | `assist.rs` | Landing range, captured paths, timing/derivatives, takeoff interlocks and all-body assists |
 | `door.rs` | Landed/open-space permissions, locked interactions and reversible hinge animation |
 | `cockpit.rs` | Control authority and typed/contextual message routing; authority coverage also lives with flight/steering/assist rules |
-| `telemetry.rs` | Core fixture DTO/default/bounds and nearby-body sensor selection/radial speed |
+| `telemetry.rs` | Core display DTO/default/bounds and nearby-body sensor selection/radial speed |
 
 Update order remains door animation, clamped steering, then flight or full-delta
 assist dispatch. Module methods use only parent-visible access where needed;
@@ -28,7 +28,7 @@ external consumers still observe `ShipSnapshot`. Dependencies are unchanged.
 
 `ShipController` is authoritative portable state. It owns a double-precision
 world pose, landed/flying/assisted state, door state, cockpit authority, persistent
-thruster percentage, a bounded noncanonical Core telemetry fixture, and a typed
+thruster percentage, an authoritative configurable joule Core, and a typed
 cockpit message. `ShipSnapshot` is the only
 runtime-facing observation needed by character composition, diagnostics, and
 renderer mapping.
@@ -95,7 +95,7 @@ Flying ships own persistent world-space f64 velocity independent of orientation.
 The starter dry hull is 100,000 kg; forward/reverse capacities are 4 MN/2 MN.
 `Propulsion` validates cached total mass and force capacities and computes signed
 local +X acceleration as force/mass. `set_propulsion` is an event-driven handoff
-for future E01 energy/cargo composition, with no per-tick cargo scans. Constant
+for E01 cargo composition, with no per-tick cargo scans. Constant
 acceleration uses v*dt + 0.5*a*dt² and v += a*dt. Zero throttle coasts, steering
 changes only future thrust direction, and no drag, speed cap or body gravity is
 applied. Snapshot speed is the magnitude of actual velocity, including assists.
@@ -110,7 +110,7 @@ use forward/reverse force capacity; zero coasts. `set_throttle_key` consumes typ
 Up/Down edges, increments one point immediately, then repeats each 100 ms of
 simulation time. Repeated presses are idempotent and simultaneous keys cancel
 repeat. Release/direction changes reset cadence. Cockpit authority, Flying state
-and nonzero Core fixture energy gate changes; power consumption remains E01.
+and nonzero authoritative Core energy gate changes; power consumption is owned by E02.
 Leaving the cockpit preserves selection and momentum while clearing held keys.
 Assists clear holds and reject changes; landing completion/collision zero selection.
 
@@ -163,3 +163,34 @@ containment. Existing physics visits and anchored frame writebacks provide pose
 events even for sleeping contents; no extra full scene scan computes mass each
 tick. Explicit scene reconciliation is available for validation. Full inertial
 cabin motion, arbitrary future physical items and Core intake are separate tasks.
+
+## Authoritative Core power (#188)
+
+`energy.rs` owns validated `EnergyConfig`, fractional f64 joule storage and atomic
+energy transfers. Starter capacity is 60 GJ at 75% charge. Free-flight draw is
+100 MW times positive throttle, 50 MW times negative magnitude; zero throttle
+has no propulsion draw. Configurable gravity/cockpit idle loads default to
+100 kW/10 kW independently of cockpit occupancy and flight mode. The ten-minute
+full-capacity estimate is tuning, not a fixed endurance invariant.
+
+All consumers share a bus. Energy determines an exact powered interval followed
+by coasting when exhausted, preserving selection and world velocity. Empty Core
+rejects throttle/steering/assist activation, blanks the display and disables cabin
+artificial gravity without adopting planetary gravity. Held controls clear;
+charging automatically resumes selected throttle on the next ship step. Cockpit
+occupancy remains a physical state, separate from power authority.
+
+`exchange_core_energy_joules(incoming, requested)` is the E03 atomic conversion
+handoff. Incoming joules serve the requested load before excess storage is
+capped; the result reports actual delivered energy. It is an explicit energy
+transaction, not a persistent charging-rate assumption. Idle/propulsion draw is
+performed by `advance`; callers must not debit those consumers a second time.
+Invalid config/transactions leave previous state intact. Whole-joule snapshots
+truncate fractional energy; `power_available` is authoritative even below 1 J.
+Current captured assists remain uncancellable; their reserved budgets and
+powered recovery are separate follow-ups, not implemented by E02.
+
+`advance_with_core_input(delta, incoming_joules)` settles converted energy at a
+step boundary with that step's normal idle/propulsion consumers before storage
+clipping. It preserves exact powered-thrust duration. Conversion timing/rate is
+owned by E03; no continuous charging source is assumed by this task.

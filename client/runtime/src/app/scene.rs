@@ -13,6 +13,7 @@ pub(super) fn map_ship_to_renderer(ship: ShipSnapshot) -> ShipMeshInstance {
         orientation: ship.pose.orientation.map(|value| value as f32),
         door_open_fraction: ship.door_open_fraction as f32,
         instruments: CockpitInstruments {
+            power_off: !ship.power_available,
             speed_meters_per_second: ship.speed_meters_per_second,
             thruster_percentage: ship.thruster_percentage,
             core_energy_capacity_joules: ship.energy_core.capacity_joules,
@@ -100,11 +101,11 @@ mod tests {
         );
         assert_eq!(stopped.instruments.nearby_body.unwrap().name, "Earth");
 
-        ship.set_stored_core_energy_joules(250_000_000_000);
+        ship.set_stored_core_energy_joules(25_000_000_000);
         let changed_energy = map_ship_to_renderer(ship.snapshot());
         assert_eq!(
             changed_energy.instruments.core_energy_stored_joules,
-            250_000_000_000
+            25_000_000_000
         );
 
         ship.adjust_thruster(1);
@@ -127,7 +128,7 @@ mod tests {
         ship.trigger_landing_action();
         ship.set_cockpit_control(false);
         let assisting = map_ship_to_renderer(ship.snapshot()).instruments;
-        assert_eq!(assisting.core_energy_stored_joules, 250_000_000_000);
+        assert_eq!(assisting.core_energy_stored_joules, 24_989_989_000);
         assert_eq!(
             assisting.speed_meters_per_second,
             full_power.instruments.speed_meters_per_second
@@ -154,7 +155,7 @@ mod tests {
         let landed = map_ship_to_renderer(ship.snapshot()).instruments;
         assert_eq!(landed.speed_meters_per_second, 0.0);
         assert_eq!(landed.thruster_percentage, 0);
-        assert_eq!(landed.core_energy_stored_joules, 250_000_000_000);
+        assert_eq!(landed.core_energy_stored_joules, 24_989_109_000);
 
         let out_of_range = ShipController::flying(
             salimon_ship::ShipPose {

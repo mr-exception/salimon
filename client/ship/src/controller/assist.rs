@@ -86,7 +86,7 @@ impl ShipController {
     /// Performs the contextual `L` action. Automatic sequences deliberately do
     /// nothing here, making them uncancellable once started.
     pub fn trigger_landing_action(&mut self) {
-        if !self.cockpit_control_active {
+        if !self.cockpit_control_active || !self.energy_core.powered() {
             return;
         }
         self.clear_throttle_input();

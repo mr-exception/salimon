@@ -9,6 +9,7 @@ use salimon_world::resource_generation::{GenerationError, SurfaceDeposit};
 
 #[derive(Default)]
 pub(crate) struct MiningTool {
+    pub(crate) ship_gravity_disabled: bool,
     pub(crate) ship_mass: salimon_ship::ShipMass,
     pub(crate) terrain: salimon_world::terrain::TerrainMode,
     placements: std::cell::RefCell<crate::resource_presentation::PlacementCache>,

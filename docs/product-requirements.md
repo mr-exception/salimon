@@ -18,7 +18,8 @@ The client-only prototype extends the Phase 0 navigation showcase with surface
 resource generation/mining, physical fragments, one-object carrying, ship/surface
 transfer, fragment gravity/contact and airlock/EVA. Resource changes survive local
 streaming in memory for the current session. Survival, crafting, NPCs, multiplayer,
-disk/backend persistence and production energy management remain deferred.
+disk/backend persistence and full physical energy conversion/intake remain deferred.
+Cached physical cargo mass and authoritative Core storage/consumers/power are implemented.
 See [Project Phases](project-phases.md) for current scope and
 [Technical Architecture](technical-architecture.md) for implemented ownership.
 

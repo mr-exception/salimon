@@ -299,3 +299,10 @@ carrying and frame/session ownership when comparing an f64 candidate.
 Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
 and [world definition contract](../world/terrain-contract.md). Keep local rules
 and their consumers aligned; flat deterministic fixtures are explicit.
+
+## Core power integration (#188)
+
+`Surface::UnpoweredFloor` retains ship-local deck geometry/contact and containment
+while applying zero gravity. Power transitions change the surface snapshot and
+wake/invalidate sleeping contact state through existing environmental matching.
+Sphere/sampled surfaces keep their independent radial gravity.

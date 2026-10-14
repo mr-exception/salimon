@@ -10,19 +10,26 @@ fn approach(current: f64, target: f64, maximum_delta: f64) -> f64 {
 
 impl ShipController {
     pub fn set_steering_input(&mut self, input: SteeringInput) {
-        self.steering_target =
-            if self.cockpit_control_active && self.flight_state == FlightState::Flying {
-                SteeringInput {
-                    pitch: input.pitch.clamp(-1.0, 1.0),
-                    yaw: input.yaw.clamp(-1.0, 1.0),
-                    roll: input.roll.clamp(-1.0, 1.0),
-                }
-            } else {
-                SteeringInput::default()
-            };
+        self.steering_target = if self.cockpit_control_active
+            && self.energy_core.powered()
+            && self.flight_state == FlightState::Flying
+        {
+            SteeringInput {
+                pitch: input.pitch.clamp(-1.0, 1.0),
+                yaw: input.yaw.clamp(-1.0, 1.0),
+                roll: input.roll.clamp(-1.0, 1.0),
+            }
+        } else {
+            SteeringInput::default()
+        };
     }
 
     pub(super) fn advance_steering(&mut self, seconds: f64) {
+        if !self.energy_core.powered() {
+            self.steering_target = SteeringInput::default();
+            self.steering = SteeringInput::default();
+            return;
+        }
         let step = seconds / STEERING_RAMP_SECONDS;
         self.steering.pitch = approach(self.steering.pitch, self.steering_target.pitch, step);
         self.steering.yaw = approach(self.steering.yaw, self.steering_target.yaw, step);

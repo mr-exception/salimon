@@ -37,8 +37,9 @@ Implemented gameplay includes surface walking, ship flight/assists, airlock/EVA,
 resource mining, one-fragment carrying, planet/ship transfer and custom fragment
 motion/contact. Mining session deltas and physical fragments survive nearby
 streaming **in memory for the current session**. This is not disk/backend
-persistence. No orbital simulation, multiplayer, production survival or energy
-management is implemented. Core energy is a bounded telemetry fixture.
+persistence. No orbital simulation, multiplayer or production survival is implemented.
+Core joule storage, watt consumers and power authority are implemented; physical
+Core intake/conversion and assist reservations remain separate follow-ups.
 
 ## Accepted constraints
 

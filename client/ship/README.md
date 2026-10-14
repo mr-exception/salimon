@@ -31,10 +31,14 @@ phase eases out of and into rest, and alignment follows the shortest quaternion
 arc. Timing uses supplied elapsed time, including frames longer than 100 ms;
 no orientation or position change occurs on activation.
 
-Each snapshot also carries a bounded Energy Core telemetry fixture and
-the nearest catalog body within an inclusive 3,000,000 m surface distance. The
-fixture starts at 750 GJ stored in a 1 TJ capacity and has no consumption,
-generation or persistence. Nonzero stored fixture energy gates throttle changes. Nearby telemetry includes
+Each snapshot carries authoritative Core power/whole-joule telemetry and
+the nearest catalog body within an inclusive 3,000,000 m surface distance.
+The configurable starter Core stores 45 GJ in a 60 GJ capacity. Forward/reverse
+thrust consumes up to 100 MW/50 MW plus independent gravity/cockpit idle loads.
+Power loss stops thrust, cockpit controls/display and artificial gravity while
+preserving throttle and velocity; charging resumes selected throttle. Fractional
+joules remain internal. Physical conversion/intake and persistence are separate
+work. See [Core power](architecture.md#authoritative-core-power-188). Nearby telemetry includes
 the body's name, surface distance, and signed radial speed: negative approaches,
 positive recedes, and zero is stationary.
 

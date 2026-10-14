@@ -1,8 +1,8 @@
 # Character Invariants
 
-1. Ship-floor and solid-body walking use one fixed 9.81 m/s² gravity strength.
-2. Ship gravity completely owns the character while the controller is inside or
-   seated, irrespective of the nearby planetary surface.
+1. Powered ship-floor and solid-body walking use fixed 9.81 m/s² gravity.
+2. Ship power owns artificial gravity inside/seated: powered gives floor gravity,
+   unpowered gives zero gravity, irrespective of nearby planetary surfaces.
 3. A closed door blocks passage in either direction. An open flying airlock
    admits space EVA; landed crossings use continuous ramp support. Closing
    during a doorway blend ends it before movement and resolves overlap to the

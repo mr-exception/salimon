@@ -19,10 +19,15 @@ impl CharacterController {
         let movement = ship_planar_movement(input, self.yaw_radians);
         local[0] += movement[0] * WALK_SPEED_METERS_PER_SECOND * seconds;
         local[2] += movement[1] * WALK_SPEED_METERS_PER_SECOND * seconds;
-        if jump_started && local[1] <= PLAYER_EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT + 0.001 {
+        if self.ship_gravity_enabled
+            && jump_started
+            && local[1] <= PLAYER_EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT + 0.001
+        {
             self.vertical_speed = JUMP_SPEED_METERS_PER_SECOND;
         }
-        self.vertical_speed -= FIXED_GRAVITY_METERS_PER_SECOND_SQUARED * seconds;
+        if self.ship_gravity_enabled {
+            self.vertical_speed -= FIXED_GRAVITY_METERS_PER_SECOND_SQUARED * seconds;
+        }
         local[1] += self.vertical_speed * seconds;
         if local[1] <= PLAYER_EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT {
             local[1] = PLAYER_EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT;
@@ -690,5 +695,41 @@ mod tests {
                 assert_eq!(local[2], 1.15);
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod energy_tests {
+    use super::super::test_support::*;
+    use super::*;
+    #[test]
+    fn unpowered_cabin_preserves_vertical_motion_without_planetary_fallback() {
+        let mut player = CharacterController {
+            position: PositionState::Inside {
+                local: [-5.0, 2.2, 0.0],
+            },
+            vertical_speed: 0.0,
+            ..Default::default()
+        };
+        player.set_ship_gravity_enabled(false);
+        player.advance(
+            Duration::from_millis(100),
+            MovementInput::default(),
+            frame(),
+            surface(),
+            false,
+            true,
+        );
+        assert_eq!(player.local_ship_position().unwrap()[1], 2.2);
+        player.set_ship_gravity_enabled(true);
+        player.advance(
+            Duration::from_millis(100),
+            MovementInput::default(),
+            frame(),
+            surface(),
+            false,
+            true,
+        );
+        assert!(player.local_ship_position().unwrap()[1] < 2.2);
     }
 }

@@ -1,0 +1,25 @@
+{
+  "setup": {"scenario": "crash-recovery", "seed": 0, "step_ms": 100},
+  "timeout_ms": 120000,
+  "steps": [
+    {"action": {"op": "step", "frames": 100}},
+    {"assert": {"path": "ship.flight_state", "equals": "GroundedAfterCrash { body: Earth }"}},
+    {"assert": {"path": "ship.speed_meters_per_second", "equals": 0}},
+    {"assert": {"path": "ship.thruster_percentage", "equals": 0}},
+    {"action": {"op": "landing"}},
+    {"assert": {"path": "ship.flight_state", "equals": "AssistedLanding { body: Earth }"}},
+    {"assert": {"path": "ship.energy_core.stored_joules", "lt": 44000000000}},
+    {"action": {"op": "landing"}},
+    {"action": {"op": "step", "frames": 120}},
+    {"assert": {"path": "ship.flight_state", "equals": "Landed { body: Earth }"}},
+    {"assert": {"path": "ship.speed_meters_per_second", "equals": 0}},
+    {"assert": {"path": "ship.thruster_percentage", "equals": 0}},
+    {"action": {"op": "landing"}},
+    {"assert": {"path": "ship.flight_state", "equals": "AssistedTakeoff { body: Earth }"}},
+    {"action": {"op": "step", "frames": 60}},
+    {"assert": {"path": "ship.flight_state", "equals": "Flying"}},
+    {"assert": {"path": "ship.speed_meters_per_second", "gt": 0}},
+    {"assert": {"path": "ship.thruster_percentage", "equals": 0}},
+    {"screenshot": "crash-recovery"}
+  ]
+}

@@ -572,3 +572,14 @@ available without power.
 Crash-grounded L input routes through the same ship-domain assisted action as
 normal landing. Automation uses that production route; tests cover lift/recovery
 and safe relocation on representative terrain with authored support geometry.
+
+## Realistic flight regression (#195)
+
+`flight_regression.rs` owns opt-in deterministic initial conditions and tests for
+`flight-regression`, `core-restart`, `crash-recovery` and `cargo-flight` E2E setups.
+After setup the normal automation actions/controllers own every transition.
+Inspection exposes explicit power, conversion and ship-owned navigation telemetry.
+The 500-piece fixture uses 0.032 kg authored iron fragments inside the aft cabin;
+checks compare the live ledger with actual physical identities, including Core
+consumption, rather than assuming every overfull stress-fixture piece is onboard.
+See the [runner commands](../../scripts/README.md#realistic-flight-regression-195).

@@ -8,6 +8,7 @@ mod benchmark_fixture;
 mod carrying;
 mod e2e;
 mod equipment;
+mod flight_regression;
 mod fragment_physics;
 mod frame_clock;
 mod mining;

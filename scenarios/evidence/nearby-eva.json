@@ -20,12 +20,6 @@
     },
     {
       "action": {
-        "op": "thruster",
-        "direction": 1
-      }
-    },
-    {
-      "action": {
         "op": "interact"
       }
     },
@@ -120,7 +114,10 @@
       }
     },
     {
-      "action": {"op": "step", "frames": 45}
+      "action": {
+        "op": "step",
+        "frames": 45
+      }
     },
     {
       "action": {

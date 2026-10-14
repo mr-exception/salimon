@@ -749,11 +749,12 @@ mod tests {
         .unwrap();
         let initial = accounting(&app);
         let anchors = app.mining.ship_fragments.clone();
-        let response = crate::automation::execute(
-            &mut app,
-            r#"{"protocol":1,"id":1,"op":"thruster","direction":1}"#,
-        );
-        assert_eq!(response["ok"], true);
+        app.ship = salimon_ship::ShipController::flying_with_velocity(
+            app.ship.snapshot().pose,
+            0,
+            [25_000.0, 0.0, 0.0],
+        )
+        .unwrap();
         app.automation_key(PhysicalKey::Code(KeyCode::KeyA), true);
         for _ in 0..100 {
             app.advance_game(Duration::from_millis(16));

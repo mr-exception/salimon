@@ -145,3 +145,12 @@ Identity, material, mass, and source stay unchanged through repeated trips.
 Current greybox cubes retain world-axis orientation with conservative clearance
 for rotated decks. This adds no abstract inventory, container system, cargo
 counting, rigid-body dynamics, or backend persistence.
+
+## Implemented starter flight (#201)
+
+The 100,000 kg dry hull has 4 MN forward and 2 MN reverse force capacity.
+World-space momentum persists independently of orientation; zero throttle
+coasts. Acceleration is force divided by cached total mass. Steering remains
+5°/s with its existing presentation ramp. There is no drag, speed cap or
+planetary gravity in this flight wave. Core energy remains a telemetry fixture
+until its separate implementation.

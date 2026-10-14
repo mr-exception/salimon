@@ -102,6 +102,7 @@ mod tests {
             10,
         );
 
+        ship.velocity = [100.0, 0.0, 0.0];
         let receding = ship.snapshot().nearby_body.unwrap();
         assert_eq!(receding.name, "Earth");
         assert_eq!(
@@ -111,6 +112,7 @@ mod tests {
         assert!(receding.radial_speed_meters_per_second > 0.0);
 
         ship.pose.orientation = [0.0, 1.0, 0.0, 0.0];
+        ship.velocity = [-100.0, 0.0, 0.0];
         assert!(
             ship.snapshot()
                 .nearby_body
@@ -120,6 +122,7 @@ mod tests {
         );
 
         ship.thruster_percentage = 0;
+        ship.velocity = [0.0; 3];
         assert_eq!(
             ship.snapshot()
                 .nearby_body

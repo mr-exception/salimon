@@ -65,7 +65,7 @@ def run(binary, count, layout, settle_steps, timeout, output, carrying, request_
     result = {'count': count, 'layout': layout, 'status': 'failed',
               'artifact_directory': str(artifacts.directory), 'checkpoints': {},
               'request_timeout_seconds': request_timeout}
-    setup = {'scenario': 'orbit-earth', 'seed': 155, 'step_ms': 16,
+    setup = {'scenario': 'coasting-orbit', 'seed': 155, 'step_ms': 16,
              'fragment_count': count, 'fragment_layout': layout,
              'fragment_settle_steps': settle_steps}
     started = time.monotonic()
@@ -116,13 +116,11 @@ def run(binary, count, layout, settle_steps, timeout, output, carrying, request_
                     result['maximum_rigid_motion_drift_meters'] = max(result['maximum_rigid_motion_drift_meters'], error)
                 result['checkpoints'][name] = checkpoint(state)
             check(initial, 'initial_sleep')
-            request('thruster', direction=1)
             key('left', True)
             state = request('step', frames=100)
             key('left', False)
             assert abs(state['ship']['speed_meters_per_second'] - 25000) < .001
             check(state, 'fast_rotating_flight')
-            request('thruster', direction=-1)
             for name, expected in [('landing', 'Landed { body: Earth }'), ('takeoff', 'Flying')]:
                 state = request('landing')
                 for _ in range(100):

@@ -18,6 +18,8 @@ use assist::AssistTransition;
 #[derive(Clone, Debug)]
 pub struct ShipController {
     pub(crate) pose: ShipPose,
+    pub(crate) velocity: [f64; 3],
+    pub(crate) propulsion: crate::Propulsion,
     pub(crate) terrain: salimon_world::terrain::TerrainMode,
     pub(crate) landing_footprint: Option<crate::LandingFootprint>,
     pub(crate) flight_state: FlightState,
@@ -41,6 +43,8 @@ impl Default for ShipController {
         let mut position_meters = earth.center.meters();
         position_meters[1] += earth.radius_meters + LANDED_ORIGIN_HEIGHT_METERS;
         Self {
+            velocity: [0.0; 3],
+            propulsion: crate::Propulsion::default(),
             terrain: salimon_world::terrain::TerrainMode::Flat,
             landing_footprint: None,
             pose: ShipPose {
@@ -67,6 +71,8 @@ impl ShipController {
     #[must_use]
     pub fn flying(pose: ShipPose, thruster_percentage: u8) -> Self {
         Self {
+            velocity: [0.0; 3],
+            propulsion: crate::Propulsion::default(),
             terrain: salimon_world::terrain::TerrainMode::Flat,
             landing_footprint: None,
             pose,
@@ -81,6 +87,25 @@ impl ShipController {
             steering: SteeringInput::default(),
             assist: None,
         }
+    }
+
+    /// A scenario/import boundary; selected throttle never implies initial speed.
+    pub fn flying_with_velocity(
+        pose: ShipPose,
+        throttle: u8,
+        velocity: [f64; 3],
+    ) -> Result<Self, crate::InvalidFlightMotion> {
+        if !velocity.iter().all(|v| v.is_finite()) {
+            return Err(crate::InvalidFlightMotion);
+        }
+        let mut ship = Self::flying(pose, throttle);
+        ship.velocity = velocity;
+        Ok(ship)
+    }
+
+    /// Event-driven cached mass/thrust update. Does not scan cargo or reset momentum.
+    pub fn set_propulsion(&mut self, propulsion: crate::Propulsion) {
+        self.propulsion = propulsion;
     }
 
     pub fn advance(&mut self, delta: Duration) {
@@ -105,6 +130,7 @@ impl ShipController {
             door_open_fraction: self.door_open_fraction,
             cockpit_control_active: self.cockpit_control_active,
             thruster_percentage: self.thruster_percentage,
+            total_mass_kg: self.propulsion.total_mass_kg(),
             speed_meters_per_second: self.speed_meters_per_second(),
             velocity_meters_per_second,
             energy_core: self.energy_core,

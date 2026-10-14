@@ -88,7 +88,8 @@ mod tests {
     use salimon_world::CameraPrototype;
     #[test]
     fn cockpit_instruments_follow_live_power_and_landing_after_leaving_the_seat() {
-        let pose = ShipController::default().snapshot().pose;
+        let mut pose = ShipController::default().snapshot().pose;
+        pose.position_meters[1] += 100.0;
         let mut ship = ShipController::flying(pose, 0);
         let stopped = map_ship_to_renderer(ship.snapshot());
         assert_eq!(stopped.instruments.speed_meters_per_second, 0.0);
@@ -109,17 +110,18 @@ mod tests {
         ship.adjust_thruster(1);
         let minimum_power = map_ship_to_renderer(ship.snapshot());
         assert_eq!(minimum_power.instruments.thruster_percentage, 1);
-        assert_eq!(
-            minimum_power.instruments.speed_meters_per_second,
-            salimon_world::PHASE_ZERO_REFERENCE_MAX_SPEED_METERS_PER_SECOND / 100.0
-        );
+        assert_eq!(minimum_power.instruments.speed_meters_per_second, 0.0);
 
         ship.adjust_thruster(99);
         let full_power = map_ship_to_renderer(ship.snapshot());
         assert_eq!(full_power.instruments.thruster_percentage, 100);
+        assert_eq!(full_power.instruments.speed_meters_per_second, 0.0);
+        ship.advance(std::time::Duration::from_millis(100));
         assert_eq!(
-            full_power.instruments.speed_meters_per_second,
-            salimon_world::PHASE_ZERO_REFERENCE_MAX_SPEED_METERS_PER_SECOND
+            map_ship_to_renderer(ship.snapshot())
+                .instruments
+                .speed_meters_per_second,
+            4.0
         );
 
         ship.trigger_landing_action();
@@ -149,13 +151,10 @@ mod tests {
             ship.snapshot().flight_state,
             FlightState::Landed { .. }
         ));
-        assert_eq!(
-            map_ship_to_renderer(ship.snapshot()).instruments,
-            CockpitInstruments {
-                core_energy_stored_joules: 250_000_000_000,
-                ..stopped.instruments
-            }
-        );
+        let landed = map_ship_to_renderer(ship.snapshot()).instruments;
+        assert_eq!(landed.speed_meters_per_second, 0.0);
+        assert_eq!(landed.thruster_percentage, 0);
+        assert_eq!(landed.core_energy_stored_joules, 250_000_000_000);
 
         let out_of_range = ShipController::flying(
             salimon_ship::ShipPose {

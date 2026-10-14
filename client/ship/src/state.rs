@@ -68,6 +68,7 @@ pub struct ShipSnapshot {
     pub door_open_fraction: f64,
     pub cockpit_control_active: bool,
     pub thruster_percentage: u8,
+    pub total_mass_kg: f64,
     pub speed_meters_per_second: f64,
     pub velocity_meters_per_second: [f64; 3],
     pub energy_core: EnergyCoreState,

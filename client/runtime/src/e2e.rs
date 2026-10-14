@@ -27,6 +27,8 @@ pub(crate) enum Scenario {
     ResourceApproach,
     OrbitMoon,
     OpenSpace,
+    CoastingSpace,
+    CoastingOrbit,
     EvaApproach,
 }
 
@@ -50,9 +52,11 @@ impl Scenario {
             "resource-approach" => Ok(Self::ResourceApproach),
             "orbit-moon" => Ok(Self::OrbitMoon),
             "open-space" => Ok(Self::OpenSpace),
+            "coasting-space" => Ok(Self::CoastingSpace),
+            "coasting-orbit" => Ok(Self::CoastingOrbit),
             "eva-approach" => Ok(Self::EvaApproach),
             _ => Err(format!(
-                "unknown scenario '{value}'; expected fragment-pile, landed-earth, cockpit-earth, resource-approach, orbit-earth, orbit-moon, open-space, or eva-approach"
+                "unknown scenario '{value}'; expected fragment-pile, landed-earth, cockpit-earth, resource-approach, orbit-earth, orbit-moon, open-space, coasting-space, or eva-approach"
             )),
         }
     }
@@ -76,6 +80,8 @@ impl Scenario {
             Self::ResourceApproach => "resource-approach",
             Self::OrbitMoon => "orbit-moon",
             Self::OpenSpace => "open-space",
+            Self::CoastingSpace => "coasting-space",
+            Self::CoastingOrbit => "coasting-orbit",
             Self::EvaApproach => "eva-approach",
         }
     }
@@ -268,6 +274,8 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
         Scenario::ResourceApproach
         | Scenario::OrbitEarth
         | Scenario::OrbitMoon
+        | Scenario::CoastingOrbit
+        | Scenario::CoastingSpace
         | Scenario::OpenSpace
         | Scenario::EvaApproach => {
             let id = if config.scenario != Scenario::OrbitMoon {
@@ -285,7 +293,10 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
             position[1] += body.radius_meters
                 + if config.scenario == Scenario::EvaApproach {
                     salimon_ship::NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS + 200_000.0
-                } else if config.scenario == Scenario::OpenSpace {
+                } else if matches!(
+                    config.scenario,
+                    Scenario::OpenSpace | Scenario::CoastingOrbit | Scenario::CoastingSpace
+                ) {
                     salimon_ship::NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS + 10_000.0
                 } else {
                     1_000.0
@@ -311,6 +322,21 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
                 },
                 0,
             );
+            if matches!(
+                config.scenario,
+                Scenario::CoastingOrbit | Scenario::CoastingSpace | Scenario::EvaApproach
+            ) {
+                app.ship = ShipController::flying_with_velocity(
+                    app.ship.snapshot().pose,
+                    0,
+                    if config.scenario == Scenario::EvaApproach {
+                        [0.0, -25_000.0, 0.0]
+                    } else {
+                        [25_000.0, 0.0, 0.0]
+                    },
+                )
+                .map_err(|error| error.to_string())?;
+            }
             app.character.enter_cockpit();
         }
     }
@@ -327,6 +353,8 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
             | Scenario::ResourceApproach
             | Scenario::OrbitEarth
             | Scenario::OrbitMoon
+            | Scenario::CoastingOrbit
+            | Scenario::CoastingSpace
             | Scenario::OpenSpace
             | Scenario::EvaApproach
     ) != (snapshot.flight_state == FlightState::Flying)
@@ -494,6 +522,32 @@ fn mix(mut value: u64) -> u64 {
 mod tests {
     use super::*;
     use std::time::Instant;
+
+    #[test]
+    fn coasting_fixtures_seed_momentum_without_selected_thrust() {
+        for (scenario, velocity) in [
+            (Scenario::CoastingSpace, [25_000.0, 0.0, 0.0]),
+            (Scenario::CoastingOrbit, [25_000.0, 0.0, 0.0]),
+            (Scenario::EvaApproach, [0.0, -25_000.0, 0.0]),
+        ] {
+            let mut app = ClientApplication::default();
+            initialize(
+                &mut app,
+                Config {
+                    scenario,
+                    seed: 0,
+                    step: Duration::from_millis(16),
+                    fragment_load: None,
+                },
+            )
+            .unwrap();
+            let initial = app.ship.snapshot();
+            assert_eq!(initial.thruster_percentage, 0);
+            assert_eq!(initial.velocity_meters_per_second, velocity);
+            app.advance_automation(Duration::from_millis(160));
+            assert_eq!(app.ship.snapshot().velocity_meters_per_second, velocity);
+        }
+    }
 
     #[test]
     fn same_seed_produces_same_initial_state_and_fixed_updates() {

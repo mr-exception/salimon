@@ -500,7 +500,7 @@ fn inspect(app: &ClientApplication) -> Value {
         "ship": {"position_meters": ship.pose.position_meters, "orientation": ship.pose.orientation,
             "flight_state": format!("{:?}", ship.flight_state), "door_state": format!("{:?}", ship.door_state), "door_open_fraction": ship.door_open_fraction,
             "cockpit_control_active": ship.cockpit_control_active,
-            "thruster_percentage": ship.thruster_percentage, "speed_meters_per_second": ship.speed_meters_per_second,
+            "thruster_percentage": ship.thruster_percentage, "total_mass_kg": ship.total_mass_kg, "speed_meters_per_second": ship.speed_meters_per_second,
             "velocity_meters_per_second": ship.velocity_meters_per_second,
             "energy_core": {"stored_joules": ship.energy_core.stored_joules,
                 "capacity_joules": ship.energy_core.capacity_joules},
@@ -1096,7 +1096,7 @@ mod tests {
     #[test]
     fn moving_eva_walkthrough_uses_real_gameplay_actions() {
         assert_gameplay_scenario(
-            Scenario::OpenSpace,
+            Scenario::CoastingSpace,
             include_str!("../../../scenarios/moving-eva.json"),
         );
     }

@@ -25,12 +25,19 @@ pub struct SphereSurface {
 }
 
 /// Environmental support; floor objects share one ship-local frame per call.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug)]
 pub enum Surface {
     Floor {
         height_meters: f64,
     },
     Sphere(SphereSurface),
+    /// Pure caller-owned heightfield query; gravity remains radial to body.center.
+    Sampled {
+        body: SphereSurface,
+        query: GroundQuery,
+        /// Same authoritative point as query, without computing its normal stencil.
+        point_query: GroundPointQuery,
+    },
     /// Legacy unsupported objects still accelerate along -Y, without ground contact.
     Unsupported,
 }
@@ -39,10 +46,59 @@ impl Surface {
         matches!(self, Self::Floor { .. })
     }
     fn sphere(self) -> Option<SphereSurface> {
-        if let Self::Sphere(body) = self {
-            Some(body)
-        } else {
-            None
+        match self {
+            Self::Sphere(body) | Self::Sampled { body, .. } => Some(body),
+            _ => None,
+        }
+    }
+}
+
+/// Absolute environmental point and outward unit normal; query is allocation-free.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct GroundSample {
+    pub point: [f64; 3],
+    pub normal: [f64; 3],
+}
+pub type GroundQuery = fn(SphereSurface, [f64; 3]) -> GroundSample;
+pub type GroundPointQuery = fn(SphereSurface, [f64; 3]) -> [f64; 3];
+impl PartialEq for Surface {
+    fn eq(&self, other: &Self) -> bool {
+        match (*self, *other) {
+            (Self::Floor { height_meters: a }, Self::Floor { height_meters: b }) => a == b,
+            (Self::Sphere(a), Self::Sphere(b)) => a == b,
+            (
+                Self::Sampled {
+                    body: a,
+                    query: qa,
+                    point_query: pa,
+                },
+                Self::Sampled {
+                    body: b,
+                    query: qb,
+                    point_query: pb,
+                },
+            ) => a == b && std::ptr::fn_addr_eq(qa, qb) && std::ptr::fn_addr_eq(pa, pb),
+            (Self::Unsupported, Self::Unsupported) => true,
+            _ => false,
+        }
+    }
+}
+impl Surface {
+    pub(crate) fn ground(self, position: [f64; 3]) -> Option<GroundSample> {
+        match self {
+            Self::Floor { height_meters } => Some(GroundSample {
+                point: [position[0], height_meters, position[2]],
+                normal: [0.0, 1.0, 0.0],
+            }),
+            Self::Sphere(body) => {
+                let normal = normalize(sub(position, body.center));
+                Some(GroundSample {
+                    point: add(body.center, scale(normal, body.radius)),
+                    normal,
+                })
+            }
+            Self::Sampled { body, query, .. } => Some(query(body, position)),
+            Self::Unsupported => None,
         }
     }
 }
@@ -818,39 +874,84 @@ fn rolling_delta(
 fn ground_contact(piece: &mut ObjectState) {
     ground_contact_cached(piece, &mut ContactResponse::default());
 }
-fn ground_contact_cached(piece: &mut ObjectState, response: &mut ContactResponse) {
-    let normal = piece
-        .surface
-        .sphere()
-        .map(|b| normalize(sub(piece.position, b.center)))
-        .unwrap_or([0.0, 1.0, 0.0]);
-    if let Some(hull) = &piece.hull {
-        piece.ground_support_meters =
-            hull.support(piece.orientation, piece.side_meters, scale(normal, -1.0));
+struct SampledContact {
+    normal: [f64; 3],
+    penetration: f64,
+    arms: Vec<[f64; 3]>,
+}
+fn sampled_contact(piece: &ObjectState) -> Option<SampledContact> {
+    let Surface::Sampled {
+        body,
+        query,
+        point_query,
+    } = piece.surface
+    else {
+        return None;
+    };
+    let hull = piece.hull.as_ref()?;
+    let mut points = Vec::with_capacity(hull.vertices.len());
+    let mut deepest = f64::INFINITY;
+    let center_normal = query(body, piece.position).normal;
+    let mut witness = piece.position;
+    for vertex in &hull.vertices {
+        let arm = convex::rotate(piece.orientation, scale(*vertex, piece.side_meters));
+        let point = add(piece.position, arm);
+        let ground = point_query(body, point);
+        let gap = dot(sub(point, ground), center_normal);
+        if gap < deepest {
+            deepest = gap;
+            witness = point;
+        }
+        points.push((arm, gap));
     }
-    let (up, penetration) = if let Surface::Floor { height_meters } = piece.surface {
-        (
-            [0.0, 1.0, 0.0],
-            height_meters + piece.ground_support_meters - piece.position[1],
-        )
-    } else if let Some(body) = piece.surface.sphere() {
-        let radial = sub(piece.position, body.center);
-        let distance = length(radial);
-        (
-            normalize(radial),
-            body.radius + piece.ground_support_meters - distance,
-        )
-    } else {
+    let arms = points
+        .into_iter()
+        .filter(|(_, gap)| *gap <= deepest + 0.001 * piece.side_meters)
+        .map(|(arm, _)| arm)
+        .collect();
+    let normal = query(body, witness).normal;
+    Some(SampledContact {
+        normal,
+        penetration: -deepest,
+        arms,
+    })
+}
+fn ground_contact_cached(piece: &mut ObjectState, response: &mut ContactResponse) {
+    let Some(ground) = piece.surface.ground(piece.position) else {
         *response = ContactResponse::default();
         return;
     };
+    let sampled = sampled_contact(piece);
+    let up = sampled.as_ref().map_or(ground.normal, |c| c.normal);
+    if let Some(hull) = &piece.hull {
+        piece.ground_support_meters =
+            hull.support(piece.orientation, piece.side_meters, scale(up, -1.0));
+    }
+    let penetration = sampled.as_ref().map_or_else(
+        || {
+            let gap = if let Surface::Sphere(body) = piece.surface {
+                length(sub(piece.position, body.center)) - body.radius
+            } else {
+                dot(sub(piece.position, ground.point), up)
+            };
+            if let Surface::Sphere(body) = piece.surface {
+                body.radius + piece.ground_support_meters - length(sub(piece.position, body.center))
+            } else {
+                piece.ground_support_meters - gap
+            }
+        },
+        |c| c.penetration,
+    );
     if penetration < -CONTACT_BIAS_METERS {
         *response = ContactResponse::default();
         return;
     }
     piece.position = add(piece.position, scale(up, penetration.max(0.0)));
     if let Some(hull) = &piece.hull {
-        let arms = hull.ground_arms(piece.orientation, piece.side_meters, scale(up, -1.0));
+        let arms = sampled.map_or_else(
+            || hull.ground_arms(piece.orientation, piece.side_meters, scale(up, -1.0)),
+            |c| c.arms,
+        );
         let paired_arms: Vec<_> = arms.iter().map(|&arm| (arm, [0.0; 3])).collect();
         response.prepare(up, &paired_arms, |_| 0.0);
         if std::mem::take(&mut response.pending_warm_start) {
@@ -1301,5 +1402,65 @@ mod tests {
         let expected_x_speed = 0.995_f64.powi(48);
         assert!((objects[0].velocity[0] - expected_x_speed).abs() < 1e-14);
         assert!(objects[0].position[1] < 96.0);
+    }
+}
+
+#[cfg(test)]
+mod terrain_tests {
+    use super::*;
+    fn ridge(_: SphereSurface, p: [f64; 3]) -> GroundSample {
+        let height = 0.2 * (1.0 - p[0].abs()).max(0.0);
+        let slope = if p[0].abs() < 1.0 {
+            -0.2 * p[0].signum()
+        } else {
+            0.0
+        };
+        GroundSample {
+            point: [p[0], height, p[2]],
+            normal: normalize([-slope, 1.0, 0.0]),
+        }
+    }
+    #[test]
+    fn convex_terrain_contact_samples_vertices_and_sleep_uses_the_same_support() {
+        let hull = Arc::new(ConvexHull::new([-0.5, 0.5].into_iter().flat_map(|x| {
+            [-0.5, 0.5]
+                .into_iter()
+                .flat_map(move |y| [-0.5, 0.5].map(move |z| [x, y, z]))
+        })));
+        let mut p = ObjectState {
+            position: [0.3, 0.5, 0.0],
+            velocity: [0.0; 3],
+            radius: 1.0,
+            ground_support_meters: 0.5,
+            surface: Surface::Sampled {
+                body: SphereSurface {
+                    center: [0.0, -1e9, 0.0],
+                    radius: 1e9,
+                },
+                query: ridge,
+                point_query: |body, p| ridge(body, p).point,
+            },
+            hull: Some(hull.clone()),
+            side_meters: 1.0,
+            orientation: [0.0, 0.0, 0.0, 1.0],
+            angular_velocity: [0.0; 3],
+            mass_kg: 1.0,
+        };
+        // Center tangent clearance misses the higher ridge under an actual corner.
+        for _ in 0..8 {
+            ground_contact(&mut p);
+        }
+        for vertex in &hull.vertices {
+            let point = add(p.position, *vertex);
+            let ground = ridge(
+                SphereSurface {
+                    center: [0.0; 3],
+                    radius: 1.0,
+                },
+                point,
+            );
+            assert!(dot(sub(point, ground.point), ground.normal) >= -0.000001);
+        }
+        assert!(sampled_contact(&p).unwrap().penetration.abs() < 0.001);
     }
 }

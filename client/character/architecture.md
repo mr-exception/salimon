@@ -132,3 +132,9 @@ Generated `LANDING_COLLIDERS` supply finite foot/column boxes to exterior walkin
 visibility and placement queries. Hull contact retains its original finite Y
 extent, permitting walking under the raised fuselage. The centered aft gate connects to the generated boarding ramp support and
 retains closed-door collision down to the landing foot plane.
+
+## Terrain integration (#179–#181)
+
+Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
+and [world definition contract](../world/terrain-contract.md). Keep local rules
+and their consumers aligned; flat deterministic fixtures are explicit.

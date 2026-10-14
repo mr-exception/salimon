@@ -7,6 +7,7 @@ use crate::{FlightState, SteeringInput};
 pub enum CockpitMessage {
     DoorLockedWhileInFlight,
     DoorObstructed,
+    UnsafeLandingSite,
     PressToLand,
     PressToTakeOff,
     CloseDoorBeforeTakeoff,
@@ -18,6 +19,7 @@ impl CockpitMessage {
     #[must_use]
     pub const fn text(self) -> &'static str {
         match self {
+            Self::UnsafeLandingSite => "Unsafe terrain: choose another landing site",
             Self::DoorObstructed => "Move clear of the boarding ramp",
             Self::DoorLockedWhileInFlight => "Door locked while in flight",
             Self::PressToLand => "Press L to land",

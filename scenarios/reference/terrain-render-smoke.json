@@ -1,0 +1,188 @@
+{
+  "setup": {
+    "scenario": "terrain-earth",
+    "seed": 181,
+    "step_ms": 16
+  },
+  "timeout_ms": 120000,
+  "steps": [
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "diagnostics",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "diagnostics",
+        "pressed": false
+      }
+    },
+    {
+      "screenshot": "terrain-diagnostics"
+    },
+    {
+      "action": {
+        "op": "window",
+        "action": "resize",
+        "width": 1280,
+        "height": 800
+      }
+    },
+    {
+      "wait": {
+        "path": "performance.drawable_pixels.0",
+        "equals": 1280
+      },
+      "frames": 1,
+      "timeout_ms": 10000
+    },
+    {
+      "screenshot": "terrain-resized"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "diagnostics",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "diagnostics",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "window",
+        "action": "minimize"
+      }
+    },
+    {
+      "wait": {
+        "path": "window.minimized",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 10000
+    },
+    {
+      "action": {
+        "op": "window",
+        "action": "restore"
+      }
+    },
+    {
+      "wait": {
+        "path": "window.minimized",
+        "equals": false
+      },
+      "frames": 1,
+      "timeout_ms": 10000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "view",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "view",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "view_mode",
+        "equals": "PrecisionTour"
+      }
+    },
+    {
+      "wait": {
+        "path": "terrain.active_patches",
+        "equals": 0
+      },
+      "frames": 1,
+      "timeout_ms": 10000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "near",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "near",
+        "pressed": false
+      }
+    },
+    {
+      "screenshot": "precision-flat-fixture"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "view",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "view",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "view_mode",
+        "equals": "Gameplay"
+      }
+    },
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 60000
+    },
+    {
+      "action": {
+        "op": "window",
+        "action": "resize",
+        "width": 1920,
+        "height": 1080
+      }
+    },
+    {
+      "wait": {
+        "path": "performance.drawable_pixels.0",
+        "equals": 1920
+      },
+      "frames": 1,
+      "timeout_ms": 10000
+    },
+    {
+      "screenshot": "terrain-restored"
+    }
+  ]
+}

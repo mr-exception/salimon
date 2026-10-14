@@ -5,6 +5,9 @@ use crate::resources::{
 use crate::{CELESTIAL_BODIES, WorldPosition};
 
 pub const FRAGMENT_MAX_MASS_KG: f64 = 2.0;
+/// A residual of a completed fill is left in the source, never debited or hidden.
+/// Initial small requests remain valid; this is not a minimum fragment mass.
+pub const FILL_ROUNDING_REMAINDER_KG: f64 = 1e-12;
 
 /// A growing physical piece receives extraction until full, then a new piece is created.
 /// This avoids producing a tiny object every simulation frame. No extracted mass is hidden.
@@ -35,6 +38,12 @@ impl FragmentOutput {
     ) -> f64 {
         let requested = mass;
         while mass > 0.0 {
+            // Repeated f64 additions can leave a microscopic residual after filling
+            // a full piece. Creating it would impose micrometre solver substeps.
+            // Return only mass actually emitted; the source retains the residual.
+            if mass < requested && mass <= FILL_ROUNDING_REMAINDER_KG {
+                break;
+            }
             let tail = self.fragments.iter().rposition(|piece| {
                 piece.source() == deposit.id() && !self.sealed.contains(&piece.id())
             });

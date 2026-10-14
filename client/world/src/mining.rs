@@ -54,11 +54,20 @@ pub fn aimed_deposit(
     deposits: &[SurfaceDeposit],
     obstruction_distance: Option<f64>,
 ) -> Option<MiningTarget> {
-    let planet_distance = CELESTIAL_BODIES
-        .iter()
-        .filter(|body| body.role == BodyRole::Solid)
-        .filter_map(|body| ray.sphere_distance(body.center, body.radius_meters))
-        .min_by(f64::total_cmp);
+    aimed_deposit_with_terrain(
+        ray,
+        deposits,
+        obstruction_distance,
+        crate::terrain::TerrainMode::Flat,
+    )
+}
+pub fn aimed_deposit_with_terrain(
+    ray: MiningRay,
+    deposits: &[SurfaceDeposit],
+    obstruction_distance: Option<f64>,
+    terrain: crate::terrain::TerrainMode,
+) -> Option<MiningTarget> {
+    let planet_distance = terrain_obstruction(ray, terrain, MINING_RANGE_METERS);
     let blocked_at = planet_distance
         .into_iter()
         .chain(obstruction_distance)
@@ -224,4 +233,50 @@ impl MiningSession {
 
 fn dot(a: [f64; 3], b: [f64; 3]) -> f64 {
     a.iter().zip(b).map(|(a, b)| a * b).sum()
+}
+
+/// Bounded short interaction ray. Flat mode preserves the analytic legacy query.
+/// Terrain uses 5 cm samples and a 20-step root bracket, including below nominal radius.
+pub fn terrain_obstruction(
+    ray: MiningRay,
+    terrain: crate::terrain::TerrainMode,
+    range: f64,
+) -> Option<f64> {
+    CELESTIAL_BODIES
+        .iter()
+        .filter(|body| body.role == BodyRole::Solid)
+        .filter_map(|body| {
+            if terrain == crate::terrain::TerrainMode::Flat || terrain.definition(body.id).is_none()
+            {
+                return ray.sphere_distance(body.center, body.radius_meters);
+            }
+            if terrain.clearance(*body, ray.origin.meters()).abs() > range + 1.0 {
+                return None;
+            }
+            let point = |distance| {
+                ray.origin
+                    .translated(ray.direction.map(|v| v * distance))
+                    .meters()
+            };
+            let mut previous = 0.0;
+            for i in 0..=80 {
+                let next = range * f64::from(i) / 80.0;
+                if terrain.clearance(*body, point(next)) <= 0.0 {
+                    let mut low = previous;
+                    let mut high = next;
+                    for _ in 0..20 {
+                        let mid = (low + high) * 0.5;
+                        if terrain.clearance(*body, point(mid)) > 0.0 {
+                            low = mid;
+                        } else {
+                            high = mid;
+                        }
+                    }
+                    return Some(high);
+                }
+                previous = next;
+            }
+            None
+        })
+        .min_by(f64::total_cmp)
 }

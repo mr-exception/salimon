@@ -23,7 +23,7 @@ salimon-world absolute f64 snapshot
         -> conservatively cull cuboid and projected sphere bounds
         -> build renderer-owned view + infinite reverse-Z projection
         -> acquire surface texture
-        -> encode depth-tested cuboids + analytic spheres + opaque ship + cockpit glass
+        -> encode depth-tested cuboids + analytic spheres + terrain patches + opaque ship + cockpit glass
         -> store scene depth, then composite overlays in a separate color-load pass
         -> resolve optional timestamp queries asynchronously
         -> submit command buffer
@@ -274,3 +274,9 @@ there is no planetary support on the lowered door in space. Renderer tags the
 leaf and tray separately, using one uniform for phased lowering/extension in
 the existing opaque batch. Character contact follows the complete sloping
 surface, supports a stopped or carrying walker, and joins radial ground at its tip.
+
+## Terrain integration (#179–#181)
+
+Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
+and [world definition contract](../world/terrain-contract.md). Keep local rules
+and their consumers aligned; flat deterministic fixtures are explicit.

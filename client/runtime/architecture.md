@@ -79,7 +79,7 @@ restarts it, and N selects and pauses the exact near-surface inspection view;
 releases and key-repeat events are ignored. The runtime maps native keys to typed
 commands; in precision-tour view, 1–6 restart inspection of Sun, Mercury, Venus, Earth, Moon, and Mars.
 It maps renderer/world measurements to diagnostics without sharing `wgpu` or
-`winit` types. All six catalog names and nonnegative camera-to-nominal-surface
+`winit` types. All six catalog names and nonnegative camera-to-sampled-surface (nominal in flat fixtures)
 observations flow through `BodyDistance`; diagnostics selects the closest for its
 single nearby-body row. Diagnostics owns aggregation and the RGBA panel, while
 the renderer owns only generic image composition. Gameplay view supplies live
@@ -452,3 +452,9 @@ there is no planetary support on the lowered door in space. Renderer tags the
 leaf and tray separately, using one uniform for phased lowering/extension in
 the existing opaque batch. Character contact follows the complete sloping
 surface, supports a stopped or carrying walker, and joins radial ground at its tip.
+
+## Terrain integration (#179–#181)
+
+Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
+and [world definition contract](../world/terrain-contract.md). Keep local rules
+and their consumers aligned; flat deterministic fixtures are explicit.

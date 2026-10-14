@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 from salimon_test import parse_scenario
+from scenario_suites import TERRAIN
 
 
 SCENARIOS = Path(__file__).resolve().parent.parent / "scenarios"
@@ -12,7 +13,7 @@ BASELINES = ("fragment-pile-floor.json", "fragment-pile-surface.json", "lower-co
 
 class BaselineScenarioTests(unittest.TestCase):
     def test_visual_variants_only_add_checkpoints(self):
-        for name in BASELINES:
+        for name in BASELINES + TERRAIN:
             path = SCENARIOS / name
             with self.subTest(scenario=path.name):
                 baseline = parse_scenario(path)
@@ -24,7 +25,7 @@ class BaselineScenarioTests(unittest.TestCase):
                 self.assertEqual(baseline, visual)
 
     def test_movement_is_released_before_authority_changes(self):
-        for name in BASELINES:
+        for name in BASELINES + TERRAIN:
             path = SCENARIOS / name
             with self.subTest(scenario=path.name):
                 held = set()

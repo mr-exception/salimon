@@ -10,6 +10,7 @@ const CLEARANCE_METERS: f64 = 0.005;
 
 pub(crate) struct EmissionSurface {
     entry: SurfaceDeposit,
+    terrain: salimon_world::terrain::TerrainMode,
     up: [f64; 3],
     player: CharacterSnapshot,
     // Points stay deposit-local until the final pose to preserve distant precision.
@@ -17,8 +18,22 @@ pub(crate) struct EmissionSurface {
 }
 
 impl EmissionSurface {
+    #[cfg(test)]
     pub(crate) fn new(entry: SurfaceDeposit, ray: MiningRay, player: CharacterSnapshot) -> Self {
-        let visual = crate::resource_presentation::deposit_mesh(entry)
+        Self::with_terrain(
+            entry,
+            ray,
+            player,
+            salimon_world::terrain::TerrainMode::Flat,
+        )
+    }
+    pub(crate) fn with_terrain(
+        entry: SurfaceDeposit,
+        ray: MiningRay,
+        player: CharacterSnapshot,
+        terrain: salimon_world::terrain::TerrainMode,
+    ) -> Self {
+        let visual = crate::resource_presentation::deposit_mesh_with_terrain(entry, terrain)
             .expect("mining target is nondepleted");
         let body = CELESTIAL_BODIES
             .iter()
@@ -31,7 +46,9 @@ impl EmissionSurface {
             .mesh
             .unit_vertices()
             .iter()
-            .map(|v| scale(*v, visual.side_meters))
+            .map(|v| {
+                salimon_physics::rotate(visual.orientation_xyzw, scale(*v, visual.side_meters))
+            })
             .collect();
         let first_hit = vertices
             .as_chunks::<3>()
@@ -88,6 +105,7 @@ impl EmissionSurface {
             .map(|(_, p, n)| (p, n))
             .collect();
         Self {
+            terrain,
             entry,
             up,
             player,
@@ -126,11 +144,32 @@ impl EmissionSurface {
                 .deposit
                 .position()
                 .translated(add(contact, scale(normal, support + CLEARANCE_METERS)));
-            let ground_support = hull.support([0.0, 0.0, 0.0, 1.0], side, scale(self.up, -1.0));
-            if length(position.offset_from(body.center)) - body.radius_meters
-                < ground_support + CLEARANCE_METERS
+            let direction = position.offset_from(body.center);
+            let ground = self
+                .terrain
+                .sample(*body, scale(direction, 1.0 / length(direction)));
+            let ground_support = hull.support(
+                [0.0, 0.0, 0.0, 1.0],
+                side,
+                scale(ground.outward_normal, -1.0),
+            );
+            if dot(
+                sub(direction, ground.body_local_position_meters),
+                ground.outward_normal,
+            ) < ground_support + CLEARANCE_METERS
             {
                 continue;
+            }
+            if self.terrain == salimon_world::terrain::TerrainMode::Representative {
+                let mesh = crate::resource_presentation::fragment_mesh(template);
+                if mesh.mesh.unit_vertices().iter().any(|vertex| {
+                    let p = add(direction, scale(*vertex, side));
+                    let radius = length(p);
+                    radius - body.radius_meters - self.terrain.height(*body, scale(p, 1.0 / radius))
+                        < CLEARANCE_METERS - 0.0002
+                }) {
+                    continue;
+                }
             }
             // Capsule clearance and existing envelopes are conservative. Try another
             // real facet, or pause extraction; never debit hidden/overlapping output.

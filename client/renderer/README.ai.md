@@ -20,7 +20,8 @@ and stored scene depth; keep projection/occlusion out of runtime gameplay policy
 
 Keep `Renderer::new`, `Renderer::resize`, and `Renderer::render` plus
 `CameraFrame`, `SceneInstance`, `SphereInstance`, `ShipMeshInstance`, `HeldItemInstance`, `CockpitInstruments`, `PointLight`, `SceneFrame`, and the typed image/result values
-as the narrow host-facing contract unless a task explicitly requires a change.
+as the host-facing contract. TerrainPatch/Key/Vertex/Mask extend it for immutable
+streamed geometry; explicit capture and cache observations support native evidence.
 Window/surface handles needed during initialization are integration inputs; they
 do not transfer native lifecycle policy to the renderer.
 
@@ -94,3 +95,9 @@ per-variant indexed instancing, pose validation, conservative resource culling a
 retained compact upload caches. CPU unit triangles remain available independently
 for collision/support queries. See [resource contract](architecture.md#authored-resource-fragments)
 before changing instance layout, material colors, precision or counters.
+
+## Terrain integration (#179–#181)
+
+Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
+and [world definition contract](../world/terrain-contract.md). Keep local rules
+and their consumers aligned; flat deterministic fixtures are explicit.

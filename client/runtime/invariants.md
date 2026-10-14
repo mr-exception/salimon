@@ -32,8 +32,10 @@
 14. Each world snapshot maps exactly six spheres plus three separate noncanonical
     marker cuboids. Sphere centers/radii remain `f64`. The Sun maps to emissive
     material and the point-light position; every solid maps to a lit material.
+    Gameplay may add bounded terrain patches and lower-envelope presentation radii
+    under the canonical terrain rules; nominal catalog radii remain unchanged.
 15. Diagnostics body observations preserve catalog order/names and report finite,
-    nonnegative camera-to-nominal-surface distances for all six bodies.
+    nonnegative camera-to-surface distances (nominal in flat fixtures) for all six bodies.
 16. Gameplay starts inside the ship landed on Earth; F2 preserves access to the
     earlier precision-tour fixture without changing domain state.
 17. Runtime contextual E routing changes cockpit authority or requests a door
@@ -149,3 +151,9 @@
   Sleeping objects stay in session presentation/picking/collision; omission wakes
   dependent contacts and streaming return rebuilds support. Ship-local rigid
   movement preserves sleep and f64 world writeback. See the [activation adapter](architecture.md#fragment-activation-adapter-156).
+
+## Terrain integration (#179–#181)
+
+Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
+and [world definition contract](../world/terrain-contract.md). Keep local rules
+and their consumers aligned; flat deterministic fixtures are explicit.

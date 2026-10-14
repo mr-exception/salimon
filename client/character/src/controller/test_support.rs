@@ -9,6 +9,7 @@ pub(super) fn frame() -> ShipFrame {
 
 pub(super) fn surface() -> SurfaceFrame {
     SurfaceFrame {
+        query: None,
         body_center_meters: [0.0, -90.0, 0.0],
         radius_meters: 100.0,
     }
@@ -54,6 +55,7 @@ pub(super) fn rotated_catalog_frames() -> (ShipFrame, SurfaceFrame) {
         ],
     };
     let surface = SurfaceFrame {
+        query: None,
         body_center_meters: sub(ship.origin_meters, scale(ship.axes[1], 6_000_000.0)),
         radius_meters: 6_000_000.0,
     };

@@ -6,7 +6,12 @@ RESOURCE_COLLECTION = (
     "resource-deposits.json", "mining.json", "mining-emission.json", "carrying.json",
     "fragment-transfer.json", "resource-streaming.json", "resource-loop.json",
 )
-GROUPS = {"ship-eva": SHIP_EVA, "resource-collection": RESOURCE_COLLECTION}
+TERRAIN = tuple(
+    f"terrain-{body}{suffix}.json"
+    for body in ("earth", "moon", "mars")
+    for suffix in ("", "-crater", "-touchdown", "-mining")
+) + ("terrain-steep-site.json",)
+GROUPS = {"terrain": TERRAIN, "ship-eva": SHIP_EVA, "resource-collection": RESOURCE_COLLECTION}
 
 
 def select_scenarios(directory, group=None, evidence=False):

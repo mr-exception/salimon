@@ -7,7 +7,8 @@ use std::{
 
 use salimon_math::{add, dot, length, scale, sub};
 
-use crate::{ObjectState, Surface, convex, normalize};
+use crate::Surface;
+use crate::{ObjectState, convex};
 
 const CONTACT_GAP_METERS: f64 = 0.001;
 const DWELL_SECONDS: f64 = 0.5;
@@ -583,16 +584,22 @@ fn near_contact(a: &ObjectState, b: &ObjectState) -> bool {
     }
 }
 fn grounded(p: &ObjectState, contains: &impl Fn([f64; 3], f64) -> bool) -> bool {
-    let (up, gap) = match p.surface {
-        Surface::Floor { height_meters } if contains(p.position, p.radius) => {
-            ([0.0, 1.0, 0.0], p.position[1] - height_meters)
-        }
-        Surface::Sphere(body) => (
-            normalize(sub(p.position, body.center)),
-            length(sub(p.position, body.center)) - body.radius,
-        ),
-        _ => return false,
+    if p.surface.is_floor() && !contains(p.position, p.radius) {
+        return false;
+    }
+    let Some(ground) = p.surface.ground(p.position) else {
+        return false;
     };
+    let up = ground.normal;
+    let gap = if let Surface::Sphere(body) = p.surface {
+        length(sub(p.position, body.center)) - body.radius
+    } else {
+        dot(sub(p.position, ground.point), up)
+    };
+    if let Some(contact) = crate::sampled_contact(p) {
+        return contact.penetration.abs() <= CONTACT_GAP_METERS
+            && dot(p.velocity, contact.normal).abs() < QUIET_SPEED;
+    }
     let support = p.hull.as_ref().map_or(p.ground_support_meters, |h| {
         h.support(p.orientation, p.side_meters, scale(up, -1.0))
     });

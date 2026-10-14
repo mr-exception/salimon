@@ -37,3 +37,9 @@ The convex motion target is recomputed after each response; preserve shared
 progression, swept waking and correction-created contact refresh. `tick_cost`
 profiles settled/fast-impact/active 500/1,000 CPU cases; it does not establish native
 reference-machine performance. See [active-group evaluation](architecture.md#active-group-evaluation-159).
+
+## Terrain integration (#179–#181)
+
+Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
+and [world definition contract](../world/terrain-contract.md). Keep local rules
+and their consumers aligned; flat deterministic fixtures are explicit.

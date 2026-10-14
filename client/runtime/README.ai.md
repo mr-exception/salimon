@@ -56,7 +56,8 @@ not reorder it or move domain rules into runtime mapping.
   the same snapshot. Do not select bodies or derive velocity in runtime.
 - Map all six world bodies to spheres, the Sun to a point light, and the three
   noncanonical markers to separate cuboids; preserve absolute `f64` centers
-  and sphere radii. Keep material-style selection at the composition boundary.
+  and nominal catalog radii. Gameplay far-envelope radii and bounded terrain DTOs
+  follow the canonical terrain integration guide; keep material selection here.
 - Keep diagnostics observational: map typed snapshots at the composition root
   and report real camera-to-body surface distances plus live typed player/ship
   values in gameplay view.
@@ -108,3 +109,9 @@ all domains consume the same completed tick. Fragment interpolation history live
 in the runtime adapter and must never enter authority/interaction state. Changes
 need stalled-clock, immediate release, local-frame and measurement aggregation
 regressions. See [the tick contract](architecture.md#bounded-gameplay-ticks-and-fragment-interpolation-159).
+
+## Terrain integration (#179–#181)
+
+Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
+and [world definition contract](../world/terrain-contract.md). Keep local rules
+and their consumers aligned; flat deterministic fixtures are explicit.

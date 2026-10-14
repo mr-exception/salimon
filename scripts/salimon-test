@@ -33,7 +33,7 @@ def main():
             parser.error("--screenshot-command must be a JSON argv array")
         if (not isinstance(screenshot_command, list)
                 or any(not isinstance(item, str) or not item for item in screenshot_command)
-                or (screenshot_command and not any("{path}" in item for item in screenshot_command))):
+                or (screenshot_command and screenshot_command != ["native"] and not any("{path}" in item for item in screenshot_command))):
             parser.error("--screenshot-command needs nonempty argv strings and a {path} placeholder")
     if (args.command == "run") != bool(args.scenario):
         parser.error("run requires a scenario path; suite takes no path")

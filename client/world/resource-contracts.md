@@ -113,7 +113,8 @@ and depleted state; generation itself remains stateless. Run `cargo test --locke
 `mining` owns aimed target validation and time-based extraction. A normalized
 `MiningRay` selects the first nondepleted spherical deposit bound within **4 m**
 of the eye ray; missed, behind-eye, out-of-range, and obscured targets are rejected.
-Solid body spheres occlude the ray. Runtime supplies the first ship-proxy hit
+Flat fixtures use solid-body sphere obstruction; enabled terrain uses the
+shared bounded short-ray height query, including negative elevation. Runtime supplies the first ship-proxy hit
 from the character domain in the same meter units, so hull/closed gates/engines
 cannot be mined through. Ship glazing is conservatively solid for this tool.
 
@@ -146,7 +147,10 @@ created. A fractional piece exists immediately, including on the first positive
 simulation step; there is no pending output mass or general resource inventory.
 Piece IDs are monotonically allocated within the session. Growth preserves ID,
 source, material key, and pose, and derives the new solid volume from density.
-Finished pieces are unchanged by later extraction. Picking up a growing piece
+A completed-fill remainder at or below FILL_ROUNDING_REMAINDER_KG (1e-12 kg)
+is left unextracted in the source, avoiding a roundoff-only microscopic body.
+No unrepresented mass is debited or credited; initial small requests remain
+valid. Finished pieces are unchanged by later extraction. Picking up a growing piece
 must end its participation in the output tail when #46 adds carrying.
 
 Pieces start with finite absolute poses and identity orientation; #148 physical contacts subsequently update their unit quaternion. They emerge near
@@ -215,8 +219,17 @@ Runtime chooses exposed eye-facing triangles from the immutable authored mesh,
 first the mining ray contact, then actual facet centers ordered by distance to
 the aimed visible triangle contact (bound contact on a visual miss). It reserves the selected fragment variant's full 2 kg
 convex support along the facet normal plus 5 mm; ground support is checked with
-the body's radial up. Conservative player-capsule and existing-fragment envelope
+the shared sampled terrain point/normal and full authored vertices when enabled. Conservative player-capsule and existing-fragment envelope
 checks reject unsafe candidates. Only creation installs an outward/radial impulse;
 growth, requery, streaming and missing/restored motion do not re-eject pieces.
 The same physical ID/pose then follows normal gravity/contact, carrying and
 streaming. No scatter positions are assigned by ordinal or teleported later.
+
+## Terrain anchoring (#180)
+
+Runtime preserves the original seeded nominal lattice and IDs, then orients and
+supports authored deposits/held pieces and new emissions on the same terrain
+definition as walking, landing and loose contact. Cached placement does not own
+mining state; journal restoration always follows materialization. See the
+[canonical integration guide](../../docs/terrain-validation.md) for cache keys,
+clearances and supported approximation limits.

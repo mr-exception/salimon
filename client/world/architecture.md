@@ -8,7 +8,7 @@ non-resource implementation modules remain private.
 | Source | Responsibility and existing tests |
 | --- | --- |
 | `src/coordinates.rs` | `WorldPosition`, absolute `f64` arithmetic and subtract-before-cast regression |
-| `src/terrain/` | Opt-in validated/versioned terrain definitions, binary codec, pure height/normal queries and reproducibility tests; [contract](terrain-contract.md) |
+| `src/terrain/` | Validated/versioned terrain definitions, binary codec, pure height/normal queries and reproducibility tests; [contract](terrain-contract.md) |
 | `src/catalog.rs` | Body IDs/roles/definitions, ordered static catalog, anchor/reference speed, membership and travel tuning tests |
 | `src/geometry.rs` | Body surface/landing distances, radial speed, sphere separation and landing-volume tests |
 | `src/proximity.rs` | Nearest-surface and nearby-solid selection, inclusive threshold and influence tests |
@@ -34,7 +34,7 @@ runtime monotonic delta + typed CameraCommand
     -> salimon-world CameraPrototype
         -> borrowed WorldSnapshot
            (f64 camera + six bodies + three precision markers)
-    -> runtime maps domain structs into renderer sphere/light/cuboid DTOs
+    -> runtime maps domain structs into renderer sphere/light/cuboid DTOs and bounded terrain patches
        and diagnostics BodyDistance values
     -> renderer subtracts camera in f64 and casts relative values to f32
 ```
@@ -84,8 +84,16 @@ with character collision geometry. Generated deposits can stream out and back
 in without losing modified mass; fragments remain the same physical entities.
 All retention is in memory for the current session, with no disk/backend save.
 
-## Terrain contract (stage 1 of #170)
+## Integrated terrain
 
-Portable terrain queries live in `terrain`; read [terrain-contract.md](terrain-contract.md)
-before integrating. They are opt-in and not consumed by nominal-sphere gameplay
-or presentation yet. Rendering/physical-contact activation is sequenced in #179–#181.
+Portable definitions, sampled surfaces and compact codecs live in src/terrain/;
+TerrainMode selects the immutable native catalog profiles. See
+[terrain-contract.md](terrain-contract.md) and the canonical
+[integration guide](../../docs/terrain-validation.md). Runtime owns patch
+generation, resource anchoring and supplying portable ground queries to consumers.
+
+## Terrain integration (#179–#181)
+
+Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
+and [world definition contract](../world/terrain-contract.md). Keep local rules
+and their consumers aligned; flat deterministic fixtures are explicit.

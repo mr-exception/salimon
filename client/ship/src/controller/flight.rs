@@ -54,7 +54,36 @@ impl ShipController {
                 self.pose.position_meters[2] - center[2],
             ];
             let distance = vector_length(offset);
-            let minimum = body.radius_meters + COLLISION_RADIUS_METERS;
+            let minimum = body.radius_meters
+                + self.terrain.elevation_bounds(*body)[1]
+                + COLLISION_RADIUS_METERS;
+            if self.terrain != salimon_world::terrain::TerrainMode::Flat {
+                if distance < minimum {
+                    // Extrema are only the broad bound. Contact projects the
+                    // conservative ship sphere against the shared local query.
+                    for _ in 0..4 {
+                        let local = salimon_math::sub(self.pose.position_meters, center);
+                        let direction =
+                            crate::orientation::normalize_or(local, self.pose.axes()[1]);
+                        let ground = self.terrain.sample(*body, direction);
+                        let gap = salimon_math::dot(
+                            salimon_math::sub(local, ground.body_local_position_meters),
+                            ground.outward_normal,
+                        );
+                        if gap >= COLLISION_RADIUS_METERS {
+                            break;
+                        }
+                        self.pose.position_meters = salimon_math::add(
+                            self.pose.position_meters,
+                            scale(
+                                ground.outward_normal,
+                                COLLISION_RADIUS_METERS - gap + 0.0002,
+                            ),
+                        );
+                    }
+                }
+                continue;
+            }
             if distance < minimum {
                 let normal = if distance > 1.0e-9 {
                     offset.map(|value| value / distance)

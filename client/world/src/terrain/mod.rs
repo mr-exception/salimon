@@ -1,7 +1,9 @@
-//! Opt-in, renderer-neutral terrain contract. Runtime still uses nominal spheres.
+//! Versioned body-local terrain contract shared by native rendering and gameplay.
 mod query;
+mod surface;
 mod wire;
 pub use query::SurfaceSample;
+pub use surface::TerrainMode;
 #[cfg(test)]
 mod tests;
 
@@ -128,7 +130,7 @@ impl TerrainDefinition {
         &self.features
     }
 
-    /// Representative opt-in profiles, not yet activated in gameplay.
+    /// Immutable native representative profiles; see the terrain integration contract.
     pub fn representative(body: CelestialBody) -> Result<Self, TerrainError> {
         let (seed, hills, ridges, pit) = match body.id {
             CelestialBodyId::Earth => (17001, 35.0, 140.0, -40.0),

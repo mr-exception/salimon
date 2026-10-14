@@ -168,3 +168,38 @@ fn collected_piece_preserves_identity_mass_and_pose_during_further_extraction() 
     assert_eq!(sum, 5.0);
     assert!(session.pick_up(session.fragments()[1].id()));
 }
+
+#[test]
+fn exact_two_second_fill_does_not_allocate_a_roundoff_only_tail() {
+    let body = CELESTIAL_BODIES
+        .iter()
+        .find(|b| b.id == CelestialBodyId::Earth)
+        .unwrap();
+    let material = RESOURCE_CATALOG[1];
+    let mut deposit = ResourceDeposit::new(
+        DepositId {
+            body: body.id,
+            local: 181,
+        },
+        RawMaterial::new(material.id, 18.085051244864966).unwrap(),
+        body.center.translated([0.0, body.radius_meters, 0.0]),
+        18.085051244864966,
+    )
+    .unwrap();
+    let original = deposit.remaining_mass_kg();
+    let mut session = MiningSession::default();
+    for _ in 0..125 {
+        session.extract(&mut deposit, Duration::from_millis(16));
+    }
+    assert_eq!(session.fragments().len(), 2);
+    assert!(
+        session
+            .fragments()
+            .iter()
+            .all(|p| p.material().mass_kg() == 2.0)
+    );
+    assert!((original - deposit.remaining_mass_kg() - 4.0).abs() < 1e-12);
+    session.extract(&mut deposit, Duration::from_millis(16));
+    assert_eq!(session.fragments().len(), 3);
+    assert!(session.fragments()[2].material().mass_kg() > 0.031);
+}

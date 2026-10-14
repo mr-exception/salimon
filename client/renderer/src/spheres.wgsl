@@ -16,6 +16,7 @@ struct VertexOutput {
     @location(2) @interpolate(flat) light_position: vec4<f32>,
     @location(3) @interpolate(flat) light_color: vec4<f32>,
     @location(4) @interpolate(flat) detail_origin: vec4<f32>,
+    @location(5) @interpolate(flat) terrain_mask: vec4<f32>,
 };
 
 @vertex
@@ -27,6 +28,7 @@ fn vs_main(
     @location(3) light_position: vec4<f32>,
     @location(4) light_color: vec4<f32>,
     @location(5) detail_origin: vec4<f32>,
+    @location(6) terrain_mask: vec4<f32>,
 ) -> VertexOutput {
     let corners = array<vec2<f32>,6>(vec2(0.0,0.0),vec2(1.0,0.0),vec2(1.0,1.0),vec2(0.0,0.0),vec2(1.0,1.0),vec2(0.0,1.0));
     var out: VertexOutput;
@@ -36,6 +38,7 @@ fn vs_main(
     out.light_position = light_position;
     out.light_color = light_color;
     out.detail_origin = detail_origin;
+    out.terrain_mask = terrain_mask;
     return out;
 }
 
@@ -69,6 +72,7 @@ fn fs_main(in: VertexOutput) -> FragmentOutput {
         // Visual volumes such as the Sun can be viewed from inside.
         hit = b + root;
     }
+    if in.terrain_mask.w > 0.0 && length(ray * hit - in.terrain_mask.xyz) < in.terrain_mask.w { discard; }
     let view_depth = hit * dot(ray,camera.forward_near.xyz);
     if view_depth < camera.forward_near.w { discard; }
     let normal = normalize(ray * (hit / radius) - direction * ratio);

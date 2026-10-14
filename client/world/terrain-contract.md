@@ -1,15 +1,17 @@
-# Planetary terrain contract (#170, stage 1)
+# Planetary terrain contract (version 1)
 
-## Status and sequencing
+## Status and activation
 
-`salimon_world::terrain` is an opt-in portable contract, not active gameplay.
-Nominal-sphere geometry, renderer, walking, mining and landing remain unchanged.
-#170 explicitly permits shipping the height-query contract first. Remaining work:
-[#179](https://github.com/mr-exception/salimon/issues/179) patch rendering,
-[#180](https://github.com/mr-exception/salimon/issues/180) shared physical contact
-and resource placement, and
-[#181](https://github.com/mr-exception/salimon/issues/181) native acceptance/budgets.
-Do not close #170 on this first PR's merge.
+The version-1 definition/query/codec is integrated into native gameplay by
+#179–#181. TerrainMode::Representative supplies the same immutable definitions
+to rendering, walking, flight/landing, resource placement and fragment support.
+Normal startup uses a validated safe Earth site; existing flat scenarios and
+the F2 precision camera retain their old spherical fixtures. Mercury/Venus
+remain zero-elevation and Sun stays visual-only. Read the canonical
+[integration/validation guide](../../docs/terrain-validation.md) for ownership,
+slope/landing policy, patch budgets, approximations and native commands.
+The original contract-first validation is historical in
+[the stage-1 report](../../reports/issue-170/README.md).
 
 ## Definition, coordinates and evaluation
 
@@ -89,9 +91,9 @@ let ground = restored.sample([0.0, 0.0, 1.0]).unwrap();
 
 Earth: 35 m hills at 500 m spacing, 140 m ridges at 2,000 m spacing and a
 -40 m/180 m pit at +Z. Moon uses 8/25/-100 m; Mars uses 25/220/-65 m.
-Seeds are 17001/17002/17003 respectively. These are representative fixtures,
-not final playable spawn sites or biome art direction; +Z pit intersects the
-old Earth spawn and requires integrated spawn placement before activation.
+Seeds are 17001/17002/17003 respectively. These are representative profiles, not final biome art direction. Runtime uses
+a bounded footprint-aware safe-site search before activating a spawn; the old
++Z pit fixture must not be used as an unchecked landing endpoint.
 
 Use the entire encoded definition as cache identity, or a collision-resistant
 content digest of it, together with body identity and patch coordinates/LOD.
@@ -107,26 +109,28 @@ order/thread/translation. Floating-point interpolation/normalization can differ
 in last bits across toolchains/architectures; compatibility vectors must stay
 within 1e-7 m in height and 1e-6 normal components. This contract does not promise
 bit-identical floating-point normals across all machines. CI on macOS/Windows/
-Linux must run the versioned golden vectors; this turn verifies Linux only.
+Linux must run the versioned golden vectors; the stage-1 report verified Linux,
+and the integrated reports record native arm64 macOS validation separately.
 A future server sends this tiny definition (or its hash plus a known definition),
 not per-vertex meshes. Sparse feature changes replace/version the record.
 
-## Rendering decision and remaining boundaries
+## Integrated rendering and physical boundaries
 
-Prefer cube-sphere quadtree patches for the next stage: stable face/level/cell
-IDs cover poles without singularities, have bounded distance-dependent selection
-and permit independently cached LOD. Tangent clipmaps are attractive for regular
-GPU grids but need moving anchors and careful global coverage; a full-body mesh
-fails the allocation/detail goal. Final budget/LOD stitching and far-sphere masking
-must be validated in #179, not inferred from a height query. Negative terrain
-requires masking the nominal sphere, not simply drawing patches over it.
+Runtime generates bounded cube-sphere quadtree patches and renderer-neutral DTOs;
+renderer owns GPU buffers and near/far presentation. Character and physics
+receive caller-supplied queries; ship consumes TerrainMode and an authored
+footprint supplied by runtime. Runtime anchors/orients resource meshes without
+changing their original generation IDs or the in-memory journal. See the
+[integration guide](../../docs/terrain-validation.md) for the quadtree/clipmap
+decision, exact budgets, mixed-LOD stitching, subtract-before-cast anchors,
+physical policies, measured tolerances and distant-envelope approximation.
 
-Queries allocate no planet geometry and retain no cache. Height cost is bounded
-by eight layers × eight lattice corners plus 32 sparse features; a full normal
-sample evaluates five heights. Geometry, query caching, CPU/GPU upload, resource
-anchoring and scene activation remain their respective owners' future work.
-No GPU timing/triangle count/FPS improvement can be measured at this stage.
+World queries allocate no planet geometry and retain no cache. Height cost is
+bounded by eight layers × eight lattice corners plus 32 sparse features; a full
+normal sample evaluates five heights. Runtime caches are separate and bounded.
+Native/reference evidence is in reports/issue-179 through issue-181; stage-1
+Linux-only evidence is not evidence for the integrated M1 implementation.
 
 Caves, tunnels, overhangs and holes through rock require volumetric geometry;
-they are explicitly deferred until after Phase 0, with a separate design and
+they remain deferred until after Phase 0, with a separate design and
 implementation phase. No placeholder cave mechanics are introduced.

@@ -22,9 +22,21 @@ pub(super) fn camera_body_distances(snapshot: WorldSnapshot<'_>) -> Vec<BodyDist
     camera_body_distances_from(snapshot, snapshot.camera.position.meters())
 }
 
+#[cfg(test)]
 pub(super) fn camera_body_distances_from(
     snapshot: WorldSnapshot<'_>,
     position_meters: [f64; 3],
+) -> Vec<BodyDistance<'static>> {
+    camera_body_distances_with_terrain(
+        snapshot,
+        position_meters,
+        salimon_world::terrain::TerrainMode::Flat,
+    )
+}
+pub(super) fn camera_body_distances_with_terrain(
+    snapshot: WorldSnapshot<'_>,
+    position_meters: [f64; 3],
+    terrain: salimon_world::terrain::TerrainMode,
 ) -> Vec<BodyDistance<'static>> {
     let position = WorldPosition::new(position_meters[0], position_meters[1], position_meters[2]);
     snapshot
@@ -32,7 +44,11 @@ pub(super) fn camera_body_distances_from(
         .iter()
         .map(|body| BodyDistance {
             name: body.name,
-            distance_meters: body.surface_distance_from(position),
+            distance_meters: if terrain == salimon_world::terrain::TerrainMode::Flat {
+                body.surface_distance_from(position)
+            } else {
+                terrain.clearance(*body, position_meters).max(0.0)
+            },
         })
         .collect()
 }

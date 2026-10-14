@@ -59,9 +59,15 @@ Follow the root [coding conventions](../../docs/coding-conventions.md),
 [feature map](../../docs/maintenance-map.md). Update affected contracts/guides
 with behavior changes and record completion evidence under root `reports/`.
 
-## Opt-in terrain
+## Terrain
 
-`src/terrain/` owns the stage-1 #170 definition/query/codec. Read
-[terrain-contract.md](terrain-contract.md) before changing evaluation or integrating
-consumers; run world terrain/golden/codec tests. Do not activate a height-only or
-rendering-only surface while walking/landing/resources still use nominal spheres.
+Read [terrain-contract.md](terrain-contract.md) and the
+[integration guide](../../docs/terrain-validation.md) before editing definitions
+or consumers. All enabled consumers must agree on the same immutable definition;
+run golden/codec/compatibility tests and affected cross-domain/native regressions.
+
+## Terrain integration (#179–#181)
+
+Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
+and [world definition contract](../world/terrain-contract.md). Keep local rules
+and their consumers aligned; flat deterministic fixtures are explicit.

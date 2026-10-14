@@ -27,9 +27,10 @@ use winit::keyboard::{KeyCode, PhysicalKey};
 use winit::window::{Window, WindowId};
 
 use diagnostics::{
-    camera_body_distances_from, camera_domain_metrics, format_metric_speed, gameplay_domain_metrics,
+    camera_body_distances_with_terrain, camera_domain_metrics, format_metric_speed,
+    gameplay_domain_metrics,
 };
-pub(crate) use frames::{character_ship_frame, nearby_surface_at, surface_frame_for_ship};
+pub(crate) use frames::{character_ship_frame, surface_frame_for_ship};
 use input::{
     ShipControlInput, camera_command, interaction_pressed, is_diagnostics_toggle, is_movement_key,
     is_ship_control_key, landing_action_pressed, release_cursor_pressed, thruster_step,
@@ -69,6 +70,15 @@ fn run_config(
     event_loop.set_control_flow(ControlFlow::Wait);
 
     let mut application = ClientApplication::default();
+    if config.is_none() && benchmark.is_none() {
+        let earth = *salimon_world::CELESTIAL_BODIES
+            .iter()
+            .find(|b| b.id == salimon_world::CelestialBodyId::Earth)
+            .expect("Earth catalog");
+        application
+            .enable_terrain(earth, [0.0, 1.0, 0.0])
+            .map_err(|e| RunError::new("terrain startup failed", e))?;
+    }
     if let Some(config) = config {
         e2e::initialize(&mut application, config)
             .map_err(|error| RunError::new("E2E setup failed", error))?;
@@ -125,6 +135,10 @@ pub(crate) struct ClientApplication {
     e2e_ready_sent: bool,
     automation: Option<Receiver<Request>>,
     pub(crate) mining: crate::mining::MiningTool,
+    pub(crate) terrain_stream: crate::terrain_patches::TerrainStream,
+    pub(crate) observations: crate::terrain_observations::Observations,
+    pub(crate) capture_status: String,
+    capture_path: Option<std::path::PathBuf>,
     pub(crate) equipment: crate::equipment::EquipmentToolbar,
     movement_input: MovementInput,
     ship_control_input: ShipControlInput,
@@ -154,6 +168,10 @@ impl Default for ClientApplication {
             e2e_ready_sent: false,
             automation: None,
             mining: crate::mining::MiningTool::default(),
+            terrain_stream: crate::terrain_patches::TerrainStream::default(),
+            observations: crate::terrain_observations::Observations::default(),
+            capture_status: "idle".into(),
+            capture_path: None,
             equipment: crate::equipment::EquipmentToolbar::default(),
             movement_input: MovementInput::default(),
             ship_control_input: ShipControlInput::default(),
@@ -181,12 +199,53 @@ fn door_passable(ship: ShipSnapshot) -> bool {
 }
 
 impl ClientApplication {
+    pub(crate) fn terrain_presentation_ready(&self) -> bool {
+        (!self.terrain_stream.has_target || !self.terrain_stream.active.is_empty())
+            && self
+                .renderer
+                .as_ref()
+                .is_some_and(|r| r.terrain_presentation_ready(&self.terrain_stream.active))
+    }
+    pub(crate) fn terrain_uploads(&self) -> (usize, usize) {
+        self.renderer
+            .as_ref()
+            .map_or((0, 0), Renderer::terrain_uploads)
+    }
+    pub(crate) fn terrain_gpu_bytes(&self) -> usize {
+        self.renderer
+            .as_ref()
+            .map_or(0, Renderer::terrain_gpu_bytes)
+    }
+    pub(crate) fn terrain_gpu_ready(&self) -> bool {
+        self.renderer
+            .as_ref()
+            .is_some_and(|r| r.terrain_ready(&self.terrain_stream.active))
+    }
+    pub(crate) fn request_capture(&mut self, path: &str) -> Result<(), String> {
+        let path = std::path::PathBuf::from(path);
+        if !path.is_absolute() || path.extension().is_none_or(|e| e != "png") || path.exists() {
+            return Err("capture needs a new absolute .png path".into());
+        }
+        self.renderer
+            .as_mut()
+            .ok_or("renderer unavailable")?
+            .request_capture()
+            .map_err(|e| e.to_string())?;
+        self.capture_path = Some(path);
+        self.capture_status = "pending".into();
+        Ok(())
+    }
     fn create_window(&mut self, event_loop: &ActiveEventLoop) -> Result<(), RunError> {
         if self.window.is_some() {
             return Ok(());
         }
 
         let mut attributes = window_attributes(self.e2e_config.is_some());
+        if self.mining.terrain == salimon_world::terrain::TerrainMode::Representative
+            || std::env::var_os("SALIMON_REFERENCE_SIZE").is_some()
+        {
+            attributes = attributes.with_inner_size(winit::dpi::PhysicalSize::new(1920, 1080));
+        }
         if let Some(benchmark) = &self.benchmark {
             attributes = attributes.with_title(benchmark.window_title());
         }
@@ -294,7 +353,7 @@ impl ClientApplication {
     pub(crate) fn interact(&mut self) {
         let ship_snapshot = self.ship.snapshot();
         let ship_frame = character_ship_frame(ship_snapshot.pose);
-        let surface = surface_frame_for_ship(ship_snapshot);
+        let surface = self.terrain_frame(ship_snapshot);
         match self.character.location() {
             CharacterLocation::Cockpit => {
                 self.character.leave_cockpit();
@@ -380,7 +439,62 @@ impl ClientApplication {
         }
     }
 
+    fn toggle_view(&mut self) {
+        self.view_mode = match self.view_mode {
+            ViewMode::Gameplay => ViewMode::PrecisionTour,
+            ViewMode::PrecisionTour => ViewMode::Gameplay,
+        };
+        self.mining.clear_input();
+        log::info!("view mode changed to {:?} (F2 toggles)", self.view_mode);
+    }
+    pub(crate) fn view_name(&self) -> &'static str {
+        match self.view_mode {
+            ViewMode::Gameplay => "Gameplay",
+            ViewMode::PrecisionTour => "PrecisionTour",
+        }
+    }
+    pub(crate) fn automation_window(
+        &self,
+        action: &str,
+        size: Option<[u32; 2]>,
+    ) -> Result<(), String> {
+        let window = self.window.as_ref().ok_or("native window unavailable")?;
+        match action {
+            "resize" => {
+                let [width, height] = size.ok_or("resize dimensions required")?;
+                if !(640..=4096).contains(&width) || !(360..=4096).contains(&height) {
+                    return Err("resize dimensions out of range".into());
+                }
+                let _ = window.request_inner_size(winit::dpi::PhysicalSize::new(width, height));
+            }
+            "minimize" => window.set_minimized(true),
+            "restore" => {
+                window.set_minimized(false);
+                window.focus_window();
+                window.request_redraw();
+            }
+            _ => return Err("expected resize, minimize, or restore".into()),
+        }
+        Ok(())
+    }
+    pub(crate) fn window_state(&self) -> serde_json::Value {
+        self.window.as_ref().map_or(serde_json::Value::Null,|w|serde_json::json!({
+            "minimized":w.is_minimized(), "inner_size":[w.inner_size().width,w.inner_size().height]
+        }))
+    }
     pub(crate) fn automation_key(&mut self, key: PhysicalKey, pressed: bool) {
+        if key == PhysicalKey::Code(KeyCode::F2) {
+            if pressed {
+                self.toggle_view();
+            }
+            return;
+        }
+        if key == PhysicalKey::Code(KeyCode::F3) {
+            if pressed {
+                self.diagnostics.toggle();
+            }
+            return;
+        }
         if self.view_mode != ViewMode::Gameplay {
             if let Some(command) = camera_command(
                 if pressed {
@@ -413,7 +527,7 @@ impl ClientApplication {
             } else if self.mining.press_f() {
                 let ship = self.ship.snapshot();
                 let frame = character_ship_frame(ship.pose);
-                let player = self.character.snapshot(frame, surface_frame_for_ship(ship));
+                let player = self.character.snapshot(frame, self.terrain_frame(ship));
                 let pickup = self.mining.session.carried_id().is_none();
                 if !pickup
                     || crate::carrying::target(&self.mining, player, frame, door_passable(ship))
@@ -444,7 +558,7 @@ impl ClientApplication {
     fn carry_action(&mut self, pickup: bool) {
         let ship = self.ship.snapshot();
         let frame = character_ship_frame(ship.pose);
-        let player = self.character.snapshot(frame, surface_frame_for_ship(ship));
+        let player = self.character.snapshot(frame, self.terrain_frame(ship));
         let door_open = door_passable(ship);
         let message = if pickup {
             match crate::carrying::target(&self.mining, player, frame, door_open) {
@@ -500,10 +614,8 @@ impl ClientApplication {
         let ship = self.ship.snapshot();
         let frame = character_ship_frame(ship.pose);
         crate::carrying::sync_ship_fragments(&mut self.mining, frame);
-        crate::carrying::follow(
-            &mut self.mining,
-            self.character.snapshot(frame, surface_frame_for_ship(ship)),
-        );
+        let player = self.character.snapshot(frame, self.terrain_frame(ship));
+        crate::carrying::follow(&mut self.mining, player);
     }
 
     fn reset_update_clock(&mut self) {
@@ -518,7 +630,7 @@ impl ClientApplication {
             let frame = character_ship_frame(ship.pose);
             let player = self
                 .character
-                .snapshot(frame, surface_frame_for_ship(ship))
+                .snapshot(frame, self.terrain_frame(ship))
                 .eye_position_meters;
             crate::fragment_physics::capture_previous(&mut self.mining, frame, player);
         }
@@ -530,12 +642,9 @@ impl ClientApplication {
         if self.view_mode == ViewMode::Gameplay {
             let eye = self
                 .character
-                .snapshot(
-                    character_ship_frame(ship.pose),
-                    surface_frame_for_ship(ship),
-                )
+                .snapshot(character_ship_frame(ship.pose), self.terrain_frame(ship))
                 .eye_position_meters;
-            self.character.set_nearby_surface(nearby_surface_at(eye));
+            self.character.set_nearby_surface(self.nearby_terrain(eye));
             self.character
                 .set_ramp_moving(ship.door_open_fraction > 0.0 && ship.door_open_fraction < 1.0);
             self.character.advance_with_motion(
@@ -545,32 +654,29 @@ impl ClientApplication {
                     character_ship_frame(ship.pose),
                     ship.velocity_meters_per_second,
                 ),
-                surface_frame_for_ship(ship),
+                self.terrain_frame(ship),
                 door_passable(ship),
                 matches!(ship.flight_state, FlightState::Landed { .. }),
             );
             let eye = self
                 .character
-                .snapshot(
-                    character_ship_frame(ship.pose),
-                    surface_frame_for_ship(ship),
-                )
+                .snapshot(character_ship_frame(ship.pose), self.terrain_frame(ship))
                 .eye_position_meters;
-            self.character.set_nearby_surface(nearby_surface_at(eye));
+            self.character.set_nearby_surface(self.nearby_terrain(eye));
         }
         if self.view_mode == ViewMode::Gameplay {
             let frame = character_ship_frame(ship.pose);
             self.mining.advance(
                 &self.equipment,
                 delta,
-                self.character.snapshot(frame, surface_frame_for_ship(ship)),
+                self.character.snapshot(frame, self.terrain_frame(ship)),
                 frame,
                 door_passable(ship),
                 self.world_seed(),
             );
             let player = self
                 .character
-                .snapshot(frame, surface_frame_for_ship(ship))
+                .snapshot(frame, self.terrain_frame(ship))
                 .eye_position_meters;
             let measurements = if self.benchmark.is_some() {
                 crate::fragment_physics::advance_measured(
@@ -644,9 +750,10 @@ impl ClientApplication {
         self.sync_carried();
         let ship_snapshot = self.ship.snapshot();
         let ship_frame = character_ship_frame(ship_snapshot.pose);
-        let surface_frame = surface_frame_for_ship(ship_snapshot);
+        let surface_frame = self.terrain_frame(ship_snapshot);
         let world_snapshot = self.camera_prototype.snapshot();
-        let (mut camera, scene_instances, spheres, light) = map_world_to_renderer(world_snapshot);
+        let (mut camera, scene_instances, mut spheres, light) =
+            map_world_to_renderer(world_snapshot);
         let mut resource_meshes = Vec::new();
         let character_snapshot = self.character.snapshot(ship_frame, surface_frame);
         let monitor_message = self.ship.contextual_cockpit_message();
@@ -734,12 +841,12 @@ impl ClientApplication {
                 .nearby(camera.position_meters, self.world_seed())
             {
                 Ok(deposits) => {
-                    resource_meshes.extend(
-                        deposits
-                            .iter()
-                            .copied()
-                            .filter_map(crate::resource_presentation::deposit_mesh),
-                    );
+                    resource_meshes.extend(deposits.iter().copied().filter_map(|entry| {
+                        crate::resource_presentation::deposit_mesh_with_terrain(
+                            entry,
+                            self.mining.terrain,
+                        )
+                    }));
                 }
                 Err(error) => log::error!("deposit presentation query failed: {error:?}"),
             }
@@ -758,7 +865,28 @@ impl ClientApplication {
                 });
             }
         }
-        let body_distances = camera_body_distances_from(world_snapshot, camera.position_meters);
+        let render_terrain = if self.view_mode == ViewMode::Gameplay {
+            self.mining.terrain
+        } else {
+            salimon_world::terrain::TerrainMode::Flat
+        };
+        if let Err(error) = self
+            .terrain_stream
+            .update(camera.position_meters, render_terrain)
+        {
+            self.fail(event_loop, error);
+            return;
+        }
+        for sphere in &mut spheres {
+            let body = crate::terrain::body_at(sphere.center_meters, sphere.radius_meters);
+            sphere.radius_meters =
+                crate::terrain::far_radius(body, camera.position_meters, render_terrain);
+        }
+        let body_distances = camera_body_distances_with_terrain(
+            world_snapshot,
+            camera.position_meters,
+            render_terrain,
+        );
         let cpu_update_time = update_started_at.elapsed();
         let overlay_image = self
             .diagnostics
@@ -795,6 +923,8 @@ impl ClientApplication {
                     instances: &scene_instances,
                     resource_meshes: &resource_meshes,
                     spheres: &spheres,
+                    terrain: &self.terrain_stream.active,
+                    terrain_mask: self.terrain_stream.mask,
                     light: Some(light),
                     ship: ship_mesh,
                     held_item,
@@ -822,6 +952,20 @@ impl ClientApplication {
             );
         }
 
+        if let Some(capture) = self.renderer.as_mut().and_then(Renderer::take_capture) {
+            let result = capture.map_err(|e| e.to_string()).and_then(|bytes| {
+                let path = self.capture_path.take().ok_or("capture path missing")?;
+                let mut file = std::fs::OpenOptions::new()
+                    .write(true)
+                    .create_new(true)
+                    .open(&path)
+                    .map_err(|e| format!("capture {}: {e}", path.display()))?;
+                file.write_all(&bytes)
+                    .map_err(|e| format!("capture {}: {e}", path.display()))
+            });
+            self.capture_status =
+                result.map_or_else(|e| format!("failed: {e}"), |()| "captured".into());
+        }
         match outcome {
             RenderOutcome::Presented(render_stats) => {
                 self.retry_at = None;
@@ -829,6 +973,12 @@ impl ClientApplication {
                 let timing = self
                     .frame_clock
                     .record_presented(render_started_at, Instant::now());
+                self.observations.record(
+                    timing.frame_interval,
+                    cpu_update_time,
+                    render_stats,
+                    [window.inner_size().width, window.inner_size().height],
+                );
                 self.diagnostics.record_presented(
                     diagnostics::frame_sample(timing, render_stats, cpu_update_time),
                     if self.view_mode == ViewMode::Gameplay {
@@ -1132,12 +1282,7 @@ impl ApplicationHandler for ClientApplication {
                 is_synthetic,
             ) =>
             {
-                self.view_mode = match self.view_mode {
-                    ViewMode::Gameplay => ViewMode::PrecisionTour,
-                    ViewMode::PrecisionTour => ViewMode::Gameplay,
-                };
-                self.mining.clear_input();
-                log::info!("view mode changed to {:?} (F2 toggles)", self.view_mode);
+                self.toggle_view();
                 window.request_redraw();
             }
             WindowEvent::KeyboardInput { event, .. }

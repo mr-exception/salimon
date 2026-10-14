@@ -115,3 +115,11 @@ Linux software Vulkan do not establish native FPS. The ordinary workspace tests
 include large-load conservation/profiler parity/carrying/frame regressions; the
 native default suite includes `scenarios/fragment-load.json`. Record actual
 settling and sample sufficiency before applying performance gates.
+
+## Integrated terrain (#179–#181)
+
+Use the canonical [terrain validation guide](terrain-validation.md) for the
+13-route native terrain group, reference window/precision smoke, direct GPU
+capture, budgets/tolerances and reference measurements. Keep native Metal and
+software Vulkan evidence separate. Direct GPU capture verifies actual rendered
+pixels; it does not certify OS input or a visible display FPS floor.

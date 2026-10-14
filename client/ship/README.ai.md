@@ -36,3 +36,9 @@ Follow the root [coding conventions](../../docs/coding-conventions.md),
 [validation matrix](../../docs/validation.md) and
 [feature map](../../docs/maintenance-map.md). Update affected contracts/guides
 with behavior changes and record completion evidence under root `reports/`.
+
+## Terrain integration (#179–#181)
+
+Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
+and [world definition contract](../world/terrain-contract.md). Keep local rules
+and their consumers aligned; flat deterministic fixtures are explicit.

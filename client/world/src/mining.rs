@@ -182,15 +182,20 @@ impl MiningSession {
         }
         // Extraction must never grow a piece after the player has collected it.
         self.fragments.seal(id);
+        let piece = *self
+            .fragments
+            .get_mut(id)
+            .expect("picked up fragment exists");
+        self.fragments.record(piece);
         true
     }
 
     pub fn move_carried(&mut self, pose: crate::resources::ResourceTransform) {
         if let Some(id) = self.carried_id() {
-            self.fragments
-                .get_mut(id)
-                .expect("carried identity exists")
-                .set_transform(pose);
+            let piece = self.fragments.get_mut(id).expect("carried identity exists");
+            piece.set_transform(pose);
+            let changed = *piece;
+            self.fragments.record(changed);
         }
     }
 
@@ -217,7 +222,24 @@ impl MiningSession {
             return false;
         };
         piece.set_transform(pose);
+        let changed = *piece;
+        self.fragments.record(changed);
         true
+    }
+
+    /// Coalesced physical mutations, ordered by stable ID; reads/streaming emit nothing.
+    pub fn drain_fragment_changes(
+        &mut self,
+    ) -> impl Iterator<Item = (crate::resources::FragmentId, Option<ResourceFragment>)> {
+        self.fragments.drain_changes()
+    }
+
+    /// Physical despawn/Core consumption; never reuse an entity identity.
+    pub fn remove_fragment(&mut self, id: crate::resources::FragmentId) -> bool {
+        if self.carried_id() == Some(id) {
+            self.carry.release();
+        }
+        self.fragments.remove(id)
     }
 
     /// Diagnostic extraction total, never spendable inventory or carried mass.

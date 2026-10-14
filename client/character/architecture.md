@@ -138,3 +138,10 @@ retains closed-door collision down to the landing foot plane.
 Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
 and [world definition contract](../world/terrain-contract.md). Keep local rules
 and their consumers aligned; flat deterministic fixtures are explicit.
+
+## Onboard object containment (#187)
+
+`ship_contains_object` classifies a physical center against authored cabin/nose
+bounds and floor/ceiling. It has no door-animation or furniture exclusion and is
+independent of floor-placement clearance. Runtime converts world positions in
+f64 using the current ship frame; handling modes never alter this rule.

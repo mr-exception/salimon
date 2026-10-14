@@ -53,6 +53,14 @@ impl Propulsion {
             reverse_force_newtons,
         })
     }
+    pub fn with_total_mass(self, mass_kg: f64) -> Result<Self, InvalidFlightMotion> {
+        Self::new(
+            mass_kg,
+            self.forward_force_newtons,
+            self.reverse_force_newtons,
+        )
+    }
+
     #[must_use]
     pub fn total_mass_kg(self) -> f64 {
         self.total_mass_kg

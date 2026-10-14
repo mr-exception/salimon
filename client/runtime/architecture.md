@@ -490,3 +490,24 @@ the cached cockpit atlas retain signed percentages and show reverse magnitude.
 `Bouncing` and `GroundedAfterCrash` map their selected solid body's surface frame
 and ship-owned velocity/telemetry. They do not satisfy ordinary `Landed` ramp
 or takeoff gates. Automation inspection retains the distinct flight-state names.
+
+## Physical mass accounting (#187)
+
+Ship's `ShipMass` caches 100,000 kg dry hull plus positive finite physical masses
+by stable `MassObjectId` (separate fragment/equipment namespaces). Upsert/removal
+is idempotent; handling and storage do not add another identity. Installed
+components can use the same ledger; the current asset has no separately defined
+installed-equipment masses beyond dry hull. No inventory/container implementation
+or invented component weights is added. `reconciles` is an explicit diagnostic,
+not flight work. `set_total_mass_kg` preserves force capacities and velocity.
+
+World coalesces creation/growth, pickup, carried/loose pose changes and physical
+removal into an ordered mutation journal. `remove_fragment` is the future Core
+consumption/despawn boundary and never reuses IDs. Streaming/read-only queries
+emit nothing. Runtime drains changes after carrying/physics synchronization,
+classifies centers in the current authored cabin/nose frame, and updates cached
+mass for the next ship step. Door animation/furniture/handling do not change
+containment. Existing physics visits and anchored frame writebacks provide pose
+events even for sleeping contents; no extra full scene scan computes mass each
+tick. Explicit scene reconciliation is available for validation. Full inertial
+cabin motion, arbitrary future physical items and Core intake are separate tasks.

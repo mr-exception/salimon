@@ -69,3 +69,8 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 24. Collision work is bounded and conservative on unresolved terrain intervals.
     Rebound speed decreases monotonically; at most four captured rebounds occur.
     Contact settling introduces neither damage nor free-flight planetary gravity.
+
+25. Physical cargo mass is cached by stable identity exactly once regardless of
+    carrying/storage. Invalid/zero masses are rejected transactionally. Mass
+    changes preserve velocity and thrust capacities; validation reconciliation
+    never runs in flight updates.

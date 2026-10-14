@@ -212,6 +212,33 @@ pub(crate) fn sync_ship_fragments(tool: &mut MiningTool, frame: ShipFrame) {
     }
 }
 
+/// Drain mutation events only; physics/frame adapters already visit moved objects.
+pub(crate) fn sync_ship_mass(
+    tool: &mut MiningTool,
+    frame: ShipFrame,
+    ship: &mut salimon_ship::ShipController,
+) {
+    for (id, fragment) in tool.session.drain_fragment_changes() {
+        if fragment.is_none() {
+            tool.ship_fragments.remove(&id);
+            tool.fragment_motion.remove(&id);
+            tool.fragment_previous.remove(&id);
+        }
+        let mass = fragment
+            .filter(|p| {
+                salimon_character::ship_contains_object(
+                    frame.world_to_local(p.transform().position().meters()),
+                )
+            })
+            .map(|p| p.material().mass_kg());
+        tool.ship_mass
+            .update(salimon_ship::MassObjectId::Fragment(id.0), mass)
+            .expect("validated physical fragment mass");
+    }
+    ship.set_total_mass_kg(tool.ship_mass.total_kg())
+        .expect("validated mass ledger");
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -404,5 +431,78 @@ mod tests {
         );
         assert!(ship_sight_obstruction([-6.5, 2.0, 0.0], [-9.0, 0.4, 0.0], false).is_some());
         assert!(ship_sight_obstruction([-5.8, 2.0, 0.0], [-5.8, 0.0, 0.0], true).is_some());
+    }
+}
+
+#[cfg(test)]
+mod mass_tests {
+    use super::*;
+    use salimon_ship::{ShipController, ShipPose};
+    use salimon_world::{
+        CelestialBodyId,
+        resources::{DepositId, RawMaterial, ResourceDeposit, ResourceId},
+    };
+    use std::time::Duration;
+
+    #[test]
+    fn physical_events_containment_moving_ship_carry_drop_and_despawn() {
+        let mut tool = MiningTool::default();
+        let mut ship = ShipController::flying_with_velocity(
+            ShipPose {
+                position_meters: [1e12, 0.0, 0.0],
+                orientation: [0.0, 0.0, 0.0, 1.0],
+            },
+            100,
+            [12.0, 0.0, 0.0],
+        )
+        .unwrap();
+        let frame = crate::app::character_ship_frame(ship.snapshot().pose);
+        let pose = |local| {
+            ResourceTransform::new(position(frame.local_to_world(local)), [0.0, 0.0, 0.0, 1.0])
+                .unwrap()
+        };
+        let mut deposit = ResourceDeposit::new(
+            DepositId {
+                body: CelestialBodyId::Earth,
+                local: 1,
+            },
+            RawMaterial::new(ResourceId::IronOre, 1000.0).unwrap(),
+            position([0.0; 3]),
+            1000.0,
+        )
+        .unwrap();
+        tool.session
+            .extract_with_spawn(&mut deposit, Duration::from_secs(500), |_, _, _| {
+                Some(pose([-5.0, 1.0, 0.0]))
+            });
+        sync_ship_mass(&mut tool, frame, &mut ship);
+        assert_eq!(ship.snapshot().total_mass_kg, 101_000.0);
+        assert_eq!(ship.snapshot().velocity_meters_per_second, [12.0, 0.0, 0.0]);
+        let id = tool.session.fragments()[0].id();
+        assert!(tool.session.pick_up(id));
+        tool.session.move_carried(pose([-7.24, 1.0, 0.0]));
+        sync_ship_mass(&mut tool, frame, &mut ship);
+        assert_eq!(ship.snapshot().total_mass_kg, 101_000.0);
+        tool.session.move_carried(pose([-7.25, 1.0, 0.0]));
+        sync_ship_mass(&mut tool, frame, &mut ship);
+        assert_eq!(ship.snapshot().total_mass_kg, 100_998.0);
+        tool.session.drop_carried(pose([-5.0, 1.0, 0.0]));
+        sync_ship_mass(&mut tool, frame, &mut ship);
+        assert_eq!(ship.snapshot().total_mass_kg, 101_000.0);
+        for piece in tool.session.fragments() {
+            tool.ship_fragments.insert(piece.id(), [-5.0, 1.0, 0.0]);
+        }
+        ship.advance(Duration::from_secs(1));
+        let moved = crate::app::character_ship_frame(ship.snapshot().pose);
+        sync_ship_fragments(&mut tool, moved);
+        sync_ship_mass(&mut tool, moved, &mut ship);
+        assert_eq!(ship.snapshot().total_mass_kg, 101_000.0);
+        assert!(
+            (ship.snapshot().velocity_meters_per_second[0] - (12.0 + 4e6 / 101000.0)).abs() < 1e-10
+        );
+        assert!(tool.session.remove_fragment(id));
+        sync_ship_mass(&mut tool, moved, &mut ship);
+        assert_eq!(ship.snapshot().total_mass_kg, 100_998.0);
+        assert!(!tool.ship_fragments.contains_key(&id));
     }
 }

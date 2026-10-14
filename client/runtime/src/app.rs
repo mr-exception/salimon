@@ -616,6 +616,7 @@ impl ClientApplication {
         };
         crate::carrying::sync_ship_fragments(&mut self.mining, frame);
         crate::carrying::follow(&mut self.mining, player);
+        crate::carrying::sync_ship_mass(&mut self.mining, frame, &mut self.ship);
         self.mining.carry_feedback = Some(message);
         self.action_bar.show_transient(message);
     }
@@ -626,6 +627,7 @@ impl ClientApplication {
         crate::carrying::sync_ship_fragments(&mut self.mining, frame);
         let player = self.character.snapshot(frame, self.terrain_frame(ship));
         crate::carrying::follow(&mut self.mining, player);
+        crate::carrying::sync_ship_mass(&mut self.mining, frame, &mut self.ship);
     }
 
     fn reset_update_clock(&mut self) {

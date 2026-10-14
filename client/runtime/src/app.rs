@@ -373,6 +373,25 @@ impl ClientApplication {
                 let interaction =
                     available_interaction_target(self.character.location(), local_eye, local_look);
                 match interaction {
+                    Some(InteractionTarget::Core) => {
+                        let result = self.ship.intake_carried_fragment(&mut self.mining.session);
+                        let text = match result {
+                            salimon_ship::IntakeResult::Accepted => "Core accepted fragment",
+                            salimon_ship::IntakeResult::Busy => "Core is processing a fragment",
+                            salimon_ship::IntakeResult::NoCarriedFragment => {
+                                "Carry a fragment to feed the Core"
+                            }
+                            salimon_ship::IntakeResult::InvalidYield => {
+                                "Invalid fragment energy yield"
+                            }
+                        };
+                        self.action_bar.show_transient(text);
+                        crate::carrying::sync_ship_mass(
+                            &mut self.mining,
+                            ship_frame,
+                            &mut self.ship,
+                        );
+                    }
                     Some(InteractionTarget::Cockpit) => {
                         self.character.enter_cockpit();
                         if self.character.location() == CharacterLocation::Cockpit {
@@ -434,6 +453,7 @@ impl ClientApplication {
         local_look: [f64; 3],
     ) -> Option<&'static str> {
         match available_interaction_target(self.character.location(), local_eye, local_look) {
+            Some(InteractionTarget::Core) => Some("core"),
             Some(InteractionTarget::Cockpit) => Some("cockpit"),
             Some(InteractionTarget::ExitDoor) => Some("exit_door"),
             None => None,
@@ -801,15 +821,17 @@ impl ClientApplication {
             door_passable(ship_snapshot),
             self.world_seed(),
         );
-        let fragment_interaction = interaction != Some(InteractionTarget::ExitDoor)
-            && (self.mining.session.carried_id().is_some()
-                || crate::carrying::target(
-                    &self.mining,
-                    character_snapshot,
-                    ship_frame,
-                    door_passable(ship_snapshot),
-                )
-                .is_some());
+        let fragment_interaction = !matches!(
+            interaction,
+            Some(InteractionTarget::ExitDoor | InteractionTarget::Core)
+        ) && (self.mining.session.carried_id().is_some()
+            || crate::carrying::target(
+                &self.mining,
+                character_snapshot,
+                ship_frame,
+                door_passable(ship_snapshot),
+            )
+            .is_some());
         let resource_context = crate::resource_context::context(
             &self.mining,
             &self.equipment,

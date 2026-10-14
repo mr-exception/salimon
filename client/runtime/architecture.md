@@ -517,3 +517,20 @@ cabin motion, arbitrary future physical items and Core intake are separate tasks
 Runtime maps `ShipSnapshot::power_available` to character artificial gravity,
 fragment floor power and renderer `CockpitInstruments::power_off`. Physical
 cockpit occupancy is independent of power. No runtime energy arithmetic is added.
+
+## Mechanical Core intake and conversion (#189)
+
+Normal E targeting within 3 m of the authored Core center, aimed within 30°,
+accepts the one carried fragment indoors, including blackout/zero-G. No
+cockpit authority or electricity is required. Ship validates finite mass ×
+material yield before removing the stable identity from the world session;
+runtime immediately drains removal events into the mass ledger and clears
+physical/presentation caches. Busy intake leaves the next fragment untouched.
+
+Ship owns a single automatic process, 200 MJ/s by default. Catalog gameplay
+yields default to 1 GJ/kg iron, 0.5 GJ/kg silicate, 2 GJ/kg ice; these are tuning
+values, not chemistry. `ConversionConfig` permits finite nonnegative yields
+and a positive finite rate. Zero yield consumes immediately. Generated joules
+settle with ordinary discharge before capacity clipping; excess is wasted and
+full batteries keep processing to completion. Updates split at process completion
+so later idle time is not incorrectly charged by an already finished fragment.

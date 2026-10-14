@@ -89,3 +89,10 @@ pub fn hull_ground_samples() -> Vec<[f64; 3]> {
     }
     samples
 }
+
+/// Authored Core center in ship-local meters for mechanical intake targeting.
+pub const CORE_INTERACTION_POSITION_METERS: [f64; 3] = [
+    (spatial_contracts::CORE_BOUNDS[0] + spatial_contracts::CORE_BOUNDS[1]) * 0.5,
+    (spatial_contracts::CORE_BOUNDS[2] + spatial_contracts::CORE_BOUNDS[3]) * 0.5,
+    (spatial_contracts::CORE_BOUNDS[4] + spatial_contracts::CORE_BOUNDS[5]) * 0.5,
+];

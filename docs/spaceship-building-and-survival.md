@@ -202,3 +202,12 @@ completion, clipped to capacity. Insufficient energy rejects activation.
 step boundary with that step's normal idle/propulsion consumers before storage
 clipping. It preserves exact powered-thrust duration. Conversion timing/rate is
 owned by E03; no continuous charging source is assumed by this task.
+
+## Physical Core fueling (#189)
+
+Carry one fragment to the Core, aim at it within 3 m and press E. Mechanical
+intake works without power, immediately consumes the fragment and removes its
+cargo mass. One fragment processes at a time, automatically, wherever the player
+is. Conversion defaults to 200 MJ/s with material-specific configurable yields
+(iron 1 GJ/kg, rock 0.5 GJ/kg, ice 2 GJ/kg). Discharge continues during conversion;
+excess energy above capacity is wasted and processing never pauses at full charge.

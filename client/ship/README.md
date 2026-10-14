@@ -2,7 +2,7 @@
 
 `salimon-ship` owns portable ship state. It provides the landed-on-Earth
 starting pose, cockpit-control authority, persistent inertial motion,
-steering/thruster controls, solid-body boundary correction,
+steering/thruster controls, continuous solid-body contact,
 timed assisted landing/takeoff, and the
 landed/open-space door rule. Opening or closing the exit uses a typed action.
 Landed ships allow access; flying ships allow it only when the existing nearby

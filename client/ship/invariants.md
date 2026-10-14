@@ -15,9 +15,9 @@
    0.12-second start/stop presentation ramp; leaving the cockpit clears input.
 10. Thruster adjustments require powered cockpit authority, change by explicit integer
     percentage points, clamp to −100..+100%, and select forward/reverse thrust capacity.
-11. Flying ships use the conservative collision radius against the sampled local
-    surface, with extrema only as a broad bound. Flat fixtures keep their original
-    sphere rule; the visual-only Sun is ignored.
+11. Flying movement segments sweep all solid bodies and terrain using the
+    conservative collision radius. Terrain extrema are broad bounds only;
+    local-normal clearance remains precise. The visual-only Sun is ignored.
 12. Landing is offered only with cockpit authority inside exactly `1.15R`, works
     for every solid catalog body, and preserves the captured approach location.
 13. Landing and takeoff automation cannot be cancelled and continues after the
@@ -62,3 +62,10 @@ and their consumers aligned; flat deterministic fixtures are explicit.
     create edges. Opposing held keys suspend repeats. Exit, focus/lifecycle loss,
     power loss and assists clear held input; selection persists until landing
     completion or collision resets it to zero.
+
+23. Contact zeros throttle and starts bounded normal rebounds, then stable
+    `GroundedAfterCrash` at rest. Crash states never count as an ordinary landed
+    ship and cannot trigger landing/takeoff through the existing L action.
+24. Collision work is bounded and conservative on unresolved terrain intervals.
+    Rebound speed decreases monotonically; at most four captured rebounds occur.
+    Contact settling introduces neither damage nor free-flight planetary gravity.

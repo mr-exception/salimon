@@ -14,6 +14,8 @@ pub(crate) fn character_ship_frame(pose: ShipPose) -> ShipFrame {
 pub(crate) fn surface_frame_for_ship(ship: ShipSnapshot) -> SurfaceFrame {
     let body_id = match ship.flight_state {
         FlightState::Landed { body }
+        | FlightState::Bouncing { body }
+        | FlightState::GroundedAfterCrash { body }
         | FlightState::AssistedLanding { body }
         | FlightState::AssistedTakeoff { body } => body,
         FlightState::Flying => {

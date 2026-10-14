@@ -1095,6 +1095,53 @@ mod tests {
     }
 
     #[test]
+    fn crash_states_survive_runtime_mapping_and_cannot_activate_ordinary_assists() {
+        let mut app = app(Scenario::OrbitEarth);
+        let earth = salimon_world::CELESTIAL_BODIES
+            .iter()
+            .find(|body| body.id == salimon_world::CelestialBodyId::Earth)
+            .unwrap();
+        let mut pose = app.ship.snapshot().pose;
+        pose.position_meters = salimon_math::add(
+            earth.center.meters(),
+            [
+                0.0,
+                earth.radius_meters + salimon_ship::COLLISION_RADIUS_METERS + 1.0,
+                0.0,
+            ],
+        );
+        app.ship =
+            salimon_ship::ShipController::flying_with_velocity(pose, 50, [0.0, -1000.0, 0.0])
+                .unwrap();
+        execute(&mut app, r#"{"protocol":1,"id":1,"op":"step","frames":1}"#);
+        let state = inspect(&app);
+        assert_eq!(state["ship"]["flight_state"], "Bouncing { body: Earth }");
+        assert_eq!(state["ship"]["thruster_percentage"], 0);
+        execute(&mut app, r#"{"protocol":1,"id":2,"op":"landing"}"#);
+        assert!(matches!(
+            app.ship.snapshot().flight_state,
+            salimon_ship::FlightState::Bouncing { .. }
+        ));
+        execute(
+            &mut app,
+            r#"{"protocol":1,"id":3,"op":"step","frames":200}"#,
+        );
+        assert_eq!(
+            inspect(&app)["ship"]["flight_state"],
+            "GroundedAfterCrash { body: Earth }"
+        );
+        assert_eq!(inspect(&app)["ship"]["speed_meters_per_second"], 0.0);
+        let resting = app.ship.snapshot().pose;
+        execute(&mut app, r#"{"protocol":1,"id":4,"op":"landing"}"#);
+        app.advance_automation(Duration::from_secs(1));
+        assert_eq!(app.ship.snapshot().pose, resting);
+        assert_eq!(
+            inspect(&app)["ship"]["flight_state"],
+            "GroundedAfterCrash { body: Earth }"
+        );
+    }
+
+    #[test]
     fn signed_held_throttle_uses_gameplay_keys_and_fixed_simulation_time() {
         let mut app = app(Scenario::OpenSpace);
         let key = |app: &mut ClientApplication, pressed| {

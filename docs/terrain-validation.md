@@ -23,9 +23,12 @@ center slope. Samples enforce the existing 2 m non-gear hull clearance, with a
 rounding. Unsafe sites report a typed rejection before an assist begins. Startup
 searches a bounded 41×41 lattice at 25 m spacing around the requested direction,
 rejecting unsafe footprints; failure aborts startup explicitly. Assists remain
-uncancellable and partition-independent. Direct flight uses elevation extrema
-only for the broad bound, then projects its conservative 16 m collision sphere
-against the sampled local surface.
+uncancellable and partition-independent. Free-flight movement uses bounded
+continuous segment sweeps: elevation extrema are broad bounds, and version-1
+heightfield gradient bounds drive chronological contact refinement. The existing
+conservative 16 m sphere retains local-normal clearance; see the ship-owned
+[collision/crash contract](../client/ship/architecture.md#swept-collision-and-crash-settling-202)
+for resolution, conservative work-cap behavior and crash-state response.
 
 Character eye height is 1.75 m along radial gravity up. Walking follows the view
 tangent at 3.8 m/s; uphill/contour traversal over 40 degrees and upward steps over

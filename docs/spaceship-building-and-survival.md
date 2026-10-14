@@ -159,3 +159,12 @@ Up/Down select signed −100..+100% throttle, one percentage point on press and
 one more per 100 ms held. Selection persists when leaving the cockpit. Only
 a powered cockpit in free flight can change it; assists reject input. Landing
 completion and contact reset selection to zero.
+
+## Implemented contact response (#202)
+
+Free flight sweeps solid bodies/terrain to prevent high-speed tunneling. Contact
+zeros throttle and produces bounded, progressively damped normal rebounds, then
+rests in `GroundedAfterCrash`. This is separate from a proper assisted landing;
+ordinary L landing/takeoff cannot activate in crash states. No damage is applied.
+The current conservative collider remains; exact hull/contact physics and
+powered recovery landing are separate work.

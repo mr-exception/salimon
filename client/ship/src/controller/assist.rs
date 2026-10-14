@@ -136,7 +136,10 @@ impl ShipController {
                     self.flight_state = FlightState::AssistedTakeoff { body };
                 }
             }
-            FlightState::AssistedLanding { .. } | FlightState::AssistedTakeoff { .. } => {}
+            FlightState::AssistedLanding { .. }
+            | FlightState::AssistedTakeoff { .. }
+            | FlightState::Bouncing { .. }
+            | FlightState::GroundedAfterCrash { .. } => {}
         }
     }
 

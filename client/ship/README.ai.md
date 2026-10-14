@@ -14,7 +14,7 @@ The portable assisted-landing/takeoff state machine builds on inertial
 flight motion. Protect cockpit-only activation, exact landing range, arbitrary
 surface normals, uncancellable automatic completion, door-interlocked takeoff,
 cockpit exit, monitor-message routing, inertial continuation, steering, and
-collision correction with unit tests.
+continuous collision and crash settling with unit tests.
 
 Each timed assist captures its starting pose and radial waypoints, then evaluates
 the path from elapsed `Duration`. Landing is 8 seconds (2 alignment, 4 approach,

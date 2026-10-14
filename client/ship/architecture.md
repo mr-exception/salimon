@@ -13,7 +13,9 @@ that same controller, without adding controllers, crates or framework layers:
 
 | Module | Ownership and adjacent regression coverage |
 | --- | --- |
-| `flight.rs` | Thruster authority, force-based acceleration and persistent velocity, motion and solid-body correction |
+| `flight.rs` | Force-based acceleration, persistent velocity and free-flight integration |
+| `throttle.rs` | Signed selection, authority and simulation-time held-key cadence |
+| `collision.rs` | Catalog/terrain segment sweeps, damped rebound and crash grounding |
 | `steering.rs` | Input clamps, cockpit/flight gate, ramps and local-axis rotations |
 | `assist.rs` | Landing range, captured paths, timing/derivatives, takeoff interlocks and all-body assists |
 | `door.rs` | Landed/open-space permissions, locked interactions and reversible hinge animation |
@@ -34,7 +36,7 @@ renderer mapping.
 Orientation is a normalized local-to-world quaternion. `ShipPose::axes` exposes
 forward/up/port axes without leaking a math or engine dependency. The current
 advance step applies local-axis quaternion steering, force-based acceleration along local +X,
-and nearest-valid-position correction against every solid catalog body while
+and continuous movement-segment sweeps against every solid catalog body while
 flying. Steering target and smoothed values are portable numeric state; platform
 key state remains outside this crate.
 Landing captures the arbitrary approach normal and starting pose. It aligns
@@ -99,7 +101,7 @@ changes only future thrust direction, and no drag, speed cap or body gravity is
 applied. Snapshot speed is the magnitude of actual velocity, including assists.
 `flying` starts at rest; `flying_with_velocity` explicitly seeds finite momentum.
 Assisted landing/takeoff retain captured paths and finish at rest. Collision
-correction is still the pre-#202 endpoint policy in this incremental change.
+uses the bounded swept contact and crash-state policy described below.
 
 ## Signed held throttle (#186)
 
@@ -111,3 +113,32 @@ repeat. Release/direction changes reset cadence. Cockpit authority, Flying state
 and nonzero Core fixture energy gate changes; power consumption remains E01.
 Leaving the cockpit preserves selection and momentum while clearing held keys.
 Assists clear holds and reject changes; landing completion/collision zero selection.
+
+## Swept collision and crash settling (#202)
+
+Each free-flight movement segment sweeps every solid catalog body; exact ties
+use catalog order, and the visual-only Sun is ignored. Analytic body-local
+line/sphere intervals avoid a high-speed endpoint-only test. Terrain extrema
+are broad bounds, then version-1 heightfield intervals use analytic gradient
+bounds to reject clear spans. Chronological subdivision detects hills even
+with both endpoints outside; resolution is 1 mm. Work is capped at 4,096
+uncertain intervals per body. Exhaustion conservatively contacts the earliest
+unresolved span (a possible early contact, never a pass through solid terrain).
+No planet mesh, cargo scan or full physics engine is required.
+
+Contact retains the existing conservative 16 m ship collider and projects its
+center to the sampled local-normal clearance, within 1 mm at the distant f64
+anchor. This is conservative proxy contact, not triangle-level hull simulation.
+Throttle/held input and steering clear immediately. Tangential impact motion
+is absorbed; the normal component rebounds at restitution 0.35, capped at
+8 m/s, along a captured contact normal. A local 10 m/s² settling response
+returns it to the contact anchor; free flight still has no planetary gravity.
+Each rebound launch speed decays by 0.35. Below 0.1 m/s or after four rebounds
+the ship becomes `GroundedAfterCrash` at zero velocity; captures/timing make
+bounce sampling independent of elapsed-time partition. No damage is applied.
+
+`Bouncing { body }` and `GroundedAfterCrash { body }` remain distinct from
+`Landed`: ordinary landing/takeoff and throttle commands cannot activate there.
+Contextual messages identify settling/crash grounding; runtime maps their
+selected body's surface frame without treating the ship as properly landed.
+Powered recovery landing belongs to its later issue; #198 owns native M1 smoke.

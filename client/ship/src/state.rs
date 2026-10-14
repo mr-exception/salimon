@@ -26,6 +26,8 @@ pub enum FlightState {
     AssistedLanding { body: CelestialBodyId },
     AssistedTakeoff { body: CelestialBodyId },
     Flying,
+    Bouncing { body: CelestialBodyId },
+    GroundedAfterCrash { body: CelestialBodyId },
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]

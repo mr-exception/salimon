@@ -55,7 +55,7 @@ expands the checked-in ship mesh once at renderer initialization; material color
 and a door-vertex flag are retained in the GPU vertex stream. Opaque ship
 geometry writes reverse-Z depth first. One `Monitor_Wide` quad carries top-left UVs and a
 flat display flag. Its fragment branch samples a linearly filtered
-1536 × 256 sRGB texture without a separate draw or light pass.
+2048 × 256 sRGB atlas (three console regions plus one Core region) without a separate draw or light pass.
 `CockpitInstruments` carries presentation-only speed, shared power, Core energy,
 and optional nearby-body surface-distance/radial values;
 `cockpit_instruments.rs` caches rounded display keys before formatting or
@@ -301,3 +301,14 @@ regions and the Core the fourth. No extra draws/materials/pipelines. Both
 screens blank once on explicit bus power loss and redraw automatically at
 restoration. The Core region independently caches rounded kW, energy, seconds
 and warning/conversion state. Runtime maps domain status without deriving rules.
+
+## Vector navigation and braking (#193)
+
+Ship owns the [navigation feasibility contract](../ship/architecture.md#vector-navigation-and-braking-193).
+Runtime maps it without deriving rules; renderer formats observation DTOs only.
+
+The existing wide console shows velocity XYZ in ship-local axes (+X forward,
++Y up, -Z starboard), angle, signed throttle/acceleration, kg mass, nearby total
+speed and reverse duration/distance/GJ. Unavailable readings use --; insufficient
+energy and alignment have explicit status. Rounded strings independently cache
+flight/braking/navigation regions. Core-local screen ownership is unchanged.

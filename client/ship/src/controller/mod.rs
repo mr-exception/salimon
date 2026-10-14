@@ -196,6 +196,7 @@ impl ShipController {
             total_mass_kg: self.propulsion.total_mass_kg(),
             speed_meters_per_second: self.speed_meters_per_second(),
             velocity_meters_per_second,
+            navigation: self.navigation_telemetry(),
             energy_core: self.energy_core.snapshot(),
             core_status: self.core_status(),
             power_available: self.energy_core.powered(),

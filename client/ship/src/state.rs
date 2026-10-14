@@ -73,6 +73,7 @@ pub struct ShipSnapshot {
     pub total_mass_kg: f64,
     pub speed_meters_per_second: f64,
     pub velocity_meters_per_second: [f64; 3],
+    pub navigation: crate::NavigationTelemetry,
     pub energy_core: EnergyCoreState,
     pub core_status: crate::CoreStatus,
     /// Authoritative power; fractional joules can power systems below display precision.

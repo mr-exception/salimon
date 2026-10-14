@@ -591,3 +591,19 @@ with press/release booleans. Holding either repeats each 100 ms of simulation
 time, with one point immediately on the press edge. The `thruster` action is a
 single powered-cockpit percentage-point command; negative settings use reverse
 thrust and do not directly assign speed.
+
+## Realistic flight regression (#195)
+
+`python scripts/salimon-test suite --group realistic-flight --summary --binary
+/path/to/salimon-client` exercises signed throttle/coasting/reverse stop, dead-Core
+mechanical refueling and automatic thrust restoration, crash recovery/reservation,
+inertial takeoff, a physically onboard 500-fragment population and moving EVA.
+Use `--evidence` for the same actions plus screen checkpoints. New initial fixtures
+are opt-in `--e2e` scenarios; no mutation/teleport/refuel command bypasses production
+interaction after initialization. The default suite/CI includes these routes.
+
+`cargo test -p salimon-client flight_regression --locked` replays the new routes
+without a window and adds runtime mass/consumption and cabin zero-G transition
+checks. Existing ship, character and physics tests retain detailed partition,
+collision, power and contact edge coverage. These checks establish portable
+correctness; Linux software rendering does not certify Apple M1 frame rate.

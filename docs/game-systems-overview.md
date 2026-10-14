@@ -8,7 +8,8 @@ This page is the high-level index of Salimon's major gameplay and simulation sys
 
 This list describes product direction, not implemented modules. The current
 client-only prototype implements navigation, walking/EVA, ship interaction,
-planetary mining, one-object carrying and fragment motion/contact. Resource state
+planetary mining, one-object carrying, fragment motion/contact, inertial flight,
+physical Core conversion/power, safe recovery and cabin zero-G. Resource state
 is retained in memory across local streaming, with no disk/backend save.
 Survival, crafting, orbital simulation, NPCs, economy, multiplayer and backend
 authority remain deferred. See [current scope](project-phases.md).
@@ -37,3 +38,15 @@ Game systems should be independently understandable and versioned domains. Their
 ## Technical architecture
 Implementation strategy is documented in [Technical Architecture & AI Maintenance](technical-architecture.md).
 Current architecture: **Rust native composition in `client/runtime` + `winit` events + `wgpu` renderer + portable Rust domain crates**, using typed commands and snapshots. Runtime composes world, character, ship and physics state; renderer owns GPU presentation. Native builds target macOS, Windows and Debian-based Linux, with macOS as the reference playable/performance target. `core/` is a reserved backend boundary. A web/WASM host, workers and authoritative backend remain future capabilities; none is required by the current client.
+
+## Current flight and energy ownership
+
+Gameplay decisions and future scope live in [Spaceship, Building & Survival](spaceship-building-and-survival.md#accepted-propulsion-and-core-review-2026-10-14).
+Ship owns persistent velocity, mass-derived force, power/reservations/conversion,
+assists and navigation observations. Runtime owns physical boundary events,
+Core interaction and gravity composition. Character/physics own weightless
+crew/cargo; renderer owns the wide cockpit and separate Core status screens.
+[Technical architecture](technical-architecture.md#flight-update-and-validation-decisions-197)
+links portable regression/profiling and timing contracts. These implemented
+systems supersede the baseline's energy exclusion; production survival and
+upgrade progression remain OUT OF SCOPE.

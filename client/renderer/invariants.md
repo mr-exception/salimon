@@ -103,3 +103,14 @@ regions and the Core the fourth. No extra draws/materials/pipelines. Both
 screens blank once on explicit bus power loss and redraw automatically at
 restoration. The Core region independently caches rounded kW, energy, seconds
 and warning/conversion state. Runtime maps domain status without deriving rules.
+
+## Vector navigation and braking (#193)
+
+Ship owns the [navigation feasibility contract](../ship/architecture.md#vector-navigation-and-braking-193).
+Runtime maps it without deriving rules; renderer formats observation DTOs only.
+
+The existing wide console shows velocity XYZ in ship-local axes (+X forward,
++Y up, -Z starboard), angle, signed throttle/acceleration, kg mass, nearby total
+speed and reverse duration/distance/GJ. Unavailable readings use --; insufficient
+energy and alignment have explicit status. Rounded strings independently cache
+flight/braking/navigation regions. Core-local screen ownership is unchanged.

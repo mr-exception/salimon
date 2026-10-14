@@ -1,0 +1,12 @@
+{
+  "setup": {"scenario": "cargo-flight", "seed": 195, "step_ms": 16},
+  "steps": [
+    {"assert": {"path": "world.fragment_count", "equals": 500}},
+    {"assert": {"path": "ship.total_mass_kg", "approx": 100016, "tolerance": 1e-06}},
+    {"action": {"op": "step", "frames": 2}},
+    {"assert": {"path": "ship.total_mass_kg", "approx": 100016, "tolerance": 1e-06}},
+    {"assert": {"path": "ship.velocity_meters_per_second.0", "equals": 96}},
+    {"assert": {"path": "world.fragment_count", "equals": 500}},
+    {"screenshot": "cargo-flight"}
+  ]
+}

@@ -23,7 +23,9 @@ use std::error::Error;
 use std::fmt;
 use std::time::Duration;
 
-pub use cockpit_instruments::{CockpitInstruments, CoreInstruments, NearbyBodyInstruments};
+pub use cockpit_instruments::{
+    CockpitInstruments, CoreInstruments, NavigationInstruments, NearbyBodyInstruments,
+};
 pub use equipment_toolbar::{EquipmentIcon, EquipmentSlot, EquipmentToolbar};
 use gpu_timing::GpuTimer;
 pub use held_item::HeldItemInstance;

@@ -12,9 +12,10 @@ and 16 GB unified memory.
 The custom scout has a broad living cabin, panoramic side/rear windows,
 a central Energy Core, warm materials and detailed aft thrusters. Its compact
 nose and shorter cockpit glazing keep the exterior silhouette streamlined.
-One center cockpit console carries three physical monitors showing live
-metric speed, thruster percentage, Core stored/capacity energy, and nearby-body
-surface distance plus approaching/receding/zero radial speed. Routes on both sides
+One center cockpit console carries one wide monitor showing persistent velocity
+direction/speed, heading angle, signed throttle/acceleration, total mass, Core
+energy, nearby-body relative speed and reverse-braking estimates. A separate
+physical Core monitor shows conversion, consumption, depletion and warnings. Routes on both sides
 let the player walk past the console into the cockpit nose. Loose fragments can
 be dropped on the cabin deck and pile up; the separate cargo module is removed. See
 the [ship asset guide](client/assets/ship/README.md).
@@ -138,7 +139,7 @@ Press **1** to equip the handheld mining tool on the surface; aim at a deposit
 within 4 m and hold left mouse to extract at 2 kg/s. Press **2–5** to stow.
 Aim at a physical fragment within 3 m and press **F** to pick it up. You can
 carry one world object at a time; equipped gear remains separate. Press **F**
-again to release it from your hand. F only grabs/drops and never starts mining. Release F before another action. E only operates cockpit/door interactions. Gravity and contact make fragments fall and pile up.
+again to release it from your hand. F only grabs/drops and never starts mining. Release F before another action. E operates cockpit/door and mechanical Core intake interactions. Gravity and contact make fragments fall and pile up.
 Object-specific prompts appear just above their cockpit, door, deposit or fragment.
 They follow the target as you look or move and hide outside the view or behind
 closer geometry. Flight/tool guidance and short blocked-action feedback remain
@@ -200,11 +201,11 @@ automated tests:
    landed ship facing the cockpit. Inspect the warm cabin, walk both routes
    around the central Energy Core, and look through the side/rear windows and
    forward from behind the lowered chair. Follow the routes on both sides past the
-   single center console into the shortened cockpit nose. Inspect the three
-   monitors on that console: speed/power, Core energy, and nearby-body state.
+   single center console into the shortened cockpit nose. Inspect its wide
+   multifunction monitor and the separate Core-local status screen.
    Check seated forward and downward visibility through the shortened glazing,
    and inspect the exterior silhouette without the former port cargo module.
-   Check 0%, 1%, and 100%
+   Check −100%, −1%, 0%, 1%, and 100%
    during flight; cross the 3 Mm nearby threshold; confirm approaching, receding,
    zero, and out-of-range states; and confirm readings remain live after leaving
    the seat. Jump and check the
@@ -288,8 +289,9 @@ commands in the [ship asset documentation](client/assets/ship/README.md).
 Mining, carrying, fragment motion/contact, ship flight and assisted landing,
 airlock access, and EVA are implemented. Modified deposits and physical fragments
 are retained in memory across local streaming during the current session.
-Orbital simulation, disk/backend persistence, networking, survival, and production
-energy management remain deferred.
+Core storage, physical conversion, assisted-flight reservations and power loss/
+restoration are implemented. Orbital simulation, disk/backend persistence,
+networking, survival, upgrade progression and manual power management remain deferred.
 
 Add future crates explicitly to the root workspace and inherit its package
 metadata and lints. Keep `Cargo.lock` committed; validate normal changes with

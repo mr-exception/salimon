@@ -11,6 +11,10 @@ use crate::app::ClientApplication;
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum Scenario {
     LandedEarth,
+    FlightRegression,
+    CargoFlight,
+    CoreRestart,
+    CrashRecovery,
     TerrainEarth,
     TerrainEarthApproach,
     TerrainMoonApproach,
@@ -35,6 +39,10 @@ pub(crate) enum Scenario {
 impl Scenario {
     fn parse(value: &str) -> Result<Self, String> {
         match value {
+            "flight-regression" => Ok(Self::FlightRegression),
+            "cargo-flight" => Ok(Self::CargoFlight),
+            "core-restart" => Ok(Self::CoreRestart),
+            "crash-recovery" => Ok(Self::CrashRecovery),
             "terrain-earth-approach" => Ok(Self::TerrainEarthApproach),
             "terrain-moon-approach" => Ok(Self::TerrainMoonApproach),
             "terrain-mars-approach" => Ok(Self::TerrainMarsApproach),
@@ -63,6 +71,10 @@ impl Scenario {
 
     pub(crate) const fn name(self) -> &'static str {
         match self {
+            Self::FlightRegression => "flight-regression",
+            Self::CargoFlight => "cargo-flight",
+            Self::CoreRestart => "core-restart",
+            Self::CrashRecovery => "crash-recovery",
             Self::TerrainEarthApproach => "terrain-earth-approach",
             Self::TerrainMoonApproach => "terrain-moon-approach",
             Self::TerrainMarsApproach => "terrain-mars-approach",
@@ -201,6 +213,10 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
     app.character = CharacterController::default();
     app.ship = ShipController::default();
     match config.scenario {
+        Scenario::FlightRegression
+        | Scenario::CargoFlight
+        | Scenario::CoreRestart
+        | Scenario::CrashRecovery => crate::flight_regression::initialize(app, config.scenario)?,
         Scenario::LandedEarth => {}
         Scenario::TerrainEarthApproach
         | Scenario::TerrainMoonApproach
@@ -346,7 +362,11 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
     let snapshot = app.ship.snapshot();
     if matches!(
         config.scenario,
-        Scenario::TerrainEarthApproach
+        Scenario::FlightRegression
+            | Scenario::CargoFlight
+            | Scenario::CoreRestart
+            | Scenario::CrashRecovery
+            | Scenario::TerrainEarthApproach
             | Scenario::TerrainMoonApproach
             | Scenario::TerrainMarsApproach
             | Scenario::TerrainMoonSteep

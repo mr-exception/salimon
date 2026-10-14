@@ -2,7 +2,9 @@
 
 > **Scope status:** This document defines the Phase 0 navigation baseline. Its
 > exclusions do not describe the current post-baseline prototype: mining,
-> physical fragments, carrying and EVA are now implemented. Use
+> physical fragments, carrying and EVA are now implemented. Its direct-speed,
+> unsigned-throttle and no-energy rules are historical and superseded by the
+> realistic flight/Core wave (see Project Phases). Use
 > [Project Phases](project-phases.md) and [Technical Architecture](technical-architecture.md)
 > for current scope. The [2026-09-15 evaluation](phase-0-evaluation.md) records
 > GO WITH REVISIONS and performance limitations at its evaluated revision.

@@ -73,3 +73,10 @@ documentation, architecture, invariants, and relevant validation required by the
 Run the root [development workflow](../README.md#development-workflow) after
 changes. Stable Rust, workspace lints, and the root lockfile apply to all client
 crates.
+
+
+The current post-baseline flight/Core contracts and future exclusions are indexed
+in [Project Phases](../docs/project-phases.md#realistic-flightcore-wave-185197).
+Ship mass, energy, conversion/reservations and cockpit telemetry are authoritative;
+rendering and CPU profiling remain observational. `--flight-profile` is a release
+CPU workload suite, not an Apple M1 frame-rate certification.

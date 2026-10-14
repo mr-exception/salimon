@@ -69,6 +69,10 @@ jobs:
         if: runner.os == 'Linux'
         timeout-minutes: 5
         run: python scripts/benchmark_fragments.py --binary artifacts/build/release/salimon-client --mode physics --counts 500 1000 --layouts scattered --states settled --warmup-seconds 0 --sample-seconds 1 --timeout 120 --machine-label github-actions-cpu-only --output artifacts/fragment-benchmarks
+      - name: Flight mass and power CPU regression profiles
+        if: runner.os == 'Linux'
+        timeout-minutes: 6
+        run: python scripts/profile_flight.py --binary artifacts/build/release/salimon-client --samples 20 --baseline reports/issue-196/baseline.json --output artifacts/fragment-benchmarks/flight-profile.json
       - name: Linux deterministic E2E baseline (Mesa software Vulkan)
         if: runner.os == 'Linux'
         timeout-minutes: 10

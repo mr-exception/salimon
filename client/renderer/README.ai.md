@@ -68,7 +68,7 @@ lighting, and the inexpensive depth-tested cockpit-glass blend pass. The single
 `Monitor_Wide` quad retains top-left UVs and a display flag in the immutable vertex stream.
 `cockpit_instruments.rs` formats typed speed/power, Core energy, and optional
 nearby-body DTO values into one cached
-1536 × 256 RGBA texture; upload it only when the displayed values change. The screen
+2048 × 256 RGBA atlas (three console regions plus one separate Core region); upload it only when the displayed values change. The screen
 is a self-lit surface in the existing opaque draw and stay live when unseated.
 Keep gameplay interaction and ship state out of these modules.
 

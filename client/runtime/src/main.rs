@@ -8,6 +8,8 @@ mod benchmark_fixture;
 mod carrying;
 mod e2e;
 mod equipment;
+mod flight_profile;
+mod flight_regression;
 mod fragment_physics;
 mod frame_clock;
 mod mining;
@@ -27,6 +29,15 @@ fn main() -> ExitCode {
     log::info!("starting Salimon native client");
 
     let args: Vec<_> = std::env::args().skip(1).collect();
+    if args.first().map(String::as_str) == Some("--flight-profile") {
+        return match flight_profile::run(&args) {
+            Ok(()) => ExitCode::SUCCESS,
+            Err(error) => {
+                eprintln!("Salimon flight profile failed: {error}");
+                ExitCode::FAILURE
+            }
+        };
+    }
     if args.first().map(String::as_str) == Some("--benchmark") {
         let result = benchmark::parse(&args).and_then(|config| {
             if config.headless {

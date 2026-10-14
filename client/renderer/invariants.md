@@ -90,3 +90,6 @@
 Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
 and [world definition contract](../world/terrain-contract.md). Keep local rules
 and their consumers aligned; flat deterministic fixtures are explicit.
+
+- Explicit Core power loss blanks the cached cockpit atlas; restoration redraws
+  every region. Rounded energy telemetry is not a power authority.

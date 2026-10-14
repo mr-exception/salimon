@@ -7,6 +7,8 @@
 use salimon_world::LANDING_RANGE_ALTITUDE_RADIUS_FACTOR;
 use std::time::Duration;
 
+mod energy;
+pub use energy::{EnergyConfig, EnergyCore, InvalidEnergy};
 mod mass;
 pub use mass::{MassObjectId, ShipMass};
 mod propulsion;
@@ -46,8 +48,8 @@ pub const LANDING_ASSIST_DURATION: Duration = Duration::from_secs(8);
 pub const TAKEOFF_ASSIST_DURATION: Duration = Duration::from_secs(6);
 /// Inclusive nominal-surface distance for the cockpit's nearby-body sensor.
 pub use salimon_world::NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS;
-/// Noncanonical Phase 0 fixture values used to exercise live Core telemetry.
-pub const DEFAULT_CORE_ENERGY_CAPACITY_JOULES: u64 = 1_000_000_000_000;
-pub const DEFAULT_CORE_ENERGY_STORED_JOULES: u64 = 750_000_000_000;
+/// Starter Core capacity/charge; watts and idle loads are configurable.
+pub const DEFAULT_CORE_ENERGY_CAPACITY_JOULES: u64 = 60_000_000_000;
+pub const DEFAULT_CORE_ENERGY_STORED_JOULES: u64 = 45_000_000_000;
 
 pub const DOOR_HINGE_ANIMATION_DURATION: Duration = Duration::from_millis(700);

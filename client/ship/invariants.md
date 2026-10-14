@@ -24,8 +24,8 @@
     cockpit is left; steering and thruster input cannot override it.
 14. Takeoff requires cockpit authority and a closed door, follows the landed
     surface normal, and returns control only after clearing the landing volume.
-15. Core telemetry is bounded by its 1 TJ fixture capacity and does not
-    imply consumption, generation, fuel, persistence, or production energy rules.
+15. Core storage is bounded by configurable capacity (starter 60 GJ, 75% charge).
+    Fractional joules and watt consumers are authoritative; telemetry is display-only.
 16. Nearby-body telemetry selects the nearest catalog surface at an inclusive
     3,000,000 m threshold and reports actual signed radial velocity: negative
     approaching, positive receding, and zero stationary/tangential.
@@ -74,3 +74,9 @@ and their consumers aligned; flat deterministic fixtures are explicit.
     carrying/storage. Invalid/zero masses are rejected transactionally. Mass
     changes preserve velocity and thrust capacities; validation reconciliation
     never runs in flight updates.
+
+26. Energy exhaustion stops free-flight force at the exact cutoff and preserves
+    selected throttle/world velocity. Charging resumes that selection automatically.
+27. Empty Core powers down cockpit controls/display and artificial cabin gravity;
+    no planetary gravity takes over inside. Atomic exchanges debit consumers
+    before clamping surplus to capacity. Invalid energy inputs are transactional.

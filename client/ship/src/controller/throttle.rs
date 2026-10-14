@@ -20,7 +20,7 @@ impl ShipController {
     fn can_adjust_thruster(&self) -> bool {
         self.cockpit_control_active
             && self.flight_state == FlightState::Flying
-            && self.energy_core.stored_joules > 0
+            && self.energy_core.powered()
     }
 
     /// One explicit percentage-point command; accepted even when already clamped.

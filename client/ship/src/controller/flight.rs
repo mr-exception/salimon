@@ -6,10 +6,11 @@ use salimon_math::{add, scale};
 use std::time::Duration;
 
 impl ShipController {
-    pub(super) fn advance_flight(&mut self, delta: Duration) {
+    pub(super) fn advance_powered_flight(&mut self, delta: Duration, powered_seconds: f64) {
         let start = self.pose.position_meters;
         let velocity = self.velocity;
-        self.integrate_thrust(delta.as_secs_f64(), self.thruster_percentage);
+        self.integrate_thrust(powered_seconds, self.thruster_percentage);
+        self.integrate_thrust((delta.as_secs_f64() - powered_seconds).max(0.0), 0);
         self.sweep_contact(start, self.pose.position_meters, velocity, delta);
     }
 
@@ -226,5 +227,98 @@ mod inertial_tests {
         whole.advance(Duration::from_secs(1));
         assert_eq!(whole.velocity_meters_per_second(), velocity);
         assert!(ShipController::flying_with_velocity(whole.pose, 0, [f64::NAN; 3]).is_err());
+    }
+}
+
+#[cfg(test)]
+mod energy_flight_tests {
+    use super::*;
+    use crate::{EnergyConfig, ShipPose, SteeringInput};
+    #[test]
+    fn converted_charge_and_consumers_share_one_step_without_capacity_clipping() {
+        let mut ship = ShipController::flying(
+            ShipPose {
+                position_meters: [0.0; 3],
+                orientation: [0.0, 0.0, 0.0, 1.0],
+            },
+            100,
+        );
+        ship.configure_energy_core(
+            EnergyConfig {
+                capacity_joules: 100,
+                forward_watts: 100.0,
+                reverse_watts: 50.0,
+                gravity_idle_watts: 0.0,
+                cockpit_idle_watts: 0.0,
+            },
+            100.0,
+        )
+        .unwrap();
+        ship.advance_with_core_input(Duration::from_secs(1), 100.0)
+            .unwrap();
+        assert_eq!(ship.snapshot().energy_core.stored_joules, 100);
+        assert_eq!(ship.snapshot().velocity_meters_per_second, [40.0, 0.0, 0.0]);
+        ship.set_stored_core_energy_joules(0);
+        ship.advance_with_core_input(Duration::from_secs(1), 50.0)
+            .unwrap();
+        assert_eq!(ship.snapshot().velocity_meters_per_second, [60.0, 0.0, 0.0]);
+        assert_eq!(ship.snapshot().energy_core.stored_joules, 0);
+        let before = ship.snapshot();
+        assert!(
+            ship.advance_with_core_input(Duration::from_secs(1), f64::NAN)
+                .is_err()
+        );
+        assert_eq!(ship.snapshot(), before);
+    }
+
+    #[test]
+    fn exhaustion_coasts_without_losing_selection_or_velocity_then_charge_resumes() {
+        let mut ship = ShipController::flying_with_velocity(
+            ShipPose {
+                position_meters: [0.0; 3],
+                orientation: [0.0, 0.0, 0.0, 1.0],
+            },
+            100,
+            [10.0, 0.0, 0.0],
+        )
+        .unwrap();
+        ship.configure_energy_core(
+            EnergyConfig {
+                capacity_joules: 1000,
+                forward_watts: 100.0,
+                reverse_watts: 50.0,
+                gravity_idle_watts: 0.0,
+                cockpit_idle_watts: 0.0,
+            },
+            50.0,
+        )
+        .unwrap();
+        let mut split = ship.clone();
+        ship.advance(Duration::from_secs(1));
+        for ms in [123, 377, 500] {
+            split.advance(Duration::from_millis(ms));
+        }
+        let state = ship.snapshot();
+        assert!(!state.power_available);
+        assert_eq!(state.thruster_percentage, 100);
+        assert_eq!(state.velocity_meters_per_second, [30.0, 0.0, 0.0]);
+        assert_eq!(state.pose.position_meters, [25.0, 0.0, 0.0]);
+        assert!((split.snapshot().pose.position_meters[0] - 25.0).abs() < 1e-10);
+        assert!(!ship.adjust_thruster(-100));
+        ship.set_steering_input(SteeringInput {
+            yaw: 1.0,
+            ..Default::default()
+        });
+        ship.advance(Duration::from_secs(1));
+        assert_eq!(ship.snapshot().pose.orientation, state.pose.orientation);
+        assert_eq!(
+            ship.snapshot().velocity_meters_per_second,
+            state.velocity_meters_per_second
+        );
+        ship.exchange_core_energy_joules(100.0, 0.0).unwrap();
+        assert!(ship.snapshot().power_available);
+        ship.advance(Duration::from_millis(500));
+        assert_eq!(ship.snapshot().velocity_meters_per_second, [50.0, 0.0, 0.0]);
+        assert_eq!(ship.snapshot().energy_core.stored_joules, 50);
     }
 }

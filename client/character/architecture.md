@@ -145,3 +145,10 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 bounds and floor/ceiling. It has no door-animation or furniture exclusion and is
 independent of floor-placement clearance. Runtime converts world positions in
 f64 using the current ship frame; handling modes never alter this rule.
+
+## Core power integration (#188)
+
+Runtime supplies `set_ship_gravity_enabled` from authoritative Core power.
+Disabled artificial gravity preserves interior vertical motion and contact/hull
+constraints without planetary fallback. Jump requires powered gravity; full
+cabin inertial dynamics remain deferred. External surface/EVA gravity is unchanged.

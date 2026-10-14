@@ -30,6 +30,10 @@ pub enum Surface {
     Floor {
         height_meters: f64,
     },
+    /// Same physical deck/contact/frame, without artificial gravity.
+    UnpoweredFloor {
+        height_meters: f64,
+    },
     Sphere(SphereSurface),
     /// Pure caller-owned heightfield query; gravity remains radial to body.center.
     Sampled {
@@ -43,8 +47,16 @@ pub enum Surface {
 }
 impl Surface {
     fn is_floor(self) -> bool {
-        matches!(self, Self::Floor { .. })
+        matches!(self, Self::Floor { .. } | Self::UnpoweredFloor { .. })
     }
+    fn gravity(self) -> f64 {
+        if matches!(self, Self::UnpoweredFloor { .. }) {
+            0.0
+        } else {
+            GRAVITY
+        }
+    }
+
     fn sphere(self) -> Option<SphereSurface> {
         match self {
             Self::Sphere(body) | Self::Sampled { body, .. } => Some(body),
@@ -64,7 +76,11 @@ pub type GroundPointQuery = fn(SphereSurface, [f64; 3]) -> [f64; 3];
 impl PartialEq for Surface {
     fn eq(&self, other: &Self) -> bool {
         match (*self, *other) {
-            (Self::Floor { height_meters: a }, Self::Floor { height_meters: b }) => a == b,
+            (Self::Floor { height_meters: a }, Self::Floor { height_meters: b })
+            | (
+                Self::UnpoweredFloor { height_meters: a },
+                Self::UnpoweredFloor { height_meters: b },
+            ) => a == b,
             (Self::Sphere(a), Self::Sphere(b)) => a == b,
             (
                 Self::Sampled {
@@ -86,10 +102,12 @@ impl PartialEq for Surface {
 impl Surface {
     pub(crate) fn ground(self, position: [f64; 3]) -> Option<GroundSample> {
         match self {
-            Self::Floor { height_meters } => Some(GroundSample {
-                point: [position[0], height_meters, position[2]],
-                normal: [0.0, 1.0, 0.0],
-            }),
+            Self::Floor { height_meters } | Self::UnpoweredFloor { height_meters } => {
+                Some(GroundSample {
+                    point: [position[0], height_meters, position[2]],
+                    normal: [0.0, 1.0, 0.0],
+                })
+            }
             Self::Sphere(body) => {
                 let normal = normalize(sub(position, body.center));
                 Some(GroundSample {
@@ -371,7 +389,7 @@ fn advance_impl<const PROFILE: bool>(
                 .sphere()
                 .map(|body| normalize(sub(piece.position, body.center)))
                 .unwrap_or([0.0, 1.0, 0.0]);
-            piece.velocity = sub(piece.velocity, scale(up, GRAVITY * dt));
+            piece.velocity = sub(piece.velocity, scale(up, piece.surface.gravity() * dt));
             gravity_velocities[i] = piece.velocity;
             gravity_ups[i] = up;
             if !has_hulls {
@@ -1028,7 +1046,8 @@ fn ground_contact_cached(piece: &mut ObjectState, response: &mut ContactResponse
 // mass/inertia and velocity impulses are unchanged; this is a support constraint.
 fn correction_direction(piece: &ObjectState, direction: [f64; 3]) -> [f64; 3] {
     if piece.hull.is_some()
-        && let Surface::Floor { height_meters } = piece.surface
+        && let Surface::Floor { height_meters } | Surface::UnpoweredFloor { height_meters } =
+            piece.surface
         && piece.position[1] - height_meters - piece.ground_support_meters <= CONTACT_BIAS_METERS
         && direction[1] < 0.0
     {
@@ -1217,6 +1236,26 @@ fn normalize(a: [f64; 3]) -> [f64; 3] {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn unpowered_deck_keeps_contacts_but_disables_gravity() {
+        let mut piece = floor([0.0, 2.0, 0.0], [0.0; 3]);
+        piece.surface = Surface::UnpoweredFloor { height_meters: 0.0 };
+        advance(
+            std::slice::from_mut(&mut piece),
+            Duration::from_millis(100),
+            |_, _| true,
+        );
+        assert_eq!(piece.position, [0.0, 2.0, 0.0]);
+        assert_eq!(piece.velocity, [0.0; 3]);
+        piece.surface = Surface::Floor { height_meters: 0.0 };
+        advance(
+            std::slice::from_mut(&mut piece),
+            Duration::from_millis(100),
+            |_, _| true,
+        );
+        assert!(piece.position[1] < 2.0);
+    }
 
     fn floor(position: [f64; 3], velocity: [f64; 3]) -> ObjectState {
         ObjectState {

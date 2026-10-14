@@ -662,6 +662,9 @@ impl ClientApplication {
             .set_steering_input(self.ship_control_input.steering());
         self.ship.advance(delta);
         let ship = self.ship.snapshot();
+        self.character
+            .set_ship_gravity_enabled(ship.power_available);
+        self.mining.ship_gravity_disabled = !ship.power_available;
         if self.view_mode == ViewMode::Gameplay {
             let eye = self
                 .character

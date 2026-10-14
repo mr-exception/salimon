@@ -1,8 +1,8 @@
 //! Authoritative private ship state and update dispatch.
 
 use crate::{
-    CockpitMessage, DoorState, EnergyCoreState, FlightState, LANDED_ORIGIN_HEIGHT_METERS, ShipPose,
-    ShipSnapshot, SteeringInput,
+    CockpitMessage, DoorState, FlightState, LANDED_ORIGIN_HEIGHT_METERS, ShipPose, ShipSnapshot,
+    SteeringInput,
 };
 use salimon_world::{CELESTIAL_BODIES, CelestialBodyId};
 use std::time::Duration;
@@ -30,7 +30,7 @@ pub struct ShipController {
     cockpit_control_active: bool,
     pub(crate) thruster_percentage: i8,
     throttle_input: throttle::HeldThrottle,
-    energy_core: EnergyCoreState,
+    energy_core: crate::EnergyCore,
     cockpit_message: Option<CockpitMessage>,
     steering_target: SteeringInput,
     steering: SteeringInput,
@@ -63,7 +63,7 @@ impl Default for ShipController {
             cockpit_control_active: false,
             throttle_input: throttle::HeldThrottle::default(),
             thruster_percentage: 0,
-            energy_core: EnergyCoreState::default(),
+            energy_core: crate::EnergyCore::default(),
             cockpit_message: None,
             steering_target: SteeringInput::default(),
             steering: SteeringInput::default(),
@@ -88,7 +88,7 @@ impl ShipController {
             cockpit_control_active: true,
             throttle_input: throttle::HeldThrottle::default(),
             thruster_percentage: thruster_percentage.clamp(-100, 100),
-            energy_core: EnergyCoreState::default(),
+            energy_core: crate::EnergyCore::default(),
             cockpit_message: None,
             steering_target: SteeringInput::default(),
             steering: SteeringInput::default(),
@@ -123,17 +123,41 @@ impl ShipController {
     }
 
     pub fn advance(&mut self, delta: Duration) {
+        self.advance_with_core_input(delta, 0.0)
+            .expect("zero Core input is valid");
+    }
+
+    /// Incoming converted joules at the step boundary, settled against this step
+    /// consumption before storage clipping. Invalid input leaves all ship state intact.
+    pub fn advance_with_core_input(
+        &mut self,
+        delta: Duration,
+        incoming_joules: f64,
+    ) -> Result<(), crate::InvalidEnergy> {
+        if !incoming_joules.is_finite() || incoming_joules < 0.0 {
+            return Err(crate::InvalidEnergy);
+        }
         self.advance_door(delta);
         self.advance_throttle(delta);
         let seconds = delta.as_secs_f64();
         self.advance_steering(seconds);
+        let powered_seconds = self.energy_core.advance_with_input(
+            delta,
+            self.thruster_percentage,
+            self.flight_state == FlightState::Flying,
+            incoming_joules,
+        )?;
+        if !self.energy_core.powered() {
+            self.clear_throttle_input();
+        }
         match self.flight_state {
-            FlightState::Flying => self.advance_flight(delta),
+            FlightState::Flying => self.advance_powered_flight(delta, powered_seconds),
             FlightState::AssistedLanding { body } => self.advance_landing(body, delta),
             FlightState::AssistedTakeoff { body } => self.advance_takeoff(body, delta),
             FlightState::Bouncing { body } => self.advance_bounce(body, delta),
             FlightState::Landed { .. } | FlightState::GroundedAfterCrash { .. } => {}
         }
+        Ok(())
     }
 
     #[must_use]
@@ -149,7 +173,8 @@ impl ShipController {
             total_mass_kg: self.propulsion.total_mass_kg(),
             speed_meters_per_second: self.speed_meters_per_second(),
             velocity_meters_per_second,
-            energy_core: self.energy_core,
+            energy_core: self.energy_core.snapshot(),
+            power_available: self.energy_core.powered(),
             nearby_body: self.nearby_body_telemetry(velocity_meters_per_second),
             cockpit_message: self.cockpit_message,
             steering: self.steering,

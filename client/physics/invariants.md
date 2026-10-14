@@ -68,3 +68,6 @@
 Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
 and [world definition contract](../world/terrain-contract.md). Keep local rules
 and their consumers aligned; flat deterministic fixtures are explicit.
+
+- Unpowered floor contacts retain geometry and containment with zero artificial
+  gravity; mode changes invalidate environmental sleep state.

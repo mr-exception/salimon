@@ -53,6 +53,9 @@ impl ShipController {
         if let Some(message) = self.cockpit_message {
             return Some(message);
         }
+        if !self.energy_core.powered() {
+            return None;
+        }
         match self.flight_state {
             FlightState::Bouncing { .. } => Some(CockpitMessage::CollisionSettling),
             FlightState::GroundedAfterCrash { .. } => Some(CockpitMessage::GroundedAfterCrash),

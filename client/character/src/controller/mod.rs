@@ -49,6 +49,7 @@ pub struct CharacterController {
     eva_axes: [[f64; 3]; 3],
     nearby_surface: Option<SurfaceFrame>,
     ramp_moving: bool,
+    ship_gravity_enabled: bool,
 }
 
 impl Default for CharacterController {
@@ -66,11 +67,16 @@ impl Default for CharacterController {
             eva_axes: [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
             nearby_surface: None,
             ramp_moving: false,
+            ship_gravity_enabled: true,
         }
     }
 }
 
 impl CharacterController {
+    pub fn set_ship_gravity_enabled(&mut self, enabled: bool) {
+        self.ship_gravity_enabled = enabled;
+    }
+
     /// Runtime supplies animated-door occupancy policy alongside sampled frames.
     pub fn set_ramp_moving(&mut self, moving: bool) {
         self.ramp_moving = moving;

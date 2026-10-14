@@ -74,6 +74,8 @@ pub struct ShipSnapshot {
     pub speed_meters_per_second: f64,
     pub velocity_meters_per_second: [f64; 3],
     pub energy_core: EnergyCoreState,
+    /// Authoritative power; fractional joules can power systems below display precision.
+    pub power_available: bool,
     pub nearby_body: Option<NearbyBodyTelemetry>,
     pub cockpit_message: Option<CockpitMessage>,
     pub steering: SteeringInput,

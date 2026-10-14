@@ -90,7 +90,10 @@ pub(crate) fn interpolated_mesh(
     let local = tool.ship_fragments.get(&fragment.id());
     if alpha >= 1.0
         || Some(fragment.id()) == tool.session.carried_id()
-        || matches!(previous.surface, Surface::Floor { .. }) != local.is_some()
+        || matches!(
+            previous.surface,
+            Surface::Floor { .. } | Surface::UnpoweredFloor { .. }
+        ) != local.is_some()
         || previous.side_meters != mesh.side_meters
         || previous.mass_kg != fragment.material().mass_kg()
     {
@@ -246,11 +249,17 @@ pub(crate) fn advance_measured(
             FragmentMotion {
                 velocity: piece.velocity,
                 angular_velocity: piece.angular_velocity,
-                ship_orientation: matches!(piece.surface, Surface::Floor { .. })
-                    .then_some(piece.orientation),
+                ship_orientation: matches!(
+                    piece.surface,
+                    Surface::Floor { .. } | Surface::UnpoweredFloor { .. }
+                )
+                .then_some(piece.orientation),
             },
         );
-        let position = if matches!(piece.surface, Surface::Floor { .. }) {
+        let position = if matches!(
+            piece.surface,
+            Surface::Floor { .. } | Surface::UnpoweredFloor { .. }
+        ) {
             tool.ship_fragments.insert(fragment.id(), piece.position);
             frame.local_to_world(piece.position)
         } else {
@@ -258,7 +267,10 @@ pub(crate) fn advance_measured(
         };
         let pose = ResourceTransform::new(
             WorldPosition::new(position[0], position[1], position[2]),
-            if matches!(piece.surface, Surface::Floor { .. }) {
+            if matches!(
+                piece.surface,
+                Surface::Floor { .. } | Surface::UnpoweredFloor { .. }
+            ) {
                 to_world_orientation(frame, piece.orientation)
             } else {
                 piece.orientation
@@ -336,8 +348,14 @@ pub(crate) fn snapshots(
                         .map_or([0.0; 3], |m| m.angular_velocity),
                     mass_kg: p.material().mass_kg(),
                     surface: if ship {
-                        Surface::Floor {
-                            height_meters: SHIP_FLOOR_HEIGHT_METERS,
+                        if tool.ship_gravity_disabled {
+                            Surface::UnpoweredFloor {
+                                height_meters: SHIP_FLOOR_HEIGHT_METERS,
+                            }
+                        } else {
+                            Surface::Floor {
+                                height_meters: SHIP_FLOOR_HEIGHT_METERS,
+                            }
                         }
                     } else {
                         body.map(|body| {

@@ -152,8 +152,7 @@ The 100,000 kg dry hull has 4 MN forward and 2 MN reverse force capacity.
 World-space momentum persists independently of orientation; zero throttle
 coasts. Acceleration is force divided by cached total mass. Steering remains
 5°/s with its existing presentation ramp. There is no drag, speed cap or
-planetary gravity in this flight wave. Core energy remains a telemetry fixture
-until its separate implementation.
+planetary gravity in this flight wave. Core energy now gates free-flight force and cockpit/artificial-gravity power.
 
 Up/Down select signed −100..+100% throttle, one percentage point on press and
 one more per 100 ms held. Selection persists when leaving the cockpit. Only
@@ -179,3 +178,24 @@ release, growth, boundary crossings and despawn/consumption update the cache onc
 per identity. Mass changes affect force/mass acceleration and preserve velocity.
 The lowered ramp outside the cabin is outside onboard containment. Session
 streaming never removes physical cargo. This does not add abstract inventories.
+
+## Implemented Energy Core (#188)
+
+The configurable starter battery stores 60 GJ, initially 45 GJ (75%). Maximum
+forward/reverse draw is 100 MW/50 MW scaled by signed throttle magnitude.
+Artificial gravity and cockpit instruments independently draw configurable idle
+watts (starter tuning: 100 kW and 10 kW). A full-capacity ten-minute forward-burn
+estimate excludes idle loads; endurance is not a fixed gameplay invariant.
+
+Zero energy stops thrust, cockpit controls/display and artificial cabin gravity,
+preserving throttle selection and velocity. Inside gravity never falls back to
+planetary gravity. Charge restoration resumes selected throttle automatically.
+Core transactions can charge and discharge together; requested loads receive
+incoming energy before surplus storage is capped. Fractional joules are retained
+internally. Physical fragment intake/conversion, assist reservation/refunds and
+recovery landing remain follow-up tasks; active captured assists still complete.
+
+`advance_with_core_input(delta, incoming_joules)` settles converted energy at a
+step boundary with that step's normal idle/propulsion consumers before storage
+clipping. It preserves exact powered-thrust duration. Conversion timing/rate is
+owned by E03; no continuous charging source is assumed by this task.

@@ -11,6 +11,7 @@ pub(crate) const ATLAS_HEIGHT: u32 = 256;
 /// Renderer-neutral values shown on the ship's physical cockpit monitors.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct CockpitInstruments {
+    pub power_off: bool,
     pub speed_meters_per_second: f64,
     pub thruster_percentage: i8,
     pub core_energy_capacity_joules: u64,
@@ -175,6 +176,7 @@ impl SpeedDisplay {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct DisplayKey {
+    power_off: bool,
     speed: SpeedDisplay,
     power: i8,
     core_capacity: EnergyDisplay,
@@ -200,32 +202,44 @@ impl InstrumentAtlas {
     /// Returns true when the caller needs to upload the atlas to the GPU.
     pub(crate) fn update(&mut self, values: CockpitInstruments) -> bool {
         let next = DisplayKey {
+            power_off: values.power_off,
             speed: SpeedDisplay::from_meters_per_second(values.speed_meters_per_second),
             power: values.thruster_percentage.clamp(-100, 100),
             core_capacity: EnergyDisplay::from_joules(values.core_energy_capacity_joules),
             core_stored: EnergyDisplay::from_joules(values.core_energy_stored_joules),
             nearby: values.nearby_body.map(NearbyDisplay::from_instruments),
         };
+        if next.power_off {
+            if self.displayed.is_some_and(|previous| previous.power_off) {
+                return false;
+            }
+            for pixel in self.pixels.as_chunks_mut::<4>().0 {
+                pixel.copy_from_slice(&[0, 0, 0, 255]);
+            }
+            self.displayed = Some(next);
+            return true;
+        }
         if self.displayed == Some(next) {
             return false;
         }
 
         // The flight region includes the shared power command once. Independent
         // energy/navigation changes leave the other regions untouched.
-        if self
-            .displayed
-            .is_none_or(|previous| previous.speed != next.speed || previous.power != next.power)
-        {
+        if self.displayed.is_none_or(|previous| {
+            previous.power_off || previous.speed != next.speed || previous.power != next.power
+        }) {
             self.draw_speed(next.speed, next.power);
         }
         if self.displayed.is_none_or(|previous| {
-            previous.core_capacity != next.core_capacity || previous.core_stored != next.core_stored
+            previous.power_off
+                || previous.core_capacity != next.core_capacity
+                || previous.core_stored != next.core_stored
         }) {
             self.draw_core(next.core_stored, next.core_capacity);
         }
         if self
             .displayed
-            .is_none_or(|previous| previous.nearby != next.nearby)
+            .is_none_or(|previous| previous.power_off || previous.nearby != next.nearby)
         {
             self.draw_nearby(next.nearby);
         }
@@ -761,5 +775,40 @@ mod tests {
             .direction,
             RadialDirection::Receding
         );
+    }
+}
+
+#[cfg(test)]
+mod power_tests {
+    use super::*;
+    #[test]
+    fn power_loss_blanks_once_and_restoration_redraws_all_regions() {
+        let mut atlas = InstrumentAtlas::new();
+        let values = CockpitInstruments {
+            core_energy_capacity_joules: 60_000_000_000,
+            core_energy_stored_joules: 45_000_000_000,
+            ..Default::default()
+        };
+        atlas.update(values);
+        let before = atlas.pixels.clone();
+        assert!(atlas.update(CockpitInstruments {
+            power_off: true,
+            ..values
+        }));
+        assert!(
+            atlas
+                .pixels
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .all(|pixel| *pixel == [0, 0, 0, 255])
+        );
+        assert!(!atlas.update(CockpitInstruments {
+            power_off: true,
+            speed_meters_per_second: 100.0,
+            ..values
+        }));
+        assert!(atlas.update(values));
+        assert_eq!(atlas.pixels, before);
     }
 }

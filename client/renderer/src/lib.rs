@@ -1489,3 +1489,14 @@ mod tests {
         represented_distance - next_nearer_distance
     }
 }
+
+#[cfg(test)]
+mod glb_candidate_tests {
+    pub fn candidate(asset: &str) -> Vec<u8> {
+        let root = std::env::var_os("SALIMON_GLB_CANDIDATES").expect(
+            "set SALIMON_GLB_CANDIDATES to the absolute offline candidate output directory",
+        );
+        std::fs::read(std::path::Path::new(&root).join(asset).join("model.glb"))
+            .expect("offline candidate must exist; run process_glb.py all first")
+    }
+}

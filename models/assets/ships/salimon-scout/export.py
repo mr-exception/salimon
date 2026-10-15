@@ -42,7 +42,7 @@ def encode_glb(document, binary):
             struct.pack('<II', len(data), 0x4E4F534A) + data +
             struct.pack('<II', len(binary), 0x004E4942) + binary)
 
-def export(blender=None):
+def export(blender=None, glb_profile=None):
     manifest_path, manifest = resolve_manifest('ship.salimon-scout', REPO)
     source = contained_path(REPO, manifest['source'], 'models/assets')
     output = contained_path(REPO, manifest['runtime'], 'client/assets')
@@ -69,6 +69,14 @@ def export(blender=None):
         doc['asset']['extras']['salimon']['sourceWorkflow'] = 'Blender source + scout export adapter'
         doc['asset']['copyright'] = metadata['copyright']
         temporary.write_bytes(encode_glb(doc, binary))
+        processing = None
+        if glb_profile is not None:
+            from process_glb import process
+            optimized = staged / 'processed.glb'
+            processing = process(manifest, temporary, optimized, glb_profile,
+                                 extension_validators=REGISTRIES)
+            optimized.replace(temporary)
+            doc, binary = read_document(temporary)
         metrics = validate_manifest(manifest, temporary, REPO, extension_validators=REGISTRIES)
         interchange = copy.deepcopy(doc)
         interchange['buffers'][0]['uri'] = output.with_suffix('.bin').name
@@ -79,6 +87,8 @@ def export(blender=None):
         report = dict(assetId=manifest['assetId'], sourceSha256=hashlib.sha256(source.read_bytes()).hexdigest(),
                       runtimeSha256=hashlib.sha256(temporary.read_bytes()).hexdigest(), metrics=metrics,
                       authoringSha256=authoring_hashes())
+        if processing is not None:
+            report['processing'] = processing
         # Every check completes before any destination is replaced. GLB is
         # replaced last; normal client builds consume only that file.
         os.replace(staged / 'spatial-contracts.json', REPO / 'client/assets/ship/spatial-contracts.json')
@@ -96,9 +106,10 @@ def export(blender=None):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--blender')
+    parser.add_argument('--glb-profile', choices=['none', 'exact-v1'], default=None)
     args = parser.parse_args()
     try:
-        print(json.dumps(export(args.blender), sort_keys=True))
+        print(json.dumps(export(args.blender, args.glb_profile), sort_keys=True))
     except (ExportError, OSError, subprocess.CalledProcessError, AssertionError, ValueError) as exc:
         print(f'scout export failed: {exc}', file=sys.stderr)
         sys.exit(1)

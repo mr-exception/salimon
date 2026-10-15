@@ -517,6 +517,39 @@ fn instance_buffer(device: &wgpu::Device, bytes: usize) -> wgpu::Buffer {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    #[ignore = "run with SALIMON_GLB_CANDIDATES after offline GLB processing"]
+    fn offline_glb_candidate_resources_match_imported_vertices() {
+        let names = [
+            "water-ice-fragment-shard",
+            "water-ice-fragment-cluster",
+            "silicate-fragment-slab",
+            "silicate-fragment-ridge",
+            "iron-fragment",
+            "iron-fragment-shard",
+            "water-ice-deposit-spire",
+            "water-ice-deposit-crown",
+            "water-ice-deposit-ridge",
+            "water-ice-deposit-shelf",
+            "silicate-deposit-boulder",
+            "silicate-deposit-slab",
+            "silicate-deposit-ridge",
+            "silicate-deposit-scree",
+            "iron-deposit-nodule",
+            "iron-deposit-vein",
+            "iron-deposit-ledge",
+            "iron-deposit-rubble",
+        ];
+        for (original, name) in ASSETS.iter().zip(names) {
+            let bytes = crate::glb_candidate_tests::candidate(&format!("resource.{name}"));
+            assert_eq!(
+                geometry(original).unwrap(),
+                geometry(&bytes).unwrap(),
+                "{name}"
+            );
+        }
+    }
+
     fn test_camera() -> CameraFrame {
         CameraFrame {
             position_meters: [1e12; 3],

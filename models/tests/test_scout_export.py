@@ -114,6 +114,16 @@ class ScoutExportTests(unittest.TestCase):
             with self.assertRaisesRegex(ValidationError, 'maxGlbBytes'):
                 scout.export()
         self.assertEqual(before, {p: p.read_bytes() for p in paths})
+        # Optional processing must fail before any spatial/interchange/provenance publication.
+        import process_glb
+        manifest = copy.deepcopy(self.manifest)
+        with patch.object(scout, 'resolve_manifest', return_value=(ASSET / 'manifest.json', manifest)), \
+             patch.object(scout.shutil, 'which', return_value='/mock/blender'), \
+             patch.object(scout.subprocess, 'run', side_effect=blender), \
+             patch.object(process_glb, 'process', side_effect=ValueError('compliance failure')):
+            with self.assertRaisesRegex(ValueError, 'compliance failure'):
+                scout.export(glb_profile='exact-v1')
+        self.assertEqual(before, {p: p.read_bytes() for p in paths})
 
 
 if __name__ == '__main__':

@@ -35,7 +35,11 @@ struct ShipGeometry {
 }
 
 fn load_geometry() -> Result<ShipGeometry, RendererError> {
-    let gltf = gltf::Gltf::from_slice(SHIP_GLB)
+    geometry_from_bytes(SHIP_GLB)
+}
+
+fn geometry_from_bytes(bytes: &[u8]) -> Result<ShipGeometry, RendererError> {
+    let gltf = gltf::Gltf::from_slice(bytes)
         .map_err(|error| RendererError::new("failed to load Phase 0 ship GLB", error))?;
     let blob = gltf.blob.as_deref().ok_or_else(|| {
         RendererError::new("failed to load Phase 0 ship GLB", "GLB has no binary chunk")
@@ -587,6 +591,18 @@ fn quaternion_axes(quaternion: [f32; 4]) -> [[f32; 3]; 3] {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    #[ignore = "run with SALIMON_GLB_CANDIDATES after offline GLB processing"]
+    fn offline_glb_candidate_ship_matches_imported_vertices() {
+        let bytes = crate::glb_candidate_tests::candidate("ship.salimon-scout");
+        let before = load_geometry().unwrap();
+        let after = geometry_from_bytes(&bytes).unwrap();
+        assert_eq!(before.opaque_vertices, after.opaque_vertices);
+        assert_eq!(before.glass_vertices, after.glass_vertices);
+        assert_eq!(before.opaque_vertex_count, after.opaque_vertex_count);
+        assert_eq!(before.glass_vertex_count, after.glass_vertex_count);
+    }
 
     #[test]
     fn checked_in_ship_glb_loads_as_renderable_triangles() {

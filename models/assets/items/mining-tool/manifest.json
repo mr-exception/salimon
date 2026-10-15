@@ -307,5 +307,11 @@
     "maxWarnings": {
       "degenerate": 32
     }
+  },
+  "visualBudget": {
+    "style": "option-a",
+    "maxNodes": 19,
+    "maxTextureMemoryBytes": 349524,
+    "maxDrawCalls": 1
   }
 }

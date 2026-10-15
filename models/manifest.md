@@ -133,3 +133,13 @@ constraints; all production manifests currently opt in. Its bounds/anchors use
 runtime meters after cumulative hierarchy transforms. See
 [quality policy](tools/README.md#category-aware-geometry-quality-226). Existing
 visual budgets remain mandatory and independently enforced.
+
+### Visual cost profiles
+
+Optional `visualBudget` records `style` (`option-a` / `option-b`), `maxNodes`,
+`maxTextureMemoryBytes` (RGBA8 full mip-chain estimate), and optional
+`maxDrawCalls` for a known Salimon consumer. These are additional gates, separate
+from shared spatial `quality` and category contracts and the five existing
+`budgets`. Current real assets declare measured Option A caps; future Option B
+replacements explicitly review their visual limits without changing meter-space
+contracts. See [cost definitions and offline reports](tools/README.md#measured-costs-and-budgets).

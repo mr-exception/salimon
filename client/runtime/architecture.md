@@ -161,6 +161,11 @@ center, without scene depth or a world-space aim cuboid. This center is NDC
 (0, 0), matching the existing eye-to-look-target interaction/mining ray; target
 selection and extraction remain unchanged. Equip/stow changes the image revision
 so the existing overlay texture cache uploads only on state changes.
+The unequipped dot replicates each original pixel as a centered 3×3 block:
+white diameter 9 pixels (previously 3), outlined diameter 15 (previously 5).
+Both images keep the same 17×17 physical-pixel canvas and unchanged center;
+the equipped cross is unchanged. This deliberately retains the existing
+fixed physical-pixel reticle policy independently of prompt/toolbar DPI scale.
 
 ## Authored fragment presentation
 

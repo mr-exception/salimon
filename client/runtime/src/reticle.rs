@@ -5,6 +5,7 @@ use crate::equipment::EquipmentToolbar;
 
 const SIZE: u32 = 17;
 const BYTE_COUNT: usize = (SIZE * SIZE * 4) as usize;
+const DOT_SCALE: i32 = 3;
 const DOT: [u8; BYTE_COUNT] = pixels(false);
 const CROSS: [u8; BYTE_COUNT] = pixels(true);
 
@@ -18,15 +19,21 @@ const fn pixels(cross: bool) -> [u8; BYTE_COUNT] {
         while x < SIZE {
             let dx = (x as i32 - (SIZE / 2) as i32).abs();
             let dy = (y as i32 - (SIZE / 2) as i32).abs();
+            // Replicate each original dot pixel as a centered 3×3 block.
+            // This triples both the white diameter (3→9) and outline (5→15)
+            // without scaling the equipped cross or filtering either image.
+            let dot_dx = (dx + DOT_SCALE / 2) / DOT_SCALE;
+            let dot_dy = (dy + DOT_SCALE / 2) / DOT_SCALE;
+            let dot_distance_squared = dot_dx * dot_dx + dot_dy * dot_dy;
             let white = if cross {
                 (dx == 0 && dy <= 6) || (dy == 0 && dx <= 6)
             } else {
-                dx * dx + dy * dy <= 1
+                dot_distance_squared <= 1
             };
             let outline = if cross {
                 (dx <= 1 && dy <= 7) || (dy <= 1 && dx <= 7)
             } else {
-                dx * dx + dy * dy <= 5
+                dot_distance_squared <= 5
             };
             let offset = ((y * SIZE + x) * 4) as usize;
             if white || outline {
@@ -90,7 +97,33 @@ mod tests {
             assert_eq!(pixel(SIZE / 2, SIZE / 2), [240, 240, 240, 255]);
         }
         let arm = ((SIZE / 2 * SIZE + SIZE / 2 + 6) * 4) as usize;
-        assert_eq!(DOT[arm + 3], 0);
+        assert_eq!(&DOT[arm..arm + 4], &[24, 24, 24, 255]);
         assert_eq!(CROSS[arm + 3], 255);
+    }
+
+    #[test]
+    fn dot_triples_diameters_and_area_while_cross_keeps_its_original_size() {
+        let bounds_and_count = |rgba: &[u8], white: bool| {
+            let mut min = [SIZE; 2];
+            let mut max = [0; 2];
+            let mut count = 0;
+            for y in 0..SIZE {
+                for x in 0..SIZE {
+                    let offset = ((y * SIZE + x) * 4) as usize;
+                    if rgba[offset + 3] != 0 && (!white || rgba[offset] == 240) {
+                        min = [min[0].min(x), min[1].min(y)];
+                        max = [max[0].max(x), max[1].max(y)];
+                        count += 1;
+                    }
+                }
+            }
+            (min, max, count)
+        };
+        // Original dot: white diameter 3 / five pixels, outlined diameter 5 /
+        // 21 pixels. The enlarged mask has 3× diameter and 9× pixel area.
+        assert_eq!(bounds_and_count(&DOT, true), ([4, 4], [12, 12], 45));
+        assert_eq!(bounds_and_count(&DOT, false), ([1, 1], [15, 15], 189));
+        assert_eq!(bounds_and_count(&CROSS, true), ([2, 2], [14, 14], 25));
+        assert_eq!(bounds_and_count(&CROSS, false), ([1, 1], [15, 15], 81));
     }
 }

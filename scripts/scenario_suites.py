@@ -11,7 +11,7 @@ TERRAIN = tuple(
     for body in ("earth", "moon", "mars")
     for suffix in ("", "-crater", "-touchdown", "-mining")
 ) + ("terrain-steep-site.json",)
-REALISTIC_FLIGHT = ("inertial-flight.json", "core-restart.json", "crash-recovery.json", "cargo-flight.json", "moving-eva.json")
+REALISTIC_FLIGHT = ("inertial-flight.json", "core-restart.json", "crash-recovery.json", "cargo-flight.json", "moving-eva.json", "cargo-blackout.json", "landing-speed-cutoff.json")
 GROUPS = {"realistic-flight": REALISTIC_FLIGHT, "terrain": TERRAIN, "ship-eva": SHIP_EVA, "resource-collection": RESOURCE_COLLECTION}
 
 

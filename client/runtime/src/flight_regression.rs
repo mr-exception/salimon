@@ -27,7 +27,7 @@ pub(crate) fn initialize(app: &mut ClientApplication, scenario: Scenario) -> Res
             app.character.enter_cockpit();
             initialize_cargo(app, 500)?;
         }
-        Scenario::CoreRestart => {
+        Scenario::CoreRestart | Scenario::CargoBlackout => {
             app.ship = ShipController::flying_with_velocity(
                 app.ship.snapshot().pose,
                 0,
@@ -84,6 +84,10 @@ pub(crate) fn initialize(app: &mut ClientApplication, scenario: Scenario) -> Res
                 return Err("refuel fixture pickup failed".into());
             }
             app.sync_carried();
+            if scenario == Scenario::CargoBlackout {
+                // One held bootstrap fragment plus 499 contained loose pieces.
+                initialize_cargo(app, 499)?;
+            }
         }
         Scenario::CrashRecovery => {
             let pose = ShipController::default().snapshot().pose;
@@ -247,6 +251,22 @@ mod tests {
         replay(
             Scenario::CargoFlight,
             include_str!("../../../scenarios/cargo-flight.json"),
+        );
+    }
+
+    #[test]
+    fn loaded_blackout_refuel_and_depletion_route() {
+        replay(
+            Scenario::CargoBlackout,
+            include_str!("../../../scenarios/cargo-blackout.json"),
+        );
+    }
+
+    #[test]
+    fn landing_rejects_fast_tangential_motion_and_accepts_below_cutoff() {
+        replay(
+            Scenario::OrbitEarth,
+            include_str!("../../../scenarios/landing-speed-cutoff.json"),
         );
     }
 

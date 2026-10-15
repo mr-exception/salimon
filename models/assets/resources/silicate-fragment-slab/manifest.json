@@ -7,24 +7,81 @@
   "runtime": "client/assets/resources/silicate-fragment-slab/model.glb",
   "coordinates": {
     "units": "meters",
-    "source": {"up": "+Z", "forward": "+X", "unitScale": 1},
-    "runtime": {"up": "+Y", "forward": "+X"},
+    "source": {
+      "up": "+Z",
+      "forward": "+X",
+      "unitScale": 1
+    },
+    "runtime": {
+      "up": "+Y",
+      "forward": "+X"
+    },
     "conversion": "x,z,-y",
     "pivot": "Center of authoritative unit bounding cube; geometry inside [-0.48, 0.48] meters"
   },
   "profile": "standard-v1",
-  "budgets": {"maxTriangles": 64, "maxPrimitives": 2, "maxMaterials": 2, "maxTextureBytes": 1, "maxGlbBytes": 16384},
-  "collision": {"policy": "none"},
+  "budgets": {
+    "maxTriangles": 64,
+    "maxPrimitives": 2,
+    "maxMaterials": 2,
+    "maxTextureBytes": 1,
+    "maxGlbBytes": 16384
+  },
+  "collision": {
+    "policy": "none"
+  },
   "contracts": {
     "root": "ASSET_silicate-fragment-slab",
-    "visualGroups": ["Visual"],
-    "groups": ["Visual"],
-    "nodes": ["Silicate_Fragment"],
-    "materials": ["Silicate_Dark", "Silicate_Light"],
-    "sockets": [], "markers": [], "colliders": [],
+    "visualGroups": [
+      "Visual"
+    ],
+    "groups": [
+      "Visual"
+    ],
+    "nodes": [
+      "Silicate_Fragment"
+    ],
+    "materials": [
+      "Silicate_Dark",
+      "Silicate_Light"
+    ],
+    "sockets": [],
+    "markers": [],
+    "colliders": [],
     "requiredExtras": [
-      {"node": "ASSET_silicate-fragment-slab", "path": "salimon.assetId"},
-      {"node": "Silicate_Fragment", "path": "salimon.role"}
+      {
+        "node": "ASSET_silicate-fragment-slab",
+        "path": "salimon.assetId"
+      },
+      {
+        "node": "Silicate_Fragment",
+        "path": "salimon.role"
+      }
     ]
+  },
+  "quality": {
+    "toleranceMeters": 1e-05,
+    "areaToleranceSquareMeters": 1e-10,
+    "boundsMeters": {
+      "Silicate_Fragment": [
+        [
+          -0.4300000071525574,
+          -0.2199999988079071,
+          -0.3199999928474426
+        ],
+        [
+          0.4399999976158142,
+          0.36000001430511475,
+          0.36000001430511475
+        ]
+      ]
+    },
+    "anchorsMeters": {
+      "ASSET_silicate-fragment-slab": [
+        0,
+        0,
+        0
+      ]
+    }
   }
 }

@@ -127,3 +127,9 @@ python3 -m venv /tmp/salimon-manifest-check
 
 This checks the schema itself, all three examples, and malformed manifest cases;
 it neither invokes Blender nor writes runtime assets.
+
+`quality` optionally declares independent spatial/topology tolerances and
+constraints; all production manifests currently opt in. Its bounds/anchors use
+runtime meters after cumulative hierarchy transforms. See
+[quality policy](tools/README.md#category-aware-geometry-quality-226). Existing
+visual budgets remain mandatory and independently enforced.

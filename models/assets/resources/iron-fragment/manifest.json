@@ -59,5 +59,30 @@
         "path": "salimon.role"
       }
     ]
+  },
+  "quality": {
+    "toleranceMeters": 1e-05,
+    "areaToleranceSquareMeters": 1e-10,
+    "boundsMeters": {
+      "Iron_Fragment": [
+        [
+          -0.4399999976158142,
+          -0.33000001311302185,
+          -0.35199999809265137
+        ],
+        [
+          0.4399999976158142,
+          0.33000001311302185,
+          0.35199999809265137
+        ]
+      ]
+    },
+    "anchorsMeters": {
+      "ASSET_iron-fragment": [
+        0,
+        0,
+        0
+      ]
+    }
   }
 }

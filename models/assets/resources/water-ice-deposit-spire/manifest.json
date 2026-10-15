@@ -58,5 +58,30 @@
         "path": "salimon.role"
       }
     ]
+  },
+  "quality": {
+    "toleranceMeters": 1e-05,
+    "areaToleranceSquareMeters": 1e-10,
+    "boundsMeters": {
+      "Ice_Deposit": [
+        [
+          -0.28421929478645325,
+          -0.46000000834465027,
+          -0.2749481797218323
+        ],
+        [
+          0.28421929478645325,
+          0.46000000834465027,
+          0.2749481797218323
+        ]
+      ]
+    },
+    "anchorsMeters": {
+      "ASSET_water-ice-deposit-spire": [
+        0,
+        0,
+        0
+      ]
+    }
   }
 }

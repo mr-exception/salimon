@@ -322,5 +322,834 @@
         "spatialContracts": "client/assets/ship/spatial-contracts.json"
       }
     }
+  },
+  "quality": {
+    "toleranceMeters": 1e-05,
+    "areaToleranceSquareMeters": 1e-10,
+    "anchorsMeters": {
+      "Salimon_Phase0_Scout": [
+        0,
+        0,
+        0
+      ],
+      "COLLIDER_InteriorFloor": [
+        -0.5,
+        0.19354838132858276,
+        0.0
+      ],
+      "COLLIDER_InteriorPortWall": [
+        -1.100000023841858,
+        1.5591397285461426,
+        4.739999771118164
+      ],
+      "COLLIDER_InteriorStarboardWall": [
+        -1.100000023841858,
+        1.5591397285461426,
+        -4.739999771118164
+      ],
+      "COLLIDER_InteriorCeiling": [
+        -1.2599999904632568,
+        2.860214948654175,
+        0.0
+      ],
+      "COLLIDER_EnergyCore": [
+        -1.0,
+        1.1505376100540161,
+        0.0
+      ],
+      "COLLIDER_AftDoor": [
+        -7.78000020980835,
+        1.3817204236984253,
+        0.0
+      ],
+      "COLLIDER_ExteriorHull": [
+        -0.6349999904632568,
+        1.8924731016159058,
+        0.0
+      ],
+      "COLLIDER_Engine_Port_Body": [
+        -6.400000095367432,
+        1.0752688646316528,
+        7.099999904632568
+      ],
+      "COLLIDER_Engine_Port_SweptFin": [
+        -5.96999979019165,
+        1.7365591526031494,
+        7.099999904632568
+      ],
+      "COLLIDER_Engine_Starboard_Body": [
+        -6.400000095367432,
+        1.0752688646316528,
+        -7.099999904632568
+      ],
+      "COLLIDER_Engine_Starboard_SweptFin": [
+        -5.96999979019165,
+        1.7365591526031494,
+        -7.099999904632568
+      ],
+      "COLLIDER_CockpitCenterConsole": [
+        4.949999809265137,
+        0.7599999904632568,
+        0.0
+      ],
+      "COLLIDER_CockpitNoseFloor": [
+        7.204999923706055,
+        0.19365590810775757,
+        0.0
+      ],
+      "COLLIDER_Wing_Port": [
+        -1.600000023841858,
+        0.32258063554763794,
+        7.300000190734863
+      ],
+      "COLLIDER_Wing_Starboard": [
+        -1.600000023841858,
+        0.32258063554763794,
+        -7.300000190734863
+      ],
+      "COLLIDER_CabinTraversalEnvelope": [
+        -0.3400000035762787,
+        1.4704301357269287,
+        0.0
+      ],
+      "COLLIDER_CabinExteriorEnvelope": [
+        0.3050000071525574,
+        1.4139784574508667,
+        0.0
+      ],
+      "COLLIDER_PilotChair": [
+        2.5350000858306885,
+        0.9886559247970581,
+        0.0
+      ],
+      "COLLIDER_CockpitPortHull": [
+        5.175000190734863,
+        1.5913978815078735,
+        3.549999952316284
+      ],
+      "COLLIDER_CockpitStarboardHull": [
+        5.175000190734863,
+        1.5913978815078735,
+        -3.549999952316284
+      ],
+      "COLLIDER_Landing_Aft_Port_Foot": [
+        -5.599999904632568,
+        -1.9875268936157227,
+        3.5999999046325684
+      ],
+      "COLLIDER_Landing_Aft_Port_Leg": [
+        -5.599999904632568,
+        -0.827526867389679,
+        3.5999999046325684
+      ],
+      "COLLIDER_Landing_Aft_Starboard_Foot": [
+        -5.599999904632568,
+        -1.9875268936157227,
+        -3.5999999046325684
+      ],
+      "COLLIDER_Landing_Aft_Starboard_Leg": [
+        -5.599999904632568,
+        -0.827526867389679,
+        -3.5999999046325684
+      ],
+      "COLLIDER_Landing_Forward_Port_Foot": [
+        4.800000190734863,
+        -1.9875268936157227,
+        3.5999999046325684
+      ],
+      "COLLIDER_Landing_Forward_Port_Leg": [
+        4.800000190734863,
+        -0.827526867389679,
+        3.5999999046325684
+      ],
+      "COLLIDER_Landing_Forward_Starboard_Foot": [
+        4.800000190734863,
+        -1.9875268936157227,
+        -3.5999999046325684
+      ],
+      "COLLIDER_Landing_Forward_Starboard_Leg": [
+        4.800000190734863,
+        -0.827526867389679,
+        -3.5999999046325684
+      ],
+      "MARKER_CockpitSeat": [
+        2.759999990463257,
+        1.1290322542190552,
+        0.0
+      ],
+      "MARKER_ExitDoor": [
+        -7.099999904632568,
+        1.3440860509872437,
+        0.0
+      ],
+      "MARKER_PlayerStart": [
+        0.5,
+        1.9973118305206299,
+        -2.200000047683716
+      ],
+      "MARKER_DoorwayTransition": [
+        -7.039999961853027,
+        0.24731183052062988,
+        0.0
+      ]
+    },
+    "overlapExemptions": [
+      {
+        "nodes": [
+          "Aft_Bulkhead_Header",
+          "Aft_Bulkhead_Header"
+        ],
+        "maxPairs": 7,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Header",
+          "Exit_Ramp_Tip"
+        ],
+        "maxPairs": 6,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Header",
+          "Hull_Aft_Cap"
+        ],
+        "maxPairs": 8,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Port",
+          "Deck_Walkable"
+        ],
+        "maxPairs": 2,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Port",
+          "Hull_Aft_Cap"
+        ],
+        "maxPairs": 4,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Port",
+          "Hull_Port_Side"
+        ],
+        "maxPairs": 2,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Port",
+          "Wall_Port_Inner"
+        ],
+        "maxPairs": 6,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Starboard",
+          "Deck_Walkable"
+        ],
+        "maxPairs": 4,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Starboard",
+          "Hull_Aft_Cap"
+        ],
+        "maxPairs": 4,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Starboard",
+          "Hull_Starboard_Side"
+        ],
+        "maxPairs": 2,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Starboard",
+          "Wall_Starboard_Inner"
+        ],
+        "maxPairs": 7,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Cabin_Low_Guidance_Lights",
+          "Wall_Port_Inner"
+        ],
+        "maxPairs": 4,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Cabin_Low_Guidance_Lights",
+          "Wall_Starboard_Inner"
+        ],
+        "maxPairs": 4,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Ceiling_Copper_Ribs",
+          "Ceiling_Inner"
+        ],
+        "maxPairs": 16,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Ceiling_Copper_Ribs",
+          "Ceiling_Lamp_Housings"
+        ],
+        "maxPairs": 16,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Ceiling_Inner",
+          "Ceiling_Lamp_Housings"
+        ],
+        "maxPairs": 12,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Ceiling_Inner",
+          "Hull_Port_Side"
+        ],
+        "maxPairs": 4,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Ceiling_Inner",
+          "Hull_Starboard_Side"
+        ],
+        "maxPairs": 4,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Ceiling_Inner",
+          "Wall_Port_Inner"
+        ],
+        "maxPairs": 8,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Ceiling_Inner",
+          "Wall_Starboard_Inner"
+        ],
+        "maxPairs": 5,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Cockpit_Lower_Glazing",
+          "Cockpit_Window_Frame"
+        ],
+        "maxPairs": 8,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Cockpit_Lower_Glazing",
+          "Hull_Nose"
+        ],
+        "maxPairs": 4,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Cockpit_Monitor_Bezels",
+          "Cockpit_Monitor_Bezels"
+        ],
+        "maxPairs": 12,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Cockpit_Monitor_Bezels",
+          "Cockpit_Monitor_Housings"
+        ],
+        "maxPairs": 18,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Cockpit_Window_Frame",
+          "Cockpit_Window_Frame"
+        ],
+        "maxPairs": 42,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Cockpit_Window_Frame",
+          "Deck_Walkable"
+        ],
+        "maxPairs": 33,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Core_Containment_Ribs",
+          "Core_Containment_Ribs"
+        ],
+        "maxPairs": 24,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Core_Cradle",
+          "Core_Cradle"
+        ],
+        "maxPairs": 30,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Core_Cradle",
+          "Core_Pedestal"
+        ],
+        "maxPairs": 26,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Core_Pedestal",
+          "Core_Pedestal"
+        ],
+        "maxPairs": 27,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Core_Pedestal",
+          "Deck_Walkable"
+        ],
+        "maxPairs": 10,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Deck_Walkable"
+        ],
+        "maxPairs": 16,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Door_Threshold"
+        ],
+        "maxPairs": 2,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Hull_Aft_Cap"
+        ],
+        "maxPairs": 4,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Hull_Belly"
+        ],
+        "maxPairs": 47,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Hull_Nose"
+        ],
+        "maxPairs": 6,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Hull_Port_Side"
+        ],
+        "maxPairs": 4,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Hull_Starboard_Side"
+        ],
+        "maxPairs": 6,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Wall_Port_Inner"
+        ],
+        "maxPairs": 6,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Wall_Starboard_Inner"
+        ],
+        "maxPairs": 8,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Wing_Port"
+        ],
+        "maxPairs": 4,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Wing_Starboard"
+        ],
+        "maxPairs": 6,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Door_Frame",
+          "Door_Frame"
+        ],
+        "maxPairs": 24,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Door_Frame",
+          "Exit_Door"
+        ],
+        "maxPairs": 9,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Door_Frame",
+          "Exit_Ramp_Tip"
+        ],
+        "maxPairs": 4,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Door_Frame",
+          "Hull_Aft_Cap"
+        ],
+        "maxPairs": 8,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Engine_Port_Cooling_Fins",
+          "Engine_Port_Running_Light"
+        ],
+        "maxPairs": 6,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Engine_Starboard_Cooling_Fins",
+          "Engine_Starboard_Running_Light"
+        ],
+        "maxPairs": 6,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Exit_Door",
+          "Exit_Door"
+        ],
+        "maxPairs": 61,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Exit_Door",
+          "Exit_Ramp_Tip"
+        ],
+        "maxPairs": 34,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Exit_Door",
+          "Hull_Aft_Cap"
+        ],
+        "maxPairs": 16,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Exit_Ramp_Tip",
+          "Hull_Aft_Cap"
+        ],
+        "maxPairs": 8,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Hull_Aft_Cap",
+          "Hull_Aft_Cap"
+        ],
+        "maxPairs": 32,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Hull_Aft_Cap",
+          "Hull_Belly"
+        ],
+        "maxPairs": 6,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Hull_Aft_Cap",
+          "Hull_Port_Side"
+        ],
+        "maxPairs": 25,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Hull_Aft_Cap",
+          "Hull_Starboard_Side"
+        ],
+        "maxPairs": 23,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Hull_Belly",
+          "Hull_Belly"
+        ],
+        "maxPairs": 12,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Hull_Belly",
+          "Hull_Nose"
+        ],
+        "maxPairs": 6,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Hull_Belly",
+          "Hull_Port_Side"
+        ],
+        "maxPairs": 2,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Hull_Belly",
+          "Hull_Starboard_Side"
+        ],
+        "maxPairs": 2,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Hull_Belly",
+          "Wing_Port"
+        ],
+        "maxPairs": 1,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Hull_Belly",
+          "Wing_Starboard"
+        ],
+        "maxPairs": 1,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Hull_Port_Side",
+          "Hull_Port_Side"
+        ],
+        "maxPairs": 32,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Hull_Port_Side",
+          "Wall_Port_Inner"
+        ],
+        "maxPairs": 8,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Hull_Port_Side",
+          "Window_Port_Sill"
+        ],
+        "maxPairs": 10,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Hull_Port_Side",
+          "Wing_Port"
+        ],
+        "maxPairs": 7,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Hull_Starboard_Side",
+          "Hull_Starboard_Side"
+        ],
+        "maxPairs": 32,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Hull_Starboard_Side",
+          "Wall_Starboard_Inner"
+        ],
+        "maxPairs": 8,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Hull_Starboard_Side",
+          "Window_Starboard_Sill"
+        ],
+        "maxPairs": 10,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Hull_Starboard_Side",
+          "Wing_Starboard"
+        ],
+        "maxPairs": 7,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Landing_Gear_Aft_Port",
+          "Landing_Gear_Aft_Port"
+        ],
+        "maxPairs": 4,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Landing_Gear_Aft_Starboard",
+          "Landing_Gear_Aft_Starboard"
+        ],
+        "maxPairs": 4,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Landing_Gear_Forward_Port",
+          "Landing_Gear_Forward_Port"
+        ],
+        "maxPairs": 4,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Landing_Gear_Forward_Starboard",
+          "Landing_Gear_Forward_Starboard"
+        ],
+        "maxPairs": 4,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Pilot_Seat_Armrests",
+          "Pilot_Seat_Bolsters"
+        ],
+        "maxPairs": 9,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Pilot_Seat_Armrests",
+          "Pilot_Seat_Controls"
+        ],
+        "maxPairs": 14,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Pilot_Seat_Base",
+          "Pilot_Seat_Base"
+        ],
+        "maxPairs": 7,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Pilot_Seat_Controls",
+          "Pilot_Seat_Controls"
+        ],
+        "maxPairs": 7,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Wall_Port_Inner",
+          "Window_Port_Sill"
+        ],
+        "maxPairs": 3,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Wall_Port_Inner",
+          "Wing_Port"
+        ],
+        "maxPairs": 4,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Wall_Starboard_Inner",
+          "Window_Starboard_Sill"
+        ],
+        "maxPairs": 3,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      },
+      {
+        "nodes": [
+          "Wall_Starboard_Inner",
+          "Wing_Starboard"
+        ],
+        "maxPairs": 4,
+        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+      }
+    ]
   }
 }

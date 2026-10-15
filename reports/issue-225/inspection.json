@@ -1,0 +1,167 @@
+{
+  "assetId": "item.cargo-container",
+  "blender": "4.5.3 LTS",
+  "objects": [
+    {
+      "boundsRuntimeMeters": [],
+      "dimensionsSourceMeters": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "library": null,
+      "materials": [],
+      "matrixSource": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "name": "ASSET_cargo-container",
+      "type": "EMPTY"
+    },
+    {
+      "boundsRuntimeMeters": [
+        [
+          -0.4000000059604645,
+          0.0,
+          0.25
+        ],
+        [
+          -0.4000000059604645,
+          0.5,
+          0.25
+        ],
+        [
+          -0.4000000059604645,
+          0.5,
+          -0.25
+        ],
+        [
+          -0.4000000059604645,
+          0.0,
+          -0.25
+        ],
+        [
+          0.4000000059604645,
+          0.0,
+          0.25
+        ],
+        [
+          0.4000000059604645,
+          0.5,
+          0.25
+        ],
+        [
+          0.4000000059604645,
+          0.5,
+          -0.25
+        ],
+        [
+          0.4000000059604645,
+          0.0,
+          -0.25
+        ]
+      ],
+      "dimensionsSourceMeters": [
+        0.800000011920929,
+        0.5,
+        0.5
+      ],
+      "library": null,
+      "materials": [
+        "Cargo_Panel",
+        "Cargo_Frame",
+        "Cargo_Trim",
+        "Cargo_Latch"
+      ],
+      "matrixSource": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "name": "Cargo_Container",
+      "type": "MESH"
+    },
+    {
+      "boundsRuntimeMeters": [],
+      "dimensionsSourceMeters": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "library": null,
+      "materials": [],
+      "matrixSource": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "name": "Visual",
+      "type": "EMPTY"
+    }
+  ],
+  "operation": "sample_palette"
+}

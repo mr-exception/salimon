@@ -297,7 +297,7 @@ pub(crate) fn snapshots(
         .fragments()
         .iter()
         .copied()
-        .filter(|p| Some(p.id()) != carried)
+        .filter(|p| Some(p.id()) != carried && Some(p.id()) != tool.session.attached_sphere_id())
         .filter(|p| {
             // Ship advancement precedes final session-pose synchronization.
             // Select anchored contents in the current frame, not last frame's

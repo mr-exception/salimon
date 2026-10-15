@@ -162,3 +162,45 @@ python models/tools/diagnose_scout_visibility.py --views reports/issue-224/visib
 
 It retains the original baseline tool. See [visibility findings](../../reports/issue-224/VISIBILITY.md)
 for exposed vs buried overlap witnesses, render-order diagnosis and limitations.
+
+## Category-aware geometry quality (#226)
+
+`python models/tools/validate_quality.py <asset-id>` emits a complete sorted JSON
+report and exits nonzero on policy violations. Generic export/validation invokes
+the same quality gate for every real manifest; category-specific scout spatial,
+monitor, pivot, collider, aisle/headroom checks still run in its adapter.
+
+Manifest `quality` is separate from presentation `budgets`: meter tolerance
+(default 10 µm), area cutoff (1e-10 m²), per-node runtime bounds, root/socket/marker
+origins, optional closed topology nodes and empty clearance boxes with explicit
+obstacle ownership. Triangle points/normals use cumulative parent transforms.
+Normals/winding, degenerate and duplicate triangles and positive-area near-plane
+overlap fail by default. Shared edges, flat normals and disconnected/open panels
+pass; only `closedNodes` demand manifold welded edges. Do not declare an aisle's
+floor/walls as obstacles; this checks box interiors and is conservative for
+non-box meshes. Existing scout detailed clearance/UV/hinge semantics remain its
+category adapter's responsibility, independently of style.
+
+Overlap candidates use sweep-and-prune on the longest asset axis, tolerant AABBs,
+normal/plane checks and projected polygon clipping. Unlike plane quantization,
+this catches pairs across bucket boundaries. Reports identify object, primitive /
+triangle index, meter location, tolerance, competing face and area. Worst case
+is quadratic for a dense overlapping pile; this is not general self-intersection
+or visible-flicker proof. Bounds are measured, never read from accessor min/max.
+
+Intentional intersections/layered glass require a named object-pair exemption,
+a reason and a maximum pair count; exceeding the count fails. Existing scout,
+cargo-container and mining-tool candidates have **temporary** counted exemptions
+linked to [#244](https://github.com/mr-exception/salimon/issues/244), not artistic
+approval. Mining tool's 32 existing degenerate triangles are capped warnings;
+new warnings beyond that count fail. All resource GLBs pass without exemptions.
+The gate does not repair assets or change physics dimensions. Category budgets
+remain independently enforced; changing style does not loosen spatial policy.
+
+Synthetic fixtures run in ordinary model CI and cover inverted normals,
+degenerate/duplicate/near-coplanar faces, shared edges, world transforms, bounds,
+anchors, closed-node topology, clearances and 2,000 spatially separated triangles.
+An Option A/Option B fixture swaps one triangle for three facets while keeping
+bounds/anchors identical. Node-only spatial metadata (including colliders) is
+independent of visual tessellation; scout category tests preserve its richer
+contract. No GPU/native hardware is required by this gate.

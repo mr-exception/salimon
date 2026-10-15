@@ -59,6 +59,7 @@ pub(crate) fn target(
         tool.session.fragments(),
         tool.session
             .carried_id()
+            .or(tool.session.attached_sphere_id())
             .map(WorldObjectId::ResourceFragment),
         blocked_at,
     )

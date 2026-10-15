@@ -59,5 +59,30 @@
         "path": "salimon.role"
       }
     ]
+  },
+  "quality": {
+    "toleranceMeters": 1e-05,
+    "areaToleranceSquareMeters": 1e-10,
+    "boundsMeters": {
+      "Iron_Deposit": [
+        [
+          -0.36899349093437195,
+          -0.4595254957675934,
+          -0.3218369483947754
+        ],
+        [
+          0.43683579564094543,
+          0.4455254375934601,
+          0.3302295506000519
+        ]
+      ]
+    },
+    "anchorsMeters": {
+      "ASSET_iron-deposit-nodule": [
+        0,
+        0,
+        0
+      ]
+    }
   }
 }

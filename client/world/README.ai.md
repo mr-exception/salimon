@@ -26,8 +26,10 @@ mining session retention across local streaming. Read the mining contract and fo
 before changing aim, rate, session mutation, or obstruction semantics.
 `resource_fragments` owns conservative output and surface poses; do not move
 fragment creation or mass splitting into runtime or renderer. Querying output
-must remain read-only. Seal a growing output tail on pickup so subsequent extraction cannot change
-the carried object's mass.
+must remain read-only. Interactive mining uses `spherical_mining` plus the session adapter in
+`sphere_session.rs`; attached entries cannot be picked up or simulated loose.
+Legacy helper output tails are sealed on pickup. Read the canonical lifecycle
+before changing caps, release precedence or session conservation.
 
 ## Source navigation
 

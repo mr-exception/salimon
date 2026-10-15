@@ -38,7 +38,7 @@
   supplied solid obstructions. Depleted deposits cannot be targeted.
 - Extraction is 2 kg/s of simulation time capped to remaining mass; it cannot
   replenish deposits or credit abstract inventory.
-- Every positive session extraction is represented in physical fragments of the
+- Every positive legacy helper extraction is represented in physical fragments of the
   source material, capped at 2 kg per piece. Their total mass equals removed
   deposit mass within floating-point tolerance; zero/depleted extraction creates
   no objects. IDs/poses survive growth and read-only requery.
@@ -71,3 +71,8 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 - Physical fragment mutations emit coalesced stable-ID events; despawn/Core
   consumption releases carrying and IDs are never reused. Querying/streaming
   does not mutate or remove cargo. Historical extracted mass remains diagnostic.
+
+- Continuous spherical mining reserves one attached mass with a configurable
+  10 kg default cap, releases on input/aim/cap/depletion/interruption, and starts
+  the next piece on the next held valid tick. Removed mass equals released plus
+  reserved mass. See [the lifecycle contract](resource-contracts.md#spherical-mining-lifecycle-230).

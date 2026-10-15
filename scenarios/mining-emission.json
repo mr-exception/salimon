@@ -68,10 +68,10 @@
       "assert": {
         "path": "ship.orientation",
         "equals": [
-          0.0,
-          0.0,
-          0.0,
-          1.0
+          0,
+          0,
+          0,
+          1
         ]
       }
     },
@@ -510,6 +510,13 @@
     },
     {
       "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
         "op": "mouse",
         "button": "left",
         "pressed": true
@@ -517,28 +524,67 @@
     },
     {
       "action": {
-        "op": "key",
-        "key": "grab_drop",
-        "pressed": false
+        "op": "step",
+        "frames": 320
       }
     },
     {
       "assert": {
-        "path": "mining.held",
+        "path": "world.fragment_count",
+        "equals": 2
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.extracted_mass_kg",
+        "approx": 10.224,
+        "tolerance": 1e-08
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.0.mass_kg",
+        "approx": 10,
+        "tolerance": 1e-09
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.0.attached_to_tool",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.1.mass_kg",
+        "approx": 0.224,
+        "tolerance": 1e-08
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.1.attached_to_tool",
         "equals": true
       }
     },
     {
       "action": {
-        "op": "key",
-        "key": "grab_drop",
-        "pressed": true
+        "op": "mouse",
+        "button": "left",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.attached_fragment_id",
+        "equals": null
       }
     },
     {
       "action": {
-        "op": "step",
-        "frames": 1
+        "op": "mouse",
+        "button": "left",
+        "pressed": true
       }
     },
     {
@@ -548,118 +594,71 @@
       }
     },
     {
-      "action": {
-        "op": "step",
-        "frames": 49
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 3
       }
     },
     {
       "assert": {
-        "path": "mining.active",
+        "path": "world.fragments.2.attached_to_tool",
         "equals": true
       }
     },
     {
-      "assert": {
-        "path": "resource_ui.context",
-        "contains": "Mining - release left mouse to stop"
+      "action": {
+        "op": "look",
+        "dx": 400,
+        "dy": 0
       }
     },
     {
       "assert": {
-        "path": "mining.extracted_mass_kg",
-        "approx": 1.92,
-        "tolerance": 1e-09
+        "path": "mining.attached_fragment_id",
+        "equals": null
       }
     },
     {
-      "assert": {
-        "path": "world.nearest_deposit.remaining_mass_kg",
-        "approx": 34.48896041381627,
-        "tolerance": 1e-09
-      }
-    },
-    {
-      "assert": {
-        "path": "world.nearest_deposit.state",
-        "equals": "PartiallyMined"
-      }
-    },
-    {
-      "assert": {
-        "path": "resource_ui.context",
-        "contains": "Silicate rock - approx 34.5 kg left - partly mined"
-      }
-    },
-    {
-      "assert": {
-        "path": "world.fragment_count",
-        "equals": 1
-      }
-    },
-    {
-      "assert": {
-        "path": "world.fragment_mass_kg",
-        "approx": 1.92,
-        "tolerance": 1e-09
-      }
-    },
-    {
-      "assert": {
-        "path": "world.fragments.0.id",
-        "equals": 1
-      }
-    },
-    {
-      "assert": {
-        "path": "world.fragments.0.source_deposit_id",
-        "equals": "Earth:16443359315117775089"
-      }
-    },
-    {
-      "assert": {
-        "path": "world.fragments.0.resource",
-        "equals": "silicate-rock"
-      }
-    },
-    {
-      "assert": {
-        "path": "world.fragments.0.mass_kg",
-        "approx": 1.92,
-        "tolerance": 1e-09
-      }
-    },
-    {
-      "assert": {
-        "path": "world.fragments.0.volume_m3",
-        "approx": 0.000711111111111111,
-        "tolerance": 1e-12
-      }
-    },
-    {
-      "assert": {
-        "path": "world.fragments.0.side_meters",
-        "approx": 0.44628863338811303,
-        "tolerance": 1e-09
-      }
-    },
-    {
-      "assert": {
-        "path": "world.fragments.0.visual.color.0",
-        "approx": 0.45,
-        "tolerance": 0.001
+      "action": {
+        "op": "look",
+        "dx": -400,
+        "dy": 0
       }
     },
     {
       "action": {
         "op": "step",
-        "frames": 120
+        "frames": 10
       }
     },
     {
       "assert": {
         "path": "world.fragment_count",
-        "equals": 3
+        "equals": 4
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.2.attached_to_tool",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.3.attached_to_tool",
+        "equals": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 600
       }
     },
     {
@@ -670,23 +669,35 @@
       }
     },
     {
-      "action": {
-        "op": "step",
-        "frames": 240
+      "assert": {
+        "path": "world.nearest_deposit.state",
+        "equals": "Depleted"
+      }
+    },
+    {
+      "assert": {
+        "path": "world.nearest_deposit.remaining_mass_kg",
+        "equals": 0
       }
     },
     {
       "assert": {
         "path": "world.fragment_mass_kg",
-        "approx": 5.76,
+        "approx": 36.40896041381627,
         "tolerance": 1e-08
       }
     },
     {
-      "action": {
-        "op": "key",
-        "key": "grab_drop",
-        "pressed": false
+      "assert": {
+        "path": "mining.extracted_mass_kg",
+        "approx": 36.40896041381627,
+        "tolerance": 1e-08
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.attached_fragment_id",
+        "equals": null
       }
     }
   ]

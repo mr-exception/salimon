@@ -53,3 +53,8 @@ Link the report and relevant commits/PR from the GitHub issue completion update.
 Close an issue only after acceptance criteria pass; a PR awaiting merge should
 link the issue for closure on merge. Push to main only when explicitly requested;
 otherwise use a reviewable branch/PR for the requested workflow.
+
+For asset authoring, follow [Option A art direction and the opt-in local bridge](models/authoring.md#option-a-art-contract-authoring-protocol-100).
+Inspect existing assets first; preserve linked libraries, named interfaces and
+manifest budgets. Use reviewed parametric Blender Python; no external AI model
+services or autonomous promotion of scratch candidates to production assets.

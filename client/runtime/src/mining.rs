@@ -26,6 +26,7 @@ pub(crate) struct MiningTool {
     >,
     pub(crate) carry_feedback: Option<&'static str>,
     pub(crate) held: bool,
+    pub(crate) config: salimon_world::spherical_mining::MiningConfig,
     f_down: bool,
     pub(crate) session: MiningSession,
 }
@@ -46,11 +47,15 @@ impl MiningTool {
 
     pub(crate) fn set_mouse_held(&mut self, pressed: bool) {
         self.held = pressed;
+        if !pressed {
+            self.session.interrupt_spherical();
+        }
     }
 
     /// Cancel extraction while preserving a contextual F press consumed by pickup.
     pub(crate) fn stop_mining(&mut self) {
         self.held = false;
+        self.session.interrupt_spherical();
     }
 
     pub(crate) fn clear_input(&mut self) {
@@ -137,47 +142,33 @@ impl MiningTool {
         door_open: bool,
         seed: u64,
     ) {
-        if !self.held {
+        let Some(pose) = attachment_pose(player) else {
+            self.session.interrupt_spherical();
             return;
-        }
-        let Some(target) = self.target(equipment, player, frame, door_open, seed) else {
+        };
+        let Some(target) = self
+            .held
+            .then(|| self.target(equipment, player, frame, door_open, seed))
+            .flatten()
+        else {
+            self.session
+                .tick_spherical(self.held, None, delta, self.config, pose);
             return;
         };
         let Ok(mut deposits) = self.nearby(player.eye_position_meters, seed) else {
+            self.session.interrupt_spherical();
             return;
         };
-        let entry = deposits
+        let target = deposits
             .iter_mut()
-            .find(|entry| entry.deposit.id() == target.id)
-            .expect("target comes from the same deterministic query");
-        let ray = MiningRay::new(
-            position(player.eye_position_meters),
-            position(player.look_target_meters),
-        )
-        .expect("target has a valid mining ray");
-        let source = *entry;
-        let mut emission = None;
-        let motion = &mut self.fragment_motion;
-        self.session
-            .extract_with_spawn(&mut entry.deposit, delta, |id, material, existing| {
-                let emission = emission.get_or_insert_with(|| {
-                    crate::mining_emission::EmissionSurface::with_terrain(
-                        source,
-                        ray,
-                        player,
-                        self.terrain,
-                    )
-                });
-                let (pose, velocity) = emission.spawn(id, material, existing)?;
-                motion.insert(
-                    id,
-                    crate::fragment_physics::FragmentMotion {
-                        velocity,
-                        ..Default::default()
-                    },
-                );
-                Some(pose)
-            });
+            .find(|entry| entry.deposit.id() == target.id);
+        self.session.tick_spherical(
+            self.held,
+            target.map(|entry| &mut entry.deposit),
+            delta,
+            self.config,
+            pose,
+        );
     }
 
     /// Equip/location gates and active feedback for the authored visual.
@@ -194,6 +185,31 @@ impl MiningTool {
             },
         )
     }
+}
+
+/// Current camera/tool front-left in absolute f64 meters. Renderer grip is
+/// camera-right 0.20, down 0.20, forward 0.55; this point is left of its muzzle.
+fn attachment_pose(
+    player: CharacterSnapshot,
+) -> Option<salimon_world::resources::ResourceTransform> {
+    use salimon_math::{cross, length, sub};
+    let direction = sub(player.look_target_meters, player.eye_position_meters);
+    let magnitude = length(direction);
+    if !magnitude.is_finite() || magnitude <= 1e-12 {
+        return None;
+    }
+    let forward = direction.map(|v| v / magnitude);
+    let right = cross(forward, player.up.map(f64::from));
+    let magnitude = length(right);
+    if !magnitude.is_finite() || magnitude <= 1e-12 {
+        return None;
+    }
+    let right = right.map(|v| v / magnitude);
+    let up = cross(right, forward);
+    let point = std::array::from_fn(|i| {
+        player.eye_position_meters[i] + forward[i] * 0.85 - right[i] * 0.15 - up[i] * 0.20
+    });
+    salimon_world::resources::ResourceTransform::new(position(point), [0.0, 0.0, 0.0, 1.0]).ok()
 }
 
 fn position(p: [f64; 3]) -> WorldPosition {
@@ -265,5 +281,76 @@ mod tests {
         tool.clear_input();
         assert!(tool.held_item(&equipment, player, true).is_none());
         assert!(!tool.held);
+    }
+}
+
+#[cfg(test)]
+mod spherical_tests {
+    use super::*;
+    use salimon_world::resources::{DepositId, RawMaterial, ResourceDeposit, ResourceId};
+
+    fn player() -> CharacterSnapshot {
+        CharacterSnapshot {
+            location: CharacterLocation::Surface,
+            eye_position_meters: [0.0, 2.0, 0.0],
+            look_target_meters: [1.0, 2.0, 0.0],
+            up: [0.0, 1.0, 0.0],
+            local_ship_position_meters: None,
+            doorway_blend_fraction: None,
+        }
+    }
+
+    #[test]
+    fn attached_piece_follows_tool_and_is_excluded_from_loose_physics() {
+        let mut tool = MiningTool::default();
+        let pose = attachment_pose(player()).unwrap();
+        let mut source = ResourceDeposit::new(
+            DepositId {
+                body: salimon_world::CelestialBodyId::Earth,
+                local: 99,
+            },
+            RawMaterial::new(ResourceId::IronOre, 25.0).unwrap(),
+            WorldPosition::new(2.0, 0.0, 0.0),
+            25.0,
+        )
+        .unwrap();
+        tool.session.tick_spherical(
+            true,
+            Some(&mut source),
+            Duration::from_millis(16),
+            tool.config,
+            pose,
+        );
+        let id = tool.session.attached_sphere_id().unwrap();
+        let frame = ShipFrame {
+            origin_meters: [0.0; 3],
+            axes: [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+        };
+        assert!(crate::fragment_physics::snapshots(&tool, frame, [0.0; 3]).is_empty());
+        assert!(!tool.session.pick_up(id));
+        tool.set_mouse_held(false);
+        assert_eq!(tool.session.attached_sphere_id(), None);
+        assert_eq!(
+            crate::fragment_physics::snapshots(&tool, frame, [0.0; 3]).len(),
+            1
+        );
+        assert_eq!(tool.session.fragments()[0].id(), id);
+        assert!(tool.session.pick_up(id));
+    }
+
+    #[test]
+    fn tool_attachment_uses_current_camera_basis_and_absolute_f64_pose() {
+        let original = attachment_pose(player()).unwrap().position().meters();
+        assert_eq!(original, [0.85, 1.8, -0.15]);
+        let mut moved = player();
+        moved.eye_position_meters = [1e12, -1e12, 1e12];
+        moved.look_target_meters = [1e12, -1e12, 1e12 + 1.0];
+        let offset = attachment_pose(moved)
+            .unwrap()
+            .position()
+            .offset_from(position(moved.eye_position_meters));
+        for (actual, expected) in offset.into_iter().zip([0.15, -0.20, 0.85]) {
+            assert!((actual - expected).abs() < 0.0002);
+        }
     }
 }

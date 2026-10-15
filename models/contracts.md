@@ -127,3 +127,13 @@ Scout traversal dimensions are generated from authored proxies/markers into one
 Rust spatial module. Gameplay clearance and permissions stay with the character
 domain. See the [geometry/policy mapping](assets/ships/salimon-scout/README.md#geometry-and-gameplay-policy)
 before editing envelopes or adding a new proxy consumer.
+
+## Quality policies and style independence
+
+All real manifests declare `quality` separately from their visual `budgets`.
+See [meter-space quality validation](tools/README.md#category-aware-geometry-quality-226)
+for tolerances, bounds/anchors, clearance volumes, optional closed topology and
+counted overlap exemptions. An Option A/Option B visual replacement must preserve
+shared spatial requirements and pass the category adapter. Flat shading and
+open/disconnected panels do not imply invalid topology. Existing diagnostic
+exceptions are explicit remediation debt, never permission to add more overlap.

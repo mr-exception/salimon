@@ -319,3 +319,14 @@ power management, damage, fuel reaction mass and survival consequences are not
 implemented by this wave. Existing configuration seams do not constitute an
 upgrade/progression system. Owner-only multiplayer navigation is a future rule;
 current client-only authority means the powered occupied cockpit.
+
+## Accepted spherical mining (2026-10-15)
+
+Holding left mouse aimed at a valid deposit grows one sphere at the mining tool's
+front-left, with a configurable per-tool **10 kg** initial cap. Release the sphere
+immediately on mouse-up or loss of valid aim; automatically release at cap and
+start another on continued hold. Depletion releases a smaller final sphere.
+Unequip/interruption also releases. Phase 0 mining consumes no energy. Keep
+single-object carrying and physical mechanical Core feeding. Portable lifecycle,
+conservation, density/radius and sequencing are canonical in the
+[resource contract](../client/world/resource-contracts.md#spherical-mining-lifecycle-230).

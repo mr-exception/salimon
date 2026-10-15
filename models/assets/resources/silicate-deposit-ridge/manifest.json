@@ -58,5 +58,30 @@
         "path": "salimon.role"
       }
     ]
+  },
+  "quality": {
+    "toleranceMeters": 1e-05,
+    "areaToleranceSquareMeters": 1e-10,
+    "boundsMeters": {
+      "Silicate_Deposit": [
+        [
+          -0.4204959571361542,
+          -0.4295254945755005,
+          -0.2983818054199219
+        ],
+        [
+          0.4195252060890198,
+          0.4755576550960541,
+          0.25086700916290283
+        ]
+      ]
+    },
+    "anchorsMeters": {
+      "ASSET_silicate-deposit-ridge": [
+        0,
+        0,
+        0
+      ]
+    }
   }
 }

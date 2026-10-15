@@ -314,6 +314,160 @@
           "data"
         ]
       }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "toleranceMeters": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 0.001
+        },
+        "areaToleranceSquareMeters": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1e-06
+        },
+        "boundsMeters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "minItems": 2,
+            "maxItems": 2
+          }
+        },
+        "anchorsMeters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          }
+        },
+        "closedNodes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "severity": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "surface-overlap": {
+              "enum": [
+                "error",
+                "warning"
+              ]
+            },
+            "duplicate-face": {
+              "enum": [
+                "error",
+                "warning"
+              ]
+            },
+            "degenerate": {
+              "enum": [
+                "error",
+                "warning"
+              ]
+            },
+            "normal-winding": {
+              "enum": [
+                "error",
+                "warning"
+              ]
+            }
+          }
+        },
+        "overlapExemptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "nodes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 12
+              },
+              "maxPairs": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "nodes",
+              "reason",
+              "maxPairs"
+            ]
+          }
+        },
+        "clearanceBoxes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "boundsMeters": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "obstacles": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1
+              }
+            },
+            "required": [
+              "name",
+              "boundsMeters",
+              "obstacles"
+            ]
+          }
+        },
+        "maxWarnings": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
     }
   },
   "required": [

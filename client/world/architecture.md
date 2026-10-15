@@ -118,3 +118,12 @@ containment. Existing physics visits and anchored frame writebacks provide pose
 events even for sleeping contents; no extra full scene scan computes mass each
 tick. Explicit scene reconciliation is available for validation. Full inertial
 cabin motion, arbitrary future physical items and Core intake are separate tasks.
+
+## Spherical mining domain contract (#230)
+
+`spherical_mining.rs` owns validated per-tool capacity/rate, attached reserved
+mass, deterministic bounded ticks and typed releases. It does not allocate
+physical IDs, place objects or simulate contacts. Session/runtime integration
+is #231; legacy extraction fixtures remain available. The canonical
+[lifecycle and radius rules](resource-contracts.md#spherical-mining-lifecycle-230)
+separate material conservation from replaceable visual geometry.

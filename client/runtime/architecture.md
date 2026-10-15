@@ -621,3 +621,14 @@ The opt-in fragment benchmark's `onboard` layout reuses that contained cargo
 initializer (0–500 pieces) for native wall-clock frame sampling. Active initial
 motion is explicit; settling still runs ordinary physics with no installed sleep
 flags. Older multilayer scattered/dense stress layouts remain distinct cases.
+
+## Continuous spherical mining (#231)
+
+`MiningTool` translates held mouse/valid target and current f64 tool attachment
+into world-owned `tick_spherical`. Input reset and mouse-up detach immediately;
+shared native/automation `apply_look_delta` admits zero-time aim transitions so
+rapid away/back releases without adding mass. Runtime never computes mining
+mass or debits energy. Session owns all reserved/released identities/journal.
+Attached entries are excluded from pickup and loose physics, then retain the
+same identity after release. See [source-of-truth lifecycle/integration](../world/resource-contracts.md#continuous-session-integration-231).
+Spherical mesh/contact and final carry/Core migration remain #232–#234.

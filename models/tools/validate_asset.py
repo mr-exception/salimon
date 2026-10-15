@@ -283,6 +283,11 @@ def validate_document(path, manifest, extension_validators=None, collision_valid
         callback = (extension_validators or {}).get((manifest['category'], namespace, extension['version']))
         require(callback is not None, f'extensions.{namespace}: unsupported {manifest["category"]} version {extension["version"]}')
         callback(context, extension['data'])
+    if 'quality' in manifest:
+        from geometry_quality import diagnose
+        quality = diagnose(doc, binary, manifest['quality'])
+        violations = [f for f in quality['findings'] if f['severity'] == 'error']
+        require(not violations, 'quality: ' + json.dumps(violations[:8], sort_keys=True))
     return metrics
 
 

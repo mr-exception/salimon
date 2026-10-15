@@ -312,7 +312,7 @@
     {
       "assert": {
         "path": "world.fragment_count",
-        "gt": 1
+        "equals": 1
       }
     },
     {
@@ -648,7 +648,8 @@
     {
       "assert": {
         "path": "world.deposits_by_id.Moon:376084701777432483.remaining_mass_kg",
-        "equals": 27.832688622481268
+        "approx": 27.832688622481268,
+        "tolerance": 1e-09
       }
     },
     {

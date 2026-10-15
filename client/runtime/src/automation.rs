@@ -180,7 +180,7 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
             let dy = command.get("dy").and_then(Value::as_f64);
             match (dx, dy) {
                 (Some(dx), Some(dy)) if dx.is_finite() && dy.is_finite() => {
-                    app.character.apply_mouse_delta(dx, dy);
+                    app.apply_look_delta(dx, dy);
                     app.sync_carried();
                     Ok(json!({"applied": true}))
                 }
@@ -189,7 +189,7 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
         }
         Some("restore_look") => {
             if let Some([dx, dy]) = app.automation_aim_delta.take() {
-                app.character.apply_mouse_delta(-dx, -dy);
+                app.apply_look_delta(-dx, -dy);
                 app.sync_carried();
                 Ok(json!({"applied": true}))
             } else {
@@ -251,7 +251,7 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
                     let pitch = dot(target, up).clamp(-1.0, 1.0).asin()
                         - dot(current, up).clamp(-1.0, 1.0).asin();
                     let delta = [yaw / 0.0022, -pitch / 0.0022];
-                    app.character.apply_mouse_delta(delta[0], delta[1]);
+                    app.apply_look_delta(delta[0], delta[1]);
                     total[0] += delta[0];
                     total[1] += delta[1];
                     app.sync_carried();
@@ -416,6 +416,7 @@ fn inspect(app: &ClientApplication) -> Value {
                 "id": piece.id().0,
                 "reference_frame": if app.mining.ship_fragments.contains_key(&piece.id()) { "ship" } else { "world" },
                 "carried": app.mining.session.carried_id() == Some(piece.id()),
+                "attached_to_tool": app.mining.session.attached_sphere_id() == Some(piece.id()),
                 "sleeping": app.mining.session.carried_id() != Some(piece.id()) && app.mining.fragment_sleep.is_sleeping(piece.id()),
                 "distance_to_player_meters": piece.transform().position().offset_from(salimon_world::WorldPosition::new(character.eye_position_meters[0], character.eye_position_meters[1], character.eye_position_meters[2])).iter().map(|v| v * v).sum::<f64>().sqrt(),
                 "ship_local_position_meters": app.mining.ship_fragments.get(&piece.id()).copied().unwrap_or_else(|| frame.world_to_local(piece.transform().position().meters())),
@@ -429,6 +430,18 @@ fn inspect(app: &ClientApplication) -> Value {
                 "orientation_xyzw": piece.transform().orientation_xyzw(),
                 "visual": {"color": mesh.color, "half_extents_meters": mesh.half_extents_meters}
             })
+        })
+        .collect();
+    let fragments_by_id: std::collections::BTreeMap<_, _> = fragments
+        .iter()
+        .map(|piece| {
+            (
+                piece["id"]
+                    .as_u64()
+                    .expect("physical fragment ID")
+                    .to_string(),
+                piece,
+            )
         })
         .collect();
     let fragment_target = crate::carrying::target(
@@ -486,7 +499,10 @@ fn inspect(app: &ClientApplication) -> Value {
             "held_item_visible": app.held_item(character, mining_target.is_some()).is_some(),
             "extracted_mass_kg": app.mining.session.extracted_mass_kg(),
             "range_meters": salimon_world::mining::MINING_RANGE_METERS,
-            "rate_kg_per_second": salimon_world::mining::MINING_RATE_KG_PER_SECOND,
+            "rate_kg_per_second": app.mining.config.rate_kg_per_second(),
+            "capacity_kg": app.mining.config.cap_kg(),
+            "reserved_mass_kg": app.mining.session.attached_sphere_id().and_then(|id| app.mining.session.fragments().iter().find(|p| p.id() == id)).map_or(0.0, |p| p.material().mass_kg()),
+            "attached_fragment_id": app.mining.session.attached_sphere_id().map(|id| id.0),
             "target": mining_target.map(|target| json!({"id": format!("{:?}:{}", target.id.body, target.id.local), "distance_meters": target.distance_meters})) },
         "player": {"nearby_body": app.mining.terrain.nearest_body(character.eye_position_meters, salimon_world::NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS, true).map(|(body, distance)| json!({"name": body.name, "surface_distance_meters": distance})),
             "velocity_meters_per_second": player_velocity,
@@ -517,7 +533,7 @@ fn inspect(app: &ClientApplication) -> Value {
                 "radial_speed_meters_per_second": body.radial_speed_meters_per_second})),
             "cockpit_message": ship.cockpit_message.map(|message| message.text())},
         "interaction": interaction,
-        "world": {"fragments": fragments,
+        "world": {"fragments": fragments, "fragments_by_id": fragments_by_id,
             "fragment_count": app.mining.session.fragments().len(),
             "sleeping_fragment_count": app.mining.session.fragments().iter().filter(|piece| app.mining.session.carried_id() != Some(piece.id()) && app.mining.fragment_sleep.is_sleeping(piece.id())).count(),
             "fragment_mass_kg": app.mining.session.fragments().iter().map(|piece| piece.material().mass_kg()).sum::<f64>(),
@@ -1030,7 +1046,7 @@ mod tests {
         for step in scenario["steps"].as_array().unwrap() {
             if step.get("assert").and_then(|check| check["path"].as_str())
                 == Some("carrying.target_id")
-                && step["assert"]["equals"] == json!(1)
+                && step["assert"]["equals"] == json!(4)
             {
                 break;
             }

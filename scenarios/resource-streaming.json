@@ -782,7 +782,7 @@
     {
       "assert": {
         "path": "world.fragment_count",
-        "equals": 19
+        "equals": 5
       }
     },
     {
@@ -849,7 +849,7 @@
     {
       "assert": {
         "path": "world.fragment_count",
-        "equals": 19
+        "equals": 5
       }
     },
     {

@@ -25,6 +25,7 @@ reacquisition while held and complete depletion/conservation.
 
 Linux x86_64, Python 3.12, Rust stable 1.99.0, locked dependencies.
 
+- `cargo test --workspace --locked`: passed the final complete run (471 passed, 7 existing opt-in tests ignored).
 - `cargo fmt --all -- --check`: passed.
 - `cargo clippy --workspace --all-targets --locked -- -D warnings`: passed.
 - `cargo test -p salimon-world --locked --test spherical_mining`: four tests passed,

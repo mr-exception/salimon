@@ -87,6 +87,13 @@ player/ship diagnostics; precision-tour view supplies its camera metrics.
 
 ## Contextual action-bar flow
 
+All contextual world prompts, screen-space flight guidance and transient action
+feedback use the shared action-bar bitmap density: 3 pixels per glyph cell at
+1× UI scale, rounded to integer density up to 6 at 2× (previously 4–8).
+Seven-cell glyphs are 21 pixels tall at 1×, with unchanged colors, text, anchors,
+visibility and expiry. This sizing is independent of cockpit displays, diagnostics,
+equipment-toolbar artwork and the reticle.
+
 The runtime field-maps ship-owned Core and nearby-body telemetry into renderer
 instrument DTOs every gameplay frame; it never derives proximity or radial
 velocity. Runtime selects one applicable prompt with the existing door/ship/resource

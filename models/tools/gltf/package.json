@@ -1,0 +1,8 @@
+{
+  "name": "salimon-offline-gltf-tools",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "gltf-validator": "2.0.0-dev.3.10"
+  }
+}

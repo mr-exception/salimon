@@ -42,6 +42,17 @@ jobs:
         run: |
           python -m pip install -r models/tools/requirements.txt
           python -m unittest discover -s models/tests -v
+      - uses: actions/setup-node@v4
+        if: runner.os == 'Linux'
+        with:
+          node-version: '22.16.0'
+      - name: Offline GLB compliance, exact optimization and visual budgets
+        if: runner.os == 'Linux'
+        timeout-minutes: 5
+        run: |
+          npm ci --prefix models/tools/gltf --ignore-scripts --no-audit --no-fund
+          python -m unittest discover -s models/tests -p test_process_glb.py -v
+          python models/tools/process_glb.py all --profile exact-v1 --output artifacts/glb
       - name: Build script and E2E runner contract tests
         run: python -m unittest discover -s scripts -p 'test_*.py'
       - name: Rust quality gates
@@ -50,6 +61,11 @@ jobs:
           cargo fmt --all -- --check
           cargo clippy --workspace --all-targets --locked -- -D warnings
           cargo test --workspace --locked
+      - name: Optimized candidates through production CPU importers
+        if: runner.os == 'Linux'
+        env:
+          SALIMON_GLB_CANDIDATES: ${{ github.workspace }}/artifacts/glb
+        run: cargo test -p salimon-renderer --locked offline_glb_candidate -- --ignored
       - name: Stage debug executable
         run: python scripts/build_game.py --profile debug --output artifacts/build/debug
       - name: Stage release executable
@@ -137,5 +153,6 @@ jobs:
             artifacts/build/
             artifacts/e2e/
             artifacts/fragment-benchmarks/
+            artifacts/glb/
             artifacts/packaged-smoke/
           if-no-files-found: warn

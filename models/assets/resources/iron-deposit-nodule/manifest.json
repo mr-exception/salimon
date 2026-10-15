@@ -84,5 +84,11 @@
         0
       ]
     }
+  },
+  "visualBudget": {
+    "style": "option-a",
+    "maxNodes": 3,
+    "maxTextureMemoryBytes": 0,
+    "maxDrawCalls": 1
   }
 }

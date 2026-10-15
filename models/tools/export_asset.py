@@ -117,7 +117,7 @@ def check_export(path, manifest):
         raise ExportError('runtime GLB must embed buffers and images')
 
 
-def export_asset(asset, blender=None, repo=REPO, **registries):
+def export_asset(asset, blender=None, repo=REPO, glb_profile=None, **registries):
     manifest_path, manifest = resolve_manifest(asset, repo)
     identity = manifest['assetId']
     try:
@@ -143,6 +143,17 @@ def export_asset(asset, blender=None, repo=REPO, **registries):
                 raise ExportError('Blender finished without producing the runtime GLB')
             from validate_asset import validate_manifest
             validate_manifest(manifest, temporary, repo, **registries)
+            if glb_profile is not None:
+                from process_glb import process
+                optimized = Path(directory) / 'processed.glb'
+                try:
+                    report = process(manifest, temporary, optimized, glb_profile, repo, **registries)
+                except ValueError as exc:
+                    raise ExportError(str(exc)) from exc
+                optimized.replace(temporary)
+                report_path = Path(directory) / 'processing.json'
+                report_path.write_text(json.dumps(report, indent=2, sort_keys=True) + '\n')
+                os.replace(report_path, output.with_suffix('.processing.json'))
             os.replace(temporary, output)
         return output
     except (OSError, ExportError) as exc:
@@ -153,9 +164,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('asset', help='logical asset ID, asset directory, or manifest path under models/assets')
     parser.add_argument('--blender', help='Blender executable (defaults to BLENDER or PATH)')
+    parser.add_argument('--glb-profile', choices=['none', 'exact-v1'], default=None,
+                        help='opt into offline Khronos validation/reporting; exact-v1 also repacks bytes')
     args = parser.parse_args()
     try:
-        output = export_asset(args.asset, args.blender)
+        output = export_asset(args.asset, args.blender, glb_profile=args.glb_profile)
     except ExportError as exc:
         print(f'export failed: {exc}', file=sys.stderr)
         return 1

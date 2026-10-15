@@ -204,3 +204,87 @@ An Option A/Option B fixture swaps one triangle for three facets while keeping
 bounds/anchors identical. Node-only spatial metadata (including colliders) is
 independent of visual tessellation; scout category tests preserve its richer
 contract. No GPU/native hardware is required by this gate.
+
+## Offline GLB compliance and cost pipeline (#227)
+
+Install Node 22.16.0 (CI) and the lockfile-pinned Khronos glTF Validator once:
+
+```sh
+npm ci --prefix models/tools/gltf --ignore-scripts --no-audit --no-fund
+python models/tools/process_glb.py all --profile exact-v1 --output artifacts/glb
+SALIMON_GLB_CANDIDATES="$PWD/artifacts/glb" cargo test -p salimon-renderer --locked offline_glb_candidate -- --ignored
+```
+
+After dependency installation these commands need no network, Blender, display
+or GPU. CI runs them on Linux and uploads each candidate GLB, detailed Khronos
+before/after diagnostics, hashes, contract metrics and aggregate `summary.json`.
+Output contains no timestamp or absolute workstation paths. Reports reflect the
+checked-in exports at that revision, not an unperformed Blender regeneration.
+
+`process_glb.py` stages candidates outside `client/assets`; it never publishes
+runtime assets. Use the normal authoring exporters to regenerate and publish:
+
+```sh
+python models/tools/export_asset.py resource.iron-fragment --glb-profile exact-v1
+python models/assets/ships/salimon-scout/export.py --glb-profile exact-v1
+```
+
+Both opt-in paths validate before replacing the runtime GLB. The generic exporter
+writes a sibling `.processing.json`; the scout embeds the processing report in
+its existing provenance report and regenerates matching glTF/bin interchange.
+Without `--glb-profile`, the established exporter remains independent of Node.
+`--glb-profile none` runs compliance/reporting while retaining exported bytes;
+omitting the flag disables the entire optional step. Re-export without the flag
+to roll back optimization; source `.blend` files are never modified. No production
+GLB is replaced just by running the CI audit.
+
+### Profile and preservation boundary
+
+`exact-v1` (versioned in repository code) compacts JSON and repacks four-byte-aligned
+binary views, aliasing **only byte-identical complete payloads**. It retains every
+node/mesh/material/accessor/view index, all names, hierarchy, transforms, extras,
+material properties and primitive order. Its full JSON + per-view byte fingerprint
+permits only buffer byte lengths and view byte offsets to differ. Thus monitor
+UVs, authored normals, indices, anchors, colliders, glass layering and emissive
+channels cannot silently change. Larger candidates fall back to the original
+bytes. Khronos errors, new warnings, spatial/category failures and any semantic
+change fail before candidate publication. Existing warnings remain in reports;
+no compliance issues are suppressed. V1 asset contracts still reject animation,
+rigs and unsupported accessors/extensions instead of silently stripping them.
+The repacker also rejects extension-bearing assets rather than guessing opaque
+extension byte-offset semantics.
+
+The equivalent conservative local toolchain is intentional. glTF Transform's
+[transform catalog](https://gltf-transform.dev/modules/functions) offers broader
+prune/dedup/join/weld/quantize and texture/compression operations. Those operations
+would need a different preservation proof and custom importer support; Draco,
+meshopt and quantized accessors are not an enabled runtime format. In particular,
+“unused” monitor UVs are consumed by Salimon rather than a glTF texture. We retain
+them, material identifiers and replaceable visual recipes. Broader transforms
+are deferred; this profile does not claim mesh simplification or GPU savings.
+
+### Measured costs and budgets
+
+Existing `budgets` remain enforced for triangles, primitive definitions, material
+count, encoded texture bytes and GLB bytes. Optional `visualBudget` separately
+records `style` (`option-a` or `option-b`), maximum nodes and decoded texture memory,
+plus maximum draw calls for assets with a known consumer. Current assets start
+with measured Option A caps. Change an artistic budget deliberately during a
+style replacement; shared spatial/quality/category contracts are unchanged.
+
+Reports distinguish mesh-definition triangles/primitives from mesh-node primitive
+references. Texture memory estimates assume RGBA8 and the full mip chain per
+embedded PNG, excluding driver overhead, atlas replacement and allocation
+sharing. Unknown image formats fail estimation explicitly. `drawCalls` reflects
+Salimon's actual batching policy: two scout batches (opaque/glass), one held-tool
+batch, one instanced batch per visible resource variant. The cargo-container has
+no runtime consumer and reports `null`, not a fictional primitive-based draw count.
+These are asset-local costs, not total scene draw calls or GPU timing measurements.
+
+For 500 identical fragments, resident geometry/index buffers are already shared;
+only poses vary. Material roles bake into vertices, so primitive/material merging
+inside a GLB will not reduce the single per-variant instanced draw. Six fragment
+variants need up to six draws, not 500. Future cross-variant geometry sharing or
+an atlas/material palette can be assessed separately; changing visual recipes
+must preserve gameplay identity, collision and interaction contracts. Byte
+repacking alone does not change runtime residency, physics or frame throughput.

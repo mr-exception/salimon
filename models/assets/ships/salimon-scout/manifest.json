@@ -1151,5 +1151,11 @@
         "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
       }
     ]
+  },
+  "visualBudget": {
+    "style": "option-a",
+    "maxNodes": 140,
+    "maxTextureMemoryBytes": 1364,
+    "maxDrawCalls": 2
   }
 }

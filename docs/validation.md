@@ -58,6 +58,16 @@ for generated layout ownership. Generic CLI export does not register the ship
 extension. Inspect source/export geometry and applicable native screenshots;
 passing metadata checks alone does not prove visual quality.
 
+## Optional offline GLB pipeline
+
+Linux CI installs the pinned local Khronos validator, runs
+`python models/tools/process_glb.py all --profile exact-v1 --output artifacts/glb`,
+and checks candidates with the production CPU importers using
+`SALIMON_GLB_CANDIDATES="$PWD/artifacts/glb" cargo test -p salimon-renderer --locked offline_glb_candidate -- --ignored`.
+See [model pipeline setup, reports and disable switch](../models/tools/README.md#offline-glb-compliance-and-cost-pipeline-227).
+These gates prove compliance, budgets, spatial invariants and exact importer data
+parity; native visual fidelity/performance remains a separate verification.
+
 ## Native graphical gates
 
 A running display, compatible GPU/backend and an unobscured capture surface are

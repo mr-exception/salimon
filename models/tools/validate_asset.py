@@ -273,6 +273,9 @@ def validate_document(path, manifest, extension_validators=None, collision_valid
         measured = sum(mesh_triangles[i] for i in used)
         require(measured > 0 and measured <= lod['maxTriangles'], f'LOD {lod["level"]}: triangle budget exceeded or empty')
         covered.update(subtree)
+    from glb_costs import measure, check_visual_budget
+    if 'visualBudget' in manifest:
+        check_visual_budget(measure(doc, binary, path.stat().st_size, manifest), manifest)
     context = {'manifest': manifest, 'document': doc, 'binary': binary, 'runtime': path, 'metrics': metrics}
     if manifest['collision']['policy'] == 'generated':
         generator = manifest['collision']['generator']

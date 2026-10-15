@@ -29,8 +29,14 @@ fn model_to_clip(camera: CameraFrame, aspect: f32) -> Result<[f32; 16], Renderer
 }
 
 fn geometry() -> Result<(Vec<f32>, crate::item_image::ItemImage), RendererError> {
-    let asset =
-        gltf::Gltf::from_slice(GLB).map_err(|e| RendererError::new("load item.mining-tool", e))?;
+    geometry_from_bytes(GLB)
+}
+
+fn geometry_from_bytes(
+    bytes: &[u8],
+) -> Result<(Vec<f32>, crate::item_image::ItemImage), RendererError> {
+    let asset = gltf::Gltf::from_slice(bytes)
+        .map_err(|e| RendererError::new("load item.mining-tool", e))?;
     let blob = asset
         .blob
         .as_deref()
@@ -408,6 +414,20 @@ fn surface_texture(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    #[ignore = "run with SALIMON_GLB_CANDIDATES after offline GLB processing"]
+    fn offline_glb_candidate_item_matches_imported_vertices_and_atlas() {
+        let bytes = crate::glb_candidate_tests::candidate("item.mining-tool");
+        let (before, image_before) = geometry().unwrap();
+        let (after, image_after) = geometry_from_bytes(&bytes).unwrap();
+        assert_eq!(before, after);
+        assert_eq!(image_before.pixels, image_after.pixels);
+        assert_eq!(
+            [image_before.width, image_before.height],
+            [image_after.width, image_after.height]
+        );
+    }
+
     #[test]
     fn authored_mesh_has_grip_and_separate_status_region() {
         let (v, atlas) = geometry().expect("validated mining tool must load");

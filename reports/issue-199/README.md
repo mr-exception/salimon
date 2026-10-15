@@ -50,7 +50,7 @@ their results are deliberately separate workloads. See commits `76016f9` and
 | Full manual containment/zero-G exploration | NOT VERIFIED | Deterministic native routes and CPU regressions cover transitions; sustained manual control remains owner work. |
 
 [Native result/checkpoint evidence](../issue-200/native-results.json),
-[real E-key observations](native-input-core-restart.json).
+[real E-key observations](native-input-core-restart.json.gz).
 
 ![Powerless Core with 500 pieces](blackout-500-core-off.png)
 

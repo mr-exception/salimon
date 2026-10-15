@@ -112,8 +112,8 @@ uncancellable crash recovery, then L initiated takeoff after the landed prompt.
 The Core probe sent E at the aimed powerless Core. Touch
 `artifacts/native-m1/input-<scenario>/capture` for a direct GPU checkpoint and
 `.../stop` for cleanup. The probe's fixed clock is explicitly unsuitable for
-performance claims. [Native key observations](../issue-198/native-input-flight-regression.json)
-and [Core observations](../issue-199/native-input-core-restart.json) preserve the
+performance claims. [Native key observations](../issue-198/native-input-flight-regression.json.gz)
+and [Core observations](../issue-199/native-input-core-restart.json.gz) preserve the
 actual transitions. No screenshot outside the game was promoted.
 
 ![Loaded landing](loaded-500-landed.png)

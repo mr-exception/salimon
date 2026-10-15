@@ -60,8 +60,8 @@ initial fixtures and continuously issued 16 ms E2E steps. CUA delivered the
 actual Up/Down/L/F3 keys; the protocol did not select those controls. These are
 native-input checks with a paced fixed clock, **not ordinary wall-clock gameplay
 or performance samples**. See [probe helper/instructions](../issue-200/README.md#desktop-input-probes),
-[flight observations](native-input-flight-regression.json) and
-[crash observations](native-input-crash-recovery.json).
+[flight observations](native-input-flight-regression.json.gz) and
+[crash observations](native-input-crash-recovery.json.gz).
 
 ![Real native signed throttle](flight-regression-native-input-2.png)
 

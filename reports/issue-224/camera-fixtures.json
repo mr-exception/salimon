@@ -1,0 +1,19 @@
+{
+  "frame": "runtime ship-local meters; isolated ship at world [0,0,0], identity orientation",
+  "up": [0, 1, 0],
+  "verticalFovDegrees": 60,
+  "nearPlaneMeters": 0.05,
+  "viewportPixels": [1280, 800],
+  "doorOpenFractions": [0, 1],
+  "capture": "For each pose: 30 unchanged frames, then 30 frames sweeping eye Z from -0.02 to +0.02 m about the stated eye, keeping target fixed. Compare static frames separately from the sweep.",
+  "views": [
+    {"id": "port-guidance-light", "eyeMeters": [-2, 1.9973118279569892, 2], "targetMeters": [-2, 0.3440860215, 4.46], "nodes": ["Cabin_Low_Guidance_Lights", "Wall_Port_Inner"]},
+    {"id": "aft-threshold", "eyeMeters": [-6.3, 1.9973118279569892, 0], "targetMeters": [-7.3, 0.24731182796, 0], "nodes": ["Deck_Walkable", "Door_Threshold"]},
+    {"id": "ceiling-construction", "eyeMeters": [-4, 1.9973118279569892, 0], "targetMeters": [-4, 2.806451559, -3.4], "nodes": ["Ceiling_Inner", "Ceiling_Lamp_Housings"], "note": "May be hidden by the housing lower face; do not classify hidden joins as visible defects."},
+    {"id": "console", "eyeMeters": [2.25, 1.9973118279569892, 0], "targetMeters": [4.42, 1.0401, 0], "nodes": ["Monitor_Wide", "Cockpit_Monitor_Housings", "Cockpit_Monitor_Bezels"]},
+    {"id": "lower-glazing", "eyeMeters": [6.1, 1.9973118279569892, -1.3], "targetMeters": [7.4, 0.8, -2.0], "nodes": ["Cockpit_Lower_Glazing", "Cockpit_Window_Frame", "Hull_Nose"]},
+    {"id": "core", "eyeMeters": [-1, 1.9973118279569892, -2.2], "targetMeters": [-1, 1.575, -0.999], "nodes": ["Core_Monitor", "Core_Cradle", "Energy_Core"]},
+    {"id": "exterior-port", "eyeMeters": [-15, 8, 22], "targetMeters": [0, 1, 0], "nodes": ["Cabin_Port_Glazing", "Cockpit_Glazing", "Hull_Port_Side", "Wing_Port"]},
+    {"id": "exterior-starboard", "eyeMeters": [15, 8, -22], "targetMeters": [0, 1, 0], "nodes": ["Cabin_Starboard_Glazing", "Cockpit_Glazing", "Hull_Starboard_Side", "Wing_Starboard"]}
+  ]
+}

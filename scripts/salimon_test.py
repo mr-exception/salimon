@@ -12,7 +12,7 @@ from e2e_artifacts import Artifacts
 
 
 PROTOCOL = 1
-SETUPS = {"flight-regression", "core-restart", "crash-recovery", "cargo-flight", "fragment-pile", "resource-approach", "landed-earth", "cockpit-earth", "orbit-earth", "orbit-moon", "open-space", "coasting-space", "coasting-orbit", "eva-approach", "terrain-earth-approach", "terrain-moon-approach", "terrain-mars-approach", "terrain-moon-steep", "terrain-earth", "terrain-moon", "terrain-mars", "terrain-earth-crater", "terrain-moon-crater", "terrain-mars-crater"}
+SETUPS = {"cargo-blackout", "flight-regression", "core-restart", "crash-recovery", "cargo-flight", "fragment-pile", "resource-approach", "landed-earth", "cockpit-earth", "orbit-earth", "orbit-moon", "open-space", "coasting-space", "coasting-orbit", "eva-approach", "terrain-earth-approach", "terrain-moon-approach", "terrain-mars-approach", "terrain-moon-steep", "terrain-earth", "terrain-moon", "terrain-mars", "terrain-earth-crater", "terrain-moon-crater", "terrain-mars-crater"}
 OPS = {"window", "performance_reset", "inspect", "step", "look", "aim_fragment", "restore_look", "key", "mouse", "interact", "landing", "thruster"}
 COMPARISONS = {"equals", "not_equals", "gt", "gte", "lt", "lte", "approx", "exists", "contains"}
 
@@ -47,7 +47,7 @@ def parse_scenario(path):
     layout = setup.get("fragment_layout", "scattered")
     if "fragment_count" in setup and (type(count) is not int or not 0 <= count <= 1000):
         raise ScenarioError("fragment_count must be 0..1000")
-    if not isinstance(layout, str) or layout not in {"scattered", "dense", "surface"} or ("fragment_layout" in setup and count is None):
+    if not isinstance(layout, str) or layout not in {"scattered", "dense", "surface", "onboard"} or ("fragment_layout" in setup and count is None):
         raise ScenarioError("fragment_layout requires fragment_count and a known layout")
     settle_steps = setup.get("fragment_settle_steps", 0)
     if type(settle_steps) is not int or not 0 <= settle_steps <= 37500 or ("fragment_settle_steps" in setup and count is None):

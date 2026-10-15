@@ -607,3 +607,21 @@ without a window and adds runtime mass/consumption and cabin zero-G transition
 checks. Existing ship, character and physics tests retain detailed partition,
 collision, power and contact edge coverage. These checks establish portable
 correctness; Linux software rendering does not certify Apple M1 frame rate.
+
+## Apple M1 flight/Core follow-up (#198–#200)
+
+The realistic-flight group includes `cargo-blackout.json` (500 physical pieces,
+held-object zero-G drift, mechanical intake, gradual conversion, restored power
+and later depletion) and `landing-speed-cutoff.json` (19.84 m/s accepted, 20.48 m/s
+tangential motion rejected, uncancellable touchdown). Both use existing production
+actions after opt-in fixture initialization; evidence variants add captures only.
+
+On the native desktop, use a release build and direct Metal framebuffer captures:
+
+```sh
+SALIMON_REFERENCE_SIZE=1 RUST_LOG=info python3 scripts/salimon-test suite --group realistic-flight --evidence --binary artifacts/build/release/salimon-client --screenshot-command '["native"]'
+```
+
+The environment switch requests a 1920×1080 physical drawable (also on Retina).
+These fixed-step routes prove state transitions and rendered checkpoints; use
+the fragment benchmark for independently sampled native frame pacing.

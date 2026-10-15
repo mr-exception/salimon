@@ -13,6 +13,7 @@ pub(crate) enum Scenario {
     LandedEarth,
     FlightRegression,
     CargoFlight,
+    CargoBlackout,
     CoreRestart,
     CrashRecovery,
     TerrainEarth,
@@ -41,6 +42,7 @@ impl Scenario {
         match value {
             "flight-regression" => Ok(Self::FlightRegression),
             "cargo-flight" => Ok(Self::CargoFlight),
+            "cargo-blackout" => Ok(Self::CargoBlackout),
             "core-restart" => Ok(Self::CoreRestart),
             "crash-recovery" => Ok(Self::CrashRecovery),
             "terrain-earth-approach" => Ok(Self::TerrainEarthApproach),
@@ -73,6 +75,7 @@ impl Scenario {
         match self {
             Self::FlightRegression => "flight-regression",
             Self::CargoFlight => "cargo-flight",
+            Self::CargoBlackout => "cargo-blackout",
             Self::CoreRestart => "core-restart",
             Self::CrashRecovery => "crash-recovery",
             Self::TerrainEarthApproach => "terrain-earth-approach",
@@ -215,6 +218,7 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
     match config.scenario {
         Scenario::FlightRegression
         | Scenario::CargoFlight
+        | Scenario::CargoBlackout
         | Scenario::CoreRestart
         | Scenario::CrashRecovery => crate::flight_regression::initialize(app, config.scenario)?,
         Scenario::LandedEarth => {}
@@ -364,6 +368,7 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
         config.scenario,
         Scenario::FlightRegression
             | Scenario::CargoFlight
+            | Scenario::CargoBlackout
             | Scenario::CoreRestart
             | Scenario::CrashRecovery
             | Scenario::TerrainEarthApproach

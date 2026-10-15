@@ -576,7 +576,8 @@ and safe relocation on representative terrain with authored support geometry.
 ## Realistic flight regression (#195)
 
 `flight_regression.rs` owns opt-in deterministic initial conditions and tests for
-`flight-regression`, `core-restart`, `crash-recovery` and `cargo-flight` E2E setups.
+`flight-regression`, `core-restart`, `crash-recovery`, `cargo-flight` and
+`cargo-blackout` E2E setups.
 After setup the normal automation actions/controllers own every transition.
 Inspection exposes explicit power, conversion and ship-owned navigation telemetry.
 The 500-piece fixture uses 0.032 kg authored iron fragments inside the aft cabin;
@@ -594,3 +595,17 @@ motion counts; no presented frames or hardware FPS are synthesized. The
 [runner](../../scripts/FRAGMENT_BENCHMARKS.md#flight-mass-and-cabin-power-cpu-profiles-196)
 validates report completeness/raw statistics and applies explicit baseline/absolute
 limits in CI. This path introduces no gameplay timing or physics shortcuts.
+
+## Native M1 integrated follow-up (#198–#200)
+
+`cargo-blackout` initializes one held 2 kg bootstrap fragment and 499 contained
+0.032 kg loose fragments with an empty Core. Production input, conversion and
+physics then own zero-G drift, recharge, gravity restoration and subsequent
+depletion. No new state-mutation command is exposed. The realistic-flight suite
+also tests the 20 m/s landing boundary reached through ordinary tangential thrust.
+See reports/issue-198 through issue-200 for dated native evidence and limits.
+
+The opt-in fragment benchmark's `onboard` layout reuses that contained cargo
+initializer (0–500 pieces) for native wall-clock frame sampling. Active initial
+motion is explicit; settling still runs ordinary physics with no installed sleep
+flags. Older multilayer scattered/dense stress layouts remain distinct cases.

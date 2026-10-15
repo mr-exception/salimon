@@ -66,3 +66,79 @@ Blender; editing a `.blend` alone will not change the game.
 For the scout, edit the owning component rather than making assembly links local.
 Shared root/groups/materials belong to its shared library; see the
 [modular scout workflow](assets/ships/salimon-scout/README.md#open-edit-and-verify).
+
+## Option A art contract (authoring protocol 1.0.0)
+
+Use code-first editable parametric primitives and small named components. Keep
+geometry specifications (meter envelope, pivots, anchors, collision proxies,
+monitor UVs and walking clearances) independent from visual recipes. Read the
+[#224 baseline](../reports/issue-224/README.md) before scout changes. Never fix
+flicker by rescaling the ship or obscuring a competing surface.
+
+| Surface | Option A rule |
+| --- | --- |
+| Silhouette | Broad readable primary forms; secondary panels must justify their screen area. No subpixel rivets. |
+| Facets | Flat-shaded rock facets; planar ship/tool panels; sharp edges and disconnected panels are intentional. Avoid coplanar layers. |
+| Palette | Graphite (0.09,0.12,0.16), slate (0.24,0.30,0.37), cyan (0.14,0.65,0.72), ochre (0.83,0.53,0.18), linear RGB. Resource identity retains its established palette. |
+| Materials | Mostly opaque base color, selective emission for status. Scout shading currently ignores metallic/roughness and ordinary textures; do not depend on Blender PBR for gameplay readability. Preserve glass and monitor material roles. |
+| Modularity | Parameterize dimensions and recipes separately. Preserve linked scout libraries; inspect evaluated assembly and edit the owning library. |
+| Lighting | Neutral three-angle CPU reference renders, fixed exposure and key; native shader verification remains separate. |
+| Budgets | Each asset manifest's five existing limits remain hard ceilings. Ship: 6,500 triangles /124 primitives /13 materials /544 KiB GLB /64 KiB textures. Read resource/item manifests rather than imposing ship budgets. |
+
+Option B can replace visual recipes with bevels, armor and richer materials;
+this is a manual authored replacement, not an automatic upgrade. Shared spatial
+contracts and collision/interaction interfaces must stay identical. Style budget
+changes require explicit review independently of physics requirements.
+
+## Local Codex bridge and headless fallback
+
+Supported: Blender **4.5.3 LTS**, Python 3.10+, pinned model requirements,
+repository-owned `salimon-authoring` **1.0.0**, MCP protocol **2024-11-05**.
+No add-on or third-party MCP package is needed. The bridge launches headless
+Blender operations from Codex while local Blender can inspect the resulting
+scratch candidate interactively. It does not attach to an unsaved GUI session.
+
+Evaluated [ahujasid Blender MCP](https://github.com/ahujasid/blender-mcp) and its
+[security guidance](https://github.com/ahujasid/blender-mcp#limitations--security-considerations)
+on 2026-10-15: a live socket/add-on and general Python execution provide broader
+authoring control than this task needs. Upstream safe mode is not a project
+sandbox. We do not install/support that provider or external model/download
+services. Chosen alternative: repository-owned fixed-operation stdio bridge,
+versioned with the code and usable without a persistent server or network port.
+
+Opt in by adding this local server to Codex configuration (replace absolute paths):
+
+```toml
+[mcp_servers.salimon_authoring]
+command = "/path/to/python"
+args = ["/path/to/salimon/models/tools/authoring_bridge.py", "--blender", "/path/to/blender"]
+```
+
+Keep the normal Codex tool approval controls enabled locally. Review the asset
+and requested operation before accepting a tool call. No operation accepts
+Python, shell commands or arbitrary source/output paths. The bridge only writes
+below `artifacts/authoring`; Blender auto-run scripts are disabled. It still
+opens trusted repository `.blend` files and runs the installed Blender binary:
+this is not an OS sandbox for hostile assets. Use a restricted OS account for
+untrusted files. Production edits require deliberate source review and export;
+no bridge operation promotes candidates. Stop Codex/remove the server stanza
+for teardown; no daemon/add-on/socket remains. Delete `artifacts/authoring` to
+roll back all sample outputs.
+
+Same deterministic CLI without MCP or GUI:
+
+```sh
+python models/tools/authoring_bridge.py --blender /path/to/blender --operation inspect_asset --asset item.cargo-container
+python models/tools/authoring_bridge.py --blender /path/to/blender --operation preview_asset --asset item.cargo-container
+python models/tools/authoring_bridge.py --blender /path/to/blender --operation sample_palette --asset item.cargo-container
+```
+
+This vertical slice changes only the four cargo-container material base colors
+in an isolated `candidate.blend`, retains all dimensions/transforms/names, and
+renders front/side/three-quarter PNGs. Inspect JSON before/after, open candidate
+beside original, and run the generic validator on the unchanged runtime asset.
+Regenerate by rerunning the command; rollback by deleting the scratch folder.
+Source/GLB promotion is a separate reviewed authoring action using the existing
+exporter, never a side effect of a preview. With no Blender installed, inspect
+runtime geometry via `diagnose_scout.py`/generic validators; source rendering is
+unavailable and must be reported as such, not substituted by metadata tests.

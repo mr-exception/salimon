@@ -47,7 +47,7 @@ def parse_scenario(path):
     layout = setup.get("fragment_layout", "scattered")
     if "fragment_count" in setup and (type(count) is not int or not 0 <= count <= 1000):
         raise ScenarioError("fragment_count must be 0..1000")
-    if not isinstance(layout, str) or layout not in {"scattered", "dense", "surface"} or ("fragment_layout" in setup and count is None):
+    if not isinstance(layout, str) or layout not in {"scattered", "dense", "surface", "onboard"} or ("fragment_layout" in setup and count is None):
         raise ScenarioError("fragment_layout requires fragment_count and a known layout")
     settle_steps = setup.get("fragment_settle_steps", 0)
     if type(settle_steps) is not int or not 0 <= settle_steps <= 37500 or ("fragment_settle_steps" in setup and count is None):

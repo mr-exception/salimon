@@ -604,3 +604,8 @@ physics then own zero-G drift, recharge, gravity restoration and subsequent
 depletion. No new state-mutation command is exposed. The realistic-flight suite
 also tests the 20 m/s landing boundary reached through ordinary tangential thrust.
 See reports/issue-198 through issue-200 for dated native evidence and limits.
+
+The opt-in fragment benchmark's `onboard` layout reuses that contained cargo
+initializer (0–500 pieces) for native wall-clock frame sampling. Active initial
+motion is explicit; settling still runs ordinary physics with no installed sleep
+flags. Older multilayer scattered/dense stress layouts remain distinct cases.

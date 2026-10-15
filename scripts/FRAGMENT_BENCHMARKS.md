@@ -395,3 +395,13 @@ plus a workload-specific noise allowance. Missing workload rows fail. Compare
 like builds/sample counts/machines when interpreting changes; CI uses permissive
 portable regression guards, not a 60 FPS target. Update a baseline deliberately
 with report evidence; do not regenerate it automatically on failure.
+
+## Contained flight-wave load (#199)
+
+`--layouts onboard --counts 0 500` selects the same contained 0.032 kg iron
+pieces as the flight/Core regression and CPU profile (16 kg for 500). It supports
+active drops and natural settled preparation through the production solver.
+The existing scattered/dense fixtures retain their larger mixed-material pieces
+and multilayer stress geometry; keep their measurements separate. Onboard count
+is capped at 500 by the shared fixture. All native clocks, sleep checks, renderer
+metadata, raw samples and failure handling remain unchanged.

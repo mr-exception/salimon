@@ -14,6 +14,7 @@ pub(crate) enum Layout {
     Scattered,
     Dense,
     Surface,
+    Onboard,
 }
 impl Layout {
     pub(crate) fn parse(value: &str) -> Result<Self, String> {
@@ -21,7 +22,8 @@ impl Layout {
             "scattered" => Ok(Self::Scattered),
             "dense" => Ok(Self::Dense),
             "surface" => Ok(Self::Surface),
-            _ => Err("layout must be scattered, dense or surface".into()),
+            "onboard" => Ok(Self::Onboard),
+            _ => Err("layout must be scattered, dense, surface or onboard".into()),
         }
     }
     pub(crate) fn name(self) -> &'static str {
@@ -29,6 +31,7 @@ impl Layout {
             Self::Scattered => "scattered",
             Self::Dense => "dense",
             Self::Surface => "surface",
+            Self::Onboard => "onboard",
         }
     }
 }
@@ -44,6 +47,22 @@ pub(crate) fn initialize(
 ) -> Result<(), String> {
     if count > 1000 {
         return Err("benchmark fixture count must be 0..1000".into());
+    }
+    if layout == Layout::Onboard {
+        crate::flight_regression::initialize_cargo(app, count)?;
+        if active {
+            for piece in app.mining.session.fragments() {
+                app.mining.fragment_motion.insert(
+                    piece.id(),
+                    FragmentMotion {
+                        velocity: [0.0, 0.4, 0.0],
+                        angular_velocity: [0.0, 0.3, 0.0],
+                        ship_orientation: Some([0.0, 0.0, 0.0, 1.0]),
+                    },
+                );
+            }
+        }
+        return Ok(());
     }
     let frame = character_ship_frame(app.ship.snapshot().pose);
     let scattered: Vec<_> = (0..160)
@@ -110,6 +129,7 @@ pub(crate) fn initialize(
         let side = salimon_world::resource_fragments::side_meters(piece);
         let support = fragment_hull(piece).support(orientation, side, [0.0, -1.0, 0.0]);
         let mut local = match layout {
+            Layout::Onboard => unreachable!("onboard fixture initialized above"),
             Layout::Dense => {
                 let base = dense[index % dense.len()];
                 [
@@ -302,6 +322,39 @@ fn checkpoint(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn onboard_benchmark_preserves_contained_flight_load_and_active_motion() {
+        for active in [false, true] {
+            let mut app = ClientApplication::default();
+            initialize(&mut app, 500, Layout::Onboard, 199, active).unwrap();
+            assert_eq!(app.mining.session.fragments().len(), 500);
+            assert!((app.ship.snapshot().total_mass_kg - 100_016.0).abs() < 1e-6);
+            assert!(
+                app.mining
+                    .ship_fragments
+                    .values()
+                    .all(|p| { salimon_character::ship_contains_object(*p) })
+            );
+            assert_eq!(
+                app.mining.fragment_motion.len(),
+                if active { 500 } else { 0 }
+            );
+            for motion in app.mining.fragment_motion.values() {
+                assert_eq!(motion.velocity, [0.0, 0.4, 0.0]);
+            }
+        }
+        assert!(
+            initialize(
+                &mut ClientApplication::default(),
+                501,
+                Layout::Onboard,
+                199,
+                false
+            )
+            .is_err()
+        );
+    }
+
     #[test]
     fn populations_conserve_mass_identity_variants_and_session_restore() {
         for count in [0, 10, 25, 50, 100, 250, 500, 1000] {

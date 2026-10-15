@@ -1,0 +1,32 @@
+{
+  "date_local": "2026-10-15",
+  "timezone": "Asia/Nicosia",
+  "hardware": {
+    "model": "iMac21,1",
+    "chip": "Apple M1",
+    "cpu_cores": 8,
+    "gpu_cores": 8,
+    "memory_gb": 16
+  },
+  "os": "macOS 26.2 (25C56)",
+  "target": "aarch64-apple-darwin",
+  "rustc": "rustc 1.89.0 (29483883e 2025-08-04)",
+  "python": "Python 3.14.2",
+  "renderer": {
+    "adapter": "Apple M1",
+    "backend": "Metal",
+    "device_type": "IntegratedGpu",
+    "drawable": [
+      1920,
+      1080
+    ],
+    "scale_factor": 2.0,
+    "present_mode": "AutoVsync",
+    "gpu_timestamp_queries": true
+  },
+  "displays": {
+    "built_in": "4480x2520 Retina 4.5K, 60 Hz pacing observed",
+    "secondary": "1920x1080, 75 Hz; not the tested drawable"
+  },
+  "conditions": "AC-powered iMac; thermal sensors not sampled; user background apps left running; no concurrent build/tests during retained benchmark windows. Larger stress preparation overlapped a release rebuild, so its wall duration is diagnostic only."
+}

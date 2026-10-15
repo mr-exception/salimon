@@ -139,33 +139,50 @@ large-coordinate, extraction timing, and depletion checks. The native
 `scenarios/mining.json` follows the real surface walkthrough and tool inputs;
 its evidence variant adds screenshot checkpoints.
 
-## Physical extraction output (#45)
+## Spherical mining lifecycle (#230)
 
-`resource_fragments` owns bounded splitting and deterministic emergence near the deposit.
-Each source deposit's most recent piece grows to **2 kg**, then a new piece is
-created. A fractional piece exists immediately, including on the first positive
-simulation step; there is no pending output mass or general resource inventory.
-Piece IDs are monotonically allocated within the session. Growth preserves ID,
-source, material key, and pose, and derives the new solid volume from density.
-A completed-fill remainder at or below FILL_ROUNDING_REMAINDER_KG (1e-12 kg)
-is left unextracted in the source, avoiding a roundoff-only microscopic body.
-No unrepresented mass is debited or credited; initial small requests remain
-valid. Finished pieces are unchanged by later extraction. Picking up a growing piece
-must end its participation in the output tail when #46 adds carrying.
+`spherical_mining` owns the accepted portable lifecycle. `MiningConfig` defaults
+to **10 kg** capacity and **2 kg/s**, configurable per tool (finite cap/rate in
+[1e-6, 10,000], no upgrade UX). Runtime supplies held left mouse and the current
+valid aimed deposit; the domain receives no key, window, pose, GPU or energy.
+It admits at most one **16 ms** simulation tick per call. Runtime must drain its
+fixed-step clock backlog; the tool never banks elapsed work or loops to create
+unbounded output after a large delta.
 
-Pieces start with finite absolute poses and identity orientation; #148 physical contacts subsequently update their unit quaternion. They emerge near
-the source with enough height for a full-size piece. Side length is the cube
-root of solid volume multiplied by the shared gameplay scale. Runtime applies an ejection impulse, gravity, and
-fragment contacts while the world crate owns mass, identity, and provenance.
-Runtime maps the same authoritative pieces into distinct material silhouettes
-and nearby-entity inspection.
-The session retains pieces independently of deposit materialization and tool
-equipment; querying or re-rendering never emits additional pieces.
+| Input / boundary | Contract |
+| --- | --- |
+| Held + valid target | Reserve positive mass in one attached sphere; its source/material remain immutable. |
+| Mouse up | Release immediately before further extraction, even on a cap/depletion tick. |
+| Aim lost/obstructed/out of range | Release immediately. Reacquiring with continued hold starts a new sphere. |
+| Target switch | Release previous sphere without debiting the new deposit on that tick; start next tick if valid/held. Never merge materials. |
+| Capacity | Release automatically. Continued hold starts a fresh sphere next tick, without requiring another button edge. |
+| Deposit depleted | Release final smaller sphere, retaining every representable positive mass; no zero-mass object. |
+| Unequip/focus/cursor/view/lifecycle interruption | Explicit interrupt releases; no post-resume hidden growth. |
+| Zero duration | No growth; mouse-up/aim-loss/interrupt still release. Explicit pause interrupts rather than accumulating catch-up work. |
+| Player movement | Runtime updates attachment pose from current tool front-left every tick. Leaving valid aim/range releases at last valid pose. |
 
-Run `cargo test --locked -p salimon-world --test resource_fragments` for material
-identity, unique IDs, partial growth, conservation at different timesteps, zero
-output, large-step splitting, depletion, and requery behavior. The mining E2E
-route now checks piece mass/volume/pose and the complete depleted output.
+Debit only representable before/after deposit differences, bounded by rate,
+remaining capacity and source availability. Subtraction rounding never consumes
+more than requested. Rounding-only cap gaps (<=1e-12 kg) can seal a piece without
+debiting the gap. An unrepresentable debit consumes nothing. Conservation:
+removed deposit mass = sum of released mass + currently reserved attached mass
+(with f64 accounting tolerance, 1e-9 kg in regressions). No hidden pending mass,
+energy cost, abstract inventory or mass discarded for visual convenience.
+
+Radius is `cbrt(3 * mass / (4π * effectiveDensity))`, clamped to **0.005–2 m** for
+presentation/support only, never changing mass/solid volume. Material keys and
+source `DepositId` remain those of the deposit. A released physical fragment
+keeps its identity for movement, one-object carrying and mechanical Core intake;
+reacquiring aim never reconnects it. No disk save exists: generation IDs, session
+journal and depleted tombstones remain in-memory source of truth.
+
+Implementation sequencing: #230 introduces and tests these domain contracts;
+#231 wires session IDs, input and native fixed ticks. The existing `extract` /
+`extract_with_spawn` helpers remain a legacy bounded 2 kg output path for saved
+fixtures/benchmarks during migration; they are not the new continuous tool
+lifecycle. Rendering/contact replacement has separate spherical-mining follow-ups.
+Use `cargo test -p salimon-world --locked --test spherical_mining` for the new
+lifecycle; existing fragment/streaming tests protect retained legacy APIs.
 
 ## Carrying and equipment exclusivity (#131)
 
@@ -186,7 +203,7 @@ Solid volume is still `mass / density`; fragment gameplay side is
 `10 * cbrt(3 * initial solid volume / (4π))`. All authored variants keep the
 same vertices; fragments now measure half the previous linear dimensions at equal mass, including growing pieces and all six variants. Deposit dimensions are unchanged.
 This is a gameplay exaggeration, not a density change; mass labels, 2 kg/s yield,
-2 kg fragment cap and conservation remain unchanged.
+legacy 2 kg fragment helper cap and conservation remain unchanged. New spherical lifecycle sizing is defined above and does not use the cube exaggeration.
 
 Growing fragments scale with current mass; picking up seals growth. Deposits
 retain initial bounds and placement while partly mined, then disappear at zero
@@ -203,7 +220,7 @@ consume the enlarged deposit sphere. Carried centers stay horizontally ahead of 
 sphere radius plus the hand offset at every pitch, and clamp to ground support. Unsafe hull/furniture floor drops retain
 the carried identity. Loose fragments remain supported in ship-local metres.
 
-## Surface emission (#150)
+## Legacy facet emission (#150)
 
 `MiningSession::extract_with_spawn` invokes the caller only for a new FragmentId,
 passing its initial material and current ordered physical pieces. A validated

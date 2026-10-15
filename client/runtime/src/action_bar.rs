@@ -3,9 +3,11 @@
 use std::time::Duration;
 
 const TRANSIENT_DURATION: Duration = Duration::from_secs(3);
-const BASE_SCALE: f64 = 4.0;
-const MIN_SCALE: u32 = 4;
-const MAX_SCALE: u32 = 8;
+// Shared by world interaction prompts, flight guidance and transient feedback.
+// Integer bitmap scaling keeps all three readable without filtered glyph edges.
+const BASE_SCALE: f64 = 3.0;
+const MIN_SCALE: u32 = 3;
+const MAX_SCALE: u32 = 6;
 
 #[derive(Clone, Copy, Debug)]
 pub(crate) struct ActionBarImage<'a> {
@@ -243,15 +245,15 @@ mod tests {
         ));
         let first = bar.image(true).unwrap();
         let revision = first.revision;
-        assert_eq!(first.height, 88);
+        assert_eq!(first.height, 66);
         let text_pixels_on_row = |row: usize| {
             first.rgba8[row * first.width as usize * 4..(row + 1) * first.width as usize * 4]
                 .as_chunks::<4>()
                 .0
                 .contains(&[248, 250, 252, 255])
         };
-        assert!(text_pixels_on_row(12));
-        assert!(text_pixels_on_row(48));
+        assert!(text_pixels_on_row(9));
+        assert!(text_pixels_on_row(36));
         bar.set_contextual(Some(
             "Silicate rock - approx 9.5 kg left\nHold left mouse to mine".to_owned(),
         ));
@@ -302,5 +304,59 @@ mod tests {
         bar.set_contextual(Some("Close door before takeoff".to_owned()));
         assert!(bar.image(true).is_some());
         assert!(bar.image(false).is_none());
+    }
+
+    #[test]
+    fn smaller_prompt_typography_is_shared_and_tracks_bounded_dpi() {
+        for text in [
+            "Press L to land",
+            "Press E to use",
+            "Door locked while in flight",
+        ] {
+            let mut bar = ActionBar::default();
+            bar.set_contextual(Some(text.to_owned()));
+            let mut revision = bar.image(true).unwrap().revision;
+            // Integer raster densities for 1×, 1.5× and 2× UI scale.
+            for (dpi, scale) in [(1.0, 3), (1.5, 5), (2.0, 6)] {
+                bar.set_scale_factor(dpi);
+                let image = bar.image(true).unwrap();
+                assert_eq!(image.height, 13 * scale);
+                assert_eq!(image.width, (text.len() as u32 * 6 - 1 + 10) * scale);
+                assert_eq!(image.rgba8.len(), (image.width * image.height * 4) as usize);
+                let text_pixels = image
+                    .rgba8
+                    .as_chunks::<4>()
+                    .0
+                    .iter()
+                    .filter(|pixel| **pixel == [248, 250, 252, 255])
+                    .count();
+                assert!(text_pixels > 0);
+                assert_eq!(text_pixels % (scale * scale) as usize, 0);
+                assert!(image.revision >= revision);
+                revision = image.revision;
+                bar.set_scale_factor(dpi);
+                assert_eq!(bar.image(true).unwrap().revision, revision);
+            }
+            // Transient and contextual messages share the same typography.
+            let before = bar.image(true).unwrap().rgba8.to_vec();
+            bar.show_transient(text);
+            assert_eq!(bar.image(true).unwrap().rgba8, before);
+        }
+    }
+
+    #[test]
+    fn invalid_and_out_of_range_dpi_keep_prompts_readable_and_bounded() {
+        for (dpi, scale) in [
+            (f64::NAN, 3),
+            (f64::INFINITY, 3),
+            (-1.0, 3),
+            (0.0, 3),
+            (99.0, 6),
+        ] {
+            let mut bar = ActionBar::default();
+            bar.set_contextual(Some("Press E to use".to_owned()));
+            bar.set_scale_factor(dpi);
+            assert_eq!(bar.image(true).unwrap().height, 13 * scale);
+        }
     }
 }

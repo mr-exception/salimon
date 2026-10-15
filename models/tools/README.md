@@ -143,3 +143,22 @@ entry point for a temporary GLB. Its manifest must already pass schema and
 workspace identity checks through `resolve_manifest`; `validate_asset` is the
 public entry point that performs both stages. Export runs this before atomic
 replacement, so semantic failures preserve existing output.
+# Read-only scout quality diagnosis
+
+`python models/tools/diagnose_scout.py` prints actual GLB bounds, provenance
+hash checks, normals/degenerate-face findings and coplanar triangle-overlap
+candidates without Blender or asset mutations. It is an investigative probe for
+the baked scout profile, not a general validation gate. See the
+[#224 baseline](../../reports/issue-224/README.md) for tolerances, camera fixtures,
+confirmed geometry/material findings and unverified graphical symptoms.
+
+
+For supplemental ray visibility/occlusion, PNG memory estimates and explicit
+camera fixtures, use the separate read-only scout probe:
+
+```sh
+python models/tools/diagnose_scout_visibility.py --views reports/issue-224/visibility-views.json --output artifacts/scout-visibility.json
+```
+
+It retains the original baseline tool. See [visibility findings](../../reports/issue-224/VISIBILITY.md)
+for exposed vs buried overlap witnesses, render-order diagnosis and limitations.

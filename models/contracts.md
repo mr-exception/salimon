@@ -119,7 +119,7 @@ storage assembly are removed. The aft pressure door lowers into the boarding ram
 `client/renderer/src/ship_mesh.rs`; renaming them would change behavior. Do not
 wrap or rename the current hierarchy just to match `ASSET_<slug>`/`Visual`.
 The ship category adapter expresses this legacy hierarchy and the current
-20-collider/four-marker inventory as an explicit compatibility contract. Detailed migration
+28-collider/four-marker inventory as an explicit compatibility contract. Detailed migration
 evidence remains in #79 and #80; the current geometry revision updates the
 asset, spatial contracts and their runtime consumers together.
 

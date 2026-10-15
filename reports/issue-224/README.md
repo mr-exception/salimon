@@ -144,3 +144,14 @@ Linux x86_64, Python 3.12.14. Model dependencies: pinned jsonschema 4.26.0.
 - No source/export regeneration, live GPU captures or Apple M1 tests were run.
   Reported flicker/proportion symptoms remain unconfirmed visually; this is the
   explicit unavailable-environment result allowed by #224, not a visual signoff.
+
+
+## Supplemental visibility and render-order investigation
+
+See [VISIBILITY.md](VISIBILITY.md) for additional named face witnesses, center-ray
+occlusion controls, eight explicit camera poses and the independently identified
+resource-after-glass scheduling defect. The supplemental read-only probe is
+`models/tools/diagnose_scout_visibility.py`; its evidence is in
+[visibility-baseline.json](visibility-baseline.json) and
+[visibility-views.json](visibility-views.json). The original probe, tests and
+baseline remain intact. Combined model-suite results: [model-tests.log](model-tests.log).

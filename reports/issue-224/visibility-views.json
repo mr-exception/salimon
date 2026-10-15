@@ -1,0 +1,247 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Diagnostic camera fixtures for #228; not salimon-test runner scenarios",
+  "frame": "runtime ship-local meters; +X forward, +Y up, +Z port",
+  "worldMapping": "worldEye = shipOrigin + shipOrientation * eyeMeters; same for target and up direction",
+  "shipOriginMeters": [
+    0,
+    0,
+    0
+  ],
+  "shipOrientationXyzw": [
+    0,
+    0,
+    0,
+    1
+  ],
+  "projection": {
+    "verticalFovDegrees": 60,
+    "nearMeters": 0.05,
+    "width": 1280,
+    "height": 800
+  },
+  "temporalProtocol": {
+    "staticFrames": 60,
+    "movingFrames": 120,
+    "eyeTranslationMeters": [
+      0.02,
+      0,
+      0.02
+    ],
+    "motion": "linear from eyeMeters to eyeMeters + eyeTranslationMeters; target fixed",
+    "freeze": "ship pose, door fraction, lights, Core/display values and simulation",
+    "repeatAtWorldOriginsMeters": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        149597870700,
+        0,
+        0
+      ]
+    ],
+    "notes": "Use f64 world pose composition and camera rebasing. Compare masks only after #228 defines raster/animation tolerance. No GPU captures exist in this baseline. Center-ray baseline always uses CLOSED asset geometry, including the open-ramp visual fixture; no ramp animation is applied by this probe."
+  },
+  "views": [
+    {
+      "id": "threshold-coplanar",
+      "eyeMeters": [
+        -7.34,
+        1.24731183,
+        -0.55000012
+      ],
+      "targetMeters": [
+        -7.34,
+        0.24731183,
+        -0.55000012
+      ],
+      "up": [
+        0,
+        0,
+        1
+      ],
+      "doorOpenFraction": 0,
+      "objects": [
+        "Deck_Walkable",
+        "Door_Threshold"
+      ],
+      "goal": "Different-material exposed coplanar top faces; inspect during subpixel camera motion"
+    },
+    {
+      "id": "starboard-shell",
+      "eyeMeters": [
+        -7.51999998,
+        0.59139785,
+        -5.5999999
+      ],
+      "targetMeters": [
+        -7.51999998,
+        0.59139785,
+        -4.5999999
+      ],
+      "up": [
+        0,
+        1,
+        0
+      ],
+      "doorOpenFraction": 0,
+      "objects": [
+        "Aft_Bulkhead_Starboard",
+        "Hull_Starboard_Side"
+      ],
+      "goal": "Occlusion control: center ray hits the outer shell 0.5 m before the candidate. Do not treat buried contact as visible flicker."
+    },
+    {
+      "id": "console-edge",
+      "eyeMeters": [
+        4.44188247,
+        0.85766882,
+        -2.04999995
+      ],
+      "targetMeters": [
+        4.44188247,
+        0.85766882,
+        -1.04999995
+      ],
+      "up": [
+        0,
+        1,
+        0
+      ],
+      "doorOpenFraction": 0,
+      "objects": [
+        "Cockpit_Monitor_Bezels",
+        "Cockpit_Monitor_Housings"
+      ],
+      "goal": "Exposed bezel/housing side overlap; keep monitor UVs unchanged"
+    },
+    {
+      "id": "lower-glazing",
+      "eyeMeters": [
+        6.55844799,
+        1.24731183,
+        -1.10043994
+      ],
+      "targetMeters": [
+        6.55844799,
+        0.24731183,
+        -1.10043994
+      ],
+      "up": [
+        0,
+        0,
+        1
+      ],
+      "doorOpenFraction": 0,
+      "objects": [
+        "Cockpit_Lower_Glazing",
+        "Cockpit_Window_Frame"
+      ],
+      "goal": "Opaque/glass contact; separate from two-opaque z-fighting"
+    },
+    {
+      "id": "floor-material",
+      "eyeMeters": [
+        0.5,
+        1.99731183,
+        -3
+      ],
+      "targetMeters": [
+        0.5,
+        0.24731183,
+        -3
+      ],
+      "up": [
+        0,
+        0,
+        1
+      ],
+      "doorOpenFraction": 0,
+      "objects": [
+        "Deck_Walkable"
+      ],
+      "goal": "Floor Grip exported texture absent from ship shader"
+    },
+    {
+      "id": "glass-layering",
+      "eyeMeters": [
+        12,
+        2,
+        6
+      ],
+      "targetMeters": [
+        0,
+        1.4,
+        -6
+      ],
+      "up": [
+        0,
+        1,
+        0
+      ],
+      "doorOpenFraction": 0,
+      "objects": [
+        "Cockpit_Glazing",
+        "Cabin_Port_Glazing",
+        "Cabin_Starboard_Glazing"
+      ],
+      "goal": "Inspect visible transparent layers; fixed GLB order is not view sorted"
+    },
+    {
+      "id": "resource-through-glass",
+      "eyeMeters": [
+        6.6,
+        1.8,
+        0
+      ],
+      "targetMeters": [
+        9.5,
+        1.8,
+        0
+      ],
+      "up": [
+        0,
+        1,
+        0
+      ],
+      "doorOpenFraction": 0,
+      "resourceCenterMeters": [
+        9.5,
+        1.8,
+        0
+      ],
+      "resourceRadiusMeters": 0.25,
+      "objects": [
+        "Cockpit_Glazing"
+      ],
+      "goal": "Resource behind glass overwrites tint because resource pass follows glass; render once with resource and once with an equivalent early opaque cuboid"
+    },
+    {
+      "id": "ramp-landing-envelope",
+      "eyeMeters": [
+        -17,
+        4,
+        -14
+      ],
+      "targetMeters": [
+        -5,
+        0,
+        0
+      ],
+      "up": [
+        0,
+        1,
+        0
+      ],
+      "doorOpenFraction": 1,
+      "objects": [
+        "Exit_Door",
+        "Exit_Ramp_Tip",
+        "Landing_Gear_Aft_Starboard"
+      ],
+      "goal": "Full ramp reaches foot plane; compare to closed fraction 0 without rescaling"
+    }
+  ]
+}

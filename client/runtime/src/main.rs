@@ -13,6 +13,7 @@ mod flight_regression;
 mod fragment_physics;
 mod frame_clock;
 mod mining;
+#[cfg(test)]
 mod mining_emission;
 mod resource_context;
 mod resource_presentation;

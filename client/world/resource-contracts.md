@@ -267,3 +267,29 @@ and a positive finite rate. Zero yield consumes immediately. Generated joules
 settle with ordinary discharge before capacity clipping; excess is wasted and
 full batteries keep processing to completion. Updates split at process completion
 so later idle time is not incorrectly charged by an already finished fragment.
+
+## Continuous session integration (#231)
+
+Native/automation left mouse now uses `MiningSession::tick_spherical`, retaining
+the same generation journal, physical mutation stream and diagnostic extracted
+mass. It allocates one stable identity at first positive reservation; that entry
+is attached, excluded from loose physics and unavailable for pickup until
+release. Releasing does not duplicate/reallocate it. Legacy emission cannot
+reconnect its sealed identity. Fresh/stale deposit copies reconcile before every
+tick. Focus/pause/equipment/mouse-up releases synchronously; zero-time camera
+updates also detect aim loss/target switching, so away/back between ticks cannot
+reconnect an old sphere. A fresh hold starts another identity.
+
+The current front-left attachment is eye + 0.85 forward - 0.15 camera-right -
+0.20 orthonormal-up meters, recomputed in f64. Loss of aim releases at the last
+valid pose. Reserved mass already appears in session `fragments()` and total
+physical/extracted telemetry; automation distinguishes `attached_to_tool`,
+`attached_fragment_id`, `reserved_mass_kg` and `capacity_kg`. Stable
+`world.fragments_by_id` inspection avoids nearby-list index changes when other
+pieces stream out. Loose physics starts
+only after release, with its ordinary zero-motion initialization. Plausible
+drop clearance/velocity, shared sphere rendering/radius contacts and final
+carry/Core geometry migration remain #232–#234. Current interim visuals and
+loose contacts still use the checked-in shard/chunk assets and size policy.
+The old extraction helpers remain for deterministic fixtures/benchmarks; the
+interactive tool does not call them. No disk save format exists to migrate.

@@ -20,6 +20,32 @@ pub(crate) struct FragmentOutput {
 }
 
 impl FragmentOutput {
+    /// Attached spherical output uses the same ID/journal storage, but is sealed
+    /// against legacy extraction-tail growth immediately.
+    pub(crate) fn upsert_sphere(
+        &mut self,
+        id: Option<FragmentId>,
+        sphere: crate::spherical_mining::GrowingSphere,
+        pose: ResourceTransform,
+    ) -> FragmentId {
+        let id = id.unwrap_or_else(|| {
+            self.next_id = self
+                .next_id
+                .checked_add(1)
+                .expect("session fragment ID space exhausted");
+            FragmentId(self.next_id)
+        });
+        let piece = ResourceFragment::new(id, sphere.source, sphere.material, pose);
+        if let Some(existing) = self.get_mut(id) {
+            *existing = piece;
+        } else {
+            self.fragments.push(piece);
+        }
+        self.sealed.insert(id);
+        self.record(piece);
+        id
+    }
+
     pub(crate) fn fragments(&self) -> &[ResourceFragment] {
         &self.fragments
     }

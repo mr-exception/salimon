@@ -306,7 +306,7 @@
     {
       "assert": {
         "path": "world.fragment_count",
-        "gt": 1
+        "equals": 1
       }
     },
     {
@@ -627,7 +627,8 @@
     {
       "assert": {
         "path": "world.deposits_by_id.Earth:15205157563045847595.remaining_mass_kg",
-        "equals": 14.085051244864971
+        "approx": 14.085051244864971,
+        "tolerance": 1e-09
       }
     }
   ]

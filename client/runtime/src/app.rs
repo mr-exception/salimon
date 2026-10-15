@@ -583,6 +583,25 @@ impl ClientApplication {
         }
     }
 
+    /// Aim transitions release immediately, including away/back between two ticks.
+    pub(crate) fn apply_look_delta(&mut self, dx: f64, dy: f64) {
+        self.character.apply_mouse_delta(dx, dy);
+        if self.view_mode == ViewMode::Gameplay {
+            let ship = self.ship.snapshot();
+            let frame = character_ship_frame(ship.pose);
+            let player = self.character.snapshot(frame, self.terrain_frame(ship));
+            let seed = self.world_seed();
+            self.mining.advance(
+                &self.equipment,
+                Duration::ZERO,
+                player,
+                frame,
+                door_passable(ship),
+                seed,
+            );
+        }
+    }
+
     /// Shared native/automation left-button route; only equipment enables mining.
     pub(crate) fn mining_mouse_input(&mut self, pressed: bool) {
         self.mining.set_mouse_held(
@@ -660,6 +679,7 @@ impl ClientApplication {
 
     fn reset_update_clock(&mut self) {
         self.update_clock.reset();
+        self.mining.clear_input();
         self.ship.clear_throttle_input();
         self.mining.fragment_previous.clear();
     }
@@ -1136,7 +1156,7 @@ impl ApplicationHandler for ClientApplication {
             && self.cursor_captured
             && let DeviceEvent::MouseMotion { delta } = event
         {
-            self.character.apply_mouse_delta(delta.0, delta.1);
+            self.apply_look_delta(delta.0, delta.1);
             if let Some(window) = self.window.as_ref() {
                 window.request_redraw();
             }

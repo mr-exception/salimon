@@ -136,10 +136,12 @@
   enlarged bounds never substitute for density-derived solid material volume.
   See [resource size contract](../world/resource-contracts.md#gameplay-size-policy-144).
 
-- Mining emission starts on an exposed authored deposit facet, reserving full
-  growth support plus 5 mm and checking ground/player/existing pieces. There
-  are no rows/grids. Only successful new-identity allocation installs an impulse;
-  existing/growing/streamed objects are never implicitly re-ejected.
+- Continuous mining reserves at most one attached identity, default cap 10 kg,
+  and releases on input/aim/cap/depletion/interruption. Attached entries follow
+  tool front-left and are excluded from loose physics/pickup. Released entries
+  retain ID/mass/source; continued hold creates a new identity next tick.
+  Legacy facet-emission helpers remain only for old fixtures/benchmarks.
+  Sphere visuals/contact/drop geometry are separate #232–#234 follow-ups.
 
 - Benchmark populations are opt-in initial conditions from production extraction;
   subsequent updates, carrying and support queries retain production behavior.

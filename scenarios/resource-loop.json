@@ -948,7 +948,7 @@
     {
       "assert": {
         "path": "world.fragment_count",
-        "equals": 19
+        "equals": 5
       }
     },
     {
@@ -961,13 +961,14 @@
     {
       "assert": {
         "path": "world.fragments.0.mass_kg",
-        "equals": 2
+        "approx": 1.92,
+        "tolerance": 1e-09
       }
     },
     {
       "assert": {
-        "path": "world.fragments.18.mass_kg",
-        "approx": 0.40896041381627,
+        "path": "world.fragments.4.mass_kg",
+        "approx": 4.48896041381627,
         "tolerance": 1e-08
       }
     },
@@ -1080,7 +1081,7 @@
     {
       "assert": {
         "path": "world.fragment_count",
-        "equals": 19
+        "equals": 5
       }
     },
     {
@@ -1147,7 +1148,7 @@
     {
       "assert": {
         "path": "world.fragment_count",
-        "equals": 19
+        "equals": 5
       }
     },
     {
@@ -1198,7 +1199,7 @@
     {
       "assert": {
         "path": "world.fragment_count",
-        "equals": 19
+        "equals": 5
       }
     },
     {
@@ -1284,19 +1285,19 @@
     {
       "action": {
         "op": "aim_fragment",
-        "fragment_id": 1
+        "fragment_id": 4
       }
     },
     {
       "assert": {
         "path": "carrying.target_id",
-        "equals": 1
+        "equals": 4
       }
     },
     {
       "assert": {
         "path": "resource_ui.context",
-        "equals": "Silicate rock fragment - approx 2.00 kg\nF to pick up fragment"
+        "equals": "Silicate rock fragment - approx 10.00 kg\nF to pick up fragment"
       }
     },
     {
@@ -1316,7 +1317,7 @@
     {
       "assert": {
         "path": "carrying.object_id",
-        "equals": 1
+        "equals": 4
       }
     },
     {
@@ -1445,7 +1446,7 @@
     },
     {
       "assert": {
-        "path": "world.fragments.0.carried",
+        "path": "world.fragments_by_id.4.carried",
         "equals": true
       }
     },
@@ -1543,7 +1544,7 @@
     {
       "assert": {
         "path": "carrying.object_id",
-        "equals": 1
+        "equals": 4
       }
     },
     {
@@ -1651,26 +1652,26 @@
     },
     {
       "assert": {
-        "path": "world.fragments.0.reference_frame",
+        "path": "world.fragments_by_id.4.reference_frame",
         "equals": "ship"
       }
     },
     {
       "assert": {
-        "path": "world.fragments.0.id",
-        "equals": 1
+        "path": "world.fragments_by_id.4.id",
+        "equals": 4
       }
     },
     {
       "assert": {
-        "path": "world.fragments.0.carried",
+        "path": "world.fragments_by_id.4.carried",
         "equals": false
       }
     },
     {
       "assert": {
         "path": "world.fragment_count",
-        "equals": 19
+        "equals": 5
       }
     }
   ]

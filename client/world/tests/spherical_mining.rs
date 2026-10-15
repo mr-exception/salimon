@@ -129,3 +129,79 @@ fn bounded_work_tiny_mass_radius_and_validated_tool_upgrades() {
     assert!(result.released.is_some());
     assert!(mining.attached().is_none());
 }
+
+#[test]
+fn session_identity_reserved_mass_streaming_and_rapid_transitions() {
+    use salimon_world::mining::MiningSession;
+    use salimon_world::resources::ResourceTransform;
+    let pose =
+        ResourceTransform::new(WorldPosition::new(1.0, 2.0, 3.0), [0.0, 0.0, 0.0, 1.0]).unwrap();
+    let moved =
+        ResourceTransform::new(WorldPosition::new(2.0, 3.0, 4.0), [0.0, 0.0, 0.0, 1.0]).unwrap();
+    let mut source = deposit(9, 23.5);
+    let stale = source;
+    let mut session = MiningSession::default();
+    session.tick_spherical(
+        true,
+        Some(&mut source),
+        SPHERE_TICK,
+        MiningConfig::default(),
+        pose,
+    );
+    let id = session.attached_sphere_id().unwrap();
+    assert!(!session.pick_up(id));
+    assert!(!session.move_loose(id, moved));
+    session.tick_spherical(
+        true,
+        Some(&mut source),
+        SPHERE_TICK,
+        MiningConfig::default(),
+        moved,
+    );
+    assert_eq!(session.fragments()[0].transform(), moved);
+    assert_eq!(session.attached_sphere_id(), Some(id));
+    assert_eq!(session.interrupt_spherical(), Some(id));
+    assert_eq!(session.interrupt_spherical(), None);
+    assert!(session.pick_up(id));
+    session.drop_carried(moved);
+    let sealed_mass = session.fragments()[0].material().mass_kg();
+    let mut restored = stale;
+    for _ in 0..1000 {
+        session.tick_spherical(
+            true,
+            Some(&mut restored),
+            SPHERE_TICK,
+            MiningConfig::default(),
+            pose,
+        );
+        let total = session
+            .fragments()
+            .iter()
+            .map(|p| p.material().mass_kg())
+            .sum::<f64>();
+        assert!((total - session.extracted_mass_kg()).abs() < 1e-9);
+        assert!((total + restored.remaining_mass_kg() - 23.5).abs() < 1e-9);
+    }
+    assert_eq!(restored.remaining_mass_kg(), 0.0);
+    assert_eq!(session.fragments()[0].id(), id);
+    assert_eq!(session.fragments()[0].material().mass_kg(), sealed_mass);
+    assert_eq!(session.fragments().len(), 4);
+    assert!(
+        session
+            .fragments()
+            .iter()
+            .all(|p| p.material().mass_kg() <= 10.0)
+    );
+    assert!(
+        session
+            .fragments()
+            .windows(2)
+            .all(|p| p[0].id().0 < p[1].id().0)
+    );
+    // Press/release without a simulation tick cannot consume material or allocate.
+    let count = session.fragments().len();
+    for _ in 0..10 {
+        session.interrupt_spherical();
+    }
+    assert_eq!(session.fragments().len(), count);
+}

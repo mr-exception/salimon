@@ -1,6 +1,9 @@
 //! Portable aimed extraction. Runtime supplies proximity candidates and obstruction distance.
 use std::time::Duration;
 
+#[path = "sphere_session.rs"]
+mod sphere_session;
+
 use crate::resource_generation::SurfaceDeposit;
 use crate::resources::{DepositId, DepositState, ResourceDeposit, ResourceFragment};
 use crate::{BodyRole, CELESTIAL_BODIES, WorldPosition};
@@ -108,6 +111,8 @@ pub fn extract(deposit: &mut ResourceDeposit, delta: Duration) -> f64 {
 #[derive(Default)]
 pub struct MiningSession {
     carry: crate::carrying::CarrySlot,
+    spherical: crate::spherical_mining::SphericalMining,
+    attached_sphere_id: Option<crate::resources::FragmentId>,
     remaining: std::collections::HashMap<DepositId, f64>,
     extracted_mass_kg: f64,
     fragments: crate::resource_fragments::FragmentOutput,
@@ -173,7 +178,8 @@ impl MiningSession {
     }
 
     pub fn pick_up(&mut self, id: crate::resources::FragmentId) -> bool {
-        if !self.fragments().iter().any(|piece| piece.id() == id)
+        if self.attached_sphere_id == Some(id)
+            || !self.fragments().iter().any(|piece| piece.id() == id)
             || !self
                 .carry
                 .pick_up(crate::carrying::WorldObjectId::ResourceFragment(id))
@@ -215,7 +221,7 @@ impl MiningSession {
         id: crate::resources::FragmentId,
         pose: crate::resources::ResourceTransform,
     ) -> bool {
-        if self.carried_id() == Some(id) {
+        if self.carried_id() == Some(id) || self.attached_sphere_id == Some(id) {
             return false;
         }
         let Some(piece) = self.fragments.get_mut(id) else {
@@ -238,6 +244,9 @@ impl MiningSession {
     pub fn remove_fragment(&mut self, id: crate::resources::FragmentId) -> bool {
         if self.carried_id() == Some(id) {
             self.carry.release();
+        }
+        if self.attached_sphere_id == Some(id) {
+            self.interrupt_spherical();
         }
         self.fragments.remove(id)
     }

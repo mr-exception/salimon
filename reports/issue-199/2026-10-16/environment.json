@@ -1,0 +1,24 @@
+{
+  "local_date": "2026-10-16",
+  "timezone": "Asia/Nicosia",
+  "revision": "875f65ca2eadc65b93a4769822b84b02608044aa",
+  "working_tree_clean_at_build": true,
+  "machine": "iMac21,1",
+  "chip": "Apple M1",
+  "cpu_cores": 8,
+  "gpu_cores": 8,
+  "ram_gib": 16,
+  "macos": "26.2 (25C56)",
+  "rust": "rustc 1.89.0 (29483883e 2025-08-04)",
+  "python": "Python 3.14.2",
+  "adapter": "Apple M1",
+  "backend": "Metal",
+  "gpu_timestamps": true,
+  "drawable_pixels": [
+    1920,
+    1080
+  ],
+  "retina_scale": 2,
+  "screenshots": "Direct GPU color-surface capture; no OS desktop content",
+  "clock": "E2E input/correctness: 16 ms fixed updates. Benchmarks: native monotonic wall-clock updates and actual submitted/presented-frame intervals."
+}

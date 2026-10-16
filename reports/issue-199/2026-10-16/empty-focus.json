@@ -1,0 +1,18 @@
+[
+  {
+    "pid": 25401,
+    "command": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/SalimonNative.app/Contents/MacOS/salimon-client --benchmark --count 0 --layout onboard --state settled --camera facing --mode native --seed 155 --warmup-seconds 10 --sample-seconds 30 --minimum-samples 100 --settle-steps 2400 --repeats 3",
+    "stdout": "frontmost=25401 target=25401\nposted PID=25401 operation=focus\n",
+    "stderr": "",
+    "returncode": 0,
+    "monotonic": 50653.577053
+  },
+  {
+    "pid": 26123,
+    "command": "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/SalimonNative.app/Contents/MacOS/salimon-client --benchmark --count 500 --layout onboard --state settled --camera facing --mode native --seed 155 --warmup-seconds 10 --sample-seconds 30 --minimum-samples 100 --settle-steps 2400 --repeats 3",
+    "stdout": "",
+    "stderr": "target window bounds unavailable\n",
+    "returncode": 1,
+    "monotonic": 50774.121066791
+  }
+]

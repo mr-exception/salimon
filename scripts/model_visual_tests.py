@@ -53,6 +53,10 @@ def evaluate(captures, baselines, output, fixture, temporal_only=False):
     if not frames:
         raise ValueError('no captured frames')
     options = fixture.get('tolerances', {})
+    if not temporal_only:
+        missing = {p.name for p in Path(baselines).glob('*.png')} - {p.name for p in frames}
+        if missing:
+            raise ValueError(f'missing captured frames: {sorted(missing)}')
     for frame in ([] if temporal_only else frames):
         baseline = Path(baselines) / frame.name
         if not baseline.is_file():
@@ -67,6 +71,8 @@ def evaluate(captures, baselines, output, fixture, temporal_only=False):
         for frame in group[1:]:
             result = compare(group[0], frame, Path(output)/('temporal-'+frame.stem), **options)
             results.append(dict(frame=frame.name, kind='temporal', **result))
+    if temporal_only and not results:
+        raise ValueError('no repeated frames for temporal comparison')
     summary = dict(passed=all(r['passed'] for r in results), results=results)
     Path(output).mkdir(parents=True, exist_ok=True)
     (Path(output)/'summary.json').write_text(json.dumps(summary, indent=2)+'\n')
@@ -91,6 +97,8 @@ def capture(fixture, binary, output):
     result = run(expanded, [str(Path(binary).resolve())], output/'runs', ['native'])
     if result['status'] != 'passed':
         raise ValueError(f"production capture failed: {result.get('error', result)}")
+    for previous in output.glob('*.png'):
+        previous.unlink()
     for step in result['steps']:
         shot = step.get('screenshot')
         if shot:

@@ -42,3 +42,18 @@ class VisualTests(unittest.TestCase):
             (root/'baseline/0.png').unlink()
             with self.assertRaisesRegex(ValueError, 'unapproved'):
                 evaluate(root/'capture', root/'baseline', root/'missing', {'mode': 'moving'})
+
+    def test_missing_capture_size_mismatch_and_single_frame_cannot_pass(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root/'baseline').mkdir()
+            (root/'capture').mkdir()
+            Image.new('RGB', (8, 8)).save(root/'baseline/0.png')
+            Image.new('RGB', (8, 8)).save(root/'baseline/1.png')
+            Image.new('RGB', (9, 8)).save(root/'capture/0.png')
+            with self.assertRaisesRegex(ValueError, 'dimensions'):
+                compare(root/'baseline/0.png', root/'capture/0.png', root/'diff')
+            with self.assertRaisesRegex(ValueError, 'missing captured'):
+                evaluate(root/'capture', root/'baseline', root/'diff', {'mode': 'moving'})
+            with self.assertRaisesRegex(ValueError, 'no repeated'):
+                evaluate(root/'capture', root/'baseline', root/'diff', {'mode': 'moving'}, True)

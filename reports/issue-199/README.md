@@ -1,5 +1,10 @@
 # Issue 199 — native Apple M1 Core, zero-G and 500-fragment smoke
 
+Latest: [2026-10-16 native smoke completion](2026-10-16/README.md) adds
+successful native OS zero-G/Core checks, current resource/loaded routes and a
+same-device old/current comparison. Performance limits remain explicitly tracked
+in #254/#255. The dated 2026-10-15 evidence below retains its original limits.
+
 Executed locally on the owner's Apple M1 iMac, 16 GB RAM, macOS 26.2,
 2026-10-15 (Asia/Nicosia). Real Metal / Apple M1 integrated GPU, timestamp
 queries enabled, 1920×1080 physical drawable at Retina scale 2, AutoVsync,

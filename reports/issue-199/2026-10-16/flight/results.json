@@ -1,0 +1,38 @@
+[
+  {
+    "scenario": "scenarios/evidence/core-restart.json",
+    "status": "passed",
+    "steps_completed": 20,
+    "duration_ms": 745,
+    "error": null,
+    "assertions": 15,
+    "captures": 1
+  },
+  {
+    "scenario": "scenarios/evidence/cargo-blackout.json",
+    "status": "passed",
+    "steps_completed": 39,
+    "duration_ms": 4869,
+    "error": null,
+    "assertions": 23,
+    "captures": 4
+  },
+  {
+    "scenario": "scenarios/evidence/moving-eva.json",
+    "status": "passed",
+    "steps_completed": 109,
+    "duration_ms": 3243,
+    "error": null,
+    "assertions": 44,
+    "captures": 3
+  },
+  {
+    "scenario": "scenarios/evidence/cargo-flight.json",
+    "status": "passed",
+    "steps_completed": 7,
+    "duration_ms": 697,
+    "error": null,
+    "assertions": 5,
+    "captures": 1
+  }
+]

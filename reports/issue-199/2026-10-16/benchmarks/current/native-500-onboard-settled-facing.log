@@ -1,0 +1,6 @@
+[2026-10-16T05:48:27Z INFO  salimon_client] starting Salimon native client
+fixture settled naturally after 46 steps (0.736 simulation seconds, 0.714 wall seconds)
+[2026-10-16T05:48:28Z INFO  salimon_client::app] native window created: physical_size=1920x1080 scale_factor=2.00
+[2026-10-16T05:48:28Z INFO  salimon_client::app] renderer ready: adapter="Apple M1" backend=Metal device_type=IntegratedGpu gpu_timestamps=true
+[2026-10-16T05:48:28Z INFO  salimon_client::app] application resumed
+[2026-10-16T05:50:28Z INFO  salimon_client::app] application exiting cleanly

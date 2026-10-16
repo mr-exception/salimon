@@ -303,7 +303,8 @@ jobs:
 
   dashboard:
     needs: reports
-    if: vars.CI_DASHBOARD_PAGES == 'true'
+    # Override inherited skips from the inactive nightly/weekly lanes.
+    if: always() && !cancelled() && needs.reports.result == 'success' && vars.CI_DASHBOARD_PAGES == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:

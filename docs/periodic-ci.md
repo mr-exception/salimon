@@ -74,6 +74,12 @@ No repository settings are changed by this PR. A maintainer enables hosting once
    non-skipped scheduled run. The `dashboard` job publishes the generated artifact
    through the `github-pages` environment and exposes the deployment URL.
 
+If the workflow succeeds but the site returns 404, check the `dashboard` job.
+It must finish successfully; a skipped job has not deployed the site. Confirm the
+opt-in is a repository **variable**, not a secret, with value exactly `true`.
+The deployment condition explicitly permits skipped inactive suite lanes while
+requiring successful report generation and a non-cancelled run.
+
 With the repository's normal project Pages address, the dashboard will be at
 `https://mr-exception.github.io/salimon/`. Use the actual deployment URL if a
 custom Pages domain/source is already configured. This deployment owns that

@@ -171,6 +171,27 @@ impl MiningTool {
         );
     }
 
+    /// Presentation of reserved mass, not an additional physical entity. Recompute
+    /// from this frame's camera so looking without a simulation tick never lags.
+    pub(crate) fn growth_preview(
+        &self,
+        equipment: &crate::equipment::EquipmentToolbar,
+        player: CharacterSnapshot,
+    ) -> Option<salimon_renderer::ResourceMeshInstance> {
+        if player.location != CharacterLocation::Surface || !equipment.mining_equipped() {
+            return None;
+        }
+        let id = self.session.attached_sphere_id()?;
+        let mut fragment = self
+            .session
+            .fragments()
+            .iter()
+            .find(|p| p.id() == id)
+            .copied()?;
+        fragment.set_transform(preview_pose(player)?);
+        Some(crate::resource_presentation::fragment_mesh(fragment))
+    }
+
     /// Equip/location gates and active feedback for the authored visual.
     /// The caller supplies gameplay visibility and the existing target result.
     pub(crate) fn held_item(
@@ -187,11 +208,21 @@ impl MiningTool {
     }
 }
 
-/// Current camera/tool front-left in absolute f64 meters. Renderer grip is
-/// camera-right 0.20, down 0.20, forward 0.55; this point is left of its muzzle.
+// Retain the pre-#232 physical orientation until spherical contacts/release
+// integration (#233/#234); presentation must not rotate legacy contact hulls.
 fn attachment_pose(
     player: CharacterSnapshot,
 ) -> Option<salimon_world::resources::ResourceTransform> {
+    salimon_world::resources::ResourceTransform::new(
+        preview_pose(player)?.position(),
+        [0.0, 0.0, 0.0, 1.0],
+    )
+    .ok()
+}
+
+/// Current camera/tool front-left in absolute f64 meters. Renderer grip is
+/// camera-right 0.20, down 0.20, forward 0.55; this point is left of its muzzle.
+fn preview_pose(player: CharacterSnapshot) -> Option<salimon_world::resources::ResourceTransform> {
     use salimon_math::{cross, length, sub};
     let direction = sub(player.look_target_meters, player.eye_position_meters);
     let magnitude = length(direction);
@@ -209,7 +240,11 @@ fn attachment_pose(
     let point = std::array::from_fn(|i| {
         player.eye_position_meters[i] + forward[i] * 0.85 - right[i] * 0.15 - up[i] * 0.20
     });
-    salimon_world::resources::ResourceTransform::new(position(point), [0.0, 0.0, 0.0, 1.0]).ok()
+    salimon_world::resources::ResourceTransform::new(
+        position(point),
+        salimon_physics::orientation_from_axes([forward, up, right]),
+    )
+    .ok()
 }
 
 fn position(p: [f64; 3]) -> WorldPosition {
@@ -322,6 +357,26 @@ mod spherical_tests {
             pose,
         );
         let id = tool.session.attached_sphere_id().unwrap();
+        let mut equipment = crate::equipment::EquipmentToolbar::default();
+        assert!(tool.growth_preview(&equipment, player()).is_none());
+        equipment.select(crate::equipment::ToolbarSlot::One, false);
+        let preview = tool.growth_preview(&equipment, player()).unwrap();
+        assert_eq!(preview.mesh, salimon_renderer::ResourceMesh::Sphere);
+        let mut rotated = player();
+        rotated.look_target_meters = [0.0, 2.0, 1.0];
+        let turned = tool.growth_preview(&equipment, rotated).unwrap();
+        assert_eq!(turned.center_meters, [0.15, 1.8, 0.85]);
+        assert_eq!(turned.side_meters, preview.side_meters);
+        assert_ne!(turned.orientation_xyzw, preview.orientation_xyzw);
+        assert_eq!(
+            tool.session.fragments().len(),
+            1,
+            "preview must not duplicate reserved mass"
+        );
+        let mut hidden = player();
+        hidden.location = CharacterLocation::Cockpit;
+        assert!(tool.growth_preview(&equipment, hidden).is_none());
+
         let frame = ShipFrame {
             origin_meters: [0.0; 3],
             axes: [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
@@ -330,12 +385,45 @@ mod spherical_tests {
         assert!(!tool.session.pick_up(id));
         tool.set_mouse_held(false);
         assert_eq!(tool.session.attached_sphere_id(), None);
+        assert!(tool.growth_preview(&equipment, player()).is_none());
         assert_eq!(
             crate::fragment_physics::snapshots(&tool, frame, [0.0; 3]).len(),
             1
         );
         assert_eq!(tool.session.fragments()[0].id(), id);
         assert!(tool.session.pick_up(id));
+    }
+
+    #[test]
+    fn default_cap_preview_stays_clear_of_aim_ray_for_every_resource() {
+        for resource in [
+            ResourceId::WaterIce,
+            ResourceId::SilicateRock,
+            ResourceId::IronOre,
+        ] {
+            let radius = salimon_world::spherical_mining::GrowingSphere {
+                source: DepositId {
+                    body: salimon_world::CelestialBodyId::Earth,
+                    local: 0,
+                },
+                material: RawMaterial::new(
+                    resource,
+                    salimon_world::spherical_mining::DEFAULT_SPHERE_CAP_KG,
+                )
+                .unwrap(),
+            }
+            .radius_meters();
+            let center = attachment_pose(player()).unwrap().position().meters();
+            let distance_from_aim = (center[1] - 2.0).hypot(center[2]);
+            assert!(
+                distance_from_aim > radius + 0.03,
+                "sphere must leave the crosshair clear"
+            );
+            assert!(
+                center[0] - radius > 0.1,
+                "sphere must stay ahead of near plane/player"
+            );
+        }
     }
 
     #[test]

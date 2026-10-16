@@ -94,7 +94,7 @@ pub(crate) fn interpolated_mesh(
             previous.surface,
             Surface::Floor { .. } | Surface::UnpoweredFloor { .. }
         ) != local.is_some()
-        || previous.side_meters != mesh.side_meters
+        || previous.side_meters != salimon_world::resource_fragments::side_meters(fragment)
         || previous.mass_kg != fragment.material().mass_kg()
     {
         return mesh;
@@ -398,7 +398,7 @@ pub(crate) fn fragment_hull(
                 ))
             })
         });
-    HULLS[crate::resource_presentation::fragment_mesh(fragment).mesh as usize].clone()
+    HULLS[crate::resource_presentation::legacy_fragment_contact_mesh(fragment) as usize].clone()
 }
 
 pub(crate) fn to_world_orientation(frame: ShipFrame, local: [f64; 4]) -> [f64; 4] {

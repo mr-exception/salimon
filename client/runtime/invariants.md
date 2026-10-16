@@ -141,7 +141,8 @@
   tool front-left and are excluded from loose physics/pickup. Released entries
   retain ID/mass/source; continued hold creates a new identity next tick.
   Legacy facet-emission helpers remain only for old fixtures/benchmarks.
-  Sphere visuals/contact/drop geometry are separate #232–#234 follow-ups.
+  Sphere visuals use the shared #232 mesh and one nonphysical growth preview.
+  Spherical contact/drop geometry remain #233–#234 follow-ups.
 
 - Benchmark populations are opt-in initial conditions from production extraction;
   subsequent updates, carrying and support queries retain production behavior.

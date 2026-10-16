@@ -161,8 +161,8 @@ impl EmissionSurface {
                 continue;
             }
             if self.terrain == salimon_world::terrain::TerrainMode::Representative {
-                let mesh = crate::resource_presentation::fragment_mesh(template);
-                if mesh.mesh.unit_vertices().iter().any(|vertex| {
+                let mesh = crate::resource_presentation::legacy_fragment_contact_mesh(template);
+                if mesh.unit_vertices().iter().any(|vertex| {
                     let p = add(direction, scale(*vertex, side));
                     let radius = length(p);
                     radius - body.radius_meters - self.terrain.height(*body, scale(p, 1.0 / radius))

@@ -1,0 +1,67 @@
+{
+  "$schema": "../../../asset-manifest.schema.json",
+  "schemaVersion": 1,
+  "assetId": "resource.spherical-fragment",
+  "category": "resources",
+  "source": "models/assets/resources/spherical-fragment/source.blend",
+  "runtime": "client/assets/resources/spherical-fragment/model.glb",
+  "coordinates": {
+    "units": "meters",
+    "source": {
+      "up": "+Z",
+      "forward": "+X",
+      "unitScale": 1
+    },
+    "runtime": {
+      "up": "+Y",
+      "forward": "+X"
+    },
+    "conversion": "x,z,-y",
+    "pivot": "Centered sphere, authored radius 0.48 m; instance scale = mass-derived radius / 0.48"
+  },
+  "profile": "standard-v1",
+  "budgets": {
+    "maxTriangles": 80,
+    "maxPrimitives": 1,
+    "maxMaterials": 1,
+    "maxTextureBytes": 1,
+    "maxGlbBytes": 32768
+  },
+  "collision": {
+    "policy": "none"
+  },
+  "contracts": {
+    "root": "ASSET_spherical-fragment",
+    "visualGroups": [
+      "Visual"
+    ],
+    "groups": [
+      "Visual"
+    ],
+    "nodes": [
+      "Spherical_Fragment"
+    ],
+    "materials": [
+      "Resource_Tint"
+    ],
+    "sockets": [],
+    "markers": [],
+    "colliders": [],
+    "requiredExtras": [
+      {
+        "node": "ASSET_spherical-fragment",
+        "path": "salimon.assetId"
+      },
+      {
+        "node": "Spherical_Fragment",
+        "path": "salimon.role"
+      }
+    ]
+  },
+  "visualBudget": {
+    "style": "option-a",
+    "maxNodes": 3,
+    "maxTextureMemoryBytes": 0,
+    "maxDrawCalls": 1
+  }
+}

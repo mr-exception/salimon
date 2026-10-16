@@ -81,7 +81,7 @@
     cannot shift artwork from the slot center; glyphs/borders remain legible.
 
 24. Authored resource vertex/index geometry is immutable on the GPU. Resources
-    upload camera-relative 32-byte pose records grouped by stable mesh variant;
+    upload camera-relative 48-byte pose/tint records grouped by stable mesh variant;
     draw calls scale with visible variants, not fragments. Conservative enclosing
     sphere culling affects rendering only. Material colors/facet fill, unit-pose
     validation, subtract-before-cast precision and reverse-Z remain intact.
@@ -115,3 +115,7 @@ The existing wide console shows velocity XYZ in ship-local axes (+X forward,
 speed and reverse duration/distance/GJ. Unavailable readings use --; insufficient
 energy and alignment have explicit status. Rounded strings independently cache
 flight/braking/navigation regions. Core-local screen ownership is unchanged.
+
+- Shared sphere resource instances use finite [0,1] linear RGB and opaque alpha;
+  the 48-byte CPU upload layout matches three WGSL vec4 instance attributes.
+  Resource identity/color changes never duplicate the shared sphere geometry.

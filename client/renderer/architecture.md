@@ -139,7 +139,7 @@ position/color vertices and retains immutable GPU vertex/index buffers. Authored
 material factors and local facet fill remain baked in the vertex colors. The
 immutable CPU triangle positions used by collision/support queries are unchanged.
 
-Runtime supplies stable variant choice, absolute center, unit quaternion and
+Runtime supplies stable mesh choice, linear tint, absolute center, unit quaternion and
 uniform side through `ResourceMeshInstance`. Each frame the renderer validates
 poses, subtracts the camera origin in `f64`, then narrows centers to `f32`.
 A rotation-independent enclosing sphere (±0.481 cube, slightly inflated for
@@ -148,11 +148,11 @@ before staging. Near-plane crossings and carried fragments use the same path;
 culling changes presentation counters only, never picking, physics or session data.
 
 Visible resources are grouped by mesh variant; material roles remain in that
-variant's resident geometry. A 32-byte record contains center/scale and quaternion
-as two `vec4<f32>` instance attributes. WGSL rotates/scales local vertices and
+variant's resident geometry. A 48-byte record contains center/scale, quaternion
+and opaque linear tint as three `vec4<f32>` instance attributes. WGSL rotates/scales local vertices and
 adds the relative center before the existing view/infinite reverse-Z projection.
-There is one indexed instanced draw per nonempty variant: 0–18 draws (up to six
-for fragment-only cargo), versus the former one CPU-expanded batch. Draw counts
+There is one indexed instanced draw per nonempty mesh: up to 19 including
+legacy probes; live fragment-only cargo uses one draw for all resource colors. Draw counts
 and triangles reflect the submitted work, not the full gameplay population.
 
 Per-variant CPU staging/last-upload caches and GPU instance buffers retain capacity;
@@ -160,7 +160,7 @@ GPU buffers grow geometrically. Only changed visible variant records upload.
 Turning the camera changes the uniform/culling; translation or ship motion may
 refresh compact instance records but never reuploads mesh geometry. An unchanged
 visible batch uploads only the 64-byte camera uniform; a fully changed batch
-uploads at most `64 + 32 * visible_count` bytes. The existing scratch counter now
+uploads at most `64 + 48 * visible_count` bytes. The existing scratch counter now
 reports retained staging plus last-uploaded byte capacities, not temporary
 expanded vertices or total allocator traffic. See the
 [benchmark guide](../../scripts/FRAGMENT_BENCHMARKS.md) and
@@ -312,3 +312,12 @@ The existing wide console shows velocity XYZ in ship-local axes (+X forward,
 speed and reverse duration/distance/GJ. Unavailable readings use --; insufficient
 energy and alignment have explicit status. Rounded strings independently cache
 flight/braking/navigation regions. Core-local screen ownership is unchanged.
+
+## Shared spherical fragment (#232)
+
+`ResourceMesh::Sphere` loads one checked-in 80-triangle neutral GLB. A linear
+opaque tint is the third vec4 in each 48-byte resource instance record; the
+shader multiplies baked facet color by tint. Deposits/legacy probes use white.
+All live fragment colors/radii share one resident mesh and one visible batch.
+`side_meters` is uniform asset scale, radius/0.48 for the new sphere. Runtime
+maps mass/density and current camera/tool attachment, never renderer gameplay.

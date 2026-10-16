@@ -104,6 +104,16 @@ jobs:
             import -window root artifacts/e2e/display-ready.png
             python scripts/salimon-test suite --summary --binary artifacts/build/release/salimon-client
           ' 2>&1 | tee artifacts/e2e/baseline.log
+      - name: Production model capture and temporal stability (software Vulkan)
+        if: runner.os == 'Linux'
+        timeout-minutes: 15
+        env:
+          WGPU_BACKEND: vulkan
+        run: |
+          python -m pip install -r scripts/visual-requirements.txt
+          python -m unittest discover -s scripts -p test_model_visual_tests.py -v
+          xvfb-run -a -s '-screen 0 1280x800x24' python scripts/model_visual_tests.py capture --binary artifacts/build/release/salimon-client
+          python scripts/model_visual_tests.py compare --temporal-only
       - name: Linux cockpit window evidence (Mesa software Vulkan)
         if: runner.os == 'Linux'
         timeout-minutes: 3
@@ -154,5 +164,6 @@ jobs:
             artifacts/e2e/
             artifacts/fragment-benchmarks/
             artifacts/glb/
+            artifacts/model-visual/
             artifacts/packaged-smoke/
           if-no-files-found: warn

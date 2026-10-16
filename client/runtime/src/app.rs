@@ -935,6 +935,9 @@ impl ClientApplication {
         }
         if self.view_mode == ViewMode::Gameplay {
             for fragment in self.mining.nearby_fragments(camera.position_meters) {
+                if self.mining.session.attached_sphere_id() == Some(fragment.id()) {
+                    continue;
+                }
                 resource_meshes.push(if self.e2e_config.is_some() {
                     crate::resource_presentation::fragment_mesh(fragment)
                 } else {
@@ -946,6 +949,13 @@ impl ClientApplication {
                     )
                 });
             }
+        }
+        if self.view_mode == ViewMode::Gameplay
+            && let Some(preview) = self
+                .mining
+                .growth_preview(&self.equipment, character_snapshot)
+        {
+            resource_meshes.push(preview);
         }
         let render_terrain = if self.view_mode == ViewMode::Gameplay {
             self.mining.terrain

@@ -1,24 +1,24 @@
 {
   "assetId": "ship.salimon-scout",
   "sourceSha256": "6231b3c46aa40340f2191ac9524ceb0efa0c25ad2851134bbe099acf48500904",
-  "runtimeSha256": "3ec25f1ee25fb9ee73f488d7b9daa1df909158a5ccd4cfa1560d77f3f619646c",
+  "runtimeSha256": "3a6aecdf12a51cb24d1a4bbb7aba29b01038c148f6cedd96504bcaa41ec80909",
   "metrics": {
-    "maxTriangles": 6102,
+    "maxTriangles": 6281,
     "maxPrimitives": 116,
     "maxMaterials": 13,
     "maxTextureBytes": 116,
-    "maxGlbBytes": 513096
+    "maxGlbBytes": 525356
   },
   "authoringSha256": {
     "assembly/salimon-scout.blend": "6231b3c46aa40340f2191ac9524ceb0efa0c25ad2851134bbe099acf48500904",
     "assembly/shared.blend": "1e741ecb26306fa7b77e607a86f2f8f574cb2e138ed847925e19740fb8d0c94e",
-    "components/cabin-interior/source.blend": "9c0440a82786a8171d07846e04ab50f3f7979cc821f392b8c222a5131179ab78",
-    "components/cockpit/source.blend": "4a4a5ed0f79b612ef8661561c1c6b78bfa46616b765a81c6419b2cf2a2a860e3",
-    "components/cockpit-console/source.blend": "f072ac468d8f3f211ff605ce62c767bc9a6d240689496ff69f6f6aabe702b2f8",
+    "components/cabin-interior/source.blend": "02f3fcb2cb00f46d24fc6aadbf2316ad37ac6e1a8515a17a1456612d6cfe5686",
+    "components/cockpit/source.blend": "3f725f387c9fa681c08cf6f0e80bf14738c74b3c75b9ddb206632a13a3586b19",
+    "components/cockpit-console/source.blend": "658b558c46c6fe98e387d2ff927b3d4ece2ddc3a077cb2b4e014dff163dcc0d1",
     "components/energy-core/source.blend": "bf52d30268d22f5a9781035b7df36cbcbfd6f08163bdc7fc7cfac89d253387dd",
-    "components/engines/source.blend": "85918965936b2344f272d05b8f26aae213044709f98869356693275f47ba59e3",
-    "components/exit-door/source.blend": "c9973de9aed293a3436bd0b31b287981324b14d6dc64221f283f9534f5337061",
-    "components/hull/source.blend": "f20a41f35f00a3722dad600c845698822d8da8f81f7ac7f60f1fe79b2fcb546c",
+    "components/engines/source.blend": "fb0e76e87960b46827be59369732244241999417bbd03259a8b2461ca6d1e8f5",
+    "components/exit-door/source.blend": "8f4ff258da14335bc02f6eeb6bde40d84fb978bb1be2a9b464c1b35b191c8192",
+    "components/hull/source.blend": "6a8c9129cf706a9e8c1e52b18482c9a814d88cf19f38a2176a68d0ebc93b9434",
     "components/pilot-seat/source.blend": "f79b97d7bb0ebf032f2b567cf3794c87e7c9f831c236994fea9eb06a69407424",
     "components/wings/source.blend": "e67c095eefe22aafaefe81698db50984fb4e615df7301ef9c290be82e1741ac6"
   }

@@ -1,0 +1,3548 @@
+{
+  "scout": {
+    "beforeOverlapPairs": 935,
+    "afterOverlapPairs": 821,
+    "pairs": [
+      {
+        "nodes": [
+          "Aft_Bulkhead_Header",
+          "Aft_Bulkhead_Header"
+        ],
+        "beforeTrianglePairs": 7,
+        "afterTrianglePairs": 0,
+        "classification": "Repaired: single material owner after coplanar panel subtraction / opaque-frame glazing trim."
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Header",
+          "Exit_Ramp_Tip"
+        ],
+        "beforeTrianglePairs": 6,
+        "afterTrianglePairs": 6,
+        "classification": "Aft_Bulkhead_Header / Exit_Ramp_Tip: closed-pose articulated leaf/tray/frame contact caps; retain surfaces for opening and telescopic extension. Mixed-material witnesses lie on the concealed lateral/end caps, not the ramp walking face.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 6,
+        "materials": [
+          "Copper Accent",
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.016461276446040757,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Aft_Bulkhead_Header",
+          "face": [
+            2,
+            20
+          ],
+          "locationMeters": [
+            -7.800000190734863,
+            2.5166666507720947,
+            0.03499999890724818
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Exit_Ramp_Tip",
+          "otherFace": [
+            0,
+            8
+          ],
+          "overlapSquareMeters": 0.004591013948668704,
+          "materials": [
+            "Copper Accent",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.800000190734863,
+            2.503064513206482,
+            0.017147176883994572
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Header",
+          "Hull_Aft_Cap"
+        ],
+        "beforeTrianglePairs": 8,
+        "afterTrianglePairs": 8,
+        "classification": "Aft_Bulkhead_Header / Hull_Aft_Cap: opposing flush attachment caps between Hull Graphite and Interior Dark solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 8,
+        "materials": [
+          "Hull Graphite",
+          "Interior Dark"
+        ],
+        "summedOverlapSquareMeters": 0.42150509331815944,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Aft_Bulkhead_Header",
+          "face": [
+            0,
+            2
+          ],
+          "locationMeters": [
+            -7.559999942779541,
+            2.7168458302815757,
+            0.5333333412806193
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Hull_Aft_Cap",
+          "otherFace": [
+            0,
+            24
+          ],
+          "overlapSquareMeters": 0.016503790411972474,
+          "materials": [
+            "Interior Dark",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.559999942779541,
+            2.8090970814034733,
+            -1.061453274079691
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Port",
+          "Deck_Walkable"
+        ],
+        "beforeTrianglePairs": 2,
+        "afterTrianglePairs": 2,
+        "classification": "Aft_Bulkhead_Port / Deck_Walkable: opposing flush attachment caps between Floor Grip and Interior Light solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 2,
+        "materials": [
+          "Floor Grip",
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 0.4799995231628573,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Aft_Bulkhead_Port",
+          "face": [
+            0,
+            6
+          ],
+          "locationMeters": [
+            -7.506666660308838,
+            0.24731183052062988,
+            2.599999984105428
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Deck_Walkable",
+          "otherFace": [
+            0,
+            4
+          ],
+          "overlapSquareMeters": 0.23999976158142733,
+          "materials": [
+            "Interior Light",
+            "Floor Grip"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.506666660308838,
+            0.24731183052062988,
+            2.599999984105428
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Port",
+          "Hull_Aft_Cap"
+        ],
+        "beforeTrianglePairs": 4,
+        "afterTrianglePairs": 4,
+        "classification": "Aft_Bulkhead_Port / Hull_Aft_Cap: opposing flush attachment caps between Hull Graphite and Interior Light solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 4,
+        "materials": [
+          "Hull Graphite",
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 2.0645160450730273,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Aft_Bulkhead_Port",
+          "face": [
+            0,
+            2
+          ],
+          "locationMeters": [
+            -7.559999942779541,
+            0.7060931921005249,
+            3.599999944368998
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Hull_Aft_Cap",
+          "otherFace": [
+            0,
+            12
+          ],
+          "overlapSquareMeters": 0.6238694132089773,
+          "materials": [
+            "Interior Light",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.559999942779541,
+            0.819000547005842,
+            3.507448632557877
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Port",
+          "Hull_Port_Side"
+        ],
+        "beforeTrianglePairs": 2,
+        "afterTrianglePairs": 2,
+        "classification": "Aft_Bulkhead_Port / Hull_Port_Side: opposing flush attachment caps between Hull Graphite and Interior Light solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 2,
+        "materials": [
+          "Hull Graphite",
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 0.11010742177245447,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Hull_Port_Side",
+          "face": [
+            0,
+            9
+          ],
+          "locationMeters": [
+            -3.3333333333333335,
+            0.6881720423698425,
+            4.599999904632568
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Aft_Bulkhead_Port",
+          "otherFace": [
+            0,
+            8
+          ],
+          "overlapSquareMeters": 0.055053710886227236,
+          "materials": [
+            "Hull Graphite",
+            "Interior Light"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.440000057220459,
+            0.5913978517055511,
+            4.599999904632568
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Port",
+          "Wall_Port_Inner"
+        ],
+        "beforeTrianglePairs": 6,
+        "afterTrianglePairs": 7,
+        "classification": "Aft_Bulkhead_Port / Wall_Port_Inner: joined primitive seams with identical Interior Light material and co-oriented planar normals; one opaque shading result at the shared boundary.",
+        "sameFacingPairs": 7,
+        "opposingPairs": 0,
+        "materials": [
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 0.03269673805544904,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Wall_Port_Inner",
+          "face": [
+            0,
+            10
+          ],
+          "locationMeters": [
+            -7.37333329518636,
+            0.695264995098114,
+            4.599999904632568
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Aft_Bulkhead_Port",
+          "otherFace": [
+            0,
+            8
+          ],
+          "overlapSquareMeters": 0.02140100158736513,
+          "materials": [
+            "Interior Light",
+            "Interior Light"
+          ],
+          "sameFacing": true,
+          "overlapCenterMeters": [
+            -7.416594597677611,
+            0.647317224246332,
+            4.599999904632568
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Starboard",
+          "Deck_Walkable"
+        ],
+        "beforeTrianglePairs": 4,
+        "afterTrianglePairs": 4,
+        "classification": "Aft_Bulkhead_Starboard / Deck_Walkable: opposing flush attachment caps between Floor Grip and Interior Light solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 4,
+        "materials": [
+          "Floor Grip",
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 0.47999952316286,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Deck_Walkable",
+          "face": [
+            0,
+            4
+          ],
+          "locationMeters": [
+            -3.4399998982747397,
+            0.24731183052062988,
+            1.5333333015441895
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Aft_Bulkhead_Starboard",
+          "otherFace": [
+            0,
+            6
+          ],
+          "overlapSquareMeters": 0.23083605210370273,
+          "materials": [
+            "Floor Grip",
+            "Interior Light"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.508703040273694,
+            0.24731183052062988,
+            -3.5618177851317974
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Starboard",
+          "Hull_Aft_Cap"
+        ],
+        "beforeTrianglePairs": 4,
+        "afterTrianglePairs": 4,
+        "classification": "Aft_Bulkhead_Starboard / Hull_Aft_Cap: opposing flush attachment caps between Hull Graphite and Interior Light solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 4,
+        "materials": [
+          "Hull Graphite",
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 2.0645160450730273,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Aft_Bulkhead_Starboard",
+          "face": [
+            0,
+            2
+          ],
+          "locationMeters": [
+            -7.559999942779541,
+            0.7060931921005249,
+            -2.599999984105428
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Hull_Aft_Cap",
+          "otherFace": [
+            0,
+            0
+          ],
+          "overlapSquareMeters": 0.5224430554919632,
+          "materials": [
+            "Interior Light",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.559999942779541,
+            0.8456981567747521,
+            -2.7327322831024814
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Starboard",
+          "Hull_Starboard_Side"
+        ],
+        "beforeTrianglePairs": 2,
+        "afterTrianglePairs": 2,
+        "classification": "Aft_Bulkhead_Starboard / Hull_Starboard_Side: opposing flush attachment caps between Hull Graphite and Interior Light solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 2,
+        "materials": [
+          "Hull Graphite",
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 0.11010742177245447,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Hull_Starboard_Side",
+          "face": [
+            0,
+            9
+          ],
+          "locationMeters": [
+            -3.3333333333333335,
+            0.6881720423698425,
+            -4.599999904632568
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Aft_Bulkhead_Starboard",
+          "otherFace": [
+            0,
+            10
+          ],
+          "overlapSquareMeters": 0.055053710886227236,
+          "materials": [
+            "Hull Graphite",
+            "Interior Light"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.519999980926514,
+            0.5913978517055511,
+            -4.599999904632568
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Aft_Bulkhead_Starboard",
+          "Wall_Starboard_Inner"
+        ],
+        "beforeTrianglePairs": 7,
+        "afterTrianglePairs": 8,
+        "classification": "Aft_Bulkhead_Starboard / Wall_Starboard_Inner: joined primitive seams with identical Interior Light material and co-oriented planar normals; one opaque shading result at the shared boundary.",
+        "sameFacingPairs": 8,
+        "opposingPairs": 0,
+        "materials": [
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 0.03269673805544926,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Wall_Starboard_Inner",
+          "face": [
+            0,
+            10
+          ],
+          "locationMeters": [
+            -7.37333329518636,
+            0.4731182853380839,
+            -4.599999904632568
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Aft_Bulkhead_Starboard",
+          "otherFace": [
+            0,
+            10
+          ],
+          "overlapSquareMeters": 0.0034408569303892023,
+          "materials": [
+            "Interior Light",
+            "Interior Light"
+          ],
+          "sameFacing": true,
+          "overlapCenterMeters": [
+            -7.426666736602783,
+            0.30465950071811676,
+            -4.599999904632568
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Cabin_Low_Guidance_Lights",
+          "Wall_Port_Inner"
+        ],
+        "beforeTrianglePairs": 4,
+        "afterTrianglePairs": 4,
+        "classification": "Cabin_Low_Guidance_Lights / Wall_Port_Inner: opposing flush attachment caps between Interior Light and Warm Lamp solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 4,
+        "materials": [
+          "Interior Light",
+          "Warm Lamp"
+        ],
+        "summedOverlapSquareMeters": 0.45161309838294983,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Wall_Port_Inner",
+          "face": [
+            0,
+            8
+          ],
+          "locationMeters": [
+            0.7866667111714681,
+            0.4731182853380839,
+            4.460000038146973
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Cabin_Low_Guidance_Lights",
+          "otherFace": [
+            0,
+            20
+          ],
+          "overlapSquareMeters": 0.22345340978813744,
+          "materials": [
+            "Interior Light",
+            "Warm Lamp"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -1.3136585859933492,
+            0.3344743985371639,
+            4.460000038146973
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Cabin_Low_Guidance_Lights",
+          "Wall_Starboard_Inner"
+        ],
+        "beforeTrianglePairs": 4,
+        "afterTrianglePairs": 4,
+        "classification": "Cabin_Low_Guidance_Lights / Wall_Starboard_Inner: opposing flush attachment caps between Interior Light and Warm Lamp solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 4,
+        "materials": [
+          "Interior Light",
+          "Warm Lamp"
+        ],
+        "summedOverlapSquareMeters": 0.4516130983829496,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Wall_Starboard_Inner",
+          "face": [
+            0,
+            8
+          ],
+          "locationMeters": [
+            0.7866667111714681,
+            0.4731182853380839,
+            -4.460000038146973
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Cabin_Low_Guidance_Lights",
+          "otherFace": [
+            0,
+            10
+          ],
+          "overlapSquareMeters": 0.17088414486379222,
+          "materials": [
+            "Interior Light",
+            "Warm Lamp"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -2.693428843132358,
+            0.3346119055355489,
+            -4.460000038146973
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Ceiling_Copper_Ribs",
+          "Ceiling_Inner"
+        ],
+        "beforeTrianglePairs": 16,
+        "afterTrianglePairs": 16,
+        "classification": "Ceiling_Copper_Ribs / Ceiling_Inner: opposing flush attachment caps between Copper Accent and Interior Light solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 16,
+        "materials": [
+          "Copper Accent",
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 4.883198611068655,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Ceiling_Copper_Ribs",
+          "face": [
+            0,
+            16
+          ],
+          "locationMeters": [
+            -3.4233333269755044,
+            2.8064515590667725,
+            1.4533333778381348
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Ceiling_Inner",
+          "otherFace": [
+            0,
+            6
+          ],
+          "overlapSquareMeters": 0.2860528995234928,
+          "materials": [
+            "Copper Accent",
+            "Interior Light"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -3.438242752441532,
+            2.8064515590667725,
+            -0.38031561556785914
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Ceiling_Copper_Ribs",
+          "Ceiling_Lamp_Housings"
+        ],
+        "beforeTrianglePairs": 16,
+        "afterTrianglePairs": 16,
+        "classification": "Ceiling_Copper_Ribs / Ceiling_Lamp_Housings: joined primitive seams with identical Copper Accent material and co-oriented planar normals; one opaque shading result at the shared boundary.",
+        "sameFacingPairs": 16,
+        "opposingPairs": 0,
+        "materials": [
+          "Copper Accent"
+        ],
+        "summedOverlapSquareMeters": 0.2688000976562539,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Ceiling_Lamp_Housings",
+          "face": [
+            0,
+            16
+          ],
+          "locationMeters": [
+            0.8933332761128744,
+            2.8064515590667725,
+            -3.380000034968058
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Ceiling_Copper_Ribs",
+          "otherFace": [
+            0,
+            28
+          ],
+          "overlapSquareMeters": 0.005237738092439548,
+          "materials": [
+            "Copper Accent",
+            "Copper Accent"
+          ],
+          "sameFacing": true,
+          "overlapCenterMeters": [
+            0.7378071202026479,
+            2.8064515590667725,
+            -3.3877787344508685
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Ceiling_Inner",
+          "Ceiling_Lamp_Housings"
+        ],
+        "beforeTrianglePairs": 12,
+        "afterTrianglePairs": 12,
+        "classification": "Ceiling_Inner / Ceiling_Lamp_Housings: opposing flush attachment caps between Copper Accent and Interior Light solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 12,
+        "materials": [
+          "Copper Accent",
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 9.196800063323959,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Ceiling_Lamp_Housings",
+          "face": [
+            0,
+            16
+          ],
+          "locationMeters": [
+            0.8933332761128744,
+            2.8064515590667725,
+            -3.380000034968058
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Ceiling_Inner",
+          "otherFace": [
+            0,
+            6
+          ],
+          "overlapSquareMeters": 1.1129899905927432,
+          "materials": [
+            "Copper Accent",
+            "Interior Light"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            1.2039804127156322,
+            2.8064515590667725,
+            -3.3630598287997233
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Ceiling_Inner",
+          "Hull_Port_Side"
+        ],
+        "beforeTrianglePairs": 4,
+        "afterTrianglePairs": 4,
+        "classification": "Ceiling_Inner / Hull_Port_Side: opposing flush attachment caps between Hull Graphite and Interior Light solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 4,
+        "materials": [
+          "Hull Graphite",
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 1.3290339518106276,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Hull_Port_Side",
+          "face": [
+            0,
+            20
+          ],
+          "locationMeters": [
+            0.9333332379659017,
+            2.7849462827046714,
+            4.599999904632568
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Ceiling_Inner",
+          "otherFace": [
+            0,
+            8
+          ],
+          "overlapSquareMeters": 0.4211070444200038,
+          "materials": [
+            "Hull Graphite",
+            "Interior Light"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            2.698256005304059,
+            2.8561856654486886,
+            4.599999904632568
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Ceiling_Inner",
+          "Hull_Starboard_Side"
+        ],
+        "beforeTrianglePairs": 4,
+        "afterTrianglePairs": 4,
+        "classification": "Ceiling_Inner / Hull_Starboard_Side: opposing flush attachment caps between Hull Graphite and Interior Light solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 4,
+        "materials": [
+          "Hull Graphite",
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 1.3290339518106284,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Hull_Starboard_Side",
+          "face": [
+            0,
+            20
+          ],
+          "locationMeters": [
+            0.9333332379659017,
+            2.7849462827046714,
+            -4.599999904632568
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Ceiling_Inner",
+          "otherFace": [
+            0,
+            10
+          ],
+          "overlapSquareMeters": 0.1441479671164161,
+          "materials": [
+            "Hull Graphite",
+            "Interior Light"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            1.004881465627858,
+            2.820113012141664,
+            -4.599999904632568
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Ceiling_Inner",
+          "Wall_Port_Inner"
+        ],
+        "beforeTrianglePairs": 8,
+        "afterTrianglePairs": 8,
+        "classification": "Ceiling_Inner / Wall_Port_Inner: joined primitive seams with identical Interior Light material and co-oriented planar normals; one opaque shading result at the shared boundary.",
+        "sameFacingPairs": 8,
+        "opposingPairs": 0,
+        "materials": [
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 0.1341934206152473,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Wall_Port_Inner",
+          "face": [
+            0,
+            21
+          ],
+          "locationMeters": [
+            -7.440000057220459,
+            2.7849462032318115,
+            4.506666660308838
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Ceiling_Inner",
+          "otherFace": [
+            0,
+            2
+          ],
+          "overlapSquareMeters": 0.00130859273536732,
+          "materials": [
+            "Interior Light",
+            "Interior Light"
+          ],
+          "sameFacing": true,
+          "overlapCenterMeters": [
+            -7.440000057220459,
+            2.8122816642805972,
+            4.526175747090001
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Ceiling_Inner",
+          "Wall_Starboard_Inner"
+        ],
+        "beforeTrianglePairs": 5,
+        "afterTrianglePairs": 5,
+        "classification": "Ceiling_Inner / Wall_Starboard_Inner: joined primitive seams with identical Interior Light material and co-oriented planar normals; one opaque shading result at the shared boundary.",
+        "sameFacingPairs": 5,
+        "opposingPairs": 0,
+        "materials": [
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 0.13419342061524642,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Wall_Starboard_Inner",
+          "face": [
+            0,
+            20
+          ],
+          "locationMeters": [
+            -7.440000057220459,
+            2.7849462032318115,
+            -4.506666660308838
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Ceiling_Inner",
+          "otherFace": [
+            0,
+            3
+          ],
+          "overlapSquareMeters": 0.0014217416132096261,
+          "materials": [
+            "Interior Light",
+            "Interior Light"
+          ],
+          "sameFacing": true,
+          "overlapCenterMeters": [
+            -7.440000057220459,
+            2.8118278980255127,
+            -4.526111086209615
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Cockpit_Lower_Glazing",
+          "Cockpit_Window_Frame"
+        ],
+        "beforeTrianglePairs": 8,
+        "afterTrianglePairs": 0,
+        "classification": "Repaired: single material owner after coplanar panel subtraction / opaque-frame glazing trim."
+      },
+      {
+        "nodes": [
+          "Cockpit_Lower_Glazing",
+          "Hull_Nose"
+        ],
+        "beforeTrianglePairs": 4,
+        "afterTrianglePairs": 0,
+        "classification": "Repaired: single material owner after coplanar panel subtraction / opaque-frame glazing trim."
+      },
+      {
+        "nodes": [
+          "Cockpit_Monitor_Bezels",
+          "Cockpit_Monitor_Bezels"
+        ],
+        "beforeTrianglePairs": 12,
+        "afterTrianglePairs": 12,
+        "classification": "Cockpit_Monitor_Bezels / Cockpit_Monitor_Bezels: opposing flush attachment caps between Interior Light solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 12,
+        "materials": [
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 0.011999919891422905,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Cockpit_Monitor_Bezels",
+          "face": [
+            0,
+            28
+          ],
+          "locationMeters": [
+            4.416666666666667,
+            0.8734999895095825,
+            -1.0099999904632568
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Cockpit_Monitor_Bezels",
+          "otherFace": [
+            0,
+            6
+          ],
+          "overlapSquareMeters": 0.0014571331685977462,
+          "materials": [
+            "Interior Light",
+            "Interior Light"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            4.412857164331036,
+            0.8734999895095825,
+            -1.0199999809265137
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Cockpit_Monitor_Bezels",
+          "Cockpit_Monitor_Housings"
+        ],
+        "beforeTrianglePairs": 18,
+        "afterTrianglePairs": 0,
+        "classification": "Repaired: single material owner after coplanar panel subtraction / opaque-frame glazing trim."
+      },
+      {
+        "nodes": [
+          "Cockpit_Monitor_Housings",
+          "Cockpit_Monitor_Housings"
+        ],
+        "beforeTrianglePairs": 0,
+        "afterTrianglePairs": 1,
+        "classification": "Cockpit_Monitor_Housings / Cockpit_Monitor_Housings: joined primitive seams with identical Hull Graphite material and co-oriented planar normals; one opaque shading result at the shared boundary.",
+        "sameFacingPairs": 1,
+        "opposingPairs": 0,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 8.985420407725542e-09,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Cockpit_Monitor_Housings",
+          "face": [
+            0,
+            12
+          ],
+          "locationMeters": [
+            4.516666730244954,
+            1.0064110557238262,
+            1.0499999523162842
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Cockpit_Monitor_Housings",
+          "otherFace": [
+            0,
+            10
+          ],
+          "overlapSquareMeters": 8.985420407725542e-09,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": true,
+          "overlapCenterMeters": [
+            4.499694810423332,
+            1.0718665421009064,
+            1.0499999523162842
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Cockpit_Window_Frame",
+          "Cockpit_Window_Frame"
+        ],
+        "beforeTrianglePairs": 42,
+        "afterTrianglePairs": 42,
+        "classification": "Cockpit_Window_Frame / Cockpit_Window_Frame: joined primitive seams with identical Copper Accent material and co-oriented planar normals; one opaque shading result at the shared boundary.",
+        "sameFacingPairs": 42,
+        "opposingPairs": 0,
+        "materials": [
+          "Copper Accent"
+        ],
+        "summedOverlapSquareMeters": 0.01958394967653021,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Cockpit_Window_Frame",
+          "face": [
+            0,
+            112
+          ],
+          "locationMeters": [
+            5.386666774749756,
+            0.2619999945163727,
+            1.0839999914169312
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Cockpit_Window_Frame",
+          "otherFace": [
+            0,
+            148
+          ],
+          "overlapSquareMeters": 1.5941187037071813e-08,
+          "materials": [
+            "Copper Accent",
+            "Copper Accent"
+          ],
+          "sameFacing": true,
+          "overlapCenterMeters": [
+            6.558355541721884,
+            0.2619999945163727,
+            1.091988795113827
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Cockpit_Window_Frame",
+          "Deck_Walkable"
+        ],
+        "beforeTrianglePairs": 33,
+        "afterTrianglePairs": 33,
+        "classification": "Cockpit_Window_Frame / Deck_Walkable: opposing flush attachment caps between Copper Accent and Floor Grip solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 33,
+        "materials": [
+          "Copper Accent",
+          "Floor Grip"
+        ],
+        "summedOverlapSquareMeters": 0.22288023769374377,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Cockpit_Window_Frame",
+          "face": [
+            0,
+            102
+          ],
+          "locationMeters": [
+            6.565999984741211,
+            0.24731183052062988,
+            -1.7800000508626301
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Deck_Walkable",
+          "otherFace": [
+            0,
+            28
+          ],
+          "overlapSquareMeters": 2.8404976921692082e-06,
+          "materials": [
+            "Copper Accent",
+            "Floor Grip"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            6.558666706085205,
+            0.24731183052062988,
+            -2.1009468058272893
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Core_Containment_Ribs",
+          "Core_Containment_Ribs"
+        ],
+        "beforeTrianglePairs": 24,
+        "afterTrianglePairs": 24,
+        "classification": "Core_Containment_Ribs / Core_Containment_Ribs: joined primitive seams with identical Hull Graphite material and co-oriented planar normals; one opaque shading result at the shared boundary.",
+        "sameFacingPairs": 24,
+        "opposingPairs": 0,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.21333324735002027,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Core_Containment_Ribs",
+          "face": [
+            0,
+            110
+          ],
+          "locationMeters": [
+            -0.5568797389666239,
+            1.4587813417116802,
+            -0.4054078956445058
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Core_Containment_Ribs",
+          "otherFace": [
+            0,
+            122
+          ],
+          "overlapSquareMeters": 0.001524002199586464,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": true,
+          "overlapCenterMeters": [
+            -0.5236215804108554,
+            0.6559139688809713,
+            -0.372149754610313
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Core_Cradle",
+          "Core_Cradle"
+        ],
+        "beforeTrianglePairs": 30,
+        "afterTrianglePairs": 30,
+        "classification": "Core_Cradle / Core_Cradle: opposing flush attachment caps between Copper Accent solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 30,
+        "materials": [
+          "Copper Accent"
+        ],
+        "summedOverlapSquareMeters": 1.4017684728756974,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Core_Cradle",
+          "face": [
+            0,
+            100
+          ],
+          "locationMeters": [
+            -1.2781286636988323,
+            1.978494644165039,
+            -0.5447953442732493
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Core_Cradle",
+          "otherFace": [
+            0,
+            34
+          ],
+          "overlapSquareMeters": 0.05239069814799241,
+          "materials": [
+            "Copper Accent",
+            "Copper Accent"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -1.3124683917138886,
+            1.978494644165039,
+            -0.6242640912532806
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Core_Cradle",
+          "Core_Pedestal"
+        ],
+        "beforeTrianglePairs": 26,
+        "afterTrianglePairs": 26,
+        "classification": "Core_Cradle / Core_Pedestal: opposing flush attachment caps between Copper Accent and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 26,
+        "materials": [
+          "Copper Accent",
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 1.6336994976051773,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Core_Cradle",
+          "face": [
+            0,
+            0
+          ],
+          "locationMeters": [
+            -0.5675329516331354,
+            0.46236559748649597,
+            0.4324670433998108
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Core_Pedestal",
+          "otherFace": [
+            0,
+            38
+          ],
+          "overlapSquareMeters": 0.08458755162130163,
+          "materials": [
+            "Copper Accent",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -0.5969491451978683,
+            0.46236559748649597,
+            0.5143502827998503
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Core_Pedestal",
+          "Core_Pedestal"
+        ],
+        "beforeTrianglePairs": 27,
+        "afterTrianglePairs": 27,
+        "classification": "Core_Pedestal / Core_Pedestal: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 27,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 2.3939807304996252,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Core_Pedestal",
+          "face": [
+            0,
+            10
+          ],
+          "locationMeters": [
+            -0.528595487276713,
+            0.34408602118492126,
+            0.3333333333333333
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Core_Pedestal",
+          "otherFace": [
+            0,
+            32
+          ],
+          "overlapSquareMeters": 0.031948046119722504,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -0.38378680306952073,
+            0.34408602118492126,
+            -0.209386014181203
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Core_Pedestal",
+          "Deck_Walkable"
+        ],
+        "beforeTrianglePairs": 10,
+        "afterTrianglePairs": 10,
+        "classification": "Core_Pedestal / Deck_Walkable: opposing flush attachment caps between Floor Grip and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 10,
+        "materials": [
+          "Floor Grip",
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 2.8284271359443665,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Core_Pedestal",
+          "face": [
+            0,
+            0
+          ],
+          "locationMeters": [
+            -0.4309644103050232,
+            0.24731183052062988,
+            0.5690355896949768
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Deck_Walkable",
+          "otherFace": [
+            0,
+            4
+          ],
+          "overlapSquareMeters": 0.07453956664032949,
+          "materials": [
+            "Hull Graphite",
+            "Floor Grip"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -0.6566199540416862,
+            0.24731183052062988,
+            0.7774888475705214
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Deck_Walkable"
+        ],
+        "beforeTrianglePairs": 16,
+        "afterTrianglePairs": 16,
+        "classification": "Deck_Walkable / Deck_Walkable: opposing flush attachment caps between Floor Grip solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 16,
+        "materials": [
+          "Floor Grip"
+        ],
+        "summedOverlapSquareMeters": 1.0102795971555094,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Deck_Walkable",
+          "face": [
+            0,
+            14
+          ],
+          "locationMeters": [
+            4.800000190734863,
+            0.21146953602631888,
+            0.36666667461395264
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Deck_Walkable",
+          "otherFace": [
+            0,
+            0
+          ],
+          "overlapSquareMeters": 0.0816386189835549,
+          "materials": [
+            "Floor Grip",
+            "Floor Grip"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            4.800000190734863,
+            0.22364422858595762,
+            0.2750000059604645
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Door_Threshold"
+        ],
+        "beforeTrianglePairs": 2,
+        "afterTrianglePairs": 2,
+        "classification": "Deck_Walkable / Door_Threshold: opposing flush attachment caps between Floor Grip and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 2,
+        "materials": [
+          "Floor Grip",
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 1.232000139236448,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Door_Threshold",
+          "face": [
+            0,
+            6
+          ],
+          "locationMeters": [
+            -7.306666533152263,
+            0.24731183052062988,
+            -0.4666666587193807
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Deck_Walkable",
+          "otherFace": [
+            0,
+            4
+          ],
+          "overlapSquareMeters": 0.7479999721390596,
+          "materials": [
+            "Hull Graphite",
+            "Floor Grip"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.3399999141693115,
+            0.24731183052062988,
+            -0.5500001183578055
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Hull_Aft_Cap"
+        ],
+        "beforeTrianglePairs": 4,
+        "afterTrianglePairs": 4,
+        "classification": "Deck_Walkable / Hull_Aft_Cap: opposing flush attachment caps between Floor Grip and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 4,
+        "materials": [
+          "Floor Grip",
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.3397849824864353,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Deck_Walkable",
+          "face": [
+            0,
+            2
+          ],
+          "locationMeters": [
+            -7.559999942779541,
+            0.21146953602631888,
+            1.5333333015441895
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Hull_Aft_Cap",
+          "otherFace": [
+            0,
+            1
+          ],
+          "overlapSquareMeters": 0.058354367732253554,
+          "materials": [
+            "Floor Grip",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.559999942779541,
+            0.23500078188138326,
+            -2.493333339691162
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Hull_Belly"
+        ],
+        "beforeTrianglePairs": 47,
+        "afterTrianglePairs": 0,
+        "classification": "Repaired: single material owner after coplanar panel subtraction / opaque-frame glazing trim."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Hull_Nose"
+        ],
+        "beforeTrianglePairs": 6,
+        "afterTrianglePairs": 0,
+        "classification": "Repaired: single material owner after coplanar panel subtraction / opaque-frame glazing trim."
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Hull_Port_Side"
+        ],
+        "beforeTrianglePairs": 4,
+        "afterTrianglePairs": 4,
+        "classification": "Deck_Walkable / Hull_Port_Side: opposing flush attachment caps between Floor Grip and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 4,
+        "materials": [
+          "Floor Grip",
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.6860215983595879,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Hull_Port_Side",
+          "face": [
+            0,
+            8
+          ],
+          "locationMeters": [
+            0.9333332379659017,
+            0.44086021184921265,
+            4.599999904632568
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Deck_Walkable",
+          "otherFace": [
+            0,
+            45
+          ],
+          "overlapSquareMeters": 0.021505359167690585,
+          "materials": [
+            "Hull Graphite",
+            "Floor Grip"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            5.0,
+            0.22043010592460632,
+            4.599999904632568
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Hull_Starboard_Side"
+        ],
+        "beforeTrianglePairs": 6,
+        "afterTrianglePairs": 6,
+        "classification": "Deck_Walkable / Hull_Starboard_Side: opposing flush attachment caps between Floor Grip and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 6,
+        "materials": [
+          "Floor Grip",
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.6860215983595879,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Hull_Starboard_Side",
+          "face": [
+            0,
+            8
+          ],
+          "locationMeters": [
+            0.9333332379659017,
+            0.44086021184921265,
+            -4.599999904632568
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Deck_Walkable",
+          "otherFace": [
+            0,
+            10
+          ],
+          "overlapSquareMeters": 0.14627874435142596,
+          "materials": [
+            "Hull Graphite",
+            "Floor Grip"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -5.822071575915594,
+            0.2058904852879786,
+            -4.599999904632568
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Wall_Port_Inner"
+        ],
+        "beforeTrianglePairs": 6,
+        "afterTrianglePairs": 6,
+        "classification": "Deck_Walkable / Wall_Port_Inner: opposing flush attachment caps between Floor Grip and Interior Light solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 6,
+        "materials": [
+          "Floor Grip",
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 1.7275983737945335,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Wall_Port_Inner",
+          "face": [
+            0,
+            6
+          ],
+          "locationMeters": [
+            -3.3266666730244956,
+            0.24731183052062988,
+            4.553333282470703
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Deck_Walkable",
+          "otherFace": [
+            0,
+            40
+          ],
+          "overlapSquareMeters": 5.672593100669587e-05,
+          "materials": [
+            "Interior Light",
+            "Floor Grip"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            4.833333492279053,
+            0.24731183052062988,
+            4.599621731398532
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Wall_Starboard_Inner"
+        ],
+        "beforeTrianglePairs": 8,
+        "afterTrianglePairs": 8,
+        "classification": "Deck_Walkable / Wall_Starboard_Inner: opposing flush attachment caps between Floor Grip and Interior Light solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 8,
+        "materials": [
+          "Floor Grip",
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 1.7275983737945388,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Wall_Starboard_Inner",
+          "face": [
+            0,
+            6
+          ],
+          "locationMeters": [
+            -3.3266666730244956,
+            0.24731183052062988,
+            -4.553333282470703
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Deck_Walkable",
+          "otherFace": [
+            0,
+            28
+          ],
+          "overlapSquareMeters": 4.4948142097211985e-07,
+          "materials": [
+            "Interior Light",
+            "Floor Grip"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            4.800198283998417,
+            0.24731183052062988,
+            -4.599434892190761
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Wing_Port"
+        ],
+        "beforeTrianglePairs": 4,
+        "afterTrianglePairs": 4,
+        "classification": "Deck_Walkable / Wing_Port: opposing flush attachment caps between Floor Grip and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 4,
+        "materials": [
+          "Floor Grip",
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.5752689217367504,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Wing_Port",
+          "face": [
+            0,
+            8
+          ],
+          "locationMeters": [
+            1.3333333333333333,
+            0.2795698841412862,
+            4.599999904632568
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Deck_Walkable",
+          "otherFace": [
+            0,
+            45
+          ],
+          "overlapSquareMeters": 0.005376339791922646,
+          "materials": [
+            "Hull Graphite",
+            "Floor Grip"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            4.8500001430511475,
+            0.22043010592460632,
+            4.599999904632568
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Deck_Walkable",
+          "Wing_Starboard"
+        ],
+        "beforeTrianglePairs": 6,
+        "afterTrianglePairs": 6,
+        "classification": "Deck_Walkable / Wing_Starboard: opposing flush attachment caps between Floor Grip and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 6,
+        "materials": [
+          "Floor Grip",
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.5752689217367504,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Wing_Starboard",
+          "face": [
+            0,
+            8
+          ],
+          "locationMeters": [
+            1.3333333333333333,
+            0.2795698841412862,
+            -4.599999904632568
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Deck_Walkable",
+          "otherFace": [
+            0,
+            10
+          ],
+          "overlapSquareMeters": 0.06245236138342519,
+          "materials": [
+            "Hull Graphite",
+            "Floor Grip"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -3.9361037982181237,
+            0.20296804118315115,
+            -4.599999904632568
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Door_Frame",
+          "Door_Frame"
+        ],
+        "beforeTrianglePairs": 24,
+        "afterTrianglePairs": 18,
+        "classification": "Door_Frame / Door_Frame: joined primitive seams with identical Hull Graphite material and co-oriented planar normals; one opaque shading result at the shared boundary.",
+        "sameFacingPairs": 18,
+        "opposingPairs": 0,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.10439992961880762,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Door_Frame",
+          "face": [
+            0,
+            22
+          ],
+          "locationMeters": [
+            -7.880000114440918,
+            1.7898565630118053,
+            1.50000003973643
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Door_Frame",
+          "otherFace": [
+            0,
+            35
+          ],
+          "overlapSquareMeters": 0.015902285732551924,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": true,
+          "overlapCenterMeters": [
+            -7.880000114440918,
+            2.5611289739608765,
+            1.528346173321392
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Door_Frame",
+          "Exit_Door"
+        ],
+        "beforeTrianglePairs": 9,
+        "afterTrianglePairs": 15,
+        "classification": "Door_Frame / Exit_Door: closed-pose articulated leaf/tray/frame contact caps; retain surfaces for opening and telescopic extension. Mixed-material witnesses lie on the concealed lateral/end caps, not the ramp walking face.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 15,
+        "materials": [
+          "Copper Accent",
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.5040006574732869,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Exit_Door",
+          "face": [
+            0,
+            13
+          ],
+          "locationMeters": [
+            -7.682142734527588,
+            2.5161290168762207,
+            0.4333333174387614
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Door_Frame",
+          "otherFace": [
+            0,
+            30
+          ],
+          "overlapSquareMeters": 0.0001569657263038593,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.6848067407332215,
+            2.5161290168762207,
+            1.2777366108496133
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Door_Frame",
+          "Exit_Ramp_Tip"
+        ],
+        "beforeTrianglePairs": 4,
+        "afterTrianglePairs": 4,
+        "classification": "Door_Frame / Exit_Ramp_Tip: closed-pose articulated leaf/tray/frame contact caps; retain surfaces for opening and telescopic extension. Mixed-material witnesses lie on the concealed lateral/end caps, not the ramp walking face.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 4,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.11199989128113064,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Exit_Ramp_Tip",
+          "face": [
+            0,
+            6
+          ],
+          "locationMeters": [
+            -7.773333549499512,
+            2.5161290168762207,
+            -0.4666666587193807
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Door_Frame",
+          "otherFace": [
+            0,
+            30
+          ],
+          "overlapSquareMeters": 0.01419626699853116,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.767555064998198,
+            2.5161290168762207,
+            0.4535839263761463
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Door_Frame",
+          "Hull_Aft_Cap"
+        ],
+        "beforeTrianglePairs": 8,
+        "afterTrianglePairs": 8,
+        "classification": "Door_Frame / Hull_Aft_Cap: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 8,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.33118319654977224,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Hull_Aft_Cap",
+          "face": [
+            0,
+            22
+          ],
+          "locationMeters": [
+            -7.800000031789144,
+            0.4444444378217061,
+            1.440000057220459
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Door_Frame",
+          "otherFace": [
+            0,
+            13
+          ],
+          "overlapSquareMeters": 0.07784274614216047,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.755850291896213,
+            0.3851998578450827,
+            1.440000057220459
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Engine_Port_Cooling_Fins",
+          "Engine_Port_Running_Light"
+        ],
+        "beforeTrianglePairs": 6,
+        "afterTrianglePairs": 0,
+        "classification": "Repaired: single material owner after coplanar panel subtraction / opaque-frame glazing trim."
+      },
+      {
+        "nodes": [
+          "Engine_Starboard_Cooling_Fins",
+          "Engine_Starboard_Running_Light"
+        ],
+        "beforeTrianglePairs": 6,
+        "afterTrianglePairs": 0,
+        "classification": "Repaired: single material owner after coplanar panel subtraction / opaque-frame glazing trim."
+      },
+      {
+        "nodes": [
+          "Exit_Door",
+          "Exit_Door"
+        ],
+        "beforeTrianglePairs": 61,
+        "afterTrianglePairs": 0,
+        "classification": "Repaired: single material owner after coplanar panel subtraction / opaque-frame glazing trim."
+      },
+      {
+        "nodes": [
+          "Exit_Door",
+          "Exit_Ramp_Tip"
+        ],
+        "beforeTrianglePairs": 34,
+        "afterTrianglePairs": 48,
+        "classification": "Exit_Door / Exit_Ramp_Tip: closed-pose articulated leaf/tray/frame contact caps; retain surfaces for opening and telescopic extension. Mixed-material witnesses lie on the concealed lateral/end caps, not the ramp walking face.",
+        "sameFacingPairs": 48,
+        "opposingPairs": 0,
+        "materials": [
+          "Copper Accent",
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.4055049357519067,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Exit_Door",
+          "face": [
+            0,
+            10
+          ],
+          "locationMeters": [
+            -7.715476195017497,
+            0.24731183052062988,
+            0.8148136834303538
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Exit_Ramp_Tip",
+          "otherFace": [
+            0,
+            5
+          ],
+          "overlapSquareMeters": 0.00020000337906056487,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": true,
+          "overlapCenterMeters": [
+            -7.766666889190674,
+            0.24731183052062988,
+            0.04518151345698507
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Exit_Door",
+          "Hull_Aft_Cap"
+        ],
+        "beforeTrianglePairs": 16,
+        "afterTrianglePairs": 18,
+        "classification": "Exit_Door / Hull_Aft_Cap: closed-pose articulated leaf/tray/frame contact caps; retain surfaces for opening and telescopic extension. Mixed-material witnesses lie on the concealed lateral/end caps, not the ramp walking face.",
+        "sameFacingPairs": 18,
+        "opposingPairs": 0,
+        "materials": [
+          "Copper Accent",
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.5651622459708951,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Hull_Aft_Cap",
+          "face": [
+            0,
+            56
+          ],
+          "locationMeters": [
+            -7.679999987284343,
+            1.534050186475118,
+            -1.399999976158142
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Exit_Door",
+          "otherFace": [
+            0,
+            0
+          ],
+          "overlapSquareMeters": 0.003798261162577532,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": true,
+          "overlapCenterMeters": [
+            -7.788183407203845,
+            1.0493818124135335,
+            -1.399999976158142
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Exit_Ramp_Tip",
+          "Hull_Aft_Cap"
+        ],
+        "beforeTrianglePairs": 8,
+        "afterTrianglePairs": 8,
+        "classification": "Exit_Ramp_Tip / Hull_Aft_Cap: closed-pose articulated leaf/tray/frame contact caps; retain surfaces for opening and telescopic extension. Mixed-material witnesses lie on the concealed lateral/end caps, not the ramp walking face.",
+        "sameFacingPairs": 8,
+        "opposingPairs": 0,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.12559127751217236,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Hull_Aft_Cap",
+          "face": [
+            0,
+            56
+          ],
+          "locationMeters": [
+            -7.679999987284343,
+            1.534050186475118,
+            -1.399999976158142
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Exit_Ramp_Tip",
+          "otherFace": [
+            0,
+            0
+          ],
+          "overlapSquareMeters": 0.01576260580808242,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": true,
+          "overlapCenterMeters": [
+            -7.770712161615294,
+            1.3195343963108206,
+            -1.399999976158142
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Hull_Aft_Cap",
+          "Hull_Aft_Cap"
+        ],
+        "beforeTrianglePairs": 32,
+        "afterTrianglePairs": 32,
+        "classification": "Hull_Aft_Cap / Hull_Aft_Cap: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 32,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.6623998714445669,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Hull_Aft_Cap",
+          "face": [
+            0,
+            16
+          ],
+          "locationMeters": [
+            -7.800000031789144,
+            0.9462365508079529,
+            3.8799999554951987
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Hull_Aft_Cap",
+          "otherFace": [
+            0,
+            66
+          ],
+          "overlapSquareMeters": 0.0018461532780866818,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.913846229832868,
+            0.9462365508079529,
+            1.5692307799212013
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Hull_Aft_Cap",
+          "Hull_Belly"
+        ],
+        "beforeTrianglePairs": 6,
+        "afterTrianglePairs": 6,
+        "classification": "Hull_Aft_Cap / Hull_Belly: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 6,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 2.6096408713825987,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Hull_Aft_Cap",
+          "face": [
+            0,
+            18
+          ],
+          "locationMeters": [
+            -7.800000031789144,
+            0.19354838132858276,
+            2.6600000063578286
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Hull_Belly",
+          "otherFace": [
+            0,
+            5
+          ],
+          "overlapSquareMeters": 0.6587672599982213,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.829361793159378,
+            0.19354838132858276,
+            3.2570565713455286
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Hull_Aft_Cap",
+          "Hull_Port_Side"
+        ],
+        "beforeTrianglePairs": 25,
+        "afterTrianglePairs": 25,
+        "classification": "Hull_Aft_Cap / Hull_Port_Side: joined primitive seams with identical Hull Graphite material and co-oriented planar normals; one opaque shading result at the shared boundary. Opposing caps at the same join are internal construction faces.",
+        "sameFacingPairs": 16,
+        "opposingPairs": 9,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.5369113192219852,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Hull_Aft_Cap",
+          "face": [
+            0,
+            72
+          ],
+          "locationMeters": [
+            -7.559999942779541,
+            2.121863822142283,
+            4.920000076293945
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Hull_Port_Side",
+          "otherFace": [
+            0,
+            26
+          ],
+          "overlapSquareMeters": 0.11856277205272825,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.559999942779541,
+            2.4447203407798117,
+            4.955330239946193
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Hull_Aft_Cap",
+          "Hull_Starboard_Side"
+        ],
+        "beforeTrianglePairs": 23,
+        "afterTrianglePairs": 23,
+        "classification": "Hull_Aft_Cap / Hull_Starboard_Side: joined primitive seams with identical Hull Graphite material and co-oriented planar normals; one opaque shading result at the shared boundary. Opposing caps at the same join are internal construction faces.",
+        "sameFacingPairs": 15,
+        "opposingPairs": 8,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.5369113192219863,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Hull_Aft_Cap",
+          "face": [
+            0,
+            36
+          ],
+          "locationMeters": [
+            -7.559999942779541,
+            2.121863822142283,
+            -5.0
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Hull_Starboard_Side",
+          "otherFace": [
+            0,
+            26
+          ],
+          "overlapSquareMeters": 0.08016774328734932,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.559999942779541,
+            2.5364018917677753,
+            -4.981167767419879
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Hull_Belly",
+          "Hull_Belly"
+        ],
+        "beforeTrianglePairs": 12,
+        "afterTrianglePairs": 29,
+        "classification": "Hull_Belly / Hull_Belly: joined primitive seams with identical Hull Graphite material and co-oriented planar normals; one opaque shading result at the shared boundary. Opposing caps at the same join are internal construction faces.",
+        "sameFacingPairs": 2,
+        "opposingPairs": 27,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 1.632258251081642,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Hull_Belly",
+          "face": [
+            0,
+            15
+          ],
+          "locationMeters": [
+            4.800000190734863,
+            0.05734767019748688,
+            0.49761905272801715
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Hull_Belly",
+          "otherFace": [
+            0,
+            0
+          ],
+          "overlapSquareMeters": 0.11992213371089597,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            4.800000190734863,
+            0.10082788359712991,
+            0.37321428955073344
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Hull_Belly",
+          "Hull_Nose"
+        ],
+        "beforeTrianglePairs": 6,
+        "afterTrianglePairs": 0,
+        "classification": "Repaired: single material owner after coplanar panel subtraction / opaque-frame glazing trim."
+      },
+      {
+        "nodes": [
+          "Hull_Belly",
+          "Hull_Port_Side"
+        ],
+        "beforeTrianglePairs": 2,
+        "afterTrianglePairs": 2,
+        "classification": "Hull_Belly / Hull_Port_Side: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 2,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 1.941155756656297,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Hull_Port_Side",
+          "face": [
+            0,
+            6
+          ],
+          "locationMeters": [
+            -3.3333333333333335,
+            0.19354838132858276,
+            4.933333237965901
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Hull_Belly",
+          "otherFace": [
+            0,
+            5
+          ],
+          "overlapSquareMeters": 1.1245043253824907,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -5.959476397727521,
+            0.19354838132858276,
+            4.8164060920283545
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Hull_Belly",
+          "Hull_Starboard_Side"
+        ],
+        "beforeTrianglePairs": 2,
+        "afterTrianglePairs": 2,
+        "classification": "Hull_Belly / Hull_Starboard_Side: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 2,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 1.9411557566562951,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Hull_Starboard_Side",
+          "face": [
+            0,
+            6
+          ],
+          "locationMeters": [
+            -3.3333333333333335,
+            0.19354838132858276,
+            -4.933333237965901
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Hull_Belly",
+          "otherFace": [
+            0,
+            6
+          ],
+          "overlapSquareMeters": 1.1245043253824907,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -5.959476397727521,
+            0.19354838132858276,
+            -4.8164060920283545
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Hull_Belly",
+          "Wing_Port"
+        ],
+        "beforeTrianglePairs": 1,
+        "afterTrianglePairs": 1,
+        "classification": "Hull_Belly / Wing_Port: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 1,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 1.2340176715937794,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Wing_Port",
+          "face": [
+            0,
+            0
+          ],
+          "locationMeters": [
+            -3.0000001589457193,
+            0.19354838132858276,
+            6.399999936421712
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Hull_Belly",
+          "otherFace": [
+            0,
+            5
+          ],
+          "overlapSquareMeters": 1.2340176715937794,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -3.6204068547160007,
+            0.19354838132858276,
+            4.722865218738142
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Hull_Belly",
+          "Wing_Starboard"
+        ],
+        "beforeTrianglePairs": 1,
+        "afterTrianglePairs": 1,
+        "classification": "Hull_Belly / Wing_Starboard: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 1,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 1.2340176715937776,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Hull_Belly",
+          "face": [
+            0,
+            6
+          ],
+          "locationMeters": [
+            0.40000025431315106,
+            0.19354838132858276,
+            -1.6999999682108562
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Wing_Starboard",
+          "otherFace": [
+            0,
+            0
+          ],
+          "overlapSquareMeters": 1.2340176715937776,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -3.6204068547160007,
+            0.19354838132858276,
+            -4.722865218738142
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Hull_Port_Side",
+          "Hull_Port_Side"
+        ],
+        "beforeTrianglePairs": 32,
+        "afterTrianglePairs": 32,
+        "classification": "Hull_Port_Side / Hull_Port_Side: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 32,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.9599995613098138,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Hull_Port_Side",
+          "face": [
+            0,
+            28
+          ],
+          "locationMeters": [
+            -7.480000019073486,
+            2.7096774578094482,
+            4.766666571299235
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Hull_Port_Side",
+          "otherFace": [
+            0,
+            18
+          ],
+          "overlapSquareMeters": 0.05852812804348062,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.4817178072759445,
+            2.7096774578094482,
+            4.770766132982232
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Hull_Port_Side",
+          "Wall_Port_Inner"
+        ],
+        "beforeTrianglePairs": 8,
+        "afterTrianglePairs": 18,
+        "classification": "Hull_Port_Side / Wall_Port_Inner: opposing flush attachment caps between Hull Graphite and Interior Light solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 18,
+        "materials": [
+          "Hull Graphite",
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 9.295482499714808,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Wall_Port_Inner",
+          "face": [
+            0,
+            10
+          ],
+          "locationMeters": [
+            -7.37333329518636,
+            0.695264995098114,
+            4.599999904632568
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Hull_Port_Side",
+          "otherFace": [
+            0,
+            9
+          ],
+          "overlapSquareMeters": 0.0677420333508536,
+          "materials": [
+            "Interior Light",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.37333329518636,
+            0.695264995098114,
+            4.599999904632568
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Hull_Port_Side",
+          "Window_Port_Sill"
+        ],
+        "beforeTrianglePairs": 10,
+        "afterTrianglePairs": 10,
+        "classification": "Hull_Port_Side / Window_Port_Sill: opposing flush attachment caps between Honey Wood and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 10,
+        "materials": [
+          "Honey Wood",
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.41290357692267454,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Window_Port_Sill",
+          "face": [
+            0,
+            10
+          ],
+          "locationMeters": [
+            -3.239999771118164,
+            0.931899627049764,
+            4.599999904632568
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Hull_Port_Side",
+          "otherFace": [
+            0,
+            44
+          ],
+          "overlapSquareMeters": 0.006247161058937634,
+          "materials": [
+            "Honey Wood",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -3.39908450029588,
+            0.9485955888597254,
+            4.599999904632568
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Hull_Port_Side",
+          "Wing_Port"
+        ],
+        "beforeTrianglePairs": 7,
+        "afterTrianglePairs": 7,
+        "classification": "Hull_Port_Side / Wing_Port: joined primitive seams with identical Hull Graphite material and co-oriented planar normals; one opaque shading result at the shared boundary.",
+        "sameFacingPairs": 7,
+        "opposingPairs": 0,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 8.039531214159831,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Wing_Port",
+          "face": [
+            0,
+            0
+          ],
+          "locationMeters": [
+            -3.0000001589457193,
+            0.19354838132858276,
+            6.399999936421712
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Hull_Port_Side",
+          "otherFace": [
+            0,
+            6
+          ],
+          "overlapSquareMeters": 2.375119884550937,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": true,
+          "overlapCenterMeters": [
+            -1.0801439854184043,
+            0.19354838132858276,
+            4.978867980427239
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Hull_Starboard_Side",
+          "Hull_Starboard_Side"
+        ],
+        "beforeTrianglePairs": 32,
+        "afterTrianglePairs": 32,
+        "classification": "Hull_Starboard_Side / Hull_Starboard_Side: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 32,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.9599995613098158,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Hull_Starboard_Side",
+          "face": [
+            0,
+            28
+          ],
+          "locationMeters": [
+            -7.480000019073486,
+            2.7096774578094482,
+            -4.766666571299235
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Hull_Starboard_Side",
+          "otherFace": [
+            0,
+            18
+          ],
+          "overlapSquareMeters": 0.05852812804348062,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.4817178072759445,
+            2.7096774578094482,
+            -4.770766132982232
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Hull_Starboard_Side",
+          "Wall_Starboard_Inner"
+        ],
+        "beforeTrianglePairs": 8,
+        "afterTrianglePairs": 17,
+        "classification": "Hull_Starboard_Side / Wall_Starboard_Inner: opposing flush attachment caps between Hull Graphite and Interior Light solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 17,
+        "materials": [
+          "Hull Graphite",
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 9.295482499714806,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Wall_Starboard_Inner",
+          "face": [
+            0,
+            10
+          ],
+          "locationMeters": [
+            -7.37333329518636,
+            0.4731182853380839,
+            -4.599999904632568
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Hull_Starboard_Side",
+          "otherFace": [
+            0,
+            9
+          ],
+          "overlapSquareMeters": 0.0677420333508536,
+          "materials": [
+            "Interior Light",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -7.37333329518636,
+            0.4731182853380839,
+            -4.599999904632568
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Hull_Starboard_Side",
+          "Window_Starboard_Sill"
+        ],
+        "beforeTrianglePairs": 10,
+        "afterTrianglePairs": 10,
+        "classification": "Hull_Starboard_Side / Window_Starboard_Sill: opposing flush attachment caps between Honey Wood and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 10,
+        "materials": [
+          "Honey Wood",
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.4129035769226739,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Window_Starboard_Sill",
+          "face": [
+            0,
+            10
+          ],
+          "locationMeters": [
+            -3.239999771118164,
+            0.931899627049764,
+            -4.599999904632568
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Hull_Starboard_Side",
+          "otherFace": [
+            0,
+            44
+          ],
+          "overlapSquareMeters": 0.006247161058937634,
+          "materials": [
+            "Honey Wood",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -3.39908450029588,
+            0.9485955888597254,
+            -4.599999904632568
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Hull_Starboard_Side",
+          "Wing_Starboard"
+        ],
+        "beforeTrianglePairs": 7,
+        "afterTrianglePairs": 7,
+        "classification": "Hull_Starboard_Side / Wing_Starboard: joined primitive seams with identical Hull Graphite material and co-oriented planar normals; one opaque shading result at the shared boundary.",
+        "sameFacingPairs": 7,
+        "opposingPairs": 0,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 8.039531214159831,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Hull_Starboard_Side",
+          "face": [
+            0,
+            6
+          ],
+          "locationMeters": [
+            -3.3333333333333335,
+            0.19354838132858276,
+            -4.933333237965901
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Wing_Starboard",
+          "otherFace": [
+            0,
+            0
+          ],
+          "overlapSquareMeters": 2.3751198845509354,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": true,
+          "overlapCenterMeters": [
+            -1.0801439854184043,
+            0.19354838132858276,
+            -4.978867980427239
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Landing_Gear_Aft_Port",
+          "Landing_Gear_Aft_Port"
+        ],
+        "beforeTrianglePairs": 4,
+        "afterTrianglePairs": 4,
+        "classification": "Landing_Gear_Aft_Port / Landing_Gear_Aft_Port: opposing flush attachment caps between Hull Ceramic and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 4,
+        "materials": [
+          "Hull Ceramic",
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.4619999341964576,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Landing_Gear_Aft_Port",
+          "face": [
+            1,
+            4
+          ],
+          "locationMeters": [
+            -5.716666539510091,
+            -1.867526888847351,
+            3.7100000381469727
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Landing_Gear_Aft_Port",
+          "otherFace": [
+            0,
+            6
+          ],
+          "overlapSquareMeters": 0.007842669542247549,
+          "materials": [
+            "Hull Ceramic",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -5.833332668651987,
+            -1.867526888847351,
+            3.3949388295584217
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Landing_Gear_Aft_Starboard",
+          "Landing_Gear_Aft_Starboard"
+        ],
+        "beforeTrianglePairs": 4,
+        "afterTrianglePairs": 4,
+        "classification": "Landing_Gear_Aft_Starboard / Landing_Gear_Aft_Starboard: opposing flush attachment caps between Hull Ceramic and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 4,
+        "materials": [
+          "Hull Ceramic",
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.4619999341964576,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Landing_Gear_Aft_Starboard",
+          "face": [
+            1,
+            4
+          ],
+          "locationMeters": [
+            -5.716666539510091,
+            -1.867526888847351,
+            -3.490000009536743
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Landing_Gear_Aft_Starboard",
+          "otherFace": [
+            0,
+            6
+          ],
+          "overlapSquareMeters": 0.007842669542247549,
+          "materials": [
+            "Hull Ceramic",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -5.833332668651987,
+            -1.867526888847351,
+            -3.805061218125294
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Landing_Gear_Forward_Port",
+          "Landing_Gear_Forward_Port"
+        ],
+        "beforeTrianglePairs": 4,
+        "afterTrianglePairs": 4,
+        "classification": "Landing_Gear_Forward_Port / Landing_Gear_Forward_Port: opposing flush attachment caps between Hull Ceramic and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 4,
+        "materials": [
+          "Hull Ceramic",
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.46200024890902114,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Landing_Gear_Forward_Port",
+          "face": [
+            1,
+            4
+          ],
+          "locationMeters": [
+            4.683333237965901,
+            -1.867526888847351,
+            3.7100000381469727
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Landing_Gear_Forward_Port",
+          "otherFace": [
+            0,
+            6
+          ],
+          "overlapSquareMeters": 0.007842572894265487,
+          "materials": [
+            "Hull Ceramic",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            4.5666665236155195,
+            -1.867526888847351,
+            3.3949382232104273
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Landing_Gear_Forward_Starboard",
+          "Landing_Gear_Forward_Starboard"
+        ],
+        "beforeTrianglePairs": 4,
+        "afterTrianglePairs": 4,
+        "classification": "Landing_Gear_Forward_Starboard / Landing_Gear_Forward_Starboard: opposing flush attachment caps between Hull Ceramic and Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 4,
+        "materials": [
+          "Hull Ceramic",
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.46200024890902025,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Landing_Gear_Forward_Starboard",
+          "face": [
+            1,
+            4
+          ],
+          "locationMeters": [
+            4.683333237965901,
+            -1.867526888847351,
+            -3.490000009536743
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Landing_Gear_Forward_Starboard",
+          "otherFace": [
+            0,
+            6
+          ],
+          "overlapSquareMeters": 0.007842572894265487,
+          "materials": [
+            "Hull Ceramic",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            4.5666665236155195,
+            -1.867526888847351,
+            -3.8050618244732886
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Pilot_Seat_Armrests",
+          "Pilot_Seat_Bolsters"
+        ],
+        "beforeTrianglePairs": 9,
+        "afterTrianglePairs": 9,
+        "classification": "Pilot_Seat_Armrests / Pilot_Seat_Bolsters: opposing flush attachment caps between Interior Dark and Terracotta Upholstery solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 9,
+        "materials": [
+          "Interior Dark",
+          "Terracotta Upholstery"
+        ],
+        "summedOverlapSquareMeters": 0.007400040423885645,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Pilot_Seat_Armrests",
+          "face": [
+            0,
+            33
+          ],
+          "locationMeters": [
+            2.4033333460489907,
+            1.0800000429153442,
+            0.6083333094914755
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Pilot_Seat_Bolsters",
+          "otherFace": [
+            0,
+            51
+          ],
+          "overlapSquareMeters": 5.000042617375744e-05,
+          "materials": [
+            "Interior Dark",
+            "Terracotta Upholstery"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            2.2766666263342126,
+            1.0800000429153442,
+            0.5933333237965902
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Pilot_Seat_Armrests",
+          "Pilot_Seat_Controls"
+        ],
+        "beforeTrianglePairs": 14,
+        "afterTrianglePairs": 14,
+        "classification": "Pilot_Seat_Armrests / Pilot_Seat_Controls: opposing flush attachment caps between Hull Graphite and Interior Dark solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 14,
+        "materials": [
+          "Hull Graphite",
+          "Interior Dark"
+        ],
+        "summedOverlapSquareMeters": 0.012603361229793109,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Pilot_Seat_Controls",
+          "face": [
+            0,
+            12
+          ],
+          "locationMeters": [
+            2.731333335240682,
+            1.159999966621399,
+            -0.670370082060496
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Pilot_Seat_Armrests",
+          "otherFace": [
+            0,
+            10
+          ],
+          "overlapSquareMeters": 0.00016291494170239673,
+          "materials": [
+            "Hull Graphite",
+            "Interior Dark"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            2.741671259091644,
+            1.159999966621399,
+            -0.6787408748292285
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Pilot_Seat_Base",
+          "Pilot_Seat_Base"
+        ],
+        "beforeTrianglePairs": 7,
+        "afterTrianglePairs": 7,
+        "classification": "Pilot_Seat_Base / Pilot_Seat_Base: opposing flush attachment caps between Interior Dark solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 7,
+        "materials": [
+          "Interior Dark"
+        ],
+        "summedOverlapSquareMeters": 0.0343595379252974,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Pilot_Seat_Base",
+          "face": [
+            0,
+            44
+          ],
+          "locationMeters": [
+            2.5383333365122476,
+            0.5,
+            0.06639528274536133
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Pilot_Seat_Base",
+          "otherFace": [
+            0,
+            30
+          ],
+          "overlapSquareMeters": 0.005726581739281769,
+          "materials": [
+            "Interior Dark",
+            "Interior Dark"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            2.5383333365122476,
+            0.5,
+            0.06639528274536133
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Pilot_Seat_Controls",
+          "Pilot_Seat_Controls"
+        ],
+        "beforeTrianglePairs": 7,
+        "afterTrianglePairs": 7,
+        "classification": "Pilot_Seat_Controls / Pilot_Seat_Controls: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 7,
+        "materials": [
+          "Hull Graphite"
+        ],
+        "summedOverlapSquareMeters": 0.002338267122965587,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Pilot_Seat_Controls",
+          "face": [
+            0,
+            16
+          ],
+          "locationMeters": [
+            2.709999958674113,
+            1.2899999618530273,
+            -0.707320511341095
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Pilot_Seat_Controls",
+          "otherFace": [
+            0,
+            38
+          ],
+          "overlapSquareMeters": 0.0003897111871609127,
+          "materials": [
+            "Hull Graphite",
+            "Hull Graphite"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            2.709999958674113,
+            1.2899999618530273,
+            -0.707320511341095
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Wall_Port_Inner",
+          "Window_Port_Sill"
+        ],
+        "beforeTrianglePairs": 3,
+        "afterTrianglePairs": 0,
+        "classification": "Repaired: single material owner after coplanar panel subtraction / opaque-frame glazing trim."
+      },
+      {
+        "nodes": [
+          "Wall_Port_Inner",
+          "Wing_Port"
+        ],
+        "beforeTrianglePairs": 4,
+        "afterTrianglePairs": 8,
+        "classification": "Wall_Port_Inner / Wing_Port: opposing flush attachment caps between Hull Graphite and Interior Light solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 8,
+        "materials": [
+          "Hull Graphite",
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 2.1860213923838785,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Wing_Port",
+          "face": [
+            0,
+            8
+          ],
+          "locationMeters": [
+            1.3333333333333333,
+            0.2795698841412862,
+            4.599999904632568
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Wall_Port_Inner",
+          "otherFace": [
+            0,
+            12
+          ],
+          "overlapSquareMeters": 0.0029304980908125278,
+          "materials": [
+            "Hull Graphite",
+            "Interior Light"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            3.600019006394575,
+            0.3181091852152125,
+            4.599999904632568
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Wall_Starboard_Inner",
+          "Window_Starboard_Sill"
+        ],
+        "beforeTrianglePairs": 3,
+        "afterTrianglePairs": 0,
+        "classification": "Repaired: single material owner after coplanar panel subtraction / opaque-frame glazing trim."
+      },
+      {
+        "nodes": [
+          "Wall_Starboard_Inner",
+          "Wing_Starboard"
+        ],
+        "beforeTrianglePairs": 4,
+        "afterTrianglePairs": 6,
+        "classification": "Wall_Starboard_Inner / Wing_Starboard: opposing flush attachment caps between Hull Graphite and Interior Light solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 6,
+        "materials": [
+          "Hull Graphite",
+          "Interior Light"
+        ],
+        "summedOverlapSquareMeters": 2.1860213923838785,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Wing_Starboard",
+          "face": [
+            0,
+            8
+          ],
+          "locationMeters": [
+            1.3333333333333333,
+            0.2795698841412862,
+            -4.599999904632568
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Wall_Starboard_Inner",
+          "otherFace": [
+            0,
+            12
+          ],
+          "overlapSquareMeters": 0.5982473298877904,
+          "materials": [
+            "Hull Graphite",
+            "Interior Light"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            2.1287152593725516,
+            0.28262401997353015,
+            -4.599999904632568
+          ]
+        }
+      }
+    ]
+  },
+  "cargo": {
+    "beforeOverlapPairs": 36,
+    "afterOverlapPairs": 32,
+    "pairs": [
+      {
+        "nodes": [
+          "Cargo_Container",
+          "Cargo_Container"
+        ],
+        "beforeTrianglePairs": 36,
+        "afterTrianglePairs": 32,
+        "classification": "Cargo_Container / Cargo_Container: opposing flush attachment caps between Cargo_Frame and Cargo_Panel and Cargo_Trim solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 32,
+        "materials": [
+          "Cargo_Frame",
+          "Cargo_Panel",
+          "Cargo_Trim"
+        ],
+        "summedOverlapSquareMeters": 0.03071598311328928,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Cargo_Container",
+          "face": [
+            1,
+            124
+          ],
+          "locationMeters": [
+            0.368666668732961,
+            0.03999999165534973,
+            0.21866666277249655
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Cargo_Container",
+          "otherFace": [
+            1,
+            248
+          ],
+          "overlapSquareMeters": 0.00017100119102578248,
+          "materials": [
+            "Cargo_Frame",
+            "Cargo_Frame"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            0.36084430675181817,
+            0.03999999165534973,
+            0.23131136296119056
+          ]
+        }
+      }
+    ]
+  },
+  "tool": {
+    "beforeOverlapPairs": 70,
+    "afterOverlapPairs": 70,
+    "pairs": [
+      {
+        "nodes": [
+          "Housing",
+          "Status_Panel"
+        ],
+        "beforeTrianglePairs": 2,
+        "afterTrianglePairs": 2,
+        "classification": "Housing / Status_Panel: opposing flush attachment caps between Tool_Housing and Tool_Status solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 2,
+        "materials": [
+          "Tool_Housing",
+          "Tool_Status"
+        ],
+        "summedOverlapSquareMeters": 0.0009430001042485259,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Status_Panel",
+          "face": [
+            0,
+            36
+          ],
+          "locationMeters": [
+            0.0018333327025175095,
+            0.08883333454529445,
+            -0.05000000074505806
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Housing",
+          "otherFace": [
+            0,
+            40
+          ],
+          "overlapSquareMeters": 0.00047150005212426294,
+          "materials": [
+            "Tool_Status",
+            "Tool_Housing"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            0.0018333327025175095,
+            0.08883333454529445,
+            -0.05000000074505806
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Housing_Details",
+          "Metal_Details"
+        ],
+        "beforeTrianglePairs": 64,
+        "afterTrianglePairs": 64,
+        "classification": "Housing_Details / Metal_Details: opposing flush attachment caps between Tool_Housing and Tool_Metal solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 64,
+        "materials": [
+          "Tool_Housing",
+          "Tool_Metal"
+        ],
+        "summedOverlapSquareMeters": 0.0005481941857674871,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Metal_Details",
+          "face": [
+            0,
+            100
+          ],
+          "locationMeters": [
+            -0.025401925047238667,
+            0.04349999874830246,
+            -0.054999999701976776
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Housing_Details",
+          "otherFace": [
+            0,
+            98
+          ],
+          "overlapSquareMeters": 8.603495416405205e-06,
+          "materials": [
+            "Tool_Metal",
+            "Tool_Housing"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -0.025166197607052597,
+            0.0429483841620929,
+            -0.054999999701976776
+          ]
+        }
+      },
+      {
+        "nodes": [
+          "Status_Top",
+          "Top_Rail"
+        ],
+        "beforeTrianglePairs": 4,
+        "afterTrianglePairs": 4,
+        "classification": "Status_Top / Top_Rail: opposing flush attachment caps between Tool_Metal and Tool_Status solids; exposed outer faces remain on opposite sides of this internal join.",
+        "sameFacingPairs": 0,
+        "opposingPairs": 4,
+        "materials": [
+          "Tool_Metal",
+          "Tool_Status"
+        ],
+        "summedOverlapSquareMeters": 0.0016340000029504283,
+        "witness": {
+          "code": "surface-overlap",
+          "node": "Status_Top",
+          "face": [
+            0,
+            32
+          ],
+          "locationMeters": [
+            -0.003666666646798452,
+            0.1404999941587448,
+            -0.0071666669100522995
+          ],
+          "toleranceMeters": 1e-05,
+          "otherNode": "Top_Rail",
+          "otherFace": [
+            0,
+            38
+          ],
+          "overlapSquareMeters": 0.0008131040738571955,
+          "materials": [
+            "Tool_Status",
+            "Tool_Metal"
+          ],
+          "sameFacing": false,
+          "overlapCenterMeters": [
+            -0.0010723874054331143,
+            0.1404999941587448,
+            -0.0014985081571374462
+          ]
+        }
+      }
+    ]
+  }
+}

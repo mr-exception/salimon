@@ -298,3 +298,12 @@ validator checks exact corners, facing, UV fit and a two-triangle budget. The
 runtime renders live energy/consumption/conversion/depletion/warnings here,
 independently of the cockpit console. It blanks at outage; mechanical intake
 stays usable. Apple M1 visual signoff belongs to the separate native work.
+
+## Surface remediation (#244)
+
+Different-material coplanar panels now have one surface owner; lower glazing is
+trimmed against opaque framing. Six owning libraries were edited with assembly
+links intact. All spatial contracts and monitor UVs are preserved.
+Current export: 6,281 triangles, 116 primitives, 13 materials, 525,356 bytes.
+The [named-pair report](../../../../reports/issue-244/README.md) explains retained
+internal joins and articulated contact caps; native M1 signoff remains #229.

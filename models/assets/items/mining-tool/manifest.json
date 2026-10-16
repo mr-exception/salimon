@@ -282,7 +282,7 @@
           "Status_Panel"
         ],
         "maxPairs": 2,
-        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+        "reason": "Housing / Status_Panel: opposing flush attachment caps between Tool_Housing and Tool_Status solids; exposed outer faces remain on opposite sides of this internal join."
       },
       {
         "nodes": [
@@ -290,7 +290,7 @@
           "Metal_Details"
         ],
         "maxPairs": 64,
-        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+        "reason": "Housing_Details / Metal_Details: opposing flush attachment caps between Tool_Housing and Tool_Metal solids; exposed outer faces remain on opposite sides of this internal join."
       },
       {
         "nodes": [
@@ -298,15 +298,9 @@
           "Top_Rail"
         ],
         "maxPairs": 4,
-        "reason": "Temporary existing construction candidate; classify/remediate in #244; not visual signoff."
+        "reason": "Status_Top / Top_Rail: opposing flush attachment caps between Tool_Metal and Tool_Status solids; exposed outer faces remain on opposite sides of this internal join."
       }
-    ],
-    "severity": {
-      "degenerate": "warning"
-    },
-    "maxWarnings": {
-      "degenerate": 32
-    }
+    ]
   },
   "visualBudget": {
     "style": "option-a",

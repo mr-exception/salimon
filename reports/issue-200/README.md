@@ -1,5 +1,9 @@
 # Issue 200 — integrated native Apple M1 propulsion regression
 
+Latest local verification: [2026-10-17 follow-up](2026-10-17/README.md).
+The evidence below is the historical 2026-10-15 run and retains its original
+coverage limits; the dated follow-up records what was verified subsequently.
+
 Executed locally on 2026-10-15 (Asia/Nicosia) on the owner's physical Apple M1
 macOS iMac; no cloud, CI, software Vulkan or emulated GPU results are presented
 as hardware verification. [Environment](environment.json),

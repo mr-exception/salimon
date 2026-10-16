@@ -1,5 +1,10 @@
 # Issue 198 — Apple M1 flight, collision and landing verification
 
+Latest: [2026-10-16 native completion](2026-10-16/README.md) adds successful
+held OS throttle/steering, native reverse motion, relative mouse-look and L
+recovery/takeoff evidence. The dated 2026-10-15 account below retains its original
+limitations and is superseded for these input checks.
+
 Native execution on the owner's iMac21,1 / Apple M1 (8 CPU and 8 GPU cores,
 16 GB RAM), macOS 26.2, on 2026-10-15 (Asia/Nicosia). Metal selected the real
 Apple M1 integrated GPU with timestamp queries. Drawable: 1920×1080 physical
@@ -16,7 +21,7 @@ Keep the issue open for that remaining owner walkthrough.
 ## Current follow-up
 
 See the [2026-10-16 current-revision rerun](2026-10-16/README.md) for refreshed
-M1 flight evidence and the remaining OS-input limitation. The original results
+M1 flight evidence and completed OS-input checks. The original results
 below remain the dated 2026-10-15 evidence at their recorded revision.
 
 ## Implementation and prerequisites

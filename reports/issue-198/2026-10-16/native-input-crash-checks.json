@@ -1,0 +1,8 @@
+{
+  "crash-grounded": true,
+  "native-recovery-started": true,
+  "recovery-landed": true,
+  "native-takeoff-started": true,
+  "takeoff-complete": true,
+  "inertial_handoff": true
+}

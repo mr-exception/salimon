@@ -6,6 +6,33 @@ from pathlib import Path
 import shutil
 
 
+def expanded_scenario(fixture):
+    """Use the same checkpoint contract for capture and offline verification."""
+    if fixture['mode'] not in ('static', 'moving'):
+        raise ValueError('invalid fixture mode')
+    repeat = fixture.get('repeat', 1)
+    if type(repeat) is not int or repeat < 1:
+        raise ValueError('repeat must be a positive integer')
+    scenario = json.loads(Path(fixture['scenario']).read_text())
+    steps = []
+    names = []
+    for step in scenario['steps']:
+        if 'screenshot' in step:
+            name = step['screenshot']
+            if not isinstance(name, str) or not name or Path(name).name != name or name in ('.', '..'):
+                raise ValueError(f'invalid screenshot name: {name!r}')
+            names.extend(f'{name}-repeat-{i:02}' for i in range(repeat))
+            steps.extend({'screenshot': f'{name}-repeat-{i:02}'} for i in range(repeat))
+        else:
+            steps.append(step)
+    if not names or len(names) != len(set(names)):
+        raise ValueError('fixture must have unique screenshot names')
+    if (fixture['mode'] == 'moving' and repeat < 2) or len(names) < 2:
+        raise ValueError('fixture requires repeated frames for temporal comparison')
+    scenario['steps'] = steps
+    return scenario, {name + '.png' for name in names}
+
+
 def compare(expected, actual, output, *, channel_tolerance=8, changed_fraction=0.001,
             masks=()):
     # Optional dependency: ordinary runner/build tooling remains standard-library only.
@@ -52,6 +79,12 @@ def evaluate(captures, baselines, output, fixture, temporal_only=False):
     frames = sorted(Path(captures).glob('*.png'))
     if not frames:
         raise ValueError('no captured frames')
+    if 'scenario' in fixture:
+        _, expected = expanded_scenario(fixture)
+        actual = {frame.name for frame in frames}
+        if actual != expected:
+            raise ValueError(f'incomplete fixture evidence: missing={sorted(expected - actual)}, '
+                             f'unexpected={sorted(actual - expected)}')
     options = fixture.get('tolerances', {})
     if not temporal_only:
         missing = {p.name for p in Path(baselines).glob('*.png')} - {p.name for p in frames}
@@ -83,15 +116,7 @@ def capture(fixture, binary, output):
     from salimon_test import run
     output = Path(output)
     output.mkdir(parents=True, exist_ok=True)
-    scenario = json.loads(Path(fixture['scenario']).read_text())
-    steps = []
-    for step in scenario['steps']:
-        if 'screenshot' in step:
-            steps.extend({'screenshot': f"{step['screenshot']}-repeat-{i:02}"}
-                         for i in range(fixture.get('repeat', 1)))
-        else:
-            steps.append(step)
-    scenario['steps'] = steps
+    scenario, _ = expanded_scenario(fixture)
     expanded = output/'expanded.json'
     expanded.write_text(json.dumps(scenario))
     result = run(expanded, [str(Path(binary).resolve())], output/'runs', ['native'])

@@ -21,6 +21,12 @@ Linux software Vulkan: prefix capture with
 Nightly verification runs software-Vulkan captures and repeat-stability checks.
 These commands also remain available locally; PR CI only builds source. Missing approved baselines
 fail ordinary comparison, never silently initialize or overwrite a baseline.
+Both comparison modes derive the exact expected PNG names from each fixture's
+source scenario and repeat count. Missing poses/repeats and unexpected stale PNGs
+fail before pixel comparison, including with `--temporal-only`. Screenshot names
+must be unique file names; moving fixtures require at least two repeats per pose,
+and static fixtures require at least two frames in total. Capture and comparison
+share the same expansion rule, so deleting evidence cannot weaken the gate.
 Artifacts contain PNG candidates, per-step production inspection/protocol logs,
 highlight/difference PNGs, changed/compared pixel counts and peak channel delta.
 

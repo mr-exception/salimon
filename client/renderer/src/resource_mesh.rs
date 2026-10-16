@@ -11,6 +11,9 @@ pub struct ResourceBatchStats {
     /// Retained CPU instance staging and last-uploaded byte capacities.
     pub scratch_capacity_bytes: u64,
 }
+#[cfg(test)]
+#[path = "resource_mesh/sphere_benchmark.rs"]
+mod sphere_benchmark;
 const FLOATS: usize = 7;
 const ASSETS: [&[u8]; 19] = [
     // Legacy variants remain for historical geometry benchmarks/contact proxies.

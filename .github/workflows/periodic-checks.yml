@@ -183,6 +183,10 @@ jobs:
         id: flight
         timeout-minutes: 6
         run: python scripts/profile_flight.py --binary target/release/salimon-client --samples 100 --baseline reports/issue-196/baseline.json --output artifacts/periodic/flight-profile.json
+      - name: Spherical mining CPU and batch matrix
+        id: spheres
+        timeout-minutes: 10
+        run: python scripts/benchmark_spheres.py --run --output artifacts/periodic/spheres
       - name: Resource preparation CPU comparison
         id: preparation
         timeout-minutes: 5
@@ -193,7 +197,7 @@ jobs:
         if: always() && steps.checkout.outcome == 'success'
         env:
           CI_STEPS: ${{ toJSON(steps) }}
-        run: python scripts/ci_reports.py record --lane benchmarks --required tools build fragments flight preparation
+        run: python scripts/ci_reports.py record --lane benchmarks --required tools build fragments flight spheres preparation
       - name: Preserve raw benchmark output
         if: always()
         uses: actions/upload-artifact@v4

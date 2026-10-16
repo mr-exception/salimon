@@ -66,7 +66,7 @@ repeating the code. Avoid speculative abstractions and unrelated cleanup.
 ## Python and shaders
 
 Python build/runner scripts support 3.10+; tooling checks use Python 3.12.
-Automatic CI only builds Rust source; run applicable tooling checks locally. Keep standard-library
+PR CI only builds Rust source; run applicable tooling checks locally. Keep standard-library
 build/run tooling independent of Blender/model dependencies. Model tooling's
 third-party requirements live in `models/tools/requirements.txt`. Use explicit
 paths rooted in the repository where the CLI supports them, small functions,

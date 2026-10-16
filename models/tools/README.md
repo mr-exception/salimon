@@ -219,7 +219,8 @@ SALIMON_GLB_CANDIDATES="$PWD/artifacts/glb" cargo test -p salimon-renderer --loc
 After dependency installation these commands need no network, Blender, display
 or GPU. Run them deliberately and retain candidate GLBs, detailed Khronos
 before/after diagnostics, hashes, contract metrics and aggregate `summary.json`.
-Automatic CI only compiles source and does not run this optional pipeline.
+PR CI only compiles source. Nightly verification runs this optional pipeline;
+see [periodic reports](../../docs/periodic-ci.md).
 Output contains no timestamp or absolute workstation paths. Reports reflect the
 checked-in exports at that revision, not an unperformed Blender regeneration.
 

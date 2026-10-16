@@ -30,8 +30,8 @@ explicitly. A helper/tool/permission/capture failure never becomes a passing
 skip. The runner focuses the launched game and changes focus on your desktop;
 use a dedicated test session. Screenshots capture the whole desktop and may
 include other visible content. Keep the game unobscured. macOS and Windows
-adapters need validation on the target desktop. Automatic CI does not exercise
-packaged smoke on any platform.
+adapters need validation on the target desktop. The nightly workflow exercises Linux
+packaged smoke; macOS/Windows graphical checks remain local.
 
 For manual Linux software-rendered startup validation:
 
@@ -43,8 +43,8 @@ WGPU_BACKEND=vulkan xvfb-run -a -s '-screen 0 1920x1080x24' \
 
 Run this explicitly after staging a Linux release package and retain the
 evidence, including failures. Xvfb/Mesa coverage does not establish hardware
-GPU fidelity. Automatic CI only compiles the source; all packaged/input smoke
-checks remain local opt-in.
+GPU fidelity. PR CI only compiles the source. Nightly verification runs the Linux smoke;
+macOS/Windows input smoke remains local opt-in.
 
 `--artifacts DIR` changes the default `artifacts/packaged-smoke/` root;
 `--timeout SECONDS` sets the bounded gameplay deadline (default 60, maximum 600).

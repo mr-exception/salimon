@@ -1,4 +1,4 @@
-# #258 — source-build-only CI
+# #258 — fast PR builds, periodic verification and reports
 
 Baseline: `0cc9764` (2026-10-16). Replace the three-platform Native builds workflow
 with **Source build**, one Ubuntu 24.04 job named **Source build (Ubuntu)**.
@@ -13,9 +13,10 @@ components from the repository toolchain file for a build-only job.
 Removed automatic OS matrix, Python/Node setup, tests, formatting/lint, model
 processing, debug/release staging, optimized release compilation, benchmarks,
 Xvfb/Mesa/input/capture setup, E2E/visual/smoke checks and artifact uploads.
-Manual dispatch runs the same source build; the visual-evidence input is removed.
+Manual dispatch of **Source build** runs the same source build; the visual-evidence input is removed.
 All local verification/build scripts and scenario files remain available.
-Maintained guides now describe manual verification separately from automatic CI.
+The follow-up request adds the separate schedule/manual-only workflow and
+dashboard described below; these do not add PR/push checks.
 
 ## Required-check migration
 
@@ -83,3 +84,57 @@ Step durations from GitHub:
 
 GitHub job setup, cleanup and orchestration account for the remaining time.
 See [ci-timing.json](ci-timing.json) for timestamps and the exact comparison.
+
+## Scheduled verification and dashboard follow-up
+
+The expanded PR adds `.github/workflows/periodic-checks.yml` with nightly Linux
+verification (00:37 UTC), weekly CPU benchmarks plus macOS/Windows build checks
+(Sunday 01:17 UTC), and manual suite/force choices. There is no PR/push trigger.
+Successful unchanged revisions skip expensive work; failed/missing suites retry.
+All suites check out the planned default-branch revision.
+
+The standard-library `scripts/ci_reports.py` collects required step outcomes,
+validates complete benchmark output and source/binary provenance, writes run
+summaries, merges bounded durable history on `ci-reports`, and generates the
+static dashboard. Failed and missing reports stay failures. Benchmark series
+isolate CPU/platform/configuration rather than comparing incompatible runs or
+converting CPU timings into native FPS.
+
+Reports include suite status, commit, check outcomes and Actions links. Raw
+screenshots/logs/measurements and the downloadable standalone dashboard have
+30-day artifact retention. Compact history retains the last 90 suite results.
+The report branch keeps normal commit ancestry and ordinary non-force pushes;
+publishing is serialized. Only that job has repository write permission.
+
+GitHub Pages deployment is opt-in and uses a separate least-privilege job.
+After merge, select **Settings → Pages → GitHub Actions** and set the repository
+variable **CI_DASHBOARD_PAGES=true**. Then manually run the periodic workflow.
+The expected project URL is `https://mr-exception.github.io/salimon/`; deployment
+outputs supply the actual URL. Existing Pages hosting should be reviewed before
+enabling this project-root deployment. Until then, Actions summaries and the
+downloaded dashboard work. See the [operation/activation guide](../../docs/periodic-ci.md).
+
+Validation for the follow-up:
+
+- `artifacts/actionlint -shellcheck= .github/workflows/*.yml`: passed with actionlint 1.7.7.
+- `python -m unittest discover -s scripts -p 'test_*.py' -v`: 73 tests passed,
+  including twelve report tests for skip/retry, failures, provenance, numeric
+  samples, hardware isolation, bounded history, HTML embedding and branch ancestry.
+- `node --check scripts/ci_dashboard/dashboard.js`: passed.
+- Headless Chrome 155 + Playwright browser QA: populated and empty dashboards,
+  seven trend points, history filtering and a 390px mobile viewport pass without
+  overflow or JavaScript errors. The mobile select overflow found in QA was fixed.
+- New/changed relative documentation links and `git diff --check`: passed.
+
+The scheduled/manual workflow file first becomes runnable after merging onto
+the default branch; no actual nightly/weekly run, history-branch write or Pages
+deployment is claimed here. Those initial runs remain the post-merge activation
+check, not native M1 signoff. The existing source-build PR check remains active.
+
+### Dashboard preview
+
+These browser screenshots deliberately use **synthetic fixture data**, visibly
+labelled in the preview. They demonstrate layout/filter/chart behavior, not real
+benchmark measurements or an already deployed dashboard.
+
+[Desktop preview](dashboard-preview-desktop.png) · [Mobile preview](dashboard-preview-mobile.png)

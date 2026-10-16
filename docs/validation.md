@@ -11,12 +11,14 @@ Use Python 3.12 for tooling checks. Initial installation/builds require network 
 [Source build](../.github/workflows/native-build.yml) runs one Ubuntu 24.04 job
 on pull requests, main pushes and manual dispatch: `cargo build --workspace --locked`
 in the debug profile. It uses Cargo caching, a 15-minute timeout and cancels
-superseded runs for the same PR/branch. It does not run the validation matrix
+superseded runs for the same PR/branch. This source-build workflow does not run the validation matrix
 below, stage executables, build release profiles or upload artifacts.
 
-Tests, formatting/lint, model processing, benchmarks and native graphical/smoke
-checks remain available for deliberate local verification. macOS/Windows builds
-and platform-specific testing remain local as well.
+The separate [Periodic verification workflow](periodic-ci.md) runs Linux tests,
+model processing and graphical/smoke checks nightly, with CPU benchmarks and
+macOS/Windows build verification weekly. It supports manual runs, summaries,
+artifacts and a history dashboard, with optional GitHub Pages deployment. It has
+no PR/push trigger. All local verification commands below remain available.
 
 The new check name is **Source build (Ubuntu)**. If branch protection or rulesets
 require the old `build (ubuntu-24.04)`, `build (macos-14)` or `build (windows-2022)`
@@ -77,7 +79,7 @@ passing metadata checks alone does not prove visual quality.
 
 ## Optional offline GLB pipeline
 
-For manual verification, install the pinned local Khronos validator, run
+For local verification (also covered nightly), install the pinned local Khronos validator, run
 `python models/tools/process_glb.py all --profile exact-v1 --output artifacts/glb`,
 and check candidates with the production CPU importers using
 `SALIMON_GLB_CANDIDATES="$PWD/artifacts/glb" cargo test -p salimon-renderer --locked offline_glb_candidate -- --ignored`.
@@ -110,8 +112,9 @@ On macOS/Windows use a local graphical desktop, omit Xvfb/Linux backend variable
 and select the staged executable (`salimon-client.exe` on Windows). Use the
 [runner guide](../scripts/README.md) for platform capture configuration and
 [packaged smoke prerequisites](../scripts/PACKAGED_SMOKE.md) for OS input/capture.
-These checks are manual on every platform. Workflow dispatch runs the same
-source-build job as PRs and main pushes; it has no visual-evidence option.
+Nightly verification runs these Linux graphical checks. macOS/Windows graphics
+remain local. Dispatch **Source build** for compilation only, or **Periodic
+verification** for a nightly/weekly suite; neither adds a PR test gate.
 
 Linux software Vulkan establishes launch, gameplay/state and capture coverage;
 it does not establish macOS Metal/Windows hardware fidelity or performance.

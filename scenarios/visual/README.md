@@ -18,7 +18,8 @@ python scripts/model_visual_tests.py compare
 
 Linux software Vulkan: prefix capture with
 `xvfb-run -a -s '-screen 0 1280x800x24'` and set `WGPU_BACKEND=vulkan`.
-Run captures and repeat-stability checks manually; automatic CI only builds source. Missing approved baselines
+Nightly verification runs software-Vulkan captures and repeat-stability checks.
+These commands also remain available locally; PR CI only builds source. Missing approved baselines
 fail ordinary comparison, never silently initialize or overwrite a baseline.
 Artifacts contain PNG candidates, per-step production inspection/protocol logs,
 highlight/difference PNGs, changed/compared pixel counts and peak channel delta.

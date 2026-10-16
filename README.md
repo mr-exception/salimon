@@ -106,6 +106,8 @@ For standalone native debug/release executables on macOS, Windows, and Debian
 Linux, use `python3 scripts/build_game.py --profile release` (`python` on
 Windows). See [native build documentation](scripts/BUILDING.md) for prerequisites,
 output locations, failure handling, and the single Ubuntu source-build CI check.
+[Nightly verification and weekly benchmarks](docs/periodic-ci.md) publish Actions
+summaries and a history dashboard without adding slow PR checks.
 
 Run declarative native E2E scenarios with `scripts/salimon-test suite` or
 `scripts/salimon-test run scenarios/landed-earth.json`; see

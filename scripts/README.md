@@ -191,17 +191,21 @@ not a passed or skipped scenario. Visual runs require a working capture helper.
 
 Every push to `main`, pull request and manual dispatch runs **Source build
 (Ubuntu)**: one `cargo build --workspace --locked` in the normal debug profile.
-The workflow retains Cargo caching, cancels superseded runs per PR/branch and
+The source-build workflow retains Cargo caching, cancels superseded runs per PR/branch and
 has a 15-minute timeout. It does not stage release/debug packages or upload
 artifacts, and does not run tests, model processing, benchmarks, graphical
-scenarios or packaged smoke. macOS/Windows builds are manual.
+scenarios or packaged smoke. macOS/Windows builds also run in the weekly workflow.
 
 Run the baseline/evidence suites above deliberately on a native desktop or a
 prepared Linux Xvfb/Mesa environment. Capture, display and assertion failures
 remain failures when these commands are run. Keep their `artifacts/e2e/` results,
-logs and screenshots for review; CI no longer uploads them. Frozen model capture
+logs and screenshots for review; periodic CI uploads them with 30-day retention. Frozen model capture
 and temporal comparison commands remain in the [visual fixture guide](../scenarios/visual/README.md).
-Manual workflow dispatch has no `visual_evidence` option.
+The separate [periodic workflow](../docs/periodic-ci.md) runs these Linux suites
+nightly and benchmarks/platform builds weekly. It has no PR/push trigger. Its
+manual dispatch selects `nightly` or `weekly`, with an optional forced rerun.
+Each run has summaries, raw artifacts and a history dashboard; GitHub Pages
+publishing is opt-in. The source-build dispatch has no `visual_evidence` option.
 
 See [automatic CI and check-name migration](../docs/validation.md#automatic-ci)
 when updating required checks. Repository protection settings are not changed

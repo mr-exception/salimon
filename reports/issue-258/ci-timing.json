@@ -1,0 +1,95 @@
+{
+  "previous": {
+    "run": 38895873017,
+    "url": "https://github.com/mr-exception/salimon/actions/runs/38895873017",
+    "jobs": [
+      {
+        "id": 116956079312,
+        "name": "build (windows-2022)",
+        "started_at": "2026-10-16T11:45:22Z",
+        "completed_at": "2026-10-16T11:51:12Z",
+        "seconds": 350
+      },
+      {
+        "id": 116956079391,
+        "name": "build (macos-14)",
+        "started_at": "2026-10-16T11:45:26Z",
+        "completed_at": "2026-10-16T11:48:58Z",
+        "seconds": 212
+      },
+      {
+        "id": 116956079634,
+        "name": "build (ubuntu-24.04)",
+        "started_at": "2026-10-16T11:45:22Z",
+        "completed_at": "2026-10-16T12:01:40Z",
+        "seconds": 978
+      }
+    ],
+    "ubuntuCache": "hit"
+  },
+  "sourceBuild": {
+    "run": 38899019926,
+    "url": "https://github.com/mr-exception/salimon/actions/runs/38899019926",
+    "commit": "d99054583905f1aa493ab8458e5dbf8566b085f4",
+    "job": 116966381213,
+    "conclusion": "success",
+    "startedAt": "2026-10-16T12:13:27Z",
+    "completedAt": "2026-10-16T12:14:51Z",
+    "executionSeconds": 84,
+    "cargoReportedSeconds": 46.66,
+    "cache": "miss",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success",
+        "seconds": 2
+      },
+      {
+        "name": "Run actions/checkout@v4",
+        "conclusion": "success",
+        "seconds": 4
+      },
+      {
+        "name": "Run dtolnay/rust-toolchain@stable",
+        "conclusion": "success",
+        "seconds": 8
+      },
+      {
+        "name": "Run Swatinem/rust-cache@v2",
+        "conclusion": "success",
+        "seconds": 1
+      },
+      {
+        "name": "Native build dependencies",
+        "conclusion": "success",
+        "seconds": 13
+      },
+      {
+        "name": "Compile workspace",
+        "conclusion": "success",
+        "seconds": 46
+      },
+      {
+        "name": "Post Run Swatinem/rust-cache@v2",
+        "conclusion": "success",
+        "seconds": 7
+      },
+      {
+        "name": "Post Run actions/checkout@v4",
+        "conclusion": "success",
+        "seconds": 0
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success",
+        "seconds": 0
+      }
+    ]
+  },
+  "comparison": {
+    "ubuntuBeforeSeconds": 978,
+    "ubuntuAfterSeconds": 84,
+    "reductionPercent": 91.41104294478528,
+    "limitations": "Different source revisions and cache states; execution time excludes queue time and is not a runner-performance guarantee."
+  }
+}

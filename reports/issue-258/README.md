@@ -32,8 +32,10 @@ repository protection settings.
   permissions and checkout/Rust/cache setup.
 - `git diff --check`: passed.
 - Reviewed maintained documentation for stale automatic test/graphics/matrix claims.
-- Real PR source-build result, duration and cache state: pending the first run.
-  This section will be updated with the run evidence before completion.
+- [PR source-build run 38899019926](https://github.com/mr-exception/salimon/actions/runs/38899019926):
+  passed, exactly one Ubuntu job with the five intended steps. The real
+  `cargo build --workspace --locked` compiled and linked successfully.
+- New/changed Markdown relative file links: passed.
 
 No native M1 or graphical check is needed for this workflow/documentation change.
 Compilation errors propagate normally through the plain Cargo command; there is
@@ -54,3 +56,30 @@ GitHub job start/completion timestamps (excluding queue time):
 The Ubuntu job included compilation plus all extra model, profiling, graphics,
 evidence and smoke work. The new check measures source compilation only. Cache
 and runner variability affect comparisons; this is not a performance guarantee.
+
+## Measured result
+
+The [first source-build job](https://github.com/mr-exception/salimon/actions/runs/38899019926/job/116966381213)
+passed on commit `d990545` from 2026-10-16 12:13:27 to 12:14:51 UTC:
+**1m 24s** execution, excluding queue time. Cargo reported **46.66s** for the
+debug build. The cache action reported **No cache found**.
+
+Compared with the previous cached Ubuntu job's **16m 18s**, this run is about
+**91.4% shorter** (11.6× less elapsed time). The previous run reported a cache
+hit and restored it successfully. These runs verify the reduced work rather
+than a guaranteed runner speed: source revisions/cache states differ, and the
+old job also performed tests, optimized builds, profiling and graphics work.
+
+Step durations from GitHub:
+
+| Step | Seconds |
+| --- | ---: |
+| Checkout | 4 |
+| Stable Rust setup | 8 |
+| Cargo cache restore (miss) | 1 |
+| Native dependencies | 13 |
+| Compile workspace | 46 |
+| Cargo cache save | 7 |
+
+GitHub job setup, cleanup and orchestration account for the remaining time.
+See [ci-timing.json](ci-timing.json) for timestamps and the exact comparison.

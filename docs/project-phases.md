@@ -33,9 +33,9 @@ later revisions. Preserve its machine-specific evidence and limitations.
 
 ## Current post-baseline prototype
 
-The client remains native-first and client-only. Build scripts/CI target macOS,
-Windows and Debian-based Linux; macOS is the reference playable/performance
-target. Web/WASM portability remains future work. No new numbered phase or formal
+The client remains native-first and client-only. Local build scripts target macOS,
+Windows and Debian-based Linux. PR CI verifies an Ubuntu source build;
+macOS is the reference playable/performance target. Web/WASM portability remains future work. No new numbered phase or formal
 phase closure is implied by this implementation summary.
 
 Implemented beyond the navigation baseline:

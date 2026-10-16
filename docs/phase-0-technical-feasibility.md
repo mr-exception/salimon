@@ -180,7 +180,7 @@ These exclusions apply to the original Phase 0 showcase, not later issue-scoped 
 - Each Phase 0 module/crate/package must gain focused unit tests as its behavior is implemented.
 - Bug fixes and precision/behavior edge cases must add regression tests whenever practical.
 - Cross-module boundaries should use contract or integration tests where useful, especially for runtime/renderer/world/character/ship interactions.
-- Tests are part of the task definition of done and should run automatically in the normal development/CI workflow.
+- Tests remain part of the task definition of done and run during local development. PR CI intentionally verifies source compilation only; run the applicable validation matrix explicitly.
 ## Completion criteria
 Phase 0 is complete when all of the following are demonstrably true:
 1. The native macOS application launches from the repository with a documented development workflow.

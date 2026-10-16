@@ -1,0 +1,326 @@
+name: Periodic verification
+
+on:
+  schedule:
+    - cron: '37 0 * * *'
+    - cron: '17 1 * * 0'
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: Suite to run against the default branch
+        type: choice
+        options: [nightly, weekly]
+        default: nightly
+      force:
+        description: Run even if this revision already passed
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: periodic-${{ inputs.suite || (github.event.schedule == '17 1 * * 0' && 'weekly' || 'nightly') }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  RUSTUP_TOOLCHAIN: stable
+
+jobs:
+  plan:
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      run: ${{ steps.plan.outputs.run }}
+      sha: ${{ steps.plan.outputs.sha }}
+      kind: ${{ steps.plan.outputs.kind }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_REVISION: ${{ github.sha }}
+          CI_KIND: ${{ inputs.suite || (github.event.schedule == '17 1 * * 0' && 'weekly' || 'nightly') }}
+          CI_FORCE: ${{ github.event_name == 'workflow_dispatch' && inputs.force }}
+        run: |
+          args=(plan --kind "$CI_KIND")
+          if [[ "$CI_FORCE" == 'true' ]]; then args+=(--force); fi
+          python scripts/ci_reports.py "${args[@]}"
+
+  nightly:
+    needs: plan
+    if: needs.plan.outputs.run == 'true' && needs.plan.outputs.kind == 'nightly'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      SOURCE_REVISION: ${{ needs.plan.outputs.sha }}
+      WGPU_BACKEND: vulkan
+    steps:
+      - uses: actions/checkout@v4
+        id: checkout
+        with:
+          ref: ${{ needs.plan.outputs.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - name: Verification tools and software graphics
+        id: tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential pkg-config libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev libx11-dev libxi-dev libxcursor-dev libxrandr-dev libvulkan1 mesa-vulkan-drivers xvfb xauth xdotool imagemagick
+          icd_files=(/usr/share/vulkan/icd.d/lvp_icd*.json)
+          test -f "${icd_files[0]}"
+          echo "VK_DRIVER_FILES=${icd_files[0]}" >> "$GITHUB_ENV"
+          python -m pip install -r models/tools/requirements.txt -r scripts/visual-requirements.txt
+          npm ci --prefix models/tools/gltf --ignore-scripts --no-audit --no-fund
+      - name: Model contracts
+        id: model
+        run: python -m unittest discover -s models/tests -v
+      - name: Script and runner contracts
+        id: scripts
+        run: python -m unittest discover -s scripts -p 'test_*.py' -v
+      - name: Rust formatting, lint and tests
+        id: rust
+        run: |
+          cargo fmt --all -- --check
+          cargo clippy --workspace --all-targets --locked -- -D warnings
+          cargo test --workspace --locked
+      - name: GLB compliance and exact importer parity
+        id: glb
+        env:
+          SALIMON_GLB_CANDIDATES: ${{ github.workspace }}/artifacts/glb
+        run: |
+          python models/tools/process_glb.py all --profile exact-v1 --output artifacts/glb
+          cargo test -p salimon-renderer --locked offline_glb_candidate -- --ignored
+          cargo test -p salimon-renderer --locked headless_resource -- --ignored
+      - name: Build graphical verification executable
+        id: build
+        run: cargo build --release --workspace --locked
+      - name: Deterministic baseline
+        id: baseline
+        timeout-minutes: 10
+        run: xvfb-run -a -s '-screen 0 1280x800x24' python scripts/salimon-test suite --summary --binary target/release/salimon-client
+      - name: Screenshot evidence suites
+        id: evidence
+        timeout-minutes: 20
+        run: xvfb-run -a -s '-screen 0 1280x800x24' python scripts/salimon-test suite --evidence --summary --binary target/release/salimon-client --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
+      - name: Model captures and temporal stability
+        id: temporal
+        timeout-minutes: 15
+        run: |
+          xvfb-run -a -s '-screen 0 1280x800x24' python scripts/model_visual_tests.py capture --binary target/release/salimon-client
+          python scripts/model_visual_tests.py compare --temporal-only
+      - name: Packaged real-input smoke
+        id: smoke
+        timeout-minutes: 5
+        run: |
+          python scripts/build_game.py --profile release --output artifacts/build/release
+          xvfb-run -a -s '-screen 0 1920x1080x24' python scripts/packaged_smoke.py --binary artifacts/build/release/salimon-client --timeout 90
+      - name: Record suite result and summary
+        if: always() && steps.checkout.outcome == 'success'
+        env:
+          CI_STEPS: ${{ toJSON(steps) }}
+        run: python scripts/ci_reports.py record --lane nightly --required tools model scripts rust glb build baseline evidence temporal smoke
+      - name: Preserve verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-nightly-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 30
+          if-no-files-found: error
+          path: |
+            artifacts/periodic/
+            artifacts/e2e/
+            artifacts/model-visual/
+            artifacts/glb/
+            artifacts/packaged-smoke/
+
+  benchmarks:
+    needs: plan
+    if: needs.plan.outputs.run == 'true' && needs.plan.outputs.kind == 'weekly'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      SOURCE_REVISION: ${{ needs.plan.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        id: checkout
+        with:
+          ref: ${{ needs.plan.outputs.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Native build dependencies
+        id: tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential pkg-config libxkbcommon-dev libwayland-dev
+      - name: Release CPU benchmark executable
+        id: build
+        run: cargo build --release --workspace --locked
+      - name: Fragment accounting and CPU timing matrix
+        id: fragments
+        timeout-minutes: 25
+        run: python scripts/benchmark_fragments.py --binary target/release/salimon-client --mode physics --counts 500 1000 --layouts scattered dense --states settled active --warmup-seconds 0 --sample-seconds 2 --minimum-samples 100 --timeout 180 --machine-label github-actions-cpu-only --output artifacts/periodic/fragments
+      - name: Flight and cargo regression profiles
+        id: flight
+        timeout-minutes: 6
+        run: python scripts/profile_flight.py --binary target/release/salimon-client --samples 100 --baseline reports/issue-196/baseline.json --output artifacts/periodic/flight-profile.json
+      - name: Resource preparation CPU comparison
+        id: preparation
+        timeout-minutes: 5
+        run: |
+          mkdir -p artifacts/periodic
+          cargo test --release -p salimon-renderer resource_preparation_benchmark --locked -- --ignored --nocapture 2>&1 | tee artifacts/periodic/resource-preparation.txt
+      - name: Record suite result and summary
+        if: always() && steps.checkout.outcome == 'success'
+        env:
+          CI_STEPS: ${{ toJSON(steps) }}
+        run: python scripts/ci_reports.py record --lane benchmarks --required tools build fragments flight preparation
+      - name: Preserve raw benchmark output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-benchmarks-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/periodic/
+          retention-days: 30
+          if-no-files-found: error
+
+  platforms:
+    needs: plan
+    if: needs.plan.outputs.run == 'true' && needs.plan.outputs.kind == 'weekly'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14
+            lane: macos
+          - os: windows-2022
+            lane: windows
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    env:
+      SOURCE_REVISION: ${{ needs.plan.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        id: checkout
+        with:
+          ref: ${{ needs.plan.outputs.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Compile native workspace
+        id: build
+        run: cargo build --workspace --locked
+      - name: Record platform result and summary
+        if: always() && steps.checkout.outcome == 'success'
+        env:
+          CI_STEPS: ${{ toJSON(steps) }}
+          CI_LANE: ${{ matrix.lane }}
+        run: python scripts/ci_reports.py record --lane "$CI_LANE" --required build
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ci-${{ matrix.lane }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/periodic/
+          retention-days: 30
+          if-no-files-found: error
+
+  reports:
+    needs: [plan, nightly, benchmarks, platforms]
+    if: always() && !cancelled() && needs.plan.outputs.run == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    concurrency:
+      group: ci-report-publisher
+      cancel-in-progress: false
+    env:
+      SOURCE_REVISION: ${{ needs.plan.outputs.sha }}
+      CI_KIND: ${{ needs.plan.outputs.kind }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.plan.outputs.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          # Failed-job reruns reuse passing lanes from earlier attempts.
+          pattern: ci-*-${{ github.run_id }}-*
+          path: artifacts/incoming
+      - name: Merge history and render dashboard
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/ci_reports.py site --kind "$CI_KIND" --input artifacts/incoming --output artifacts/site
+      - name: Preserve standalone dashboard
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-dashboard
+          path: artifacts/site/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Save durable report history
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git ls-remote --exit-code --heads origin ci-reports > artifacts/report-ref; then
+            git fetch origin ci-reports
+            git checkout --detach FETCH_HEAD
+          else
+            code=$?
+            if [[ "$code" != 2 ]]; then exit "$code"; fi
+            git checkout --orphan ci-reports
+          fi
+          git --work-tree=artifacts/site add -A -- .
+          if git --work-tree=artifacts/site diff --cached --quiet; then
+            echo 'This report history is already published.'
+          else
+            git --work-tree=artifacts/site commit -m "CI reports for run $GITHUB_RUN_ID attempt $GITHUB_RUN_ATTEMPT"
+            git push origin HEAD:refs/heads/ci-reports
+          fi
+
+  dashboard:
+    needs: reports
+    if: vars.CI_DASHBOARD_PAGES == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: ci-dashboard
+          path: site
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+      - uses: actions/deploy-pages@v4
+        id: deployment

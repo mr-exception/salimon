@@ -18,7 +18,8 @@ python scripts/model_visual_tests.py compare
 
 Linux software Vulkan: prefix capture with
 `xvfb-run -a -s '-screen 0 1280x800x24'` and set `WGPU_BACKEND=vulkan`.
-CI captures candidates and checks repeat stability. Missing approved baselines
+Nightly verification runs software-Vulkan captures and repeat-stability checks.
+These commands also remain available locally; PR CI only builds source. Missing approved baselines
 fail ordinary comparison, never silently initialize or overwrite a baseline.
 Artifacts contain PNG candidates, per-step production inspection/protocol logs,
 highlight/difference PNGs, changed/compared pixel counts and peak channel delta.
@@ -39,7 +40,7 @@ Option A images. No approved production image baseline is claimed by this
 implementation. Review candidate images for coherent low-poly silhouettes,
 transparency, scale and competing surfaces before copying selected images there
 in a separate reviewed commit, recording driver/adapter, resolution and revision.
-Do not automatically promote CI output. Hardware/native M1 execution and visual
+Do not automatically promote captured output. Hardware/native M1 execution and visual
 approval remain tracked in #229; software Vulkan is not equivalent coverage.
 
 An Option B trial uses a separate baseline directory via `--baselines`, with

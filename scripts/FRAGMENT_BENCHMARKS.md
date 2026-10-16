@@ -92,7 +92,7 @@ counters and sleeping counts. This isolates solver work on identical geometry;
 it is a CPU comparison on the host, and does not provide a baseline native FPS.
 
 
-## CPU wall-clock diagnosis and CI
+## Manual CPU wall-clock diagnosis
 
 Without a native display:
 
@@ -104,8 +104,8 @@ This times actual fragment adapters/convex physics at **16ms simulation deltas**
 without rendering or real-time pacing. It reports CPU cost, not FPS or native
 frame latency. One-second windows are exploratory, frequently with too few
 samples for reliable tails. Physics-only mode runs one camera setting because
-it performs no GPU work. CI uses this bounded command for 500/1,000 scattered
-loads and preserves JSON/logs, without absolute FPS assertions. Rust fixture tests
+it performs no GPU work. Run this bounded command for 500/1,000 scattered
+loads and preserve JSON/logs, without absolute FPS assertions. Rust fixture tests
 protect all population sizes, conservation/stale-source restoration, profiler
 pose parity, 500/1,000 production updates and distant rotated frame writeback;
 500-fragment F pickup/drop/lockout and the native takeoff scenario share the
@@ -189,8 +189,8 @@ Repeat each baseline case three times on the same machine/settings with ≥100
 samples. `--baseline path/to/summary.json --tolerance 0.2` rejects incompatible
 machine/case/renderer metadata and insufficient samples, and fails p95 regressions
 above 20% for frame, physics and CPU-render time (baseline ≥0.1ms). Treat that
-initial tolerance as provisional; calibrate variability from the repeats. Shared
-CI checks deterministic accounting/order/counters, not hardware timing thresholds.
+initial tolerance as provisional; calibrate variability from the repeats. Manual
+regression checks verify deterministic accounting/order/counters, not hardware timing thresholds.
 Before/after optimization reports should compare pair/candidate counts separately
 from storage/allocation counters so allocation removal and filtering remain
 attributable. A dense pile can still require quadratic contact work.
@@ -377,7 +377,7 @@ not 500 large pieces piled outside the hull. Dense rows place a supported single
 ordinary rows spread across the aft deck. Multilayer pile stress remains the
 optional `--stacked` variant (ten by ten by five, non-overlapping 12 cm
 spacing), and the existing `--benchmark --layout dense` workload. The bounded
-CI deck suite does not claim their performance acceptance. The recorded stacked
+manual deck suite does not claim their performance acceptance. The recorded stacked
 run fails its p95 ceiling; pass `--stacked` without the deck `--baseline` to
 reproduce that stress result. Different fixture baselines cannot be compared. Each measured update is 16 ms; no
 warmup hides initial collision work. Per-sample moving counts reveal settling.
@@ -392,7 +392,7 @@ The Python runner rejects incomplete/duplicate/nonfinite rows, offboard cargo
 and summaries that disagree with raw samples. Limits are explicit in
 `profile_flight.py`: p95 must satisfy both the absolute ceiling and 4× baseline
 plus a workload-specific noise allowance. Missing workload rows fail. Compare
-like builds/sample counts/machines when interpreting changes; CI uses permissive
+like builds/sample counts/machines when interpreting changes; the manual runner uses permissive
 portable regression guards, not a 60 FPS target. Update a baseline deliberately
 with report evidence; do not regenerate it automatically on failure.
 

@@ -606,7 +606,7 @@ checks run outside each timed region. Reports retain update distributions and
 motion counts; no presented frames or hardware FPS are synthesized. The
 [runner](../../scripts/FRAGMENT_BENCHMARKS.md#flight-mass-and-cabin-power-cpu-profiles-196)
 validates report completeness/raw statistics and applies explicit baseline/absolute
-limits in CI. This path introduces no gameplay timing or physics shortcuts.
+limits when explicitly invoked and in weekly diagnostics; PR CI only compiles source. This path introduces no gameplay timing or physics shortcuts.
 
 ## Native M1 integrated follow-up (#198–#200)
 

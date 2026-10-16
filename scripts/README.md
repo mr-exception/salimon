@@ -77,7 +77,7 @@ and ship/player inherited speed of 25,000 m/s. It also checks velocity after
 re-entry. The nearby route checks open-space mode before threshold crossing,
 Earth selection inside 3,000,000 m, continuous altitude and bounded radial
 acceleration. Cockpit-to-nose traversal and airlock collision checks cover the real layout.
-The required Linux CI job runs this evidence group against the release binary.
+Run this evidence group manually against a locally staged release binary.
 See [checked-in validation](../reports/issue-39/README.md) for results and screenshots.
 
 ## Resource collection suite (#51)
@@ -94,8 +94,8 @@ Both commands accept `--binary` and `--artifacts`. The six required routes run i
 this order: resource-deposits, mining, carrying, fragment-transfer,
 resource-streaming, resource-loop. Each starts a fresh seeded native client. Missing scenario
 files, failed launches, failed assertions and failed evidence captures fail the
-aggregate report; no route is silently skipped. Linux CI requires the evidence
-suite against the staged release executable and uploads all shared runner artifacts.
+aggregate report; no route is silently skipped. Run the evidence
+suite manually against a staged release executable and retain its runner artifacts.
 
 | Boundary | Regression coverage |
 | --- | --- |
@@ -109,7 +109,7 @@ and assertions. Every run preserves structured results, per-step state and logs;
 failures also preserve available state and screenshots. Runner contracts cover
 failed capture, process cleanup and assertion/startup failure; suite contracts
 verify that failed launches retain six isolated result directories. Native
-macOS/Windows graphics need local GPU validation; Linux CI uses software Vulkan.
+macOS/Windows graphics need local GPU validation; manual Linux runs may use software Vulkan.
 
 ## Deterministic first resource loop (#52)
 
@@ -125,7 +125,7 @@ python3 scripts/salimon-test run scenarios/evidence/resource-loop.json \
   --screenshot-command '["python3", "scripts/capture_settled.py", "{path}"]'
 ```
 
-Both variants run in required Linux CI through baseline discovery and the
+Run both variants manually through baseline discovery and the
 resource-collection evidence group. The route checks two actual locally
 materialized collectible types (iron ore and silicate rock), walks to the stable
 silicate source, verifies physical mass/identity/volume after mining, leaves and
@@ -189,44 +189,28 @@ not a passed or skipped scenario. Visual runs require a working capture helper.
 
 ## Continuous integration coverage
 
-Every push to `main` and every pull request runs the deterministic baseline
-`suite` against the staged **release** executable on Ubuntu 24.04 in
-`.github/workflows/native-build.yml`. This required Linux check covers launch,
-seeded readiness, the cockpit/door/surface/assisted-takeoff path and the
-orbit/assisted-landing path. It uses a dedicated 1280×800 Xvfb display and
-discovers the installed Mesa lavapipe ICD filename and selects it via
-`VK_DRIVER_FILES`; software Vulkan is the
-CI fallback, not a hardware performance or native graphics fidelity check.
-Display, Vulkan, and screenshot-helper failures fail the job. A capture
-preflight saves `display-ready.png`, and automatic failure screenshots remain
-enabled throughout the suite.
+Every push to `main`, pull request and manual dispatch runs **Source build
+(Ubuntu)**: one `cargo build --workspace --locked` in the normal debug profile.
+The source-build workflow retains Cargo caching, cancels superseded runs per PR/branch and
+has a 15-minute timeout. It does not stage release/debug packages or upload
+artifacts, and does not run tests, model processing, benchmarks, graphical
+scenarios or packaged smoke. macOS/Windows builds also run in the weekly workflow.
 
-The runner's nonzero exit status propagates through `tee` using Bash
-`pipefail`. `baseline.log` contains the aggregate report, including the failed
-scenario/step reason. CI uses `--summary` to print only status, duration, errors
-and evidence paths; full step snapshots remain in each `result.json`. Default
-CLI output still includes full results. The always-run artifact upload preserves all
-`artifacts/e2e/` results, per-step state, protocol/process logs, failure state
-and available failure screenshots in `salimon-ubuntu-24.04`, alongside runnable
-builds and packaged smoke evidence. Each native scenario has a bounded timeout;
-the baseline and resource evidence steps each have a ten-minute limit, cockpit
-window evidence has three minutes, and ship/EVA evidence has five minutes. These
-required suites run in separate Xvfb steps so their time and console output do
-not consume a single shared deadline. Inspect `result.json` for the first
-failed step before checking its logs and screenshots.
+Run the baseline/evidence suites above deliberately on a native desktop or a
+prepared Linux Xvfb/Mesa environment. Capture, display and assertion failures
+remain failures when these commands are run. Keep their `artifacts/e2e/` results,
+logs and screenshots for review; periodic CI uploads them with 30-day retention. Frozen model capture
+and temporal comparison commands remain in the [visual fixture guide](../scenarios/visual/README.md).
+The separate [periodic workflow](../docs/periodic-ci.md) runs these Linux suites
+nightly and benchmarks/platform builds weekly. It has no PR/push trigger. Its
+manual dispatch selects `nightly` or `weekly`, with an optional forced rerun.
+Each run has summaries, raw artifacts and a history dashboard; GitHub Pages
+publishing is opt-in. The source-build dispatch has no `visual_evidence` option.
 
-The fast required baseline has no successful-run screenshot checkpoints. For
-the slower visual suite, manually dispatch **Native builds** with
-`visual_evidence` enabled. It runs both `scenarios/evidence/*.json` paths and
-uploads named screenshots plus `visual.log`; capture failures fail that step.
-The separate required packaged smoke still checks normal startup and real OS
-keyboard input. Both Linux checks use software Vulkan.
-
-macOS and Windows CI run build, Rust, and applicable Python contract checks;
-graphical E2E is explicitly not run there and this is recorded in the job
-summary. Validate those platforms with local baseline and evidence runs on
-their native GPU desktops. No successful Linux check claims macOS/Windows
-graphics coverage.
+See [automatic CI and check-name migration](../docs/validation.md#automatic-ci)
+when updating required checks. Repository protection settings are not changed
+by the workflow. No source-build result establishes gameplay, visual quality,
+native OS input, hardware performance or macOS/Windows compatibility.
 
 ## State and visual evidence
 
@@ -304,9 +288,8 @@ xvfb-run -a -s '-screen 0 1280x800x24' scripts/salimon-test \
   run scenarios/evidence/landed-earth.json --binary target/debug/salimon-client
 ```
 
-The Linux CI baseline step also requires the matching resource-deposit visual
-scenario, saving a `generated-silicate-deposit` screenshot and authoritative
-state within 4 m of the deposit. A screenshot failure fails CI. This uses the
+The manual resource-deposit visual scenario saves a `generated-silicate-deposit` screenshot and authoritative
+state within 4 m of the deposit. A screenshot failure fails the run. This uses the
 same real gameplay route as `scenarios/resource-deposits.json`; no state
 teleportation or fixture deposits are used. Run it locally with:
 
@@ -324,13 +307,12 @@ remaining mass, positions, player distance, and renderer-facing geometry.
 `scenarios/evidence/mining.json` adds equipped, actively mined, and depleted
 screenshots to the same deterministic mining route. Run it with a working
 native capture helper to inspect the greybox handheld tool and removed deposit.
-Its baseline is automatically included in CI's default suite. Both variants
+Its baseline is included when the default suite is run manually. Both variants
 assert physical fragment identity, material, mass, volume, pose, and bounded
 output after depletion. Extraction totals and session fragment totals are
 diagnostics only, never inventory. Current authored fragments emit from exposed deposit facets and settle through
 physics; see the surface-emission sequence below.
-Linux's required baseline job runs this mining evidence variant; capture errors
-fail the job. Checked-in [issue #45 evidence](../reports/issue-45/README.md) records
+Run this mining evidence variant manually; capture errors fail the run. Checked-in [issue #45 evidence](../reports/issue-45/README.md) records
 the initial Linux validation.
 
 ## Local streamed resource state (#50)
@@ -339,8 +321,7 @@ the initial Linux validation.
 mining input, walks 153.6 m away and back, and checks the source is absent from
 `world.deposits_by_id` while away. It verifies partial mass restoration, then
 repeats after depletion and verifies zero mass, no visual/target, and unchanged
-physical output totals. The baseline is included in the default suite; Linux CI
-also runs `scenarios/evidence/resource-streaming.json` with named screenshots.
+physical output totals. The baseline is included in the default suite; manually run `scenarios/evidence/resource-streaming.json` with named screenshots.
 No teleportation or test-only state mutation is used. Local session state is
 retained only until the world/session ends, without disk or backend persistence.
 
@@ -353,7 +334,7 @@ the old `mine` keyboard alias is rejected. It verifies E cannot grab/drop, held-
 suppression, material/mass/identity preservation, tool independence, release,
 subsequent pickup, and carried entity proximity after movement. The evidence
 variant adds first pickup, repeated-F suppression, placement and moving carry
-screenshots. Both run in required Linux CI.
+screenshots. Both remain available for manual verification.
 Run the evidence variant with a working display/capture helper:
 
 ```sh
@@ -399,7 +380,7 @@ normal controls to leave the cockpit, walk to the gate, open it, exit without
 planetary snapping, close it from outside, verify blocked re-entry, reopen and
 re-enter, close it again, and verify blocked exit. It runs in the default suite.
 `scenarios/evidence/space-airlock.json` adds four screenshot/state checkpoints and
-is required in Linux CI. Use the settled capture helper as for the cockpit nose.
+is available for manual verification. Use the settled capture helper as for the cockpit nose.
 
 The portable runtime test executes the same access scenario, while ship tests
 cover inclusive threshold locking and assisted-sequence locking. Moving-ship
@@ -413,7 +394,7 @@ no-input ship-relative stability over 600 fixed frames, Space/Shift vertical
 translation, pitched/yawed view-relative translation, assisted stop, closed-gate
 collision, and clean interior re-entry. The baseline runs in the default suite;
 the synchronized evidence variant adds drift, vertical-flight and re-entry
-screenshots and runs in required Linux CI. Portable runtime tests execute both
+screenshots and is available for manual verification. Portable runtime tests execute both
 stationary and moving routes, and character contracts compare 10/20/100 ms
 updates and verify detached motion/view independence from ship changes.
 
@@ -425,7 +406,7 @@ cross Earth's inclusive shared surface-distance threshold. Assertions check the
 player-selected body, nearby movement mode, continuous altitude, inherited
 25,000 m/s motion, and bounded radial acceleration. The baseline runs in the
 default suite; its evidence variant adds three screenshot/state checkpoints and
-runs in required Linux CI. Character contracts additionally check boundary mode
+is available for manual verification. Character contracts additionally check boundary mode
 changes, gravity integration across update sizes, influence exit, and contact.
 
 ## Planet/ship fragment transfer (#47)
@@ -437,7 +418,7 @@ and stable ship-local placement while walking away/back and during assisted
 takeoff and 25,000 m/s flight. The portable runtime executes the same route,
 checking carried proximity after each input/step. Narrow contracts cover rotated
 and translated ship frames, pickup detachment, invalid placement, and sight
-obstruction. The default suite includes the baseline; Linux CI also requires
+obstruction. The default suite includes the baseline; manually run
 the evidence variant with settled capture:
 
 ```sh
@@ -465,7 +446,7 @@ each side of the console. It starts assisted landing, checks the surface distanc
 falls below 25 m, waits for touchdown, inspects both sides, restores the forward
 view, takes off and leaves cockpit control. Its evidence variant records eight
 native screenshots, including the seated low-altitude surface view. The default
-suite runs the baseline; Linux CI requires the settled-capture evidence variant.
+suite runs the baseline; run the settled-capture evidence variant manually.
 
 ```sh
 python scripts/salimon-test run scenarios/evidence/lower-cockpit-windows.json \
@@ -512,7 +493,7 @@ The synchronized evidence variant adds `toolbar-mining-tool-selected` and
 existing `equipment.slots`, `equipment.selected_slot`, `mining.equipped`,
 `mining.held_item_visible`, `mining.active` and output fields suffice.
 Both routes run through baseline discovery/resource-collection evidence in
-required Linux CI; the portable runtime also executes both JSON contracts.
+manual verification; the portable runtime also executes both JSON contracts.
 
 ```sh
 python scripts/salimon-test run scenarios/carrying.json --binary artifacts/build/release/salimon-client
@@ -562,7 +543,7 @@ Long resource-collection fixed-step batches (300–600 frames) explicitly use
 `timeout_ms: 30000` for the combined action and following inspection. The
 default 5-second budget still applies to ordinary inputs/assertions; whole
 scenario deadlines remain bounded. This accommodates complete convex piles
-on shared software-rendered CI without changing fixed steps or assertions.
+on shared software-rendered hosts without changing fixed steps or assertions.
 
 The game automation server grants valid protocol-1 `step` requests of 1–600
 frames a 120-second deadline for both queue expiry and reply waiting. A single
@@ -600,7 +581,7 @@ mechanical refueling and automatic thrust restoration, crash recovery/reservatio
 inertial takeoff, a physically onboard 500-fragment population and moving EVA.
 Use `--evidence` for the same actions plus screen checkpoints. New initial fixtures
 are opt-in `--e2e` scenarios; no mutation/teleport/refuel command bypasses production
-interaction after initialization. The default suite/CI includes these routes.
+interaction after initialization. The manually invoked default suite includes these routes.
 
 `cargo test -p salimon-client flight_regression --locked` replays the new routes
 without a window and adds runtime mass/consumption and cabin zero-G transition

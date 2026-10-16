@@ -501,6 +501,12 @@
     },
     {
       "assert": {
+        "path": "mining.growth_preview",
+        "equals": null
+      }
+    },
+    {
+      "assert": {
         "path": "mining.extracted_mass_kg",
         "equals": 0
       }
@@ -684,6 +690,24 @@
       }
     },
     {
+      "assert": {
+        "path": "mining.growth_preview",
+        "not_equals": null
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.0.sphere_visual.asset",
+        "equals": "resource.spherical-fragment"
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragments.0.sphere_visual.radius_meters",
+        "gt": 0
+      }
+    },
+    {
       "action": {
         "op": "look",
         "dx": 400,
@@ -739,6 +763,12 @@
       "assert": {
         "path": "mining.held",
         "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "mining.growth_preview",
+        "equals": null
       }
     },
     {

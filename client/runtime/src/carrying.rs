@@ -135,16 +135,19 @@ pub(crate) fn follow(tool: &mut MiningTool, player: CharacterSnapshot) {
             true,
         )
     {
-        let mesh = crate::resource_presentation::fragment_mesh(*piece);
+        let mesh = crate::resource_presentation::legacy_fragment_contact_mesh(*piece);
         for _ in 0..3 {
             let local = salimon_math::sub(p, body.center.meters());
             let mut lift = 0.0_f64;
-            for vertex in mesh.mesh.unit_vertices() {
+            for vertex in mesh.unit_vertices() {
                 let point = salimon_math::add(
                     local,
                     salimon_physics::rotate(
                         orientation,
-                        salimon_math::scale(*vertex, mesh.side_meters),
+                        salimon_math::scale(
+                            *vertex,
+                            salimon_world::resource_fragments::side_meters(*piece),
+                        ),
                     ),
                 );
                 let radius = length(point);
@@ -338,10 +341,10 @@ mod tests {
                         p[0].hypot(p[2]) > radius + 0.3,
                         "whole object clears torso and legs"
                     );
-                    let support = crate::resource_presentation::fragment_mesh(carried)
-                        .mesh
-                        .support_meters([0.0, 1.0, 0.0])
-                        * salimon_world::resource_fragments::side_meters(carried);
+                    let support =
+                        crate::resource_presentation::legacy_fragment_contact_mesh(carried)
+                            .support_meters([0.0, 1.0, 0.0])
+                            * salimon_world::resource_fragments::side_meters(carried);
                     assert!(p[1] - support >= 0.0049);
                     assert_eq!(carried.id(), piece.id());
                     assert_eq!(carried.material(), piece.material());

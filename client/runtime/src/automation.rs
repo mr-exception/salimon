@@ -412,6 +412,7 @@ fn inspect(app: &ClientApplication) -> Value {
         .nearby_fragments(character.eye_position_meters)
         .map(|piece| {
             let mesh = crate::resource_presentation::fragment_visual(piece);
+            let sphere = crate::resource_presentation::fragment_mesh(piece);
             json!({
                 "id": piece.id().0,
                 "reference_frame": if app.mining.ship_fragments.contains_key(&piece.id()) { "ship" } else { "world" },
@@ -428,6 +429,7 @@ fn inspect(app: &ClientApplication) -> Value {
                 "side_meters": salimon_world::resource_fragments::side_meters(piece),
                 "position_meters": piece.transform().position().meters(),
                 "orientation_xyzw": piece.transform().orientation_xyzw(),
+                "sphere_visual": {"asset": "resource.spherical-fragment", "radius_meters": sphere.side_meters * 0.48, "tint": sphere.tint},
                 "visual": {"color": mesh.color, "half_extents_meters": mesh.half_extents_meters}
             })
         })
@@ -503,6 +505,7 @@ fn inspect(app: &ClientApplication) -> Value {
             "capacity_kg": app.mining.config.cap_kg(),
             "reserved_mass_kg": app.mining.session.attached_sphere_id().and_then(|id| app.mining.session.fragments().iter().find(|p| p.id() == id)).map_or(0.0, |p| p.material().mass_kg()),
             "attached_fragment_id": app.mining.session.attached_sphere_id().map(|id| id.0),
+            "growth_preview": app.mining.growth_preview(&app.equipment, character).map(|mesh| json!({"center_meters": mesh.center_meters, "radius_meters": mesh.side_meters * 0.48, "tint": mesh.tint})),
             "target": mining_target.map(|target| json!({"id": format!("{:?}:{}", target.id.body, target.id.local), "distance_meters": target.distance_meters})) },
         "player": {"nearby_body": app.mining.terrain.nearest_body(character.eye_position_meters, salimon_world::NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS, true).map(|(body, distance)| json!({"name": body.name, "surface_distance_meters": distance})),
             "velocity_meters_per_second": player_velocity,

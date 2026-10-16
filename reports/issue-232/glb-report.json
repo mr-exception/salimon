@@ -1,0 +1,150 @@
+{
+  "after": {
+    "drawCalls": 1,
+    "drawPolicy": "one indexed instanced draw per visible variant",
+    "encodedTextureBytes": 0,
+    "glbBytes": 9540,
+    "materials": 1,
+    "nodes": 3,
+    "primitiveReferences": 1,
+    "primitives": 1,
+    "textureMemoryBytes": 0,
+    "triangles": 80
+  },
+  "assetId": "resource.spherical-fragment",
+  "before": {
+    "drawCalls": 1,
+    "drawPolicy": "one indexed instanced draw per visible variant",
+    "encodedTextureBytes": 0,
+    "glbBytes": 9540,
+    "materials": 1,
+    "nodes": 3,
+    "primitiveReferences": 1,
+    "primitives": 1,
+    "textureMemoryBytes": 0,
+    "triangles": 80
+  },
+  "budgets": {
+    "maxGlbBytes": 32768,
+    "maxMaterials": 1,
+    "maxPrimitives": 1,
+    "maxTextureBytes": 1,
+    "maxTriangles": 80
+  },
+  "candidateSha256": "4cc01e9964eb1b4bddfe89f025a94b6698e8c884c6f6cebea8a52f80a5e784f9",
+  "complianceAfter": {
+    "info": {
+      "animationCount": 0,
+      "drawCallCount": 1,
+      "generator": "Khronos glTF Blender I/O v4.0.44",
+      "hasDefaultScene": true,
+      "hasMorphTargets": false,
+      "hasSkins": false,
+      "hasTextures": false,
+      "materialCount": 1,
+      "maxAttributes": 3,
+      "maxInfluences": 0,
+      "maxUVs": 1,
+      "resources": [
+        {
+          "byteLength": 8160,
+          "mimeType": "application/gltf-buffer",
+          "pointer": "/buffers/0",
+          "storage": "glb"
+        }
+      ],
+      "totalTriangleCount": 80,
+      "totalVertexCount": 240,
+      "version": "2.0"
+    },
+    "issues": {
+      "messages": [
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0",
+          "severity": 2
+        }
+      ],
+      "numErrors": 0,
+      "numHints": 0,
+      "numInfos": 1,
+      "numWarnings": 0,
+      "truncated": false
+    },
+    "mimeType": "model/gltf-binary",
+    "validatorVersion": "2.0.0-dev.3.10"
+  },
+  "complianceBefore": {
+    "info": {
+      "animationCount": 0,
+      "drawCallCount": 1,
+      "generator": "Khronos glTF Blender I/O v4.0.44",
+      "hasDefaultScene": true,
+      "hasMorphTargets": false,
+      "hasSkins": false,
+      "hasTextures": false,
+      "materialCount": 1,
+      "maxAttributes": 3,
+      "maxInfluences": 0,
+      "maxUVs": 1,
+      "resources": [
+        {
+          "byteLength": 8160,
+          "mimeType": "application/gltf-buffer",
+          "pointer": "/buffers/0",
+          "storage": "glb"
+        }
+      ],
+      "totalTriangleCount": 80,
+      "totalVertexCount": 240,
+      "version": "2.0"
+    },
+    "issues": {
+      "messages": [
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0",
+          "severity": 2
+        }
+      ],
+      "numErrors": 0,
+      "numHints": 0,
+      "numInfos": 1,
+      "numWarnings": 0,
+      "truncated": false
+    },
+    "mimeType": "model/gltf-binary",
+    "validatorVersion": "2.0.0-dev.3.10"
+  },
+  "contractMetrics": {
+    "maxGlbBytes": 9540,
+    "maxMaterials": 1,
+    "maxPrimitives": 1,
+    "maxTextureBytes": 0,
+    "maxTriangles": 80
+  },
+  "delta": {
+    "drawCalls": 0,
+    "encodedTextureBytes": 0,
+    "glbBytes": 0,
+    "materials": 0,
+    "nodes": 0,
+    "primitiveReferences": 0,
+    "primitives": 0,
+    "textureMemoryBytes": 0,
+    "triangles": 0
+  },
+  "profile": "exact-v1",
+  "schemaVersion": 1,
+  "semanticEquality": true,
+  "sourceSha256": "4cc01e9964eb1b4bddfe89f025a94b6698e8c884c6f6cebea8a52f80a5e784f9",
+  "visualBudget": {
+    "maxDrawCalls": 1,
+    "maxNodes": 3,
+    "maxTextureMemoryBytes": 0,
+    "style": "option-a"
+  },
+  "visualStyle": "option-a"
+}

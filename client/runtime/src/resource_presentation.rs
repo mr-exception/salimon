@@ -233,6 +233,7 @@ pub(crate) fn deposit_mesh_with_terrain(
     };
     let mesh = variants[(entry.deposit.id().local % 4) as usize];
     Some(ResourceMeshInstance {
+        tint: [1.0; 4],
         mesh,
         center_meters: entry.deposit.position().meters(),
         // Every baked vertex fits +/-0.48 m. Inscribe its cube in the
@@ -268,12 +269,16 @@ pub(crate) fn deposit_mesh_with_terrain(
     })
 }
 
-pub(crate) fn fragment_visual(fragment: ResourceFragment) -> SceneInstance {
-    let color = match fragment.material().resource() {
+fn fragment_tint(resource: ResourceId) -> [f32; 4] {
+    match resource {
         ResourceId::IronOre => [0.75, 0.22, 0.06, 1.0],
         ResourceId::SilicateRock => [0.45, 0.50, 0.36, 1.0],
         ResourceId::WaterIce => [0.25, 0.85, 1.0, 1.0],
-    };
+    }
+}
+
+pub(crate) fn fragment_visual(fragment: ResourceFragment) -> SceneInstance {
+    let color = fragment_tint(fragment.material().resource());
     SceneInstance {
         center_meters: fragment.transform().position().meters(),
         half_extents_meters: [(salimon_world::resource_fragments::side_meters(fragment) * 0.5)
@@ -282,10 +287,27 @@ pub(crate) fn fragment_visual(fragment: ResourceFragment) -> SceneInstance {
     }
 }
 
-/// Identity alone chooses the authored variant; movement and mass cannot change it.
+/// One shared authored mesh; mass/density determine radius, never fragment ID.
 pub(crate) fn fragment_mesh(fragment: ResourceFragment) -> ResourceMeshInstance {
+    let color = fragment_tint(fragment.material().resource());
+    let radius = salimon_world::spherical_mining::GrowingSphere {
+        source: fragment.source(),
+        material: fragment.material(),
+    }
+    .radius_meters();
+    ResourceMeshInstance {
+        mesh: ResourceMesh::Sphere,
+        tint: color,
+        center_meters: fragment.transform().position().meters(),
+        side_meters: radius / 0.48,
+        orientation_xyzw: fragment.transform().orientation_xyzw(),
+    }
+}
+
+/// Transitional contact proxy only; spherical physics is tracked in #233.
+pub(crate) fn legacy_fragment_contact_mesh(fragment: ResourceFragment) -> ResourceMesh {
     let even = fragment.id().0.is_multiple_of(2);
-    let mesh = match fragment.material().resource() {
+    match fragment.material().resource() {
         ResourceId::WaterIce => {
             if even {
                 ResourceMesh::IceShard
@@ -307,12 +329,6 @@ pub(crate) fn fragment_mesh(fragment: ResourceFragment) -> ResourceMeshInstance 
                 ResourceMesh::IronShard
             }
         }
-    };
-    ResourceMeshInstance {
-        mesh,
-        center_meters: fragment.transform().position().meters(),
-        side_meters: salimon_world::resource_fragments::side_meters(fragment),
-        orientation_xyzw: fragment.transform().orientation_xyzw(),
     }
 }
 
@@ -389,7 +405,7 @@ mod tests {
     }
 
     #[test]
-    fn authored_fragment_variants_follow_identity_and_authoritative_size() {
+    fn shared_sphere_preserves_identity_pose_and_mass_derived_radius() {
         for resource in [
             ResourceId::WaterIce,
             ResourceId::SilicateRock,
@@ -411,24 +427,16 @@ mod tests {
                         .unwrap(),
                     );
                     let visual = fragment_mesh(fragment);
-                    let expected = match (resource, id % 2 == 0) {
-                        (ResourceId::WaterIce, true) => ResourceMesh::IceShard,
-                        (ResourceId::WaterIce, false) => ResourceMesh::IceCluster,
-                        (ResourceId::SilicateRock, true) => ResourceMesh::SilicateSlab,
-                        (ResourceId::SilicateRock, false) => ResourceMesh::SilicateRidge,
-                        (ResourceId::IronOre, true) => ResourceMesh::IronChunk,
-                        (ResourceId::IronOre, false) => ResourceMesh::IronShard,
-                    };
-                    assert_eq!(visual.mesh, expected);
-                    let old_side = fragment.material().volume_m3().cbrt() * 10.0;
-                    assert_eq!(visual.side_meters, old_side * 0.5);
+                    assert_eq!(visual.mesh, ResourceMesh::Sphere);
+                    let radius = salimon_world::spherical_mining::GrowingSphere {
+                        source: fragment.source(),
+                        material: fragment.material(),
+                    }
+                    .radius_meters();
+                    assert_eq!(visual.side_meters, radius / 0.48);
                     assert_eq!(
                         visual.orientation_xyzw,
                         fragment.transform().orientation_xyzw()
-                    );
-                    assert_eq!(
-                        visual.side_meters,
-                        salimon_world::resource_fragments::side_meters(fragment)
                     );
                     assert_eq!(
                         visual.center_meters,

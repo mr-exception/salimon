@@ -632,3 +632,22 @@ mass or debits energy. Session owns all reserved/released identities/journal.
 Attached entries are excluded from pickup and loose physics, then retain the
 same identity after release. See [source-of-truth lifecycle/integration](../world/resource-contracts.md#continuous-session-integration-231).
 Spherical mesh/contact and final carry/Core migration remain #232–#234.
+
+## Sphere presentation (#232)
+
+`resource_presentation::fragment_mesh` selects the single sphere, established
+resource tint and `GrowingSphere::radius_meters()/0.48`, preserving pose/ID.
+The reserved attached identity is omitted from the ordinary loose draw list;
+`MiningTool::growth_preview` supplies exactly one visual at this frame's current
+camera-local front-left pose (including orientation), without a rigid body or
+second material record. It hides when stowed/outside surface gameplay and
+vanishes on release; the same session ID becomes an ordinary world visual.
+
+Legacy contact proxies and inflated gameplay size remain explicitly independent
+until #233 (spherical physics) and #234 (release/carry/contact integration).
+Consequently this visual migration alone does not claim matching sphere contact
+or final resting heights. Existing fragment interpolation compares the physical
+snapshot size to physical size, independently of the new authored visual scale.
+Automation exposes `sphere_visual` and `mining.growth_preview` without changing
+legacy observation fields used by existing fixtures. No disk migration is needed
+for the in-memory Phase 0 session.

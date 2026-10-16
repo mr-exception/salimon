@@ -55,6 +55,7 @@ fn resource_geometry_gpu_cost() {
                 );
                 let mut instances: Vec<_> = (0..count)
                     .map(|i| ResourceMeshInstance {
+                        tint: [1.0; 4],
                         mesh: tests::ALL_MESHES[i % 6],
                         center_meters: [
                             1e12 + (i % 40) as f64 * 0.075 - 1.5,

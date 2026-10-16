@@ -1,8 +1,9 @@
 import tempfile
 import unittest
+import json
 from pathlib import Path
 
-from model_visual_tests import compare, evaluate
+from model_visual_tests import compare, evaluate, expanded_scenario
 
 try:
     from PIL import Image
@@ -12,6 +13,58 @@ except ImportError:
 
 @unittest.skipIf(Image is None, 'optional visual tests require Pillow')
 class VisualTests(unittest.TestCase):
+    def test_complete_fixture_required_even_without_baselines(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            scenario = root/'scenario.json'
+            scenario.write_text(json.dumps({'steps': [
+                {'screenshot': 'front'}, {'action': {'op': 'look', 'dx': 8, 'dy': 2}},
+                {'screenshot': 'side'}]}))
+            fixture = {'mode': 'moving', 'repeat': 3, 'scenario': str(scenario)}
+            expanded, names = expanded_scenario(fixture)
+            self.assertEqual(len(expanded['steps']), 7)
+            captures = root/'captures'
+            captures.mkdir()
+            for name in names:
+                Image.new('RGB', (8, 8)).save(captures/name)
+            self.assertTrue(evaluate(captures, root/'unapproved', root/'diff',
+                                     fixture, temporal_only=True)['passed'])
+            # Losing one repeat or a whole camera pose used to pass temporal CI.
+            for missing in [('side-repeat-02.png',),
+                            tuple(name for name in names if name.startswith('side'))]:
+                for name in missing:
+                    (captures/name).unlink()
+                with self.assertRaisesRegex(ValueError, 'incomplete fixture evidence: missing='):
+                    evaluate(captures, root/'unapproved', root/'diff', fixture, True)
+                for name in missing:
+                    Image.new('RGB', (8, 8)).save(captures/name)
+            Image.new('RGB', (8, 8)).save(captures/'stale.png')
+            with self.assertRaisesRegex(ValueError, "unexpected=\\['stale.png'\\]"):
+                evaluate(captures, root/'unapproved', root/'diff', fixture, True)
+
+    def test_fixture_contract_rejects_ambiguous_or_unrepeatable_sequences(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            scenario = Path(tmp)/'scenario.json'
+            for names, mode, repeat in [(['same', 'same'], 'static', 1),
+                                        (['../escape'], 'static', 2),
+                                        ([], 'static', 2),
+                                        (['one'], 'moving', 1),
+                                        (['one'], 'static', 1),
+                                        (['one'], 'static', 0),
+                                        (['one'], 'static', True),
+                                        (['one'], 'unknown', 2)]:
+                with self.subTest(names=names, mode=mode, repeat=repeat):
+                    scenario.write_text(json.dumps({'steps': [{'screenshot': n} for n in names]}))
+                    with self.assertRaises(ValueError):
+                        expanded_scenario({'scenario': str(scenario), 'mode': mode, 'repeat': repeat})
+
+    def test_production_fixture_sequences_are_complete_and_repeatable(self):
+        fixtures = json.loads(Path('scenarios/visual/fixtures.json').read_text())
+        for name, fixture in fixtures.items():
+            with self.subTest(fixture=name):
+                _, names = expanded_scenario(fixture)
+                self.assertGreaterEqual(len(names), 2)
+
     def test_injected_change_masks_tolerance_and_artifacts(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

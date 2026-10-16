@@ -37,7 +37,7 @@ threshold, physics/sleep/accounting change or new OS focus automation was added.
 ## Reproduce
 
 Copy the staged binary into a local macOS app bundle as in the
-[earlier native setup](../issue-199/2026-10-16/README.md#reproduction).
+[earlier native setup](../issue-199/2026-10-16/README.md#reproduction-and-checks).
 Compile the reviewed [PID input helper](../issue-198/2026-10-16/input.swift)
 with `swiftc -O reports/issue-198/2026-10-16/input.swift -o artifacts/native-input`.
 The explicit opt-in probe activates/clicks only the target game; its loss variant

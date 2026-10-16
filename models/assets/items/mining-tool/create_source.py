@@ -2,6 +2,7 @@
 from pathlib import Path
 import math
 import random
+import sys
 import bpy
 from mathutils import Vector
 
@@ -172,4 +173,10 @@ grip = bpy.data.objects.new('SOCKET_Grip', None)
 bpy.context.collection.objects.link(grip)
 grip.parent = sockets
 grip['salimon'] = {'role': 'first-person-grip'}
+# Beveling the 6 mm side panels at their half-thickness creates collapsed
+# corner triangles. Drop those zero-area faces and apply the same explicit
+# coplanar surface ownership used by the reviewed source migration.
+sys.path.insert(0, str(HERE.parents[2] / 'tools'))
+from repair_authored_surfaces import repair
+repair([o for o in visual.children if o.type == 'MESH'], 'mining-tool')
 bpy.ops.wm.save_as_mainfile(filepath=str(HERE / 'source.blend'))

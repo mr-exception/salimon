@@ -189,11 +189,12 @@ is quadratic for a dense overlapping pile; this is not general self-intersection
 or visible-flicker proof. Bounds are measured, never read from accessor min/max.
 
 Intentional intersections/layered glass require a named object-pair exemption,
-a reason and a maximum pair count; exceeding the count fails. Existing scout,
-cargo-container and mining-tool candidates have **temporary** counted exemptions
-linked to [#244](https://github.com/mr-exception/salimon/issues/244), not artistic
-approval. Mining tool's 32 existing degenerate triangles are capped warnings;
-new warnings beyond that count fail. All resource GLBs pass without exemptions.
+a reason and a maximum pair count; exceeding the count fails. Scout,
+cargo-container and mining-tool exemptions now classify retained construction
+joins and articulated contact caps; see the [#244 report](../../reports/issue-244/README.md).
+The mining tool has no degenerate allowance: reconstruction removes collapsed
+bevel faces, and any remaining degenerate triangle fails. All resource GLBs pass
+without exemptions.
 The gate does not repair assets or change physics dimensions. Category budgets
 remain independently enforced; changing style does not loosen spatial policy.
 

@@ -1,0 +1,44 @@
+SURFACE_REPAIR mining-tool {"Housing_Details": {"after": 232, "before": 232}}
+Info: Saved as "source.blend"
+Blender 4.5.3 LTS (hash 67807e1800cc built 2025-09-09 01:38:15)
+
+Blender quit
+INFO Draco mesh compression is available, use library at /tmp/blender-4.5.3-linux-x64/4.5/scripts/addons_core/io_scene_gltf2/libextern_draco.so
+08:41:22 | INFO: Starting glTF 2.0 export
+08:41:22 | INFO: Extracting primitive: Cube.003
+08:41:22 | INFO: Primitives created: 1
+08:41:22 | INFO: Extracting primitive: Cube.005
+08:41:22 | INFO: Primitives created: 1
+08:41:22 | INFO: Extracting primitive: Cube.006
+08:41:22 | INFO: Primitives created: 1
+08:41:22 | INFO: Extracting primitive: Cube.007
+08:41:22 | INFO: Primitives created: 1
+08:41:22 | INFO: Extracting primitive: Cube.008
+08:41:22 | INFO: Primitives created: 1
+08:41:22 | INFO: Extracting primitive: Cylinder
+08:41:22 | INFO: Primitives created: 1
+08:41:22 | INFO: Extracting primitive: Cylinder.001
+08:41:22 | INFO: Primitives created: 1
+08:41:22 | INFO: Extracting primitive: Cube.002
+08:41:22 | INFO: Primitives created: 1
+08:41:22 | INFO: Extracting primitive: Cube.001
+08:41:22 | INFO: Primitives created: 1
+08:41:22 | INFO: Extracting primitive: Cube.040_partitioned
+08:41:22 | INFO: Primitives created: 1
+08:41:22 | INFO: Extracting primitive: Cube.041
+08:41:22 | INFO: Primitives created: 1
+08:41:22 | INFO: Extracting primitive: Cylinder.016
+08:41:22 | INFO: Primitives created: 1
+08:41:22 | INFO: Extracting primitive: Cube.009
+08:41:22 | INFO: Primitives created: 1
+08:41:22 | INFO: Extracting primitive: Cube.010
+08:41:22 | INFO: Primitives created: 1
+08:41:22 | INFO: Extracting primitive: Cube.004
+08:41:22 | INFO: Primitives created: 1
+08:41:22 | INFO: Finished glTF 2.0 export in 0.13017559051513672 s
+
+Blender 4.5.3 LTS (hash 67807e1800cc built 2025-09-09 01:38:15)
+Read blend: "/workspace/scratch/b240ff84a285/salimon/models/assets/items/mining-tool/source.blend"
+
+Blender quit
+RECONSTRUCTED_TOOL {'maxTriangles': 2064, 'maxPrimitives': 15, 'maxMaterials': 4, 'maxTextureBytes': 68079, 'maxGlbBytes': 225176}

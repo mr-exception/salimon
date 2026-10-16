@@ -135,5 +135,6 @@ See [meter-space quality validation](tools/README.md#category-aware-geometry-qua
 for tolerances, bounds/anchors, clearance volumes, optional closed topology and
 counted overlap exemptions. An Option A/Option B visual replacement must preserve
 shared spatial requirements and pass the category adapter. Flat shading and
-open/disconnected panels do not imply invalid topology. Existing diagnostic
-exceptions are explicit remediation debt, never permission to add more overlap.
+open/disconnected panels do not imply invalid topology. Counted exceptions
+require specific construction reasons, never permission to add more overlap. The [authored-surface classification](../reports/issue-244/README.md)
+records reviewed joins separately from repaired material competition.

@@ -66,3 +66,10 @@ requiring a texture-free export. All 23 model pipeline tests passed with real
 Blender integration enabled. A second shared export produced identical bytes.
 Re-import verified the 0.80 × 0.50 × 0.50 m dimensions and preserved metadata;
 the exported preview was visually inspected. The legacy scout validator passed.
+
+## Surface quality (#244)
+
+Coplanar panel/frame/trim competition is partitioned in the editable source.
+Current export: 945 triangles, four primitives/materials, 73,704 GLB bytes;
+remaining pairs are opposing internal construction caps. The original validation
+evidence above is historical. See [current classification and checks](../../../../reports/issue-244/README.md).

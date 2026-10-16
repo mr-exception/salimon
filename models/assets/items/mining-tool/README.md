@@ -41,8 +41,8 @@ only that region changes. The source's status tile is amber for icon rendering.
   targeting, equip/stow controls, carrying or resource identity. Reticle and
   surface/gameplay/equipment gates remain runtime-owned.
 - Budgets: 3,000 triangles, 16 primitives, 4 materials, 96 KiB encoded embedded
-  textures, 384 KiB GLB. Current export: 2,096 triangles, 15 primitives,
-  4 materials, one 68,079-byte PNG, 226,380-byte GLB and one scene draw.
+  textures, 384 KiB GLB. Current export: 2,064 triangles, 15 primitives,
+  4 materials, one 68,079-byte PNG, 225,176-byte GLB and one scene draw.
 - GPU atlas budget: 256 KiB base level / 349,524 bytes including all nine mips.
   CPU decoding uses 256 KiB RGBA plus temporary mip/decode buffers at startup;
   no per-frame texture regeneration/upload. Icon: 128×128 RGBA (64 KiB decoded),
@@ -79,3 +79,9 @@ To deliberately reconstruct the design, run Blender with `--factory-startup
 the icon using the commands above. Normal Cargo builds embed the GLB/icon and
 never invoke Blender. Reviewed native before/after evidence and limits are in
 [issue #142's report](../../../../reports/issue-142/README.md).
+
+## Surface quality (#244)
+
+Reconstruction removes collapsed side-panel bevel triangles before saving.
+The degenerate warning allowance is removed; the three remaining counted pairs
+are opposing rear/attachment caps. See the [classification and validation](../../../../reports/issue-244/README.md).

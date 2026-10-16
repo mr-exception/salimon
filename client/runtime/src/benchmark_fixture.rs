@@ -312,7 +312,7 @@ fn checkpoint(
             "angular_velocity":p.angular_velocity, "radius":p.radius,
             "mass_kg":p.mass_kg, "side_meters":p.side_meters,
             "sleeping":app.mining.fragment_sleep.is_sleeping(piece.id()),
-            "vertices":crate::resource_presentation::legacy_fragment_contact_mesh(*piece).unit_vertices()})
+            "collision_shape":"sphere"})
     }).collect::<Vec<_>>()});
     std::fs::write(path, serde_json::to_vec(&data).map_err(|e| e.to_string())?)
         .map_err(|e| format!("fixture checkpoint: {e}"))

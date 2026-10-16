@@ -1,6 +1,5 @@
 //! Permanent one-world-object carrying rule. Equipped gear uses separate systems.
 use crate::mining::MiningRay;
-use crate::resource_fragments::side_meters;
 use crate::resources::{FragmentId, ResourceFragment};
 
 pub const PICKUP_RANGE_METERS: f64 = 3.0;
@@ -36,7 +35,7 @@ impl CarrySlot {
     }
 }
 
-/// Target the oriented conservative cube, excluding the carried object. Hull and terrain
+/// Target the mass/density sphere, excluding the carried object. Hull and terrain
 /// occlusion are supplied by composition; equal-distance ties use stable identity.
 pub fn aimed_fragment(
     ray: MiningRay,
@@ -50,47 +49,15 @@ pub fn aimed_fragment(
             if carried == Some(WorldObjectId::ResourceFragment(piece.id())) {
                 return None;
             }
-            let q = piece.transform().orientation_xyzw();
-            let inverse = [-q[0], -q[1], -q[2], q[3]];
-            let center = rotate(
-                inverse,
-                piece.transform().position().offset_from(ray.origin),
-            );
-            let direction = rotate(inverse, ray.direction);
-            let half = side_meters(*piece) * 0.5;
-            let mut near: f64 = 0.0;
-            let mut far = PICKUP_RANGE_METERS.min(blocked_at);
-            for (axis, component) in center.iter().enumerate() {
-                let direction = direction[axis];
-                if direction.abs() < 1e-12 {
-                    if component.abs() > half {
-                        return None;
-                    }
-                } else {
-                    let a = (component - half) / direction;
-                    let b = (component + half) / direction;
-                    near = near.max(a.min(b));
-                    far = far.min(a.max(b));
-                }
-            }
-            (near <= far && near < blocked_at).then_some((piece.id(), near))
+            let distance = ray.sphere_distance(
+                piece.transform().position(),
+                crate::resource_size::fragment_contact_radius_meters(piece.material()),
+            )?;
+            (distance <= PICKUP_RANGE_METERS && distance < blocked_at)
+                .then_some((piece.id(), distance))
         })
         .min_by(|a, b| a.1.total_cmp(&b.1).then_with(|| a.0.0.cmp(&b.0.0)))
         .map(|target| target.0)
-}
-
-fn rotate(q: [f64; 4], p: [f64; 3]) -> [f64; 3] {
-    let v = [q[0], q[1], q[2]];
-    let cross = |a: [f64; 3], b: [f64; 3]| {
-        [
-            a[1] * b[2] - a[2] * b[1],
-            a[2] * b[0] - a[0] * b[2],
-            a[0] * b[1] - a[1] * b[0],
-        ]
-    };
-    let t = cross(v, p).map(|v| v * 2.0);
-    let c = cross(v, t);
-    std::array::from_fn(|i| p[i] + q[3] * t[i] + c[i])
 }
 
 #[cfg(test)]
@@ -112,6 +79,39 @@ mod tests {
     }
 
     #[test]
+    fn sphere_pickup_rejects_old_cube_corners_and_ignores_rotation() {
+        let fragment = piece(1, 1.0);
+        let radius = crate::resource_size::fragment_contact_radius_meters(fragment.material());
+        let miss = MiningRay::new(
+            WorldPosition::new(radius * 0.9, radius * 0.9, 0.0),
+            WorldPosition::new(radius * 0.9, radius * 0.9, 2.0),
+        )
+        .unwrap();
+        assert_eq!(aimed_fragment(miss, &[fragment], None, f64::INFINITY), None);
+        let hit = MiningRay::new(
+            WorldPosition::new(radius * 0.5, 0.0, 0.0),
+            WorldPosition::new(radius * 0.5, 0.0, 2.0),
+        )
+        .unwrap();
+        let mut rotated = fragment;
+        rotated.set_transform(
+            ResourceTransform::new(
+                fragment.transform().position(),
+                [0.0, 0.0, 0.7_f64.sin(), 0.7_f64.cos()],
+            )
+            .unwrap(),
+        );
+        assert_eq!(
+            aimed_fragment(hit, &[fragment], None, f64::INFINITY),
+            Some(fragment.id())
+        );
+        assert_eq!(
+            aimed_fragment(hit, &[rotated], None, f64::INFINITY),
+            Some(fragment.id())
+        );
+    }
+
+    #[test]
     fn permanent_single_slot_rejects_replacement_until_release() {
         let mut slot = CarrySlot::default();
         let first = WorldObjectId::ResourceFragment(FragmentId(1));
@@ -123,7 +123,7 @@ mod tests {
     }
 
     #[test]
-    fn targeting_checks_cube_range_occlusion_and_carried_identity() {
+    fn targeting_checks_sphere_range_occlusion_and_carried_identity() {
         let ray = MiningRay::new(
             WorldPosition::new(0.0, 0.0, 0.0),
             WorldPosition::new(0.0, 0.0, 1.0),

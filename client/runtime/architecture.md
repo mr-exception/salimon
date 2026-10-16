@@ -660,3 +660,17 @@ Ground support is rotation-independent. Grid, support/sleep tracking and frame
 conversion remain in physics; no per-fragment hull allocation/import is required.
 Attached previews and carried identities never enter the solver. Final raycast,
 carry clearance and old emission-adapter migration follow in #234.
+
+## Sphere interaction integration (#234)
+
+World defines the single radius used by pickup and all runtime clearance, prompt,
+visual and contact adapters. Attachment pose now includes current camera rotation;
+release retains that same reserved ID, mass, radius and pose, with ordinary gravity
+providing the drop motion. Tool previews have no loose body or pickup target.
+Legacy hull selection is removed from emission/carrying/benchmark setup; historical
+geometry evaluations still explicitly load their original assets. Checkpoints
+identify `collision_shape: sphere` rather than exporting stale shard vertices.
+Core intake uses the ordinary mechanical E route and authoritative ship conversion.
+The portable `sphere_interactions` test covers all materials at 10 kg and a short
+0.25 kg deposit through F pickup, carry, F drop, reacquisition, E intake and
+streaming restoration. Native M1 remains #236.

@@ -627,7 +627,7 @@
     {
       "assert": {
         "path": "world.fragments.0.side_meters",
-        "approx": 0.44628863338811303,
+        "approx": 0.11074214912205532,
         "tolerance": 1e-09
       }
     },
@@ -1452,7 +1452,7 @@
     {
       "assert": {
         "path": "world.fragments_by_id.4.ship_local_position_meters.0",
-        "approx": -5.276427241995858,
+        "approx": -5.714934251465636,
         "tolerance": 0.02
       }
     },
@@ -1466,7 +1466,7 @@
     {
       "assert": {
         "path": "world.fragments_by_id.4.ship_local_position_meters.2",
-        "approx": -2.5782138980089155,
+        "approx": -2.2819703847218857,
         "tolerance": 0.02
       }
     },
@@ -1670,7 +1670,7 @@
     {
       "assert": {
         "path": "world.fragments_by_id.4.ship_local_position_meters.0",
-        "approx": -5.276427241995858,
+        "approx": -5.714934251465636,
         "tolerance": 0.02
       }
     },
@@ -1684,7 +1684,7 @@
     {
       "assert": {
         "path": "world.fragments_by_id.4.ship_local_position_meters.2",
-        "approx": -2.5782138980089155,
+        "approx": -2.2819703847218857,
         "tolerance": 0.02
       }
     },

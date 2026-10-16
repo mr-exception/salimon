@@ -376,29 +376,6 @@ pub(crate) fn snapshots(
         .collect()
 }
 
-pub(crate) fn fragment_hull(
-    fragment: salimon_world::resources::ResourceFragment,
-) -> std::sync::Arc<salimon_physics::ConvexHull> {
-    use salimon_renderer::ResourceMesh;
-    static HULLS: std::sync::LazyLock<[std::sync::Arc<salimon_physics::ConvexHull>; 6]> =
-        std::sync::LazyLock::new(|| {
-            [
-                ResourceMesh::IceShard,
-                ResourceMesh::IceCluster,
-                ResourceMesh::SilicateSlab,
-                ResourceMesh::SilicateRidge,
-                ResourceMesh::IronChunk,
-                ResourceMesh::IronShard,
-            ]
-            .map(|mesh| {
-                std::sync::Arc::new(salimon_physics::ConvexHull::new(
-                    mesh.unit_vertices().iter().copied(),
-                ))
-            })
-        });
-    HULLS[crate::resource_presentation::legacy_fragment_contact_mesh(fragment) as usize].clone()
-}
-
 pub(crate) fn to_world_orientation(frame: ShipFrame, local: [f64; 4]) -> [f64; 4] {
     salimon_physics::compose(salimon_physics::orientation_from_axes(frame.axes), local)
 }

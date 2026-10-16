@@ -533,7 +533,7 @@
     {
       "assert": {
         "path": "world.fragments.0.side_meters",
-        "approx": 0.44628863338811303,
+        "approx": 0.11074214912205532,
         "tolerance": 1e-09
       }
     },

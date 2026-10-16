@@ -208,16 +208,10 @@ impl MiningTool {
     }
 }
 
-// Retain the pre-#232 physical orientation until spherical contacts/release
-// integration (#233/#234); presentation must not rotate legacy contact hulls.
 fn attachment_pose(
     player: CharacterSnapshot,
 ) -> Option<salimon_world::resources::ResourceTransform> {
-    salimon_world::resources::ResourceTransform::new(
-        preview_pose(player)?.position(),
-        [0.0, 0.0, 0.0, 1.0],
-    )
-    .ok()
+    preview_pose(player)
 }
 
 /// Current camera/tool front-left in absolute f64 meters. Renderer grip is

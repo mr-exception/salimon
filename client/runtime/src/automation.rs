@@ -217,8 +217,8 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
                 let frame = character_ship_frame(ship.pose);
                 let side = salimon_world::resource_fragments::side_meters(fragment);
                 let mut total = [0.0; 2];
-                // Try the center first, then points inside the oriented pickup
-                // cube. A pile can obscure its center while exposing a corner.
+                // Try the center first, then points inside the pickup
+                // sphere. A pile can obscure its center while exposing an edge.
                 for candidate in 0..9 {
                     let player = app.character.snapshot(frame, app.terrain_frame(ship));
                     let up = player.up.map(f64::from);
@@ -229,9 +229,9 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
                         if candidate == 0 {
                             0.0
                         } else if (candidate - 1) & (1 << axis) == 0 {
-                            -0.35 * side
+                            -0.25 * side
                         } else {
-                            0.35 * side
+                            0.25 * side
                         }
                     });
                     let offset =

@@ -55,9 +55,7 @@ pub struct GrowingSphere {
 
 impl GrowingSphere {
     pub fn radius_meters(self) -> f64 {
-        (3.0 * self.material.volume_m3() / (4.0 * std::f64::consts::PI))
-            .cbrt()
-            .clamp(MIN_SPHERE_RADIUS_METERS, MAX_SPHERE_RADIUS_METERS)
+        crate::resource_size::fragment_contact_radius_meters(self.material)
     }
 }
 

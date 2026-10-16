@@ -124,21 +124,13 @@ impl EmissionSurface {
             salimon_world::resource_fragments::FRAGMENT_MAX_MASS_KG,
         )
         .unwrap();
-        let template = ResourceFragment::new(
-            id,
-            self.entry.deposit.id(),
-            full,
-            ResourceTransform::new(self.entry.deposit.position(), [0.0, 0.0, 0.0, 1.0]).unwrap(),
-        );
-        let hull = crate::fragment_physics::fragment_hull(template);
-        let side = salimon_world::resource_fragments::side_meters(template);
         let radius = salimon_world::resource_size::fragment_contact_radius_meters(full);
         let body = CELESTIAL_BODIES
             .iter()
             .find(|b| b.id == self.entry.deposit.id().body)
             .unwrap();
         for &(contact, normal) in &self.candidates {
-            let support = hull.support([0.0, 0.0, 0.0, 1.0], side, scale(normal, -1.0));
+            let support = radius;
             let position = self
                 .entry
                 .deposit
@@ -148,28 +140,13 @@ impl EmissionSurface {
             let ground = self
                 .terrain
                 .sample(*body, scale(direction, 1.0 / length(direction)));
-            let ground_support = hull.support(
-                [0.0, 0.0, 0.0, 1.0],
-                side,
-                scale(ground.outward_normal, -1.0),
-            );
+            let ground_support = radius;
             if dot(
                 sub(direction, ground.body_local_position_meters),
                 ground.outward_normal,
             ) < ground_support + CLEARANCE_METERS
             {
                 continue;
-            }
-            if self.terrain == salimon_world::terrain::TerrainMode::Representative {
-                let mesh = crate::resource_presentation::legacy_fragment_contact_mesh(template);
-                if mesh.unit_vertices().iter().any(|vertex| {
-                    let p = add(direction, scale(*vertex, side));
-                    let radius = length(p);
-                    radius - body.radius_meters - self.terrain.height(*body, scale(p, 1.0 / radius))
-                        < CLEARANCE_METERS - 0.0002
-                }) {
-                    continue;
-                }
             }
             // Capsule clearance and existing envelopes are conservative. Try another
             // real facet, or pause extraction; never debit hidden/overlapping output.
@@ -289,8 +266,7 @@ mod tests {
                             full,
                             pose,
                         );
-                        let hull = crate::fragment_physics::fragment_hull(piece);
-                        let side = salimon_world::resource_fragments::side_meters(piece);
+                        let radius = crate::fragment_physics::sphere_radius(piece);
                         let local = pose
                             .position()
                             .offset_from(emission.entry.deposit.position());
@@ -298,25 +274,12 @@ mod tests {
                             crate::resource_presentation::deposit_mesh(emission.entry).unwrap();
                         assert!(
                             emission.candidates.iter().any(|(point, normal)| {
-                                let expected = add(
-                                    *point,
-                                    scale(
-                                        *normal,
-                                        hull.support(
-                                            pose.orientation_xyzw(),
-                                            side,
-                                            scale(*normal, -1.0),
-                                        ) + CLEARANCE_METERS,
-                                    ),
-                                );
+                                let expected =
+                                    add(*point, scale(*normal, radius + CLEARANCE_METERS));
                                 length(sub(local, expected)) < 0.0003
                                     && visual.mesh.unit_vertices().iter().all(|v| {
                                         dot(*normal, sub(local, scale(*v, visual.side_meters)))
-                                            >= hull.support(
-                                                pose.orientation_xyzw(),
-                                                side,
-                                                scale(*normal, -1.0),
-                                            ) - 0.0003
+                                            >= radius - 0.0003
                                     })
                             }),
                             "{material:?} variant {variant}: fragment clears authored deposit"

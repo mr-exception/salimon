@@ -625,3 +625,6 @@ SALIMON_REFERENCE_SIZE=1 RUST_LOG=info python3 scripts/salimon-test suite --grou
 The environment switch requests a 1920×1080 physical drawable (also on Retina).
 These fixed-step routes prove state transitions and rendered checkpoints; use
 the fragment benchmark for independently sampled native frame pacing.
+
+Production GPU model captures, offline visual comparisons and frozen-frame
+flicker checks: [visual fixture workflow](../scenarios/visual/README.md).

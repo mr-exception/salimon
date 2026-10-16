@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "runs": [
+    {
+      "lane": "nightly",
+      "revision": "c8219fe5c2250462c9bb7c7b4b1de53bf8badbc2",
+      "status": "success",
+      "run_id": "38907136946",
+      "attempt": "1",
+      "created_at": "2026-10-16T13:47:50.350233+00:00",
+      "url": "https://github.com/mr-exception/salimon/actions/runs/38907136946/attempts/1",
+      "checks": [
+        {
+          "name": "tools",
+          "status": "success"
+        },
+        {
+          "name": "model",
+          "status": "success"
+        },
+        {
+          "name": "scripts",
+          "status": "success"
+        },
+        {
+          "name": "rust",
+          "status": "success"
+        },
+        {
+          "name": "glb",
+          "status": "success"
+        },
+        {
+          "name": "build",
+          "status": "success"
+        },
+        {
+          "name": "baseline",
+          "status": "success"
+        },
+        {
+          "name": "evidence",
+          "status": "success"
+        },
+        {
+          "name": "temporal",
+          "status": "success"
+        },
+        {
+          "name": "smoke",
+          "status": "success"
+        }
+      ],
+      "metrics": [],
+      "error": null,
+      "environment": {
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "architecture": "x86_64",
+        "cpu": "AMD EPYC 9V74 80-Core Processor",
+        "runner_image": "ubuntu24",
+        "runner_image_version": "20261012.334.1"
+      }
+    }
+  ]
+}

@@ -429,10 +429,7 @@ impl<K: Copy + Eq + Hash> SleepTracker<K> {
                 if contact {
                     neighbors[i].push(j);
                     neighbors[j].push(i);
-                    if !(activation.sleeping[i] && activation.sleeping[j])
-                        && pieces[i].hull.is_some()
-                        && pieces[j].hull.is_some()
-                    {
+                    if !(activation.sleeping[i] && activation.sleeping[j]) {
                         let offset = sub(pieces[j].position, pieces[i].position);
                         let depth = if let Some(geometry) = activation
                             .geometry
@@ -441,11 +438,16 @@ impl<K: Copy + Eq + Hash> SleepTracker<K> {
                             .filter(|geometry| geometry.used_this_substep)
                         {
                             convex::projected_contact(&geometry.projections, offset)
-                        } else {
+                        } else if pieces[i].hull.is_some() && pieces[j].hull.is_some() {
                             convex::projected_contact(
                                 &convex::projections(&pieces[i], &pieces[j]),
                                 offset,
                             )
+                        } else {
+                            Some((
+                                [0.0, 1.0, 0.0],
+                                pieces[i].radius + pieces[j].radius - length(offset),
+                            ))
                         };
                         if depth.is_some_and(|(_, depth)| depth > CONTACT_GAP_METERS) {
                             deep_contact[i] = true;

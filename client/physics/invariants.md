@@ -23,7 +23,7 @@
   Response transport does not reuse rotated SAT spans or change separation.
   Distributed tangential impulses use 16 local iterations and a per-point
   Coulomb disk with radius 0.65 times its solved normal impulse; resting faces
-  and edges therefore resist twist. Sphere fallback friction stays unchanged.
+  and edges therefore resist twist. Analytic spheres use one radial arm with the same Coulomb limit.
 - Convex contacts use mass-weighted impulses, angular response and Coulomb friction
   capped at 0.65 of normal impulse. Low-speed convex impacts have no restitution;
   faster pair impacts use 0.12. Convex ground contacts are inelastic.
@@ -37,8 +37,9 @@
   advancement and another 16 when the pose moves. Substeps adapt to scale and speed, target at most
   1/90 s and cap at 4096; the awake motion target is reevaluated after each
   response, including gravity speed. All elapsed time is retained. No CCD guarantee is made.
-- The optional sphere fallback preserves three passes, the 48-step cap and
-  original ground restitution/tangent damping. Missing hulls never spin.
+- Analytic spheres use exact radius support, 2/5 mr² inertia, sixteen pre/post
+  passes and adaptive motion steps capped at 4096. Friction generates spin;
+  contact-loaded rolling resistance dissipates it. Deep sphere overlaps cannot sleep.
 - Floor/non-floor groups and distinct sphere centers do not contact. One floor
   reference frame may appear per call. Removed supports are reevaluated each step.
 - Physics owns motion/contact rules only. Caller retains IDs/material/session,

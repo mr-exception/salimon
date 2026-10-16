@@ -11,7 +11,7 @@ Duplicate vertices and coplanar faces are merged; supporting face normals and
 true edge directions supply the separating-axis test. Pair projections subtract
 centers in f64 before testing axes. Radii only reject distant pairs and constrain
 ship hull clearance; they do not determine convex pair separation. A missing
-hull retains the previous sphere response for compatible callers.
+hull selects analytic sphere contacts at the caller-supplied radius.
 Pair projection axes remove numerical parallel repeats in generation order with
 1e-9 component bins. Support-graph queries test the same face/crossed-edge SAT
 axes, stopping at the first separating axis without allocating a response
@@ -68,7 +68,7 @@ body's own weight. Rough contact rolling/spin loss is a separate accumulated
 angular impulse capped at 0.1 times normal impulse times bounding radius (the
 smaller radius for pairs). It exchanges equal/opposite pair torques and requires
 a current contact load; unsupported objects receive no rolling drag. This is a
-uniform approximate contact law, not a material-specific deformation model. The legacy sphere response is unchanged. Pair velocity constraints remain active across a 20 µm
+uniform approximate contact law, not a material-specific deformation model. Analytic spheres use one radial contact arm and the same mass-weighted normal, friction and rolling constraints; no hull/SAT is allocated. Pair velocity constraints remain active across a 20 µm
 contact skin around the 10 µm positional bias, preventing correction from
 prematurely dropping a loaded velocity constraint.
 Positional separation respects a convex body's existing deck support: downward
@@ -103,8 +103,7 @@ remains at most 1/90 s, with identical 8 ms subdivisions for ordinary 16 ms
 updates. Sleeping objects constrain no motion until waking; swept wake/contact
 checks and shared time progression remain in every substep. This limits ordinary drop
 and ejection tunneling, but is not general continuous collision detection.
-Legacy sphere-only calls retain the 48-step cap and three contact passes. Both
-paths distribute all elapsed time. Convex envelopes intentionally bridge local
+Sphere-only calls use the same adaptive 4096-step cap and sixteen pre/post contact passes. All calls distribute elapsed time. Convex envelopes intentionally bridge local
 concavities, notably the clustered ice asset.
 
 Release helpers retain existing impulses. Identity, material, lifetime, carried
@@ -324,3 +323,21 @@ adds conservative radius-based ceiling containment; horizontal hull/fixture
 containment and precise deck support remain unchanged. Surface changes invalidate
 sleep support through existing snapshot matching. No acceleration-induced cabin
 forces, crew inertial simulation or new contact engine is introduced.
+
+## Analytic fragment spheres (#233)
+
+Runtime loose fragments use `hull: None`, the bounded mass/density radius from
+`GrowingSphere`, and equal ground support. Sphere inertia is 2/5 mr². Contact
+arms are ±normal × radius, with cached unilateral impulses and contact-loaded
+rolling loss. Low-speed pair impacts and ground contacts are inelastic. Radius
+controls floor, sampled tangent-plane, radial terrain and ceiling support,
+independent of orientation. No mesh-mesh contact is used. Adaptive motion
+steps use sphere diameter; grid ordering, correction refresh and swept wake
+remain shared with convex bodies. Contact penetration above 1 mm prevents
+sphere-island sleep. This bounds ordinary tunneling, without a CCD guarantee.
+
+A supported deck cannot absorb downward positional corrections for either
+shape. Sphere reactions retain no SAT projections. Carried and attached
+identities are excluded by runtime; persistent identities and mass remain world
+owned. Old authored hulls remain only in legacy emission/evaluation adapters
+until the final interaction migration (#234).

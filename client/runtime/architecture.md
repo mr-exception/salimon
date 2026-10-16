@@ -651,3 +651,12 @@ snapshot size to physical size, independently of the new authored visual scale.
 Automation exposes `sphere_visual` and `mining.growth_preview` without changing
 legacy observation fields used by existing fixtures. No disk migration is needed
 for the in-memory Phase 0 session.
+
+## Sphere contacts (#233)
+
+`fragment_physics::snapshots` maps every loose fragment to an analytic sphere
+using the exact bounded `GrowingSphere` radius already used by presentation.
+Ground support is rotation-independent. Grid, support/sleep tracking and frame
+conversion remain in physics; no per-fragment hull allocation/import is required.
+Attached previews and carried identities never enter the solver. Final raycast,
+carry clearance and old emission-adapter migration follow in #234.

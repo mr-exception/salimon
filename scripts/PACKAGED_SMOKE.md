@@ -30,10 +30,10 @@ explicitly. A helper/tool/permission/capture failure never becomes a passing
 skip. The runner focuses the launched game and changes focus on your desktop;
 use a dedicated test session. Screenshots capture the whole desktop and may
 include other visible content. Keep the game unobscured. macOS and Windows
-adapters need validation on the target desktop; CI currently exercises Linux
-only and does not claim graphical coverage on those two hosts.
+adapters need validation on the target desktop. Automatic CI does not exercise
+packaged smoke on any platform.
 
-For Linux CI or local software-rendered startup validation:
+For manual Linux software-rendered startup validation:
 
 ```sh
 sudo apt install xvfb xdotool imagemagick mesa-vulkan-drivers
@@ -41,10 +41,10 @@ WGPU_BACKEND=vulkan xvfb-run -a -s '-screen 0 1920x1080x24' \
   python3 scripts/packaged_smoke.py --binary artifacts/build/release/salimon-client --timeout 90
 ```
 
-The Native builds workflow runs this on the staged Linux release package and
-uploads evidence even on failure. Xvfb/Mesa coverage does not establish hardware
-GPU fidelity. macOS/Windows builds and Python contracts run in CI; native input
-smoke runs there remain local opt-in.
+Run this explicitly after staging a Linux release package and retain the
+evidence, including failures. Xvfb/Mesa coverage does not establish hardware
+GPU fidelity. Automatic CI only compiles the source; all packaged/input smoke
+checks remain local opt-in.
 
 `--artifacts DIR` changes the default `artifacts/packaged-smoke/` root;
 `--timeout SECONDS` sets the bounded gameplay deadline (default 60, maximum 600).

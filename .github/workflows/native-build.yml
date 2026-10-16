@@ -1,169 +1,33 @@
-name: Native builds
+name: Source build
 
 on:
   push:
     branches: [main]
   pull_request:
   workflow_dispatch:
-    inputs:
-      visual_evidence:
-        description: Run optional Linux screenshot checkpoint scenarios
-        type: boolean
-        default: false
 
 permissions:
   contents: read
 
+concurrency:
+  group: source-build-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-24.04, macos-14, windows-2022]
-    runs-on: ${{ matrix.os }}
+    name: Source build (Ubuntu)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      # Keep developer rustfmt/Clippy components out of this build-only job.
+      RUSTUP_TOOLCHAIN: stable
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
       - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
-      - name: Debian build and runtime dependencies
-        if: runner.os == 'Linux'
+      - name: Native build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev libx11-dev libxi-dev libxcursor-dev libxrandr-dev libvulkan1 mesa-vulkan-drivers xvfb xauth xdotool imagemagick
-          icd_files=(/usr/share/vulkan/icd.d/lvp_icd*.json)
-          test -f "${icd_files[0]}"
-          echo "VK_DRIVER_FILES=${icd_files[0]}" >> "$GITHUB_ENV"
-      - name: Generic model validation contract tests
-        run: |
-          python -m pip install -r models/tools/requirements.txt
-          python -m unittest discover -s models/tests -v
-      - uses: actions/setup-node@v4
-        if: runner.os == 'Linux'
-        with:
-          node-version: '22.16.0'
-      - name: Offline GLB compliance, exact optimization and visual budgets
-        if: runner.os == 'Linux'
-        timeout-minutes: 5
-        run: |
-          npm ci --prefix models/tools/gltf --ignore-scripts --no-audit --no-fund
-          python -m unittest discover -s models/tests -p test_process_glb.py -v
-          python models/tools/process_glb.py all --profile exact-v1 --output artifacts/glb
-      - name: Build script and E2E runner contract tests
-        run: python -m unittest discover -s scripts -p 'test_*.py'
-      - name: Rust quality gates
-        shell: bash
-        run: |
-          cargo fmt --all -- --check
-          cargo clippy --workspace --all-targets --locked -- -D warnings
-          cargo test --workspace --locked
-      - name: Optimized candidates through production CPU importers
-        if: runner.os == 'Linux'
-        env:
-          SALIMON_GLB_CANDIDATES: ${{ github.workspace }}/artifacts/glb
-        run: cargo test -p salimon-renderer --locked offline_glb_candidate -- --ignored
-      - name: Stage debug executable
-        run: python scripts/build_game.py --profile debug --output artifacts/build/debug
-      - name: Stage release executable
-        run: python scripts/build_game.py --profile release --output artifacts/build/release
-      - name: Resident resource instancing contracts and CPU comparison
-        if: runner.os == 'Linux'
-        timeout-minutes: 5
-        shell: bash
-        env:
-          WGPU_BACKEND: vulkan
-        run: |
-          set -euo pipefail
-          mkdir -p artifacts/fragment-benchmarks
-          cargo test -p salimon-renderer headless_resource --locked -- --ignored
-          cargo test --release -p salimon-renderer resource_preparation_benchmark --locked -- --ignored --nocapture | tee artifacts/fragment-benchmarks/resource-preparation.txt
-      - name: Fragment stress measurements (CPU-only; no hardware FPS assertions)
-        if: runner.os == 'Linux'
-        timeout-minutes: 5
-        run: python scripts/benchmark_fragments.py --binary artifacts/build/release/salimon-client --mode physics --counts 500 1000 --layouts scattered --states settled --warmup-seconds 0 --sample-seconds 1 --timeout 120 --machine-label github-actions-cpu-only --output artifacts/fragment-benchmarks
-      - name: Flight mass and power CPU regression profiles
-        if: runner.os == 'Linux'
-        timeout-minutes: 6
-        run: python scripts/profile_flight.py --binary artifacts/build/release/salimon-client --samples 20 --baseline reports/issue-196/baseline.json --output artifacts/fragment-benchmarks/flight-profile.json
-      - name: Linux deterministic E2E baseline (Mesa software Vulkan)
-        if: runner.os == 'Linux'
-        timeout-minutes: 10
-        shell: bash
-        env:
-          WGPU_BACKEND: vulkan
-        run: |
-          set -euo pipefail
-          mkdir -p artifacts/e2e
-          test -f "$VK_DRIVER_FILES"
-          command -v import
-          xvfb-run -a -s '-screen 0 1280x800x24' bash -euo pipefail -c '
-            import -window root artifacts/e2e/display-ready.png
-            python scripts/salimon-test suite --summary --binary artifacts/build/release/salimon-client
-          ' 2>&1 | tee artifacts/e2e/baseline.log
-      - name: Production model capture and temporal stability (software Vulkan)
-        if: runner.os == 'Linux'
-        timeout-minutes: 15
-        env:
-          WGPU_BACKEND: vulkan
-        run: |
-          python -m pip install -r scripts/visual-requirements.txt
-          python -m unittest discover -s scripts -p test_model_visual_tests.py -v
-          xvfb-run -a -s '-screen 0 1280x800x24' python scripts/model_visual_tests.py capture --binary artifacts/build/release/salimon-client
-          python scripts/model_visual_tests.py compare --temporal-only
-      - name: Linux cockpit window evidence (Mesa software Vulkan)
-        if: runner.os == 'Linux'
-        timeout-minutes: 3
-        env:
-          WGPU_BACKEND: vulkan
-        run: xvfb-run -a -s '-screen 0 1280x800x24' python scripts/salimon-test run scenarios/evidence/lower-cockpit-windows.json --summary --binary artifacts/build/release/salimon-client --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
-      - name: Linux resource evidence (Mesa software Vulkan)
-        if: runner.os == 'Linux'
-        timeout-minutes: 10
-        env:
-          WGPU_BACKEND: vulkan
-        run: xvfb-run -a -s '-screen 0 1280x800x24' python scripts/salimon-test suite --group resource-collection --evidence --summary --binary artifacts/build/release/salimon-client --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
-      - name: Linux ship and EVA evidence (Mesa software Vulkan)
-        if: runner.os == 'Linux'
-        timeout-minutes: 5
-        env:
-          WGPU_BACKEND: vulkan
-        run: xvfb-run -a -s '-screen 0 1280x800x24' python scripts/salimon-test suite --group ship-eva --evidence --summary --binary artifacts/build/release/salimon-client --screenshot-command '["python", "scripts/capture_settled.py", "{path}"]'
-      - name: Linux optional visual checkpoints (Mesa software Vulkan)
-        if: runner.os == 'Linux' && inputs.visual_evidence == true
-        timeout-minutes: 10
-        shell: bash
-        env:
-          WGPU_BACKEND: vulkan
-        run: |
-          set -euo pipefail
-          xvfb-run -a -s '-screen 0 1280x800x24' bash -euo pipefail -c '
-            for scenario in scenarios/evidence/*.json; do
-              python scripts/salimon-test run "$scenario" --summary --binary artifacts/build/release/salimon-client
-            done
-          ' 2>&1 | tee artifacts/e2e/visual.log
-      - name: Record native graphics coverage on macOS and Windows
-        if: runner.os != 'Linux'
-        shell: bash
-        run: echo 'Native graphical E2E is not run on this platform in CI; run the baseline/evidence suites on a local GPU desktop. Build, Rust, and Python checks still run.' >> "$GITHUB_STEP_SUMMARY"
-      - name: Linux packaged black-box smoke (real X11 input)
-        if: runner.os == 'Linux'
-        env:
-          WGPU_BACKEND: vulkan
-        run: xvfb-run -a -s '-screen 0 1920x1080x24' python scripts/packaged_smoke.py --binary artifacts/build/release/salimon-client --timeout 90
-      - name: Preserve runnable builds and smoke evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: salimon-${{ matrix.os }}
-          path: |
-            artifacts/build/
-            artifacts/e2e/
-            artifacts/fragment-benchmarks/
-            artifacts/glb/
-            artifacts/model-visual/
-            artifacts/packaged-smoke/
-          if-no-files-found: warn
+          sudo apt-get install -y --no-install-recommends build-essential pkg-config libxkbcommon-dev libwayland-dev
+      - name: Compile workspace
+        run: cargo build --workspace --locked

@@ -4,7 +4,24 @@ Run commands from the repository root. Use `python3` on macOS/Linux where
 `python` is not available, and `python` on Windows. Native builds require Python
 3.10+, stable Rust 1.89+ with rustfmt/Clippy, locked Cargo dependencies, and the
 [platform build prerequisites](../scripts/BUILDING.md#platform-prerequisites).
-CI uses Python 3.12. Initial installation/builds require network access.
+Use Python 3.12 for tooling checks. Initial installation/builds require network access.
+
+## Automatic CI
+
+[Source build](../.github/workflows/native-build.yml) runs one Ubuntu 24.04 job
+on pull requests, main pushes and manual dispatch: `cargo build --workspace --locked`
+in the debug profile. It uses Cargo caching, a 15-minute timeout and cancels
+superseded runs for the same PR/branch. It does not run the validation matrix
+below, stage executables, build release profiles or upload artifacts.
+
+Tests, formatting/lint, model processing, benchmarks and native graphical/smoke
+checks remain available for deliberate local verification. macOS/Windows builds
+and platform-specific testing remain local as well.
+
+The new check name is **Source build (Ubuntu)**. If branch protection or rulesets
+require the old `build (ubuntu-24.04)`, `build (macos-14)` or `build (windows-2022)`
+checks, a maintainer must replace those requirements with the new check before
+merging under that policy. This workflow change does not edit protection settings.
 
 ## CPU and tooling gates
 
@@ -60,9 +77,9 @@ passing metadata checks alone does not prove visual quality.
 
 ## Optional offline GLB pipeline
 
-Linux CI installs the pinned local Khronos validator, runs
+For manual verification, install the pinned local Khronos validator, run
 `python models/tools/process_glb.py all --profile exact-v1 --output artifacts/glb`,
-and checks candidates with the production CPU importers using
+and check candidates with the production CPU importers using
 `SALIMON_GLB_CANDIDATES="$PWD/artifacts/glb" cargo test -p salimon-renderer --locked offline_glb_candidate -- --ignored`.
 See [model pipeline setup, reports and disable switch](../models/tools/README.md#offline-glb-compliance-and-cost-pipeline-227).
 These gates prove compliance, budgets, spatial invariants and exact importer data
@@ -71,7 +88,7 @@ parity; native visual fidelity/performance remains a separate verification.
 ## Native graphical gates
 
 A running display, compatible GPU/backend and an unobscured capture surface are
-required. After release staging, the Linux CI-equivalent commands are:
+required. After local release staging, manual Linux verification commands are:
 
 ```sh
 export WGPU_BACKEND=vulkan
@@ -83,19 +100,18 @@ xvfb-run -a -s '-screen 0 1280x800x24' python scripts/salimon-test suite --group
 xvfb-run -a -s '-screen 0 1920x1080x24' python scripts/packaged_smoke.py --binary artifacts/build/release/salimon-client --timeout 90
 ```
 
-Use the actual installed lavapipe ICD filename (CI discovers
-`/usr/share/vulkan/icd.d/lvp_icd*.json`); do not copy the placeholder. Install
-Xvfb, xauth, xdotool, ImageMagick and Mesa Vulkan plus desktop libraries as in
-[CI](../.github/workflows/native-build.yml). Check `import -window root` capture
+Use the actual installed lavapipe ICD filename from
+`/usr/share/vulkan/icd.d/lvp_icd*.json`; do not copy the placeholder. Install
+Xvfb, xauth, xdotool, ImageMagick and Mesa Vulkan plus the desktop libraries
+from the [build prerequisites](../scripts/BUILDING.md#platform-prerequisites). Check `import -window root` capture
 works on the test display. Screenshot/capture failures are failures, not skips.
 
 On macOS/Windows use a local graphical desktop, omit Xvfb/Linux backend variables,
 and select the staged executable (`salimon-client.exe` on Windows). Use the
 [runner guide](../scripts/README.md) for platform capture configuration and
 [packaged smoke prerequisites](../scripts/PACKAGED_SMOKE.md) for OS input/capture.
-CI runs Rust/Python/build gates on all three OSes, required baseline/evidence and
-packaged smoke on Linux only, and optional `scenarios/evidence/*.json` checkpoints
-on `workflow_dispatch` with `visual_evidence=true`.
+These checks are manual on every platform. Workflow dispatch runs the same
+source-build job as PRs and main pushes; it has no visual-evidence option.
 
 Linux software Vulkan establishes launch, gameplay/state and capture coverage;
 it does not establish macOS Metal/Windows hardware fidelity or performance.
@@ -120,7 +136,7 @@ from CPU tests alone.
 ## Fragment profiling (#155)
 
 Use [the benchmark guide](../scripts/FRAGMENT_BENCHMARKS.md) for opt-in 500/1,000
-release matrices and reference-machine settings. CPU-only CI measurements and
+release matrices and reference-machine settings. CPU-only measurements and
 Linux software Vulkan do not establish native FPS. The ordinary workspace tests
 include large-load conservation/profiler parity/carrying/frame regressions; the
 native default suite includes `scenarios/fragment-load.json`. Record actual

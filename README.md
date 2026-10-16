@@ -105,7 +105,7 @@ and `wgpu` dependency graph. Running the client needs no external account connec
 For standalone native debug/release executables on macOS, Windows, and Debian
 Linux, use `python3 scripts/build_game.py --profile release` (`python` on
 Windows). See [native build documentation](scripts/BUILDING.md) for prerequisites,
-output locations, failure handling, and the cross-platform CI build matrix.
+output locations, failure handling, and the single Ubuntu source-build CI check.
 
 Run declarative native E2E scenarios with `scripts/salimon-test suite` or
 `scripts/salimon-test run scenarios/landed-earth.json`; see

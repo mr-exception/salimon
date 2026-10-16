@@ -198,7 +198,7 @@ without exemptions.
 The gate does not repair assets or change physics dimensions. Category budgets
 remain independently enforced; changing style does not loosen spatial policy.
 
-Synthetic fixtures run in ordinary model CI and cover inverted normals,
+Synthetic fixtures run in the manually invoked model tests and cover inverted normals,
 degenerate/duplicate/near-coplanar faces, shared edges, world transforms, bounds,
 anchors, closed-node topology, clearances and 2,000 spatially separated triangles.
 An Option A/Option B fixture swaps one triangle for three facets while keeping
@@ -208,7 +208,7 @@ contract. No GPU/native hardware is required by this gate.
 
 ## Offline GLB compliance and cost pipeline (#227)
 
-Install Node 22.16.0 (CI) and the lockfile-pinned Khronos glTF Validator once:
+Install Node 22.16.0 and the lockfile-pinned Khronos glTF Validator once:
 
 ```sh
 npm ci --prefix models/tools/gltf --ignore-scripts --no-audit --no-fund
@@ -217,8 +217,9 @@ SALIMON_GLB_CANDIDATES="$PWD/artifacts/glb" cargo test -p salimon-renderer --loc
 ```
 
 After dependency installation these commands need no network, Blender, display
-or GPU. CI runs them on Linux and uploads each candidate GLB, detailed Khronos
+or GPU. Run them deliberately and retain candidate GLBs, detailed Khronos
 before/after diagnostics, hashes, contract metrics and aggregate `summary.json`.
+Automatic CI only compiles source and does not run this optional pipeline.
 Output contains no timestamp or absolute workstation paths. Reports reflect the
 checked-in exports at that revision, not an unperformed Blender regeneration.
 
@@ -237,7 +238,7 @@ Without `--glb-profile`, the established exporter remains independent of Node.
 `--glb-profile none` runs compliance/reporting while retaining exported bytes;
 omitting the flag disables the entire optional step. Re-export without the flag
 to roll back optimization; source `.blend` files are never modified. No production
-GLB is replaced just by running the CI audit.
+GLB is replaced just by running this audit.
 
 ### Profile and preservation boundary
 

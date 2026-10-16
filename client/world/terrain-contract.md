@@ -108,9 +108,10 @@ Same executable/input reproduces identical samples, independently of evaluation
 order/thread/translation. Floating-point interpolation/normalization can differ
 in last bits across toolchains/architectures; compatibility vectors must stay
 within 1e-7 m in height and 1e-6 normal components. This contract does not promise
-bit-identical floating-point normals across all machines. CI on macOS/Windows/
-Linux must run the versioned golden vectors; the stage-1 report verified Linux,
-and the integrated reports record native arm64 macOS validation separately.
+bit-identical floating-point normals across all machines. For platform
+verification, manually run the versioned golden vectors on macOS/Windows/Linux.
+Automatic CI only compiles source. The stage-1 report verified Linux, and the
+integrated reports record native arm64 macOS validation separately.
 A future server sends this tiny definition (or its hash plus a known definition),
 not per-vertex meshes. Sparse feature changes replace/version the record.
 

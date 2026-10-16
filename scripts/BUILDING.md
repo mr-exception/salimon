@@ -102,22 +102,20 @@ Run fast build-script and existing runner contracts without a GPU:
 python3 -m unittest discover -s scripts -p 'test_*.py'
 ```
 
-`.github/workflows/native-build.yml` runs these contracts and Rust quality gates,
-builds/stages debug and release on the native macOS runner, Windows (x86-64 MSVC)
-and Ubuntu (x86-64), and uploads the runnable folders. Linux also launches the
-staged release executable under Xvfb with explicitly selected Mesa lavapipe and
-runs the complete deterministic Phase 0 baseline suite (landed Earth and orbit
-Earth). It uploads logs/results and available failure screenshots even on failure.
-See [CI coverage](README.md#continuous-integration-coverage) for required checks,
-failure diagnosis, and the optional manual-dispatch visual checkpoint suite.
-No graphical launch is claimed for macOS/Windows CI; validate native GPU/window
-behavior with the [manual smoke checks](../README.md#native-smoke-check) and the
-[E2E runner](README.md) on those desktops. Linux software rendering checks
-gameplay, not hardware performance or visual quality. Packaged OS-input
-automation is provided by the [black-box smoke command](PACKAGED_SMOKE.md).
+Automatic [Source build CI](../.github/workflows/native-build.yml) only runs
+`cargo build --workspace --locked` on Ubuntu 24.04. It uses checked-in assets,
+Cargo caching and native compilation dependencies; it does not stage debug or
+release executables, upload packages or execute the local tests above.
+See [CI coverage](README.md#continuous-integration-coverage) and the
+[check-name migration](../docs/validation.md#automatic-ci).
+
+Build other platforms and run graphical validation deliberately on a suitable
+host. Use the [manual smoke checks](../README.md#native-smoke-check),
+[E2E runner](README.md) and [black-box smoke command](PACKAGED_SMOKE.md).
+Linux software rendering checks gameplay, not native hardware fidelity.
 
 The existing E2E runner CLI subprocess contract uses a POSIX shebang fixture and
-is explicitly skipped on Windows. All build-interface contracts and the other
+is explicitly skipped on Windows. When invoked locally, build-interface contracts and the other
 runner contracts execute there; Windows does not claim that Unix-only fixture.
 
 Signing, notarization, installers, automatic updates, non-Debian distributions

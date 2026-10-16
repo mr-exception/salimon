@@ -1,0 +1,29 @@
+[
+  {
+    "scenario": "scenarios/evidence/inertial-flight.json",
+    "status": "passed",
+    "steps_completed": 426,
+    "duration_ms": 14982,
+    "error": null,
+    "assertions": 13,
+    "captures": 1
+  },
+  {
+    "scenario": "scenarios/evidence/landing-speed-cutoff.json",
+    "status": "passed",
+    "steps_completed": 319,
+    "duration_ms": 10885,
+    "error": null,
+    "assertions": 8,
+    "captures": 3
+  },
+  {
+    "scenario": "scenarios/evidence/crash-recovery.json",
+    "status": "passed",
+    "steps_completed": 19,
+    "duration_ms": 748,
+    "error": null,
+    "assertions": 12,
+    "captures": 1
+  }
+]

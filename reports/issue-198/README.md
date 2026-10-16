@@ -13,6 +13,12 @@ were not successfully exercised by the available desktop input automation.
 This report does not turn scripted steering coverage into manual coverage.
 Keep the issue open for that remaining owner walkthrough.
 
+## Current follow-up
+
+See the [2026-10-16 current-revision rerun](2026-10-16/README.md) for refreshed
+M1 flight evidence and the remaining OS-input limitation. The original results
+below remain the dated 2026-10-15 evidence at their recorded revision.
+
 ## Implementation and prerequisites
 
 All prerequisite implementation issues #202, #190, #192 and #193 were closed and

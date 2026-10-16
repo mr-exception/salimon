@@ -18,6 +18,10 @@ mod mining_emission;
 mod resource_context;
 mod resource_presentation;
 mod reticle;
+#[cfg(test)]
+mod sphere_benchmark;
+#[cfg(test)]
+mod sphere_interactions;
 mod terrain;
 mod terrain_observations;
 mod terrain_patches;

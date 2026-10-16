@@ -1,0 +1,13 @@
+{
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "architecture": "x86_64",
+  "rust": "1.89.0",
+  "profile": "test; runtime/renderer unoptimized, physics/math opt-level 2; codegen-units 1, no debug symbols",
+  "samples_per_case": 100,
+  "gpu": null,
+  "source_sha256": {
+    "client/runtime/src/sphere_benchmark.rs": "00690f767e3ebfabfdb663beb49bd60cca74737e53fbe99f8566f30af713b8d7",
+    "client/renderer/src/resource_mesh/sphere_benchmark.rs": "b1f3612c762b2a95c1bb880c47532d7b4a3fcaadacde87b07b74e275fa30da7f"
+  },
+  "resume_note": "Raw evidence retained across environment restart. Latest pile runtime benchmark compiled directly against retained Rust 1.89 build dependencies; no repository build settings changed."
+}

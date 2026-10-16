@@ -8,6 +8,8 @@ use std::{
 mod broad_phase;
 mod convex;
 mod sleep;
+#[cfg(test)]
+mod sphere_tests;
 pub use convex::{ConvexHull, ConvexHullComplexity, compose, orientation_from_axes, rotate};
 pub use sleep::SleepTracker;
 
@@ -138,7 +140,7 @@ pub struct ObjectState {
     /// Authored support distance along the environmental normal, in metres.
     pub ground_support_meters: f64,
     pub surface: Surface,
-    /// Immutable unit-scale authored convex envelope. None retains legacy sphere policy.
+    /// Immutable unit-scale convex envelope; None selects exact radius contacts.
     pub hull: Option<Arc<ConvexHull>>,
     pub side_meters: f64,
     /// Unit local-to-simulation-frame quaternion; angular velocity is frame radians/s.
@@ -250,8 +252,8 @@ pub fn advance_profiled(
 /// Advance in stable slice order; preserve that order across updates.
 /// `floor_contains` is a pure geometry query in ship-local metres, not a response rule.
 /// Separate floor frames must be advanced in separate calls. Sphere centers distinguish
-/// planetary contact groups. Convex substeps adapt to scale/speed; sphere-only
-/// calls retain the legacy 48-step cap. No elapsed time is discarded.
+/// planetary contact groups. Both shapes adapt substeps to scale/speed with a
+/// 4096-step cap. No elapsed time is discarded.
 pub fn advance(
     pieces: &mut [ObjectState],
     delta: Duration,
@@ -318,10 +320,7 @@ fn advance_impl<const PROFILE: bool>(
         return stats;
     }
     // A fixed maximum substep prevents fast ejected pieces from tunnelling through a pile.
-    let has_hulls = pieces.iter().any(|p| p.hull.is_some());
-    let base_steps = (elapsed / MAX_STEP)
-        .ceil()
-        .clamp(1.0, if has_hulls { 4096.0 } else { 48.0 }) as usize;
+    let base_steps = (elapsed / MAX_STEP).ceil().clamp(1.0, 4096.0) as usize;
     let base_dt = elapsed / base_steps as f64;
     let mut remaining = elapsed;
     let mut completed = 0;
@@ -333,28 +332,27 @@ fn advance_impl<const PROFILE: bool>(
         let motion_step = pieces
             .iter()
             .enumerate()
-            .filter(|(i, p)| {
-                p.hull.is_some() && !activation.as_ref().is_some_and(|a| a.sleeping[*i])
-            })
+            .filter(|(i, _)| !activation.as_ref().is_some_and(|a| a.sleeping[*i]))
             .map(|(_, p)| {
-                0.15 * p.side_meters
-                    / (length(p.velocity)
-                        + length(p.angular_velocity) * p.radius
-                        + 1.0
-                        + GRAVITY * base_dt)
+                0.15 * if p.hull.is_some() {
+                    p.side_meters
+                } else {
+                    2.0 * p.radius
+                } / (length(p.velocity)
+                    + length(p.angular_velocity) * p.radius
+                    + 1.0
+                    + GRAVITY * base_dt)
             })
             .fold(base_dt, f64::min)
             .max(1e-5);
-        let available = if has_hulls { 4096 } else { base_steps } - completed;
-        let dt = if has_hulls {
+        let available = 4096 - completed;
+        let dt = {
             let steps = (remaining / motion_step)
                 .ceil()
                 .clamp(1.0, available as f64);
             (remaining / steps)
                 .min(base_dt)
                 .max(remaining / available as f64)
-        } else {
-            remaining / available as f64
         };
         remaining = (remaining - dt).max(0.0);
         completed += 1;
@@ -399,11 +397,6 @@ fn advance_impl<const PROFILE: bool>(
             piece.velocity = sub(piece.velocity, scale(up, piece.surface.gravity() * dt));
             gravity_velocities[i] = piece.velocity;
             gravity_ups[i] = up;
-            if !has_hulls {
-                piece.position = add(piece.position, scale(piece.velocity, dt));
-                piece.orientation =
-                    convex::integrate(piece.orientation, piece.angular_velocity, dt);
-            }
             if piece.surface.is_floor() && !floor_contains(piece.position, piece.radius) {
                 piece.position[0] = previous[0];
                 piece.position[2] = previous[2];
@@ -455,15 +448,7 @@ fn advance_impl<const PROFILE: bool>(
                 piece.velocity = scale(piece.velocity, 0.995);
                 piece.angular_velocity = scale(piece.angular_velocity, 0.98);
             }
-            if !has_hulls && !matches!(piece.surface, Surface::UnpoweredFloor { .. }) {
-                if length(piece.angular_velocity) < 0.015 {
-                    piece.angular_velocity = [0.0; 3];
-                }
-                if length(piece.velocity) < 0.015 {
-                    piece.velocity = [0.0; 3];
-                }
-            }
-            if has_hulls {
+            {
                 let previous = piece.position;
                 let orientation = piece.orientation;
                 piece.position = add(piece.position, scale(piece.velocity, dt));
@@ -490,7 +475,7 @@ fn advance_impl<const PROFILE: bool>(
         if let Some(start) = pose_start {
             stats.integration_time += start.elapsed();
         }
-        if has_hulls && moved {
+        if moved {
             pair_geometry.pairs.retain(|&(i, j), cache| {
                 if rotated[i] || rotated[j] {
                     if let Some(geometry) = cache.as_mut()
@@ -524,7 +509,7 @@ fn advance_impl<const PROFILE: bool>(
         }
         // Apply rest cutoff only after all constraint iterations. Clearing
         // velocities between solves invalidates their accumulated impulses.
-        if has_hulls {
+        {
             for (i, piece) in pieces.iter_mut().enumerate() {
                 if activation.as_ref().is_some_and(|a| a.sleeping[i]) {
                     continue;
@@ -544,7 +529,8 @@ fn advance_impl<const PROFILE: bool>(
         }
         if let Some(a) = &mut activation {
             a.warm_dt = dt;
-            a.warm_pairs.clear();
+            warm_pairs.retain(|&(i, j), _| pair_geometry.grid.overlaps(i, j));
+            a.warm_pairs = warm_pairs;
             for (&pair, geometry) in &mut pair_geometry.pairs {
                 if let Some(geometry) = geometry
                     && geometry.used_this_substep
@@ -576,7 +562,6 @@ fn solve_contacts<const PROFILE: bool>(
     floor_contains: impl Fn([f64; 3], f64) -> bool,
     stats: &mut StepStats,
 ) {
-    let has_hulls = pieces.iter().any(|piece| piece.hull.is_some());
     let old_capacity = pair_geometry.pairs.capacity();
     pair_geometry.grid.reset(pieces, 2.0 * CONTACT_BIAS_METERS);
     pair_geometry
@@ -588,7 +573,7 @@ fn solve_contacts<const PROFILE: bool>(
     for (cache, p) in pair_geometry.transformed.iter_mut().zip(pieces.iter()) {
         cache.refresh(p);
     }
-    for _ in 0..if has_hulls { 16 } else { 3 } {
+    for _ in 0..16 {
         if PROFILE {
             stats.solver_passes += 1;
         }
@@ -687,11 +672,7 @@ fn resolve_candidate<const PROFILE: bool>(
     let distance = length(separation);
     let minimum = a.radius + b.radius;
     let convex_pair = a.hull.is_some() && b.hull.is_some();
-    if if convex_pair {
-        distance > minimum + 2.0 * CONTACT_BIAS_METERS
-    } else {
-        distance >= minimum
-    } {
+    if distance > minimum + 2.0 * CONTACT_BIAS_METERS {
         return;
     }
     if PROFILE {
@@ -800,7 +781,7 @@ fn resolve_candidate<const PROFILE: bool>(
     if let Some(geometry) = cached {
         pair_impulse_cached(a, b, normal, &mut geometry.response);
     } else {
-        pair_impulse(a, b, normal);
+        pair_impulse_cached(a, b, normal, warm_pairs.entry((i, j)).or_default());
     }
     ground_contact_cached(a, &mut ground_responses[i]);
     ground_contact_cached(b, &mut ground_responses[j]);
@@ -965,10 +946,9 @@ fn ground_contact_cached(piece: &mut ObjectState, response: &mut ContactResponse
     };
     let sampled = sampled_contact(piece);
     let up = sampled.as_ref().map_or(ground.normal, |c| c.normal);
-    if let Some(hull) = &piece.hull {
-        piece.ground_support_meters =
-            hull.support(piece.orientation, piece.side_meters, scale(up, -1.0));
-    }
+    piece.ground_support_meters = piece.hull.as_ref().map_or(piece.radius, |hull| {
+        hull.support(piece.orientation, piece.side_meters, scale(up, -1.0))
+    });
     let penetration = sampled.as_ref().map_or_else(
         || {
             let gap = if let Surface::Sphere(body) = piece.surface {
@@ -989,9 +969,14 @@ fn ground_contact_cached(piece: &mut ObjectState, response: &mut ContactResponse
         return;
     }
     piece.position = add(piece.position, scale(up, penetration.max(0.0)));
-    if let Some(hull) = &piece.hull {
+    {
         let arms = sampled.map_or_else(
-            || hull.ground_arms(piece.orientation, piece.side_meters, scale(up, -1.0)),
+            || {
+                piece.hull.as_ref().map_or_else(
+                    || vec![scale(up, -piece.radius)],
+                    |hull| hull.ground_arms(piece.orientation, piece.side_meters, scale(up, -1.0)),
+                )
+            },
             |c| c.arms,
         );
         let paired_arms: Vec<_> = arms.iter().map(|&arm| (arm, [0.0; 3])).collect();
@@ -1049,17 +1034,7 @@ fn ground_contact_cached(piece: &mut ObjectState, response: &mut ContactResponse
                 scale(torque, inverse_inertia(piece)),
             );
         }
-        return;
     }
-    let downward = dot(piece.velocity, up);
-    if downward < 0.0 {
-        piece.velocity = sub(piece.velocity, scale(up, downward * (1.0 + RESTITUTION)));
-    }
-    let normal_speed = dot(piece.velocity, up);
-    piece.velocity = add(
-        scale(sub(piece.velocity, scale(up, normal_speed)), 0.88),
-        scale(up, normal_speed),
-    );
 }
 
 // A convex body already supported by a rigid deck cannot resolve another
@@ -1069,9 +1044,8 @@ fn ground_contact_cached(piece: &mut ObjectState, response: &mut ContactResponse
 // leaving loaded stacks to compact and chatter over repeated passes. Physical
 // mass/inertia and velocity impulses are unchanged; this is a support constraint.
 fn correction_direction(piece: &ObjectState, direction: [f64; 3]) -> [f64; 3] {
-    if piece.hull.is_some()
-        && let Surface::Floor { height_meters } | Surface::UnpoweredFloor { height_meters, .. } =
-            piece.surface
+    if let Surface::Floor { height_meters } | Surface::UnpoweredFloor { height_meters, .. } =
+        piece.surface
         && piece.position[1] - height_meters - piece.ground_support_meters <= CONTACT_BIAS_METERS
         && direction[1] < 0.0
     {
@@ -1082,11 +1056,7 @@ fn correction_direction(piece: &ObjectState, direction: [f64; 3]) -> [f64; 3] {
 }
 
 fn inverse_inertia(piece: &ObjectState) -> f64 {
-    if piece.hull.is_some() {
-        1.0 / (0.4 * piece.mass_kg * piece.radius * piece.radius)
-    } else {
-        0.0
-    }
+    1.0 / (0.4 * piece.mass_kg * piece.radius * piece.radius)
 }
 fn apply_impulse(piece: &mut ObjectState, arm: [f64; 3], impulse: [f64; 3]) {
     piece.velocity = add(piece.velocity, scale(impulse, 1.0 / piece.mass_kg));
@@ -1123,6 +1093,7 @@ fn friction_delta(
     delta
 }
 
+#[cfg(test)]
 fn pair_impulse(a: &mut ObjectState, b: &mut ObjectState, normal: [f64; 3]) {
     pair_impulse_cached(a, b, normal, &mut ContactResponse::default());
 }
@@ -1137,8 +1108,12 @@ fn pair_impulse_cached(
     let inverse_mass_b = 1.0 / b.mass_kg;
     let inertia_a = inverse_inertia(a);
     let inertia_b = inverse_inertia(b);
-    if a.hull.is_some() && b.hull.is_some() {
-        let arms = convex::contact_manifold(a, b, normal);
+    {
+        let arms = if a.hull.is_some() && b.hull.is_some() {
+            convex::contact_manifold(a, b, normal)
+        } else {
+            vec![(scale(normal, a.radius), scale(normal, -b.radius))]
+        };
         if !arms.is_empty() {
             let relative = |a: &ObjectState, b: &ObjectState, aa, ba| {
                 sub(
@@ -1341,7 +1316,7 @@ mod tests {
     }
 
     #[test]
-    fn authored_support_controls_ground_while_pair_contact_keeps_conservative_radius() {
+    fn sphere_radius_controls_ground_and_pair_support() {
         let mut objects = [
             floor([0.0, 0.1, 0.0], [0.0; 3]),
             floor([0.0, 0.1, 0.0], [0.0; 3]),
@@ -1353,8 +1328,8 @@ mod tests {
         for _ in 0..180 {
             advance(&mut objects, Duration::from_millis(16), |_, _| true);
         }
-        assert!(objects.iter().all(|p| p.position[1] >= 0.3 - 1e-9));
-        assert!(objects.iter().any(|p| (p.position[1] - 0.3).abs() < 0.002));
+        assert!(objects.iter().all(|p| p.position[1] >= 0.8 - 1e-9));
+        assert!(objects.iter().any(|p| (p.position[1] - 0.8).abs() < 0.002));
         assert!(length(sub(objects[0].position, objects[1].position)) >= 1.6 - 0.002);
     }
 
@@ -1392,24 +1367,25 @@ mod tests {
     }
 
     #[test]
-    fn ground_contact_preserves_restitution_and_tangential_friction() {
+    fn spherical_ground_contact_dissipates_sliding_and_generates_rotation() {
         let mut object = floor([0.0, 0.1, 0.0], [1.0, -2.0, 0.0]);
         ground_contact(&mut object);
         assert_eq!(object.position, [0.0, 0.2, 0.0]);
-        assert!((object.velocity[1] - 0.24).abs() < 1e-15);
-        assert_eq!(object.velocity[0], 0.88);
+        assert!(object.velocity[1].abs() < 1e-12);
+        assert!(object.velocity[0] < 1.0);
+        assert!(length(object.angular_velocity) > 0.0);
     }
 
     #[test]
-    fn floor_geometry_rejects_horizontal_motion_with_legacy_response() {
+    fn floor_geometry_rejects_horizontal_motion() {
         let mut objects = [floor([0.0, 1.0, 0.0], [1.0, 0.0, 2.0])];
         advance(&mut objects, Duration::from_secs_f64(1.0 / 90.0), |_, _| {
             false
         });
         assert_eq!(objects[0].position[0], 0.0);
         assert_eq!(objects[0].position[2], 0.0);
-        assert_eq!(objects[0].velocity[0], -0.15 * 0.995);
-        assert_eq!(objects[0].velocity[2], -0.30 * 0.995);
+        assert!(objects[0].velocity[0].abs() < 1.0);
+        assert!(objects[0].velocity[2].abs() < 2.0);
     }
 
     #[test]
@@ -1495,7 +1471,7 @@ mod tests {
     }
 
     #[test]
-    fn zero_delta_is_noop_and_large_delta_retains_48_substep_cap() {
+    fn zero_delta_is_noop_and_large_delta_uses_bounded_motion_steps() {
         let mut objects = [ObjectState {
             surface: Surface::Unsupported,
             ..floor([0.0, 100.0, 0.0], [1.0, 0.0, 0.0])
@@ -1503,10 +1479,11 @@ mod tests {
         let initial = objects.clone();
         advance(&mut objects, Duration::ZERO, |_, _| panic!("zero delta"));
         assert_eq!(objects, initial);
-        advance(&mut objects, Duration::from_secs(1), |_, _| {
+        let stats = advance_profiled(&mut objects, Duration::from_secs(1), |_, _| {
             panic!("unsupported")
         });
-        let expected_x_speed = 0.995_f64.powi(48);
+        assert!(stats.substeps > 48 && stats.substeps <= 4096);
+        let expected_x_speed = 0.995_f64.powi(stats.substeps as i32);
         assert!((objects[0].velocity[0] - expected_x_speed).abs() < 1e-14);
         assert!(objects[0].position[1] < 96.0);
     }

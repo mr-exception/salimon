@@ -326,11 +326,9 @@ pub(crate) fn snapshots(
                 ObjectState {
                     position,
                     velocity: initial,
-                    radius: salimon_world::resource_size::fragment_contact_radius_meters(
-                        p.material(),
-                    ),
-                    ground_support_meters: 0.0,
-                    hull: Some(fragment_hull(p)),
+                    radius: sphere_radius(p),
+                    ground_support_meters: sphere_radius(p),
+                    hull: None,
                     side_meters: salimon_world::resource_fragments::side_meters(p),
                     orientation: if ship {
                         tool.fragment_motion
@@ -378,29 +376,6 @@ pub(crate) fn snapshots(
         .collect()
 }
 
-pub(crate) fn fragment_hull(
-    fragment: salimon_world::resources::ResourceFragment,
-) -> std::sync::Arc<salimon_physics::ConvexHull> {
-    use salimon_renderer::ResourceMesh;
-    static HULLS: std::sync::LazyLock<[std::sync::Arc<salimon_physics::ConvexHull>; 6]> =
-        std::sync::LazyLock::new(|| {
-            [
-                ResourceMesh::IceShard,
-                ResourceMesh::IceCluster,
-                ResourceMesh::SilicateSlab,
-                ResourceMesh::SilicateRidge,
-                ResourceMesh::IronChunk,
-                ResourceMesh::IronShard,
-            ]
-            .map(|mesh| {
-                std::sync::Arc::new(salimon_physics::ConvexHull::new(
-                    mesh.unit_vertices().iter().copied(),
-                ))
-            })
-        });
-    HULLS[crate::resource_presentation::legacy_fragment_contact_mesh(fragment) as usize].clone()
-}
-
 pub(crate) fn to_world_orientation(frame: ShipFrame, local: [f64; 4]) -> [f64; 4] {
     salimon_physics::compose(salimon_physics::orientation_from_axes(frame.axes), local)
 }
@@ -409,12 +384,16 @@ fn to_local_orientation(frame: ShipFrame, world: [f64; 4]) -> [f64; 4] {
     salimon_physics::compose([-q[0], -q[1], -q[2], q[3]], world)
 }
 
-pub(crate) fn support(fragment: salimon_world::resources::ResourceFragment, up: [f64; 3]) -> f64 {
-    fragment_hull(fragment).support(
-        fragment.transform().orientation_xyzw(),
-        salimon_world::resource_fragments::side_meters(fragment),
-        up.map(|v| -v),
-    )
+pub(crate) fn sphere_radius(fragment: salimon_world::resources::ResourceFragment) -> f64 {
+    salimon_world::spherical_mining::GrowingSphere {
+        source: fragment.source(),
+        material: fragment.material(),
+    }
+    .radius_meters()
+}
+
+pub(crate) fn support(fragment: salimon_world::resources::ResourceFragment, _up: [f64; 3]) -> f64 {
+    sphere_radius(fragment)
 }
 
 fn nearest_body(position: [f64; 3]) -> Option<SphereSurface> {
@@ -459,6 +438,43 @@ mod tests {
         tool.session
             .extract(&mut deposit, Duration::from_secs_f64(mass / 2.0));
         tool
+    }
+
+    #[test]
+    fn loose_snapshot_radius_matches_visual_and_attached_mass_has_no_body() {
+        let mut tool = mined(2.0);
+        let p = tool.session.fragments()[0];
+        let states = snapshots(&tool, frame(), p.transform().position().meters());
+        assert_eq!(states.len(), 1);
+        let state = &states[0].1;
+        let visual = crate::resource_presentation::fragment_mesh(p);
+        assert!(state.hull.is_none());
+        assert_eq!(state.radius, visual.side_meters * 0.48);
+        assert_eq!(state.ground_support_meters, state.radius);
+        assert_eq!(state.mass_kg, p.material().mass_kg());
+        let mut source = ResourceDeposit::new(
+            DepositId {
+                local: 999,
+                ..p.source()
+            },
+            p.material(),
+            p.transform().position(),
+            2.0,
+        )
+        .unwrap();
+        tool.session.tick_spherical(
+            true,
+            Some(&mut source),
+            Duration::from_millis(16),
+            Default::default(),
+            p.transform(),
+        );
+        let attached = tool.session.attached_sphere_id().unwrap();
+        assert!(
+            snapshots(&tool, frame(), p.transform().position().meters())
+                .iter()
+                .all(|(p, _)| p.id() != attached)
+        );
     }
 
     #[test]
@@ -553,7 +569,7 @@ mod tests {
     }
 
     #[test]
-    fn all_authored_variants_settle_rotated_at_current_scale_and_preserve_mass() {
+    fn all_resource_spheres_settle_rotated_at_current_radius_and_preserve_mass() {
         for resource in [
             ResourceId::IronOre,
             ResourceId::SilicateRock,
@@ -789,20 +805,10 @@ mod tests {
         }
         let a = tool.ship_fragments[&pieces[0].id()];
         let b = tool.ship_fragments[&pieces[1].id()];
-        // Broad-phase spheres may overlap; visible authored hulls define the pile.
+        // Exact spherical contacts retain the sum of radii within solver tolerance.
         assert!(a[1].min(b[1]) >= SHIP_FLOOR_HEIGHT_METERS);
         assert!(length(sub(a, b)) > 0.05);
-        assert!(
-            length(sub(a, b))
-                < pieces
-                    .iter()
-                    .map(
-                        |p| salimon_world::resource_size::fragment_contact_radius_meters(
-                            p.material()
-                        )
-                    )
-                    .sum::<f64>()
-        );
+        assert!(length(sub(a, b)) + 0.002 >= pieces.iter().map(|p| sphere_radius(*p)).sum::<f64>());
     }
 
     #[test]

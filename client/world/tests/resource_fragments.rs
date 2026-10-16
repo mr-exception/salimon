@@ -60,9 +60,9 @@ fn physical_output_conserves_every_material_for_small_and_large_steps() {
                     piece.material().mass_kg() > 0.0
                         && piece.material().mass_kg() <= FRAGMENT_MAX_MASS_KG
                 );
+                let radius = side_meters(*piece) * 0.5;
                 assert!(
-                    ((side_meters(*piece) / salimon_world::resource_size::FRAGMENT_LINEAR_SCALE)
-                        .powi(3)
+                    (4.0 / 3.0 * std::f64::consts::PI * radius.powi(3)
                         - piece.material().volume_m3())
                     .abs()
                         < 1e-15

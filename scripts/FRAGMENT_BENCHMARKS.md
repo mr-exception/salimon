@@ -405,3 +405,37 @@ The existing scattered/dense fixtures retain their larger mixed-material pieces
 and multilayer stress geometry; keep their measurements separate. Onboard count
 is capped at 500 by the shared fixture. All native clocks, sleep checks, renderer
 metadata, raw samples and failure handling remain unchanged.
+
+## Spherical mining matrix (#235)
+
+`python scripts/benchmark_spheres.py --run --output artifacts/sphere-benchmarks`
+executes the opt-in **release** CPU tests and validates a complete 10/100/500
+matrix (100 samples per case). Run without `--run` to validate/summarize retained
+`cpu.json` and `renderer.csv`. Missing/duplicate/nonfinite evidence fails.
+Weekly verification runs this matrix and retains its output in the normal raw
+benchmark artifact; PR checks remain source-build only.
+
+Runtime uses actual 10 kg extraction, sphere snapshots, ship placement and the
+production physics adapter: active initial drops, naturally sleeping single-deck
+contents, and a 100-column/five-layer 500-piece pile. Setup/cloning/mining are not
+timed. Rest must arise from ordinary contact/sleep, never installed flags. IDs,
+mass and zero SAT projections are checked throughout. Active samples can settle
+and expose actual moving/sleeping observations; they are not a perpetual stress
+workload. Renderer preparation uses the same fixed universe-scale camera/poses
+and material masses for old six-shard and shared-sphere batches, with/without a
+maximum-size growth preview. No production code is replaced during measurement.
+
+Structural regression gates follow the measured implementation: one sphere batch,
+48 encoded bytes per submitted instance, 80 triangles per sphere, zero sleeping
+integration/pair work and unchanged identity/mass. These are deterministic gates;
+this shared cloud environment does not justify a portable millisecond threshold.
+Timings retain all 100 samples and mean/p95/max, with no synthesized FPS. Encoded
+bytes/batch counts are CPU submission observations, not GPU transfer/draw timing.
+Capacity excludes allocator overhead and is not process/GPU resident memory.
+
+The dated report separates local test-profile measurements from recommended
+release reruns. Old geometry comparison covers renderer preparation only; its
+inflated hulls are not a matched settled 500-sphere physics baseline. Native
+presented FPS/1% lows, GPU frame/pass time and total memory require a graphical
+reference run under #236. Existing wall-clock native tools remain available;
+CPU tests cannot supply those metrics.

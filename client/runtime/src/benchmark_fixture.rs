@@ -1,6 +1,6 @@
 //! Deterministic initial populations only; all later updates use production state.
 use crate::app::{ClientApplication, character_ship_frame, surface_frame_for_ship};
-use crate::fragment_physics::{FragmentMotion, fragment_hull};
+use crate::fragment_physics::{FragmentMotion, sphere_radius};
 use salimon_character::SHIP_FLOOR_HEIGHT_METERS;
 use salimon_world::{
     CelestialBodyId, WorldPosition,
@@ -126,8 +126,7 @@ pub(crate) fn initialize(
         let angle =
             ((seed.wrapping_add(index as u64 * 17)) % 360) as f64 * std::f64::consts::PI / 180.0;
         let orientation = [0.0, (angle / 2.0).sin(), 0.0, (angle / 2.0).cos()];
-        let side = salimon_world::resource_fragments::side_meters(piece);
-        let support = fragment_hull(piece).support(orientation, side, [0.0, -1.0, 0.0]);
+        let support = sphere_radius(piece);
         let mut local = match layout {
             Layout::Onboard => unreachable!("onboard fixture initialized above"),
             Layout::Dense => {
@@ -313,7 +312,7 @@ fn checkpoint(
             "angular_velocity":p.angular_velocity, "radius":p.radius,
             "mass_kg":p.mass_kg, "side_meters":p.side_meters,
             "sleeping":app.mining.fragment_sleep.is_sleeping(piece.id()),
-            "vertices":crate::resource_presentation::legacy_fragment_contact_mesh(*piece).unit_vertices()})
+            "collision_shape":"sphere"})
     }).collect::<Vec<_>>()});
     std::fs::write(path, serde_json::to_vec(&data).map_err(|e| e.to_string())?)
         .map_err(|e| format!("fixture checkpoint: {e}"))

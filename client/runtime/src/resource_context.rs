@@ -33,9 +33,9 @@ pub(crate) fn context(
         return Some(Prompt {
             placement: salimon_renderer::OverlayPlacement::World {
                 anchor_meters: piece.transform().position().meters(),
-                radius_meters: salimon_world::resource_fragments::side_meters(*piece)
-                    * 0.5
-                    * 3.0_f64.sqrt(),
+                radius_meters: salimon_world::resource_size::fragment_contact_radius_meters(
+                    piece.material(),
+                ),
             },
             text: format!(
                 "{} fragment - approx {:.2} kg\n{}",

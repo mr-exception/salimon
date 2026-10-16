@@ -197,13 +197,11 @@ fragment identity or persistence rule. See the
 
 ## Gameplay size policy (#144)
 
-`resource_size.rs` is the single size authority: deposits use `RESOURCE_LINEAR_SCALE = 10`; fragments use `FRAGMENT_LINEAR_SCALE = 5` after #148.
-Solid volume is still `mass / density`; fragment gameplay side is
-`5 * cbrt(solid volume)` and deposit gameplay radius is
-`10 * cbrt(3 * initial solid volume / (4π))`. All authored variants keep the
-same vertices; fragments now measure half the previous linear dimensions at equal mass, including growing pieces and all six variants. Deposit dimensions are unchanged.
-This is a gameplay exaggeration, not a density change; mass labels, 2 kg/s yield,
-legacy 2 kg fragment helper cap and conservation remain unchanged. New spherical lifecycle sizing is defined above and does not use the cube exaggeration.
+`resource_size.rs` is the single size authority. Deposits retain their 10×
+linear exaggeration; live fragments use density-derived spherical radius, bounded
+to 5 mm–2 m, and `side_meters` is diameter. This supersedes the historical
+#144/#148 enlarged shard/cube bounds. Mass labels, 2 kg/s yield, legacy helper
+output cap and conservation are unchanged; interactive mining uses its 10 kg cap.
 
 Growing fragments scale with current mass; picking up seals growth. Deposits
 retain initial bounds and placement while partly mined, then disappear at zero
@@ -213,12 +211,12 @@ of remaining mass and is restored alongside the same ID/variant on requery.
 Generation query membership still uses the original surface anchors; size does
 not change seed arithmetic or distribution spacing (25–80 m).
 
-Native emission reserves the full growing fragment envelope at an exposed authored facet;
-there are no spawn lanes or ordinal position offsets. Runtime supplies a circumscribed cube sphere for
-broad-phase/ship containment only. Authored convex envelopes, rotated by the physical pose, define pair and terrain/deck contacts. World pickup intersects the oriented conservative cube; mining and prompts
-consume the enlarged deposit sphere. Carried centers stay horizontally ahead of the player capsule by the cube
-sphere radius plus the hand offset at every pitch, and clamp to ground support. Unsafe hull/furniture floor drops retain
-the carried identity. Loose fragments remain supported in ship-local metres.
+The legacy emission adapter reserves its full sphere envelope at an exposed
+authored facet. Runtime loose contacts, world pickup rays and carried clearance
+use the same analytic radius. Mining and deposit prompts retain enlarged deposit
+bounds. Carried centers remain ahead of the player capsule and clamp to sampled
+terrain support. Unsafe hull/furniture floor drops retain the carried identity;
+loose ship contents keep ship-local metre poses.
 
 ## Legacy facet emission (#150)
 
@@ -293,3 +291,21 @@ carry/Core geometry migration remain #232–#234. Current interim visuals and
 loose contacts still use the checked-in shard/chunk assets and size policy.
 The old extraction helpers remain for deterministic fixtures/benchmarks; the
 interactive tool does not call them. No disk save format exists to migrate.
+
+## Sphere interaction migration (#234)
+
+All live fragment radii, loose support, pickup rays, carrying/terrain clearance,
+world prompt anchors and visual bounds share `resource_size::fragment_contact_radius_meters`.
+It derives radius from mass/effective density with the existing 5 mm–2 m bounds;
+`fragment_side_meters` / inspection `side_meters` now mean **sphere diameter**.
+Deposit enlargement remains 10× and does not change yield. Sphere visuals use
+radius / authored 0.48 m. Pickup tests the analytic sphere (not its faceted
+mesh); equal distances still break by stable identity, with the same 3 m range
+and obstruction rules. One-object carry and Core conversion policy are unchanged.
+
+Phase 0 retains only in-memory sessions. Streaming restoration keeps IDs, source,
+material, mass and pose; there is no supported disk save format to migrate.
+Every existing session fragment maps to the shared sphere regardless of its ID
+or previous chunk/shard parity. Old GLBs remain available solely for historical
+asset/cost comparisons, never live collision selection. Unknown material keys
+still fail validation rather than silently changing resource identity.

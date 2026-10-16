@@ -304,34 +304,6 @@ pub(crate) fn fragment_mesh(fragment: ResourceFragment) -> ResourceMeshInstance 
     }
 }
 
-/// Transitional contact proxy only; spherical physics is tracked in #233.
-pub(crate) fn legacy_fragment_contact_mesh(fragment: ResourceFragment) -> ResourceMesh {
-    let even = fragment.id().0.is_multiple_of(2);
-    match fragment.material().resource() {
-        ResourceId::WaterIce => {
-            if even {
-                ResourceMesh::IceShard
-            } else {
-                ResourceMesh::IceCluster
-            }
-        }
-        ResourceId::SilicateRock => {
-            if even {
-                ResourceMesh::SilicateSlab
-            } else {
-                ResourceMesh::SilicateRidge
-            }
-        }
-        ResourceId::IronOre => {
-            if even {
-                ResourceMesh::IronChunk
-            } else {
-                ResourceMesh::IronShard
-            }
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

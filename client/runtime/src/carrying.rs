@@ -135,32 +135,23 @@ pub(crate) fn follow(tool: &mut MiningTool, player: CharacterSnapshot) {
             true,
         )
     {
-        let mesh = crate::resource_presentation::legacy_fragment_contact_mesh(*piece);
+        // Use the same sampled tangent support as loose sphere physics.
         for _ in 0..3 {
             let local = salimon_math::sub(p, body.center.meters());
-            let mut lift = 0.0_f64;
-            for vertex in mesh.unit_vertices() {
-                let point = salimon_math::add(
-                    local,
-                    salimon_physics::rotate(
-                        orientation,
-                        salimon_math::scale(
-                            *vertex,
-                            salimon_world::resource_fragments::side_meters(*piece),
-                        ),
-                    ),
-                );
-                let radius = length(point);
-                let radial = salimon_math::scale(point, 1.0 / radius);
-                let gap = radius - body.radius_meters - tool.terrain.height(*body, radial);
-                lift = lift.max((0.005 - gap) / dot(up, radial).max(0.1));
-            }
-            if lift < 0.00001 {
+            let radial = salimon_math::scale(local, 1.0 / length(local));
+            let ground = tool.terrain.sample(*body, radial);
+            let gap = dot(
+                salimon_math::sub(local, ground.body_local_position_meters),
+                ground.outward_normal,
+            );
+            let lift = (clearance + 0.005 - gap) / dot(up, ground.outward_normal).max(0.1);
+            if lift <= 0.00001 {
                 break;
             }
             p = salimon_math::add(p, salimon_math::scale(up, lift));
         }
     }
+
     if let Ok(pose) = ResourceTransform::new(position(p), orientation) {
         tool.session.move_carried(pose);
     }
@@ -308,7 +299,7 @@ mod tests {
             ResourceId::SilicateRock,
             ResourceId::WaterIce,
         ] {
-            for mass in [0.032, 1.0, 2.0] {
+            for mass in [0.032, 1.0, 2.0, 10.0] {
                 let mut tool = MiningTool::default();
                 let mut deposit = ResourceDeposit::new(
                     DepositId {
@@ -341,10 +332,7 @@ mod tests {
                         p[0].hypot(p[2]) > radius + 0.3,
                         "whole object clears torso and legs"
                     );
-                    let support =
-                        crate::resource_presentation::legacy_fragment_contact_mesh(carried)
-                            .support_meters([0.0, 1.0, 0.0])
-                            * salimon_world::resource_fragments::side_meters(carried);
+                    let support = crate::fragment_physics::sphere_radius(carried);
                     assert!(p[1] - support >= 0.0049);
                     assert_eq!(carried.id(), piece.id());
                     assert_eq!(carried.material(), piece.material());

@@ -89,11 +89,7 @@ fn profile(count: usize, workload: &str, samples: usize, stacked: bool) -> Resul
         // imported penetration. Multilayer pile stress uses the existing dense
         // benchmark and is deliberately not called a settled/60 FPS result here.
         for (i, piece) in app.mining.session.fragments().iter().enumerate() {
-            let support = crate::fragment_physics::fragment_hull(*piece).support(
-                [0.0, 0.0, 0.0, 1.0],
-                salimon_world::resource_fragments::side_meters(*piece),
-                [0.0, -1.0, 0.0],
-            );
+            let support = crate::fragment_physics::sphere_radius(*piece);
             let local = if stacked {
                 [
                     -5.5 + (i % 10) as f64 * 0.12,

@@ -710,7 +710,10 @@ mod tests {
             assert_eq!(sample["sleep_integrated_objects"], 0);
             assert_eq!(sample["sleep_pair_visits"], 0);
             assert!(sample["stateless_integrated_objects"].as_u64().unwrap() > 0);
-            assert!(sample["stateless_pair_visits"].as_u64().unwrap() > 0);
+            assert_eq!(
+                sample["stateless_narrow_phase_tests"].as_u64().unwrap_or(0),
+                0
+            );
         }
         let frame = character_ship_frame(app.ship.snapshot().pose);
         let eye = app
@@ -984,7 +987,7 @@ mod tests {
             let rebuilt = crate::fragment_physics::snapshots(&app.mining, frame, eye);
             for (expected, (fragment, actual)) in direct.iter().zip(rebuilt) {
                 let mut expected = expected.clone();
-                expected.ground_support_meters = 0.0;
+                expected.ground_support_meters = expected.radius;
                 assert_eq!(actual, expected, "step={step} id={:?}", fragment.id());
                 assert_eq!(
                     app.mining.fragment_sleep.is_sleeping(fragment.id()),

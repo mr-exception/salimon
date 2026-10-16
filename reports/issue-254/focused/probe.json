@@ -1,0 +1,35 @@
+{
+  "command": [
+    "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/SalimonAcceptance.app/Contents/MacOS/salimon-client",
+    "--benchmark",
+    "--count",
+    "0",
+    "--layout",
+    "onboard",
+    "--state",
+    "settled",
+    "--camera",
+    "facing",
+    "--warmup-seconds",
+    "2",
+    "--sample-seconds",
+    "8",
+    "--minimum-samples",
+    "100"
+  ],
+  "pid": 87335,
+  "returncode": 0,
+  "deliberately_lost_focus": false,
+  "focus": [
+    {
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "target PID is not running\n"
+    },
+    {
+      "returncode": 0,
+      "stdout": "frontmost=87335 target=87335\nposted PID=87335 operation=focus\n",
+      "stderr": ""
+    }
+  ]
+}

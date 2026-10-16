@@ -221,9 +221,28 @@ pub(crate) struct Recorder {
     stride: usize,
     completed: Vec<Value>,
     baseline: Option<Value>,
+    native_ready: bool,
+    lifecycle: Vec<Value>,
+    created: Instant,
 }
 
 impl Recorder {
+    // Observe the real window, never infer visibility from submission cadence.
+    // Successful present calls still do not prove physical display scanout.
+    pub(crate) fn observe_native(&mut self, event: &str, ready: bool) -> Result<(), String> {
+        self.lifecycle.push(json!({"event": event, "ready": ready,
+            "elapsed_seconds": self.created.elapsed().as_secs_f64()}));
+        self.native_ready = ready;
+        if !ready && !self.restart_before_sampling() {
+            return Err(format!("benchmark native readiness lost: {event}"));
+        }
+        Ok(())
+    }
+
+    pub(crate) fn native_readiness_changed(&self, ready: bool) -> bool {
+        self.native_ready != ready
+    }
+
     pub(crate) fn restart_before_sampling(&mut self) -> bool {
         if self
             .samples
@@ -282,6 +301,9 @@ impl Recorder {
             stride: 1,
             completed: Vec::new(),
             baseline: solver_baseline(config, app),
+            native_ready: false,
+            lifecycle: Vec::new(),
+            created: Instant::now(),
         }
     }
     pub(crate) fn set_renderer(
@@ -302,6 +324,9 @@ impl Recorder {
         simulation: Duration,
         render: Option<RenderStats>,
     ) -> bool {
+        if !self.config.headless && !self.native_ready {
+            return false;
+        }
         // The first redraw can have zero simulation delta and no completed
         // physics observation. Do not report default zero counters as a wake.
         if delta.is_zero() && self.started.is_none() {
@@ -348,6 +373,9 @@ impl Recorder {
         if self.samples.is_empty() {
             return Err("benchmark recorded no samples".into());
         }
+        if !self.config.headless && !self.native_ready {
+            return Err("benchmark has no verified native foreground/visibility".into());
+        }
         if app_accounting != self.initial {
             return Err("benchmark lost fragments or changed mass/identity".into());
         }
@@ -382,6 +410,10 @@ impl Recorder {
             "sample_wall_seconds": self.last_presented.zip(self.started).map(|(end, start)|
                 end.duration_since(start).as_secs_f64() - self.config.warmup_seconds as f64),
             "renderer": self.info, "accounting": self.initial, "accounting_preserved": true,
+            "presentation": (!self.config.headless).then(|| json!({"schema": 1,
+                "foreground_visible": self.native_ready, "pid": std::process::id(),
+                "interval_kind": "submitted_present_calls", "physical_scanout_verified": false,
+                "lifecycle": self.lifecycle})),
             "solver_baseline": self.baseline,
             "updates_observed": self.observed, "sampling_stride": self.stride,
             "elapsed_seconds": self.started.map(|s| s.elapsed().as_secs_f64()),
@@ -505,9 +537,37 @@ pub(crate) fn run_headless(config: Config) -> Result<(), String> {
 mod tests {
     use super::*;
     #[test]
+    fn native_readiness_gates_start_and_loss_invalidates_collection() {
+        let config = parse(&["--benchmark".into(), "--warmup-seconds".into(), "0".into()]).unwrap();
+        let mut recorder = Recorder::new(config, &ClientApplication::default());
+        let delta = Duration::from_millis(16);
+        assert!(!recorder.record(delta, Duration::ZERO, Duration::ZERO, None));
+        assert!(recorder.started.is_none());
+        recorder.observe_native("focused_visible", true).unwrap();
+        recorder.record(delta, Duration::ZERO, Duration::ZERO, None);
+        recorder
+            .observe_native("unfocused_before_interval", false)
+            .unwrap();
+        assert!(recorder.started.is_none());
+        recorder.observe_native("focused_visible", true).unwrap();
+        recorder.record(delta, Duration::ZERO, Duration::ZERO, None);
+        recorder.samples[0].frame_ms = Some(17.0);
+        assert!(recorder.observe_native("unfocused", false).is_err());
+        assert_eq!(recorder.samples.len(), 1);
+        assert!(
+            recorder
+                .finish(accounting(&ClientApplication::default()))
+                .is_err()
+        );
+    }
+
+    #[test]
     fn surface_metadata_cannot_change_during_startup_or_warmup() {
         let config = parse(&["--benchmark".into()]).unwrap();
         let mut recorder = Recorder::new(config, &ClientApplication::default());
+        recorder
+            .observe_native("test_foreground_visible", true)
+            .unwrap();
         assert!(!recorder.surface_changed(1920, 1080, 2.0));
         recorder.info = json!({"width":1920,"height":1080,"scale_factor":2.0});
         for started in [None, Some(Instant::now())] {
@@ -522,6 +582,9 @@ mod tests {
     fn startup_occlusion_restarts_warmup_but_retained_intervals_fail() {
         let config = parse(&["--benchmark".into()]).unwrap();
         let mut recorder = Recorder::new(config, &ClientApplication::default());
+        recorder
+            .observe_native("test_foreground_visible", true)
+            .unwrap();
         recorder.started = Some(Instant::now());
         recorder.last_presented = recorder.started;
         recorder.observed = 1;
@@ -559,6 +622,9 @@ mod tests {
         ])
         .unwrap();
         let mut recorder = Recorder::new(config, &ClientApplication::default());
+        recorder
+            .observe_native("test_foreground_visible", true)
+            .unwrap();
         recorder.started = Some(Instant::now() - Duration::from_secs(2));
         let render = Some(RenderStats {
             resource_batch: Default::default(),
@@ -603,6 +669,9 @@ mod tests {
         .unwrap();
         let app = ClientApplication::default();
         let mut recorder = Recorder::new(config, &app);
+        recorder
+            .observe_native("test_foreground_visible", true)
+            .unwrap();
         assert!(recorder.finish(accounting(&app)).is_err());
         for index in 0..3 {
             recorder.record(
@@ -634,6 +703,9 @@ mod tests {
         ])
         .unwrap();
         let mut recorder = Recorder::new(config, &ClientApplication::default());
+        recorder
+            .observe_native("test_foreground_visible", true)
+            .unwrap();
         assert!(!recorder.record(Duration::ZERO, Duration::ZERO, Duration::ZERO, None));
         assert!(recorder.samples.is_empty());
         assert!(recorder.started.is_none());
@@ -655,6 +727,9 @@ mod tests {
         .unwrap();
         let app = ClientApplication::default();
         let mut recorder = Recorder::new(config, &app);
+        recorder
+            .observe_native("test_foreground_visible", true)
+            .unwrap();
         for index in 0..4 {
             assert!(
                 recorder

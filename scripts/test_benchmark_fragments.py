@@ -11,6 +11,23 @@ from benchmark_fragments import compare, distribution, summarize, main, prepared
 
 
 class BenchmarkTests(unittest.TestCase):
+    def presentation(self):
+        return {"schema": 1, "foreground_visible": True, "pid": 123,
+                "interval_kind": "submitted_present_calls", "physical_scanout_verified": False,
+                "lifecycle": [{"event": "focused", "ready": True, "elapsed_seconds": 0.1}]}
+
+    def test_native_missing_incomplete_and_rejected_readiness_fail(self):
+        for evidence in (None, {}, dict(self.presentation(), foreground_visible=False),
+                         dict(self.presentation(), lifecycle=[]),
+                         dict(self.presentation(), lifecycle=[{"event": "unfocused", "ready": False, "elapsed_seconds": 1}])):
+            result = self.result()
+            result["mode"] = "native_wall_clock"
+            result["presentation"] = evidence
+            with self.assertRaisesRegex(ValueError, "native"):
+                summarize(result)
+        result["presentation"] = self.presentation()
+        self.assertEqual(summarize(result)["presentation"], result["presentation"])
+
     def result(self):
         return {"schema": 1, "mode": "physics_wall_clock", "config": {"count": 1},
             "accounting_preserved": True, "accounting": {"fragments": [{"id": 1, "mass_kg": 2}], "extracted_mass_kg": 2},
@@ -39,6 +56,7 @@ class BenchmarkTests(unittest.TestCase):
     def test_minimum_native_samples_counts_intervals_and_reports_mixed_motion(self):
         result = self.result()
         result['mode'] = 'native_wall_clock'
+        result['presentation'] = self.presentation()
         result['config']['minimum_samples'] = 3
         result['sample_wall_seconds'] = 45.5
         result['samples'] = [dict(result['samples'][0], frame_ms=frame, moving_objects=moving)
@@ -168,9 +186,22 @@ class BenchmarkTests(unittest.TestCase):
         current["environment"]["machine_label"] = "software-vulkan"
         with self.assertRaises(ValueError):
             compare(current, baseline, .2)
+
         current = copy.deepcopy(baseline)
         current["cases"][0]["config"]["count"] = 10
         with self.assertRaises(ValueError):
+            compare(current, baseline, .2)
+
+    def test_relative_native_gate_rejects_historical_unverified_baseline(self):
+        result = self.result()
+        result['mode'] = 'native_wall_clock'
+        result['presentation'] = self.presentation()
+        case = summarize(result)
+        case['samples_retained'] = 100
+        current = {'environment': {'machine_label': 'M1'}, 'cases': [case]}
+        baseline = copy.deepcopy(current)
+        baseline['cases'][0].pop('presentation')
+        with self.assertRaisesRegex(ValueError, 'native foreground'):
             compare(current, baseline, .2)
 
 

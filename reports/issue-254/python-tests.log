@@ -1,0 +1,37 @@
+........Running native-1-dense-settled-facing
+Running native-1-dense-active-facing
+Running native-1-dense-settled-facing
+Running native-1-dense-active-facing
+...Running native-1-dense-settled-facing
+Running native-1-dense-active-facing-repeat-1
+Running native-1-dense-active-facing-repeat-2
+Running native-1-dense-active-facing-repeat-3
+Running native-1-dense-settled-facing
+Running native-1-dense-active-facing-repeat-1
+Running native-1-dense-active-facing-repeat-2
+Running native-1-dense-active-facing-repeat-3
+.Running physics-1-dense-active-facing
+Running physics-1-dense-active-facing
+..Prepared a
+Prepared b
+Measuring a (other fixtures idle)
+Measuring b (other fixtures idle)
+....Building: cargo build --locked -p salimon-client --target x86_64-unknown-linux-gnu --message-format json-render-diagnostics
+Building: cargo build --locked -p salimon-client --target x86_64-unknown-linux-gnu --message-format json-render-diagnostics --release
+.Building: cargo build --locked -p salimon-client --target x86_64-unknown-linux-gnu --message-format json-render-diagnostics
+Building: cargo build --locked -p salimon-client --target x86_64-unknown-linux-gnu --message-format json-render-diagnostics
+.............Switched to a new branch 'ci-reports'
+./opt/homebrew/Cellar/python@3.14/3.14.2_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 404: 'fixture'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+/opt/homebrew/Cellar/python@3.14/3.14.2_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 403: 'fixture'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+/opt/homebrew/Cellar/python@3.14/3.14.2_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/tempfile.py:484: ResourceWarning: Implicitly cleaning up <HTTPError 500: 'fixture'>
+  _warnings.warn(self.warn_message, ResourceWarning)
+...............................................
+----------------------------------------------------------------------
+Ran 80 tests in 4.370s
+
+OK
+No source change since the latest successful suites; skipping
+Run suites
+{"status": "failed", "report": "/var/folders/f6/q5wpvx_12r7971p1xyxwm3b80000gn/T/tmp63ntfetm/failed.json", "error": "Command 'profile' timed out after 300 seconds"}

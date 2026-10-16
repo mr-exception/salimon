@@ -25,6 +25,22 @@ failure/timeout is retained and makes the runner exit nonzero. No partial case i
 reported as a successful measurement. Reports store binary SHA-256, source base
 revision/dirty flag, CPU/OS label, adapter/backend/type, resolution and settings.
 
+Native collection now waits for actual window focus, known visibility, a non-minimized
+window and no reported occlusion. Warmup starts only after admission; losing readiness
+before retained intervals restarts warmup, and losing it during collection fails.
+Suspension, surface loss and surface configuration changes also invalidate collection.
+Raw `presentation` evidence records the target PID and monotonic lifecycle events.
+The summary/comparison runner rejects missing or incomplete evidence, including old
+unverified baselines; recollect those on the same device. CPU-only runs are exempt.
+These intervals measure successful submitted present calls, not physical scanout or
+a certified visible-display FPS floor. No refresh-rate threshold admits readiness.
+
+On macOS, use the identical executable inside a local app bundle and explicitly
+bring its PID's window forward before warmup. OS focus/input helpers remain local
+opt-in actions (see [desktop prerequisites](PACKAGED_SMOKE.md)); the benchmark runner
+does not change desktop focus. An unfocused executable times out rather than producing
+accepted results. Keep the window unobscured throughout all repeat windows.
+
 For baseline collection, pass `--minimum-samples 100`: each window must meet both
 its requested duration and retained sample count. Native mode counts completed
 frame intervals; CPU mode counts updates. Expensive updates can extend actual

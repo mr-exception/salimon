@@ -424,6 +424,21 @@ metadata, raw samples and failure handling remain unchanged.
 
 ## Spherical mining matrix (#235)
 
+### Native 10 kg workloads (#236)
+
+`--layouts sphere-deck sphere-pile --counts 10 100 500` selects real 10 kg
+iron spheres emitted through capped production spherical extraction. The deck
+uses the #235 supported 21 cm grid; the pile uses its first 100 columns and up
+to five layers. Both are capped at 500. They are distinct from 0.032 kg `onboard`
+and mixed-mass legacy layouts. Active starts add 30 cm of height and 0.4 m/s
+upward velocity, then run ordinary motion/contact; no continuous forcing is used.
+Requested settled cases require explicit `--settle-steps` and verified natural
+sleep to establish resting acceptance. IDs and 5,000 kg total at 500 are preserved.
+The same names are accepted by opt-in E2E `fragment_layout` setup for GPU captures.
+Native foreground admission and all raw-sample/budget limitations above apply.
+
+### Portable CPU matrix
+
 `python scripts/benchmark_spheres.py --run --output artifacts/sphere-benchmarks`
 executes the opt-in **release** CPU tests and validates a complete 10/100/500
 matrix (100 samples per case). Run without `--run` to validate/summarize retained

@@ -142,7 +142,8 @@
   retain ID/mass/source; continued hold creates a new identity next tick.
   Legacy facet-emission helpers remain only for old fixtures/benchmarks.
   Sphere visuals use the shared #232 mesh and one nonphysical growth preview.
-  Spherical contact/drop geometry remain #233–#234 follow-ups.
+  Released sphere radius drives contact, pickup, carry and drop geometry under
+  the world-owned resource-size contract (#233–#234).
 
 - Benchmark populations are opt-in initial conditions from production extraction;
   subsequent updates, carrying and support queries retain production behavior.

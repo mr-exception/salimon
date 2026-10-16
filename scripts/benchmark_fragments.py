@@ -194,7 +194,7 @@ def main(argv=None):
     parser.add_argument("--binary", type=Path, required=True)
     parser.add_argument("--output", type=Path, default=Path("artifacts/fragment-benchmarks"))
     parser.add_argument("--counts", type=int, nargs="+", default=COUNTS)
-    parser.add_argument("--layouts", nargs="+", choices=("scattered", "dense", "surface", "onboard"), default=("scattered", "dense", "surface"))
+    parser.add_argument("--layouts", nargs="+", choices=("scattered", "dense", "surface", "onboard", "sphere-deck", "sphere-pile"), default=("scattered", "dense", "surface"))
     parser.add_argument("--states", nargs="+", choices=("settled", "active"), default=("settled", "active"))
     parser.add_argument("--cameras", nargs="+", choices=("facing", "away"), default=("facing", "away"))
     parser.add_argument("--mode", choices=("native", "physics"), default="native")

@@ -25,6 +25,22 @@ failure/timeout is retained and makes the runner exit nonzero. No partial case i
 reported as a successful measurement. Reports store binary SHA-256, source base
 revision/dirty flag, CPU/OS label, adapter/backend/type, resolution and settings.
 
+Native collection now waits for actual window focus, known visibility, a non-minimized
+window and no reported occlusion. Warmup starts only after admission; losing readiness
+before retained intervals restarts warmup, and losing it during collection fails.
+Suspension, surface loss and surface configuration changes also invalidate collection.
+Raw `presentation` evidence records the target PID and monotonic lifecycle events.
+The summary/comparison runner rejects missing or incomplete evidence, including old
+unverified baselines; recollect those on the same device. CPU-only runs are exempt.
+These intervals measure successful submitted present calls, not physical scanout or
+a certified visible-display FPS floor. No refresh-rate threshold admits readiness.
+
+On macOS, use the identical executable inside a local app bundle and explicitly
+bring its PID's window forward before warmup. OS focus/input helpers remain local
+opt-in actions (see [desktop prerequisites](PACKAGED_SMOKE.md)); the benchmark runner
+does not change desktop focus. An unfocused executable times out rather than producing
+accepted results. Keep the window unobscured throughout all repeat windows.
+
 For baseline collection, pass `--minimum-samples 100`: each window must meet both
 its requested duration and retained sample count. Native mode counts completed
 frame intervals; CPU mode counts updates. Expensive updates can extend actual
@@ -407,6 +423,21 @@ is capped at 500 by the shared fixture. All native clocks, sleep checks, rendere
 metadata, raw samples and failure handling remain unchanged.
 
 ## Spherical mining matrix (#235)
+
+### Native 10 kg workloads (#236)
+
+`--layouts sphere-deck sphere-pile --counts 10 100 500` selects real 10 kg
+iron spheres emitted through capped production spherical extraction. The deck
+uses the #235 supported 21 cm grid; the pile uses its first 100 columns and up
+to five layers. Both are capped at 500. They are distinct from 0.032 kg `onboard`
+and mixed-mass legacy layouts. Active starts add 30 cm of height and 0.4 m/s
+upward velocity, then run ordinary motion/contact; no continuous forcing is used.
+Requested settled cases require explicit `--settle-steps` and verified natural
+sleep to establish resting acceptance. IDs and 5,000 kg total at 500 are preserved.
+The same names are accepted by opt-in E2E `fragment_layout` setup for GPU captures.
+Native foreground admission and all raw-sample/budget limitations above apply.
+
+### Portable CPU matrix
 
 `python scripts/benchmark_spheres.py --run --output artifacts/sphere-benchmarks`
 executes the opt-in **release** CPU tests and validates a complete 10/100/500

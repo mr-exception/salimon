@@ -1060,6 +1060,17 @@ impl ClientApplication {
         }
         match outcome {
             RenderOutcome::Presented(render_stats) => {
+                let ready = window.has_focus()
+                    && window.is_visible() == Some(true)
+                    && window.is_minimized() != Some(true)
+                    && !self.occluded;
+                if let Some(benchmark) = self.benchmark.as_mut()
+                    && benchmark.native_readiness_changed(ready)
+                    && let Err(error) = benchmark.observe_native("presented_window_poll", ready)
+                {
+                    self.fail(event_loop, error);
+                    return;
+                }
                 self.retry_at = None;
                 event_loop.set_control_flow(ControlFlow::Wait);
                 let timing = self
@@ -1142,6 +1153,12 @@ impl ClientApplication {
                 }
             }
             RenderOutcome::SurfaceLost => {
+                if let Some(benchmark) = self.benchmark.as_mut()
+                    && let Err(error) = benchmark.observe_native("surface_lost", false)
+                {
+                    self.fail(event_loop, error);
+                    return;
+                }
                 log::warn!("rendering surface was lost; rebuilding renderer");
                 self.renderer = None;
                 if let Err(error) = self.initialize_renderer() {
@@ -1195,6 +1212,12 @@ impl ApplicationHandler for ClientApplication {
     }
 
     fn suspended(&mut self, event_loop: &ActiveEventLoop) {
+        if let Some(benchmark) = self.benchmark.as_mut()
+            && let Err(error) = benchmark.observe_native("suspended", false)
+        {
+            self.fail(event_loop, error);
+            return;
+        }
         event_loop.set_control_flow(ControlFlow::Wait);
         self.renderer = None;
         self.retry_at = None;
@@ -1269,12 +1292,10 @@ impl ApplicationHandler for ClientApplication {
             }
             WindowEvent::Occluded(is_occluded) => {
                 if is_occluded
-                    && self
-                        .benchmark
-                        .as_mut()
-                        .is_some_and(|b| !b.restart_before_sampling())
+                    && let Some(benchmark) = self.benchmark.as_mut()
+                    && let Err(error) = benchmark.observe_native("occluded", false)
                 {
-                    self.fail(event_loop, "benchmark window occluded during collection");
+                    self.fail(event_loop, error);
                     return;
                 }
                 log::debug!("native window occluded: {is_occluded}");
@@ -1291,6 +1312,15 @@ impl ApplicationHandler for ClientApplication {
                 }
             }
             WindowEvent::Focused(focused) => {
+                if let Some(benchmark) = self.benchmark.as_mut()
+                    && let Err(error) = benchmark.observe_native(
+                        if focused { "focused" } else { "unfocused" },
+                        focused && window.is_visible() == Some(true) && !self.occluded,
+                    )
+                {
+                    self.fail(event_loop, error);
+                    return;
+                }
                 if focused {
                     self.cursor_captured = capture_cursor(&window);
                 } else {

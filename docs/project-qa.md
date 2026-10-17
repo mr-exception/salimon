@@ -19,3 +19,16 @@ integrated storage within the aerodynamic hull, use a detachable module, or defe
 dedicated storage to a later ship design. This decision affects future container
 placement, cargo capacity and ship expansion; it does not block the current
 geometry revision or loose-fragment storage on the deck.
+
+### What does #236 require by “save/reload”?
+
+[Native verification #236](https://github.com/mr-exception/salimon/issues/236)
+mentions save/reload, while the accepted #234 integration and current
+[resource compatibility contract](../client/world/resource-contracts.md) support
+only in-memory streaming restoration, with no disk format or backend. Native
+streaming unload/reload can be tested now; cross-process restoration cannot pass
+without a separately designed persistence feature. Confirm whether to narrow
+#236 to session streaming or schedule disk persistence and its native acceptance
+in a future wave. Track the decision in
+[issue #268](https://github.com/mr-exception/salimon/issues/268); this does not
+change current resource lifetime or authorize a speculative save implementation.

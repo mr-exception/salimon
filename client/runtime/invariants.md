@@ -142,7 +142,8 @@
   retain ID/mass/source; continued hold creates a new identity next tick.
   Legacy facet-emission helpers remain only for old fixtures/benchmarks.
   Sphere visuals use the shared #232 mesh and one nonphysical growth preview.
-  Spherical contact/drop geometry remain #233–#234 follow-ups.
+  Released sphere radius drives contact, pickup, carry and drop geometry under
+  the world-owned resource-size contract (#233–#234).
 
 - Benchmark populations are opt-in initial conditions from production extraction;
   subsequent updates, carrying and support queries retain production behavior.
@@ -151,6 +152,11 @@
   distinct. Raw benchmark frame intervals preserve spikes; missing GPU/sleep data
   is null/explicit rather than synthesized. Requested settled state must be checked
   against observed moving-object counts.
+- Native benchmark warmup/collection requires focused, known-visible, non-minimized,
+  unoccluded window observations. Loss before retained intervals resets warmup;
+  loss during collection fails, including suspension/surface loss. Results retain
+  PID/lifecycle admission evidence. Successful present-call intervals do not certify
+  physical display scanout; CPU-only measurements require no native readiness.
 
 - Fragment activation follows stable IDs at the portable physics boundary.
   Sleeping objects stay in session presentation/picking/collision; omission wakes

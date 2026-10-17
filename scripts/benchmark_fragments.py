@@ -34,6 +34,7 @@ def distribution(values):
 def summarize(result):
     if result.get("schema") != 1 or not result.get("samples") or result.get("accounting_preserved") is not True:
         raise ValueError("invalid/incomplete benchmark or accounting failure")
+    presentation = validate_presentation(result)
     fragments = result["accounting"]["fragments"]
     if len(fragments) != result["config"]["count"] or len({p["id"] for p in fragments}) != len(fragments):
         raise ValueError("fragment count/identity mismatch")
@@ -48,6 +49,7 @@ def summarize(result):
     metrics["frames_over_16_67ms"] = sum(s.get("frame_ms") is not None and s["frame_ms"] > 1000 / 60 for s in result["samples"])
     metrics["frames_over_50ms"] = sum(s.get("frame_ms") is not None and s["frame_ms"] > 50 for s in result["samples"])
     return {"config": result["config"], "mode": result["mode"], "renderer": result["renderer"],
+            "presentation": presentation,
             "samples_retained": len(result["samples"]), "tail_statistics_reliable": len(result["samples"]) >= 100, "updates_observed": result.get("updates_observed"),
             "frame_samples_retained": frame_samples,
             "sample_wall_seconds": result.get("sample_wall_seconds"),
@@ -58,6 +60,33 @@ def summarize(result):
             "sleeping_observed": all(s.get("sleeping_objects") == result["config"]["count"] for s in result["samples"]),
             "active_observed": any(s["moving_objects"] > 0 for s in result["samples"]),
             "median_interval_fps": 1000 / frame["median"] if frame and frame["median"] > 0 else None}
+
+
+def validate_presentation(result):
+    if result["mode"] != "native_wall_clock":
+        return None
+    evidence = result.get("presentation")
+    if not isinstance(evidence, dict) or evidence.get("schema") != 1 or evidence.get("foreground_visible") is not True:
+        raise ValueError("native foreground/visibility evidence missing or rejected")
+    events = evidence.get("lifecycle")
+    if (evidence.get("interval_kind") != "submitted_present_calls"
+            or evidence.get("physical_scanout_verified") is not False
+            or type(evidence.get("pid")) is not int or evidence["pid"] <= 0
+            or not isinstance(events, list) or not events):
+        raise ValueError("incomplete native presentation evidence")
+    previous = -1
+    for event in events:
+        if not isinstance(event, dict):
+            raise ValueError("invalid native lifecycle evidence")
+        stamp = event.get("elapsed_seconds")
+        if (not isinstance(stamp, (int, float)) or not math.isfinite(stamp)
+                or stamp < previous or type(event.get("ready")) is not bool
+                or not isinstance(event.get("event"), str)):
+            raise ValueError("invalid native lifecycle evidence")
+        previous = stamp
+    if events[-1]["ready"] is not True:
+        raise ValueError("native presentation not ready at completion")
+    return evidence
 
 
 def command_output(args, cwd):
@@ -75,6 +104,8 @@ def compare(current, baseline, tolerance):
         key = (case["mode"], json.dumps(case["config"], sort_keys=True))
         if key not in old or old[key]["renderer"] != case["renderer"]:
             raise ValueError("baseline case or renderer configuration missing/different")
+        for candidate in (case, old[key]):
+            validate_presentation(candidate)
         if min(case["samples_retained"], old[key]["samples_retained"]) < 100:
             raise ValueError("relative performance gates require at least 100 retained samples per case")
         for metric in ("frame_ms", "physics_total_ms", "cpu_render_ms"):
@@ -163,7 +194,7 @@ def main(argv=None):
     parser.add_argument("--binary", type=Path, required=True)
     parser.add_argument("--output", type=Path, default=Path("artifacts/fragment-benchmarks"))
     parser.add_argument("--counts", type=int, nargs="+", default=COUNTS)
-    parser.add_argument("--layouts", nargs="+", choices=("scattered", "dense", "surface", "onboard"), default=("scattered", "dense", "surface"))
+    parser.add_argument("--layouts", nargs="+", choices=("scattered", "dense", "surface", "onboard", "sphere-deck", "sphere-pile"), default=("scattered", "dense", "surface"))
     parser.add_argument("--states", nargs="+", choices=("settled", "active"), default=("settled", "active"))
     parser.add_argument("--cameras", nargs="+", choices=("facing", "away"), default=("facing", "away"))
     parser.add_argument("--mode", choices=("native", "physics"), default="native")

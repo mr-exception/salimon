@@ -74,6 +74,13 @@ to run on the native event thread with explicit fixed steps and production gates
 
 ## Diagnostics flow
 
+Opt-in native benchmarks observe real winit focus/visibility/minimization and
+occlusion before admitting warmup. Lifecycle loss resets pre-sampling clocks or
+fails an already sampled window. Their PID and monotonic transition evidence is
+required by the Python summary/comparison gate; see the canonical
+[benchmark protocol](../../scripts/FRAGMENT_BENCHMARKS.md#native-wall-clock-matrix).
+Successful present-call intervals remain distinct from physical scanout.
+
 F2 toggles gameplay/precision-tour view and F3 toggles diagnostics. P toggles the camera fixture, R
 restarts it, and N selects and pauses the exact near-surface inspection view;
 releases and key-repeat events are ignored. The runtime maps native keys to typed

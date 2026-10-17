@@ -15,6 +15,8 @@ pub(crate) enum Layout {
     Dense,
     Surface,
     Onboard,
+    SphereDeck,
+    SpherePile,
 }
 impl Layout {
     pub(crate) fn parse(value: &str) -> Result<Self, String> {
@@ -23,7 +25,12 @@ impl Layout {
             "dense" => Ok(Self::Dense),
             "surface" => Ok(Self::Surface),
             "onboard" => Ok(Self::Onboard),
-            _ => Err("layout must be scattered, dense, surface or onboard".into()),
+            "sphere-deck" => Ok(Self::SphereDeck),
+            "sphere-pile" => Ok(Self::SpherePile),
+            _ => Err(
+                "layout must be scattered, dense, surface, onboard, sphere-deck or sphere-pile"
+                    .into(),
+            ),
         }
     }
     pub(crate) fn name(self) -> &'static str {
@@ -32,6 +39,8 @@ impl Layout {
             Self::Dense => "dense",
             Self::Surface => "surface",
             Self::Onboard => "onboard",
+            Self::SphereDeck => "sphere-deck",
+            Self::SpherePile => "sphere-pile",
         }
     }
 }
@@ -47,6 +56,9 @@ pub(crate) fn initialize(
 ) -> Result<(), String> {
     if count > 1000 {
         return Err("benchmark fixture count must be 0..1000".into());
+    }
+    if matches!(layout, Layout::SphereDeck | Layout::SpherePile) {
+        return initialize_spheres(app, count, layout == Layout::SpherePile, active);
     }
     if layout == Layout::Onboard {
         crate::flight_regression::initialize_cargo(app, count)?;
@@ -128,7 +140,9 @@ pub(crate) fn initialize(
         let orientation = [0.0, (angle / 2.0).sin(), 0.0, (angle / 2.0).cos()];
         let support = sphere_radius(piece);
         let mut local = match layout {
-            Layout::Onboard => unreachable!("onboard fixture initialized above"),
+            Layout::Onboard | Layout::SphereDeck | Layout::SpherePile => {
+                unreachable!("specialized fixture initialized above")
+            }
             Layout::Dense => {
                 let base = dense[index % dense.len()];
                 [
@@ -217,6 +231,90 @@ pub(crate) fn initialize(
     if app.mining.session.fragments().len() != count {
         return Err("fixture count mismatch".into());
     }
+    Ok(())
+}
+
+/// Native counterpart of the #235 10 kg production-extraction workload.
+/// Keep its mass, deck cells and 100-column pile distinct from legacy fixtures.
+fn initialize_spheres(
+    app: &mut ClientApplication,
+    count: usize,
+    pile: bool,
+    active: bool,
+) -> Result<(), String> {
+    use salimon_world::spherical_mining::{MiningConfig, SPHERE_TICK};
+    if count > 500 {
+        return Err("10 kg sphere workload count must be <=500".into());
+    }
+    let frame = character_ship_frame(app.ship.snapshot().pose);
+    let material = RawMaterial::new(ResourceId::IronOre, 10.0)
+        .map_err(|e| format!("sphere workload material: {e:?}"))?;
+    let radius = salimon_world::resource_size::fragment_contact_radius_meters(material);
+    let mut cells: Vec<_> = (0..600)
+        .map(|i| {
+            [
+                -6.3 + (i % 25) as f64 * 0.21,
+                SHIP_FLOOR_HEIGHT_METERS + radius,
+                -2.5 + (i / 25) as f64 * 0.21,
+            ]
+        })
+        .filter(|p| salimon_character::ship_floor_placement(*p, radius).is_some())
+        .collect();
+    if pile {
+        cells.truncate(100);
+    }
+    if cells.is_empty() {
+        return Err("no supported sphere workload cells".into());
+    }
+    for i in 0..count {
+        let mut local = cells[i % cells.len()];
+        local[1] += (i / cells.len()) as f64 * (2.0 * radius + 0.00001);
+        if active {
+            local[1] += 0.3;
+        }
+        let world = frame.local_to_world(local);
+        let orientation =
+            crate::fragment_physics::to_world_orientation(frame, [0.0, 0.0, 0.0, 1.0]);
+        let pose = ResourceTransform::new(
+            WorldPosition::new(world[0], world[1], world[2]),
+            orientation,
+        )
+        .map_err(|e| format!("sphere workload pose: {e:?}"))?;
+        let mut deposit = ResourceDeposit::new(
+            DepositId {
+                body: CelestialBodyId::Earth,
+                local: 236_000 + i as u64,
+            },
+            material,
+            pose.position(),
+            10.0,
+        )
+        .map_err(|e| format!("sphere workload deposit: {e:?}"))?;
+        let mut released = None;
+        for _ in 0..400 {
+            released = app.mining.session.tick_spherical(
+                true,
+                Some(&mut deposit),
+                SPHERE_TICK,
+                MiningConfig::default(),
+                pose,
+            );
+            if released.is_some() {
+                break;
+            }
+        }
+        let id = released.ok_or("sphere workload did not release at its 10 kg cap")?;
+        app.mining.ship_fragments.insert(id, local);
+        app.mining.fragment_motion.insert(
+            id,
+            FragmentMotion {
+                velocity: if active { [0.0, 0.4, 0.0] } else { [0.0; 3] },
+                angular_velocity: [0.0; 3],
+                ship_orientation: Some([0.0, 0.0, 0.0, 1.0]),
+            },
+        );
+    }
+    app.sync_carried();
     Ok(())
 }
 
@@ -321,6 +419,47 @@ fn checkpoint(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn ten_kg_native_spheres_conserve_identity_mass_and_naturally_sleep() {
+        for layout in [Layout::SphereDeck, Layout::SpherePile] {
+            assert_eq!(Layout::parse(layout.name()).unwrap(), layout);
+            let mut app = ClientApplication::default();
+            initialize(&mut app, 500, layout, 236, false).unwrap();
+            let initial = crate::benchmark::accounting(&app);
+            assert_eq!(app.mining.session.fragments().len(), 500);
+            // The session accumulator adds ~157,000 tick masses; allow only
+            // 50 micrograms of f64 summation error across five tonnes.
+            assert!((app.mining.session.extracted_mass_kg() - 5000.0).abs() < 5e-8);
+            assert!(
+                app.mining
+                    .session
+                    .fragments()
+                    .iter()
+                    .all(|p| p.material().mass_kg() == 10.0)
+            );
+            assert!((app.ship.snapshot().total_mass_kg - 105_000.0).abs() < 1e-6);
+            settle(&mut app, 500, 1200).unwrap();
+            assert_eq!(crate::benchmark::accounting(&app), initial);
+            assert!(
+                app.mining
+                    .session
+                    .fragments()
+                    .iter()
+                    .all(|p| app.mining.fragment_sleep.is_sleeping(p.id()))
+            );
+        }
+        let mut active = ClientApplication::default();
+        initialize(&mut active, 10, Layout::SphereDeck, 236, true).unwrap();
+        assert!(
+            active
+                .mining
+                .fragment_motion
+                .values()
+                .all(|m| m.velocity[1] > 0.0)
+        );
+        assert!(initialize(&mut active, 501, Layout::SphereDeck, 236, false).is_err());
+    }
+
     #[test]
     fn onboard_benchmark_preserves_contained_flight_load_and_active_motion() {
         for active in [false, true] {

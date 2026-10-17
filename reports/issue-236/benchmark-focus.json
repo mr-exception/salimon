@@ -1,0 +1,37 @@
+[
+  {
+    "pid": 90144,
+    "monotonic": 114816.266379958,
+    "returncode": 0,
+    "stdout": "frontmost=90144 target=90144\nposted PID=90144 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 90382,
+    "monotonic": 114846.700462125,
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "target window bounds unavailable\n"
+  },
+  {
+    "pid": 90382,
+    "monotonic": 114847.625830083,
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "target window bounds unavailable\n"
+  },
+  {
+    "pid": 90382,
+    "monotonic": 114848.544989291,
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "target window bounds unavailable\n"
+  },
+  {
+    "pid": 90382,
+    "monotonic": 114849.608802541,
+    "returncode": 0,
+    "stdout": "frontmost=90382 target=90382\nposted PID=90382 operation=focus\n",
+    "stderr": ""
+  }
+]

@@ -1,0 +1,83 @@
+{
+  "after": {
+    "assetId": "item.mining-tool",
+    "costs": {
+      "drawCalls": 1,
+      "drawPolicy": "one held-item batch",
+      "encodedTextureBytes": 68079,
+      "glbBytes": 225176,
+      "materials": 4,
+      "nodes": 19,
+      "primitiveReferences": 15,
+      "primitives": 15,
+      "textureMemoryBytes": 349524,
+      "triangles": 2064
+    },
+    "exceptions": [],
+    "measurements": {
+      "exactDuplicateMeshDefinitions": 0,
+      "flatTriangles": 2064,
+      "lodTriangles": [],
+      "meshInstances": 15,
+      "microAreaSquareMeters": 1e-06,
+      "microTriangles": 136,
+      "missingNormalTriangles": 0,
+      "referencedMeshes": 15,
+      "reusedMeshReferences": 0,
+      "smoothTriangles": 0,
+      "space": "mesh-local meters; instanced transforms/screen size not inferred",
+      "validTriangles": 2064
+    },
+    "profile": {
+      "name": "option-a-v1"
+    },
+    "unusedExceptions": [],
+    "warnings": []
+  },
+  "before": {
+    "assetId": "item.mining-tool",
+    "costs": {
+      "drawCalls": 1,
+      "drawPolicy": "one held-item batch",
+      "encodedTextureBytes": 68079,
+      "glbBytes": 225176,
+      "materials": 4,
+      "nodes": 19,
+      "primitiveReferences": 15,
+      "primitives": 15,
+      "textureMemoryBytes": 349524,
+      "triangles": 2064
+    },
+    "exceptions": [],
+    "measurements": {
+      "exactDuplicateMeshDefinitions": 0,
+      "flatTriangles": 2064,
+      "lodTriangles": [],
+      "meshInstances": 15,
+      "microAreaSquareMeters": 1e-06,
+      "microTriangles": 136,
+      "missingNormalTriangles": 0,
+      "referencedMeshes": 15,
+      "reusedMeshReferences": 0,
+      "smoothTriangles": 0,
+      "space": "mesh-local meters; instanced transforms/screen size not inferred",
+      "validTriangles": 2064
+    },
+    "profile": {
+      "name": "option-a-v1"
+    },
+    "unusedExceptions": [],
+    "warnings": []
+  },
+  "delta": {
+    "drawCalls": 0,
+    "encodedTextureBytes": 0,
+    "glbBytes": 0,
+    "materials": 0,
+    "nodes": 0,
+    "primitiveReferences": 0,
+    "primitives": 0,
+    "textureMemoryBytes": 0,
+    "triangles": 0
+  }
+}

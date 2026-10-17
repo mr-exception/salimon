@@ -291,3 +291,46 @@ variants need up to six draws, not 500. Future cross-variant geometry sharing or
 an atlas/material palette can be assessed separately; changing visual recipes
 must preserve gameplay identity, collision and interaction contracts. Byte
 repacking alone does not change runtime residency, physics or frame throughput.
+
+## Offline style review (#275)
+
+No Blender is needed. Install the existing model requirements, then:
+
+```sh
+python models/tools/style_review.py item.mining-tool --output artifacts/style/tool.json
+python models/tools/style_review.py ship.salimon-scout --before artifacts/scout-before.glb --output artifacts/style/scout-comparison.json
+python -m unittest discover -s models/tests -p 'test_style_review.py' -v
+```
+
+Current assets pass the existing generic and category validators before a report
+is emitted. `--before` measures a historical GLB against the **current** profile;
+it does not pretend the old asset satisfies a deliberately revised preservation
+contract. JSON includes before/after costs and numeric deltas. Outputs are confined
+to `artifacts/`; promote reviewed evidence to a task report separately.
+`process_glb.py` also adds before/after `styleReview` sections when opted in,
+reusing its validated documents and existing #227 cost metrics.
+
+`styleProfile.name=option-a-v1` opts into advisory signals by category. Proposed
+triangle/material targets: ship/vehicle 6500/13, item/prop 3000/4 or 8, resource
+1200/4, structure 12000/16, character 6000/8. More than 1 MiB decoded texture memory
+warns. None replaces an asset's five mandatory budgets or `visualBudget` gates.
+
+The report counts face-aligned (`dot >= .999`), interpolated and absent normals;
+warns for predominantly smooth resources, more than 10% micro triangles,
+nondecreasing declared LOD triangle cost, and byte-equivalent mesh definitions
+that could share accessors. Micro area thresholds are mesh-local square meters:
+ship/vehicle/structure .0001, item/character .000001, resource/prop .00001.
+Instanced scale, projected screen density, UV aesthetics and color/shape quality
+are not inferred. Mesh reuse counts exact shared mesh references, not GPU draws;
+existing consumer-specific cost measurement owns actual draw estimates. Degenerate
+triangles/topology, LOD hierarchy correctness and spatial quality remain owned by
+the existing validators, not duplicated here. Missing LODs are permitted.
+
+Warnings are advisory and never turn an otherwise valid asset into a failure.
+Hard contract/schema errors still fail. Document purposeful exceptions with
+`styleProfile.exceptions` code/reason; report records suppressed findings and
+unused reasons. Functional spheres can justify smoother normals, while monitors,
+glass and lights retain their mandatory contracts. Human review of #274 references
+owns aesthetic approval. [Sample cost comparison](../../reports/issue-275/sample-comparison.json)
+compares the same existing tool with opt-in measurements, so its zero deltas are
+intentional; the production Scout before/after report belongs to #276.

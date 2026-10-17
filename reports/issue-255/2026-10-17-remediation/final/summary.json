@@ -1,0 +1,2369 @@
+{
+  "schema": 1,
+  "created_at": "2026-10-17T16:00:31.771186+00:00",
+  "revision": "0b9ff3572e5188761c6b2a81fef5e7470fbf4cf0",
+  "binary_sha256": "98ec9624dcbecf557e1a1e97d93a115c9d19e0610e585674492b0b98cdfd30de",
+  "dirty": true,
+  "environment": {
+    "machine_label": "apple-m1-imac-16gb-macos26.2",
+    "platform": "macOS-26.2-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "cpu": "arm",
+    "logical_cpus": 8,
+    "wgpu_backend": null,
+    "vk_driver_files": null
+  },
+  "cases": [
+    {
+      "config": {
+        "camera": "facing",
+        "count": 500,
+        "initial_state": "active",
+        "layout": "onboard",
+        "minimum_samples": 100,
+        "sample_seconds": 3,
+        "seed": 155,
+        "settle_steps_limit": 0,
+        "warmup_seconds": 0,
+        "repeat": 1
+      },
+      "mode": "native_wall_clock",
+      "renderer": {
+        "adapter": "Apple M1",
+        "backend": "Metal",
+        "device_type": "IntegratedGpu",
+        "gpu_timestamps_supported": true,
+        "height": 1080,
+        "present_mode": "AutoVsync",
+        "scale_factor": 2.0,
+        "width": 1920
+      },
+      "presentation": {
+        "foreground_visible": true,
+        "interval_kind": "submitted_present_calls",
+        "lifecycle": [
+          {
+            "elapsed_seconds": 0.18416675,
+            "event": "unfocused",
+            "ready": false
+          },
+          {
+            "elapsed_seconds": 0.213073583,
+            "event": "focused",
+            "ready": true
+          }
+        ],
+        "physical_scanout_verified": false,
+        "pid": 42383,
+        "schema": 1
+      },
+      "samples_retained": 181,
+      "tail_statistics_reliable": true,
+      "updates_observed": 181,
+      "frame_samples_retained": 180,
+      "sample_wall_seconds": 3.010120625,
+      "moving_samples": 18,
+      "resting_samples": 163,
+      "sampling_stride": 1,
+      "metrics": {
+        "frame_ms": {
+          "median": 16.6584375,
+          "p95": 17.406708,
+          "p99": 26.503583,
+          "max": 27.61675
+        },
+        "cpu_update_ms": {
+          "median": 2.282209,
+          "p95": 9.034875,
+          "p99": 9.681792,
+          "max": 11.25375
+        },
+        "cpu_simulation_ms": {
+          "median": 1.6505,
+          "p95": 8.759083,
+          "p99": 9.419042000000001,
+          "max": 11.001541999999999
+        },
+        "cpu_scene_prepare_ms": {
+          "median": 0.32650000000000023,
+          "p95": 0.7409169999999996,
+          "p99": 0.8066249999999997,
+          "max": 0.976791
+        },
+        "physics_total_ms": {
+          "median": 0.9456249999999999,
+          "p95": 8.4885,
+          "p99": 9.170375,
+          "max": 10.752083
+        },
+        "physics_adapter_ms": {
+          "median": 0.26625,
+          "p95": 0.803834,
+          "p99": 1.362249,
+          "max": 1.417043
+        },
+        "physics_integration_ms": {
+          "median": 0.0,
+          "p95": 6.106376,
+          "p99": 6.472668,
+          "max": 6.547668000000001
+        },
+        "physics_contact_ms": {
+          "median": 0.0,
+          "p95": 2.740626,
+          "p99": 3.633457,
+          "max": 3.795875
+        },
+        "physics_activation_ms": {
+          "median": 0.33216700000000005,
+          "p95": 0.793959,
+          "p99": 1.151169,
+          "max": 3.234916
+        },
+        "cpu_render_ms": {
+          "median": 0.370166,
+          "p95": 1.072042,
+          "p99": 1.150042,
+          "max": 1.583625
+        },
+        "resource_prepare_ms": {
+          "median": 0.022500000000000003,
+          "p95": 0.10725,
+          "p99": 0.146417,
+          "max": 0.146833
+        },
+        "resource_upload_ms": {
+          "median": 0.014084,
+          "p95": 0.024916,
+          "p99": 0.033917,
+          "max": 0.034167
+        },
+        "gpu_latest_ms": {
+          "median": 1.3222500000000001,
+          "p95": 2.711416,
+          "p99": 3.390834,
+          "max": 3.390834
+        },
+        "pair_visits": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "radius_candidates": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "narrow_phase_tests": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "contacts": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "substeps": {
+          "median": 0,
+          "p95": 9,
+          "p99": 12,
+          "max": 12
+        },
+        "matrix_allocations": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "projection_storage_bytes": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "resource_upload_bytes": {
+          "median": 64,
+          "p95": 23776,
+          "p99": 23920,
+          "max": 23920
+        },
+        "resource_triangles": {
+          "median": 40688,
+          "p95": 40688,
+          "p99": 40688,
+          "max": 40688
+        },
+        "draw_calls": {
+          "median": 13,
+          "p95": 13,
+          "p99": 13,
+          "max": 13
+        },
+        "moving_objects": {
+          "median": 0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "objects_simulated": {
+          "median": 500,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "awake_objects": {
+          "median": 0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "sleeping_objects": {
+          "median": 500,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "quiet_objects": {
+          "median": 500,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "integrated_objects": {
+          "median": 0,
+          "p95": 4500,
+          "p99": 6000,
+          "max": 6000
+        },
+        "frames_over_16_67ms": 83,
+        "frames_over_50ms": 0
+      },
+      "settled_observed": false,
+      "sleeping_observed": false,
+      "active_observed": true,
+      "median_interval_fps": 60.02963963456956,
+      "raw_file": "native-500-onboard-active-facing-repeat-1.stdout"
+    },
+    {
+      "config": {
+        "camera": "facing",
+        "count": 500,
+        "initial_state": "active",
+        "layout": "onboard",
+        "minimum_samples": 100,
+        "sample_seconds": 3,
+        "seed": 155,
+        "settle_steps_limit": 0,
+        "warmup_seconds": 0,
+        "repeat": 2
+      },
+      "mode": "native_wall_clock",
+      "renderer": {
+        "adapter": "Apple M1",
+        "backend": "Metal",
+        "device_type": "IntegratedGpu",
+        "gpu_timestamps_supported": true,
+        "height": 1080,
+        "present_mode": "AutoVsync",
+        "scale_factor": 2.0,
+        "width": 1920
+      },
+      "presentation": {
+        "foreground_visible": true,
+        "interval_kind": "submitted_present_calls",
+        "lifecycle": [
+          {
+            "elapsed_seconds": 0.17754325,
+            "event": "unfocused",
+            "ready": false
+          },
+          {
+            "elapsed_seconds": 0.18623725,
+            "event": "focused",
+            "ready": true
+          }
+        ],
+        "physical_scanout_verified": false,
+        "pid": 42409,
+        "schema": 1
+      },
+      "samples_retained": 179,
+      "tail_statistics_reliable": true,
+      "updates_observed": 179,
+      "frame_samples_retained": 178,
+      "sample_wall_seconds": 3.000152167,
+      "moving_samples": 18,
+      "resting_samples": 161,
+      "sampling_stride": 1,
+      "metrics": {
+        "frame_ms": {
+          "median": 16.668833499999998,
+          "p95": 17.120791,
+          "p99": 29.524333,
+          "max": 35.244584
+        },
+        "cpu_update_ms": {
+          "median": 2.249417,
+          "p95": 8.995208,
+          "p99": 9.27875,
+          "max": 11.116958
+        },
+        "cpu_simulation_ms": {
+          "median": 1.539917,
+          "p95": 8.647209,
+          "p99": 9.026917000000001,
+          "max": 10.863541000000001
+        },
+        "cpu_scene_prepare_ms": {
+          "median": 0.30166700000000013,
+          "p95": 0.7591670000000001,
+          "p99": 0.821,
+          "max": 0.8292499999999996
+        },
+        "physics_total_ms": {
+          "median": 0.86725,
+          "p95": 8.395083,
+          "p99": 8.758708,
+          "max": 10.616499999999998
+        },
+        "physics_adapter_ms": {
+          "median": 0.2495,
+          "p95": 0.7030409999999999,
+          "p99": 0.824334,
+          "max": 1.0443740000000001
+        },
+        "physics_integration_ms": {
+          "median": 0.0,
+          "p95": 6.106999,
+          "p99": 6.401833,
+          "max": 6.405917
+        },
+        "physics_contact_ms": {
+          "median": 0.0,
+          "p95": 2.813833,
+          "p99": 3.6029579999999997,
+          "max": 3.662582
+        },
+        "physics_activation_ms": {
+          "median": 0.3035,
+          "p95": 0.734167,
+          "p99": 1.140125,
+          "max": 3.15075
+        },
+        "cpu_render_ms": {
+          "median": 0.353042,
+          "p95": 0.880417,
+          "p99": 0.907583,
+          "max": 1.906792
+        },
+        "resource_prepare_ms": {
+          "median": 0.022292,
+          "p95": 0.107125,
+          "p99": 0.10900000000000001,
+          "max": 0.109583
+        },
+        "resource_upload_ms": {
+          "median": 0.006125,
+          "p95": 0.023667,
+          "p99": 0.034125,
+          "max": 0.05075
+        },
+        "gpu_latest_ms": {
+          "median": 1.321375,
+          "p95": 2.6891670000000003,
+          "p99": 2.713833,
+          "max": 3.3865420000000004
+        },
+        "pair_visits": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "radius_candidates": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "narrow_phase_tests": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "contacts": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "substeps": {
+          "median": 0,
+          "p95": 9,
+          "p99": 12,
+          "max": 12
+        },
+        "matrix_allocations": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "projection_storage_bytes": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "resource_upload_bytes": {
+          "median": 64,
+          "p95": 23776,
+          "p99": 23920,
+          "max": 23920
+        },
+        "resource_triangles": {
+          "median": 40688,
+          "p95": 40688,
+          "p99": 40688,
+          "max": 40688
+        },
+        "draw_calls": {
+          "median": 13,
+          "p95": 13,
+          "p99": 13,
+          "max": 13
+        },
+        "moving_objects": {
+          "median": 0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "objects_simulated": {
+          "median": 500,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "awake_objects": {
+          "median": 0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "sleeping_objects": {
+          "median": 500,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "quiet_objects": {
+          "median": 500,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "integrated_objects": {
+          "median": 0,
+          "p95": 4500,
+          "p99": 6000,
+          "max": 6000
+        },
+        "frames_over_16_67ms": 94,
+        "frames_over_50ms": 0
+      },
+      "settled_observed": false,
+      "sleeping_observed": false,
+      "active_observed": true,
+      "median_interval_fps": 59.99220041402418,
+      "raw_file": "native-500-onboard-active-facing-repeat-2.stdout"
+    },
+    {
+      "config": {
+        "camera": "facing",
+        "count": 500,
+        "initial_state": "active",
+        "layout": "onboard",
+        "minimum_samples": 100,
+        "sample_seconds": 3,
+        "seed": 155,
+        "settle_steps_limit": 0,
+        "warmup_seconds": 0,
+        "repeat": 3
+      },
+      "mode": "native_wall_clock",
+      "renderer": {
+        "adapter": "Apple M1",
+        "backend": "Metal",
+        "device_type": "IntegratedGpu",
+        "gpu_timestamps_supported": true,
+        "height": 1080,
+        "present_mode": "AutoVsync",
+        "scale_factor": 2.0,
+        "width": 1920
+      },
+      "presentation": {
+        "foreground_visible": true,
+        "interval_kind": "submitted_present_calls",
+        "lifecycle": [
+          {
+            "elapsed_seconds": 0.2034215,
+            "event": "unfocused",
+            "ready": false
+          },
+          {
+            "elapsed_seconds": 0.212061333,
+            "event": "focused",
+            "ready": true
+          }
+        ],
+        "physical_scanout_verified": false,
+        "pid": 42440,
+        "schema": 1
+      },
+      "samples_retained": 180,
+      "tail_statistics_reliable": true,
+      "updates_observed": 180,
+      "frame_samples_retained": 179,
+      "sample_wall_seconds": 3.000317875,
+      "moving_samples": 18,
+      "resting_samples": 162,
+      "sampling_stride": 1,
+      "metrics": {
+        "frame_ms": {
+          "median": 16.660500000000003,
+          "p95": 17.18775,
+          "p99": 24.544208,
+          "max": 30.846999999999998
+        },
+        "cpu_update_ms": {
+          "median": 2.3543335,
+          "p95": 9.064208,
+          "p99": 9.40675,
+          "max": 11.450541
+        },
+        "cpu_simulation_ms": {
+          "median": 1.6455625,
+          "p95": 8.734375,
+          "p99": 9.092208,
+          "max": 11.181916
+        },
+        "cpu_scene_prepare_ms": {
+          "median": 0.3259585000000006,
+          "p95": 0.7557080000000003,
+          "p99": 0.8086250000000001,
+          "max": 0.928375
+        },
+        "physics_total_ms": {
+          "median": 0.9648125000000001,
+          "p95": 8.454416,
+          "p99": 8.81675,
+          "max": 10.916209
+        },
+        "physics_adapter_ms": {
+          "median": 0.26779149999999996,
+          "p95": 0.7165,
+          "p99": 1.0698750000000001,
+          "max": 1.172416
+        },
+        "physics_integration_ms": {
+          "median": 0.0,
+          "p95": 6.124416,
+          "p99": 6.449961,
+          "max": 6.551999
+        },
+        "physics_contact_ms": {
+          "median": 0.0,
+          "p95": 2.785044,
+          "p99": 3.467459,
+          "max": 3.5385820000000003
+        },
+        "physics_activation_ms": {
+          "median": 0.35760400000000003,
+          "p95": 0.7174170000000001,
+          "p99": 1.006876,
+          "max": 3.259875
+        },
+        "cpu_render_ms": {
+          "median": 0.3918545,
+          "p95": 0.913334,
+          "p99": 1.4645000000000001,
+          "max": 1.524708
+        },
+        "resource_prepare_ms": {
+          "median": 0.0237705,
+          "p95": 0.107042,
+          "p99": 0.146416,
+          "max": 0.14958300000000002
+        },
+        "resource_upload_ms": {
+          "median": 0.014458499999999999,
+          "p95": 0.022916,
+          "p99": 0.041167,
+          "max": 0.042459000000000004
+        },
+        "gpu_latest_ms": {
+          "median": 1.322896,
+          "p95": 2.716333,
+          "p99": 2.768375,
+          "max": 2.870292
+        },
+        "pair_visits": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "radius_candidates": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "narrow_phase_tests": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "contacts": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "substeps": {
+          "median": 0.0,
+          "p95": 9,
+          "p99": 12,
+          "max": 12
+        },
+        "matrix_allocations": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "projection_storage_bytes": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "resource_upload_bytes": {
+          "median": 64.0,
+          "p95": 23776,
+          "p99": 23920,
+          "max": 23920
+        },
+        "resource_triangles": {
+          "median": 40688.0,
+          "p95": 40688,
+          "p99": 40688,
+          "max": 40688
+        },
+        "draw_calls": {
+          "median": 13.0,
+          "p95": 13,
+          "p99": 13,
+          "max": 13
+        },
+        "moving_objects": {
+          "median": 0.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "objects_simulated": {
+          "median": 500.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "awake_objects": {
+          "median": 0.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "sleeping_objects": {
+          "median": 500.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "quiet_objects": {
+          "median": 500.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "integrated_objects": {
+          "median": 0.0,
+          "p95": 4500,
+          "p99": 6000,
+          "max": 6000
+        },
+        "frames_over_16_67ms": 86,
+        "frames_over_50ms": 0
+      },
+      "settled_observed": false,
+      "sleeping_observed": false,
+      "active_observed": true,
+      "median_interval_fps": 60.022208217040294,
+      "raw_file": "native-500-onboard-active-facing-repeat-3.stdout"
+    },
+    {
+      "config": {
+        "camera": "facing",
+        "count": 500,
+        "initial_state": "active",
+        "layout": "onboard",
+        "minimum_samples": 100,
+        "sample_seconds": 3,
+        "seed": 155,
+        "settle_steps_limit": 0,
+        "warmup_seconds": 0,
+        "repeat": 4
+      },
+      "mode": "native_wall_clock",
+      "renderer": {
+        "adapter": "Apple M1",
+        "backend": "Metal",
+        "device_type": "IntegratedGpu",
+        "gpu_timestamps_supported": true,
+        "height": 1080,
+        "present_mode": "AutoVsync",
+        "scale_factor": 2.0,
+        "width": 1920
+      },
+      "presentation": {
+        "foreground_visible": true,
+        "interval_kind": "submitted_present_calls",
+        "lifecycle": [
+          {
+            "elapsed_seconds": 0.17064375,
+            "event": "unfocused",
+            "ready": false
+          },
+          {
+            "elapsed_seconds": 0.182014709,
+            "event": "focused",
+            "ready": true
+          }
+        ],
+        "physical_scanout_verified": false,
+        "pid": 42467,
+        "schema": 1
+      },
+      "samples_retained": 179,
+      "tail_statistics_reliable": true,
+      "updates_observed": 179,
+      "frame_samples_retained": 178,
+      "sample_wall_seconds": 3.000431167,
+      "moving_samples": 18,
+      "resting_samples": 161,
+      "sampling_stride": 1,
+      "metrics": {
+        "frame_ms": {
+          "median": 16.663937,
+          "p95": 17.236708,
+          "p99": 29.957749999999997,
+          "max": 31.909667000000002
+        },
+        "cpu_update_ms": {
+          "median": 2.3236250000000003,
+          "p95": 9.117541,
+          "p99": 10.409167,
+          "max": 11.74
+        },
+        "cpu_simulation_ms": {
+          "median": 1.6468330000000002,
+          "p95": 8.840541,
+          "p99": 10.081916999999999,
+          "max": 11.476208
+        },
+        "cpu_scene_prepare_ms": {
+          "median": 0.33233299999999977,
+          "p95": 0.7786249999999999,
+          "p99": 0.8362090000000002,
+          "max": 0.8366250000000002
+        },
+        "physics_total_ms": {
+          "median": 0.935667,
+          "p95": 8.537166000000001,
+          "p99": 9.797583,
+          "max": 11.227292
+        },
+        "physics_adapter_ms": {
+          "median": 0.276999,
+          "p95": 0.7692089999999999,
+          "p99": 1.263709,
+          "max": 1.5866669999999998
+        },
+        "physics_integration_ms": {
+          "median": 0.0,
+          "p95": 6.140832,
+          "p99": 6.373292,
+          "max": 7.392626
+        },
+        "physics_contact_ms": {
+          "median": 0.0,
+          "p95": 2.954751,
+          "p99": 3.7385420000000003,
+          "max": 4.345625
+        },
+        "physics_activation_ms": {
+          "median": 0.315083,
+          "p95": 0.821126,
+          "p99": 0.9915830000000001,
+          "max": 3.347667
+        },
+        "cpu_render_ms": {
+          "median": 0.398959,
+          "p95": 1.0297500000000002,
+          "p99": 1.137375,
+          "max": 1.601667
+        },
+        "resource_prepare_ms": {
+          "median": 0.023583,
+          "p95": 0.14550000000000002,
+          "p99": 0.146042,
+          "max": 0.14616600000000002
+        },
+        "resource_upload_ms": {
+          "median": 0.0145,
+          "p95": 0.028458,
+          "p99": 0.051792000000000005,
+          "max": 0.055708
+        },
+        "gpu_latest_ms": {
+          "median": 1.3185,
+          "p95": 2.718166,
+          "p99": 2.78925,
+          "max": 5.000875
+        },
+        "pair_visits": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "radius_candidates": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "narrow_phase_tests": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "contacts": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "substeps": {
+          "median": 0,
+          "p95": 9,
+          "p99": 12,
+          "max": 12
+        },
+        "matrix_allocations": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "projection_storage_bytes": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "resource_upload_bytes": {
+          "median": 64,
+          "p95": 23776,
+          "p99": 23920,
+          "max": 23920
+        },
+        "resource_triangles": {
+          "median": 40688,
+          "p95": 40688,
+          "p99": 40688,
+          "max": 40688
+        },
+        "draw_calls": {
+          "median": 13,
+          "p95": 13,
+          "p99": 13,
+          "max": 13
+        },
+        "moving_objects": {
+          "median": 0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "objects_simulated": {
+          "median": 500,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "awake_objects": {
+          "median": 0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "sleeping_objects": {
+          "median": 500,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "quiet_objects": {
+          "median": 500,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "integrated_objects": {
+          "median": 0,
+          "p95": 4500,
+          "p99": 6000,
+          "max": 6000
+        },
+        "frames_over_16_67ms": 87,
+        "frames_over_50ms": 0
+      },
+      "settled_observed": false,
+      "sleeping_observed": false,
+      "active_observed": true,
+      "median_interval_fps": 60.00982840969694,
+      "raw_file": "native-500-onboard-active-facing-repeat-4.stdout"
+    },
+    {
+      "config": {
+        "camera": "facing",
+        "count": 500,
+        "initial_state": "active",
+        "layout": "onboard",
+        "minimum_samples": 100,
+        "sample_seconds": 3,
+        "seed": 155,
+        "settle_steps_limit": 0,
+        "warmup_seconds": 0,
+        "repeat": 5
+      },
+      "mode": "native_wall_clock",
+      "renderer": {
+        "adapter": "Apple M1",
+        "backend": "Metal",
+        "device_type": "IntegratedGpu",
+        "gpu_timestamps_supported": true,
+        "height": 1080,
+        "present_mode": "AutoVsync",
+        "scale_factor": 2.0,
+        "width": 1920
+      },
+      "presentation": {
+        "foreground_visible": true,
+        "interval_kind": "submitted_present_calls",
+        "lifecycle": [
+          {
+            "elapsed_seconds": 0.175616666,
+            "event": "unfocused",
+            "ready": false
+          },
+          {
+            "elapsed_seconds": 0.203855916,
+            "event": "focused",
+            "ready": true
+          }
+        ],
+        "physical_scanout_verified": false,
+        "pid": 42498,
+        "schema": 1
+      },
+      "samples_retained": 181,
+      "tail_statistics_reliable": true,
+      "updates_observed": 181,
+      "frame_samples_retained": 180,
+      "sample_wall_seconds": 3.016378334,
+      "moving_samples": 17,
+      "resting_samples": 164,
+      "sampling_stride": 1,
+      "metrics": {
+        "frame_ms": {
+          "median": 16.6560835,
+          "p95": 17.120666,
+          "p99": 28.799625,
+          "max": 29.436833
+        },
+        "cpu_update_ms": {
+          "median": 2.275458,
+          "p95": 9.046417,
+          "p99": 9.972583,
+          "max": 11.289291
+        },
+        "cpu_simulation_ms": {
+          "median": 1.597625,
+          "p95": 8.751458,
+          "p99": 9.666457999999999,
+          "max": 11.021415999999999
+        },
+        "cpu_scene_prepare_ms": {
+          "median": 0.3234169999999992,
+          "p95": 0.7604999999999997,
+          "p99": 0.8211660000000001,
+          "max": 0.8308339999999999
+        },
+        "physics_total_ms": {
+          "median": 0.9105409999999999,
+          "p95": 8.468167000000001,
+          "p99": 9.163375,
+          "max": 10.756083
+        },
+        "physics_adapter_ms": {
+          "median": 0.267375,
+          "p95": 0.735999,
+          "p99": 1.257792,
+          "max": 1.366375
+        },
+        "physics_integration_ms": {
+          "median": 0.0,
+          "p95": 6.114668,
+          "p99": 6.53079,
+          "max": 6.557001
+        },
+        "physics_contact_ms": {
+          "median": 0.0,
+          "p95": 2.743707,
+          "p99": 3.5549589999999998,
+          "max": 3.562335
+        },
+        "physics_activation_ms": {
+          "median": 0.314832,
+          "p95": 0.749166,
+          "p99": 1.130874,
+          "max": 3.154042
+        },
+        "cpu_render_ms": {
+          "median": 0.389209,
+          "p95": 0.896083,
+          "p99": 1.125583,
+          "max": 2.5862089999999998
+        },
+        "resource_prepare_ms": {
+          "median": 0.022916,
+          "p95": 0.107375,
+          "p99": 0.14645899999999998,
+          "max": 0.147833
+        },
+        "resource_upload_ms": {
+          "median": 0.014709,
+          "p95": 0.025542,
+          "p99": 0.038333,
+          "max": 0.059208
+        },
+        "gpu_latest_ms": {
+          "median": 1.3224580000000001,
+          "p95": 2.721041,
+          "p99": 5.170083,
+          "max": 5.386458
+        },
+        "pair_visits": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "radius_candidates": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "narrow_phase_tests": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "contacts": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "substeps": {
+          "median": 0,
+          "p95": 9,
+          "p99": 12,
+          "max": 12
+        },
+        "matrix_allocations": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "projection_storage_bytes": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "resource_upload_bytes": {
+          "median": 64,
+          "p95": 23776,
+          "p99": 23920,
+          "max": 23920
+        },
+        "resource_triangles": {
+          "median": 40688,
+          "p95": 40688,
+          "p99": 40688,
+          "max": 40688
+        },
+        "draw_calls": {
+          "median": 13,
+          "p95": 13,
+          "p99": 13,
+          "max": 13
+        },
+        "moving_objects": {
+          "median": 0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "objects_simulated": {
+          "median": 500,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "awake_objects": {
+          "median": 0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "sleeping_objects": {
+          "median": 500,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "quiet_objects": {
+          "median": 500,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "integrated_objects": {
+          "median": 0,
+          "p95": 4500,
+          "p99": 6000,
+          "max": 6000
+        },
+        "frames_over_16_67ms": 84,
+        "frames_over_50ms": 0
+      },
+      "settled_observed": false,
+      "sleeping_observed": false,
+      "active_observed": true,
+      "median_interval_fps": 60.038123608109906,
+      "raw_file": "native-500-onboard-active-facing-repeat-5.stdout"
+    },
+    {
+      "config": {
+        "camera": "facing",
+        "count": 500,
+        "initial_state": "active",
+        "layout": "onboard",
+        "minimum_samples": 100,
+        "sample_seconds": 3,
+        "seed": 155,
+        "settle_steps_limit": 0,
+        "warmup_seconds": 0,
+        "repeat": 6
+      },
+      "mode": "native_wall_clock",
+      "renderer": {
+        "adapter": "Apple M1",
+        "backend": "Metal",
+        "device_type": "IntegratedGpu",
+        "gpu_timestamps_supported": true,
+        "height": 1080,
+        "present_mode": "AutoVsync",
+        "scale_factor": 2.0,
+        "width": 1920
+      },
+      "presentation": {
+        "foreground_visible": true,
+        "interval_kind": "submitted_present_calls",
+        "lifecycle": [
+          {
+            "elapsed_seconds": 0.170427625,
+            "event": "unfocused",
+            "ready": false
+          },
+          {
+            "elapsed_seconds": 0.181739083,
+            "event": "focused",
+            "ready": true
+          }
+        ],
+        "physical_scanout_verified": false,
+        "pid": 42528,
+        "schema": 1
+      },
+      "samples_retained": 182,
+      "tail_statistics_reliable": true,
+      "updates_observed": 182,
+      "frame_samples_retained": 181,
+      "sample_wall_seconds": 3.011842541,
+      "moving_samples": 20,
+      "resting_samples": 162,
+      "sampling_stride": 1,
+      "metrics": {
+        "frame_ms": {
+          "median": 16.672916999999998,
+          "p95": 17.1755,
+          "p99": 28.406667,
+          "max": 30.279667
+        },
+        "cpu_update_ms": {
+          "median": 2.2306665,
+          "p95": 8.994250000000001,
+          "p99": 9.581833,
+          "max": 11.150125000000001
+        },
+        "cpu_simulation_ms": {
+          "median": 1.5145625,
+          "p95": 8.623084,
+          "p99": 9.28325,
+          "max": 10.887083
+        },
+        "cpu_scene_prepare_ms": {
+          "median": 0.3436670000000004,
+          "p95": 0.7426250000000001,
+          "p99": 0.8487089999999997,
+          "max": 1.062834
+        },
+        "physics_total_ms": {
+          "median": 0.868625,
+          "p95": 8.348709,
+          "p99": 8.9985,
+          "max": 10.63125
+        },
+        "physics_adapter_ms": {
+          "median": 0.2666455,
+          "p95": 0.709083,
+          "p99": 1.181625,
+          "max": 1.208084
+        },
+        "physics_integration_ms": {
+          "median": 0.0,
+          "p95": 6.084877,
+          "p99": 6.281998,
+          "max": 6.287664
+        },
+        "physics_contact_ms": {
+          "median": 0.0,
+          "p95": 2.553376,
+          "p99": 3.516878,
+          "max": 4.144916
+        },
+        "physics_activation_ms": {
+          "median": 0.3075635,
+          "p95": 0.760583,
+          "p99": 1.177041,
+          "max": 3.145625
+        },
+        "cpu_render_ms": {
+          "median": 0.373958,
+          "p95": 0.8642920000000001,
+          "p99": 1.452292,
+          "max": 1.573584
+        },
+        "resource_prepare_ms": {
+          "median": 0.022417,
+          "p95": 0.106833,
+          "p99": 0.145709,
+          "max": 0.146375
+        },
+        "resource_upload_ms": {
+          "median": 0.014,
+          "p95": 0.022167,
+          "p99": 0.052,
+          "max": 0.053208000000000005
+        },
+        "gpu_latest_ms": {
+          "median": 1.3195000000000001,
+          "p95": 2.7169999999999996,
+          "p99": 2.760375,
+          "max": 4.427041
+        },
+        "pair_visits": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "radius_candidates": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "narrow_phase_tests": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "contacts": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "substeps": {
+          "median": 0.0,
+          "p95": 9,
+          "p99": 12,
+          "max": 13
+        },
+        "matrix_allocations": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "projection_storage_bytes": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "resource_upload_bytes": {
+          "median": 64.0,
+          "p95": 23776,
+          "p99": 23920,
+          "max": 23920
+        },
+        "resource_triangles": {
+          "median": 40688.0,
+          "p95": 40688,
+          "p99": 40688,
+          "max": 40688
+        },
+        "draw_calls": {
+          "median": 13.0,
+          "p95": 13,
+          "p99": 13,
+          "max": 13
+        },
+        "moving_objects": {
+          "median": 0.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "objects_simulated": {
+          "median": 500.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "awake_objects": {
+          "median": 0.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "sleeping_objects": {
+          "median": 500.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "quiet_objects": {
+          "median": 500.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "integrated_objects": {
+          "median": 0.0,
+          "p95": 4500,
+          "p99": 6000,
+          "max": 6500
+        },
+        "frames_over_16_67ms": 95,
+        "frames_over_50ms": 0
+      },
+      "settled_observed": false,
+      "sleeping_observed": false,
+      "active_observed": true,
+      "median_interval_fps": 59.97750723523665,
+      "raw_file": "native-500-onboard-active-facing-repeat-6.stdout"
+    },
+    {
+      "config": {
+        "camera": "facing",
+        "count": 500,
+        "initial_state": "active",
+        "layout": "onboard",
+        "minimum_samples": 100,
+        "sample_seconds": 3,
+        "seed": 155,
+        "settle_steps_limit": 0,
+        "warmup_seconds": 0,
+        "repeat": 7
+      },
+      "mode": "native_wall_clock",
+      "renderer": {
+        "adapter": "Apple M1",
+        "backend": "Metal",
+        "device_type": "IntegratedGpu",
+        "gpu_timestamps_supported": true,
+        "height": 1080,
+        "present_mode": "AutoVsync",
+        "scale_factor": 2.0,
+        "width": 1920
+      },
+      "presentation": {
+        "foreground_visible": true,
+        "interval_kind": "submitted_present_calls",
+        "lifecycle": [
+          {
+            "elapsed_seconds": 0.184800667,
+            "event": "unfocused",
+            "ready": false
+          },
+          {
+            "elapsed_seconds": 0.214270834,
+            "event": "focused",
+            "ready": true
+          }
+        ],
+        "physical_scanout_verified": false,
+        "pid": 42565,
+        "schema": 1
+      },
+      "samples_retained": 180,
+      "tail_statistics_reliable": true,
+      "updates_observed": 180,
+      "frame_samples_retained": 179,
+      "sample_wall_seconds": 3.000465958,
+      "moving_samples": 18,
+      "resting_samples": 162,
+      "sampling_stride": 1,
+      "metrics": {
+        "frame_ms": {
+          "median": 16.659709000000003,
+          "p95": 17.177292,
+          "p99": 24.986667,
+          "max": 34.134709
+        },
+        "cpu_update_ms": {
+          "median": 2.1181665,
+          "p95": 8.929291000000001,
+          "p99": 9.529917000000001,
+          "max": 11.257416
+        },
+        "cpu_simulation_ms": {
+          "median": 1.459,
+          "p95": 8.643042,
+          "p99": 9.256874999999999,
+          "max": 11.004083
+        },
+        "cpu_scene_prepare_ms": {
+          "median": 0.28054150000000005,
+          "p95": 0.7027500000000002,
+          "p99": 0.7576670000000001,
+          "max": 0.7973329999999996
+        },
+        "physics_total_ms": {
+          "median": 0.8345210000000001,
+          "p95": 8.372,
+          "p99": 8.984499999999999,
+          "max": 10.759125
+        },
+        "physics_adapter_ms": {
+          "median": 0.244312,
+          "p95": 0.7605,
+          "p99": 1.2011260000000001,
+          "max": 1.237751
+        },
+        "physics_integration_ms": {
+          "median": 0.0,
+          "p95": 6.079751000000001,
+          "p99": 6.4127469999999995,
+          "max": 6.54425
+        },
+        "physics_contact_ms": {
+          "median": 0.0,
+          "p95": 2.746957,
+          "p99": 3.551122,
+          "max": 3.5928319999999996
+        },
+        "physics_activation_ms": {
+          "median": 0.292584,
+          "p95": 0.749251,
+          "p99": 1.062624,
+          "max": 3.249043
+        },
+        "cpu_render_ms": {
+          "median": 0.3508335,
+          "p95": 0.8482090000000001,
+          "p99": 1.126333,
+          "max": 1.645875
+        },
+        "resource_prepare_ms": {
+          "median": 0.02225,
+          "p95": 0.106625,
+          "p99": 0.145792,
+          "max": 0.146167
+        },
+        "resource_upload_ms": {
+          "median": 0.006125,
+          "p95": 0.024624999999999998,
+          "p99": 0.029791,
+          "max": 0.039958
+        },
+        "gpu_latest_ms": {
+          "median": 1.320417,
+          "p95": 2.697042,
+          "p99": 2.718,
+          "max": 2.747041
+        },
+        "pair_visits": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "radius_candidates": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "narrow_phase_tests": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "contacts": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "substeps": {
+          "median": 0.0,
+          "p95": 9,
+          "p99": 12,
+          "max": 12
+        },
+        "matrix_allocations": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "projection_storage_bytes": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "resource_upload_bytes": {
+          "median": 64.0,
+          "p95": 23776,
+          "p99": 23920,
+          "max": 23920
+        },
+        "resource_triangles": {
+          "median": 40688.0,
+          "p95": 40688,
+          "p99": 40688,
+          "max": 40688
+        },
+        "draw_calls": {
+          "median": 13.0,
+          "p95": 13,
+          "p99": 13,
+          "max": 13
+        },
+        "moving_objects": {
+          "median": 0.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "objects_simulated": {
+          "median": 500.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "awake_objects": {
+          "median": 0.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "sleeping_objects": {
+          "median": 500.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "quiet_objects": {
+          "median": 500.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "integrated_objects": {
+          "median": 0.0,
+          "p95": 4500,
+          "p99": 6000,
+          "max": 6000
+        },
+        "frames_over_16_67ms": 82,
+        "frames_over_50ms": 0
+      },
+      "settled_observed": false,
+      "sleeping_observed": false,
+      "active_observed": true,
+      "median_interval_fps": 60.025058060738026,
+      "raw_file": "native-500-onboard-active-facing-repeat-7.stdout"
+    },
+    {
+      "config": {
+        "camera": "facing",
+        "count": 500,
+        "initial_state": "active",
+        "layout": "onboard",
+        "minimum_samples": 100,
+        "sample_seconds": 3,
+        "seed": 155,
+        "settle_steps_limit": 0,
+        "warmup_seconds": 0,
+        "repeat": 8
+      },
+      "mode": "native_wall_clock",
+      "renderer": {
+        "adapter": "Apple M1",
+        "backend": "Metal",
+        "device_type": "IntegratedGpu",
+        "gpu_timestamps_supported": true,
+        "height": 1080,
+        "present_mode": "AutoVsync",
+        "scale_factor": 2.0,
+        "width": 1920
+      },
+      "presentation": {
+        "foreground_visible": true,
+        "interval_kind": "submitted_present_calls",
+        "lifecycle": [
+          {
+            "elapsed_seconds": 0.177481583,
+            "event": "unfocused",
+            "ready": false
+          },
+          {
+            "elapsed_seconds": 0.185943166,
+            "event": "focused",
+            "ready": true
+          }
+        ],
+        "physical_scanout_verified": false,
+        "pid": 42606,
+        "schema": 1
+      },
+      "samples_retained": 182,
+      "tail_statistics_reliable": true,
+      "updates_observed": 182,
+      "frame_samples_retained": 181,
+      "sample_wall_seconds": 3.016426042,
+      "moving_samples": 18,
+      "resting_samples": 164,
+      "sampling_stride": 1,
+      "metrics": {
+        "frame_ms": {
+          "median": 16.661125,
+          "p95": 17.144875,
+          "p99": 25.458792000000003,
+          "max": 27.464542
+        },
+        "cpu_update_ms": {
+          "median": 2.2762705,
+          "p95": 9.018165999999999,
+          "p99": 9.845667,
+          "max": 11.276375
+        },
+        "cpu_simulation_ms": {
+          "median": 1.601,
+          "p95": 8.7285,
+          "p99": 9.458292,
+          "max": 11.013917
+        },
+        "cpu_scene_prepare_ms": {
+          "median": 0.3198959999999995,
+          "p95": 0.7556669999999999,
+          "p99": 0.8344170000000002,
+          "max": 0.9839579999999999
+        },
+        "physics_total_ms": {
+          "median": 0.937896,
+          "p95": 8.351959,
+          "p99": 8.952292,
+          "max": 10.767917
+        },
+        "physics_adapter_ms": {
+          "median": 0.2649165,
+          "p95": 0.773792,
+          "p99": 1.074541,
+          "max": 1.088042
+        },
+        "physics_integration_ms": {
+          "median": 0.0,
+          "p95": 6.109416,
+          "p99": 6.517043,
+          "max": 6.638998999999999
+        },
+        "physics_contact_ms": {
+          "median": 0.0,
+          "p95": 2.739499,
+          "p99": 3.5851260000000003,
+          "max": 3.591957
+        },
+        "physics_activation_ms": {
+          "median": 0.33254150000000005,
+          "p95": 0.786042,
+          "p99": 1.166416,
+          "max": 3.335292
+        },
+        "cpu_render_ms": {
+          "median": 0.36939600000000006,
+          "p95": 0.87825,
+          "p99": 1.113375,
+          "max": 1.474458
+        },
+        "resource_prepare_ms": {
+          "median": 0.0223545,
+          "p95": 0.106833,
+          "p99": 0.149333,
+          "max": 0.149542
+        },
+        "resource_upload_ms": {
+          "median": 0.008250500000000001,
+          "p95": 0.024791,
+          "p99": 0.034458,
+          "max": 0.0385
+        },
+        "gpu_latest_ms": {
+          "median": 1.3218125,
+          "p95": 2.717125,
+          "p99": 4.623542,
+          "max": 6.921166
+        },
+        "pair_visits": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "radius_candidates": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "narrow_phase_tests": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "contacts": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "substeps": {
+          "median": 0.0,
+          "p95": 9,
+          "p99": 12,
+          "max": 12
+        },
+        "matrix_allocations": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "projection_storage_bytes": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "resource_upload_bytes": {
+          "median": 64.0,
+          "p95": 23776,
+          "p99": 23920,
+          "max": 23920
+        },
+        "resource_triangles": {
+          "median": 40688.0,
+          "p95": 40688,
+          "p99": 40688,
+          "max": 40688
+        },
+        "draw_calls": {
+          "median": 13.0,
+          "p95": 13,
+          "p99": 13,
+          "max": 13
+        },
+        "moving_objects": {
+          "median": 0.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "objects_simulated": {
+          "median": 500.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "awake_objects": {
+          "median": 0.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "sleeping_objects": {
+          "median": 500.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "quiet_objects": {
+          "median": 500.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "integrated_objects": {
+          "median": 0.0,
+          "p95": 4500,
+          "p99": 6000,
+          "max": 6000
+        },
+        "frames_over_16_67ms": 84,
+        "frames_over_50ms": 0
+      },
+      "settled_observed": false,
+      "sleeping_observed": false,
+      "active_observed": true,
+      "median_interval_fps": 60.01995663558134,
+      "raw_file": "native-500-onboard-active-facing-repeat-8.stdout"
+    },
+    {
+      "config": {
+        "camera": "facing",
+        "count": 500,
+        "initial_state": "active",
+        "layout": "onboard",
+        "minimum_samples": 100,
+        "sample_seconds": 3,
+        "seed": 155,
+        "settle_steps_limit": 0,
+        "warmup_seconds": 0,
+        "repeat": 9
+      },
+      "mode": "native_wall_clock",
+      "renderer": {
+        "adapter": "Apple M1",
+        "backend": "Metal",
+        "device_type": "IntegratedGpu",
+        "gpu_timestamps_supported": true,
+        "height": 1080,
+        "present_mode": "AutoVsync",
+        "scale_factor": 2.0,
+        "width": 1920
+      },
+      "presentation": {
+        "foreground_visible": true,
+        "interval_kind": "submitted_present_calls",
+        "lifecycle": [
+          {
+            "elapsed_seconds": 0.170387208,
+            "event": "unfocused",
+            "ready": false
+          },
+          {
+            "elapsed_seconds": 0.181410375,
+            "event": "focused",
+            "ready": true
+          }
+        ],
+        "physical_scanout_verified": false,
+        "pid": 42650,
+        "schema": 1
+      },
+      "samples_retained": 182,
+      "tail_statistics_reliable": true,
+      "updates_observed": 182,
+      "frame_samples_retained": 181,
+      "sample_wall_seconds": 3.011639291,
+      "moving_samples": 20,
+      "resting_samples": 162,
+      "sampling_stride": 1,
+      "metrics": {
+        "frame_ms": {
+          "median": 16.660292000000002,
+          "p95": 17.281292,
+          "p99": 25.871624999999998,
+          "max": 30.597165999999998
+        },
+        "cpu_update_ms": {
+          "median": 2.2754585,
+          "p95": 9.083666000000001,
+          "p99": 10.861374999999999,
+          "max": 11.263125
+        },
+        "cpu_simulation_ms": {
+          "median": 1.5662920000000002,
+          "p95": 8.717416,
+          "p99": 10.4795,
+          "max": 10.998917
+        },
+        "cpu_scene_prepare_ms": {
+          "median": 0.33031249999999973,
+          "p95": 0.8269580000000001,
+          "p99": 0.8616249999999999,
+          "max": 0.9250419999999999
+        },
+        "physics_total_ms": {
+          "median": 0.9155,
+          "p95": 8.422333,
+          "p99": 9.943624999999999,
+          "max": 10.743208000000001
+        },
+        "physics_adapter_ms": {
+          "median": 0.2593335,
+          "p95": 0.671542,
+          "p99": 1.095457,
+          "max": 1.227416
+        },
+        "physics_integration_ms": {
+          "median": 0.0,
+          "p95": 6.113332,
+          "p99": 6.566915000000001,
+          "max": 6.767001
+        },
+        "physics_contact_ms": {
+          "median": 0.0,
+          "p95": 3.003498,
+          "p99": 3.659498,
+          "max": 4.420373
+        },
+        "physics_activation_ms": {
+          "median": 0.3394995,
+          "p95": 0.826374,
+          "p99": 1.20875,
+          "max": 3.274875
+        },
+        "cpu_render_ms": {
+          "median": 0.36343749999999997,
+          "p95": 0.873792,
+          "p99": 1.650875,
+          "max": 2.137042
+        },
+        "resource_prepare_ms": {
+          "median": 0.022458000000000002,
+          "p95": 0.10675000000000001,
+          "p99": 0.146666,
+          "max": 0.154625
+        },
+        "resource_upload_ms": {
+          "median": 0.0078335,
+          "p95": 0.024083,
+          "p99": 0.042540999999999995,
+          "max": 0.04875
+        },
+        "gpu_latest_ms": {
+          "median": 1.3196664999999999,
+          "p95": 2.881667,
+          "p99": 7.058125,
+          "max": 8.380875
+        },
+        "pair_visits": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "radius_candidates": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "narrow_phase_tests": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "contacts": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "substeps": {
+          "median": 0.0,
+          "p95": 10,
+          "p99": 12,
+          "max": 15
+        },
+        "matrix_allocations": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "projection_storage_bytes": {
+          "median": 0.0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "resource_upload_bytes": {
+          "median": 64.0,
+          "p95": 23776,
+          "p99": 23920,
+          "max": 23920
+        },
+        "resource_triangles": {
+          "median": 40688.0,
+          "p95": 40688,
+          "p99": 40688,
+          "max": 40688
+        },
+        "draw_calls": {
+          "median": 13.0,
+          "p95": 13,
+          "p99": 13,
+          "max": 13
+        },
+        "moving_objects": {
+          "median": 0.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "objects_simulated": {
+          "median": 500.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "awake_objects": {
+          "median": 0.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "sleeping_objects": {
+          "median": 500.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "quiet_objects": {
+          "median": 500.0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "integrated_objects": {
+          "median": 0.0,
+          "p95": 5000,
+          "p99": 6000,
+          "max": 7500
+        },
+        "frames_over_16_67ms": 86,
+        "frames_over_50ms": 0
+      },
+      "settled_observed": false,
+      "sleeping_observed": false,
+      "active_observed": true,
+      "median_interval_fps": 60.0229575808155,
+      "raw_file": "native-500-onboard-active-facing-repeat-9.stdout"
+    },
+    {
+      "config": {
+        "camera": "facing",
+        "count": 500,
+        "initial_state": "active",
+        "layout": "onboard",
+        "minimum_samples": 100,
+        "sample_seconds": 3,
+        "seed": 155,
+        "settle_steps_limit": 0,
+        "warmup_seconds": 0,
+        "repeat": 10
+      },
+      "mode": "native_wall_clock",
+      "renderer": {
+        "adapter": "Apple M1",
+        "backend": "Metal",
+        "device_type": "IntegratedGpu",
+        "gpu_timestamps_supported": true,
+        "height": 1080,
+        "present_mode": "AutoVsync",
+        "scale_factor": 2.0,
+        "width": 1920
+      },
+      "presentation": {
+        "foreground_visible": true,
+        "interval_kind": "submitted_present_calls",
+        "lifecycle": [
+          {
+            "elapsed_seconds": 0.184067916,
+            "event": "unfocused",
+            "ready": false
+          },
+          {
+            "elapsed_seconds": 0.195677333,
+            "event": "focused",
+            "ready": true
+          }
+        ],
+        "physical_scanout_verified": false,
+        "pid": 42678,
+        "schema": 1
+      },
+      "samples_retained": 181,
+      "tail_statistics_reliable": true,
+      "updates_observed": 181,
+      "frame_samples_retained": 180,
+      "sample_wall_seconds": 3.013374667,
+      "moving_samples": 20,
+      "resting_samples": 161,
+      "sampling_stride": 1,
+      "metrics": {
+        "frame_ms": {
+          "median": 16.663625,
+          "p95": 17.18675,
+          "p99": 24.96375,
+          "max": 33.242833
+        },
+        "cpu_update_ms": {
+          "median": 2.2686249999999997,
+          "p95": 8.966666,
+          "p99": 9.371832999999999,
+          "max": 11.16375
+        },
+        "cpu_simulation_ms": {
+          "median": 1.599834,
+          "p95": 8.681666,
+          "p99": 9.100917,
+          "max": 10.902875
+        },
+        "cpu_scene_prepare_ms": {
+          "median": 0.300833,
+          "p95": 0.7400420000000001,
+          "p99": 0.7965000000000004,
+          "max": 0.8151669999999998
+        },
+        "physics_total_ms": {
+          "median": 0.914417,
+          "p95": 8.392999999999999,
+          "p99": 8.837041000000001,
+          "max": 10.643583999999999
+        },
+        "physics_adapter_ms": {
+          "median": 0.27587500000000004,
+          "p95": 0.74675,
+          "p99": 1.2416669999999999,
+          "max": 1.28925
+        },
+        "physics_integration_ms": {
+          "median": 0.0,
+          "p95": 6.1165,
+          "p99": 6.446167,
+          "max": 6.526750000000001
+        },
+        "physics_contact_ms": {
+          "median": 0.0,
+          "p95": 3.0159179999999997,
+          "p99": 3.605628,
+          "max": 3.737543
+        },
+        "physics_activation_ms": {
+          "median": 0.32095799999999997,
+          "p95": 0.786293,
+          "p99": 1.243417,
+          "max": 3.175541
+        },
+        "cpu_render_ms": {
+          "median": 0.364375,
+          "p95": 1.0875839999999999,
+          "p99": 1.935417,
+          "max": 2.467
+        },
+        "resource_prepare_ms": {
+          "median": 0.022375,
+          "p95": 0.145833,
+          "p99": 0.1535,
+          "max": 0.16525
+        },
+        "resource_upload_ms": {
+          "median": 0.0077919999999999994,
+          "p95": 0.031875,
+          "p99": 0.038708,
+          "max": 0.039625
+        },
+        "gpu_latest_ms": {
+          "median": 1.320667,
+          "p95": 2.717333,
+          "p99": 2.755542,
+          "max": 2.924958
+        },
+        "pair_visits": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "radius_candidates": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "narrow_phase_tests": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "contacts": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "substeps": {
+          "median": 0,
+          "p95": 10,
+          "p99": 12,
+          "max": 13
+        },
+        "matrix_allocations": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "projection_storage_bytes": {
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "resource_upload_bytes": {
+          "median": 64,
+          "p95": 23776,
+          "p99": 23920,
+          "max": 23920
+        },
+        "resource_triangles": {
+          "median": 40688,
+          "p95": 40688,
+          "p99": 40688,
+          "max": 40688
+        },
+        "draw_calls": {
+          "median": 13,
+          "p95": 13,
+          "p99": 13,
+          "max": 13
+        },
+        "moving_objects": {
+          "median": 0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "objects_simulated": {
+          "median": 500,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "awake_objects": {
+          "median": 0,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "sleeping_objects": {
+          "median": 500,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "quiet_objects": {
+          "median": 500,
+          "p95": 500,
+          "p99": 500,
+          "max": 500
+        },
+        "integrated_objects": {
+          "median": 0,
+          "p95": 5000,
+          "p99": 6000,
+          "max": 6500
+        },
+        "frames_over_16_67ms": 89,
+        "frames_over_50ms": 0
+      },
+      "settled_observed": false,
+      "sleeping_observed": false,
+      "active_observed": true,
+      "median_interval_fps": 60.01095199873977,
+      "raw_file": "native-500-onboard-active-facing-repeat-10.stdout"
+    }
+  ],
+  "failures": []
+}

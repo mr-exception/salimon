@@ -32,6 +32,9 @@ Spatial candidate/cache maintenance follows
 [the broad-phase contract](architecture.md#deterministic-spatial-candidates-157).
 `candidate_filtering_cost` is an ignored release test isolating sparse all-pairs
 versus grid filtering; retain exact-pose all-pairs and old-projection oracles.
+The benchmark guide's [spatial attribution commands](../../scripts/FRAGMENT_BENCHMARKS.md#spatial-candidate-attribution-157)
+also cover `separated_sphere_contact_cost` for empty-row, grid-refresh and
+all-awake activation costs (#255/#288).
 
 The convex motion target is recomputed after each response; preserve shared
 progression, swept waking and correction-created contact refresh. `tick_cost`

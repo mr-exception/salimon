@@ -1,5 +1,8 @@
 # Issue 255 — M1 cadence calibration and active-load failure
 
+Latest: [active contact-path remediation and fresh matched M1 measurements](2026-10-17-remediation/README.md).
+The evidence below records the earlier revision; its raw failures are preserved.
+
 Executed locally on 2026-10-17, Apple M1 iMac21,1 (8 CPU / 8 GPU cores),
 16 GiB RAM, macOS 26.2 (25C56), Metal, AutoVsync, 1920×1080 physical drawable
 at 2× scale on the built-in Retina display. Secondary 1080p/75 Hz display attached.

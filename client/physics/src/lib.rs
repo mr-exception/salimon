@@ -573,14 +573,25 @@ fn solve_contacts<const PROFILE: bool>(
     for (cache, p) in pair_geometry.transformed.iter_mut().zip(pieces.iter()) {
         cache.refresh(p);
     }
+    // An empty spatial row stays empty across ordered passes until any center
+    // correction changes the bounds. Retain only absence, not a dense pair list.
+    // Every solve starts fresh (including the post-integration solve).
+    let mut empty_rows = vec![0_usize; pieces.len()];
+    let mut bounds_revision = 1_usize;
     for _ in 0..16 {
         if PROFILE {
             stats.solver_passes += 1;
         }
         for i in 0..pieces.len() {
+            if empty_rows[i] == bounds_revision {
+                continue;
+            }
             pair_geometry
                 .grid
                 .query(i, 0.0, &mut pair_geometry.candidates);
+            if pair_geometry.candidates.is_empty() {
+                empty_rows[i] = bounds_revision;
+            }
             let mut after = i;
             loop {
                 let next_index = pair_geometry.candidates.partition_point(|&j| j <= after);
@@ -616,6 +627,11 @@ fn solve_contacts<const PROFILE: bool>(
                         .update(j, &pieces[j], 2.0 * CONTACT_BIAS_METERS);
                 }
                 if changed_i || changed_j {
+                    bounds_revision = bounds_revision.wrapping_add(1);
+                    if bounds_revision == 0 {
+                        empty_rows.fill(0);
+                        bounds_revision = 1;
+                    }
                     // Match brute-force semantics: newly reachable later IDs are
                     // visited this pass; earlier IDs wait until the next pass.
                     pair_geometry

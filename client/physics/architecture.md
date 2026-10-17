@@ -165,7 +165,17 @@ conservative rounding guard. Rotations remain covered by the bounding radius.
 Very large bodies or swept query regions (over 512 cells) use an exact linear
 fallback instead of enumerating unbounded cells; there is no population cap.
 
-Every current-pose solve rebuilds membership, retaining bucket/vector capacity.
+Every current-pose solve refreshes exact bounds. When population length and cell
+width match, unchanged cell ranges retain bucket membership; changed ranges are
+removed/reinserted, and obsolete empty buckets are pruned. A changed length or
+cell width rebuilds membership, retaining bucket/vector capacity. The local
+origin is refreshed before all bounds; no query sees a partially refreshed grid.
+Within that solve, empty spatial query rows are reused across the sixteen ordered
+passes while all center bounds remain unchanged (#255/#288). Any pair/ground
+positional correction invalidates every empty row before further reuse; the
+post-integration solve starts fresh. Only empty results are retained in O(n)
+scratch, so dense candidate storage does not grow quadratically. SAT, impulses,
+pass counts and adaptive time progression are unchanged.
 Every pair's positional/ground corrections immediately update affected bounds
 and requery the current row for later IDs. Correction-created contacts are
 therefore visited in the same pass as brute force; earlier pairs wait until the
@@ -244,6 +254,9 @@ wake contact islands before a fast object's substep; actual contacts also wake
 before applying response. For convex hulls the pre-integration wake also requires
 SAT proximity expanded by linear/angular travel and gravity over the substep;
 overlapping conservative spheres alone cannot repeatedly wake separated hulls.
+Swept activation queries return immediately when every participant is already
+awake; the query only changes sleeping flags. Mixed sleeping/awake populations
+retain all swept wake and support propagation checks.
 This wake bound does not add a CCD guarantee. Missing
 identities are pruned; streaming return starts awake and reestablishes support.
 Floor containment is checked even for sleepers. Call `wake_all` when a force or

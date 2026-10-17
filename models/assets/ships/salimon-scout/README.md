@@ -307,3 +307,23 @@ links intact. All spatial contracts and monitor UVs are preserved.
 Current export: 6,281 triangles, 116 primitives, 13 materials, 525,356 bytes.
 The [named-pair report](../../../../reports/issue-244/README.md) explains retained
 internal joins and articulated contact caps; native M1 signoff remains #229.
+
+## Option A pass (#276)
+
+The [art bible](../../../../docs/visual-style.md) owns direction. Shared materials
+now use graphite/slate, ochre mechanical accents and warm neutral interior panels.
+Broad roof/ceiling cyan panels reuse Hull Ceramic; live status/display/glow, glass
+and floor-texture roles remain unchanged. Eight owning libraries explicitly use
+flat opaque panel shading while soft seat padding retains its functional normal
+policy. No vertices, UVs, dimensions, pivots, metadata or collision changed.
+Existing broad hull/wing/engine/gear silhouettes already meet the primary-form
+policy and are intentionally retained; no extra bevels or micro geometry added.
+
+Reapply `author_option_a.py` with Blender 4.5.3, then export through the normal
+adapter and run source/modular/category checks. The recipe is visually idempotent;
+Blender save metadata/file hashes can change on another save. `styleProfile`
+opts this asset into #275 advisory measurements; all previous hard caps remain.
+The export report records measured costs and source hashes. [Before/after images
+and costs](../../../../reports/issue-276/README.md) are review candidates, not
+approved GPU baselines. Approve the #274 reference and this production pass in
+order; native M1 evidence remains #279 (coordinated with #229).

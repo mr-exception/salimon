@@ -1069,5 +1069,8 @@
     "maxNodes": 140,
     "maxTextureMemoryBytes": 1364,
     "maxDrawCalls": 2
+  },
+  "styleProfile": {
+    "name": "option-a-v1"
   }
 }

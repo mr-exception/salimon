@@ -132,6 +132,11 @@ def process(manifest, source, destination, profile='none', repo=REPO, **validato
                       candidateSha256=hashlib.sha256(staged.read_bytes()).hexdigest(),
                       semanticEquality=True, contractMetrics=contract_metrics,
                       complianceBefore=before_compliance, complianceAfter=after_compliance)
+        if 'styleProfile' in manifest:
+            from style_review import report as style_report
+            report['styleReview'] = {
+                'before': style_report(doc, binary, source.stat().st_size, manifest),
+                'after': style_report(after_doc, after_bin, staged.stat().st_size, manifest)}
         staged.replace(destination)
     return report
 

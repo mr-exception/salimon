@@ -1,0 +1,84 @@
+{
+  "after": {
+    "assetId": "ship.salimon-scout",
+    "costs": {
+      "drawCalls": 2,
+      "drawPolicy": "ship opaque + glass batches",
+      "encodedTextureBytes": 116,
+      "glbBytes": 526536,
+      "materials": 13,
+      "nodes": 140,
+      "primitiveReferences": 116,
+      "primitives": 116,
+      "textureMemoryBytes": 1364,
+      "triangles": 6281
+    },
+    "exceptions": [],
+    "measurements": {
+      "exactDuplicateMeshDefinitions": 0,
+      "flatTriangles": 6273,
+      "lodTriangles": [],
+      "meshInstances": 103,
+      "microAreaSquareMeters": 0.0001,
+      "microTriangles": 154,
+      "missingNormalTriangles": 0,
+      "referencedMeshes": 103,
+      "reusedMeshReferences": 0,
+      "smoothTriangles": 8,
+      "space": "mesh-local meters; instanced transforms/screen size not inferred",
+      "validTriangles": 6281
+    },
+    "profile": {
+      "name": "option-a-v1"
+    },
+    "unusedExceptions": [],
+    "warnings": []
+  },
+  "before": {
+    "assetId": "ship.salimon-scout",
+    "costs": {
+      "drawCalls": 2,
+      "drawPolicy": "ship opaque + glass batches",
+      "encodedTextureBytes": 116,
+      "glbBytes": 525356,
+      "materials": 13,
+      "nodes": 140,
+      "primitiveReferences": 116,
+      "primitives": 116,
+      "textureMemoryBytes": 1364,
+      "triangles": 6281
+    },
+    "exceptions": [],
+    "measurements": {
+      "exactDuplicateMeshDefinitions": 0,
+      "flatTriangles": 6273,
+      "lodTriangles": [],
+      "meshInstances": 103,
+      "microAreaSquareMeters": 0.0001,
+      "microTriangles": 154,
+      "missingNormalTriangles": 0,
+      "referencedMeshes": 103,
+      "reusedMeshReferences": 0,
+      "smoothTriangles": 8,
+      "space": "mesh-local meters; instanced transforms/screen size not inferred",
+      "validTriangles": 6281
+    },
+    "profile": {
+      "name": "option-a-v1"
+    },
+    "unusedExceptions": [],
+    "warnings": []
+  },
+  "delta": {
+    "drawCalls": 0,
+    "encodedTextureBytes": 0,
+    "glbBytes": 1180,
+    "materials": 0,
+    "nodes": 0,
+    "primitiveReferences": 0,
+    "primitives": 0,
+    "textureMemoryBytes": 0,
+    "triangles": 0
+  },
+  "historicalContractValidation": "not performed; current contract may deliberately differ"
+}

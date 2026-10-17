@@ -143,3 +143,19 @@ from shared spatial `quality` and category contracts and the five existing
 `budgets`. Current real assets declare measured Option A caps; future Option B
 replacements explicitly review their visual limits without changing meter-space
 contracts. See [cost definitions and offline reports](tools/README.md#measured-costs-and-budgets).
+
+Option A/B are art-direction labels defined by the [art bible](../docs/visual-style.md),
+not quality levels or automatic aesthetic approval.
+
+### Optional advisory style profile (#275)
+
+`styleProfile: {"name": "option-a-v1"}` opts into category-aware measurements.
+It adds no runtime data or hard geometry/material gates. Optional `exceptions`
+contain `{ "code": "micro-geometry", "reason": "Readable close-range controls" }`.
+Reasons remain visible beside measured findings; unused exceptions are reported.
+Do not copy an exception without reviewing the measured source. Assets without
+this field retain existing validity and receive cost-only reports. The profile
+name is versioned separately from the hard `visualBudget.style` vocabulary.
+See [offline style reports](tools/README.md#offline-style-review-275) for supported
+signals, limitations and commands. Hard spatial/collider/socket/glass/monitor
+contracts are unchanged.

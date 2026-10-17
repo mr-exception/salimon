@@ -1,5 +1,7 @@
 # 3D model authoring workspace
 
+Follow the authoritative [visual style](../docs/visual-style.md) for art decisions.
+
 `models/` owns editable, offline 3D art and its authoring contracts. It supports
 ships, resources, items, structures, props, characters, and vehicles without
 making a ship's cockpit or collision rules mandatory for other assets.

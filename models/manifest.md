@@ -143,3 +143,6 @@ from shared spatial `quality` and category contracts and the five existing
 `budgets`. Current real assets declare measured Option A caps; future Option B
 replacements explicitly review their visual limits without changing meter-space
 contracts. See [cost definitions and offline reports](tools/README.md#measured-costs-and-budgets).
+
+Option A/B are art-direction labels defined by the [art bible](../docs/visual-style.md),
+not quality levels or automatic aesthetic approval.

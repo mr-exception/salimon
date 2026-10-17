@@ -1,5 +1,7 @@
 # Blender and AI authoring workflow
 
+Follow the authoritative [visual style](../docs/visual-style.md) for art decisions.
+
 Blender edits offline sources. Codex may author through a configured Blender MCP
 bridge or produce reviewed Blender Python automation. A bridge is optional and
 is not a Cargo dependency, a runtime service, or an assumed built-in Blender
@@ -75,20 +77,10 @@ monitor UVs and walking clearances) independent from visual recipes. Read the
 [#224 baseline](../reports/issue-224/README.md) before scout changes. Never fix
 flicker by rescaling the ship or obscuring a competing surface.
 
-| Surface | Option A rule |
-| --- | --- |
-| Silhouette | Broad readable primary forms; secondary panels must justify their screen area. No subpixel rivets. |
-| Facets | Flat-shaded rock facets; planar ship/tool panels; sharp edges and disconnected panels are intentional. Avoid coplanar layers. |
-| Palette | Graphite (0.09,0.12,0.16), slate (0.24,0.30,0.37), cyan (0.14,0.65,0.72), ochre (0.83,0.53,0.18), linear RGB. Resource identity retains its established palette. |
-| Materials | Mostly opaque base color, selective emission for status. Scout shading currently ignores metallic/roughness and ordinary textures; do not depend on Blender PBR for gameplay readability. Preserve glass and monitor material roles. |
-| Modularity | Parameterize dimensions and recipes separately. Preserve linked scout libraries; inspect evaluated assembly and edit the owning library. |
-| Lighting | Neutral three-angle CPU reference renders, fixed exposure and key; native shader verification remains separate. |
-| Budgets | Each asset manifest's five existing limits remain hard ceilings. Ship: 6,500 triangles /124 primitives /13 materials /544 KiB GLB /64 KiB textures. Read resource/item manifests rather than imposing ship budgets. |
-
-Option B can replace visual recipes with bevels, armor and richer materials;
-this is a manual authored replacement, not an automatic upgrade. Shared spatial
-contracts and collision/interaction interfaces must stay identical. Style budget
-changes require explicit review independently of physics requirements.
+The [art bible](../docs/visual-style.md) owns silhouette, shading, palette,
+lighting and exception policies. Asset manifests own hard budgets. Option B
+changes visual recipes with deliberate review, preserving the same spatial
+interfaces; it is not an automatic upgrade.
 
 ## Local Codex bridge and headless fallback
 

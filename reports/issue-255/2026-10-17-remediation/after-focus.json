@@ -1,0 +1,79 @@
+[
+  {
+    "pid": 40515,
+    "monotonic": 173700.57061025,
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "target window bounds unavailable\n"
+  },
+  {
+    "pid": 40515,
+    "monotonic": 173701.707824541,
+    "returncode": 0,
+    "stdout": "frontmost=40515 target=40515\nposted PID=40515 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 40545,
+    "monotonic": 173704.967434083,
+    "returncode": 0,
+    "stdout": "frontmost=40545 target=40545\nposted PID=40545 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 40577,
+    "monotonic": 173708.258547083,
+    "returncode": 0,
+    "stdout": "frontmost=40577 target=40577\nposted PID=40577 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 40605,
+    "monotonic": 173711.580565166,
+    "returncode": 0,
+    "stdout": "frontmost=40605 target=40605\nposted PID=40605 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 40640,
+    "monotonic": 173715.39248975,
+    "returncode": 0,
+    "stdout": "frontmost=40640 target=40640\nposted PID=40640 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 40661,
+    "monotonic": 173718.662887916,
+    "returncode": 0,
+    "stdout": "frontmost=40661 target=40661\nposted PID=40661 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 40694,
+    "monotonic": 173721.945128041,
+    "returncode": 0,
+    "stdout": "frontmost=40694 target=40694\nposted PID=40694 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 40722,
+    "monotonic": 173725.815827,
+    "returncode": 0,
+    "stdout": "frontmost=40722 target=40722\nposted PID=40722 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 40750,
+    "monotonic": 173729.175611333,
+    "returncode": 0,
+    "stdout": "frontmost=40750 target=40750\nposted PID=40750 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 40778,
+    "monotonic": 173732.430733666,
+    "returncode": 0,
+    "stdout": "frontmost=40778 target=40778\nposted PID=40778 operation=focus\n",
+    "stderr": ""
+  }
+]

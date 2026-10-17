@@ -1,0 +1,7 @@
+PASS: complete raw/focus/accounting/comparison reproduction
+PASS: 43 raw archive SHA-256 digests and JSON payloads
+PASS: a 1,000 ms resting spike cannot alter active-only frame tails
+PASS: rejected invalid presentation
+PASS: rejected mass mismatch
+PASS: rejected missing target-PID OS focus
+PASS: affected guide/report local Markdown link targets

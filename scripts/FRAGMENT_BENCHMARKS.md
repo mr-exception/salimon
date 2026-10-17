@@ -301,6 +301,14 @@ Compare the same example at a pre-#157 revision for matrix/storage attribution.
 Native authored matrix, dense piles and active interactions still require the
 reference commands above. The spatial grid does not imply linear dense-pile cost.
 
+For #255/#288 empty-contact attribution, run
+`cargo test --release -p salimon-physics separated_sphere_contact_cost --locked -- --ignored --nocapture`.
+The probe uses 500/1,000 separated analytic spheres, ten warmups and 100 fresh
+16 ms replays. It reports solver/contact p95 alongside isolated repeated spatial
+queries, all-awake swept activation queries and exact grid refresh. Setup is
+excluded; the old repeated-query pattern remains an attribution control. This
+does not establish authored cargo or native FPS acceptance. See the
+[matched M1 evidence and remaining signoff](../reports/issue-255/2026-10-17-remediation/README.md).
 
 ## Tick/backlog diagnosis (#159)
 

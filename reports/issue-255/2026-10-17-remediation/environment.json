@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-17",
+  "base_revision": "ba7a11664d5c34c8c73c8968a724d3e471b12b00",
+  "python": "3.14.2",
+  "before_binary_sha256": "a7e2bdbec8d32dff611e870daebf2b42465c507c7c1277c737203164f83dae4b",
+  "machine": "Hardware:\n\n    Hardware Overview:\n\n      Model Name: iMac\n      Model Identifier: iMac21,1\n      Model Number: Z12X002L9GR/A\n      Chip: Apple M1\n      Total Number of Cores: 8 (4 performance and 4 efficiency)\n      Memory: 16 GB\n      System Firmware Version: 13822.61.10\n      OS Loader Version: 13822.61.10\n      Activation Lock Status: Disabled\n\nGraphics/Displays:\n\n    Apple M1:\n\n      Chipset Model: Apple M1\n      Type: GPU\n      Bus: Built-In\n      Total Number of Cores: 8\n      Vendor: Apple (0x106b)\n      Metal Support: Metal 4\n      Displays:\n        iMac:\n          Display Type: Built-In Retina LCD\n          Resolution: Retina 4.5K (4480 x 2520)\n          Main Display: Yes\n          Mirror: Off\n          Online: Yes\n          Automatically Adjust Brightness: Yes\n          Connection Type: Internal\n        LF27T450F:\n          Resolution: 1920 x 1080 (1080p FHD - Full High Definition)\n          UI Looks like: 1920 x 1080 @ 75.00Hz\n          Mirror: Off\n          Online: Yes\n          Rotation: Supported\n",
+  "power": "Now drawing from 'AC Power'\n",
+  "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded\n",
+  "os": "ProductName:\t\tmacOS\nProductVersion:\t\t26.2\nBuildVersion:\t\t25C56\n",
+  "rust": "rustc 1.89.0 (29483883e 2025-08-04)\n"
+}

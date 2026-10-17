@@ -1,0 +1,9 @@
+[
+  {
+    "pid": 44351,
+    "monotonic": 174282.635501791,
+    "returncode": 0,
+    "stdout": "frontmost=44351 target=44351\nposted PID=44351 operation=focus\n",
+    "stderr": ""
+  }
+]

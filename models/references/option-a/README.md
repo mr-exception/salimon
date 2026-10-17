@@ -37,3 +37,9 @@ its own PR. Approve palette/composition and that PR explicitly before merging.
 For production renders after an authored edit use `--production`; identical
 cameras/lighting allow comparison to these candidates. GPU baseline approval
 uses `scenarios/visual/README.md` and remains separate from these Blender previews.
+
+The #274 images record the pre-migration sources in PR #281. To reconstruct that
+historical comparison, use that PR's revision; rerunning on a later asset revision
+intentionally previews the current sources. #276 production comparisons use the
+same camera/light recipe, with before images preserved in its report. Neither
+report promotes candidates into approved GPU baselines.

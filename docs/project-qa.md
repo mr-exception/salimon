@@ -9,6 +9,26 @@
 - Once answered, remove the question from this page and incorporate the decision into the relevant project document and/or task.
 - Do not keep resolved decisions, implementation notes, task history, or technical summaries here.
 ## Open questions
+### What budget should complete active 500-piece M1 signoff (#255)?
+
+[The latest native evidence](../reports/issue-255/2026-10-17-remediation/README.md)
+removes the measured redundant physics work but retains an admitted active-only
+frame p95 of 24.416 ms and physics p95 of 5.741 ms. These exceed the existing
+17.5 ms settled cadence guidance and provisional 5 ms physics partition; neither
+limit is changed by the remediation. The benchmark guide requires an explicitly
+reviewed active budget, which has not yet been approved.
+Matched empty launch prefixes have frame p95 23.897 ms, so the long settled
+reference and short naturally moving launch window also have different cadence
+coverage. Six whole-window CPU-render relative comparisons still fail their
+existing 20% check; the report retains these failures separately from absolute
+component guidance.
+
+Decide whether signoff must satisfy those existing reference values after further
+profiling, or whether a separately justified active/launch-period budget should
+be reviewed using matched empty-launch evidence. Until that decision and its
+measurements pass, keep [#255](https://github.com/mr-exception/salimon/issues/255)
+open; a faster solver alone is not active cadence acceptance.
+
 ### Where should dedicated physical storage go after the cargo-room removal?
 
 The current scout revision removes the dedicated port cargo room and its storage

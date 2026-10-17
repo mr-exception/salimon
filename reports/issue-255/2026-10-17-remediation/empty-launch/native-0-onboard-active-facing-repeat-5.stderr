@@ -1,0 +1,5 @@
+[2026-10-17T16:01:43Z INFO  salimon_client] starting Salimon native client
+[2026-10-17T16:01:43Z INFO  salimon_client::app] native window created: physical_size=1920x1080 scale_factor=2.00
+[2026-10-17T16:01:43Z INFO  salimon_client::app] renderer ready: adapter="Apple M1" backend=Metal device_type=IntegratedGpu gpu_timestamps=true
+[2026-10-17T16:01:43Z INFO  salimon_client::app] application resumed
+[2026-10-17T16:01:46Z INFO  salimon_client::app] application exiting cleanly

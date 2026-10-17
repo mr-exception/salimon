@@ -211,6 +211,11 @@ impl Activation {
     // Conservative swept-sphere wake, before integration, includes fast contacts.
     // Narrow phase still determines actual collision response.
     pub(crate) fn impacts(&mut self, pieces: &[ObjectState], dt: f64) {
+        // This query can only wake sleeping participants. Once all are awake,
+        // there is no activation state to change, even during a fast sweep.
+        if !self.sleeping.iter().any(|asleep| *asleep) {
+            return;
+        }
         let active: Vec<_> = self
             .sleeping
             .iter()

@@ -21,14 +21,30 @@ pub(crate) struct Grid {
     cell: f64,
     origin: [f64; 3],
     radii: Vec<f64>,
+    obsolete_cells: bool,
 }
 impl Grid {
     pub(crate) fn reset(&mut self, pieces: &[ObjectState], gap: f64) {
         self.radii.clear();
         self.radii.extend(pieces.iter().map(|p| p.radius));
         self.radii.sort_unstable_by(f64::total_cmp);
-        self.cell = (2.0 * self.radii.get(pieces.len() / 2).copied().unwrap_or(1.0)).max(1e-6);
+        let cell = (2.0 * self.radii.get(pieces.len() / 2).copied().unwrap_or(1.0)).max(1e-6);
+        let reuse = self.cell == cell && self.bounds.len() == pieces.len();
+        self.cell = cell;
         self.origin = pieces.first().map_or([0.0; 3], |p| p.position);
+        if reuse {
+            // Refresh every exact AABB in the new local origin, but keep bucket
+            // membership when its cell range is unchanged. Queries run only
+            // after all rows have been refreshed.
+            for (i, p) in pieces.iter().enumerate() {
+                self.update(i, p, gap);
+            }
+            if self.obsolete_cells {
+                self.cells.retain(|_, bucket| !bucket.is_empty());
+                self.obsolete_cells = false;
+            }
+            return;
+        }
         // Retain bucket vectors within a solve; discard obsolete cells between
         // poses so moving populations cannot accumulate unbounded empty buckets.
         for bucket in self.cells.values_mut() {
@@ -41,6 +57,7 @@ impl Grid {
             self.insert(i);
         }
         self.cells.retain(|_, bucket| !bucket.is_empty());
+        self.obsolete_cells = false;
     }
     fn bound(&self, p: &ObjectState, gap: f64) -> Bounds {
         // Relative coordinates retain precision at distant planet/ship anchors.
@@ -85,6 +102,7 @@ impl Grid {
             self.bounds[i] = next;
             return;
         }
+        self.obsolete_cells = true;
         if let Some((lo, hi)) = self.keys(self.bounds[i]) {
             Self::each_key(lo, hi, |key| {
                 if let Some(bucket) = self.cells.get_mut(&key) {
@@ -264,6 +282,45 @@ mod tests {
         }
     }
     #[test]
+    fn refreshed_membership_matches_fresh_grid_after_origin_shape_and_population_changes() {
+        let mut pieces: Vec<_> = (0..40)
+            .map(|i| cube([1e12 + i as f64 * 0.1, 1.0, 0.0], 0.1))
+            .collect();
+        let mut retained = Grid::default();
+        let mut actual = Vec::new();
+        let mut expected = Vec::new();
+        for step in 0..20 {
+            for (i, p) in pieces.iter_mut().enumerate() {
+                p.position[0] += if step < 5 { 0.3 } else { (i % 3) as f64 * 0.07 };
+                if step == 7 {
+                    p.radius *= 2.0;
+                }
+            }
+            if step == 9 {
+                pieces[0].radius = 20.0; // Normal-to-oversize membership.
+            } else if step == 10 {
+                pieces[0].radius = 0.01; // Oversize-to-normal membership.
+                pieces.reverse();
+            } else if step == 12 {
+                pieces.truncate(21);
+            } else if step == 14 {
+                pieces.push(cube([1e12, 1.0, 0.0], 0.2));
+            }
+            let gap = if step % 2 == 0 { 0.001 } else { 0.0 };
+            retained.reset(&pieces, gap);
+            let mut fresh = Grid::default();
+            fresh.reset(&pieces, gap);
+            assert!(retained.cells.values().all(|bucket| !bucket.is_empty()));
+            for reach in [0.0, 0.1, 100.0] {
+                for i in 0..pieces.len() {
+                    retained.query(i, reach, &mut actual);
+                    fresh.query(i, reach, &mut expected);
+                    assert_eq!(actual, expected, "step {step}, row {i}, reach {reach}");
+                }
+            }
+        }
+    }
+    #[test]
     fn separated_populations_have_no_pair_storage_or_pair_visits() {
         for count in [500, 1000] {
             let mut pieces: Vec<_> = (0..count)
@@ -275,6 +332,47 @@ mod tests {
             assert_eq!(stats.matrix_allocations, 0);
         }
     }
+    #[test]
+    fn empty_earlier_row_is_requeried_after_a_later_pair_correction() {
+        let mut pieces = vec![
+            cube([0.0, 1.0, 0.0], 0.2),
+            cube([0.39, 1.0, 0.0], 0.2),
+            cube([0.40, 1.0, 0.0], 0.2),
+        ];
+        for p in &mut pieces {
+            p.hull = None;
+        }
+        let mut grid = Grid::default();
+        grid.reset(&pieces, 2.0 * crate::CONTACT_BIAS_METERS);
+        let mut candidates = Vec::new();
+        grid.query(0, 0.0, &mut candidates);
+        assert!(candidates.is_empty());
+        let original = pieces[0].position;
+        let mut brute = pieces.clone();
+        advance_profiled(&mut pieces, Duration::from_millis(1), |_, _| true);
+        reference(&mut brute, Duration::from_millis(1));
+        assert_eq!(pieces, brute);
+        assert!(pieces[0].position[0] < original[0]);
+    }
+
+    #[test]
+    fn empty_rows_are_refreshed_after_integration_and_between_updates() {
+        let mut pieces = vec![cube([0.0, 1.0, 0.0], 0.2), cube([0.36, 1.0, 0.0], 0.2)];
+        for (i, p) in pieces.iter_mut().enumerate() {
+            p.hull = None;
+            p.velocity[0] = if i == 0 { 1.0 } else { -1.0 };
+        }
+        let mut brute = pieces.clone();
+        let mut contacts = 0;
+        for _ in 0..10 {
+            contacts +=
+                advance_profiled(&mut pieces, Duration::from_millis(16), |_, _| true).contacts;
+            reference(&mut brute, Duration::from_millis(16));
+            assert_eq!(pieces, brute);
+        }
+        assert!(contacts > 0);
+    }
+
     #[test]
     #[ignore = "CPU-only sparse-storage versus spatial-filtering attribution"]
     fn candidate_filtering_cost() {
@@ -324,6 +422,92 @@ mod tests {
                     );
                 }
             }
+        }
+    }
+
+    #[test]
+    #[ignore = "CPU-only attribution of repeated empty contact queries (#255)"]
+    fn separated_sphere_contact_cost() {
+        use std::{hint::black_box, time::Instant};
+        println!(
+            "count,samples,total_p95_ms,contact_p95_ms,query_replay_p95_ms,wake_replay_p95_ms,reset_replay_p95_ms,substeps,passes"
+        );
+        for count in [500, 1000] {
+            let initial: Vec<_> = (0..count)
+                .map(|i| {
+                    let mut p = cube([(i % 25) as f64 * 0.12, 1.0, (i / 25) as f64 * 0.12], 0.02);
+                    p.hull = None;
+                    p.radius = 0.01;
+                    p.velocity = [0.0, 0.4, 0.0];
+                    p.angular_velocity = [0.0, 0.3, 0.0];
+                    p
+                })
+                .collect();
+            let mut total = Vec::new();
+            let mut contact = Vec::new();
+            let mut queries = Vec::new();
+            let mut wakes = Vec::new();
+            let mut resets = Vec::new();
+            let mut stats = crate::StepStats::default();
+            let mut grid = Grid::default();
+            let mut candidates = Vec::new();
+            for sample in 0..110 {
+                let mut pieces = initial.clone();
+                let start = Instant::now();
+                stats = advance_profiled(&mut pieces, Duration::from_millis(16), |_, _| true);
+                let elapsed = start.elapsed();
+                assert_eq!(stats.pair_visits, 0);
+                // Replay the pre-#255 repeated-query path on the same separated
+                // bounds. This isolates query cost, excluding response/integration.
+                let start = Instant::now();
+                for _ in 0..stats.solver_passes / 16 {
+                    grid.reset(&initial, 2.0 * crate::CONTACT_BIAS_METERS);
+                    for _ in 0..16 {
+                        for i in 0..count {
+                            grid.query(i, 0.0, &mut candidates);
+                            black_box(&candidates);
+                            assert!(candidates.is_empty());
+                        }
+                    }
+                }
+                let query_elapsed = start.elapsed();
+                let ids: Vec<_> = (0..count).collect();
+                let mut tracker = crate::SleepTracker::default();
+                let mut activation = tracker.prepare(&ids, &initial);
+                let start = Instant::now();
+                for _ in 0..stats.substeps {
+                    activation.impacts(&initial, 0.002);
+                    activation.impacts(&initial, 0.0);
+                    activation.impacts(&initial, 0.0);
+                }
+                let wake_elapsed = start.elapsed();
+                let start = Instant::now();
+                for _ in 0..stats.solver_passes / 16 {
+                    grid.reset(black_box(&initial), 2.0 * crate::CONTACT_BIAS_METERS);
+                }
+                if sample >= 10 {
+                    total.push(elapsed.as_secs_f64() * 1000.0);
+                    contact.push(stats.contact_time.as_secs_f64() * 1000.0);
+                    queries.push(query_elapsed.as_secs_f64() * 1000.0);
+                    wakes.push(wake_elapsed.as_secs_f64() * 1000.0);
+                    resets.push(start.elapsed().as_secs_f64() * 1000.0);
+                }
+            }
+            total.sort_by(f64::total_cmp);
+            contact.sort_by(f64::total_cmp);
+            queries.sort_by(f64::total_cmp);
+            wakes.sort_by(f64::total_cmp);
+            resets.sort_by(f64::total_cmp);
+            println!(
+                "{count},100,{:.6},{:.6},{:.6},{:.6},{:.6},{},{}",
+                total[94],
+                contact[94],
+                queries[94],
+                wakes[94],
+                resets[94],
+                stats.substeps,
+                stats.solver_passes
+            );
         }
     }
 }

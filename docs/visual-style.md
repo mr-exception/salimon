@@ -99,3 +99,52 @@ approval. Its existing node, texture-memory and consumer draw caps and the five
 signals (density, normal alignment, reuse, LOD cost); shape, color and quality
 remain review decisions. Purposeful exceptions require an asset-local reason.
 See [manifest](../models/manifest.md) and [shared contracts](../models/contracts.md).
+
+The production tool/deposit palette recipe and preserved shared-sphere policy
+are documented in [resource Option A](../models/assets/resources/OPTION-A.md).
+
+## Procedural body and terrain recipes (#278)
+
+`client/renderer/src/planet_style.rs` owns the compact version-1 visual recipes;
+`surface_textures.rs` deterministically generates their shared 512×256 linear RGB
+maps and unchanged mip chains. No textures/mesh payloads cross a server boundary.
+These are generic renderer materials. Runtime's `app/scene.rs` selects them for
+bodies; unknown future bodies can select an existing preset. A future custom
+recipe API must validate the version, finite [0,1] colors and seed and key the
+texture cache by the complete visual recipe. Do not substitute its visual seed
+for the authoritative terrain seed/definition or resource-generation identity.
+No new persistence/network contract is introduced here.
+
+| Body / material | Visual seed | Linear dark → light palette |
+| --- | ---: | --- |
+| Mercury / stone | 91 | (0.25,0.23,0.21) → (0.55,0.51,0.45) |
+| Venus / ochre | 734378 | (0.38,0.24,0.10) → (0.72,0.53,0.25) |
+| Earth / oceanic | 1468665 | (0.03,0.12,0.25) → (0.08,0.30,0.46) |
+| Earth / land color region | same | (0.18,0.27,0.18) → (0.43,0.48,0.28) |
+| Moon / slate | 2202952 | (0.24,0.27,0.30) → (0.56,0.57,0.53) |
+| Mars / rust | 2937239 | (0.32,0.13,0.07) → (0.66,0.34,0.17) |
+| Sun / emissive | 3671526 | unchanged emissive recipe |
+
+Five deliberate swatches per geological region replace fine albedo noise. The
+Earth color-region split remains the seeded broad field at 0.50, independent of
+physical ground; it implies no new ocean or biome simulation. Longitude/poles
+sample the same continuous 3D field. Shared texture filtering/mips avoid hard
+screen-distance switches. Existing 128 m detail is restrained to a 0.94–1.06
+multiplier on solids, and Sun detail/emission remains unchanged.
+
+Near terrain derives one outward face normal from derivatives of the already
+morphed geometric triangle. There is no mesh expansion, additional vertex data,
+or displacement. Full face shading below 80 m fades continuously to sampled
+normals by 240 m; startup/outer-cap geometry blends also suppress facets. Hills,
+craters and their surrounding terrain use the same treatment. Deposits keep
+actual authored silhouettes; distant analytic planets intentionally retain
+continuous spherical silhouettes and rationalized depth. Normals-only styling
+does not add rocky silhouette geometry or change walking/landing contact.
+
+Preserve the existing stable patch keys, shared-edge samples and 2:1 fans,
+4,096–6,144 m outer morph, 0.25 s activation blend, conservative sphere envelope,
+and upload/memory limits in [terrain validation](terrain-validation.md). No
+randomness is generated per frame and no LOD triangle is moved for art direction.
+The [GPU comparison recipe and report](../reports/issue-278/README.md) describes
+matched near/far/orbit scenes, fade-boundary continuity, unchanged coverage and
+costs. Native M1 gameplay/visual approval remains #279/#229.

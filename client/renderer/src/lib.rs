@@ -17,6 +17,7 @@ mod ship_mesh;
 mod spheres;
 mod terrain;
 pub use terrain::{TerrainMask, TerrainPatch, TerrainPatchKey, TerrainVertex};
+mod planet_style;
 mod surface_textures;
 
 use std::error::Error;

@@ -321,3 +321,13 @@ shader multiplies baked facet color by tint. Deposits/legacy probes use white.
 All live fragment colors/radii share one resident mesh and one visible batch.
 `side_meters` is uniform asset scale, radius/0.48 for the new sphere. Runtime
 maps mass/density and current camera/tool attachment, never renderer gameplay.
+
+## Procedural Option A style (#278)
+
+`planet_style.rs` holds compact, immutable version/seed/palette recipes indexed by
+generic `SurfaceMaterial`; runtime retains celestial mapping. `surface_textures.rs`
+generates the shared broad albedo swatches. Terrain's existing triangle positions
+supply derivative face normals, smoothly faded with camera distance and existing
+geometry morph. GPU patch vertex/uniform layout, depth, caches and world physics
+contracts do not change. See the [art bible](../../docs/visual-style.md#procedural-body-and-terrain-recipes-278)
+for exact palettes, fades and future external-body configuration constraints.

@@ -1,7 +1,7 @@
 use super::*;
 use std::{io::Write, time::Instant};
 
-fn camera() -> CameraFrame {
+pub(super) fn camera() -> CameraFrame {
     CameraFrame {
         position_meters: [1e12; 3],
         target_meters: [1e12, 1e12, 1e12 - 1.0],
@@ -10,7 +10,7 @@ fn camera() -> CameraFrame {
         near_plane_meters: 0.1,
     }
 }
-fn workload(count: usize, preview: bool, legacy: bool) -> Vec<ResourceMeshInstance> {
+pub(super) fn workload(count: usize, preview: bool, legacy: bool) -> Vec<ResourceMeshInstance> {
     (0..count + usize::from(preview))
         .map(|i| {
             // Matched 10 kg material, fixed camera/poses; old enlargement is deliberate.

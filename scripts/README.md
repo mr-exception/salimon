@@ -609,3 +609,8 @@ the fragment benchmark for independently sampled native frame pacing.
 
 Production GPU model captures, offline visual comparisons and frozen-frame
 flicker checks: [visual fixture workflow](../scenarios/visual/README.md).
+
+`compare_terrain_style.py` compares offscreen `terrain_style_reference` captures:
+matched scene coverage/costs, color changes, contact sheets and timing records.
+Requires the existing optional Pillow dependency. See
+[terrain validation](../docs/terrain-validation.md#option-a-shader-evidence-278).

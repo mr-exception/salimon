@@ -1,4 +1,4 @@
-//! Original, deterministic material-demo textures. No external imagery or assets.
+//! Original deterministic Option A palettes; shared by analytic bodies and terrain.
 
 pub(crate) const WIDTH: u32 = 512;
 pub(crate) const HEIGHT: u32 = 256;
@@ -39,21 +39,24 @@ fn noise(point: [f64; 3], seed: u32) -> f64 {
 }
 
 fn albedo(normal: [f64; 3], layer: u32) -> [u8; 4] {
-    let seed = layer.wrapping_mul(734_287).wrapping_add(91);
-    let broad = noise(normal.map(|x| x * 4.0 + 7.0), seed);
-    let medium = noise(normal.map(|x| x * 18.0 + 3.0), seed + 1);
-    let fine = noise(normal.map(|x| x * 70.0), seed + 2);
-    let variation = 0.55 * broad + 0.3 * medium + 0.15 * fine;
-    let (dark, light) = match layer {
-        0 => ([0.25, 0.23, 0.21], [0.65, 0.60, 0.53]),
-        1 => ([0.38, 0.18, 0.06], [0.85, 0.63, 0.27]),
-        2 if broad < 0.50 => ([0.02, 0.09, 0.27], [0.05, 0.30, 0.57]),
-        2 => ([0.10, 0.23, 0.12], [0.47, 0.53, 0.25]),
-        3 => ([0.24, 0.25, 0.27], [0.70, 0.69, 0.63]),
-        4 => ([0.32, 0.07, 0.035], [0.80, 0.32, 0.12]),
-        _ => ([0.95, 0.31, 0.035], [1.0, 0.86, 0.22]),
+    let style = crate::planet_style::STYLES[layer.min(5) as usize];
+    debug_assert_eq!(style.version, 1);
+    let broad = noise(normal.map(|x| x * 4.0 + 7.0), style.seed);
+    let medium = noise(normal.map(|x| x * 18.0 + 3.0), style.seed + 1);
+    let palette = if broad >= 0.50 {
+        style.land.unwrap_or(style.palette)
+    } else {
+        style.palette
     };
-    let t = ((variation - 0.25) * 2.0).clamp(0.0, 1.0);
+    let [dark, light] = palette;
+    let t = if layer == 5 {
+        let fine = noise(normal.map(|x| x * 70.0), style.seed + 2);
+        ((0.55 * broad + 0.3 * medium + 0.15 * fine - 0.25) * 2.0).clamp(0.0, 1.0)
+    } else {
+        // Five deliberate swatches; mip filtering blends continuously at distance.
+        let variation = 0.75 * broad + 0.25 * medium;
+        ((((variation - 0.25) * 2.0).clamp(0.0, 1.0) * 4.0).round()) / 4.0
+    };
     let rgb: [u8; 3] =
         std::array::from_fn(|i| ((dark[i] + (light[i] - dark[i]) * t) * 255.0) as u8);
     [rgb[0], rgb[1], rgb[2], 255]
@@ -117,6 +120,31 @@ pub(crate) fn mip_chain(layer: u32) -> Vec<(u32, u32, Vec<u8>)> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn fixed_style_scene_texels_are_deterministic() {
+        let expected = [
+            [[140, 130, 114, 255], [63, 58, 53, 255], [82, 76, 68, 255]],
+            [[118, 79, 35, 255], [183, 135, 63, 255], [161, 116, 54, 255]],
+            [[61, 82, 52, 255], [93, 109, 65, 255], [14, 53, 90, 255]],
+            [
+                [102, 107, 105, 255],
+                [142, 145, 135, 255],
+                [102, 107, 105, 255],
+            ],
+            [[124, 59, 30, 255], [81, 33, 17, 255], [168, 86, 43, 255]],
+            [
+                [250, 166, 38, 255],
+                [249, 155, 34, 255],
+                [247, 131, 26, 255],
+            ],
+        ];
+        for layer in 0..6 {
+            let values =
+                [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.36, 0.48, 0.80]].map(|n| albedo(n, layer));
+            assert_eq!(values, expected[layer as usize], "material {layer}");
+        }
+    }
+
     #[test]
     fn generic_materials_are_distinct_and_mip_chains_end_at_one_texel() {
         let mut averages = Vec::new();

@@ -85,3 +85,14 @@ never invoke Blender. Reviewed native before/after evidence and limits are in
 Reconstruction removes collapsed side-panel bevel triangles before saving.
 The degenerate warning allowance is removed; the three remaining counted pairs
 are opposing rear/attachment caps. See the [classification and validation](../../../../reports/issue-244/README.md).
+
+## Option A surface pass (#277)
+
+The saved source/export now uses graphite/slate housing, dark ribbed grip and
+steel surfaces; broad atlas seams replace stochastic grain/scuffs. All geometry,
+UVs, status regions and grip remain unchanged. The texture cost and current GLB
+size supersede the historical #142 numbers above; see the
+[resource style guide](../../resources/OPTION-A.md) and
+[comparison report](../../../../reports/issue-277/README.md). After reconstructing
+historical geometry, reapply `models/tools/author_resources_option_a.py`, then
+export and regenerate the icon. No normal build invokes Blender.

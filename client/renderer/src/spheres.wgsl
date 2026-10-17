@@ -91,7 +91,9 @@ fn fs_main(in: VertexOutput) -> FragmentOutput {
     let detail = weights.x * textureSampleLevel(albedo,detail_sampler,fract(tile.yz),6,detail_level).r
         + weights.y * textureSampleLevel(albedo,detail_sampler,fract(tile.xz),6,detail_level).r
         + weights.z * textureSampleLevel(albedo,detail_sampler,fract(tile.xy),6,detail_level).r;
-    let surface = base * (0.65 + 0.7 * detail);
+    // Quiet detail keeps broad palette planes readable; retain Sun appearance.
+    let detail_gain = mix(0.94 + 0.12 * detail, 0.65 + 0.7 * detail, in.distance_altitude_material.w);
+    let surface = base * detail_gain;
     let to_light = in.light_position.xyz - normal;
     let light_direction = to_light / max(length(to_light),0.00001);
     let diffuse = max(dot(normal,light_direction),0.0);

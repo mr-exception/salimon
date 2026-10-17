@@ -90,3 +90,13 @@ meter-scale terrain by adding an `f32` radius to a large `f32` center.
 The existing sphere path deliberately does not claim terrain/elevation support.
 It establishes stable bounds, surface depth, body-local material coordinates,
 and an isolated presentation contract on which that work can build.
+
+## Option A styling (#278)
+
+The versioned generic palettes and explicit visual seeds live in `planet_style.rs`;
+[the art bible](../../docs/visual-style.md#procedural-body-and-terrain-recipes-278)
+owns body mapping, palette/normal policy and limitations. Solids use five broad
+swatches per color region, shared with streamed terrain. Texture dimensions,
+linear-color mip filtering, instance layout, body-relative detail origin,
+intersection/depth, continuous silhouettes and emissive Sun are preserved.
+No geometric tessellation or new draw is added for distant faceting.

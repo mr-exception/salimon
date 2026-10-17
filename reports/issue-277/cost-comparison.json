@@ -1,0 +1,1178 @@
+[
+  {
+    "before": {
+      "assetId": "resource.iron-deposit-ledge",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 52,
+        "nodes": 3,
+        "primitives": 3,
+        "materials": 3,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 5612,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 3
+      },
+      "measurements": {
+        "flatTriangles": 41,
+        "smoothTriangles": 11,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 52,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "after": {
+      "assetId": "resource.iron-deposit-ledge",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 52,
+        "nodes": 3,
+        "primitives": 3,
+        "materials": 3,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 5628,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 3
+      },
+      "measurements": {
+        "flatTriangles": 41,
+        "smoothTriangles": 11,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 52,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "delta": {
+      "triangles": 0,
+      "nodes": 0,
+      "primitives": 0,
+      "materials": 0,
+      "encodedTextureBytes": 0,
+      "textureMemoryBytes": 0,
+      "glbBytes": 16,
+      "drawCalls": 0,
+      "primitiveReferences": 0
+    },
+    "positionsIndicesUVsAndNodesIdentical": true
+  },
+  {
+    "before": {
+      "assetId": "resource.iron-deposit-nodule",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 26,
+        "nodes": 3,
+        "primitives": 3,
+        "materials": 3,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 4248,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 3
+      },
+      "measurements": {
+        "flatTriangles": 20,
+        "smoothTriangles": 6,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 26,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "after": {
+      "assetId": "resource.iron-deposit-nodule",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 26,
+        "nodes": 3,
+        "primitives": 3,
+        "materials": 3,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 4260,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 3
+      },
+      "measurements": {
+        "flatTriangles": 20,
+        "smoothTriangles": 6,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 26,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "delta": {
+      "triangles": 0,
+      "nodes": 0,
+      "primitives": 0,
+      "materials": 0,
+      "encodedTextureBytes": 0,
+      "textureMemoryBytes": 0,
+      "glbBytes": 12,
+      "drawCalls": 0,
+      "primitiveReferences": 0
+    },
+    "positionsIndicesUVsAndNodesIdentical": true
+  },
+  {
+    "before": {
+      "assetId": "resource.iron-deposit-rubble",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 130,
+        "nodes": 3,
+        "primitives": 3,
+        "materials": 3,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 9696,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 3
+      },
+      "measurements": {
+        "flatTriangles": 100,
+        "smoothTriangles": 30,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 130,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "after": {
+      "assetId": "resource.iron-deposit-rubble",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 130,
+        "nodes": 3,
+        "primitives": 3,
+        "materials": 3,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 9708,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 3
+      },
+      "measurements": {
+        "flatTriangles": 100,
+        "smoothTriangles": 30,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 130,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "delta": {
+      "triangles": 0,
+      "nodes": 0,
+      "primitives": 0,
+      "materials": 0,
+      "encodedTextureBytes": 0,
+      "textureMemoryBytes": 0,
+      "glbBytes": 12,
+      "drawCalls": 0,
+      "primitiveReferences": 0
+    },
+    "positionsIndicesUVsAndNodesIdentical": true
+  },
+  {
+    "before": {
+      "assetId": "resource.iron-deposit-vein",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 52,
+        "nodes": 3,
+        "primitives": 3,
+        "materials": 3,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 5612,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 3
+      },
+      "measurements": {
+        "flatTriangles": 40,
+        "smoothTriangles": 12,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 52,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "after": {
+      "assetId": "resource.iron-deposit-vein",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 52,
+        "nodes": 3,
+        "primitives": 3,
+        "materials": 3,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 5624,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 3
+      },
+      "measurements": {
+        "flatTriangles": 40,
+        "smoothTriangles": 12,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 52,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "delta": {
+      "triangles": 0,
+      "nodes": 0,
+      "primitives": 0,
+      "materials": 0,
+      "encodedTextureBytes": 0,
+      "textureMemoryBytes": 0,
+      "glbBytes": 12,
+      "drawCalls": 0,
+      "primitiveReferences": 0
+    },
+    "positionsIndicesUVsAndNodesIdentical": true
+  },
+  {
+    "before": {
+      "assetId": "resource.silicate-deposit-boulder",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 38,
+        "nodes": 3,
+        "primitives": 2,
+        "materials": 2,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 4028,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 2
+      },
+      "measurements": {
+        "flatTriangles": 25,
+        "smoothTriangles": 13,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 38,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "after": {
+      "assetId": "resource.silicate-deposit-boulder",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 38,
+        "nodes": 3,
+        "primitives": 2,
+        "materials": 2,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 4016,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 2
+      },
+      "measurements": {
+        "flatTriangles": 25,
+        "smoothTriangles": 13,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 38,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "delta": {
+      "triangles": 0,
+      "nodes": 0,
+      "primitives": 0,
+      "materials": 0,
+      "encodedTextureBytes": 0,
+      "textureMemoryBytes": 0,
+      "glbBytes": -12,
+      "drawCalls": 0,
+      "primitiveReferences": 0
+    },
+    "positionsIndicesUVsAndNodesIdentical": true
+  },
+  {
+    "before": {
+      "assetId": "resource.silicate-deposit-ridge",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 114,
+        "nodes": 3,
+        "primitives": 2,
+        "materials": 2,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 7848,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 2
+      },
+      "measurements": {
+        "flatTriangles": 73,
+        "smoothTriangles": 41,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 114,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "after": {
+      "assetId": "resource.silicate-deposit-ridge",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 114,
+        "nodes": 3,
+        "primitives": 2,
+        "materials": 2,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 7832,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 2
+      },
+      "measurements": {
+        "flatTriangles": 73,
+        "smoothTriangles": 41,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 114,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "delta": {
+      "triangles": 0,
+      "nodes": 0,
+      "primitives": 0,
+      "materials": 0,
+      "encodedTextureBytes": 0,
+      "textureMemoryBytes": 0,
+      "glbBytes": -16,
+      "drawCalls": 0,
+      "primitiveReferences": 0
+    },
+    "positionsIndicesUVsAndNodesIdentical": true
+  },
+  {
+    "before": {
+      "assetId": "resource.silicate-deposit-scree",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 190,
+        "nodes": 3,
+        "primitives": 2,
+        "materials": 2,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 11664,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 2
+      },
+      "measurements": {
+        "flatTriangles": 125,
+        "smoothTriangles": 65,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 190,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "after": {
+      "assetId": "resource.silicate-deposit-scree",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 190,
+        "nodes": 3,
+        "primitives": 2,
+        "materials": 2,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 11652,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 2
+      },
+      "measurements": {
+        "flatTriangles": 125,
+        "smoothTriangles": 65,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 190,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "delta": {
+      "triangles": 0,
+      "nodes": 0,
+      "primitives": 0,
+      "materials": 0,
+      "encodedTextureBytes": 0,
+      "textureMemoryBytes": 0,
+      "glbBytes": -12,
+      "drawCalls": 0,
+      "primitiveReferences": 0
+    },
+    "positionsIndicesUVsAndNodesIdentical": true
+  },
+  {
+    "before": {
+      "assetId": "resource.silicate-deposit-slab",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 76,
+        "nodes": 3,
+        "primitives": 2,
+        "materials": 2,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 5932,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 2
+      },
+      "measurements": {
+        "flatTriangles": 56,
+        "smoothTriangles": 20,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 76,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "after": {
+      "assetId": "resource.silicate-deposit-slab",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 76,
+        "nodes": 3,
+        "primitives": 2,
+        "materials": 2,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 5920,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 2
+      },
+      "measurements": {
+        "flatTriangles": 56,
+        "smoothTriangles": 20,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 76,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "delta": {
+      "triangles": 0,
+      "nodes": 0,
+      "primitives": 0,
+      "materials": 0,
+      "encodedTextureBytes": 0,
+      "textureMemoryBytes": 0,
+      "glbBytes": -12,
+      "drawCalls": 0,
+      "primitiveReferences": 0
+    },
+    "positionsIndicesUVsAndNodesIdentical": true
+  },
+  {
+    "before": {
+      "assetId": "resource.water-ice-deposit-crown",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 128,
+        "nodes": 3,
+        "primitives": 2,
+        "materials": 2,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 8620,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 2
+      },
+      "measurements": {
+        "flatTriangles": 128,
+        "smoothTriangles": 0,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 128,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "after": {
+      "assetId": "resource.water-ice-deposit-crown",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 128,
+        "nodes": 3,
+        "primitives": 2,
+        "materials": 2,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 8636,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 2
+      },
+      "measurements": {
+        "flatTriangles": 128,
+        "smoothTriangles": 0,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 128,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "delta": {
+      "triangles": 0,
+      "nodes": 0,
+      "primitives": 0,
+      "materials": 0,
+      "encodedTextureBytes": 0,
+      "textureMemoryBytes": 0,
+      "glbBytes": 16,
+      "drawCalls": 0,
+      "primitiveReferences": 0
+    },
+    "positionsIndicesUVsAndNodesIdentical": true
+  },
+  {
+    "before": {
+      "assetId": "resource.water-ice-deposit-ridge",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 96,
+        "nodes": 3,
+        "primitives": 2,
+        "materials": 2,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 6992,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 2
+      },
+      "measurements": {
+        "flatTriangles": 96,
+        "smoothTriangles": 0,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 96,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "after": {
+      "assetId": "resource.water-ice-deposit-ridge",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 96,
+        "nodes": 3,
+        "primitives": 2,
+        "materials": 2,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 7008,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 2
+      },
+      "measurements": {
+        "flatTriangles": 96,
+        "smoothTriangles": 0,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 96,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "delta": {
+      "triangles": 0,
+      "nodes": 0,
+      "primitives": 0,
+      "materials": 0,
+      "encodedTextureBytes": 0,
+      "textureMemoryBytes": 0,
+      "glbBytes": 16,
+      "drawCalls": 0,
+      "primitiveReferences": 0
+    },
+    "positionsIndicesUVsAndNodesIdentical": true
+  },
+  {
+    "before": {
+      "assetId": "resource.water-ice-deposit-shelf",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 64,
+        "nodes": 3,
+        "primitives": 2,
+        "materials": 2,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 5348,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 2
+      },
+      "measurements": {
+        "flatTriangles": 64,
+        "smoothTriangles": 0,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 64,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "after": {
+      "assetId": "resource.water-ice-deposit-shelf",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 64,
+        "nodes": 3,
+        "primitives": 2,
+        "materials": 2,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 5368,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 2
+      },
+      "measurements": {
+        "flatTriangles": 64,
+        "smoothTriangles": 0,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 64,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "delta": {
+      "triangles": 0,
+      "nodes": 0,
+      "primitives": 0,
+      "materials": 0,
+      "encodedTextureBytes": 0,
+      "textureMemoryBytes": 0,
+      "glbBytes": 20,
+      "drawCalls": 0,
+      "primitiveReferences": 0
+    },
+    "positionsIndicesUVsAndNodesIdentical": true
+  },
+  {
+    "before": {
+      "assetId": "resource.water-ice-deposit-spire",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 32,
+        "nodes": 3,
+        "primitives": 2,
+        "materials": 2,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 3716,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 2
+      },
+      "measurements": {
+        "flatTriangles": 32,
+        "smoothTriangles": 0,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 32,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "after": {
+      "assetId": "resource.water-ice-deposit-spire",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 32,
+        "nodes": 3,
+        "primitives": 2,
+        "materials": 2,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 3736,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 2
+      },
+      "measurements": {
+        "flatTriangles": 32,
+        "smoothTriangles": 0,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 32,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "delta": {
+      "triangles": 0,
+      "nodes": 0,
+      "primitives": 0,
+      "materials": 0,
+      "encodedTextureBytes": 0,
+      "textureMemoryBytes": 0,
+      "glbBytes": 20,
+      "drawCalls": 0,
+      "primitiveReferences": 0
+    },
+    "positionsIndicesUVsAndNodesIdentical": true
+  },
+  {
+    "before": {
+      "assetId": "item.mining-tool",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 2064,
+        "nodes": 19,
+        "primitives": 15,
+        "materials": 4,
+        "encodedTextureBytes": 68079,
+        "textureMemoryBytes": 349524,
+        "glbBytes": 225176,
+        "drawCalls": 1,
+        "drawPolicy": "one held-item batch",
+        "primitiveReferences": 15
+      },
+      "measurements": {
+        "flatTriangles": 2064,
+        "smoothTriangles": 0,
+        "missingNormalTriangles": 0,
+        "microTriangles": 136,
+        "microAreaSquareMeters": 1e-06,
+        "validTriangles": 2064,
+        "meshInstances": 15,
+        "referencedMeshes": 15,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "after": {
+      "assetId": "item.mining-tool",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 2064,
+        "nodes": 19,
+        "primitives": 15,
+        "materials": 4,
+        "encodedTextureBytes": 2080,
+        "textureMemoryBytes": 349524,
+        "glbBytes": 159160,
+        "drawCalls": 1,
+        "drawPolicy": "one held-item batch",
+        "primitiveReferences": 15
+      },
+      "measurements": {
+        "flatTriangles": 2064,
+        "smoothTriangles": 0,
+        "missingNormalTriangles": 0,
+        "microTriangles": 136,
+        "microAreaSquareMeters": 1e-06,
+        "validTriangles": 2064,
+        "meshInstances": 15,
+        "referencedMeshes": 15,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "delta": {
+      "triangles": 0,
+      "nodes": 0,
+      "primitives": 0,
+      "materials": 0,
+      "encodedTextureBytes": -65999,
+      "textureMemoryBytes": 0,
+      "glbBytes": -66016,
+      "drawCalls": 0,
+      "primitiveReferences": 0
+    },
+    "positionsIndicesUVsAndNodesIdentical": true
+  },
+  {
+    "before": {
+      "assetId": "resource.spherical-fragment",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 80,
+        "nodes": 3,
+        "primitives": 1,
+        "materials": 1,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 9540,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 1
+      },
+      "measurements": {
+        "flatTriangles": 80,
+        "smoothTriangles": 0,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 80,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "after": {
+      "assetId": "resource.spherical-fragment",
+      "profile": {
+        "name": "option-a-v1"
+      },
+      "costs": {
+        "triangles": 80,
+        "nodes": 3,
+        "primitives": 1,
+        "materials": 1,
+        "encodedTextureBytes": 0,
+        "textureMemoryBytes": 0,
+        "glbBytes": 9540,
+        "drawCalls": 1,
+        "drawPolicy": "one indexed instanced draw per visible variant",
+        "primitiveReferences": 1
+      },
+      "measurements": {
+        "flatTriangles": 80,
+        "smoothTriangles": 0,
+        "missingNormalTriangles": 0,
+        "microTriangles": 0,
+        "microAreaSquareMeters": 1e-05,
+        "validTriangles": 80,
+        "meshInstances": 1,
+        "referencedMeshes": 1,
+        "reusedMeshReferences": 0,
+        "exactDuplicateMeshDefinitions": 0,
+        "space": "mesh-local meters; instanced transforms/screen size not inferred",
+        "lodTriangles": []
+      },
+      "warnings": [],
+      "exceptions": [],
+      "unusedExceptions": []
+    },
+    "delta": {
+      "triangles": 0,
+      "nodes": 0,
+      "primitives": 0,
+      "materials": 0,
+      "encodedTextureBytes": 0,
+      "textureMemoryBytes": 0,
+      "glbBytes": 0,
+      "drawCalls": 0,
+      "primitiveReferences": 0
+    },
+    "positionsIndicesUVsAndNodesIdentical": true
+  }
+]

@@ -139,6 +139,36 @@ large-coordinate, extraction timing, and depletion checks. The native
 `scenarios/mining.json` follows the real surface walkthrough and tool inputs;
 its evidence variant adds screenshot checkpoints.
 
+## Persistence and reload verification scope (#268)
+
+The supported Phase 0 reload operation is **streaming unload/reload inside the
+same running world session**. Keep the existing `MiningSession` alive while
+nearby deposits are discarded and regenerated. Restore changed deposit mass by
+stable ID, including partial deposits and depleted tombstones; retain fragment
+IDs, source deposit, material, mass and pose without duplicating output or
+replenishing mined resources. This is the persistence boundary used by spherical
+mining integration #234.
+
+For [native verification #236](https://github.com/mr-exception/salimon/issues/236),
+interpret “save/reload” as that in-session streaming check. Use
+[`resource-streaming.json`](../../scenarios/evidence/resource-streaming.json)
+and [`resource-loop.json`](../../scenarios/evidence/resource-loop.json), retaining
+state assertions and native evidence. Closing and relaunching the executable
+starts a fresh session, even with the same seed; it cannot certify restoration
+of previous fragments or mined deposits. The native
+[#236 report](../../reports/issue-236/README.md) records this distinction.
+
+The scope clarification above is proposed for owner approval through #268's PR;
+[Project Q&A](../../docs/project-qa.md#what-does-236-require-by-savereload)
+tracks the pending decision. Approval selects session-only verification for this
+wave. Disk/backend persistence and cross-process save/relaunch acceptance remain
+deferred; no save parser, legacy save migration or backend is required here.
+If disk saves are requested later, first define the saved world/seed identity,
+versioned state and compatibility policy, deposit tombstones, fragment identity
+and pose restoration, and write/load failure handling. Implement and validate
+that contract before a separate native save/quit/relaunch verification issue.
+Those prerequisites describe future planning, not an implemented save format.
+
 ## Spherical mining lifecycle (#230)
 
 `spherical_mining` owns the accepted portable lifecycle. `MiningConfig` defaults

@@ -107,6 +107,36 @@ Update affected canonical guides with behavior/contract changes. Crate guides
 link here for common rules instead of duplicating them. Historical reports
 record what was validated at their revision and do not override current guides.
 
+## Issue completion and follow-up
+
+Deliver an issue's completed work in the current PR and close the source issue
+on merge, using a closing reference such as `Closes #123` in the PR description.
+If any point remains unresolved, create a separate follow-up issue for that
+remaining work rather than keeping the entire source issue open. Create and
+link the follow-up before the source issue closes so the work stays tracked.
+
+For each follow-up:
+
+- Give it a focused title, the exact unresolved requirement or decision,
+  acceptance criteria, relevant evidence and any explicit blockers.
+- Link back to the source issue, delivering PR and completion report. Link the
+  follow-up from the source issue's completion update, PR and report as well.
+- State which original acceptance criteria passed and which were transferred.
+  Preserve failed, skipped and unrun checks and their reasons. Closing the
+  source issue records delivery and transfer of remaining scope; it does not
+  turn those checks into passes, approve a pending decision or waive a limit.
+
+Update affected dependency links so work blocked by an unresolved point follows
+the new issue rather than treating the closed source issue as a resolved blocker.
+Keep unresolved product/architecture questions in [Project Q&A](project-qa.md)
+linked to the follow-up until a decision is made. Preserve historical reports
+as evidence at their recorded revision; current workflow belongs here.
+
+For example, a performance PR can close its source issue after delivering an
+optimization while a linked follow-up owns a remaining timing regression or
+budget decision. The PR/report must still identify the failed gate or pending
+approval explicitly.
+
 ## Task completion reports
 
 Every completed task must write/update `reports/issue-<number>/README.md`, or
@@ -115,7 +145,8 @@ Every completed task must write/update `reports/issue-<number>/README.md`, or
 - Outcome and meaningful changes, including the affected ownership/contracts.
 - Exact validation commands and results, relevant environment/tool versions,
   skipped checks and the reason; distinguish not run, failed and passed.
-- Limitations, remaining blockers or follow-up work.
+- Limitations and remaining blockers, with links to the follow-up issues that
+  own unresolved work under the [completion workflow](#issue-completion-and-follow-up).
 - Applicable result screenshots/images beside the report, linked relatively;
   include structured state/logs when they establish behavior. Do not invent
   screenshots for a documentation-only task.

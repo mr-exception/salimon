@@ -390,3 +390,7 @@ impl TerrainRenderer {
         self.uniform_stride * MAX_PATCHES + self.cache.values().map(|p| p.bytes).sum::<usize>()
     }
 }
+
+#[cfg(test)]
+#[path = "terrain_style_tests.rs"]
+mod style_tests;

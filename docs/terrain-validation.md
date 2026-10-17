@@ -160,3 +160,25 @@ averages or software Vulkan.
 
 Completion evidence lives in [#179](../reports/issue-179/README.md),
 [#180](../reports/issue-180/README.md) and [#181](../reports/issue-181/README.md).
+
+## Option A shader evidence (#278)
+
+Visual palette/face-normal policy is maintained in the
+[art bible](visual-style.md#procedural-body-and-terrain-recipes-278).
+`terrain_style_reference` is an opt-in renderer-only synthetic hill/crater and
+analytic-body fixture, independent of authoritative world terrain. It compares
+frozen frames and 2 cm crossings around both shading fade boundaries. It records
+actual offscreen GPU pass timestamps when supported (explicit NaN/no samples
+otherwise), patch buffer/uniform costs and PNG captures. It does not simulate
+walking, certify physical support or replace native gameplay/M1 scenarios.
+
+```sh
+SALIMON_TERRAIN_STYLE_DIR=/absolute/path/to/artifacts/terrain-style cargo test -p salimon-renderer --locked terrain_style_reference -- --ignored --nocapture
+python scripts/compare_terrain_style.py --before artifacts/terrain-before --after artifacts/terrain-style --output artifacts/terrain-comparison
+```
+
+Use the same renderer test harness and camera fixtures for before/after. The
+comparison rejects changed silhouette/background coverage, geometry/draw/memory
+costs, or inconsistent scene sets; palette/color changes are expected. No
+comparison promotes a pixel baseline. Run existing topology/shared-border and
+world ground/ship/character/physics regressions alongside this visual-only probe.

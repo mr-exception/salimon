@@ -1,0 +1,43 @@
+{
+  "command": [
+    "python3",
+    "reports/issue-229/foreground_matrix.py",
+    "--helper",
+    "artifacts/native-input",
+    "--records",
+    "artifacts/native-255/stress-focus.json",
+    "--",
+    "python3",
+    "scripts/benchmark_fragments.py",
+    "--binary",
+    "artifacts/SalimonAcceptance.app/Contents/MacOS/salimon-client",
+    "--machine-label",
+    "apple-m1-imac-16gb-macos26.2",
+    "--counts",
+    "500",
+    "--layouts",
+    "scattered",
+    "--states",
+    "settled",
+    "--cameras",
+    "facing",
+    "--minimum-samples",
+    "100",
+    "--warmup-seconds",
+    "0",
+    "--sample-seconds",
+    "3",
+    "--settle-steps",
+    "120",
+    "--timeout",
+    "60",
+    "--output",
+    "artifacts/native-255/stress"
+  ],
+  "returncode": 0,
+  "wall_seconds": 15.481730750005227,
+  "limits": {
+    "preparation_steps": 120,
+    "case_timeout_seconds": 60
+  }
+}

@@ -1,0 +1,23 @@
+[
+  {
+    "pid": 79075,
+    "monotonic": 159667.426303916,
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "target window bounds unavailable\n"
+  },
+  {
+    "pid": 79075,
+    "monotonic": 159668.354653375,
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "target window bounds unavailable\n"
+  },
+  {
+    "pid": 79075,
+    "monotonic": 159669.400282708,
+    "returncode": 0,
+    "stdout": "frontmost=79075 target=79075\nposted PID=79075 operation=focus\n",
+    "stderr": ""
+  }
+]

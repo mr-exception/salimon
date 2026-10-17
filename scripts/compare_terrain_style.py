@@ -45,7 +45,7 @@ def compare(before, after, output):
                 draw.text((x + 10, y + 6), f'{body} / {distance} / {label}', fill='white')
                 sheet.paste(Image.open(folder / f'{body}-{distance}.png').convert('RGB'), (x, y + 28))
         sheet.save(output / (body + '.jpg'), quality=90)
-    result = {'schema': 1, 'scope': '512x384 fixed synthetic hill/crater and analytic-body GPU fixtures; software Vulkan timings are not native FPS', 'scenes': measurements}
+    result = {'schema': 1, 'scope': '512x384 fixed synthetic hill/crater and analytic-body GPU fixtures; offscreen pass timings are not native gameplay FPS', 'scenes': measurements}
     (output / 'comparison.json').write_text(json.dumps(result, indent=2) + '\n')
     return result
 

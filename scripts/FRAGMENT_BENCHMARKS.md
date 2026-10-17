@@ -194,8 +194,17 @@ rather than skipping updates or weakening interaction gates.
   retained samples/observed updates/stride. Spike counts then describe retained
   samples, not every original update. Tails with <100 samples are flagged unreliable.
 
-Proposed native 500 settled target: 60 FPS, frame p95 ≤16.67ms with actual settled
-state verified. A practical first **provisional**, unvalidated partition is ≤5ms
+Reference M1 60 Hz settled cadence guidance: submitted-present frame p95 ≤17.5ms,
+with actual settled state and foreground admission verified. This explicitly
+replaces the provisional ≤16.67ms p95 guidance: three 30-second empty windows on
+2026-10-17 measured p95 17.239–17.268ms, despite median cadence near 16.68ms.
+17.5ms is one 60 Hz interval plus a 5% scheduling allowance; it is a bounded
+reference-machine cadence budget, not a strict visible 60 FPS floor or a portable
+threshold for other refresh rates. Preserve p99/max and spike counts, including
+the empty-reference 41.781ms maximum. See [#255 evidence and unresolved active
+signoff](../reports/issue-255/README.md). The existing 20% same-device relative
+regression gate remains independently applicable; this calibration does not
+turn active overload into a pass. A practical first **provisional** partition is ≤5ms
 physics+adapter, ≤4ms other CPU update/preparation, ≤4ms CPU rendering and ≤12ms
 GPU pass time (CPU/GPU overlap; these are not summed as frame time). For active
 loads record budgets from the native baseline before setting a gate; prioritize

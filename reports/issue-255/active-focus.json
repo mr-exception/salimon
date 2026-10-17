@@ -1,0 +1,72 @@
+[
+  {
+    "pid": 76161,
+    "monotonic": 159294.2851465,
+    "returncode": 0,
+    "stdout": "frontmost=76161 target=76161\nposted PID=76161 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 76208,
+    "monotonic": 159297.510502666,
+    "returncode": 0,
+    "stdout": "frontmost=76208 target=76208\nposted PID=76208 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 76237,
+    "monotonic": 159300.79454275,
+    "returncode": 0,
+    "stdout": "frontmost=76237 target=76237\nposted PID=76237 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 76276,
+    "monotonic": 159304.076271166,
+    "returncode": 0,
+    "stdout": "frontmost=76276 target=76276\nposted PID=76276 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 76305,
+    "monotonic": 159307.855799375,
+    "returncode": 0,
+    "stdout": "frontmost=76305 target=76305\nposted PID=76305 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 76330,
+    "monotonic": 159311.085052166,
+    "returncode": 0,
+    "stdout": "frontmost=76330 target=76330\nposted PID=76330 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 76358,
+    "monotonic": 159314.368550958,
+    "returncode": 0,
+    "stdout": "frontmost=76358 target=76358\nposted PID=76358 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 76391,
+    "monotonic": 159318.139987166,
+    "returncode": 0,
+    "stdout": "frontmost=76391 target=76391\nposted PID=76391 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 76411,
+    "monotonic": 159321.427502833,
+    "returncode": 0,
+    "stdout": "frontmost=76411 target=76411\nposted PID=76411 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 76446,
+    "monotonic": 159325.212477458,
+    "returncode": 0,
+    "stdout": "frontmost=76446 target=76446\nposted PID=76446 operation=focus\n",
+    "stderr": ""
+  }
+]

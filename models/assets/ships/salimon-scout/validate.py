@@ -234,6 +234,34 @@ def validate_sightlines(document: dict, binary: bytes) -> None:
             require(nearest[1] == name, f"{name} display occluded by {nearest[1]} at UV {(u,v)}")
             require(abs(nearest[0]-1.) < 1e-5, 'abs(nearest[0]-1.) < 1e-5')
 
+    # Trace the Core face from straight and oblique starboard approaches. Sample
+    # close to each corner as well as the center so the new rim cannot crop it.
+    for origin in ((-1., 1.65, -3.), (-3., 1.75, -3.), (1., 1.75, -3.)):
+        for u, v in ((.01, .01), (.99, .01), (.5, .5), (.01, .99), (.99, .99)):
+            target = (-.35-1.3*u, 1.9-.65*v, -.999)
+            direction = sub(target, origin)
+            hits = [(distance, name) for name, glass, triangles in meshes
+                    if not glass for tri in triangles
+                    if (distance := hit(origin, direction, tri)) is not None]
+            require(hits and min(hits)[1] == 'Core_Monitor',
+                    f'Core monitor display occluded from {origin} at UV {(u, v)}')
+
+    # Prove a physical rim/back enclosure and two pedestal supports exist,
+    # independently of the emissive screen artwork or whole-mesh AABBs.
+    for target, owner in (((-1., 1.925, -1.), 'Core_Ceramic_Armor'),
+                          ((-1., 1.225, -1.), 'Core_Ceramic_Armor'),
+                          ((-1.68, 1.575, -1.), 'Core_Ceramic_Armor'),
+                          ((-.32, 1.575, -1.), 'Core_Ceramic_Armor'),
+                          ((-1., 1.575, -.975), 'Core_Pedestal'),
+                          ((-1.575, .8, -.97), 'Core_Cradle'),
+                          ((-.425, .8, -.97), 'Core_Cradle')):
+        origin = (target[0], target[1], -3.)
+        direction = sub(target, origin)
+        hits = [distance for name, glass, triangles in meshes if name == owner
+                for tri in triangles if (distance := hit(origin, direction, tri)) is not None]
+        require(hits and abs(min(hits)-1.) < 1e-5,
+                f'Core monitor frame/mount missing at {target}: {owner}')
+
     # End caps used to conceal the thruster emitters. Trace down each nozzle.
     for label, z in (("Port",7.10),("Starboard",-7.10)):
         origin=(-10.5,4/3.72,z)

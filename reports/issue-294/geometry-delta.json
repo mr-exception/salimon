@@ -1,0 +1,19 @@
+{
+  "comparison": "Oriented triangles, positions rounded to 1 micrometer, normals to 1e-5, material roles; all other visual meshes unchanged",
+  "changedMeshes": {
+    "Core_Ceramic_Armor": {
+      "removed": 0,
+      "added": 8
+    },
+    "Core_Cradle": {
+      "removed": 0,
+      "added": 20
+    },
+    "Core_Pedestal": {
+      "removed": 0,
+      "added": 20
+    }
+  },
+  "beforeNodes": 140,
+  "afterNodes": 140
+}

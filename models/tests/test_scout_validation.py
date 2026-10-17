@@ -11,7 +11,7 @@ import unittest
 from unittest.mock import patch
 
 from test_scout_export import ASSET, REPO, scout
-from validate import REGISTRIES, main, node_position_bounds, overall_position_bounds
+from validate import REGISTRIES, main, node_position_bounds, overall_position_bounds, validate_sightlines
 from validate_asset import ValidationError, accessor_values, read_document, validate_manifest
 
 
@@ -113,6 +113,26 @@ class ScoutValidationTests(unittest.TestCase):
                                             lambda p: (6.5, p[1], p[0]))
         with self.assertRaisesRegex(ValidationError, 'obstructed|blocked'):
             self.validate(document, binary)
+
+    def test_core_frame_does_not_cover_live_display(self):
+        # Pull only the frame's backing forward through the screen. All names,
+        # display UVs and the broader pedestal bounds still look valid.
+        document, binary = self.vertex_edit(
+            'Core_Pedestal', 'POSITION',
+            lambda p: (p[0], p[1], -1.) if p[1] > 1.0 else p)
+        with self.assertRaisesRegex(ValidationError, 'Core monitor display occluded'):
+            validate_sightlines(document, binary)
+
+    def test_core_monitor_needs_physical_rim_and_pedestal_supports(self):
+        for name in ('Core_Ceramic_Armor', 'Core_Cradle'):
+            # Remove the newly added front geometry, leaving the original Core
+            # meshes, the live quad, UVs and proxy inventory present.
+            document, binary = self.vertex_edit(
+                name, 'POSITION',
+                lambda p: (p[0], p[1], -.82) if p[2] < -.86 else p)
+            with self.subTest(name=name):
+                with self.assertRaisesRegex(ValidationError, 'Core monitor frame/mount missing'):
+                    validate_sightlines(document, binary)
 
     def test_collision_anchor_material_and_budget_regressions(self):
         for name, mutate in (

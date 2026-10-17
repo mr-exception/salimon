@@ -299,6 +299,23 @@ runtime renders live energy/consumption/conversion/depletion/warnings here,
 independently of the cockpit console. It blanks at outage; mechanical intake
 stays usable. Apple M1 visual signoff belongs to the separate native work.
 
+### Physical Core display frame (#294)
+
+The same recipe now adds a 150 mm deep graphite enclosure with a slate rim,
+24 mm clearance behind the unchanged live quad, and two ochre supports seated
+into the pedestal. Everything stays inside the existing Core collision box;
+the forward service/feeding face remains clear. The opening leaves 3 mm around
+the display and the rim stays 1 mm ahead of its original starboard plane.
+
+`Core_Monitor_Frame` vertex groups select the editable additions in
+`Core_Pedestal` (housing), `Core_Ceramic_Armor` (rim), and `Core_Cradle` (supports).
+Reauthoring replaces only those grouped vertices. Reusing the owners' materials
+keeps 140 nodes, 116 primitives, 13 materials and one opaque/one glass draw;
+the enclosure adds 48 triangles (6,329 total). No preservation, collider, marker
+or renderer interface changes are required. Category validation traces display
+corners from three approaches and probes the physical frame/back/supports.
+See [authored previews and verification](../../../../reports/issue-294/README.md).
+
 ## Surface remediation (#244)
 
 Different-material coplanar panels now have one surface owner; lower glazing is

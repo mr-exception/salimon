@@ -210,6 +210,21 @@ GPU pass time (CPU/GPU overlap; these are not summed as frame time). For active
 loads record budgets from the native baseline before setting a gate; prioritize
 p95/max/spikes and missed interaction deadlines. 1,000 has no 60 FPS requirement.
 
+### Proposed active launch budget (#288; pending owner review)
+
+The [#288 proposal](../reports/issue-288/README.md) separates ten fresh,
+naturally settling 500×0.032 kg onboard drops from the long settled reference.
+Its [machine-readable limits](../reports/issue-288/proposed-budget.json) and
+[raw-evidence evaluation](../reports/issue-288/analysis.json) are review material,
+not approved replacement guidance. The owner requested this proposal on
+2026-10-17; approval of the thresholds remains a PR review decision.
+The proposal preserves the settled guidance above and independently reports
+the existing whole-window 20% relative checks, including their failures.
+Passing the proposed numbers does not grant #255/#288 signoff or establish
+continuous motion, larger-piece, dense-contact or #236 sphere acceptance.
+
+### Same-device relative regression checks
+
 Repeat each baseline case three times on the same machine/settings with ≥100
 samples. `--baseline path/to/summary.json --tolerance 0.2` rejects incompatible
 machine/case/renderer metadata and insufficient samples, and fails p95 regressions

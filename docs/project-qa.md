@@ -29,6 +29,16 @@ be reviewed using matched empty-launch evidence. Until that decision and its
 measurements pass, keep [#255](https://github.com/mr-exception/salimon/issues/255)
 open; a faster solver alone is not active cadence acceptance.
 
+On 2026-10-17 the owner requested a separately justified active-budget proposal
+for PR review. The [#288 proposal and reproducible evaluation](../reports/issue-288/README.md)
+provide that decision material. This request authorizes proposing thresholds;
+it does not approve them or waive the historical relative failures. Keep this
+question open until the owner reviews the proposal and remaining limitations.
+Fresh same-state settled comparisons also fail CPU-render p95 by 22.0–24.7%
+in all three pairs, while frame and physics relative checks pass. Different
+moving/sleeping proportions alone therefore do not explain the relative failure;
+its cause still needs attribution before unconditional signoff.
+
 ### Where should dedicated physical storage go after the cargo-room removal?
 
 The current scout revision removes the dedicated port cargo room and its storage

@@ -1,0 +1,7 @@
+source 1da0d9507eb720fc66c10475a25652e39d80555b
+macOS 26.2 (25C56), arm64, iMac21,1, Apple M1 8 CPU / 8 GPU cores, 16 GiB
+AC power; pmset -g therm: no thermal/performance warning
+Built-in 4480x2520 Retina display, reference drawable 1920x1080 at scale2
+Secondary LF27T450F attached, 1920x1080 at75Hz
+Metal AutoVsync; F3 off; compiler jobs and other validation jobs idle during windows
+Python3.14.2, rustc1.89.0; Python3.12 unavailable

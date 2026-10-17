@@ -1,0 +1,17 @@
+{
+  "status": "proposed_pending_owner_review",
+  "scope": "M1 60 Hz, Metal, 1920x1080, AutoVsync, ten fresh 500x0.032 kg onboard drops, seed 155, no warmup; completed moving intervals only",
+  "minimum_active_intervals": 100,
+  "maximums": {
+    "frame_ms.p95": 33.333333333333336,
+    "frame_ms.max": 50.0,
+    "physics_total_ms.p95": 8.0,
+    "cpu_render_ms.p95": 4.0,
+    "gpu_latest_ms.p95": 12.0,
+    "game_backlog_ms.max": 50.0
+  },
+  "maximum_frame_p95_ratio_to_matched_empty": 1.2,
+  "maximum_active_frames_over_50ms": 0,
+  "whole_window_relative_tolerance": 0.2,
+  "settled_frame_p95_ms": 17.5
+}

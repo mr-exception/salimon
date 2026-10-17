@@ -12,6 +12,7 @@ from benchmark_fragments import METRICS, distribution, summarize
 def analyze(paths):
     windows = []
     active = []
+    completed = []
     signatures = []
     for path in paths:
         opener = gzip.open if path.suffix == '.gz' else open
@@ -22,6 +23,7 @@ def analyze(paths):
             if run['mode'] != 'native_wall_clock' or run.get('sampling_stride', 1) != 1:
                 raise ValueError('requires native, undecimated raw windows')
             samples = [s for s in run['samples'] if s.get('frame_ms') is not None]
+            completed.extend(samples)
             moving = [s for s in samples if s['moving_objects'] > 0]
             signature = (run['config'], run['renderer'])
             signatures.append(signature)
@@ -36,7 +38,8 @@ def analyze(paths):
     return dict(windows=windows, active_intervals=len(active),
                 active_tail_sample_requirement_met=len(active) >= 100,
                 active_metrics={key: distribution([s[key] for s in active if s.get(key) is not None])
-                                for key in METRICS},
+                                for key in (*METRICS, 'game_backlog_ms', 'solver_passes')},
+                completed_game_backlog_ms=distribution([s['game_backlog_ms'] for s in completed]),
                 active_frames_over_50ms=sum(s['frame_ms'] > 50 for s in active),
                 active_frames_over_16_67ms=sum(s['frame_ms'] > 1000/60 for s in active))
 

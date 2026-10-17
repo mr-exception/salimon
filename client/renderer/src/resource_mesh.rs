@@ -1393,6 +1393,52 @@ mod gpu_tests {
         device.poll(wgpu::PollType::wait_indefinitely()).unwrap();
     }
     #[test]
+    #[ignore = "requires GPU; 500 shared spheres, unchanged upload cache and repeat pixels"]
+    fn headless_five_hundred_shared_spheres() {
+        let gpu = wgpu::Instance::default();
+        let adapter = block_on(gpu.request_adapter(&Default::default())).unwrap();
+        println!("500-sphere adapter={:?}", adapter.get_info());
+        let (device, queue) = block_on(adapter.request_device(&Default::default())).unwrap();
+        let camera = sphere_benchmark::camera();
+        let projection = crate::multiply_mat4(
+            crate::infinite_reverse_z_projection(camera, 1.0).unwrap(),
+            crate::view_rotation(crate::camera_basis(camera).unwrap()),
+        );
+        let instances = sphere_benchmark::workload(500, false, false);
+        let mut renderer =
+            ResourceMeshRenderer::new(&device, wgpu::TextureFormat::Rgba8UnormSrgb).unwrap();
+        let initial = renderer
+            .prepare(&device, &queue, camera, projection, 1.0, &instances)
+            .unwrap();
+        assert_eq!(renderer.object_count(), 500);
+        assert_eq!(renderer.draw_count(), 1);
+        assert_eq!(initial.triangles, 40_000);
+        assert_eq!(initial.upload_bytes, 64 + 500 * 48);
+        let first = capture(&device, &queue, &renderer);
+        assert!(
+            first
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .filter(|p| p[..3] != [0, 0, 0])
+                .count()
+                > 1000
+        );
+        let unchanged = renderer
+            .prepare(&device, &queue, camera, projection, 1.0, &instances)
+            .unwrap();
+        assert_eq!(unchanged.upload_bytes, 64);
+        assert_eq!(first, capture(&device, &queue, &renderer));
+        println!(
+            "500 spheres: triangles={} draws=1 first_upload={} unchanged_upload={} retained_cpu_bytes={}",
+            initial.triangles,
+            initial.upload_bytes,
+            unchanged.upload_bytes,
+            initial.scratch_capacity_bytes
+        );
+    }
+
+    #[test]
     #[ignore = "requires GPU; shared sphere palette and repeat stability"]
     fn headless_resource_sphere_palette() {
         let gpu = wgpu::Instance::default();

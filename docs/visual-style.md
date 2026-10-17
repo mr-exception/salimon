@@ -99,3 +99,6 @@ approval. Its existing node, texture-memory and consumer draw caps and the five
 signals (density, normal alignment, reuse, LOD cost); shape, color and quality
 remain review decisions. Purposeful exceptions require an asset-local reason.
 See [manifest](../models/manifest.md) and [shared contracts](../models/contracts.md).
+
+The production tool/deposit palette recipe and preserved shared-sphere policy
+are documented in [resource Option A](../models/assets/resources/OPTION-A.md).

@@ -73,6 +73,7 @@ class StyleReviewTests(unittest.TestCase):
     def test_existing_pipeline_includes_style_only_when_opted_in(self):
         import process_glb
         m=json.loads((REPO/'models/assets/items/mining-tool/manifest.json').read_text())
+        m.pop('styleProfile', None)  # Exercise opt-out even after production adopts it.
         with tempfile.TemporaryDirectory() as directory:
             destination=Path(directory)/'candidate.glb'
             with patch.object(process_glb,'compliance',return_value={

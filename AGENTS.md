@@ -50,8 +50,11 @@ limitations or blockers. Put applicable screenshots/images beside it with
 relative links. Follow [report conventions](docs/coding-conventions.md#task-completion-reports)
 and [reports layout](reports/README.md); never add task-result folders to `docs/`.
 Link the report and relevant commits/PR from the GitHub issue completion update.
-Close an issue only after acceptance criteria pass; a PR awaiting merge should
-link the issue for closure on merge. Push to main only when explicitly requested;
+Close the source issue through the current PR and move unresolved points into
+linked follow-up issues; do not keep the whole source issue open for remaining
+work. Follow the canonical
+[issue completion and follow-up workflow](docs/coding-conventions.md#issue-completion-and-follow-up).
+Push to main only when explicitly requested;
 otherwise use a reviewable branch/PR for the requested workflow.
 
 For asset authoring, follow [Option A art direction and the opt-in local bridge](models/authoring.md#option-a-art-contract-authoring-protocol-100).

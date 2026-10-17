@@ -8,6 +8,9 @@
 - Each question should explain what decision is needed, why it matters, and the main options or tradeoffs when useful.
 - Once answered, remove the question from this page and incorporate the decision into the relevant project document and/or task.
 - Do not keep resolved decisions, implementation notes, task history, or technical summaries here.
+- When the delivering PR closes a source issue with a question still unresolved,
+  link the question to its new follow-up issue under the
+  [completion workflow](coding-conventions.md#issue-completion-and-follow-up).
 ## Open questions
 ### What budget should complete active 500-piece M1 signoff (#255)?
 
@@ -25,9 +28,10 @@ component guidance.
 
 Decide whether signoff must satisfy those existing reference values after further
 profiling, or whether a separately justified active/launch-period budget should
-be reviewed using matched empty-launch evidence. Until that decision and its
-measurements pass, keep [#255](https://github.com/mr-exception/salimon/issues/255)
-open; a faster solver alone is not active cadence acceptance.
+be reviewed using matched empty-launch evidence. Track that decision and the
+remaining measurements from [#255](https://github.com/mr-exception/salimon/issues/255)
+in linked follow-up issues when delivering its PR; a faster solver alone is not
+active cadence acceptance, and source-issue closure does not grant signoff.
 
 On 2026-10-17 the owner requested a separately justified active-budget proposal
 for PR review. The [#288 proposal and reproducible evaluation](../reports/issue-288/README.md)

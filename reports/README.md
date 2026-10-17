@@ -9,6 +9,11 @@ Task-result evidence lives here; maintained specifications and guides live in
   link them with relative paths. Record outcome, changes, exact validation results,
   skipped checks, environment and limitations. Link the report from the issue update.
 
+When unresolved points remain, link their new follow-up issues from the report
+and close the source issue through the delivering PR, following the canonical
+[issue completion workflow](../docs/coding-conventions.md#issue-completion-and-follow-up).
+Keep failed or incomplete validation visible when transferring the remaining scope.
+
 The migrated `issue-*` and `task-*` directories preserve historical validation
 from earlier revisions. Older `task-*` reports retain their original
 `validation.md` filenames so external evidence links and chronology remain

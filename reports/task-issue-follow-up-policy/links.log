@@ -1,0 +1,4 @@
+PASS: 72 relative links resolve across 7 changed Markdown files.
+PASS: every reference to #issue-completion-and-follow-up resolves to its canonical heading.
+KNOWN EXISTING FAILURE: reports/evidence-aliases.json is absent at base d92229f; tracked in follow-up #297.
+No new broken links.

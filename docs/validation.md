@@ -135,6 +135,10 @@ exact commands, passed/failed/skipped/not-run status, OS/tool versions and
 limitations. Promote applicable screenshots plus structured state/logs and
 link the report from the issue/PR. Never claim GPU, Blender or hardware coverage
 from CPU tests alone.
+When an unresolved validation point remains at delivery, transfer it to a linked
+follow-up issue and close the source issue through the current PR under the
+[completion workflow](coding-conventions.md#issue-completion-and-follow-up).
+Retain its failed, skipped or unrun status; issue closure does not change results.
 
 ## Fragment profiling (#155)
 

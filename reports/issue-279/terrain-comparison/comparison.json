@@ -1,0 +1,531 @@
+{
+  "schema": 1,
+  "scope": "512x384 fixed synthetic hill/crater and analytic-body GPU fixtures; offscreen pass timings are not native gameplay FPS",
+  "scenes": [
+    {
+      "scene": "earth-near",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 103353,
+      "before": {
+        "scene": "earth-near",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.062541",
+        "p95_gpu_ms": "0.065625"
+      },
+      "after": {
+        "scene": "earth-near",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.070334",
+        "p95_gpu_ms": "0.074042"
+      }
+    },
+    {
+      "scene": "earth-fade-start-before",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 55551,
+      "before": {
+        "scene": "earth-fade-start-before",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.049082999999999995",
+        "p95_gpu_ms": "0.059583000000000004"
+      },
+      "after": {
+        "scene": "earth-fade-start-before",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.050166",
+        "p95_gpu_ms": "0.058125"
+      }
+    },
+    {
+      "scene": "earth-fade-start-after",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 55513,
+      "before": {
+        "scene": "earth-fade-start-after",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.052542",
+        "p95_gpu_ms": "0.056499999999999995"
+      },
+      "after": {
+        "scene": "earth-fade-start-after",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.056",
+        "p95_gpu_ms": "0.06175"
+      }
+    },
+    {
+      "scene": "earth-fade-end-before",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 4958,
+      "before": {
+        "scene": "earth-fade-end-before",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.038666",
+        "p95_gpu_ms": "0.046167"
+      },
+      "after": {
+        "scene": "earth-fade-end-before",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.041124999999999995",
+        "p95_gpu_ms": "0.050875000000000004"
+      }
+    },
+    {
+      "scene": "earth-fade-end-after",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 4957,
+      "before": {
+        "scene": "earth-fade-end-after",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.043541",
+        "p95_gpu_ms": "0.047125"
+      },
+      "after": {
+        "scene": "earth-fade-end-after",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.041208999999999996",
+        "p95_gpu_ms": "0.050915999999999996"
+      }
+    },
+    {
+      "scene": "earth-far",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 3138,
+      "before": {
+        "scene": "earth-far",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.041124999999999995",
+        "p95_gpu_ms": "0.05025"
+      },
+      "after": {
+        "scene": "earth-far",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.040375",
+        "p95_gpu_ms": "0.046167"
+      }
+    },
+    {
+      "scene": "earth-orbit",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 48496,
+      "before": {
+        "scene": "earth-orbit",
+        "draws": "1",
+        "triangles": "2",
+        "patch_gpu_bytes": "131072",
+        "uniform_upload_bytes": "0",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.069583",
+        "p95_gpu_ms": "0.078917"
+      },
+      "after": {
+        "scene": "earth-orbit",
+        "draws": "1",
+        "triangles": "2",
+        "patch_gpu_bytes": "131072",
+        "uniform_upload_bytes": "0",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.06916699999999999",
+        "p95_gpu_ms": "0.076791"
+      }
+    },
+    {
+      "scene": "moon-near",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 103353,
+      "before": {
+        "scene": "moon-near",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.05925",
+        "p95_gpu_ms": "0.065708"
+      },
+      "after": {
+        "scene": "moon-near",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.07004200000000001",
+        "p95_gpu_ms": "0.075125"
+      }
+    },
+    {
+      "scene": "moon-fade-start-before",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 55551,
+      "before": {
+        "scene": "moon-fade-start-before",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.04825",
+        "p95_gpu_ms": "0.0535"
+      },
+      "after": {
+        "scene": "moon-fade-start-before",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.047667",
+        "p95_gpu_ms": "0.057707999999999995"
+      }
+    },
+    {
+      "scene": "moon-fade-start-after",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 55513,
+      "before": {
+        "scene": "moon-fade-start-after",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.052708",
+        "p95_gpu_ms": "0.055875"
+      },
+      "after": {
+        "scene": "moon-fade-start-after",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.057125",
+        "p95_gpu_ms": "0.063167"
+      }
+    },
+    {
+      "scene": "moon-fade-end-before",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 4958,
+      "before": {
+        "scene": "moon-fade-end-before",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.039667",
+        "p95_gpu_ms": "0.056041"
+      },
+      "after": {
+        "scene": "moon-fade-end-before",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.043250000000000004",
+        "p95_gpu_ms": "0.047083"
+      }
+    },
+    {
+      "scene": "moon-fade-end-after",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 4957,
+      "before": {
+        "scene": "moon-fade-end-after",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.039834",
+        "p95_gpu_ms": "0.05025"
+      },
+      "after": {
+        "scene": "moon-fade-end-after",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.044167",
+        "p95_gpu_ms": "0.048084"
+      }
+    },
+    {
+      "scene": "moon-far",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 3138,
+      "before": {
+        "scene": "moon-far",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.038708",
+        "p95_gpu_ms": "0.049292"
+      },
+      "after": {
+        "scene": "moon-far",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.041665999999999995",
+        "p95_gpu_ms": "0.048"
+      }
+    },
+    {
+      "scene": "moon-orbit",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 48496,
+      "before": {
+        "scene": "moon-orbit",
+        "draws": "1",
+        "triangles": "2",
+        "patch_gpu_bytes": "131072",
+        "uniform_upload_bytes": "0",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.069125",
+        "p95_gpu_ms": "0.077791"
+      },
+      "after": {
+        "scene": "moon-orbit",
+        "draws": "1",
+        "triangles": "2",
+        "patch_gpu_bytes": "131072",
+        "uniform_upload_bytes": "0",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.07058299999999999",
+        "p95_gpu_ms": "0.077542"
+      }
+    },
+    {
+      "scene": "mars-near",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 103353,
+      "before": {
+        "scene": "mars-near",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.059458",
+        "p95_gpu_ms": "0.068583"
+      },
+      "after": {
+        "scene": "mars-near",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.06375",
+        "p95_gpu_ms": "0.071917"
+      }
+    },
+    {
+      "scene": "mars-fade-start-before",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 55551,
+      "before": {
+        "scene": "mars-fade-start-before",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.052417000000000005",
+        "p95_gpu_ms": "0.056625"
+      },
+      "after": {
+        "scene": "mars-fade-start-before",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.053583",
+        "p95_gpu_ms": "0.060792"
+      }
+    },
+    {
+      "scene": "mars-fade-start-after",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 55513,
+      "before": {
+        "scene": "mars-fade-start-after",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.052917",
+        "p95_gpu_ms": "0.056958"
+      },
+      "after": {
+        "scene": "mars-fade-start-after",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.054708",
+        "p95_gpu_ms": "0.062541"
+      }
+    },
+    {
+      "scene": "mars-fade-end-before",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 4958,
+      "before": {
+        "scene": "mars-fade-end-before",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.042375",
+        "p95_gpu_ms": "0.0505"
+      },
+      "after": {
+        "scene": "mars-fade-end-before",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.045250000000000005",
+        "p95_gpu_ms": "0.048958"
+      }
+    },
+    {
+      "scene": "mars-fade-end-after",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 4957,
+      "before": {
+        "scene": "mars-fade-end-after",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.042416",
+        "p95_gpu_ms": "0.048667"
+      },
+      "after": {
+        "scene": "mars-fade-end-after",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.044458",
+        "p95_gpu_ms": "0.048875"
+      }
+    },
+    {
+      "scene": "mars-far",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 3138,
+      "before": {
+        "scene": "mars-far",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.041417",
+        "p95_gpu_ms": "0.047167"
+      },
+      "after": {
+        "scene": "mars-far",
+        "draws": "1",
+        "triangles": "512",
+        "patch_gpu_bytes": "147620",
+        "uniform_upload_bytes": "256",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.041375",
+        "p95_gpu_ms": "0.046"
+      }
+    },
+    {
+      "scene": "mars-orbit",
+      "changedCoveragePixels": 0,
+      "changedColorPixels": 48496,
+      "before": {
+        "scene": "mars-orbit",
+        "draws": "1",
+        "triangles": "2",
+        "patch_gpu_bytes": "131072",
+        "uniform_upload_bytes": "0",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.070958",
+        "p95_gpu_ms": "0.078333"
+      },
+      "after": {
+        "scene": "mars-orbit",
+        "draws": "1",
+        "triangles": "2",
+        "patch_gpu_bytes": "131072",
+        "uniform_upload_bytes": "0",
+        "gpu_samples": "30",
+        "median_gpu_ms": "0.07004200000000001",
+        "p95_gpu_ms": "0.07437500000000001"
+      }
+    }
+  ]
+}

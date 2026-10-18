@@ -9,6 +9,12 @@ fn approach(current: f64, target: f64, maximum_delta: f64) -> f64 {
 }
 
 impl ShipController {
+    /// Lifecycle/view discontinuities discard both held target and presentation ramp.
+    pub fn clear_steering_input(&mut self) {
+        self.steering_target = SteeringInput::default();
+        self.steering = SteeringInput::default();
+    }
+
     pub fn set_steering_input(&mut self, input: SteeringInput) {
         self.steering_target = if self.cockpit_control_active
             && self.energy_core.powered()

@@ -1,6 +1,8 @@
 mod diagnostics;
 mod frames;
 mod input;
+#[cfg(test)]
+mod input_tests;
 mod interaction;
 mod native;
 mod scene;
@@ -32,10 +34,9 @@ use diagnostics::{
 };
 pub(crate) use frames::{character_ship_frame, surface_frame_for_ship};
 use input::{
-    ShipControlInput, camera_command, interaction_pressed, is_diagnostics_toggle, is_movement_key,
-    is_ship_control_key, landing_action_pressed, release_cursor_pressed, throttle_direction,
-    throttle_event, tool_key_event, toolbar_selection_pressed, toolbar_slot, update_movement_input,
-    update_powered_ship_control_input, view_toggle_pressed,
+    InputPolicy, InputSource, ShipControlInput, camera_command, is_movement_key,
+    is_ship_control_key, release_cursor_pressed, throttle_direction, toolbar_slot,
+    update_movement_input, update_powered_ship_control_input,
 };
 use interaction::{
     InteractionTarget, action_bar_context, available_interaction_target, gameplay_window_title,
@@ -144,6 +145,7 @@ pub(crate) struct ClientApplication {
     ship_control_input: ShipControlInput,
     view_mode: ViewMode,
     cursor_captured: bool,
+    native_focused: bool,
     diagnostics: Diagnostics,
     action_bar: ActionBar,
     render_attempts: u64,
@@ -177,6 +179,7 @@ impl Default for ClientApplication {
             ship_control_input: ShipControlInput::default(),
             view_mode: ViewMode::Gameplay,
             cursor_captured: false,
+            native_focused: false,
             diagnostics: Diagnostics::default(),
             action_bar: ActionBar::default(),
             render_attempts: 0,
@@ -254,6 +257,7 @@ impl ClientApplication {
             .map_err(|error| RunError::new("failed to create native window", error))?;
         window.set_visible(true);
         window.focus_window();
+        self.native_focused = window.has_focus();
         self.cursor_captured = capture_cursor(&window);
         let size = window.inner_size();
         log::info!(
@@ -465,8 +469,7 @@ impl ClientApplication {
             ViewMode::Gameplay => ViewMode::PrecisionTour,
             ViewMode::PrecisionTour => ViewMode::Gameplay,
         };
-        self.mining.clear_input();
-        self.ship.clear_throttle_input();
+        self.clear_held_controls();
         log::info!("view mode changed to {:?} (F2 toggles)", self.view_mode);
     }
     pub(crate) fn view_name(&self) -> &'static str {
@@ -504,57 +507,97 @@ impl ClientApplication {
             "minimized":w.is_minimized(), "inner_size":[w.inner_size().width,w.inner_size().height]
         }))
     }
+    fn input_policy(&self) -> InputPolicy {
+        InputPolicy {
+            gameplay: self.view_mode == ViewMode::Gameplay,
+            captured: self.cursor_captured,
+            focused: self.native_focused,
+            occluded: self.occluded,
+        }
+    }
+
     pub(crate) fn automation_key(&mut self, key: PhysicalKey, pressed: bool) {
-        if key == PhysicalKey::Code(KeyCode::F2) {
-            if pressed {
-                self.toggle_view();
+        self.dispatch_key(key, pressed, false, false, InputSource::Automation);
+    }
+
+    fn dispatch_key(
+        &mut self,
+        key: PhysicalKey,
+        pressed: bool,
+        repeat: bool,
+        synthetic: bool,
+        source: InputSource,
+    ) {
+        if !self
+            .input_policy()
+            .admits_key(source, key, pressed, repeat, synthetic)
+        {
+            return;
+        }
+        // Release both possible meanings even if the view/location changed.
+        if !pressed {
+            update_movement_input(&mut self.movement_input, key, false);
+            input::update_ship_control_input(&mut self.ship_control_input, key, false);
+            if let Some(direction) = throttle_direction(key) {
+                self.ship.set_throttle_key(direction, false);
             }
+            if key == PhysicalKey::Code(KeyCode::KeyF) {
+                self.mining.release_f();
+            }
+            return;
+        }
+        if key == PhysicalKey::Code(KeyCode::F2) {
+            self.toggle_view();
             return;
         }
         if key == PhysicalKey::Code(KeyCode::F3) {
-            if pressed {
-                self.diagnostics.toggle();
-            }
+            self.diagnostics.toggle();
             return;
         }
         if self.view_mode != ViewMode::Gameplay {
-            if let Some(command) = camera_command(
-                if pressed {
-                    ElementState::Pressed
-                } else {
-                    ElementState::Released
-                },
-                false,
-                key,
-                true,
-            ) {
+            if let Some(command) = camera_command(ElementState::Pressed, false, key, true) {
                 self.camera_prototype.apply_command(command);
             }
+            return;
+        }
+        if key == PhysicalKey::Code(KeyCode::KeyE) {
+            self.interact();
+            return;
+        }
+        if key == PhysicalKey::Code(KeyCode::KeyL) {
+            self.ship.trigger_landing_action();
+            return;
+        }
+        if let Some(command) = camera_command(ElementState::Pressed, false, key, false) {
+            self.toggle_view();
+            self.camera_prototype.apply_command(command);
             return;
         }
         if let Some(direction) = throttle_direction(key) {
             if self.character.location() == CharacterLocation::Cockpit {
                 self.ship.set_throttle_key(direction, pressed);
+                let snapshot = self.ship.snapshot();
+                log::info!(
+                    "cockpit monitor: {} / {}%",
+                    format_metric_speed(snapshot.speed_meters_per_second),
+                    snapshot.thruster_percentage
+                );
             } else {
                 self.ship.clear_throttle_input();
             }
             return;
         }
         if let Some(slot) = toolbar_slot(key) {
-            if pressed {
-                let previous = self.equipment.selected();
-                self.equipment
-                    .select(slot, self.mining.session.carried_id().is_some());
-                if previous != self.equipment.selected() {
-                    self.mining.clear_input();
-                }
+            let previous = self.equipment.selected();
+            self.equipment
+                .select(slot, self.mining.session.carried_id().is_some());
+            if previous != self.equipment.selected() {
+                self.mining.clear_input();
             }
             return;
         }
         if key == PhysicalKey::Code(KeyCode::KeyF) {
-            if !pressed {
-                self.mining.release_f();
-            } else if self.mining.press_f() {
+            if self.mining.press_f() {
                 let ship = self.ship.snapshot();
                 let frame = character_ship_frame(ship.pose);
                 let player = self.character.snapshot(frame, self.terrain_frame(ship));
@@ -578,7 +621,7 @@ impl ClientApplication {
                     && ship.cockpit_control_active
                     && ship.flight_state == FlightState::Flying,
             );
-        } else {
+        } else if is_movement_key(key) {
             update_movement_input(&mut self.movement_input, key, pressed);
         }
     }
@@ -677,10 +720,29 @@ impl ClientApplication {
         crate::carrying::sync_ship_mass(&mut self.mining, frame, &mut self.ship);
     }
 
-    fn reset_update_clock(&mut self) {
-        self.update_clock.reset();
+    fn set_input_focus(&mut self, focused: bool) {
+        self.native_focused = focused;
+        if !focused {
+            self.release_input_capture();
+        }
+    }
+
+    fn release_input_capture(&mut self) {
+        self.cursor_captured = false;
+        self.clear_held_controls();
+    }
+
+    fn clear_held_controls(&mut self) {
+        self.movement_input = MovementInput::default();
+        self.ship_control_input = ShipControlInput::default();
+        self.ship.clear_steering_input();
         self.mining.clear_input();
         self.ship.clear_throttle_input();
+    }
+
+    fn reset_update_clock(&mut self) {
+        self.update_clock.reset();
+        self.clear_held_controls();
         self.mining.fragment_previous.clear();
     }
 
@@ -1206,6 +1268,8 @@ impl ApplicationHandler for ClientApplication {
         }
 
         if let Some(window) = self.window.as_ref() {
+            self.native_focused = window.has_focus();
+            self.cursor_captured = capture_cursor(window);
             window.request_redraw();
         }
         log::info!("application resumed");
@@ -1220,11 +1284,12 @@ impl ApplicationHandler for ClientApplication {
         }
         event_loop.set_control_flow(ControlFlow::Wait);
         self.renderer = None;
+        self.native_focused = false;
+        self.cursor_captured = false;
         self.retry_at = None;
         self.frame_clock.reset_interval();
         self.reset_update_clock();
         self.diagnostics.reset_frame_window();
-        self.mining.clear_input();
         log::info!("application suspended; GPU presentation resources released");
     }
 
@@ -1312,6 +1377,7 @@ impl ApplicationHandler for ClientApplication {
                 }
             }
             WindowEvent::Focused(focused) => {
+                self.set_input_focus(focused);
                 if let Some(benchmark) = self.benchmark.as_mut()
                     && let Err(error) = benchmark.observe_native(
                         if focused { "focused" } else { "unfocused" },
@@ -1323,162 +1389,45 @@ impl ApplicationHandler for ClientApplication {
                 }
                 if focused {
                     self.cursor_captured = capture_cursor(&window);
-                } else {
-                    self.movement_input = MovementInput::default();
-                    self.ship_control_input = ShipControlInput::default();
-                    self.ship.clear_throttle_input();
-                    self.cursor_captured = false;
-                    self.mining.clear_input();
                 }
             }
             WindowEvent::MouseInput {
                 state: ElementState::Pressed,
                 ..
-            } if !self.cursor_captured => {
+            } if !self.cursor_captured && self.native_focused && !self.occluded => {
                 self.cursor_captured = capture_cursor(&window);
             }
-            WindowEvent::KeyboardInput { event, .. }
-                if release_cursor_pressed(event.state, event.repeat, event.physical_key) =>
+            WindowEvent::KeyboardInput {
+                event,
+                is_synthetic,
+                ..
+            } if !is_synthetic
+                && release_cursor_pressed(event.state, event.repeat, event.physical_key) =>
             {
                 release_cursor(&window);
-                self.cursor_captured = false;
-                self.movement_input = MovementInput::default();
-                self.ship_control_input = ShipControlInput::default();
-                self.ship.clear_throttle_input();
-                self.mining.clear_input();
+                self.release_input_capture();
             }
             WindowEvent::MouseInput {
                 state,
                 button: MouseButton::Left,
                 ..
             } => {
-                self.mining_mouse_input(self.cursor_captured && state == ElementState::Pressed);
-            }
-            WindowEvent::KeyboardInput {
-                event,
-                is_synthetic,
-                ..
-            } if self.cursor_captured
-                && tool_key_event(event.repeat, is_synthetic, event.physical_key) =>
-            {
-                self.automation_key(event.physical_key, event.state == ElementState::Pressed);
-                window.request_redraw();
-            }
-            WindowEvent::KeyboardInput {
-                event,
-                is_synthetic,
-                ..
-            } if self.view_mode == ViewMode::Gameplay
-                && self.cursor_captured
-                && toolbar_selection_pressed(
-                    event.state,
-                    event.repeat,
-                    event.physical_key,
-                    is_synthetic,
-                ) =>
-            {
-                self.automation_key(event.physical_key, true);
-                window.request_redraw();
-            }
-            WindowEvent::KeyboardInput { event, .. }
-                if interaction_pressed(event.state, event.repeat, event.physical_key) =>
-            {
-                self.interact();
-                window.request_redraw();
-            }
-            WindowEvent::KeyboardInput { event, .. }
-                if landing_action_pressed(event.state, event.repeat, event.physical_key) =>
-            {
-                self.ship.trigger_landing_action();
-                if let Some(message) = self.ship.contextual_cockpit_message() {
-                    log::info!("cockpit monitor: {}", message.text());
+                let pressed = state == ElementState::Pressed;
+                if !pressed || self.input_policy().admits_press(InputSource::Native, false) {
+                    self.mining_mouse_input(pressed);
                 }
-                window.request_redraw();
             }
             WindowEvent::KeyboardInput {
                 event,
                 is_synthetic,
                 ..
-            } if view_toggle_pressed(
-                event.state,
-                event.repeat,
-                event.physical_key,
-                is_synthetic,
-            ) =>
-            {
-                self.toggle_view();
-                window.request_redraw();
-            }
-            WindowEvent::KeyboardInput {
-                event,
-                is_synthetic,
-                ..
-            } if self.character.location() == CharacterLocation::Cockpit
-                && is_ship_control_key(event.physical_key) =>
-            {
-                if throttle_event(event.state, event.repeat, is_synthetic) {
-                    self.automation_key(event.physical_key, event.state == ElementState::Pressed);
-                }
-                window.request_redraw();
-            }
-            WindowEvent::KeyboardInput {
-                event,
-                is_synthetic,
-                ..
-            } if throttle_direction(event.physical_key).is_some() => {
-                if throttle_event(event.state, event.repeat, is_synthetic) {
-                    self.automation_key(event.physical_key, event.state == ElementState::Pressed);
-                    if event.state == ElementState::Pressed {
-                        let snapshot = self.ship.snapshot();
-                        log::info!(
-                            "cockpit monitor: {} / {}%",
-                            format_metric_speed(snapshot.speed_meters_per_second),
-                            snapshot.thruster_percentage
-                        );
-                    }
-                }
-                window.request_redraw();
-            }
-            WindowEvent::KeyboardInput { event, .. } if is_movement_key(event.physical_key) => {
-                update_movement_input(
-                    &mut self.movement_input,
+            } => {
+                self.dispatch_key(
                     event.physical_key,
                     event.state == ElementState::Pressed,
-                );
-                window.request_redraw();
-            }
-            WindowEvent::KeyboardInput { event, .. }
-                if is_diagnostics_toggle(event.state, event.repeat, event.physical_key) =>
-            {
-                let visible = self.diagnostics.toggle();
-                log::info!(
-                    "engineering diagnostics overlay {} (F3 toggles)",
-                    if visible { "visible" } else { "hidden" }
-                );
-                window.request_redraw();
-            }
-            WindowEvent::KeyboardInput { event, .. }
-                if camera_command(
-                    event.state,
                     event.repeat,
-                    event.physical_key,
-                    self.view_mode == ViewMode::PrecisionTour,
-                )
-                .is_some() =>
-            {
-                let command = camera_command(
-                    event.state,
-                    event.repeat,
-                    event.physical_key,
-                    self.view_mode == ViewMode::PrecisionTour,
-                )
-                .expect("guard accepts only camera commands");
-                self.camera_prototype.apply_command(command);
-                self.mining.clear_input();
-                self.view_mode = ViewMode::PrecisionTour;
-                log::info!(
-                    "camera tour command: {command:?}; paused={}",
-                    self.camera_prototype.is_paused()
+                    is_synthetic,
+                    InputSource::Native,
                 );
                 window.request_redraw();
             }

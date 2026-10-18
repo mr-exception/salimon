@@ -21,7 +21,11 @@ mod reticle;
 #[cfg(test)]
 mod sphere_benchmark;
 #[cfg(test)]
+mod sphere_fixtures;
+#[cfg(test)]
 mod sphere_interactions;
+#[cfg(test)]
+mod sphere_workloads;
 mod terrain;
 mod terrain_observations;
 mod terrain_patches;

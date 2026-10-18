@@ -24,7 +24,9 @@ that same controller, without adding controllers, crates or framework layers:
 
 Update order remains door animation, clamped steering, then flight or full-delta
 assist dispatch. Module methods use only parent-visible access where needed;
-external consumers still observe `ShipSnapshot`. Dependencies are unchanged.
+external consumers still observe `ShipSnapshot`. `clear_steering_input` discards
+both target and ramp on runtime lifecycle/view discontinuities without changing
+pose, momentum or selected throttle. Dependencies are unchanged.
 
 `ShipController` is authoritative portable state. It owns a double-precision
 world pose, landed/flying/assisted state, door state, cockpit authority, persistent
@@ -149,7 +151,11 @@ settling remains locked. #198 owns native M1 collision smoke.
 ## Physical mass accounting (#187)
 
 Ship's `ShipMass` caches 100,000 kg dry hull plus positive finite physical masses
-by stable `MassObjectId` (separate fragment/equipment namespaces). Upsert/removal
+by stable `MassObjectId` (separate fragment/equipment namespaces). Cargo uses
+an incremental error-free partial-sum expansion separate from dry hull mass, so
+replacement/removal retains small residuals without scanning objects. An empty
+ledger resets to exact dry mass; invalid/overflowing updates are transactional.
+This numerical rule is owned here; runtime only drains physical events. Upsert/removal
 is idempotent; handling and storage do not add another identity. Installed
 components can use the same ledger; the current asset has no separately defined
 installed-equipment masses beyond dry hull. No inventory/container implementation

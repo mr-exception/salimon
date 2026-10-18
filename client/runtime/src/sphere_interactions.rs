@@ -97,6 +97,8 @@ fn cap_and_short_deposit_spheres_keep_identity_radius_and_yield_through_core() {
             assert!(deposit.remaining_mass_kg() < 1e-10);
             assert_eq!(app.mining.session.fragments().len(), 1);
             let original = app.mining.session.fragments()[0];
+            assert_eq!(original.id(), id);
+            crate::sphere_fixtures::assert_sphere(original, resource, mass);
             let radius = crate::fragment_physics::sphere_radius(original);
             assert!((original.material().mass_kg() - mass).abs() < 1e-10);
             command(

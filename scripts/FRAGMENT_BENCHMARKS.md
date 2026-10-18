@@ -420,7 +420,8 @@ The opt-in `--flight-profile` CLI runs fresh deterministic 0/500 populations for
 idle event-driven mass reads, boundary exit/re-entry, moving powered ship/cargo,
 moving zero-G cargo, alternating power transitions and dense falling contacts.
 Every row checks stable IDs and physically onboard mass outside its timed window.
-The contained fixture has 500 authored iron fragments, 0.032 kg each (16 kg total),
+The contained fixture is explicitly `legacy-onboard-032kg-v1`: 500 iron
+fragments, 0.032 kg each (16 kg total),
 not 500 large pieces piled outside the hull. Dense rows place a supported single layer of authored hulls at 12 cm spacing;
 ordinary rows spread across the aft deck. Multilayer pile stress remains the
 optional `--stacked` variant (ten by ten by five, non-overlapping 12 cm
@@ -502,3 +503,46 @@ inflated hulls are not a matched settled 500-sphere physics baseline. Native
 presented FPS/1% lows, GPU frame/pass time and total memory require a graphical
 reference run under #236. Existing wall-clock native tools remain available;
 CPU tests cannot supply those metrics.
+
+
+## Current sphere fixture and CPU workload contracts (#303)
+
+Runtime carrying/contact tests construct released spheres through the default
+production 16 ms, 2 kg/s, 10 kg-cap lifecycle using the checked test-only
+`sphere_fixtures` builder. It verifies growth ID stability, source, one new object,
+actual mass (canonical 1e-9 kg budget) and an independently calculated density
+radius (1e-12 m budget) before behavior checks. Tiny positive residuals retain
+physical mass even when support radius clamps to 5 mm. A separate regression
+checks repeated cap releases and one-object carrying. Core conversion tests
+also use current spherical extraction, including residual and 10 kg inputs.
+
+The older 10/100/500 #235 matrix and its fixtures are unchanged. The following
+**separate**, opt-in release CPU workload adds 500/1,000-object populations:
+
+```sh
+mkdir -p artifacts/current-spheres-303
+SALIMON_CURRENT_SPHERE_CPU_REPORT="$PWD/artifacts/current-spheres-303/cpu.json" cargo test --release -p salimon-client --locked current_sphere_workloads_cpu -- --ignored --nocapture
+```
+
+`current-spheres-303-v1` has `cap-10kg-iron-v1` and `mixed-residuals-v1` profiles.
+The latter cycles 1e-9, 0.000003, 0.032, 0.25, 2 and 10 kg, across all three
+materials. `supported-deck-layers-active-v1` uses supported 30 cm deck cells,
+conservative largest-radius layer spacing, a 30 cm initial lift and 0.4 m/s
+upward velocity. No forcing or sleep flags are installed. Setup is outside
+measurements. Every row retains actual total mass, count, individual IDs,
+material/mass/radius and initial local positions; every sample checks complete
+active selection, stable identity/material and onboard accounting.
+
+There are 100 consecutive 16 ms samples per case, including adapter and mass-sync
+wall time, activation/contact work and observed moving/sleeping/substep counts.
+These are fresh-drop CPU samples; they can settle and are not native frame/FPS,
+steady-state or active-only performance acceptance. No timing threshold is
+introduced. Keep their raw distributions and environment/source metadata when
+comparing the same profile, count, layout, build and machine. Do not compare them
+against the 16 kg historical flight baseline or overwrite old evidence.
+
+Legacy extraction remains deliberate in the #195 2 kg refuel fixture, 0.032 kg
+onboard flight populations, #47 six-piece mixed transfer fixture, and the explicit
+unsealed-tail-growth regression. Their counts/masses remain fixed; they do not
+certify cap-sized cargo. New flight profile output includes the fixture version;
+older reports are identified by their recorded source revisions, never rewritten.

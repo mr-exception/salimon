@@ -26,29 +26,45 @@ prevents portable types from acquiring `wgpu` or `winit` dependencies.
 ## Internal composition modules
 
 `src/app.rs` owns `ClientApplication`, the `ApplicationHandler` lifecycle,
-renderer recovery/redraw scheduling, automation dispatch and gameplay update
-ordering. Its private `src/app/` modules hold cohesive translation helpers:
+renderer recovery/redraw scheduling, native admission/budgets and evidence IO.
+It contains one `GameplaySession`; portable composition does not contain a window,
+renderer, automation reader or benchmark recorder.
 
 | Module | Responsibility |
 | --- | --- |
-| `input.rs` | Physical-key commands, initial-press/repeat gates and held movement/steering state |
-| `interaction.rs` | Ship-local cockpit/door targeting, interior authority gate and contextual text selection |
-| `frames.rs` | Ship/surface frame adapters and nearby solid-body selection |
-| `scene.rs` | World spheres/markers/light and live ship instrument DTO mapping; absolute `f64` positions stay intact |
-| `diagnostics.rs` | Body distances, gameplay/tour metrics, presented-frame measurements and metric log formatting |
-| `native.rs` | Window attributes, drawable size and cursor grab/release operations |
+| `session.rs` | Typed `Command`/`Snapshot`, gameplay state, held controls, interactions and portable tick order |
+| `session/frames.rs` | Ship/surface frame adapters and nearby solid-body selection |
+| `session/interaction.rs` | Ship-local target/range/aim and interior authority gates |
+| `app/input.rs` | Physical-key translation and native focus/capture/repeat/synthetic admission |
+| `app/interaction.rs` | Contextual text and prompt-placement mapping |
+| `app/scene.rs` | World/ship renderer DTO mapping at absolute `f64` positions |
+| `app/diagnostics.rs` | Observational metrics, frame measurements and formatting |
+| `app/native.rs` | Window attributes, drawable size and cursor operations |
+| `mining.rs` | `ResourceGameplay`: world mining session, fragment motion/sleep/history/scratch, ship anchors and cargo ledger; a separate `MiningTool` stores only input latches |
 
-These are internal composition helpers, not new domain or platform interfaces.
-Pure helper regressions live beside their owners. Existing crate-visible frame
-helpers remain available through `app` for automation/carrying consumers; domain
-and renderer DTOs are unchanged. Renderer and diagnostic maps observe snapshots
-without advancing controllers or taking ownership of authoritative state.
+`GameplaySession::advance_game` preserves the existing sequence: presentation
+history, precision camera, ship steering/advance, power gates, character nearby
+surface/movement/nearby surface, mining, loose physics, then carried-object/anchor
+and mass synchronization. The native shell advances transient action-bar expiry
+by the same completed simulation duration. Commands return transient feedback via
+a consumed observation; only the shell rasterizes/expires text.
 
-`advance_game` stays in `app.rs`: preserve ship/character/camera advancement,
-nearby surface updates, mining, carried-object synchronization and loose-fragment
-stepping in their existing order. Redraw maps snapshots after those updates and
-records diagnostics only after a successful presentation. Automation continues
-to run on the native event thread with explicit fixed steps and production gates.
+Native scheduling still admits elapsed time to the same session-owned
+`UpdateClock`, permits at least one tick, then enforces the existing tick-count
+and wall-clock catch-up budgets. `advance_automation` drains the identical fixed
+ticks without a wall-clock budget and retains the fractional backlog. Lifecycle
+resets clear held controls/history and exclude backlog exactly as before.
+
+`automation::execute_session` and `inspect_session` run against the production
+session without constructing `ClientApplication`. Native `execute` adds window,
+capture, upload and performance observations/operations to that same route.
+The deliberate automation desktop-admission bypass remains explicit; portable
+view, carrying, cockpit, power and assist gates still apply. E2E and benchmark
+initializers take `GameplaySession` directly. Headless benchmark sampling advances
+the whole production tick and records solver/adapter costs separately, rather
+than running a second fragment-only simulation. Session-only regressions and
+existing declarative routes cover cross-domain behavior; OS delivery and native
+visuals/FPS remain separate #312/#313 verification.
 
 ## Lifecycle flow
 
@@ -142,7 +158,7 @@ the runtime.
 into portable `salimon_world::mining` calls. World owns target selection, rate,
 validated deposit mutation, and session mass deltas. Character exposes ray hits
 against its solid ship proxies. Runtime queries nearby generation, applies
-world session state for both GPU mapping and inspection, and presents the authored tool through `MiningTool::held_item` / `HeldItemInstance`
+world session state for both GPU mapping and inspection, and presents the authored tool through `ResourceGameplay::held_item` / `HeldItemInstance`
 and resource geometry through generic renderer DTOs without exposing gameplay
 types to the renderer. No procedural tool or aim cuboid remains.
 Physical fragments are world-owned session entities. Runtime maps their
@@ -152,7 +168,7 @@ nearby query supplies automation state even when the tool is stowed.
 ## Physical surface/ship transfer (#47)
 
 `carrying.rs` composes surface and interior targeting/placement with the shared
-character collision layout. `MiningTool.ship_fragments` holds supporting ship-local
+character collision layout. `ResourceGameplay.ship_fragments` holds supporting ship-local
 coordinates keyed by existing physical fragment IDs, never inventory quantities.
 Successful interior release installs an anchor; pickup removes it before following
 the player; surface release stays world-local. Every gameplay update and look/input
@@ -261,7 +277,7 @@ Production commands are covered portably; real OS-input verification remains
 
 E routes cockpit/door and mechanical Core interactions. `automation_key` shares the native F
 route: an initial press grabs an aimed reachable object or drops the carried
-object; a miss never starts mining. MiningTool latches F until release to prevent
+object; a miss never starts mining. The MiningTool input state latches F until release to prevent
 repeat grab/drop. Only left mouse controls `held`; releasing F never changes it.
 Lifecycle resets and stowing clear mining input and the latch. Automation
 `grab_drop` plus legacy `pickup`/`drop` names map to F. The old `mine` key alias
@@ -272,7 +288,7 @@ equipment and carrying gates; native events additionally require cursor capture.
 ## Equipment toolbar state (#128)
 
 `equipment.rs` owns a portable five-slot loadout and optional typed selection,
-composed by `ClientApplication.equipment`. Slot 1 contains `MiningTool`; slots
+composed by `GameplaySession.equipment`. Slot 1 contains `MiningTool`; slots
 2–5 are empty. Initial selection is absent. Gameplay numeric keys 1–5 select
 one slot, including empty slots, without toggling the current selection off.
 Native selection accepts only captured-cursor, nonsynthetic initial presses.
@@ -308,7 +324,7 @@ no held mining input. An explicit slot 1 selection equips again without resuming
 an old mouse hold. The toolbar remains visible with its usual five
 slots and no highlight while carrying; carrying never creates a sixth slot.
 
-Automation inspection exposes `mining.held_item_visible` from the shared `ClientApplication::held_item` DTO helper used by redraw,
+Automation inspection exposes `mining.held_item_visible` from the shared `GameplaySession::held_item` DTO helper used by redraw,
 including the same view/location/equipment presentation gates, so carrying scenarios
 check the absence of the held tool as well as selection/extraction state.
 Baseline and evidence carrying/resource-loop scenarios cover an F miss before
@@ -428,7 +444,7 @@ benchmark result. See the [benchmark guide](../../scripts/FRAGMENT_BENCHMARKS.md
 
 ## Fragment activation adapter (#156)
 
-`MiningTool.fragment_sleep` owns the in-memory `SleepTracker<FragmentId>` lifetime.
+`ResourceGameplay.fragment_sleep` owns the in-memory `SleepTracker<FragmentId>` lifetime.
 The adapter supplies stable IDs alongside current frame-local snapshots; selection
 uses current-frame world positions for ship anchors even before final pose
 synchronization, so high-speed flight cannot omit last frame's trailing cargo.
@@ -658,7 +674,7 @@ flags. Older multilayer scattered/dense stress layouts remain distinct cases.
 
 ## Continuous spherical mining (#231)
 
-`MiningTool` translates held mouse/valid target and current f64 tool attachment
+`ResourceGameplay` translates held mouse/valid target and current f64 tool attachment
 into world-owned `tick_spherical`. Input reset and mouse-up detach immediately;
 shared native/automation `apply_look_delta` admits zero-time aim transitions so
 rapid away/back releases without adding mass. Runtime never computes mining
@@ -672,7 +688,7 @@ Spherical mesh/contact and final carry/Core migration remain #232–#234.
 `resource_presentation::fragment_mesh` selects the single sphere, established
 resource tint and `GrowingSphere::radius_meters()/0.48`, preserving pose/ID.
 The reserved attached identity is omitted from the ordinary loose draw list;
-`MiningTool::growth_preview` supplies exactly one visual at this frame's current
+`ResourceGameplay::growth_preview` supplies exactly one visual at this frame's current
 camera-local front-left pose (including orientation), without a rigid body or
 second material record. It hides when stowed/outside surface gameplay and
 vanishes on release; the same session ID becomes an ordinary world visual.
@@ -735,7 +751,7 @@ these observations to prevent comparisons between incompatible capture contexts
 
 ## Fragment update scratch and mass invalidation (#306)
 
-MiningTool retains snapshot/state/ID buffers. Snapshot filling preserves session
+ResourceGameplay retains snapshot/state/ID buffers. Snapshot filling preserves session
 order and range/frame gates; states move into the contiguous solver input rather
 than cloning a second population. Capturing presentation history reuses the same
 snapshot storage and retains its simulation-frame interpolation policy.

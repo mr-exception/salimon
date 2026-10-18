@@ -1,6 +1,7 @@
 //! Corrected, deterministic portable attribution. No GPU or native FPS claim.
 use crate::{
-    app::character_ship_frame, carrying, fragment_physics, mining::MiningTool, sphere_fixtures,
+    carrying, fragment_physics, mining::ResourceGameplay, session::frames::character_ship_frame,
+    sphere_fixtures,
 };
 use salimon_character::{SHIP_FLOOR_HEIGHT_METERS, ShipFrame};
 use salimon_ship::{ShipController, ShipPose};
@@ -15,9 +16,13 @@ fn pose(p: [f64; 3]) -> ResourceTransform {
     ResourceTransform::new(WorldPosition::new(p[0], p[1], p[2]), [0.0, 0.0, 0.0, 1.0]).unwrap()
 }
 
-fn fixture(count: usize, history: usize, mode: &str) -> (MiningTool, ShipController, ShipFrame) {
+fn fixture(
+    count: usize,
+    history: usize,
+    mode: &str,
+) -> (ResourceGameplay, ShipController, ShipFrame) {
     let onboard = matches!(mode, "moving-ship" | "zero-g");
-    let mut tool = MiningTool::default();
+    let mut tool = ResourceGameplay::default();
     let ship = ShipController::flying(
         ShipPose {
             position_meters: SURFACE_ANCHOR.translated([0.0, 0.0, 20.0]).meters(),

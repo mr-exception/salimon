@@ -116,9 +116,9 @@ pub(crate) fn landing_footprint() -> salimon_ship::LandingFootprint {
         hull: salimon_character::hull_ground_samples(),
     }
 }
-impl crate::app::ClientApplication {
+impl crate::session::GameplaySession {
     pub(crate) fn terrain_frame(&self, ship: salimon_ship::ShipSnapshot) -> SurfaceFrame {
-        let mut frame = crate::app::surface_frame_for_ship(ship);
+        let mut frame = crate::session::frames::surface_frame_for_ship(ship);
         if self.mining.terrain == TerrainMode::Representative {
             frame.query = Some(character_ground);
         }
@@ -173,10 +173,10 @@ mod tests {
         ] {
             let body = *CELESTIAL_BODIES.iter().find(|b| b.id == id).unwrap();
             for d in [[0.0, 1.0, 0.0], [0.0, 0.0, 1.0]] {
-                let mut app = crate::app::ClientApplication::default();
+                let mut app = crate::session::GameplaySession::default();
                 app.enable_terrain(body, d).unwrap();
                 let ship = app.ship.snapshot();
-                let frame = crate::app::character_ship_frame(ship.pose);
+                let frame = crate::session::frames::character_ship_frame(ship.pose);
                 let support = footprint();
                 let mut max_gap = 0.0_f64;
                 for p in support.feet.iter().chain(&support.ramp) {
@@ -208,7 +208,7 @@ mod tests {
             .iter()
             .find(|b| b.id == salimon_world::CelestialBodyId::Moon)
             .unwrap();
-        let mut app = crate::app::ClientApplication::default();
+        let mut app = crate::session::GameplaySession::default();
         app.enable_terrain(body, [0.0, 0.0, 1.0]).unwrap();
         let landed = app.ship.snapshot().pose;
         let d = sub(landed.position_meters, body.center.meters());
@@ -300,7 +300,7 @@ mod tests {
             1.0 / length(sub(landed.pose.position_meters, body.center.meters())),
         );
         assert!(length(sub(start_direction, end_direction)) > 1e-6);
-        let frame = crate::app::character_ship_frame(landed.pose);
+        let frame = crate::session::frames::character_ship_frame(landed.pose);
         for local in footprint().feet.iter().chain(&footprint().ramp) {
             let world = frame.local_to_world(*local);
             let relative = sub(world, body.center.meters());

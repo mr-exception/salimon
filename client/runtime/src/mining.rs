@@ -1,4 +1,4 @@
-//! Tool input and session extraction composition; no general resource inventory.
+//! Resource composition owns fragments, cargo anchors/mass, query caches and tool input.
 use std::{
     cell::RefCell,
     rc::Rc,
@@ -25,6 +25,12 @@ struct NearbyCache {
 
 #[derive(Default)]
 pub(crate) struct MiningTool {
+    pub(crate) held: bool,
+    f_down: bool,
+}
+
+#[derive(Default)]
+pub(crate) struct ResourceGameplay {
     pub(crate) ship_gravity_disabled: bool,
     pub(crate) ship_mass: salimon_ship::ShipMass,
     pub(crate) mass_frame: Option<ShipFrame>,
@@ -44,28 +50,27 @@ pub(crate) struct MiningTool {
         crate::fragment_physics::FragmentMotion,
     >,
     pub(crate) carry_feedback: Option<&'static str>,
-    pub(crate) held: bool,
+    pub(crate) input: MiningTool,
     pub(crate) config: salimon_world::spherical_mining::MiningConfig,
-    f_down: bool,
     pub(crate) session: MiningSession,
 }
 
-impl MiningTool {
+impl ResourceGameplay {
     /// Latch the initial F edge; a carrying action consumes this entire press.
     pub(crate) fn press_f(&mut self) -> bool {
-        if self.f_down {
+        if self.input.f_down {
             return false;
         }
-        self.f_down = true;
+        self.input.f_down = true;
         true
     }
 
     pub(crate) fn release_f(&mut self) {
-        self.f_down = false;
+        self.input.f_down = false;
     }
 
     pub(crate) fn set_mouse_held(&mut self, pressed: bool) {
-        self.held = pressed;
+        self.input.held = pressed;
         if !pressed {
             self.session.interrupt_spherical();
         }
@@ -73,12 +78,12 @@ impl MiningTool {
 
     /// Cancel extraction while preserving a contextual F press consumed by pickup.
     pub(crate) fn stop_mining(&mut self) {
-        self.held = false;
+        self.input.held = false;
         self.session.interrupt_spherical();
     }
 
     pub(crate) fn clear_input(&mut self) {
-        self.f_down = false;
+        self.input.f_down = false;
         self.stop_mining();
     }
 
@@ -198,12 +203,13 @@ impl MiningTool {
             return;
         };
         let Some(target) = self
+            .input
             .held
             .then(|| self.target(equipment, player, frame, door_open, seed))
             .flatten()
         else {
             self.session
-                .tick_spherical(self.held, None, delta, self.config, pose);
+                .tick_spherical(self.input.held, None, delta, self.config, pose);
             return;
         };
         let Ok(deposits) = self.nearby(player.eye_position_meters, seed) else {
@@ -215,7 +221,7 @@ impl MiningTool {
             .find(|entry| entry.deposit.id() == target.id)
             .map(|entry| entry.deposit);
         self.session
-            .tick_spherical(self.held, target.as_mut(), delta, self.config, pose);
+            .tick_spherical(self.input.held, target.as_mut(), delta, self.config, pose);
     }
 
     /// Presentation of reserved mass, not an additional physical entity. Recompute
@@ -249,7 +255,7 @@ impl MiningTool {
     ) -> Option<HeldItemInstance> {
         (player.location == CharacterLocation::Surface && equipment.mining_equipped()).then_some(
             HeldItemInstance {
-                active: self.held && valid_target,
+                active: self.input.held && valid_target,
             },
         )
     }
@@ -298,34 +304,34 @@ mod tests {
 
     #[test]
     fn carrying_press_is_latched_and_mouse_mining_is_independent() {
-        let mut tool = MiningTool::default();
+        let mut tool = ResourceGameplay::default();
         assert!(tool.press_f());
         assert!(
-            !tool.held,
+            !tool.input.held,
             "carrying consumes F without starting extraction"
         );
         assert!(!tool.press_f(), "repeated press cannot change the action");
         tool.set_mouse_held(true);
         tool.release_f();
-        assert!(tool.held, "F release must preserve left mouse mining");
+        assert!(tool.input.held, "F release must preserve left mouse mining");
         assert!(tool.press_f());
         tool.set_mouse_held(false);
         assert!(
-            !tool.held,
+            !tool.input.held,
             "held F cannot sustain mining after mouse release"
         );
         tool.set_mouse_held(true);
         tool.stop_mining();
-        assert!(!tool.held);
+        assert!(!tool.input.held);
         assert!(!tool.press_f(), "pickup cancellation preserves the F latch");
         tool.clear_input();
         assert!(tool.press_f(), "input reset clears the F latch");
-        assert!(!tool.held, "F after reset cannot start mining");
+        assert!(!tool.input.held, "F after reset cannot start mining");
     }
 
     #[test]
     fn authored_tool_visibility_and_feedback_follow_existing_gates() {
-        let mut tool = MiningTool::default();
+        let mut tool = ResourceGameplay::default();
         let mut equipment = crate::equipment::EquipmentToolbar::default();
         let mut player = CharacterSnapshot {
             location: CharacterLocation::Surface,
@@ -341,7 +347,7 @@ mod tests {
             tool.held_item(&equipment, player, true),
             Some(HeldItemInstance { active: false })
         );
-        tool.held = true;
+        tool.input.held = true;
         assert_eq!(
             tool.held_item(&equipment, player, false),
             Some(HeldItemInstance { active: false })
@@ -356,7 +362,7 @@ mod tests {
         equipment.sync_carrying(true);
         tool.clear_input();
         assert!(tool.held_item(&equipment, player, true).is_none());
-        assert!(!tool.held);
+        assert!(!tool.input.held);
     }
 }
 
@@ -378,7 +384,7 @@ mod spherical_tests {
 
     #[test]
     fn attached_piece_follows_tool_and_is_excluded_from_loose_physics() {
-        let mut tool = MiningTool::default();
+        let mut tool = ResourceGameplay::default();
         let pose = attachment_pose(player()).unwrap();
         let mut source = ResourceDeposit::new(
             DepositId {
@@ -491,7 +497,7 @@ mod query_cache_tests {
 
     #[test]
     fn nearby_cache_reuses_results_and_reconciles_depletion_without_regenerating() {
-        let mut tool = MiningTool::default();
+        let mut tool = ResourceGameplay::default();
         let body = CELESTIAL_BODIES
             .iter()
             .find(|b| b.id == CelestialBodyId::Earth)
@@ -535,7 +541,7 @@ mod query_cache_tests {
 
     #[test]
     fn look_only_updates_recompute_aim_and_zero_time_aim_loss_releases() {
-        let mut tool = MiningTool::default();
+        let mut tool = ResourceGameplay::default();
         let body = CELESTIAL_BODIES
             .iter()
             .find(|b| b.id == CelestialBodyId::Earth)
@@ -567,7 +573,7 @@ mod query_cache_tests {
         };
         let mut equipment = crate::equipment::EquipmentToolbar::default();
         equipment.select(crate::equipment::ToolbarSlot::One, false);
-        tool.held = true;
+        tool.input.held = true;
         assert!(tool.target(&equipment, player, frame, false, 42).is_some());
         tool.advance(
             &equipment,
@@ -589,7 +595,7 @@ mod query_cache_tests {
     #[test]
     #[ignore = "opt-in CPU timing; does not certify native performance"]
     fn preparation_profile() {
-        let tool = MiningTool {
+        let tool = ResourceGameplay {
             terrain: TerrainMode::Representative,
             ..Default::default()
         };

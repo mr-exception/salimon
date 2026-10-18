@@ -1,5 +1,5 @@
 //! Compose physical carrying with character aim and release from hand height.
-use crate::mining::MiningTool;
+use crate::mining::ResourceGameplay;
 use salimon_character::{CharacterLocation, CharacterSnapshot, ShipFrame};
 use salimon_math::{cross, dot, length};
 use salimon_world::WorldPosition;
@@ -32,7 +32,7 @@ fn hull_obstruction(
 }
 
 pub(crate) fn target(
-    tool: &MiningTool,
+    tool: &ResourceGameplay,
     player: CharacterSnapshot,
     frame: ShipFrame,
     door_open: bool,
@@ -66,7 +66,7 @@ pub(crate) fn target(
 }
 
 pub(crate) fn context(
-    tool: &MiningTool,
+    tool: &ResourceGameplay,
     target: Option<FragmentId>,
     player: CharacterSnapshot,
 ) -> Option<&'static str> {
@@ -87,7 +87,7 @@ pub(crate) fn context(
     }
 }
 
-pub(crate) fn follow(tool: &mut MiningTool, player: CharacterSnapshot) {
+pub(crate) fn follow(tool: &mut ResourceGameplay, player: CharacterSnapshot) {
     let Some(id) = tool.session.carried_id() else {
         return;
     };
@@ -159,7 +159,7 @@ pub(crate) fn follow(tool: &mut MiningTool, player: CharacterSnapshot) {
 
 /// Release at the current carried pose. Gravity and contacts then determine where it lands.
 pub(crate) fn release_pose(
-    tool: &MiningTool,
+    tool: &ResourceGameplay,
     player: CharacterSnapshot,
     frame: ShipFrame,
 ) -> Option<ResourceTransform> {
@@ -187,7 +187,7 @@ pub(crate) fn release_pose(
 
 /// Interior gravity abstracts acceleration: loose pieces retain their ship-local
 /// coordinates while the ship translates/rotates. Surface pieces remain world-local.
-pub(crate) fn sync_ship_fragments(tool: &mut MiningTool, frame: ShipFrame) {
+pub(crate) fn sync_ship_fragments(tool: &mut ResourceGameplay, frame: ShipFrame) {
     if let Some(id) = tool.session.carried_id() {
         tool.ship_fragments.remove(&id);
     }
@@ -212,7 +212,7 @@ pub(crate) fn sync_ship_fragments(tool: &mut MiningTool, frame: ShipFrame) {
 /// frame performs no containment/mass work. A moving boundary must still notice
 /// stationary world objects, even when their poses emit no mutation.
 pub(crate) fn sync_ship_mass(
-    tool: &mut MiningTool,
+    tool: &mut ResourceGameplay,
     frame: ShipFrame,
     ship: &mut salimon_ship::ShipController,
 ) -> usize {
@@ -267,8 +267,8 @@ mod tests {
     use salimon_world::resources::ResourceId;
     use std::time::Duration;
 
-    fn mined() -> MiningTool {
-        let mut tool = MiningTool::default();
+    fn mined() -> ResourceGameplay {
+        let mut tool = ResourceGameplay::default();
         crate::sphere_fixtures::sphere(
             &mut tool.session,
             ResourceId::SilicateRock,
@@ -285,8 +285,8 @@ mod tests {
         assert!(tool.session.pick_up(id));
         let mut ship = salimon_ship::ShipController::default();
         ship.set_stored_core_energy_joules(0);
-        let frame = crate::app::character_ship_frame(ship.snapshot().pose);
-        let surface = crate::app::surface_frame_for_ship(ship.snapshot());
+        let frame = crate::session::frames::character_ship_frame(ship.snapshot().pose);
+        let surface = crate::session::frames::surface_frame_for_ship(ship.snapshot());
         let mut player = salimon_character::CharacterController::default();
         player.set_ship_gravity_enabled(false);
         follow(&mut tool, player.snapshot(frame, surface));
@@ -321,7 +321,7 @@ mod tests {
             ResourceId::WaterIce,
         ] {
             for mass in [1e-9, 0.000_003, 0.032, 1.0, 2.0, 10.0] {
-                let mut tool = MiningTool::default();
+                let mut tool = ResourceGameplay::default();
                 crate::sphere_fixtures::sphere(
                     &mut tool.session,
                     resource,
@@ -492,7 +492,7 @@ mod mass_tests {
     fn unequal_spheres_boundary_transfers_and_final_core_removal_return_exact_dry_mass() {
         use salimon_ship::{IntakeResult, STARTER_DRY_MASS_KG};
         use salimon_world::spherical_mining::MiningConfig;
-        let mut tool = MiningTool::default();
+        let mut tool = ResourceGameplay::default();
         let mut ship = ShipController::flying(
             ShipPose {
                 position_meters: [1e12, 0.0, 0.0],
@@ -500,7 +500,7 @@ mod mass_tests {
             },
             0,
         );
-        let frame = crate::app::character_ship_frame(ship.snapshot().pose);
+        let frame = crate::session::frames::character_ship_frame(ship.snapshot().pose);
         let pose = |local| {
             ResourceTransform::new(position(frame.local_to_world(local)), [0.0, 0.0, 0.0, 1.0])
                 .unwrap()
@@ -568,7 +568,7 @@ mod mass_tests {
 
     #[test]
     fn physical_events_containment_moving_ship_carry_drop_and_despawn() {
-        let mut tool = MiningTool::default();
+        let mut tool = ResourceGameplay::default();
         let mut ship = ShipController::flying_with_velocity(
             ShipPose {
                 position_meters: [1e12, 0.0, 0.0],
@@ -578,7 +578,7 @@ mod mass_tests {
             [12.0, 0.0, 0.0],
         )
         .unwrap();
-        let frame = crate::app::character_ship_frame(ship.snapshot().pose);
+        let frame = crate::session::frames::character_ship_frame(ship.snapshot().pose);
         let pose = |local| {
             ResourceTransform::new(position(frame.local_to_world(local)), [0.0, 0.0, 0.0, 1.0])
                 .unwrap()
@@ -615,7 +615,7 @@ mod mass_tests {
             tool.ship_fragments.insert(piece.id(), [-5.0, 1.0, 0.0]);
         }
         ship.advance(Duration::from_secs(1));
-        let moved = crate::app::character_ship_frame(ship.snapshot().pose);
+        let moved = crate::session::frames::character_ship_frame(ship.snapshot().pose);
         sync_ship_fragments(&mut tool, moved);
         sync_ship_mass(&mut tool, moved, &mut ship);
         assert_eq!(ship.snapshot().total_mass_kg, 101_000.0);

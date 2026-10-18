@@ -1,8 +1,9 @@
 //! Opt-in benchmark orchestration. JSON is emitted after sampling, not per frame.
 use crate::{
-    app::{ClientApplication, character_ship_frame, surface_frame_for_ship},
     benchmark_fixture::{self, Layout},
     fragment_physics::Measurements,
+    session::GameplaySession,
+    session::frames::{character_ship_frame, surface_frame_for_ship},
 };
 use salimon_renderer::{GpuFrameTime, RenderStats};
 use serde_json::{Value, json};
@@ -164,15 +165,22 @@ pub(crate) fn parse(args: &[String]) -> Result<Config, String> {
     Ok(config)
 }
 
-pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<(), String> {
+pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<(), String> {
     benchmark_fixture::initialize(app, config.count, config.layout, config.seed, config.active)?;
     benchmark_fixture::settle(app, config.count, config.settle_steps)?;
+    app.seed = config.seed;
+    app.measure_physics = true;
     // Camera remains a production character camera, facing the aft population.
     if !config.away {
         app.character
             .apply_mouse_delta(std::f64::consts::PI / 0.0022, 0.0);
     }
     app.character.apply_mouse_delta(0.0, 220.0);
+    Ok(())
+}
+
+/// Native runner IO; portable fixture construction never waits for stdin.
+pub(crate) fn wait_for_start(config: Config) -> Result<(), String> {
     if config.defer_start {
         // Explicit runner barrier before creating a native window or starting
         // clocks. Other fixtures can prepare concurrently, then all CPU work
@@ -286,7 +294,7 @@ impl Recorder {
     pub(crate) fn switch_camera(&self) -> bool {
         self.config.both_cameras && self.completed.len() == self.config.repeats
     }
-    pub(crate) fn new(config: Config, app: &ClientApplication) -> Self {
+    pub(crate) fn new(config: Config, app: &GameplaySession) -> Self {
         Self {
             config,
             started: None,
@@ -400,7 +408,7 @@ impl Recorder {
                 "gpu_latest_ms": r.and_then(|r| if let GpuFrameTime::Measured(d) = r.gpu_frame_time { Some(ms(d)) } else { None }),
                 "gpu_status": r.map(|r| match r.gpu_frame_time { GpuFrameTime::Measured(_) => "measured_latest", GpuFrameTime::Pending => "pending", GpuFrameTime::Unsupported => "unsupported" })})
         }).collect();
-        let output = json!({"schema": 1, "mode": if self.config.headless { "physics_wall_clock" } else { "native_wall_clock" },
+        let output = json!({"schema": 1, "update_scope": "gameplay_session_v1", "mode": if self.config.headless { "physics_wall_clock" } else { "native_wall_clock" },
             "config": {"count": self.config.count, "layout": self.config.layout.name(), "seed": self.config.seed,
                 "initial_state": if self.config.active { "active" } else { "settled_requested" },
                 "camera": if self.config.away || (self.config.both_cameras && self.completed.len() >= self.config.repeats) { "away" } else { "facing" },
@@ -437,7 +445,7 @@ impl Recorder {
     }
 }
 
-fn solver_baseline(config: Config, app: &ClientApplication) -> Option<Value> {
+fn solver_baseline(config: Config, app: &GameplaySession) -> Option<Value> {
     if config.baseline_samples == 0 {
         return None;
     }
@@ -498,7 +506,7 @@ fn solver_baseline(config: Config, app: &ClientApplication) -> Option<Value> {
     )
 }
 
-pub(crate) fn accounting(app: &ClientApplication) -> Value {
+pub(crate) fn accounting(app: &GameplaySession) -> Value {
     // Stable session order; poses/velocity are deliberately absent.
     json!({"extracted_mass_kg": app.mining.session.extracted_mass_kg(),
         "fragments": app.mining.session.fragments().iter().map(|p|
@@ -510,20 +518,15 @@ fn ms(duration: Duration) -> f64 {
 }
 
 pub(crate) fn run_headless(config: Config) -> Result<(), String> {
-    let mut app = ClientApplication::default();
+    let mut app = GameplaySession::default();
     initialize(&mut app, config)?;
     let mut recorder = Recorder::new(config, &app);
     let delta = Duration::from_millis(16);
     loop {
         let started = Instant::now();
-        let ship = app.ship.snapshot();
-        let frame = character_ship_frame(ship.pose);
-        let player = app
-            .character
-            .snapshot(frame, surface_frame_for_ship(ship))
-            .eye_position_meters;
-        recorder.latest_physics =
-            crate::fragment_physics::advance_measured(&mut app.mining, frame, delta, player, true);
+        app.latest_physics.clear_work();
+        app.advance_automation(delta);
+        recorder.latest_physics = app.latest_physics;
         let update_time = started.elapsed();
         if recorder.record(delta, update_time, update_time, None)
             && recorder.finish(accounting(&app))?
@@ -539,7 +542,7 @@ mod tests {
     #[test]
     fn native_readiness_gates_start_and_loss_invalidates_collection() {
         let config = parse(&["--benchmark".into(), "--warmup-seconds".into(), "0".into()]).unwrap();
-        let mut recorder = Recorder::new(config, &ClientApplication::default());
+        let mut recorder = Recorder::new(config, &GameplaySession::default());
         let delta = Duration::from_millis(16);
         assert!(!recorder.record(delta, Duration::ZERO, Duration::ZERO, None));
         assert!(recorder.started.is_none());
@@ -556,7 +559,7 @@ mod tests {
         assert_eq!(recorder.samples.len(), 1);
         assert!(
             recorder
-                .finish(accounting(&ClientApplication::default()))
+                .finish(accounting(&GameplaySession::default()))
                 .is_err()
         );
     }
@@ -564,7 +567,7 @@ mod tests {
     #[test]
     fn surface_metadata_cannot_change_during_startup_or_warmup() {
         let config = parse(&["--benchmark".into()]).unwrap();
-        let mut recorder = Recorder::new(config, &ClientApplication::default());
+        let mut recorder = Recorder::new(config, &GameplaySession::default());
         recorder
             .observe_native("test_foreground_visible", true)
             .unwrap();
@@ -581,7 +584,7 @@ mod tests {
     #[test]
     fn startup_occlusion_restarts_warmup_but_retained_intervals_fail() {
         let config = parse(&["--benchmark".into()]).unwrap();
-        let mut recorder = Recorder::new(config, &ClientApplication::default());
+        let mut recorder = Recorder::new(config, &GameplaySession::default());
         recorder
             .observe_native("test_foreground_visible", true)
             .unwrap();
@@ -621,7 +624,7 @@ mod tests {
             "2".into(),
         ])
         .unwrap();
-        let mut recorder = Recorder::new(config, &ClientApplication::default());
+        let mut recorder = Recorder::new(config, &GameplaySession::default());
         recorder
             .observe_native("test_foreground_visible", true)
             .unwrap();
@@ -649,7 +652,7 @@ mod tests {
                 headless: true,
                 ..config
             },
-            &ClientApplication::default(),
+            &GameplaySession::default(),
         );
         cpu.started = Some(Instant::now() - Duration::from_secs(2));
         assert!(!cpu.record(delta, Duration::ZERO, Duration::ZERO, None));
@@ -667,7 +670,7 @@ mod tests {
             "0".into(),
         ])
         .unwrap();
-        let app = ClientApplication::default();
+        let app = GameplaySession::default();
         let mut recorder = Recorder::new(config, &app);
         recorder
             .observe_native("test_foreground_visible", true)
@@ -702,7 +705,7 @@ mod tests {
             "0".into(),
         ])
         .unwrap();
-        let mut recorder = Recorder::new(config, &ClientApplication::default());
+        let mut recorder = Recorder::new(config, &GameplaySession::default());
         recorder
             .observe_native("test_foreground_visible", true)
             .unwrap();
@@ -725,7 +728,7 @@ mod tests {
             "0".into(),
         ])
         .unwrap();
-        let app = ClientApplication::default();
+        let app = GameplaySession::default();
         let mut recorder = Recorder::new(config, &app);
         recorder
             .observe_native("test_foreground_visible", true)
@@ -765,7 +768,7 @@ mod tests {
             "dense".into(),
         ])
         .unwrap();
-        let mut app = ClientApplication::default();
+        let mut app = GameplaySession::default();
         config.settle_steps = 1;
         assert!(
             initialize(&mut app, config)
@@ -773,7 +776,7 @@ mod tests {
                 .contains("did not sleep")
         );
         let expected = accounting(&app);
-        let mut app = ClientApplication::default();
+        let mut app = GameplaySession::default();
         config.settle_steps = 1200;
         initialize(&mut app, config).unwrap();
         assert_eq!(accounting(&app), expected);
@@ -814,7 +817,7 @@ mod tests {
     #[test]
     fn full_game_high_speed_flight_keeps_sleep_and_ship_local_poses() {
         use winit::keyboard::{KeyCode, PhysicalKey};
-        let mut app = ClientApplication::default();
+        let mut app = GameplaySession::default();
         crate::e2e::initialize(
             &mut app,
             crate::e2e::Config {
@@ -833,7 +836,7 @@ mod tests {
             [25_000.0, 0.0, 0.0],
         )
         .unwrap();
-        app.automation_key(PhysicalKey::Code(KeyCode::KeyA), true);
+        crate::app::input::dispatch_session_key(&mut app, PhysicalKey::Code(KeyCode::KeyA), true);
         for _ in 0..100 {
             app.advance_game(Duration::from_millis(16));
             assert_eq!(app.mining.ship_fragments, anchors);
@@ -869,7 +872,7 @@ mod tests {
     }
     #[test]
     fn native_large_load_scenario_uses_production_input_and_takeoff() {
-        let mut app = ClientApplication::default();
+        let mut app = GameplaySession::default();
         crate::e2e::initialize(
             &mut app,
             crate::e2e::Config {
@@ -889,7 +892,7 @@ mod tests {
                 .unwrap_or(json!({"op": "inspect"}));
             command["protocol"] = json!(1);
             command["id"] = json!(1);
-            let response = crate::automation::execute(&mut app, &command.to_string());
+            let response = crate::automation::execute_session(&mut app, &command.to_string());
             assert_eq!(response["ok"], true, "{response}");
             if let Some(assertion) = step.get("assert") {
                 let path = format!("/{}", assertion["path"].as_str().unwrap().replace('.', "/"));
@@ -913,7 +916,7 @@ mod tests {
                 "scattered".into(),
             ])
             .unwrap();
-            let mut app = ClientApplication::default();
+            let mut app = GameplaySession::default();
             initialize(&mut app, config).unwrap();
             let original = accounting(&app);
             app.advance_game(Duration::from_millis(16));
@@ -952,7 +955,7 @@ mod tests {
 
     #[test]
     fn loaded_fixture_accepts_real_f_pickup_drop_and_carry_lockout() {
-        let mut app = ClientApplication::default();
+        let mut app = GameplaySession::default();
         crate::e2e::initialize(
             &mut app,
             crate::e2e::Config {
@@ -981,11 +984,11 @@ mod tests {
             })
             .map(|p| p.id().0)
             .collect();
-        let command = |app: &mut ClientApplication, op: Value| {
+        let command = |app: &mut GameplaySession, op: Value| {
             let mut op = op;
             op["protocol"] = json!(1);
             op["id"] = json!(1);
-            let response = crate::automation::execute(app, &op.to_string());
+            let response = crate::automation::execute_session(app, &op.to_string());
             assert_eq!(response["ok"], true, "{response}");
             response
         };
@@ -1031,7 +1034,7 @@ mod tests {
 
     #[test]
     fn canonical_adapter_retains_uninterrupted_solver_states_between_updates() {
-        let mut app = ClientApplication::default();
+        let mut app = GameplaySession::default();
         benchmark_fixture::initialize(&mut app, 100, Layout::Dense, 155, false).unwrap();
         let frame = character_ship_frame(app.ship.snapshot().pose);
         let eye = app
@@ -1075,8 +1078,8 @@ mod tests {
     #[test]
     fn instrumentation_does_not_change_production_poses_or_accounting() {
         let config = parse(&["--benchmark".into(), "--count".into(), "12".into()]).unwrap();
-        let mut a = ClientApplication::default();
-        let mut b = ClientApplication::default();
+        let mut a = GameplaySession::default();
+        let mut b = GameplaySession::default();
         initialize(&mut a, config).unwrap();
         initialize(&mut b, config).unwrap();
         let original = accounting(&a);

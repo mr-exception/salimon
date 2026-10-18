@@ -547,7 +547,7 @@ mod terrain_tests {
                     .center
                     .translated(ground.body_local_position_meters)
                     .meters();
-                let mut tool = crate::mining::MiningTool::default();
+                let mut tool = crate::mining::ResourceGameplay::default();
                 tool.terrain = mode;
                 let entries = tool.nearby(player, 181).unwrap();
                 assert!(!entries.is_empty());

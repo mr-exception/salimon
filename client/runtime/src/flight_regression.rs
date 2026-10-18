@@ -1,9 +1,6 @@
 //! Reproducible initial conditions for portable/native flight regression routes.
 //! No test-only mutation commands: subsequent actions use production controllers.
-use crate::{
-    app::{ClientApplication, character_ship_frame},
-    e2e::Scenario,
-};
+use crate::{e2e::Scenario, session::GameplaySession, session::frames::character_ship_frame};
 use salimon_ship::{ShipController, ShipPose};
 use salimon_world::resources::{
     DepositId, RawMaterial, ResourceDeposit, ResourceId, ResourceTransform,
@@ -11,7 +8,7 @@ use salimon_world::resources::{
 use salimon_world::{CelestialBodyId, WorldPosition};
 use std::time::Duration;
 
-pub(crate) fn initialize(app: &mut ClientApplication, scenario: Scenario) -> Result<(), String> {
+pub(crate) fn initialize(app: &mut GameplaySession, scenario: Scenario) -> Result<(), String> {
     app.ship = ShipController::flying_with_velocity(
         ShipPose {
             position_meters: [0.0; 3],
@@ -45,7 +42,7 @@ pub(crate) fn initialize(app: &mut ClientApplication, scenario: Scenario) -> Res
                 .character
                 .snapshot(
                     frame,
-                    crate::app::surface_frame_for_ship(app.ship.snapshot()),
+                    crate::session::frames::surface_frame_for_ship(app.ship.snapshot()),
                 )
                 .eye_position_meters;
             let target = frame.local_to_world(salimon_character::CORE_INTERACTION_POSITION_METERS);
@@ -111,7 +108,7 @@ pub(crate) fn initialize(app: &mut ClientApplication, scenario: Scenario) -> Res
 /// Historical legacy-onboard-032kg-v1: 500 × 0.032 kg = 16 kg, never 10 kg spheres.
 /// Small fragments fit 500 actual centers inside the aft cabin without
 /// an overfull fixture silently excluding cargo from mass accounting.
-pub(crate) fn initialize_cargo(app: &mut ClientApplication, count: usize) -> Result<(), String> {
+pub(crate) fn initialize_cargo(app: &mut GameplaySession, count: usize) -> Result<(), String> {
     if count > 500 {
         return Err("onboard regression population must be <=500".into());
     }
@@ -174,7 +171,7 @@ mod tests {
 
     fn replay(scenario: Scenario, source: &str) {
         let route: Value = serde_json::from_str(source).unwrap();
-        let mut app = ClientApplication::default();
+        let mut app = GameplaySession::default();
         e2e::initialize(
             &mut app,
             e2e::Config {
@@ -190,10 +187,10 @@ mod tests {
                 let mut command = action.clone();
                 command["protocol"] = json!(1);
                 command["id"] = json!(index);
-                let response = automation::execute(&mut app, &command.to_string());
+                let response = automation::execute_session(&mut app, &command.to_string());
                 assert_eq!(response["ok"], true, "step {index}: {response}");
             } else if let Some(check) = step.get("assert") {
-                let state = automation::execute(
+                let state = automation::execute_session(
                     &mut app,
                     &json!({"protocol":1,"id":index,"op":"inspect"}).to_string(),
                 );
@@ -285,7 +282,7 @@ mod tests {
 
     #[test]
     fn cabin_blackout_coasts_with_held_fragment_and_restores_in_place() {
-        let mut app = ClientApplication::default();
+        let mut app = GameplaySession::default();
         e2e::initialize(
             &mut app,
             e2e::Config {
@@ -299,7 +296,7 @@ mod tests {
         let held = app.mining.session.carried_id();
         let start = app.character.local_ship_position().unwrap();
         assert_eq!(
-            automation::execute(
+            automation::execute_session(
                 &mut app,
                 &json!({"protocol":1,"id":1,"op":"key","key":"ascend","pressed":true}).to_string()
             )["ok"],
@@ -309,7 +306,7 @@ mod tests {
             app.advance_game(Duration::from_millis(16));
         }
         assert_eq!(
-            automation::execute(
+            automation::execute_session(
                 &mut app,
                 &json!({"protocol":1,"id":2,"op":"key","key":"ascend","pressed":false}).to_string()
             )["ok"],
@@ -331,7 +328,7 @@ mod tests {
 
     #[test]
     fn five_hundred_fragments_mass_power_transition_and_consumption() {
-        let mut app = ClientApplication::default();
+        let mut app = GameplaySession::default();
         e2e::initialize(
             &mut app,
             e2e::Config {

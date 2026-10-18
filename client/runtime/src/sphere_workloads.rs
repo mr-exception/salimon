@@ -1,5 +1,5 @@
 //! Separately versioned current-sphere CPU workloads; never a native FPS gate.
-use crate::{carrying, fragment_physics, mining::MiningTool, sphere_fixtures};
+use crate::{carrying, fragment_physics, mining::ResourceGameplay, sphere_fixtures};
 use salimon_character::SHIP_FLOOR_HEIGHT_METERS;
 use salimon_ship::{ShipController, ShipPose};
 use salimon_world::{
@@ -10,8 +10,8 @@ use salimon_world::{
 use serde_json::json;
 use std::time::Instant;
 
-fn population(count: usize, mixed: bool) -> (MiningTool, ShipController, serde_json::Value) {
-    let mut tool = MiningTool::default();
+fn population(count: usize, mixed: bool) -> (ResourceGameplay, ShipController, serde_json::Value) {
+    let mut tool = ResourceGameplay::default();
     let mut ship = ShipController::flying(
         ShipPose {
             position_meters: [1e12, 0.0, 0.0],
@@ -19,7 +19,7 @@ fn population(count: usize, mixed: bool) -> (MiningTool, ShipController, serde_j
         },
         0,
     );
-    let frame = crate::app::character_ship_frame(ship.snapshot().pose);
+    let frame = crate::session::frames::character_ship_frame(ship.snapshot().pose);
     let max_radius = salimon_world::resource_size::fragment_contact_radius_meters(
         salimon_world::resources::RawMaterial::new(ResourceId::WaterIce, 10.0).unwrap(),
     );
@@ -116,7 +116,7 @@ fn current_sphere_workloads_cpu() {
     for count in [500, 1000] {
         for mixed in [false, true] {
             let (mut tool, mut ship, mut metadata) = population(count, mixed);
-            let frame = crate::app::character_ship_frame(ship.snapshot().pose);
+            let frame = crate::session::frames::character_ship_frame(ship.snapshot().pose);
             let eye = frame.local_to_world([-5.0, 2.0, 0.0]);
             let identities: Vec<_> = tool
                 .session

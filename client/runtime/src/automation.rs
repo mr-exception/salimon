@@ -8,7 +8,9 @@ use std::time::{Duration, Instant};
 use serde_json::{Value, json};
 use winit::keyboard::{KeyCode, PhysicalKey};
 
-use crate::app::{ClientApplication, character_ship_frame};
+use crate::app::ClientApplication;
+use crate::session::GameplaySession;
+use crate::session::frames::character_ship_frame;
 use salimon_character::CharacterLocation;
 use salimon_world::CELESTIAL_BODIES;
 
@@ -102,32 +104,29 @@ fn error(id: Value, code: &str, message: &str) -> Value {
 }
 
 pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
+    let before = app.session.elapsed;
+    let result = execute_native(app, line);
+    app.advance_feedback(app.session.elapsed - before);
+    app.show_session_feedback();
+    result
+}
+fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
+    // Portable parser validates every envelope before any shell side effects.
     if app.e2e_step().is_none() {
         return error(Value::Null, "disabled", "automation requires --e2e");
     }
     let command: Value = match serde_json::from_str(line) {
         Ok(value) => value,
-        Err(_) => {
-            return error(
-                Value::Null,
-                "invalid_json",
-                "expected one JSON object per line",
-            );
-        }
+        Err(_) => return execute_session(&mut app.session, line),
     };
     let id = command.get("id").cloned().unwrap_or(Value::Null);
-    if !command.is_object() || !(id.is_string() || id.is_number()) {
-        return error(
-            id,
-            "invalid_request",
-            "object with string or numeric id required",
-        );
-    }
-    if command.get("protocol").and_then(Value::as_u64) != Some(u64::from(PROTOCOL)) {
-        return error(id, "protocol_mismatch", "expected protocol 1");
+    if !command.is_object()
+        || !(id.is_string() || id.is_number())
+        || command.get("protocol").and_then(Value::as_u64) != Some(u64::from(PROTOCOL))
+    {
+        return execute_session(&mut app.session, line);
     }
     let result = match command.get("op").and_then(Value::as_str) {
-        Some("inspect") => Ok(inspect(app)),
         Some("window") => {
             let action = command.get("action").and_then(Value::as_str).unwrap_or("");
             let size = command
@@ -161,6 +160,77 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
             app.observations.clear();
             Ok(json!({"reset":true}))
         }
+        Some("inspect") => {
+            let mut result = inspect_session(&app.session);
+            let upload_times = app.terrain_upload_times();
+            let (uploaded_bytes, peak_upload_bytes) = app.terrain_uploads();
+            let native = json!({ "terrain_upload_preparation_micros": upload_times,
+            "visual_context": app.visual_context(),
+            "window": app.window_state(),
+            "capture_status": app.capture_status,
+            "performance": app.observations.snapshot(),
+            "terrain": { "mode": format!("{:?}", app.session.mining.terrain), "active_patches": app.terrain_stream.active.len(),
+                "cache_patches": app.terrain_stream.cached(), "pending_patches": app.terrain_stream.pending,
+                "gpu_ready": app.terrain_gpu_ready(), "presentation_ready":app.terrain_presentation_ready(), "triangles": app.terrain_stream.triangles(), "cpu_cache_bytes": app.terrain_stream.cpu_bytes(),
+                "gpu_cache_bytes": app.terrain_gpu_bytes(), "generated_last_frame": app.terrain_stream.generated,
+                "selection_last_frame_micros": app.terrain_stream.selection_micros,
+                "preparation_last_frame_micros": app.terrain_stream.preparation_micros,
+                "preparation_peak_micros": app.terrain_stream.preparation_peak_micros,
+                "preparation_overruns": app.terrain_stream.preparation_overruns,
+                "generation_last_frame_micros": app.terrain_stream.generation_micros,
+                "generation_peak_micros":app.terrain_stream.generation_peak_micros,
+                "generation_total_micros":app.terrain_stream.generation_total_micros,
+                "generated_peak":app.terrain_stream.generated_peak, "uploaded_last_frame_bytes":uploaded_bytes, "peak_upload_bytes":peak_upload_bytes, "total_generated": app.terrain_stream.total_generated },
+
+                });
+            for (key, value) in native.as_object().expect("native observation object") {
+                result[key] = value.clone();
+            }
+            return json!({"protocol":PROTOCOL,"id":id,"ok":true,"result":result});
+        }
+        Some("key") if command.get("key").and_then(Value::as_str) == Some("diagnostics") => {
+            if let Some(pressed) = command.get("pressed").and_then(Value::as_bool) {
+                app.automation_key(PhysicalKey::Code(KeyCode::F3), pressed);
+                Ok(json!({"applied":true}))
+            } else {
+                return execute_session(&mut app.session, line);
+            }
+        }
+        _ => return execute_session(&mut app.session, line),
+    };
+    match result {
+        Ok(result) => json!({"protocol":PROTOCOL,"id":id,"ok":true,"result":result}),
+        Err((code, message)) => error(id, code, message),
+    }
+}
+
+pub(crate) fn execute_session(app: &mut GameplaySession, line: &str) -> Value {
+    if app.e2e_step().is_none() {
+        return error(Value::Null, "disabled", "automation requires --e2e");
+    }
+    let command: Value = match serde_json::from_str(line) {
+        Ok(value) => value,
+        Err(_) => {
+            return error(
+                Value::Null,
+                "invalid_json",
+                "expected one JSON object per line",
+            );
+        }
+    };
+    let id = command.get("id").cloned().unwrap_or(Value::Null);
+    if !command.is_object() || !(id.is_string() || id.is_number()) {
+        return error(
+            id,
+            "invalid_request",
+            "object with string or numeric id required",
+        );
+    }
+    if command.get("protocol").and_then(Value::as_u64) != Some(u64::from(PROTOCOL)) {
+        return error(id, "protocol_mismatch", "expected protocol 1");
+    }
+    let result = match command.get("op").and_then(Value::as_str) {
+        Some("inspect") => Ok(inspect_session(app)),
         Some("step") => match command.get("frames").and_then(Value::as_u64) {
             Some(frames @ 1..=600) => {
                 let step = app.e2e_step().expect("automation only runs in E2E mode");
@@ -180,7 +250,7 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
             let dy = command.get("dy").and_then(Value::as_f64);
             match (dx, dy) {
                 (Some(dx), Some(dy)) if dx.is_finite() && dy.is_finite() => {
-                    app.apply_look_delta(dx, dy);
+                    app.command(crate::session::Command::Look(dx, dy));
                     app.sync_carried();
                     Ok(json!({"applied": true}))
                 }
@@ -278,7 +348,7 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
             let pressed = command.get("pressed").and_then(Value::as_bool);
             match (key.and_then(key_code), pressed) {
                 (Some(key), Some(pressed)) => {
-                    app.automation_key(PhysicalKey::Code(key), pressed);
+                    crate::app::input::dispatch_session_key(app, PhysicalKey::Code(key), pressed);
                     Ok(json!({"key": command["key"], "pressed": pressed}))
                 }
                 _ => Err(("invalid_argument", "known key and boolean pressed required")),
@@ -290,7 +360,7 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
                 command.get("pressed").and_then(Value::as_bool),
             ) {
                 (Some("left"), Some(pressed)) => {
-                    app.mining_mouse_input(pressed);
+                    app.command(crate::session::Command::Mining(pressed));
                     Ok(json!({"button": "left", "pressed": pressed}))
                 }
                 _ => Err((
@@ -300,11 +370,11 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
             }
         }
         Some("interact") => {
-            app.automation_key(PhysicalKey::Code(KeyCode::KeyE), true);
+            crate::app::input::dispatch_session_key(app, PhysicalKey::Code(KeyCode::KeyE), true);
             Ok(json!({"applied": app.view_name() == "Gameplay"}))
         }
         Some("landing") => {
-            app.automation_key(PhysicalKey::Code(KeyCode::KeyL), true);
+            crate::app::input::dispatch_session_key(app, PhysicalKey::Code(KeyCode::KeyL), true);
             Ok(json!({"applied": app.view_name() == "Gameplay"}))
         }
         Some("thruster") => match command.get("direction").and_then(Value::as_i64) {
@@ -353,10 +423,11 @@ fn key_code(name: &str) -> Option<KeyCode> {
     }
 }
 
-fn inspect(app: &ClientApplication) -> Value {
-    let ship = app.ship.snapshot();
+pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
+    let snapshot = app.snapshot();
+    let ship = snapshot.ship;
     let frame = character_ship_frame(ship.pose);
-    let character = app.character.snapshot(frame, app.terrain_frame(ship));
+    let character = snapshot.character;
     let local_eye = frame.world_to_local(character.eye_position_meters);
     let local_look = frame.world_to_local(character.look_target_meters);
     let interaction = app.automation_interaction(local_eye, local_look);
@@ -366,10 +437,7 @@ fn inspect(app: &ClientApplication) -> Value {
             "ship_surface_distance_meters": (body.center.meters().iter().zip(ship.pose.position_meters)
                 .map(|(center, position)| (*center - position).powi(2)).sum::<f64>()).sqrt() - body.radius_meters})
     }).collect();
-    let deposits = app.mining.nearby(
-        character.eye_position_meters,
-        app.e2e_config.map_or(0, |config| config.seed),
-    );
+    let deposits = app.mining.nearby(character.eye_position_meters, app.seed);
     let (deposits, deposit_error) = match deposits {
         Ok(entries) => (entries.iter().copied().map(|entry| json!({
             "id": format!("{:?}:{}", entry.deposit.id().body, entry.deposit.id().local),
@@ -406,10 +474,9 @@ fn inspect(app: &ClientApplication) -> Value {
         character,
         frame,
         ship.door_state == salimon_ship::DoorState::Open && ship.door_open_fraction >= 0.95,
-        app.e2e_config.map_or(0, |config| config.seed),
+        app.seed,
     );
-    let fragments: Vec<_> = app
-        .mining
+    let fragments: Vec<_> = app.mining
         .nearby_fragments(character.eye_position_meters)
         .map(|piece| {
             let mesh = crate::resource_presentation::fragment_visual(piece);
@@ -459,7 +526,7 @@ fn inspect(app: &ClientApplication) -> Value {
         character,
         frame,
         ship.door_state == salimon_ship::DoorState::Open && ship.door_open_fraction >= 0.95,
-        app.e2e_config.map_or(0, |config| config.seed),
+        app.seed,
     );
     let player_velocity = app
         .character
@@ -467,30 +534,13 @@ fn inspect(app: &ClientApplication) -> Value {
         .unwrap_or(ship.velocity_meters_per_second);
     let relative_velocity =
         std::array::from_fn::<_, 3, _>(|i| player_velocity[i] - ship.velocity_meters_per_second[i]);
-    let upload_times = app.terrain_upload_times();
-    let (uploaded_bytes, peak_upload_bytes) = app.terrain_uploads();
     let (ground_entries, ground_hits, ground_misses) = crate::terrain::ground_cache_stats();
     json!({
-        "terrain_upload_preparation_micros": upload_times,
+        "simulation_backlog_millis": snapshot.backlog.as_secs_f64() * 1000.0,
         "resource_queries": app.mining.query_metrics(),
         "ground_cache": {"entries":ground_entries,"hits":ground_hits,"misses":ground_misses},
-        "visual_context": app.visual_context(),
         "view_mode": app.view_name(),
-        "window": app.window_state(),
-        "capture_status": app.capture_status,
-        "performance": app.observations.snapshot(),
-        "terrain": { "mode": format!("{:?}", app.mining.terrain), "active_patches": app.terrain_stream.active.len(),
-            "cache_patches": app.terrain_stream.cached(), "pending_patches": app.terrain_stream.pending,
-            "gpu_ready": app.terrain_gpu_ready(), "presentation_ready":app.terrain_presentation_ready(), "triangles": app.terrain_stream.triangles(), "cpu_cache_bytes": app.terrain_stream.cpu_bytes(),
-            "gpu_cache_bytes": app.terrain_gpu_bytes(), "generated_last_frame": app.terrain_stream.generated,
-            "selection_last_frame_micros": app.terrain_stream.selection_micros,
-            "preparation_last_frame_micros": app.terrain_stream.preparation_micros,
-            "preparation_peak_micros": app.terrain_stream.preparation_peak_micros,
-            "preparation_overruns": app.terrain_stream.preparation_overruns,
-            "generation_last_frame_micros": app.terrain_stream.generation_micros,
-            "generation_peak_micros":app.terrain_stream.generation_peak_micros,
-            "generation_total_micros":app.terrain_stream.generation_total_micros,
-            "generated_peak":app.terrain_stream.generated_peak, "uploaded_last_frame_bytes":uploaded_bytes, "peak_upload_bytes":peak_upload_bytes, "total_generated": app.terrain_stream.total_generated },
+        "terrain": { "mode": format!("{:?}", app.mining.terrain) },
         "resource_ui": {
             "context": resource_context.as_ref().map(|prompt| &prompt.text),
             "anchor_meters": resource_context.as_ref().and_then(|prompt| match prompt.placement {
@@ -505,8 +555,8 @@ fn inspect(app: &ClientApplication) -> Value {
             "target_id": fragment_target.map(|id| id.0),
             "context": crate::carrying::context(&app.mining, fragment_target, character),
             "last_action_feedback": app.mining.carry_feedback},
-        "mining": { "equipped": app.equipment.mining_equipped(), "held": app.mining.held,
-            "active": app.mining.held && mining_target.is_some(),
+        "mining": { "equipped": app.equipment.mining_equipped(), "held": app.mining.input.held,
+            "active": app.mining.input.held && mining_target.is_some(),
             "held_item_visible": app.held_item(character, mining_target.is_some()).is_some(),
             "extracted_mass_kg": app.mining.session.extracted_mass_kg(),
             "range_meters": salimon_world::mining::MINING_RANGE_METERS,
@@ -556,6 +606,7 @@ fn inspect(app: &ClientApplication) -> Value {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use super::{execute_session as execute, inspect_session as inspect};
 
     #[test]
     fn loaded_step_deadlines_are_bounded_and_ordinary_requests_stay_short() {
@@ -586,8 +637,8 @@ mod tests {
 
     use crate::e2e::{self, Config, Scenario};
 
-    fn app(scenario: Scenario) -> ClientApplication {
-        let mut app = ClientApplication::default();
+    fn app(scenario: Scenario) -> GameplaySession {
+        let mut app = GameplaySession::default();
         e2e::initialize(
             &mut app,
             Config {
@@ -774,8 +825,8 @@ mod tests {
             KeyCode::Digit5,
         ] {
             test.mining.set_mouse_held(true);
-            test.automation_key(PhysicalKey::Code(key), true);
-            assert!(!test.mining.held);
+            crate::app::input::dispatch_session_key(&mut test, PhysicalKey::Code(key), true);
+            assert!(!test.mining.input.held);
             assert_eq!(inspect(&test)["mining"]["equipped"], false);
             assert_eq!(inspect(&test)["mining"]["target"], Value::Null);
             assert!(
@@ -787,7 +838,11 @@ mod tests {
             let mass = test.mining.session.extracted_mass_kg();
             test.advance_game(Duration::from_millis(16));
             assert_eq!(test.mining.session.extracted_mass_kg(), mass);
-            test.automation_key(PhysicalKey::Code(KeyCode::Digit1), true);
+            crate::app::input::dispatch_session_key(
+                &mut test,
+                PhysicalKey::Code(KeyCode::Digit1),
+                true,
+            );
             assert!(
                 test.mining
                     .held_item(&test.equipment, player, true)
@@ -799,12 +854,15 @@ mod tests {
                     .revision,
                 dot.revision
             );
-            assert!(!test.mining.held, "selection must not restart held mining");
+            assert!(
+                !test.mining.input.held,
+                "selection must not restart held mining"
+            );
             assert!(test.mining.press_f());
             test.mining_mouse_input(true);
         }
         assert_eq!(key_code("equip_mining_tool"), None);
-        test.automation_key(PhysicalKey::Code(KeyCode::KeyM), true);
+        crate::app::input::dispatch_session_key(&mut test, PhysicalKey::Code(KeyCode::KeyM), true);
         assert!(
             test.equipment.mining_equipped(),
             "M cannot toggle selection"
@@ -847,40 +905,58 @@ mod tests {
         assert_eq!(execute(&mut test, &old_mine.to_string())["ok"], false);
         let f = PhysicalKey::Code(KeyCode::KeyF);
         for _ in 0..3 {
-            test.automation_key(f, true);
+            crate::app::input::dispatch_session_key(&mut test, f, true);
             test.advance_game(Duration::from_millis(16));
-            assert!(!test.mining.held);
+            assert!(!test.mining.input.held);
             assert_eq!(test.mining.session.extracted_mass_kg(), 0.0);
         }
         test.mining_mouse_input(true);
-        test.automation_key(f, false);
-        assert!(test.mining.held, "F release preserves mouse mining");
+        crate::app::input::dispatch_session_key(&mut test, f, false);
+        assert!(test.mining.input.held, "F release preserves mouse mining");
         test.advance_game(Duration::from_millis(16));
         assert!(test.mining.session.extracted_mass_kg() > 0.0);
-        test.automation_key(f, true);
+        crate::app::input::dispatch_session_key(&mut test, f, true);
         test.mining_mouse_input(false);
-        assert!(!test.mining.held, "held F cannot sustain mouse mining");
+        assert!(
+            !test.mining.input.held,
+            "held F cannot sustain mouse mining"
+        );
         let mass = test.mining.session.extracted_mass_kg();
         test.advance_game(Duration::from_millis(16));
         assert_eq!(test.mining.session.extracted_mass_kg(), mass);
         test.mining_mouse_input(true);
         test.mining.clear_input(); // Native focus loss/cursor release use this reset.
-        test.automation_key(f, true);
-        assert!(!test.mining.held);
+        crate::app::input::dispatch_session_key(&mut test, f, true);
+        assert!(!test.mining.input.held);
         test.mining_mouse_input(true);
-        test.automation_key(PhysicalKey::Code(KeyCode::Digit2), true);
-        assert!(!test.mining.held);
+        crate::app::input::dispatch_session_key(
+            &mut test,
+            PhysicalKey::Code(KeyCode::Digit2),
+            true,
+        );
+        assert!(!test.mining.input.held);
         test.mining_mouse_input(true);
-        assert!(!test.mining.held, "empty selection rejects mouse input");
-        test.automation_key(PhysicalKey::Code(KeyCode::Digit1), true);
-        assert!(!test.mining.held, "re-equip never resumes old input");
+        assert!(
+            !test.mining.input.held,
+            "empty selection rejects mouse input"
+        );
+        crate::app::input::dispatch_session_key(
+            &mut test,
+            PhysicalKey::Code(KeyCode::Digit1),
+            true,
+        );
+        assert!(!test.mining.input.held, "re-equip never resumes old input");
     }
 
     #[test]
     fn mining_real_inputs_gate_surface_equipment_aim_and_release() {
         let mut test = app(Scenario::LandedEarth);
-        test.automation_key(PhysicalKey::Code(KeyCode::Digit1), true);
-        test.mining.held = true;
+        crate::app::input::dispatch_session_key(
+            &mut test,
+            PhysicalKey::Code(KeyCode::Digit1),
+            true,
+        );
+        test.mining.input.held = true;
         test.advance_game(Duration::from_secs(1));
         assert_eq!(
             test.mining.session.extracted_mass_kg(),
@@ -898,7 +974,7 @@ mod tests {
         )
         .unwrap();
         // The fixture does not alter mining state; reset only test's initial input.
-        test.mining = crate::mining::MiningTool::default();
+        test.mining = crate::mining::ResourceGameplay::default();
         test.equipment = crate::equipment::EquipmentToolbar::default();
         let scenario: Value =
             serde_json::from_str(include_str!("../../../scenarios/mining.json")).unwrap();
@@ -1069,15 +1145,23 @@ mod tests {
                 assert_eq!(execute(&mut test, &command.to_string())["ok"], true);
             }
         }
-        test.automation_key(PhysicalKey::Code(KeyCode::Digit1), true);
+        crate::app::input::dispatch_session_key(
+            &mut test,
+            PhysicalKey::Code(KeyCode::Digit1),
+            true,
+        );
         assert!(test.equipment.mining_equipped());
-        test.automation_key(PhysicalKey::Code(KeyCode::Digit1), true);
+        crate::app::input::dispatch_session_key(
+            &mut test,
+            PhysicalKey::Code(KeyCode::Digit1),
+            true,
+        );
         assert_eq!(inspect(&test)["equipment"]["selected_slot"], 1);
         let mass = test.mining.session.extracted_mass_kg();
         test.mining.set_mouse_held(true);
         test.interact();
         assert!(test.mining.session.carried_id().is_none());
-        test.automation_key(PhysicalKey::Code(KeyCode::KeyF), true);
+        crate::app::input::dispatch_session_key(&mut test, PhysicalKey::Code(KeyCode::KeyF), true);
         assert!(test.mining.session.carried_id().is_some());
         assert_eq!(inspect(&test)["equipment"]["selected_slot"], Value::Null);
         assert!(!test.equipment.mining_equipped());
@@ -1088,27 +1172,38 @@ mod tests {
             assert_eq!(execute(&mut test, &request.to_string())["ok"], true);
             assert_eq!(inspect(&test)["equipment"]["selected_slot"], Value::Null);
         }
-        assert!(!test.mining.held);
-        test.automation_key(PhysicalKey::Code(KeyCode::KeyF), true);
+        assert!(!test.mining.input.held);
+        crate::app::input::dispatch_session_key(&mut test, PhysicalKey::Code(KeyCode::KeyF), true);
         test.advance_game(Duration::from_secs(1));
         assert_eq!(test.mining.session.extracted_mass_kg(), mass);
         assert!(test.mining.session.carried_id().is_some());
         test.interact();
         assert!(test.mining.session.carried_id().is_some());
-        test.automation_key(PhysicalKey::Code(KeyCode::KeyF), false);
-        test.automation_key(PhysicalKey::Code(KeyCode::KeyF), true);
+        crate::app::input::dispatch_session_key(&mut test, PhysicalKey::Code(KeyCode::KeyF), false);
+        crate::app::input::dispatch_session_key(&mut test, PhysicalKey::Code(KeyCode::KeyF), true);
         assert!(test.mining.session.carried_id().is_none());
-        assert!(!test.mining.held, "drop must not start F mining either");
+        assert!(
+            !test.mining.input.held,
+            "drop must not start F mining either"
+        );
         assert_eq!(inspect(&test)["equipment"]["selected_slot"], Value::Null);
-        test.automation_key(PhysicalKey::Code(KeyCode::Digit5), true);
+        crate::app::input::dispatch_session_key(
+            &mut test,
+            PhysicalKey::Code(KeyCode::Digit5),
+            true,
+        );
         assert_eq!(inspect(&test)["equipment"]["selected_slot"], 5);
         assert_eq!(inspect(&test)["equipment"]["slots"][4], Value::Null);
-        test.automation_key(PhysicalKey::Code(KeyCode::Digit1), true);
+        crate::app::input::dispatch_session_key(
+            &mut test,
+            PhysicalKey::Code(KeyCode::Digit1),
+            true,
+        );
         assert_eq!(inspect(&test)["equipment"]["selected_slot"], 1);
         assert!(test.equipment.mining_equipped());
         assert_eq!(inspect(&test)["mining"]["held_item_visible"], true);
         assert!(
-            !test.mining.held,
+            !test.mining.input.held,
             "re-selection must not resume held mining"
         );
     }
@@ -1185,7 +1280,7 @@ mod tests {
     #[test]
     fn signed_held_throttle_uses_gameplay_keys_and_fixed_simulation_time() {
         let mut app = app(Scenario::OpenSpace);
-        let key = |app: &mut ClientApplication, pressed| {
+        let key = |app: &mut GameplaySession, pressed| {
             execute(
                 app,
                 &json!({"protocol":1,"id":1,"op":"key","key":"thruster_down","pressed":pressed})
@@ -1423,7 +1518,7 @@ mod tests {
 
     #[test]
     fn protocol_rejects_malformed_and_unavailable_commands() {
-        let mut normal = ClientApplication::default();
+        let mut normal = GameplaySession::default();
         assert_eq!(
             execute(&mut normal, r#"{"protocol":1,"id":1,"op":"inspect"}"#)["error"]["code"],
             "disabled"

@@ -193,3 +193,22 @@ See the [canonical dispatch policy](architecture.md#gameplay-input-dispatch-302)
   performs zero journal-driven containment/mass visits.
 - Adapter snapshot/state/ID buffers and the solver's six per-body arrays retain
   capacities; initialization/iteration order and interpolation history are unchanged.
+
+## Gameplay-session boundary (#309)
+
+- `GameplaySession` composes portable controllers, resource/cargo state, typed
+  commands and snapshots. It has no window/GPU handles, protocol reader, evidence
+  IO or benchmark recorder. Supporting domains and renderer never depend on it.
+- Native and automation admission translate to the same session commands. Releases
+  still clear both movement and steering meanings across view/location changes.
+  Native lifecycle resets clear holds/history without changing selected throttle.
+- E2E fixtures, benchmark initialization and headless protocol regressions construct
+  the production session directly. Every complete gameplay tick follows the order
+  recorded in architecture; fractional/backlogged elapsed time is never discarded
+  except by explicit lifecycle exclusion.
+- `ResourceGameplay` owns the world session and fragment/cargo adapter caches;
+  `MiningTool` owns only held mouse/F input. IDs, source mass and mutations remain
+  world-owned; ledger and contact rules remain ship/physics-owned.
+- Action-bar rasterization and transient expiration remain shell presentation.
+  Session feedback is consumed immediately after dispatched native/protocol input;
+  expiration follows completed simulation time, including explicit automation steps.

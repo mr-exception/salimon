@@ -1,8 +1,9 @@
 //! Portable release → pickup/carry/drop → mechanical Core composition regression.
 use crate::{
-    app::{ClientApplication, character_ship_frame},
     automation,
     e2e::{self, Scenario},
+    session::GameplaySession,
+    session::frames::character_ship_frame,
 };
 use salimon_world::{
     CelestialBodyId, WorldPosition,
@@ -11,14 +12,14 @@ use salimon_world::{
 };
 use std::time::Duration;
 
-fn command(app: &mut ClientApplication, value: serde_json::Value) {
+fn command(app: &mut GameplaySession, value: serde_json::Value) {
     let mut value = value;
     value["protocol"] = 1.into();
     value["id"] = 1.into();
-    let response = automation::execute(app, &value.to_string());
+    let response = automation::execute_session(app, &value.to_string());
     assert_eq!(response["ok"], true, "{response}");
 }
-fn f(app: &mut ClientApplication) {
+fn f(app: &mut GameplaySession) {
     command(
         app,
         serde_json::json!({"op":"key","key":"grab_drop","pressed":true}),
@@ -37,7 +38,7 @@ fn cap_and_short_deposit_spheres_keep_identity_radius_and_yield_through_core() {
         ResourceId::WaterIce,
     ] {
         for mass in [10.0, 0.25] {
-            let mut app = ClientApplication::default();
+            let mut app = GameplaySession::default();
             e2e::initialize(
                 &mut app,
                 e2e::Config {

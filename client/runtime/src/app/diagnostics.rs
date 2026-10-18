@@ -7,16 +7,6 @@ use salimon_ship::ShipSnapshot;
 use salimon_world::{TransitionPhase, WorldPosition, WorldSnapshot};
 use std::time::Duration;
 
-pub(super) fn format_metric_speed(meters_per_second: f64) -> String {
-    if meters_per_second >= 1_000_000.0 {
-        format!("{:.2} Mm/s", meters_per_second / 1_000_000.0)
-    } else if meters_per_second >= 1_000.0 {
-        format!("{:.2} km/s", meters_per_second / 1_000.0)
-    } else {
-        format!("{meters_per_second:.1} m/s")
-    }
-}
-
 #[cfg(test)]
 pub(super) fn camera_body_distances(snapshot: WorldSnapshot<'_>) -> Vec<BodyDistance<'static>> {
     camera_body_distances_from(snapshot, snapshot.camera.position.meters())
@@ -123,13 +113,6 @@ pub(super) fn frame_sample(
 mod tests {
     use super::*;
     use salimon_world::{CELESTIAL_BODIES, CameraCommand, CameraPrototype, CelestialBodyId};
-    #[test]
-    fn cockpit_speed_uses_practical_metric_units() {
-        assert_eq!(format_metric_speed(12.0), "12.0 m/s");
-        assert_eq!(format_metric_speed(12_500.0), "12.50 km/s");
-        assert_eq!(format_metric_speed(2_500_000.0), "2.50 Mm/s");
-    }
-
     #[test]
     fn diagnostics_reports_every_body_and_near_view_earth_is_closest() {
         let mut prototype = CameraPrototype::default();

@@ -4,7 +4,7 @@ use std::time::{Duration, Instant};
 
 use salimon_math::{dot, length, sub};
 
-use crate::mining::MiningTool;
+use crate::mining::ResourceGameplay;
 use salimon_character::{SHIP_FLOOR_HEIGHT_METERS, ShipFrame, ship_floor_placement};
 use salimon_world::resources::{FragmentId, ResourceTransform};
 use salimon_world::{BodyRole, CELESTIAL_BODIES, WorldPosition};
@@ -29,7 +29,7 @@ pub(crate) struct FragmentMotion {
 }
 
 pub(crate) fn release(
-    tool: &mut MiningTool,
+    tool: &mut ResourceGameplay,
     id: FragmentId,
     player_forward: [f64; 3],
     frame: ShipFrame,
@@ -70,7 +70,7 @@ pub(crate) fn release(
 
 /// Save presentation history before a native gameplay tick, in each object's
 /// simulation frame. New/growing/transferred/released objects bypass history.
-pub(crate) fn capture_previous(tool: &mut MiningTool, frame: ShipFrame, player: [f64; 3]) {
+pub(crate) fn capture_previous(tool: &mut ResourceGameplay, frame: ShipFrame, player: [f64; 3]) {
     let mut scratch = std::mem::take(&mut tool.fragment_scratch);
     snapshots_into(tool, frame, player, &mut scratch.snapshots);
     tool.fragment_previous.clear();
@@ -84,7 +84,7 @@ pub(crate) fn capture_previous(tool: &mut MiningTool, frame: ShipFrame, player: 
 }
 
 pub(crate) fn interpolated_mesh(
-    tool: &MiningTool,
+    tool: &ResourceGameplay,
     fragment: salimon_world::resources::ResourceFragment,
     frame: ShipFrame,
     alpha: f64,
@@ -146,7 +146,12 @@ pub(crate) fn interpolated_mesh(
     mesh
 }
 
-pub(crate) fn advance(tool: &mut MiningTool, frame: ShipFrame, delta: Duration, player: [f64; 3]) {
+pub(crate) fn advance(
+    tool: &mut ResourceGameplay,
+    frame: ShipFrame,
+    delta: Duration,
+    player: [f64; 3],
+) {
     advance_measured(tool, frame, delta, player, false);
 }
 
@@ -207,7 +212,7 @@ impl Measurements {
 }
 
 pub(crate) fn advance_measured(
-    tool: &mut MiningTool,
+    tool: &mut ResourceGameplay,
     frame: ShipFrame,
     delta: Duration,
     player: [f64; 3],
@@ -303,7 +308,7 @@ pub(crate) fn advance_measured(
 
 /// Canonical production adapter input; also used for identical-snapshot solver replay.
 pub(crate) fn snapshots(
-    tool: &MiningTool,
+    tool: &ResourceGameplay,
     frame: ShipFrame,
     player: [f64; 3],
 ) -> Vec<(salimon_world::resources::ResourceFragment, ObjectState)> {
@@ -313,7 +318,7 @@ pub(crate) fn snapshots(
 }
 
 fn snapshots_into(
-    tool: &MiningTool,
+    tool: &ResourceGameplay,
     frame: ShipFrame,
     player: [f64; 3],
     output: &mut Vec<(salimon_world::resources::ResourceFragment, ObjectState)>,
@@ -457,8 +462,8 @@ mod tests {
     }
     // Preserve these historical adapter populations (4 kg means two 2 kg pieces),
     // but construct/validate each piece through current spherical extraction.
-    fn mined(mass: f64) -> MiningTool {
-        let mut tool = MiningTool::default();
+    fn mined(mass: f64) -> ResourceGameplay {
+        let mut tool = ResourceGameplay::default();
         let mut remaining = mass;
         while remaining > 0.0 {
             let piece_mass = remaining.min(2.0);
@@ -477,7 +482,7 @@ mod tests {
 
     #[test]
     fn settled_tick_avoids_journal_and_mass_work_but_frame_changes_transfer() {
-        let mut tool = MiningTool::default();
+        let mut tool = ResourceGameplay::default();
         let frame = frame();
         let pose = ResourceTransform::new(
             WorldPosition::new(-5.0, SHIP_FLOOR_HEIGHT_METERS + 0.088027, 0.0),
@@ -699,7 +704,7 @@ mod tests {
             ResourceId::SilicateRock,
             ResourceId::WaterIce,
         ] {
-            let mut tool = MiningTool::default();
+            let mut tool = ResourceGameplay::default();
             for _ in 0..2 {
                 crate::sphere_fixtures::sphere(
                     &mut tool.session,
@@ -951,7 +956,7 @@ mod tests {
             2.0,
         )
         .unwrap();
-        let mut tool = MiningTool::default();
+        let mut tool = ResourceGameplay::default();
         tool.session.extract(&mut deposit, Duration::from_secs(1));
         let id = tool.session.fragments()[0].id();
         tool.fragment_motion.insert(
@@ -987,7 +992,7 @@ mod tests {
     fn legacy_tail_growth_and_restored_motion_never_receive_an_implicit_ejection() {
         // This regression deliberately exercises the retained legacy unsealed-tail
         // growth API. Released current spheres never reconnect to a later hold.
-        let mut tool = MiningTool::default();
+        let mut tool = ResourceGameplay::default();
         let mut source = ResourceDeposit::new(
             DepositId {
                 body: CelestialBodyId::Earth,

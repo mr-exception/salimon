@@ -6,7 +6,7 @@ use salimon_character::{CharacterController, CharacterLocation};
 use salimon_ship::{FlightState, ShipController, ShipPose};
 use salimon_world::{CELESTIAL_BODIES, CelestialBodyId};
 
-use crate::app::ClientApplication;
+use crate::session::GameplaySession;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum Scenario {
@@ -212,7 +212,7 @@ pub(crate) fn parse_args(args: impl IntoIterator<Item = String>) -> Result<Optio
 
 /// Only alters initial conditions. Later movement, interaction and collision use
 /// the regular character and ship controllers.
-pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<(), String> {
+pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<(), String> {
     app.character = CharacterController::default();
     app.ship = ShipController::default();
     match config.scenario {
@@ -399,13 +399,15 @@ pub(crate) fn initialize(app: &mut ClientApplication, config: Config) -> Result<
         crate::benchmark_fixture::settle(app, count, settle_steps)?;
     }
     app.update_clock.set_fixed_step(config.step);
-    app.e2e_config = Some(config);
+    app.seed = config.seed;
+    app.automation_step = Some(config.step);
+    app.interpolate_fragments = false;
     Ok(())
 }
 
 /// Deterministic initial loose objects; subsequent stepping uses production physics.
 /// Seed parity selects cabin or planetary support. No gameplay protocol mutation.
-fn initialize_fragment_pile(app: &mut ClientApplication, seed: u64) {
+fn initialize_fragment_pile(app: &mut GameplaySession, seed: u64) {
     use salimon_character::{MovementInput, ShipFrame, SurfaceFrame};
     use salimon_world::{
         WorldPosition,
@@ -555,7 +557,7 @@ mod tests {
             (Scenario::CoastingOrbit, [25_000.0, 0.0, 0.0]),
             (Scenario::EvaApproach, [0.0, -25_000.0, 0.0]),
         ] {
-            let mut app = ClientApplication::default();
+            let mut app = GameplaySession::default();
             initialize(
                 &mut app,
                 Config {
@@ -582,8 +584,8 @@ mod tests {
             seed: 42,
             step: Duration::from_millis(20),
         };
-        let mut a = ClientApplication::default();
-        let mut b = ClientApplication::default();
+        let mut a = GameplaySession::default();
+        let mut b = GameplaySession::default();
         initialize(&mut a, config).unwrap();
         initialize(&mut b, config).unwrap();
         assert_eq!(a.ship.snapshot(), b.ship.snapshot());
@@ -605,7 +607,7 @@ mod tests {
 
     #[test]
     fn scenarios_use_production_interactions_and_distinct_seeds() {
-        let mut landed = ClientApplication::default();
+        let mut landed = GameplaySession::default();
         initialize(
             &mut landed,
             Config {
@@ -622,7 +624,7 @@ mod tests {
             landed.ship.snapshot().door_state,
             salimon_ship::DoorState::Open
         );
-        let mut cockpit = ClientApplication::default();
+        let mut cockpit = GameplaySession::default();
         initialize(
             &mut cockpit,
             Config {
@@ -634,7 +636,7 @@ mod tests {
         )
         .unwrap();
         assert_eq!(cockpit.character.location(), CharacterLocation::Cockpit);
-        let mut orbit = ClientApplication::default();
+        let mut orbit = GameplaySession::default();
         initialize(
             &mut orbit,
             Config {
@@ -681,7 +683,7 @@ mod tests {
         ] {
             assert!(parse_args(args.into_iter().map(str::to_owned)).is_err());
         }
-        let mut app = ClientApplication::default();
+        let mut app = GameplaySession::default();
         assert_eq!(
             app.ship.snapshot().flight_state,
             FlightState::Landed {

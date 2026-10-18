@@ -300,16 +300,17 @@ pub(crate) fn execute(app: &mut ClientApplication, line: &str) -> Value {
             }
         }
         Some("interact") => {
-            app.interact();
-            Ok(json!({"applied": true}))
+            app.automation_key(PhysicalKey::Code(KeyCode::KeyE), true);
+            Ok(json!({"applied": app.view_name() == "Gameplay"}))
         }
         Some("landing") => {
-            app.ship.trigger_landing_action();
-            Ok(json!({"applied": true}))
+            app.automation_key(PhysicalKey::Code(KeyCode::KeyL), true);
+            Ok(json!({"applied": app.view_name() == "Gameplay"}))
         }
         Some("thruster") => match command.get("direction").and_then(Value::as_i64) {
             Some(direction @ -1..=1) if direction != 0 => {
-                let applied = app.character.location() == CharacterLocation::Cockpit
+                let applied = app.view_name() == "Gameplay"
+                    && app.character.location() == CharacterLocation::Cockpit
                     && app.ship.adjust_thruster(direction as i8);
                 Ok(json!({"applied": applied}))
             }

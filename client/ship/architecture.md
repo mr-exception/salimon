@@ -24,7 +24,9 @@ that same controller, without adding controllers, crates or framework layers:
 
 Update order remains door animation, clamped steering, then flight or full-delta
 assist dispatch. Module methods use only parent-visible access where needed;
-external consumers still observe `ShipSnapshot`. Dependencies are unchanged.
+external consumers still observe `ShipSnapshot`. `clear_steering_input` discards
+both target and ramp on runtime lifecycle/view discontinuities without changing
+pose, momentum or selected throttle. Dependencies are unchanged.
 
 `ShipController` is authoritative portable state. It owns a double-precision
 world pose, landed/flying/assisted state, door state, cockpit authority, persistent

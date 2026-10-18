@@ -232,9 +232,34 @@ Compatible `f64` component arithmetic comes from the dependency-free
 with their owning domain. See the canonical
 [decision and inventory](../../docs/technical-architecture.md#shared-math-decision-115).
 
+## Gameplay input dispatch (#302)
+
+`app/input.rs::InputPolicy` is the canonical press-admission policy. Native
+initial presses require focus and a non-occluded window; gameplay additionally
+requires capture and Gameplay view. OS repeats and synthetic focus-replay presses
+are ignored for all keys. F2/F3 and engineering-camera commands remain global
+view/diagnostic controls; tour numbers address bodies, never toolbar slots.
+Release edges clear both movement/steering meanings and F/throttle latches even
+after a view, location or capture change. Left-mouse mining and mouse look use
+the same native gameplay admission conditions.
+
+Native key translation and automation call `dispatch_key`. The explicit
+`InputSource::Automation` harness policy bypasses desktop focus/capture/occlusion,
+while retaining view, equipment, cockpit, power and assist authority. Protocol
+`interact` and `landing` use the E/L dispatch route and report `applied: false`
+in PrecisionTour; this is admission, not proof that a domain interaction succeeded.
+The legacy one-point `thruster` operation also requires Gameplay view.
+
+Escape/capture loss, focus loss, view changes and lifecycle clock resets use
+`clear_held_controls`: movement, steering target/ramp, F/mining and held throttle
+are discarded, preserving persistent throttle selection. Occlusion, suspension,
+resize/minimize and renderer recovery retain their existing clock-reset policy.
+Production commands are covered portably; real OS-input verification remains
+[#312](https://github.com/mr-exception/salimon/issues/312).
+
 ## Physical interaction input (#126)
 
-E routes only cockpit/door interactions. `automation_key` shares the native F
+E routes cockpit/door and mechanical Core interactions. `automation_key` shares the native F
 route: an initial press grabs an aimed reachable object or drops the carried
 object; a miss never starts mining. MiningTool latches F until release to prevent
 repeat grab/drop. Only left mouse controls `held`; releasing F never changes it.

@@ -176,3 +176,12 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 
 - Core power snapshot gates character/fragment artificial gravity and blanks the
   physical monitor. No planetary fallback applies inside the unpowered cabin.
+
+## Unified input admission (#302)
+
+Native gameplay presses require focused, non-occluded Gameplay view and cursor
+capture. Initial real edges only are accepted; release edges always clear holds.
+Automation explicitly bypasses desktop admission only and shares view/domain
+gates. View, focus/capture loss and lifecycle resets clear movement, steering
+including its ramp, mining/F and held throttle, preserving selected throttle.
+See the [canonical dispatch policy](architecture.md#gameplay-input-dispatch-302).

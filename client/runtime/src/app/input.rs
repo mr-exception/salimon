@@ -10,11 +10,6 @@ pub(super) fn release_cursor_pressed(state: ElementState, repeat: bool, key: Phy
     state == ElementState::Pressed && !repeat && key == PhysicalKey::Code(KeyCode::Escape)
 }
 
-/// Tool/carrying input accepts real edges only; focus replay cannot grab/drop.
-pub(super) fn tool_key_event(repeat: bool, is_synthetic: bool, key: PhysicalKey) -> bool {
-    !repeat && !is_synthetic && matches!(key, PhysicalKey::Code(KeyCode::KeyF))
-}
-
 pub(super) fn toolbar_slot(key: PhysicalKey) -> Option<crate::equipment::ToolbarSlot> {
     use crate::equipment::ToolbarSlot;
     match key {
@@ -27,34 +22,48 @@ pub(super) fn toolbar_slot(key: PhysicalKey) -> Option<crate::equipment::Toolbar
     }
 }
 
-pub(super) fn toolbar_selection_pressed(
-    state: ElementState,
-    repeat: bool,
-    key: PhysicalKey,
-    is_synthetic: bool,
-) -> bool {
-    state == ElementState::Pressed && !repeat && !is_synthetic && toolbar_slot(key).is_some()
+/// Automation deliberately bypasses desktop capture/focus, never gameplay/view
+/// or domain authority. Native release edges are admitted even after capture loss.
+#[derive(Clone, Copy, Debug)]
+pub(super) enum InputSource {
+    Native,
+    Automation,
 }
 
-pub(super) fn interaction_pressed(state: ElementState, repeat: bool, key: PhysicalKey) -> bool {
-    state == ElementState::Pressed && !repeat && key == PhysicalKey::Code(KeyCode::KeyE)
+#[derive(Clone, Copy, Debug)]
+pub(super) struct InputPolicy {
+    pub gameplay: bool,
+    pub captured: bool,
+    pub focused: bool,
+    pub occluded: bool,
 }
-
-pub(super) fn landing_action_pressed(state: ElementState, repeat: bool, key: PhysicalKey) -> bool {
-    state == ElementState::Pressed && !repeat && key == PhysicalKey::Code(KeyCode::KeyL)
-}
-
-pub(super) fn view_toggle_pressed(
-    state: ElementState,
-    repeat: bool,
-    key: PhysicalKey,
-    is_synthetic: bool,
-) -> bool {
-    // Winit replays held keys on focus changes. A replay must not toggle views.
-    state == ElementState::Pressed
-        && !repeat
-        && !is_synthetic
-        && key == PhysicalKey::Code(KeyCode::F2)
+impl InputPolicy {
+    pub fn admits_press(self, source: InputSource, global: bool) -> bool {
+        match source {
+            InputSource::Automation => global || self.gameplay,
+            InputSource::Native => {
+                self.focused && !self.occluded && (global || (self.gameplay && self.captured))
+            }
+        }
+    }
+    pub fn admits_key(
+        self,
+        source: InputSource,
+        key: PhysicalKey,
+        pressed: bool,
+        repeat: bool,
+        synthetic: bool,
+    ) -> bool {
+        if !pressed {
+            return true;
+        }
+        if repeat || synthetic {
+            return false;
+        }
+        let global = matches!(key, PhysicalKey::Code(KeyCode::F2 | KeyCode::F3))
+            || camera_command(ElementState::Pressed, false, key, !self.gameplay).is_some();
+        self.admits_press(source, global)
+    }
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -151,11 +160,6 @@ pub(super) fn throttle_direction(key: PhysicalKey) -> Option<ThrottleDirection> 
     }
 }
 
-/// Synthetic focus replay and OS repeats never generate throttle press edges.
-pub(super) fn throttle_event(state: ElementState, repeat: bool, synthetic: bool) -> bool {
-    state == ElementState::Released || (!repeat && !synthetic)
-}
-
 fn movement_key(key: PhysicalKey) -> Option<MovementKey> {
     match key {
         PhysicalKey::Code(KeyCode::KeyW) => Some(MovementKey::Forward),
@@ -182,10 +186,6 @@ pub(super) fn update_movement_input(input: &mut MovementInput, key: PhysicalKey,
         Some(MovementKey::Descend) => input.descend = pressed,
         None => {}
     }
-}
-
-pub(super) fn is_diagnostics_toggle(state: ElementState, repeat: bool, key: PhysicalKey) -> bool {
-    state == ElementState::Pressed && !repeat && key == PhysicalKey::Code(KeyCode::F3)
 }
 
 pub(super) fn camera_command(
@@ -245,6 +245,66 @@ mod tests {
     use super::*;
     use salimon_world::CameraCommand;
     #[test]
+    fn native_press_policy_rejects_capture_focus_tour_repeats_and_synthetic_replay() {
+        let ready = InputPolicy {
+            gameplay: true,
+            captured: true,
+            focused: true,
+            occluded: false,
+        };
+        for key in [
+            KeyCode::KeyW,
+            KeyCode::KeyE,
+            KeyCode::KeyL,
+            KeyCode::KeyF,
+            KeyCode::Digit1,
+            KeyCode::ArrowUp,
+            KeyCode::ArrowLeft,
+        ] {
+            let key = PhysicalKey::Code(key);
+            assert!(ready.admits_key(InputSource::Native, key, true, false, false));
+            assert!(!ready.admits_key(InputSource::Native, key, true, true, false));
+            assert!(!ready.admits_key(InputSource::Native, key, true, false, true));
+            for denied in [
+                InputPolicy {
+                    captured: false,
+                    ..ready
+                },
+                InputPolicy {
+                    focused: false,
+                    ..ready
+                },
+                InputPolicy {
+                    occluded: true,
+                    ..ready
+                },
+            ] {
+                assert!(!denied.admits_key(InputSource::Native, key, true, false, false));
+                assert!(denied.admits_key(InputSource::Native, key, false, false, false));
+                assert!(denied.admits_key(InputSource::Automation, key, true, false, false));
+            }
+            let tour = InputPolicy {
+                gameplay: false,
+                ..ready
+            };
+            if key != PhysicalKey::Code(KeyCode::Digit1) {
+                assert!(!tour.admits_key(InputSource::Native, key, true, false, false));
+                assert!(!tour.admits_key(InputSource::Automation, key, true, false, false));
+            }
+            assert!(tour.admits_key(InputSource::Native, key, false, false, false));
+        }
+        for key in [KeyCode::F2, KeyCode::F3] {
+            assert!(!ready.admits_key(
+                InputSource::Native,
+                PhysicalKey::Code(key),
+                true,
+                false,
+                true
+            ));
+        }
+    }
+
+    #[test]
     fn denied_steering_is_not_replayed_after_power_returns() {
         let mut input = ShipControlInput::default();
         let key = PhysicalKey::Code(KeyCode::KeyW);
@@ -257,109 +317,6 @@ mod tests {
     }
 
     #[test]
-    fn toolbar_keys_are_real_initial_edges_and_tour_numbers_are_gated() {
-        for (index, key) in [
-            KeyCode::Digit1,
-            KeyCode::Digit2,
-            KeyCode::Digit3,
-            KeyCode::Digit4,
-            KeyCode::Digit5,
-        ]
-        .into_iter()
-        .enumerate()
-        {
-            let key = PhysicalKey::Code(key);
-            assert_eq!(toolbar_slot(key).unwrap().index(), index);
-            assert!(toolbar_selection_pressed(
-                ElementState::Pressed,
-                false,
-                key,
-                false
-            ));
-            assert!(!toolbar_selection_pressed(
-                ElementState::Pressed,
-                true,
-                key,
-                false
-            ));
-            assert!(!toolbar_selection_pressed(
-                ElementState::Pressed,
-                false,
-                key,
-                true
-            ));
-            assert!(!toolbar_selection_pressed(
-                ElementState::Released,
-                false,
-                key,
-                false
-            ));
-            assert_eq!(
-                camera_command(ElementState::Pressed, false, key, false),
-                None
-            );
-        }
-        let six = PhysicalKey::Code(KeyCode::Digit6);
-        assert_eq!(toolbar_slot(six), None);
-        assert_eq!(
-            camera_command(ElementState::Pressed, false, six, false),
-            None
-        );
-    }
-
-    #[test]
-    fn f_carrying_ignores_repeat_focus_replay_and_other_keys() {
-        let f = PhysicalKey::Code(KeyCode::KeyF);
-        assert!(tool_key_event(false, false, f));
-        assert!(!tool_key_event(
-            false,
-            false,
-            PhysicalKey::Code(KeyCode::KeyM)
-        ));
-        assert!(!tool_key_event(true, false, f));
-        assert!(!tool_key_event(false, true, f));
-        assert!(!tool_key_event(
-            false,
-            false,
-            PhysicalKey::Code(KeyCode::KeyE)
-        ));
-    }
-
-    #[test]
-    fn focus_replayed_f2_does_not_toggle_the_view_again() {
-        let f2 = PhysicalKey::Code(KeyCode::F2);
-        assert!(view_toggle_pressed(ElementState::Pressed, false, f2, false));
-        assert!(!view_toggle_pressed(ElementState::Pressed, false, f2, true));
-        assert!(!view_toggle_pressed(ElementState::Pressed, true, f2, false));
-        assert!(!view_toggle_pressed(
-            ElementState::Released,
-            false,
-            f2,
-            false
-        ));
-        assert!(!view_toggle_pressed(
-            ElementState::Pressed,
-            false,
-            PhysicalKey::Code(KeyCode::F3),
-            false,
-        ));
-    }
-
-    #[test]
-    fn f3_toggles_only_on_the_initial_press() {
-        let f3 = PhysicalKey::Code(KeyCode::F3);
-
-        assert!(is_diagnostics_toggle(ElementState::Pressed, false, f3));
-        assert!(!is_diagnostics_toggle(ElementState::Pressed, true, f3));
-        assert!(!is_diagnostics_toggle(ElementState::Released, false, f3));
-        assert!(!is_diagnostics_toggle(
-            ElementState::Pressed,
-            false,
-            PhysicalKey::Code(KeyCode::F2),
-        ));
-    }
-
-    #[test]
     fn escape_releases_cursor_only_on_the_initial_press() {
         let escape = PhysicalKey::Code(KeyCode::Escape);
         assert!(release_cursor_pressed(ElementState::Pressed, false, escape));
@@ -368,31 +325,6 @@ mod tests {
             ElementState::Released,
             false,
             escape
-        ));
-    }
-
-    #[test]
-    fn landing_action_accepts_only_initial_l_press() {
-        let landing = PhysicalKey::Code(KeyCode::KeyL);
-        assert!(landing_action_pressed(
-            ElementState::Pressed,
-            false,
-            landing
-        ));
-        assert!(!landing_action_pressed(
-            ElementState::Pressed,
-            true,
-            landing
-        ));
-        assert!(!landing_action_pressed(
-            ElementState::Released,
-            false,
-            landing
-        ));
-        assert!(!landing_action_pressed(
-            ElementState::Pressed,
-            false,
-            PhysicalKey::Code(KeyCode::KeyK),
         ));
     }
 
@@ -510,9 +442,5 @@ mod tests {
             throttle_direction(PhysicalKey::Code(KeyCode::ArrowDown)),
             Some(ThrottleDirection::Down)
         );
-        assert!(throttle_event(ElementState::Pressed, false, false));
-        assert!(!throttle_event(ElementState::Pressed, true, false));
-        assert!(!throttle_event(ElementState::Pressed, false, true));
-        assert!(throttle_event(ElementState::Released, false, true));
     }
 }

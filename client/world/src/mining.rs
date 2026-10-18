@@ -206,6 +206,9 @@ impl MiningSession {
     pub fn move_carried(&mut self, pose: crate::resources::ResourceTransform) {
         if let Some(id) = self.carried_id() {
             let piece = self.fragments.get_mut(id).expect("carried identity exists");
+            if piece.transform() == pose {
+                return;
+            }
             piece.set_transform(pose);
             let changed = *piece;
             self.fragments.record(changed);
@@ -217,7 +220,10 @@ impl MiningSession {
             return false;
         }
         self.move_carried(pose);
+        let id = self.carried_id().expect("checked carried identity");
         self.carry.release();
+        let piece = *self.fragments.get(id).expect("carried identity exists");
+        self.fragments.record(piece);
         true
     }
 
@@ -234,6 +240,9 @@ impl MiningSession {
         let Some(piece) = self.fragments.get_mut(id) else {
             return false;
         };
+        if piece.transform() == pose {
+            return true;
+        }
         piece.set_transform(pose);
         let changed = *piece;
         self.fragments.record(changed);

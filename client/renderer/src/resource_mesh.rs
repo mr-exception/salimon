@@ -14,6 +14,8 @@ pub struct ResourceBatchStats {
 #[cfg(test)]
 #[path = "resource_mesh/sphere_benchmark.rs"]
 mod sphere_benchmark;
+/// Radius of the checked-in spherical mesh at unit scale, in authored meters.
+pub const SPHERE_AUTHORED_RADIUS_METERS: f64 = 0.48;
 const FLOATS: usize = 7;
 const ASSETS: [&[u8]; 19] = [
     // Legacy variants remain for historical geometry benchmarks/contact proxies.
@@ -93,9 +95,9 @@ pub struct ResourceMeshInstance {
     /// Linear opaque material tint; shared geometry remains immutable.
     pub tint: [f32; 4],
     pub center_meters: [f64; 3],
-    /// Uniform visual scale; runtime inscribes deposits in their authoritative sphere.
-    /// Spheres use radius / authored unit radius (0.48 m).
-    pub side_meters: f64,
+    /// Dimensionless multiplier of authored mesh coordinates (not a diameter).
+    /// Spheres use analytic radius / SPHERE_AUTHORED_RADIUS_METERS.
+    pub authored_mesh_scale: f64,
     pub orientation_xyzw: [f64; 4],
 }
 fn geometry(bytes: &[u8]) -> Result<Vec<[f32; FLOATS]>, RendererError> {
@@ -173,8 +175,8 @@ fn relative_vertices(
 ) -> Result<Vec<f32>, RendererError> {
     let mut output = Vec::new();
     for instance in instances {
-        if !instance.side_meters.is_finite()
-            || instance.side_meters <= 0.0
+        if !instance.authored_mesh_scale.is_finite()
+            || instance.authored_mesh_scale <= 0.0
             || instance
                 .tint
                 .iter()
@@ -211,7 +213,7 @@ fn relative_vertices(
                 let rotated = p[axis] + q[3] * t[axis] + c[axis];
                 output.push(
                     ((instance.center_meters[axis] - camera.position_meters[axis])
-                        + rotated * instance.side_meters) as f32,
+                        + rotated * instance.authored_mesh_scale) as f32,
                 );
             }
             output.extend((0..4).map(|i| vertex[3 + i] * instance.tint[i]));
@@ -240,8 +242,8 @@ fn prepare_instances(
         batch.staging.clear();
     }
     for instance in instances {
-        if !instance.side_meters.is_finite()
-            || instance.side_meters <= 0.0
+        if !instance.authored_mesh_scale.is_finite()
+            || instance.authored_mesh_scale <= 0.0
             || instance
                 .tint
                 .iter()
@@ -261,7 +263,7 @@ fn prepare_instances(
         let center = std::array::from_fn::<_, 3, _>(|i| {
             (instance.center_meters[i] - camera.position_meters[i]) as f32
         });
-        let side = instance.side_meters as f32;
+        let side = instance.authored_mesh_scale as f32;
         if center.iter().any(|v| !v.is_finite()) || !side.is_finite() || side <= 0.0 {
             return Err(RendererError::new(
                 "prepare resource mesh",
@@ -613,7 +615,7 @@ mod tests {
                         tint: [1.0; 4],
                         mesh: ALL_MESHES[i],
                         center_meters: [1e12 + 0.125, 1e12 - 0.25, 1e12 - 4.0],
-                        side_meters: side,
+                        authored_mesh_scale: side,
                         orientation_xyzw,
                     };
                     let old = relative_vertices(&meshes, &[instance], camera).unwrap();
@@ -654,6 +656,15 @@ mod tests {
     ];
 
     #[test]
+    fn checked_in_sphere_vertices_match_the_authored_radius_contract() {
+        for vertex in ResourceMesh::Sphere.unit_vertices() {
+            let radius = vertex.iter().map(|v| v * v).sum::<f64>().sqrt();
+            // GLB positions are f32; allow 0.1 micrometer export rounding.
+            assert!((radius - SPHERE_AUTHORED_RADIUS_METERS).abs() < 1e-7);
+        }
+    }
+
+    #[test]
     fn shared_sphere_batches_different_resource_tints_without_mesh_duplication() {
         let camera = test_camera();
         let mut instances: Vec<_> = [
@@ -666,7 +677,7 @@ mod tests {
             mesh: ResourceMesh::Sphere,
             tint,
             center_meters: [1e12, 1e12, 1e12 - 4.0],
-            side_meters: 0.2,
+            authored_mesh_scale: 0.2,
             orientation_xyzw: [0.0, 0.0, 0.0, 1.0],
         })
         .collect();
@@ -692,7 +703,7 @@ mod tests {
             tint: [1.0; 4],
             mesh: ResourceMesh::IronChunk,
             center_meters: [1e12, 1e12, 1e12 - 0.11],
-            side_meters: 0.5,
+            authored_mesh_scale: 0.5,
             orientation_xyzw: [0.5; 4],
         };
         let cases = [
@@ -760,7 +771,7 @@ mod tests {
                 tint: [1.0; 4],
                 mesh: ALL_MESHES[i % 6],
                 center_meters: [1e12, 1e12, 1e12 - 4.0],
-                side_meters: 0.1,
+                authored_mesh_scale: 0.1,
                 orientation_xyzw: [0.0, 0.0, 0.0, 1.0],
             })
             .collect();
@@ -805,7 +816,7 @@ mod tests {
                             tint: [1.0; 4],
                             mesh: ALL_MESHES[i % 6],
                             center_meters: [1e12 + (i % 10) as f64 * 0.1, 1e12, 1e12 - 4.0],
-                            side_meters: 0.1,
+                            authored_mesh_scale: 0.1,
                             orientation_xyzw: [0.5; 4],
                         })
                         .collect();
@@ -923,14 +934,14 @@ mod tests {
                 tint: [1.0; 4],
                 mesh,
                 center_meters: [1e12; 3],
-                side_meters: 0.1,
+                authored_mesh_scale: 0.1,
                 orientation_xyzw: [0.0, 0.0, 0.0, 1.0],
             };
             let before = relative_vertices(&meshes, &[instance], camera).unwrap();
             let after = relative_vertices(
                 &meshes,
                 &[ResourceMeshInstance {
-                    side_meters: 1.0,
+                    authored_mesh_scale: 1.0,
                     ..instance
                 }],
                 camera,
@@ -1016,7 +1027,7 @@ mod tests {
                     tint: [1.0; 4],
                     mesh,
                     center_meters: [1e12; 3],
-                    side_meters: side,
+                    authored_mesh_scale: side,
                     orientation_xyzw: [0.0, 0.0, 0.0, 1.0],
                 };
                 let vertices = relative_vertices(&meshes, &[instance], camera).unwrap();
@@ -1169,7 +1180,7 @@ mod gpu_tests {
                     1e12 + (i / 6) as f64 * 0.7 - 0.7,
                     1e12 - 4.0,
                 ],
-                side_meters: 0.6,
+                authored_mesh_scale: 0.6,
                 orientation_xyzw: if i % 2 == 0 {
                     [0.5; 4]
                 } else {
@@ -1206,7 +1217,7 @@ mod gpu_tests {
                 tint: [1.0; 4],
                 mesh: v.mesh,
                 center_meters: camera.position_meters,
-                side_meters: 1.0,
+                authored_mesh_scale: 1.0,
                 orientation_xyzw: [0.0, 0.0, 0.0, 1.0],
             })
             .collect();
@@ -1291,7 +1302,7 @@ mod gpu_tests {
                 tint: [1.0; 4],
                 mesh: *mesh,
                 center_meters: [1e12, 1e12, 1e12 - 4.0],
-                side_meters: 0.1,
+                authored_mesh_scale: 0.1,
                 orientation_xyzw: [0.5; 4],
             })
             .collect();
@@ -1467,7 +1478,7 @@ mod gpu_tests {
             mesh: ResourceMesh::Sphere,
             tint,
             center_meters: [1e12 + (i as f64 - 1.0) * 0.8, 1e12, 1e12 - 2.5],
-            side_meters: 0.7,
+            authored_mesh_scale: 0.7,
             orientation_xyzw: [0.0, 0.0, 0.0, 1.0],
         })
         .collect();

@@ -9,7 +9,7 @@ fn sphere(position: [f64; 3], radius: f64) -> ObjectState {
         angular_velocity: [0.0; 3],
         orientation: [0.0, 0.0, 0.0, 1.0],
         mass_kg: 10.0,
-        side_meters: 2.0 * radius,
+        authored_mesh_scale: 2.0 * radius,
         hull: None,
         surface: Surface::Floor { height_meters: 0.0 },
     }
@@ -143,4 +143,21 @@ fn fast_small_sphere_cannot_cross_a_stationary_neighbor_in_an_ordinary_tick() {
     assert!(stats.contacts > 0);
     assert!(bodies[0].position[0] < bodies[1].position[0]);
     assert!(length(sub(bodies[0].position, bodies[1].position)) >= 0.039);
+}
+
+#[test]
+fn analytic_contact_size_is_independent_of_authored_mesh_scale() {
+    let mut baseline = sphere([0.0, 0.05, 0.0], 0.1);
+    baseline.velocity = [0.0, -1.0, 0.0];
+    let mut expected = [baseline.clone()];
+    advance(&mut expected, Duration::from_millis(16), |_, _| true);
+    for authored_mesh_scale in [0.001, 1.0, 10_000.0] {
+        let mut actual = [ObjectState {
+            authored_mesh_scale,
+            ..baseline.clone()
+        }];
+        advance(&mut actual, Duration::from_millis(16), |_, _| true);
+        assert_eq!(actual[0].position, expected[0].position);
+        assert_eq!(actual[0].velocity, expected[0].velocity);
+    }
 }

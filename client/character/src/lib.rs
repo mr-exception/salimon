@@ -13,8 +13,10 @@ mod ramp;
 #[allow(dead_code)] // Shared generated geometry; character consumes support dimensions.
 mod ramp_geometry;
 pub use ramp::{boarding_ramp_occupied, boarding_ramp_tip_meters};
+mod points;
 mod spatial_contracts;
 mod state;
+pub use points::{ShipLocalPoint, WorldPoint};
 
 pub use controller::CharacterController;
 pub use input::MovementInput;

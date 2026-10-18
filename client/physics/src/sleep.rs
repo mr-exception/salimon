@@ -41,7 +41,7 @@ impl MotionWindow {
             self.points.push([0.; 3]);
             if let Some(h) = &p.hull {
                 self.points
-                    .extend(h.vertices.iter().map(|v| scale(*v, p.side_meters)));
+                    .extend(h.vertices.iter().map(|v| scale(*v, p.authored_mesh_scale)));
             } else {
                 for i in 0..3 {
                     for sign in [-1., 1.] {
@@ -566,7 +566,7 @@ fn unchanged(a: &ObjectState, b: &ObjectState) -> bool {
         && a.velocity == b.velocity
         && a.angular_velocity == b.angular_velocity
         && a.mass_kg == b.mass_kg
-        && a.side_meters == b.side_meters
+        && a.authored_mesh_scale == b.authored_mesh_scale
         && a.radius == b.radius
         && a.surface == b.surface
         && match (&a.hull, &b.hull) {
@@ -610,7 +610,7 @@ fn grounded(p: &ObjectState, contains: &impl Fn([f64; 3], f64) -> bool) -> bool 
             && dot(p.velocity, contact.normal).abs() < QUIET_SPEED;
     }
     let support = p.hull.as_ref().map_or(p.ground_support_meters, |h| {
-        h.support(p.orientation, p.side_meters, scale(up, -1.0))
+        h.support(p.orientation, p.authored_mesh_scale, scale(up, -1.0))
     });
     (gap - support).abs() <= CONTACT_GAP_METERS && dot(p.velocity, up).abs() < QUIET_SPEED
 }
@@ -628,7 +628,7 @@ mod tests {
             angular_velocity: [0.0; 3],
             radius: 0.18,
             ground_support_meters: 0.1,
-            side_meters: 0.2,
+            authored_mesh_scale: 0.2,
             mass_kg: 1.0,
             orientation: [0.0, 0.0, 0.0, 1.0],
             surface: Surface::Floor { height_meters: 0.0 },
@@ -796,7 +796,7 @@ mod tests {
             settle(&[1], &mut objects, &mut tracker);
             match change {
                 0 => objects[0].mass_kg = 2.0,
-                1 => objects[0].side_meters *= 1.5,
+                1 => objects[0].authored_mesh_scale *= 1.5,
                 2 => objects[0].surface = Surface::Unsupported,
                 3 => objects[0].velocity = [0.0, 3.0, 0.0],
                 4 => tracker.wake_all(),

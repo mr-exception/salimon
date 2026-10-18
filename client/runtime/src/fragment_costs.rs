@@ -79,7 +79,8 @@ fn fixture(
         };
         let id = sphere_fixtures::sphere(&mut tool.session, resource, mass, pose(p));
         if onboard {
-            tool.ship_fragments.insert(id, local);
+            tool.ship_fragments
+                .insert(id, salimon_character::ShipLocalPoint::new(local));
             tool.fragment_motion.insert(
                 id,
                 fragment_physics::FragmentMotion {

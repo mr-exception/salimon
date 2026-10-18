@@ -63,7 +63,8 @@ fn population(count: usize, mixed: bool) -> (ResourceGameplay, ShipController, s
         )
         .unwrap();
         let id = sphere_fixtures::sphere(&mut tool.session, resource, mass, pose);
-        tool.ship_fragments.insert(id, local);
+        tool.ship_fragments
+            .insert(id, salimon_character::ShipLocalPoint::new(local));
         tool.fragment_motion.insert(
             id,
             fragment_physics::FragmentMotion {
@@ -80,7 +81,7 @@ fn population(count: usize, mixed: bool) -> (ResourceGameplay, ShipController, s
     let inventory: Vec<_> = tool.session.fragments().iter().map(|piece| json!({
         "id":piece.id().0,"source":piece.source().local,"resource":piece.material().resource().key(),
         "mass_kg":piece.material().mass_kg(),"radius_meters":fragment_physics::sphere_radius(*piece),
-        "initial_ship_local_meters":tool.ship_fragments[&piece.id()]
+        "initial_ship_local_meters":tool.ship_fragments[&piece.id()].meters()
     })).collect();
     let actual_mass: f64 = tool
         .session

@@ -9,6 +9,30 @@ pub struct ShipFrame {
 }
 
 impl ShipFrame {
+    /// Convert an absolute point to ship-local meters, subtracting in f64 first.
+    ///
+    /// ```compile_fail
+    /// use salimon_character::{ShipFrame, ShipLocalPoint};
+    /// let frame = ShipFrame { origin_meters: [0.0; 3], axes: [[1.0,0.0,0.0],[0.0,1.0,0.0],[0.0,0.0,1.0]] };
+    /// frame.project_world(ShipLocalPoint::new([1.0; 3]));
+    /// ```
+    #[must_use]
+    pub fn project_world(self, world: crate::WorldPoint) -> crate::ShipLocalPoint {
+        crate::ShipLocalPoint::new(self.world_to_local(world.meters()))
+    }
+
+    /// Convert a ship-local point to absolute meters using the existing axes.
+    ///
+    /// ```compile_fail
+    /// use salimon_character::{ShipFrame, WorldPoint};
+    /// let frame = ShipFrame { origin_meters: [0.0; 3], axes: [[1.0,0.0,0.0],[0.0,1.0,0.0],[0.0,0.0,1.0]] };
+    /// frame.unproject_local(WorldPoint::new([1.0; 3]));
+    /// ```
+    #[must_use]
+    pub fn unproject_local(self, local: crate::ShipLocalPoint) -> crate::WorldPoint {
+        crate::WorldPoint::new(self.local_to_world(local.meters()))
+    }
+
     #[must_use]
     pub fn local_to_world(self, local: [f64; 3]) -> [f64; 3] {
         add(

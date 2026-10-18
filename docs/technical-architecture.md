@@ -270,3 +270,41 @@ uses one clamped backlog factor and consistent world/ship-local frames. Live loo
 and all gameplay authority remain current; automation renders exact snapshots.
 Lifecycle and frame transitions invalidate history. Native smoothness/latency
 verification remains separate in #314.
+
+## Position boundaries and resource dimensions (#311)
+
+The high-risk frame inventory is deliberately limited to concrete boundaries;
+this does not introduce a generic vector library or move domain policies to math.
+
+| Boundary / owner | Contract and treatment |
+| --- | --- |
+| Persistent loose ship cargo → world poses (`runtime/carrying.rs`, `fragment_physics.rs`, `session.rs`) | Anchor map values are `salimon_character::ShipLocalPoint`, not interchangeable with raw or absolute positions. Insertions explicitly assign the solver/fixture frame; pose-derived insertions call `ShipFrame::project_world`. Synchronization calls `unproject_local`. |
+| Historical/live character eyes → presented ship frame (`runtime/session/presentation.rs`) | `WorldPoint` → `ShipLocalPoint`; local interpolation accepts/returns only ship-local points before typed unprojection. Attached fragment remapping uses the same typed conversion pair. |
+| Runtime → portable physics (`fragment_physics.rs`) | Unwrap local points only when building `ObjectState`; floor/unpowered-floor snapshots use ship coordinates, other surfaces use absolute coordinates. Floor output explicitly constructs a local point before storage. This existing surface-tagged solver DTO is retained; separate ship frames still require separate solver calls. |
+| Body-relative terrain → absolute ground / renderer patches (`world/terrain`, `runtime/terrain.rs`) | Existing `TerrainSample.body_local_position_meters`, body-center `WorldPosition` and patch-specific DTOs name the frame explicitly. Retained as frame-specific DTOs, without changing the terrain codec or normal/query policy. |
+| Absolute CPU → camera-relative GPU (`world/coordinates.rs`, renderer preparation) | Existing `WorldPosition` and private prepared renderer records retain subtract-in-f64-before-f32 conversion. Renderer remains domain-independent; no world/character dependency is added. |
+
+`WorldPoint` is a narrow character-boundary DTO, not a replacement for the
+world domain's canonical `WorldPosition`. The DTOs provide explicit `new` and
+`meters` methods, with no implicit conversions, dereference, arithmetic operators
+or serialization. Raw array `ShipFrame` adapters remain available for existing
+character-local geometry. Both APIs share the exact previous f64 operations and
+axis order. Constructors assign a frame, not finite-input validation; quaternion,
+handedness (+X forward, +Y up, +Z port), normalization and domain fallback policies
+are unchanged. Compile-fail examples reject reversed typed conversion arguments.
+
+Analytic fragment size remains owned by `resource_size`: contact radius in meters
+and `resource_fragments::diameter_meters` / `fragment_diameter_meters` for diameter.
+Renderer `ResourceMeshInstance.authored_mesh_scale` and physics
+`ObjectState.authored_mesh_scale` are dimensionless multipliers of authored mesh /
+hull coordinates, never an analytic diameter. For the shared fragment GLB, visual
+scale is radius divided by `SPHERE_AUTHORED_RADIUS_METERS` (0.48 m). Analytic contacts ignore
+that scale when `hull` is absent; sphere support/contact uses `radius`. Runtime
+history invalidation compares analytic radii, not a legacy size alias.
+
+External automation/benchmark JSON stays compatible: fragment `side_meters`
+continues to serialize diameter; `authored_visual.side_meters` and legacy solver
+snapshot `side_meters` keep their previous numeric meanings. The solver snapshot's
+unused mesh-scale slot retains its historical diameter value for analytic spheres;
+it is not consumed as analytic contact size. No asset, terrain codec, scenario,
+material-volume, mass or session persistence contract changes.

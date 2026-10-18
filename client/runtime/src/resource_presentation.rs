@@ -124,7 +124,7 @@ fn nearby_deposits_impl(
                 } else {
                     [0.0, 1.0, 0.0]
                 },
-            ) * visual.side_meters
+            ) * visual.authored_mesh_scale
                 + 0.005;
             let offset = if terrain == salimon_world::terrain::TerrainMode::Flat {
                 up.map(|v| v * lift)
@@ -153,7 +153,7 @@ fn nearby_deposits_impl(
                     for vertex in mesh.mesh.unit_vertices() {
                         let arm = salimon_physics::rotate(
                             mesh.orientation_xyzw,
-                            salimon_math::scale(*vertex, mesh.side_meters),
+                            salimon_math::scale(*vertex, mesh.authored_mesh_scale),
                         );
                         let p = salimon_math::add(entry.body_local_position_meters, arm);
                         let radial = salimon_math::scale(p, 1.0 / salimon_math::length(p));
@@ -244,9 +244,10 @@ pub(crate) fn deposit_mesh_with_terrain(
         tint: [1.0; 4],
         mesh,
         center_meters: entry.deposit.position().meters(),
-        // Every baked vertex fits +/-0.48 m. Inscribe its cube in the
+        // Every baked vertex fits +/-salimon_renderer::SPHERE_AUTHORED_RADIUS_METERS m. Inscribe its cube in the
         // authoritative sphere without relying on orientation or geometry shape.
-        side_meters: entry.bounds_radius_meters / (0.48 * 3.0_f64.sqrt()),
+        authored_mesh_scale: entry.bounds_radius_meters
+            / (salimon_renderer::SPHERE_AUTHORED_RADIUS_METERS * 3.0_f64.sqrt()),
         orientation_xyzw: if terrain == salimon_world::terrain::TerrainMode::Flat {
             [0.0, 0.0, 0.0, 1.0]
         } else {
@@ -289,7 +290,7 @@ pub(crate) fn fragment_visual(fragment: ResourceFragment) -> SceneInstance {
     let color = fragment_tint(fragment.material().resource());
     SceneInstance {
         center_meters: fragment.transform().position().meters(),
-        half_extents_meters: [(salimon_world::resource_fragments::side_meters(fragment) * 0.5)
+        half_extents_meters: [(salimon_world::resource_fragments::diameter_meters(fragment) * 0.5)
             as f32; 3],
         color,
     }
@@ -307,7 +308,7 @@ pub(crate) fn fragment_mesh(fragment: ResourceFragment) -> ResourceMeshInstance 
         mesh: ResourceMesh::Sphere,
         tint: color,
         center_meters: fragment.transform().position().meters(),
-        side_meters: radius / 0.48,
+        authored_mesh_scale: radius / salimon_renderer::SPHERE_AUTHORED_RADIUS_METERS,
         orientation_xyzw: fragment.transform().orientation_xyzw(),
     }
 }
@@ -339,7 +340,7 @@ mod tests {
                     let up = radial.map(|v| v / length);
                     let bottom = length
                         - body.radius_meters
-                        - mesh.mesh.support_meters(up) * mesh.side_meters;
+                        - mesh.mesh.support_meters(up) * mesh.authored_mesh_scale;
                     assert!((bottom - 0.005).abs() < 0.001);
                 }
                 let bounds: Vec<_> = entries
@@ -350,13 +351,13 @@ mod tests {
                             let mut up = [0.0; 3];
                             up[axis] = 1.0;
                             mesh.center_meters[axis]
-                                - mesh.mesh.support_meters(up) * mesh.side_meters
+                                - mesh.mesh.support_meters(up) * mesh.authored_mesh_scale
                         });
                         let max: [f64; 3] = std::array::from_fn(|axis| {
                             let mut down = [0.0; 3];
                             down[axis] = -1.0;
                             mesh.center_meters[axis]
-                                + mesh.mesh.support_meters(down) * mesh.side_meters
+                                + mesh.mesh.support_meters(down) * mesh.authored_mesh_scale
                         });
                         (min, max)
                     })
@@ -413,7 +414,10 @@ mod tests {
                         material: fragment.material(),
                     }
                     .radius_meters();
-                    assert_eq!(visual.side_meters, radius / 0.48);
+                    assert_eq!(
+                        visual.authored_mesh_scale,
+                        radius / salimon_renderer::SPHERE_AUTHORED_RADIUS_METERS
+                    );
                     assert_eq!(
                         visual.orientation_xyzw,
                         fragment.transform().orientation_xyzw()
@@ -431,7 +435,7 @@ mod tests {
                     );
                     let moved = fragment_mesh(fragment);
                     assert_eq!(moved.mesh, visual.mesh);
-                    assert_eq!(moved.side_meters, visual.side_meters);
+                    assert_eq!(moved.authored_mesh_scale, visual.authored_mesh_scale);
                     assert_eq!(fragment.material().mass_kg(), mass);
                 }
             }
@@ -489,7 +493,14 @@ mod tests {
                     let mesh = deposit_mesh(original).unwrap();
                     assert_eq!(mesh.mesh, variants[(local % 4) as usize]);
                     assert_eq!(mesh.center_meters, original.deposit.position().meters());
-                    assert!((mesh.side_meters * 0.48 * 3.0_f64.sqrt() - radius).abs() < 1e-12);
+                    assert!(
+                        (mesh.authored_mesh_scale
+                            * salimon_renderer::SPHERE_AUTHORED_RADIUS_METERS
+                            * 3.0_f64.sqrt()
+                            - radius)
+                            .abs()
+                            < 1e-12
+                    );
                     assert_eq!(deposit_mesh(make(1.0)), Some(mesh));
                     assert_eq!(deposit_mesh(make(30.0)), Some(mesh));
                     assert!(deposit_mesh(make(0.0)).is_none());
@@ -562,7 +573,7 @@ mod terrain_tests {
                             entry.body_local_position_meters,
                             salimon_physics::rotate(
                                 mesh.orientation_xyzw,
-                                salimon_math::scale(*vertex, mesh.side_meters),
+                                salimon_math::scale(*vertex, mesh.authored_mesh_scale),
                             ),
                         );
                         let radius = salimon_math::length(p);

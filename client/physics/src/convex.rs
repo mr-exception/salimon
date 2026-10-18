@@ -269,7 +269,7 @@ pub(crate) struct TransformedHull {
 impl TransformedHull {
     pub(crate) fn refresh(&mut self, p: &super::ObjectState) {
         if self.orientation == p.orientation
-            && self.side == p.side_meters
+            && self.side == p.authored_mesh_scale
             && match (&self.hull, &p.hull) {
                 (Some(a), Some(b)) => std::sync::Arc::ptr_eq(a, b),
                 (None, None) => true,
@@ -279,7 +279,7 @@ impl TransformedHull {
             return;
         }
         self.orientation = p.orientation;
-        self.side = p.side_meters;
+        self.side = p.authored_mesh_scale;
         self.hull = p.hull.clone();
         self.vertices.clear();
         self.normals.clear();
@@ -288,7 +288,7 @@ impl TransformedHull {
             self.vertices.extend(
                 h.vertices
                     .iter()
-                    .map(|v| rotate(p.orientation, scale(*v, p.side_meters))),
+                    .map(|v| rotate(p.orientation, scale(*v, p.authored_mesh_scale))),
             );
             self.normals
                 .extend(h.normals.iter().map(|v| rotate(p.orientation, *v)));
@@ -394,12 +394,12 @@ fn separated_by_faces_with_gap(a: &super::ObjectState, b: &super::ObjectState, g
         .any(|axis| {
             let offset = dot(separation, axis);
             offset
-                > ah.support(a.orientation, a.side_meters, axis)
-                    + bh.support(b.orientation, b.side_meters, scale(axis, -1.0))
+                > ah.support(a.orientation, a.authored_mesh_scale, axis)
+                    + bh.support(b.orientation, b.authored_mesh_scale, scale(axis, -1.0))
                     + gap
                 || -offset
-                    > ah.support(a.orientation, a.side_meters, scale(axis, -1.0))
-                        + bh.support(b.orientation, b.side_meters, axis)
+                    > ah.support(a.orientation, a.authored_mesh_scale, scale(axis, -1.0))
+                        + bh.support(b.orientation, b.authored_mesh_scale, axis)
                         + gap
         })
 }
@@ -496,8 +496,8 @@ pub(crate) fn near_contact(a: &super::ObjectState, b: &super::ObjectState, gap: 
             .map(|v| rotate(orientation, scale(*v, side)))
             .collect::<Vec<_>>()
     };
-    let av = vertices(ah, a.orientation, a.side_meters);
-    let bv = vertices(bh, b.orientation, b.side_meters);
+    let av = vertices(ah, a.orientation, a.authored_mesh_scale);
+    let bv = vertices(bh, b.orientation, b.authored_mesh_scale);
     let span = |vertices: &[[f64; 3]], axis| {
         vertices
             .iter()
@@ -581,11 +581,16 @@ pub(crate) fn contact_arms(
             .filter(|p| dot(*p, direction) >= support - side * SUPPORT_FEATURE_TOLERANCE)
             .collect::<Vec<_>>()
     };
-    let av = feature(ah, a.orientation, a.side_meters, normal);
-    let bv: Vec<_> = feature(bh, b.orientation, b.side_meters, scale(normal, -1.0))
-        .into_iter()
-        .map(|v| add(v, offset))
-        .collect();
+    let av = feature(ah, a.orientation, a.authored_mesh_scale, normal);
+    let bv: Vec<_> = feature(
+        bh,
+        b.orientation,
+        b.authored_mesh_scale,
+        scale(normal, -1.0),
+    )
+    .into_iter()
+    .map(|v| add(v, offset))
+    .collect();
     let mut closest = (av[0], bv[0]);
     let mut distance = f64::INFINITY;
     let mut consider = |a, b| {
@@ -721,11 +726,13 @@ pub(crate) fn contact_manifold(
     let bitangent = cross(normal, tangent);
     let feature = |p: &super::ObjectState, direction| {
         let hull = p.hull.as_ref().expect("convex caller");
-        let support = hull.support(p.orientation, p.side_meters, direction);
+        let support = hull.support(p.orientation, p.authored_mesh_scale, direction);
         hull.vertices
             .iter()
-            .map(|v| rotate(p.orientation, scale(*v, p.side_meters)))
-            .filter(|v| dot(*v, direction) >= support - p.side_meters * SUPPORT_FEATURE_TOLERANCE)
+            .map(|v| rotate(p.orientation, scale(*v, p.authored_mesh_scale)))
+            .filter(|v| {
+                dot(*v, direction) >= support - p.authored_mesh_scale * SUPPORT_FEATURE_TOLERANCE
+            })
             .collect::<Vec<_>>()
     };
     let av = feature(a, normal);
@@ -972,12 +979,12 @@ mod tests {
         let av: Vec<_> = ah
             .vertices
             .iter()
-            .map(|v| rotate(a.orientation, scale(*v, a.side_meters)))
+            .map(|v| rotate(a.orientation, scale(*v, a.authored_mesh_scale)))
             .collect();
         let bv: Vec<_> = bh
             .vertices
             .iter()
-            .map(|v| rotate(b.orientation, scale(*v, b.side_meters)))
+            .map(|v| rotate(b.orientation, scale(*v, b.authored_mesh_scale)))
             .collect();
         let span = |vertices: &[[f64; 3]], axis| {
             vertices
@@ -1010,7 +1017,7 @@ mod tests {
             let angle = step as f64 * 0.13;
             b.orientation = [0.0, 0.0, (angle / 2.0).sin(), (angle / 2.0).cos()];
             if step == 10 {
-                a.side_meters = 1.5;
+                a.authored_mesh_scale = 1.5;
             }
             if step == 20 {
                 a.hull = b.hull.clone();
@@ -1483,7 +1490,7 @@ mod tests {
             ground_support_meters: half[1],
             surface: Surface::Floor { height_meters: 0.0 },
             hull: Some(box_hull(half)),
-            side_meters: 1.0,
+            authored_mesh_scale: 1.0,
             orientation: [0.0, 0.0, 0.0, 1.0],
             angular_velocity: [0.0; 3],
             mass_kg: 2.0,
@@ -1573,7 +1580,7 @@ mod tests {
             object([0.0, 0.3, 0.0], [0.2, 0.1, 0.2]),
         ];
         let hull = pieces[1].hull.clone().unwrap();
-        pieces[1].side_meters = 1.5;
+        pieces[1].authored_mesh_scale = 1.5;
         pieces[1].radius *= 1.5;
         pieces[1].mass_kg = 3.0;
         for _ in 0..120 {

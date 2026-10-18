@@ -104,7 +104,9 @@ fn profile(count: usize, workload: &str, samples: usize, stacked: bool) -> Resul
                     -2.6 + (i / 20) as f64 * 0.12,
                 ]
             };
-            app.mining.ship_fragments.insert(piece.id(), local);
+            app.mining
+                .ship_fragments
+                .insert(piece.id(), salimon_character::ShipLocalPoint::new(local));
         }
         app.sync_carried();
     }

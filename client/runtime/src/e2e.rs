@@ -528,7 +528,9 @@ fn initialize_fragment_pile(app: &mut GameplaySession, seed: u64) {
         .expect("fixture pose");
         app.mining.session.move_loose(piece.id(), pose);
         if !outside {
-            app.mining.ship_fragments.insert(piece.id(), local);
+            app.mining
+                .ship_fragments
+                .insert(piece.id(), salimon_character::ShipLocalPoint::new(local));
         }
         app.mining.fragment_motion.insert(
             piece.id(),

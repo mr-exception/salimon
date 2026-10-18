@@ -229,7 +229,8 @@ fragment identity or persistence rule. See the
 
 `resource_size.rs` is the single size authority. Deposits retain their 10×
 linear exaggeration; live fragments use density-derived spherical radius, bounded
-to 5 mm–2 m, and `side_meters` is diameter. This supersedes the historical
+to 5 mm–2 m; `fragment_diameter_meters` / `diameter_meters` name diameter explicitly.
+The compatible inspection field `side_meters` retains that diameter. This supersedes the historical
 #144/#148 enlarged shard/cube bounds. Mass labels, 2 kg/s yield, legacy helper
 output cap and conservation are unchanged; interactive mining uses its 10 kg cap.
 
@@ -327,9 +328,11 @@ interactive tool does not call them. No disk save format exists to migrate.
 All live fragment radii, loose support, pickup rays, carrying/terrain clearance,
 world prompt anchors and visual bounds share `resource_size::fragment_contact_radius_meters`.
 It derives radius from mass/effective density with the existing 5 mm–2 m bounds;
-`fragment_side_meters` / inspection `side_meters` now mean **sphere diameter**.
+`fragment_diameter_meters` and `resource_fragments::diameter_meters` mean
+**sphere diameter**, as does the compatible inspection key `side_meters`.
 Deposit enlargement remains 10× and does not change yield. Sphere visuals use
-radius / authored 0.48 m. Pickup tests the analytic sphere (not its faceted
+radius / `salimon_renderer::SPHERE_AUTHORED_RADIUS_METERS` (authored 0.48 m),
+stored as dimensionless `authored_mesh_scale`, never a side length. Pickup tests the analytic sphere (not its faceted
 mesh); equal distances still break by stable identity, with the same 3 m range
 and obstruction rules. One-object carry and Core conversion policy are unchanged.
 

@@ -43,8 +43,10 @@ pub(crate) struct ResourceGameplay {
     >,
     pub(crate) fragment_scratch: crate::fragment_physics::FragmentScratch,
     pub(crate) fragment_sleep: salimon_physics::SleepTracker<salimon_world::resources::FragmentId>,
-    pub(crate) ship_fragments:
-        std::collections::HashMap<salimon_world::resources::FragmentId, [f64; 3]>,
+    pub(crate) ship_fragments: std::collections::HashMap<
+        salimon_world::resources::FragmentId,
+        salimon_character::ShipLocalPoint,
+    >,
     pub(crate) fragment_motion: std::collections::HashMap<
         salimon_world::resources::FragmentId,
         crate::fragment_physics::FragmentMotion,
@@ -413,7 +415,7 @@ mod spherical_tests {
         rotated.look_target_meters = [0.0, 2.0, 1.0];
         let turned = tool.growth_preview(&equipment, rotated).unwrap();
         assert_eq!(turned.center_meters, [0.15, 1.8, 0.85]);
-        assert_eq!(turned.side_meters, preview.side_meters);
+        assert_eq!(turned.authored_mesh_scale, preview.authored_mesh_scale);
         assert_ne!(turned.orientation_xyzw, preview.orientation_xyzw);
         assert_eq!(
             tool.session.fragments().len(),

@@ -85,17 +85,21 @@ impl History {
             let old = character_ship_frame(previous.ship.pose);
             let live = character_ship_frame(current.ship.pose);
             let render = character_ship_frame(result.ship.pose);
-            let local_eye = lerp(
-                old.world_to_local(previous.character.eye_position_meters),
-                live.world_to_local(current.character.eye_position_meters),
+            let local_eye = lerp_ship_local(
+                old.project_world(salimon_character::WorldPoint::new(
+                    previous.character.eye_position_meters,
+                )),
+                live.project_world(salimon_character::WorldPoint::new(
+                    current.character.eye_position_meters,
+                )),
                 result.alpha,
             );
             result.character.local_ship_position_meters = current
                 .character
                 .local_ship_position_meters
-                .map(|_| local_eye);
+                .map(|_| local_eye.meters());
             (
-                render.local_to_world(local_eye),
+                render.unproject_local(local_eye).meters(),
                 rotate_vector(direction, live, render),
                 rotate_vector(current.character.up.map(f64::from), live, render),
             )
@@ -188,7 +192,11 @@ impl Presentation {
             };
             mesh.center_meters = add(self.character.eye_position_meters, offset);
         } else if session.mining.ship_fragments.contains_key(&fragment.id()) {
-            mesh.center_meters = render.local_to_world(frame.world_to_local(mesh.center_meters));
+            mesh.center_meters = render
+                .unproject_local(
+                    frame.project_world(salimon_character::WorldPoint::new(mesh.center_meters)),
+                )
+                .meters();
         } else {
             return mesh;
         }
@@ -204,6 +212,15 @@ impl Presentation {
         }
         mesh
     }
+}
+
+/// Both historical samples must already have been projected into their own ship frames.
+fn lerp_ship_local(
+    previous: salimon_character::ShipLocalPoint,
+    current: salimon_character::ShipLocalPoint,
+    alpha: f64,
+) -> salimon_character::ShipLocalPoint {
+    salimon_character::ShipLocalPoint::new(lerp(previous.meters(), current.meters(), alpha))
 }
 
 #[cfg(test)]

@@ -8,7 +8,7 @@ new crate dependencies or native/platform types.
 
 | Source under `src/` | Responsibility |
 | --- | --- |
-| `state.rs` | Typed ship/surface frames, location/snapshot and private position state |
+| `state.rs`, `points.rs` | Ship/surface frames, narrow world/ship-local point DTOs, location/snapshot and private position state |
 | `input.rs` | Portable movement flags and normalized planar controls |
 | `controller/mod.rs` | Private mutable controller fields, default state, inspection and one-mode update dispatch |
 | `controller/interior.rs` | Ship-local walking/jumping and instant cockpit transitions |
@@ -170,3 +170,11 @@ adds conservative radius-based ceiling containment; horizontal hull/fixture
 containment and precise deck support remain unchanged. Surface changes invalidate
 sleep support through existing snapshot matching. No acceleration-induced cabin
 forces, crew inertial simulation or new contact engine is introduced.
+
+## Typed position boundary (#311)
+
+`ShipFrame::project_world(WorldPoint)` and `unproject_local(ShipLocalPoint)`
+retain the existing raw-array transform arithmetic while rejecting reversed frame
+arguments. Runtime uses them for persistent cargo and ship-relative presentation;
+local controller geometry retains the raw adapters. No validation, quaternion or
+normalization policy changes. See the [canonical inventory](../../docs/technical-architecture.md#position-boundaries-and-resource-dimensions-311).

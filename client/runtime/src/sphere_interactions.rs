@@ -101,6 +101,25 @@ fn cap_and_short_deposit_spheres_keep_identity_radius_and_yield_through_core() {
             assert_eq!(original.id(), id);
             crate::sphere_fixtures::assert_sphere(original, resource, mass);
             let radius = crate::fragment_physics::sphere_radius(original);
+            let inspection = automation::inspect_session(&app);
+            let serialized = &inspection["world"]["fragments"][0];
+            assert_eq!(serialized["side_meters"].as_f64(), Some(radius * 2.0));
+            assert!(
+                (serialized["sphere_visual"]["radius_meters"]
+                    .as_f64()
+                    .unwrap()
+                    - radius)
+                    .abs()
+                    < 1e-12
+            );
+            assert_eq!(
+                serialized["ship_local_position_meters"]
+                    .as_array()
+                    .unwrap()
+                    .len(),
+                3
+            );
+            assert!(serialized.get("authored_mesh_scale").is_none());
             assert!((original.material().mass_kg() - mass).abs() < 1e-10);
             command(
                 &mut app,
@@ -142,6 +161,59 @@ fn cap_and_short_deposit_spheres_keep_identity_radius_and_yield_through_core() {
                 pose,
             );
             assert!(stale.remaining_mass_kg() < 1e-10);
+        }
+    }
+}
+
+#[test]
+fn analytic_radius_matches_authored_render_pickup_and_contact_contracts() {
+    use salimon_world::{
+        carrying::aimed_fragment, mining::MiningRay, resource_fragments::diameter_meters,
+    };
+    for resource in [
+        ResourceId::IronOre,
+        ResourceId::SilicateRock,
+        ResourceId::WaterIce,
+    ] {
+        for mass in [0.001, 0.25, 10.0] {
+            for anchor in [0.0, 1e12] {
+                let center = WorldPosition::new(anchor, anchor, anchor + 2.0);
+                let pose = ResourceTransform::new(center, [0.0, 0.0, 0.0, 1.0]).unwrap();
+                let mut tool = crate::mining::ResourceGameplay::default();
+                let id = crate::sphere_fixtures::sphere(&mut tool.session, resource, mass, pose);
+                let piece = *tool.session.fragment(id).unwrap();
+                let radius = crate::fragment_physics::sphere_radius(piece);
+                let mesh = crate::resource_presentation::fragment_mesh(piece);
+                let rendered_radius =
+                    mesh.authored_mesh_scale * salimon_renderer::SPHERE_AUTHORED_RADIUS_METERS;
+                assert!((rendered_radius - radius).abs() < 1e-12);
+                assert_eq!(diameter_meters(piece), radius * 2.0);
+                assert_ne!(mesh.authored_mesh_scale, diameter_meters(piece));
+                let proxy = crate::resource_presentation::fragment_visual(piece);
+                assert!((f64::from(proxy.half_extents_meters[0]) - radius).abs() < 1e-7);
+                let frame = salimon_character::ShipFrame {
+                    origin_meters: [anchor; 3],
+                    axes: [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+                };
+                let states = crate::fragment_physics::snapshots(&tool, frame, center.meters());
+                assert_eq!(states[0].1.radius, radius);
+                assert_eq!(states[0].1.ground_support_meters, radius);
+                // Probe just inside/outside the visible radius, including near a
+                // distant anchor. This detects accidentally picking with mesh scale.
+                for (fraction, expected) in [(0.9, Some(id)), (1.1, None)] {
+                    let eye = WorldPosition::new(anchor + radius * fraction, anchor, anchor);
+                    let look = eye.translated([0.0, 0.0, 4.0]);
+                    assert_eq!(
+                        aimed_fragment(
+                            MiningRay::new(eye, look).unwrap(),
+                            &[piece],
+                            None,
+                            f64::INFINITY
+                        ),
+                        expected
+                    );
+                }
+            }
         }
     }
 }

@@ -100,12 +100,15 @@ pub(crate) fn interpolated_mesh(
             previous.surface,
             Surface::Floor { .. } | Surface::UnpoweredFloor { .. }
         ) != local.is_some()
-        || previous.side_meters != salimon_world::resource_fragments::side_meters(fragment)
+        || previous.radius != sphere_radius(fragment)
         || previous.mass_kg != fragment.material().mass_kg()
     {
         return mesh;
     }
-    let current = local.copied().unwrap_or(mesh.center_meters);
+    let current = local
+        .copied()
+        .map(salimon_character::ShipLocalPoint::meters)
+        .unwrap_or(mesh.center_meters);
     let position =
         std::array::from_fn(|i| previous.position[i] + (current[i] - previous.position[i]) * alpha);
     let current_q = if local.is_some() {
@@ -134,7 +137,9 @@ pub(crate) fn interpolated_mesh(
     let norm = q.iter().map(|v| v * v).sum::<f64>().sqrt();
     let q = q.map(|v| v / norm);
     mesh.center_meters = if local.is_some() {
-        frame.local_to_world(position)
+        frame
+            .unproject_local(salimon_character::ShipLocalPoint::new(position))
+            .meters()
     } else {
         position
     };
@@ -279,8 +284,9 @@ pub(crate) fn advance_measured(
             piece.surface,
             Surface::Floor { .. } | Surface::UnpoweredFloor { .. }
         ) {
-            tool.ship_fragments.insert(id, piece.position);
-            frame.local_to_world(piece.position)
+            let local = salimon_character::ShipLocalPoint::new(piece.position);
+            tool.ship_fragments.insert(id, local);
+            frame.unproject_local(local).meters()
         } else {
             piece.position
         };
@@ -339,14 +345,14 @@ fn snapshots_into(
                 // world pose (which may be hundreds of metres behind in flight).
                 let position = tool.ship_fragments.get(&p.id()).map_or_else(
                     || p.transform().position().meters(),
-                    |local| frame.local_to_world(*local),
+                    |local| frame.unproject_local(*local).meters(),
                 );
                 length(sub(position, player)) < 125.0
             })
             .map(|p| {
                 let ship = tool.ship_fragments.contains_key(&p.id());
                 let position = if ship {
-                    tool.ship_fragments[&p.id()]
+                    tool.ship_fragments[&p.id()].meters()
                 } else {
                     p.transform().position().meters()
                 };
@@ -364,7 +370,7 @@ fn snapshots_into(
                         radius: sphere_radius(p),
                         ground_support_meters: sphere_radius(p),
                         hull: None,
-                        side_meters: salimon_world::resource_fragments::side_meters(p),
+                        authored_mesh_scale: salimon_world::resource_fragments::diameter_meters(p),
                         orientation: if ship {
                             tool.fragment_motion
                                 .get(&p.id())
@@ -491,8 +497,10 @@ mod tests {
         .unwrap();
         let id = crate::sphere_fixtures::sphere(&mut tool.session, ResourceId::IronOre, 10.0, pose);
         let radius = sphere_radius(tool.session.fragments()[0]);
-        tool.ship_fragments
-            .insert(id, [-5.0, SHIP_FLOOR_HEIGHT_METERS + radius, 0.0]);
+        tool.ship_fragments.insert(
+            id,
+            salimon_character::ShipLocalPoint::new([-5.0, SHIP_FLOOR_HEIGHT_METERS + radius, 0.0]),
+        );
         let mut ship = salimon_ship::ShipController::flying(
             salimon_ship::ShipPose {
                 position_meters: frame.origin_meters,
@@ -578,7 +586,10 @@ mod tests {
         let state = &states[0].1;
         let visual = crate::resource_presentation::fragment_mesh(p);
         assert!(state.hull.is_none());
-        assert_eq!(state.radius, visual.side_meters * 0.48);
+        assert_eq!(
+            state.radius,
+            visual.authored_mesh_scale * salimon_renderer::SPHERE_AUTHORED_RADIUS_METERS
+        );
         assert_eq!(state.ground_support_meters, state.radius);
         assert_eq!(state.mass_kg, p.material().mass_kg());
         let mut source = ResourceDeposit::new(
@@ -610,7 +621,8 @@ mod tests {
     fn interpolation_is_local_to_ship_and_release_has_no_history_lag() {
         let mut tool = mined(2.0);
         let id = tool.session.fragments()[0].id();
-        tool.ship_fragments.insert(id, [-5.0, 1.3, 0.0]);
+        tool.ship_fragments
+            .insert(id, salimon_character::ShipLocalPoint::new([-5.0, 1.3, 0.0]));
         capture_previous(&mut tool, frame(), [-5.0, 2.0, 0.0]);
         let moving = ShipFrame {
             origin_meters: [1e12, 2e12, -3e12],
@@ -629,7 +641,7 @@ mod tests {
         let local = tool.ship_fragments[&id];
         assert_eq!(
             midpoint.center_meters,
-            moving.local_to_world([-5.0, (1.3 + local[1]) * 0.5, 0.0])
+            moving.local_to_world([-5.0, (1.3 + local.meters()[1]) * 0.5, 0.0])
         );
         assert!((midpoint.orientation_xyzw.iter().map(|v| v * v).sum::<f64>() - 1.0).abs() < 1e-12);
         let authoritative = crate::resource_presentation::fragment_mesh(fragment);
@@ -650,10 +662,11 @@ mod tests {
         let mut tool = mined(2.0);
         let fragment = tool.session.fragments()[0];
         let id = fragment.id();
-        tool.ship_fragments.insert(id, [-5.0, 1.3, 0.0]);
+        tool.ship_fragments
+            .insert(id, salimon_character::ShipLocalPoint::new([-5.0, 1.3, 0.0]));
         capture_previous(&mut tool, frame(), [-5.0, 2.0, 0.0]);
         let expected = crate::resource_presentation::fragment_mesh(fragment).center_meters;
-        tool.fragment_previous.get_mut(&id).unwrap().side_meters *= 0.5;
+        tool.fragment_previous.get_mut(&id).unwrap().radius *= 0.5;
         assert_eq!(
             interpolated_mesh(&tool, fragment, frame(), 0.0).center_meters,
             expected
@@ -664,7 +677,8 @@ mod tests {
             interpolated_mesh(&tool, fragment, frame(), 0.0).center_meters,
             expected
         );
-        tool.ship_fragments.insert(id, [-5.0, 1.3, 0.0]);
+        tool.ship_fragments
+            .insert(id, salimon_character::ShipLocalPoint::new([-5.0, 1.3, 0.0]));
         assert!(tool.session.pick_up(id));
         assert_eq!(
             interpolated_mesh(&tool, fragment, frame(), 0.0).center_meters,
@@ -726,7 +740,8 @@ mod tests {
                     )
                     .unwrap(),
                 );
-                tool.ship_fragments.insert(p.id(), local);
+                tool.ship_fragments
+                    .insert(p.id(), salimon_character::ShipLocalPoint::new(local));
                 tool.fragment_motion
                     .insert(p.id(), FragmentMotion::default());
             }
@@ -749,7 +764,7 @@ mod tests {
             for (before, p) in initial.iter().zip(tool.session.fragments()) {
                 assert_eq!(before.id(), p.id());
                 assert_eq!(before.material(), p.material());
-                let gap = tool.ship_fragments[&p.id()][1]
+                let gap = tool.ship_fragments[&p.id()].meters()[1]
                     - SHIP_FLOOR_HEIGHT_METERS
                     - support(*p, [0.0, 1.0, 0.0]);
                 assert!(gap.abs() < 0.003, "{resource:?} {:?}: gap {gap}", p.id());
@@ -767,7 +782,8 @@ mod tests {
         let mut tool = mined(2.0);
         let original = tool.session.fragments()[0];
         let id = original.id();
-        tool.ship_fragments.insert(id, [-5.0, 1.3, 0.0]);
+        tool.ship_fragments
+            .insert(id, salimon_character::ShipLocalPoint::new([-5.0, 1.3, 0.0]));
         tool.fragment_motion.insert(id, FragmentMotion::default());
         for _ in 0..500 {
             advance(
@@ -806,7 +822,7 @@ mod tests {
         assert_eq!(tool.ship_fragments[&id], local);
         assert_eq!(
             tool.session.fragments()[0].transform().position().meters(),
-            moving.local_to_world(local)
+            moving.unproject_local(local).meters()
         );
         // Leaving the selected set invalidates contacts; returning retains identity/mass.
         advance(&mut tool, moving, Duration::from_millis(16), [0.0; 3]);
@@ -857,7 +873,8 @@ mod tests {
         )
         .unwrap();
         assert!(tool.session.move_loose(id, pose));
-        tool.ship_fragments.insert(id, local);
+        tool.ship_fragments
+            .insert(id, salimon_character::ShipLocalPoint::new(local));
         tool.fragment_motion.insert(id, FragmentMotion::default());
         let before = tool.session.fragments()[0];
         release(&mut tool, id, frame.axes[0], frame, true);
@@ -880,7 +897,7 @@ mod tests {
         );
         assert_eq!(
             after.transform().position().meters(),
-            frame.local_to_world(tool.ship_fragments[&id])
+            frame.unproject_local(tool.ship_fragments[&id]).meters()
         );
         assert_ne!(after.transform().position(), before.transform().position());
     }
@@ -889,7 +906,8 @@ mod tests {
     fn released_fragment_falls_from_hand_and_settles_on_deck() {
         let mut tool = mined(2.0);
         let id = tool.session.fragments()[0].id();
-        tool.ship_fragments.insert(id, [-5.0, 1.3, 0.0]);
+        tool.ship_fragments
+            .insert(id, salimon_character::ShipLocalPoint::new([-5.0, 1.3, 0.0]));
         tool.fragment_motion.insert(id, FragmentMotion::default());
         release(&mut tool, id, [1.0, 0.0, 0.0], frame(), true);
         advance(
@@ -898,7 +916,7 @@ mod tests {
             Duration::from_millis(100),
             [-5.0, 2.0, 0.0],
         );
-        let falling = tool.ship_fragments[&id];
+        let falling = tool.ship_fragments[&id].meters();
         assert!(falling[0] > -5.0 && falling[1] < 1.3);
         for _ in 0..180 {
             advance(
@@ -908,7 +926,7 @@ mod tests {
                 [-5.0, 2.0, 0.0],
             );
         }
-        let settled = tool.ship_fragments[&id];
+        let settled = tool.ship_fragments[&id].meters();
         let piece = tool.session.fragments()[0];
         let radius = support(piece, [0.0, 1.0, 0.0]);
         assert!((settled[1] - SHIP_FLOOR_HEIGHT_METERS - radius).abs() < 0.002);
@@ -919,8 +937,10 @@ mod tests {
         let mut tool = mined(4.0);
         let pieces = tool.session.fragments().to_vec();
         for (i, piece) in pieces.iter().enumerate() {
-            tool.ship_fragments
-                .insert(piece.id(), [-5.0, 0.5 + i as f64 * 0.4, 0.0]);
+            tool.ship_fragments.insert(
+                piece.id(),
+                salimon_character::ShipLocalPoint::new([-5.0, 0.5 + i as f64 * 0.4, 0.0]),
+            );
             tool.fragment_motion
                 .insert(piece.id(), FragmentMotion::default());
         }
@@ -932,8 +952,8 @@ mod tests {
                 [-5.0, 2.0, 0.0],
             );
         }
-        let a = tool.ship_fragments[&pieces[0].id()];
-        let b = tool.ship_fragments[&pieces[1].id()];
+        let a = tool.ship_fragments[&pieces[0].id()].meters();
+        let b = tool.ship_fragments[&pieces[1].id()].meters();
         // Exact spherical contacts retain the sum of radii within solver tolerance.
         assert!(a[1].min(b[1]) >= SHIP_FLOOR_HEIGHT_METERS);
         assert!(length(sub(a, b)) > 0.05);

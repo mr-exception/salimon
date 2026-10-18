@@ -5,7 +5,7 @@ use crate::resources::RawMaterial;
 /// Deposit scale; fragments use their separate scale. Neither changes yield.
 pub const RESOURCE_LINEAR_SCALE: f64 = 10.0;
 
-pub fn fragment_side_meters(material: RawMaterial) -> f64 {
+pub fn fragment_diameter_meters(material: RawMaterial) -> f64 {
     2.0 * fragment_contact_radius_meters(material)
 }
 
@@ -38,7 +38,7 @@ mod tests {
                 assert_eq!(material.mass_kg(), mass);
                 assert_eq!(material.volume_m3(), solid_volume);
                 assert_eq!(
-                    fragment_side_meters(material),
+                    fragment_diameter_meters(material),
                     2.0 * fragment_contact_radius_meters(material)
                 );
                 let original_radius = (3.0 * solid_volume / (4.0 * std::f64::consts::PI)).cbrt();

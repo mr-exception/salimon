@@ -1,7 +1,8 @@
 # Physics architecture
 
 `ObjectState` is an ordered, caller-owned snapshot with f64 metre position,
-linear velocity, unit XYZW orientation, angular velocity, mass, uniform scale,
+linear velocity, unit XYZW orientation, angular velocity, mass, dimensionless
+`authored_mesh_scale` for optional hull coordinates,
 conservative radius, optional shared immutable convex hull and explicit surface.
 Physics advances motion and returns poses without allocating identities or
 reading assets, native events, renderer state or resource sessions.
@@ -366,3 +367,6 @@ them for the duration of one update. Every substep initializes the same values
 as fresh arrays; warm responses are moved out before reuse. A fresh-versus-reused
 array oracle checks exact state parity across population growth and shrinkage.
 This does not eliminate manifold, response-internal or activation-graph allocations.
+
+Analytic sphere contact and support use `ObjectState.radius`, independently of
+`authored_mesh_scale`. See the [dimension contract](../../docs/technical-architecture.md#position-boundaries-and-resource-dimensions-311).

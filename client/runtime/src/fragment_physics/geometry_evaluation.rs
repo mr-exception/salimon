@@ -56,7 +56,7 @@ fn object(hull: Arc<ConvexHull>) -> ObjectState {
         angular_velocity: [0.0; 3],
         radius: side * 0.48 * 3.0_f64.sqrt(),
         ground_support_meters: 0.0,
-        side_meters: side,
+        authored_mesh_scale: side,
         mass_kg: 2.0,
         orientation: [0.0, 0.0, 0.0, 1.0],
         surface: Surface::Floor { height_meters: 0.0 },
@@ -157,12 +157,12 @@ fn resource_geometry_evaluation() {
                                 + 0.002
                                 + base.hull.as_ref().unwrap().support(
                                     base.orientation,
-                                    base.side_meters,
+                                    base.authored_mesh_scale,
                                     [0.0, 1.0, 0.0],
                                 )
                                 + p.hull.as_ref().unwrap().support(
                                     p.orientation,
-                                    p.side_meters,
+                                    p.authored_mesh_scale,
                                     [0.0, -1.0, 0.0],
                                 );
                         }

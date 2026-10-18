@@ -719,3 +719,11 @@ current-sphere workloads, with raw population and CPU samples. Historical flight
 and #235 populations retain their original definitions. See the canonical
 [fixture/workload contract](../../scripts/FRAGMENT_BENCHMARKS.md#current-sphere-fixture-and-cpu-workload-contracts-303)
 for commands, fixture identities, tolerances and interpretation limits.
+
+## Nearby preparation observations (#307)
+
+`mining.rs` retains one Rc-owned immutable nearby result plus raw candidates,
+with exact position/seed/mode invalidation and world deposit revision-based
+reconciliation. Current rays/obstruction are never cached. Terrain selection,
+generation, complete preparation and renderer CPU upload preparation are measured
+separately in automation inspection; see the canonical [budget guide](../../docs/terrain-validation.md#nearby-query-reuse-307).

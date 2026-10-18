@@ -13,6 +13,8 @@ type PlacementKey = (u8, u64, u64, Vec<u8>);
 pub(crate) struct PlacementCache {
     entries: std::collections::BTreeMap<PlacementKey, (SurfaceDeposit, u64)>,
     clock: u64,
+    pub(crate) misses: u64,
+    pub(crate) micros: u128,
 }
 impl PlacementCache {
     fn get(&mut self, key: &PlacementKey) -> Option<SurfaceDeposit> {
@@ -109,6 +111,7 @@ fn nearby_deposits_impl(
                 deposits.push(found);
                 continue;
             }
+            let placement_started = std::time::Instant::now();
             let up = entry
                 .body_local_position_meters
                 .map(|v| v / body.radius_meters);
@@ -185,6 +188,11 @@ fn nearby_deposits_impl(
                 && let Some(cache) = cache
             {
                 cache.borrow_mut().insert(placement_key, entry);
+            }
+            if let Some(cache) = cache {
+                let mut cache = cache.borrow_mut();
+                cache.misses += 1;
+                cache.micros += placement_started.elapsed().as_micros();
             }
             deposits.push(entry);
         }
@@ -324,7 +332,7 @@ mod tests {
                     .translated(direction.map(|v| v * body.radius_meters))
                     .meters();
                 let entries = nearby_deposits(position, 0).unwrap();
-                for entry in &entries {
+                for entry in entries.iter() {
                     let mesh = deposit_mesh(*entry).unwrap();
                     let radial = entry.deposit.position().offset_from(body.center);
                     let length = radial[0].hypot(radial[1]).hypot(radial[2]);
@@ -544,9 +552,9 @@ mod terrain_tests {
                 let entries = tool.nearby(player, 181).unwrap();
                 assert!(!entries.is_empty());
                 let oracle = nearby_deposits_with_terrain(player, 181, mode).unwrap();
-                assert_eq!(entries, oracle);
+                assert_eq!(entries.as_ref(), &oracle);
                 let mut lowest = f64::INFINITY;
-                for entry in &entries {
+                for entry in entries.iter() {
                     let mesh = deposit_mesh_with_terrain(*entry, mode).unwrap();
                     let mut min = f64::INFINITY;
                     for vertex in mesh.mesh.unit_vertices() {

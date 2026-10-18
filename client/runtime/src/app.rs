@@ -209,6 +209,9 @@ impl ClientApplication {
                 .as_ref()
                 .is_some_and(|r| r.terrain_presentation_ready(&self.terrain_stream.active))
     }
+    pub(crate) fn terrain_upload_times(&self) -> Option<(u128, u128)> {
+        self.renderer.as_ref().map(Renderer::terrain_upload_times)
+    }
     pub(crate) fn terrain_uploads(&self) -> (usize, usize) {
         self.renderer
             .as_ref()

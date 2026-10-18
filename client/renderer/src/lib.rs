@@ -667,6 +667,11 @@ impl Renderer {
     pub fn terrain_presentation_ready(&self, patches: &[std::sync::Arc<TerrainPatch>]) -> bool {
         self.terrain.presentation_ready(patches)
     }
+    /// CPU preparation including buffer creation and queue writes; not GPU execution time.
+    pub fn terrain_upload_times(&self) -> (u128, u128) {
+        self.terrain.upload_times()
+    }
+
     pub fn terrain_uploads(&self) -> (usize, usize) {
         self.terrain.uploads()
     }

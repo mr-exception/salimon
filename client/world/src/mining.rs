@@ -113,12 +113,18 @@ pub struct MiningSession {
     carry: crate::carrying::CarrySlot,
     spherical: crate::spherical_mining::SphericalMining,
     attached_sphere_id: Option<crate::resources::FragmentId>,
+    deposit_revision: u64,
     remaining: std::collections::HashMap<DepositId, f64>,
     extracted_mass_kg: f64,
     fragments: crate::resource_fragments::FragmentOutput,
 }
 
 impl MiningSession {
+    /// Changes only when deposit mass changes, not when fragments move or release.
+    pub const fn deposit_revision(&self) -> u64 {
+        self.deposit_revision
+    }
+
     pub fn apply_to(&self, deposits: &mut [SurfaceDeposit]) {
         for entry in deposits {
             self.restore(&mut entry.deposit);
@@ -166,6 +172,7 @@ impl MiningSession {
                 .expect("bounded output only decreases mass");
             self.remaining
                 .insert(deposit.id(), deposit.remaining_mass_kg());
+            self.deposit_revision += 1;
             self.extracted_mass_kg += removed;
         }
         removed

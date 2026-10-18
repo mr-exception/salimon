@@ -95,14 +95,14 @@ keeps the player on the supported cabin floor.
 | CPU patch cache | 1,024 patches; measured requested buffers/metadata below 48 MiB in regressions |
 | GPU patch buffers and uniform arena | 32 MiB hard preparation bound |
 | GPU uploads, including uniforms | 2 MiB per frame |
-| Generation | At most 8 patches/frame; 2 ms admission target, allowing the last bounded patch to finish |
+| Complete CPU preparation | 2 ms admission target from target/LOD selection through publication; at most 8 generated patches/frame. A final bounded selection unit or patch may overrun; counted explicitly |
 | Deposit placement cache | 1,024 immutable placements |
 | Exact normal-query cache | 4,096 entries/native thread |
 | Observational frame history | 3,600 samples |
 
 These are requested application buffers, not total driver/RSS allocations.
 Record process RSS separately; Metal may not expose wgpu allocator totals.
-Generation peak/total costs and upload peaks are available in native inspection.
+Selection/key construction, generation, full CPU preparation (including cold work) and renderer upload preparation have separate native inspection timings. The 2 ms clock starts before selection; selection, balancing and key construction advance in cooperative slices before admitting generation. Queues are capped at 128 pending tree nodes and 512 leaves/keys; changed body/definition/anchor discards partial work. The final indivisible selection unit or patch can cause a soft-budget overrun, not a hidden pass. `preparation_overruns` and peak include them; the existing far sphere/previous complete cap remains until the new cap is ready. Renderer upload timing measures CPU validation/buffer/queue preparation, not GPU execution.
 No full-planet mesh or unbounded generation queue is allocated.
 
 CPU tests measure vertex/shared-border error below 0.2 mm at catalog radii and
@@ -182,3 +182,24 @@ comparison rejects changed silhouette/background coverage, geometry/draw/memory
 costs, or inconsistent scene sets; palette/color changes are expected. No
 comparison promotes a pixel baseline. Run existing topology/shared-border and
 world ground/ship/character/physics regressions alongside this visual-only probe.
+
+## Nearby query reuse (#307)
+
+Runtime retains one immutable nearby candidate/result snapshot, keyed by exact
+position bits, seed and terrain mode (definitions are immutable). Within a tick
+and subsequent unchanged-position redraws, targeting and mesh presentation share
+it. A world-owned deposit revision invalidates reconciliation only when mass
+changes; fragment movement and input release do not regenerate candidates. A new
+position/seed/mode regenerates; streaming return reapplies depleted tombstones.
+Aim/ship obstruction/equipment gates always use current snapshots, including
+zero-duration look updates. No ray-result cache can delay aim loss or release.
+`resource_queries` separates candidate/placement/reconciliation costs and counts;
+placement misses include cold authored-vertex terrain support. The single result
+cache and 1,024-placement limit keep memory bounded. No background queues were
+introduced. Run the opt-in CPU traversal probe with:
+
+    cargo test -p salimon-client --locked preparation_profile -- --ignored --nocapture
+
+CPU observations and measured cold/steady costs are recorded in
+[the #307 report](../reports/issue-307/README.md); hardware budgets/FPS remain
+pending [native #313](https://github.com/mr-exception/salimon/issues/313).

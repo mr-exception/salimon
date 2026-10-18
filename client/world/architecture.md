@@ -127,3 +127,13 @@ physical IDs, place objects or simulate contacts. Session/runtime integration
 is #231; legacy extraction fixtures remain available. The canonical
 [lifecycle and radius rules](resource-contracts.md#spherical-mining-lifecycle-230)
 separate material conservation from replaceable visual geometry.
+
+## Fragment identity lookup (#305)
+
+The fragment Vec remains canonical creation/solver order. A private ID-to-slot
+hash index serves lookup/writeback and is never iterated for gameplay ordering.
+Growth preserves slots; ordered deletion repairs shifted slots rather than
+swapping entities. Removal is O(retained count), lookup is expected O(1), and IDs
+are monotonic across consumption. Range selection still visits retained entities;
+CPU attribution in the #305/#306 reports determines whether another spatial
+membership structure is justified. Streaming does not remove retained identities.

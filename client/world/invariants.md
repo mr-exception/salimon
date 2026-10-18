@@ -76,3 +76,7 @@ and their consumers aligned; flat deterministic fixtures are explicit.
   10 kg default cap, releases on input/aim/cap/depletion/interruption, and starts
   the next piece on the next held valid tick. Removed mass equals released plus
   reserved mass. See [the lifecycle contract](resource-contracts.md#spherical-mining-lifecycle-230).
+
+- Every retained fragment has exactly one ID-to-Vec-slot entry. Ordered removal
+  repairs shifted slots; growth/pickup/drop never reorder survivors. Index hash
+  iteration cannot determine journal or solver order. Removed IDs are never reused.

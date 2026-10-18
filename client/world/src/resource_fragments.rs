@@ -14,6 +14,7 @@ pub const FILL_ROUNDING_REMAINDER_KG: f64 = 1e-12;
 #[derive(Default)]
 pub(crate) struct FragmentOutput {
     fragments: Vec<ResourceFragment>,
+    slots: std::collections::HashMap<FragmentId, usize>,
     changes: std::collections::BTreeMap<u64, Option<ResourceFragment>>,
     next_id: u64,
     sealed: std::collections::HashSet<FragmentId>,
@@ -39,6 +40,7 @@ impl FragmentOutput {
         if let Some(existing) = self.get_mut(id) {
             *existing = piece;
         } else {
+            self.slots.insert(id, self.fragments.len());
             self.fragments.push(piece);
         }
         self.sealed.insert(id);
@@ -50,8 +52,13 @@ impl FragmentOutput {
         &self.fragments
     }
 
+    pub(crate) fn get(&self, id: FragmentId) -> Option<&ResourceFragment> {
+        self.slots.get(&id).map(|&slot| &self.fragments[slot])
+    }
+
     pub(crate) fn get_mut(&mut self, id: FragmentId) -> Option<&mut ResourceFragment> {
-        self.fragments.iter_mut().find(|piece| piece.id() == id)
+        let slot = *self.slots.get(&id)?;
+        Some(&mut self.fragments[slot])
     }
 
     pub(crate) fn record(&mut self, piece: ResourceFragment) {
@@ -67,10 +74,15 @@ impl FragmentOutput {
     }
 
     pub(crate) fn remove(&mut self, id: FragmentId) -> bool {
-        let Some(index) = self.fragments.iter().position(|p| p.id() == id) else {
+        let Some(index) = self.slots.remove(&id) else {
             return false;
         };
         self.fragments.remove(index);
+        // Removal is uncommon. Keep the canonical Vec order (never swap_remove)
+        // and repair only shifted slots; hash iteration never controls simulation.
+        for (slot, piece) in self.fragments.iter().enumerate().skip(index) {
+            self.slots.insert(piece.id(), slot);
+        }
         self.sealed.remove(&id);
         self.changes.insert(id.0, None);
         true
@@ -115,6 +127,7 @@ impl FragmentOutput {
                     break;
                 };
                 let fragment = ResourceFragment::new(id, deposit.id(), material, pose);
+                self.slots.insert(id, self.fragments.len());
                 self.fragments.push(fragment);
                 self.next_id = id.0;
                 self.changes.insert(id.0, Some(fragment));
@@ -163,6 +176,82 @@ mod mutation_tests {
         resources::{DepositId, ResourceId},
     };
     use std::time::Duration;
+    fn sphere(output: &mut FragmentOutput, mass: f64) -> FragmentId {
+        let material = RawMaterial::new(ResourceId::IronOre, mass).unwrap();
+        let id = output.upsert_sphere(None, crate::spherical_mining::GrowingSphere {
+            source: DepositId { body: CelestialBodyId::Earth, local: 305 }, material,
+        }, ResourceTransform::new(WorldPosition::new(0.0, 0.0, 0.0), [0.0, 0.0, 0.0, 1.0]).unwrap());
+        let piece = *output.get(id).unwrap();
+        assert_eq!(piece.id(), id);
+        assert_eq!(piece.material().mass_kg(), mass);
+        let expected = (3.0 * mass / (4.0 * std::f64::consts::PI * 3500.0)).cbrt().clamp(0.005, 2.0);
+        assert!((crate::resource_size::fragment_contact_radius_meters(material) - expected).abs() < 1e-14);
+        id
+    }
+
+    fn assert_index(output: &FragmentOutput) {
+        assert_eq!(output.slots.len(), output.fragments.len());
+        for (slot, piece) in output.fragments.iter().enumerate() {
+            assert_eq!(output.slots.get(&piece.id()), Some(&slot));
+            assert_eq!(output.get(piece.id()), Some(piece));
+        }
+    }
+
+    #[test]
+    fn ordered_removal_growth_and_journal_keep_index_consistent() {
+        let mut output = FragmentOutput::default();
+        let ids: Vec<_> = (0..30).map(|i| sphere(&mut output, if i % 2 == 0 {10.0} else {0.000003})).collect();
+        assert_index(&output);
+        for id in [ids[0], ids[15], ids[29], ids[3]] {
+            assert!(output.remove(id));
+            assert!(!output.remove(id));
+            assert!(output.get(id).is_none());
+            assert_index(&output);
+        }
+        let survivors: Vec<_> = ids.iter().copied().filter(|id| output.get(*id).is_some()).collect();
+        assert_eq!(output.fragments.iter().map(|p|p.id()).collect::<Vec<_>>(), survivors);
+        let new = sphere(&mut output, 10.0);
+        assert!(new.0 > ids.last().unwrap().0);
+        let old = *output.get(survivors[1]).unwrap();
+        output.upsert_sphere(Some(old.id()), crate::spherical_mining::GrowingSphere {
+            source: old.source(), material: RawMaterial::new(ResourceId::IronOre, 2.0).unwrap(),
+        }, old.transform());
+        assert_index(&output);
+        assert_eq!(output.get(old.id()).unwrap().material().mass_kg(), 2.0);
+        let changes: Vec<_> = output.drain_changes().collect();
+        assert!(changes.windows(2).all(|w| w[0].0.0 < w[1].0.0));
+        for id in [ids[0], ids[15], ids[29], ids[3]] {
+            assert_eq!(changes.iter().find(|(key,_)|*key == id).unwrap().1, None);
+        }
+    }
+
+    #[test]
+    #[ignore = "opt-in indexed vs historical linear lookup attribution, CPU only"]
+    fn fragment_index_cost() {
+        use std::{hint::black_box, time::Instant};
+        for active in [500, 1000] {
+            for inactive in [0, 10_000, 50_000] {
+                let mut output = FragmentOutput::default();
+                let ids: Vec<_> = (0..active + inactive).map(|_| sphere(&mut output, 10.0)).collect();
+                assert_index(&output);
+                let queries = &ids[inactive..];
+                let capacity = output.slots.capacity();
+                for sample in 0..20 {
+                    let now = Instant::now();
+                    for &id in queries {
+                        black_box(output.fragments.iter_mut().find(|p| p.id() == black_box(id)).unwrap());
+                    }
+                    let linear_ns = now.elapsed().as_nanos();
+                    let now = Instant::now();
+                    for &id in queries { black_box(output.get_mut(black_box(id)).unwrap()); }
+                    let indexed_ns = now.elapsed().as_nanos();
+                    assert_eq!(output.slots.capacity(), capacity);
+                    println!("INDEX_COST active={active} inactive={inactive} sample={sample} linear_ns={linear_ns} indexed_ns={indexed_ns} index_capacity={capacity}");
+                }
+            }
+        }
+    }
+
     #[test]
     fn growth_is_coalesced_and_consumed_identity_is_never_reused() {
         let mut session = MiningSession::default();

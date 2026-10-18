@@ -261,3 +261,12 @@ mass, #188 Core, #189 intake, #203 reservations, #190 safe assist/recovery,
 remain native tasks; passing cloud checks does not imply M1/60 FPS validation.
 Future thruster/landing upgrades, extra module loads, full cabin inertial physics,
 ship gravity/orbits and manual power management are explicitly OUT OF SCOPE.
+
+## Coherent render-only gameplay interpolation (#310)
+
+The runtime session retains previous/completed ship and character observations
+beside loose-fragment history. Its [presentation contract](../client/runtime/architecture.md#bounded-gameplay-ticks-and-fragment-interpolation-159)
+uses one clamped backlog factor and consistent world/ship-local frames. Live look
+and all gameplay authority remain current; automation renders exact snapshots.
+Lifecycle and frame transitions invalidate history. Native smoothness/latency
+verification remains separate in #314.

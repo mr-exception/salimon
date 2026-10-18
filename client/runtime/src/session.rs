@@ -1,6 +1,7 @@
 //! Portable production gameplay composition. No window, GPU lifecycle or evidence IO.
 pub(crate) mod frames;
 pub(crate) mod interaction;
+mod presentation;
 #[cfg(test)]
 mod tests;
 use self::frames::character_ship_frame;
@@ -13,6 +14,7 @@ use salimon_world::{CameraPrototype, TransitionPhase};
 use std::time::Duration;
 
 pub(crate) struct GameplaySession {
+    pub(crate) presentation: presentation::History,
     pub(crate) update_clock: UpdateClock,
     pub(crate) camera_prototype: CameraPrototype,
     pub(crate) character: CharacterController,
@@ -25,7 +27,7 @@ pub(crate) struct GameplaySession {
     pub(crate) view_mode: ViewMode,
     pub(crate) seed: u64,
     pub(crate) automation_step: Option<Duration>,
-    pub(crate) interpolate_fragments: bool,
+    pub(crate) interpolate_presentation: bool,
     pub(crate) measure_physics: bool,
     pub(crate) latest_physics: crate::fragment_physics::Measurements,
     pub(crate) elapsed: Duration,
@@ -54,6 +56,7 @@ impl ShipControlInput {
 impl Default for GameplaySession {
     fn default() -> Self {
         Self {
+            presentation: Default::default(),
             update_clock: UpdateClock::default(),
             camera_prototype: CameraPrototype::default(),
             character: CharacterController::default(),
@@ -66,7 +69,7 @@ impl Default for GameplaySession {
             view_mode: ViewMode::default(),
             seed: 0,
             automation_step: None,
-            interpolate_fragments: true,
+            interpolate_presentation: true,
             measure_physics: false,
             latest_physics: Default::default(),
             feedback: None,
@@ -100,6 +103,7 @@ pub(crate) enum Command {
 }
 
 /// Owned domain observations; no native or renderer handles.
+#[derive(Clone, Copy)]
 pub(crate) struct Snapshot {
     pub(crate) ship: ShipSnapshot,
     pub(crate) character: salimon_character::CharacterSnapshot,
@@ -228,6 +232,7 @@ impl GameplaySession {
             ViewMode::PrecisionTour => ViewMode::Gameplay,
         };
         self.clear_held_controls();
+        self.reset_presentation();
         log::info!("view mode changed to {:?} (F2 toggles)", self.view_mode);
     }
 
@@ -347,7 +352,8 @@ impl GameplaySession {
 
     pub(crate) fn advance_game(&mut self, delta: Duration) {
         self.elapsed += delta;
-        if self.interpolate_fragments {
+        if self.interpolate_presentation {
+            self.presentation.begin(self.snapshot());
             let ship = self.ship.snapshot();
             let frame = character_ship_frame(ship.pose);
             let player = self
@@ -424,6 +430,9 @@ impl GameplaySession {
             self.latest_physics.accumulate(measurements);
         }
         self.sync_carried();
+        if self.interpolate_presentation && !self.presentation.complete(self.snapshot()) {
+            self.mining.fragment_previous.clear();
+        }
     }
 }
 
@@ -468,8 +477,17 @@ impl GameplaySession {
                     self.ship.clear_throttle_input();
                 }
             }
-            Interact => self.interact(),
-            Landing => self.ship.trigger_landing_action(),
+            Interact => {
+                let location = self.character.location();
+                self.interact();
+                if location != self.character.location() {
+                    self.reset_presentation();
+                }
+            }
+            Landing => {
+                self.ship.trigger_landing_action();
+                self.reset_presentation();
+            }
             Select(slot) => {
                 let previous = self.equipment.selected();
                 self.equipment

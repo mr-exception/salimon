@@ -63,3 +63,7 @@ airlock permissions/animation, authority/messages and instrument observation.
 Existing regression tests live alongside those owners, including all-body assist
 timing and quaternion boundaries. Ship may consume world/math contracts; it does
 not own renderer meshes, native input or character movement.
+
+Ship/character/fragment render interpolation: `client/runtime/src/session/presentation.rs`,
+`fragment_physics.rs` and `app.rs`; tests live with presentation and the fragment
+adapter. See the [coherent presentation contract](../client/runtime/architecture.md#bounded-gameplay-ticks-and-fragment-interpolation-159).

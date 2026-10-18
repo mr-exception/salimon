@@ -416,7 +416,7 @@ fn snapshots_into(
 pub(crate) fn to_world_orientation(frame: ShipFrame, local: [f64; 4]) -> [f64; 4] {
     salimon_physics::compose(salimon_physics::orientation_from_axes(frame.axes), local)
 }
-fn to_local_orientation(frame: ShipFrame, world: [f64; 4]) -> [f64; 4] {
+pub(crate) fn to_local_orientation(frame: ShipFrame, world: [f64; 4]) -> [f64; 4] {
     let q = salimon_physics::orientation_from_axes(frame.axes);
     salimon_physics::compose([-q[0], -q[1], -q[2], q[3]], world)
 }

@@ -211,7 +211,9 @@ pub(crate) fn initialize(
         }
         let in_ship = layout != Layout::Surface;
         if in_ship {
-            app.mining.ship_fragments.insert(piece.id(), local);
+            app.mining
+                .ship_fragments
+                .insert(piece.id(), salimon_character::ShipLocalPoint::new(local));
         }
         app.mining.fragment_motion.insert(
             piece.id(),
@@ -307,7 +309,9 @@ fn initialize_spheres(
             }
         }
         let id = released.ok_or("sphere workload did not release at its 10 kg cap")?;
-        app.mining.ship_fragments.insert(id, local);
+        app.mining
+            .ship_fragments
+            .insert(id, salimon_character::ShipLocalPoint::new(local));
         app.mining.fragment_motion.insert(
             id,
             FragmentMotion {
@@ -411,7 +415,7 @@ fn checkpoint(
         serde_json::json!({"id":piece.id().0, "position":p.position,
             "orientation":p.orientation, "velocity":p.velocity,
             "angular_velocity":p.angular_velocity, "radius":p.radius,
-            "mass_kg":p.mass_kg, "side_meters":p.side_meters,
+            "mass_kg":p.mass_kg, "side_meters":p.authored_mesh_scale,
             "sleeping":app.mining.fragment_sleep.is_sleeping(piece.id()),
             "collision_shape":"sphere"})
     }).collect::<Vec<_>>()});
@@ -474,7 +478,7 @@ mod tests {
                 app.mining
                     .ship_fragments
                     .values()
-                    .all(|p| { salimon_character::ship_contains_object(*p) })
+                    .all(|p| { salimon_character::ship_contains_object(p.meters()) })
             );
             assert_eq!(
                 app.mining.fragment_motion.len(),

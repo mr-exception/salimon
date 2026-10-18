@@ -502,7 +502,7 @@ fn solver_baseline(config: Config, app: &GameplaySession) -> Option<Value> {
         "cloning_timed": false, "samples": samples,
         "initial_snapshot": snapshots.iter().map(|(p, s)| json!({"id":p.id().0,
             "position":s.position,"orientation":s.orientation,"velocity":s.velocity,
-            "angular_velocity":s.angular_velocity,"side_meters":s.side_meters,"mass_kg":s.mass_kg})).collect::<Vec<_>>()}),
+            "angular_velocity":s.angular_velocity,"side_meters":s.authored_mesh_scale,"mass_kg":s.mass_kg})).collect::<Vec<_>>()}),
     )
 }
 
@@ -946,7 +946,9 @@ mod tests {
             for piece in app.mining.session.fragments() {
                 assert_eq!(
                     piece.transform().position().meters(),
-                    frame.local_to_world(app.mining.ship_fragments[&piece.id()])
+                    frame
+                        .unproject_local(app.mining.ship_fragments[&piece.id()])
+                        .meters()
                 );
             }
             assert_eq!(accounting(&app), original);

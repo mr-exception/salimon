@@ -169,7 +169,9 @@ nearby query supplies automation state even when the tool is stowed.
 
 `carrying.rs` composes surface and interior targeting/placement with the shared
 character collision layout. `ResourceGameplay.ship_fragments` holds supporting ship-local
-coordinates keyed by existing physical fragment IDs, never inventory quantities.
+`salimon_character::ShipLocalPoint` coordinates keyed by existing physical
+fragment IDs, never inventory quantities. Typed project/unproject boundaries and
+explicit solver/JSON array adapters prevent accidental absolute-position storage.
 Successful interior release installs an anchor; pickup removes it before following
 the player; surface release stays world-local. Every gameplay update and look/input
 synchronization maps loose anchors through the current ship frame. The same world
@@ -788,3 +790,11 @@ the same frame do no extra scan; a moving frame pays O(retained count) for exact
 boundary membership. This deliberately replaces the assumption that every
 unchanged pose creates an event. The return count is ledger visits for portable
 profiling, not a gameplay input or native performance promise.
+
+## Frame and dimension boundary inventory (#311)
+
+See the canonical [boundary inventory and compatibility policy](../../docs/technical-architecture.md#position-boundaries-and-resource-dimensions-311).
+Interior character history interpolates typed ship-local points; fragment anchor
+storage also requires that type. Renderer mesh scale and analytic sphere diameter
+have separate names. Automation serializes explicit arrays and preserves its
+existing JSON keys and values.

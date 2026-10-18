@@ -297,9 +297,12 @@ impl GameplaySession {
                 .expect("drop has carried identity");
             self.mining.session.drop_carried(pose);
             if player.location == CharacterLocation::InsideShip {
-                self.mining
-                    .ship_fragments
-                    .insert(id, frame.world_to_local(pose.position().meters()));
+                self.mining.ship_fragments.insert(
+                    id,
+                    frame.project_world(salimon_character::WorldPoint::new(
+                        pose.position().meters(),
+                    )),
+                );
             } else {
                 self.mining.ship_fragments.remove(&id);
             }

@@ -319,7 +319,10 @@ flight/braking/navigation regions. Core-local screen ownership is unchanged.
 opaque tint is the third vec4 in each 48-byte resource instance record; the
 shader multiplies baked facet color by tint. Deposits/legacy probes use white.
 All live fragment colors/radii share one resident mesh and one visible batch.
-`side_meters` is uniform asset scale, radius/0.48 for the new sphere. Runtime
+`authored_mesh_scale` is dimensionless uniform asset scale,
+radius / `SPHERE_AUTHORED_RADIUS_METERS` (0.48 m) for the shared sphere.
+It is independent of analytic gameplay diameter. The legacy inspection JSON key
+`authored_visual.side_meters` retains its previous mesh-scale meaning. Runtime
 maps mass/density and current camera/tool attachment, never renderer gameplay.
 
 ## Procedural Option A style (#278)

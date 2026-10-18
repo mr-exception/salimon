@@ -147,7 +147,9 @@ pub struct ObjectState {
     pub surface: Surface,
     /// Immutable unit-scale convex envelope; None selects exact radius contacts.
     pub hull: Option<Arc<ConvexHull>>,
-    pub side_meters: f64,
+    /// Dimensionless multiplier of authored hull coordinates; ignored when hull is None.
+    /// Analytic sphere contacts use radius exclusively.
+    pub authored_mesh_scale: f64,
     /// Unit local-to-simulation-frame quaternion; angular velocity is frame radians/s.
     pub orientation: [f64; 4],
     pub angular_velocity: [f64; 3],
@@ -393,7 +395,7 @@ fn advance_impl<const PROFILE: bool>(
             .filter(|(i, _)| !activation.as_ref().is_some_and(|a| a.sleeping[*i]))
             .map(|(_, p)| {
                 0.15 * if p.hull.is_some() {
-                    p.side_meters
+                    p.authored_mesh_scale
                 } else {
                     2.0 * p.radius
                 } / (length(p.velocity)
@@ -993,7 +995,7 @@ fn sampled_contact(piece: &ObjectState) -> Option<SampledContact> {
     let center_normal = query(body, piece.position).normal;
     let mut witness = piece.position;
     for vertex in &hull.vertices {
-        let arm = convex::rotate(piece.orientation, scale(*vertex, piece.side_meters));
+        let arm = convex::rotate(piece.orientation, scale(*vertex, piece.authored_mesh_scale));
         let point = add(piece.position, arm);
         let ground = point_query(body, point);
         let gap = dot(sub(point, ground), center_normal);
@@ -1005,7 +1007,7 @@ fn sampled_contact(piece: &ObjectState) -> Option<SampledContact> {
     }
     let arms = points
         .into_iter()
-        .filter(|(_, gap)| *gap <= deepest + 0.001 * piece.side_meters)
+        .filter(|(_, gap)| *gap <= deepest + 0.001 * piece.authored_mesh_scale)
         .map(|(arm, _)| arm)
         .collect();
     let normal = query(body, witness).normal;
@@ -1024,7 +1026,11 @@ fn ground_contact_cached(piece: &mut ObjectState, response: &mut ContactResponse
     let sampled = sampled_contact(piece);
     let up = sampled.as_ref().map_or(ground.normal, |c| c.normal);
     piece.ground_support_meters = piece.hull.as_ref().map_or(piece.radius, |hull| {
-        hull.support(piece.orientation, piece.side_meters, scale(up, -1.0))
+        hull.support(
+            piece.orientation,
+            piece.authored_mesh_scale,
+            scale(up, -1.0),
+        )
     });
     let penetration = sampled.as_ref().map_or_else(
         || {
@@ -1051,7 +1057,13 @@ fn ground_contact_cached(piece: &mut ObjectState, response: &mut ContactResponse
             || {
                 piece.hull.as_ref().map_or_else(
                     || vec![scale(up, -piece.radius)],
-                    |hull| hull.ground_arms(piece.orientation, piece.side_meters, scale(up, -1.0)),
+                    |hull| {
+                        hull.ground_arms(
+                            piece.orientation,
+                            piece.authored_mesh_scale,
+                            scale(up, -1.0),
+                        )
+                    },
                 )
             },
             |c| c.arms,
@@ -1321,7 +1333,7 @@ mod tests {
             radius: 0.1,
             ground_support_meters: 0.0,
             hull: None,
-            side_meters: 0.2,
+            authored_mesh_scale: 0.2,
             orientation: [0.0, 0.0, 0.0, 1.0],
             angular_velocity: [0.0; 3],
             mass_kg: 1.0,
@@ -1385,7 +1397,7 @@ mod tests {
             ground_support_meters: 0.2,
             surface: Surface::Floor { height_meters: 0.0 },
             hull: None,
-            side_meters: 0.4,
+            authored_mesh_scale: 0.4,
             orientation: [0.0, 0.0, 0.0, 1.0],
             angular_velocity: [0.0; 3],
             mass_kg: 1.0,
@@ -1473,7 +1485,7 @@ mod tests {
             radius: 0.2,
             ground_support_meters: 0.2,
             hull: None,
-            side_meters: 0.4,
+            authored_mesh_scale: 0.4,
             orientation: [0.0, 0.0, 0.0, 1.0],
             angular_velocity: [0.0; 3],
             mass_kg: 1.0,
@@ -1514,7 +1526,7 @@ mod tests {
             radius: 0.2,
             ground_support_meters: 0.2,
             hull: None,
-            side_meters: 0.4,
+            authored_mesh_scale: 0.4,
             orientation: [0.0, 0.0, 0.0, 1.0],
             angular_velocity: [0.0; 3],
             mass_kg: 1.0,
@@ -1555,7 +1567,7 @@ mod tests {
             mass_kg: 10.0,
             radius,
             ground_support_meters: radius,
-            side_meters: radius * 2.0,
+            authored_mesh_scale: radius * 2.0,
             angular_velocity: [0.4, 0.6, 0.8],
             surface: Surface::Unsupported,
             ..floor([0.0, 1000.0, 0.0], [1.0, 0.0, 0.0])
@@ -1605,7 +1617,7 @@ mod tests {
                 velocity: [20.0, 0.0, 0.0],
                 radius: 0.005,
                 ground_support_meters: 0.005,
-                side_meters: 0.01,
+                authored_mesh_scale: 0.01,
                 mass_kg: 0.000003,
                 ..subject
             },
@@ -1709,7 +1721,7 @@ mod terrain_tests {
                 point_query: |body, p| ridge(body, p).point,
             },
             hull: Some(hull.clone()),
-            side_meters: 1.0,
+            authored_mesh_scale: 1.0,
             orientation: [0.0, 0.0, 0.0, 1.0],
             angular_velocity: [0.0; 3],
             mass_kg: 1.0,

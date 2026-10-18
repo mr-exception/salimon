@@ -84,3 +84,11 @@ meter detail there.
   it cannot distinguish exactly coplanar surfaces or compensate for poorly
   chosen near geometry. Visual GPU limitations must be recorded by the runtime
   and renderer smoke test on the reference Apple M1 iMac.
+
+## Typed gameplay boundaries (#311)
+
+See the canonical [boundary inventory](../../docs/technical-architecture.md#position-boundaries-and-resource-dimensions-311).
+Persistent ship-local cargo and interior presentation remapping now use narrow
+`ShipLocalPoint` / `WorldPoint` DTOs at character `ShipFrame` conversions. World
+positions, body-relative terrain DTOs and camera-relative preparation retain their
+existing owners and f64 arithmetic; shared math remains frame-neutral.

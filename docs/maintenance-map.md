@@ -67,3 +67,8 @@ not own renderer meshes, native input or character movement.
 Ship/character/fragment render interpolation: `client/runtime/src/session/presentation.rs`,
 `fragment_physics.rs` and `app.rs`; tests live with presentation and the fragment
 adapter. See the [coherent presentation contract](../client/runtime/architecture.md#bounded-gameplay-ticks-and-fragment-interpolation-159).
+
+Frame/size boundaries: see the [typed boundary inventory](technical-architecture.md#position-boundaries-and-resource-dimensions-311).
+Character `points.rs` / `state.rs` own the narrow position DTO/conversion API;
+runtime anchor storage/presentation and physics/renderer mesh-scale consumers must
+be migrated together. World owns analytic fragment radius/diameter.

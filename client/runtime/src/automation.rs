@@ -285,7 +285,7 @@ pub(crate) fn execute_session(app: &mut GameplaySession, line: &str) -> Value {
                 };
                 let ship = app.ship.snapshot();
                 let frame = character_ship_frame(ship.pose);
-                let side = salimon_world::resource_fragments::side_meters(fragment);
+                let side = salimon_world::resource_fragments::diameter_meters(fragment);
                 let mut total = [0.0; 2];
                 // Try the center first, then points inside the pickup
                 // sphere. A pile can obscure its center while exposing an edge.
@@ -450,7 +450,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
             "distance_to_player_meters": entry.deposit.position().offset_from(salimon_world::WorldPosition::new(character.eye_position_meters[0], character.eye_position_meters[1], character.eye_position_meters[2])).iter().map(|v| v * v).sum::<f64>().sqrt(),
             "state": format!("{:?}", entry.deposit.state()),
             "visual": Value::Null,
-            "authored_visual": crate::resource_presentation::deposit_mesh_with_terrain(entry, app.mining.terrain).map(|mesh| json!({"mesh": format!("{:?}", mesh.mesh), "center_meters": mesh.center_meters, "side_meters": mesh.side_meters}))
+            "authored_visual": crate::resource_presentation::deposit_mesh_with_terrain(entry, app.mining.terrain).map(|mesh| json!({"mesh": format!("{:?}", mesh.mesh), "center_meters": mesh.center_meters, "side_meters": mesh.authored_mesh_scale}))
         })).collect::<Vec<_>>(), None),
         Err(error) => (Vec::new(), Some(format!("{error:?}"))),
     };
@@ -488,16 +488,16 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
                 "attached_to_tool": app.mining.session.attached_sphere_id() == Some(piece.id()),
                 "sleeping": app.mining.session.carried_id() != Some(piece.id()) && app.mining.fragment_sleep.is_sleeping(piece.id()),
                 "distance_to_player_meters": piece.transform().position().offset_from(salimon_world::WorldPosition::new(character.eye_position_meters[0], character.eye_position_meters[1], character.eye_position_meters[2])).iter().map(|v| v * v).sum::<f64>().sqrt(),
-                "ship_local_position_meters": app.mining.ship_fragments.get(&piece.id()).copied().unwrap_or_else(|| frame.world_to_local(piece.transform().position().meters())),
+                "ship_local_position_meters": app.mining.ship_fragments.get(&piece.id()).copied().map(salimon_character::ShipLocalPoint::meters).unwrap_or_else(|| frame.world_to_local(piece.transform().position().meters())),
                 "contact_fragment_ids": if app.mining.session.carried_id() == Some(piece.id()) { Vec::new() } else { app.mining.fragment_sleep.contact_neighbors(piece.id()).iter().map(|id| id.0).collect::<Vec<_>>() },
                 "environment_supported": app.mining.session.carried_id() != Some(piece.id()) && app.mining.fragment_sleep.environment_supported(piece.id(), |position, radius| salimon_character::ship_floor_placement(position, radius).is_some()),
                 "source_deposit_id": format!("{:?}:{}", piece.source().body, piece.source().local),
                 "resource": piece.material().resource().key(),
                 "mass_kg": piece.material().mass_kg(), "volume_m3": piece.material().volume_m3(),
-                "side_meters": salimon_world::resource_fragments::side_meters(piece),
+                "side_meters": salimon_world::resource_fragments::diameter_meters(piece),
                 "position_meters": piece.transform().position().meters(),
                 "orientation_xyzw": piece.transform().orientation_xyzw(),
-                "sphere_visual": {"asset": "resource.spherical-fragment", "radius_meters": sphere.side_meters * 0.48, "tint": sphere.tint},
+                "sphere_visual": {"asset": "resource.spherical-fragment", "radius_meters": sphere.authored_mesh_scale * salimon_renderer::SPHERE_AUTHORED_RADIUS_METERS, "tint": sphere.tint},
                 "visual": {"color": mesh.color, "half_extents_meters": mesh.half_extents_meters}
             })
         })
@@ -564,7 +564,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
             "capacity_kg": app.mining.config.cap_kg(),
             "reserved_mass_kg": app.mining.session.attached_sphere_id().and_then(|id| app.mining.session.fragments().iter().find(|p| p.id() == id)).map_or(0.0, |p| p.material().mass_kg()),
             "attached_fragment_id": app.mining.session.attached_sphere_id().map(|id| id.0),
-            "growth_preview": app.mining.growth_preview(&app.equipment, character).map(|mesh| json!({"center_meters": mesh.center_meters, "radius_meters": mesh.side_meters * 0.48, "tint": mesh.tint})),
+            "growth_preview": app.mining.growth_preview(&app.equipment, character).map(|mesh| json!({"center_meters": mesh.center_meters, "radius_meters": mesh.authored_mesh_scale * salimon_renderer::SPHERE_AUTHORED_RADIUS_METERS, "tint": mesh.tint})),
             "target": mining_target.map(|target| json!({"id": format!("{:?}:{}", target.id.body, target.id.local), "distance_meters": target.distance_meters})) },
         "player": {"nearby_body": app.mining.terrain.nearest_body(character.eye_position_meters, salimon_world::NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS, true).map(|(body, distance)| json!({"name": body.name, "surface_distance_meters": distance})),
             "velocity_meters_per_second": player_velocity,

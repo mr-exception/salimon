@@ -62,7 +62,7 @@ fn resource_geometry_gpu_cost() {
                             1e12 + (i / 40) as f64 * 0.07 - 0.875,
                             1e12 - 4.0,
                         ],
-                        side_meters: 0.1,
+                        authored_mesh_scale: 0.1,
                         orientation_xyzw: [0.0, 0.0, 0.0, 1.0],
                     })
                     .collect();

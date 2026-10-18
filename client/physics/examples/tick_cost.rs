@@ -19,7 +19,7 @@ fn main() {
                 angular_velocity: [0.0; 3],
                 radius: 0.18,
                 ground_support_meters: 0.1,
-                side_meters: 0.2,
+                authored_mesh_scale: 0.2,
                 mass_kg: if i % 2 == 0 { 0.5 } else { 2.0 },
                 orientation: [0.0, 0.0, 0.0, 1.0],
                 surface: Surface::Floor { height_meters: 0.0 },

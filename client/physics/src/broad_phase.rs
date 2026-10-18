@@ -163,7 +163,7 @@ mod tests {
             hull: Some(Arc::new(ConvexHull::new((0..8).map(|i| {
                 std::array::from_fn(|a| if i & (1 << a) == 0 { -0.5 } else { 0.5 })
             })))),
-            side_meters: side,
+            authored_mesh_scale: side,
             orientation: [0.0, 0.0, 0.0, 1.0],
             angular_velocity: [0.0; 3],
             mass_kg: 2.0,

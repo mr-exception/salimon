@@ -47,7 +47,10 @@ impl EmissionSurface {
             .unit_vertices()
             .iter()
             .map(|v| {
-                salimon_physics::rotate(visual.orientation_xyzw, scale(*v, visual.side_meters))
+                salimon_physics::rotate(
+                    visual.orientation_xyzw,
+                    scale(*v, visual.authored_mesh_scale),
+                )
             })
             .collect();
         let first_hit = vertices
@@ -278,8 +281,10 @@ mod tests {
                                     add(*point, scale(*normal, radius + CLEARANCE_METERS));
                                 length(sub(local, expected)) < 0.0003
                                     && visual.mesh.unit_vertices().iter().all(|v| {
-                                        dot(*normal, sub(local, scale(*v, visual.side_meters)))
-                                            >= radius - 0.0003
+                                        dot(
+                                            *normal,
+                                            sub(local, scale(*v, visual.authored_mesh_scale)),
+                                        ) >= radius - 0.0003
                                     })
                             }),
                             "{material:?} variant {variant}: fragment clears authored deposit"

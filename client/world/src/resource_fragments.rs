@@ -138,9 +138,9 @@ impl FragmentOutput {
     }
 }
 
-/// Authoritative gameplay cube side; solid material volume remains density-derived.
-pub fn side_meters(fragment: ResourceFragment) -> f64 {
-    crate::resource_size::fragment_side_meters(fragment.material())
+/// Analytic sphere diameter; solid material volume remains density-derived.
+pub fn diameter_meters(fragment: ResourceFragment) -> f64 {
+    crate::resource_size::fragment_diameter_meters(fragment.material())
 }
 
 pub(crate) fn spawn_position(deposit: ResourceDeposit) -> WorldPosition {

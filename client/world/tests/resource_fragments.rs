@@ -1,5 +1,5 @@
 use salimon_world::mining::MiningSession;
-use salimon_world::resource_fragments::{FRAGMENT_MAX_MASS_KG, side_meters};
+use salimon_world::resource_fragments::{FRAGMENT_MAX_MASS_KG, diameter_meters};
 use salimon_world::resources::{
     DepositId, DepositState, RESOURCE_CATALOG, RawMaterial, ResourceDeposit,
 };
@@ -60,7 +60,7 @@ fn physical_output_conserves_every_material_for_small_and_large_steps() {
                     piece.material().mass_kg() > 0.0
                         && piece.material().mass_kg() <= FRAGMENT_MAX_MASS_KG
                 );
-                let radius = side_meters(*piece) * 0.5;
+                let radius = diameter_meters(*piece) * 0.5;
                 assert!(
                     (4.0 / 3.0 * std::f64::consts::PI * radius.powi(3)
                         - piece.material().volume_m3())
@@ -77,7 +77,7 @@ fn physical_output_conserves_every_material_for_small_and_large_steps() {
                     .sqrt()
                     - body.radius_meters;
                 assert!(
-                    altitude > side_meters(*piece) * 0.5,
+                    altitude > diameter_meters(*piece) * 0.5,
                     "fragment must be above the surface"
                 );
             }

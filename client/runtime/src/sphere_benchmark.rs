@@ -72,7 +72,8 @@ fn sphere_cpu_benchmark() {
                     }
                 }
                 let id = id.unwrap();
-                tool.ship_fragments.insert(id, local);
+                tool.ship_fragments
+                    .insert(id, salimon_character::ShipLocalPoint::new(local));
             }
             let ids: Vec<_> = tool.session.fragments().iter().map(|p| p.id()).collect();
             let mut preparation = 0;

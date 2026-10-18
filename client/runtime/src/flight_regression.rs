@@ -157,7 +157,9 @@ pub(crate) fn initialize_cargo(app: &mut GameplaySession, count: usize) -> Resul
         {
             return Err("legacy 0.032 kg cargo fixture mass/population mismatch".into());
         }
-        app.mining.ship_fragments.insert(piece.id(), local);
+        app.mining
+            .ship_fragments
+            .insert(piece.id(), salimon_character::ShipLocalPoint::new(local));
     }
     app.sync_carried();
     Ok(())

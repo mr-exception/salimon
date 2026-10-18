@@ -193,7 +193,7 @@ pub(crate) fn sync_ship_fragments(tool: &mut ResourceGameplay, frame: ShipFrame)
     }
     for (&id, &local) in &tool.ship_fragments {
         if let Ok(pose) = ResourceTransform::new(
-            position(frame.local_to_world(local)),
+            position(frame.unproject_local(local).meters()),
             crate::fragment_physics::to_world_orientation(
                 frame,
                 tool.fragment_motion
@@ -388,7 +388,8 @@ mod tests {
         let original = tool.session.fragments()[0];
         let id = original.id();
         let local = [-5.8, 0.4, 0.0];
-        tool.ship_fragments.insert(id, local);
+        tool.ship_fragments
+            .insert(id, salimon_character::ShipLocalPoint::new(local));
         let orientation = [0.0, 0.0, 0.3_f64.sin(), 0.3_f64.cos()];
         tool.fragment_motion.insert(
             id,
@@ -612,7 +613,10 @@ mod mass_tests {
         sync_ship_mass(&mut tool, frame, &mut ship);
         assert_eq!(ship.snapshot().total_mass_kg, 101_000.0);
         for piece in tool.session.fragments() {
-            tool.ship_fragments.insert(piece.id(), [-5.0, 1.0, 0.0]);
+            tool.ship_fragments.insert(
+                piece.id(),
+                salimon_character::ShipLocalPoint::new([-5.0, 1.0, 0.0]),
+            );
         }
         ship.advance(Duration::from_secs(1));
         let moved = crate::session::frames::character_ship_frame(ship.snapshot().pose);

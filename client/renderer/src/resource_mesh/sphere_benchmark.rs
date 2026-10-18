@@ -36,7 +36,7 @@ pub(super) fn workload(count: usize, preview: bool, legacy: bool) -> Vec<Resourc
                     1e12 + (i / 20) as f64 * 0.21 - 2.5,
                     1e12 - 12.0,
                 ],
-                side_meters: if legacy {
+                authored_mesh_scale: if legacy {
                     (10.0 / density).cbrt() * 5.0
                 } else {
                     radius / 0.48

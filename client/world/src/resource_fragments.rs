@@ -293,6 +293,62 @@ mod mutation_tests {
     }
 
     #[test]
+    fn identical_poses_emit_nothing_but_pickup_drop_and_removal_still_emit() {
+        let mut session = MiningSession::default();
+        let mut deposit = ResourceDeposit::new(
+            DepositId {
+                body: CelestialBodyId::Earth,
+                local: 306,
+            },
+            RawMaterial::new(ResourceId::IronOre, 10.0).unwrap(),
+            WorldPosition::new(0.0, 0.0, 0.0),
+            10.0,
+        )
+        .unwrap();
+        let pose = ResourceTransform::new(deposit.position(), [0.0, 0.0, 0.0, 1.0]).unwrap();
+        let mut released = None;
+        for _ in 0..400 {
+            released = session.tick_spherical(
+                true,
+                Some(&mut deposit),
+                crate::spherical_mining::SPHERE_TICK,
+                crate::spherical_mining::MiningConfig::default(),
+                pose,
+            );
+            if released.is_some() {
+                break;
+            }
+        }
+        assert_eq!(session.fragments().len(), 1);
+        assert_eq!(released, Some(session.fragments()[0].id()));
+        assert!((session.fragments()[0].material().mass_kg() - 10.0).abs() < 1e-9);
+        let piece = session.fragments()[0];
+        let expected_radius = (3.0 * 10.0 / (4.0 * std::f64::consts::PI * 3500.0)).cbrt();
+        assert!((crate::resource_size::fragment_contact_radius_meters(piece.material()) - expected_radius).abs() < 1e-12);
+        session.drain_fragment_changes().for_each(drop);
+        assert!(session.move_loose(piece.id(), piece.transform()));
+        assert_eq!(session.drain_fragment_changes().count(), 0);
+        assert!(session.pick_up(piece.id()));
+        assert_eq!(session.drain_fragment_changes().count(), 1);
+        session.move_carried(piece.transform());
+        assert_eq!(session.drain_fragment_changes().count(), 0);
+        assert!(session.drop_carried(piece.transform()));
+        assert_eq!(session.drain_fragment_changes().count(), 1);
+        let moved = ResourceTransform::new(
+            piece.transform().position().translated([1.0, 0.0, 0.0]),
+            [0.0, 0.0, 0.0, 1.0],
+        )
+        .unwrap();
+        assert!(session.move_loose(piece.id(), moved));
+        assert_eq!(session.drain_fragment_changes().count(), 1);
+        assert!(session.remove_fragment(piece.id()));
+        assert_eq!(
+            session.drain_fragment_changes().collect::<Vec<_>>(),
+            vec![(piece.id(), None)]
+        );
+    }
+
+    #[test]
     fn growth_is_coalesced_and_consumed_identity_is_never_reused() {
         let mut session = MiningSession::default();
         let mut deposit = ResourceDeposit::new(

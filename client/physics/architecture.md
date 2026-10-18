@@ -356,3 +356,13 @@ shape. Sphere reactions retain no SAT projections. Carried and attached
 identities are excluded by runtime; persistent identities and mass remain world
 owned. Old authored hulls remain only in legacy emission/evaluation adapters
 until the final interaction migration (#234).
+
+## Per-body solver scratch (#306)
+
+Ground-response slots, gravity velocities/up vectors, rotation/support flags and
+pre-post-contact velocities retain capacity across substeps. Stateful callers
+retain these six arrays with SleepTracker between ticks; stateless calls retain
+them for the duration of one update. Every substep initializes the same values
+as fresh arrays; warm responses are moved out before reuse. A fresh-versus-reused
+array oracle checks exact state parity across population growth and shrinkage.
+This does not eliminate manifold, response-internal or activation-graph allocations.

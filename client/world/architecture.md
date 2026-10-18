@@ -115,8 +115,8 @@ emit nothing. Runtime drains changes after carrying/physics synchronization,
 classifies centers in the current authored cabin/nose frame, and updates cached
 mass for the next ship step. Door animation/furniture/handling do not change
 containment. Existing physics visits and anchored frame writebacks provide pose
-events even for sleeping contents; no extra full scene scan computes mass each
-tick. Explicit scene reconciliation is available for validation. Full inertial
+events when poses actually change. Identical poses emit nothing; runtime
+reclassifies retained centers only when the containment frame changes (#306). Explicit scene reconciliation is available for validation. Full inertial
 cabin motion, arbitrary future physical items and Core intake are separate tasks.
 
 ## Spherical mining domain contract (#230)

@@ -38,9 +38,7 @@ pub(crate) fn release(
     } else {
         let position = tool
             .session
-            .fragments()
-            .iter()
-            .find(|p| p.id() == id)
+            .fragment(id)
             .expect("released fragment exists")
             .transform()
             .position()
@@ -49,9 +47,7 @@ pub(crate) fn release(
     };
     let world_orientation = tool
         .session
-        .fragments()
-        .iter()
-        .find(|p| p.id() == id)
+        .fragment(id)
         .expect("released fragment")
         .transform()
         .orientation_xyzw();

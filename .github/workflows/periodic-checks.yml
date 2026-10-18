@@ -125,6 +125,22 @@ jobs:
         run: |
           xvfb-run -a -s '-screen 0 1280x800x24' python scripts/model_visual_tests.py capture --binary target/release/salimon-client
           python scripts/model_visual_tests.py compare --temporal-only
+      - name: Reviewed appearance regression
+        id: appearance
+        timeout-minutes: 5
+        run: |
+          set +e
+          python scripts/model_visual_tests.py compare --reviewed --baselines scenarios/visual/baselines/software-vulkan-option-a-v1
+          result=$?
+          set -e
+          if [ "$result" -eq 3 ]; then
+            echo 'coverage=pending' >> "$GITHUB_OUTPUT"
+            echo 'Appearance coverage pending human baseline approval' >> "$GITHUB_STEP_SUMMARY"
+          elif [ "$result" -eq 0 ]; then
+            echo 'coverage=success' >> "$GITHUB_OUTPUT"
+          else
+            exit "$result"
+          fi
       - name: Packaged real-input smoke
         id: smoke
         timeout-minutes: 5
@@ -135,7 +151,7 @@ jobs:
         if: always() && steps.checkout.outcome == 'success'
         env:
           CI_STEPS: ${{ toJSON(steps) }}
-        run: python scripts/ci_reports.py record --lane nightly --required tools model scripts rust glb build baseline evidence temporal smoke
+        run: python scripts/ci_reports.py record --lane nightly --required tools model scripts rust glb build baseline evidence temporal appearance smoke
       - name: Preserve verification evidence
         if: always()
         uses: actions/upload-artifact@v4

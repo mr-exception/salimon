@@ -6,7 +6,7 @@ only schedule and manual triggers; it never runs on a PR or each push.
 
 | Suite | Schedule (UTC) | Coverage |
 | --- | --- | --- |
-| Nightly | Daily 00:37 | Model and Python contracts, Rust fmt/Clippy/tests, GLB compliance/importer parity, software-Vulkan resource tests, one release build, deterministic baseline, screenshot evidence, model temporal comparison, packaged OS-input smoke |
+| Nightly | Daily 00:37 | Model and Python contracts, Rust fmt/Clippy/tests, GLB compliance/importer parity, software-Vulkan resource tests, one release build, deterministic baseline, screenshot evidence, model temporal and reviewed appearance comparison, packaged OS-input smoke |
 | Weekly | Sunday 01:17 | Release CPU benchmark executable on Linux, 500/1,000-fragment scattered/dense × settled/active matrix with at least 100 samples per case, 100-sample flight/cargo regression profiles, resource-preparation comparison; debug workspace builds on macOS and Windows |
 
 Schedules run the default branch. GitHub schedules can start late; these are
@@ -43,7 +43,7 @@ inherit a previous pass. A plan summary explains skipped work.
 
 The reporting job stores compact metadata and CPU measurements on a dedicated
 `ci-reports` branch, outside source history on main. It retains the most recent
-**90 suite results**, including failures and separate rerun attempts. Failed-job reruns reuse passing
+**90 suite results**, including failures, pending appearance approval and separate rerun attempts. Failed-job reruns reuse passing
 lanes from the same run's earlier attempts and select the newest available
 attempt per lane; duplicate artifacts for the same lane/attempt are rejected. Report
 publishing is serialized and uses ordinary non-force pushes, so nightly/weekly
@@ -108,3 +108,13 @@ Actions; it cannot promise a dashboard record when the workflow never publishes.
 
 The initial scheduled workflow and first Pages deployment can run after merge
 because the new schedule/manual workflow must exist on the default branch.
+
+## Appearance coverage (#308)
+
+Nightly comparison uses the independently reviewed software-Vulkan corpus under
+`scenarios/visual/baselines/software-vulkan-option-a-v1`. A missing/candidate/
+pending corpus produces an explicit pending appearance check and pending lane,
+not a green appearance result. Temporal stability and fixture completeness remain
+required. Any real failure overrides pending status. Metadata mismatch or changed
+appearance against an approved corpus fails. See the [baseline review workflow](../scenarios/visual/README.md#approval-policy-and-style-replacement).
+Native Metal approval (#314) and software approval (#321) remain independent.

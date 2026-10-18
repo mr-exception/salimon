@@ -47,6 +47,23 @@ class CiReportTests(unittest.TestCase):
         history['runs'].pop()
         self.assertTrue(ci.should_run(history, 'weekly', REVISION))
 
+    def test_pending_appearance_is_not_success_and_real_failure_wins(self):
+        with patch.dict(os.environ, ENV):
+            steps = {'temporal': {'outcome': 'success'}, 'appearance': {
+                'outcome': 'success', 'outputs': {'coverage': 'pending'}}}
+            result = ci.collect('nightly', REVISION, steps, ['temporal', 'appearance'], Path('.'))
+            self.assertEqual(result['status'], 'pending')
+            self.assertEqual(result['checks'][1]['status'], 'pending')
+            history = {'schema': 1, 'runs': [result]}
+            ci.validate_history(history)
+            self.assertTrue(ci.should_run(history, 'nightly', REVISION))
+            self.assertIn('| appearance | pending |', ci.summary([result]))
+            steps['temporal']['outcome'] = 'failure'
+            self.assertEqual(ci.collect('nightly', REVISION, steps, ['temporal', 'appearance'], Path('.'))['status'], 'failure')
+            steps['temporal']['outcome'] = 'success'
+            steps['appearance']['outputs'] = {}
+            self.assertEqual(ci.collect('nightly', REVISION, steps, ['temporal', 'appearance'], Path('.'))['status'], 'failure')
+
     def test_network_errors_are_not_treated_as_first_run(self):
         with patch.dict(os.environ, {**ENV, 'GH_TOKEN': 'fixture'}):
             for code in (404, 403, 500):

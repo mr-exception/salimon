@@ -335,3 +335,6 @@ for exact palettes, fades and future external-body configuration constraints.
 Terrain upload observations include CPU preparation duration and peak separately
 from upload bytes and asynchronous GPU pass timings. This covers validation,
 buffer creation and queue writes; it does not measure GPU completion (#307).
+
+`RendererInfo::driver` retains the selected adapter's driver/driver-info strings
+for versioned visual-corpus provenance, alongside its name/backend (#308).

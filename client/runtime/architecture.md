@@ -727,3 +727,8 @@ with exact position/seed/mode invalidation and world deposit revision-based
 reconciliation. Current rays/obstruction are never cached. Terrain selection,
 generation, complete preparation and renderer CPU upload preparation are measured
 separately in automation inspection; see the canonical [budget guide](../../docs/terrain-validation.md#nearby-query-reuse-307).
+
+Automation inspection's `visual_context` observes the renderer-selected backend,
+adapter and driver plus physical window size and DPI scale. Corpus tooling uses
+these observations to prevent comparisons between incompatible capture contexts
+(#308); they never affect gameplay or automatically approve images.

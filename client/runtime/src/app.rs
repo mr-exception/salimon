@@ -505,6 +505,18 @@ impl ClientApplication {
         }
         Ok(())
     }
+    pub(crate) fn visual_context(&self) -> serde_json::Value {
+        let Some(renderer) = self.renderer.as_ref() else {
+            return serde_json::Value::Null;
+        };
+        let Some(window) = self.window.as_ref() else {
+            return serde_json::Value::Null;
+        };
+        let info = renderer.info();
+        serde_json::json!({"backend": info.backend, "adapter": info.adapter_name,
+            "driver": info.driver, "viewport_pixels": [window.inner_size().width, window.inner_size().height],
+            "scale_factor": window.scale_factor()})
+    }
     pub(crate) fn window_state(&self) -> serde_json::Value {
         self.window.as_ref().map_or(serde_json::Value::Null,|w|serde_json::json!({
             "minimized":w.is_minimized(), "inner_size":[w.inner_size().width,w.inner_size().height]

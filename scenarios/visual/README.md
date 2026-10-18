@@ -13,12 +13,12 @@ Core, tool/deposit/fragment, contact piles and floor/door/ramp.
 python -m pip install -r scripts/visual-requirements.txt
 python scripts/model_visual_tests.py capture --binary target/debug/salimon-client
 python scripts/model_visual_tests.py compare --temporal-only
-python scripts/model_visual_tests.py compare
+python scripts/model_visual_tests.py compare --reviewed --baselines scenarios/visual/baselines/software-vulkan-option-a-v1
 ```
 
 Linux software Vulkan: prefix capture with
 `xvfb-run -a -s '-screen 0 1280x800x24'` and set `WGPU_BACKEND=vulkan`.
-Nightly verification runs software-Vulkan captures and repeat-stability checks.
+Nightly verification runs software-Vulkan captures, repeat stability and reviewed appearance comparison.
 These commands also remain available locally; PR CI only builds source. Missing approved baselines
 fail ordinary comparison, never silently initialize or overwrite a baseline.
 Both comparison modes derive the exact expected PNG names from each fixture's
@@ -41,16 +41,50 @@ to conceal failures. Size changes fail explicitly.
 
 ## Approval policy and style replacement
 
-`baselines/option-a/<fixture>/<checkpoint>.png` is reserved for **human-reviewed**
-Option A images. No approved production image baseline is claimed by this
-implementation. Review candidate images for coherent low-poly silhouettes,
-transparency, scale and competing surfaces before copying selected images there
-in a separate reviewed commit, recording driver/adapter, resolution and revision.
-Do not automatically promote captured output. Hardware/native M1 execution and visual
-approval remain tracked in #229; software Vulkan is not equivalent coverage.
+`baselines/software-vulkan-option-a-v1` and `baselines/metal-option-a-v1`
+are **independent** versioned corpora. Both currently contain pending metadata,
+not approved production images. Software approval is tracked in
+[#321](https://github.com/mr-exception/salimon/issues/321); native M1/Metal review
+remains [#314](https://github.com/mr-exception/salimon/issues/314).
 
-An Option B trial uses a separate baseline directory via `--baselines`, with
-unchanged fixture setup/actions/gameplay assertions. Comparing an A capture to a
-B candidate must expose the deliberate visual replacement as a reviewable diff.
-The offline injected-change test demonstrates that gate without inventing an
-approved aesthetic or redesigning a production asset.
+Capture only from a clean tracked source revision. Each capture writes a
+`corpus.json` candidate record with actual runtime backend/adapter/driver,
+physical viewport pixels and DPI scale, OS, source revision and binary SHA-256.
+The fixture-contract hash covers source actions/assertions, seed, repeat counts,
+tolerances and masks. Per-image SHA-256 records detect replaced/missing images.
+All fixture screenshots must agree on renderer context and dimensions. The
+revision and binary hashes provide provenance; comparing a newer revision is
+allowed, while context and fixture-contract changes require independent review.
+
+To review a new corpus:
+
+1. Keep the candidate directory and run logs as evidence; inspect every PNG for
+   coherent low-poly silhouettes, material/color, transparency, scale and layout.
+2. Review the exact fixture tolerances and pixel masks. Masks must exclude only
+   reviewed intentional animation/UI; never mask defects or promote a repeatable
+   but wrong appearance. Fixture/mask/tolerance changes invalidate old approval.
+3. In a **separate baseline review PR**, manually copy the selected fixture PNGs
+   and candidate `corpus.json` into the intended versioned corpus. Preserve all
+   provenance and image hashes; add `corpus_id`, set `status` to `approved` and
+   add a `review` object containing nonempty `reviewer`, `reviewed_at`, `evidence`
+   (review link/notes) and `masks_and_tolerances_reviewed: true`. Human approval is
+   required for the images themselves and these tolerance/mask decisions.
+4. Run `compare --reviewed --baselines <that-corpus>`, retain diffs and
+   `appearance.json`, and have the reviewer approve that PR. No command promotes
+   or overwrites approved images. New backend/adapter/driver/OS/viewport/DPI or
+   art direction uses an independently reviewed corpus, never an automatic reset.
+
+`--reviewed` exits **0** for passed approved appearance, **1** for broken capture,
+metadata/incompatible context or a pixel regression, and **3** for missing or
+pending/unapproved baseline coverage. Pending does not pass appearance. Temporal
+completeness/stability still must pass before a pending outcome can be emitted.
+Nightly reports show a `pending` lane when every executed check passed but
+appearance approval is pending; a real failure still takes priority. Download
+`artifacts/model-visual/diffs/appearance.json` and the candidates for details.
+Source-only PR CI is unchanged. A software-Vulkan approval never certifies Metal.
+
+An Option B trial uses a different corpus via `--baselines`, preserving the
+fixture gameplay assertions. Intentional replacements require a new reviewed
+commit. The tooling tests inject persistent silhouette, material and layout
+changes: temporal stability passes but appearance comparison fails. Synthetic
+fixtures test the comparator, not production aesthetic approval.

@@ -38,7 +38,7 @@ def validate_history(data):
     if data.get('schema') != 1 or not isinstance(data.get('runs'), list):
         raise ValueError('unsupported CI history')
     for row in data['runs']:
-        if row['lane'] not in LANES or row['status'] not in ('success', 'failure'):
+        if row['lane'] not in LANES or row['status'] not in ('success', 'failure', 'pending'):
             raise ValueError('invalid CI history row')
     return data
 
@@ -158,7 +158,13 @@ def collect(lane, revision, steps, required, root):
         raise ValueError('invalid lane or source revision')
     checks = [{'name': key, 'status': steps.get(key, {}).get('outcome', 'missing')}
               for key in required]
-    status = 'success' if checks and all(c['status'] == 'success' for c in checks) else 'failure'
+    for check in checks:
+        if check['name'] == 'appearance' and check['status'] == 'success':
+            coverage = steps.get('appearance', {}).get('outputs', {}).get('coverage')
+            check['status'] = coverage if coverage in ('success', 'pending') else 'missing'
+    status = ('success' if checks and all(c['status'] == 'success' for c in checks)
+              else 'pending' if checks and all(c['status'] in ('success', 'pending') for c in checks)
+              else 'failure')
     env = environment()
     metrics, error = [], None
     if lane == 'benchmarks':

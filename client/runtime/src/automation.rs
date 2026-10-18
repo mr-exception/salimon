@@ -474,6 +474,7 @@ fn inspect(app: &ClientApplication) -> Value {
         "terrain_upload_preparation_micros": upload_times,
         "resource_queries": app.mining.query_metrics(),
         "ground_cache": {"entries":ground_entries,"hits":ground_hits,"misses":ground_misses},
+        "visual_context": app.visual_context(),
         "view_mode": app.view_name(),
         "window": app.window_state(),
         "capture_status": app.capture_status,

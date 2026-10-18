@@ -179,7 +179,7 @@ function chart() {
       cx: x(i),
       cy: y(p.m.value),
       r: 4,
-      fill: p.row.status === "success" ? "#6fe2c1" : "#ff9a9a",
+      fill: p.row.status === "success" ? "#6fe2c1" : p.row.status === "pending" ? "#f3d479" : "#ff9a9a",
     });
     circle.append(
       svg(

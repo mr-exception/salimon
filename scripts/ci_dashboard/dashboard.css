@@ -125,6 +125,10 @@ section {
   background: #153d33;
   color: var(--accent);
 }
+.pending {
+  background: #443b20;
+  color: #f3d479;
+}
 .failure {
   background: #472a32;
   color: var(--bad);

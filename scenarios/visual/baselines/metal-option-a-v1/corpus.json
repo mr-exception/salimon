@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "status": "pending",
+  "corpus_id": "metal-option-a-v1",
+  "scope": {
+    "backend": "Metal",
+    "adapter_family": "Apple M1",
+    "viewport_pixels": [
+      1280,
+      800
+    ],
+    "scale_factor": 1.0
+  },
+  "follow_up": "https://github.com/mr-exception/salimon/issues/314",
+  "reason": "No human-approved images, masks or tolerances yet. Replace only in a separately reviewed baseline PR."
+}

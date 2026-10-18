@@ -17,6 +17,11 @@ const GRAVITY: f64 = 9.81;
 const RESTITUTION: f64 = 0.12;
 const ROLLING_RESISTANCE: f64 = 0.1;
 const MAX_STEP: f64 = 1.0 / 90.0;
+// Preserve the ordinary 16 ms tick's two 8 ms steps, independent of adaptive
+// scheduling pressure from other objects. Unpowered cabins remain undamped.
+const DAMPING_REFERENCE_SECONDS: f64 = 0.008;
+const LINEAR_RETENTION: f64 = 0.995;
+const ANGULAR_RETENTION: f64 = 0.98;
 const CONTACT_BIAS_METERS: f64 = 0.00001;
 
 /// Spherical ground geometry in the same frame as its objects.
@@ -432,6 +437,8 @@ fn advance_impl<const PROFILE: bool>(
             stats.contact_time += start.elapsed();
         }
         let pose_start = PROFILE.then(Instant::now);
+        let linear_retention = LINEAR_RETENTION.powf(dt / DAMPING_REFERENCE_SECONDS);
+        let angular_retention = ANGULAR_RETENTION.powf(dt / DAMPING_REFERENCE_SECONDS);
         let mut moved = false;
         let mut rotated = vec![false; pieces.len()];
         let mut support_reactions = vec![false; pieces.len()];
@@ -445,8 +452,8 @@ fn advance_impl<const PROFILE: bool>(
                     > 0.5 * GRAVITY * dt;
             support_reactions[i] = supported_reaction;
             if !matches!(piece.surface, Surface::UnpoweredFloor { .. }) {
-                piece.velocity = scale(piece.velocity, 0.995);
-                piece.angular_velocity = scale(piece.angular_velocity, 0.98);
+                piece.velocity = scale(piece.velocity, linear_retention);
+                piece.angular_velocity = scale(piece.angular_velocity, angular_retention);
             }
             {
                 let previous = piece.position;
@@ -1486,6 +1493,66 @@ mod tests {
         assert_eq!(objects, isolated);
     }
 
+    /// Iron density and 10 kg cap radius, matching the world sphere contract
+    /// without adding a world dependency to portable physics.
+    fn cap_sphere() -> ObjectState {
+        let radius = (3.0 * 10.0 / (4.0 * std::f64::consts::PI * 3500.0)).cbrt();
+        ObjectState {
+            mass_kg: 10.0,
+            radius,
+            ground_support_meters: radius,
+            side_meters: radius * 2.0,
+            angular_velocity: [0.4, 0.6, 0.8],
+            surface: Surface::Unsupported,
+            ..floor([0.0, 1000.0, 0.0], [1.0, 0.0, 0.0])
+        }
+    }
+
+    #[test]
+    fn elapsed_damping_is_partition_and_restart_independent() {
+        let initial = cap_sphere();
+        let mut reference = initial.clone();
+        advance(std::slice::from_mut(&mut reference), Duration::from_millis(160), |_, _| true);
+        for partition_ms in [1, 4, 8, 16, 40, 160] {
+            let mut piece = initial.clone();
+            for _ in 0..160 / partition_ms {
+                advance(std::slice::from_mut(&mut piece), Duration::from_millis(partition_ms), |_, _| true);
+            }
+            // Repeated exponentials accumulate rounding; position/gravity integration
+            // is intentionally not partition invariant (semi-implicit Euler).
+            assert!((piece.velocity[0] - reference.velocity[0]).abs() < 2e-14);
+            for (actual, expected) in piece.angular_velocity.iter().zip(reference.angular_velocity) {
+                assert!((actual - expected).abs() < 2e-14);
+            }
+        }
+        assert!((reference.velocity[0] - LINEAR_RETENTION.powf(20.0)).abs() < 2e-14);
+    }
+
+    #[test]
+    fn distant_fast_residual_changes_steps_without_changing_subject_damping() {
+        let subject = cap_sphere();
+        let mut isolated = [subject.clone()];
+        let mut mixed = [subject.clone(), ObjectState {
+            position: [1000.0, 1000.0, 0.0],
+            velocity: [20.0, 0.0, 0.0],
+            radius: 0.005,
+            ground_support_meters: 0.005,
+            side_meters: 0.01,
+            mass_kg: 0.000003,
+            ..subject
+        }];
+        let delta = Duration::from_millis(16);
+        let a = advance_profiled(&mut isolated, delta, |_, _| true);
+        let b = advance_profiled(&mut mixed, delta, |_, _| true);
+        assert!(b.substeps > a.substeps * 10, "{a:?} {b:?}");
+        assert_eq!(a.contacts, 0);
+        assert_eq!(b.contacts, 0);
+        assert!((isolated[0].velocity[0] - mixed[0].velocity[0]).abs() < 2e-14);
+        for (a, b) in isolated[0].angular_velocity.iter().zip(mixed[0].angular_velocity) {
+            assert!((a - b).abs() < 2e-14);
+        }
+    }
+
     #[test]
     fn zero_delta_is_noop_and_large_delta_uses_bounded_motion_steps() {
         let mut objects = [ObjectState {
@@ -1499,7 +1566,7 @@ mod tests {
             panic!("unsupported")
         });
         assert!(stats.substeps > 48 && stats.substeps <= 4096);
-        let expected_x_speed = 0.995_f64.powi(stats.substeps as i32);
+        let expected_x_speed = LINEAR_RETENTION.powf(1.0 / DAMPING_REFERENCE_SECONDS);
         assert!((objects[0].velocity[0] - expected_x_speed).abs() < 1e-14);
         assert!(objects[0].position[1] < 96.0);
     }

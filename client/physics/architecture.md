@@ -42,7 +42,9 @@ substep. Cutting between passes would invalidate accumulated constraint impulses
 Translation is not cut separately
 while rolling remains meaningful; unsupported bodies accumulate gravity even
 with very short updates. The existing standalone 0.015 rad/s angular cutoff and
-0.995 / 0.98 linear/angular damping remain.
+elapsed-time linear/angular damping uses retention `0.995^(dt/0.008)` /
+`0.98^(dt/0.008)`. This preserves ordinary two-step 16 ms behavior while
+removing adaptive-population dependence. Unpowered floors receive no damping.
 Supporting ground faces use their near-coplanar vertices. Pair face contacts
 clip the two support polygons in the contact tangent plane, then solve normal
 constraints at the intersection corners. Sixteen local projected iterations

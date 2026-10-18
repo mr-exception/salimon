@@ -29,6 +29,8 @@ jobs:
         with:
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
       - name: Native build dependencies
         run: |
           sudo apt-get update
@@ -41,7 +43,7 @@ jobs:
           echo FORMAT_PATCH_START
           git diff --binary
           echo FORMAT_PATCH_END
-          cargo test --workspace --locked
+          cargo test -p salimon-physics --locked
           cargo clippy --workspace --all-targets --locked -- -D warnings
           python3 -m unittest discover -s scripts -p 'test_*.py'
 

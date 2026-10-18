@@ -36,9 +36,11 @@ def measure(ref, label, fixture, output, target, allocations):
         main = tree / "client/runtime/src/main.rs"
         content = main.read_text()
         if "mod fragment_costs;" not in content:
-            main.write_text("#[cfg(test)]\nmod fragment_costs;\n" + content)
+            main.write_text(content.replace("mod fragment_physics;", "#[cfg(test)]\nmod fragment_costs;\nmod fragment_physics;", 1))
         env = dict(os.environ, CARGO_TARGET_DIR=str(target),
                    SALIMON_FRAGMENT_COST_REPORT=str(destination / "timings.json"))
+        if label == "before":
+            run(["cargo", "test", "-p", "salimon-physics", "--locked"], tree, env)
         run(["cargo", "test", "--release", "-p", "salimon-client", "--locked",
              "fragment_update_costs", "--", "--ignored", "--nocapture"], tree, env)
         with (destination / "timings.json").open("rb") as source:

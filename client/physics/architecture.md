@@ -42,7 +42,9 @@ substep. Cutting between passes would invalidate accumulated constraint impulses
 Translation is not cut separately
 while rolling remains meaningful; unsupported bodies accumulate gravity even
 with very short updates. The existing standalone 0.015 rad/s angular cutoff and
-0.995 / 0.98 linear/angular damping remain.
+elapsed-time linear/angular damping uses retention `0.995^(dt/0.008)` /
+`0.98^(dt/0.008)`. This preserves ordinary two-step 16 ms behavior while
+removing adaptive-population dependence. Unpowered floors receive no damping.
 Supporting ground faces use their near-coplanar vertices. Pair face contacts
 clip the two support polygons in the contact tangent plane, then solve normal
 constraints at the intersection corners. Sixteen local projected iterations
@@ -354,3 +356,13 @@ shape. Sphere reactions retain no SAT projections. Carried and attached
 identities are excluded by runtime; persistent identities and mass remain world
 owned. Old authored hulls remain only in legacy emission/evaluation adapters
 until the final interaction migration (#234).
+
+## Per-body solver scratch (#306)
+
+Ground-response slots, gravity velocities/up vectors, rotation/support flags and
+pre-post-contact velocities retain capacity across substeps. Stateful callers
+retain these six arrays with SleepTracker between ticks; stateless calls retain
+them for the duration of one update. Every substep initializes the same values
+as fresh arrays; warm responses are moved out before reuse. A fresh-versus-reused
+array oracle checks exact state parity across population growth and shrinkage.
+This does not eliminate manifold, response-internal or activation-graph allocations.

@@ -29,7 +29,9 @@
   faster pair impacts use 0.12. Convex ground contacts are inelastic.
   Rough-contact rolling/spin torque is bounded by 0.1 of normal impulse times
   radius. Pair torques are equal/opposite; contact-free motion has no rolling drag.
-- Linear/angular damping is 0.995/0.98 per substep. Convex rest requires an actual
+- Linear/angular retention is `0.995^(dt/0.008)` / `0.98^(dt/0.008)`
+  for elapsed seconds dt, calibrated to ordinary 8 ms substeps. Unpowered
+  floors remain undamped. Convex rest requires an actual
   upward reaction and combined surface speed below 0.015 m/s; both velocities
   stop together after all contact iterations. The standalone angular cutoff
   remains 0.015 rad/s. Unsupported

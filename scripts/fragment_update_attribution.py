@@ -1,0 +1,115 @@
+#!/usr/bin/env python3
+"""Compare fragment CPU costs on identical current-sphere fixtures, never native FPS.
+
+Builds isolated worktrees; only the test-only attribution module is copied into
+older revisions. Production code and damping remain those of each supplied ref.
+Use a baseline containing #304 to isolate indexing/scratch from damping changes.
+"""
+from __future__ import annotations
+
+import argparse
+import gzip
+import hashlib
+import json
+import os
+from pathlib import Path
+import platform
+import shutil
+import subprocess
+import tempfile
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def run(command, cwd, env=None, stdout=None):
+    subprocess.run(command, cwd=cwd, env=env, stdout=stdout, check=True, timeout=1200)
+
+
+def allocation_summary(destination, mode):
+    traces = [path for path in destination.glob(f"allocations-{mode}*") if path.suffix in (".gz", ".zst")]
+    if len(traces) != 1:
+        raise RuntimeError(f"expected one heaptrack trace in {destination}: {traces}")
+    with (destination / f"allocations-{mode}.txt").open("w") as stream:
+        run(["heaptrack_print", "-f", str(traces[0])], ROOT, stdout=stream)
+
+
+def measure(ref, label, fixture, output, target, allocations, allocations_only):
+    directory = Path(tempfile.mkdtemp(prefix=f"salimon-fragments-{label}-"))
+    tree = directory / "source"
+    run(["git", "worktree", "add", "--detach", str(tree), ref], ROOT)
+    destination = output / label
+    destination.mkdir()
+    try:
+        (tree / "client/runtime/src/fragment_costs.rs").write_bytes(fixture)
+        main = tree / "client/runtime/src/main.rs"
+        content = main.read_text()
+        if "mod fragment_costs;" not in content:
+            main.write_text(content.replace("mod fragment_physics;", "#[cfg(test)]\nmod fragment_costs;\nmod fragment_physics;", 1))
+        env = dict(os.environ, CARGO_TARGET_DIR=str(target),
+                   SALIMON_FRAGMENT_COST_REPORT=str(destination / "timings.json"))
+        if not allocations_only:
+            if label == "before":
+                run(["cargo", "test", "-p", "salimon-physics", "--locked"], tree, env)
+            run(["cargo", "test", "--release", "-p", "salimon-client", "--locked",
+                 "fragment_update_costs", "--", "--ignored", "--nocapture"], tree, env)
+            with (destination / "timings.json").open("rb") as source:
+                with gzip.open(destination / "timings.json.gz", "wb") as compressed:
+                    shutil.copyfileobj(source, compressed)
+            (destination / "timings.json").unlink()
+        if allocations:
+            with (destination / "executables.jsonl").open("w") as stream:
+                run(["cargo", "test", "--release", "-p", "salimon-client", "--locked",
+                     "--no-run", "--message-format=json"], tree, env, stream)
+            messages = [json.loads(line) for line in (destination / "executables.jsonl").read_text().splitlines()]
+            binary = next(item["executable"] for item in messages
+                          if item.get("reason") == "compiler-artifact"
+                          and item.get("target", {}).get("name") == "salimon-client"
+                          and item.get("profile", {}).get("test") and item.get("executable"))
+            for mode in ("asleep", "active", "mixed", "moving-ship", "zero-g"):
+                env.update(SALIMON_FRAGMENT_COST_QUICK="1",
+                           SALIMON_FRAGMENT_ALLOCATION_MODE=mode,
+                           SALIMON_FRAGMENT_COST_REPORT=str(destination / f"allocation-{mode}.json"))
+                run(["heaptrack", "-o", str(destination / f"allocations-{mode}"), binary,
+                     "fragment_update_costs", "--ignored", "--nocapture"], tree, env)
+                allocation_summary(destination, mode)
+    finally:
+        run(["git", "worktree", "remove", "--force", str(tree)], ROOT)
+        shutil.rmtree(directory)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--before", required=True)
+    parser.add_argument("--after", required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--heaptrack", action="store_true")
+    parser.add_argument("--allocations-only", action="store_true", help="skip timing matrix and collect only per-mode heaptrack evidence")
+    args = parser.parse_args()
+    if args.allocations_only and not args.heaptrack:
+        parser.error("--allocations-only requires --heaptrack")
+    output = args.output.resolve()
+    output.mkdir(parents=True, exist_ok=False)
+    if args.heaptrack and (not shutil.which("heaptrack") or not shutil.which("heaptrack_print")):
+        parser.error("--heaptrack requires heaptrack and heaptrack_print")
+    fixture = (ROOT / "client/runtime/src/fragment_costs.rs").read_bytes()
+    metadata = {"fixture_sha256": hashlib.sha256(fixture).hexdigest(),
+                "machine": platform.platform(), "processor": platform.processor(),
+                "cpu_model": next((line.split(":", 1)[1].strip() for line in Path("/proc/cpuinfo").read_text().splitlines() if line.startswith("model name")), "unknown") if Path("/proc/cpuinfo").exists() else platform.processor(),
+                "samples_per_case": int(os.environ.get("SALIMON_FRAGMENT_COST_SAMPLES", "20")),
+                "rustc": subprocess.check_output(["rustc", "-Vv"], text=True),
+                "refs": {key: subprocess.check_output(["git", "rev-parse", value], cwd=ROOT, text=True).strip()
+                         for key, value in (("before", args.before), ("after", args.after))},
+                "heaptrack": args.heaptrack,
+                "allocation_modes": ["asleep", "active", "mixed", "moving-ship", "zero-g"],
+                "allocations_only": args.allocations_only,
+                "allocation_scope": "one whole five-sample 500-object process per mode, including identical fixture/setup/warmup/replay; not per-tick counts",
+                "gpu_fps": None}
+    (output / "metadata.json").write_text(json.dumps(metadata, indent=2) + "\n")
+    labels = ((args.before, "before"), (args.after, "after"))
+    target = ROOT / "target/fragment-attribution"
+    for ref, label in labels:
+        measure(ref, label, fixture, output, target / label, args.heaptrack, args.allocations_only)
+
+
+if __name__ == "__main__":
+    main()

@@ -17,6 +17,11 @@ const GRAVITY: f64 = 9.81;
 const RESTITUTION: f64 = 0.12;
 const ROLLING_RESISTANCE: f64 = 0.1;
 const MAX_STEP: f64 = 1.0 / 90.0;
+// Preserve the ordinary 16 ms tick's two 8 ms steps, independent of adaptive
+// scheduling pressure from other objects. Unpowered cabins remain undamped.
+const DAMPING_REFERENCE_SECONDS: f64 = 0.008;
+const LINEAR_RETENTION: f64 = 0.995;
+const ANGULAR_RETENTION: f64 = 0.98;
 const CONTACT_BIAS_METERS: f64 = 0.00001;
 
 /// Spherical ground geometry in the same frame as its objects.
@@ -240,13 +245,31 @@ pub struct StepStats {
     pub contact_time: Duration,
 }
 
+// Six O(n) per-body arrays are retained between substeps and stateful ticks.
+// Contact response internals and activation graph work remain separately owned.
+#[derive(Clone, Debug, Default)]
+struct SolverScratch {
+    ground_responses: Vec<ContactResponse>,
+    gravity_velocities: Vec<[f64; 3]>,
+    gravity_ups: Vec<[f64; 3]>,
+    rotated: Vec<bool>,
+    support_reactions: Vec<bool>,
+    before_post_contact: Vec<[f64; 3]>,
+}
+
 /// Profile with per-substep clocks, never a clock or allocator hook per pair.
 pub fn advance_profiled(
     pieces: &mut [ObjectState],
     delta: Duration,
     floor_contains: impl Fn([f64; 3], f64) -> bool,
 ) -> StepStats {
-    advance_impl::<true>(pieces, delta, floor_contains, None)
+    advance_impl::<true>(
+        pieces,
+        delta,
+        floor_contains,
+        None,
+        &mut SolverScratch::default(),
+    )
 }
 
 /// Advance in stable slice order; preserve that order across updates.
@@ -259,7 +282,13 @@ pub fn advance(
     delta: Duration,
     floor_contains: impl Fn([f64; 3], f64) -> bool,
 ) {
-    advance_impl::<false>(pieces, delta, floor_contains, None);
+    advance_impl::<false>(
+        pieces,
+        delta,
+        floor_contains,
+        None,
+        &mut SolverScratch::default(),
+    );
 }
 
 /// Stateful activation path. IDs follow the snapshot order and must be unique.
@@ -284,11 +313,25 @@ pub fn advance_with_sleep<K: Copy + Eq + std::hash::Hash>(
         }
     }
     let prepare_time = activation_start.map(|s| s.elapsed()).unwrap_or_default();
+    let mut scratch = std::mem::take(&mut tracker.scratch);
     let mut stats = if profile {
-        advance_impl::<true>(pieces, delta, &floor_contains, Some(&mut activation))
+        advance_impl::<true>(
+            pieces,
+            delta,
+            &floor_contains,
+            Some(&mut activation),
+            &mut scratch,
+        )
     } else {
-        advance_impl::<false>(pieces, delta, &floor_contains, Some(&mut activation))
+        advance_impl::<false>(
+            pieces,
+            delta,
+            &floor_contains,
+            Some(&mut activation),
+            &mut scratch,
+        )
     };
+    tracker.scratch = scratch;
     let finish_start = profile.then(Instant::now);
     tracker.finish(ids, pieces, delta, &mut activation, floor_contains);
     stats.activation_time = prepare_time + finish_start.map(|s| s.elapsed()).unwrap_or_default();
@@ -305,6 +348,7 @@ fn advance_impl<const PROFILE: bool>(
     delta: Duration,
     floor_contains: impl Fn([f64; 3], f64) -> bool,
     mut activation: Option<&mut sleep::Activation>,
+    scratch: &mut SolverScratch,
 ) -> StepStats {
     let mut stats = StepStats {
         objects: pieces.len(),
@@ -319,6 +363,20 @@ fn advance_impl<const PROFILE: bool>(
     {
         return stats;
     }
+    scratch
+        .ground_responses
+        .resize_with(pieces.len(), Default::default);
+    scratch.gravity_velocities.resize(pieces.len(), [0.0; 3]);
+    scratch.gravity_ups.resize(pieces.len(), [0.0, 1.0, 0.0]);
+    scratch.rotated.resize(pieces.len(), false);
+    scratch.support_reactions.resize(pieces.len(), false);
+    scratch.before_post_contact.resize(pieces.len(), [0.0; 3]);
+    let ground_responses = &mut scratch.ground_responses;
+    let gravity_velocities = &mut scratch.gravity_velocities;
+    let gravity_ups = &mut scratch.gravity_ups;
+    let rotated = &mut scratch.rotated;
+    let support_reactions = &mut scratch.support_reactions;
+    let before_post_contact = &mut scratch.before_post_contact;
     // A fixed maximum substep prevents fast ejected pieces from tunnelling through a pile.
     let base_steps = (elapsed / MAX_STEP).ceil().clamp(1.0, 4096.0) as usize;
     let base_dt = elapsed / base_steps as f64;
@@ -359,7 +417,7 @@ fn advance_impl<const PROFILE: bool>(
         if let Some(a) = &mut activation {
             a.impacts(pieces, dt);
         }
-        let mut ground_responses = vec![ContactResponse::default(); pieces.len()];
+        ground_responses.fill(ContactResponse::default());
         let mut warm_pairs = activation
             .as_mut()
             .map(|a| std::mem::take(&mut a.warm_pairs))
@@ -379,8 +437,8 @@ fn advance_impl<const PROFILE: bool>(
             }
         }
         let integration_start = PROFILE.then(Instant::now);
-        let mut gravity_velocities = vec![[0.0; 3]; pieces.len()];
-        let mut gravity_ups = vec![[0.0, 1.0, 0.0]; pieces.len()];
+        gravity_velocities.fill([0.0; 3]);
+        gravity_ups.fill([0.0, 1.0, 0.0]);
         for (i, piece) in pieces.iter_mut().enumerate() {
             if activation.as_ref().is_some_and(|a| a.sleeping[i]) {
                 continue;
@@ -423,7 +481,7 @@ fn advance_impl<const PROFILE: bool>(
             pieces,
             &mut activation,
             &mut pair_geometry,
-            &mut ground_responses,
+            ground_responses,
             &mut warm_pairs,
             &floor_contains,
             &mut stats,
@@ -432,10 +490,12 @@ fn advance_impl<const PROFILE: bool>(
             stats.contact_time += start.elapsed();
         }
         let pose_start = PROFILE.then(Instant::now);
+        let linear_retention = LINEAR_RETENTION.powf(dt / DAMPING_REFERENCE_SECONDS);
+        let angular_retention = ANGULAR_RETENTION.powf(dt / DAMPING_REFERENCE_SECONDS);
         let mut moved = false;
-        let mut rotated = vec![false; pieces.len()];
-        let mut support_reactions = vec![false; pieces.len()];
-        let mut before_post_contact = vec![[0.0; 3]; pieces.len()];
+        rotated.fill(false);
+        support_reactions.fill(false);
+        before_post_contact.fill([0.0; 3]);
         for (i, piece) in pieces.iter_mut().enumerate() {
             if activation.as_ref().is_some_and(|a| a.sleeping[i]) {
                 continue;
@@ -445,8 +505,8 @@ fn advance_impl<const PROFILE: bool>(
                     > 0.5 * GRAVITY * dt;
             support_reactions[i] = supported_reaction;
             if !matches!(piece.surface, Surface::UnpoweredFloor { .. }) {
-                piece.velocity = scale(piece.velocity, 0.995);
-                piece.angular_velocity = scale(piece.angular_velocity, 0.98);
+                piece.velocity = scale(piece.velocity, linear_retention);
+                piece.angular_velocity = scale(piece.angular_velocity, angular_retention);
             }
             {
                 let previous = piece.position;
@@ -498,7 +558,7 @@ fn advance_impl<const PROFILE: bool>(
                 pieces,
                 &mut activation,
                 &mut pair_geometry,
-                &mut ground_responses,
+                ground_responses,
                 &mut warm_pairs,
                 &floor_contains,
                 &mut stats,
@@ -541,9 +601,10 @@ fn advance_impl<const PROFILE: bool>(
                 }
             }
             a.warm_ground = ground_responses
-                .into_iter()
+                .iter_mut()
                 .enumerate()
                 .filter(|(_, response)| !response.arms.is_empty())
+                .map(|(index, response)| (index, std::mem::take(response)))
                 .collect();
             a.geometry = Some(pair_geometry);
         } else {
@@ -1486,6 +1547,113 @@ mod tests {
         assert_eq!(objects, isolated);
     }
 
+    /// Iron density and 10 kg cap radius, matching the world sphere contract
+    /// without adding a world dependency to portable physics.
+    fn cap_sphere() -> ObjectState {
+        let radius = (3.0 * 10.0 / (4.0 * std::f64::consts::PI * 3500.0)).cbrt();
+        ObjectState {
+            mass_kg: 10.0,
+            radius,
+            ground_support_meters: radius,
+            side_meters: radius * 2.0,
+            angular_velocity: [0.4, 0.6, 0.8],
+            surface: Surface::Unsupported,
+            ..floor([0.0, 1000.0, 0.0], [1.0, 0.0, 0.0])
+        }
+    }
+
+    #[test]
+    fn elapsed_damping_is_partition_and_restart_independent() {
+        let initial = cap_sphere();
+        let mut reference = initial.clone();
+        advance(
+            std::slice::from_mut(&mut reference),
+            Duration::from_millis(160),
+            |_, _| true,
+        );
+        for partition_ms in [1, 4, 8, 16, 40, 160] {
+            let mut piece = initial.clone();
+            for _ in 0..160 / partition_ms {
+                advance(
+                    std::slice::from_mut(&mut piece),
+                    Duration::from_millis(partition_ms),
+                    |_, _| true,
+                );
+            }
+            // Repeated exponentials accumulate rounding; position/gravity integration
+            // is intentionally not partition invariant (semi-implicit Euler).
+            assert!((piece.velocity[0] - reference.velocity[0]).abs() < 2e-14);
+            for (actual, expected) in piece
+                .angular_velocity
+                .iter()
+                .zip(reference.angular_velocity)
+            {
+                assert!((actual - expected).abs() < 2e-14);
+            }
+        }
+        assert!((reference.velocity[0] - LINEAR_RETENTION.powf(20.0)).abs() < 2e-14);
+    }
+
+    #[test]
+    fn distant_fast_residual_changes_steps_without_changing_subject_damping() {
+        let subject = cap_sphere();
+        let mut isolated = [subject.clone()];
+        let mut mixed = [
+            subject.clone(),
+            ObjectState {
+                position: [1000.0, 1000.0, 0.0],
+                velocity: [20.0, 0.0, 0.0],
+                radius: 0.005,
+                ground_support_meters: 0.005,
+                side_meters: 0.01,
+                mass_kg: 0.000003,
+                ..subject
+            },
+        ];
+        let delta = Duration::from_millis(16);
+        let a = advance_profiled(&mut isolated, delta, |_, _| true);
+        let b = advance_profiled(&mut mixed, delta, |_, _| true);
+        assert!(b.substeps > a.substeps * 10, "{a:?} {b:?}");
+        assert_eq!(a.contacts, 0);
+        assert_eq!(b.contacts, 0);
+        assert!((isolated[0].velocity[0] - mixed[0].velocity[0]).abs() < 2e-14);
+        for (a, b) in isolated[0]
+            .angular_velocity
+            .iter()
+            .zip(mixed[0].angular_velocity)
+        {
+            assert!((a - b).abs() < 2e-14);
+        }
+    }
+
+    #[test]
+    fn reused_solver_arrays_match_fresh_arrays_through_population_changes() {
+        let mut scratch = SolverScratch::default();
+        for count in [8, 2, 16, 1] {
+            let initial: Vec<_> = (0..count)
+                .map(|i| ObjectState {
+                    position: [i as f64 * 0.15, 0.15, 0.0],
+                    surface: Surface::Floor { height_meters: 0.0 },
+                    ..cap_sphere()
+                })
+                .collect();
+            let mut retained = initial.clone();
+            let mut fresh = initial;
+            for _ in 0..12 {
+                advance_impl::<false>(
+                    &mut retained,
+                    Duration::from_millis(16),
+                    |_, _| true,
+                    None,
+                    &mut scratch,
+                );
+                advance(&mut fresh, Duration::from_millis(16), |_, _| true);
+                assert_eq!(retained, fresh);
+            }
+            assert!(scratch.gravity_velocities.capacity() >= count);
+        }
+    }
+
     #[test]
     fn zero_delta_is_noop_and_large_delta_uses_bounded_motion_steps() {
         let mut objects = [ObjectState {
@@ -1499,7 +1667,7 @@ mod tests {
             panic!("unsupported")
         });
         assert!(stats.substeps > 48 && stats.substeps <= 4096);
-        let expected_x_speed = 0.995_f64.powi(stats.substeps as i32);
+        let expected_x_speed = LINEAR_RETENTION.powf(1.0 / DAMPING_REFERENCE_SECONDS);
         assert!((objects[0].velocity[0] - expected_x_speed).abs() < 1e-14);
         assert!(objects[0].position[1] < 96.0);
     }

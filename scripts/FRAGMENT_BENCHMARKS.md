@@ -588,9 +588,9 @@ The standalone world lookup test retains 20 samples of historical linear versus
 indexed lookup on identical 500/1,000 active + 0/10,000/50,000 inactive 10 kg
 spheres; index capacity must not grow during queries.
 
-Heaptrack measures the entire five-sample 500-object asleep test process,
-including identical creation, 80 preparation ticks, snapshot replay and test
-harness. Retain its allocation stacks/totals; they are **not** per-tick counters.
+Heaptrack measures a separate entire five-sample 500-object test process for
+each of asleep/active/mixed/moving-ship/zero-g, including identical creation,
+applicable 80-tick preparation, snapshot replay and test harness. Retain its allocation stacks/totals; they are **not** per-tick counters.
 Six per-body solver arrays and adapter vector capacity reuse have separate
 regressions. Remaining activation/contact allocations are not hidden. CPU timing
 and allocation observations never establish native M1 visuals or FPS (#313).
@@ -604,3 +604,9 @@ journal-drain CPU time separately on checked 0.032 kg current spheres. Use
 changes production behavior. The historical baseline must still emit one event
 per requested write. Heaptrack trace extraction discovers `.gz`/`.zst` output
 rather than assuming the runner's compression format.
+
+`--allocations-only --heaptrack` collects only those five per-mode process
+profiles for both refs. Separate per-ref Cargo target directories prevent an
+older worktree's artifacts being reused by a checkout with older file mtimes.
+When running the standalone journal integration probe across refs, also use
+separate `CARGO_TARGET_DIR` paths (or clean the world package between revisions).

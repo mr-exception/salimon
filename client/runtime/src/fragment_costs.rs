@@ -103,6 +103,9 @@ fn fixture(count: usize, history: usize, mode: &str) -> (MiningTool, ShipControl
 fn fragment_update_costs() {
     let path = std::env::var("SALIMON_FRAGMENT_COST_REPORT").expect("set output path");
     let quick = std::env::var_os("SALIMON_FRAGMENT_COST_QUICK").is_some();
+    let allocation_mode = std::env::var("SALIMON_FRAGMENT_ALLOCATION_MODE")
+        .unwrap_or_else(|_| "asleep".to_owned());
+    assert!(["asleep", "active", "mixed", "moving-ship", "zero-g"].contains(&allocation_mode.as_str()));
     let sample_count: usize = std::env::var("SALIMON_FRAGMENT_COST_SAMPLES")
         .map(|value| value.parse().expect("integer sample count"))
         .unwrap_or(20);
@@ -111,7 +114,7 @@ fn fragment_update_costs() {
     for count in if quick { vec![500] } else { vec![500, 1000] } {
         for history in if quick { vec![0] } else { vec![0, 10_000] } {
             for mode in if quick {
-                vec!["asleep"]
+                vec![allocation_mode.as_str()]
             } else {
                 vec!["asleep", "active", "mixed", "moving-ship", "zero-g"]
             } {

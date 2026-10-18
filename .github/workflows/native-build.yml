@@ -33,6 +33,7 @@ jobs:
           cache-on-failure: true
       - name: Native build dependencies
         run: |
+          set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends build-essential pkg-config libxkbcommon-dev libwayland-dev
       - name: Compile workspace
@@ -52,15 +53,15 @@ jobs:
           sudo apt-get install -y --no-install-recommends heaptrack
           mkdir -p artifacts
           cargo test --release -p salimon-world --locked fragment_index_cost -- --ignored --nocapture | tee artifacts/index-cost.log
-          SALIMON_FRAGMENT_COST_SAMPLES=5 python3 scripts/fragment_update_attribution.py --before 9f6fdf7dee6ca1075762b9b55b5c7df204f89c9a --after HEAD --output artifacts/fragment-attribution --heaptrack
+          SALIMON_FRAGMENT_COST_SAMPLES=5 python3 scripts/fragment_update_attribution.py --allocations-only --before 9f6fdf7dee6ca1075762b9b55b5c7df204f89c9a --after HEAD --output artifacts/fragment-allocation-matrix --heaptrack
       - name: Journal attribution
         run: |
           probe_root=$(mktemp -d)
           git worktree add --detach "$probe_root/source" 9f6fdf7dee6ca1075762b9b55b5c7df204f89c9a
           cp client/world/tests/fragment_journal_cost.rs "$probe_root/source/client/world/tests/fragment_journal_cost.rs"
-          CARGO_TARGET_DIR="$GITHUB_WORKSPACE/target" cargo test --manifest-path "$probe_root/source/Cargo.toml" --release -p salimon-world --locked --test fragment_journal_cost -- --ignored --nocapture | tee artifacts/journal-before.log
+          CARGO_TARGET_DIR="$GITHUB_WORKSPACE/target/journal-before" cargo test --manifest-path "$probe_root/source/Cargo.toml" --release -p salimon-world --locked --test fragment_journal_cost -- --ignored --nocapture | tee artifacts/journal-before.log
           git worktree remove --force "$probe_root/source"
-          SALIMON_EXPECT_QUIET_JOURNAL=1 cargo test --release -p salimon-world --locked --test fragment_journal_cost -- --ignored --nocapture | tee artifacts/journal-after.log
+          SALIMON_EXPECT_QUIET_JOURNAL=1 CARGO_TARGET_DIR="$GITHUB_WORKSPACE/target/journal-after" cargo test --release -p salimon-world --locked --test fragment_journal_cost -- --ignored --nocapture | tee artifacts/journal-after.log
       - name: Retain portable evidence
         if: always()
         run: |
@@ -69,7 +70,7 @@ jobs:
           import base64,gzip
           root=Path("artifacts")
           for path in sorted(root.rglob("*")):
-              if path.name in ("timings.json.gz","metadata.json","allocations.txt","index-cost.log","allocation-fixture.json","journal-before.log","journal-after.log"):
+              if path.name in ("timings.json.gz","metadata.json","allocations.txt","index-cost.log","allocation-fixture.json","journal-before.log","journal-after.log") or (path.name.startswith("allocations-") and path.suffix==".txt") or (path.name.startswith("allocation-") and path.suffix==".json"):
                   print("EVIDENCE_START "+str(path))
                   print(base64.b64encode(gzip.compress(path.read_bytes())).decode())
                   print("EVIDENCE_END")
@@ -79,6 +80,6 @@ jobs:
         with:
           name: fragment-stack-attribution
           path: |
-            artifacts/fragment-attribution
+            artifacts/fragment-allocation-matrix
             artifacts/index-cost.log
             artifacts/journal-*.log

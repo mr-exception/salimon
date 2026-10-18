@@ -25,15 +25,15 @@ def run(command, cwd, env=None, stdout=None):
     subprocess.run(command, cwd=cwd, env=env, stdout=stdout, check=True, timeout=1200)
 
 
-def allocation_summary(destination):
-    traces = [path for path in destination.glob("allocations*") if path.suffix in (".gz", ".zst")]
+def allocation_summary(destination, mode):
+    traces = [path for path in destination.glob(f"allocations-{mode}*") if path.suffix in (".gz", ".zst")]
     if len(traces) != 1:
         raise RuntimeError(f"expected one heaptrack trace in {destination}: {traces}")
-    with (destination / "allocations.txt").open("w") as stream:
+    with (destination / f"allocations-{mode}.txt").open("w") as stream:
         run(["heaptrack_print", "-f", str(traces[0])], ROOT, stdout=stream)
 
 
-def measure(ref, label, fixture, output, target, allocations):
+def measure(ref, label, fixture, output, target, allocations, allocations_only):
     directory = Path(tempfile.mkdtemp(prefix=f"salimon-fragments-{label}-"))
     tree = directory / "source"
     run(["git", "worktree", "add", "--detach", str(tree), ref], ROOT)
@@ -47,14 +47,15 @@ def measure(ref, label, fixture, output, target, allocations):
             main.write_text(content.replace("mod fragment_physics;", "#[cfg(test)]\nmod fragment_costs;\nmod fragment_physics;", 1))
         env = dict(os.environ, CARGO_TARGET_DIR=str(target),
                    SALIMON_FRAGMENT_COST_REPORT=str(destination / "timings.json"))
-        if label == "before":
-            run(["cargo", "test", "-p", "salimon-physics", "--locked"], tree, env)
-        run(["cargo", "test", "--release", "-p", "salimon-client", "--locked",
-             "fragment_update_costs", "--", "--ignored", "--nocapture"], tree, env)
-        with (destination / "timings.json").open("rb") as source:
-            with gzip.open(destination / "timings.json.gz", "wb") as compressed:
-                shutil.copyfileobj(source, compressed)
-        (destination / "timings.json").unlink()
+        if not allocations_only:
+            if label == "before":
+                run(["cargo", "test", "-p", "salimon-physics", "--locked"], tree, env)
+            run(["cargo", "test", "--release", "-p", "salimon-client", "--locked",
+                 "fragment_update_costs", "--", "--ignored", "--nocapture"], tree, env)
+            with (destination / "timings.json").open("rb") as source:
+                with gzip.open(destination / "timings.json.gz", "wb") as compressed:
+                    shutil.copyfileobj(source, compressed)
+            (destination / "timings.json").unlink()
         if allocations:
             with (destination / "executables.jsonl").open("w") as stream:
                 run(["cargo", "test", "--release", "-p", "salimon-client", "--locked",
@@ -64,11 +65,13 @@ def measure(ref, label, fixture, output, target, allocations):
                           if item.get("reason") == "compiler-artifact"
                           and item.get("target", {}).get("name") == "salimon-client"
                           and item.get("profile", {}).get("test") and item.get("executable"))
-            env.update(SALIMON_FRAGMENT_COST_QUICK="1",
-                       SALIMON_FRAGMENT_COST_REPORT=str(destination / "allocation-fixture.json"))
-            run(["heaptrack", "-o", str(destination / "allocations"), binary,
-                 "fragment_update_costs", "--ignored", "--nocapture"], tree, env)
-            allocation_summary(destination)
+            for mode in ("asleep", "active", "mixed", "moving-ship", "zero-g"):
+                env.update(SALIMON_FRAGMENT_COST_QUICK="1",
+                           SALIMON_FRAGMENT_ALLOCATION_MODE=mode,
+                           SALIMON_FRAGMENT_COST_REPORT=str(destination / f"allocation-{mode}.json"))
+                run(["heaptrack", "-o", str(destination / f"allocations-{mode}"), binary,
+                     "fragment_update_costs", "--ignored", "--nocapture"], tree, env)
+                allocation_summary(destination, mode)
     finally:
         run(["git", "worktree", "remove", "--force", str(tree)], ROOT)
         shutil.rmtree(directory)
@@ -80,7 +83,10 @@ def main():
     parser.add_argument("--after", required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--heaptrack", action="store_true")
+    parser.add_argument("--allocations-only", action="store_true", help="skip timing matrix and collect only per-mode heaptrack evidence")
     args = parser.parse_args()
+    if args.allocations_only and not args.heaptrack:
+        parser.error("--allocations-only requires --heaptrack")
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     if args.heaptrack and (not shutil.which("heaptrack") or not shutil.which("heaptrack_print")):
@@ -94,13 +100,15 @@ def main():
                 "refs": {key: subprocess.check_output(["git", "rev-parse", value], cwd=ROOT, text=True).strip()
                          for key, value in (("before", args.before), ("after", args.after))},
                 "heaptrack": args.heaptrack,
-                "allocation_scope": "whole quick test process, including identical fixture/setup/warmup/replay; not per-tick counts",
+                "allocation_modes": ["asleep", "active", "mixed", "moving-ship", "zero-g"],
+                "allocations_only": args.allocations_only,
+                "allocation_scope": "one whole five-sample 500-object process per mode, including identical fixture/setup/warmup/replay; not per-tick counts",
                 "gpu_fps": None}
     (output / "metadata.json").write_text(json.dumps(metadata, indent=2) + "\n")
     labels = ((args.before, "before"), (args.after, "after"))
-    target = ROOT / "target"
+    target = ROOT / "target/fragment-attribution"
     for ref, label in labels:
-        measure(ref, label, fixture, output, target, args.heaptrack)
+        measure(ref, label, fixture, output, target / label, args.heaptrack, args.allocations_only)
 
 
 if __name__ == "__main__":

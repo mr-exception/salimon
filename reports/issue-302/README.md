@@ -21,7 +21,7 @@ steering-reset method; no new simulation or event framework was introduced.
 
 Local macOS; Rust 1.89.0, Python 3.14.2. Python 3.12 was unavailable locally.
 
-- `cargo test --workspace --locked`: passed; 594 tests, 16 existing opt-in ignores.
+- `cargo test --workspace --locked`: passed; 494 tests, 16 existing opt-in ignores.
 - `cargo test -p salimon-client --locked app::input_tests`: 4 production dispatch /
   lifecycle composition regressions passed after final cleanup.
 - `cargo clippy --workspace --all-targets --locked -- -D warnings`: passed.

@@ -347,3 +347,11 @@ extraction only. It invalidates runtime's reconciled nearby results immediately;
 fragment pose/carry/release changes leave deposit results reusable. A new world
 session creates a new runtime MiningTool (and cache). Terrain definitions stay
 immutable; position, seed and terrain mode are runtime candidate-cache inputs.
+
+## Identical pose updates (#306)
+
+Validated exact identical carried/loose poses are accepted without a physical
+mutation event. Pickup/drop still emit at an unchanged pose; growth, physical
+removal and actual transforms retain ordered/coalesced journal semantics.
+Runtime invalidates containment membership when the ship frame changes rather
+than relying on no-op poses to trigger mass work.

@@ -27,6 +27,7 @@ struct NearbyCache {
 pub(crate) struct MiningTool {
     pub(crate) ship_gravity_disabled: bool,
     pub(crate) ship_mass: salimon_ship::ShipMass,
+    pub(crate) mass_frame: Option<ShipFrame>,
     pub(crate) terrain: salimon_world::terrain::TerrainMode,
     nearby_cache: RefCell<NearbyCache>,
     placements: std::cell::RefCell<crate::resource_presentation::PlacementCache>,
@@ -34,6 +35,7 @@ pub(crate) struct MiningTool {
         salimon_world::resources::FragmentId,
         salimon_physics::ObjectState,
     >,
+    pub(crate) fragment_scratch: crate::fragment_physics::FragmentScratch,
     pub(crate) fragment_sleep: salimon_physics::SleepTracker<salimon_world::resources::FragmentId>,
     pub(crate) ship_fragments:
         std::collections::HashMap<salimon_world::resources::FragmentId, [f64; 3]>,

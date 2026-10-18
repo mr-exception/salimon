@@ -732,3 +732,24 @@ Automation inspection's `visual_context` observes the renderer-selected backend,
 adapter and driver plus physical window size and DPI scale. Corpus tooling uses
 these observations to prevent comparisons between incompatible capture contexts
 (#308); they never affect gameplay or automatically approve images.
+
+## Fragment update scratch and mass invalidation (#306)
+
+MiningTool retains snapshot/state/ID buffers. Snapshot filling preserves session
+order and range/frame gates; states move into the contiguous solver input rather
+than cloning a second population. Capturing presentation history reuses the same
+snapshot storage and retains its simulation-frame interpolation policy.
+
+Exact identical validated carried/loose poses emit no world journal entry;
+pickup/drop remain explicit events even at the same pose. Physics still stores
+velocities, angular state and local anchors, and ship synchronization still
+computes absolute poses when a supporting frame moves. Growth, Core removal,
+release and wake invalidations keep their existing routes.
+
+Mass synchronization drains mutations in the stationary containment frame.
+Changing that frame reclassifies retained centers once, including unchanged
+unanchored world objects that a moving boundary can pass. Repeated redraws in
+the same frame do no extra scan; a moving frame pays O(retained count) for exact
+boundary membership. This deliberately replaces the assumption that every
+unchanged pose creates an event. The return count is ledger visits for portable
+profiling, not a gameplay input or native performance promise.

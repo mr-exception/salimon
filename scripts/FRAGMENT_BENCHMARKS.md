@@ -546,3 +546,51 @@ onboard flight populations, #47 six-piece mixed transfer fixture, and the explic
 unsealed-tail-growth regression. Their counts/masses remain fixed; they do not
 certify cap-sized cargo. New flight profile output includes the fixture version;
 older reports are identified by their recorded source revisions, never rewritten.
+
+## Portable retained-session attribution (#305–#306)
+
+`fragment_update_costs` is a separate corrected current-sphere workload, not the
+historical 16 kg cargo fixture or the authored convex/native matrix. It builds
+500/1,000 active identities with independently 0/10,000 retained inactive
+0.032 kg spheres. Active exterior populations use 10 kg current spheres across
+all materials; mixed rows cycle 10/0.032/0.000003 kg. Exterior centers use a
+40 cm tangent grid at Earth's surface. Ship/zero-g rows use 0.032 kg spheres on
+validated 8 cm ship-deck cells; these isolate adapter/frame costs and do not
+stand in for 10 kg crowded cargo. Every population records actual IDs, masses,
+radii and poses. Inactive identities stay beyond 1 km, outside the exact 125 m gate.
+
+Modes: verified asleep (80 production preparation ticks), active at 1 m lift,
+mixed sleepers/repeatedly driven half population, moving ship-local frame
+(5 cm/sample), and unpowered/undamped cabin. Active/mixed samples explicitly
+reapply velocities to retain scheduling pressure; they are driven attribution
+fixtures, not unforced settling trajectories. Each row retains 20 raw 16 ms
+samples: allocating read-only selection, isolated stateful solver replay,
+production adapter/physics total, frame synchronization, mass/containment work
+and complete capture/advance/synchronization time. Replay setup/cloning and
+postcondition checks stay outside the total-update timer. Replay checks velocity
+and angular equality plus 0.2 mm absolute-position tolerance at the large anchor.
+
+For a same-machine sequential comparison (requires Cargo and optionally Linux
+heaptrack; output path must not exist):
+
+```sh
+python3 scripts/fragment_update_attribution.py --before issue-304 --after issue-306 --output artifacts/fragment-attribution --heaptrack
+cargo test --release -p salimon-world --locked fragment_index_cost -- --ignored --nocapture
+```
+
+The comparison runner copies only the identical test module into isolated older
+worktrees. Use the #304 commit as baseline so damping is already corrected and
+only indexing/scratch/mutation behavior differs. Reports retain exact refs,
+fixture SHA-256, compiler/platform, full populations and raw samples as gzip JSON.
+Before #306, `mass_visits` is `"()"` (not instrumented); afterwards it reports the
+ledger visit count. Timings always include actual production mass synchronization.
+The standalone world lookup test retains 20 samples of historical linear versus
+indexed lookup on identical 500/1,000 active + 0/10,000/50,000 inactive 10 kg
+spheres; index capacity must not grow during queries.
+
+Heaptrack measures the entire five-sample 500-object asleep test process,
+including identical creation, 80 preparation ticks, snapshot replay and test
+harness. Retain its allocation stacks/totals; they are **not** per-tick counters.
+Six per-body solver arrays and adapter vector capacity reuse have separate
+regressions. Remaining activation/contact allocations are not hidden. CPU timing
+and allocation observations never establish native M1 visuals or FPS (#313).

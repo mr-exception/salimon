@@ -178,14 +178,28 @@ mod mutation_tests {
     use std::time::Duration;
     fn sphere(output: &mut FragmentOutput, mass: f64) -> FragmentId {
         let material = RawMaterial::new(ResourceId::IronOre, mass).unwrap();
-        let id = output.upsert_sphere(None, crate::spherical_mining::GrowingSphere {
-            source: DepositId { body: CelestialBodyId::Earth, local: 305 }, material,
-        }, ResourceTransform::new(WorldPosition::new(0.0, 0.0, 0.0), [0.0, 0.0, 0.0, 1.0]).unwrap());
+        let id = output.upsert_sphere(
+            None,
+            crate::spherical_mining::GrowingSphere {
+                source: DepositId {
+                    body: CelestialBodyId::Earth,
+                    local: 305,
+                },
+                material,
+            },
+            ResourceTransform::new(WorldPosition::new(0.0, 0.0, 0.0), [0.0, 0.0, 0.0, 1.0])
+                .unwrap(),
+        );
         let piece = *output.get(id).unwrap();
         assert_eq!(piece.id(), id);
         assert_eq!(piece.material().mass_kg(), mass);
-        let expected = (3.0 * mass / (4.0 * std::f64::consts::PI * 3500.0)).cbrt().clamp(0.005, 2.0);
-        assert!((crate::resource_size::fragment_contact_radius_meters(material) - expected).abs() < 1e-14);
+        let expected = (3.0 * mass / (4.0 * std::f64::consts::PI * 3500.0))
+            .cbrt()
+            .clamp(0.005, 2.0);
+        assert!(
+            (crate::resource_size::fragment_contact_radius_meters(material) - expected).abs()
+                < 1e-14
+        );
         id
     }
 
@@ -200,7 +214,9 @@ mod mutation_tests {
     #[test]
     fn ordered_removal_growth_and_journal_keep_index_consistent() {
         let mut output = FragmentOutput::default();
-        let ids: Vec<_> = (0..30).map(|i| sphere(&mut output, if i % 2 == 0 {10.0} else {0.000003})).collect();
+        let ids: Vec<_> = (0..30)
+            .map(|i| sphere(&mut output, if i % 2 == 0 { 10.0 } else { 0.000003 }))
+            .collect();
         assert_index(&output);
         for id in [ids[0], ids[15], ids[29], ids[3]] {
             assert!(output.remove(id));
@@ -208,20 +224,32 @@ mod mutation_tests {
             assert!(output.get(id).is_none());
             assert_index(&output);
         }
-        let survivors: Vec<_> = ids.iter().copied().filter(|id| output.get(*id).is_some()).collect();
-        assert_eq!(output.fragments.iter().map(|p|p.id()).collect::<Vec<_>>(), survivors);
+        let survivors: Vec<_> = ids
+            .iter()
+            .copied()
+            .filter(|id| output.get(*id).is_some())
+            .collect();
+        assert_eq!(
+            output.fragments.iter().map(|p| p.id()).collect::<Vec<_>>(),
+            survivors
+        );
         let new = sphere(&mut output, 10.0);
         assert!(new.0 > ids.last().unwrap().0);
         let old = *output.get(survivors[1]).unwrap();
-        output.upsert_sphere(Some(old.id()), crate::spherical_mining::GrowingSphere {
-            source: old.source(), material: RawMaterial::new(ResourceId::IronOre, 2.0).unwrap(),
-        }, old.transform());
+        output.upsert_sphere(
+            Some(old.id()),
+            crate::spherical_mining::GrowingSphere {
+                source: old.source(),
+                material: RawMaterial::new(ResourceId::IronOre, 2.0).unwrap(),
+            },
+            old.transform(),
+        );
         assert_index(&output);
         assert_eq!(output.get(old.id()).unwrap().material().mass_kg(), 2.0);
         let changes: Vec<_> = output.drain_changes().collect();
         assert!(changes.windows(2).all(|w| w[0].0.0 < w[1].0.0));
         for id in [ids[0], ids[15], ids[29], ids[3]] {
-            assert_eq!(changes.iter().find(|(key,_)|*key == id).unwrap().1, None);
+            assert_eq!(changes.iter().find(|(key, _)| *key == id).unwrap().1, None);
         }
     }
 
@@ -232,24 +260,74 @@ mod mutation_tests {
         for active in [500, 1000] {
             for inactive in [0, 10_000, 50_000] {
                 let mut output = FragmentOutput::default();
-                let ids: Vec<_> = (0..active + inactive).map(|_| sphere(&mut output, 10.0)).collect();
+                let ids: Vec<_> = (0..active + inactive)
+                    .map(|_| sphere(&mut output, 10.0))
+                    .collect();
                 assert_index(&output);
                 let queries = &ids[inactive..];
                 let capacity = output.slots.capacity();
                 for sample in 0..20 {
                     let now = Instant::now();
                     for &id in queries {
-                        black_box(output.fragments.iter_mut().find(|p| p.id() == black_box(id)).unwrap());
+                        black_box(
+                            output
+                                .fragments
+                                .iter_mut()
+                                .find(|p| p.id() == black_box(id))
+                                .unwrap(),
+                        );
                     }
                     let linear_ns = now.elapsed().as_nanos();
                     let now = Instant::now();
-                    for &id in queries { black_box(output.get_mut(black_box(id)).unwrap()); }
+                    for &id in queries {
+                        black_box(output.get_mut(black_box(id)).unwrap());
+                    }
                     let indexed_ns = now.elapsed().as_nanos();
                     assert_eq!(output.slots.capacity(), capacity);
-                    println!("INDEX_COST active={active} inactive={inactive} sample={sample} linear_ns={linear_ns} indexed_ns={indexed_ns} index_capacity={capacity}");
+                    println!(
+                        "INDEX_COST active={active} inactive={inactive} sample={sample} linear_ns={linear_ns} indexed_ns={indexed_ns} index_capacity={capacity}"
+                    );
                 }
             }
         }
+    }
+
+    #[test]
+    fn identical_poses_emit_nothing_but_pickup_drop_and_removal_still_emit() {
+        let mut session = MiningSession::default();
+        let mut deposit = ResourceDeposit::new(
+            DepositId {
+                body: CelestialBodyId::Earth,
+                local: 306,
+            },
+            RawMaterial::new(ResourceId::IronOre, 10.0).unwrap(),
+            WorldPosition::new(0.0, 0.0, 0.0),
+            10.0,
+        )
+        .unwrap();
+        session.extract(&mut deposit, Duration::from_secs(1));
+        let piece = session.fragments()[0];
+        session.drain_fragment_changes().for_each(drop);
+        assert!(session.move_loose(piece.id(), piece.transform()));
+        assert_eq!(session.drain_fragment_changes().count(), 0);
+        assert!(session.pick_up(piece.id()));
+        assert_eq!(session.drain_fragment_changes().count(), 1);
+        session.move_carried(piece.transform());
+        assert_eq!(session.drain_fragment_changes().count(), 0);
+        assert!(session.drop_carried(piece.transform()));
+        assert_eq!(session.drain_fragment_changes().count(), 1);
+        let moved = ResourceTransform::new(
+            piece.transform().position().translated([1.0, 0.0, 0.0]),
+            [0.0, 0.0, 0.0, 1.0],
+        )
+        .unwrap();
+        assert!(session.move_loose(piece.id(), moved));
+        assert_eq!(session.drain_fragment_changes().count(), 1);
+        assert!(session.remove_fragment(piece.id()));
+        assert_eq!(
+            session.drain_fragment_changes().collect::<Vec<_>>(),
+            vec![(piece.id(), None)]
+        );
     }
 
     #[test]

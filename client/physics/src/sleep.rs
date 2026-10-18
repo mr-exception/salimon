@@ -163,6 +163,7 @@ pub struct SleepTracker<K> {
     warm_dt: f64,
     spatial: crate::broad_phase::Grid,
     candidates: Vec<usize>,
+    pub(crate) scratch: crate::SolverScratch,
 }
 impl<K> Default for SleepTracker<K> {
     fn default() -> Self {
@@ -175,6 +176,7 @@ impl<K> Default for SleepTracker<K> {
             warm_dt: 0.0,
             spatial: Default::default(),
             candidates: Vec::new(),
+            scratch: Default::default(),
         }
     }
 }

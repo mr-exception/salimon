@@ -10,6 +10,8 @@ mod e2e;
 mod equipment;
 mod flight_profile;
 mod flight_regression;
+#[cfg(test)]
+mod fragment_costs;
 mod fragment_physics;
 mod frame_clock;
 mod mining;

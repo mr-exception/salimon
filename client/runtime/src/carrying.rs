@@ -207,18 +207,27 @@ pub(crate) fn sync_ship_fragments(tool: &mut MiningTool, frame: ShipFrame) {
     }
 }
 
-/// Drain mutation events only; physics/frame adapters already visit moved objects.
+/// Drain mutations; reclassify retained centers when the containment frame changes.
+/// Return actual ledger visits for portable attribution. A stationary unchanged
+/// frame performs no containment/mass work. A moving boundary must still notice
+/// stationary world objects, even when their poses emit no mutation.
 pub(crate) fn sync_ship_mass(
     tool: &mut MiningTool,
     frame: ShipFrame,
     ship: &mut salimon_ship::ShipController,
-) {
+) -> usize {
+    let frame_changed = tool.mass_frame != Some(frame);
+    let mut events = 0;
     for (id, fragment) in tool.session.drain_fragment_changes() {
         if fragment.is_none() {
             tool.ship_fragments.remove(&id);
             tool.fragment_motion.remove(&id);
             tool.fragment_previous.remove(&id);
         }
+        if frame_changed && fragment.is_some() {
+            continue;
+        }
+        events += 1;
         let mass = fragment
             .filter(|p| {
                 salimon_character::ship_contains_object(
@@ -230,8 +239,26 @@ pub(crate) fn sync_ship_mass(
             .update(salimon_ship::MassObjectId::Fragment(id.0), mass)
             .expect("validated physical fragment mass");
     }
-    ship.set_total_mass_kg(tool.ship_mass.total_kg())
-        .expect("validated mass ledger");
+    if frame_changed {
+        for piece in tool.session.fragments() {
+            events += 1;
+            let onboard = salimon_character::ship_contains_object(
+                frame.world_to_local(piece.transform().position().meters()),
+            );
+            tool.ship_mass
+                .update(
+                    salimon_ship::MassObjectId::Fragment(piece.id().0),
+                    onboard.then(|| piece.material().mass_kg()),
+                )
+                .expect("validated physical fragment mass");
+        }
+        tool.mass_frame = Some(frame);
+    }
+    if events > 0 || frame_changed {
+        ship.set_total_mass_kg(tool.ship_mass.total_kg())
+            .expect("validated mass ledger");
+    }
+    events
 }
 
 #[cfg(test)]

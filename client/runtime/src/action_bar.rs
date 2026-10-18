@@ -4,10 +4,11 @@ use std::time::Duration;
 
 const TRANSIENT_DURATION: Duration = Duration::from_secs(3);
 // Shared by world interaction prompts, flight guidance and transient feedback.
-// Integer bitmap scaling keeps all three readable without filtered glyph edges.
-const BASE_SCALE: f64 = 3.0;
-const MIN_SCALE: u32 = 3;
-const MAX_SCALE: u32 = 6;
+// Integer bitmap scaling keeps glyph edges sharp. Cap high-DPI growth so
+// contextual labels stay compact rather than doubling their physical footprint.
+const BASE_SCALE: f64 = 2.0;
+const MIN_SCALE: u32 = 2;
+const MAX_SCALE: u32 = 3;
 
 #[derive(Clone, Copy, Debug)]
 pub(crate) struct ActionBarImage<'a> {
@@ -245,15 +246,15 @@ mod tests {
         ));
         let first = bar.image(true).unwrap();
         let revision = first.revision;
-        assert_eq!(first.height, 66);
+        assert_eq!(first.height, 44);
         let text_pixels_on_row = |row: usize| {
             first.rgba8[row * first.width as usize * 4..(row + 1) * first.width as usize * 4]
                 .as_chunks::<4>()
                 .0
                 .contains(&[248, 250, 252, 255])
         };
-        assert!(text_pixels_on_row(9));
-        assert!(text_pixels_on_row(36));
+        assert!(text_pixels_on_row(6));
+        assert!(text_pixels_on_row(24));
         bar.set_contextual(Some(
             "Silicate rock - approx 9.5 kg left\nHold left mouse to mine".to_owned(),
         ));
@@ -307,7 +308,7 @@ mod tests {
     }
 
     #[test]
-    fn smaller_prompt_typography_is_shared_and_tracks_bounded_dpi() {
+    fn compact_prompt_typography_is_shared_and_tracks_bounded_dpi() {
         for text in [
             "Press L to land",
             "Press E to use",
@@ -317,7 +318,7 @@ mod tests {
             bar.set_contextual(Some(text.to_owned()));
             let mut revision = bar.image(true).unwrap().revision;
             // Integer raster densities for 1×, 1.5× and 2× UI scale.
-            for (dpi, scale) in [(1.0, 3), (1.5, 5), (2.0, 6)] {
+            for (dpi, scale) in [(1.0, 2), (1.5, 3), (2.0, 3)] {
                 bar.set_scale_factor(dpi);
                 let image = bar.image(true).unwrap();
                 assert_eq!(image.height, 13 * scale);
@@ -345,13 +346,67 @@ mod tests {
     }
 
     #[test]
+    fn raster_is_smaller_than_issue_238_without_clipping_or_filtering() {
+        for text in [
+            "Press L to land",
+            "Press E to use",
+            "Press L to take off",
+            "Silicate rock - approx 10.5 kg left\nHold left mouse to mine",
+        ] {
+            for (dpi, old_scale, new_scale) in [(1.0, 3, 2), (1.5, 5, 3), (2.0, 6, 3)] {
+                let mut bar = ActionBar::default();
+                bar.set_scale_factor(dpi);
+                bar.set_contextual(Some(text.to_owned()));
+                let image = bar.image(true).unwrap();
+                let (old_width, old_height, _) = super::rasterize_action_bar(text, old_scale);
+                assert!(image.width * 3 <= old_width * 2);
+                assert!(image.height * 3 <= old_height * 2);
+
+                // Every source cell survives as a solid integer-sized block,
+                // including both rows and padding: no interpolation or lost glyphs.
+                let (width, height, pixels) = super::rasterize_action_bar(text, 1);
+                for y in 0..height {
+                    for x in 0..width {
+                        let source = ((y * width + x) * 4) as usize;
+                        for dy in 0..new_scale {
+                            for dx in 0..new_scale {
+                                let target =
+                                    (((y * new_scale + dy) * image.width + x * new_scale + dx) * 4)
+                                        as usize;
+                                assert_eq!(
+                                    &image.rgba8[target..target + 4],
+                                    &pixels[source..source + 4],
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn capped_dpi_reuses_raster_and_returning_to_one_x_rebuilds_it() {
+        let mut bar = ActionBar::default();
+        bar.set_contextual(Some("Press E to use".to_owned()));
+        let one_x = bar.image(true).unwrap().rgba8.to_vec();
+        bar.set_scale_factor(1.5);
+        let revision = bar.image(true).unwrap().revision;
+        bar.set_scale_factor(2.0);
+        assert_eq!(bar.image(true).unwrap().revision, revision);
+        bar.set_scale_factor(1.0);
+        assert!(bar.image(true).unwrap().revision > revision);
+        assert_eq!(bar.image(true).unwrap().rgba8, one_x);
+    }
+
+    #[test]
     fn invalid_and_out_of_range_dpi_keep_prompts_readable_and_bounded() {
         for (dpi, scale) in [
-            (f64::NAN, 3),
-            (f64::INFINITY, 3),
-            (-1.0, 3),
-            (0.0, 3),
-            (99.0, 6),
+            (f64::NAN, 2),
+            (f64::INFINITY, 2),
+            (-1.0, 2),
+            (0.0, 2),
+            (99.0, 3),
         ] {
             let mut bar = ActionBar::default();
             bar.set_contextual(Some("Press E to use".to_owned()));

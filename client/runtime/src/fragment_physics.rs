@@ -423,20 +423,23 @@ mod tests {
             axes: [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
         }
     }
+    // Preserve these historical adapter populations (4 kg means two 2 kg pieces),
+    // but construct/validate each piece through current spherical extraction.
     fn mined(mass: f64) -> MiningTool {
         let mut tool = MiningTool::default();
-        let mut deposit = ResourceDeposit::new(
-            DepositId {
-                body: CelestialBodyId::Earth,
-                local: 1,
-            },
-            RawMaterial::new(ResourceId::SilicateRock, mass).unwrap(),
-            WorldPosition::new(0.0, 0.0, 0.0),
-            mass,
-        )
-        .unwrap();
-        tool.session
-            .extract(&mut deposit, Duration::from_secs_f64(mass / 2.0));
+        let mut remaining = mass;
+        while remaining > 0.0 {
+            let piece_mass = remaining.min(2.0);
+            crate::sphere_fixtures::sphere(
+                &mut tool.session,
+                ResourceId::SilicateRock,
+                piece_mass,
+                ResourceTransform::new(WorldPosition::new(0.0, 0.0, 0.0), [0.0, 0.0, 0.0, 1.0])
+                    .unwrap(),
+            );
+            remaining -= piece_mass;
+        }
+        assert_eq!(tool.session.fragments().len(), (mass / 2.0).ceil() as usize);
         tool
     }
 
@@ -576,17 +579,16 @@ mod tests {
             ResourceId::WaterIce,
         ] {
             let mut tool = MiningTool::default();
-            let mut deposit = ResourceDeposit::new(
-                DepositId {
-                    body: CelestialBodyId::Earth,
-                    local: 99,
-                },
-                RawMaterial::new(resource, 4.0).unwrap(),
-                WorldPosition::new(0.0, 0.0, 0.0),
-                4.0,
-            )
-            .unwrap();
-            tool.session.extract(&mut deposit, Duration::from_secs(2));
+            for _ in 0..2 {
+                crate::sphere_fixtures::sphere(
+                    &mut tool.session,
+                    resource,
+                    10.0,
+                    ResourceTransform::new(WorldPosition::new(0.0, 0.0, 0.0), [0.0, 0.0, 0.0, 1.0])
+                        .unwrap(),
+                );
+            }
+            assert_eq!(tool.session.fragments().len(), 2);
             let initial = tool.session.fragments().to_vec();
             for (index, p) in initial.iter().enumerate() {
                 let local = [-5.0, 1.3, index as f64 * 1.5 - 0.75];
@@ -637,7 +639,8 @@ mod tests {
     #[test]
     fn sleeping_ship_fragment_follows_rigid_motion_and_streaming_return_wakes_safely() {
         let mut tool = mined(2.0);
-        let id = tool.session.fragments()[0].id();
+        let original = tool.session.fragments()[0];
+        let id = original.id();
         tool.ship_fragments.insert(id, [-5.0, 1.3, 0.0]);
         tool.fragment_motion.insert(id, FragmentMotion::default());
         for _ in 0..500 {
@@ -690,7 +693,7 @@ mod tests {
         );
         assert!(stats.solver.integrated_objects > 0);
         assert_eq!(tool.session.fragments()[0].id(), id);
-        assert_eq!(tool.session.fragments()[0].material().mass_kg(), 2.0);
+        assert_eq!(tool.session.fragments()[0].material(), original.material());
     }
 
     #[test]
@@ -860,8 +863,28 @@ mod tests {
     }
 
     #[test]
-    fn missing_or_restored_motion_never_receives_an_implicit_ejection() {
-        let mut tool = mined(0.5);
+    fn legacy_tail_growth_and_restored_motion_never_receive_an_implicit_ejection() {
+        // This regression deliberately exercises the retained legacy unsealed-tail
+        // growth API. Released current spheres never reconnect to a later hold.
+        let mut tool = MiningTool::default();
+        let mut source = ResourceDeposit::new(
+            DepositId {
+                body: CelestialBodyId::Earth,
+                local: 1,
+            },
+            RawMaterial::new(ResourceId::SilicateRock, 1.0).unwrap(),
+            WorldPosition::new(0.0, 0.0, 0.0),
+            1.0,
+        )
+        .unwrap();
+        tool.session
+            .extract(&mut source, Duration::from_millis(250));
+        assert_eq!(tool.session.fragments().len(), 1);
+        crate::sphere_fixtures::assert_sphere(
+            tool.session.fragments()[0],
+            ResourceId::SilicateRock,
+            0.5,
+        );
         let piece = tool.session.fragments()[0];
         let body = CELESTIAL_BODIES
             .iter()

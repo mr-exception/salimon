@@ -48,7 +48,7 @@ pub(crate) fn run(args: &[String]) -> Result<(), String> {
     }
     println!(
         "{}",
-        json!({"schema":1,"kind":"flight-cpu-profile","fixture":if stacked {"stacked"} else {"deck"},"step_seconds":0.016,"samples":samples,"rows":rows})
+        json!({"schema":1,"kind":"flight-cpu-profile","fixture_version":"legacy-onboard-032kg-v1","fixture":if stacked {"stacked"} else {"deck"},"step_seconds":0.016,"samples":samples,"rows":rows})
     );
     Ok(())
 }

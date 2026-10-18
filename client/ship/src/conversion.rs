@@ -139,7 +139,40 @@ mod tests {
             mass,
         )
         .unwrap();
-        session.extract(&mut deposit, Duration::from_secs(10));
+        let pose = salimon_world::resources::ResourceTransform::new(
+            deposit.position(),
+            [0.0, 0.0, 0.0, 1.0],
+        )
+        .unwrap();
+        let mut released = None;
+        for _ in 0..400 {
+            released = session.tick_spherical(
+                true,
+                Some(&mut deposit),
+                salimon_world::spherical_mining::SPHERE_TICK,
+                salimon_world::spherical_mining::MiningConfig::default(),
+                pose,
+            );
+            if released.is_some() {
+                break;
+            }
+        }
+        let id = released.expect("current sphere released at cap/depletion");
+        assert_eq!(session.fragments().len(), 1);
+        let piece = session.fragments()[0];
+        assert_eq!(piece.id(), id);
+        assert_eq!(piece.material().resource(), resource);
+        assert!((piece.material().mass_kg() - mass).abs() < 1e-9);
+        let expected_radius = (3.0 * mass
+            / (4.0 * std::f64::consts::PI * resource.definition().density_kg_per_m3))
+            .cbrt()
+            .clamp(0.005, 2.0);
+        assert!(
+            (salimon_world::resource_size::fragment_contact_radius_meters(piece.material())
+                - expected_radius)
+                .abs()
+                < 1e-12
+        );
         assert!(session.pick_up(session.fragments()[0].id()));
         session
     }
@@ -150,16 +183,17 @@ mod tests {
             ResourceId::SilicateRock,
             ResourceId::WaterIce,
         ] {
-            for mass in [0.125, 1.0, 2.0] {
+            for mass in [1e-9, 0.000_003, 0.125, 1.0, 2.0, 10.0] {
                 let mut ship = ShipController::default();
                 let mut session = carried(resource, mass);
+                let expected = session.fragments()[0].material().mass_kg()
+                    * resource.definition().energy_joules_per_kg;
                 assert_eq!(
                     ship.intake_carried_fragment(&mut session),
                     IntakeResult::Accepted
                 );
                 assert!(session.fragments().is_empty());
                 assert_eq!(session.carried_id(), None);
-                let expected = mass * resource.definition().energy_joules_per_kg;
                 assert_eq!(ship.conversion_remaining_joules(), expected);
                 assert_eq!(
                     ship.intake_carried_fragment(&mut session),
@@ -214,10 +248,12 @@ mod tests {
             ..Default::default()
         })
         .unwrap();
-        ship.intake_carried_fragment(&mut carried(ResourceId::IronOre, 1.0));
+        let mut session = carried(ResourceId::IronOre, 1.0);
+        let expected_joules = session.fragments()[0].material().mass_kg() * 1000.0;
+        ship.intake_carried_fragment(&mut session);
         let status = ship.snapshot().core_status;
         assert_eq!(status.conversion_watts, 200.0);
-        assert_eq!(status.conversion_remaining_joules, 1000.0);
+        assert_eq!(status.conversion_remaining_joules, expected_joules);
         assert_eq!(status.depletion_seconds, Some(105.0));
         ship.advance(Duration::from_secs(5));
         assert_eq!(ship.snapshot().core_status.conversion_watts, 0.0);

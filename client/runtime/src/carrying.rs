@@ -237,23 +237,17 @@ pub(crate) fn sync_ship_mass(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use salimon_world::CelestialBodyId;
-    use salimon_world::resources::{DepositId, RawMaterial, ResourceDeposit, ResourceId};
+    use salimon_world::resources::ResourceId;
     use std::time::Duration;
 
     fn mined() -> MiningTool {
         let mut tool = MiningTool::default();
-        let mut deposit = ResourceDeposit::new(
-            DepositId {
-                body: CelestialBodyId::Earth,
-                local: 1,
-            },
-            RawMaterial::new(ResourceId::SilicateRock, 2.0).unwrap(),
-            position([0.0, 0.0, 0.0]),
+        crate::sphere_fixtures::sphere(
+            &mut tool.session,
+            ResourceId::SilicateRock,
             2.0,
-        )
-        .unwrap();
-        tool.session.extract(&mut deposit, Duration::from_secs(1));
+            ResourceTransform::new(position([0.0; 3]), [0.0, 0.0, 0.0, 1.0]).unwrap(),
+        );
         tool
     }
 
@@ -299,19 +293,15 @@ mod tests {
             ResourceId::SilicateRock,
             ResourceId::WaterIce,
         ] {
-            for mass in [0.032, 1.0, 2.0, 10.0] {
+            for mass in [1e-9, 0.000_003, 0.032, 1.0, 2.0, 10.0] {
                 let mut tool = MiningTool::default();
-                let mut deposit = ResourceDeposit::new(
-                    DepositId {
-                        body: CelestialBodyId::Earth,
-                        local: 1,
-                    },
-                    RawMaterial::new(resource, mass).unwrap(),
-                    position([0.0; 3]),
+                crate::sphere_fixtures::sphere(
+                    &mut tool.session,
+                    resource,
                     mass,
-                )
-                .unwrap();
-                tool.session.extract(&mut deposit, Duration::from_secs(1));
+                    ResourceTransform::new(position([0.0; 3]), [0.0, 0.0, 0.0, 1.0]).unwrap(),
+                );
+                assert_eq!(tool.session.fragments().len(), 1);
                 let piece = tool.session.fragments()[0];
                 assert!(tool.session.pick_up(piece.id()));
                 let radius =

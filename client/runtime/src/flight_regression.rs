@@ -79,6 +79,12 @@ pub(crate) fn initialize(app: &mut ClientApplication, scenario: Scenario) -> Res
                     )
                 },
             );
+            // Retained #195 bootstrap fixture: exactly one legacy 2 kg piece.
+            if app.mining.session.fragments().len() != 1
+                || app.mining.session.fragments()[0].material() != material
+            {
+                return Err("legacy refuel fixture mass/population mismatch".into());
+            }
             let id = app.mining.session.fragments()[0].id();
             if !app.mining.session.pick_up(id) {
                 return Err("refuel fixture pickup failed".into());
@@ -102,13 +108,15 @@ pub(crate) fn initialize(app: &mut ClientApplication, scenario: Scenario) -> Res
     Ok(())
 }
 
-/// Small authored fragments fit 500 actual centers inside the aft cabin without
+/// Historical legacy-onboard-032kg-v1: 500 × 0.032 kg = 16 kg, never 10 kg spheres.
+/// Small fragments fit 500 actual centers inside the aft cabin without
 /// an overfull fixture silently excluding cargo from mass accounting.
 pub(crate) fn initialize_cargo(app: &mut ClientApplication, count: usize) -> Result<(), String> {
     if count > 500 {
         return Err("onboard regression population must be <=500".into());
     }
     let frame = character_ship_frame(app.ship.snapshot().pose);
+    let initial_count = app.mining.session.fragments().len();
     for i in 0..count {
         let material = RawMaterial::new(ResourceId::IronOre, 0.032)
             .map_err(|e| format!("cargo material: {e:?}"))?;
@@ -147,6 +155,11 @@ pub(crate) fn initialize_cargo(app: &mut ClientApplication, count: usize) -> Res
             .fragments()
             .last()
             .ok_or("cargo extraction failed")?;
+        if piece.material() != material
+            || app.mining.session.fragments().len() != initial_count + i + 1
+        {
+            return Err("legacy 0.032 kg cargo fixture mass/population mismatch".into());
+        }
         app.mining.ship_fragments.insert(piece.id(), local);
     }
     app.sync_carried();

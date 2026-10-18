@@ -708,3 +708,14 @@ Core intake uses the ordinary mechanical E route and authoritative ship conversi
 The portable `sphere_interactions` test covers all materials at 10 kg and a short
 0.25 kg deposit through F pickup, carry, F drop, reacquisition, E intake and
 streaming restoration. Native M1 remains #236.
+
+
+## Checked spherical fixtures (#303)
+
+Test-only `sphere_fixtures.rs` constructs append-only, released default-lifecycle
+spheres and checks actual mass/radius/source/ID/count before carrying/contact
+assertions. `sphere_workloads.rs` owns separately versioned portable 500/1,000
+current-sphere workloads, with raw population and CPU samples. Historical flight
+and #235 populations retain their original definitions. See the canonical
+[fixture/workload contract](../../scripts/FRAGMENT_BENCHMARKS.md#current-sphere-fixture-and-cpu-workload-contracts-303)
+for commands, fixture identities, tolerances and interpretation limits.

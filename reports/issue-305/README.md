@@ -40,9 +40,10 @@ and wall-clock evidence, not a global allocator interception count.
 
 Portable runtime selection/adapter/solver and allocation attribution is in the
 [stack report](https://github.com/mr-exception/salimon/blob/issue-306/reports/issue-306/README.md).
- Range selection keeps
-its existing exact scan/frame semantics pending measured justification for a
-second membership structure. No inactive state is pruned.
+ Range selection retains exact scan/frame semantics. The after-stack isolated
+1,000-active/10,000-inactive asleep selection median was 0.580 ms; another
+spatial membership/cache was not justified by these measurements. Selection
+remains explicitly linear in retained count. No inactive state is pruned.
 
 Local `git diff --check` passed. The first complete stack verification passed 507 Rust tests (21 opt-in ignored),
 workspace build and Clippy with warnings denied, plus 92 Python tooling tests.

@@ -24,7 +24,7 @@
 13. Landing and takeoff automation cannot be cancelled and continues after the
     cockpit is left; steering and thruster input cannot override it.
 14. Takeoff requires cockpit authority and a closed door, follows the landed
-    surface normal, and returns control only after clearing the landing volume.
+    surface normal, and returns control at rest after 50 m of local surface clearance.
 15. Core storage is bounded by configurable capacity (starter 60 GJ, 75% charge).
     Fractional joules and watt consumers are authoritative; telemetry is display-only.
 16. Nearby-body telemetry selects the nearest catalog surface at an inclusive
@@ -34,10 +34,10 @@
     independent of frame partition or the render frame partition; recovery takes 12 seconds.
 18. Assist activation preserves the pose. Landing levels smoothly over 2 seconds
     before descending; takeoff preserves landed orientation. Every radial phase
-    joins at rest except takeoff clearance, whose terminal analytic velocity
+    joins at rest, including takeoff completion; the same zero analytic velocity
     is handed to inertial flight with throttle zero. Completion consumes leftover time.
 19. Landing reserves 2 seconds for its last 15 m or less; takeoff reserves 2 seconds
-    for its first 15 m, so local surface motion stays readable on every solid body.
+    for its first 10 m, so local surface motion stays readable on every solid body.
 
 ## Source ownership
 
@@ -153,9 +153,11 @@ axis (at most 1681 candidates). No safe site rejects before energy debit; no
 power leaves the ship grounded. Rotation begins only after clearance.
 
 All assistance snapshots report analytic vector velocity, including relocation.
-Landing completes Landed with velocity and throttle zero. Takeoff clearance
-accelerates smoothly from rest and hands its analytic terminal outward velocity
-to Flying, throttle zero. Updates split at completion and apply remaining time
+Landing completes Landed with velocity and throttle zero. Takeoff rises 50 m locally, with peak speed 15 m/s and peak acceleration
+15 m/s² independent of planetary radius/landing eligibility. It hands zero
+analytic terminal velocity to Flying, throttle zero. Manual thrust is available
+immediately with powered cockpit authority. The ordinary 1.15R landing prompt
+can therefore remain available at handoff. Updates split at completion and apply remaining time
 to normal flight/idle consumption; partitioned inertial world-coordinate updates
 retain normal distant-anchor f64 quantization. Door interlocks are unchanged.
 

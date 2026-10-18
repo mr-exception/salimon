@@ -325,3 +325,8 @@ without selection, and post-drop deselection. See the
 
 `restore_look` reverses the preceding `aim_fragment` camera deltas so a scripted
 walking route keeps its intended heading after the pickup checkpoint.
+
+Takeoff returns powered control at rest after a six-second, 50 m local rise;
+while captured it reports `Assisted takeoff - flight controls locked`. Landing
+eligibility is unchanged, so a land prompt can remain available at handoff.
+See [the ship-owned contract](../ship/architecture.md) and #295.

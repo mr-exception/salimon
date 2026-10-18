@@ -219,7 +219,7 @@ mod tests {
             .instruments
             .nearby_body
             .unwrap();
-        assert!((lifting.radial_speed_meters_per_second - 11.25).abs() < 1.0e-9);
+        assert!((lifting.radial_speed_meters_per_second - 7.5).abs() < 1.0e-9);
         ship.advance(std::time::Duration::from_secs(1));
         let lifted = map_ship_to_renderer(ship.snapshot())
             .instruments
@@ -227,6 +227,15 @@ mod tests {
             .unwrap();
         assert!(lifted.surface_distance_meters > lifting.surface_distance_meters);
         assert_eq!(lifted.radial_speed_meters_per_second, 0.0);
+        ship.advance(std::time::Duration::from_secs(4));
+        let handoff = map_ship_to_renderer(ship.snapshot())
+            .instruments
+            .nearby_body
+            .unwrap();
+        assert_eq!(handoff.radial_speed_meters_per_second, 0.0);
+        assert!(
+            (handoff.surface_distance_meters - lifted.surface_distance_meters - 40.0).abs() < 0.001
+        );
 
         let mut pose = ShipController::default().snapshot().pose;
         pose.position_meters[1] += 100.0;

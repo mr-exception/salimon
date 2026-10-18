@@ -32,7 +32,7 @@ impl CockpitMessage {
             Self::PressToTakeOff => "Press L to take off",
             Self::CloseDoorBeforeTakeoff => "Close door before takeoff",
             Self::LandingInProgress => "Assisted landing in progress",
-            Self::TakeoffInProgress => "Assisted takeoff in progress",
+            Self::TakeoffInProgress => "Assisted takeoff - flight controls locked",
         }
     }
 }

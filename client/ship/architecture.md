@@ -44,12 +44,13 @@ key state remains outside this crate.
 Landing captures the arbitrary approach normal and starting pose. It aligns
 local `+Y` over 2 seconds using eased shortest-arc quaternion interpolation,
 approaches over 4 seconds, then spends 2 seconds descending the last 15 m or
-less to the corresponding tangent surface pose. Takeoff follows that same
-normal, lifting 15 m over 2 seconds before clearing the landing volume over
-4 seconds. Smoothstep radial segments provide continuous position and velocity,
-with zero velocity at internal phase boundaries. Takeoff clearance uses an
-accelerating quadratic segment and hands its nonzero analytic terminal velocity
-to free flight with throttle zero. Captured radial waypoints and elapsed
+less to the corresponding tangent surface pose. Takeoff lifts 10 m in 2 seconds, then rises another 40 m in 4 seconds using
+smoothstep segments. It ends 50 m above the captured landed origin at rest,
+with throttle zero and immediate powered manual control. The stages peak at
+7.5 and 15 m/s respectively, each with acceleration magnitude at most 15 m/s²; position and velocity are
+continuous at the join and handoff. This local clearance is independent of the
+planetary landing-eligibility shell. There is no free-flight planetary gravity,
+so zero-throttle flight remains stationary until thrust is selected. Captured radial waypoints and elapsed
 `Duration` make sampling independent of frame partition, without accumulated
 position error. Automatic sequences consume the full supplied delta; the
 runtime supplies shared 16 ms gameplay ticks. Runtime maps the active body's frame to
@@ -60,7 +61,7 @@ Enabled terrain uses terrain_landing.rs and runtime-supplied authored footprint
 samples to preserve that clearance and reject unsupported fixed feet/ramp sites. `landing_geometry.rs` is generated from the same authored GLB
 as the character collision layout.
 The current 18.33 × 4.00 × 20.00 m hull uses a conservative 16 m collision sphere;
-this same clearance is included when completing automatic takeoff.
+the 50 m local takeoff rise clears this sphere at the validated landed site.
 Snapshot velocity reflects direct flight or the analytic derivative of the active
 assist segment, including zero during alignment and at rest. The ship
 combines that velocity with world-owned surface-distance/radial helpers to report
@@ -272,9 +273,9 @@ axis (at most 1681 candidates). No safe site rejects before energy debit; no
 power leaves the ship grounded. Rotation begins only after clearance.
 
 All assistance snapshots report analytic vector velocity, including relocation.
-Landing completes Landed with velocity and throttle zero. Takeoff clearance
-accelerates smoothly from rest and hands its analytic terminal outward velocity
-to Flying, throttle zero. Updates split at completion and apply remaining time
+Landing completes Landed with velocity and throttle zero. Takeoff ends at rest after a 50 m local rise, hands the same zero analytic
+velocity to Flying, and sets throttle zero. It remains inside the landing
+eligibility shell; a powered pilot can immediately command thrust or land again. Updates split at completion and apply remaining time
 to normal flight/idle consumption; partitioned inertial world-coordinate updates
 retain normal distant-anchor f64 quantization. Door interlocks are unchanged.
 

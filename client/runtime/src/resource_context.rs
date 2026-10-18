@@ -1,5 +1,5 @@
 //! Applicable resource text and absolute object anchors; no projection or GPU policy.
-use crate::mining::MiningTool;
+use crate::mining::ResourceGameplay;
 use salimon_character::{CharacterLocation, CharacterSnapshot, ShipFrame};
 use salimon_world::resources::DepositState;
 
@@ -9,7 +9,7 @@ pub(crate) struct Prompt {
 }
 
 pub(crate) fn context(
-    tool: &MiningTool,
+    tool: &ResourceGameplay,
     equipment: &crate::equipment::EquipmentToolbar,
     player: CharacterSnapshot,
     frame: ShipFrame,
@@ -62,7 +62,7 @@ pub(crate) fn context(
         };
         let prompt = if !equipment.mining_equipped() {
             "1 to equip mining tool"
-        } else if tool.held {
+        } else if tool.input.held {
             "Mining - release left mouse to stop"
         } else {
             "Hold left mouse to mine - 2-5 to stow"

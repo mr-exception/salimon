@@ -15,7 +15,7 @@ dependencies; each crate's architecture/invariants defines its local contracts.
 
 | Boundary | Implemented ownership |
 | --- | --- |
-| `client/runtime/` | Native lifecycle, input, clocks, domain composition, automation, resource presentation and physical-object frame/session adapters |
+| `client/runtime/` | Native shell/lifecycle/evidence IO plus portable GameplaySession commands, snapshots, stepping, resource/cargo adapters and presentation mapping |
 | `client/world/` | Static six-body compressed catalog, `f64` coordinates/camera tour, resource contracts, generation, extraction/session deltas, fragments and one-object carrying |
 | `client/ship/` | Pose, cockpit authority, inertial force-based flight, uncancellable landing/takeoff, airlock interlocks and live telemetry |
 | `client/physics/` | Portable small-object gravity, ejection/release velocity, authored convex contacts and angular motion, restitution and deterministic substeps; caller-supplied surfaces/geometry |
@@ -76,7 +76,7 @@ or shared frame/normalization policy would obscure existing domain contracts.
 | --- | --- |
 | character vector consumers; ship `src/orientation.rs`, `controller/{flight,assist}.rs` | Identical add/sub/scale/dot/right-handed cross; import shared primitives. Ship's length has the same X/Y/Z sum-of-squares order and is imported under its existing name. |
 | physics `src/lib.rs` (extracted from runtime `fragment_physics.rs`); runtime `carrying.rs` | Fragment component arithmetic/dot/cross/length has the same order and semantics; import it. Carrying imports the identical cross product. |
-| runtime `app/interaction.rs` (formerly in `app.rs`) | Subtract/dot/length also compatible, but leave these composition helpers outside the limited first migration. |
+| runtime `session/interaction.rs` | Subtract/dot/length also compatible, but leave these composition helpers outside the limited first migration. |
 | world `src/coordinates.rs`, `geometry.rs`, `mining.rs`, `resource_fragments.rs` | Length/dot/cross are compatible candidates, left local for now to avoid extending the first migration into world ownership. `WorldPosition`, subtraction/rebasing and resource pose validation remain world-owned. |
 | world `resource_generation.rs` | Chained `hypot` length deliberately differs from naive sum of squares; retain overflow-safe deterministic generation math. |
 | character/ship/fragment normalization | Current magnitude cutoff is `> 1e-12`, but fallbacks belong to the caller (character/fragment +Y; ship caller-selected). Keep local functions and their exact comparison/arithmetic, including existing NaN/overflow behavior. Character rejection/interpolation/tangent selection stay local. |

@@ -1,8 +1,9 @@
 //! CPU-only, deterministic workloads over production runtime/domain adapters.
 use crate::{
-    app::{ClientApplication, character_ship_frame},
     e2e::{self, Scenario},
     flight_regression,
+    session::GameplaySession,
+    session::frames::character_ship_frame,
 };
 use serde_json::{Value, json};
 use std::time::{Duration, Instant};
@@ -53,8 +54,8 @@ pub(crate) fn run(args: &[String]) -> Result<(), String> {
     Ok(())
 }
 
-fn app(count: usize) -> Result<ClientApplication, String> {
-    let mut app = ClientApplication::default();
+fn app(count: usize) -> Result<GameplaySession, String> {
+    let mut app = GameplaySession::default();
     e2e::initialize(
         &mut app,
         e2e::Config {

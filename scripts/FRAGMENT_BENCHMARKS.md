@@ -116,8 +116,13 @@ Without a native display:
 python scripts/benchmark_fragments.py --binary artifacts/build/release/salimon-client --mode physics --machine-label cpu-only --counts 500 1000 --layouts scattered dense surface --states settled active --warmup-seconds 0 --sample-seconds 1 --output artifacts/fragment-benchmarks/cpu
 ```
 
-This times actual fragment adapters/convex physics at **16ms simulation deltas**,
-without rendering or real-time pacing. It reports CPU cost, not FPS or native
+This advances the production `GameplaySession` at **16ms simulation deltas**,
+including ship/character, mining, fragments, carrying and mass synchronization.
+Solver/adapter measurements remain separate within each full update. Historical
+pre-#309 CPU totals timed only fragment stepping and are not directly comparable
+to these full-session update totals. Reports identify this scope as
+`update_scope: gameplay_session_v1`. The CLI `--mode physics` name remains for
+compatibility. Sampling runs without rendering or real-time pacing. It reports CPU cost, not FPS or native
 frame latency. One-second windows are exploratory, frequently with too few
 samples for reliable tails. Physics-only mode runs one camera setting because
 it performs no GPU work. Run this bounded command for 500/1,000 scattered

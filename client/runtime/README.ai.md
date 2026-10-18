@@ -29,12 +29,14 @@ real second implementation requires it.
 
 ## Source routing
 
-Start in `app.rs` for lifecycle, recovery, update order or automation dispatch.
-Use its private `app/input.rs`, `interaction.rs`, `frames.rs`, `scene.rs`,
-`diagnostics.rs` and `native.rs` for the corresponding translation helpers and
-local regression tests. See the [module ownership table](architecture.md#internal-composition-modules).
-Keep cross-domain update sequencing visible in `app.rs`; a helper extraction must
-not reorder it or move domain rules into runtime mapping.
+Start in `app.rs` for native lifecycle, recovery, scheduling and evidence IO.
+Use `session.rs` for typed commands/snapshots, gameplay state and exact cross-domain
+update order; `session/frames.rs` and `session/interaction.rs` own portable adapters.
+Native key translation stays in `app/input.rs`; scene, diagnostic and prompt
+mapping stay in `app/`. See the [ownership table](architecture.md#internal-composition-modules).
+E2E/benchmark initializers and portable regressions construct `GameplaySession`
+directly. `automation::execute_session` exercises production commands without a
+native shell; `execute` adds native-only operations/observations.
 
 ## Change checklist
 
@@ -70,7 +72,7 @@ not reorder it or move domain rules into runtime mapping.
   behavior intentionally changes.
 
 F grab/drop latching and left-mouse mining held state are runtime
-composition in `app.rs`/`app/input.rs` and `mining.rs`; see runtime invariants.
+composition in `session.rs`, translated by `app/input.rs`; `mining.rs` holds the resource owner and separate tool input; see runtime invariants.
 Automation must share that route. Mining input/presentation is runtime composition; keep target validation, rate,
 source mass mutation, and session state in `salimon_world::mining`.
 
@@ -91,7 +93,7 @@ control experiment, not gameplay fixtures or replacement collision geometry.
 Run the commands and interpret limitations in the
 [benchmark guide](../../scripts/FRAGMENT_BENCHMARKS.md#resource-geometry-evaluation-160).
 
-Equipment toolbar state lives in `equipment.rs`, composed in `app.rs`. Keep
+Equipment toolbar state lives in `equipment.rs`, composed in `session.rs`. Keep
 world-session carrying checks and native/automation view gates aligned. Its
 selection is the sole equipment authority for mining, held presentation and reticle.
 Slot changes clear mining input; physical pickup clears selection and held mining.

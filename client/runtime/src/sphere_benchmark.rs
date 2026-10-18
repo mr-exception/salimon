@@ -1,5 +1,5 @@
 //! Opt-in portable measurements: production runtime adapter, no native FPS claim.
-use crate::{fragment_physics, mining::MiningTool};
+use crate::{fragment_physics, mining::ResourceGameplay};
 use salimon_character::{SHIP_FLOOR_HEIGHT_METERS, ShipFrame};
 use salimon_world::{
     CelestialBodyId, WorldPosition,
@@ -20,7 +20,7 @@ fn sphere_cpu_benchmark() {
     let mut rows = Vec::new();
     for count in [10, 100, 500] {
         for state in ["resting", "active", "pile-resting"] {
-            let mut tool = MiningTool::default();
+            let mut tool = ResourceGameplay::default();
             let material = RawMaterial::new(ResourceId::IronOre, 10.0).unwrap();
             let radius = salimon_world::resource_size::fragment_contact_radius_meters(material);
             let mut cells: Vec<_> = (0..600)

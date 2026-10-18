@@ -1,7 +1,6 @@
 //! Native physical-key translation and held control state.
 
-use salimon_character::MovementInput;
-use salimon_ship::{SteeringInput, ThrottleDirection};
+use salimon_ship::ThrottleDirection;
 use salimon_world::{CameraCommand, CelestialBodyId};
 use winit::event::ElementState;
 use winit::keyboard::{KeyCode, PhysicalKey};
@@ -66,125 +65,11 @@ impl InputPolicy {
     }
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-enum MovementKey {
-    Forward,
-    Backward,
-    Left,
-    Right,
-    Jump,
-    Descend,
-}
-
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
-pub(super) struct ShipControlInput {
-    pitch_up: bool,
-    pitch_down: bool,
-    yaw_left: bool,
-    yaw_right: bool,
-    roll_left: bool,
-    roll_right: bool,
-}
-
-impl ShipControlInput {
-    pub(super) fn steering(self) -> SteeringInput {
-        SteeringInput {
-            pitch: f64::from(i8::from(self.pitch_up) - i8::from(self.pitch_down)),
-            yaw: f64::from(i8::from(self.yaw_left) - i8::from(self.yaw_right)),
-            roll: f64::from(i8::from(self.roll_right) - i8::from(self.roll_left)),
-        }
-    }
-}
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-enum ShipControlKey {
-    PitchUp,
-    PitchDown,
-    YawLeft,
-    YawRight,
-    RollLeft,
-    RollRight,
-}
-
-fn ship_control_key(key: PhysicalKey) -> Option<ShipControlKey> {
-    match key {
-        PhysicalKey::Code(KeyCode::KeyW) => Some(ShipControlKey::PitchUp),
-        PhysicalKey::Code(KeyCode::KeyS) => Some(ShipControlKey::PitchDown),
-        PhysicalKey::Code(KeyCode::KeyA) => Some(ShipControlKey::YawLeft),
-        PhysicalKey::Code(KeyCode::KeyD) => Some(ShipControlKey::YawRight),
-        PhysicalKey::Code(KeyCode::ArrowLeft) => Some(ShipControlKey::RollLeft),
-        PhysicalKey::Code(KeyCode::ArrowRight) => Some(ShipControlKey::RollRight),
-        _ => None,
-    }
-}
-
-pub(super) fn is_ship_control_key(key: PhysicalKey) -> bool {
-    ship_control_key(key).is_some()
-}
-
-/// Denied input is cleared instead of retained for replay after power/assist return.
-pub(super) fn update_powered_ship_control_input(
-    input: &mut ShipControlInput,
-    key: PhysicalKey,
-    pressed: bool,
-    allowed: bool,
-) {
-    if allowed {
-        update_ship_control_input(input, key, pressed);
-    } else {
-        *input = ShipControlInput::default();
-    }
-}
-
-pub(super) fn update_ship_control_input(
-    input: &mut ShipControlInput,
-    key: PhysicalKey,
-    pressed: bool,
-) {
-    match ship_control_key(key) {
-        Some(ShipControlKey::PitchUp) => input.pitch_up = pressed,
-        Some(ShipControlKey::PitchDown) => input.pitch_down = pressed,
-        Some(ShipControlKey::YawLeft) => input.yaw_left = pressed,
-        Some(ShipControlKey::YawRight) => input.yaw_right = pressed,
-        Some(ShipControlKey::RollLeft) => input.roll_left = pressed,
-        Some(ShipControlKey::RollRight) => input.roll_right = pressed,
-        None => {}
-    }
-}
-
 pub(super) fn throttle_direction(key: PhysicalKey) -> Option<ThrottleDirection> {
     match key {
         PhysicalKey::Code(KeyCode::ArrowUp) => Some(ThrottleDirection::Up),
         PhysicalKey::Code(KeyCode::ArrowDown) => Some(ThrottleDirection::Down),
         _ => None,
-    }
-}
-
-fn movement_key(key: PhysicalKey) -> Option<MovementKey> {
-    match key {
-        PhysicalKey::Code(KeyCode::KeyW) => Some(MovementKey::Forward),
-        PhysicalKey::Code(KeyCode::KeyS) => Some(MovementKey::Backward),
-        PhysicalKey::Code(KeyCode::KeyA) => Some(MovementKey::Left),
-        PhysicalKey::Code(KeyCode::KeyD) => Some(MovementKey::Right),
-        PhysicalKey::Code(KeyCode::Space) => Some(MovementKey::Jump),
-        PhysicalKey::Code(KeyCode::ShiftLeft) => Some(MovementKey::Descend),
-        _ => None,
-    }
-}
-
-pub(super) fn is_movement_key(key: PhysicalKey) -> bool {
-    movement_key(key).is_some()
-}
-
-pub(super) fn update_movement_input(input: &mut MovementInput, key: PhysicalKey, pressed: bool) {
-    match movement_key(key) {
-        Some(MovementKey::Forward) => input.forward = pressed,
-        Some(MovementKey::Backward) => input.backward = pressed,
-        Some(MovementKey::Left) => input.left = pressed,
-        Some(MovementKey::Right) => input.right = pressed,
-        Some(MovementKey::Jump) => input.jump = pressed,
-        Some(MovementKey::Descend) => input.descend = pressed,
-        None => {}
     }
 }
 
@@ -237,6 +122,62 @@ pub(super) fn camera_command(
             Some(CameraCommand::InspectBody(CelestialBodyId::Mars))
         }
         _ => None,
+    }
+}
+
+/// Native key translation only; portable session owns command semantics.
+pub(super) fn control_key(key: PhysicalKey) -> Option<crate::session::ControlKey> {
+    use crate::session::ControlKey::*;
+    Some(match key {
+        PhysicalKey::Code(KeyCode::KeyW) => Forward,
+        PhysicalKey::Code(KeyCode::KeyS) => Backward,
+        PhysicalKey::Code(KeyCode::KeyA) => Left,
+        PhysicalKey::Code(KeyCode::KeyD) => Right,
+        PhysicalKey::Code(KeyCode::Space) => Jump,
+        PhysicalKey::Code(KeyCode::ShiftLeft) => Descend,
+        PhysicalKey::Code(KeyCode::ArrowLeft) => RollLeft,
+        PhysicalKey::Code(KeyCode::ArrowRight) => RollRight,
+        _ => return None,
+    })
+}
+
+pub(crate) fn dispatch_session_key(
+    session: &mut crate::session::GameplaySession,
+    key: PhysicalKey,
+    pressed: bool,
+) {
+    use crate::session::Command;
+    let command = if !pressed {
+        if let Some(control) = control_key(key) {
+            Some(Command::Control(control, false))
+        } else if let Some(direction) = throttle_direction(key) {
+            Some(Command::Throttle(direction, false))
+        } else if key == PhysicalKey::Code(KeyCode::KeyF) {
+            Some(Command::GrabDrop(false))
+        } else {
+            None
+        }
+    } else if key == PhysicalKey::Code(KeyCode::F2) {
+        Some(Command::ToggleView)
+    } else if session.view_mode != crate::session::ViewMode::Gameplay {
+        camera_command(ElementState::Pressed, false, key, true).map(Command::Camera)
+    } else if key == PhysicalKey::Code(KeyCode::KeyE) {
+        Some(Command::Interact)
+    } else if key == PhysicalKey::Code(KeyCode::KeyL) {
+        Some(Command::Landing)
+    } else if let Some(camera) = camera_command(ElementState::Pressed, false, key, false) {
+        Some(Command::Camera(camera))
+    } else if let Some(direction) = throttle_direction(key) {
+        Some(Command::Throttle(direction, true))
+    } else if let Some(slot) = toolbar_slot(key) {
+        Some(Command::Select(slot))
+    } else if key == PhysicalKey::Code(KeyCode::KeyF) {
+        Some(Command::GrabDrop(true))
+    } else {
+        control_key(key).map(|key| Command::Control(key, true))
+    };
+    if let Some(command) = command {
+        session.command(command);
     }
 }
 
@@ -302,18 +243,6 @@ mod tests {
                 true
             ));
         }
-    }
-
-    #[test]
-    fn denied_steering_is_not_replayed_after_power_returns() {
-        let mut input = ShipControlInput::default();
-        let key = PhysicalKey::Code(KeyCode::KeyW);
-        update_powered_ship_control_input(&mut input, key, true, true);
-        assert_ne!(input.steering(), SteeringInput::default());
-        update_powered_ship_control_input(&mut input, key, true, false);
-        assert_eq!(input.steering(), SteeringInput::default());
-        update_powered_ship_control_input(&mut input, key, false, true);
-        assert_eq!(input.steering(), SteeringInput::default());
     }
 
     #[test]
@@ -405,31 +334,6 @@ mod tests {
             ),
             None
         );
-    }
-
-    #[test]
-    fn cockpit_keys_map_to_independent_held_axes() {
-        let mut input = ShipControlInput::default();
-        update_ship_control_input(&mut input, PhysicalKey::Code(KeyCode::KeyW), true);
-        update_ship_control_input(&mut input, PhysicalKey::Code(KeyCode::KeyA), true);
-        update_ship_control_input(&mut input, PhysicalKey::Code(KeyCode::ArrowRight), true);
-        assert_eq!(input.steering().pitch, 1.0);
-        assert_eq!(input.steering().yaw, 1.0);
-        assert_eq!(input.steering().roll, 1.0);
-        update_ship_control_input(&mut input, PhysicalKey::Code(KeyCode::KeyW), false);
-        assert_eq!(input.steering().pitch, 0.0);
-        assert!(ship_control_key(PhysicalKey::Code(KeyCode::ArrowUp)).is_none());
-    }
-
-    #[test]
-    fn a_and_d_emit_the_corrected_opposite_yaw_directions() {
-        let mut input = ShipControlInput::default();
-        update_ship_control_input(&mut input, PhysicalKey::Code(KeyCode::KeyA), true);
-        assert_eq!(input.steering().yaw, 1.0);
-
-        update_ship_control_input(&mut input, PhysicalKey::Code(KeyCode::KeyA), false);
-        update_ship_control_input(&mut input, PhysicalKey::Code(KeyCode::KeyD), true);
-        assert_eq!(input.steering().yaw, -1.0);
     }
 
     #[test]

@@ -1,6 +1,9 @@
 //! Deterministic initial populations only; all later updates use production state.
-use crate::app::{ClientApplication, character_ship_frame, surface_frame_for_ship};
 use crate::fragment_physics::{FragmentMotion, sphere_radius};
+use crate::{
+    session::GameplaySession,
+    session::frames::{character_ship_frame, surface_frame_for_ship},
+};
 use salimon_character::SHIP_FLOOR_HEIGHT_METERS;
 use salimon_world::{
     CelestialBodyId, WorldPosition,
@@ -48,7 +51,7 @@ impl Layout {
 /// Create one source per fragment through normal mass extraction. Fixture IDs,
 /// materials, sizes and rotations are independent of machine/iteration timing.
 pub(crate) fn initialize(
-    app: &mut ClientApplication,
+    app: &mut GameplaySession,
     count: usize,
     layout: Layout,
     seed: u64,
@@ -237,7 +240,7 @@ pub(crate) fn initialize(
 /// Native counterpart of the #235 10 kg production-extraction workload.
 /// Keep its mass, deck cells and 100-column pile distinct from legacy fixtures.
 fn initialize_spheres(
-    app: &mut ClientApplication,
+    app: &mut GameplaySession,
     count: usize,
     pile: bool,
     active: bool,
@@ -319,7 +322,7 @@ fn initialize_spheres(
 }
 
 /// Prepare a fixture only through production updates; never install rest poses or flags.
-pub(crate) fn settle(app: &mut ClientApplication, count: usize, limit: u64) -> Result<(), String> {
+pub(crate) fn settle(app: &mut GameplaySession, count: usize, limit: u64) -> Result<(), String> {
     // Settled fixture preparation uses the real adapter at explicit 16 ms deltas,
     // before starting the native wall-clock measurement. No sleep flags/poses
     // are installed. This avoids a slow initial fall feeding large native deltas
@@ -395,7 +398,7 @@ pub(crate) fn settle(app: &mut ClientApplication, count: usize, limit: u64) -> R
 /// Optional diagnostic export; never changes the fixture or activation state.
 /// Each checkpoint replaces the file so failed preparation retains its last state.
 fn checkpoint(
-    app: &ClientApplication,
+    app: &GameplaySession,
     frame: salimon_character::ShipFrame,
     eye: [f64; 3],
     step: u64,
@@ -423,7 +426,7 @@ mod tests {
     fn ten_kg_native_spheres_conserve_identity_mass_and_naturally_sleep() {
         for layout in [Layout::SphereDeck, Layout::SpherePile] {
             assert_eq!(Layout::parse(layout.name()).unwrap(), layout);
-            let mut app = ClientApplication::default();
+            let mut app = GameplaySession::default();
             initialize(&mut app, 500, layout, 236, false).unwrap();
             let initial = crate::benchmark::accounting(&app);
             assert_eq!(app.mining.session.fragments().len(), 500);
@@ -448,7 +451,7 @@ mod tests {
                     .all(|p| app.mining.fragment_sleep.is_sleeping(p.id()))
             );
         }
-        let mut active = ClientApplication::default();
+        let mut active = GameplaySession::default();
         initialize(&mut active, 10, Layout::SphereDeck, 236, true).unwrap();
         assert!(
             active
@@ -463,7 +466,7 @@ mod tests {
     #[test]
     fn onboard_benchmark_preserves_contained_flight_load_and_active_motion() {
         for active in [false, true] {
-            let mut app = ClientApplication::default();
+            let mut app = GameplaySession::default();
             initialize(&mut app, 500, Layout::Onboard, 199, active).unwrap();
             assert_eq!(app.mining.session.fragments().len(), 500);
             assert!((app.ship.snapshot().total_mass_kg - 100_016.0).abs() < 1e-6);
@@ -483,7 +486,7 @@ mod tests {
         }
         assert!(
             initialize(
-                &mut ClientApplication::default(),
+                &mut GameplaySession::default(),
                 501,
                 Layout::Onboard,
                 199,
@@ -496,14 +499,14 @@ mod tests {
     #[test]
     fn populations_conserve_mass_identity_variants_and_session_restore() {
         for count in [0, 10, 25, 50, 100, 250, 500, 1000] {
-            let mut app = ClientApplication::default();
+            let mut app = GameplaySession::default();
             initialize(&mut app, count, Layout::Dense, 155, true).unwrap();
             let pieces = app.mining.session.fragments();
             let total: f64 = pieces.iter().map(|p| p.material().mass_kg()).sum();
             assert_eq!(app.mining.session.extracted_mass_kg(), total);
             assert_eq!(pieces.len(), count);
             let before = pieces.to_vec();
-            let mut other = ClientApplication::default();
+            let mut other = GameplaySession::default();
             initialize(&mut other, count, Layout::Dense, 155, true).unwrap();
             assert_eq!(before, other.mining.session.fragments());
             for piece in before {

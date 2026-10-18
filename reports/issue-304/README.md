@@ -14,8 +14,20 @@ more than 10× without changing the subject's linear/angular retention. The
 semi-implicit position/gravity integration is not claimed partition invariant.
 Existing contact/sleep/conservation/zero-g regressions remain required.
 
-Local Rust checks could not run: this Linux container has no cargo/rustc and
-cannot reach the Rust distribution host. GitHub Ubuntu verification of the
-complete stack, including this change, is recorded in the #306 report.
-`git diff --check` passed. Native M1 motion/performance/visual verification remains
+## Portable validation
+
+- `cargo test -p salimon-physics --locked` against the standalone #304 baseline:
+  **69 passed, 2 opt-in ignored**. Contact, sleep/wake, zero-g and the new damping
+  regressions passed before indexing/scratch changes.
+  [Baseline verification](https://github.com/mr-exception/salimon/actions/runs/39136864104).
+- `cargo test --workspace --locked` on the first complete stack: **507 passed,
+  21 opt-in ignored**. `cargo build --workspace --locked` and
+  `cargo clippy --workspace --all-targets --locked -- -D warnings`: **passed**.
+  [Complete stack run](https://github.com/mr-exception/salimon/actions/runs/39136204385).
+- `python3 -m unittest discover -s scripts -p 'test_*.py'`: **92 passed**.
+- The first formatting check exposed new-test formatting; runner rustfmt output
+  was applied. `git diff --check`: **passed**. Rust 1.99.1/Ubuntu 24.04 were used;
+  local Rust commands were unavailable because this editing container lacks Cargo.
+
+Native M1 motion/performance/visual verification is **not run** and remains
 pending in [#313](https://github.com/mr-exception/salimon/issues/313).

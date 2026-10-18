@@ -103,6 +103,10 @@ fn fixture(count: usize, history: usize, mode: &str) -> (MiningTool, ShipControl
 fn fragment_update_costs() {
     let path = std::env::var("SALIMON_FRAGMENT_COST_REPORT").expect("set output path");
     let quick = std::env::var_os("SALIMON_FRAGMENT_COST_QUICK").is_some();
+    let sample_count: usize = std::env::var("SALIMON_FRAGMENT_COST_SAMPLES")
+        .map(|value| value.parse().expect("integer sample count"))
+        .unwrap_or(20);
+    assert!((1..=1000).contains(&sample_count));
     let mut rows = Vec::new();
     for count in if quick { vec![500] } else { vec![500, 1000] } {
         for history in if quick { vec![0] } else { vec![0, 10_000] } {
@@ -140,7 +144,7 @@ fn fragment_update_costs() {
                 }
                 let inventory:Vec<_>=tool.session.fragments()[history..].iter().map(|p|json!({"id":p.id().0,"mass_kg":p.material().mass_kg(),"resource":p.material().resource().key(),"radius_m":fragment_physics::sphere_radius(*p),"position_m":p.transform().position().meters()})).collect();
                 let mut samples = Vec::new();
-                for sample in 0..if quick { 5 } else { 20 } {
+                for sample in 0..if quick { 5 } else { sample_count } {
                     if mode == "moving-ship" {
                         frame.origin_meters[0] += 0.05;
                     }
@@ -212,6 +216,6 @@ fn fragment_update_costs() {
             }
         }
     }
-    let report = json!({"schema":1,"fixture":"fragment-attribution-305-306-v1","step_ms":16,"gpu_fps":null,"rows":rows});
+    let report = json!({"schema":1,"fixture":"fragment-attribution-305-306-v1","step_ms":16,"samples_per_case":if quick {5} else {sample_count},"gpu_fps":null,"rows":rows});
     std::fs::write(path, serde_json::to_vec_pretty(&report).unwrap()).unwrap();
 }

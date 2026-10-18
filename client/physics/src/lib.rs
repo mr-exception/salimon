@@ -1630,16 +1630,24 @@ mod tests {
     fn reused_solver_arrays_match_fresh_arrays_through_population_changes() {
         let mut scratch = SolverScratch::default();
         for count in [8, 2, 16, 1] {
-            let initial: Vec<_> = (0..count).map(|i| ObjectState {
-                position: [i as f64 * 0.15, 0.15, 0.0],
-                surface: Surface::Floor { height_meters: 0.0 },
-                ..cap_sphere()
-            }).collect();
+            let initial: Vec<_> = (0..count)
+                .map(|i| ObjectState {
+                    position: [i as f64 * 0.15, 0.15, 0.0],
+                    surface: Surface::Floor { height_meters: 0.0 },
+                    ..cap_sphere()
+                })
+                .collect();
             let mut retained = initial.clone();
             let mut fresh = initial;
             for _ in 0..12 {
-                advance_impl::<false>(&mut retained, Duration::from_millis(16), |_,_| true, None, &mut scratch);
-                advance(&mut fresh, Duration::from_millis(16), |_,_| true);
+                advance_impl::<false>(
+                    &mut retained,
+                    Duration::from_millis(16),
+                    |_, _| true,
+                    None,
+                    &mut scratch,
+                );
+                advance(&mut fresh, Duration::from_millis(16), |_, _| true);
                 assert_eq!(retained, fresh);
             }
             assert!(scratch.gravity_velocities.capacity() >= count);

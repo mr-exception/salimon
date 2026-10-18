@@ -43,7 +43,7 @@ jobs:
           echo FORMAT_PATCH_START
           git diff --binary
           echo FORMAT_PATCH_END
-          cargo test -p salimon-physics --locked
+          cargo test -p salimon-physics -p salimon-world --locked
           cargo clippy --workspace --all-targets --locked -- -D warnings
           python3 -m unittest discover -s scripts -p 'test_*.py'
 
@@ -52,7 +52,15 @@ jobs:
           sudo apt-get install -y --no-install-recommends heaptrack
           mkdir -p artifacts
           cargo test --release -p salimon-world --locked fragment_index_cost -- --ignored --nocapture | tee artifacts/index-cost.log
-          python3 scripts/fragment_update_attribution.py --before 9f6fdf7dee6ca1075762b9b55b5c7df204f89c9a --after HEAD --output artifacts/fragment-attribution --heaptrack
+          SALIMON_FRAGMENT_COST_SAMPLES=5 python3 scripts/fragment_update_attribution.py --before 9f6fdf7dee6ca1075762b9b55b5c7df204f89c9a --after HEAD --output artifacts/fragment-attribution --heaptrack
+      - name: Journal attribution
+        run: |
+          probe_root=$(mktemp -d)
+          git worktree add --detach "$probe_root/source" 9f6fdf7dee6ca1075762b9b55b5c7df204f89c9a
+          cp client/world/tests/fragment_journal_cost.rs "$probe_root/source/client/world/tests/fragment_journal_cost.rs"
+          CARGO_TARGET_DIR="$GITHUB_WORKSPACE/target" cargo test --manifest-path "$probe_root/source/Cargo.toml" --release -p salimon-world --locked --test fragment_journal_cost -- --ignored --nocapture | tee artifacts/journal-before.log
+          git worktree remove --force "$probe_root/source"
+          SALIMON_EXPECT_QUIET_JOURNAL=1 cargo test --release -p salimon-world --locked --test fragment_journal_cost -- --ignored --nocapture | tee artifacts/journal-after.log
       - name: Retain portable evidence
         if: always()
         run: |
@@ -61,7 +69,7 @@ jobs:
           import base64,gzip
           root=Path("artifacts")
           for path in sorted(root.rglob("*")):
-              if path.name in ("timings.json.gz","metadata.json","allocations.txt","index-cost.log","allocation-fixture.json"):
+              if path.name in ("timings.json.gz","metadata.json","allocations.txt","index-cost.log","allocation-fixture.json","journal-before.log","journal-after.log"):
                   print("EVIDENCE_START "+str(path))
                   print(base64.b64encode(gzip.compress(path.read_bytes())).decode())
                   print("EVIDENCE_END")
@@ -73,3 +81,4 @@ jobs:
           path: |
             artifacts/fragment-attribution
             artifacts/index-cost.log
+            artifacts/journal-*.log

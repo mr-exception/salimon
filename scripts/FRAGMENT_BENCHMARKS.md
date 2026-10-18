@@ -594,3 +594,13 @@ harness. Retain its allocation stacks/totals; they are **not** per-tick counters
 Six per-body solver arrays and adapter vector capacity reuse have separate
 regressions. Remaining activation/contact allocations are not hidden. CPU timing
 and allocation observations never establish native M1 visuals or FPS (#313).
+
+`SALIMON_FRAGMENT_COST_SAMPLES=N` optionally shortens the per-case CPU sample
+count (default 20); record it and use the same value for both refs. Short samples
+are descriptive attribution, not a tail-latency or performance-budget gate.
+The independent `fragment_journal_cost` integration test records writeback and
+journal-drain CPU time separately on checked 0.032 kg current spheres. Use
+`SALIMON_EXPECT_QUIET_JOURNAL=1` only for the optimized ref's assertion; it never
+changes production behavior. The historical baseline must still emit one event
+per requested write. Heaptrack trace extraction discovers `.gz`/`.zst` output
+rather than assuming the runner's compression format.

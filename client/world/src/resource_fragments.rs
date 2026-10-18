@@ -305,8 +305,26 @@ mod mutation_tests {
             10.0,
         )
         .unwrap();
-        session.extract(&mut deposit, Duration::from_secs(1));
+        let pose = ResourceTransform::new(deposit.position(), [0.0, 0.0, 0.0, 1.0]).unwrap();
+        let mut released = None;
+        for _ in 0..400 {
+            released = session.tick_spherical(
+                true,
+                Some(&mut deposit),
+                crate::spherical_mining::SPHERE_TICK,
+                crate::spherical_mining::MiningConfig::default(),
+                pose,
+            );
+            if released.is_some() {
+                break;
+            }
+        }
+        assert_eq!(session.fragments().len(), 1);
+        assert_eq!(released, Some(session.fragments()[0].id()));
+        assert!((session.fragments()[0].material().mass_kg() - 10.0).abs() < 1e-9);
         let piece = session.fragments()[0];
+        let expected_radius = (3.0 * 10.0 / (4.0 * std::f64::consts::PI * 3500.0)).cbrt();
+        assert!((crate::resource_size::fragment_contact_radius_meters(piece.material()) - expected_radius).abs() < 1e-12);
         session.drain_fragment_changes().for_each(drop);
         assert!(session.move_loose(piece.id(), piece.transform()));
         assert_eq!(session.drain_fragment_changes().count(), 0);

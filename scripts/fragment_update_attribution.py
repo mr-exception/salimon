@@ -25,6 +25,14 @@ def run(command, cwd, env=None, stdout=None):
     subprocess.run(command, cwd=cwd, env=env, stdout=stdout, check=True, timeout=1200)
 
 
+def allocation_summary(destination):
+    traces = [path for path in destination.glob("allocations*") if path.suffix in (".gz", ".zst")]
+    if len(traces) != 1:
+        raise RuntimeError(f"expected one heaptrack trace in {destination}: {traces}")
+    with (destination / "allocations.txt").open("w") as stream:
+        run(["heaptrack_print", "-f", str(traces[0])], ROOT, stdout=stream)
+
+
 def measure(ref, label, fixture, output, target, allocations):
     directory = Path(tempfile.mkdtemp(prefix=f"salimon-fragments-{label}-"))
     tree = directory / "source"
@@ -58,10 +66,9 @@ def measure(ref, label, fixture, output, target, allocations):
                           and item.get("profile", {}).get("test") and item.get("executable"))
             env.update(SALIMON_FRAGMENT_COST_QUICK="1",
                        SALIMON_FRAGMENT_COST_REPORT=str(destination / "allocation-fixture.json"))
-            run(["heaptrack", "-o", str(destination / "allocations.gz"), binary,
+            run(["heaptrack", "-o", str(destination / "allocations"), binary,
                  "fragment_update_costs", "--ignored", "--nocapture"], tree, env)
-            with (destination / "allocations.txt").open("w") as stream:
-                run(["heaptrack_print", "-f", str(destination / "allocations.gz")], tree, env, stream)
+            allocation_summary(destination)
     finally:
         run(["git", "worktree", "remove", "--force", str(tree)], ROOT)
         shutil.rmtree(directory)
@@ -81,6 +88,8 @@ def main():
     fixture = (ROOT / "client/runtime/src/fragment_costs.rs").read_bytes()
     metadata = {"fixture_sha256": hashlib.sha256(fixture).hexdigest(),
                 "machine": platform.platform(), "processor": platform.processor(),
+                "cpu_model": next((line.split(":", 1)[1].strip() for line in Path("/proc/cpuinfo").read_text().splitlines() if line.startswith("model name")), "unknown") if Path("/proc/cpuinfo").exists() else platform.processor(),
+                "samples_per_case": int(os.environ.get("SALIMON_FRAGMENT_COST_SAMPLES", "20")),
                 "rustc": subprocess.check_output(["rustc", "-Vv"], text=True),
                 "refs": {key: subprocess.check_output(["git", "rev-parse", value], cwd=ROOT, text=True).strip()
                          for key, value in (("before", args.before), ("after", args.after))},
@@ -88,8 +97,9 @@ def main():
                 "allocation_scope": "whole quick test process, including identical fixture/setup/warmup/replay; not per-tick counts",
                 "gpu_fps": None}
     (output / "metadata.json").write_text(json.dumps(metadata, indent=2) + "\n")
-    target = ROOT / "artifacts/fragment-attribution-target"
-    for ref, label in ((args.before, "before"), (args.after, "after")):
+    labels = ((args.before, "before"), (args.after, "after"))
+    target = ROOT / "target"
+    for ref, label in labels:
         measure(ref, label, fixture, output, target, args.heaptrack)
 
 

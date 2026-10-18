@@ -24,3 +24,10 @@ Portable validation and corrected-fixture before/after CPU/allocation evidence
 are being collected on GitHub Ubuntu; the editing container has no Rust toolchain.
 Native Apple M1 visuals/motion/FPS remain pending in
 [#313](https://github.com/mr-exception/salimon/issues/313), not claimed here.
+
+`client/world/tests/fragment_journal_cost.rs` isolates no-op pose/writeback and
+journal drain from solver/adapter/mass timing. Its checked 0.032 kg current iron
+spheres use production one-tick depleted extraction; it records 20 raw samples
+for 500/1,000 writes plus independently 0/10,000 inactive identities. The same
+integration test runs at the #304 baseline and completed stack, with expected
+event counts supplied observationally by environment.

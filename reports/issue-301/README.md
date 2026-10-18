@@ -14,7 +14,7 @@ Environment: local macOS, Rust 1.89.0. No native graphical acceptance claimed.
 - Regression proof: `cargo test -p salimon-ship --locked exact_reported_removal_sequence`
   with the pre-fix implementation fails on final removal with `InvalidFlightMotion`.
   The same regression passes with the fix.
-- `cargo test --workspace --locked`: passed (594 tests; 16 existing opt-in ignores).
+- `cargo test --workspace --locked`: passed (494 tests; 16 existing opt-in ignores).
 - `cargo clippy --workspace --all-targets --locked -- -D warnings`: passed.
 - `cargo build --workspace --locked`: passed.
 - `cargo fmt --all -- --check` and `git diff --check`: passed.

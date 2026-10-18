@@ -472,6 +472,84 @@ mod mass_tests {
     use std::time::Duration;
 
     #[test]
+    fn unequal_spheres_boundary_transfers_and_final_core_removal_return_exact_dry_mass() {
+        use salimon_ship::{IntakeResult, STARTER_DRY_MASS_KG};
+        use salimon_world::spherical_mining::MiningConfig;
+        let mut tool = MiningTool::default();
+        let mut ship = ShipController::flying(
+            ShipPose {
+                position_meters: [1e12, 0.0, 0.0],
+                orientation: [0.0, 0.0, 0.0, 1.0],
+            },
+            0,
+        );
+        let frame = crate::app::character_ship_frame(ship.snapshot().pose);
+        let pose = |local| {
+            ResourceTransform::new(position(frame.local_to_world(local)), [0.0, 0.0, 0.0, 1.0])
+                .unwrap()
+        };
+        let masses = [8.88252139878047, 6.8409055493844075, 8.003999726694019];
+        for (index, mass) in masses.into_iter().enumerate() {
+            let mut deposit = ResourceDeposit::new(
+                DepositId {
+                    body: CelestialBodyId::Earth,
+                    local: index as u64,
+                },
+                RawMaterial::new(ResourceId::IronOre, mass).unwrap(),
+                position([0.0; 3]),
+                mass,
+            )
+            .unwrap();
+            let id = tool
+                .session
+                .tick_spherical(
+                    true,
+                    Some(&mut deposit),
+                    Duration::from_millis(16),
+                    MiningConfig::new(10.0, 1000.0).unwrap(),
+                    pose([-5.0, 1.0, 0.0]),
+                )
+                .unwrap();
+            assert_eq!(
+                tool.session
+                    .fragments()
+                    .last()
+                    .unwrap()
+                    .material()
+                    .mass_kg(),
+                mass
+            );
+            assert_eq!(tool.session.fragments().last().unwrap().id(), id);
+            sync_ship_mass(&mut tool, frame, &mut ship);
+        }
+        let ids: Vec<_> = tool.session.fragments().iter().map(|p| p.id()).collect();
+        for _ in 0..100 {
+            for &id in ids.iter().rev() {
+                assert!(tool.session.move_loose(id, pose([-20.0, 1.0, 0.0])));
+                sync_ship_mass(&mut tool, frame, &mut ship);
+            }
+            assert_eq!(ship.snapshot().total_mass_kg, STARTER_DRY_MASS_KG);
+            for &id in &ids {
+                assert!(tool.session.move_loose(id, pose([-5.0, 1.0, 0.0])));
+                sync_ship_mass(&mut tool, frame, &mut ship);
+            }
+        }
+        for &id in ids.iter().rev() {
+            assert!(tool.session.pick_up(id));
+            assert_eq!(
+                ship.intake_carried_fragment(&mut tool.session),
+                IntakeResult::Accepted
+            );
+            sync_ship_mass(&mut tool, frame, &mut ship);
+            ship.advance(Duration::from_secs(100));
+            assert!(!tool.ship_fragments.contains_key(&id));
+        }
+        assert!(tool.session.fragments().is_empty());
+        assert_eq!(ship.snapshot().total_mass_kg, STARTER_DRY_MASS_KG);
+        assert!(tool.ship_mass.reconciles([]));
+    }
+
+    #[test]
     fn physical_events_containment_moving_ship_carry_drop_and_despawn() {
         let mut tool = MiningTool::default();
         let mut ship = ShipController::flying_with_velocity(

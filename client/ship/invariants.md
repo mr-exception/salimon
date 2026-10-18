@@ -75,7 +75,8 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 
 25. Physical cargo mass is cached by stable identity exactly once regardless of
     carrying/storage. Invalid/zero masses are rejected transactionally. Mass
-    changes preserve velocity and thrust capacities; validation reconciliation
+    changes preserve velocity and thrust capacities; empty cargo restores exact dry
+    mass and finite residuals survive replacement/removal. Validation reconciliation
     never runs in flight updates.
 
 26. Energy exhaustion stops free-flight force at the exact cutoff and preserves

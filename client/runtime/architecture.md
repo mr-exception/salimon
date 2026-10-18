@@ -483,17 +483,36 @@ Unobserved lifecycle gap duration is not represented as gameplay debt. Saturatin
 Automation still advances the exact requested fixed delta directly, and renders
 current authoritative state; it never uses native backlog or interpolation.
 
-Before each native tick, runtime captures selected loose fragment poses in their
-simulation frames. Presentation blends previous/current centers in f64 and uses
-normalized shortest-sign quaternion interpolation. Ship-local history maps
-through the current ship frame, avoiding interpolation across rigid world-space
-ship travel. The alpha is backlog / tick, clamped to 1 under overload; using a
-modulo remainder would produce a backward sawtooth. New/growing/frame-transferred,
-carried and just-released objects bypass incompatible history. Release invalidates
-history immediately; held/drop/pickup authority and interaction queries never use
-interpolated poses. Interpolation adds up to one tick of loose-object visual delay;
-native visual quality is a separate graphical gate. Ship/camera/controller poses
-remain authoritative; this change does not smooth all native controller motion.
+Before each native tick, runtime captures ship/character snapshots and selected
+loose-fragment poses. `session/presentation.rs` keeps the last completed pair;
+rendering only reads it. One alpha (backlog / 16 ms, clamped to 1 under overload)
+drives ship, character and fragment presentation. Centers blend in `f64` and
+orientations use normalized shortest-sign quaternion interpolation. Interior
+camera positions blend in ship-local space and map through the interpolated
+ship pose, as do loose ship-local fragments. Exterior camera/fragment positions
+blend in world space. Immediate live look direction is retained, transformed
+through the render ship frame for interior views. Door fraction interpolates;
+instrument/telemetry values always come from the current snapshot.
+
+Initialization, lifecycle/view resets, cockpit entry/exit, doorway/EVA/frame
+transitions and flight-state transitions bypass history for the entire scene.
+Doorway blending uses current poses throughout. Out-of-tick ship/character pose
+changes (including automation fixture teleports) invalidate sampling. New,
+growing, frame-transferred, carried and just-released fragments bypass their
+incompatible object history, while retaining their current render-frame
+attachment. Removed entities are never retained in presentation. Carried objects,
+growing previews and held tools follow the presented camera with immediate look.
+Ship and fragment prompt eligibility still reads authority; only their anchors
+follow the presented geometry (fragment anchors retain stable IDs).
+
+Interaction, mining, physics, cargo and diagnostics authority never consume
+interpolated poses. Automation disables all gameplay interpolation, so inspection
+and image fixtures stay exact and deterministic. Rendering does not advance the
+simulation. Interpolation adds up to one tick of positional/ship-orientation
+visual delay; mouse look remains immediate. Portable synthetic 60/120/144 Hz,
+zero/multiple tick, fractional/overloaded backlog, distant-anchor and frame-reset
+regressions do not establish native smoothness or input latency. Native signoff
+remains [#314](https://github.com/mr-exception/salimon/issues/314).
 
 Native benchmark samples sum solver work/time across all completed ticks in a
 render and retain the final activation counts. Zero-tick renders record zero new

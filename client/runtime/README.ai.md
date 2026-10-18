@@ -106,9 +106,10 @@ For toolbar changes, run the carrying baseline/evidence route: it exercises all
 five selections, left-mouse mining rejection for every empty slot, equipped pickup,
 lockout and post-drop explicit selection. See [runner coverage](../../scripts/README.md#toolbar-gameplay-coverage-132).
 
-Native tick/backlog admission lives in `update_clock.rs` and `app::advance_native`;
-all domains consume the same completed tick. Fragment interpolation history lives
-in the runtime adapter and must never enter authority/interaction state. Changes
+`session/presentation.rs` owns render-only ship/character history and frame mapping;
+see the coherent presentation contract below. Native tick/backlog admission lives in `update_clock.rs` and `app::advance_native`;
+all domains consume the same completed tick. Fragment history lives
+in the resource adapter and must never enter authority/interaction state. Changes
 need stalled-clock, immediate release, local-frame and measurement aggregation
 regressions. See [the tick contract](architecture.md#bounded-gameplay-ticks-and-fragment-interpolation-159).
 

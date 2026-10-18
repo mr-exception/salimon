@@ -5,6 +5,7 @@ use salimon_world::resources::DepositState;
 
 pub(crate) struct Prompt {
     pub text: String,
+    pub fragment: Option<salimon_world::resources::FragmentId>,
     pub placement: salimon_renderer::OverlayPlacement,
 }
 
@@ -31,6 +32,7 @@ pub(crate) fn context(
             .find(|piece| piece.id() == id)?;
         let prompt = crate::carrying::context(tool, target, player)?;
         return Some(Prompt {
+            fragment: Some(id),
             placement: salimon_renderer::OverlayPlacement::World {
                 anchor_meters: piece.transform().position().meters(),
                 radius_meters: salimon_world::resource_size::fragment_contact_radius_meters(
@@ -68,6 +70,7 @@ pub(crate) fn context(
             "Hold left mouse to mine - 2-5 to stow"
         };
         return Some(Prompt {
+            fragment: None,
             placement: salimon_renderer::OverlayPlacement::World {
                 anchor_meters: deposit.position().meters(),
                 radius_meters: radius,
@@ -82,6 +85,7 @@ pub(crate) fn context(
         });
     }
     equipment.mining_equipped().then(|| Prompt {
+        fragment: None,
         text: "Aim at a deposit within 4 m - 2-5 to stow".to_owned(),
         placement: salimon_renderer::OverlayPlacement::BottomCenter,
     })

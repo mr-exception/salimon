@@ -212,3 +212,17 @@ See the [canonical dispatch policy](architecture.md#gameplay-input-dispatch-302)
 - Action-bar rasterization and transient expiration remain shell presentation.
   Session feedback is consumed immediately after dispatched native/protocol input;
   expiration follows completed simulation time, including explicit automation steps.
+
+## Coherent gameplay presentation (#310)
+
+- Render-only ship/character history uses the same clamped backlog alpha as
+  loose fragments. Interior camera/objects use the presented ship frame;
+  exterior positions retain `f64` world coordinates until renderer rebasing.
+- Live mouse look, telemetry, interaction/mining decisions and physics remain
+  current-state observations. Rendering never advances or writes simulation.
+- Lifecycle/view discontinuities, teleports and location/flight-frame transitions
+  bypass incompatible history. Doorway blending bypasses it throughout.
+- New/removed/transferred/carried/released objects never reuse incompatible
+  object history; current ship/camera attachments use presented frames.
+- E2E presentation bypasses all interpolation. Native #314 remains required for
+  smoothness/capture/latency signoff; portable schedules cannot establish it.

@@ -401,7 +401,7 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
     app.update_clock.set_fixed_step(config.step);
     app.seed = config.seed;
     app.automation_step = Some(config.step);
-    app.interpolate_fragments = false;
+    app.interpolate_presentation = false;
     Ok(())
 }
 

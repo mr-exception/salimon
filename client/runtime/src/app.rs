@@ -437,7 +437,7 @@ impl ClientApplication {
     fn reset_update_clock(&mut self) {
         self.session.update_clock.reset();
         self.session.clear_held_controls();
-        self.session.mining.fragment_previous.clear();
+        self.session.reset_presentation();
     }
 
     fn advance_native(&mut self, elapsed: Duration) -> (Duration, usize) {
@@ -502,6 +502,8 @@ impl ClientApplication {
             map_world_to_renderer(world_snapshot);
         let mut resource_meshes = Vec::new();
         let character_snapshot = self.session.character.snapshot(ship_frame, surface_frame);
+        let presentation = self.session.presentation();
+        let render_ship_frame = character_ship_frame(presentation.ship.pose);
         let monitor_message = self.session.ship.contextual_cockpit_message();
         let interaction = if self.session.view_mode == ViewMode::Gameplay
             && character_snapshot.location != CharacterLocation::Cockpit
@@ -542,6 +544,7 @@ impl ClientApplication {
         );
         let ship_context = action_bar_context(monitor_message, interaction).map(|text| {
             crate::resource_context::Prompt {
+                fragment: None,
                 text: text.to_owned(),
                 placement: if monitor_message
                     .filter(|message| {
@@ -552,7 +555,7 @@ impl ClientApplication {
                     OverlayPlacement::BottomCenter
                 } else {
                     interaction.map_or(OverlayPlacement::BottomCenter, |target| {
-                        interaction::prompt_placement(target, ship_frame)
+                        interaction::prompt_placement(target, render_ship_frame)
                     })
                 },
             }
@@ -562,9 +565,22 @@ impl ClientApplication {
         } else {
             ship_context.or(resource_context)
         };
-        let contextual_placement = contextual_action
+        let mut contextual_placement = contextual_action
             .as_ref()
             .map_or(OverlayPlacement::BottomCenter, |prompt| prompt.placement);
+        if let OverlayPlacement::World { radius_meters, .. } = contextual_placement
+            && let Some(fragment) = contextual_action
+                .as_ref()
+                .and_then(|prompt| prompt.fragment)
+                .and_then(|id| self.session.mining.session.fragment(id))
+        {
+            contextual_placement = OverlayPlacement::World {
+                anchor_meters: presentation
+                    .fragment_mesh(&self.session, *fragment)
+                    .center_meters,
+                radius_meters,
+            };
+        }
         self.action_bar
             .set_contextual(contextual_action.map(|prompt| prompt.text));
         window.set_title(&self.benchmark.as_ref().map_or_else(
@@ -573,13 +589,13 @@ impl ClientApplication {
         ));
         let ship_mesh = if self.session.view_mode == ViewMode::Gameplay {
             camera = CameraFrame {
-                position_meters: character_snapshot.eye_position_meters,
-                target_meters: character_snapshot.look_target_meters,
-                up: character_snapshot.up,
+                position_meters: presentation.character.eye_position_meters,
+                target_meters: presentation.character.look_target_meters,
+                up: presentation.character.up,
                 vertical_fov_radians: 70.0_f32.to_radians(),
                 near_plane_meters: 0.05,
             };
-            Some(map_ship_to_renderer(ship_snapshot))
+            Some(map_ship_to_renderer(presentation.ship))
         } else {
             None
         };
@@ -605,23 +621,14 @@ impl ClientApplication {
                 if self.session.mining.session.attached_sphere_id() == Some(fragment.id()) {
                     continue;
                 }
-                resource_meshes.push(if self.e2e_config.is_some() {
-                    crate::resource_presentation::fragment_mesh(fragment)
-                } else {
-                    crate::fragment_physics::interpolated_mesh(
-                        &self.session.mining,
-                        fragment,
-                        ship_frame,
-                        self.session.update_clock.interpolation(),
-                    )
-                });
+                resource_meshes.push(presentation.fragment_mesh(&self.session, fragment));
             }
         }
         if self.session.view_mode == ViewMode::Gameplay
             && let Some(preview) = self
                 .session
                 .mining
-                .growth_preview(&self.session.equipment, character_snapshot)
+                .growth_preview(&self.session.equipment, presentation.character)
         {
             resource_meshes.push(preview);
         }
@@ -674,7 +681,7 @@ impl ClientApplication {
             });
         let held_item = self
             .session
-            .held_item(character_snapshot, mining_target.is_some());
+            .held_item(presentation.character, mining_target.is_some());
         let outcome = match self
             .renderer
             .as_mut()

@@ -330,3 +330,39 @@ Unequip/interruption also releases. Phase 0 mining consumes no energy. Keep
 single-object carrying and physical mechanical Core feeding. Portable lifecycle,
 conservation, density/radius and sequencing are canonical in the
 [resource contract](../client/world/resource-contracts.md#spherical-mining-lifecycle-230).
+
+## Local takeoff and powered handoff (#295)
+
+The old fixed-six-second takeoff targeted the edge of the 0.15R landing shell.
+On Earth this moved roughly 900 km and handed about 450 km/s to flight; manual
+throttle was intentionally locked during that captured path. Increasing engine
+force cannot fix that scripted target or its retained momentum.
+
+Takeoff lifts 10 m in 2 seconds, then rises another 40 m in 4 seconds using
+smoothstep segments. It ends 50 m above the captured landed origin at rest,
+with throttle zero and immediate powered manual control. The stages peak at
+7.5 and 15 m/s respectively, each with acceleration magnitude at most 15 m/s²; position and velocity are
+continuous at the join and handoff. This local clearance is independent of the
+planetary landing-eligibility shell. There is no free-flight planetary gravity,
+so zero-throttle flight remains stationary until thrust is selected.
+
+This deliberately supersedes historical wording that takeoff must clear the
+entire planetary landing volume. Landing range remains an activation rule,
+unchanged at 0.15R and ≤20 m/s. The six-second uncancellable assist, orientation,
+door interlock, cockpit-exit continuation and isolated energy reservation remain.
+The cockpit explicitly says flight controls are locked while takeoff runs.
+
+Starter dry/cargo propulsion remains 4 MN forward, 2 MN reverse at 100,000 kg
+plus physical cargo. With 1,000 × 10 kg fragments, 110,000 kg gives 36.36 m/s²
+forward and 18.18 m/s² reverse, sufficient after a stationary handoff. Doubling
+mass gives 20/10 m/s². No force or Core upgrade is justified by this defect.
+Core capacity/initial charge remain 60/45 GJ, full engine draws 100/50 MW,
+and takeoff still reserves 600 MJ up front plus ordinary 110 kW idle demand
+(600.66 MJ total over six seconds at starter tuning). Assisted paths remain
+captured kinematics with a conservative watt-time budget, not a mass-dependent
+physical-work solver. Free-flight force, mass, power and braking remain governed
+by their existing physics/energy contracts.
+
+The [#295 report](../reports/issue-295/README.md) contains before/after production
+controller traces and exact portable validation. Native M1 flight/input/EVA
+signoff remains [#312](https://github.com/mr-exception/salimon/issues/312).

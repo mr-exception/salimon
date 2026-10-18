@@ -371,7 +371,7 @@ fn inspect(app: &ClientApplication) -> Value {
         app.e2e_config.map_or(0, |config| config.seed),
     );
     let (deposits, deposit_error) = match deposits {
-        Ok(entries) => (entries.into_iter().map(|entry| json!({
+        Ok(entries) => (entries.iter().copied().map(|entry| json!({
             "id": format!("{:?}:{}", entry.deposit.id().body, entry.deposit.id().local),
             "resource": entry.deposit.material().resource().key(),
             "position_meters": entry.deposit.position().meters(),
@@ -467,10 +467,14 @@ fn inspect(app: &ClientApplication) -> Value {
         .unwrap_or(ship.velocity_meters_per_second);
     let relative_velocity =
         std::array::from_fn::<_, 3, _>(|i| player_velocity[i] - ship.velocity_meters_per_second[i]);
+    let upload_times = app.terrain_upload_times();
     let (uploaded_bytes, peak_upload_bytes) = app.terrain_uploads();
     let (ground_entries, ground_hits, ground_misses) = crate::terrain::ground_cache_stats();
     json!({
+        "terrain_upload_preparation_micros": upload_times,
+        "resource_queries": app.mining.query_metrics(),
         "ground_cache": {"entries":ground_entries,"hits":ground_hits,"misses":ground_misses},
+        "visual_context": app.visual_context(),
         "view_mode": app.view_name(),
         "window": app.window_state(),
         "capture_status": app.capture_status,
@@ -479,6 +483,10 @@ fn inspect(app: &ClientApplication) -> Value {
             "cache_patches": app.terrain_stream.cached(), "pending_patches": app.terrain_stream.pending,
             "gpu_ready": app.terrain_gpu_ready(), "presentation_ready":app.terrain_presentation_ready(), "triangles": app.terrain_stream.triangles(), "cpu_cache_bytes": app.terrain_stream.cpu_bytes(),
             "gpu_cache_bytes": app.terrain_gpu_bytes(), "generated_last_frame": app.terrain_stream.generated,
+            "selection_last_frame_micros": app.terrain_stream.selection_micros,
+            "preparation_last_frame_micros": app.terrain_stream.preparation_micros,
+            "preparation_peak_micros": app.terrain_stream.preparation_peak_micros,
+            "preparation_overruns": app.terrain_stream.preparation_overruns,
             "generation_last_frame_micros": app.terrain_stream.generation_micros,
             "generation_peak_micros":app.terrain_stream.generation_peak_micros,
             "generation_total_micros":app.terrain_stream.generation_total_micros,

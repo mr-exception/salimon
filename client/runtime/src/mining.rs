@@ -1,5 +1,9 @@
 //! Tool input and session extraction composition; no general resource inventory.
-use std::time::Duration;
+use std::{
+    cell::RefCell,
+    rc::Rc,
+    time::{Duration, Instant},
+};
 
 use salimon_character::{CharacterLocation, CharacterSnapshot, ShipFrame};
 use salimon_renderer::HeldItemInstance;
@@ -8,10 +12,23 @@ use salimon_world::mining::{MiningRay, MiningSession, MiningTarget, aimed_deposi
 use salimon_world::resource_generation::{GenerationError, SurfaceDeposit};
 
 #[derive(Default)]
+struct NearbyCache {
+    key: Option<([u64; 3], u64, salimon_world::terrain::TerrainMode)>,
+    raw: Vec<SurfaceDeposit>,
+    revision: Option<u64>,
+    reconciled: Rc<Vec<SurfaceDeposit>>,
+    queries: u64,
+    reconciliations: u64,
+    candidate_micros: u128,
+    reconciliation_micros: u128,
+}
+
+#[derive(Default)]
 pub(crate) struct MiningTool {
     pub(crate) ship_gravity_disabled: bool,
     pub(crate) ship_mass: salimon_ship::ShipMass,
     pub(crate) terrain: salimon_world::terrain::TerrainMode,
+    nearby_cache: RefCell<NearbyCache>,
     placements: std::cell::RefCell<crate::resource_presentation::PlacementCache>,
     pub(crate) fragment_previous: std::collections::HashMap<
         salimon_world::resources::FragmentId,
@@ -67,15 +84,47 @@ impl MiningTool {
         &self,
         position: [f64; 3],
         seed: u64,
-    ) -> Result<Vec<SurfaceDeposit>, GenerationError> {
-        let mut entries = crate::resource_presentation::nearby_deposits_cached(
-            position,
-            seed,
-            self.terrain,
-            &self.placements,
-        )?;
-        self.session.apply_to(&mut entries);
-        Ok(entries)
+    ) -> Result<Rc<Vec<SurfaceDeposit>>, GenerationError> {
+        // Exact position bits preserve radius boundaries; look-only redraws reuse
+        // candidates but always recompute the ray/obstruction against current aim.
+        let key = (position.map(f64::to_bits), seed, self.terrain);
+        let mut cache = self.nearby_cache.borrow_mut();
+        if cache.key != Some(key) {
+            let start = Instant::now();
+            let entries = crate::resource_presentation::nearby_deposits_cached(
+                position,
+                seed,
+                self.terrain,
+                &self.placements,
+            )?;
+            cache.candidate_micros += start.elapsed().as_micros();
+            cache.queries += 1;
+            cache.raw = entries;
+            cache.key = Some(key);
+            cache.revision = None;
+        }
+        if cache.revision != Some(self.session.deposit_revision()) {
+            let start = Instant::now();
+            let mut entries = cache.raw.clone();
+            self.session.apply_to(&mut entries);
+            cache.reconciled = Rc::new(entries);
+            cache.revision = Some(self.session.deposit_revision());
+            cache.reconciliations += 1;
+            cache.reconciliation_micros += start.elapsed().as_micros();
+        }
+        Ok(Rc::clone(&cache.reconciled))
+    }
+
+    pub(crate) fn query_metrics(&self) -> serde_json::Value {
+        let cache = self.nearby_cache.borrow();
+        let placements = self.placements.borrow();
+        serde_json::json!({"candidate_queries": cache.queries,
+            "candidate_and_placement_micros": cache.candidate_micros,
+            "candidate_micros": cache.candidate_micros.saturating_sub(placements.micros),
+            "reconciliations": cache.reconciliations,
+            "reconciliation_micros": cache.reconciliation_micros,
+            "placement_misses": placements.misses,
+            "placement_micros": placements.micros})
     }
 
     pub(crate) fn target(
@@ -155,20 +204,16 @@ impl MiningTool {
                 .tick_spherical(self.held, None, delta, self.config, pose);
             return;
         };
-        let Ok(mut deposits) = self.nearby(player.eye_position_meters, seed) else {
+        let Ok(deposits) = self.nearby(player.eye_position_meters, seed) else {
             self.session.interrupt_spherical();
             return;
         };
-        let target = deposits
-            .iter_mut()
-            .find(|entry| entry.deposit.id() == target.id);
-        self.session.tick_spherical(
-            self.held,
-            target.map(|entry| &mut entry.deposit),
-            delta,
-            self.config,
-            pose,
-        );
+        let mut target = deposits
+            .iter()
+            .find(|entry| entry.deposit.id() == target.id)
+            .map(|entry| entry.deposit);
+        self.session
+            .tick_spherical(self.held, target.as_mut(), delta, self.config, pose);
     }
 
     /// Presentation of reserved mass, not an additional physical entity. Recompute
@@ -433,6 +478,173 @@ mod spherical_tests {
             .offset_from(position(moved.eye_position_meters));
         for (actual, expected) in offset.into_iter().zip([0.15, -0.20, 0.85]) {
             assert!((actual - expected).abs() < 0.0002);
+        }
+    }
+}
+
+#[cfg(test)]
+mod query_cache_tests {
+    use super::*;
+    use salimon_world::{CELESTIAL_BODIES, CelestialBodyId, terrain::TerrainMode};
+
+    #[test]
+    fn nearby_cache_reuses_results_and_reconciles_depletion_without_regenerating() {
+        let mut tool = MiningTool::default();
+        let body = CELESTIAL_BODIES
+            .iter()
+            .find(|b| b.id == CelestialBodyId::Earth)
+            .unwrap();
+        let point = body
+            .center
+            .translated([0.0, body.radius_meters + 2.0, 0.0])
+            .meters();
+        let first = tool.nearby(point, 42).unwrap();
+        assert!(!first.is_empty());
+        assert!(Rc::ptr_eq(&first, &tool.nearby(point, 42).unwrap()));
+        let mut source = first[0].deposit;
+        tool.session
+            .extract(&mut source, Duration::from_secs(100_000));
+        let restored = tool.nearby(point, 42).unwrap();
+        assert_eq!(tool.nearby_cache.borrow().queries, 1);
+        assert_eq!(restored[0].deposit.remaining_mass_kg(), 0.0);
+        assert!(
+            first[0].deposit.remaining_mass_kg() > 0.0,
+            "old frame remains immutable"
+        );
+        tool.nearby(salimon_math::add(point, [256.0, 0.0, 0.0]), 42)
+            .unwrap();
+        assert_eq!(tool.nearby(point, 42).unwrap(), restored);
+        tool.nearby(point, 43).unwrap();
+        tool.terrain = TerrainMode::Representative;
+        tool.nearby(point, 43).unwrap();
+        let moon = CELESTIAL_BODIES
+            .iter()
+            .find(|b| b.id == CelestialBodyId::Moon)
+            .unwrap();
+        tool.nearby(
+            moon.center
+                .translated([0.0, moon.radius_meters, 0.0])
+                .meters(),
+            43,
+        )
+        .unwrap();
+        assert_eq!(tool.nearby_cache.borrow().queries, 6);
+    }
+
+    #[test]
+    fn look_only_updates_recompute_aim_and_zero_time_aim_loss_releases() {
+        let mut tool = MiningTool::default();
+        let body = CELESTIAL_BODIES
+            .iter()
+            .find(|b| b.id == CelestialBodyId::Earth)
+            .unwrap();
+        let nearby = tool
+            .nearby(
+                body.center
+                    .translated([0.0, body.radius_meters, 0.0])
+                    .meters(),
+                42,
+            )
+            .unwrap();
+        let source = nearby[0];
+        let center = source.deposit.position().meters();
+        let mut player = CharacterSnapshot {
+            location: CharacterLocation::Surface,
+            eye_position_meters: salimon_math::add(
+                center,
+                [0.0, source.bounds_radius_meters + 1.0, 0.0],
+            ),
+            look_target_meters: center,
+            up: [0.0, 0.0, 1.0],
+            local_ship_position_meters: None,
+            doorway_blend_fraction: None,
+        };
+        let frame = ShipFrame {
+            origin_meters: [0.0; 3],
+            axes: [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+        };
+        let mut equipment = crate::equipment::EquipmentToolbar::default();
+        equipment.select(crate::equipment::ToolbarSlot::One, false);
+        tool.held = true;
+        assert!(tool.target(&equipment, player, frame, false, 42).is_some());
+        tool.advance(
+            &equipment,
+            Duration::from_millis(16),
+            player,
+            frame,
+            false,
+            42,
+        );
+        assert!(tool.session.attached_sphere_id().is_some());
+        let queries = tool.nearby_cache.borrow().queries;
+        player.look_target_meters = salimon_math::add(player.eye_position_meters, [0.0, 10.0, 0.0]);
+        assert!(tool.target(&equipment, player, frame, false, 42).is_none());
+        tool.advance(&equipment, Duration::ZERO, player, frame, false, 42);
+        assert!(tool.session.attached_sphere_id().is_none());
+        assert_eq!(tool.nearby_cache.borrow().queries, queries);
+    }
+
+    #[test]
+    #[ignore = "opt-in CPU timing; does not certify native performance"]
+    fn preparation_profile() {
+        let tool = MiningTool {
+            terrain: TerrainMode::Representative,
+            ..Default::default()
+        };
+        let mut stream = crate::terrain_patches::TerrainStream::default();
+        for body in CELESTIAL_BODIES.iter().filter(|b| {
+            [
+                CelestialBodyId::Earth,
+                CelestialBodyId::Moon,
+                CelestialBodyId::Mars,
+            ]
+            .contains(&b.id)
+        }) {
+            for offset in [0.0, 256.0, 1200.0, 0.0] {
+                let radial = [offset, body.radius_meters, 0.0];
+                let direction = salimon_math::scale(radial, 1.0 / salimon_math::length(radial));
+                let ground = TerrainMode::Representative.sample(*body, direction);
+                let point = body
+                    .center
+                    .translated(salimon_math::add(
+                        ground.body_local_position_meters,
+                        salimon_math::scale(ground.outward_normal, 2.0),
+                    ))
+                    .meters();
+                let start = Instant::now();
+                let entries = tool.nearby(point, 42).unwrap();
+                let cold = start.elapsed();
+                let start = Instant::now();
+                for _ in 0..100 {
+                    tool.nearby(point, 42).unwrap();
+                }
+                let reuse = start.elapsed();
+                stream.update(point, TerrainMode::Representative).unwrap();
+                eprintln!(
+                    "{} {offset}: {} deposits cold={cold:?} reuse100={reuse:?} selection={}us preparation={}us",
+                    body.name,
+                    entries.len(),
+                    stream.selection_micros,
+                    stream.preparation_micros
+                );
+                for _ in 0..600 {
+                    stream.update(point, TerrainMode::Representative).unwrap();
+                    if stream.pending == 0 {
+                        break;
+                    }
+                }
+                assert_eq!(stream.pending, 0);
+                for _ in 0..20 {
+                    stream.update(point, TerrainMode::Representative).unwrap();
+                }
+                eprintln!(
+                    "terrain steady preparation={}us peak={}us overruns={} metrics={}",
+                    stream.preparation_micros,
+                    stream.preparation_peak_micros,
+                    stream.preparation_overruns,
+                    tool.query_metrics()
+                );
+            }
         }
     }
 }

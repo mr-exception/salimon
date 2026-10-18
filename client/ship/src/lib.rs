@@ -49,7 +49,7 @@ pub const COLLISION_RADIUS_METERS: f64 = 16.0;
 pub const LANDING_RANGE_RADIUS_FRACTION: f64 = LANDING_RANGE_ALTITUDE_RADIUS_FACTOR;
 /// Landing spends two seconds aligning, four approaching, and two touching down.
 pub const LANDING_ASSIST_DURATION: Duration = Duration::from_secs(8);
-/// Takeoff spends two seconds lifting locally and four clearing the landing volume.
+/// Takeoff spends two seconds lifting 10 m and four rising another 40 m, ending at rest.
 pub const TAKEOFF_ASSIST_DURATION: Duration = Duration::from_secs(6);
 /// Inclusive nominal-surface distance for the cockpit's nearby-body sensor.
 pub use salimon_world::NEARBY_BODY_MAX_SURFACE_DISTANCE_METERS;

@@ -339,3 +339,11 @@ Every existing session fragment maps to the shared sphere regardless of its ID
 or previous chunk/shard parity. Old GLBs remain available solely for historical
 asset/cost comparisons, never live collision selection. Unknown material keys
 still fail validation rather than silently changing resource identity.
+
+## Deposit query revision (#307)
+
+`MiningSession::deposit_revision` changes on successful legacy or spherical
+extraction only. It invalidates runtime's reconciled nearby results immediately;
+fragment pose/carry/release changes leave deposit results reusable. A new world
+session creates a new runtime MiningTool (and cache). Terrain definitions stay
+immutable; position, seed and terrain mode are runtime candidate-cache inputs.

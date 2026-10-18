@@ -25,10 +25,13 @@ with `Close door before takeoff`.
 Landing takes 8 seconds: 2 seconds to smoothly align the hull while holding its
 position, 4 seconds to approach a low hover, and 2 seconds to touch down. The
 final descent covers at most 15 m (a quarter of the available height for a close
-approach). Takeoff takes 6 seconds: a readable 15 m lift over 2 seconds, then
-4 seconds to clear the landing volume plus the collision radius. Each movement
-phase joins at rest except final takeoff clearance, which hands its analytic
-terminal velocity into inertial flight. Alignment follows the shortest quaternion
+approach). Takeoff lifts 10 m in 2 seconds, then rises another 40 m in 4 seconds using
+smoothstep segments. It ends 50 m above the captured landed origin at rest,
+with throttle zero and immediate powered manual control. The stages peak at
+7.5 and 15 m/s respectively, each with acceleration magnitude at most 15 m/s²; position and velocity are
+continuous at the join and handoff. This local clearance is independent of the
+planetary landing-eligibility shell. There is no free-flight planetary gravity,
+so zero-throttle flight remains stationary until thrust is selected. Alignment follows the shortest quaternion
 arc. Timing uses supplied elapsed time, including frames longer than 100 ms;
 no orientation or position change occurs on activation.
 

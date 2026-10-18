@@ -52,6 +52,8 @@ pub(crate) struct TerrainRenderer {
     uniform: wgpu::Buffer,
     bind: wgpu::BindGroup,
     uniform_stride: usize,
+    upload_preparation_micros: u128,
+    peak_upload_preparation_micros: u128,
     uploaded_bytes: usize,
     peak_upload_bytes: usize,
     fade_body: Option<u8>,
@@ -188,6 +190,8 @@ impl TerrainRenderer {
             uniform,
             bind,
             uniform_stride,
+            upload_preparation_micros: 0,
+            peak_upload_preparation_micros: 0,
             uploaded_bytes: 0,
             peak_upload_bytes: 0,
             fade_body: None,
@@ -204,6 +208,7 @@ impl TerrainRenderer {
         scene: crate::SceneFrame<'_>,
         matrix: [f32; 16],
     ) -> Result<(), RendererError> {
+        let started = std::time::Instant::now();
         let camera = scene.camera;
         let patches = scene.terrain;
         let light = scene.light;
@@ -360,6 +365,10 @@ impl TerrainRenderer {
         if !uniforms.is_empty() {
             queue.write_buffer(&self.uniform, 0, &uniforms);
         }
+        self.upload_preparation_micros = started.elapsed().as_micros();
+        self.peak_upload_preparation_micros = self
+            .peak_upload_preparation_micros
+            .max(self.upload_preparation_micros);
         self.uploaded_bytes = uploaded;
         self.peak_upload_bytes = self.peak_upload_bytes.max(uploaded);
         Ok(())
@@ -376,6 +385,12 @@ impl TerrainRenderer {
     }
     pub(crate) fn presentation_ready(&self, patches: &[Arc<TerrainPatch>]) -> bool {
         self.ready(patches) && (patches.is_empty() || self.fraction >= 1.0)
+    }
+    pub(crate) fn upload_times(&self) -> (u128, u128) {
+        (
+            self.upload_preparation_micros,
+            self.peak_upload_preparation_micros,
+        )
     }
     pub(crate) fn uploads(&self) -> (usize, usize) {
         (self.uploaded_bytes, self.peak_upload_bytes)

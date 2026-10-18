@@ -4,6 +4,10 @@ import argparse
 import json
 from pathlib import Path
 import shutil
+import platform
+import subprocess
+
+from visual_corpus import candidate, digest, reviewed_status, write_json
 
 
 def expanded_scenario(fixture):
@@ -122,6 +126,10 @@ def capture(fixture, binary, output):
     result = run(expanded, [str(Path(binary).resolve())], output/'runs', ['native'])
     if result['status'] != 'passed':
         raise ValueError(f"production capture failed: {result.get('error', result)}")
+    contexts = [step['state']['visual_context'] for step in result['steps'] if step.get('screenshot')]
+    if not contexts or any(context != contexts[0] for context in contexts):
+        raise ValueError('renderer context changed during fixture capture')
+    result['visual_context'] = {**contexts[0], 'platform': platform.platform()}
     for previous in output.glob('*.png'):
         previous.unlink()
     for step in result['steps']:
@@ -136,23 +144,56 @@ def main():
     parser.add_argument('command', choices=['capture', 'compare'])
     parser.add_argument('--fixtures', type=Path, default=Path('scenarios/visual/fixtures.json'))
     parser.add_argument('--binary', type=Path)
+    parser.add_argument('--reviewed', action='store_true', help='validate reviewed corpus metadata before appearance comparison; exit 3 means pending coverage')
     parser.add_argument('--temporal-only', action='store_true', help='check repeat stability only; does not approve visual appearance')
     parser.add_argument('--captures', type=Path, default=Path('artifacts/model-visual/candidates'))
-    parser.add_argument('--baselines', type=Path, default=Path('scenarios/visual/baselines/option-a'))
+    parser.add_argument('--baselines', type=Path, default=Path('scenarios/visual/baselines/software-vulkan-option-a-v1'))
     parser.add_argument('--output', type=Path, default=Path('artifacts/model-visual/diffs'))
     args = parser.parse_args()
     if args.command == 'capture' and not args.binary:
         parser.error('capture requires --binary')
+    if args.reviewed and (args.command != 'compare' or args.temporal_only):
+        parser.error('--reviewed requires appearance comparison')
     try:
-        results = []
-        for name, fixture in json.loads(args.fixtures.read_text()).items():
+        fixtures = json.loads(args.fixtures.read_text())
+        results, contexts = [], []
+        if args.command == 'capture':
+            existing = args.captures/'corpus.json'
+            if existing.exists() and json.loads(existing.read_text()).get('status') == 'approved':
+                raise ValueError('capture cannot overwrite an approved corpus')
+            if args.baselines.resolve() == args.captures.resolve() or args.baselines.resolve() in args.captures.resolve().parents:
+                raise ValueError('capture candidates must be separate from baseline images')
+        if args.reviewed:
+            # Completeness is required even before human review has happened.
+            for name, fixture in fixtures.items():
+                if not evaluate(args.captures/name, args.baselines/name, args.output/name, fixture, True)['passed']:
+                    raise ValueError('temporal stability failed before appearance comparison')
+            coverage = reviewed_status(args.captures, args.baselines, fixtures)
+            if coverage['status'] != 'approved':
+                write_json(args.output/'appearance.json', coverage)
+                print(json.dumps(coverage))
+                return 3
+        for name, fixture in fixtures.items():
             if args.command == 'capture':
-                capture(fixture, args.binary, args.captures/name)
+                contexts.append(capture(fixture, args.binary, args.captures/name)['visual_context'])
             else:
                 results.append(evaluate(args.captures/name, args.baselines/name, args.output/name, fixture, args.temporal_only))
-        return 0 if all(r['passed'] for r in results) else 1
-    except (OSError, ValueError) as exc:
+        if args.command == 'capture':
+            if not contexts or any(context != contexts[0] for context in contexts):
+                raise ValueError('fixtures used different renderer contexts')
+            revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+            if subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=no'], text=True).strip():
+                raise ValueError('baseline candidates require a clean tracked source revision')
+            write_json(args.captures/'corpus.json', candidate(args.captures, fixtures, contexts[0], revision, digest(args.binary)))
+        passed = all(r['passed'] for r in results)
+        if args.reviewed:
+            write_json(args.output/'appearance.json', {**coverage, 'status': 'passed' if passed else 'failed', 'passed': passed})
+        return 0 if passed else 1
+    except (OSError, ValueError, KeyError, TypeError, subprocess.CalledProcessError) as exc:
+        if args.reviewed:
+            write_json(args.output/'appearance.json', {'status': 'failed', 'passed': False, 'reason': str(exc)})
         parser.exit(1, f'{exc}\n')
+
 
 
 if __name__ == '__main__':

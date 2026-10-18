@@ -18,7 +18,7 @@
     {"assert": {"path": "ship.flight_state", "equals": "AssistedTakeoff { body: Earth }"}},
     {"action": {"op": "step", "frames": 60}},
     {"assert": {"path": "ship.flight_state", "equals": "Flying"}},
-    {"assert": {"path": "ship.speed_meters_per_second", "gt": 0}},
+    {"assert": {"path": "ship.speed_meters_per_second", "equals": 0}},
     {"assert": {"path": "ship.thruster_percentage", "equals": 0}},
     {"screenshot": "crash-recovery"}
   ]

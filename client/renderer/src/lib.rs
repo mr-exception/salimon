@@ -150,6 +150,7 @@ impl SurfaceSize {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct RendererInfo {
     pub adapter_name: String,
+    pub driver: String,
     pub backend: String,
     pub device_type: String,
     pub timestamp_queries_supported: bool,
@@ -667,6 +668,11 @@ impl Renderer {
     pub fn terrain_presentation_ready(&self, patches: &[std::sync::Arc<TerrainPatch>]) -> bool {
         self.terrain.presentation_ready(patches)
     }
+    /// CPU preparation including buffer creation and queue writes; not GPU execution time.
+    pub fn terrain_upload_times(&self) -> (u128, u128) {
+        self.terrain.upload_times()
+    }
+
     pub fn terrain_uploads(&self) -> (usize, usize) {
         self.terrain.uploads()
     }
@@ -707,6 +713,7 @@ impl Renderer {
         let adapter_info = adapter.get_info();
         let info = RendererInfo {
             adapter_name: adapter_info.name,
+            driver: format!("{} / {}", adapter_info.driver, adapter_info.driver_info),
             backend: format!("{:?}", adapter_info.backend),
             device_type: format!("{:?}", adapter_info.device_type),
             timestamp_queries_supported,

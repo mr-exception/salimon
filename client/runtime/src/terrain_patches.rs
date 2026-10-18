@@ -14,6 +14,7 @@ use std::{
 pub(crate) const MAX_ACTIVE_PATCHES: usize = 512;
 pub(crate) const MAX_CACHE_PATCHES: usize = 1024;
 pub(crate) const MAX_GENERATED_PER_FRAME: usize = 8;
+pub(crate) const PREPARATION_BUDGET_MICROS: u128 = 2000;
 const GRID: u32 = 16;
 const COVERAGE_METERS: f64 = 8192.0;
 const MASK_METERS: f64 = 4096.0;
@@ -77,7 +78,13 @@ impl Cell {
         })
     }
 }
-fn select(cell: Cell, radius: f64, anchor: [f64; 3], leaves: &mut BTreeSet<Cell>) {
+fn select(
+    cell: Cell,
+    radius: f64,
+    anchor: [f64; 3],
+    leaves: &mut BTreeSet<Cell>,
+    pending: &mut Vec<Cell>,
+) {
     let center = scale(cell.direction(0.5, 0.5), radius);
     let corners = [(0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0)]
         .map(|(u, v)| scale(cell.direction(u, v), radius));
@@ -93,9 +100,7 @@ fn select(cell: Cell, radius: f64, anchor: [f64; 3], leaves: &mut BTreeSet<Cell>
         return;
     }
     if cell.level < 24 && size > (distance * 0.45).clamp(64.0, 4096.0) {
-        for child in cell.children() {
-            select(child, radius, anchor, leaves);
-        }
+        pending.extend(cell.children());
     } else {
         leaves.insert(cell);
     }
@@ -129,20 +134,19 @@ fn neighbor(cell: Cell, edge: usize, leaves: &BTreeSet<Cell>) -> Option<Cell> {
         .filter_map(|i| neighbor_at(cell, edge, (f64::from(i) + 0.5) / 8.0, leaves))
         .max_by_key(|c| c.level)
 }
+#[cfg(test)]
 fn balanced_selection(radius: f64, anchor: [f64; 3]) -> Result<BTreeSet<Cell>, String> {
     let mut leaves = BTreeSet::new();
-    for face in 0..6 {
-        select(
-            Cell {
-                face,
-                level: 0,
-                u: 0,
-                v: 0,
-            },
-            radius,
-            anchor,
-            &mut leaves,
-        );
+    let mut pending: Vec<_> = (0..6)
+        .map(|face| Cell {
+            face,
+            level: 0,
+            u: 0,
+            v: 0,
+        })
+        .collect();
+    while let Some(cell) = pending.pop() {
+        select(cell, radius, anchor, &mut leaves, &mut pending);
     }
     loop {
         let split: Vec<_> = leaves
@@ -278,16 +282,123 @@ fn generate(
         },
     }
 }
+// Cooperative CPU work, not a worker thread: bounded queues and an exact target
+// identity prevent stale partial selections from becoming visible after traversal.
+#[derive(Default)]
+enum SelectionPhase {
+    #[default]
+    Select,
+    Balance,
+    Keys,
+}
+struct SelectionWork {
+    id: (u8, Vec<u8>, [f64; 3]),
+    leaves: BTreeSet<Cell>,
+    pending: Vec<Cell>,
+    scan: Vec<Cell>,
+    split: Vec<Cell>,
+    index: usize,
+    phase: SelectionPhase,
+    keys: Vec<TerrainPatchKey>,
+}
+impl SelectionWork {
+    fn new(id: (u8, Vec<u8>, [f64; 3])) -> Self {
+        Self {
+            id,
+            leaves: BTreeSet::new(),
+            pending: (0..6)
+                .map(|face| Cell {
+                    face,
+                    level: 0,
+                    u: 0,
+                    v: 0,
+                })
+                .collect(),
+            scan: Vec::new(),
+            split: Vec::new(),
+            index: 0,
+            phase: SelectionPhase::Select,
+            keys: Vec::new(),
+        }
+    }
+    fn advance(
+        &mut self,
+        body: CelestialBody,
+        definition: &TerrainDefinition,
+        start: Instant,
+    ) -> Result<Option<Vec<TerrainPatchKey>>, String> {
+        while start.elapsed().as_micros() < PREPARATION_BUDGET_MICROS {
+            match self.phase {
+                SelectionPhase::Select => {
+                    if let Some(cell) = self.pending.pop() {
+                        select(
+                            cell,
+                            body.radius_meters,
+                            self.id.2,
+                            &mut self.leaves,
+                            &mut self.pending,
+                        );
+                        if self.leaves.len() > MAX_ACTIVE_PATCHES || self.pending.len() > 128 {
+                            return Err("terrain selection work budget exceeded".into());
+                        }
+                    } else {
+                        self.scan = self.leaves.iter().copied().collect();
+                        self.phase = SelectionPhase::Balance;
+                    }
+                }
+                SelectionPhase::Balance => {
+                    if let Some(cell) = self.scan.get(self.index).copied() {
+                        if (0..4).any(|edge| {
+                            neighbor(cell, edge, &self.leaves)
+                                .is_some_and(|n| n.level > cell.level + 1)
+                        }) {
+                            self.split.push(cell);
+                        }
+                        self.index += 1;
+                    } else if self.split.is_empty() {
+                        self.index = 0;
+                        self.phase = SelectionPhase::Keys;
+                    } else {
+                        for cell in self.split.drain(..) {
+                            self.leaves.remove(&cell);
+                            self.leaves.extend(cell.children());
+                        }
+                        if self.leaves.len() > MAX_ACTIVE_PATCHES {
+                            return Err("terrain active patch budget exceeded".into());
+                        }
+                        self.scan = self.leaves.iter().copied().collect();
+                        self.index = 0;
+                    }
+                }
+                SelectionPhase::Keys => {
+                    if let Some(cell) = self.scan.get(self.index) {
+                        self.keys.push(key(*cell, body, definition, &self.leaves));
+                        self.index += 1;
+                    } else {
+                        return Ok(Some(std::mem::take(&mut self.keys)));
+                    }
+                }
+            }
+        }
+        Ok(None)
+    }
+}
+
 #[derive(Default)]
 pub(crate) struct TerrainStream {
     cache: BTreeMap<TerrainPatchKey, (Arc<TerrainPatch>, u64)>,
     selection_id: Option<(u8, Vec<u8>, [f64; 3])>,
+    selection_work: Option<SelectionWork>,
     desired_keys: Vec<TerrainPatchKey>,
     desired_set: BTreeSet<TerrainPatchKey>,
     pub(crate) active: Vec<Arc<TerrainPatch>>,
     pub(crate) mask: Option<TerrainMask>,
     frame: u64,
     pub(crate) generated: usize,
+    pub(crate) selection_micros: u128,
+    pub(crate) preparation_micros: u128,
+    pub(crate) preparation_peak_micros: u128,
+    pub(crate) preparation_overruns: u64,
     pub(crate) generation_micros: u128,
     pub(crate) generation_peak_micros: u128,
     pub(crate) generation_total_micros: u128,
@@ -298,6 +409,9 @@ pub(crate) struct TerrainStream {
 }
 impl TerrainStream {
     pub(crate) fn update(&mut self, camera: [f64; 3], mode: TerrainMode) -> Result<(), String> {
+        let start = Instant::now();
+        self.selection_micros = 0;
+        self.preparation_micros = 0;
         self.frame += 1;
         self.generated = 0;
         self.generation_micros = 0;
@@ -312,9 +426,12 @@ impl TerrainStream {
             .min_by(|a, b| a.3.total_cmp(&b.3));
         self.has_target = target.is_some();
         let Some((body, definition, local, _)) = target else {
+            self.selection_id = None;
+            self.selection_work = None;
             self.active.clear();
             self.mask = None;
             self.pending = 0;
+            self.record_preparation(start);
             return Ok(());
         };
         let (face, u, v) = face_uv(local);
@@ -329,24 +446,48 @@ impl TerrainStream {
         let anchor = scale(direction, body.radius_meters);
         let selection_id = (body.id as u8, definition.to_bytes(), anchor);
         if self.selection_id.as_ref() != Some(&selection_id) {
-            let selection = balanced_selection(body.radius_meters, anchor)?;
-            self.desired_keys = selection
-                .iter()
-                .map(|c| key(*c, body, definition, &selection))
-                .collect();
+            let selection_started = Instant::now();
+            if self
+                .selection_work
+                .as_ref()
+                .is_none_or(|work| work.id != selection_id)
+            {
+                self.selection_work = Some(SelectionWork::new(selection_id.clone()));
+            }
+            let ready = self
+                .selection_work
+                .as_mut()
+                .expect("selection work initialized")
+                .advance(body, definition, start)?;
+            self.selection_micros = selection_started.elapsed().as_micros();
+            let Some(keys) = ready else {
+                self.pending = self.desired_keys.len().max(1);
+                if self
+                    .mask
+                    .is_some_and(|m| m.body_center_meters != body.center.meters())
+                {
+                    self.active.clear();
+                    self.mask = None;
+                }
+                self.record_preparation(start);
+                return Ok(());
+            };
+            self.desired_keys = keys;
             self.desired_set = self.desired_keys.iter().cloned().collect();
             self.selection_id = Some(selection_id);
+            self.selection_work = None;
+        } else {
+            self.selection_work = None;
         }
         let keys = &self.desired_keys;
         let desired = &self.desired_set;
-        let start = Instant::now();
         for k in keys {
             if let Some((_, age)) = self.cache.get_mut(k) {
                 *age = self.frame;
                 continue;
             }
             if self.generated >= MAX_GENERATED_PER_FRAME
-                || (self.generated > 0 && start.elapsed().as_micros() >= 2000)
+                || start.elapsed().as_micros() >= PREPARATION_BUDGET_MICROS
             {
                 continue;
             }
@@ -390,7 +531,15 @@ impl TerrainStream {
             self.active.clear();
             self.mask = None;
         }
+        self.record_preparation(start);
         Ok(())
+    }
+    fn record_preparation(&mut self, start: Instant) {
+        self.preparation_micros = start.elapsed().as_micros();
+        self.preparation_peak_micros = self.preparation_peak_micros.max(self.preparation_micros);
+        if self.preparation_micros > PREPARATION_BUDGET_MICROS {
+            self.preparation_overruns += 1;
+        }
     }
     pub(crate) fn cpu_bytes(&self) -> usize {
         self.cache
@@ -418,6 +567,17 @@ impl TerrainStream {
                 .map(|k| k.definition.capacity())
                 .sum::<usize>()
             + self.active.capacity() * std::mem::size_of::<Arc<TerrainPatch>>()
+            + self.selection_work.as_ref().map_or(0, |w| {
+                w.leaves.len() * (std::mem::size_of::<Cell>() + 32)
+                    + (w.pending.capacity() + w.scan.capacity() + w.split.capacity())
+                        * std::mem::size_of::<Cell>()
+                    + w.keys.capacity() * std::mem::size_of::<TerrainPatchKey>()
+                    + w.keys
+                        .iter()
+                        .map(|k| k.definition.capacity())
+                        .sum::<usize>()
+                    + w.id.1.capacity()
+            })
     }
     pub(crate) fn triangles(&self) -> usize {
         self.active.iter().map(|p| p.indices.len() / 3).sum()
@@ -690,5 +850,52 @@ mod topology_tests {
             }
             assert!(checked > 1000);
         }
+    }
+}
+
+#[cfg(test)]
+mod selection_work_tests {
+    use super::*;
+    #[test]
+    fn cooperative_selection_matches_reference_and_rejects_stale_body_targets() {
+        let mut stream = TerrainStream::default();
+        let mode = TerrainMode::Representative;
+        for body in CELESTIAL_BODIES
+            .iter()
+            .filter(|b| mode.definition(b.id).is_some())
+        {
+            let camera = body
+                .center
+                .translated([0.0, body.radius_meters + 2.0, 0.0])
+                .meters();
+            // Change bodies before previous work can publish a stale cap.
+            stream.update(camera, mode).unwrap();
+            if let Some(work) = &stream.selection_work {
+                assert_eq!(work.id.0, body.id as u8);
+            }
+        }
+        let body = *CELESTIAL_BODIES
+            .iter()
+            .find(|b| b.id == salimon_world::CelestialBodyId::Earth)
+            .unwrap();
+        let camera = body
+            .center
+            .translated([0.0, body.radius_meters + 2.0, 0.0])
+            .meters();
+        for _ in 0..2000 {
+            stream.update(camera, mode).unwrap();
+            if stream.pending == 0 {
+                break;
+            }
+        }
+        assert_eq!(stream.pending, 0);
+        let anchor = stream.selection_id.as_ref().unwrap().2;
+        let leaves = balanced_selection(body.radius_meters, anchor).unwrap();
+        let expected: Vec<_> = leaves
+            .iter()
+            .map(|c| key(*c, body, mode.definition(body.id).unwrap(), &leaves))
+            .collect();
+        assert_eq!(stream.desired_keys, expected);
+        assert!(stream.active.iter().all(|p| p.key.body == body.id as u8));
     }
 }

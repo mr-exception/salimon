@@ -47,6 +47,7 @@ impl MiningSession {
                 self.remaining
                     .insert(source.id(), source.remaining_mass_kg());
             }
+            self.deposit_revision += 1;
             self.extracted_mass_kg += result.added_kg;
         } else if result.released.is_none()
             && let (Some(id), Some(sphere)) = (self.attached_sphere_id, self.spherical.attached())

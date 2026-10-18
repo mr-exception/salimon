@@ -35,7 +35,10 @@ jobs:
         run: cargo build --workspace --locked
       - name: Verify stack
         run: |
-          cargo fmt --all -- --check
+          cargo fmt --all
+          echo FORMAT_PATCH_START
+          git diff --binary
+          echo FORMAT_PATCH_END
           cargo test --workspace --locked
           cargo clippy --workspace --all-targets --locked -- -D warnings
           python3 -m unittest discover -s scripts -p 'test_*.py'

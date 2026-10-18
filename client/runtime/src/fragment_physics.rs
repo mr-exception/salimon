@@ -14,6 +14,13 @@ use salimon_physics::{ObjectState, SphereSurface, Surface};
 #[cfg(test)]
 mod geometry_evaluation;
 
+#[derive(Default)]
+pub(crate) struct FragmentScratch {
+    snapshots: Vec<(salimon_world::resources::ResourceFragment, ObjectState)>,
+    states: Vec<ObjectState>,
+    ids: Vec<FragmentId>,
+}
+
 #[derive(Clone, Copy, Debug, Default)]
 pub(crate) struct FragmentMotion {
     pub(crate) velocity: [f64; 3],
@@ -38,9 +45,7 @@ pub(crate) fn release(
     } else {
         let position = tool
             .session
-            .fragments()
-            .iter()
-            .find(|p| p.id() == id)
+            .fragment(id)
             .expect("released fragment exists")
             .transform()
             .position()
@@ -49,9 +54,7 @@ pub(crate) fn release(
     };
     let world_orientation = tool
         .session
-        .fragments()
-        .iter()
-        .find(|p| p.id() == id)
+        .fragment(id)
         .expect("released fragment")
         .transform()
         .orientation_xyzw();
@@ -68,13 +71,15 @@ pub(crate) fn release(
 /// Save presentation history before a native gameplay tick, in each object's
 /// simulation frame. New/growing/transferred/released objects bypass history.
 pub(crate) fn capture_previous(tool: &mut MiningTool, frame: ShipFrame, player: [f64; 3]) {
-    let pieces = snapshots(tool, frame, player);
+    let mut scratch = std::mem::take(&mut tool.fragment_scratch);
+    snapshots_into(tool, frame, player, &mut scratch.snapshots);
     tool.fragment_previous.clear();
     tool.fragment_previous.extend(
-        pieces
-            .into_iter()
+        scratch.snapshots
+            .drain(..)
             .map(|(fragment, state)| (fragment.id(), state)),
     );
+    tool.fragment_scratch = scratch;
 }
 
 pub(crate) fn interpolated_mesh(
@@ -213,8 +218,10 @@ pub(crate) fn advance_measured(
     if elapsed <= 0.0 {
         return measurements;
     }
-    let pieces = snapshots(tool, frame, player);
-    if pieces.is_empty() {
+    let mut scratch = std::mem::take(&mut tool.fragment_scratch);
+    snapshots_into(tool, frame, player, &mut scratch.snapshots);
+    if scratch.snapshots.is_empty() {
+        tool.fragment_scratch = scratch;
         tool.fragment_sleep = salimon_physics::SleepTracker::default();
         if let Some(start) = started {
             measurements.total_time = start.elapsed();
@@ -222,14 +229,20 @@ pub(crate) fn advance_measured(
         }
         return measurements;
     }
-    let mut states: Vec<_> = pieces.iter().map(|(_, state)| state.clone()).collect();
+    scratch.states.clear();
+    scratch.ids.clear();
+    for (fragment, state) in scratch.snapshots.drain(..) {
+        scratch.ids.push(fragment.id());
+        scratch.states.push(state);
+    }
+    let states = &mut scratch.states;
+    let ids = &scratch.ids;
     let solver_start = profile.then(Instant::now);
     let contains = |position, radius| ship_floor_placement(position, radius).is_some();
-    let ids: Vec<_> = pieces.iter().map(|(p, _)| p.id()).collect();
     measurements.solver = salimon_physics::advance_with_sleep(
         &mut tool.fragment_sleep,
-        &ids,
-        &mut states,
+        ids,
+        states,
         delta,
         contains,
         profile,
@@ -243,9 +256,9 @@ pub(crate) fn advance_measured(
     let solver_time = solver_start
         .map(|start| start.elapsed())
         .unwrap_or_default();
-    for ((fragment, _), piece) in pieces.into_iter().zip(states) {
+    for (&id, piece) in ids.iter().zip(states.drain(..)) {
         tool.fragment_motion.insert(
-            fragment.id(),
+            id,
             FragmentMotion {
                 velocity: piece.velocity,
                 angular_velocity: piece.angular_velocity,
@@ -260,7 +273,7 @@ pub(crate) fn advance_measured(
             piece.surface,
             Surface::Floor { .. } | Surface::UnpoweredFloor { .. }
         ) {
-            tool.ship_fragments.insert(fragment.id(), piece.position);
+            tool.ship_fragments.insert(id, piece.position);
             frame.local_to_world(piece.position)
         } else {
             piece.position
@@ -277,8 +290,9 @@ pub(crate) fn advance_measured(
             },
         )
         .expect("finite fragment physics pose");
-        tool.session.move_loose(fragment.id(), pose);
+        tool.session.move_loose(id, pose);
     }
+    tool.fragment_scratch = scratch;
     if let Some(start) = started {
         measurements.total_time = start.elapsed();
         measurements.adapter_time = measurements.total_time.saturating_sub(solver_time);
@@ -292,8 +306,20 @@ pub(crate) fn snapshots(
     frame: ShipFrame,
     player: [f64; 3],
 ) -> Vec<(salimon_world::resources::ResourceFragment, ObjectState)> {
+    let mut output = Vec::new();
+    snapshots_into(tool, frame, player, &mut output);
+    output
+}
+
+fn snapshots_into(
+    tool: &MiningTool,
+    frame: ShipFrame,
+    player: [f64; 3],
+    output: &mut Vec<(salimon_world::resources::ResourceFragment, ObjectState)>,
+) {
+    output.clear();
     let carried = tool.session.carried_id();
-    tool.session
+    output.extend(tool.session
         .fragments()
         .iter()
         .copied()
@@ -373,7 +399,7 @@ pub(crate) fn snapshots(
                 },
             )
         })
-        .collect()
+        );
 }
 
 pub(crate) fn to_world_orientation(frame: ShipFrame, local: [f64; 4]) -> [f64; 4] {
@@ -441,6 +467,45 @@ mod tests {
         }
         assert_eq!(tool.session.fragments().len(), (mass / 2.0).ceil() as usize);
         tool
+    }
+
+    #[test]
+    fn settled_tick_avoids_journal_and_mass_work_but_frame_changes_transfer() {
+        let mut tool = MiningTool::default();
+        let frame = frame();
+        let pose = ResourceTransform::new(WorldPosition::new(-5.0, SHIP_FLOOR_HEIGHT_METERS + 0.088027, 0.0), [0.0,0.0,0.0,1.0]).unwrap();
+        let id = crate::sphere_fixtures::sphere(&mut tool.session, ResourceId::IronOre, 10.0, pose);
+        let radius = sphere_radius(tool.session.fragments()[0]);
+        tool.ship_fragments.insert(id, [-5.0, SHIP_FLOOR_HEIGHT_METERS + radius, 0.0]);
+        let mut ship = salimon_ship::ShipController::flying(salimon_ship::ShipPose {
+            position_meters: frame.origin_meters, orientation: [0.0,0.0,0.0,1.0],
+        }, 0);
+        for _ in 0..90 {
+            advance(&mut tool, frame, Duration::from_millis(16), [-5.0,2.0,0.0]);
+            crate::carrying::sync_ship_mass(&mut tool, frame, &mut ship);
+        }
+        assert!(tool.fragment_sleep.is_sleeping(id));
+        let capacities = (tool.fragment_scratch.snapshots.capacity(), tool.fragment_scratch.states.capacity(), tool.fragment_scratch.ids.capacity());
+        capture_previous(&mut tool, frame, [-5.0,2.0,0.0]);
+        advance(&mut tool, frame, Duration::from_millis(16), [-5.0,2.0,0.0]);
+        crate::carrying::sync_ship_fragments(&mut tool, frame);
+        assert_eq!(crate::carrying::sync_ship_mass(&mut tool, frame, &mut ship), 0);
+        assert_eq!(capacities, (tool.fragment_scratch.snapshots.capacity(),tool.fragment_scratch.states.capacity(),tool.fragment_scratch.ids.capacity()));
+        assert_eq!(ship.snapshot().total_mass_kg, 100_010.0);
+        let moved = ShipFrame { origin_meters: [100.0,0.0,0.0], ..frame };
+        crate::carrying::sync_ship_fragments(&mut tool, moved);
+        assert!(crate::carrying::sync_ship_mass(&mut tool, moved, &mut ship) > 0);
+        assert_eq!(ship.snapshot().total_mass_kg, 100_010.0);
+        assert!(tool.session.fragment(id).unwrap().transform().position().meters()[0] > 90.0);
+        assert!(tool.fragment_sleep.is_sleeping(id));
+        // A stationary unanchored object crosses a MOVING containment boundary
+        // without a pose event. Its cached mass must still be removed.
+        tool.ship_fragments.remove(&id);
+        let away = ShipFrame {origin_meters:[1000.0,0.0,0.0],..frame};
+        assert!(crate::carrying::sync_ship_mass(&mut tool, away, &mut ship) > 0);
+        assert_eq!(ship.snapshot().total_mass_kg, 100_000.0);
+        assert!(tool.session.remove_fragment(id));
+        assert_eq!(crate::carrying::sync_ship_mass(&mut tool, away, &mut ship), 1);
     }
 
     #[test]

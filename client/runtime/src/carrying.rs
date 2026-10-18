@@ -245,8 +245,11 @@ pub(crate) fn sync_ship_mass(
             let onboard = salimon_character::ship_contains_object(
                 frame.world_to_local(piece.transform().position().meters()),
             );
-            tool.ship_mass.update(salimon_ship::MassObjectId::Fragment(piece.id().0),
-                onboard.then(|| piece.material().mass_kg()))
+            tool.ship_mass
+                .update(
+                    salimon_ship::MassObjectId::Fragment(piece.id().0),
+                    onboard.then(|| piece.material().mass_kg()),
+                )
                 .expect("validated physical fragment mass");
         }
         tool.mass_frame = Some(frame);

@@ -263,7 +263,13 @@ pub fn advance_profiled(
     delta: Duration,
     floor_contains: impl Fn([f64; 3], f64) -> bool,
 ) -> StepStats {
-    advance_impl::<true>(pieces, delta, floor_contains, None, &mut SolverScratch::default())
+    advance_impl::<true>(
+        pieces,
+        delta,
+        floor_contains,
+        None,
+        &mut SolverScratch::default(),
+    )
 }
 
 /// Advance in stable slice order; preserve that order across updates.
@@ -276,7 +282,13 @@ pub fn advance(
     delta: Duration,
     floor_contains: impl Fn([f64; 3], f64) -> bool,
 ) {
-    advance_impl::<false>(pieces, delta, floor_contains, None, &mut SolverScratch::default());
+    advance_impl::<false>(
+        pieces,
+        delta,
+        floor_contains,
+        None,
+        &mut SolverScratch::default(),
+    );
 }
 
 /// Stateful activation path. IDs follow the snapshot order and must be unique.
@@ -303,9 +315,21 @@ pub fn advance_with_sleep<K: Copy + Eq + std::hash::Hash>(
     let prepare_time = activation_start.map(|s| s.elapsed()).unwrap_or_default();
     let mut scratch = std::mem::take(&mut tracker.scratch);
     let mut stats = if profile {
-        advance_impl::<true>(pieces, delta, &floor_contains, Some(&mut activation), &mut scratch)
+        advance_impl::<true>(
+            pieces,
+            delta,
+            &floor_contains,
+            Some(&mut activation),
+            &mut scratch,
+        )
     } else {
-        advance_impl::<false>(pieces, delta, &floor_contains, Some(&mut activation), &mut scratch)
+        advance_impl::<false>(
+            pieces,
+            delta,
+            &floor_contains,
+            Some(&mut activation),
+            &mut scratch,
+        )
     };
     tracker.scratch = scratch;
     let finish_start = profile.then(Instant::now);
@@ -339,7 +363,9 @@ fn advance_impl<const PROFILE: bool>(
     {
         return stats;
     }
-    scratch.ground_responses.resize_with(pieces.len(), Default::default);
+    scratch
+        .ground_responses
+        .resize_with(pieces.len(), Default::default);
     scratch.gravity_velocities.resize(pieces.len(), [0.0; 3]);
     scratch.gravity_ups.resize(pieces.len(), [0.0, 1.0, 0.0]);
     scratch.rotated.resize(pieces.len(), false);
@@ -1540,16 +1566,28 @@ mod tests {
     fn elapsed_damping_is_partition_and_restart_independent() {
         let initial = cap_sphere();
         let mut reference = initial.clone();
-        advance(std::slice::from_mut(&mut reference), Duration::from_millis(160), |_, _| true);
+        advance(
+            std::slice::from_mut(&mut reference),
+            Duration::from_millis(160),
+            |_, _| true,
+        );
         for partition_ms in [1, 4, 8, 16, 40, 160] {
             let mut piece = initial.clone();
             for _ in 0..160 / partition_ms {
-                advance(std::slice::from_mut(&mut piece), Duration::from_millis(partition_ms), |_, _| true);
+                advance(
+                    std::slice::from_mut(&mut piece),
+                    Duration::from_millis(partition_ms),
+                    |_, _| true,
+                );
             }
             // Repeated exponentials accumulate rounding; position/gravity integration
             // is intentionally not partition invariant (semi-implicit Euler).
             assert!((piece.velocity[0] - reference.velocity[0]).abs() < 2e-14);
-            for (actual, expected) in piece.angular_velocity.iter().zip(reference.angular_velocity) {
+            for (actual, expected) in piece
+                .angular_velocity
+                .iter()
+                .zip(reference.angular_velocity)
+            {
                 assert!((actual - expected).abs() < 2e-14);
             }
         }
@@ -1560,15 +1598,18 @@ mod tests {
     fn distant_fast_residual_changes_steps_without_changing_subject_damping() {
         let subject = cap_sphere();
         let mut isolated = [subject.clone()];
-        let mut mixed = [subject.clone(), ObjectState {
-            position: [1000.0, 1000.0, 0.0],
-            velocity: [20.0, 0.0, 0.0],
-            radius: 0.005,
-            ground_support_meters: 0.005,
-            side_meters: 0.01,
-            mass_kg: 0.000003,
-            ..subject
-        }];
+        let mut mixed = [
+            subject.clone(),
+            ObjectState {
+                position: [1000.0, 1000.0, 0.0],
+                velocity: [20.0, 0.0, 0.0],
+                radius: 0.005,
+                ground_support_meters: 0.005,
+                side_meters: 0.01,
+                mass_kg: 0.000003,
+                ..subject
+            },
+        ];
         let delta = Duration::from_millis(16);
         let a = advance_profiled(&mut isolated, delta, |_, _| true);
         let b = advance_profiled(&mut mixed, delta, |_, _| true);
@@ -1576,7 +1617,11 @@ mod tests {
         assert_eq!(a.contacts, 0);
         assert_eq!(b.contacts, 0);
         assert!((isolated[0].velocity[0] - mixed[0].velocity[0]).abs() < 2e-14);
-        for (a, b) in isolated[0].angular_velocity.iter().zip(mixed[0].angular_velocity) {
+        for (a, b) in isolated[0]
+            .angular_velocity
+            .iter()
+            .zip(mixed[0].angular_velocity)
+        {
             assert!((a - b).abs() < 2e-14);
         }
     }
@@ -1586,7 +1631,8 @@ mod tests {
         let mut scratch = SolverScratch::default();
         for count in [8, 2, 16, 1] {
             let initial: Vec<_> = (0..count).map(|i| ObjectState {
-                position: [i as f64 * 0.25, 0.15, 0.0],
+                position: [i as f64 * 0.15, 0.15, 0.0],
+                surface: Surface::Floor { height_meters: 0.0 },
                 ..cap_sphere()
             }).collect();
             let mut retained = initial.clone();

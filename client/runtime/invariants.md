@@ -171,8 +171,8 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 
 - Cargo mass composition drains physical mutation events after carrying/physics
   synchronization. Centers use current authored ship bounds independent of door
-  animation; carried and loose objects share one identity. No extra per-tick
-  cargo scan determines propulsion mass.
+  animation; carried and loose objects share one identity. Stationary frames need no extra cargo scan; changed containment frames
+  reclassify retained centers under the #306 invalidation contract.
 
 - Core power snapshot gates character/fragment artificial gravity and blanks the
   physical monitor. No planetary fallback applies inside the unpowered cabin.
@@ -185,3 +185,11 @@ Automation explicitly bypasses desktop admission only and shares view/domain
 gates. View, focus/capture loss and lifecycle resets clear movement, steering
 including its ramp, mining/F and held throttle, preserving selected throttle.
 See the [canonical dispatch policy](architecture.md#gameplay-input-dispatch-302).
+
+- Exact identical fragment poses generate no redundant physical journal event.
+  Pickup/drop, growth/removal and actual pose/frame changes retain their events.
+  A changed containment frame reclassifies retained centers so a moving ship
+  cannot miss a stationary object's boundary transfer. An unchanged settled tick
+  performs zero journal-driven containment/mass visits.
+- Adapter snapshot/state/ID buffers and the solver's six per-body arrays retain
+  capacities; initialization/iteration order and interpolation history are unchanged.

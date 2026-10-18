@@ -75,7 +75,8 @@ pub(crate) fn capture_previous(tool: &mut MiningTool, frame: ShipFrame, player: 
     snapshots_into(tool, frame, player, &mut scratch.snapshots);
     tool.fragment_previous.clear();
     tool.fragment_previous.extend(
-        scratch.snapshots
+        scratch
+            .snapshots
             .drain(..)
             .map(|(fragment, state)| (fragment.id(), state)),
     );
@@ -319,87 +320,92 @@ fn snapshots_into(
 ) {
     output.clear();
     let carried = tool.session.carried_id();
-    output.extend(tool.session
-        .fragments()
-        .iter()
-        .copied()
-        .filter(|p| Some(p.id()) != carried && Some(p.id()) != tool.session.attached_sphere_id())
-        .filter(|p| {
-            // Ship advancement precedes final session-pose synchronization.
-            // Select anchored contents in the current frame, not last frame's
-            // world pose (which may be hundreds of metres behind in flight).
-            let position = tool.ship_fragments.get(&p.id()).map_or_else(
-                || p.transform().position().meters(),
-                |local| frame.local_to_world(*local),
-            );
-            length(sub(position, player)) < 125.0
-        })
-        .map(|p| {
-            let ship = tool.ship_fragments.contains_key(&p.id());
-            let position = if ship {
-                tool.ship_fragments[&p.id()]
-            } else {
-                p.transform().position().meters()
-            };
-            let body = if ship { None } else { nearest_body(position) };
-            // Only creation installs an ejection. Missing/restored motion is at rest.
-            let initial = tool
-                .fragment_motion
-                .get(&p.id())
-                .map_or([0.0; 3], |m| m.velocity);
-            (
-                p,
-                ObjectState {
-                    position,
-                    velocity: initial,
-                    radius: sphere_radius(p),
-                    ground_support_meters: sphere_radius(p),
-                    hull: None,
-                    side_meters: salimon_world::resource_fragments::side_meters(p),
-                    orientation: if ship {
-                        tool.fragment_motion
-                            .get(&p.id())
-                            .and_then(|m| m.ship_orientation)
-                            .unwrap_or_else(|| {
-                                to_local_orientation(frame, p.transform().orientation_xyzw())
-                            })
-                    } else {
-                        p.transform().orientation_xyzw()
-                    },
-                    angular_velocity: tool
-                        .fragment_motion
-                        .get(&p.id())
-                        .map_or([0.0; 3], |m| m.angular_velocity),
-                    mass_kg: p.material().mass_kg(),
-                    surface: if ship {
-                        if tool.ship_gravity_disabled {
-                            Surface::UnpoweredFloor {
-                                height_meters: SHIP_FLOOR_HEIGHT_METERS,
-                                ceiling_meters: salimon_character::SHIP_CEILING_HEIGHT_METERS,
-                            }
+    output.extend(
+        tool.session
+            .fragments()
+            .iter()
+            .copied()
+            .filter(|p| {
+                Some(p.id()) != carried && Some(p.id()) != tool.session.attached_sphere_id()
+            })
+            .filter(|p| {
+                // Ship advancement precedes final session-pose synchronization.
+                // Select anchored contents in the current frame, not last frame's
+                // world pose (which may be hundreds of metres behind in flight).
+                let position = tool.ship_fragments.get(&p.id()).map_or_else(
+                    || p.transform().position().meters(),
+                    |local| frame.local_to_world(*local),
+                );
+                length(sub(position, player)) < 125.0
+            })
+            .map(|p| {
+                let ship = tool.ship_fragments.contains_key(&p.id());
+                let position = if ship {
+                    tool.ship_fragments[&p.id()]
+                } else {
+                    p.transform().position().meters()
+                };
+                let body = if ship { None } else { nearest_body(position) };
+                // Only creation installs an ejection. Missing/restored motion is at rest.
+                let initial = tool
+                    .fragment_motion
+                    .get(&p.id())
+                    .map_or([0.0; 3], |m| m.velocity);
+                (
+                    p,
+                    ObjectState {
+                        position,
+                        velocity: initial,
+                        radius: sphere_radius(p),
+                        ground_support_meters: sphere_radius(p),
+                        hull: None,
+                        side_meters: salimon_world::resource_fragments::side_meters(p),
+                        orientation: if ship {
+                            tool.fragment_motion
+                                .get(&p.id())
+                                .and_then(|m| m.ship_orientation)
+                                .unwrap_or_else(|| {
+                                    to_local_orientation(frame, p.transform().orientation_xyzw())
+                                })
                         } else {
-                            Surface::Floor {
-                                height_meters: SHIP_FLOOR_HEIGHT_METERS,
-                            }
-                        }
-                    } else {
-                        body.map(|body| {
-                            if tool.terrain == salimon_world::terrain::TerrainMode::Representative {
-                                Surface::Sampled {
-                                    body,
-                                    query: crate::terrain::physics_ground,
-                                    point_query: crate::terrain::physics_ground_point,
+                            p.transform().orientation_xyzw()
+                        },
+                        angular_velocity: tool
+                            .fragment_motion
+                            .get(&p.id())
+                            .map_or([0.0; 3], |m| m.angular_velocity),
+                        mass_kg: p.material().mass_kg(),
+                        surface: if ship {
+                            if tool.ship_gravity_disabled {
+                                Surface::UnpoweredFloor {
+                                    height_meters: SHIP_FLOOR_HEIGHT_METERS,
+                                    ceiling_meters: salimon_character::SHIP_CEILING_HEIGHT_METERS,
                                 }
                             } else {
-                                Surface::Sphere(body)
+                                Surface::Floor {
+                                    height_meters: SHIP_FLOOR_HEIGHT_METERS,
+                                }
                             }
-                        })
-                        .unwrap_or(Surface::Unsupported)
+                        } else {
+                            body.map(|body| {
+                                if tool.terrain
+                                    == salimon_world::terrain::TerrainMode::Representative
+                                {
+                                    Surface::Sampled {
+                                        body,
+                                        query: crate::terrain::physics_ground,
+                                        point_query: crate::terrain::physics_ground_point,
+                                    }
+                                } else {
+                                    Surface::Sphere(body)
+                                }
+                            })
+                            .unwrap_or(Surface::Unsupported)
+                        },
                     },
-                },
-            )
-        })
-        );
+                )
+            }),
+    );
 }
 
 pub(crate) fn to_world_orientation(frame: ShipFrame, local: [f64; 4]) -> [f64; 4] {
@@ -473,39 +479,89 @@ mod tests {
     fn settled_tick_avoids_journal_and_mass_work_but_frame_changes_transfer() {
         let mut tool = MiningTool::default();
         let frame = frame();
-        let pose = ResourceTransform::new(WorldPosition::new(-5.0, SHIP_FLOOR_HEIGHT_METERS + 0.088027, 0.0), [0.0,0.0,0.0,1.0]).unwrap();
+        let pose = ResourceTransform::new(
+            WorldPosition::new(-5.0, SHIP_FLOOR_HEIGHT_METERS + 0.088027, 0.0),
+            [0.0, 0.0, 0.0, 1.0],
+        )
+        .unwrap();
         let id = crate::sphere_fixtures::sphere(&mut tool.session, ResourceId::IronOre, 10.0, pose);
         let radius = sphere_radius(tool.session.fragments()[0]);
-        tool.ship_fragments.insert(id, [-5.0, SHIP_FLOOR_HEIGHT_METERS + radius, 0.0]);
-        let mut ship = salimon_ship::ShipController::flying(salimon_ship::ShipPose {
-            position_meters: frame.origin_meters, orientation: [0.0,0.0,0.0,1.0],
-        }, 0);
+        tool.ship_fragments
+            .insert(id, [-5.0, SHIP_FLOOR_HEIGHT_METERS + radius, 0.0]);
+        let mut ship = salimon_ship::ShipController::flying(
+            salimon_ship::ShipPose {
+                position_meters: frame.origin_meters,
+                orientation: [0.0, 0.0, 0.0, 1.0],
+            },
+            0,
+        );
         for _ in 0..90 {
-            advance(&mut tool, frame, Duration::from_millis(16), [-5.0,2.0,0.0]);
+            advance(
+                &mut tool,
+                frame,
+                Duration::from_millis(16),
+                [-5.0, 2.0, 0.0],
+            );
             crate::carrying::sync_ship_mass(&mut tool, frame, &mut ship);
         }
         assert!(tool.fragment_sleep.is_sleeping(id));
-        let capacities = (tool.fragment_scratch.snapshots.capacity(), tool.fragment_scratch.states.capacity(), tool.fragment_scratch.ids.capacity());
-        capture_previous(&mut tool, frame, [-5.0,2.0,0.0]);
-        advance(&mut tool, frame, Duration::from_millis(16), [-5.0,2.0,0.0]);
+        let capacities = (
+            tool.fragment_scratch.snapshots.capacity(),
+            tool.fragment_scratch.states.capacity(),
+            tool.fragment_scratch.ids.capacity(),
+        );
+        capture_previous(&mut tool, frame, [-5.0, 2.0, 0.0]);
+        advance(
+            &mut tool,
+            frame,
+            Duration::from_millis(16),
+            [-5.0, 2.0, 0.0],
+        );
         crate::carrying::sync_ship_fragments(&mut tool, frame);
-        assert_eq!(crate::carrying::sync_ship_mass(&mut tool, frame, &mut ship), 0);
-        assert_eq!(capacities, (tool.fragment_scratch.snapshots.capacity(),tool.fragment_scratch.states.capacity(),tool.fragment_scratch.ids.capacity()));
+        assert_eq!(
+            crate::carrying::sync_ship_mass(&mut tool, frame, &mut ship),
+            0
+        );
+        assert_eq!(
+            capacities,
+            (
+                tool.fragment_scratch.snapshots.capacity(),
+                tool.fragment_scratch.states.capacity(),
+                tool.fragment_scratch.ids.capacity()
+            )
+        );
         assert_eq!(ship.snapshot().total_mass_kg, 100_010.0);
-        let moved = ShipFrame { origin_meters: [100.0,0.0,0.0], ..frame };
+        let moved = ShipFrame {
+            origin_meters: [100.0, 0.0, 0.0],
+            ..frame
+        };
         crate::carrying::sync_ship_fragments(&mut tool, moved);
         assert!(crate::carrying::sync_ship_mass(&mut tool, moved, &mut ship) > 0);
         assert_eq!(ship.snapshot().total_mass_kg, 100_010.0);
-        assert!(tool.session.fragment(id).unwrap().transform().position().meters()[0] > 90.0);
+        assert!(
+            tool.session
+                .fragment(id)
+                .unwrap()
+                .transform()
+                .position()
+                .meters()[0]
+                > 90.0
+        );
         assert!(tool.fragment_sleep.is_sleeping(id));
         // A stationary unanchored object crosses a MOVING containment boundary
         // without a pose event. Its cached mass must still be removed.
         tool.ship_fragments.remove(&id);
-        let away = ShipFrame {origin_meters:[1000.0,0.0,0.0],..frame};
+        let away = ShipFrame {
+            origin_meters: [1000.0, 0.0, 0.0],
+            ..frame
+        };
         assert!(crate::carrying::sync_ship_mass(&mut tool, away, &mut ship) > 0);
         assert_eq!(ship.snapshot().total_mass_kg, 100_000.0);
         assert!(tool.session.remove_fragment(id));
-        assert_eq!(crate::carrying::sync_ship_mass(&mut tool, away, &mut ship), 1);
+        assert_eq!(
+            crate::carrying::sync_ship_mass(&mut tool, away, &mut ship),
+            1
+        );
     }
 
     #[test]

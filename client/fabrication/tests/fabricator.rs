@@ -79,7 +79,7 @@ fn mass_quantization_is_once_and_rejects_invalid_or_unrepresentable_input() {
 }
 
 #[test]
-fn every_bin_is_independently_bounded_and_full_insertion_discards_entire_input() {
+fn every_bin_is_independently_bounded_and_full_insertion_is_atomic_rejection() {
     let mut f = Fabricator::starter();
     for resource in RESOURCE_CATALOG {
         let first = insert(&mut f, resource.id, 19.999_999);
@@ -87,9 +87,12 @@ fn every_bin_is_independently_bounded_and_full_insertion_discards_entire_input()
         let overflow = insert(&mut f, resource.id, 0.000_003);
         assert_eq!(overflow.accepted_milligrams, 1);
         assert_eq!(overflow.discarded_milligrams, 2);
-        let full = insert(&mut f, resource.id, 50.0);
-        assert_eq!(full.accepted_milligrams, 0);
-        assert_eq!(full.discarded_milligrams, 50_000_000);
+        let before = f.clone();
+        assert_eq!(
+            f.insert(RawMaterial::new(resource.id, 50.0).unwrap()),
+            Err(FabricationError::StorageFull(resource.id))
+        );
+        assert_eq!(f, before);
         assert_eq!(balance(&f, resource.id), STORAGE_CAPACITY_MILLIGRAMS);
     }
     assert_eq!(f.mass_contribution().stored_milligrams, 100_000_000);

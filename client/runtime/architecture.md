@@ -803,3 +803,14 @@ existing JSON keys and values.
 ## Consumable raw resources (#337)
 
 See the canonical [resource catalog and compatibility contract](../world/resource-contracts.md#consumable-raw-resources-337) for new feedstock generation, physical lifecycle, distinct presentation and Core yields.
+
+## Fabricator physical input (#339)
+
+The session owns a portable Fabricator. E inserts the one held world fragment
+through a universal interior port, within 3 m and 30 degrees with unobstructed
+sight. Core/cockpit/door targets retain priority; blackout does not gate intake.
+The port uses a ship-local adapter anchor until #342 authors its asset marker.
+Successful insertion removes the source exactly once and drains its physical
+journal into mass, motion, anchors and presentation caches immediately. Full
+reserves and invalid milligram masses leave both domains unchanged. The whole
+accepted object is consumed, with overflow discarded. F pickup/drop is unchanged.

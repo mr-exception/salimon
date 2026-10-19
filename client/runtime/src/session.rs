@@ -1,4 +1,5 @@
 //! Portable production gameplay composition. No window, GPU lifecycle or evidence IO.
+mod fabrication;
 pub(crate) mod frames;
 pub(crate) mod interaction;
 mod presentation;
@@ -21,6 +22,7 @@ pub(crate) struct GameplaySession {
     pub(crate) ship: ShipController,
     pub(crate) automation_aim_delta: Option<[f64; 2]>,
     pub(crate) mining: crate::mining::ResourceGameplay,
+    pub(crate) fabricator: salimon_fabrication::Fabricator,
     pub(crate) equipment: crate::equipment::EquipmentToolbar,
     pub(crate) movement_input: MovementInput,
     pub(crate) ship_control_input: ShipControlInput,
@@ -63,6 +65,7 @@ impl Default for GameplaySession {
             ship: ShipController::default(),
             automation_aim_delta: None,
             mining: Default::default(),
+            fabricator: salimon_fabrication::Fabricator::starter(),
             equipment: Default::default(),
             movement_input: Default::default(),
             ship_control_input: Default::default(),
@@ -150,6 +153,9 @@ impl GameplaySession {
                 let interaction =
                     available_interaction_target(self.character.location(), local_eye, local_look);
                 match interaction {
+                    Some(InteractionTarget::Fabricator) => {
+                        self.insert_fabricator_fragment();
+                    }
                     Some(InteractionTarget::Core) => {
                         let result = self.ship.intake_carried_fragment(&mut self.mining.session);
                         let text = match result {
@@ -219,6 +225,7 @@ impl GameplaySession {
         local_look: [f64; 3],
     ) -> Option<&'static str> {
         match available_interaction_target(self.character.location(), local_eye, local_look) {
+            Some(InteractionTarget::Fabricator) => Some("fabricator"),
             Some(InteractionTarget::Core) => Some("core"),
             Some(InteractionTarget::Cockpit) => Some("cockpit"),
             Some(InteractionTarget::ExitDoor) => Some("exit_door"),

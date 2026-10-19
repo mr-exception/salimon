@@ -525,7 +525,11 @@ impl ClientApplication {
         );
         let fragment_interaction = !matches!(
             interaction,
-            Some(InteractionTarget::ExitDoor | InteractionTarget::Core)
+            Some(
+                InteractionTarget::ExitDoor
+                    | InteractionTarget::Core
+                    | InteractionTarget::Fabricator
+            )
         ) && (self.session.mining.session.carried_id().is_some()
             || crate::carrying::target(
                 &self.session.mining,

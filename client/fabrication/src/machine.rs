@@ -25,8 +25,7 @@ pub enum CommandResult {
     Collected(OutputItem),
 }
 
-/// Success means the adapter must remove the ENTIRE source fragment, even when
-/// accepted is zero. Errors mean it must preserve the source fragment unchanged.
+/// Success means the adapter must remove the ENTIRE source fragment, with any overflow discarded. Errors mean it must preserve the source fragment unchanged.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Insertion {
     pub resource: ResourceId,
@@ -182,6 +181,9 @@ impl Fabricator {
             .find(|s| s.resource == material.resource())
             .expect("all world resources initialized");
         let accepted = mass.min(STORAGE_CAPACITY_MILLIGRAMS - stored.milligrams);
+        if accepted == 0 {
+            return Err(FabricationError::StorageFull(material.resource()));
+        }
         stored.milligrams += accepted;
         Ok(Insertion {
             resource: material.resource(),

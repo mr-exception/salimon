@@ -11,6 +11,7 @@ workspace = true
 
 [dependencies]
 serde.workspace = true
+salimon-survival = { path = "../survival" }
 salimon-persistence = { path = "../persistence" }
 salimon-fabrication = { path = "../fabrication" }
 salimon-physics = { path = "../physics" }

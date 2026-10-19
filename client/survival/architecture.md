@@ -70,3 +70,46 @@ Registry bounds are 256 sources/effects; intervals are 1ms..1day, timed/linger
 limits one day. Execution costs scale with actual effect events, not render frames.
 Native survival persistence, consumable effects, death archives and host world
 freeze remain #369–#372; this owner supplies deterministic test fixtures.
+
+## Movement and interaction restrictions (#369)
+
+`restrictions.rs` derives an exact basis-point DTO and typed action permissions
+from the current snapshot. Hunger >=50 is neutral; [20,50) is 90%; [0,20) is
+75%. Fatigue (50,100] is neutral; (20,50] is 85%; (0,20] is 65%; exactly zero
+is 30%. Fractional points follow these continuous intervals (50.001 fatigue is
+neutral; 20.001 is 85%). Combine movement multiplicatively, then apply the
+configured minimum. The DTO retains both component percentages and the final
+percentage for #373's persistent penalty labels.
+
+`RestrictionConfig` validates serializable tuning. Explicit provisional defaults
+are a 10% minimum movement multiplier, 75% interaction work rate for hunger <20,
+75% for fatigue <=20, combined multiplicatively, and a 250 ms base interaction
+recovery. These are tuning values, not fixed lore or changes to approved meter
+durations; #384 may tune them. Continuous mining receives the reduced admitted
+work duration; discrete nonessential actions receive an additional recovery of
+`base * (1/rate - 1)`. Normal interaction rate adds no delay. The minimum never
+turns a forbidden action into an allowed one.
+
+At fatigue zero allow voluntary slow translation, emergency food/medicine,
+doors and basic menus; deny mining, piloting, Fabricator operations, carrying
+and Core feeding. Terminal state permits only menus. Runtime applies the policy
+at shared command/tick boundaries, interrupts attached mining, closes crafting
+and revokes piloting. This revocation deliberately selects zero manual throttle,
+clears all steering/held throttle and cockpit control, preserving world velocity,
+heading and committed assists. Recovery needs fresh cockpit entry and input;
+it never resurrects held controls or automatically restarts thrust. Ordinary
+cockpit exit and power loss retain their existing throttle-preservation rules.
+
+Character receives a transient voluntary-speed multiplier in cabin/ramp/surface/
+EVA movement; gravity, jump impulse, inherited drift, collisions and elapsed time
+remain physical. Existing zero-G momentum is not artificially braked. Fabricator
+jobs, Core and ship physics continue at full admitted time, even when the player
+cannot operate the machine. Emergency interactions bypass recovery delays.
+
+The session now composes the survival owner and these consumers. As with #367
+and #368, production depletion, full-save migration/offline recovery, terminal
+world freeze and restart lifecycle belong to #371; this change does not start an
+unsaved survival clock. Default session vitals stay full until that integration.
+#370 owns actual consumable effects and #377 owns final wheel dispatch; neither
+is required to implement/test this action policy. #373 owns the persistent HUD;
+automation exposes `survival_restrictions` with exact basis-point values today.

@@ -84,6 +84,12 @@ impl GameplaySession {
     }
 
     pub(super) fn insert_fabricator_fragment(&mut self) {
+        if !self
+            .restrictions()
+            .permits(salimon_survival::restrictions::Action::Fabricate)
+        {
+            return;
+        }
         let Some(id) = self.mining.session.carried_id() else {
             self.feedback = Some("Carry a fragment to feed the Fabricator");
             return;
@@ -120,6 +126,12 @@ impl GameplaySession {
     }
 
     pub(super) fn collect_fabricator_output(&mut self) {
+        if !self
+            .restrictions()
+            .permits(salimon_survival::restrictions::Action::Fabricate)
+        {
+            return;
+        }
         let Some(item) = self
             .fabricator
             .snapshot(self.ship.snapshot().power_available)

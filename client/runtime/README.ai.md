@@ -130,3 +130,7 @@ filesystem durability. Startup renderer creation preserves restored clock backlo
 E2E and benchmark launches remain isolated from user saves. See the
 [canonical save contract](../../docs/save-contract.md#durable-active-run-366)
 for paths, recovery/failure policy, Windows behavior and future lifecycle owners.
+
+Survival action gates and voluntary movement composition (#369) live in
+`session/survival.rs`; use its shared policy for new native/protocol interactions.
+See [canonical restrictions](../survival/architecture.md#movement-and-interaction-restrictions-369).

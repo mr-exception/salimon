@@ -306,3 +306,11 @@ filesystem durability. Startup renderer creation preserves restored clock backlo
 E2E and benchmark launches remain isolated from user saves. See the
 [canonical save contract](../../docs/save-contract.md#durable-active-run-366)
 for paths, recovery/failure policy, Windows behavior and future lifecycle owners.
+
+- #369 movement/interaction modifiers and exhausted-pilot revocation consume
+  typed survival snapshots at shared command/tick boundaries, with no native or
+  automation bypass. See the canonical survival restriction contract.
+- Survival clock/save activation remains #371; default full vitals do not drain
+  unsaved. Emergency consumption permission never shares nonessential cooldowns.
+- Exhaustion cannot pause ongoing Fabricator jobs, Core, ship or fragment physics;
+  it interrupts held mining and clears manual pilot input/thrust without braking.

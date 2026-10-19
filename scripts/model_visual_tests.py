@@ -123,7 +123,10 @@ def capture(fixture, binary, output):
     scenario, _ = expanded_scenario(fixture)
     expanded = output/'expanded.json'
     expanded.write_text(json.dumps(scenario))
-    result = run(expanded, [str(Path(binary).resolve())], output/'runs', ['native'])
+    # Runner diagnostics contain duplicate PNGs. Keep them outside the corpus,
+    # whose recursive image inventory must contain only contracted checkpoints.
+    runs = output.parent.with_name(output.parent.name + '-runs')/output.name
+    result = run(expanded, [str(Path(binary).resolve())], runs, ['native'])
     if result['status'] != 'passed':
         raise ValueError(f"production capture failed: {result.get('error', result)}")
     contexts = [step['state']['visual_context'] for step in result['steps'] if step.get('screenshot')]

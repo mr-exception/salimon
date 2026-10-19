@@ -55,6 +55,10 @@ tolerances and masks. Per-image SHA-256 records detect replaced/missing images.
 All fixture screenshots must agree on renderer context and dimensions. The
 revision and binary hashes provide provenance; comparing a newer revision is
 allowed, while context and fixture-contract changes require independent review.
+Runner diagnostics are retained beside the corpus: the default candidate images
+are in `artifacts/model-visual/candidates/<fixture>/`, and full runner logs and
+duplicate raw screenshots are in `artifacts/model-visual/candidates-runs/<fixture>/`.
+Only contracted checkpoint PNGs belong inside a corpus; unexpected images still fail.
 
 To review a new corpus:
 

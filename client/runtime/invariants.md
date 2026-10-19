@@ -314,3 +314,11 @@ for paths, recovery/failure policy, Windows behavior and future lifecycle owners
   unsaved. Emergency consumption permission never shares nonessential cooldowns.
 - Exhaustion cannot pause ongoing Fabricator jobs, Core, ship or fragment physics;
   it interrupts held mining and clears manual pilot input/thrust without braking.
+
+- #370 consumption identifies exact `(slot, job, unit)` and prepares validated
+  recipe effects before removing one item. Repeated/stale clicks cannot consume
+  a replacement identity; failed use preserves both owners, full vitals permit
+  waste, and exhaustion alone never denies emergency food/medicine.
+- The shared transaction respects Gameplay/crafting/terminal gates and changes no
+  ship mass. Native focus/Q-wheel input remains #377; full-save/clock activation
+  remains #371. M/N are not reintroduced.

@@ -1,4 +1,5 @@
 //! Portable production gameplay composition. No window, GPU lifecycle or evidence IO.
+pub(crate) mod consumables;
 pub(crate) mod crafting_ui;
 mod fabrication;
 pub(crate) mod frames;
@@ -21,6 +22,7 @@ use salimon_world::{CameraPrototype, TransitionPhase};
 use std::time::Duration;
 
 pub(crate) struct GameplaySession {
+    pub(crate) consumable_effects: salimon_survival::consumables::Catalog,
     pub(crate) survival: salimon_survival::Survival,
     pub(super) restriction_config: salimon_survival::restrictions::RestrictionConfig,
     interaction_ready_at: Duration,
@@ -69,6 +71,7 @@ impl ShipControlInput {
 impl Default for GameplaySession {
     fn default() -> Self {
         Self {
+            consumable_effects: salimon_survival::consumables::Catalog::starter(),
             survival: Default::default(),
             restriction_config: Default::default(),
             interaction_ready_at: Duration::ZERO,

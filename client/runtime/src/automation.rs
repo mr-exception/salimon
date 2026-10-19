@@ -231,6 +231,39 @@ pub(crate) fn execute_session(app: &mut GameplaySession, line: &str) -> Value {
     }
     let result = match command.get("op").and_then(Value::as_str) {
         Some("inspect") => Ok(inspect_session(app)),
+        Some("consume") => {
+            let slot = command
+                .get("slot")
+                .and_then(Value::as_u64)
+                .filter(|n| (1..=5).contains(n))
+                .map(|n| salimon_fabrication::ConsumableSlot::ALL[n as usize - 1]);
+            let job = command
+                .get("job")
+                .and_then(Value::as_u64)
+                .filter(|n| *n > 0);
+            let unit = command
+                .get("unit")
+                .and_then(Value::as_u64)
+                .and_then(|n| u32::try_from(n).ok())
+                .filter(|n| *n > 0);
+            match (slot, job, unit) {
+                (Some(slot), Some(job), Some(unit)) => {
+                    let result = app.consume_selection(crate::session::consumables::Selection {
+                        slot,
+                        job: salimon_fabrication::JobId(job),
+                        unit,
+                    });
+                    match result {
+                        Ok(item) => Ok(json!({"applied":true,"job":item.job.0,"unit":item.unit})),
+                        Err(reason) => Ok(json!({"applied":false,"reason":format!("{reason:?}")})),
+                    }
+                }
+                _ => Err((
+                    "invalid_argument",
+                    "slot 1..5, positive job and u32 unit required",
+                )),
+            }
+        }
         Some("crafting") => {
             use crate::session::crafting_ui::CraftingAction as A;
             let action = match command.get("action").and_then(Value::as_str) {
@@ -413,7 +446,7 @@ pub(crate) fn execute_session(app: &mut GameplaySession, line: &str) -> Value {
         },
         _ => Err((
             "unknown_op",
-            "expected inspect, step, look, aim_fragment, restore_look, key, mouse, interact, landing, or thruster",
+            "expected inspect, step, look, aim_fragment, restore_look, key, mouse, interact, landing, thruster, crafting, or consume",
         )),
     };
     match result {
@@ -561,7 +594,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
         std::array::from_fn::<_, 3, _>(|i| player_velocity[i] - ship.velocity_meters_per_second[i]);
     let (ground_entries, ground_hits, ground_misses) = crate::terrain::ground_cache_stats();
     let fabrication = app.fabrication_snapshot();
-    let item = |item: &salimon_fabrication::OutputItem| json!({"recipe":item.recipe.key(), "job":item.job.0, "unit":item.unit, "mass_kg":item.mass.kg(), "category":format!("{:?}",item.category)});
+    let item = |item: &salimon_fabrication::OutputItem| json!({"recipe":item.recipe.key(), "job":item.job.0, "unit":item.unit, "mass_kg":item.mass.kg(), "category":format!("{:?}",item.category), "effect":app.consumable_effects.get(item.recipe.key())});
     json!({
         "fabricator": {
             "status":format!("{:?}",fabrication.status), "requested_watts":fabrication.requested_watts,
@@ -583,6 +616,11 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
                 _ => None,
             }),
         },
+        "survival": {"hunger":app.survival.snapshot().hunger.value(),
+            "health":app.survival.snapshot().health.value(), "fatigue":app.survival.snapshot().fatigue.value(),
+            "terminal":app.survival.snapshot().terminal,
+            "effects":app.survival.active_effects().map(|(id,stacks,remaining)|
+                json!({"id":id.0,"stacks":stacks,"remaining_seconds":remaining.map(|d|d.as_secs_f64())})).collect::<Vec<_>>()},
         "survival_restrictions": {
             "hunger_movement_bps": app.restrictions().hunger_movement_bps,
             "fatigue_movement_bps": app.restrictions().fatigue_movement_bps,

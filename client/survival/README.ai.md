@@ -10,3 +10,8 @@ for cross-crate changes. Add deterministic boundary and partition tests for rule
 and validated numeric tuning; `tests/restrictions.rs` checks fractional boundaries.
 Runtime applies the policy in `session/survival.rs`; character and ship own the
 physical consumers. Do not duplicate thresholds in input handlers or the HUD.
+
+`src/consumables.rs` owns #370 item recovery data/validation and atomic application;
+`tests/consumables.rs` covers timed food/medical benefits, registry conflicts,
+terminal ordering, treatment, exact restoration and offline freeze. Runtime owns
+item selection/removal, never this crate. See the canonical consumable contract.

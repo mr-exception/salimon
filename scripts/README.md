@@ -39,7 +39,7 @@ timeout. A step can specify its own `timeout_ms`. Example:
 ```
 
 `action` takes any operation and its parameters from the native command
-protocol: `inspect`, `step`, `key`, `mouse`, `look`, `aim_fragment`, `restore_look`, `interact`, `landing`, or `thruster`.
+protocol: `inspect`, `step`, `key`, `mouse`, `look`, `aim_fragment`, `restore_look`, `interact`, `landing`, `thruster`, `crafting`, or `consume`.
 `assert` inspects state once; `wait` inspects until matched, advancing the
 simulation by `frames` (1–600, default 1) between checks. Condition `path`
 uses dot-separated object keys and zero-based array indices, such as
@@ -623,3 +623,14 @@ open machine modal. Actions: `close`, `previous_recipe`, `next_recipe`, `less`,
 `more`, `next_job`, `cancel`, `add`. Closed modal returns `applied:false`.
 Inspection adds `fabricator` (bins, FIFO jobs, tray, power demand and UI state)
 and `consumables.food` / `consumables.medical` arrays with stable item identities.
+
+
+Consumable recovery protocol (#370):
+`{"op":"consume","slot":1,"job":12,"unit":1}` identifies an exact current
+item (slot 1–3 food, 4–5 medical). Obtain job/unit from inspection; both must match
+the selected slot. Success returns `applied:true`; empty/stale/denied/unknown
+effects return `applied:false` with a reason, without removing anything. Invalid
+argument shapes fail validation. This is the portable shared transaction for
+#377's native Q wheel, not a new gameplay hotkey; M/N remain absent. Inspection
+adds each item's validated recovery definition and `survival` current meters/
+active effects. Whole-game survival clock/save activation remains #371.

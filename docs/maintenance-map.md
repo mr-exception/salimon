@@ -124,3 +124,13 @@ owns exact threshold percentages, validated tuning and typed permissions;
 and ship revocation regressions. Run workspace tests/build/Clippy/fmt. See the
 [canonical policy](../client/survival/architecture.md#movement-and-interaction-restrictions-369).
 Clock/save activation remains #371; HUD/wheel/effects remain #373/#377/#370.
+
+Consumable survival effects (#370): `survival/src/consumables.rs` owns validated
+milli-point recipe recovery records; its `pipeline.rs` executes timed food/healing
+with the existing deterministic effect clock. `fabrication/src/inventory.rs`
+provides exact slots shared with #377; runtime `session/consumables.rs` commits
+exact identity plus prepared benefits and `automation.rs` exposes inspection/
+portable requests. Coverage: survival `tests/consumables.rs`, runtime
+`session/consumables/tests.rs`, existing inventory/save/status regressions. Run
+workspace tests/build/Clippy/fmt; full-save clock activation is #371 and native
+wheel/presentation is #377. [Canonical data/semantics](../client/survival/architecture.md#consumable-recovery-definitions-370).

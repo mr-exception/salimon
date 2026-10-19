@@ -3,7 +3,8 @@
 mod inventory;
 mod machine;
 pub use inventory::{
-    ConsumableCategory, ConsumableInventory, FOOD_SLOT_COUNT, InventoryError, MEDICAL_SLOT_COUNT,
+    ConsumableCategory, ConsumableInventory, ConsumableSlot, FOOD_SLOT_COUNT, InventoryError,
+    MEDICAL_SLOT_COUNT,
 };
 mod mass;
 mod recipes;

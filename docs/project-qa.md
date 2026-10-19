@@ -84,3 +84,17 @@ These defaults are exposed for review and later #384 balance work, rather than
 being immutable gameplay requirements. Exhaustion selects zero manual thrust
 without cancelling an already committed assist or braking inertial motion;
 recovery requires fresh cockpit entry/input. Whole-save activation remains #371.
+
+## Consumable recovery tuning (#370, 2026-10-19)
+
+Basic `food-ration` uses the expansion's +40 instant hunger default. The existing
+`medkit` receives explicit provisional, configurable data of +2.5 ordinary health
+per active second for 10 seconds (+25 total), cap one stack; subsequent legitimate
+kits refresh duration without multiplying stacks or resetting partial cadence.
+This is implementation tuning for review/#384 balancing, not a prior approved
+exact efficacy or medical-lore requirement. Definitions can select treatment
+healing for later items; the starter kit does not silently erase treatment-only
+wounds. Full meters allow consumption and wasted excess. Recipes, ingredients,
+production time/watts/mass and unlocks remain unchanged; advanced foods are #378.
+The [canonical recovery contract](../client/survival/architecture.md#consumable-recovery-definitions-370)
+owns validation, identity conflicts, exact continuation and offline freeze.

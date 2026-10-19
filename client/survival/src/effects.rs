@@ -76,6 +76,9 @@ pub struct Heal {
 pub struct EffectId(pub u16);
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub enum Behavior {
+    Feed {
+        amount: Points,
+    },
     Damage {
         source: Source,
         amount: Points,
@@ -189,7 +192,7 @@ impl Validate for Rules {
                         return Err(invalid("unregistered effect source"));
                     }
                 }
-                Behavior::Heal { amount, .. } => amount.validate()?,
+                Behavior::Feed { amount } | Behavior::Heal { amount, .. } => amount.validate()?,
                 Behavior::Amplify {
                     source,
                     basis_points,

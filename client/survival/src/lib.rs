@@ -1,5 +1,6 @@
 //! Deterministic survival authority. Hosts supply admitted active durations and UTC
 //! samples; this crate never reads a clock, advances a world, or performs IO.
+pub mod consumables;
 pub mod effects;
 mod pipeline;
 pub mod restrictions;

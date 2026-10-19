@@ -22,6 +22,8 @@ pub struct ShipMeshInstance {
     /// Unit quaternion `[x, y, z, w]` rotating ship-local coordinates to world.
     pub orientation: [f32; 4],
     pub door_open_fraction: f32,
+    /// Show the authored stationary package only while the Fabricator tray is occupied.
+    pub fabricator_output_present: bool,
     /// Read-only presentation values, kept live independently of cockpit control.
     pub instruments: CockpitInstruments,
 }
@@ -64,6 +66,7 @@ fn geometry_from_bytes(bytes: &[u8]) -> Result<ShipGeometry, RendererError> {
         let display_flag = match node.name() {
             Some("Monitor_Wide") => 1.0,
             Some("Core_Monitor") => 2.0,
+            Some("Fabricator_Output") => 3.0,
             _ => 0.0,
         };
         let matrix = node.transform().matrix();
@@ -528,7 +531,7 @@ impl ShipMeshRenderer {
             0.0,
             RAMP_EXTENSION_METERS as f32 * extension_fraction,
             RAMP_FACE_OFFSET_METERS as f32 * extension_fraction,
-            0.0,
+            f32::from(ship.fabricator_output_present),
             0.0,
         ]);
         queue.write_buffer(&self.uniform, 0, &encode_f32s(values));
@@ -759,5 +762,30 @@ mod tests {
             + (tray_top + RAMP_EXTENSION_METERS as f32 - DOOR_HINGE_Y_METERS)
                 * OPEN_DOOR_ANGLE_RADIANS.cos();
         assert!((deployed_top + 2.107_526_8).abs() < 1e-5);
+    }
+}
+
+#[cfg(test)]
+mod fabricator_tests {
+    use super::*;
+    #[test]
+    fn tray_package_has_a_dedicated_conditional_surface_and_valid_shader() {
+        let geometry = load_geometry().unwrap();
+        let vertices: Vec<_> = geometry
+            .opaque_vertices
+            .as_chunks::<VERTEX_FLOATS>()
+            .0
+            .iter()
+            .filter(|vertex| vertex[17] == 3.0)
+            .collect();
+        assert_eq!(vertices.len(), 36);
+        assert!(vertices.iter().all(|v| v[10] == 0.0 && v[14] == 1.0)); // Stationary interior geometry.
+        let module = wgpu::naga::front::wgsl::parse_str(include_str!("ship_mesh.wgsl")).unwrap();
+        wgpu::naga::valid::Validator::new(
+            wgpu::naga::valid::ValidationFlags::all(),
+            wgpu::naga::valid::Capabilities::all(),
+        )
+        .validate(&module)
+        .unwrap();
     }
 }

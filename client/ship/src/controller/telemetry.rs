@@ -36,6 +36,8 @@ pub struct NearbyBodyTelemetry {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct CoreStatus {
     pub consumption_watts: f64,
+    /// Actual instantaneous recipe draw; zero without power or a runnable job.
+    pub fabricator_watts: f64,
     pub conversion_watts: f64,
     pub conversion_remaining_joules: f64,
     pub depletion_seconds: Option<f64>,
@@ -95,7 +97,8 @@ impl ShipController {
         } else {
             let seconds = speed / reverse_acceleration;
             let distance_meters = 0.5 * speed * seconds;
-            let energy_joules = seconds * self.energy_core.config().demand_watts(-100, true);
+            let energy_joules = seconds
+                * (self.energy_core.config().demand_watts(-100, true) + self.fabricator_watts);
             if [seconds, distance_meters, energy_joules]
                 .iter()
                 .all(|v| v.is_finite())
@@ -123,7 +126,7 @@ impl ShipController {
         let demand = self.energy_core.config().demand_watts(
             self.thruster_percentage,
             self.flight_state == crate::FlightState::Flying,
-        );
+        ) + self.fabricator_watts;
         let stored = self.energy_core.stored_joules();
         let conversion = self.conversion.remaining_joules();
         let rate = self.conversion.active_watts();
@@ -140,6 +143,11 @@ impl ShipController {
             Some(duration + after / demand)
         };
         CoreStatus {
+            fabricator_watts: if self.energy_core.powered() {
+                self.fabricator_watts
+            } else {
+                0.0
+            },
             consumption_watts: if self.energy_core.powered() {
                 demand
             } else {

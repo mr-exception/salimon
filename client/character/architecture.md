@@ -178,3 +178,12 @@ retain the existing raw-array transform arithmetic while rejecting reversed fram
 arguments. Runtime uses them for persistent cargo and ship-relative presentation;
 local controller geometry retains the raw adapters. No validation, quaternion or
 normalization policy changes. See the [canonical inventory](../../docs/technical-architecture.md#position-boundaries-and-resource-dimensions-311).
+
+## Wall Fabricator (#342)
+
+The generated Fabricator box expands by the existing player radius for interior
+walking, zero-G and loose-object floor placement. Both Core aisles and the aft
+door route remain clear. Three generated markers own input, screen and tray
+positions. Ordinary sight queries treat the module as solid; the port query
+omits only its own conservative envelope because the input face is recessed
+behind the tray. Runtime still checks interior authority, front face, range and aim.

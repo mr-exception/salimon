@@ -177,6 +177,34 @@ impl EnergyCore {
         Ok((delivered / watts).min(seconds))
     }
 
+    /// Shared continuous load. Every consumer receives the same powered interval;
+    /// isolated assist reservations are never accessible on this bus.
+    pub fn advance_with_load(
+        &mut self,
+        delta: Duration,
+        throttle: i8,
+        free_flight: bool,
+        incoming_joules: f64,
+        additional_watts: f64,
+    ) -> Result<f64, InvalidEnergy> {
+        let watts = self.config.demand_watts(throttle, free_flight) + additional_watts;
+        if !additional_watts.is_finite()
+            || additional_watts < 0.0
+            || !watts.is_finite()
+            || !incoming_joules.is_finite()
+            || incoming_joules < 0.0
+        {
+            return Err(InvalidEnergy);
+        }
+        // Keep the historical zero-load path and its rounding behavior unchanged.
+        if additional_watts == 0.0 {
+            return self.advance_with_input(delta, throttle, free_flight, incoming_joules);
+        }
+        let seconds = delta.as_secs_f64();
+        let delivered = self.exchange_joules(incoming_joules, (watts * seconds).min(f64::MAX))?;
+        Ok((delivered / watts).min(seconds))
+    }
+
     /// All consumers share one bus; no consumer receives energy after exhaustion.
     /// Exact powered duration permits thrust integration followed by inertial coasting.
     pub fn advance(&mut self, delta: Duration, throttle: i8, free_flight: bool) -> f64 {
@@ -308,5 +336,36 @@ mod reservation_tests {
             assert!(core.reserve_assist(invalid).is_none());
             assert_eq!(core.stored_joules(), 50.0);
         }
+    }
+}
+
+#[cfg(test)]
+mod machine_load_tests {
+    use super::*;
+    #[test]
+    fn shared_load_is_atomic_and_cannot_spend_reserved_assist_energy() {
+        let mut core = EnergyCore::default();
+        core.set_stored_joules(1000.0).unwrap();
+        let reservation = core.reserve_assist(880.0).unwrap();
+        let funded = core
+            .advance_with_load(Duration::from_secs(1), 0, false, 0.0, 10_000.0)
+            .unwrap();
+        assert_eq!(funded, 0.001);
+        assert_eq!(core.stored_joules(), 0.0);
+        core.refund_assist(reservation);
+        assert_eq!(core.stored_joules(), 880.0);
+        for watts in [f64::NAN, f64::INFINITY, -1.0] {
+            assert!(
+                core.advance_with_load(Duration::from_secs(1), 100, true, 20.0, watts)
+                    .is_err()
+            );
+            assert_eq!(core.stored_joules(), 880.0);
+        }
+        // Simultaneous forward thrust, gravity, cockpit and independent machine load.
+        core.set_stored_joules(1000.0).unwrap();
+        let seconds = core
+            .advance_with_load(Duration::from_secs(1), 100, true, 0.0, 10_000.0)
+            .unwrap();
+        assert_eq!(seconds, 1000.0 / 100_120_000.0);
     }
 }

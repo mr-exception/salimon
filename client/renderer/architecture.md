@@ -341,3 +341,13 @@ buffer creation and queue writes; it does not measure GPU completion (#307).
 
 `RendererInfo::driver` retains the selected adapter's driver/driver-info strings
 for versioned visual-corpus provenance, alongside its name/backend (#308).
+
+## Authored Fabricator module and tray presentation (#342)
+
+The cabin component owns the wall chassis, monitor, input throat and tray, plus
+a stationary generic output package. Runtime reads the generated input marker.
+The renderer receives only a tray-occupied boolean; the existing ship uniform's
+spare component gates the authored output surface in the opaque shader. The
+package appears at completion and disappears on collection, with no animation,
+new draw or physical fragment identity. It follows the presented ship pose and
+remains visible during blackout. Monitor artwork/crafting UI are owned by #343.

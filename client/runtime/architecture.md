@@ -803,3 +803,51 @@ existing JSON keys and values.
 ## Consumable raw resources (#337)
 
 See the canonical [resource catalog and compatibility contract](../world/resource-contracts.md#consumable-raw-resources-337) for new feedstock generation, physical lifecycle, distinct presentation and Core yields.
+
+## Fabricator physical input (#339)
+
+The session owns a portable Fabricator. E inserts the one held world fragment
+through a universal interior port, within 3 m and 30 degrees with unobstructed
+sight. Core/cockpit/door targets retain priority; blackout does not gate intake.
+The port uses the generated ship-local Fabricator input marker (#342).
+Successful insertion removes the source exactly once and drains its physical
+journal into mass, motion, anchors and presentation caches immediately. Full
+reserves and invalid milligram masses leave both domains unchanged. The whole
+accepted object is consumed, with overflow discarded. F pickup/drop is unchanged.
+
+## Continuous Fabricator power (#340)
+
+Runtime registers the runnable head recipe's watts with ShipController before
+every shared gameplay tick, regardless of view, player location or flight state.
+The Core settles conversion, propulsion, idle and Fabricator demand together.
+Every ordinary bus consumer shares the exact funded interval, while reserved
+assist energy remains isolated. Runtime floors that interval to nanoseconds
+(no free progress; less than one nanosecond of paid work can be lost at an
+exhaustion boundary). No blackout time is banked. Recipe completion splits the
+tick and removes its load immediately; idle and blocked tray demand zero watts.
+Core telemetry exposes Fabricator watts separately and includes them in total
+draw, depletion and braking-energy estimates. Recipe efficiency is watts times
+actual worked duration; there is no second battery or assumed full powered frame.
+
+## Fabricator mass transitions (#341)
+
+The runtime updates two dedicated cached ledger keys for integer raw reserves
+and the one physical tray item. Every machine command and completion synchronizes
+immediately; zero contributions remove their keys. World fragment consumption
+drains the same physical journal before the input command returns, so carrying
+never creates a second cargo identity. Enqueue removes committed ingredients
+from accounted mass deliberately, collection removes tray mass, and cancellation
+never refunds. Queue/in-progress/consumable inventory contribute zero. Existing
+loose cargo and Core-consumed identity accounting retain their owners. Runtime
+UI/inventory adapters must use execute_fabricator and validate receiving slots
+before collection; no consumable collection UI is introduced by this issue.
+
+## Authored Fabricator module and tray presentation (#342)
+
+The cabin component owns the wall chassis, monitor, input throat and tray, plus
+a stationary generic output package. Runtime reads the generated input marker.
+The renderer receives only a tray-occupied boolean; the existing ship uniform's
+spare component gates the authored output surface in the opaque shader. The
+package appears at completion and disappears on collection, with no animation,
+new draw or physical fragment identity. It follows the presented ship pose and
+remains visible during blackout. Monitor artwork/crafting UI are owned by #343.

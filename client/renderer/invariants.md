@@ -119,3 +119,13 @@ flight/braking/navigation regions. Core-local screen ownership is unchanged.
 - Shared sphere resource instances use finite [0,1] linear RGB and opaque alpha;
   the 48-byte CPU upload layout matches three WGSL vec4 instance attributes.
   Resource identity/color changes never duplicate the shared sphere geometry.
+
+## Authored Fabricator module and tray presentation (#342)
+
+The cabin component owns the wall chassis, monitor, input throat and tray, plus
+a stationary generic output package. Runtime reads the generated input marker.
+The renderer receives only a tray-occupied boolean; the existing ship uniform's
+spare component gates the authored output surface in the opaque shader. The
+package appears at completion and disappears on collection, with no animation,
+new draw or physical fragment identity. It follows the presented ship pose and
+remains visible during blackout. Monitor artwork/crafting UI are owned by #343.

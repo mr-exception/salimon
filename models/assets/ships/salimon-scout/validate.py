@@ -556,7 +556,35 @@ def validate_scout(context, data):
             upward_top_vertices += 1
     require(upward_top_vertices >= 4, 'upward_top_vertices >= 4')
     validate_sightlines(document, geometry)
+    validate_fabricator(document, geometry)
 
+
+
+def validate_fabricator(document, binary):
+    """Keep the module inside its proxy and away from existing traversal routes."""
+    proxy=node(document, "COLLIDER_Fabricator")
+    center=proxy['translation'];size=proxy['extras']['salimon']['sizeMeters']
+    low=[center[i]-size[i]/2 for i in range(3)]
+    high=[center[i]+size[i]/2 for i in range(3)]
+    for name in ("Chassis", "Panels", "Frame", "Input", "Monitor", "Tray", "Output"):
+        minimum,maximum=node_position_bounds(document,binary,"Fabricator_"+name)
+        require(all(minimum[i]>=low[i]-1e-5 and maximum[i]<=high[i]+1e-5 for i in range(3)),
+                "Fabricator visual exceeds collision envelope: "+name)
+    require(low[2]>=3.0 and low[0]>-4.5 and high[0]<-1.5,
+            "Fabricator blocks Core/cockpit/door walking clearance")
+    port=node(document,"MARKER_FabricatorInput")['translation']
+    tray=node(document,"MARKER_FabricatorTray")['translation']
+    require(low[2] < port[2] < high[2] and low[0] < port[0] < high[0],
+            "Fabricator input must be on its cabin-facing recessed port")
+    product_min,product_max=node_position_bounds(document,binary,"Fabricator_Output")
+    require(abs(product_min[1]-tray[1])<1e-5 and product_max[0]-product_min[0]<.6,
+            "Fabricator package must rest at the one-item tray anchor")
+    screen=node(document,"Fabricator_Monitor")
+    primitive=document['meshes'][screen['mesh']]['primitives'][0]
+    require(len(accessor_values(document,binary,primitive['indices']))==6,
+            "Fabricator screen must have two triangles")
+    normals=accessor_values(document,binary,primitive['attributes']['NORMAL'])
+    require(all(n[2]<-.99 for n in normals),"Fabricator screen must face the cabin")
 
 
 REGISTRIES = {("ships", "ship", 1): validate_scout}

@@ -418,7 +418,8 @@ reject a full queue atomically. Stable monotonic job IDs are never reused.
 ### Invariants and transactions
 
 - Stored mass is bounded independently per stable world resource identity.
-  Insertion into even a full bin consumes the original fragment and discards excess.
+  Insertion consumes the original fragment and discards overflow only when space
+  remains; a full bin rejects without consuming the carried object (#339).
 - All units' ingredients leave storage together at enqueue. Reserved ingredients
   are committed costs, cannot be withdrawn and are never credited on cancellation.
 - Only the FIFO head advances. Collecting output frees the tray; no elapsed time

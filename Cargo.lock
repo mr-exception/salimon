@@ -1778,6 +1778,7 @@ dependencies = [
  "pollster",
  "salimon-character",
  "salimon-diagnostics",
+ "salimon-fabrication",
  "salimon-math",
  "salimon-physics",
  "salimon-renderer",

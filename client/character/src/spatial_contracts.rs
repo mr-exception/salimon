@@ -1,5 +1,8 @@
 // Generated from Blender-authored scout spatial contracts; do not edit by hand.
 // Bounds: [forward min/max, up min/max, port min/max] in ship-local meters.
+pub const FABRICATOR_INPUT_MARKER_METERS: [f64; 3] = [-3.0, 1.65, 3.55];
+pub const FABRICATOR_MONITOR_MARKER_METERS: [f64; 3] = [-3.8, 2.0, 3.69];
+pub const FABRICATOR_TRAY_MARKER_METERS: [f64; 3] = [-2.55, 0.991, 3.4];
 pub const COCKPIT_SEAT_MARKER_METERS: [f64; 3] = [2.76, 1.129032258064516, 0.0];
 pub const EXIT_DOOR_MARKER_METERS: [f64; 3] = [-7.1, 1.3440860215053763, 0.0];
 pub const PLAYER_START_MARKER_METERS: [f64; 3] = [0.5, 1.9973118279569892, -2.2];
@@ -45,6 +48,8 @@ pub(crate) const AFT_DOOR_BOUNDS: [f64; 6] = [
     -1.4,
     1.4,
 ];
+// COLLIDER_Fabricator
+pub(crate) const FABRICATOR_BOUNDS: [f64; 6] = [-4.35, -1.95, 0.5, 2.4, 3.1, 4.4];
 // COLLIDER_EnergyCore
 pub(crate) const CORE_BOUNDS: [f64; 6] =
     [-2.0, 0.0, 0.24731182795698947, 2.053763440860215, -1.0, 1.0];

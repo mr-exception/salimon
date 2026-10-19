@@ -1,8 +1,8 @@
 {
   "extras": {
     "salimon": {
-      "drawPrimitiveCount": 116,
-      "triangleCount": 6329,
+      "drawPrimitiveCount": 123,
+      "triangleCount": 6493,
       "materialCount": 13,
       "externalAssetDependencies": 0,
       "scaleFromTask7Baseline": [
@@ -25,7 +25,7 @@
         "width": 9.2,
         "height": 2.5591397849462365
       },
-      "designRevision": "bottom-hinged-boarding-ramp",
+      "designRevision": "wall-integrated-fabricator",
       "energyCore": {
         "centerMeters": [
           -1.0,
@@ -141,7 +141,7 @@
   },
   "assetExtras": {
     "salimon": {
-      "assetVersion": 13,
+      "assetVersion": 14,
       "units": "meters",
       "upAxis": "+Y",
       "forwardAxis": "+X",

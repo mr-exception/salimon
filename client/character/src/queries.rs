@@ -33,6 +33,22 @@ pub fn ship_floor_placement(local: [f64; 3], half: f64) -> Option<[f64; 3]> {
 /// Inputs are ship-local; the returned distance is in meters along a unit ray.
 #[must_use]
 pub fn ship_sight_obstruction(eye: [f64; 3], target: [f64; 3], door_open: bool) -> Option<f64> {
+    sight_obstruction(eye, target, door_open, false)
+}
+
+/// The input port is recessed behind its own conservative tray/fixture envelope.
+/// Ignore that envelope only for this authored face; all other solids still occlude.
+#[must_use]
+pub fn fabricator_input_sight_obstruction(eye: [f64; 3]) -> Option<f64> {
+    sight_obstruction(eye, crate::FABRICATOR_INPUT_MARKER_METERS, true, true)
+}
+
+fn sight_obstruction(
+    eye: [f64; 3],
+    target: [f64; 3],
+    door_open: bool,
+    input_face: bool,
+) -> Option<f64> {
     let direction = sub(target, eye);
     let length = dot(direction, direction).sqrt();
     if !length.is_finite() || length <= 0.0 || !eye.iter().all(|v| v.is_finite()) {
@@ -72,16 +88,21 @@ pub fn ship_sight_obstruction(eye: [f64; 3], target: [f64; 3], door_open: bool) 
     if (inside_cabin || inside_nose) && eye[1] >= SHIP_FLOOR_HEIGHT && eye[1] <= SHIP_CEILING_HEIGHT
     {
         boxes.clear();
-        boxes.extend(INTERIOR_OBSTACLES.iter().map(|b| {
-            [
-                b[0],
-                b[1],
-                SHIP_FLOOR_HEIGHT,
-                SHIP_CEILING_HEIGHT,
-                b[2],
-                b[3],
-            ]
-        }));
+        boxes.extend(
+            INTERIOR_OBSTACLES
+                .iter()
+                .filter(|b| !input_face || **b != FABRICATOR_OBSTACLE)
+                .map(|b| {
+                    [
+                        b[0],
+                        b[1],
+                        SHIP_FLOOR_HEIGHT,
+                        SHIP_CEILING_HEIGHT,
+                        b[2],
+                        b[3],
+                    ]
+                }),
+        );
         // The shared deck and ceiling occlude objects on the other side.
         for (x0, x1, z0, z1) in [
             (
@@ -226,5 +247,20 @@ mod containment_tests {
         assert!(!ship_contains_object([-5.0, 10.0, 0.0]));
         assert!(!ship_contains_object([0.0, -1.0, 0.0]));
         assert!(!ship_contains_object([f64::NAN, 1.0, 0.0]));
+    }
+}
+
+#[cfg(test)]
+mod fabricator_tests {
+    use super::*;
+    #[test]
+    fn wall_module_blocks_physical_objects_and_sight_but_not_its_input_or_aisles() {
+        assert!(ship_floor_placement([-3.0, 1.0, 3.5], 0.1).is_none());
+        assert!(ship_floor_placement([-3.0, 1.0, 2.0], 0.1).is_some());
+        assert!(ship_floor_placement([-5.0, 1.0, 3.4], 0.1).is_some());
+        let eye = [-3.0, 1.65, 2.0];
+        let input = crate::FABRICATOR_INPUT_MARKER_METERS;
+        assert!(ship_sight_obstruction(eye, input, true).unwrap() < 1.55);
+        assert!(fabricator_input_sight_obstruction(eye).is_none_or(|hit| hit >= 1.55));
     }
 }

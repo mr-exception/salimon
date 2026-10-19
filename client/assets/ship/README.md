@@ -223,3 +223,12 @@ See the [authored support contract](../../../models/assets/ships/salimon-scout/R
 for regeneration, proxy ownership and the aft threshold/ramp reservation.
 The exported ship envelope is 18.33 × 6 × 20 m including the legs; the original
 non-gear envelope stays 18.33 × 4 × 20 m. Two GPU draws and 13 materials remain.
+
+## Wall Fabricator (#342)
+
+The linked cabin source now includes a wall-integrated Fabricator, input port,
+monitor and single-item tray, with three generated anchors and one fixture box.
+See the [source/authoring guide](../../../models/assets/ships/salimon-scout/README.md#fabricator-wall-module-342).
+Its output package is an authored conditional surface in the existing opaque
+draw, visible exactly when the domain tray is occupied; it is not a loose
+fragment and has no automatic animation. Screen UI remains #343.

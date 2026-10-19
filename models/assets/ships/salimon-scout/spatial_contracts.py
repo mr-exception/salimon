@@ -20,13 +20,14 @@ LANDING_COLLIDERS = tuple(
 )
 WING_COLLIDERS = ("COLLIDER_Wing_Port", "COLLIDER_Wing_Starboard")
 MARKERS = ("MARKER_CockpitSeat", "MARKER_ExitDoor", "MARKER_PlayerStart",
-           "MARKER_DoorwayTransition")
+           "MARKER_DoorwayTransition", "MARKER_FabricatorInput", "MARKER_FabricatorMonitor", "MARKER_FabricatorTray")
 LAYOUT_BOXES = {
     "INTERIOR_FLOOR_BOUNDS": "COLLIDER_InteriorFloor",
     "NOSE_FLOOR_BOUNDS": "COLLIDER_CockpitNoseFloor",
     "CABIN_TRAVERSAL_BOUNDS": "COLLIDER_CabinTraversalEnvelope",
     "CABIN_EXTERIOR_BOUNDS": "COLLIDER_CabinExteriorEnvelope",
     "AFT_DOOR_BOUNDS": "COLLIDER_AftDoor",
+    "FABRICATOR_BOUNDS": "COLLIDER_Fabricator",
     "CORE_BOUNDS": "COLLIDER_EnergyCore",
     "PILOT_CHAIR_BOUNDS": "COLLIDER_PilotChair",
     "CONSOLE_BOUNDS": "COLLIDER_CockpitCenterConsole",
@@ -162,6 +163,9 @@ def build_spatial_contracts(document, preservation=None, binary=None):
         "colliders": colliders,
         "markers": markers,
         "anchors": {
+            "fabricatorInput": markers["MARKER_FabricatorInput"]["positionMeters"],
+            "fabricatorMonitor": markers["MARKER_FabricatorMonitor"]["positionMeters"],
+            "fabricatorTray": markers["MARKER_FabricatorTray"]["positionMeters"],
             "cockpitSeat": markers["MARKER_CockpitSeat"]["positionMeters"],
             "exitDoor": markers["MARKER_ExitDoor"]["positionMeters"],
             "doorwayTransition": markers["MARKER_DoorwayTransition"]["positionMeters"],
@@ -245,6 +249,9 @@ def spatial_rust_source(contracts):
         "// Bounds: [forward min/max, up min/max, port min/max] in ship-local meters.",
     ]
     for rust_name, key in (
+        ("FABRICATOR_INPUT_MARKER_METERS", "fabricatorInput"),
+        ("FABRICATOR_MONITOR_MARKER_METERS", "fabricatorMonitor"),
+        ("FABRICATOR_TRAY_MARKER_METERS", "fabricatorTray"),
         ("COCKPIT_SEAT_MARKER_METERS", "cockpitSeat"),
         ("EXIT_DOOR_MARKER_METERS", "exitDoor"),
         ("PLAYER_START_MARKER_METERS", "playerStart"),

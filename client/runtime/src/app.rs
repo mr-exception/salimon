@@ -525,7 +525,11 @@ impl ClientApplication {
         );
         let fragment_interaction = !matches!(
             interaction,
-            Some(InteractionTarget::ExitDoor | InteractionTarget::Core)
+            Some(
+                InteractionTarget::ExitDoor
+                    | InteractionTarget::Core
+                    | InteractionTarget::Fabricator
+            )
         ) && (self.session.mining.session.carried_id().is_some()
             || crate::carrying::target(
                 &self.session.mining,
@@ -595,7 +599,9 @@ impl ClientApplication {
                 vertical_fov_radians: 70.0_f32.to_radians(),
                 near_plane_meters: 0.05,
             };
-            Some(map_ship_to_renderer(presentation.ship))
+            let mut mesh = map_ship_to_renderer(presentation.ship);
+            mesh.fabricator_output_present = self.session.fabricator_output_present();
+            Some(mesh)
         } else {
             None
         };

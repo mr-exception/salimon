@@ -31,6 +31,8 @@ pub struct ShipController {
     pub(crate) thruster_percentage: i8,
     throttle_input: throttle::HeldThrottle,
     energy_core: crate::EnergyCore,
+    fabricator_watts: f64,
+    fabricator_powered_seconds: f64,
     pub(crate) conversion: crate::conversion::Conversion,
     cockpit_message: Option<CockpitMessage>,
     steering_target: SteeringInput,
@@ -66,6 +68,8 @@ impl Default for ShipController {
             throttle_input: throttle::HeldThrottle::default(),
             thruster_percentage: 0,
             energy_core: crate::EnergyCore::default(),
+            fabricator_watts: 0.0,
+            fabricator_powered_seconds: 0.0,
             conversion: crate::conversion::Conversion::default(),
             cockpit_message: None,
             steering_target: SteeringInput::default(),
@@ -93,6 +97,8 @@ impl ShipController {
             throttle_input: throttle::HeldThrottle::default(),
             thruster_percentage: thruster_percentage.clamp(-100, 100),
             energy_core: crate::EnergyCore::default(),
+            fabricator_watts: 0.0,
+            fabricator_powered_seconds: 0.0,
             conversion: crate::conversion::Conversion::default(),
             cockpit_message: None,
             steering_target: SteeringInput::default(),
@@ -128,7 +134,26 @@ impl ShipController {
         self.propulsion = propulsion;
     }
 
+    /// Register requested recipe watts independently of the existing ship consumers.
+    pub fn set_fabricator_watts(&mut self, watts: f64) -> Result<(), crate::InvalidEnergy> {
+        let total = self.energy_core.config().demand_watts(100, true) + watts;
+        let reverse = self.energy_core.config().demand_watts(-100, true) + watts;
+        if !watts.is_finite() || watts < 0.0 || !total.is_finite() || !reverse.is_finite() {
+            return Err(crate::InvalidEnergy);
+        }
+        self.fabricator_watts = watts;
+        Ok(())
+    }
+
+    /// Funded interval from the last advance; no duration is banked between ticks.
+    pub fn fabricator_powered_duration(&self, delta: Duration) -> Duration {
+        // Floor at the Duration boundary: never grant even a nanosecond of free work.
+        let nanos = (self.fabricator_powered_seconds * 1_000_000_000.0).floor();
+        Duration::from_nanos(nanos.clamp(0.0, u64::MAX as f64) as u64).min(delta)
+    }
+
     pub fn advance(&mut self, delta: Duration) {
+        self.fabricator_powered_seconds = 0.0;
         let converting = self.conversion.remaining_duration().min(delta);
         let incoming = self.conversion.advance(converting);
         self.advance_with_core_input(converting, incoming)
@@ -160,12 +185,16 @@ impl ShipController {
         }
         self.advance_door(delta);
         self.advance_throttle(delta);
-        let powered_seconds = self.energy_core.advance_with_input(
+        let powered_seconds = self.energy_core.advance_with_load(
             delta,
             self.thruster_percentage,
             self.flight_state == FlightState::Flying,
             incoming_joules,
+            self.fabricator_watts,
         )?;
+        if self.fabricator_watts > 0.0 {
+            self.fabricator_powered_seconds += powered_seconds;
+        }
         // Integrate steering only over the powered part of the interval, then
         // clear input residue at blackout so restoration preserves the heading.
         self.advance_steering(powered_seconds);

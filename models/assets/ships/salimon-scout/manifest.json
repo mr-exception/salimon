@@ -48,7 +48,14 @@
     "nodes": [
       "Exit_Door",
       "Monitor_Wide",
-      "Core_Monitor"
+      "Core_Monitor",
+      "Fabricator_Chassis",
+      "Fabricator_Panels",
+      "Fabricator_Frame",
+      "Fabricator_Input",
+      "Fabricator_Monitor",
+      "Fabricator_Tray",
+      "Fabricator_Output"
     ],
     "materials": [
       "Hull Graphite",
@@ -70,7 +77,10 @@
       "MARKER_CockpitSeat",
       "MARKER_ExitDoor",
       "MARKER_PlayerStart",
-      "MARKER_DoorwayTransition"
+      "MARKER_DoorwayTransition",
+      "MARKER_FabricatorInput",
+      "MARKER_FabricatorMonitor",
+      "MARKER_FabricatorTray"
     ],
     "colliders": [
       "COLLIDER_InteriorFloor",
@@ -100,7 +110,8 @@
       "COLLIDER_Landing_Forward_Port_Foot",
       "COLLIDER_Landing_Forward_Port_Leg",
       "COLLIDER_Landing_Forward_Starboard_Foot",
-      "COLLIDER_Landing_Forward_Starboard_Leg"
+      "COLLIDER_Landing_Forward_Starboard_Leg",
+      "COLLIDER_Fabricator"
     ],
     "requiredExtras": [
       {
@@ -297,6 +308,30 @@
       },
       {
         "node": "Core_Monitor",
+        "path": "salimon"
+      },
+      {
+        "node": "Fabricator_Monitor",
+        "path": "salimon"
+      },
+      {
+        "node": "Fabricator_Output",
+        "path": "salimon"
+      },
+      {
+        "node": "COLLIDER_Fabricator",
+        "path": "salimon"
+      },
+      {
+        "node": "MARKER_FabricatorInput",
+        "path": "salimon"
+      },
+      {
+        "node": "MARKER_FabricatorMonitor",
+        "path": "salimon"
+      },
+      {
+        "node": "MARKER_FabricatorTray",
         "path": "salimon"
       }
     ]
@@ -1066,7 +1101,7 @@
   },
   "visualBudget": {
     "style": "option-a",
-    "maxNodes": 140,
+    "maxNodes": 151,
     "maxTextureMemoryBytes": 1364,
     "maxDrawCalls": 2
   },

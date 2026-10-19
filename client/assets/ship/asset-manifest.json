@@ -1,7 +1,7 @@
 {
   "name": "Salimon Phase 0 Scout",
-  "assetVersion": 13,
-  "source": "../../../models/assets/ships/salimon-scout/source.blend",
+  "assetVersion": 14,
+  "source": "../../../models/assets/ships/salimon-scout/assembly/salimon-scout.blend",
   "editableInterchange": "export/salimon_phase0_ship.gltf",
   "runtimeAsset": "export/salimon_phase0_ship.glb",
   "units": "meters",
@@ -153,5 +153,15 @@
       256
     ]
   },
-  "exportCommand": "python3 models/assets/ships/salimon-scout/export.py"
+  "exportCommand": "python3 models/assets/ships/salimon-scout/export.py",
+  "fabricator": {
+    "component": "cabin-interior",
+    "collision": "COLLIDER_Fabricator",
+    "input": "MARKER_FabricatorInput",
+    "monitor": "MARKER_FabricatorMonitor",
+    "tray": "MARKER_FabricatorTray",
+    "output": "Fabricator_Output",
+    "outputVisibility": "tray-occupied",
+    "additionalDraws": 0
+  }
 }

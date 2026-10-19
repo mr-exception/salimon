@@ -11,6 +11,7 @@ pub(crate) const COCKPIT_INTERACTION_PROMPT: &str = "Press E to use";
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum InteractionTarget {
+    Fabricator,
     Cockpit,
     Core,
     ExitDoor,
@@ -49,6 +50,8 @@ pub(crate) fn interaction_target(
         && local_eye_position[2].abs() < 2.3
     {
         Some(InteractionTarget::ExitDoor)
+    } else if fabricator_target(local_eye_position, local_look_target) {
+        Some(InteractionTarget::Fabricator)
     } else {
         None
     }
@@ -60,11 +63,9 @@ pub(crate) fn available_interaction_target(
     local_look_target: [f64; 3],
 ) -> Option<InteractionTarget> {
     match interaction_target(local_eye_position, local_look_target) {
-        Some(InteractionTarget::Cockpit | InteractionTarget::Core)
-            if location != CharacterLocation::InsideShip =>
-        {
-            None
-        }
+        Some(
+            InteractionTarget::Cockpit | InteractionTarget::Core | InteractionTarget::Fabricator,
+        ) if location != CharacterLocation::InsideShip => None,
         target => target,
     }
 }
@@ -79,4 +80,21 @@ fn dot(left: [f64; 3], right: [f64; 3]) -> f64 {
 
 fn vector_length(vector: [f64; 3]) -> f64 {
     dot(vector, vector).sqrt()
+}
+
+/// Canonical authored input face, generated from the Blender source.
+pub(crate) const FABRICATOR_INPUT_METERS: [f64; 3] =
+    salimon_character::FABRICATOR_INPUT_MARKER_METERS;
+
+fn fabricator_target(eye: [f64; 3], look: [f64; 3]) -> bool {
+    let to_input = subtract(FABRICATOR_INPUT_METERS, eye);
+    let distance = vector_length(to_input);
+    let direction = subtract(look, eye);
+    distance > f64::EPSILON && distance <= 3.0
+        && dot(to_input, direction) / (distance * vector_length(direction)).max(f64::EPSILON)
+            >= COCKPIT_INTERACTION_MINIMUM_AIM_DOT
+        // The port is on the cabin-facing surface; no interaction through its back.
+        && eye[2] < FABRICATOR_INPUT_METERS[2]
+        && salimon_character::fabricator_input_sight_obstruction(eye)
+            .is_none_or(|hit| hit >= distance - 0.02)
 }

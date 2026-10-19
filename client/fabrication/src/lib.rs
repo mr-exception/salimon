@@ -25,6 +25,7 @@ pub enum FabricationError {
     InsufficientMaterial(salimon_world::resources::ResourceId),
     UnknownJob,
     EmptyTray,
+    StorageFull(salimon_world::resources::ResourceId),
 }
 
 impl std::fmt::Display for FabricationError {

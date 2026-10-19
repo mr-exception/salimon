@@ -25,7 +25,7 @@ methods. Bins use world catalog identities in stable catalog order. All balances
 and recipe costs are integer milligrams; world positive finite kg round once to
 the nearest mg (half upward). Sub-half-mg and overflowing values are rejected,
 preserving the original fragment. Accepted insertions consume the entire original
-fragment, including zero accepted mass at a full bin. `Insertion` reports accepted
+fragment; a full bin rejects input without consuming it (#339). `Insertion` reports accepted
 and discarded mg; runtime must remove the source exactly once. There is no raw
 withdrawal operation. This crate cannot itself despawn physical entities.
 

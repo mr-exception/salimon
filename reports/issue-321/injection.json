@@ -4,7 +4,7 @@
   "fixture": "core",
   "temporal_passed": true,
   "appearance_passed": false,
-  "approval": "pending; direct pixel comparison does not certify reviewed appearance",
+  "approval": "approved baseline; injected corpus is disposable test evidence",
   "results": [
     {
       "frame": "core-restart-repeat-00.png",
@@ -51,5 +51,12 @@
       "peak_channel_delta": 0,
       "passed": true
     }
-  ]
+  ],
+  "reviewed_exit_code": 1,
+  "reviewed_coverage": {
+    "status": "failed",
+    "passed": false,
+    "baseline_revision": "6eacbbac2cd341a990b3d50e0482cd7997dac702",
+    "capture_revision": "6eacbbac2cd341a990b3d50e0482cd7997dac702"
+  }
 }

@@ -1,5 +1,6 @@
 {
-  "status": "candidate",
-  "passed": false,
-  "reason": "human image/mask/tolerance approval pending"
+  "status": "passed",
+  "passed": true,
+  "baseline_revision": "6eacbbac2cd341a990b3d50e0482cd7997dac702",
+  "capture_revision": "6eacbbac2cd341a990b3d50e0482cd7997dac702"
 }

@@ -1,0 +1,50 @@
+{
+  "passed": true,
+  "results": [
+    {
+      "frame": "core-restart-repeat-00.png",
+      "kind": "baseline",
+      "changed_pixels": 0,
+      "compared_pixels": 1024000,
+      "changed_fraction": 0.0,
+      "peak_channel_delta": 0,
+      "passed": true
+    },
+    {
+      "frame": "core-restart-repeat-01.png",
+      "kind": "baseline",
+      "changed_pixels": 0,
+      "compared_pixels": 1024000,
+      "changed_fraction": 0.0,
+      "peak_channel_delta": 0,
+      "passed": true
+    },
+    {
+      "frame": "core-restart-repeat-02.png",
+      "kind": "baseline",
+      "changed_pixels": 0,
+      "compared_pixels": 1024000,
+      "changed_fraction": 0.0,
+      "peak_channel_delta": 0,
+      "passed": true
+    },
+    {
+      "frame": "core-restart-repeat-01.png",
+      "kind": "temporal",
+      "changed_pixels": 0,
+      "compared_pixels": 1024000,
+      "changed_fraction": 0.0,
+      "peak_channel_delta": 0,
+      "passed": true
+    },
+    {
+      "frame": "core-restart-repeat-02.png",
+      "kind": "temporal",
+      "changed_pixels": 0,
+      "compared_pixels": 1024000,
+      "changed_fraction": 0.0,
+      "peak_channel_delta": 0,
+      "passed": true
+    }
+  ]
+}

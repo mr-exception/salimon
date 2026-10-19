@@ -8,6 +8,8 @@ pub enum ResourceId {
     IronOre,
     SilicateRock,
     WaterIce,
+    OrganicBiomass,
+    MedicinalCompounds,
 }
 
 impl ResourceId {
@@ -17,7 +19,14 @@ impl ResourceId {
             Self::IronOre => "iron-ore",
             Self::SilicateRock => "silicate-rock",
             Self::WaterIce => "water-ice",
+            Self::OrganicBiomass => "organic-biomass",
+            Self::MedicinalCompounds => "medicinal-compounds",
         }
+    }
+
+    /// Separate abundance layer keeps existing mineral placement unchanged.
+    pub const fn is_consumable_feedstock(self) -> bool {
+        matches!(self, Self::OrganicBiomass | Self::MedicinalCompounds)
     }
 
     pub fn from_key(key: &str) -> Option<Self> {
@@ -64,6 +73,18 @@ pub static RESOURCE_CATALOG: &[ResourceDefinition] = &[
         name: "Water ice",
         density_kg_per_m3: 920.0,
         energy_joules_per_kg: 2_000_000_000.0,
+    },
+    ResourceDefinition {
+        id: ResourceId::OrganicBiomass,
+        name: "Organic biomass",
+        density_kg_per_m3: 600.0,
+        energy_joules_per_kg: 250_000_000.0,
+    },
+    ResourceDefinition {
+        id: ResourceId::MedicinalCompounds,
+        name: "Medicinal compounds",
+        density_kg_per_m3: 1_200.0,
+        energy_joules_per_kg: 100_000_000.0,
     },
 ];
 

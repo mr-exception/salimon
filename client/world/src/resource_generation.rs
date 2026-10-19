@@ -65,14 +65,20 @@ pub fn materialize_nearby_deposits(
     let chord =
         ((radius_meters + (length - body.radius_meters).abs()) / body.radius_meters).min(2.0);
     let inputs = profile.generation_inputs(world_seed, biome);
-    let max_weight = inputs
-        .iter()
-        .map(|i| i.distribution.weight())
-        .fold(0.0, f64::max);
-    let total_weight: f64 = inputs
-        .iter()
-        .map(|i| i.distribution.weight() / max_weight)
-        .sum();
+    // Normalize each material layer independently. New feedstocks must not
+    // change existing mineral acceptance, poses, mass or stable IDs.
+    let totals: [(f64, f64); 2] = std::array::from_fn(|group| {
+        let selected = || {
+            inputs.iter().filter(|i| {
+                usize::from(i.distribution.resource().is_consumable_feedstock()) == group
+            })
+        };
+        let max = selected()
+            .map(|i| i.distribution.weight())
+            .fold(0.0, f64::max);
+        let sum = selected().map(|i| i.distribution.weight() / max).sum();
+        (max, sum)
+    });
     let mut output = Vec::new();
     let mut candidates = 0;
     for input in inputs {
@@ -119,6 +125,8 @@ pub fn materialize_nearby_deposits(
             for u in intervals[0][0]..=intervals[0][1] {
                 for v in intervals[1][0]..=intervals[1][1] {
                     let seed = cell_seed(input.seed, cells, face, u, v);
+                    let (max_weight, total_weight) =
+                        totals[usize::from(distribution.resource().is_consumable_feedstock())];
                     let probability = (distribution.weight() / max_weight) / total_weight;
                     if sample(seed, 0) >= probability {
                         continue;

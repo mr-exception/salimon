@@ -798,3 +798,8 @@ Interior character history interpolates typed ship-local points; fragment anchor
 storage also requires that type. Renderer mesh scale and analytic sphere diameter
 have separate names. Automation serializes explicit arrays and preserves its
 existing JSON keys and values.
+
+
+## Consumable raw resources (#337)
+
+See the canonical [resource catalog and compatibility contract](../world/resource-contracts.md#consumable-raw-resources-337) for new feedstock generation, physical lifecycle, distinct presentation and Core yields.

@@ -16,6 +16,7 @@ dependencies; each crate's architecture/invariants defines its local contracts.
 | Boundary | Implemented ownership |
 | --- | --- |
 | `client/runtime/` | Native shell/lifecycle/evidence IO plus portable GameplaySession commands, snapshots, stepping, resource/cargo adapters and presentation mapping |
+| `client/fabrication/` | Portable validated recipes, integer raw storage/reservation, FIFO jobs and single tray; runtime adapters remain separate |
 | `client/world/` | Static six-body compressed catalog, `f64` coordinates/camera tour, resource contracts, generation, extraction/session deltas, fragments and one-object carrying |
 | `client/ship/` | Pose, cockpit authority, inertial force-based flight, uncancellable landing/takeoff, airlock interlocks and live telemetry |
 | `client/physics/` | Portable small-object gravity, ejection/release velocity, authored convex contacts and angular motion, restitution and deterministic substeps; caller-supplied surfaces/geometry |
@@ -157,7 +158,7 @@ they are not dependencies or scaffolding requirements for current work:
 | Workers/scheduler/event bus | Evaluate for measured simulation needs; no worker infrastructure required by current native composition |
 | Streaming/storage | Larger spatial hierarchies and storage interfaces remain future work; IndexedDB is the browser cache direction, native storage needs a platform implementation |
 | Networking/server | Authoritative multiplayer server and shared deterministic domain reuse are future architecture |
-| Survival/economy/crafting/NPCs | Product directions, not implemented crates or interfaces |
+| Survival/economy/NPCs | Product directions, not implemented crates or interfaces |
 
 Future public component boundaries should declare capabilities, errors,
 compatibility and versioning. Shared buffers need profiling and documented
@@ -308,3 +309,8 @@ snapshot `side_meters` keep their previous numeric meanings. The solver snapshot
 unused mesh-scale slot retains its historical diameter value for analytic spheres;
 it is not consumed as analytic contact size. No asset, terrain codec, scenario,
 material-volume, mass or session persistence contract changes.
+
+
+Fabricator crafting is newly authorized by the [accepted five-round contracts](spaceship-building-and-survival.md#accepted-fabricator-contracts-2026-10-19-336). Implementation is staged: #336 contracts, #337 raw materials, #338 portable domain, then separate runtime/UI integration. Survival effects, disk persistence and playable progression remain deferred.
+
+The #338 portable Fabricator domain is implemented in [salimon-fabrication](../client/fabrication/architecture.md). It depends only on world resource contracts; native/playable integration remains #339–#347.

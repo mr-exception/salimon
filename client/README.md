@@ -14,6 +14,7 @@ ship asset/runtime mesh path. Add future Cargo packages explicitly to the root w
 | --- | --- |
 | `runtime/` | Native lifecycle, redraw/update scheduling, typed key routing, timing, and client composition |
 | `renderer/` | `wgpu` resources, camera-relative conversion, reverse-Z scene/ship/overlay pipelines, measurements, and presentation |
+| `fabrication/` | Portable recipes, raw storage/reservation, FIFO crafting and output tray; physical/Core/inventory integration remains separate |
 | `world/` | Immutable six-body compressed Solar System, portable `f64` coordinates, camera state, geometry math, precision markers, resource generation, mining session state, and carrying |
 | `physics/` | Portable physical-object gravity, velocity, contact and substeps with caller-supplied geometry |
 | `math/` | Dependency-free `f64` vector primitives; units, frames and normalization policy remain caller-owned |
@@ -27,7 +28,7 @@ Character, ship, physics and runtime also consume the dependency-free `salimon-m
 leaf crate. World and renderer retain their own precision/validation policies.
 See the [shared math decision](../docs/technical-architecture.md#shared-math-decision-115).
 
-The current dependency direction is:
+The current runtime dependency direction is:
 
 ```text
 salimon-client (runtime, winit lifecycle, clocks, snapshot mapping)
@@ -80,3 +81,5 @@ in [Project Phases](../docs/project-phases.md#realistic-flightcore-wave-185197).
 Ship mass, energy, conversion/reservations and cockpit telemetry are authoritative;
 rendering and CPU profiling remain observational. `--flight-profile` is a release
 CPU workload suite, not an Apple M1 frame-rate certification.
+
+`salimon-fabrication` is a portable workspace library depending on world resource values; it awaits runtime integration in #339–#347. See its [architecture](fabrication/architecture.md).

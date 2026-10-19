@@ -9,6 +9,8 @@ Runtime systems map these values into presentation and physics objects later.
 | `iron-ore` | Iron-bearing ore | 3500 |
 | `silicate-rock` | Silicate rock | 2700 |
 | `water-ice` | Water ice | 920 |
+| `organic-biomass` | Organic biomass | 600 |
+| `medicinal-compounds` | Medicinal compounds | 1200 |
 
 These are initial gameplay approximations, not purity/chemistry simulations.
 Persist or communicate `ResourceId::key()`, never catalog indices or Rust enum
@@ -358,3 +360,21 @@ mutation event. Pickup/drop still emit at an unchanged pose; growth, physical
 removal and actual transforms retain ordered/coalesced journal semantics.
 Runtime invalidates containment membership when the ship frame changes rather
 than relying on no-op poses to trigger mass work.
+
+
+## Consumable raw resources (#337)
+
+World adds stable keys `organic-biomass` (600 kg/m³) and
+`medicinal-compounds` (1200 kg/m³). Earth has both, in a separate abundance
+layer so existing mineral identities, placements and masses stay unchanged.
+Biomass uses weight 3, 35 m spacing, 5–20 kg; medicinal compounds weight 1,
+45 m spacing, 2–10 kg. Other bodies retain their mineral-only defaults.
+These are proposed gameplay tunables, not scientific/balanced chemistry.
+The same generation, depletion, spherical mining, physical fragment, carrying
+and in-session streaming contracts apply. Runtime reuses the authored boulder
+and crown geometry with green/purple tints; fragments use the shared sphere
+with corresponding tints and density-derived radius. No asset export changes.
+Core accepts both using proposed 0.25/0.1 GJ/kg yields and the ordinary single
+intake/conversion path. ConversionConfig exposes both yields with the same
+finite/nonnegative validation. Original three yields/visual mappings are unchanged.
+CPU tests verify these contracts; native appearance is not certified by them.

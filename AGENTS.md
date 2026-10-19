@@ -21,7 +21,7 @@ Current implementation is a native, client-only custom Rust/winit/wgpu game.
 backend implementation. Ship flight/landing, movement/EVA, mining, carrying and
 fragment motion/contact are implemented. Resource changes survive local streaming
 in the current in-memory session. Disk/backend persistence, networking, orbital
-simulation and production survival/energy management remain deferred.
+simulation and production survival remain deferred. Fabricator crafting is authorized by #336–#348; see the accepted contracts in docs/spaceship-building-and-survival.md.
 
 Explicit user instructions govern the task. Approved specifications and issue
 acceptance criteria define intended behavior; current code/tests establish what

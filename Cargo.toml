@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "client/character",
+    "client/fabrication",
     "client/diagnostics",
     "client/math",
     "client/physics",

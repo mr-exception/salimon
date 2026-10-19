@@ -313,3 +313,8 @@ an endurance guarantee. Future force/efficiency upgrades, landing speed/range/
 cost upgrades, extra module consumers, gravity/orbits, manual power management
 and detailed inertial cabin forces are OUT OF SCOPE. Existing setters are
 integration/tuning seams, not shipped upgrade mechanics.
+
+
+## Consumable raw resources (#337)
+
+See the canonical [resource catalog and compatibility contract](../world/resource-contracts.md#consumable-raw-resources-337) for new feedstock generation, physical lifecycle, distinct presentation and Core yields.

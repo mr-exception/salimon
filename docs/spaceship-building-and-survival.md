@@ -110,7 +110,7 @@ The game should avoid conventional abstract inventory.
 - The player has no general backpack or pocket inventory for resources or other ordinary world objects.
 - Equipped gear and dedicated equipment slots are separate from the one-object carrying mechanic and do not consume that carrying capacity.
 - A player can equip one primary gun/tool and carry one extra in a toolbelt; these equipped/toolbelt items are separate from the one-object carrying mechanic.
-- Future suit/outfit gear may provide dedicated consumable slots, such as **4 food-ration slots** or **3 medkit slots**. Exact slot design is deferred, but these slots must remain separate from physical world-object carrying.
+- The accepted Fabricator wave specifies **3 food-ration slots** and **2 medkit slots**, one item each, separate from physical world-object carrying. See the accepted Fabricator contracts below.
 - Future transport aids such as electrical carts may help move multiple physical items, without increasing the player's personal one-object carrying capacity.
 - Every physical item has mass and volume and these properties affect carrying, storage, and ship mass.
 - Loose objects inside the spaceship do not need to react to ship acceleration because the ship provides internal gravity; acceleration effects are intentionally abstracted away for interior object stability.
@@ -366,3 +366,124 @@ by their existing physics/energy contracts.
 The [#295 report](../reports/issue-295/README.md) contains before/after production
 controller traces and exact portable validation. Native M1 flight/input/EVA
 signoff remains [#312](https://github.com/mr-exception/salimon/issues/312).
+
+
+## Accepted Fabricator contracts (2026-10-19, #336)
+
+This section is the canonical gameplay contract for the five approved Fabricator
+Q&A rounds. It authorizes crafting beyond the historical Phase 0 exclusions;
+it does not authorize survival, disk persistence, upgrades or progression gameplay.
+Implementation is staged through #336–#348; documentation is not playable delivery.
+
+| Round | Approved behavior |
+| --- | --- |
+| 1 — Products and collection | Start with medkits and food rations. Basic blueprints are unlocked by default; future advanced blueprints have unlock requirements. Select a recipe and positive quantity, then collect finished output from the physical tray. Three food slots and two medical slots are separate from equipment and physical carrying. |
+| 2 — Raw storage and reservation | One universal port accepts resource fragments. Store at most 20 kg of each material. Consume the entire inserted fragment, discard overflow, and provide no raw withdrawal. Deduct/reserve all ingredients for the requested quantity atomically at enqueue; reject insufficient materials without mutation. |
+| 3 — Work scheduling | Fixed recipe durations and continuous Core watts, one operation at a time in strict FIFO order. Blackout pauses progress without losing it; power restoration resumes. Add/cancel jobs; cancellation never refunds inputs. The single occupied output tray blocks production, including the next unit of a multi-unit request. Work continues while the player is away whenever powered. |
+| 4 — Physical interaction and UI | Wall-integrated module, universal insertion port, physical monitor and output tray. E opens its interface. Dedicated food/medical HUD slots remain separate from the five-slot equipment toolbar. M consumes a medkit; N consumes a ration. |
+| 5 — Final scope | Exactly one item per slot. M/N consume the first available matching slot, even if a future health/hunger benefit is wasted. Implement item crafting/inventory only; no healing, hunger or health effects. Design persistence boundaries but keep state in memory until the game has persistence. Crafting continues during landing, takeoff and acceleration. Count stored raw resources and physical tray output in ship mass; exclude reserved inputs and carried consumable inventory. Add real raw material identities suitable for food/medicine. Blueprints are data-driven: ingredients, time, watts, output mass/category and unlock requirements. |
+
+### Ownership, commands and snapshots
+
+`salimon-world` owns raw material identity, generation, extraction, physical
+fragments and the single carried world-object slot. The portable
+`salimon-fabrication` crate (introduced by #338) owns validated blueprints, bounded
+raw storage, reservation, queue/progress and its one-item output tray. It depends
+only on world resource contracts and std; never renderer, native IO or ship.
+Runtime owns proximity/aim/E gating, consuming a real world fragment exactly
+once after storage acceptance, Core energy settlement, tray-to-inventory
+transactions, M/N input, and cached ship mass updates. Ship owns electricity and
+its mass ledger. Renderer receives observation DTOs only. Dedicated consumable
+inventory must not enlarge world carrying or equipment capacity.
+
+Typed API (implemented in #338; [crate guide](../client/fabrication/architecture.md)): `RecipeId`, `JobId`, `Mass`,
+`Ingredient`, validated `RecipeBook`, `Fabricator`, `FabricationCommand` and
+`FabricatorSnapshot`. Commands insert material, enqueue recipe/quantity, cancel
+by job identity and collect tray output. Errors are typed and transactional.
+Snapshots expose stable IDs, raw balances, ordered pending quantities, active
+progress/state, requested watts and tray item; reads never advance simulation.
+Private authoritative state is mutated only through validated methods. A step
+accepts exact elapsed `Duration` and an explicitly powered interval from the
+runtime/Core adapter; no wall clock or cockpit/player dependency participates.
+Power draw applies only while actual work advances. Empty queue, blocked tray
+and blackout consume no crafting watts. Runtime splits at energy/job boundaries
+rather than granting an entire powered frame on the basis of one charged joule.
+
+Use integer mass quanta (milligrams) and `Duration` for the portable ledger;
+convert positive finite world kilograms once at the insertion boundary with an
+explicit rounding policy. Never repeatedly subtract floating-point recipe mass.
+Queue limits are configurable technical bounds, not approved gameplay capacity;
+reject a full queue atomically. Stable monotonic job IDs are never reused.
+
+### Invariants and transactions
+
+- Stored mass is bounded independently per stable world resource identity.
+  Insertion into even a full bin consumes the original fragment and discards excess.
+- All units' ingredients leave storage together at enqueue. Reserved ingredients
+  are committed costs, cannot be withdrawn and are never credited on cancellation.
+- Only the FIFO head advances. Collecting output frees the tray; no elapsed time
+  accumulated while blocked or unpowered may later be applied as free progress.
+- Cancellation of an active job discards its partial work and remaining units;
+  existing completed tray output survives. Cancelling a waiting job preserves
+  survivors' order. Collection transfers exactly one output or changes nothing.
+- Core interruption, player departure and flight state never reset queued work.
+- Mass accounting intentionally makes an exception to universal physical mass:
+  raw insertion replaces fragment mass with accepted storage mass (overflow lost);
+  enqueue immediately removes all reserved ingredient mass; completion adds only
+  finished tray mass; collection removes tray mass, with no consumable-inventory
+  contribution. Cancellation adds no mass. This is a deliberate simplified rule,
+  not conservation of ship mass or a reason to change other physical cargo.
+  Integration must test every transition and avoid double-counting journal events.
+
+```mermaid
+sequenceDiagram
+    participant R as Runtime
+    participant W as World
+    participant F as Fabricator
+    participant S as Ship ledger
+    R->>W: Read carried fragment
+    R->>F: Validate and insert material
+    F-->>R: Accepted and discarded mass
+    R->>W: Remove original fragment once
+    R->>S: Drain removal, replace stored mass
+    R->>F: Enqueue recipe and quantity
+    F-->>R: Reserve all inputs or typed error
+    R->>S: Update stored mass
+```
+
+```mermaid
+sequenceDiagram
+    participant R as Runtime
+    participant S as Core
+    participant F as Fabricator
+    participant I as Consumable slots
+    R->>F: Read next work boundary and watts
+    R->>S: Settle powered interval
+    R->>F: Advance funded time only
+    F-->>R: Progress or one tray item
+    R->>I: Validate free matching slot
+    R->>F: Collect one item after validation
+    R->>I: Place item; update tray mass
+```
+
+### Data, persistence and tuning boundary
+
+Recipes identify materials by stable world keys and carry fixed quantities,
+duration, watts, finished mass, category and unlock prerequisites. Ration and
+medkit are initially unlocked. Categories/prerequisites permit future expansion;
+no unlock acquisition, upgrade effects or research gameplay is authorized here.
+Proposed starter tuning, **not user-specified or balanced**: ration uses 0.4 kg
+organic biomass + 0.1 kg water ice, 10 seconds at 10 kW, output 0.3 kg; medkit uses
+0.2 kg medicinal compounds + 0.1 kg water ice, 15 seconds at 20 kW, output 0.2 kg.
+Catalog density, distribution, Core yields and technical queue bounds are also
+proposed tunables. Food/medicine inputs must be real world resources, not fake
+crafting-only counters.
+
+Future persistence would version stable recipe/material/job IDs, balances,
+ordered jobs including captured recipe parameters/progress, tray and consumable
+slots. Validate unknown IDs, mass bounds and recipe-version compatibility before
+restoring atomically. Snapshots are observations, not a shipped save format.
+No filesystem/serialization or save/load integration is implemented in this wave.
+Portable domain tests cover reservation, overflow, ordering, power, cancellation,
+tray gates and arithmetic; later runtime tests cover physical intake, power
+settlement, inventory and mass transitions. Native visuals/signoff are separate.

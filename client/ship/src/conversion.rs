@@ -10,6 +10,8 @@ pub struct ConversionConfig {
     pub iron_joules_per_kg: f64,
     pub silicate_joules_per_kg: f64,
     pub ice_joules_per_kg: f64,
+    pub biomass_joules_per_kg: f64,
+    pub medicinal_joules_per_kg: f64,
 }
 impl Default for ConversionConfig {
     fn default() -> Self {
@@ -18,6 +20,10 @@ impl Default for ConversionConfig {
             iron_joules_per_kg: ResourceId::IronOre.definition().energy_joules_per_kg,
             silicate_joules_per_kg: ResourceId::SilicateRock.definition().energy_joules_per_kg,
             ice_joules_per_kg: ResourceId::WaterIce.definition().energy_joules_per_kg,
+            biomass_joules_per_kg: ResourceId::OrganicBiomass.definition().energy_joules_per_kg,
+            medicinal_joules_per_kg: ResourceId::MedicinalCompounds
+                .definition()
+                .energy_joules_per_kg,
         }
     }
 }
@@ -27,6 +33,8 @@ impl ConversionConfig {
             ResourceId::IronOre => self.iron_joules_per_kg,
             ResourceId::SilicateRock => self.silicate_joules_per_kg,
             ResourceId::WaterIce => self.ice_joules_per_kg,
+            ResourceId::OrganicBiomass => self.biomass_joules_per_kg,
+            ResourceId::MedicinalCompounds => self.medicinal_joules_per_kg,
         }
     }
     fn validate(self) -> Result<Self, InvalidEnergy> {
@@ -36,6 +44,8 @@ impl ConversionConfig {
                 self.iron_joules_per_kg,
                 self.silicate_joules_per_kg,
                 self.ice_joules_per_kg,
+                self.biomass_joules_per_kg,
+                self.medicinal_joules_per_kg,
             ]
             .iter()
             .any(|v| !v.is_finite() || *v < 0.0)
@@ -182,6 +192,8 @@ mod tests {
             ResourceId::IronOre,
             ResourceId::SilicateRock,
             ResourceId::WaterIce,
+            ResourceId::OrganicBiomass,
+            ResourceId::MedicinalCompounds,
         ] {
             for mass in [1e-9, 0.000_003, 0.125, 1.0, 2.0, 10.0] {
                 let mut ship = ShipController::default();

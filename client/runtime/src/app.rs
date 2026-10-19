@@ -601,6 +601,7 @@ impl ClientApplication {
             };
             let mut mesh = map_ship_to_renderer(presentation.ship);
             mesh.fabricator_output_present = self.session.fabricator_output_present();
+            mesh.instruments.fabricator = self.session.fabricator_instruments();
             Some(mesh)
         } else {
             None
@@ -661,15 +662,34 @@ impl ClientApplication {
             render_terrain,
         );
         let cpu_update_time = update_started_at.elapsed();
-        let overlay_image = self
-            .diagnostics
-            .overlay()
-            .map(|image| RendererOverlayImage {
-                width: image.width,
-                height: image.height,
-                rgba8: image.rgba8,
-                revision: image.revision,
-                placement: OverlayPlacement::TopLeft,
+        let crafting_text = self.session.crafting_text();
+        let crafting_pixels = crafting_text
+            .as_ref()
+            .map(|text| crate::action_bar::rasterize_action_bar(text, 3));
+        let overlay_image = crafting_pixels
+            .as_ref()
+            .map(|(width, height, pixels)| RendererOverlayImage {
+                width: *width,
+                height: *height,
+                rgba8: pixels,
+                revision: {
+                    use std::hash::{Hash, Hasher};
+                    let mut hash = std::collections::hash_map::DefaultHasher::new();
+                    crafting_text.hash(&mut hash);
+                    hash.finish()
+                },
+                placement: OverlayPlacement::Center,
+            })
+            .or_else(|| {
+                self.diagnostics
+                    .overlay()
+                    .map(|image| RendererOverlayImage {
+                        width: image.width,
+                        height: image.height,
+                        rgba8: image.rgba8,
+                        revision: image.revision,
+                        placement: OverlayPlacement::TopLeft,
+                    })
             });
         let action_bar_image = self
             .action_bar

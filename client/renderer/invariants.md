@@ -129,3 +129,7 @@ spare component gates the authored output surface in the opaque shader. The
 package appears at completion and disappears on collection, with no animation,
 new draw or physical fragment identity. It follows the presented ship pose and
 remains visible during blackout. Monitor artwork/crafting UI are owned by #343.
+
+The Fabricator display occupies only atlas region 4. Cockpit regions 0–2 and
+Core region 3 retain their independent cache/UV mappings. Machine observation
+never changes recipe, queue, power or inventory authority.

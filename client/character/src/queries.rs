@@ -40,7 +40,13 @@ pub fn ship_sight_obstruction(eye: [f64; 3], target: [f64; 3], door_open: bool) 
 /// Ignore that envelope only for this authored face; all other solids still occlude.
 #[must_use]
 pub fn fabricator_input_sight_obstruction(eye: [f64; 3]) -> Option<f64> {
-    sight_obstruction(eye, crate::FABRICATOR_INPUT_MARKER_METERS, true, true)
+    fabricator_sight_obstruction(eye, crate::FABRICATOR_INPUT_MARKER_METERS)
+}
+
+/// Authored machine surfaces omit only their own conservative fixture envelope.
+#[must_use]
+pub fn fabricator_sight_obstruction(eye: [f64; 3], target: [f64; 3]) -> Option<f64> {
+    sight_obstruction(eye, target, true, true)
 }
 
 fn sight_obstruction(

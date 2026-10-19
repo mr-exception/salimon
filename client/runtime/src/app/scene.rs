@@ -14,6 +14,7 @@ pub(super) fn map_ship_to_renderer(ship: ShipSnapshot) -> ShipMeshInstance {
         orientation: ship.pose.orientation.map(|value| value as f32),
         door_open_fraction: ship.door_open_fraction as f32,
         instruments: CockpitInstruments {
+            fabricator: Default::default(),
             navigation: NavigationInstruments {
                 direction_local: ship.navigation.velocity_direction_local,
                 angle_degrees: ship.navigation.heading_velocity_angle_degrees,

@@ -15,6 +15,9 @@ pub(crate) fn prompt_placement(
     frame: salimon_character::ShipFrame,
 ) -> salimon_renderer::OverlayPlacement {
     let (local, radius_meters) = match target {
+        InteractionTarget::FabricatorScreen => {
+            (salimon_character::FABRICATOR_MONITOR_MARKER_METERS, 0.2)
+        }
         InteractionTarget::Fabricator => {
             (crate::session::interaction::FABRICATOR_INPUT_METERS, 0.15)
         }
@@ -52,6 +55,7 @@ pub(crate) fn action_bar_context(
         .filter(|message| *message != CockpitMessage::DoorLockedWhileInFlight)
         .map(CockpitMessage::text)
         .or(match interaction {
+            Some(InteractionTarget::FabricatorScreen) => Some("E to open Fabricator crafting"),
             Some(InteractionTarget::Fabricator) => {
                 Some("E to insert carried fragment into Fabricator")
             }

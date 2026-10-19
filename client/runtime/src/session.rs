@@ -1,4 +1,5 @@
 //! Portable production gameplay composition. No window, GPU lifecycle or evidence IO.
+pub(crate) mod crafting_ui;
 mod fabrication;
 pub(crate) mod frames;
 pub(crate) mod interaction;
@@ -23,6 +24,7 @@ pub(crate) struct GameplaySession {
     pub(crate) automation_aim_delta: Option<[f64; 2]>,
     pub(crate) mining: crate::mining::ResourceGameplay,
     fabricator: salimon_fabrication::Fabricator,
+    pub(crate) crafting_ui: crafting_ui::CraftingUi,
     pub(crate) equipment: crate::equipment::EquipmentToolbar,
     pub(crate) movement_input: MovementInput,
     pub(crate) ship_control_input: ShipControlInput,
@@ -66,6 +68,7 @@ impl Default for GameplaySession {
             automation_aim_delta: None,
             mining: Default::default(),
             fabricator: salimon_fabrication::Fabricator::starter(),
+            crafting_ui: Default::default(),
             equipment: Default::default(),
             movement_input: Default::default(),
             ship_control_input: Default::default(),
@@ -153,6 +156,10 @@ impl GameplaySession {
                 let interaction =
                     available_interaction_target(self.character.location(), local_eye, local_look);
                 match interaction {
+                    Some(InteractionTarget::FabricatorScreen) => {
+                        self.clear_held_controls();
+                        self.crafting_ui.open = true;
+                    }
                     Some(InteractionTarget::Fabricator) => {
                         self.insert_fabricator_fragment();
                     }
@@ -225,6 +232,7 @@ impl GameplaySession {
         local_look: [f64; 3],
     ) -> Option<&'static str> {
         match available_interaction_target(self.character.location(), local_eye, local_look) {
+            Some(InteractionTarget::FabricatorScreen) => Some("fabricator_screen"),
             Some(InteractionTarget::Fabricator) => Some("fabricator"),
             Some(InteractionTarget::Core) => Some("core"),
             Some(InteractionTarget::Cockpit) => Some("cockpit"),
@@ -347,6 +355,7 @@ impl GameplaySession {
     }
 
     pub(crate) fn clear_held_controls(&mut self) {
+        self.crafting_ui.open = false;
         self.movement_input = MovementInput::default();
         self.ship_control_input = ShipControlInput::default();
         self.ship.clear_steering_input();
@@ -441,6 +450,7 @@ impl GameplaySession {
             self.latest_physics.accumulate(measurements);
         }
         self.sync_carried();
+        self.validate_crafting_focus();
         if self.interpolate_presentation && !self.presentation.complete(self.snapshot()) {
             self.mining.fragment_previous.clear();
         }
@@ -461,6 +471,9 @@ impl GameplaySession {
     /// Desktop admission is a shell policy. View/domain gates apply to every caller.
     pub(crate) fn command(&mut self, command: Command) {
         use Command::*;
+        if self.crafting_ui.open {
+            return; // Modal UI owns input; simulation and Core funding continue.
+        }
         if let ToggleView = command {
             self.toggle_view();
             return;

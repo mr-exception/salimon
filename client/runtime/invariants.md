@@ -250,3 +250,8 @@ never refunds. Queue/in-progress/consumable inventory contribute zero. Existing
 loose cargo and Core-consumed identity accounting retain their owners. Runtime
 UI/inventory adapters must use execute_fabricator and validate receiving slots
 before collection; no consumable collection UI is introduced by this issue.
+
+Fabricator modal input is exclusive: opening clears held gameplay controls;
+repeat/synthetic native presses never enqueue twice. Range/interior/occlusion are
+revalidated on simulation ticks; leaving the monitor closes the modal. Display
+reads never step or mutate crafting. Add/cancel use atomic domain commands.

@@ -114,7 +114,7 @@ impl ActionBar {
     }
 }
 
-fn rasterize_action_bar(text: &str, scale: u32) -> (u32, u32, Vec<u8>) {
+pub(crate) fn rasterize_action_bar(text: &str, scale: u32) -> (u32, u32, Vec<u8>) {
     const GLYPH_WIDTH: u32 = 5;
     const GLYPH_HEIGHT: u32 = 7;
     const CHARACTER_ADVANCE: u32 = 6;

@@ -147,6 +147,26 @@ pub(crate) fn dispatch_session_key(
     pressed: bool,
 ) {
     use crate::session::Command;
+    if session.crafting_ui.open {
+        if pressed {
+            use crate::session::crafting_ui::CraftingAction as A;
+            let action = match key {
+                PhysicalKey::Code(KeyCode::Escape | KeyCode::KeyE) => Some(A::Close),
+                PhysicalKey::Code(KeyCode::ArrowUp) => Some(A::PreviousRecipe),
+                PhysicalKey::Code(KeyCode::ArrowDown) => Some(A::NextRecipe),
+                PhysicalKey::Code(KeyCode::ArrowLeft) => Some(A::Less),
+                PhysicalKey::Code(KeyCode::ArrowRight) => Some(A::More),
+                PhysicalKey::Code(KeyCode::Tab) => Some(A::NextJob),
+                PhysicalKey::Code(KeyCode::Delete) => Some(A::Cancel),
+                PhysicalKey::Code(KeyCode::Enter) => Some(A::Add),
+                _ => None,
+            };
+            if let Some(action) = action {
+                session.crafting_action(action);
+            }
+        }
+        return;
+    }
     let command = if !pressed {
         if let Some(control) = control_key(key) {
             Some(Command::Control(control, false))
@@ -346,5 +366,38 @@ mod tests {
             throttle_direction(PhysicalKey::Code(KeyCode::ArrowDown)),
             Some(ThrottleDirection::Down)
         );
+    }
+}
+
+#[cfg(test)]
+mod crafting_tests {
+    use super::*;
+    #[test]
+    fn initial_ui_edges_dispatch_once_and_losing_focus_closes_modal() {
+        let policy = InputPolicy {
+            gameplay: true,
+            captured: true,
+            focused: true,
+            occluded: false,
+        };
+        let mut s = crate::session::GameplaySession::default();
+        s.crafting_ui.open = true;
+        for r in salimon_world::resources::RESOURCE_CATALOG {
+            s.execute_fabricator(salimon_fabrication::FabricationCommand::Insert(
+                salimon_world::resources::RawMaterial::new(r.id, 2.0).unwrap(),
+            ))
+            .unwrap();
+        }
+        for (repeat, synthetic) in [(false, false), (true, false), (false, true)] {
+            let key = PhysicalKey::Code(KeyCode::Enter);
+            if policy.admits_key(InputSource::Native, key, true, repeat, synthetic) {
+                dispatch_session_key(&mut s, key, true);
+            }
+        }
+        assert!(s.crafting_text().unwrap().contains("QUEUE: 1 /"));
+        dispatch_session_key(&mut s, PhysicalKey::Code(KeyCode::KeyW), true);
+        assert!(!s.movement_input.forward);
+        s.clear_held_controls();
+        assert!(!s.crafting_ui.open);
     }
 }

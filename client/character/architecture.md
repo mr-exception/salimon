@@ -187,3 +187,8 @@ door route remain clear. Three generated markers own input, screen and tray
 positions. Ordinary sight queries treat the module as solid; the port query
 omits only its own conservative envelope because the input face is recessed
 behind the tray. Runtime still checks interior authority, front face, range and aim.
+
+Fabricator surface targeting uses `fabricator_sight_obstruction(eye, target)`
+for authored port/monitor/tray faces; it excludes only the module's conservative
+fixture envelope, preserving cabin solids, deck and ceiling occlusion. Runtime
+owns face hit regions and interaction range; walking collision is unchanged.

@@ -5,13 +5,15 @@
 //! for unchanged frames.
 
 const SECTION_WIDTH: u32 = 512;
-pub(crate) const ATLAS_WIDTH: u32 = SECTION_WIDTH * 4;
+pub(crate) const ATLAS_WIDTH: u32 = SECTION_WIDTH * 5;
 pub(crate) const ATLAS_HEIGHT: u32 = 256;
 
 /// Renderer-neutral values shown on the ship's physical cockpit monitors.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct CockpitInstruments {
     pub power_off: bool,
+    /// Observation only: idle, working, no power, or blocked tray.
+    pub fabricator: FabricatorInstruments,
     pub speed_meters_per_second: f64,
     pub thruster_percentage: i8,
     pub core_energy_capacity_joules: u64,
@@ -19,6 +21,13 @@ pub struct CockpitInstruments {
     pub nearby_body: Option<NearbyBodyInstruments>,
     pub core_status: CoreInstruments,
     pub navigation: NavigationInstruments,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct FabricatorInstruments {
+    pub status: u8,
+    pub jobs: u32,
+    pub remaining_seconds: u32,
 }
 
 /// Renderer-only navigation values; the ship owns braking feasibility.
@@ -268,6 +277,7 @@ impl SpeedDisplay {
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct DisplayKey {
     power_off: bool,
+    fabricator: FabricatorInstruments,
     speed: SpeedDisplay,
     power: i8,
     core_capacity: EnergyDisplay,
@@ -296,6 +306,7 @@ impl InstrumentAtlas {
     pub(crate) fn update(&mut self, values: CockpitInstruments) -> bool {
         let next = DisplayKey {
             power_off: values.power_off,
+            fabricator: values.fabricator,
             speed: SpeedDisplay::from_meters_per_second(values.speed_meters_per_second),
             power: values.thruster_percentage.clamp(-100, 100),
             core_capacity: EnergyDisplay::from_joules(values.core_energy_capacity_joules),
@@ -356,6 +367,31 @@ impl InstrumentAtlas {
         }) {
             self.draw_core_status(&next);
         }
+        self.section_frame(4, "FABRICATOR");
+        self.text(
+            28,
+            70,
+            match next.fabricator.status {
+                1 => "WORKING",
+                2 => "PAUSED / NO POWER",
+                3 => "OUTPUT BLOCKED",
+                _ => "IDLE",
+            },
+            3,
+            CYAN,
+        );
+        self.text(
+            28,
+            112,
+            &format!(
+                "JOBS {} / LEFT {}s",
+                next.fabricator.jobs, next.fabricator.remaining_seconds
+            ),
+            2,
+            IVORY,
+        );
+        self.text(28, 160, "E AT SCREEN TO CRAFT", 2, IVORY);
+        self.text(28, 192, "AIM AT PORT TO INSERT", 2, MUTED);
         self.displayed = Some(next);
         true
     }
@@ -902,7 +938,10 @@ mod tests {
             }
             assert!(!atlas.update(values));
         }
-        assert_eq!(atlas.pixels.len(), 2048 * 256 * 4);
+        assert_eq!(
+            atlas.pixels.len(),
+            ATLAS_WIDTH as usize * ATLAS_HEIGHT as usize * 4
+        );
         assert_eq!(
             distance_unit(SpeedDisplay::from_meters_per_second(0.0)),
             "m"

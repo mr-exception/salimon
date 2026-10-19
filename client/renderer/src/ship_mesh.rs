@@ -67,6 +67,7 @@ fn geometry_from_bytes(bytes: &[u8]) -> Result<ShipGeometry, RendererError> {
             Some("Monitor_Wide") => 1.0,
             Some("Core_Monitor") => 2.0,
             Some("Fabricator_Output") => 3.0,
+            Some("Fabricator_Monitor") => 4.0,
             _ => 0.0,
         };
         let matrix = node.transform().matrix();

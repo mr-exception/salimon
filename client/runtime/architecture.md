@@ -929,3 +929,23 @@ filesystem durability. Startup renderer creation preserves restored clock backlo
 E2E and benchmark launches remain isolated from user saves. See the
 [canonical save contract](../../docs/save-contract.md#durable-active-run-366)
 for paths, recovery/failure policy, Windows behavior and future lifecycle owners.
+
+## Pending pause checkpoint controls (#382 preparation)
+
+`checkpoints/control.rs` owns portable SaveNow/SaveAndExit/Retry/CancelExit/
+ExitWithRisk admission and Idle/Saving/Saved/Failed observations. The existing
+single worker/store handles manual and auto captures; one coalesced pending flag
+captures the newest session after an older write completes. Only a verified IO
+result publishes its captured UTC timestamp. Capture/queue/worker failures cannot
+publish Saved. Exit intent waits for a capture admitted after its request;
+failure suspends exit until an explicit retry, cancellation or risk exit.
+Manual retry bypasses game-time backoff so it works when time is frozen. Rendering
+can continue polling; no game tick or offline recovery is performed by requests.
+
+This is preparatory backend code, not a completed pause menu. #381 is explicitly
+blocked by #371 and must supply full authoritative freeze, input/cursor admission,
+Q-wheel exclusion and resume clock resets. Until then, the native UI does not call
+these request/status methods; the narrowly marked dead-code allowances document
+that dependency. #382 must still wire accessible Resume/Save Now/Settings/Save &
+Exit, failure choices, verified timestamp display and DPI/layout/native coverage.
+Do not use the existing synchronous OS-close `finish` method for the future menu.

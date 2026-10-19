@@ -130,3 +130,7 @@ filesystem durability. Startup renderer creation preserves restored clock backlo
 E2E and benchmark launches remain isolated from user saves. See the
 [canonical save contract](../../docs/save-contract.md#durable-active-run-366)
 for paths, recovery/failure policy, Windows behavior and future lifecycle owners.
+
+Pause checkpoint request/status policy is in `checkpoints/control.rs` (#382
+preparation). It is tested with the real worker/storage boundary and injected
+full/corrupt stores. UI admission is intentionally pending #381; see architecture.

@@ -100,3 +100,12 @@ restart, #372/#374 own journey archives and terminal UI. Those owners must inclu
 their new typed state and discrete events and retire both old generations on
 restart so fallback can never revive the previous run. #382 owns verified Save
 Now feedback; #375/#376 own expanded survival/graphical/reference-hardware checks.
+
+## Pending pause controls (#382)
+
+The same active-run worker now supports manual save request coalescing, verified
+status/timestamps and save-before-exit failure choices; see runtime
+[preparation contract](../client/runtime/architecture.md#pending-pause-checkpoint-controls-382-preparation).
+No second slot or offline recovery is introduced. Pause-menu UI is not yet wired:
+#381 full freeze and its #371 prerequisite remain blocking work. #382 stays open
+and its preparation PR stays draft until that integration and native UI validation.

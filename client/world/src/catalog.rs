@@ -61,7 +61,8 @@ pub static CELESTIAL_BODIES: &[CelestialBody] = &[
     ),
 ];
 /// Stable identity for one canonical Phase 0 body.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum CelestialBodyId {
     Sun,
     Mercury,

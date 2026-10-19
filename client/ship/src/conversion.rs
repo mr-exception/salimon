@@ -4,7 +4,8 @@ use salimon_world::{mining::MiningSession, resources::ResourceId};
 use std::time::Duration;
 
 /// Explicit material-keyed tuning; defaults come from the world resource catalog.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ConversionConfig {
     pub joules_per_second: f64,
     pub iron_joules_per_kg: f64,
@@ -56,7 +57,8 @@ impl ConversionConfig {
     }
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub(crate) struct Conversion {
     config: ConversionConfig,
     remaining_joules: f64,
@@ -126,6 +128,18 @@ impl ShipController {
     /// Capture a fragment's yield at intake; tuning updates apply to future intakes.
     pub fn configure_conversion(&mut self, config: ConversionConfig) -> Result<(), InvalidEnergy> {
         self.conversion.config = config.validate()?;
+        Ok(())
+    }
+}
+
+impl Conversion {
+    pub(crate) fn validate_save(&self) -> Result<(), salimon_persistence::SaveError> {
+        self.config
+            .validate()
+            .map_err(|_| salimon_persistence::invalid("conversion config"))?;
+        if !self.remaining_joules.is_finite() || self.remaining_joules < 0. {
+            return Err(salimon_persistence::invalid("conversion charge"));
+        }
         Ok(())
     }
 }

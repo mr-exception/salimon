@@ -8,10 +8,34 @@ use std::{
 mod broad_phase;
 mod convex;
 mod sleep;
+
+impl ContactResponse {
+    fn validate_save(&self) -> Result<(), salimon_persistence::SaveError> {
+        let n = self.arms.len();
+        if n != self.impulses.len()
+            || n != self.friction.len()
+            || n != self.targets.len()
+            || self
+                .normal
+                .iter()
+                .chain(self.rolling.iter())
+                .chain(self.arms.iter().flat_map(|(a, b)| a.iter().chain(b.iter())))
+                .chain(self.impulses.iter())
+                .chain(self.friction.iter().flatten())
+                .chain(self.targets.iter())
+                .any(|v| !v.is_finite())
+        {
+            return Err(salimon_persistence::invalid("contact impulse"));
+        }
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod sphere_tests;
+mod surface_save;
 pub use convex::{ConvexHull, ConvexHullComplexity, compose, orientation_from_axes, rotate};
-pub use sleep::SleepTracker;
+pub use sleep::{SleepSaveState, SleepTracker};
 
 const GRAVITY: f64 = 9.81;
 const RESTITUTION: f64 = 0.12;
@@ -25,7 +49,8 @@ const ANGULAR_RETENTION: f64 = 0.98;
 const CONTACT_BIAS_METERS: f64 = 0.00001;
 
 /// Spherical ground geometry in the same frame as its objects.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SphereSurface {
     pub center: [f64; 3],
     pub radius: f64,
@@ -137,15 +162,18 @@ impl Surface {
 
 /// Caller-validated finite pose, velocity (m/s) and positive spherical radius (m).
 /// Identity/material stay with the caller; physics updates position/orientation.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ObjectState {
     pub position: [f64; 3],
     pub velocity: [f64; 3],
     pub radius: f64,
     /// Authored support distance along the environmental normal, in metres.
     pub ground_support_meters: f64,
+    #[serde(with = "surface_save")]
     pub surface: Surface,
     /// Immutable unit-scale convex envelope; None selects exact radius contacts.
+    #[serde(skip)]
     pub hull: Option<Arc<ConvexHull>>,
     /// Dimensionless multiplier of authored hull coordinates; ignored when hull is None.
     /// Analytic sphere contacts use radius exclusively.
@@ -866,7 +894,8 @@ fn resolve_candidate<const PROFILE: bool>(
     ground_contact_cached(b, &mut ground_responses[j]);
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 struct ContactResponse {
     pending_warm_start: bool,
     transport_response: bool,

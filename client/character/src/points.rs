@@ -17,7 +17,8 @@ impl WorldPoint {
 
 /// Ship-local f64 meters: +X forward, +Y up, +Z port.
 /// No implicit conversion from absolute positions or raw arrays is provided.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ShipLocalPoint([f64; 3]);
 
 impl ShipLocalPoint {

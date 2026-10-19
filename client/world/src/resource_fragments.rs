@@ -167,6 +167,32 @@ pub(crate) fn spawn_position(deposit: ResourceDeposit) -> WorldPosition {
         .translated(up.map(|v| v * (edge + support)))
 }
 
+impl FragmentOutput {
+    pub(crate) fn save_parts(&self) -> (Vec<ResourceFragment>, u64, Vec<FragmentId>) {
+        let mut sealed: Vec<_> = self.sealed.iter().copied().collect();
+        sealed.sort_by_key(|id| id.0);
+        (self.fragments.clone(), self.next_id, sealed)
+    }
+    pub(crate) fn from_save_parts(
+        fragments: Vec<ResourceFragment>,
+        next_id: u64,
+        sealed: Vec<FragmentId>,
+    ) -> Self {
+        let slots = fragments
+            .iter()
+            .enumerate()
+            .map(|(i, f)| (f.id(), i))
+            .collect();
+        Self {
+            fragments,
+            slots,
+            next_id,
+            sealed: sealed.into_iter().collect(),
+            changes: Default::default(),
+        }
+    }
+}
+
 #[cfg(test)]
 mod mutation_tests {
     use super::*;

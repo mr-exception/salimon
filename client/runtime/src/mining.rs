@@ -300,6 +300,33 @@ fn position(p: [f64; 3]) -> WorldPosition {
     WorldPosition::new(p[0], p[1], p[2])
 }
 
+impl ResourceGameplay {
+    pub(crate) fn from_saved_world(
+        session: MiningSession,
+        anchors: std::collections::HashMap<
+            salimon_world::resources::FragmentId,
+            salimon_character::ShipLocalPoint,
+        >,
+        motion: std::collections::HashMap<
+            salimon_world::resources::FragmentId,
+            crate::fragment_physics::FragmentMotion,
+        >,
+        terrain: salimon_world::terrain::TerrainMode,
+        gravity_disabled: bool,
+        config: salimon_world::spherical_mining::MiningConfig,
+    ) -> Self {
+        Self {
+            session,
+            ship_fragments: anchors,
+            fragment_motion: motion,
+            terrain,
+            ship_gravity_disabled: gravity_disabled,
+            config,
+            ..Default::default()
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

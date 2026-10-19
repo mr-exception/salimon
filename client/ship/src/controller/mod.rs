@@ -12,12 +12,14 @@ pub(crate) mod cockpit;
 mod collision;
 mod door;
 mod flight;
+pub mod persistence;
 mod steering;
 pub(crate) mod telemetry;
 pub mod throttle;
 use assist::AssistTransition;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ShipController {
     pub(crate) pose: ShipPose,
     pub(crate) velocity: [f64; 3],
@@ -29,12 +31,16 @@ pub struct ShipController {
     door_open_fraction: f64,
     cockpit_control_active: bool,
     pub(crate) thruster_percentage: i8,
+    #[serde(skip)]
     throttle_input: throttle::HeldThrottle,
     energy_core: crate::EnergyCore,
     fabricator_watts: f64,
+    #[serde(skip)]
     fabricator_powered_seconds: f64,
     pub(crate) conversion: crate::conversion::Conversion,
+    #[serde(skip)]
     cockpit_message: Option<CockpitMessage>,
+    #[serde(skip)]
     steering_target: SteeringInput,
     steering: SteeringInput,
     pub(crate) assist: Option<AssistTransition>,

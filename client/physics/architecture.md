@@ -370,3 +370,15 @@ This does not eliminate manifold, response-internal or activation-graph allocati
 
 Analytic sphere contact and support use `ObjectState.radius`, independently of
 `authored_mesh_scale`. See the [dimension contract](../../docs/technical-architecture.md#position-boundaries-and-resource-dimensions-311).
+
+## Logical save boundary (#364)
+
+The [canonical save inventory](../../docs/save-contract.md) defines schema-1
+source state and excluded caches. Domain-owned save state is validated before
+restore; runtime composes temporary owners and rebuilds mass, immutable terrain
+queries and presentation/query/solver caches without advancing simulation.
+Stable IDs, depletion, carrying, motion, Core/assist progress and logical
+contact/sleep/dwell state survive. No input latch, OS handle or GPU state is
+restored. An attached mining sphere becomes a detached existing physical entity,
+without allocating a new ID or losing mass. Whole-session/Fabricator publication
+is composed in #365; disk checkpoints remain #366.

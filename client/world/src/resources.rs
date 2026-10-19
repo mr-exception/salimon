@@ -3,7 +3,8 @@
 use crate::{CelestialBodyId, WorldPosition};
 
 /// Material identity is independent of catalog order and display names.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum ResourceId {
     IronOre,
     SilicateRock,
@@ -106,7 +107,8 @@ impl std::fmt::Display for ResourceError {
 impl std::error::Error for ResourceError {}
 
 /// Positive finite raw mass and derived solid volume; zero-mass fragments do not exist.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RawMaterial {
     resource: ResourceId,
     mass_kg: f64,
@@ -141,14 +143,16 @@ impl RawMaterial {
 }
 
 /// Generator-assigned local identity, scoped to a celestial body. Streaming must reuse it.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DepositId {
     pub body: CelestialBodyId,
     pub local: u64,
 }
 
 /// Fragment IDs are allocated uniquely within a world/session, separately from deposit IDs.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct FragmentId(pub u64);
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -233,7 +237,8 @@ fn validate_remaining(initial: f64, remaining: f64) -> Result<(), ResourceError>
 }
 
 /// Absolute meters and a unit quaternion in [x, y, z, w] order, with no visual scale.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ResourceTransform {
     position: WorldPosition,
     orientation_xyzw: [f64; 4],
@@ -261,7 +266,8 @@ impl ResourceTransform {
 }
 
 /// A physical world object, not an inventory quantity. Pose can change; identity cannot.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ResourceFragment {
     id: FragmentId,
     source: DepositId,

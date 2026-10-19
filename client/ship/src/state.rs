@@ -4,7 +4,8 @@ use crate::orientation::normalized_quaternion;
 use crate::{CockpitMessage, EnergyCoreState, NearbyBodyTelemetry};
 use salimon_world::CelestialBodyId;
 
-#[derive(Clone, Copy, Debug, Default, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SteeringInput {
     /// `-1` pitches down, `1` pitches up.
     pub pitch: f64,
@@ -14,13 +15,15 @@ pub struct SteeringInput {
     pub roll: f64,
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum DoorState {
     Closed,
     Open,
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum FlightState {
     Landed { body: CelestialBodyId },
     AssistedLanding { body: CelestialBodyId },
@@ -30,7 +33,8 @@ pub enum FlightState {
     GroundedAfterCrash { body: CelestialBodyId },
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ShipPose {
     pub position_meters: [f64; 3],
     /// Unit quaternion `[x, y, z, w]` rotating ship-local coordinates to world.

@@ -18,7 +18,8 @@ const SETTLING_ACCELERATION: f64 = 10.0;
 const MIN_REBOUND_SPEED: f64 = 0.1;
 const MAX_REBOUNDS: u8 = 4;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub(super) struct Bounce {
     anchor: [f64; 3],
     normal: [f64; 3],
@@ -243,6 +244,24 @@ impl ShipController {
                 break;
             }
         }
+    }
+}
+
+impl Bounce {
+    pub(super) fn validate_save(&self) -> Result<(), salimon_persistence::SaveError> {
+        if self
+            .anchor
+            .iter()
+            .chain(self.normal.iter())
+            .any(|v| !v.is_finite())
+            || !self.speed.is_finite()
+            || self.speed < 0.
+            || self.elapsed > self.duration
+            || self.rebounds > MAX_REBOUNDS
+        {
+            return Err(salimon_persistence::invalid("bounce"));
+        }
+        Ok(())
     }
 }
 

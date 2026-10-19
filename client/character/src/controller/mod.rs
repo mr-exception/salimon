@@ -18,6 +18,7 @@ mod collision_tests;
 mod doorway;
 mod eva;
 mod interior;
+pub mod persistence;
 mod surface;
 #[cfg(test)]
 mod test_support;
@@ -37,13 +38,15 @@ struct Step {
     doorway_passable: bool,
     jump_started: bool,
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CharacterController {
     position: PositionState,
     yaw_radians: f64,
     pitch_radians: f64,
     vertical_speed: f64,
     interior_velocity: [f64; 3],
+    #[serde(skip)]
     jump_was_down: bool,
     eva_inherited_velocity: [f64; 3],
     eva_control_velocity: [f64; 3],

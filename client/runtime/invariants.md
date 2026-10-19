@@ -269,3 +269,15 @@ Inspection exposes stable ordered raw bins/jobs, tray identity and the existing
 the same open-modal action handler as native input; they cannot insert free
 resources, open a remote machine or bypass transactional validation. Portable
 session regressions run in PR CI; graphical and native signoff remain separate.
+
+## Logical save boundary (#364)
+
+The [canonical save inventory](../../docs/save-contract.md) defines schema-1
+source state and excluded caches. Domain-owned save state is validated before
+restore; runtime composes temporary owners and rebuilds mass, immutable terrain
+queries and presentation/query/solver caches without advancing simulation.
+Stable IDs, depletion, carrying, motion, Core/assist progress and logical
+contact/sleep/dwell state survive. No input latch, OS handle or GPU state is
+restored. An attached mining sphere becomes a detached existing physical entity,
+without allocating a new ID or losing mass. Whole-session/Fabricator publication
+is composed in #365; disk checkpoints remain #366.

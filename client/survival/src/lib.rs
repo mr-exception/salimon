@@ -1,5 +1,8 @@
 //! Deterministic survival authority. Hosts supply admitted active durations and UTC
 //! samples; this crate never reads a clock, advances a world, or performs IO.
+pub mod effects;
+mod pipeline;
+
 use salimon_persistence::{SaveError, Validate, invalid};
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
@@ -96,6 +99,8 @@ pub struct Snapshot {
     pub health: Points,
     pub terminal: bool,
     pub active_time: Duration,
+    pub death_cause: Option<effects::Source>,
+    pub wounds: Points,
 }
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Command {
@@ -115,6 +120,7 @@ pub enum OfflineResult {
 #[serde(deny_unknown_fields)]
 pub struct Survival {
     config: Config,
+    pipeline: effects::Pipeline,
     hunger: Points,
     fatigue: Points,
     health: Points,
@@ -137,6 +143,7 @@ impl Survival {
         config.validate()?;
         Ok(Self {
             config,
+            pipeline: Default::default(),
             hunger: Points::FULL,
             fatigue: Points::FULL,
             health: Points::FULL,
@@ -154,6 +161,8 @@ impl Survival {
             health: self.health,
             terminal: self.terminal,
             active_time: self.active_time,
+            death_cause: self.pipeline.death_cause,
+            wounds: self.pipeline.wounds,
         }
     }
     pub fn command(&mut self, command: Command) -> Result<(), SaveError> {
@@ -171,42 +180,22 @@ impl Survival {
                     self.starvation_elapsed = Duration::ZERO;
                 }
             }
-            Command::Heal(p) => self.health.add(p),
-            Command::Damage(p) => {
-                self.health.subtract(p);
-                self.terminal = self.health == Points::ZERO;
-            }
+            Command::Heal(p) => self.heal(effects::Heal {
+                amount: p,
+                mode: effects::Healing::Ordinary,
+            })?,
+            Command::Damage(p) => self.damage(effects::Damage {
+                source: effects::Source::Environment,
+                amount: p,
+                wound: false,
+            })?,
         }
         Ok(())
     }
     /// Exact elapsed accounting, independent of render cadence. Terminal updates
     /// stop at the lethal boundary, even when a host supplies a very large delta.
     pub fn advance(&mut self, elapsed: Duration) {
-        if self.terminal {
-            return;
-        }
-        let hunger_rate = u128::from(SCALE_SECONDS / self.config.hunger_full_seconds);
-        let until_empty = u128::from(self.hunger.0).div_ceil(hunger_rate);
-        let before_starvation = elapsed.as_nanos().min(until_empty);
-        self.drain_meters(before_starvation);
-        let mut remaining = elapsed.as_nanos() - before_starvation;
-        if self.hunger != Points::ZERO {
-            return;
-        }
-        let interval = self.config.starvation_interval.as_nanos();
-        let hits_to_death = u128::from(self.health.0).div_ceil(u128::from(POINT));
-        let lethal_after =
-            (hits_to_death * interval).saturating_sub(self.starvation_elapsed.as_nanos());
-        remaining = remaining.min(lethal_after);
-        self.drain_meters(remaining);
-        let total = self.starvation_elapsed.as_nanos() + remaining;
-        let damage = (total / interval) * u128::from(POINT);
-        self.health.0 = self
-            .health
-            .0
-            .saturating_sub(damage.min(u128::from(FULL)) as u64);
-        self.starvation_elapsed = nanos(total % interval);
-        self.terminal = self.health == Points::ZERO;
+        self.advance_pipeline(elapsed);
     }
     fn drain_meters(&mut self, elapsed_ns: u128) {
         self.hunger.0 = self.hunger.0.saturating_sub(
@@ -249,6 +238,13 @@ impl Survival {
 impl Validate for Survival {
     fn validate(&self) -> Result<(), SaveError> {
         self.config.validate()?;
+        self.pipeline.validate()?;
+        self.health.validate()?;
+        if self.terminal != self.pipeline.death_cause.is_some()
+            || self.pipeline.wounds.0 > FULL - self.health.0
+        {
+            return Err(invalid("inconsistent death source/wound debt"));
+        }
         self.hunger.validate()?;
         self.fatigue.validate()?;
         self.health.validate()?;

@@ -11,3 +11,9 @@
   The host commits credited state before exposure; see architecture for crash policy.
 - Full elapsed admission and authoritative world death freeze are composed by #371,
   not duplicated inside this standalone domain.
+- Starvation, external damage and periodic effects share one modifier pipeline.
+- Damage at a timestamp precedes all healing; terminal damage cannot be healed.
+- Wound debt is at most missing health and ordinary regeneration cannot erase it.
+- Stable Source/EffectId ordering and bounded stacks are independent of host order.
+- Timed final ticks occur before expiry; exposure exits with zero linger remove
+  immediately. Offline time advances no regeneration/effect interval.

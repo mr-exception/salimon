@@ -24,6 +24,7 @@ pub(crate) struct GameplaySession {
     pub(crate) automation_aim_delta: Option<[f64; 2]>,
     pub(crate) mining: crate::mining::ResourceGameplay,
     fabricator: salimon_fabrication::Fabricator,
+    consumable_keys_down: [bool; 2],
     pub(crate) consumables: salimon_fabrication::ConsumableInventory,
     pub(crate) crafting_ui: crafting_ui::CraftingUi,
     pub(crate) equipment: crate::equipment::EquipmentToolbar,
@@ -71,6 +72,7 @@ impl Default for GameplaySession {
             fabricator: salimon_fabrication::Fabricator::starter(),
             crafting_ui: Default::default(),
             consumables: Default::default(),
+            consumable_keys_down: [false; 2],
             equipment: Default::default(),
             movement_input: Default::default(),
             ship_control_input: Default::default(),
@@ -106,6 +108,7 @@ pub(crate) enum Command {
     GrabDrop(bool),
     Look(f64, f64),
     Mining(bool),
+    Consume(salimon_fabrication::ConsumableCategory, bool),
     ToggleView,
     Camera(salimon_world::CameraCommand),
 }
@@ -360,6 +363,7 @@ impl GameplaySession {
 
     pub(crate) fn clear_held_controls(&mut self) {
         self.crafting_ui.open = false;
+        self.consumable_keys_down = [false; 2];
         self.movement_input = MovementInput::default();
         self.ship_control_input = ShipControlInput::default();
         self.ship.clear_steering_input();
@@ -491,7 +495,11 @@ impl GameplaySession {
         }
         let release = matches!(
             command,
-            Control(_, false) | Throttle(_, false) | GrabDrop(false) | Mining(false)
+            Control(_, false)
+                | Throttle(_, false)
+                | GrabDrop(false)
+                | Mining(false)
+                | Consume(_, false)
         );
         if self.view_mode != ViewMode::Gameplay && !release {
             return;
@@ -545,6 +553,7 @@ impl GameplaySession {
             }
             Look(dx, dy) => self.apply_look_delta(dx, dy),
             Mining(pressed) => self.mining_mouse_input(pressed),
+            Consume(category, pressed) => self.consume_input(category, pressed),
             ToggleView | Camera(_) => unreachable!(),
         }
     }

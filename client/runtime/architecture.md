@@ -878,3 +878,15 @@ submesh, never a loose world/carrying entity; it follows the presented ship pose
 and remains visible without Core power. Category selects ration stripes or a
 medical cross in its UV surface. Only occupied tray output contributes mass;
 collection removes that contribution. Reserved/queued jobs remain distinct.
+
+## Consumable keys (#345)
+
+Gameplay M consumes the first medical item, N the first food item. Portable
+`Command::Consume(category, pressed)` maintains independent edge latches: held
+presses consume once until release. Focus/lifecycle/view clearing resets latches;
+native repeats and synthetic focus replay remain rejected. Crafting modal captures
+these keys. N retains JumpToNear only in precision tour and cannot switch gameplay
+into that camera view. Empty categories report feedback. Consumption does not
+alter gear selection, one-object carrying, flight controls, mass or vitals.
+Automation exposes `consume_food`/`consume_medkit` press/release keys through the
+same production route. Dedicated HUD presentation remains #346.

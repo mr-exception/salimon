@@ -16,7 +16,7 @@ dependencies; each crate's architecture/invariants defines its local contracts.
 | Boundary | Implemented ownership |
 | --- | --- |
 | `client/runtime/` | Native shell/lifecycle/evidence IO plus portable GameplaySession commands, snapshots, stepping, resource/cargo adapters and presentation mapping |
-| `client/fabrication/` | Portable validated recipes, integer raw storage/reservation, FIFO jobs and single tray; runtime adapters remain separate |
+| `client/fabrication/` | Portable validated recipes, integer raw storage/reservation, FIFO jobs, single tray and typed consumable slots; runtime adapters remain separate |
 | `client/world/` | Static six-body compressed catalog, `f64` coordinates/camera tour, resource contracts, generation, extraction/session deltas, fragments and one-object carrying |
 | `client/ship/` | Pose, cockpit authority, inertial force-based flight, uncancellable landing/takeoff, airlock interlocks and live telemetry |
 | `client/physics/` | Portable small-object gravity, ejection/release velocity, authored convex contacts and angular motion, restitution and deterministic substeps; caller-supplied surfaces/geometry |

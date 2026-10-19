@@ -65,3 +65,14 @@ collection (#344): three food and two medical, one item each. Runtime validates
 first-vacant placement before removing the tray under exclusive session ownership;
 full/unsupported/duplicate placement preserves both domains. These slots are
 independent of equipment, world fragments and ship mass. Consumption input is #345.
+
+## Consumable inventory (#345)
+
+`ConsumableInventory` owns exactly `FOOD_SLOT_COUNT = 3` food and
+`MEDICAL_SLOT_COUNT = 2` medical slots. Placement derives category from the typed
+output and takes the first vacant slot; equipment/component outputs are rejected.
+`consume_first(ConsumableCategory)` removes the first occupied matching slot
+without shifting survivors or introducing selected/stacked items. Empty input is
+observational. There is no health/hunger/full-vitals check or healing effect.
+Read-only slot arrays expose stable item/recipe/job identities for later HUD and
+future versioned persistence adapters; no serialization/disk IO is implemented.

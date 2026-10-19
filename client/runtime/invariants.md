@@ -255,3 +255,8 @@ Fabricator modal input is exclusive: opening clears held gameplay controls;
 repeat/synthetic native presses never enqueue twice. Range/interior/occlusion are
 revalidated on simulation ticks; leaving the monitor closes the modal. Display
 reads never step or mutate crafting. Add/cancel use atomic domain commands.
+
+Consumable M/N are independent press/release edges, consume the first matching
+slot even with no vitals system, and leave toolbar, carrying and ship authority
+unchanged. Gameplay N never invokes precision-tour camera selection. Crafting
+modal/view/focus policy is shared with other gameplay input.

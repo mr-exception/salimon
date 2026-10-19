@@ -91,7 +91,9 @@ Updated the existing draft on top of #392 (#366) after #388–#390 were merged.
 The update preserves the existing wheel implementation and all persistence
 changes. Resolved appended runtime architecture/invariant sections by retaining
 both contracts; the app/input changes merged without source conflicts. PR #387
-now targets `issue-366-atomic-checkpoints`; merge #392 first.
+retains GitHub's managed `main` base: GitHub rejected changing the base because
+this PR is part of a stack. Its history includes #392 as a merge parent; merge
+#392 first, then review the remaining wheel diff. No force update was used.
 
 Added a real native filesystem checkpoint regression with Q held, an empty slot
 hovered and primary mouse held. Opening/hovering the wheel does not change the

@@ -51,8 +51,7 @@ Implemented beyond the navigation baseline:
 - Native build staging and declarative gameplay/evidence automation.
 
 Modified deposits and physical fragments survive local streaming **in memory for
-the current session**. This is not disk/backend persistence. Production survival,
-crafting, NPCs, networking, multiplayer, economy and
+the current session**. This is not disk/backend persistence. Production survival, NPCs, networking, multiplayer, economy and
 orbital simulation remain deferred. `core/` remains a documentation-only backend
 boundary. The [technical architecture](technical-architecture.md) and
 [feature maintenance map](maintenance-map.md) define implemented owners/contracts.
@@ -82,3 +81,6 @@ GitHub queue. Update existing owned documents only, without a new central spec.
 Future thruster/landing upgrades and module loads remain documentation-only.
 Cloud unit/E2E/profiling work is #195/#196; Apple M1 physical signoff is isolated
 in native-labeled #198–#200 and is not established by cloud software rendering.
+
+
+Fabricator crafting is newly authorized by the [accepted five-round contracts](spaceship-building-and-survival.md#accepted-fabricator-contracts-2026-10-19-336). Implementation is staged: #336 contracts, #337 raw materials, #338 portable domain, then separate runtime/UI integration. Survival effects, disk persistence and playable progression remain deferred.

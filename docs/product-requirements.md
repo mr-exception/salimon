@@ -17,7 +17,7 @@
 The client-only prototype extends the Phase 0 navigation showcase with surface
 resource generation/mining, physical fragments, one-object carrying, ship/surface
 transfer, fragment gravity/contact and airlock/EVA. Resource changes survive local
-streaming in memory for the current session. Survival, crafting, NPCs, multiplayer,
+streaming in memory for the current session. Survival, NPCs, multiplayer,
 disk/backend persistence and full physical energy conversion/intake remain deferred.
 Cached physical cargo mass and authoritative Core storage/consumers/power are implemented.
 See [Project Phases](project-phases.md) for current scope and
@@ -38,3 +38,6 @@ A phase should produce a demonstrable improvement to the playable application. A
 3. Define or refine the next small phase.
 4. Break that phase into tasks in **GitHub issues**.
 5. Complete and validate the phase before expanding scope.
+
+
+Fabricator crafting is newly authorized by the [accepted five-round contracts](spaceship-building-and-survival.md#accepted-fabricator-contracts-2026-10-19-336). Implementation is staged: #336 contracts, #337 raw materials, #338 portable domain, then separate runtime/UI integration. Survival effects, disk persistence and playable progression remain deferred.

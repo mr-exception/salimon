@@ -72,3 +72,7 @@ Frame/size boundaries: see the [typed boundary inventory](technical-architecture
 Character `points.rs` / `state.rs` own the narrow position DTO/conversion API;
 runtime anchor storage/presentation and physics/renderer mesh-scale consumers must
 be migrated together. World owns analytic fragment radius/diameter.
+
+## Fabricator wave (#336–#348)
+
+Canonical behavior and planned typed ownership: [accepted Fabricator contracts](spaceship-building-and-survival.md#accepted-fabricator-contracts-2026-10-19-336). World owns raw identities/generation; fabrication owns recipes/storage/queue/tray; runtime owns physical transactions, Core funding, inventory and mass adapters. #338 introduces the portable crate; later issues integrate it.

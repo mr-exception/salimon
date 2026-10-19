@@ -68,3 +68,6 @@ Owner approval is pending; this PR does not claim that a decision was already
 made. Keep this question open until answered, then remove it and record the
 answer in the canonical contract and #236 issue scope. Current runtime behavior
 remains session-only while review is pending.
+
+
+Fabricator crafting is newly authorized by the [accepted five-round contracts](spaceship-building-and-survival.md#accepted-fabricator-contracts-2026-10-19-336). Implementation is staged: #336 contracts, #337 raw materials, #338 portable domain, then separate runtime/UI integration. Survival effects, disk persistence and playable progression remain deferred.

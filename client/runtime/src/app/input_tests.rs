@@ -13,17 +13,16 @@ fn native(app: &mut ClientApplication, key: KeyCode, pressed: bool) {
     );
 }
 fn pilot() -> ClientApplication {
-    let mut app = ClientApplication {
-        session: crate::session::GameplaySession {
-            ship: ShipController::flying(
-                salimon_ship::ShipPose {
-                    position_meters: [1e12, 0.0, 0.0],
-                    orientation: [0.0, 0.0, 0.0, 1.0],
-                },
-                0,
-            ),
-            ..Default::default()
+    let mut session = crate::session::GameplaySession::default();
+    session.ship = ShipController::flying(
+        salimon_ship::ShipPose {
+            position_meters: [1e12, 0.0, 0.0],
+            orientation: [0.0, 0.0, 0.0, 1.0],
         },
+        0,
+    );
+    let mut app = ClientApplication {
+        session,
         native_focused: true,
         cursor_captured: true,
         ..ClientApplication::default()

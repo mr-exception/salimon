@@ -6,6 +6,8 @@ use std::collections::BTreeMap;
 pub enum MassObjectId {
     Fragment(u64),
     Equipment(u64),
+    FabricatorReserve,
+    FabricatorTray,
 }
 
 #[derive(Clone, Debug)]

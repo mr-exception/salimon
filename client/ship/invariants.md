@@ -204,3 +204,16 @@ tick and removes its load immediately; idle and blocked tray demand zero watts.
 Core telemetry exposes Fabricator watts separately and includes them in total
 draw, depletion and braking-energy estimates. Recipe efficiency is watts times
 actual worked duration; there is no second battery or assumed full powered frame.
+
+## Fabricator mass transitions (#341)
+
+The runtime updates two dedicated cached ledger keys for integer raw reserves
+and the one physical tray item. Every machine command and completion synchronizes
+immediately; zero contributions remove their keys. World fragment consumption
+drains the same physical journal before the input command returns, so carrying
+never creates a second cargo identity. Enqueue removes committed ingredients
+from accounted mass deliberately, collection removes tray mass, and cancellation
+never refunds. Queue/in-progress/consumable inventory contribute zero. Existing
+loose cargo and Core-consumed identity accounting retain their owners. Runtime
+UI/inventory adapters must use execute_fabricator and validate receiving slots
+before collection; no consumable collection UI is introduced by this issue.

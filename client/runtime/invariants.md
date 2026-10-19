@@ -237,3 +237,16 @@ Successful insertion removes the source exactly once and drains its physical
 journal into mass, motion, anchors and presentation caches immediately. Full
 reserves and invalid milligram masses leave both domains unchanged. The whole
 accepted object is consumed, with overflow discarded. F pickup/drop is unchanged.
+
+## Fabricator mass transitions (#341)
+
+The runtime updates two dedicated cached ledger keys for integer raw reserves
+and the one physical tray item. Every machine command and completion synchronizes
+immediately; zero contributions remove their keys. World fragment consumption
+drains the same physical journal before the input command returns, so carrying
+never creates a second cargo identity. Enqueue removes committed ingredients
+from accounted mass deliberately, collection removes tray mass, and cancellation
+never refunds. Queue/in-progress/consumable inventory contribute zero. Existing
+loose cargo and Core-consumed identity accounting retain their owners. Runtime
+UI/inventory adapters must use execute_fabricator and validate receiving slots
+before collection; no consumable collection UI is introduced by this issue.

@@ -22,7 +22,7 @@ pub(crate) struct GameplaySession {
     pub(crate) ship: ShipController,
     pub(crate) automation_aim_delta: Option<[f64; 2]>,
     pub(crate) mining: crate::mining::ResourceGameplay,
-    pub(crate) fabricator: salimon_fabrication::Fabricator,
+    fabricator: salimon_fabrication::Fabricator,
     pub(crate) equipment: crate::equipment::EquipmentToolbar,
     pub(crate) movement_input: MovementInput,
     pub(crate) ship_control_input: ShipControlInput,
@@ -343,6 +343,7 @@ impl GameplaySession {
         let player = self.character.snapshot(frame, self.terrain_frame(ship));
         crate::carrying::follow(&mut self.mining, player);
         crate::carrying::sync_ship_mass(&mut self.mining, frame, &mut self.ship);
+        self.sync_fabricator_mass();
     }
 
     pub(crate) fn clear_held_controls(&mut self) {

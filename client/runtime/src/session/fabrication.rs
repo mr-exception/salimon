@@ -3,6 +3,43 @@ use super::GameplaySession;
 use salimon_fabrication::FabricationError;
 
 impl GameplaySession {
+    /// Portable command seam for later machine UI/inventory adapters. Collection
+    /// callers must validate a receiving slot before committing this command.
+    pub(crate) fn execute_fabricator(
+        &mut self,
+        command: salimon_fabrication::FabricationCommand,
+    ) -> Result<salimon_fabrication::CommandResult, FabricationError> {
+        let result = self.fabricator.execute(command)?;
+        self.sync_fabricator_mass();
+        Ok(result)
+    }
+
+    pub(super) fn sync_fabricator_mass(&mut self) {
+        let mass = self.fabricator.mass_contribution();
+        let mut changed = false;
+        for (id, mg) in [
+            (
+                salimon_ship::MassObjectId::FabricatorReserve,
+                mass.stored_milligrams,
+            ),
+            (
+                salimon_ship::MassObjectId::FabricatorTray,
+                mass.tray_milligrams,
+            ),
+        ] {
+            changed |= self
+                .mining
+                .ship_mass
+                .update(id, (mg > 0).then_some(mg as f64 / 1_000_000.0))
+                .expect("bounded stored quantities and validated output mass");
+        }
+        if changed || self.ship.snapshot().total_mass_kg != self.mining.ship_mass.total_kg() {
+            self.ship
+                .set_total_mass_kg(self.mining.ship_mass.total_kg())
+                .expect("finite Fabricator and physical cargo ledger");
+        }
+    }
+
     /// One shared tick; recipe completion ends its draw before the rest of the tick.
     pub(super) fn advance_fabrication(&mut self, delta: std::time::Duration) {
         let demand = self.fabricator.power_demand();
@@ -15,6 +52,7 @@ impl GameplaySession {
             let funded = self.ship.fabricator_powered_duration(active);
             self.fabricator.step(funded, true);
             self.fabricator.step(active - funded, false);
+            self.sync_fabricator_mass();
         }
         self.ship
             .set_fabricator_watts(self.fabricator.power_demand().map_or(0.0, |d| d.watts))
@@ -35,7 +73,7 @@ impl GameplaySession {
             .fragment(id)
             .expect("carried identity belongs to the world session")
             .material();
-        match self.fabricator.insert(material) {
+        match self.execute_fabricator(salimon_fabrication::FabricationCommand::Insert(material)) {
             Ok(_) => {
                 // Both domains are exclusively borrowed by this command; no mutation
                 // can invalidate the previously checked world identity between commits.
@@ -86,6 +124,19 @@ mod tests {
                 session.sync_carried();
                 let before = session.fabricator.mass_contribution();
                 session.insert_fabricator_fragment();
+                let loose: f64 = session
+                    .mining
+                    .session
+                    .fragments()
+                    .iter()
+                    .map(|f| f.material().mass_kg())
+                    .sum();
+                assert_eq!(
+                    session.ship.snapshot().total_mass_kg,
+                    salimon_ship::STARTER_DRY_MASS_KG
+                        + loose
+                        + session.fabricator.mass_contribution().kg()
+                );
                 if kg == 1.0 {
                     assert_eq!(session.mining.session.carried_id(), Some(id));
                     assert_eq!(session.fabricator.mass_contribution(), before);
@@ -230,5 +281,82 @@ mod power_tests {
         assert_eq!(whole.fabricator, split.fabricator);
         assert_eq!(whole.ship.snapshot(), split.ship.snapshot());
         assert_eq!(whole.update_clock.backlog(), split.update_clock.backlog());
+    }
+}
+
+#[cfg(test)]
+mod mass_tests {
+    use super::*;
+    use salimon_fabrication::{CommandResult, FabricationCommand as C, RecipeId};
+    use salimon_world::resources::{RawMaterial, ResourceId};
+    use std::time::Duration;
+    fn mass(s: &GameplaySession) -> f64 {
+        s.ship.snapshot().total_mass_kg
+    }
+    #[test]
+    fn command_and_tick_boundaries_update_mass_with_deliberate_queue_inventory_exclusions() {
+        let mut s = GameplaySession::default();
+        let dry = mass(&s);
+        for (resource, kg) in [
+            (ResourceId::OrganicBiomass, 0.800_000_4),
+            (ResourceId::WaterIce, 0.200_000_4),
+        ] {
+            s.execute_fabricator(C::Insert(RawMaterial::new(resource, kg).unwrap()))
+                .unwrap();
+        }
+        assert_eq!(mass(&s), dry + 1.0);
+        let CommandResult::Enqueued(job) = s
+            .execute_fabricator(C::Enqueue {
+                recipe: RecipeId::new("food-ration").unwrap(),
+                quantity: 2,
+            })
+            .unwrap()
+        else {
+            panic!()
+        };
+        assert_eq!(mass(&s), dry); // Committed ingredients intentionally disappear from ship mass.
+        for _ in 0..625 {
+            s.advance_fabrication(Duration::from_millis(16));
+        }
+        assert_eq!(mass(&s), dry + 0.3);
+        s.execute_fabricator(C::Cancel(job)).unwrap();
+        assert_eq!(mass(&s), dry + 0.3); // Cancellation preserves completed tray; never refunds.
+        s.execute_fabricator(C::Collect).unwrap();
+        assert_eq!(mass(&s), dry); // Collected consumable inventory intentionally contributes zero.
+        assert!(s.execute_fabricator(C::Collect).is_err());
+        assert_eq!(mass(&s), dry);
+        assert!(s.mining.ship_mass.reconciles([]));
+    }
+    #[test]
+    fn reserves_follow_ship_motion_and_replacements_keep_loose_core_and_equipment_mass() {
+        let mut s = GameplaySession::default();
+        let id = salimon_ship::MassObjectId::Equipment(5);
+        s.mining.ship_mass.update(id, Some(2.0)).unwrap();
+        s.execute_fabricator(C::Insert(
+            RawMaterial::new(ResourceId::IronOre, 19.999_999).unwrap(),
+        ))
+        .unwrap();
+        s.execute_fabricator(C::Insert(
+            RawMaterial::new(ResourceId::IronOre, 0.000_003).unwrap(),
+        ))
+        .unwrap();
+        assert_eq!(mass(&s), salimon_ship::STARTER_DRY_MASS_KG + 22.0);
+        let before = mass(&s);
+        let pose = s.ship.snapshot().pose;
+        s.ship =
+            salimon_ship::ShipController::flying_with_velocity(pose, 0, [20.0, 0.0, 0.0]).unwrap();
+        s.sync_carried();
+        assert_eq!(mass(&s), before);
+        for _ in 0..10 {
+            s.advance_game(Duration::from_millis(16));
+        }
+        assert_eq!(mass(&s), before);
+        assert!(
+            s.execute_fabricator(C::Insert(
+                RawMaterial::new(ResourceId::IronOre, 1.0).unwrap()
+            ))
+            .is_err()
+        );
+        assert_eq!(mass(&s), before);
     }
 }

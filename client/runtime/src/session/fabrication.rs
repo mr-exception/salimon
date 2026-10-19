@@ -143,32 +143,6 @@ impl GameplaySession {
     }
 }
 
-impl GameplaySession {
-    pub(super) fn consume_input(
-        &mut self,
-        category: salimon_fabrication::ConsumableCategory,
-        pressed: bool,
-    ) {
-        use salimon_fabrication::ConsumableCategory as C;
-        let index = match category {
-            C::Food => 0,
-            C::Medical => 1,
-        };
-        let was_down = std::mem::replace(&mut self.consumable_keys_down[index], pressed);
-        if !pressed || was_down {
-            return;
-        }
-        self.feedback = Some(
-            match (category, self.consumables.consume_first(category).is_some()) {
-                (C::Food, true) => "Food ration consumed",
-                (C::Medical, true) => "Medkit consumed",
-                (C::Food, false) => "No food ration available",
-                (C::Medical, false) => "No medkit available",
-            },
-        );
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -612,5 +586,24 @@ mod tray_tests {
             available_interaction_target(salimon_character::CharacterLocation::Space, eye, target),
             None
         );
+    }
+}
+
+impl GameplaySession {
+    pub(crate) fn equipment_presentation(&self) -> salimon_renderer::EquipmentToolbar {
+        use salimon_renderer::ConsumableIcon;
+        let mut hud = self.equipment.presentation();
+        for (target, item) in hud.consumables.iter_mut().zip(
+            self.consumables
+                .food()
+                .iter()
+                .chain(self.consumables.medical()),
+        ) {
+            *target = item.as_ref().map(|item| match item.category {
+                salimon_fabrication::OutputCategory::Medical => ConsumableIcon::Medical,
+                _ => ConsumableIcon::Food,
+            });
+        }
+        hud
     }
 }

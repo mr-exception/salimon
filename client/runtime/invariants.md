@@ -256,7 +256,8 @@ repeat/synthetic native presses never enqueue twice. Range/interior/occlusion ar
 revalidated on simulation ticks; leaving the monitor closes the modal. Display
 reads never step or mutate crafting. Add/cancel use atomic domain commands.
 
-Consumable M/N are independent press/release edges, consume the first matching
-slot even with no vitals system, and leave toolbar, carrying and ship authority
-unchanged. Gameplay N never invokes precision-tour camera selection. Crafting
-modal/view/focus policy is shared with other gameplay input.
+### Consumable HUD (#346)
+
+Runtime maps the existing three food and two medical slots into a separate
+renderer DTO row. Equipment selection remains keys 1–5. M/N do not consume
+items in gameplay; #377 owns Q-wheel selection. No vitals effect is introduced.

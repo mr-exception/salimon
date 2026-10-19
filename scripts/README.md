@@ -615,7 +615,5 @@ matched scene coverage/costs, color changes, contact sheets and timing records.
 Requires the existing optional Pillow dependency. See
 [terrain validation](../docs/terrain-validation.md#option-a-shader-evidence-278).
 
-Consumable automation (#345): `consume_food` and `consume_medkit` map to gameplay
-N/M. Send a release between uses; repeated held presses consume once. In precision
-tour N retains its camera meaning (`near`). Crafting modal captures consumption.
-Inventory has no health/hunger effect and dedicated HUD presentation follows #346.
+Consumable automation: M/N consumption keys are retired (#346). The Q wheel
+(#377) owns selection; precision-tour `near` retains its camera meaning.

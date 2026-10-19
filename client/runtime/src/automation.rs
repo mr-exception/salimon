@@ -402,8 +402,6 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "view" => Some(KeyCode::F2),
         "diagnostics" => Some(KeyCode::F3),
         "near" => Some(KeyCode::KeyN),
-        "consume_food" => Some(KeyCode::KeyN),
-        "consume_medkit" => Some(KeyCode::KeyM),
         "thruster_up" => Some(KeyCode::ArrowUp),
         "thruster_down" => Some(KeyCode::ArrowDown),
         "forward" => Some(KeyCode::KeyW),

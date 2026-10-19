@@ -524,6 +524,7 @@ mod tests {
             let mut toolbar = ToolbarRaster::default();
             toolbar.update(
                 EquipmentToolbar {
+                    consumables: [None; 5],
                     slots: [None; 5],
                     selected: None,
                 },

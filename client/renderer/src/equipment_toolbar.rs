@@ -32,10 +32,19 @@ impl EquipmentSlot {
 /// Presentation snapshot, with no tool usability or input policy.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct EquipmentToolbar {
+    /// Food slots 0..3, medical slots 3..5; separate from equipment.
+    pub consumables: [Option<ConsumableIcon>; 5],
     pub slots: [Option<EquipmentIcon>; 5],
     pub selected: Option<EquipmentSlot>,
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ConsumableIcon {
+    Food,
+    Medical,
+}
+
+const HEIGHT: u32 = 72;
 const SLOT: u32 = 34;
 const GAP: u32 = 4;
 const WIDTH: u32 = 5 * SLOT + 4 * GAP;
@@ -64,7 +73,7 @@ impl ToolbarRaster {
             return;
         }
         self.key = Some((state, scale));
-        self.pixels = vec![0; (WIDTH * SLOT * scale * scale * 4) as usize];
+        self.pixels = vec![0; (WIDTH * HEIGHT * scale * scale * 4) as usize];
         self.revision = self.revision.wrapping_add(1);
         for (index, icon) in state.slots.iter().enumerate() {
             let x = index as u32 * (SLOT + GAP);
@@ -92,6 +101,44 @@ impl ToolbarRaster {
                 for col in 0..5 {
                     if bits & (1 << (4 - col)) != 0 {
                         self.rect(x + 4 + col, 4 + row as u32, 1, 1, INK);
+                    }
+                }
+            }
+        }
+        for (index, icon) in state.consumables.iter().enumerate() {
+            let x = index as u32 * (SLOT + GAP);
+            let y = SLOT + GAP;
+            self.rect(x, y, SLOT, SLOT, BORDER);
+            self.rect(x + 1, y + 1, SLOT - 2, SLOT - 2, BACKGROUND);
+            // Original faceted package silhouettes match the authored tray:
+            // amber ration stripes; pale medical package with a red cross.
+            if let Some(icon) = icon {
+                let color = match icon {
+                    ConsumableIcon::Food => [197, 139, 57, 255],
+                    ConsumableIcon::Medical => [214, 229, 222, 255],
+                };
+                self.rect(x + 8, y + 8, 18, 19, color);
+                self.rect(x + 8, y + 8, 18, 3, [245, 225, 173, 255]);
+                match icon {
+                    ConsumableIcon::Food => {
+                        self.rect(x + 10, y + 15, 14, 3, [104, 68, 34, 255]);
+                        self.rect(x + 10, y + 21, 14, 2, [104, 68, 34, 255]);
+                    }
+                    ConsumableIcon::Medical => {
+                        self.rect(x + 15, y + 13, 4, 12, [184, 43, 45, 255]);
+                        self.rect(x + 11, y + 17, 12, 4, [184, 43, 45, 255]);
+                    }
+                }
+            }
+            // Category marker stays visible even for empty slots.
+            let mark = if index < 3 { 'F' } else { '+' };
+            for (row, bits) in crate::cockpit_instruments::glyph_rows(mark)
+                .iter()
+                .enumerate()
+            {
+                for col in 0..5 {
+                    if bits & (1 << (4 - col)) != 0 {
+                        self.rect(x + 2 + col, y + 2 + row as u32, 1, 1, INK);
                     }
                 }
             }
@@ -144,7 +191,7 @@ impl ToolbarRaster {
         let scale = self.key?.1;
         Some(OverlayImage {
             width: WIDTH * scale,
-            height: SLOT * scale,
+            height: HEIGHT * scale,
             rgba8: &self.pixels,
             revision: self.revision,
             placement: OverlayPlacement::BottomCenter,
@@ -197,6 +244,7 @@ mod tests {
 
     fn state(selected: Option<EquipmentSlot>) -> EquipmentToolbar {
         EquipmentToolbar {
+            consumables: [None; 5],
             slots: [Some(EquipmentIcon::MiningTool), None, None, None, None],
             selected,
         }
@@ -213,7 +261,7 @@ mod tests {
         ] {
             raster.update(state(selection), 1.0);
             let image = raster.image().unwrap();
-            assert_eq!([image.width, image.height], [372, 68]);
+            assert_eq!([image.width, image.height], [372, 144]);
             image.validate().unwrap();
             for index in 0..5 {
                 let pixel = |x: u32, y: u32| {
@@ -289,6 +337,7 @@ mod tests {
                 let mut empty = ToolbarRaster::default();
                 empty.update(
                     EquipmentToolbar {
+                        consumables: [None; 5],
                         slots: [None; 5],
                         selected: selection,
                     },
@@ -334,7 +383,7 @@ mod tests {
         raster.update(state(Some(EquipmentSlot::Three)), 1.0);
         assert_ne!(raster.image().unwrap().revision, revision);
         raster.update(state(None), 2.0);
-        assert_eq!(raster.image().unwrap().height, 136);
+        assert_eq!(raster.image().unwrap().height, 288);
         for surface in [[1280, 720], [360, 640], [1920, 1080]] {
             let image = raster.image().unwrap();
             let size = crate::overlay::fitted_overlay_size(surface, [image.width, image.height]);
@@ -343,11 +392,53 @@ mod tests {
         // Contents come from the DTO even if all five slots are empty.
         raster.update(
             EquipmentToolbar {
+                consumables: [None; 5],
                 slots: [None; 5],
                 selected: None,
             },
             1.0,
         );
         assert!(raster.image().is_some());
+    }
+}
+
+#[cfg(test)]
+mod consumable_tests {
+    use super::*;
+    #[test]
+    fn five_separate_slots_cache_content_changes_and_fit_small_viewports() {
+        let mut raster = ToolbarRaster::default();
+        let mut state = EquipmentToolbar {
+            slots: [None; 5],
+            selected: None,
+            consumables: [None; 5],
+        };
+        raster.update(state, 1.0);
+        let empty = raster.pixels.clone();
+        let revision = raster.revision;
+        state.consumables = [
+            Some(ConsumableIcon::Food),
+            None,
+            Some(ConsumableIcon::Food),
+            Some(ConsumableIcon::Medical),
+            None,
+        ];
+        raster.update(state, 1.0);
+        assert_ne!(revision, raster.revision);
+        // Adding consumables must not alter the equipment row.
+        assert_eq!(
+            &empty[..(WIDTH * SLOT * 4 * 4) as usize],
+            &raster.pixels[..(WIDTH * SLOT * 4 * 4) as usize]
+        );
+        assert_ne!(empty, raster.pixels);
+        let revision = raster.revision;
+        raster.update(state, 1.0);
+        assert_eq!(revision, raster.revision);
+        for surface in [[320, 240], [1280, 720], [1920, 1080]] {
+            let image = raster.image().unwrap();
+            image.validate().unwrap();
+            let fitted = crate::overlay::fitted_overlay_size(surface, [image.width, image.height]);
+            assert!(fitted[0] <= surface[0] as f32 && fitted[1] <= surface[1] as f32);
+        }
     }
 }

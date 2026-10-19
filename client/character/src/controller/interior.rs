@@ -694,7 +694,8 @@ mod tests {
                 ..MovementInput::default()
             },
         ] {
-            let mut controller = inside_at(-4.5, 0.0);
+            // Aft of the Fabricator footprint, both wall routes stay clear.
+            let mut controller = inside_at(-5.0, 0.0);
             walk_steps(&mut controller, input, 20);
             let local = controller.local_ship_position().unwrap();
             assert!((local[2].abs() - INTERIOR_SIDE_LIMIT).abs() < 1.0e-12);

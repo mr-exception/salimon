@@ -1338,6 +1338,170 @@
           "uvOrigin": "top-left"
         }
       }
+    },
+    {
+      "name": "Fabricator_Chassis",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "Fabricator_Panels",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "Fabricator_Frame",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "Fabricator_Input",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "Fabricator_Monitor",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "displayRole": "fabricator",
+          "uvOrigin": "top-left",
+          "purpose": "fabricator-monitor"
+        }
+      }
+    },
+    {
+      "name": "Fabricator_Tray",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "COLLIDER_Fabricator",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -3.15,
+        1.45,
+        3.75
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            2.4,
+            1.9,
+            1.3
+          ],
+          "purpose": "fabricator-wall-module"
+        }
+      }
+    },
+    {
+      "name": "MARKER_FabricatorInput",
+      "parent": "Interaction_Markers",
+      "visual": false,
+      "translation": [
+        -3,
+        1.65,
+        3.55
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "fabricator-input",
+          "facingDirection": [
+            0,
+            0,
+            -1
+          ]
+        }
+      }
+    },
+    {
+      "name": "MARKER_FabricatorMonitor",
+      "parent": "Interaction_Markers",
+      "visual": false,
+      "translation": [
+        -3.8,
+        2.0,
+        3.69
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "fabricator-monitor",
+          "facingDirection": [
+            0,
+            0,
+            -1
+          ]
+        }
+      }
+    },
+    {
+      "name": "MARKER_FabricatorTray",
+      "parent": "Interaction_Markers",
+      "visual": false,
+      "translation": [
+        -2.55,
+        0.991,
+        3.4
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "fabricator-tray",
+          "facingDirection": [
+            0,
+            0,
+            -1
+          ]
+        }
+      }
+    },
+    {
+      "name": "Fabricator_Output",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "fabricator-output",
+          "visibility": "tray-occupied"
+        }
+      }
     }
   ],
   "materials": [

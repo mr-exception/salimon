@@ -43,7 +43,7 @@ objects and linked shared hierarchy/materials. All use the same ship-local frame
 | pilot-seat | Seat, chair collider and cockpit-seat marker |
 | cockpit-console | Console, monitors, housings, controls and console collider |
 | energy-core | Core, pedestal, details and core collider |
-| cabin-interior | Deck, walls, ceiling, trim/lights, cabin colliders, traversal envelope and spawn marker |
+| cabin-interior | Deck, walls, ceiling, trim/lights, wall Fabricator, cabin colliders, traversal envelope and authored markers |
 
 `assembly/shared.blend` owns the root/group empties and the 13 shared materials
 (including the packed floor image). Components link these dependencies through
@@ -137,7 +137,7 @@ All current `COLLIDER_` names, translations, `collisionShape=box`, `sizeMeters` 
 legacy metadata-only empties, not newly authored solid proxies. The groups cover
 cabin floor/walls/ceiling, Core, aft door, coarse hull, engine bounds
 and the unified center console. The retired cargo-room boundaries are absent.
-The four markers remain empties. Empty cube display glyphs help find colliders
+The seven markers remain empties. Empty cube display glyphs help find colliders
 but **do not describe their actual box dimensions**; use their saved size metadata.
 
 The adapter generates portable spatial Rust layouts from Blender-authored
@@ -344,3 +344,32 @@ The export report records measured costs and source hashes. [Before/after images
 and costs](../../../../reports/issue-276/README.md) are review candidates, not
 approved GPU baselines. Approve the #274 reference and this production pass in
 order; native M1 evidence remains #279 (coordinated with #229).
+
+## Fabricator wall module (#342)
+
+`cabin-interior` owns the Fabricator (original project geometry/license). Its
+2.4 × 1.9 × 1.3 m conservative proxy sits at ship-local (-3.15, 1.45, 3.75).
+The port, monitor and one-item tray use `MARKER_FabricatorInput`,
+`MARKER_FabricatorMonitor` and `MARKER_FabricatorTray`; generated Rust constants
+are the runtime authority. A generic opaque parcel is gated by tray occupancy
+in the existing ship draw; it appears without animation at completion. Native
+UI/artwork and inventory are separate #343/#345 integrations.
+
+Reproduce the reviewed parametric edit with Blender 4.5.3:
+
+```sh
+blender -b --python-exit-code 1 --python models/assets/ships/salimon-scout/author_fabricator.py
+python models/assets/ships/salimon-scout/export.py --blender /path/to/blender
+blender -b --python-exit-code 1 --python models/assets/ships/salimon-scout/preview_fabricator.py
+```
+
+The author script only replaces named Fabricator objects in the cabin library;
+shared materials/hierarchy and assembly links stay linked. Preview cameras and
+lights are read-only and never saved into source. The preview shows an occupied
+tray; the game gates the same parcel by actual domain state.
+
+The node budget deliberately grows 140→151 for seven visual nodes, three
+markers and one proxy. Existing hard triangle/primitive/material/GLB limits
+stay 6500 / 124 / 13 / 557056 bytes; export measures 6493 / 123 / 13 / 549060.
+The collision and output-support checks, overlap checks, named interfaces and
+source comparison are mandatory; no new overlap exemption was added.

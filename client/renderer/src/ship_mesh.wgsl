@@ -77,7 +77,10 @@ fn vs_main(
 
 @fragment
 fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
-    if input.display_flag > 0u {
+    if input.display_flag == 3u && ship.padding.z < 0.5 {
+        discard;
+    }
+    if input.display_flag == 1u || input.display_flag == 2u {
         // Clamp inside the single display texture at an
         // edge. Explicit LOD permits sampling in this per-surface branch.
         let size = vec2<f32>(textureDimensions(instruments));

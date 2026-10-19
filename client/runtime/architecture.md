@@ -809,7 +809,7 @@ See the canonical [resource catalog and compatibility contract](../world/resourc
 The session owns a portable Fabricator. E inserts the one held world fragment
 through a universal interior port, within 3 m and 30 degrees with unobstructed
 sight. Core/cockpit/door targets retain priority; blackout does not gate intake.
-The port uses a ship-local adapter anchor until #342 authors its asset marker.
+The port uses the generated ship-local Fabricator input marker (#342).
 Successful insertion removes the source exactly once and drains its physical
 journal into mass, motion, anchors and presentation caches immediately. Full
 reserves and invalid milligram masses leave both domains unchanged. The whole
@@ -841,3 +841,13 @@ never refunds. Queue/in-progress/consumable inventory contribute zero. Existing
 loose cargo and Core-consumed identity accounting retain their owners. Runtime
 UI/inventory adapters must use execute_fabricator and validate receiving slots
 before collection; no consumable collection UI is introduced by this issue.
+
+## Authored Fabricator module and tray presentation (#342)
+
+The cabin component owns the wall chassis, monitor, input throat and tray, plus
+a stationary generic output package. Runtime reads the generated input marker.
+The renderer receives only a tray-occupied boolean; the existing ship uniform's
+spare component gates the authored output surface in the opaque shader. The
+package appears at completion and disappears on collection, with no animation,
+new draw or physical fragment identity. It follows the presented ship pose and
+remains visible during blackout. Monitor artwork/crafting UI are owned by #343.

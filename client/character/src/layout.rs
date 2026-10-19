@@ -103,7 +103,14 @@ pub(crate) const COCKPIT_STARBOARD_NOSE_SHOULDER: [f64; 4] = [
 // [forward minimum, forward maximum, side minimum, side maximum]. These simple
 // body-expanded footprints match the Core, pilot chair, and
 // unified console/monitor assembly.
-pub(crate) const INTERIOR_OBSTACLES: [[f64; 4]; 7] = [
+pub(crate) const FABRICATOR_OBSTACLE: [f64; 4] = [
+    FABRICATOR_BOUNDS[0] - PLAYER_RADIUS_METERS,
+    FABRICATOR_BOUNDS[1] + PLAYER_RADIUS_METERS,
+    FABRICATOR_BOUNDS[4] - PLAYER_RADIUS_METERS,
+    FABRICATOR_BOUNDS[5] + PLAYER_RADIUS_METERS,
+];
+pub(crate) const INTERIOR_OBSTACLES: [[f64; 4]; 8] = [
+    FABRICATOR_OBSTACLE,
     [
         CORE_FORWARD_MIN,
         CORE_FORWARD_MAX,

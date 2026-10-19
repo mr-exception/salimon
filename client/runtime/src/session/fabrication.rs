@@ -3,6 +3,10 @@ use super::GameplaySession;
 use salimon_fabrication::FabricationError;
 
 impl GameplaySession {
+    pub(crate) fn fabricator_output_present(&self) -> bool {
+        self.fabricator.mass_contribution().tray_milligrams > 0
+    }
+
     /// Portable command seam for later machine UI/inventory adapters. Collection
     /// callers must validate a receiving slot before committing this command.
     pub(crate) fn execute_fabricator(
@@ -11,6 +15,9 @@ impl GameplaySession {
     ) -> Result<salimon_fabrication::CommandResult, FabricationError> {
         let result = self.fabricator.execute(command)?;
         self.sync_fabricator_mass();
+        self.ship
+            .set_fabricator_watts(self.fabricator.power_demand().map_or(0.0, |d| d.watts))
+            .expect("validated recipe watts");
         Ok(result)
     }
 
@@ -42,24 +49,38 @@ impl GameplaySession {
 
     /// One shared tick; recipe completion ends its draw before the rest of the tick.
     pub(super) fn advance_fabrication(&mut self, delta: std::time::Duration) {
-        let demand = self.fabricator.power_demand();
-        let active = demand.map_or(std::time::Duration::ZERO, |d| d.until_output.min(delta));
-        self.ship
-            .set_fabricator_watts(demand.map_or(0.0, |d| d.watts))
-            .expect("validated recipe and starter ship watts have finite sum");
-        if !active.is_zero() {
+        let mut remaining = delta;
+        while !remaining.is_zero() {
+            let Some(demand) = self.fabricator.power_demand() else {
+                self.ship
+                    .set_fabricator_watts(0.0)
+                    .expect("zero load is valid");
+                self.ship.advance(remaining);
+                break;
+            };
+            let active = demand.until_output.min(remaining);
+            self.ship
+                .set_fabricator_watts(demand.watts)
+                .expect("validated recipe watts");
             self.ship.advance(active);
             let funded = self.ship.fabricator_powered_duration(active);
             self.fabricator.step(funded, true);
             self.fabricator.step(active - funded, false);
             self.sync_fabricator_mass();
+            remaining -= active;
+            if funded.is_zero() && !remaining.is_zero() {
+                // Insufficient allocated power: pause until the next shared tick,
+                // allowing ordinary loads/conversion to settle without charging work.
+                self.ship
+                    .set_fabricator_watts(0.0)
+                    .expect("zero load is valid");
+                self.ship.advance(remaining);
+                break;
+            }
         }
         self.ship
             .set_fabricator_watts(self.fabricator.power_demand().map_or(0.0, |d| d.watts))
             .expect("validated recipe watts");
-        if active < delta {
-            self.ship.advance(delta - active);
-        }
     }
 
     pub(super) fn insert_fabricator_fragment(&mut self) {
@@ -210,7 +231,7 @@ mod power_tests {
     use salimon_world::resources::{RESOURCE_CATALOG, RawMaterial};
     use std::time::Duration;
 
-    pub(super) fn queued() -> GameplaySession {
+    fn queued() -> GameplaySession {
         let mut session = GameplaySession::default();
         let mut recipe = RecipeBook::starter().recipes()[0].clone();
         recipe.duration = Duration::from_millis(100);
@@ -271,6 +292,66 @@ mod power_tests {
     }
 
     #[test]
+    fn fabrication_runs_in_inertial_flight_takeoff_and_after_mechanical_core_restart() {
+        let mut flight = queued();
+        flight.ship = salimon_ship::ShipController::flying(
+            salimon_ship::ShipPose {
+                position_meters: [1e12, 0.0, 0.0],
+                orientation: [0.0, 0.0, 0.0, 1.0],
+            },
+            50,
+        );
+        flight.ship.set_cockpit_control(false);
+        flight.advance_game(Duration::from_millis(16));
+        assert_eq!(
+            flight.fabricator.snapshot(true).jobs[0].progress,
+            Duration::from_millis(16)
+        );
+        assert_eq!(
+            flight.ship.snapshot().core_status.fabricator_watts,
+            10_000.0
+        );
+        let mut takeoff = queued();
+        takeoff.ship.set_cockpit_control(true);
+        takeoff.ship.trigger_landing_action();
+        assert!(matches!(
+            takeoff.ship.snapshot().flight_state,
+            salimon_ship::FlightState::AssistedTakeoff { .. }
+        ));
+        takeoff.ship.set_cockpit_control(false);
+        takeoff.advance_game(Duration::from_millis(16));
+        assert_eq!(
+            takeoff.fabricator.snapshot(true).jobs[0].progress,
+            Duration::from_millis(16)
+        );
+        let mut restart = queued();
+        restart.ship.set_stored_core_energy_joules(0);
+        let id = crate::sphere_fixtures::sphere(
+            &mut restart.mining.session,
+            salimon_world::resources::ResourceId::IronOre,
+            1.0,
+            salimon_world::resources::ResourceTransform::new(
+                salimon_world::WorldPosition::new(0.0, 0.0, 0.0),
+                [0.0, 0.0, 0.0, 1.0],
+            )
+            .unwrap(),
+        );
+        restart.mining.session.pick_up(id);
+        assert_eq!(
+            restart
+                .ship
+                .intake_carried_fragment(&mut restart.mining.session),
+            salimon_ship::IntakeResult::Accepted
+        );
+        restart.advance_game(Duration::from_millis(16));
+        assert_eq!(
+            restart.fabricator.snapshot(true).jobs[0].progress,
+            Duration::from_millis(16)
+        );
+        assert!(restart.ship.snapshot().power_available);
+    }
+
+    #[test]
     fn frame_stalls_and_partitioned_admission_fund_the_same_fixed_ticks_away_from_machine() {
         let mut whole = queued();
         let mut split = queued();
@@ -319,9 +400,11 @@ mod mass_tests {
             s.advance_fabrication(Duration::from_millis(16));
         }
         assert_eq!(mass(&s), dry + 0.3);
+        assert!(s.fabricator_output_present());
         s.execute_fabricator(C::Cancel(job)).unwrap();
         assert_eq!(mass(&s), dry + 0.3); // Cancellation preserves completed tray; never refunds.
         s.execute_fabricator(C::Collect).unwrap();
+        assert!(!s.fabricator_output_present());
         assert_eq!(mass(&s), dry); // Collected consumable inventory intentionally contributes zero.
         assert!(s.execute_fabricator(C::Collect).is_err());
         assert_eq!(mass(&s), dry);

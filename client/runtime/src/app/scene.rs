@@ -9,6 +9,7 @@ use salimon_world::{CelestialBodyId, WorldSnapshot};
 
 pub(super) fn map_ship_to_renderer(ship: ShipSnapshot) -> ShipMeshInstance {
     ShipMeshInstance {
+        fabricator_output_present: false,
         position_meters: ship.pose.position_meters,
         orientation: ship.pose.orientation.map(|value| value as f32),
         door_open_fraction: ship.door_open_fraction as f32,

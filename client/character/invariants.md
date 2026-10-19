@@ -110,3 +110,12 @@ adds conservative radius-based ceiling containment; horizontal hull/fixture
 containment and precise deck support remain unchanged. Surface changes invalidate
 sleep support through existing snapshot matching. No acceleration-induced cabin
 forces, crew inertial simulation or new contact engine is introduced.
+
+## Wall Fabricator (#342)
+
+The generated Fabricator box expands by the existing player radius for interior
+walking, zero-G and loose-object floor placement. Both Core aisles and the aft
+door route remain clear. Three generated markers own input, screen and tray
+positions. Ordinary sight queries treat the module as solid; the port query
+omits only its own conservative envelope because the input face is recessed
+behind the tray. Runtime still checks interior authority, front face, range and aim.

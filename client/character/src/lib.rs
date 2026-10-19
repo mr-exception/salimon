@@ -20,10 +20,14 @@ pub use points::{ShipLocalPoint, WorldPoint};
 
 pub use controller::CharacterController;
 pub use input::MovementInput;
-pub use queries::{ship_contains_object, ship_floor_placement, ship_sight_obstruction};
+pub use queries::{
+    fabricator_input_sight_obstruction, ship_contains_object, ship_floor_placement,
+    ship_sight_obstruction,
+};
 pub use spatial_contracts::{
     COCKPIT_SEAT_MARKER_METERS, ENGINE_PORT_ANCHOR_METERS, ENGINE_STARBOARD_ANCHOR_METERS,
-    EXIT_DOOR_MARKER_METERS, PLAYER_START_MARKER_METERS,
+    EXIT_DOOR_MARKER_METERS, FABRICATOR_INPUT_MARKER_METERS, FABRICATOR_MONITOR_MARKER_METERS,
+    FABRICATOR_TRAY_MARKER_METERS, PLAYER_START_MARKER_METERS,
 };
 pub use state::{
     CharacterLocation, CharacterSnapshot, GroundQuery, GroundSample, ShipFrame, SurfaceFrame,

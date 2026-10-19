@@ -599,7 +599,9 @@ impl ClientApplication {
                 vertical_fov_radians: 70.0_f32.to_radians(),
                 near_plane_meters: 0.05,
             };
-            Some(map_ship_to_renderer(presentation.ship))
+            let mut mesh = map_ship_to_renderer(presentation.ship);
+            mesh.fabricator_output_present = self.session.fabricator_output_present();
+            Some(mesh)
         } else {
             None
         };

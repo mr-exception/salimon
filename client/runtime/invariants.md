@@ -232,7 +232,7 @@ See the [canonical dispatch policy](architecture.md#gameplay-input-dispatch-302)
 The session owns a portable Fabricator. E inserts the one held world fragment
 through a universal interior port, within 3 m and 30 degrees with unobstructed
 sight. Core/cockpit/door targets retain priority; blackout does not gate intake.
-The port uses a ship-local adapter anchor until #342 authors its asset marker.
+The port uses the generated ship-local Fabricator input marker (#342).
 Successful insertion removes the source exactly once and drains its physical
 journal into mass, motion, anchors and presentation caches immediately. Full
 reserves and invalid milligram masses leave both domains unchanged. The whole

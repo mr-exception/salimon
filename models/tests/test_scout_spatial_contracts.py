@@ -80,7 +80,7 @@ class ScoutSpatialContractsTests(unittest.TestCase):
         self.assertNotEqual(sidecar_json(edited), sidecar_json(self.contracts))
 
     def test_authored_contract_inventory_and_semantics(self):
-        self.assertEqual(len(self.contracts["colliders"]), 28)
+        self.assertEqual(len(self.contracts["colliders"]), 29)
         self.assertNotIn("cargoRoom", self.contracts)
         self.assertNotIn("cargoCenter", self.contracts["anchors"])
         self.assertFalse(any(name.startswith("COLLIDER_Cargo_")

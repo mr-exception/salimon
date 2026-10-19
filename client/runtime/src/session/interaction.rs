@@ -82,8 +82,9 @@ fn vector_length(vector: [f64; 3]) -> f64 {
     dot(vector, vector).sqrt()
 }
 
-/// Ship-local input face. Replaced by the authored marker in the asset integration.
-pub(crate) const FABRICATOR_INPUT_METERS: [f64; 3] = [-3.0, 1.65, 3.55];
+/// Canonical authored input face, generated from the Blender source.
+pub(crate) const FABRICATOR_INPUT_METERS: [f64; 3] =
+    salimon_character::FABRICATOR_INPUT_MARKER_METERS;
 
 fn fabricator_target(eye: [f64; 3], look: [f64; 3]) -> bool {
     let to_input = subtract(FABRICATOR_INPUT_METERS, eye);
@@ -94,6 +95,6 @@ fn fabricator_target(eye: [f64; 3], look: [f64; 3]) -> bool {
             >= COCKPIT_INTERACTION_MINIMUM_AIM_DOT
         // The port is on the cabin-facing surface; no interaction through its back.
         && eye[2] < FABRICATOR_INPUT_METERS[2]
-        && salimon_character::ship_sight_obstruction(eye, FABRICATOR_INPUT_METERS, true)
+        && salimon_character::fabricator_input_sight_obstruction(eye)
             .is_none_or(|hit| hit >= distance - 0.02)
 }

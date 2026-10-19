@@ -13,13 +13,15 @@ fn catalog_keys_are_stable_unique_and_round_trip() {
     assert_eq!(ResourceId::IronOre.key(), "iron-ore");
     assert_eq!(ResourceId::SilicateRock.key(), "silicate-rock");
     assert_eq!(ResourceId::WaterIce.key(), "water-ice");
+    assert_eq!(ResourceId::OrganicBiomass.key(), "organic-biomass");
+    assert_eq!(ResourceId::MedicinalCompounds.key(), "medicinal-compounds");
     let keys: HashSet<_> = RESOURCE_CATALOG
         .iter()
         .map(|entry| entry.id.key())
         .collect();
     let ids: HashSet<_> = RESOURCE_CATALOG.iter().map(|entry| entry.id).collect();
-    assert_eq!(keys.len(), 3);
-    assert_eq!(ids.len(), 3);
+    assert_eq!(keys.len(), 5);
+    assert_eq!(ids.len(), 5);
     for entry in RESOURCE_CATALOG {
         assert_eq!(ResourceId::from_key(entry.id.key()), Some(entry.id));
         assert_eq!(entry.id.definition(), entry);

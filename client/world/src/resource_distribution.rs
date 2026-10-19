@@ -194,7 +194,7 @@ fn validate_resources(resources: &[ResourceDistribution]) -> Result<(), Distribu
 /// Initial gameplay approximations for every canonical solid body. Sun has no
 /// collectible surface. Kept separate from geometry/rendering and body constructors.
 pub fn default_resource_distribution(body: CelestialBodyId) -> BodyResourceDistribution {
-    use ResourceId::{IronOre, SilicateRock, WaterIce};
+    use ResourceId::{IronOre, MedicinalCompounds, OrganicBiomass, SilicateRock, WaterIce};
     type ProfileEntry = (ResourceId, f64, f64, [f64; 2]);
     let (seed, entries): (u64, &[ProfileEntry]) = match body {
         CelestialBodyId::Sun => (0, &[]),
@@ -218,6 +218,8 @@ pub fn default_resource_distribution(body: CelestialBodyId) -> BodyResourceDistr
                 (IronOre, 2.0, 40.0, [20.0, 80.0]),
                 (SilicateRock, 4.0, 25.0, [10.0, 60.0]),
                 (WaterIce, 1.0, 70.0, [5.0, 30.0]),
+                (OrganicBiomass, 3.0, 35.0, [5.0, 20.0]),
+                (MedicinalCompounds, 1.0, 45.0, [2.0, 10.0]),
             ],
         ),
         CelestialBodyId::Moon => (

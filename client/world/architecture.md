@@ -137,3 +137,8 @@ swapping entities. Removal is O(retained count), lookup is expected O(1), and ID
 are monotonic across consumption. Range selection still visits retained entities;
 CPU attribution in the #305/#306 reports determines whether another spatial
 membership structure is justified. Streaming does not remove retained identities.
+
+
+## Consumable raw resources (#337)
+
+See the canonical [resource catalog and compatibility contract](../world/resource-contracts.md#consumable-raw-resources-337) for new feedstock generation, physical lifecycle, distinct presentation and Core yields.

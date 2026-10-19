@@ -232,6 +232,9 @@ pub(crate) fn deposit_mesh_with_terrain(
             ResourceMesh::SilicateDepositRidge,
             ResourceMesh::SilicateDepositScree,
         ],
+        // Reuse existing low-poly geometry with distinct material tints.
+        ResourceId::OrganicBiomass => [ResourceMesh::SilicateDepositBoulder; 4],
+        ResourceId::MedicinalCompounds => [ResourceMesh::IceDepositCrown; 4],
         ResourceId::IronOre => [
             ResourceMesh::IronDepositNodule,
             ResourceMesh::IronDepositVein,
@@ -241,7 +244,16 @@ pub(crate) fn deposit_mesh_with_terrain(
     };
     let mesh = variants[(entry.deposit.id().local % 4) as usize];
     Some(ResourceMeshInstance {
-        tint: [1.0; 4],
+        tint: if entry
+            .deposit
+            .material()
+            .resource()
+            .is_consumable_feedstock()
+        {
+            fragment_tint(entry.deposit.material().resource())
+        } else {
+            [1.0; 4]
+        },
         mesh,
         center_meters: entry.deposit.position().meters(),
         // Every baked vertex fits +/-salimon_renderer::SPHERE_AUTHORED_RADIUS_METERS m. Inscribe its cube in the
@@ -283,6 +295,8 @@ fn fragment_tint(resource: ResourceId) -> [f32; 4] {
         ResourceId::IronOre => [0.75, 0.22, 0.06, 1.0],
         ResourceId::SilicateRock => [0.45, 0.50, 0.36, 1.0],
         ResourceId::WaterIce => [0.25, 0.85, 1.0, 1.0],
+        ResourceId::OrganicBiomass => [0.18, 0.75, 0.12, 1.0],
+        ResourceId::MedicinalCompounds => [0.75, 0.18, 0.85, 1.0],
     }
 }
 
@@ -320,6 +334,36 @@ mod tests {
     use salimon_world::resources::{
         DepositId, FragmentId, RawMaterial, ResourceDeposit, ResourceFragment, ResourceTransform,
     };
+
+    #[test]
+    fn feedstock_visuals_are_distinct_stable_and_depletion_removes_them() {
+        let mut colors = Vec::new();
+        for resource in [ResourceId::OrganicBiomass, ResourceId::MedicinalCompounds] {
+            let material = RawMaterial::new(resource, 2.0).unwrap();
+            let mut entry = SurfaceDeposit {
+                deposit: ResourceDeposit::new(
+                    DepositId {
+                        body: CelestialBodyId::Earth,
+                        local: 42,
+                    },
+                    material,
+                    WorldPosition::new(0.0, 0.0, 0.0),
+                    2.0,
+                )
+                .unwrap(),
+                body_local_position_meters: [0.0; 3],
+                bounds_radius_meters: salimon_world::resource_size::deposit_radius_meters(material),
+            };
+            let mesh = deposit_mesh(entry).unwrap();
+            assert_eq!(Some(mesh), deposit_mesh(entry));
+            assert_eq!(mesh.tint, fragment_tint(resource));
+            assert!(mesh.authored_mesh_scale > 0.0);
+            colors.push(mesh.tint);
+            entry.deposit.set_remaining_mass_kg(0.0).unwrap();
+            assert!(deposit_mesh(entry).is_none());
+        }
+        assert_ne!(colors[0], colors[1]);
+    }
 
     #[test]
     fn terrain_support_and_default_spacing_cover_enlarged_deposits() {

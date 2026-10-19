@@ -339,3 +339,9 @@ restore, 60-second/event capture, bounded background IO, visible recovery/failur
 warnings and verified clean exit. See [canonical contract](save-contract.md#durable-active-run-366).
 Survival/death/restart/archive integration follows #371/#372/#374; no offline
 world simulation or multi-save UI is implied.
+
+## Survival meters (#367)
+
+Portable meter/active-clock/offline-fatigue authority lives in
+[`salimon-survival`](../client/survival/architecture.md). Native/session persistence
+integration is #371; the current playable session does not yet advance survival.

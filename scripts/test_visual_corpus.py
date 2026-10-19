@@ -5,9 +5,10 @@ import tempfile
 import subprocess
 import sys
 import unittest
+from unittest.mock import patch
 
 from visual_corpus import candidate, reviewed_status, write_json
-from model_visual_tests import evaluate
+from model_visual_tests import capture, evaluate
 try:
     from PIL import Image, ImageDraw
 except ImportError:
@@ -16,6 +17,33 @@ except ImportError:
 
 @unittest.skipIf(Image is None, 'optional visual tests require Pillow')
 class CorpusTests(unittest.TestCase):
+    def test_capture_diagnostics_do_not_contaminate_corpus_inventory(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            fixtures, context = self.fixture(root)
+
+            def native_run(scenario_path, binary, artifacts, tags):
+                artifacts.mkdir(parents=True, exist_ok=True)
+                scenario = json.loads(scenario_path.read_text())
+                steps = []
+                for step in scenario['steps']:
+                    image = artifacts/(step['screenshot'] + '.png')
+                    Image.new('RGB', (32, 32), 'black').save(image)
+                    steps.append({'step': step, 'screenshot': {'path': str(image)},
+                                  'state': {'visual_context': context}})
+                return {'status': 'passed', 'steps': steps}
+
+            with patch('salimon_test.run', side_effect=native_run):
+                result = capture(fixtures['ship'], root/'binary', root/'fresh/ship')
+            metadata = candidate(root/'fresh', fixtures, result['visual_context'], 'a'*40, 'b'*64)
+            self.assertEqual(len(metadata['images']), 2)
+            self.assertEqual(len(list((root/'fresh-runs/ship').glob('*.png'))), 2)
+            self.assertFalse((root/'fresh/ship/runs').exists())
+            # The fix must not weaken rejection of genuinely stray corpus PNGs.
+            Image.new('RGB', (32, 32)).save(root/'fresh/stray.png')
+            with self.assertRaisesRegex(ValueError, 'unexpected image outside fixture contract'):
+                candidate(root/'fresh', fixtures, result['visual_context'], 'a'*40, 'b'*64)
+
     def fixture(self, root):
         scenario = root/'scenario.json'
         scenario.write_text(json.dumps({'setup': {'seed': 42}, 'steps': [{'screenshot': 'pose'}]}))

@@ -42,8 +42,10 @@ to conceal failures. Size changes fail explicitly.
 ## Approval policy and style replacement
 
 `baselines/software-vulkan-option-a-v1` and `baselines/metal-option-a-v1`
-are **independent** versioned corpora. Both currently contain pending metadata,
-not approved production images. Software approval is tracked in
+are **independent** versioned corpora. Software Vulkan contains a captured
+**candidate** awaiting human review; Metal still contains pending metadata.
+Neither is approved. See the [software capture report](../../reports/issue-321/README.md)
+and [checkpoint index](../../reports/issue-321/checkpoints.md). Software approval is tracked in
 [#321](https://github.com/mr-exception/salimon/issues/321); native M1/Metal review
 remains [#314](https://github.com/mr-exception/salimon/issues/314).
 
@@ -55,6 +57,10 @@ tolerances and masks. Per-image SHA-256 records detect replaced/missing images.
 All fixture screenshots must agree on renderer context and dimensions. The
 revision and binary hashes provide provenance; comparing a newer revision is
 allowed, while context and fixture-contract changes require independent review.
+Runner diagnostics are retained beside the corpus: the default candidate images
+are in `artifacts/model-visual/candidates/<fixture>/`, and full runner logs and
+duplicate raw screenshots are in `artifacts/model-visual/candidates-runs/<fixture>/`.
+Only contracted checkpoint PNGs belong inside a corpus; unexpected images still fail.
 
 To review a new corpus:
 

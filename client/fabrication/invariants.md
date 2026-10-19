@@ -29,3 +29,17 @@
 14. Consumption removes only the first occupied slot in the requested typed
     consumable category. It does not shift survivors, affect the other category,
     apply vitals, change ship mass or depend on a future full-health/hunger state.
+
+## Whole-session saves (#365)
+
+`FabricationSaveState` validates recipe definitions, ordered complete bins, queue
+IDs/captured recipes/committed quantities/progress, allocator high-water marks,
+tray and exact inventory slots together. Cross-owner item identities cannot be
+both collected and on the tray. Runtime's `SessionState` is the concrete payload
+inside `SaveGame`; `save_bytes` and transactional `restore_bytes` integrate all
+physical state, equipment and exact elapsed/backlog clocks. Stored mass and
+recipe watts are reconstructed without charging or refunding. UI/input/focus,
+feedback and render caches reset; interactions are recomputed from restored
+world state. The native host's automation policy stays host-owned. No disk IO,
+autosave scheduling or offline simulation is implied; #366 owns durable storage
+and shell lifecycle integration. See [canonical save contract](../../docs/save-contract.md).

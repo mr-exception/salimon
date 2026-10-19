@@ -3,7 +3,10 @@ use crate::FabricationError;
 /// Positive integer milligrams. Balances may be zero and use plain u64.
 /// Quantize world kilograms once, nearest milligram (half rounds upward).
 /// Sub-half-milligram or overflowing input is rejected without consuming it.
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(
+    Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, serde::Serialize, serde::Deserialize,
+)]
+#[serde(deny_unknown_fields)]
 pub struct Mass(u64);
 
 impl Mass {

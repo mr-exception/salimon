@@ -40,3 +40,14 @@ calculation; those are later persistence/survival issues.
 
 Disk durability, verification/fallback and periodic/event/exit checkpoints belong
 to #366. A round-trip here proves the logical state boundary, not durable storage.
+
+## Implemented whole-session boundary (#364–#365)
+
+Runtime `session/persistence.rs::SessionState` is the concrete typed payload.
+`GameplaySession::save_bytes(now_unix_seconds)` exports it through `SaveGame`;
+`restore_bytes` validates and constructs temporary domain owners before one
+assignment. `FabricationSaveState` keeps machine/inventory validation together.
+Propulsion mass is excluded from wire data and rebuilt from the physical cargo,
+reserves and tray source state. Tests cover subsequent deterministic simulation,
+not only byte round-trip, including sleeping contacts and mid-assist/mid-craft.
+The boundary is ready for #366; no startup/exit/manual-disk UI is wired yet.

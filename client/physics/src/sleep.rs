@@ -691,6 +691,11 @@ impl<K: Clone + Eq + Hash + serde::Serialize> SleepTracker<K> {
             {
                 return Err(invalid("sleep/contact state"));
             }
+            if (e.motion.samples.is_empty() && e.motion.time != 0.)
+                || (e.motion.samples.len() == 1 && e.motion.samples[0].time != e.motion.time)
+            {
+                return Err(invalid("incomplete sleep dwell window"));
+            }
             let mut previous = None;
             for sample in &e.motion.samples {
                 let n: f64 = sample.orientation.iter().map(|v| v * v).sum();

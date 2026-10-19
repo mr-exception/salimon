@@ -43,6 +43,13 @@ impl Validate for PhysicalState {
             return Err(invalid("character surface is not in world catalog"));
         }
         self.world.validate()?;
+        let mut total = salimon_ship::STARTER_DRY_MASS_KG;
+        for fragment in &self.world.fragments {
+            total += fragment.material().mass_kg();
+            if !total.is_finite() {
+                return Err(invalid("physical mass overflow"));
+            }
+        }
         salimon_world::spherical_mining::MiningConfig::new(
             self.mining_config.cap_kg(),
             self.mining_config.rate_kg_per_second(),
@@ -51,6 +58,10 @@ impl Validate for PhysicalState {
         self.camera.validate_save()?;
         let ids: std::collections::HashSet<_> =
             self.world.fragments.iter().map(|f| f.id()).collect();
+        // Validate logical sleep state even when decoding without publishing it.
+        salimon_physics::SleepTracker::from_save(self.sleep.clone(), |id, p| {
+            ids.contains(id).then(|| p.clone())
+        })?;
         for (id, anchor) in &self.anchors {
             if !ids.contains(id)
                 || Some(*id) == self.world.carried
@@ -139,6 +150,74 @@ impl PhysicalState {
             ship,
             mining,
         })
+    }
+}
+
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(crate) struct SessionState {
+    physical: PhysicalState,
+    fabrication: salimon_fabrication::FabricationSaveState,
+    equipment: crate::equipment::EquipmentToolbar,
+}
+impl Validate for SessionState {
+    fn validate(&self) -> Result<(), SaveError> {
+        self.physical.validate()?;
+        self.fabrication.validate()?;
+        self.equipment
+            .validate_save(self.physical.world.carried.is_some())?;
+        Ok(())
+    }
+}
+impl GameplaySession {
+    pub(crate) fn save_bytes(&self, now_unix_seconds: u64) -> Result<Vec<u8>, SaveError> {
+        let state = SessionState {
+            physical: PhysicalState::capture(self),
+            fabrication: salimon_fabrication::FabricationSaveState::capture(
+                &self.fabricator,
+                &self.consumables,
+            ),
+            equipment: self.equipment.clone(),
+        };
+        salimon_persistence::SaveGame::new(
+            state,
+            self.elapsed,
+            self.update_clock.backlog(),
+            now_unix_seconds,
+        )?
+        .encode()
+    }
+    /// Decode, validate and reconstruct in isolation, then publish exactly once.
+    /// Native focus/capture and filesystem scheduling remain shell-owned (#366).
+    pub(crate) fn restore_bytes(&mut self, bytes: &[u8]) -> Result<(), SaveError> {
+        let save = salimon_persistence::SaveGame::<SessionState>::decode(bytes)?;
+        let (fabricator, consumables) = save.state.fabrication.restore()?;
+        let physical = save.state.physical.restore()?;
+        let mut restored = Self {
+            seed: physical.seed,
+            view_mode: physical.view_mode,
+            camera_prototype: physical.camera,
+            character: physical.character,
+            ship: physical.ship,
+            mining: physical.mining,
+            fabricator,
+            consumables,
+            equipment: save.state.equipment,
+            elapsed: save.simulated_time,
+            update_clock: crate::update_clock::UpdateClock::from_saved_backlog(save.pending_time),
+            // Automation policy belongs to the current host, never the save file.
+            automation_step: self.automation_step,
+            interpolate_presentation: self.interpolate_presentation,
+            measure_physics: self.measure_physics,
+            ..Default::default()
+        };
+        restored.sync_fabricator_mass();
+        restored
+            .ship
+            .set_fabricator_watts(restored.fabricator.power_demand().map_or(0., |d| d.watts))
+            .map_err(|_| invalid("restored machine/Core demand"))?;
+        *self = restored;
+        Ok(())
     }
 }
 

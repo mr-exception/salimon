@@ -15,7 +15,8 @@
 6. Camera-relative positions subtract their `f64` origin before any `f32`
    conversion.
 7. World code never depends on `winit`, `wgpu`, native handles, graphics
-   clip-space conventions, networking, persistence, or backend services.
+   clip-space conventions, networking, disk storage, or backend services. Logical
+   world save DTOs remain world-owned.
 8. Approach and retreat are monotonic, dwell phases hold exact endpoints, and
    pause/restart/near-inspection commands remain deterministic.
 9. Pausing changes only tour progression. The body catalog and three precision

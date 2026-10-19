@@ -38,3 +38,6 @@ impl std::fmt::Display for FabricationError {
     }
 }
 impl std::error::Error for FabricationError {}
+
+mod save;
+pub use save::FabricationSaveState;

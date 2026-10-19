@@ -1800,7 +1800,9 @@ version = "0.1.0"
 name = "salimon-fabrication"
 version = "0.1.0"
 dependencies = [
+ "salimon-persistence",
  "salimon-world",
+ "serde",
 ]
 
 [[package]]

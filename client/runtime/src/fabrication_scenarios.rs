@@ -180,3 +180,118 @@ fn declarative_initial_contract_replays_through_portable_protocol() {
     assert_eq!(response["ok"], false);
     assert_eq!(s.fabrication_snapshot(), old);
 }
+
+#[test]
+fn saved_midcraft_session_resumes_once_with_exact_clocks_energy_and_inventory() {
+    let mut s = session();
+    s.equipment
+        .select(crate::equipment::ToolbarSlot::Three, false);
+    for (i, resource) in [
+        ResourceId::OrganicBiomass,
+        ResourceId::MedicinalCompounds,
+        ResourceId::WaterIce,
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        mine_carry_load(&mut s, resource, 2., 20_000 + i as u64);
+    }
+    for (recipe, quantity) in [("food-ration", 2), ("medkit", 1)] {
+        s.execute_fabricator(C::Enqueue {
+            recipe: RecipeId::new(recipe).unwrap(),
+            quantity,
+        })
+        .unwrap();
+    }
+    s.advance_automation(Duration::from_millis(4003));
+    let bytes = s.save_bytes(12345).unwrap();
+    let mut restored = session();
+    restored.restore_bytes(&bytes).unwrap();
+    assert_eq!(bytes, restored.save_bytes(12345).unwrap());
+    assert_eq!(s.fabrication_snapshot(), restored.fabrication_snapshot());
+    assert_eq!(s.snapshot().backlog, Duration::from_millis(3));
+    assert_eq!(s.elapsed, restored.elapsed);
+    // Complete two rations then a medkit. Save/reload occupied slots and tray on
+    // every boundary; neither ingredients nor energy may be committed twice.
+    for (index, ms) in [6016, 10000, 15008].into_iter().enumerate() {
+        s.advance_automation(Duration::from_millis(ms));
+        restored.advance_automation(Duration::from_millis(ms));
+        assert_eq!(s.fabrication_snapshot(), restored.fabrication_snapshot());
+        assert_eq!(s.snapshot().ship, restored.snapshot().ship);
+        assert!(s.fabrication_snapshot().tray.is_some());
+        let occupied = restored.save_bytes(12345).unwrap();
+        let mut duplicate: Value = serde_json::from_slice(&occupied).unwrap();
+        duplicate["state"]["fabrication"]["inventory"]["food"][0] =
+            duplicate["state"]["fabrication"]["machine"]["tray"].clone();
+        assert!(
+            restored
+                .restore_bytes(&serde_json::to_vec(&duplicate).unwrap())
+                .is_err()
+        );
+        assert_eq!(occupied, restored.save_bytes(12345).unwrap());
+        restored.restore_bytes(&occupied).unwrap();
+        assert_eq!(occupied, restored.save_bytes(12345).unwrap());
+        s.collect_fabricator_output();
+        restored.collect_fabricator_output();
+        restored.collect_fabricator_output();
+        assert_eq!(s.consumables, restored.consumables);
+        assert_eq!(
+            restored
+                .consumables
+                .food()
+                .iter()
+                .filter(|v| v.is_some())
+                .count(),
+            (index + 1).min(2)
+        );
+    }
+    let saved = restored.save_bytes(12345).unwrap();
+    restored.restore_bytes(&saved).unwrap();
+    assert!(
+        restored
+            .consumables
+            .consume_first(salimon_fabrication::ConsumableCategory::Food)
+            .is_some()
+    );
+    assert!(
+        restored
+            .consumables
+            .consume_first(salimon_fabrication::ConsumableCategory::Medical)
+            .is_some()
+    );
+    assert_eq!(restored.consumables.food().iter().flatten().count(), 1);
+    assert!(restored.consumables.medical().iter().all(Option::is_none));
+}
+
+#[test]
+fn save_restore_blackout_is_atomic_and_never_restores_held_input_or_modal() {
+    let mut s = session();
+    mine_carry_load(&mut s, ResourceId::OrganicBiomass, 1., 30_000);
+    mine_carry_load(&mut s, ResourceId::WaterIce, 1., 30_001);
+    s.execute_fabricator(C::Enqueue {
+        recipe: RecipeId::new("food-ration").unwrap(),
+        quantity: 1,
+    })
+    .unwrap();
+    s.advance_automation(Duration::from_millis(1008));
+    s.ship.set_stored_core_energy_joules(0);
+    s.advance_automation(Duration::from_millis(16));
+    s.movement_input.forward = true;
+    s.crafting_ui.open = true;
+    let bytes = s.save_bytes(10).unwrap();
+    let before = s.fabrication_snapshot();
+    s.restore_bytes(&bytes).unwrap();
+    assert!(!s.movement_input.forward);
+    assert!(!s.crafting_ui.open);
+    assert_eq!(before, s.fabrication_snapshot());
+    s.advance_automation(Duration::from_millis(1008));
+    assert_eq!(before.jobs, s.fabrication_snapshot().jobs);
+    let mut bad: Value = serde_json::from_slice(&bytes).unwrap();
+    bad["state"]["fabrication"]["machine"]["jobs"][0]["progress"] = json!({"secs":999,"nanos":0});
+    let current = s.save_bytes(11).unwrap();
+    assert!(s.restore_bytes(&serde_json::to_vec(&bad).unwrap()).is_err());
+    assert_eq!(current, s.save_bytes(11).unwrap());
+    s.ship.exchange_core_energy_joules(1e8, 0.).unwrap();
+    s.advance_automation(Duration::from_secs(10));
+    assert!(s.fabrication_snapshot().tray.is_some());
+}

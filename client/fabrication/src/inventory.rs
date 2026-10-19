@@ -17,7 +17,8 @@ pub enum InventoryError {
     AlreadyStored,
 }
 
-#[derive(Clone, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Debug, Default, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ConsumableInventory {
     food: [Option<OutputItem>; FOOD_SLOT_COUNT],
     medical: [Option<OutputItem>; MEDICAL_SLOT_COUNT],

@@ -114,3 +114,13 @@ integration is #371; the current playable session does not yet advance survival.
 
 Damage, regeneration, treatment-only wound debt and data-driven timed/persistent/
 exposure status effects (#368) use the survival crate's [single pipeline](../client/survival/architecture.md#damage-and-status-pipeline-368).
+
+Survival movement/interaction restrictions (#369): `survival/src/restrictions.rs`
+owns exact threshold percentages, validated tuning and typed permissions;
+`runtime/src/session/survival.rs` applies them to shared commands/ticks,
+`character/src/controller/` scales voluntary locomotion, and ship's
+`controller/cockpit.rs` owns explicit pilot revocation. Tests: survival
+`tests/restrictions.rs`, runtime `session/survival/tests.rs`, character locomotion
+and ship revocation regressions. Run workspace tests/build/Clippy/fmt. See the
+[canonical policy](../client/survival/architecture.md#movement-and-interaction-restrictions-369).
+Clock/save activation remains #371; HUD/wheel/effects remain #373/#377/#370.

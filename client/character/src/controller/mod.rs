@@ -48,6 +48,8 @@ pub struct CharacterController {
     interior_velocity: [f64; 3],
     #[serde(skip)]
     jump_was_down: bool,
+    #[serde(skip, default = "normal_movement_scale")]
+    movement_scale: f64,
     eva_inherited_velocity: [f64; 3],
     eva_control_velocity: [f64; 3],
     eva_axes: [[f64; 3]; 3],
@@ -67,6 +69,7 @@ impl Default for CharacterController {
             vertical_speed: 0.0,
             interior_velocity: [0.0; 3],
             jump_was_down: false,
+            movement_scale: 1.0,
             eva_inherited_velocity: [0.0; 3],
             eva_control_velocity: [0.0; 3],
             eva_axes: [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
@@ -77,7 +80,23 @@ impl Default for CharacterController {
     }
 }
 
+fn normal_movement_scale() -> f64 {
+    1.0
+}
+
 impl CharacterController {
+    /// Scales voluntary locomotion only, never gravity, elapsed time or inherited drift.
+    pub fn set_movement_scale(&mut self, scale: f64) {
+        self.movement_scale = if scale.is_finite() {
+            scale.clamp(0.0, 1.0)
+        } else {
+            1.0
+        };
+    }
+    fn walk_speed(&self) -> f64 {
+        WALK_SPEED_METERS_PER_SECOND * self.movement_scale
+    }
+
     pub fn set_ship_gravity_enabled(&mut self, enabled: bool) {
         if matches!(self.position, PositionState::Inside { .. }) {
             if self.ship_gravity_enabled && !enabled {
@@ -239,5 +258,91 @@ mod timing_tests {
             partitioned.snapshot(frame(), surface()).eye_position_meters
         );
         assert_eq!(after.eye_position_meters[0], 1020.0);
+    }
+}
+
+#[cfg(test)]
+mod locomotion_modifier_tests {
+    use super::test_support::{frame, surface};
+    use super::*;
+
+    #[test]
+    fn movement_multiplier_never_scales_inherited_eva_drift_or_gravity_time() {
+        let controller = CharacterController {
+            position: PositionState::Space { world: [1000.0; 3] },
+            eva_inherited_velocity: [10.0, 0.0, 0.0],
+            ..Default::default()
+        };
+        let mut normal = controller.clone();
+        let mut slow = controller;
+        slow.set_movement_scale(0.225);
+        normal.advance(
+            Duration::from_secs(1),
+            MovementInput::default(),
+            frame(),
+            surface(),
+            false,
+            false,
+        );
+        slow.advance(
+            Duration::from_secs(1),
+            MovementInput::default(),
+            frame(),
+            surface(),
+            false,
+            false,
+        );
+        assert_eq!(
+            normal.snapshot(frame(), surface()),
+            slow.snapshot(frame(), surface())
+        );
+        assert_eq!(slow.eva_velocity(), Some([10.0, 0.0, 0.0]));
+    }
+
+    #[test]
+    fn zero_g_acceleration_is_scaled_but_existing_momentum_and_save_source_are_preserved() {
+        let mut normal = CharacterController {
+            position: PositionState::Inside {
+                local: [-2.0, 2.0, 1.0],
+            },
+            ship_gravity_enabled: false,
+            ..Default::default()
+        };
+        let mut slow = normal.clone();
+        slow.set_movement_scale(0.5);
+        let input = MovementInput {
+            forward: true,
+            ..Default::default()
+        };
+        normal.advance(
+            Duration::from_millis(100),
+            input,
+            frame(),
+            surface(),
+            false,
+            false,
+        );
+        slow.advance(
+            Duration::from_millis(100),
+            input,
+            frame(),
+            surface(),
+            false,
+            false,
+        );
+        assert!((slow.interior_velocity[0] / normal.interior_velocity[0] - 0.5).abs() < 1e-12);
+        let moving = slow.interior_velocity;
+        slow.set_movement_scale(0.1);
+        slow.advance(
+            Duration::from_millis(100),
+            MovementInput::default(),
+            frame(),
+            surface(),
+            false,
+            false,
+        );
+        assert_eq!(slow.interior_velocity, moving);
+        let restored = CharacterController::from_save(slow.save_state(), None).unwrap();
+        assert_eq!(restored.movement_scale, 1.0);
     }
 }

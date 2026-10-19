@@ -60,6 +60,7 @@ impl CharacterController {
         state.validate()?;
         let mut c = state.0;
         c.jump_was_down = false;
+        c.set_movement_scale(1.0);
         if let Some(s) = &mut c.nearby_surface {
             s.query = query;
         }

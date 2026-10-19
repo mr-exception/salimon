@@ -929,3 +929,21 @@ filesystem durability. Startup renderer creation preserves restored clock backlo
 E2E and benchmark launches remain isolated from user saves. See the
 [canonical save contract](../../docs/save-contract.md#durable-active-run-366)
 for paths, recovery/failure policy, Windows behavior and future lifecycle owners.
+
+## Survival restriction composition (#369)
+
+`session/survival.rs` derives the [canonical restriction policy](../survival/architecture.md#movement-and-interaction-restrictions-369)
+from the session's typed survival owner. Shared commands and each tick apply
+voluntary character speed, pilot revocation, mining interruption and crafting
+permission. Both native input and portable protocol use these gates, including
+legacy direct `thruster` automation. Contextual cockpit/machine prompts filter
+for the same permissions. Discrete nonessential E/F/crafting mutations share an
+active-time recovery timestamp; doors/menus/emergency consumption bypass it.
+Mining scales only its bounded extraction delta, not world/physics/job time.
+
+Automation inspection exposes exact `survival_restrictions` basis points for
+future HUD consumption and regression checks. #371 still owns active vital
+clock/save publication; default session vitals remain full until it lands. #370
+and #377 supply actual effects and wheel dispatch separately. No schema-1 save
+is silently changed; derived character scale and interaction cooldown reset on
+restore and are reapplied by the session before the next tick.

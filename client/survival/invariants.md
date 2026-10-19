@@ -17,3 +17,8 @@
 - Stable Source/EffectId ordering and bounded stacks are independent of host order.
 - Timed final ticks occur before expiry; exposure exits with zero linger remove
   immediately. Offline time advances no regeneration/effect interval.
+- #369 threshold intervals, multiplicative rates and typed permission policy have
+  one owner in `restrictions.rs`; see the architecture contract. Zero fatigue
+  cannot deny doors, basic menus or food/medicine solely because of exhaustion.
+- Reduced interaction work never reduces ship, physics, Core or machine-job time.
+  Derived percentages/cooldowns do not substitute for #371's saved vital state.

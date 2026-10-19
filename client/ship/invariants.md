@@ -229,3 +229,7 @@ contact/sleep/dwell state survive. No input latch, OS handle or GPU state is
 restored. An attached mining sphere becomes a detached existing physical entity,
 without allocating a new ID or losing mass. Whole-session/Fabricator publication
 is composed in #365; disk checkpoints remain #366.
+
+- Explicit survival pilot revocation (#369) selects zero manual throttle and
+  clears cockpit/held steering/throttle authority without braking world momentum
+  or cancelling committed assists. Ordinary cockpit exit remains invariant 4.

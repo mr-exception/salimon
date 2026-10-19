@@ -344,3 +344,11 @@ contact/sleep/dwell state survive. No input latch, OS handle or GPU state is
 restored. An attached mining sphere becomes a detached existing physical entity,
 without allocating a new ID or losing mass. Whole-session/Fabricator publication
 is composed in #365; disk checkpoints remain #366.
+
+## Explicit pilot revocation (#369)
+
+`revoke_pilot_control` is a separate authority-loss command: select zero manual
+throttle and clear cockpit/steering/held inputs, preserving pose, world velocity
+and committed assist progression. Runtime uses it for exhausted/terminal pilots.
+Ordinary `set_cockpit_control(false)` still preserves selected throttle. Recovery
+requires a new cockpit entry and fresh controls; no hidden thrust resumes.

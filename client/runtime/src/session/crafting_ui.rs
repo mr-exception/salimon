@@ -42,6 +42,19 @@ impl GameplaySession {
         if !self.crafting_ui.open {
             return;
         }
+        // Close and navigation remain safe menu actions. Mutation uses authority.
+        if !self
+            .restrictions()
+            .permits(salimon_survival::restrictions::Action::Fabricate)
+        {
+            self.crafting_ui.open = false;
+            return;
+        }
+        if matches!(key, CraftingAction::Add | CraftingAction::Cancel)
+            && !self.admit_survival_action(salimon_survival::restrictions::Action::Fabricate)
+        {
+            return;
+        }
         let recipes = self.fabricator.recipes().recipes();
         let snapshot = self
             .fabricator

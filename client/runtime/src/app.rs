@@ -533,6 +533,7 @@ impl ClientApplication {
                 ship_frame.world_to_local(character_snapshot.eye_position_meters),
                 ship_frame.world_to_local(character_snapshot.look_target_meters),
             )
+            .filter(|target| self.session.permitted_interaction(*target))
         } else {
             None
         };

@@ -2,6 +2,7 @@
 //! samples; this crate never reads a clock, advances a world, or performs IO.
 pub mod effects;
 mod pipeline;
+pub mod restrictions;
 
 use salimon_persistence::{SaveError, Validate, invalid};
 use serde::{Deserialize, Serialize};

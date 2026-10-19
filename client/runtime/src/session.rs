@@ -4,6 +4,7 @@ mod fabrication;
 pub(crate) mod frames;
 pub(crate) mod interaction;
 mod presentation;
+mod survival;
 // Portable adapters are consumed by whole-session orchestration in #365/#366.
 #[allow(dead_code)]
 pub(crate) mod persistence;
@@ -15,10 +16,14 @@ use crate::update_clock::UpdateClock;
 use salimon_character::{CharacterController, CharacterLocation, MovementInput};
 use salimon_ship::SteeringInput;
 use salimon_ship::{CockpitMessage, DoorState, FlightState, ShipController, ShipSnapshot};
+use salimon_survival::restrictions::Action;
 use salimon_world::{CameraPrototype, TransitionPhase};
 use std::time::Duration;
 
 pub(crate) struct GameplaySession {
+    pub(crate) survival: salimon_survival::Survival,
+    pub(super) restriction_config: salimon_survival::restrictions::RestrictionConfig,
+    interaction_ready_at: Duration,
     pub(crate) presentation: presentation::History,
     pub(crate) update_clock: UpdateClock,
     pub(crate) camera_prototype: CameraPrototype,
@@ -64,6 +69,9 @@ impl ShipControlInput {
 impl Default for GameplaySession {
     fn default() -> Self {
         Self {
+            survival: Default::default(),
+            restriction_config: Default::default(),
+            interaction_ready_at: Duration::ZERO,
             presentation: Default::default(),
             update_clock: UpdateClock::default(),
             camera_prototype: CameraPrototype::default(),
@@ -140,6 +148,7 @@ impl GameplaySession {
         self.seed
     }
     pub(crate) fn interact(&mut self) {
+        self.enforce_survival_restrictions();
         let ship_snapshot = self.ship.snapshot();
         let ship_frame = character_ship_frame(ship_snapshot.pose);
         let surface = self.terrain_frame(ship_snapshot);
@@ -161,6 +170,11 @@ impl GameplaySession {
                 let local_look = ship_frame.world_to_local(character.look_target_meters);
                 let interaction =
                     available_interaction_target(self.character.location(), local_eye, local_look);
+                if let Some(target) = interaction
+                    && !self.admit_survival_action(Self::interaction_action(target))
+                {
+                    return;
+                }
                 match interaction {
                     Some(InteractionTarget::FabricatorTray) => self.collect_fabricator_output(),
                     Some(InteractionTarget::FabricatorScreen) => {
@@ -238,7 +252,9 @@ impl GameplaySession {
         local_eye: [f64; 3],
         local_look: [f64; 3],
     ) -> Option<&'static str> {
-        match available_interaction_target(self.character.location(), local_eye, local_look) {
+        match available_interaction_target(self.character.location(), local_eye, local_look)
+            .filter(|target| self.permitted_interaction(*target))
+        {
             Some(InteractionTarget::FabricatorTray) => Some("fabricator_tray"),
             Some(InteractionTarget::FabricatorScreen) => Some("fabricator_screen"),
             Some(InteractionTarget::Fabricator) => Some("fabricator"),
@@ -288,12 +304,16 @@ impl GameplaySession {
         self.mining.set_mouse_held(
             pressed
                 && self.view_mode == ViewMode::Gameplay
+                && self.restrictions().permits(Action::Mine)
                 && self.equipment.mining_equipped()
                 && self.mining.session.carried_id().is_none(),
         );
     }
 
     pub(crate) fn carry_action(&mut self, pickup: bool) {
+        if !self.admit_survival_action(Action::Carry) {
+            return;
+        }
         let ship = self.ship.snapshot();
         let frame = character_ship_frame(ship.pose);
         let player = self.character.snapshot(frame, self.terrain_frame(ship));
@@ -379,6 +399,7 @@ impl GameplaySession {
     }
 
     pub(crate) fn advance_game(&mut self, delta: Duration) {
+        self.enforce_survival_restrictions();
         self.elapsed += delta;
         if self.interpolate_presentation {
             self.presentation.begin(self.snapshot());
@@ -433,7 +454,7 @@ impl GameplaySession {
             let frame = character_ship_frame(ship.pose);
             self.mining.advance(
                 &self.equipment,
-                delta,
+                self.mining_delta(delta),
                 self.character.snapshot(frame, self.terrain_frame(ship)),
                 frame,
                 door_passable(ship),
@@ -479,6 +500,7 @@ impl GameplaySession {
     /// Desktop admission is a shell policy. View/domain gates apply to every caller.
     pub(crate) fn command(&mut self, command: Command) {
         use Command::*;
+        self.enforce_survival_restrictions();
         if self.crafting_ui.open {
             return; // Modal UI owns input; simulation and Core funding continue.
         }
@@ -503,7 +525,10 @@ impl GameplaySession {
         match command {
             Control(key, pressed) => self.control(key, pressed),
             Throttle(direction, pressed) => {
-                if !pressed || self.character.location() == CharacterLocation::Cockpit {
+                if !pressed
+                    || (self.character.location() == CharacterLocation::Cockpit
+                        && self.restrictions().permits(Action::Pilot))
+                {
                     self.ship.set_throttle_key(direction, pressed);
                 } else {
                     self.ship.clear_throttle_input();
@@ -517,6 +542,9 @@ impl GameplaySession {
                 }
             }
             Landing => {
+                if !self.admit_survival_action(Action::Pilot) {
+                    return;
+                }
                 self.ship.trigger_landing_action();
                 self.reset_presentation();
             }
@@ -570,7 +598,8 @@ impl GameplaySession {
         if !pressed || cockpit {
             let ship = self.ship.snapshot();
             if pressed
-                && !(ship.power_available
+                && !(self.restrictions().permits(Action::Pilot)
+                    && ship.power_available
                     && ship.cockpit_control_active
                     && ship.flight_state == FlightState::Flying)
             {

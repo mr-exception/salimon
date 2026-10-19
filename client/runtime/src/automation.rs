@@ -403,6 +403,9 @@ pub(crate) fn execute_session(app: &mut GameplaySession, line: &str) -> Value {
             Some(direction @ -1..=1) if direction != 0 => {
                 let applied = app.view_name() == "Gameplay"
                     && app.character.location() == CharacterLocation::Cockpit
+                    && app
+                        .restrictions()
+                        .permits(salimon_survival::restrictions::Action::Pilot)
                     && app.ship.adjust_thruster(direction as i8);
                 Ok(json!({"applied": applied}))
             }
@@ -579,6 +582,16 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
                 salimon_renderer::OverlayPlacement::World { anchor_meters, .. } => Some(anchor_meters),
                 _ => None,
             }),
+        },
+        "survival_restrictions": {
+            "hunger_movement_bps": app.restrictions().hunger_movement_bps,
+            "fatigue_movement_bps": app.restrictions().fatigue_movement_bps,
+            "movement_bps": app.restrictions().movement_bps,
+            "interaction_bps": app.restrictions().interaction_bps,
+            "exhausted": app.restrictions().exhausted,
+            "can_pilot": app.restrictions().permits(salimon_survival::restrictions::Action::Pilot),
+            "can_mine": app.restrictions().permits(salimon_survival::restrictions::Action::Mine),
+            "can_consume": app.restrictions().permits(salimon_survival::restrictions::Action::Consume)
         },
         "equipment": {"slots": app.equipment.slots().map(|tool| tool.map(|tool| match tool {
             crate::equipment::EquipmentTool::MiningTool => "mining_tool",

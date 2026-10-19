@@ -71,3 +71,16 @@ remains session-only while review is pending.
 
 
 Fabricator crafting is newly authorized by the [accepted five-round contracts](spaceship-building-and-survival.md#accepted-fabricator-contracts-2026-10-19-336). Implementation is staged: #336 contracts, #337 raw materials, #338 portable domain, then separate runtime/UI integration. Survival effects, disk persistence and playable progression remain deferred.
+
+## Survival restriction tuning (#369, 2026-10-19)
+
+The approved movement factors and exact continuous threshold intervals are
+implemented in the [restriction contract](../client/survival/architecture.md#movement-and-interaction-restrictions-369).
+Unspecified numeric interaction/minimum-speed settings are explicit configurable
+provisional tuning: minimum 10%, low-hunger and low-fatigue interaction rates
+75% each (multiplicative), 250 ms base recovery for discrete nonessential actions.
+Normal rate adds no recovery; emergency doors/food/medicine/menus bypass it.
+These defaults are exposed for review and later #384 balance work, rather than
+being immutable gameplay requirements. Exhaustion selects zero manual thrust
+without cancelling an already committed assist or braking inertial motion;
+recovery requires fresh cockpit entry/input. Whole-save activation remains #371.

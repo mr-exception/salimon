@@ -918,3 +918,14 @@ feedback and render caches reset; interactions are recomputed from restored
 world state. The native host's automation policy stays host-owned. No disk IO,
 autosave scheduling or offline simulation is implied; #366 owns durable storage
 and shell lifecycle integration. See [canonical save contract](../../docs/save-contract.md).
+
+## Durable active-run orchestration (#366)
+
+Runtime `checkpoints.rs` owns normal-play startup restore, a bounded save worker,
+60-game-second/discrete-event scheduling, persistent native-title warnings and
+verified clean-exit capture. Domain state stays on the event thread; owned bytes
+cross to the worker. `salimon-persistence::storage` owns verification and native
+filesystem durability. Startup renderer creation preserves restored clock backlog;
+E2E and benchmark launches remain isolated from user saves. See the
+[canonical save contract](../../docs/save-contract.md#durable-active-run-366)
+for paths, recovery/failure policy, Windows behavior and future lifecycle owners.

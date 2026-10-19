@@ -418,3 +418,23 @@ mod journal_tests {
         assert_eq!(restored.save_state().extracted_mass_kg, 2.);
     }
 }
+
+impl GameplaySession {
+    /// Discrete gameplay events only: movement/progress remain covered by the
+    /// periodic timer. No presentation or held input becomes save authority.
+    pub(crate) fn checkpoint_events(&self) -> Vec<u8> {
+        let machine = self
+            .fabricator
+            .snapshot(self.ship.snapshot().power_available);
+        let ship = self.ship.snapshot();
+        let jobs: Vec<_> = machine
+            .jobs
+            .iter()
+            .map(|j| (j.id, j.remaining_quantity, j.completed_quantity))
+            .collect();
+        serde_json::to_vec(&(self.mining.session.fragments().len(), self.mining.session.fragments().last().map(|f| f.id()), self.mining.session.attached_sphere_id(), self.mining.session.carried_id(),
+            ship.flight_state, ship.door_state, ship.power_available,
+            machine.stored, jobs, machine.tray, &self.consumables, &self.equipment))
+            .expect("discrete checkpoint events contain only serializable finite identities and integer quantities")
+    }
+}

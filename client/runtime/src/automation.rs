@@ -231,6 +231,28 @@ pub(crate) fn execute_session(app: &mut GameplaySession, line: &str) -> Value {
     }
     let result = match command.get("op").and_then(Value::as_str) {
         Some("inspect") => Ok(inspect_session(app)),
+        Some("crafting") => {
+            use crate::session::crafting_ui::CraftingAction as A;
+            let action = match command.get("action").and_then(Value::as_str) {
+                Some("close") => Some(A::Close),
+                Some("previous_recipe") => Some(A::PreviousRecipe),
+                Some("next_recipe") => Some(A::NextRecipe),
+                Some("less") => Some(A::Less),
+                Some("more") => Some(A::More),
+                Some("next_job") => Some(A::NextJob),
+                Some("cancel") => Some(A::Cancel),
+                Some("add") => Some(A::Add),
+                _ => None,
+            };
+            match action {
+                Some(action) => {
+                    let applied = app.crafting_ui.open;
+                    app.crafting_action(action);
+                    Ok(json!({"applied":applied}))
+                }
+                None => Err(("invalid_argument", "known crafting action required")),
+            }
+        }
         Some("step") => match command.get("frames").and_then(Value::as_u64) {
             Some(frames @ 1..=600) => {
                 let step = app.e2e_step().expect("automation only runs in E2E mode");
@@ -535,7 +557,17 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
     let relative_velocity =
         std::array::from_fn::<_, 3, _>(|i| player_velocity[i] - ship.velocity_meters_per_second[i]);
     let (ground_entries, ground_hits, ground_misses) = crate::terrain::ground_cache_stats();
+    let fabrication = app.fabrication_snapshot();
+    let item = |item: &salimon_fabrication::OutputItem| json!({"recipe":item.recipe.key(), "job":item.job.0, "unit":item.unit, "mass_kg":item.mass.kg(), "category":format!("{:?}",item.category)});
     json!({
+        "fabricator": {
+            "status":format!("{:?}",fabrication.status), "requested_watts":fabrication.requested_watts,
+            "stored":fabrication.stored.iter().map(|bin| json!({"resource":bin.resource.key(),"milligrams":bin.milligrams})).collect::<Vec<_>>(),
+            "jobs":fabrication.jobs.iter().map(|job| json!({"id":job.id.0,"recipe":job.recipe.key(),"remaining_quantity":job.remaining_quantity,"completed_quantity":job.completed_quantity,"progress_seconds":job.progress.as_secs_f64(),"unit_seconds":job.unit_duration.as_secs_f64()})).collect::<Vec<_>>(),
+            "tray":fabrication.tray.as_ref().map(item), "queue_capacity":fabrication.queue_capacity,
+            "ui_open":app.crafting_ui.open,
+        },
+        "consumables": {"food":app.consumables.food().iter().map(|slot|slot.as_ref().map(item)).collect::<Vec<_>>(), "medical":app.consumables.medical().iter().map(|slot|slot.as_ref().map(item)).collect::<Vec<_>>()},
         "simulation_backlog_millis": snapshot.backlog.as_secs_f64() * 1000.0,
         "resource_queries": app.mining.query_metrics(),
         "ground_cache": {"entries":ground_entries,"hits":ground_hits,"misses":ground_misses},

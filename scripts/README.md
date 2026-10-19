@@ -617,3 +617,9 @@ Requires the existing optional Pillow dependency. See
 
 Consumable automation: M/N consumption keys are retired (#346). The Q wheel
 (#377) owns selection; precision-tour `near` retains its camera meaning.
+
+Fabricator automation (#347): `{"op":"crafting","action":"add"}` invokes the
+open machine modal. Actions: `close`, `previous_recipe`, `next_recipe`, `less`,
+`more`, `next_job`, `cancel`, `add`. Closed modal returns `applied:false`.
+Inspection adds `fabricator` (bins, FIFO jobs, tray, power demand and UI state)
+and `consumables.food` / `consumables.medical` arrays with stable item identities.

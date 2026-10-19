@@ -607,3 +607,10 @@ impl GameplaySession {
         hud
     }
 }
+
+impl GameplaySession {
+    pub(crate) fn fabrication_snapshot(&self) -> salimon_fabrication::FabricatorSnapshot {
+        self.fabricator
+            .snapshot(self.ship.snapshot().power_available)
+    }
+}

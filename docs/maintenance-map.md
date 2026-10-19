@@ -7,6 +7,7 @@ iterating and the [applicable validation gates](validation.md) before completion
 
 | Feature | Owner and source entry points | Contracts/tests | Native scenarios |
 | --- | --- | --- | --- |
+| Durable active run | persistence `src/storage.rs`; runtime `src/checkpoints.rs`, `session/persistence.rs`, `app.rs` | [Save contract](save-contract.md); fault injection, 60s/event scheduling, native restart/fallback, 500 fragments | Normal play startup/exit; E2E/benchmark isolated; expanded signoff #375/#376 |
 | Lifecycle, resize, recovery, clocks | runtime `src/app.rs`, `app/native.rs`, `frame_clock.rs`, `update_clock.rs`, `main.rs` | runtime invariants; inline clock/native tests | `landed-earth.json`, `orbit-earth.json`; root native smoke for resize/minimize/close |
 | Rendering, depth, lighting, instruments | renderer `src/lib.rs`, `spheres.rs`, `ship_mesh.rs`, `cockpit_instruments.rs`, `overlay.rs`, adjacent WGSL | renderer invariants, `sphere-rendering.md`, inline tests and CPU/shader layout; single `Monitor_Wide` contract and cached 1536×256 dashboard | `lower-cockpit-windows.json`, `cockpit-nose-starboard.json`; `evidence/cockpit-wide-monitor{,-space}.json` and visual tour |
 | Shared vector arithmetic | math `src/lib.rs`; character/ship and runtime fragment/carrying consumers | math architecture/invariants; arithmetic/handedness/precision tests; domain normalization/quaternion tests | Existing movement, flight and fragment scenarios |

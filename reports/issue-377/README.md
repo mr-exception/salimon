@@ -84,3 +84,26 @@ Final refreshed-tree validation: `cargo test --workspace --locked` passed
  discover -s scripts -p 'test_*.py'` passed all 93 tests. Graphical/OS-input/M1
 checks remain unrun under the original limits above; this refresh does not claim
 survival effects, pause/death integration or native visual signoff.
+
+## Durable checkpoint stack refresh (2026-10-19)
+
+Updated the existing draft on top of #392 (#366) after #388–#390 were merged.
+The update preserves the existing wheel implementation and all persistence
+changes. Resolved appended runtime architecture/invariant sections by retaining
+both contracts; the app/input changes merged without source conflicts. PR #387
+now targets `issue-366-atomic-checkpoints`; merge #392 first.
+
+Added a real native filesystem checkpoint regression with Q held, an empty slot
+hovered and primary mouse held. Opening/hovering the wheel does not change the
+discrete save event signature or authoritative bytes. Reopening the durable save
+clears open/held/hover/primary state and cannot replay consumption. Existing
+exact-slot populated-inventory and continuation scenarios remain passing.
+
+Refreshed combined tree: `cargo test --workspace --locked`: **592 passed, 0
+failed; 22 existing opt-in ignored**. Workspace build, all-target Clippy with
+warnings denied, formatting, diff checks and 93 Python script tests passed.
+The underlying #366 layer separately passed Linux Vulkan launch/OS input and
+three real clean-exit/relaunch/corrupt-fallback launches; see
+[its report](../issue-366/README.md). This refresh does not claim Q-wheel native
+visual/M1 signoff. #368 and the survival/effect/death integrations remain pending,
+and #387 remains draft. No changes were merged automatically.

@@ -37,10 +37,10 @@ module boundaries, not dynamically loaded WASM components.
 Implemented gameplay includes surface walking, ship flight/assists, airlock/EVA,
 resource mining, one-fragment carrying, planet/ship transfer and custom fragment
 motion/contact. Mining session deltas and physical fragments survive nearby
-streaming **in memory for the current session**. This is not disk/backend
-persistence. The canonical [reload verification scope](../client/world/resource-contracts.md#persistence-and-reload-verification-scope-268)
+streaming and normal-play process restarts through versioned whole-session
+checkpoints (#363–#366). The canonical [reload verification scope](../client/world/resource-contracts.md#persistence-and-reload-verification-scope-268)
 defines in-session restoration and the proposed #236 scope clarification awaiting
-owner approval; relaunching starts a fresh session. No orbital simulation,
+owner approval; normal play restores its active run, while E2E/benchmarks start isolated sessions. No orbital simulation,
 multiplayer or production survival is implemented.
 Core joule storage, watt consumers and power authority are implemented; assist reservations are implemented; physical Core intake/conversion and a distinct Core-local status display are implemented.
 
@@ -330,3 +330,12 @@ modules, world `mining_save.rs`, physics `SleepSaveState` and fabrication
 publication; derived mass, power request and caches regenerate. Persistence
 regressions live in runtime session/persistence and fabrication_scenarios.
 Filesystem durability and native lifecycle checkpoints remain #366.
+
+## Durable active run (#366)
+
+Persistence `storage.rs` owns the two-generation verified storage protocol and
+native filesystem lease/adapter. Runtime `checkpoints.rs` composes whole-session
+restore, 60-second/event capture, bounded background IO, visible recovery/failure
+warnings and verified clean exit. See [canonical contract](save-contract.md#durable-active-run-366).
+Survival/death/restart/archive integration follows #371/#372/#374; no offline
+world simulation or multi-save UI is implied.

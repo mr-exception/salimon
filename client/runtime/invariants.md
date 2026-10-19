@@ -320,3 +320,13 @@ wheel explicitly says so. Full-meter/fatigue-zero semantics, death cancellation
 and treatment/status effects need integration against #368 and the survival
 lifecycle. Escape pause behavior belongs to the unfinished pause implementation;
 this change does not pretend that releasing the cursor pauses gameplay.
+## Durable active-run orchestration (#366)
+
+Runtime `checkpoints.rs` owns normal-play startup restore, a bounded save worker,
+60-game-second/discrete-event scheduling, persistent native-title warnings and
+verified clean-exit capture. Domain state stays on the event thread; owned bytes
+cross to the worker. `salimon-persistence::storage` owns verification and native
+filesystem durability. Startup renderer creation preserves restored clock backlog;
+E2E and benchmark launches remain isolated from user saves. See the
+[canonical save contract](../../docs/save-contract.md#durable-active-run-366)
+for paths, recovery/failure policy, Windows behavior and future lifecycle owners.

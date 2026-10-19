@@ -38,8 +38,8 @@ while restoring. Re-snapshot must equal the normalized restored state. This
 boundary performs no filesystem IO, checkpoint scheduling or offline fatigue
 calculation; those are later persistence/survival issues.
 
-Disk durability, verification/fallback and periodic/event/exit checkpoints belong
-to #366. A round-trip here proves the logical state boundary, not durable storage.
+Disk durability is implemented by #366, described below. Logical round-trip tests
+and native filesystem restart tests establish separate boundaries.
 
 ## Implemented whole-session boundary (#364–#365)
 
@@ -50,4 +50,53 @@ assignment. `FabricationSaveState` keeps machine/inventory validation together.
 Propulsion mass is excluded from wire data and rebuilt from the physical cargo,
 reserves and tray source state. Tests cover subsequent deterministic simulation,
 not only byte round-trip, including sleeping contacts and mid-assist/mid-craft.
-The boundary is ready for #366; no startup/exit/manual-disk UI is wired yet.
+Normal-play startup/exit and automatic checkpoints are wired by #366; manual
+Save Now UI belongs to #382.
+
+## Durable active run (#366)
+
+`salimon-persistence::storage` owns a portable `CheckpointStore` and
+`SaveManager`; `NativeStore` owns filesystem operations and an exclusive OS file
+lease (released automatically after crash). Runtime `checkpoints.rs` captures
+validated `SessionState` on the session thread and sends owned bytes to one
+bounded worker. The worker revalidates full reconstruction, writes/flushes a
+same-directory temporary, renames, flushes the directory on Unix and reads back
+exact bytes before acknowledging success. Two alternating slots retain the newest
+verified checkpoint while publishing the next. Windows removes only the inactive
+slot before rename because replacement rename differs there; the current slot
+remains intact. CRC32 covers generation, length and payload; it detects accidental
+corruption, not malicious modification. Reads and payloads are size bounded.
+
+Recovery validates both slots, integrity, schema and domain reconstruction, then
+chooses the highest generation (never wall time). A corrupt latest slot falls
+back with a persistent warning in the native window title. If neither slot is
+valid, start a fresh run with a warning. Unsupported schema or unreadable files
+fail launch explicitly, preventing silent overwrite by an incompatible version.
+Unpublished temporary files are ignored. Another running game using the same
+save directory is rejected. Failed captures/writes keep the verified generation,
+log the error, warn visibly and retry after five game seconds; exit failure returns
+an unsuccessful application status.
+
+Normal play restores before window/gameplay startup and preserves the saved
+admitted clock backlog through first renderer initialization. It checkpoints on
+the first update, every 60 seconds of simulated active time, and after discrete
+cargo/fragment creation/removal/carry, landing/takeoff, door/power, Fabricator
+reserve/FIFO/completion/tray, inventory and equipment changes. While IO is busy,
+events coalesce to the next complete snapshot; clean exit drains IO and verifies
+the final snapshot. Serialization/capture still runs on the event thread; durable
+IO, readback and reconstruction verification run on the worker. No asynchronous
+mutation of gameplay owners is allowed. E2E/benchmark launches never read/write
+the user's active run. No closed-app world advancement occurs.
+
+Default directory: Linux `$XDG_DATA_HOME/salimon/active-run` (fallback
+`~/.local/share/salimon/active-run`), macOS
+`~/Library/Application Support/salimon/active-run`, Windows
+`%LOCALAPPDATA%/salimon/active-run`. `SALIMON_SAVE_DIR` overrides it. There is one
+active run, represented by two recovery generations, with no multi-slot UI.
+Existing files can be backed up/moved when deliberately starting a fresh run.
+
+Survival/death does not exist yet: #371 integrates terminal-state checkpoints and
+restart, #372/#374 own journey archives and terminal UI. Those owners must include
+their new typed state and discrete events and retire both old generations on
+restart so fallback can never revive the previous run. #382 owns verified Save
+Now feedback; #375/#376 own expanded survival/graphical/reference-hardware checks.

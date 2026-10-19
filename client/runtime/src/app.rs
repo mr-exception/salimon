@@ -76,6 +76,17 @@ fn run_config(
             .enable_terrain(earth, [0.0, 1.0, 0.0])
             .map_err(|e| RunError::new("terrain startup failed", e))?;
     }
+    if config.is_none() && benchmark.is_none() {
+        application.checkpoints = Some(
+            crate::checkpoints::Checkpoints::open(
+                crate::checkpoints::default_directory()
+                    .map_err(|e| RunError::new("save directory", e))?,
+                &mut application.session,
+            )
+            .map_err(|e| RunError::new("restore active run", e))?,
+        );
+    }
+    application.preserve_startup_backlog = application.checkpoints.is_some();
     if let Some(config) = config {
         e2e::initialize(&mut application.session, config)
             .map(|()| application.e2e_config = Some(config))
@@ -127,6 +138,8 @@ impl Error for RunError {}
 pub(crate) struct ClientApplication {
     pub(crate) session: crate::session::GameplaySession,
     pub(crate) benchmark: Option<crate::benchmark::Recorder>,
+    checkpoints: Option<crate::checkpoints::Checkpoints>,
+    preserve_startup_backlog: bool,
     window: Option<Arc<Window>>,
     renderer: Option<Renderer>,
     frame_clock: FrameClock,
@@ -153,6 +166,8 @@ impl Default for ClientApplication {
         Self {
             session: crate::session::GameplaySession::default(),
             benchmark: None,
+            checkpoints: None,
+            preserve_startup_backlog: false,
             window: None,
             renderer: None,
             frame_clock: FrameClock::default(),
@@ -302,7 +317,9 @@ impl ClientApplication {
         self.render_attempts = 0;
         self.retry_at = None;
         self.frame_clock.reset_interval();
-        self.reset_update_clock();
+        if !std::mem::take(&mut self.preserve_startup_backlog) {
+            self.reset_update_clock();
+        }
         self.diagnostics.reset_frame_window();
         Ok(())
     }
@@ -489,6 +506,9 @@ impl ClientApplication {
                 lifecycle_excluded: self.session.update_clock.lifecycle_excluded(),
             };
         }
+        if let Some(checkpoints) = &mut self.checkpoints {
+            checkpoints.poll(&self.session);
+        }
         (update_delta, ticks)
     }
 
@@ -606,7 +626,13 @@ impl ClientApplication {
         self.action_bar
             .set_contextual(contextual_action.map(|prompt| prompt.text));
         window.set_title(&self.benchmark.as_ref().map_or_else(
-            || gameplay_window_title(monitor_message, interaction),
+            || {
+                let title = gameplay_window_title(monitor_message, interaction);
+                self.checkpoints
+                    .as_ref()
+                    .and_then(|c| c.warning)
+                    .map_or(title.clone(), |warning| format!("{title} | {warning}"))
+            },
             crate::benchmark::Recorder::window_title,
         ));
         let ship_mesh = if self.session.view_mode == ViewMode::Gameplay {
@@ -1192,6 +1218,12 @@ impl ApplicationHandler for ClientApplication {
     }
 
     fn exiting(&mut self, _event_loop: &ActiveEventLoop) {
+        if let Some(mut checkpoints) = self.checkpoints.take()
+            && let Err(error) = checkpoints.finish(&self.session)
+        {
+            log::error!("exit checkpoint failed: {error}");
+            self.failure = Some(format!("exit checkpoint failed: {error}"));
+        }
         self.renderer = None;
         self.window = None;
         log::info!("application exiting cleanly");

@@ -21,8 +21,8 @@ pub use points::{ShipLocalPoint, WorldPoint};
 pub use controller::CharacterController;
 pub use input::MovementInput;
 pub use queries::{
-    fabricator_input_sight_obstruction, ship_contains_object, ship_floor_placement,
-    ship_sight_obstruction,
+    fabricator_input_sight_obstruction, fabricator_sight_obstruction, ship_contains_object,
+    ship_floor_placement, ship_sight_obstruction,
 };
 pub use spatial_contracts::{
     COCKPIT_SEAT_MARKER_METERS, ENGINE_PORT_ANCHOR_METERS, ENGINE_STARBOARD_ANCHOR_METERS,

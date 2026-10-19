@@ -1,6 +1,10 @@
 //! Portable fabrication rules. Runtime owns physical intake, energy settlement,
 //! inventory transfer and ship mass adapters; no clocks, GPU, IO or native types.
+mod inventory;
 mod machine;
+pub use inventory::{
+    ConsumableCategory, ConsumableInventory, FOOD_SLOT_COUNT, InventoryError, MEDICAL_SLOT_COUNT,
+};
 mod mass;
 mod recipes;
 

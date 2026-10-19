@@ -25,7 +25,8 @@ use std::fmt;
 use std::time::Duration;
 
 pub use cockpit_instruments::{
-    CockpitInstruments, CoreInstruments, NavigationInstruments, NearbyBodyInstruments,
+    CockpitInstruments, CoreInstruments, FabricatorInstruments, NavigationInstruments,
+    NearbyBodyInstruments,
 };
 pub use equipment_toolbar::{EquipmentIcon, EquipmentSlot, EquipmentToolbar};
 use gpu_timing::GpuTimer;

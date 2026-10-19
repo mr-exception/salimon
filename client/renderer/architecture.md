@@ -351,3 +351,13 @@ spare component gates the authored output surface in the opaque shader. The
 package appears at completion and disappears on collection, with no animation,
 new draw or physical fragment identity. It follows the presented ship pose and
 remains visible during blackout. Monitor artwork/crafting UI are owned by #343.
+
+Fabricator monitor (#343) uses atlas section 4 (five 512x256 regions total).
+The wide cockpit retains sections 0–2 and Core retains section 3. The authored
+`Fabricator_Monitor` UV surface samples section 4; its renderer-neutral DTO carries
+status, job count and active seconds only. Enlarged recipe UI is runtime RGBA.
+
+Tray category styling (#344) uses the fourth spare ship-uniform component;
+occupied state remains the third. The single authored output submesh stays
+stationary in ship coordinates, with ration stripes or a medical cross, including
+blackout. No loose physics, extra draw call or inventory authority is added.

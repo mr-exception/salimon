@@ -24,6 +24,7 @@ pub struct ShipMeshInstance {
     pub door_open_fraction: f32,
     /// Show the authored stationary package only while the Fabricator tray is occupied.
     pub fabricator_output_present: bool,
+    pub fabricator_output_medical: bool,
     /// Read-only presentation values, kept live independently of cockpit control.
     pub instruments: CockpitInstruments,
 }
@@ -67,6 +68,7 @@ fn geometry_from_bytes(bytes: &[u8]) -> Result<ShipGeometry, RendererError> {
             Some("Monitor_Wide") => 1.0,
             Some("Core_Monitor") => 2.0,
             Some("Fabricator_Output") => 3.0,
+            Some("Fabricator_Monitor") => 4.0,
             _ => 0.0,
         };
         let matrix = node.transform().matrix();
@@ -532,7 +534,7 @@ impl ShipMeshRenderer {
             RAMP_EXTENSION_METERS as f32 * extension_fraction,
             RAMP_FACE_OFFSET_METERS as f32 * extension_fraction,
             f32::from(ship.fabricator_output_present),
-            0.0,
+            f32::from(ship.fabricator_output_medical),
         ]);
         queue.write_buffer(&self.uniform, 0, &encode_f32s(values));
         self.visible = true;

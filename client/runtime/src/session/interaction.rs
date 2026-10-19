@@ -12,6 +12,8 @@ pub(crate) const COCKPIT_INTERACTION_PROMPT: &str = "Press E to use";
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum InteractionTarget {
     Fabricator,
+    FabricatorScreen,
+    FabricatorTray,
     Cockpit,
     Core,
     ExitDoor,
@@ -50,6 +52,18 @@ pub(crate) fn interaction_target(
         && local_eye_position[2].abs() < 2.3
     {
         Some(InteractionTarget::ExitDoor)
+    } else if machine_target(
+        local_eye_position,
+        local_look_target,
+        salimon_character::FABRICATOR_TRAY_MARKER_METERS,
+    ) {
+        Some(InteractionTarget::FabricatorTray)
+    } else if machine_target(
+        local_eye_position,
+        local_look_target,
+        salimon_character::FABRICATOR_MONITOR_MARKER_METERS,
+    ) {
+        Some(InteractionTarget::FabricatorScreen)
     } else if fabricator_target(local_eye_position, local_look_target) {
         Some(InteractionTarget::Fabricator)
     } else {
@@ -64,7 +78,11 @@ pub(crate) fn available_interaction_target(
 ) -> Option<InteractionTarget> {
     match interaction_target(local_eye_position, local_look_target) {
         Some(
-            InteractionTarget::Cockpit | InteractionTarget::Core | InteractionTarget::Fabricator,
+            InteractionTarget::Cockpit
+            | InteractionTarget::Core
+            | InteractionTarget::Fabricator
+            | InteractionTarget::FabricatorScreen
+            | InteractionTarget::FabricatorTray,
         ) if location != CharacterLocation::InsideShip => None,
         target => target,
     }
@@ -87,14 +105,53 @@ pub(crate) const FABRICATOR_INPUT_METERS: [f64; 3] =
     salimon_character::FABRICATOR_INPUT_MARKER_METERS;
 
 fn fabricator_target(eye: [f64; 3], look: [f64; 3]) -> bool {
-    let to_input = subtract(FABRICATOR_INPUT_METERS, eye);
-    let distance = vector_length(to_input);
+    machine_target(eye, look, FABRICATOR_INPUT_METERS)
+}
+
+pub(super) fn machine_target(eye: [f64; 3], look: [f64; 3], target: [f64; 3]) -> bool {
+    let distance = vector_length(subtract(target, eye));
     let direction = subtract(look, eye);
-    distance > f64::EPSILON && distance <= 3.0
-        && dot(to_input, direction) / (distance * vector_length(direction)).max(f64::EPSILON)
-            >= COCKPIT_INTERACTION_MINIMUM_AIM_DOT
-        // The port is on the cabin-facing surface; no interaction through its back.
-        && eye[2] < FABRICATOR_INPUT_METERS[2]
-        && salimon_character::fabricator_input_sight_obstruction(eye)
-            .is_none_or(|hit| hit >= distance - 0.02)
+    // Intersect the cabin-facing plane; disjoint authored hit regions prevent
+    // a broad aim cone from routing the same E press to both port and monitor.
+    let t = (target[2] - eye[2]) / direction[2];
+    let hit = std::array::from_fn::<_, 3, _>(|i| eye[i] + t * direction[i]);
+    distance > f64::EPSILON
+        && distance <= 3.0
+        && t > 0.0
+        && eye[2] < target[2]
+        && (hit[0] - target[0]).abs() <= 0.30
+        && (hit[1] - target[1]).abs() <= 0.22
+        && salimon_character::fabricator_sight_obstruction(eye, target)
+            .is_none_or(|obstruction| obstruction >= distance - 0.02)
+}
+
+#[cfg(test)]
+mod machine_tests {
+    use super::*;
+    #[test]
+    fn input_and_monitor_are_disjoint_and_obey_aim_distance_and_solid_occlusion() {
+        let eye = [-3.0, 1.65, 2.0];
+        for (point, expected) in [
+            (FABRICATOR_INPUT_METERS, InteractionTarget::Fabricator),
+            (
+                salimon_character::FABRICATOR_MONITOR_MARKER_METERS,
+                InteractionTarget::FabricatorScreen,
+            ),
+        ] {
+            assert_eq!(
+                available_interaction_target(CharacterLocation::InsideShip, eye, point),
+                Some(expected)
+            );
+            for invalid in [[-3.0, 1.65, 0.0], [-3.0, 1.65, 4.8], [0.0, 1.65, 1.0]] {
+                assert_ne!(
+                    available_interaction_target(CharacterLocation::InsideShip, invalid, point),
+                    Some(expected)
+                );
+            }
+            assert_eq!(
+                available_interaction_target(CharacterLocation::Space, eye, point),
+                None
+            );
+        }
+    }
 }

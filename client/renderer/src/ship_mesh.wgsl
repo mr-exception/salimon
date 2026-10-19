@@ -80,13 +80,23 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
     if input.display_flag == 3u && ship.padding.z < 0.5 {
         discard;
     }
-    if input.display_flag == 1u || input.display_flag == 2u {
+    if input.display_flag == 3u {
+        // One anchored package, styled by output category. Independent of bus power.
+        let uv = input.screen_uv;
+        let cross = (abs(uv.x - 0.5) < 0.09 && abs(uv.y - 0.5) < 0.3)
+            || (abs(uv.y - 0.5) < 0.09 && abs(uv.x - 0.5) < 0.3);
+        let medical = select(vec3<f32>(0.85, 0.88, 0.85), vec3<f32>(0.85, 0.08, 0.06), cross);
+        let ration = select(vec3<f32>(0.64, 0.42, 0.18), vec3<f32>(0.18, 0.28, 0.08), uv.y > 0.35 && uv.y < 0.65);
+        return vec4<f32>(select(ration, medical, ship.padding.w > 0.5), 1.0);
+    }
+    if input.display_flag == 1u || input.display_flag == 2u || input.display_flag == 4u {
         // Clamp inside the single display texture at an
         // edge. Explicit LOD permits sampling in this per-surface branch.
         let size = vec2<f32>(textureDimensions(instruments));
         let core = input.display_flag == 2u;
-        let region = vec2<f32>(select(size.x * 0.75, size.x * 0.25, core), size.y);
-        let origin = vec2<f32>(select(0.0, size.x * 0.75, core), 0.0);
+        let machine = input.display_flag == 4u;
+        let region = vec2<f32>(select(size.x * 0.6, size.x * 0.2, core || machine), size.y);
+        let origin = vec2<f32>(select(select(0.0, size.x * 0.6, core), size.x * 0.8, machine), 0.0);
         let pixel = origin + vec2<f32>(0.5) + clamp(input.screen_uv, vec2<f32>(0.0), vec2<f32>(1.0))
             * (region - vec2<f32>(1.0));
         let uv = pixel / size;

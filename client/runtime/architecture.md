@@ -851,3 +851,42 @@ spare component gates the authored output surface in the opaque shader. The
 package appears at completion and disappears on collection, with no animation,
 new draw or physical fragment identity. It follows the presented ship pose and
 remains visible during blackout. Monitor artwork/crafting UI are owned by #343.
+
+## Fabricator crafting screen (#343)
+
+`session/crafting_ui.rs` maps validated recipe/job snapshots to a keyboard modal.
+E targets disjoint authored monitor/input face regions; only the port inserts.
+Character's machine sight query excludes its own conservative fixture and retains
+other occluders. Opening clears held movement/mining/throttle; modal input cannot
+reach gameplay. E/Escape close, Up/Down browse every recipe (including locked),
+Left/Right choose positive quantity, Enter adds, Tab selects any queued job and
+Delete cancels without refund. Native repeats/synthetic presses use the existing
+focus/capture policy. Focus loss/view lifecycle clearing closes the modal.
+The screen shows all raw bins, fixed per-unit costs/time/watts, precise shortages,
+active time and selected FIFO jobs, quantities and tray/power status. It uses a
+centered, high-contrast 3x bitmap panel, wrapping long feedback at 66 characters.
+Renderer's fifth instrument-atlas section displays observational Fabricator status
+on the authored monitor. No gameplay state lives in the GPU or rasterizer.
+
+## Deliberate Fabricator output collection (#344)
+
+E targeting the separate authored tray face validates the portable consumable
+receiver before clearing one stable `(job, unit)` output. Full category leaves
+the tray, queue block and mass unchanged and reports feedback. Empty/repeated
+collection cannot duplicate inventory. The package is an existing authored ship
+submesh, never a loose world/carrying entity; it follows the presented ship pose
+and remains visible without Core power. Category selects ration stripes or a
+medical cross in its UV surface. Only occupied tray output contributes mass;
+collection removes that contribution. Reserved/queued jobs remain distinct.
+
+## Consumable keys (#345)
+
+Gameplay M consumes the first medical item, N the first food item. Portable
+`Command::Consume(category, pressed)` maintains independent edge latches: held
+presses consume once until release. Focus/lifecycle/view clearing resets latches;
+native repeats and synthetic focus replay remain rejected. Crafting modal captures
+these keys. N retains JumpToNear only in precision tour and cannot switch gameplay
+into that camera view. Empty categories report feedback. Consumption does not
+alter gear selection, one-object carrying, flight controls, mass or vitals.
+Automation exposes `consume_food`/`consume_medkit` press/release keys through the
+same production route. Dedicated HUD presentation remains #346.

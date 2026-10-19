@@ -1,4 +1,5 @@
 //! Portable production gameplay composition. No window, GPU lifecycle or evidence IO.
+pub(crate) mod crafting_ui;
 mod fabrication;
 pub(crate) mod frames;
 pub(crate) mod interaction;
@@ -23,6 +24,9 @@ pub(crate) struct GameplaySession {
     pub(crate) automation_aim_delta: Option<[f64; 2]>,
     pub(crate) mining: crate::mining::ResourceGameplay,
     fabricator: salimon_fabrication::Fabricator,
+    consumable_keys_down: [bool; 2],
+    pub(crate) consumables: salimon_fabrication::ConsumableInventory,
+    pub(crate) crafting_ui: crafting_ui::CraftingUi,
     pub(crate) equipment: crate::equipment::EquipmentToolbar,
     pub(crate) movement_input: MovementInput,
     pub(crate) ship_control_input: ShipControlInput,
@@ -66,6 +70,9 @@ impl Default for GameplaySession {
             automation_aim_delta: None,
             mining: Default::default(),
             fabricator: salimon_fabrication::Fabricator::starter(),
+            crafting_ui: Default::default(),
+            consumables: Default::default(),
+            consumable_keys_down: [false; 2],
             equipment: Default::default(),
             movement_input: Default::default(),
             ship_control_input: Default::default(),
@@ -101,6 +108,7 @@ pub(crate) enum Command {
     GrabDrop(bool),
     Look(f64, f64),
     Mining(bool),
+    Consume(salimon_fabrication::ConsumableCategory, bool),
     ToggleView,
     Camera(salimon_world::CameraCommand),
 }
@@ -153,6 +161,11 @@ impl GameplaySession {
                 let interaction =
                     available_interaction_target(self.character.location(), local_eye, local_look);
                 match interaction {
+                    Some(InteractionTarget::FabricatorTray) => self.collect_fabricator_output(),
+                    Some(InteractionTarget::FabricatorScreen) => {
+                        self.clear_held_controls();
+                        self.crafting_ui.open = true;
+                    }
                     Some(InteractionTarget::Fabricator) => {
                         self.insert_fabricator_fragment();
                     }
@@ -225,6 +238,8 @@ impl GameplaySession {
         local_look: [f64; 3],
     ) -> Option<&'static str> {
         match available_interaction_target(self.character.location(), local_eye, local_look) {
+            Some(InteractionTarget::FabricatorTray) => Some("fabricator_tray"),
+            Some(InteractionTarget::FabricatorScreen) => Some("fabricator_screen"),
             Some(InteractionTarget::Fabricator) => Some("fabricator"),
             Some(InteractionTarget::Core) => Some("core"),
             Some(InteractionTarget::Cockpit) => Some("cockpit"),
@@ -347,6 +362,8 @@ impl GameplaySession {
     }
 
     pub(crate) fn clear_held_controls(&mut self) {
+        self.crafting_ui.open = false;
+        self.consumable_keys_down = [false; 2];
         self.movement_input = MovementInput::default();
         self.ship_control_input = ShipControlInput::default();
         self.ship.clear_steering_input();
@@ -441,6 +458,7 @@ impl GameplaySession {
             self.latest_physics.accumulate(measurements);
         }
         self.sync_carried();
+        self.validate_crafting_focus();
         if self.interpolate_presentation && !self.presentation.complete(self.snapshot()) {
             self.mining.fragment_previous.clear();
         }
@@ -461,6 +479,9 @@ impl GameplaySession {
     /// Desktop admission is a shell policy. View/domain gates apply to every caller.
     pub(crate) fn command(&mut self, command: Command) {
         use Command::*;
+        if self.crafting_ui.open {
+            return; // Modal UI owns input; simulation and Core funding continue.
+        }
         if let ToggleView = command {
             self.toggle_view();
             return;
@@ -474,7 +495,11 @@ impl GameplaySession {
         }
         let release = matches!(
             command,
-            Control(_, false) | Throttle(_, false) | GrabDrop(false) | Mining(false)
+            Control(_, false)
+                | Throttle(_, false)
+                | GrabDrop(false)
+                | Mining(false)
+                | Consume(_, false)
         );
         if self.view_mode != ViewMode::Gameplay && !release {
             return;
@@ -528,6 +553,7 @@ impl GameplaySession {
             }
             Look(dx, dy) => self.apply_look_delta(dx, dy),
             Mining(pressed) => self.mining_mouse_input(pressed),
+            Consume(category, pressed) => self.consume_input(category, pressed),
             ToggleView | Camera(_) => unreachable!(),
         }
     }

@@ -1,0 +1,17 @@
+[package]
+name = "salimon-survival"
+description = "Portable deterministic player meters and status rules"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[dependencies]
+serde.workspace = true
+salimon-persistence = { path = "../persistence" }
+
+[dev-dependencies]
+serde_json.workspace = true
+
+[lints]
+workspace = true

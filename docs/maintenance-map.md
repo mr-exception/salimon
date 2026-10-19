@@ -107,9 +107,18 @@ publication; derived mass, power request and caches regenerate. Persistence
 regressions live in runtime session/persistence and fabrication_scenarios.
 Filesystem durability and native lifecycle checkpoints remain #366.
 
+## Survival meters (#367)
+
+Portable meter/active-clock/offline-fatigue authority lives in
+[`salimon-survival`](../client/survival/architecture.md). Native/session persistence
+integration is #371; the current playable session does not yet advance survival.
+
+Damage, regeneration, treatment-only wound debt and data-driven timed/persistent/
+exposure status effects (#368) use the survival crate's [single pipeline](../client/survival/architecture.md#damage-and-status-pipeline-368).
+
 Q-wheel #377: fabrication `inventory.rs` owns exact typed slot consumption;
 runtime `session/consumable_wheel.rs` owns modal/held state; native pointer/focus
 mapping lives in `app.rs`/`app/input.rs`; renderer `consumable_wheel.rs` owns the
 shared image/hit geometry. Tests cover slot identities, input/focus/repeat,
 world-input isolation, continuing ship simulation and protocol resource-to-Q
-consumption. Survival integration/signoff is blocked by #368, native visuals #348.
+consumption. Consumable/session survival integration remains #369–#371; pause coordination is #381. Native visuals remain #348.

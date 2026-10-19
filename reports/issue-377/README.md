@@ -109,3 +109,28 @@ three real clean-exit/relaunch/corrupt-fallback launches; see
 [its report](../issue-366/README.md). This refresh does not claim Q-wheel native
 visual/M1 signoff. #368 and the survival/effect/death integrations remain pending,
 and #387 remains draft. No changes were merged automatically.
+
+
+## Survival/checkpoint stack refresh — 2026-10-19
+
+Included #393 (#367), #394 (#368), and draft #395 (#382 backend preparation)
+as a merge parent. Preserved the existing wheel and exact-slot input/save tests;
+three-way merged runtime architecture/invariants/checkpoints and technical
+architecture cleanly; resolved the maintenance-map append conflict by retaining
+both owners. The managed base remains main if GitHub rejects retargeting; stack
+ancestry is explicit. Review order: #393 → #394 → #395 → this draft, after all
+blocking work is complete. Do not merge either draft as a finished feature.
+
+#367/#368 now supply portable meters and status execution, but the wheel is still
+not wired to actual survival consumption. #369–#371 own those effects/session/save
+lifecycle; #381 owns full pause/input coordination. The wheel still displays
+`NO ACTIVE EFFECT` and this PR remains draft. No completed gameplay-survival
+integration or new native UI validation is claimed.
+
+Checks completed before runtime replacement: #368 workspace tests 597 passed,
+22 opt-in ignored; #395 focused checkpoint tests 10 passed, workspace build,
+all-target Clippy, rustfmt and 93 script tests passed. The subsequent full
+workspace run was interrupted before its completion was observed. After the
+replacement, no Rust toolchain is available: this final combined merge tree has
+NOT been freshly compiled/tested. CI must verify it. Earlier combined-wheel
+validation above describes the previous revision, not this refreshed tree.

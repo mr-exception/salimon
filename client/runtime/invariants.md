@@ -330,3 +330,9 @@ filesystem durability. Startup renderer creation preserves restored clock backlo
 E2E and benchmark launches remain isolated from user saves. See the
 [canonical save contract](../../docs/save-contract.md#durable-active-run-366)
 for paths, recovery/failure policy, Windows behavior and future lifecycle owners.
+
+- Preparatory #382 manual saves share the active-run worker/store and never step
+  gameplay. Only verified completion publishes Saved and its captured UTC time.
+- A newer coalesced request cannot be satisfied by an older in-flight write.
+  Failed Save & Exit waits for retry/cancel/explicit risk exit; failure does not
+  become success. Actual pause-menu input/freeze wiring remains blocked by #381.

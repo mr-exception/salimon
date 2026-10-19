@@ -1804,6 +1804,14 @@ name = "salimon-math"
 version = "0.1.0"
 
 [[package]]
+name = "salimon-persistence"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "salimon-physics"
 version = "0.1.0"
 dependencies = [

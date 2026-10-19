@@ -88,3 +88,11 @@ FIFO, output and receiver adapters. Existing fabrication domain and session test
 cover overflow/rejected intake, mixed batches, nonrefundable cancel, blackout,
 blocked tray, mass, flight and takeoff. `scenarios/fabricator-contract.json`
 protects initial snapshot/closed-modal admission. Q consumption coverage is #377.
+
+## Whole-game persistence (#363)
+
+The [canonical save contract](save-contract.md) inventories authoritative state,
+restore order, clocks, validation and schema evolution. `salimon-persistence` owns
+the platform-independent versioned envelope and deterministic stable-ID map codec.
+Domain adapters follow in #364 and session/Fabricator composition in #365; disk
+checkpoints remain #366. Renderer caches are never save authority.

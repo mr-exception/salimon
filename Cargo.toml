@@ -5,6 +5,7 @@ members = [
     "client/diagnostics",
     "client/math",
     "client/physics",
+    "client/persistence",
     "client/renderer",
     "client/runtime",
     "client/ship",
@@ -25,6 +26,8 @@ rust-version = "1.89"
 publish = false
 
 [workspace.dependencies]
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = { version = "=1.0.151", features = ["float_roundtrip"] }
 env_logger = "=0.11.8"
 gltf = { version = "=1.4.1", default-features = false, features = ["names", "utils"] }
 log = "=0.4.29"

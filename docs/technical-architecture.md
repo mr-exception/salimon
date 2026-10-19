@@ -16,6 +16,7 @@ dependencies; each crate's architecture/invariants defines its local contracts.
 | Boundary | Implemented ownership |
 | --- | --- |
 | `client/runtime/` | Native shell/lifecycle/evidence IO plus portable GameplaySession commands, snapshots, stepping, resource/cargo adapters and presentation mapping |
+| `client/fabrication/` | Portable validated recipes, integer raw storage/reservation, FIFO jobs and single tray; runtime adapters remain separate |
 | `client/world/` | Static six-body compressed catalog, `f64` coordinates/camera tour, resource contracts, generation, extraction/session deltas, fragments and one-object carrying |
 | `client/ship/` | Pose, cockpit authority, inertial force-based flight, uncancellable landing/takeoff, airlock interlocks and live telemetry |
 | `client/physics/` | Portable small-object gravity, ejection/release velocity, authored convex contacts and angular motion, restitution and deterministic substeps; caller-supplied surfaces/geometry |
@@ -311,3 +312,5 @@ material-volume, mass or session persistence contract changes.
 
 
 Fabricator crafting is newly authorized by the [accepted five-round contracts](spaceship-building-and-survival.md#accepted-fabricator-contracts-2026-10-19-336). Implementation is staged: #336 contracts, #337 raw materials, #338 portable domain, then separate runtime/UI integration. Survival effects, disk persistence and playable progression remain deferred.
+
+The #338 portable Fabricator domain is implemented in [salimon-fabrication](../client/fabrication/architecture.md). It depends only on world resource contracts; native/playable integration remains #339–#347.

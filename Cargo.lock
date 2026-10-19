@@ -1792,6 +1792,13 @@ name = "salimon-diagnostics"
 version = "0.1.0"
 
 [[package]]
+name = "salimon-fabrication"
+version = "0.1.0"
+dependencies = [
+ "salimon-world",
+]
+
+[[package]]
 name = "salimon-math"
 version = "0.1.0"
 

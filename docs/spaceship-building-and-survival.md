@@ -396,7 +396,7 @@ transactions, M/N input, and cached ship mass updates. Ship owns electricity and
 its mass ledger. Renderer receives observation DTOs only. Dedicated consumable
 inventory must not enlarge world carrying or equipment capacity.
 
-Planned typed API (implemented/refined in #338): `RecipeId`, `JobId`, `Mass`,
+Typed API (implemented in #338; [crate guide](../client/fabrication/architecture.md)): `RecipeId`, `JobId`, `Mass`,
 `Ingredient`, validated `RecipeBook`, `Fabricator`, `FabricationCommand` and
 `FabricatorSnapshot`. Commands insert material, enqueue recipe/quantity, cancel
 by job identity and collect tray output. Errors are typed and transactional.

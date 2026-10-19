@@ -84,3 +84,11 @@ in native-labeled #198–#200 and is not established by cloud software rendering
 
 
 Fabricator crafting is newly authorized by the [accepted five-round contracts](spaceship-building-and-survival.md#accepted-fabricator-contracts-2026-10-19-336). Implementation is staged: #336 contracts, #337 raw materials, #338 portable domain, then separate runtime/UI integration. Survival effects, disk persistence and playable progression remain deferred.
+
+
+### Fabricator portable foundation (#336–#338)
+
+Approved contracts, real organic biomass/medicinal raw resources and the portable
+recipe/storage/FIFO/tray domain are delivered. Crafting remains unconnected to
+native interactions pending #339–#347; no playable-wave completion or phase
+renumbering is implied. See [fabrication architecture](../client/fabrication/architecture.md).

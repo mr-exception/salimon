@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
-      # Keep developer rustfmt/Clippy components out of this build-only job.
+      # Keep developer rustfmt/Clippy components out of this build-and-portable-test job.
       RUSTUP_TOOLCHAIN: stable
     steps:
       - uses: actions/checkout@v4

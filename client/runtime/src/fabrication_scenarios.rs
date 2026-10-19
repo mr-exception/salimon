@@ -145,6 +145,45 @@ fn mined_materials_mixed_fifo_cancel_blackout_tray_inventory_and_mass() {
         3
     );
     assert!(s.fabrication_snapshot().jobs.is_empty());
+    let mass = s.ship.snapshot().total_mass_kg;
+    request(
+        &mut s,
+        json!({"op":"key","key":"consumable_wheel","pressed":true}),
+    );
+    request(&mut s, json!({"op":"wheel_hover","slot":1}));
+    for _ in 0..3 {
+        request(&mut s, json!({"op":"mouse","button":"left","pressed":true}));
+    }
+    assert!(!s.wheel.open);
+    assert!(
+        !s.mining.input.held,
+        "consumption press cannot click through to mining"
+    );
+    assert!(s.consumables.food()[1].is_none());
+    assert!(s.consumables.food()[0].is_some());
+    assert_eq!(s.ship.snapshot().total_mass_kg, mass);
+    request(
+        &mut s,
+        json!({"op":"mouse","button":"left","pressed":false}),
+    );
+    request(
+        &mut s,
+        json!({"op":"key","key":"consumable_wheel","pressed":false}),
+    );
+    request(
+        &mut s,
+        json!({"op":"key","key":"consumable_wheel","pressed":true}),
+    );
+    request(&mut s, json!({"op":"wheel_hover","slot":3}));
+    request(
+        &mut s,
+        json!({"op":"key","key":"wheel_confirm","pressed":true}),
+    );
+    assert!(s.consumables.medical()[0].is_none());
+    request(
+        &mut s,
+        json!({"op":"key","key":"consumable_wheel","pressed":false}),
+    );
 }
 #[test]
 fn declarative_initial_contract_replays_through_portable_protocol() {
@@ -247,18 +286,31 @@ fn saved_midcraft_session_resumes_once_with_exact_clocks_energy_and_inventory() 
     }
     let saved = restored.save_bytes(12345).unwrap();
     restored.restore_bytes(&saved).unwrap();
-    assert!(
-        restored
-            .consumables
-            .consume_first(salimon_fabrication::ConsumableCategory::Food)
-            .is_some()
-    );
-    assert!(
-        restored
-            .consumables
-            .consume_first(salimon_fabrication::ConsumableCategory::Medical)
-            .is_some()
-    );
+    // Wheel/modal/hover/held mouse are transient. Reload the real inventory while
+    // Q is open, then consume through the production exact-slot Q route.
+    use crate::session::{Command, consumable_wheel::WheelAction};
+    use salimon_fabrication::ConsumableSlot;
+    restored.command(Command::Wheel(WheelAction::Hold(true)));
+    restored.command(Command::Wheel(WheelAction::Hover(Some(
+        ConsumableSlot::FoodThree,
+    ))));
+    restored.command(Command::Wheel(WheelAction::Primary(true)));
+    assert!(restored.wheel.open && restored.wheel.primary_down);
+    let open = restored.save_bytes(12345).unwrap();
+    restored.restore_bytes(&open).unwrap();
+    assert!(!restored.wheel.open && !restored.wheel.held && !restored.wheel.primary_down);
+    assert!(restored.wheel.hovered.is_none());
+    assert_eq!(saved, restored.save_bytes(12345).unwrap());
+    for slot in [ConsumableSlot::FoodOne, ConsumableSlot::MedicalOne] {
+        assert!(restored.consumables.item(slot).is_some());
+        restored.command(Command::Wheel(WheelAction::Hold(true)));
+        restored.command(Command::Wheel(WheelAction::Hover(Some(slot))));
+        restored.command(Command::Wheel(WheelAction::Primary(true)));
+        assert!(restored.consumables.item(slot).is_none());
+        assert!(!restored.wheel.open);
+        restored.command(Command::Mining(false));
+        restored.command(Command::Wheel(WheelAction::Hold(false)));
+    }
     assert_eq!(restored.consumables.food().iter().flatten().count(), 1);
     assert!(restored.consumables.medical().iter().all(Option::is_none));
 }

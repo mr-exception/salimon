@@ -147,6 +147,32 @@ pub(crate) fn dispatch_session_key(
     pressed: bool,
 ) {
     use crate::session::Command;
+    if key == PhysicalKey::Code(KeyCode::KeyQ) {
+        session.command(Command::Wheel(
+            crate::session::consumable_wheel::WheelAction::Hold(pressed),
+        ));
+        return;
+    }
+    if session.wheel.open {
+        use crate::session::consumable_wheel::WheelAction as W;
+        let action = match (key, pressed) {
+            (PhysicalKey::Code(KeyCode::Tab | KeyCode::ArrowRight | KeyCode::ArrowDown), true) => {
+                Some(W::Next)
+            }
+            (PhysicalKey::Code(KeyCode::ArrowLeft | KeyCode::ArrowUp), true) => Some(W::Previous),
+            (PhysicalKey::Code(KeyCode::Enter), true) => Some(W::Confirm),
+            (PhysicalKey::Code(KeyCode::Escape), true) => Some(W::Cancel),
+            (PhysicalKey::Code(KeyCode::F2), true) => {
+                session.command(Command::ToggleView);
+                return;
+            }
+            _ => None,
+        };
+        if let Some(action) = action {
+            session.command(Command::Wheel(action));
+        }
+        return;
+    }
     if session.crafting_ui.open {
         if pressed {
             use crate::session::crafting_ui::CraftingAction as A;
@@ -414,5 +440,56 @@ mod consumable_tests {
         }
         assert_eq!(session.view_mode, crate::session::ViewMode::Gameplay);
         assert!(session.feedback.is_none());
+    }
+}
+
+#[cfg(test)]
+mod wheel_input_tests {
+    use super::*;
+    #[test]
+    fn native_q_repeat_synthetic_modal_and_release_admission_share_production_dispatch() {
+        let mut s = crate::session::GameplaySession::default();
+        let ready = InputPolicy {
+            gameplay: true,
+            captured: true,
+            focused: true,
+            occluded: false,
+        };
+        let q = PhysicalKey::Code(KeyCode::KeyQ);
+        for (repeat, synthetic) in [(false, false), (true, false), (false, true)] {
+            if ready.admits_key(InputSource::Native, q, true, repeat, synthetic) {
+                dispatch_session_key(&mut s, q, true);
+            }
+        }
+        assert!(s.wheel.open);
+        for key in [KeyCode::KeyW, KeyCode::KeyE, KeyCode::KeyF, KeyCode::Digit1] {
+            dispatch_session_key(&mut s, PhysicalKey::Code(key), true);
+        }
+        assert!(!s.movement_input.forward);
+        assert!(s.equipment.selected().is_none());
+        assert!(!s.crafting_ui.open);
+        dispatch_session_key(&mut s, q, false);
+        assert!(!s.wheel.open);
+        assert!(!s.wheel.held);
+        dispatch_session_key(&mut s, q, true);
+        s.clear_held_controls();
+        assert!(!s.wheel.open);
+        for policy in [
+            InputPolicy {
+                captured: false,
+                ..ready
+            },
+            InputPolicy {
+                focused: false,
+                ..ready
+            },
+            InputPolicy {
+                occluded: true,
+                ..ready
+            },
+        ] {
+            assert!(!policy.admits_key(InputSource::Native, q, true, false, false));
+            assert!(policy.admits_key(InputSource::Native, q, false, false, false));
+        }
     }
 }

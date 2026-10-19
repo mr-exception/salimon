@@ -26,8 +26,7 @@
 13. Consumable receiving slots are exactly three food and two medical, one item
     each; matching first-vacant placement is atomic and rejects unsupported
     categories, duplicate resident identities and full categories without mutation.
-14. Consumption removes only the first occupied slot in the requested typed
-    consumable category. It does not shift survivors, affect the other category,
+14. Consumption removes only the explicitly selected typed consumable slot. It does not shift survivors, affect the other category,
     apply vitals, change ship mass or depend on a future full-health/hunger state.
 
 ## Whole-session saves (#365)

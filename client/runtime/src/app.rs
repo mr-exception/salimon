@@ -138,6 +138,7 @@ pub(crate) struct ClientApplication {
     pub(crate) capture_status: String,
     capture_path: Option<std::path::PathBuf>,
     cursor_captured: bool,
+    wheel_raster: salimon_renderer::ConsumableWheelRaster,
     native_focused: bool,
     diagnostics: Diagnostics,
     action_bar: ActionBar,
@@ -163,6 +164,7 @@ impl Default for ClientApplication {
             capture_status: "idle".into(),
             capture_path: None,
             cursor_captured: false,
+            wheel_raster: Default::default(),
             native_focused: false,
             diagnostics: Diagnostics::default(),
             action_bar: ActionBar::default(),
@@ -390,7 +392,7 @@ impl ClientApplication {
     fn input_policy(&self) -> InputPolicy {
         InputPolicy {
             gameplay: self.session.view_mode == ViewMode::Gameplay,
-            captured: self.cursor_captured,
+            captured: self.cursor_captured || self.session.wheel.open,
             focused: self.native_focused,
             occluded: self.occluded,
         }
@@ -418,8 +420,24 @@ impl ClientApplication {
             self.diagnostics.toggle();
             return;
         }
+        let wheel_was_open = self.session.wheel.open;
         input::dispatch_session_key(&mut self.session, key, pressed);
+        self.sync_wheel_cursor(wheel_was_open);
         self.show_session_feedback();
+    }
+
+    fn sync_wheel_cursor(&mut self, was_open: bool) {
+        if was_open == self.session.wheel.open {
+            return;
+        }
+        if let Some(window) = &self.window {
+            if self.session.wheel.open {
+                release_cursor(window);
+                self.cursor_captured = false;
+            } else if self.native_focused && !self.occluded {
+                self.cursor_captured = capture_cursor(window);
+            }
+        }
     }
 
     fn set_input_focus(&mut self, focused: bool) {
@@ -667,19 +685,31 @@ impl ClientApplication {
         let crafting_pixels = crafting_text
             .as_ref()
             .map(|text| crate::action_bar::rasterize_action_bar(text, 3));
-        let overlay_image = crafting_pixels
-            .as_ref()
-            .map(|(width, height, pixels)| RendererOverlayImage {
-                width: *width,
-                height: *height,
-                rgba8: pixels,
-                revision: {
-                    use std::hash::{Hash, Hasher};
-                    let mut hash = std::collections::hash_map::DefaultHasher::new();
-                    crafting_text.hash(&mut hash);
-                    hash.finish()
-                },
-                placement: OverlayPlacement::Center,
+        if self.session.wheel.open {
+            self.wheel_raster.update(self.session.wheel_presentation());
+        }
+        let wheel_image = self
+            .session
+            .wheel
+            .open
+            .then(|| self.wheel_raster.image())
+            .flatten();
+        let overlay_image = wheel_image
+            .or_else(|| {
+                crafting_pixels
+                    .as_ref()
+                    .map(|(width, height, pixels)| RendererOverlayImage {
+                        width: *width,
+                        height: *height,
+                        rgba8: pixels,
+                        revision: {
+                            use std::hash::{Hash, Hasher};
+                            let mut hash = std::collections::hash_map::DefaultHasher::new();
+                            crafting_text.hash(&mut hash);
+                            hash.finish()
+                        },
+                        placement: OverlayPlacement::Center,
+                    })
             })
             .or_else(|| {
                 self.diagnostics
@@ -728,7 +758,7 @@ impl ClientApplication {
                 overlay_image,
                 action_bar_image,
                 crate::reticle::image(
-                    self.session.view_mode == ViewMode::Gameplay,
+                    self.session.view_mode == ViewMode::Gameplay && !self.session.wheel.open,
                     &self.session.equipment,
                 ),
                 (self.session.view_mode == ViewMode::Gameplay)
@@ -1035,8 +1065,35 @@ impl ApplicationHandler for ClientApplication {
                     self.fail(event_loop, error);
                     return;
                 }
-                if focused {
+                if focused && !self.session.wheel.open {
                     self.cursor_captured = capture_cursor(&window);
+                }
+            }
+            WindowEvent::CursorMoved { position, .. } if self.session.wheel.open => {
+                let hovered = salimon_renderer::consumable_wheel_hit_test(
+                    [window.inner_size().width, window.inner_size().height],
+                    [position.x, position.y],
+                )
+                .and_then(|i| salimon_fabrication::ConsumableSlot::ALL.get(i).copied());
+                self.session.command(crate::session::Command::Wheel(
+                    crate::session::consumable_wheel::WheelAction::Hover(hovered),
+                ));
+            }
+            WindowEvent::CursorLeft { .. } if self.session.wheel.open => {
+                self.session.command(crate::session::Command::Wheel(
+                    crate::session::consumable_wheel::WheelAction::Hover(None),
+                ));
+            }
+            WindowEvent::MouseInput { state, button, .. } if self.session.wheel.open => {
+                if button == MouseButton::Left && self.native_focused && !self.occluded {
+                    let was_open = self.session.wheel.open;
+                    self.session.command(crate::session::Command::Wheel(
+                        crate::session::consumable_wheel::WheelAction::Primary(
+                            state == ElementState::Pressed,
+                        ),
+                    ));
+                    self.sync_wheel_cursor(was_open);
+                    self.show_session_feedback();
                 }
             }
             WindowEvent::MouseInput {

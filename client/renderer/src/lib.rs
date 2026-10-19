@@ -5,7 +5,9 @@
 
 mod capture;
 mod cockpit_instruments;
+mod consumable_wheel;
 mod equipment_toolbar;
+pub use consumable_wheel::{ConsumableWheel, ConsumableWheelRaster, consumable_wheel_hit_test};
 mod gpu_timing;
 mod held_item;
 mod item_image;

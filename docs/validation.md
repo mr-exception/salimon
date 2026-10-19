@@ -115,7 +115,7 @@ and select the staged executable (`salimon-client.exe` on Windows). Use the
 [runner guide](../scripts/README.md) for platform capture configuration and
 [packaged smoke prerequisites](../scripts/PACKAGED_SMOKE.md) for OS input/capture.
 Nightly verification runs these Linux graphical checks. macOS/Windows graphics
-remain local. Dispatch **Source build** for compilation only, or **Periodic
+remain local. Dispatch **Source build** for compilation and portable tests, or **Periodic
 verification** for a nightly/weekly suite; neither adds a PR test gate.
 
 Linux software Vulkan establishes launch, gameplay/state and capture coverage;

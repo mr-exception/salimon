@@ -623,3 +623,11 @@ open machine modal. Actions: `close`, `previous_recipe`, `next_recipe`, `less`,
 `more`, `next_job`, `cancel`, `add`. Closed modal returns `applied:false`.
 Inspection adds `fabricator` (bins, FIFO jobs, tray, power demand and UI state)
 and `consumables.food` / `consumables.medical` arrays with stable item identities.
+
+Q-wheel automation (#377): send `key:consumable_wheel` with `pressed:true/false`;
+`{"op":"wheel_hover","slot":0}` selects a zero-based food/medical segment (0–4;
+null clears hover). Left mouse press consumes the occupied selection once.
+`wheel_next`/`wheel_confirm` key presses exercise Tab/Enter fallback. Inspection
+exposes `consumable_wheel.open/held/hovered`. Actions use the same portable modal
+and item transaction as native events, without desktop focus admission. Native
+pointer delivery and survival effects require their separate verification.

@@ -5,7 +5,7 @@
 Salimon uses a custom Rust runtime with low-level `winit` and `wgpu`, without a
 full game engine. The current prototype extends the Phase 0 baseline and remains native and
 client-only. Local build scripts stage macOS, Windows and Debian-based Linux
-executables. PR CI compiles the workspace once on Ubuntu. Separate nightly
+executables. PR CI compiles and runs portable workspace tests on Ubuntu. Separate nightly
 verification and weekly benchmarks/platform builds publish reports; all local
 commands remain available. Native macOS is the reference playable/performance target. Web/server reuse remains a future capability, not a shipped target.
 

@@ -488,3 +488,27 @@ No filesystem/serialization or save/load integration is implemented in this wave
 Portable domain tests cover reservation, overflow, ordering, power, cancellation,
 tray gates and arithmetic; later runtime tests cover physical intake, power
 settlement, inventory and mass transitions. Native visuals/signoff are separate.
+
+## Hold-Q consumable wheel (#377)
+
+Hold Q in captured gameplay to open five radial segments in stable inventory
+order: three food, then two medical. Release Q cancels. Left-click an occupied
+segment to consume that exact item once and close; empty segments cannot consume.
+Tab/arrows cycle occupied slots, Enter consumes. Keys 1–5 remain equipment only.
+M/N consumption remains removed; the inventory has no first-occupied shortcut.
+
+Opening clears movement/steering/throttle-adjust/grab/mining held inputs; world
+and ship simulation continue on the same fixed clock. Gameplay movement, look,
+mining and interactions are gated while open. Native cursor movement selects
+segments using the same fitted geometry as rendering. The pointer is released
+while open and recaptured on Q release/consumption; focus/lifecycle loss cancels
+without replay. A mouse already held on opening must release before it can
+consume. The consumption press cannot become a mining press. Escape cancels and
+uses the existing cursor release policy.
+
+This is the portable implementation for review, not survival signoff: #368 is
+still open. Item consumption currently has no healing/hunger effect and the
+wheel explicitly says so. Full-meter/fatigue-zero semantics, death cancellation
+and treatment/status effects need integration against #368 and the survival
+lifecycle. Escape pause behavior belongs to the unfinished pause implementation;
+this change does not pretend that releasing the cursor pauses gameplay.

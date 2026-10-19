@@ -229,6 +229,14 @@ pub(crate) fn execute_session(app: &mut GameplaySession, line: &str) -> Value {
     if command.get("protocol").and_then(Value::as_u64) != Some(u64::from(PROTOCOL)) {
         return error(id, "protocol_mismatch", "expected protocol 1");
     }
+    if app.wheel.open
+        && matches!(
+            command.get("op").and_then(Value::as_str),
+            Some("aim_fragment" | "restore_look" | "thruster")
+        )
+    {
+        return json!({"protocol":PROTOCOL,"id":id,"ok":true,"result":{"applied":false}});
+    }
     let result = match command.get("op").and_then(Value::as_str) {
         Some("inspect") => Ok(inspect_session(app)),
         Some("crafting") => {
@@ -376,13 +384,34 @@ pub(crate) fn execute_session(app: &mut GameplaySession, line: &str) -> Value {
                 _ => Err(("invalid_argument", "known key and boolean pressed required")),
             }
         }
+        Some("wheel_hover") => {
+            let slot = command.get("slot");
+            let selection = slot
+                .and_then(Value::as_u64)
+                .and_then(|i| usize::try_from(i).ok())
+                .and_then(|i| salimon_fabrication::ConsumableSlot::ALL.get(i).copied());
+            if selection.is_some() || slot.is_some_and(Value::is_null) {
+                app.command(crate::session::Command::Wheel(
+                    crate::session::consumable_wheel::WheelAction::Hover(selection),
+                ));
+                Ok(json!({"applied":app.wheel.open}))
+            } else {
+                Err(("invalid_argument", "slot must be null or integer 0..4"))
+            }
+        }
         Some("mouse") => {
             match (
                 command.get("button").and_then(Value::as_str),
                 command.get("pressed").and_then(Value::as_bool),
             ) {
                 (Some("left"), Some(pressed)) => {
-                    app.command(crate::session::Command::Mining(pressed));
+                    if app.wheel.open {
+                        app.command(crate::session::Command::Wheel(
+                            crate::session::consumable_wheel::WheelAction::Primary(pressed),
+                        ));
+                    } else {
+                        app.command(crate::session::Command::Mining(pressed));
+                    }
                     Ok(json!({"button": "left", "pressed": pressed}))
                 }
                 _ => Err((
@@ -421,6 +450,9 @@ pub(crate) fn execute_session(app: &mut GameplaySession, line: &str) -> Value {
 
 fn key_code(name: &str) -> Option<KeyCode> {
     match name {
+        "consumable_wheel" => Some(KeyCode::KeyQ),
+        "wheel_next" => Some(KeyCode::Tab),
+        "wheel_confirm" => Some(KeyCode::Enter),
         "view" => Some(KeyCode::F2),
         "diagnostics" => Some(KeyCode::F3),
         "near" => Some(KeyCode::KeyN),
@@ -560,6 +592,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
     let fabrication = app.fabrication_snapshot();
     let item = |item: &salimon_fabrication::OutputItem| json!({"recipe":item.recipe.key(), "job":item.job.0, "unit":item.unit, "mass_kg":item.mass.kg(), "category":format!("{:?}",item.category)});
     json!({
+        "consumable_wheel": {"open":app.wheel.open,"held":app.wheel.held,"hovered":app.wheel.hovered.map(salimon_fabrication::ConsumableSlot::index)},
         "fabricator": {
             "status":format!("{:?}",fabrication.status), "requested_watts":fabrication.requested_watts,
             "stored":fabrication.stored.iter().map(|bin| json!({"resource":bin.resource.key(),"milligrams":bin.milligrams})).collect::<Vec<_>>(),

@@ -21,7 +21,8 @@ pub(crate) struct FragmentScratch {
     ids: Vec<FragmentId>,
 }
 
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub(crate) struct FragmentMotion {
     pub(crate) velocity: [f64; 3],
     pub(crate) angular_velocity: [f64; 3],

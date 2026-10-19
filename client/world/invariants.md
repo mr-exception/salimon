@@ -15,7 +15,8 @@
 6. Camera-relative positions subtract their `f64` origin before any `f32`
    conversion.
 7. World code never depends on `winit`, `wgpu`, native handles, graphics
-   clip-space conventions, networking, persistence, or backend services.
+   clip-space conventions, networking, disk storage, or backend services. Logical
+   world save DTOs remain world-owned.
 8. Approach and retreat are monotonic, dwell phases hold exact endpoints, and
    pause/restart/near-inspection commands remain deterministic.
 9. Pausing changes only tour progression. The body catalog and three precision
@@ -80,3 +81,15 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 - Every retained fragment has exactly one ID-to-Vec-slot entry. Ordered removal
   repairs shifted slots; growth/pickup/drop never reorder survivors. Index hash
   iteration cannot determine journal or solver order. Removed IDs are never reused.
+
+## Logical save boundary (#364)
+
+The [canonical save inventory](../../docs/save-contract.md) defines schema-1
+source state and excluded caches. Domain-owned save state is validated before
+restore; runtime composes temporary owners and rebuilds mass, immutable terrain
+queries and presentation/query/solver caches without advancing simulation.
+Stable IDs, depletion, carrying, motion, Core/assist progress and logical
+contact/sleep/dwell state survive. No input latch, OS handle or GPU state is
+restored. An attached mining sphere becomes a detached existing physical entity,
+without allocating a new ID or losing mass. Whole-session/Fabricator publication
+is composed in #365; disk checkpoints remain #366.

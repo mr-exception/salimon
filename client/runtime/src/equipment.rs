@@ -1,6 +1,7 @@
 //! Portable toolbar state; presentation and individual tool behavior are separate.
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub(crate) enum ToolbarSlot {
     One,
     Two,
@@ -21,11 +22,15 @@ impl ToolbarSlot {
     }
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub(crate) enum EquipmentTool {
     MiningTool,
 }
 
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+#[derive(Clone)]
 pub(crate) struct EquipmentToolbar {
     slots: [Option<EquipmentTool>; 5],
     selected: Option<ToolbarSlot>,
@@ -84,6 +89,22 @@ impl EquipmentToolbar {
         if carrying {
             self.selected = None;
         }
+    }
+}
+
+impl EquipmentToolbar {
+    pub(crate) fn validate_save(
+        &self,
+        carrying: bool,
+    ) -> Result<(), salimon_persistence::SaveError> {
+        if self.slots != [Some(EquipmentTool::MiningTool), None, None, None, None]
+            || (carrying && self.selected.is_some())
+        {
+            return Err(salimon_persistence::invalid(
+                "equipment loadout/carrying lock",
+            ));
+        }
+        Ok(())
     }
 }
 

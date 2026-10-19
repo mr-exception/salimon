@@ -64,6 +64,15 @@ impl UpdateClock {
     }
 }
 
+impl UpdateClock {
+    pub(crate) fn from_saved_backlog(backlog: Duration) -> Self {
+        Self {
+            backlog,
+            ..Self::default()
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::UpdateClock;

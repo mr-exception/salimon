@@ -1,8 +1,11 @@
 //! Portable aimed extraction. Runtime supplies proximity candidates and obstruction distance.
 use std::time::Duration;
 
+#[path = "mining_save.rs"]
+mod save;
 #[path = "sphere_session.rs"]
 mod sphere_session;
+pub use save::MiningSaveState;
 
 use crate::resource_generation::SurfaceDeposit;
 use crate::resources::{DepositId, DepositState, ResourceDeposit, ResourceFragment};

@@ -119,3 +119,15 @@ door route remain clear. Three generated markers own input, screen and tray
 positions. Ordinary sight queries treat the module as solid; the port query
 omits only its own conservative envelope because the input face is recessed
 behind the tray. Runtime still checks interior authority, front face, range and aim.
+
+## Logical save boundary (#364)
+
+The [canonical save inventory](../../docs/save-contract.md) defines schema-1
+source state and excluded caches. Domain-owned save state is validated before
+restore; runtime composes temporary owners and rebuilds mass, immutable terrain
+queries and presentation/query/solver caches without advancing simulation.
+Stable IDs, depletion, carrying, motion, Core/assist progress and logical
+contact/sleep/dwell state survive. No input latch, OS handle or GPU state is
+restored. An attached mining sphere becomes a detached existing physical entity,
+without allocating a new ID or losing mass. Whole-session/Fabricator publication
+is composed in #365; disk checkpoints remain #366.

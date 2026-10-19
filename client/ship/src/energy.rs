@@ -11,7 +11,8 @@ impl fmt::Display for InvalidEnergy {
 }
 impl std::error::Error for InvalidEnergy {}
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct EnergyConfig {
     pub capacity_joules: u64,
     pub forward_watts: f64,
@@ -66,7 +67,8 @@ impl EnergyConfig {
 
 /// An isolated assist budget. Only the Core can reserve/refund it; consumers
 /// cannot borrow from it. It is crate-private to prevent duplicated spending.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub(crate) struct AssistEnergyReservation {
     remaining_joules: f64,
 }
@@ -76,7 +78,8 @@ impl AssistEnergyReservation {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct EnergyCore {
     config: EnergyConfig,
     stored_joules: f64,
@@ -223,6 +226,29 @@ impl EnergyCore {
             self.stored_joules = (self.stored_joules - watts * seconds).max(0.0);
         }
         powered_seconds
+    }
+}
+
+impl EnergyCore {
+    pub(crate) fn validate_save(&self) -> Result<(), salimon_persistence::SaveError> {
+        self.config
+            .validate()
+            .map_err(|_| salimon_persistence::invalid("Core config"))?;
+        if !self.stored_joules.is_finite()
+            || self.stored_joules < 0.
+            || self.stored_joules > self.config.capacity_joules as f64
+        {
+            return Err(salimon_persistence::invalid("Core charge"));
+        }
+        Ok(())
+    }
+}
+impl AssistEnergyReservation {
+    pub(crate) fn validate_save(&self) -> Result<(), salimon_persistence::SaveError> {
+        if !self.remaining_joules.is_finite() || self.remaining_joules < 0. {
+            return Err(salimon_persistence::invalid("assist reservation"));
+        }
+        Ok(())
     }
 }
 

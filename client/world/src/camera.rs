@@ -62,7 +62,8 @@ pub struct WorldSnapshot<'a> {
 }
 
 /// Deterministic camera tour between far-space and near-surface validation views.
-#[derive(Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CameraPrototype {
     elapsed_in_cycle: Duration,
     paused: bool,
@@ -224,6 +225,15 @@ fn logarithmic_transition(start: f64, end: f64, progress: f64) -> f64 {
 
     let eased = progress * progress * (3.0 - 2.0 * progress);
     (start.ln() + (end.ln() - start.ln()) * eased).exp()
+}
+
+impl CameraPrototype {
+    pub fn validate_save(&self) -> Result<(), salimon_persistence::SaveError> {
+        if self.elapsed_in_cycle >= Self::CYCLE_DURATION {
+            return Err(salimon_persistence::invalid("camera tour clock"));
+        }
+        Ok(())
+    }
 }
 
 #[cfg(test)]

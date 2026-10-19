@@ -6,7 +6,8 @@ pub const STORAGE_CAPACITY_MILLIGRAMS: u64 = 20_000_000;
 /// Technical memory bound, not a gameplay upgrade/capacity decision.
 pub const DEFAULT_QUEUE_CAPACITY: usize = 64;
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct JobId(pub u64);
 
 #[derive(Clone, Debug, PartialEq)]
@@ -33,7 +34,8 @@ pub struct Insertion {
     pub discarded_milligrams: u64,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct OutputItem {
     pub recipe: RecipeId,
     pub job: JobId,
@@ -43,7 +45,8 @@ pub struct OutputItem {
     pub category: OutputCategory,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct StoredResource {
     pub resource: ResourceId,
     pub milligrams: u64,
@@ -108,7 +111,8 @@ impl MassContribution {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 struct Job {
     id: JobId,
     recipe: RecipeDefinition,
@@ -118,7 +122,8 @@ struct Job {
 }
 
 /// In-memory authoritative domain; snapshots are observations, not a save format.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Fabricator {
     recipes: RecipeBook,
     stored: Vec<StoredResource>,
@@ -349,6 +354,74 @@ impl Fabricator {
             stored_milligrams: self.stored.iter().map(|s| s.milligrams).sum(),
             tray_milligrams: self.tray.as_ref().map_or(0, |item| item.mass.milligrams()),
         }
+    }
+}
+
+impl Fabricator {
+    pub(crate) fn next_job_id(&self) -> u64 {
+        self.next_job
+    }
+    pub(crate) fn validate_output_identity(
+        &self,
+        item: &OutputItem,
+    ) -> Result<(), salimon_persistence::SaveError> {
+        if self.jobs.iter().any(|job| {
+            job.id == item.job && (item.unit > job.completed || item.recipe != job.recipe.id)
+        }) {
+            return Err(salimon_persistence::invalid("uncompleted output identity"));
+        }
+        Ok(())
+    }
+    pub(crate) fn tray_item(&self) -> Option<&OutputItem> {
+        self.tray.as_ref()
+    }
+    pub(crate) fn validate_save(&self) -> Result<(), salimon_persistence::SaveError> {
+        use salimon_persistence::invalid;
+        crate::RecipeBook::new(self.recipes.recipes().to_vec())
+            .map_err(|_| invalid("recipe book"))?;
+        for r in self.recipes.recipes() {
+            crate::RecipeId::new(r.id.key()).map_err(|_| invalid("recipe ID"))?;
+            Mass::from_milligrams(r.output_mass.milligrams())
+                .map_err(|_| invalid("recipe output mass"))?;
+            for ingredient in &r.ingredients {
+                Mass::from_milligrams(ingredient.mass.milligrams())
+                    .map_err(|_| invalid("recipe ingredient"))?;
+            }
+        }
+        if self.queue_capacity == 0
+            || self.jobs.len() > self.queue_capacity
+            || self.next_job == 0
+            || self.stored.len() != RESOURCE_CATALOG.len()
+        {
+            return Err(invalid("machine capacity/allocator/bins"));
+        }
+        for (bin, definition) in self.stored.iter().zip(RESOURCE_CATALOG) {
+            if bin.resource != definition.id || bin.milligrams > STORAGE_CAPACITY_MILLIGRAMS {
+                return Err(invalid("storage bin identity/capacity"));
+            }
+        }
+        let mut previous = 0;
+        for (i, job) in self.jobs.iter().enumerate() {
+            if job.id.0 <= previous
+                || job.id.0 >= self.next_job
+                || job.remaining == 0
+                || job.remaining.checked_add(job.completed).is_none()
+                || job.progress >= job.recipe.duration
+                || (i > 0 && (!job.progress.is_zero() || job.completed != 0))
+                || self.recipes.get(&job.recipe.id) != Some(&job.recipe)
+            {
+                return Err(invalid("FIFO job identity/recipe/progress"));
+            }
+            previous = job.id.0;
+        }
+        if let Some(item) = &self.tray
+            && self.jobs.front().is_some_and(|job| {
+                job.id == item.job && (item.unit != job.completed || !job.progress.is_zero())
+            })
+        {
+            return Err(invalid("tray/job completion mismatch"));
+        }
+        Ok(())
     }
 }
 

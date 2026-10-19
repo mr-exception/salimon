@@ -332,3 +332,15 @@ tick and removes its load immediately; idle and blocked tray demand zero watts.
 Core telemetry exposes Fabricator watts separately and includes them in total
 draw, depletion and braking-energy estimates. Recipe efficiency is watts times
 actual worked duration; there is no second battery or assumed full powered frame.
+
+## Logical save boundary (#364)
+
+The [canonical save inventory](../../docs/save-contract.md) defines schema-1
+source state and excluded caches. Domain-owned save state is validated before
+restore; runtime composes temporary owners and rebuilds mass, immutable terrain
+queries and presentation/query/solver caches without advancing simulation.
+Stable IDs, depletion, carrying, motion, Core/assist progress and logical
+contact/sleep/dwell state survive. No input latch, OS handle or GPU state is
+restored. An attached mining sphere becomes a detached existing physical entity,
+without allocating a new ID or losing mass. Whole-session/Fabricator publication
+is composed in #365; disk checkpoints remain #366.

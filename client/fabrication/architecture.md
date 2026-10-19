@@ -53,8 +53,9 @@ The separate integer storage/tray mass components avoid an overflowing combined
 u64 and exclude jobs/committed inputs/collected inventory deliberately. Runtime
 maps these to cached ship ledger entries alongside world fragment removal.
 
-All state is in-memory. Cloning supports portable tests, not disk persistence.
-Snapshots are owned observations, not a restorable save schema. Future persistence
+All state remains in-memory; `FabricationSaveState` provides versioned save
+source state through the runtime envelope. Ordinary snapshots are observations.
+Filesystem persistence
 must version material/recipe/job IDs, captured job parameters and state and
 validate restoration atomically, as documented in the canonical specification.
 Runtime/physical/power/UI adapters are separately tracked by #339–#347; native
@@ -75,4 +76,18 @@ output and takes the first vacant slot; equipment/component outputs are rejected
 without shifting survivors or introducing selected/stacked items. Empty input is
 observational. There is no health/hunger/full-vitals check or healing effect.
 Read-only slot arrays expose stable item/recipe/job identities for later HUD and
-future versioned persistence adapters; no serialization/disk IO is implemented.
+versioned save adapters; serialization is implemented, while disk IO remains #366.
+
+## Whole-session saves (#365)
+
+`FabricationSaveState` validates recipe definitions, ordered complete bins, queue
+IDs/captured recipes/committed quantities/progress, allocator high-water marks,
+tray and exact inventory slots together. Cross-owner item identities cannot be
+both collected and on the tray. Runtime's `SessionState` is the concrete payload
+inside `SaveGame`; `save_bytes` and transactional `restore_bytes` integrate all
+physical state, equipment and exact elapsed/backlog clocks. Stored mass and
+recipe watts are reconstructed without charging or refunding. UI/input/focus,
+feedback and render caches reset; interactions are recomputed from restored
+world state. The native host's automation policy stays host-owned. No disk IO,
+autosave scheduling or offline simulation is implied; #366 owns durable storage
+and shell lifecycle integration. See [canonical save contract](../../docs/save-contract.md).

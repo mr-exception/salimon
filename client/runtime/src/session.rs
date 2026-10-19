@@ -4,6 +4,9 @@ mod fabrication;
 pub(crate) mod frames;
 pub(crate) mod interaction;
 mod presentation;
+// Portable adapters are consumed by whole-session orchestration in #365/#366.
+#[allow(dead_code)]
+pub(crate) mod persistence;
 #[cfg(test)]
 mod tests;
 use self::frames::character_ship_frame;
@@ -117,7 +120,8 @@ pub(crate) struct Snapshot {
     pub(crate) character: salimon_character::CharacterSnapshot,
     pub(crate) backlog: Duration,
 }
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub(crate) enum ViewMode {
     #[default]
     Gameplay,

@@ -9,7 +9,8 @@ pub const SPHERE_TICK: Duration = Duration::from_millis(16);
 pub const MIN_SPHERE_RADIUS_METERS: f64 = 0.005;
 pub const MAX_SPHERE_RADIUS_METERS: f64 = 2.0;
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct MiningConfig {
     cap_kg: f64,
     rate_kg_per_second: f64,

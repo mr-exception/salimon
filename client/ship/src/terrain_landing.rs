@@ -7,7 +7,8 @@ use salimon_world::{CelestialBody, terrain::TerrainMode};
 /// Fixed feet and ramp cannot conform arbitrarily; reject sites rather than burying them.
 pub const MAX_SUPPORT_GAP_METERS: f64 = 0.10;
 pub const MAX_LANDING_SLOPE: f64 = 0.363_970_234_266_202_34; // 20 degrees
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct LandingFootprint {
     /// Sole corners and intermediate samples in ship-local metres.
     pub feet: Vec<[f64; 3]>,

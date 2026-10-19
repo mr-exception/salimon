@@ -314,3 +314,19 @@ material-volume, mass or session persistence contract changes.
 Fabricator crafting is newly authorized by the [accepted five-round contracts](spaceship-building-and-survival.md#accepted-fabricator-contracts-2026-10-19-336). Implementation is staged: #336 contracts, #337 raw materials, #338 portable domain, then separate runtime/UI integration. Survival effects, disk persistence and playable progression remain deferred.
 
 The #338 portable Fabricator domain is implemented in [salimon-fabrication](../client/fabrication/architecture.md). It depends only on world resource contracts; native/playable integration remains #339–#347.
+
+## Whole-game persistence (#363)
+
+The [canonical save contract](save-contract.md) inventories authoritative state,
+restore order, clocks, validation and schema evolution. `salimon-persistence` owns
+the platform-independent versioned envelope and deterministic stable-ID map codec.
+Domain adapters follow in #364 and session/Fabricator composition in #365; disk
+checkpoints remain #366. Renderer caches are never save authority.
+
+The #364/#365 adapters now implement the typed whole-session in-memory save
+boundary: runtime `session/persistence.rs`, domain character/ship persistence
+modules, world `mining_save.rs`, physics `SleepSaveState` and fabrication
+`save.rs`. Machine/inventory/physical identities validate before atomic session
+publication; derived mass, power request and caches regenerate. Persistence
+regressions live in runtime session/persistence and fabrication_scenarios.
+Filesystem durability and native lifecycle checkpoints remain #366.

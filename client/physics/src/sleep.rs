@@ -21,7 +21,8 @@ const POINT_ENVELOPE_SPEED: f64 = 0.03;
 const QUIET_SPEED: f64 = 0.15;
 const QUIET_ANGULAR_SPEED: f64 = 1.0;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 struct MotionSample {
     time: f64,
     position: [f64; 3],
@@ -29,7 +30,8 @@ struct MotionSample {
     supported: bool,
     quiet: bool,
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 struct MotionWindow {
     time: f64,
     samples: VecDeque<MotionSample>,
@@ -140,7 +142,8 @@ impl MotionWindow {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 struct Entry<K> {
     state: ObjectState,
     neighbors: Vec<K>,
@@ -613,6 +616,124 @@ fn grounded(p: &ObjectState, contains: &impl Fn([f64; 3], f64) -> bool) -> bool 
         h.support(p.orientation, p.authored_mesh_scale, scale(up, -1.0))
     });
     (gap - support).abs() <= CONTACT_GAP_METERS && dot(p.velocity, up).abs() < QUIET_SPEED
+}
+
+/// Exact activation/dwell/contact impulses; geometry and solver buffers regenerate.
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SleepSaveState<K> {
+    entries: Vec<(K, Entry<K>)>,
+    warm_pairs: Vec<((K, K), crate::ContactResponse)>,
+    warm_ground: Vec<(K, crate::ContactResponse)>,
+    warm_dt: f64,
+}
+impl<K: Clone + Eq + Hash + serde::Serialize> SleepTracker<K> {
+    pub fn save_state(&self) -> SleepSaveState<K> {
+        fn ordered<K: serde::Serialize, V>(mut v: Vec<(K, V)>) -> Vec<(K, V)> {
+            v.sort_by_cached_key(|(k, _)| {
+                serde_json::to_string(k).expect("stable identity serializes")
+            });
+            v
+        }
+        SleepSaveState {
+            entries: ordered(
+                self.entries
+                    .iter()
+                    .map(|(k, v)| (k.clone(), v.clone()))
+                    .collect(),
+            ),
+            warm_pairs: ordered(
+                self.warm_pairs
+                    .iter()
+                    .map(|(k, v)| (k.clone(), v.clone()))
+                    .collect(),
+            ),
+            warm_ground: ordered(
+                self.warm_ground
+                    .iter()
+                    .map(|(k, v)| (k.clone(), v.clone()))
+                    .collect(),
+            ),
+            warm_dt: self.warm_dt,
+        }
+    }
+    pub fn from_save(
+        state: SleepSaveState<K>,
+        mut rebuild: impl FnMut(&K, &ObjectState) -> Option<ObjectState>,
+    ) -> Result<Self, salimon_persistence::SaveError> {
+        use salimon_persistence::invalid;
+        let mut tracker = Self::default();
+        let ids: std::collections::HashSet<_> =
+            state.entries.iter().map(|(id, _)| id.clone()).collect();
+        if ids.len() != state.entries.len() || !state.warm_dt.is_finite() || state.warm_dt < 0. {
+            return Err(invalid("sleep identities/timestep"));
+        }
+        for (id, mut e) in state.entries {
+            let p = &e.state;
+            let norm: f64 = p.orientation.iter().map(|v| v * v).sum();
+            if p.position
+                .iter()
+                .chain(p.velocity.iter())
+                .chain(p.angular_velocity.iter())
+                .any(|v| !v.is_finite())
+                || !norm.is_finite()
+                || (norm - 1.).abs() > 1e-9
+                || !p.radius.is_finite()
+                || p.radius <= 0.
+                || !p.mass_kg.is_finite()
+                || p.mass_kg <= 0.
+                || !e.quiet_seconds.is_finite()
+                || e.quiet_seconds < 0.
+                || e.neighbors.iter().any(|n| !ids.contains(n))
+                || !e.motion.time.is_finite()
+                || e.motion.time < 0.
+                || e.motion.points.iter().flatten().any(|v| !v.is_finite())
+            {
+                return Err(invalid("sleep/contact state"));
+            }
+            if (e.motion.samples.is_empty() && e.motion.time != 0.)
+                || (e.motion.samples.len() == 1 && e.motion.samples[0].time != e.motion.time)
+            {
+                return Err(invalid("incomplete sleep dwell window"));
+            }
+            let mut previous = None;
+            for sample in &e.motion.samples {
+                let n: f64 = sample.orientation.iter().map(|v| v * v).sum();
+                if !sample.time.is_finite()
+                    || sample.time < 0.
+                    || sample.time > e.motion.time
+                    || previous.is_some_and(|t| sample.time <= t)
+                    || sample.position.iter().any(|v| !v.is_finite())
+                    || !n.is_finite()
+                    || (n - 1.).abs() > 1e-9
+                {
+                    return Err(invalid("sleep dwell samples"));
+                }
+                previous = Some(sample.time);
+            }
+            e.state = rebuild(&id, &e.state)
+                .ok_or_else(|| invalid("sleep state has no physical identity"))?;
+            tracker.entries.insert(id, e);
+        }
+        for ((a, b), r) in state.warm_pairs {
+            r.validate_save()?;
+            if !ids.contains(&a)
+                || !ids.contains(&b)
+                || a == b
+                || tracker.warm_pairs.insert((a, b), r).is_some()
+            {
+                return Err(invalid("contact pair identity"));
+            }
+        }
+        for (id, r) in state.warm_ground {
+            r.validate_save()?;
+            if !ids.contains(&id) || tracker.warm_ground.insert(id, r).is_some() {
+                return Err(invalid("ground contact identity"));
+            }
+        }
+        tracker.warm_dt = state.warm_dt;
+        Ok(tracker)
+    }
 }
 
 #[cfg(test)]

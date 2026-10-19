@@ -12,7 +12,8 @@ use salimon_world::{BodyRole, CELESTIAL_BODIES, CelestialBody, CelestialBodyId};
 use std::time::Duration;
 
 /// Starter eligibility tuning. Future upgrades remain documentation only.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AssistConfig {
     pub landing_range_radius_fraction: f64,
     pub maximum_landing_speed_meters_per_second: f64,
@@ -38,7 +39,8 @@ const RECOVERY_LIFT_SECONDS: f64 = 2.0;
 const RECOVERY_REPOSITION_SECONDS: f64 = 2.0;
 const RECOVERY_DURATION: Duration = Duration::from_secs(12);
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 struct RecoveryPath {
     start_normal: [f64; 3],
     start_distance: f64,
@@ -55,7 +57,8 @@ const TAKEOFF_TOTAL_RISE_METERS: f64 = 50.0;
 const TAKEOFF_LIFT_SECONDS: f64 = 2.0;
 const TAKEOFF_CLEARANCE_SECONDS: f64 = 4.0;
 /// Captured path data prevents accumulated position or frame-rate-dependent timing.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub(crate) struct AssistTransition {
     elapsed: Duration,
     duration: Duration,
@@ -457,6 +460,60 @@ impl ShipController {
             self.finish_assist_energy();
             self.assist = None;
         }
+    }
+}
+
+impl AssistTransition {
+    pub(super) fn validate_save(&self) -> Result<(), salimon_persistence::SaveError> {
+        use salimon_persistence::invalid;
+        if self.duration.is_zero()
+            || self.elapsed > self.duration
+            || !self.energy_watts.is_finite()
+            || self.energy_watts < 0.
+            || [
+                self.start_distance,
+                self.intermediate_distance,
+                self.destination_distance,
+            ]
+            .iter()
+            .any(|v| !v.is_finite() || *v < 0.)
+            || self
+                .surface_normal
+                .iter()
+                .chain(self.velocity_meters_per_second.iter())
+                .any(|v| !v.is_finite())
+        {
+            return Err(invalid("assist path"));
+        }
+        for pose in [Some(self.start_pose), self.landing_pose]
+            .into_iter()
+            .flatten()
+        {
+            let n: f64 = pose.orientation.iter().map(|v| v * v).sum();
+            if pose.position_meters.iter().any(|v| !v.is_finite())
+                || !n.is_finite()
+                || (n - 1.).abs() > 1e-9
+            {
+                return Err(invalid("assist pose"));
+            }
+        }
+        let n: f64 = self.aligned_orientation.iter().map(|v| v * v).sum();
+        if !n.is_finite() || (n - 1.).abs() > 1e-9 {
+            return Err(invalid("assist aligned orientation"));
+        }
+        if let Some(r) = &self.reservation {
+            r.validate_save()?;
+        }
+        if let Some(r) = &self.recovery
+            && (r.start_normal.iter().any(|v| !v.is_finite())
+                || !r.start_distance.is_finite()
+                || !r.clearance_distance.is_finite()
+                || r.start_distance < 0.
+                || r.clearance_distance < 0.)
+        {
+            return Err(invalid("recovery path"));
+        }
+        Ok(())
     }
 }
 

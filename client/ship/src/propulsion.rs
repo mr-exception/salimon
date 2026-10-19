@@ -17,8 +17,10 @@ impl fmt::Display for InvalidFlightMotion {
 }
 impl std::error::Error for InvalidFlightMotion {}
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Propulsion {
+    #[serde(skip, default = "saved_dry_mass")]
     total_mass_kg: f64,
     forward_force_newtons: f64,
     reverse_force_newtons: f64,
@@ -32,6 +34,10 @@ impl Default for Propulsion {
         }
     }
 }
+fn saved_dry_mass() -> f64 {
+    STARTER_DRY_MASS_KG
+}
+
 impl Propulsion {
     pub fn new(
         total_mass_kg: f64,
@@ -76,6 +82,18 @@ impl Propulsion {
             self.forward_force_newtons
         };
         fraction * force / self.total_mass_kg
+    }
+}
+
+impl Propulsion {
+    pub(crate) fn validate_save(&self) -> Result<(), salimon_persistence::SaveError> {
+        Self::new(
+            self.total_mass_kg,
+            self.forward_force_newtons,
+            self.reverse_force_newtons,
+        )
+        .map(|_| ())
+        .map_err(|_| salimon_persistence::invalid("propulsion"))
     }
 }
 

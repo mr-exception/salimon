@@ -1,7 +1,8 @@
 //! Absolute meter coordinates and subtract-before-cast conversion.
 
 /// A canonical world-space position in meters.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct WorldPosition {
     meters: [f64; 3],
 }

@@ -2,7 +2,8 @@ use crate::{FabricationError, Mass};
 use salimon_world::resources::ResourceId;
 use std::time::Duration;
 
-#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RecipeId(String);
 impl RecipeId {
     pub fn new(key: impl Into<String>) -> Result<Self, FabricationError> {
@@ -28,7 +29,8 @@ fn valid_key(key: &str) -> bool {
 }
 
 /// Equipment/component are schema categories only; no upgrade gameplay here.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum OutputCategory {
     Food,
     Medical,
@@ -36,7 +38,8 @@ pub enum OutputCategory {
     Component,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Ingredient {
     pub resource: ResourceId,
     pub mass: Mass,
@@ -44,14 +47,16 @@ pub struct Ingredient {
 
 /// Schema for later progression. This wave only enables default-unlocked recipes;
 /// it exposes no command to acquire research or upgrades.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UnlockRequirements {
     pub unlocked_by_default: bool,
     pub prerequisites: Vec<String>,
 }
 
 /// Data input; RecipeBook validates the whole set before accepting any recipe.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RecipeDefinition {
     pub id: RecipeId,
     pub ingredients: Vec<Ingredient>,
@@ -94,7 +99,8 @@ impl RecipeDefinition {
 }
 
 /// Immutable validated definitions, in caller order. Jobs capture their definition.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RecipeBook(Vec<RecipeDefinition>);
 impl RecipeBook {
     pub fn new(definitions: Vec<RecipeDefinition>) -> Result<Self, FabricationError> {

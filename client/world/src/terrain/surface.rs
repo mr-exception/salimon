@@ -3,7 +3,8 @@ use super::{SurfaceSample, TerrainDefinition};
 use crate::{CELESTIAL_BODIES, CelestialBody, CelestialBodyId};
 use std::sync::LazyLock;
 
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum TerrainMode {
     #[default]
     Flat,

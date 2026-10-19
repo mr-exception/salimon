@@ -1767,6 +1767,8 @@ name = "salimon-character"
 version = "0.1.0"
 dependencies = [
  "salimon-math",
+ "salimon-persistence",
+ "serde",
 ]
 
 [[package]]
@@ -1780,10 +1782,12 @@ dependencies = [
  "salimon-diagnostics",
  "salimon-fabrication",
  "salimon-math",
+ "salimon-persistence",
  "salimon-physics",
  "salimon-renderer",
  "salimon-ship",
  "salimon-world",
+ "serde",
  "serde_json",
  "winit",
 ]
@@ -1796,7 +1800,9 @@ version = "0.1.0"
 name = "salimon-fabrication"
 version = "0.1.0"
 dependencies = [
+ "salimon-persistence",
  "salimon-world",
+ "serde",
 ]
 
 [[package]]
@@ -1804,10 +1810,21 @@ name = "salimon-math"
 version = "0.1.0"
 
 [[package]]
+name = "salimon-persistence"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "salimon-physics"
 version = "0.1.0"
 dependencies = [
  "salimon-math",
+ "salimon-persistence",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -1824,12 +1841,18 @@ name = "salimon-ship"
 version = "0.1.0"
 dependencies = [
  "salimon-math",
+ "salimon-persistence",
  "salimon-world",
+ "serde",
 ]
 
 [[package]]
 name = "salimon-world"
 version = "0.1.0"
+dependencies = [
+ "salimon-persistence",
+ "serde",
+]
 
 [[package]]
 name = "same-file"

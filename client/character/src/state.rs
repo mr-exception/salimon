@@ -1,7 +1,8 @@
 //! Environmental frames and character presentation contracts.
 use salimon_math::{add, dot, scale, sub};
 use std::time::Duration;
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ShipFrame {
     pub origin_meters: [f64; 3],
     /// Local ship axes in world space: forward (+X), up (+Y), port (+Z).
@@ -54,11 +55,13 @@ impl ShipFrame {
         ]
     }
 }
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SurfaceFrame {
     pub body_center_meters: [f64; 3],
     pub radius_meters: f64,
     /// Pure caller query in absolute metres; None retains the flat sphere fixture.
+    #[serde(skip)]
     pub query: Option<GroundQuery>,
 }
 
@@ -82,7 +85,8 @@ pub struct CharacterSnapshot {
     pub doorway_blend_fraction: Option<f64>,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub(crate) enum PositionState {
     Cockpit,
     Inside {

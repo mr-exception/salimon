@@ -190,3 +190,17 @@ supersedes historical direct-speed/no-energy baseline prose. Force/energy tuning
 is configurable; no ten-minute endurance invariant, steering inertia, reaction
 mass, upgrade system or orbital gravity is implied. GroundedAfterCrash and Landed
 remain distinct until powered recovery completes (final decisions 79–83).
+
+## Continuous Fabricator power (#340)
+
+Runtime registers the runnable head recipe's watts with ShipController before
+every shared gameplay tick, regardless of view, player location or flight state.
+The Core settles conversion, propulsion, idle and Fabricator demand together.
+Every ordinary bus consumer shares the exact funded interval, while reserved
+assist energy remains isolated. Runtime floors that interval to nanoseconds
+(no free progress; less than one nanosecond of paid work can be lost at an
+exhaustion boundary). No blackout time is banked. Recipe completion splits the
+tick and removes its load immediately; idle and blocked tray demand zero watts.
+Core telemetry exposes Fabricator watts separately and includes them in total
+draw, depletion and braking-energy estimates. Recipe efficiency is watts times
+actual worked duration; there is no second battery or assumed full powered frame.

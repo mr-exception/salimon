@@ -3,6 +3,27 @@ use super::GameplaySession;
 use salimon_fabrication::FabricationError;
 
 impl GameplaySession {
+    /// One shared tick; recipe completion ends its draw before the rest of the tick.
+    pub(super) fn advance_fabrication(&mut self, delta: std::time::Duration) {
+        let demand = self.fabricator.power_demand();
+        let active = demand.map_or(std::time::Duration::ZERO, |d| d.until_output.min(delta));
+        self.ship
+            .set_fabricator_watts(demand.map_or(0.0, |d| d.watts))
+            .expect("validated recipe and starter ship watts have finite sum");
+        if !active.is_zero() {
+            self.ship.advance(active);
+            let funded = self.ship.fabricator_powered_duration(active);
+            self.fabricator.step(funded, true);
+            self.fabricator.step(active - funded, false);
+        }
+        self.ship
+            .set_fabricator_watts(self.fabricator.power_demand().map_or(0.0, |d| d.watts))
+            .expect("validated recipe watts");
+        if active < delta {
+            self.ship.advance(delta - active);
+        }
+    }
+
     pub(super) fn insert_fabricator_fragment(&mut self) {
         let Some(id) = self.mining.session.carried_id() else {
             self.feedback = Some("Carry a fragment to feed the Fabricator");
@@ -128,5 +149,86 @@ mod tests {
             ),
             Some(InteractionTarget::Fabricator)
         );
+    }
+}
+
+#[cfg(test)]
+mod power_tests {
+    use super::*;
+    use salimon_fabrication::{Fabricator, RecipeBook, RecipeId};
+    use salimon_world::resources::{RESOURCE_CATALOG, RawMaterial};
+    use std::time::Duration;
+
+    pub(super) fn queued() -> GameplaySession {
+        let mut session = GameplaySession::default();
+        let mut recipe = RecipeBook::starter().recipes()[0].clone();
+        recipe.duration = Duration::from_millis(100);
+        recipe.watts = 10_000.0;
+        session.fabricator = Fabricator::new(RecipeBook::new(vec![recipe]).unwrap(), 8).unwrap();
+        for resource in RESOURCE_CATALOG {
+            session
+                .fabricator
+                .insert(RawMaterial::new(resource.id, 1.0).unwrap())
+                .unwrap();
+        }
+        session
+            .fabricator
+            .enqueue(&RecipeId::new("food-ration").unwrap(), 2)
+            .unwrap();
+        session
+    }
+
+    #[test]
+    fn core_cutoff_pauses_exactly_and_restores_without_banking_or_double_charge() {
+        let mut s = queued();
+        s.ship.set_stored_core_energy_joules(960); // 8 ms at 110 kW idle + 10 kW recipe.
+        s.advance_game(Duration::from_millis(16));
+        assert_eq!(
+            s.fabricator.snapshot(false).jobs[0].progress,
+            Duration::from_millis(8)
+        );
+        assert!(!s.ship.snapshot().power_available);
+        let paused = s.fabricator.clone();
+        for _ in 0..10 {
+            s.advance_game(Duration::from_millis(16));
+        }
+        assert_eq!(s.fabricator, paused);
+        s.ship
+            .exchange_core_energy_joules(1_000_000.0, 0.0)
+            .unwrap();
+        s.advance_game(Duration::from_millis(16));
+        assert_eq!(
+            s.fabricator.snapshot(true).jobs[0].progress,
+            Duration::from_millis(24)
+        );
+        assert_eq!(s.ship.snapshot().energy_core.stored_joules, 998_080);
+        assert_eq!(s.ship.snapshot().core_status.fabricator_watts, 10_000.0);
+    }
+
+    #[test]
+    fn completion_stops_draw_mid_tick_and_occupied_tray_only_pays_idle() {
+        let mut s = queued();
+        s.ship.set_stored_core_energy_joules(1_000_000);
+        for _ in 0..7 {
+            s.advance_game(Duration::from_millis(16));
+        }
+        assert!(s.fabricator.snapshot(true).tray.is_some());
+        assert_eq!(s.ship.snapshot().energy_core.stored_joules, 986_680); // 112 ms idle + 100 ms craft.
+        assert_eq!(s.ship.snapshot().core_status.fabricator_watts, 0.0);
+        s.advance_game(Duration::from_secs(1));
+        assert_eq!(s.ship.snapshot().energy_core.stored_joules, 876_680);
+    }
+
+    #[test]
+    fn frame_stalls_and_partitioned_admission_fund_the_same_fixed_ticks_away_from_machine() {
+        let mut whole = queued();
+        let mut split = queued();
+        whole.advance_automation(Duration::from_millis(250));
+        for ms in [1, 33, 100, 116] {
+            split.advance_automation(Duration::from_millis(ms));
+        }
+        assert_eq!(whole.fabricator, split.fabricator);
+        assert_eq!(whole.ship.snapshot(), split.ship.snapshot());
+        assert_eq!(whole.update_clock.backlog(), split.update_clock.backlog());
     }
 }

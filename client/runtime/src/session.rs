@@ -375,7 +375,7 @@ impl GameplaySession {
         self.camera_prototype.advance(delta);
         self.ship
             .set_steering_input(self.ship_control_input.steering());
-        self.ship.advance(delta);
+        self.advance_fabrication(delta);
         let ship = self.ship.snapshot();
         if !ship.power_available
             || !ship.cockpit_control_active

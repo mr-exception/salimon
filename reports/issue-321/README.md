@@ -1,8 +1,41 @@
 # Issue #321 — software-Vulkan Option A candidate corpus
 
-2026-10-19. **Candidate captured; human approval and approved appearance comparison
-remain pending.** This baseline review PR does not complete #321 or certify
-Metal appearance/native M1 FPS.
+2026-10-19. **Owner approval recorded; approved software-Vulkan comparison passed.**
+The follow-up PR completes #321 on merge. Metal appearance/native M1 FPS remain
+independent in #314.
+
+## Approval and final validation
+
+Repository owner `mr-exception` merged [PR #335](https://github.com/mr-exception/salimon/pull/335)
+at 2026-10-19T09:40:25Z and explicitly confirmed approval in ChatGPT at
+2026-10-19T12:41:40+03:00, following the explanation that approval covers images,
+masks and tolerances. This owner confirmation is the approval evidence; no
+GitHub review submission is claimed. The corpus now records the actual reviewer,
+date, evidence and `masks_and_tolerances_reviewed: true`. Image bytes, source and
+binary provenance, fixture actions/seeds, empty masks and thresholds are unchanged.
+
+- **Passed:** `python scripts/model_visual_tests.py compare --reviewed --baselines scenarios/visual/baselines/software-vulkan-option-a-v1 --output artifacts/model-visual/approved-diffs`
+  — exit 0, all 128 baseline comparisons and all temporal checks passed.
+  [Coverage](appearance.json) / [per-fixture metrics and summaries](approved-comparison/).
+  This compares the retained production captures from the original clean source
+  revision against the exact owner-approved corpus; it is not a new game launch.
+- **Passed detection test:** `python reports/issue-321/reproduce-injection.py`
+  — the approved full CLI rejects the injected Core patch with exit 1 and
+  [failed appearance coverage](reviewed-injection-appearance.json).
+  [Core metrics](reviewed-injection-core.json) show all three pixel comparisons
+  fail while both temporal comparisons pass. Injected image hashes were refreshed
+  so this tests pixel failure, not rejection of stale hashes. Test images are
+  disposable; the approved corpus is never modified.
+- **Passed:** `python -m unittest discover -s scripts -p 'test_*.py'`
+  — 93 tests; [approval validation log](approval-python-tests.log).
+- **Passed:** `git diff --check`, corpus image/fixture hash integrity, and local
+  report-link validation.
+- **Not run:** a new graphical capture/build (runtime and fixture inputs are
+  unchanged), a live modified shader/asset, Metal captures or native M1 FPS.
+
+The earlier pending result is retained in [appearance-before-approval.json](appearance-before-approval.json).
+The following sections preserve the initial candidate delivery and its checks;
+references to pending review there describe that initial state, before approval.
 
 ## Delivered
 
@@ -11,11 +44,11 @@ Metal appearance/native M1 FPS.
   revision `6eacbbac2cd341a990b3d50e0482cd7997dac702`.
 - Candidate images and provenance in
   [software-vulkan-option-a-v1](../../scenarios/visual/baselines/software-vulkan-option-a-v1/corpus.json).
-  The metadata remains `status: candidate`; no reviewer, date, approval evidence
-  or `masks_and_tolerances_reviewed: true` has been fabricated.
+  At initial delivery the metadata was `status: candidate`; approval fields
+  were added only after the owner confirmation recorded above.
 - [Checkpoint review index](checkpoints.md) links **every frame**, including all
   repeats. Review silhouette, materials, glazing, console/Core, resources/tool/
-  spheres, contact floor, ramp and door. All rows await human review.
+  spheres, contact floor, ramp and door. All rows initially awaited human review; the index now records approval.
 - [Capture evidence](capture-evidence.json) retains passed fixture setup, step
   counts, screenshot statuses and observed context for every image.
 - [Temporal summaries](temporal/) and [appearance coverage](appearance.json)
@@ -122,5 +155,5 @@ actual reviewer, review date, evidence link and
 `masks_and_tolerances_reviewed: true`. Then run and retain a successful approved
 `compare --reviewed` against this exact corpus and finish #321. A merge or a
 passing temporal check alone does not satisfy that approval contract. Until
-then, periodic appearance coverage must remain pending. This draft intentionally
-keeps #321 open; it does not transfer or waive its remaining acceptance criteria.
+then, periodic appearance coverage must remain pending. The original draft kept #321 open without transferring or waiving requirements.
+The approval and passed reviewed comparison recorded above now satisfy those gates.

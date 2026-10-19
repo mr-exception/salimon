@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "candidate",
+  "status": "approved",
   "context": {
     "adapter": "llvmpipe (LLVM 20.1.2, 256 bits)",
     "backend": "Vulkan",
@@ -145,5 +145,11 @@
     "moving/camera-07-repeat-01.png": "af54be9f3dff0d34533416ad7db772ac13d32017f3542150eab95bfe07d48e0a",
     "moving/camera-07-repeat-02.png": "af54be9f3dff0d34533416ad7db772ac13d32017f3542150eab95bfe07d48e0a"
   },
-  "corpus_id": "software-vulkan-option-a-v1"
+  "corpus_id": "software-vulkan-option-a-v1",
+  "review": {
+    "reviewer": "mr-exception (Alireza Darbandi)",
+    "reviewed_at": "2026-10-19",
+    "evidence": "https://github.com/mr-exception/salimon/pull/335 \u2014 owner merged PR at 2026-10-19T09:40:25Z and explicitly confirmed approval in ChatGPT at 2026-10-19T12:41:40+03:00 after the image/mask/tolerance approval requirement was explained. No GitHub review submission is claimed.",
+    "masks_and_tolerances_reviewed": true
+  }
 }

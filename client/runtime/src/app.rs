@@ -732,7 +732,7 @@ impl ClientApplication {
                     &self.session.equipment,
                 ),
                 (self.session.view_mode == ViewMode::Gameplay)
-                    .then(|| self.session.equipment.presentation()),
+                    .then(|| self.session.equipment_presentation()),
                 window.scale_factor(),
                 || window.pre_present_notify(),
             ) {

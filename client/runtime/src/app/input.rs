@@ -125,15 +125,6 @@ pub(super) fn camera_command(
     }
 }
 
-fn consumable_category(key: PhysicalKey) -> Option<salimon_fabrication::ConsumableCategory> {
-    use salimon_fabrication::ConsumableCategory as C;
-    match key {
-        PhysicalKey::Code(KeyCode::KeyM) => Some(C::Medical),
-        PhysicalKey::Code(KeyCode::KeyN) => Some(C::Food),
-        _ => None,
-    }
-}
-
 /// Native key translation only; portable session owns command semantics.
 pub(super) fn control_key(key: PhysicalKey) -> Option<crate::session::ControlKey> {
     use crate::session::ControlKey::*;
@@ -181,8 +172,6 @@ pub(crate) fn dispatch_session_key(
             Some(Command::Control(control, false))
         } else if let Some(direction) = throttle_direction(key) {
             Some(Command::Throttle(direction, false))
-        } else if let Some(category) = consumable_category(key) {
-            Some(Command::Consume(category, false))
         } else if key == PhysicalKey::Code(KeyCode::KeyF) {
             Some(Command::GrabDrop(false))
         } else {
@@ -194,8 +183,6 @@ pub(crate) fn dispatch_session_key(
         camera_command(ElementState::Pressed, false, key, true).map(Command::Camera)
     } else if key == PhysicalKey::Code(KeyCode::KeyE) {
         Some(Command::Interact)
-    } else if let Some(category) = consumable_category(key) {
-        Some(Command::Consume(category, true))
     } else if key == PhysicalKey::Code(KeyCode::KeyL) {
         Some(Command::Landing)
     } else if let Some(camera) = camera_command(ElementState::Pressed, false, key, false) {
@@ -418,119 +405,14 @@ mod crafting_tests {
 #[cfg(test)]
 mod consumable_tests {
     use super::*;
-    use crate::session::{GameplaySession, ViewMode};
-    use salimon_fabrication::{JobId, Mass, OutputCategory, OutputItem, RecipeId};
-    fn stocked() -> GameplaySession {
-        let mut s = GameplaySession::default();
-        for (id, category) in [
-            (1, OutputCategory::Food),
-            (2, OutputCategory::Food),
-            (3, OutputCategory::Food),
-            (4, OutputCategory::Medical),
-            (5, OutputCategory::Medical),
-        ] {
-            s.consumables
-                .insert(OutputItem {
-                    recipe: RecipeId::new("test-item").unwrap(),
-                    job: JobId(id),
-                    unit: 1,
-                    mass: Mass::from_milligrams(1000).unwrap(),
-                    category,
-                })
-                .unwrap();
-        }
-        s
-    }
     #[test]
-    fn mn_consume_first_once_per_edge_and_never_change_gear_carrying_mass_or_view() {
-        let mut s = stocked();
-        let fragment = crate::sphere_fixtures::sphere(
-            &mut s.mining.session,
-            salimon_world::resources::ResourceId::IronOre,
-            1.0,
-            salimon_world::resources::ResourceTransform::new(
-                salimon_world::WorldPosition::new(0.0, 0.0, 0.0),
-                [0.0, 0.0, 0.0, 1.0],
-            )
-            .unwrap(),
-        );
-        s.mining.session.pick_up(fragment);
-        let selected = s.equipment.selected();
-        let ship = s.ship.snapshot();
-        for (key, remaining) in [(KeyCode::KeyN, 2), (KeyCode::KeyM, 1)] {
-            for _ in 0..4 {
-                dispatch_session_key(&mut s, PhysicalKey::Code(key), true);
-            }
-            assert_eq!(
-                if key == KeyCode::KeyN {
-                    s.consumables.food().iter().flatten().count()
-                } else {
-                    s.consumables.medical().iter().flatten().count()
-                },
-                remaining
-            );
-            dispatch_session_key(&mut s, PhysicalKey::Code(key), false);
-            dispatch_session_key(&mut s, PhysicalKey::Code(key), true);
-        }
-        assert_eq!(s.view_mode, ViewMode::Gameplay); // N must not trigger the precision-tour camera.
-        assert_eq!(s.equipment.selected(), selected);
-        assert_eq!(s.mining.session.carried_id(), Some(fragment));
-        assert_eq!(s.ship.snapshot(), ship);
-        assert!(s.consumables.food()[0].is_none());
-        assert!(s.consumables.food()[1].is_none());
-        assert_eq!(s.consumables.food()[2].as_ref().unwrap().job, JobId(3));
-        assert!(s.consumables.medical().iter().all(Option::is_none));
-    }
-    #[test]
-    fn native_policy_empty_focus_modal_and_tour_gates_preserve_consumables() {
-        let ready = InputPolicy {
-            gameplay: true,
-            captured: true,
-            focused: true,
-            occluded: false,
-        };
-        let mut s = stocked();
-        let original = s.consumables.clone();
+    fn mn_no_longer_dispatch_consumption_or_change_gameplay_view() {
+        let mut session = crate::session::GameplaySession::default();
         for key in [KeyCode::KeyM, KeyCode::KeyN] {
-            let key = PhysicalKey::Code(key);
-            for (repeat, synthetic) in [(true, false), (false, true)] {
-                assert!(!ready.admits_key(InputSource::Native, key, true, repeat, synthetic));
-            }
-            assert!(
-                !InputPolicy {
-                    focused: false,
-                    ..ready
-                }
-                .admits_key(InputSource::Native, key, true, false, false)
-            );
-            assert!(
-                !InputPolicy {
-                    captured: false,
-                    ..ready
-                }
-                .admits_key(InputSource::Native, key, true, false, false)
-            );
-            assert!(
-                !InputPolicy {
-                    occluded: true,
-                    ..ready
-                }
-                .admits_key(InputSource::Native, key, true, false, false)
-            );
-            s.crafting_ui.open = true;
-            dispatch_session_key(&mut s, key, true);
-            assert_eq!(s.consumables, original);
-            s.clear_held_controls();
+            dispatch_session_key(&mut session, PhysicalKey::Code(key), true);
+            dispatch_session_key(&mut session, PhysicalKey::Code(key), false);
         }
-        s.toggle_view();
-        dispatch_session_key(&mut s, PhysicalKey::Code(KeyCode::KeyM), true);
-        dispatch_session_key(&mut s, PhysicalKey::Code(KeyCode::KeyN), true);
-        assert_eq!(s.consumables, original);
-        s.toggle_view();
-        s.consumables = Default::default();
-        dispatch_session_key(&mut s, PhysicalKey::Code(KeyCode::KeyN), true);
-        assert_eq!(s.feedback, Some("No food ration available"));
-        dispatch_session_key(&mut s, PhysicalKey::Code(KeyCode::KeyM), true);
-        assert_eq!(s.feedback, Some("No medkit available"));
+        assert_eq!(session.view_mode, crate::session::ViewMode::Gameplay);
+        assert!(session.feedback.is_none());
     }
 }

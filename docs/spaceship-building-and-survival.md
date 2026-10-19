@@ -380,8 +380,8 @@ Implementation is staged through #336–#348; documentation is not playable deli
 | 1 — Products and collection | Start with medkits and food rations. Basic blueprints are unlocked by default; future advanced blueprints have unlock requirements. Select a recipe and positive quantity, then collect finished output from the physical tray. Three food slots and two medical slots are separate from equipment and physical carrying. |
 | 2 — Raw storage and reservation | One universal port accepts resource fragments. Store at most 20 kg of each material. Consume the entire inserted fragment, discard overflow, and provide no raw withdrawal. Deduct/reserve all ingredients for the requested quantity atomically at enqueue; reject insufficient materials without mutation. |
 | 3 — Work scheduling | Fixed recipe durations and continuous Core watts, one operation at a time in strict FIFO order. Blackout pauses progress without losing it; power restoration resumes. Add/cancel jobs; cancellation never refunds inputs. The single occupied output tray blocks production, including the next unit of a multi-unit request. Work continues while the player is away whenever powered. |
-| 4 — Physical interaction and UI | Wall-integrated module, universal insertion port, physical monitor and output tray. E opens its interface. Dedicated food/medical HUD slots remain separate from the five-slot equipment toolbar. M consumes a medkit; N consumes a ration. |
-| 5 — Final scope | Exactly one item per slot. M/N consume the first available matching slot, even if a future health/hunger benefit is wasted. Implement item crafting/inventory only; no healing, hunger or health effects. Design persistence boundaries but keep state in memory until the game has persistence. Crafting continues during landing, takeoff and acceleration. Count stored raw resources and physical tray output in ship mass; exclude reserved inputs and carried consumable inventory. Add real raw material identities suitable for food/medicine. Blueprints are data-driven: ingredients, time, watts, output mass/category and unlock requirements. |
+| 4 — Physical interaction and UI | Wall-integrated module, universal insertion port, physical monitor and output tray. E opens its interface. Dedicated food/medical HUD slots remain separate from the five-slot equipment toolbar. Consumable selection is owned by the hold-Q wheel (#377); M/N consumption is retired. |
+| 5 — Final scope | Exactly one item per slot. The Q wheel consumes a specific occupied slot even if a future health/hunger benefit is wasted. Implement item crafting/inventory only; no healing, hunger or health effects. Design persistence boundaries but keep state in memory until the game has persistence. Crafting continues during landing, takeoff and acceleration. Count stored raw resources and physical tray output in ship mass; exclude reserved inputs and carried consumable inventory. Add real raw material identities suitable for food/medicine. Blueprints are data-driven: ingredients, time, watts, output mass/category and unlock requirements. |
 
 ### Ownership, commands and snapshots
 
@@ -392,7 +392,7 @@ raw storage, reservation, queue/progress and its one-item output tray. It depend
 only on world resource contracts and std; never renderer, native IO or ship.
 Runtime owns proximity/aim/E gating, consuming a real world fragment exactly
 once after storage acceptance, Core energy settlement, tray-to-inventory
-transactions, M/N input, and cached ship mass updates. Ship owns electricity and
+transactions, Q-wheel input, and cached ship mass updates. Ship owns electricity and
 its mass ledger. Renderer receives observation DTOs only. Dedicated consumable
 inventory must not enlarge world carrying or equipment capacity.
 

@@ -133,3 +133,10 @@ remains visible during blackout. Monitor artwork/crafting UI are owned by #343.
 The Fabricator display occupies only atlas region 4. Cockpit regions 0–2 and
 Core region 3 retain their independent cache/UV mappings. Machine observation
 never changes recipe, queue, power or inventory authority.
+
+### Consumable HUD (#346)
+
+The bottom HUD raster reserves two distinct rows: five equipment slots and
+three food/two medical slots. Empty category markers stay visible. Amber ration
+stripes and a pale package/red cross match the existing low-poly tray styling.
+Message inset covers both rows; DPI fitting and caching use the full image.

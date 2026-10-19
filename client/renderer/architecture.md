@@ -361,3 +361,10 @@ Tray category styling (#344) uses the fourth spare ship-uniform component;
 occupied state remains the third. The single authored output submesh stays
 stationary in ship coordinates, with ration stripes or a medical cross, including
 blackout. No loose physics, extra draw call or inventory authority is added.
+
+### Consumable HUD (#346)
+
+The bottom HUD raster reserves two distinct rows: five equipment slots and
+three food/two medical slots. Empty category markers stay visible. Amber ration
+stripes and a pale package/red cross match the existing low-poly tray styling.
+Message inset covers both rows; DPI fitting and caching use the full image.

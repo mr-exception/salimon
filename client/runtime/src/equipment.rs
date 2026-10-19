@@ -56,6 +56,7 @@ impl EquipmentToolbar {
     pub(crate) fn presentation(&self) -> salimon_renderer::EquipmentToolbar {
         use salimon_renderer::{EquipmentIcon, EquipmentSlot};
         salimon_renderer::EquipmentToolbar {
+            consumables: [None; 5],
             slots: self.slots.map(|tool| {
                 tool.map(|tool| match tool {
                     EquipmentTool::MiningTool => EquipmentIcon::MiningTool,

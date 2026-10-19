@@ -378,3 +378,12 @@ Core accepts both using proposed 0.25/0.1 GJ/kg yields and the ordinary single
 intake/conversion path. ConversionConfig exposes both yields with the same
 finite/nonnegative validation. Original three yields/visual mappings are unchanged.
 CPU tests verify these contracts; native appearance is not certified by them.
+
+## Cross-process persistence update (#363–#366)
+
+Earlier in-memory-only descriptions above document the original #268 boundary.
+Normal-play runtime now persists complete world state through
+[canonical whole-game checkpoints](../../docs/save-contract.md), including sparse
+depletion and physical fragment identities. E2E/benchmark launches still begin
+isolated sessions. World itself never performs disk IO. The original
+in-session streaming tests remain distinct from native filesystem restart tests.

@@ -23,7 +23,8 @@ outbound dependencies are `salimon-character`, `salimon-ship`, `salimon-world`,
 `salimon-physics`, `salimon-renderer`, and `salimon-diagnostics`.
 
 Do not add GPU pipelines/resources, authoritative world or ship state, backend
-behavior, persistence, or networking here. Keep new platform-specific behavior
+behavior or networking here. Persistence orchestration uses the dedicated
+`checkpoints.rs` boundary. Keep new platform-specific behavior
 small in `app/native.rs`. Introduce a separate platform boundary only when a
 real second implementation requires it.
 
@@ -118,3 +119,14 @@ regressions. See [the tick contract](architecture.md#bounded-gameplay-ticks-and-
 Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
 and [world definition contract](../world/terrain-contract.md). Keep local rules
 and their consumers aligned; flat deterministic fixtures are explicit.
+
+## Durable active-run orchestration (#366)
+
+Runtime `checkpoints.rs` owns normal-play startup restore, a bounded save worker,
+60-game-second/discrete-event scheduling, persistent native-title warnings and
+verified clean-exit capture. Domain state stays on the event thread; owned bytes
+cross to the worker. `salimon-persistence::storage` owns verification and native
+filesystem durability. Startup renderer creation preserves restored clock backlog;
+E2E and benchmark launches remain isolated from user saves. See the
+[canonical save contract](../../docs/save-contract.md#durable-active-run-366)
+for paths, recovery/failure policy, Windows behavior and future lifecycle owners.

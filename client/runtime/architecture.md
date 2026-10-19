@@ -867,3 +867,14 @@ active time and selected FIFO jobs, quantities and tray/power status. It uses a
 centered, high-contrast 3x bitmap panel, wrapping long feedback at 66 characters.
 Renderer's fifth instrument-atlas section displays observational Fabricator status
 on the authored monitor. No gameplay state lives in the GPU or rasterizer.
+
+## Deliberate Fabricator output collection (#344)
+
+E targeting the separate authored tray face validates the portable consumable
+receiver before clearing one stable `(job, unit)` output. Full category leaves
+the tray, queue block and mass unchanged and reports feedback. Empty/repeated
+collection cannot duplicate inventory. The package is an existing authored ship
+submesh, never a loose world/carrying entity; it follows the presented ship pose
+and remains visible without Core power. Category selects ration stripes or a
+medical cross in its UV surface. Only occupied tray output contributes mass;
+collection removes that contribution. Reserved/queued jobs remain distinct.

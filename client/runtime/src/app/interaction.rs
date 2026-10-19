@@ -15,6 +15,9 @@ pub(crate) fn prompt_placement(
     frame: salimon_character::ShipFrame,
 ) -> salimon_renderer::OverlayPlacement {
     let (local, radius_meters) = match target {
+        InteractionTarget::FabricatorTray => {
+            (salimon_character::FABRICATOR_TRAY_MARKER_METERS, 0.15)
+        }
         InteractionTarget::FabricatorScreen => {
             (salimon_character::FABRICATOR_MONITOR_MARKER_METERS, 0.2)
         }
@@ -55,6 +58,7 @@ pub(crate) fn action_bar_context(
         .filter(|message| *message != CockpitMessage::DoorLockedWhileInFlight)
         .map(CockpitMessage::text)
         .or(match interaction {
+            Some(InteractionTarget::FabricatorTray) => Some("E to collect Fabricator tray item"),
             Some(InteractionTarget::FabricatorScreen) => Some("E to open Fabricator crafting"),
             Some(InteractionTarget::Fabricator) => {
                 Some("E to insert carried fragment into Fabricator")
@@ -235,6 +239,26 @@ mod tests {
             ),
             Some(super::COCKPIT_INTERACTION_PROMPT),
             "timed blocked feedback is owned by ActionBar, not stale ship state"
+        );
+    }
+}
+
+#[cfg(test)]
+mod tray_anchor_tests {
+    use super::*;
+    #[test]
+    fn tray_anchor_tracks_current_rotated_ship_pose() {
+        let frame = salimon_character::ShipFrame {
+            origin_meters: [1e12, 20.0, 30.0],
+            axes: [[0.0, 0.0, -1.0], [0.0, 1.0, 0.0], [1.0, 0.0, 0.0]],
+        };
+        assert_eq!(
+            prompt_placement(InteractionTarget::FabricatorTray, frame),
+            salimon_renderer::OverlayPlacement::World {
+                anchor_meters: frame
+                    .local_to_world(salimon_character::FABRICATOR_TRAY_MARKER_METERS),
+                radius_meters: 0.15
+            }
         );
     }
 }

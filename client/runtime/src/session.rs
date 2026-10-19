@@ -24,6 +24,7 @@ pub(crate) struct GameplaySession {
     pub(crate) automation_aim_delta: Option<[f64; 2]>,
     pub(crate) mining: crate::mining::ResourceGameplay,
     fabricator: salimon_fabrication::Fabricator,
+    pub(crate) consumables: salimon_fabrication::ConsumableInventory,
     pub(crate) crafting_ui: crafting_ui::CraftingUi,
     pub(crate) equipment: crate::equipment::EquipmentToolbar,
     pub(crate) movement_input: MovementInput,
@@ -69,6 +70,7 @@ impl Default for GameplaySession {
             mining: Default::default(),
             fabricator: salimon_fabrication::Fabricator::starter(),
             crafting_ui: Default::default(),
+            consumables: Default::default(),
             equipment: Default::default(),
             movement_input: Default::default(),
             ship_control_input: Default::default(),
@@ -156,6 +158,7 @@ impl GameplaySession {
                 let interaction =
                     available_interaction_target(self.character.location(), local_eye, local_look);
                 match interaction {
+                    Some(InteractionTarget::FabricatorTray) => self.collect_fabricator_output(),
                     Some(InteractionTarget::FabricatorScreen) => {
                         self.clear_held_controls();
                         self.crafting_ui.open = true;
@@ -232,6 +235,7 @@ impl GameplaySession {
         local_look: [f64; 3],
     ) -> Option<&'static str> {
         match available_interaction_target(self.character.location(), local_eye, local_look) {
+            Some(InteractionTarget::FabricatorTray) => Some("fabricator_tray"),
             Some(InteractionTarget::FabricatorScreen) => Some("fabricator_screen"),
             Some(InteractionTarget::Fabricator) => Some("fabricator"),
             Some(InteractionTarget::Core) => Some("core"),

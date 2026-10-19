@@ -59,3 +59,9 @@ must version material/recipe/job IDs, captured job parameters and state and
 validate restoration atomically, as documented in the canonical specification.
 Runtime/physical/power/UI adapters are separately tracked by #339–#347; native
 reference signoff is #348. This crate alone does not make crafting playable.
+
+`inventory.rs` provides the typed receiving slots required by deliberate tray
+collection (#344): three food and two medical, one item each. Runtime validates
+first-vacant placement before removing the tray under exclusive session ownership;
+full/unsupported/duplicate placement preserves both domains. These slots are
+independent of equipment, world fragments and ship mass. Consumption input is #345.

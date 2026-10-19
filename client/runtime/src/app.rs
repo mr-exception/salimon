@@ -601,6 +601,7 @@ impl ClientApplication {
             };
             let mut mesh = map_ship_to_renderer(presentation.ship);
             mesh.fabricator_output_present = self.session.fabricator_output_present();
+            mesh.fabricator_output_medical = self.session.fabricator_output_medical();
             mesh.instruments.fabricator = self.session.fabricator_instruments();
             Some(mesh)
         } else {

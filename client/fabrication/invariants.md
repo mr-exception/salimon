@@ -23,3 +23,6 @@
     zero. This deliberate mass exception is covered at every domain transition.
 12. Definitions/state contain no platform/GPU/clock/disk/backend or health effects.
     Unlock and future category records do not implement progression/upgrades.
+13. Consumable receiving slots are exactly three food and two medical, one item
+    each; matching first-vacant placement is atomic and rejects unsupported
+    categories, duplicate resident identities and full categories without mutation.

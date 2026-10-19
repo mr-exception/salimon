@@ -13,6 +13,7 @@ pub(crate) const COCKPIT_INTERACTION_PROMPT: &str = "Press E to use";
 pub(crate) enum InteractionTarget {
     Fabricator,
     FabricatorScreen,
+    FabricatorTray,
     Cockpit,
     Core,
     ExitDoor,
@@ -54,6 +55,12 @@ pub(crate) fn interaction_target(
     } else if machine_target(
         local_eye_position,
         local_look_target,
+        salimon_character::FABRICATOR_TRAY_MARKER_METERS,
+    ) {
+        Some(InteractionTarget::FabricatorTray)
+    } else if machine_target(
+        local_eye_position,
+        local_look_target,
         salimon_character::FABRICATOR_MONITOR_MARKER_METERS,
     ) {
         Some(InteractionTarget::FabricatorScreen)
@@ -74,7 +81,8 @@ pub(crate) fn available_interaction_target(
             InteractionTarget::Cockpit
             | InteractionTarget::Core
             | InteractionTarget::Fabricator
-            | InteractionTarget::FabricatorScreen,
+            | InteractionTarget::FabricatorScreen
+            | InteractionTarget::FabricatorTray,
         ) if location != CharacterLocation::InsideShip => None,
         target => target,
     }

@@ -111,6 +111,38 @@ impl GameplaySession {
     }
 }
 
+impl GameplaySession {
+    pub(crate) fn fabricator_output_medical(&self) -> bool {
+        self.fabricator
+            .snapshot(self.ship.snapshot().power_available)
+            .tray
+            .is_some_and(|item| item.category == salimon_fabrication::OutputCategory::Medical)
+    }
+
+    pub(super) fn collect_fabricator_output(&mut self) {
+        let Some(item) = self
+            .fabricator
+            .snapshot(self.ship.snapshot().power_available)
+            .tray
+        else {
+            self.feedback = Some("Fabricator tray is empty");
+            return;
+        };
+        match self.consumables.insert(item) {
+            Ok(_) => {
+                // Exclusive session ownership: tray cannot change after slot acceptance.
+                self.execute_fabricator(salimon_fabrication::FabricationCommand::Collect)
+                    .expect("validated occupied tray in single-owner collection transaction");
+                self.feedback = Some("Fabricator item collected");
+            }
+            Err(salimon_fabrication::InventoryError::Full) => {
+                self.feedback = Some("Matching consumable slots are full; item stays on tray")
+            }
+            Err(_) => self.feedback = Some("Cannot collect this output category"),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -441,5 +473,118 @@ mod mass_tests {
             .is_err()
         );
         assert_eq!(mass(&s), before);
+    }
+}
+
+#[cfg(test)]
+mod tray_tests {
+    use super::*;
+    use salimon_fabrication::{FabricationCommand as C, OutputCategory, RecipeId};
+    use salimon_world::resources::{RESOURCE_CATALOG, RawMaterial};
+    use std::time::Duration;
+
+    fn loaded() -> GameplaySession {
+        let mut s = GameplaySession::default();
+        for r in RESOURCE_CATALOG {
+            s.execute_fabricator(C::Insert(RawMaterial::new(r.id, 5.0).unwrap()))
+                .unwrap();
+        }
+        s
+    }
+    #[test]
+    fn anchored_output_blocks_queue_survives_blackout_and_collects_once_into_matching_slots() {
+        for (recipe, seconds, capacity, category) in [
+            ("food-ration", 10, 3, OutputCategory::Food),
+            ("medkit", 15, 2, OutputCategory::Medical),
+        ] {
+            let mut s = loaded();
+            let fragments = s.mining.session.fragments().len();
+            let held = s.mining.session.carried_id();
+            s.execute_fabricator(C::Enqueue {
+                recipe: RecipeId::new(recipe).unwrap(),
+                quantity: capacity + 1,
+            })
+            .unwrap();
+            for index in 0..=capacity {
+                s.advance_fabrication(Duration::from_secs(seconds));
+                let output = s.fabricator.snapshot(true).tray.unwrap();
+                assert_eq!(output.category, category);
+                assert_eq!(output.unit, index + 1);
+                assert_eq!(
+                    s.fabricator_output_medical(),
+                    category == OutputCategory::Medical
+                );
+                let blocked = s.fabricator.clone();
+                s.ship.set_stored_core_energy_joules(0);
+                s.advance_fabrication(Duration::from_secs(100));
+                assert_eq!(s.fabricator, blocked);
+                assert_eq!(s.ship.snapshot().core_status.fabricator_watts, 0.0);
+                let before = s.ship.snapshot().total_mass_kg;
+                s.collect_fabricator_output();
+                if index == capacity {
+                    assert_eq!(s.fabricator, blocked);
+                    assert_eq!(s.ship.snapshot().total_mass_kg, before);
+                    assert!(s.feedback.unwrap().contains("full"));
+                } else {
+                    assert!(!s.fabricator_output_present());
+                    assert_eq!(s.ship.snapshot().total_mass_kg, before - output.mass.kg());
+                    let inventory = s.consumables.clone();
+                    s.collect_fabricator_output();
+                    assert_eq!(s.consumables, inventory);
+                    assert!(!s.fabricator_output_present());
+                }
+                s.ship.set_stored_core_energy_joules(10_000_000);
+            }
+            assert_eq!(s.mining.session.fragments().len(), fragments);
+            assert_eq!(s.mining.session.carried_id(), held);
+            assert_eq!(
+                s.consumables.food().iter().flatten().count(),
+                if category == OutputCategory::Food {
+                    3
+                } else {
+                    0
+                }
+            );
+            assert_eq!(
+                s.consumables.medical().iter().flatten().count(),
+                if category == OutputCategory::Medical {
+                    2
+                } else {
+                    0
+                }
+            );
+        }
+    }
+    #[test]
+    fn tray_prompt_tracks_ship_pose_and_obeys_front_range_interior_and_cabin_solids() {
+        use crate::session::interaction::{InteractionTarget, available_interaction_target};
+        let target = salimon_character::FABRICATOR_TRAY_MARKER_METERS;
+        let eye = [-2.55, 1.65, 2.0];
+        let frame = salimon_character::ShipFrame {
+            origin_meters: [1e12, 30.0, 1e10],
+            axes: [[0.0, 0.0, -1.0], [0.0, 1.0, 0.0], [1.0, 0.0, 0.0]],
+        };
+        assert_eq!(
+            available_interaction_target(
+                salimon_character::CharacterLocation::InsideShip,
+                frame.world_to_local(frame.local_to_world(eye)),
+                frame.world_to_local(frame.local_to_world(target))
+            ),
+            Some(InteractionTarget::FabricatorTray)
+        );
+        for invalid in [[-2.55, 1.65, 0.0], [-2.55, 1.65, 4.5], [1.0, 1.65, 1.0]] {
+            assert_ne!(
+                available_interaction_target(
+                    salimon_character::CharacterLocation::InsideShip,
+                    invalid,
+                    target
+                ),
+                Some(InteractionTarget::FabricatorTray)
+            );
+        }
+        assert_eq!(
+            available_interaction_target(salimon_character::CharacterLocation::Space, eye, target),
+            None
+        );
     }
 }

@@ -77,3 +77,14 @@ be migrated together. World owns analytic fragment radius/diameter.
 ## Fabricator wave (#336–#348)
 
 Canonical behavior and planned typed ownership: [accepted Fabricator contracts](spaceship-building-and-survival.md#accepted-fabricator-contracts-2026-10-19-336). World owns raw identities/generation; fabrication owns recipes/storage/queue/tray and typed consumable slots; runtime owns physical transactions, Core funding, UI/input, inventory transfer and mass adapters. #338 implements the [portable crate](../client/fabrication/architecture.md); later issues integrate it.
+
+## Fabricator session verification (#347)
+
+`session/fabrication.rs` owns intake, Core funding, tray transactions and mass;
+`automation.rs` maps read-only machine/jobs/tray and both typed slot arrays into
+inspection and admits `crafting` actions only while the production modal is open.
+`fabrication_scenarios.rs` covers mined new resources through the same intake,
+FIFO, output and receiver adapters. Existing fabrication domain and session tests
+cover overflow/rejected intake, mixed batches, nonrefundable cancel, blackout,
+blocked tray, mass, flight and takeoff. `scenarios/fabricator-contract.json`
+protects initial snapshot/closed-modal admission. Q consumption coverage is #377.

@@ -587,3 +587,7 @@ impl GameplaySession {
         }
     }
 }
+
+#[cfg(test)]
+#[path = "fabrication_scenarios.rs"]
+mod fabrication_scenarios;

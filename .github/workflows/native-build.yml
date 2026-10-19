@@ -31,3 +31,5 @@ jobs:
           sudo apt-get install -y --no-install-recommends build-essential pkg-config libxkbcommon-dev libwayland-dev
       - name: Compile workspace
         run: cargo build --workspace --locked
+      - name: Portable workspace unit and session E2E contracts
+        run: cargo test --workspace --locked

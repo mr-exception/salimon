@@ -261,3 +261,11 @@ reads never step or mutate crafting. Add/cancel use atomic domain commands.
 Runtime maps the existing three food and two medical slots into a separate
 renderer DTO row. Equipment selection remains keys 1–5. M/N do not consume
 items in gameplay; #377 owns Q-wheel selection. No vitals effect is introduced.
+
+### Fabricator automation (#347)
+
+Inspection exposes stable ordered raw bins/jobs, tray identity and the existing
+3/2 inventory slots without advancing simulation. `crafting` actions invoke only
+the same open-modal action handler as native input; they cannot insert free
+resources, open a remote machine or bypass transactional validation. Portable
+session regressions run in PR CI; graphical and native signoff remain separate.

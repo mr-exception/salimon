@@ -11,8 +11,9 @@ Use Python 3.12 for tooling checks. Initial installation/builds require network 
 [Source build](../.github/workflows/native-build.yml) runs one Ubuntu 24.04 job
 on pull requests, main pushes and manual dispatch: `cargo build --workspace --locked`
 in the debug profile. It uses Cargo caching, a 15-minute timeout and cancels
-superseded runs for the same PR/branch. This source-build workflow does not run the validation matrix
-below, stage executables, build release profiles or upload artifacts.
+superseded runs for the same PR/branch. The same cached Ubuntu job also runs `cargo test --workspace --locked`, including
+portable session E2E contracts (#347). Graphical suites remain periodic. It does
+not stage executables, build release profiles or upload artifacts.
 
 The separate [Periodic verification workflow](periodic-ci.md) runs Linux tests,
 model processing and graphical/smoke checks nightly, with CPU benchmarks and

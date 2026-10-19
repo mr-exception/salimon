@@ -345,3 +345,6 @@ world simulation or multi-save UI is implied.
 Portable meter/active-clock/offline-fatigue authority lives in
 [`salimon-survival`](../client/survival/architecture.md). Native/session persistence
 integration is #371; the current playable session does not yet advance survival.
+
+Damage, regeneration, treatment-only wound debt and data-driven timed/persistent/
+exposure status effects (#368) use the survival crate's [single pipeline](../client/survival/architecture.md#damage-and-status-pipeline-368).

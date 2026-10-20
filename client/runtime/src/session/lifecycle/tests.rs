@@ -141,7 +141,7 @@ fn fresh_restart_rebuilds_state_and_monotonic_run_identity_without_reusing_old_i
     assert!(!fresh.movement_input.forward);
     assert_eq!(fresh.survival.snapshot().health, Points::FULL);
     assert!(fresh.mining.session.fragments().is_empty());
-    assert_eq!(fresh.consumables, Default::default());
+    assert_eq!(fresh.consumables, GameplaySession::new_run().consumables);
     assert_eq!(s.ended_run_bytes().unwrap(), s.ended_run_bytes().unwrap());
 }
 

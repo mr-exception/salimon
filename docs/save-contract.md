@@ -132,9 +132,9 @@ The native Journey Ended screen (#374) displays the typed archived report and a
 single Restart Game action. An initial focused Enter/numpad Enter/R press or left
 click on the button requests the same verified restart transaction. Repeats,
 synthetic replay and living runs cannot restart through this path. Runtime prepares a fresh
-deterministic Earth world, clears all old objects/inventory/jobs/effects/inputs,
+deterministic Earth world, clears all old objects/inventory/jobs/effects/inputs, then grants new-run supplies,
 starts meters at 100 and increments the saved run serial. Terrain mode and world
-seed retain their deterministic new-run policy. New-run starter supplies are #379.
+seed retain their deterministic new-run policy. New-run supplies follow the [#379 contract](#starting-supplies-379).
 
 The existing save worker first checkpoints the terminal run into both slots,
 then durably publishes an immutable idempotent `journeys/v2/run-<serial>.json` summary,
@@ -160,9 +160,8 @@ Archive failure leaves verified terminal generations and retries through the sam
 visible failure policy. Report version 2 includes final named location and samples.
 
 #375 owns expanded cross-system suites and #376 native reference signoff; #381
-owns a true pause menu and #382 manual Save Now controls. This change activates
-survival before the final HUD/Q-wheel/starter-supply wave (#373/#377/#379); native
-consumption UI is not claimed delivered by the lifecycle PR.
+owns a true pause menu and #382 manual Save Now controls. Survival, HUD, Journey Ended and starting supplies are implemented through
+#371/#373/#374/#379; native Q-wheel consumption UI remains #377.
 
 
 ## Journey statistics (#372)
@@ -238,3 +237,30 @@ the normal terminal image exactly fits that margin so it is not further scaled.
 RGBA allocation is bounded at 64 MiB: very large surfaces retain a centered card
 without allocating an unbounded backdrop. Normal resize/DPI/aspect layouts remain
 centered and cached. Native OS-input/Metal validation remains #376.
+
+## Starting supplies (#379)
+
+Normal play constructs `GameplaySession::new_run` before the verified first
+checkpoint; terminal restart uses the same constructor before its existing
+archive/two-generation publication transaction. It grants two basic rations in
+food slots one/two, one medkit in medical slot one, and the exact integer recipe
+ingredients for one additional ration in Fabricator reserves. The fabrication
+owner derives item mass/category and reserve quantities from its validated
+starter recipes. Initial grants consume no game time, Core energy or ingredients;
+they are new-run endowments, not completed player crafting operations.
+
+The two rations use `(job 1, units 1/2)` and the medkit `(job 2, unit 1)`;
+subsequent player jobs start at 3. These are ordinary typed output identities,
+persisted with the existing allocator high-water mark and cross-owner validation.
+No parallel inventory, seed flag, recipe unlock or save-schema change is added.
+Stored reserves contribute 0.5 kg at current recipe tuning; inventory contributes
+zero under the existing collected-consumable mass exception. Enqueue, output and
+collection retain ordinary ingredient/power/tray/mass rules.
+
+Restore replaces inventories/reserves exactly, including vacancies and old saves
+with no supplies. It never calls the grant constructor. Loading, offline recovery,
+ship entry, focus/cursor release, resume and renderer reconstruction cannot grant
+items. Restart candidates contain one grant; publication failures retain terminal
+authority and retries rebuild that same candidate rather than appending supplies.
+Isolated engineering/E2E/benchmark fixtures keep their explicitly empty `Default`
+starting state; portable new-run E2E tests opt into the production constructor.

@@ -1102,3 +1102,13 @@ exposes `journey_ended` report text; `restart` is a native-host operation and do
 not add a diskless portable-session bypass. E2E hosts without verified storage
 report failure instead of pretending to restart. #375 owns broader scenario/save
 DSL and expansion verification; #376 owns native OS/Metal visual acceptance.
+
+## New-run initialization (#379)
+
+`GameplaySession::new_run` composes fabrication-owned starter inventory/reserves
+and reconciles ship mass immediately. Normal-play startup and the existing
+verified restart candidate use it; `Default` remains empty for restore and
+isolated fixtures. `restore_bytes` replaces complete owners and never grants
+supplies. The [canonical contract](../../docs/save-contract.md#starting-supplies-379)
+records identities, publication and conservation. Portable E2E coverage lives in
+`session/starting_supplies_tests.rs`, including real disk launch/restart/reload.

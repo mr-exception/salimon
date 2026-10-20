@@ -43,7 +43,7 @@ defines in-session restoration and the proposed #236 scope clarification awaitin
 owner approval; normal play restores its active run, while E2E/benchmarks start isolated sessions. No orbital simulation,
 multiplayer is implemented. Survival meters/status/recovery, active clocks,
 whole-game persistence and terminal/restart lifecycle are implemented through
-#371; final HUD, native Q consumption and starter supplies remain #373/#377/#379.
+#371; HUD, Journey Ended and starter supplies are implemented by #373/#374/#379; native Q consumption remains #377.
 Core joule storage, watt consumers and power authority are implemented; assist reservations are implemented; physical Core intake/conversion and a distinct Core-local status display are implemented.
 
 ## Accepted constraints

@@ -23,3 +23,8 @@ Maintain the root task report and affected guides with behavior changes.
 #377's wheel draft. Prefer exact identity selection for new consumers. The runtime
 survival adapter owns effects and transaction preparation; keep this crate free
 of health/hunger and input/focus policy.
+
+#379 adds the explicit `Fabricator::starter_with_supplies` constructor, deriving
+initial outputs/reserves from starter recipes and reserving their identities.
+It is never a restore repair or recurring inventory refill. See the
+[canonical supply contract](../../docs/save-contract.md#starting-supplies-379).

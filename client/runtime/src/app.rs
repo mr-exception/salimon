@@ -67,6 +67,7 @@ fn run_config(
 
     let mut application = ClientApplication::default();
     if config.is_none() && benchmark.is_none() {
+        application.session = crate::session::GameplaySession::new_run();
         let earth = *salimon_world::CELESTIAL_BODIES
             .iter()
             .find(|b| b.id == salimon_world::CelestialBodyId::Earth)

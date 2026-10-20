@@ -1,0 +1,69 @@
+{
+  "migrationCommit": "db534caf08cfe3c133d3dce06f9cb6532b4f1247",
+  "beforeMigration": "b926083cdaf44047cd669e7767c755d7ebb42616",
+  "cleanupCommit": "9b0a24526e2da337efdac2beb31c525e7fbb27d1",
+  "beforeCleanup": "7e8946ee75d7f9be1158118109b26d47f96445ec",
+  "currentAliasManifestExists": false,
+  "mappings": [
+    {
+      "historicalAlias": {
+        "removed": "issue-29/failure.png",
+        "retained": "issue-29/landed-cabin.png",
+        "sha256": "dd9387150c216de7176d46b23475f73978b3250a3ff08f0cde192af8c9dc1baf"
+      },
+      "beforeDeduplication": [
+        {
+          "role": "removed",
+          "path": "docs/issue-29/failure.png",
+          "revision": "b926083cdaf44047cd669e7767c755d7ebb42616",
+          "sha256": "dd9387150c216de7176d46b23475f73978b3250a3ff08f0cde192af8c9dc1baf",
+          "bytes": 41129
+        },
+        {
+          "role": "retained",
+          "path": "docs/issue-29/landed-cabin.png",
+          "revision": "b926083cdaf44047cd669e7767c755d7ebb42616",
+          "sha256": "dd9387150c216de7176d46b23475f73978b3250a3ff08f0cde192af8c9dc1baf",
+          "bytes": 41129
+        }
+      ],
+      "retainedBeforeCleanup": {
+        "path": "reports/issue-29/landed-cabin.png",
+        "revision": "7e8946ee75d7f9be1158118109b26d47f96445ec",
+        "sha256": "dd9387150c216de7176d46b23475f73978b3250a3ff08f0cde192af8c9dc1baf",
+        "bytes": 41129
+      },
+      "currentTargetExists": false
+    },
+    {
+      "historicalAlias": {
+        "removed": "issue-34/step-018-cargo-route-cockpit-17.png",
+        "retained": "issue-34/step-123-cargo-route-cockpit-120.png",
+        "sha256": "d573ff63d1a2eea55266b1f7417ee0945743ff619bd8ec9a9c6c3afe409cee1f"
+      },
+      "beforeDeduplication": [
+        {
+          "role": "removed",
+          "path": "docs/issue-34/step-018-cargo-route-cockpit-17.png",
+          "revision": "b926083cdaf44047cd669e7767c755d7ebb42616",
+          "sha256": "d573ff63d1a2eea55266b1f7417ee0945743ff619bd8ec9a9c6c3afe409cee1f",
+          "bytes": 51327
+        },
+        {
+          "role": "retained",
+          "path": "docs/issue-34/step-123-cargo-route-cockpit-120.png",
+          "revision": "b926083cdaf44047cd669e7767c755d7ebb42616",
+          "sha256": "d573ff63d1a2eea55266b1f7417ee0945743ff619bd8ec9a9c6c3afe409cee1f",
+          "bytes": 51327
+        }
+      ],
+      "retainedBeforeCleanup": {
+        "path": "reports/issue-34/step-123-cargo-route-cockpit-120.png",
+        "revision": "7e8946ee75d7f9be1158118109b26d47f96445ec",
+        "sha256": "d573ff63d1a2eea55266b1f7417ee0945743ff619bd8ec9a9c6c3afe409cee1f",
+        "bytes": 51327
+      },
+      "currentTargetExists": false
+    }
+  ]
+}

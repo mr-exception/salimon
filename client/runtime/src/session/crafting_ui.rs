@@ -24,7 +24,7 @@ pub(crate) struct CraftingUi {
 
 impl GameplaySession {
     pub(super) fn validate_crafting_focus(&mut self) {
-        if !self.crafting_ui.open {
+        if self.is_paused() || !self.crafting_ui.open {
             return;
         }
         let snapshot = self.snapshot();
@@ -39,7 +39,7 @@ impl GameplaySession {
     }
 
     pub(crate) fn crafting_action(&mut self, key: CraftingAction) {
-        if !self.crafting_ui.open {
+        if self.is_paused() || !self.crafting_ui.open {
             return;
         }
         // Close and navigation remain safe menu actions. Mutation uses authority.
@@ -130,7 +130,7 @@ impl GameplaySession {
     }
 
     pub(crate) fn crafting_text(&self) -> Option<String> {
-        if !self.crafting_ui.open {
+        if self.is_paused() || !self.crafting_ui.open {
             return None;
         }
         let s = self

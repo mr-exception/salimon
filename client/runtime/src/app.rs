@@ -67,6 +67,7 @@ fn run_config(
 
     let mut application = ClientApplication::default();
     if config.is_none() && benchmark.is_none() {
+        application.condition_feedback = crate::condition_feedback::Presenter::open();
         application.session = crate::session::GameplaySession::new_run();
         let earth = *salimon_world::CELESTIAL_BODIES
             .iter()
@@ -159,6 +160,7 @@ pub(crate) struct ClientApplication {
     retry_at: Option<Instant>,
     pub(crate) survival_hud: crate::survival_hud::Hud,
     journey_ended: crate::journey_ended::Screen,
+    condition_feedback: crate::condition_feedback::Presenter,
     occluded: bool,
     failure: Option<String>,
 }
@@ -188,6 +190,7 @@ impl Default for ClientApplication {
             retry_at: None,
             survival_hud: Default::default(),
             journey_ended: Default::default(),
+            condition_feedback: Default::default(),
             occluded: false,
             failure: None,
         }
@@ -484,6 +487,54 @@ impl ClientApplication {
             }
             return;
         }
+        let pause_key = self.session.view_mode == ViewMode::Gameplay
+            && (key == PhysicalKey::Code(KeyCode::Escape)
+                || (self.session.is_paused()
+                    && matches!(
+                        key,
+                        PhysicalKey::Code(KeyCode::Enter | KeyCode::NumpadEnter)
+                    )));
+        if self.session.is_paused()
+            && pressed
+            && !repeat
+            && !synthetic
+            && self.input_policy().admits_press(source, true)
+        {
+            match key {
+                PhysicalKey::Code(KeyCode::KeyS) => {
+                    self.condition_feedback.settings_open = !self.condition_feedback.settings_open
+                }
+                PhysicalKey::Code(KeyCode::KeyC) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(0)
+                }
+                PhysicalKey::Code(KeyCode::KeyA) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(1)
+                }
+                PhysicalKey::Code(KeyCode::KeyV) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(2)
+                }
+                _ => {}
+            }
+        }
+        if pause_key {
+            if pressed && !repeat && !synthetic && self.input_policy().admits_press(source, true) {
+                self.session.command(crate::session::Command::TogglePause);
+                self.condition_feedback.settings_open = false;
+                self.survival_hud.close_details();
+                self.cursor_captured = false;
+                if let Some(window) = &self.window {
+                    if self.session.is_paused() {
+                        release_cursor(window);
+                    } else {
+                        self.cursor_captured = capture_cursor(window);
+                    }
+                }
+            }
+            return;
+        }
+        if self.session.is_paused() {
+            return;
+        }
         if !self
             .input_policy()
             .admits_key(source, key, pressed, repeat, synthetic)
@@ -544,7 +595,7 @@ impl ClientApplication {
 
     fn advance_native(&mut self, elapsed: Duration) -> (Duration, usize) {
         let started = Instant::now();
-        if self.session.survival.snapshot().terminal {
+        if self.session.is_paused() || self.session.survival.snapshot().terminal {
             self.session.update_clock.reset();
         } else {
             self.session.update_clock.accumulate(elapsed);
@@ -577,6 +628,12 @@ impl ClientApplication {
                 lifecycle_excluded: self.session.update_clock.lifecycle_excluded(),
             };
         }
+        self.condition_feedback
+            .update(crate::condition_feedback::Observation::capture(
+                &self.session,
+                self.native_focused,
+                self.occluded,
+            ));
         if let Some(checkpoints) = &mut self.checkpoints {
             checkpoints.poll(&self.session);
         }
@@ -738,6 +795,7 @@ impl ClientApplication {
                 vertical_fov_radians: 70.0_f32.to_radians(),
                 near_plane_meters: 0.05,
             };
+            self.condition_feedback.camera(&mut camera);
             let mut mesh = map_ship_to_renderer(presentation.ship);
             mesh.fabricator_output_present = self.session.fabricator_output_present();
             mesh.fabricator_output_medical = self.session.fabricator_output_medical();
@@ -819,7 +877,13 @@ impl ClientApplication {
             [window.inner_size().width, window.inner_size().height],
             window.scale_factor(),
         );
-        let crafting_text = self.session.crafting_text();
+        let crafting_text = if self.session.is_paused() && self.condition_feedback.settings_open {
+            Some(self.condition_feedback.menu_text())
+        } else {
+            self.session
+                .pause_text()
+                .or_else(|| self.session.crafting_text())
+        };
         let crafting_pixels = crafting_text
             .as_ref()
             .map(|text| crate::action_bar::rasterize_action_bar(text, 3));
@@ -865,7 +929,11 @@ impl ClientApplication {
         };
         let action_bar_image = self
             .action_bar
-            .image(self.session.view_mode == ViewMode::Gameplay && !terminal)
+            .image(
+                self.session.view_mode == ViewMode::Gameplay
+                    && !terminal
+                    && !self.session.is_paused(),
+            )
             .map(|image| RendererOverlayImage {
                 width: image.width,
                 height: image.height,
@@ -899,14 +967,19 @@ impl ClientApplication {
                     ship: ship_mesh,
                     held_item,
                 },
+                self.condition_feedback.image(),
                 overlay_image,
                 action_bar_image,
                 crate::reticle::image(
-                    self.session.view_mode == ViewMode::Gameplay && !terminal,
+                    self.session.view_mode == ViewMode::Gameplay
+                        && !terminal
+                        && !self.session.is_paused(),
                     &self.session.equipment,
                 ),
-                (self.session.view_mode == ViewMode::Gameplay && !terminal)
-                    .then(|| self.session.equipment_presentation()),
+                (self.session.view_mode == ViewMode::Gameplay
+                    && !terminal
+                    && !self.session.is_paused())
+                .then(|| self.session.equipment_presentation()),
                 window.scale_factor(),
                 || window.pre_present_notify(),
             ) {
@@ -1211,7 +1284,7 @@ impl ApplicationHandler for ClientApplication {
                     return;
                 }
                 if focused {
-                    if self.session.survival.snapshot().terminal {
+                    if self.session.is_paused() || self.session.survival.snapshot().terminal {
                         // Focus may have been lost before death. The capture
                         // flag is already clear then, but the OS cursor still
                         // needs explicit restoration for the restart button.
@@ -1260,6 +1333,7 @@ impl ApplicationHandler for ClientApplication {
             } if !self.cursor_captured
                 && self.native_focused
                 && !self.occluded
+                && !self.session.is_paused()
                 && !self.session.survival.snapshot().terminal =>
             {
                 self.cursor_captured = capture_cursor(&window);
@@ -1269,7 +1343,9 @@ impl ApplicationHandler for ClientApplication {
                 is_synthetic,
                 ..
             } if !is_synthetic
-                && release_cursor_pressed(event.state, event.repeat, event.physical_key) =>
+                && release_cursor_pressed(event.state, event.repeat, event.physical_key)
+                && (event.physical_key == PhysicalKey::Code(KeyCode::F1)
+                    || self.session.view_mode != ViewMode::Gameplay) =>
             {
                 release_cursor(&window);
                 self.release_input_capture();

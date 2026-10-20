@@ -33,12 +33,12 @@ fn pilot() -> ClientApplication {
 }
 
 #[test]
-fn escape_then_w_e_l_and_throttle_do_not_mutate_gameplay_until_recapture() {
+fn cursor_release_then_w_e_l_and_throttle_do_not_mutate_gameplay_until_recapture() {
     let mut app = pilot();
     native(&mut app, KeyCode::KeyW, true);
     native(&mut app, KeyCode::ArrowUp, true);
     app.session.advance_game(Duration::from_millis(16));
-    app.release_input_capture(); // Same reset invoked by real initial Escape.
+    app.release_input_capture(); // Same reset invoked by F1 cursor release.
     let before = app.session.ship.snapshot();
     for key in [
         KeyCode::KeyW,
@@ -377,4 +377,46 @@ fn journey_ended_terminal_relaunch_and_missing_storage_never_grant_unverified_ga
     assert!(app.session.survival.snapshot().terminal);
     drop(app);
     std::fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn pause_native_background_focus_and_protocol_share_freeze() {
+    let mut app = pilot();
+    native(&mut app, KeyCode::KeyW, true);
+    native(&mut app, KeyCode::ArrowUp, true);
+    native(&mut app, KeyCode::Escape, true);
+    assert!(app.session.is_paused());
+    let throttle = app.session.ship.snapshot().thruster_percentage;
+    let frozen = app.session.save_bytes(123).unwrap();
+    for key in [
+        KeyCode::KeyW,
+        KeyCode::KeyL,
+        KeyCode::F2,
+        KeyCode::KeyP,
+        KeyCode::KeyE,
+    ] {
+        native(&mut app, key, true);
+    }
+    assert_eq!(
+        app.advance_native(Duration::from_secs(7200)),
+        (Duration::ZERO, 0)
+    );
+    app.set_input_focus(false);
+    app.reset_update_clock();
+    app.set_input_focus(true);
+    assert!(app.session.is_paused());
+    assert_eq!(app.session.save_bytes(123).unwrap(), frozen);
+    // A focus-generated Escape must never resume.
+    app.dispatch_key(
+        PhysicalKey::Code(KeyCode::Escape),
+        true,
+        false,
+        true,
+        InputSource::Native,
+    );
+    assert!(app.session.is_paused());
+    native(&mut app, KeyCode::Enter, true);
+    assert!(!app.session.is_paused());
+    assert_eq!(app.session.ship.snapshot().thruster_percentage, throttle);
+    assert_eq!(app.session.ship_control_input, ShipControlInput::default());
 }

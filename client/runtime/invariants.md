@@ -370,3 +370,48 @@ fresh generations before resetting host presentation/input. See the
   spent items/ingredients and old empty saves; focus, resume and ship entry never
   replenish. Reserve mass is reconciled before observation; inventory retains
   its existing deliberate zero ship-mass contribution.
+
+
+## Gameplay pause (#381)
+
+Escape in gameplay opens the pause menu and releases the cursor. Enter or Escape
+resumes; F1 explicitly releases the cursor without pausing. P/R/N camera commands
+belong only to the F2 precision tour. Pausing closes crafting/status overlays and
+clears held movement, steering, throttle keys and mining. Requested ship throttle
+is preserved. Full simulation, Core, fabrication, loose cargo, survival effects,
+journey accounting and autosave game-time intervals freeze at the session boundary.
+UI/rendering and checkpoint IO continue. The transient pause flag is not saved.
+Both native/background and portable automation tick paths exclude paused elapsed
+time and clear pending backlog on entry/resume; focus/minimize/suspend cannot
+resume a paused session or credit offline fatigue. Resume requires fresh controls.
+The pause menu takes priority over diagnostics, HUD, reticle and equipment.
+Save Now/Save & Exit remain the separate #382 feature; Q-wheel input must respect
+`GameplaySession::is_paused()` and the shared consumption gate.
+
+
+## Optional condition presentation (#383)
+
+`condition_feedback.rs` samples immutable survival snapshots. Health <25 gives a
+faint edge vignette and a finite two-beat cue; hunger <20 gives one warning (the
+existing survival HUD owns its pulse); fatigue <20 gives a quiet breathing cue
+and walking-only camera roll, capped at 0.003 radians at zero fatigue. The center
+aim ray and all authority remain unchanged. Three-point hysteresis rearms cues;
+there is no endless sound loop. Exponential fades use active time. Pause, crafting,
+tour, terminal, unfocused and occluded presentation suppress effects immediately.
+The renderer stretches a cached 128x128 generic image before HUDs, preserving
+center readability. No postprocessing or gameplay-domain dependency is added.
+
+Pause -> S opens keyboard accessibility: C camera motion, A condition audio, V
+vignette; S returns and Enter/Escape resumes. Version-1 preferences live in
+`settings.json` beside the active-run directory (or `SALIMON_SETTINGS_FILE`) and
+survive restart/new runs. Save errors stay visible; corrupt/unknown settings use
+defaults with a warning. Settings do not enter run checkpoints.
+
+`condition_feedback/audio.rs` synthesizes original quiet one-second PCM WAV cues
+(22050 Hz mono, 16-bit, peak <=1500) beside the settings file. No third-party
+samples/licenses or Cargo/native audio link dependency. Playback uses macOS
+`afplay`, Windows PowerShell SoundPlayer, or optional Linux `paplay`/`aplay`. A
+bounded queue and one child process are polled without blocking the frame; menu
+suppression kills/reaps playback. Missing/failed players log an explicit warning;
+missing players also show an accessibility warning. Actual OS playback and sensory
+quality/performance require reference-device verification (#376).

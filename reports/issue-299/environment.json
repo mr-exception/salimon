@@ -1,0 +1,19 @@
+{
+  "checked": "2026-10-20",
+  "source_revision": "4d8faf8f108ebf046690b55f2e71d31bbc2e571b",
+  "machine": "Apple M1 iMac21,1",
+  "cpu_cores": 8,
+  "gpu_cores": 8,
+  "memory_gib": 16,
+  "os": "macOS 26.2 (25C56)",
+  "backend": "Metal",
+  "viewport_pixels": [
+    1280,
+    800
+  ],
+  "scale_factor": 2.0,
+  "displays": "built-in Retina 4480x2520; external 1920x1080 at75Hz",
+  "power": "AC-powered iMac; no thermal logging",
+  "python": "Python 3.14.2",
+  "rust": "rustc 1.89.0 (29483883e 2025-08-04)"
+}

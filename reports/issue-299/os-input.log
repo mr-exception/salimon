@@ -1,0 +1,8 @@
+initial {"thruster_percentage": 50, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 100.0, "flight_state": "Flying", "power_available": false}
+zero-g-space-released {"thruster_percentage": 50, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 100.0, "flight_state": "Flying", "power_available": false}
+zero-g-coast {"thruster_percentage": 50, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 100.0, "flight_state": "Flying", "power_available": false}
+native-core-intake {"thruster_percentage": 50, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 104.15999999999991, "flight_state": "Flying", "power_available": true}
+conversion-restored-power {"thruster_percentage": 50, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 123.6799999999995, "flight_state": "Flying", "power_available": true}
+converted {"thruster_percentage": 50, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 317.27999999999537, "flight_state": "Flying", "power_available": true}
+final {"thruster_percentage": 50, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 320.7999999999953, "flight_state": "Flying", "power_available": true}
+ARTIFACTS /Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/native-20261020/299/os-current/run-7l0uy9b_

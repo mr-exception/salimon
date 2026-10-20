@@ -15,6 +15,7 @@ mod flight_regression;
 mod fragment_costs;
 mod fragment_physics;
 mod frame_clock;
+mod journey_ended;
 mod mining;
 #[cfg(test)]
 mod mining_emission;

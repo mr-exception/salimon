@@ -36,11 +36,11 @@ pub(crate) struct EndedRun {
     schema_version: u32,
     serial: u64,
     seed: u64,
-    active_duration: Duration,
-    cause: salimon_survival::effects::Source,
+    pub(crate) active_duration: Duration,
+    pub(crate) cause: salimon_survival::effects::Source,
     position_meters: [f64; 3],
-    journey: JourneyState,
-    final_location: super::journey::NamedLocation,
+    pub(crate) journey: JourneyState,
+    pub(crate) final_location: super::journey::NamedLocation,
 }
 impl GameplaySession {
     pub(super) fn freeze_terminal(&mut self) {
@@ -50,12 +50,16 @@ impl GameplaySession {
         self.reset_presentation();
     }
     pub(crate) fn ended_run_bytes(&self) -> Result<Vec<u8>, SaveError> {
+        serde_json::to_vec(&self.ended_run()?).map_err(|e| SaveError::Encoding(e.to_string()))
+    }
+    /// One typed report is shared by native presentation and durable archives.
+    pub(crate) fn ended_run(&self) -> Result<EndedRun, SaveError> {
         self.run.validate()?;
         let snapshot = self.survival.snapshot();
         if !snapshot.terminal {
             return Err(invalid("cannot archive a living run"));
         }
-        let report = EndedRun {
+        Ok(EndedRun {
             schema_version: ARCHIVE_VERSION,
             serial: self.run.serial,
             seed: self.seed,
@@ -68,8 +72,7 @@ impl GameplaySession {
             final_location: super::journey::NamedLocation::at(
                 self.snapshot().character.eye_position_meters,
             ),
-        };
-        serde_json::to_vec(&report).map_err(|e| SaveError::Encoding(e.to_string()))
+        })
     }
     /// Build without publishing. The host archives/checkpoints before replacing self.
     pub(crate) fn fresh_after_death(&self) -> Result<Self, SaveError> {

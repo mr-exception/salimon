@@ -9,6 +9,21 @@ pub(super) fn release_cursor_pressed(state: ElementState, repeat: bool, key: Phy
     state == ElementState::Pressed && !repeat && key == PhysicalKey::Code(KeyCode::Escape)
 }
 
+pub(super) fn terminal_restart_pressed(
+    state: ElementState,
+    repeat: bool,
+    synthetic: bool,
+    key: PhysicalKey,
+) -> bool {
+    state == ElementState::Pressed
+        && !repeat
+        && !synthetic
+        && matches!(
+            key,
+            PhysicalKey::Code(KeyCode::KeyR | KeyCode::Enter | KeyCode::NumpadEnter)
+        )
+}
+
 pub(super) fn toolbar_slot(key: PhysicalKey) -> Option<crate::equipment::ToolbarSlot> {
     use crate::equipment::ToolbarSlot;
     match key {

@@ -165,3 +165,14 @@ See the [canonical HUD contract](../client/runtime/architecture.md#survival-hud-
 Tests cover actual consumables, exact penalties, visual timing/cache, all supported
 viewport/DPI layouts, full effect pagination and native input policy. #376 retains
 native visual signoff; #381/#377 extend the existing menu/wheel admission later.
+
+
+## Journey Ended (#374)
+
+Runtime `journey_ended.rs` + `journey_ended/raster.rs` own the report screen and
+physical pointer layout. `session/lifecycle.rs::ended_run` is shared with durable
+archives; `app.rs::restart_terminal` composes the existing verified restart for
+keyboard/mouse/native automation. Renderer only exposes its generic screen margin.
+See the [terminal contract](save-contract.md#journey-ended-presentation-374).
+Tests: `journey_ended/tests.rs`, native-host input/restart regressions and existing
+checkpoint/restart fault injection. Reference native visual/input acceptance is #376.

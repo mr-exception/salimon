@@ -116,3 +116,9 @@ and warning/conversion state. Runtime maps domain status without deriving rules.
 `toolbar_message_inset(surface, dpi)` is the pure shared bottom-band layout seam
 for runtime HUD producers (#373). Keep it consistent with `ToolbarRaster` message
 stacking; it introduces no renderer dependency on survival or other domains.
+
+
+`overlay_available_size(surface)` (#374) exposes the existing physical screen
+margin, shared by overlay fitting and bounded host-produced terminal images.
+A host image that exactly fits this size stays unscaled, keeping physical pointer
+hit rectangles aligned. Runtime still owns all terminal state, text and input.

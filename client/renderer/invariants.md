@@ -145,3 +145,9 @@ Message inset covers both rows; DPI fitting and caching use the full image.
 The exported toolbar message inset (#373) and internal message placement use the
 same scale/fitting implementation. Runtime HUDs may reserve this band, but renderer
 must never inspect their gameplay state or own their animation/expiry.
+
+
+`overlay_available_size(surface)` (#374) exposes the existing physical screen
+margin, shared by overlay fitting and bounded host-produced terminal images.
+A host image that exactly fits this size stays unscaled, keeping physical pointer
+hit rectangles aligned. Runtime still owns all terminal state, text and input.

@@ -161,3 +161,11 @@ H/[ / ] admission in `app.rs`. See the [canonical HUD contract](architecture.md#
 Keep UI state out of full saves, use typed effect/restriction snapshots, and use
 the renderer-owned toolbar reservation when fitting overlays. Preserve the HUD,
 real-consumable, focus/modal and raster/layout regressions.
+
+
+Journey Ended (#374): `journey_ended.rs` and its `raster.rs` own report DTO/layout/
+pixels; `session/lifecycle.rs::ended_run` also supplies the archive. Native input
+and the sole verified restart path stay in `app.rs`. Read the
+[terminal contract](../../docs/save-contract.md#journey-ended-presentation-374),
+preserve highest overlay priority, stale-pointer invalidation and failed-restart
+terminal authority. Regressions live in `journey_ended/tests.rs` and `app/input_tests.rs`.

@@ -165,7 +165,7 @@ fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
             let mut result = inspect_session(&app.session);
             let upload_times = app.terrain_upload_times();
             let (uploaded_bytes, peak_upload_bytes) = app.terrain_uploads();
-            let native = json!({ "terrain_upload_preparation_micros": upload_times,
+            let native = json!({ "native_input_isolated":app.e2e_input_isolated, "terrain_upload_preparation_micros": upload_times,
             "visual_context": app.visual_context(),
                     "survival_details_open":app.survival_hud.details_open,
             "window": app.window_state(),

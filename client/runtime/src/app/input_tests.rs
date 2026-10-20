@@ -420,3 +420,30 @@ fn pause_native_background_focus_and_protocol_share_freeze() {
     assert_eq!(app.session.ship.snapshot().thruster_percentage, throttle);
     assert_eq!(app.session.ship_control_input, ShipControlInput::default());
 }
+
+#[test]
+fn isolated_e2e_ignores_desktop_keys_and_preserves_protocol_holds_on_lifecycle_reset() {
+    let mut app = pilot();
+    app.e2e_input_isolated = true;
+    native(&mut app, KeyCode::KeyW, true);
+    assert_eq!(app.session.ship_control_input, ShipControlInput::default());
+    app.automation_key(PhysicalKey::Code(KeyCode::KeyW), true);
+    let scripted = app.session.ship_control_input;
+    app.session
+        .update_clock
+        .accumulate(Duration::from_millis(5));
+    assert_ne!(scripted, ShipControlInput::default());
+    app.set_input_focus(false);
+    app.reset_update_clock();
+    assert_eq!(app.session.ship_control_input, scripted);
+    assert_eq!(app.session.update_clock.backlog(), Duration::from_millis(5));
+    app.automation_key(PhysicalKey::Code(KeyCode::KeyW), false);
+    assert_eq!(app.session.ship_control_input, ShipControlInput::default());
+    app.e2e_input_isolated = false;
+    app.native_focused = true;
+    app.cursor_captured = true;
+    native(&mut app, KeyCode::KeyW, true);
+    assert_ne!(app.session.ship_control_input, ShipControlInput::default());
+    app.set_input_focus(false);
+    assert_eq!(app.session.ship_control_input, ShipControlInput::default());
+}

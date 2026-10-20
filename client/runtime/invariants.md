@@ -421,3 +421,8 @@ extraction, counts, material/mass cycle and supported layered cells. These are
 opt-in initial conditions only; they never force sleep, keep motion alive or
 change production damping/contact/mass rules. Raw accounting reports actual
 contact radii alongside mass/identity; the minimum radius does not clamp mass.
+
+Deterministic E2E isolation (#313) is explicit and limited to `--e2e`: desktop
+input/focus must not rotate the scripted camera, clear protocol holds or discard
+fixed-step backlog. Native OS-input probes keep normal delivery/reset semantics.
+Isolated scenario evidence cannot establish native input or lifecycle acceptance.

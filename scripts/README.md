@@ -634,3 +634,13 @@ argument shapes fail validation. This is the portable shared transaction for
 #377's native Q wheel, not a new gameplay hotkey; M/N remain absent. Inspection
 adds each item's validated recovery definition and `survival` current meters/
 active effects. Whole-game survival clock/save activation remains #371.
+
+## Deterministic input boundary (#313)
+
+`salimon-test` and model visual fixtures isolate their E2E child from desktop
+keyboard/mouse events and focus/resize resets of scripted held controls/time.
+They set `SALIMON_E2E_ISOLATE_INPUT=1`; `inspect.native_input_isolated` records it.
+This prevents a shared desktop or initial cursor warp from changing fixture poses.
+Direct `salimon_test.Game` defaults to `native_input=True` for opt-in OS probes
+and removes the variable; use those probes for native input/lifecycle signoff.
+Isolation never certifies real input or normal wall-clock interpolation.

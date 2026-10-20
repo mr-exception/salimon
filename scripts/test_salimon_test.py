@@ -74,6 +74,13 @@ class RunnerTests(unittest.TestCase):
             game.request({"op": "inspect"})
         self.assertIsNotNone(game.process.poll())
 
+    def test_scenarios_isolate_input_while_direct_native_probes_keep_os_delivery(self):
+        self.fake.write_text('import os\nassert os.environ.get("SALIMON_E2E_ISOLATE_INPUT") == "1"\n' + FAKE)
+        self.assertEqual(self.execute()["status"], "passed")
+        self.fake.write_text('import os\nassert "SALIMON_E2E_ISOLATE_INPUT" not in os.environ\n' + FAKE)
+        with Game([sys.executable, str(self.fake)], parse_scenario(self.scenario)["setup"], time.monotonic() + 2) as game:
+            game.request({"op": "inspect"})
+
     def test_console_summary_preserves_evidence_and_failure_diagnostics(self):
         for expected in (4, 8):
             self.data["steps"] = [{"assert": {"path": "ship.speed", "equals": expected}}]

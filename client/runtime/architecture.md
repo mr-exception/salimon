@@ -1170,3 +1170,13 @@ same policy. Status details describe continuous modifiers and remaining active
 time. The existing pause/full-save/offline gates own their timing and persistence.
 No native wheel dispatch is added ahead of #377. See the
 [food effect contract](../survival/architecture.md#four-food-catalog-378).
+
+### Deterministic E2E desktop-input isolation (#313)
+
+The scenario runner uses `SALIMON_E2E_ISOLATE_INPUT=1` only on its `--e2e`
+child. Runtime then ignores native keyboard/pointer events and preserves
+protocol-held controls and fixed-step backlog across native focus/resize clock
+resets. Window/GPU lifecycle and visibility still operate; this is not native
+input/lifecycle certification. Normal play and benchmark mode ignore this E2E
+setting. Direct `Game` probes default to actual native input; their child removes
+the variable. `inspect.native_input_isolated` makes the boundary observable.

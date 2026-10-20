@@ -633,3 +633,12 @@ an invented minimum mass. Native foreground admission, completed-frame sample
 counts, active-only filtering and timeout/failure rules above remain required.
 A 1,000-object residual workload can be expensive; a timed-out run has no passing
 frame/FPS result. Never substitute a legacy 500-piece run for these populations.
+
+### Controlled-build provenance (#313)
+
+Use a distinct `CARGO_TARGET_DIR` for production and each source-variant
+worktree. A shared target reused the temporary damping ablation library during
+#313 staging; that binary's evidence was rejected and recollected from an
+isolated production target. Record actual binary/source hashes and target paths,
+and run release physics invariants before native sampling. A checkout revision
+alone does not establish which physics artifact was linked.

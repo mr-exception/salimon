@@ -339,14 +339,25 @@ Persistence `storage.rs` owns the two-generation verified storage protocol and
 native filesystem lease/adapter. Runtime `checkpoints.rs` composes whole-session
 restore, 60-second/event capture, bounded background IO, visible recovery/failure
 warnings and verified clean exit. See [canonical contract](save-contract.md#durable-active-run-366).
-Survival/death/restart/archive integration follows #371/#372/#374; no offline
+Survival/death/restart/archive integration is implemented by #371/#372; #374 owns
+Journey Ended presentation. No offline
 world simulation or multi-save UI is implied.
 
 ## Survival meters (#367)
 
 Portable meter/active-clock/offline-fatigue authority lives in
 [`salimon-survival`](../client/survival/architecture.md). Native/session persistence
-integration is #371; the current playable session does not yet advance survival.
+integration is implemented by #371; the playable session advances and saves survival.
 
 Damage, regeneration, treatment-only wound debt and data-driven timed/persistent/
 exposure status effects (#368) use the survival crate's [single pipeline](../client/survival/architecture.md#damage-and-status-pipeline-368).
+
+
+## Journey statistics (#372)
+
+Runtime `session/journey.rs` owns portable travel samples/counter and final named
+location; survival owns active duration and typed death cause. Schema-3 saves and
+version-2 death reports compose these with physical authority, without reading
+render-relative coordinates. Background occlusion/zero drawable keeps bounded
+simulation active. See the [canonical metric/save contract](save-contract.md#journey-statistics-372)
+and maintenance map for sources, frame policy and regression ownership.

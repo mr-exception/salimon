@@ -147,3 +147,9 @@ fatigue credit, terminal freeze and archive/restart publication. See the canonic
 archive and both fresh fallback generations before exposing new gameplay; failures
 remain failures. Maintain lifecycle, offline rollback, publication-failure and
 restart fault-injection tests with changes to this boundary.
+
+
+Journey accounting and final location live in `session/journey.rs`; read the
+[metric/save contract](../../docs/save-contract.md#journey-statistics-372) before
+changing frame sampling, background timing or archived summaries. Preserve the
+journey, background tick and archive version/recovery regressions.

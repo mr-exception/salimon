@@ -336,3 +336,12 @@ for paths, recovery/failure policy, Windows behavior and future lifecycle owners
   before publishing fresh gameplay. A failed archive/write never silently revives
   a terminal run or acknowledges an unverified restart.
 - Terminal IO retries use host time, independent of frozen gameplay timers.
+
+
+Journey (#372): active duration comes from the survival clock. Combined physical
+travel uses ship-origin and independent character tick paths, with cabin-local
+coordinates removing passenger double counting. Saved samples never bridge a
+teleport/restore/camera change. Occlusion/zero drawable suppress presentation while
+bounded simulation and checkpointing continue; OS suspension remains an explicit
+clock exclusion. Death archives before restart. See the canonical
+[journey contract](../../docs/save-contract.md#journey-statistics-372).

@@ -1,0 +1,7 @@
+{
+  "command": "target/debug/salimon-client",
+  "exit_code": 1,
+  "result": "blocked before native window",
+  "display": null,
+  "wayland_display": null
+}

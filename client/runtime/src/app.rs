@@ -345,7 +345,8 @@ impl ClientApplication {
         } else {
             event_loop.set_control_flow(ControlFlow::Wait);
             self.frame_clock.reset_interval();
-            self.reset_update_clock();
+            self.release_input_capture();
+            self.session.reset_presentation();
             self.diagnostics.reset_frame_window();
         }
     }
@@ -505,10 +506,16 @@ impl ClientApplication {
         (update_delta, ticks)
     }
 
+    /// Background presentation stops, but the running, living session continues
+    /// through the same bounded physical ticks and checkpoint scheduler.
+    fn advance_background(&mut self, now: Instant) {
+        let elapsed = self.session.update_clock.step(now);
+        self.advance_native(elapsed);
+    }
+
     fn redraw(&mut self, event_loop: &ActiveEventLoop, window: Arc<Window>) {
         if self.occluded {
             self.frame_clock.reset_interval();
-            self.reset_update_clock();
             self.diagnostics.reset_frame_window();
             return;
         }
@@ -1064,7 +1071,8 @@ impl ApplicationHandler for ClientApplication {
                 self.occluded = is_occluded;
                 self.retry_at = None;
                 self.frame_clock.reset_interval();
-                self.reset_update_clock();
+                self.release_input_capture();
+                self.session.reset_presentation();
                 self.diagnostics.reset_frame_window();
                 if is_occluded {
                     event_loop.set_control_flow(ControlFlow::Wait);
@@ -1200,6 +1208,18 @@ impl ApplicationHandler for ClientApplication {
             ));
             return;
         }
+        if self.renderer.is_some()
+            && self
+                .window
+                .as_ref()
+                .is_some_and(|window| self.occluded || !surface_size(window).is_drawable())
+        {
+            self.advance_background(Instant::now());
+            event_loop.set_control_flow(ControlFlow::WaitUntil(
+                Instant::now() + crate::update_clock::GAME_TICK,
+            ));
+            return;
+        }
         let Some(retry_at) = self.retry_at else {
             return;
         };
@@ -1233,6 +1253,43 @@ mod toolbar_tests {
     use super::*;
     use crate::equipment::ToolbarSlot;
     use salimon_world::{CameraCommand, CelestialBodyId};
+
+    #[test]
+    fn background_ticks_preserve_active_time_travel_and_resume_without_double_counting() {
+        let mut app = ClientApplication::default();
+        app.session.ship = salimon_ship::ShipController::flying_with_velocity(
+            salimon_ship::ShipPose {
+                position_meters: [0.; 3],
+                orientation: [0., 0., 0., 1.],
+            },
+            0,
+            [100., 0., 0.],
+        )
+        .unwrap();
+        let start = Instant::now();
+        app.session.update_clock.step(start);
+        app.set_input_focus(false);
+        app.occluded = true;
+        for n in 1..=10 {
+            app.advance_background(start + Duration::from_millis(16 * n));
+        }
+        assert_eq!(
+            app.session.survival.snapshot().active_time,
+            Duration::from_millis(160)
+        );
+        assert!((app.session.run.journey.distance_meters - 16.).abs() < 1e-9);
+        app.occluded = false;
+        let elapsed = app
+            .session
+            .update_clock
+            .step(start + Duration::from_millis(176));
+        app.advance_native(elapsed);
+        assert_eq!(
+            app.session.survival.snapshot().active_time,
+            Duration::from_millis(176)
+        );
+        assert!((app.session.run.journey.distance_meters - 17.6).abs() < 1e-9);
+    }
 
     #[test]
     fn automation_partitions_preserve_elapsed_and_match_native_ticks() {

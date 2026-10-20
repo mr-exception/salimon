@@ -4,6 +4,7 @@ pub(crate) mod crafting_ui;
 mod fabrication;
 pub(crate) mod frames;
 pub(crate) mod interaction;
+pub(crate) mod journey;
 pub(crate) mod lifecycle;
 mod presentation;
 mod survival;
@@ -434,6 +435,7 @@ impl GameplaySession {
                 .eye_position_meters;
             crate::fragment_physics::capture_previous(&mut self.mining, frame, player);
         }
+        let journey_ship_start = self.ship.snapshot().pose.position_meters;
         self.camera_prototype.advance(delta);
         self.ship
             .set_steering_input(self.ship_control_input.steering());
@@ -448,6 +450,9 @@ impl GameplaySession {
         self.character
             .set_ship_gravity_enabled(ship.power_available);
         self.mining.ship_gravity_disabled = !ship.power_available;
+        // Both character endpoints use the completed ship frame. Transport and
+        // rotation of the cabin therefore cannot become extra walking distance.
+        let journey_character_start = self.snapshot().character;
         if self.view_mode == ViewMode::Gameplay {
             let eye = self
                 .character
@@ -501,6 +506,14 @@ impl GameplaySession {
             };
             self.latest_physics.accumulate(measurements);
         }
+        let journey_character_end = self.snapshot().character;
+        self.run.journey.record(
+            journey_ship_start,
+            ship.pose.position_meters,
+            journey_character_start,
+            journey_character_end,
+            !delta.is_zero(),
+        );
         self.sync_carried();
         self.validate_crafting_focus();
         if self.survival.snapshot().terminal {

@@ -1,0 +1,5 @@
+START 313/native-cap-active
+END 313/native-cap-active exit 0
+START 313/native-mixed-active
+END 313/native-mixed-active exit 1
+START 313/native-cap-settled

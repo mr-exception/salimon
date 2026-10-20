@@ -20,3 +20,8 @@ item selection/removal, never this crate. See the canonical consumable contract.
 `effect_snapshots()` (#373) is the immutable presentation seam for captured effect
 rules, stacks and live timers. Keep descriptions/native visibility in runtime,
 not the survival owner, and preserve stable EffectId iteration and offline freeze.
+
+#378 extends the existing catalogs with four food definitions and captured food
+modifiers; see the owning architecture for provisional tuning and regressions.
+Keep advanced food recipes locked and preserve exact-slot consumption; no new
+progression acquisition or native Q-wheel input is introduced.

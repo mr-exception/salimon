@@ -1157,3 +1157,13 @@ bounded queue and one child process are polled without blocking the frame; menu
 suppression kills/reaps playback. Missing/failed players log an explicit warning;
 missing players also show an accessibility warning. Actual OS playback and sensory
 quality/performance require reference-device verification (#376).
+
+## Advanced food composition (#378)
+
+The shared exact-identity consumption transaction accepts all four food recipe
+IDs from the survival catalog. `session/survival.rs` derives fatigue penalty relief
+from captured active modifiers; movement, interaction work and HUD receive that
+same policy. Status details describe continuous modifiers and remaining active
+time. The existing pause/full-save/offline gates own their timing and persistence.
+No native wheel dispatch is added ahead of #377. See the
+[food effect contract](../survival/architecture.md#four-food-catalog-378).

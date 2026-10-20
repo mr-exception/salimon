@@ -74,8 +74,18 @@ pub struct Heal {
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct EffectId(pub u16);
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+pub enum Modifier {
+    FatigueDrain,
+    Regeneration,
+    FatigueRelief,
+}
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub enum Behavior {
+    Modifier {
+        kind: Modifier,
+        basis_points: u16,
+    },
     Feed {
         amount: Points,
     },
@@ -194,6 +204,16 @@ impl Validate for Rules {
                 _ => {}
             }
             match &rule.behavior {
+                Behavior::Modifier { kind, basis_points } => {
+                    let valid = match kind {
+                        Modifier::FatigueDrain => *basis_points <= 10_000,
+                        Modifier::Regeneration => (10_000..=50_000).contains(basis_points),
+                        Modifier::FatigueRelief => *basis_points <= 10_000,
+                    };
+                    if !valid || rule.interval.is_some() || rule.max_stacks != 1 {
+                        return Err(invalid("invalid continuous food modifier"));
+                    }
+                }
                 Behavior::Damage { source, amount, .. } => {
                     amount.validate()?;
                     if !sources.contains(source) {
@@ -213,8 +233,10 @@ impl Validate for Rules {
                     }
                 }
             }
-            if !matches!(rule.behavior, Behavior::Amplify { .. })
-                && !matches!(rule.interval, Some(d) if d >= Duration::from_millis(1) && d <= Duration::from_secs(86400))
+            if !matches!(
+                rule.behavior,
+                Behavior::Amplify { .. } | Behavior::Modifier { .. }
+            ) && !matches!(rule.interval, Some(d) if d >= Duration::from_millis(1) && d <= Duration::from_secs(86400))
             {
                 return Err(invalid("periodic effect interval outside [1ms,1day]"));
             }

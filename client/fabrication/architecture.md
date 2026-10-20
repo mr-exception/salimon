@@ -15,7 +15,7 @@ runtime, renderer or world session. Canonical behavior is the
 
 `RecipeBook::new` accepts data records and validates the complete set before
 publishing it. Callers may build records from a later data adapter; there is no
-file format/parser in this crate. Both starter recipes are unlocked; advanced
+file format/parser in this crate. The two basic starter recipes are unlocked; the three advanced food recipes are locked. Advanced
 requirements can be represented but cannot be acquired here. Jobs capture recipe
 values so balances/progress never depend on later tuning. There are no setters
 that mutate a validated recipe book inside a running machine.
@@ -114,3 +114,23 @@ and the shared job identity allocator. It is a constructor, never a replenishmen
 method. It performs no crafting, simulation or energy settlement. Runtime owns
 when a new run is created and reconciles the ordinary reserve mass. See the
 [canonical supply/save contract](../../docs/save-contract.md#starting-supplies-379).
+
+## Advanced food definitions (#378)
+
+The starter book contains five recipes: basic food ration and medkit unlocked,
+plus locked nutrient gel, complete meal and energy drink. There is no unlock
+acquisition operation. Existing FIFO, physical ingredient intake, Core funding,
+tray, mass and three-food/two-medical inventory rules apply unchanged. Effect
+definitions live in [survival](../survival/architecture.md#four-food-catalog-378).
+
+Explicit provisional production tuning (subject to #384 balance):
+
+| Recipe | Organic biomass | Water ice | Work | Power | Output mass |
+| --- | --- | --- | --- | --- | --- |
+| `nutrient-gel` | 0.20 kg | 0.15 kg | 10 s | 10 kW | 0.20 kg |
+| `complete-meal` | 0.70 kg | 0.20 kg | 20 s | 15 kW | 0.50 kg |
+| `energy-drink` | 0.10 kg | 0.25 kg | 10 s | 10 kW | 0.25 kg |
+
+These recipes are data records, not a playable progression system. Tests explicitly
+provide an unlocked fixture book to verify production/consumption/save integration;
+the production starter book rejects all three advanced enqueue requests atomically.

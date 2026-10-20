@@ -211,3 +211,70 @@ fn malformed_and_stale_protocol_requests_cannot_consume_replacement_items() {
     assert_eq!(result["result"]["applied"], false);
     assert!(s.consumables.food()[0].is_some());
 }
+
+#[test]
+fn four_food_definitions_share_fabricator_core_exact_consumption_and_full_save() {
+    use salimon_fabrication::{Fabricator, RecipeBook};
+    use salimon_world::resources::RawMaterial;
+    for key in [
+        "food-ration",
+        "nutrient-gel",
+        "complete-meal",
+        "energy-drink",
+    ] {
+        let mut s = session();
+        let mut recipe = RecipeBook::starter()
+            .get(&RecipeId::new(key).unwrap())
+            .unwrap()
+            .clone();
+        assert_eq!(recipe.unlock.unlocked_by_default, key == "food-ration");
+        if key != "food-ration" {
+            let before = s.fabricator.clone();
+            assert!(
+                s.execute_fabricator(C::Enqueue {
+                    recipe: recipe.id.clone(),
+                    quantity: 1
+                })
+                .is_err()
+            );
+            assert_eq!(s.fabricator, before);
+        }
+        // Explicit fixture configuration, not a playable progression/unlock command.
+        recipe.unlock.unlocked_by_default = true;
+        s.fabricator = Fabricator::new(RecipeBook::new(vec![recipe.clone()]).unwrap(), 8).unwrap();
+        for ingredient in &recipe.ingredients {
+            s.execute_fabricator(C::Insert(
+                RawMaterial::new(ingredient.resource, ingredient.mass.kg()).unwrap(),
+            ))
+            .unwrap();
+        }
+        s.execute_fabricator(C::Enqueue {
+            recipe: recipe.id.clone(),
+            quantity: 1,
+        })
+        .unwrap();
+        let energy = s.snapshot().ship.energy_core.stored_joules as f64;
+        s.advance_fabrication(recipe.duration);
+        assert!(
+            s.snapshot().ship.energy_core.stored_joules as f64
+                <= energy - recipe.watts * recipe.duration.as_secs_f64()
+        );
+        s.collect_fabricator_output();
+        let item = s.consumables.food()[0].as_ref().unwrap();
+        let chosen = Selection {
+            slot: ConsumableSlot::FoodOne,
+            job: item.job,
+            unit: item.unit,
+        };
+        s.consume_selection(chosen).unwrap();
+        assert!(s.consumables.food()[0].is_none());
+        s.survival.advance(Duration::from_nanos(1));
+        let bytes = s.save_bytes(100).unwrap();
+        let mut loaded = session();
+        loaded.restore_bytes(&bytes).unwrap();
+        assert_eq!(loaded.save_bytes(100).unwrap(), bytes);
+        loaded.survival.advance(Duration::from_millis(1250));
+        s.survival.advance(Duration::from_millis(1250));
+        assert_eq!(loaded.survival, s.survival);
+    }
+}

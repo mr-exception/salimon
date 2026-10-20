@@ -193,3 +193,11 @@ cover native/background and portable full-save freeze.
 Condition cues/accessibility (#383): `client/runtime/src/condition_feedback.rs`,
 `condition_feedback/settings.rs` and `condition_feedback/audio.rs`; renderer owns
 only a generic fullscreen overlay before ordinary HUDs.
+
+Four-food expansion (#378): fabrication `recipes.rs` owns the three locked food
+records; survival `consumables.rs`, `effects.rs`, `pipeline.rs`, `lib.rs` and
+`restrictions.rs` own validated modifiers, exact fatigue remainder and penalties.
+Runtime `session/survival.rs` and `survival_hud.rs` consume the same derived policy.
+Tests: survival `tests/foods.rs`, fabrication starter catalog regression, runtime
+`session/consumables/tests.rs` craft/Core/exact-consume/full-save scenarios. See the
+[canonical catalog and provisional settings](../client/survival/architecture.md#four-food-catalog-378).

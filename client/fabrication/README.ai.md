@@ -28,3 +28,8 @@ of health/hunger and input/focus policy.
 initial outputs/reserves from starter recipes and reserving their identities.
 It is never a restore repair or recurring inventory refill. See the
 [canonical supply contract](../../docs/save-contract.md#starting-supplies-379).
+
+#378 extends the existing catalogs with four food definitions and captured food
+modifiers; see the owning architecture for provisional tuning and regressions.
+Keep advanced food recipes locked and preserve exact-slot consumption; no new
+progression acquisition or native Q-wheel input is introduced.

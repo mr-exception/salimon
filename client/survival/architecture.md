@@ -138,8 +138,8 @@ nothing. There is no full-health/full-hunger rejection: current gains clamp at
 Repeated legitimate medkits refresh the existing duration without exceeding one
 stack or resetting its partial tick cadence; no unbounded parallel healing is
 created. A stale click must not be treated as another legitimate item use by the
-host. Special treatment definitions can use `Healing::Treatment`; future food
-buff behavior remains #378, built on the same typed effect registry.
+host. Special treatment definitions can use `Healing::Treatment`; food
+buff behavior is implemented by #378 on the same typed effect registry.
 
 Periodic food now uses `Behavior::Feed` in the existing deterministic pipeline.
 At a shared timestamp damage still runs first; only a living state receives food,
@@ -154,7 +154,7 @@ this owner with consumed inventory in one verified whole-game checkpoint and
 activates the production clock. Saved catalog rules must agree with already
 captured registry IDs; conflicting definitions reject before restoration. Native Q-wheel
 selection/hover presentation belongs #377 and consumes through runtime's exact
-item transaction; M/N remain absent. Four-food expansion/unlocks are #378.
+item transaction; M/N remain absent. Four-food definitions are implemented by #378; acquisition stays deferred.
 
 
 ## Observational effect snapshots (#373)
@@ -165,3 +165,41 @@ present behavior, source, severity and removal policy without interpreting priva
 serialized state. This API performs no registration, advancement or mutation.
 The [runtime HUD contract](../runtime/architecture.md#survival-hud-and-status-details-373)
 owns text, visual thresholds, animations and native input; none belong here.
+
+## Four-food catalog (#378)
+
+New runs capture the following validated, serialized recovery records. Recipe IDs
+are shared with Fabrication; benefit definitions stay in the survival owner.
+
+| Recipe | Hunger | Active modifier | Initial recipe availability |
+| --- | --- | --- | --- |
+| `food-ration` | +40 immediately | None | Unlocked |
+| `nutrient-gel` | +20 immediately | 50% fatigue drain for 600 seconds | Locked |
+| `complete-meal` | +7 each 6 seconds, ten ticks (+70/60 seconds) | 200% eligible natural regeneration for 300 seconds | Locked |
+| `energy-drink` | +10 immediately | 50% fatigue penalty relief for 300 seconds | Locked |
+
+The 200% regeneration and 50% penalty relief are explicit **provisional balance
+settings**, represented by `Benefit::Modifier::basis_points` (20000/5000), not
+new fixed product requirements. #384 owns balance signoff. Gel drain is 5000 bps.
+All values/durations are captured catalog data and validate before publication.
+Medkit data remains unchanged. Only basic food is initially unlocked; medkits
+remain unlocked medical items. No research/acquisition command is introduced.
+
+Continuous modifiers have no tick interval, require one maximum stack, and use
+the strongest same-kind active value rather than compounding. Reconsumption
+refreshes duration. Gel modifies only active fatigue drain. A saved 0..9999
+integer remainder preserves sub-unit drain across arbitrary nanosecond partitions;
+old saves without it decode to zero. Offline fatigue recovery leaves all food
+rules, durations and hunger/health unchanged. Meal regeneration still needs
+hunger >=70 and fatigue >=50 and cannot erase wounds; its multiplier applies to
+the ordinary 60-second regeneration event, including an event at expiry.
+
+Energy drink reduces the fatigue component of movement and interaction penalties;
+hunger penalties remain separate. It neither restores fatigue nor changes its
+thresholds. At zero fatigue, slow walking improves but exhausted action bans
+remain. Runtime obtains this same derived policy for physical movement and HUD.
+Full-save restore preserves captured recipe/effect catalogs, including older runs;
+loading does not inject new recipes, unlocks, items or benefits into old saves.
+
+Native Q-wheel selection remains #377; these definitions use its existing exact
+slot/job/unit consumption transaction, with no new hotkeys or input flow.

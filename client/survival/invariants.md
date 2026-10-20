@@ -31,3 +31,9 @@
 - Effect presentation snapshots borrow validated captured definitions and timers
   in stable EffectId order; observing them never mutates authority or re-registers
   effects. Runtime owns all display strings, animation and UI thresholds (#373).
+
+- Food continuous modifiers expire on admitted active time, never offline time;
+  refresh cannot compound a one-stack benefit. Fatigue drain retains its validated
+  fractional remainder across saves and arbitrary nanosecond partitions.
+- Food regeneration respects hunger/fatigue eligibility and wounds; fatigue relief
+  never restores fatigue or bypasses exhausted-action bans. See the four-food catalog.

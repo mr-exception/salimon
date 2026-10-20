@@ -17,6 +17,12 @@ pub enum Recovery {
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum Benefit {
+    Modifier {
+        id: EffectId,
+        kind: Modifier,
+        basis_points: u16,
+        duration: Duration,
+    },
     Instant {
         recovery: Recovery,
         milli_points: u32,
@@ -33,6 +39,19 @@ pub enum Benefit {
 impl Benefit {
     fn rule(&self) -> Option<EffectRule> {
         match *self {
+            Self::Modifier {
+                id,
+                kind,
+                basis_points,
+                duration,
+            } => Some(EffectRule {
+                id,
+                behavior: Behavior::Modifier { kind, basis_points },
+                lifetime: Lifetime::Timed(duration),
+                interval: None,
+                max_stacks: 1,
+                removal: Removal::Dispellable,
+            }),
             Self::OverTime {
                 id,
                 recovery,
@@ -83,6 +102,7 @@ impl Validate for Definition {
         }
         for benefit in &self.benefits {
             let (milli_points, durations) = match benefit {
+                Benefit::Modifier { .. } => continue,
                 Benefit::Instant { milli_points, .. } => (*milli_points, None),
                 Benefit::OverTime {
                     milli_points,
@@ -148,6 +168,60 @@ impl Catalog {
                     recovery: Recovery::Hunger,
                     milli_points: 40_000,
                 }],
+            },
+            Definition {
+                item_id: "nutrient-gel".into(),
+                category: Category::Food,
+                benefits: vec![
+                    Benefit::Instant {
+                        recovery: Recovery::Hunger,
+                        milli_points: 20_000,
+                    },
+                    Benefit::Modifier {
+                        id: EffectId(10_001),
+                        kind: Modifier::FatigueDrain,
+                        basis_points: 5000,
+                        duration: Duration::from_secs(600),
+                    },
+                ],
+            },
+            Definition {
+                item_id: "complete-meal".into(),
+                category: Category::Food,
+                benefits: vec![
+                    Benefit::OverTime {
+                        id: EffectId(10_002),
+                        recovery: Recovery::Hunger,
+                        milli_points: 7000,
+                        interval: Duration::from_secs(6),
+                        duration: Duration::from_secs(60),
+                        max_stacks: 1,
+                    },
+                    // Provisional balance: twice the eligible natural regeneration.
+                    Benefit::Modifier {
+                        id: EffectId(10_003),
+                        kind: Modifier::Regeneration,
+                        basis_points: 20_000,
+                        duration: Duration::from_secs(300),
+                    },
+                ],
+            },
+            Definition {
+                item_id: "energy-drink".into(),
+                category: Category::Food,
+                benefits: vec![
+                    Benefit::Instant {
+                        recovery: Recovery::Hunger,
+                        milli_points: 10_000,
+                    },
+                    // Provisional balance: halve fatigue penalties, preserve exhaustion gates.
+                    Benefit::Modifier {
+                        id: EffectId(10_004),
+                        kind: Modifier::FatigueRelief,
+                        basis_points: 5000,
+                        duration: Duration::from_secs(300),
+                    },
+                ],
             },
             // Explicit provisional balancing: +25 ordinary health over 10 active seconds.
             Definition {
@@ -219,7 +293,9 @@ impl Survival {
                         Recovery::Health(mode) => next.heal(Heal { amount, mode })?,
                     }
                 }
-                Benefit::OverTime { id, .. } => next.apply_effect(id)?,
+                Benefit::OverTime { id, .. } | Benefit::Modifier { id, .. } => {
+                    next.apply_effect(id)?
+                }
             }
         }
         next.validate()?;

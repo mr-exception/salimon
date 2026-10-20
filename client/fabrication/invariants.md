@@ -53,3 +53,7 @@ and shell lifecycle integration. See [canonical save contract](../../docs/save-c
   high-water mark as future jobs and copies exact starter recipe ingredients.
   No job/tray work, fake fragment, extra inventory, unlock acquisition or capacity
   bypass is introduced; restoration never replenishes supplies.
+
+- Advanced foods are locked validated definitions in the starter recipe book.
+  Only basic food is initially unlocked; medkit availability is unchanged. No
+  gameplay unlock acquisition or inventory capacity increase is implied (#378).

@@ -175,3 +175,8 @@ restore and isolated fixtures use empty `Default`. Fabrication allocates grant
 identities and exact recipe reserves; runtime reconciles mass. Read the
 [canonical contract](../../docs/save-contract.md#starting-supplies-379) and preserve
 `session/starting_supplies_tests.rs` launch/craft/reload/restart coverage.
+
+#378 extends the existing catalogs with four food definitions and captured food
+modifiers; see the owning architecture for provisional tuning and regressions.
+Keep advanced food recipes locked and preserve exact-slot consumption; no new
+progression acquisition or native Q-wheel input is introduced.

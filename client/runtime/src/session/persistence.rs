@@ -25,7 +25,6 @@ pub(crate) struct PhysicalState {
 }
 pub(crate) struct RestoredPhysical {
     pub(crate) seed: u64,
-    pub(crate) view_mode: ViewMode,
     pub(crate) camera: salimon_world::CameraPrototype,
     pub(crate) character: salimon_character::CharacterController,
     pub(crate) ship: salimon_ship::ShipController,
@@ -93,7 +92,7 @@ impl PhysicalState {
     pub(crate) fn capture(s: &GameplaySession) -> Self {
         Self {
             seed: s.seed,
-            view_mode: s.view_mode,
+            view_mode: ViewMode::Gameplay,
             camera: s.camera_prototype.clone(),
             character: s.character.save_state(),
             ship: s.ship.save_state(),
@@ -144,7 +143,6 @@ impl PhysicalState {
         crate::carrying::sync_ship_mass(&mut mining, frame, &mut ship);
         Ok(RestoredPhysical {
             seed: self.seed,
-            view_mode: self.view_mode,
             camera: self.camera,
             character,
             ship,
@@ -159,11 +157,32 @@ pub(crate) struct SessionState {
     physical: PhysicalState,
     fabrication: salimon_fabrication::FabricationSaveState,
     equipment: crate::equipment::EquipmentToolbar,
+    #[serde(default)]
+    survival: Option<SurvivalState>,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct SurvivalState {
+    vitals: salimon_survival::Survival,
+    catalog: salimon_survival::consumables::Catalog,
+    restrictions: salimon_survival::restrictions::RestrictionConfig,
+    run: super::lifecycle::RunState,
+}
+impl Validate for SurvivalState {
+    fn validate(&self) -> Result<(), SaveError> {
+        self.vitals.validate()?;
+        self.catalog.validate_registered(&self.vitals)?;
+        self.restrictions.validate()?;
+        self.run.validate()
+    }
 }
 impl Validate for SessionState {
     fn validate(&self) -> Result<(), SaveError> {
         self.physical.validate()?;
         self.fabrication.validate()?;
+        if let Some(survival) = &self.survival {
+            survival.validate()?;
+        }
         self.equipment
             .validate_save(self.physical.world.carried.is_some())?;
         Ok(())
@@ -178,6 +197,12 @@ impl GameplaySession {
                 &self.consumables,
             ),
             equipment: self.equipment.clone(),
+            survival: Some(SurvivalState {
+                vitals: self.survival.clone(),
+                catalog: self.consumable_effects.clone(),
+                restrictions: self.restriction_config,
+                run: self.run.clone(),
+            }),
         };
         salimon_persistence::SaveGame::new(
             state,
@@ -191,11 +216,26 @@ impl GameplaySession {
     /// Native focus/capture and filesystem scheduling remain shell-owned (#366).
     pub(crate) fn restore_bytes(&mut self, bytes: &[u8]) -> Result<(), SaveError> {
         let save = salimon_persistence::SaveGame::<SessionState>::decode(bytes)?;
+        let survival = match (save.schema_version, save.state.survival) {
+            (1, None) => SurvivalState {
+                vitals: Default::default(),
+                catalog: salimon_survival::consumables::Catalog::starter(),
+                restrictions: Default::default(),
+                run: Default::default(),
+            },
+            (2, Some(state)) => state,
+            _ => return Err(invalid("survival payload does not match envelope version")),
+        };
+        survival.validate()?;
         let (fabricator, consumables) = save.state.fabrication.restore()?;
         let physical = save.state.physical.restore()?;
         let mut restored = Self {
             seed: physical.seed,
-            view_mode: physical.view_mode,
+            view_mode: ViewMode::Gameplay,
+            survival: survival.vitals,
+            consumable_effects: survival.catalog,
+            restriction_config: survival.restrictions,
+            run: survival.run,
             camera_prototype: physical.camera,
             character: physical.character,
             ship: physical.ship,
@@ -216,6 +256,10 @@ impl GameplaySession {
             .ship
             .set_fabricator_watts(restored.fabricator.power_demand().map_or(0., |d| d.watts))
             .map_err(|_| invalid("restored machine/Core demand"))?;
+        restored.enforce_survival_restrictions();
+        if restored.survival.snapshot().terminal {
+            restored.freeze_terminal();
+        }
         *self = restored;
         Ok(())
     }
@@ -248,7 +292,7 @@ mod tests {
         let r = decoded.restore().unwrap();
         let mut restored = GameplaySession {
             seed: r.seed,
-            view_mode: r.view_mode,
+            view_mode: ViewMode::Gameplay,
             camera_prototype: r.camera,
             character: r.character,
             ship: r.ship,
@@ -434,7 +478,8 @@ impl GameplaySession {
             .collect();
         serde_json::to_vec(&(self.mining.session.fragments().len(), self.mining.session.fragments().last().map(|f| f.id()), self.mining.session.attached_sphere_id(), self.mining.session.carried_id(),
             ship.flight_state, ship.door_state, ship.power_available,
-            machine.stored, jobs, machine.tray, &self.consumables, &self.equipment))
+            machine.stored, jobs, machine.tray, &self.consumables, &self.equipment,
+            self.survival.snapshot().terminal, self.survival.active_effects().map(|(id,stacks,_)|(id,stacks)).collect::<Vec<_>>(),self.run.serial))
             .expect("discrete checkpoint events contain only serializable finite identities and integer quantities")
     }
 }

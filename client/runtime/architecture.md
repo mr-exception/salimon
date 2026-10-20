@@ -942,8 +942,7 @@ active-time recovery timestamp; doors/menus/emergency consumption bypass it.
 Mining scales only its bounded extraction delta, not world/physics/job time.
 
 Automation inspection exposes exact `survival_restrictions` basis points for
-future HUD consumption and regression checks. #371 still owns active vital
-clock/save publication; default session vitals remain full until it lands. #370
+future HUD consumption and regression checks. #371 activates the vital clock and whole-game save publication. #370
 and #377 supply actual effects and wheel dispatch separately. No schema-1 save
 is silently changed; derived character scale and interaction cooldown reset on
 restore and are reapplied by the session before the next tick.
@@ -968,7 +967,30 @@ with this seam, capture the selected item identity, close only after success and
 use these recovery definitions for hover feedback. M/N remain absent.
 
 See the [canonical recovery data](../survival/architecture.md#consumable-recovery-definitions-370).
-As with #367–#369, #371 owns production survival ticking/full-save publication;
-this change does not activate an unsaved clock, alter schema-1 saves, or implement
-#377's native wheel/#378's locked food expansion. Domain serialized recovery and
-inventory support exact continuation and offline freeze for that composition.
+Runtime #371 activates production survival ticking and schema-2 full-save
+publication; #377 still owns the native wheel and #378 advanced foods. Serialized
+recovery and inventory continue exactly and remain frozen offline.
+
+
+## Active survival, terminal state and restart (#371)
+
+`session/lifecycle.rs` owns typed run/journey source and deterministic fresh-run
+preparation. `session.rs` advances survival first to determine the admitted portion
+before death, then composes physical work for that duration. Terminal state clears
+held controls/mining, pilot authority and backlog, and rejects subsequent world
+commands. Ordinary menus continue active time; true pause remains #381.
+
+`session/persistence.rs` captures survival meters, fractional clocks, captured
+status/healing rules/intervals, terminal cause, offline watermark, item catalog,
+restriction tuning and run/journey source with world/ship/Fabricator/inventory in
+one schema-2 envelope. V1 migration initializes only the new survival source;
+v2 missing/invalid source rejects. Restore resets transient UI/view/input and
+repairs derived permissions without stepping or granting offline effects.
+
+`checkpoints.rs` performs verified launch recovery before exposing a temporary
+candidate; only fatigue may be credited. Its bounded worker publishes terminal
+pairs, immutable archive summaries and both fresh generations during restart.
+Native R is an initial focused nonsynthetic terminal-only action, with a minimal
+notice until #374's complete screen. See the
+[canonical save/lifecycle contract](../../docs/save-contract.md#survival-lifecycle-and-launch-transaction-371)
+for failure/crash guarantees and remaining #372/#373/#377/#379 scope.

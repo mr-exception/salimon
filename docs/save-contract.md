@@ -1,18 +1,19 @@
-# Canonical whole-game save contract (schema 1)
+# Canonical whole-game save contract (schema 2)
 
-`salimon-persistence::SaveGame<T>` is the only versioned envelope. Runtime's
-concrete state payload composes domain-owned typed state; read-only observation
-snapshots are not sufficient. Version 1 has no predecessor: older/future versions
-fail explicitly, never silently reseed. A future migration must dispatch on the
-header before decoding a payload and validate its result. Unknown fields and
-missing required state fail; new authoritative extensions require a schema bump,
-a typed field, owner validation and a round-trip fixture. No unregistered opaque
-extension payloads are accepted.
+`salimon-persistence::SaveGame<T>` is the versioned envelope. New captures use
+version 2. Decode accepts version 1 only for the explicit runtime migration:
+retain the complete physical/Fabricator/equipment payload, initialize newly
+introduced survival meters at 100 with no effects or retrospective active time,
+and initialize the run/journey source. A version-1 payload must lack survival;
+version 2 must contain complete typed survival state. Missing/null v2 survival,
+invalid meters/effect registries/configuration, unknown fields and unsupported
+versions reject before publication. Migration is checkpointed before exposure.
 
 ## Authoritative inventory
 
 | Owner | Required logical state | Regenerated/excluded state |
 | --- | --- | --- |
+| Survival/run | Meters/config, fractional drain/starvation/regeneration, full captured effect rules/stacks/partial ticks/lifetimes, wounds/death source/terminal flag, active survival duration, offline UTC watermark, consumable catalog, movement/interaction tuning, run serial and journey counter source | Launch receipt, held inputs/UI/capture, movement scale and presentation history; derived permissions are repaired |
 | Envelope/runtime clock | Unix-second recording time, completed simulation Duration, exact admitted Duration backlog | Instant, wall-clock frame timer, profiling durations; offline world advancement is zero |
 | Character | Location/frame including doorway blend, local/world position, yaw/pitch, vertical/interior/EVA velocities, nearby surface, EVA basis, gravity/ramp state | Jump key edge reset; camera matrices regenerated |
 | Ship | Pose/quaternion, linear velocity, steering ramp, propulsion/configuration, flight/landed state, full assist/bounce progress, selected signed throttle, door state/fraction, cockpit authority, terrain/footprint, Core config/charge/fraction/reservation/consumption, conversion source and progress, Fabricator demand | Held throttle/steering intent reset, transient message and last-funded interval reset; instruments regenerated |
@@ -95,8 +96,62 @@ Default directory: Linux `$XDG_DATA_HOME/salimon/active-run` (fallback
 active run, represented by two recovery generations, with no multi-slot UI.
 Existing files can be backed up/moved when deliberately starting a fresh run.
 
-Survival/death does not exist yet: #371 integrates terminal-state checkpoints and
-restart, #372/#374 own journey archives and terminal UI. Those owners must include
-their new typed state and discrete events and retire both old generations on
-restart so fallback can never revive the previous run. #382 owns verified Save
-Now feedback; #375/#376 own expanded survival/graphical/reference-hardware checks.
+## Survival lifecycle and launch transaction (#371)
+
+The session ticks survival on every admitted game interval while alive, including
+ordinary crafting/tour menus. It advances physical domains only for the admitted
+portion before a lethal boundary; death clears held controls/mining/crafting,
+stops manual pilot authority and discards pending catch-up. Further authoritative
+simulation and world commands are frozen. Terminal state is a discrete checkpoint
+event; the worker writes it into both generations before acknowledging, so its
+verified backup is terminal too. Failed writes remain failures: a death that cannot
+reach storage is not claimed durable, and visible save warnings/retry remain.
+
+Normal-play launch first restores into a temporary candidate. Only fatigue is
+credited from the checkpoint UTC to launch UTC, with the survival domain's six-hour
+configured cap and rollback/high-watermark protection. Hunger, health, effects,
+world and active duration never advance offline. The worker's SaveManager verifies
+and publishes credited state/watermark before the candidate is exposed. Failed
+credit publication leaves the caller's live session unchanged and fails startup.
+The receipt is launch-only: focus, minimize/resume, save and renderer changes do
+not grant recovery. Crash recovery conservatively treats time since the newest
+verified checkpoint as closed time; see the survival clock contract.
+
+A new native run is also checkpointed before play. Default save paths/lease and
+60-active-second/discrete-event/exit policy above are retained. Checkpoint failures
+while terminal use a host-time retry delay because the gameplay clock is frozen;
+no game-domain time advances to retry IO. E2E/benchmarks remain isolated from the
+user's save directory. Direct portable restore is a reconstruction operation and
+never grants offline credit; only the launch transaction does.
+
+## Terminal archive and restart (#371)
+
+The minimal native terminal notice accepts an initial real focused R press;
+repeat, synthetic replay and living runs cannot restart through that path. Full
+Journey Ended layout/action/report presentation is #374. Runtime prepares a fresh
+deterministic Earth world, clears all old objects/inventory/jobs/effects/inputs,
+starts meters at 100 and increments the saved run serial. Terrain mode and world
+seed retain their deterministic new-run policy. New-run starter supplies are #379.
+
+The existing save worker first checkpoints the terminal run into both slots,
+then durably publishes an immutable idempotent `journeys/run-<serial>.json` summary,
+then verifies the fresh run in both slots. Only success replaces the live terminal
+session. Failure never grants gameplay with an unverified fresh state; retry
+retains the terminal source. After success both fallback generations belong to
+the fresh run. Interruption before success can recover a terminal run or the
+already verified pristine fresh run, never an old living generation after the
+terminal pair was verified. A first terminal write that fails can only preserve
+the prior verified checkpoint; no stronger disk-failure guarantee is claimed.
+
+Archive summaries contain their version, serial, seed, typed death cause, active
+survival duration, final absolute position and typed journey counter source.
+Byte-identical retry is idempotent; conflicting historical reports reject without
+overwrite. Native archive scans choose unused run serials when starting fresh
+after missing/damaged saves. Temporary archive files are not active reports.
+Distance sampling/coordinate discontinuity accounting and richer location/report
+semantics remain #372; the counter source is persisted now and defaults to zero.
+
+#375 owns expanded cross-system suites and #376 native reference signoff; #381
+owns a true pause menu and #382 manual Save Now controls. This change activates
+survival before the final HUD/Q-wheel/starter-supply wave (#373/#377/#379); native
+consumption UI is not claimed delivered by the lifecycle PR.

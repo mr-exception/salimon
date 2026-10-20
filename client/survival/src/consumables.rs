@@ -117,6 +117,28 @@ impl Catalog {
     pub fn get(&self, item_id: &str) -> Option<&Definition> {
         self.0.iter().find(|d| d.item_id == item_id)
     }
+    /// Saved configuration must agree with already captured registry IDs.
+    pub fn validate_registered(&self, survival: &Survival) -> Result<(), SaveError> {
+        self.validate()?;
+        for rule in self
+            .0
+            .iter()
+            .flat_map(|d| d.benefits.iter().filter_map(Benefit::rule))
+        {
+            if survival
+                .pipeline
+                .rules
+                .effects
+                .iter()
+                .any(|r| r.id == rule.id && *r != rule)
+            {
+                return Err(invalid(
+                    "saved consumable catalog conflicts with captured effect",
+                ));
+            }
+        }
+        Ok(())
+    }
     pub fn starter() -> Self {
         Self::new(vec![
             Definition {

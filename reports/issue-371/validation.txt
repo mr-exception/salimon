@@ -1,0 +1,63 @@
+Issue #371 final validation: Linux x86_64, Rust stable 1.99.1
+
+cargo clippy --workspace --all-targets --locked -- -D warnings: PASS
+cargo test --workspace --locked: PASS (633 passed, 22 existing opt-in ignored)
+cargo build --workspace --locked: PASS
+cargo fmt --all -- --check: PASS
+python3 -m unittest discover -s scripts -p 'test_*.py': PASS (93 tests)
+git diff --check: PASS
+New/changed relative Markdown file targets: PASS
+Native startup/OS keyboard smoke: BLOCKED before window creation (X11 connection unavailable)
+Reference Apple M1/Metal: UNRUN, tracked in #376/#312
+
+New lifecycle/publication/restart cases:
+test checkpoints::lifecycle_tests::archive_is_idempotent_conflicting_report_rejects_and_new_run_serial_avoids_history ... ok
+test checkpoints::lifecycle_tests::launch_commits_only_fatigue_credit_once_and_preserves_world_healing_and_rollback_watermark ... ok
+test checkpoints::lifecycle_tests::terminal_native_restart_archives_once_and_corrupt_latest_cannot_restore_old_run ... ok
+test checkpoints::publication_failure_tests::failed_offline_credit_publication_does_not_expose_candidate_or_destroy_prior_checkpoint ... ok
+test checkpoints::publication_failure_tests::terminal_checkpoint_retry_uses_host_time_while_gameplay_clock_is_frozen ... ok
+test session::lifecycle::tests::active_menu_time_advances_but_restore_resets_ui_and_terminal_backlog ... ok
+test session::lifecycle::tests::death_truncates_world_to_lethal_boundary_and_freezes_all_future_work_and_commands ... ok
+test session::lifecycle::tests::fresh_restart_rebuilds_state_and_monotonic_run_identity_without_reusing_old_inputs ... ok
+test session::lifecycle::tests::schema_one_migrates_only_missing_survival_and_schema_two_requires_complete_state ... ok
+test session::lifecycle::tests::whole_game_roundtrip_includes_active_healing_fraction_configuration_and_journey_source ... ok
+test session::lifecycle::tests::consumed_crafted_medkit_and_partial_healing_share_one_whole_game_checkpoint ... ok
+test storage::restart_tests::failure_at_each_write_preserves_a_verified_generation_and_never_falsely_acknowledges_restart ... ok
+test storage::restart_tests::archive_failure_keeps_two_terminal_slots_and_success_retires_both_old_generations ... ok
+
+Workspace suite summaries:
+test result: ok. 68 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+test result: ok. 217 passed; 0 failed; 5 ignored; 0 measured; 0 filtered out; finished in 32.74s
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 71 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 3.38s
+test result: ok. 64 passed; 0 failed; 12 ignored; 0 measured; 0 filtered out; finished in 2.32s
+test result: ok. 68 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.08s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 42 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.02s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

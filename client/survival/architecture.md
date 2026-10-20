@@ -25,13 +25,11 @@ so the interval since that checkpoint is conservatively treated as closed time,
 with a six-hour cap. This intentionally cannot distinguish process execution
 lost in a crash from genuinely closed time. Save capture itself grants nothing.
 
-#371 owns native/session/save integration: validate deserialized state, apply
-recovery once, durably publish the credited state and new timestamp before gameplay
-exposure. If publication fails, do not expose the grant. The watermark plus updated
-fatigue must be one atomic checkpoint; domain receipts alone cannot ensure
-exactly-once recovery across a host crash. Old checkpoints without survival require
-an explicit #371 migration. This crate is not yet ticked by the playable session;
-no existing save format is silently changed. Death archive/restart is #371/#372.
+Runtime #371 composes this owner into full-game schema-2 saves, admits active
+durations and performs a launch-only verified fatigue-credit transaction. Old
+schema-1 worlds migrate once with full new meters and zero survival active time;
+no old hunger/health/effect progress is invented. See the
+[canonical lifecycle/save contract](../../docs/save-contract.md#survival-lifecycle-and-launch-transaction-371).
 
 ## Damage and status pipeline (#368)
 
@@ -68,8 +66,9 @@ Validate definitions and decoded state before publication, including source/ID
 uniqueness, durations/intervals, stack limits, armor, wound debt and death cause.
 Registry bounds are 256 sources/effects; intervals are 1ms..1day, timed/linger
 limits one day. Execution costs scale with actual effect events, not render frames.
-Native survival persistence, consumable effects, death archives and host world
-freeze remain #369–#372; this owner supplies deterministic test fixtures.
+Runtime #371 owns full-game persistence, native clock admission, terminal world
+freeze and restart publication; #370 composes consumable effects. #372 owns
+journey distance sampling and richer reports.
 
 ## Movement and interaction restrictions (#369)
 
@@ -106,13 +105,9 @@ remain physical. Existing zero-G momentum is not artificially braked. Fabricator
 jobs, Core and ship physics continue at full admitted time, even when the player
 cannot operate the machine. Emergency interactions bypass recovery delays.
 
-The session now composes the survival owner and these consumers. As with #367
-and #368, production depletion, full-save migration/offline recovery, terminal
-world freeze and restart lifecycle belong to #371; this change does not start an
-unsaved survival clock. Default session vitals stay full until that integration.
-#370 owns actual consumable effects and #377 owns final wheel dispatch; neither
-is required to implement/test this action policy. #373 owns the persistent HUD;
-automation exposes `survival_restrictions` with exact basis-point values today.
+Runtime #371 activates the survival clock and persists source state with the
+whole session. #370 owns consumable benefits, #377 final native wheel dispatch,
+and #373 the persistent HUD. Automation exposes exact restriction basis points.
 
 ## Consumable recovery definitions (#370)
 
@@ -153,8 +148,9 @@ averted by food/healing scheduled for the lethal timestamp.
 
 Active recovery rule definitions, stacks, duration and fractional tick are part
 of serialized `Survival`; validate and restore without stepping. Offline recovery
-only changes fatigue, never these timers or benefits. #371 owns composing this
-owner with consumed inventory into one verified whole-game checkpoint and
-activating production clocks; #370 does not start an unsaved clock. Native Q-wheel
+only changes fatigue, never these timers or benefits. Runtime #371 composes
+this owner with consumed inventory in one verified whole-game checkpoint and
+activates the production clock. Saved catalog rules must agree with already
+captured registry IDs; conflicting definitions reject before restoration. Native Q-wheel
 selection/hover presentation belongs #377 and consumes through runtime's exact
 item transaction; M/N remain absent. Four-food expansion/unlocks are #378.

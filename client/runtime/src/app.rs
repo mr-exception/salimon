@@ -257,7 +257,8 @@ impl ClientApplication {
         window.set_visible(true);
         window.focus_window();
         self.native_focused = window.has_focus();
-        self.cursor_captured = capture_cursor(&window);
+        self.cursor_captured =
+            !self.session.survival.snapshot().terminal && capture_cursor(&window);
         let size = window.inner_size();
         log::info!(
             "native window created: physical_size={}x{} scale_factor={:.2}",
@@ -459,7 +460,11 @@ impl ClientApplication {
 
     fn advance_native(&mut self, elapsed: Duration) -> (Duration, usize) {
         let started = Instant::now();
-        self.session.update_clock.accumulate(elapsed);
+        if self.session.survival.snapshot().terminal {
+            self.session.update_clock.reset();
+        } else {
+            self.session.update_clock.accumulate(elapsed);
+        }
         if let Some(benchmark) = &mut self.benchmark {
             benchmark.latest_physics.clear_work();
             self.session.latest_physics.clear_work();
@@ -490,6 +495,12 @@ impl ClientApplication {
         }
         if let Some(checkpoints) = &mut self.checkpoints {
             checkpoints.poll(&self.session);
+        }
+        if self.session.survival.snapshot().terminal && self.cursor_captured {
+            if let Some(window) = &self.window {
+                release_cursor(window);
+            }
+            self.release_input_capture();
         }
         (update_delta, ticks)
     }
@@ -606,11 +617,22 @@ impl ClientApplication {
                 radius_meters,
             };
         }
+        if self.session.survival.snapshot().terminal {
+            contextual_placement = OverlayPlacement::BottomCenter;
+        }
         self.action_bar
-            .set_contextual(contextual_action.map(|prompt| prompt.text));
+            .set_contextual(if self.session.survival.snapshot().terminal {
+                Some("Journey ended - R to restart".into())
+            } else {
+                contextual_action.map(|prompt| prompt.text)
+            });
         window.set_title(&self.benchmark.as_ref().map_or_else(
             || {
-                let title = gameplay_window_title(monitor_message, interaction);
+                let title = if self.session.survival.snapshot().terminal {
+                    "Salimon - Journey ended - R to restart".to_owned()
+                } else {
+                    gameplay_window_title(monitor_message, interaction)
+                };
                 self.checkpoints
                     .as_ref()
                     .and_then(|c| c.warning)
@@ -1062,15 +1084,47 @@ impl ApplicationHandler for ClientApplication {
                     self.fail(event_loop, error);
                     return;
                 }
-                if focused {
+                if focused && !self.session.survival.snapshot().terminal {
                     self.cursor_captured = capture_cursor(&window);
                 }
             }
             WindowEvent::MouseInput {
                 state: ElementState::Pressed,
                 ..
-            } if !self.cursor_captured && self.native_focused && !self.occluded => {
+            } if !self.cursor_captured
+                && self.native_focused
+                && !self.occluded
+                && !self.session.survival.snapshot().terminal =>
+            {
                 self.cursor_captured = capture_cursor(&window);
+            }
+            WindowEvent::KeyboardInput {
+                event,
+                is_synthetic,
+                ..
+            } if self.session.survival.snapshot().terminal
+                && self.native_focused
+                && !self.occluded
+                && !is_synthetic
+                && event.state == ElementState::Pressed
+                && !event.repeat
+                && event.physical_key == PhysicalKey::Code(KeyCode::KeyR) =>
+            {
+                if let Some(checkpoints) = &mut self.checkpoints {
+                    match checkpoints.restart(&mut self.session) {
+                        Ok(()) => {
+                            self.reset_update_clock();
+                            self.terrain_stream = Default::default();
+                            self.action_bar = Default::default();
+                        }
+                        Err(error) => {
+                            log::error!("restart failed: {error}");
+                            checkpoints.warning =
+                                Some("RESTART FAILED - terminal save retained; R to retry");
+                        }
+                    }
+                }
+                window.request_redraw();
             }
             WindowEvent::KeyboardInput {
                 event,

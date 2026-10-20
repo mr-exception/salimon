@@ -388,3 +388,20 @@ competing materials in deployed support. `repair_door_seams.py` records the
 deliberate one-time Blender source migration; do not run it during export or
 reapply it to already repaired sources. `preview_seams.py` creates read-only CPU
 reference views using the runtime's hinge/extension phases.
+
+
+## Canopy shoulder junction (#334)
+
+Both opaque side-hull forward ends and the roof now terminate at X=4.98 m,
+inside the rear canopy frame (4.94..5.06 m), before glazing starts at X=5 m.
+This removes the old 0.22 m shoulder intrusion and 0.18 m roof overhang without
+changing glass alpha/materials, window frames, nose/floor, monitors or walking
+lanes. The owning hull library and exports are updated together. The overall
+broad envelope and conservative pane/traversal proxies are unchanged: they do
+not represent these decorative shoulder end caps. Generated spatial/ramp/landing
+contracts remain byte-identical.
+The category validator tests 24 additional near-corner rays from seated and
+standing eyes on both sides, plus existing lower-window/monitor visibility.
+A deliberately extended shoulder fails those rays. `repair_cockpit_shoulders.py`
+records the one-time source migration; `preview_seams.py -- corners <output>`
+uses the actual seated eye and creates read-only interior/exterior references.

@@ -31,8 +31,8 @@ def render(topic,output):
     else:
         views=[]
         for side in [-1,1]:
-            views += [(f'seated-{side}',(6.1,0,1.65),(5.12,side*4.8,1.65),0),
-              (f'standing-{side}',(4.3,0,1.7),(5.12,side*4.8,1.65),0),
+            views += [(f'seated-{side}',(2.76,0,1.799032258),(5.12,side*4.7,1.65),0),
+              (f'standing-{side}',(1.3,0,1.997311828),(5.12,side*4.7,1.65),0),
               (f'exterior-{side}',(10,side*9,4),(5.1,side*4.7,1.6),0)]
     for name,eye,target,f in views:
         h=min(f/.6,1);h=h*h*(3-2*h);e=max(0,min(1,(f-.6)/.4));e=e*e*(3-2*e)

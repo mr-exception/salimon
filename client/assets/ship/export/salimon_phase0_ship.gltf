@@ -2163,7 +2163,7 @@
       ]
     },
     {
-      "name": "Hull_Port_Side",
+      "name": "Hull_Port_Side / canopy termination",
       "primitives": [
         {
           "attributes": {
@@ -2191,7 +2191,7 @@
       ]
     },
     {
-      "name": "Hull_Roof",
+      "name": "Hull_Roof / canopy termination",
       "primitives": [
         {
           "attributes": {
@@ -2205,7 +2205,7 @@
       ]
     },
     {
-      "name": "Hull_Starboard_Side",
+      "name": "Hull_Starboard_Side / canopy termination",
       "primitives": [
         {
           "attributes": {
@@ -4623,7 +4623,7 @@
       "componentType": 5126,
       "count": 144,
       "max": [
-        5.199999809265137,
+        4.980000019073486,
         2.935483932495117,
         5.099999904632568
       ],
@@ -4685,7 +4685,7 @@
       "componentType": 5126,
       "count": 48,
       "max": [
-        5.159999847412109,
+        4.980000019073486,
         3.3118278980255127,
         5.239999771118164
       ],
@@ -4719,7 +4719,7 @@
       "componentType": 5126,
       "count": 144,
       "max": [
-        5.199999809265137,
+        4.980000019073486,
         2.935483932495117,
         -4.599999904632568
       ],

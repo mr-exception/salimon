@@ -3,12 +3,8 @@ use super::{GameplaySession, ViewMode};
 use salimon_persistence::{SaveError, Validate, invalid};
 use std::time::Duration;
 
-/// Persisted journey counters; distance sampling/presentation is owned by #372.
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
-#[serde(deny_unknown_fields)]
-pub(crate) struct JourneyState {
-    pub(crate) distance_meters: f64,
-}
+pub(crate) use super::journey::JourneyState;
+pub(crate) const ARCHIVE_VERSION: u32 = 2;
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct RunState {
@@ -31,7 +27,7 @@ impl Validate for RunState {
         {
             return Err(invalid("invalid run identity/journey counters"));
         }
-        Ok(())
+        self.journey.validate()
     }
 }
 #[derive(serde::Serialize)]
@@ -44,6 +40,7 @@ pub(crate) struct EndedRun {
     cause: salimon_survival::effects::Source,
     position_meters: [f64; 3],
     journey: JourneyState,
+    final_location: super::journey::NamedLocation,
 }
 impl GameplaySession {
     pub(super) fn freeze_terminal(&mut self) {
@@ -59,7 +56,7 @@ impl GameplaySession {
             return Err(invalid("cannot archive a living run"));
         }
         let report = EndedRun {
-            schema_version: 1,
+            schema_version: ARCHIVE_VERSION,
             serial: self.run.serial,
             seed: self.seed,
             active_duration: snapshot.active_time,
@@ -68,6 +65,9 @@ impl GameplaySession {
                 .ok_or_else(|| invalid("terminal cause missing"))?,
             position_meters: self.snapshot().character.eye_position_meters,
             journey: self.run.journey.clone(),
+            final_location: super::journey::NamedLocation::at(
+                self.snapshot().character.eye_position_meters,
+            ),
         };
         serde_json::to_vec(&report).map_err(|e| SaveError::Encoding(e.to_string()))
     }

@@ -216,16 +216,23 @@ impl GameplaySession {
     /// Native focus/capture and filesystem scheduling remain shell-owned (#366).
     pub(crate) fn restore_bytes(&mut self, bytes: &[u8]) -> Result<(), SaveError> {
         let save = salimon_persistence::SaveGame::<SessionState>::decode(bytes)?;
-        let survival = match (save.schema_version, save.state.survival) {
+        let mut survival = match (save.schema_version, save.state.survival) {
             (1, None) => SurvivalState {
                 vitals: Default::default(),
                 catalog: salimon_survival::consumables::Catalog::starter(),
                 restrictions: Default::default(),
                 run: Default::default(),
             },
-            (2, Some(state)) => state,
+            (2 | 3, Some(state)) => state,
             _ => return Err(invalid("survival payload does not match envelope version")),
         };
+        if save.schema_version == 2 {
+            // Schema 2 recorded only a cumulative counter. There is no missing
+            // movement to infer, and no restore displacement to charge.
+            survival.run.journey.initialize_tracking();
+        } else if survival.run.journey.tracking.is_none() {
+            return Err(invalid("schema-3 journey sampling source missing"));
+        }
         survival.validate()?;
         let (fabricator, consumables) = save.state.fabrication.restore()?;
         let physical = save.state.physical.restore()?;

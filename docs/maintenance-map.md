@@ -138,9 +138,17 @@ wheel/presentation is #377. [Canonical data/semantics](../client/survival/archit
 
 Survival lifecycle (#371): runtime `session/lifecycle.rs`, `session/persistence.rs`,
 `session.rs`, `checkpoints.rs` and `app.rs`; persistence envelope `src/lib.rs` and
-`src/storage.rs`. The [schema-2 save/lifecycle contract](save-contract.md) owns
+`src/storage.rs`. The [save/lifecycle contract](save-contract.md) owns
 v1 migration, startup publication, terminal freeze, archive/restart ordering and
 failure guarantees. Tests live in `session/lifecycle/tests.rs`, checkpoint launch/
 restart/publication-failure modules and storage restart fault injection. Run
 workspace tests/build/Clippy/fmt, native startup/restart smoke; reference signoff
-remains #376. Journey source persistence is ready for #372 distance sampling.
+remains #376. Journey distance sampling is implemented by #372.
+
+
+Journey statistics (#372): runtime `session/journey.rs`, tick composition in
+`session.rs`, observational `automation.rs`, background admission in `app.rs` and
+terminal publication in `checkpoints.rs`; storage owns versioned archive paths.
+See [metric and migration](save-contract.md#journey-statistics-372). Regressions:
+`session/journey/tests.rs`, app background ticks, checkpoint archive/repair/version
+and persistence restart fault injection.

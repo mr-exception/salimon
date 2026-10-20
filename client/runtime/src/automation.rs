@@ -616,6 +616,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
                 _ => None,
             }),
         },
+        "journey": {"active_duration":app.survival.snapshot().active_time, "distance_meters":app.run.journey.distance_meters, "location":crate::session::journey::NamedLocation::at(app.snapshot().character.eye_position_meters)},
         "survival": {"hunger":app.survival.snapshot().hunger.value(),
             "health":app.survival.snapshot().health.value(), "fatigue":app.survival.snapshot().fatigue.value(),
             "terminal":app.survival.snapshot().terminal,

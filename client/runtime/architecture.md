@@ -477,10 +477,11 @@ held state; backlog is elapsed-time debt, not a recorded input event replay.
 
 Overload retains debt and slows the entire gameplay simulation relative to wall
 time. Recovery drains it in bounded batches. A long unreported stall is no longer
-silently clamped to 250 ms. Lifecycle resets (occlusion, suspension, zero drawable,
-renderer reconstruction) deliberately exclude the gap and clear already queued
+silently clamped to 250 ms. Lifecycle resets (OS suspension and renderer reconstruction) deliberately exclude the gap and clear already queued
 debt plus interpolation history; cleared debt is added to `lifecycle_excluded`.
-Unobserved lifecycle gap duration is not represented as gameplay debt. Saturating
+Occlusion/zero drawable instead clear held controls and presentation history,
+then wake the same bounded scheduler every 16 ms without rendering. Focus loss
+also continues gameplay. Unobserved OS lifecycle gap duration is not represented as gameplay debt. Saturating
 `Duration` arithmetic bounds representation, not a gameplay cargo/time cap.
 Automation still advances the exact requested fixed delta directly, and renders
 current authoritative state; it never uses native backlog or interpolation.
@@ -967,7 +968,7 @@ with this seam, capture the selected item identity, close only after success and
 use these recovery definitions for hover feedback. M/N remain absent.
 
 See the [canonical recovery data](../survival/architecture.md#consumable-recovery-definitions-370).
-Runtime #371 activates production survival ticking and schema-2 full-save
+Runtime #371 activates production survival ticking and full-save
 publication; #377 still owns the native wheel and #378 advanced foods. Serialized
 recovery and inventory continue exactly and remain frozen offline.
 
@@ -983,8 +984,8 @@ commands. Ordinary menus continue active time; true pause remains #381.
 `session/persistence.rs` captures survival meters, fractional clocks, captured
 status/healing rules/intervals, terminal cause, offline watermark, item catalog,
 restriction tuning and run/journey source with world/ship/Fabricator/inventory in
-one schema-2 envelope. V1 migration initializes only the new survival source;
-v2 missing/invalid source rejects. Restore resets transient UI/view/input and
+one schema-3 envelope. V1 migration initializes the new survival source;
+v2 migration adds journey tracking. Missing/invalid version-required source rejects. Restore resets transient UI/view/input and
 repairs derived permissions without stepping or granting offline effects.
 
 `checkpoints.rs` performs verified launch recovery before exposing a temporary
@@ -993,4 +994,18 @@ pairs, immutable archive summaries and both fresh generations during restart.
 Native R is an initial focused nonsynthetic terminal-only action, with a minimal
 notice until #374's complete screen. See the
 [canonical save/lifecycle contract](../../docs/save-contract.md#survival-lifecycle-and-launch-transaction-371)
-for failure/crash guarantees and remaining #372/#373/#377/#379 scope.
+for failure/crash guarantees and remaining #373/#377/#379 scope.
+
+
+## Journey accounting (#372)
+
+`session/journey.rs` owns framed last valid physical samples, combined travel and
+named location DTOs. `session.rs` measures ship travel around its update, then
+character travel around its controller using the same completed ship frame.
+Cabin-local samples exclude inherited ship translation/rotation; outside/EVA
+samples remain absolute f64. Neither camera/render origins nor out-of-tick changes
+create distance. The [canonical save contract](../../docs/save-contract.md#journey-statistics-372)
+defines the metric, schema-3 v1/v2 migration, background timing and version-2
+archive policy. `checkpoints.rs` archives on terminal publication, not only restart.
+Maintain `session/journey/tests.rs`, native background-scheduler and checkpoint
+archive/recovery/version tests when changing these boundaries.

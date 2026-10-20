@@ -13,7 +13,12 @@ pub trait CheckpointStore {
     fn next_run_serial(&self) -> Result<u64, SaveError> {
         Ok(1)
     }
-    fn archive_run(&mut self, _serial: u64, _report: &[u8]) -> Result<(), SaveError> {
+    fn archive_run(
+        &mut self,
+        _version: u32,
+        _serial: u64,
+        _report: &[u8],
+    ) -> Result<(), SaveError> {
         Err(invalid("store does not support run archives"))
     }
 }
@@ -81,6 +86,7 @@ impl<S: CheckpointStore> SaveManager<S> {
     /// requires both active slots to contain the fresh run, after durable archive.
     pub fn replace_terminal_run(
         &mut self,
+        archive_version: u32,
         serial: u64,
         report: &[u8],
         terminal: &[u8],
@@ -89,12 +95,25 @@ impl<S: CheckpointStore> SaveManager<S> {
     ) -> Result<(), SaveError> {
         validate(terminal)?;
         validate(fresh)?;
-        self.checkpoint(terminal, &validate)?;
-        self.checkpoint(terminal, &validate)?;
-        self.store.archive_run(serial, report)?;
+        self.checkpoint_terminal(archive_version, serial, report, terminal, &validate)?;
         self.checkpoint(fresh, &validate)?;
         self.checkpoint(fresh, &validate)
     }
+    /// Verify both terminal fallbacks before publishing an immutable report.
+    /// Archive failure leaves terminal recovery intact and is safe to retry.
+    pub fn checkpoint_terminal(
+        &mut self,
+        archive_version: u32,
+        serial: u64,
+        report: &[u8],
+        terminal: &[u8],
+        validate: impl Fn(&[u8]) -> Result<(), SaveError>,
+    ) -> Result<(), SaveError> {
+        self.checkpoint(terminal, &validate)?;
+        self.checkpoint(terminal, &validate)?;
+        self.store.archive_run(archive_version, serial, report)
+    }
+
     pub fn checkpoint(
         &mut self,
         payload: &[u8],
@@ -203,35 +222,45 @@ fn io_error(operation: &str, path: &Path, error: std::io::Error) -> SaveError {
 }
 impl CheckpointStore for NativeStore {
     fn next_run_serial(&self) -> Result<u64, SaveError> {
-        let directory = self.directory.join("journeys");
-        let entries = match std::fs::read_dir(&directory) {
-            Ok(entries) => entries,
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(1),
-            Err(e) => return Err(io_error("scan archives", &directory, e)),
-        };
         let mut maximum = 0;
-        for entry in entries {
-            let name = entry
-                .map_err(|e| io_error("scan archive entry", &directory, e))?
-                .file_name();
-            if let Some(serial) = name
-                .to_str()
-                .and_then(|n| n.strip_prefix("run-"))
-                .and_then(|n| n.strip_suffix(".json"))
-                .and_then(|n| n.parse::<u64>().ok())
-            {
-                maximum = maximum.max(serial);
+        // V1 archives remain immutable at the original path. V2 uses a separate
+        // namespace, including an interrupted v1 restart restored by a newer client.
+        for directory in [
+            self.directory.join("journeys"),
+            self.directory.join("journeys/v2"),
+        ] {
+            let entries = match std::fs::read_dir(&directory) {
+                Ok(entries) => entries,
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,
+                Err(e) => return Err(io_error("scan archives", &directory, e)),
+            };
+            for entry in entries {
+                let name = entry
+                    .map_err(|e| io_error("scan archive entry", &directory, e))?
+                    .file_name();
+                if let Some(serial) = name
+                    .to_str()
+                    .and_then(|n| n.strip_prefix("run-"))
+                    .and_then(|n| n.strip_suffix(".json"))
+                    .and_then(|n| n.parse::<u64>().ok())
+                {
+                    maximum = maximum.max(serial);
+                }
             }
         }
         maximum
             .checked_add(1)
             .ok_or_else(|| invalid("run archive identity exhausted"))
     }
-    fn archive_run(&mut self, serial: u64, report: &[u8]) -> Result<(), SaveError> {
-        if serial == 0 || report.len() > 1024 * 1024 {
+    fn archive_run(&mut self, version: u32, serial: u64, report: &[u8]) -> Result<(), SaveError> {
+        if !matches!(version, 1 | 2) || serial == 0 || report.len() > 1024 * 1024 {
             return Err(invalid("run archive identity/size"));
         }
-        let directory = self.directory.join("journeys");
+        let directory = self.directory.join(if version == 1 {
+            "journeys"
+        } else {
+            "journeys/v2"
+        });
         std::fs::create_dir_all(&directory)
             .map_err(|e| io_error("create archive directory", &directory, e))?;
         let destination = directory.join(format!("run-{serial}.json"));
@@ -258,9 +287,15 @@ impl CheckpointStore for NativeStore {
         std::fs::rename(&temporary, &destination)
             .map_err(|e| io_error("publish archive", &destination, e))?;
         #[cfg(unix)]
-        std::fs::File::open(&directory)
-            .and_then(|f| f.sync_all())
-            .map_err(|e| io_error("flush archive directory", &directory, e))?;
+        for parent in [
+            &directory,
+            &self.directory.join("journeys"),
+            &self.directory,
+        ] {
+            std::fs::File::open(parent)
+                .and_then(|f| f.sync_all())
+                .map_err(|e| io_error("flush archive directory", parent, e))?;
+        }
         let existing =
             std::fs::read(&destination).map_err(|e| io_error("verify archive", &destination, e))?;
         if existing != report {
@@ -447,7 +482,7 @@ mod restart_tests {
             self.slots[slot] = Some(bytes.to_vec());
             Ok(())
         }
-        fn archive_run(&mut self, _id: u64, report: &[u8]) -> Result<(), SaveError> {
+        fn archive_run(&mut self, _version: u32, _id: u64, report: &[u8]) -> Result<(), SaveError> {
             if self.fail_archive {
                 return Err(invalid("archive disk full"));
             }
@@ -471,7 +506,7 @@ mod restart_tests {
             manager.store.fail_write = Some(manager.store.writes + stage);
             assert!(
                 manager
-                    .replace_terminal_run(1, b"report", b"terminal", b"fresh", valid)
+                    .replace_terminal_run(1, 1, b"report", b"terminal", b"fresh", valid)
                     .is_err()
             );
             let recovered = SaveManager::new(manager.store)
@@ -496,7 +531,7 @@ mod restart_tests {
         manager.store.fail_archive = true;
         assert!(
             manager
-                .replace_terminal_run(1, b"report", b"terminal", b"fresh", valid)
+                .replace_terminal_run(1, 1, b"report", b"terminal", b"fresh", valid)
                 .is_err()
         );
         for slot in 0..2 {
@@ -509,7 +544,7 @@ mod restart_tests {
         }
         manager.store.fail_archive = false;
         manager
-            .replace_terminal_run(1, b"report", b"terminal", b"fresh", valid)
+            .replace_terminal_run(1, 1, b"report", b"terminal", b"fresh", valid)
             .unwrap();
         assert_eq!(manager.store.report, Some(b"report".to_vec()));
         for slot in 0..2 {

@@ -1,11 +1,14 @@
-# Canonical whole-game save contract (schema 2)
+# Canonical whole-game save contract (schema 3)
 
 `salimon-persistence::SaveGame<T>` is the versioned envelope. New captures use
-version 2. Decode accepts version 1 only for the explicit runtime migration:
+version 3. Decode accepts versions 1 and 2 for explicit runtime migration:
 retain the complete physical/Fabricator/equipment payload, initialize newly
 introduced survival meters at 100 with no effects or retrospective active time,
 and initialize the run/journey source. A version-1 payload must lack survival;
-version 2 must contain complete typed survival state. Missing/null v2 survival,
+version 2 must contain complete typed survival state. V2 keeps its cumulative
+journey distance and initializes empty sampling history without inventing travel.
+Version 3 requires journey tracking source (which can have no samples on a fresh
+run). Missing/null v2/v3 survival or missing v3 tracking,
 invalid meters/effect registries/configuration, unknown fields and unsupported
 versions reject before publication. Migration is checkpointed before exposure.
 
@@ -13,7 +16,7 @@ versions reject before publication. Migration is checkpointed before exposure.
 
 | Owner | Required logical state | Regenerated/excluded state |
 | --- | --- | --- |
-| Survival/run | Meters/config, fractional drain/starvation/regeneration, full captured effect rules/stacks/partial ticks/lifetimes, wounds/death source/terminal flag, active survival duration, offline UTC watermark, consumable catalog, movement/interaction tuning, run serial and journey counter source | Launch receipt, held inputs/UI/capture, movement scale and presentation history; derived permissions are repaired |
+| Survival/run | Meters/config, fractional drain/starvation/regeneration, full captured effect rules/stacks/partial ticks/lifetimes, wounds/death source/terminal flag, active survival duration, offline UTC watermark, consumable catalog, movement/interaction tuning, run serial, cumulative journey distance and last valid framed physical samples | Launch receipt, held inputs/UI/capture, movement scale and presentation history; derived permissions are repaired |
 | Envelope/runtime clock | Unix-second recording time, completed simulation Duration, exact admitted Duration backlog | Instant, wall-clock frame timer, profiling durations; offline world advancement is zero |
 | Character | Location/frame including doorway blend, local/world position, yaw/pitch, vertical/interior/EVA velocities, nearby surface, EVA basis, gravity/ramp state | Jump key edge reset; camera matrices regenerated |
 | Ship | Pose/quaternion, linear velocity, steering ramp, propulsion/configuration, flight/landed state, full assist/bounce progress, selected signed throttle, door state/fraction, cockpit authority, terrain/footprint, Core config/charge/fraction/reservation/consumption, conversion source and progress, Fabricator demand | Held throttle/steering intent reset, transient message and last-funded interval reset; instruments regenerated |
@@ -23,7 +26,6 @@ versions reject before publication. Migration is checkpointed before exposure.
 | Fabricator | Recipe definitions/IDs/unlocks, bins, FIFO committed job recipes/IDs/counts/current progress, queue capacity, next ID, occupied tray item | No refund/re-enqueue/recharge during restore; status/demand derived from jobs and Core |
 | Inventory/equipment | Exactly three food/two medical single-item slots with stable job/unit identities; five equipment slots and selection | No held controls or automatic consumption; carrying selection lock revalidated |
 | Session/presentation | Gameplay seed, gameplay/precision camera mode and camera controller, deterministic simulation state | Crafting/radial modals, hover, feedback, aim commands, pending OS events, held keys/buttons, focus/capture, window/GPU, automation reader, measurement flags and caches excluded |
-| Future survival owner | Health/hunger/fatigue/status timers/effects/journey counters must become required typed fields when implemented | Only fatigue may recharge while closed. Health/hunger/DoT/healing/world freeze. No survival implementation or default state invented here |
 
 ## Validation and restore order
 
@@ -134,7 +136,7 @@ starts meters at 100 and increments the saved run serial. Terrain mode and world
 seed retain their deterministic new-run policy. New-run starter supplies are #379.
 
 The existing save worker first checkpoints the terminal run into both slots,
-then durably publishes an immutable idempotent `journeys/run-<serial>.json` summary,
+then durably publishes an immutable idempotent `journeys/v2/run-<serial>.json` summary,
 then verifies the fresh run in both slots. Only success replaces the live terminal
 session. Failure never grants gameplay with an unverified fresh state; retry
 retains the terminal source. After success both fallback generations belong to
@@ -148,10 +150,57 @@ survival duration, final absolute position and typed journey counter source.
 Byte-identical retry is idempotent; conflicting historical reports reject without
 overwrite. Native archive scans choose unused run serials when starting fresh
 after missing/damaged saves. Temporary archive files are not active reports.
-Distance sampling/coordinate discontinuity accounting and richer location/report
-semantics remain #372; the counter source is persisted now and defaults to zero.
+Version-2 summaries are published on the death checkpoint, clean exit and terminal
+launch recovery, before any restart request. Launch repairs a missing report after
+an interrupted terminal publication. Restart verifies the same report idempotently.
+Version-1 reports stay immutable in `journeys/run-<serial>.json`; both namespaces
+reserve serials, including an interrupted v1 restart restored by a newer client.
+Archive failure leaves verified terminal generations and retries through the same
+visible failure policy. Report version 2 includes final named location and samples.
 
 #375 owns expanded cross-system suites and #376 native reference signoff; #381
 owns a true pause menu and #382 manual Save Now controls. This change activates
 survival before the final HUD/Q-wheel/starter-supply wave (#373/#377/#379); native
 consumption UI is not claimed delivered by the lifecycle PR.
+
+
+## Journey statistics (#372)
+
+`session/journey.rs` owns the cumulative distance and latest valid ship/character
+samples. Active duration remains the exact `Survival::active_time` authority,
+including ordinary menus and background running, stopping at the lethal boundary.
+It is not wall-clock age or the legacy world elapsed clock. Offline recovery
+changes neither duration nor distance.
+
+Distance is the sum of ship-origin displacement and character displacement during
+each admitted physical tick. Ship flight/coasting/landing/takeoff counts even
+while the player is outside. Cabin movement uses native ship-local f64 positions;
+an idle passenger contributes zero extra distance, including a turning cabin.
+Character endpoints are taken before/after the controller using the same completed
+ship frame. Outside/EVA and doorway crossings use absolute f64 endpoints in that
+frame. An EVA traveller and the independently moving ship each contribute their
+own path. Surface walking, gravity and inherited EVA drift count as physical travel.
+The metric is sampled path length (tick chords), not net spawn-to-current distance.
+
+Only movement inside the production physics/controller tick enters accounting.
+Out-of-tick fixture/assist commands, cockpit snaps, teleport, restore, streaming
+and camera precision-tour positions cannot bridge old samples into a fake leg.
+Physical assist motion during a tick counts normally. Render-origin shifts never
+enter the source. Last valid positions persist with explicit ShipLocal/World tags;
+they record the last completed physical sample, not an instruction to bridge a
+later rebase/restore. Fresh runs have no samples. Finite checks protect persisted
+statistics; f64 subtraction precedes norms and cabin motion avoids solar-coordinate
+round-trips. This adds no arbitrary maximum-speed teleport heuristic.
+
+Final location derives from the saved physical character position, nearest catalog
+surface (catalog order breaks ties), stable body ID and nominal altitude. Names
+are `Near <body>` within the shared inclusive 3,000,000 m envelope, otherwise
+`Space near <body>`; neither claims terrain contact. Cause is the typed survival
+death source, never inferred from location or last movement. Automation inspection
+exposes duration, distance and the same location DTO. #374 owns its native layout.
+
+Occluded or zero-sized windows stop presentation and clear held controls but keep
+the same bounded physical tick/checkpoint scheduler running at 16 ms wakeups.
+Focus loss alone also keeps time running. OS suspension and renderer reconstruction
+retain the existing explicit lifecycle gap exclusion; this is distinct from a
+running minimized/unfocused app. Native desktop delivery remains #376 signoff.

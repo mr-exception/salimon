@@ -1,5 +1,5 @@
 //! Native orchestration: capture on the session thread, durable IO on one worker.
-use crate::session::GameplaySession;
+use crate::session::{GameplaySession, lifecycle::ARCHIVE_VERSION};
 use salimon_persistence::{
     SaveError,
     storage::{NativeStore, SaveManager},
@@ -40,7 +40,7 @@ pub(crate) fn default_directory() -> Result<PathBuf, SaveError> {
 enum SaveJob {
     Checkpoint {
         bytes: Vec<u8>,
-        terminal: bool,
+        archive: Option<(u64, Vec<u8>)>,
     },
     Restart {
         serial: u64,
@@ -48,6 +48,23 @@ enum SaveJob {
         terminal: Vec<u8>,
         fresh: Vec<u8>,
     },
+}
+impl SaveJob {
+    fn checkpoint(session: &GameplaySession, utc: u64) -> Result<Self, SaveError> {
+        Ok(Self::Checkpoint {
+            bytes: session.save_bytes(utc)?,
+            archive: session
+                .survival
+                .snapshot()
+                .terminal
+                .then(|| {
+                    session
+                        .ended_run_bytes()
+                        .map(|report| (session.run.serial, report))
+                })
+                .transpose()?,
+        })
+    }
 }
 pub(crate) struct Checkpoints {
     sender: Option<SyncSender<SaveJob>>,
@@ -88,8 +105,15 @@ impl Checkpoints {
                 candidate.run.serial = manager.next_run_serial()?;
             }
             let credited = candidate.save_bytes(launch_utc)?;
-            manager.checkpoint(&credited, validate)?;
             if candidate.survival.snapshot().terminal {
+                manager.checkpoint_terminal(
+                    ARCHIVE_VERSION,
+                    candidate.run.serial,
+                    &candidate.ended_run_bytes()?,
+                    &credited,
+                    validate,
+                )?;
+            } else {
                 manager.checkpoint(&credited, validate)?;
             }
             *session = candidate;
@@ -107,22 +131,29 @@ impl Checkpoints {
             .spawn(move || {
                 for job in jobs {
                     let result = match job {
-                        SaveJob::Checkpoint { bytes, terminal } => {
-                            manager.checkpoint(&bytes, validate).and_then(|()| {
-                                if terminal {
-                                    manager.checkpoint(&bytes, validate)
-                                } else {
-                                    Ok(())
-                                }
-                            })
-                        }
+                        SaveJob::Checkpoint { bytes, archive } => match archive {
+                            Some((serial, report)) => manager.checkpoint_terminal(
+                                ARCHIVE_VERSION,
+                                serial,
+                                &report,
+                                &bytes,
+                                validate,
+                            ),
+                            None => manager.checkpoint(&bytes, validate),
+                        },
                         SaveJob::Restart {
                             serial,
                             report,
                             terminal,
                             fresh,
-                        } => manager
-                            .replace_terminal_run(serial, &report, &terminal, &fresh, validate),
+                        } => manager.replace_terminal_run(
+                            ARCHIVE_VERSION,
+                            serial,
+                            &report,
+                            &terminal,
+                            &fresh,
+                            validate,
+                        ),
                     };
                     if done.send(result).is_err() {
                         break;
@@ -179,15 +210,12 @@ impl Checkpoints {
             return;
         }
         match now()
-            .and_then(|now| session.save_bytes(now))
-            .and_then(|bytes| {
+            .and_then(|now| SaveJob::checkpoint(session, now))
+            .and_then(|job| {
                 self.sender
                     .as_ref()
                     .ok_or_else(|| salimon_persistence::invalid("save worker closed"))?
-                    .try_send(SaveJob::Checkpoint {
-                        bytes,
-                        terminal: session.survival.snapshot().terminal,
-                    })
+                    .try_send(job)
                     .map_err(|e| salimon_persistence::invalid(format!("queue checkpoint: {e}")))
             }) {
             Ok(()) => {
@@ -241,7 +269,7 @@ impl Checkpoints {
     }
     /// Drain the in-flight write, then verify the final snapshot before returning.
     pub(crate) fn finish(&mut self, session: &GameplaySession) -> Result<(), SaveError> {
-        let bytes = now().and_then(|now| session.save_bytes(now))?;
+        let job = now().and_then(|now| SaveJob::checkpoint(session, now))?;
         if self.busy {
             let _ = self.results.recv();
             self.busy = false;
@@ -251,10 +279,7 @@ impl Checkpoints {
             .take()
             .ok_or_else(|| salimon_persistence::invalid("checkpoint worker closed"))?;
         sender
-            .send(SaveJob::Checkpoint {
-                bytes,
-                terminal: session.survival.snapshot().terminal,
-            })
+            .send(job)
             .map_err(|e| salimon_persistence::invalid(format!("queue exit checkpoint: {e}")))?;
         drop(sender);
         let result = self
@@ -442,7 +467,7 @@ mod lifecycle_tests {
         assert_eq!(s.run.serial, serial + 1);
         assert_eq!(s.survival.snapshot().health, Points::FULL);
         assert_eq!(
-            std::fs::read(directory.join(format!("journeys/run-{serial}.json"))).unwrap(),
+            std::fs::read(directory.join(format!("journeys/v2/run-{serial}.json"))).unwrap(),
             report
         );
         drop(saves);
@@ -469,13 +494,58 @@ mod lifecycle_tests {
         std::fs::remove_dir_all(directory).unwrap();
     }
     #[test]
+    fn death_checkpoint_archives_before_restart_and_launch_repairs_missing_report() {
+        let directory = dir("death-archive");
+        let _ = std::fs::remove_dir_all(&directory);
+        let mut s = reduced();
+        let mut saves = Checkpoints::open_at(directory.clone(), &mut s, 100).unwrap();
+        s.survival.command(Command::Damage(Points::FULL)).unwrap();
+        let report = s.ended_run_bytes().unwrap();
+        saves.poll(&s);
+        saves.results.recv().unwrap().unwrap();
+        saves.busy = false;
+        let path = directory.join(format!("journeys/v2/run-{}.json", s.run.serial));
+        assert_eq!(std::fs::read(&path).unwrap(), report);
+        assert!(s.survival.snapshot().terminal);
+        // Model interruption after both terminal writes but before archive rename.
+        std::fs::remove_file(&path).unwrap();
+        drop(saves);
+        let mut recovered = GameplaySession::default();
+        let saves = Checkpoints::open_at(directory.clone(), &mut recovered, 100).unwrap();
+        assert!(recovered.survival.snapshot().terminal);
+        assert_eq!(std::fs::read(&path).unwrap(), report);
+        drop(saves);
+        std::fs::remove_dir_all(directory).unwrap();
+    }
+    #[test]
+    fn report_versions_are_immutable_and_both_namespaces_reserve_run_ids() {
+        let directory = dir("archive-versions");
+        let _ = std::fs::remove_dir_all(&directory);
+        let mut store = NativeStore::open(directory.clone()).unwrap();
+        store.archive_run(1, 7, b"legacy").unwrap();
+        store.archive_run(2, 7, b"current").unwrap();
+        store.archive_run(2, 9, b"latest").unwrap();
+        assert_eq!(
+            std::fs::read(directory.join("journeys/run-7.json")).unwrap(),
+            b"legacy"
+        );
+        assert_eq!(
+            std::fs::read(directory.join("journeys/v2/run-7.json")).unwrap(),
+            b"current"
+        );
+        assert!(store.archive_run(2, 7, b"conflict").is_err());
+        assert_eq!(store.next_run_serial().unwrap(), 10);
+        drop(store);
+        std::fs::remove_dir_all(directory).unwrap();
+    }
+    #[test]
     fn archive_is_idempotent_conflicting_report_rejects_and_new_run_serial_avoids_history() {
         let directory = dir("archive");
         let _ = std::fs::remove_dir_all(&directory);
         let mut store = NativeStore::open(directory.clone()).unwrap();
-        store.archive_run(7, b"report").unwrap();
-        store.archive_run(7, b"report").unwrap();
-        assert!(store.archive_run(7, b"different").is_err());
+        store.archive_run(1, 7, b"report").unwrap();
+        store.archive_run(1, 7, b"report").unwrap();
+        assert!(store.archive_run(1, 7, b"different").is_err());
         assert_eq!(store.next_run_serial().unwrap(), 8);
         drop(store);
         let mut s = GameplaySession::default();

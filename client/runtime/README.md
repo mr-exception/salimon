@@ -92,6 +92,12 @@ the original monotonic update clock and default starting state.
   monotonic delta. Reset only the update clock across lifecycle gaps; preserve
   portable state across renderer reconstruction.
 
+The compact upper-left survival HUD shows health, hunger and fatigue icons with
+thin bars. Press **H** for status details and exact active movement/interaction
+penalties; use **[** / **]** to page through effects and H to close. It does not
+pause gameplay. Recovery briefly shows +Health/+Hunger feedback. Crafting and
+engineering diagnostics take overlay priority; focus/capture loss closes details.
+
 Press **F3** to show or hide the engineering diagnostics overlay. It is hidden by
 default and remains a developer view rather than a normal gameplay HUD. Runtime
 frame observations feed the diagnostics crate after each successful present;

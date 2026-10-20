@@ -166,6 +166,7 @@ fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
             let (uploaded_bytes, peak_upload_bytes) = app.terrain_uploads();
             let native = json!({ "terrain_upload_preparation_micros": upload_times,
             "visual_context": app.visual_context(),
+                    "survival_details_open":app.survival_hud.details_open,
             "window": app.window_state(),
             "capture_status": app.capture_status,
             "performance": app.observations.snapshot(),
@@ -188,9 +189,20 @@ fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
             }
             return json!({"protocol":PROTOCOL,"id":id,"ok":true,"result":result});
         }
-        Some("key") if command.get("key").and_then(Value::as_str) == Some("diagnostics") => {
+        Some("key")
+            if matches!(
+                command.get("key").and_then(Value::as_str),
+                Some("diagnostics" | "status" | "status_previous" | "status_next")
+            ) =>
+        {
             if let Some(pressed) = command.get("pressed").and_then(Value::as_bool) {
-                app.automation_key(PhysicalKey::Code(KeyCode::F3), pressed);
+                let key = match command["key"].as_str() {
+                    Some("status") => KeyCode::KeyH,
+                    Some("status_previous") => KeyCode::BracketLeft,
+                    Some("status_next") => KeyCode::BracketRight,
+                    _ => KeyCode::F3,
+                };
+                app.automation_key(PhysicalKey::Code(key), pressed);
                 Ok(json!({"applied":true}))
             } else {
                 return execute_session(&mut app.session, line);
@@ -483,6 +495,7 @@ fn key_code(name: &str) -> Option<KeyCode> {
 
 pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
     let snapshot = app.snapshot();
+    let hud = crate::survival_hud::Observation::capture(app);
     let ship = snapshot.ship;
     let frame = character_ship_frame(ship.pose);
     let character = snapshot.character;
@@ -616,6 +629,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
                 _ => None,
             }),
         },
+        "survival_hud": {"visible":hud.visible,"penalties":hud.penalties,"statuses":hud.statuses},
         "journey": {"active_duration":app.survival.snapshot().active_time, "distance_meters":app.run.journey.distance_meters, "location":crate::session::journey::NamedLocation::at(app.snapshot().character.eye_position_meters)},
         "survival": {"hunger":app.survival.snapshot().hunger.value(),
             "health":app.survival.snapshot().health.value(), "fatigue":app.survival.snapshot().fatigue.value(),

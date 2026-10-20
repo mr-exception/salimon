@@ -118,6 +118,14 @@ pub struct EffectRule {
     pub max_stacks: u16,
     pub removal: Removal,
 }
+/// Observational view of a registered active effect; cannot mutate authority.
+#[derive(Clone, Copy, Debug)]
+pub struct EffectSnapshot<'a> {
+    pub rule: &'a EffectRule,
+    pub stacks: u16,
+    pub remaining: Option<Duration>,
+}
+
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Rules {

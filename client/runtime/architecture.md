@@ -1009,3 +1009,60 @@ defines the metric, schema-3 v1/v2 migration, background timing and version-2
 archive policy. `checkpoints.rs` archives on terminal publication, not only restart.
 Maintain `session/journey/tests.rs`, native background-scheduler and checkpoint
 archive/recovery/version tests when changing these boundaries.
+
+
+## Survival HUD and status details (#373)
+
+`survival_hud.rs` maps typed survival snapshots, immutable effect snapshots and the
+existing restriction DTO into observational UI data; `survival_hud/raster.rs`
+produces cached RGBA through the existing generic TopLeft overlay. The renderer
+has no survival dependency. `Survival::effect_snapshots` exposes captured behavior,
+stack severity, lifetime/remaining duration and removal policy without JSON peeking
+or mutation. Registered sources retain their stable source ID in descriptions.
+
+Gameplay shows health/cross, hunger/cutlery and fatigue/bolt with thin bars and no
+permanent meter numbers. Active effects have a separate icon strip. Active hunger
+and fatigue speed reductions remain labeled below the bars; H opens/closes the
+read-only detail panel, and [ / ] pages through the entire bounded effect registry.
+The panel shows per-tick amounts, stack count, duration rounded up to seconds,
+exposure/persistent lifetime and treatment-only policy, plus exact hunger, fatigue,
+combined speed and interaction-rate reductions from the authoritative basis points.
+No threshold or restriction math is duplicated in UI authority.
+
+H requires normal gameplay focus/capture and initial nonsynthetic input. The
+panel does not pause time or consume world controls; it uses keyboard navigation
+and no pointer capture. Capture/focus loss closes it. Crafting, engineering tour,
+diagnostics overlay and terminal state suppress this HUD. Overlay priority is
+crafting, diagnostics, then survival. #381 must extend this same visibility and
+input admission when adding actual pause menus; #377 retains meters while the
+wheel is open and uses its own world-input gate. Neither UI is implemented here.
+
+Presentation-only thresholds are health <25, hunger <20 and fatigue <=20 for
+critical colors; other values <50 use amber. A subdued 400 ms color pulse and a
+three-second warning accompany entry. Warning rearm requires two points above
+the threshold, preventing repeated warnings near a boundary. These choices do not
+change gameplay rules. Positive observed net health/hunger changes tween bars for
+450 ms and float the actual +N gain for 1.2 s; damage shows immediately. Passive
+hunger drain updates rather than cancels recovery animation. Full-meter waste has
+no fabricated gain. New-run/time-rewind observations establish a fresh baseline.
+
+All animations use admitted survival time, never render frame count, and never
+modify save state. Hidden panels close safely. Unchanged quantized healthy frames
+reuse the image/revision; presentation state is host-owned and excluded from saves.
+Icons are original bitmap shapes; shared action-bar glyphs include UI punctuation.
+
+Raster scale is bounded 2x–3x then reduced to fit. The renderer-owned
+`toolbar_message_inset` is shared with the native HUD: no copied inventory dimensions.
+Layout reserves that fitted lower band, a 96 px action/margin allowance and the
+screen center. At the minimum window size, detail text replaces the meter rows
+while H is open; status/equipment are not overlaid on one another. Below usable
+native bounds, a non-fitting image hides rather than overflowing or allocating
+unbounded pixels. Text is bounded to validated typed formats, with effect pages
+and two-line descriptions preserving all current registered definitions.
+
+Portable regressions live in `survival_hud/tests.rs`, its raster layout tests and
+app status-key admission tests. Inspection exposes `survival_hud` DTOs; native E2E
+keys `status`, `status_previous`, `status_next` use the same host dispatch as H/[ / ].
+Native inspection adds `survival_details_open`. CPU PNG previews in the completion
+report show actual raster output; they are not native GPU screenshots. #376 owns
+remaining desktop/DPI/Metal visual signoff and #383 optional sensory feedback.

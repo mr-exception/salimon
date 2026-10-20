@@ -345,3 +345,13 @@ teleport/restore/camera change. Occlusion/zero drawable suppress presentation wh
 bounded simulation and checkpointing continue; OS suspension remains an explicit
 clock exclusion. Death archives before restart. See the canonical
 [journey contract](../../docs/save-contract.md#journey-statistics-372).
+
+
+Survival HUD (#373) is observational: icon/thin-bar meters carry no permanent
+numeric text. Exact penalty labels consume the existing basis-point authority.
+Animations/status details cannot mutate meters, clocks, inventory or saves.
+H/[ / ] uses focused initial gameplay admission; focus/capture loss and competing
+modals close/suppress details. Crafting > diagnostics > survival overlay priority
+and shared renderer toolbar reservations prevent collisions. See the
+[HUD contract](architecture.md#survival-hud-and-status-details-373) for thresholds,
+small-window behavior, timing and pending native signoff.

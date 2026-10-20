@@ -168,6 +168,12 @@ In precision-tour view, press **1–6** to restart the approach for **Sun, Mercu
 Mars**, respectively. Earth is selected at launch. Selection is an engineering
 camera fixture; it does not move bodies or implement flight/landing gameplay.
 
+The compact upper-left survival HUD shows health, hunger and fatigue icons with
+thin bars. Press **H** for status details and exact active movement/interaction
+penalties; use **[** / **]** to page through effects and H to close. It does not
+pause gameplay. Recovery briefly shows +Health/+Hunger feedback. Crafting and
+engineering diagnostics take overlay priority; focus/capture loss closes details.
+
 Press **F3** to toggle the engineering diagnostics overlay. It is hidden by
 default and updates at a throttled cadence while frame observations continue to
 be collected. The view includes FPS/frame time, real world-update and

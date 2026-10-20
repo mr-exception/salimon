@@ -30,6 +30,7 @@ mod sphere_fixtures;
 mod sphere_interactions;
 #[cfg(test)]
 mod sphere_workloads;
+mod survival_hud;
 mod terrain;
 mod terrain_observations;
 mod terrain_patches;

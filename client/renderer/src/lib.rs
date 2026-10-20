@@ -28,7 +28,9 @@ pub use cockpit_instruments::{
     CockpitInstruments, CoreInstruments, FabricatorInstruments, NavigationInstruments,
     NearbyBodyInstruments,
 };
-pub use equipment_toolbar::{ConsumableIcon, EquipmentIcon, EquipmentSlot, EquipmentToolbar};
+pub use equipment_toolbar::{
+    ConsumableIcon, EquipmentIcon, EquipmentSlot, EquipmentToolbar, toolbar_message_inset,
+};
 use gpu_timing::GpuTimer;
 pub use held_item::HeldItemInstance;
 pub use overlay::{OverlayImage, OverlayPlacement};

@@ -256,3 +256,125 @@ fn native_protocol_adds_only_shell_observations_and_expires_session_feedback() {
         "expiry uses completed automation ticks"
     );
 }
+
+#[test]
+fn journey_ended_restart_uses_verified_archive_and_retries_failure_without_resurrection() {
+    use crate::checkpoints::Checkpoints;
+    let root = std::env::temp_dir().join(format!("salimon-374-restart-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&root);
+    let mut app = ClientApplication::default();
+    app.checkpoints = Some(Checkpoints::open_at(root.clone(), &mut app.session, 100).unwrap());
+    app.session
+        .survival
+        .command(salimon_survival::Command::Damage(
+            salimon_survival::Points::FULL,
+        ))
+        .unwrap();
+    let before = app.session.save_bytes(1).unwrap();
+    let serial = app.session.run.serial;
+    // Stale/unfocused/occluded/synthetic/repeated presses cannot restart.
+    native(&mut app, KeyCode::Enter, true);
+    assert_eq!(app.session.run.serial, serial);
+    app.native_focused = true;
+    app.occluded = true;
+    native(&mut app, KeyCode::Enter, true);
+    app.occluded = false;
+    for (repeat, synthetic, pressed) in [
+        (true, false, true),
+        (false, true, true),
+        (false, false, false),
+    ] {
+        app.dispatch_key(
+            PhysicalKey::Code(KeyCode::Enter),
+            pressed,
+            repeat,
+            synthetic,
+            InputSource::Native,
+        );
+        assert_eq!(app.session.run.serial, serial);
+    }
+    for key in [
+        KeyCode::F2,
+        KeyCode::F3,
+        KeyCode::KeyH,
+        KeyCode::KeyW,
+        KeyCode::KeyE,
+    ] {
+        native(&mut app, key, true);
+    }
+    assert_eq!(app.session.save_bytes(1).unwrap(), before);
+    let archive = root.join(format!("journeys/v2/run-{serial}.json"));
+    std::fs::create_dir_all(archive.parent().unwrap()).unwrap();
+    std::fs::write(&archive, b"conflict").unwrap();
+    native(&mut app, KeyCode::Enter, true);
+    assert!(app.session.survival.snapshot().terminal);
+    assert_eq!(app.session.save_bytes(1).unwrap(), before);
+    assert!(app.checkpoints.as_ref().unwrap().warning.is_some());
+    std::fs::remove_file(&archive).unwrap();
+    native(&mut app, KeyCode::NumpadEnter, true);
+    assert!(!app.session.survival.snapshot().terminal);
+    assert_eq!(app.session.run.serial, serial + 1);
+    assert_eq!(
+        app.session.survival.snapshot().hunger,
+        salimon_survival::Points::FULL
+    );
+    assert_eq!(
+        app.session.survival.snapshot().health,
+        salimon_survival::Points::FULL
+    );
+    assert_eq!(
+        app.session.survival.snapshot().fatigue,
+        salimon_survival::Points::FULL
+    );
+    assert_eq!(app.session.run.journey.distance_meters, 0.);
+    assert_eq!(app.session.update_clock.backlog(), Duration::ZERO);
+    assert!(!app.cursor_captured);
+    assert!(archive.exists());
+    let report: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(&archive).unwrap()).unwrap();
+    assert_eq!(report["serial"], serial);
+    // A second activation in fresh gameplay cannot restart a living run.
+    assert!(!app.restart_terminal());
+    assert_eq!(app.session.run.serial, serial + 1);
+    drop(app);
+    let mut restored = crate::session::GameplaySession::default();
+    let saves = Checkpoints::open_at(root.clone(), &mut restored, 100).unwrap();
+    assert_eq!(restored.run.serial, serial + 1);
+    assert!(!restored.survival.snapshot().terminal);
+    drop(saves);
+    std::fs::remove_dir_all(root).unwrap();
+}
+#[test]
+fn journey_ended_terminal_relaunch_and_missing_storage_never_grant_unverified_gameplay() {
+    use crate::checkpoints::Checkpoints;
+    let root = std::env::temp_dir().join(format!("salimon-374-terminal-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&root);
+    let mut app = ClientApplication::default();
+    let mut saves = Checkpoints::open_at(root.clone(), &mut app.session, 100).unwrap();
+    app.session
+        .survival
+        .command(salimon_survival::Command::Damage(
+            salimon_survival::Points::FULL,
+        ))
+        .unwrap();
+    saves.finish(&app.session).unwrap();
+    drop(saves);
+    drop(app);
+    let mut app = ClientApplication::default();
+    let saves = Checkpoints::open_at(root.clone(), &mut app.session, 100).unwrap();
+    assert!(app.session.survival.snapshot().terminal);
+    let model = crate::journey_ended::Report::from(&app.session.ended_run().unwrap());
+    assert!(
+        app.journey_ended
+            .image(Some(model), [640, 360], 1.)
+            .is_some()
+    );
+    // Dropping the store models an unavailable restart backend, not permission to bypass it.
+    drop(saves);
+    let serial = app.session.run.serial;
+    assert!(!app.restart_terminal());
+    assert_eq!(app.session.run.serial, serial);
+    assert!(app.session.survival.snapshot().terminal);
+    drop(app);
+    std::fs::remove_dir_all(root).unwrap();
+}

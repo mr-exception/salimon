@@ -1,0 +1,39 @@
+............Running native-1-dense-settled-facing
+Running native-1-dense-active-facing
+Running native-1-dense-settled-facing
+Running native-1-dense-active-facing
+...Running native-1-dense-settled-facing
+Running native-1-dense-active-facing-repeat-1
+Running native-1-dense-active-facing-repeat-2
+Running native-1-dense-active-facing-repeat-3
+Running native-1-dense-settled-facing
+Running native-1-dense-active-facing-repeat-1
+Running native-1-dense-active-facing-repeat-2
+Running native-1-dense-active-facing-repeat-3
+.Running physics-1-dense-active-facing
+Running physics-1-dense-active-facing
+..Prepared a
+Prepared b
+Measuring a (other fixtures idle)
+Measuring b (other fixtures idle)
+.F..Building: cargo build --locked -p salimon-client --target x86_64-unknown-linux-gnu --message-format json-render-diagnostics
+Building: cargo build --locked -p salimon-client --target x86_64-unknown-linux-gnu --message-format json-render-diagnostics --release
+.Building: cargo build --locked -p salimon-client --target x86_64-unknown-linux-gnu --message-format json-render-diagnostics
+Building: cargo build --locked -p salimon-client --target x86_64-unknown-linux-gnu --message-format json-render-diagnostics
+..............Switched to a new branch 'ci-reports'
+........................................................
+======================================================================
+FAIL: test_early_exit_and_readiness_timeout_are_failures (test_benchmark_fragments.PreparationLifecycleTests.test_early_exit_and_readiness_timeout_are_failures)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/b39d38a5ab40/salimon/scripts/test_benchmark_fragments.py", line 235, in test_early_exit_and_readiness_timeout_are_failures
+    self.assertIn('exited 2 before native readiness', outcomes['exit'])
+AssertionError: 'exited 2 before native readiness' not found in 'preparation exceeded 0.2 second deadline'
+
+----------------------------------------------------------------------
+Ran 93 tests in 9.531s
+
+FAILED (failures=1)
+No source change since the latest successful suites; skipping
+Run suites
+{"status": "failed", "report": "/tmp/tmpq3_66oj2/failed.json", "error": "Command 'profile' timed out after 300 seconds"}

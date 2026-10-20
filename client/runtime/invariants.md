@@ -355,3 +355,12 @@ modals close/suppress details. Crafting > diagnostics > survival overlay priorit
 and shared renderer toolbar reservations prevent collisions. See the
 [HUD contract](architecture.md#survival-hud-and-status-details-373) for thresholds,
 small-window behavior, timing and pending native signoff.
+
+
+Journey Ended (#374) displays the exact typed archive source. It has one Restart
+Game action, admitted by initial focused Enter/R or a fresh physical pointer hit.
+All other terminal gameplay/view/status commands remain blocked. The overlay
+supersedes ordinary HUDs, including equipment/reticle, without stepping authority.
+Failed/missing verified storage cannot expose a living run; success publishes both
+fresh generations before resetting host presentation/input. See the
+[terminal contract](../../docs/save-contract.md#journey-ended-presentation-374).

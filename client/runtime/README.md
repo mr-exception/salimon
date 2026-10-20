@@ -92,6 +92,11 @@ the original monotonic update clock and default starting state.
   monotonic delta. Reset only the update clock across lifecycle gaps; preserve
   portable state across renderer reconstruction.
 
+At health zero, the **Journey Ended** screen shows cause, active survival time,
+travel distance and final location. Click **Restart Game** or press **Enter/R**
+to archive the run and start fresh after its checkpoint verifies. Failure keeps
+the terminal screen and lets you retry. Click the new game view to recapture controls.
+
 The compact upper-left survival HUD shows health, hunger and fatigue icons with
 thin bars. Press **H** for status details and exact active movement/interaction
 penalties; use **[** / **]** to page through effects and H to close. It does not

@@ -157,6 +157,7 @@ pub(crate) struct ClientApplication {
     render_attempts: u64,
     retry_at: Option<Instant>,
     pub(crate) survival_hud: crate::survival_hud::Hud,
+    journey_ended: crate::journey_ended::Screen,
     occluded: bool,
     failure: Option<String>,
 }
@@ -185,6 +186,7 @@ impl Default for ClientApplication {
             render_attempts: 0,
             retry_at: None,
             survival_hud: Default::default(),
+            journey_ended: Default::default(),
             occluded: false,
             failure: None,
         }
@@ -336,6 +338,7 @@ impl ClientApplication {
 
     fn resize_renderer(&mut self, event_loop: &ActiveEventLoop, window: &Window) {
         let size = surface_size(window);
+        self.journey_ended.clear_pointer();
         log::debug!("native drawable resized: {size:?}");
         self.retry_at = None;
         if let Some(renderer) = self.renderer.as_mut() {
@@ -408,6 +411,40 @@ impl ClientApplication {
             "minimized":w.is_minimized(), "inner_size":[w.inner_size().width,w.inner_size().height]
         }))
     }
+    /// The only host restart path: publish archive and both fresh generations
+    /// before exposing gameplay. Native and automation callers share it.
+    pub(crate) fn restart_terminal(&mut self) -> bool {
+        if !self.session.survival.snapshot().terminal {
+            return false;
+        }
+        let result = match &mut self.checkpoints {
+            Some(checkpoints) => checkpoints.restart(&mut self.session),
+            None => Err(salimon_persistence::invalid(
+                "verified restart storage unavailable",
+            )),
+        };
+        match result {
+            Ok(()) => {
+                self.reset_update_clock();
+                self.terrain_stream = Default::default();
+                self.action_bar = Default::default();
+                self.survival_hud = Default::default();
+                self.journey_ended = Default::default();
+                self.cursor_captured = false;
+                true
+            }
+            Err(error) => {
+                log::error!("restart failed: {error}");
+                self.journey_ended.restart_failed();
+                if let Some(checkpoints) = &mut self.checkpoints {
+                    checkpoints.warning =
+                        Some("RESTART FAILED - terminal save retained; retry Restart Game");
+                }
+                false
+            }
+        }
+    }
+
     fn input_policy(&self) -> InputPolicy {
         InputPolicy {
             gameplay: self.session.view_mode == ViewMode::Gameplay,
@@ -429,6 +466,23 @@ impl ClientApplication {
         synthetic: bool,
         source: InputSource,
     ) {
+        if self.session.survival.snapshot().terminal {
+            if self.input_policy().admits_press(source, true)
+                && input::terminal_restart_pressed(
+                    if pressed {
+                        ElementState::Pressed
+                    } else {
+                        ElementState::Released
+                    },
+                    repeat,
+                    synthetic,
+                    key,
+                )
+            {
+                self.restart_terminal();
+            }
+            return;
+        }
         if !self
             .input_policy()
             .admits_key(source, key, pressed, repeat, synthetic)
@@ -475,10 +529,12 @@ impl ClientApplication {
     fn release_input_capture(&mut self) {
         self.cursor_captured = false;
         self.survival_hud.close_details();
+        self.journey_ended.clear_pointer();
         self.session.clear_held_controls();
     }
 
     fn reset_update_clock(&mut self) {
+        self.journey_ended.clear_pointer();
         self.survival_hud.close_details();
         self.session.update_clock.reset();
         self.session.clear_held_controls();
@@ -655,14 +711,14 @@ impl ClientApplication {
         }
         self.action_bar
             .set_contextual(if self.session.survival.snapshot().terminal {
-                Some("Journey ended - R to restart".into())
+                None
             } else {
                 contextual_action.map(|prompt| prompt.text)
             });
         window.set_title(&self.benchmark.as_ref().map_or_else(
             || {
                 let title = if self.session.survival.snapshot().terminal {
-                    "Salimon - Journey ended - R to restart".to_owned()
+                    "Salimon - Journey Ended".to_owned()
                 } else {
                     gameplay_window_title(monitor_message, interaction)
                 };
@@ -745,6 +801,23 @@ impl ClientApplication {
             render_terrain,
         );
         let cpu_update_time = update_started_at.elapsed();
+        let terminal = self.session.survival.snapshot().terminal;
+        let terminal_report = if terminal {
+            match self.session.ended_run() {
+                Ok(report) => Some(crate::journey_ended::Report::from(&report)),
+                Err(error) => {
+                    self.fail(event_loop, error);
+                    return;
+                }
+            }
+        } else {
+            None
+        };
+        let ended_image = self.journey_ended.image(
+            terminal_report,
+            [window.inner_size().width, window.inner_size().height],
+            window.scale_factor(),
+        );
         let crafting_text = self.session.crafting_text();
         let crafting_pixels = crafting_text
             .as_ref()
@@ -758,7 +831,7 @@ impl ClientApplication {
             window.scale_factor(),
             hud_visible,
         );
-        let overlay_image = crafting_pixels
+        let gameplay_overlay = crafting_pixels
             .as_ref()
             .map(|(width, height, pixels)| RendererOverlayImage {
                 width: *width,
@@ -784,9 +857,14 @@ impl ClientApplication {
                     })
             })
             .or(hud_image);
+        let overlay_image = if terminal {
+            ended_image
+        } else {
+            gameplay_overlay
+        };
         let action_bar_image = self
             .action_bar
-            .image(self.session.view_mode == ViewMode::Gameplay)
+            .image(self.session.view_mode == ViewMode::Gameplay && !terminal)
             .map(|image| RendererOverlayImage {
                 width: image.width,
                 height: image.height,
@@ -798,9 +876,12 @@ impl ClientApplication {
                     contextual_placement
                 },
             });
-        let held_item = self
-            .session
-            .held_item(presentation.character, mining_target.is_some());
+        let held_item = (!terminal)
+            .then(|| {
+                self.session
+                    .held_item(presentation.character, mining_target.is_some())
+            })
+            .flatten();
         let outcome = match self
             .renderer
             .as_mut()
@@ -820,10 +901,10 @@ impl ClientApplication {
                 overlay_image,
                 action_bar_image,
                 crate::reticle::image(
-                    self.session.view_mode == ViewMode::Gameplay,
+                    self.session.view_mode == ViewMode::Gameplay && !terminal,
                     &self.session.equipment,
                 ),
-                (self.session.view_mode == ViewMode::Gameplay)
+                (self.session.view_mode == ViewMode::Gameplay && !terminal)
                     .then(|| self.session.equipment_presentation()),
                 window.scale_factor(),
                 || window.pre_present_notify(),
@@ -1128,9 +1209,49 @@ impl ApplicationHandler for ClientApplication {
                     self.fail(event_loop, error);
                     return;
                 }
-                if focused && !self.session.survival.snapshot().terminal {
-                    self.cursor_captured = capture_cursor(&window);
+                if focused {
+                    if self.session.survival.snapshot().terminal {
+                        // Focus may have been lost before death. The capture
+                        // flag is already clear then, but the OS cursor still
+                        // needs explicit restoration for the restart button.
+                        release_cursor(&window);
+                        self.release_input_capture();
+                    } else {
+                        self.cursor_captured = capture_cursor(&window);
+                    }
                 }
+            }
+            WindowEvent::CursorMoved { position, .. } => {
+                if self.session.survival.snapshot().terminal
+                    && self.native_focused
+                    && !self.occluded
+                {
+                    self.journey_ended.pointer_moved([position.x, position.y]);
+                    window.request_redraw();
+                } else {
+                    self.journey_ended.clear_pointer();
+                }
+            }
+            WindowEvent::CursorLeft { .. } => {
+                self.journey_ended.clear_pointer();
+                if self.session.survival.snapshot().terminal {
+                    window.request_redraw();
+                }
+            }
+            WindowEvent::MouseInput { state, button, .. }
+                if self.session.survival.snapshot().terminal =>
+            {
+                if state == ElementState::Pressed
+                    && button == MouseButton::Left
+                    && self.input_policy().admits_press(InputSource::Native, true)
+                    && self.journey_ended.clicked_restart(
+                        [window.inner_size().width, window.inner_size().height],
+                        window.scale_factor(),
+                    )
+                {
+                    self.restart_terminal();
+                }
+                window.request_redraw();
             }
             WindowEvent::MouseInput {
                 state: ElementState::Pressed,
@@ -1141,34 +1262,6 @@ impl ApplicationHandler for ClientApplication {
                 && !self.session.survival.snapshot().terminal =>
             {
                 self.cursor_captured = capture_cursor(&window);
-            }
-            WindowEvent::KeyboardInput {
-                event,
-                is_synthetic,
-                ..
-            } if self.session.survival.snapshot().terminal
-                && self.native_focused
-                && !self.occluded
-                && !is_synthetic
-                && event.state == ElementState::Pressed
-                && !event.repeat
-                && event.physical_key == PhysicalKey::Code(KeyCode::KeyR) =>
-            {
-                if let Some(checkpoints) = &mut self.checkpoints {
-                    match checkpoints.restart(&mut self.session) {
-                        Ok(()) => {
-                            self.reset_update_clock();
-                            self.terrain_stream = Default::default();
-                            self.action_bar = Default::default();
-                        }
-                        Err(error) => {
-                            log::error!("restart failed: {error}");
-                            checkpoints.warning =
-                                Some("RESTART FAILED - terminal save retained; R to retry");
-                        }
-                    }
-                }
-                window.request_redraw();
             }
             WindowEvent::KeyboardInput {
                 event,

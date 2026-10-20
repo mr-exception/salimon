@@ -377,3 +377,9 @@ band used internally for action text. Runtime uses it to fit the independent
 survival overlay without copying inventory raster dimensions or changing existing
 slots/art. The renderer still receives only generic borrowed RGBA and placement;
 all survival state, effect descriptions, HUD raster and expiry remain runtime-owned.
+
+
+`overlay_available_size(surface)` (#374) exposes the existing physical screen
+margin, shared by overlay fitting and bounded host-produced terminal images.
+A host image that exactly fits this size stays unscaled, keeping physical pointer
+hit rectangles aligned. Runtime still owns all terminal state, text and input.

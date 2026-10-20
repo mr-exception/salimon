@@ -71,8 +71,13 @@ impl std::fmt::Display for OverlayImageError {
     }
 }
 
+/// Usable physical pixels inside the generic overlay's screen margins.
+pub fn overlay_available_size(surface_size: [u32; 2]) -> [u32; 2] {
+    surface_size.map(|size| size.saturating_sub(2 * OVERLAY_MARGIN_PIXELS))
+}
+
 pub(crate) fn fitted_overlay_size(surface_size: [u32; 2], image_size: [u32; 2]) -> [f32; 2] {
-    let available = surface_size.map(|size| size.saturating_sub(2 * OVERLAY_MARGIN_PIXELS) as f32);
+    let available = overlay_available_size(surface_size).map(|size| size as f32);
     let image_size = image_size.map(|size| size as f32);
     let scale = (available[0] / image_size[0])
         .min(available[1] / image_size[1])

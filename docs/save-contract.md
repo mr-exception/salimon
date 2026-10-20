@@ -128,9 +128,10 @@ never grants offline credit; only the launch transaction does.
 
 ## Terminal archive and restart (#371)
 
-The minimal native terminal notice accepts an initial real focused R press;
-repeat, synthetic replay and living runs cannot restart through that path. Full
-Journey Ended layout/action/report presentation is #374. Runtime prepares a fresh
+The native Journey Ended screen (#374) displays the typed archived report and a
+single Restart Game action. An initial focused Enter/numpad Enter/R press or left
+click on the button requests the same verified restart transaction. Repeats,
+synthetic replay and living runs cannot restart through this path. Runtime prepares a fresh
 deterministic Earth world, clears all old objects/inventory/jobs/effects/inputs,
 starts meters at 100 and increments the saved run serial. Terrain mode and world
 seed retain their deterministic new-run policy. New-run starter supplies are #379.
@@ -204,3 +205,36 @@ the same bounded physical tick/checkpoint scheduler running at 16 ms wakeups.
 Focus loss alone also keeps time running. OS suspension and renderer reconstruction
 retain the existing explicit lifecycle gap exclusion; this is distinct from a
 running minimized/unfocused app. Native desktop delivery remains #376 signoff.
+
+
+## Journey Ended presentation (#374)
+
+`GameplaySession::ended_run()` is the single typed report builder used by both
+archive serialization and `journey_ended.rs` presentation. UI reads the existing
+typed cause, active duration, combined distance and final nearest-body context;
+it never guesses death cause or derives travel from render positions. Display
+rounding does not change archived source precision. The report is available only
+for terminal runs, including terminal launch recovery.
+
+The terminal overlay takes priority over crafting, diagnostics and survival HUD;
+reticle, held tool, inventory/equipment and action messages are hidden. The frozen
+world remains behind a dark backdrop and readable final-transmission card.
+Enter/R and pointer activation share `ClientApplication::restart_terminal()`.
+All ordinary world/view/status/diagnostic commands are rejected during terminal
+input dispatch; the existing session gate also rejects consumption/mining/flight.
+
+Failed publication retains terminal authority, shows a persistent failure footer
+and leaves Restart Game usable. Missing verified storage never permits a free
+restart. Successful verification replaces both active slots (rather than deleting
+a verified fallback prematurely), clears terminal/HUD/action/presentation caches,
+terrain streaming and inputs, and leaves cursor capture off until fresh input.
+No revive or resume action exists. Restart IO retains the existing synchronous
+verified transaction; fresh gameplay is never exposed while writes are pending.
+
+Pointer positions are physical pixels and match the exact raster button rectangle.
+Focus/capture loss, cursor leave and resize/DPI/lifecycle resets invalidate stale
+pointer coordinates. The renderer-owned `overlay_available_size` defines fitting;
+the normal terminal image exactly fits that margin so it is not further scaled.
+RGBA allocation is bounded at 64 MiB: very large surfaces retain a centered card
+without allocating an unbounded backdrop. Normal resize/DPI/aspect layouts remain
+centered and cached. Native OS-input/Metal validation remains #376.

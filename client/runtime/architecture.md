@@ -991,8 +991,8 @@ repairs derived permissions without stepping or granting offline effects.
 `checkpoints.rs` performs verified launch recovery before exposing a temporary
 candidate; only fatigue may be credited. Its bounded worker publishes terminal
 pairs, immutable archive summaries and both fresh generations during restart.
-Native R is an initial focused nonsynthetic terminal-only action, with a minimal
-notice until #374's complete screen. See the
+The #374 Journey Ended screen exposes one verified Restart Game action through
+initial focused Enter/R or a pointer hit; it replaces the earlier minimal notice. See the
 [canonical save/lifecycle contract](../../docs/save-contract.md#survival-lifecycle-and-launch-transaction-371)
 for failure/crash guarantees and remaining #373/#377/#379 scope.
 
@@ -1066,3 +1066,39 @@ keys `status`, `status_previous`, `status_next` use the same host dispatch as H/
 Native inspection adds `survival_details_open`. CPU PNG previews in the completion
 report show actual raster output; they are not native GPU screenshots. #376 owns
 remaining desktop/DPI/Metal visual signoff and #383 optional sensory feedback.
+
+
+## Journey Ended screen (#374)
+
+`journey_ended.rs` owns observational report formatting, bounded physical-pixel
+layout, pointer hit testing and image caching; `journey_ended/raster.rs` owns the
+bitmap final-transmission card, dim backdrop, button/hover and failure footer.
+It consumes the same typed `session/lifecycle.rs::ended_run()` as the archive,
+not JSON or independent guesses. Source states/schema/report bytes are unchanged.
+
+`app.rs::restart_terminal` is shared by Enter/R, the one left-click action and
+native automation `restart`. It calls the existing verified checkpoint/archive/
+fresh-pair transaction before replacing session state. Error retains the terminal
+session and usable retry feedback. Completion resets host HUD/action/terminal/
+terrain/presentation caches and leaves input capture off. Default new-run state
+and starter-supply ownership (#379) remain unchanged.
+
+Keyboard dispatch admits initial nonsynthetic Enter/numpad Enter/R only while
+terminal, focused and not occluded; ordinary terminal keys cannot open gameplay,
+engineering or status views. Pointer events require the same native focus gate,
+fresh finite physical coordinates and the half-open button bounds. Capture/focus
+loss, cursor leave, resize/DPI and lifecycle reset invalidate pointer state.
+Terminal rendering suppresses diagnostics/crafting/HUD, reticle, held tool and
+inventory/equipment over the frozen world. See the
+[canonical terminal contract](../../docs/save-contract.md#journey-ended-presentation-374)
+for publication guarantees, display rounding, fitting and native limitations.
+
+Tests live in `journey_ended/tests.rs` and `app/input_tests.rs`: typed report/archive
+parity, all causes, extreme time/distance formatting, DPI/aspect/button-pixel parity,
+cache/hover/failure, guarded real keyboard restart, archive conflict/retry and
+terminal/fresh relaunch using real temporary native storage. Existing restart
+fault injection and terminal world freeze tests remain required. Native inspection
+exposes `journey_ended` report text; `restart` is a native-host operation and does
+not add a diskless portable-session bypass. E2E hosts without verified storage
+report failure instead of pretending to restart. #375 owns broader scenario/save
+DSL and expansion verification; #376 owns native OS/Metal visual acceptance.

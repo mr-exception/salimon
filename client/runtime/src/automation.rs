@@ -127,6 +127,7 @@ fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
         return execute_session(&mut app.session, line);
     }
     let result = match command.get("op").and_then(Value::as_str) {
+        Some("restart") => Ok(json!({"applied":app.restart_terminal()})),
         Some("window") => {
             let action = command.get("action").and_then(Value::as_str).unwrap_or("");
             let size = command
@@ -629,6 +630,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
                 _ => None,
             }),
         },
+        "journey_ended": app.survival.snapshot().terminal.then(||app.ended_run().map(|r|crate::journey_ended::Report::from(&r)).expect("validated terminal report")),
         "survival_hud": {"visible":hud.visible,"penalties":hud.penalties,"statuses":hud.statuses},
         "journey": {"active_duration":app.survival.snapshot().active_time, "distance_meters":app.run.journey.distance_meters, "location":crate::session::journey::NamedLocation::at(app.snapshot().character.eye_position_meters)},
         "survival": {"hunger":app.survival.snapshot().hunger.value(),

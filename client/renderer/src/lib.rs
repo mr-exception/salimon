@@ -33,7 +33,7 @@ pub use equipment_toolbar::{
 };
 use gpu_timing::GpuTimer;
 pub use held_item::HeldItemInstance;
-pub use overlay::{OverlayImage, OverlayPlacement};
+pub use overlay::{OverlayImage, OverlayPlacement, overlay_available_size};
 pub use resource_mesh::{ResourceMesh, ResourceMeshInstance, SPHERE_AUTHORED_RADIUS_METERS};
 pub use ship_mesh::ShipMeshInstance;
 pub use spheres::{PointLight, SphereInstance, SurfaceMaterial};

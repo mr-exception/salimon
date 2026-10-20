@@ -21,6 +21,20 @@ impl Survival {
             .iter()
             .map(|(id, a)| (*id, a.stacks, a.remaining))
     }
+    /// Immutable captured definitions and live timers in stable EffectId order.
+    /// Presentation can describe effects without inspecting serialized internals.
+    pub fn effect_snapshots(&self) -> impl Iterator<Item = EffectSnapshot<'_>> {
+        self.active_effects()
+            .map(|(id, stacks, remaining)| EffectSnapshot {
+                rule: self
+                    .pipeline
+                    .rules
+                    .effect(id)
+                    .expect("validated active effects have registered definitions"),
+                stacks,
+                remaining,
+            })
+    }
     pub fn apply_effect(&mut self, id: EffectId) -> Result<(), SaveError> {
         let rule = self
             .pipeline

@@ -12,7 +12,8 @@ meter durations (the exact arithmetic lattice), and starvation intervals (0,3600
 
 Hosts admit elapsed real time while alive, including ordinary menus; render frame
 count is never time. Runtime's existing UpdateClock supplies admitted elapsed and
-excludes explicit suspend/occlusion/zero-size/renderer lifecycle gaps. No implicit
+excludes explicit OS-suspend/renderer-reconstruction lifecycle gaps.
+Occlusion and zero-size presentation continue bounded gameplay ticks (#372). No implicit
 recovery occurs on focus change, suspend/resume, pause or save. A future full pause
 (#381) excludes authoritative elapsed explicitly. Unreported stalls retain time;
 reported OS lifecycle exclusions do not become active time or offline recovery.
@@ -25,7 +26,7 @@ so the interval since that checkpoint is conservatively treated as closed time,
 with a six-hour cap. This intentionally cannot distinguish process execution
 lost in a crash from genuinely closed time. Save capture itself grants nothing.
 
-Runtime #371 composes this owner into full-game schema-2 saves, admits active
+Runtime #371 composes this owner into versioned full-game saves, admits active
 durations and performs a launch-only verified fatigue-credit transaction. Old
 schema-1 worlds migrate once with full new meters and zero survival active time;
 no old hunger/health/effect progress is invented. See the
@@ -154,3 +155,13 @@ activates the production clock. Saved catalog rules must agree with already
 captured registry IDs; conflicting definitions reject before restoration. Native Q-wheel
 selection/hover presentation belongs #377 and consumes through runtime's exact
 item transaction; M/N remain absent. Four-food expansion/unlocks are #378.
+
+
+## Observational effect snapshots (#373)
+
+`effect_snapshots()` yields immutable captured `EffectRule` references plus live
+stacks and optional remaining duration in stable EffectId order. Runtime can
+present behavior, source, severity and removal policy without interpreting private
+serialized state. This API performs no registration, advancement or mutation.
+The [runtime HUD contract](../runtime/architecture.md#survival-hud-and-status-details-373)
+owns text, visual thresholds, animations and native input; none belong here.

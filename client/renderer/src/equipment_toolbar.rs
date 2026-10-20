@@ -53,6 +53,19 @@ const BORDER: [u8; 4] = [67, 95, 108, 255];
 const SELECTED: [u8; 4] = [89, 224, 215, 255];
 const INK: [u8; 4] = [220, 233, 236, 255];
 
+fn toolbar_scale(dpi: f64) -> u32 {
+    (if dpi.is_finite() { dpi } else { 1.0 }.clamp(1.0, 2.0) * 2.0).round() as u32
+}
+fn message_inset_for_scale(surface: [u32; 2], scale: u32) -> u32 {
+    let size = crate::overlay::fitted_overlay_size(surface, [WIDTH * scale, HEIGHT * scale]);
+    (size[1] + 8.0 * scale as f32).ceil() as u32
+}
+/// Physical bottom band occupied by inventory/equipment plus the message gap.
+/// Hosts can place independent HUD images without duplicating toolbar dimensions.
+pub fn toolbar_message_inset(surface: [u32; 2], dpi: f64) -> u32 {
+    message_inset_for_scale(surface, toolbar_scale(dpi))
+}
+
 #[derive(Default)]
 pub(crate) struct ToolbarRaster {
     key: Option<(EquipmentToolbar, u32)>,
@@ -62,13 +75,7 @@ pub(crate) struct ToolbarRaster {
 
 impl ToolbarRaster {
     pub(crate) fn update(&mut self, state: EquipmentToolbar, scale_factor: f64) {
-        // Match existing HUD density handling: finite DPI, bounded to 1x–2x.
-        let factor = if scale_factor.is_finite() {
-            scale_factor
-        } else {
-            1.0
-        };
-        let scale = (factor.clamp(1.0, 2.0) * 2.0).round() as u32;
+        let scale = toolbar_scale(scale_factor);
         if self.key == Some((state, scale)) {
             return;
         }
@@ -200,10 +207,8 @@ impl ToolbarRaster {
 
     /// Reserve the fitted toolbar height plus a gap for screen-space messages.
     pub(crate) fn message_inset(&self, surface: [u32; 2]) -> u32 {
-        self.image().map_or(0, |image| {
-            let size = crate::overlay::fitted_overlay_size(surface, [image.width, image.height]);
-            (size[1] + 8.0 * self.key.expect("image requires raster key").1 as f32).ceil() as u32
-        })
+        self.key
+            .map_or(0, |(_, scale)| message_inset_for_scale(surface, scale))
     }
 }
 

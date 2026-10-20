@@ -156,6 +156,7 @@ pub(crate) struct ClientApplication {
     action_bar: ActionBar,
     render_attempts: u64,
     retry_at: Option<Instant>,
+    pub(crate) survival_hud: crate::survival_hud::Hud,
     occluded: bool,
     failure: Option<String>,
 }
@@ -183,6 +184,7 @@ impl Default for ClientApplication {
             action_bar: ActionBar::default(),
             render_attempts: 0,
             retry_at: None,
+            survival_hud: Default::default(),
             occluded: false,
             failure: None,
         }
@@ -437,6 +439,28 @@ impl ClientApplication {
             self.diagnostics.toggle();
             return;
         }
+        if pressed
+            && self.session.view_mode == ViewMode::Gameplay
+            && !self.session.crafting_ui.open
+            && !self.session.survival.snapshot().terminal
+        {
+            match key {
+                PhysicalKey::Code(KeyCode::KeyH) => {
+                    self.survival_hud
+                        .observe(crate::survival_hud::Observation::capture(&self.session));
+                    self.survival_hud.toggle_details();
+                    return;
+                }
+                PhysicalKey::Code(KeyCode::BracketLeft | KeyCode::BracketRight)
+                    if self.survival_hud.details_open =>
+                {
+                    self.survival_hud
+                        .next_page(key == PhysicalKey::Code(KeyCode::BracketRight));
+                    return;
+                }
+                _ => {}
+            }
+        }
         input::dispatch_session_key(&mut self.session, key, pressed);
         self.show_session_feedback();
     }
@@ -450,10 +474,12 @@ impl ClientApplication {
 
     fn release_input_capture(&mut self) {
         self.cursor_captured = false;
+        self.survival_hud.close_details();
         self.session.clear_held_controls();
     }
 
     fn reset_update_clock(&mut self) {
+        self.survival_hud.close_details();
         self.session.update_clock.reset();
         self.session.clear_held_controls();
         self.session.reset_presentation();
@@ -723,6 +749,15 @@ impl ClientApplication {
         let crafting_pixels = crafting_text
             .as_ref()
             .map(|text| crate::action_bar::rasterize_action_bar(text, 3));
+        let hud_observation = crate::survival_hud::Observation::capture(&self.session);
+        let hud_visible = hud_observation.visible && !self.diagnostics.is_visible();
+        let hud_frame = self.survival_hud.observe(hud_observation);
+        let hud_image = self.survival_hud.image(
+            hud_frame,
+            [window.inner_size().width, window.inner_size().height],
+            window.scale_factor(),
+            hud_visible,
+        );
         let overlay_image = crafting_pixels
             .as_ref()
             .map(|(width, height, pixels)| RendererOverlayImage {
@@ -747,7 +782,8 @@ impl ClientApplication {
                         revision: image.revision,
                         placement: OverlayPlacement::TopLeft,
                     })
-            });
+            })
+            .or(hud_image);
         let action_bar_image = self
             .action_bar
             .image(self.session.view_mode == ViewMode::Gameplay)
@@ -1253,6 +1289,42 @@ mod toolbar_tests {
     use super::*;
     use crate::equipment::ToolbarSlot;
     use salimon_world::{CameraCommand, CelestialBodyId};
+
+    #[test]
+    fn status_panel_input_uses_focus_capture_repeat_and_modal_guards() {
+        let mut app = ClientApplication::default();
+        let key = PhysicalKey::Code(KeyCode::KeyH);
+        app.dispatch_key(key, true, false, false, InputSource::Native);
+        assert!(!app.survival_hud.details_open);
+        app.native_focused = true;
+        app.cursor_captured = true;
+        let before = app.session.save_bytes(1).unwrap();
+        app.dispatch_key(key, true, false, false, InputSource::Native);
+        assert!(app.survival_hud.details_open);
+        assert_eq!(app.session.save_bytes(1).unwrap(), before);
+        for (repeat, synthetic) in [(true, false), (false, true)] {
+            app.dispatch_key(key, true, repeat, synthetic, InputSource::Native);
+            assert!(app.survival_hud.details_open);
+        }
+        app.session.advance_game(Duration::from_millis(16));
+        assert!(app.session.survival.snapshot().active_time > Duration::ZERO);
+        app.set_input_focus(false);
+        assert!(!app.survival_hud.details_open);
+        app.native_focused = true;
+        app.cursor_captured = true;
+        app.dispatch_key(key, true, false, false, InputSource::Native);
+        assert!(app.survival_hud.details_open);
+        app.reset_update_clock();
+        assert!(!app.survival_hud.details_open);
+        app.session.crafting_ui.open = true;
+        app.dispatch_key(key, true, false, false, InputSource::Native);
+        assert!(!app.survival_hud.details_open);
+        app.session.crafting_ui.open = false;
+        app.session.view_mode = ViewMode::PrecisionTour;
+        app.dispatch_key(key, true, false, false, InputSource::Native);
+        assert!(!app.survival_hud.details_open);
+        assert_ne!(app.session.save_bytes(1).unwrap(), before); // only the tick changed authority
+    }
 
     #[test]
     fn background_ticks_preserve_active_time_travel_and_resume_without_double_counting() {

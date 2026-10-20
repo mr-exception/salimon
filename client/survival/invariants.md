@@ -27,3 +27,7 @@
   reject. Recovery uses the same wounds, clamps and lethal-timestamp ordering.
 - Consumed items' timed benefits preserve fractional intervals across serialization;
   offline fatigue recovery cannot tick food, healing or treatment effects.
+
+- Effect presentation snapshots borrow validated captured definitions and timers
+  in stable EffectId order; observing them never mutates authority or re-registers
+  effects. Runtime owns all display strings, animation and UI thresholds (#373).

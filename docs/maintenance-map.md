@@ -152,3 +152,16 @@ terminal publication in `checkpoints.rs`; storage owns versioned archive paths.
 See [metric and migration](save-contract.md#journey-statistics-372). Regressions:
 `session/journey/tests.rs`, app background ticks, checkpoint archive/repair/version
 and persistence restart fault injection.
+
+
+## Survival HUD (#373)
+
+Runtime `survival_hud.rs` owns typed observational mapping and presentation
+feedback/cache, with bounded raster/layout in `survival_hud/raster.rs`; `app.rs`
+owns H/[ / ] focus-safe dispatch and overlay priority. Survival's immutable
+`effect_snapshots` supplies captured rules/stacks/timers. Renderer exposes its
+existing fitted toolbar message band; existing inventory/equipment art is unchanged.
+See the [canonical HUD contract](../client/runtime/architecture.md#survival-hud-and-status-details-373).
+Tests cover actual consumables, exact penalties, visual timing/cache, all supported
+viewport/DPI layouts, full effect pagination and native input policy. #376 retains
+native visual signoff; #381/#377 extend the existing menu/wheel admission later.

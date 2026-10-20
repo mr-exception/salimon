@@ -153,3 +153,11 @@ Journey accounting and final location live in `session/journey.rs`; read the
 [metric/save contract](../../docs/save-contract.md#journey-statistics-372) before
 changing frame sampling, background timing or archived summaries. Preserve the
 journey, background tick and archive version/recovery regressions.
+
+
+Survival HUD/status details (#373): start in `survival_hud.rs` (observational DTOs,
+feedback/tween/cache), `survival_hud/raster.rs` (bounded layout/RGBA), and native
+H/[ / ] admission in `app.rs`. See the [canonical HUD contract](architecture.md#survival-hud-and-status-details-373).
+Keep UI state out of full saves, use typed effect/restriction snapshots, and use
+the renderer-owned toolbar reservation when fitting overlays. Preserve the HUD,
+real-consumable, focus/modal and raster/layout regressions.

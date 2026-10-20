@@ -15,3 +15,8 @@ physical consumers. Do not duplicate thresholds in input handlers or the HUD.
 `tests/consumables.rs` covers timed food/medical benefits, registry conflicts,
 terminal ordering, treatment, exact restoration and offline freeze. Runtime owns
 item selection/removal, never this crate. See the canonical consumable contract.
+
+
+`effect_snapshots()` (#373) is the immutable presentation seam for captured effect
+rules, stacks and live timers. Keep descriptions/native visibility in runtime,
+not the survival owner, and preserve stable EffectId iteration and offline freeze.

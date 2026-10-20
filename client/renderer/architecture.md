@@ -368,3 +368,12 @@ The bottom HUD raster reserves two distinct rows: five equipment slots and
 three food/two medical slots. Empty category markers stay visible. Amber ration
 stripes and a pale package/red cross match the existing low-poly tray styling.
 Message inset covers both rows; DPI fitting and caching use the full image.
+
+
+## Shared toolbar reservation (#373)
+
+`toolbar_message_inset(surface, dpi)` exposes the same pure fitted physical bottom
+band used internally for action text. Runtime uses it to fit the independent
+survival overlay without copying inventory raster dimensions or changing existing
+slots/art. The renderer still receives only generic borrowed RGBA and placement;
+all survival state, effect descriptions, HUD raster and expiry remain runtime-owned.

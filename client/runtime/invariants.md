@@ -415,3 +415,9 @@ bounded queue and one child process are polled without blocking the frame; menu
 suppression kills/reaps playback. Missing/failed players log an explicit warning;
 missing players also show an accessibility warning. Actual OS playback and sensory
 quality/performance require reference-device verification (#376).
+
+Current-sphere benchmark/E2E profiles (#313) share the CPU workload's production
+extraction, counts, material/mass cycle and supported layered cells. These are
+opt-in initial conditions only; they never force sleep, keep motion alive or
+change production damping/contact/mass rules. Raw accounting reports actual
+contact radii alongside mass/identity; the minimum radius does not clamp mass.

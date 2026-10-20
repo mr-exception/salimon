@@ -753,7 +753,10 @@ streaming restoration. Native M1 remains #236.
 Test-only `sphere_fixtures.rs` constructs append-only, released default-lifecycle
 spheres and checks actual mass/radius/source/ID/count before carrying/contact
 assertions. `sphere_workloads.rs` owns separately versioned portable 500/1,000
-current-sphere workloads, with raw population and CPU samples. Historical flight
+current-sphere workloads, with raw population and CPU samples. Their canonical
+initialization now lives in `benchmark_fixture.rs`, exposed as `current-cap` and
+`current-mixed` to native benchmarks and opt-in E2E, including 1,000 objects (#313).
+Raw benchmark accounting includes actual per-object contact radius. Historical flight
 and #235 populations retain their original definitions. See the canonical
 [fixture/workload contract](../../scripts/FRAGMENT_BENCHMARKS.md#current-sphere-fixture-and-cpu-workload-contracts-303)
 for commands, fixture identities, tolerances and interpretation limits.

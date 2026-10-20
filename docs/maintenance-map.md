@@ -201,3 +201,8 @@ Runtime `session/survival.rs` and `survival_hud.rs` consume the same derived pol
 Tests: survival `tests/foods.rs`, fabrication starter catalog regression, runtime
 `session/consumables/tests.rs` craft/Core/exact-consume/full-save scenarios. See the
 [canonical catalog and provisional settings](../client/survival/architecture.md#four-food-catalog-378).
+
+Native current-sphere validation (#313) routes through runtime
+`benchmark_fixture.rs` (`current-cap`/`current-mixed`), shared with the portable
+`sphere_workloads.rs` matrix; use the
+[benchmark contract](../scripts/FRAGMENT_BENCHMARKS.md#native-current-sphere-profiles-313).

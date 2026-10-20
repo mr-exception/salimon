@@ -615,3 +615,21 @@ profiles for both refs. Separate per-ref Cargo target directories prevent an
 older worktree's artifacts being reused by a checkout with older file mtimes.
 When running the standalone journal integration probe across refs, also use
 separate `CARGO_TARGET_DIR` paths (or clean the world package between revisions).
+
+### Native current-sphere profiles (#313)
+
+`--layouts current-cap current-mixed --counts 500 1000` exposes the
+`current-spheres-303-v1` population to the native benchmark and opt-in E2E setup.
+`current-cap` is 10 kg iron; `current-mixed` cycles the existing residual masses
+and three materials. Both use the canonical 30 cm supported deck cells and
+conservative water-ice-radius layer spacing shared with `sphere_workloads.rs`.
+Active starts retain the 30 cm lift and 0.4 m/s upward velocity; settled starts
+omit the lift/velocity and still require natural preparation/sleep verification.
+The legacy `sphere-deck`, `sphere-pile` and `onboard` layouts are unchanged.
+
+Raw accounting now also records each fragment's actual `radius_meters`; IDs,
+material and mass remain authoritative. The 5 mm minimum contact radius is not
+an invented minimum mass. Native foreground admission, completed-frame sample
+counts, active-only filtering and timeout/failure rules above remain required.
+A 1,000-object residual workload can be expensive; a timed-out run has no passing
+frame/FPS result. Never substitute a legacy 500-piece run for these populations.

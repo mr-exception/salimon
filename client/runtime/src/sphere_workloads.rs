@@ -1,83 +1,43 @@
 //! Separately versioned current-sphere CPU workloads; never a native FPS gate.
-use crate::{carrying, fragment_physics, mining::ResourceGameplay, sphere_fixtures};
-use salimon_character::SHIP_FLOOR_HEIGHT_METERS;
+use crate::{carrying, fragment_physics, mining::ResourceGameplay};
 use salimon_ship::{ShipController, ShipPose};
-use salimon_world::{
-    WorldPosition,
-    resources::{ResourceId, ResourceTransform},
-    spherical_mining::SPHERE_TICK,
-};
+use salimon_world::spherical_mining::SPHERE_TICK;
 use serde_json::json;
 use std::time::Instant;
 
 fn population(count: usize, mixed: bool) -> (ResourceGameplay, ShipController, serde_json::Value) {
-    let mut tool = ResourceGameplay::default();
-    let mut ship = ShipController::flying(
+    let mut app = crate::session::GameplaySession::default();
+    app.ship = ShipController::flying(
         ShipPose {
             position_meters: [1e12, 0.0, 0.0],
             orientation: [0.0, 0.0, 0.0, 1.0],
         },
         0,
     );
-    let frame = crate::session::frames::character_ship_frame(ship.snapshot().pose);
-    let max_radius = salimon_world::resource_size::fragment_contact_radius_meters(
-        salimon_world::resources::RawMaterial::new(ResourceId::WaterIce, 10.0).unwrap(),
-    );
-    let cells: Vec<_> = (0..600)
+    crate::benchmark_fixture::initialize(
+        &mut app,
+        count,
+        if mixed {
+            crate::benchmark_fixture::Layout::CurrentMixed
+        } else {
+            crate::benchmark_fixture::Layout::CurrentCap
+        },
+        303,
+        true,
+    )
+    .unwrap();
+    let (cells, layer_spacing) = crate::benchmark_fixture::current_sphere_layout();
+    let expected_mass: f64 = (0..count)
         .map(|i| {
-            [
-                -6.3 + (i % 25) as f64 * 0.30,
-                SHIP_FLOOR_HEIGHT_METERS + max_radius,
-                -3.4 + (i / 25) as f64 * 0.30,
-            ]
+            if mixed {
+                [1e-9, 0.000_003, 0.032, 0.25, 2.0, 10.0][i % 6]
+            } else {
+                10.0
+            }
         })
-        .filter(|p| salimon_character::ship_floor_placement(*p, max_radius).is_some())
-        .collect();
-    assert!(!cells.is_empty());
-    let mut expected_mass = 0.0;
-    for i in 0..count {
-        let mass = if mixed {
-            [1e-9, 0.000_003, 0.032, 0.25, 2.0, 10.0][i % 6]
-        } else {
-            10.0
-        };
-        let resource = if mixed {
-            [
-                ResourceId::IronOre,
-                ResourceId::SilicateRock,
-                ResourceId::WaterIce,
-            ][(i / 6) % 3]
-        } else {
-            ResourceId::IronOre
-        };
-        let mut local = cells[i % cells.len()];
-        local[1] += (i / cells.len()) as f64 * (2.0 * max_radius + 0.000_01) + 0.30;
-        assert!(
-            salimon_character::ship_contains_object(local),
-            "fixture must stay onboard: {local:?}"
-        );
-        let world = frame.local_to_world(local);
-        let pose = ResourceTransform::new(
-            WorldPosition::new(world[0], world[1], world[2]),
-            [0.0, 0.0, 0.0, 1.0],
-        )
-        .unwrap();
-        let id = sphere_fixtures::sphere(&mut tool.session, resource, mass, pose);
-        tool.ship_fragments
-            .insert(id, salimon_character::ShipLocalPoint::new(local));
-        tool.fragment_motion.insert(
-            id,
-            fragment_physics::FragmentMotion {
-                velocity: [0.0, 0.4, 0.0],
-                ship_orientation: Some([0.0, 0.0, 0.0, 1.0]),
-                ..Default::default()
-            },
-        );
-        expected_mass += mass;
-    }
-    assert_eq!(tool.session.fragments().len(), count);
-    carrying::sync_ship_mass(&mut tool, frame, &mut ship);
-    assert!((ship.snapshot().total_mass_kg - 100_000.0 - expected_mass).abs() < 1e-8);
+        .sum();
+    let tool = app.mining;
+    let ship = app.ship;
     let inventory: Vec<_> = tool.session.fragments().iter().map(|piece| json!({
         "id":piece.id().0,"source":piece.source().local,"resource":piece.material().resource().key(),
         "mass_kg":piece.material().mass_kg(),"radius_meters":fragment_physics::sphere_radius(*piece),
@@ -92,7 +52,7 @@ fn population(count: usize, mixed: bool) -> (ResourceGameplay, ShipController, s
     assert!((actual_mass - expected_mass).abs() < 1e-8);
     let metadata = json!({"requested_count":count,"actual_count":inventory.len(),
         "actual_mass_kg":actual_mass,"layout":"supported-deck-layers-active-v1",
-        "columns":cells.len(),"layer_spacing_meters":2.0*max_radius+0.000_01,
+        "columns":cells.len(),"layer_spacing_meters":layer_spacing,
         "profile":if mixed {"mixed-residuals-v1"} else {"cap-10kg-iron-v1"},
         "population":inventory});
     (tool, ship, metadata)

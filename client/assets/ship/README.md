@@ -232,3 +232,18 @@ See the [source/authoring guide](../../../models/assets/ships/salimon-scout/READ
 Its output package is an authored conditional surface in the existing opaque
 draw, visible exactly when the domain tray is occupied; it is not a loose
 fragment and has no automatic animation. Screen UI remains #343.
+
+
+## Articulated aft seam repair (#333)
+
+The moving leaf no longer shares coplanar cap surfaces with the stationary hull
+aperture/header or inset tray. A 10 mm hidden aperture clearance and tapered
+tray caps replace the old closed-contact exemptions. The leaf owns the support
+overlap at full extension; the tray's concealed front strip is omitted with a
+0.1 mm numerical separation at the seam. The 4.4 m ramp, support rectangle,
+hinge, marker and collider contracts remain unchanged.
+`seam_checks.py` validates closed/opening/extension/reversal samples and rejects
+competing materials in deployed support. `repair_door_seams.py` records the
+deliberate one-time Blender source migration; do not run it during export or
+reapply it to already repaired sources. `preview_seams.py` creates read-only CPU
+reference views using the runtime's hinge/extension phases.

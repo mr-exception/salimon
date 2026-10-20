@@ -490,6 +490,8 @@ def validate_scout(context, data):
     require(door_material_bounds["Hull Graphite"][0][0] -
             door_material_bounds["Petrol Teal"][0][0] >= 0.019,
             "door exterior backing and plate must not be coplanar")
+    from seam_checks import door_seams
+    door_seams(document, geometry)
     # The balanced hull has matching sides and the rebuilt port window.
     for port_name, starboard_name in (("Wing_Port", "Wing_Starboard"),
                                       ("Hull_Port_Side", "Hull_Starboard_Side"),

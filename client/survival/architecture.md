@@ -113,3 +113,48 @@ unsaved survival clock. Default session vitals stay full until that integration.
 #370 owns actual consumable effects and #377 owns final wheel dispatch; neither
 is required to implement/test this action policy. #373 owns the persistent HUD;
 automation exposes `survival_restrictions` with exact basis-point values today.
+
+## Consumable recovery definitions (#370)
+
+`consumables.rs` owns serializable, validated `Catalog`/`Definition` data keyed
+by the stable Fabricator recipe ID string. Fabrication owns no vital mechanics.
+Each definition declares Food/Medical category and bounded benefits in integer
+milli-points (1000 = one meter point). Benefits are instant or timed hunger,
+ordinary-health or treatment-health recovery. Treatment uses the existing wound
+pipeline; no new medical lore, disease or status acquisition is introduced.
+
+| Starter item ID | Recovery data | Status |
+| --- | --- | --- |
+| `food-ration` | +40 hunger instantly, clamped to 100 | Basic-ration default from approved expansion #378, still subject to #384 balance |
+| `medkit` | +2.5 ordinary health each 1 active second for 10 seconds (+25 total), stack cap 1 | Explicit provisional tuning for review/balance, not an owner-approved medical efficacy claim |
+
+Starter medical EffectId is 10000. Reusing an ID with different rules rejects
+atomically; catalogs reject duplicate item/effect IDs. Timed definitions require
+positive 1ms..1day intervals, positive <=1day lifetimes, an integral number of
+intervals, and the shared stack bounds. Definitions contain at most 16 benefits;
+catalog/effect registries retain the 256-entry bound. Decode then `Validate`
+before installing configuration or restored authoritative state.
+
+`apply_consumable` validates and prepares all registration/benefits on a clone,
+then commits once. A failed definition, conflicting ID or terminal run changes
+nothing. There is no full-health/full-hunger rejection: current gains clamp at
+100 and excess is wasted, while timed benefits retain their configured lifetime.
+Repeated legitimate medkits refresh the existing duration without exceeding one
+stack or resetting its partial tick cadence; no unbounded parallel healing is
+created. A stale click must not be treated as another legitimate item use by the
+host. Special treatment definitions can use `Healing::Treatment`; future food
+buff behavior remains #378, built on the same typed effect registry.
+
+Periodic food now uses `Behavior::Feed` in the existing deterministic pipeline.
+At a shared timestamp damage still runs first; only a living state receives food,
+then periodic health recovery and natural regeneration, with expiry last. Food
+resets the starvation interval through the same Feed command. Death cannot be
+averted by food/healing scheduled for the lethal timestamp.
+
+Active recovery rule definitions, stacks, duration and fractional tick are part
+of serialized `Survival`; validate and restore without stepping. Offline recovery
+only changes fatigue, never these timers or benefits. #371 owns composing this
+owner with consumed inventory into one verified whole-game checkpoint and
+activating production clocks; #370 does not start an unsaved clock. Native Q-wheel
+selection/hover presentation belongs #377 and consumes through runtime's exact
+item transaction; M/N remain absent. Four-food expansion/unlocks are #378.

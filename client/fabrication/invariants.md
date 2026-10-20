@@ -43,3 +43,8 @@ feedback and render caches reset; interactions are recomputed from restored
 world state. The native host's automation policy stays host-owned. No disk IO,
 autosave scheduling or offline simulation is implied; #366 owns durable storage
 and shell lifecycle integration. See [canonical save contract](../../docs/save-contract.md).
+
+- Explicit `consume_slot` (#370/#377) removes only that named slot; survivors never
+  compact and no first-available fallback occurs. Runtime checks the selected
+  stable job/unit before committing validated survival benefits. The historical
+  invariant 14 describes only the retained `consume_first` compatibility helper.

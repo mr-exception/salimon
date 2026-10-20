@@ -229,6 +229,7 @@ impl Survival {
             remaining -= step;
             let mut damages = Vec::new();
             let mut heals = Vec::new();
+            let mut feeds = Vec::new();
             if hungry {
                 self.starvation_elapsed += delta;
                 if self.starvation_elapsed == self.config.starvation_interval {
@@ -263,6 +264,7 @@ impl Survival {
                                     amount,
                                     wound,
                                 }),
+                                Behavior::Feed { amount } => feeds.push(amount),
                                 Behavior::Heal { amount, mode } => {
                                     heals.push(Heal { amount, mode })
                                 }
@@ -279,6 +281,10 @@ impl Survival {
             damages.sort_by_key(|d| d.source);
             self.damage_batch(&damages);
             if !self.terminal {
+                for amount in feeds {
+                    self.command(Command::Feed(amount))
+                        .expect("validated periodic food");
+                }
                 for heal in heals {
                     self.heal(heal).expect("validated periodic healing");
                 }

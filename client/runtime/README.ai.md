@@ -134,3 +134,8 @@ for paths, recovery/failure policy, Windows behavior and future lifecycle owners
 Survival action gates and voluntary movement composition (#369) live in
 `session/survival.rs`; use its shared policy for new native/protocol interactions.
 See [canonical restrictions](../survival/architecture.md#movement-and-interaction-restrictions-369).
+
+Item effects/removal compose in `session/consumables.rs` (#370): use the exact
+slot/job/unit selection seam from native wheel or protocol adapters. Validate and
+prepare benefits before removing inventory; never consume a slot first and try
+to apply potentially fallible effects afterward. See the recovery contract.

@@ -947,3 +947,28 @@ clock/save publication; default session vitals remain full until it lands. #370
 and #377 supply actual effects and wheel dispatch separately. No schema-1 save
 is silently changed; derived character scale and interaction cooldown reset on
 restore and are reapplied by the session before the next tick.
+
+## Consumable survival transaction (#370)
+
+`session/consumables.rs::consume_selection` is the shared wheel/protocol seam.
+Selection captures a named inventory slot plus expected `JobId`/unit, not a
+category/first-occupied request. Gameplay view, non-crafting state and typed
+Consume permission gate use; fatigue zero remains eligible. Stale/empty identity,
+unknown recipe, mismatched category, bad effect data or terminal state reject
+without changing either owner. Prepare all benefits on a survival clone; only
+then take the exact slot and publish the prepared owner under exclusive session
+ownership. Neither operation changes ship mass or Fabricator jobs/raw/tray.
+
+The portable protocol supports `consume` with 1-based slot 1..5 and positive
+`job`/`unit`, all required. It calls this same transaction and reports applied/
+rejection; it does not introduce a gameplay hotkey. Inspection includes recipe
+recovery definitions and active survival recovery snapshots. Native desktop
+focus admission stays shell-owned; #377's wheel must replace its raw slot removal
+with this seam, capture the selected item identity, close only after success and
+use these recovery definitions for hover feedback. M/N remain absent.
+
+See the [canonical recovery data](../survival/architecture.md#consumable-recovery-definitions-370).
+As with #367–#369, #371 owns production survival ticking/full-save publication;
+this change does not activate an unsaved clock, alter schema-1 saves, or implement
+#377's native wheel/#378's locked food expansion. Domain serialized recovery and
+inventory support exact continuation and offline freeze for that composition.

@@ -91,3 +91,17 @@ feedback and render caches reset; interactions are recomputed from restored
 world state. The native host's automation policy stays host-owned. No disk IO,
 autosave scheduling or offline simulation is implied; #366 owns durable storage
 and shell lifecycle integration. See [canonical save contract](../../docs/save-contract.md).
+
+## Exact consumption selection (#370)
+
+The `ConsumableSlot` facade matches the existing #377 wheel draft: five named
+slots, `ALL`/`index`, observational `item` and exact `consume_slot`, without
+compaction. New runtime consumers must identify `(slot, JobId, unit)` and reject
+stale selection before removal. `consume_first` remains a compatibility helper;
+no native M/N dispatch exists and no new first-available UI should use it.
+
+Runtime's #370 adapter validates item/category/effects and prepares survival before
+removing the one selected identity; fabrication itself still owns no health,
+hunger, effect timer or full-vitals gate. Inventory/tray/raw mass semantics and
+save representation are unchanged. See the
+[recovery contract](../survival/architecture.md#consumable-recovery-definitions-370).

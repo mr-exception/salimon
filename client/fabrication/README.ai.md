@@ -18,3 +18,8 @@ transactions. Keep errors atomic and keep snapshots observational.
 Run `cargo test -p salimon-fabrication --locked`, formatting and Clippy; use the
 root [validation matrix](../../docs/validation.md) for cross-crate checks.
 Maintain the root task report and affected guides with behavior changes.
+
+#370 adds the exact `ConsumableSlot`/`item`/`consume_slot` facade already used by
+#377's wheel draft. Prefer exact identity selection for new consumers. The runtime
+survival adapter owns effects and transaction preparation; keep this crate free
+of health/hunger and input/focus policy.

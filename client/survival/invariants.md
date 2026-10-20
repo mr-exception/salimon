@@ -22,3 +22,8 @@
   cannot deny doors, basic menus or food/medicine solely because of exhaustion.
 - Reduced interaction work never reduces ship, physics, Core or machine-job time.
   Derived percentages/cooldowns do not substitute for #371's saved vital state.
+- #370 consumable definitions use integer milli-points and validated stable IDs;
+  all benefits register/apply atomically. Full meters permit waste, terminal runs
+  reject. Recovery uses the same wounds, clamps and lethal-timestamp ordering.
+- Consumed items' timed benefits preserve fractional intervals across serialization;
+  offline fatigue recovery cannot tick food, healing or treatment effects.

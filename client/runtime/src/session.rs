@@ -9,6 +9,7 @@ pub(crate) mod lifecycle;
 mod presentation;
 mod survival;
 // Portable adapters are consumed by whole-session orchestration in #365/#366.
+mod pause;
 #[allow(dead_code)]
 pub(crate) mod persistence;
 #[cfg(test)]
@@ -26,6 +27,7 @@ use salimon_world::{CameraPrototype, TransitionPhase};
 use std::time::Duration;
 
 pub(crate) struct GameplaySession {
+    paused: bool,
     pub(crate) run: lifecycle::RunState,
     pub(crate) consumable_effects: salimon_survival::consumables::Catalog,
     pub(crate) survival: salimon_survival::Survival,
@@ -76,6 +78,7 @@ impl ShipControlInput {
 impl Default for GameplaySession {
     fn default() -> Self {
         Self {
+            paused: false,
             run: Default::default(),
             consumable_effects: salimon_survival::consumables::Catalog::starter(),
             survival: Default::default(),
@@ -118,6 +121,7 @@ pub(crate) enum ControlKey {
 }
 #[derive(Clone, Copy, Debug)]
 pub(crate) enum Command {
+    TogglePause,
     Control(ControlKey, bool),
     Throttle(salimon_ship::ThrottleDirection, bool),
     Interact,
@@ -170,7 +174,7 @@ impl GameplaySession {
         self.seed
     }
     pub(crate) fn interact(&mut self) {
-        if self.survival.snapshot().terminal {
+        if self.paused || self.survival.snapshot().terminal {
             return;
         }
         self.enforce_survival_restrictions();
@@ -291,6 +295,9 @@ impl GameplaySession {
     }
 
     pub(crate) fn toggle_view(&mut self) {
+        if self.paused {
+            return;
+        }
         self.view_mode = match self.view_mode {
             ViewMode::Gameplay => ViewMode::PrecisionTour,
             ViewMode::PrecisionTour => ViewMode::Gameplay,
@@ -308,7 +315,7 @@ impl GameplaySession {
     }
 
     pub(crate) fn apply_look_delta(&mut self, dx: f64, dy: f64) {
-        if self.survival.snapshot().terminal {
+        if self.paused || self.survival.snapshot().terminal {
             return;
         }
         self.character.apply_mouse_delta(dx, dy);
@@ -331,6 +338,7 @@ impl GameplaySession {
     pub(crate) fn mining_mouse_input(&mut self, pressed: bool) {
         self.mining.set_mouse_held(
             pressed
+                && !self.paused
                 && self.view_mode == ViewMode::Gameplay
                 && self.restrictions().permits(Action::Mine)
                 && self.equipment.mining_equipped()
@@ -401,6 +409,9 @@ impl GameplaySession {
     }
 
     pub(crate) fn sync_carried(&mut self) {
+        if self.paused {
+            return;
+        }
         let ship = self.ship.snapshot();
         let frame = character_ship_frame(ship.pose);
         crate::carrying::sync_ship_fragments(&mut self.mining, frame);
@@ -420,6 +431,9 @@ impl GameplaySession {
     }
 
     pub(crate) fn advance_automation(&mut self, elapsed: Duration) {
+        if self.paused {
+            return;
+        }
         if self.survival.snapshot().terminal {
             self.freeze_terminal();
             return;
@@ -431,6 +445,9 @@ impl GameplaySession {
     }
 
     pub(crate) fn advance_game(&mut self, delta: Duration) {
+        if self.paused {
+            return;
+        }
         if self.survival.snapshot().terminal {
             self.freeze_terminal();
             return;
@@ -558,6 +575,13 @@ impl GameplaySession {
             self.freeze_terminal();
             return;
         }
+        if let TogglePause = command {
+            self.toggle_pause();
+            return;
+        }
+        if self.paused {
+            return;
+        }
         self.enforce_survival_restrictions();
         if self.crafting_ui.open {
             return; // Modal UI owns input; simulation and Core funding continue.
@@ -635,7 +659,7 @@ impl GameplaySession {
             }
             Look(dx, dy) => self.apply_look_delta(dx, dy),
             Mining(pressed) => self.mining_mouse_input(pressed),
-            ToggleView | Camera(_) => unreachable!(),
+            TogglePause | ToggleView | Camera(_) => unreachable!(),
         }
     }
     fn control(&mut self, key: ControlKey, pressed: bool) {

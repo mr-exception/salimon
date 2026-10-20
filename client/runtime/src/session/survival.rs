@@ -29,6 +29,9 @@ impl GameplaySession {
     }
 
     pub(super) fn admit_survival_action(&mut self, action: Action) -> bool {
+        if self.is_paused() {
+            return false;
+        }
         let rules = self.restrictions();
         if !rules.permits(action) {
             self.feedback = Some("Too fatigued for this action");

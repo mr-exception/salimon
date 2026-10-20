@@ -484,6 +484,31 @@ impl ClientApplication {
             }
             return;
         }
+        let pause_key = self.session.view_mode == ViewMode::Gameplay
+            && (key == PhysicalKey::Code(KeyCode::Escape)
+                || (self.session.is_paused()
+                    && matches!(
+                        key,
+                        PhysicalKey::Code(KeyCode::Enter | KeyCode::NumpadEnter)
+                    )));
+        if pause_key {
+            if pressed && !repeat && !synthetic && self.input_policy().admits_press(source, true) {
+                self.session.command(crate::session::Command::TogglePause);
+                self.survival_hud.close_details();
+                self.cursor_captured = false;
+                if let Some(window) = &self.window {
+                    if self.session.is_paused() {
+                        release_cursor(window);
+                    } else {
+                        self.cursor_captured = capture_cursor(window);
+                    }
+                }
+            }
+            return;
+        }
+        if self.session.is_paused() {
+            return;
+        }
         if !self
             .input_policy()
             .admits_key(source, key, pressed, repeat, synthetic)
@@ -544,7 +569,7 @@ impl ClientApplication {
 
     fn advance_native(&mut self, elapsed: Duration) -> (Duration, usize) {
         let started = Instant::now();
-        if self.session.survival.snapshot().terminal {
+        if self.session.is_paused() || self.session.survival.snapshot().terminal {
             self.session.update_clock.reset();
         } else {
             self.session.update_clock.accumulate(elapsed);
@@ -819,7 +844,10 @@ impl ClientApplication {
             [window.inner_size().width, window.inner_size().height],
             window.scale_factor(),
         );
-        let crafting_text = self.session.crafting_text();
+        let crafting_text = self
+            .session
+            .pause_text()
+            .or_else(|| self.session.crafting_text());
         let crafting_pixels = crafting_text
             .as_ref()
             .map(|text| crate::action_bar::rasterize_action_bar(text, 3));
@@ -865,7 +893,11 @@ impl ClientApplication {
         };
         let action_bar_image = self
             .action_bar
-            .image(self.session.view_mode == ViewMode::Gameplay && !terminal)
+            .image(
+                self.session.view_mode == ViewMode::Gameplay
+                    && !terminal
+                    && !self.session.is_paused(),
+            )
             .map(|image| RendererOverlayImage {
                 width: image.width,
                 height: image.height,
@@ -902,11 +934,15 @@ impl ClientApplication {
                 overlay_image,
                 action_bar_image,
                 crate::reticle::image(
-                    self.session.view_mode == ViewMode::Gameplay && !terminal,
+                    self.session.view_mode == ViewMode::Gameplay
+                        && !terminal
+                        && !self.session.is_paused(),
                     &self.session.equipment,
                 ),
-                (self.session.view_mode == ViewMode::Gameplay && !terminal)
-                    .then(|| self.session.equipment_presentation()),
+                (self.session.view_mode == ViewMode::Gameplay
+                    && !terminal
+                    && !self.session.is_paused())
+                .then(|| self.session.equipment_presentation()),
                 window.scale_factor(),
                 || window.pre_present_notify(),
             ) {
@@ -1211,7 +1247,7 @@ impl ApplicationHandler for ClientApplication {
                     return;
                 }
                 if focused {
-                    if self.session.survival.snapshot().terminal {
+                    if self.session.is_paused() || self.session.survival.snapshot().terminal {
                         // Focus may have been lost before death. The capture
                         // flag is already clear then, but the OS cursor still
                         // needs explicit restoration for the restart button.
@@ -1260,6 +1296,7 @@ impl ApplicationHandler for ClientApplication {
             } if !self.cursor_captured
                 && self.native_focused
                 && !self.occluded
+                && !self.session.is_paused()
                 && !self.session.survival.snapshot().terminal =>
             {
                 self.cursor_captured = capture_cursor(&window);
@@ -1269,7 +1306,9 @@ impl ApplicationHandler for ClientApplication {
                 is_synthetic,
                 ..
             } if !is_synthetic
-                && release_cursor_pressed(event.state, event.repeat, event.physical_key) =>
+                && release_cursor_pressed(event.state, event.repeat, event.physical_key)
+                && (event.physical_key == PhysicalKey::Code(KeyCode::F1)
+                    || self.session.view_mode != ViewMode::Gameplay) =>
             {
                 release_cursor(&window);
                 self.release_input_capture();

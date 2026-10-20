@@ -152,8 +152,9 @@ closer geometry. Flight/tool guidance and short blocked-action feedback remain
 at the bottom of the screen.
 Face the open door and walk forward through it to transition over 0.25 seconds
 to the active solid body's radial gravity and inspect the ship exterior. There is no sprint or crouch. Press
-**Escape** to release the captured cursor for window controls; click the game
-view to capture it again.
+**F1** to release the captured cursor for window controls; click the game
+view to capture it again. **Escape** opens the full simulation pause menu;
+**Enter** or **Escape** resumes with fresh controls.
 
 Press **F2** to switch to the engineering Solar System precision tour. Six textured spheres show the static
 compressed bodies during the automatic far-space-to-Earth-surface transition.

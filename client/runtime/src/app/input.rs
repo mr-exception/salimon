@@ -6,7 +6,9 @@ use winit::event::ElementState;
 use winit::keyboard::{KeyCode, PhysicalKey};
 
 pub(super) fn release_cursor_pressed(state: ElementState, repeat: bool, key: PhysicalKey) -> bool {
-    state == ElementState::Pressed && !repeat && key == PhysicalKey::Code(KeyCode::Escape)
+    state == ElementState::Pressed
+        && !repeat
+        && matches!(key, PhysicalKey::Code(KeyCode::Escape | KeyCode::F1))
 }
 
 pub(super) fn terminal_restart_pressed(
@@ -98,19 +100,7 @@ pub(super) fn camera_command(
         return None;
     }
 
-    if !precision_tour
-        && matches!(
-            key,
-            PhysicalKey::Code(
-                KeyCode::Digit1
-                    | KeyCode::Digit2
-                    | KeyCode::Digit3
-                    | KeyCode::Digit4
-                    | KeyCode::Digit5
-                    | KeyCode::Digit6
-            )
-        )
-    {
+    if !precision_tour {
         return None;
     }
 
@@ -162,6 +152,24 @@ pub(crate) fn dispatch_session_key(
     pressed: bool,
 ) {
     use crate::session::Command;
+    if pressed
+        && key == PhysicalKey::Code(KeyCode::Escape)
+        && session.view_mode == crate::session::ViewMode::Gameplay
+    {
+        session.command(Command::TogglePause);
+        return;
+    }
+    if session.is_paused() {
+        if pressed
+            && matches!(
+                key,
+                PhysicalKey::Code(KeyCode::Enter | KeyCode::NumpadEnter)
+            )
+        {
+            session.command(Command::TogglePause);
+        }
+        return;
+    }
     if session.crafting_ui.open {
         if pressed {
             use crate::session::crafting_ui::CraftingAction as A;

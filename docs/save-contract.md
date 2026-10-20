@@ -264,3 +264,20 @@ items. Restart candidates contain one grant; publication failures retain termina
 authority and retries rebuild that same candidate rather than appending supplies.
 Isolated engineering/E2E/benchmark fixtures keep their explicitly empty `Default`
 starting state; portable new-run E2E tests opt into the production constructor.
+
+
+## Gameplay pause (#381)
+
+Escape in gameplay opens the pause menu and releases the cursor. Enter or Escape
+resumes; F1 explicitly releases the cursor without pausing. P/R/N camera commands
+belong only to the F2 precision tour. Pausing closes crafting/status overlays and
+clears held movement, steering, throttle keys and mining. Requested ship throttle
+is preserved. Full simulation, Core, fabrication, loose cargo, survival effects,
+journey accounting and autosave game-time intervals freeze at the session boundary.
+UI/rendering and checkpoint IO continue. The transient pause flag is not saved.
+Both native/background and portable automation tick paths exclude paused elapsed
+time and clear pending backlog on entry/resume; focus/minimize/suspend cannot
+resume a paused session or credit offline fatigue. Resume requires fresh controls.
+The pause menu takes priority over diagnostics, HUD, reticle and equipment.
+Save Now/Save & Exit remain the separate #382 feature; Q-wheel input must respect
+`GameplaySession::is_paused()` and the shared consumption gate.

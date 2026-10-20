@@ -141,6 +141,7 @@ impl Observation {
                 format!("INTERACTION RATE -{}%", percent(10000 - r.interaction_bps)),
             ],
             visible: session.view_mode == ViewMode::Gameplay
+                && !session.is_paused()
                 && !session.crafting_ui.open
                 && !v.terminal,
         }

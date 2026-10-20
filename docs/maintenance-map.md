@@ -185,3 +185,7 @@ and `session/lifecycle.rs` compose new runs and mass. Restore is unchanged.
 See the [canonical contract](save-contract.md#starting-supplies-379).
 Tests: fabrication `tests/starting_supplies.rs`, runtime
 `session/starting_supplies_tests.rs`, existing checkpoint/restart fault injection.
+
+Gameplay pause (#381): `client/runtime/src/session/pause.rs` owns transient modal
+authority and clock resets. Native routing is `app.rs`/`app/input.rs`; regressions
+cover native/background and portable full-save freeze.

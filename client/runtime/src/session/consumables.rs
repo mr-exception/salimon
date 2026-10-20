@@ -26,7 +26,8 @@ impl GameplaySession {
         &mut self,
         selected: Selection,
     ) -> Result<OutputItem, ConsumeError> {
-        if self.view_mode != ViewMode::Gameplay
+        if self.is_paused()
+            || self.view_mode != ViewMode::Gameplay
             || self.crafting_ui.open
             || !self.restrictions().permits(Action::Consume)
         {

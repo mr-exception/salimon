@@ -193,11 +193,20 @@ fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
         Some("key")
             if matches!(
                 command.get("key").and_then(Value::as_str),
-                Some("diagnostics" | "status" | "status_previous" | "status_next")
+                Some(
+                    "pause"
+                        | "resume"
+                        | "diagnostics"
+                        | "status"
+                        | "status_previous"
+                        | "status_next"
+                )
             ) =>
         {
             if let Some(pressed) = command.get("pressed").and_then(Value::as_bool) {
                 let key = match command["key"].as_str() {
+                    Some("pause") => KeyCode::Escape,
+                    Some("resume") => KeyCode::Enter,
                     Some("status") => KeyCode::KeyH,
                     Some("status_previous") => KeyCode::BracketLeft,
                     Some("status_next") => KeyCode::BracketRight,
@@ -241,6 +250,14 @@ pub(crate) fn execute_session(app: &mut GameplaySession, line: &str) -> Value {
     }
     if command.get("protocol").and_then(Value::as_u64) != Some(u64::from(PROTOCOL)) {
         return error(id, "protocol_mismatch", "expected protocol 1");
+    }
+    if app.is_paused()
+        && !matches!(
+            command.get("op").and_then(Value::as_str),
+            Some("inspect" | "key" | "step")
+        )
+    {
+        return error(id, "paused", "gameplay commands unavailable while paused");
     }
     let result = match command.get("op").and_then(Value::as_str) {
         Some("inspect") => Ok(inspect_session(app)),
@@ -470,6 +487,8 @@ pub(crate) fn execute_session(app: &mut GameplaySession, line: &str) -> Value {
 
 fn key_code(name: &str) -> Option<KeyCode> {
     match name {
+        "pause" => Some(KeyCode::Escape),
+        "resume" => Some(KeyCode::Enter),
         "view" => Some(KeyCode::F2),
         "diagnostics" => Some(KeyCode::F3),
         "near" => Some(KeyCode::KeyN),
@@ -610,6 +629,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
     let fabrication = app.fabrication_snapshot();
     let item = |item: &salimon_fabrication::OutputItem| json!({"recipe":item.recipe.key(), "job":item.job.0, "unit":item.unit, "mass_kg":item.mass.kg(), "category":format!("{:?}",item.category), "effect":app.consumable_effects.get(item.recipe.key())});
     json!({
+        "paused": app.is_paused(),
         "fabricator": {
             "status":format!("{:?}",fabrication.status), "requested_watts":fabrication.requested_watts,
             "stored":fabrication.stored.iter().map(|bin| json!({"resource":bin.resource.key(),"milligrams":bin.milligrams})).collect::<Vec<_>>(),

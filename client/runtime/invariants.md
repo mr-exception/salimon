@@ -310,8 +310,8 @@ for paths, recovery/failure policy, Windows behavior and future lifecycle owners
 - #369 movement/interaction modifiers and exhausted-pilot revocation consume
   typed survival snapshots at shared command/tick boundaries, with no native or
   automation bypass. See the canonical survival restriction contract.
-- Survival clock/save activation remains #371; default full vitals do not drain
-  unsaved. Emergency consumption permission never shares nonessential cooldowns.
+- #371 ticks and saves survival on admitted active intervals; only fatigue recovers
+  offline through the verified launch transaction. Emergency consumption permission never shares nonessential cooldowns.
 - Exhaustion cannot pause ongoing Fabricator jobs, Core, ship or fragment physics;
   it interrupts held mining and clears manual pilot input/thrust without braking.
 
@@ -320,5 +320,19 @@ for paths, recovery/failure policy, Windows behavior and future lifecycle owners
   a replacement identity; failed use preserves both owners, full vitals permit
   waste, and exhaustion alone never denies emergency food/medicine.
 - The shared transaction respects Gameplay/crafting/terminal gates and changes no
-  ship mass. Native focus/Q-wheel input remains #377; full-save/clock activation
-  remains #371. M/N are not reintroduced.
+  ship mass. Native focus/Q-wheel input remains #377; full-save/clock composition
+  is owned by #371. M/N are not reintroduced.
+
+
+## Survival lifecycle (#371)
+
+- Schema 2 requires complete validated survival/effect/catalog/config/run state.
+  Schema 1 migrates physical/Fabricator state once with full new vital meters.
+- Restore never ticks or credits recovery. Native launch credits only fatigue in
+  a temporary candidate and verifies its checkpoint before live publication.
+- Terminal state truncates the lethal tick, clears inputs and backlog, rejects
+  world commands and freezes all authoritative domains. IO/UI may still operate.
+- Restart archives the terminal summary and verifies two fresh fallback slots
+  before publishing fresh gameplay. A failed archive/write never silently revives
+  a terminal run or acknowledges an unverified restart.
+- Terminal IO retries use host time, independent of frozen gameplay timers.

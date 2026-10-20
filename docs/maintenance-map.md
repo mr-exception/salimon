@@ -110,7 +110,7 @@ Filesystem durability and native lifecycle checkpoints remain #366.
 
 Portable meter/active-clock/offline-fatigue authority lives in
 [`salimon-survival`](../client/survival/architecture.md). Native/session persistence
-integration is #371; the current playable session does not yet advance survival.
+integration is implemented by #371; the session now advances and saves survival.
 
 Damage, regeneration, treatment-only wound debt and data-driven timed/persistent/
 exposure status effects (#368) use the survival crate's [single pipeline](../client/survival/architecture.md#damage-and-status-pipeline-368).
@@ -123,7 +123,7 @@ owns exact threshold percentages, validated tuning and typed permissions;
 `tests/restrictions.rs`, runtime `session/survival/tests.rs`, character locomotion
 and ship revocation regressions. Run workspace tests/build/Clippy/fmt. See the
 [canonical policy](../client/survival/architecture.md#movement-and-interaction-restrictions-369).
-Clock/save activation remains #371; HUD/wheel/effects remain #373/#377/#370.
+Clock/save integration is implemented by #371; HUD/wheel/effects remain #373/#377/#370.
 
 Consumable survival effects (#370): `survival/src/consumables.rs` owns validated
 milli-point recipe recovery records; its `pipeline.rs` executes timed food/healing
@@ -132,5 +132,15 @@ provides exact slots shared with #377; runtime `session/consumables.rs` commits
 exact identity plus prepared benefits and `automation.rs` exposes inspection/
 portable requests. Coverage: survival `tests/consumables.rs`, runtime
 `session/consumables/tests.rs`, existing inventory/save/status regressions. Run
-workspace tests/build/Clippy/fmt; full-save clock activation is #371 and native
+workspace tests/build/Clippy/fmt; full-save clock integration is #371 and native
 wheel/presentation is #377. [Canonical data/semantics](../client/survival/architecture.md#consumable-recovery-definitions-370).
+
+
+Survival lifecycle (#371): runtime `session/lifecycle.rs`, `session/persistence.rs`,
+`session.rs`, `checkpoints.rs` and `app.rs`; persistence envelope `src/lib.rs` and
+`src/storage.rs`. The [schema-2 save/lifecycle contract](save-contract.md) owns
+v1 migration, startup publication, terminal freeze, archive/restart ordering and
+failure guarantees. Tests live in `session/lifecycle/tests.rs`, checkpoint launch/
+restart/publication-failure modules and storage restart fault injection. Run
+workspace tests/build/Clippy/fmt, native startup/restart smoke; reference signoff
+remains #376. Journey source persistence is ready for #372 distance sampling.

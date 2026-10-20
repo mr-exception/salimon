@@ -20,8 +20,9 @@ Current implementation is a native, client-only custom Rust/winit/wgpu game.
 `client/` owns runtime code; `models/` owns offline authoring; `core/` has no
 backend implementation. Ship flight/landing, movement/EVA, mining, carrying and
 fragment motion/contact are implemented. Resource changes survive local streaming
-in the current in-memory session. Disk checkpoint persistence is implemented by #363–#366; backend persistence,
-networking, orbital simulation and production survival remain deferred. Fabricator crafting is authorized by #336–#348; see the accepted contracts in docs/spaceship-building-and-survival.md.
+in the current in-memory session. Disk checkpoints and survival clock/full-save/terminal restart are implemented
+by #363–#371; backend persistence, networking and orbital simulation remain deferred.
+Survival HUD/Q-wheel/starter-supply work remains #373/#377/#379. Fabricator crafting is authorized by #336–#348; see the accepted contracts in docs/spaceship-building-and-survival.md.
 
 Explicit user instructions govern the task. Approved specifications and issue
 acceptance criteria define intended behavior; current code/tests establish what

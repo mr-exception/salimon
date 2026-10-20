@@ -4,6 +4,7 @@ pub(crate) mod crafting_ui;
 mod fabrication;
 pub(crate) mod frames;
 pub(crate) mod interaction;
+pub(crate) mod lifecycle;
 mod presentation;
 mod survival;
 // Portable adapters are consumed by whole-session orchestration in #365/#366.
@@ -22,6 +23,7 @@ use salimon_world::{CameraPrototype, TransitionPhase};
 use std::time::Duration;
 
 pub(crate) struct GameplaySession {
+    pub(crate) run: lifecycle::RunState,
     pub(crate) consumable_effects: salimon_survival::consumables::Catalog,
     pub(crate) survival: salimon_survival::Survival,
     pub(super) restriction_config: salimon_survival::restrictions::RestrictionConfig,
@@ -71,6 +73,7 @@ impl ShipControlInput {
 impl Default for GameplaySession {
     fn default() -> Self {
         Self {
+            run: Default::default(),
             consumable_effects: salimon_survival::consumables::Catalog::starter(),
             survival: Default::default(),
             restriction_config: Default::default(),
@@ -151,6 +154,9 @@ impl GameplaySession {
         self.seed
     }
     pub(crate) fn interact(&mut self) {
+        if self.survival.snapshot().terminal {
+            return;
+        }
         self.enforce_survival_restrictions();
         let ship_snapshot = self.ship.snapshot();
         let ship_frame = character_ship_frame(ship_snapshot.pose);
@@ -286,6 +292,9 @@ impl GameplaySession {
     }
 
     pub(crate) fn apply_look_delta(&mut self, dx: f64, dy: f64) {
+        if self.survival.snapshot().terminal {
+            return;
+        }
         self.character.apply_mouse_delta(dx, dy);
         if self.view_mode == ViewMode::Gameplay {
             let ship = self.ship.snapshot();
@@ -395,6 +404,10 @@ impl GameplaySession {
     }
 
     pub(crate) fn advance_automation(&mut self, elapsed: Duration) {
+        if self.survival.snapshot().terminal {
+            self.freeze_terminal();
+            return;
+        }
         self.update_clock.accumulate(elapsed);
         while let Some(tick) = self.update_clock.take_tick() {
             self.advance_game(tick);
@@ -402,6 +415,13 @@ impl GameplaySession {
     }
 
     pub(crate) fn advance_game(&mut self, delta: Duration) {
+        if self.survival.snapshot().terminal {
+            self.freeze_terminal();
+            return;
+        }
+        let before = self.survival.snapshot().active_time;
+        self.survival.advance(delta);
+        let delta = self.survival.snapshot().active_time - before;
         self.enforce_survival_restrictions();
         self.elapsed += delta;
         if self.interpolate_presentation {
@@ -483,6 +503,9 @@ impl GameplaySession {
         }
         self.sync_carried();
         self.validate_crafting_focus();
+        if self.survival.snapshot().terminal {
+            self.freeze_terminal();
+        }
         if self.interpolate_presentation && !self.presentation.complete(self.snapshot()) {
             self.mining.fragment_previous.clear();
         }
@@ -503,6 +526,10 @@ impl GameplaySession {
     /// Desktop admission is a shell policy. View/domain gates apply to every caller.
     pub(crate) fn command(&mut self, command: Command) {
         use Command::*;
+        if self.survival.snapshot().terminal {
+            self.freeze_terminal();
+            return;
+        }
         self.enforce_survival_restrictions();
         if self.crafting_ui.open {
             return; // Modal UI owns input; simulation and Core funding continue.

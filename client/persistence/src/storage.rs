@@ -10,6 +10,12 @@ const HEADER: usize = 28;
 pub trait CheckpointStore {
     fn read(&self, slot: usize) -> Result<Option<Vec<u8>>, SaveError>;
     fn publish(&mut self, slot: usize, bytes: &[u8]) -> Result<(), SaveError>;
+    fn next_run_serial(&self) -> Result<u64, SaveError> {
+        Ok(1)
+    }
+    fn archive_run(&mut self, _serial: u64, _report: &[u8]) -> Result<(), SaveError> {
+        Err(invalid("store does not support run archives"))
+    }
 }
 
 pub struct Recovery {
@@ -67,6 +73,27 @@ impl<S: CheckpointStore> SaveManager<S> {
                 recovered: damaged,
             })
         }
+    }
+    pub fn next_run_serial(&self) -> Result<u64, SaveError> {
+        self.store.next_run_serial()
+    }
+    /// Terminal generations survive all failed restart stages. Acknowledgment
+    /// requires both active slots to contain the fresh run, after durable archive.
+    pub fn replace_terminal_run(
+        &mut self,
+        serial: u64,
+        report: &[u8],
+        terminal: &[u8],
+        fresh: &[u8],
+        validate: impl Fn(&[u8]) -> Result<(), SaveError>,
+    ) -> Result<(), SaveError> {
+        validate(terminal)?;
+        validate(fresh)?;
+        self.checkpoint(terminal, &validate)?;
+        self.checkpoint(terminal, &validate)?;
+        self.store.archive_run(serial, report)?;
+        self.checkpoint(fresh, &validate)?;
+        self.checkpoint(fresh, &validate)
     }
     pub fn checkpoint(
         &mut self,
@@ -175,6 +202,72 @@ fn io_error(operation: &str, path: &Path, error: std::io::Error) -> SaveError {
     invalid(format!("{operation} {}: {error}", path.display()))
 }
 impl CheckpointStore for NativeStore {
+    fn next_run_serial(&self) -> Result<u64, SaveError> {
+        let directory = self.directory.join("journeys");
+        let entries = match std::fs::read_dir(&directory) {
+            Ok(entries) => entries,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(1),
+            Err(e) => return Err(io_error("scan archives", &directory, e)),
+        };
+        let mut maximum = 0;
+        for entry in entries {
+            let name = entry
+                .map_err(|e| io_error("scan archive entry", &directory, e))?
+                .file_name();
+            if let Some(serial) = name
+                .to_str()
+                .and_then(|n| n.strip_prefix("run-"))
+                .and_then(|n| n.strip_suffix(".json"))
+                .and_then(|n| n.parse::<u64>().ok())
+            {
+                maximum = maximum.max(serial);
+            }
+        }
+        maximum
+            .checked_add(1)
+            .ok_or_else(|| invalid("run archive identity exhausted"))
+    }
+    fn archive_run(&mut self, serial: u64, report: &[u8]) -> Result<(), SaveError> {
+        if serial == 0 || report.len() > 1024 * 1024 {
+            return Err(invalid("run archive identity/size"));
+        }
+        let directory = self.directory.join("journeys");
+        std::fs::create_dir_all(&directory)
+            .map_err(|e| io_error("create archive directory", &directory, e))?;
+        let destination = directory.join(format!("run-{serial}.json"));
+        if destination.exists() {
+            let file = std::fs::File::open(&destination)
+                .map_err(|e| io_error("read archive", &destination, e))?;
+            let mut existing = Vec::new();
+            file.take(1024 * 1024 + 1)
+                .read_to_end(&mut existing)
+                .map_err(|e| io_error("read archive", &destination, e))?;
+            return if existing == report {
+                Ok(())
+            } else {
+                Err(invalid("archive identity already has different report"))
+            };
+        }
+        let temporary = directory.join(format!("run-{serial}.tmp"));
+        let mut file = std::fs::File::create(&temporary)
+            .map_err(|e| io_error("create archive", &temporary, e))?;
+        file.write_all(report)
+            .and_then(|()| file.sync_all())
+            .map_err(|e| io_error("flush archive", &temporary, e))?;
+        drop(file);
+        std::fs::rename(&temporary, &destination)
+            .map_err(|e| io_error("publish archive", &destination, e))?;
+        #[cfg(unix)]
+        std::fs::File::open(&directory)
+            .and_then(|f| f.sync_all())
+            .map_err(|e| io_error("flush archive directory", &directory, e))?;
+        let existing =
+            std::fs::read(&destination).map_err(|e| io_error("verify archive", &destination, e))?;
+        if existing != report {
+            return Err(invalid("archive readback mismatch"));
+        }
+        Ok(())
+    }
     fn read(&self, slot: usize) -> Result<Option<Vec<u8>>, SaveError> {
         let path = self.path(slot);
         let file = match std::fs::File::open(&path) {
@@ -327,5 +420,115 @@ mod tests {
             b"third"
         );
         std::fs::remove_dir_all(dir).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod restart_tests {
+    use super::*;
+    #[derive(Default)]
+    struct FaultStore {
+        slots: [Option<Vec<u8>>; 2],
+        writes: usize,
+        fail_write: Option<usize>,
+        fail_archive: bool,
+        report: Option<Vec<u8>>,
+    }
+    impl CheckpointStore for FaultStore {
+        fn read(&self, slot: usize) -> Result<Option<Vec<u8>>, SaveError> {
+            Ok(self.slots[slot].clone())
+        }
+        fn publish(&mut self, slot: usize, bytes: &[u8]) -> Result<(), SaveError> {
+            self.writes += 1;
+            if self.fail_write == Some(self.writes) {
+                self.slots[slot] = Some(b"partial".to_vec());
+                return Err(invalid("injected disk full"));
+            }
+            self.slots[slot] = Some(bytes.to_vec());
+            Ok(())
+        }
+        fn archive_run(&mut self, _id: u64, report: &[u8]) -> Result<(), SaveError> {
+            if self.fail_archive {
+                return Err(invalid("archive disk full"));
+            }
+            self.report = Some(report.to_vec());
+            Ok(())
+        }
+    }
+    fn valid(bytes: &[u8]) -> Result<(), SaveError> {
+        if [b"alive".as_slice(), b"terminal", b"fresh"].contains(&bytes) {
+            Ok(())
+        } else {
+            Err(invalid("payload"))
+        }
+    }
+    #[test]
+    fn failure_at_each_write_preserves_a_verified_generation_and_never_falsely_acknowledges_restart()
+     {
+        for stage in 1..=4 {
+            let mut manager = SaveManager::new(FaultStore::default());
+            manager.checkpoint(b"alive", valid).unwrap();
+            manager.store.fail_write = Some(manager.store.writes + stage);
+            assert!(
+                manager
+                    .replace_terminal_run(1, b"report", b"terminal", b"fresh", valid)
+                    .is_err()
+            );
+            let recovered = SaveManager::new(manager.store)
+                .recover(valid)
+                .unwrap()
+                .bytes
+                .unwrap();
+            assert_eq!(
+                recovered,
+                match stage {
+                    1 => b"alive".as_slice(),
+                    2 | 3 => b"terminal",
+                    _ => b"fresh",
+                }
+            );
+        }
+    }
+    #[test]
+    fn archive_failure_keeps_two_terminal_slots_and_success_retires_both_old_generations() {
+        let mut manager = SaveManager::new(FaultStore::default());
+        manager.checkpoint(b"alive", valid).unwrap();
+        manager.store.fail_archive = true;
+        assert!(
+            manager
+                .replace_terminal_run(1, b"report", b"terminal", b"fresh", valid)
+                .is_err()
+        );
+        for slot in 0..2 {
+            assert_eq!(
+                unpack(manager.store.slots[slot].as_ref().unwrap())
+                    .unwrap()
+                    .1,
+                b"terminal"
+            );
+        }
+        manager.store.fail_archive = false;
+        manager
+            .replace_terminal_run(1, b"report", b"terminal", b"fresh", valid)
+            .unwrap();
+        assert_eq!(manager.store.report, Some(b"report".to_vec()));
+        for slot in 0..2 {
+            assert_eq!(
+                unpack(manager.store.slots[slot].as_ref().unwrap())
+                    .unwrap()
+                    .1,
+                b"fresh"
+            );
+        }
+        let current = manager.current.unwrap().0;
+        manager.store.slots[current] = Some(b"corrupt".to_vec());
+        assert_eq!(
+            SaveManager::new(manager.store)
+                .recover(valid)
+                .unwrap()
+                .bytes
+                .unwrap(),
+            b"fresh"
+        );
     }
 }

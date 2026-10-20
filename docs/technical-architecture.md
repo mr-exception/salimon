@@ -41,7 +41,9 @@ streaming and normal-play process restarts through versioned whole-session
 checkpoints (#363–#366). The canonical [reload verification scope](../client/world/resource-contracts.md#persistence-and-reload-verification-scope-268)
 defines in-session restoration and the proposed #236 scope clarification awaiting
 owner approval; normal play restores its active run, while E2E/benchmarks start isolated sessions. No orbital simulation,
-multiplayer or production survival is implemented.
+multiplayer is implemented. Survival meters/status/recovery, active clocks,
+whole-game persistence and terminal/restart lifecycle are implemented through
+#371; final HUD, native Q consumption and starter supplies remain #373/#377/#379.
 Core joule storage, watt consumers and power authority are implemented; assist reservations are implemented; physical Core intake/conversion and a distinct Core-local status display are implemented.
 
 ## Accepted constraints

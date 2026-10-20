@@ -2,7 +2,7 @@
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use std::{fmt, time::Duration};
 
-pub const SCHEMA_VERSION: u32 = 1;
+pub const SCHEMA_VERSION: u32 = 2;
 pub const FORMAT: &str = "salimon.save";
 pub const MAX_SAVE_BYTES: usize = 64 * 1024 * 1024;
 
@@ -54,7 +54,7 @@ impl<T: Validate> SaveGame<T> {
         })
     }
     pub fn validate(&self) -> Result<(), SaveError> {
-        if self.schema_version != SCHEMA_VERSION {
+        if !matches!(self.schema_version, 1 | SCHEMA_VERSION) {
             return Err(SaveError::UnsupportedVersion(self.schema_version));
         }
         if self.format != FORMAT {
@@ -76,15 +76,15 @@ impl<T: Validate + Serialize + DeserializeOwned> SaveGame<T> {
         if bytes.len() > MAX_SAVE_BYTES {
             return Err(invalid("save exceeds size limit"));
         }
-        // Inspect the version before decoding any domain state. There is no v0
-        // schema to migrate; future migrations must explicitly dispatch here.
+        // Inspect the version before decoding any domain state. Runtime owns
+        // the explicit v1 -> v2 payload migration; unknown versions reject.
         #[derive(Deserialize)]
         struct Header {
             schema_version: u32,
         }
         let header: Header =
             serde_json::from_slice(bytes).map_err(|e| SaveError::Encoding(e.to_string()))?;
-        if header.schema_version != SCHEMA_VERSION {
+        if !matches!(header.schema_version, 1 | SCHEMA_VERSION) {
             return Err(SaveError::UnsupportedVersion(header.schema_version));
         }
         let save: Self =
@@ -179,10 +179,10 @@ mod tests {
         assert_eq!(restored.pending_time, save.pending_time);
         let future = String::from_utf8(bytes)
             .unwrap()
-            .replace("\"schema_version\":1", "\"schema_version\":2");
+            .replace("\"schema_version\":2", "\"schema_version\":3");
         assert_eq!(
             SaveGame::<Fixture>::decode(future.as_bytes()).unwrap_err(),
-            SaveError::UnsupportedVersion(2)
+            SaveError::UnsupportedVersion(3)
         );
         assert!(SaveGame::<Fixture>::decode(b"{}").is_err());
         assert!(

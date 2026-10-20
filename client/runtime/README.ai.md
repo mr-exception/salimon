@@ -139,3 +139,11 @@ Item effects/removal compose in `session/consumables.rs` (#370): use the exact
 slot/job/unit selection seam from native wheel or protocol adapters. Validate and
 prepare benefits before removing inventory; never consume a slot first and try
 to apply potentially fallible effects afterward. See the recovery contract.
+
+
+#371 composes schema-2 survival source, explicit v1 migration, verified launch-only
+fatigue credit, terminal freeze and archive/restart publication. See the canonical
+[save/lifecycle contract](../../docs/save-contract.md). Restart must publish an
+archive and both fresh fallback generations before exposing new gameplay; failures
+remain failures. Maintain lifecycle, offline rollback, publication-failure and
+restart fault-injection tests with changes to this boundary.

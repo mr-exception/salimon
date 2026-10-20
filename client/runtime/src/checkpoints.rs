@@ -8,7 +8,7 @@ use std::{
     path::PathBuf,
     sync::mpsc::{self, Receiver, SyncSender},
     thread::JoinHandle,
-    time::{Duration, SystemTime, UNIX_EPOCH},
+    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 
 fn validate(bytes: &[u8]) -> Result<(), SaveError> {
@@ -37,14 +37,27 @@ pub(crate) fn default_directory() -> Result<PathBuf, SaveError> {
         .ok_or_else(|| salimon_persistence::invalid("no user save directory; set SALIMON_SAVE_DIR"))
 }
 
+enum SaveJob {
+    Checkpoint {
+        bytes: Vec<u8>,
+        terminal: bool,
+    },
+    Restart {
+        serial: u64,
+        report: Vec<u8>,
+        terminal: Vec<u8>,
+        fresh: Vec<u8>,
+    },
+}
 pub(crate) struct Checkpoints {
-    sender: Option<SyncSender<Vec<u8>>>,
+    sender: Option<SyncSender<SaveJob>>,
     results: Receiver<Result<(), SaveError>>,
     worker: Option<JoinHandle<()>>,
     busy: bool,
     last_time: Duration,
     last_events: Option<Vec<u8>>,
     retry_at: Duration,
+    retry_wall: Option<Instant>,
     pub(crate) warning: Option<&'static str>,
 }
 impl Checkpoints {
@@ -52,19 +65,65 @@ impl Checkpoints {
         directory: PathBuf,
         session: &mut GameplaySession,
     ) -> Result<Self, SaveError> {
+        Self::open_at(directory, session, now()?)
+    }
+    pub(crate) fn open_at(
+        directory: PathBuf,
+        session: &mut GameplaySession,
+        launch_utc: u64,
+    ) -> Result<Self, SaveError> {
         let mut manager = SaveManager::new(NativeStore::open(directory)?);
         let recovery = manager.recover(validate)?;
         let had_save = recovery.bytes.is_some();
         if let Some(bytes) = recovery.bytes {
-            session.restore_bytes(&bytes)?;
+            let mut candidate = GameplaySession::default();
+            candidate.restore_for_launch(&bytes, launch_utc)?;
+            #[derive(serde::Deserialize)]
+            struct Version {
+                schema_version: u32,
+            }
+            let version: Version =
+                serde_json::from_slice(&bytes).map_err(|e| SaveError::Encoding(e.to_string()))?;
+            if version.schema_version == 1 {
+                candidate.run.serial = manager.next_run_serial()?;
+            }
+            let credited = candidate.save_bytes(launch_utc)?;
+            manager.checkpoint(&credited, validate)?;
+            if candidate.survival.snapshot().terminal {
+                manager.checkpoint(&credited, validate)?;
+            }
+            *session = candidate;
+        } else {
+            // Corruption of both slots must not reuse an archived run identity.
+            session.run.serial = manager.next_run_serial()?;
+            // Bootstrap a verified checkpoint before the new run becomes playable.
+            let initial = session.save_bytes(launch_utc)?;
+            manager.checkpoint(&initial, validate)?;
         }
-        let (sender, jobs) = mpsc::sync_channel::<Vec<u8>>(1);
+        let (sender, jobs) = mpsc::sync_channel::<SaveJob>(1);
         let (done, results) = mpsc::channel();
         let worker = std::thread::Builder::new()
             .name("salimon-save".into())
             .spawn(move || {
-                for bytes in jobs {
-                    let result = manager.checkpoint(&bytes, validate);
+                for job in jobs {
+                    let result = match job {
+                        SaveJob::Checkpoint { bytes, terminal } => {
+                            manager.checkpoint(&bytes, validate).and_then(|()| {
+                                if terminal {
+                                    manager.checkpoint(&bytes, validate)
+                                } else {
+                                    Ok(())
+                                }
+                            })
+                        }
+                        SaveJob::Restart {
+                            serial,
+                            report,
+                            terminal,
+                            fresh,
+                        } => manager
+                            .replace_terminal_run(serial, &report, &terminal, &fresh, validate),
+                    };
                     if done.send(result).is_err() {
                         break;
                     }
@@ -79,6 +138,7 @@ impl Checkpoints {
             last_time: session.elapsed,
             last_events: None,
             retry_at: Duration::ZERO,
+            retry_wall: None,
             warning: recovery.recovered.then_some(if had_save {
                 "RECOVERED PREVIOUS CHECKPOINT - latest save damaged"
             } else {
@@ -96,6 +156,7 @@ impl Checkpoints {
                         self.warning = Some("SAVE FAILED - check storage and permissions");
                         self.last_events = None;
                         self.retry_at = session.elapsed.saturating_add(Duration::from_secs(5));
+                        self.retry_wall = Some(Instant::now() + Duration::from_secs(5));
                     }
                 }
                 Err(mpsc::TryRecvError::Empty) => return,
@@ -105,7 +166,10 @@ impl Checkpoints {
                 }
             }
         }
-        if session.elapsed < self.retry_at {
+        if (!session.survival.snapshot().terminal && session.elapsed < self.retry_at)
+            || (session.survival.snapshot().terminal
+                && self.retry_wall.is_some_and(|at| Instant::now() < at))
+        {
             return;
         }
         let events = session.checkpoint_events();
@@ -120,7 +184,10 @@ impl Checkpoints {
                 self.sender
                     .as_ref()
                     .ok_or_else(|| salimon_persistence::invalid("save worker closed"))?
-                    .try_send(bytes)
+                    .try_send(SaveJob::Checkpoint {
+                        bytes,
+                        terminal: session.survival.snapshot().terminal,
+                    })
                     .map_err(|e| salimon_persistence::invalid(format!("queue checkpoint: {e}")))
             }) {
             Ok(()) => {
@@ -132,8 +199,45 @@ impl Checkpoints {
                 log::error!("capture checkpoint failed: {error}");
                 self.warning = Some("SAVE FAILED - session could not be captured");
                 self.retry_at = session.elapsed.saturating_add(Duration::from_secs(5));
+                self.retry_wall = Some(Instant::now() + Duration::from_secs(5));
             }
         }
+    }
+    pub(crate) fn restart(&mut self, session: &mut GameplaySession) -> Result<(), SaveError> {
+        if !session.survival.snapshot().terminal {
+            return Err(salimon_persistence::invalid("restart requires death"));
+        }
+        let fresh = session.fresh_after_death()?;
+        let utc = now()?;
+        let job = SaveJob::Restart {
+            serial: session.run.serial,
+            report: session.ended_run_bytes()?,
+            terminal: session.save_bytes(utc)?,
+            fresh: fresh.save_bytes(utc)?,
+        };
+        if self.busy {
+            let result = self
+                .results
+                .recv()
+                .map_err(|e| salimon_persistence::invalid(format!("drain checkpoint: {e}")));
+            self.busy = false;
+            result??;
+        }
+        self.sender
+            .as_ref()
+            .ok_or_else(|| salimon_persistence::invalid("save worker closed"))?
+            .send(job)
+            .map_err(|e| salimon_persistence::invalid(format!("queue restart: {e}")))?;
+        self.results
+            .recv()
+            .map_err(|e| salimon_persistence::invalid(format!("verify restart: {e}")))??;
+        *session = fresh;
+        self.last_time = session.elapsed;
+        self.last_events = Some(session.checkpoint_events());
+        self.retry_at = Duration::ZERO;
+        self.retry_wall = None;
+        self.warning = None;
+        Ok(())
     }
     /// Drain the in-flight write, then verify the final snapshot before returning.
     pub(crate) fn finish(&mut self, session: &GameplaySession) -> Result<(), SaveError> {
@@ -147,7 +251,10 @@ impl Checkpoints {
             .take()
             .ok_or_else(|| salimon_persistence::invalid("checkpoint worker closed"))?;
         sender
-            .send(bytes)
+            .send(SaveJob::Checkpoint {
+                bytes,
+                terminal: session.survival.snapshot().terminal,
+            })
             .map_err(|e| salimon_persistence::invalid(format!("queue exit checkpoint: {e}")))?;
         drop(sender);
         let result = self
@@ -174,6 +281,14 @@ impl Drop for Checkpoints {
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn logical(bytes: Vec<u8>) -> serde_json::Value {
+        let mut value: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+        value["state"]["survival"]["vitals"]
+            .as_object_mut()
+            .unwrap()
+            .remove("offline_watermark");
+        value
+    }
     #[test]
     fn periodic_boundary_and_discrete_events_schedule_without_waiting_for_render_time() {
         let dir = std::env::temp_dir().join(format!("salimon-timer-save-{}", std::process::id()));
@@ -212,14 +327,15 @@ mod tests {
         )
         .unwrap();
         session.update_clock.accumulate(Duration::from_millis(7));
-        let expected = session.save_bytes(1).unwrap();
+        let expected = logical(session.save_bytes(1).unwrap());
+        let launch = now().unwrap();
         let mut saves = Checkpoints::open(dir.clone(), &mut session).unwrap();
         saves.finish(&session).unwrap();
         drop(saves);
         let mut restored = GameplaySession::default();
-        let saves = Checkpoints::open(dir.clone(), &mut restored).unwrap();
+        let saves = Checkpoints::open_at(dir.clone(), &mut restored, launch).unwrap();
         assert_eq!(restored.mining.session.fragments().len(), 500);
-        assert_eq!(restored.save_bytes(1).unwrap(), expected);
+        assert_eq!(logical(restored.save_bytes(1).unwrap()), expected);
         drop(saves);
         std::fs::remove_dir_all(dir).unwrap();
     }
@@ -230,21 +346,199 @@ mod tests {
         let mut saves = Checkpoints::open(dir.clone(), &mut session).unwrap();
         saves.poll(&session);
         session.advance_automation(Duration::from_secs(1));
-        let expected = session.save_bytes(123).unwrap();
+        let expected = logical(session.save_bytes(123).unwrap());
+        let launch = now().unwrap();
         saves.finish(&session).unwrap();
         drop(saves);
         let mut restored = GameplaySession::default();
-        let mut saves = Checkpoints::open(dir.clone(), &mut restored).unwrap();
-        assert_eq!(restored.save_bytes(123).unwrap(), expected);
+        let mut saves = Checkpoints::open_at(dir.clone(), &mut restored, launch).unwrap();
+        assert_eq!(logical(restored.save_bytes(123).unwrap()), expected);
         saves.finish(&restored).unwrap();
         drop(saves);
-        // Third generation is slot 0; the second remains independently loadable.
+        // Latest generation is slot 0 after bootstrap, launch-credit and exit writes.
         std::fs::write(dir.join("checkpoint-0.sav"), b"partial").unwrap();
         let mut recovered = GameplaySession::default();
-        let saves = Checkpoints::open(dir.clone(), &mut recovered).unwrap();
+        let saves = Checkpoints::open_at(dir.clone(), &mut recovered, launch).unwrap();
         assert!(saves.warning.is_some());
-        assert_eq!(recovered.save_bytes(123).unwrap(), expected);
+        assert_eq!(logical(recovered.save_bytes(123).unwrap()), expected);
         drop(saves);
         std::fs::remove_dir_all(dir).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod lifecycle_tests {
+    use super::*;
+    use salimon_persistence::storage::CheckpointStore;
+    use salimon_survival::{Command, Points};
+    fn dir(name: &str) -> PathBuf {
+        std::env::temp_dir().join(format!("salimon-371-{name}-{}", std::process::id()))
+    }
+    fn reduced() -> GameplaySession {
+        let mut s = GameplaySession::default();
+        let mut v = serde_json::to_value(&s.survival).unwrap();
+        v["fatigue"] = serde_json::to_value(Points::whole(20).unwrap()).unwrap();
+        s.survival = serde_json::from_value(v).unwrap();
+        s.survival
+            .command(Command::Damage(Points::whole(40).unwrap()))
+            .unwrap();
+        s.survival
+            .apply_consumable(s.consumable_effects.get("medkit").unwrap())
+            .unwrap();
+        s.advance_automation(Duration::from_millis(1375));
+        s
+    }
+    #[test]
+    fn launch_commits_only_fatigue_credit_once_and_preserves_world_healing_and_rollback_watermark()
+    {
+        let directory = dir("offline");
+        let _ = std::fs::remove_dir_all(&directory);
+        let original = reduced();
+        let mut manager = SaveManager::new(NativeStore::open(directory.clone()).unwrap());
+        manager
+            .checkpoint(&original.save_bytes(100).unwrap(), validate)
+            .unwrap();
+        drop(manager);
+        let mut restored = GameplaySession::default();
+        let saves = Checkpoints::open_at(directory.clone(), &mut restored, 7300).unwrap();
+        assert_eq!(
+            restored.survival.snapshot().health,
+            original.survival.snapshot().health
+        );
+        assert_eq!(
+            restored.survival.snapshot().hunger,
+            original.survival.snapshot().hunger
+        );
+        assert_eq!(
+            restored.survival.active_effects().collect::<Vec<_>>(),
+            original.survival.active_effects().collect::<Vec<_>>()
+        );
+        assert_eq!(restored.snapshot().ship, original.snapshot().ship);
+        assert!(restored.survival.snapshot().fatigue.value() > 53.0);
+        let credited = restored.survival.snapshot().fatigue;
+        drop(saves);
+        let saves = Checkpoints::open_at(directory.clone(), &mut restored, 7300).unwrap();
+        assert_eq!(restored.survival.snapshot().fatigue, credited);
+        drop(saves);
+        let saves = Checkpoints::open_at(directory.clone(), &mut restored, 1).unwrap();
+        assert_eq!(restored.survival.snapshot().fatigue, credited);
+        drop(saves);
+        let saves = Checkpoints::open_at(directory.clone(), &mut restored, 2).unwrap();
+        assert_eq!(restored.survival.snapshot().fatigue, credited);
+        drop(saves);
+        std::fs::remove_dir_all(directory).unwrap();
+    }
+    #[test]
+    fn terminal_native_restart_archives_once_and_corrupt_latest_cannot_restore_old_run() {
+        let directory = dir("restart");
+        let _ = std::fs::remove_dir_all(&directory);
+        let mut s = reduced();
+        let mut saves = Checkpoints::open_at(directory.clone(), &mut s, 100).unwrap();
+        s.survival.command(Command::Damage(Points::FULL)).unwrap();
+        s.advance_automation(Duration::from_secs(1));
+        let serial = s.run.serial;
+        let report = s.ended_run_bytes().unwrap();
+        saves.restart(&mut s).unwrap();
+        assert_eq!(s.run.serial, serial + 1);
+        assert_eq!(s.survival.snapshot().health, Points::FULL);
+        assert_eq!(
+            std::fs::read(directory.join(format!("journeys/run-{serial}.json"))).unwrap(),
+            report
+        );
+        drop(saves);
+        // Both slots contain the fresh run, regardless of which was the final generation.
+        for slot in 0..2 {
+            let copy = dir(&format!("fallback-{slot}"));
+            let _ = std::fs::remove_dir_all(&copy);
+            std::fs::create_dir_all(&copy).unwrap();
+            for i in 0..2 {
+                std::fs::copy(
+                    directory.join(format!("checkpoint-{i}.sav")),
+                    copy.join(format!("checkpoint-{i}.sav")),
+                )
+                .unwrap();
+            }
+            std::fs::write(copy.join(format!("checkpoint-{slot}.sav")), b"bad").unwrap();
+            let mut candidate = GameplaySession::default();
+            let reopened = Checkpoints::open_at(copy.clone(), &mut candidate, 100).unwrap();
+            assert_eq!(candidate.run.serial, serial + 1);
+            assert!(!candidate.survival.snapshot().terminal);
+            drop(reopened);
+            std::fs::remove_dir_all(copy).unwrap();
+        }
+        std::fs::remove_dir_all(directory).unwrap();
+    }
+    #[test]
+    fn archive_is_idempotent_conflicting_report_rejects_and_new_run_serial_avoids_history() {
+        let directory = dir("archive");
+        let _ = std::fs::remove_dir_all(&directory);
+        let mut store = NativeStore::open(directory.clone()).unwrap();
+        store.archive_run(7, b"report").unwrap();
+        store.archive_run(7, b"report").unwrap();
+        assert!(store.archive_run(7, b"different").is_err());
+        assert_eq!(store.next_run_serial().unwrap(), 8);
+        drop(store);
+        let mut s = GameplaySession::default();
+        let saves = Checkpoints::open_at(directory.clone(), &mut s, 100).unwrap();
+        assert_eq!(s.run.serial, 8);
+        drop(saves);
+        std::fs::remove_dir_all(directory).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod publication_failure_tests {
+    use super::*;
+    #[test]
+    fn failed_offline_credit_publication_does_not_expose_candidate_or_destroy_prior_checkpoint() {
+        let directory =
+            std::env::temp_dir().join(format!("salimon-371-credit-fail-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&directory);
+        let mut original = GameplaySession::default();
+        let mut vitals = serde_json::to_value(&original.survival).unwrap();
+        vitals["fatigue"] =
+            serde_json::to_value(salimon_survival::Points::whole(20).unwrap()).unwrap();
+        original.survival = serde_json::from_value(vitals).unwrap();
+        let mut manager = SaveManager::new(NativeStore::open(directory.clone()).unwrap());
+        manager
+            .checkpoint(&original.save_bytes(100).unwrap(), validate)
+            .unwrap();
+        drop(manager);
+        std::fs::create_dir(directory.join("checkpoint-1.tmp")).unwrap();
+        let mut visible = GameplaySession::default();
+        let before = visible.save_bytes(100).unwrap();
+        assert!(Checkpoints::open_at(directory.clone(), &mut visible, 1000).is_err());
+        assert!(visible.save_bytes(100).unwrap() == before);
+        let mut manager = SaveManager::new(NativeStore::open(directory.clone()).unwrap());
+        assert_eq!(
+            manager.recover(validate).unwrap().bytes.unwrap(),
+            original.save_bytes(100).unwrap()
+        );
+        drop(manager);
+        std::fs::remove_dir_all(directory).unwrap();
+    }
+    #[test]
+    fn terminal_checkpoint_retry_uses_host_time_while_gameplay_clock_is_frozen() {
+        let directory =
+            std::env::temp_dir().join(format!("salimon-371-retry-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&directory);
+        let mut s = GameplaySession::default();
+        let mut saves = Checkpoints::open_at(directory.clone(), &mut s, 100).unwrap();
+        s.survival
+            .command(salimon_survival::Command::Damage(
+                salimon_survival::Points::FULL,
+            ))
+            .unwrap();
+        saves.retry_at = Duration::from_secs(5);
+        saves.retry_wall = Some(Instant::now() + Duration::from_secs(5));
+        saves.poll(&s);
+        assert!(!saves.busy);
+        saves.retry_wall = Some(Instant::now() - Duration::from_secs(1));
+        saves.poll(&s);
+        assert!(saves.busy);
+        saves.results.recv().unwrap().unwrap();
+        saves.busy = false;
+        drop(saves);
+        std::fs::remove_dir_all(directory).unwrap();
     }
 }

@@ -14,7 +14,7 @@ impl GameplaySession {
         self.paused = !self.paused;
     }
     pub(crate) fn pause_text(&self) -> Option<String> {
-        self.paused.then(|| "SALIMON / PAUSED\n\nENTER / ESC   RESUME\n\nAll simulation is frozen.\nF1 releases the cursor during gameplay.".into())
+        self.paused.then(|| "SALIMON / PAUSED\n\nENTER / ESC   RESUME\nS   ACCESSIBILITY SETTINGS\n\nAll simulation is frozen.\nF1 releases the cursor during gameplay.".into())
     }
 }
 #[cfg(test)]

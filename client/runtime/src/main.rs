@@ -7,6 +7,7 @@ mod benchmark;
 mod benchmark_fixture;
 mod carrying;
 mod checkpoints;
+mod condition_feedback;
 mod e2e;
 mod equipment;
 mod flight_profile;

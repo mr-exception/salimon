@@ -67,6 +67,7 @@ fn run_config(
 
     let mut application = ClientApplication::default();
     if config.is_none() && benchmark.is_none() {
+        application.condition_feedback = crate::condition_feedback::Presenter::open();
         application.session = crate::session::GameplaySession::new_run();
         let earth = *salimon_world::CELESTIAL_BODIES
             .iter()
@@ -159,6 +160,7 @@ pub(crate) struct ClientApplication {
     retry_at: Option<Instant>,
     pub(crate) survival_hud: crate::survival_hud::Hud,
     journey_ended: crate::journey_ended::Screen,
+    condition_feedback: crate::condition_feedback::Presenter,
     occluded: bool,
     failure: Option<String>,
 }
@@ -188,6 +190,7 @@ impl Default for ClientApplication {
             retry_at: None,
             survival_hud: Default::default(),
             journey_ended: Default::default(),
+            condition_feedback: Default::default(),
             occluded: false,
             failure: None,
         }
@@ -491,9 +494,32 @@ impl ClientApplication {
                         key,
                         PhysicalKey::Code(KeyCode::Enter | KeyCode::NumpadEnter)
                     )));
+        if self.session.is_paused()
+            && pressed
+            && !repeat
+            && !synthetic
+            && self.input_policy().admits_press(source, true)
+        {
+            match key {
+                PhysicalKey::Code(KeyCode::KeyS) => {
+                    self.condition_feedback.settings_open = !self.condition_feedback.settings_open
+                }
+                PhysicalKey::Code(KeyCode::KeyC) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(0)
+                }
+                PhysicalKey::Code(KeyCode::KeyA) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(1)
+                }
+                PhysicalKey::Code(KeyCode::KeyV) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(2)
+                }
+                _ => {}
+            }
+        }
         if pause_key {
             if pressed && !repeat && !synthetic && self.input_policy().admits_press(source, true) {
                 self.session.command(crate::session::Command::TogglePause);
+                self.condition_feedback.settings_open = false;
                 self.survival_hud.close_details();
                 self.cursor_captured = false;
                 if let Some(window) = &self.window {
@@ -602,6 +628,12 @@ impl ClientApplication {
                 lifecycle_excluded: self.session.update_clock.lifecycle_excluded(),
             };
         }
+        self.condition_feedback
+            .update(crate::condition_feedback::Observation::capture(
+                &self.session,
+                self.native_focused,
+                self.occluded,
+            ));
         if let Some(checkpoints) = &mut self.checkpoints {
             checkpoints.poll(&self.session);
         }
@@ -763,6 +795,7 @@ impl ClientApplication {
                 vertical_fov_radians: 70.0_f32.to_radians(),
                 near_plane_meters: 0.05,
             };
+            self.condition_feedback.camera(&mut camera);
             let mut mesh = map_ship_to_renderer(presentation.ship);
             mesh.fabricator_output_present = self.session.fabricator_output_present();
             mesh.fabricator_output_medical = self.session.fabricator_output_medical();
@@ -844,10 +877,13 @@ impl ClientApplication {
             [window.inner_size().width, window.inner_size().height],
             window.scale_factor(),
         );
-        let crafting_text = self
-            .session
-            .pause_text()
-            .or_else(|| self.session.crafting_text());
+        let crafting_text = if self.session.is_paused() && self.condition_feedback.settings_open {
+            Some(self.condition_feedback.menu_text())
+        } else {
+            self.session
+                .pause_text()
+                .or_else(|| self.session.crafting_text())
+        };
         let crafting_pixels = crafting_text
             .as_ref()
             .map(|text| crate::action_bar::rasterize_action_bar(text, 3));
@@ -931,6 +967,7 @@ impl ClientApplication {
                     ship: ship_mesh,
                     held_item,
                 },
+                self.condition_feedback.image(),
                 overlay_image,
                 action_bar_image,
                 crate::reticle::image(

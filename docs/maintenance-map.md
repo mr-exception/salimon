@@ -189,3 +189,7 @@ Tests: fabrication `tests/starting_supplies.rs`, runtime
 Gameplay pause (#381): `client/runtime/src/session/pause.rs` owns transient modal
 authority and clock resets. Native routing is `app.rs`/`app/input.rs`; regressions
 cover native/background and portable full-save freeze.
+
+Condition cues/accessibility (#383): `client/runtime/src/condition_feedback.rs`,
+`condition_feedback/settings.rs` and `condition_feedback/audio.rs`; renderer owns
+only a generic fullscreen overlay before ordinary HUDs.

@@ -317,3 +317,7 @@ metadata and lints. Keep `Cargo.lock` committed; validate normal changes with
 dependencies. Cargo's [workspace documentation](https://doc.rust-lang.org/cargo/reference/workspaces.html)
 and [lockfile guide](https://doc.rust-lang.org/cargo/guide/cargo-toml-vs-cargo-lock.html)
 describe these conventions.
+
+Optional survival feedback: pause with **Escape**, then **S** opens accessibility
+settings. **C** toggles camera motion, **A** condition audio, **V** the health
+vignette. Preferences persist across runs. Linux audio needs `paplay` or `aplay`.

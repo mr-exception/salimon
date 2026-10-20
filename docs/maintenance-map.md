@@ -176,3 +176,12 @@ keyboard/mouse/native automation. Renderer only exposes its generic screen margi
 See the [terminal contract](save-contract.md#journey-ended-presentation-374).
 Tests: `journey_ended/tests.rs`, native-host input/restart regressions and existing
 checkpoint/restart fault injection. Reference native visual/input acceptance is #376.
+
+## Starting supplies (#379)
+
+Fabrication `machine.rs::starter_with_supplies` owns recipe-derived grants and
+allocator reservation; runtime `session.rs::new_run`, normal startup `app.rs`
+and `session/lifecycle.rs` compose new runs and mass. Restore is unchanged.
+See the [canonical contract](save-contract.md#starting-supplies-379).
+Tests: fabrication `tests/starting_supplies.rs`, runtime
+`session/starting_supplies_tests.rs`, existing checkpoint/restart fault injection.

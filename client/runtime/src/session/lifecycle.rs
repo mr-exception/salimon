@@ -93,7 +93,7 @@ impl GameplaySession {
                 serial,
                 ..Default::default()
             },
-            ..Default::default()
+            ..Self::new_run()
         };
         if self.mining.terrain == salimon_world::terrain::TerrainMode::Representative {
             let earth = *salimon_world::CELESTIAL_BODIES

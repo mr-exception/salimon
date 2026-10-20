@@ -158,6 +158,47 @@ impl Fabricator {
         Self::new(RecipeBook::starter(), DEFAULT_QUEUE_CAPACITY).expect("nonzero static capacity")
     }
 
+    /// Brand-new run grant, never a restore/repair operation. Allocate starter
+    /// outputs from the same identity space as future jobs, without simulating
+    /// work or charging ingredients/energy for already-owned supplies.
+    pub fn starter_with_supplies() -> (Self, crate::ConsumableInventory) {
+        let mut machine = Self::starter();
+        let mut inventory = crate::ConsumableInventory::default();
+        for (key, quantity) in [("food-ration", 2), ("medkit", 1)] {
+            let recipe = machine
+                .recipes
+                .get(&RecipeId::new(key).expect("static starter recipe key"))
+                .expect("starter recipe exists");
+            assert!(recipe.unlock.unlocked_by_default);
+            for unit in 1..=quantity {
+                inventory
+                    .insert(OutputItem {
+                        recipe: recipe.id.clone(),
+                        job: JobId(machine.next_job),
+                        unit,
+                        mass: recipe.output_mass,
+                        category: recipe.output_category,
+                    })
+                    .expect("static starter quantities fit typed slots");
+            }
+            machine.next_job += 1;
+            if key == "food-ration" {
+                for ingredient in &recipe.ingredients {
+                    // Exact integer recipe quantities; no kg round-trip or
+                    // overflow-discard insertion policy in a pristine reserve.
+                    assert!(ingredient.mass.milligrams() <= STORAGE_CAPACITY_MILLIGRAMS);
+                    machine
+                        .stored
+                        .iter_mut()
+                        .find(|bin| bin.resource == ingredient.resource)
+                        .expect("all world resources initialized")
+                        .milligrams = ingredient.mass.milligrams();
+                }
+            }
+        }
+        (machine, inventory)
+    }
+
     pub fn recipes(&self) -> &RecipeBook {
         &self.recipes
     }

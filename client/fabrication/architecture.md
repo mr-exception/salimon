@@ -105,3 +105,12 @@ removing the one selected identity; fabrication itself still owns no health,
 hunger, effect timer or full-vitals gate. Inventory/tray/raw mass semantics and
 save representation are unchanged. See the
 [recovery contract](../survival/architecture.md#consumable-recovery-definitions-370).
+
+## New-run supplies (#379)
+
+`Fabricator::starter_with_supplies` constructs the machine and existing typed
+inventory together, using starter recipe definitions, exact bounded integer bins
+and the shared job identity allocator. It is a constructor, never a replenishment
+method. It performs no crafting, simulation or energy settlement. Runtime owns
+when a new run is created and reconciles the ordinary reserve mass. See the
+[canonical supply/save contract](../../docs/save-contract.md#starting-supplies-379).

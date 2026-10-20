@@ -169,3 +169,9 @@ and the sole verified restart path stay in `app.rs`. Read the
 [terminal contract](../../docs/save-contract.md#journey-ended-presentation-374),
 preserve highest overlay priority, stale-pointer invalidation and failed-restart
 terminal authority. Regressions live in `journey_ended/tests.rs` and `app/input_tests.rs`.
+
+Starting supplies (#379): normal launch/restart use `GameplaySession::new_run`;
+restore and isolated fixtures use empty `Default`. Fabrication allocates grant
+identities and exact recipe reserves; runtime reconciles mass. Read the
+[canonical contract](../../docs/save-contract.md#starting-supplies-379) and preserve
+`session/starting_supplies_tests.rs` launch/craft/reload/restart coverage.

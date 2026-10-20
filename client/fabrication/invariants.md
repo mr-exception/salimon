@@ -48,3 +48,8 @@ and shell lifecycle integration. See [canonical save contract](../../docs/save-c
   compact and no first-available fallback occurs. Runtime checks the selected
   stable job/unit before committing validated survival benefits. The historical
   invariant 14 describes only the retained `consume_first` compatibility helper.
+
+- #379's new-run constructor allocates initial output identities from the same
+  high-water mark as future jobs and copies exact starter recipe ingredients.
+  No job/tray work, fake fragment, extra inventory, unlock acquisition or capacity
+  bypass is introduced; restoration never replenishes supplies.

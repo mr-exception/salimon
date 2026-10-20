@@ -364,3 +364,9 @@ supersedes ordinary HUDs, including equipment/reticle, without stepping authorit
 Failed/missing verified storage cannot expose a living run; success publishes both
 fresh generations before resetting host presentation/input. See the
 [terminal contract](../../docs/save-contract.md#journey-ended-presentation-374).
+
+- #379 starting supplies enter only through explicit new-run construction, before
+  verified first-checkpoint/restart publication. Whole-owner restore preserves
+  spent items/ingredients and old empty saves; focus, resume and ship entry never
+  replenish. Reserve mass is reconciled before observation; inventory retains
+  its existing deliberate zero ship-mass contribution.

@@ -12,6 +12,8 @@ mod survival;
 #[allow(dead_code)]
 pub(crate) mod persistence;
 #[cfg(test)]
+mod starting_supplies_tests;
+#[cfg(test)]
 mod tests;
 use self::frames::character_ship_frame;
 use self::interaction::{InteractionTarget, available_interaction_target};
@@ -148,6 +150,19 @@ pub(crate) fn door_passable(ship: ShipSnapshot) -> bool {
 }
 
 impl GameplaySession {
+    /// Explicit new-run boundary. Empty Default remains useful for restoration
+    /// and isolated fixtures; loading/resuming never invokes this constructor.
+    pub(crate) fn new_run() -> Self {
+        let (fabricator, consumables) = salimon_fabrication::Fabricator::starter_with_supplies();
+        let mut session = Self {
+            fabricator,
+            consumables,
+            ..Default::default()
+        };
+        session.sync_fabricator_mass();
+        session
+    }
+
     pub(crate) fn e2e_step(&self) -> Option<Duration> {
         self.automation_step
     }

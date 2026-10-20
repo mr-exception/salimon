@@ -385,3 +385,9 @@ keyboard/mouse/native automation. Renderer only exposes its generic screen margi
 See the [terminal contract](save-contract.md#journey-ended-presentation-374).
 Tests: `journey_ended/tests.rs`, native-host input/restart regressions and existing
 checkpoint/restart fault injection. Reference native visual/input acceptance is #376.
+
+Four-food definitions and continuous food modifiers are implemented by #378 in
+survival, with locked advanced recipes in fabrication. Native wheel input remains
+#377; no progression acquisition is implemented. See the
+[canonical food contract](../client/survival/architecture.md#four-food-catalog-378)
+for captured settings, active/offline clocks and exact drain arithmetic.

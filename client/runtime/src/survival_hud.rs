@@ -68,6 +68,19 @@ impl Observation {
                 .map_or(String::new(), |d| format!(" / {:.3}S", d.as_secs_f64()));
             let stacks = f64::from(effect.stacks);
             let (icon, description) = match effect.rule.behavior {
+                Behavior::Modifier { kind, basis_points } => (
+                    Icon::Recovery,
+                    format!(
+                        "{} {}%",
+                        match kind {
+                            salimon_survival::effects::Modifier::FatigueDrain => "FATIGUE DRAIN",
+                            salimon_survival::effects::Modifier::Regeneration => "NATURAL REGEN",
+                            salimon_survival::effects::Modifier::FatigueRelief =>
+                                "FATIGUE PENALTY RELIEF",
+                        },
+                        percent(u32::from(basis_points))
+                    ),
+                ),
                 Behavior::Feed { amount } => (
                     Icon::Hunger,
                     format!("HUNGER +{:.1}{period}", amount.value() * stacks),

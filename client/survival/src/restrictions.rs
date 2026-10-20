@@ -67,7 +67,18 @@ pub struct Restrictions {
 }
 impl Restrictions {
     pub fn new(snapshot: Snapshot, config: RestrictionConfig) -> Result<Self, SaveError> {
+        Self::with_fatigue_relief(snapshot, config, 0)
+    }
+    pub fn with_fatigue_relief(
+        snapshot: Snapshot,
+        config: RestrictionConfig,
+        relief_bps: u16,
+    ) -> Result<Self, SaveError> {
         config.validate()?;
+        if relief_bps > 10_000 {
+            return Err(invalid("fatigue relief above 100 percent"));
+        }
+        let relieved = |value: u32| ONE - (ONE - value) * (ONE - u32::from(relief_bps)) / ONE;
         let hunger = snapshot.hunger;
         let fatigue = snapshot.fatigue;
         let point = |n| Points::whole(n).expect("constant threshold in 0..100");
@@ -87,13 +98,14 @@ impl Restrictions {
         } else {
             ONE
         };
+        let fatigue_movement_bps = relieved(fatigue_movement_bps);
         let mut interaction_bps = ONE;
         if hunger < point(20) {
             interaction_bps = config.low_hunger_interaction_bps;
         }
         if fatigue <= point(20) {
             interaction_bps = (u64::from(interaction_bps)
-                * u64::from(config.low_fatigue_interaction_bps)
+                * u64::from(relieved(config.low_fatigue_interaction_bps))
                 / u64::from(ONE)) as u32;
         }
         Ok(Self {

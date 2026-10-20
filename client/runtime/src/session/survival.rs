@@ -5,8 +5,13 @@ use std::time::Duration;
 
 impl GameplaySession {
     pub(crate) fn restrictions(&self) -> Restrictions {
-        Restrictions::new(self.survival.snapshot(), self.restriction_config)
-            .expect("session restriction tuning validated before installation")
+        Restrictions::with_fatigue_relief(
+            self.survival.snapshot(),
+            self.restriction_config,
+            self.survival
+                .modifier_bps(salimon_survival::effects::Modifier::FatigueRelief),
+        )
+        .expect("session restriction tuning validated before installation")
     }
 
     pub(super) fn enforce_survival_restrictions(&mut self) {

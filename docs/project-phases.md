@@ -110,3 +110,11 @@ migration. Current gameplay/visual implementation prerequisites are delivered;
 remaining native reference gates retain their existing issues. U02 and subsequent
 dependency-ordered expansion issues remain unimplemented. See
 [schema contract](../client/universe/architecture.md).
+
+## Ongoing universe documentation gate (#440)
+
+[U35](documentation-maintenance.md) applies to every U01–U34 PR now, with explicit
+same-PR documentation impact, guide links, justified exceptions and review checks.
+The policy setup is delivered; future authors/reviewers continue to enforce it.
+Automated CI links/stale-contract checks are #442; final audit #441 waits for
+U01–U33 and must not depend on U34. Neither defers individual PR documentation.

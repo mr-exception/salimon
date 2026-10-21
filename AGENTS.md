@@ -62,3 +62,13 @@ For asset authoring, follow [Option A art direction and the opt-in local bridge]
 Inspect existing assets first; preserve linked libraries, named interfaces and
 manifest budgets. Use reviewed parametric Blender Python; no external AI model
 services or autonomous promotion of scratch candidates to production assets.
+
+## Universe documentation readiness (#440)
+
+For every U01–U34 implementation/fix, apply the required
+[documentation maintenance gate](docs/documentation-maintenance.md) before marking
+ready. Include same-PR guide changes or a precise no-impact justification, owning
+architecture/invariants links, behavior/source/test mapping and checked paths.
+The PR/issue templates carry the author/reviewer checklist. Final audit #441 is
+not a substitute; automated linting remains #442. This policy is review-enforced,
+not a claim that branch protection or CI semantic verification was installed.

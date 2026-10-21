@@ -237,7 +237,7 @@ legacy flat scenarios and F2 precision markers retain their fixtures. Read
 physical policy and native/reference validation. Networking, persistence and
 volumetric terrain remain deferred.
 
-**Future canonical planet source contract:** [multi-seed planet identity](canonical-planet-generation.md) separates the versioned immutable planet definition (offline package now, matching backend catalog later), independent procedural domains (terrain/resources/visuals/etc.), mutable shared-world deltas and local renderer caches. The present six-body terrain codecs and existing save/runtime seeds are not that future catalog; keep legacy invariants until the dedicated universe issues implement their replacement.
+**Future canonical planet source contract:** [multi-seed planet identity](canonical-planet-generation.md) separates the versioned immutable planet definition (offline package now, matching backend catalog later), independent but **explicitly versioned interdependent** procedural domains (geology input → one authoritative terrain query; geology/biome inputs → optional resource distribution; visuals remain physically inert), mutable shared-world deltas and local renderer caches. Published fictional planets may change only via controlled migration; all real observed solid bodies freeze their physical surfaces from first authoritative real-scale publication, not from prototype fixtures. The present six-body terrain codecs and existing save/runtime seeds are not that future catalog; keep legacy invariants until the dedicated universe issues implement their replacement.
 
 ## Flight update and validation decisions (#197)
 

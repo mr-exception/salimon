@@ -20,9 +20,12 @@ mod journey_ended;
 mod mining;
 #[cfg(test)]
 mod mining_emission;
+mod native_audio;
 mod resource_context;
 mod resource_presentation;
 mod reticle;
+mod scout_audio;
+mod scout_reference;
 mod session;
 #[cfg(test)]
 mod sphere_benchmark;

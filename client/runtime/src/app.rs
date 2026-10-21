@@ -159,6 +159,7 @@ pub(crate) struct ClientApplication {
     pub(crate) terrain_stream: crate::terrain_patches::TerrainStream,
     pub(crate) observations: crate::terrain_observations::Observations,
     pub(crate) capture_status: String,
+    pub(crate) scout_reference: Option<crate::scout_reference::View>,
     capture_path: Option<std::path::PathBuf>,
     cursor_captured: bool,
     native_focused: bool,
@@ -169,6 +170,7 @@ pub(crate) struct ClientApplication {
     pub(crate) survival_hud: crate::survival_hud::Hud,
     journey_ended: crate::journey_ended::Screen,
     condition_feedback: crate::condition_feedback::Presenter,
+    scout_audio: crate::scout_audio::Presenter,
     occluded: bool,
     failure: Option<String>,
 }
@@ -190,6 +192,7 @@ impl Default for ClientApplication {
             terrain_stream: crate::terrain_patches::TerrainStream::default(),
             observations: crate::terrain_observations::Observations::default(),
             capture_status: "idle".into(),
+            scout_reference: None,
             capture_path: None,
             cursor_captured: false,
             native_focused: false,
@@ -200,6 +203,7 @@ impl Default for ClientApplication {
             survival_hud: Default::default(),
             journey_ended: Default::default(),
             condition_feedback: Default::default(),
+            scout_audio: Default::default(),
             occluded: false,
             failure: None,
         }
@@ -525,12 +529,22 @@ impl ClientApplication {
                 PhysicalKey::Code(KeyCode::KeyV) if self.condition_feedback.settings_open => {
                     self.condition_feedback.toggle_setting(2)
                 }
+                PhysicalKey::Code(KeyCode::KeyM) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(3)
+                }
+                PhysicalKey::Code(KeyCode::KeyB) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(4)
+                }
+                PhysicalKey::Code(KeyCode::KeyG) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(5)
+                }
                 _ => {}
             }
         }
         if pause_key {
             if pressed && !repeat && !synthetic && self.input_policy().admits_press(source, true) {
                 self.session.command(crate::session::Command::TogglePause);
+                self.scout_audio.stop();
                 self.condition_feedback.settings_open = false;
                 self.survival_hud.close_details();
                 self.cursor_captured = false;
@@ -591,6 +605,7 @@ impl ClientApplication {
     }
 
     fn release_input_capture(&mut self) {
+        self.scout_audio.stop();
         self.cursor_captured = false;
         self.survival_hud.close_details();
         self.journey_ended.clear_pointer();
@@ -654,6 +669,22 @@ impl ClientApplication {
                 self.native_focused,
                 self.occluded,
             ));
+        let audio = crate::scout_audio::Observation::capture(
+            &self.session,
+            self.native_focused
+                && !self.occluded
+                && self.e2e_config.is_none()
+                && self.benchmark.is_none(),
+        );
+        self.scout_audio.update(
+            audio,
+            self.condition_feedback.settings,
+            self.condition_feedback.settings_path(),
+        );
+        if self.scout_audio.unavailable() {
+            self.condition_feedback.message =
+                "Ship audio unavailable - check OS player/output".into();
+        }
         if let Some(checkpoints) = &mut self.checkpoints {
             checkpoints.poll(&self.session);
         }
@@ -816,6 +847,9 @@ impl ClientApplication {
                 near_plane_meters: 0.05,
             };
             self.condition_feedback.camera(&mut camera);
+            if let Some(view) = &self.scout_reference {
+                camera = view.camera(presentation.ship.pose);
+            }
             let mut mesh = map_ship_to_renderer(presentation.ship);
             mesh.fabricator_output_present = self.session.fabricator_output_present();
             mesh.fabricator_output_medical = self.session.fabricator_output_medical();
@@ -1192,6 +1226,7 @@ impl ApplicationHandler for ClientApplication {
     }
 
     fn suspended(&mut self, event_loop: &ActiveEventLoop) {
+        self.scout_audio.stop();
         if let Some(benchmark) = self.benchmark.as_mut()
             && let Err(error) = benchmark.observe_native("suspended", false)
         {

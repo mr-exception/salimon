@@ -127,6 +127,20 @@ fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
         return execute_session(&mut app.session, line);
     }
     let result = match command.get("op").and_then(Value::as_str) {
+        Some("scout_reference") => match command.get("view").and_then(Value::as_str) {
+            Some("clear") => {
+                app.scout_reference = None;
+                Ok(json!({"view":"clear"}))
+            }
+            Some(name) => match crate::scout_reference::find(name) {
+                Some(view) => {
+                    app.scout_reference = Some(view);
+                    Ok(json!({"view":name}))
+                }
+                None => Err(("invalid_view", "unknown Scout reference camera")),
+            },
+            None => Err(("invalid_view", "view is required")),
+        },
         Some("restart") => Ok(json!({"applied":app.restart_terminal()})),
         Some("window") => {
             let action = command.get("action").and_then(Value::as_str).unwrap_or("");

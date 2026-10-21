@@ -383,3 +383,21 @@ all survival state, effect descriptions, HUD raster and expiry remain runtime-ow
 margin, shared by overlay fitting and bounded host-produced terminal images.
 A host image that exactly fits this size stays unscaled, keeping physical pointer
 hit rectangles aligned. Runtime still owns all terminal state, text and input.
+
+## Scout light zoning (#463)
+
+The existing 160-byte ship uniform uses `center.w` for the explicit bus-on bit
+from `!instruments.power_off`; energy rounding never determines presentation.
+`ship_mesh.wgsl` retains per-vertex diffuse fill, now cool outside and warm in
+ship-local cockpit/workshop zones. On bus loss electrical emission extinguishes,
+screens retain the existing blank-atlas policy, and a cool non-electrical fill
+keeps silhouettes visible. This is an artistic visibility floor, not simulated
+emergency energy. No light lists, shadows, new textures, geometry, draws or GPU
+allocations are added. Glass alpha, reverse-Z and material base factors remain.
+Ordinary metallic/roughness, normal maps, reflections and occlusion/PBR transport
+are still unsupported. Engine emission remains a power-only accent; throttle
+animation belongs to E02 (#464).
+
+The shared camera contract and native/offline capture commands are documented in
+[Scout presentation](../../docs/scout-presentation.md). New images are candidates;
+existing reviewed baseline images are never automatically replaced.

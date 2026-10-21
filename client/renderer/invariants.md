@@ -151,3 +151,8 @@ must never inspect their gameplay state or own their animation/expiry.
 margin, shared by overlay fitting and bounded host-produced terminal images.
 A host image that exactly fits this size stays unscaled, keeping physical pointer
 hit rectangles aligned. Runtime still owns all terminal state, text and input.
+
+Scout lighting (#463) consumes the same explicit bus state as the physical
+screens. Blackout suppresses electrical emission and warm fill, preserving a
+cool visibility floor without adding power/gameplay authority. Glass blending,
+depth, immutable geometry and the 160-byte uniform size remain unchanged.

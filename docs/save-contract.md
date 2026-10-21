@@ -301,3 +301,11 @@ risk choice. Final exit does not start a second write after either choice.
 Terminal archives/restart and 60-second/event autosaves retain their owners.
 No manual request ticks gameplay or credits offline fatigue. Native OS-input,
 DPI/appearance and M1 signoff remain separately tracked by #376.
+
+## Future Jump Drive, Core-impulse and shared-clock save additions (NOT schema 3)
+
+The [approved future travel contract](jump-drive-and-interstellar-travel.md) uses one 1:1 real-world universe clock for every online/offline player, **no relativistic time dilation**, ordinary powered flight plus real-time engine-off coasting, and an owner-triggered Core-powered Jump Drive. The future engine change (#493) must maintain deterministic impulse from **actually funded joules** (1 N·s/J baseline) over exact power/clock boundaries without adding a second kinetic-energy charge. These are **not implemented by existing schema 3**.
+
+A later, explicitly versioned save/online server model must include the installed Jump Drive identity/revision, parameter N (initial **20%**), effective impulse coefficient, physically mounted/upgrade parts, true engine on/off state **distinct from selected throttle**, position/orientation/velocity frame+epoch, and sufficiently precise Core amounts. Pending quantum transitions require stable idempotency transaction IDs, captured pre-jump position, mass, velocity, heading, six-field normalized light-second distance, quoted/reserved energy, validated target state and passenger/cargo identities. On recovery **commit exactly once or roll back/refund exactly once**; never duplicate an owner ship or charge twice. Do not let an unverified position materialize or let quantum staging create an alternate time line.
+
+Offline catch-up remains deterministic on one shared clock and **does not autonomously fire jumps**. The code's current compressed-world zero-offline-world-duration implementation must be explicitly migrated by the existing universe offline-propagation issues; these future plans do not claim such propagation is implemented today.

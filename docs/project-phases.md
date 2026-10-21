@@ -96,3 +96,9 @@ Approved contracts, real organic biomass/medicinal raw resources and the portabl
 recipe/storage/FIFO/tray domain are delivered. Crafting remains unconnected to
 native interactions pending #339–#347; no playable-wave completion or phase
 renumbering is implied. See [fabrication architecture](../client/fabrication/architecture.md).
+
+## Future Jump Drive and impulse model — approved documentation, pending implementation (2026-10-21)
+
+The [approved travel contract](jump-drive-and-interstellar-travel.md) changes the **future** design to one global 1:1 real-time clock without relativistic time dilation; ordinary thrusters, sub-light long voyages, engine-off offline coasting and the fictional reusable **Spatial Jump Drive** coexist. The Jump Drive is a fabricated physical ship module with an owner-authorized six-field light-distance panel, hard propulsion-engine-off gate, Core-priced forward displacement using initial **N=20%** of the remaining gap to c per light-second, quantum-themed loading, and unchanged ship velocity after arrival. It is not the lore wormhole, not ordinary cruise propulsion and not a new time scale.
+
+[Development issue #493](https://github.com/mr-exception/salimon/issues/493) separately changes normal thrusters to **1 N·s of impulse per 1 J of actual Core propulsion spend**, and reconciles existing force/power tests. Later Jump Drive implementation needs its **own** planning, material/assembly progression, Core energy/charging balance, explicit engine switch, safe arrivals, multiplayer-safe transactions, offline persistence, quantum visuals and native signoff. The current 60 GJ Core cannot fund a complete 1-light-second jump at N20% for a 100 t ship at rest; the desired ~6–12 months of full-play galaxy exploration requires measured future balance, not silent formula changes. These documents do not reopen closed implementation issues or claim a finished feature.

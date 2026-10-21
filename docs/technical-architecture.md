@@ -409,3 +409,14 @@ and audio. It adds no gameplay controller or saved state. See the
 
 Pause saves (#382) use the existing worker/store and verified receipts; see
 [manual checkpoint contract](save-contract.md#pause-checkpoint-controls-382).
+
+## Future sub-light voyage, Core impulse and Spatial Jump Drive boundaries (2026-10-21)
+
+**Approved future design, not runtime implementation:** [canonical spatial Jump Drive and shared clock](jump-drive-and-interstellar-travel.md), and **engine-only issue [#493](https://github.com/mr-exception/salimon/issues/493)**. For current binaries continue to describe the existing 4 MN/2 MN thrust, 100 MW/50 MW draws and 60 GJ Core accurately until the engine PR actually merges.
+
+- **Ship/Core portable domain:** switch the engine to **actually funded energy × 1 N·s/J = vector impulse**, applied through current total mass, orientation and exact substep power boundaries. Document and test the significant acceleration change; don't bill conventional kinetic-energy differences. **No change to deployed flight** is implied by this document.
+- **Future Jump Drive portable domain:** validate mass, finite direction and distance, N=20% initially, speed 0<=v<c, one-frame epoch and destination safety; energy = light_seconds * mass_kg * (N/100) * (c-v_mps) / kappa. Preserve real velocity and orientation. Refuse engine-on, including idle zero throttle, through a **new explicit propulsion switched-off authority bit**; reject incompatible assists and insufficient unreserved Core. Other speed regimes remain undecided and must not create negative/free jumps.
+- **Fabricator/world:** version physical component and upgrade recipes/IDs using existing queue/raw-bin/tray/material ownership. The first module is permanent, not a disposable item or food/medical slot; installed mass contributes to the ship ledger. The old 20 kg raw bin and one-object carrying constraints still apply.
+- **Runtime/render:** owner-authorized **six-field** light-distance panel quotes energy and errors without mutating simulation; verified single-debit quantum-transition transaction, atomic onboard contents, staging/loading scene and full position/frame change only after the relevant world region loads. Renderer uses immutable observation DTOs; no GPU-owned movement, power or chronology.
+- **Persistence/future backend:** shared 1:1 real elapsed universe time for offline/online users (no relativistic per-player clocks), single authoritative jump position/energy event, idempotent restart/reconnect and passengers, physics catch-up. Offline engines off; offline coasting continues and jumps are not automatic. The precise multiplayer backend does not currently exist.
+- **Gameplay/economy:** one-to-twelve-month real-time long voyages and approximately 6–12 months of dedicated galaxy exploration are **aspirational balance**, not evidence that the current 60 GJ Core funds even a 1-light-second jump at N=20%. Explicit balance review required.

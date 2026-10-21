@@ -267,3 +267,18 @@ publication faults, including every archive/restart write. The two extended
 [commands and operation reference](../scenarios/portable/README.md) and
 [acceptance traceability](../reports/issue-375/README.md). Existing #377–#384 owner
 tests remain part of workspace CI; this matrix composes their production owners.
+
+## Scout UI readability (#466)
+
+[Canonical surface matrix](scout-presentation.md#scout-ui-readability-contract-466):
+renderer `ui_style.rs` is the shared bitmap/palette owner; `cockpit_instruments.rs`
+owns bounded readings/region caches; `ship_mesh.rs` owns physical screen U/V
+interpretation. Runtime `action_bar.rs`, `app/interaction.rs`,
+`session/crafting_ui.rs` and `survival_hud/raster.rs` retain their existing text,
+input and layout roles. Run workspace tests/build/Clippy/fmt, including glyph,
+contrast, line-fit, three-screen orientation and modal/interaction regressions.
+The ignored `scout_ui_raster_evidence` / `scout_prompt_raster_evidence` tests emit
+CPU pixels with `SALIMON_SCOUT_UI_DIR` set to an **absolute** evidence directory.
+Existing `scout_feedback_gpu_evidence` supplies opt-in synthetic GPU views.
+[Delivery report](../reports/issue-466/README.md); native M1 acceptance #502;
+future scanner UI #503 after #430. Closed source scope is not native/scanner approval.

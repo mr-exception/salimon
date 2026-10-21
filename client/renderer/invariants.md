@@ -99,8 +99,8 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 
 `Core_Monitor` is an authored two-triangle, starboard-facing screen in the
 energy-core component, distinct from `Monitor_Wide`. The existing opaque draw
-samples a cached 2048 × 256 atlas: the console occupies the first three 512 px
-regions and the Core the fourth. No extra draws/materials/pipelines. Both
+samples a cached 2560 × 256 atlas: the console occupies the first three 512 px
+regions, the Core the fourth and Fabricator the fifth. No extra draws/materials/pipelines. Both
 screens blank once on explicit bus power loss and redraw automatically at
 restoration. The Core region independently caches rounded kW, energy, seconds
 and warning/conversion state. Runtime maps domain status without deriving rules.
@@ -175,3 +175,11 @@ foundation; #464 extends that layout.
 Engine ON/OFF observation (#493) is independent of selected throttle and Core
 blackout. A switch change invalidates the cockpit flight display cache without
 mutating gameplay; native appearance acceptance remains #498.
+
+
+Scout UI #466: one presentation-only font/palette, case-preserving SI readings,
+explicit textual warning and truncation, and viewer-right/top-left physical screen
+orientation. No display text may spill into adjacent atlas sections. The current
+Fabricator import-only U correction is deliberate and must be reconciled with
+any future authored UV change. Native acceptance remains #502; future scanner
+integration remains #503 after #430.

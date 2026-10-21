@@ -204,3 +204,9 @@ reference review remains #376. See the onboarding section in architecture.md.
 Engine #493: B input uses `Command::ToggleEngines` and ship-owned authority;
 `session/persistence.rs` migrates v1-v4 force records to schema 5. Keep visual/audio
 feedback conditional on explicit engine state, with native review #498.
+
+
+Scout UI #466: prompt and crafting/status glyphs reuse renderer `ui_style`.
+See the [canonical surface matrix](../../docs/scout-presentation.md#scout-ui-readability-contract-466);
+retain contextual/expiry and modal admission tests, and keep power/interaction
+rules out of palette/raster changes. Scanner integration is separately #503.

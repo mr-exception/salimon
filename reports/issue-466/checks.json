@@ -1,0 +1,8 @@
+{
+  "passed": 760,
+  "failed": 0,
+  "ignored": 27,
+  "base_commit": "f389d9d2a8518b52aedb08172cd214af190bbe15",
+  "native_appearance": "not run; #502",
+  "scanner": "not implemented; #503 blocked by #430"
+}

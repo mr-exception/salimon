@@ -50,8 +50,8 @@ const GAP: u32 = 4;
 const WIDTH: u32 = 5 * SLOT + 4 * GAP;
 const BACKGROUND: [u8; 4] = [8, 21, 29, 224];
 const BORDER: [u8; 4] = [67, 95, 108, 255];
-const SELECTED: [u8; 4] = [89, 224, 215, 255];
-const INK: [u8; 4] = [220, 233, 236, 255];
+const SELECTED: [u8; 4] = crate::ui_style::CYAN;
+const INK: [u8; 4] = crate::ui_style::IVORY;
 
 fn toolbar_scale(dpi: f64) -> u32 {
     (if dpi.is_finite() { dpi } else { 1.0 }.clamp(1.0, 2.0) * 2.0).round() as u32
@@ -100,10 +100,9 @@ impl ToolbarRaster {
             if *icon == Some(EquipmentIcon::MiningTool) {
                 self.mining_icon(x);
             }
-            for (row, bits) in
-                crate::cockpit_instruments::glyph_rows(char::from(b'1' + index as u8))
-                    .iter()
-                    .enumerate()
+            for (row, bits) in crate::ui_style::glyph_rows(char::from(b'1' + index as u8))
+                .iter()
+                .enumerate()
             {
                 for col in 0..5 {
                     if bits & (1 << (4 - col)) != 0 {
@@ -139,10 +138,7 @@ impl ToolbarRaster {
             }
             // Category marker stays visible even for empty slots.
             let mark = if index < 3 { 'F' } else { '+' };
-            for (row, bits) in crate::cockpit_instruments::glyph_rows(mark)
-                .iter()
-                .enumerate()
-            {
+            for (row, bits) in crate::ui_style::glyph_rows(mark).iter().enumerate() {
                 for col in 0..5 {
                     if bits & (1 << (4 - col)) != 0 {
                         self.rect(x + 2 + col, y + 2 + row as u32, 1, 1, INK);

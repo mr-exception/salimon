@@ -58,14 +58,12 @@ pub(crate) fn action_bar_context(
         .filter(|message| *message != CockpitMessage::DoorLockedWhileInFlight)
         .map(CockpitMessage::text)
         .or(match interaction {
-            Some(InteractionTarget::FabricatorTray) => Some("E to collect Fabricator tray item"),
-            Some(InteractionTarget::FabricatorScreen) => Some("E to open Fabricator crafting"),
-            Some(InteractionTarget::Fabricator) => {
-                Some("E to insert carried fragment into Fabricator")
-            }
-            Some(InteractionTarget::Core) => Some("E to feed carried fragment to Core"),
+            Some(InteractionTarget::FabricatorTray) => Some("[E] Collect Fabricator tray item"),
+            Some(InteractionTarget::FabricatorScreen) => Some("[E] Open Fabricator crafting"),
+            Some(InteractionTarget::Fabricator) => Some("[E] Insert cargo into Fabricator"),
+            Some(InteractionTarget::Core) => Some("[E] Feed cargo to Core"),
             Some(InteractionTarget::Cockpit) => Some(COCKPIT_INTERACTION_PROMPT),
-            Some(InteractionTarget::ExitDoor) => Some("E to open/close exit door"),
+            Some(InteractionTarget::ExitDoor) => Some("[E] Open/close exit door"),
             None => None,
         })
 }
@@ -201,7 +199,7 @@ mod tests {
         );
         assert_eq!(
             action_bar_context(None, Some(InteractionTarget::ExitDoor)),
-            Some("E to open/close exit door")
+            Some("[E] Open/close exit door")
         );
 
         landed.set_cockpit_control(true);

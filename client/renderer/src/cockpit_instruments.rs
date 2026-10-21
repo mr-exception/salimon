@@ -4,6 +4,8 @@
 //! into one allocation; the renderer can skip both rasterization and GPU uploads
 //! for unchanged frames.
 
+use crate::ui_style::{AMBER, BACKGROUND, CYAN, INSET, IVORY, MUTED, RULE, glyph_rows};
+
 const SECTION_WIDTH: u32 = 512;
 pub(crate) const ATLAS_WIDTH: u32 = SECTION_WIDTH * 5;
 pub(crate) const ATLAS_HEIGHT: u32 = 256;
@@ -52,7 +54,17 @@ struct NavigationDisplay {
 fn reading(value: Option<f64>) -> String {
     value
         .filter(|v| v.is_finite() && v.abs() < 1e12)
-        .map_or_else(|| "--".to_owned(), |v| format!("{v:.1}"))
+        .map_or_else(
+            || "--".to_owned(),
+            |v| {
+                let fixed = format!("{v:.1}");
+                if fixed.len() <= 9 {
+                    fixed
+                } else {
+                    format!("{v:.2e}")
+                }
+            },
+        )
 }
 impl From<NavigationInstruments> for NavigationDisplay {
     fn from(v: NavigationInstruments) -> Self {
@@ -127,14 +139,6 @@ impl From<CoreInstruments> for CoreDisplay {
         }
     }
 }
-
-const BACKGROUND: [u8; 4] = [6, 17, 23, 255];
-const INSET: [u8; 4] = [10, 27, 34, 255];
-const RULE: [u8; 4] = [34, 70, 78, 255];
-const MUTED: [u8; 4] = [132, 168, 176, 255];
-const IVORY: [u8; 4] = [236, 243, 232, 255];
-const CYAN: [u8; 4] = [89, 224, 215, 255];
-const AMBER: [u8; 4] = [245, 185, 98, 255];
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum SpeedUnit {
@@ -371,33 +375,37 @@ impl InstrumentAtlas {
         }) {
             self.draw_core_status(&next);
         }
+        if self
+            .displayed
+            .as_ref()
+            .is_none_or(|previous| previous.power_off || previous.fabricator != next.fabricator)
+        {
+            self.draw_fabricator(next.fabricator);
+        }
+        self.displayed = Some(next);
+        true
+    }
+
+    fn draw_fabricator(&mut self, value: FabricatorInstruments) {
         self.section_frame(4, "FABRICATOR");
+        let (label, color, hint) = match value.status {
+            0 => ("IDLE", CYAN, "[E] SCREEN / CRAFT"),
+            1 => ("WORKING", CYAN, "[E] SCREEN / QUEUE"),
+            2 => ("NO POWER", AMBER, "RESTORE CORE POWER"),
+            3 => ("OUTPUT BLOCKED", AMBER, "[E] TRAY / COLLECT"),
+            _ => ("STATUS UNKNOWN", AMBER, "CHECK MACHINE"),
+        };
+        self.text(28, 70, label, 3, color);
+        self.text(28, 110, &format!("JOBS {}", value.jobs), 2, IVORY);
         self.text(
             28,
-            70,
-            match next.fabricator.status {
-                1 => "WORKING",
-                2 => "PAUSED / NO POWER",
-                3 => "OUTPUT BLOCKED",
-                _ => "IDLE",
-            },
-            3,
-            CYAN,
-        );
-        self.text(
-            28,
-            112,
-            &format!(
-                "JOBS {} / LEFT {}s",
-                next.fabricator.jobs, next.fabricator.remaining_seconds
-            ),
+            142,
+            &format!("LEFT {} s", value.remaining_seconds),
             2,
             IVORY,
         );
-        self.text(28, 160, "E AT SCREEN TO CRAFT", 2, IVORY);
-        self.text(28, 192, "AIM AT PORT TO INSERT", 2, MUTED);
-        self.displayed = Some(next);
-        true
+        self.text(28, 184, hint, 2, color);
+        self.text(28, 222, "[E] PORT / INSERT CARGO", 2, MUTED);
     }
 
     fn draw_core_status(&mut self, key: &DisplayKey) {
@@ -579,6 +587,7 @@ impl InstrumentAtlas {
     }
 
     fn text(&mut self, x: u32, y: u32, text: &str, scale: u32, color: [u8; 4]) {
+        let (text, scale) = fit_instrument_line(text, scale, SECTION_WIDTH.saturating_sub(x + 28));
         for (index, character) in text.chars().enumerate() {
             for (row, bits) in glyph_rows(character).into_iter().enumerate() {
                 for column in 0..5 {
@@ -595,6 +604,23 @@ impl InstrumentAtlas {
             }
         }
     }
+}
+
+// Keep a complete reading where possible. Never spill into another atlas region,
+// silently cut a value/unit, or shrink below the existing two-pixel body face.
+fn fit_instrument_line(text: &str, preferred_scale: u32, width: u32) -> (String, u32) {
+    let count = text.chars().count() as u32;
+    let scale = (2..=preferred_scale.max(2))
+        .rev()
+        .find(|scale| count.saturating_mul(6).saturating_sub(1) * scale <= width)
+        .unwrap_or(2);
+    let capacity = ((width / scale + 1) / 6) as usize;
+    if count as usize <= capacity {
+        return (text.to_owned(), scale);
+    }
+    let mut result: String = text.chars().take(capacity.saturating_sub(3)).collect();
+    result.extend(std::iter::repeat_n('.', capacity.min(3)));
+    (result, scale)
 }
 
 fn speed_text(speed: SpeedDisplay) -> (String, &'static str, [u8; 4]) {
@@ -629,61 +655,6 @@ fn distance_unit(distance: SpeedDisplay) -> &'static str {
             ..
         } => "km",
         _ => "Mm",
-    }
-}
-
-pub(crate) fn glyph_rows(character: char) -> [u8; 7] {
-    // Deliberately preserve the case of metric prefixes: m/s and Mm/s denote
-    // different scales. Labels elsewhere use the uppercase instrument face.
-    match character {
-        'm' => [0, 0, 0b11010, 0b10101, 0b10101, 0b10101, 0b10101],
-        'k' => [
-            0b10000, 0b10000, 0b10010, 0b10100, 0b11000, 0b10100, 0b10010,
-        ],
-        's' => [0, 0, 0b01111, 0b10000, 0b01110, 0b00001, 0b11110],
-        'A' => [14, 17, 17, 31, 17, 17, 17],
-        'B' => [30, 17, 17, 30, 17, 17, 30],
-        'C' => [15, 16, 16, 16, 16, 16, 15],
-        'D' => [30, 17, 17, 17, 17, 17, 30],
-        'E' => [31, 16, 16, 30, 16, 16, 31],
-        'F' => [31, 16, 16, 30, 16, 16, 16],
-        'G' => [15, 16, 16, 23, 17, 17, 15],
-        'H' => [17, 17, 17, 31, 17, 17, 17],
-        'I' => [31, 4, 4, 4, 4, 4, 31],
-        'J' => [7, 2, 2, 2, 18, 18, 12],
-        'K' => [17, 18, 20, 24, 20, 18, 17],
-        'L' => [16, 16, 16, 16, 16, 16, 31],
-        'M' => [17, 27, 21, 21, 17, 17, 17],
-        'N' => [17, 25, 21, 19, 17, 17, 17],
-        'O' => [14, 17, 17, 17, 17, 17, 14],
-        'P' => [30, 17, 17, 30, 16, 16, 16],
-        'Q' => [14, 17, 17, 17, 21, 18, 13],
-        'R' => [30, 17, 17, 30, 20, 18, 17],
-        'S' => [15, 16, 16, 14, 1, 1, 30],
-        'T' => [31, 4, 4, 4, 4, 4, 4],
-        'U' => [17, 17, 17, 17, 17, 17, 14],
-        'V' => [17, 17, 17, 17, 17, 10, 4],
-        'W' => [17, 17, 17, 21, 21, 21, 10],
-        'X' => [17, 17, 10, 4, 10, 17, 17],
-        'Y' => [17, 17, 10, 4, 4, 4, 4],
-        'Z' => [31, 1, 2, 4, 8, 16, 31],
-        '0' => [14, 17, 19, 21, 25, 17, 14],
-        '1' => [4, 12, 4, 4, 4, 4, 14],
-        '2' => [14, 17, 1, 2, 4, 8, 31],
-        '3' => [30, 1, 1, 14, 1, 1, 30],
-        '4' => [2, 6, 10, 18, 31, 2, 2],
-        '5' => [31, 16, 16, 30, 1, 1, 30],
-        '6' => [14, 16, 16, 30, 17, 17, 14],
-        '7' => [31, 1, 2, 4, 8, 8, 8],
-        '8' => [14, 17, 17, 14, 17, 17, 14],
-        '9' => [14, 17, 17, 15, 1, 1, 14],
-        ':' => [0, 4, 4, 0, 4, 4, 0],
-        '.' => [0, 0, 0, 0, 0, 6, 6],
-        '-' => [0, 0, 0, 31, 0, 0, 0],
-        '/' => [1, 2, 2, 4, 8, 8, 16],
-        '%' => [25, 26, 4, 8, 22, 6, 0],
-        '>' => [16, 8, 4, 2, 4, 8, 16],
-        _ => [0; 7],
     }
 }
 
@@ -1141,5 +1112,104 @@ mod navigation_display_tests {
         assert!(!atlas.update(off));
         assert!(atlas.update(on));
         assert_eq!(atlas.pixels, before);
+    }
+}
+
+#[cfg(test)]
+mod readability_tests {
+    use super::*;
+
+    #[test]
+    fn long_readings_retain_units_and_never_silently_clip() {
+        let nav = NavigationDisplay::from(NavigationInstruments {
+            direction_local: Some([-9e11, 9e11, -9e11]),
+            acceleration: Some(-9e11),
+            angle_degrees: Some(180.0),
+            mass_kg: 9e11,
+            braking: Some([9e11, 9e11, 9e11]),
+            braking_status: "ALIGN NOSE TO VELOCITY",
+            ..Default::default()
+        });
+        for row in nav.flight.iter().chain(nav.brake.iter()) {
+            let (fitted, scale) = fit_instrument_line(row, 2, 456);
+            assert_eq!(&fitted, row, "compact readings must keep their unit: {row}");
+            assert_eq!(scale, 2);
+        }
+        for text in ["A".repeat(80), "M".repeat(40)] {
+            let (line, scale) = fit_instrument_line(&text, 3, 456);
+            assert!(line.ends_with("..."));
+            assert!(scale >= 2);
+            assert!((line.chars().count() as u32 * 6 - 1) * scale <= 456);
+        }
+        let (line, scale) = fit_instrument_line("123.45 Mm/s", 4, 456);
+        assert_eq!((line.as_str(), scale), ("123.45 Mm/s", 4));
+    }
+
+    #[test]
+    fn fabricator_warning_states_keep_text_and_cache_regions_isolated() {
+        let mut atlas = InstrumentAtlas::new();
+        let base = CockpitInstruments::default();
+        atlas.update(base);
+        let cockpit = super::tests::regions(&atlas.pixels);
+        for status in [1, 2, 3, 255] {
+            let values = CockpitInstruments {
+                fabricator: FabricatorInstruments {
+                    status,
+                    jobs: u32::MAX,
+                    remaining_seconds: u32::MAX,
+                },
+                ..base
+            };
+            assert!(atlas.update(values));
+            assert_eq!(super::tests::regions(&atlas.pixels), cockpit);
+            let ink = if status == 1 { CYAN } else { AMBER };
+            assert!(atlas.pixels.as_chunks::<4>().0.contains(&ink));
+            assert!(!atlas.update(values));
+        }
+    }
+
+    #[test]
+    #[ignore = "writes CPU raster evidence; set SALIMON_SCOUT_UI_DIR"]
+    fn scout_ui_raster_evidence() {
+        let dir = std::path::PathBuf::from(std::env::var("SALIMON_SCOUT_UI_DIR").unwrap());
+        std::fs::create_dir_all(&dir).unwrap();
+        for (name, status, power_off) in [
+            ("idle", 0, false),
+            ("working", 1, false),
+            ("blocked", 3, false),
+            ("blackout", 2, true),
+        ] {
+            let mut atlas = InstrumentAtlas::new();
+            atlas.update(CockpitInstruments {
+                power_off,
+                speed_meters_per_second: 1250.0,
+                thruster_percentage: 25,
+                core_energy_capacity_joules: 60_000_000_000,
+                core_energy_stored_joules: 45_000_000_000,
+                fabricator: FabricatorInstruments {
+                    status,
+                    jobs: 2,
+                    remaining_seconds: 42,
+                },
+                navigation: NavigationInstruments {
+                    mass_kg: 100_000.0,
+                    direction_local: Some([1.0, 0.0, 0.0]),
+                    acceleration: Some(250.0),
+                    braking_status: "AVAILABLE",
+                    ..Default::default()
+                },
+                ..Default::default()
+            });
+            let mut bytes = Vec::new();
+            {
+                let mut encoder = png::Encoder::new(&mut bytes, ATLAS_WIDTH, ATLAS_HEIGHT);
+                encoder.set_color(png::ColorType::Rgba);
+                encoder.set_depth(png::BitDepth::Eight);
+                let mut writer = encoder.write_header().unwrap();
+                writer.write_image_data(&atlas.pixels).unwrap();
+                writer.finish().unwrap();
+            }
+            std::fs::write(dir.join(format!("atlas-{name}.png")), bytes).unwrap();
+        }
     }
 }

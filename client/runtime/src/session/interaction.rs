@@ -7,7 +7,7 @@ pub(crate) const COCKPIT_INTERACTION_POSITION_METERS: [f64; 3] = [
 ];
 const COCKPIT_INTERACTION_RANGE_METERS: f64 = 4.0;
 const COCKPIT_INTERACTION_MINIMUM_AIM_DOT: f64 = 0.866_025_403_784_438_6;
-pub(crate) const COCKPIT_INTERACTION_PROMPT: &str = "Press E to use";
+pub(crate) const COCKPIT_INTERACTION_PROMPT: &str = "[E] Use cockpit";
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum InteractionTarget {

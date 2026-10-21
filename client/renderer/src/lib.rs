@@ -19,6 +19,7 @@ mod resource_mesh;
 mod ship_mesh;
 mod spheres;
 mod terrain;
+pub mod ui_style;
 pub use terrain::{TerrainMask, TerrainPatch, TerrainPatchKey, TerrainVertex};
 mod planet_style;
 mod surface_textures;

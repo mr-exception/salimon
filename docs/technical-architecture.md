@@ -448,3 +448,11 @@ runtime owns text selection, eligibility, focus and typed commands. Existing
 domain power/simulation/mass/persistence ownership is unchanged. Delivery evidence
 is [reports/issue-466](../reports/issue-466/README.md); M1 signoff is #502, and
 scanner integration #503 remains blocked by #430.
+
+
+## Scout Archive (#467)
+
+Runtime owns local Archive records and modal input; the existing save manager
+persists validated identities/read progress in schema 6. Renderer adds a flush
+panel to its existing ship draw and one static instrument atlas region. No backend,
+chart or recovery authority is added. See [ownership](../client/runtime/architecture.md#scout-archive-467).

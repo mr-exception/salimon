@@ -30,7 +30,11 @@ impl GameplaySession {
                 self.wheel.selection = None;
                 return;
             }
-            if self.wheel.held || self.crafting_ui.open || self.view_mode != ViewMode::Gameplay {
+            if self.wheel.held
+                || self.crafting_ui.open
+                || self.archive_reader.open
+                || self.view_mode != ViewMode::Gameplay
+            {
                 return;
             }
             let primary_down = self.wheel.primary_down;

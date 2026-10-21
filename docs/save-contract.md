@@ -1,4 +1,4 @@
-# Canonical whole-game save contract (schema 5)
+# Canonical whole-game save contract (schema 6)
 
 > This is the **current compressed-world runtime save schema**. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. Under the approved policy, future fictional-planet upgrades require explicit versioned save/world-delta migration, preservation or validated remapping of physical anchors, and recoverable failure handling; scientific terrain detail on **any published real observed solid body** may not displace saved positions after its first authoritative real-scale surface publication. Future fictional-planet changes to geology/biome-dependent resource layouts likewise require explicit stable-ID, depletion and positional migration; the historical compressed prototype does not establish the real-body surface freeze. This note does not modify schema 3 or imply backend multiplayer exists.
 
@@ -349,3 +349,16 @@ archive/new run. CRC-valid invalid-domain saves must fall back; future schemas
 must abort launch without replacing visible state. Existing native-store tests
 retain crash-temp-file, lease and platform durability coverage. See the
 [acceptance matrix and raw results](../reports/issue-375/README.md).
+
+
+## Scout Archive schema 6 (#467)
+
+Schema 6 adds required `state.archive`: inner version 1, selected stable record ID
+and bounded unique read IDs. Runtime validates this with the full session before
+publishing. Save/close/relaunch retains selection/read progress and original local
+record definitions; reader open/held input remain transient. V1–V5 explicitly
+initialize an unread Archive and preserve their existing survival/tutorial/engine
+migrations. No recovery progress or charted destinations are invented. Unknown
+versions/IDs, duplicate read IDs and missing current Archive source reject before
+replacing a live session. Discrete read/selection changes use existing atomic
+checkpoint scheduling. See [source and input](../client/runtime/architecture.md#scout-archive-467).

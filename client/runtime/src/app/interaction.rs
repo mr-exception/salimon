@@ -15,6 +15,7 @@ pub(crate) fn prompt_placement(
     frame: salimon_character::ShipFrame,
 ) -> salimon_renderer::OverlayPlacement {
     let (local, radius_meters) = match target {
+        InteractionTarget::Archive => (crate::session::archive::TERMINAL, 0.15),
         InteractionTarget::FabricatorTray => {
             (salimon_character::FABRICATOR_TRAY_MARKER_METERS, 0.15)
         }
@@ -58,6 +59,7 @@ pub(crate) fn action_bar_context(
         .filter(|message| *message != CockpitMessage::DoorLockedWhileInFlight)
         .map(CockpitMessage::text)
         .or(match interaction {
+            Some(InteractionTarget::Archive) => Some("[E] Read Scout Archive"),
             Some(InteractionTarget::FabricatorTray) => Some("[E] Collect Fabricator tray item"),
             Some(InteractionTarget::FabricatorScreen) => Some("[E] Open Fabricator crafting"),
             Some(InteractionTarget::Fabricator) => Some("[E] Insert cargo into Fabricator"),

@@ -1,4 +1,5 @@
 //! Portable production gameplay composition. No window, GPU lifecycle or evidence IO.
+pub(crate) mod archive;
 pub(crate) mod consumable_wheel;
 pub(crate) mod consumables;
 pub(crate) mod crafting_ui;
@@ -35,6 +36,8 @@ use std::time::Duration;
 pub(crate) struct GameplaySession {
     paused: bool,
     pub(crate) tutorial: tutorial::Tutorial,
+    pub(crate) archive: archive::Archive,
+    pub(crate) archive_reader: archive::Reader,
     pub(crate) run: lifecycle::RunState,
     pub(crate) consumable_effects: salimon_survival::consumables::Catalog,
     pub(crate) survival: salimon_survival::Survival,
@@ -87,6 +90,8 @@ impl Default for GameplaySession {
     fn default() -> Self {
         Self {
             paused: false,
+            archive: Default::default(),
+            archive_reader: Default::default(),
             tutorial: tutorial::Tutorial::dismissed(),
             run: Default::default(),
             consumable_effects: salimon_survival::consumables::Catalog::starter(),
@@ -220,6 +225,7 @@ impl GameplaySession {
                     return;
                 }
                 match interaction {
+                    Some(InteractionTarget::Archive) => self.open_archive(),
                     Some(InteractionTarget::FabricatorTray) => self.collect_fabricator_output(),
                     Some(InteractionTarget::FabricatorScreen) => {
                         self.clear_held_controls();
@@ -300,6 +306,7 @@ impl GameplaySession {
         match available_interaction_target(self.character.location(), local_eye, local_look)
             .filter(|target| self.permitted_interaction(*target))
         {
+            Some(InteractionTarget::Archive) => Some("archive"),
             Some(InteractionTarget::FabricatorTray) => Some("fabricator_tray"),
             Some(InteractionTarget::FabricatorScreen) => Some("fabricator_screen"),
             Some(InteractionTarget::Fabricator) => Some("fabricator"),
@@ -439,6 +446,7 @@ impl GameplaySession {
 
     pub(crate) fn clear_held_controls(&mut self) {
         self.crafting_ui.open = false;
+        self.archive_reader.open = false;
         self.wheel = Default::default();
         self.movement_input = MovementInput::default();
         self.ship_control_input = ShipControlInput::default();
@@ -565,6 +573,7 @@ impl GameplaySession {
         );
         self.sync_carried();
         self.validate_crafting_focus();
+        self.validate_archive_focus();
         if self.survival.snapshot().terminal {
             self.freeze_terminal();
         }
@@ -606,7 +615,9 @@ impl GameplaySession {
                     self.tutorial.skip();
                     return;
                 }
-                InspectVitals if !self.wheel.open && !self.crafting_ui.open => {
+                InspectVitals
+                    if !self.wheel.open && !self.crafting_ui.open && !self.archive_reader.open =>
+                {
                     self.tutorial.record(tutorial::Objective::Vitals);
                     return;
                 }
@@ -623,7 +634,7 @@ impl GameplaySession {
             }
             return;
         }
-        if self.crafting_ui.open {
+        if self.crafting_ui.open || self.archive_reader.open {
             return; // Modal UI owns input; simulation and Core funding continue.
         }
         if let ToggleView = command {

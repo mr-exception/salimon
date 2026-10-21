@@ -1304,3 +1304,35 @@ eligibility, absolute authored anchors, expiry, modal focus and all input routin
 to readable words without changing commands, ingredient precision or queue order.
 The [canonical UI matrix](../../docs/scout-presentation.md#scout-ui-readability-contract-466)
 records reticle invariants, scanner blockers and native acceptance separately.
+
+
+## Scout Archive (#467)
+
+The separate flush wall terminal at ship-local `[-3.0, 1.7, -4.13]` faces +Z,
+opposite the Fabricator. E opens within 2.5 m, aimed at the screen, inside the
+ship with bus power and a clear solid ray. Up/Down (also Left/Right/Tab) select
+records; E closes and Escape opens pause. Reading blocks movement/world actions,
+Q and H but keeps simulation running. Range/location/power loss, focus/lifecycle
+reset, pause, death and restore close the transient reader and clear held input.
+
+`session/archive.rs` owns seven fixed record identities, provenance, explicit
+unknown timestamps, retained sequence, per-run read identities and selection.
+Five intact departure/Mars/routine/exit records and two unreadable packets carry
+no coordinates, reconstructed claims or confirmed missing history. No recovery
+work, destination granting, backend or Hall UI is implemented. #468 owns future
+reconstruction states/progress; #469 owns player-known charting. Reader text uses
+the existing shared-font modal raster and input admission, never a new UI stack.
+
+Schema 6 requires an inner version-1 Archive payload. Validate known IDs,
+selection, bounded read set and no duplicates before transactional publication.
+Versions 1–5 explicitly initialize an unread Archive; no prior history is invented.
+Read/selection changes enter discrete checkpoint scheduling. Save/restore retains
+records but never modal/input state; a new run resets the Archive.
+
+Renderer `archive_terminal.rs` code-authors twelve immutable vertices for flush
+backing and screen in the existing ship-local opaque draw, with no new buffers,
+pipeline or authored GLB edits. It projects no additional collision volume into
+the existing cabin lane. The sixth 512x256 instrument atlas region shows Archive
+identity and E affordance, blanks with the bus and restores through the existing
+cache. This is a modest code-authored panel, not a Blender asset replacement.
+Native appearance/input/DPI/full-frame performance require separate evidence.

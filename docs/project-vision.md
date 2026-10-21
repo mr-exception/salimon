@@ -12,6 +12,12 @@ Native builds target macOS, Windows and Debian-based Linux; macOS remains the
 reference playable/performance target. Web/WASM portability, backend persistence
 and networking are future capabilities. See [Project Phases](project-phases.md).
 
+## Approved future opening and narrative direction (2026-10-21)
+
+The updated narrative begins with the traveler **waking outside a landed Scout on an unknown alien world**, with lost autobiographical memories but retained ship-operating skills and the knowledge that **Earth is home**. Earth's location/Solar System route is *not* known to the traveler and must be discovered and charted; seeking Earth and seeking Absenat are two independent, non-mandatory goals. Intact Earth-departure, Mars and Solar System exit logs precede recovered distress and warning leads. Whether the traveler actually entered an alleged wormhole is intentionally unknown. See [full narrative](narrative-and-lost-journey.md) and [Archive/navigation](archive-recovery-and-navigation.md).
+
+The future Absenat gate opens onto the cosmic boundary between successive universes and a monumental endless-ring Hall with player inscriptions. The Hall is future **backend-only shared endgame** and has an absolute no-spoilers-before-first-completion rule; see [Absenat contract](absenat-and-hall.md). This paragraph is design, **not current implementation**. The previous Earth-start/Mars-first-quest bullets below are historical and superseded for the future starting scenario.
+
 ## Narrative premise
 An unknown entity teleports an object to Earth every 18 hours. Humanity calls it **the Core**: a battery capable of storing extremely large amounts of electrical energy for effectively unlimited time, solving Earth's energy crisis.
 Whenever a Core appears, the entity leaves the same message:
@@ -45,7 +51,7 @@ Salimon should differentiate itself through the combination of:
 - a custom low-level runtime with no full game engine, optimized for native desktop delivery while preserving future web/WASM portability.
 ## Development principle
 The project is delivered through **small, reachable phases**. Each phase must produce a player-visible result, remain narrow enough for autonomous AI implementation and validation, and preserve the long-term architecture rather than creating disposable prototypes.
-## Confirmed story and progression decisions
+## Historical story and progression decisions (superseded where noted above)
 - Every new run begins on **Earth**.
 - The player boards their spaceship and begins the story from there.
 - The first planned main quest sends the player toward **Mars** to investigate an anomaly.

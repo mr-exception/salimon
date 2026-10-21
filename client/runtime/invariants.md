@@ -463,3 +463,13 @@ Engine switch #493: B is an initial admitted powered-cockpit action. Paused,
 wheel/crafting, terminal, non-pilot and active assist gates cannot toggle it.
 Save migration never changes velocity/energy or grants cargo. Renderer/audio
 observe the explicit switch, not merely selected zero throttle.
+
+
+Portable verification (#375) must validate the complete save source, not infer
+restoration from matching HUDs. Rejected restores and failed publication cannot
+publish candidate gameplay or acknowledge a successful exit. A complete write
+followed by an IO error may be recovered on the next launch, but cannot have
+reported success in the failed host. Offline comparisons permit only fatigue and
+its receipt/watermark to change; effects, power, crafting and motion freeze.
+Test-only checkpoint/reload operations never enter the live automation protocol.
+See [scenario isolation and commands](../../scenarios/portable/README.md).

@@ -171,3 +171,20 @@ Engine #493: `cargo test -p salimon-ship --locked` plus workspace tests/build/
 Clippy/fmt. `inertial-flight.json` and `landing-speed-cutoff.json` now exercise
 1000/500 m/s² dry thrust, coast/braking and the unchanged 20m/s landing limit.
 Physical B input, handling and instrument appearance need #498 reference evidence.
+
+## Portable persistence and survival (#375)
+
+`cargo test --workspace --locked` includes the bounded whole-session disk/launch,
+checkpoint worker failure, death/restart and survival scenario contracts. For
+focused iteration: `cargo test -p salimon-client --locked persistence_scenario`.
+The [portable DSL and operation reference](../scenarios/portable/README.md) adds
+checkpoint/reload/continuation actions to existing production protocol requests.
+All paths use isolated temporary storage, never the player's active save.
+
+Run `cargo test -p salimon-client --locked persistence_extended -- --ignored` for
+the 500-fragment whole-session continuation and full eighteen-hour 16/33/100 ms
+survival partition matrix. Nightly verification runs this exact filter in its
+Rust step and retains the raw output with periodic artifacts. Do not replace it
+with an unrestricted `--ignored`, which also selects unrelated opt-in GPU tests.
+See the [coverage/results report](../reports/issue-375/README.md); reference M1,
+OS input and physical route acceptance remain #348/#376/#496/#498 as applicable.

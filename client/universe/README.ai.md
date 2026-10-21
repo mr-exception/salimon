@@ -1,0 +1,12 @@
+# Universe schema maintenance
+
+Read the active issue, root [AGENTS.md](../../AGENTS.md), this crate's
+[architecture](architecture.md) and [invariants](invariants.md) before editing.
+`identity.rs` owns stable source IDs; `records.rs` owns public input DTOs;
+`validation.rs` validates publication; `lib.rs` exposes immutable catalog access.
+
+Preserve the independent schema-1 fixture, missing/uncertain source distinctions
+and existing playable world's IDs. Extend versioned wire contracts deliberately;
+no runtime/renderer coupling, new scientific assumptions, migration, data import
+or world evaluation is implied by a schema change. Run the architecture's checks
+and update affected docs/report in the same PR.

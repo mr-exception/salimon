@@ -292,3 +292,13 @@ Persistence: `session/persistence.rs` and schema-6 save envelope. Native keys:
 Geometry: renderer `archive_terminal.rs`; label: `cockpit_instruments.rs`; shader:
 `ship_mesh.wgsl`. Contract: [runtime](../client/runtime/architecture.md#scout-archive-467).
 Run workspace build/tests/fmt/Clippy; retain native visual/input limits separately.
+
+## Canonical universe schema (#402)
+
+`client/universe/src/{identity,records,validation,lib}.rs` owns U01; its
+[architecture](../client/universe/architecture.md) and
+[invariants](../client/universe/invariants.md) define the immutable contract.
+Tests: `client/universe/src/tests.rs`, frozen `fixtures/schema-v1.json`.
+Run `cargo test -p salimon-universe --locked` and workspace gates. U02 frames,
+U04 binary storage, U06–U12 data/build and U05 save binding are future consumers;
+no existing world IDs or render/native boundaries are changed.

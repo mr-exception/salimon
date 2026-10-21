@@ -1,5 +1,7 @@
 # Phase 0 — Technical Feasibility Showcase
 
+> **Historical reference only:** Earth-start and compressed Solar System acceptance criteria below describe the original Phase 0 showcase, not the approved new-game design. Future gameplay starts outside the Scout on an unknown alien planet. See [narrative canon](narrative-and-lost-journey.md).
+
 > **Scope status:** This document defines the Phase 0 navigation baseline. Its
 > exclusions do not describe the current post-baseline prototype: mining,
 > physical fragments, carrying and EVA are now implemented. Its direct-speed,

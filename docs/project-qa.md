@@ -21,36 +21,25 @@ validation fixture is intended or whether the requirement should use existing
 lighting. [#451](https://github.com/mr-exception/salimon/issues/451) owns the
 remaining native condition and evidence; no dark-cabin pass is claimed.
 
-### What budget should complete active 500-piece M1 signoff (#255)?
+### What budget should complete legacy active 500-piece M1 signoff (#479)?
 
-[The latest native evidence](../reports/issue-255/2026-10-17-remediation/README.md)
-removes the measured redundant physics work but retains an admitted active-only
-frame p95 of 24.416 ms and physics p95 of 5.741 ms. These exceed the existing
-17.5 ms settled cadence guidance and provisional 5 ms physics partition; neither
-limit is changed by the remediation. The benchmark guide requires an explicitly
-reviewed active budget, which has not yet been approved.
-Matched empty launch prefixes have frame p95 23.897 ms, so the long settled
-reference and short naturally moving launch window also have different cadence
-coverage. Six whole-window CPU-render relative comparisons still fail their
-existing 20% check; the report retains these failures separately from absolute
-component guidance.
+The [2026-10-21 native evidence](../reports/issue-255/2026-10-21/README.md)
+retains 150 completed moving intervals across ten fresh drops: frame p95
+23.446 ms, physics p95 5.932 ms, no intervals over 50 ms and a 1.064 ratio to
+matched empty launch prefixes. All numerical checks in the existing
+[#288 proposal](../reports/issue-288/README.md) pass; its status remains
+`proposed_pending_owner_review`. Requesting a proposal did not approve its limits.
+The active results still exceed settled 17.5 ms guidance and the provisional
+5 ms physics partition; neither is silently replaced.
 
-Decide whether signoff must satisfy those existing reference values after further
-profiling, or whether a separately justified active/launch-period budget should
-be reviewed using matched empty-launch evidence. Track that decision and the
-remaining measurements from [#255](https://github.com/mr-exception/salimon/issues/255)
-in linked follow-up issues when delivering its PR; a faster solver alone is not
-active cadence acceptance, and source-issue closure does not grant signoff.
-
-On 2026-10-17 the owner requested a separately justified active-budget proposal
-for PR review. The [#288 proposal and reproducible evaluation](../reports/issue-288/README.md)
-provide that decision material. This request authorizes proposing thresholds;
-it does not approve them or waive the historical relative failures. Keep this
-question open until the owner reviews the proposal and remaining limitations.
-Fresh same-state settled comparisons also fail CPU-render p95 by 22.0–24.7%
-in all three pairs, while frame and physics relative checks pass. Different
-moving/sleeping proportions alone therefore do not explain the relative failure;
-its cause still needs attribution before unconditional signoff.
+Owner review must decide whether the proposed active/launch-period limits and
+remaining historical evidence justify acceptance or whether more profiling is
+required. Fresh exact historical binary pairs pass the 20% relative checks, but
+the six prior whole-window and three prior same-state CPU-render failures remain
+recorded failures without an attributed cause. [#479](https://github.com/mr-exception/salimon/issues/479)
+owns this decision and any required attribution after #255 delivery. Keep this
+question open until explicit review resolves it; source closure grants no signoff.
+Current-cap/mixed-sphere overload is independently tracked in #455.
 
 ### Where should dedicated physical storage go after the cargo-room removal?
 

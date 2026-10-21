@@ -15,7 +15,7 @@ The corpus covers cabin/exterior/glazing, seated and standing canopy/lower views
 ## Comparisons and defects
 
 - **Passed:** all 86 frozen-repeat comparisons, zero changed pixels, existing tolerance8/fraction0.001, no new masks. [Per-check results](temporal.json).
-- **Diagnostic only:** all 128 images match the original valid `a25fb874…` production corpus within existing comparison tolerances. [Inventory/results](review-sheets/inventory.json). This independently helped reject the intermediate cache-contaminated corpus, which differed in contact views. The original captures are not approved baselines.
+- **Diagnostic only:** all 128 images match the original valid `a25fb874…` production corpus within existing comparison tolerances. [Inventory/results](review-sheets/inventory.json.gz). This independently helped reject the intermediate cache-contaminated corpus, which differed in contact views. The original captures are not approved baselines.
 - **Passed comparator self-test:** injected persistent silhouette, material and layout defects each fail appearance comparison against a current candidate, while repeating the wrong image passes temporal comparison. [Results/diffs](injected/), [reproducer](inject_defects.py). This demonstrates the distinction between stability and appearance; it does not approve the reference image.
 - **Pending, not passed:** reviewed appearance comparison exits3, `human image/mask/tolerance approval pending`. [Status](appearance.json). No baseline images, metadata approval, masks or tolerances were promoted/relaxed. The pending `metal-option-a-v1` descriptor specifies scale1; actual candidate scale2 requires deliberate review in #477. Software-Vulkan approval is independent and unchanged.
 

@@ -15,6 +15,8 @@ mod pause;
 #[allow(dead_code)]
 pub(crate) mod persistence;
 #[cfg(test)]
+mod propulsion_tests;
+#[cfg(test)]
 mod starting_supplies_tests;
 #[cfg(test)]
 mod tests;
@@ -135,6 +137,7 @@ pub(crate) enum Command {
     Throttle(salimon_ship::ThrottleDirection, bool),
     Interact,
     Landing,
+    ToggleEngines,
     Select(crate::equipment::ToolbarSlot),
     GrabDrop(bool),
     Look(f64, f64),
@@ -656,6 +659,15 @@ impl GameplaySession {
                 self.interact();
                 if location != self.character.location() {
                     self.reset_presentation();
+                }
+            }
+            ToggleEngines => {
+                if self.admit_survival_action(Action::Pilot) && self.ship.toggle_engines() {
+                    self.feedback = Some(if self.ship.snapshot().engines_enabled {
+                        "Engines on"
+                    } else {
+                        "Engines off - coasting"
+                    });
                 }
             }
             Landing => {

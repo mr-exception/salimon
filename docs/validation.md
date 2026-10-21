@@ -166,3 +166,8 @@ DPI, prompt priority and full interaction walkthrough remain #376.
 
 Balance #384: `cargo test -p salimon-client survival_balance --locked`; the six
 scenarios also run in workspace PR CI. See [JSON reproduction and limits](survival-balance.md).
+
+Engine #493: `cargo test -p salimon-ship --locked` plus workspace tests/build/
+Clippy/fmt. `inertial-flight.json` and `landing-speed-cutoff.json` now exercise
+1000/500 m/s² dry thrust, coast/braking and the unchanged 20m/s landing limit.
+Physical B input, handling and instrument appearance need #498 reference evidence.

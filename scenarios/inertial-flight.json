@@ -105,7 +105,7 @@
     {"action": {"op": "thruster", "direction": 1}},
     {"action": {"op": "thruster", "direction": 1}},
     {"action": {"op": "step", "frames": 100}},
-    {"assert": {"path": "ship.velocity_meters_per_second.0", "approx": 160, "tolerance": 1e-07}},
+    {"assert": {"path": "ship.velocity_meters_per_second.0", "approx": 1696, "tolerance": 1e-07}},
     {"action": {"op": "thruster", "direction": -1}},
     {"action": {"op": "thruster", "direction": -1}},
     {"action": {"op": "thruster", "direction": -1}},
@@ -207,7 +207,7 @@
     {"action": {"op": "thruster", "direction": -1}},
     {"action": {"op": "thruster", "direction": -1}},
     {"action": {"op": "step", "frames": 100}},
-    {"assert": {"path": "ship.speed_meters_per_second", "approx": 160, "tolerance": 1e-07}},
+    {"assert": {"path": "ship.speed_meters_per_second", "approx": 1696, "tolerance": 1e-07}},
     {"action": {"op": "thruster", "direction": -1}},
     {"action": {"op": "thruster", "direction": -1}},
     {"action": {"op": "thruster", "direction": -1}},
@@ -308,11 +308,11 @@
     {"action": {"op": "thruster", "direction": -1}},
     {"action": {"op": "thruster", "direction": -1}},
     {"action": {"op": "thruster", "direction": -1}},
-    {"action": {"op": "step", "frames": 500}},
+    {"action": {"op": "step", "frames": 212}},
     {"assert": {"path": "ship.speed_meters_per_second", "approx": 0, "tolerance": 1e-07}},
     {"assert": {"path": "ship.thruster_percentage", "equals": -100}},
     {"action": {"op": "step", "frames": 100}},
-    {"assert": {"path": "ship.velocity_meters_per_second.0", "approx": -32, "tolerance": 1e-07}},
+    {"assert": {"path": "ship.velocity_meters_per_second.0", "approx": -800, "tolerance": 1e-07}},
     {"action": {"op": "thruster", "direction": 1}},
     {"action": {"op": "thruster", "direction": 1}},
     {"action": {"op": "thruster", "direction": 1}},
@@ -416,7 +416,7 @@
     {"action": {"op": "key", "key": "left", "pressed": true}},
     {"action": {"op": "step", "frames": 100}},
     {"action": {"op": "key", "key": "left", "pressed": false}},
-    {"assert": {"path": "ship.velocity_meters_per_second.0", "approx": -32, "tolerance": 1e-07}},
+    {"assert": {"path": "ship.velocity_meters_per_second.0", "approx": -800, "tolerance": 1e-07}},
     {"assert": {"path": "ship.navigation.angle_degrees", "gt": 170}},
     {"action": {"op": "key", "key": "thruster_down", "pressed": true}},
     {"action": {"op": "step", "frames": 100}},
@@ -426,6 +426,6 @@
     {"assert": {"path": "ship.cockpit_control_active", "equals": false}},
     {"assert": {"path": "ship.thruster_percentage", "equals": -17}},
     {"action": {"op": "step", "frames": 1}},
-    {"assert": {"path": "ship.speed_meters_per_second", "gt": 32}}
+    {"assert": {"path": "ship.speed_meters_per_second", "gt": 800}}
   ]
 }

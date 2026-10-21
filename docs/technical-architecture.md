@@ -412,7 +412,7 @@ Pause saves (#382) use the existing worker/store and verified receipts; see
 
 ## Future sub-light voyage, Core impulse and Spatial Jump Drive boundaries (2026-10-21)
 
-**Approved future design, not runtime implementation:** [canonical spatial Jump Drive and shared clock](jump-drive-and-interstellar-travel.md), and **engine-only issue [#493](https://github.com/mr-exception/salimon/issues/493)**. For current binaries continue to describe the existing 4 MN/2 MN thrust, 100 MW/50 MW draws and 60 GJ Core accurately until the engine PR actually merges.
+**Implemented engine / future Jump Drive:** #493 implements fictional 1 N·s/J from funded Core propulsion, 100/50 MW default draws, explicit engine on/off and schema 5. The Core remains 60 GJ. The [spatial Jump Drive and shared clock](jump-drive-and-interstellar-travel.md) remain future; native engine handling review is #498.
 
 - **Ship/Core portable domain:** switch the engine to **actually funded energy × 1 N·s/J = vector impulse**, applied through current total mass, orientation and exact substep power boundaries. Document and test the significant acceleration change; don't bill conventional kinetic-energy differences. **No change to deployed flight** is implied by this document.
 - **Future Jump Drive portable domain:** validate mass, finite direction and distance, N=20% initially, speed 0<=v<c, one-frame epoch and destination safety; energy = light_seconds * mass_kg * (N/100) * (c-v_mps) / kappa. Preserve real velocity and orientation. Refuse engine-on, including idle zero throttle, through a **new explicit propulsion switched-off authority bit**; reject incompatible assists and insufficient unreserved Core. Other speed regimes remain undecided and must not create negative/free jumps.

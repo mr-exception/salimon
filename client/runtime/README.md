@@ -129,8 +129,10 @@ events never cross the world boundary.
 
 While seated in the cockpit, W/S pitch, A yaws left, D yaws right, and
 Left/Right Arrow roll.
-Up/Down Arrow change direct-speed thruster power by one percentage point on each
-initial press. The current practical metric speed and percentage are published
+Up/Down Arrow select signed propulsion throttle by one percentage point on each
+initial press and every 100 ms held. B toggles explicit engine on/off while seated;
+off preserves throttle and momentum. Funded Core joules become impulse at 1 N·s/J.
+ The current practical metric speed and percentage are published
 on the physical cockpit screens through `ShipMeshInstance::instruments` on every
 gameplay frame, including while the player walks away from the seat. The port
 screen shows live stored/capacity Core energy; the starboard screen shows the
@@ -138,9 +140,9 @@ nearest body within 3 Mm, its surface distance, and approaching/receding/zero
 radial speed, or a clear out-of-range state. Mouse look
 remains independent and never steers or recenters the ship. Leaving with E clears
 held steering but preserves heading, thruster, and autonomous forward motion.
-The speed screen preserves the ship snapshot's direct-speed reading. Separate
+The speed screen displays the ship snapshot's actual inertial speed. Separate
 snapshot velocity keeps nearby radial telemetry accurate during assisted landing
-and takeoff without redefining the direct-speed field.
+and takeoff without changing velocity authority.
 
 While controlling the cockpit, L starts assisted landing whenever the ship is
 inside a solid body's `1.15R` volume. When landed, the same key starts takeoff;

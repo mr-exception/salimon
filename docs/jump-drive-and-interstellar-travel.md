@@ -1,6 +1,11 @@
 # Spatial Jump Drive, sub-light travel and shared-time propulsion
 
-Status: **approved future gameplay design, documentation only (2026-10-21); not implemented**. This is the authoritative contract for the travel decisions reached after the [universe expansion design](universe-expansion-approved-design.md). It supersedes that document's former blanket no-warp/FTL and future velocity-dependent relativity assumptions **for the Jump Drive only**. The existing compressed-world ship flight, Core, Fabricator and saves are not retroactively changed. [Engine implementation issue #493](https://github.com/mr-exception/salimon/issues/493) is separate; Jump Drive implementation is not authorized by this documentation PR.
+Status: **Jump Drive/shared-time travel remains approved future design, not implemented**.
+The ordinary funded-impulse engine law is implemented by #493 in this revision;
+it does not deliver the Jump Drive, Fabricator module or universe clock. This
+contract supersedes former blanket no-warp/FTL and future velocity-dependent
+relativity assumptions for the Jump Drive. Current compressed-world/offline
+simulation otherwise retains its existing owners.
 
 ## Experience, journey duration and shared time
 
@@ -10,15 +15,22 @@ Status: **approved future gameplay design, documentation only (2026-10-21); not 
 - Engine upgrades may improve thrust and energy-to-impulse conversion without an arbitrary conventional engine speed-cap per module. Whether **ordinary continuous thrusters themselves** may deliberately reach/exceed light speed is **not finally decided by this contract**; the approved extraordinary-distance mechanism is the Jump Drive. Avoid presenting existing Newtonian numerical superluminal limitations as a validated physical propulsion feature. Do not simulate relativistic proper-time differences.
 - The intended progression is exploration across the galaxy during an approximately **six-month to one-year full playthrough** for a dedicated progressing player, without making routine travel require constant grinding. This is a design target needing quantitative end-to-end balance, **not a guarantee** under the current Core and energy figures.
 
-## Core-powered thruster impulse — approved future engine contract
+## Core-powered thruster impulse — implemented engine law (#493)
 
 The Core directly converts funded electrical joules into impulse. **A joule is energy, not a newton of force.** The agreed baseline is an explicitly fictional conversion coefficient:
 
 - kappa = **1 newton-second per joule (1 N·s/J)**; therefore 1 kJ of actually funded propulsion energy gives 1,000 N·s impulse.
 - Funded energy E (J) yields impulse J = kappa * E (N·s); the change of velocity along the selected thrust axis is delta-v = J / current_ship_mass_kg (m/s). For a continuous powered interval dt with power P (W): force F = kappa * P (N), acceleration a = F / m, and consumed energy E = P * dt. Only **actually funded propulsion energy** may generate impulse.
 - Keep separate forward and reverse throttle/power budgets, ship-relative thrust direction, world-frame persistent velocity, manual braking, zero-throttle coasting, ship-mass ledger, exact energy-boundary splitting, and no independently billed kinetic-energy delta. Future upgrades can change kappa or permitted power without inventing reaction-mass tanks.
-- Test fixture: at m=100,000 kg and kappa=1, +10 km/s requires 1 GJ impulse energy regardless of existing inertial speed. Existing starter 100 MW forward / 50 MW reverse power would produce 100 MN / 50 MN and 1,000 / 500 m/s² for 100 t if the future contract were implemented; these differ **25x** from today's implemented 4 MN / 2 MN. Revisit assists, collision risk, controls and telemetry, not just a number in a document.
-- **Implementation status:** the current game still uses force capacity 4 MN / 2 MN, draws 100 MW / 50 MW, and has a 60 GJ Core. Those are existing behaviors, not an assertion that issue #493 is already shipped. Issue #493 owns the engine migration and test reconciliation.
+- Test fixture: at m=100,000 kg and kappa=1, +10 km/s requires 1 GJ propulsion
+  energy regardless of existing speed. Default 100/50 MW now produces 100/50 MN
+  and 1000/500 m/s², 25× historical force tuning. Separate service draw still
+  consumes Core energy. Captured assists remain conservative kinematic paths,
+  ending at rest/throttle zero; landing remains <=20 m/s.
+- **Implementation status:** #493 implements exact funded impulse, explicit B
+  engine switch and schema-5 migration. Core remains 60 GJ/45 GJ initially.
+  Native handling/control/instrument approval remains #498; Jump Drive is future.
+
 
 ## Reusable Spatial Jump Drive
 
@@ -89,7 +101,7 @@ The current **60 GJ** starter Core cannot fund even **one whole light-second** a
 
 ## Implementation and test boundaries
 
-- **Issue #493:** implement and verify the direct joule-to-impulse engine change; update currently implemented flight tests/contracts only when code actually changes. It does **not** implement Jump Drive.
+- **Issue #493:** implements the direct joule-to-impulse engine change and reconciled flight tests/contracts in this revision; native review remains #498. It does **not** implement Jump Drive.
 - A **separate future implementation plan/issues** must cover physical Jump Drive and Fabricator components/upgrades, Core transactions, ship interlock, six-field panel/validation, destination safety, quantum staging and native verification, save/restart, performance and multiplayer authority. This document and linked changes are **docs only**, not claims of shipping code.
 - Required model fixtures: 100 t, 0 km/s, N20%, D1 gives 5,995,849,160,000 J; 100 t, 100,000 km/s, N20%, D1 gives 3,995,849,160,000 J; double mass doubles cost; halve N halves cost; 60 light-seconds costs sixty times the 1-light-second quote; fractional distances scale linearly. Fuel equality must hold across batching and Core restoration. Test engines-on rejection (including throttle 0), no-charge rejection, unknown chart IDs, changing nearby bodies, save/close/reopen during loading, concurrent passengers, duplicate commands and preserved velocity.
 - **Remaining owner decisions** requiring explicit follow-up: safe departure zones/arrival clearance; handling when v>=c or approaching c; late-game realistic energy/capacity/efficiency economics for galaxy-scale progression; whether and how upgrades reduce N; how future upgrades fit physical machinery and Fabricator constraints; optional destination selection beyond a forward-vector jump; damage/interruption and multiplayer jump consensus; whether ordinary continuous thrust may deliberately exceed c. No implementation may invent these as if approved.

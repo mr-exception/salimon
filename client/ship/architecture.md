@@ -97,9 +97,11 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 ## Inertial propulsion (#201)
 
 Flying ships own persistent world-space f64 velocity independent of orientation.
-The starter dry hull is 100,000 kg; forward/reverse capacities are 4 MN/2 MN.
-`Propulsion` validates cached total mass and force capacities and computes signed
-local +X acceleration as force/mass. `set_propulsion` is an event-driven handoff
+The starter dry hull is 100,000 kg. `Propulsion` validates cached total mass and
+one fictional impulse coefficient, initially 1 N·s/J (#493). Forward/reverse
+power limits are 100/50 MW; only allocated propulsion joules generate signed
+local +X impulse, giving 1000/500 m/s² dry acceleration. No independent force
+capacity or kinetic-energy charge exists. `set_propulsion` is an event-driven handoff
 for E01 cargo composition, with no per-tick cargo scans. Constant
 acceleration uses v*dt + 0.5*a*dt² and v += a*dt. Zero throttle coasts, steering
 changes only future thrust direction, and no drag, speed cap or body gravity is
@@ -161,7 +163,7 @@ is idempotent; handling and storage do not add another identity. Installed
 components can use the same ledger; the current asset has no separately defined
 installed-equipment masses beyond dry hull. No inventory/container implementation
 or invented component weights is added. `reconciles` is an explicit diagnostic,
-not flight work. `set_total_mass_kg` preserves force capacities and velocity.
+not flight work. `set_total_mass_kg` preserves the impulse coefficient and velocity.
 
 World coalesces creation/growth, pickup, carried/loose pose changes and physical
 removal into an ordered mutation journal. `remove_fragment` is the future Core
@@ -289,7 +291,7 @@ heading/velocity angle, signed instantaneous engine acceleration and an explicit
 reverse-stop estimate. Free-flight power and cached total mass determine actual
 engine acceleration; assists/crash states report it unavailable. Static catalog
 bodies have zero velocity, so nearby total relative speed equals vector magnitude.
-Full reverse estimates use configured reverse force, mass and watts including idle
+Full reverse estimates use configured reverse watts, impulse coefficient and mass, with energy including idle
 loads. They require nose alignment within 1e-9 transverse unit-vector magnitude;
 misalignment, no power, non-flight and zero reverse force never claim a stop.
 Required energy is compared with unreserved fractional storage; future conversion
@@ -353,8 +355,41 @@ and committed assist progression. Runtime uses it for exhausted/terminal pilots.
 Ordinary `set_cockpit_control(false)` still preserves selected throttle. Recovery
 requires a new cockpit entry and fresh controls; no hidden thrust resumes.
 
-## Approved future Core-impulse flight and Jump Drive boundary (2026-10-21; NOT SHIPPED)
+## Funded Core impulse and engine switch (#493)
 
-The currently implemented 4 MN forward / 2 MN reverse thrust and 100 MW / 50 MW Core draw above remain the **current implementation**. The **future** [travel and Jump Drive contract](../../docs/jump-drive-and-interstellar-travel.md) and [engine change issue #493](https://github.com/mr-exception/salimon/issues/493) require exact impulse from actually funded propulsion energy: **1 N·s per 1 J** initially. Thus, if today's power limits were retained, full forward would become 100 MN at 100 MW, with 1,000 m/s² on a 100 t ship; reverse becomes 50 MN at 50 MW. Existing test fixtures, power-bounded substeps, assists, collision and handling must be deliberately retuned/tested at implementation, not relabeled as already complete. No separate kinetic-energy formula or arbitrary per-engine velocity cap belongs to this new rule.
+The engine change is implemented in this revision. For each power-funded segment,
+`E_propulsion = requested_propulsion_watts * funded_seconds`; only that share of
+ordinary-bus allocation creates `signed_delta_v = kappa * E_propulsion / mass`.
+Idle, cockpit, Fabricator and assist reservations never create free-flight impulse.
+Powered displacement uses `v*dt + delta_v*dt/2`; unpowered remainder coasts. The
+same forward/reverse configured watt limits determine instantaneous acceleration
+and braking. Numerical coefficient validation admits finite 0..=1000 N·s/J so
+extreme finite energy divided by the dry hull mass cannot overflow; this is not
+a speed cap or an implemented upgrade progression. The default remains exactly 1.
 
-Future Jump Drive is a separate ship module powered by the same authoritative Core. It computes a virtual delta-v = 0.20 * (c - pre_jump_speed) **per light-second** (c=299,792,458 m/s) and quotes total cost = distance_light_seconds * mass_kg * virtual_delta_v_mps / (1 N·s/J). It translates the entire ship along its current forward direction while retaining **actual** world-frame position-independent velocity and orientation; no direct boost, braking or clock manipulation. **Reject while propulsion engines are switched on**, even at zero throttle. The current selected signed throttle is **not** a full on/off switch; a separate powered-off propulsion state and explicit restart rules are future implementation requirements. Above/equal light speed is currently an explicit refused/undecided case to avoid zero/negative costs; destination safety, quantum loading staging and crash-safe Core debit belong to future Jump Drive work, not issue #493. Future offline ships coast on one shared 1:1 clock; they do not jump automatically.
+Held throttle repeats split at their true 100ms boundaries, billing the preceding
+selection before changing it. Conversion completion, depleted-bus intervals and
+assist completion preserve existing funding splits. Orientation at the admitted
+substep directs only new impulse. Inertia, mass accounting, steering and swept
+collision remain production authorities.
+
+The dry-hull change is 25× legacy 4/2 MN: 100/50 MN at 100/50 MW, or 1000/500 m/s².
+Landing eligibility stays <=20 m/s. Takeoff still eases 50 m over six seconds,
+peaks at 15 m/s and 15 m/s², and hands off at rest with throttle zero. Isolated
+600/800/1200 MJ assist reservations remain conservative kinematic power-time
+budgets, not a second free-flight impulse. Portable all-body/mass/energy/handoff
+and collision tests protect these choices; native handling acceptance is #498.
+
+B toggles the explicit `engines_enabled` switch with powered cockpit authority
+outside active assists/bounces. Off preserves selected throttle and velocity,
+zeros propulsion draw/acceleration and makes powered braking unavailable. Idle
+loads/steering remain electrical systems. Power restoration never turns an
+explicitly off engine on; switched-on selected throttle still resumes after
+blackout. An on engine at zero throttle remains distinct. Assistance activation
+requires the engine switch on; committed assists cannot be interrupted by B.
+
+Schema 5 persists the switch and coefficient; runtime migrates v1-v4 legacy
+force capacities to coefficient 1 and engine-on without changing energy, velocity
+or cargo source. Invalid/unknown/missing current-schema fields reject atomically.
+
+Future Jump Drive is a separate ship module powered by the same authoritative Core. It computes a virtual delta-v = 0.20 * (c - pre_jump_speed) **per light-second** (c=299,792,458 m/s) and quotes total cost = distance_light_seconds * mass_kg * virtual_delta_v_mps / (1 N·s/J). It translates the entire ship along its current forward direction while retaining **actual** world-frame position-independent velocity and orientation; no direct boost, braking or clock manipulation. **Reject while propulsion engines are switched on**, even at zero throttle. The implemented `engines_enabled` state supplies this distinction; the Jump Drive interlock itself remains future work. Above/equal light speed is currently an explicit refused/undecided case to avoid zero/negative costs; destination safety, quantum loading staging and crash-safe Core debit belong to future Jump Drive work, not issue #493. Future offline ships coast on one shared 1:1 clock; they do not jump automatically.

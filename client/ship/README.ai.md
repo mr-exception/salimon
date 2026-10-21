@@ -51,3 +51,7 @@ For approved flight/Core choices and historical supersession, follow the
 [owned review](../../docs/spaceship-building-and-survival.md#accepted-propulsion-and-core-review-2026-10-14).
 Future upgrade/module-load/inertial-cabin/orbit/manual-power features remain out
 of scope; do not interpret tuning setters as progression mechanics.
+
+#493 replaces independent force capacities with funded Core impulse. Read the
+[math/safety/switch contract](architecture.md#funded-core-impulse-and-engine-switch-493).
+Protect exact consumer allocation, throttle boundaries and engine-off persistence.

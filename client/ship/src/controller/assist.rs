@@ -161,7 +161,7 @@ impl ShipController {
     /// Performs the contextual `L` action. Automatic sequences deliberately do
     /// nothing here, making them uncancellable once started.
     pub fn trigger_landing_action(&mut self) {
-        if !self.cockpit_control_active || !self.energy_core.powered() {
+        if !self.cockpit_control_active || !self.energy_core.powered() || !self.engines_enabled {
             return;
         }
         self.clear_throttle_input();
@@ -1244,7 +1244,7 @@ mod safety_tests {
             assert!(ship.adjust_thruster(100));
             ship.advance(Duration::from_secs(1));
             let powered = ship.snapshot();
-            assert!((powered.speed_meters_per_second - 4_000_000.0 / mass).abs() < 1e-9);
+            assert!((powered.speed_meters_per_second - 100_000_000.0 / mass).abs() < 1e-9);
             assert_eq!(
                 before.energy_core.stored_joules - powered.energy_core.stored_joules,
                 100_110_000

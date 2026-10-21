@@ -56,7 +56,7 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 
 20. Flying velocity is authoritative world-space f64 momentum; orientation and
     cockpit authority never reset it. Zero throttle coasts without drag or a cap.
-21. Validated cached mass/force inputs determine acceleration; speed telemetry is
+21. Validated cached mass and funded propulsion joules determine impulse; speed telemetry is
     the actual velocity magnitude, including captured assist paths.
 
 22. Up/Down presses change one signed percentage point immediately and repeat
@@ -75,7 +75,7 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 
 25. Physical cargo mass is cached by stable identity exactly once regardless of
     carrying/storage. Invalid/zero masses are rejected transactionally. Mass
-    changes preserve velocity and thrust capacities; empty cargo restores exact dry
+    changes preserve velocity and impulse coefficient; empty cargo restores exact dry
     mass and finite residuals survive replacement/removal. Validation reconciliation
     never runs in flight updates.
 
@@ -171,9 +171,9 @@ heading/velocity angle, signed instantaneous engine acceleration and an explicit
 reverse-stop estimate. Free-flight power and cached total mass determine actual
 engine acceleration; assists/crash states report it unavailable. Static catalog
 bodies have zero velocity, so nearby total relative speed equals vector magnitude.
-Full reverse estimates use configured reverse force, mass and watts including idle
+Full reverse estimates use configured reverse power, impulse coefficient and mass, with energy including idle
 loads. They require nose alignment within 1e-9 transverse unit-vector magnitude;
-misalignment, no power, non-flight and zero reverse force never claim a stop.
+misalignment, no power, non-flight, engine-off and zero reverse power/coefficient never claim a stop.
 Required energy is compared with unreserved fractional storage; future conversion
 is not credited. Estimates assume unchanged heading/mass and collision-free travel,
 and never command steering or braking.
@@ -241,3 +241,13 @@ See [approved travel design](../../docs/jump-drive-and-interstellar-travel.md) a
 Future engine: funded propulsion energy in joules yields impulse with baseline conversion **1 N·s/J**; projected delta-v equals vector impulse / ship mass; coasting consumes zero propulsion joules, and depleted Core yields zero new engine impulse. Upgrade/tuning and exact split-step tests must preserve energy/mass/velocity authority.
 
 Future Jump Drive: retain one shared time clock, no velocity-dependent time dilation; owner-only command; explicitly switched-**off** engines (even zero throttle while switched on rejects), no active assists, initial **N=20%**, valid 0<=speed<c, charge = D_light_seconds * mass_kg * 0.20*(c-speed_mps)/(1 N·s/J); no zero-distance jump. Validate region safety/charge and apply exactly once. The quantum loading transition does not advance fictitious travel time; entire ship/passengers/cargo translate along forward axis while world-frame velocity/orientation are preserved. Do not auto-jump offline or expose undiscovered chart positions; at/above-c behavior, safe departure zones and progression economics require further approval.
+
+## Funded-impulse propulsion (#493)
+
+Only ordinary-bus propulsion joules generate impulse at default 1 N·s/J. Service,
+Fabricator and reserved assist joules are excluded. No independent force capacity
+or kinetic-energy debit; zero funding gives zero impulse. Engine-off is durable
+and distinct from zero throttle; restoration/refueling cannot enable it. B and
+assist activation share powered cockpit gates; committed paths stay uncancellable.
+Throttle repeat boundaries bill the previous selection for its actual interval.
+See the [current math/safety contract](architecture.md#funded-core-impulse-and-engine-switch-493).

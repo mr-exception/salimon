@@ -458,3 +458,8 @@ order is independent of prompt order. Skip/progress never grant items, alter
 meters, capture movement or change clocks. New runs start fresh; restore preserves
 progress and skip. Native admission rejects repeat/synthetic/unfocused keys.
 Existing interaction feedback and modal/status overlays take priority over guidance.
+
+Engine switch #493: B is an initial admitted powered-cockpit action. Paused,
+wheel/crafting, terminal, non-pilot and active assist gates cannot toggle it.
+Save migration never changes velocity/energy or grants cargo. Renderer/audio
+observe the explicit switch, not merely selected zero throttle.

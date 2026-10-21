@@ -200,3 +200,7 @@ requires retry/cancel/explicit risk exit. See [contract](architecture.md#pause-c
 Tutorial #380 lives in `session/tutorial.rs`; record progress only at successful
 action boundaries. It is durable per-run state, not UI cache. T skips; native
 reference review remains #376. See the onboarding section in architecture.md.
+
+Engine #493: B input uses `Command::ToggleEngines` and ship-owned authority;
+`session/persistence.rs` migrates v1-v4 force records to schema 5. Keep visual/audio
+feedback conditional on explicit engine state, with native review #498.

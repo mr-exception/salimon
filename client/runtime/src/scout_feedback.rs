@@ -14,6 +14,7 @@ pub(crate) fn capture(session: &GameplaySession, ship: ShipSnapshot) -> Machiner
             0.
         },
         thrust: if powered
+            && ship.engines_enabled
             && ship
                 .navigation
                 .acceleration_meters_per_second_squared

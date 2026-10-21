@@ -29,3 +29,7 @@ bytes; storage does not interpret gameplay JSON. See the canonical
 
 #380 advances captures to schema 4 for per-run tutorial progress/skip. Runtime
 explicitly migrates versions 1–3 dismissed; missing schema-4 source rejects.
+
+#493 advances captures to schema 5 for explicit engine on/off and the fictional
+impulse coefficient. Runtime migrates v1-v4 force records without a simulation
+tick; see the current canonical save contract.

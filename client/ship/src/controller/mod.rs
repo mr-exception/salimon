@@ -31,6 +31,7 @@ pub struct ShipController {
     door_open_fraction: f64,
     cockpit_control_active: bool,
     pub(crate) thruster_percentage: i8,
+    engines_enabled: bool,
     #[serde(skip)]
     throttle_input: throttle::HeldThrottle,
     energy_core: crate::EnergyCore,
@@ -73,6 +74,7 @@ impl Default for ShipController {
             cockpit_control_active: false,
             throttle_input: throttle::HeldThrottle::default(),
             thruster_percentage: 0,
+            engines_enabled: true,
             energy_core: crate::EnergyCore::default(),
             fabricator_watts: 0.0,
             fabricator_powered_seconds: 0.0,
@@ -102,6 +104,7 @@ impl ShipController {
             cockpit_control_active: true,
             throttle_input: throttle::HeldThrottle::default(),
             thruster_percentage: thruster_percentage.clamp(-100, 100),
+            engines_enabled: true,
             energy_core: crate::EnergyCore::default(),
             fabricator_watts: 0.0,
             fabricator_powered_seconds: 0.0,
@@ -180,6 +183,14 @@ impl ShipController {
         if !incoming_joules.is_finite() || incoming_joules < 0.0 {
             return Err(crate::InvalidEnergy);
         }
+        if let Some(boundary) = self.throttle_boundary()
+            && !boundary.is_zero()
+            && delta > boundary
+        {
+            let first_input = incoming_joules * (boundary.as_secs_f64() / delta.as_secs_f64());
+            self.advance_with_core_input(boundary, first_input)?;
+            return self.advance_with_core_input(delta - boundary, incoming_joules - first_input);
+        }
         if let Some(remaining) = self.assist_remaining()
             && delta > remaining
             && !remaining.is_zero()
@@ -190,10 +201,14 @@ impl ShipController {
             return self.advance_with_core_input(delta - remaining, incoming_joules - first_input);
         }
         self.advance_door(delta);
-        self.advance_throttle(delta);
+        let effective_throttle = self.effective_throttle();
+        let propulsion_watts = self
+            .energy_core
+            .config()
+            .propulsion_watts(effective_throttle, self.flight_state == FlightState::Flying);
         let powered_seconds = self.energy_core.advance_with_load(
             delta,
-            self.thruster_percentage,
+            effective_throttle,
             self.flight_state == FlightState::Flying,
             incoming_joules,
             self.fabricator_watts,
@@ -209,13 +224,40 @@ impl ShipController {
         }
         self.settle_assist_energy(delta);
         match self.flight_state {
-            FlightState::Flying => self.advance_powered_flight(delta, powered_seconds),
+            FlightState::Flying => self.advance_powered_flight(
+                delta,
+                powered_seconds,
+                propulsion_watts * powered_seconds * f64::from(effective_throttle.signum()),
+            ),
             FlightState::AssistedLanding { body } => self.advance_landing(body, delta),
             FlightState::AssistedTakeoff { body } => self.advance_takeoff(body, delta),
             FlightState::Bouncing { body } => self.advance_bounce(body, delta),
             FlightState::Landed { .. } | FlightState::GroundedAfterCrash { .. } => {}
         }
+        self.advance_throttle(delta);
         Ok(())
+    }
+
+    pub(super) fn effective_throttle(&self) -> i8 {
+        if self.engines_enabled {
+            self.thruster_percentage
+        } else {
+            0
+        }
+    }
+    /// Explicit engine switch; zero selected throttle is still engine-on.
+    pub fn toggle_engines(&mut self) -> bool {
+        if !self.cockpit_control_active
+            || !self.energy_core.powered()
+            || self.assist.is_some()
+            || matches!(self.flight_state, FlightState::Bouncing { .. })
+        {
+            return false;
+        }
+        self.engines_enabled = !self.engines_enabled;
+        self.cockpit_message = None;
+        self.clear_throttle_input();
+        true
     }
 
     #[must_use]
@@ -228,6 +270,7 @@ impl ShipController {
             door_open_fraction: self.door_open_fraction,
             cockpit_control_active: self.cockpit_control_active,
             thruster_percentage: self.thruster_percentage,
+            engines_enabled: self.engines_enabled,
             total_mass_kg: self.propulsion.total_mass_kg(),
             speed_meters_per_second: self.speed_meters_per_second(),
             velocity_meters_per_second,
@@ -271,3 +314,6 @@ mod tests {
         );
     }
 }
+
+#[cfg(test)]
+mod impulse_tests;

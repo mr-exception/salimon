@@ -90,10 +90,10 @@ fn schema_one_migrates_only_missing_survival_and_schema_two_requires_complete_st
             .is_err()
     );
     assert!(original == restored.save_bytes(10).unwrap());
-    v["schema_version"] = json!(5);
+    v["schema_version"] = json!(6);
     assert!(matches!(
         restored.restore_bytes(&serde_json::to_vec(&v).unwrap()),
-        Err(SaveError::UnsupportedVersion(5))
+        Err(SaveError::UnsupportedVersion(6))
     ));
 }
 #[test]

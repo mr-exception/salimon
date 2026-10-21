@@ -62,6 +62,14 @@ impl ShipController {
         self.throttle_input = HeldThrottle::default();
     }
 
+    pub(super) fn throttle_boundary(&self) -> Option<Duration> {
+        let up = self.throttle_input.up && !self.throttle_input.down;
+        let down = self.throttle_input.down && !self.throttle_input.up;
+        (self.can_adjust_thruster()
+            && ((up && self.thruster_percentage < 100)
+                || (down && self.thruster_percentage > -100)))
+            .then(|| THROTTLE_REPEAT_INTERVAL.saturating_sub(self.throttle_input.elapsed))
+    }
     pub(super) fn advance_throttle(&mut self, delta: Duration) {
         if !self.can_adjust_thruster() {
             self.clear_throttle_input();
@@ -101,7 +109,7 @@ mod tests {
         ship.adjust_thruster(-127);
         assert_eq!(ship.snapshot().thruster_percentage, -100);
         ship.advance(Duration::from_secs(1));
-        assert_eq!(ship.velocity_meters_per_second(), [-20.0, 0.0, 0.0]);
+        assert_eq!(ship.velocity_meters_per_second(), [-500.0, 0.0, 0.0]);
         ship.adjust_thruster(127);
         ship.adjust_thruster(127);
         assert_eq!(ship.snapshot().thruster_percentage, 100);

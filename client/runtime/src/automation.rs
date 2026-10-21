@@ -533,6 +533,7 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "consumable_wheel" => Some(KeyCode::KeyQ),
         "wheel_next" => Some(KeyCode::Tab),
         "wheel_confirm" => Some(KeyCode::Enter),
+        "engines" => Some(KeyCode::KeyB),
         "pause" => Some(KeyCode::Escape),
         "status" => Some(KeyCode::KeyH),
         "skip_tutorial" => Some(KeyCode::KeyT),
@@ -778,6 +779,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
             "fragment_mass_kg": app.mining.session.fragments().iter().map(|piece| piece.material().mass_kg()).sum::<f64>(),
             "nearest_deposit": nearest_deposit, "resource_types": resource_types, "deposits": deposits, "deposits_by_id": deposits_by_id, "deposit_query_error": deposit_error, "bodies": bodies, "camera_phase": format!("{:?}", app.camera_phase())}
     });
+    observation["ship"]["engines_enabled"] = ship.engines_enabled.into();
     observation["tutorial"] = json!({"state":app.tutorial,"prompt":app.tutorial.text()});
     observation
 }

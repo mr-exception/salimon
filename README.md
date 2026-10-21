@@ -135,6 +135,9 @@ Gameplay **1–5** selects one of five equipment slots (slot 1: mining tool;
 slots 2–5: empty). Pickup clears selection; carrying blocks selection, and
 dropping leaves it deselected until you explicitly press **1–5** again.
 The toolbar appears at bottom center with no initial selection.
+While seated, **B** toggles engines; off coasts and preserves selected throttle.
+Default funded propulsion is 1 N·s/J: 1000/500 m/s² dry at 100/50 MW.
+
 Brand-new runs start with two food rations, one medkit and Fabricator reserves
 for one more ration. Saves retain spent supplies; restarting after death grants
 the new run its supplies once. See the [supply contract](docs/save-contract.md#starting-supplies-379).

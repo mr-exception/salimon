@@ -96,7 +96,10 @@ impl Observation {
             powered: state.ship.power_available,
             conversion: state.ship.core_status.conversion_watts > 0.0,
             fabrication: state.ship.core_status.fabricator_watts > 0.0,
-            thrust: if state.ship.power_available {
+            thrust: if state.ship.power_available
+                && state.ship.engines_enabled
+                && state.ship.flight_state == salimon_ship::FlightState::Flying
+            {
                 f64::from(state.ship.thruster_percentage).abs() / 100.0
             } else {
                 0.0

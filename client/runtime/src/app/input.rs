@@ -238,6 +238,8 @@ pub(crate) fn dispatch_session_key(
         Some(Command::InspectVitals)
     } else if key == PhysicalKey::Code(KeyCode::KeyE) {
         Some(Command::Interact)
+    } else if key == PhysicalKey::Code(KeyCode::KeyB) {
+        Some(Command::ToggleEngines)
     } else if key == PhysicalKey::Code(KeyCode::KeyL) {
         Some(Command::Landing)
     } else if let Some(camera) = camera_command(ElementState::Pressed, false, key, false) {
@@ -520,5 +522,44 @@ mod wheel_input_tests {
             assert!(!policy.admits_key(InputSource::Native, q, true, false, false));
             assert!(policy.admits_key(InputSource::Native, q, false, false, false));
         }
+    }
+}
+
+#[cfg(test)]
+mod engine_tests {
+    #[test]
+    fn native_press_admission_and_modals_gate_engine_toggles() {
+        use super::*;
+        use crate::session::{Command, consumable_wheel};
+        use winit::keyboard::{KeyCode, PhysicalKey};
+        let mut s = crate::session::GameplaySession::new_run();
+        s.character.enter_cockpit();
+        s.ship = salimon_ship::ShipController::flying(s.ship.snapshot().pose, 70);
+        let key = PhysicalKey::Code(KeyCode::KeyB);
+        let policy = InputPolicy {
+            gameplay: true,
+            captured: true,
+            focused: true,
+            occluded: false,
+        };
+        for (repeat, synthetic) in [(false, false), (true, false), (false, true)] {
+            if policy.admits_key(InputSource::Native, key, true, repeat, synthetic) {
+                dispatch_session_key(&mut s, key, true);
+            }
+        }
+        assert!(!s.ship.snapshot().engines_enabled);
+        s.command(Command::TogglePause);
+        s.command(Command::ToggleEngines);
+        assert!(!s.ship.snapshot().engines_enabled);
+        s.command(Command::TogglePause);
+        s.command(Command::Wheel(consumable_wheel::WheelAction::Hold(true)));
+        s.command(Command::ToggleEngines);
+        assert!(!s.ship.snapshot().engines_enabled);
+        s.clear_held_controls();
+        s.command(Command::ToggleEngines);
+        assert!(s.ship.snapshot().engines_enabled);
+        s.ship.set_cockpit_control(false);
+        s.command(Command::ToggleEngines);
+        assert!(s.ship.snapshot().engines_enabled);
     }
 }

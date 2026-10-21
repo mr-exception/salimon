@@ -81,16 +81,27 @@ impl ShipController {
         let powered = self.energy_core.powered();
         let acceleration = free.then(|| {
             if powered {
-                self.propulsion
-                    .acceleration_meters_per_second_squared(self.thruster_percentage)
+                self.propulsion.acceleration_meters_per_second_squared(
+                    self.energy_core
+                        .config()
+                        .propulsion_watts(self.effective_throttle(), true)
+                        * f64::from(self.effective_throttle().signum()),
+                )
             } else {
                 0.0
             }
         });
-        let reverse_acceleration = -self.propulsion.acceleration_meters_per_second_squared(-100);
+        let reverse_acceleration = self
+            .propulsion
+            .acceleration_meters_per_second_squared(self.energy_core.config().reverse_watts);
         let braking = if speed == 0.0 {
             BrakingEstimate::Stationary
-        } else if !free || !powered || !speed.is_finite() || reverse_acceleration <= 0.0 {
+        } else if !free
+            || !powered
+            || !self.engines_enabled
+            || !speed.is_finite()
+            || reverse_acceleration <= 0.0
+        {
             BrakingEstimate::Unavailable
         } else if local.is_none_or(|v| v[0] <= 0.0 || v[1].hypot(v[2]) > 1e-9) {
             BrakingEstimate::AlignHeading
@@ -124,7 +135,7 @@ impl ShipController {
 
     pub(super) fn core_status(&self) -> CoreStatus {
         let demand = self.energy_core.config().demand_watts(
-            self.thruster_percentage,
+            self.effective_throttle(),
             self.flight_state == crate::FlightState::Flying,
         ) + self.fabricator_watts;
         let stored = self.energy_core.stored_joules();
@@ -351,13 +362,13 @@ mod navigation_tests {
         let n = ship.snapshot().navigation;
         assert_eq!(n.velocity_direction_local, Some([1.0, 0.0, 0.0]));
         assert_eq!(n.heading_velocity_angle_degrees, Some(0.0));
-        assert_eq!(n.acceleration_meters_per_second_squared, Some(-5.0));
+        assert_eq!(n.acceleration_meters_per_second_squared, Some(-125.0));
         assert_eq!(
             n.braking,
             BrakingEstimate::Aligned {
-                seconds: 10.0,
-                distance_meters: 500.0,
-                energy_joules: 501_100_000.0,
+                seconds: 0.4,
+                distance_meters: 20.0,
+                energy_joules: 20_044_000.0,
                 sufficient_energy: true
             }
         );
@@ -408,7 +419,7 @@ mod navigation_tests {
         assert_eq!(n.heading_velocity_angle_degrees, None);
         assert_eq!(n.braking, BrakingEstimate::Stationary);
         let mut ship = moving([100.0, 0.0, 0.0]);
-        ship.propulsion = Propulsion::new(100_000.0, 4e6, 0.0).unwrap();
+        ship.propulsion = Propulsion::new(100_000.0, 0.0).unwrap();
         assert_eq!(
             ship.snapshot().navigation.braking,
             BrakingEstimate::Unavailable

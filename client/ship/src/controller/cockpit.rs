@@ -6,6 +6,7 @@ use crate::{FlightState, SteeringInput};
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CockpitMessage {
     DoorLockedWhileInFlight,
+    EnginesOff,
     CollisionSettling,
     GroundedAfterCrash,
     DoorObstructed,
@@ -22,6 +23,7 @@ impl CockpitMessage {
     #[must_use]
     pub const fn text(self) -> &'static str {
         match self {
+            Self::EnginesOff => "Engines off - press B to enable",
             Self::CollisionSettling => "Collision settling in progress",
             Self::GroundedAfterCrash => "Ship grounded after collision - press L to recover",
             Self::InsufficientAssistEnergy => "Insufficient Core energy for assistance",
@@ -69,6 +71,9 @@ impl ShipController {
         }
         if !self.energy_core.powered() {
             return None;
+        }
+        if self.cockpit_control_active && !self.engines_enabled {
+            return Some(CockpitMessage::EnginesOff);
         }
         match self.flight_state {
             FlightState::Bouncing { .. } => Some(CockpitMessage::CollisionSettling),
@@ -133,7 +138,7 @@ mod blackout_tests {
             assert!(ship.snapshot().power_available);
             assert_eq!(ship.snapshot().thruster_percentage, throttle);
             assert_eq!(ship.snapshot().pose.orientation, heading);
-            let expected = if throttle > 0 { 50.0 } else { -10.0 };
+            let expected = if throttle > 0 { 10.001 } else { 9.9995 };
             assert_eq!(ship.snapshot().velocity_meters_per_second[0], expected);
         }
     }

@@ -15,8 +15,7 @@ mod mass;
 pub use mass::{MassObjectId, ShipMass};
 mod propulsion;
 pub use propulsion::{
-    InvalidFlightMotion, Propulsion, STARTER_DRY_MASS_KG, STARTER_FORWARD_FORCE_NEWTONS,
-    STARTER_REVERSE_FORCE_NEWTONS,
+    InvalidFlightMotion, Propulsion, STARTER_DRY_MASS_KG, STARTER_IMPULSE_NS_PER_JOULE,
 };
 
 mod controller;

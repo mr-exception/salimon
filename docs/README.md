@@ -19,7 +19,7 @@ These newer approved narrative contracts supersede historical Earth-start assump
 - [Project Vision](project-vision.md)
 - [Game Systems Overview](game-systems-overview.md)
 - [World & Realism](world-and-realism.md)
-- [Canonical planetary generation, multi-seed identity and open decisions](canonical-planet-generation.md)
+- [Canonical planetary generation, multi-seed identity and approved migration policies](canonical-planet-generation.md)
 - [Spaceship, Building & Survival](spaceship-building-and-survival.md)
 - [Multiplayer & NPC Interaction](multiplayer-and-npc-interaction.md)
 - [Technical Architecture & AI Maintenance](technical-architecture.md)

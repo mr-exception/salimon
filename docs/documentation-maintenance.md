@@ -102,3 +102,25 @@ owners. [U01 report](../reports/issue-402/README.md) records portable validation
 production ingestion, binary packs, frames, playable migration and native checks
 remain explicitly deferred. A versioned definition reference is not a full
 published planet or verified scientific dataset.
+
+## Offline CI validation (#442)
+
+`python scripts/check_docs.py` checks maintained root/docs/crate/tooling Markdown
+local inline links, reference definitions and ATX heading anchors (including
+Unicode and duplicate headings), required owned paths, scoped stale-contract
+patterns and the frozen schema-1 JSON envelope. Code fences and remote URLs are
+not resolved. Historical reports, vendored docs, model authoring and asset READMEs
+are outside this maintained-guide scope; they remain the author's responsibility.
+Raw code snippets, dynamic paths/globs, Setext headings and arbitrary Markdown/HTML
+are not interpreted. This is a bounded linter, not a full Markdown renderer.
+
+PR CI also passes `--base <base-sha>`: changed Rust/Cargo crate boundaries require
+all three owning guides and an owning Markdown update. A precise source-pattern
+exception with nonempty reason may be reviewed in `scripts/docs-policy.json`;
+this mechanical test does not decide whether an update/reason is sufficient.
+`--write-baseline` is an explicit maintainer debt-review command, never run by CI;
+there is currently no accepted baseline debt. Never automatically accept findings.
+Run `python -m unittest discover -s scripts -p test_check_docs.py -v` for positive
+and deliberately broken fixtures. CI emits file/line errors and fails on findings.
+The source job now includes documentation validation; branch protections and
+semantic review remain maintainer-owned.

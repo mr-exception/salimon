@@ -23,6 +23,22 @@ jobs:
       RUSTUP_TOOLCHAIN: stable
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Documentation validator contracts
+        run: python -m unittest discover -s scripts -p test_check_docs.py -v
+      - name: Offline documentation validation
+        env:
+          DOCS_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [ -n "$DOCS_BASE" ]; then
+            python scripts/check_docs.py --base "$DOCS_BASE"
+          else
+            python scripts/check_docs.py
+          fi
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Native build dependencies

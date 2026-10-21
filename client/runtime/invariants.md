@@ -434,3 +434,9 @@ suppresses both. Focus/pause/occlusion/suspend/terminal/time/run discontinuities
 clear scene events; E2E/benchmarks never spawn scene players. Surface/EVA has no
 transmitted ship sound in the absence of an atmosphere model. Settings stay
 outside run saves, and failed playback never changes gameplay.
+
+Scout machinery feedback (#464) is stateless and observational. Real power,
+funded work/progress and ramped yaw gate the cues; retained throttle alone cannot
+light an unpowered/landed drive. Active phase freezes during pause/death and
+restoration never replays prior cues. Existing interpolated pose, ramp/cargo
+transforms and collision authority are preserved.

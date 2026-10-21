@@ -1202,3 +1202,11 @@ not enter session commands, domain progression or run checkpoints. See the
 [canonical mix/budgets/validation contract](../../docs/scout-presentation.md#soundscape-boundary-465).
 Native loop/listening and OS/device costs remain #485, distinct from portable
 mapping/settings/synthesis checks.
+
+## Scout machinery composition (#464)
+
+`scout_feedback.rs` derives `MachineryFeedback` from existing authoritative ship,
+Core, Fabricator and active elapsed snapshots. `app.rs` attaches it to the same
+presented ship pose; `automation.rs` exposes read-only inspection. No event queue,
+animation controller, save state or additional elapsed admission is introduced.
+See the [canonical feedback contract](../../docs/scout-presentation.md#machinery-feedback-boundary-464).

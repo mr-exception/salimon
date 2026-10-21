@@ -156,3 +156,10 @@ Scout lighting (#463) consumes the same explicit bus state as the physical
 screens. Blackout suppresses electrical emission and warm fill, preserving a
 cool visibility floor without adding power/gameplay authority. Glass blending,
 depth, immutable geometry and the 160-byte uniform size remain unchanged.
+
+Scout machinery (#464) consumes finite normalized immutable feedback only; no
+simulation/clock/save authority. The current ship uniform is 192 bytes and vertex
+stride 76 bytes. Named role tags cannot animate structural supports, hull, ramp
+or colliders. Electrical cues obey explicit bus state; tray output remains
+independent of power. The original #463 layout statement above describes its
+foundation; #464 extends that layout.

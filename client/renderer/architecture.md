@@ -401,3 +401,10 @@ animation belongs to E02 (#464).
 The shared camera contract and native/offline capture commands are documented in
 [Scout presentation](../../docs/scout-presentation.md). New images are candidates;
 existing reviewed baseline images are never automatically replaced.
+
+## Scout machinery surfaces (#464)
+
+`machinery.rs` owns typed presentation DTOs and named-surface tagging. The ship
+vertex stride is 76 bytes; its uniform is now 192 bytes. Power, role, progress,
+charge, ramped rudder and active phase drive the existing shader/draws without
+new geometry or gameplay dependencies. See the [canonical feedback contract](../../docs/scout-presentation.md#machinery-feedback-boundary-464).

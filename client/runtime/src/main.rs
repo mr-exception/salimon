@@ -25,6 +25,7 @@ mod resource_context;
 mod resource_presentation;
 mod reticle;
 mod scout_audio;
+mod scout_feedback;
 mod scout_reference;
 mod session;
 #[cfg(test)]

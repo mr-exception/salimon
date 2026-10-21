@@ -190,3 +190,5 @@ Deterministic runner children explicitly isolate desktop input/focus from protoc
 holds and fixed-step time (#313); direct native `Game` probes retain OS input.
 See the [harness boundary](architecture.md#deterministic-e2e-desktop-input-isolation-313)
 before interpreting a scenario pass as native input/lifecycle evidence.
+
+Scout machinery #464: read the [canonical feedback boundary](../../docs/scout-presentation.md#machinery-feedback-boundary-464). Runtime maps snapshots in `scout_feedback.rs`; renderer owns `machinery.rs`/ship roles/shader. Preserve pause/restore and power/work gating tests; run the opt-in offscreen GPU evidence check for shader changes.

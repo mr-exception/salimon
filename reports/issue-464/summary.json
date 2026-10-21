@@ -1,0 +1,20 @@
+{
+  "cpu_prepare_us": {
+    "samples": 196,
+    "median": 153.49349999999998,
+    "p95": 1381.669,
+    "max": 9883.715
+  },
+  "gpu_ms": {
+    "samples": 196,
+    "median": 26.892965500000003,
+    "p95": 195.355537,
+    "max": 569.156138
+  },
+  "fixed": {
+    "draws": "2",
+    "vertices": "19479",
+    "vertex_bytes": "1480404",
+    "uniform_bytes": "192"
+  }
+}

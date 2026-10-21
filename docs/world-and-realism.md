@@ -3,7 +3,7 @@
 > Migrated from the Salimon project documents on 2026-09-29. For current task status and dependencies, use [GitHub issues](https://github.com/mr-exception/salimon/issues).
 
 ## Direction
-Salimon's world is intended to model the **known universe**, not only one galaxy. Real astronomical bodies should be represented as faithfully as practical, while fictional planets, systems, anomalies, wrecks, stations, and other points of interest may be added to make the universe playable and interesting.
+Salimon's long-term world is intended to model the **known universe**, not only one galaxy; the approved initial playable/catalog package covers the **Milky Way only**. Real astronomical bodies should be represented as faithfully as practical, while fictional planets, systems, anomalies, wrecks, stations, and other points of interest may be added to make the universe playable and interesting. Fixed planet identity and multi-domain seeds are specified in [canonical planetary generation](canonical-planet-generation.md).
 ## Scale and astronomical model
 - Known stars, planets, moons, and major systems should use real-world positions, scale relationships, and orbital behavior where data exists.
 - Planets and moons move in realistic orbits rather than remaining static.
@@ -58,15 +58,15 @@ World resource extraction must persist. Examples include:
 - wreck state;
 - player-caused damage;
 - economy-affecting resource changes.
-The backend may regenerate renewable resources periodically, but replenishment must account for local and global economic balance rather than blindly resetting locations.
+The backend may regenerate renewable resources periodically as **authoritative mutable-state events/deltas**, but replenishment must account for local and global economic balance rather than blindly resetting locations or rewriting the immutable seeded baseline.
 ## Authority
 The world is a persistent shared simulation.
 - Backend-authoritative: astronomical motion, protected large objects, economy-critical global state, NPC canonical state, regeneration schedules, and anti-cheat-sensitive outcomes.
 - Client simulation: local presentation, prediction, deterministic catch-up, and approved interactions.
 - Player actions are submitted to the backend and become canonical only after validation.
 ## Confirmed world-model decisions
-- Fictional planets are generated authoritatively on the backend and are identical for all players.
-- Real planets should use real geographic/terrain data where practical; Earth and Mars should aim for recognizable real-world terrain rather than purely fictional surfaces.
+- Fictional planets have one **published canonical base definition** generated reproducibly for the offline package; a future backend database distributes/verifies that **same definition** and owns mutable shared state. Clients derive identical underlying terrain and fixed sites from versioned per-domain seeds and parameters, not player/session randomness. See [canonical generation and approved owner decisions](canonical-planet-generation.md). Previously published fictional worlds may be revised only through explicit, safe, shared-world-consistent migrations; each active version is immutable.
+- Real observed bodies should use real geographic/terrain data where practical; Earth and Mars in particular should aim for recognizable real-world terrain rather than purely fictional surfaces. **Approved real-body surface policy:** all observed solid bodies (Earth, Mars, Moon, other Solar System planets and moons, and future cataloged real worlds) preserve published physical geography and collision from their **first authoritative real-scale surface publication**. Improved datasets may add non-displacing detail and scientific presentation only; physical remapping requires a separate owner decision. Today's compressed six-body prototype/engineering fixtures are **not** the frozen authoritative surface. See [canonical generation policy](canonical-planet-generation.md).
 - Players cannot build permanent bases or structures on planets. Permanent player construction is limited to the spaceship.
 - The universe uses **one global shared world** for all players rather than independent shards.
 - In principle, players occupying the same location should all be part of the same world presence; scalability techniques must preserve that shared-world model rather than silently creating separate copies.

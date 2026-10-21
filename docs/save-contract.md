@@ -1,18 +1,24 @@
-# Canonical whole-game save contract (schema 1)
+# Canonical whole-game save contract (schema 3)
 
-`salimon-persistence::SaveGame<T>` is the only versioned envelope. Runtime's
-concrete state payload composes domain-owned typed state; read-only observation
-snapshots are not sufficient. Version 1 has no predecessor: older/future versions
-fail explicitly, never silently reseed. A future migration must dispatch on the
-header before decoding a payload and validate its result. Unknown fields and
-missing required state fail; new authoritative extensions require a schema bump,
-a typed field, owner validation and a round-trip fixture. No unregistered opaque
-extension payloads are accepted.
+> This is the **current compressed-world runtime save schema**. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. Under the approved policy, future fictional-planet upgrades require explicit versioned save/world-delta migration, preservation or validated remapping of physical anchors, and recoverable failure handling; scientific terrain detail on **any published real observed solid body** may not displace saved positions after its first authoritative real-scale surface publication. Future fictional-planet changes to geology/biome-dependent resource layouts likewise require explicit stable-ID, depletion and positional migration; the historical compressed prototype does not establish the real-body surface freeze. This note does not modify schema 3 or imply backend multiplayer exists.
+
+`salimon-persistence::SaveGame<T>` is the versioned envelope. New captures use
+version 3. Decode accepts versions 1 and 2 for explicit runtime migration:
+retain the complete physical/Fabricator/equipment payload, initialize newly
+introduced survival meters at 100 with no effects or retrospective active time,
+and initialize the run/journey source. A version-1 payload must lack survival;
+version 2 must contain complete typed survival state. V2 keeps its cumulative
+journey distance and initializes empty sampling history without inventing travel.
+Version 3 requires journey tracking source (which can have no samples on a fresh
+run). Missing/null v2/v3 survival or missing v3 tracking,
+invalid meters/effect registries/configuration, unknown fields and unsupported
+versions reject before publication. Migration is checkpointed before exposure.
 
 ## Authoritative inventory
 
 | Owner | Required logical state | Regenerated/excluded state |
 | --- | --- | --- |
+| Survival/run | Meters/config, fractional drain/starvation/regeneration, full captured effect rules/stacks/partial ticks/lifetimes, wounds/death source/terminal flag, active survival duration, offline UTC watermark, consumable catalog, movement/interaction tuning, run serial, cumulative journey distance and last valid framed physical samples | Launch receipt, held inputs/UI/capture, movement scale and presentation history; derived permissions are repaired |
 | Envelope/runtime clock | Unix-second recording time, completed simulation Duration, exact admitted Duration backlog | Instant, wall-clock frame timer, profiling durations; offline world advancement is zero |
 | Character | Location/frame including doorway blend, local/world position, yaw/pitch, vertical/interior/EVA velocities, nearby surface, EVA basis, gravity/ramp state | Jump key edge reset; camera matrices regenerated |
 | Ship | Pose/quaternion, linear velocity, steering ramp, propulsion/configuration, flight/landed state, full assist/bounce progress, selected signed throttle, door state/fraction, cockpit authority, terrain/footprint, Core config/charge/fraction/reservation/consumption, conversion source and progress, Fabricator demand | Held throttle/steering intent reset, transient message and last-funded interval reset; instruments regenerated |
@@ -22,7 +28,6 @@ extension payloads are accepted.
 | Fabricator | Recipe definitions/IDs/unlocks, bins, FIFO committed job recipes/IDs/counts/current progress, queue capacity, next ID, occupied tray item | No refund/re-enqueue/recharge during restore; status/demand derived from jobs and Core |
 | Inventory/equipment | Exactly three food/two medical single-item slots with stable job/unit identities; five equipment slots and selection | No held controls or automatic consumption; carrying selection lock revalidated |
 | Session/presentation | Gameplay seed, gameplay/precision camera mode and camera controller, deterministic simulation state | Crafting/radial modals, hover, feedback, aim commands, pending OS events, held keys/buttons, focus/capture, window/GPU, automation reader, measurement flags and caches excluded |
-| Future survival owner | Health/hunger/fatigue/status timers/effects/journey counters must become required typed fields when implemented | Only fatigue may recharge while closed. Health/hunger/DoT/healing/world freeze. No survival implementation or default state invented here |
 
 ## Validation and restore order
 
@@ -95,17 +100,204 @@ Default directory: Linux `$XDG_DATA_HOME/salimon/active-run` (fallback
 active run, represented by two recovery generations, with no multi-slot UI.
 Existing files can be backed up/moved when deliberately starting a fresh run.
 
-Survival/death does not exist yet: #371 integrates terminal-state checkpoints and
-restart, #372/#374 own journey archives and terminal UI. Those owners must include
-their new typed state and discrete events and retire both old generations on
-restart so fallback can never revive the previous run. #382 owns verified Save
-Now feedback; #375/#376 own expanded survival/graphical/reference-hardware checks.
+## Survival lifecycle and launch transaction (#371)
 
-## Pending pause controls (#382)
+The session ticks survival on every admitted game interval while alive, including
+ordinary crafting/tour menus. It advances physical domains only for the admitted
+portion before a lethal boundary; death clears held controls/mining/crafting,
+stops manual pilot authority and discards pending catch-up. Further authoritative
+simulation and world commands are frozen. Terminal state is a discrete checkpoint
+event; the worker writes it into both generations before acknowledging, so its
+verified backup is terminal too. Failed writes remain failures: a death that cannot
+reach storage is not claimed durable, and visible save warnings/retry remain.
 
-The same active-run worker now supports manual save request coalescing, verified
-status/timestamps and save-before-exit failure choices; see runtime
-[preparation contract](../client/runtime/architecture.md#pending-pause-checkpoint-controls-382-preparation).
-No second slot or offline recovery is introduced. Pause-menu UI is not yet wired:
-#381 full freeze and its #371 prerequisite remain blocking work. #382 stays open
-and its preparation PR stays draft until that integration and native UI validation.
+Normal-play launch first restores into a temporary candidate. Only fatigue is
+credited from the checkpoint UTC to launch UTC, with the survival domain's six-hour
+configured cap and rollback/high-watermark protection. Hunger, health, effects,
+world and active duration never advance offline. The worker's SaveManager verifies
+and publishes credited state/watermark before the candidate is exposed. Failed
+credit publication leaves the caller's live session unchanged and fails startup.
+The receipt is launch-only: focus, minimize/resume, save and renderer changes do
+not grant recovery. Crash recovery conservatively treats time since the newest
+verified checkpoint as closed time; see the survival clock contract.
+
+A new native run is also checkpointed before play. Default save paths/lease and
+60-active-second/discrete-event/exit policy above are retained. Checkpoint failures
+while terminal use a host-time retry delay because the gameplay clock is frozen;
+no game-domain time advances to retry IO. E2E/benchmarks remain isolated from the
+user's save directory. Direct portable restore is a reconstruction operation and
+never grants offline credit; only the launch transaction does.
+
+## Terminal archive and restart (#371)
+
+The native Journey Ended screen (#374) displays the typed archived report and a
+single Restart Game action. An initial focused Enter/numpad Enter/R press or left
+click on the button requests the same verified restart transaction. Repeats,
+synthetic replay and living runs cannot restart through this path. Runtime prepares a fresh
+deterministic Earth world, clears all old objects/inventory/jobs/effects/inputs, then grants new-run supplies,
+starts meters at 100 and increments the saved run serial. Terrain mode and world
+seed retain their deterministic new-run policy. New-run supplies follow the [#379 contract](#starting-supplies-379).
+
+The existing save worker first checkpoints the terminal run into both slots,
+then durably publishes an immutable idempotent `journeys/v2/run-<serial>.json` summary,
+then verifies the fresh run in both slots. Only success replaces the live terminal
+session. Failure never grants gameplay with an unverified fresh state; retry
+retains the terminal source. After success both fallback generations belong to
+the fresh run. Interruption before success can recover a terminal run or the
+already verified pristine fresh run, never an old living generation after the
+terminal pair was verified. A first terminal write that fails can only preserve
+the prior verified checkpoint; no stronger disk-failure guarantee is claimed.
+
+Archive summaries contain their version, serial, seed, typed death cause, active
+survival duration, final absolute position and typed journey counter source.
+Byte-identical retry is idempotent; conflicting historical reports reject without
+overwrite. Native archive scans choose unused run serials when starting fresh
+after missing/damaged saves. Temporary archive files are not active reports.
+Version-2 summaries are published on the death checkpoint, clean exit and terminal
+launch recovery, before any restart request. Launch repairs a missing report after
+an interrupted terminal publication. Restart verifies the same report idempotently.
+Version-1 reports stay immutable in `journeys/run-<serial>.json`; both namespaces
+reserve serials, including an interrupted v1 restart restored by a newer client.
+Archive failure leaves verified terminal generations and retries through the same
+visible failure policy. Report version 2 includes final named location and samples.
+
+#375 owns expanded cross-system suites and #376 native reference signoff; #381
+owns a true pause menu and #382 manual Save Now controls. Survival, HUD, Journey Ended and starting supplies are implemented through
+#371/#373/#374/#379; native Q-wheel consumption UI remains #377.
+
+
+## Journey statistics (#372)
+
+`session/journey.rs` owns the cumulative distance and latest valid ship/character
+samples. Active duration remains the exact `Survival::active_time` authority,
+including ordinary menus and background running, stopping at the lethal boundary.
+It is not wall-clock age or the legacy world elapsed clock. Offline recovery
+changes neither duration nor distance.
+
+Distance is the sum of ship-origin displacement and character displacement during
+each admitted physical tick. Ship flight/coasting/landing/takeoff counts even
+while the player is outside. Cabin movement uses native ship-local f64 positions;
+an idle passenger contributes zero extra distance, including a turning cabin.
+Character endpoints are taken before/after the controller using the same completed
+ship frame. Outside/EVA and doorway crossings use absolute f64 endpoints in that
+frame. An EVA traveller and the independently moving ship each contribute their
+own path. Surface walking, gravity and inherited EVA drift count as physical travel.
+The metric is sampled path length (tick chords), not net spawn-to-current distance.
+
+Only movement inside the production physics/controller tick enters accounting.
+Out-of-tick fixture/assist commands, cockpit snaps, teleport, restore, streaming
+and camera precision-tour positions cannot bridge old samples into a fake leg.
+Physical assist motion during a tick counts normally. Render-origin shifts never
+enter the source. Last valid positions persist with explicit ShipLocal/World tags;
+they record the last completed physical sample, not an instruction to bridge a
+later rebase/restore. Fresh runs have no samples. Finite checks protect persisted
+statistics; f64 subtraction precedes norms and cabin motion avoids solar-coordinate
+round-trips. This adds no arbitrary maximum-speed teleport heuristic.
+
+Final location derives from the saved physical character position, nearest catalog
+surface (catalog order breaks ties), stable body ID and nominal altitude. Names
+are `Near <body>` within the shared inclusive 3,000,000 m envelope, otherwise
+`Space near <body>`; neither claims terrain contact. Cause is the typed survival
+death source, never inferred from location or last movement. Automation inspection
+exposes duration, distance and the same location DTO. #374 owns its native layout.
+
+Occluded or zero-sized windows stop presentation and clear held controls but keep
+the same bounded physical tick/checkpoint scheduler running at 16 ms wakeups.
+Focus loss alone also keeps time running. OS suspension and renderer reconstruction
+retain the existing explicit lifecycle gap exclusion; this is distinct from a
+running minimized/unfocused app. Native desktop delivery remains #376 signoff.
+
+
+## Journey Ended presentation (#374)
+
+`GameplaySession::ended_run()` is the single typed report builder used by both
+archive serialization and `journey_ended.rs` presentation. UI reads the existing
+typed cause, active duration, combined distance and final nearest-body context;
+it never guesses death cause or derives travel from render positions. Display
+rounding does not change archived source precision. The report is available only
+for terminal runs, including terminal launch recovery.
+
+The terminal overlay takes priority over crafting, diagnostics and survival HUD;
+reticle, held tool, inventory/equipment and action messages are hidden. The frozen
+world remains behind a dark backdrop and readable final-transmission card.
+Enter/R and pointer activation share `ClientApplication::restart_terminal()`.
+All ordinary world/view/status/diagnostic commands are rejected during terminal
+input dispatch; the existing session gate also rejects consumption/mining/flight.
+
+Failed publication retains terminal authority, shows a persistent failure footer
+and leaves Restart Game usable. Missing verified storage never permits a free
+restart. Successful verification replaces both active slots (rather than deleting
+a verified fallback prematurely), clears terminal/HUD/action/presentation caches,
+terrain streaming and inputs, and leaves cursor capture off until fresh input.
+No revive or resume action exists. Restart IO retains the existing synchronous
+verified transaction; fresh gameplay is never exposed while writes are pending.
+
+Pointer positions are physical pixels and match the exact raster button rectangle.
+Focus/capture loss, cursor leave and resize/DPI/lifecycle resets invalidate stale
+pointer coordinates. The renderer-owned `overlay_available_size` defines fitting;
+the normal terminal image exactly fits that margin so it is not further scaled.
+RGBA allocation is bounded at 64 MiB: very large surfaces retain a centered card
+without allocating an unbounded backdrop. Normal resize/DPI/aspect layouts remain
+centered and cached. Native OS-input/Metal validation remains #376.
+
+## Starting supplies (#379)
+
+Normal play constructs `GameplaySession::new_run` before the verified first
+checkpoint; terminal restart uses the same constructor before its existing
+archive/two-generation publication transaction. It grants two basic rations in
+food slots one/two, one medkit in medical slot one, and the exact integer recipe
+ingredients for one additional ration in Fabricator reserves. The fabrication
+owner derives item mass/category and reserve quantities from its validated
+starter recipes. Initial grants consume no game time, Core energy or ingredients;
+they are new-run endowments, not completed player crafting operations.
+
+The two rations use `(job 1, units 1/2)` and the medkit `(job 2, unit 1)`;
+subsequent player jobs start at 3. These are ordinary typed output identities,
+persisted with the existing allocator high-water mark and cross-owner validation.
+No parallel inventory, seed flag, recipe unlock or save-schema change is added.
+Stored reserves contribute 0.5 kg at current recipe tuning; inventory contributes
+zero under the existing collected-consumable mass exception. Enqueue, output and
+collection retain ordinary ingredient/power/tray/mass rules.
+
+Restore replaces inventories/reserves exactly, including vacancies and old saves
+with no supplies. It never calls the grant constructor. Loading, offline recovery,
+ship entry, focus/cursor release, resume and renderer reconstruction cannot grant
+items. Restart candidates contain one grant; publication failures retain terminal
+authority and retries rebuild that same candidate rather than appending supplies.
+Isolated engineering/E2E/benchmark fixtures keep their explicitly empty `Default`
+starting state; portable new-run E2E tests opt into the production constructor.
+
+
+## Gameplay pause (#381)
+
+Escape in gameplay opens the pause menu and releases the cursor. Enter or Escape
+resumes; F1 explicitly releases the cursor without pausing. P/R/N camera commands
+belong only to the F2 precision tour. Pausing closes crafting/status overlays and
+clears held movement, steering, throttle keys and mining. Requested ship throttle
+is preserved. Full simulation, Core, fabrication, loose cargo, survival effects,
+journey accounting and autosave game-time intervals freeze at the session boundary.
+UI/rendering and checkpoint IO continue. The transient pause flag is not saved.
+Both native/background and portable automation tick paths exclude paused elapsed
+time and clear pending backlog on entry/resume; focus/minimize/suspend cannot
+resume a paused session or credit offline fatigue. Resume requires fresh controls.
+The pause menu takes priority over diagnostics, HUD, reticle and equipment.
+Save Now/Save & Exit use the verified #382 worker; Q-wheel input must respect
+`GameplaySession::is_paused()` and the shared consumption gate.
+
+## Pause checkpoint controls (#382)
+
+The paused menu offers Enter/Escape Resume, N Save Now, S Settings and X Save &
+Exit. R retries failures, C cancels exit and Q explicitly exits without saving
+only after a failed exit checkpoint. Resume cancels exit intent. Menu keys require
+initial focused admission; repeats/synthetic/unfocused input cannot request IO.
+The existing center panel uniformly fits its drawable; Settings keep their keys.
+
+`checkpoints/control.rs` owns bounded coalescing, verified UTC receipts and exit
+intent. Manual/automatic captures share the same worker, atomic store and active
+run. Polling continues while paused/minimized; a newer request cannot be satisfied
+by an older in-flight snapshot. Retry bypasses frozen game-time backoff. Save &
+Exit and living-gameplay window close await verification or explicit failed-save
+risk choice. Final exit does not start a second write after either choice.
+Terminal archives/restart and 60-second/event autosaves retain their owners.
+No manual request ticks gameplay or credits offline fatigue. Native OS-input,
+DPI/appearance and M1 signoff remain separately tracked by #376.

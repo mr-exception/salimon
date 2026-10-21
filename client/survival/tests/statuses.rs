@@ -278,3 +278,67 @@ fn registry_validation_custom_sources_and_corrupt_status_rejection() {
             .is_err()
     );
 }
+
+#[test]
+fn losing_regen_eligibility_resets_credit_before_immediate_feeding() {
+    let mut s = Survival::new(Config {
+        hunger_full_seconds: 216,
+        ..Config::default()
+    })
+    .unwrap();
+    s.damage(damage(Source::Fall, 20, false)).unwrap();
+    // Hunger reaches 70 at 64.8 s; the next nanosecond loses eligibility.
+    s.advance(Duration::from_millis(64_800) + Duration::from_nanos(1));
+    assert!(s.snapshot().hunger.value() < 70.0);
+    let mut json = serde_json::to_value(&s).unwrap();
+    assert_eq!(
+        json["pipeline"]["regeneration"],
+        serde_json::json!({"secs": 0, "nanos": 0})
+    );
+    // A checkpoint at that exact boundary must not preserve old eligible credit.
+    let mut restored: Survival = serde_json::from_value(json.take()).unwrap();
+    restored.validate().unwrap();
+    for state in [&mut s, &mut restored] {
+        state.command(Command::Feed(Points::FULL)).unwrap();
+        state.advance(sec(56));
+        assert_eq!(state.snapshot().health, p(81));
+        state.advance(sec(4));
+        assert_eq!(state.snapshot().health, p(82));
+    }
+    assert_eq!(s, restored);
+}
+
+#[test]
+fn periodic_food_at_eligibility_loss_does_not_preserve_regen_credit() {
+    let boundary = Duration::from_millis(64_800) + Duration::from_nanos(1);
+    let mut food = effect(
+        1,
+        Behavior::Feed {
+            amount: Points::FULL,
+        },
+        Lifetime::Timed(boundary),
+        1,
+    );
+    food.interval = Some(boundary);
+    let mut s = Survival::with_rules(
+        Config {
+            hunger_full_seconds: 216,
+            ..Config::default()
+        },
+        Rules {
+            effects: vec![food],
+            ..Rules::default()
+        },
+    )
+    .unwrap();
+    s.damage(damage(Source::Fall, 20, false)).unwrap();
+    s.apply_effect(EffectId(1)).unwrap();
+    let mut split = s.clone();
+    s.advance(boundary);
+    split.advance(Duration::from_millis(64_800));
+    split.advance(Duration::from_nanos(1));
+    assert_eq!(s, split);
+    s.advance(sec(56));
+    assert_eq!(s.snapshot().health, p(81));
+    s.validate().unwrap();
+}

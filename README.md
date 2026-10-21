@@ -135,6 +135,10 @@ Gameplay **1–5** selects one of five equipment slots (slot 1: mining tool;
 slots 2–5: empty). Pickup clears selection; carrying blocks selection, and
 dropping leaves it deselected until you explicitly press **1–5** again.
 The toolbar appears at bottom center with no initial selection.
+Brand-new runs start with two food rations, one medkit and Fabricator reserves
+for one more ration. Saves retain spent supplies; restarting after death grants
+the new run its supplies once. See the [supply contract](docs/save-contract.md#starting-supplies-379).
+
 Slot 1 equips the mining tool; selecting an empty slot stows it and stops mining.
 
 Press **1** to equip the handheld mining tool on the surface; aim at a deposit
@@ -148,8 +152,9 @@ closer geometry. Flight/tool guidance and short blocked-action feedback remain
 at the bottom of the screen.
 Face the open door and walk forward through it to transition over 0.25 seconds
 to the active solid body's radial gravity and inspect the ship exterior. There is no sprint or crouch. Press
-**Escape** to release the captured cursor for window controls; click the game
-view to capture it again.
+**F1** to release the captured cursor for window controls; click the game
+view to capture it again. **Escape** opens the full simulation pause menu;
+**Enter** or **Escape** resumes with fresh controls.
 
 Press **F2** to switch to the engineering Solar System precision tour. Six textured spheres show the static
 compressed bodies during the automatic far-space-to-Earth-surface transition.
@@ -167,6 +172,17 @@ repeats and releases are ignored.
 In precision-tour view, press **1–6** to restart the approach for **Sun, Mercury, Venus, Earth, Moon,
 Mars**, respectively. Earth is selected at launch. Selection is an engineering
 camera fixture; it does not move bodies or implement flight/landing gameplay.
+
+At health zero, the **Journey Ended** screen shows cause, active survival time,
+travel distance and final location. Click **Restart Game** or press **Enter/R**
+to archive the run and start fresh after its checkpoint verifies. Failure keeps
+the terminal screen and lets you retry. Click the new game view to recapture controls.
+
+The compact upper-left survival HUD shows health, hunger and fatigue icons with
+thin bars. Press **H** for status details and exact active movement/interaction
+penalties; use **[** / **]** to page through effects and H to close. It does not
+pause gameplay. Recovery briefly shows +Health/+Hunger feedback. Crafting and
+engineering diagnostics take overlay priority; focus/capture loss closes details.
 
 Press **F3** to toggle the engineering diagnostics overlay. It is hidden by
 default and updates at a throttled cadence while frame observations continue to
@@ -301,3 +317,7 @@ metadata and lints. Keep `Cargo.lock` committed; validate normal changes with
 dependencies. Cargo's [workspace documentation](https://doc.rust-lang.org/cargo/reference/workspaces.html)
 and [lockfile guide](https://doc.rust-lang.org/cargo/guide/cargo-toml-vs-cargo-lock.html)
 describe these conventions.
+
+Optional survival feedback: pause with **Escape**, then **S** opens accessibility
+settings. **C** toggles camera motion, **A** condition audio, **V** the health
+vignette. Preferences persist across runs. Linux audio needs `paplay` or `aplay`.

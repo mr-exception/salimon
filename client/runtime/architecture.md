@@ -477,10 +477,11 @@ held state; backlog is elapsed-time debt, not a recorded input event replay.
 
 Overload retains debt and slows the entire gameplay simulation relative to wall
 time. Recovery drains it in bounded batches. A long unreported stall is no longer
-silently clamped to 250 ms. Lifecycle resets (occlusion, suspension, zero drawable,
-renderer reconstruction) deliberately exclude the gap and clear already queued
+silently clamped to 250 ms. Lifecycle resets (OS suspension and renderer reconstruction) deliberately exclude the gap and clear already queued
 debt plus interpolation history; cleared debt is added to `lifecycle_excluded`.
-Unobserved lifecycle gap duration is not represented as gameplay debt. Saturating
+Occlusion/zero drawable instead clear held controls and presentation history,
+then wake the same bounded scheduler every 16 ms without rendering. Focus loss
+also continues gameplay. Unobserved OS lifecycle gap duration is not represented as gameplay debt. Saturating
 `Duration` arithmetic bounds representation, not a gameplay cargo/time cap.
 Automation still advances the exact requested fixed delta directly, and renders
 current authoritative state; it never uses native backlog or interpolation.
@@ -752,7 +753,10 @@ streaming restoration. Native M1 remains #236.
 Test-only `sphere_fixtures.rs` constructs append-only, released default-lifecycle
 spheres and checks actual mass/radius/source/ID/count before carrying/contact
 assertions. `sphere_workloads.rs` owns separately versioned portable 500/1,000
-current-sphere workloads, with raw population and CPU samples. Historical flight
+current-sphere workloads, with raw population and CPU samples. Their canonical
+initialization now lives in `benchmark_fixture.rs`, exposed as `current-cap` and
+`current-mixed` to native benchmarks and opt-in E2E, including 1,000 objects (#313).
+Raw benchmark accounting includes actual per-object contact radius. Historical flight
 and #235 populations retain their original definitions. See the canonical
 [fixture/workload contract](../../scripts/FRAGMENT_BENCHMARKS.md#current-sphere-fixture-and-cpu-workload-contracts-303)
 for commands, fixture identities, tolerances and interpretation limits.
@@ -883,7 +887,7 @@ collection removes that contribution. Reserved/queued jobs remain distinct.
 
 Runtime maps the existing three food and two medical slots into a separate
 renderer DTO row. Equipment selection remains keys 1–5. M/N do not consume
-items in gameplay; #377 owns Q-wheel selection. No vitals effect is introduced.
+items in gameplay; #377 owns Q-wheel selection. Survival effects use the shared #370 transaction.
 
 ### Fabricator automation (#347)
 
@@ -922,27 +926,26 @@ and shell lifecycle integration. See [canonical save contract](../../docs/save-c
 
 ## Hold-Q consumable wheel (#377)
 
-Hold Q in captured gameplay to open five radial segments in stable inventory
-order: three food, then two medical. Release Q cancels. Left-click an occupied
-segment to consume that exact item once and close; empty segments cannot consume.
-Tab/arrows cycle occupied slots, Enter consumes. Keys 1–5 remain equipment only.
-M/N consumption remains removed; the inventory has no first-occupied shortcut.
+Hold Q in captured living gameplay to open five stable inventory segments: three
+food, then two medical. Release cancels; clicking an occupied segment consumes
+and closes only after the shared #370 prepare-before-remove transaction succeeds.
+Hover/keyboard selection captures `(slot, job, unit)`; stale replacements and
+invalid effects cannot remove items or apply partial benefits. Full vitals allow
+waste; exhaustion permits emergency consumption. Hover feedback reads the saved
+recovery catalog. Tab/arrows navigate, Enter/numpad Enter consume; equipment stays
+on keys 1–5 and M/N never consume items.
 
-Opening clears movement/steering/throttle-adjust/grab/mining held inputs; world
-and ship simulation continue on the same fixed clock. Gameplay movement, look,
-mining and interactions are gated while open. Native cursor movement selects
-segments using the same fitted geometry as rendering. The pointer is released
-while open and recaptured on Q release/consumption; focus/lifecycle loss cancels
-without replay. A mouse already held on opening must release before it can
-consume. The consumption press cannot become a mining press. Escape cancels and
-uses the existing cursor release policy.
+Opening clears held movement/steering/throttle-adjust/grab/mining controls.
+World, ship, crafting and survival continue ticking; movement/look/world actions
+are gated. Pointer geometry shares the rendered physical-pixel fit. A pre-held
+mouse must release before use; consumption cannot click through to mining.
+Focus/lifecycle loss and restore clear transient wheel state. Escape closes the
+wheel and opens full pause; death closes it and freezes authority. Cursor capture
+resumes only in living, unpaused, focused gameplay. Vital meters remain beside
+the wheel through the generic secondary UI layer normally occupied by the hidden
+reticle, without adding a GPU layer or simulation authority. Native OS-input,
+DPI/appearance/M1 signoff remains separate under #376.
 
-This is the portable implementation for review, not survival signoff: #368 is
-still open. Item consumption currently has no healing/hunger effect and the
-wheel explicitly says so. Full-meter/fatigue-zero semantics, death cancellation
-and treatment/status effects need integration against #368 and the survival
-lifecycle. Escape pause behavior belongs to the unfinished pause implementation;
-this change does not pretend that releasing the cursor pauses gameplay.
 ## Durable active-run orchestration (#366)
 
 Runtime `checkpoints.rs` owns normal-play startup restore, a bounded save worker,
@@ -954,22 +957,296 @@ E2E and benchmark launches remain isolated from user saves. See the
 [canonical save contract](../../docs/save-contract.md#durable-active-run-366)
 for paths, recovery/failure policy, Windows behavior and future lifecycle owners.
 
-## Pending pause checkpoint controls (#382 preparation)
+## Survival restriction composition (#369)
 
-`checkpoints/control.rs` owns portable SaveNow/SaveAndExit/Retry/CancelExit/
-ExitWithRisk admission and Idle/Saving/Saved/Failed observations. The existing
-single worker/store handles manual and auto captures; one coalesced pending flag
-captures the newest session after an older write completes. Only a verified IO
-result publishes its captured UTC timestamp. Capture/queue/worker failures cannot
-publish Saved. Exit intent waits for a capture admitted after its request;
-failure suspends exit until an explicit retry, cancellation or risk exit.
-Manual retry bypasses game-time backoff so it works when time is frozen. Rendering
-can continue polling; no game tick or offline recovery is performed by requests.
+`session/survival.rs` derives the [canonical restriction policy](../survival/architecture.md#movement-and-interaction-restrictions-369)
+from the session's typed survival owner. Shared commands and each tick apply
+voluntary character speed, pilot revocation, mining interruption and crafting
+permission. Both native input and portable protocol use these gates, including
+legacy direct `thruster` automation. Contextual cockpit/machine prompts filter
+for the same permissions. Discrete nonessential E/F/crafting mutations share an
+active-time recovery timestamp; doors/menus/emergency consumption bypass it.
+Mining scales only its bounded extraction delta, not world/physics/job time.
 
-This is preparatory backend code, not a completed pause menu. #381 is explicitly
-blocked by #371 and must supply full authoritative freeze, input/cursor admission,
-Q-wheel exclusion and resume clock resets. Until then, the native UI does not call
-these request/status methods; the narrowly marked dead-code allowances document
-that dependency. #382 must still wire accessible Resume/Save Now/Settings/Save &
-Exit, failure choices, verified timestamp display and DPI/layout/native coverage.
-Do not use the existing synchronous OS-close `finish` method for the future menu.
+Automation inspection exposes exact `survival_restrictions` basis points for
+future HUD consumption and regression checks. #371 activates the vital clock and whole-game save publication. #370
+and #377 supply actual effects and wheel dispatch separately. No schema-1 save
+is silently changed; derived character scale and interaction cooldown reset on
+restore and are reapplied by the session before the next tick.
+
+## Consumable survival transaction (#370)
+
+`session/consumables.rs::consume_selection` is the shared wheel/protocol seam.
+Selection captures a named inventory slot plus expected `JobId`/unit, not a
+category/first-occupied request. Gameplay view, non-crafting state and typed
+Consume permission gate use; fatigue zero remains eligible. Stale/empty identity,
+unknown recipe, mismatched category, bad effect data or terminal state reject
+without changing either owner. Prepare all benefits on a survival clone; only
+then take the exact slot and publish the prepared owner under exclusive session
+ownership. Neither operation changes ship mass or Fabricator jobs/raw/tray.
+
+The portable protocol supports `consume` with 1-based slot 1..5 and positive
+`job`/`unit`, all required. It calls this same transaction and reports applied/
+rejection; it does not introduce a gameplay hotkey. Inspection includes recipe
+recovery definitions and active survival recovery snapshots. Native desktop
+focus admission stays shell-owned; #377's wheel uses this seam, captures the selected identity and closes only
+after success; recovery definitions supply hover feedback. M/N remain absent.
+
+See the [canonical recovery data](../survival/architecture.md#consumable-recovery-definitions-370).
+Runtime #371 activates production survival ticking and full-save
+publication; #377 still owns the native wheel and #378 advanced foods. Serialized
+recovery and inventory continue exactly and remain frozen offline.
+
+
+## Active survival, terminal state and restart (#371)
+
+`session/lifecycle.rs` owns typed run/journey source and deterministic fresh-run
+preparation. `session.rs` advances survival first to determine the admitted portion
+before death, then composes physical work for that duration. Terminal state clears
+held controls/mining, pilot authority and backlog, and rejects subsequent world
+commands. Ordinary menus continue active time; true pause remains #381.
+
+`session/persistence.rs` captures survival meters, fractional clocks, captured
+status/healing rules/intervals, terminal cause, offline watermark, item catalog,
+restriction tuning and run/journey source with world/ship/Fabricator/inventory in
+one schema-3 envelope. V1 migration initializes the new survival source;
+v2 migration adds journey tracking. Missing/invalid version-required source rejects. Restore resets transient UI/view/input and
+repairs derived permissions without stepping or granting offline effects.
+
+`checkpoints.rs` performs verified launch recovery before exposing a temporary
+candidate; only fatigue may be credited. Its bounded worker publishes terminal
+pairs, immutable archive summaries and both fresh generations during restart.
+The #374 Journey Ended screen exposes one verified Restart Game action through
+initial focused Enter/R or a pointer hit; it replaces the earlier minimal notice. See the
+[canonical save/lifecycle contract](../../docs/save-contract.md#survival-lifecycle-and-launch-transaction-371)
+for failure/crash guarantees and remaining #373/#377/#379 scope.
+
+
+## Journey accounting (#372)
+
+`session/journey.rs` owns framed last valid physical samples, combined travel and
+named location DTOs. `session.rs` measures ship travel around its update, then
+character travel around its controller using the same completed ship frame.
+Cabin-local samples exclude inherited ship translation/rotation; outside/EVA
+samples remain absolute f64. Neither camera/render origins nor out-of-tick changes
+create distance. The [canonical save contract](../../docs/save-contract.md#journey-statistics-372)
+defines the metric, schema-3 v1/v2 migration, background timing and version-2
+archive policy. `checkpoints.rs` archives on terminal publication, not only restart.
+Maintain `session/journey/tests.rs`, native background-scheduler and checkpoint
+archive/recovery/version tests when changing these boundaries.
+
+
+## Survival HUD and status details (#373)
+
+`survival_hud.rs` maps typed survival snapshots, immutable effect snapshots and the
+existing restriction DTO into observational UI data; `survival_hud/raster.rs`
+produces cached RGBA through the existing generic TopLeft overlay. The renderer
+has no survival dependency. `Survival::effect_snapshots` exposes captured behavior,
+stack severity, lifetime/remaining duration and removal policy without JSON peeking
+or mutation. Registered sources retain their stable source ID in descriptions.
+
+Gameplay shows health/cross, hunger/cutlery and fatigue/bolt with thin bars and no
+permanent meter numbers. Active effects have a separate icon strip. Active hunger
+and fatigue speed reductions remain labeled below the bars; H opens/closes the
+read-only detail panel, and [ / ] pages through the entire bounded effect registry.
+The panel shows per-tick amounts, stack count, duration rounded up to seconds,
+exposure/persistent lifetime and treatment-only policy, plus exact hunger, fatigue,
+combined speed and interaction-rate reductions from the authoritative basis points.
+No threshold or restriction math is duplicated in UI authority.
+
+H requires normal gameplay focus/capture and initial nonsynthetic input. The
+panel does not pause time or consume world controls; it uses keyboard navigation
+and no pointer capture. Capture/focus loss closes it. Crafting, engineering tour,
+diagnostics overlay and terminal state suppress this HUD. Overlay priority is
+crafting, diagnostics, then survival. #381 must extend this same visibility and
+input admission when adding actual pause menus; #377 retains meters while the
+wheel is open and uses its own world-input gate. Both interfaces share these admission gates.
+
+Presentation-only thresholds are health <25, hunger <20 and fatigue <=20 for
+critical colors; other values <50 use amber. A subdued 400 ms color pulse and a
+three-second warning accompany entry. Warning rearm requires two points above
+the threshold, preventing repeated warnings near a boundary. These choices do not
+change gameplay rules. Positive observed net health/hunger changes tween bars for
+450 ms and float the actual +N gain for 1.2 s; damage shows immediately. Passive
+hunger drain updates rather than cancels recovery animation. Full-meter waste has
+no fabricated gain. New-run/time-rewind observations establish a fresh baseline.
+
+All animations use admitted survival time, never render frame count, and never
+modify save state. Hidden panels close safely. Unchanged quantized healthy frames
+reuse the image/revision; presentation state is host-owned and excluded from saves.
+Icons are original bitmap shapes; shared action-bar glyphs include UI punctuation.
+
+Raster scale is bounded 2x–3x then reduced to fit. The renderer-owned
+`toolbar_message_inset` is shared with the native HUD: no copied inventory dimensions.
+Layout reserves that fitted lower band, a 96 px action/margin allowance and the
+screen center. At the minimum window size, detail text replaces the meter rows
+while H is open; status/equipment are not overlaid on one another. Below usable
+native bounds, a non-fitting image hides rather than overflowing or allocating
+unbounded pixels. Text is bounded to validated typed formats, with effect pages
+and two-line descriptions preserving all current registered definitions.
+
+Portable regressions live in `survival_hud/tests.rs`, its raster layout tests and
+app status-key admission tests. Inspection exposes `survival_hud` DTOs; native E2E
+keys `status`, `status_previous`, `status_next` use the same host dispatch as H/[ / ].
+Native inspection adds `survival_details_open`. CPU PNG previews in the completion
+report show actual raster output; they are not native GPU screenshots. #376 owns
+remaining desktop/DPI/Metal visual signoff and #383 optional sensory feedback.
+
+
+## Journey Ended screen (#374)
+
+`journey_ended.rs` owns observational report formatting, bounded physical-pixel
+layout, pointer hit testing and image caching; `journey_ended/raster.rs` owns the
+bitmap final-transmission card, dim backdrop, button/hover and failure footer.
+It consumes the same typed `session/lifecycle.rs::ended_run()` as the archive,
+not JSON or independent guesses. Source states/schema/report bytes are unchanged.
+
+`app.rs::restart_terminal` is shared by Enter/R, the one left-click action and
+native automation `restart`. It calls the existing verified checkpoint/archive/
+fresh-pair transaction before replacing session state. Error retains the terminal
+session and usable retry feedback. Completion resets host HUD/action/terminal/
+terrain/presentation caches and leaves input capture off. Default new-run state
+and starter-supply ownership (#379) remain unchanged.
+
+Keyboard dispatch admits initial nonsynthetic Enter/numpad Enter/R only while
+terminal, focused and not occluded; ordinary terminal keys cannot open gameplay,
+engineering or status views. Pointer events require the same native focus gate,
+fresh finite physical coordinates and the half-open button bounds. Capture/focus
+loss, cursor leave, resize/DPI and lifecycle reset invalidate pointer state.
+Terminal rendering suppresses diagnostics/crafting/HUD, reticle, held tool and
+inventory/equipment over the frozen world. See the
+[canonical terminal contract](../../docs/save-contract.md#journey-ended-presentation-374)
+for publication guarantees, display rounding, fitting and native limitations.
+
+Tests live in `journey_ended/tests.rs` and `app/input_tests.rs`: typed report/archive
+parity, all causes, extreme time/distance formatting, DPI/aspect/button-pixel parity,
+cache/hover/failure, guarded real keyboard restart, archive conflict/retry and
+terminal/fresh relaunch using real temporary native storage. Existing restart
+fault injection and terminal world freeze tests remain required. Native inspection
+exposes `journey_ended` report text; `restart` is a native-host operation and does
+not add a diskless portable-session bypass. E2E hosts without verified storage
+report failure instead of pretending to restart. #375 owns broader scenario/save
+DSL and expansion verification; #376 owns native OS/Metal visual acceptance.
+
+## New-run initialization (#379)
+
+`GameplaySession::new_run` composes fabrication-owned starter inventory/reserves
+and reconciles ship mass immediately. Normal-play startup and the existing
+verified restart candidate use it; `Default` remains empty for restore and
+isolated fixtures. `restore_bytes` replaces complete owners and never grants
+supplies. The [canonical contract](../../docs/save-contract.md#starting-supplies-379)
+records identities, publication and conservation. Portable E2E coverage lives in
+`session/starting_supplies_tests.rs`, including real disk launch/restart/reload.
+
+
+## Gameplay pause (#381)
+
+Escape in gameplay opens the pause menu and releases the cursor. Enter or Escape
+resumes; F1 explicitly releases the cursor without pausing. P/R/N camera commands
+belong only to the F2 precision tour. Pausing closes crafting/status overlays and
+clears held movement, steering, throttle keys and mining. Requested ship throttle
+is preserved. Full simulation, Core, fabrication, loose cargo, survival effects,
+journey accounting and autosave game-time intervals freeze at the session boundary.
+UI/rendering and checkpoint IO continue. The transient pause flag is not saved.
+Both native/background and portable automation tick paths exclude paused elapsed
+time and clear pending backlog on entry/resume; focus/minimize/suspend cannot
+resume a paused session or credit offline fatigue. Resume requires fresh controls.
+The pause menu takes priority over diagnostics, HUD, reticle and equipment.
+Save Now/Save & Exit use the verified #382 worker; Q-wheel input must respect
+`GameplaySession::is_paused()` and the shared consumption gate.
+
+
+## Optional condition presentation (#383)
+
+`condition_feedback.rs` samples immutable survival snapshots. Health <25 gives a
+faint edge vignette and a finite two-beat cue; hunger <20 gives one warning (the
+existing survival HUD owns its pulse); fatigue <20 gives a quiet breathing cue
+and walking-only camera roll, capped at 0.003 radians at zero fatigue. The center
+aim ray and all authority remain unchanged. Three-point hysteresis rearms cues;
+there is no endless sound loop. Exponential fades use active time. Pause, crafting,
+tour, terminal, unfocused and occluded presentation suppress effects immediately.
+The renderer stretches a cached 128x128 generic image before HUDs, preserving
+center readability. No postprocessing or gameplay-domain dependency is added.
+
+Pause -> S opens keyboard accessibility: C camera motion, A condition audio, V
+vignette; #465 adds M master mute, B ship audio and G ship volume (0–100%).
+S returns and Enter/Escape resumes. Version-1 preferences live in
+`settings.json` beside the active-run directory (or `SALIMON_SETTINGS_FILE`) and
+survive restart/new runs. Save errors stay visible; corrupt/unknown settings use
+defaults with a warning. Settings do not enter run checkpoints.
+
+`condition_feedback/audio.rs` synthesizes original quiet one-second PCM WAV cues
+(22050 Hz mono, 16-bit, peak <=1500) beside the settings file. No third-party
+samples/licenses or Cargo/native audio link dependency. The shared `native_audio.rs` playback seam uses macOS
+`afplay`, Windows PowerShell SoundPlayer, or optional Linux `paplay`/`aplay`. A
+bounded queue and one child process are polled without blocking the frame; menu
+suppression kills/reaps playback. Missing/failed players log an explicit warning;
+missing players also show an accessibility warning. Actual OS playback and sensory
+quality/performance require reference-device verification (#376).
+
+## Advanced food composition (#378)
+
+The shared exact-identity consumption transaction accepts all four food recipe
+IDs from the survival catalog. `session/survival.rs` derives fatigue penalty relief
+from captured active modifiers; movement, interaction work and HUD receive that
+same policy. Status details describe continuous modifiers and remaining active
+time. The existing pause/full-save/offline gates own their timing and persistence.
+Native wheel dispatch is integrated by #377. See the
+[food effect contract](../survival/architecture.md#four-food-catalog-378).
+
+### Deterministic E2E desktop-input isolation (#313)
+
+The scenario runner uses `SALIMON_E2E_ISOLATE_INPUT=1` only on its `--e2e`
+child. Runtime then ignores native keyboard/pointer events and preserves
+protocol-held controls and fixed-step backlog across native focus/resize clock
+resets. Window/GPU lifecycle and visibility still operate; this is not native
+input/lifecycle certification. Normal play and benchmark mode ignore this E2E
+setting. Direct `Game` probes default to actual native input; their child removes
+the variable. `inspect.native_input_isolated` makes the boundary observable.
+
+## Scout reference cameras (#463)
+
+`scout_reference.rs` loads four checked-in ship-local camera poses shared with
+Blender. The `scout_reference` automation operation is admitted only in the
+existing native `--e2e` boundary. Its optional camera overrides presentation,
+never character position/aim, interaction rays, power, time or saved state.
+`clear` restores the gameplay camera. The reference scenario uses real Core
+feeding/restoration to compare blackout/powered views. See
+[the capture contract](../../docs/scout-presentation.md).
+
+## Scout audio composition (#465)
+
+`scout_audio.rs` owns snapshot-to-cue mapping, local listener/attenuation, bounded
+transients and native scene playback; `scout_audio/synth.rs` owns original stereo
+PCM. `native_audio.rs` is the existing survival/scene shared OS process seam.
+`condition_feedback/settings.rs` remains the sole preference store. Audio does
+not enter session commands, domain progression or run checkpoints. See the
+[canonical mix/budgets/validation contract](../../docs/scout-presentation.md#soundscape-boundary-465).
+Native loop/listening and OS/device costs remain #485, distinct from portable
+mapping/settings/synthesis checks.
+
+## Scout machinery composition (#464)
+
+`scout_feedback.rs` derives `MachineryFeedback` from existing authoritative ship,
+Core, Fabricator and active elapsed snapshots. `app.rs` attaches it to the same
+presented ship pose; `automation.rs` exposes read-only inspection. No event queue,
+animation controller, save state or additional elapsed admission is introduced.
+See the [canonical feedback contract](../../docs/scout-presentation.md#machinery-feedback-boundary-464).
+
+## Pause checkpoint controls (#382)
+
+The paused menu offers Enter/Escape Resume, N Save Now, S Settings and X Save &
+Exit. R retries failures, C cancels exit and Q explicitly exits without saving
+only after a failed exit checkpoint. Resume cancels exit intent. Menu keys require
+initial focused admission; repeats/synthetic/unfocused input cannot request IO.
+The existing center panel uniformly fits its drawable; Settings keep their keys.
+
+`checkpoints/control.rs` owns bounded coalescing, verified UTC receipts and exit
+intent. Manual/automatic captures share the same worker, atomic store and active
+run. Polling continues while paused/minimized; a newer request cannot be satisfied
+by an older in-flight snapshot. Retry bypasses frozen game-time backoff. Save &
+Exit and living-gameplay window close await verification or explicit failed-save
+risk choice. Final exit does not start a second write after either choice.
+Terminal archives/restart and 60-second/event autosaves retain their owners.
+No manual request ticks gameplay or credits offline fatigue. Native OS-input,
+DPI/appearance and M1 signoff remain separately tracked by #376.

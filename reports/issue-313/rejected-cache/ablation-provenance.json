@@ -1,0 +1,24 @@
+{
+  "candidate_source": "fc634bf265abb1c9a4a786bd855d84b994bc21c3",
+  "controlled_difference": [
+    "client/physics/src/lib.rs"
+  ],
+  "two_factor_restoration_matches_candidate_exactly": true,
+  "checked_client_files": 304,
+  "before_build": {
+    "schema_version": 1,
+    "host": "aarch64-apple-darwin",
+    "profile": "release",
+    "rust": "rustc 1.89.0 (29483883e 2025-08-04)",
+    "executable": "salimon-client",
+    "sha256": "a2546a5470dfa4a4fca17bceb99345e6177cf76c19f68da01d325792fd196339"
+  },
+  "current_build": {
+    "schema_version": 1,
+    "host": "aarch64-apple-darwin",
+    "profile": "release",
+    "rust": "rustc 1.89.0 (29483883e 2025-08-04)",
+    "executable": "salimon-client",
+    "sha256": "cbba4ab213a1053dd8a28c80340e60ff044841d00a404832f0a889c049502b0c"
+  }
+}

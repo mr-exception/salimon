@@ -37,10 +37,7 @@ impl CharacterController {
         let (forward, right) = surface_view_basis(ship.axes, up, self.yaw_radians);
         let movement = movement_axes(input);
         let tangent = add(scale(forward, movement[0]), scale(right, movement[1]));
-        world = add(
-            world,
-            scale(tangent, WALK_SPEED_METERS_PER_SECOND * seconds),
-        );
+        world = add(world, scale(tangent, self.walk_speed() * seconds));
         let ground = surface.sample(world);
         let previous_ground = surface.sample(old_world);
         let rise = dot(

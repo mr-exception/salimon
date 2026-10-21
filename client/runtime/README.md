@@ -92,6 +92,17 @@ the original monotonic update clock and default starting state.
   monotonic delta. Reset only the update clock across lifecycle gaps; preserve
   portable state across renderer reconstruction.
 
+At health zero, the **Journey Ended** screen shows cause, active survival time,
+travel distance and final location. Click **Restart Game** or press **Enter/R**
+to archive the run and start fresh after its checkpoint verifies. Failure keeps
+the terminal screen and lets you retry. Click the new game view to recapture controls.
+
+The compact upper-left survival HUD shows health, hunger and fatigue icons with
+thin bars. Press **H** for status details and exact active movement/interaction
+penalties; use **[** / **]** to page through effects and H to close. It does not
+pause gameplay. Recovery briefly shows +Health/+Hunger feedback. Crafting and
+engineering diagnostics take overlay priority; focus/capture loss closes details.
+
 Press **F3** to show or hide the engineering diagnostics overlay. It is hidden by
 default and remains a developer view rather than a normal gameplay HUD. Runtime
 frame observations feed the diagnostics crate after each successful present;
@@ -330,3 +341,8 @@ Takeoff returns powered control at rest after a six-second, 50 m local rise;
 while captured it reports `Assisted takeoff - flight controls locked`. Landing
 eligibility is unchanged, so a land prompt can remain available at handoff.
 See [the ship-owned contract](../ship/architecture.md) and #295.
+
+Scout soundscape (#465): Pause -> S opens preferences; M toggles master mute,
+B toggles ship sound and G cycles ship volume. A keeps its survival-cue meaning.
+Preferences survive new runs. See the [soundscape contract](../../docs/scout-presentation.md#soundscape-boundary-465)
+for spatial/quiet-zone behavior, optional OS playback and native-review limits.

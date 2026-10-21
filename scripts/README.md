@@ -39,7 +39,7 @@ timeout. A step can specify its own `timeout_ms`. Example:
 ```
 
 `action` takes any operation and its parameters from the native command
-protocol: `inspect`, `step`, `key`, `mouse`, `look`, `aim_fragment`, `restore_look`, `interact`, `landing`, or `thruster`.
+protocol: `inspect`, `step`, `key`, `mouse`, `look`, `aim_fragment`, `restore_look`, `interact`, `landing`, `thruster`, `crafting`, or `consume`.
 `assert` inspects state once; `wait` inspects until matched, advancing the
 simulation by `frames` (1–600, default 1) between checks. Condition `path`
 uses dot-separated object keys and zero-based array indices, such as
@@ -629,5 +629,26 @@ Q-wheel automation (#377): send `key:consumable_wheel` with `pressed:true/false`
 null clears hover). Left mouse press consumes the occupied selection once.
 `wheel_next`/`wheel_confirm` key presses exercise Tab/Enter fallback. Inspection
 exposes `consumable_wheel.open/held/hovered`. Actions use the same portable modal
-and item transaction as native events, without desktop focus admission. Native
-pointer delivery and survival effects require their separate verification.
+and item transaction as native events, without desktop focus admission. Survival
+effects use the same exact-item transaction; native pointer/appearance signoff
+remains separately under #376.
+
+Consumable recovery protocol (#370):
+`{"op":"consume","slot":1,"job":12,"unit":1}` identifies an exact current
+item (slot 1–3 food, 4–5 medical). Obtain job/unit from inspection; both must match
+the selected slot. Success returns `applied:true`; empty/stale/denied/unknown
+effects return `applied:false` with a reason, without removing anything. Invalid
+argument shapes fail validation. This is the portable shared transaction for
+#377's native Q wheel, not a new gameplay hotkey; M/N remain absent. Inspection
+adds each item's validated recovery definition and `survival` current meters/
+active effects. Whole-game survival clock/save activation remains #371.
+
+## Deterministic input boundary (#313)
+
+`salimon-test` and model visual fixtures isolate their E2E child from desktop
+keyboard/mouse events and focus/resize resets of scripted held controls/time.
+They set `SALIMON_E2E_ISOLATE_INPUT=1`; `inspect.native_input_isolated` records it.
+This prevents a shared desktop or initial cursor warp from changing fixture poses.
+Direct `salimon_test.Game` defaults to `native_input=True` for opt-in OS probes
+and removes the variable; use those probes for native input/lifecycle signoff.
+Isolation never certifies real input or normal wall-clock interpolation.

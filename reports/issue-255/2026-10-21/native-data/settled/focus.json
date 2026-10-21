@@ -1,0 +1,16 @@
+[
+  {
+    "pid": 38950,
+    "monotonic": 481111.270594833,
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "target window bounds unavailable\n"
+  },
+  {
+    "pid": 38950,
+    "monotonic": 481112.33364025,
+    "returncode": 0,
+    "stdout": "frontmost=38950 target=38950\nposted PID=38950 operation=focus\n",
+    "stderr": ""
+  }
+]

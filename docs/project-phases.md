@@ -3,6 +3,10 @@
 > Migrated from the Salimon project documents on 2026-09-29. For current task status and dependencies, use [GitHub issues](https://github.com/mr-exception/salimon/issues).
 
 > The roadmap is intentionally incremental. Exact phases will be finalized after the first design questions are answered.
+## Future narrative/experience initiative (2026-10-21)
+
+A grounded cinematic Scout vertical slice, opening memory-loss narrative, Archive/Data Recovery, player-known charting, and eventual Absenat gate/Hall are specified in [experience roadmap](experience-implementation-map.md). Work is split into scoped issues #463–476 and reused existing dependencies. The future homeworld replaces historical Earth-start requirements when migrated; the currently shipped prototype is not retroactively changed. Backend-powered Hall is a later implementation stage, completely undiscoverable in all pre-completion player UI.
+
 ## Phase rules
 Every phase should:
 - Have **one primary playable goal**.

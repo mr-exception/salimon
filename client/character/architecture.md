@@ -204,3 +204,13 @@ contact/sleep/dwell state survive. No input latch, OS handle or GPU state is
 restored. An attached mining sphere becomes a detached existing physical entity,
 without allocating a new ID or losing mass. Whole-session/Fabricator publication
 is composed in #365; disk checkpoints remain #366.
+
+## Voluntary movement multiplier (#369)
+
+`set_movement_scale` admits a bounded transient multiplier for voluntary movement
+in every walking mode and EVA assist, and for zero-G cabin acceleration/control
+speed. It never scales elapsed time, gravity, jump impulse or inherited velocity.
+Existing faster zero-G momentum is preserved. The field is excluded from saved
+source state and resets to one on restoration; the host reapplies current derived
+survival restrictions before stepping. Character has no survival dependency;
+thresholds/permissions remain in the survival domain and runtime composition.

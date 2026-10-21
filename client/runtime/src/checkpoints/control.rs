@@ -1,5 +1,5 @@
 //! Portable request/status policy for the #382 pause-menu consumer.
-//! UI wiring is blocked by #381; IO completion is the only success authority.
+//! IO completion is the only success authority.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub(crate) enum Status {
     #[default]
@@ -11,7 +11,6 @@ pub(crate) enum Status {
     Failed,
 }
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-#[allow(dead_code)] // Pause-menu admission follows #381; tests exercise the policy now.
 pub(crate) enum Request {
     SaveNow,
     SaveAndExit,
@@ -29,7 +28,6 @@ pub(crate) struct Control {
     captured_utc: Option<u64>,
 }
 impl Control {
-    #[allow(dead_code)] // Called by the future #381/#382 native menu adapter.
     pub(crate) fn request(&mut self, request: Request) {
         match request {
             Request::SaveNow | Request::SaveAndExit | Request::Retry => {
@@ -77,6 +75,29 @@ impl Control {
             self.status = Status::Failed;
         }
     }
+}
+/// Format a verified checkpoint receipt as Gregorian UTC.
+pub(crate) fn timestamp(utc: u64) -> String {
+    let days = utc / 86400;
+    if days > 2932896 {
+        return format!("{utc} seconds since Unix epoch (UTC)");
+    }
+    let z = days as i64 + 719468;
+    let era = z / 146097;
+    let doe = z - era * 146097;
+    let yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365;
+    let mut year = yoe + era * 400;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp = (5 * doy + 2) / 153;
+    let day = doy - (153 * mp + 2) / 5 + 1;
+    let month = mp + if mp < 10 { 3 } else { -9 };
+    year += i64::from(month <= 2);
+    format!(
+        "{year:04}-{month:02}-{day:02} {:02}:{:02}:{:02} UTC",
+        utc / 3600 % 24,
+        utc / 60 % 60,
+        utc % 60
+    )
 }
 #[cfg(test)]
 mod tests {

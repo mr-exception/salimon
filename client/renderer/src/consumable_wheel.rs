@@ -192,7 +192,7 @@ mod tests {
             ],
             hovered: Some(0),
             names: std::array::from_fn(|i| format!("ITEM {i}")),
-            effect: "NO ACTIVE EFFECT".into(),
+            effect: "HUNGER +40".into(),
         };
         raster.update(state.clone());
         raster.image().unwrap().validate().unwrap();

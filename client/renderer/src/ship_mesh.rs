@@ -6,9 +6,9 @@ use crate::cockpit_instruments::{ATLAS_HEIGHT, ATLAS_WIDTH, InstrumentAtlas};
 use crate::{CockpitInstruments, DEPTH_FORMAT, RendererError, SceneFrame, encode_f32s};
 
 const SHIP_GLB: &[u8] = include_bytes!("../../assets/ship/export/salimon_phase0_ship.glb");
-const VERTEX_FLOATS: usize = 18;
+const VERTEX_FLOATS: usize = 19;
 const VERTEX_STRIDE: u64 = (VERTEX_FLOATS * size_of::<f32>()) as u64;
-const UNIFORM_SIZE: u64 = 160;
+const UNIFORM_SIZE: u64 = 192;
 use crate::ramp_geometry::{
     RAMP_ANGLE_RADIANS, RAMP_EXTENSION_METERS, RAMP_FACE_OFFSET_METERS, RAMP_HINGE,
 };
@@ -18,6 +18,7 @@ const DOOR_HINGE_Y_METERS: f32 = RAMP_HINGE[1] as f32;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ShipMeshInstance {
+    pub machinery: crate::MachineryFeedback,
     pub position_meters: [f64; 3],
     /// Unit quaternion `[x, y, z, w]` rotating ship-local coordinates to world.
     pub orientation: [f32; 4],
@@ -165,6 +166,7 @@ fn geometry_from_bytes(bytes: &[u8]) -> Result<ShipGeometry, RendererError> {
                     uv[0],
                     uv[1],
                     display_flag,
+                    crate::machinery::surface_role(node.name()),
                 ]);
             }
         }
@@ -299,6 +301,11 @@ fn create_pipeline(
                         format: wgpu::VertexFormat::Float32x3,
                         offset: 60,
                         shader_location: 6,
+                    },
+                    wgpu::VertexAttribute {
+                        format: wgpu::VertexFormat::Float32,
+                        offset: 72,
+                        shader_location: 7,
                     },
                 ],
             })],
@@ -503,7 +510,7 @@ impl ShipMeshRenderer {
                 },
             );
         }
-        let mut values = Vec::with_capacity(40);
+        let mut values = Vec::with_capacity(48);
         values.extend_from_slice(&view_projection);
         let fraction = ship.door_open_fraction;
         let hinge_fraction = (fraction / 0.6).clamp(0.0, 1.0);
@@ -514,7 +521,8 @@ impl ShipMeshRenderer {
             center[0],
             center[1],
             center[2],
-            0.0,
+            // Shared explicit bus state: never infer lighting from rounded energy.
+            f32::from(!ship.instruments.power_off),
             axes[0][0],
             axes[0][1],
             axes[0][2],
@@ -536,6 +544,7 @@ impl ShipMeshRenderer {
             f32::from(ship.fabricator_output_present),
             f32::from(ship.fabricator_output_medical),
         ]);
+        values.extend_from_slice(&ship.machinery.uniforms()?);
         queue.write_buffer(&self.uniform, 0, &encode_f32s(values));
         self.visible = true;
         Ok(())
@@ -791,3 +800,7 @@ mod fabricator_tests {
         .unwrap();
     }
 }
+
+#[cfg(test)]
+#[path = "ship_feedback_tests.rs"]
+mod feedback_gpu_tests;

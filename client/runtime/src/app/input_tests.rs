@@ -33,12 +33,12 @@ fn pilot() -> ClientApplication {
 }
 
 #[test]
-fn escape_then_w_e_l_and_throttle_do_not_mutate_gameplay_until_recapture() {
+fn cursor_release_then_w_e_l_and_throttle_do_not_mutate_gameplay_until_recapture() {
     let mut app = pilot();
     native(&mut app, KeyCode::KeyW, true);
     native(&mut app, KeyCode::ArrowUp, true);
     app.session.advance_game(Duration::from_millis(16));
-    app.release_input_capture(); // Same reset invoked by real initial Escape.
+    app.release_input_capture(); // Same reset invoked by F1 cursor release.
     let before = app.session.ship.snapshot();
     for key in [
         KeyCode::KeyW,
@@ -278,4 +278,267 @@ fn wheel_released_pointer_still_admits_q_release_and_focus_loss_cancels_without_
     app.set_input_focus(true);
     native(&mut app, KeyCode::KeyQ, true); // No capture: no synthetic reopen.
     assert!(!app.session.wheel.open);
+}
+
+#[test]
+fn journey_ended_restart_uses_verified_archive_and_retries_failure_without_resurrection() {
+    use crate::checkpoints::Checkpoints;
+    let root = std::env::temp_dir().join(format!("salimon-374-restart-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&root);
+    let mut app = ClientApplication::default();
+    app.checkpoints = Some(Checkpoints::open_at(root.clone(), &mut app.session, 100).unwrap());
+    app.session
+        .survival
+        .command(salimon_survival::Command::Damage(
+            salimon_survival::Points::FULL,
+        ))
+        .unwrap();
+    let before = app.session.save_bytes(1).unwrap();
+    let serial = app.session.run.serial;
+    // Stale/unfocused/occluded/synthetic/repeated presses cannot restart.
+    native(&mut app, KeyCode::Enter, true);
+    assert_eq!(app.session.run.serial, serial);
+    app.native_focused = true;
+    app.occluded = true;
+    native(&mut app, KeyCode::Enter, true);
+    app.occluded = false;
+    for (repeat, synthetic, pressed) in [
+        (true, false, true),
+        (false, true, true),
+        (false, false, false),
+    ] {
+        app.dispatch_key(
+            PhysicalKey::Code(KeyCode::Enter),
+            pressed,
+            repeat,
+            synthetic,
+            InputSource::Native,
+        );
+        assert_eq!(app.session.run.serial, serial);
+    }
+    for key in [
+        KeyCode::F2,
+        KeyCode::F3,
+        KeyCode::KeyH,
+        KeyCode::KeyW,
+        KeyCode::KeyE,
+    ] {
+        native(&mut app, key, true);
+    }
+    assert_eq!(app.session.save_bytes(1).unwrap(), before);
+    let archive = root.join(format!("journeys/v2/run-{serial}.json"));
+    std::fs::create_dir_all(archive.parent().unwrap()).unwrap();
+    std::fs::write(&archive, b"conflict").unwrap();
+    native(&mut app, KeyCode::Enter, true);
+    assert!(app.session.survival.snapshot().terminal);
+    assert_eq!(app.session.save_bytes(1).unwrap(), before);
+    assert!(app.checkpoints.as_ref().unwrap().warning.is_some());
+    std::fs::remove_file(&archive).unwrap();
+    native(&mut app, KeyCode::NumpadEnter, true);
+    assert!(!app.session.survival.snapshot().terminal);
+    assert_eq!(app.session.run.serial, serial + 1);
+    assert_eq!(
+        app.session.survival.snapshot().hunger,
+        salimon_survival::Points::FULL
+    );
+    assert_eq!(
+        app.session.survival.snapshot().health,
+        salimon_survival::Points::FULL
+    );
+    assert_eq!(
+        app.session.survival.snapshot().fatigue,
+        salimon_survival::Points::FULL
+    );
+    assert_eq!(app.session.run.journey.distance_meters, 0.);
+    assert_eq!(app.session.update_clock.backlog(), Duration::ZERO);
+    assert!(!app.cursor_captured);
+    assert!(archive.exists());
+    let report: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(&archive).unwrap()).unwrap();
+    assert_eq!(report["serial"], serial);
+    // A second activation in fresh gameplay cannot restart a living run.
+    assert!(!app.restart_terminal());
+    assert_eq!(app.session.run.serial, serial + 1);
+    drop(app);
+    let mut restored = crate::session::GameplaySession::default();
+    let saves = Checkpoints::open_at(root.clone(), &mut restored, 100).unwrap();
+    assert_eq!(restored.run.serial, serial + 1);
+    assert!(!restored.survival.snapshot().terminal);
+    drop(saves);
+    std::fs::remove_dir_all(root).unwrap();
+}
+#[test]
+fn journey_ended_terminal_relaunch_and_missing_storage_never_grant_unverified_gameplay() {
+    use crate::checkpoints::Checkpoints;
+    let root = std::env::temp_dir().join(format!("salimon-374-terminal-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&root);
+    let mut app = ClientApplication::default();
+    let mut saves = Checkpoints::open_at(root.clone(), &mut app.session, 100).unwrap();
+    app.session
+        .survival
+        .command(salimon_survival::Command::Damage(
+            salimon_survival::Points::FULL,
+        ))
+        .unwrap();
+    saves.finish(&app.session).unwrap();
+    drop(saves);
+    drop(app);
+    let mut app = ClientApplication::default();
+    let saves = Checkpoints::open_at(root.clone(), &mut app.session, 100).unwrap();
+    assert!(app.session.survival.snapshot().terminal);
+    let model = crate::journey_ended::Report::from(&app.session.ended_run().unwrap());
+    assert!(
+        app.journey_ended
+            .image(Some(model), [640, 360], 1.)
+            .is_some()
+    );
+    // Dropping the store models an unavailable restart backend, not permission to bypass it.
+    drop(saves);
+    let serial = app.session.run.serial;
+    assert!(!app.restart_terminal());
+    assert_eq!(app.session.run.serial, serial);
+    assert!(app.session.survival.snapshot().terminal);
+    drop(app);
+    std::fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn pause_native_background_focus_and_protocol_share_freeze() {
+    let mut app = pilot();
+    native(&mut app, KeyCode::KeyW, true);
+    native(&mut app, KeyCode::ArrowUp, true);
+    native(&mut app, KeyCode::Escape, true);
+    assert!(app.session.is_paused());
+    let throttle = app.session.ship.snapshot().thruster_percentage;
+    let frozen = app.session.save_bytes(123).unwrap();
+    for key in [
+        KeyCode::KeyW,
+        KeyCode::KeyL,
+        KeyCode::F2,
+        KeyCode::KeyP,
+        KeyCode::KeyE,
+    ] {
+        native(&mut app, key, true);
+    }
+    assert_eq!(
+        app.advance_native(Duration::from_secs(7200)),
+        (Duration::ZERO, 0)
+    );
+    app.set_input_focus(false);
+    app.reset_update_clock();
+    app.set_input_focus(true);
+    assert!(app.session.is_paused());
+    assert_eq!(app.session.save_bytes(123).unwrap(), frozen);
+    // A focus-generated Escape must never resume.
+    app.dispatch_key(
+        PhysicalKey::Code(KeyCode::Escape),
+        true,
+        false,
+        true,
+        InputSource::Native,
+    );
+    assert!(app.session.is_paused());
+    native(&mut app, KeyCode::Enter, true);
+    assert!(!app.session.is_paused());
+    assert_eq!(app.session.ship.snapshot().thruster_percentage, throttle);
+    assert_eq!(app.session.ship_control_input, ShipControlInput::default());
+}
+
+#[test]
+fn isolated_e2e_ignores_desktop_keys_and_preserves_protocol_holds_on_lifecycle_reset() {
+    let mut app = pilot();
+    app.e2e_input_isolated = true;
+    native(&mut app, KeyCode::KeyW, true);
+    assert_eq!(app.session.ship_control_input, ShipControlInput::default());
+    app.automation_key(PhysicalKey::Code(KeyCode::KeyW), true);
+    let scripted = app.session.ship_control_input;
+    app.session
+        .update_clock
+        .accumulate(Duration::from_millis(5));
+    assert_ne!(scripted, ShipControlInput::default());
+    app.set_input_focus(false);
+    app.reset_update_clock();
+    assert_eq!(app.session.ship_control_input, scripted);
+    assert_eq!(app.session.update_clock.backlog(), Duration::from_millis(5));
+    app.automation_key(PhysicalKey::Code(KeyCode::KeyW), false);
+    assert_eq!(app.session.ship_control_input, ShipControlInput::default());
+    app.e2e_input_isolated = false;
+    app.native_focused = true;
+    app.cursor_captured = true;
+    native(&mut app, KeyCode::KeyW, true);
+    assert_ne!(app.session.ship_control_input, ShipControlInput::default());
+    app.set_input_focus(false);
+    assert_eq!(app.session.ship_control_input, ShipControlInput::default());
+}
+
+#[test]
+fn pause_save_menu_requires_initial_focus_and_preserves_paused_state() {
+    let mut app = ClientApplication {
+        native_focused: true,
+        cursor_captured: true,
+        ..Default::default()
+    };
+    let dir = std::env::temp_dir().join(format!("salimon-382-menu-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&dir);
+    app.checkpoints =
+        Some(crate::checkpoints::Checkpoints::open(dir.clone(), &mut app.session).unwrap());
+    native(&mut app, KeyCode::Escape, true);
+    let before = app.session.save_bytes(123).unwrap();
+    let key = PhysicalKey::Code(KeyCode::KeyX);
+    app.dispatch_key(key, true, true, false, InputSource::Native);
+    app.dispatch_key(key, true, false, true, InputSource::Native);
+    app.native_focused = false;
+    native(&mut app, KeyCode::KeyX, true);
+    assert!(!app.checkpoints.as_ref().unwrap().exit_requested());
+    app.native_focused = true;
+    native(&mut app, KeyCode::KeyS, true);
+    native(&mut app, KeyCode::KeyX, true);
+    assert!(!app.checkpoints.as_ref().unwrap().exit_requested());
+    native(&mut app, KeyCode::KeyS, true);
+    native(&mut app, KeyCode::KeyX, true);
+    assert!(app.checkpoints.as_ref().unwrap().exit_requested());
+    assert!(app.pause_menu_text().unwrap().contains("C   CANCEL EXIT"));
+    assert_eq!(app.session.save_bytes(123).unwrap(), before);
+    native(&mut app, KeyCode::Escape, true);
+    assert!(!app.session.is_paused());
+    assert!(!app.checkpoints.as_ref().unwrap().exit_requested());
+    drop(app);
+    std::fs::remove_dir_all(dir).unwrap();
+}
+#[test]
+fn pause_menu_raster_and_verified_utc_receipt_are_available() {
+    use crate::checkpoints::control::timestamp;
+    assert_eq!(timestamp(0), "1970-01-01 00:00:00 UTC");
+    assert_eq!(timestamp(951827696), "2000-02-29 12:34:56 UTC");
+    assert!(timestamp(u64::MAX).contains("Unix epoch"));
+    let mut app = ClientApplication::default();
+    app.session.command(crate::session::Command::TogglePause);
+    let text = app.pause_menu_text().unwrap();
+    assert!(text.contains("N   SAVE NOW"));
+    assert!(text.contains("Saving unavailable"));
+    let (w, h, pixels) = crate::action_bar::rasterize_action_bar(&text, 3);
+    assert_eq!(pixels.len(), (w * h * 4) as usize);
+}
+
+#[test]
+fn wheel_pause_and_death_clear_pending_input_without_recapture() {
+    let mut app = pilot();
+    native(&mut app, KeyCode::KeyQ, true);
+    assert!(app.session.wheel.open);
+    app.cursor_captured = false;
+    native(&mut app, KeyCode::Escape, true);
+    assert!(app.session.is_paused() && !app.session.wheel.open);
+    native(&mut app, KeyCode::KeyQ, true);
+    assert!(!app.session.wheel.open);
+    native(&mut app, KeyCode::Escape, true);
+    app.cursor_captured = true;
+    native(&mut app, KeyCode::KeyQ, true);
+    app.session
+        .survival
+        .command(salimon_survival::Command::Damage(
+            salimon_survival::Points::FULL,
+        ))
+        .unwrap();
+    app.advance_native(Duration::ZERO);
+    assert!(!app.session.wheel.open && !app.cursor_captured);
 }

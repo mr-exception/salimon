@@ -1,0 +1,79 @@
+[
+  {
+    "pid": 39770,
+    "monotonic": 481242.732216916,
+    "returncode": 0,
+    "stdout": "frontmost=39770 target=39770\nposted PID=39770 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 39794,
+    "monotonic": 481246.034259416,
+    "returncode": 0,
+    "stdout": "frontmost=39794 target=39794\nposted PID=39794 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 39810,
+    "monotonic": 481249.346040291,
+    "returncode": 0,
+    "stdout": "frontmost=39810 target=39810\nposted PID=39810 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 39834,
+    "monotonic": 481252.64520825,
+    "returncode": 0,
+    "stdout": "frontmost=39834 target=39834\nposted PID=39834 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 39864,
+    "monotonic": 481255.946046916,
+    "returncode": 0,
+    "stdout": "frontmost=39864 target=39864\nposted PID=39864 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 39881,
+    "monotonic": 481259.252063208,
+    "returncode": 0,
+    "stdout": "frontmost=39881 target=39881\nposted PID=39881 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 39906,
+    "monotonic": 481262.5168085,
+    "returncode": 0,
+    "stdout": "frontmost=39906 target=39906\nposted PID=39906 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 39922,
+    "monotonic": 481265.802705458,
+    "returncode": 0,
+    "stdout": "frontmost=39922 target=39922\nposted PID=39922 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 39947,
+    "monotonic": 481268.617168041,
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "target window bounds unavailable\n"
+  },
+  {
+    "pid": 39947,
+    "monotonic": 481269.683348333,
+    "returncode": 0,
+    "stdout": "frontmost=39947 target=39947\nposted PID=39947 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 39972,
+    "monotonic": 481272.402712,
+    "returncode": 0,
+    "stdout": "frontmost=39972 target=39972\nposted PID=39972 operation=focus\n",
+    "stderr": ""
+  }
+]

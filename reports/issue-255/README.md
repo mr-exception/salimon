@@ -1,3 +1,5 @@
+> Current delivery (2026-10-21): [refreshed native evidence](2026-10-21/README.md). Historical results below remain dated evidence. Remaining budget approval and performance decisions are tracked in [#479](https://github.com/mr-exception/salimon/issues/479).
+
 # Issue 255 — M1 cadence calibration and active-load failure
 
 Latest: [active contact-path remediation and fresh matched M1 measurements](2026-10-17-remediation/README.md).

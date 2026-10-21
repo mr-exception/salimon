@@ -131,3 +131,7 @@ contact/sleep/dwell state survive. No input latch, OS handle or GPU state is
 restored. An attached mining sphere becomes a detached existing physical entity,
 without allocating a new ID or losing mass. Whole-session/Fabricator publication
 is composed in #365; disk checkpoints remain #366.
+
+- Voluntary speed scaling (#369) applies consistently in cabin, ramp, surface and
+  EVA without scaling physical clocks, gravity or inherited motion. Derived scale
+  is transient and must be recomputed by the host after save restoration.

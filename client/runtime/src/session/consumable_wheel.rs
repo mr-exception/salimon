@@ -17,6 +17,7 @@ pub(crate) struct WheelState {
     pub(crate) open: bool,
     pub(crate) hovered: Option<ConsumableSlot>,
     pub(crate) primary_down: bool,
+    selection: Option<super::consumables::Selection>,
 }
 impl GameplaySession {
     pub(super) fn wheel_action(&mut self, action: WheelAction) {
@@ -26,6 +27,7 @@ impl GameplaySession {
                 self.wheel.held = false;
                 self.wheel.open = false;
                 self.wheel.hovered = None;
+                self.wheel.selection = None;
                 return;
             }
             if self.wheel.held || self.crafting_ui.open || self.view_mode != ViewMode::Gameplay {
@@ -38,6 +40,7 @@ impl GameplaySession {
                 open: true,
                 hovered: None,
                 primary_down,
+                selection: None,
             };
             return;
         }
@@ -45,7 +48,7 @@ impl GameplaySession {
             return;
         }
         match action {
-            Hover(slot) => self.wheel.hovered = slot,
+            Hover(slot) => self.select_wheel_slot(slot),
             Primary(pressed) => {
                 let was_down = std::mem::replace(&mut self.wheel.primary_down, pressed);
                 if pressed && !was_down {
@@ -58,9 +61,10 @@ impl GameplaySession {
                     .wheel
                     .hovered
                     .map_or(if offset == 1 { 4 } else { 0 }, ConsumableSlot::index);
-                self.wheel.hovered = (1..=5)
+                let slot = (1..=5)
                     .map(|step| ConsumableSlot::ALL[(start + offset * step) % 5])
                     .find(|slot| self.consumables.item(*slot).is_some());
+                self.select_wheel_slot(slot);
             }
             Confirm => self.consume_wheel_selection(),
             Cancel => {
@@ -70,21 +74,28 @@ impl GameplaySession {
             Hold(_) => unreachable!(),
         }
     }
+    fn select_wheel_slot(&mut self, slot: Option<ConsumableSlot>) {
+        self.wheel.hovered = slot;
+        self.wheel.selection = slot.and_then(|slot| {
+            self.consumables
+                .item(slot)
+                .map(|item| super::consumables::Selection {
+                    slot,
+                    job: item.job,
+                    unit: item.unit,
+                })
+        });
+    }
     fn consume_wheel_selection(&mut self) {
-        let Some(item) = self
-            .wheel
-            .hovered
-            .and_then(|slot| self.consumables.consume_slot(slot))
-        else {
+        let Some(selected) = self.wheel.selection else {
             return;
         };
+        if self.consume_selection(selected).is_err() {
+            return;
+        }
         self.wheel.open = false;
         self.wheel.hovered = None;
-        // #368 owns applying healing/status effects. Do not invent survival state here.
-        self.feedback = Some(match item.category {
-            salimon_fabrication::OutputCategory::Medical => "Medkit consumed",
-            _ => "Food ration consumed",
-        });
+        self.wheel.selection = None;
     }
     pub(crate) fn wheel_presentation(&self) -> salimon_renderer::ConsumableWheel {
         salimon_renderer::ConsumableWheel {
@@ -95,7 +106,67 @@ impl GameplaySession {
                     .item(ConsumableSlot::ALL[i])
                     .map_or_else(|| "EMPTY SLOT".into(), |item| item.recipe.key().to_owned())
             }),
-            effect: "NO ACTIVE EFFECT".into(),
+            effect: self
+                .wheel
+                .hovered
+                .and_then(|slot| self.consumables.item(slot))
+                .and_then(|item| self.consumable_effects.get(item.recipe.key()))
+                .map_or_else(
+                    || "SELECT AN ITEM".into(),
+                    |definition| {
+                        definition
+                            .benefits
+                            .iter()
+                            .map(benefit_text)
+                            .collect::<Vec<_>>()
+                            .join(" / ")
+                    },
+                ),
+        }
+    }
+}
+fn benefit_text(benefit: &salimon_survival::consumables::Benefit) -> String {
+    use salimon_survival::consumables::{Benefit, Recovery};
+    let name = |recovery| match recovery {
+        Recovery::Hunger => "HUNGER",
+        Recovery::Health(salimon_survival::effects::Healing::Ordinary) => "HEALTH",
+        Recovery::Health(salimon_survival::effects::Healing::Treatment) => "WOUND CARE",
+    };
+    match *benefit {
+        Benefit::Instant {
+            recovery,
+            milli_points,
+        } => format!("{} +{}", name(recovery), milli_points as f64 / 1000.0),
+        Benefit::OverTime {
+            recovery,
+            milli_points,
+            interval,
+            duration,
+            ..
+        } => format!(
+            "{} +{}/{}s FOR {}s",
+            name(recovery),
+            milli_points as f64 / 1000.0,
+            interval.as_secs_f64(),
+            duration.as_secs_f64()
+        ),
+        Benefit::Modifier {
+            kind,
+            basis_points,
+            duration,
+            ..
+        } => {
+            use salimon_survival::effects::Modifier;
+            let name = match kind {
+                Modifier::FatigueDrain => "FATIGUE DRAIN",
+                Modifier::Regeneration => "REGEN",
+                Modifier::FatigueRelief => "FATIGUE PENALTY",
+            };
+            format!(
+                "{name} {}% {}s",
+                basis_points as f64 / 100.0,
+                duration.as_secs_f64()
+            )
         }
     }
 }
@@ -234,5 +305,111 @@ mod tests {
         action(&mut s, WheelAction::Cancel);
         action(&mut s, WheelAction::Hold(true));
         assert!(!s.wheel.open);
+    }
+}
+
+#[cfg(test)]
+mod survival_integration_tests {
+    use super::*;
+    use crate::session::Command;
+    use salimon_survival::{Command as VitalCommand, Points};
+    use std::time::Duration;
+    fn use_item(s: &mut GameplaySession, slot: ConsumableSlot) {
+        for c in [
+            Command::Mining(false),
+            Command::Wheel(WheelAction::Hold(false)),
+            Command::Wheel(WheelAction::Hold(true)),
+            Command::Wheel(WheelAction::Hover(Some(slot))),
+            Command::Wheel(WheelAction::Confirm),
+        ] {
+            s.command(c);
+        }
+    }
+    #[test]
+    fn real_ration_medkit_and_full_vitals_consumption() {
+        let mut s = GameplaySession::new_run();
+        let mut v = serde_json::to_value(&s.survival).unwrap();
+        v["hunger"] = serde_json::to_value(Points::whole(10).unwrap()).unwrap();
+        s.survival = serde_json::from_value(v).unwrap();
+        s.survival
+            .command(VitalCommand::Damage(Points::whole(30).unwrap()))
+            .unwrap();
+        use_item(&mut s, ConsumableSlot::FoodOne);
+        assert_eq!(s.survival.snapshot().hunger, Points::whole(50).unwrap());
+        assert!(s.consumables.food()[0].is_none() && !s.wheel.open);
+        use_item(&mut s, ConsumableSlot::MedicalOne);
+        let before = s.survival.snapshot().health;
+        s.advance_automation(Duration::from_secs(6));
+        assert!(s.survival.snapshot().health > before);
+        assert!(s.consumables.medical()[0].is_none());
+        let mut full = GameplaySession::new_run();
+        use_item(&mut full, ConsumableSlot::FoodTwo);
+        assert!(full.consumables.food()[1].is_none());
+        assert_eq!(full.survival.snapshot().hunger, Points::FULL);
+    }
+    #[test]
+    fn exhaustion_allows_use_but_pause_death_and_reload_cancel_selection() {
+        let mut s = GameplaySession::new_run();
+        let mut v = serde_json::to_value(&s.survival).unwrap();
+        v["fatigue"] = serde_json::to_value(Points::ZERO).unwrap();
+        s.survival = serde_json::from_value(v).unwrap();
+        use_item(&mut s, ConsumableSlot::FoodOne);
+        assert!(s.consumables.food()[0].is_none());
+        s.command(Command::Wheel(WheelAction::Hold(false)));
+        s.command(Command::Wheel(WheelAction::Hold(true)));
+        s.command(Command::Wheel(WheelAction::Hover(Some(
+            ConsumableSlot::FoodTwo,
+        ))));
+        let original = s.consumables.clone();
+        s.command(Command::TogglePause);
+        assert!(!s.wheel.open);
+        s.command(Command::Wheel(WheelAction::Hold(true)));
+        s.command(Command::Wheel(WheelAction::Confirm));
+        assert_eq!(s.consumables, original);
+        s.command(Command::TogglePause);
+        s.command(Command::Wheel(WheelAction::Hold(true)));
+        let bytes = s.save_bytes(123).unwrap();
+        s.restore_bytes(&bytes).unwrap();
+        assert!(!s.wheel.open && s.wheel.selection.is_none());
+        s.command(Command::Wheel(WheelAction::Confirm));
+        assert_eq!(s.consumables, original);
+        s.command(Command::Wheel(WheelAction::Hold(true)));
+        s.survival
+            .command(VitalCommand::Damage(Points::FULL))
+            .unwrap();
+        s.command(Command::Wheel(WheelAction::Confirm));
+        assert!(!s.wheel.open);
+        assert_eq!(s.consumables, original);
+    }
+    #[test]
+    fn replaced_selection_and_unknown_effect_do_not_consume_inventory() {
+        let mut s = GameplaySession::new_run();
+        let slot = ConsumableSlot::FoodOne;
+        s.command(Command::Wheel(WheelAction::Hold(true)));
+        s.command(Command::Wheel(WheelAction::Hover(Some(slot))));
+        let mut replacement = s.consumables.consume_slot(slot).unwrap();
+        replacement.job = salimon_fabrication::JobId(999);
+        s.consumables.insert(replacement).unwrap();
+        let before = s.save_bytes(1).unwrap();
+        s.command(Command::Wheel(WheelAction::Confirm));
+        assert_eq!(s.save_bytes(1).unwrap(), before);
+        assert!(s.wheel.open);
+        s.command(Command::Wheel(WheelAction::Hover(Some(slot))));
+        s.consumable_effects = salimon_survival::consumables::Catalog::new(vec![]).unwrap();
+        s.command(Command::Wheel(WheelAction::Confirm));
+        assert!(s.consumables.item(slot).is_some() && s.wheel.open);
+    }
+    #[test]
+    fn hover_uses_configured_recovery_definitions() {
+        let mut s = GameplaySession::new_run();
+        s.command(Command::Wheel(WheelAction::Hold(true)));
+        s.command(Command::Wheel(WheelAction::Hover(Some(
+            ConsumableSlot::FoodOne,
+        ))));
+        assert_eq!(s.wheel_presentation().effect, "HUNGER +40");
+        s.command(Command::Wheel(WheelAction::Hover(Some(
+            ConsumableSlot::MedicalOne,
+        ))));
+        assert_eq!(s.wheel_presentation().effect, "HEALTH +2.5/1s FOR 10s");
     }
 }

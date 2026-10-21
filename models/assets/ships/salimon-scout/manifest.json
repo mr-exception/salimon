@@ -836,42 +836,10 @@
       {
         "nodes": [
           "Door_Frame",
-          "Exit_Door"
-        ],
-        "maxPairs": 15,
-        "reason": "Door_Frame / Exit_Door: closed-pose articulated leaf/tray/frame contact caps; retain surfaces for opening and telescopic extension. Mixed-material witnesses lie on the concealed lateral/end caps, not the ramp walking face."
-      },
-      {
-        "nodes": [
-          "Door_Frame",
-          "Exit_Ramp_Tip"
-        ],
-        "maxPairs": 4,
-        "reason": "Door_Frame / Exit_Ramp_Tip: closed-pose articulated leaf/tray/frame contact caps; retain surfaces for opening and telescopic extension. Mixed-material witnesses lie on the concealed lateral/end caps, not the ramp walking face."
-      },
-      {
-        "nodes": [
-          "Door_Frame",
           "Hull_Aft_Cap"
         ],
         "maxPairs": 8,
         "reason": "Door_Frame / Hull_Aft_Cap: opposing flush attachment caps between Hull Graphite solids; exposed outer faces remain on opposite sides of this internal join."
-      },
-      {
-        "nodes": [
-          "Exit_Door",
-          "Exit_Ramp_Tip"
-        ],
-        "maxPairs": 48,
-        "reason": "Exit_Door / Exit_Ramp_Tip: closed-pose articulated leaf/tray/frame contact caps; retain surfaces for opening and telescopic extension. Mixed-material witnesses lie on the concealed lateral/end caps, not the ramp walking face."
-      },
-      {
-        "nodes": [
-          "Exit_Door",
-          "Hull_Aft_Cap"
-        ],
-        "maxPairs": 18,
-        "reason": "Exit_Door / Hull_Aft_Cap: closed-pose articulated leaf/tray/frame contact caps; retain surfaces for opening and telescopic extension. Mixed-material witnesses lie on the concealed lateral/end caps, not the ramp walking face."
       },
       {
         "nodes": [

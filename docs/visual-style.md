@@ -6,6 +6,10 @@ constraint, not a quality rating. Option B is a later stylized hard-surface pass
 more deliberate bevels and material detail, with the same metric interfaces.
 Neither option changes gameplay, physics, sockets, pivots or asset identity.
 
+## Experience-level direction (2026-10-21)
+
+The approved overarching mood is **grounded cinematic sci-fi**, using the existing low-poly geometry identity but unifying it with believable physical machinery, coherent warm Scout-versus-cold-world lighting, spatial sound and deliberate quiet, meaningful rare encounters, consistent on-board UI/animation/VFX, environmental clues and strong composition. **Asset style alone does not establish experience direction.** The first reference vertical slice is the Scout interior and all on-board interactions. See [experience-direction.md](experience-direction.md) for the authoritative experiential contract. Native renderer verification and performance remain mandatory; do not assume advanced materials supported merely from authored Blender output.
+
 ## Form and shading
 
 Use broad geometric hull planes, clipped corners and strong engine/wing/landing
@@ -113,7 +117,7 @@ bodies; unknown future bodies can select an existing preset. A future custom
 recipe API must validate the version, finite [0,1] colors and seed and key the
 texture cache by the complete visual recipe. Do not substitute its visual seed
 for the authoritative terrain seed/definition or resource-generation identity.
-No new persistence/network contract is introduced here.
+No new persistence/network contract is introduced here. For future fictional planets, the [canonical multi-seed definition](canonical-planet-generation.md) gives the **visual** domain its own published seed, algorithm version and complete cache key, independent of the physical terrain, resources and fixed discoveries. Renderer LOD/visual quality may differ between clients; visual variation must never move physical geometry or determine multiplayer gameplay identity. All **real observed solid bodies** retain established physical terrain from the first authoritative real-scale publication (today's representative six-body fixtures are excluded); later scientific/material passes may be non-displacing only. Geology-derived physical forms belong to the single canonical world terrain query, not render-only displacement.
 
 | Body / material | Visual seed | Linear dark → light palette |
 | --- | ---: | --- |
@@ -148,3 +152,6 @@ randomness is generated per frame and no LOD triangle is moved for art direction
 The [GPU comparison recipe and report](../reports/issue-278/README.md) describes
 matched near/far/orbit scenes, fade-boundary continuity, unchanged coverage and
 costs. Native M1 gameplay/visual approval remains #279/#229.
+
+Scout light zoning and reproducible native/offline cameras (#463) are defined in
+[Scout presentation](scout-presentation.md); CPU/Blender results do not grant native visual signoff.

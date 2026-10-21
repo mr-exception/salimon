@@ -491,24 +491,17 @@ settlement, inventory and mass transitions. Native visuals/signoff are separate.
 
 ## Hold-Q consumable wheel (#377)
 
-Hold Q in captured gameplay to open five radial segments in stable inventory
-order: three food, then two medical. Release Q cancels. Left-click an occupied
-segment to consume that exact item once and close; empty segments cannot consume.
-Tab/arrows cycle occupied slots, Enter consumes. Keys 1–5 remain equipment only.
-M/N consumption remains removed; the inventory has no first-occupied shortcut.
+Exact-identity survival consumption, continuing world/vital clocks and pause/death/
+focus/restore cancellation follow the [canonical wheel contract](../client/runtime/architecture.md#hold-q-consumable-wheel-377).
 
-Opening clears movement/steering/throttle-adjust/grab/mining held inputs; world
-and ship simulation continue on the same fixed clock. Gameplay movement, look,
-mining and interactions are gated while open. Native cursor movement selects
-segments using the same fitted geometry as rendering. The pointer is released
-while open and recaptured on Q release/consumption; focus/lifecycle loss cancels
-without replay. A mouse already held on opening must release before it can
-consume. The consumption press cannot become a mining press. Escape cancels and
-uses the existing cursor release policy.
+### Survival consumable effects (#370)
 
-This is the portable implementation for review, not survival signoff: #368 is
-still open. Item consumption currently has no healing/hunger effect and the
-wheel explicitly says so. Full-meter/fatigue-zero semantics, death cancellation
-and treatment/status effects need integration against #368 and the survival
-lifecycle. Escape pause behavior belongs to the unfinished pause implementation;
-this change does not pretend that releasing the cursor pauses gameplay.
+The later survival expansion now defines an atomic explicit-item recovery adapter
+on top of the Fabricator inventory-only wave above. Recipe IDs map to validated
+instant/timed recovery records in the
+[canonical survival recovery contract](../client/survival/architecture.md#consumable-recovery-definitions-370).
+Exact slot/job/unit selection replaces category-first input; M/N remain absent.
+Basic ration restores 40 hunger; medkit's provisional +25 ordinary health over
+10 active seconds is documented reviewable balancing, not an approved lore
+constant. Full-save/clock activation is #371, native Q wheel #377 and advanced
+food definitions/unlocks #378. No recipe resource, mass or power policy changes.

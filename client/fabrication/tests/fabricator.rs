@@ -39,7 +39,7 @@ fn custom(recipe: RecipeDefinition, capacity: usize) -> Fabricator {
 #[test]
 fn starter_data_uses_world_feedstocks_and_two_unlocked_products() {
     let book = RecipeBook::starter();
-    assert_eq!(book.recipes().len(), 2);
+    assert_eq!(book.recipes().len(), 5);
     let ration = book.get(&id("food-ration")).unwrap();
     assert_eq!(ration.output_category, OutputCategory::Food);
     assert_eq!(ration.duration, seconds(10));
@@ -54,7 +54,11 @@ fn starter_data_uses_world_feedstocks_and_two_unlocked_products() {
         OutputCategory::Medical
     );
     for r in book.recipes() {
-        assert!(r.unlock.unlocked_by_default && r.unlock.prerequisites.is_empty());
+        assert_eq!(
+            r.unlock.unlocked_by_default,
+            matches!(r.id.key(), "food-ration" | "medkit")
+        );
+        assert!(r.unlock.prerequisites.is_empty());
     }
 }
 

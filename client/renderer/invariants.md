@@ -149,3 +149,25 @@ sector gaps/radii and uniform center fitting, including resized small windows.
 The inner hole/gaps/outside are noninteractive. Empty segments are visibly dim;
 original ration stripes/medical crosses match the dedicated HUD and authored
 tray. Renderer owns no inventory, consumption, input or survival rules.
+
+The exported toolbar message inset (#373) and internal message placement use the
+same scale/fitting implementation. Runtime HUDs may reserve this band, but renderer
+must never inspect their gameplay state or own their animation/expiry.
+
+
+`overlay_available_size(surface)` (#374) exposes the existing physical screen
+margin, shared by overlay fitting and bounded host-produced terminal images.
+A host image that exactly fits this size stays unscaled, keeping physical pointer
+hit rectangles aligned. Runtime still owns all terminal state, text and input.
+
+Scout lighting (#463) consumes the same explicit bus state as the physical
+screens. Blackout suppresses electrical emission and warm fill, preserving a
+cool visibility floor without adding power/gameplay authority. Glass blending,
+depth, immutable geometry and the 160-byte uniform size remain unchanged.
+
+Scout machinery (#464) consumes finite normalized immutable feedback only; no
+simulation/clock/save authority. The current ship uniform is 192 bytes and vertex
+stride 76 bytes. Named role tags cannot animate structural supports, hull, ramp
+or colliders. Electrical cues obey explicit bus state; tray output remains
+independent of power. The original #463 layout statement above describes its
+foundation; #464 extends that layout.

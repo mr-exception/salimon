@@ -6,7 +6,24 @@ use winit::event::ElementState;
 use winit::keyboard::{KeyCode, PhysicalKey};
 
 pub(super) fn release_cursor_pressed(state: ElementState, repeat: bool, key: PhysicalKey) -> bool {
-    state == ElementState::Pressed && !repeat && key == PhysicalKey::Code(KeyCode::Escape)
+    state == ElementState::Pressed
+        && !repeat
+        && matches!(key, PhysicalKey::Code(KeyCode::Escape | KeyCode::F1))
+}
+
+pub(super) fn terminal_restart_pressed(
+    state: ElementState,
+    repeat: bool,
+    synthetic: bool,
+    key: PhysicalKey,
+) -> bool {
+    state == ElementState::Pressed
+        && !repeat
+        && !synthetic
+        && matches!(
+            key,
+            PhysicalKey::Code(KeyCode::KeyR | KeyCode::Enter | KeyCode::NumpadEnter)
+        )
 }
 
 pub(super) fn toolbar_slot(key: PhysicalKey) -> Option<crate::equipment::ToolbarSlot> {
@@ -83,19 +100,7 @@ pub(super) fn camera_command(
         return None;
     }
 
-    if !precision_tour
-        && matches!(
-            key,
-            PhysicalKey::Code(
-                KeyCode::Digit1
-                    | KeyCode::Digit2
-                    | KeyCode::Digit3
-                    | KeyCode::Digit4
-                    | KeyCode::Digit5
-                    | KeyCode::Digit6
-            )
-        )
-    {
+    if !precision_tour {
         return None;
     }
 
@@ -147,6 +152,24 @@ pub(crate) fn dispatch_session_key(
     pressed: bool,
 ) {
     use crate::session::Command;
+    if pressed
+        && key == PhysicalKey::Code(KeyCode::Escape)
+        && session.view_mode == crate::session::ViewMode::Gameplay
+    {
+        session.command(Command::TogglePause);
+        return;
+    }
+    if session.is_paused() {
+        if pressed
+            && matches!(
+                key,
+                PhysicalKey::Code(KeyCode::Enter | KeyCode::NumpadEnter)
+            )
+        {
+            session.command(Command::TogglePause);
+        }
+        return;
+    }
     if key == PhysicalKey::Code(KeyCode::KeyQ) {
         session.command(Command::Wheel(
             crate::session::consumable_wheel::WheelAction::Hold(pressed),
@@ -160,7 +183,7 @@ pub(crate) fn dispatch_session_key(
                 Some(W::Next)
             }
             (PhysicalKey::Code(KeyCode::ArrowLeft | KeyCode::ArrowUp), true) => Some(W::Previous),
-            (PhysicalKey::Code(KeyCode::Enter), true) => Some(W::Confirm),
+            (PhysicalKey::Code(KeyCode::Enter | KeyCode::NumpadEnter), true) => Some(W::Confirm),
             (PhysicalKey::Code(KeyCode::Escape), true) => Some(W::Cancel),
             (PhysicalKey::Code(KeyCode::F2), true) => {
                 session.command(Command::ToggleView);

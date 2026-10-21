@@ -2,6 +2,36 @@ use super::{effects::*, *};
 const REGEN_INTERVAL: Duration = Duration::from_secs(60);
 
 impl Survival {
+    /// Same-kind modifiers use the strongest active value, never multiply stacks.
+    pub fn modifier_bps(&self, kind: Modifier) -> u16 {
+        let initial = if matches!(kind, Modifier::FatigueRelief) {
+            0
+        } else {
+            10_000
+        };
+        self.pipeline
+            .active
+            .keys()
+            .filter_map(|id| match self.pipeline.rules.effect(*id)?.behavior {
+                Behavior::Modifier {
+                    kind: ref k,
+                    basis_points,
+                } if *k == kind => Some(basis_points),
+                _ => None,
+            })
+            .fold(initial, |a, b| {
+                if matches!(kind, Modifier::FatigueDrain) {
+                    a.min(b)
+                } else {
+                    a.max(b)
+                }
+            })
+    }
+    pub(crate) fn fatigue_rate_numerator(&self) -> u128 {
+        u128::from(SCALE_SECONDS / self.config.fatigue_full_seconds)
+            * u128::from(self.modifier_bps(Modifier::FatigueDrain))
+    }
+
     pub fn with_rules(config: Config, rules: Rules) -> Result<Self, SaveError> {
         rules.validate()?;
         let mut state = Self::new(config)?;
@@ -20,6 +50,20 @@ impl Survival {
             .active
             .iter()
             .map(|(id, a)| (*id, a.stacks, a.remaining))
+    }
+    /// Immutable captured definitions and live timers in stable EffectId order.
+    /// Presentation can describe effects without inspecting serialized internals.
+    pub fn effect_snapshots(&self) -> impl Iterator<Item = EffectSnapshot<'_>> {
+        self.active_effects()
+            .map(|(id, stacks, remaining)| EffectSnapshot {
+                rule: self
+                    .pipeline
+                    .rules
+                    .effect(id)
+                    .expect("validated active effects have registered definitions"),
+                stacks,
+                remaining,
+            })
     }
     pub fn apply_effect(&mut self, id: EffectId) -> Result<(), SaveError> {
         let rule = self
@@ -196,7 +240,8 @@ impl Survival {
             }
             let mut step = remaining;
             let hunger_rate = u128::from(SCALE_SECONDS / self.config.hunger_full_seconds);
-            let fatigue_rate = u128::from(SCALE_SECONDS / self.config.fatigue_full_seconds);
+            let fatigue_rate = self.fatigue_rate_numerator();
+            let regen_bps = self.modifier_bps(Modifier::Regeneration);
             if !hungry {
                 step = step.min(u128::from(self.hunger.0).div_ceil(hunger_rate));
             }
@@ -209,7 +254,13 @@ impl Survival {
                 // Cross the inclusive eligibility boundary at the first admitted
                 // nanosecond below it, never by one render or arbitrary tick.
                 step = step.min(u128::from(self.hunger.0 - 70 * POINT) / hunger_rate + 1);
-                step = step.min(u128::from(self.fatigue.0 - 50 * POINT) / fatigue_rate + 1);
+                if fatigue_rate > 0 {
+                    step = step.min(
+                        (u128::from(self.fatigue.0 - 50 * POINT + 1) * 10_000
+                            - u128::from(self.fatigue_remainder))
+                        .div_ceil(fatigue_rate),
+                    );
+                }
             }
             for (id, a) in &self.pipeline.active {
                 let rule = self
@@ -229,6 +280,7 @@ impl Survival {
             remaining -= step;
             let mut damages = Vec::new();
             let mut heals = Vec::new();
+            let mut feeds = Vec::new();
             if hungry {
                 self.starvation_elapsed += delta;
                 if self.starvation_elapsed == self.config.starvation_interval {
@@ -240,7 +292,12 @@ impl Survival {
                     });
                 }
             }
-            if regen {
+            // Publish eligibility loss at this timestamp, before periodic food
+            // or a command following advance() can restore the meters. Otherwise
+            // a checkpoint/instant feed can retain credit from a broken interval.
+            if !self.regen_eligible() {
+                self.pipeline.regeneration = Duration::ZERO;
+            } else if regen {
                 self.pipeline.regeneration += delta;
             }
             for (id, a) in &mut self.pipeline.active {
@@ -263,10 +320,11 @@ impl Survival {
                                     amount,
                                     wound,
                                 }),
+                                Behavior::Feed { amount } => feeds.push(amount),
                                 Behavior::Heal { amount, mode } => {
                                     heals.push(Heal { amount, mode })
                                 }
-                                Behavior::Amplify { .. } => {
+                                Behavior::Amplify { .. } | Behavior::Modifier { .. } => {
                                     unreachable!("amplifiers have no interval")
                                 }
                             }
@@ -279,13 +337,17 @@ impl Survival {
             damages.sort_by_key(|d| d.source);
             self.damage_batch(&damages);
             if !self.terminal {
+                for amount in feeds {
+                    self.command(Command::Feed(amount))
+                        .expect("validated periodic food");
+                }
                 for heal in heals {
                     self.heal(heal).expect("validated periodic healing");
                 }
                 if self.pipeline.regeneration == REGEN_INTERVAL {
                     self.pipeline.regeneration = Duration::ZERO;
                     self.heal(Heal {
-                        amount: Points(POINT),
+                        amount: Points(POINT * u64::from(regen_bps) / 10_000),
                         mode: Healing::Ordinary,
                     })
                     .expect("constant regeneration");

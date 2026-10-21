@@ -4,6 +4,8 @@
 
 ## Purpose
 This page is the high-level index of Salimon's major gameplay and simulation systems. Detailed behavior belongs in dedicated specifications as each area is refined.
+The approved future starting state is the unknown alien homeworld, not Earth. Player-known navigation must rediscover Earth and the Solar System. See [lost journey](narrative-and-lost-journey.md) and [Archive and navigation](archive-recovery-and-navigation.md); Phase 0 Earth-start references are historical only.
+
 ## Long-term system areas
 
 This list describes product direction, not implemented modules. The current

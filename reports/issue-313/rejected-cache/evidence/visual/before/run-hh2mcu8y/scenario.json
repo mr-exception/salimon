@@ -1,0 +1,67 @@
+{
+  "setup": {
+    "scenario": "landed-earth",
+    "seed": 303,
+    "step_ms": 16,
+    "fragment_count": 50,
+    "fragment_layout": "current-mixed"
+  },
+  "timeout_ms": 120000,
+  "steps": [
+    {
+      "action": {
+        "op": "look",
+        "dx": 1428,
+        "dy": 220
+      }
+    },
+    {
+      "screenshot": "initial"
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 8
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 50
+      }
+    },
+    {
+      "screenshot": "after-8-more-ticks"
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 16
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 50
+      }
+    },
+    {
+      "screenshot": "after-16-more-ticks"
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 32
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 50
+      }
+    },
+    {
+      "screenshot": "after-32-more-ticks"
+    }
+  ]
+}

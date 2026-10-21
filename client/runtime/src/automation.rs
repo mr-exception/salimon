@@ -127,6 +127,21 @@ fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
         return execute_session(&mut app.session, line);
     }
     let result = match command.get("op").and_then(Value::as_str) {
+        Some("scout_reference") => match command.get("view").and_then(Value::as_str) {
+            Some("clear") => {
+                app.scout_reference = None;
+                Ok(json!({"view":"clear"}))
+            }
+            Some(name) => match crate::scout_reference::find(name) {
+                Some(view) => {
+                    app.scout_reference = Some(view);
+                    Ok(json!({"view":name}))
+                }
+                None => Err(("invalid_view", "unknown Scout reference camera")),
+            },
+            None => Err(("invalid_view", "view is required")),
+        },
+        Some("restart") => Ok(json!({"applied":app.restart_terminal()})),
         Some("window") => {
             let action = command.get("action").and_then(Value::as_str).unwrap_or("");
             let size = command
@@ -164,8 +179,9 @@ fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
             let mut result = inspect_session(&app.session);
             let upload_times = app.terrain_upload_times();
             let (uploaded_bytes, peak_upload_bytes) = app.terrain_uploads();
-            let native = json!({ "terrain_upload_preparation_micros": upload_times,
+            let native = json!({ "native_input_isolated":app.e2e_input_isolated, "terrain_upload_preparation_micros": upload_times,
             "visual_context": app.visual_context(),
+                    "survival_details_open":app.survival_hud.details_open,
             "window": app.window_state(),
             "capture_status": app.capture_status,
             "performance": app.observations.snapshot(),
@@ -188,9 +204,29 @@ fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
             }
             return json!({"protocol":PROTOCOL,"id":id,"ok":true,"result":result});
         }
-        Some("key") if command.get("key").and_then(Value::as_str) == Some("diagnostics") => {
+        Some("key")
+            if matches!(
+                command.get("key").and_then(Value::as_str),
+                Some(
+                    "pause"
+                        | "resume"
+                        | "diagnostics"
+                        | "status"
+                        | "status_previous"
+                        | "status_next"
+                )
+            ) =>
+        {
             if let Some(pressed) = command.get("pressed").and_then(Value::as_bool) {
-                app.automation_key(PhysicalKey::Code(KeyCode::F3), pressed);
+                let key = match command["key"].as_str() {
+                    Some("pause") => KeyCode::Escape,
+                    Some("resume") => KeyCode::Enter,
+                    Some("status") => KeyCode::KeyH,
+                    Some("status_previous") => KeyCode::BracketLeft,
+                    Some("status_next") => KeyCode::BracketRight,
+                    _ => KeyCode::F3,
+                };
+                app.automation_key(PhysicalKey::Code(key), pressed);
                 Ok(json!({"applied":true}))
             } else {
                 return execute_session(&mut app.session, line);
@@ -237,8 +273,49 @@ pub(crate) fn execute_session(app: &mut GameplaySession, line: &str) -> Value {
     {
         return json!({"protocol":PROTOCOL,"id":id,"ok":true,"result":{"applied":false}});
     }
+    if app.is_paused()
+        && !matches!(
+            command.get("op").and_then(Value::as_str),
+            Some("inspect" | "key" | "step")
+        )
+    {
+        return error(id, "paused", "gameplay commands unavailable while paused");
+    }
     let result = match command.get("op").and_then(Value::as_str) {
         Some("inspect") => Ok(inspect_session(app)),
+        Some("consume") => {
+            let slot = command
+                .get("slot")
+                .and_then(Value::as_u64)
+                .filter(|n| (1..=5).contains(n))
+                .map(|n| salimon_fabrication::ConsumableSlot::ALL[n as usize - 1]);
+            let job = command
+                .get("job")
+                .and_then(Value::as_u64)
+                .filter(|n| *n > 0);
+            let unit = command
+                .get("unit")
+                .and_then(Value::as_u64)
+                .and_then(|n| u32::try_from(n).ok())
+                .filter(|n| *n > 0);
+            match (slot, job, unit) {
+                (Some(slot), Some(job), Some(unit)) => {
+                    let result = app.consume_selection(crate::session::consumables::Selection {
+                        slot,
+                        job: salimon_fabrication::JobId(job),
+                        unit,
+                    });
+                    match result {
+                        Ok(item) => Ok(json!({"applied":true,"job":item.job.0,"unit":item.unit})),
+                        Err(reason) => Ok(json!({"applied":false,"reason":format!("{reason:?}")})),
+                    }
+                }
+                _ => Err((
+                    "invalid_argument",
+                    "slot 1..5, positive job and u32 unit required",
+                )),
+            }
+        }
         Some("crafting") => {
             use crate::session::crafting_ui::CraftingAction as A;
             let action = match command.get("action").and_then(Value::as_str) {
@@ -432,6 +509,9 @@ pub(crate) fn execute_session(app: &mut GameplaySession, line: &str) -> Value {
             Some(direction @ -1..=1) if direction != 0 => {
                 let applied = app.view_name() == "Gameplay"
                     && app.character.location() == CharacterLocation::Cockpit
+                    && app
+                        .restrictions()
+                        .permits(salimon_survival::restrictions::Action::Pilot)
                     && app.ship.adjust_thruster(direction as i8);
                 Ok(json!({"applied": applied}))
             }
@@ -439,7 +519,7 @@ pub(crate) fn execute_session(app: &mut GameplaySession, line: &str) -> Value {
         },
         _ => Err((
             "unknown_op",
-            "expected inspect, step, look, aim_fragment, restore_look, key, mouse, interact, landing, or thruster",
+            "expected inspect, step, look, aim_fragment, restore_look, key, mouse, interact, landing, thruster, crafting, or consume",
         )),
     };
     match result {
@@ -453,6 +533,8 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "consumable_wheel" => Some(KeyCode::KeyQ),
         "wheel_next" => Some(KeyCode::Tab),
         "wheel_confirm" => Some(KeyCode::Enter),
+        "pause" => Some(KeyCode::Escape),
+        "resume" => Some(KeyCode::Enter),
         "view" => Some(KeyCode::F2),
         "diagnostics" => Some(KeyCode::F3),
         "near" => Some(KeyCode::KeyN),
@@ -479,6 +561,7 @@ fn key_code(name: &str) -> Option<KeyCode> {
 
 pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
     let snapshot = app.snapshot();
+    let hud = crate::survival_hud::Observation::capture(app);
     let ship = snapshot.ship;
     let frame = character_ship_frame(ship.pose);
     let character = snapshot.character;
@@ -590,9 +673,18 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
         std::array::from_fn::<_, 3, _>(|i| player_velocity[i] - ship.velocity_meters_per_second[i]);
     let (ground_entries, ground_hits, ground_misses) = crate::terrain::ground_cache_stats();
     let fabrication = app.fabrication_snapshot();
-    let item = |item: &salimon_fabrication::OutputItem| json!({"recipe":item.recipe.key(), "job":item.job.0, "unit":item.unit, "mass_kg":item.mass.kg(), "category":format!("{:?}",item.category)});
+    let machinery = crate::scout_feedback::capture(app, ship);
+    let item = |item: &salimon_fabrication::OutputItem| json!({"recipe":item.recipe.key(), "job":item.job.0, "unit":item.unit, "mass_kg":item.mass.kg(), "category":format!("{:?}",item.category), "effect":app.consumable_effects.get(item.recipe.key())});
     json!({
         "consumable_wheel": {"open":app.wheel.open,"held":app.wheel.held,"hovered":app.wheel.hovered.map(salimon_fabrication::ConsumableSlot::index)},
+        "paused": app.is_paused(),
+        "machinery": {
+            "thrust":machinery.thrust, "rudder":machinery.rudder,
+            "converting":machinery.converting, "core_charge":machinery.core_charge,
+            "fabricator":format!("{:?}",machinery.fabricator),
+            "fabrication_progress":machinery.fabrication_progress,
+            "phase":machinery.phase, "cockpit_active":machinery.cockpit_active,
+        },
         "fabricator": {
             "status":format!("{:?}",fabrication.status), "requested_watts":fabrication.requested_watts,
             "stored":fabrication.stored.iter().map(|bin| json!({"resource":bin.resource.key(),"milligrams":bin.milligrams})).collect::<Vec<_>>(),
@@ -612,6 +704,24 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
                 salimon_renderer::OverlayPlacement::World { anchor_meters, .. } => Some(anchor_meters),
                 _ => None,
             }),
+        },
+        "journey_ended": app.survival.snapshot().terminal.then(||app.ended_run().map(|r|crate::journey_ended::Report::from(&r)).expect("validated terminal report")),
+        "survival_hud": {"visible":hud.visible,"penalties":hud.penalties,"statuses":hud.statuses},
+        "journey": {"active_duration":app.survival.snapshot().active_time, "distance_meters":app.run.journey.distance_meters, "location":crate::session::journey::NamedLocation::at(app.snapshot().character.eye_position_meters)},
+        "survival": {"hunger":app.survival.snapshot().hunger.value(),
+            "health":app.survival.snapshot().health.value(), "fatigue":app.survival.snapshot().fatigue.value(),
+            "terminal":app.survival.snapshot().terminal,
+            "effects":app.survival.active_effects().map(|(id,stacks,remaining)|
+                json!({"id":id.0,"stacks":stacks,"remaining_seconds":remaining.map(|d|d.as_secs_f64())})).collect::<Vec<_>>()},
+        "survival_restrictions": {
+            "hunger_movement_bps": app.restrictions().hunger_movement_bps,
+            "fatigue_movement_bps": app.restrictions().fatigue_movement_bps,
+            "movement_bps": app.restrictions().movement_bps,
+            "interaction_bps": app.restrictions().interaction_bps,
+            "exhausted": app.restrictions().exhausted,
+            "can_pilot": app.restrictions().permits(salimon_survival::restrictions::Action::Pilot),
+            "can_mine": app.restrictions().permits(salimon_survival::restrictions::Action::Mine),
+            "can_consume": app.restrictions().permits(salimon_survival::restrictions::Action::Consume)
         },
         "equipment": {"slots": app.equipment.slots().map(|tool| tool.map(|tool| match tool {
             crate::equipment::EquipmentTool::MiningTool => "mining_tool",

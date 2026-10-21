@@ -1,0 +1,7 @@
+{
+  "grounded": true,
+  "native_l_recovery": true,
+  "recovered_landed": true,
+  "native_l_takeoff": true,
+  "inertial_handoff": true
+}

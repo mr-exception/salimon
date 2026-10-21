@@ -1,3 +1,22 @@
+# Issue #377 — integrated exact-item survival wheel
+
+2026-10-21: refreshed onto current main and pause-save PR #395. Uses the #370
+validated identity/effect transaction; no raw-slot removal bypass. Hover feedback
+comes from configured recovery definitions. Full vitals allow waste; exhaustion
+permits food/medicine. Pause/death/focus/restore cancel pending use, world/vital
+clocks continue while Q is open, equipment stays on 1–5, and vital meters remain
+visible beside the wheel. Cloud verification results follow below.
+
+Native OS-input/DPI/appearance and reference-M1 checks remain unrun under existing
+[#376](https://github.com/mr-exception/salimon/issues/376); a prior Xvfb attempt
+failed before display startup because listening sockets were unavailable. No
+baseline images/masks or performance acceptance is promoted. Review #395 first.
+
+The dated draft report below is historical; its open prerequisites and placeholder
+NO ACTIVE EFFECT presentation no longer describe the integrated code.
+
+---
+
 # Issue #377 — Q-wheel implementation, survival integration blocked
 
 2026-10-19. Reviewable portable implementation on top of #346/#347. This PR is

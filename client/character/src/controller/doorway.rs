@@ -50,8 +50,8 @@ impl CharacterController {
         } else {
             1.0
         };
-        local[0] += movement[0] * WALK_SPEED_METERS_PER_SECOND * seconds / speed_scale;
-        local[2] = (local[2] + movement[1] * WALK_SPEED_METERS_PER_SECOND * seconds / speed_scale)
+        local[0] += movement[0] * self.walk_speed() * seconds / speed_scale;
+        local[2] = (local[2] + movement[1] * self.walk_speed() * seconds / speed_scale)
             .clamp(-crate::ramp::side_limit(), crate::ramp::side_limit());
         // Contact changes with distance along the deployed mesh. A stopped
         // walker never completes a timer and drops from the elevated threshold.

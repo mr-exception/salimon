@@ -1,0 +1,8 @@
+initial {"thruster_percentage": 0, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 0.7010754400000003, "flight_state": "Bouncing { body: Earth }", "power_available": true}
+crash-grounded {"thruster_percentage": 0, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 0.0, "flight_state": "GroundedAfterCrash { body: Earth }", "power_available": true}
+native-recovery-started {"thruster_percentage": 0, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 3.3120000000000003, "flight_state": "AssistedLanding { body: Earth }", "power_available": true}
+recovery-landed {"thruster_percentage": 0, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 0.0, "flight_state": "Landed { body: Earth }", "power_available": true}
+native-takeoff-started {"thruster_percentage": 0, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 2.407679999999999, "flight_state": "AssistedTakeoff { body: Earth }", "power_available": true}
+takeoff-complete {"thruster_percentage": 0, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 0.0, "flight_state": "Flying", "power_available": true}
+final {"thruster_percentage": 0, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 0.0, "flight_state": "Flying", "power_available": true}
+ARTIFACTS /Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/native-20261020/312/os-recovery/run-y55xiaq0

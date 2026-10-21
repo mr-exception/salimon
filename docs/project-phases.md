@@ -118,3 +118,6 @@ same-PR documentation impact, guide links, justified exceptions and review check
 The policy setup is delivered; future authors/reviewers continue to enforce it.
 Automated CI links/stale-contract checks are #442; final audit #441 waits for
 U01–U33 and must not depend on U34. Neither defers individual PR documentation.
+
+U02 (#403) delivers isolated hierarchical coordinates/epoch APIs after U01. No
+playable world, rendering, scientific catalog or orbital flight migration occurs.

@@ -54,3 +54,11 @@ issue/PR templates are implemented. Every U01–U34 code change still updates it
 own affected guides in the same PR, with explicit reviewed exceptions and checked
 links. Automatic link/path/stale-contract validation remains #442 and final audit
 remains #441. This policy setup does not certify future changes or native gates.
+
+## U02 implementation status (#403)
+
+Portable split-cell galactic positions, typed instantaneous frame trees and
+calendar epoch/scale gates are delivered independently of playable migration.
+See [limits and ownership](../client/universe/architecture.md#hierarchical-frames-and-epoch--u02-403).
+Actual ephemerides, astrometry ingestion and UTC leap-table conversion remain
+explicit downstream work; no reference-machine/real-dataset approval is implied.

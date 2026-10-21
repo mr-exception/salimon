@@ -18,3 +18,10 @@
    gravity, scanner, save migration or world replacement is implemented here.
 
 The [architecture](architecture.md) is the canonical API/limit/ownership contract.
+
+9. U02 galaxy anchors remain split cells/local offsets. Narrowing to GPU f32
+   occurs after relative subtraction; common frame ancestry cancels first.
+10. Parent-relative velocity includes rotating-frame transport; every frame in
+    one tree is evaluated at one declared epoch. Unknown/cyclic/stale frames fail.
+11. Epoch scale labels survive serialization. Leap seconds, implicit scale
+    conversion and unsupported cross-day UTC arithmetic fail explicitly.

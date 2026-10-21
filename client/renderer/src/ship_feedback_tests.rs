@@ -74,6 +74,24 @@ fn scout_feedback_gpu_evidence() {
     let mut images = std::collections::BTreeMap::new();
     for (name, eye, target, feedback, power, door, output) in [
         (
+            "archive-powered",
+            [-3., 1.8, -2.8],
+            crate::ARCHIVE_TERMINAL_METERS,
+            idle,
+            true,
+            0.,
+            false,
+        ),
+        (
+            "archive-blackout",
+            [-3., 1.8, -2.8],
+            crate::ARCHIVE_TERMINAL_METERS,
+            idle,
+            false,
+            0.,
+            false,
+        ),
+        (
             "core-idle",
             [-1., 1.9, -3.],
             [-1., 1.2, 0.],

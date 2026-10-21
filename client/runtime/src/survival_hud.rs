@@ -156,6 +156,7 @@ impl Observation {
             visible: session.view_mode == ViewMode::Gameplay
                 && !session.is_paused()
                 && !session.crafting_ui.open
+                && !session.archive_reader.open
                 && !v.terminal,
         }
     }

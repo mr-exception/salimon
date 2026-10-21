@@ -170,6 +170,23 @@ pub(crate) fn dispatch_session_key(
         }
         return;
     }
+    if session.archive_reader.open {
+        if pressed {
+            use crate::session::archive::ReaderAction as A;
+            let action = match key {
+                PhysicalKey::Code(KeyCode::KeyE) => Some(A::Close),
+                PhysicalKey::Code(KeyCode::ArrowUp | KeyCode::ArrowLeft) => Some(A::Previous),
+                PhysicalKey::Code(KeyCode::ArrowDown | KeyCode::ArrowRight | KeyCode::Tab) => {
+                    Some(A::Next)
+                }
+                _ => None,
+            };
+            if let Some(action) = action {
+                session.archive_action(action);
+            }
+        }
+        return;
+    }
     if key == PhysicalKey::Code(KeyCode::KeyQ) {
         session.command(Command::Wheel(
             crate::session::consumable_wheel::WheelAction::Hold(pressed),

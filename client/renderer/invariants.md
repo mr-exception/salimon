@@ -183,3 +183,14 @@ orientation. No display text may spill into adjacent atlas sections. The current
 Fabricator import-only U correction is deliberate and must be reconciled with
 any future authored UV change. Native acceptance remains #502; future scanner
 integration remains #503 after #430.
+
+
+## Archive terminal (#467)
+
+`archive_terminal.rs` adds a flush +Z-facing cabin panel and screen (12 vertices)
+to the existing ship draw. The runtime uses its published physical center for
+interaction. UVs are viewer-right/top-left; the sixth 512x256 region extends the
+instrument atlas to 3072x256 without changing the first five region dimensions.
+The shader uses section indices, blanks all six regions on power loss and restores
+them from the cached DTO. No new draw/pipeline, collision or simulation authority.
+See [runtime contract](../runtime/architecture.md#scout-archive-467).

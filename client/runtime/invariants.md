@@ -480,3 +480,8 @@ reticle dimensions/center and all modal/interaction gates retain their owners.
 Readable Fabricator status text and queue-selection chevrons never enqueue,
 consume, change recipe unlocks or advance simulation. Native review is #502;
 future scanner UI #503 is blocked by #430.
+
+
+Archive #467: follow [the source/persistence/input contract](architecture.md#scout-archive-467).
+Record identity/read selection is source; the modal is transient. No log mention
+grants a navigation fix. Preserve schema-6 transaction, modal, ray and restart tests.

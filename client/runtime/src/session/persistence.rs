@@ -155,6 +155,8 @@ impl PhysicalState {
 #[serde(deny_unknown_fields)]
 pub(crate) struct SessionState {
     physical: PhysicalState,
+    #[serde(default)]
+    archive: Option<super::archive::Archive>,
     fabrication: salimon_fabrication::FabricationSaveState,
     equipment: crate::equipment::EquipmentToolbar,
     #[serde(default)]
@@ -181,6 +183,9 @@ impl Validate for SurvivalState {
 impl Validate for SessionState {
     fn validate(&self) -> Result<(), SaveError> {
         self.physical.validate()?;
+        if let Some(archive) = &self.archive {
+            archive.validate()?;
+        }
         if let Some(tutorial) = &self.tutorial {
             tutorial.validate()?;
         }
@@ -197,6 +202,7 @@ impl GameplaySession {
     pub(crate) fn save_bytes(&self, now_unix_seconds: u64) -> Result<Vec<u8>, SaveError> {
         let state = SessionState {
             physical: PhysicalState::capture(self),
+            archive: Some(self.archive.clone()),
             fabrication: salimon_fabrication::FabricationSaveState::capture(
                 &self.fabricator,
                 &self.consumables,
@@ -230,7 +236,7 @@ impl GameplaySession {
                 restrictions: Default::default(),
                 run: Default::default(),
             },
-            (2..=5, Some(state)) => state,
+            (2..=6, Some(state)) => state,
             _ => return Err(invalid("survival payload does not match envelope version")),
         };
         if save.schema_version == 2 {
@@ -242,14 +248,20 @@ impl GameplaySession {
         }
         survival.validate()?;
         let tutorial = match (save.schema_version, save.state.tutorial) {
-            (4 | 5, Some(tutorial)) => tutorial,
+            (4..=6, Some(tutorial)) => tutorial,
             (1..=3, _) => super::tutorial::Tutorial::dismissed(),
             _ => return Err(invalid("tutorial source missing for save schema")),
+        };
+        let archive = match (save.schema_version, save.state.archive) {
+            (6, Some(archive)) => archive,
+            (1..=5, _) => Default::default(),
+            _ => return Err(invalid("archive source missing for save schema")),
         };
         let (fabricator, consumables) = save.state.fabrication.restore()?;
         let physical = save.state.physical.restore()?;
         let mut restored = Self {
             seed: physical.seed,
+            archive,
             tutorial,
             view_mode: ViewMode::Gameplay,
             survival: survival.vitals,
@@ -548,7 +560,7 @@ impl GameplaySession {
         serde_json::to_vec(&(self.mining.session.fragments().len(), self.mining.session.fragments().last().map(|f| f.id()), self.mining.session.attached_sphere_id(), self.mining.session.carried_id(),
             ship.flight_state, ship.door_state, ship.power_available,
             machine.stored, jobs, machine.tray, &self.consumables, &self.equipment,
-            self.survival.snapshot().terminal, self.survival.active_effects().map(|(id,stacks,_)|(id,stacks)).collect::<Vec<_>>(),(self.run.serial, ship.engines_enabled), &self.tutorial))
+            self.survival.snapshot().terminal, self.survival.active_effects().map(|(id,stacks,_)|(id,stacks)).collect::<Vec<_>>(),(self.run.serial, ship.engines_enabled), (&self.tutorial, &self.archive)))
             .expect("discrete checkpoint events contain only serializable finite identities and integer quantities")
     }
 }

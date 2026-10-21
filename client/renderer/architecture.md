@@ -434,3 +434,14 @@ face/palette; the runtime reuses it without handing gameplay policy to renderer.
 only when that section's key changes. `ship_mesh.rs` explicitly interprets the
 current Fabricator U as viewer-right; CPU geometry tests cover all three screens.
 No GLB, normal, collider, pipeline, atlas dimension or power authority changes.
+
+
+## Archive terminal (#467)
+
+`archive_terminal.rs` adds a flush +Z-facing cabin panel and screen (12 vertices)
+to the existing ship draw. The runtime uses its published physical center for
+interaction. UVs are viewer-right/top-left; the sixth 512x256 region extends the
+instrument atlas to 3072x256 without changing the first five region dimensions.
+The shader uses section indices, blanks all six regions on power loss and restores
+them from the cached DTO. No new draw/pipeline, collision or simulation authority.
+See [runtime contract](../runtime/architecture.md#scout-archive-467).

@@ -39,3 +39,7 @@ Maintain repeatable authored/reference cameras for cockpit, Core, Fabricator, do
 ## Anti-goals
 
 No random emissive strips, endless information HUDs, ungrounded NPC density, fake weather everywhere, shader features presumed implemented, external game engine, forced narrative campaign, renaming of physical assets just for style, or premature Absenat spoilers.
+
+## Future quantum Jump Drive staging — approved mechanic, not a shipped art asset
+
+The [Spatial Jump Drive travel contract](jump-drive-and-interstellar-travel.md) requires a **quantum-themed loading environment containing the same ship and onboard occupants**, shown **after** an explicitly engine-off, owner-authorized, sufficiently funded and destination-validated jump. The staging should feel like deliberate extraordinary engineering rather than a generic spinner or guaranteed lore wormhole; it remains a **presentation of a single transactional relocation**, not a second world/time scale, alternate multiplayer timeline or proof of the Absenat mystery. Preserve readable ship interfaces, power/jump progress/error information, accessible effects and the low-poly grounded visual bible; avoid inventing shader capabilities or finalized effect palettes without native signoff. The normal seamless space-to-surface flight art direction is unchanged and does not inherit a loading transition. Actual art/mockup and wgpu/M1 validation belong to future implementation, not this documentation-only update.

@@ -115,8 +115,8 @@ feedback use the shared action-bar bitmap density: 2 pixels per glyph cell at
 1× UI scale, rounded to integer density and capped at 3 (1.5× and higher).
 Seven-cell glyphs are 14/21/21 physical pixels tall at 1×/1.5×/2×, respectively;
 single-line panels are 26/39/39 pixels tall. The high-DPI cap keeps contextual
-labels compact; integer rasterization preserves sharp edges. Colors, text, anchors,
-visibility and expiry are unchanged. This sizing is independent of cockpit
+labels compact; integer rasterization preserves sharp edges. The font/palette is now shared with physical instruments (#466); anchors,
+visibility and expiry retain their existing owners. This sizing remains independent of cockpit
 displays, diagnostics, equipment-toolbar artwork and the reticle.
 
 The runtime field-maps ship-owned Core and nearby-body telemetry into renderer
@@ -1292,3 +1292,15 @@ boundaries. `checkpoints/scenarios.rs` exercises actual asynchronous manual-save
 startup and terminal restart transactions with storage publication faults.
 Production ownership, schemas and native input stay unchanged. See the
 [portable DSL, isolation and commands](../../scenarios/portable/README.md).
+
+## Scout UI presentation (#466)
+
+`action_bar.rs::glyph_rows` delegates uppercase prose to renderer `ui_style`,
+which also serves physical instrument, toolbar and Q-wheel text. Action/crafting
+panels use the shared opaque dark background, cyan rules and ivory text;
+`survival_hud/raster.rs` shares text/secondary/accent inks. Runtime retains prompt
+eligibility, absolute authored anchors, expiry, modal focus and all input routing.
+`app/interaction.rs` supplies compact `[E]` controls; crafting maps status enums
+to readable words without changing commands, ingredient precision or queue order.
+The [canonical UI matrix](../../docs/scout-presentation.md#scout-ui-readability-contract-466)
+records reticle invariants, scanner blockers and native acceptance separately.

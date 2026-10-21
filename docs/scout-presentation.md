@@ -136,3 +136,46 @@ The normal-play interaction walkthrough, reference hardware budgets and observed
 Fabricator reference-text orientation remain [#489](https://github.com/mr-exception/salimon/issues/489).
 The absent scanner hologram will integrate through #430/#466 when available.
 No native appearance, mask/tolerance or baseline approval is granted here.
+
+## Scout UI readability contract (#466)
+
+The renderer's [ui_style.rs](../client/renderer/src/ui_style.rs) owns one 5x7
+bitmap face and functional palette shared by physical instruments, runtime
+prompts/crafting/status text, toolbar and Q wheel. Runtime prose uses uppercase
+labels; instruments preserve `m`, `k` and `s` to distinguish SI readings such as
+`m/s` and `Mm/s`. Brackets, selection chevrons, plus, percent and recipe punctuation
+have visible glyphs. Ivory is primary text, muted blue-gray is secondary, cyan
+marks ordinary controls and amber identifies a warning **with explicit text**.
+The opaque prompt background and screen palette have CPU sRGB contrast tests
+(>=4.5:1 for these inks); perspective filtering, glass and native DPI still need
+physical review. No per-pixel/native accessibility certification is implied.
+
+| Surface | Presentation and source | Authority / verification boundary |
+| --- | --- | --- |
+| Door, cockpit, Core and Fabricator interactions | Compact `[E]` action labels in runtime `app/interaction.rs`; one `action_bar.rs` raster and authored world anchors | Existing range/aim/location/occlusion, input, expiry and power rules stay with their owners |
+| Cargo/mining prompts | Existing resource names, mass, F carry/drop and left-mouse mining guidance use the same prompt face and palette | `resource_context.rs`/carrying/mining own eligibility; depth/fitting remain renderer-owned |
+| Cockpit flight/braking/navigation | Five atlas sections total; cockpit uses sections 0–2. Long numeric readings use bounded scientific notation with units; text fits at integer density >=2 or shows an explicit ellipsis | Renderer formats immutable telemetry; no navigation/scanner data is invented |
+| Core screen | Section 3; energy, draw, conversion, depletion and textual low-energy warning | Core bus state owns blackout; screens blank and restore through the existing cache |
+| Fabricator physical screen | Section 4; IDLE/WORKING/NO POWER/OUTPUT BLOCKED, separate job/time rows and screen/port/tray action hints | Status/job/time observations only. Unknown DTO values show STATUS UNKNOWN; blackout still blanks the whole atlas |
+| Fabricator recipe panel | Existing modal; readable status words, exact ingredients, queue selection `>` and no-refund controls | Existing atomic enqueue/cancel, focus/range revalidation and exclusive input remain authoritative |
+| Toolbar, Q and H | Shared face/ivory/cyan accents; original food/medical artwork, category colors, layout and modal rules retained | Equipment/inventory/survival selection and consumption stay with existing owners |
+| Reticle | Existing outlined white dot / equipped cross at the exact camera center; fixed physical size retained | Equipment decides the shape; no aim/ray/interaction rule changes |
+| Future scanner | Apply this language after the hologram exists | Blocked by #430; remaining integration is [#503](https://github.com/mr-exception/salimon/issues/503) |
+
+Physical screens remain self-lit opaque geometry behind their existing housings;
+no glass opacity, material, draw, shader or pipeline change is introduced. The
+checked-in Fabricator UVs increase toward ship +X, which is viewer-left from its
+cabin-facing -Z side. `ship_mesh.rs` flips **only that surface's U** at import so
+text reads viewer-right. This is an explicit presentation interpretation of the
+existing export, not an edit to generated geometry or collision. A regression
+checks all three screens' U against viewer-right and V against world-up. Future
+asset UV changes must deliberately reconcile/remove this mapping to avoid a
+double flip. Core and cockpit mappings retain their authored orientation.
+
+Prompt density remains 2/3/3 at 1x/1.5x/2x UI scale; the user's compact label and
+enlarged-dot choices are retained. Unchanged instrument sections are not
+rerasterized; unchanged full display keys skip GPU uploads. The five-section
+2560x256 atlas is unchanged in size (2.5 MiB per CPU/GPU RGBA copy). Native M1
+appearance/input/frame-tail acceptance is [#502](https://github.com/mr-exception/salimon/issues/502),
+separate from CPU rasters and software Vulkan. See the
+[delivery report and evidence](../reports/issue-466/README.md).

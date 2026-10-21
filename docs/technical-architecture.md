@@ -437,3 +437,14 @@ protocol. Fixture placement and supplied UTC are explicit; clocks and domain
 rules remain production-owned. Long meter partition tests run directly against
 survival, while separate fixed-tick session tests prove clock/death routing.
 Bounded coverage runs in PR workspace tests; extended coverage runs nightly.
+
+## Unified Scout UI presentation (#466)
+
+The [Scout UI contract and surface matrix](scout-presentation.md#scout-ui-readability-contract-466)
+connects existing physical monitors, contextual prompts, crafting, toolbar, Q/H
+and reticle owners. Renderer `ui_style` provides shared bitmap glyphs/functional
+colors, instruments own bounded formatting/caching and screen UV interpretation;
+runtime owns text selection, eligibility, focus and typed commands. Existing
+domain power/simulation/mass/persistence ownership is unchanged. Delivery evidence
+is [reports/issue-466](../reports/issue-466/README.md); M1 signoff is #502, and
+scanner integration #503 remains blocked by #430.

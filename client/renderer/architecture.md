@@ -55,12 +55,12 @@ expands the checked-in ship mesh once at renderer initialization; material color
 and a door-vertex flag are retained in the GPU vertex stream. Opaque ship
 geometry writes reverse-Z depth first. One `Monitor_Wide` quad carries top-left UVs and a
 flat display flag. Its fragment branch samples a linearly filtered
-2048 × 256 sRGB atlas (three console regions plus one Core region) without a separate draw or light pass.
+2560 × 256 sRGB atlas (three console regions plus Core and Fabricator regions) without a separate draw or light pass.
 `CockpitInstruments` carries presentation-only speed, shared power, Core energy,
 and optional nearby-body surface-distance/radial values;
 `cockpit_instruments.rs` caches rounded display keys before formatting or
 rasterizing. Unchanged frames allocate no instrument images and upload no
-instrument pixels. One atlas occupies 1.5 MiB on the CPU and GPU each.
+instrument pixels. One atlas occupies 2.5 MiB on the CPU and GPU each.
 The screen remains attached to the ship and obey normal occlusion/free-look.
 The double-sided cockpit glass then uses
 one alpha-blended draw with depth testing but no depth writes, shadows, sorting,
@@ -296,8 +296,8 @@ from rounded stored-joule telemetry.
 
 `Core_Monitor` is an authored two-triangle, starboard-facing screen in the
 energy-core component, distinct from `Monitor_Wide`. The existing opaque draw
-samples a cached 2048 × 256 atlas: the console occupies the first three 512 px
-regions and the Core the fourth. No extra draws/materials/pipelines. Both
+samples a cached 2560 × 256 atlas: the console occupies the first three 512 px
+regions, the Core the fourth and Fabricator the fifth. No extra draws/materials/pipelines. Both
 screens blank once on explicit bus power loss and redraw automatically at
 restoration. The Core region independently caches rounded kW, energy, seconds
 and warning/conversion state. Runtime maps domain status without deriving rules.
@@ -423,3 +423,14 @@ new geometry or gameplay dependencies. See the [canonical feedback contract](../
 throttle row shows signed selection plus ENG ON/OFF and B hint. Its display cache
 invalidates the flight region when the switch changes even at zero throttle;
 Core blackout still blanks physical displays. Native readability review is #498.
+
+## Unified Scout UI (#466)
+
+Read the [shared UI contract](../../docs/scout-presentation.md#scout-ui-readability-contract-466)
+for the physical screen/prompt/toolbar matrix. `ui_style.rs` is the sole bitmap
+face/palette; the runtime reuses it without handing gameplay policy to renderer.
+`cockpit_instruments.rs` fits lines within their atlas section at integer density
+>=2, makes truncation visible, and renders Fabricator textual warning/action rows
+only when that section's key changes. `ship_mesh.rs` explicitly interprets the
+current Fabricator U as viewer-right; CPU geometry tests cover all three screens.
+No GLB, normal, collider, pipeline, atlas dimension or power authority changes.

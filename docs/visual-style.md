@@ -6,6 +6,10 @@ constraint, not a quality rating. Option B is a later stylized hard-surface pass
 more deliberate bevels and material detail, with the same metric interfaces.
 Neither option changes gameplay, physics, sockets, pivots or asset identity.
 
+## Experience-level direction (2026-10-21)
+
+The approved overarching mood is **grounded cinematic sci-fi**, using the existing low-poly geometry identity but unifying it with believable physical machinery, coherent warm Scout-versus-cold-world lighting, spatial sound and deliberate quiet, meaningful rare encounters, consistent on-board UI/animation/VFX, environmental clues and strong composition. **Asset style alone does not establish experience direction.** The first reference vertical slice is the Scout interior and all on-board interactions. See [experience-direction.md](experience-direction.md) for the authoritative experiential contract. Native renderer verification and performance remain mandatory; do not assume advanced materials supported merely from authored Blender output.
+
 ## Form and shading
 
 Use broad geometric hull planes, clipped corners and strong engine/wing/landing

@@ -456,3 +456,14 @@ Runtime owns local Archive records and modal input; the existing save manager
 persists validated identities/read progress in schema 6. Renderer adds a flush
 panel to its existing ship draw and one static instrument atlas region. No backend,
 chart or recovery authority is added. See [ownership](../client/runtime/architecture.md#scout-archive-467).
+
+## Canonical universe schema foundation (#402)
+
+`client/universe/` (`salimon-universe`) now owns immutable validated catalog
+schema, exact source IDs, systems/stars/individual bodies/statistical populations,
+per-field provenance/uncertainty/validity and versioned canonical definition/seed
+references. It is a portable leaf, not a runtime dependency. The six-body playable
+`salimon-world`, terrain/resource-v1 and current save interpretation are unchanged.
+See [schema ownership and bounds](../client/universe/architecture.md). Catalog
+truth grants no player chart knowledge; frames, storage/import and native world
+migration remain U02 onward.

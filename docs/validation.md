@@ -212,3 +212,12 @@ modal gates and bounded spoiler-free text. Workspace gates also cover all prior
 save/lifecycle and instrument cache contracts. Renderer test `terminal_faces_cabin`
 checks panel normals/UVs. Native walk/use/save/relaunch, power transitions, DPI and
 reference frame tails remain separate from portable results.
+
+## Universe U01 (#402)
+
+`cargo test -p salimon-universe --locked` checks canonical sorted interchange,
+frozen schema-1 compatibility, exact IDs, missing/uncertain/provenance preservation,
+references/cycles, invalid quantities, domain dependencies and schema rejection.
+Run workspace build/tests/fmt/all-target Clippy for workspace membership changes.
+These are synthetic portable fixtures; no real-data accuracy, production pack,
+playable real-scale integration or native performance claim is established.

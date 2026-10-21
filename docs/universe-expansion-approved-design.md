@@ -1,6 +1,6 @@
 # Real-scale universe expansion — approved design (2026-10-20)
 
-Status: **approved for issue planning, not implemented**. Source: ten rounds of owner Q&A. This contract supersedes compressed-playable-world assumptions *for the future expansion*, not existing implementation until migrated. Work begins after the existing planned gameplay implementation queue completes. Keep separate native verification, no implementation PRs as part of planning.
+Status: **approved design; U01 schema foundation (#402) delivered, remaining expansion not implemented**. Source: ten rounds of owner Q&A. This contract supersedes compressed-playable-world assumptions *for the future expansion*, not existing implementation until migrated. Work begins after the existing planned gameplay implementation queue completes. Keep separate native verification, no implementation PRs as part of planning.
 
 ## Narrative alignment (2026-10-21)
 
@@ -37,3 +37,12 @@ The approved alien homeworld becomes the traveler's **awakening location**; they
 
 ## Deferred / explicit TODOs
 Jump Drive implementation and balance, explicit at/above-c behavior and high-speed protection (ordinary relativistic time dilation is not planned); breathable-atmosphere toxicity and suit oxygen supply; detailed reentry heating, structural tides, full EVA gravity migration, artificial ships/stations/signals/distress broadcasts, radar upgrades gameplay/progression, other galaxies, online data downloads/multiplayer/server authority, autopilot.
+
+
+## Implemented U01 boundary (#402)
+
+The [isolated portable schema](../client/universe/architecture.md) now implements
+immutable source IDs, typed records and provenance/uncertainty validation. It does
+not connect canonical truth to player discovery or replace the playable catalog.
+U02–U34 retain their dependency gates. Existing gameplay implementation work is
+delivered; separate native review is not claimed complete.

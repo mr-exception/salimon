@@ -16,7 +16,7 @@ and networking are future capabilities. See [Project Phases](project-phases.md).
 
 The updated narrative begins with the traveler **waking outside a landed Scout on an unknown alien world**, with lost autobiographical memories but retained ship-operating skills and the knowledge that **Earth is home**. Earth's location/Solar System route is *not* known to the traveler and must be discovered and charted; seeking Earth and seeking Absenat are two independent, non-mandatory goals. Intact Earth-departure, Mars and Solar System exit logs precede recovered distress and warning leads. Whether the traveler actually entered an alleged wormhole is intentionally unknown. See [full narrative](narrative-and-lost-journey.md) and [Archive/navigation](archive-recovery-and-navigation.md).
 
-The future Absenat gate opens onto the cosmic boundary between successive universes and a monumental endless-ring Hall with player inscriptions. The Hall is future **backend-only shared endgame** and has an absolute no-spoilers-before-first-completion rule; see [Absenat contract](absenat-and-hall.md). This paragraph is design, **not current implementation**. The previous Earth-start/Mars-first-quest bullets below are historical and superseded for the future starting scenario.
+The future Absenat gate opens onto the cosmic boundary between successive universes and a monumental endless-ring Hall with player inscriptions. The Hall is future **backend-only shared endgame** and has an absolute no-spoilers-before-first-completion rule; see [Absenat contract](absenat-and-hall.md). This paragraph is design, **not current implementation**. Historical prototype requirements are preserved only in explicitly historical Phase 0/evaluation documents, not as active future gameplay requirements.
 
 ## Narrative premise
 An unknown entity teleports an object to Earth every 18 hours. Humanity calls it **the Core**: a battery capable of storing extremely large amounts of electrical energy for effectively unlimited time, solving Earth's energy crisis.
@@ -51,13 +51,16 @@ Salimon should differentiate itself through the combination of:
 - a custom low-level runtime with no full game engine, optimized for native desktop delivery while preserving future web/WASM portability.
 ## Development principle
 The project is delivered through **small, reachable phases**. Each phase must produce a player-visible result, remain narrow enough for autonomous AI implementation and validation, and preserve the long-term architecture rather than creating disposable prototypes.
-## Historical story and progression decisions (superseded where noted above)
-- Every new run begins on **Earth**.
-- The player boards their spaceship and begins the story from there.
-- The first planned main quest sends the player toward **Mars** to investigate an anomaly.
-- The detailed main-quest chain will be authored later.
-- **Absenat is the end-game destination.** Reaching it ends the game; its final physical form may be a station, planet, anomaly, or another destination decided later.
-- The **Core** is the critical heart of the spaceship. If its durability reaches failure state it shuts down rather than being physically erased, and the ship becomes unusable until the Core is repaired.
+## Approved story and progression decisions
+- The traveler awakens **outside the landed Scout on the unknown alien homeworld**, with autobiographical memory missing but practical ship knowledge retained.
+- The traveler remembers Earth as home, **not** its location; the Solar System must be rediscovered and a route charted.
+- **Returning to Earth and investigating Absenat are independent, optional long-term goals**. Neither is a compulsory first quest.
+- The intact Archive includes Earth departure, Mars passage, ordinary voyage communications and Solar System territory exit. Damaged records can reveal the distress/accident and later hostile warning locations.
+- The warning describes the alleged wormhole as a trap. **Whether the traveler entered that wormhole remains unknown.**
+- **Absenat contains the endgame gate.** Passing it completes the active journey and eventually reveals the spoiler-protected Hall of Passage, as defined in [Absenat and Hall](absenat-and-hall.md).
+- The **Core** is the critical heart of the spaceship. If its durability reaches failure state it shuts down rather than being physically erased, and the ship becomes unusable until repaired.
+- Additional recovered transmissions, identities, and later narrative events are intentionally undecided; see [lost journey canon](narrative-and-lost-journey.md).
+
 ## Time and persistence rules
 - Game time follows real-world time.
 - Offline time contributes to sleep recovery; as a baseline, roughly 8 hours offline should restore enough sleep/energy for about 16 hours of play.

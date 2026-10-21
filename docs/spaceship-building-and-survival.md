@@ -489,6 +489,11 @@ Portable domain tests cover reservation, overflow, ordering, power, cancellation
 tray gates and arithmetic; later runtime tests cover physical intake, power
 settlement, inventory and mass transitions. Native visuals/signoff are separate.
 
+## Hold-Q consumable wheel (#377)
+
+Exact-identity survival consumption, continuing world/vital clocks and pause/death/
+focus/restore cancellation follow the [canonical wheel contract](../client/runtime/architecture.md#hold-q-consumable-wheel-377).
+
 ### Survival consumable effects (#370)
 
 The later survival expansion now defines an atomic explicit-item recovery adapter

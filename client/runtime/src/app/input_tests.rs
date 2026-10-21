@@ -258,6 +258,29 @@ fn native_protocol_adds_only_shell_observations_and_expires_session_feedback() {
 }
 
 #[test]
+fn wheel_released_pointer_still_admits_q_release_and_focus_loss_cancels_without_replay() {
+    let mut app = pilot();
+    native(&mut app, KeyCode::KeyW, true);
+    native(&mut app, KeyCode::KeyQ, true);
+    assert!(app.session.wheel.open);
+    assert_eq!(app.session.ship_control_input, ShipControlInput::default());
+    // The native pointer is released while the wheel has keyboard focus.
+    app.cursor_captured = false;
+    native(&mut app, KeyCode::KeyQ, false);
+    assert!(!app.session.wheel.open);
+    app.cursor_captured = true;
+    native(&mut app, KeyCode::KeyQ, true);
+    app.set_input_focus(false);
+    assert!(!app.session.wheel.open);
+    assert!(!app.session.wheel.held);
+    native(&mut app, KeyCode::Enter, true);
+    assert!(!app.session.wheel.open);
+    app.set_input_focus(true);
+    native(&mut app, KeyCode::KeyQ, true); // No capture: no synthetic reopen.
+    assert!(!app.session.wheel.open);
+}
+
+#[test]
 fn journey_ended_restart_uses_verified_archive_and_retries_failure_without_resurrection() {
     use crate::checkpoints::Checkpoints;
     let root = std::env::temp_dir().join(format!("salimon-374-restart-{}", std::process::id()));
@@ -495,4 +518,27 @@ fn pause_menu_raster_and_verified_utc_receipt_are_available() {
     assert!(text.contains("Saving unavailable"));
     let (w, h, pixels) = crate::action_bar::rasterize_action_bar(&text, 3);
     assert_eq!(pixels.len(), (w * h * 4) as usize);
+}
+
+#[test]
+fn wheel_pause_and_death_clear_pending_input_without_recapture() {
+    let mut app = pilot();
+    native(&mut app, KeyCode::KeyQ, true);
+    assert!(app.session.wheel.open);
+    app.cursor_captured = false;
+    native(&mut app, KeyCode::Escape, true);
+    assert!(app.session.is_paused() && !app.session.wheel.open);
+    native(&mut app, KeyCode::KeyQ, true);
+    assert!(!app.session.wheel.open);
+    native(&mut app, KeyCode::Escape, true);
+    app.cursor_captured = true;
+    native(&mut app, KeyCode::KeyQ, true);
+    app.session
+        .survival
+        .command(salimon_survival::Command::Damage(
+            salimon_survival::Points::FULL,
+        ))
+        .unwrap();
+    app.advance_native(Duration::ZERO);
+    assert!(!app.session.wheel.open && !app.cursor_captured);
 }

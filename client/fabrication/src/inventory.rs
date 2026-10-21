@@ -32,12 +32,6 @@ impl ConsumableSlot {
     }
 }
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum ConsumableCategory {
-    Food,
-    Medical,
-}
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum InventoryError {
     Full,
     UnsupportedCategory,
@@ -64,19 +58,6 @@ impl ConsumableInventory {
             i @ 0..=2 => self.food[i].take(),
             i => self.medical[i - 3].take(),
         }
-    }
-
-    /// Removes the first occupied matching slot, without shifting/stacking items.
-    /// No health/hunger or future full-vitals gate participates in this phase.
-    pub fn consume_first(&mut self, category: ConsumableCategory) -> Option<OutputItem> {
-        let slots: &mut [Option<OutputItem>] = match category {
-            ConsumableCategory::Food => &mut self.food,
-            ConsumableCategory::Medical => &mut self.medical,
-        };
-        slots
-            .iter_mut()
-            .find(|slot| slot.is_some())
-            .and_then(Option::take)
     }
 
     pub fn food(&self) -> &[Option<OutputItem>; FOOD_SLOT_COUNT] {
@@ -128,8 +109,8 @@ mod tests {
         let mut inventory = ConsumableInventory::default();
         assert_eq!(inventory.food().len(), FOOD_SLOT_COUNT);
         assert_eq!(inventory.medical().len(), MEDICAL_SLOT_COUNT);
-        assert_eq!(inventory.consume_first(ConsumableCategory::Food), None);
-        assert_eq!(inventory.consume_first(ConsumableCategory::Medical), None);
+        assert_eq!(inventory.consume_slot(ConsumableSlot::FoodOne), None);
+        assert_eq!(inventory.consume_slot(ConsumableSlot::MedicalOne), None);
         for id in 1..=3 {
             assert_eq!(
                 inventory.insert(item(id, OutputCategory::Food)),
@@ -151,32 +132,24 @@ mod tests {
             assert_eq!(inventory, full);
         }
         assert_eq!(
-            inventory
-                .consume_first(ConsumableCategory::Food)
-                .unwrap()
-                .job,
+            inventory.consume_slot(ConsumableSlot::FoodOne).unwrap().job,
             JobId(1)
         );
         assert!(inventory.food()[0].is_none());
         assert_eq!(inventory.food()[1].as_ref().unwrap().job, JobId(2));
         assert_eq!(inventory.insert(item(6, OutputCategory::Food)), Ok(0));
-        for id in [6, 2, 3] {
-            assert_eq!(
-                inventory
-                    .consume_first(ConsumableCategory::Food)
-                    .unwrap()
-                    .job,
-                JobId(id)
-            );
+        for (id, slot) in [
+            (6, ConsumableSlot::FoodOne),
+            (2, ConsumableSlot::FoodTwo),
+            (3, ConsumableSlot::FoodThree),
+        ] {
+            assert_eq!(inventory.consume_slot(slot).unwrap().job, JobId(id));
         }
-        for id in [4, 5] {
-            assert_eq!(
-                inventory
-                    .consume_first(ConsumableCategory::Medical)
-                    .unwrap()
-                    .job,
-                JobId(id)
-            );
+        for (id, slot) in [
+            (4, ConsumableSlot::MedicalOne),
+            (5, ConsumableSlot::MedicalTwo),
+        ] {
+            assert_eq!(inventory.consume_slot(slot).unwrap().job, JobId(id));
         }
         assert_eq!(inventory, ConsumableInventory::default());
     }
@@ -197,5 +170,45 @@ mod tests {
             Err(InventoryError::AlreadyStored)
         );
         assert_eq!(inventory, original);
+    }
+}
+
+#[cfg(test)]
+mod selected_slot_tests {
+    use super::*;
+    use crate::{JobId, Mass, RecipeId};
+    #[test]
+    fn exact_slot_consumption_preserves_every_other_identity_and_empty_is_noop() {
+        let mut inventory = ConsumableInventory::default();
+        for i in 0..5 {
+            inventory
+                .insert(OutputItem {
+                    recipe: RecipeId::new("test").unwrap(),
+                    job: JobId(i + 1),
+                    unit: 1,
+                    mass: Mass::from_milligrams(1000).unwrap(),
+                    category: if i < 3 {
+                        OutputCategory::Food
+                    } else {
+                        OutputCategory::Medical
+                    },
+                })
+                .unwrap();
+        }
+        for (i, slot) in ConsumableSlot::ALL.into_iter().enumerate() {
+            assert_eq!(slot.index(), i);
+            let before = inventory.clone();
+            assert_eq!(
+                inventory.consume_slot(slot).unwrap().job,
+                JobId(i as u64 + 1)
+            );
+            for other in ConsumableSlot::ALL {
+                if other != slot {
+                    assert_eq!(inventory.item(other), before.item(other));
+                }
+            }
+            assert_eq!(inventory.consume_slot(slot), None);
+        }
+        assert_eq!(inventory, ConsumableInventory::default());
     }
 }

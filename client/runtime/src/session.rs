@@ -1,4 +1,5 @@
 //! Portable production gameplay composition. No window, GPU lifecycle or evidence IO.
+pub(crate) mod consumable_wheel;
 pub(crate) mod consumables;
 pub(crate) mod crafting_ui;
 mod fabrication;
@@ -41,6 +42,7 @@ pub(crate) struct GameplaySession {
     pub(crate) automation_aim_delta: Option<[f64; 2]>,
     pub(crate) mining: crate::mining::ResourceGameplay,
     fabricator: salimon_fabrication::Fabricator,
+    pub(crate) wheel: consumable_wheel::WheelState,
     pub(crate) consumables: salimon_fabrication::ConsumableInventory,
     pub(crate) crafting_ui: crafting_ui::CraftingUi,
     pub(crate) equipment: crate::equipment::EquipmentToolbar,
@@ -94,6 +96,7 @@ impl Default for GameplaySession {
             fabricator: salimon_fabrication::Fabricator::starter(),
             crafting_ui: Default::default(),
             consumables: Default::default(),
+            wheel: Default::default(),
             equipment: Default::default(),
             movement_input: Default::default(),
             ship_control_input: Default::default(),
@@ -121,6 +124,7 @@ pub(crate) enum ControlKey {
 }
 #[derive(Clone, Copy, Debug)]
 pub(crate) enum Command {
+    Wheel(consumable_wheel::WheelAction),
     TogglePause,
     Control(ControlKey, bool),
     Throttle(salimon_ship::ThrottleDirection, bool),
@@ -423,6 +427,7 @@ impl GameplaySession {
 
     pub(crate) fn clear_held_controls(&mut self) {
         self.crafting_ui.open = false;
+        self.wheel = Default::default();
         self.movement_input = MovementInput::default();
         self.ship_control_input = ShipControlInput::default();
         self.ship.clear_steering_input();
@@ -583,6 +588,16 @@ impl GameplaySession {
             return;
         }
         self.enforce_survival_restrictions();
+        if let Wheel(action) = command {
+            self.wheel_action(action);
+            return;
+        }
+        if self.wheel.open {
+            if matches!(command, ToggleView) {
+                self.toggle_view();
+            }
+            return;
+        }
         if self.crafting_ui.open {
             return; // Modal UI owns input; simulation and Core funding continue.
         }
@@ -658,7 +673,13 @@ impl GameplaySession {
                 }
             }
             Look(dx, dy) => self.apply_look_delta(dx, dy),
-            Mining(pressed) => self.mining_mouse_input(pressed),
+            Mining(pressed) => {
+                let was_down = std::mem::replace(&mut self.wheel.primary_down, pressed);
+                if !pressed || !was_down {
+                    self.mining_mouse_input(pressed);
+                }
+            }
+            Wheel(_) => unreachable!(),
             TogglePause | ToggleView | Camera(_) => unreachable!(),
         }
     }

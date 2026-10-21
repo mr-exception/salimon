@@ -22,7 +22,7 @@ backend implementation. Ship flight/landing, movement/EVA, mining, carrying and
 fragment motion/contact are implemented. Resource changes survive local streaming
 in the current in-memory session. Disk checkpoints and survival clock/full-save/terminal restart are implemented
 by #363–#371; backend persistence, networking and orbital simulation remain deferred.
-Survival HUD/status details and Journey Ended presentation are implemented by #373/#374; Starter supplies are implemented by #379; Q-wheel work remains #377. Fabricator crafting is authorized by #336–#348; see the accepted contracts in docs/spaceship-building-and-survival.md.
+Survival HUD/status details and Journey Ended presentation are implemented by #373/#374; Starter supplies are implemented by #379; Q-wheel consumption is integrated by #377. Fabricator crafting is authorized by #336–#348; see the accepted contracts in docs/spaceship-building-and-survival.md.
 
 Explicit user instructions govern the task. Approved specifications and issue
 acceptance criteria define intended behavior; current code/tests establish what

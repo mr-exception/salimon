@@ -887,7 +887,7 @@ collection removes that contribution. Reserved/queued jobs remain distinct.
 
 Runtime maps the existing three food and two medical slots into a separate
 renderer DTO row. Equipment selection remains keys 1–5. M/N do not consume
-items in gameplay; #377 owns Q-wheel selection. No vitals effect is introduced.
+items in gameplay; #377 owns Q-wheel selection. Survival effects use the shared #370 transaction.
 
 ### Fabricator automation (#347)
 
@@ -896,6 +896,7 @@ Inspection exposes stable ordered raw bins/jobs, tray identity and the existing
 the same open-modal action handler as native input; they cannot insert free
 resources, open a remote machine or bypass transactional validation. Portable
 session regressions run in PR CI; graphical and native signoff remain separate.
+
 
 ## Logical save boundary (#364)
 
@@ -922,6 +923,28 @@ feedback and render caches reset; interactions are recomputed from restored
 world state. The native host's automation policy stays host-owned. No disk IO,
 autosave scheduling or offline simulation is implied; #366 owns durable storage
 and shell lifecycle integration. See [canonical save contract](../../docs/save-contract.md).
+
+## Hold-Q consumable wheel (#377)
+
+Hold Q in captured living gameplay to open five stable inventory segments: three
+food, then two medical. Release cancels; clicking an occupied segment consumes
+and closes only after the shared #370 prepare-before-remove transaction succeeds.
+Hover/keyboard selection captures `(slot, job, unit)`; stale replacements and
+invalid effects cannot remove items or apply partial benefits. Full vitals allow
+waste; exhaustion permits emergency consumption. Hover feedback reads the saved
+recovery catalog. Tab/arrows navigate, Enter/numpad Enter consume; equipment stays
+on keys 1–5 and M/N never consume items.
+
+Opening clears held movement/steering/throttle-adjust/grab/mining controls.
+World, ship, crafting and survival continue ticking; movement/look/world actions
+are gated. Pointer geometry shares the rendered physical-pixel fit. A pre-held
+mouse must release before use; consumption cannot click through to mining.
+Focus/lifecycle loss and restore clear transient wheel state. Escape closes the
+wheel and opens full pause; death closes it and freezes authority. Cursor capture
+resumes only in living, unpaused, focused gameplay. Vital meters remain beside
+the wheel through the generic secondary UI layer normally occupied by the hidden
+reticle, without adding a GPU layer or simulation authority. Native OS-input,
+DPI/appearance/M1 signoff remains separate under #376.
 
 ## Durable active-run orchestration (#366)
 
@@ -966,9 +989,8 @@ The portable protocol supports `consume` with 1-based slot 1..5 and positive
 `job`/`unit`, all required. It calls this same transaction and reports applied/
 rejection; it does not introduce a gameplay hotkey. Inspection includes recipe
 recovery definitions and active survival recovery snapshots. Native desktop
-focus admission stays shell-owned; #377's wheel must replace its raw slot removal
-with this seam, capture the selected item identity, close only after success and
-use these recovery definitions for hover feedback. M/N remain absent.
+focus admission stays shell-owned; #377's wheel uses this seam, captures the selected identity and closes only
+after success; recovery definitions supply hover feedback. M/N remain absent.
 
 See the [canonical recovery data](../survival/architecture.md#consumable-recovery-definitions-370).
 Runtime #371 activates production survival ticking and full-save
@@ -1038,7 +1060,7 @@ and no pointer capture. Capture/focus loss closes it. Crafting, engineering tour
 diagnostics overlay and terminal state suppress this HUD. Overlay priority is
 crafting, diagnostics, then survival. #381 must extend this same visibility and
 input admission when adding actual pause menus; #377 retains meters while the
-wheel is open and uses its own world-input gate. Neither UI is implemented here.
+wheel is open and uses its own world-input gate. Both interfaces share these admission gates.
 
 Presentation-only thresholds are health <25, hunger <20 and fatigue <=20 for
 critical colors; other values <50 use amber. A subdued 400 ms color pulse and a
@@ -1169,7 +1191,7 @@ IDs from the survival catalog. `session/survival.rs` derives fatigue penalty rel
 from captured active modifiers; movement, interaction work and HUD receive that
 same policy. Status details describe continuous modifiers and remaining active
 time. The existing pause/full-save/offline gates own their timing and persistence.
-No native wheel dispatch is added ahead of #377. See the
+Native wheel dispatch is integrated by #377. See the
 [food effect contract](../survival/architecture.md#four-food-catalog-378).
 
 ### Deterministic E2E desktop-input isolation (#313)

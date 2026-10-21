@@ -260,7 +260,7 @@ reads never step or mutate crafting. Add/cancel use atomic domain commands.
 
 Runtime maps the existing three food and two medical slots into a separate
 renderer DTO row. Equipment selection remains keys 1–5. M/N do not consume
-items in gameplay; #377 owns Q-wheel selection. No vitals effect is introduced.
+items in gameplay; #377 owns Q-wheel selection. Survival effects use the shared #370 transaction.
 
 ### Fabricator automation (#347)
 
@@ -269,6 +269,7 @@ Inspection exposes stable ordered raw bins/jobs, tray identity and the existing
 the same open-modal action handler as native input; they cannot insert free
 resources, open a remote machine or bypass transactional validation. Portable
 session regressions run in PR CI; graphical and native signoff remain separate.
+
 
 ## Logical save boundary (#364)
 
@@ -295,6 +296,11 @@ feedback and render caches reset; interactions are recomputed from restored
 world state. The native host's automation policy stays host-owned. No disk IO,
 autosave scheduling or offline simulation is implied; #366 owns durable storage
 and shell lifecycle integration. See [canonical save contract](../../docs/save-contract.md).
+
+## Hold-Q consumable wheel (#377)
+
+Exact-identity survival consumption, continuing world/vital clocks and pause/death/
+focus/restore cancellation follow the [canonical wheel contract](architecture.md#hold-q-consumable-wheel-377).
 
 ## Durable active-run orchestration (#366)
 

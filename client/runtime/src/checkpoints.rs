@@ -363,6 +363,34 @@ mod tests {
         value
     }
     #[test]
+    fn durable_restore_closes_q_wheel_and_clears_primary_without_consumption() {
+        use crate::session::{Command, consumable_wheel::WheelAction};
+        let dir = std::env::temp_dir().join(format!("salimon-wheel-save-{}", std::process::id()));
+        let mut session = GameplaySession::default();
+        let expected = session.save_bytes(123).unwrap();
+        let events = session.checkpoint_events();
+        session.command(Command::Wheel(WheelAction::Hold(true)));
+        session.command(Command::Wheel(WheelAction::Hover(Some(
+            salimon_fabrication::ConsumableSlot::ALL[0],
+        ))));
+        session.command(Command::Wheel(WheelAction::Primary(true)));
+        assert!(session.wheel.open && session.wheel.primary_down);
+        assert_eq!(session.checkpoint_events(), events);
+        let mut saves = Checkpoints::open(dir.clone(), &mut session).unwrap();
+        saves.finish(&session).unwrap();
+        drop(saves);
+        let mut restored = GameplaySession::default();
+        let saves = Checkpoints::open(dir.clone(), &mut restored).unwrap();
+        assert!(!restored.wheel.open && !restored.wheel.held && !restored.wheel.primary_down);
+        assert!(restored.wheel.hovered.is_none());
+        assert_eq!(
+            logical(restored.save_bytes(123).unwrap()),
+            logical(expected)
+        );
+        drop(saves);
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+    #[test]
     fn periodic_boundary_and_discrete_events_schedule_without_waiting_for_render_time() {
         let dir = std::env::temp_dir().join(format!("salimon-timer-save-{}", std::process::id()));
         let mut session = GameplaySession::default();

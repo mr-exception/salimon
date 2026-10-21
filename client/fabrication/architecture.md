@@ -72,8 +72,9 @@ independent of equipment, world fragments and ship mass. Consumption input is #3
 `ConsumableInventory` owns exactly `FOOD_SLOT_COUNT = 3` food and
 `MEDICAL_SLOT_COUNT = 2` medical slots. Placement derives category from the typed
 output and takes the first vacant slot; equipment/component outputs are rejected.
-`consume_first(ConsumableCategory)` removes the first occupied matching slot
-without shifting survivors or introducing selected/stacked items. Empty input is
+`consume_slot(ConsumableSlot)` removes precisely the selected one-item slot
+without shifting survivors or stacking items. The five enum variants preserve
+food/medical category boundaries and stable HUD order; empty selection is a no-op. Empty input is
 observational. There is no health/hunger/full-vitals check or healing effect.
 Read-only slot arrays expose stable item/recipe/job identities for later HUD and
 versioned save adapters; serialization is implemented, while disk IO remains #366.
@@ -94,10 +95,10 @@ and shell lifecycle integration. See [canonical save contract](../../docs/save-c
 
 ## Exact consumption selection (#370)
 
-The `ConsumableSlot` facade matches the existing #377 wheel draft: five named
+The `ConsumableSlot` facade matches the integrated #377 wheel: five named
 slots, `ALL`/`index`, observational `item` and exact `consume_slot`, without
 compaction. New runtime consumers must identify `(slot, JobId, unit)` and reject
-stale selection before removal. `consume_first` remains a compatibility helper;
+stale selection before removal. The category-first compatibility helper is removed;
 no native M/N dispatch exists and no new first-available UI should use it.
 
 Runtime's #370 adapter validates item/category/effects and prepares survival before

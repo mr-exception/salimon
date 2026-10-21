@@ -426,3 +426,11 @@ Deterministic E2E isolation (#313) is explicit and limited to `--e2e`: desktop
 input/focus must not rotate the scripted camera, clear protocol holds or discard
 fixed-step backlog. Native OS-input probes keep normal delivery/reset semantics.
 Isolated scenario evidence cannot establish native input or lifecycle acceptance.
+
+Scout audio (#465) observes snapshots only. Four queued transients/eight mixed
+voices and one scene playback child are hard bounds; existing survival audio
+has its own one-child bound and uses the same platform spawn seam. Master mute
+suppresses both. Focus/pause/occlusion/suspend/terminal/time/run discontinuities
+clear scene events; E2E/benchmarks never spawn scene players. Surface/EVA has no
+transmitted ship sound in the absence of an atmosphere model. Settings stay
+outside run saves, and failed playback never changes gameplay.

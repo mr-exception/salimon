@@ -341,3 +341,8 @@ Takeoff returns powered control at rest after a six-second, 50 m local rise;
 while captured it reports `Assisted takeoff - flight controls locked`. Landing
 eligibility is unchanged, so a land prompt can remain available at handoff.
 See [the ship-owned contract](../ship/architecture.md) and #295.
+
+Scout soundscape (#465): Pause -> S opens preferences; M toggles master mute,
+B toggles ship sound and G cycles ship volume. A keeps its survival-cue meaning.
+Preferences survive new runs. See the [soundscape contract](../../docs/scout-presentation.md#soundscape-boundary-465)
+for spatial/quiet-zone behavior, optional OS playback and native-review limits.

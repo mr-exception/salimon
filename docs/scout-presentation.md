@@ -40,3 +40,51 @@ captures separate from Blender mood references and from approved image corpora.
 Inspect screens, glass, walking-lane edges and dark housings; never promote a
 candidate without human image/mask/tolerance review. M1 signoff remains #451/#477;
 these cloud/reference fixtures do not grant that acceptance.
+
+## Soundscape boundary (#465)
+
+Runtime `scout_audio.rs` observes immutable session/ship/character snapshots. Its
+private typed cues cover Core hum/conversion, funded Fabricator work, selected
+powered thrust, moving ramp, grounded interior footsteps, bus loss/restoration
+and low-power crossing. E02 may consume the same authoritative observations;
+there is no second machinery controller, timer or gameplay event bus. Existing
+#383 heart/hunger/breath cues keep their content and threshold owner, sharing
+only `native_audio.rs` OS playback and the master mute preference.
+
+The listener and machinery anchors are ship-local metres; left/right pan follows
+look direction. A softened inverse-square curve `1/(1+d*d/9)` and 20-metre cutoff
+bound sources, with equal-power stereo panning. There is no HRTF or obstruction
+solver. Interior footfalls require actual horizontal distance, walking input,
+power/artificial gravity and floor-level eye height. Ship translation, airborne
+drift and teleport/reset do not imply footsteps. No exterior wind/atmosphere,
+transmitted machinery in Surface/Space/NearbyBody, music, voices or chatter is
+invented. DoorwayBlend retains cabin sound until the location leaves the ship.
+A powerless cabin becomes quiet after its finite blackout cue; idle power retains
+only restrained Core hum. Existing prompts/screens remain visual alternatives.
+
+Pause -> S settings adds M master mute, B ship audio and G ship volume, cycling
+0/20/40/60/80/100 percent. A still controls only survival condition cues. Version-1
+settings gain defaulted fields (master mute false, ship audio true, volume 60),
+preserving older preferences; invalid volume and unknown versions fail. These
+preferences live outside run saves and survive new runs/restarts. Pause, focus,
+occlusion, suspend, terminal, tour and run/time reset discard pending scene cues;
+E2E and benchmarks never start scene playback. Missing or failed playback is
+explicitly reported and stops retrying until a lifecycle/settings suppression.
+
+Original deterministic 22050-Hz stereo 16-bit synthesis uses 0.5-second chunks,
+short edge fades and <=8 simultaneous voices. Four queued transients are bounded;
+power alerts take priority over footsteps. One 44,144-byte WAV is rewritten only
+after its single playback child exits, uses a PID-specific filename beside the
+settings file, and is removed on normal presenter drop. One scene child plus the
+existing one condition child are the maximum; no sample library or Cargo
+link/dependency is introduced. Absolute sample peak is bounded to 30,000.
+The scene's scratch PCM is ~43 KiB; event/mix storage is bounded independently
+of elapsed play time. There is no persistent gameplay audio history.
+
+This minimal OS boundary reuses afplay, Windows SoundPlayer or optional Linux
+paplay/aplay. It can have audible chunk gaps and up to a chunk of response latency;
+OS process startup/file IO are not realtime streaming. Native listening and
+matched whole-frame costs remain [#485](https://github.com/mr-exception/salimon/issues/485),
+which must decide whether a continuous backend is needed. Synthesis measurements
+are not audio-device or M1 budget approval. See the
+[audio report](../reports/issue-465/README.md) for actual tests and limits.

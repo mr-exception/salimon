@@ -394,3 +394,8 @@ for captured settings, active/offline clocks and exact drain arithmetic.
 
 Scout light zoning and reproducible native/offline cameras (#463) are defined in
 [Scout presentation](scout-presentation.md); CPU/Blender results do not grant native visual signoff.
+
+Scout audio (#465) is a runtime-only presentation adapter with bounded stereo
+PCM and shared optional OS playback, independent of run saves and all domain
+authority. [Soundscape contract](scout-presentation.md#soundscape-boundary-465)
+records spatial/mute/quiet-zone rules and the unverified native playback limits.

@@ -102,3 +102,8 @@ owns validation, identity conflicts, exact continuation and offline freeze.
 The 2026-10-21 [#314 delivery](../reports/issue-314/README.md) contains scale-2 Apple M1 candidates, frozen-repeat checks and defect-injection evidence. Human image/mask/tolerance approval and a separate baseline promotion PR remain required; the scale-1 pending descriptor must be reconciled deliberately. True normal-play interpolation at available 60/75 Hz is also unrun: fixed-step E2E disables it, and external native input delivery failed. [#477](https://github.com/mr-exception/salimon/issues/477) owns these remaining decisions/checks, coordinating #453. Source issue closure grants no appearance or interpolation acceptance.
 
 Scout #463 lighting is a bounded presentation proposal pending image/readability and matched frame-budget review in [#483](https://github.com/mr-exception/salimon/issues/483). Its cool blackout floor is visibility fill, not emergency electrical energy. Native #451/#477 captures from older shaders do not approve this change.
+
+Scout #465 native timbre/mix, chunk continuity/latency and matched audio-on/off
+frame costs remain [#485](https://github.com/mr-exception/salimon/issues/485).
+Portable synthesis is bounded but cannot grant listening or M1 performance
+acceptance; the minimal shared OS playback seam may need a continuous backend.

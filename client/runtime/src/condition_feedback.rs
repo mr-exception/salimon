@@ -106,7 +106,7 @@ impl Presenter {
             0.0
         };
         self.motion += (target - self.motion) * fade;
-        if self.settings.condition_audio {
+        if self.settings.condition_audio && !self.settings.master_mute {
             for (i, cue) in [Cue::Heart, Cue::Hunger, Cue::Breath]
                 .into_iter()
                 .enumerate()
@@ -121,7 +121,7 @@ impl Presenter {
     }
     pub(crate) fn update(&mut self, o: Observation) {
         let cue = self.observe(o);
-        if self.settings.condition_audio {
+        if self.settings.condition_audio && !self.settings.master_mute {
             self.audio.update(cue, self.path.as_deref());
             if self.audio.unavailable() {
                 self.message = "Audio unavailable - check OS player/output".into();
@@ -178,7 +178,11 @@ impl Presenter {
         match key {
             0 => next.camera_motion = !next.camera_motion,
             1 => next.condition_audio = !next.condition_audio,
-            _ => next.vignette = !next.vignette,
+            2 => next.vignette = !next.vignette,
+            3 => next.master_mute = !next.master_mute,
+            4 => next.scene_audio = !next.scene_audio,
+            5 => next.scene_volume_percent = (next.scene_volume_percent + 20) % 120,
+            _ => return,
         }
         match self
             .path
@@ -194,13 +198,19 @@ impl Presenter {
             Err(e) => self.message = format!("Save failed: {e}"),
         }
     }
+    pub(crate) fn settings_path(&self) -> Option<&std::path::Path> {
+        self.path.as_deref()
+    }
     pub(crate) fn menu_text(&self) -> String {
         let on = |v| if v { "ON" } else { "OFF" };
         format!(
-            "SALIMON / ACCESSIBILITY\n\nC   CAMERA MOTION: {}\nA   CONDITION AUDIO: {}\nV   HEALTH VIGNETTE: {}\n\nS   BACK TO PAUSE MENU\nENTER / ESC   RESUME\n\n{}",
+            "SALIMON / ACCESSIBILITY\n\nC   CAMERA MOTION: {}\nA   CONDITION AUDIO: {}\nV   HEALTH VIGNETTE: {}\nM   MASTER MUTE: {}\nB   SHIP AUDIO: {}\nG   SHIP VOLUME: {}%\n\nS   BACK TO PAUSE MENU\nENTER / ESC   RESUME\n\n{}",
             on(self.settings.camera_motion),
             on(self.settings.condition_audio),
             on(self.settings.vignette),
+            on(self.settings.master_mute),
+            on(self.settings.scene_audio),
+            self.settings.scene_volume_percent,
             self.message.chars().take(65).collect::<String>()
         )
     }
@@ -246,6 +256,7 @@ mod tests {
                 camera_motion: false,
                 condition_audio: false,
                 vignette: false,
+                ..Default::default()
             },
             ..Default::default()
         };
@@ -303,5 +314,49 @@ mod integration_tests {
             std::fs::write(dir.join("settings.rgba"), pixels).unwrap();
             std::fs::write(dir.join("settings-size.txt"), format!("{w} {h}")).unwrap();
         }
+    }
+    #[test]
+    fn master_mute_suppresses_existing_survival_cues() {
+        let mut p = Presenter {
+            settings: Settings {
+                master_mute: true,
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+        let o = Observation {
+            values: [1.; 3],
+            active: true,
+            walking: true,
+            now: Duration::ZERO,
+            serial: 1,
+        };
+        assert_eq!(p.observe(o), None);
+        p.settings.master_mute = false;
+        assert_eq!(p.observe(o), Some(Cue::Heart));
+    }
+    #[test]
+    fn mix_controls_persist_separately_from_active_run() {
+        let path = std::env::temp_dir().join(format!(
+            "salimon-audio-controls-{}.json",
+            std::process::id()
+        ));
+        let mut p = Presenter {
+            path: Some(path.clone()),
+            ..Default::default()
+        };
+        p.toggle_setting(3);
+        p.toggle_setting(4);
+        p.toggle_setting(5);
+        let saved = settings::load(&path).unwrap();
+        assert!(saved.master_mute);
+        assert!(!saved.scene_audio);
+        assert_eq!(saved.scene_volume_percent, 80);
+        for _ in 0..8 {
+            p.toggle_setting(5);
+            assert!(p.settings.scene_volume_percent <= 100);
+        }
+        assert_eq!(settings::load(&path).unwrap(), p.settings);
+        std::fs::remove_file(path).unwrap();
     }
 }

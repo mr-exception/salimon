@@ -1,5 +1,7 @@
 # Canonical whole-game save contract (schema 3)
 
+> This is the **current compressed-world runtime save schema**. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. This note does not modify schema 3 or imply backend multiplayer exists.
+
 `salimon-persistence::SaveGame<T>` is the versioned envelope. New captures use
 version 3. Decode accepts versions 1 and 2 for explicit runtime migration:
 retain the complete physical/Fabricator/equipment payload, initialize newly

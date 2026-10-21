@@ -1,0 +1,9 @@
+[2026-10-20T18:25:20Z INFO  salimon_client] starting Salimon native client
+[2026-10-20T18:25:20Z INFO  salimon_client::app] native window created: physical_size=1920x1080 scale_factor=2.00
+[2026-10-20T18:25:20Z INFO  salimon_client::app] renderer ready: adapter="Apple M1" backend=Metal device_type=IntegratedGpu gpu_timestamps=true
+[2026-10-20T18:25:20Z INFO  salimon_client::app] application resumed
+[2026-10-20T18:25:22Z INFO  salimon_client::session] exit door is now Open
+[2026-10-20T18:25:23Z INFO  salimon_client::session] cockpit monitor: Move clear of the boarding ramp
+[2026-10-20T18:25:23Z INFO  salimon_client::session] exit door is now Closed
+[2026-10-20T18:25:23Z INFO  salimon_client::session] exit door is now Open
+[2026-10-20T18:25:24Z INFO  salimon_client::session] exit door is now Closed

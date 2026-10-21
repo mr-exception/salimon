@@ -1,0 +1,386 @@
+{
+  "setup": {
+    "scenario": "terrain-earth",
+    "seed": 169,
+    "step_ms": 16
+  },
+  "timeout_ms": 240000,
+  "steps": [
+    {
+      "wait": {
+        "path": "terrain.active_patches",
+        "gt": 0
+      },
+      "frames": 1,
+      "timeout_ms": 60000
+    },
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "terrain.pending_patches",
+        "equals": 0
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 110
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 36
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 40
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "InsideShip"
+      }
+    },
+    {
+      "screenshot": "closed-interior"
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 20
+      }
+    },
+    {
+      "screenshot": "lowering-interior"
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 25
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 25
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "DoorwayBlend"
+      }
+    },
+    {
+      "assert": {
+        "path": "player.ship_local_eye_position_meters.1",
+        "gt": 0.4
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 120
+      }
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "DoorwayBlend"
+      }
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.door_state",
+        "equals": "Open"
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.cockpit_message",
+        "equals": "Move clear of the boarding ramp"
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 75
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "Surface"
+      }
+    },
+    {
+      "assert": {
+        "path": "player.ship_local_eye_position_meters.0",
+        "lt": -11.7
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 120
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 0,
+        "dy": -180
+      }
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.door_state",
+        "equals": "Closed"
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 45
+      }
+    },
+    {
+      "screenshot": "closed-exterior"
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.door_state",
+        "equals": "Open"
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 20
+      }
+    },
+    {
+      "screenshot": "lowering-exterior"
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 25
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 120
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 45
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 0,
+        "dy": 100
+      }
+    },
+    {
+      "screenshot": "deployed-exterior"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 45
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 0,
+        "dy": -100
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 110
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "InsideShip"
+      }
+    },
+    {
+      "assert": {
+        "path": "player.ship_local_eye_position_meters.1",
+        "approx": 1.9973118279569892,
+        "tolerance": 0.001
+      }
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.door_state",
+        "equals": "Closed"
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 45
+      }
+    }
+  ]
+}

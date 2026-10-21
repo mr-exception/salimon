@@ -180,3 +180,13 @@ identities and exact recipe reserves; runtime reconciles mass. Read the
 modifiers; see the owning architecture for provisional tuning and regressions.
 Keep advanced food recipes locked and preserve exact-slot consumption; no new
 progression acquisition or native Q-wheel input is introduced.
+
+For #313 reference validation, `benchmark_fixture.rs` owns the shared
+`current-cap` / `current-mixed` 500/1,000 initialization used by native runs and
+`sphere_workloads.rs`. Preserve the legacy sphere and onboard layouts; see the
+[canonical benchmark guide](../../scripts/FRAGMENT_BENCHMARKS.md#native-current-sphere-profiles-313).
+
+Deterministic runner children explicitly isolate desktop input/focus from protocol
+holds and fixed-step time (#313); direct native `Game` probes retain OS input.
+See the [harness boundary](architecture.md#deterministic-e2e-desktop-input-isolation-313)
+before interpreting a scenario pass as native input/lifecycle evidence.

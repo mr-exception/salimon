@@ -90,6 +90,13 @@ fn run_config(
     }
     application.preserve_startup_backlog = application.checkpoints.is_some();
     if let Some(config) = config {
+        application.e2e_input_isolated =
+            std::env::var_os("SALIMON_E2E_ISOLATE_INPUT").is_some_and(|v| v == "1");
+        if application.e2e_input_isolated {
+            log::info!(
+                "E2E desktop input isolated; protocol controls retained across focus resets"
+            );
+        }
         e2e::initialize(&mut application.session, config)
             .map(|()| application.e2e_config = Some(config))
             .map_err(|error| RunError::new("E2E setup failed", error))?;
@@ -147,6 +154,7 @@ pub(crate) struct ClientApplication {
     frame_clock: FrameClock,
     pub(crate) e2e_config: Option<e2e::Config>,
     e2e_ready_sent: bool,
+    pub(crate) e2e_input_isolated: bool,
     automation: Option<Receiver<Request>>,
     pub(crate) terrain_stream: crate::terrain_patches::TerrainStream,
     pub(crate) observations: crate::terrain_observations::Observations,
@@ -177,6 +185,7 @@ impl Default for ClientApplication {
             frame_clock: FrameClock::default(),
             e2e_config: None,
             e2e_ready_sent: false,
+            e2e_input_isolated: false,
             automation: None,
             terrain_stream: crate::terrain_patches::TerrainStream::default(),
             observations: crate::terrain_observations::Observations::default(),
@@ -470,6 +479,9 @@ impl ClientApplication {
         synthetic: bool,
         source: InputSource,
     ) {
+        if self.e2e_input_isolated && matches!(source, InputSource::Native) {
+            return;
+        }
         if self.session.survival.snapshot().terminal {
             if self.input_policy().admits_press(source, true)
                 && input::terminal_restart_pressed(
@@ -582,14 +594,22 @@ impl ClientApplication {
         self.cursor_captured = false;
         self.survival_hud.close_details();
         self.journey_ended.clear_pointer();
-        self.session.clear_held_controls();
+        if !self.e2e_input_isolated {
+            self.session.clear_held_controls();
+        }
     }
 
     fn reset_update_clock(&mut self) {
+        // Fixed-step protocol time/holds must not depend on desktop focus or resize.
+        if self.e2e_input_isolated {
+            return;
+        }
         self.journey_ended.clear_pointer();
         self.survival_hud.close_details();
         self.session.update_clock.reset();
-        self.session.clear_held_controls();
+        if !self.e2e_input_isolated {
+            self.session.clear_held_controls();
+        }
         self.session.reset_presentation();
     }
 
@@ -1135,6 +1155,7 @@ impl ApplicationHandler for ClientApplication {
         event: DeviceEvent,
     ) {
         if self.benchmark.is_none()
+            && !self.e2e_input_isolated
             && self.session.view_mode == ViewMode::Gameplay
             && self.cursor_captured
             && let DeviceEvent::MouseMotion { delta } = event
@@ -1202,10 +1223,13 @@ impl ApplicationHandler for ClientApplication {
         }
         // Benchmark cameras and population are deterministic initial conditions.
         // Keep native timing/rendering, while desktop input cannot mutate them.
-        if self.benchmark.is_some()
+        if (self.benchmark.is_some() || self.e2e_input_isolated)
             && matches!(
                 event,
-                WindowEvent::KeyboardInput { .. } | WindowEvent::MouseInput { .. }
+                WindowEvent::KeyboardInput { .. }
+                    | WindowEvent::MouseInput { .. }
+                    | WindowEvent::CursorMoved { .. }
+                    | WindowEvent::MouseWheel { .. }
             )
         {
             return;

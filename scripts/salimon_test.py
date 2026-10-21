@@ -1,6 +1,7 @@
 """Declarative native E2E runner for Salimon (Python standard library only)."""
 
 import json
+import os
 import queue
 import re
 import subprocess
@@ -47,7 +48,7 @@ def parse_scenario(path):
     layout = setup.get("fragment_layout", "scattered")
     if "fragment_count" in setup and (type(count) is not int or not 0 <= count <= 1000):
         raise ScenarioError("fragment_count must be 0..1000")
-    if not isinstance(layout, str) or layout not in {"scattered", "dense", "surface", "onboard", "sphere-deck", "sphere-pile"} or ("fragment_layout" in setup and count is None):
+    if not isinstance(layout, str) or layout not in {"scattered", "dense", "surface", "onboard", "sphere-deck", "sphere-pile", "current-cap", "current-mixed"} or ("fragment_layout" in setup and count is None):
         raise ScenarioError("fragment_layout requires fragment_count and a known layout")
     settle_steps = setup.get("fragment_settle_steps", 0)
     if type(settle_steps) is not int or not 0 <= settle_steps <= 37500 or ("fragment_settle_steps" in setup and count is None):
@@ -147,8 +148,9 @@ def result_summary(result):
 
 
 class Game:
-    def __init__(self, command, setup, deadline, artifacts=None):
+    def __init__(self, command, setup, deadline, artifacts=None, native_input=True):
         self.command = command
+        self.native_input = native_input
         self.artifacts = artifacts
         self.setup = setup
         self.deadline = deadline
@@ -164,11 +166,16 @@ class Game:
                                "--fragment-layout", self.setup["fragment_layout"]]
             if "fragment_settle_steps" in self.setup:
                 population_args += ["--fragment-settle-steps", str(self.setup["fragment_settle_steps"])]
+        env = dict(os.environ)
+        if self.native_input:
+            env.pop("SALIMON_E2E_ISOLATE_INPUT", None)
+        else:
+            env["SALIMON_E2E_ISOLATE_INPUT"] = "1"
         self.process = subprocess.Popen(
             self.command + ["--e2e", "--scenario", self.setup["scenario"],
                             "--seed", str(self.setup["seed"]), "--step-ms", str(self.setup["step_ms"])] + population_args,
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-            text=True, bufsize=1,
+            text=True, bufsize=1, env=env,
         )
         self.readers = [threading.Thread(target=self._read_stdout, daemon=True),
                         threading.Thread(target=self._read_stderr, daemon=True)]
@@ -297,7 +304,7 @@ def run(path, command, artifact_root="artifacts/e2e", screenshot_command=None):
         artifacts.write_json("scenario.json", scenario)
         result["setup"] = scenario["setup"]
         deadline = start + scenario["timeout_ms"] / 1000
-        game = Game(command, scenario["setup"], deadline, artifacts)
+        game = Game(command, scenario["setup"], deadline, artifacts, native_input=False)
         with game:
             try:
                 for index, step in enumerate(scenario["steps"], 1):

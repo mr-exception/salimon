@@ -1,0 +1,7 @@
+{
+  "rejected_production_binary_sha256": "cbba4ab213a1053dd8a28c80340e60ff044841d00a404832f0a889c049502b0c",
+  "reason": "shared Cargo target reused the controlled constant-damping physics artifact; root production build emitted unused DAMPING_REFERENCE_SECONDS warning",
+  "affected": "all build-current/SalimonReview staged measurements and captures, not the original 4d8faf8 build",
+  "unaffected_original_sha256": "a25fb8746a4b798d6d7410b1a08df19857d67e9d04cad5cafc0bcd2749596576",
+  "action": "isolated target-production build plus release physics regression tests; recollect affected evidence"
+}

@@ -279,13 +279,13 @@ impl Hud {
             }
         }
         let thresholds = [25.0, 20.0, 20.0];
-        for i in 0..3 {
+        for (i, threshold) in thresholds.into_iter().enumerate() {
             let critical = if i == 2 {
-                o.values[i] <= thresholds[i]
+                o.values[i] <= threshold
             } else {
-                o.values[i] < thresholds[i]
+                o.values[i] < threshold
             };
-            if o.values[i] >= thresholds[i] + 2.0 {
+            if o.values[i] >= threshold + 2.0 {
                 self.armed[i] = true;
             }
             if critical && self.armed[i] {

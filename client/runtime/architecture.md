@@ -753,7 +753,10 @@ streaming restoration. Native M1 remains #236.
 Test-only `sphere_fixtures.rs` constructs append-only, released default-lifecycle
 spheres and checks actual mass/radius/source/ID/count before carrying/contact
 assertions. `sphere_workloads.rs` owns separately versioned portable 500/1,000
-current-sphere workloads, with raw population and CPU samples. Historical flight
+current-sphere workloads, with raw population and CPU samples. Their canonical
+initialization now lives in `benchmark_fixture.rs`, exposed as `current-cap` and
+`current-mixed` to native benchmarks and opt-in E2E, including 1,000 objects (#313).
+Raw benchmark accounting includes actual per-object contact radius. Historical flight
 and #235 populations retain their original definitions. See the canonical
 [fixture/workload contract](../../scripts/FRAGMENT_BENCHMARKS.md#current-sphere-fixture-and-cpu-workload-contracts-303)
 for commands, fixture identities, tolerances and interpretation limits.
@@ -1167,3 +1170,13 @@ same policy. Status details describe continuous modifiers and remaining active
 time. The existing pause/full-save/offline gates own their timing and persistence.
 No native wheel dispatch is added ahead of #377. See the
 [food effect contract](../survival/architecture.md#four-food-catalog-378).
+
+### Deterministic E2E desktop-input isolation (#313)
+
+The scenario runner uses `SALIMON_E2E_ISOLATE_INPUT=1` only on its `--e2e`
+child. Runtime then ignores native keyboard/pointer events and preserves
+protocol-held controls and fixed-step backlog across native focus/resize clock
+resets. Window/GPU lifecycle and visibility still operate; this is not native
+input/lifecycle certification. Normal play and benchmark mode ignore this E2E
+setting. Direct `Game` probes default to actual native input; their child removes
+the variable. `inspect.native_input_isolated` makes the boundary observable.

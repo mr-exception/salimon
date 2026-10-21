@@ -511,7 +511,8 @@ pub(crate) fn accounting(app: &GameplaySession) -> Value {
     json!({"extracted_mass_kg": app.mining.session.extracted_mass_kg(),
         "fragments": app.mining.session.fragments().iter().map(|p|
             json!({"id": p.id().0, "source": p.source().local,
-                "resource": p.material().resource().key(), "mass_kg": p.material().mass_kg()})).collect::<Vec<_>>()})
+                "resource": p.material().resource().key(), "mass_kg": p.material().mass_kg(),
+                "radius_meters": crate::fragment_physics::sphere_radius(*p)})).collect::<Vec<_>>()})
 }
 fn ms(duration: Duration) -> f64 {
     duration.as_secs_f64() * 1000.0

@@ -1,0 +1,106 @@
+{
+  "setup": {
+    "scenario": "terrain-mars-approach",
+    "seed": 181,
+    "step_ms": 16
+  },
+  "timeout_ms": 120000,
+  "steps": [
+    {
+      "wait": {
+        "path": "terrain.active_patches",
+        "gt": 0
+      },
+      "frames": 1,
+      "timeout_ms": 60000
+    },
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 60000
+    },
+    {
+      "assert": {
+        "path": "ship.flight_state",
+        "equals": "Flying"
+      }
+    },
+    {
+      "screenshot": "terrain-approach"
+    },
+    {
+      "action": {
+        "op": "landing"
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.flight_state",
+        "equals": "AssistedLanding { body: Mars }"
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 125
+      }
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "InsideShip"
+      }
+    },
+    {
+      "action": {
+        "op": "landing"
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.flight_state",
+        "equals": "AssistedLanding { body: Mars }"
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 250
+      }
+    },
+    {
+      "screenshot": "terrain-descent"
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 125
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.flight_state",
+        "equals": "Landed { body: Mars }"
+      }
+    },
+    {
+      "wait": {
+        "path": "terrain.presentation_ready",
+        "equals": true
+      },
+      "frames": 1,
+      "timeout_ms": 60000
+    },
+    {
+      "screenshot": "terrain-touchdown"
+    }
+  ]
+}

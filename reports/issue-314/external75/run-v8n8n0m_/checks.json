@@ -1,0 +1,11 @@
+{
+  "checks": {
+    "external_scale1": true,
+    "native_steering": false,
+    "native_mouse_delivery": false,
+    "returned_primary_scale2": true
+  },
+  "coverage": {
+    "frame_rate_or_live_interpolation_certified": false
+  }
+}

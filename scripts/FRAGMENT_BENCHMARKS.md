@@ -227,6 +227,10 @@ The proposal preserves the settled guidance above and independently reports
 the existing whole-window 20% relative checks, including their failures.
 Passing the proposed numbers does not grant #255/#288 signoff or establish
 continuous motion, larger-piece, dense-contact or #236 sphere acceptance.
+The [2026-10-21 refresh](../reports/issue-255/2026-10-21/README.md) passes all
+numerical proposal checks and fresh historical relative comparisons; prior failed
+windows remain recorded. [#479](https://github.com/mr-exception/salimon/issues/479)
+owns the remaining explicit budget/limitation review after #255 delivery.
 
 ### Same-device relative regression checks
 
@@ -615,3 +619,30 @@ profiles for both refs. Separate per-ref Cargo target directories prevent an
 older worktree's artifacts being reused by a checkout with older file mtimes.
 When running the standalone journal integration probe across refs, also use
 separate `CARGO_TARGET_DIR` paths (or clean the world package between revisions).
+
+### Native current-sphere profiles (#313)
+
+`--layouts current-cap current-mixed --counts 500 1000` exposes the
+`current-spheres-303-v1` population to the native benchmark and opt-in E2E setup.
+`current-cap` is 10 kg iron; `current-mixed` cycles the existing residual masses
+and three materials. Both use the canonical 30 cm supported deck cells and
+conservative water-ice-radius layer spacing shared with `sphere_workloads.rs`.
+Active starts retain the 30 cm lift and 0.4 m/s upward velocity; settled starts
+omit the lift/velocity and still require natural preparation/sleep verification.
+The legacy `sphere-deck`, `sphere-pile` and `onboard` layouts are unchanged.
+
+Raw accounting now also records each fragment's actual `radius_meters`; IDs,
+material and mass remain authoritative. The 5 mm minimum contact radius is not
+an invented minimum mass. Native foreground admission, completed-frame sample
+counts, active-only filtering and timeout/failure rules above remain required.
+A 1,000-object residual workload can be expensive; a timed-out run has no passing
+frame/FPS result. Never substitute a legacy 500-piece run for these populations.
+
+### Controlled-build provenance (#313)
+
+Use a distinct `CARGO_TARGET_DIR` for production and each source-variant
+worktree. A shared target reused the temporary damping ablation library during
+#313 staging; that binary's evidence was rejected and recollected from an
+isolated production target. Record actual binary/source hashes and target paths,
+and run release physics invariants before native sampling. A checkout revision
+alone does not establish which physics artifact was linked.

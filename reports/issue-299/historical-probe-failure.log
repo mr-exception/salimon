@@ -1,0 +1,11 @@
+initial {"thruster_percentage": 50, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 100.0, "flight_state": "Flying", "power_available": false}
+zero-g-space-released {"thruster_percentage": 50, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 100.0, "flight_state": "Flying", "power_available": false}
+zero-g-coast {"thruster_percentage": 50, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 100.0, "flight_state": "Flying", "power_available": false}
+native-core-intake {"thruster_percentage": 50, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 103.19999999999993, "flight_state": "Flying", "power_available": true}
+conversion-restored-power {"thruster_percentage": 50, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 122.71999999999952, "flight_state": "Flying", "power_available": true}
+converted {"thruster_percentage": 50, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 318.55999999999534, "flight_state": "Flying", "power_available": true}
+final {"thruster_percentage": 50, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 322.07999999999527, "flight_state": "Flying", "power_available": true}
+Traceback (most recent call last):
+  File "/Users/mrexception/Documents/Projects/Salimon/salimon/reports/issue-198/2026-10-16/input_probe.py", line 161, in <module>
+    raise RuntimeError('native probe checks failed: ' + str(checks))
+RuntimeError: native probe checks failed: {'unpowered_native_movement': True, 'zero_g_coasting': True, 'native_e_consumes_once': False, 'gradual_conversion_power': True, 'conversion_completed': True, 'identities_retained': True}

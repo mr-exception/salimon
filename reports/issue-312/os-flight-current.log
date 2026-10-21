@@ -1,0 +1,18 @@
+initial {"thruster_percentage": 0, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 96.0, "flight_state": "Flying", "power_available": true}
+held-up-released {"thruster_percentage": 7, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 97.33119999999985, "flight_state": "Flying", "power_available": true}
+throttle-remains-after-release {"thruster_percentage": 7, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 98.45119999999973, "flight_state": "Flying", "power_available": true}
+coasting-before-steer {"thruster_percentage": 0, "orientation": [0.0, 0.0, 0.0, 1.0], "speed_meters_per_second": 104.38399999999908, "flight_state": "Flying", "power_available": true}
+held-yaw-left-released {"thruster_percentage": 0, "orientation": [0.0, 0.03210853858178156, 0.0, 0.9994843879471768], "speed_meters_per_second": 104.38399999999908, "flight_state": "Flying", "power_available": true}
+yaw-release-idle {"thruster_percentage": 0, "orientation": [0.0, 0.03210853858178156, 0.0, 0.9994843879471768], "speed_meters_per_second": 104.38399999999908, "flight_state": "Flying", "power_available": true}
+held-yaw-right-released {"thruster_percentage": 0, "orientation": [0.0, -0.0006981316440875785, 0.0, 0.9999997563060742], "speed_meters_per_second": 104.38399999999908, "flight_state": "Flying", "power_available": true}
+held-pitch-released {"thruster_percentage": 0, "orientation": [-1.7056876702352354e-05, -0.0006979232446577387, 0.024432172198679745, 0.9997012461600024], "speed_meters_per_second": 104.38399999999908, "flight_state": "Flying", "power_available": true}
+held-roll-released {"thruster_percentage": 0, "orientation": [0.024407827160560187, -0.00010078372362281568, 0.024441930730660887, 0.99940324185891], "speed_meters_per_second": 104.38399999999908, "flight_state": "Flying", "power_available": true}
+relative-mouse-positive {"thruster_percentage": 0, "orientation": [0.024407827160560187, -0.00010078372362281568, 0.024441930730660887, 0.99940324185891], "speed_meters_per_second": 104.38399999999908, "flight_state": "Flying", "power_available": true}
+relative-mouse-return {"thruster_percentage": 0, "orientation": [0.024407827160560187, -0.00010078372362281568, 0.024441930730660887, 0.99940324185891], "speed_meters_per_second": 104.38399999999908, "flight_state": "Flying", "power_available": true}
+native-reverse-selected {"thruster_percentage": -96, "orientation": [0.024407827160560187, -0.00010078372362281568, 0.024441930730660887, 0.99940324185891], "speed_meters_per_second": 5.901047021353167, "flight_state": "Flying", "power_available": true}
+native-reverse-motion {"thruster_percentage": -96, "orientation": [0.024407827160560187, -0.00010078372362281568, 0.024441930730660887, 0.99940324185891], "speed_meters_per_second": 181.4252524549367, "flight_state": "Flying", "power_available": true}
+final {"thruster_percentage": -96, "orientation": [0.024407827160560187, -0.00010078372362281568, 0.024441930730660887, 0.99940324185891], "speed_meters_per_second": 184.80314083542518, "flight_state": "Flying", "power_available": true}
+Traceback (most recent call last):
+  File "/Users/mrexception/Documents/Projects/Salimon/salimon/reports/issue-312/native_flight.py", line 167, in <module>
+    raise RuntimeError('native probe checks failed: ' + str(checks))
+RuntimeError: native probe checks failed: {'held_throttle_repeat': True, 'release_preserves_selection': True, 'held_yaw_changes_heading': True, 'released_yaw_stops': True, 'opposite_yaw_changes_heading': True, 'pitch_changes_heading': True, 'roll_changes_heading': True, 'native_reverse_motion': True, 'coasting_velocity_preserved': True, 'native_relative_mouse_changes_view': True, 'inverse_mouse_restores_view': False}

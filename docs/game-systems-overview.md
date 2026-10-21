@@ -52,3 +52,7 @@ crew/cargo; renderer owns the wide cockpit and separate Core status screens.
 links portable regression/profiling and timing contracts. These implemented
 systems supersede the baseline's energy exclusion; production survival and
 upgrade progression remain OUT OF SCOPE.
+
+## Approved future travel systems — not implemented
+
+The future [single-clock and Spatial Jump Drive design](jump-drive-and-interstellar-travel.md) refines exploration, navigation, ship/Core propulsion and Fabricator module progression without changing current binary behavior. Ordinary thrusters use **Core-funded impulse** (future 1 N·s/J baseline, implementation issue [#493](https://github.com/mr-exception/salimon/issues/493)); continuous flight, local braking, coasting and offline movement remain meaningful. A reusable fabricated **Spatial Jump Drive** instead converts Core energy into forward **displacement**: energy per light-second = current ship mass * 20% of the remaining speed-to-c gap / 1 N·s/J; actual velocity remains unchanged. Six panel fields provide equivalent light-distance (years/months/days/hours/minutes/seconds), engine-**off** is a hard interlock, and a quantum-themed staging scene hides destination loading. The shared world advances 1:1 in real time, no player-specific time dilation and no automatic offline jumps. Do not confuse this with the narrative's still-unverified wormhole, a universal unrestricted search, or shipped gameplay; detailed costs and edge decisions remain in the canonical design.

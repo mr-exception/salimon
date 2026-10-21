@@ -302,3 +302,11 @@ Tests: `client/universe/src/tests.rs`, frozen `fixtures/schema-v1.json`.
 Run `cargo test -p salimon-universe --locked` and workspace gates. U02 frames,
 U04 binary storage, U06–U12 data/build and U05 save binding are future consumers;
 no existing world IDs or render/native boundaries are changed.
+
+## Documentation maintenance policy (#440)
+
+Canonical owner: [documentation maintenance gate](documentation-maintenance.md).
+Contributor entry points: root AGENTS/coding conventions, PR template and Universe
+issue form. Same-PR owning guides/links and explicit no-impact reasons are required
+before readiness/review. Automated validation owner is #442; final audit is #441.
+Do not duplicate those scopes or claim automatic semantic accuracy.

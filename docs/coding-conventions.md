@@ -157,3 +157,13 @@ specifications and development guides. Reusable asset previews remain with the
 asset. Keep disposable build/E2E output in ignored `artifacts/`, promoting only
 useful evidence into the task report. Redact unrelated desktop/private content
 before committing screenshots. See [reports layout](../reports/README.md).
+
+## Universe documentation impact (#440)
+
+The [U35 maintenance gate](documentation-maintenance.md) requires a Documentation
+impact section, same-PR guide updates or precise justified exceptions, owning
+architecture/invariants links and actual path/link checks for every U01–U34 PR.
+Authors complete it before readiness; reviewers require changes for gaps. Keep
+approved requirements, implementation, historical fixtures and native evidence
+distinct. Templates implement the checklist; automated CI lint is #442 and the
+final consistency audit is #441, neither a reason to postpone documentation.

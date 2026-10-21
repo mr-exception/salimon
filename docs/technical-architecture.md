@@ -467,3 +467,11 @@ references. It is a portable leaf, not a runtime dependency. The six-body playab
 See [schema ownership and bounds](../client/universe/architecture.md). Catalog
 truth grants no player chart knowledge; frames, storage/import and native world
 migration remain U02 onward.
+
+## Universe documentation maintenance (#440)
+
+Every U01–U34 PR applies the [same-PR documentation gate](documentation-maintenance.md)
+with owning architecture/invariants links and checked implementation status.
+Root/source maps and domain contracts change alongside behavior, or a precise
+no-impact exception is reviewed. This is contributor/reviewer policy; automated
+CI lint #442 and final semantic audit #441 remain separate scoped work.

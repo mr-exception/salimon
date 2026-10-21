@@ -19,7 +19,7 @@ The approved alien homeworld becomes the traveler's **awakening location**; they
 - Startup ship inherits local planet rotation and orbital state in an inertial reference frame. Landing support forces and physically funded assist maneuvers. Recalibrate real thrust and Core where necessary; no artificial gravity-defying assists. Continuous swept collision broad phase and local terrain contact. Hierarchical coordinate frames + camera-relative GPU f32 after f64 local subtraction; galaxy-scale distances never raw global f64-meters-only.
 - The existing Newtonian flight prototype remains its current implementation until changed; future normal thrusters use **exact Core-joule-to-impulse accounting** (baseline 1 N·s/J; implementation issue #493), not kinetic-energy-balance billing. This gameplay convention is a fictional exception to physical energy accounting. Continuous sub-light travel and offline coasting remain important; future ordinary engine upgrades can improve acceleration. Whether continuous engines deliberately exceed light speed remains **undecided** and a numerical superluminal bug is not approval.
 - **One global universe clock:** 1 second of actual real elapsed time = 1 second of universe time for all ships and players, regardless of speed/online status. **No relativistic time dilation or per-player elapsed-time differences.** The separately approved reusable **Spatial Jump Drive** is an intentional FTL displacement exception: Core joules pay an N=20% virtual speed-gap/impulse cost **per light-second of distance**, it moves the ship forward without changing its real velocity, and it uses a quantum-themed loading transition. Its physical operation and formula are in [the canonical future design](jump-drive-and-interstellar-travel.md). No ordinary warp acceleration or time acceleration is implied. Black holes/compact bodies use approximate models with explicit validity limits, not implied fully relativistic accuracy.
-- Navigation instruments include trajectory prediction, distances, closing speed, power/acceleration estimates; no autopilot yet. The future owner-authorized Jump Drive panel has separate light-distance years/months/days/hours/minutes/seconds inputs, shows Core cost before activation, and **rejects a jump while engines are on** (even at zero selected throttle); the current code lacks a separate engine-off state.
+- Navigation instruments include trajectory prediction, distances, closing speed, power/acceleration estimates; no autopilot yet. The future owner-authorized Jump Drive panel has separate light-distance years/months/days/hours/minutes/seconds inputs, shows Core cost before activation, and **rejects a jump while engines are on** (even at zero selected throttle); the engine-off switch is now implemented by #493; the Jump Drive panel remains future work.
 
 ## Rendering / scanner
 - Hybrid beautiful authored Milky Way skybox plus physical/catalog-derived local stars, physically informed atmospheric/astronomical effects, real projected sizes during flight; enhanced markers only in navigation UI. Seamless terrain tile LOD from space to surface; bounded cache, prefetch and stall budgets. Performance target 60 FPS on reference Apple M1 iMac, configurable render LOD/streaming budgets without changing canonical content.
@@ -46,3 +46,11 @@ immutable source IDs, typed records and provenance/uncertainty validation. It do
 not connect canonical truth to player discovery or replace the playable catalog.
 U02–U34 retain their dependency gates. Existing gameplay implementation work is
 delivered; separate native review is not claimed complete.
+
+## Ongoing documentation implementation gate (#440)
+
+The [U35 contributor/reviewer policy](documentation-maintenance.md) and GitHub
+issue/PR templates are implemented. Every U01–U34 code change still updates its
+own affected guides in the same PR, with explicit reviewed exceptions and checked
+links. Automatic link/path/stale-contract validation remains #442 and final audit
+remains #441. This policy setup does not certify future changes or native gates.

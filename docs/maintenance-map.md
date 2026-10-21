@@ -16,7 +16,7 @@ iterating and the [applicable validation gates](validation.md) before completion
 | Precision fixtures and engineering camera | world `src/precision.rs`, `camera.rs`; root public reexports in `lib.rs` | world coordinate strategy/invariants; inline precision and deterministic camera-tour tests | F2/N/1–6 precision tour |
 | Flight, assists, cockpit authority, airlock | ship `src/lib.rs` facade, `state.rs`, `orientation.rs`, `controller/{mod,flight,steering,assist,door,cockpit,telemetry}.rs`; runtime `session.rs`, `session/interaction.rs`, `app/input.rs`, `app/interaction.rs`, `app/scene.rs`, `action_bar.rs` compose | ship architecture/invariants, inline motion/assist/door tests | `orbit-earth.json`, `space-airlock.json`, `lower-cockpit-windows.json` |
 | Walking, gravity, hull collision, EVA | character `src/controller/{mod,interior,doorway,surface,eva,camera}.rs`, `collision.rs`, `layout.rs`, `queries.rs`; runtime `session.rs`, `session/frames.rs` compose ship snapshots | character architecture/invariants; mode-local collision/gravity/EVA tests and `controller/collision_tests.rs`; generated `spatial_contracts.rs` | `cockpit-nose.json`, `space-airlock.json`, `moving-eva.json`, `nearby-eva.json` |
-| Fabricator recipes, storage, queue, tray and consumables | fabrication `src/{mass,recipes,machine,inventory}.rs`; runtime `session/{fabrication,crafting_ui}.rs`, `app/input.rs` | fabrication architecture/invariants; `tests/fabricator.rs`; integer/atomic/FIFO/power/mass regressions | Runtime scenarios are #347; native signoff #348 |
+| Fabricator recipes, storage, queue, tray and consumables | fabrication `src/{mass,recipes,machine,inventory}.rs`; runtime `session/{fabrication,crafting_ui,consumable_wheel}.rs`, `app/input.rs` | fabrication architecture/invariants; `tests/fabricator.rs`; integer/atomic/FIFO/power/mass regressions | Runtime scenarios are #347; native signoff #348 |
 | Resource identities/generation/streaming | world `src/resources.rs`, `resource_distribution.rs`, `resource_generation.rs`, `mining.rs` | `resource-contracts.md`, world invariants; inline generation/session tests | `resource-deposits.json`, `resource-streaming.json` |
 | Equipment toolbar state/input | runtime `equipment.rs`, `session.rs`, `app/input.rs`, `automation.rs` | five-slot/loadout/selection tests, carrying-lockout and view-gating tests; runtime invariants | `carrying.json` five-slot selection, empty-slot mining rejection and F pickup/drop; synchronized evidence captures equipped/empty/carrying/post-drop states |
 | Equipment toolbar HUD | runtime `equipment.rs` presentation mapping / `app.rs` redraw; renderer `equipment_toolbar.rs`, `overlay.rs`, `lib.rs` | renderer DTO/raster/cache/DPI/stacking tests; runtime mapping tests | `evidence/equipment-toolbar.json`; native resize/F2 |
@@ -90,6 +90,7 @@ cover overflow/rejected intake, mixed batches, nonrefundable cancel, blackout,
 blocked tray, mass, flight and takeoff. `scenarios/fabricator-contract.json`
 protects initial snapshot/closed-modal admission. Q consumption coverage is #377.
 
+
 ## Whole-game persistence (#363)
 
 The [canonical save contract](save-contract.md) inventories authoritative state,
@@ -115,6 +116,13 @@ integration is implemented by #371; the session now advances and saves survival.
 Damage, regeneration, treatment-only wound debt and data-driven timed/persistent/
 exposure status effects (#368) use the survival crate's [single pipeline](../client/survival/architecture.md#damage-and-status-pipeline-368).
 
+Q-wheel #377: fabrication `inventory.rs` owns exact typed slot consumption;
+runtime `session/consumable_wheel.rs` owns modal/held state; native pointer/focus
+mapping lives in `app.rs`/`app/input.rs`; renderer `consumable_wheel.rs` owns the
+shared image/hit geometry. Tests cover slot identities, input/focus/repeat,
+world-input isolation, continuing ship simulation and protocol resource-to-Q
+consumption. Consumption uses #370/#371 effects/lifecycle; pause coordination is #381/#382.
+Native visual/input signoff remains #376.
 Survival movement/interaction restrictions (#369): `survival/src/restrictions.rs`
 owns exact threshold percentages, validated tuning and typed permissions;
 `runtime/src/session/survival.rs` applies them to shared commands/ticks,

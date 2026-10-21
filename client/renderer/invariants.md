@@ -141,6 +141,14 @@ three food/two medical slots. Empty category markers stay visible. Amber ration
 stripes and a pale package/red cross match the existing low-poly tray styling.
 Message inset covers both rows; DPI fitting and caching use the full image.
 
+## Radial consumable presentation (#377)
+
+`consumable_wheel.rs` accepts renderer-neutral slot icons, names, hover index and
+effect text. Its cached 480px RGBA donut and native physical-pixel hit test share
+sector gaps/radii and uniform center fitting, including resized small windows.
+The inner hole/gaps/outside are noninteractive. Empty segments are visibly dim;
+original ration stripes/medical crosses match the dedicated HUD and authored
+tray. Renderer owns no inventory, consumption, input or survival rules.
 
 The exported toolbar message inset (#373) and internal message placement use the
 same scale/fitting implementation. Runtime HUDs may reserve this band, but renderer

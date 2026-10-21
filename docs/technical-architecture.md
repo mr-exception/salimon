@@ -5,7 +5,7 @@
 Salimon uses a custom Rust runtime with low-level `winit` and `wgpu`, without a
 full game engine. The current prototype extends the Phase 0 baseline and remains native and
 client-only. Local build scripts stage macOS, Windows and Debian-based Linux
-executables. PR CI compiles the workspace once on Ubuntu. Separate nightly
+executables. PR CI compiles and runs portable workspace tests on Ubuntu. Separate nightly
 verification and weekly benchmarks/platform builds publish reports; all local
 commands remain available. Native macOS is the reference playable/performance target. Web/server reuse remains a future capability, not a shipped target.
 
@@ -43,7 +43,7 @@ defines in-session restoration and the proposed #236 scope clarification awaitin
 owner approval; normal play restores its active run, while E2E/benchmarks start isolated sessions. No orbital simulation,
 multiplayer is implemented. Survival meters/status/recovery, active clocks,
 whole-game persistence and terminal/restart lifecycle are implemented through
-#371; HUD, Journey Ended and starter supplies are implemented by #373/#374/#379; native Q consumption remains #377.
+#371; HUD, Journey Ended and starter supplies are implemented by #373/#374/#379; native Q consumption is integrated by #377.
 Core joule storage, watt consumers and power authority are implemented; assist reservations are implemented; physical Core intake/conversion and a distinct Core-local status display are implemented.
 
 ## Accepted constraints
@@ -375,7 +375,7 @@ existing fitted toolbar message band; existing inventory/equipment art is unchan
 See the [canonical HUD contract](../client/runtime/architecture.md#survival-hud-and-status-details-373).
 Tests cover actual consumables, exact penalties, visual timing/cache, all supported
 viewport/DPI layouts, full effect pagination and native input policy. #376 retains
-native visual signoff; #381/#377 extend the existing menu/wheel admission later.
+native visual signoff; #381/#377 integrate menu/wheel admission.
 
 
 ## Journey Ended (#374)
@@ -389,7 +389,7 @@ Tests: `journey_ended/tests.rs`, native-host input/restart regressions and exist
 checkpoint/restart fault injection. Reference native visual/input acceptance is #376.
 
 Four-food definitions and continuous food modifiers are implemented by #378 in
-survival, with locked advanced recipes in fabrication. Native wheel input remains
+survival, with locked advanced recipes in fabrication. Native wheel input is integrated by
 #377; no progression acquisition is implemented. See the
 [canonical food contract](../client/survival/architecture.md#four-food-catalog-378)
 for captured settings, active/offline clocks and exact drain arithmetic.

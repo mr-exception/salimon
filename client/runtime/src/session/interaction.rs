@@ -11,6 +11,7 @@ pub(crate) const COCKPIT_INTERACTION_PROMPT: &str = "[E] Use cockpit";
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum InteractionTarget {
+    Archive,
     Fabricator,
     FabricatorScreen,
     FabricatorTray,
@@ -42,7 +43,9 @@ pub(crate) fn interaction_target(
         && dot(to_core, look_direction)
             / (core_distance * vector_length(look_direction)).max(f64::EPSILON)
             >= COCKPIT_INTERACTION_MINIMUM_AIM_DOT;
-    if core_aimed {
+    if super::archive::target(local_eye_position, local_look_target) {
+        Some(InteractionTarget::Archive)
+    } else if core_aimed {
         Some(InteractionTarget::Core)
     } else if cockpit_is_aimed_at {
         Some(InteractionTarget::Cockpit)
@@ -78,7 +81,8 @@ pub(crate) fn available_interaction_target(
 ) -> Option<InteractionTarget> {
     match interaction_target(local_eye_position, local_look_target) {
         Some(
-            InteractionTarget::Cockpit
+            InteractionTarget::Archive
+            | InteractionTarget::Cockpit
             | InteractionTarget::Core
             | InteractionTarget::Fabricator
             | InteractionTarget::FabricatorScreen

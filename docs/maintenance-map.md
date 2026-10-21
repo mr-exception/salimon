@@ -282,3 +282,13 @@ CPU pixels with `SALIMON_SCOUT_UI_DIR` set to an **absolute** evidence directory
 Existing `scout_feedback_gpu_evidence` supplies opt-in synthetic GPU views.
 [Delivery report](../reports/issue-466/README.md); native M1 acceptance #502;
 future scanner UI #503 after #430. Closed source scope is not native/scanner approval.
+
+
+## Scout Archive (#467)
+
+Owner: `client/runtime/src/session/archive.rs`; tests in `session/archive/tests.rs`.
+Persistence: `session/persistence.rs` and schema-6 save envelope. Native keys:
+`app/input.rs`; contextual target/prompt: `session/interaction.rs`, `app/interaction.rs`.
+Geometry: renderer `archive_terminal.rs`; label: `cockpit_instruments.rs`; shader:
+`ship_mesh.wgsl`. Contract: [runtime](../client/runtime/architecture.md#scout-archive-467).
+Run workspace build/tests/fmt/Clippy; retain native visual/input limits separately.

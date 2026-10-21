@@ -84,7 +84,8 @@ impl GameplaySession {
             && !self.is_paused()
             && !self.survival.snapshot().terminal
             && !self.wheel.open
-            && !self.crafting_ui.open)
+            && !self.crafting_ui.open
+            && !self.archive_reader.open)
             .then(|| self.tutorial.text())
             .flatten()
     }

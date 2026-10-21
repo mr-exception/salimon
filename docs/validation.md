@@ -202,3 +202,13 @@ These pixels are not native screenshots. M1 view/DPI/OS-input/frame-tail review
 remains #502; scanner integration #503 waits for #430. See the
 [UI report](../reports/issue-466/README.md) and
 [canonical matrix](scout-presentation.md#scout-ui-readability-contract-466).
+
+
+## Scout Archive (#467)
+
+`cargo test -p salimon-client --locked archive` covers physical ray/access, read
+selection, whole-session restore/legacy migration, invalid source transaction,
+modal gates and bounded spoiler-free text. Workspace gates also cover all prior
+save/lifecycle and instrument cache contracts. Renderer test `terminal_faces_cabin`
+checks panel normals/UVs. Native walk/use/save/relaunch, power transitions, DPI and
+reference frame tails remain separate from portable results.

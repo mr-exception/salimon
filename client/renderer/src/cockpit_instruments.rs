@@ -7,7 +7,7 @@
 use crate::ui_style::{AMBER, BACKGROUND, CYAN, INSET, IVORY, MUTED, RULE, glyph_rows};
 
 const SECTION_WIDTH: u32 = 512;
-pub(crate) const ATLAS_WIDTH: u32 = SECTION_WIDTH * 5;
+pub(crate) const ATLAS_WIDTH: u32 = SECTION_WIDTH * 6;
 pub(crate) const ATLAS_HEIGHT: u32 = 256;
 
 /// Renderer-neutral values shown on the ship's physical cockpit monitors.
@@ -381,6 +381,17 @@ impl InstrumentAtlas {
             .is_none_or(|previous| previous.power_off || previous.fabricator != next.fabricator)
         {
             self.draw_fabricator(next.fabricator);
+        }
+        if self
+            .displayed
+            .as_ref()
+            .is_none_or(|previous| previous.power_off)
+        {
+            self.section_frame(5, "SCOUT ARCHIVE");
+            self.text(28, 74, "LOCAL VOYAGE RECORDS", 3, CYAN);
+            self.text(28, 122, "INTACT / DAMAGED", 3, IVORY);
+            self.text(28, 176, "[E] READ ARCHIVE", 3, CYAN);
+            self.text(28, 222, "NO NAVIGATION FIX", 2, MUTED);
         }
         self.displayed = Some(next);
         true

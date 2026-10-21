@@ -178,6 +178,7 @@ fn geometry_from_bytes(bytes: &[u8]) -> Result<ShipGeometry, RendererError> {
             }
         }
     }
+    crate::archive_terminal::append(&mut opaque_vertices);
     let opaque_vertex_count =
         u32::try_from(opaque_vertices.len() / VERTEX_FLOATS).map_err(|_| {
             RendererError::new(

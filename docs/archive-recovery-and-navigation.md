@@ -1,6 +1,6 @@
 # Scout Archive, data recovery and discovered navigation
 
-Status: **approved design, not implemented**. Documentation issue #459. Related: [lost journey](narrative-and-lost-journey.md), [approved universe](universe-expansion-approved-design.md), [Absenat](absenat-and-hall.md).
+Status: **Archive reader implemented by #467; Recovery Module and discovered navigation remain approved future design**. Documentation issue #459. Related: [lost journey](narrative-and-lost-journey.md), [approved universe](universe-expansion-approved-design.md), [Absenat](absenat-and-hall.md).
 
 ## Physical Ship Archive
 
@@ -35,3 +35,14 @@ Test arrival with no Earth route, inspecting ordinary and damaged messages, inte
 The [Spatial Jump Drive](jump-drive-and-interstellar-travel.md) is a **physical Core-powered owner-operated displacement module**, not the narrative's alleged wormhole. The player may set **six light-distance fields** (years/months/days/hours/minutes/seconds) to request a jump along the ship's current forward direction; this neither supplies free galactic search nor reveals unknown Earth/Solar System/Absenat coordinates. Canonical hidden catalog and moving-body data may be checked for **destination collision safety without granting player knowledge**; show navigation/uncertainty warnings through existing instruments only when supported by actual charted evidence. The jump leaves inertial velocity unchanged; approach/orbit/braking remain player responsibilities.
 
 The quantum-themed transition is **loading**, not proof of travel through the unresolved wormhole or another chronology; every player remains on the same universal 1:1 real-time clock. The engine must be explicitly **off**, not just zero throttle. First-module N is **20%** of the remaining difference to c per light-second priced as equivalent Core impulse (see full formula in the canonical future design); no jump code is delivered by these docs.
+
+
+## Implemented local reader (#467)
+
+The separate Scout wall terminal now exposes five intact ordinary voyage/routine
+records and two damaged packets with unknown contents. Source and unknown time
+are explicit; a name or historical departure never grants a destination. Durable
+versioned identities/read selection round-trip through schema 6. Recovery states,
+energy consumption/reconstruction, destination leads and player charting remain
+#468–470. Native appearance/input signoff remains separate. See the
+[implementation boundary](../client/runtime/architecture.md#scout-archive-467).

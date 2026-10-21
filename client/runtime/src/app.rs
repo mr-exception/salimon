@@ -607,6 +607,7 @@ impl ClientApplication {
         if pressed
             && self.session.view_mode == ViewMode::Gameplay
             && !self.session.crafting_ui.open
+            && !self.session.archive_reader.open
             && !self.session.wheel.open
             && !self.session.survival.snapshot().terminal
         {
@@ -1031,6 +1032,7 @@ impl ClientApplication {
             Some(self.condition_feedback.menu_text())
         } else {
             self.pause_menu_text()
+                .or_else(|| self.session.archive_text())
                 .or_else(|| self.session.crafting_text())
         };
         let ended_image = self.journey_ended.image(

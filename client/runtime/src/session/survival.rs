@@ -64,6 +64,7 @@ impl GameplaySession {
 
     pub(super) fn interaction_action(target: InteractionTarget) -> Action {
         match target {
+            InteractionTarget::Archive => Action::Menu,
             InteractionTarget::Cockpit => Action::Pilot,
             InteractionTarget::ExitDoor => Action::Door,
             InteractionTarget::Core => Action::FeedCore,

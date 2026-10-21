@@ -210,3 +210,8 @@ Scout UI #466: prompt and crafting/status glyphs reuse renderer `ui_style`.
 See the [canonical surface matrix](../../docs/scout-presentation.md#scout-ui-readability-contract-466);
 retain contextual/expiry and modal admission tests, and keep power/interaction
 rules out of palette/raster changes. Scanner integration is separately #503.
+
+
+Archive #467: follow [the source/persistence/input contract](architecture.md#scout-archive-467).
+Record identity/read selection is source; the modal is transient. No log mention
+grants a navigation fix. Preserve schema-6 transaction, modal, ray and restart tests.

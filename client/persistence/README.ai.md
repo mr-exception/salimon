@@ -33,3 +33,9 @@ explicitly migrates versions 1–3 dismissed; missing schema-4 source rejects.
 #493 advances captures to schema 5 for explicit engine on/off and the fictional
 impulse coefficient. Runtime migrates v1-v4 force records without a simulation
 tick; see the current canonical save contract.
+
+
+#467 advances captures to schema 6, requiring versioned local Archive identities,
+read progress and selection. Runtime initializes old v1–v5 Archives unread;
+current payload omissions/unknown identities reject transactionally. See
+[Archive save contract](../../docs/save-contract.md#scout-archive-schema-6-467).

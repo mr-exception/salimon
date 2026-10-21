@@ -1267,3 +1267,11 @@ interaction prompt/transient is present; details, wheel, crafting, diagnostics,
 pause and terminal screens suppress it. Thus it adds no competing overlay or
 world-anchored label. Existing DPI fitting and toolbar reservations apply.
 Native appearance and complete physical input review remain #376.
+
+## Portable survival balance (#384)
+
+`src/survival_balance.rs` runs six bounded cross-domain tests through production
+mining, carrying, E/Q transactions, funded crafting, save/lifecycle and EVA routes.
+Travel/setup are explicit time budgets with stage fixture placements; see the
+[canonical evidence/limitations](../../docs/survival-balance.md). Native and owner
+budget/tuning approval remain #496; no production constants change.

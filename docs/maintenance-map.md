@@ -244,3 +244,7 @@ Survival onboarding (#380): `runtime/src/session/tutorial.rs`, success hooks in
 and action-band fallback in `app.rs`; version-4 composition in
 `session/persistence.rs`. Tests: `session/tutorial/tests.rs`, persistence and
 existing native admission regressions. See the [onboarding contract](../client/runtime/architecture.md#persistent-survival-onboarding-380).
+
+Survival balance #384: runtime `src/survival_balance.rs` owns six bounded portable
+scenarios and opt-in JSON reports. See [evidence and assumptions](survival-balance.md);
+owner/native route and tuning acceptance remains #496.

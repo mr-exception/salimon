@@ -503,6 +503,29 @@ impl ClientApplication {
             }
             return;
         }
+        if self.session.is_paused()
+            && pressed
+            && !repeat
+            && !synthetic
+            && self.input_policy().admits_press(source, true)
+            && !self.condition_feedback.settings_open
+        {
+            use crate::checkpoints::control::Request;
+            let request = match key {
+                PhysicalKey::Code(KeyCode::KeyN) => Some(Request::SaveNow),
+                PhysicalKey::Code(KeyCode::KeyX) => Some(Request::SaveAndExit),
+                PhysicalKey::Code(KeyCode::KeyR) => Some(Request::Retry),
+                PhysicalKey::Code(KeyCode::KeyC) => Some(Request::CancelExit),
+                PhysicalKey::Code(KeyCode::KeyQ) => Some(Request::ExitWithRisk),
+                _ => None,
+            };
+            if let Some(request) = request {
+                if let Some(checkpoints) = &mut self.checkpoints {
+                    checkpoints.request(request, &self.session);
+                }
+                return;
+            }
+        }
         let pause_key = self.session.view_mode == ViewMode::Gameplay
             && (key == PhysicalKey::Code(KeyCode::Escape)
                 || (self.session.is_paused()
@@ -543,6 +566,14 @@ impl ClientApplication {
         }
         if pause_key {
             if pressed && !repeat && !synthetic && self.input_policy().admits_press(source, true) {
+                if self.session.is_paused()
+                    && let Some(checkpoints) = &mut self.checkpoints
+                {
+                    checkpoints.request(
+                        crate::checkpoints::control::Request::CancelExit,
+                        &self.session,
+                    );
+                }
                 self.session.command(crate::session::Command::TogglePause);
                 self.scout_audio.stop();
                 self.condition_feedback.settings_open = false;
@@ -695,6 +726,45 @@ impl ClientApplication {
             self.release_input_capture();
         }
         (update_delta, ticks)
+    }
+
+    /// Observe host IO without stepping the paused session.
+    fn pause_menu_text(&self) -> Option<String> {
+        if !self.session.is_paused() {
+            return None;
+        }
+        let mut text = String::from(
+            "SALIMON / PAUSED\n\nENTER / ESC   RESUME\nN   SAVE NOW\nS   SETTINGS\nX   SAVE & EXIT\n\n",
+        );
+        use crate::checkpoints::control::Status;
+        match &self.checkpoints {
+            None => text.push_str("Saving unavailable in this session"),
+            Some(checkpoints) => {
+                let (status, verified, _) = checkpoints.status();
+                text.push_str(match status {
+                    Status::Idle => "No checkpoint verified this session",
+                    Status::Saving => "Saving...",
+                    Status::Saved { .. } => "Saved",
+                    Status::Failed => "SAVE FAILED - check storage/permissions",
+                });
+                if let Some(utc) = verified {
+                    text.push_str(&format!(
+                        "\nLast verified: {}",
+                        crate::checkpoints::control::timestamp(utc)
+                    ));
+                }
+                if status == Status::Failed {
+                    text.push_str("\nR   RETRY");
+                }
+                if checkpoints.exit_requested() {
+                    text.push_str("\nC   CANCEL EXIT");
+                    if status == Status::Failed {
+                        text.push_str("\nQ   EXIT WITHOUT SAVING");
+                    }
+                }
+            }
+        }
+        Some(text)
     }
 
     /// Background presentation stops, but the running, living session continues
@@ -927,18 +997,17 @@ impl ClientApplication {
         } else {
             None
         };
+        let crafting_text = if self.session.is_paused() && self.condition_feedback.settings_open {
+            Some(self.condition_feedback.menu_text())
+        } else {
+            self.pause_menu_text()
+                .or_else(|| self.session.crafting_text())
+        };
         let ended_image = self.journey_ended.image(
             terminal_report,
             [window.inner_size().width, window.inner_size().height],
             window.scale_factor(),
         );
-        let crafting_text = if self.session.is_paused() && self.condition_feedback.settings_open {
-            Some(self.condition_feedback.menu_text())
-        } else {
-            self.session
-                .pause_text()
-                .or_else(|| self.session.crafting_text())
-        };
         let crafting_pixels = crafting_text
             .as_ref()
             .map(|text| crate::action_bar::rasterize_action_bar(text, 3));
@@ -1275,6 +1344,23 @@ impl ApplicationHandler for ClientApplication {
             WindowEvent::CloseRequested => {
                 if self.benchmark.is_some() {
                     self.fail(event_loop, "benchmark window closed before completion");
+                } else if self.checkpoints.is_some()
+                    && self.session.view_mode == ViewMode::Gameplay
+                    && !self.session.survival.snapshot().terminal
+                {
+                    if !self.session.is_paused() {
+                        self.session.command(crate::session::Command::TogglePause);
+                    }
+                    self.condition_feedback.settings_open = false;
+                    release_cursor(&window);
+                    self.release_input_capture();
+                    if let Some(checkpoints) = &mut self.checkpoints {
+                        checkpoints.request(
+                            crate::checkpoints::control::Request::SaveAndExit,
+                            &self.session,
+                        );
+                    }
+                    window.request_redraw();
                 } else {
                     event_loop.exit();
                 }
@@ -1448,6 +1534,13 @@ impl ApplicationHandler for ClientApplication {
     }
 
     fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
+        if let Some(checkpoints) = &mut self.checkpoints {
+            checkpoints.poll(&self.session);
+            if checkpoints.status().2 {
+                event_loop.exit();
+                return;
+            }
+        }
         if self.automation.is_some() {
             // Drain the queue on the native thread; the stdin thread never touches state.
             while let Some(request) = self
@@ -1503,6 +1596,7 @@ impl ApplicationHandler for ClientApplication {
 
     fn exiting(&mut self, _event_loop: &ActiveEventLoop) {
         if let Some(mut checkpoints) = self.checkpoints.take()
+            && !checkpoints.status().2
             && let Err(error) = checkpoints.finish(&self.session)
         {
             log::error!("exit checkpoint failed: {error}");

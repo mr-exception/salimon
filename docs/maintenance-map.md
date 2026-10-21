@@ -225,3 +225,8 @@ Tests include portable pause/restore/power/blocked/progress/yaw and opt-in
 `ship_feedback_tests.rs` production shader snapshots with raw timing evidence.
 See [feedback contract](scout-presentation.md#machinery-feedback-boundary-464);
 native walkthrough and budget acceptance remain #489.
+
+Pause saves (#382): runtime `checkpoints/control.rs`, `checkpoints.rs` and `app.rs`
+own request/status/UTC, asynchronous verified IO and focused menu/exit admission.
+Fault-injected worker/store and native dispatch regressions cover the contract.
+See [save contract](save-contract.md#pause-checkpoint-controls-382); native #376.

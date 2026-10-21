@@ -281,5 +281,23 @@ Both native/background and portable automation tick paths exclude paused elapsed
 time and clear pending backlog on entry/resume; focus/minimize/suspend cannot
 resume a paused session or credit offline fatigue. Resume requires fresh controls.
 The pause menu takes priority over diagnostics, HUD, reticle and equipment.
-Save Now/Save & Exit remain the separate #382 feature; Q-wheel input must respect
+Save Now/Save & Exit use the verified #382 worker; Q-wheel input must respect
 `GameplaySession::is_paused()` and the shared consumption gate.
+
+## Pause checkpoint controls (#382)
+
+The paused menu offers Enter/Escape Resume, N Save Now, S Settings and X Save &
+Exit. R retries failures, C cancels exit and Q explicitly exits without saving
+only after a failed exit checkpoint. Resume cancels exit intent. Menu keys require
+initial focused admission; repeats/synthetic/unfocused input cannot request IO.
+The existing center panel uniformly fits its drawable; Settings keep their keys.
+
+`checkpoints/control.rs` owns bounded coalescing, verified UTC receipts and exit
+intent. Manual/automatic captures share the same worker, atomic store and active
+run. Polling continues while paused/minimized; a newer request cannot be satisfied
+by an older in-flight snapshot. Retry bypasses frozen game-time backoff. Save &
+Exit and living-gameplay window close await verification or explicit failed-save
+risk choice. Final exit does not start a second write after either choice.
+Terminal archives/restart and 60-second/event autosaves retain their owners.
+No manual request ticks gameplay or credits offline fatigue. Native OS-input,
+DPI/appearance and M1 signoff remain separately tracked by #376.

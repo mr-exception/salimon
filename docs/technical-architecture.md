@@ -406,3 +406,6 @@ Scout machinery (#464) uses a stateless runtime snapshot mapper and renderer-onl
 normalized feedback, sharing authoritative power/progress with existing monitors
 and audio. It adds no gameplay controller or saved state. See the
 [feedback contract](scout-presentation.md#machinery-feedback-boundary-464).
+
+Pause saves (#382) use the existing worker/store and verified receipts; see
+[manual checkpoint contract](save-contract.md#pause-checkpoint-controls-382).

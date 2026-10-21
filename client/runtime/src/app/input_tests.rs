@@ -447,3 +447,52 @@ fn isolated_e2e_ignores_desktop_keys_and_preserves_protocol_holds_on_lifecycle_r
     app.set_input_focus(false);
     assert_eq!(app.session.ship_control_input, ShipControlInput::default());
 }
+
+#[test]
+fn pause_save_menu_requires_initial_focus_and_preserves_paused_state() {
+    let mut app = ClientApplication {
+        native_focused: true,
+        cursor_captured: true,
+        ..Default::default()
+    };
+    let dir = std::env::temp_dir().join(format!("salimon-382-menu-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&dir);
+    app.checkpoints =
+        Some(crate::checkpoints::Checkpoints::open(dir.clone(), &mut app.session).unwrap());
+    native(&mut app, KeyCode::Escape, true);
+    let before = app.session.save_bytes(123).unwrap();
+    let key = PhysicalKey::Code(KeyCode::KeyX);
+    app.dispatch_key(key, true, true, false, InputSource::Native);
+    app.dispatch_key(key, true, false, true, InputSource::Native);
+    app.native_focused = false;
+    native(&mut app, KeyCode::KeyX, true);
+    assert!(!app.checkpoints.as_ref().unwrap().exit_requested());
+    app.native_focused = true;
+    native(&mut app, KeyCode::KeyS, true);
+    native(&mut app, KeyCode::KeyX, true);
+    assert!(!app.checkpoints.as_ref().unwrap().exit_requested());
+    native(&mut app, KeyCode::KeyS, true);
+    native(&mut app, KeyCode::KeyX, true);
+    assert!(app.checkpoints.as_ref().unwrap().exit_requested());
+    assert!(app.pause_menu_text().unwrap().contains("C   CANCEL EXIT"));
+    assert_eq!(app.session.save_bytes(123).unwrap(), before);
+    native(&mut app, KeyCode::Escape, true);
+    assert!(!app.session.is_paused());
+    assert!(!app.checkpoints.as_ref().unwrap().exit_requested());
+    drop(app);
+    std::fs::remove_dir_all(dir).unwrap();
+}
+#[test]
+fn pause_menu_raster_and_verified_utc_receipt_are_available() {
+    use crate::checkpoints::control::timestamp;
+    assert_eq!(timestamp(0), "1970-01-01 00:00:00 UTC");
+    assert_eq!(timestamp(951827696), "2000-02-29 12:34:56 UTC");
+    assert!(timestamp(u64::MAX).contains("Unix epoch"));
+    let mut app = ClientApplication::default();
+    app.session.command(crate::session::Command::TogglePause);
+    let text = app.pause_menu_text().unwrap();
+    assert!(text.contains("N   SAVE NOW"));
+    assert!(text.contains("Saving unavailable"));
+    let (w, h, pixels) = crate::action_bar::rasterize_action_bar(&text, 3);
+    assert_eq!(pixels.len(), (w * h * 4) as usize);
+}

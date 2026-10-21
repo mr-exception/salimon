@@ -15,6 +15,8 @@ mod pause;
 #[allow(dead_code)]
 pub(crate) mod persistence;
 #[cfg(test)]
+mod persistence_scenarios;
+#[cfg(test)]
 mod propulsion_tests;
 #[cfg(test)]
 mod starting_supplies_tests;

@@ -1283,3 +1283,12 @@ focus/modal/pilot/power gates. Scene mapping passes ON/OFF, actual acceleration
 and braking to the existing cockpit instruments. Audio/machinery suppress drive
 feedback while explicitly off. Schema 5 migration is in `session/persistence.rs`;
 see the [ship math/safety contract](../ship/architecture.md#funded-core-impulse-and-engine-switch-493).
+
+## Portable persistence/survival scenario composition (#375)
+
+Test-only `session/persistence_scenarios.rs` owns a strict versioned JSON DSL,
+whole-save comparisons and deterministic continuation across real disk/launch
+boundaries. `checkpoints/scenarios.rs` exercises actual asynchronous manual-save,
+startup and terminal restart transactions with storage publication faults.
+Production ownership, schemas and native input stay unchanged. See the
+[portable DSL, isolation and commands](../../scenarios/portable/README.md).

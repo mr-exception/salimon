@@ -6,7 +6,7 @@ only schedule and manual triggers; it never runs on a PR or each push.
 
 | Suite | Schedule (UTC) | Coverage |
 | --- | --- | --- |
-| Nightly | Daily 00:37 | Model and Python contracts, Rust fmt/Clippy/tests, GLB compliance/importer parity, software-Vulkan resource tests, one release build, deterministic baseline, screenshot evidence, model temporal and reviewed appearance comparison, packaged OS-input smoke |
+| Nightly | Daily 00:37 | Model and Python contracts, Rust fmt/Clippy/tests plus extended persistence/survival matrix, GLB compliance/importer parity, software-Vulkan resource tests, one release build, deterministic baseline, screenshot evidence, model temporal and reviewed appearance comparison, packaged OS-input smoke |
 | Weekly | Sunday 01:17 | Release CPU benchmark executable on Linux, 500/1,000-fragment scattered/dense × settled/active matrix with at least 100 samples per case, 100-sample flight/cargo regression profiles, resource-preparation comparison; debug workspace builds on macOS and Windows |
 
 Schedules run the default branch. GitHub schedules can start late; these are

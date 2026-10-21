@@ -254,3 +254,16 @@ telemetry/assist/persistence; runtime session/native B, schema migration, scene,
 audio/machinery mapping; renderer cockpit atlas. Tests: ship `impulse_tests.rs`,
 runtime `session/propulsion_tests.rs`, input/cache and inertial/landing scenarios.
 See [current math](../client/ship/architecture.md#funded-core-impulse-and-engine-switch-493); native review #498.
+
+## Persistence/survival cross-system verification (#375)
+
+Runtime `session/persistence_scenarios.rs` executes the versioned
+[`scenarios/portable/persistence-survival.json`](../scenarios/portable/persistence-survival.json)
+DSL and full-source disk/restore/continuation matrix. Its `rates.rs` covers meter
+partition/save boundaries and exhausted Q behavior. `checkpoints/scenarios.rs`
+exercises the real worker/launch/restart composition with before/torn/after
+publication faults, including every archive/restart write. The two extended
+`persistence_extended` tests are opt-in locally and run nightly. See
+[commands and operation reference](../scenarios/portable/README.md) and
+[acceptance traceability](../reports/issue-375/README.md). Existing #377–#384 owner
+tests remain part of workspace CI; this matrix composes their production owners.

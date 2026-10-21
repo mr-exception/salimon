@@ -330,3 +330,22 @@ all other state. Current-schema missing/retired/unknown fields reject atomically
 Tutorial schema-4 progress remains required for v4/v5; earlier tutorial migration
 stays dismissed. No inventory/resource grant or simulation tick occurs on restore.
 The switch participates in discrete checkpoint events; held B/keys are transient.
+
+## Portable cross-system verification (#375)
+
+The [portable scenario DSL](../scenarios/portable/README.md) composes real session
+encoding/validation, NativeStore checkpoints and the normal verified launch path
+at explicit UTC. Full-source equality and post-restore continuation cover landed,
+moving, outside-EVA, cargo, blackout/Core and terrain states with partial
+fabrication, inventory, tutorial, active healing/damage and fixed-tick fractions.
+An extended 500-fragment case preserves depletion across stream reconciliation,
+physical identities, derived mass and continuation.
+
+Checkpoint worker fault injection covers failed writes before publication, torn
+bytes and complete writes followed by an error. Death/restart tests inject at
+each of the two terminal copies, archive and two fresh copies, retain the terminal
+visible session on error, recover valid durable state and converge to exactly one
+archive/new run. CRC-valid invalid-domain saves must fall back; future schemas
+must abort launch without replacing visible state. Existing native-store tests
+retain crash-temp-file, lease and platform durability coverage. See the
+[acceptance matrix and raw results](../reports/issue-375/README.md).

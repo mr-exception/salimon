@@ -1,5 +1,7 @@
 //! Native orchestration: capture on the session thread, durable IO on one worker.
 pub(crate) mod control;
+#[cfg(test)]
+mod scenarios;
 use crate::session::{GameplaySession, lifecycle::ARCHIVE_VERSION};
 use control::Control;
 use salimon_persistence::{

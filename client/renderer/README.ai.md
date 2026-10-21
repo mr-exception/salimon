@@ -122,3 +122,5 @@ stacking; it introduces no renderer dependency on survival or other domains.
 margin, shared by overlay fitting and bounded host-produced terminal images.
 A host image that exactly fits this size stays unscaled, keeping physical pointer
 hit rectangles aligned. Runtime still owns all terminal state, text and input.
+
+Scout machinery #464: read the [canonical feedback boundary](../../docs/scout-presentation.md#machinery-feedback-boundary-464). Runtime maps snapshots in `scout_feedback.rs`; renderer owns `machinery.rs`/ship roles/shader. Preserve pause/restore and power/work gating tests; run the opt-in offscreen GPU evidence check for shader changes.

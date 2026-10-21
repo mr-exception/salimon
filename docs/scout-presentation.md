@@ -11,8 +11,9 @@ Functional chassis/base colors and glass alpha are preserved; ordinary ship PBR
 metallic/roughness/maps remain ignored. Do not use Cycles output to certify them.
 
 Budget delta: zero new vertices, textures, buffers, draws or pipelines. The same
-160-byte uniform carries the bus bit in its previously unused `center.w`.
+original 160-byte uniform carried the bus bit in its previously unused `center.w`.
 Additional vertex arithmetic is bounded (two smoothstep zones, no light loop).
+The machinery extension below enlarges that uniform to 192 bytes.
 Measured Linux costs and unrun reference-hardware gates belong in the
 [delivery report](../reports/issue-463/README.md), not a claimed FPS target.
 
@@ -88,3 +89,50 @@ matched whole-frame costs remain [#485](https://github.com/mr-exception/salimon/
 which must decide whether a continuous backend is needed. Synthesis measurements
 are not audio-device or M1 budget approval. See the
 [audio report](../reports/issue-465/README.md) for actual tests and limits.
+
+## Machinery feedback boundary (#464)
+
+`runtime/scout_feedback.rs` maps immutable ship and Fabricator snapshots to typed
+`MachineryFeedback`. This is a stateless presentation adapter; physical power,
+energy, recipes, interaction, transforms, elapsed time and saves retain their
+existing owners. Automation exposes the same mapping in `machinery` inspection.
+Loading/restoration takes the current snapshot immediately; no event replay,
+work catch-up or extra animation history enters a checkpoint.
+
+| Surface | Authoritative observation and feedback |
+| --- | --- |
+| Engine glow | Signed powered free-flight throttle; magnitude controls drive emission, zero while coasting/landed/assisted/unpowered; separate running lamps remain bus powered |
+| Core / spine / charge gauge | Charge-proportional steady emission, with a restrained four-second conversion modulation while the bus is powered; blackout extinguishes electrical accents |
+| Fabricator panels | Quiet idle, progress-positioned teal work sweep only when funded, steady amber blocked tray, no emission during blackout; progress freezes with the actual job |
+| Cockpit | Ready indicators follow powered cockpit authority; opposed rudder pedals move at most 1.5 cm from actual ramped yaw; monitor retains signed throttle/telemetry |
+| Door / ramp / landing supports | Existing presented door fraction and hinge/extension geometry; supports remain authored fixed structure attached to the ship, including touchdown/bounce motion |
+| Output / carried / loose cargo | Existing deliberate tray appearance/collection, carried grip and coherent fragment/ship transforms; no invented collection animation or duplicate item |
+
+The phase uses integer active elapsed modulo four seconds before conversion to
+f32. Paused/terminal worlds freeze it. Fabricator work uses actual normalized
+job progress, so interruption cannot accumulate a hidden animation backlog.
+Only named functional surfaces receive tags; structural meshes, colliders,
+walking lanes, GLB authoring and mass accounting are unchanged. Existing physical
+screen statuses and prompts are the nonanimated/text alternatives. There are no
+flashing alerts, camera shake, particles, lights or postprocessing passes.
+
+Renderer adds one f32 role per immutable ship vertex (72 -> 76-byte stride) and
+two vec4 uniform slots (160 -> 192 bytes per rendered ship frame). Geometry counts,
+textures, two opaque/glass draws, buffers and pipelines remain fixed. The role
+shader adds bounded arithmetic with no source loop or dynamic allocation.
+[Report](../reports/issue-464/README.md) records actual software-Vulkan debug costs
+and limits, rather than claiming a full-frame or M1 budget pass.
+
+An opt-in offscreen production-pipeline test records 14 synthetic reference
+states, raw CPU/GPU samples and byte-identical repeated PNGs without a desktop.
+These images test shader/DTO behavior, not production input or a gameplay run.
+Run with an absolute output directory:
+
+```sh
+SALIMON_SCOUT_FEEDBACK_DIR="$PWD/artifacts/scout-feedback" VK_DRIVER_FILES=/usr/share/vulkan/icd.d/lvp_icd.json cargo test -p salimon-renderer --locked scout_feedback_gpu_evidence -- --ignored --nocapture
+```
+
+The normal-play interaction walkthrough, reference hardware budgets and observed
+Fabricator reference-text orientation remain [#489](https://github.com/mr-exception/salimon/issues/489).
+The absent scanner hologram will integrate through #430/#466 when available.
+No native appearance, mask/tolerance or baseline approval is granted here.

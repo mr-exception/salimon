@@ -399,3 +399,8 @@ Scout audio (#465) is a runtime-only presentation adapter with bounded stereo
 PCM and shared optional OS playback, independent of run saves and all domain
 authority. [Soundscape contract](scout-presentation.md#soundscape-boundary-465)
 records spatial/mute/quiet-zone rules and the unverified native playback limits.
+
+Scout machinery (#464) uses a stateless runtime snapshot mapper and renderer-only
+normalized feedback, sharing authoritative power/progress with existing monitors
+and audio. It adds no gameplay controller or saved state. See the
+[feedback contract](scout-presentation.md#machinery-feedback-boundary-464).

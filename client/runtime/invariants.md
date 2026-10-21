@@ -385,7 +385,7 @@ Both native/background and portable automation tick paths exclude paused elapsed
 time and clear pending backlog on entry/resume; focus/minimize/suspend cannot
 resume a paused session or credit offline fatigue. Resume requires fresh controls.
 The pause menu takes priority over diagnostics, HUD, reticle and equipment.
-Save Now/Save & Exit remain the separate #382 feature; Q-wheel input must respect
+Save Now/Save & Exit use the verified #382 worker; Q-wheel input must respect
 `GameplaySession::is_paused()` and the shared consumption gate.
 
 
@@ -440,3 +440,7 @@ funded work/progress and ramped yaw gate the cues; retained throttle alone canno
 light an unpowered/landed drive. Active phase freezes during pause/death and
 restoration never replays prior cues. Existing interpolated pose, ramp/cargo
 transforms and collision authority are preserved.
+
+Pause saves (#382) use the shared worker/store without advancing authoritative
+clocks. Saved/UTC require verified completion. Resume cancels exit intent; failure
+requires retry/cancel/explicit risk exit. See [contract](architecture.md#pause-checkpoint-controls-382).

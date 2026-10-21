@@ -10,7 +10,7 @@ visible beside the wheel. Cloud verification results follow below.
 Native OS-input/DPI/appearance and reference-M1 checks remain unrun under existing
 [#376](https://github.com/mr-exception/salimon/issues/376); a prior Xvfb attempt
 failed before display startup because listening sockets were unavailable. No
-baseline images/masks or performance acceptance is promoted. Review #395 first.
+baseline images/masks or performance acceptance is promoted. PR #395 is merged.
 
 ## Fresh cloud validation
 
@@ -35,11 +35,22 @@ The first stale-selection fixture failed because its invented job ID violated
 the allocator high-water mark. The corrected fixture swaps two actual allocated
 starter items. The regression and complete final suite pass with valid state.
 
-Review/merge pause-save PR #395 before this PR. This PR closes #377 on merge;
+Pause-save PR #395 is merged. This PR closes #377 on merge;
 remaining native Q/pause/consumable acceptance stays explicitly under #376.
 
 The dated draft report below is historical; its open prerequisites and placeholder
 NO ACTIVE EFFECT presentation no longer describe the integrated code.
+
+## Conflict refresh after #395 merged — 2026-10-21
+
+Merged main `8d52130` into the existing PR branch. Resolved the sole conflict in
+`app/input_tests.rs` by retaining the Q-wheel pause/death regression. Before the
+report update, the resolved tree exactly matched the previous PR tree
+`d02c489eb41e3b219aafa1d36080de51e9cf1288`; no source behavior changed.
+
+Fresh `cargo test -p salimon-client --locked wheel`: 11 passed. Formatting and
+changed-file diff checks passed. The earlier complete cloud validation above
+applies to the identical source tree; native limitations remain unchanged.
 
 ---
 

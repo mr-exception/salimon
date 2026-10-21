@@ -146,7 +146,14 @@ fn geometry_from_bytes(bytes: &[u8]) -> Result<ShipGeometry, RendererError> {
                 })?;
                 let transformed_position = transform_position(matrix, *position);
                 let transformed_normal = normalize(transform_direction(matrix, *normal));
-                let uv = texcoords.get(vertex_index).copied().unwrap_or([0.0; 2]);
+                let mut uv = texcoords.get(vertex_index).copied().unwrap_or([0.0; 2]);
+                // The checked-in Fabricator UVs increase toward +X, which is
+                // viewer-left from the cabin-facing (-Z) side. Interpret that
+                // surface as viewer-right before sampling the shared atlas.
+                // Do not modify the authored mesh, normals, colliders or exports.
+                if node.name() == Some("Fabricator_Monitor") {
+                    uv[0] = 1.0 - uv[0];
+                }
                 vertices.extend_from_slice(&[
                     transformed_position[0],
                     transformed_position[1],
@@ -779,6 +786,35 @@ mod tests {
 #[cfg(test)]
 mod fabricator_tests {
     use super::*;
+    #[test]
+    fn all_physical_screens_read_left_to_right_from_the_cabin_side() {
+        let geometry = load_geometry().unwrap();
+        for flag in [1.0, 2.0, 4.0] {
+            let vertices: Vec<_> = geometry
+                .opaque_vertices
+                .as_chunks::<VERTEX_FLOATS>()
+                .0
+                .iter()
+                .filter(|v| v[17] == flag)
+                .collect();
+            assert_eq!(vertices.len(), 6);
+            let normal = &vertices[0][3..6];
+            // Viewer-right is +up cross surface normal; top-left V=0 is higher.
+            let right = [normal[2], 0.0, -normal[0]];
+            let u0: Vec<_> = vertices.iter().filter(|v| v[15] == 0.0).collect();
+            let u1: Vec<_> = vertices.iter().filter(|v| v[15] == 1.0).collect();
+            assert!(!u0.is_empty() && !u1.is_empty());
+            let delta: f32 = (0..3).map(|i| (u1[0][i] - u0[0][i]) * right[i]).sum();
+            assert!(
+                delta > 0.0,
+                "display {flag} is mirrored from its readable side"
+            );
+            let top = vertices.iter().find(|v| v[16] == 0.0).unwrap();
+            let bottom = vertices.iter().find(|v| v[16] == 1.0).unwrap();
+            assert!(top[1] > bottom[1], "display {flag} is upside down");
+        }
+    }
+
     #[test]
     fn tray_package_has_a_dedicated_conditional_surface_and_valid_shader() {
         let geometry = load_geometry().unwrap();

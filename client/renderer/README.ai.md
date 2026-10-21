@@ -68,7 +68,7 @@ lighting, and the inexpensive depth-tested cockpit-glass blend pass. The single
 `Monitor_Wide` quad retains top-left UVs and a display flag in the immutable vertex stream.
 `cockpit_instruments.rs` formats typed speed/power, Core energy, and optional
 nearby-body DTO values into one cached
-2048 × 256 RGBA atlas (three console regions plus one separate Core region); upload it only when the displayed values change. The screen
+2560 × 256 RGBA atlas (three console regions plus Core and Fabricator regions); upload it only when the displayed values change. The screen
 is a self-lit surface in the existing opaque draw and stay live when unseated.
 Keep gameplay interaction and ship state out of these modules.
 
@@ -106,8 +106,8 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 
 `Core_Monitor` is an authored two-triangle, starboard-facing screen in the
 energy-core component, distinct from `Monitor_Wide`. The existing opaque draw
-samples a cached 2048 × 256 atlas: the console occupies the first three 512 px
-regions and the Core the fourth. No extra draws/materials/pipelines. Both
+samples a cached 2560 × 256 atlas: the console occupies the first three 512 px
+regions, the Core the fourth and Fabricator the fifth. No extra draws/materials/pipelines. Both
 screens blank once on explicit bus power loss and redraw automatically at
 restoration. The Core region independently caches rounded kW, energy, seconds
 and warning/conversion state. Runtime maps domain status without deriving rules.
@@ -124,3 +124,9 @@ A host image that exactly fits this size stays unscaled, keeping physical pointe
 hit rectangles aligned. Runtime still owns all terminal state, text and input.
 
 Scout machinery #464: read the [canonical feedback boundary](../../docs/scout-presentation.md#machinery-feedback-boundary-464). Runtime maps snapshots in `scout_feedback.rs`; renderer owns `machinery.rs`/ship roles/shader. Preserve pause/restore and power/work gating tests; run the opt-in offscreen GPU evidence check for shader changes.
+
+
+Scout UI #466: `ui_style.rs` owns the shared font/palette; runtime prompts reuse
+it. Read the [canonical matrix](../../docs/scout-presentation.md#scout-ui-readability-contract-466)
+before changing text, key cues, line fitting or physical screen orientation.
+Preserve SI case, non-color warning text and all three screen-orientation tests.

@@ -193,10 +193,10 @@ impl Canvas {
         }
     }
 }
-const TEXT: [u8; 4] = [225, 239, 244, 255];
-const MUTED: [u8; 4] = [146, 170, 184, 255];
+const TEXT: [u8; 4] = salimon_renderer::ui_style::IVORY;
+const MUTED: [u8; 4] = salimon_renderer::ui_style::MUTED;
 const BACK: [u8; 4] = [8, 18, 27, 225];
-const ACCENT: [u8; 4] = [62, 215, 193, 255];
+const ACCENT: [u8; 4] = salimon_renderer::ui_style::CYAN;
 pub(super) fn draw(frame: &Frame, layout: Layout) -> (u32, u32, Vec<u8>) {
     let mut c = Canvas {
         width: layout.width,

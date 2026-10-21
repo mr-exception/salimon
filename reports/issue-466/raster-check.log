@@ -1,0 +1,9 @@
+   Compiling salimon-renderer v0.1.0 (/workspace/scratch/58e2c7a72bf7/salimon/client/renderer)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.90s
+     Running unittests src/lib.rs (target/debug/deps/salimon_renderer-89e0f0844b1445db)
+
+running 1 test
+test cockpit_instruments::readability_tests::scout_ui_raster_evidence ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 87 filtered out; finished in 2.05s
+

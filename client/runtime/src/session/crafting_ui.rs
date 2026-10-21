@@ -141,8 +141,14 @@ impl GameplaySession {
             "UP/DOWN recipe  LEFT/RIGHT quantity  ENTER add".into(),
             "TAB next job  DELETE cancel (no refund)  E/ESC close".into(),
             format!(
-                "Status: {:?} / quantity {}",
-                s.status,
+                "Status: {} / quantity {}",
+                match s.status {
+                    salimon_fabrication::FabricatorStatus::Idle => "IDLE",
+                    salimon_fabrication::FabricatorStatus::Working => "WORKING",
+                    salimon_fabrication::FabricatorStatus::NoPower => "NO POWER - RESTORE CORE",
+                    salimon_fabrication::FabricatorStatus::TrayBlocked =>
+                        "OUTPUT BLOCKED - COLLECT TRAY",
+                },
                 self.crafting_ui.quantity.max(1)
             ),
         ];
@@ -313,6 +319,11 @@ mod tests {
         let (w, h, pixels) =
             crate::action_bar::rasterize_action_bar(&s.crafting_text().unwrap(), 3);
         assert!(w <= 1248 && h <= 768, "{w}x{h}");
-        assert!(pixels.as_chunks::<4>().0.contains(&[248, 250, 252, 255]));
+        assert!(
+            pixels
+                .as_chunks::<4>()
+                .0
+                .contains(&salimon_renderer::ui_style::IVORY)
+        );
     }
 }

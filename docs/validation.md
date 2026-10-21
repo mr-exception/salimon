@@ -188,3 +188,17 @@ Rust step and retains the raw output with periodic artifacts. Do not replace it
 with an unrestricted `--ignored`, which also selects unrelated opt-in GPU tests.
 See the [coverage/results report](../reports/issue-375/README.md); reference M1,
 OS input and physical route acceptance remain #348/#376/#496/#498 as applicable.
+
+
+## Scout UI (#466)
+
+Workspace gates cover shared glyphs/SI case, opaque palette contrast, bounded
+instrument lines, physical viewer-right/top-left screen orientation, existing
+prompt/DPI/modal/reticle/input contracts and Fabricator transactions. Opt-in CPU
+pixel evidence: set `SALIMON_SCOUT_UI_DIR` to an absolute directory and run
+`cargo test -p salimon-renderer --locked scout_ui_raster_evidence -- --ignored`
+and `cargo test -p salimon-client --locked scout_prompt_raster_evidence -- --ignored`.
+These pixels are not native screenshots. M1 view/DPI/OS-input/frame-tail review
+remains #502; scanner integration #503 waits for #430. See the
+[UI report](../reports/issue-466/README.md) and
+[canonical matrix](scout-presentation.md#scout-ui-readability-contract-466).

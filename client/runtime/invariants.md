@@ -41,7 +41,7 @@
 17. Runtime contextual E routing changes cockpit authority or requests a door
     action, but never owns the resulting character/ship behavior. Cockpit entry
     requires the character to be inside the ship as well as in range and aimed;
-    the same gate presents `Press E to use`. Exterior and doorway characters
+    the same gate presents `[E] Use cockpit`. Exterior and doorway characters
     cannot gain cockpit authority through a spatial interaction hit.
 18. Escape releases cursor capture so native window controls remain reachable;
     clicking the game view restores mouse-look capture.
@@ -473,3 +473,10 @@ reported success in the failed host. Offline comparisons permit only fatigue and
 its receipt/watermark to change; effects, power, crafting and motion freeze.
 Test-only checkpoint/reload operations never enter the live automation protocol.
 See [scenario isolation and commands](../../scenarios/portable/README.md).
+
+
+Scout UI #466 reuses one renderer-owned face/palette. Prompt shape/anchors/expiry,
+reticle dimensions/center and all modal/interaction gates retain their owners.
+Readable Fabricator status text and queue-selection chevrons never enqueue,
+consume, change recipe unlocks or advance simulation. Native review is #502;
+future scanner UI #503 is blocked by #430.

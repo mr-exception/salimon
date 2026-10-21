@@ -1,5 +1,6 @@
 //! Runtime-owned contextual action-bar state and deterministic bitmap generation.
 
+use salimon_renderer::ui_style::{BACKGROUND, CYAN, IVORY};
 use std::time::Duration;
 
 const TRANSIENT_DURATION: Duration = Duration::from_secs(3);
@@ -120,9 +121,8 @@ pub(crate) fn rasterize_action_bar(text: &str, scale: u32) -> (u32, u32, Vec<u8>
     const CHARACTER_ADVANCE: u32 = 6;
     const HORIZONTAL_PADDING: u32 = 5;
     const VERTICAL_PADDING: u32 = 3;
-    const BACKGROUND: [u8; 4] = [7, 16, 29, 235];
-    const BORDER: [u8; 4] = [45, 212, 191, 255];
-    const TEXT: [u8; 4] = [248, 250, 252, 255];
+    const BORDER: [u8; 4] = CYAN;
+    const TEXT: [u8; 4] = IVORY;
 
     let lines: Vec<_> = text.lines().collect();
     let characters = lines
@@ -187,63 +187,57 @@ fn fill_rect(
     }
 }
 
+// Runtime prose keeps the established uppercase label face. Instrument metric
+// readings use the same face's explicit case-preserving SI variants directly.
 pub(crate) fn glyph_rows(character: char) -> [u8; 7] {
-    match character.to_ascii_uppercase() {
-        'A' => [14, 17, 17, 31, 17, 17, 17],
-        'B' => [30, 17, 17, 30, 17, 17, 30],
-        'C' => [15, 16, 16, 16, 16, 16, 15],
-        'D' => [30, 17, 17, 17, 17, 17, 30],
-        'E' => [31, 16, 16, 30, 16, 16, 31],
-        'F' => [31, 16, 16, 30, 16, 16, 16],
-        'G' => [15, 16, 16, 23, 17, 17, 15],
-        'H' => [17, 17, 17, 31, 17, 17, 17],
-        'I' => [31, 4, 4, 4, 4, 4, 31],
-        'J' => [7, 2, 2, 2, 18, 18, 12],
-        'K' => [17, 18, 20, 24, 20, 18, 17],
-        'L' => [16, 16, 16, 16, 16, 16, 31],
-        'M' => [17, 27, 21, 21, 17, 17, 17],
-        'N' => [17, 25, 21, 19, 17, 17, 17],
-        'O' => [14, 17, 17, 17, 17, 17, 14],
-        'P' => [30, 17, 17, 30, 16, 16, 16],
-        'Q' => [14, 17, 17, 17, 21, 18, 13],
-        'R' => [30, 17, 17, 30, 20, 18, 17],
-        'S' => [15, 16, 16, 14, 1, 1, 30],
-        'T' => [31, 4, 4, 4, 4, 4, 4],
-        'U' => [17, 17, 17, 17, 17, 17, 14],
-        'V' => [17, 17, 17, 17, 17, 10, 4],
-        'W' => [17, 17, 17, 21, 21, 21, 10],
-        'X' => [17, 17, 10, 4, 10, 17, 17],
-        'Y' => [17, 17, 10, 4, 4, 4, 4],
-        'Z' => [31, 1, 2, 4, 8, 16, 31],
-        '0' => [14, 17, 19, 21, 25, 17, 14],
-        '1' => [4, 12, 4, 4, 4, 4, 14],
-        '2' => [14, 17, 1, 2, 4, 8, 31],
-        '3' => [30, 1, 1, 14, 1, 1, 30],
-        '4' => [2, 6, 10, 18, 31, 2, 2],
-        '5' => [31, 16, 16, 30, 1, 1, 30],
-        '6' => [14, 16, 16, 30, 17, 17, 14],
-        '7' => [31, 1, 2, 4, 8, 8, 8],
-        '8' => [14, 17, 17, 14, 17, 17, 14],
-        '9' => [14, 17, 17, 15, 1, 1, 14],
-        '.' => [0, 0, 0, 0, 0, 6, 6],
-        '/' => [1, 2, 2, 4, 8, 8, 16],
-        '%' => [17, 2, 4, 8, 17, 0, 0],
-        '-' => [0, 0, 0, 31, 0, 0, 0],
-        '+' => [0, 4, 4, 31, 4, 4, 0],
-        ':' => [0, 6, 6, 0, 6, 6, 0],
-        ',' => [0, 0, 0, 0, 6, 4, 8],
-        '[' => [14, 8, 8, 8, 8, 8, 14],
-        ']' => [14, 2, 2, 2, 2, 2, 14],
-        '#' => [10, 31, 10, 10, 31, 10, 0],
-        '<' => [1, 2, 4, 8, 4, 2, 1],
-        _ => [0; 7],
-    }
+    salimon_renderer::ui_style::glyph_rows(character.to_ascii_uppercase())
 }
 
 #[cfg(test)]
 mod tests {
     use super::ActionBar;
     use std::time::Duration;
+
+    #[test]
+    fn recipe_selection_marker_renders_and_controls_share_the_scout_face() {
+        let (w, _, pixels) = super::rasterize_action_bar("> #1 BASIC-RATION", 2);
+        let marker_has_ink = (6..20).any(|y| {
+            (10..20).any(|x| {
+                let i = ((y * w + x) * 4) as usize;
+                pixels[i..i + 4] == salimon_renderer::ui_style::IVORY
+            })
+        });
+        assert!(
+            marker_has_ink,
+            "selected job marker must not be a blank glyph"
+        );
+        for c in "[E] USE COCKPIT > #1 + 20%".chars() {
+            assert_eq!(
+                super::glyph_rows(c),
+                salimon_renderer::ui_style::glyph_rows(c)
+            );
+        }
+    }
+
+    #[test]
+    #[ignore = "writes CPU prompt evidence; set SALIMON_SCOUT_UI_DIR"]
+    fn scout_prompt_raster_evidence() {
+        let dir = std::path::PathBuf::from(std::env::var("SALIMON_SCOUT_UI_DIR").unwrap());
+        std::fs::create_dir_all(&dir).unwrap();
+        let text = "[E] Open/close exit door\n[F] Drop carried cargo";
+        for (name, dpi) in [("1x", 1.0), ("1_5x", 1.5), ("2x", 2.0)] {
+            let mut bar = ActionBar::default();
+            bar.set_scale_factor(dpi);
+            bar.set_contextual(Some(text.to_owned()));
+            let img = bar.image(true).unwrap();
+            std::fs::write(dir.join(format!("prompt-{name}.rgba")), img.rgba8).unwrap();
+            std::fs::write(
+                dir.join(format!("prompt-{name}.size")),
+                format!("{} {}", img.width, img.height),
+            )
+            .unwrap();
+        }
+    }
 
     #[test]
     fn dynamic_multiline_context_updates_mass_and_renders_both_rows() {
@@ -258,7 +252,7 @@ mod tests {
             first.rgba8[row * first.width as usize * 4..(row + 1) * first.width as usize * 4]
                 .as_chunks::<4>()
                 .0
-                .contains(&[248, 250, 252, 255])
+                .contains(&salimon_renderer::ui_style::IVORY)
         };
         assert!(text_pixels_on_row(6));
         assert!(text_pixels_on_row(24));
@@ -336,7 +330,7 @@ mod tests {
                     .as_chunks::<4>()
                     .0
                     .iter()
-                    .filter(|pixel| **pixel == [248, 250, 252, 255])
+                    .filter(|pixel| **pixel == salimon_renderer::ui_style::IVORY)
                     .count();
                 assert!(text_pixels > 0);
                 assert_eq!(text_pixels % (scale * scale) as usize, 0);

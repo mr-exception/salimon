@@ -121,7 +121,7 @@ impl ConsumableWheelRaster {
     }
     fn text(&mut self, text: &str, x: u32, y: u32) {
         for (index, ch) in text.chars().take(72).enumerate() {
-            for (row, bits) in crate::cockpit_instruments::glyph_rows(ch.to_ascii_uppercase())
+            for (row, bits) in crate::ui_style::glyph_rows(ch.to_ascii_uppercase())
                 .iter()
                 .enumerate()
             {
@@ -130,7 +130,7 @@ impl ConsumableWheelRaster {
                         self.pixel(
                             x + index as u32 * 6 + col,
                             y + row as u32,
-                            [248, 250, 252, 255],
+                            crate::ui_style::IVORY,
                         );
                     }
                 }

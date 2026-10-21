@@ -100,6 +100,8 @@ jobs:
           cargo fmt --all -- --check
           cargo clippy --workspace --all-targets --locked -- -D warnings
           cargo test --workspace --locked
+          mkdir -p artifacts/periodic
+          cargo test -p salimon-client --locked persistence_extended -- --ignored 2>&1 | tee artifacts/periodic/persistence-survival.log
       - name: GLB compliance and exact importer parity
         id: glb
         env:

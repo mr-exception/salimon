@@ -425,3 +425,15 @@ Survival onboarding (#380) is implemented as portable per-run objective/skip
 state in runtime, persisted by schema 4. Events come from existing successful
 Q/Fabricator/status actions; prompts use the existing action band and do not
 alter input or simulation authority. See the [owning contract](../client/runtime/architecture.md#persistent-survival-onboarding-380).
+
+## Portable persistence/survival scenario boundary (#375)
+
+Test-only runtime modules compose production full-session saves, the two-slot
+filesystem manager and normal `Checkpoints::open_at` launch transaction, plus
+worker/restart transactions over fault-injected `CheckpointStore`. The
+[versioned portable DSL](../scenarios/portable/README.md) admits checkpoint/reload
+and full-source comparison without adding filesystem writes to the live E2E
+protocol. Fixture placement and supplied UTC are explicit; clocks and domain
+rules remain production-owned. Long meter partition tests run directly against
+survival, while separate fixed-tick session tests prove clock/death routing.
+Bounded coverage runs in PR workspace tests; extended coverage runs nightly.

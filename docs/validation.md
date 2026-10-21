@@ -221,3 +221,12 @@ references/cycles, invalid quantities, domain dependencies and schema rejection.
 Run workspace build/tests/fmt/all-target Clippy for workspace membership changes.
 These are synthetic portable fixtures; no real-data accuracy, production pack,
 playable real-scale integration or native performance claim is established.
+
+## Documentation readiness (#440)
+
+Apply [U35's author/reviewer gate](documentation-maintenance.md#readiness-and-reviewer-gate)
+to each Universe implementation PR. Check changed local links/anchors, actual
+source/module/command paths and semantic correspondence at the final revision;
+record results in the PR/report. Documentation-only policy changes need those
+checks, not invented native/GPU evidence. Automated repository-wide link/path and
+stale-contract CI remains #442; this review policy does not add a CI status check.

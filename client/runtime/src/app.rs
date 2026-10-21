@@ -615,6 +615,9 @@ impl ClientApplication {
                     self.survival_hud
                         .observe(crate::survival_hud::Observation::capture(&self.session));
                     self.survival_hud.toggle_details();
+                    if self.survival_hud.details_open {
+                        self.session.command(crate::session::Command::InspectVitals);
+                    }
                     return;
                 }
                 PhysicalKey::Code(KeyCode::BracketLeft | KeyCode::BracketRight)
@@ -915,7 +918,11 @@ impl ClientApplication {
             .set_contextual(if self.session.survival.snapshot().terminal {
                 None
             } else {
-                contextual_action.map(|prompt| prompt.text)
+                contextual_action.map(|prompt| prompt.text).or_else(|| {
+                    (!self.survival_hud.details_open && !self.diagnostics.is_visible())
+                        .then(|| self.session.tutorial_text())
+                        .flatten()
+                })
             });
         window.set_title(&self.benchmark.as_ref().map_or_else(
             || {

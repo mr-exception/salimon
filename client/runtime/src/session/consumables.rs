@@ -61,6 +61,9 @@ impl GameplaySession {
             .consume_slot(selected.slot)
             .expect("selected identity validated under exclusive session ownership");
         self.survival = survival;
+        if item.recipe.key() == "food-ration" {
+            self.tutorial.record(super::tutorial::Objective::Ration);
+        }
         self.feedback = Some(match item.category {
             OutputCategory::Medical => "Medkit consumed",
             _ => "Food consumed",

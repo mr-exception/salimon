@@ -420,3 +420,8 @@ Pause saves (#382) use the existing worker/store and verified receipts; see
 - **Runtime/render:** owner-authorized **six-field** light-distance panel quotes energy and errors without mutating simulation; verified single-debit quantum-transition transaction, atomic onboard contents, staging/loading scene and full position/frame change only after the relevant world region loads. Renderer uses immutable observation DTOs; no GPU-owned movement, power or chronology.
 - **Persistence/future backend:** shared 1:1 real elapsed universe time for offline/online users (no relativistic per-player clocks), single authoritative jump position/energy event, idempotent restart/reconnect and passengers, physics catch-up. Offline engines off; offline coasting continues and jumps are not automatic. The precise multiplayer backend does not currently exist.
 - **Gameplay/economy:** one-to-twelve-month real-time long voyages and approximately 6–12 months of dedicated galaxy exploration are **aspirational balance**, not evidence that the current 60 GJ Core funds even a 1-light-second jump at N=20%. Explicit balance review required.
+
+Survival onboarding (#380) is implemented as portable per-run objective/skip
+state in runtime, persisted by schema 4. Events come from existing successful
+Q/Fabricator/status actions; prompts use the existing action band and do not
+alter input or simulation authority. See the [owning contract](../client/runtime/architecture.md#persistent-survival-onboarding-380).

@@ -450,3 +450,11 @@ transforms and collision authority are preserved.
 Pause saves (#382) use the shared worker/store without advancing authoritative
 clocks. Saved/UTC require verified completion. Resume cancels exit intent; failure
 requires retry/cancel/explicit risk exit. See [contract](architecture.md#pause-checkpoint-controls-382).
+
+## Survival onboarding (#380)
+
+Only successful production events complete persistent tutorial objectives; their
+order is independent of prompt order. Skip/progress never grant items, alter
+meters, capture movement or change clocks. New runs start fresh; restore preserves
+progress and skip. Native admission rejects repeat/synthetic/unfocused keys.
+Existing interaction feedback and modal/status overlays take priority over guidance.

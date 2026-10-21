@@ -65,6 +65,14 @@ impl GameplaySession {
             self.ship.advance(active);
             let funded = self.ship.fabricator_powered_duration(active);
             self.fabricator.step(funded, true);
+            if self
+                .fabrication_snapshot()
+                .tray
+                .as_ref()
+                .is_some_and(|item| item.recipe.key() == "food-ration")
+            {
+                self.tutorial.record(super::tutorial::Objective::Craft);
+            }
             self.fabricator.step(active - funded, false);
             self.sync_fabricator_mass();
             remaining -= active;
@@ -140,11 +148,16 @@ impl GameplaySession {
             self.feedback = Some("Fabricator tray is empty");
             return;
         };
+        let ration = item.recipe.key() == "food-ration";
         match self.consumables.insert(item) {
             Ok(_) => {
                 // Exclusive session ownership: tray cannot change after slot acceptance.
                 self.execute_fabricator(salimon_fabrication::FabricationCommand::Collect)
                     .expect("validated occupied tray in single-owner collection transaction");
+                if ration {
+                    self.tutorial.record(super::tutorial::Objective::Craft);
+                    self.tutorial.record(super::tutorial::Objective::Collect);
+                }
                 self.feedback = Some("Fabricator item collected");
             }
             Err(salimon_fabrication::InventoryError::Full) => {

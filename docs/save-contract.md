@@ -1,4 +1,4 @@
-# Canonical whole-game save contract (schema 3)
+# Canonical whole-game save contract (schema 4)
 
 > This is the **current compressed-world runtime save schema**. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. Under the approved policy, future fictional-planet upgrades require explicit versioned save/world-delta migration, preservation or validated remapping of physical anchors, and recoverable failure handling; scientific terrain detail on **any published real observed solid body** may not displace saved positions after its first authoritative real-scale surface publication. Future fictional-planet changes to geology/biome-dependent resource layouts likewise require explicit stable-ID, depletion and positional migration; the historical compressed prototype does not establish the real-body surface freeze. This note does not modify schema 3 or imply backend multiplayer exists.
 
@@ -309,3 +309,13 @@ The [approved future travel contract](jump-drive-and-interstellar-travel.md) use
 A later, explicitly versioned save/online server model must include the installed Jump Drive identity/revision, parameter N (initial **20%**), effective impulse coefficient, physically mounted/upgrade parts, true engine on/off state **distinct from selected throttle**, position/orientation/velocity frame+epoch, and sufficiently precise Core amounts. Pending quantum transitions require stable idempotency transaction IDs, captured pre-jump position, mass, velocity, heading, six-field normalized light-second distance, quoted/reserved energy, validated target state and passenger/cargo identities. On recovery **commit exactly once or roll back/refund exactly once**; never duplicate an owner ship or charge twice. Do not let an unverified position materialize or let quantum staging create an alternate time line.
 
 Offline catch-up remains deterministic on one shared clock and **does not autonomously fire jumps**. The code's current compressed-world zero-offline-world-duration implementation must be explicitly migrated by the existing universe offline-propagation issues; these future plans do not claim such propagation is implemented today.
+
+## Tutorial progress and schema 4 (#380)
+
+Schema 4 adds required `state.tutorial` with seven validated objective bits and
+per-run skipped flag. Captures use version 4; versions 1–3 migrate dismissed,
+without granting supplies or inferring completed actions from an empty inventory.
+Missing/unknown objective state rejects before publication. UI/input/cache remain
+transient; only durable progress/skip participates in discrete checkpoint events.
+Verified death restart resets onboarding through `new_run`. The existing
+physical/Fabricator/survival/journey migrations and storage guarantees remain.

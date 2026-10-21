@@ -1250,3 +1250,20 @@ risk choice. Final exit does not start a second write after either choice.
 Terminal archives/restart and 60-second/event autosaves retain their owners.
 No manual request ticks gameplay or credits offline fatigue. Native OS-input,
 DPI/appearance and M1 signoff remain separately tracked by #376.
+
+## Persistent survival onboarding (#380)
+
+`session/tutorial.rs` owns seven monotonic per-run objective bits and durable skip:
+inspect H survival details, open hold-Q, eat a basic ration, inspect the Fabricator
+screen, finish a basic ration, collect it, and view checkpoint status in Escape.
+Production success boundaries record events even before their current prompt;
+failed consumption/collection and canceled jobs do not complete objectives.
+T skips permanently for this run. Death/restart creates fresh objectives; legacy
+saves and empty fixtures migrate dismissed. No resources, clock immunity, input
+capture or forced ordering comes from the tutorial.
+
+Compact two-line guidance uses the existing bottom action band only when no
+interaction prompt/transient is present; details, wheel, crafting, diagnostics,
+pause and terminal screens suppress it. Thus it adds no competing overlay or
+world-anchored label. Existing DPI fitting and toolbar reservations apply.
+Native appearance and complete physical input review remain #376.

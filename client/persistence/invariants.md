@@ -26,3 +26,6 @@ use separate immutable namespaces (legacy `journeys/`, current `journeys/v2/`);
 allocator high-water scanning covers both. Runtime supplies the version and opaque
 bytes; storage does not interpret gameplay JSON. See the canonical
 [journey contract](../../docs/save-contract.md#journey-statistics-372).
+
+#380 advances captures to schema 4 for per-run tutorial progress/skip. Runtime
+explicitly migrates versions 1–3 dismissed; missing schema-4 source rejects.

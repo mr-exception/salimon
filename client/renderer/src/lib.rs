@@ -9,6 +9,7 @@ mod equipment_toolbar;
 mod gpu_timing;
 mod held_item;
 mod item_image;
+mod machinery;
 mod overlay;
 #[allow(dead_code)] // Shared generated geometry; renderer consumes only animation dimensions.
 mod ramp_geometry;
@@ -28,10 +29,13 @@ pub use cockpit_instruments::{
     CockpitInstruments, CoreInstruments, FabricatorInstruments, NavigationInstruments,
     NearbyBodyInstruments,
 };
-pub use equipment_toolbar::{ConsumableIcon, EquipmentIcon, EquipmentSlot, EquipmentToolbar};
+pub use equipment_toolbar::{
+    ConsumableIcon, EquipmentIcon, EquipmentSlot, EquipmentToolbar, toolbar_message_inset,
+};
 use gpu_timing::GpuTimer;
 pub use held_item::HeldItemInstance;
-pub use overlay::{OverlayImage, OverlayPlacement};
+pub use machinery::{MachineryFeedback, MachineryState};
+pub use overlay::{OverlayImage, OverlayPlacement, overlay_available_size};
 pub use resource_mesh::{ResourceMesh, ResourceMeshInstance, SPHERE_AUTHORED_RADIUS_METERS};
 pub use ship_mesh::ShipMeshInstance;
 pub use spheres::{PointLight, SphereInstance, SurfaceMaterial};
@@ -627,6 +631,7 @@ pub struct Renderer {
     instance_buffer: wgpu::Buffer,
     instance_capacity: usize,
     depth_target: DepthTarget,
+    condition_overlay: overlay::OverlayRenderer,
     overlay: overlay::OverlayRenderer,
     action_bar: overlay::OverlayRenderer,
     reticle: overlay::OverlayRenderer,
@@ -866,6 +871,7 @@ impl Renderer {
             mapped_at_creation: false,
         });
         let depth_target = DepthTarget::new(&device, configured_width, configured_height);
+        let condition_overlay = overlay::OverlayRenderer::new(&device, configuration.format);
         let overlay = overlay::OverlayRenderer::new(&device, configuration.format);
         let action_bar = overlay::OverlayRenderer::new(&device, configuration.format);
         let reticle = overlay::OverlayRenderer::new(&device, configuration.format);
@@ -890,6 +896,7 @@ impl Renderer {
             instance_buffer,
             instance_capacity: 1,
             depth_target,
+            condition_overlay,
             overlay,
             action_bar,
             reticle,
@@ -942,6 +949,7 @@ impl Renderer {
     pub fn render(
         &mut self,
         scene: SceneFrame<'_>,
+        condition_image: Option<OverlayImage<'_>>,
         overlay_image: Option<OverlayImage<'_>>,
         action_bar_image: Option<OverlayImage<'_>>,
         reticle_image: Option<OverlayImage<'_>>,
@@ -1028,6 +1036,18 @@ impl Renderer {
                 &encode_instances(&prepared_scene.instances),
             );
         }
+        self.condition_overlay
+            .prepare(
+                &self.device,
+                &self.queue,
+                self.configuration.width,
+                self.configuration.height,
+                condition_image,
+                scene.camera,
+                prepared_scene.view_projection,
+                &self.depth_target.view,
+            )
+            .map_err(|error| RendererError::new("failed to prepare condition overlay", error))?;
         self.overlay
             .prepare(
                 &self.device,
@@ -1164,6 +1184,7 @@ impl Renderer {
                 occlusion_query_set: None,
                 multiview_mask: None,
             });
+            self.condition_overlay.draw(&mut render_pass);
             self.overlay.draw(&mut render_pass);
             self.toolbar.draw(&mut render_pass);
             self.action_bar.draw(&mut render_pass);
@@ -1206,7 +1227,8 @@ impl Renderer {
                 .map_or(GpuFrameTime::Pending, GpuFrameTime::Measured),
             None => GpuFrameTime::Unsupported,
         };
-        let overlay_draw_calls = u32::from(self.overlay.is_visible())
+        let overlay_draw_calls = u32::from(self.condition_overlay.is_visible())
+            + u32::from(self.overlay.is_visible())
             + u32::from(self.action_bar.is_visible())
             + u32::from(self.reticle.is_visible())
             + u32::from(self.toolbar.is_visible());

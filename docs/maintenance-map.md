@@ -110,7 +110,123 @@ Filesystem durability and native lifecycle checkpoints remain #366.
 
 Portable meter/active-clock/offline-fatigue authority lives in
 [`salimon-survival`](../client/survival/architecture.md). Native/session persistence
-integration is #371; the current playable session does not yet advance survival.
+integration is implemented by #371; the session now advances and saves survival.
 
 Damage, regeneration, treatment-only wound debt and data-driven timed/persistent/
 exposure status effects (#368) use the survival crate's [single pipeline](../client/survival/architecture.md#damage-and-status-pipeline-368).
+
+Survival movement/interaction restrictions (#369): `survival/src/restrictions.rs`
+owns exact threshold percentages, validated tuning and typed permissions;
+`runtime/src/session/survival.rs` applies them to shared commands/ticks,
+`character/src/controller/` scales voluntary locomotion, and ship's
+`controller/cockpit.rs` owns explicit pilot revocation. Tests: survival
+`tests/restrictions.rs`, runtime `session/survival/tests.rs`, character locomotion
+and ship revocation regressions. Run workspace tests/build/Clippy/fmt. See the
+[canonical policy](../client/survival/architecture.md#movement-and-interaction-restrictions-369).
+Clock/save integration is implemented by #371; HUD/wheel/effects remain #373/#377/#370.
+
+Consumable survival effects (#370): `survival/src/consumables.rs` owns validated
+milli-point recipe recovery records; its `pipeline.rs` executes timed food/healing
+with the existing deterministic effect clock. `fabrication/src/inventory.rs`
+provides exact slots shared with #377; runtime `session/consumables.rs` commits
+exact identity plus prepared benefits and `automation.rs` exposes inspection/
+portable requests. Coverage: survival `tests/consumables.rs`, runtime
+`session/consumables/tests.rs`, existing inventory/save/status regressions. Run
+workspace tests/build/Clippy/fmt; full-save clock integration is #371 and native
+wheel/presentation is #377. [Canonical data/semantics](../client/survival/architecture.md#consumable-recovery-definitions-370).
+
+
+Survival lifecycle (#371): runtime `session/lifecycle.rs`, `session/persistence.rs`,
+`session.rs`, `checkpoints.rs` and `app.rs`; persistence envelope `src/lib.rs` and
+`src/storage.rs`. The [save/lifecycle contract](save-contract.md) owns
+v1 migration, startup publication, terminal freeze, archive/restart ordering and
+failure guarantees. Tests live in `session/lifecycle/tests.rs`, checkpoint launch/
+restart/publication-failure modules and storage restart fault injection. Run
+workspace tests/build/Clippy/fmt, native startup/restart smoke; reference signoff
+remains #376. Journey distance sampling is implemented by #372.
+
+
+Journey statistics (#372): runtime `session/journey.rs`, tick composition in
+`session.rs`, observational `automation.rs`, background admission in `app.rs` and
+terminal publication in `checkpoints.rs`; storage owns versioned archive paths.
+See [metric and migration](save-contract.md#journey-statistics-372). Regressions:
+`session/journey/tests.rs`, app background ticks, checkpoint archive/repair/version
+and persistence restart fault injection.
+
+
+## Survival HUD (#373)
+
+Runtime `survival_hud.rs` owns typed observational mapping and presentation
+feedback/cache, with bounded raster/layout in `survival_hud/raster.rs`; `app.rs`
+owns H/[ / ] focus-safe dispatch and overlay priority. Survival's immutable
+`effect_snapshots` supplies captured rules/stacks/timers. Renderer exposes its
+existing fitted toolbar message band; existing inventory/equipment art is unchanged.
+See the [canonical HUD contract](../client/runtime/architecture.md#survival-hud-and-status-details-373).
+Tests cover actual consumables, exact penalties, visual timing/cache, all supported
+viewport/DPI layouts, full effect pagination and native input policy. #376 retains
+native visual signoff; #381/#377 extend the existing menu/wheel admission later.
+
+
+## Journey Ended (#374)
+
+Runtime `journey_ended.rs` + `journey_ended/raster.rs` own the report screen and
+physical pointer layout. `session/lifecycle.rs::ended_run` is shared with durable
+archives; `app.rs::restart_terminal` composes the existing verified restart for
+keyboard/mouse/native automation. Renderer only exposes its generic screen margin.
+See the [terminal contract](save-contract.md#journey-ended-presentation-374).
+Tests: `journey_ended/tests.rs`, native-host input/restart regressions and existing
+checkpoint/restart fault injection. Reference native visual/input acceptance is #376.
+
+## Starting supplies (#379)
+
+Fabrication `machine.rs::starter_with_supplies` owns recipe-derived grants and
+allocator reservation; runtime `session.rs::new_run`, normal startup `app.rs`
+and `session/lifecycle.rs` compose new runs and mass. Restore is unchanged.
+See the [canonical contract](save-contract.md#starting-supplies-379).
+Tests: fabrication `tests/starting_supplies.rs`, runtime
+`session/starting_supplies_tests.rs`, existing checkpoint/restart fault injection.
+
+Gameplay pause (#381): `client/runtime/src/session/pause.rs` owns transient modal
+authority and clock resets. Native routing is `app.rs`/`app/input.rs`; regressions
+cover native/background and portable full-save freeze.
+
+Condition cues/accessibility (#383): `client/runtime/src/condition_feedback.rs`,
+`condition_feedback/settings.rs` and `condition_feedback/audio.rs`; renderer owns
+only a generic fullscreen overlay before ordinary HUDs.
+
+Four-food expansion (#378): fabrication `recipes.rs` owns the three locked food
+records; survival `consumables.rs`, `effects.rs`, `pipeline.rs`, `lib.rs` and
+`restrictions.rs` own validated modifiers, exact fatigue remainder and penalties.
+Runtime `session/survival.rs` and `survival_hud.rs` consume the same derived policy.
+Tests: survival `tests/foods.rs`, fabrication starter catalog regression, runtime
+`session/consumables/tests.rs` craft/Core/exact-consume/full-save scenarios. See the
+[canonical catalog and provisional settings](../client/survival/architecture.md#four-food-catalog-378).
+
+Native current-sphere validation (#313) routes through runtime
+`benchmark_fixture.rs` (`current-cap`/`current-mixed`), shared with the portable
+`sphere_workloads.rs` matrix; use the
+[benchmark contract](../scripts/FRAGMENT_BENCHMARKS.md#native-current-sphere-profiles-313).
+
+Scout lighting/reference cameras (#463): renderer `ship_mesh.rs/.wgsl` owns bus
+lighting; runtime `scout_reference.rs` owns E2E-only camera mapping. Shared poses
+and eight power/view checkpoints live under `scenarios/visual/scout-*`; offline
+`models/assets/ships/salimon-scout/preview_lighting.py` reads the same poses without
+saving source assets. See [capture/limits](scout-presentation.md).
+
+Scout spatial soundscape (#465): runtime `scout_audio.rs`, `scout_audio/synth.rs`
+and `scout_audio/tests.rs`; shared OS playback `native_audio.rs`; persisted mix
+controls remain in existing `condition_feedback/settings.rs`. See
+[soundscape contract/budgets](scout-presentation.md#soundscape-boundary-465).
+Do not duplicate #383 survival cues or simulate machinery in the audio adapter.
+
+Scout machinery feedback (#464): runtime `scout_feedback.rs`, `app.rs` mapping
+and `automation.rs` inspection; renderer `machinery.rs`, `ship_mesh.rs/.wgsl`.
+Tests include portable pause/restore/power/blocked/progress/yaw and opt-in
+`ship_feedback_tests.rs` production shader snapshots with raw timing evidence.
+See [feedback contract](scout-presentation.md#machinery-feedback-boundary-464);
+native walkthrough and budget acceptance remain #489.
+
+Pause saves (#382): runtime `checkpoints/control.rs`, `checkpoints.rs` and `app.rs`
+own request/status/UTC, asynchronous verified IO and focused menu/exit admission.
+Fault-injected worker/store and native dispatch regressions cover the contract.
+See [save contract](save-contract.md#pause-checkpoint-controls-382); native #376.

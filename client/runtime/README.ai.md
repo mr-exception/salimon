@@ -131,6 +131,68 @@ E2E and benchmark launches remain isolated from user saves. See the
 [canonical save contract](../../docs/save-contract.md#durable-active-run-366)
 for paths, recovery/failure policy, Windows behavior and future lifecycle owners.
 
-Pause checkpoint request/status policy is in `checkpoints/control.rs` (#382
-preparation). It is tested with the real worker/storage boundary and injected
-full/corrupt stores. UI admission is intentionally pending #381; see architecture.
+Survival action gates and voluntary movement composition (#369) live in
+`session/survival.rs`; use its shared policy for new native/protocol interactions.
+See [canonical restrictions](../survival/architecture.md#movement-and-interaction-restrictions-369).
+
+Item effects/removal compose in `session/consumables.rs` (#370): use the exact
+slot/job/unit selection seam from native wheel or protocol adapters. Validate and
+prepare benefits before removing inventory; never consume a slot first and try
+to apply potentially fallible effects afterward. See the recovery contract.
+
+
+#371 composes schema-2 survival source, explicit v1 migration, verified launch-only
+fatigue credit, terminal freeze and archive/restart publication. See the canonical
+[save/lifecycle contract](../../docs/save-contract.md). Restart must publish an
+archive and both fresh fallback generations before exposing new gameplay; failures
+remain failures. Maintain lifecycle, offline rollback, publication-failure and
+restart fault-injection tests with changes to this boundary.
+
+
+Journey accounting and final location live in `session/journey.rs`; read the
+[metric/save contract](../../docs/save-contract.md#journey-statistics-372) before
+changing frame sampling, background timing or archived summaries. Preserve the
+journey, background tick and archive version/recovery regressions.
+
+
+Survival HUD/status details (#373): start in `survival_hud.rs` (observational DTOs,
+feedback/tween/cache), `survival_hud/raster.rs` (bounded layout/RGBA), and native
+H/[ / ] admission in `app.rs`. See the [canonical HUD contract](architecture.md#survival-hud-and-status-details-373).
+Keep UI state out of full saves, use typed effect/restriction snapshots, and use
+the renderer-owned toolbar reservation when fitting overlays. Preserve the HUD,
+real-consumable, focus/modal and raster/layout regressions.
+
+
+Journey Ended (#374): `journey_ended.rs` and its `raster.rs` own report DTO/layout/
+pixels; `session/lifecycle.rs::ended_run` also supplies the archive. Native input
+and the sole verified restart path stay in `app.rs`. Read the
+[terminal contract](../../docs/save-contract.md#journey-ended-presentation-374),
+preserve highest overlay priority, stale-pointer invalidation and failed-restart
+terminal authority. Regressions live in `journey_ended/tests.rs` and `app/input_tests.rs`.
+
+Starting supplies (#379): normal launch/restart use `GameplaySession::new_run`;
+restore and isolated fixtures use empty `Default`. Fabrication allocates grant
+identities and exact recipe reserves; runtime reconciles mass. Read the
+[canonical contract](../../docs/save-contract.md#starting-supplies-379) and preserve
+`session/starting_supplies_tests.rs` launch/craft/reload/restart coverage.
+
+#378 extends the existing catalogs with four food definitions and captured food
+modifiers; see the owning architecture for provisional tuning and regressions.
+Keep advanced food recipes locked and preserve exact-slot consumption; no new
+progression acquisition or native Q-wheel input is introduced.
+
+For #313 reference validation, `benchmark_fixture.rs` owns the shared
+`current-cap` / `current-mixed` 500/1,000 initialization used by native runs and
+`sphere_workloads.rs`. Preserve the legacy sphere and onboard layouts; see the
+[canonical benchmark guide](../../scripts/FRAGMENT_BENCHMARKS.md#native-current-sphere-profiles-313).
+
+Deterministic runner children explicitly isolate desktop input/focus from protocol
+holds and fixed-step time (#313); direct native `Game` probes retain OS input.
+See the [harness boundary](architecture.md#deterministic-e2e-desktop-input-isolation-313)
+before interpreting a scenario pass as native input/lifecycle evidence.
+
+Scout machinery #464: read the [canonical feedback boundary](../../docs/scout-presentation.md#machinery-feedback-boundary-464). Runtime maps snapshots in `scout_feedback.rs`; renderer owns `machinery.rs`/ship roles/shader. Preserve pause/restore and power/work gating tests; run the opt-in offscreen GPU evidence check for shader changes.
+
+Pause saves (#382) use the shared worker/store without advancing authoritative
+clocks. Saved/UTC require verified completion. Resume cancels exit intent; failure
+requires retry/cancel/explicit risk exit. See [contract](architecture.md#pause-checkpoint-controls-382).

@@ -488,3 +488,15 @@ No filesystem/serialization or save/load integration is implemented in this wave
 Portable domain tests cover reservation, overflow, ordering, power, cancellation,
 tray gates and arithmetic; later runtime tests cover physical intake, power
 settlement, inventory and mass transitions. Native visuals/signoff are separate.
+
+### Survival consumable effects (#370)
+
+The later survival expansion now defines an atomic explicit-item recovery adapter
+on top of the Fabricator inventory-only wave above. Recipe IDs map to validated
+instant/timed recovery records in the
+[canonical survival recovery contract](../client/survival/architecture.md#consumable-recovery-definitions-370).
+Exact slot/job/unit selection replaces category-first input; M/N remain absent.
+Basic ration restores 40 hunger; medkit's provisional +25 ordinary health over
+10 active seconds is documented reviewable balancing, not an approved lore
+constant. Full-save/clock activation is #371, native Q wheel #377 and advanced
+food definitions/unlocks #378. No recipe resource, mass or power policy changes.

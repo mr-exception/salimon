@@ -17,3 +17,23 @@
 - Stable Source/EffectId ordering and bounded stacks are independent of host order.
 - Timed final ticks occur before expiry; exposure exits with zero linger remove
   immediately. Offline time advances no regeneration/effect interval.
+- #369 threshold intervals, multiplicative rates and typed permission policy have
+  one owner in `restrictions.rs`; see the architecture contract. Zero fatigue
+  cannot deny doors, basic menus or food/medicine solely because of exhaustion.
+- Reduced interaction work never reduces ship, physics, Core or machine-job time.
+  Derived percentages/cooldowns do not substitute for #371's saved vital state.
+- #370 consumable definitions use integer milli-points and validated stable IDs;
+  all benefits register/apply atomically. Full meters permit waste, terminal runs
+  reject. Recovery uses the same wounds, clamps and lethal-timestamp ordering.
+- Consumed items' timed benefits preserve fractional intervals across serialization;
+  offline fatigue recovery cannot tick food, healing or treatment effects.
+
+- Effect presentation snapshots borrow validated captured definitions and timers
+  in stable EffectId order; observing them never mutates authority or re-registers
+  effects. Runtime owns all display strings, animation and UI thresholds (#373).
+
+- Food continuous modifiers expire on admitted active time, never offline time;
+  refresh cannot compound a one-stack benefit. Fatigue drain retains its validated
+  fractional remainder across saves and arbitrary nanosecond partitions.
+- Food regeneration respects hunger/fatigue eligibility and wounds; fatigue relief
+  never restores fatigue or bypasses exhausted-action bans. See the four-food catalog.

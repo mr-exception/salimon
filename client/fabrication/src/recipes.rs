@@ -128,7 +128,7 @@ impl RecipeBook {
             unlocked_by_default: true,
             prerequisites: vec![],
         };
-        Self::new(vec![
+        let mut definitions = vec![
             RecipeDefinition {
                 id: RecipeId::new("food-ration").expect("valid static recipe key"),
                 ingredients: vec![
@@ -165,7 +165,35 @@ impl RecipeBook {
                 output_category: OutputCategory::Medical,
                 unlock: unlocked,
             },
-        ])
-        .expect("valid starter recipe definitions")
+        ];
+        // Explicit provisional production tuning; advanced food stays locked.
+        for (key, biomass, water, seconds, watts, output) in [
+            ("nutrient-gel", 200_000, 150_000, 10, 10_000.0, 200_000),
+            ("complete-meal", 700_000, 200_000, 20, 15_000.0, 500_000),
+            ("energy-drink", 100_000, 250_000, 10, 10_000.0, 250_000),
+        ] {
+            definitions.push(RecipeDefinition {
+                id: RecipeId::new(key).expect("static food key"),
+                ingredients: vec![
+                    Ingredient {
+                        resource: ResourceId::OrganicBiomass,
+                        mass: Mass::from_milligrams(biomass).expect("positive constant"),
+                    },
+                    Ingredient {
+                        resource: ResourceId::WaterIce,
+                        mass: Mass::from_milligrams(water).expect("positive constant"),
+                    },
+                ],
+                duration: Duration::from_secs(seconds),
+                watts,
+                output_mass: Mass::from_milligrams(output).expect("positive constant"),
+                output_category: OutputCategory::Food,
+                unlock: UnlockRequirements {
+                    unlocked_by_default: false,
+                    prerequisites: vec![],
+                },
+            });
+        }
+        Self::new(definitions).expect("valid starter recipe definitions")
     }
 }

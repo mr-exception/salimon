@@ -1,0 +1,8 @@
+START 313-verified/cap500-active
+END 313-verified/cap500-active exit 1
+START 313-verified/cap1000-active
+END 313-verified/cap1000-active exit 0
+START 313-verified/mixed-active
+END 313-verified/mixed-active exit 1
+START 313-verified/cap-settled
+END 313-verified/cap-settled exit 0

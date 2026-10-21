@@ -67,6 +67,8 @@ fn run_config(
 
     let mut application = ClientApplication::default();
     if config.is_none() && benchmark.is_none() {
+        application.condition_feedback = crate::condition_feedback::Presenter::open();
+        application.session = crate::session::GameplaySession::new_run();
         let earth = *salimon_world::CELESTIAL_BODIES
             .iter()
             .find(|b| b.id == salimon_world::CelestialBodyId::Earth)
@@ -88,6 +90,13 @@ fn run_config(
     }
     application.preserve_startup_backlog = application.checkpoints.is_some();
     if let Some(config) = config {
+        application.e2e_input_isolated =
+            std::env::var_os("SALIMON_E2E_ISOLATE_INPUT").is_some_and(|v| v == "1");
+        if application.e2e_input_isolated {
+            log::info!(
+                "E2E desktop input isolated; protocol controls retained across focus resets"
+            );
+        }
         e2e::initialize(&mut application.session, config)
             .map(|()| application.e2e_config = Some(config))
             .map_err(|error| RunError::new("E2E setup failed", error))?;
@@ -145,10 +154,12 @@ pub(crate) struct ClientApplication {
     frame_clock: FrameClock,
     pub(crate) e2e_config: Option<e2e::Config>,
     e2e_ready_sent: bool,
+    pub(crate) e2e_input_isolated: bool,
     automation: Option<Receiver<Request>>,
     pub(crate) terrain_stream: crate::terrain_patches::TerrainStream,
     pub(crate) observations: crate::terrain_observations::Observations,
     pub(crate) capture_status: String,
+    pub(crate) scout_reference: Option<crate::scout_reference::View>,
     capture_path: Option<std::path::PathBuf>,
     cursor_captured: bool,
     native_focused: bool,
@@ -156,6 +167,10 @@ pub(crate) struct ClientApplication {
     action_bar: ActionBar,
     render_attempts: u64,
     retry_at: Option<Instant>,
+    pub(crate) survival_hud: crate::survival_hud::Hud,
+    journey_ended: crate::journey_ended::Screen,
+    condition_feedback: crate::condition_feedback::Presenter,
+    scout_audio: crate::scout_audio::Presenter,
     occluded: bool,
     failure: Option<String>,
 }
@@ -172,10 +187,12 @@ impl Default for ClientApplication {
             frame_clock: FrameClock::default(),
             e2e_config: None,
             e2e_ready_sent: false,
+            e2e_input_isolated: false,
             automation: None,
             terrain_stream: crate::terrain_patches::TerrainStream::default(),
             observations: crate::terrain_observations::Observations::default(),
             capture_status: "idle".into(),
+            scout_reference: None,
             capture_path: None,
             cursor_captured: false,
             native_focused: false,
@@ -183,6 +200,10 @@ impl Default for ClientApplication {
             action_bar: ActionBar::default(),
             render_attempts: 0,
             retry_at: None,
+            survival_hud: Default::default(),
+            journey_ended: Default::default(),
+            condition_feedback: Default::default(),
+            scout_audio: Default::default(),
             occluded: false,
             failure: None,
         }
@@ -257,7 +278,8 @@ impl ClientApplication {
         window.set_visible(true);
         window.focus_window();
         self.native_focused = window.has_focus();
-        self.cursor_captured = capture_cursor(&window);
+        self.cursor_captured =
+            !self.session.survival.snapshot().terminal && capture_cursor(&window);
         let size = window.inner_size();
         log::info!(
             "native window created: physical_size={}x{} scale_factor={:.2}",
@@ -333,6 +355,7 @@ impl ClientApplication {
 
     fn resize_renderer(&mut self, event_loop: &ActiveEventLoop, window: &Window) {
         let size = surface_size(window);
+        self.journey_ended.clear_pointer();
         log::debug!("native drawable resized: {size:?}");
         self.retry_at = None;
         if let Some(renderer) = self.renderer.as_mut() {
@@ -344,7 +367,8 @@ impl ClientApplication {
         } else {
             event_loop.set_control_flow(ControlFlow::Wait);
             self.frame_clock.reset_interval();
-            self.reset_update_clock();
+            self.release_input_capture();
+            self.session.reset_presentation();
             self.diagnostics.reset_frame_window();
         }
     }
@@ -404,6 +428,40 @@ impl ClientApplication {
             "minimized":w.is_minimized(), "inner_size":[w.inner_size().width,w.inner_size().height]
         }))
     }
+    /// The only host restart path: publish archive and both fresh generations
+    /// before exposing gameplay. Native and automation callers share it.
+    pub(crate) fn restart_terminal(&mut self) -> bool {
+        if !self.session.survival.snapshot().terminal {
+            return false;
+        }
+        let result = match &mut self.checkpoints {
+            Some(checkpoints) => checkpoints.restart(&mut self.session),
+            None => Err(salimon_persistence::invalid(
+                "verified restart storage unavailable",
+            )),
+        };
+        match result {
+            Ok(()) => {
+                self.reset_update_clock();
+                self.terrain_stream = Default::default();
+                self.action_bar = Default::default();
+                self.survival_hud = Default::default();
+                self.journey_ended = Default::default();
+                self.cursor_captured = false;
+                true
+            }
+            Err(error) => {
+                log::error!("restart failed: {error}");
+                self.journey_ended.restart_failed();
+                if let Some(checkpoints) = &mut self.checkpoints {
+                    checkpoints.warning =
+                        Some("RESTART FAILED - terminal save retained; retry Restart Game");
+                }
+                false
+            }
+        }
+    }
+
     fn input_policy(&self) -> InputPolicy {
         InputPolicy {
             gameplay: self.session.view_mode == ViewMode::Gameplay,
@@ -425,6 +483,115 @@ impl ClientApplication {
         synthetic: bool,
         source: InputSource,
     ) {
+        if self.e2e_input_isolated && matches!(source, InputSource::Native) {
+            return;
+        }
+        if self.session.survival.snapshot().terminal {
+            if self.input_policy().admits_press(source, true)
+                && input::terminal_restart_pressed(
+                    if pressed {
+                        ElementState::Pressed
+                    } else {
+                        ElementState::Released
+                    },
+                    repeat,
+                    synthetic,
+                    key,
+                )
+            {
+                self.restart_terminal();
+            }
+            return;
+        }
+        if self.session.is_paused()
+            && pressed
+            && !repeat
+            && !synthetic
+            && self.input_policy().admits_press(source, true)
+            && !self.condition_feedback.settings_open
+        {
+            use crate::checkpoints::control::Request;
+            let request = match key {
+                PhysicalKey::Code(KeyCode::KeyN) => Some(Request::SaveNow),
+                PhysicalKey::Code(KeyCode::KeyX) => Some(Request::SaveAndExit),
+                PhysicalKey::Code(KeyCode::KeyR) => Some(Request::Retry),
+                PhysicalKey::Code(KeyCode::KeyC) => Some(Request::CancelExit),
+                PhysicalKey::Code(KeyCode::KeyQ) => Some(Request::ExitWithRisk),
+                _ => None,
+            };
+            if let Some(request) = request {
+                if let Some(checkpoints) = &mut self.checkpoints {
+                    checkpoints.request(request, &self.session);
+                }
+                return;
+            }
+        }
+        let pause_key = self.session.view_mode == ViewMode::Gameplay
+            && (key == PhysicalKey::Code(KeyCode::Escape)
+                || (self.session.is_paused()
+                    && matches!(
+                        key,
+                        PhysicalKey::Code(KeyCode::Enter | KeyCode::NumpadEnter)
+                    )));
+        if self.session.is_paused()
+            && pressed
+            && !repeat
+            && !synthetic
+            && self.input_policy().admits_press(source, true)
+        {
+            match key {
+                PhysicalKey::Code(KeyCode::KeyS) => {
+                    self.condition_feedback.settings_open = !self.condition_feedback.settings_open
+                }
+                PhysicalKey::Code(KeyCode::KeyC) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(0)
+                }
+                PhysicalKey::Code(KeyCode::KeyA) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(1)
+                }
+                PhysicalKey::Code(KeyCode::KeyV) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(2)
+                }
+                PhysicalKey::Code(KeyCode::KeyM) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(3)
+                }
+                PhysicalKey::Code(KeyCode::KeyB) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(4)
+                }
+                PhysicalKey::Code(KeyCode::KeyG) if self.condition_feedback.settings_open => {
+                    self.condition_feedback.toggle_setting(5)
+                }
+                _ => {}
+            }
+        }
+        if pause_key {
+            if pressed && !repeat && !synthetic && self.input_policy().admits_press(source, true) {
+                if self.session.is_paused()
+                    && let Some(checkpoints) = &mut self.checkpoints
+                {
+                    checkpoints.request(
+                        crate::checkpoints::control::Request::CancelExit,
+                        &self.session,
+                    );
+                }
+                self.session.command(crate::session::Command::TogglePause);
+                self.scout_audio.stop();
+                self.condition_feedback.settings_open = false;
+                self.survival_hud.close_details();
+                self.cursor_captured = false;
+                if let Some(window) = &self.window {
+                    if self.session.is_paused() {
+                        release_cursor(window);
+                    } else {
+                        self.cursor_captured = capture_cursor(window);
+                    }
+                }
+            }
+            return;
+        }
+        if self.session.is_paused() {
+            return;
+        }
         if !self
             .input_policy()
             .admits_key(source, key, pressed, repeat, synthetic)
@@ -434,6 +601,28 @@ impl ClientApplication {
         if pressed && key == PhysicalKey::Code(KeyCode::F3) {
             self.diagnostics.toggle();
             return;
+        }
+        if pressed
+            && self.session.view_mode == ViewMode::Gameplay
+            && !self.session.crafting_ui.open
+            && !self.session.survival.snapshot().terminal
+        {
+            match key {
+                PhysicalKey::Code(KeyCode::KeyH) => {
+                    self.survival_hud
+                        .observe(crate::survival_hud::Observation::capture(&self.session));
+                    self.survival_hud.toggle_details();
+                    return;
+                }
+                PhysicalKey::Code(KeyCode::BracketLeft | KeyCode::BracketRight)
+                    if self.survival_hud.details_open =>
+                {
+                    self.survival_hud
+                        .next_page(key == PhysicalKey::Code(KeyCode::BracketRight));
+                    return;
+                }
+                _ => {}
+            }
         }
         input::dispatch_session_key(&mut self.session, key, pressed);
         self.show_session_feedback();
@@ -447,19 +636,36 @@ impl ClientApplication {
     }
 
     fn release_input_capture(&mut self) {
+        self.scout_audio.stop();
         self.cursor_captured = false;
-        self.session.clear_held_controls();
+        self.survival_hud.close_details();
+        self.journey_ended.clear_pointer();
+        if !self.e2e_input_isolated {
+            self.session.clear_held_controls();
+        }
     }
 
     fn reset_update_clock(&mut self) {
+        // Fixed-step protocol time/holds must not depend on desktop focus or resize.
+        if self.e2e_input_isolated {
+            return;
+        }
+        self.journey_ended.clear_pointer();
+        self.survival_hud.close_details();
         self.session.update_clock.reset();
-        self.session.clear_held_controls();
+        if !self.e2e_input_isolated {
+            self.session.clear_held_controls();
+        }
         self.session.reset_presentation();
     }
 
     fn advance_native(&mut self, elapsed: Duration) -> (Duration, usize) {
         let started = Instant::now();
-        self.session.update_clock.accumulate(elapsed);
+        if self.session.is_paused() || self.session.survival.snapshot().terminal {
+            self.session.update_clock.reset();
+        } else {
+            self.session.update_clock.accumulate(elapsed);
+        }
         if let Some(benchmark) = &mut self.benchmark {
             benchmark.latest_physics.clear_work();
             self.session.latest_physics.clear_work();
@@ -488,16 +694,89 @@ impl ClientApplication {
                 lifecycle_excluded: self.session.update_clock.lifecycle_excluded(),
             };
         }
+        self.condition_feedback
+            .update(crate::condition_feedback::Observation::capture(
+                &self.session,
+                self.native_focused,
+                self.occluded,
+            ));
+        let audio = crate::scout_audio::Observation::capture(
+            &self.session,
+            self.native_focused
+                && !self.occluded
+                && self.e2e_config.is_none()
+                && self.benchmark.is_none(),
+        );
+        self.scout_audio.update(
+            audio,
+            self.condition_feedback.settings,
+            self.condition_feedback.settings_path(),
+        );
+        if self.scout_audio.unavailable() {
+            self.condition_feedback.message =
+                "Ship audio unavailable - check OS player/output".into();
+        }
         if let Some(checkpoints) = &mut self.checkpoints {
             checkpoints.poll(&self.session);
         }
+        if self.session.survival.snapshot().terminal && self.cursor_captured {
+            if let Some(window) = &self.window {
+                release_cursor(window);
+            }
+            self.release_input_capture();
+        }
         (update_delta, ticks)
+    }
+
+    /// Observe host IO without stepping the paused session.
+    fn pause_menu_text(&self) -> Option<String> {
+        if !self.session.is_paused() {
+            return None;
+        }
+        let mut text = String::from(
+            "SALIMON / PAUSED\n\nENTER / ESC   RESUME\nN   SAVE NOW\nS   SETTINGS\nX   SAVE & EXIT\n\n",
+        );
+        use crate::checkpoints::control::Status;
+        match &self.checkpoints {
+            None => text.push_str("Saving unavailable in this session"),
+            Some(checkpoints) => {
+                let (status, verified, _) = checkpoints.status();
+                text.push_str(match status {
+                    Status::Idle => "No checkpoint verified this session",
+                    Status::Saving => "Saving...",
+                    Status::Saved { .. } => "Saved",
+                    Status::Failed => "SAVE FAILED - check storage/permissions",
+                });
+                if let Some(utc) = verified {
+                    text.push_str(&format!(
+                        "\nLast verified: {}",
+                        crate::checkpoints::control::timestamp(utc)
+                    ));
+                }
+                if status == Status::Failed {
+                    text.push_str("\nR   RETRY");
+                }
+                if checkpoints.exit_requested() {
+                    text.push_str("\nC   CANCEL EXIT");
+                    if status == Status::Failed {
+                        text.push_str("\nQ   EXIT WITHOUT SAVING");
+                    }
+                }
+            }
+        }
+        Some(text)
+    }
+
+    /// Background presentation stops, but the running, living session continues
+    /// through the same bounded physical ticks and checkpoint scheduler.
+    fn advance_background(&mut self, now: Instant) {
+        let elapsed = self.session.update_clock.step(now);
+        self.advance_native(elapsed);
     }
 
     fn redraw(&mut self, event_loop: &ActiveEventLoop, window: Arc<Window>) {
         if self.occluded {
             self.frame_clock.reset_interval();
-            self.reset_update_clock();
             self.diagnostics.reset_frame_window();
             return;
         }
@@ -533,6 +812,7 @@ impl ClientApplication {
                 ship_frame.world_to_local(character_snapshot.eye_position_meters),
                 ship_frame.world_to_local(character_snapshot.look_target_meters),
             )
+            .filter(|target| self.session.permitted_interaction(*target))
         } else {
             None
         };
@@ -605,11 +885,22 @@ impl ClientApplication {
                 radius_meters,
             };
         }
+        if self.session.survival.snapshot().terminal {
+            contextual_placement = OverlayPlacement::BottomCenter;
+        }
         self.action_bar
-            .set_contextual(contextual_action.map(|prompt| prompt.text));
+            .set_contextual(if self.session.survival.snapshot().terminal {
+                None
+            } else {
+                contextual_action.map(|prompt| prompt.text)
+            });
         window.set_title(&self.benchmark.as_ref().map_or_else(
             || {
-                let title = gameplay_window_title(monitor_message, interaction);
+                let title = if self.session.survival.snapshot().terminal {
+                    "Salimon - Journey Ended".to_owned()
+                } else {
+                    gameplay_window_title(monitor_message, interaction)
+                };
                 self.checkpoints
                     .as_ref()
                     .and_then(|c| c.warning)
@@ -625,10 +916,15 @@ impl ClientApplication {
                 vertical_fov_radians: 70.0_f32.to_radians(),
                 near_plane_meters: 0.05,
             };
+            self.condition_feedback.camera(&mut camera);
+            if let Some(view) = &self.scout_reference {
+                camera = view.camera(presentation.ship.pose);
+            }
             let mut mesh = map_ship_to_renderer(presentation.ship);
             mesh.fabricator_output_present = self.session.fabricator_output_present();
             mesh.fabricator_output_medical = self.session.fabricator_output_medical();
             mesh.instruments.fabricator = self.session.fabricator_instruments();
+            mesh.machinery = crate::scout_feedback::capture(&self.session, presentation.ship);
             Some(mesh)
         } else {
             None
@@ -689,11 +985,42 @@ impl ClientApplication {
             render_terrain,
         );
         let cpu_update_time = update_started_at.elapsed();
-        let crafting_text = self.session.crafting_text();
+        let terminal = self.session.survival.snapshot().terminal;
+        let terminal_report = if terminal {
+            match self.session.ended_run() {
+                Ok(report) => Some(crate::journey_ended::Report::from(&report)),
+                Err(error) => {
+                    self.fail(event_loop, error);
+                    return;
+                }
+            }
+        } else {
+            None
+        };
+        let crafting_text = if self.session.is_paused() && self.condition_feedback.settings_open {
+            Some(self.condition_feedback.menu_text())
+        } else {
+            self.pause_menu_text()
+                .or_else(|| self.session.crafting_text())
+        };
+        let ended_image = self.journey_ended.image(
+            terminal_report,
+            [window.inner_size().width, window.inner_size().height],
+            window.scale_factor(),
+        );
         let crafting_pixels = crafting_text
             .as_ref()
             .map(|text| crate::action_bar::rasterize_action_bar(text, 3));
-        let overlay_image = crafting_pixels
+        let hud_observation = crate::survival_hud::Observation::capture(&self.session);
+        let hud_visible = hud_observation.visible && !self.diagnostics.is_visible();
+        let hud_frame = self.survival_hud.observe(hud_observation);
+        let hud_image = self.survival_hud.image(
+            hud_frame,
+            [window.inner_size().width, window.inner_size().height],
+            window.scale_factor(),
+            hud_visible,
+        );
+        let gameplay_overlay = crafting_pixels
             .as_ref()
             .map(|(width, height, pixels)| RendererOverlayImage {
                 width: *width,
@@ -717,10 +1044,20 @@ impl ClientApplication {
                         revision: image.revision,
                         placement: OverlayPlacement::TopLeft,
                     })
-            });
+            })
+            .or(hud_image);
+        let overlay_image = if terminal {
+            ended_image
+        } else {
+            gameplay_overlay
+        };
         let action_bar_image = self
             .action_bar
-            .image(self.session.view_mode == ViewMode::Gameplay)
+            .image(
+                self.session.view_mode == ViewMode::Gameplay
+                    && !terminal
+                    && !self.session.is_paused(),
+            )
             .map(|image| RendererOverlayImage {
                 width: image.width,
                 height: image.height,
@@ -732,9 +1069,12 @@ impl ClientApplication {
                     contextual_placement
                 },
             });
-        let held_item = self
-            .session
-            .held_item(presentation.character, mining_target.is_some());
+        let held_item = (!terminal)
+            .then(|| {
+                self.session
+                    .held_item(presentation.character, mining_target.is_some())
+            })
+            .flatten();
         let outcome = match self
             .renderer
             .as_mut()
@@ -751,14 +1091,19 @@ impl ClientApplication {
                     ship: ship_mesh,
                     held_item,
                 },
+                self.condition_feedback.image(),
                 overlay_image,
                 action_bar_image,
                 crate::reticle::image(
-                    self.session.view_mode == ViewMode::Gameplay,
+                    self.session.view_mode == ViewMode::Gameplay
+                        && !terminal
+                        && !self.session.is_paused(),
                     &self.session.equipment,
                 ),
-                (self.session.view_mode == ViewMode::Gameplay)
-                    .then(|| self.session.equipment_presentation()),
+                (self.session.view_mode == ViewMode::Gameplay
+                    && !terminal
+                    && !self.session.is_paused())
+                .then(|| self.session.equipment_presentation()),
                 window.scale_factor(),
                 || window.pre_present_notify(),
             ) {
@@ -914,6 +1259,7 @@ impl ApplicationHandler for ClientApplication {
         event: DeviceEvent,
     ) {
         if self.benchmark.is_none()
+            && !self.e2e_input_isolated
             && self.session.view_mode == ViewMode::Gameplay
             && self.cursor_captured
             && let DeviceEvent::MouseMotion { delta } = event
@@ -950,6 +1296,7 @@ impl ApplicationHandler for ClientApplication {
     }
 
     fn suspended(&mut self, event_loop: &ActiveEventLoop) {
+        self.scout_audio.stop();
         if let Some(benchmark) = self.benchmark.as_mut()
             && let Err(error) = benchmark.observe_native("suspended", false)
         {
@@ -981,10 +1328,13 @@ impl ApplicationHandler for ClientApplication {
         }
         // Benchmark cameras and population are deterministic initial conditions.
         // Keep native timing/rendering, while desktop input cannot mutate them.
-        if self.benchmark.is_some()
+        if (self.benchmark.is_some() || self.e2e_input_isolated)
             && matches!(
                 event,
-                WindowEvent::KeyboardInput { .. } | WindowEvent::MouseInput { .. }
+                WindowEvent::KeyboardInput { .. }
+                    | WindowEvent::MouseInput { .. }
+                    | WindowEvent::CursorMoved { .. }
+                    | WindowEvent::MouseWheel { .. }
             )
         {
             return;
@@ -994,6 +1344,23 @@ impl ApplicationHandler for ClientApplication {
             WindowEvent::CloseRequested => {
                 if self.benchmark.is_some() {
                     self.fail(event_loop, "benchmark window closed before completion");
+                } else if self.checkpoints.is_some()
+                    && self.session.view_mode == ViewMode::Gameplay
+                    && !self.session.survival.snapshot().terminal
+                {
+                    if !self.session.is_paused() {
+                        self.session.command(crate::session::Command::TogglePause);
+                    }
+                    self.condition_feedback.settings_open = false;
+                    release_cursor(&window);
+                    self.release_input_capture();
+                    if let Some(checkpoints) = &mut self.checkpoints {
+                        checkpoints.request(
+                            crate::checkpoints::control::Request::SaveAndExit,
+                            &self.session,
+                        );
+                    }
+                    window.request_redraw();
                 } else {
                     event_loop.exit();
                 }
@@ -1041,7 +1408,8 @@ impl ApplicationHandler for ClientApplication {
                 self.occluded = is_occluded;
                 self.retry_at = None;
                 self.frame_clock.reset_interval();
-                self.reset_update_clock();
+                self.release_input_capture();
+                self.session.reset_presentation();
                 self.diagnostics.reset_frame_window();
                 if is_occluded {
                     event_loop.set_control_flow(ControlFlow::Wait);
@@ -1062,13 +1430,58 @@ impl ApplicationHandler for ClientApplication {
                     return;
                 }
                 if focused {
-                    self.cursor_captured = capture_cursor(&window);
+                    if self.session.is_paused() || self.session.survival.snapshot().terminal {
+                        // Focus may have been lost before death. The capture
+                        // flag is already clear then, but the OS cursor still
+                        // needs explicit restoration for the restart button.
+                        release_cursor(&window);
+                        self.release_input_capture();
+                    } else {
+                        self.cursor_captured = capture_cursor(&window);
+                    }
                 }
+            }
+            WindowEvent::CursorMoved { position, .. } => {
+                if self.session.survival.snapshot().terminal
+                    && self.native_focused
+                    && !self.occluded
+                {
+                    self.journey_ended.pointer_moved([position.x, position.y]);
+                    window.request_redraw();
+                } else {
+                    self.journey_ended.clear_pointer();
+                }
+            }
+            WindowEvent::CursorLeft { .. } => {
+                self.journey_ended.clear_pointer();
+                if self.session.survival.snapshot().terminal {
+                    window.request_redraw();
+                }
+            }
+            WindowEvent::MouseInput { state, button, .. }
+                if self.session.survival.snapshot().terminal =>
+            {
+                if state == ElementState::Pressed
+                    && button == MouseButton::Left
+                    && self.input_policy().admits_press(InputSource::Native, true)
+                    && self.journey_ended.clicked_restart(
+                        [window.inner_size().width, window.inner_size().height],
+                        window.scale_factor(),
+                    )
+                {
+                    self.restart_terminal();
+                }
+                window.request_redraw();
             }
             WindowEvent::MouseInput {
                 state: ElementState::Pressed,
                 ..
-            } if !self.cursor_captured && self.native_focused && !self.occluded => {
+            } if !self.cursor_captured
+                && self.native_focused
+                && !self.occluded
+                && !self.session.is_paused()
+                && !self.session.survival.snapshot().terminal =>
+            {
                 self.cursor_captured = capture_cursor(&window);
             }
             WindowEvent::KeyboardInput {
@@ -1076,7 +1489,9 @@ impl ApplicationHandler for ClientApplication {
                 is_synthetic,
                 ..
             } if !is_synthetic
-                && release_cursor_pressed(event.state, event.repeat, event.physical_key) =>
+                && release_cursor_pressed(event.state, event.repeat, event.physical_key)
+                && (event.physical_key == PhysicalKey::Code(KeyCode::F1)
+                    || self.session.view_mode != ViewMode::Gameplay) =>
             {
                 release_cursor(&window);
                 self.release_input_capture();
@@ -1119,6 +1534,13 @@ impl ApplicationHandler for ClientApplication {
     }
 
     fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
+        if let Some(checkpoints) = &mut self.checkpoints {
+            checkpoints.poll(&self.session);
+            if checkpoints.status().2 {
+                event_loop.exit();
+                return;
+            }
+        }
         if self.automation.is_some() {
             // Drain the queue on the native thread; the stdin thread never touches state.
             while let Some(request) = self
@@ -1145,6 +1567,18 @@ impl ApplicationHandler for ClientApplication {
             ));
             return;
         }
+        if self.renderer.is_some()
+            && self
+                .window
+                .as_ref()
+                .is_some_and(|window| self.occluded || !surface_size(window).is_drawable())
+        {
+            self.advance_background(Instant::now());
+            event_loop.set_control_flow(ControlFlow::WaitUntil(
+                Instant::now() + crate::update_clock::GAME_TICK,
+            ));
+            return;
+        }
         let Some(retry_at) = self.retry_at else {
             return;
         };
@@ -1162,6 +1596,7 @@ impl ApplicationHandler for ClientApplication {
 
     fn exiting(&mut self, _event_loop: &ActiveEventLoop) {
         if let Some(mut checkpoints) = self.checkpoints.take()
+            && !checkpoints.status().2
             && let Err(error) = checkpoints.finish(&self.session)
         {
             log::error!("exit checkpoint failed: {error}");
@@ -1178,6 +1613,79 @@ mod toolbar_tests {
     use super::*;
     use crate::equipment::ToolbarSlot;
     use salimon_world::{CameraCommand, CelestialBodyId};
+
+    #[test]
+    fn status_panel_input_uses_focus_capture_repeat_and_modal_guards() {
+        let mut app = ClientApplication::default();
+        let key = PhysicalKey::Code(KeyCode::KeyH);
+        app.dispatch_key(key, true, false, false, InputSource::Native);
+        assert!(!app.survival_hud.details_open);
+        app.native_focused = true;
+        app.cursor_captured = true;
+        let before = app.session.save_bytes(1).unwrap();
+        app.dispatch_key(key, true, false, false, InputSource::Native);
+        assert!(app.survival_hud.details_open);
+        assert_eq!(app.session.save_bytes(1).unwrap(), before);
+        for (repeat, synthetic) in [(true, false), (false, true)] {
+            app.dispatch_key(key, true, repeat, synthetic, InputSource::Native);
+            assert!(app.survival_hud.details_open);
+        }
+        app.session.advance_game(Duration::from_millis(16));
+        assert!(app.session.survival.snapshot().active_time > Duration::ZERO);
+        app.set_input_focus(false);
+        assert!(!app.survival_hud.details_open);
+        app.native_focused = true;
+        app.cursor_captured = true;
+        app.dispatch_key(key, true, false, false, InputSource::Native);
+        assert!(app.survival_hud.details_open);
+        app.reset_update_clock();
+        assert!(!app.survival_hud.details_open);
+        app.session.crafting_ui.open = true;
+        app.dispatch_key(key, true, false, false, InputSource::Native);
+        assert!(!app.survival_hud.details_open);
+        app.session.crafting_ui.open = false;
+        app.session.view_mode = ViewMode::PrecisionTour;
+        app.dispatch_key(key, true, false, false, InputSource::Native);
+        assert!(!app.survival_hud.details_open);
+        assert_ne!(app.session.save_bytes(1).unwrap(), before); // only the tick changed authority
+    }
+
+    #[test]
+    fn background_ticks_preserve_active_time_travel_and_resume_without_double_counting() {
+        let mut app = ClientApplication::default();
+        app.session.ship = salimon_ship::ShipController::flying_with_velocity(
+            salimon_ship::ShipPose {
+                position_meters: [0.; 3],
+                orientation: [0., 0., 0., 1.],
+            },
+            0,
+            [100., 0., 0.],
+        )
+        .unwrap();
+        let start = Instant::now();
+        app.session.update_clock.step(start);
+        app.set_input_focus(false);
+        app.occluded = true;
+        for n in 1..=10 {
+            app.advance_background(start + Duration::from_millis(16 * n));
+        }
+        assert_eq!(
+            app.session.survival.snapshot().active_time,
+            Duration::from_millis(160)
+        );
+        assert!((app.session.run.journey.distance_meters - 16.).abs() < 1e-9);
+        app.occluded = false;
+        let elapsed = app
+            .session
+            .update_clock
+            .step(start + Duration::from_millis(176));
+        app.advance_native(elapsed);
+        assert_eq!(
+            app.session.survival.snapshot().active_time,
+            Duration::from_millis(176)
+        );
+        assert!((app.session.run.journey.distance_meters - 17.6).abs() < 1e-9);
+    }
 
     #[test]
     fn automation_partitions_preserve_elapsed_and_match_native_ticks() {

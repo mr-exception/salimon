@@ -1,0 +1,8 @@
+{
+  "unpowered_native_movement": true,
+  "zero_g_coasting": true,
+  "native_e_consumes_once": true,
+  "gradual_conversion_power": true,
+  "conversion_completed": true,
+  "identities_retained": true
+}

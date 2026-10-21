@@ -48,7 +48,7 @@ fn fixture(
         .filter(|p| salimon_character::ship_floor_placement(*p, 0.03).is_some())
         .collect();
     assert!(cells.len() >= count);
-    for i in 0..count {
+    for (i, &cell) in cells.iter().take(count).enumerate() {
         let resource = [
             ResourceId::IronOre,
             ResourceId::SilicateRock,
@@ -64,7 +64,7 @@ fn fixture(
         let radius = salimon_world::resource_size::fragment_contact_radius_meters(
             RawMaterial::new(resource, mass).unwrap(),
         );
-        let mut local = cells[i];
+        let mut local = cell;
         local[1] = SHIP_FLOOR_HEIGHT_METERS + radius + if mode == "zero-g" { 0.5 } else { 0.0 };
         let p = if onboard {
             frame.local_to_world(local)

@@ -158,6 +158,14 @@ def validate_sightlines(document: dict, binary: bytes) -> None:
             ("starboard window",(-4.5,eye,-2.2),(0,0,-1)),
             ("aft port window",(-5.8,eye,2.6),(-1,0,0)),
             ("aft starboard window",(-5.8,eye,-2.6),(-1,0,0))]
+    # #334: both near rear-canopy corners, from the actual seated eye and
+    # standing behind the chair. These used to hit the protruding hull shoulders.
+    for label,origin in [('seated',(2.76,1.799032258064516,0)),('standing',(1.3,eye,0))]:
+        for side in [-1,1]:
+            for x in [5.12,5.2,5.35]:
+                for height in [1.5,2.0]:
+                    target=(x,height,side*(4.84-(x-5.0)*1.125))
+                    checks.append((f'{label} canopy corner {side}/{x}/{height}',origin,sub(target,origin)))
     for label,origin,direction in checks:
         glass_hit=False
         for name,glass,triangles in meshes:
@@ -490,6 +498,8 @@ def validate_scout(context, data):
     require(door_material_bounds["Hull Graphite"][0][0] -
             door_material_bounds["Petrol Teal"][0][0] >= 0.019,
             "door exterior backing and plate must not be coplanar")
+    from seam_checks import door_seams
+    door_seams(document, geometry)
     # The balanced hull has matching sides and the rebuilt port window.
     for port_name, starboard_name in (("Wing_Port", "Wing_Starboard"),
                                       ("Hull_Port_Side", "Hull_Starboard_Side"),

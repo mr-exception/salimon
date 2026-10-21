@@ -24,10 +24,14 @@ runs remain under ignored `artifacts/`; promote useful evidence deliberately.
 
 ## Duplicate evidence cleanup
 
-[evidence-aliases.json](evidence-aliases.json) maps two removed byte-identical
-PNG copies to their retained files with SHA-256 digests. The issue #29 failure
-image and cabin image had identical bytes; issue #34's initial/return cockpit
-images also matched. Report links now use the retained image. Original structured
-results/logs remain unchanged and may contain historical capture filenames; use
-this alias index to locate those bytes. Distinct failed-run or older-layout
-evidence is retained because it records useful validation limits.
+The historical [alias manifest](https://github.com/mr-exception/salimon/blob/7e8946ee75d7f9be1158118109b26d47f96445ec/reports/evidence-aliases.json)
+recorded two byte-identical PNG mappings for issues #29 and #34. The manifest
+and those report folders were intentionally removed by the
+[2026-10-06 old-report cleanup](https://github.com/mr-exception/salimon/commit/9b0a24526e2da337efdac2beb31c525e7fbb27d1).
+There is no live alias index or retained target for these mappings in the current
+tree. Use the immutable historical manifest/image references and
+[verified provenance report](issue-297/README.md) to inspect those bytes; all
+recorded digests were checked against the original and retained Git blobs.
+Historical capture filenames in archived logs describe their recorded revision,
+not files guaranteed to exist in the current checkout. Keep useful current
+evidence and its validation limitations unchanged.

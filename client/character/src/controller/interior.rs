@@ -21,8 +21,8 @@ impl CharacterController {
             return;
         }
         let movement = ship_planar_movement(input, self.yaw_radians);
-        local[0] += movement[0] * WALK_SPEED_METERS_PER_SECOND * seconds;
-        local[2] += movement[1] * WALK_SPEED_METERS_PER_SECOND * seconds;
+        local[0] += movement[0] * self.walk_speed() * seconds;
+        local[2] += movement[1] * self.walk_speed() * seconds;
         if self.ship_gravity_enabled
             && jump_started
             && local[1] <= PLAYER_EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT + 0.001
@@ -103,13 +103,13 @@ impl CharacterController {
         );
         let acceleration = scale(
             movement,
-            WALK_SPEED_METERS_PER_SECOND / dot(movement, movement).sqrt().max(1.0),
+            self.walk_speed() / dot(movement, movement).sqrt().max(1.0),
         );
         let next_velocity = add(self.interior_velocity, scale(acceleration, step.seconds));
         let speed = dot(next_velocity, next_velocity).sqrt();
         let limit = dot(self.interior_velocity, self.interior_velocity)
             .sqrt()
-            .max(WALK_SPEED_METERS_PER_SECOND);
+            .max(self.walk_speed());
         let next_velocity = scale(next_velocity, (limit / speed.max(limit)).min(1.0));
         let proposed = add(
             previous,

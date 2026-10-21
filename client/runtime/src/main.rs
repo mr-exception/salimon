@@ -7,6 +7,7 @@ mod benchmark;
 mod benchmark_fixture;
 mod carrying;
 mod checkpoints;
+mod condition_feedback;
 mod e2e;
 mod equipment;
 mod flight_profile;
@@ -15,12 +16,17 @@ mod flight_regression;
 mod fragment_costs;
 mod fragment_physics;
 mod frame_clock;
+mod journey_ended;
 mod mining;
 #[cfg(test)]
 mod mining_emission;
+mod native_audio;
 mod resource_context;
 mod resource_presentation;
 mod reticle;
+mod scout_audio;
+mod scout_feedback;
+mod scout_reference;
 mod session;
 #[cfg(test)]
 mod sphere_benchmark;
@@ -30,6 +36,7 @@ mod sphere_fixtures;
 mod sphere_interactions;
 #[cfg(test)]
 mod sphere_workloads;
+mod survival_hud;
 mod terrain;
 mod terrain_observations;
 mod terrain_patches;

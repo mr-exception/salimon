@@ -20,6 +20,8 @@ pub enum OverlayPlacement {
     /// Bottom-center message above a renderer-reserved physical-pixel band.
     BottomCenterInset(u32),
     Center,
+    /// Stretch a small generic image across the drawable, without HUD margins.
+    Fullscreen,
     /// Absolute object center and conservative visible-surface radius, in metres.
     World {
         anchor_meters: [f64; 3],
@@ -71,8 +73,13 @@ impl std::fmt::Display for OverlayImageError {
     }
 }
 
+/// Usable physical pixels inside the generic overlay's screen margins.
+pub fn overlay_available_size(surface_size: [u32; 2]) -> [u32; 2] {
+    surface_size.map(|size| size.saturating_sub(2 * OVERLAY_MARGIN_PIXELS))
+}
+
 pub(crate) fn fitted_overlay_size(surface_size: [u32; 2], image_size: [u32; 2]) -> [f32; 2] {
-    let available = surface_size.map(|size| size.saturating_sub(2 * OVERLAY_MARGIN_PIXELS) as f32);
+    let available = overlay_available_size(surface_size).map(|size| size as f32);
     let image_size = image_size.map(|size| size as f32);
     let scale = (available[0] / image_size[0])
         .min(available[1] / image_size[1])
@@ -87,6 +94,7 @@ fn overlay_origin(
 ) -> [f32; 2] {
     match placement {
         OverlayPlacement::World { .. } => unreachable!("world placement is projected separately"),
+        OverlayPlacement::Fullscreen => [0.0; 2],
         OverlayPlacement::TopLeft => [OVERLAY_MARGIN_PIXELS as f32; 2],
         OverlayPlacement::Center => [
             (surface_size[0] as f32 - display_size[0]) * 0.5,
@@ -304,6 +312,9 @@ impl OverlayRenderer {
         if matches!(image.placement, OverlayPlacement::World { .. }) {
             let scale = (surface_width as f32 * 0.6 / display_size[0]).min(1.0);
             display_size = display_size.map(|value| value * scale);
+        }
+        if image.placement == OverlayPlacement::Fullscreen {
+            display_size = [surface_width as f32, surface_height as f32];
         }
         let (origin, visibility) = match image.placement {
             OverlayPlacement::World {

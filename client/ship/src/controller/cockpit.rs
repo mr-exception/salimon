@@ -38,6 +38,13 @@ impl CockpitMessage {
 }
 
 impl ShipController {
+    /// Survival authority loss: stop manual thrust/control without cancelling
+    /// an already committed assist, changing heading or erasing world momentum.
+    pub fn revoke_pilot_control(&mut self) {
+        self.thruster_percentage = 0;
+        self.set_cockpit_control(false);
+    }
+
     pub fn set_cockpit_control(&mut self, active: bool) {
         self.cockpit_control_active = active;
         if !active {
@@ -175,5 +182,31 @@ mod blackout_tests {
         ship.set_cockpit_control(false);
         ship.advance(Duration::from_secs(1));
         assert_eq!(ship.snapshot().pose.orientation, exit_heading);
+    }
+}
+
+#[cfg(test)]
+mod survival_revocation_tests {
+    use super::*;
+    #[test]
+    fn revocation_stops_manual_thrust_even_during_blackout_and_never_erases_velocity() {
+        let mut ship = ShipController::flying_with_velocity(
+            crate::ShipPose {
+                position_meters: [0.0; 3],
+                orientation: [0.0, 0.0, 0.0, 1.0],
+            },
+            50,
+            [10.0, 20.0, 30.0],
+        )
+        .unwrap();
+        ship.set_stored_core_energy_joules(0);
+        ship.revoke_pilot_control();
+        ship.exchange_core_energy_joules(1e9, 0.0).unwrap();
+        ship.advance(std::time::Duration::from_secs(1));
+        let s = ship.snapshot();
+        assert_eq!(s.thruster_percentage, 0);
+        assert_eq!(s.velocity_meters_per_second, [10.0, 20.0, 30.0]);
+        assert_eq!(s.pose.position_meters, [10.0, 20.0, 30.0]);
+        assert!(!s.cockpit_control_active);
     }
 }

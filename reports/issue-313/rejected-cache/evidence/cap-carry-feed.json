@@ -1,0 +1,235 @@
+{
+  "setup": {
+    "scenario": "landed-earth",
+    "seed": 303,
+    "step_ms": 16,
+    "fragment_count": 1,
+    "fragment_layout": "current-cap",
+    "fragment_settle_steps": 1200
+  },
+  "timeout_ms": 120000,
+  "steps": [
+    {
+      "assert": {
+        "path": "ship.total_mass_kg",
+        "equals": 100010
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 100
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "left",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 12
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "left",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "aim_fragment",
+        "fragment_id": 1
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "carrying.object_id",
+        "equals": 1
+      }
+    },
+    {
+      "screenshot": "cap-10kg-carried"
+    },
+    {
+      "action": {
+        "op": "restore_look"
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "carrying.object_id",
+        "equals": null
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 60
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.total_mass_kg",
+        "equals": 100010
+      }
+    },
+    {
+      "action": {
+        "op": "aim_fragment",
+        "fragment_id": 1
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "grab_drop",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "carrying.object_id",
+        "equals": 1
+      }
+    },
+    {
+      "action": {
+        "op": "restore_look"
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 100
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 12
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 986.0069183061062,
+        "dy": 139.95419282293778
+      }
+    },
+    {
+      "assert": {
+        "path": "interaction",
+        "equals": "core"
+      }
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "assert": {
+        "path": "world.fragment_count",
+        "equals": 0
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.total_mass_kg",
+        "equals": 100000
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.conversion_remaining_joules",
+        "equals": 10000000000
+      }
+    },
+    {
+      "screenshot": "cap-fed-final-cargo-removed"
+    }
+  ]
+}

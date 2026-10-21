@@ -247,18 +247,15 @@ fn saved_midcraft_session_resumes_once_with_exact_clocks_energy_and_inventory() 
     }
     let saved = restored.save_bytes(12345).unwrap();
     restored.restore_bytes(&saved).unwrap();
-    assert!(
-        restored
-            .consumables
-            .consume_first(salimon_fabrication::ConsumableCategory::Food)
-            .is_some()
-    );
-    assert!(
-        restored
-            .consumables
-            .consume_first(salimon_fabrication::ConsumableCategory::Medical)
-            .is_some()
-    );
+    for slot in [
+        salimon_fabrication::ConsumableSlot::FoodOne,
+        salimon_fabrication::ConsumableSlot::MedicalOne,
+    ] {
+        let item = restored.consumables.item(slot).unwrap();
+        let command = json!({"op":"consume","slot":slot.index()+1,
+            "job":item.job.0,"unit":item.unit});
+        assert_eq!(request(&mut restored, command)["applied"], true);
+    }
     assert_eq!(restored.consumables.food().iter().flatten().count(), 1);
     assert!(restored.consumables.medical().iter().all(Option::is_none));
 }

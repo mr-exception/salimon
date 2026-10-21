@@ -41,7 +41,9 @@ streaming and normal-play process restarts through versioned whole-session
 checkpoints (#363–#366). The canonical [reload verification scope](../client/world/resource-contracts.md#persistence-and-reload-verification-scope-268)
 defines in-session restoration and the proposed #236 scope clarification awaiting
 owner approval; normal play restores its active run, while E2E/benchmarks start isolated sessions. No orbital simulation,
-multiplayer or production survival is implemented.
+multiplayer is implemented. Survival meters/status/recovery, active clocks,
+whole-game persistence and terminal/restart lifecycle are implemented through
+#371; HUD, Journey Ended and starter supplies are implemented by #373/#374/#379; native Q consumption remains #377.
 Core joule storage, watt consumers and power authority are implemented; assist reservations are implemented; physical Core intake/conversion and a distinct Core-local status display are implemented.
 
 ## Accepted constraints
@@ -235,6 +237,8 @@ legacy flat scenarios and F2 precision markers retain their fixtures. Read
 physical policy and native/reference validation. Networking, persistence and
 volumetric terrain remain deferred.
 
+**Future canonical planet source contract:** [multi-seed planet identity](canonical-planet-generation.md) separates the versioned immutable planet definition (offline package now, matching backend catalog later), independent but **explicitly versioned interdependent** procedural domains (geology input → one authoritative terrain query; geology/biome inputs → optional resource distribution; visuals remain physically inert), mutable shared-world deltas and local renderer caches. Published fictional planets may change only via controlled migration; all real observed solid bodies freeze their physical surfaces from first authoritative real-scale publication, not from prototype fixtures. The present six-body terrain codecs and existing save/runtime seeds are not that future catalog; keep legacy invariants until the dedicated universe issues implement their replacement.
+
 ## Flight update and validation decisions (#197)
 
 Accepted review decisions **42 and 78** require deterministic bounded fixed ticks
@@ -337,14 +341,71 @@ Persistence `storage.rs` owns the two-generation verified storage protocol and
 native filesystem lease/adapter. Runtime `checkpoints.rs` composes whole-session
 restore, 60-second/event capture, bounded background IO, visible recovery/failure
 warnings and verified clean exit. See [canonical contract](save-contract.md#durable-active-run-366).
-Survival/death/restart/archive integration follows #371/#372/#374; no offline
+Survival/death/restart/archive integration is implemented by #371/#372; #374 owns
+Journey Ended presentation. No offline
 world simulation or multi-save UI is implied.
 
 ## Survival meters (#367)
 
 Portable meter/active-clock/offline-fatigue authority lives in
 [`salimon-survival`](../client/survival/architecture.md). Native/session persistence
-integration is #371; the current playable session does not yet advance survival.
+integration is implemented by #371; the playable session advances and saves survival.
 
 Damage, regeneration, treatment-only wound debt and data-driven timed/persistent/
 exposure status effects (#368) use the survival crate's [single pipeline](../client/survival/architecture.md#damage-and-status-pipeline-368).
+
+
+## Journey statistics (#372)
+
+Runtime `session/journey.rs` owns portable travel samples/counter and final named
+location; survival owns active duration and typed death cause. Schema-3 saves and
+version-2 death reports compose these with physical authority, without reading
+render-relative coordinates. Background occlusion/zero drawable keeps bounded
+simulation active. See the [canonical metric/save contract](save-contract.md#journey-statistics-372)
+and maintenance map for sources, frame policy and regression ownership.
+
+
+## Survival HUD (#373)
+
+Runtime `survival_hud.rs` owns typed observational mapping and presentation
+feedback/cache, with bounded raster/layout in `survival_hud/raster.rs`; `app.rs`
+owns H/[ / ] focus-safe dispatch and overlay priority. Survival's immutable
+`effect_snapshots` supplies captured rules/stacks/timers. Renderer exposes its
+existing fitted toolbar message band; existing inventory/equipment art is unchanged.
+See the [canonical HUD contract](../client/runtime/architecture.md#survival-hud-and-status-details-373).
+Tests cover actual consumables, exact penalties, visual timing/cache, all supported
+viewport/DPI layouts, full effect pagination and native input policy. #376 retains
+native visual signoff; #381/#377 extend the existing menu/wheel admission later.
+
+
+## Journey Ended (#374)
+
+Runtime `journey_ended.rs` + `journey_ended/raster.rs` own the report screen and
+physical pointer layout. `session/lifecycle.rs::ended_run` is shared with durable
+archives; `app.rs::restart_terminal` composes the existing verified restart for
+keyboard/mouse/native automation. Renderer only exposes its generic screen margin.
+See the [terminal contract](save-contract.md#journey-ended-presentation-374).
+Tests: `journey_ended/tests.rs`, native-host input/restart regressions and existing
+checkpoint/restart fault injection. Reference native visual/input acceptance is #376.
+
+Four-food definitions and continuous food modifiers are implemented by #378 in
+survival, with locked advanced recipes in fabrication. Native wheel input remains
+#377; no progression acquisition is implemented. See the
+[canonical food contract](../client/survival/architecture.md#four-food-catalog-378)
+for captured settings, active/offline clocks and exact drain arithmetic.
+
+Scout light zoning and reproducible native/offline cameras (#463) are defined in
+[Scout presentation](scout-presentation.md); CPU/Blender results do not grant native visual signoff.
+
+Scout audio (#465) is a runtime-only presentation adapter with bounded stereo
+PCM and shared optional OS playback, independent of run saves and all domain
+authority. [Soundscape contract](scout-presentation.md#soundscape-boundary-465)
+records spatial/mute/quiet-zone rules and the unverified native playback limits.
+
+Scout machinery (#464) uses a stateless runtime snapshot mapper and renderer-only
+normalized feedback, sharing authoritative power/progress with existing monitors
+and audio. It adds no gameplay controller or saved state. See the
+[feedback contract](scout-presentation.md#machinery-feedback-boundary-464).
+
+Pause saves (#382) use the existing worker/store and verified receipts; see
+[manual checkpoint contract](save-contract.md#pause-checkpoint-controls-382).

@@ -1,0 +1,13 @@
+{
+  "held_throttle_repeat": true,
+  "release_preserves_selection": true,
+  "held_yaw_changes_heading": true,
+  "released_yaw_stops": true,
+  "opposite_yaw_changes_heading": true,
+  "pitch_changes_heading": true,
+  "roll_changes_heading": true,
+  "native_reverse_motion": false,
+  "coasting_velocity_preserved": true,
+  "native_relative_mouse_changes_view": false,
+  "inverse_mouse_restores_view": true
+}

@@ -11,6 +11,6 @@
     ],
     "scale_factor": 1.0
   },
-  "follow_up": "https://github.com/mr-exception/salimon/issues/314",
+  "follow_up": "https://github.com/mr-exception/salimon/issues/477",
   "reason": "No human-approved images, masks or tolerances yet. Replace only in a separately reviewed baseline PR."
 }

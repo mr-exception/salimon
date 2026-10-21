@@ -4,6 +4,33 @@ use crate::{OutputCategory, OutputItem};
 pub const FOOD_SLOT_COUNT: usize = 3;
 pub const MEDICAL_SLOT_COUNT: usize = 2;
 
+/// Exact one-item slot selection; invalid numeric indexes never enter the domain.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ConsumableSlot {
+    FoodOne,
+    FoodTwo,
+    FoodThree,
+    MedicalOne,
+    MedicalTwo,
+}
+impl ConsumableSlot {
+    pub const ALL: [Self; 5] = [
+        Self::FoodOne,
+        Self::FoodTwo,
+        Self::FoodThree,
+        Self::MedicalOne,
+        Self::MedicalTwo,
+    ];
+    pub fn index(self) -> usize {
+        match self {
+            Self::FoodOne => 0,
+            Self::FoodTwo => 1,
+            Self::FoodThree => 2,
+            Self::MedicalOne => 3,
+            Self::MedicalTwo => 4,
+        }
+    }
+}
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum ConsumableCategory {
     Food,
@@ -25,6 +52,20 @@ pub struct ConsumableInventory {
 }
 
 impl ConsumableInventory {
+    pub fn item(&self, slot: ConsumableSlot) -> Option<&OutputItem> {
+        match slot.index() {
+            i @ 0..=2 => self.food[i].as_ref(),
+            i => self.medical[i - 3].as_ref(),
+        }
+    }
+    /// Consume precisely the chosen slot; never compact survivors or check vitals.
+    pub fn consume_slot(&mut self, slot: ConsumableSlot) -> Option<OutputItem> {
+        match slot.index() {
+            i @ 0..=2 => self.food[i].take(),
+            i => self.medical[i - 3].take(),
+        }
+    }
+
     /// Removes the first occupied matching slot, without shifting/stacking items.
     /// No health/hunger or future full-vitals gate participates in this phase.
     pub fn consume_first(&mut self, category: ConsumableCategory) -> Option<OutputItem> {

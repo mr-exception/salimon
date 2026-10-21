@@ -1,7 +1,9 @@
 //! Deterministic survival authority. Hosts supply admitted active durations and UTC
 //! samples; this crate never reads a clock, advances a world, or performs IO.
+pub mod consumables;
 pub mod effects;
 mod pipeline;
+pub mod restrictions;
 
 use salimon_persistence::{SaveError, Validate, invalid};
 use serde::{Deserialize, Serialize};
@@ -123,6 +125,8 @@ pub struct Survival {
     pipeline: effects::Pipeline,
     hunger: Points,
     fatigue: Points,
+    #[serde(default)]
+    fatigue_remainder: u16,
     health: Points,
     starvation_elapsed: Duration,
     active_time: Duration,
@@ -146,6 +150,7 @@ impl Survival {
             pipeline: Default::default(),
             hunger: Points::FULL,
             fatigue: Points::FULL,
+            fatigue_remainder: 0,
             health: Points::FULL,
             starvation_elapsed: Duration::ZERO,
             active_time: Duration::ZERO,
@@ -202,10 +207,17 @@ impl Survival {
             (elapsed_ns * u128::from(SCALE_SECONDS / self.config.hunger_full_seconds))
                 .min(u128::from(FULL)) as u64,
         );
-        self.fatigue.0 = self.fatigue.0.saturating_sub(
-            (elapsed_ns * u128::from(SCALE_SECONDS / self.config.fatigue_full_seconds))
-                .min(u128::from(FULL)) as u64,
-        );
+        let fatigue =
+            elapsed_ns * self.fatigue_rate_numerator() + u128::from(self.fatigue_remainder);
+        self.fatigue.0 = self
+            .fatigue
+            .0
+            .saturating_sub((fatigue / 10_000).min(u128::from(FULL)) as u64);
+        self.fatigue_remainder = if self.fatigue == Points::ZERO {
+            0
+        } else {
+            (fatigue % 10_000) as u16
+        };
         self.active_time = self.active_time.saturating_add(nanos(elapsed_ns));
     }
     /// Called once by a launch transaction, never on resume, pause, or saving.
@@ -239,6 +251,11 @@ impl Validate for Survival {
     fn validate(&self) -> Result<(), SaveError> {
         self.config.validate()?;
         self.pipeline.validate()?;
+        if self.fatigue_remainder >= 10_000
+            || (self.fatigue == Points::ZERO && self.fatigue_remainder != 0)
+        {
+            return Err(invalid("invalid fatigue drain remainder"));
+        }
         self.health.validate()?;
         if self.terminal != self.pipeline.death_cause.is_some()
             || self.pipeline.wounds.0 > FULL - self.health.0

@@ -50,7 +50,7 @@ impl CharacterController {
             scale(up, axis(input.jump, input.descend)),
         );
         let length = dot(movement, movement).sqrt().max(1.0);
-        self.eva_control_velocity = scale(movement, WALK_SPEED_METERS_PER_SECOND / length);
+        self.eva_control_velocity = scale(movement, self.walk_speed() / length);
         let proposed = ship.world_to_local(add(
             ship.local_to_world(previous),
             scale(self.eva_control_velocity, seconds),

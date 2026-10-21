@@ -1,0 +1,15 @@
+diff --git a/client/physics/src/lib.rs b/client/physics/src/lib.rs
+index 4ba5650..1ef9120 100644
+--- a/client/physics/src/lib.rs
++++ b/client/physics/src/lib.rs
+@@ -520,8 +520,8 @@ fn advance_impl<const PROFILE: bool>(
+             stats.contact_time += start.elapsed();
+         }
+         let pose_start = PROFILE.then(Instant::now);
+-        let linear_retention = LINEAR_RETENTION.powf(dt / DAMPING_REFERENCE_SECONDS);
+-        let angular_retention = ANGULAR_RETENTION.powf(dt / DAMPING_REFERENCE_SECONDS);
++        let linear_retention = LINEAR_RETENTION;
++        let angular_retention = ANGULAR_RETENTION;
+         let mut moved = false;
+         rotated.fill(false);
+         support_reactions.fill(false);

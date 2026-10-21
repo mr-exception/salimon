@@ -206,3 +206,7 @@ loading does not inject new recipes, unlocks, items or benefits into old saves.
 
 Native Q-wheel selection remains #377; these definitions use its existing exact
 slot/job/unit consumption transaction, with no new hotkeys or input flow.
+
+#384 supplies [portable balance evidence](../../docs/survival-balance.md) without
+changing the provisional food/modifier/restriction parameters. Explicit owner
+signoff and physical route difficulty review remain #496.

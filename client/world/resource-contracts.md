@@ -65,6 +65,8 @@ material does not perturb an existing material's seed. Changing parameters
 changes the returned input even though its seed stays fixed. The generation
 algorithm must use these parameters and its own documented deterministic sampler.
 
+**Future canonical multi-seed alignment (design only):** [planetary generation contract](../../docs/canonical-planet-generation.md) adds a published, independent **resources** seed domain for each future canonical planet, separate from terrain, geology, visuals and discoveries. The current `generation_inputs` world/body/material FNV-1a derivation and version-1 SplitMix64 sampling remain unchanged and deterministic; adding a domain root in a later generator must not silently reassign existing `DepositId`s or invalidate saved depletion journals. A complete resources definition includes domain seed, generator version, distribution/biome configuration, stable body/material keys and authored overrides. On-demand pseudorandom sampling from those canonical inputs is permitted, but new process/session seeds are not.
+
 Named `BiomeResourceOverride` lists replace the entire base resource list,
 including with an empty list. Unknown or absent biome keys fall back to base
 inputs and seeds; recognized biome keys partition seeds. Duplicate or empty/

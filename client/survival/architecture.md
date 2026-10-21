@@ -46,7 +46,10 @@ Basis points are bounded; amplification is source-specific. Commands and effects
 use the same pipeline as starvation. Ordinary healing/regen cannot fill the wound
 portion of missing health; treatment reduces that debt and heals. Regeneration
 adds one point every 60 eligible seconds (hunger >=70, fatigue >=50), retaining
-fractions while eligible and resetting the interval when eligibility is lost.
+fractions while eligible and resetting the interval at the first ineligible
+timestamp, before periodic food, later commands or checkpoint capture can restore
+eligibility. Exact hunger=70/fatigue=50 remains eligible; a broken interval never
+contributes credit to the next one.
 
 Advance splits at meter/regen/starvation/effect/expiry boundaries. At a shared
 timestamp: drain meters and advance timers; collect starvation and periodic damage;

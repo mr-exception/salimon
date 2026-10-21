@@ -292,7 +292,12 @@ impl Survival {
                     });
                 }
             }
-            if regen {
+            // Publish eligibility loss at this timestamp, before periodic food
+            // or a command following advance() can restore the meters. Otherwise
+            // a checkpoint/instant feed can retain credit from a broken interval.
+            if !self.regen_eligible() {
+                self.pipeline.regeneration = Duration::ZERO;
+            } else if regen {
                 self.pipeline.regeneration += delta;
             }
             for (id, a) in &mut self.pipeline.active {

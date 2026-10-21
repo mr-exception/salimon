@@ -641,9 +641,17 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
         std::array::from_fn::<_, 3, _>(|i| player_velocity[i] - ship.velocity_meters_per_second[i]);
     let (ground_entries, ground_hits, ground_misses) = crate::terrain::ground_cache_stats();
     let fabrication = app.fabrication_snapshot();
+    let machinery = crate::scout_feedback::capture(app, ship);
     let item = |item: &salimon_fabrication::OutputItem| json!({"recipe":item.recipe.key(), "job":item.job.0, "unit":item.unit, "mass_kg":item.mass.kg(), "category":format!("{:?}",item.category), "effect":app.consumable_effects.get(item.recipe.key())});
     json!({
         "paused": app.is_paused(),
+        "machinery": {
+            "thrust":machinery.thrust, "rudder":machinery.rudder,
+            "converting":machinery.converting, "core_charge":machinery.core_charge,
+            "fabricator":format!("{:?}",machinery.fabricator),
+            "fabrication_progress":machinery.fabrication_progress,
+            "phase":machinery.phase, "cockpit_active":machinery.cockpit_active,
+        },
         "fabricator": {
             "status":format!("{:?}",fabrication.status), "requested_watts":fabrication.requested_watts,
             "stored":fabrication.stored.iter().map(|bin| json!({"resource":bin.resource.key(),"milligrams":bin.milligrams})).collect::<Vec<_>>(),

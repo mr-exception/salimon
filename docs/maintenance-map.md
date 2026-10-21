@@ -218,3 +218,10 @@ and `scout_audio/tests.rs`; shared OS playback `native_audio.rs`; persisted mix
 controls remain in existing `condition_feedback/settings.rs`. See
 [soundscape contract/budgets](scout-presentation.md#soundscape-boundary-465).
 Do not duplicate #383 survival cues or simulate machinery in the audio adapter.
+
+Scout machinery feedback (#464): runtime `scout_feedback.rs`, `app.rs` mapping
+and `automation.rs` inspection; renderer `machinery.rs`, `ship_mesh.rs/.wgsl`.
+Tests include portable pause/restore/power/blocked/progress/yaw and opt-in
+`ship_feedback_tests.rs` production shader snapshots with raw timing evidence.
+See [feedback contract](scout-presentation.md#machinery-feedback-boundary-464);
+native walkthrough and budget acceptance remain #489.

@@ -107,3 +107,7 @@ wounds. Full meters allow consumption and wasted excess. Recipes, ingredients,
 production time/watts/mass and unlocks remain unchanged; advanced foods are #378.
 The [canonical recovery contract](../client/survival/architecture.md#consumable-recovery-definitions-370)
 owns validation, identity conflicts, exact continuation and offline freeze.
+
+### When can the native Metal candidates become approved baselines?
+
+The 2026-10-21 [#314 delivery](../reports/issue-314/README.md) contains scale-2 Apple M1 candidates, frozen-repeat checks and defect-injection evidence. Human image/mask/tolerance approval and a separate baseline promotion PR remain required; the scale-1 pending descriptor must be reconciled deliberately. True normal-play interpolation at available 60/75 Hz is also unrun: fixed-step E2E disables it, and external native input delivery failed. [#477](https://github.com/mr-exception/salimon/issues/477) owns these remaining decisions/checks, coordinating #453. Source issue closure grants no appearance or interpolation acceptance.

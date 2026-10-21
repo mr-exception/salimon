@@ -346,3 +346,8 @@ Scout soundscape (#465): Pause -> S opens preferences; M toggles master mute,
 B toggles ship sound and G cycles ship volume. A keeps its survival-cue meaning.
 Preferences survive new runs. See the [soundscape contract](../../docs/scout-presentation.md#soundscape-boundary-465)
 for spatial/quiet-zone behavior, optional OS playback and native-review limits.
+
+Survival onboarding: new runs show contextual objective guidance when the action
+band is free. H inspects survival details; hold Q and click a ration to consume;
+E at the Fabricator opens recipes/collects its tray; Escape shows checkpoint
+status. T skips the tutorial for this run. Progress and skip survive save/reload.

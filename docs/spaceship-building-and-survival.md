@@ -515,3 +515,10 @@ food definitions/unlocks #378. No recipe resource, mass or power policy changes.
 - **Future physical Jump Drive:** no disposable 'wrap cells' or separate fuel pool. Fabricator-built permanent module uses ordinary Core joules to displace the ship along its current forward vector while preserving inertial velocity, orientation and onboard contents; initial virtual velocity-gap N is **20% per light-second** and upgrades may lower N. Owner-authorized control panel has six separate light-distance fields (years/months/days/hours/minutes/seconds), live joule/charge preview and a **hard engines-on rejection**, even at zero throttle. The player and ship share a quantum-themed loading environment before arrival; no simulated elapsed years or free braking.
 - **Physical and lifecycle guards:** explicit engine-off state distinct from throttle; no active flight assist; validated safe destination and region readiness; atomic single-debit jump transaction; no spoiler/chart leakage; offline/restore and multiplayer passengers remain consistent. Departing from/arriving near planets is still a later owner decision.
 - **Balance must be measured:** at 100 t and rest, N20% requires **5.99584916 TJ for just 1 light-second**, versus the existing 60 GJ starter Core. The long-term galaxy-travel goal requires separately approved future economics/capacity/upgrade balancing; do not reduce N silently or claim this setup already plays well.
+
+### Implemented survival onboarding (#380)
+
+New runs guide survival details, Q consumption, Fabricator inspection/crafting/
+collection and pause-menu checkpoint status. T explicitly skips. Completed
+actions count out of order and progress/skip persist per run; no free supplies,
+auto-pause or timer immunity. See the [runtime contract](../client/runtime/architecture.md#persistent-survival-onboarding-380).

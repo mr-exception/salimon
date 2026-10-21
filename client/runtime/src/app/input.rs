@@ -176,6 +176,10 @@ pub(crate) fn dispatch_session_key(
         ));
         return;
     }
+    if pressed && key == PhysicalKey::Code(KeyCode::KeyT) {
+        session.command(Command::SkipTutorial);
+        return;
+    }
     if session.wheel.open {
         use crate::session::consumable_wheel::WheelAction as W;
         let action = match (key, pressed) {
@@ -230,6 +234,8 @@ pub(crate) fn dispatch_session_key(
         Some(Command::ToggleView)
     } else if session.view_mode != crate::session::ViewMode::Gameplay {
         camera_command(ElementState::Pressed, false, key, true).map(Command::Camera)
+    } else if key == PhysicalKey::Code(KeyCode::KeyH) {
+        Some(Command::InspectVitals)
     } else if key == PhysicalKey::Code(KeyCode::KeyE) {
         Some(Command::Interact)
     } else if key == PhysicalKey::Code(KeyCode::KeyL) {

@@ -35,6 +35,7 @@ impl GameplaySession {
             }
             let primary_down = self.wheel.primary_down;
             self.clear_held_controls();
+            self.tutorial.record(super::tutorial::Objective::Wheel);
             self.wheel = WheelState {
                 held: true,
                 open: true,

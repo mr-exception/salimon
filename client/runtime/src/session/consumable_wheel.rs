@@ -387,9 +387,10 @@ mod survival_integration_tests {
         let slot = ConsumableSlot::FoodOne;
         s.command(Command::Wheel(WheelAction::Hold(true)));
         s.command(Command::Wheel(WheelAction::Hover(Some(slot))));
-        let mut replacement = s.consumables.consume_slot(slot).unwrap();
-        replacement.job = salimon_fabrication::JobId(999);
+        let original = s.consumables.consume_slot(slot).unwrap();
+        let replacement = s.consumables.consume_slot(ConsumableSlot::FoodTwo).unwrap();
         s.consumables.insert(replacement).unwrap();
+        s.consumables.insert(original).unwrap();
         let before = s.save_bytes(1).unwrap();
         s.command(Command::Wheel(WheelAction::Confirm));
         assert_eq!(s.save_bytes(1).unwrap(), before);

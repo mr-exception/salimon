@@ -12,6 +12,32 @@ Native OS-input/DPI/appearance and reference-M1 checks remain unrun under existi
 failed before display startup because listening sockets were unavailable. No
 baseline images/masks or performance acceptance is promoted. Review #395 first.
 
+## Fresh cloud validation
+
+Linux x86_64, Rust/Cargo 1.99.1, 2026-10-21:
+
+- `cargo test -p salimon-client --locked wheel`: 11 passed.
+- `cargo test --workspace --locked`: 726 passed, 0 failed, 23 opt-in ignored.
+- `cargo clippy --workspace --all-targets --locked -- -D warnings`: passed.
+- `cargo build --workspace --locked`: passed.
+- `cargo fmt --all -- --check`: passed.
+- `python -m unittest discover -s scripts -p 'test_*.py'`: 95 passed.
+- Added relative Markdown links and changed-file diff checks: passed.
+
+Coverage includes real ration/medkit effects, full-meter waste, zero-fatigue use,
+stale identity/unknown effect rejection, pause/death/reload cancellation, focus,
+pre-held mouse/no click-through, continued flight/vital time, keyboard fallback,
+real durable restore and mined-resource/save-to-Q scenarios. Renderer CPU tests
+cover all five sectors, fit/hit parity at multiple sizes, invalid pointers,
+art/labels and cache behavior; they are not native screenshots or M1 signoff.
+
+The first stale-selection fixture failed because its invented job ID violated
+the allocator high-water mark. The corrected fixture swaps two actual allocated
+starter items. The regression and complete final suite pass with valid state.
+
+Review/merge pause-save PR #395 before this PR. This PR closes #377 on merge;
+remaining native Q/pause/consumable acceptance stays explicitly under #376.
+
 The dated draft report below is historical; its open prerequisites and placeholder
 NO ACTIVE EFFECT presentation no longer describe the integrated code.
 

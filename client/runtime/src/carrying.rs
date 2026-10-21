@@ -624,7 +624,8 @@ mod mass_tests {
         sync_ship_mass(&mut tool, moved, &mut ship);
         assert_eq!(ship.snapshot().total_mass_kg, 101_000.0);
         assert!(
-            (ship.snapshot().velocity_meters_per_second[0] - (12.0 + 4e6 / 101000.0)).abs() < 1e-10
+            (ship.snapshot().velocity_meters_per_second[0] - (12.0 + 100e6 / 101000.0)).abs()
+                < 1e-10
         );
         assert!(tool.session.pick_up(id));
         assert_eq!(

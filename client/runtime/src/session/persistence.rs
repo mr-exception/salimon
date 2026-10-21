@@ -221,7 +221,8 @@ impl GameplaySession {
     /// Decode, validate and reconstruct in isolation, then publish exactly once.
     /// Native focus/capture and filesystem scheduling remain shell-owned (#366).
     pub(crate) fn restore_bytes(&mut self, bytes: &[u8]) -> Result<(), SaveError> {
-        let save = salimon_persistence::SaveGame::<SessionState>::decode(bytes)?;
+        let migrated = migrate_propulsion(bytes)?;
+        let save = salimon_persistence::SaveGame::<SessionState>::decode(&migrated)?;
         let mut survival = match (save.schema_version, save.state.survival) {
             (1, None) => SurvivalState {
                 vitals: Default::default(),
@@ -229,7 +230,7 @@ impl GameplaySession {
                 restrictions: Default::default(),
                 run: Default::default(),
             },
-            (2..=4, Some(state)) => state,
+            (2..=5, Some(state)) => state,
             _ => return Err(invalid("survival payload does not match envelope version")),
         };
         if save.schema_version == 2 {
@@ -241,9 +242,9 @@ impl GameplaySession {
         }
         survival.validate()?;
         let tutorial = match (save.schema_version, save.state.tutorial) {
-            (4, Some(tutorial)) => tutorial,
+            (4 | 5, Some(tutorial)) => tutorial,
             (1..=3, _) => super::tutorial::Tutorial::dismissed(),
-            _ => return Err(invalid("schema-4 tutorial source missing")),
+            _ => return Err(invalid("tutorial source missing for save schema")),
         };
         let (fabricator, consumables) = save.state.fabrication.restore()?;
         let physical = save.state.physical.restore()?;
@@ -282,6 +283,55 @@ impl GameplaySession {
         *self = restored;
         Ok(())
     }
+}
+
+/// v1-v4 force capacities are deliberately superseded, not converted into an
+/// arbitrary coefficient. Preserve energy, velocity and all other source state.
+fn migrate_propulsion(bytes: &[u8]) -> Result<Vec<u8>, SaveError> {
+    if bytes.len() > salimon_persistence::MAX_SAVE_BYTES {
+        return Err(invalid("save exceeds size limit"));
+    }
+    #[derive(serde::Deserialize)]
+    struct Header {
+        schema_version: u32,
+    }
+    let version = serde_json::from_slice::<Header>(bytes)
+        .map_err(|e| SaveError::Encoding(e.to_string()))?
+        .schema_version;
+    if !(1..=salimon_persistence::SCHEMA_VERSION).contains(&version) {
+        return Err(SaveError::UnsupportedVersion(version));
+    }
+    if version == salimon_persistence::SCHEMA_VERSION {
+        // Preserve typed decoding's duplicate-field rejection, and avoid a
+        // full DOM/reserialization pass for ordinary current-schema restores.
+        return Ok(bytes.to_vec());
+    }
+    let mut value: serde_json::Value =
+        serde_json::from_slice(bytes).map_err(|e| SaveError::Encoding(e.to_string()))?;
+    if version <= 4 {
+        let ship = value["state"]["physical"]["ship"]
+            .as_object_mut()
+            .ok_or_else(|| invalid("legacy ship source missing"))?;
+        ship.entry("engines_enabled").or_insert(true.into());
+        let p = ship
+            .get_mut("propulsion")
+            .and_then(serde_json::Value::as_object_mut)
+            .ok_or_else(|| invalid("legacy propulsion missing"))?;
+        if p.contains_key("forward_force_newtons") || p.contains_key("reverse_force_newtons") {
+            for key in ["forward_force_newtons", "reverse_force_newtons"] {
+                if !p
+                    .get(key)
+                    .and_then(serde_json::Value::as_f64)
+                    .is_some_and(|v| v.is_finite() && v >= 0.0)
+                {
+                    return Err(invalid("legacy force configuration"));
+                }
+                p.remove(key);
+            }
+            p.insert("impulse_ns_per_joule".into(), 1.0.into());
+        }
+    }
+    serde_json::to_vec(&value).map_err(|e| SaveError::Encoding(e.to_string()))
 }
 
 #[cfg(test)]
@@ -498,7 +548,7 @@ impl GameplaySession {
         serde_json::to_vec(&(self.mining.session.fragments().len(), self.mining.session.fragments().last().map(|f| f.id()), self.mining.session.attached_sphere_id(), self.mining.session.carried_id(),
             ship.flight_state, ship.door_state, ship.power_available,
             machine.stored, jobs, machine.tray, &self.consumables, &self.equipment,
-            self.survival.snapshot().terminal, self.survival.active_effects().map(|(id,stacks,_)|(id,stacks)).collect::<Vec<_>>(),self.run.serial, &self.tutorial))
+            self.survival.snapshot().terminal, self.survival.active_effects().map(|(id,stacks,_)|(id,stacks)).collect::<Vec<_>>(),(self.run.serial, ship.engines_enabled), &self.tutorial))
             .expect("discrete checkpoint events contain only serializable finite identities and integer quantities")
     }
 }

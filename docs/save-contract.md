@@ -1,4 +1,4 @@
-# Canonical whole-game save contract (schema 4)
+# Canonical whole-game save contract (schema 5)
 
 > This is the **current compressed-world runtime save schema**. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. Under the approved policy, future fictional-planet upgrades require explicit versioned save/world-delta migration, preservation or validated remapping of physical anchors, and recoverable failure handling; scientific terrain detail on **any published real observed solid body** may not displace saved positions after its first authoritative real-scale surface publication. Future fictional-planet changes to geology/biome-dependent resource layouts likewise require explicit stable-ID, depletion and positional migration; the historical compressed prototype does not establish the real-body surface freeze. This note does not modify schema 3 or imply backend multiplayer exists.
 
@@ -302,9 +302,9 @@ Terminal archives/restart and 60-second/event autosaves retain their owners.
 No manual request ticks gameplay or credits offline fatigue. Native OS-input,
 DPI/appearance and M1 signoff remain separately tracked by #376.
 
-## Future Jump Drive, Core-impulse and shared-clock save additions (NOT schema 3)
+## Future Jump Drive and shared-clock save additions
 
-The [approved future travel contract](jump-drive-and-interstellar-travel.md) uses one 1:1 real-world universe clock for every online/offline player, **no relativistic time dilation**, ordinary powered flight plus real-time engine-off coasting, and an owner-triggered Core-powered Jump Drive. The future engine change (#493) must maintain deterministic impulse from **actually funded joules** (1 N·s/J baseline) over exact power/clock boundaries without adding a second kinetic-energy charge. These are **not implemented by existing schema 3**.
+The [approved future travel contract](jump-drive-and-interstellar-travel.md) uses one 1:1 real-world universe clock for every online/offline player, **no relativistic time dilation**, ordinary powered flight plus real-time engine-off coasting, and an owner-triggered Core-powered Jump Drive. The engine change (#493) now maintains deterministic impulse from **actually funded joules** (1 N·s/J baseline) over exact power/clock boundaries without adding a second kinetic-energy charge. The engine switch/coefficient are implemented in schema 5; Jump Drive and shared-world clock fields are still future.
 
 A later, explicitly versioned save/online server model must include the installed Jump Drive identity/revision, parameter N (initial **20%**), effective impulse coefficient, physically mounted/upgrade parts, true engine on/off state **distinct from selected throttle**, position/orientation/velocity frame+epoch, and sufficiently precise Core amounts. Pending quantum transitions require stable idempotency transaction IDs, captured pre-jump position, mass, velocity, heading, six-field normalized light-second distance, quoted/reserved energy, validated target state and passenger/cargo identities. On recovery **commit exactly once or roll back/refund exactly once**; never duplicate an owner ship or charge twice. Do not let an unverified position materialize or let quantum staging create an alternate time line.
 
@@ -319,3 +319,14 @@ Missing/unknown objective state rejects before publication. UI/input/cache remai
 transient; only durable progress/skip participates in discrete checkpoint events.
 Verified death restart resets onboarding through `new_run`. The existing
 physical/Fabricator/survival/journey migrations and storage guarantees remain.
+
+## Funded-impulse engine migration and schema 5 (#493)
+
+Schema 5 requires physical ship `engines_enabled` and propulsion
+`impulse_ns_per_joule`. Runtime migrates valid versions 1–4 before typed domain
+decode: validate and retire both legacy force capacities, install coefficient 1
+and default legacy engine-on, preserving velocity, energy, physical cargo and
+all other state. Current-schema missing/retired/unknown fields reject atomically.
+Tutorial schema-4 progress remains required for v4/v5; earlier tutorial migration
+stays dismissed. No inventory/resource grant or simulation tick occurs on restore.
+The switch participates in discrete checkpoint events; held B/keys are transient.

@@ -171,3 +171,7 @@ stride 76 bytes. Named role tags cannot animate structural supports, hull, ramp
 or colliders. Electrical cues obey explicit bus state; tray output remains
 independent of power. The original #463 layout statement above describes its
 foundation; #464 extends that layout.
+
+Engine ON/OFF observation (#493) is independent of selected throttle and Core
+blackout. A switch change invalidates the cockpit flight display cache without
+mutating gameplay; native appearance acceptance remains #498.

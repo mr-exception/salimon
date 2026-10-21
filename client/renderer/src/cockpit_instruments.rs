@@ -12,6 +12,7 @@ pub(crate) const ATLAS_HEIGHT: u32 = 256;
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct CockpitInstruments {
     pub power_off: bool,
+    pub engines_off: bool,
     /// Observation only: idle, working, no power, or blocked tray.
     pub fabricator: FabricatorInstruments,
     pub speed_meters_per_second: f64,
@@ -277,6 +278,7 @@ impl SpeedDisplay {
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct DisplayKey {
     power_off: bool,
+    engines_off: bool,
     fabricator: FabricatorInstruments,
     speed: SpeedDisplay,
     power: i8,
@@ -309,6 +311,7 @@ impl InstrumentAtlas {
             fabricator: values.fabricator,
             speed: SpeedDisplay::from_meters_per_second(values.speed_meters_per_second),
             power: values.thruster_percentage.clamp(-100, 100),
+            engines_off: values.engines_off,
             core_capacity: EnergyDisplay::from_joules(values.core_energy_capacity_joules),
             core_stored: EnergyDisplay::from_joules(values.core_energy_stored_joules),
             nearby: values.nearby_body.map(NearbyDisplay::from_instruments),
@@ -339,9 +342,10 @@ impl InstrumentAtlas {
             previous.power_off
                 || previous.speed != next.speed
                 || previous.power != next.power
+                || previous.engines_off != next.engines_off
                 || previous.navigation.flight != next.navigation.flight
         }) {
-            self.draw_speed(next.speed, next.power, &next.navigation);
+            self.draw_speed(next.speed, next.power, next.engines_off, &next.navigation);
         }
         if self.displayed.as_ref().is_none_or(|previous| {
             previous.power_off
@@ -460,11 +464,26 @@ impl InstrumentAtlas {
         );
     }
 
-    fn draw_speed(&mut self, speed: SpeedDisplay, percentage: i8, nav: &NavigationDisplay) {
+    fn draw_speed(
+        &mut self,
+        speed: SpeedDisplay,
+        percentage: i8,
+        engines_off: bool,
+        nav: &NavigationDisplay,
+    ) {
         self.section_frame(0, "INERTIAL FLIGHT");
         let (number, unit, color) = speed_text(speed);
         self.text(28, 66, &format!("{number} {unit}"), 4, color);
-        self.text(28, 112, &format!("THROTTLE {percentage}%"), 3, CYAN);
+        self.text(
+            28,
+            112,
+            &format!(
+                "{percentage}% / ENG {} [B]",
+                if engines_off { "OFF" } else { "ON" }
+            ),
+            3,
+            CYAN,
+        );
         for (i, row) in nav.flight.iter().enumerate() {
             self.text(28, 153 + i as u32 * 28, row, 2, IVORY);
         }
@@ -1106,5 +1125,21 @@ mod navigation_display_tests {
         {
             assert!(row.len() <= 38);
         }
+    }
+    #[test]
+    fn engine_off_is_distinct_at_zero_throttle_and_invalidates_the_flight_region() {
+        let mut atlas = InstrumentAtlas::new();
+        let on = CockpitInstruments::default();
+        assert!(atlas.update(on));
+        let before = atlas.pixels.clone();
+        let off = CockpitInstruments {
+            engines_off: true,
+            ..on
+        };
+        assert!(atlas.update(off));
+        assert_ne!(atlas.pixels, before);
+        assert!(!atlas.update(off));
+        assert!(atlas.update(on));
+        assert_eq!(atlas.pixels, before);
     }
 }

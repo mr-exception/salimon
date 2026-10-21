@@ -114,3 +114,10 @@ Portable balance evidence is [documented](survival-balance.md). Proposed comfort
 360-second and break-even 720-second one-ration budgets await explicit owner
 approval in #496. Physical routes/subjective native timing remain unmeasured;
 current non-Earth profiles have no biomass. Approved meter durations are unchanged.
+
+## Engine handling after impulse migration (#493 / #498)
+
+The approved 1 N·s/J and 100/50 MW imply 1000/500 m/s² dry acceleration.
+The 20m/s landing gate, stationary assist handoff and 60GJ capacity remain.
+Portable tests reconcile numerical behavior; native handling/readability review
+remains #498. Jump Drive N=20% capacity/progression balance stays future, unchanged.

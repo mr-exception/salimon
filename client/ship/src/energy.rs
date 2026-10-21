@@ -50,7 +50,7 @@ impl EnergyConfig {
         }
         Ok(self)
     }
-    pub fn demand_watts(self, throttle: i8, free_flight: bool) -> f64 {
+    pub fn propulsion_watts(self, throttle: i8, free_flight: bool) -> f64 {
         let fraction = if free_flight {
             f64::from(throttle.clamp(-100, 100)).abs() / 100.0
         } else {
@@ -61,7 +61,12 @@ impl EnergyConfig {
         } else {
             self.forward_watts
         };
-        fraction * propulsion + self.gravity_idle_watts + self.cockpit_idle_watts
+        fraction * propulsion
+    }
+    pub fn demand_watts(self, throttle: i8, free_flight: bool) -> f64 {
+        self.propulsion_watts(throttle, free_flight)
+            + self.gravity_idle_watts
+            + self.cockpit_idle_watts
     }
 }
 

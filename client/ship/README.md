@@ -13,8 +13,9 @@ in flight` message. No pressure or survival simulation is implemented.
 Leaving the cockpit changes only control authority. A flying ship keeps its pose,
 orientation, selected thruster percentage, and inertial motion. Steering
 ramps on/off over 0.12 seconds and settles at 5 degrees/second; this smoothing is
-presentation feel, not inertia. Throttle selection is signed −100..+100%; force divided by cached total mass
-accelerates persistent world-space velocity. Zero throttle coasts. Up/Down
+presentation feel, not inertia. Throttle selection is signed −100..+100%; funded
+Core propulsion energy gives impulse at 1 N·s/J, divided by cached total mass
+to change persistent world-space velocity. Zero throttle coasts. Up/Down
 presses change one point and repeat every 100 ms held, independently of OS repeats.
 The runtime supplies typed held edges; only powered cockpit free flight accepts
 changes. Exit clears holds while preserving selection; landing/collision resets it. `L` starts an uncancellable automatic landing at the current approach
@@ -63,3 +64,8 @@ take off directly. See [safe recovery](architecture.md#safe-assisted-landing-and
 and [navigation](architecture.md#vector-navigation-and-braking-193).
 Future propulsion/landing upgrades and additional module power loads are OUT OF
 SCOPE; configuration APIs do not implement a progression system.
+
+B explicitly toggles engines while powered/seated outside an active assist. Engine
+off coasts with idle loads, preserves throttle and survives save/reload/blackout.
+Default dry acceleration is 1000/500 m/s² forward/reverse at 100/50 MW; landing
+still requires <=20 m/s. See [math and assist reconciliation](architecture.md#funded-core-impulse-and-engine-switch-493).

@@ -148,9 +148,11 @@ containers or backend persistence. Physical fragments now contribute to cached s
 
 ## Implemented starter flight (#201)
 
-The 100,000 kg dry hull has 4 MN forward and 2 MN reverse force capacity.
-World-space momentum persists independently of orientation; zero throttle
-coasts. Acceleration is force divided by cached total mass. Steering remains
+The 100,000 kg dry hull now uses the #493 fictional funded-energy law: 1 J of
+propulsion allocation gives 1 N·s impulse. At default 100/50 MW forward/reverse,
+this yields 100/50 MN and 1000/500 m/s². World-space momentum persists independently
+of orientation; zero throttle coasts. Acceleration uses configured watts, the
+impulse coefficient and cached total mass. Steering remains
 5°/s with its existing presentation ramp. There is no drag, speed cap or
 planetary gravity in this flight wave. Core energy now gates free-flight force and cockpit/artificial-gravity power.
 
@@ -266,9 +268,9 @@ owns timing, validation and implementation boundaries.
   Intake accepts one process at a time and keeps processing at full charge,
   wasting excess. EVA inherits velocity once at exit; later ship acceleration
   does not tow the player.
-- **37–41, 43–48:** Starter hull is 100 tonnes; 4 MN forward gives 40 m/s² dry,
-  with 2 MN reverse. Watt demand and resource J/kg are configuration, not physics
-  constants. Forward draw is 100 MW and reverse 50 MW; battery capacity is 60 GJ,
+- **37–41, 43–48:** Starter hull is 100 tonnes. Historical 4/2 MN capacities are
+  superseded by #493: 1 N·s/J from funded Core propulsion gives 100/50 MN and
+  1000/500 m/s² dry. Watt demand and resource J/kg remain configuration. Forward draw is 100 MW and reverse 50 MW; battery capacity is 60 GJ,
   initially 75% (45 GJ). Ten minutes at full charge/max forward is a rough tuning
   estimate excluding idle, not guaranteed endurance. Thrusters, assistance,
   artificial gravity and cockpit consume power. Accepted fragments become energy
@@ -352,10 +354,12 @@ unchanged at 0.15R and ≤20 m/s. The six-second uncancellable assist, orientati
 door interlock, cockpit-exit continuation and isolated energy reservation remain.
 The cockpit explicitly says flight controls are locked while takeoff runs.
 
-Starter dry/cargo propulsion remains 4 MN forward, 2 MN reverse at 100,000 kg
-plus physical cargo. With 1,000 × 10 kg fragments, 110,000 kg gives 36.36 m/s²
-forward and 18.18 m/s² reverse, sufficient after a stationary handoff. Doubling
-mass gives 20/10 m/s². No force or Core upgrade is justified by this defect.
+#493 supersedes the historical 4/2 MN free-flight tuning. At 100/50 MW and
+1 N·s/J, 110,000 kg (1,000 × 10 kg cargo) gives about 909.09/454.55 m/s²;
+doubled dry mass gives 500/250 m/s². The unchanged stationary assist handoff
+avoids an automatic thrust jump; manual control must account for the higher
+acceleration. Native handling review is #498; no Core capacity increase or
+change to approved impulse math is silently introduced.
 Core capacity/initial charge remain 60/45 GJ, full engine draws 100/50 MW,
 and takeoff still reserves 600 MJ up front plus ordinary 110 kW idle demand
 (600.66 MJ total over six seconds at starter tuning). Assisted paths remain
@@ -510,7 +514,7 @@ food definitions/unlocks #378. No recipe resource, mass or power policy changes.
 
 **Documentation only; neither engine conversion nor Jump Drive is shipped.** The full authoritative [shared-time, engine conversion and Jump Drive design](jump-drive-and-interstellar-travel.md) supersedes future-design assumptions that ordinary FTL is prohibited, while leaving the implemented October 14 ship/energy and October 19 Fabricator values above untouched **until separately implemented**.
 
-- **Future ordinary engines, issue #493:** fund thrust directly by Core impulse: 1 J actual propulsion draw = 1 N·s of impulse (baseline coefficient 1 N·s/J). Changed velocity = impulse/current physical ship mass, directed along current signed ship thrust axis. Continuous power gives force = watts * 1 N·s/J. This is an intentional fictional efficiency, **not** a physical equivalence between energy and force. Do not charge kinetic-energy difference on top of Core watts. Implementation must reconcile legacy 4 MN at 100 MW/2 MN at 50 MW, landing assistants, power-off/throttle-state behavior and tests.
+- **Implemented ordinary engines, issue #493:** fund thrust directly by Core impulse: 1 J actual propulsion draw = 1 N·s of impulse (baseline coefficient 1 N·s/J). Changed velocity = impulse/current physical ship mass, directed along current signed ship thrust axis. Continuous power gives force = watts * 1 N·s/J. This is an intentional fictional efficiency, **not** a physical equivalence between energy and force. Do not charge kinetic-energy difference on top of Core watts. Legacy independent 4/2 MN capacities are removed. B controls durable engine on/off; power-funded substeps, telemetry, all-body assist/handoff and collision regressions implement the reconciliation. Native handling remains #498.
 - **Sub-light and offline voyages:** prepare reserves, accelerate with thrusters, coast for real-world weeks/months while offline (engines off), and log in optionally to service machinery, use the Fabricator, recover Archive records and check navigation. Braking is not supplied by a jump. The universe clock is shared 1:1 by all players; no time dilation. Whether continuous thrusters can deliberately move at or above light speed is still undecided.
 - **Future physical Jump Drive:** no disposable 'wrap cells' or separate fuel pool. Fabricator-built permanent module uses ordinary Core joules to displace the ship along its current forward vector while preserving inertial velocity, orientation and onboard contents; initial virtual velocity-gap N is **20% per light-second** and upgrades may lower N. Owner-authorized control panel has six separate light-distance fields (years/months/days/hours/minutes/seconds), live joule/charge preview and a **hard engines-on rejection**, even at zero throttle. The player and ship share a quantum-themed loading environment before arrival; no simulated elapsed years or free braking.
 - **Physical and lifecycle guards:** explicit engine-off state distinct from throttle; no active flight assist; validated safe destination and region readiness; atomic single-debit jump transaction; no spoiler/chart leakage; offline/restore and multiplayer passengers remain consistent. Departing from/arriving near planets is still a later owner decision.

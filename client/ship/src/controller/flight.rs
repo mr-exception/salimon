@@ -6,28 +6,36 @@ use salimon_math::{add, scale};
 use std::time::Duration;
 
 impl ShipController {
-    pub(super) fn advance_powered_flight(&mut self, delta: Duration, powered_seconds: f64) {
+    pub(super) fn advance_powered_flight(
+        &mut self,
+        delta: Duration,
+        powered_seconds: f64,
+        signed_funded_joules: f64,
+    ) {
         let start = self.pose.position_meters;
         let velocity = self.velocity;
-        self.integrate_thrust(powered_seconds, self.thruster_percentage);
-        self.integrate_thrust((delta.as_secs_f64() - powered_seconds).max(0.0), 0);
+        self.integrate_thrust(powered_seconds, signed_funded_joules);
+        self.integrate_thrust((delta.as_secs_f64() - powered_seconds).max(0.0), 0.0);
         self.sweep_contact(start, self.pose.position_meters, velocity, delta);
     }
 
-    fn integrate_thrust(&mut self, seconds: f64, throttle: i8) {
-        let acceleration = scale(
+    fn integrate_thrust(&mut self, seconds: f64, signed_funded_joules: f64) {
+        if seconds <= 0.0 {
+            return;
+        }
+        let delta_velocity = scale(
             self.pose.axes()[0],
             self.propulsion
-                .acceleration_meters_per_second_squared(throttle),
+                .delta_velocity_meters_per_second(signed_funded_joules),
         );
         self.pose.position_meters = add(
             self.pose.position_meters,
             add(
                 scale(self.velocity, seconds),
-                scale(acceleration, 0.5 * seconds * seconds),
+                scale(delta_velocity, 0.5 * seconds),
             ),
         );
-        self.velocity = add(self.velocity, scale(acceleration, seconds));
+        self.velocity = add(self.velocity, delta_velocity);
     }
 
     #[must_use]
@@ -184,21 +192,21 @@ mod inertial_tests {
         forward.advance(Duration::from_secs(1));
         assert_eq!(
             forward.snapshot().velocity_meters_per_second,
-            [40.0, 0.0, 0.0]
+            [1000.0, 0.0, 0.0]
         );
-        assert_eq!(forward.snapshot().pose.position_meters, [20.0, 0.0, 0.0]);
+        assert_eq!(forward.snapshot().pose.position_meters, [500.0, 0.0, 0.0]);
         let mut reverse = ship(0, [0.0; 3]);
-        reverse.integrate_thrust(1.0, -100);
+        reverse.integrate_thrust(1.0, -50_000_000.0);
         assert_eq!(
             reverse.snapshot().velocity_meters_per_second,
-            [-20.0, 0.0, 0.0]
+            [-500.0, 0.0, 0.0]
         );
-        assert_eq!(reverse.snapshot().pose.position_meters, [-10.0, 0.0, 0.0]);
-        forward.set_propulsion(Propulsion::new(200_000.0, 4_000_000.0, 2_000_000.0).unwrap());
+        assert_eq!(reverse.snapshot().pose.position_meters, [-250.0, 0.0, 0.0]);
+        forward.set_propulsion(Propulsion::new(200_000.0, 1.0).unwrap());
         forward.advance(Duration::from_secs(1));
         assert_eq!(
             forward.snapshot().velocity_meters_per_second,
-            [60.0, 0.0, 0.0]
+            [1500.0, 0.0, 0.0]
         );
         assert_eq!(forward.snapshot().total_mass_kg, 200_000.0);
     }
@@ -257,11 +265,17 @@ mod energy_flight_tests {
         ship.advance_with_core_input(Duration::from_secs(1), 100.0)
             .unwrap();
         assert_eq!(ship.snapshot().energy_core.stored_joules, 100);
-        assert_eq!(ship.snapshot().velocity_meters_per_second, [40.0, 0.0, 0.0]);
+        assert_eq!(
+            ship.snapshot().velocity_meters_per_second,
+            [0.001, 0.0, 0.0]
+        );
         ship.set_stored_core_energy_joules(0);
         ship.advance_with_core_input(Duration::from_secs(1), 50.0)
             .unwrap();
-        assert_eq!(ship.snapshot().velocity_meters_per_second, [60.0, 0.0, 0.0]);
+        assert_eq!(
+            ship.snapshot().velocity_meters_per_second,
+            [0.0015, 0.0, 0.0]
+        );
         assert_eq!(ship.snapshot().energy_core.stored_joules, 0);
         let before = ship.snapshot();
         assert!(
@@ -301,9 +315,9 @@ mod energy_flight_tests {
         let state = ship.snapshot();
         assert!(!state.power_available);
         assert_eq!(state.thruster_percentage, 100);
-        assert_eq!(state.velocity_meters_per_second, [30.0, 0.0, 0.0]);
-        assert_eq!(state.pose.position_meters, [25.0, 0.0, 0.0]);
-        assert!((split.snapshot().pose.position_meters[0] - 25.0).abs() < 1e-10);
+        assert_eq!(state.velocity_meters_per_second, [10.0005, 0.0, 0.0]);
+        assert_eq!(state.pose.position_meters, [10.000375, 0.0, 0.0]);
+        assert!((split.snapshot().pose.position_meters[0] - 10.000375).abs() < 1e-10);
         assert!(!ship.adjust_thruster(-100));
         ship.set_steering_input(SteeringInput {
             yaw: 1.0,
@@ -318,7 +332,12 @@ mod energy_flight_tests {
         ship.exchange_core_energy_joules(100.0, 0.0).unwrap();
         assert!(ship.snapshot().power_available);
         ship.advance(Duration::from_millis(500));
-        assert_eq!(ship.snapshot().velocity_meters_per_second, [50.0, 0.0, 0.0]);
+        // Two finite-energy additions differ from the decimal literal by one ULP.
+        assert!((ship.snapshot().velocity_meters_per_second[0] - 10.001).abs() < 1e-12);
+        assert_eq!(
+            &ship.snapshot().velocity_meters_per_second[1..],
+            &[0.0, 0.0]
+        );
         assert_eq!(ship.snapshot().energy_core.stored_joules, 50);
     }
 }

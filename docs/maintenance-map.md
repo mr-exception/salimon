@@ -248,3 +248,9 @@ existing native admission regressions. See the [onboarding contract](../client/r
 Survival balance #384: runtime `src/survival_balance.rs` owns six bounded portable
 scenarios and opt-in JSON reports. See [evidence and assumptions](survival-balance.md);
 owner/native route and tuning acceptance remains #496.
+
+Funded impulse #493: ship `propulsion.rs`, `energy.rs`, controller flight/throttle/
+telemetry/assist/persistence; runtime session/native B, schema migration, scene,
+audio/machinery mapping; renderer cockpit atlas. Tests: ship `impulse_tests.rs`,
+runtime `session/propulsion_tests.rs`, input/cache and inertial/landing scenarios.
+See [current math](../client/ship/architecture.md#funded-core-impulse-and-engine-switch-493); native review #498.

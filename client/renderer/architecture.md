@@ -416,3 +416,10 @@ existing reviewed baseline images are never automatically replaced.
 vertex stride is 76 bytes; its uniform is now 192 bytes. Power, role, progress,
 charge, ramped rudder and active phase drive the existing shader/draws without
 new geometry or gameplay dependencies. See the [canonical feedback contract](../../docs/scout-presentation.md#machinery-feedback-boundary-464).
+
+## Engine switch instrument (#493)
+
+`CockpitInstruments::engines_off` is a renderer-neutral observation. The existing
+throttle row shows signed selection plus ENG ON/OFF and B hint. Its display cache
+invalidates the flight region when the switch changes even at zero throttle;
+Core blackout still blanks physical displays. Native readability review is #498.

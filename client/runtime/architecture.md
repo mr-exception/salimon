@@ -583,7 +583,7 @@ is idempotent; handling and storage do not add another identity. Installed
 components can use the same ledger; the current asset has no separately defined
 installed-equipment masses beyond dry hull. No inventory/container implementation
 or invented component weights is added. `reconciles` is an explicit diagnostic,
-not flight work. `set_total_mass_kg` preserves force capacities and velocity.
+not flight work. `set_total_mass_kg` preserves the impulse coefficient and velocity.
 
 World coalesces creation/growth, pickup, carried/loose pose changes and physical
 removal into an ordered mutation journal. `remove_fragment` is the future Core
@@ -1275,3 +1275,11 @@ mining, carrying, E/Q transactions, funded crafting, save/lifecycle and EVA rout
 Travel/setup are explicit time budgets with stage fixture placements; see the
 [canonical evidence/limitations](../../docs/survival-balance.md). Native and owner
 budget/tuning approval remain #496; no production constants change.
+
+## Funded engine composition (#493)
+
+`session` maps B to the ship-owned engine switch; native/protocol input share
+focus/modal/pilot/power gates. Scene mapping passes ON/OFF, actual acceleration
+and braking to the existing cockpit instruments. Audio/machinery suppress drive
+feedback while explicitly off. Schema 5 migration is in `session/persistence.rs`;
+see the [ship math/safety contract](../ship/architecture.md#funded-core-impulse-and-engine-switch-493).

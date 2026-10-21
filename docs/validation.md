@@ -158,3 +158,8 @@ Use the canonical [terrain validation guide](terrain-validation.md) for the
 capture, budgets/tolerances and reference measurements. Keep native Metal and
 software Vulkan evidence separate. Direct GPU capture verifies actual rendered
 pixels; it does not certify OS input or a visible display FPS floor.
+
+Tutorial #380: `cargo test -p salimon-client session::tutorial --locked` checks
+early actions, exact item use, skip/reload, legacy migration, restart and bounded
+prompt raster. Run workspace tests/build/Clippy/fmt for schema changes. Native
+DPI, prompt priority and full interaction walkthrough remain #376.

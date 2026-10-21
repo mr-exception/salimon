@@ -158,6 +158,8 @@ pub(crate) struct SessionState {
     fabrication: salimon_fabrication::FabricationSaveState,
     equipment: crate::equipment::EquipmentToolbar,
     #[serde(default)]
+    tutorial: Option<super::tutorial::Tutorial>,
+    #[serde(default)]
     survival: Option<SurvivalState>,
 }
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -179,6 +181,9 @@ impl Validate for SurvivalState {
 impl Validate for SessionState {
     fn validate(&self) -> Result<(), SaveError> {
         self.physical.validate()?;
+        if let Some(tutorial) = &self.tutorial {
+            tutorial.validate()?;
+        }
         self.fabrication.validate()?;
         if let Some(survival) = &self.survival {
             survival.validate()?;
@@ -197,6 +202,7 @@ impl GameplaySession {
                 &self.consumables,
             ),
             equipment: self.equipment.clone(),
+            tutorial: Some(self.tutorial.clone()),
             survival: Some(SurvivalState {
                 vitals: self.survival.clone(),
                 catalog: self.consumable_effects.clone(),
@@ -223,7 +229,7 @@ impl GameplaySession {
                 restrictions: Default::default(),
                 run: Default::default(),
             },
-            (2 | 3, Some(state)) => state,
+            (2..=4, Some(state)) => state,
             _ => return Err(invalid("survival payload does not match envelope version")),
         };
         if save.schema_version == 2 {
@@ -234,10 +240,16 @@ impl GameplaySession {
             return Err(invalid("schema-3 journey sampling source missing"));
         }
         survival.validate()?;
+        let tutorial = match (save.schema_version, save.state.tutorial) {
+            (4, Some(tutorial)) => tutorial,
+            (1..=3, _) => super::tutorial::Tutorial::dismissed(),
+            _ => return Err(invalid("schema-4 tutorial source missing")),
+        };
         let (fabricator, consumables) = save.state.fabrication.restore()?;
         let physical = save.state.physical.restore()?;
         let mut restored = Self {
             seed: physical.seed,
+            tutorial,
             view_mode: ViewMode::Gameplay,
             survival: survival.vitals,
             consumable_effects: survival.catalog,
@@ -486,7 +498,7 @@ impl GameplaySession {
         serde_json::to_vec(&(self.mining.session.fragments().len(), self.mining.session.fragments().last().map(|f| f.id()), self.mining.session.attached_sphere_id(), self.mining.session.carried_id(),
             ship.flight_state, ship.door_state, ship.power_available,
             machine.stored, jobs, machine.tray, &self.consumables, &self.equipment,
-            self.survival.snapshot().terminal, self.survival.active_effects().map(|(id,stacks,_)|(id,stacks)).collect::<Vec<_>>(),self.run.serial))
+            self.survival.snapshot().terminal, self.survival.active_effects().map(|(id,stacks,_)|(id,stacks)).collect::<Vec<_>>(),self.run.serial, &self.tutorial))
             .expect("discrete checkpoint events contain only serializable finite identities and integer quantities")
     }
 }

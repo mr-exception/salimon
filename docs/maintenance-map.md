@@ -238,3 +238,9 @@ Pause saves (#382): runtime `checkpoints/control.rs`, `checkpoints.rs` and `app.
 own request/status/UTC, asynchronous verified IO and focused menu/exit admission.
 Fault-injected worker/store and native dispatch regressions cover the contract.
 See [save contract](save-contract.md#pause-checkpoint-controls-382); native #376.
+
+Survival onboarding (#380): `runtime/src/session/tutorial.rs`, success hooks in
+`session/{consumables,consumable_wheel,fabrication,pause}.rs`, native H/T routing
+and action-band fallback in `app.rs`; version-4 composition in
+`session/persistence.rs`. Tests: `session/tutorial/tests.rs`, persistence and
+existing native admission regressions. See the [onboarding contract](../client/runtime/architecture.md#persistent-survival-onboarding-380).

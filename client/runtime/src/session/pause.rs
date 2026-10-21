@@ -12,6 +12,9 @@ impl GameplaySession {
         self.update_clock.reset();
         self.reset_presentation();
         self.paused = !self.paused;
+        if self.paused {
+            self.tutorial.record(super::tutorial::Objective::SaveStatus);
+        }
     }
 }
 #[cfg(test)]

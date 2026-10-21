@@ -196,3 +196,7 @@ Scout machinery #464: read the [canonical feedback boundary](../../docs/scout-pr
 Pause saves (#382) use the shared worker/store without advancing authoritative
 clocks. Saved/UTC require verified completion. Resume cancels exit intent; failure
 requires retry/cancel/explicit risk exit. See [contract](architecture.md#pause-checkpoint-controls-382).
+
+Tutorial #380 lives in `session/tutorial.rs`; record progress only at successful
+action boundaries. It is durable per-run state, not UI cache. T skips; native
+reference review remains #376. See the onboarding section in architecture.md.

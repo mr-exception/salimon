@@ -9,6 +9,7 @@ pub(crate) mod journey;
 pub(crate) mod lifecycle;
 mod presentation;
 mod survival;
+pub(crate) mod tutorial;
 // Portable adapters are consumed by whole-session orchestration in #365/#366.
 mod pause;
 #[allow(dead_code)]
@@ -29,6 +30,7 @@ use std::time::Duration;
 
 pub(crate) struct GameplaySession {
     paused: bool,
+    pub(crate) tutorial: tutorial::Tutorial,
     pub(crate) run: lifecycle::RunState,
     pub(crate) consumable_effects: salimon_survival::consumables::Catalog,
     pub(crate) survival: salimon_survival::Survival,
@@ -81,6 +83,7 @@ impl Default for GameplaySession {
     fn default() -> Self {
         Self {
             paused: false,
+            tutorial: tutorial::Tutorial::dismissed(),
             run: Default::default(),
             consumable_effects: salimon_survival::consumables::Catalog::starter(),
             survival: Default::default(),
@@ -126,6 +129,8 @@ pub(crate) enum ControlKey {
 pub(crate) enum Command {
     Wheel(consumable_wheel::WheelAction),
     TogglePause,
+    InspectVitals,
+    SkipTutorial,
     Control(ControlKey, bool),
     Throttle(salimon_ship::ThrottleDirection, bool),
     Interact,
@@ -165,6 +170,7 @@ impl GameplaySession {
         let mut session = Self {
             fabricator,
             consumables,
+            tutorial: tutorial::Tutorial::default(),
             ..Default::default()
         };
         session.sync_fabricator_mass();
@@ -213,6 +219,7 @@ impl GameplaySession {
                     Some(InteractionTarget::FabricatorScreen) => {
                         self.clear_held_controls();
                         self.crafting_ui.open = true;
+                        self.tutorial.record(tutorial::Objective::Fabricator);
                     }
                     Some(InteractionTarget::Fabricator) => {
                         self.insert_fabricator_fragment();
@@ -588,6 +595,19 @@ impl GameplaySession {
             return;
         }
         self.enforce_survival_restrictions();
+        if self.view_mode == ViewMode::Gameplay {
+            match command {
+                SkipTutorial => {
+                    self.tutorial.skip();
+                    return;
+                }
+                InspectVitals if !self.wheel.open && !self.crafting_ui.open => {
+                    self.tutorial.record(tutorial::Objective::Vitals);
+                    return;
+                }
+                _ => {}
+            }
+        }
         if let Wheel(action) = command {
             self.wheel_action(action);
             return;
@@ -680,6 +700,7 @@ impl GameplaySession {
                 }
             }
             Wheel(_) => unreachable!(),
+            InspectVitals | SkipTutorial => {}
             TogglePause | ToggleView | Camera(_) => unreachable!(),
         }
     }

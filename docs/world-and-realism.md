@@ -7,10 +7,10 @@ Salimon's long-term world is intended to model the **known universe**, not only 
 ## Scale and astronomical model
 - Known stars, planets, moons, and major systems should use real-world positions, scale relationships, and orbital behavior where data exists.
 - Planets and moons move in realistic orbits rather than remaining static.
-- Space-to-surface travel should be seamless; loading transitions should not be part of the intended experience.
+- Space-to-surface **normal flight** should be seamless; the future Spatial Jump Drive explicitly uses a **quantum-themed transition while the distant destination loads**, not a routine local travel loading barrier.
 - Distances should remain meaningful and physically large.
-- Ship speed is primarily determined by propulsion upgrades; intended capabilities can range roughly from `10 km/s` to `1 Mm/s` and potentially evolve further through progression.
-- Absenat is deliberately extremely far away and serves as the long-term exploration target.
+- Ship speed is primarily determined by ongoing propulsion, physical mass and thrust/efficiency upgrades; starter and future tiers are not assigned arbitrary maximum engine speeds. Continuous ordinary-engine behavior at/above light speed remains a **separate unresolved owner decision**, not guaranteed by today's Newtonian speed-cap absence. See [approved Core impulse and Jump Drive design](jump-drive-and-interstellar-travel.md).
+- Absenat is deliberately extremely far away and serves as the long-term exploration target. A reusable Core-powered Spatial Jump Drive may displace the entire ship forward by chosen light-distance without changing its velocity; this explicitly fictional FTL technology does not prove the separate alleged wormhole in the narrative.
 ## World hierarchy
 The simulation should be spatially partitioned so only relevant regions are active at full fidelity.
 Suggested hierarchy:
@@ -42,7 +42,7 @@ Planets, moons, and biomes can expose ships and players to hazards such as:
 - Darkness and visibility conditions
 Ship equipment and player equipment must determine whether a location can be entered safely. Hazards can damage hulls and modules when appropriate protection is missing.
 ## Persistent simulation
-The universe continues evolving even when players are offline or no player is nearby.
+The universe continues evolving even when players are offline or no player is nearby. There is **one shared 1:1 real-time clock** for offline and online players, with **no velocity-dependent time dilation**. Ships coast while offline with their engines off; no automatic offline jumps. A future Jump Drive relocation has an atomic shared-world timestamp and preserves the ship's inertial velocity; it never fast-forwards elapsed universe time. See [shared time and quantum transition contract](jump-drive-and-interstellar-travel.md).
 A sector/snapshot model should be used:
 1. The backend stores persistent snapshots for spatial sectors with timestamps.
 2. The backend periodically advances or refreshes authoritative state.

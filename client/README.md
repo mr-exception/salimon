@@ -83,3 +83,10 @@ rendering and CPU profiling remain observational. `--flight-profile` is a releas
 CPU workload suite, not an Apple M1 frame-rate certification.
 
 `salimon-fabrication` is a portable workspace library depending on world resource values; it awaits runtime integration in #339–#347. See its [architecture](fabrication/architecture.md).
+
+## Canonical universe schema foundation
+
+`universe/` is the portable `salimon-universe` library for immutable IDs, typed
+catalog records and explicit provenance/uncertainty. It is intentionally not in
+the runtime dependency graph yet; `world/` remains the playable fixture owner.
+See [U01 architecture](universe/architecture.md).

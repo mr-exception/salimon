@@ -11,6 +11,7 @@ members = [
     "client/ship",
     "client/survival",
     "client/world",
+    "client/universe",
 ]
 default-members = ["client/runtime"]
 exclude = ["vendor/wgpu-hal"]

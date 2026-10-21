@@ -233,3 +233,11 @@ is composed in #365; disk checkpoints remain #366.
 - Explicit survival pilot revocation (#369) selects zero manual throttle and
   clears cockpit/held steering/throttle authority without braking world momentum
   or cancelling committed assists. Ordinary cockpit exit remains invariant 4.
+
+## Future impulse and Jump Drive invariants (not enforced by current client)
+
+See [approved travel design](../../docs/jump-drive-and-interstellar-travel.md) and [engine implementation issue #493](https://github.com/mr-exception/salimon/issues/493). Current force/watt values and historic default-Earth compressed fixture invariants above are current implementation facts, **not** the new real-scale future homeworld or a claim the Jump Drive exists.
+
+Future engine: funded propulsion energy in joules yields impulse with baseline conversion **1 N·s/J**; projected delta-v equals vector impulse / ship mass; coasting consumes zero propulsion joules, and depleted Core yields zero new engine impulse. Upgrade/tuning and exact split-step tests must preserve energy/mass/velocity authority.
+
+Future Jump Drive: retain one shared time clock, no velocity-dependent time dilation; owner-only command; explicitly switched-**off** engines (even zero throttle while switched on rejects), no active assists, initial **N=20%**, valid 0<=speed<c, charge = D_light_seconds * mass_kg * 0.20*(c-speed_mps)/(1 N·s/J); no zero-distance jump. Validate region safety/charge and apply exactly once. The quantum loading transition does not advance fictitious travel time; entire ship/passengers/cargo translate along forward axis while world-frame velocity/orientation are preserved. Do not auto-jump offline or expose undiscovered chart positions; at/above-c behavior, safe departure zones and progression economics require further approval.

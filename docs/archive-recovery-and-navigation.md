@@ -29,3 +29,9 @@ Versioned records, module state, progress and discovered route identities must r
 ## Validation
 
 Test arrival with no Earth route, inspecting ordinary and damaged messages, interrupted recovery, full mine-carry-Core-recover loop, recovering two distinct location leads, navigation uncertainty, save/load/close/reopen, existing scanner pulse/contact expiry, and alternate choice to chart Earth directly. Keep historical event claims and recovered evidence separate.
+
+## Jump Drive integration with discovery (future design only)
+
+The [Spatial Jump Drive](jump-drive-and-interstellar-travel.md) is a **physical Core-powered owner-operated displacement module**, not the narrative's alleged wormhole. The player may set **six light-distance fields** (years/months/days/hours/minutes/seconds) to request a jump along the ship's current forward direction; this neither supplies free galactic search nor reveals unknown Earth/Solar System/Absenat coordinates. Canonical hidden catalog and moving-body data may be checked for **destination collision safety without granting player knowledge**; show navigation/uncertainty warnings through existing instruments only when supported by actual charted evidence. The jump leaves inertial velocity unchanged; approach/orbit/braking remain player responsibilities.
+
+The quantum-themed transition is **loading**, not proof of travel through the unresolved wormhole or another chronology; every player remains on the same universal 1:1 real-time clock. The engine must be explicitly **off**, not just zero throttle. First-module N is **20%** of the remaining difference to c per light-second priced as equivalent Core impulse (see full formula in the canonical future design); no jump code is delivered by these docs.

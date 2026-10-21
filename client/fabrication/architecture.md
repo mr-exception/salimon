@@ -135,3 +135,9 @@ Explicit provisional production tuning (subject to #384 balance):
 These recipes are data records, not a playable progression system. Tests explicitly
 provide an unlocked fixture book to verify production/consumption/save integration;
 the production starter book rejects all three advanced enqueue requests atomically.
+
+## Future physical Jump Drive component fabrication (approved design, NOT SHIPPED)
+
+See [Spatial Jump Drive and shared-time travel](../../docs/jump-drive-and-interstellar-travel.md). The reusable ship-mounted Jump Drive and its upgrades will use **physical Fabricator-built components**, **not** consumable 'wrap cells', food/medical slots, or a separate fuel currency. Actual jump costs are paid by the existing authoritative Core. The first module uses virtual speed-gap parameter **N=20%** per light-second; future upgrades may reduce N, but component recipes, unlock timing and raw material costs are **not yet approved**.
+
+Reuse world material IDs and genuine mineral supply, the current **20 kg per-material bin**, strict FIFO job, Core-funded job work, single physical output tray, and one-carriable-world-object rule. A large assembly needs an explicit **future physical assembly/interface design** rather than placing an entire full-sized Jump Drive into the present consumable slots or silently expanding Fabricator capacity. No source code, recipe book, save schema or gameplay inventory is changed by this note.

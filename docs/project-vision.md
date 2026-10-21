@@ -62,12 +62,12 @@ The project is delivered through **small, reachable phases**. Each phase must pr
 - Additional recovered transmissions, identities, and later narrative events are intentionally undecided; see [lost journey canon](narrative-and-lost-journey.md).
 
 ## Time and persistence rules
-- Game time follows real-world time.
+- Game time follows real-world time for **all players and ships on a single multiplayer universe clock**. Velocity does not change player/world time; **relativistic time dilation is not a gameplay mechanic**. The [Spatial Jump Drive](jump-drive-and-interstellar-travel.md) changes position rather than skipping calendar time.
 - Offline time contributes to sleep recovery; as a baseline, roughly 8 hours offline should restore enough sleep/energy for about 16 hours of play.
 - Sleep deprivation increases stamina drain and makes other survival pressures harsher.
-- A ship continues moving while the player is offline according to its current position, velocity, gravity, and world events.
-- Thrusters and other active ship modules turn off while the player is offline.
-- Long-distance travel should remain physically grounded. FTL, teleportation, or wormholes may only exist if represented through a physically motivated in-world mechanism rather than ordinary fast travel.
+- A ship continues moving while the player is offline according to its current position, velocity, gravity, and world events. Optional logged-in hours during long real-time voyages may be spent on maintenance, Core resources, Fabricator chores, Archive reconstruction, scientific observation and planning; do not require a compulsory daily login.
+- Thrusters and other active ship modules turn off while the player is offline; there is no automatic offline Jump Drive activation. This does not stop existing approved offline Fabricator/Core conversion timers from progressing under their own explicit rules.
+- Long-distance space is still astronomically large: continuously powered **sub-light** propulsion, inertial offline coasting, braking and a reusable **Core-powered Spatial Jump Drive** coexist. The Jump Drive provides an approved **fictional FTL displacement exception** (not a generic unrestricted destination search): physical module, charged energy cost, explicit engine-off interlock, quantum-themed loading, retained velocity, and one shared clock. It is separate from the unverified narrative wormhole; no conventional time dilation. The goal of exploring far across the galaxy over roughly 6–12 months of dedicated play is a **balance target, not already validated** under the existing 60 GJ Core and N=20% formula.
 ## Death and continuity
 - Player death resets the run completely. No character, technology, inventory, or other progression carries over.
 - The dead player's ship and physical belongings remain in the shared universe as a wreck/loot source for others.

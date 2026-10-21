@@ -514,7 +514,8 @@ impl ShipMeshRenderer {
             center[0],
             center[1],
             center[2],
-            0.0,
+            // Shared explicit bus state: never infer lighting from rounded energy.
+            f32::from(!ship.instruments.power_off),
             axes[0][0],
             axes[0][1],
             axes[0][2],

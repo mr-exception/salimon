@@ -391,3 +391,6 @@ survival, with locked advanced recipes in fabrication. Native wheel input remain
 #377; no progression acquisition is implemented. See the
 [canonical food contract](../client/survival/architecture.md#four-food-catalog-378)
 for captured settings, active/offline clocks and exact drain arithmetic.
+
+Scout light zoning and reproducible native/offline cameras (#463) are defined in
+[Scout presentation](scout-presentation.md); CPU/Blender results do not grant native visual signoff.

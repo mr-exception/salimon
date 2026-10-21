@@ -152,3 +152,6 @@ randomness is generated per frame and no LOD triangle is moved for art direction
 The [GPU comparison recipe and report](../reports/issue-278/README.md) describes
 matched near/far/orbit scenes, fade-boundary continuity, unchanged coverage and
 costs. Native M1 gameplay/visual approval remains #279/#229.
+
+Scout light zoning and reproducible native/offline cameras (#463) are defined in
+[Scout presentation](scout-presentation.md); CPU/Blender results do not grant native visual signoff.

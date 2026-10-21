@@ -23,6 +23,7 @@ mod mining_emission;
 mod resource_context;
 mod resource_presentation;
 mod reticle;
+mod scout_reference;
 mod session;
 #[cfg(test)]
 mod sphere_benchmark;

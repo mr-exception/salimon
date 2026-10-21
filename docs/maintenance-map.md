@@ -206,3 +206,9 @@ Native current-sphere validation (#313) routes through runtime
 `benchmark_fixture.rs` (`current-cap`/`current-mixed`), shared with the portable
 `sphere_workloads.rs` matrix; use the
 [benchmark contract](../scripts/FRAGMENT_BENCHMARKS.md#native-current-sphere-profiles-313).
+
+Scout lighting/reference cameras (#463): renderer `ship_mesh.rs/.wgsl` owns bus
+lighting; runtime `scout_reference.rs` owns E2E-only camera mapping. Shared poses
+and eight power/view checkpoints live under `scenarios/visual/scout-*`; offline
+`models/assets/ships/salimon-scout/preview_lighting.py` reads the same poses without
+saving source assets. See [capture/limits](scout-presentation.md).

@@ -63,13 +63,24 @@ fn vs_main(
     output.clip_position = ship.view_projection * vec4<f32>(relative, 1.0);
     output.color = color;
     let key = normalize(vec3<f32>(0.35, 0.82, 0.44));
-    let exterior_light = vec3<f32>(0.32 + 0.68 * abs(dot(normal, key)));
-    // A restrained, ship-local cabin fill stays warm as the ship rotates. This
-    // is evaluated per vertex; it needs no light loops, textures, or shadows.
-    let cabin_light = vec3<f32>(0.76, 0.69, 0.59)
-        + vec3<f32>(0.16) * abs(local_normal.y);
+    let exterior_light = vec3<f32>(0.82, 0.90, 1.0)
+        * (0.28 + 0.62 * abs(dot(normal, key)));
+    // Ship-local work zones, evaluated per vertex. Deliberately bounded fill,
+    // not PBR, shadowing or physically simulated light transport. center.w is
+    // the explicit bus state shared with the screen atlas.
+    let powered = ship.center.w;
+    let cockpit = 1.0 - smoothstep(1.0, 5.0, abs(local.x - 4.0));
+    let workshop = 1.0 - smoothstep(1.0, 4.0, abs(local.x + 3.0));
+    let task_fill = max(cockpit, workshop);
+    let ceiling = 0.12 * abs(local_normal.y);
+    let cold_spill = vec3<f32>(0.10, 0.14, 0.20);
+    let cabin_light = cold_spill + powered
+        * (vec3<f32>(0.46, 0.34, 0.22)
+        + vec3<f32>(0.18, 0.14, 0.09) * task_fill + vec3<f32>(ceiling));
     output.light = mix(exterior_light, cabin_light, interior_flag);
-    output.emissive = emissive;
+    // Authored electrical lamps/accents extinguish on bus loss. Unpowered
+    // surfaces retain a cool readability floor; this is not emergency power.
+    output.emissive = emissive * powered;
     output.screen_uv = display.xy;
     output.display_flag = u32(display.z);
     return output;

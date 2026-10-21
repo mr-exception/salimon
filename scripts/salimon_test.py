@@ -14,7 +14,7 @@ from e2e_artifacts import Artifacts
 
 PROTOCOL = 1
 SETUPS = {"cargo-blackout", "flight-regression", "core-restart", "crash-recovery", "cargo-flight", "fragment-pile", "resource-approach", "landed-earth", "cockpit-earth", "orbit-earth", "orbit-moon", "open-space", "coasting-space", "coasting-orbit", "eva-approach", "terrain-earth-approach", "terrain-moon-approach", "terrain-mars-approach", "terrain-moon-steep", "terrain-earth", "terrain-moon", "terrain-mars", "terrain-earth-crater", "terrain-moon-crater", "terrain-mars-crater"}
-OPS = {"crafting", "window", "performance_reset", "inspect", "step", "look", "aim_fragment", "restore_look", "key", "mouse", "interact", "landing", "thruster"}
+OPS = {"scout_reference", "crafting", "window", "performance_reset", "inspect", "step", "look", "aim_fragment", "restore_look", "key", "mouse", "interact", "landing", "thruster"}
 COMPARISONS = {"equals", "not_equals", "gt", "gte", "lt", "lte", "approx", "exists", "contains"}
 
 

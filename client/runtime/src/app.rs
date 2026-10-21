@@ -159,6 +159,7 @@ pub(crate) struct ClientApplication {
     pub(crate) terrain_stream: crate::terrain_patches::TerrainStream,
     pub(crate) observations: crate::terrain_observations::Observations,
     pub(crate) capture_status: String,
+    pub(crate) scout_reference: Option<crate::scout_reference::View>,
     capture_path: Option<std::path::PathBuf>,
     cursor_captured: bool,
     native_focused: bool,
@@ -190,6 +191,7 @@ impl Default for ClientApplication {
             terrain_stream: crate::terrain_patches::TerrainStream::default(),
             observations: crate::terrain_observations::Observations::default(),
             capture_status: "idle".into(),
+            scout_reference: None,
             capture_path: None,
             cursor_captured: false,
             native_focused: false,
@@ -816,6 +818,9 @@ impl ClientApplication {
                 near_plane_meters: 0.05,
             };
             self.condition_feedback.camera(&mut camera);
+            if let Some(view) = &self.scout_reference {
+                camera = view.camera(presentation.ship.pose);
+            }
             let mut mesh = map_ship_to_renderer(presentation.ship);
             mesh.fabricator_output_present = self.session.fabricator_output_present();
             mesh.fabricator_output_medical = self.session.fabricator_output_medical();

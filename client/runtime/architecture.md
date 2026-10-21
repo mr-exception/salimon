@@ -1180,3 +1180,13 @@ resets. Window/GPU lifecycle and visibility still operate; this is not native
 input/lifecycle certification. Normal play and benchmark mode ignore this E2E
 setting. Direct `Game` probes default to actual native input; their child removes
 the variable. `inspect.native_input_isolated` makes the boundary observable.
+
+## Scout reference cameras (#463)
+
+`scout_reference.rs` loads four checked-in ship-local camera poses shared with
+Blender. The `scout_reference` automation operation is admitted only in the
+existing native `--e2e` boundary. Its optional camera overrides presentation,
+never character position/aim, interaction rays, power, time or saved state.
+`clear` restores the gameplay camera. The reference scenario uses real Core
+feeding/restoration to compare blackout/powered views. See
+[the capture contract](../../docs/scout-presentation.md).

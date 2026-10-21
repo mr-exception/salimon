@@ -362,3 +362,39 @@ migrations. No recovery progress or charted destinations are invented. Unknown
 versions/IDs, duplicate read IDs and missing current Archive source reject before
 replacing a live session. Discrete read/selection changes use existing atomic
 checkpoint scheduling. See [source and input](../client/runtime/architecture.md#scout-archive-467).
+
+## Future universe new-run contract — U05 (#406)
+
+`salimon-persistence::universe::UniverseSave` is a **separate**
+`salimon.universe.save` version-1 wire envelope, not a migration of current
+`salimon.save` schema 6. It is delivered for future world integration; normal
+startup still uses the compressed-world session source. Existing saves are never
+implicitly interpreted, discarded or rewritten by this API.
+
+The universe envelope binds catalog schema/revision and an exact lowercase SHA256
+pack identity, supplied by the future **verified** pack loader. This layer checks
+identity equality, not the pack's content digest (U12 owns publication/verification).
+It stores a split calendar epoch, galaxy-split or catalog system/body-relative
+ship position, frame-relative velocity and unit xyzw orientation. Local ship
+frames reject until their independent authoritative definitions are persistable.
+Referenced fictional body anchors require their exact version/digest binding.
+Published definitions remain immutable; no terrain seed regenerates saved truth.
+
+Historical discoveries store object ID, first/last epoch and observation count;
+no catalog object becomes a live contact or player-known coordinate merely by
+loading. Discovery IDs/time scales/order/duplicates validate. Future scanner U30
+owns live expiry/contact semantics. Domain-owned mutable player/world sections
+are independently versioned opaque bytes with exact owner identity. Every encode/
+decode requires a caller-supplied validator for **every** section: unknown versions,
+identities, physical anchors and domain constraints must reject before runtime
+publication. This envelope does not implement those future gameplay domains.
+
+Unknown universe versions fail before payload decoding. Catalog or definition
+mismatch is `IncompatibleCatalog`, fatal during `SaveManager::recover`, like an
+unsupported schema: never silently fall back/reseed into a different universe.
+Ordinary corruption/torn publication retains the existing two-generation fallback.
+The size limit remains 64 MiB. Decode validates temporary owned source before any
+session assignment; callers must abort on incompatibility. Future migration must
+explicitly remap each stable ID/frame/definition and mutable section, verify both
+new generations in a distinct namespace and retain old verified saves until success.
+No implicit version upgrade, offline catch-up, world replacement or backend exists.

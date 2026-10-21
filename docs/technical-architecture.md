@@ -483,3 +483,13 @@ frame trees, rotating-frame velocities and validated calendar/scale arithmetic.
 See [U02 contract](../client/universe/architecture.md#hierarchical-frames-and-epoch--u02-403).
 Runtime and compressed playable-world coordinates remain unchanged; ephemerides,
 UTC leap-table conversion and production astrometry import are downstream work.
+
+## Universe new-run saves (#406)
+
+Owner: `client/persistence/src/universe.rs`; tests: `src/universe/tests.rs`.
+Persistence now depends on the portable universe leaf for validated IDs, split
+positions and epochs. Existing `SaveManager` protects catalog incompatibility as
+a fatal recovery error. Runtime schema 6 remains unchanged. See
+[save contract](save-contract.md#future-universe-new-run-contract--u05-406),
+[persistence architecture](../client/persistence/architecture.md) and
+[invariants](../client/persistence/invariants.md).

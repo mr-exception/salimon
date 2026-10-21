@@ -112,3 +112,7 @@ input and cross-day UTC arithmetic reject until an explicit leap-table adapter
 exists. These errors preserve scientific uncertainty rather than silently using
 POSIX UTC as TT. Calendar clocks are supplied by consumers; no OS clock is read.
 The U01 wire schema remains version 1; new frame/epoch types are independent APIs.
+
+U05 now consumes these IDs/epochs in the separate persistence universe envelope;
+`Epoch::compare` orders same-scale split instants without UTC duration assumptions.
+No catalog or world state is mutated by persistence.

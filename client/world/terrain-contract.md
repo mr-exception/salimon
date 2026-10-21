@@ -22,6 +22,10 @@ belong in this definition. Inputs and outputs use body-local f64 meters. Current
 bodies do not rotate; any future rotation must be applied by the frame owner
 before/after querying. No player-relative seed or mutable RNG is used.
 
+### Future canonical multi-seed planet definitions (documentation only)
+
+The approved future shared-world contract is [canonical planetary generation](../../docs/canonical-planet-generation.md): each planet's **published** record has independent versioned domain seeds for terrain, resources, visual appearance and future geology/biomes/discoveries, alongside a stable body ID, full-definition hashes and authored/scientific inputs. The current version-1 `TerrainDefinition` **already** has a deterministic `u64` terrain seed and generator version; keep its codec, numerical rules, representative fixture seeds and cache identity unchanged. Do not insert new fields into the version-1 binary envelope or assume it can represent arbitrary future galactic IDs. A future versioned catalog/terrain adapter must make any new domain seeds and body identity explicit, without silently reinterpreting visited worlds or altering resource IDs. Seeded on-demand evaluation is allowed; client/session/clock-driven selection of permanent terrain is not.
+
 `height(unit_direction)` returns signed elevation above nominal radius.
 `sample(unit_direction)` also returns body-local surface position, outward unit
 normal and dimensionless slope (`tan` of the angle to radial up). Input directions

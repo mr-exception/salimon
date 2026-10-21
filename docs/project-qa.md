@@ -107,3 +107,10 @@ Scout #465 native timbre/mix, chunk continuity/latency and matched audio-on/off
 frame costs remain [#485](https://github.com/mr-exception/salimon/issues/485).
 Portable synthesis is bounded but cannot grant listening or M1 performance
 acceptance; the minimal shared OS playback seam may need a continuous backend.
+
+## Survival difficulty budget review (#384 / #496)
+
+Portable balance evidence is [documented](survival-balance.md). Proposed comfortable
+360-second and break-even 720-second one-ration budgets await explicit owner
+approval in #496. Physical routes/subjective native timing remain unmeasured;
+current non-Earth profiles have no biomass. Approved meter durations are unchanged.

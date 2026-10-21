@@ -163,3 +163,6 @@ Tutorial #380: `cargo test -p salimon-client session::tutorial --locked` checks
 early actions, exact item use, skip/reload, legacy migration, restart and bounded
 prompt raster. Run workspace tests/build/Clippy/fmt for schema changes. Native
 DPI, prompt priority and full interaction walkthrough remain #376.
+
+Balance #384: `cargo test -p salimon-client survival_balance --locked`; the six
+scenarios also run in workspace PR CI. See [JSON reproduction and limits](survival-balance.md).

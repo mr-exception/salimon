@@ -117,7 +117,7 @@ bodies; unknown future bodies can select an existing preset. A future custom
 recipe API must validate the version, finite [0,1] colors and seed and key the
 texture cache by the complete visual recipe. Do not substitute its visual seed
 for the authoritative terrain seed/definition or resource-generation identity.
-No new persistence/network contract is introduced here.
+No new persistence/network contract is introduced here. For future fictional planets, the [canonical multi-seed definition](canonical-planet-generation.md) gives the **visual** domain its own published seed, algorithm version and complete cache key, independent of the physical terrain, resources and fixed discoveries. Renderer LOD/visual quality may differ between clients; visual variation must never move physical geometry or determine multiplayer gameplay identity. All **real observed solid bodies** retain established physical terrain from the first authoritative real-scale publication (today's representative six-body fixtures are excluded); later scientific/material passes may be non-displacing only. Geology-derived physical forms belong to the single canonical world terrain query, not render-only displacement.
 
 | Body / material | Visual seed | Linear dark → light palette |
 | --- | ---: | --- |

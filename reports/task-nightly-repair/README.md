@@ -16,11 +16,11 @@
 ## Validation
 
 - `python -m unittest discover -s scripts -p 'test_*.py'`: passed, 105 tests (Python 3.12.14, Pillow 12.3.0). This includes landing baseline/evidence parity, strict visual corpus compatibility/integrity and appearance pending/failure precedence contracts.
-- `python scripts/check_docs.py --base origin/main`: passed, zero documentation failures.
+- `python scripts/check_docs.py --base origin/main`: initially passed before the local commit; PR CI correctly required the owning runtime guide update once source changes were committed. Added the precise evidence-route test/maintenance contract to `client/runtime/README.ai.md`; rechecked before delivery.
 - `git diff --check`: passed.
 - Rust fmt/Clippy/tests and graphical captures: not run locally; Rust/Xvfb/Vulkan are not preinstalled. Package installation was attempted but did not complete in the restricted environment. PR CI validates the portable Rust tests; post-merge forced nightly is still required for native screenshot/temporal/smoke verification.
 - Independent software appearance approval: pending #518. No Metal/hardware visual or performance signoff is claimed.
 
 ## Documentation maintenance
 
-This changes verification fixtures/tool defaults, not runtime mechanics or U01–U34 behavior. Owning runtime architecture/invariants and ship engine/landing contracts are unchanged. Updated `docs/validation.md`, `docs/periodic-ci.md` and `scenarios/visual/README.md` map the affected commands, scenarios, baseline transition and review limitation. No generated assets or historical evidence are modified.
+This changes verification fixtures/tool defaults, not runtime mechanics or U01–U34 behavior. Owning runtime architecture/invariants and ship engine/landing contracts are unchanged. Updated `client/runtime/README.ai.md`, `docs/validation.md`, `docs/periodic-ci.md` and `scenarios/visual/README.md` map the affected commands, scenarios, baseline transition and review limitation. No generated assets or historical evidence are modified.

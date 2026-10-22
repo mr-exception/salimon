@@ -1,6 +1,6 @@
 # Real-scale universe expansion — approved design (2026-10-20)
 
-Status: **approved design; portable U01–U07 foundations delivered with the limits below; remaining expansion not implemented**. Source: ten rounds of owner Q&A. This contract supersedes compressed-playable-world assumptions *for the future expansion*, not existing implementation until migrated. Work begins after the existing planned gameplay implementation queue completes. Keep separate native verification, no implementation PRs as part of planning.
+Status: **approved design; portable U01–U08 foundations delivered with the limits below; remaining expansion not implemented**. Source: ten rounds of owner Q&A. This contract supersedes compressed-playable-world assumptions *for the future expansion*, not existing implementation until migrated. Work begins after the existing planned gameplay implementation queue completes. Keep separate native verification, no implementation PRs as part of planning.
 
 ## Narrative alignment (2026-10-21)
 
@@ -99,3 +99,9 @@ U07 now implements local streaming Gaia selection and exact reviewed-ID matching
 with typed source-unit measurements, missing-data preservation and synthetic
 storage sensitivity evidence. See [implemented contract](universe-gaia-ingestion.md).
 It is not a full observed catalog or production pack; #513 remains required.
+
+U08 imports frozen Horizons geometric ICRF/SSB/TDB state/physical measurements and
+PS exoplanet quantities with Gaia host reconciliation and explicit errors/limits.
+See [implemented validity and unit policy](universe-observed-ingestion.md).
+Exact samples only; arbitrary-date/lower-accuracy models remain U14, full reviewed
+source coverage #526/#513 and real pack integration U12. No native world migration.

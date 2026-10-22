@@ -164,3 +164,17 @@ migration or astrometry storage in U04's wire is implied.
 Gaia angular values expose degrees; separately named RA/Dec source-error fields
 retain mas without implicit covariance conversion. A mixed-unit regression
 protects both typed and raw evidence.
+
+## Observed Solar System and exoplanets — U08 (#409)
+
+`ingestion/horizons.rs` owns bounded strict API-1.2 table-2 ICRF/SSB/TDB decoding,
+SI vector/physical conversion, imported coverage and exact-state refusal policy.
+`ingestion/exoplanets.rs` owns PS default-row typed quantities, asymmetric errors,
+limits, original references and U07/Gaia host reconciliation. Their `tests.rs`
+modules own actual Earth/Proxima plus synthetic boundary/matching regressions;
+Earth states compare against independent U03 goldens. `examples/observed_import.rs`
+builds the frozen source fixture deterministically, also checked twice in CI.
+Read the [canonical units, identities and validity contract](../../docs/universe-observed-ingestion.md).
+U01/U04 wire is unchanged: astrometry/ephemerides/orbits remain separate typed
+observations requiring U12 packaging. Full reviewed coverage remains #526/#513;
+U14 owns arbitrary-date model evaluation and lower-accuracy fallback, not U08.

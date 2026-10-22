@@ -544,3 +544,14 @@ See the [Gaia selection/units/cross-match contract](universe-gaia-ingestion.md),
 [invariants](../client/universe/invariants.md). Synthetic local ingestion and
 bounded canonical batches are implemented; production approval/full snapshots
 remain #513, inference U09, astrometry pack integration U12. No playable migration.
+
+## Universe observed ingestion (#409)
+
+Owners: `client/universe/src/ingestion/horizons.rs`, `exoplanets.rs`; tests in their
+sibling module directories; fixture example `client/universe/examples/observed_import.rs`.
+See [units/identity/validity contract](universe-observed-ingestion.md),
+[architecture](../client/universe/architecture.md#observed-solar-system-and-exoplanets--u08-409)
+and [invariants](../client/universe/invariants.md). CI compares two offline builds.
+Actual frozen Earth/Proxima and synthetic matching work; full reviewed release
+coverage remains #526/#513, packaging U12, arbitrary-date models U14. No runtime
+world, scanner knowledge, save or rendering migration is implied.

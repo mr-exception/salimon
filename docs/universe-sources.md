@@ -40,7 +40,7 @@ replaced. No downloader, socket, credentials, runtime hook or scientific convers
 is included. Tests disable sockets and compare two complete builds byte-for-byte.
 Rust `sources.rs` validates the shared typed metadata with independent fixtures.
 U07 now implements the [Gaia fixture adapter](universe-gaia-ingestion.md);
-U08 owns JPL/exoplanet science adapters. Binary codecs remain U04.
+U08 now implements the [JPL/exoplanet fixture adapters](universe-observed-ingestion.md). Binary codecs remain U04.
 
 `--production` fails on the checked-in manifest: restricted/unreviewed sources
 and synthetic fixtures cannot be published. There is no opt-in override flag.

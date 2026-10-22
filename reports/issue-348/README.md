@@ -2,11 +2,11 @@
 
 ## Outcome
 
-Partial native evidence, **not full signoff**. Current main `812a877` was rebuilt
+Native verification in progress, **not full signoff**. Current main `812a877` was rebuilt
 from scratch in an isolated Cargo target on Apple M1 iMac21,1 / 16 GiB / macOS
 26.2, using Metal at a 1920×1080 physical drawable. No gameplay, assets, recipes,
-input rules, shader or baseline approvals changed. Native OS input is blocked:
-the helper reports `macOS event posting access is unavailable`. The source issue
+input rules, shader or baseline approvals changed. The initial native OS input attempt was blocked by event-posting permission.
+After the owner enabled Accessibility, the retry passed five bounded checks. The source issue
 must remain open until its remaining acceptance is exercised.
 
 ## Completed checks
@@ -60,3 +60,14 @@ invariant edit is required. Owners remain [runtime](../../client/runtime/archite
 [fabrication](../../client/fabrication/architecture.md),
 [fabrication invariants](../../client/fabrication/invariants.md) and the
 [validation matrix](../../docs/validation.md). Historical reports are unchanged.
+
+## Accessibility retry
+
+After the owner enabled Accessibility, the same exact binary/probe passed:
+actual native E opens/closes the aimed Fabricator screen; Q release leaves no
+open wheel or stale hold; initially empty inventory remains unchanged.
+[Checks](evidence/native-retry/checks.json), [full input/state records](evidence/native-retry/observations.json).
+The [actual physical screen](evidence/native-retry/physical-screen.png) and
+[crafting modal](evidence/native-retry/crafting-modal.png) are Metal captures.
+These five checks do not establish that an occupied item was consumed or that
+the wheel visibly opened while Q was held. Original permission failure remains.

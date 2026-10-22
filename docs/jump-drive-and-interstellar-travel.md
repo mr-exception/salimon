@@ -34,6 +34,8 @@ The Core directly converts funded electrical joules into impulse. **A joule is e
 
 ## Reusable Spatial Jump Drive
 
+> **Construction integration (approved 2026-10-22):** The Jump Drive is **not installed in the starter Scout**. It is a later physical module installed through an in-world blueprint placeholder: place it within sufficiently large ship structure, feed real material/components one carried object at a time, then begin short automatic construction when fully funded. Ordinary upgrades disable the module for their entire automatic build/commissioning period, and module-specific flight-safety rules apply. This **does not** change the drive's canonical N=20% initial parameter, operation, Core joule cost or impulse mathematics. See [Scout and modular construction](scout-and-modular-construction.md) and #547. The separate instant-material/no-timer rule applies **only to Energy Core upgrades**, not Jump Drive upgrades.
+
 The owner-approved module is named **Spatial Jump Drive** (short form: **Jump Drive**). The abandoned consumable 'wrap/warp cell' concept is **not** part of this design.
 
 - The player builds and installs a **physical, persistent, upgradeable** ship module. Its components and later upgrades can be fabricated with the existing Fabricator design, without disposable jump cells or a new power currency. Core joules are the per-jump cost.

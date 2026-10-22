@@ -109,7 +109,7 @@ this opt-in test/evidence boundary; [save policy](../../docs/save-contract.md) a
 
 Still pending: complete physical discovery/gather/craft/travel/save routes with
 real fragment motion/contact, supported DPI/resolution matrix, long-lived-input
-and actual sleep/wake (#453), full condition sensory/audio review, and matched
+and actual sleep/wake ([#557](https://github.com/mr-exception/salimon/issues/557), transferred from #453), full condition sensory/audio review, and matched
 active-500 full-session frame/memory evidence. Balance decisions/physical routes
 remain #537. Fixture native passes do not settle those gates or constitute human
 art/balance signoff. PR is stacked after #553. At the owner’s request it is ready for review, with these native limits explicitly transferred to #557; existing #537 retains its ownership.

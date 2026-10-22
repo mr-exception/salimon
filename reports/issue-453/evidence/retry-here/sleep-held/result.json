@@ -1,0 +1,16 @@
+{
+  "status": "failed",
+  "physical_sleep_verified": true,
+  "native_steering_admitted": true,
+  "power_stats": "Sleep Count:2\nDark Wake Count:0\nUser Wake Count:4\n",
+  "held_input_overlaps_actual_sleep": false,
+  "wall_gap_seconds": 247.5948190689087,
+  "monotonic_gap_seconds": 9.047941999975592,
+  "position_stable_without_fresh_input": true,
+  "steering_stable_without_fresh_input": true,
+  "simulation_advance_seconds": 8.047999999999998,
+  "world_clock_wall_seconds": 262.26655101776123,
+  "os_sleep_seconds": 242.0,
+  "awake_wall_upper_bound_seconds": 23.26655101776123,
+  "no_sleep_time_replayed": true
+}

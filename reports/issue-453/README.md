@@ -5,14 +5,14 @@
 2026-10-22 on reference Apple M1 iMac21,1 /16 GiB /macOS26.2, Metal,
 physical1920×1080 /2× scale. [Binary identity](evidence/binary.json); production
 runtime is the #348 modal fix, with subsequent branches adding tests/docs only.
-No runtime lifecycle/input changes are made in this PR.
+The final revision adds opt-in runtime trace logging; admission, controls and timing behavior are unchanged.
 
 **14/14 bounded native lifecycle checks pass.** A longer flight sequence passes
 all nine keyboard/throttle/coasting checks, but **relative-mouse motion fails**.
 A dedicated mouse-only repeat also fails to move the look direction. Physical
 system sleep/wake now passes a bounded normal-clock renderer/continuity probe.
-This remains a draft because mouse delivery and held-control coverage remain
-incomplete; it does not close the issue.
+These were the initial results. The retry below resolves bounded mouse delivery;
+remaining native acceptance is transferred to [#557](https://github.com/mr-exception/salimon/issues/557) at the owner’s request. This PR closes #453 on merge as a delivery/scope transfer, not full native signoff.
 
 ## Actual executed checks
 
@@ -109,10 +109,81 @@ sleep overlap and release/reset behavior; relative-mouse forward/inverse deliver
 also remains failed. Physical sleep, renderer continuity and the bounded live-clock
 check pass; complete #453 input signoff remains open.
 
+## Retry here and explicit scope transfer — 2026-10-22
+
+The owner requested completion of all four PRs and deferred further dedicated
+sleep testing to [#557](https://github.com/mr-exception/salimon/issues/557).
+The initial failed probes above remain historical evidence, not current passes.
+
+- **Mouse-only and longer flight now pass**: 2/2 and 11/11 checks. Runtime trace
+  receives `(120, 35)` and `(-120, -35)` with capture/focus true, occlusion and
+  isolation false. Positive view change and inverse restoration both pass.
+  [Mouse checks](evidence/retry-here/mouse/checks.json),
+  [long checks](evidence/retry-here/long-flight/checks.json),
+  [received events](evidence/retry-here/long-flight/stderr.log),
+  [state/input](evidence/retry-here/long-flight/observations.json).
+  The report-local helper uses an in-window position, a private CGEvent source
+  with suppression interval zero, and a 300ms post-event dwell. Earlier attempts
+  without that dwell received no motion; this is a successful delivery recipe,
+  not an isolated proof of which OS implementation detail caused every failure.
+- Runtime `app.rs` adds trace-only mouse admission metadata, key/control/orientation
+  observations and capture-release/focus logging. No input gate, domain controller
+  or clock rule changed. The trace boundary makes posted-vs-received evidence
+  explicit. [Source/binary identities](evidence/retry-here/identity.json) distinguish
+  the mouse/long trace build (two extra observational device/cursor messages) from
+  the final sleep build; gameplay code is identical between them.
+- The fresh normal-clock coasting run positively admits native W: orientation
+  changes from identity to `[0, 0, 0.034201781836552744, 0.9994149479166323]`.
+  Occlusion then releases an admitted `pitch_up: true`; focus-loss logs show
+  cleared controls. Actual OS sleep is **242s, 21:15:30–21:19:32 Asia/Nicosia**.
+  Renderer and clean exit recover. A fresh after-idle checkpoint (generation9)
+  records 17.392s of simulation advance within a conservative awake-wall upper
+  bound 23.267s; post-wake orientation
+  remains exactly `[0, 0, 0.050058383995431804, 0.9987462932055197]` through fresh
+  no-input observation. The trace records that same orientation at focus
+  regain and before the first post-wake Escape, before pause can clear controls.
+- **The stricter held-overlap result fails** and is retained as failed: the helper’s
+  original 180s wall deadline expires during 242s of sleep, releasing on resume
+  at Unix1792693171.792, about 0.208s before the coarse OS wake timestamp. This
+  does not independently prove a hold spanning the full logged interval.
+  Artifact audit also found `after-wake.sav` was stale generation8 from before
+  sleep; the raw result’s 8.048s simulation delta is therefore not a valid
+  post-wake clock measurement. The fresh generation9 after-idle save supports
+  the 17.392s calculation above. Future harness runs now require generation
+  advancement and current save UTC, and calculate the delta from the final
+  snapshot. These new harness guards have syntax validation only; no further
+  native run was performed after the owner deferred testing.
+  [Result](evidence/retry-here/sleep-held/result.json),
+  [OS events](evidence/retry-here/sleep-held/power-events.json),
+  [input](evidence/retry-here/sleep-held/input.json),
+  [runtime trace](evidence/retry-here/sleep-held/stderr.log).
+- The helper now bounds a hold by 300s of uptime and always posts release during
+  normal cleanup; `--manual-sleep` never issues a sleep command and prints a ready
+  marker. The final manual attempt was stopped/deferred by the owner, with no
+  actual sleep pair verified. It is **incomplete**, not a pass. An earlier cancelled
+  request is likewise retained. No further sleep testing is authorized in this run.
+  [Manual result](evidence/retry-here/manual-stopped/result.json),
+  [cancelled request](evidence/retry-here/cancelled-request/result.json).
+
+![Actual native renderer after the 242-second sleep](evidence/retry-here/sleep-held/after-wake.png)
+
+Reproduction for a future dedicated session (manual operation, new output path):
+
+```sh
+swiftc reports/issue-453/native_input.swift -o artifacts/input-453
+python3 reports/issue-453/sleep_probe.py --binary /absolute/path/to/salimon-client --helper artifacts/input-453 --source-checkpoint reports/issue-376/evidence/initial/moving/before.sav --output artifacts/future-manual-sleep --manual-sleep
+```
+
+The source issues #348/#376/#453 close through their delivery PRs; #557 owns
+unresolved held-input proof, tray/intake/travel, display/sensory and active-load
+checks explicitly listed there. Broader art/performance ownership stays with
+#483/#477/#479. No failed gate is waived or reclassified by marking PRs ready.
+
 ## Checks and ownership
 
-Python syntax, documentation/base-impact and whitespace checks pass. No
-production code changed; runtime build/tests/Clippy from #348 remain inherited.
+Python syntax, documentation/base-impact and whitespace checks pass. Fresh release build, **849 workspace tests passed /0 failed /29 ignored**,
+all-target Clippy and formatting pass. [Tests](evidence/retry-here/workspace-tests.log),
+[Clippy](evidence/retry-here/clippy.log).
 [Runtime lifecycle ownership](../../client/runtime/architecture.md),
 [runtime invariants](../../client/runtime/invariants.md) and the existing
 [runner input-isolation contract](../../scripts/README.md#deterministic-input-boundary-313)

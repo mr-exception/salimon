@@ -261,6 +261,14 @@ Release edges clear both movement/steering meanings and F/throttle latches even
 after a view, location or capture change. Left-mouse mining and mouse look use
 the same native gameplay admission conditions.
 
+For dedicated native input diagnosis, `RUST_LOG=info,salimon_client::app=trace`
+records received mouse deltas with capture/focus/occlusion/isolation admission
+state, key edges with ship controls/orientation, and capture release. Focus
+transitions are logged at debug level. These observations do not change admission,
+controller state or timing. Posting an OS event alone is not proof of delivery;
+compare this boundary trace with native state changes, as in the
+[#453 report](../../reports/issue-453/README.md).
+
 Native key translation and automation call `dispatch_key`. The explicit
 `InputSource::Automation` harness policy bypasses desktop focus/capture/occlusion,
 while retaining view, equipment, cockpit, power and assist authority. Protocol

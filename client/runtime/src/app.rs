@@ -485,6 +485,11 @@ impl ClientApplication {
         synthetic: bool,
         source: InputSource,
     ) {
+        log::trace!(
+            "input key={key:?} pressed={pressed} source={source:?} ship_controls={:?} orientation={:?}",
+            self.session.ship_control_input,
+            self.session.ship.snapshot().pose.orientation,
+        );
         if self.e2e_input_isolated && matches!(source, InputSource::Native) {
             return;
         }
@@ -656,6 +661,11 @@ impl ClientApplication {
     }
 
     fn set_input_focus(&mut self, focused: bool) {
+        log::debug!(
+            "native input focus={focused} ship_controls={:?} orientation={:?}",
+            self.session.ship_control_input,
+            self.session.ship.snapshot().pose.orientation,
+        );
         self.native_focused = focused;
         if !focused {
             self.release_input_capture();
@@ -663,6 +673,10 @@ impl ClientApplication {
     }
 
     fn release_input_capture(&mut self) {
+        log::trace!(
+            "releasing native input: ship_controls={:?}",
+            self.session.ship_control_input
+        );
         self.scout_audio.stop();
         self.cursor_captured = false;
         self.survival_hud.close_details();
@@ -1304,6 +1318,16 @@ impl ApplicationHandler for ClientApplication {
         _device_id: DeviceId,
         event: DeviceEvent,
     ) {
+        if let DeviceEvent::MouseMotion { delta } = &event {
+            log::trace!(
+                "native mouse delta={delta:?} captured={} focused={} occluded={} isolated={} view={:?}",
+                self.cursor_captured,
+                self.native_focused,
+                self.occluded,
+                self.e2e_input_isolated,
+                self.session.view_mode,
+            );
+        }
         if self.benchmark.is_none()
             && !self.e2e_input_isolated
             && self.session.view_mode == ViewMode::Gameplay

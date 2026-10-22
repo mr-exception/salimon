@@ -35,7 +35,7 @@ See the [canonical record contract](../../docs/universe-sources.md#private-devel
   [architecture](../../client/universe/architecture.md#source-manifests--u06-407)
   and [invariant 12](../../client/universe/invariants.md) remain applicable.
 
-## Pending #513 acceptance
+## Production acceptance transferred to #537
 
 Full current provider terms were not fetched: the configured network allows
 package hosts, not ESA/JPL/IPAC. The prior 2026-10-21 full Cosmos fetch returned
@@ -44,7 +44,10 @@ credits, new permission record, reviewed full production inputs or production
 eligibility are claimed. U07/U12 production remains blocked. The production
 record validates completeness/binding, not legal truth or actual survey coverage.
 
-This PR stays draft while #513's full acceptance is pending. The current private
-scope permits continued fixture development; before broadening use, review the
-actual full terms and acquire/freeze full selected snapshots and permission
-as required. #513 retains those requirements; no pending gate becomes a pass.
+The owner requested transfer of the remaining source-use/full-snapshot review to
+[follow-up #537](https://github.com/mr-exception/salimon/issues/537), labeled
+`native`. [PR #533](https://github.com/mr-exception/salimon/pull/533) closes #513
+on merge for private-scope/evidence-gate delivery. Before broadening use, #537
+requires actual full terms, exact credits, full selected snapshots and required
+permission. U07/U12 production depends on that follow-up; no pending gate passes
+merely because #513 closes.

@@ -49,8 +49,12 @@ renderer architecture/invariants and all crate sources are unchanged. Updated
 experience implementation map, new canonical validation guide and portable
 runner guide expose the matrix's source/test/native boundaries in the same PR.
 
-This PR is draft while full #476 acceptance remains pending; no source issue
-closure or native/backend waiver is claimed from the matrix/tooling delivery.
+The owner transferred full experience/native/backend acceptance to
+[follow-up #537](https://github.com/mr-exception/salimon/issues/537), labeled
+`native`. [PR #535](https://github.com/mr-exception/salimon/pull/535) closes #476
+on merge for versioned matrix/runner/protocol delivery. The follow-up retains
+all blocked rows, human comparison and M1 performance requirements; source
+closure grants no native/backend waiver or false pass.
 
 ## Final shared checks
 

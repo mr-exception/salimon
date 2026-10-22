@@ -45,3 +45,9 @@ portable Scout coverage and native/backend protocols. Twelve exact Scout test
 mappings are runnable now; fourteen remaining rows explicitly retain their
 opening/navigation/story/endgame blockers. Portable passes are not full E06,
 M1/audio/appearance approval or a backend fallback implementation.
+
+
+Full native/backend acceptance from #476 is tracked in
+[follow-up #537](https://github.com/mr-exception/salimon/issues/537) after the
+versioned matrix/runner delivery. Its feature prerequisites and human evidence
+requirements remain active when #476 closes.

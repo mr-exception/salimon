@@ -73,4 +73,6 @@ one visible sign/account, own latest placement and active-run isolation.
 Human native comparisons and reference performance remain required separately.
 
 [Current delivery/report](../reports/issue-476/README.md) records actual passed,
-blocked and unrun outcomes. #476 remains open while its full acceptance is pending.
+blocked and unrun outcomes. [Follow-up #537](https://github.com/mr-exception/salimon/issues/537)
+owns full native/backend experience acceptance after #476 matrix/runner delivery.
+Closing #476 does not resolve the feature dependencies or grant native signoff.

@@ -19,14 +19,14 @@ links; source/test review checks units, deterministic identity and missing data.
 
 Linux x86_64 cloud environment, Rust 1.99.1, Python 3.12.14. Commands from repo root:
 
-- `cargo test -p salimon-universe --locked`: **35 passed**, including five new
+- `cargo test -p salimon-universe --locked`: **36 passed**, including six new
   CSV/Gaia contracts. Existing schema/partition/reference goldens still pass.
 - `cargo clippy -p salimon-universe --all-targets --locked -- -D warnings`: pass.
 - `cargo run -p salimon-universe --example gaia_bench --release --locked`: pass.
   The separate timed release executable run is preserved in [benchmark.json](benchmark.json)
   and [resource output](benchmark-resources.txt). It measures synthetic input,
   canonical records plus full source measurement/provenance debug sidecars.
-- `cargo test --workspace --locked`: **815 passed, 28 intentionally ignored**, no failures.
+- `cargo test --workspace --locked`: **816 passed, 28 intentionally ignored**, no failures.
 - `cargo build --workspace --locked`: pass.
 - `cargo clippy --workspace --all-targets --locked -- -D warnings`: pass.
 - `cargo fmt --all -- --check`: pass.
@@ -35,11 +35,14 @@ Linux x86_64 cloud environment, Rust 1.99.1, Python 3.12.14. Commands from repo 
   includes changed-source owning-guide coverage.
 
 [Workspace output](validation.log) preserves actual tests/build/Clippy results.
-The final summary refinement makes streaming canonical counts explicitly unknown
-until collection; focused universe tests and all-target Clippy were rerun afterward.
+Final science review separates degree-valued RA/Dec from explicitly mas-valued
+source error fields. A mixed-unit regression protects both typed and raw values;
+there is no implicit tangent-plane/covariance reinterpretation. Streaming
+canonical counts remain explicitly unknown until collection. Focused universe
+tests and all-target Clippy were rerun after this source-unit refinement.
 
-The 10,000-row synthetic batch uses 386,579 compressed bytes (~38.66 bytes/star).
-At an assumed 1.8 billion objects that density alone implies **69.58 decimal GB**,
+The 10,000-row synthetic batch uses 389,884 compressed bytes (~38.99 bytes/star).
+At an assumed 1.8 billion objects that density alone implies **70.18 decimal GB**,
 above the approved initial budget, excluding additional fields/index/planet costs.
 This is an explicit debug-format sensitivity and budget exception observation,
 not an actual full-catalog forecast, representative Gaia benchmark or approval to

@@ -50,3 +50,6 @@ negative/missing parallax and missing velocities. No distance or motion is inven
 rows/ambiguous matches fail. Canonicalization is input-order independent. Selection
 counts and explicit policy accompany results; bounded decoding is distinct from
 collector memory. See the [Gaia contract](../../docs/universe-gaia-ingestion.md).
+
+Gaia RA/Dec source errors stay in explicitly named mas fields, separate from
+degree-valued coordinates; raw source error/correlation evidence is preserved.

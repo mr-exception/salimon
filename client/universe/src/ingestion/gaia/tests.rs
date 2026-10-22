@@ -118,3 +118,16 @@ fn malformed_data_and_sink_failure_never_succeed() {
         .is_err()
     );
 }
+
+#[test]
+fn gaia_angular_values_and_source_errors_have_separate_explicit_units() {
+    let csv=b"source_id,ref_epoch,ra,dec,parallax,parallax_error,pmra,pmdec,radial_velocity,ra_error,dec_error\n1,2016,120,-45,,,,,,3.6,7.2\n";
+    let result = run(&csv[..], &StellarCrossMatch::default()).unwrap();
+    let observation = &result.observations.values().next().unwrap()[0];
+    assert_eq!(observation.ra_degrees, 120.0);
+    assert_eq!(observation.dec_degrees, -45.0);
+    assert_eq!(observation.ra_error_mas, Some(3.6));
+    assert_eq!(observation.dec_error_mas, Some(7.2));
+    assert_eq!(observation.source_fields["ra_error"], "3.6");
+    assert_eq!(observation.source_fields["dec_error"], "7.2");
+}

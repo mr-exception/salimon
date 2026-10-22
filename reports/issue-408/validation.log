@@ -2,12 +2,12 @@
    Compiling salimon-persistence v0.1.0 (/workspace/salimon/client/persistence)
    Compiling salimon-world v0.1.0 (/workspace/salimon/client/world)
    Compiling salimon-survival v0.1.0 (/workspace/salimon/client/survival)
-   Compiling salimon-fabrication v0.1.0 (/workspace/salimon/client/fabrication)
    Compiling salimon-physics v0.1.0 (/workspace/salimon/client/physics)
+   Compiling salimon-fabrication v0.1.0 (/workspace/salimon/client/fabrication)
    Compiling salimon-ship v0.1.0 (/workspace/salimon/client/ship)
    Compiling salimon-character v0.1.0 (/workspace/salimon/client/character)
    Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 24s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 31.45s
      Running unittests src/lib.rs (target/debug/deps/salimon_character-cc50eff65d716188)
 
 running 68 tests
@@ -66,8 +66,9 @@ test controller::interior::tests::unified_console_blocks_walking_and_jumping_bef
 test controller::interior::tests::wider_cabin_allows_window_approaches_and_stops_before_window_sills ... ok
 test controller::locomotion_modifier_tests::movement_multiplier_never_scales_inherited_eva_drift_or_gravity_time ... ok
 test controller::locomotion_modifier_tests::zero_g_acceleration_is_scaled_but_existing_momentum_and_save_source_are_preserved ... ok
-test controller::collision_tests::surface_walkers_cannot_enter_through_the_hull_with_either_door_state ... ok
 test controller::surface::terrain_tests::terrain_jump_is_ballistic_and_held_input_cannot_relaunch ... ok
+test controller::surface::terrain_tests::walking_tracks_actual_ground_and_blocks_steep_uphill_and_large_steps ... ok
+test controller::collision_tests::surface_walkers_cannot_enter_through_the_hull_with_either_door_state ... ok
 test controller::surface::tests::surface_forward_direction_tracks_camera_yaw_changes ... ok
 test controller::surface::tests::surface_motion_stays_on_full_sphere_with_fixed_eye_height ... ok
 test controller::surface::tests::surface_wasd_follows_camera_tangent_basis_across_bodies_and_orientations ... ok
@@ -78,7 +79,6 @@ test queries::containment_tests::authored_gate_nose_and_vertical_edges_define_me
 test queries::fabricator_tests::wall_module_blocks_physical_objects_and_sight_but_not_its_input_or_aisles ... ok
 test queries::sight_tests::sight_respects_solid_ship_gate_and_engines ... ok
 test ramp::tests::moving_sweep_blocks_fast_eva_and_vertical_entry_but_allows_escape ... ok
-test controller::surface::terrain_tests::walking_tracks_actual_ground_and_blocks_steep_uphill_and_large_steps ... ok
 
 test result: ok. 68 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
 
@@ -89,8 +89,8 @@ test action_bar::tests::action_bar_is_hidden_outside_normal_gameplay_view ... ok
 test action_bar::tests::blocked_action_temporarily_overrides_then_restores_context ... ok
 test action_bar::tests::capped_dpi_reuses_raster_and_returning_to_one_x_rebuilds_it ... ok
 test action_bar::tests::contextual_prompts_appear_change_and_disappear ... ok
-test action_bar::tests::dynamic_multiline_context_updates_mass_and_renders_both_rows ... ok
 test action_bar::tests::compact_prompt_typography_is_shared_and_tracks_bounded_dpi ... ok
+test action_bar::tests::dynamic_multiline_context_updates_mass_and_renders_both_rows ... ok
 test action_bar::tests::invalid_and_out_of_range_dpi_keep_prompts_readable_and_bounded ... ok
 test action_bar::tests::recipe_selection_marker_renders_and_controls_share_the_scout_face ... ok
 test action_bar::tests::scout_prompt_raster_evidence ... ignored, writes CPU prompt evidence; set SALIMON_SCOUT_UI_DIR
@@ -128,12 +128,12 @@ test app::scene::tests::cockpit_instruments_follow_live_power_and_landing_after_
 test app::scene::tests::cockpit_proximity_monitor_tracks_eased_assists_without_pilot_authority ... ok
 test app::scene::tests::initial_overview_fully_frames_every_sphere ... ok
 test app::scene::tests::runtime_mapping_preserves_spheres_light_camera_and_separate_markers ... ok
-test app::input_tests::journey_ended_terminal_relaunch_and_missing_storage_never_grant_unverified_gameplay ... ok
-test app::toolbar_tests::background_ticks_preserve_active_time_travel_and_resume_without_double_counting ... ok
 test app::toolbar_tests::automation_partitions_preserve_elapsed_and_match_native_ticks ... ok
+test app::toolbar_tests::background_ticks_preserve_active_time_travel_and_resume_without_double_counting ... ok
+test app::toolbar_tests::failed_pickup_preserves_selected_tool_and_mining_input ... ok
 test app::toolbar_tests::numeric_inputs_select_gameplay_slots_without_changing_the_tour ... ok
 test app::toolbar_tests::precision_tour_numbers_leave_equipment_selection_intact ... ok
-test app::toolbar_tests::failed_pickup_preserves_selected_tool_and_mining_input ... ok
+test app::input_tests::journey_ended_terminal_relaunch_and_missing_storage_never_grant_unverified_gameplay ... ok
 test app::toolbar_tests::status_panel_input_uses_focus_capture_repeat_and_modal_guards ... ok
 test app::toolbar_tests::stalled_native_scheduler_matches_shared_fixed_gameplay_ticks ... ok
 test automation::tests::boarding_ramp_walkthrough_preserves_contact_and_rejects_occupied_closure ... ok
@@ -157,7 +157,7 @@ test automation::tests::mining_emission_walkthrough_preserves_rate_and_repeated_
 test automation::tests::resource_loop_uses_real_landing_mining_and_cabin_delivery_actions ... ok
 test automation::tests::signed_held_throttle_uses_gameplay_keys_and_fixed_simulation_time ... ok
 test automation::tests::space_airlock_walkthrough_uses_real_gameplay_actions ... ok
-test automation::tests::resource_prompt_anchors_match_deposit_and_carried_pose ... ok
+test automation::tests::streaming_walkthrough_reloads_partial_and_depleted_state ... ok
 test automation::tests::toolbar_stows_cancel_both_mining_inputs_and_never_resume_on_reselect ... ok
 test benchmark::tests::authored_dense_preparation_requires_natural_sleep_and_preserves_accounting ... ok
 test benchmark::tests::both_cameras_get_separate_windows_and_one_transition ... ok
@@ -166,7 +166,7 @@ test benchmark::tests::full_game_high_speed_flight_keeps_sleep_and_ship_local_po
 test benchmark::tests::instrumentation_does_not_change_production_poses_or_accounting ... ok
 test benchmark::tests::loaded_fixture_accepts_real_f_pickup_drop_and_carry_lockout ... ok
 test benchmark::tests::minimum_samples_requires_elapsed_time_and_completed_native_intervals ... ok
-test automation::tests::streaming_walkthrough_reloads_partial_and_depleted_state ... ok
+test automation::tests::resource_prompt_anchors_match_deposit_and_carried_pose ... ok
 test benchmark::tests::native_readiness_gates_start_and_loss_invalidates_collection ... ok
 test benchmark::tests::primary_and_stress_loads_use_production_updates_without_loss ... ok
 test benchmark::tests::rejects_invalid_and_duplicate_options ... ok
@@ -372,7 +372,7 @@ test session::recovery::tests::recovery_ui_evidence ... ignored, writes CPU Arch
 test session::recovery::tests::save_restore_offline_freeze_legacy_and_bad_sources_are_transactional ... ok
 test session::starting_supplies_tests::new_run_crafts_exactly_one_extra_ration_and_resaves_without_regranting ... ok
 test session::starting_supplies_tests::old_empty_saves_and_launch_recovery_never_receive_new_run_grants ... ok
-test session::starting_supplies_tests::verified_native_launch_restart_and_reload_publish_supplies_once ... ok
+test session::persistence_scenarios::disk_resume_freezes_everything_except_fatigue_and_replay_is_idempotent ... ok
 test session::survival::tests::committed_assist_is_not_cancelled_by_exhaustion ... ok
 test session::survival::tests::exhausted_can_exit_cockpit_operate_door_and_use_emergency_actions_but_not_fabricate ... ok
 test session::survival::tests::exhausted_door_uses_real_interact_route_and_attached_mining_is_released_without_mass_loss ... ok
@@ -383,23 +383,23 @@ test session::survival::tests::slowed_actions_use_active_time_without_blocking_e
 test session::tests::benchmark_configuration_advances_the_production_ship_character_and_cargo ... ok
 test session::tests::typed_and_protocol_commands_share_blackout_intake_power_and_backlog ... ok
 test session::tests::typed_controls_clear_on_view_reset_and_never_replay_denied_steering ... ok
-test session::persistence_scenarios::disk_resume_freezes_everything_except_fatigue_and_replay_is_idempotent ... ok
 test session::tutorial::tests::all_prompts_fit_small_drawables_above_the_toolbar ... ok
+test session::tutorial::tests::early_actions_complete_once_and_survive_reload_without_grants ... ok
 test session::tutorial::tests::legacy_migration_invalid_state_and_missing_source_are_transactional ... ok
 test session::tutorial::tests::skip_is_durable_focus_and_modal_safe_and_restart_is_fresh ... ok
 test session::tutorial::tests::tutorial_never_pauses_or_blocks_world_and_modal_overlays_hide_it ... ok
 test sphere_benchmark::sphere_cpu_benchmark ... ignored, opt-in 10/100/500-sphere CPU benchmark; never native FPS
-test session::tutorial::tests::early_actions_complete_once_and_survive_reload_without_grants ... ok
 test sphere_fixtures::checked_fixtures_cover_residuals_materials_multiple_releases_and_one_object_carrying ... ok
 test sphere_interactions::analytic_radius_matches_authored_render_pickup_and_contact_contracts ... ok
+test sphere_interactions::cap_and_short_deposit_spheres_keep_identity_radius_and_yield_through_core ... ok
 test sphere_workloads::current_sphere_population_contract ... ok
 test sphere_workloads::current_sphere_workloads_cpu ... ignored, opt-in versioned 500/1000 current-sphere CPU workloads; never native FPS
-test sphere_interactions::cap_and_short_deposit_spheres_keep_identity_radius_and_yield_through_core ... ok
-test survival_balance::pause_wheel_reload_blackout_slots_and_exact_starvation_boundaries ... ok
 test survival_balance::full_slots_block_tray_and_more_work_without_free_energy ... ok
+test survival_balance::pause_wheel_reload_blackout_slots_and_exact_starvation_boundaries ... ok
 test survival_balance::sampled_availability_reports_missing_feedstocks_instead_of_inventing_food ... ok
+test session::starting_supplies_tests::verified_native_launch_restart_and_reload_publish_supplies_once ... ok
+test survival_balance::seeded_food_loop_sensitivity_report ... ok
 test survival_balance::unchanged_meter_and_startup_famine_budgets_are_explicit ... ok
-test survival_balance::zero_fatigue_denies_work_but_emergency_food_and_eva_return_still_use_production_gates ... ok
 test survival_hud::raster::tests::layout_fits_above_lower_hud_at_supported_dpi_and_aspects_and_pages_all_effects ... ok
 test survival_hud::tests::cache_does_not_upload_an_unchanged_healthy_frame_and_small_surfaces_hide_safely ... ok
 test survival_hud::tests::critical_colors_warnings_and_hysteresis_follow_exact_boundaries ... ok
@@ -410,7 +410,7 @@ test survival_hud::tests::real_exact_slot_ration_and_medkit_recovery_drive_feedb
 test survival_hud::tests::recovery_tweens_survive_passive_drain_and_feedback_expires_without_fake_initial_gain ... ok
 test survival_hud::tests::status_punctuation_is_visible_and_maximum_typed_descriptions_fit_without_truncation ... ok
 test survival_hud::tests::typed_effect_details_preserve_amount_stacks_duration_removal_and_source ... ok
-test survival_balance::seeded_food_loop_sensitivity_report ... ok
+test survival_balance::zero_fatigue_denies_work_but_emergency_food_and_eva_return_still_use_production_gates ... ok
 test terrain::flight_tests::direct_flight_contact_uses_actual_negative_terrain_not_the_global_elevation_envelope ... ok
 test terrain::tests::crashed_ship_repositions_from_unsafe_crater_and_lands_on_supported_feet ... ok
 test terrain::cache_tests::cached_normal_and_height_only_queries_agree_after_eviction_and_reordering ... ok
@@ -429,7 +429,7 @@ test update_clock::tests::reset_excludes_a_lifecycle_gap ... ok
 test update_clock::tests::retains_an_unreported_stall ... ok
 test terrain_patches::topology_tests::mixed_lod_and_cross_face_segments_have_no_open_edges_inside_the_mask ... ok
 
-test result: ok. 334 passed; 0 failed; 9 ignored; 0 measured; 0 filtered out; finished in 93.02s
+test result: ok. 334 passed; 0 failed; 9 ignored; 0 measured; 0 filtered out; finished in 100.92s
 
      Running unittests src/lib.rs (target/debug/deps/salimon_diagnostics-69a7742d0bb93b85)
 
@@ -437,19 +437,19 @@ running 14 tests
 test aggregation::tests::refresh_threshold_copies_domain_snapshot_and_reset_retains_it ... ok
 test aggregation::tests::timing_statistics_use_average_and_nearest_rank_p95 ... ok
 test aggregation::tests::window_evicts_oldest_valid_samples_and_zero_only_updates_latest ... ok
-test format::tests::aggregates_sixty_hertz_and_ignores_initial_zero_interval ... ok
 test format::tests::distinguishes_unavailable_and_populated_domain_metrics ... ok
+test format::tests::aggregates_sixty_hertz_and_ignores_initial_zero_interval ... ok
 test format::tests::invalid_domain_values_remain_unavailable ... ok
 test format::tests::reports_gpu_capability_states_without_faking_a_number ... ok
-test raster::tests::rasterized_image_has_exact_rgba_length_and_visible_pixels ... ok
 test format::tests::reverse_throttle_preserves_sign_in_observed_text ... ok
+test raster::tests::rasterized_image_has_exact_rgba_length_and_visible_pixels ... ok
 test tests::changing_domain_metrics_do_not_bypass_the_refresh_cadence ... ok
 test tests::refresh_is_throttled_until_a_quarter_second_elapses ... ok
 test tests::reset_discards_pre_pause_frame_history ... ok
 test tests::starts_hidden_and_toggles_both_directions ... ok
 test tests::scale_and_memory_warning_changes_rebuild_the_visible_panel ... ok
 
-test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
 
      Running unittests src/lib.rs (target/debug/deps/salimon_fabrication-134b8ca58db30238)
 
@@ -483,8 +483,8 @@ test invalid_recipe_records_and_ambiguous_catalogs_are_rejected ... ok
 test queue_capacity_counts_jobs_and_rejection_keeps_balances_and_ids ... ok
 test snapshots_are_observations_and_idle_never_requests_or_consumes_power ... ok
 test starter_data_uses_world_feedstocks_and_two_unlocked_products ... ok
-test repeated_small_insertions_and_batch_reservation_have_exact_integer_balances ... ok
 test strict_fifo_batches_do_not_interleave_and_only_head_has_progress ... ok
+test repeated_small_insertions_and_batch_reservation_have_exact_integer_balances ... ok
 test typed_commands_follow_the_same_transaction_paths ... ok
 
 test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
@@ -499,8 +499,8 @@ test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
      Running unittests src/lib.rs (target/debug/deps/salimon_math-dfb0e8d05cf0a12c)
 
 running 3 tests
-test tests::arithmetic_and_length_keep_f64_precision ... ok
 test tests::length_preserves_existing_ieee_edge_behavior ... ok
+test tests::arithmetic_and_length_keep_f64_precision ... ok
 test tests::right_handed_axes_and_cross_order ... ok
 
 test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
@@ -510,8 +510,8 @@ test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 running 11 tests
 test storage::restart_tests::archive_failure_keeps_two_terminal_slots_and_success_retires_both_old_generations ... ok
 test storage::restart_tests::failure_at_each_write_preserves_a_verified_generation_and_never_falsely_acknowledges_restart ... ok
-test storage::tests::malformed_payload_and_failed_publish_do_not_replace_current ... ok
 test storage::tests::interrupted_write_and_corruption_preserve_verified_fallback ... ok
+test storage::tests::malformed_payload_and_failed_publish_do_not_replace_current ... ok
 test storage::tests::no_valid_checkpoint_warns_but_future_version_never_silently_reseeds ... ok
 test storage::tests::native_crash_restart_ignores_temporary_and_chooses_generation_not_clock ... ok
 test tests::exact_clock_and_float_roundtrip_and_version_rejection ... ok
@@ -526,8 +526,8 @@ test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fin
 
 running 73 tests
 test broad_phase::tests::candidate_filtering_cost ... ignored, CPU-only sparse-storage versus spatial-filtering attribution
-test broad_phase::tests::empty_earlier_row_is_requeried_after_a_later_pair_correction ... ok
 test broad_phase::tests::correction_created_later_pair_is_visited_in_the_same_pass ... ok
+test broad_phase::tests::empty_earlier_row_is_requeried_after_a_later_pair_correction ... ok
 test broad_phase::tests::empty_rows_are_refreshed_after_integration_and_between_updates ... ok
 test broad_phase::tests::grid_covers_reference_radius_pairs_and_swept_queries_at_distant_anchors ... ok
 test broad_phase::tests::refreshed_membership_matches_fresh_grid_after_origin_shape_and_population_changes ... ok
@@ -555,8 +555,8 @@ test convex::tests::resting_face_friction_resists_twist ... ok
 test convex::tests::rolling_translation_is_not_cut_off_independently_from_rotation ... ok
 test convex::tests::rough_point_contact_resists_loaded_spin_without_dragging_airborne_motion ... ok
 test convex::tests::ship_basis_orientation_roundtrips_vectors ... ok
-test convex::tests::resting_face_balances_an_off_center_load_without_rocking ... ok
 test convex::tests::support_graph_short_circuit_matches_full_sat ... ok
+test convex::tests::resting_face_balances_an_off_center_load_without_rocking ... ok
 test convex::tests::supported_face_in_a_stack_balances_an_off_center_load ... ok
 test convex::tests::transformed_cache_matches_original_projection_arithmetic_and_refreshes_shape ... ok
 test sleep::tests::adapter_quaternion_rounding_preserves_sleep_but_real_rotation_wakes ... ok
@@ -573,13 +573,13 @@ test sleep::tests::overlapping_bounds_without_convex_contact_do_not_connect_slee
 test sleep::tests::point_envelope_rejects_sliding_and_tipping_above_the_movement_bound ... ok
 test sleep::tests::point_window_credits_observed_time_and_handles_quaternion_sign ... ok
 test sleep::tests::profiling_and_zero_delta_preserve_activation_behavior ... ok
-test sleep::tests::fast_deck_impact_releases_substep_pressure_without_waking_remote_cargo ... ok
 test sleep::tests::retained_projection_spans_match_fresh_substep_rebuilds_exactly ... ok
+test sleep::tests::support_removal_wakes_only_the_connected_pile_and_reordering_keeps_identity ... ok
 test sleep::tests::supported_motion_below_the_point_envelope_can_rest ... ok
-test sleep::tests::warm_reactions_follow_identity_and_discard_changed_bodies_and_forces ... ok
+test sleep::tests::fast_deck_impact_releases_substep_pressure_without_waking_remote_cargo ... ok
 test sphere_tests::analytic_contact_size_is_independent_of_authored_mesh_scale ... ok
 test sphere_tests::fast_small_sphere_cannot_cross_a_stationary_neighbor_in_an_ordinary_tick ... ok
-test sleep::tests::support_removal_wakes_only_the_connected_pile_and_reordering_keeps_identity ... ok
+test sleep::tests::warm_reactions_follow_identity_and_discard_changed_bodies_and_forces ... ok
 test sphere_tests::sphere_pair_impulses_conserve_momentum_and_reduce_energy ... ok
 test sphere_tests::sphere_stack_sleeps_separates_and_wakes_after_support_removal ... ok
 test terrain_tests::convex_terrain_contact_samples_vertices_and_sleep_uses_the_same_support ... ok
@@ -599,7 +599,7 @@ test tests::weightless_cargo_retains_drift_and_bounces_below_ceiling ... ok
 test tests::zero_delta_is_noop_and_large_delta_uses_bounded_motion_steps ... ok
 test tests::reused_solver_arrays_match_fresh_arrays_through_population_changes ... ok
 
-test result: ok. 71 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 7.05s
+test result: ok. 71 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 6.56s
 
      Running unittests src/lib.rs (target/debug/deps/salimon_renderer-3b894cc228562d3b)
 
@@ -615,22 +615,22 @@ test cockpit_instruments::readability_tests::fabricator_warning_states_keep_text
 test cockpit_instruments::tests::changed_power_updates_only_flight_region ... ok
 test cockpit_instruments::tests::capacity_and_navigation_fields_invalidate_only_their_region ... ok
 test cockpit_instruments::tests::invalid_and_extreme_speeds_have_bounded_readings ... ok
-test cockpit_instruments::tests::nearby_target_and_radial_direction_only_change_navigation_region ... ok
 test cockpit_instruments::tests::energy_only_changes_the_energy_region_at_visible_precision ... ok
+test cockpit_instruments::tests::power_clamps_and_all_pixels_remain_opaque ... ok
 test cockpit_instruments::tests::radial_direction_is_classified_after_visible_rounding ... ok
 test cockpit_instruments::tests::speed_rounds_and_promotes_metric_units_without_long_digits ... ok
-test cockpit_instruments::tests::power_clamps_and_all_pixels_remain_opaque ... ok
+test cockpit_instruments::tests::nearby_target_and_radial_direction_only_change_navigation_region ... ok
 test consumable_wheel::tests::centers_fit_and_hit_every_segment_at_all_drawable_sizes ... ok
 test consumable_wheel::tests::empty_slots_icons_hover_names_effects_and_cache_are_present ... ok
 test equipment_toolbar::consumable_tests::five_separate_slots_cache_content_changes_and_fit_small_viewports ... ok
 test equipment_toolbar::tests::artwork_is_centered_by_visible_bounds_despite_asymmetric_canvas ... ok
-test cockpit_instruments::tests::unchanged_visible_values_preserve_atlas_and_allocation ... ok
 test equipment_toolbar::tests::cache_and_dpi_follow_display_state_without_gameplay_policy ... ok
-test gpu_timing::tests::timestamp_ticks_use_the_adapter_period ... ok
 test equipment_toolbar::tests::raster_has_five_numbered_slots_icon_empty_centers_and_single_highlight ... ok
+test gpu_timing::tests::timestamp_ticks_use_the_adapter_period ... ok
+test held_item::tests::authored_mesh_has_grip_and_separate_status_region ... ok
 test held_item::tests::grip_follows_look_without_changing_screen_offset_or_center_aim ... ok
 test held_item::tests::offline_glb_candidate_item_matches_imported_vertices_and_atlas ... ignored, run with SALIMON_GLB_CANDIDATES after offline GLB processing
-test held_item::tests::authored_mesh_has_grip_and_separate_status_region ... ok
+test cockpit_instruments::tests::unchanged_visible_values_preserve_atlas_and_allocation ... ok
 test machinery::tests::invalid_feedback_rejects_nan_infinity_and_out_of_range_inputs ... ok
 test machinery::tests::motion_roles_exclude_hulls_supports_and_ramp_collision_surfaces ... ok
 test overlay::tests::accepts_exact_rgba_byte_length ... ok
@@ -662,8 +662,8 @@ test resource_mesh::tests::offline_glb_candidate_resources_match_imported_vertic
 test resource_mesh::tests::resource_geometry_inventory ... ignored, opt-in authored geometry inventory; no GPU timing
 test resource_mesh::tests::resource_preparation_benchmark ... ignored, opt-in release CPU preparation benchmark; no hardware FPS assertion
 test resource_mesh::tests::shared_sphere_batches_different_resource_tints_without_mesh_duplication ... ok
-test resource_mesh::tests::subtracts_large_origin_before_narrowing ... ok
 test resource_mesh::tests::indexed_variants_and_gpu_transforms_preserve_all_authored_triangles ... ok
+test resource_mesh::tests::subtracts_large_origin_before_narrowing ... ok
 test ship_mesh::fabricator_tests::all_physical_screens_read_left_to_right_from_the_cabin_side ... ok
 test ship_mesh::feedback_gpu_tests::scout_feedback_gpu_evidence ... ignored, requires GPU; set SALIMON_SCOUT_FEEDBACK_DIR for PNGs and raw timing CSV
 test ship_mesh::fabricator_tests::tray_package_has_a_dedicated_conditional_surface_and_valid_shader ... ok
@@ -694,7 +694,7 @@ test ui_style::tests::controls_and_readings_have_visible_punctuation_and_distinc
 test ui_style::tests::functional_inks_have_readable_srgb_contrast_on_panel_backgrounds ... ok
 test surface_textures::tests::generic_materials_are_distinct_and_mip_chains_end_at_one_texel ... ok
 
-test result: ok. 75 passed; 0 failed; 14 ignored; 0 measured; 0 filtered out; finished in 3.38s
+test result: ok. 75 passed; 0 failed; 14 ignored; 0 measured; 0 filtered out; finished in 3.18s
 
      Running unittests src/lib.rs (target/debug/deps/salimon_ship-57ce57385171888f)
 
@@ -774,7 +774,7 @@ test orientation::tests::quaternion_alignment_follows_the_short_arc_without_endp
 test propulsion::tests::funded_impulse_and_cached_mass_are_the_only_velocity_inputs ... ok
 test controller::assist::tests::assists_have_readable_phases_and_exact_endpoints_on_every_solid_body ... ok
 
-test result: ok. 73 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.08s
+test result: ok. 73 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.09s
 
      Running unittests src/lib.rs (target/debug/deps/salimon_survival-084f751df9530566)
 
@@ -787,8 +787,8 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 running 5 tests
 test lethal_starvation_tick_precedes_periodic_food_and_healing_at_same_timestamp ... ok
 test active_treatment_and_food_resume_exact_fractional_intervals_and_freeze_offline ... ok
-test registry_conflicts_invalid_and_terminal_consumption_are_transactional ... ok
 test repeated_medkits_refresh_but_do_not_exceed_configured_stacks_or_replay_offline_ticks ... ok
+test registry_conflicts_invalid_and_terminal_consumption_are_transactional ... ok
 test starter_ration_clamps_hunger_and_medkit_delivers_exact_bounded_gradual_healing ... ok
 
 test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
@@ -798,8 +798,8 @@ test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 running 5 tests
 test drink_relaxes_penalties_without_recharging_fatigue_or_bypassing_exhaustion ... ok
 test gel_halves_only_active_drain_and_expires_exactly_after_ten_minutes ... ok
-test malformed_buff_catalog_and_missing_old_remainder_are_handled ... ok
 test all_food_timers_refresh_without_stacking_preserve_save_fraction_and_freeze_offline ... ok
+test malformed_buff_catalog_and_missing_old_remainder_are_handled ... ok
 test meal_feeds_exact_seventy_over_sixty_seconds_and_boosts_eligible_regen_only ... ok
 
 test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
@@ -834,8 +834,8 @@ test exposure_radiation_stops_immediately_burn_lingers_and_offline_freezes_all_e
 test losing_regen_eligibility_resets_credit_before_immediate_feeding ... ok
 test periodic_food_at_eligibility_loss_does_not_preserve_regen_credit ... ok
 test registry_validation_custom_sources_and_corrupt_status_rejection ... ok
-test starvation_and_periodic_heal_compete_with_stable_damage_first_order ... ok
 test regen_exact_sixty_seconds_thresholds_and_fractional_save_continuation ... ok
+test starvation_and_periodic_heal_compete_with_stable_damage_first_order ... ok
 test wounds_block_only_the_affected_debt_until_treatment ... ok
 test timed_stacking_refresh_cap_dispel_and_treatment_only_rules ... ok
 
@@ -843,12 +843,13 @@ test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fin
 
      Running unittests src/lib.rs (target/debug/deps/salimon_universe-1078c39e48be8275)
 
-running 35 tests
+running 36 tests
 test coordinates::tests::gregorian_epoch_rollovers_scale_mismatch_and_wire_validation ... ok
 test coordinates::tests::invalid_frames_epochs_rotations_and_positions_reject ... ok
-test coordinates::tests::nested_moving_rotating_frames_roundtrip_and_common_ancestor_precision ... ok
 test coordinates::tests::proper_and_radial_motion_retain_local_offset ... ok
+test coordinates::tests::nested_moving_rotating_frames_roundtrip_and_common_ancestor_precision ... ok
 test coordinates::tests::submeter_details_survive_million_cell_anchor_and_gpu_subtraction ... ok
+test ingestion::gaia::tests::gaia_angular_errors_convert_mas_to_degrees_without_changing_raw_evidence ... ok
 test ingestion::gaia::tests::golden_exact_ids_missing_motion_and_negative_parallax ... ok
 test ingestion::gaia::tests::malformed_data_and_sink_failure_never_succeed ... ok
 test ingestion::gaia::tests::quality_counts_keep_uncertain_distances_but_reject_bad_positions ... ok
@@ -880,17 +881,17 @@ test ingestion::csv::tests::quoting_width_utf8_and_limits ... ok
 test tests::source_identity_is_exact_namespaced_and_independent_of_display_and_row_order ... ok
 test tests::schema_evolution_unknown_fields_duplicate_json_and_malformed_ids_reject ... ok
 
-test result: ok. 35 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
 
      Running unittests src/lib.rs (target/debug/deps/salimon_world-512f36c6f68e4cf6)
 
 running 43 tests
-test camera::tests::approach_is_monotonic_and_reaches_the_near_dwell ... ok
 test camera::tests::a_large_delta_wraps_to_the_same_deterministic_sample ... ok
-test camera::tests::default_snapshot_starts_at_the_far_approach_endpoint ... ok
+test camera::tests::approach_is_monotonic_and_reaches_the_near_dwell ... ok
 test camera::tests::inspection_tours_reach_every_catalog_surface_and_keep_the_scene_immutable ... ok
 test camera::tests::jump_to_near_selects_the_exact_near_dwell_endpoint_and_pauses ... ok
 test camera::tests::logarithmic_midpoint_is_the_geometric_mean ... ok
+test camera::tests::default_snapshot_starts_at_the_far_approach_endpoint ... ok
 test camera::tests::near_and_far_dwells_hold_their_endpoints ... ok
 test camera::tests::near_camera_is_twelve_meters_above_earth_surface ... ok
 test camera::tests::pause_freezes_the_timeline_and_toggle_resumes_it ... ok
@@ -922,8 +923,8 @@ test resource_fragments::mutation_tests::ordered_removal_growth_and_journal_keep
 test resource_size::tests::geometry_enlarges_every_axis_without_changing_material_volume_or_mass ... ok
 test terrain::tests::crater_depth_support_and_normal_match_radial_surface ... ok
 test terrain::tests::decoding_rejects_truncation_corruption_and_wrong_body ... ok
-test camera::tests::snapshots_remain_finite_through_an_entire_cycle ... ok
 test terrain::tests::full_capacity_wire_budget_and_definition_identity ... ok
+test camera::tests::snapshots_remain_finite_through_an_entire_cycle ... ok
 test terrain::tests::rejects_invalid_inputs_and_unbounded_definitions ... ok
 test terrain::tests::roundtrip_profiles_order_and_world_translation ... ok
 test terrain::tests::version_one_golden_samples ... ok
@@ -1020,8 +1021,8 @@ test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
    Doc-tests salimon_character
 
 running 2 tests
-test client/character/src/state.rs - state::ShipFrame::project_world (line 15) - compile fail ... ok
 test client/character/src/state.rs - state::ShipFrame::unproject_local (line 27) - compile fail ... ok
+test client/character/src/state.rs - state::ShipFrame::project_world (line 15) - compile fail ... ok
 
 test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
 
@@ -1085,154 +1086,75 @@ running 0 tests
 
 test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
+   Compiling salimon-universe v0.1.0 (/workspace/salimon/client/universe)
+   Compiling salimon-persistence v0.1.0 (/workspace/salimon/client/persistence)
+   Compiling salimon-world v0.1.0 (/workspace/salimon/client/world)
+   Compiling salimon-physics v0.1.0 (/workspace/salimon/client/physics)
+   Compiling salimon-survival v0.1.0 (/workspace/salimon/client/survival)
+   Compiling salimon-character v0.1.0 (/workspace/salimon/client/character)
+   Compiling salimon-ship v0.1.0 (/workspace/salimon/client/ship)
+   Compiling salimon-fabrication v0.1.0 (/workspace/salimon/client/fabrication)
    Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 8.75s
-   Compiling proc-macro2 v1.0.107
-    Checking simd-adler32 v0.3.10
-    Checking serde_json v1.0.151
-    Checking bitflags v2.13.1
-    Checking miniz_oxide v0.9.1
-    Checking log v0.4.29
-    Checking libloading v0.8.9
-    Checking once_cell v1.21.4
-    Checking dlib v0.5.3
-   Compiling quote v1.0.47
-    Checking flate2 v1.1.10
-   Compiling syn v3.0.5
-   Compiling syn v2.0.119
-    Checking smallvec v1.16.0
-    Checking wayland-sys v0.31.11
-    Checking libc v0.2.189
-    Checking linux-raw-sys v0.12.1
-    Checking foldhash v0.2.0
-    Checking equivalent v1.0.2
-    Checking libm v0.2.16
-   Compiling serde_derive v1.0.229
-    Checking rustix v1.1.4
-   Compiling bytemuck_derive v1.12.0
-    Checking bytemuck v1.25.2
-   Compiling thiserror-impl v2.0.20
-   Compiling zerocopy-derive v0.8.56
-    Checking serde v1.0.229
-    Checking thiserror v2.0.20
-    Checking hashbrown v0.17.1
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 9.56s
     Checking salimon-universe v0.1.0 (/workspace/salimon/client/universe)
-    Checking zerocopy v0.8.56
-    Checking arrayvec v0.7.8
-    Checking downcast-rs v1.2.1
-    Checking scoped-tls v1.0.1
-    Checking indexmap v2.14.2
-    Checking wayland-backend v0.3.17
     Checking salimon-persistence v0.1.0 (/workspace/salimon/client/persistence)
-    Checking num-traits v0.2.19
     Checking salimon-world v0.1.0 (/workspace/salimon/client/world)
-    Checking rustc-hash v1.1.0
-    Checking naga-types v30.0.1
-   Compiling wayland-scanner v0.31.11
-    Checking unicode-width v0.2.2
-    Checking raw-window-handle v0.6.2
-    Checking bit-vec v0.9.1
-    Checking codespan-reporting v0.13.1
-    Checking bit-set v0.10.0
-    Checking spirv v0.4.0+sdk-1.4.341.0
-    Checking unicode-ident v1.0.24
-    Checking static_assertions v1.1.0
-    Checking scopeguard v1.2.0
-    Checking allocator-api2 v0.2.21
-    Checking wayland-client v0.31.15
-    Checking salimon-math v0.1.0 (/workspace/salimon/client/math)
-    Checking hashbrown v0.16.1
-    Checking lock_api v0.4.14
-    Checking wgpu-types v30.0.1
-    Checking parking_lot_core v0.9.12
-    Checking ash v0.38.0+1.3.281
-    Checking presser v0.3.1
-    Checking parking_lot v0.12.5
-    Checking khronos-egl v6.0.0
-    Checking ordered-float v5.4.0
-    Checking half v2.7.1
-   Compiling thiserror-impl v1.0.69
-    Checking naga v30.0.1
-    Checking linux-raw-sys v0.4.15
-    Checking glow v0.17.0
-    Checking renderdoc-sys v1.1.0
-    Checking profiling v1.0.18
-    Checking thiserror v1.0.69
-    Checking rustix v0.38.44
-    Checking wayland-protocols v0.32.13
     Checking salimon-survival v0.1.0 (/workspace/salimon/client/survival)
-    Checking polling v3.11.0
-    Checking slab v0.4.12
-    Checking calloop v0.13.0
-   Compiling gltf-derive v1.4.1
-    Checking aho-corasick v1.1.5
-    Checking arrayref v0.3.9
-    Checking xcursor v0.3.11
-    Checking strict-num v0.1.1
-    Checking cursor-icon v1.2.0
-    Checking regex-syntax v0.8.11
-    Checking xkeysym v0.2.1
-    Checking ttf-parser v0.25.1
-    Checking regex-automata v0.4.18
-    Checking wgpu-naga-bridge v30.0.1
-    Checking wayland-csd-frame v0.3.0
-    Checking tiny-skia-path v0.11.4
-    Checking owned_ttf_parser v0.25.1
-    Checking wayland-cursor v0.31.14
-    Checking gltf-json v1.4.1
-    Checking calloop-wayland-source v0.3.0
-    Checking wayland-protocols-wlr v0.3.12
-    Checking gpu-allocator v0.28.0
-    Checking wgpu-hal v30.0.1 (/workspace/salimon/vendor/wgpu-hal)
-    Checking memmap2 v0.9.11
-    Checking fdeflate v0.3.7
-    Checking miniz_oxide v0.8.9
-    Checking utf8parse v0.2.2
-    Checking lazy_static v1.5.0
-    Checking byteorder v1.5.0
-    Checking ab_glyph_rasterizer v0.1.10
-    Checking ab_glyph v0.2.32
-    Checking png v0.18.0
-    Checking anstyle-parse v0.2.7
-    Checking regex v1.13.1
-    Checking gltf v1.4.1
-    Checking smithay-client-toolkit v0.19.2
-    Checking tiny-skia v0.11.4
-    Checking getrandom v0.3.4
     Checking salimon-physics v0.1.0 (/workspace/salimon/client/physics)
-    Checking salimon-fabrication v0.1.0 (/workspace/salimon/client/fabrication)
-    Checking gethostname v1.1.0
-    Checking pin-project-lite v0.2.17
-    Checking anstyle v1.0.14
-    Checking as-raw-xcb-connection v1.0.1
-    Checking jiff-core v0.1.0
-    Checking tracing-core v0.1.36
-    Checking anstyle-query v1.1.5
-    Checking x11rb-protocol v0.13.2
-    Checking is_terminal_polyfill v1.70.2
-    Checking colorchoice v1.0.5
-    Checking jiff v0.2.35
-    Checking anstream v0.6.21
-    Checking tracing v0.1.44
-    Checking wgpu-core-deps-windows-linux-android v30.0.1
-    Checking sctk-adwaita v0.10.1
-    Checking wgpu-core v30.0.1
-    Checking ahash v0.8.12
-    Checking x11-dl v2.21.0
-    Checking env_filter v0.1.4
-    Checking xkbcommon-dl v0.4.2
-    Checking wayland-protocols-plasma v0.3.12
-    Checking percent-encoding v2.3.2
-    Checking dpi v0.1.2
-    Checking smol_str v0.2.2
-    Checking env_logger v0.11.8
-    Checking salimon-ship v0.1.0 (/workspace/salimon/client/ship)
     Checking salimon-character v0.1.0 (/workspace/salimon/client/character)
-    Checking pollster v0.4.0
-    Checking salimon-diagnostics v0.1.0 (/workspace/salimon/client/diagnostics)
-    Checking wgpu v30.0.1
-    Checking salimon-renderer v0.1.0 (/workspace/salimon/client/renderer)
-    Checking x11rb v0.13.2
-    Checking winit v0.30.13
+    Checking salimon-fabrication v0.1.0 (/workspace/salimon/client/fabrication)
+    Checking salimon-ship v0.1.0 (/workspace/salimon/client/ship)
     Checking salimon-client v0.1.0 (/workspace/salimon/client/runtime)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 02s
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 8.84s
+   Compiling salimon-universe v0.1.0 (/workspace/salimon/client/universe)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.64s
+     Running unittests src/lib.rs (target/debug/deps/salimon_universe-b642115ae07ec460)
+
+running 36 tests
+test coordinates::tests::gregorian_epoch_rollovers_scale_mismatch_and_wire_validation ... ok
+test coordinates::tests::invalid_frames_epochs_rotations_and_positions_reject ... ok
+test coordinates::tests::nested_moving_rotating_frames_roundtrip_and_common_ancestor_precision ... ok
+test coordinates::tests::proper_and_radial_motion_retain_local_offset ... ok
+test coordinates::tests::submeter_details_survive_million_cell_anchor_and_gpu_subtraction ... ok
+test ingestion::gaia::tests::gaia_angular_values_and_source_errors_have_separate_explicit_units ... ok
+test ingestion::gaia::tests::golden_exact_ids_missing_motion_and_negative_parallax ... ok
+test ingestion::gaia::tests::malformed_data_and_sink_failure_never_succeed ... ok
+test ingestion::gaia::tests::quality_counts_keep_uncertain_distances_but_reject_bad_positions ... ok
+test ingestion::gaia::tests::reviewed_crossmatch_and_duplicate_resolution_are_order_independent ... ok
+test partitions::tests::exact_roundtrip_sources_lookup_and_determinism ... ok
+test partitions::tests::independent_cells_do_not_read_corrupt_neighbors ... ok
+test partitions::tests::independent_python_zlib_v1_fixture_remains_readable ... ok
+test partitions::tests::lossless_f64_missing_data_and_provenance ... ok
+test ingestion::csv::tests::quoting_width_utf8_and_limits ... ok
+test partitions::tests::rechecksummed_truncated_zlib_trailer_is_rejected ... ok
+test partitions::tests::reject_bad_headers_truncation_crc_and_trailing_bytes ... ok
+test partitions::tests::reject_duplicate_conflicting_or_incomplete_cells ... ok
+test partitions::tests::rechecksummed_extra_stream_bytes_are_rejected ... ok
+test partitions::tests::reject_payload_index_mismatch_and_expansion_past_limit ... ok
+test partitions::tests::reject_rechecksummed_hostile_index ... ok
+test reference::tests::candidate_envelope_strict_roundtrip_order_and_overflow ... ok
+test reference::tests::golden_jpl_epochs_si_conversion_and_production_frames_match ... ok
+test reference::tests::norm_not_componentwise_and_boundary_inclusive ... ok
+test reference::tests::version_fields_bounds_duplicates_and_invalid_budgets_reject ... ok
+test reference::tests::independent_faults_cannot_silently_pass ... ok
+test sources::tests::malformed_artifacts_and_unknown_versions_cannot_publish ... ok
+test sources::tests::pinned_sources_decode_but_production_reuse_is_not_implicitly_approved ... ok
+test tests::canonical_world_definition_requires_versioned_domain_separation_and_valid_dag ... ok
+test tests::checked_in_schema_one_fixture_remains_compatible_and_canonical ... ok
+test tests::fixture_revision_replacement_is_explicit_and_does_not_mutate_published_catalog ... ok
+test tests::invalid_quantity_uncertainty_validity_and_source_are_rejected ... ok
+test tests::duplicate_id_wrong_system_dangling_parent_and_cycles_never_publish ... ok
+test tests::roundtrip_preserves_missing_values_uncertainties_provenance_and_population ... ok
+test tests::source_identity_is_exact_namespaced_and_independent_of_display_and_row_order ... ok
+test tests::schema_evolution_unknown_fields_duplicate_json_and_malformed_ids_reject ... ok
+
+test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+   Doc-tests salimon_universe
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+    Checking salimon-universe v0.1.0 (/workspace/salimon/client/universe)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.90s

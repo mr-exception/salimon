@@ -160,3 +160,7 @@ storage sensitivity and throughput, not a production forecast. Read the
 [selection, units, sidecar and scaling contract](../../docs/universe-gaia-ingestion.md).
 No distance inference, full snapshot approval, multiple-star solver, runtime
 migration or astrometry storage in U04's wire is implied.
+
+Gaia angular values expose degrees; separately named RA/Dec source-error fields
+retain mas without implicit covariance conversion. A mixed-unit regression
+protects both typed and raw evidence.

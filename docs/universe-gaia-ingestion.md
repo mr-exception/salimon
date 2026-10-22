@@ -24,6 +24,10 @@ counted. Required headers match the U06 snapshot; errors and quality columns not
 in that snapshot are optional. A source without parallax remains usable as a sky
 observation; no 3D location is fabricated.
 
+Gaia `ra_error`/`dec_error` are milliarcseconds even though RA/Dec values are
+degrees. The typed `ra_error_mas`/`dec_error_mas` fields keep source errors
+separate from the degree-valued coordinates, without inferring scalar RA-angle
+covariance or transforming Gaia's astrometric error convention. Raw columns remain intact.
 Typed observations retain RA/Dec in degrees, parallax and its standard error in
 mas, pmra (including cos(dec))/pmdec in mas/year, radial velocity in km/s, their
 optional published standard errors, and the Julian reference year. These source

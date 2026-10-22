@@ -32,8 +32,12 @@ pub struct GaiaObservation {
     pub provenance: Provenance,
     /// Julian reference year in Gaia's source convention, not a converted Epoch.
     pub ref_epoch_julian_year: f64,
-    pub ra_degrees: Measurement,
-    pub dec_degrees: Measurement,
+    pub ra_degrees: f64,
+    pub dec_degrees: f64,
+    /// Gaia source astrometric errors remain mas, separate from degree values.
+    /// No covariance/tangent-plane reinterpretation is performed here.
+    pub ra_error_mas: Option<f64>,
+    pub dec_error_mas: Option<f64>,
     /// Negative parallaxes remain observed values; no inverse-parallax distance.
     pub parallax_mas: Option<Measurement>,
     /// Gaia pmra already includes cos(dec).
@@ -175,8 +179,10 @@ pub fn stream(
             source,
             provenance,
             ref_epoch_julian_year: epoch,
-            ra_degrees: ra,
-            dec_degrees: dec,
+            ra_degrees: ra.value,
+            dec_degrees: dec.value,
+            ra_error_mas: ra.standard_error,
+            dec_error_mas: dec.standard_error,
             parallax_mas: parallax,
             pmra_mas_per_year: pmra,
             pmdec_mas_per_year: pmdec,

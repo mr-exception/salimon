@@ -310,3 +310,15 @@ checks; repeat output must compare identically on the tested toolchain. CI runs
 this gate and repeat comparison. See [model limits](universe-inference.md) and
 [measured evidence](../reports/issue-410/README.md). No empirical frequency fit,
 production source approval, runtime migration or native M1 signoff is implied.
+
+## Universe fictional builder (#411)
+
+`cargo test -p salimon-universe --locked` includes U10 source preservation,
+identity/order/namespace, input bounds, hashed recipe references, fixed publication
+goldens and Roche/Hill/Kepler plus age/metallicity trend checks. Run
+`cargo run -p salimon-universe --example fiction_sanity --release --locked` for
+four synthetic 64-system distributions, repeat/reorder byte checks and raw/zlib
+storage. Source CI repeats/compares the summary and macOS/Windows portable jobs
+run the same synthesis goldens; those are CPU contracts, not graphical signoff.
+See [file adapter usage and limits](universe-fiction-builder.md#commands-and-validation).
+Workspace build/tests/all-target Clippy/fmt and docs/base-impact gates also apply.

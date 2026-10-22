@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "seed": 42,
+  "revision": "fiction-test-v1",
+  "rationale": "synthetic reviewed region; not production Milky Way calibration",
+  "regions": [{
+    "key": "disk",
+    "center": {"cell": [900000000, 0, 0], "offset": [0.0, 0.0, 0.0]},
+    "extent_parsecs": [2.0, 2.0, 2.0],
+    "residual_systems_per_cubic_parsec": 1.0,
+    "age_gyr": [1.0, 12.0],
+    "metallicity_feh": [-2.5, 0.5]
+  }]
+}

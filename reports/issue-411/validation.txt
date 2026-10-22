@@ -1,0 +1,93 @@
+Linux x86_64 Debian 13; Rust/Cargo 1.99.1; Python 3.12.14
+
+cargo test --workspace --locked
+test result: ok. 68 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+test result: ok. 334 passed; 0 failed; 9 ignored; 0 measured; 0 filtered out; finished in 131.88s
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+test result: ok. 71 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 11.00s
+test result: ok. 75 passed; 0 failed; 14 ignored; 0 measured; 0 filtered out; finished in 6.46s
+test result: ok. 73 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.23s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 59 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.38s
+test result: ok. 42 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.02s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+cargo test -p salimon-universe --locked
+test result: ok. 59 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.05s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+cargo test -p salimon-universe --release --locked synthesis
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 53 filtered out; finished in 0.04s
+
+cargo build --workspace --locked
+    Blocking waiting for file lock on build directory
+   Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 57.54s
+
+cargo clippy --workspace --all-targets --locked -- -D warnings
+    Checking salimon-character v0.1.0 (/workspace/salimon/client/character)
+    Checking pollster v0.4.0
+    Checking salimon-diagnostics v0.1.0 (/workspace/salimon/client/diagnostics)
+    Checking salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 39s
+
+cargo clippy -p salimon-universe --all-targets --locked -- -D warnings
+    Checking salimon-universe v0.1.0 (/workspace/salimon/client/universe)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.75s
+
+python -m unittest discover -s scripts -p test_check_docs.py -v
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.006s
+
+OK
+
+cargo run -p salimon-universe --example fiction_sanity --release --locked
+Repeated/reordered full publications: byte-identical
+Repeated JSON summary cmp: passed
+Debug/release JSON summary cmp: passed
+Raw JSON/zlib storage, histograms and hashes: sanity.json
+
+cargo build -p salimon-universe --example fiction_build --locked
+valid build 1: passed; 97d2c46654d7afc5e4aac03fdf94358e9182f0b8ff38251990a802684ea632f1
+valid build 2: passed; 97d2c46654d7afc5e4aac03fdf94358e9182f0b8ff38251990a802684ea632f1
+unknown-version: refused; prior output preserved
+malformed: refused; prior output preserved
+oversized: refused; prior output preserved
+aliased input/output: refused; input preserved
+no temporary output files left behind
+
+cargo fmt --all -- --check: passed
+python scripts/check_docs.py: 0 findings
+python scripts/check_docs.py --base origin/main: 0 findings
+git diff --check: passed
+Remote macOS/Windows publication goldens: pending PR CI; native game/M1/Metal checks not run

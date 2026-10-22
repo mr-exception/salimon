@@ -1,9 +1,9 @@
 # Canonical universe schema — U01 (#402)
 
-`salimon-universe` is a portable leaf crate using Serde/JSON and pinned pure Rust flate2/CRC32 storage dependencies. It is not yet a runtime dependency. `salimon-world`
+`salimon-universe` is a portable leaf crate using Serde/JSON and pinned pure Rust flate2/CRC32 storage and sha2 digest dependencies. It is not yet a runtime dependency. `salimon-world`
 continues owning the compressed six-body playable fixture, terrain/resource-v1
 identity and existing saves. Catalog data must never implicitly grant player
-navigation knowledge. No GPU/window/network, source download, real production catalog, orbit, OS clock,
+navigation knowledge. No GPU/window/network, source download, real production catalog, orbital integration, OS clock,
 terrain evaluation or backend is introduced. U04 adds consumer-supplied Read/Seek
 IO and an in-memory prototype encoder, not a production pack builder.
 
@@ -23,7 +23,7 @@ preserve source key case and never derive from display names, list position,
 system time, runtime random state or a default language hasher. Namespace is
 lowercase ASCII; key is case-sensitive ASCII; both use letters/digits/`._-` and
 one separating colon, at most 160 UTF-8 bytes. Builder-defined canonical keys are
-committed publication identities; this crate does not select/generate them.
+committed publication identities; the schema validator does not select/generate them; U10 synthesis now owns fictional publication keys.
 
 Dataset IDs and record IDs are globally disjoint. Every observed/inferred field
 references registered versioned source metadata; original observed record keys
@@ -50,10 +50,10 @@ Each fictional planet/moon requires a positive definition version, lowercase
 `visual` seed domains. Domains bind `u64` seed, positive algorithm version,
 subdefinition digest and explicit upstream domain dependencies. At most 64 named
 domains are admitted; duplicate/missing/cyclic dependencies reject. Seed equality
-alone is not a dependency; domain names separate interpretation. The crate does
-not generate seeds, verify full-definition content against digests, run hashes,
-or evaluate algorithms. Full canonical definitions/parameters, reproducible PRF
-and actual digest verification belong to U04/U10/U11. A seed/digest reference is
+alone is not a dependency; domain names separate interpretation. The schema validator does
+not verify full-definition content or evaluate algorithms. U10 now derives seeds
+and hashes actual generation recipe/domain inputs; full canonical physical
+definitions and evaluators remain U11. A seed/digest reference is
 not advertised as a complete planet. Published revisions are immutable; changes
 require explicit validated version/migration work rather than mutating a running
 catalog. This is not owner approval of geography changes or a save migration.
@@ -193,3 +193,19 @@ sampling evidence use separate typed sidecars requiring U12 packaging. Present
 quantities are immutable; unsupported systems/inconsistent observations reject.
 No calibrated posterior, full state, long-term stability proof, runtime migration
 or native hardware signoff is claimed.
+
+## Canonical fiction synthesis — U10 (#411)
+
+`synthesis.rs` owns validated residual-density region inputs, versioned SHA-256
+field lanes, deterministic stellar/body/population recipes and immutable bounded
+publications. `synthesis/tests.rs` owns physical/source/identity/failure and fixed
+hash contracts; `fixtures/fiction-request-v1.json` pins a development request.
+`examples/fiction_build.rs` owns bounded local file IO and staged replacement;
+`examples/fiction_sanity.rs` measures four fixed synthetic cohorts and raw/zlib
+storage with repeated/reordered full-output comparisons. Read the [canonical
+builder contract](../../docs/universe-fiction-builder.md) for formulas, units,
+limits, namespace reservation, provenance and conditional distribution evidence.
+U01/U04 wire is unchanged. Actual recipe bytes and domain inputs are hashed;
+full terrain/geology/physical definitions and evaluation remain U11, and U12
+must package the catalog plus sidecars. No empirical full-Galaxy fit, production
+pack, runtime generation, chart reveal or native acceptance is supplied.

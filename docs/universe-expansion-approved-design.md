@@ -115,3 +115,14 @@ physical screening. It preserves measurements and refuses unsupported/inconsiste
 inputs. This is not empirical population calibration, a stability proof or a
 complete ephemeris. Sidecar packaging remains U12, state evaluation U14 and
 production-source/native gates remain independent.
+
+## U10 implementation status (#411)
+
+The [portable offline fictional-system builder](universe-fiction-builder.md) now
+publishes stable individually materialized stellar/body records and compact minor
+populations from explicit residual-density/age/metallicity regions. Actual
+generation recipes and catalog bytes are hashed reproducibly. Validation uses
+synthetic heuristic cohorts, not a calibrated production Milky Way census. Full
+world definitions remain U11; production batching/packaging U12 and native
+real-scale integration/signoff remain downstream. Runtime does not generate a
+new canonical world on player arrival.

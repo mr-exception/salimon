@@ -2,7 +2,7 @@
 
 ## Outcome
 
-Native verification in progress, **not full signoff**. Current main `812a877` was rebuilt
+Modal fix and bounded native evidence delivered; **full signoff deferred to #557**. Current main `812a877` was rebuilt
 from scratch in an isolated Cargo target on Apple M1 iMac21,1 / 16 GiB / macOS
 26.2, using Metal at a 1920×1080 physical drawable. The runtime now suppresses world prompts/reticle while a modal owns the screen.
 Assets, recipes, input authority, shader and baseline approvals are unchanged. The initial native OS input attempt was blocked by event-posting permission.
@@ -123,7 +123,7 @@ mismatch. These source adaptations are included in `native_input.swift`.
 At initial delivery, full physical intake/collection/circulation, representative
 matched frame budgets, supported DPI and human appearance/playability approval
 remain pending. Historical mouse delivery failures remain recorded; #453 later records a successful bounded longer-sequence delivery retry. Remaining native signoff is owned by #557.
-No complete native signoff or issue closure is claimed.
+Full native signoff remains deferred. Closing #348 records delivery and transfer to #557, not passage of the remaining gates.
 
 
 ## Review readiness and transferred acceptance

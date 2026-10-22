@@ -116,3 +116,14 @@ The U01 wire schema remains version 1; new frame/epoch types are independent API
 U05 now consumes these IDs/epochs in the separate persistence universe envelope;
 `Epoch::compare` orders same-scale split instants without UTC duration assumptions.
 No catalog or world state is mutated by persistence.
+
+## Source manifests — U06 (#407)
+
+`sources.rs` is the typed, bounded version-1 `salimon.universe.sources` metadata
+boundary: exact source IDs/release/query, official documentation, reuse status,
+credit/review references, coverage/uncertainty and artifact byte counts/SHA256s.
+It validates paths, duplicates, required metadata and production eligibility;
+it performs no IO, hashing, scientific conversion or download. The offline CLI
+[import contract](../../docs/universe-sources.md) verifies hashes and stages raw
+bytes. U07/U08 own source-specific science ingestion/cross-match/units; U12 owns
+production pack publication. Neither fixtures nor catalog truth grant chart knowledge.

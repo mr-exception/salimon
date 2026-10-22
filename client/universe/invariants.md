@@ -25,3 +25,7 @@ The [architecture](architecture.md) is the canonical API/limit/ownership contrac
     one tree is evaluated at one declared epoch. Unknown/cyclic/stale frames fail.
 11. Epoch scale labels survive serialization. Leap seconds, implicit scale
     conversion and unsupported cross-day UTC arithmetic fail explicitly.
+
+12. Source download access never implies reuse approval. Production manifests
+    reject restricted/unreviewed sources and synthetic artifacts; raw bytes must
+    match frozen sizes/digests before offline staging. No runtime network path.

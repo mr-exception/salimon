@@ -407,5 +407,19 @@ file adapter: `examples/fiction_build.rs`; cohort/storage workload:
 `examples/fiction_sanity.rs` (all under `client/universe/`).
 See the [builder contract](universe-fiction-builder.md), [architecture](../client/universe/architecture.md#canonical-fiction-synthesis--u10-411)
 and [invariants](../client/universe/invariants.md). Source imports and observed
-U09 completion remain separate. U11 full worlds, U12 production packs and U14
+U09 completion remain separate. U11 below publishes the selected world; other
+worlds' full definitions, U12 production packs and U14
 complete states retain their boundaries; runtime/world/renderer are unchanged.
+
+## Universe permanent starting system (#412)
+
+Owner: `client/universe/src/starting_system.rs`; tests:
+`src/starting_system/tests.rs`; request/world goldens: `fixtures/starting-*-v1.json`;
+audit adapter: `examples/starting_system.rs` (paths within `client/universe/`).
+Read the [selection/world contract](universe-starting-system.md),
+[architecture](../client/universe/architecture.md#permanent-starting-world--u11-412)
+and [invariants](../client/universe/invariants.md). Run universe/workspace gates,
+repeat the manifest example and compare the golden; cross-platform CI also runs
+debug/release tests. Candidate/world hashes must not change silently. U12 merges
+and packages; U14 supplies states; U23/U24 integrate terrain/arrival/resources.
+No runtime, prototype save, player chart or native signoff changes are implied.

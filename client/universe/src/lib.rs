@@ -6,6 +6,7 @@ pub mod ingestion;
 pub mod partitions;
 pub mod reference;
 pub mod sources;
+pub mod starting_system;
 pub mod synthesis;
 pub use epoch::Epoch;
 mod identity;

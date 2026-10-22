@@ -334,3 +334,9 @@ The portable [canonical fictional-system builder](docs/universe-fiction-builder.
 also supplies stable offline catalogs and compact minor-population recipes from
 reviewed density/age/metallicity regions. Synthetic distribution/storage checks
 do not constitute production universe publication or playable-world migration.
+
+
+The [permanent awakening definition](docs/universe-starting-system.md) freezes
+Nacre Reach / Vesper, its >=30 ly Earth-distance proof and versioned starting
+surface/resources. Reproduce its manifest/audit with the portable `starting_system`
+example; real-scale playable startup and native verification remain downstream.

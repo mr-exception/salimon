@@ -51,4 +51,13 @@ lanes; `synthesis/tests.rs` owns identity/source/physical/golden regressions.
 Read the [builder contract](../../docs/universe-fiction-builder.md) before changing
 recipes or publication hashes. Examples `fiction_build` and `fiction_sanity` own
 file IO and synthetic evidence; never call synthesis from runtime or replace
-observed records. Full terrain definitions/evaluation remain U11.
+observed records. U11 now publishes the selected starting world's full definition;
+other worlds' definitions and playable evaluation adapters remain downstream.
+
+U11 `starting_system.rs` owns the exact permanent candidate/world digests, fixed
+IDs, complete selected-world manifest and single radial surface query. Read the
+[starting-system contract](../../docs/universe-starting-system.md). Do not reselect
+on launch, regenerate a visited world or treat U10 recipe hashes as U11 world
+digests. Visual overrides cannot change terrain or resources. Resource routes
+must clear the authored ship disk and use the same terrain query. Golden changes
+need explicit publication/migration review; native/playable integration is U24.

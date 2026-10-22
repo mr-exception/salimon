@@ -1,0 +1,277 @@
+U11 final local validation, 2026-10-22; Linux x86_64; Rust/Cargo 1.99.1
+Workspace aggregate: 849 passed, 0 failed, 28 intentionally ignored.
+Source environment: /workspace/.salimon-tools/env.sh; pinned --locked dependencies; --offline.
+
+workspace unit/session/doc tests
+     Running unittests src/lib.rs (target/debug/deps/salimon_character-fe4707dde5b1b61f)
+test result: ok. 68 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-225cf3bc83389f81)
+test result: ok. 334 passed; 0 failed; 9 ignored; 0 measured; 0 filtered out; finished in 107.18s
+     Running unittests src/lib.rs (target/debug/deps/salimon_diagnostics-69a7742d0bb93b85)
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+     Running unittests src/lib.rs (target/debug/deps/salimon_fabrication-6c4ff318d896d0cd)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (target/debug/deps/salimon_math-dfb0e8d05cf0a12c)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (target/debug/deps/salimon_persistence-bc96b601a36561d0)
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+     Running unittests src/lib.rs (target/debug/deps/salimon_physics-e51e0dbbbadde96f)
+test result: ok. 71 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 19.09s
+     Running unittests src/lib.rs (target/debug/deps/salimon_renderer-3b894cc228562d3b)
+test result: ok. 75 passed; 0 failed; 14 ignored; 0 measured; 0 filtered out; finished in 11.27s
+     Running unittests src/lib.rs (target/debug/deps/salimon_ship-2215f4bbda8e2944)
+test result: ok. 73 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.39s
+     Running unittests src/lib.rs (target/debug/deps/salimon_survival-f4557e4adfc448e5)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running unittests src/lib.rs (target/debug/deps/salimon_universe-dc2ac845de5a5dbc)
+test result: ok. 69 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.79s
+     Running unittests src/lib.rs (target/debug/deps/salimon_world-29e88debb7ffa8e3)
+test result: ok. 42 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.05s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+workspace build
+   Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 9.39s
+
+workspace all-target Clippy -D warnings
+   Compiling proc-macro2 v1.0.107
+    Checking simd-adler32 v0.3.10
+    Checking serde_json v1.0.151
+    Checking bitflags v2.13.1
+    Checking log v0.4.29
+    Checking miniz_oxide v0.9.1
+    Checking libloading v0.8.9
+    Checking once_cell v1.21.4
+    Checking dlib v0.5.3
+    Checking smallvec v1.16.0
+    Checking libc v0.2.189
+    Checking wayland-sys v0.31.11
+   Compiling quote v1.0.47
+    Checking flate2 v1.1.10
+   Compiling syn v3.0.5
+   Compiling syn v2.0.119
+    Checking linux-raw-sys v0.12.1
+    Checking foldhash v0.2.0
+    Checking equivalent v1.0.2
+    Checking libm v0.2.16
+    Checking hashbrown v0.17.1
+    Checking rustix v1.1.4
+    Checking downcast-rs v1.2.1
+    Checking scoped-tls v1.0.1
+    Checking arrayvec v0.7.8
+    Checking indexmap v2.14.2
+   Compiling serde_derive v1.0.229
+   Compiling bytemuck_derive v1.12.0
+   Compiling zerocopy-derive v0.8.56
+    Checking bytemuck v1.25.2
+   Compiling thiserror-impl v2.0.20
+    Checking wayland-backend v0.3.17
+    Checking zerocopy v0.8.56
+    Checking num-traits v0.2.19
+    Checking thiserror v2.0.20
+    Checking rustc-hash v1.1.0
+    Checking naga-types v30.0.1
+   Compiling wayland-scanner v0.31.11
+    Checking raw-window-handle v0.6.2
+    Checking bit-vec v0.9.1
+    Checking unicode-width v0.2.2
+    Checking serde v1.0.229
+    Checking codespan-reporting v0.13.1
+    Checking salimon-universe v0.1.0 (/workspace/salimon/client/universe)
+    Checking bit-set v0.10.0
+    Checking spirv v0.4.0+sdk-1.4.341.0
+    Checking wayland-client v0.31.15
+    Checking unicode-ident v1.0.24
+    Checking salimon-persistence v0.1.0 (/workspace/salimon/client/persistence)
+    Checking static_assertions v1.1.0
+    Checking scopeguard v1.2.0
+    Checking salimon-math v0.1.0 (/workspace/salimon/client/math)
+    Checking allocator-api2 v0.2.21
+    Checking lock_api v0.4.14
+    Checking half v2.7.1
+    Checking hashbrown v0.16.1
+    Checking wgpu-types v30.0.1
+    Checking salimon-world v0.1.0 (/workspace/salimon/client/world)
+    Checking naga v30.0.1
+    Checking parking_lot_core v0.9.12
+    Checking ash v0.38.0+1.3.281
+    Checking presser v0.3.1
+    Checking parking_lot v0.12.5
+    Checking khronos-egl v6.0.0
+    Checking ordered-float v5.4.0
+   Compiling thiserror-impl v1.0.69
+    Checking glow v0.17.0
+    Checking renderdoc-sys v1.1.0
+    Checking linux-raw-sys v0.4.15
+    Checking profiling v1.0.18
+    Checking rustix v0.38.44
+    Checking thiserror v1.0.69
+    Checking salimon-survival v0.1.0 (/workspace/salimon/client/survival)
+    Checking wayland-protocols v0.32.13
+    Checking polling v3.11.0
+    Checking slab v0.4.12
+   Compiling gltf-derive v1.4.1
+    Checking wgpu-naga-bridge v30.0.1
+    Checking calloop v0.13.0
+    Checking aho-corasick v1.1.5
+    Checking regex-syntax v0.8.11
+    Checking xkeysym v0.2.1
+    Checking ttf-parser v0.25.1
+    Checking arrayref v0.3.9
+    Checking xcursor v0.3.11
+    Checking strict-num v0.1.1
+    Checking cursor-icon v1.2.0
+    Checking wayland-csd-frame v0.3.0
+    Checking tiny-skia-path v0.11.4
+    Checking wayland-protocols-wlr v0.3.12
+    Checking wayland-cursor v0.31.14
+    Checking regex-automata v0.4.18
+    Checking owned_ttf_parser v0.25.1
+    Checking calloop-wayland-source v0.3.0
+    Checking gltf-json v1.4.1
+    Checking memmap2 v0.9.11
+    Checking gpu-allocator v0.28.0
+    Checking fdeflate v0.3.7
+    Checking wgpu-hal v30.0.1 (/workspace/salimon/vendor/wgpu-hal)
+    Checking miniz_oxide v0.8.9
+    Checking lazy_static v1.5.0
+    Checking byteorder v1.5.0
+    Checking ab_glyph_rasterizer v0.1.10
+    Checking utf8parse v0.2.2
+    Checking anstyle-parse v0.2.7
+    Checking ab_glyph v0.2.32
+    Checking gltf v1.4.1
+    Checking regex v1.13.1
+    Checking png v0.18.0
+    Checking smithay-client-toolkit v0.19.2
+    Checking getrandom v0.3.4
+    Checking tiny-skia v0.11.4
+    Checking salimon-fabrication v0.1.0 (/workspace/salimon/client/fabrication)
+    Checking salimon-physics v0.1.0 (/workspace/salimon/client/physics)
+    Checking gethostname v1.1.0
+    Checking anstyle-query v1.1.5
+    Checking tracing-core v0.1.36
+    Checking x11rb-protocol v0.13.2
+    Checking is_terminal_polyfill v1.70.2
+    Checking colorchoice v1.0.5
+    Checking as-raw-xcb-connection v1.0.1
+    Checking pin-project-lite v0.2.17
+    Checking jiff-core v0.1.0
+    Checking anstyle v1.0.14
+    Checking anstream v0.6.21
+    Checking tracing v0.1.44
+    Checking wgpu-core-deps-windows-linux-android v30.0.1
+    Checking wgpu-core v30.0.1
+    Checking sctk-adwaita v0.10.1
+    Checking jiff v0.2.35
+    Checking ahash v0.8.12
+    Checking x11-dl v2.21.0
+    Checking env_filter v0.1.4
+    Checking wayland-protocols-plasma v0.3.12
+    Checking xkbcommon-dl v0.4.2
+    Checking percent-encoding v2.3.2
+    Checking wgpu v30.0.1
+    Checking dpi v0.1.2
+    Checking smol_str v0.2.2
+    Checking env_logger v0.11.8
+    Checking salimon-ship v0.1.0 (/workspace/salimon/client/ship)
+    Checking salimon-character v0.1.0 (/workspace/salimon/client/character)
+    Checking pollster v0.4.0
+    Checking salimon-diagnostics v0.1.0 (/workspace/salimon/client/diagnostics)
+    Checking salimon-renderer v0.1.0 (/workspace/salimon/client/renderer)
+    Checking x11rb v0.13.2
+    Checking winit v0.30.13
+    Checking salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 24s
+
+release U11 tests
+   Compiling version_check v0.9.5
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.24
+   Compiling typenum v1.20.1
+   Compiling quote v1.0.47
+   Compiling generic-array v0.14.7
+   Compiling serde_core v1.0.229
+   Compiling crc32fast v1.5.2
+   Compiling cfg-if v1.0.4
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.151
+   Compiling syn v3.0.5
+   Compiling simd-adler32 v0.3.10
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling adler2 v2.0.1
+   Compiling serde v1.0.229
+   Compiling miniz_oxide v0.9.1
+   Compiling digest v0.10.7
+   Compiling cpufeatures v0.2.17
+   Compiling itoa v1.0.18
+   Compiling memchr v2.8.3
+   Compiling serde_derive v1.0.229
+   Compiling sha2 v0.10.9
+   Compiling flate2 v1.1.10
+   Compiling salimon-universe v0.1.0 (/workspace/salimon/client/universe)
+    Finished `release` profile [optimized] target(s) in 25.59s
+     Running unittests src/lib.rs (target/release/deps/salimon_universe-aa7c4a8972a1b96e)
+
+running 9 tests
+test starting_system::tests::starting_system_distance_independent_split_cell_proof ... ok
+test starting_system::tests::starting_system_arrival_surface_and_all_resource_types_accessible ... ok
+test starting_system::tests::starting_system_physical_limits_and_source_recipe_preservation ... ok
+test starting_system::tests::starting_system_publication_and_world_golden ... ok
+test starting_system::tests::starting_system_refuses_altered_candidate_without_reselection ... ok
+test starting_system::tests::starting_system_rejects_blocked_and_unreachable_arrival_paths ... ok
+test starting_system::tests::starting_system_single_surface_bounds_poles_and_invalid_coordinates ... ok
+test starting_system::tests::starting_system_visual_domain_cannot_change_physical_surface_or_deposits ... ok
+test starting_system::tests::starting_system_rejects_corrupt_versions_parameters_and_names ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 60 filtered out; finished in 0.02s
+
+
+offline documentation validation
+Documentation: 0 failures; 0 exact historical findings retained.
+
+documentation validator contracts
+test_broken_path_anchor_and_escape_report_lines (test_check_docs.DocumentationChecks.test_broken_path_anchor_and_escape_report_lines) ... ok
+test_exact_baseline_does_not_hide_new_failure (test_check_docs.DocumentationChecks.test_exact_baseline_does_not_hide_new_failure) ... ok
+test_required_guides_json_example_and_changed_owner_gate (test_check_docs.DocumentationChecks.test_required_guides_json_example_and_changed_owner_gate) ... ok
+test_stale_rule_is_scoped_and_historical_exclusion_is_explicit (test_check_docs.DocumentationChecks.test_stale_rule_is_scoped_and_historical_exclusion_is_explicit) ... ok
+test_valid_links_reference_definition_unicode_duplicate_anchors_and_fences (test_check_docs.DocumentationChecks.test_valid_links_reference_definition_unicode_duplicate_anchors_and_fences) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.016s
+
+OK
+
+cargo fmt --all --check: exit 0
+git diff --check: exit 0
+Debug/release/repeated starting_system manifest cmp: exit 0; 3283 bytes including newline
+Candidate: 8 systems, 26 planets, 5 eligible; fixed chosen Vesper ID.
+Native M1/Metal rendering/playable acceptance: not run; tracked by U23/U24 and #436-#439.
+python scripts/check_docs.py --base origin/main: 0 failures, 0 exact historical findings retained.

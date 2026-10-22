@@ -323,3 +323,16 @@ run the same synthesis goldens in debug and release profiles, retaining failed
 publication bytes as CI artifacts; those are CPU contracts, not graphical signoff.
 See [file adapter usage and limits](universe-fiction-builder.md#commands-and-validation).
 Workspace build/tests/all-target Clippy/fmt and docs/base-impact gates also apply.
+## Universe permanent starting world (#412)
+
+Run `cargo test -p salimon-universe --locked starting_system`, workspace
+build/tests/all-target Clippy/fmt and documentation/base-impact validation.
+`cargo run -p salimon-universe --example starting_system --locked` must reproduce
+`client/universe/fixtures/starting-world-v1.json` exactly (including newline).
+The `-- --audit` option emits all candidate assessments and definition hashes.
+macOS/Windows portable CI runs debug/release U11 goldens; Ubuntu repeats/compares
+the manifest. Tests cover independent >=30 ly proof, physical screens, immutable
+IDs/digests, altered/unknown/oversized data, single-surface queries, all five
+resources, ship-clearing walk paths and visual independence. See
+[contract](universe-starting-system.md) and [evidence](../reports/issue-412/README.md).
+These CPU checks do not replace U24 integration or native #436–#439 acceptance.

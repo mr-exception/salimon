@@ -1,6 +1,6 @@
 # Real-scale universe expansion — approved design (2026-10-20)
 
-Status: **approved design; portable U01–U09 foundations delivered with the limits below; remaining expansion not implemented**. Source: ten rounds of owner Q&A. This contract supersedes compressed-playable-world assumptions *for the future expansion*, not existing implementation until migrated. Work begins after the existing planned gameplay implementation queue completes. Keep separate native verification, no implementation PRs as part of planning.
+Status: **approved design; portable U01–U11 foundations delivered with the limits below; remaining expansion not implemented**. Source: ten rounds of owner Q&A. This contract supersedes compressed-playable-world assumptions *for the future expansion*, not existing implementation until migrated. Work begins after the existing planned gameplay implementation queue completes. Keep separate native verification, no implementation PRs as part of planning.
 
 ## Narrative alignment (2026-10-21)
 
@@ -123,6 +123,20 @@ publishes stable individually materialized stellar/body records and compact mino
 populations from explicit residual-density/age/metallicity regions. Actual
 generation recipes and catalog bytes are hashed reproducibly. Validation uses
 synthetic heuristic cohorts, not a calibrated production Milky Way census. Full
-world definitions remain U11; production batching/packaging U12 and native
+selected-world definitions are delivered by U11 below; other worlds' full
+definitions remain downstream. Production batching/packaging U12 and native
 real-scale integration/signoff remain downstream. Runtime does not generate a
 new canonical world on player arrival.
+
+
+## U11 implementation status (#412)
+
+The [permanent starting publication](universe-starting-system.md) now freezes
+Nacre Reach / Vesper with separate IDs/names, conservative 37.5500 ly Earth-distance
+proof, physical screening, complete selected-world inputs/digests and portable
+single-surface evaluation. Authored nearby outcrops cover all five material keys
+with checked ship-clearing walk paths. This is a cold airless fictional baseline,
+not a biosphere, climate model, production Milky Way pack or native screenshot.
+U12 packaging, U14 evolving states and U23/U24 playable terrain/arrival/mining
+remain downstream. Current runtime startup, discovery/chart and save semantics
+are unchanged; native #436–#439 retain separate acceptance.

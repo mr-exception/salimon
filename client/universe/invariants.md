@@ -87,3 +87,14 @@ exclude individually materialized selected bodies. Generation references do not
 claim complete U11 terrain definitions. Recipe changes require explicit new
 publication/migration; the runtime never silently regenerates a visited world.
 See the [builder contract](../../docs/universe-fiction-builder.md).
+
+24. U11 freezes one fixed system/star/planet ID and exact candidate/world hashes.
+Changed inputs or unsupported manifests fail; no fallback/reselection per player,
+install or launch. Names never replace scientific identity. Earth-distance proof
+uses common split coordinates and conservative orbital envelopes at publication.
+25. U11's full selected-world manifest is distinct from U10's recipe reference.
+All surface consumers use its single height query; the visual domain cannot alter
+surface/resources. Fixed semantic deposit IDs, positive starting quantities and
+ship-clearing <=55 m walk paths are baseline inputs, not mining/persistence deltas.
+Native/playable U24 integration and explicit revision migration remain required.
+See the [starting-system contract](../../docs/universe-starting-system.md).

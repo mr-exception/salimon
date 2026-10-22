@@ -49,7 +49,7 @@ and [checkpoint index](../../reports/issue-321/checkpoints.md). Software approva
 remains [#314](https://github.com/mr-exception/salimon/issues/314).
 
 Nightly now selects `baselines/software-vulkan-option-a-v2`, explicitly pending
-[review #518](https://github.com/mr-exception/salimon/issues/518). Engine #493
+[review follow-up #537](https://github.com/mr-exception/salimon/issues/537). Engine #493
 changed the cockpit fixture's flight timing, and hosted Mesa changed since v1.
 The old approved v1 corpus remains untouched; its approval does not transfer to
 new actions or renderer contexts. Capture complete candidates after the repair

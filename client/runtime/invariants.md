@@ -496,3 +496,11 @@ funding; recovery only spends surplus above an emergency floor. Schema 7
 validates installed/pending/tray identity and reconstructs mass without charging.
 See [canonical contract](../../docs/data-recovery-module.md). No offline work,
 free coordinates or reconstruction of irrecoverable bytes. Native review #515.
+
+## Modal presentation priority (#348)
+
+Crafting, Archive, pause/settings, terminal and Q-wheel overlays suppress world
+action prompts and the gameplay reticle while they own the screen. Opening a
+modal does not clear prompt state or change interaction authority; closing it
+restores ordinary presentation from current state. Native evidence lives in
+[the Fabricator report](../../reports/issue-348/README.md).

@@ -71,3 +71,56 @@ The [actual physical screen](evidence/native-retry/physical-screen.png) and
 [crafting modal](evidence/native-retry/crafting-modal.png) are Metal captures.
 These five checks do not establish that an occupied item was consumed or that
 the wheel visibly opened while Q was held. Original permission failure remains.
+
+## Live run and modal correction
+
+The owner explicitly authorized the reviewed native input helper. An isolated
+normal wall-clock run (`SALIMON_SAVE_DIR=artifacts/native-20261022/live-348/save`)
+consumed exactly starter food job1/unit1 by Q+pointer click, retaining food
+job1/unit2 in place. Actual E/Enter crafting committed the 0.4 kg biomass +
+0.1 kg ice starter reserve once and produced one 0.3 kg ration job3/unit1 in the
+tray. Native held Q + four Tab presses + Enter consumed medkit job2/unit1.
+[Before medkit](evidence/live/after-collection.json),
+[after medkit](evidence/live/after-medical-wheel.json),
+[input log](evidence/live/actions.log). These are verified native checkpoint
+payload observations, not edited saves. Starter reserves are not a measured
+physical gathering route. The attempted native tray aim/collection did NOT
+collect: the ration remains in the tray. Relative-mouse delivery remains
+unreliable and must not be represented as a successful collection.
+
+Actual inspection found the world E prompt covering crafting material rows
+and the Q-wheel center. Native redraw now suppresses world action-bar/reticle
+pixels while a modal owns the screen; input authority/retained prompts are
+unchanged. Runtime architecture/invariants document this presentation rule.
+The post-fix probe passes the same five native checks, with foreground PID
+matching its child. [Fixed probe](evidence/fixed-probe/checks.json),
+[fixed image](evidence/fixed-probe/crafting-modal.png),
+[fixed binary identity](evidence/fixed-binary.json).
+
+![Before: prompt obscures modal](evidence/live/craft-attempt.png)
+![After: modal rows unobscured](evidence/fixed-probe/crafting-modal.png)
+![Actual held Q and medkit selection before fix](evidence/live/medical-wheel.png)
+
+Final code validation: workspace tests **849 passed, 0 failed, 28 ignored**;
+all-target workspace Clippy with `-D warnings` passed; isolated release build
+passed; formatting and documentation/base-impact checks passed.
+[Tests](evidence/348-workspace-tests.log), [Clippy](evidence/348-clippy.log).
+Scout export validation initially failed because the host Python lacked
+jsonschema, then passed in an isolated venv with the pinned model requirements:
+549732 GLB bytes, 13 materials, 123 primitives, 6493 triangles.
+[Initial failure](evidence/348-asset-validation.log),
+[successful validation](evidence/348-asset-validation-installed.log).
+
+A copied-in-place `.app` executable was rejected on launch (137), and re-signing
+that copy stopped after native-window creation (132). The untouched standalone
+staged executable and a fresh app directory both initialize Metal successfully.
+No gameplay failure is inferred from this packaging attempt; production staging
+is the standalone executable. The native helper now selects the largest target
+window (avoiding tiny auxiliary windows) and refuses key/mouse input unless
+the requested PID is foreground. Global input must not be trusted on a PID
+mismatch. These source adaptations are included in `native_input.swift`.
+
+This remains a draft: full physical intake/collection/circulation, representative
+matched frame budgets, supported DPI and human appearance/playability approval
+remain pending. Existing #453 owns unreliable long-sequence mouse delivery.
+No complete native signoff or issue closure is claimed.

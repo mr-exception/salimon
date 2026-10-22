@@ -39,8 +39,9 @@ through the production interaction, advances one tick, and captures them again.
 Repeated frames must stay identical within the declared tolerance. Keep native
 captures separate from Blender mood references and from approved image corpora.
 Inspect screens, glass, walking-lane edges and dark housings; never promote a
-candidate without human image/mask/tolerance review. M1 signoff remains #451/#477;
-these cloud/reference fixtures do not grant that acceptance.
+candidate without human image/mask/tolerance review. The [#451 native report](../reports/issue-451/README.md) verifies the current Core
+blackout condition. Broader lighting/art/baseline approval remains #483/#477;
+cloud/reference fixture passes do not grant that acceptance.
 
 ## Soundscape boundary (#465)
 
@@ -179,3 +180,25 @@ rerasterized; unchanged full display keys skip GPU uploads. The five-section
 appearance/input/frame-tail acceptance is [#502](https://github.com/mr-exception/salimon/issues/502),
 separate from CPU rasters and software Vulkan. See the
 [delivery report and evidence](../reports/issue-466/README.md).
+
+## Core contrast verification condition (#451)
+
+Use the existing production Core **bus-off state** as the dark-cabin condition,
+paired with bus-on from the identical named Core camera. The #463 lighting
+contract above supersedes the fixed-warm-light premise in the historical #299
+report: the shader's `ship.center.w` bus bit now removes warm/task fill and
+electrical emission while retaining cool visibility fill. Core screen blanking
+uses the same authoritative power state. Do not add a separate brightness knob,
+emergency energy supply or synthetic night fixture for this verification.
+
+The maintained `scout-lighting.json` route starts with a depleted Core, captures
+the bus-off camera, feeds the real carried fragment through production intake
+and advances one tick before the bus-on capture. Named cameras change only
+presentation. `reports/issue-299/core-views.json` adds actual-player-camera close,
+oblique and receding views. Keep their original state assertions; native captures
+verify the shader/material/screen contrast at the recorded context without
+promoting any baseline or weakening an authored contract.
+
+See [#451 native evidence](../reports/issue-451/README.md) for the exact binary,
+shader digest, Metal/drawable context, images, pass results and remaining wider
+appearance/performance limits. The dated #299 report is retained unchanged.

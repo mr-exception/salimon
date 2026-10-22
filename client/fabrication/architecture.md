@@ -15,7 +15,7 @@ runtime, renderer or world session. Canonical behavior is the
 
 `RecipeBook::new` accepts data records and validates the complete set before
 publishing it. Callers may build records from a later data adapter; there is no
-file format/parser in this crate. The two basic starter recipes are unlocked; the three advanced food recipes are locked. Advanced
+file format/parser in this crate. The two basic consumable recipes and recovery module are unlocked; the three advanced food recipes are locked. Advanced
 requirements can be represented but cannot be acquired here. Jobs capture recipe
 values so balances/progress never depend on later tuning. There are no setters
 that mutate a validated recipe book inside a running machine.
@@ -118,7 +118,7 @@ when a new run is created and reconciles the ordinary reserve mass. See the
 
 ## Advanced food definitions (#378)
 
-The starter book contains five recipes: basic food ration and medkit unlocked,
+The starter book contains six recipes: basic food ration, medkit and recovery module unlocked,
 plus locked nutrient gel, complete meal and energy drink. There is no unlock
 acquisition operation. Existing FIFO, physical ingredient intake, Core funding,
 tray, mass and three-food/two-medical inventory rules apply unchanged. Effect
@@ -144,3 +144,14 @@ Reuse world material IDs and genuine mineral supply, the current **20 kg per-mat
 
 #384 measures the existing recipes through [portable scenarios](../../docs/survival-balance.md).
 No recipe tuning changes; provisional settings await owner review #496.
+
+## Recovery controller component (#468)
+
+`config/recovery-module.json` supplies a validated sixth starter recipe and
+`RecipeBook::recovery_module` loads its data. Runtime enforces one committed
+module and atomically installs from the existing tray, retaining the component's
+physical mass. Components never enter food/medical slots. Fabrication's public
+installed-component validator protects identity/high-water/recipe/mass ownership
+when runtime saves the installed item. Explicit old-save blueprint migration
+retains captured jobs/definitions and grants no resources/work. See
+[recipe and installation contract](../../docs/data-recovery-module.md).

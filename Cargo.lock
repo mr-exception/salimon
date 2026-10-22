@@ -1804,6 +1804,7 @@ dependencies = [
  "salimon-persistence",
  "salimon-world",
  "serde",
+ "serde_json",
 ]
 
 [[package]]

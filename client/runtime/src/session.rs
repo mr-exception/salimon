@@ -9,6 +9,7 @@ pub(crate) mod interaction;
 pub(crate) mod journey;
 pub(crate) mod lifecycle;
 mod presentation;
+mod recovery;
 mod survival;
 pub(crate) mod tutorial;
 // Portable adapters are consumed by whole-session orchestration in #365/#366.
@@ -37,6 +38,7 @@ pub(crate) struct GameplaySession {
     paused: bool,
     pub(crate) tutorial: tutorial::Tutorial,
     pub(crate) archive: archive::Archive,
+    recovery: recovery::Recovery,
     pub(crate) archive_reader: archive::Reader,
     pub(crate) run: lifecycle::RunState,
     pub(crate) consumable_effects: salimon_survival::consumables::Catalog,
@@ -91,6 +93,7 @@ impl Default for GameplaySession {
         Self {
             paused: false,
             archive: Default::default(),
+            recovery: Default::default(),
             archive_reader: Default::default(),
             tutorial: tutorial::Tutorial::dismissed(),
             run: Default::default(),
@@ -497,6 +500,7 @@ impl GameplaySession {
         self.ship
             .set_steering_input(self.ship_control_input.steering());
         self.advance_fabrication(delta);
+        self.advance_recovery(delta);
         let ship = self.ship.snapshot();
         if !ship.power_available
             || !ship.cockpit_control_active

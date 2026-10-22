@@ -252,3 +252,14 @@ U06: `python -m unittest discover -s scripts -p test_import_universe_sources.py 
 checks no-network reproducibility, hash tampering, paths, unknown versions and
 fail-closed production reuse. The source workflow runs it and the fixture importer
 plus Rust typed-manifest tests. Production `--production` refusal is expected.
+
+## Data Recovery (#468)
+
+Run workspace tests/build/fmt/all-target Clippy after schema, recipe and DTO changes.
+Focused contracts: `cargo test -p salimon-client --locked recovery` and
+`cargo test -p salimon-ship --locked auxiliary`. They cover real-domain mine/carry/
+craft/Core work, reserve floor, duplicate/mass atomicity, legacy/current restore,
+R input, pause and continuation. Shader tests validate the component branch.
+Opt-in `recovery_ui_evidence` emits CPU RGBA/size pairs using
+`SALIMON_RECOVERY_EVIDENCE` and is not a native screenshot. Reference appearance,
+physical route, DPI and budget remain #515.

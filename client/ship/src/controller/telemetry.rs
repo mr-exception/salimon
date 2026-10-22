@@ -137,7 +137,8 @@ impl ShipController {
         let demand = self.energy_core.config().demand_watts(
             self.effective_throttle(),
             self.flight_state == crate::FlightState::Flying,
-        ) + self.fabricator_watts;
+        ) + self.fabricator_watts
+            + self.auxiliary_watts;
         let stored = self.energy_core.stored_joules();
         let conversion = self.conversion.remaining_joules();
         let rate = self.conversion.active_watts();
@@ -205,6 +206,33 @@ impl ShipController {
             self.clear_flight_control_input();
         }
         Ok(delivered)
+    }
+
+    /// Low-priority post-bus work, settled after ordinary loads/conversion.
+    /// Only stored unreserved energy above the emergency floor may be spent.
+    pub fn energy_config(&self) -> crate::EnergyConfig {
+        self.energy_core.config()
+    }
+    pub fn fund_auxiliary_work(
+        &mut self,
+        requested: f64,
+        reserve: f64,
+        elapsed: std::time::Duration,
+    ) -> Result<f64, crate::InvalidEnergy> {
+        if !requested.is_finite() || requested < 0.0 || !reserve.is_finite() || reserve < 0.0 {
+            return Err(crate::InvalidEnergy);
+        }
+        if elapsed.is_zero() {
+            return if requested == 0.0 {
+                Ok(0.0)
+            } else {
+                Err(crate::InvalidEnergy)
+            };
+        }
+        let available = (self.energy_core.stored_joules() - reserve).max(0.0);
+        let funded = self.exchange_core_energy_joules(0.0, requested.min(available))?;
+        self.auxiliary_watts = funded / elapsed.as_secs_f64();
+        Ok(funded)
     }
 
     pub(super) fn nearby_body_telemetry(
@@ -457,5 +485,38 @@ mod tiny_velocity_test {
         let n = ship.snapshot().navigation;
         assert_eq!(n.velocity_direction_local, Some([1.0, 0.0, 0.0]));
         assert_eq!(n.heading_velocity_angle_degrees, Some(0.0));
+    }
+}
+
+#[cfg(test)]
+mod auxiliary_tests {
+    use std::time::Duration;
+    #[test]
+    fn auxiliary_draw_protects_reserve_is_reported_and_invalid_requests_are_atomic() {
+        let mut ship = crate::ShipController::default();
+        ship.set_stored_core_energy_joules(1000);
+        assert_eq!(
+            ship.fund_auxiliary_work(900.0, 400.0, Duration::from_secs(2))
+                .unwrap(),
+            600.0
+        );
+        assert_eq!(ship.snapshot().energy_core.stored_joules, 400);
+        assert_eq!(ship.auxiliary_watts, 300.0);
+        let restored = crate::ShipController::from_save(ship.save_state()).unwrap();
+        assert_eq!(restored.auxiliary_watts, 0.0);
+        assert_eq!(restored.snapshot().energy_core.stored_joules, 400);
+        for (draw, reserve) in [(f64::NAN, 0.0), (-1.0, 0.0), (1.0, f64::INFINITY)] {
+            assert!(
+                ship.fund_auxiliary_work(draw, reserve, Duration::from_secs(1))
+                    .is_err()
+            );
+            assert_eq!(ship.snapshot().energy_core.stored_joules, 400);
+        }
+        assert!(ship.fund_auxiliary_work(1.0, 0.0, Duration::ZERO).is_err());
+        assert_eq!(
+            ship.fund_auxiliary_work(100.0, 500.0, Duration::from_secs(1))
+                .unwrap(),
+            0.0
+        );
     }
 }

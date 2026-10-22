@@ -141,3 +141,12 @@ instrument atlas to 3072x256 without changing the first five region dimensions.
 The shader uses section indices, blanks all six regions on power loss and restores
 them from the cached DTO. No new draw/pipeline, collision or simulation authority.
 See [runtime contract](../runtime/architecture.md#scout-archive-467).
+
+## Recovery component tray presentation (#468)
+
+`ShipMeshInstance::fabricator_output_component` is an observational flag for the
+existing anchored tray package. Its existing uniform lane encodes component=2,
+medical=1 or food=0; `ship_mesh.wgsl` draws grey/cyan circuit traces for components.
+No buffers/draws/colliders, installation authority or resource state are added.
+Archive work/progress text remains runtime-owned. Native appearance/input/budget
+acceptance is #515; CPU shader/layout contracts cannot establish it.

@@ -33,3 +33,14 @@ It is never a restore repair or recurring inventory refill. See the
 modifiers; see the owning architecture for provisional tuning and regressions.
 Keep advanced food recipes locked and preserve exact-slot consumption; no new
 progression acquisition or native Q-wheel input is introduced.
+
+## Recovery controller component (#468)
+
+`config/recovery-module.json` supplies a validated sixth starter recipe and
+`RecipeBook::recovery_module` loads its data. Runtime enforces one committed
+module and atomically installs from the existing tray, retaining the component's
+physical mass. Components never enter food/medical slots. Fabrication's public
+installed-component validator protects identity/high-water/recipe/mass ownership
+when runtime saves the installed item. Explicit old-save blueprint migration
+retains captured jobs/definitions and grants no resources/work. See
+[recipe and installation contract](../../docs/data-recovery-module.md).

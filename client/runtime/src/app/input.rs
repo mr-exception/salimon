@@ -175,6 +175,7 @@ pub(crate) fn dispatch_session_key(
             use crate::session::archive::ReaderAction as A;
             let action = match key {
                 PhysicalKey::Code(KeyCode::KeyE) => Some(A::Close),
+                PhysicalKey::Code(KeyCode::KeyR) => Some(A::ToggleRecovery),
                 PhysicalKey::Code(KeyCode::ArrowUp | KeyCode::ArrowLeft) => Some(A::Previous),
                 PhysicalKey::Code(KeyCode::ArrowDown | KeyCode::ArrowRight | KeyCode::Tab) => {
                     Some(A::Next)

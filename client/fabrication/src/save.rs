@@ -55,6 +55,34 @@ impl FabricationSaveState {
             inventory: inventory.clone(),
         }
     }
+    pub fn validate_installed_component(&self, item: &OutputItem) -> Result<(), SaveError> {
+        let recipe = self
+            .machine
+            .recipes()
+            .get(&item.recipe)
+            .ok_or_else(|| invalid("installed recipe missing"))?;
+        if item.category != OutputCategory::Component
+            || item.category != recipe.output_category
+            || item.mass != recipe.output_mass
+            || item.job.0 == 0
+            || item.job.0 >= self.machine.next_job_id()
+            || item.unit == 0
+            || self
+                .machine
+                .tray_item()
+                .is_some_and(|m| m.job == item.job && m.unit == item.unit)
+            || self
+                .inventory
+                .food()
+                .iter()
+                .chain(self.inventory.medical())
+                .flatten()
+                .any(|m| m.job == item.job && m.unit == item.unit)
+        {
+            return Err(invalid("installed component identity/mass duplication"));
+        }
+        self.machine.validate_output_identity(item)
+    }
     pub fn restore(self) -> Result<(Fabricator, ConsumableInventory), SaveError> {
         self.validate()?;
         Ok((self.machine, self.inventory))

@@ -3,6 +3,12 @@ use super::GameplaySession;
 use salimon_fabrication::FabricationError;
 
 impl GameplaySession {
+    pub(crate) fn fabricator_output_component(&self) -> bool {
+        self.fabricator
+            .snapshot(true)
+            .tray
+            .is_some_and(|i| i.category == salimon_fabrication::OutputCategory::Component)
+    }
     pub(crate) fn fabricator_output_present(&self) -> bool {
         self.fabricator.mass_contribution().tray_milligrams > 0
     }
@@ -13,6 +19,26 @@ impl GameplaySession {
         &mut self,
         command: salimon_fabrication::FabricationCommand,
     ) -> Result<salimon_fabrication::CommandResult, FabricationError> {
+        if let salimon_fabrication::FabricationCommand::Enqueue { recipe, quantity } = &command
+            && recipe.key() == "data-recovery-module"
+        {
+            if *quantity != 1 {
+                return Err(FabricationError::InvalidQuantity);
+            }
+            let snapshot = self.fabricator.snapshot(true);
+            if self.recovery.module.is_some()
+                || snapshot
+                    .jobs
+                    .iter()
+                    .any(|j| j.recipe.key() == "data-recovery-module")
+                || snapshot
+                    .tray
+                    .as_ref()
+                    .is_some_and(|i| i.recipe.key() == "data-recovery-module")
+            {
+                return Err(FabricationError::ComponentAlreadyCommitted);
+            }
+        }
         let result = self.fabricator.execute(command)?;
         self.sync_fabricator_mass();
         self.ship
@@ -25,6 +51,13 @@ impl GameplaySession {
         let mass = self.fabricator.mass_contribution();
         let mut changed = false;
         for (id, mg) in [
+            (
+                salimon_ship::MassObjectId::RecoveryModule,
+                self.recovery
+                    .module
+                    .as_ref()
+                    .map_or(0, |m| m.mass.milligrams()),
+            ),
             (
                 salimon_ship::MassObjectId::FabricatorReserve,
                 mass.stored_milligrams,
@@ -148,6 +181,12 @@ impl GameplaySession {
             self.feedback = Some("Fabricator tray is empty");
             return;
         };
+        if item.recipe.key() == "data-recovery-module"
+            && item.category == salimon_fabrication::OutputCategory::Component
+        {
+            self.install_recovery_module(item);
+            return;
+        }
         let ration = item.recipe.key() == "food-ration";
         match self.consumables.insert(item) {
             Ok(_) => {

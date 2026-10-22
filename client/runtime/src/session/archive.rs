@@ -105,6 +105,7 @@ pub(crate) enum ReaderAction {
     Previous,
     Next,
     Close,
+    ToggleRecovery,
 }
 
 pub(crate) fn target(eye: [f64; 3], look: [f64; 3]) -> bool {
@@ -155,6 +156,15 @@ impl GameplaySession {
             .position(|r| r.id == self.archive.selected)
             .expect("validated archive selection");
         let next = match action {
+            ReaderAction::ToggleRecovery => {
+                if self
+                    .restrictions()
+                    .permits(salimon_survival::restrictions::Action::Fabricate)
+                {
+                    self.toggle_recovery(RECORDS[i].id);
+                }
+                return;
+            }
             ReaderAction::Close => {
                 self.archive_reader.open = false;
                 return;
@@ -187,14 +197,21 @@ impl GameplaySession {
         }
         let i = RECORDS.iter().position(|r| r.id == self.archive.selected)?;
         let r = RECORDS[i];
+        let record = self
+            .recovery
+            .record_text(r.id)
+            .unwrap_or_else(|| format!("{}\n{}", r.status, r.body));
         Some(format!(
-            "SCOUT ARCHIVE  {}/{}\n{}\n{}\nSOURCE: {}\nTIME: UNKNOWN / ORDER: RETAINED RECORD SEQUENCE\n\n{}\n\nREAD {}/{}  |  NO NAVIGATION FIX\nUP/DOWN: records  E: close  ESC: pause",
+            "SCOUT ARCHIVE  {}/{}\n{}\nSOURCE: {}\nTIME: UNKNOWN / RETAINED ORDER\n{}\n{}\nREAD {}/{} | NO NAVIGATION FIX\nUP/DOWN records  E close  ESC pause",
             i + 1,
             RECORDS.len(),
             r.title,
-            r.status,
             r.source,
-            r.body,
+            record,
+            self.recovery.panel(
+                self.recovery_reserve(),
+                self.ship.snapshot().energy_core.stored_joules
+            ),
             self.archive.read.len(),
             RECORDS.len()
         ))

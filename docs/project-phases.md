@@ -132,3 +132,8 @@ reproducible offline raw staging. It does not distribute a scientific universe:
 [reuse/full-snapshot follow-up #513](https://github.com/mr-exception/salimon/issues/513)
 remains required for production Gaia inputs and pack publication. See
 [source coverage and restrictions](universe-sources.md).
+
+Local Data Recovery #468 is delivered through configurable Fabricator hardware,
+Archive controls, Core-funded progress and schema 7. Full destination leads remain
+#470 after charting/world integration; native/physical/balance approval is #515.
+See [implementation boundaries](data-recovery-module.md).

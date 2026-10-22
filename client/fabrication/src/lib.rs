@@ -24,6 +24,7 @@ pub enum FabricationError {
     UnknownRecipe,
     LockedRecipe,
     InvalidQuantity,
+    ComponentAlreadyCommitted,
     QueueFull,
     ArithmeticOverflow,
     InsufficientMaterial(salimon_world::resources::ResourceId),

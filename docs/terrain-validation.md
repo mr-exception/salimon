@@ -53,7 +53,7 @@ definition edits/migration remain unsupported.
 A fill residual at or below 1e-12 kg after successful emission is left unextracted
 in the source instead of allocating a roundoff-only microscopic body. It is not
 credited, discarded or buffered. Initial small requests remain valid. See
-[resource output](../client/world/resource-contracts.md#physical-extraction-output-45).
+[resource output](../client/world/resource-contracts.md#handheld-extraction).
 
 ## Patch selection and near/far presentation
 

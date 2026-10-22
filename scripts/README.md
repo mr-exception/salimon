@@ -78,7 +78,7 @@ re-entry. The nearby route checks open-space mode before threshold crossing,
 Earth selection inside 3,000,000 m, continuous altitude and bounded radial
 acceleration. Cockpit-to-nose traversal and airlock collision checks cover the real layout.
 Run this evidence group manually against a locally staged release binary.
-See [checked-in validation](../reports/issue-39/README.md) for results and screenshots.
+See [historical issue discussion](https://github.com/mr-exception/salimon/issues/39) for results and screenshots.
 
 ## Resource collection suite (#51)
 
@@ -136,7 +136,7 @@ The evidence variant adds named screenshots without changing actions or assertio
 
 Every run writes structured results, per-step state snapshots and process/protocol
 logs; evidence captures also save their authoritative states. See the shared
-artifact format below and [checked-in validation](../reports/issue-52/README.md).
+artifact format below and [historical issue discussion](https://github.com/mr-exception/salimon/issues/52).
 This scenario covers the first local resource loop; refining, crafting, trading,
 survival consumption, asteroid mining and backend persistence are outside it.
 
@@ -312,7 +312,7 @@ assert physical fragment identity, material, mass, volume, pose, and bounded
 output after depletion. Extraction totals and session fragment totals are
 diagnostics only, never inventory. Current authored fragments emit from exposed deposit facets and settle through
 physics; see the surface-emission sequence below.
-Run this mining evidence variant manually; capture errors fail the run. Checked-in [issue #45 evidence](../reports/issue-45/README.md) records
+Run this mining evidence variant manually; capture errors fail the run. Historical [issue #45 discussion](https://github.com/mr-exception/salimon/issues/45) records
 the initial Linux validation.
 
 ## Local streamed resource state (#50)
@@ -370,7 +370,7 @@ reduce stale frames from asynchronous GPU presentation. It is not a GPU fence;
 authoritative movement/state assertions remain the verification source. Capture
 errors still fail the scenario and the runner's normal deadlines apply. Use a
 dedicated unobscured test display. The prior cargo-room route and its evidence
-remain archived under [issue #34](../reports/issue-34/README.md).
+are tracked under historical [issue #34](https://github.com/mr-exception/salimon/issues/34).
 
 ## Space airlock access (#35)
 
@@ -436,7 +436,7 @@ ship-local pose. These fields describe actual physical entities, not inventory.
 keeps its ship-local pose while the ship moves, and that pickup and surface
 placement transfer the same physical entity between reference frames. The
 resource loop additionally delivers a mined fragment into the cabin. The former
-dedicated cargo-room behavior is archived in [issue #49](../reports/issue-49/README.md).
+dedicated cargo-room behavior is described in [issue #49](https://github.com/mr-exception/salimon/issues/49).
 
 ## Lower cockpit windows (#38)
 

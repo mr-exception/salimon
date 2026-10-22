@@ -377,7 +377,7 @@ adapter only for new IDs. A rejected placement pauses extraction without pending
 mass. Normal convex physics then supplies motion; runtime installs
 `surface_ejection_velocity` only in the successful creation callback. Missing
 motion defaults to rest rather than inferring newness from map membership.
-See the canonical [surface emission contract](../world/resource-contracts.md#surface-emission-150).
+See the canonical [surface emission contract](../world/resource-contracts.md#legacy-facet-emission-150).
 
 ## Automation command deadlines
 

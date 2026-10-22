@@ -73,3 +73,13 @@ reproducible offline raw staging. It does not distribute a scientific universe:
 [reuse/full-snapshot follow-up #513](https://github.com/mr-exception/salimon/issues/513)
 remains required for production Gaia inputs and pack publication. See
 [source coverage and restrictions](universe-sources.md).
+
+## U04 implementation status (#405)
+
+The [binary partition prototype](universe-storage.md) delivers bounded versioned
+compressed dependency-closed cells, strict immutable source/record indexes,
+lossless U01 precision, corruption checks and random-access Read/Seek decoding.
+Observed development sample measurements do not establish the 2–5 GB goal or
+<=10 GB full-pack target. Production construction/publication, large-system
+cross-cell format evolution and runtime caching remain U12/U13. Source reuse
+remains #513; no runtime migration or M1 approval is implied.

@@ -1,9 +1,10 @@
-# Canonical whole-game save contract (schema 6)
+# Canonical whole-game save contract (schema 7)
 
-> This is the **current compressed-world runtime save schema**. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. Under the approved policy, future fictional-planet upgrades require explicit versioned save/world-delta migration, preservation or validated remapping of physical anchors, and recoverable failure handling; scientific terrain detail on **any published real observed solid body** may not displace saved positions after its first authoritative real-scale surface publication. Future fictional-planet changes to geology/biome-dependent resource layouts likewise require explicit stable-ID, depletion and positional migration; the historical compressed prototype does not establish the real-body surface freeze. This note does not modify schema 3 or imply backend multiplayer exists.
+> This is the **current compressed-world runtime save schema 7**. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. Under the approved policy, future fictional-planet upgrades require explicit versioned save/world-delta migration, preservation or validated remapping of physical anchors, and recoverable failure handling; scientific terrain detail on **any published real observed solid body** may not displace saved positions after its first authoritative real-scale surface publication. Future fictional-planet changes to geology/biome-dependent resource layouts likewise require explicit stable-ID, depletion and positional migration; the historical compressed prototype does not establish the real-body surface freeze. This note does not modify schema 3 or imply backend multiplayer exists.
 
 `salimon-persistence::SaveGame<T>` is the versioned envelope. New captures use
-version 3. Decode accepts versions 1 and 2 for explicit runtime migration:
+version 7. Decode accepts versions 1–6 for explicit runtime migration; the
+following v1–v3 paragraphs record that historical migration:
 retain the complete physical/Fabricator/equipment payload, initialize newly
 introduced survival meters at 100 with no effects or retrospective active time,
 and initialize the run/journey source. A version-1 payload must lack survival;
@@ -367,7 +368,7 @@ checkpoint scheduling. See [source and input](../client/runtime/architecture.md#
 
 `salimon-persistence::universe::UniverseSave` is a **separate**
 `salimon.universe.save` version-1 wire envelope, not a migration of current
-`salimon.save` schema 6. It is delivered for future world integration; normal
+`salimon.save` (now schema 7). It is delivered for future world integration; normal
 startup still uses the compressed-world session source. Existing saves are never
 implicitly interpreted, discarded or rewritten by this API.
 
@@ -398,3 +399,15 @@ session assignment; callers must abort on incompatibility. Future migration must
 explicitly remap each stable ID/frame/definition and mutable section, verify both
 new generations in a distinct namespace and retain old verified saves until success.
 No implicit version upgrade, offline catch-up, world replacement or backend exists.
+
+## Recovery Module schema 7 (#468)
+
+Current captures add required version-1 Recovery config, installed component
+identity and mass, paid per-record joules and active job. Source is validated
+against the Fabricator's captured recipe/high-water and pending/tray identities.
+A missing current source or duplicate installation fails transactionally.
+Old v1–v6 saves explicitly initialize empty hardware/progress and add the blueprint
+without granting inputs or replaying work. Current schema-6 Archive identities
+and all prior physical/consumable state survive. Transient R/menu/native input
+and last-tick auxiliary power are never restored; no offline progress is credited.
+See [canonical Recovery contract](data-recovery-module.md#persistence-and-verification).

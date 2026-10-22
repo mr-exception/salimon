@@ -39,7 +39,7 @@ fn custom(recipe: RecipeDefinition, capacity: usize) -> Fabricator {
 #[test]
 fn starter_data_uses_world_feedstocks_and_two_unlocked_products() {
     let book = RecipeBook::starter();
-    assert_eq!(book.recipes().len(), 5);
+    assert_eq!(book.recipes().len(), 6);
     let ration = book.get(&id("food-ration")).unwrap();
     assert_eq!(ration.output_category, OutputCategory::Food);
     assert_eq!(ration.duration, seconds(10));
@@ -56,7 +56,10 @@ fn starter_data_uses_world_feedstocks_and_two_unlocked_products() {
     for r in book.recipes() {
         assert_eq!(
             r.unlock.unlocked_by_default,
-            matches!(r.id.key(), "food-ration" | "medkit")
+            matches!(
+                r.id.key(),
+                "food-ration" | "medkit" | "data-recovery-module"
+            )
         );
         assert!(r.unlock.prerequisites.is_empty());
     }
@@ -502,4 +505,21 @@ fn typed_commands_follow_the_same_transaction_paths() {
         f.execute(FabricationCommand::Collect),
         Ok(CommandResult::Collected(_))
     ));
+}
+
+#[test]
+fn data_driven_component_recipe_rejects_invalid_wire_mass_and_identity() {
+    let original = serde_json::to_value(RecipeBook::recovery_module()).unwrap();
+    for (field, value) in [
+        ("output_mass", serde_json::json!(0)),
+        ("id", serde_json::json!("INVALID KEY")),
+    ] {
+        let mut bad = original.clone();
+        bad[field] = value;
+        let recipe = serde_json::from_value(bad).unwrap();
+        assert!(RecipeBook::new(vec![recipe]).is_err());
+    }
+    let mut bad = original;
+    bad["ingredients"][0]["mass"] = serde_json::json!(0);
+    assert!(RecipeBook::new(vec![serde_json::from_value(bad).unwrap()]).is_err());
 }

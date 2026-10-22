@@ -55,3 +55,13 @@ of scope; do not interpret tuning setters as progression mechanics.
 #493 replaces independent force capacities with funded Core impulse. Read the
 [math/safety/switch contract](architecture.md#funded-core-impulse-and-engine-switch-493).
 Protect exact consumer allocation, throttle boundaries and engine-off persistence.
+
+## Low-priority data recovery energy (#468)
+
+`fund_auxiliary_work` spends only actual stored, unreserved Core energy above
+a caller-supplied emergency floor after ordinary ship/Fabricator settlement.
+Invalid requests are atomic; no auxiliary joule creates propulsion impulse.
+Last-tick auxiliary watts are transient observation, included in total draw
+without another debit and cleared on subsequent advance/restore. Runtime owns
+record progress/config and the `RecoveryModule` physical mass ledger entry. See
+[canonical funding/priority contract](../../docs/data-recovery-module.md#core-funding-and-reserve).

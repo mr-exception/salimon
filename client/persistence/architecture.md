@@ -43,8 +43,15 @@ current payload omissions/unknown identities reject transactionally. See
 ## Universe new-run envelope (#406)
 
 `universe.rs` owns the independent version-1 future universe save contract, using
-`salimon-universe` IDs/frames/epochs. It never replaces current runtime schema 6.
+`salimon-universe` IDs/frames/epochs. It does not replace the compressed-world runtime envelope (now schema 7).
 Catalog/definition incompatibility is fatal during recovery; corruption alone can
 fall back. Domain delta validators are mandatory. See the canonical
 [universe save contract](../../docs/save-contract.md#future-universe-new-run-contract--u05-406)
 and `src/universe/tests.rs` for wire, identity and interrupted-publication coverage.
+
+## Runtime schema 7 (#468)
+
+New compressed-world captures require runtime-owned Recovery config/module/paid
+progress; explicit v1-v6 migration initializes empty hardware/work and preserves
+prior recipe sources while adding the blueprint. Current universe envelope is
+independent and unchanged. See [save contract](../../docs/save-contract.md#recovery-module-schema-7-468).

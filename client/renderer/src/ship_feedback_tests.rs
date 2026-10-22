@@ -266,6 +266,7 @@ fn scout_feedback_gpu_evidence() {
                 door_open_fraction: door,
                 fabricator_output_present: output,
                 fabricator_output_medical: false,
+                fabricator_output_component: false,
                 machinery: feedback,
                 instruments: CockpitInstruments {
                     power_off: !power,

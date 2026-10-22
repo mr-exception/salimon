@@ -20,6 +20,7 @@ impl ShipController {
         ship.steering_target = Default::default();
         ship.cockpit_message = None;
         ship.fabricator_powered_seconds = 0.;
+        ship.auxiliary_watts = 0.;
         Ok(ship)
     }
     fn validate_save(&self) -> Result<(), SaveError> {

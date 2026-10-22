@@ -954,6 +954,7 @@ impl ClientApplication {
             let mut mesh = map_ship_to_renderer(presentation.ship);
             mesh.fabricator_output_present = self.session.fabricator_output_present();
             mesh.fabricator_output_medical = self.session.fabricator_output_medical();
+            mesh.fabricator_output_component = self.session.fabricator_output_component();
             mesh.instruments.fabricator = self.session.fabricator_instruments();
             mesh.machinery = crate::scout_feedback::capture(&self.session, presentation.ship);
             Some(mesh)

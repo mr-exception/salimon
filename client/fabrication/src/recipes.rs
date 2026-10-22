@@ -69,6 +69,11 @@ pub struct RecipeDefinition {
 
 impl RecipeDefinition {
     fn validate(&self) -> Result<(), FabricationError> {
+        RecipeId::new(self.id.key())?;
+        Mass::from_milligrams(self.output_mass.milligrams())?;
+        for ingredient in &self.ingredients {
+            Mass::from_milligrams(ingredient.mass.milligrams())?;
+        }
         if self.ingredients.is_empty()
             || self.duration.is_zero()
             || !self.watts.is_finite()
@@ -123,6 +128,13 @@ impl RecipeBook {
     }
 
     /// Proposed starter balancing values, not user-specified exact quantities.
+    pub fn recovery_module() -> RecipeDefinition {
+        let recipe: RecipeDefinition =
+            serde_json::from_str(include_str!("../config/recovery-module.json"))
+                .expect("checked-in recovery recipe JSON");
+        recipe.validate().expect("validated recovery recipe");
+        recipe
+    }
     pub fn starter() -> Self {
         let unlocked = UnlockRequirements {
             unlocked_by_default: true,
@@ -194,6 +206,7 @@ impl RecipeBook {
                 },
             });
         }
+        definitions.push(Self::recovery_module());
         Self::new(definitions).expect("valid starter recipe definitions")
     }
 }

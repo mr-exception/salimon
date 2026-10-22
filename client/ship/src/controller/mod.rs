@@ -37,6 +37,8 @@ pub struct ShipController {
     energy_core: crate::EnergyCore,
     fabricator_watts: f64,
     #[serde(skip)]
+    auxiliary_watts: f64,
+    #[serde(skip)]
     fabricator_powered_seconds: f64,
     pub(crate) conversion: crate::conversion::Conversion,
     #[serde(skip)]
@@ -77,6 +79,7 @@ impl Default for ShipController {
             engines_enabled: true,
             energy_core: crate::EnergyCore::default(),
             fabricator_watts: 0.0,
+            auxiliary_watts: 0.0,
             fabricator_powered_seconds: 0.0,
             conversion: crate::conversion::Conversion::default(),
             cockpit_message: None,
@@ -107,6 +110,7 @@ impl ShipController {
             engines_enabled: true,
             energy_core: crate::EnergyCore::default(),
             fabricator_watts: 0.0,
+            auxiliary_watts: 0.0,
             fabricator_powered_seconds: 0.0,
             conversion: crate::conversion::Conversion::default(),
             cockpit_message: None,
@@ -163,6 +167,7 @@ impl ShipController {
 
     pub fn advance(&mut self, delta: Duration) {
         self.fabricator_powered_seconds = 0.0;
+        self.auxiliary_watts = 0.0;
         let converting = self.conversion.remaining_duration().min(delta);
         let incoming = self.conversion.advance(converting);
         self.advance_with_core_input(converting, incoming)

@@ -1,6 +1,6 @@
 # Scout Archive, data recovery and discovered navigation
 
-Status: **Archive reader implemented by #467; Recovery Module and discovered navigation remain approved future design**. Documentation issue #459. Related: [lost journey](narrative-and-lost-journey.md), [approved universe](universe-expansion-approved-design.md), [Absenat](absenat-and-hall.md).
+Status: **Archive reader #467 and local Recovery Module #468 implemented; destination leads/charting remain future #469–470**. Documentation issue #459. Related: [lost journey](narrative-and-lost-journey.md), [approved universe](universe-expansion-approved-design.md), [Absenat](absenat-and-hall.md).
 
 ## Physical Ship Archive
 
@@ -42,7 +42,14 @@ The quantum-themed transition is **loading**, not proof of travel through the un
 The separate Scout wall terminal now exposes five intact ordinary voyage/routine
 records and two damaged packets with unknown contents. Source and unknown time
 are explicit; a name or historical departure never grants a destination. Durable
-versioned identities/read selection round-trip through schema 6. Recovery states,
-energy consumption/reconstruction, destination leads and player charting remain
-#468–470. Native appearance/input signoff remains separate. See the
+versioned identities/read selection round-trip through schema 6. Recovery states and Core-funded work are delivered by #468. Destination leads
+and player charting remain #469–470. Native appearance/input signoff remains separate. See the
 [implementation boundary](../client/runtime/architecture.md#scout-archive-467).
+
+## Local Recovery implementation (#468)
+
+[Canonical module contract](data-recovery-module.md) records configurable recipe/
+energy defaults, one-component installation into the Archive, emergency reserve,
+low-priority funded work, R controls and schema-7 migration. Recovered local
+fragments stay unverified; full location-bearing story payloads remain #470.
+Native physical/visual/budget and provisional tuning review remains #515.

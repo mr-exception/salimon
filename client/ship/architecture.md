@@ -393,3 +393,13 @@ force capacities to coefficient 1 and engine-on without changing energy, velocit
 or cargo source. Invalid/unknown/missing current-schema fields reject atomically.
 
 Future Jump Drive is a separate ship module powered by the same authoritative Core. It computes a virtual delta-v = 0.20 * (c - pre_jump_speed) **per light-second** (c=299,792,458 m/s) and quotes total cost = distance_light_seconds * mass_kg * virtual_delta_v_mps / (1 N·s/J). It translates the entire ship along its current forward direction while retaining **actual** world-frame position-independent velocity and orientation; no direct boost, braking or clock manipulation. **Reject while propulsion engines are switched on**, even at zero throttle. The implemented `engines_enabled` state supplies this distinction; the Jump Drive interlock itself remains future work. Above/equal light speed is currently an explicit refused/undecided case to avoid zero/negative costs; destination safety, quantum loading staging and crash-safe Core debit belong to future Jump Drive work, not issue #493. Future offline ships coast on one shared 1:1 clock; they do not jump automatically.
+
+## Low-priority data recovery energy (#468)
+
+`fund_auxiliary_work` spends only actual stored, unreserved Core energy above
+a caller-supplied emergency floor after ordinary ship/Fabricator settlement.
+Invalid requests are atomic; no auxiliary joule creates propulsion impulse.
+Last-tick auxiliary watts are transient observation, included in total draw
+without another debit and cleared on subsequent advance/restore. Runtime owns
+record progress/config and the `RecoveryModule` physical mass ledger entry. See
+[canonical funding/priority contract](../../docs/data-recovery-module.md#core-funding-and-reserve).

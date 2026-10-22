@@ -1,0 +1,9 @@
+{
+  "id": "data-recovery-module",
+  "ingredients": [{"resource":"IronOre","mass":1000000},{"resource":"SilicateRock","mass":500000}],
+  "duration": {"secs":60,"nanos":0},
+  "watts":1000000.0,
+  "output_mass":750000,
+  "output_category":"Component",
+  "unlock":{"unlocked_by_default":true,"prerequisites":[]}
+}

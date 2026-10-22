@@ -1318,9 +1318,8 @@ reset, pause, death and restore close the transient reader and clear held input.
 `session/archive.rs` owns seven fixed record identities, provenance, explicit
 unknown timestamps, retained sequence, per-run read identities and selection.
 Five intact departure/Mars/routine/exit records and two unreadable packets carry
-no coordinates, reconstructed claims or confirmed missing history. No recovery
-work, destination granting, backend or Hall UI is implemented. #468 owns future
-reconstruction states/progress; #469 owns player-known charting. Reader text uses
+no coordinates, reconstructed claims or confirmed missing history. Recovery work is now implemented by #468; destination granting, backend and Hall
+UI remain deferred. #469 owns player-known charting. Reader text uses
 the existing shared-font modal raster and input admission, never a new UI stack.
 
 Schema 6 requires an inner version-1 Archive payload. Validate known IDs,
@@ -1336,3 +1335,14 @@ the existing cabin lane. The sixth 512x256 instrument atlas region shows Archive
 identity and E affordance, blanks with the bus and restores through the existing
 cache. This is a modest code-authored panel, not a Blender asset replacement.
 Native appearance/input/DPI/full-frame performance require separate evidence.
+
+## Data Recovery Module (#468)
+
+`session/recovery.rs` owns per-run module identity, captured config and paid
+record progress. `archive.rs` composes R start/stop and bounded evidence text;
+`fabrication.rs` moves the one component tray identity into the installed mass
+ledger. Ordinary ship/Fabricator tick settlement precedes low-priority Core
+funding; recovery only spends surplus above an emergency floor. Schema 7
+validates installed/pending/tray identity and reconstructs mass without charging.
+See [canonical contract](../../docs/data-recovery-module.md). No offline work,
+free coordinates or reconstruction of irrecoverable bytes. Native review #515.

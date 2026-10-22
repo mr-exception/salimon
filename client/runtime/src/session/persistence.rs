@@ -157,6 +157,8 @@ pub(crate) struct SessionState {
     physical: PhysicalState,
     #[serde(default)]
     archive: Option<super::archive::Archive>,
+    #[serde(default)]
+    recovery: Option<super::recovery::Recovery>,
     fabrication: salimon_fabrication::FabricationSaveState,
     equipment: crate::equipment::EquipmentToolbar,
     #[serde(default)]
@@ -190,6 +192,29 @@ impl Validate for SessionState {
             tutorial.validate()?;
         }
         self.fabrication.validate()?;
+        if let Some(recovery) = &self.recovery {
+            recovery.validate()?;
+            let machine = self.fabrication.machine.snapshot(true);
+            let committed = machine
+                .jobs
+                .iter()
+                .filter(|j| j.recipe.key() == "data-recovery-module")
+                .map(|j| u64::from(j.remaining_quantity))
+                .sum::<u64>()
+                + u64::from(
+                    machine
+                        .tray
+                        .as_ref()
+                        .is_some_and(|i| i.recipe.key() == "data-recovery-module"),
+                )
+                + u64::from(recovery.module.is_some());
+            if committed > 1 {
+                return Err(invalid("multiple committed Recovery Modules"));
+            }
+            if let Some(module) = &recovery.module {
+                self.fabrication.validate_installed_component(module)?;
+            }
+        }
         if let Some(survival) = &self.survival {
             survival.validate()?;
         }
@@ -203,6 +228,7 @@ impl GameplaySession {
         let state = SessionState {
             physical: PhysicalState::capture(self),
             archive: Some(self.archive.clone()),
+            recovery: Some(self.recovery.clone()),
             fabrication: salimon_fabrication::FabricationSaveState::capture(
                 &self.fabricator,
                 &self.consumables,
@@ -236,7 +262,7 @@ impl GameplaySession {
                 restrictions: Default::default(),
                 run: Default::default(),
             },
-            (2..=6, Some(state)) => state,
+            (2..=7, Some(state)) => state,
             _ => return Err(invalid("survival payload does not match envelope version")),
         };
         if save.schema_version == 2 {
@@ -248,20 +274,31 @@ impl GameplaySession {
         }
         survival.validate()?;
         let tutorial = match (save.schema_version, save.state.tutorial) {
-            (4..=6, Some(tutorial)) => tutorial,
+            (4..=7, Some(tutorial)) => tutorial,
             (1..=3, _) => super::tutorial::Tutorial::dismissed(),
             _ => return Err(invalid("tutorial source missing for save schema")),
         };
         let archive = match (save.schema_version, save.state.archive) {
-            (6, Some(archive)) => archive,
+            (6..=7, Some(archive)) => archive,
             (1..=5, _) => Default::default(),
             _ => return Err(invalid("archive source missing for save schema")),
         };
-        let (fabricator, consumables) = save.state.fabrication.restore()?;
+        let recovery = match (save.schema_version, save.state.recovery) {
+            (7, Some(recovery)) => recovery,
+            (1..=6, _) => Default::default(),
+            _ => return Err(invalid("recovery source missing for schema 7")),
+        };
+        let (mut fabricator, consumables) = save.state.fabrication.restore()?;
+        if save.schema_version <= 6 {
+            fabricator
+                .migrate_recovery_recipe()
+                .map_err(|e| invalid(e.to_string()))?;
+        }
         let physical = save.state.physical.restore()?;
         let mut restored = Self {
             seed: physical.seed,
             archive,
+            recovery,
             tutorial,
             view_mode: ViewMode::Gameplay,
             survival: survival.vitals,
@@ -560,7 +597,7 @@ impl GameplaySession {
         serde_json::to_vec(&(self.mining.session.fragments().len(), self.mining.session.fragments().last().map(|f| f.id()), self.mining.session.attached_sphere_id(), self.mining.session.carried_id(),
             ship.flight_state, ship.door_state, ship.power_available,
             machine.stored, jobs, machine.tray, &self.consumables, &self.equipment,
-            self.survival.snapshot().terminal, self.survival.active_effects().map(|(id,stacks,_)|(id,stacks)).collect::<Vec<_>>(),(self.run.serial, ship.engines_enabled), (&self.tutorial, &self.archive)))
+            self.survival.snapshot().terminal, self.survival.active_effects().map(|(id,stacks,_)|(id,stacks)).collect::<Vec<_>>(),(self.run.serial, ship.engines_enabled), (&self.tutorial, &self.archive, self.recovery.checkpoint_events())))
             .expect("discrete checkpoint events contain only serializable finite identities and integer quantities")
     }
 }

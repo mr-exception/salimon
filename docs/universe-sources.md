@@ -52,3 +52,41 @@ records manifest/tooling delivery, not approval of production use or science.
 
 U07 now provides [Gaia scientific fixture ingestion](universe-gaia-ingestion.md);
 raw staging remains separate and production gates above still apply.
+
+## Private-development decision and production evidence (#513)
+
+On 2026-10-22 the owner selected **private development only** in the task
+conversation. [Decision and exact input inventory](../reports/issue-513/private-development-decision.json)
+bind that scope to the current manifest. Keep synthetic Gaia and the existing
+small JPL/PS development inputs; no actual Gaia release, commercial distribution,
+production source approval or alternative scientific source is authorized by
+that choice. Source-specific restrictions and unreviewed statuses remain intact.
+
+Production staging now additionally requires `--production-review <file>`.
+A separate schema-1 `salimon.universe.production-review` JSON record must bind
+`manifest_sha256` to the **exact input manifest bytes**, identify `intended_use`,
+`distribution`, human `reviewer`, ISO `reviewed_on` and `approval_evidence`, and
+contain exactly one `sources` entry for every source ID. Each entry records:
+
+- `id`, `terms_url`, ISO `terms_checked_on`, `terms_evidence` identifying archived
+  full terms, exact `credit_text` and source-specific `references`;
+- `decision`: `terms_permit_intended_use` or `permission_obtained`, with a nonempty
+  `permission_record` for the latter;
+- `snapshot_scope: full_production_selection`, exact `acquisition`, `epoch`,
+  `frame`, and explicit `snapshot_approval_evidence`.
+
+The bound manifest already freezes query/release and every input size/hash.
+Changing it invalidates review. Stage preserves manifest bytes and includes the
+review record, then revalidates both before atomic publication. Status/origin
+flag edits alone cannot promote development snapshots. Reserved output metadata
+paths cannot be artifact names. Rust `SourceManifest` remains the unchanged
+metadata validator; the offline Python staging boundary enforces the additional
+human review sidecar. No runtime consumer or production packaging is added.
+
+These checks establish record completeness and binding; they cannot verify the
+truth or legal sufficiency of a human decision. Owner source-use review must
+inspect actual full current terms/permissions and actual complete selected data.
+No full current terms were fetched in this restricted environment. Existing
+2026-10-21 references are historical guidance, not refreshed legal approval.
+U07 and U12 publication remain gated until that review; private fixture science
+and implementation may continue. See the [report](../reports/issue-513/README.md).

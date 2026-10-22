@@ -61,3 +61,9 @@ on launch, regenerate a visited world or treat U10 recipe hashes as U11 world
 digests. Visual overrides cannot change terrain or resources. Resource routes
 must clear the authored ship disk and use the same terrain query. Golden changes
 need explicit publication/migration review; native/playable integration is U24.
+
+#513 owner scope is private development only. Python production staging additionally
+requires a human review sidecar bound to the exact source manifest; see the
+[source-use/evidence contract](../../docs/universe-sources.md#private-development-decision-and-production-evidence-513).
+Rust source metadata/schema is unchanged; never treat metadata acceptance as
+permission, full-snapshot coverage or approval of a production staging operation.

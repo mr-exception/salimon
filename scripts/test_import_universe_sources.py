@@ -64,3 +64,29 @@ class OfflineSourceImport(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+class ProductionEvidenceGate(unittest.TestCase):
+    def test_status_and_origin_edits_alone_cannot_publish_observed_fixtures(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            stage(ROOT / 'catalogs/sources/manifest-v1.json', root / 'source')
+            manifest = root / 'source/manifest-v1.json'
+            data = json.loads(manifest.read_text())
+            for source in data['sources']:
+                source['license']['status'] = 'approved'
+                for artifact in source['artifacts']:
+                    artifact['origin'] = 'observed_snapshot'
+            manifest.write_text(json.dumps(data))
+            with self.assertRaisesRegex(ValueError, '--production-review'):
+                stage(manifest, root / 'published', True)
+            self.assertFalse((root / 'published').exists())
+
+    def test_reserved_review_path_cannot_replace_staged_evidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'manifest.json'
+            data = json.loads((ROOT / 'catalogs/sources/manifest-v1.json').read_text())
+            for reserved in ('manifest-v1.json', 'production-review.json'):
+                data['sources'][0]['artifacts'][0]['path'] = reserved
+                path.write_text(json.dumps(data))
+                with self.assertRaisesRegex(ValueError, 'unsafe'):
+                    verify(path)

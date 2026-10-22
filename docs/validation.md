@@ -278,3 +278,13 @@ header/index CRC, hostile lengths/ranges/order and payload/index/source mismatch
 codec density/timings for frozen observed fields and labeled synthetic replication.
 See [storage limits and budget interpretation](universe-storage.md); these numbers
 are not a full-catalog size forecast, production publication or native FPS signoff.
+
+## Universe scientific reference fixtures (#404)
+
+`cargo test -p salimon-universe --locked` covers frozen JPL vector/epoch/SI goldens,
+analytic production-U02 frames/motion/GPU narrowing, injected unit/axis/epoch/scale
+faults, missing/extra/duplicate coverage, malformed wire, finite budgets and norm
+boundaries. Release comparator and repeated CPU workloads are documented in the
+[reference guide](universe-reference-fixtures.md); retain raw JSON/context/hashes.
+Linux results do not approve M1 performance (#521), future ephemeris/integrator
+model drift or whole-game frame rates. Reference data is not production reuse.

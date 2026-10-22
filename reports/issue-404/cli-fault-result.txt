@@ -1,0 +1,4 @@
+Command: target/release/examples/reference_compare artifacts/reference-bad-units.json
+Mutation: first Earth vector x divided by 1000 (km-as-m fault).
+Exit code: 1
+Error: "reference tolerance exceeded"

@@ -2,6 +2,7 @@
 pub mod coordinates;
 mod epoch;
 pub mod partitions;
+pub mod reference;
 pub mod sources;
 pub use epoch::Epoch;
 mod identity;

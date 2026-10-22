@@ -357,3 +357,14 @@ wire fixture `fixtures/partition-v1.bin`; workload: `examples/partition_bench.rs
 and [invariants](../client/universe/invariants.md). Bounded prototype only: no GB
 builder/cross-cell references/runtime cache or production reuse approval. U12/U13
 retain those boundaries. Run universe/workspace gates and the release workload.
+
+## Universe scientific reference fixtures (#404)
+
+Owner: `client/universe/src/reference.rs`, tests: `reference/tests.rs`, goldens:
+`fixtures/references-v1.json`, examples: `reference_compare.rs`, `reference_bench.rs`
+with `support/reference_inputs.rs` (paths within `client/universe/`/its examples).
+See [reference wire/budget/workload guide](universe-reference-fixtures.md),
+[architecture](../client/universe/architecture.md#scientific-reference-harness--u03-404)
+and [invariants](../client/universe/invariants.md). Strict SI/epoch/frame comparison
+and CPU diagnostics only; no solver/world migration or scientific model approval.
+Native reference measurements remain #521; full-game native gates remain #435–#439.

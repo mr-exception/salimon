@@ -23,3 +23,9 @@ U04 `partitions.rs` owns the bounded prototype container and consumer-supplied
 Read/Seek adapter. Read [storage contract](../../docs/universe-storage.md) before
 changing offsets, codec/precision, limits, source map or schema versions. Run
 partition regressions and the release example; retain conditional budget evidence.
+
+U03 `reference.rs` owns strict independent reference comparison; frozen goldens,
+unit regressions and example workload adapters have separate paths in the
+[architecture](architecture.md#scientific-reference-harness--u03-404). Read the
+[reference budget guide](../../docs/universe-reference-fixtures.md) before changing
+tolerances or claiming solver/native coverage. Preserve failure and source context.

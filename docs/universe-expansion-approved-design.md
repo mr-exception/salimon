@@ -83,3 +83,14 @@ Observed development sample measurements do not establish the 2–5 GB goal or
 <=10 GB full-pack target. Production construction/publication, large-system
 cross-cell format evolution and runtime caching remain U12/U13. Source reuse
 remains #513; no runtime migration or M1 approval is implied.
+
+## U03 implementation status (#404)
+
+The [scientific reference harness](universe-reference-fixtures.md) delivers frozen
+Horizons and analytic coordinate/time goldens, complete strict SI/frame/epoch
+comparison, test-level numerical budgets by flight regime, a candidate-file CLI
+and repeatable Linux CPU workloads. It implements no orbit/gravity solver and
+approves no future scientific model drift. Reference M1 profiling remains
+[native follow-up #521](https://github.com/mr-exception/salimon/issues/521);
+full-game/flight/rendering acceptance remains #435–#439. Fixture/source-use and
+production pack limitations remain intact.

@@ -1,0 +1,3 @@
+1bf1f7b34379f7be7e947ffc13ae41350ccd57df188cf86c033b2b52cfc18cda  client/universe/fixtures/references-v1.json
+ecd183f9b4b065163ace0044862ef767d8ec91beba926ad12745b409c6830500  client/universe/fixtures/storage-observed-v1.json
+cb4301b038c85e5c1cdc296b16564bfbd38e4fef42938fa07656d490323f31bb  catalogs/sources/fixtures/jpl-earth-j2000.json

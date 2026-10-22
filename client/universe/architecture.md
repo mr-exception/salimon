@@ -1,11 +1,11 @@
 # Canonical universe schema — U01 (#402)
 
-`salimon-universe` is a portable leaf crate using only the workspace's existing
-Serde/JSON dependencies. It is not yet a runtime dependency. `salimon-world`
+`salimon-universe` is a portable leaf crate using Serde/JSON and pinned pure Rust flate2/CRC32 storage dependencies. It is not yet a runtime dependency. `salimon-world`
 continues owning the compressed six-body playable fixture, terrain/resource-v1
 identity and existing saves. Catalog data must never implicitly grant player
-navigation knowledge. No GPU/window/network/file IO, source download, real
-catalog, orbit, OS clock, terrain evaluation, pack builder or backend is introduced.
+navigation knowledge. No GPU/window/network, source download, real production catalog, orbit, OS clock,
+terrain evaluation or backend is introduced. U04 adds consumer-supplied Read/Seek
+IO and an in-memory prototype encoder, not a production pack builder.
 
 ## Source and API
 
@@ -69,9 +69,8 @@ The checked-in v1 fixture is a golden compatibility contract, not real science.
 
 JSON is limited to 16 MiB and intended for review/fixtures/small builder inputs;
 there is no claim of GB-pack throughput/size or a production storage format.
-U04 owns binary partitions/codecs/indexing; U06–U12 own official manifests,
-licensed ingestion, inference, canonical generation and pack publication; U02
-delivers hierarchical frames/epoch. U05 owns new-run save/catalog binding. Schema
+U04 now owns the bounded binary prototype below; U06–U12 own official manifests,
+licensed ingestion, inference, canonical generation and pack publication; U02 delivers hierarchical frames/epoch. U05 owns new-run save/catalog binding. Schema
 extension can add future galaxy hierarchy without reinterpreting source IDs.
 The real-scale playable migration and native gates remain those blocked issues.
 
@@ -127,3 +126,15 @@ it performs no IO, hashing, scientific conversion or download. The offline CLI
 [import contract](../../docs/universe-sources.md) verifies hashes and stages raw
 bytes. U07/U08 own source-specific science ingestion/cross-match/units; U12 owns
 production pack publication. Neither fixtures nor catalog truth grant chart knowledge.
+
+## Binary partitions — U04 (#405)
+
+`partitions.rs` owns deterministic container encoding, strict bounded index
+validation, random-access Read/Seek cell decoding and the immutable source map.
+`partitions/tests.rs` covers wire compatibility, corruption, hostile index
+ranges/order, length expansion and payload/index agreement. The independently
+Python/zlib-generated `fixtures/partition-v1.bin` freezes version-1 compatibility.
+`examples/partition_bench.rs` measures the observed development sample and clearly
+marked replicated sensitivity rows. See the canonical [wire/precision/budget
+contract](../../docs/universe-storage.md). No cross-cell references, GB pack,
+source reuse approval or runtime world replacement is supplied by this prototype.

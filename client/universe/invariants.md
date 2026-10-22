@@ -29,3 +29,11 @@ The [architecture](architecture.md) is the canonical API/limit/ownership contrac
 12. Source download access never implies reuse approval. Production manifests
     reject restricted/unreviewed sources and synthetic artifacts; raw bytes must
     match frozen sizes/digests before offline staging. No runtime network path.
+
+13. Partition indexes reject overlapping/gapped/out-of-file ranges, duplicate
+    identities, unknown versions/fields and conflicting immutable source metadata.
+    A requested cell must pass CRC, bounded exact zlib consumption, U01 validation
+    and index/revision/source agreement before exposure. Unread cells remain unverified.
+14. Storage is lossless for admitted U01 values; CRC32 is corruption detection,
+    not cryptographic publication approval. Prototype limits and measured sample
+    density never establish production size, catalog completeness or M1 performance.

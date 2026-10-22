@@ -18,3 +18,8 @@ Read their architecture contract before changing numerical/time behavior.
 U06 source metadata is in `sources.rs`; checksum verification and atomic raw-byte
 staging are in `scripts/import_universe_sources.py`. Never promote fixture or
 restricted/unreviewed source data into production by changing a checksum alone.
+
+U04 `partitions.rs` owns the bounded prototype container and consumer-supplied
+Read/Seek adapter. Read [storage contract](../../docs/universe-storage.md) before
+changing offsets, codec/precision, limits, source map or schema versions. Run
+partition regressions and the release example; retain conditional budget evidence.

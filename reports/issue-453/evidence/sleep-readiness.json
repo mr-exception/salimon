@@ -1,0 +1,9 @@
+{
+  "physical_sleep_run": false,
+  "owner_authorized_sleep": true,
+  "macos_reports_active_call_audio": true,
+  "dedicated_session_confirmation": "pending after detecting current active use",
+  "automatic_wake_available_without_admin": false,
+  "admin_password_requested_or_used": false,
+  "power_settings_changed": false
+}

@@ -572,8 +572,21 @@ The portable universe leaf now owns a bounded offline fictional-system builder
 using explicit residual density, age and metallicity inputs, reserved stable
 IDs, SHA-256 lanes, individually materialized bodies and aggregate minor
 populations. Observed source records remain intact. Complete generation recipes
-and partial orbital/stellar sidecars are hashed with the catalog; U11 owns full
-world definitions/evaluation and U12 production batching/packaging. See the
+and partial orbital/stellar sidecars are hashed with the catalog. U11 below owns
+the selected world's full definition/surface query; other worlds' definitions
+remain downstream and U12 owns production batching/packaging. See the
 [builder contract](universe-fiction-builder.md) and [owning architecture](../client/universe/architecture.md#canonical-fiction-synthesis--u10-411).
 Synthetic distribution/storage evidence does not certify a real Milky Way pack
 or playable/native integration.
+
+## Permanent awakening publication (#412)
+
+The portable universe leaf now freezes Nacre Reach / Vesper from a pinned U10
+cohort. `starting_system.rs` owns stable IDs/names, >=30 ly distance proof,
+physical screening, full selected-world parameters, baseline outcrops/arrival
+routes, independent domain digests and a single surface evaluator. See
+[contract](universe-starting-system.md) and
+[owning architecture](../client/universe/architecture.md#permanent-starting-world--u11-412).
+U01 recipe references remain unchanged; U12 packages the expanded U11 sidecar.
+The runtime still starts in the compressed prototype. U14 states, U23 LOD and
+U24 arrival/mining integration retain their scopes, with separate native gates.

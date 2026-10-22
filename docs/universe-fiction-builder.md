@@ -59,8 +59,9 @@ input-catalog hash, catalog and all sidecars. Body definition references hash th
 actual serialized body recipe; population references hash the actual population
 recipe. Terrain/resources/visual domains hash their reserved version-1 input
 tuples `(builder, object ID, domain name, seed, radius, density)` and have no
-implicit dependencies. U11 must supply full physical/geology/terrain algorithms
-and definitions before evaluation: these are **generation recipe references**,
+implicit dependencies. The selected world now has a full U11 definition/query;
+other worlds still require full physical/terrain definitions before evaluation.
+These U10 inputs are **generation recipe references**,
 not complete landable worlds, meshes or a new terrain codec. U01/U04 wire is
 unchanged. Publication JSON is bounded builder output with no promised production
 decoder; U12 owns the final pack/version/checksum protocol.
@@ -119,7 +120,8 @@ identity stability, collisions, invalid/bounded requests, Roche/Hill/Kepler
 constraints and 512 fixed-seed systems with expected age/metallicity trends.
 These broad heuristic screens are not empirical goodness-of-fit tests.
 
-See [U10 evidence](../reports/issue-411/README.md). U11 full world definitions,
+See [U10 evidence](../reports/issue-411/README.md). U11 now publishes the [selected-world definition](universe-starting-system.md);
+other worlds' full definitions,
 U12 production batching/packaging, U14 dynamics, source reuse/coverage
 #513/#524/#526, and native integration/signoff #436–#439 remain their existing
 scopes. There is no playable migration, scanner revelation, save change, Earth

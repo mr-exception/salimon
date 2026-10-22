@@ -69,6 +69,12 @@ jobs:
           cargo run -p salimon-universe --example fiction_sanity --locked > artifacts/fiction-v1-repeat.json
           cmp artifacts/fiction-v1.json artifacts/fiction-v1-repeat.json
           cargo run -p salimon-universe --example fiction_build --locked -- client/universe/fixtures/schema-v1.json client/universe/fixtures/fiction-request-v1.json artifacts/fiction-publication-v1.json
+      - name: Permanent starting world publication and reproducibility
+        run: |
+          cargo run -p salimon-universe --example starting_system --locked > artifacts/starting-world-v1.json
+          cargo run -p salimon-universe --example starting_system --locked > artifacts/starting-world-v1-repeat.json
+          cmp artifacts/starting-world-v1.json artifacts/starting-world-v1-repeat.json
+          cmp artifacts/starting-world-v1.json client/universe/fixtures/starting-world-v1.json
 
   fiction-portable-golden:
     name: Fiction publication golden (${{ matrix.os }})
@@ -86,6 +92,10 @@ jobs:
         run: cargo test -p salimon-universe --locked synthesis
       - name: Optimized cross-platform identity and publication hashes
         run: cargo test -p salimon-universe --release --locked synthesis
+      - name: Permanent starting world cross-platform golden
+        run: cargo test -p salimon-universe --locked starting_system
+      - name: Optimized permanent starting world cross-platform golden
+        run: cargo test -p salimon-universe --release --locked starting_system
       - name: Retain publication bytes on golden failure
         if: failure()
         shell: bash

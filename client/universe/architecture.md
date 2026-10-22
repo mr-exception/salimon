@@ -4,7 +4,8 @@
 continues owning the compressed six-body playable fixture, terrain/resource-v1
 identity and existing saves. Catalog data must never implicitly grant player
 navigation knowledge. No GPU/window/network, source download, real production catalog, orbital integration, OS clock,
-terrain evaluation or backend is introduced. U04 adds consumer-supplied Read/Seek
+playable world replacement or backend is introduced. U11 adds only the selected
+world's portable surface query below. U04 adds consumer-supplied Read/Seek
 IO and an in-memory prototype encoder, not a production pack builder.
 
 ## Source and API
@@ -53,7 +54,8 @@ domains are admitted; duplicate/missing/cyclic dependencies reject. Seed equalit
 alone is not a dependency; domain names separate interpretation. The schema validator does
 not verify full-definition content or evaluate algorithms. U10 now derives seeds
 and hashes actual generation recipe/domain inputs; full canonical physical
-definitions and evaluators remain U11. A seed/digest reference is
+definitions and evaluation are provided for the selected world by U11 below;
+other worlds remain downstream. A seed/digest reference is
 not advertised as a complete planet. Published revisions are immutable; changes
 require explicit validated version/migration work rather than mutating a running
 catalog. This is not owner approval of geography changes or a save migration.
@@ -208,6 +210,29 @@ storage with repeated/reordered full-output comparisons. Read the [canonical
 builder contract](../../docs/universe-fiction-builder.md) for formulas, units,
 limits, namespace reservation, provenance and conditional distribution evidence.
 U01/U04 wire is unchanged. Actual recipe bytes and domain inputs are hashed;
-full terrain/geology/physical definitions and evaluation remain U11, and U12
+U11 below supplies the selected world's full inputs/surface query; other worlds'
+full definitions and playable adapters remain downstream, and U12
 must package the catalog plus sidecars. No empirical full-Galaxy fit, production
 pack, runtime generation, chart reveal or native acceptance is supplied.
+## Permanent starting world — U11 (#412)
+
+`starting_system.rs` consumes a pinned U10 cohort and publishes exactly one
+versioned immutable awakening definition. It owns the ID/naming freeze, split-cell
+Earth-distance lower bound, physical/candidate screening, explicit full selected
+world inputs, subsystem/world SHA-256s and portable single radial-height query.
+`FrozenStart` exposes shared DTOs and validates bounded exact-manifest decoding;
+unsupported/altered publications refuse without fallback selection.
+
+The [canonical contract](../../docs/universe-starting-system.md) defines the
+source/expanded-definition distinction, arithmetic, cold/airless assumptions,
+palette overrides, named domains and fixed resource/arrival routes. The resource
+domain declares terrain anchoring; visuals remain physically independent.
+No new dependencies or U01 schema changes are needed. Prototype world remains
+unchanged; full definitions for other worlds, U12 packaging, U14 states and U24
+playable adapters remain separate. Catalog access never grants player knowledge.
+
+Tests: `src/starting_system/tests.rs`; independent frozen manifest/request:
+`fixtures/starting-world-v1.json`, `starting-candidates-v1.json`; reproduction:
+`examples/starting_system.rs`. Run universe/workspace gates and repeated example
+output; macOS/Windows CI runs debug/release U11 goldens. These are portable CPU
+definitions and physical screens, not M1 rendering/contact/survival acceptance.

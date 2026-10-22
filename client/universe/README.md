@@ -36,4 +36,10 @@ U10 adds the [offline canonical fictional-system builder](../../docs/universe-fi
 It preserves observed sources, publishes stable fictional IDs and compact minor
 populations, and hashes complete generation sidecars. `fiction_build` accepts
 reviewed region inputs; `fiction_sanity` measures synthetic cohorts/storage.
-Full U11 world definitions and U12 production publication remain downstream.
+Other worlds' full definitions and U12 production publication remain downstream.
+
+U11 freezes [Nacre Reach and Vesper](../../docs/universe-starting-system.md), with
+distance/physical screening, full versioned starting-world surface/resource/visual
+inputs and a reproducible manifest. Run `cargo run -p salimon-universe --example
+starting_system --locked -- --audit` for candidate evidence. Portable definition
+publication does not change playable startup; U24 owns that migration.

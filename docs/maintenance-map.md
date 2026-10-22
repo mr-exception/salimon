@@ -389,3 +389,12 @@ and [invariants](../client/universe/invariants.md). CI compares two offline buil
 Actual frozen Earth/Proxima and synthetic matching work; full reviewed release
 coverage remains #526/#513, packaging U12, arbitrary-date models U14. No runtime
 world, scanner knowledge, save or rendering migration is implied.
+
+## Universe missing-data inference (#410)
+
+Owner: `client/universe/src/inference.rs`, `inference/observed.rs`; tests:
+`inference/tests.rs`; fixed-seed workload: `client/universe/examples/inference_sanity.rs`.
+Read the [inference contract](universe-inference.md), [architecture](../client/universe/architecture.md#missing-data-inference--u09-410)
+and [invariants](../client/universe/invariants.md). Run universe/workspace gates,
+sanity report twice and docs checks. Priors are heuristic; U12 owns packaging,
+U14 full-state evaluation; native and production-source gates remain separate.

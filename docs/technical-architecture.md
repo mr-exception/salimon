@@ -555,3 +555,13 @@ and [invariants](../client/universe/invariants.md). CI compares two offline buil
 Actual frozen Earth/Proxima and synthetic matching work; full reviewed release
 coverage remains #526/#513, packaging U12, arbitrary-date models U14. No runtime
 world, scanner knowledge, save or rendering migration is implied.
+
+## Universe missing-data inference (#410)
+
+The portable universe leaf now owns offline, model-classified single-star
+completion of missing physical quantities, age and partial orbits, with versioned
+proposal/confidence evidence and whole-system physical screens. U08 source limits
+and conflicts reject before inference. See [contract](universe-inference.md) and
+[owning architecture](../client/universe/architecture.md#missing-data-inference--u09-410).
+This does not replace runtime/world state, fit empirical population frequencies,
+prove long-term stability or package the sidecars for production (U12).

@@ -324,3 +324,8 @@ describe these conventions.
 Optional survival feedback: pause with **Escape**, then **S** opens accessibility
 settings. **C** toggles camera motion, **A** condition audio, **V** the health
 vignette. Preferences persist across runs. Linux audio needs `paplay` or `aplay`.
+
+Portable universe foundations include [offline missing-data inference](docs/universe-inference.md)
+with versioned heuristic priors and conservative physical screens. These offline
+catalog tools do not replace the playable six-body world or establish native
+real-scale universe acceptance.

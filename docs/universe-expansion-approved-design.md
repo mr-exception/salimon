@@ -1,6 +1,6 @@
 # Real-scale universe expansion — approved design (2026-10-20)
 
-Status: **approved design; portable U01–U08 foundations delivered with the limits below; remaining expansion not implemented**. Source: ten rounds of owner Q&A. This contract supersedes compressed-playable-world assumptions *for the future expansion*, not existing implementation until migrated. Work begins after the existing planned gameplay implementation queue completes. Keep separate native verification, no implementation PRs as part of planning.
+Status: **approved design; portable U01–U09 foundations delivered with the limits below; remaining expansion not implemented**. Source: ten rounds of owner Q&A. This contract supersedes compressed-playable-world assumptions *for the future expansion*, not existing implementation until migrated. Work begins after the existing planned gameplay implementation queue completes. Keep separate native verification, no implementation PRs as part of planning.
 
 ## Narrative alignment (2026-10-21)
 
@@ -105,3 +105,13 @@ PS exoplanet quantities with Gaia host reconciliation and explicit errors/limits
 See [implemented validity and unit policy](universe-observed-ingestion.md).
 Exact samples only; arbitrary-date/lower-accuracy models remain U14, full reviewed
 source coverage #526/#513 and real pack integration U12. No native world migration.
+
+## U09 implementation status (#410)
+
+[Offline inference](universe-inference.md) now completes missing physical/age/partial
+orbital data for explicitly classified supported single-star systems, with
+versioned heuristic priors, qualitative confidence, source evidence and bounded
+physical screening. It preserves measurements and refuses unsupported/inconsistent
+inputs. This is not empirical population calibration, a stability proof or a
+complete ephemeris. Sidecar packaging remains U12, state evaluation U14 and
+production-source/native gates remain independent.

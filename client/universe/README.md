@@ -26,3 +26,8 @@ physical measurements and PS default-row planets; see the [observed ingestion
 contract](../../docs/universe-observed-ingestion.md) before editing frame/epoch,
 unit/error/limit or identity behavior. `observed_import` is a deterministic local
 fixture example, not production packaging. Full source coverage remains #526.
+
+U09 adds [offline missing-data inference](../../docs/universe-inference.md) with
+explicit model classes, deterministic proposals, provenance and conservative
+physical screens. Run `cargo run -p salimon-universe --example inference_sanity --locked`
+for fixed-seed histograms; this does not fit empirical population frequencies.

@@ -62,3 +62,13 @@ errors, one-sided errors and limit/minimum-mass distinctions survive ingestion.
 Missing orbital elements never become complete states. Canonical/base identity
 conflicts reject; source-order changes cannot alter publication. See the
 [observed ingestion contract](../../docs/universe-observed-ingestion.md).
+
+20. U09 never overwrites a present quantity or its uncertainty/validity/provenance.
+Inferred values retain versioned methods, proposal distributions, qualitative
+confidence, registered dependencies and reproducible seeds/attempts. Proposal
+support is not a calibrated posterior; derived uncertainty stays unknown.
+21. Only complete supported single-star systems passing bounded point-constraint,
+Roche, radial-separation and mutual-Hill screens publish a new revision. Failure
+never mutates input. U08 limits/conflicts require explicit reconciliation; minimum
+mass never becomes observed true mass. Missing phase/epoch/orientation stays
+missing. See the [inference contract](../../docs/universe-inference.md).

@@ -31,6 +31,14 @@ class ScenarioSuiteTests(unittest.TestCase):
                 for path in select_scenarios(root, group, evidence):
                     parse_scenario(path)
 
+    def test_landing_evidence_preserves_baseline_gameplay(self):
+        root = Path(__file__).resolve().parents[1] / "scenarios"
+        baseline = parse_scenario(root / "landing-speed-cutoff.json")
+        evidence = parse_scenario(root / "evidence/landing-speed-cutoff.json")
+        self.assertEqual(baseline["setup"], evidence["setup"])
+        self.assertEqual(baseline["steps"],
+                         [step for step in evidence["steps"] if "screenshot" not in step])
+
     def test_unknown_group_is_rejected(self):
         with self.assertRaises(ValueError):
             select_scenarios(Path("scenarios"), "typo")

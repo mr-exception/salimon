@@ -203,7 +203,12 @@ reference review remains #376. See the onboarding section in architecture.md.
 
 Engine #493: B input uses `Command::ToggleEngines` and ship-owned authority;
 `session/persistence.rs` migrates v1-v4 force records to schema 5. Keep visual/audio
-feedback conditional on explicit engine state, with native review #498.
+feedback conditional on explicit engine state, with native review #498. Portable
+`flight_regression` tests also replay landing-cutoff and cockpit-monitor evidence
+JSON through production commands, ignoring only screenshot markers. Keep
+screenshot flight timings aligned with the current engine and assert assist
+admission before advancing toward landing; native periodic runs verify capture
+and pixels. Software-Vulkan corpus renewal is tracked in #518.
 
 
 Scout UI #466: prompt and crafting/status glyphs reuse renderer `ui_style`.

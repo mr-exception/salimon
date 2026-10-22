@@ -112,9 +112,27 @@ because the new schedule/manual workflow must exist on the default branch.
 ## Appearance coverage (#308)
 
 Nightly comparison uses the independently reviewed software-Vulkan corpus under
-`scenarios/visual/baselines/software-vulkan-option-a-v1`. A missing/candidate/
+`scenarios/visual/baselines/software-vulkan-option-a-v2`. A missing/candidate/
 pending corpus produces an explicit pending appearance check and pending lane,
 not a green appearance result. Temporal stability and fixture completeness remain
 required. Any real failure overrides pending status. Metadata mismatch or changed
 appearance against an approved corpus fails. See the [baseline review workflow](../scenarios/visual/README.md#approval-policy-and-style-replacement).
 Native Metal approval (#314) and software approval (#321) remain independent.
+
+
+### Current corpus transition (2026-10-22)
+
+The approved v1 corpus remains unchanged as historical evidence. Hosted Mesa
+changed since its capture (nightly #39548321491 failed driver compatibility),
+and engine #493 requires corrected cockpit-monitor fixture actions: 25% thrust
+for two 16 ms ticks produces 8 m/s, permitting the unchanged 20 m/s landing gate.
+The landing-cutoff evidence now follows the portable baseline at 16/32 m/s.
+Both screenshot routes have portable gameplay replay tests in
+`client/runtime/src/flight_regression.rs`; screenshots still require native runs.
+
+Nightly and the comparator default select the explicitly pending v2 corpus.
+[Review #518](https://github.com/mr-exception/salimon/issues/518) owns fresh
+captures and independent human image/mask/tolerance approval. Until then the lane
+reports **pending**, never approved appearance or full nightly success. Temporal
+completeness/stability, gameplay and packaged input smoke remain required;
+comparator compatibility, image hashes and pixel thresholds are unchanged.

@@ -171,6 +171,11 @@ Engine #493: `cargo test -p salimon-ship --locked` plus workspace tests/build/
 Clippy/fmt. `inertial-flight.json` and `landing-speed-cutoff.json` now exercise
 1000/500 m/s² dry thrust, coast/braking and the unchanged 20m/s landing limit.
 Physical B input, handling and instrument appearance need #498 reference evidence.
+The same runtime flight regression module replays the landing-cutoff and cockpit
+monitor evidence routes without GPU capture. Run `cargo test -p salimon-client
+--locked flight_regression` for both baseline and screenshot-route gameplay;
+nightly still owns screenshot, temporal and reviewed appearance checks. Software
+corpus v2 approval is pending #518; see [periodic CI](periodic-ci.md#current-corpus-transition-2026-10-22).
 
 ## Portable persistence and survival (#375)
 

@@ -37,3 +37,9 @@ The [architecture](architecture.md) is the canonical API/limit/ownership contrac
 14. Storage is lossless for admitted U01 values; CRC32 is corruption detection,
     not cryptographic publication approval. Prototype limits and measured sample
     density never establish production size, catalog completeness or M1 performance.
+
+15. Reference comparisons require complete unique case coverage and identical
+    exact frame/epoch/scale; finite Euclidean SI errors are checked against
+    explicit finite budgets. No implicit conversion, missing-data pass or
+    self-updated golden. Fixture rounding/numerical budgets are not scientific
+    model-error or native performance approval.

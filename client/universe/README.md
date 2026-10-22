@@ -12,3 +12,7 @@ calendar epochs. See [coordinate/time contract](architecture.md#hierarchical-fra
 U04 adds a bounded independently compressed cell prototype, strict index/source
 map and random-access reader. See [storage contract](../../docs/universe-storage.md).
 Measure with `cargo run -p salimon-universe --example partition_bench --release --locked`.
+
+U03 adds the [scientific reference comparator and CPU workloads](../../docs/universe-reference-fixtures.md).
+Run `cargo run -p salimon-universe --example reference_bench --release --locked`;
+reference Apple M1 measurements remain a separate gate.

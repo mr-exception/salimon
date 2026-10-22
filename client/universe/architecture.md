@@ -138,3 +138,14 @@ Python/zlib-generated `fixtures/partition-v1.bin` freezes version-1 compatibilit
 marked replicated sensitivity rows. See the canonical [wire/precision/budget
 contract](../../docs/universe-storage.md). No cross-cell references, GB pack,
 source reuse approval or runtime world replacement is supplied by this prototype.
+
+## Scientific reference harness — U03 (#404)
+
+`reference.rs` owns strict bounded reference/candidate wire decoding and validated
+immutable suites. `reference/tests.rs` owns coverage/frame/epoch/norm/failure gates;
+`fixtures/references-v1.json` freezes independently transcribed Horizons SI and
+analytic goldens. `examples/support/reference_inputs.rs` is a frozen-source test
+adapter plus production U02 workload, not a U08 importer/solver. The comparator
+CLI and seven-sample CPU workload are `examples/reference_compare.rs` and
+`examples/reference_bench.rs`. Read the [reference/budget contract](../../docs/universe-reference-fixtures.md).
+No gameplay/model accuracy or M1 performance is inferred; native work remains #521.

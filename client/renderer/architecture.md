@@ -454,3 +454,11 @@ medical=1 or food=0; `ship_mesh.wgsl` draws grey/cyan circuit traces for compone
 No buffers/draws/colliders, installation authority or resource state are added.
 Archive work/progress text remains runtime-owned. Native appearance/input/budget
 acceptance is #515; CPU shader/layout contracts cannot establish it.
+
+### Core blackout verification (#451)
+
+The current power-aware shader remains owned by the
+[Scout lighting/contrast contract](../../docs/scout-presentation.md#core-contrast-verification-condition-451).
+The [dated native report](../../reports/issue-451/README.md) binds current M1
+captures to the shader/binary; it does not promote image baselines or change GPU
+work, authored materials or simulation authority.

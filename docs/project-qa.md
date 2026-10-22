@@ -12,15 +12,6 @@
   link the question to its new follow-up issue under the
   [completion workflow](coding-conventions.md#issue-completion-and-follow-up).
 ## Open questions
-### Which dark-cabin condition should Core contrast verification use (#451)?
-
-The [#299 native evidence](../reports/issue-299/README.md) verifies the powered
-and blank Core face under current fixed warm interior lighting. Outage blanks
-the display but does not dim the cabin. Decide whether a separate dim-light
-validation fixture is intended or whether the requirement should use existing
-lighting. [#451](https://github.com/mr-exception/salimon/issues/451) owns the
-remaining native condition and evidence; no dark-cabin pass is claimed.
-
 ### What budget should complete legacy active 500-piece M1 signoff (#479)?
 
 The [2026-10-21 native evidence](../reports/issue-255/2026-10-21/README.md)

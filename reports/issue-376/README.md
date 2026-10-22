@@ -12,7 +12,7 @@ modifying a player's active run or adding a production cheat/clock command.
 Native launch, H/status, pause/manual save, clean exit, damaged-slot fallback,
 SIGKILL recovery and terminal R/archive/restart were exercised. This is bounded
 reference evidence, not full acceptance of physical travel, all DPI/sensory
-conditions or active 500-fragment performance. Source #376 remains open.
+conditions or active 500-fragment performance. Remaining acceptance is transferred to [#557](https://github.com/mr-exception/salimon/issues/557); source #376 closes through PR #554 on merge.
 
 ## Fixtures and reproduction
 
@@ -112,4 +112,15 @@ real fragment motion/contact, supported DPI/resolution matrix, long-lived-input
 and actual sleep/wake (#453), full condition sensory/audio review, and matched
 active-500 full-session frame/memory evidence. Balance decisions/physical routes
 remain #537. Fixture native passes do not settle those gates or constitute human
-art/balance signoff. PR is stacked after #553 and remains draft for these limits.
+art/balance signoff. PR is stacked after #553. At the owner’s request it is ready for review, with these native limits explicitly transferred to #557; existing #537 retains its ownership.
+
+
+## Review readiness and transferred acceptance
+
+The owner deferred further native desktop testing on 2026-10-22 and requested
+all delivery PRs ready. [#557](https://github.com/mr-exception/salimon/issues/557)
+owns the remaining physical travel/gather, DPI/sensory and active-load acceptance
+listed above; #537 and broader performance/art issues retain their scopes.
+PR #554 closes #376 on merge as delivered evidence/tooling and scope transfer,
+not full human/native signoff. Fixture/production contracts and the recorded
+checks are unchanged; documentation/path checks pass.

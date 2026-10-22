@@ -324,3 +324,19 @@ describe these conventions.
 Optional survival feedback: pause with **Escape**, then **S** opens accessibility
 settings. **C** toggles camera motion, **A** condition audio, **V** the health
 vignette. Preferences persist across runs. Linux audio needs `paplay` or `aplay`.
+
+Portable universe foundations include [offline missing-data inference](docs/universe-inference.md)
+with versioned heuristic priors and conservative physical screens. These offline
+catalog tools do not replace the playable six-body world or establish native
+real-scale universe acceptance.
+
+The portable [canonical fictional-system builder](docs/universe-fiction-builder.md)
+also supplies stable offline catalogs and compact minor-population recipes from
+reviewed density/age/metallicity regions. Synthetic distribution/storage checks
+do not constitute production universe publication or playable-world migration.
+
+
+The [permanent awakening definition](docs/universe-starting-system.md) freezes
+Nacre Reach / Vesper, its >=30 ly Earth-distance proof and versioned starting
+surface/resources. Reproduce its manifest/audit with the portable `starting_system`
+example; real-scale playable startup and native verification remain downstream.

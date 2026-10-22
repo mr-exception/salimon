@@ -231,3 +231,12 @@ funding; recovery only spends surplus above an emergency floor. Schema 7
 validates installed/pending/tray identity and reconstructs mass without charging.
 See [canonical contract](../../docs/data-recovery-module.md). No offline work,
 free coordinates or reconstruction of irrecoverable bytes. Native review #515.
+
+For #455 inactive-history attribution, run the independently selectable sleeping
+lane in the [benchmark guide](../../scripts/FRAGMENT_BENCHMARKS.md#independent-inactive-history-measurement-455).
+It preserves the existing fixture and records CPU adapter costs, never native FPS.
+
+Native cargo review #477 uses an opt-in test-only checkpoint exporter. The
+[validation guide](../../docs/validation.md#normal-clock-cargo-review-fixture-477)
+records its explicit fixture/normal-launch boundary. It changes no production
+input, save schema, physics or interpolation policy.

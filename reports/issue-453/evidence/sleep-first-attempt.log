@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/Users/mrexception/Documents/Projects/Salimon/salimon/reports/issue-453/sleep_probe.py", line 72, in <module>
+    helper('focus');key(36)
+    ~~~~~~^^^^^^^^^
+  File "/Users/mrexception/Documents/Projects/Salimon/salimon/reports/issue-453/sleep_probe.py", line 41, in helper
+    if r.returncode:raise RuntimeError(r.stderr)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: focus did not foreground target PID
+

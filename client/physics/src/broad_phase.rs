@@ -356,6 +356,33 @@ mod tests {
     }
 
     #[test]
+    fn earlier_only_row_is_requeried_after_a_later_pair_correction() {
+        // Row 1 initially sees only 0. The (2,3) correction brings a later
+        // neighbor into reach, invalidating the exhausted row for the next pass.
+        let mut pieces = vec![
+            cube([-0.34, 1.0, 0.0], 0.2),
+            cube([0.0, 1.0, 0.0], 0.2),
+            cube([0.39, 1.0, 0.0], 0.2),
+            cube([0.40, 1.0, 0.0], 0.2),
+        ];
+        for p in &mut pieces {
+            p.hull = None;
+            p.surface = Surface::Unsupported;
+        }
+        let mut grid = Grid::default();
+        grid.reset(&pieces, 2.0 * crate::CONTACT_BIAS_METERS);
+        let mut candidates = Vec::new();
+        grid.query(1, 0.0, &mut candidates);
+        assert_eq!(candidates, vec![0]);
+        let mut brute = pieces.clone();
+        let stats = advance_profiled(&mut pieces, Duration::from_millis(1), |_, _| true);
+        let expected = reference(&mut brute, Duration::from_millis(1));
+        assert_eq!(pieces, brute);
+        assert_eq!(stats.contacts, expected.contacts);
+        assert!(pieces[2].position[0] < 0.39);
+    }
+
+    #[test]
     fn empty_rows_are_refreshed_after_integration_and_between_updates() {
         let mut pieces = vec![cube([0.0, 1.0, 0.0], 0.2), cube([0.36, 1.0, 0.0], 0.2)];
         for (i, p) in pieces.iter_mut().enumerate() {

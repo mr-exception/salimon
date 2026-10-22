@@ -1,0 +1,33 @@
+{
+  "arch": "x86_64",
+  "os": "linux",
+  "rows": [
+    {
+      "compress_seconds": 0.000195249,
+      "compressed_bytes_per_star": 335.0,
+      "conditional_10gb_star_capacity": 29850746.268656716,
+      "conditional_1_8_billion_star_gb": 603.0,
+      "conditional_5gb_star_capacity": 14925373.134328358,
+      "ingest_seconds": 0.000038076,
+      "input_bytes": 188,
+      "json_bytes": 2792,
+      "stars_per_second": 52526.525895577266,
+      "synthetic_stars": 2,
+      "zlib_bytes": 670
+    },
+    {
+      "compress_seconds": 0.151307002,
+      "compressed_bytes_per_star": 38.9884,
+      "conditional_10gb_star_capacity": 256486544.7158642,
+      "conditional_1_8_billion_star_gb": 70.17912,
+      "conditional_5gb_star_capacity": 128243272.3579321,
+      "ingest_seconds": 0.168682325,
+      "input_bytes": 560974,
+      "json_bytes": 11492310,
+      "stars_per_second": 59283.03395154175,
+      "synthetic_stars": 10000,
+      "zlib_bytes": 389884
+    }
+  ],
+  "workload": "synthetic source rows + canonical records + all astrometry/provenance; JSON/zlib6 sensitivity, not U04 wire or production pack forecast; excludes full quality-column diversity, partition indexes and planets"
+}

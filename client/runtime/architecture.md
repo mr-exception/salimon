@@ -261,6 +261,14 @@ Release edges clear both movement/steering meanings and F/throttle latches even
 after a view, location or capture change. Left-mouse mining and mouse look use
 the same native gameplay admission conditions.
 
+For dedicated native input diagnosis, `RUST_LOG=info,salimon_client::app=trace`
+records received mouse deltas with capture/focus/occlusion/isolation admission
+state, key edges with ship controls/orientation, and capture release. Focus
+transitions are logged at debug level. These observations do not change admission,
+controller state or timing. Posting an OS event alone is not proof of delivery;
+compare this boundary trace with native state changes, as in the
+[#453 report](../../reports/issue-453/README.md).
+
 Native key translation and automation call `dispatch_key`. The explicit
 `InputSource::Automation` harness policy bypasses desktop focus/capture/occlusion,
 while retaining view, equipment, cockpit, power and assist authority. Protocol
@@ -515,7 +523,8 @@ simulation. Interpolation adds up to one tick of positional/ship-orientation
 visual delay; mouse look remains immediate. Portable synthetic 60/120/144 Hz,
 zero/multiple tick, fractional/overloaded backlog, distant-anchor and frame-reset
 regressions do not establish native smoothness or input latency. Native signoff
-remains [#314](https://github.com/mr-exception/salimon/issues/314).
+requires normal-clock evidence and explicit human review; see the
+[#477 report](../../reports/issue-477/README.md).
 
 Native benchmark samples sum solver work/time across all completed ticks in a
 render and retain the final activation counts. Zero-tick renders record zero new
@@ -1346,3 +1355,20 @@ funding; recovery only spends surplus above an emergency floor. Schema 7
 validates installed/pending/tray identity and reconstructs mass without charging.
 See [canonical contract](../../docs/data-recovery-module.md). No offline work,
 free coordinates or reconstruction of irrecoverable bytes. Native review #515.
+
+### Modal/world overlay composition (#348)
+
+Native redraw in `app.rs` uses one visibility decision for world action-bar
+pixels and the reticle. Gameplay without a modal shows both normally; pause,
+terminal, Archive/crafting/settings text or the Q wheel suppresses them so a
+world-anchored prompt cannot cover modal rows. This only gates rendering;
+session input authority and retained prompt/expiry state keep their owners.
+
+### Opt-in native save-review fixtures (#376)
+
+`session/persistence_scenarios.rs::native_reference_checkpoints_376` is an ignored,
+test-only export seam over existing #375 scenario initialization, production
+consumable/damage/crafting transactions and `SaveManager<NativeStore>`. It writes
+only to a new explicitly supplied directory and verifies exact save roundtrips.
+It adds no production launch flag, save format, simulation clock or authority.
+See [validation](../../docs/validation.md#reference-savehud-fixtures-376).

@@ -87,3 +87,29 @@ These policies change **future design requirements only**; current terrain-v1 co
 | Geology versus terrain geometry | Separate named seeds could suggest two competing physical surfaces. | **Reconciled**: geology supplies versioned inputs to exactly one authoritative terrain evaluator used by collision, landing, walking and rendering geometry. |
 | Scientific terrain updates | Better scientific data could shift established real planetary surfaces and player state. | **Approved A, extended**: freeze physical geography of **all real observed bodies** from first authoritative real-scale publication; allow non-displacing scientific/visual detail only, not freeze the current compressed prototype. Physical remapping requires a new owner approval. |
 | Discovery secrecy in offline pack | Fixed shared site placement is compatible with deterministic generation but a user can inspect packaged data even before discovering sites in-game. | **Approved A**: accept offline package datamining risk; enforce in-game discovery visibility instead of pretending canonical data is hidden from inspection. Maintain Hall pre-completion UI secrecy and independently required endgame backend authority. |
+
+## U10 generation recipe boundary (#411)
+
+The [offline fictional builder](universe-fiction-builder.md) now selects fixed
+region/system/body inputs and independent terrain/resources/visual seed lanes,
+retaining actual input bytes through typed recipes and SHA-256 references. These
+are generation recipes, not complete physical terrain/geology definitions or
+evaluators. U11 now resolves the selected starting world's full definition and
+single surface query (see below); other worlds still require full definitions. U12 must
+package all catalog and sidecar bytes together. Publication immutability, explicit
+revision migration and observed-surface preservation policies above still apply.
+No existing terrain-v1/resource/save identity changes are introduced.
+
+
+## U11 permanent selected-world publication (#412)
+
+[Nacre Reach / Vesper](universe-starting-system.md) now has a frozen full manifest
+with retained source-recipe digest, complete physical/surface/resource/visual
+parameters, independent named seeds, subsystem/full-world hashes, stable authored
+outcrop IDs and ship-clearing arrival/walk paths. Its portable single height
+query is shared by surface-point evaluation. Visual overrides cannot affect
+terrain/deposits; resources explicitly depend on terrain anchoring. This publishes
+one immutable selected-world baseline, not all fictional planets or gameplay
+adapters. U10's catalog recipe references remain unchanged and distinct; U12
+packages the expanded sidecar. U23/U24 real-scale geometry/mining/arrival, U14
+evolving states, native checks and explicit revision migration remain required.

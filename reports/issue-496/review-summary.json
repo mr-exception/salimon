@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "evidence_kind": "portable_fixture_reproduction",
+  "physical_routes_measured": false,
+  "owner_approval": false,
+  "hunger_seconds": 1800,
+  "fatigue_seconds": 64800,
+  "offline_recovery_seconds": 21600,
+  "comfortable_seconds_proposed": 360,
+  "break_even_seconds": 720,
+  "rows": [
+    {
+      "name": "baseline",
+      "first_ration_seconds": 86.304,
+      "single_ration_margin": 35.20533333333333,
+      "net_negative": false,
+      "travel_budget_seconds": 60.0,
+      "setup_budget_seconds": 15.0
+    },
+    {
+      "name": "slow_setup",
+      "first_ration_seconds": 431.304,
+      "single_ration_margin": 16.03866666666667,
+      "net_negative": false,
+      "travel_budget_seconds": 300.0,
+      "setup_budget_seconds": 120.0
+    },
+    {
+      "name": "low_health_fatigue",
+      "first_ration_seconds": 221.384,
+      "single_ration_margin": 27.700888888888883,
+      "net_negative": false,
+      "travel_budget_seconds": 180.0,
+      "setup_budget_seconds": 30.0
+    },
+    {
+      "name": "net_negative_route",
+      "first_ration_seconds": 941.304,
+      "single_ration_margin": -12.294666666666672,
+      "net_negative": true,
+      "travel_budget_seconds": 900.0,
+      "setup_budget_seconds": 30.0
+    }
+  ],
+  "availability_samples_per_body": {
+    "Mercury": {
+      "samples": 16,
+      "biomass_present": 0,
+      "ice_present": 0
+    },
+    "Venus": {
+      "samples": 16,
+      "biomass_present": 0,
+      "ice_present": 0
+    },
+    "Earth": {
+      "samples": 16,
+      "biomass_present": 16,
+      "ice_present": 16
+    },
+    "Moon": {
+      "samples": 16,
+      "biomass_present": 0,
+      "ice_present": 16
+    },
+    "Mars": {
+      "samples": 16,
+      "biomass_present": 0,
+      "ice_present": 16
+    }
+  },
+  "input_sha256": {
+    "balance.json": "d247b6e12cee123ea8e5486edd98f9788cc4436cbd0fb4755ad7fc93bb874cd1",
+    "availability.json": "03e37e3f1bd4c828010c3d188dcc97e0a3138ebff8cd68448d99541d2622e138"
+  }
+}

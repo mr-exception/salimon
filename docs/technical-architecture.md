@@ -523,3 +523,70 @@ wire fixture `fixtures/partition-v1.bin`; workload: `examples/partition_bench.rs
 and [invariants](../client/universe/invariants.md). Bounded prototype only: no GB
 builder/cross-cell references/runtime cache or production reuse approval. U12/U13
 retain those boundaries. Run universe/workspace gates and the release workload.
+
+## Universe scientific reference fixtures (#404)
+
+Owner: `client/universe/src/reference.rs`, tests: `reference/tests.rs`, goldens:
+`fixtures/references-v1.json`, examples: `reference_compare.rs`, `reference_bench.rs`
+with `support/reference_inputs.rs` (paths within `client/universe/`/its examples).
+See [reference wire/budget/workload guide](universe-reference-fixtures.md),
+[architecture](../client/universe/architecture.md#scientific-reference-harness--u03-404)
+and [invariants](../client/universe/invariants.md). Strict SI/epoch/frame comparison
+and CPU diagnostics only; no solver/world migration or scientific model approval.
+Native reference measurements remain #521; full-game native gates remain #435–#439.
+
+## Universe Gaia ingestion (#408)
+
+Owner: `client/universe/src/ingestion/gaia.rs`, shared `ingestion/csv.rs`; tests:
+`ingestion/gaia/tests.rs`; workload: `client/universe/examples/gaia_bench.rs`.
+See the [Gaia selection/units/cross-match contract](universe-gaia-ingestion.md),
+[architecture](../client/universe/architecture.md#gaia-ingestion--u07-408) and
+[invariants](../client/universe/invariants.md). Synthetic local ingestion and
+bounded canonical batches are implemented; production approval/full snapshots
+remain #513, inference U09, astrometry pack integration U12. No playable migration.
+
+## Universe observed ingestion (#409)
+
+Owners: `client/universe/src/ingestion/horizons.rs`, `exoplanets.rs`; tests in their
+sibling module directories; fixture example `client/universe/examples/observed_import.rs`.
+See [units/identity/validity contract](universe-observed-ingestion.md),
+[architecture](../client/universe/architecture.md#observed-solar-system-and-exoplanets--u08-409)
+and [invariants](../client/universe/invariants.md). CI compares two offline builds.
+Actual frozen Earth/Proxima and synthetic matching work; full reviewed release
+coverage remains #526/#513, packaging U12, arbitrary-date models U14. No runtime
+world, scanner knowledge, save or rendering migration is implied.
+
+## Universe missing-data inference (#410)
+
+The portable universe leaf now owns offline, model-classified single-star
+completion of missing physical quantities, age and partial orbits, with versioned
+proposal/confidence evidence and whole-system physical screens. U08 source limits
+and conflicts reject before inference. See [contract](universe-inference.md) and
+[owning architecture](../client/universe/architecture.md#missing-data-inference--u09-410).
+This does not replace runtime/world state, fit empirical population frequencies,
+prove long-term stability or package the sidecars for production (U12).
+
+## Canonical fictional systems (#411)
+
+The portable universe leaf now owns a bounded offline fictional-system builder
+using explicit residual density, age and metallicity inputs, reserved stable
+IDs, SHA-256 lanes, individually materialized bodies and aggregate minor
+populations. Observed source records remain intact. Complete generation recipes
+and partial orbital/stellar sidecars are hashed with the catalog. U11 below owns
+the selected world's full definition/surface query; other worlds' definitions
+remain downstream and U12 owns production batching/packaging. See the
+[builder contract](universe-fiction-builder.md) and [owning architecture](../client/universe/architecture.md#canonical-fiction-synthesis--u10-411).
+Synthetic distribution/storage evidence does not certify a real Milky Way pack
+or playable/native integration.
+
+## Permanent awakening publication (#412)
+
+The portable universe leaf now freezes Nacre Reach / Vesper from a pinned U10
+cohort. `starting_system.rs` owns stable IDs/names, >=30 ly distance proof,
+physical screening, full selected-world parameters, baseline outcrops/arrival
+routes, independent domain digests and a single surface evaluator. See
+[contract](universe-starting-system.md) and
+[owning architecture](../client/universe/architecture.md#permanent-starting-world--u11-412).
+U01 recipe references remain unchanged; U12 packages the expanded U11 sidecar.
+The runtime still starts in the compressed prototype. U14 states, U23 LOD and
+U24 arrival/mining integration retain their scopes, with separate native gates.

@@ -3,6 +3,8 @@
 > Migrated from the Salimon project documents on 2026-09-29. For current task status and dependencies, use [GitHub issues](https://github.com/mr-exception/salimon/issues).
 
 > **Purpose:** This page is only for unresolved product, gameplay, visual, UX, or architecture questions that require a human decision before implementation continues.
+
+> **Resolved 2026-10-22:** Starter Scout cargo/storage is no longer an open question. The approved future design includes a **dedicated aft cargo bay, full-height partition, wide closable door and physical bins**, distinct from the current authored Scout implementation. See [approved Scout and modular construction contract](scout-and-modular-construction.md) and issues #538–#540.
 ## How to use this page
 - Add a question here only when the intended behavior cannot be safely inferred from existing project documentation.
 - Each question should explain what decision is needed, why it matters, and the main options or tradeoffs when useful.
@@ -12,15 +14,6 @@
   link the question to its new follow-up issue under the
   [completion workflow](coding-conventions.md#issue-completion-and-follow-up).
 ## Open questions
-### Which dark-cabin condition should Core contrast verification use (#451)?
-
-The [#299 native evidence](../reports/issue-299/README.md) verifies the powered
-and blank Core face under current fixed warm interior lighting. Outage blanks
-the display but does not dim the cabin. Decide whether a separate dim-light
-validation fixture is intended or whether the requirement should use existing
-lighting. [#451](https://github.com/mr-exception/salimon/issues/451) owns the
-remaining native condition and evidence; no dark-cabin pass is claimed.
-
 ### What budget should complete legacy active 500-piece M1 signoff (#479)?
 
 The [2026-10-21 native evidence](../reports/issue-255/2026-10-21/README.md)
@@ -40,17 +33,6 @@ recorded failures without an attributed cause. [#479](https://github.com/mr-exce
 owns this decision and any required attribution after #255 delivery. Keep this
 question open until explicit review resolves it; source closure grants no signoff.
 Current-cap/mixed-sphere overload is independently tracked in #455.
-
-### Where should dedicated physical storage go after the cargo-room removal?
-
-The current scout revision removes the dedicated port cargo room and its storage
-volume to improve the ship silhouette. Loose fragments can still be dropped on
-clear main-cabin deck space. The previous requirement for an initial dedicated
-cargo room is superseded. Decide whether a later scout revision should add
-integrated storage within the aerodynamic hull, use a detachable module, or defer
-dedicated storage to a later ship design. This decision affects future container
-placement, cargo capacity and ship expansion; it does not block the current
-geometry revision or loose-fragment storage on the deck.
 
 ### What does #236 require by “save/reload”?
 
@@ -112,7 +94,8 @@ acceptance; the minimal shared OS playback seam may need a continuous backend.
 
 Portable balance evidence is [documented](survival-balance.md). Proposed comfortable
 360-second and break-even 720-second one-ration budgets await explicit owner
-approval in #496. Physical routes/subjective native timing remain unmeasured;
+approval in [#537](https://github.com/mr-exception/salimon/issues/537) after #496
+evidence delivery. Physical routes/subjective native timing remain unmeasured;
 current non-Earth profiles have no biomass. Approved meter durations are unchanged.
 
 ## Engine handling after impulse migration (#493 / #498)
@@ -121,3 +104,15 @@ The approved 1 N·s/J and 100/50 MW imply 1000/500 m/s² dry acceleration.
 The 20m/s landing gate, stationary assist handoff and 60GJ capacity remain.
 Portable tests reconcile numerical behavior; native handling/readability review
 remains #498. Jump Drive N=20% capacity/progression balance stays future, unchanged.
+
+
+## Replacement corpus and production source decisions (#537)
+
+[Follow-up #537](https://github.com/mr-exception/salimon/issues/537) retains human
+image/mask/tolerance approval and exact hosted software-Vulkan verification after
+#518 candidate delivery. Candidate status and native Metal independence remain.
+It also retains source-specific full terms, exact credits/permissions and full
+production snapshot approval after #513 private-development/evidence-gate delivery.
+The owner chose private development only; production eligibility remains blocked
+until the source-review checklist is resolved. Closing either source issue grants
+no appearance or production-data approval.

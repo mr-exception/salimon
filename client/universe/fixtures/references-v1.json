@@ -1,0 +1,146 @@
+{
+  "format": "salimon.universe.references",
+  "schema_version": 1,
+  "cases": [
+    {
+      "expected": {
+        "id": "earth-jpl-1",
+        "frame": "ICRF-SSB-geometric",
+        "epoch": {
+          "day": 10957,
+          "nanos": 0,
+          "scale": "tdb"
+        },
+        "position_meters": [
+          -26279037510.48988,
+          132573481168.4155,
+          57510611843.1282
+        ],
+        "velocity_mps": [
+          -29830.52803412253,
+          -4789.643244025283,
+          -2076.675100153809
+        ]
+      },
+      "regime": "system_flight",
+      "budget": {
+        "position_meters": 0.00025,
+        "velocity_mps": 1e-10
+      },
+      "budget_basis": "Snapshot decimal rounding plus SI/f64 conversion envelope; not DE441 uncertainty or future integrator drift allowance.",
+      "reference": "JPL Horizons Earth399 / 500@0, DE441, KM-S, TDB; catalogs/sources/manifest-v1.json SHA256 cb4301b038c85e5c1cdc296b16564bfbd38e4fef42938fa07656d490323f31bb"
+    },
+    {
+      "expected": {
+        "id": "earth-jpl-2",
+        "frame": "ICRF-SSB-geometric",
+        "epoch": {
+          "day": 10958,
+          "nanos": 0,
+          "scale": "tdb"
+        },
+        "position_meters": [
+          -28852422144.59306,
+          132138914804.9882,
+          57322205957.48592
+        ],
+        "velocity_mps": [
+          -29736.94826380772,
+          -5269.561174592738,
+          -2284.486678493427
+        ]
+      },
+      "regime": "system_flight",
+      "budget": {
+        "position_meters": 0.00025,
+        "velocity_mps": 1e-10
+      },
+      "budget_basis": "Snapshot decimal rounding plus SI/f64 conversion envelope; not DE441 uncertainty or future integrator drift allowance.",
+      "reference": "JPL Horizons Earth399 / 500@0, DE441, KM-S, TDB; catalogs/sources/manifest-v1.json SHA256 cb4301b038c85e5c1cdc296b16564bfbd38e4fef42938fa07656d490323f31bb"
+    },
+    {
+      "expected": {
+        "id": "local-rotating",
+        "frame": "fixture-body",
+        "epoch": {
+          "day": 10957,
+          "nanos": 43200000000000,
+          "scale": "tdb"
+        },
+        "position_meters": [
+          10,
+          22,
+          30
+        ],
+        "velocity_mps": [
+          -1,
+          5,
+          5
+        ]
+      },
+      "regime": "local_contact",
+      "budget": {
+        "position_meters": 1e-12,
+        "velocity_mps": 1e-12
+      },
+      "budget_basis": "Exact 90-degree axes, integer origin/velocity and omega cross r; arithmetic regression allowance only.",
+      "reference": "Analytic: R(x,y,z)=(-y,x,z), origin=(10,20,30), v=(3,4,5), omega=(0,0,2), local r=(2,0,0), v=(1,0,0)."
+    },
+    {
+      "expected": {
+        "id": "distant-submillimeter",
+        "frame": "galactic-camera-relative",
+        "epoch": {
+          "day": 10957,
+          "nanos": 43200000000000,
+          "scale": "tdb"
+        },
+        "position_meters": [
+          0.000244140625,
+          0,
+          0
+        ],
+        "velocity_mps": [
+          0,
+          0,
+          0
+        ]
+      },
+      "regime": "local_contact",
+      "budget": {
+        "position_meters": 0.00025,
+        "velocity_mps": 0
+      },
+      "budget_basis": "sqrt(3) times worst U02 cell-local f64 spacing <0.000212m, rounded outward to 0.00025m; no global f64 flatten.",
+      "reference": "Analytic: million-cell camera, centered local offset 2^39-1m, displacement 2^-12m on x; exact dyadic expected value."
+    },
+    {
+      "expected": {
+        "id": "interstellar-proper-motion",
+        "frame": "galactic-initial-relative",
+        "epoch": {
+          "day": 10959,
+          "nanos": 43200000000000,
+          "scale": "tdb"
+        },
+        "position_meters": [
+          518400,
+          -691200,
+          2073600
+        ],
+        "velocity_mps": [
+          3,
+          -4,
+          12
+        ]
+      },
+      "regime": "interstellar",
+      "budget": {
+        "position_meters": 0.00025,
+        "velocity_mps": 1e-12
+      },
+      "budget_basis": "Same U02 cell-local spacing envelope for nearby relative result after distant anchor cancellation; not a global absolute-position bound.",
+      "reference": "Analytic: million-cell anchor, constant (3,-4,12)m/s for exactly two TDB days; no orbital/gravity model or missing-velocity inference."
+    }
+  ]
+}

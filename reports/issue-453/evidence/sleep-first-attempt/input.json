@@ -1,0 +1,74 @@
+[
+  {
+    "input": [
+      "focus"
+    ],
+    "wall_utc": 1792691964.601475,
+    "stdout": "frontmost=88594 target=88594\nposted PID=88594 operation=focus\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "key",
+      53,
+      100
+    ],
+    "wall_utc": 1792691965.093369,
+    "stdout": "posted PID=88594 operation=key 53 100\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "key",
+      45,
+      100
+    ],
+    "wall_utc": 1792691965.5960262,
+    "stdout": "posted PID=88594 operation=key 45 100\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "window"
+    ],
+    "wall_utc": 1792691966.7896051,
+    "stdout": "{\"kCGWindowAlpha\":1,\"kCGWindowBounds\":{\"Height\":572,\"Width\":960,\"X\":640,\"Y\":169},\"kCGWindowIsOnscreen\":true,\"kCGWindowLayer\":0,\"kCGWindowMemoryUsage\":2368,\"kCGWindowName\":\"Salimon \u2014 Compressed Solar System\",\"kCGWindowNumber\":11031,\"kCGWindowOwnerName\":\"SalimonReview\",\"kCGWindowOwnerPID\":88594,\"kCGWindowSharingState\":1,\"kCGWindowStoreType\":1}\nposted PID=88594 operation=window\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "key",
+      36,
+      100
+    ],
+    "wall_utc": 1792691967.465813,
+    "stdout": "posted PID=88594 operation=key 36 100\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "operation": "pmset sleepnow",
+    "returncode": 0,
+    "stdout": "Sleeping now...\n",
+    "stderr": "",
+    "wall_utc": 1792691968.282679
+  },
+  {
+    "held_w_returncode": 0,
+    "stdout": "posted PID=88594 operation=key 13 5000\n",
+    "stderr": ""
+  },
+  {
+    "input": [
+      "focus"
+    ],
+    "wall_utc": 1792691974.198752,
+    "stdout": "",
+    "stderr": "focus did not foreground target PID\n",
+    "returncode": 1
+  }
+]

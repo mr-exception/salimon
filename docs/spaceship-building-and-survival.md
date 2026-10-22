@@ -1,5 +1,7 @@
 # Spaceship, Building & Survival
 
+> **Approved future Scout/construction contract (2026-10-22):** [Scout art direction and modular construction](scout-and-modular-construction.md). Older entries below describe the **currently implemented** authored Scout where noted; they do not override the new target. This page is not evidence that modular building or the new cargo bay has shipped.
+
 > Migrated from the Salimon project documents on 2026-09-29. For current task status and dependencies, use [GitHub issues](https://github.com/mr-exception/salimon/issues).
 
 ## Direction
@@ -10,11 +12,14 @@ The spaceship is the player's **primary home, vehicle, survival system, workshop
 - The cockpit/navigation module controls navigation and can only be operated by the ship owner.
 - Other systems such as railguns, laser weapons, fabrication, charging, processing, maintenance, and life-support functions should exist at distinct physical locations.
 - Other players aboard the ship may operate all modules except owner-only navigation.
-- The initial scout has a walkable cabin, cockpit, and aft airlock. Its separate port cargo room and protruding cargo hull module are removed to keep the exterior silhouette coherent.
+- **Current implementation:** The authored Scout has a walkable cabin, cockpit and aft airlock; the old protruding port cargo module was removed. **Approved future starter:** Integrate a dedicated aft physical cargo bay inside a coherent hull, separated from the main cabin by a wide-door bulkhead, with compact bunk/galley/hygiene facilities. See [approved target](scout-and-modular-construction.md) and #538–#540.
 - The cockpit has a shorter nose and shorter canopy glazing. One center console carries one wide multifunction monitor, with clear walking routes on both sides from the cabin past the console into the cockpit nose. Seated forward and downward visibility remains usable.
-- Loose physical fragments can be dropped on the main-cabin deck and travel with the ship. The initial scout has no dedicated cargo room or designated storage volume; its cabin bench and storage cabinet are removed. Future dedicated physical storage is an open design question in [Project Q&A](project-qa.md).
+- **Current implementation:** Loose physical fragments can be dropped on the cabin deck; the existing authored asset has no designated cargo room. **Approved future starter:** An aft cargo bay with visible physical bins/racks and a closable internal door (not a second virtual inventory). This design question is resolved; see [the approved contract](scout-and-modular-construction.md).
 
 ## Construction
+
+> **Updated approved flow:** Select an object/room/module, place its in-world placeholder, feed resources directly into it, then build automatically once fully funded (about 5–20 seconds for simple objects, up to 5 minutes for complex ones). Cancellation before completion returns `100% - progress%` of each physically contributed resource type; no separate worksite machine, Start button or staged salvage minigame. A multi-cell room may use one placeholder; construction remains a **future** feature. Instant direct-material **Energy Core upgrades** are exempt from timers, worksites, power costs and module shutdown. See [complete current approval](scout-and-modular-construction.md) and issues #541–#550.
+
 - Ship expansion uses **modular rooms/hull sections**.
 - Adding new structural rooms requires the ship to be landed or docked.
 - Interior modules and objects can be built while the ship is in flight where physically reasonable.
@@ -63,7 +68,7 @@ Death is intentionally severe. If the player dies or suffers unrecoverable total
 Inventory should avoid abstract chest/list behavior wherever possible.
 - Resources exist as physical objects/fragments.
 - Players can drop resources directly on the ship floor and create visible piles.
-- The initial scout can carry loose fragments dropped on the main-cabin deck. It has no dedicated cargo room or cargo-counting volume.
+- **Current implementation:** The authored Scout can carry loose fragments on its cabin deck and has no dedicated cargo room. **Approved future starter:** a separated aft cargo bay with real physical bins and correct cargo mass, without abstract storage; see [approved future design](scout-and-modular-construction.md).
 - Physical containers organize objects spatially; the player can see and retrieve the actual contents.
 - Cargo mass and placement may affect the ship where simulation depth permits.
 ## Space EVA and airlock
@@ -115,7 +120,7 @@ The game should avoid conventional abstract inventory.
 - Every physical item has mass and volume and these properties affect carrying, storage, and ship mass.
 - Loose objects inside the spaceship do not need to react to ship acceleration because the ship provides internal gravity; acceleration effects are intentionally abstracted away for interior object stability.
 ## Confirmed construction and damage model
-- Structural expansion uses a **grid-based modular system with snap points along the Z axis**.
+- **Approved future construction:** a **ship-local 3 m × 3 m × 3 m structural grid on all three axes**, with face-based connection to the persistent Core, multi-deck expansion, optional finer data-driven attachment snapping, and one blueprint spanning many structural cells. The older Z-only snap plan is superseded by [this approved contract](scout-and-modular-construction.md).
 - Rooms and modules can be individually detached or destroyed during combat and can physically separate from the ship.
 - Structural integrity is primarily a numerical design constraint rather than a full bending/breaking simulation.
 - Weapon damage should be localized to specific hull sections/modules and can cause decompression, disabled systems, and internal damage.

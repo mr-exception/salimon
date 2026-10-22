@@ -45,7 +45,7 @@ biomass entirely, so their samples cannot sustain basic-ration production. No
 new world resources or approved meter tuning are silently introduced.
 
 Owner budget/tuning acceptance, measured physical routes and subjective native
-signoff remain [#496](https://github.com/mr-exception/salimon/issues/496), alongside
+signoff remain #496 delivery follow-up [#537](https://github.com/mr-exception/salimon/issues/537), alongside
 existing native #376. Advanced food/restriction provisional tuning remains
 provisional until that review.
 
@@ -62,3 +62,46 @@ cargo test -p salimon-client survival_balance --locked
 
 These six bounded portable tests run in ordinary workspace PR CI. No window,
 GPU, audio device, native baseline approval or network source is needed.
+
+## Physical route review (#496)
+
+[Current reproduction and review packet](../reports/issue-496/README.md) retains
+fresh portable JSON, explicit failures/assumptions and an unfilled native trial
+worksheet. No measured native route or owner balance approval is implied.
+
+Copy [the trial template](../reports/issue-496/physical-trial-template.json) to a
+new file; fill actual revision, reference hardware/OS/backend, body/seed,
+health/fatigue/hunger, layout/obstacles, operator/date and recording/log evidence.
+Time the full route through discovery, setup, outbound navigation, gathering,
+return, physical intake, Fabricator, collection and Q consumption. These are
+**exclusive active-time intervals**; their sum must match an independent active
+stopwatch within 0.01 seconds. Pause stops both clocks. Count crafting overlap
+once, as part of the interval actually occupied, never add a whole parallel job
+duration twice. Preserve actual state before/after and elapsed production ticks
+in the linked evidence. No fixture placements or starter material reserves can
+prove the repeatable route. Record newly gathered biomass/ice and the number of
+newly crafted/consumed rations, excluding starter rations.
+
+```sh
+python scripts/survival_route_review.py artifacts/my-physical-trial.json \
+  --output artifacts/my-physical-trial-result.json
+python -m unittest discover -s scripts -p test_survival_route_review.py -v
+```
+
+Use `outcome: completed` only with every stage measured. Failed/no-feedstock
+trials use `outcome: failed` or `no_feedstock`, `failure_reason` and `null` for
+unrun stages; these are retained without supply passes. The CLI exits 1 for
+those outcomes, malformed evidence or a net-negative completed route, and 0 for
+a completed route meeting break-even. Outputs never overwrite earlier evidence.
+`comfortable_proposal_met` compares with the **unapproved** 360-second proposal.
+`unclamped_hunger_supply_margin = 40 * rations - active_seconds * 100 / 1800`
+is an arithmetic supply margin before meter caps/modifiers, not measured hunger
+recovery. Actual meter observations remain in evidence. No result grants owner
+approval or native signoff.
+
+Reference trials must include baseline, low health/fatigue, discovery/setup,
+obstacle detours and poor resource layouts. Retain failures on Moon/Mars/Mercury/
+Venus; missing biomass is a design constraint, not permission to add it everywhere.
+The 16-seed/200m sample cannot establish global availability. Owner acceptance of
+budgets and provisional recipes/modifiers/restrictions remains #537 after #496 delivery; coordinate
+HUD/wheel/visual accessibility with #376 before native acceptance.

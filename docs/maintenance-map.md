@@ -336,7 +336,7 @@ a deterministic bundle. `catalogs/sources/manifest-v1.json` separates synthetic
 Gaia fixtures from actual JPL/exoplanet snapshots. [Source contract](universe-sources.md),
 [architecture](../client/universe/architecture.md#source-manifests--u06-407) and
 [invariants](../client/universe/invariants.md) govern reuse/precision boundaries.
-Production reuse/full snapshots wait for #513; science ingestion remains U07/U08.
+Production reuse/full snapshots wait for #537; science ingestion remains U07/U08.
 
 ## Data Recovery Module (#468)
 
@@ -357,3 +357,69 @@ wire fixture `fixtures/partition-v1.bin`; workload: `examples/partition_bench.rs
 and [invariants](../client/universe/invariants.md). Bounded prototype only: no GB
 builder/cross-cell references/runtime cache or production reuse approval. U12/U13
 retain those boundaries. Run universe/workspace gates and the release workload.
+
+## Universe scientific reference fixtures (#404)
+
+Owner: `client/universe/src/reference.rs`, tests: `reference/tests.rs`, goldens:
+`fixtures/references-v1.json`, examples: `reference_compare.rs`, `reference_bench.rs`
+with `support/reference_inputs.rs` (paths within `client/universe/`/its examples).
+See [reference wire/budget/workload guide](universe-reference-fixtures.md),
+[architecture](../client/universe/architecture.md#scientific-reference-harness--u03-404)
+and [invariants](../client/universe/invariants.md). Strict SI/epoch/frame comparison
+and CPU diagnostics only; no solver/world migration or scientific model approval.
+Native reference measurements remain #521; full-game native gates remain #435–#439.
+
+## Universe Gaia ingestion (#408)
+
+Owner: `client/universe/src/ingestion/gaia.rs`, shared `ingestion/csv.rs`; tests:
+`ingestion/gaia/tests.rs`; workload: `client/universe/examples/gaia_bench.rs`.
+See the [Gaia selection/units/cross-match contract](universe-gaia-ingestion.md),
+[architecture](../client/universe/architecture.md#gaia-ingestion--u07-408) and
+[invariants](../client/universe/invariants.md). Synthetic local ingestion and
+bounded canonical batches are implemented; production approval/full snapshots
+remain #537, inference U09, astrometry pack integration U12. No playable migration.
+
+## Universe observed ingestion (#409)
+
+Owners: `client/universe/src/ingestion/horizons.rs`, `exoplanets.rs`; tests in their
+sibling module directories; fixture example `client/universe/examples/observed_import.rs`.
+See [units/identity/validity contract](universe-observed-ingestion.md),
+[architecture](../client/universe/architecture.md#observed-solar-system-and-exoplanets--u08-409)
+and [invariants](../client/universe/invariants.md). CI compares two offline builds.
+Actual frozen Earth/Proxima and synthetic matching work; full reviewed release
+coverage remains #526/#513, packaging U12, arbitrary-date models U14. No runtime
+world, scanner knowledge, save or rendering migration is implied.
+
+## Universe missing-data inference (#410)
+
+Owner: `client/universe/src/inference.rs`, `inference/observed.rs`; tests:
+`inference/tests.rs`; fixed-seed workload: `client/universe/examples/inference_sanity.rs`.
+Read the [inference contract](universe-inference.md), [architecture](../client/universe/architecture.md#missing-data-inference--u09-410)
+and [invariants](../client/universe/invariants.md). Run universe/workspace gates,
+sanity report twice and docs checks. Priors are heuristic; U12 owns packaging,
+U14 full-state evaluation; native and production-source gates remain separate.
+
+## Canonical fictional systems U10 (#411)
+
+Owner: `client/universe/src/synthesis.rs`; regression tests:
+`synthesis/tests.rs`; pinned request: `fixtures/fiction-request-v1.json`; offline
+file adapter: `examples/fiction_build.rs`; cohort/storage workload:
+`examples/fiction_sanity.rs` (all under `client/universe/`).
+See the [builder contract](universe-fiction-builder.md), [architecture](../client/universe/architecture.md#canonical-fiction-synthesis--u10-411)
+and [invariants](../client/universe/invariants.md). Source imports and observed
+U09 completion remain separate. U11 below publishes the selected world; other
+worlds' full definitions, U12 production packs and U14
+complete states retain their boundaries; runtime/world/renderer are unchanged.
+
+## Universe permanent starting system (#412)
+
+Owner: `client/universe/src/starting_system.rs`; tests:
+`src/starting_system/tests.rs`; request/world goldens: `fixtures/starting-*-v1.json`;
+audit adapter: `examples/starting_system.rs` (paths within `client/universe/`).
+Read the [selection/world contract](universe-starting-system.md),
+[architecture](../client/universe/architecture.md#permanent-starting-world--u11-412)
+and [invariants](../client/universe/invariants.md). Run universe/workspace gates,
+repeat the manifest example and compare the golden; cross-platform CI also runs
+debug/release tests. Candidate/world hashes must not change silently. U12 merges
+and packages; U14 supplies states; U23/U24 integrate terrain/arrival/resources.
+No runtime, prototype save, player chart or native signoff changes are implied.

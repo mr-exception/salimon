@@ -53,3 +53,58 @@ jobs:
         run: cargo build --workspace --locked
       - name: Portable workspace unit and session E2E contracts
         run: cargo test --workspace --locked
+      - name: Deterministic offline scientific fixture ingestion
+        run: |
+          cargo run -p salimon-universe --example observed_import --locked > artifacts/observed-v1.json
+          cargo run -p salimon-universe --example observed_import --locked > artifacts/observed-v1-repeat.json
+          cmp artifacts/observed-v1.json artifacts/observed-v1-repeat.json
+      - name: Fixed-seed inference scientific sanity and reproducibility
+        run: |
+          cargo run -p salimon-universe --example inference_sanity --locked > artifacts/inference-v1.json
+          cargo run -p salimon-universe --example inference_sanity --locked > artifacts/inference-v1-repeat.json
+          cmp artifacts/inference-v1.json artifacts/inference-v1-repeat.json
+      - name: Canonical fiction distribution, storage and reproducibility
+        run: |
+          cargo run -p salimon-universe --example fiction_sanity --locked > artifacts/fiction-v1.json
+          cargo run -p salimon-universe --example fiction_sanity --locked > artifacts/fiction-v1-repeat.json
+          cmp artifacts/fiction-v1.json artifacts/fiction-v1-repeat.json
+          cargo run -p salimon-universe --example fiction_build --locked -- client/universe/fixtures/schema-v1.json client/universe/fixtures/fiction-request-v1.json artifacts/fiction-publication-v1.json
+      - name: Permanent starting world publication and reproducibility
+        run: |
+          cargo run -p salimon-universe --example starting_system --locked > artifacts/starting-world-v1.json
+          cargo run -p salimon-universe --example starting_system --locked > artifacts/starting-world-v1-repeat.json
+          cmp artifacts/starting-world-v1.json artifacts/starting-world-v1-repeat.json
+          cmp artifacts/starting-world-v1.json client/universe/fixtures/starting-world-v1.json
+
+  fiction-portable-golden:
+    name: Fiction publication golden (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Portable cross-platform identity and publication hashes
+        run: cargo test -p salimon-universe --locked synthesis
+      - name: Optimized cross-platform identity and publication hashes
+        run: cargo test -p salimon-universe --release --locked synthesis
+      - name: Permanent starting world cross-platform golden
+        run: cargo test -p salimon-universe --locked starting_system
+      - name: Optimized permanent starting world cross-platform golden
+        run: cargo test -p salimon-universe --release --locked starting_system
+      - name: Retain publication bytes on golden failure
+        if: failure()
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          cargo run -p salimon-universe --example fiction_build --locked -- client/universe/fixtures/schema-v1.json client/universe/fixtures/fiction-request-v1.json artifacts/fiction-publication-ci.json
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: fiction-publication-${{ matrix.os }}
+          path: artifacts/fiction-publication-ci.json
+          if-no-files-found: ignore

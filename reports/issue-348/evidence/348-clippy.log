@@ -1,0 +1,24 @@
+    Checking typenum v1.20.1
+    Checking serde_json v1.0.151
+    Checking cpufeatures v0.2.17
+    Checking serde v1.0.229
+    Checking salimon-math v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/math)
+    Checking salimon-diagnostics v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/diagnostics)
+    Checking generic-array v0.14.7
+    Checking gltf-json v1.4.1
+    Checking crypto-common v0.1.7
+    Checking block-buffer v0.10.4
+    Checking digest v0.10.7
+    Checking sha2 v0.10.9
+    Checking salimon-universe v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/universe)
+    Checking gltf v1.4.1
+    Checking salimon-renderer v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/renderer)
+    Checking salimon-persistence v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/persistence)
+    Checking salimon-world v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/world)
+    Checking salimon-survival v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/survival)
+    Checking salimon-physics v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/physics)
+    Checking salimon-character v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/character)
+    Checking salimon-fabrication v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/fabrication)
+    Checking salimon-ship v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/ship)
+    Checking salimon-client v0.1.0 (/Users/mrexception/Documents/Projects/Salimon/salimon/client/runtime)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 21.25s

@@ -109,6 +109,13 @@ fn fixture(
 fn fragment_update_costs() {
     let path = std::env::var("SALIMON_FRAGMENT_COST_REPORT").expect("set output path");
     let quick = std::env::var_os("SALIMON_FRAGMENT_COST_QUICK").is_some();
+    // Run the retained-history lane independently of expensive active contacts.
+    // This changes only selection of opt-in measurements, never the fixture.
+    let inactive_only = std::env::var_os("SALIMON_FRAGMENT_COST_INACTIVE_ONLY").is_some();
+    assert!(
+        !(quick && inactive_only),
+        "choose quick or inactive-history scope"
+    );
     let allocation_mode =
         std::env::var("SALIMON_FRAGMENT_ALLOCATION_MODE").unwrap_or_else(|_| "asleep".to_owned());
     assert!(
@@ -121,7 +128,9 @@ fn fragment_update_costs() {
     let mut rows = Vec::new();
     for count in if quick { vec![500] } else { vec![500, 1000] } {
         for history in if quick { vec![0] } else { vec![0, 10_000] } {
-            for mode in if quick {
+            for mode in if inactive_only {
+                vec!["asleep"]
+            } else if quick {
                 vec![allocation_mode.as_str()]
             } else {
                 vec!["asleep", "active", "mixed", "moving-ship", "zero-g"]
@@ -227,6 +236,6 @@ fn fragment_update_costs() {
             }
         }
     }
-    let report = json!({"schema":1,"fixture":"fragment-attribution-305-306-v1","step_ms":16,"samples_per_case":if quick {5} else {sample_count},"gpu_fps":null,"rows":rows});
+    let report = json!({"schema":1,"fixture":"fragment-attribution-305-306-v1","scope":if inactive_only {"inactive-history"} else if quick {"quick"} else {"full"},"step_ms":16,"samples_per_case":if quick {5} else {sample_count},"gpu_fps":null,"rows":rows});
     std::fs::write(path, serde_json::to_vec_pretty(&report).unwrap()).unwrap();
 }

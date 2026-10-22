@@ -25,7 +25,7 @@ def load(path):
     return json.loads(path.read_text(encoding='utf-8'), object_pairs_hook=unique_object)
 
 
-def verify(manifest, production=False):
+def verify(manifest, production=False, production_review=None):
     data = load(manifest)
     if set(data) != {'format', 'schema_version', 'reviewed_on', 'sources'} or data['format'] != 'salimon.universe.sources' or data['schema_version'] != 1:
         raise ValueError('unsupported source manifest')
@@ -47,7 +47,7 @@ def verify(manifest, production=False):
             if set(artifact) != {'path', 'sha256', 'bytes', 'origin', 'encoding'}:
                 raise ValueError('unknown/missing artifact fields')
             name = artifact['path']
-            if name in paths or not name or '\\' in name or ':' in name or name.startswith('/') or any(p in {'', '.', '..'} for p in name.split('/')):
+            if name in {'manifest-v1.json', 'production-review.json'} or name in paths or not name or '\\' in name or ':' in name or name.startswith('/') or any(p in {'', '.', '..'} for p in name.split('/')):
                 raise ValueError(f'unsafe/duplicate artifact path: {name}')
             paths.add(name)
             path = (root / name).resolve()
@@ -65,11 +65,14 @@ def verify(manifest, production=False):
             if size != artifact['bytes'] or digest.hexdigest() != artifact['sha256']:
                 raise ValueError(f'{name}: checksum/size mismatch')
             entries.append((path, artifact))
+    if production:
+        from production_source_review import verify_review
+        verify_review(manifest, data, production_review)
     return data, entries
 
 
-def stage(manifest, output, production=False):
-    data, entries = verify(manifest, production)
+def stage(manifest, output, production=False, production_review=None):
+    data, entries = verify(manifest, production, production_review)
     if output.exists():
         raise ValueError(f'output exists; choose a new destination: {output}')
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -81,8 +84,12 @@ def stage(manifest, output, production=False):
             shutil.copyfile(path, dest)
         # Reverify staged bytes: copying concurrent modified input must fail.
         frozen = temporary / 'manifest-v1.json'
-        frozen.write_text(json.dumps(data, sort_keys=True, indent=2) + '\n', encoding='utf-8')
-        verify(frozen, production)
+        frozen.write_bytes(manifest.read_bytes())
+        frozen_review = None
+        if production:
+            frozen_review = temporary / 'production-review.json'
+            shutil.copyfile(production_review, frozen_review)
+        verify(frozen, production, frozen_review)
         temporary.rename(output)
     finally:
         if temporary.exists():
@@ -95,9 +102,13 @@ def main():
     parser.add_argument('--manifest', type=Path, default=ROOT / 'catalogs/sources/manifest-v1.json')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--production', action='store_true', help='requires reviewed reuse and forbids synthetic fixtures')
+    parser.add_argument('--production-review', type=Path,
+                        help='human use/terms/full-snapshot review bound to the exact manifest digest')
     args = parser.parse_args()
     try:
-        count = stage(args.manifest, args.output, args.production)
+        if args.production_review and not args.production:
+            raise ValueError('--production-review requires --production')
+        count = stage(args.manifest, args.output, args.production, args.production_review)
     except (OSError, ValueError, KeyError, TypeError) as error:
         parser.exit(1, f'source import failed: {error}\n')
     print(f'Verified and staged {count} source artifacts; no network or scientific conversion.')

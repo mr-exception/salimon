@@ -1,0 +1,53 @@
+{
+  "reference_kind": "unapproved current Metal candidate; comparator self-test only",
+  "results": {
+    "silhouette": {
+      "appearance": {
+        "changed_pixels": 123041,
+        "compared_pixels": 1024000,
+        "changed_fraction": 0.1201572265625,
+        "peak_channel_delta": 250,
+        "passed": false
+      },
+      "frozen_wrong_repeat": {
+        "changed_pixels": 0,
+        "compared_pixels": 1024000,
+        "changed_fraction": 0.0,
+        "peak_channel_delta": 0,
+        "passed": true
+      }
+    },
+    "material": {
+      "appearance": {
+        "changed_pixels": 134121,
+        "compared_pixels": 1024000,
+        "changed_fraction": 0.1309775390625,
+        "peak_channel_delta": 225,
+        "passed": false
+      },
+      "frozen_wrong_repeat": {
+        "changed_pixels": 0,
+        "compared_pixels": 1024000,
+        "changed_fraction": 0.0,
+        "peak_channel_delta": 0,
+        "passed": true
+      }
+    },
+    "layout": {
+      "appearance": {
+        "changed_pixels": 267731,
+        "compared_pixels": 1024000,
+        "changed_fraction": 0.2614560546875,
+        "peak_channel_delta": 236,
+        "passed": false
+      },
+      "frozen_wrong_repeat": {
+        "changed_pixels": 0,
+        "compared_pixels": 1024000,
+        "changed_fraction": 0.0,
+        "peak_channel_delta": 0,
+        "passed": true
+      }
+    }
+  }
+}

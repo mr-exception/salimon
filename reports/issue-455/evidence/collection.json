@@ -1,0 +1,18 @@
+[
+  {
+    "lane": "before-cap",
+    "returncode": 0
+  },
+  {
+    "lane": "after-cap",
+    "returncode": 0
+  },
+  {
+    "lane": "after-mixed",
+    "returncode": 1
+  },
+  {
+    "lane": "after-sleeping",
+    "returncode": 1
+  }
+]

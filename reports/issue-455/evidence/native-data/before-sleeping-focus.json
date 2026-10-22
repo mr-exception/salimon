@@ -1,0 +1,72 @@
+[
+  {
+    "pid": 30981,
+    "monotonic": 620625.626115125,
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "target window bounds unavailable\n"
+  },
+  {
+    "pid": 30981,
+    "monotonic": 620626.684562,
+    "returncode": 0,
+    "stdout": "frontmost=30981 target=30981\nposted PID=30981 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 31075,
+    "monotonic": 620640.221904125,
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "target window bounds unavailable\n"
+  },
+  {
+    "pid": 31075,
+    "monotonic": 620640.828487875,
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "target window bounds unavailable\n"
+  },
+  {
+    "pid": 31075,
+    "monotonic": 620641.429501333,
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "target window bounds unavailable\n"
+  },
+  {
+    "pid": 31075,
+    "monotonic": 620642.029534208,
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "target window bounds unavailable\n"
+  },
+  {
+    "pid": 31075,
+    "monotonic": 620642.632925416,
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "target window bounds unavailable\n"
+  },
+  {
+    "pid": 31075,
+    "monotonic": 620643.234597875,
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "target window bounds unavailable\n"
+  },
+  {
+    "pid": 31075,
+    "monotonic": 620643.836003458,
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "target window bounds unavailable\n"
+  },
+  {
+    "pid": 31075,
+    "monotonic": 620644.877807416,
+    "returncode": 0,
+    "stdout": "frontmost=31075 target=31075\nposted PID=31075 operation=focus\n",
+    "stderr": ""
+  }
+]

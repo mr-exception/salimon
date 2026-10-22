@@ -1,0 +1,1 @@
+["artifacts/native-20261022/Salimon348Fixed.app/Contents/MacOS/salimon-client", "--benchmark", "--mode", "native", "--count", "0", "--layout", "onboard", "--state", "settled", "--camera", "facing", "--warmup-seconds", "1", "--sample-seconds", "5", "--minimum-samples", "100", "--repeats", "3", "--settle-steps", "120"]

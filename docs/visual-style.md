@@ -8,6 +8,8 @@ Neither option changes gameplay, physics, sockets, pivots or asset identity.
 
 ## Experience-level direction (2026-10-21)
 
+The [2026-10-22 approved future starter Scout design](scout-and-modular-construction.md) adds an aft physical cargo bay, integrated living facilities and a 3D modular expansion language. This is a **future layout target**, not a claim the current Blender asset already incorporates it, and it does not silently relax this art bible's existing budgets or native-verification requirements.
+
 The approved overarching mood is **grounded cinematic sci-fi**, using the existing low-poly geometry identity but unifying it with believable physical machinery, coherent warm Scout-versus-cold-world lighting, spatial sound and deliberate quiet, meaningful rare encounters, consistent on-board UI/animation/VFX, environmental clues and strong composition. **Asset style alone does not establish experience direction.** The first reference vertical slice is the Scout interior and all on-board interactions. See [experience-direction.md](experience-direction.md) for the authoritative experiential contract. Native renderer verification and performance remain mandatory; do not assume advanced materials supported merely from authored Blender output.
 
 ## Form and shading

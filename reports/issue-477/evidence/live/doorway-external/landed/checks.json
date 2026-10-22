@@ -1,0 +1,14 @@
+{
+  "checks": {
+    "native_door_open": true,
+    "left_ship": true,
+    "returned_inside": true,
+    "normal_clock_advanced": true,
+    "paused_state_frozen": true,
+    "clean_exit": true,
+    "recording_created": true
+  },
+  "human_temporal_review": "pending",
+  "fixture": true,
+  "fixed_step": false
+}

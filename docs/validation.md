@@ -278,3 +278,91 @@ header/index CRC, hostile lengths/ranges/order and payload/index/source mismatch
 codec density/timings for frozen observed fields and labeled synthetic replication.
 See [storage limits and budget interpretation](universe-storage.md); these numbers
 are not a full-catalog size forecast, production publication or native FPS signoff.
+
+## Universe scientific reference fixtures (#404)
+
+`cargo test -p salimon-universe --locked` covers frozen JPL vector/epoch/SI goldens,
+analytic production-U02 frames/motion/GPU narrowing, injected unit/axis/epoch/scale
+faults, missing/extra/duplicate coverage, malformed wire, finite budgets and norm
+boundaries. Release comparator and repeated CPU workloads are documented in the
+[reference guide](universe-reference-fixtures.md); retain raw JSON/context/hashes.
+Linux results do not approve M1 performance (#521), future ephemeris/integrator
+model drift or whole-game frame rates. Reference data is not production reuse.
+
+U07: universe/workspace tests run Gaia/CSV goldens, quality/missing-data counts,
+matching, duplicates and malformed input. Run `cargo run -p salimon-universe
+--example gaia_bench --release --locked` as one command for synthetic resource
+sensitivity; see the [Gaia contract](universe-gaia-ingestion.md) for projection limits.
+
+U08: universe/workspace tests compare the production source importer against U03
+Earth goldens, physical headers and Proxima quantities/IDs/errors, plus synthetic
+limits/matching/error cases. `cargo run -p salimon-universe --example observed_import --locked`
+emits the deterministic development fixture; Source build CI compares two outputs.
+See the [observed ingestion contract](universe-observed-ingestion.md) for source
+verification, unsupported formats and exact-epoch/refused fallback policy.
+
+## Universe inference (#410)
+
+Run `cargo test -p salimon-universe --locked` and the workspace build/test/Clippy/fmt
+gates. `cargo run -p salimon-universe --example inference_sanity --locked` emits
+8192 fixed-seed synthetic systems, proposal histograms and numerical/physical
+checks; repeat output must compare identically on the tested toolchain. CI runs
+this gate and repeat comparison. See [model limits](universe-inference.md) and
+[measured evidence](../reports/issue-410/README.md). No empirical frequency fit,
+production source approval, runtime migration or native M1 signoff is implied.
+
+## Universe fictional builder (#411)
+
+`cargo test -p salimon-universe --locked` includes U10 source preservation,
+identity/order/namespace, input bounds, hashed recipe references, fixed publication
+goldens and Roche/Hill/Kepler plus age/metallicity trend checks. Run
+`cargo run -p salimon-universe --example fiction_sanity --release --locked` for
+four synthetic 64-system distributions, repeat/reorder byte checks and raw/zlib
+storage. Source CI repeats/compares the summary and macOS/Windows portable jobs
+run the same synthesis goldens in debug and release profiles, retaining failed
+publication bytes as CI artifacts; those are CPU contracts, not graphical signoff.
+See [file adapter usage and limits](universe-fiction-builder.md#commands-and-validation).
+Workspace build/tests/all-target Clippy/fmt and docs/base-impact gates also apply.
+## Universe permanent starting world (#412)
+
+Run `cargo test -p salimon-universe --locked starting_system`, workspace
+build/tests/all-target Clippy/fmt and documentation/base-impact validation.
+`cargo run -p salimon-universe --example starting_system --locked` must reproduce
+`client/universe/fixtures/starting-world-v1.json` exactly (including newline).
+The `-- --audit` option emits all candidate assessments and definition hashes.
+macOS/Windows portable CI runs debug/release U11 goldens; Ubuntu repeats/compares
+the manifest. Tests cover independent >=30 ly proof, physical screens, immutable
+IDs/digests, altered/unknown/oversized data, single-surface queries, all five
+resources, ship-clearing walk paths and visual independence. See
+[contract](universe-starting-system.md) and [evidence](../reports/issue-412/README.md).
+These CPU checks do not replace U24 integration or native #436–#439 acceptance.
+
+## Reference save/HUD fixtures (#376)
+
+Opt-in `SALIMON_NATIVE_REVIEW_DIR=/absolute/new/output cargo test -p salimon-client
+--locked native_reference_checkpoints_376 -- --ignored` emits five validated
+normal-launch checkpoint fixtures (landed/cockpit/moving/EVA/terminal). The output
+must not already exist. Fixtures explicitly set reduced meters, apply production
+medkit/damage/crafting transactions and use existing #375 placement fixtures;
+they do not prove physical travel or naturally elapsed death. Each checkpoint
+round-trips through production validation and the real two-slot disk manager.
+Run [the native review harness](../reports/issue-376/native_restore.py) only against
+those isolated directories with the locally authorized OS-input helper. Retain
+source/binary/adapter/DPI, input/checkpoint records and actual images. Fixture
+rendering never grants full gameplay, balance or representative FPS acceptance.
+
+## Normal-clock cargo review fixture (#477)
+
+```sh
+SALIMON_NATIVE_CARGO_DIR="$PWD/artifacts/new-native-cargo" cargo test --release -p salimon-client --locked native_cargo_checkpoint_477 -- --ignored --nocapture
+```
+
+The output directory must not exist. This test reuses the existing seeded
+FragmentPile fixture, advances production ticks, aims at an existing identity,
+validates exact save roundtrip with automation absent after restore, and proves
+the typed F route can pick that identity. Only then does it write two verified
+slots. Use the [#477 native harnesses](../reports/issue-477/README.md) against a
+copy in a fresh isolated save directory. Normal launch uses the real wall clock
+and native OS events; no stdin stepping or rendering override is active.
+Fixture placement/aiming is not physical mining/travel, visual approval or FPS
+evidence. Keep blocked placement failures and human temporal review separate.

@@ -1,10 +1,11 @@
 # Canonical universe schema — U01 (#402)
 
-`salimon-universe` is a portable leaf crate using Serde/JSON and pinned pure Rust flate2/CRC32 storage dependencies. It is not yet a runtime dependency. `salimon-world`
+`salimon-universe` is a portable leaf crate using Serde/JSON and pinned pure Rust flate2/CRC32 storage and sha2 digest dependencies. It is not yet a runtime dependency. `salimon-world`
 continues owning the compressed six-body playable fixture, terrain/resource-v1
 identity and existing saves. Catalog data must never implicitly grant player
-navigation knowledge. No GPU/window/network, source download, real production catalog, orbit, OS clock,
-terrain evaluation or backend is introduced. U04 adds consumer-supplied Read/Seek
+navigation knowledge. No GPU/window/network, source download, real production catalog, orbital integration, OS clock,
+playable world replacement or backend is introduced. U11 adds only the selected
+world's portable surface query below. U04 adds consumer-supplied Read/Seek
 IO and an in-memory prototype encoder, not a production pack builder.
 
 ## Source and API
@@ -23,7 +24,7 @@ preserve source key case and never derive from display names, list position,
 system time, runtime random state or a default language hasher. Namespace is
 lowercase ASCII; key is case-sensitive ASCII; both use letters/digits/`._-` and
 one separating colon, at most 160 UTF-8 bytes. Builder-defined canonical keys are
-committed publication identities; this crate does not select/generate them.
+committed publication identities; the schema validator does not select/generate them; U10 synthesis now owns fictional publication keys.
 
 Dataset IDs and record IDs are globally disjoint. Every observed/inferred field
 references registered versioned source metadata; original observed record keys
@@ -50,10 +51,11 @@ Each fictional planet/moon requires a positive definition version, lowercase
 `visual` seed domains. Domains bind `u64` seed, positive algorithm version,
 subdefinition digest and explicit upstream domain dependencies. At most 64 named
 domains are admitted; duplicate/missing/cyclic dependencies reject. Seed equality
-alone is not a dependency; domain names separate interpretation. The crate does
-not generate seeds, verify full-definition content against digests, run hashes,
-or evaluate algorithms. Full canonical definitions/parameters, reproducible PRF
-and actual digest verification belong to U04/U10/U11. A seed/digest reference is
+alone is not a dependency; domain names separate interpretation. The schema validator does
+not verify full-definition content or evaluate algorithms. U10 now derives seeds
+and hashes actual generation recipe/domain inputs; full canonical physical
+definitions and evaluation are provided for the selected world by U11 below;
+other worlds remain downstream. A seed/digest reference is
 not advertised as a complete planet. Published revisions are immutable; changes
 require explicit validated version/migration work rather than mutating a running
 catalog. This is not owner approval of geography changes or a save migration.
@@ -138,3 +140,99 @@ Python/zlib-generated `fixtures/partition-v1.bin` freezes version-1 compatibilit
 marked replicated sensitivity rows. See the canonical [wire/precision/budget
 contract](../../docs/universe-storage.md). No cross-cell references, GB pack,
 source reuse approval or runtime world replacement is supplied by this prototype.
+
+## Scientific reference harness — U03 (#404)
+
+`reference.rs` owns strict bounded reference/candidate wire decoding and validated
+immutable suites. `reference/tests.rs` owns coverage/frame/epoch/norm/failure gates;
+`fixtures/references-v1.json` freezes independently transcribed Horizons SI and
+analytic goldens. `examples/support/reference_inputs.rs` is a frozen-source test
+adapter plus production U02 workload, not a U08 importer/solver. The comparator
+CLI and seven-sample CPU workload are `examples/reference_compare.rs` and
+`examples/reference_bench.rs`. Read the [reference/budget contract](../../docs/universe-reference-fixtures.md).
+No gameplay/model accuracy or M1 performance is inferred; native work remains #521.
+
+## Gaia ingestion — U07 (#408)
+
+`ingestion/gaia.rs` owns explicit quality selection, typed source-unit astrometry,
+exact reviewed stellar cross-match and bounded-batch schema-1 canonicalization.
+`ingestion/csv.rs` owns bounded local CSV decoding; Gaia tests live in
+`ingestion/gaia/tests.rs`. `examples/gaia_bench.rs` measures synthetic JSON/zlib
+storage sensitivity and throughput, not a production forecast. Read the
+[selection, units, sidecar and scaling contract](../../docs/universe-gaia-ingestion.md).
+No distance inference, full snapshot approval, multiple-star solver, runtime
+migration or astrometry storage in U04's wire is implied.
+
+Gaia angular values expose degrees; separately named RA/Dec source-error fields
+retain mas without implicit covariance conversion. A mixed-unit regression
+protects both typed and raw evidence.
+
+## Observed Solar System and exoplanets — U08 (#409)
+
+`ingestion/horizons.rs` owns bounded strict API-1.2 table-2 ICRF/SSB/TDB decoding,
+SI vector/physical conversion, imported coverage and exact-state refusal policy.
+`ingestion/exoplanets.rs` owns PS default-row typed quantities, asymmetric errors,
+limits, original references and U07/Gaia host reconciliation. Their `tests.rs`
+modules own actual Earth/Proxima plus synthetic boundary/matching regressions;
+Earth states compare against independent U03 goldens. `examples/observed_import.rs`
+builds the frozen source fixture deterministically, also checked twice in CI.
+Read the [canonical units, identities and validity contract](../../docs/universe-observed-ingestion.md).
+U01/U04 wire is unchanged: astrometry/ephemerides/orbits remain separate typed
+observations requiring U12 packaging. Full reviewed coverage remains #526/#513;
+U14 owns arbitrary-date model evaluation and lower-accuracy fallback, not U08.
+
+## Missing-data inference — U09 (#410)
+
+`inference.rs` owns typed single-star system requests, deterministic version-1
+proposal distributions, qualitative confidence, source-dependency evidence and
+bounded whole-system physical acceptance. `inference/observed.rs` adapts U08
+measurements with explicit source-limit/conflict refusal. `inference/tests.rs`
+and `examples/inference_sanity.rs` cover fixed-seed preservation, constraints,
+Kepler references and distribution coverage. Read the [canonical inference
+contract](../../docs/universe-inference.md) for exact formulas/ranges/limits.
+Catalog schema-1 remains unchanged; age, partial orbits, model identity and
+sampling evidence use separate typed sidecars requiring U12 packaging. Present
+quantities are immutable; unsupported systems/inconsistent observations reject.
+No calibrated posterior, full state, long-term stability proof, runtime migration
+or native hardware signoff is claimed.
+
+## Canonical fiction synthesis — U10 (#411)
+
+`synthesis.rs` owns validated residual-density region inputs, versioned SHA-256
+field lanes, deterministic stellar/body/population recipes and immutable bounded
+publications. Cubes use fixed-order IEEE multiplication rather than the
+platform-dependent precision of `f64::powi`; CI verifies debug/release hashes.
+`synthesis/tests.rs` owns physical/source/identity/failure and fixed
+hash contracts; `fixtures/fiction-request-v1.json` pins a development request.
+`examples/fiction_build.rs` owns bounded local file IO and staged replacement;
+`examples/fiction_sanity.rs` measures four fixed synthetic cohorts and raw/zlib
+storage with repeated/reordered full-output comparisons. Read the [canonical
+builder contract](../../docs/universe-fiction-builder.md) for formulas, units,
+limits, namespace reservation, provenance and conditional distribution evidence.
+U01/U04 wire is unchanged. Actual recipe bytes and domain inputs are hashed;
+U11 below supplies the selected world's full inputs/surface query; other worlds'
+full definitions and playable adapters remain downstream, and U12
+must package the catalog plus sidecars. No empirical full-Galaxy fit, production
+pack, runtime generation, chart reveal or native acceptance is supplied.
+## Permanent starting world — U11 (#412)
+
+`starting_system.rs` consumes a pinned U10 cohort and publishes exactly one
+versioned immutable awakening definition. It owns the ID/naming freeze, split-cell
+Earth-distance lower bound, physical/candidate screening, explicit full selected
+world inputs, subsystem/world SHA-256s and portable single radial-height query.
+`FrozenStart` exposes shared DTOs and validates bounded exact-manifest decoding;
+unsupported/altered publications refuse without fallback selection.
+
+The [canonical contract](../../docs/universe-starting-system.md) defines the
+source/expanded-definition distinction, arithmetic, cold/airless assumptions,
+palette overrides, named domains and fixed resource/arrival routes. The resource
+domain declares terrain anchoring; visuals remain physically independent.
+No new dependencies or U01 schema changes are needed. Prototype world remains
+unchanged; full definitions for other worlds, U12 packaging, U14 states and U24
+playable adapters remain separate. Catalog access never grants player knowledge.
+
+Tests: `src/starting_system/tests.rs`; independent frozen manifest/request:
+`fixtures/starting-world-v1.json`, `starting-candidates-v1.json`; reproduction:
+`examples/starting_system.rs`. Run universe/workspace gates and repeated example
+output; macOS/Windows CI runs debug/release U11 goldens. These are portable CPU
+definitions and physical screens, not M1 rendering/contact/survival acceptance.

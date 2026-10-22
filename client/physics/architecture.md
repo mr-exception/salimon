@@ -173,11 +173,14 @@ width match, unchanged cell ranges retain bucket membership; changed ranges are
 removed/reinserted, and obsolete empty buckets are pruned. A changed length or
 cell width rebuilds membership, retaining bucket/vector capacity. The local
 origin is refreshed before all bounds; no query sees a partially refreshed grid.
-Within that solve, empty spatial query rows are reused across the sixteen ordered
-passes while all center bounds remain unchanged (#255/#288). Any pair/ground
-positional correction invalidates every empty row before further reuse; the
-post-integration solve starts fresh. Only empty results are retained in O(n)
-scratch, so dense candidate storage does not grow quadratically. SAT, impulses,
+Within that solve, rows without any later-ID spatial candidate are reused across
+the sixteen ordered passes while all center bounds remain unchanged (#455).
+Earlier IDs own their pairs; a row containing only earlier neighbors has no
+remaining pair to resolve. Any pair/ground positional correction invalidates
+every exhausted row before further reuse; the post-integration solve starts
+fresh. Only absence of later candidates is retained in O(n) scratch, so dense
+candidate storage does not grow quadratically. Exact all-pairs comparisons cover
+correction-created contacts, including an earlier-only row gaining a later neighbor. SAT, impulses,
 pass counts and adaptive time progression are unchanged.
 Every pair's positional/ground corrections immediately update affected bounds
 and requery the current row for later IDs. Correction-created contacts are

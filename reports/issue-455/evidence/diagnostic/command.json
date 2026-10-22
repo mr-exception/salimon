@@ -1,0 +1,22 @@
+[
+  "artifacts/native-20261022/455/build-optimized/salimon-client",
+  "--benchmark",
+  "--count",
+  "1000",
+  "--layout",
+  "current-mixed",
+  "--state",
+  "active",
+  "--camera",
+  "facing",
+  "--mode",
+  "physics",
+  "--seed",
+  "155",
+  "--warmup-seconds",
+  "0",
+  "--sample-seconds",
+  "3",
+  "--minimum-samples",
+  "100"
+]

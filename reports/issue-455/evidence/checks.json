@@ -1,0 +1,36 @@
+{
+  "workspace_tests": {
+    "passed": 850,
+    "failed": 0,
+    "ignored": 29
+  },
+  "workspace_build": "passed",
+  "release_build": "passed",
+  "clippy_all_targets": "passed",
+  "python_tooling": {
+    "passed": 118
+  },
+  "format": "passed",
+  "docs": "passed",
+  "whitespace": "passed",
+  "native_acceptance": "failed/incomplete; see #559",
+  "inactive_history": {
+    "repetitions": 3,
+    "rows_per_run": 4,
+    "samples_per_row": 100,
+    "passed": true
+  },
+  "docs_base_origin_main": "passed",
+  "release_physics_results": [
+    [
+      "72",
+      "0",
+      "2"
+    ],
+    [
+      "0",
+      "0",
+      "0"
+    ]
+  ]
+}

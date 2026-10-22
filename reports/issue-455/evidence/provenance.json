@@ -1,0 +1,12 @@
+{
+  "base": "ccbc2fda04147a641c659bbeb6e74af37ad5066a",
+  "variant": "exhausted later-ID rows; no physics rule change",
+  "files": {
+    "client/physics/src/lib.rs": "437ab5fd437f21d66b2c325622818471f37118a10693432ccd401afbcffff96d",
+    "client/physics/src/broad_phase.rs": "a72baaac8b9cb611fc398677ec7dfebfa6341e376a71f074e41e5760adb7ab17",
+    "client/runtime/src/fragment_costs.rs": "afd30a10a59b4c4d9e6b004d342d0c202e5768845e06cb4b65deda4eaa07f30d"
+  },
+  "before_binary": "88745ae125557fd83aa86abff0ee335a490fe93bcaac7998b9ecc09581b17773",
+  "after_binary": "826382ab20c91a453a19219781493dd62cead29c6f310077245c4fbe5e988eb5",
+  "target": "artifacts/native-20261022/target/aarch64-apple-darwin/release"
+}

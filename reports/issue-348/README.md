@@ -7,7 +7,7 @@ from scratch in an isolated Cargo target on Apple M1 iMac21,1 / 16 GiB / macOS
 26.2, using Metal at a 1920×1080 physical drawable. The runtime now suppresses world prompts/reticle while a modal owns the screen.
 Assets, recipes, input authority, shader and baseline approvals are unchanged. The initial native OS input attempt was blocked by event-posting permission.
 After the owner enabled Accessibility, the retry passed five bounded checks. The source issue
-must remain open until its remaining acceptance is exercised.
+closes on merge as delivery and explicit transfer of remaining acceptance to [#557](https://github.com/mr-exception/salimon/issues/557).
 
 ## Completed checks
 
@@ -120,7 +120,18 @@ window (avoiding tiny auxiliary windows) and refuses key/mouse input unless
 the requested PID is foreground. Global input must not be trusted on a PID
 mismatch. These source adaptations are included in `native_input.swift`.
 
-This remains a draft: full physical intake/collection/circulation, representative
+At initial delivery, full physical intake/collection/circulation, representative
 matched frame budgets, supported DPI and human appearance/playability approval
-remain pending. Existing #453 owns unreliable long-sequence mouse delivery.
+remain pending. Historical mouse delivery failures remain recorded; #453 later records a successful bounded longer-sequence delivery retry. Remaining native signoff is owned by #557.
 No complete native signoff or issue closure is claimed.
+
+
+## Review readiness and transferred acceptance
+
+The owner requested all four delivery PRs ready for review on 2026-10-22 and
+deferred further desktop testing. [#557](https://github.com/mr-exception/salimon/issues/557)
+owns the uncompleted tray/intake/circulation, display and matched-performance
+checks above. Broader art/performance issues keep their existing ownership.
+PR #553 closes #348 on merge as delivery plus scope transfer; no failed/unrun
+check becomes a pass and human approval is still pending. Documentation/path
+checks pass; production implementation and recorded validation are unchanged.

@@ -4,8 +4,8 @@
 
 Native verification in progress, **not full signoff**. Current main `812a877` was rebuilt
 from scratch in an isolated Cargo target on Apple M1 iMac21,1 / 16 GiB / macOS
-26.2, using Metal at a 1920×1080 physical drawable. No gameplay, assets, recipes,
-input rules, shader or baseline approvals changed. The initial native OS input attempt was blocked by event-posting permission.
+26.2, using Metal at a 1920×1080 physical drawable. The runtime now suppresses world prompts/reticle while a modal owns the screen.
+Assets, recipes, input authority, shader and baseline approvals are unchanged. The initial native OS input attempt was blocked by event-posting permission.
 After the owner enabled Accessibility, the retry passed five bounded checks. The source issue
 must remain open until its remaining acceptance is exercised.
 
@@ -54,8 +54,8 @@ is appropriate yet.
 
 ## Documentation impact
 
-Evidence-only addition. Canonical behavior is unchanged; no architecture or
-invariant edit is required. Owners remain [runtime](../../client/runtime/architecture.md),
+Runtime architecture/invariants now describe modal/world presentation priority.
+Input and domain behavior are unchanged. Owners remain [runtime](../../client/runtime/architecture.md),
 [runtime invariants](../../client/runtime/invariants.md),
 [fabrication](../../client/fabrication/architecture.md),
 [fabrication invariants](../../client/fabrication/invariants.md) and the

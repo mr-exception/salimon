@@ -16,3 +16,7 @@ Measure with `cargo run -p salimon-universe --example partition_bench --release 
 U03 adds the [scientific reference comparator and CPU workloads](../../docs/universe-reference-fixtures.md).
 Run `cargo run -p salimon-universe --example reference_bench --release --locked`;
 reference Apple M1 measurements remain a separate gate.
+
+U07 `ingestion/gaia.rs` adds streaming local CSV decoding and bounded canonical
+matching with typed source measurements; see the [Gaia contract](../../docs/universe-gaia-ingestion.md).
+Production reuse/full-data acceptance remain gated on #513.

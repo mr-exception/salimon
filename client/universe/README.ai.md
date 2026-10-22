@@ -29,3 +29,7 @@ unit regressions and example workload adapters have separate paths in the
 [architecture](architecture.md#scientific-reference-harness--u03-404). Read the
 [reference budget guide](../../docs/universe-reference-fixtures.md) before changing
 tolerances or claiming solver/native coverage. Preserve failure and source context.
+
+U07 `ingestion/gaia.rs` adds streaming local CSV decoding and bounded canonical
+matching with typed source measurements; see the [Gaia contract](../../docs/universe-gaia-ingestion.md).
+Production reuse/full-data acceptance remain gated on #513.

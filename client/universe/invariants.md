@@ -43,3 +43,13 @@ The [architecture](architecture.md) is the canonical API/limit/ownership contrac
     explicit finite budgets. No implicit conversion, missing-data pass or
     self-updated golden. Fixture rounding/numerical budgets are not scientific
     model-error or native performance approval.
+
+16. U07 preserves exact Gaia IDs, all selected source columns, measured errors,
+negative/missing parallax and missing velocities. No distance or motion is invented.
+17. Reviewed cross-matches preserve every source observation; conflicting duplicate
+rows/ambiguous matches fail. Canonicalization is input-order independent. Selection
+counts and explicit policy accompany results; bounded decoding is distinct from
+collector memory. See the [Gaia contract](../../docs/universe-gaia-ingestion.md).
+
+Gaia RA/Dec source errors stay in explicitly named mas fields, separate from
+degree-valued coordinates; raw source error/correlation evidence is preserved.

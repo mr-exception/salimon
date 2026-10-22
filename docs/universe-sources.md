@@ -39,7 +39,8 @@ bytes and renames only a complete validated bundle. Existing output is never
 replaced. No downloader, socket, credentials, runtime hook or scientific conversion
 is included. Tests disable sockets and compare two complete builds byte-for-byte.
 Rust `sources.rs` validates the shared typed metadata with independent fixtures.
-Source-specific scientific import remains U07/U08; binary codecs remain U04.
+U07 now implements the [Gaia fixture adapter](universe-gaia-ingestion.md);
+U08 owns JPL/exoplanet science adapters. Binary codecs remain U04.
 
 `--production` fails on the checked-in manifest: restricted/unreviewed sources
 and synthetic fixtures cannot be published. There is no opt-in override flag.
@@ -48,3 +49,6 @@ review/permissions and actual full input snapshot approval before production Gai
 work or pack distribution. Code licensing does not relicense third-party data.
 Fixture source bytes retain their provider's terms and references. U06 closure
 records manifest/tooling delivery, not approval of production use or science.
+
+U07 now provides [Gaia scientific fixture ingestion](universe-gaia-ingestion.md);
+raw staging remains separate and production gates above still apply.

@@ -493,3 +493,13 @@ a fatal recovery error. Runtime schema 6 remains unchanged. See
 [save contract](save-contract.md#future-universe-new-run-contract--u05-406),
 [persistence architecture](../client/persistence/architecture.md) and
 [invariants](../client/persistence/invariants.md).
+
+## Universe source inputs (#407)
+
+`client/universe/src/sources.rs` owns typed source metadata;
+`scripts/import_universe_sources.py` verifies frozen local raw bytes and stages
+a deterministic bundle. `catalogs/sources/manifest-v1.json` separates synthetic
+Gaia fixtures from actual JPL/exoplanet snapshots. [Source contract](universe-sources.md),
+[architecture](../client/universe/architecture.md#source-manifests--u06-407) and
+[invariants](../client/universe/invariants.md) govern reuse/precision boundaries.
+Production reuse/full snapshots wait for #513; science ingestion remains U07/U08.

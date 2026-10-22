@@ -247,3 +247,8 @@ numerical contracts, not real ephemeris or native rendering evidence.
 U05: `cargo test -p salimon-persistence --locked` includes universe wire roundtrip,
 version/catalog/delta refusal, bad poses/history and torn-slot recovery. Workspace
 gates cover the added portable dependency; no playable-world migration is claimed.
+
+U06: `python -m unittest discover -s scripts -p test_import_universe_sources.py -v`
+checks no-network reproducibility, hash tampering, paths, unknown versions and
+fail-closed production reuse. The source workflow runs it and the fixture importer
+plus Rust typed-manifest tests. Production `--production` refusal is expected.

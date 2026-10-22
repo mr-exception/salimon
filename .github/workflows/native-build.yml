@@ -39,6 +39,10 @@ jobs:
           else
             python scripts/check_docs.py
           fi
+      - name: Offline source importer contracts
+        run: |
+          python -m unittest discover -s scripts -p test_import_universe_sources.py -v
+          python scripts/import_universe_sources.py --output artifacts/universe-sources
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Native build dependencies

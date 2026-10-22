@@ -67,3 +67,9 @@ U05 (#406) delivers a separate catalog-bound new-run save envelope, with verifie
 slot fallback and explicit incompatibility errors. Production pack verification,
 scanner payloads, world migration and runtime adoption remain downstream. See
 [contract](save-contract.md#future-universe-new-run-contract--u05-406).
+
+U06 (#407) delivers pinned development source manifests, typed metadata and
+reproducible offline raw staging. It does not distribute a scientific universe:
+[reuse/full-snapshot follow-up #513](https://github.com/mr-exception/salimon/issues/513)
+remains required for production Gaia inputs and pack publication. See
+[source coverage and restrictions](universe-sources.md).

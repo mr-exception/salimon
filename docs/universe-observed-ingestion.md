@@ -129,3 +129,12 @@ acceptance remain [#526](https://github.com/mr-exception/salimon/issues/526), af
 [#513](https://github.com/mr-exception/salimon/issues/513); pack integration remains
 U12, arbitrary-date evaluation U14, native/playable integration U34 and its own
 evidence. Portable fixture closure is not production/native approval.
+
+## U09 inference consumer
+
+The [missing-data inference adapter](universe-inference.md) now consumes these
+observations without modifying them. It requires explicit measurement limit flags,
+rejects conflicting physical values, preserves minimum-mass constraints and
+keeps original raw/literature/one-sided-error/epoch/orientation evidence in the
+U08 observations. An unspecified flag is a review requirement, not permission to
+treat an observation as absent or measured certainty.

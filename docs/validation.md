@@ -300,3 +300,13 @@ limits/matching/error cases. `cargo run -p salimon-universe --example observed_i
 emits the deterministic development fixture; Source build CI compares two outputs.
 See the [observed ingestion contract](universe-observed-ingestion.md) for source
 verification, unsupported formats and exact-epoch/refused fallback policy.
+
+## Universe inference (#410)
+
+Run `cargo test -p salimon-universe --locked` and the workspace build/test/Clippy/fmt
+gates. `cargo run -p salimon-universe --example inference_sanity --locked` emits
+8192 fixed-seed synthetic systems, proposal histograms and numerical/physical
+checks; repeat output must compare identically on the tested toolchain. CI runs
+this gate and repeat comparison. See [model limits](universe-inference.md) and
+[measured evidence](../reports/issue-410/README.md). No empirical frequency fit,
+production source approval, runtime migration or native M1 signoff is implied.

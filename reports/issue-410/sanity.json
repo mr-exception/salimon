@@ -1,0 +1,959 @@
+{
+  "format": "salimon.universe.inference-sanity",
+  "model_version": "salimon-inference-v1",
+  "populations": [
+    {
+      "candidate_attempts": 4096,
+      "constraint_failures": 0,
+      "first_completion": {
+        "accepted_attempt": 0,
+        "age_seconds": {
+          "provenance": {
+            "datasets": [
+              "sanity:source"
+            ],
+            "kind": "inferred",
+            "method": "salimon-inference-v1/age_seconds"
+          },
+          "uncertainty": {
+            "confidence": null,
+            "kind": "bounds",
+            "minus": 8286275810348321.0,
+            "plus": 4.2717704658965165e+17
+          },
+          "validity": null,
+          "value": 8317833410348321.0
+        },
+        "catalog": {
+          "datasets": [
+            {
+              "id": "sanity:source",
+              "reference": "synthetic inference workload; no empirical population claim",
+              "version": "v1"
+            }
+          ],
+          "format": "salimon.universe.catalog",
+          "records": [
+            {
+              "kind": "body",
+              "record": {
+                "body_kind": "planet",
+                "definition": null,
+                "header": {
+                  "display_name": null,
+                  "id": "sanity:planet",
+                  "provenance": {
+                    "dataset": "sanity:source",
+                    "kind": "observed",
+                    "record_key": "synthetic-not-observation"
+                  }
+                },
+                "mass_kg": {
+                  "provenance": {
+                    "datasets": [
+                      "sanity:source"
+                    ],
+                    "kind": "inferred",
+                    "method": "salimon-inference-v1/mass_kg"
+                  },
+                  "uncertainty": {
+                    "kind": "unknown"
+                  },
+                  "validity": null,
+                  "value": 8.571433712047148e+24
+                },
+                "parent": "sanity:star",
+                "radius_meters": {
+                  "provenance": {
+                    "datasets": [
+                      "sanity:source"
+                    ],
+                    "kind": "inferred",
+                    "method": "salimon-inference-v1/radius_meters"
+                  },
+                  "uncertainty": {
+                    "confidence": null,
+                    "kind": "bounds",
+                    "minus": 5147588.4014527025,
+                    "plus": 3134711.5985472975
+                  },
+                  "validity": null,
+                  "value": 7058888.4014527025
+                },
+                "system": "sanity:system"
+              }
+            },
+            {
+              "kind": "star",
+              "record": {
+                "header": {
+                  "display_name": null,
+                  "id": "sanity:star",
+                  "provenance": {
+                    "dataset": "sanity:source",
+                    "kind": "observed",
+                    "record_key": "synthetic-not-observation"
+                  }
+                },
+                "mass_kg": {
+                  "provenance": {
+                    "datasets": [
+                      "sanity:source"
+                    ],
+                    "kind": "inferred",
+                    "method": "salimon-inference-v1/mass_kg"
+                  },
+                  "uncertainty": {
+                    "confidence": null,
+                    "kind": "bounds",
+                    "minus": 6.261052040137811e+29,
+                    "plus": 3.191757195986219e+30
+                  },
+                  "validity": null,
+                  "value": 7.851828040137811e+29
+                },
+                "radius_meters": {
+                  "provenance": {
+                    "datasets": [
+                      "sanity:source"
+                    ],
+                    "kind": "inferred",
+                    "method": "salimon-inference-v1/radius_meters"
+                  },
+                  "uncertainty": {
+                    "confidence": null,
+                    "kind": "bounds",
+                    "minus": 104845237.04900104,
+                    "plus": 27480214.27331525
+                  },
+                  "validity": null,
+                  "value": 369496139.69363374
+                },
+                "system": "sanity:system"
+              }
+            },
+            {
+              "kind": "system",
+              "record": {
+                "header": {
+                  "display_name": null,
+                  "id": "sanity:system",
+                  "provenance": {
+                    "dataset": "sanity:source",
+                    "kind": "observed",
+                    "record_key": "synthetic-not-observation"
+                  }
+                }
+              }
+            }
+          ],
+          "revision": "sanity-output",
+          "schema_version": 1
+        },
+        "evidence": [
+          {
+            "confidence": "LowPrior",
+            "distribution": {
+              "kind": "log_uniform",
+              "lower": 1.590776e+29,
+              "upper": 3.97694e+30
+            },
+            "field": "mass_kg",
+            "object": "sanity:star",
+            "quantity": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/mass_kg"
+              },
+              "uncertainty": {
+                "confidence": null,
+                "kind": "bounds",
+                "minus": 6.261052040137811e+29,
+                "plus": 3.191757195986219e+30
+              },
+              "validity": null,
+              "value": 7.851828040137811e+29
+            }
+          },
+          {
+            "confidence": "ModelConditional",
+            "distribution": {
+              "kind": "log_uniform",
+              "lower": 264650902.6446327,
+              "upper": 396976353.966949
+            },
+            "field": "radius_meters",
+            "object": "sanity:star",
+            "quantity": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/radius_meters"
+              },
+              "uncertainty": {
+                "confidence": null,
+                "kind": "bounds",
+                "minus": 104845237.04900104,
+                "plus": 27480214.27331525
+              },
+              "validity": null,
+              "value": 369496139.69363374
+            }
+          },
+          {
+            "confidence": "ModelConditional",
+            "distribution": {
+              "kind": "uniform",
+              "lower": 31557600000000.0,
+              "upper": 4.3549488e+17
+            },
+            "field": "age_seconds",
+            "object": "sanity:star",
+            "quantity": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/age_seconds"
+              },
+              "uncertainty": {
+                "confidence": null,
+                "kind": "bounds",
+                "minus": 8286275810348321.0,
+                "plus": 4.2717704658965165e+17
+              },
+              "validity": null,
+              "value": 8317833410348321.0
+            }
+          },
+          {
+            "confidence": "LowPrior",
+            "distribution": {
+              "kind": "log_uniform",
+              "lower": 1911300.0,
+              "upper": 10193600.0
+            },
+            "field": "radius_meters",
+            "object": "sanity:planet",
+            "quantity": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/radius_meters"
+              },
+              "uncertainty": {
+                "confidence": null,
+                "kind": "bounds",
+                "minus": 5147588.4014527025,
+                "plus": 3134711.5985472975
+              },
+              "validity": null,
+              "value": 7058888.4014527025
+            }
+          },
+          {
+            "confidence": "ModelConditional",
+            "distribution": {
+              "kind": "log_uniform",
+              "lower": 3000.0,
+              "upper": 8000.0
+            },
+            "field": "density_kg_per_m3",
+            "object": "sanity:planet",
+            "quantity": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/density_kg_per_m3"
+              },
+              "uncertainty": {
+                "confidence": null,
+                "kind": "bounds",
+                "minus": 2817.761506713635,
+                "plus": 2182.238493286365
+              },
+              "validity": null,
+              "value": 5817.761506713635
+            }
+          },
+          {
+            "confidence": "ModelConditional",
+            "distribution": {
+              "kind": "derived",
+              "relation": "mass = density * 4*pi*radius^3/3"
+            },
+            "field": "mass_kg",
+            "object": "sanity:planet",
+            "quantity": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/mass_kg"
+              },
+              "uncertainty": {
+                "kind": "unknown"
+              },
+              "validity": null,
+              "value": 8.571433712047148e+24
+            }
+          },
+          {
+            "confidence": "LowPrior",
+            "distribution": {
+              "kind": "log_uniform",
+              "lower": 2991957414.0,
+              "upper": 14959787070000.0
+            },
+            "field": "semi_major_axis_meters",
+            "object": "sanity:planet",
+            "quantity": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/semi_major_axis_meters"
+              },
+              "uncertainty": {
+                "confidence": null,
+                "kind": "bounds",
+                "minus": 2529574573061.8315,
+                "plus": 12427220539524.168
+              },
+              "validity": null,
+              "value": 2532566530475.8315
+            }
+          },
+          {
+            "confidence": "ModelConditional",
+            "distribution": {
+              "kind": "derived",
+              "relation": "Kepler period = 2*pi*sqrt(a^3/(G*(M+m)))"
+            },
+            "field": "period_seconds",
+            "object": "sanity:planet",
+            "quantity": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/period_seconds"
+              },
+              "uncertainty": {
+                "kind": "unknown"
+              },
+              "validity": null,
+              "value": 3498086471.0918384
+            }
+          },
+          {
+            "confidence": "LowPrior",
+            "distribution": {
+              "kind": "uniform",
+              "lower": 0.0,
+              "upper": 0.3
+            },
+            "field": "eccentricity",
+            "object": "sanity:planet",
+            "quantity": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/eccentricity"
+              },
+              "uncertainty": {
+                "confidence": null,
+                "kind": "bounds",
+                "minus": 0.11305918809159911,
+                "plus": 0.1869408119084009
+              },
+              "validity": null,
+              "value": 0.11305918809159911
+            }
+          }
+        ],
+        "model_version": "salimon-inference-v1",
+        "orbits": [
+          {
+            "eccentricity": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/eccentricity"
+              },
+              "uncertainty": {
+                "confidence": null,
+                "kind": "bounds",
+                "minus": 0.11305918809159911,
+                "plus": 0.1869408119084009
+              },
+              "validity": null,
+              "value": 0.11305918809159911
+            },
+            "period_seconds": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/period_seconds"
+              },
+              "uncertainty": {
+                "kind": "unknown"
+              },
+              "validity": null,
+              "value": 3498086471.0918384
+            },
+            "planet": "sanity:planet",
+            "semi_major_axis_meters": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/semi_major_axis_meters"
+              },
+              "uncertainty": {
+                "confidence": null,
+                "kind": "bounds",
+                "minus": 2529574573061.8315,
+                "plus": 12427220539524.168
+              },
+              "validity": null,
+              "value": 2532566530475.8315
+            }
+          }
+        ],
+        "planet_models": {
+          "sanity:planet": "RockyV1"
+        },
+        "seed": 0,
+        "stellar_model": "MainSequenceV1"
+      },
+      "histogram_coverage_pass": true,
+      "histograms_five_equal_bins": {
+        "axis_log_au_0_02_to_100": [
+          804,
+          790,
+          852,
+          831,
+          819
+        ],
+        "eccentricity_linear_0_to_0_3": [
+          829,
+          808,
+          836,
+          802,
+          821
+        ],
+        "fraction_of_allowed_age_linear": [
+          820,
+          794,
+          822,
+          840,
+          820
+        ],
+        "rocky_density_log_kg_m3_3000_to_8000": [
+          813,
+          859,
+          786,
+          794,
+          844
+        ],
+        "stellar_mass_log_solar_0_08_to_2": [
+          824,
+          837,
+          804,
+          832,
+          799
+        ]
+      },
+      "minimum_pericenter_clearance_ratio": 1.686505918246043,
+      "model": "RockyV1",
+      "systems": 4096,
+      "worst_relative_kepler_residual": 5.551115123125783e-16
+    },
+    {
+      "candidate_attempts": 4126,
+      "constraint_failures": 0,
+      "first_completion": {
+        "accepted_attempt": 0,
+        "age_seconds": {
+          "provenance": {
+            "datasets": [
+              "sanity:source"
+            ],
+            "kind": "inferred",
+            "method": "salimon-inference-v1/age_seconds"
+          },
+          "uncertainty": {
+            "confidence": null,
+            "kind": "bounds",
+            "minus": 8286275810348321.0,
+            "plus": 4.2717704658965165e+17
+          },
+          "validity": null,
+          "value": 8317833410348321.0
+        },
+        "catalog": {
+          "datasets": [
+            {
+              "id": "sanity:source",
+              "reference": "synthetic inference workload; no empirical population claim",
+              "version": "v1"
+            }
+          ],
+          "format": "salimon.universe.catalog",
+          "records": [
+            {
+              "kind": "body",
+              "record": {
+                "body_kind": "planet",
+                "definition": null,
+                "header": {
+                  "display_name": null,
+                  "id": "sanity:planet",
+                  "provenance": {
+                    "dataset": "sanity:source",
+                    "kind": "observed",
+                    "record_key": "synthetic-not-observation"
+                  }
+                },
+                "mass_kg": {
+                  "provenance": {
+                    "datasets": [
+                      "sanity:source"
+                    ],
+                    "kind": "inferred",
+                    "method": "salimon-inference-v1/mass_kg"
+                  },
+                  "uncertainty": {
+                    "confidence": null,
+                    "kind": "bounds",
+                    "minus": 1.9994788620245442e+27,
+                    "plus": 1.6792008137975455e+28
+                  },
+                  "validity": null,
+                  "value": 2.189291862024544e+27
+                },
+                "parent": "sanity:star",
+                "radius_meters": {
+                  "provenance": {
+                    "datasets": [
+                      "sanity:source"
+                    ],
+                    "kind": "inferred",
+                    "method": "salimon-inference-v1/radius_meters"
+                  },
+                  "uncertainty": {
+                    "confidence": null,
+                    "kind": "bounds",
+                    "minus": 35916937.87648001,
+                    "plus": 14127462.123519987
+                  },
+                  "validity": null,
+                  "value": 85961337.87648001
+                },
+                "system": "sanity:system"
+              }
+            },
+            {
+              "kind": "star",
+              "record": {
+                "header": {
+                  "display_name": null,
+                  "id": "sanity:star",
+                  "provenance": {
+                    "dataset": "sanity:source",
+                    "kind": "observed",
+                    "record_key": "synthetic-not-observation"
+                  }
+                },
+                "mass_kg": {
+                  "provenance": {
+                    "datasets": [
+                      "sanity:source"
+                    ],
+                    "kind": "inferred",
+                    "method": "salimon-inference-v1/mass_kg"
+                  },
+                  "uncertainty": {
+                    "confidence": null,
+                    "kind": "bounds",
+                    "minus": 6.261052040137811e+29,
+                    "plus": 3.191757195986219e+30
+                  },
+                  "validity": null,
+                  "value": 7.851828040137811e+29
+                },
+                "radius_meters": {
+                  "provenance": {
+                    "datasets": [
+                      "sanity:source"
+                    ],
+                    "kind": "inferred",
+                    "method": "salimon-inference-v1/radius_meters"
+                  },
+                  "uncertainty": {
+                    "confidence": null,
+                    "kind": "bounds",
+                    "minus": 104845237.04900104,
+                    "plus": 27480214.27331525
+                  },
+                  "validity": null,
+                  "value": 369496139.69363374
+                },
+                "system": "sanity:system"
+              }
+            },
+            {
+              "kind": "system",
+              "record": {
+                "header": {
+                  "display_name": null,
+                  "id": "sanity:system",
+                  "provenance": {
+                    "dataset": "sanity:source",
+                    "kind": "observed",
+                    "record_key": "synthetic-not-observation"
+                  }
+                }
+              }
+            }
+          ],
+          "revision": "sanity-output",
+          "schema_version": 1
+        },
+        "evidence": [
+          {
+            "confidence": "LowPrior",
+            "distribution": {
+              "kind": "log_uniform",
+              "lower": 1.590776e+29,
+              "upper": 3.97694e+30
+            },
+            "field": "mass_kg",
+            "object": "sanity:star",
+            "quantity": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/mass_kg"
+              },
+              "uncertainty": {
+                "confidence": null,
+                "kind": "bounds",
+                "minus": 6.261052040137811e+29,
+                "plus": 3.191757195986219e+30
+              },
+              "validity": null,
+              "value": 7.851828040137811e+29
+            }
+          },
+          {
+            "confidence": "ModelConditional",
+            "distribution": {
+              "kind": "log_uniform",
+              "lower": 264650902.6446327,
+              "upper": 396976353.966949
+            },
+            "field": "radius_meters",
+            "object": "sanity:star",
+            "quantity": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/radius_meters"
+              },
+              "uncertainty": {
+                "confidence": null,
+                "kind": "bounds",
+                "minus": 104845237.04900104,
+                "plus": 27480214.27331525
+              },
+              "validity": null,
+              "value": 369496139.69363374
+            }
+          },
+          {
+            "confidence": "ModelConditional",
+            "distribution": {
+              "kind": "uniform",
+              "lower": 31557600000000.0,
+              "upper": 4.3549488e+17
+            },
+            "field": "age_seconds",
+            "object": "sanity:star",
+            "quantity": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/age_seconds"
+              },
+              "uncertainty": {
+                "confidence": null,
+                "kind": "bounds",
+                "minus": 8286275810348321.0,
+                "plus": 4.2717704658965165e+17
+              },
+              "validity": null,
+              "value": 8317833410348321.0
+            }
+          },
+          {
+            "confidence": "LowPrior",
+            "distribution": {
+              "kind": "log_uniform",
+              "lower": 1.8981300000000002e+26,
+              "upper": 1.89813e+28
+            },
+            "field": "mass_kg",
+            "object": "sanity:planet",
+            "quantity": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/mass_kg"
+              },
+              "uncertainty": {
+                "confidence": null,
+                "kind": "bounds",
+                "minus": 1.9994788620245442e+27,
+                "plus": 1.6792008137975455e+28
+              },
+              "validity": null,
+              "value": 2.189291862024544e+27
+            }
+          },
+          {
+            "confidence": "LowPrior",
+            "distribution": {
+              "kind": "log_uniform",
+              "lower": 50044400.0,
+              "upper": 100088800.0
+            },
+            "field": "radius_meters",
+            "object": "sanity:planet",
+            "quantity": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/radius_meters"
+              },
+              "uncertainty": {
+                "confidence": null,
+                "kind": "bounds",
+                "minus": 35916937.87648001,
+                "plus": 14127462.123519987
+              },
+              "validity": null,
+              "value": 85961337.87648001
+            }
+          },
+          {
+            "confidence": "LowPrior",
+            "distribution": {
+              "kind": "log_uniform",
+              "lower": 2991957414.0,
+              "upper": 14959787070000.0
+            },
+            "field": "semi_major_axis_meters",
+            "object": "sanity:planet",
+            "quantity": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/semi_major_axis_meters"
+              },
+              "uncertainty": {
+                "confidence": null,
+                "kind": "bounds",
+                "minus": 2529574573061.8315,
+                "plus": 12427220539524.168
+              },
+              "validity": null,
+              "value": 2532566530475.8315
+            }
+          },
+          {
+            "confidence": "ModelConditional",
+            "distribution": {
+              "kind": "derived",
+              "relation": "Kepler period = 2*pi*sqrt(a^3/(G*(M+m)))"
+            },
+            "field": "period_seconds",
+            "object": "sanity:planet",
+            "quantity": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/period_seconds"
+              },
+              "uncertainty": {
+                "kind": "unknown"
+              },
+              "validity": null,
+              "value": 3493238929.568117
+            }
+          },
+          {
+            "confidence": "LowPrior",
+            "distribution": {
+              "kind": "uniform",
+              "lower": 0.0,
+              "upper": 0.3
+            },
+            "field": "eccentricity",
+            "object": "sanity:planet",
+            "quantity": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/eccentricity"
+              },
+              "uncertainty": {
+                "confidence": null,
+                "kind": "bounds",
+                "minus": 0.11305918809159911,
+                "plus": 0.1869408119084009
+              },
+              "validity": null,
+              "value": 0.11305918809159911
+            }
+          }
+        ],
+        "model_version": "salimon-inference-v1",
+        "orbits": [
+          {
+            "eccentricity": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/eccentricity"
+              },
+              "uncertainty": {
+                "confidence": null,
+                "kind": "bounds",
+                "minus": 0.11305918809159911,
+                "plus": 0.1869408119084009
+              },
+              "validity": null,
+              "value": 0.11305918809159911
+            },
+            "period_seconds": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/period_seconds"
+              },
+              "uncertainty": {
+                "kind": "unknown"
+              },
+              "validity": null,
+              "value": 3493238929.568117
+            },
+            "planet": "sanity:planet",
+            "semi_major_axis_meters": {
+              "provenance": {
+                "datasets": [
+                  "sanity:source"
+                ],
+                "kind": "inferred",
+                "method": "salimon-inference-v1/semi_major_axis_meters"
+              },
+              "uncertainty": {
+                "confidence": null,
+                "kind": "bounds",
+                "minus": 2529574573061.8315,
+                "plus": 12427220539524.168
+              },
+              "validity": null,
+              "value": 2532566530475.8315
+            }
+          }
+        ],
+        "planet_models": {
+          "sanity:planet": "GasGiantV1"
+        },
+        "seed": 0,
+        "stellar_model": "MainSequenceV1"
+      },
+      "histogram_coverage_pass": true,
+      "histograms_five_equal_bins": {
+        "axis_log_au_0_02_to_100": [
+          791,
+          790,
+          854,
+          836,
+          825
+        ],
+        "eccentricity_linear_0_to_0_3": [
+          829,
+          804,
+          835,
+          805,
+          823
+        ],
+        "fraction_of_allowed_age_linear": [
+          822,
+          798,
+          819,
+          840,
+          817
+        ],
+        "rocky_density_log_kg_m3_3000_to_8000": null,
+        "stellar_mass_log_solar_0_08_to_2": [
+          827,
+          838,
+          808,
+          833,
+          790
+        ]
+      },
+      "minimum_pericenter_clearance_ratio": 1.0035754100700753,
+      "model": "GasGiantV1",
+      "systems": 4096,
+      "worst_relative_kepler_residual": 5.551115123125783e-16
+    }
+  ],
+  "production_eligible": false,
+  "seed_end_exclusive": 4096,
+  "seed_start": 0
+}

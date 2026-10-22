@@ -15,7 +15,7 @@ fn digest(s: &str) -> bool {
         && s.bytes()
             .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
 }
-fn provenance(p: &Provenance, sources: &BTreeSet<&CatalogId>) -> Result<(), Error> {
+pub(crate) fn provenance(p: &Provenance, sources: &BTreeSet<&CatalogId>) -> Result<(), Error> {
     match p {
         Provenance::Observed {
             dataset,
@@ -53,7 +53,7 @@ fn provenance(p: &Provenance, sources: &BTreeSet<&CatalogId>) -> Result<(), Erro
     }
     Ok(())
 }
-fn quantity(q: &Option<Quantity>, sources: &BTreeSet<&CatalogId>) -> Result<(), Error> {
+pub(crate) fn quantity(q: &Option<Quantity>, sources: &BTreeSet<&CatalogId>) -> Result<(), Error> {
     let Some(q) = q else { return Ok(()) };
     if !q.value.is_finite() || q.value <= 0.0 {
         return Err(invalid("physical SI quantity must be positive and finite"));

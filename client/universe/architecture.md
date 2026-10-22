@@ -178,3 +178,18 @@ Read the [canonical units, identities and validity contract](../../docs/universe
 U01/U04 wire is unchanged: astrometry/ephemerides/orbits remain separate typed
 observations requiring U12 packaging. Full reviewed coverage remains #526/#513;
 U14 owns arbitrary-date model evaluation and lower-accuracy fallback, not U08.
+
+## Missing-data inference — U09 (#410)
+
+`inference.rs` owns typed single-star system requests, deterministic version-1
+proposal distributions, qualitative confidence, source-dependency evidence and
+bounded whole-system physical acceptance. `inference/observed.rs` adapts U08
+measurements with explicit source-limit/conflict refusal. `inference/tests.rs`
+and `examples/inference_sanity.rs` cover fixed-seed preservation, constraints,
+Kepler references and distribution coverage. Read the [canonical inference
+contract](../../docs/universe-inference.md) for exact formulas/ranges/limits.
+Catalog schema-1 remains unchanged; age, partial orbits, model identity and
+sampling evidence use separate typed sidecars requiring U12 packaging. Present
+quantities are immutable; unsupported systems/inconsistent observations reject.
+No calibrated posterior, full state, long-term stability proof, runtime migration
+or native hardware signoff is claimed.

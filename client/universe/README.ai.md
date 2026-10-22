@@ -39,3 +39,9 @@ physical measurements and PS default-row planets; see the [observed ingestion
 contract](../../docs/universe-observed-ingestion.md) before editing frame/epoch,
 unit/error/limit or identity behavior. `observed_import` is a deterministic local
 fixture example, not production packaging. Full source coverage remains #526.
+
+U09 `inference.rs` owns bounded system completion; `inference/observed.rs` adapts
+U08 measurements and `inference/tests.rs` owns preservation/failure regressions.
+Read the [inference contract](../../docs/universe-inference.md) before changing
+priors, confidence, rejection or deterministic identity. `inference_sanity` is
+portable heuristic evidence, not calibrated science or production publication.

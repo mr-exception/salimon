@@ -293,3 +293,10 @@ U07: universe/workspace tests run Gaia/CSV goldens, quality/missing-data counts,
 matching, duplicates and malformed input. Run `cargo run -p salimon-universe
 --example gaia_bench --release --locked` as one command for synthetic resource
 sensitivity; see the [Gaia contract](universe-gaia-ingestion.md) for projection limits.
+
+U08: universe/workspace tests compare the production source importer against U03
+Earth goldens, physical headers and Proxima quantities/IDs/errors, plus synthetic
+limits/matching/error cases. `cargo run -p salimon-universe --example observed_import --locked`
+emits the deterministic development fixture; Source build CI compares two outputs.
+See the [observed ingestion contract](universe-observed-ingestion.md) for source
+verification, unsupported formats and exact-epoch/refused fallback policy.

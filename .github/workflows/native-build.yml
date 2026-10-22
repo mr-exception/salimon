@@ -53,3 +53,8 @@ jobs:
         run: cargo build --workspace --locked
       - name: Portable workspace unit and session E2E contracts
         run: cargo test --workspace --locked
+      - name: Deterministic offline scientific fixture ingestion
+        run: |
+          cargo run -p salimon-universe --example observed_import --locked > artifacts/observed-v1.json
+          cargo run -p salimon-universe --example observed_import --locked > artifacts/observed-v1-repeat.json
+          cmp artifacts/observed-v1.json artifacts/observed-v1-repeat.json

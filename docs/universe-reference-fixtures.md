@@ -32,8 +32,8 @@ JPL source bytes, query/frame/epoch/model and SHA256 are frozen in the
 [source contract](universe-sources.md). Goldens are separately transcribed SI
 vectors; the example/test adapter parses the frozen KM-S rows and evaluates
 production U02 transforms, GPU narrowing and split epoch motion against them.
-That adapter recognizes only these two epochs/context; it is not the future U08
-scientific importer. The two rows are reference orbital states, not an orbital
+That adapter recognizes only these two epochs/context; it is separate from the [U08 scientific fixture importer](universe-observed-ingestion.md).
+U08 tests compare its production adapter directly to these independent goldens. The two rows are reference orbital states, not an orbital
 integration pass. Production reuse approval remains #513.
 
 ## Comparator wire and failure behavior

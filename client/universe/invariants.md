@@ -53,3 +53,12 @@ collector memory. See the [Gaia contract](../../docs/universe-gaia-ingestion.md)
 
 Gaia RA/Dec source errors stay in explicitly named mas fields, separate from
 degree-valued coordinates; raw source error/correlation evidence is preserved.
+
+18. U08 states carry explicit ICRF/SSB geometric frame and TDB epoch; imported
+coverage is not full model validity. Exact-state lookup refuses unimported dates
+and time-scale conversions. Physical header validity/uncertainty stays separate.
+19. PS source keys/Gaia matches, raw measurements, literature, signed asymmetric
+errors, one-sided errors and limit/minimum-mass distinctions survive ingestion.
+Missing orbital elements never become complete states. Canonical/base identity
+conflicts reject; source-order changes cannot alter publication. See the
+[observed ingestion contract](../../docs/universe-observed-ingestion.md).

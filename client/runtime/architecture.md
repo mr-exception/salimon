@@ -1346,3 +1346,11 @@ funding; recovery only spends surplus above an emergency floor. Schema 7
 validates installed/pending/tray identity and reconstructs mass without charging.
 See [canonical contract](../../docs/data-recovery-module.md). No offline work,
 free coordinates or reconstruction of irrecoverable bytes. Native review #515.
+
+### Modal/world overlay composition (#348)
+
+Native redraw in `app.rs` uses one visibility decision for world action-bar
+pixels and the reticle. Gameplay without a modal shows both normally; pause,
+terminal, Archive/crafting/settings text or the Q wheel suppresses them so a
+world-anchored prompt cannot cover modal rows. This only gates rendering;
+session input authority and retained prompt/expiry state keep their owners.

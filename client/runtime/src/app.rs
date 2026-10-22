@@ -1093,13 +1093,16 @@ impl ClientApplication {
         } else {
             wheel_image.or(gameplay_overlay)
         };
+        // Modal text and the Q wheel own interaction; world prompts/reticle must
+        // not obscure their rows or suggest a competing world action.
+        let world_interaction_visible = self.session.view_mode == ViewMode::Gameplay
+            && !terminal
+            && !self.session.is_paused()
+            && crafting_text.is_none()
+            && !self.session.wheel.open;
         let action_bar_image = self
             .action_bar
-            .image(
-                self.session.view_mode == ViewMode::Gameplay
-                    && !terminal
-                    && !self.session.is_paused(),
-            )
+            .image(world_interaction_visible)
             .map(|image| RendererOverlayImage {
                 width: image.width,
                 height: image.height,
@@ -1136,18 +1139,13 @@ impl ClientApplication {
                 self.condition_feedback.image(),
                 overlay_image,
                 action_bar_image,
-                crate::reticle::image(
-                    self.session.view_mode == ViewMode::Gameplay
-                        && !self.session.wheel.open
-                        && !terminal
-                        && !self.session.is_paused(),
-                    &self.session.equipment,
-                )
-                .or(if self.session.wheel.open {
-                    hud_image
-                } else {
-                    None
-                }),
+                crate::reticle::image(world_interaction_visible, &self.session.equipment).or(
+                    if self.session.wheel.open {
+                        hud_image
+                    } else {
+                        None
+                    },
+                ),
                 (self.session.view_mode == ViewMode::Gameplay
                     && !terminal
                     && !self.session.is_paused())

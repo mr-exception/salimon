@@ -1,5 +1,7 @@
 # Salimon scout — Blender visual source
 
+> **Current-asset documentation, not the approved final starter layout.** The GLB/Blender revision documented below **currently has no dedicated cargo room**. On 2026-10-22 the owner approved a **future** redesigned starter Scout with a coherent separate aft cargo bay and wide internal door, real physical bins, fold-away bunk, compact galley/hygiene, and accommodation for later 3D modular expansion. The old cargo-room removal is implementation history, **not the latest design goal**. See [approved design contract](../../../../docs/scout-and-modular-construction.md) and #538–#540. All listed current anchors, ramp measures, collision and budget constraints remain in force until the redesign is implemented and verified.
+
 `assembly/salimon-scout.blend` is the editable Blender source for the current scout. It contains
 the authored visual geometry, metadata-only colliders and interaction empties.
 The original floor texture is packed. This is original Salimon geometry under

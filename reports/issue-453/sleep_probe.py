@@ -53,23 +53,37 @@ with (a.output/'stdout.log').open('w') as stdout,(a.output/'stderr.log').open('w
         r=subprocess.run(['pmset','sleepnow'],capture_output=True,text=True,timeout=15)
         records.append({'operation':'pmset sleepnow','returncode':r.returncode,'stdout':r.stdout,'stderr':r.stderr,'wall_utc':time.time()})
         if r.returncode:raise RuntimeError('physical sleep command rejected: '+r.stderr)
-        time.sleep(3)
+        # Sleep entry may wait tens of seconds for another application's ack.
+        # A successful request or dark display is not a completed sleep/wake.
+        events=[];sleeps=[];wakes=[]
+        wake_deadline=time.monotonic()+180
+        while time.monotonic()<wake_deadline:
+            log=subprocess.check_output(['pmset','-g','log'],text=True,timeout=15)
+            events=[]
+            for line in log.splitlines():
+                if not ('Entering Sleep state' in line or ('Wake from' in line and 'DarkWake' not in line)):continue
+                try:stamp=datetime.strptime(line[:25],'%Y-%m-%d %H:%M:%S %z').timestamp()
+                except ValueError:continue
+                if stamp>=wall_start-1:events.append({'unix':stamp,'line':line})
+            sleeps=[x for x in events if 'Entering Sleep state' in x['line']]
+            wakes=[x for x in events if 'Wake from' in x['line']]
+            if sleeps and wakes:break
+            time.sleep(1)
+        (a.output/'power-events.json').write_text(json.dumps(events,indent=2)+'\n')
+        result['power_stats']=subprocess.check_output(['pmset','-g','stats'],text=True,timeout=5)
         out,err=held.communicate(timeout=8)
         records.append({'held_w_returncode':held.returncode,'stdout':out,'stderr':err})
         if held.returncode:raise RuntimeError('held-W helper failed')
         wall_end=time.time();mono_end=time.monotonic()
-        log=subprocess.check_output(['pmset','-g','log'],text=True,timeout=15)
-        events=[]
-        for line in log.splitlines():
-            if not ('Entering Sleep state' in line or ('Wake from' in line and 'DarkWake' not in line)):continue
-            try:stamp=datetime.strptime(line[:25],'%Y-%m-%d %H:%M:%S %z').timestamp()
-            except ValueError:continue
-            if stamp>=wall_start-1:events.append({'unix':stamp,'line':line})
-        (a.output/'power-events.json').write_text(json.dumps(events,indent=2)+'\n')
-        sleeps=[x for x in events if 'Entering Sleep state' in x['line']]
-        wakes=[x for x in events if 'Wake from' in x['line']]
         result.update(wall_gap_seconds=wall_end-wall_start,monotonic_gap_seconds=mono_end-mono_start,physical_sleep_verified=bool(sleeps and wakes))
-        helper('focus');key(36)
+        if not result['physical_sleep_verified']:raise RuntimeError('no actual Sleep/full-Wake pair; request alone is not acceptance')
+        focus_deadline=time.monotonic()+60
+        while True:
+            try:helper('focus');break
+            except RuntimeError:
+                if time.monotonic()>=focus_deadline:raise
+                time.sleep(1)  # Allow the owner to unlock the dedicated desktop.
+        key(36)
         after=paused_save('after-wake')
         key(36);time.sleep(1)
         idle=paused_save('after-idle')

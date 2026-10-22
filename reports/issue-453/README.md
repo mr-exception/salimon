@@ -10,8 +10,9 @@ No runtime lifecycle/input changes are made in this PR.
 **14/14 bounded native lifecycle checks pass.** A longer flight sequence passes
 all nine keyboard/throttle/coasting checks, but **relative-mouse motion fails**.
 A dedicated mouse-only repeat also fails to move the look direction. Physical
-system sleep remains **not run** pending a dedicated shared-desktop window.
-This is a draft, not completed #453 signoff, and does not close the issue.
+system sleep/wake now passes a bounded normal-clock renderer/continuity probe.
+This remains a draft because mouse delivery and held-control coverage remain
+incomplete; it does not close the issue.
 
 ## Actual executed checks
 
@@ -52,35 +53,61 @@ root cause is asserted without that boundary evidence. This differs from the
 remain valid only at their recorded contexts. The current normal-play #348 tray
 attempt also retained its original pose/item and is not a collection pass.
 
-## Physical sleep gate and prepared probe
+## Actual physical sleep/wake
 
-The owner authorized an actual sleep/wake cycle. Before executing it, read-only
-macOS power assertions reported active call/audio use. #453 explicitly says
-**“Do not sleep a shared desktop while unrelated work is active; schedule a
-dedicated native session.”** A timing question remains pending for that changed
-state. No application was stopped and no power settings/schedules were changed.
-Automatic one-shot wake scheduling requires administrator access here;
-`sudo -n true` reports that a password is required. No password or elevation was
-requested or used. [Sanitized readiness record](evidence/sleep-readiness.json).
+After the owner reconfirmed the dedicated timing despite the active-call warning,
+the authorized probe requested actual system sleep. No admin access or power
+schedule/settings change was used; the owner manually woke the Mac.
 
-The [prepared probe](sleep_probe.py) launches an isolated normal wall-clock run,
-records verified before/after saves and actual own-window images, holds W across
-`pmset sleepnow`, requires real macOS Sleep/full-Wake log evidence, then checks
-stable position without fresh input and bounds live simulation advancement by
-actual awake wall time. Integer-second power-log endpoints have an explicit
-rounding allowance, not a gameplay/performance waiver. Its source has been
-syntax-checked but **the physical probe has not been executed**. The operator
-must be ready to wake the Mac manually after about20 seconds; no automatic wake
-or sudo workaround is installed. Example once the dedicated window is confirmed:
+The first attempt is **incomplete, not a sleep pass**. `pmset sleepnow` returned
+success, but macOS was still waiting for another application's sleep notification
+acknowledgement (30-second delay). The original probe tried to refocus too soon;
+its foreground-PID guard refused input. OS sleep count was still0. The failed
+attempt and early-focus error are retained in [first attempt](evidence/sleep-first-attempt/result.json)
+and [log](evidence/sleep-first-attempt.log). No unrelated app was stopped or
+sleep assertion overridden to work around that delay.
+
+The probe now waits for a real Sleep/full-Wake pair (not merely command success
+or a dark display), then waits for the owner to unlock the desktop before input.
+The retry **passed** on the same isolated normal wall-clock game:
+
+- macOS records software sleep at **21:01:50** and full Deep Idle wake by HID
+  activity at **21:02:08 Asia/Nicosia**, **18 seconds asleep**. System counters:
+  Sleep1, DarkWake0, UserWake2. [OS events](evidence/sleep-retry/power-events.json).
+- The request-to-observation wall gap is50.423s and monotonic gap34.831s. The
+  complete measured sequence (including native post-wake save/idle checks) spans
+  59.708s of wall time; simulation advances40.928s, below its conservative
+  awake-wall upper bound44.708s after excluding the18-second OS sleep and allowing
+  integer-second event-timestamp rounding. No sleep interval is replayed into
+  simulation under this bounded check. [Result](evidence/sleep-retry/result.json).
+- Actual post-wake native window captures show the renderer presenting normally;
+  verified native Save Now and clean exit succeed. The player position is exactly
+  unchanged in the before, after-wake and subsequent fresh no-input snapshots.
+  [Before](evidence/sleep-retry/before.sav),
+  [after wake](evidence/sleep-retry/after-wake.sav),
+  [after no-input interval](evidence/sleep-retry/after-idle.sav).
+- Native logs include initial application resume and clean exit, with no renderer
+  failure. They do **not** show an additional winit suspended/resumed callback;
+  no GPU-resource rebuild or callback coverage is inferred from post-wake rendering.
+
+![Actual native rendering and verified save after physical wake](evidence/sleep-retry/after-wake.png)
+
+Reproduction (requires an explicitly dedicated desktop and a person ready to wake
+and unlock it; use a new output directory):
 
 ```sh
-python3 reports/issue-453/sleep_probe.py --binary artifacts/native-20261022/Salimon348Fixed.app/Contents/MacOS/salimon-client --helper artifacts/native-20261022/input-review --source-checkpoint reports/issue-376/evidence/initial/landed/before.sav --output artifacts/native-20261022/453/sleep --run-sleep
+python3 reports/issue-453/sleep_probe.py --binary artifacts/native-20261022/Salimon348Fixed.app/Contents/MacOS/salimon-client --helper artifacts/native-20261022/input-review --source-checkpoint reports/issue-376/evidence/initial/landed/before.sav --output artifacts/native-20261022/453/sleep-retry --run-sleep
 ```
 
-Until real execution/evidence, renderer recovery, physical sleep clearing,
-normal live-clock discontinuity and the longer mouse inverse acceptance remain
-unverified. Minimize/restore, a prepared script or #376 launch/offline proof is
-not a substitute.
+The native W injection is bounded to5 seconds across the **sleep request**. With
+macOS's delayed sleep entry, release can occur before actual sleep. Also, the
+checkpointed player did not move before/after this attempt, so the stable-position
+result cannot independently establish that a movement hold was admitted and then
+cleared across hardware sleep. Do not label that stronger gate passed. A future
+controlled held-input delivery trace must establish positive admission, actual
+sleep overlap and release/reset behavior; relative-mouse forward/inverse delivery
+also remains failed. Physical sleep, renderer continuity and the bounded live-clock
+check pass; complete #453 input signoff remains open.
 
 ## Checks and ownership
 

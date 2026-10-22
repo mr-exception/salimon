@@ -1,0 +1,8 @@
+test_portable_pass_still_leaves_native_and_backend_pending (test_experience_suite.ExperienceSuite.test_portable_pass_still_leaves_native_and_backend_pending) ... ok
+test_unsafe_ids_and_missing_blockers_reject_before_execution (test_experience_suite.ExperienceSuite.test_unsafe_ids_and_missing_blockers_reject_before_execution) ... ok
+test_zero_selected_tests_and_real_failure_never_pass (test_experience_suite.ExperienceSuite.test_zero_selected_tests_and_real_failure_never_pass) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.002s
+
+OK

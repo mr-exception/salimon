@@ -36,3 +36,12 @@ Status: **documentation planning only; implementation issue descriptions do not 
 - Great-circle/cumulative path accounting, discontinuities, sign placement, ties, moderation and persistent unlock require independent implementation contracts before final tests.
 - Visual/audio acceptance includes in-engine 1080p views, powered/unpowered states, contact feedback, low clutter, CPU/GPU cost; Linux/cloud evidence is not Apple M1/Metal signoff.
 - Avoid overwriting full technical approved universe contracts in #402–442 merely to add story. A later documentation sync PR updates owned files as systems actually ship.
+
+## Versioned verification delivery (#476)
+
+[Experience validation](experience-validation.md) and the
+[26-invariant matrix](../scenarios/portable/experience-v1.json) define current
+portable Scout coverage and native/backend protocols. Twelve exact Scout test
+mappings are runnable now; fourteen remaining rows explicitly retain their
+opening/navigation/story/endgame blockers. Portable passes are not full E06,
+M1/audio/appearance approval or a backend fallback implementation.

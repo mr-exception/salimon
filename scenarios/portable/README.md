@@ -48,3 +48,25 @@ meter tests advance survival directly to avoid millions of unrelated world ticks
 a separate session partition/death test verifies fixed-tick routing. These checks
 do not certify OS input, visual/audio quality, physical gathering routes, native
 M1 frame timing or owner acceptance of balance values.
+
+## Scout and Absenat experience matrix (#476)
+
+[experience-v1.json](experience-v1.json) is the versioned 26-invariant matrix for
+the [approved experience/narrative contracts](../../docs/experience-validation.md).
+It is separate from the persistence-survival DSL above. Each implemented Scout
+row names an exact existing production-controller test and a native comparison
+protocol. Unimplemented opening/discovery/story/Hall rows retain explicit issue
+blockers; their prose is a future acceptance protocol, never fake gameplay.
+
+```sh
+python scripts/experience_suite.py --output artifacts/experience-v1-run
+python -m unittest discover -s scripts -p test_experience_suite.py -v
+```
+
+Run from the repository root with the normal Rust toolchain/prerequisites.
+Each exact test must report one actual passed test; zero-selected cases fail.
+Logs, source revision, matrix digest and all blocked/native outcomes are retained
+in a new output directory. Existing evidence is never overwritten. Exit 1 means
+failure, and exit 3 means portable checks passed with native/backend work pending.
+This portable runner cannot emit full native/backend acceptance. Do not install a
+production account service or unlock the Hall to make this suite appear green.

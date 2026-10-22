@@ -1,0 +1,9 @@
+test_failed_scarce_routes_retain_unrun_stages_without_a_supply_pass (test_survival_route_review.PhysicalRoutes.test_failed_scarce_routes_retain_unrun_stages_without_a_supply_pass) ... ok
+test_fixture_shortcuts_and_unfunded_repeat_routes_fail (test_survival_route_review.PhysicalRoutes.test_fixture_shortcuts_and_unfunded_repeat_routes_fail) ... ok
+test_missing_stages_and_nonfinite_or_negative_times_fail (test_survival_route_review.PhysicalRoutes.test_missing_stages_and_nonfinite_or_negative_times_fail) ... ok
+test_supply_boundary_and_proposal_are_distinct_from_approval (test_survival_route_review.PhysicalRoutes.test_supply_boundary_and_proposal_are_distinct_from_approval) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.001s
+
+OK

@@ -112,7 +112,8 @@ acceptance; the minimal shared OS playback seam may need a continuous backend.
 
 Portable balance evidence is [documented](survival-balance.md). Proposed comfortable
 360-second and break-even 720-second one-ration budgets await explicit owner
-approval in #496. Physical routes/subjective native timing remain unmeasured;
+approval in [#537](https://github.com/mr-exception/salimon/issues/537) after #496
+evidence delivery. Physical routes/subjective native timing remain unmeasured;
 current non-Earth profiles have no biomass. Approved meter durations are unchanged.
 
 ## Engine handling after impulse migration (#493 / #498)
@@ -121,3 +122,15 @@ The approved 1 N·s/J and 100/50 MW imply 1000/500 m/s² dry acceleration.
 The 20m/s landing gate, stationary assist handoff and 60GJ capacity remain.
 Portable tests reconcile numerical behavior; native handling/readability review
 remains #498. Jump Drive N=20% capacity/progression balance stays future, unchanged.
+
+
+## Replacement corpus and production source decisions (#537)
+
+[Follow-up #537](https://github.com/mr-exception/salimon/issues/537) retains human
+image/mask/tolerance approval and exact hosted software-Vulkan verification after
+#518 candidate delivery. Candidate status and native Metal independence remain.
+It also retains source-specific full terms, exact credits/permissions and full
+production snapshot approval after #513 private-development/evidence-gate delivery.
+The owner chose private development only; production eligibility remains blocked
+until the source-review checklist is resolved. Closing either source issue grants
+no appearance or production-data approval.

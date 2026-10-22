@@ -51,9 +51,11 @@ navigation, discovery, obstacles, gathering, carrying, intake/crafting/collectio
 and Q remain unmeasured, including low health/fatigue and poor layouts. Coordinate
 #376 HUD/wheel/accessibility evidence. No balance tuning is approved by this PR;
 owner must accept/revise budgets and provisional recipes/modifiers/restrictions,
-then authorize specific changes. #496 and the Project Q&A retain those decisions.
-Keep this PR draft until required review/evidence is resolved; do not close #496
-on tooling alone.
+then authorize specific changes. The owner transferred these decisions and
+reference route requirements to [follow-up #537](https://github.com/mr-exception/salimon/issues/537),
+labeled `native`. [PR #534](https://github.com/mr-exception/salimon/pull/534) closes
+#496 on merge for evidence/evaluator delivery. Project Q&A follows #537; no
+budget, tuning, physical-route or accessibility acceptance follows from closure.
 
 ## Documentation impact and checks
 

@@ -45,7 +45,7 @@ biomass entirely, so their samples cannot sustain basic-ration production. No
 new world resources or approved meter tuning are silently introduced.
 
 Owner budget/tuning acceptance, measured physical routes and subjective native
-signoff remain [#496](https://github.com/mr-exception/salimon/issues/496), alongside
+signoff remain #496 delivery follow-up [#537](https://github.com/mr-exception/salimon/issues/537), alongside
 existing native #376. Advanced food/restriction provisional tuning remains
 provisional until that review.
 
@@ -103,5 +103,5 @@ Reference trials must include baseline, low health/fatigue, discovery/setup,
 obstacle detours and poor resource layouts. Retain failures on Moon/Mars/Mercury/
 Venus; missing biomass is a design constraint, not permission to add it everywhere.
 The 16-seed/200m sample cannot establish global availability. Owner acceptance of
-budgets and provisional recipes/modifiers/restrictions remains #496; coordinate
+budgets and provisional recipes/modifiers/restrictions remains #537 after #496 delivery; coordinate
 HUD/wheel/visual accessibility with #376 before native acceptance.

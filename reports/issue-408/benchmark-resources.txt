@@ -1,0 +1,7 @@
+{
+  "command": "target/release/examples/gaia_bench",
+  "elapsed_seconds": 0.8837769730000105,
+  "peak_child_rss_kib_linux": 181924,
+  "user_seconds": 0.363118,
+  "system_seconds": 0.06464199999999999
+}

@@ -534,3 +534,13 @@ See [reference wire/budget/workload guide](universe-reference-fixtures.md),
 and [invariants](../client/universe/invariants.md). Strict SI/epoch/frame comparison
 and CPU diagnostics only; no solver/world migration or scientific model approval.
 Native reference measurements remain #521; full-game native gates remain #435–#439.
+
+## Universe Gaia ingestion (#408)
+
+Owner: `client/universe/src/ingestion/gaia.rs`, shared `ingestion/csv.rs`; tests:
+`ingestion/gaia/tests.rs`; workload: `client/universe/examples/gaia_bench.rs`.
+See the [Gaia selection/units/cross-match contract](universe-gaia-ingestion.md),
+[architecture](../client/universe/architecture.md#gaia-ingestion--u07-408) and
+[invariants](../client/universe/invariants.md). Synthetic local ingestion and
+bounded canonical batches are implemented; production approval/full snapshots
+remain #513, inference U09, astrometry pack integration U12. No playable migration.

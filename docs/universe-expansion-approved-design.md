@@ -1,6 +1,6 @@
 # Real-scale universe expansion — approved design (2026-10-20)
 
-Status: **approved design; U01 schema foundation (#402) delivered, remaining expansion not implemented**. Source: ten rounds of owner Q&A. This contract supersedes compressed-playable-world assumptions *for the future expansion*, not existing implementation until migrated. Work begins after the existing planned gameplay implementation queue completes. Keep separate native verification, no implementation PRs as part of planning.
+Status: **approved design; portable U01–U07 foundations delivered with the limits below; remaining expansion not implemented**. Source: ten rounds of owner Q&A. This contract supersedes compressed-playable-world assumptions *for the future expansion*, not existing implementation until migrated. Work begins after the existing planned gameplay implementation queue completes. Keep separate native verification, no implementation PRs as part of planning.
 
 ## Narrative alignment (2026-10-21)
 
@@ -94,3 +94,8 @@ approves no future scientific model drift. Reference M1 profiling remains
 [native follow-up #521](https://github.com/mr-exception/salimon/issues/521);
 full-game/flight/rendering acceptance remains #435–#439. Fixture/source-use and
 production pack limitations remain intact.
+
+U07 now implements local streaming Gaia selection and exact reviewed-ID matching
+with typed source-unit measurements, missing-data preservation and synthetic
+storage sensitivity evidence. See [implemented contract](universe-gaia-ingestion.md).
+It is not a full observed catalog or production pack; #513 remains required.

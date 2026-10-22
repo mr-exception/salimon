@@ -288,3 +288,8 @@ boundaries. Release comparator and repeated CPU workloads are documented in the
 [reference guide](universe-reference-fixtures.md); retain raw JSON/context/hashes.
 Linux results do not approve M1 performance (#521), future ephemeris/integrator
 model drift or whole-game frame rates. Reference data is not production reuse.
+
+U07: universe/workspace tests run Gaia/CSV goldens, quality/missing-data counts,
+matching, duplicates and malformed input. Run `cargo run -p salimon-universe
+--example gaia_bench --release --locked` as one command for synthetic resource
+sensitivity; see the [Gaia contract](universe-gaia-ingestion.md) for projection limits.

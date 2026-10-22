@@ -149,3 +149,14 @@ adapter plus production U02 workload, not a U08 importer/solver. The comparator
 CLI and seven-sample CPU workload are `examples/reference_compare.rs` and
 `examples/reference_bench.rs`. Read the [reference/budget contract](../../docs/universe-reference-fixtures.md).
 No gameplay/model accuracy or M1 performance is inferred; native work remains #521.
+
+## Gaia ingestion — U07 (#408)
+
+`ingestion/gaia.rs` owns explicit quality selection, typed source-unit astrometry,
+exact reviewed stellar cross-match and bounded-batch schema-1 canonicalization.
+`ingestion/csv.rs` owns bounded local CSV decoding; Gaia tests live in
+`ingestion/gaia/tests.rs`. `examples/gaia_bench.rs` measures synthetic JSON/zlib
+storage sensitivity and throughput, not a production forecast. Read the
+[selection, units, sidecar and scaling contract](../../docs/universe-gaia-ingestion.md).
+No distance inference, full snapshot approval, multiple-star solver, runtime
+migration or astrometry storage in U04's wire is implied.

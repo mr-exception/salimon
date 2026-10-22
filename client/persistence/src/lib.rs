@@ -10,6 +10,8 @@ pub const MAX_SAVE_BYTES: usize = 64 * 1024 * 1024;
 pub enum SaveError {
     Encoding(String),
     UnsupportedVersion(u32),
+    /// Valid bytes bound to a different immutable universe; never auto-reseed.
+    IncompatibleCatalog(String),
     Invalid(String),
 }
 impl fmt::Display for SaveError {
@@ -201,3 +203,4 @@ mod tests {
 }
 
 pub mod storage;
+pub mod universe;

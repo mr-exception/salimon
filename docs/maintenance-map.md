@@ -310,3 +310,10 @@ Contributor entry points: root AGENTS/coding conventions, PR template and Univer
 issue form. Same-PR owning guides/links and explicit no-impact reasons are required
 before readiness/review. Automated validation owner is #442; final audit is #441.
 Do not duplicate those scopes or claim automatic semantic accuracy.
+
+## Universe coordinates and epoch (#403)
+
+Owner: `client/universe/src/coordinates.rs`, `epoch.rs`; regressions:
+`coordinates/tests.rs`. [Architecture](../client/universe/architecture.md#hierarchical-frames-and-epoch--u02-403)
+and [invariants](../client/universe/invariants.md) own numerical/scale boundaries.
+Run universe and workspace Rust gates plus offline documentation validation.

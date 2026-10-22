@@ -1,4 +1,7 @@
 //! U01 immutable schema foundation. Not connected to playable world/navigation.
+pub mod coordinates;
+mod epoch;
+pub use epoch::Epoch;
 mod identity;
 mod records;
 mod validation;

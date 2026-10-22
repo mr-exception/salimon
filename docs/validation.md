@@ -230,3 +230,11 @@ source/module/command paths and semantic correspondence at the final revision;
 record results in the PR/report. Documentation-only policy changes need those
 checks, not invented native/GPU evidence. Automated repository-wide link/path and
 stale-contract CI remains #442; this review policy does not add a CI status check.
+
+## Offline documentation CI (#442)
+
+Run `python scripts/check_docs.py`; for PR source-impact coverage also run
+`python scripts/check_docs.py --base origin/main` after committing changes.
+Validator contracts: `python -m unittest discover -s scripts -p test_check_docs.py -v`.
+The Ubuntu source workflow runs both checks before compilation, without network
+link lookups. See [scope, exclusions and exceptions](documentation-maintenance.md#offline-ci-validation-442).

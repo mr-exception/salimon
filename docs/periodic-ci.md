@@ -131,7 +131,7 @@ Both screenshot routes have portable gameplay replay tests in
 `client/runtime/src/flight_regression.rs`; screenshots still require native runs.
 
 Nightly and the comparator default select the explicitly pending v2 corpus.
-[Review #518](https://github.com/mr-exception/salimon/issues/518) owns fresh
+[Review follow-up #537](https://github.com/mr-exception/salimon/issues/537) owns fresh
 captures and independent human image/mask/tolerance approval. Until then the lane
 reports **pending**, never approved appearance or full nightly success. Temporal
 completeness/stability, gameplay and packaged input smoke remain required;

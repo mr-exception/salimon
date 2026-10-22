@@ -132,7 +132,7 @@ jobs:
         timeout-minutes: 5
         run: |
           set +e
-          python scripts/model_visual_tests.py compare --reviewed --baselines scenarios/visual/baselines/software-vulkan-option-a-v1
+          python scripts/model_visual_tests.py compare --reviewed --baselines scenarios/visual/baselines/software-vulkan-option-a-v2
           result=$?
           set -e
           if [ "$result" -eq 3 ]; then

@@ -231,6 +231,8 @@ mod tests {
                         "{message}"
                     );
                 }
+            } else if step.get("screenshot").is_some() {
+                // Replay gameplay only; native periodic runs verify actual capture/pixels.
             } else {
                 panic!("unhandled route step {index}");
             }
@@ -279,6 +281,22 @@ mod tests {
         replay(
             Scenario::OrbitEarth,
             include_str!("../../../scenarios/landing-speed-cutoff.json"),
+        );
+    }
+
+    #[test]
+    fn landing_cutoff_evidence_matches_current_engine() {
+        replay(
+            Scenario::OrbitEarth,
+            include_str!("../../../scenarios/evidence/landing-speed-cutoff.json"),
+        );
+    }
+
+    #[test]
+    fn cockpit_monitor_evidence_enters_assist_and_completes_landing() {
+        replay(
+            Scenario::OrbitEarth,
+            include_str!("../../../scenarios/evidence/cockpit-wide-monitor.json"),
         );
     }
 

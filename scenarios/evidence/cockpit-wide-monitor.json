@@ -184,7 +184,14 @@
     {
       "action": {
         "op": "step",
-        "frames": 60
+        "frames": 2
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.speed_meters_per_second",
+        "approx": 8,
+        "tolerance": 1e-08
       }
     },
     {
@@ -193,6 +200,12 @@
     {
       "action": {
         "op": "landing"
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.flight_state",
+        "equals": "AssistedLanding { body: Earth }"
       }
     },
     {
@@ -205,12 +218,22 @@
       "screenshot": "dashboard-approaching"
     },
     {
-      "wait": {
+      "action": {
+        "op": "step",
+        "frames": 600
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 200
+      }
+    },
+    {
+      "assert": {
         "path": "ship.flight_state",
         "equals": "Landed { body: Earth }"
-      },
-      "frames": 25,
-      "timeout_ms": 20000
+      }
     },
     {
       "assert": {

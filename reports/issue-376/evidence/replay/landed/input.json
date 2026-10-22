@@ -1,0 +1,126 @@
+[
+  {
+    "input": [
+      "focus"
+    ],
+    "stdout": "frontmost=73726 target=73726\nposted PID=73726 operation=focus\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "key",
+      4,
+      100
+    ],
+    "stdout": "posted PID=73726 operation=key 4 100\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "window"
+    ],
+    "stdout": "{\"kCGWindowAlpha\":1,\"kCGWindowBounds\":{\"Height\":572,\"Width\":960,\"X\":640,\"Y\":169},\"kCGWindowIsOnscreen\":true,\"kCGWindowLayer\":0,\"kCGWindowMemoryUsage\":2368,\"kCGWindowName\":\"Salimon \u2014 Compressed Solar System\",\"kCGWindowNumber\":10818,\"kCGWindowOwnerName\":\"SalimonReview\",\"kCGWindowOwnerPID\":73726,\"kCGWindowSharingState\":1,\"kCGWindowStoreType\":1}\nposted PID=73726 operation=window\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "window": {
+      "kCGWindowAlpha": 1,
+      "kCGWindowBounds": {
+        "Height": 572,
+        "Width": 960,
+        "X": 640,
+        "Y": 169
+      },
+      "kCGWindowIsOnscreen": true,
+      "kCGWindowLayer": 0,
+      "kCGWindowMemoryUsage": 2368,
+      "kCGWindowName": "Salimon \u2014 Compressed Solar System",
+      "kCGWindowNumber": 10818,
+      "kCGWindowOwnerName": "SalimonReview",
+      "kCGWindowOwnerPID": 73726,
+      "kCGWindowSharingState": 1,
+      "kCGWindowStoreType": 1
+    }
+  },
+  {
+    "input": [
+      "key",
+      4,
+      100
+    ],
+    "stdout": "posted PID=73726 operation=key 4 100\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "key",
+      53,
+      100
+    ],
+    "stdout": "posted PID=73726 operation=key 53 100\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "key",
+      45,
+      100
+    ],
+    "stdout": "posted PID=73726 operation=key 45 100\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "window"
+    ],
+    "stdout": "{\"kCGWindowAlpha\":1,\"kCGWindowBounds\":{\"Height\":572,\"Width\":960,\"X\":640,\"Y\":169},\"kCGWindowIsOnscreen\":true,\"kCGWindowLayer\":0,\"kCGWindowMemoryUsage\":2368,\"kCGWindowName\":\"Salimon \u2014 Compressed Solar System\",\"kCGWindowNumber\":10818,\"kCGWindowOwnerName\":\"SalimonReview\",\"kCGWindowOwnerPID\":73726,\"kCGWindowSharingState\":1,\"kCGWindowStoreType\":1}\nposted PID=73726 operation=window\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "window": {
+      "kCGWindowAlpha": 1,
+      "kCGWindowBounds": {
+        "Height": 572,
+        "Width": 960,
+        "X": 640,
+        "Y": 169
+      },
+      "kCGWindowIsOnscreen": true,
+      "kCGWindowLayer": 0,
+      "kCGWindowMemoryUsage": 2368,
+      "kCGWindowName": "Salimon \u2014 Compressed Solar System",
+      "kCGWindowNumber": 10818,
+      "kCGWindowOwnerName": "SalimonReview",
+      "kCGWindowOwnerPID": 73726,
+      "kCGWindowSharingState": 1,
+      "kCGWindowStoreType": 1
+    }
+  },
+  {
+    "input": [
+      "key",
+      45,
+      100
+    ],
+    "stdout": "posted PID=73726 operation=key 45 100\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "key",
+      7,
+      100
+    ],
+    "stdout": "posted PID=73726 operation=key 7 100\n",
+    "stderr": "",
+    "returncode": 0
+  }
+]

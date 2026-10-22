@@ -438,3 +438,72 @@ fn integrity_valid_but_domain_invalid_generation_falls_back_and_future_schema_st
         }
     }
 }
+
+/// Emit validated disk checkpoints for reference renderer/lifecycle review.
+/// Explicit fixtures are not evidence of physical travel or naturally elapsed death.
+#[test]
+#[ignore = "writes opt-in native review fixtures; requires SALIMON_NATIVE_REVIEW_DIR"]
+fn native_reference_checkpoints_376() {
+    let root = PathBuf::from(
+        std::env::var_os("SALIMON_NATIVE_REVIEW_DIR").expect("isolated output directory required"),
+    );
+    std::fs::create_dir(&root).expect("output must be new; never overwrite a live save");
+    let utc = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+    let cases = [
+        ("landed", e2e::Scenario::LandedEarth),
+        ("cockpit", e2e::Scenario::CockpitEarth),
+        ("moving", e2e::Scenario::CoastingSpace),
+        ("eva", e2e::Scenario::EvaApproach),
+        ("terminal", e2e::Scenario::LandedEarth),
+    ];
+    let mut manifest = Vec::new();
+    for (name, scenario) in cases {
+        let mut s = initialize(scenario);
+        meters(&mut s, 30, 20);
+        s.survival
+            .damage(Damage {
+                source: Source::Environment,
+                amount: Points::whole(40).unwrap(),
+                wound: false,
+            })
+            .unwrap();
+        let slot = ConsumableSlot::ALL[3];
+        let item = s.consumables.item(slot).unwrap();
+        let selection = consumables::Selection {
+            slot,
+            job: item.job,
+            unit: item.unit,
+        };
+        s.consume_selection(selection).unwrap();
+        enqueue(&mut s, "food-ration", 1);
+        s.advance_game(Duration::from_secs(1));
+        if name == "terminal" {
+            s.survival
+                .damage(Damage {
+                    source: Source::Environment,
+                    amount: Points::FULL,
+                    wound: false,
+                })
+                .unwrap();
+            s.advance_game(Duration::from_millis(16));
+            assert!(s.survival.snapshot().terminal);
+        }
+        let bytes = s.save_bytes(utc).unwrap();
+        let mut restored = GameplaySession::default();
+        restored.restore_bytes(&bytes).unwrap();
+        assert_eq!(restored.save_bytes(utc).unwrap(), bytes);
+        let directory = root.join(name);
+        let mut manager = SaveManager::new(NativeStore::open(directory).unwrap());
+        manager.checkpoint(&bytes, validate).unwrap();
+        manager.checkpoint(&bytes, validate).unwrap();
+        manifest.push(json!({"case":name,"scenario":scenario.name(),"fixture":true,"saved_at_utc":utc,"active_effects":name!="terminal","scope":"validated fixture checkpoint; not native input, travel, natural death or performance acceptance"}));
+    }
+    std::fs::write(
+        root.join("manifest.json"),
+        serde_json::to_vec_pretty(&manifest).unwrap(),
+    )
+    .unwrap();
+}

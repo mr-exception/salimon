@@ -1354,3 +1354,12 @@ pixels and the reticle. Gameplay without a modal shows both normally; pause,
 terminal, Archive/crafting/settings text or the Q wheel suppresses them so a
 world-anchored prompt cannot cover modal rows. This only gates rendering;
 session input authority and retained prompt/expiry state keep their owners.
+
+### Opt-in native save-review fixtures (#376)
+
+`session/persistence_scenarios.rs::native_reference_checkpoints_376` is an ignored,
+test-only export seam over existing #375 scenario initialization, production
+consumable/damage/crafting transactions and `SaveManager<NativeStore>`. It writes
+only to a new explicitly supplied directory and verifies exact save roundtrips.
+It adds no production launch flag, save format, simulation clock or authority.
+See [validation](../../docs/validation.md#reference-savehud-fixtures-376).

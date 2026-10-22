@@ -336,3 +336,17 @@ IDs/digests, altered/unknown/oversized data, single-surface queries, all five
 resources, ship-clearing walk paths and visual independence. See
 [contract](universe-starting-system.md) and [evidence](../reports/issue-412/README.md).
 These CPU checks do not replace U24 integration or native #436–#439 acceptance.
+
+## Reference save/HUD fixtures (#376)
+
+Opt-in `SALIMON_NATIVE_REVIEW_DIR=/absolute/new/output cargo test -p salimon-client
+--locked native_reference_checkpoints_376 -- --ignored` emits five validated
+normal-launch checkpoint fixtures (landed/cockpit/moving/EVA/terminal). The output
+must not already exist. Fixtures explicitly set reduced meters, apply production
+medkit/damage/crafting transactions and use existing #375 placement fixtures;
+they do not prove physical travel or naturally elapsed death. Each checkpoint
+round-trips through production validation and the real two-slot disk manager.
+Run [the native review harness](../reports/issue-376/native_restore.py) only against
+those isolated directories with the locally authorized OS-input helper. Retain
+source/binary/adapter/DPI, input/checkpoint records and actual images. Fixture
+rendering never grants full gameplay, balance or representative FPS acceptance.

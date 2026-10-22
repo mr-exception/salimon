@@ -62,3 +62,8 @@ calendar epoch/scale gates are delivered independently of playable migration.
 See [limits and ownership](../client/universe/architecture.md#hierarchical-frames-and-epoch--u02-403).
 Actual ephemerides, astrometry ingestion and UTC leap-table conversion remain
 explicit downstream work; no reference-machine/real-dataset approval is implied.
+
+U05 (#406) delivers a separate catalog-bound new-run save envelope, with verified
+slot fallback and explicit incompatibility errors. Production pack verification,
+scanner payloads, world migration and runtime adoption remain downstream. See
+[contract](save-contract.md#future-universe-new-run-contract--u05-406).

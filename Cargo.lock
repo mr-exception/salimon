@@ -1814,6 +1814,7 @@ version = "0.1.0"
 name = "salimon-persistence"
 version = "0.1.0"
 dependencies = [
+ "salimon-universe",
  "serde",
  "serde_json",
 ]

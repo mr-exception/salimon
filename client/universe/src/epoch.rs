@@ -85,6 +85,13 @@ impl Epoch {
         }
         .try_into()
     }
+    /// Exact ordering without pretending UTC days all have 86400 SI seconds.
+    pub fn compare(self, other: Self) -> Result<std::cmp::Ordering, Error> {
+        if self.scale != other.scale {
+            return Err(invalid("epoch time-scale mismatch"));
+        }
+        Ok((self.day, self.nanos).cmp(&(other.day, other.nanos)))
+    }
     pub fn scale(self) -> TimeScale {
         self.scale
     }

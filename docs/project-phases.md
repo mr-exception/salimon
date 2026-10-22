@@ -121,3 +121,8 @@ U01–U33 and must not depend on U34. Neither defers individual PR documentation
 
 U02 (#403) delivers isolated hierarchical coordinates/epoch APIs after U01. No
 playable world, rendering, scientific catalog or orbital flight migration occurs.
+
+U05 (#406) delivers a separate catalog-bound new-run save envelope, with verified
+slot fallback and explicit incompatibility errors. Production pack verification,
+scanner payloads, world migration and runtime adoption remain downstream. See
+[contract](save-contract.md#future-universe-new-run-contract--u05-406).

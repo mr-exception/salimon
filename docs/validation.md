@@ -243,3 +243,7 @@ U02: universe tests cover million-cell submeter/GPU differences, boundary carrie
 rotating moving-frame roundtrips, proper/radial space motion, invalid hierarchy,
 Gregorian leap days, wire bounds and scale/leap-second refusal. They are synthetic
 numerical contracts, not real ephemeris or native rendering evidence.
+
+U05: `cargo test -p salimon-persistence --locked` includes universe wire roundtrip,
+version/catalog/delta refusal, bad poses/history and torn-slot recovery. Workspace
+gates cover the added portable dependency; no playable-world migration is claimed.

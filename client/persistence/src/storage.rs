@@ -55,7 +55,9 @@ impl<S: CheckpointStore> SaveManager<S> {
                 }) {
                     Ok((generation, payload)) => valid.push((generation, slot, payload)),
                     // Never overwrite a save from a newer game with older state.
-                    Err(e @ SaveError::UnsupportedVersion(_)) => return Err(e),
+                    Err(
+                        e @ (SaveError::UnsupportedVersion(_) | SaveError::IncompatibleCatalog(_)),
+                    ) => return Err(e),
                     Err(_) => damaged = true,
                 },
                 Err(e) => return Err(e),

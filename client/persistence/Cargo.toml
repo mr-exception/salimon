@@ -1,6 +1,6 @@
 [package]
 name = "salimon-persistence"
-description = "Versioned portable save contracts without platform or domain dependencies"
+description = "Versioned portable save contracts with portable universe identity binding"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -10,3 +10,4 @@ workspace = true
 [dependencies]
 serde.workspace = true
 serde_json.workspace = true
+salimon-universe = { path = "../universe" }

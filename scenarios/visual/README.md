@@ -101,3 +101,12 @@ fixture gameplay assertions. Intentional replacements require a new reviewed
 commit. The tooling tests inject persistent silhouette, material and layout
 changes: temporal stability passes but appearance comparison fails. Synthetic
 fixtures test the comparator, not production aesthetic approval.
+
+### v2 candidate evidence (#518)
+
+[Review packet and every-frame index](../../reports/issue-518/README.md) retain
+128 current-action local software-Vulkan candidates and zero-change temporal
+results. v2 is `candidate`, with exact observed Linux/Mesa context, awaiting
+human review. These captures are from the cloud executor; hosted nightly
+context/captures and subsequent approved comparison remain required. Never
+approve this local context as a substitute for a different hosted driver/OS.

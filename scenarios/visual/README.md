@@ -13,7 +13,7 @@ Core, tool/deposit/fragment, contact piles and floor/door/ramp.
 python -m pip install -r scripts/visual-requirements.txt
 python scripts/model_visual_tests.py capture --binary target/debug/salimon-client
 python scripts/model_visual_tests.py compare --temporal-only
-python scripts/model_visual_tests.py compare --reviewed --baselines scenarios/visual/baselines/software-vulkan-option-a-v1
+python scripts/model_visual_tests.py compare --reviewed --baselines scenarios/visual/baselines/software-vulkan-option-a-v2
 ```
 
 Linux software Vulkan: prefix capture with
@@ -47,6 +47,14 @@ by the repository owner on 2026-10-19 after PR #335; Metal approval remains pend
 and [checkpoint index](../../reports/issue-321/checkpoints.md). Software approval is tracked in
 [#321](https://github.com/mr-exception/salimon/issues/321); native M1/Metal review
 remains [#314](https://github.com/mr-exception/salimon/issues/314).
+
+Nightly now selects `baselines/software-vulkan-option-a-v2`, explicitly pending
+[review #518](https://github.com/mr-exception/salimon/issues/518). Engine #493
+changed the cockpit fixture's flight timing, and hosted Mesa changed since v1.
+The old approved v1 corpus remains untouched; its approval does not transfer to
+new actions or renderer contexts. Capture complete candidates after the repair
+merges and use the separate review process below before claiming appearance
+coverage. See [nightly transition](../../docs/periodic-ci.md#current-corpus-transition-2026-10-22).
 
 Capture only from a clean tracked source revision. Each capture writes a
 `corpus.json` candidate record with actual runtime backend/adapter/driver,

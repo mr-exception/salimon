@@ -150,7 +150,7 @@ def main():
     parser.add_argument('--reviewed', action='store_true', help='validate reviewed corpus metadata before appearance comparison; exit 3 means pending coverage')
     parser.add_argument('--temporal-only', action='store_true', help='check repeat stability only; does not approve visual appearance')
     parser.add_argument('--captures', type=Path, default=Path('artifacts/model-visual/candidates'))
-    parser.add_argument('--baselines', type=Path, default=Path('scenarios/visual/baselines/software-vulkan-option-a-v1'))
+    parser.add_argument('--baselines', type=Path, default=Path('scenarios/visual/baselines/software-vulkan-option-a-v2'))
     parser.add_argument('--output', type=Path, default=Path('artifacts/model-visual/diffs'))
     args = parser.parse_args()
     if args.command == 'capture' and not args.binary:

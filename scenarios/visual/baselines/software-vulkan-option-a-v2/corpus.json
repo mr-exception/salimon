@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "status": "pending",
+  "corpus_id": "software-vulkan-option-a-v2",
+  "scope": {
+    "backend": "Vulkan",
+    "adapter_family": "llvmpipe",
+    "viewport_pixels": [1280, 800],
+    "scale_factor": 1.0
+  },
+  "follow_up": "https://github.com/mr-exception/salimon/issues/518",
+  "reason": "Engine #493 requires corrected cockpit fixture actions; hosted Mesa driver also differs from v1. Capture and independently review current images, masks and tolerances in a separate baseline PR. v1 remains historical approved evidence."
+}

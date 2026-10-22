@@ -398,3 +398,14 @@ Read the [inference contract](universe-inference.md), [architecture](../client/u
 and [invariants](../client/universe/invariants.md). Run universe/workspace gates,
 sanity report twice and docs checks. Priors are heuristic; U12 owns packaging,
 U14 full-state evaluation; native and production-source gates remain separate.
+
+## Canonical fictional systems U10 (#411)
+
+Owner: `client/universe/src/synthesis.rs`; regression tests:
+`synthesis/tests.rs`; pinned request: `fixtures/fiction-request-v1.json`; offline
+file adapter: `examples/fiction_build.rs`; cohort/storage workload:
+`examples/fiction_sanity.rs` (all under `client/universe/`).
+See the [builder contract](universe-fiction-builder.md), [architecture](../client/universe/architecture.md#canonical-fiction-synthesis--u10-411)
+and [invariants](../client/universe/invariants.md). Source imports and observed
+U09 completion remain separate. U11 full worlds, U12 production packs and U14
+complete states retain their boundaries; runtime/world/renderer are unchanged.

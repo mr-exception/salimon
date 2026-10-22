@@ -63,3 +63,38 @@ jobs:
           cargo run -p salimon-universe --example inference_sanity --locked > artifacts/inference-v1.json
           cargo run -p salimon-universe --example inference_sanity --locked > artifacts/inference-v1-repeat.json
           cmp artifacts/inference-v1.json artifacts/inference-v1-repeat.json
+      - name: Canonical fiction distribution, storage and reproducibility
+        run: |
+          cargo run -p salimon-universe --example fiction_sanity --locked > artifacts/fiction-v1.json
+          cargo run -p salimon-universe --example fiction_sanity --locked > artifacts/fiction-v1-repeat.json
+          cmp artifacts/fiction-v1.json artifacts/fiction-v1-repeat.json
+          cargo run -p salimon-universe --example fiction_build --locked -- client/universe/fixtures/schema-v1.json client/universe/fixtures/fiction-request-v1.json artifacts/fiction-publication-v1.json
+
+  fiction-portable-golden:
+    name: Fiction publication golden (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Portable cross-platform identity and publication hashes
+        run: cargo test -p salimon-universe --locked synthesis
+      - name: Optimized cross-platform identity and publication hashes
+        run: cargo test -p salimon-universe --release --locked synthesis
+      - name: Retain publication bytes on golden failure
+        if: failure()
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          cargo run -p salimon-universe --example fiction_build --locked -- client/universe/fixtures/schema-v1.json client/universe/fixtures/fiction-request-v1.json artifacts/fiction-publication-ci.json
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: fiction-publication-${{ matrix.os }}
+          path: artifacts/fiction-publication-ci.json
+          if-no-files-found: ignore

@@ -31,3 +31,9 @@ U09 adds [offline missing-data inference](../../docs/universe-inference.md) with
 explicit model classes, deterministic proposals, provenance and conservative
 physical screens. Run `cargo run -p salimon-universe --example inference_sanity --locked`
 for fixed-seed histograms; this does not fit empirical population frequencies.
+
+U10 adds the [offline canonical fictional-system builder](../../docs/universe-fiction-builder.md).
+It preserves observed sources, publishes stable fictional IDs and compact minor
+populations, and hashes complete generation sidecars. `fiction_build` accepts
+reviewed region inputs; `fiction_sanity` measures synthetic cohorts/storage.
+Full U11 world definitions and U12 production publication remain downstream.

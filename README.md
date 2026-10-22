@@ -329,3 +329,8 @@ Portable universe foundations include [offline missing-data inference](docs/univ
 with versioned heuristic priors and conservative physical screens. These offline
 catalog tools do not replace the playable six-body world or establish native
 real-scale universe acceptance.
+
+The portable [canonical fictional-system builder](docs/universe-fiction-builder.md)
+also supplies stable offline catalogs and compact minor-population recipes from
+reviewed density/age/metallicity regions. Synthetic distribution/storage checks
+do not constitute production universe publication or playable-world migration.

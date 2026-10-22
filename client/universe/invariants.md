@@ -72,3 +72,18 @@ Roche, radial-separation and mutual-Hill screens publish a new revision. Failure
 never mutates input. U08 limits/conflicts require explicit reconciliation; minimum
 mass never becomes observed true mass. Missing phase/epoch/orientation stays
 missing. See the [inference contract](../../docs/universe-inference.md).
+
+22. U10 synthesizes fiction only offline from explicit version/seed/reviewed
+residual-density regions; observed catalog records/datasets pass through intact.
+Reserved namespace collisions, overlapping supports and invalid/oversized inputs
+reject atomically. Permanent keyed slots and named SHA-256 lanes do not depend
+on input iteration, unrelated regions, install/session state or runtime RNG.
+Publication arithmetic fixes cube multiplication order; debug/release builds
+on supported platforms must match the same full-publication golden hash.
+23. Published U10 output retains the full generation request and typed
+position/age/metallicity/body/orbit/minor-population recipes. Actual recipe bytes
+match definition-reference hashes; aggregate members remain unallocated and
+exclude individually materialized selected bodies. Generation references do not
+claim complete U11 terrain definitions. Recipe changes require explicit new
+publication/migration; the runtime never silently regenerates a visited world.
+See the [builder contract](../../docs/universe-fiction-builder.md).

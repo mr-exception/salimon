@@ -45,3 +45,10 @@ U08 measurements and `inference/tests.rs` owns preservation/failure regressions.
 Read the [inference contract](../../docs/universe-inference.md) before changing
 priors, confidence, rejection or deterministic identity. `inference_sanity` is
 portable heuristic evidence, not calibrated science or production publication.
+
+U10 `synthesis.rs` owns bounded offline fictional-system publication and SHA-256
+lanes; `synthesis/tests.rs` owns identity/source/physical/golden regressions.
+Read the [builder contract](../../docs/universe-fiction-builder.md) before changing
+recipes or publication hashes. Examples `fiction_build` and `fiction_sanity` own
+file IO and synthetic evidence; never call synthesis from runtime or replace
+observed records. Full terrain definitions/evaluation remain U11.

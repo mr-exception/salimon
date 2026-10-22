@@ -1,0 +1,141 @@
+{
+  "builder": "salimon-fiction-v1",
+  "catalog_json_bytes": 3477943,
+  "catalog_sha256": "2cb8049e26a87089bf77ea626c8a0d52c0a54a42378e5b3aa2357d7d332285c2",
+  "catalog_zlib6_bytes": 424279,
+  "cohorts": [
+    {
+      "age_gyr": [
+        0.01,
+        0.01
+      ],
+      "feh": [
+        -2.5,
+        -2.5
+      ],
+      "gas_giants": 1,
+      "major_moons": 147,
+      "mass_bins_solar_0_1_0_2_0_5_1_1_5_2": [
+        12,
+        41,
+        10,
+        1,
+        0
+      ],
+      "mean_stellar_mass_solar": 0.40074999999999994,
+      "planets": 147,
+      "region": "young-poor",
+      "selected_minor_bodies": 64,
+      "systems": 64,
+      "x_position_equal_width_bins": [
+        13,
+        15,
+        13,
+        11,
+        12
+      ]
+    },
+    {
+      "age_gyr": [
+        12.0,
+        12.0
+      ],
+      "feh": [
+        -2.5,
+        -2.5
+      ],
+      "gas_giants": 2,
+      "major_moons": 121,
+      "mass_bins_solar_0_1_0_2_0_5_1_1_5_2": [
+        18,
+        32,
+        14,
+        0,
+        0
+      ],
+      "mean_stellar_mass_solar": 0.37898437500000004,
+      "planets": 121,
+      "region": "old-poor",
+      "selected_minor_bodies": 64,
+      "systems": 64,
+      "x_position_equal_width_bins": [
+        14,
+        17,
+        13,
+        12,
+        8
+      ]
+    },
+    {
+      "age_gyr": [
+        0.01,
+        0.01
+      ],
+      "feh": [
+        0.5,
+        0.5
+      ],
+      "gas_giants": 37,
+      "major_moons": 188,
+      "mass_bins_solar_0_1_0_2_0_5_1_1_5_2": [
+        12,
+        40,
+        10,
+        2,
+        0
+      ],
+      "mean_stellar_mass_solar": 0.4184375,
+      "planets": 188,
+      "region": "young-rich",
+      "selected_minor_bodies": 64,
+      "systems": 64,
+      "x_position_equal_width_bins": [
+        17,
+        13,
+        7,
+        11,
+        16
+      ]
+    },
+    {
+      "age_gyr": [
+        12.0,
+        12.0
+      ],
+      "feh": [
+        0.5,
+        0.5
+      ],
+      "gas_giants": 48,
+      "major_moons": 194,
+      "mass_bins_solar_0_1_0_2_0_5_1_1_5_2": [
+        13,
+        42,
+        9,
+        0,
+        0
+      ],
+      "mean_stellar_mass_solar": 0.3756406249999998,
+      "planets": 194,
+      "region": "old-rich",
+      "selected_minor_bodies": 64,
+      "systems": 64,
+      "x_position_equal_width_bins": [
+        15,
+        12,
+        10,
+        13,
+        14
+      ]
+    }
+  ],
+  "population_descriptors": 512,
+  "production_eligible": false,
+  "publication_json_bytes": 5484124,
+  "publication_sha256": "a638e6794646ce6f0394fc9a2035a3b41ee360528dbf5a697f7fd3c59dd34410",
+  "publication_zlib6_bytes": 794203,
+  "records": 2580,
+  "repeat_and_reorder_identical": true,
+  "systems": 256,
+  "unmaterialized_members": 281599744
+}

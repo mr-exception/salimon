@@ -565,3 +565,15 @@ and conflicts reject before inference. See [contract](universe-inference.md) and
 [owning architecture](../client/universe/architecture.md#missing-data-inference--u09-410).
 This does not replace runtime/world state, fit empirical population frequencies,
 prove long-term stability or package the sidecars for production (U12).
+
+## Canonical fictional systems (#411)
+
+The portable universe leaf now owns a bounded offline fictional-system builder
+using explicit residual density, age and metallicity inputs, reserved stable
+IDs, SHA-256 lanes, individually materialized bodies and aggregate minor
+populations. Observed source records remain intact. Complete generation recipes
+and partial orbital/stellar sidecars are hashed with the catalog; U11 owns full
+world definitions/evaluation and U12 production batching/packaging. See the
+[builder contract](universe-fiction-builder.md) and [owning architecture](../client/universe/architecture.md#canonical-fiction-synthesis--u10-411).
+Synthetic distribution/storage evidence does not certify a real Milky Way pack
+or playable/native integration.

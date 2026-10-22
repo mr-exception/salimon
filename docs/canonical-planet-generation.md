@@ -87,3 +87,14 @@ These policies change **future design requirements only**; current terrain-v1 co
 | Geology versus terrain geometry | Separate named seeds could suggest two competing physical surfaces. | **Reconciled**: geology supplies versioned inputs to exactly one authoritative terrain evaluator used by collision, landing, walking and rendering geometry. |
 | Scientific terrain updates | Better scientific data could shift established real planetary surfaces and player state. | **Approved A, extended**: freeze physical geography of **all real observed bodies** from first authoritative real-scale publication; allow non-displacing scientific/visual detail only, not freeze the current compressed prototype. Physical remapping requires a new owner approval. |
 | Discovery secrecy in offline pack | Fixed shared site placement is compatible with deterministic generation but a user can inspect packaged data even before discovering sites in-game. | **Approved A**: accept offline package datamining risk; enforce in-game discovery visibility instead of pretending canonical data is hidden from inspection. Maintain Hall pre-completion UI secrecy and independently required endgame backend authority. |
+
+## U10 generation recipe boundary (#411)
+
+The [offline fictional builder](universe-fiction-builder.md) now selects fixed
+region/system/body inputs and independent terrain/resources/visual seed lanes,
+retaining actual input bytes through typed recipes and SHA-256 references. These
+are generation recipes, not complete physical terrain/geology definitions or
+evaluators. U11 must resolve those before a world can be evaluated; U12 must
+package all catalog and sidecar bytes together. Publication immutability, explicit
+revision migration and observed-surface preservation policies above still apply.
+No existing terrain-v1/resource/save identity changes are introduced.

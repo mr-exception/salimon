@@ -154,6 +154,17 @@ impl Fabricator {
         })
     }
 
+    /// Explicit schema <=6 migration: retain captured recipes/jobs and add the
+    /// new module blueprint only if absent; no grants, work or allocated IDs.
+    pub fn migrate_recovery_recipe(&mut self) -> Result<(), crate::FabricationError> {
+        let recipe = RecipeBook::recovery_module();
+        if self.recipes.get(&recipe.id).is_none() {
+            let mut definitions = self.recipes.recipes().to_vec();
+            definitions.push(recipe);
+            self.recipes = RecipeBook::new(definitions)?;
+        }
+        Ok(())
+    }
     pub fn starter() -> Self {
         Self::new(RecipeBook::starter(), DEFAULT_QUEUE_CAPACITY).expect("nonzero static capacity")
     }

@@ -120,7 +120,11 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
             || (abs(uv.y - 0.5) < 0.09 && abs(uv.x - 0.5) < 0.3);
         let medical = select(vec3<f32>(0.85, 0.88, 0.85), vec3<f32>(0.85, 0.08, 0.06), cross);
         let ration = select(vec3<f32>(0.64, 0.42, 0.18), vec3<f32>(0.18, 0.28, 0.08), uv.y > 0.35 && uv.y < 0.65);
-        return vec4<f32>(select(ration, medical, ship.padding.w > 0.5), 1.0);
+        let trace = abs(uv.x - 0.35) < 0.035 || abs(uv.x - 0.65) < 0.035
+            || abs(uv.y - 0.5) < 0.035;
+        let component = select(vec3<f32>(0.12, 0.18, 0.2), vec3<f32>(0.18, 0.78, 0.78), trace);
+        let tray_color = select(ration, medical, ship.padding.w > 0.5);
+        return vec4<f32>(select(tray_color, component, ship.padding.w > 1.5), 1.0);
     }
     if input.display_flag == 1u || input.display_flag == 2u || input.display_flag == 4u || input.display_flag == 5u {
         // Clamp inside the single display texture at an

@@ -8,6 +8,7 @@ pub enum MassObjectId {
     Equipment(u64),
     FabricatorReserve,
     FabricatorTray,
+    RecoveryModule,
 }
 
 #[derive(Clone, Debug)]

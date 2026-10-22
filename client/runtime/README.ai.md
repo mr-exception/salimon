@@ -215,3 +215,14 @@ rules out of palette/raster changes. Scanner integration is separately #503.
 Archive #467: follow [the source/persistence/input contract](architecture.md#scout-archive-467).
 Record identity/read selection is source; the modal is transient. No log mention
 grants a navigation fix. Preserve schema-6 transaction, modal, ray and restart tests.
+
+## Data Recovery Module (#468)
+
+`session/recovery.rs` owns per-run module identity, captured config and paid
+record progress. `archive.rs` composes R start/stop and bounded evidence text;
+`fabrication.rs` moves the one component tray identity into the installed mass
+ledger. Ordinary ship/Fabricator tick settlement precedes low-priority Core
+funding; recovery only spends surplus above an emergency floor. Schema 7
+validates installed/pending/tray identity and reconstructs mass without charging.
+See [canonical contract](../../docs/data-recovery-module.md). No offline work,
+free coordinates or reconstruction of irrecoverable bytes. Native review #515.

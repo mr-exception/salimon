@@ -251,3 +251,13 @@ and distinct from zero throttle; restoration/refueling cannot enable it. B and
 assist activation share powered cockpit gates; committed paths stay uncancellable.
 Throttle repeat boundaries bill the previous selection for its actual interval.
 See the [current math/safety contract](architecture.md#funded-core-impulse-and-engine-switch-493).
+
+## Low-priority data recovery energy (#468)
+
+`fund_auxiliary_work` spends only actual stored, unreserved Core energy above
+a caller-supplied emergency floor after ordinary ship/Fabricator settlement.
+Invalid requests are atomic; no auxiliary joule creates propulsion impulse.
+Last-tick auxiliary watts are transient observation, included in total draw
+without another debit and cleared on subsequent advance/restore. Runtime owns
+record progress/config and the `RecoveryModule` physical mass ledger entry. See
+[canonical funding/priority contract](../../docs/data-recovery-module.md#core-funding-and-reserve).

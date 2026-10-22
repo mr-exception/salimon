@@ -56,3 +56,14 @@ and shell lifecycle integration. See [canonical save contract](../../docs/save-c
 - Advanced foods are locked validated definitions in the starter recipe book.
   Only basic food is initially unlocked; medkit availability is unchanged. No
   gameplay unlock acquisition or inventory capacity increase is implied (#378).
+
+## Recovery controller component (#468)
+
+`config/recovery-module.json` supplies a validated sixth starter recipe and
+`RecipeBook::recovery_module` loads its data. Runtime enforces one committed
+module and atomically installs from the existing tray, retaining the component's
+physical mass. Components never enter food/medical slots. Fabrication's public
+installed-component validator protects identity/high-water/recipe/mass ownership
+when runtime saves the installed item. Explicit old-save blueprint migration
+retains captured jobs/definitions and grants no resources/work. See
+[recipe and installation contract](../../docs/data-recovery-module.md).

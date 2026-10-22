@@ -12,6 +12,7 @@ pub(super) fn map_ship_to_renderer(ship: ShipSnapshot) -> ShipMeshInstance {
         machinery: Default::default(),
         fabricator_output_present: false,
         fabricator_output_medical: false,
+        fabricator_output_component: false,
         position_meters: ship.pose.position_meters,
         orientation: ship.pose.orientation.map(|value| value as f32),
         door_open_fraction: ship.door_open_fraction as f32,

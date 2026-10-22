@@ -1,0 +1,5 @@
+{
+  "watts":5000000.0,
+  "record_cost_joules":[3000000000.0,5000000000.0],
+  "mobility_reserve_joules":2000000000.0
+}

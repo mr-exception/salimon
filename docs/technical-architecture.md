@@ -489,7 +489,7 @@ UTC leap-table conversion and production astrometry import are downstream work.
 Owner: `client/persistence/src/universe.rs`; tests: `src/universe/tests.rs`.
 Persistence now depends on the portable universe leaf for validated IDs, split
 positions and epochs. Existing `SaveManager` protects catalog incompatibility as
-a fatal recovery error. Runtime schema 6 remains unchanged. See
+a fatal recovery error. Runtime retains its separate compressed-world envelope (now schema 7). See
 [save contract](save-contract.md#future-universe-new-run-contract--u05-406),
 [persistence architecture](../client/persistence/architecture.md) and
 [invariants](../client/persistence/invariants.md).
@@ -503,3 +503,13 @@ Gaia fixtures from actual JPL/exoplanet snapshots. [Source contract](universe-so
 [architecture](../client/universe/architecture.md#source-manifests--u06-407) and
 [invariants](../client/universe/invariants.md) govern reuse/precision boundaries.
 Production reuse/full snapshots wait for #513; science ingestion remains U07/U08.
+
+## Data Recovery Module (#468)
+
+Runtime `session/recovery.rs` owns Archive work; Fabricator data provides the
+controller recipe and typed tray output; ship funds low-priority surplus joules
+and accounts installed mass; renderer only styles the existing package. Runtime
+schema 7 persists source and rejects duplicate ownership. See [canonical contract](data-recovery-module.md),
+[runtime architecture](../client/runtime/architecture.md#data-recovery-module-468)
+and [invariants](../client/runtime/invariants.md). Tests: `session/recovery/tests.rs`
+and ship auxiliary energy tests; native acceptance #515, future leads #470.

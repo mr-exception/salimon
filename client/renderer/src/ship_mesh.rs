@@ -26,6 +26,7 @@ pub struct ShipMeshInstance {
     /// Show the authored stationary package only while the Fabricator tray is occupied.
     pub fabricator_output_present: bool,
     pub fabricator_output_medical: bool,
+    pub fabricator_output_component: bool,
     /// Read-only presentation values, kept live independently of cockpit control.
     pub instruments: CockpitInstruments,
 }
@@ -550,7 +551,11 @@ impl ShipMeshRenderer {
             RAMP_EXTENSION_METERS as f32 * extension_fraction,
             RAMP_FACE_OFFSET_METERS as f32 * extension_fraction,
             f32::from(ship.fabricator_output_present),
-            f32::from(ship.fabricator_output_medical),
+            if ship.fabricator_output_component {
+                2.0
+            } else {
+                f32::from(ship.fabricator_output_medical)
+            },
         ]);
         values.extend_from_slice(&ship.machinery.uniforms()?);
         queue.write_buffer(&self.uniform, 0, &encode_f32s(values));

@@ -29,6 +29,18 @@ fn hash_and_lane_golden() {
     assert_eq!(lane(42, "disk.s000000", "terrain"), 10521425917048484930);
 }
 #[test]
+fn cubic_publication_arithmetic_has_frozen_ieee_rounding() {
+    // Independent Python binary64 goldens for (x*x)*x, covering body radii,
+    // planetary axes and large distances. Platform libm powi is not a contract.
+    for (input, bits) in [
+        (2_345_678.0, 0x43e663980401b6eb),
+        (71_345_600_000.0, 0x46b1e7c2e912837c),
+        (1.23456789012345e16, 0x49f499949687193a),
+    ] {
+        assert_eq!(cube(input).to_bits(), bits);
+    }
+}
+#[test]
 fn preserves_observations_and_hashes_all_recipe_content() {
     let b = base();
     let p = build(&b, request()).unwrap();

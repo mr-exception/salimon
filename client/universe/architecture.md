@@ -198,7 +198,9 @@ or native hardware signoff is claimed.
 
 `synthesis.rs` owns validated residual-density region inputs, versioned SHA-256
 field lanes, deterministic stellar/body/population recipes and immutable bounded
-publications. `synthesis/tests.rs` owns physical/source/identity/failure and fixed
+publications. Cubes use fixed-order IEEE multiplication rather than the
+platform-dependent precision of `f64::powi`; CI verifies debug/release hashes.
+`synthesis/tests.rs` owns physical/source/identity/failure and fixed
 hash contracts; `fixtures/fiction-request-v1.json` pins a development request.
 `examples/fiction_build.rs` owns bounded local file IO and staged replacement;
 `examples/fiction_sanity.rs` measures four fixed synthetic cohorts and raw/zlib

@@ -78,6 +78,8 @@ residual-density regions; observed catalog records/datasets pass through intact.
 Reserved namespace collisions, overlapping supports and invalid/oversized inputs
 reject atomically. Permanent keyed slots and named SHA-256 lanes do not depend
 on input iteration, unrelated regions, install/session state or runtime RNG.
+Publication arithmetic fixes cube multiplication order; debug/release builds
+on supported platforms must match the same full-publication golden hash.
 23. Published U10 output retains the full generation request and typed
 position/age/metallicity/body/orbit/minor-population recipes. Actual recipe bytes
 match definition-reference hashes; aggregate members remain unallocated and

@@ -84,3 +84,17 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Portable cross-platform identity and publication hashes
         run: cargo test -p salimon-universe --locked synthesis
+      - name: Optimized cross-platform identity and publication hashes
+        run: cargo test -p salimon-universe --release --locked synthesis
+      - name: Retain publication bytes on golden failure
+        if: failure()
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          cargo run -p salimon-universe --example fiction_build --locked -- client/universe/fixtures/schema-v1.json client/universe/fixtures/fiction-request-v1.json artifacts/fiction-publication-ci.json
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: fiction-publication-${{ matrix.os }}
+          path: artifacts/fiction-publication-ci.json
+          if-no-files-found: ignore

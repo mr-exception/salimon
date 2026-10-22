@@ -91,3 +91,17 @@ python scripts/check_docs.py: 0 findings
 python scripts/check_docs.py --base origin/main: 0 findings
 git diff --check: passed
 Remote macOS/Windows publication goldens: pending PR CI; native game/M1/Metal checks not run
+
+Windows CI follow-up (2026-10-22):
+Initial run 39763026760: Ubuntu success; macOS golden success; Windows MSVC golden failure.
+Initial Windows full-publication hash: 517c8adba17ef4a32f94566ddee9704bac48b62ea27aa43f3e0630e81b73e0c9
+Shared unchanged expectation: 97d2c46654d7afc5e4aac03fdf94358e9182f0b8ff38251990a802684ea632f1
+Replaced publication powi(3) with explicit ordered IEEE multiplication.
+cargo test -p salimon-universe --locked: 60 passed, 0 failed
+cargo test -p salimon-universe --release --locked synthesis: 7 passed, 0 failed
+cargo clippy -p salimon-universe --all-targets --locked -- -D warnings: passed
+cargo fmt --all -- --check: passed
+python scripts/check_docs.py: 0 findings
+cargo run -p salimon-universe --example fiction_sanity --release --locked: passed
+cmp reports/issue-411/sanity.json artifacts/issue-411/ci-fix-sanity.json: identical
+Portable macOS/Windows CI now checks debug/release and retains failed publication bytes.

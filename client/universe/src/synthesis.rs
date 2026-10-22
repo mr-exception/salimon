@@ -389,7 +389,7 @@ fn system(
         let mr = (radius * if giant { 0.025 } else { 0.08 }).round();
         let md = 3300.0;
         let moon_axis = 10.0 * radius;
-        if moon_axis.powi(3) < (0.2 * a).powi(3) * pm / (3.0 * sm) {
+        if cube(moon_axis) < cube(0.2 * a) * pm / (3.0 * sm) {
             add_body(
                 out,
                 records,
@@ -493,8 +493,13 @@ fn stellar_radius(milli: u32) -> f64 {
     f64::from(lo)
 }
 
+// Fixed multiplication order: f64::powi permits platform-dependent precision.
+fn cube(value: f64) -> f64 {
+    (value * value) * value
+}
+
 fn volume(r: f64) -> f64 {
-    (4.0 / 3.0) * std::f64::consts::PI * r.powi(3)
+    (4.0 / 3.0) * std::f64::consts::PI * cube(r)
 }
 #[allow(clippy::too_many_arguments)]
 fn add_body(
@@ -515,9 +520,7 @@ fn add_body(
     let r = &out.request;
     let h = header(key, r)?;
     let mass = density * volume(radius);
-    if axis <= parent_radius + radius
-        || axis.powi(3) <= (2.44 * radius).powi(3) * (parent_mass / mass)
-    {
+    if axis <= parent_radius + radius || cube(axis) <= cube(2.44 * radius) * (parent_mass / mass) {
         return Err(invalid("fiction orbit violates surface/Roche bound"));
     }
     let orbit = Orbit {
@@ -525,7 +528,7 @@ fn add_body(
         parent: parent.clone(),
         semi_major_axis_meters: axis,
         eccentricity: 0.0,
-        period_seconds: std::f64::consts::TAU * (axis.powi(3) / (G * (parent_mass + mass))).sqrt(),
+        period_seconds: std::f64::consts::TAU * (cube(axis) / (G * (parent_mass + mass))).sqrt(),
     };
     let mut domains = vec![];
     for name in ["resources", "terrain", "visual"] {

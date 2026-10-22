@@ -43,11 +43,13 @@ SHA-256 lanes hash seed LE-u64 followed by length-prefixed UTF8 builder version,
 exact key and named field. Seeds and domain names are independent of consumption
 order. Samples use exact 32-bit dyadic interior fractions. Basic IEEE arithmetic,
 integer-metre radii, an integer search for stellar power-law radius and square
-roots avoid platform `powf`/`cbrt` in publication generation. Canonical struct
+roots avoid platform `powf`/`cbrt` in publication generation. Cubes use the explicit
+ordered product `(x*x)*x`; `f64::powi` is excluded because its precision can vary
+by platform even for integer exponents. Canonical struct
 field order, sorted regions/sources/catalog records and BTreeMap recipe ordering
 produce deterministic JSON. The pinned sha2 dependency supplies actual SHA-256;
 hashes are not CRCs or language hash values. Linux repeated/reordered checks and
-macOS/Windows portable CI golden tests verify the contract; native game evidence
+macOS/Windows debug and release portable CI golden tests verify the contract; native game evidence
 is separate. A changed golden must be reviewed as a version/publication change.
 
 Every generated record and mass/radius uses explicit `Fiction` builder, revision

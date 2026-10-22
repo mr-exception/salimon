@@ -23,6 +23,9 @@ and [invariants](../../client/universe/invariants.md).
 
 ## Measured evidence
 
+These initial Linux results describe `df1026f`. The Windows CI correction and
+its validation are recorded below; the original failed CI result is retained.
+
 Linux x86_64 Debian 13; Rust/Cargo 1.99.1; Python 3.12.14. [Validation summary](validation.txt) and [release cohort/storage evidence](sanity.json) retain the actual results. No graphical capture applies
 to this portable offline change.
 
@@ -94,3 +97,26 @@ performance signoff remain [#436](https://github.com/mr-exception/salimon/issues
 [#439](https://github.com/mr-exception/salimon/issues/439). They were not run here;
 portable/CI results must not be interpreted as native signoff. Existing playable
 world, terrain/resource-v1 IDs, save schema and player-known chart are unaffected.
+
+## Windows CI correction (2026-10-22)
+
+Initial [Source build run 39763026760](https://github.com/mr-exception/salimon/actions/runs/39763026760)
+passed Ubuntu workspace checks and the macOS publication golden, but the Windows
+MSVC golden failed: `517c8adb...` versus the shared `97d2c466...` expectation.
+That failure is retained as a failed portability gate at `df1026f`, not a pass.
+
+Publication cubes used `f64::powi(3)`, whose precision is platform-dependent.
+They now use explicit `(x*x)*x` for volume/mass, Kepler periods and Roche/Hill
+screens. The original shared publication golden remains unchanged; no per-OS
+expected values, exclusions or tolerance weakening were introduced. Independent
+binary64 cube goldens cover physical radii and astronomical distances. Portable
+macOS/Windows jobs now test both debug and release and retain publication bytes
+as artifacts on any golden failure.
+
+Correction checks: `cargo test -p salimon-universe --locked` **60 passed**;
+`cargo test -p salimon-universe --release --locked synthesis` **7 passed**;
+owning-crate all-target Clippy, fmt and documentation validation passed. The
+release `fiction_sanity` JSON exactly matches the retained pre-correction evidence,
+so Linux catalog/full-publication hashes, distributions and storage measurements
+remain unchanged. The updated PR checks record the resulting cross-platform CI
+status; these remain portable CPU checks, not native game/M1/Metal signoff.

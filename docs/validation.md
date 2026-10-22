@@ -319,6 +319,7 @@ goldens and Roche/Hill/Kepler plus age/metallicity trend checks. Run
 `cargo run -p salimon-universe --example fiction_sanity --release --locked` for
 four synthetic 64-system distributions, repeat/reorder byte checks and raw/zlib
 storage. Source CI repeats/compares the summary and macOS/Windows portable jobs
-run the same synthesis goldens; those are CPU contracts, not graphical signoff.
+run the same synthesis goldens in debug and release profiles, retaining failed
+publication bytes as CI artifacts; those are CPU contracts, not graphical signoff.
 See [file adapter usage and limits](universe-fiction-builder.md#commands-and-validation).
 Workspace build/tests/all-target Clippy/fmt and docs/base-impact gates also apply.

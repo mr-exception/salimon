@@ -347,3 +347,13 @@ schema 7 persists source and rejects duplicate ownership. See [canonical contrac
 [runtime architecture](../client/runtime/architecture.md#data-recovery-module-468)
 and [invariants](../client/runtime/invariants.md). Tests: `session/recovery/tests.rs`
 and ship auxiliary energy tests; native acceptance #515, future leads #470.
+
+## Universe binary partitions (#405)
+
+Owner: `client/universe/src/partitions.rs`; tests: `partitions/tests.rs`, independent
+wire fixture `fixtures/partition-v1.bin`; workload: `examples/partition_bench.rs`
+(all relative to `client/universe/`). Read the [storage contract](universe-storage.md),
+[owning architecture](../client/universe/architecture.md#binary-partitions--u04-405)
+and [invariants](../client/universe/invariants.md). Bounded prototype only: no GB
+builder/cross-cell references/runtime cache or production reuse approval. U12/U13
+retain those boundaries. Run universe/workspace gates and the release workload.

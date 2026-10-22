@@ -268,3 +268,13 @@ R input, pause and continuation. Shader tests validate the component branch.
 Opt-in `recovery_ui_evidence` emits CPU RGBA/size pairs using
 `SALIMON_RECOVERY_EVIDENCE` and is not a native screenshot. Reference appearance,
 physical route, DPI and budget remain #515.
+
+## Universe binary storage (#405)
+
+`cargo test -p salimon-universe --locked` covers independent version-1 wire decode,
+lossless floats/missing provenance, random access independent of corrupt neighbors,
+header/index CRC, hostile lengths/ranges/order and payload/index/source mismatch.
+`cargo run -p salimon-universe --example partition_bench --release --locked` emits
+codec density/timings for frozen observed fields and labeled synthetic replication.
+See [storage limits and budget interpretation](universe-storage.md); these numbers
+are not a full-catalog size forecast, production publication or native FPS signoff.

@@ -99,8 +99,8 @@ schema, bounded fixture JSON, exact IDs and provenance validation. The
 [technical architecture](technical-architecture.md#canonical-universe-schema-foundation-402)
 and [maintenance map](maintenance-map.md#canonical-universe-schema-402) route its
 owners. [U01 report](../reports/issue-402/README.md) records portable validation;
-production ingestion, binary packs, frames, playable migration and native checks
-remain explicitly deferred. A versioned definition reference is not a full
+production ingestion/packs, playable migration and native checks remain deferred;
+U02 frames and the bounded U04 prototype now have their own implementation notes. A versioned definition reference is not a full
 published planet or verified scientific dataset.
 
 ## Offline CI validation (#442)

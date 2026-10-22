@@ -1,0 +1,8 @@
+
+running 1 test
+test flight_regression::tests::cockpit_monitor_evidence_enters_assist_and_completes_landing ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 342 filtered out; finished in 0.05s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-225cf3bc83389f81)

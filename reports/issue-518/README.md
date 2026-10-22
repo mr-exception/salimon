@@ -2,7 +2,9 @@
 
 2026-10-22. Candidate evidence delivered for review; **appearance approval and
 hosted nightly acceptance remain pending**. This is a baseline review PR, not
-approval of its images. Keep it draft until those requirements are resolved.
+approval of its images. Outstanding acceptance is transferred to
+[follow-up #537](https://github.com/mr-exception/salimon/issues/537); PR #532 may
+close #518 on merge without approving the corpus.
 
 ## Evidence and provenance
 
@@ -43,7 +45,7 @@ are visually consistent; no mask/tolerance expansion or image substitution was
 made. Thumbnail review cannot certify native readability; originals are linked
 for explicit owner image review. No gameplay/shader/asset change was made.
 
-## Remaining acceptance before approval/merge
+## Remaining corpus acceptance — follow-up #537
 
 1. Force Periodic verification on current main (`suite=nightly`, `force=true`)
    and retain its exact-revision candidates, provenance, logs and temporal result.
@@ -57,8 +59,12 @@ for explicit owner image review. No gameplay/shader/asset change was made.
 4. Retain approved `compare --reviewed` appearance.json and all diffs, then verify
    a subsequent full nightly. Metal/hardware remains independent.
 
-#518 retains these requirements while this PR is draft; it must not close on a
-candidate-only merge. No acceptance is transferred or waived by this report.
+The owner requested transfer of these requirements to
+[issue #537](https://github.com/mr-exception/salimon/issues/537), labeled `native`.
+[PR #532](https://github.com/mr-exception/salimon/pull/532) closes #518 on merge
+for candidate/evidence delivery. The follow-up owns hosted captures, explicit
+human approval, reviewed appearance and full-nightly acceptance. Corpus status
+remains candidate; merging this delivery grants no image/mask/tolerance approval.
 
 ## Documentation impact
 

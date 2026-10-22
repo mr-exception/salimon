@@ -49,7 +49,7 @@ and [checkpoint index](../../reports/issue-321/checkpoints.md). Software approva
 remains [#314](https://github.com/mr-exception/salimon/issues/314).
 
 Nightly now selects `baselines/software-vulkan-option-a-v2`, explicitly pending
-[review #518](https://github.com/mr-exception/salimon/issues/518). Engine #493
+[review follow-up #537](https://github.com/mr-exception/salimon/issues/537). Engine #493
 changed the cockpit fixture's flight timing, and hosted Mesa changed since v1.
 The old approved v1 corpus remains untouched; its approval does not transfer to
 new actions or renderer contexts. Capture complete candidates after the repair
@@ -101,3 +101,12 @@ fixture gameplay assertions. Intentional replacements require a new reviewed
 commit. The tooling tests inject persistent silhouette, material and layout
 changes: temporal stability passes but appearance comparison fails. Synthetic
 fixtures test the comparator, not production aesthetic approval.
+
+### v2 candidate evidence (#518)
+
+[Review packet and every-frame index](../../reports/issue-518/README.md) retain
+128 current-action local software-Vulkan candidates and zero-change temporal
+results. v2 is `candidate`, with exact observed Linux/Mesa context, awaiting
+human review. These captures are from the cloud executor; hosted nightly
+context/captures and subsequent approved comparison remain required. Never
+approve this local context as a substitute for a different hosted driver/OS.

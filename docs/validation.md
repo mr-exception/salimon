@@ -238,3 +238,8 @@ Run `python scripts/check_docs.py`; for PR source-impact coverage also run
 Validator contracts: `python -m unittest discover -s scripts -p test_check_docs.py -v`.
 The Ubuntu source workflow runs both checks before compilation, without network
 link lookups. See [scope, exclusions and exceptions](documentation-maintenance.md#offline-ci-validation-442).
+
+U02: universe tests cover million-cell submeter/GPU differences, boundary carries,
+rotating moving-frame roundtrips, proper/radial space motion, invalid hierarchy,
+Gregorian leap days, wire bounds and scale/leap-second refusal. They are synthetic
+numerical contracts, not real ephemeris or native rendering evidence.

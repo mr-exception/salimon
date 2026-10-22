@@ -475,3 +475,11 @@ with owning architecture/invariants links and checked implementation status.
 Root/source maps and domain contracts change alongside behavior, or a precise
 no-impact exception is reviewed. This is contributor/reviewer policy; automated
 CI lint #442 and final semantic audit #441 remain separate scoped work.
+
+## Universe coordinates and epoch (#403)
+
+The portable universe leaf also owns split galactic cells, typed system/body/local
+frame trees, rotating-frame velocities and validated calendar/scale arithmetic.
+See [U02 contract](../client/universe/architecture.md#hierarchical-frames-and-epoch--u02-403).
+Runtime and compressed playable-world coordinates remain unchanged; ephemerides,
+UTC leap-table conversion and production astrometry import are downstream work.

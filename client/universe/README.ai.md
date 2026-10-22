@@ -10,3 +10,7 @@ and existing playable world's IDs. Extend versioned wire contracts deliberately;
 no runtime/renderer coupling, new scientific assumptions, migration, data import
 or world evaluation is implied by a schema change. Run the architecture's checks
 and update affected docs/report in the same PR.
+
+U02: `coordinates.rs` owns split galactic cells, system/body/local transforms and
+moving-frame velocity; `epoch.rs` owns split calendar instants and scale gates.
+Read their architecture contract before changing numerical/time behavior.

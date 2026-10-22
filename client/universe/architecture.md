@@ -5,7 +5,7 @@ Serde/JSON dependencies. It is not yet a runtime dependency. `salimon-world`
 continues owning the compressed six-body playable fixture, terrain/resource-v1
 identity and existing saves. Catalog data must never implicitly grant player
 navigation knowledge. No GPU/window/network/file IO, source download, real
-catalog, orbit, clock, terrain evaluation, pack builder or backend is introduced.
+catalog, orbit, OS clock, terrain evaluation, pack builder or backend is introduced.
 
 ## Source and API
 
@@ -34,7 +34,7 @@ unknown uncertainty/validity stays unknown, never fabricated certainty or zero.
 Mass is kg and radius meters, positive finite when present. Published asymmetric
 bounds are finite/nonnegative, cannot cross zero mass/radius, and have optional
 confidence in (0,1]. Validity retains declared Julian-day endpoints and explicit
-UTC/TT/TDB scale as **metadata only**; U02 owns actual clocks/transforms and U08
+UTC/TT/TDB scale as **metadata only**; U02 owns split epoch/frame arithmetic and U08
 owns ephemerides/fallback policy. No cross-scale arithmetic occurs here.
 
 Records reference an existing system. Body/population parents must be individual
@@ -71,7 +71,7 @@ JSON is limited to 16 MiB and intended for review/fixtures/small builder inputs;
 there is no claim of GB-pack throughput/size or a production storage format.
 U04 owns binary partitions/codecs/indexing; U06–U12 own official manifests,
 licensed ingestion, inference, canonical generation and pack publication; U02
-owns hierarchical frames/epoch. U05 owns new-run save/catalog binding. Schema
+delivers hierarchical frames/epoch. U05 owns new-run save/catalog binding. Schema
 extension can add future galaxy hierarchy without reinterpreting source IDs.
 The real-scale playable migration and native gates remain those blocked issues.
 
@@ -85,3 +85,30 @@ versions, malformed/oversized JSON and immutable explicit revision replacement.
 No native signoff is needed for this isolated portable schema; downstream native
 integration retains #436–439. See [approved design](../../docs/universe-expansion-approved-design.md)
 and [canonical world policy](../../docs/canonical-planet-generation.md).
+
+## Hierarchical frames and epoch — U02 (#403)
+
+`coordinates.rs` owns validated galactic positions: integer 2^40-meter cells plus
+centered local f64 offsets. Do not flatten them to global f64 meters. Relative
+subtraction uses integer cell differences before combining offsets; GPU conversion
+is available only after camera subtraction. Local cell spacing is at most 0.123 mm;
+large differences remain approximate distances, not precision-preserving origins.
+
+`FrameTree` evaluates one system at one exact epoch. Typed system/body/local IDs,
+validated right-handed orthonormal axes and instantaneous parent-relative poses,
+linear velocities and angular velocities compose through the common ancestor.
+Velocity includes omega cross radius. Local-to-body paths never visit the galaxy
+anchor. `SystemAnchor` carries galactic position, fixed orientation and explicit
+SI space velocity (proper/tangential and radial components supplied by importers),
+with linear epoch propagation. Missing observed motion must not be invented.
+Actual orbit/orientation evaluation and catalog astrometry conversion are U08/U14;
+frame trees reject stale epochs, unknown frames, duplicates, cycles and nonfinite
+states. The tree is not an ephemeris or current runtime/world replacement.
+
+`epoch.rs` owns validated split Gregorian midnight days/nanoseconds, years 1–9999,
+and explicit UTC/TT/TDB labels. TT/TDB durations use uniform SI calendar seconds;
+there is no relativistic player clock or implicit scale conversion. Leap-second
+input and cross-day UTC arithmetic reject until an explicit leap-table adapter
+exists. These errors preserve scientific uncertainty rather than silently using
+POSIX UTC as TT. Calendar clocks are supplied by consumers; no OS clock is read.
+The U01 wire schema remains version 1; new frame/epoch types are independent APIs.

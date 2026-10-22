@@ -1,0 +1,228 @@
+[2026-10-22T18:15:17Z INFO  salimon_client] starting Salimon native client
+[2026-10-22T18:15:17Z INFO  salimon_client::app] native window created: physical_size=1920x1080 scale_factor=2.00
+[2026-10-22T18:15:17Z INFO  salimon_client::app] renderer ready: adapter="Apple M1" backend=Metal device_type=IntegratedGpu gpu_timestamps=true
+[2026-10-22T18:15:17Z INFO  salimon_client::app] application resumed
+[2026-10-22T18:15:17Z DEBUG salimon_client::app] render attempt 1 completed with Presented(RenderStats { resource_batch: ResourceBatchStats { prepare_time: 833ns, upload_time: 5.25µs, upload_bytes: 64, triangles: 0, scratch_capacity_bytes: 0 }, cpu_render_time: 3.388833ms, gpu_frame_time: Pending, visible_objects: 3, rendered_objects: 3, scene_draw_calls: 3, total_draw_calls: 7, gpu_memory: None })
+[2026-10-22T18:15:17Z DEBUG salimon_client::app] native drawable resized: SurfaceSize { width: 1920, height: 1080 }
+[2026-10-22T18:15:17Z DEBUG salimon_client::app] native drawable resized: SurfaceSize { width: 1920, height: 1080 }
+[2026-10-22T18:15:17Z DEBUG salimon_client::app] native drawable resized: SurfaceSize { width: 1920, height: 1080 }
+[2026-10-22T18:15:17Z DEBUG salimon_client::app] native input focus=false ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.0, 1.0]
+[2026-10-22T18:15:17Z TRACE salimon_client::app] releasing native input: ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false }
+[2026-10-22T18:15:17Z DEBUG salimon_client::app] native input focus=true ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.0, 1.0]
+[2026-10-22T18:15:17Z DEBUG salimon_client::app] native window occluded: false
+[2026-10-22T18:15:17Z TRACE salimon_client::app] releasing native input: ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false }
+[2026-10-22T18:15:18Z TRACE salimon_client::app] input key=Code(Escape) pressed=true source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.0, 1.0]
+[2026-10-22T18:15:18Z TRACE salimon_client::app] input key=Code(Escape) pressed=false source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.0, 1.0]
+[2026-10-22T18:15:19Z TRACE salimon_client::app] input key=Code(KeyN) pressed=true source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.0, 1.0]
+[2026-10-22T18:15:19Z TRACE salimon_client::app] input key=Code(KeyN) pressed=false source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.0, 1.0]
+[2026-10-22T18:15:21Z TRACE salimon_client::app] input key=Code(Enter) pressed=true source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.0, 1.0]
+[2026-10-22T18:15:21Z TRACE salimon_client::app] input key=Code(Enter) pressed=false source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.0, 1.0]
+[2026-10-22T18:15:21Z TRACE salimon_client::app] input key=Code(KeyW) pressed=true source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.0, 1.0]
+[2026-10-22T18:15:22Z TRACE salimon_client::app] input key=Code(KeyW) pressed=false source=Native ship_controls=ShipControlInput { pitch_up: true, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.03192246556358884, 0.9994903482237042]
+[2026-10-22T18:15:22Z TRACE salimon_client::app] input key=Code(Escape) pressed=true source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.034201781836552744, 0.9994149479166323]
+[2026-10-22T18:15:22Z TRACE salimon_client::app] input key=Code(Escape) pressed=false source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.034201781836552744, 0.9994149479166323]
+[2026-10-22T18:15:23Z TRACE salimon_client::app] input key=Code(KeyN) pressed=true source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.034201781836552744, 0.9994149479166323]
+[2026-10-22T18:15:23Z TRACE salimon_client::app] input key=Code(KeyN) pressed=false source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.034201781836552744, 0.9994149479166323]
+[2026-10-22T18:15:25Z TRACE salimon_client::app] input key=Code(Enter) pressed=true source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.034201781836552744, 0.9994149479166323]
+[2026-10-22T18:15:25Z TRACE salimon_client::app] input key=Code(Enter) pressed=false source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.034201781836552744, 0.9994149479166323]
+[2026-10-22T18:15:25Z TRACE salimon_client::app] input key=Code(KeyW) pressed=true source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.034201781836552744, 0.9994149479166323]
+[2026-10-22T18:15:26Z DEBUG salimon_client::app] native window occluded: true
+[2026-10-22T18:15:26Z TRACE salimon_client::app] releasing native input: ship_controls=ShipControlInput { pitch_up: true, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false }
+[2026-10-22T18:15:26Z DEBUG salimon_client::app] native input focus=false ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.050058383995431804, 0.9987462932055197]
+[2026-10-22T18:15:26Z TRACE salimon_client::app] releasing native input: ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false }
+[2026-10-22T18:19:31Z TRACE salimon_client::app] input key=Code(KeyW) pressed=false source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.050058383995431804, 0.9987462932055197]
+[2026-10-22T18:19:31Z DEBUG salimon_client::app] native input focus=true ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.050058383995431804, 0.9987462932055197]
+[2026-10-22T18:19:32Z DEBUG salimon_client::app] native window occluded: false
+[2026-10-22T18:19:32Z TRACE salimon_client::app] releasing native input: ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false }
+[2026-10-22T18:19:34Z TRACE salimon_client::app] input key=Code(Enter) pressed=true source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.050058383995431804, 0.9987462932055197]
+[2026-10-22T18:19:34Z TRACE salimon_client::app] input key=Code(Enter) pressed=false source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.050058383995431804, 0.9987462932055197]
+[2026-10-22T18:19:35Z TRACE salimon_client::app] native mouse delta=(1124.0, -170.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:35Z TRACE salimon_client::app] native mouse delta=(18.0, 0.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:35Z TRACE salimon_client::app] native mouse delta=(-2.0, 0.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:35Z TRACE salimon_client::app] native mouse delta=(-70.0, 8.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-480.0, 73.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-304.0, 23.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-236.0, 15.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-187.0, 5.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-43.0, 2.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-9.0, 0.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(6.0, 0.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(41.0, 0.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(28.0, 0.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(384.0, 0.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(338.0, 0.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(342.0, 0.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(153.0, 4.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(63.0, 6.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-7.0, 0.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-9.0, 1.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-10.0, 1.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-15.0, 1.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-21.0, 3.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-18.0, 6.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-10.0, 4.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-6.0, 4.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-16.0, 9.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-15.0, 11.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-20.0, 18.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-15.0, 18.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-9.0, 18.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-3.0, 12.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-1.0, 10.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(0.0, 7.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(-1.0, 4.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(0.0, 2.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:36Z TRACE salimon_client::app] native mouse delta=(0.0, 1.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] input key=Code(Escape) pressed=true source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.050058383995431804, 0.9987462932055197]
+[2026-10-22T18:19:37Z TRACE salimon_client::app] input key=Code(Escape) pressed=false source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.050058383995431804, 0.9987462932055197]
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(0.0, -1.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(0.0, -1.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] input key=Code(Escape) pressed=true source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.050058383995431804, 0.9987462932055197]
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(2.0, 0.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(7.0, 1.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(10.0, 6.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] input key=Code(Escape) pressed=false source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.050058383995431804, 0.9987462932055197]
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(20.0, 11.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(26.0, 18.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(16.0, 12.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(8.0, 11.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(3.0, 5.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(4.0, 10.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] input key=Code(KeyN) pressed=true source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.050058383995431804, 0.9987462932055197]
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(0.0, 9.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(-1.0, 14.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(-3.0, 7.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(-2.0, 12.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(-3.0, 25.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] input key=Code(KeyN) pressed=false source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.050058383995431804, 0.9987462932055197]
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(-2.0, 19.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(-3.0, 18.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(0.0, 10.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(-1.0, 30.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(0.0, 17.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(0.0, 19.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(-1.0, 30.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(-1.0, 16.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(-1.0, 19.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(-1.0, 6.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(0.0, -12.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(1.0, -18.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(-10.0, -58.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(-11.0, -28.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(-32.0, -60.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(-33.0, -59.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:37Z TRACE salimon_client::app] native mouse delta=(-12.0, -31.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(-1.0, -21.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(4.0, -14.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(24.0, -27.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(26.0, -19.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(29.0, -20.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(82.0, -53.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(87.0, -51.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(45.0, -25.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(34.0, -18.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(6.0, -5.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(1.0, 0.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(-1.0, 0.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(-1.0, 0.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] input key=Code(Escape) pressed=true source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.050058383995431804, 0.9987462932055197]
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(-1.0, 0.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] input key=Code(Escape) pressed=false source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.050058383995431804, 0.9987462932055197]
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(0.0, 2.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(4.0, 11.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(3.0, 11.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(3.0, 15.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(5.0, 41.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(7.0, 36.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(9.0, 64.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(3.0, 27.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(-1.0, 64.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(-6.0, 35.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(-1.0, 4.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(0.0, 9.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(0.0, 2.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(0.0, 1.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:38Z TRACE salimon_client::app] native mouse delta=(0.0, 2.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:39Z TRACE salimon_client::app] native mouse delta=(-12.0, 28.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:39Z TRACE salimon_client::app] native mouse delta=(-13.0, 29.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:39Z TRACE salimon_client::app] native mouse delta=(-12.0, 35.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:39Z TRACE salimon_client::app] native mouse delta=(-6.0, 16.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:39Z TRACE salimon_client::app] native mouse delta=(-1.0, 7.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:39Z TRACE salimon_client::app] native mouse delta=(0.0, 2.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:39Z TRACE salimon_client::app] native mouse delta=(0.0, 1.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:39Z TRACE salimon_client::app] native mouse delta=(1.0, 0.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:39Z TRACE salimon_client::app] native mouse delta=(2.0, 0.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:39Z TRACE salimon_client::app] native mouse delta=(5.0, -2.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:39Z TRACE salimon_client::app] native mouse delta=(1.0, 0.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:39Z TRACE salimon_client::app] input key=Code(Enter) pressed=true source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.050058383995431804, 0.9987462932055197]
+[2026-10-22T18:19:39Z TRACE salimon_client::app] native mouse delta=(1.0, 0.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:39Z TRACE salimon_client::app] native mouse delta=(0.0, 1.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:39Z TRACE salimon_client::app] native mouse delta=(4.0, 10.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:39Z TRACE salimon_client::app] native mouse delta=(1.0, 2.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:39Z TRACE salimon_client::app] native mouse delta=(1.0, 5.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:39Z TRACE salimon_client::app] native mouse delta=(0.0, 2.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:39Z TRACE salimon_client::app] input key=Code(Enter) pressed=false source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.050058383995431804, 0.9987462932055197]
+[2026-10-22T18:19:39Z TRACE salimon_client::app] native mouse delta=(0.0, 1.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:40Z TRACE salimon_client::app] native mouse delta=(1.0, 0.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:40Z TRACE salimon_client::app] native mouse delta=(1.0, 0.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:40Z TRACE salimon_client::app] native mouse delta=(1.0, -1.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:40Z TRACE salimon_client::app] native mouse delta=(0.0, -2.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:40Z TRACE salimon_client::app] native mouse delta=(0.0, -2.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:40Z TRACE salimon_client::app] native mouse delta=(0.0, -1.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:40Z TRACE salimon_client::app] native mouse delta=(0.0, -1.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:40Z TRACE salimon_client::app] native mouse delta=(-5.0, -1.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:40Z TRACE salimon_client::app] native mouse delta=(-7.0, -3.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:40Z TRACE salimon_client::app] native mouse delta=(-13.0, -5.0) captured=true focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:40Z TRACE salimon_client::app] input key=Code(Escape) pressed=true source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.050058383995431804, 0.9987462932055197]
+[2026-10-22T18:19:41Z TRACE salimon_client::app] input key=Code(Escape) pressed=false source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.050058383995431804, 0.9987462932055197]
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(0.0, -1.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(0.0, -1.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(0.0, -1.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] input key=Code(KeyN) pressed=true source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.050058383995431804, 0.9987462932055197]
+[2026-10-22T18:19:41Z TRACE salimon_client::app] input key=Code(KeyN) pressed=false source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.050058383995431804, 0.9987462932055197]
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(0.0, -1.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(0.0, -2.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(0.0, -2.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(0.0, -4.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(6.0, -9.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(13.0, -13.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(21.0, -22.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(21.0, -29.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(8.0, -13.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(18.0, -24.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(13.0, -16.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(8.0, -13.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(1.0, -2.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(-2.0, 2.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(-10.0, 12.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(-8.0, 13.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(-3.0, 8.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(-3.0, 6.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(-2.0, 4.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(-5.0, 2.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(-2.0, 1.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:41Z TRACE salimon_client::app] native mouse delta=(-2.0, 0.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:42Z TRACE salimon_client::app] native mouse delta=(-1.0, 3.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:42Z TRACE salimon_client::app] native mouse delta=(-14.0, 28.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:42Z TRACE salimon_client::app] native mouse delta=(-7.0, 18.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:42Z TRACE salimon_client::app] native mouse delta=(-5.0, 21.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:42Z TRACE salimon_client::app] native mouse delta=(-4.0, 16.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:42Z TRACE salimon_client::app] native mouse delta=(-4.0, 16.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:42Z TRACE salimon_client::app] native mouse delta=(-5.0, 23.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:42Z TRACE salimon_client::app] native mouse delta=(-4.0, 12.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:42Z TRACE salimon_client::app] native mouse delta=(-5.0, 11.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:42Z TRACE salimon_client::app] native mouse delta=(-3.0, 5.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:42Z TRACE salimon_client::app] native mouse delta=(-1.0, 2.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:42Z TRACE salimon_client::app] native mouse delta=(0.0, -1.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:42Z TRACE salimon_client::app] native mouse delta=(0.0, -1.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:42Z TRACE salimon_client::app] native mouse delta=(0.0, -1.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:42Z TRACE salimon_client::app] native mouse delta=(0.0, -1.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:42Z TRACE salimon_client::app] native mouse delta=(1.0, -2.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:42Z TRACE salimon_client::app] native mouse delta=(1.0, -1.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:42Z TRACE salimon_client::app] native mouse delta=(1.0, 0.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:42Z TRACE salimon_client::app] native mouse delta=(0.0, -1.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:43Z TRACE salimon_client::app] native mouse delta=(1.0, 0.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:43Z TRACE salimon_client::app] native mouse delta=(2.0, 0.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:43Z TRACE salimon_client::app] native mouse delta=(2.0, 0.0) captured=false focused=true occluded=false isolated=false view=Gameplay
+[2026-10-22T18:19:43Z TRACE salimon_client::app] input key=Code(KeyX) pressed=true source=Native ship_controls=ShipControlInput { pitch_up: false, pitch_down: false, yaw_left: false, yaw_right: false, roll_left: false, roll_right: false } orientation=[0.0, 0.0, 0.050058383995431804, 0.9987462932055197]
+[2026-10-22T18:19:43Z INFO  salimon_client::app] application exiting cleanly

@@ -1,0 +1,9 @@
+{
+  "owner_authorized_sleep": true,
+  "owner_reconfirmed_dedicated_timing_after_active_call_warning": true,
+  "owner_manual_wake": true,
+  "physical_sleep_verified": true,
+  "sleep_seconds": 18,
+  "automatic_wake_schedule_or_power_setting_changed": false,
+  "admin_password_requested_or_used": false
+}

@@ -1,0 +1,169 @@
+[
+  {
+    "input": [
+      "focus"
+    ],
+    "wall_utc": 1792692077.0898209,
+    "stdout": "frontmost=89190 target=89190\nposted PID=89190 operation=focus\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "key",
+      53,
+      100
+    ],
+    "wall_utc": 1792692077.5852952,
+    "stdout": "posted PID=89190 operation=key 53 100\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "key",
+      45,
+      100
+    ],
+    "wall_utc": 1792692078.087132,
+    "stdout": "posted PID=89190 operation=key 45 100\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "window"
+    ],
+    "wall_utc": 1792692079.276184,
+    "stdout": "{\"kCGWindowAlpha\":1,\"kCGWindowBounds\":{\"Height\":572,\"Width\":960,\"X\":640,\"Y\":169},\"kCGWindowIsOnscreen\":true,\"kCGWindowLayer\":0,\"kCGWindowMemoryUsage\":2368,\"kCGWindowName\":\"Salimon \u2014 Compressed Solar System\",\"kCGWindowNumber\":11056,\"kCGWindowOwnerName\":\"SalimonReview\",\"kCGWindowOwnerPID\":89190,\"kCGWindowSharingState\":1,\"kCGWindowStoreType\":1}\nposted PID=89190 operation=window\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "key",
+      36,
+      100
+    ],
+    "wall_utc": 1792692079.953078,
+    "stdout": "posted PID=89190 operation=key 36 100\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "operation": "pmset sleepnow",
+    "returncode": 0,
+    "stdout": "Sleeping now...\n",
+    "stderr": "",
+    "wall_utc": 1792692080.7684438
+  },
+  {
+    "held_w_returncode": 0,
+    "stdout": "posted PID=89190 operation=key 13 5000\n",
+    "stderr": ""
+  },
+  {
+    "input": [
+      "focus"
+    ],
+    "wall_utc": 1792692131.7258198,
+    "stdout": "frontmost=89190 target=89190\nposted PID=89190 operation=focus\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "key",
+      36,
+      100
+    ],
+    "wall_utc": 1792692132.918884,
+    "stdout": "posted PID=89190 operation=key 36 100\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "key",
+      53,
+      100
+    ],
+    "wall_utc": 1792692133.416311,
+    "stdout": "posted PID=89190 operation=key 53 100\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "key",
+      45,
+      100
+    ],
+    "wall_utc": 1792692133.921222,
+    "stdout": "posted PID=89190 operation=key 45 100\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "window"
+    ],
+    "wall_utc": 1792692135.1138802,
+    "stdout": "{\"kCGWindowAlpha\":1,\"kCGWindowBounds\":{\"Height\":572,\"Width\":960,\"X\":640,\"Y\":169},\"kCGWindowIsOnscreen\":true,\"kCGWindowLayer\":0,\"kCGWindowMemoryUsage\":2368,\"kCGWindowName\":\"Salimon \u2014 Compressed Solar System\",\"kCGWindowNumber\":11056,\"kCGWindowOwnerName\":\"SalimonReview\",\"kCGWindowOwnerPID\":89190,\"kCGWindowSharingState\":1,\"kCGWindowStoreType\":1}\nposted PID=89190 operation=window\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "key",
+      36,
+      100
+    ],
+    "wall_utc": 1792692135.7930582,
+    "stdout": "posted PID=89190 operation=key 36 100\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "key",
+      53,
+      100
+    ],
+    "wall_utc": 1792692137.291669,
+    "stdout": "posted PID=89190 operation=key 53 100\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "key",
+      45,
+      100
+    ],
+    "wall_utc": 1792692137.788718,
+    "stdout": "posted PID=89190 operation=key 45 100\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "window"
+    ],
+    "wall_utc": 1792692138.982966,
+    "stdout": "{\"kCGWindowAlpha\":1,\"kCGWindowBounds\":{\"Height\":572,\"Width\":960,\"X\":640,\"Y\":169},\"kCGWindowIsOnscreen\":true,\"kCGWindowLayer\":0,\"kCGWindowMemoryUsage\":2368,\"kCGWindowName\":\"Salimon \u2014 Compressed Solar System\",\"kCGWindowNumber\":11056,\"kCGWindowOwnerName\":\"SalimonReview\",\"kCGWindowOwnerPID\":89190,\"kCGWindowSharingState\":1,\"kCGWindowStoreType\":1}\nposted PID=89190 operation=window\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  {
+    "input": [
+      "key",
+      7,
+      100
+    ],
+    "wall_utc": 1792692139.669921,
+    "stdout": "posted PID=89190 operation=key 7 100\n",
+    "stderr": "",
+    "returncode": 0
+  }
+]

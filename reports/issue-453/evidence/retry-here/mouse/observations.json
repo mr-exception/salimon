@@ -1,0 +1,1653 @@
+[
+  {
+    "input": [
+      "focus"
+    ],
+    "stdout": "frontmost=93163 target=93163\nposted PID=93163 operation=focus\n",
+    "stderr": "",
+    "returncode": 0,
+    "monotonic": 613805.68306425
+  },
+  {
+    "name": "initial",
+    "monotonic": 613806.066912666,
+    "state": {
+      "capture_status": "idle",
+      "carrying": {
+        "context": null,
+        "last_action_feedback": null,
+        "object_id": null,
+        "target_id": null
+      },
+      "consumable_wheel": {
+        "held": false,
+        "hovered": null,
+        "open": false
+      },
+      "consumables": {
+        "food": [
+          null,
+          null,
+          null
+        ],
+        "medical": [
+          null,
+          null
+        ]
+      },
+      "equipment": {
+        "selected_slot": null,
+        "slots": [
+          "mining_tool",
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "fabricator": {
+        "jobs": [],
+        "queue_capacity": 64,
+        "requested_watts": 0.0,
+        "status": "Idle",
+        "stored": [
+          {
+            "milligrams": 0,
+            "resource": "iron-ore"
+          },
+          {
+            "milligrams": 0,
+            "resource": "silicate-rock"
+          },
+          {
+            "milligrams": 0,
+            "resource": "water-ice"
+          },
+          {
+            "milligrams": 0,
+            "resource": "organic-biomass"
+          },
+          {
+            "milligrams": 0,
+            "resource": "medicinal-compounds"
+          }
+        ],
+        "tray": null,
+        "ui_open": false
+      },
+      "ground_cache": {
+        "entries": 0,
+        "hits": 0,
+        "misses": 0
+      },
+      "interaction": null,
+      "journey": {
+        "active_duration": {
+          "nanos": 784000000,
+          "secs": 0
+        },
+        "distance_meters": 75.26400000000004,
+        "location": {
+          "altitude_meters": 1274657510218.4736,
+          "name": "Space near Sun",
+          "nearest_body": "Sun"
+        }
+      },
+      "journey_ended": null,
+      "machinery": {
+        "cockpit_active": true,
+        "converting": false,
+        "core_charge": 0.7499985694885254,
+        "fabrication_progress": 0.0,
+        "fabricator": "Idle",
+        "phase": 0.19599999487400055,
+        "rudder": 0.0,
+        "thrust": 0.0
+      },
+      "mining": {
+        "active": false,
+        "attached_fragment_id": null,
+        "capacity_kg": 10.0,
+        "equipped": false,
+        "extracted_mass_kg": 0.0,
+        "growth_preview": null,
+        "held": false,
+        "held_item_visible": false,
+        "range_meters": 4.0,
+        "rate_kg_per_second": 2.0,
+        "reserved_mass_kg": 0.0,
+        "target": null
+      },
+      "native_input_isolated": false,
+      "paused": false,
+      "performance": {
+        "cpu_render": {
+          "max_ms": 2.96075,
+          "mean_ms": 0.43042901851851845,
+          "min_ms": 0.169708,
+          "p95_ms": 0.737125,
+          "samples": 54
+        },
+        "cpu_update": {
+          "max_ms": 0.032833,
+          "mean_ms": 0.01652005555555555,
+          "min_ms": 0.00625,
+          "p95_ms": 0.024167,
+          "samples": 54
+        },
+        "drawable_pixels": [
+          1920,
+          1080
+        ],
+        "gpu_allocator": null,
+        "gpu_pass": {
+          "max_ms": 1.783291,
+          "mean_ms": 0.7493702641509433,
+          "min_ms": 0.499333,
+          "p95_ms": 1.575,
+          "samples": 53
+        },
+        "presented_interval": {
+          "max_ms": 24.513083,
+          "mean_ms": 15.757581796296295,
+          "min_ms": 0.0,
+          "p95_ms": 21.703457999999998,
+          "samples": 54
+        },
+        "samples": 54
+      },
+      "player": {
+        "eye_position_meters": [
+          78.02400000000004,
+          1.799032258064516,
+          0.0
+        ],
+        "local_ship_position_meters": [
+          2.76,
+          1.799032258064516,
+          0.0
+        ],
+        "location": "Cockpit",
+        "look_target_meters": [
+          79.01900416527808,
+          1.6991988414176877,
+          0.0
+        ],
+        "nearby_body": null,
+        "relative_speed_meters_per_second": 0.0,
+        "relative_velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_local_eye_position_meters": [
+          2.760000000000005,
+          1.799032258064516,
+          0.0
+        ],
+        "speed_meters_per_second": 96.0,
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "velocity_meters_per_second": [
+          96.0,
+          0.0,
+          0.0
+        ]
+      },
+      "resource_queries": {
+        "candidate_and_placement_micros": 0,
+        "candidate_micros": 0,
+        "candidate_queries": 50,
+        "placement_micros": 0,
+        "placement_misses": 0,
+        "reconciliation_micros": 0,
+        "reconciliations": 50
+      },
+      "resource_ui": {
+        "anchor_meters": null,
+        "context": null
+      },
+      "ship": {
+        "cockpit_control_active": true,
+        "cockpit_message": null,
+        "consumption_watts": 110000.0,
+        "conversion_remaining_joules": 0.0,
+        "door_open_fraction": 0.0,
+        "door_state": "Closed",
+        "energy_core": {
+          "capacity_joules": 60000000000,
+          "stored_joules": 44999913760
+        },
+        "engines_enabled": true,
+        "flight_state": "Flying",
+        "navigation": {
+          "acceleration": 0.0,
+          "angle_degrees": 0.0,
+          "braking": "Aligned { seconds: 0.192, distance_meters: 9.216000000000001, energy_joules: 9621120.0, sufficient_energy: true }",
+          "direction_local": [
+            1.0,
+            0.0,
+            0.0
+          ]
+        },
+        "nearby_body": null,
+        "orientation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "position_meters": [
+          75.26400000000004,
+          0.0,
+          0.0
+        ],
+        "power_available": true,
+        "speed_meters_per_second": 96.0,
+        "thruster_percentage": 0,
+        "total_mass_kg": 100000.0,
+        "velocity_meters_per_second": [
+          96.0,
+          0.0,
+          0.0
+        ]
+      },
+      "simulation_backlog_millis": 0.0,
+      "survival": {
+        "effects": [],
+        "fatigue": 99.99879012345679,
+        "health": 100.0,
+        "hunger": 99.95644444444444,
+        "terminal": false
+      },
+      "survival_details_open": false,
+      "survival_hud": {
+        "penalties": [
+          "HUNGER SPEED -0%",
+          "FATIGUE SPEED -0%",
+          "COMBINED SPEED -0%",
+          "INTERACTION RATE -0%"
+        ],
+        "statuses": [],
+        "visible": true
+      },
+      "survival_restrictions": {
+        "can_consume": true,
+        "can_mine": true,
+        "can_pilot": true,
+        "exhausted": false,
+        "fatigue_movement_bps": 10000,
+        "hunger_movement_bps": 10000,
+        "interaction_bps": 10000,
+        "movement_bps": 10000
+      },
+      "terrain": {
+        "active_patches": 0,
+        "cache_patches": 0,
+        "cpu_cache_bytes": 0,
+        "generated_last_frame": 0,
+        "generated_peak": 0,
+        "generation_last_frame_micros": 0,
+        "generation_peak_micros": 0,
+        "generation_total_micros": 0,
+        "gpu_cache_bytes": 131072,
+        "gpu_ready": true,
+        "mode": "Flat",
+        "peak_upload_bytes": 0,
+        "pending_patches": 0,
+        "preparation_last_frame_micros": 0,
+        "preparation_overruns": 0,
+        "preparation_peak_micros": 1,
+        "presentation_ready": true,
+        "selection_last_frame_micros": 0,
+        "total_generated": 0,
+        "triangles": 0,
+        "uploaded_last_frame_bytes": 0
+      },
+      "terrain_upload_preparation_micros": [
+        1,
+        1
+      ],
+      "tutorial": {
+        "prompt": null,
+        "state": {
+          "completed": 0,
+          "skipped": true
+        }
+      },
+      "view_mode": "Gameplay",
+      "visual_context": {
+        "adapter": "Apple M1",
+        "backend": "Metal",
+        "driver": " / ",
+        "scale_factor": 2.0,
+        "viewport_pixels": [
+          1920,
+          1080
+        ]
+      },
+      "window": {
+        "inner_size": [
+          1920,
+          1080
+        ],
+        "minimized": false
+      },
+      "world": {
+        "bodies": [
+          {
+            "center_meters": [
+              999910000000.0,
+              -749982000000.0,
+              249994000000.0
+            ],
+            "name": "Sun",
+            "radius_meters": 15000000.0,
+            "ship_surface_distance_meters": 1274657510219.58
+          },
+          {
+            "center_meters": [
+              999942000000.0,
+              -750022000000.0,
+              249994000000.0
+            ],
+            "name": "Mercury",
+            "radius_meters": 2400000.0,
+            "ship_surface_distance_meters": 1274718747441.071
+          },
+          {
+            "center_meters": [
+              999970000000.0,
+              -749980000000.0,
+              249994000000.0
+            ],
+            "name": "Venus",
+            "radius_meters": 5500000.0,
+            "ship_surface_distance_meters": 1274712900740.1306
+          },
+          {
+            "center_meters": [
+              1000000000000.0,
+              -750000000000.0,
+              249994000000.0
+            ],
+            "name": "Earth",
+            "radius_meters": 6000000.0,
+            "ship_surface_distance_meters": 1274747701655.9207
+          },
+          {
+            "center_meters": [
+              1000020000000.0,
+              -750012000000.0,
+              249994000000.0
+            ],
+            "name": "Moon",
+            "radius_meters": 1600000.0,
+            "ship_surface_distance_meters": 1274774851158.9744
+          },
+          {
+            "center_meters": [
+              1000069500000.0,
+              -750000000000.0,
+              249994000000.0
+            ],
+            "name": "Mars",
+            "radius_meters": 3500000.0,
+            "ship_surface_distance_meters": 1274804722720.4653
+          }
+        ],
+        "camera_phase": "Approach",
+        "deposit_query_error": null,
+        "deposits": [],
+        "deposits_by_id": {},
+        "fragment_count": 0,
+        "fragment_mass_kg": -0.0,
+        "fragments": [],
+        "fragments_by_id": {},
+        "nearest_deposit": null,
+        "resource_types": [],
+        "sleeping_fragment_count": 0
+      }
+    }
+  },
+  {
+    "input": [
+      "mouse",
+      120,
+      35
+    ],
+    "stdout": "cg_delta=120,35 ns_delta=120.0,35.0\nposted PID=93163 operation=mouse 120 35\n",
+    "stderr": "",
+    "returncode": 0,
+    "monotonic": 613807.000845333
+  },
+  {
+    "name": "relative-mouse-positive",
+    "monotonic": 613807.183407583,
+    "state": {
+      "capture_status": "captured",
+      "carrying": {
+        "context": null,
+        "last_action_feedback": null,
+        "object_id": null,
+        "target_id": null
+      },
+      "consumable_wheel": {
+        "held": false,
+        "hovered": null,
+        "open": false
+      },
+      "consumables": {
+        "food": [
+          null,
+          null,
+          null
+        ],
+        "medical": [
+          null,
+          null
+        ]
+      },
+      "equipment": {
+        "selected_slot": null,
+        "slots": [
+          "mining_tool",
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "fabricator": {
+        "jobs": [],
+        "queue_capacity": 64,
+        "requested_watts": 0.0,
+        "status": "Idle",
+        "stored": [
+          {
+            "milligrams": 0,
+            "resource": "iron-ore"
+          },
+          {
+            "milligrams": 0,
+            "resource": "silicate-rock"
+          },
+          {
+            "milligrams": 0,
+            "resource": "water-ice"
+          },
+          {
+            "milligrams": 0,
+            "resource": "organic-biomass"
+          },
+          {
+            "milligrams": 0,
+            "resource": "medicinal-compounds"
+          }
+        ],
+        "tray": null,
+        "ui_open": false
+      },
+      "ground_cache": {
+        "entries": 0,
+        "hits": 0,
+        "misses": 0
+      },
+      "interaction": null,
+      "journey": {
+        "active_duration": {
+          "nanos": 776000000,
+          "secs": 1
+        },
+        "distance_meters": 170.49600000000012,
+        "location": {
+          "altitude_meters": 1274657510143.7693,
+          "name": "Space near Sun",
+          "nearest_body": "Sun"
+        }
+      },
+      "journey_ended": null,
+      "machinery": {
+        "cockpit_active": true,
+        "converting": false,
+        "core_charge": 0.7499967217445374,
+        "fabrication_progress": 0.0,
+        "fabricator": "Idle",
+        "phase": 0.4440000057220459,
+        "rudder": 0.0,
+        "thrust": 0.0
+      },
+      "mining": {
+        "active": false,
+        "attached_fragment_id": null,
+        "capacity_kg": 10.0,
+        "equipped": false,
+        "extracted_mass_kg": 0.0,
+        "growth_preview": null,
+        "held": false,
+        "held_item_visible": false,
+        "range_meters": 4.0,
+        "rate_kg_per_second": 2.0,
+        "reserved_mass_kg": 0.0,
+        "target": null
+      },
+      "native_input_isolated": false,
+      "paused": false,
+      "performance": {
+        "cpu_render": {
+          "max_ms": 23.574958,
+          "mean_ms": 0.6838798583333331,
+          "min_ms": 0.16841699999999998,
+          "p95_ms": 1.1900000000000002,
+          "samples": 120
+        },
+        "cpu_update": {
+          "max_ms": 0.131334,
+          "mean_ms": 0.01931145833333334,
+          "min_ms": 0.005208999999999999,
+          "p95_ms": 0.038458,
+          "samples": 120
+        },
+        "drawable_pixels": [
+          1920,
+          1080
+        ],
+        "gpu_allocator": null,
+        "gpu_pass": {
+          "max_ms": 1.783291,
+          "mean_ms": 0.6388346722689079,
+          "min_ms": 0.499333,
+          "p95_ms": 1.561291,
+          "samples": 119
+        },
+        "presented_interval": {
+          "max_ms": 40.218875000000004,
+          "mean_ms": 16.397925,
+          "min_ms": 0.0,
+          "p95_ms": 17.89925,
+          "samples": 120
+        },
+        "samples": 120
+      },
+      "player": {
+        "eye_position_meters": [
+          173.2560000000001,
+          1.799032258064516,
+          0.0
+        ],
+        "local_ship_position_meters": [
+          2.76,
+          1.799032258064516,
+          0.0
+        ],
+        "location": "Cockpit",
+        "look_target_meters": [
+          174.20627157896075,
+          1.6229550169222378,
+          0.25686714731815263
+        ],
+        "nearby_body": null,
+        "relative_speed_meters_per_second": 0.0,
+        "relative_velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_local_eye_position_meters": [
+          2.759999999999991,
+          1.799032258064516,
+          0.0
+        ],
+        "speed_meters_per_second": 96.0,
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "velocity_meters_per_second": [
+          96.0,
+          0.0,
+          0.0
+        ]
+      },
+      "resource_queries": {
+        "candidate_and_placement_micros": 12,
+        "candidate_micros": 12,
+        "candidate_queries": 112,
+        "placement_micros": 0,
+        "placement_misses": 0,
+        "reconciliation_micros": 5,
+        "reconciliations": 112
+      },
+      "resource_ui": {
+        "anchor_meters": null,
+        "context": null
+      },
+      "ship": {
+        "cockpit_control_active": true,
+        "cockpit_message": null,
+        "consumption_watts": 110000.0,
+        "conversion_remaining_joules": 0.0,
+        "door_open_fraction": 0.0,
+        "door_state": "Closed",
+        "energy_core": {
+          "capacity_joules": 60000000000,
+          "stored_joules": 44999804640
+        },
+        "engines_enabled": true,
+        "flight_state": "Flying",
+        "navigation": {
+          "acceleration": 0.0,
+          "angle_degrees": 0.0,
+          "braking": "Aligned { seconds: 0.192, distance_meters: 9.216000000000001, energy_joules: 9621120.0, sufficient_energy: true }",
+          "direction_local": [
+            1.0,
+            0.0,
+            0.0
+          ]
+        },
+        "nearby_body": null,
+        "orientation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "position_meters": [
+          170.49600000000012,
+          0.0,
+          0.0
+        ],
+        "power_available": true,
+        "speed_meters_per_second": 96.0,
+        "thruster_percentage": 0,
+        "total_mass_kg": 100000.0,
+        "velocity_meters_per_second": [
+          96.0,
+          0.0,
+          0.0
+        ]
+      },
+      "simulation_backlog_millis": 0.0,
+      "survival": {
+        "effects": [],
+        "fatigue": 99.99725925925927,
+        "health": 100.0,
+        "hunger": 99.90133333333333,
+        "terminal": false
+      },
+      "survival_details_open": false,
+      "survival_hud": {
+        "penalties": [
+          "HUNGER SPEED -0%",
+          "FATIGUE SPEED -0%",
+          "COMBINED SPEED -0%",
+          "INTERACTION RATE -0%"
+        ],
+        "statuses": [],
+        "visible": true
+      },
+      "survival_restrictions": {
+        "can_consume": true,
+        "can_mine": true,
+        "can_pilot": true,
+        "exhausted": false,
+        "fatigue_movement_bps": 10000,
+        "hunger_movement_bps": 10000,
+        "interaction_bps": 10000,
+        "movement_bps": 10000
+      },
+      "terrain": {
+        "active_patches": 0,
+        "cache_patches": 0,
+        "cpu_cache_bytes": 0,
+        "generated_last_frame": 0,
+        "generated_peak": 0,
+        "generation_last_frame_micros": 0,
+        "generation_peak_micros": 0,
+        "generation_total_micros": 0,
+        "gpu_cache_bytes": 131072,
+        "gpu_ready": true,
+        "mode": "Flat",
+        "peak_upload_bytes": 0,
+        "pending_patches": 0,
+        "preparation_last_frame_micros": 0,
+        "preparation_overruns": 0,
+        "preparation_peak_micros": 34,
+        "presentation_ready": true,
+        "selection_last_frame_micros": 0,
+        "total_generated": 0,
+        "triangles": 0,
+        "uploaded_last_frame_bytes": 0
+      },
+      "terrain_upload_preparation_micros": [
+        0,
+        5
+      ],
+      "tutorial": {
+        "prompt": null,
+        "state": {
+          "completed": 0,
+          "skipped": true
+        }
+      },
+      "view_mode": "Gameplay",
+      "visual_context": {
+        "adapter": "Apple M1",
+        "backend": "Metal",
+        "driver": " / ",
+        "scale_factor": 2.0,
+        "viewport_pixels": [
+          1920,
+          1080
+        ]
+      },
+      "window": {
+        "inner_size": [
+          1920,
+          1080
+        ],
+        "minimized": false
+      },
+      "world": {
+        "bodies": [
+          {
+            "center_meters": [
+              999910000000.0,
+              -749982000000.0,
+              249994000000.0
+            ],
+            "name": "Sun",
+            "radius_meters": 15000000.0,
+            "ship_surface_distance_meters": 1274657510144.876
+          },
+          {
+            "center_meters": [
+              999942000000.0,
+              -750022000000.0,
+              249994000000.0
+            ],
+            "name": "Mercury",
+            "radius_meters": 2400000.0,
+            "ship_surface_distance_meters": 1274718747366.3672
+          },
+          {
+            "center_meters": [
+              999970000000.0,
+              -749980000000.0,
+              249994000000.0
+            ],
+            "name": "Venus",
+            "radius_meters": 5500000.0,
+            "ship_surface_distance_meters": 1274712900665.4248
+          },
+          {
+            "center_meters": [
+              1000000000000.0,
+              -750000000000.0,
+              249994000000.0
+            ],
+            "name": "Earth",
+            "radius_meters": 6000000.0,
+            "ship_surface_distance_meters": 1274747701581.2146
+          },
+          {
+            "center_meters": [
+              1000020000000.0,
+              -750012000000.0,
+              249994000000.0
+            ],
+            "name": "Moon",
+            "radius_meters": 1600000.0,
+            "ship_surface_distance_meters": 1274774851084.268
+          },
+          {
+            "center_meters": [
+              1000069500000.0,
+              -750000000000.0,
+              249994000000.0
+            ],
+            "name": "Mars",
+            "radius_meters": 3500000.0,
+            "ship_surface_distance_meters": 1274804722645.757
+          }
+        ],
+        "camera_phase": "Approach",
+        "deposit_query_error": null,
+        "deposits": [],
+        "deposits_by_id": {},
+        "fragment_count": 0,
+        "fragment_mass_kg": -0.0,
+        "fragments": [],
+        "fragments_by_id": {},
+        "nearest_deposit": null,
+        "resource_types": [],
+        "sleeping_fragment_count": 0
+      }
+    }
+  },
+  {
+    "input": [
+      "mouse",
+      -120,
+      -35
+    ],
+    "stdout": "cg_delta=-120,-35 ns_delta=-120.0,-35.0\nposted PID=93163 operation=mouse -120 -35\n",
+    "stderr": "",
+    "returncode": 0,
+    "monotonic": 613808.150501708
+  },
+  {
+    "name": "relative-mouse-return",
+    "monotonic": 613808.33395275,
+    "state": {
+      "capture_status": "captured",
+      "carrying": {
+        "context": null,
+        "last_action_feedback": null,
+        "object_id": null,
+        "target_id": null
+      },
+      "consumable_wheel": {
+        "held": false,
+        "hovered": null,
+        "open": false
+      },
+      "consumables": {
+        "food": [
+          null,
+          null,
+          null
+        ],
+        "medical": [
+          null,
+          null
+        ]
+      },
+      "equipment": {
+        "selected_slot": null,
+        "slots": [
+          "mining_tool",
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "fabricator": {
+        "jobs": [],
+        "queue_capacity": 64,
+        "requested_watts": 0.0,
+        "status": "Idle",
+        "stored": [
+          {
+            "milligrams": 0,
+            "resource": "iron-ore"
+          },
+          {
+            "milligrams": 0,
+            "resource": "silicate-rock"
+          },
+          {
+            "milligrams": 0,
+            "resource": "water-ice"
+          },
+          {
+            "milligrams": 0,
+            "resource": "organic-biomass"
+          },
+          {
+            "milligrams": 0,
+            "resource": "medicinal-compounds"
+          }
+        ],
+        "tray": null,
+        "ui_open": false
+      },
+      "ground_cache": {
+        "entries": 0,
+        "hits": 0,
+        "misses": 0
+      },
+      "interaction": null,
+      "journey": {
+        "active_duration": {
+          "nanos": 768000000,
+          "secs": 2
+        },
+        "distance_meters": 265.7280000000002,
+        "location": {
+          "altitude_meters": 1274657510069.0652,
+          "name": "Space near Sun",
+          "nearest_body": "Sun"
+        }
+      },
+      "journey_ended": null,
+      "machinery": {
+        "cockpit_active": true,
+        "converting": false,
+        "core_charge": 0.7499949336051941,
+        "fabrication_progress": 0.0,
+        "fabricator": "Idle",
+        "phase": 0.6919999718666077,
+        "rudder": 0.0,
+        "thrust": 0.0
+      },
+      "mining": {
+        "active": false,
+        "attached_fragment_id": null,
+        "capacity_kg": 10.0,
+        "equipped": false,
+        "extracted_mass_kg": 0.0,
+        "growth_preview": null,
+        "held": false,
+        "held_item_visible": false,
+        "range_meters": 4.0,
+        "rate_kg_per_second": 2.0,
+        "reserved_mass_kg": 0.0,
+        "target": null
+      },
+      "native_input_isolated": false,
+      "paused": false,
+      "performance": {
+        "cpu_render": {
+          "max_ms": 33.5595,
+          "mean_ms": 0.8430164812834228,
+          "min_ms": 0.159708,
+          "p95_ms": 1.196959,
+          "samples": 187
+        },
+        "cpu_update": {
+          "max_ms": 0.131334,
+          "mean_ms": 0.02050691978609626,
+          "min_ms": 0.0048330000000000005,
+          "p95_ms": 0.045583,
+          "samples": 187
+        },
+        "drawable_pixels": [
+          1920,
+          1080
+        ],
+        "gpu_allocator": null,
+        "gpu_pass": {
+          "max_ms": 1.783291,
+          "mean_ms": 0.6114083548387101,
+          "min_ms": 0.499333,
+          "p95_ms": 1.364375,
+          "samples": 186
+        },
+        "presented_interval": {
+          "max_ms": 49.786625,
+          "mean_ms": 16.67391287700535,
+          "min_ms": 0.0,
+          "p95_ms": 18.692625,
+          "samples": 187
+        },
+        "samples": 187
+      },
+      "player": {
+        "eye_position_meters": [
+          268.48800000000017,
+          1.799032258064516,
+          0.0
+        ],
+        "local_ship_position_meters": [
+          2.76,
+          1.799032258064516,
+          0.0
+        ],
+        "location": "Cockpit",
+        "look_target_meters": [
+          269.4830041652782,
+          1.6991988414176877,
+          0.0
+        ],
+        "nearby_body": null,
+        "relative_speed_meters_per_second": 0.0,
+        "relative_velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_local_eye_position_meters": [
+          2.759999999999991,
+          1.799032258064516,
+          0.0
+        ],
+        "speed_meters_per_second": 96.0,
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "velocity_meters_per_second": [
+          96.0,
+          0.0,
+          0.0
+        ]
+      },
+      "resource_queries": {
+        "candidate_and_placement_micros": 26,
+        "candidate_micros": 26,
+        "candidate_queries": 174,
+        "placement_micros": 0,
+        "placement_misses": 0,
+        "reconciliation_micros": 10,
+        "reconciliations": 174
+      },
+      "resource_ui": {
+        "anchor_meters": null,
+        "context": null
+      },
+      "ship": {
+        "cockpit_control_active": true,
+        "cockpit_message": null,
+        "consumption_watts": 110000.0,
+        "conversion_remaining_joules": 0.0,
+        "door_open_fraction": 0.0,
+        "door_state": "Closed",
+        "energy_core": {
+          "capacity_joules": 60000000000,
+          "stored_joules": 44999695520
+        },
+        "engines_enabled": true,
+        "flight_state": "Flying",
+        "navigation": {
+          "acceleration": 0.0,
+          "angle_degrees": 0.0,
+          "braking": "Aligned { seconds: 0.192, distance_meters: 9.216000000000001, energy_joules: 9621120.0, sufficient_energy: true }",
+          "direction_local": [
+            1.0,
+            0.0,
+            0.0
+          ]
+        },
+        "nearby_body": null,
+        "orientation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "position_meters": [
+          265.7280000000002,
+          0.0,
+          0.0
+        ],
+        "power_available": true,
+        "speed_meters_per_second": 96.0,
+        "thruster_percentage": 0,
+        "total_mass_kg": 100000.0,
+        "velocity_meters_per_second": [
+          96.0,
+          0.0,
+          0.0
+        ]
+      },
+      "simulation_backlog_millis": 0.0,
+      "survival": {
+        "effects": [],
+        "fatigue": 99.99572839506173,
+        "health": 100.0,
+        "hunger": 99.84622222222222,
+        "terminal": false
+      },
+      "survival_details_open": false,
+      "survival_hud": {
+        "penalties": [
+          "HUNGER SPEED -0%",
+          "FATIGUE SPEED -0%",
+          "COMBINED SPEED -0%",
+          "INTERACTION RATE -0%"
+        ],
+        "statuses": [],
+        "visible": true
+      },
+      "survival_restrictions": {
+        "can_consume": true,
+        "can_mine": true,
+        "can_pilot": true,
+        "exhausted": false,
+        "fatigue_movement_bps": 10000,
+        "hunger_movement_bps": 10000,
+        "interaction_bps": 10000,
+        "movement_bps": 10000
+      },
+      "terrain": {
+        "active_patches": 0,
+        "cache_patches": 0,
+        "cpu_cache_bytes": 0,
+        "generated_last_frame": 0,
+        "generated_peak": 0,
+        "generation_last_frame_micros": 0,
+        "generation_peak_micros": 0,
+        "generation_total_micros": 0,
+        "gpu_cache_bytes": 131072,
+        "gpu_ready": true,
+        "mode": "Flat",
+        "peak_upload_bytes": 0,
+        "pending_patches": 0,
+        "preparation_last_frame_micros": 0,
+        "preparation_overruns": 0,
+        "preparation_peak_micros": 34,
+        "presentation_ready": true,
+        "selection_last_frame_micros": 0,
+        "total_generated": 0,
+        "triangles": 0,
+        "uploaded_last_frame_bytes": 0
+      },
+      "terrain_upload_preparation_micros": [
+        1,
+        5
+      ],
+      "tutorial": {
+        "prompt": null,
+        "state": {
+          "completed": 0,
+          "skipped": true
+        }
+      },
+      "view_mode": "Gameplay",
+      "visual_context": {
+        "adapter": "Apple M1",
+        "backend": "Metal",
+        "driver": " / ",
+        "scale_factor": 2.0,
+        "viewport_pixels": [
+          1920,
+          1080
+        ]
+      },
+      "window": {
+        "inner_size": [
+          1920,
+          1080
+        ],
+        "minimized": false
+      },
+      "world": {
+        "bodies": [
+          {
+            "center_meters": [
+              999910000000.0,
+              -749982000000.0,
+              249994000000.0
+            ],
+            "name": "Sun",
+            "radius_meters": 15000000.0,
+            "ship_surface_distance_meters": 1274657510070.1716
+          },
+          {
+            "center_meters": [
+              999942000000.0,
+              -750022000000.0,
+              249994000000.0
+            ],
+            "name": "Mercury",
+            "radius_meters": 2400000.0,
+            "ship_surface_distance_meters": 1274718747291.6636
+          },
+          {
+            "center_meters": [
+              999970000000.0,
+              -749980000000.0,
+              249994000000.0
+            ],
+            "name": "Venus",
+            "radius_meters": 5500000.0,
+            "ship_surface_distance_meters": 1274712900590.7188
+          },
+          {
+            "center_meters": [
+              1000000000000.0,
+              -750000000000.0,
+              249994000000.0
+            ],
+            "name": "Earth",
+            "radius_meters": 6000000.0,
+            "ship_surface_distance_meters": 1274747701506.5083
+          },
+          {
+            "center_meters": [
+              1000020000000.0,
+              -750012000000.0,
+              249994000000.0
+            ],
+            "name": "Moon",
+            "radius_meters": 1600000.0,
+            "ship_surface_distance_meters": 1274774851009.5618
+          },
+          {
+            "center_meters": [
+              1000069500000.0,
+              -750000000000.0,
+              249994000000.0
+            ],
+            "name": "Mars",
+            "radius_meters": 3500000.0,
+            "ship_surface_distance_meters": 1274804722571.049
+          }
+        ],
+        "camera_phase": "Approach",
+        "deposit_query_error": null,
+        "deposits": [],
+        "deposits_by_id": {},
+        "fragment_count": 0,
+        "fragment_mass_kg": -0.0,
+        "fragments": [],
+        "fragments_by_id": {},
+        "nearest_deposit": null,
+        "resource_types": [],
+        "sleeping_fragment_count": 0
+      }
+    }
+  },
+  {
+    "name": "final",
+    "monotonic": 613808.349736833,
+    "state": {
+      "capture_status": "captured",
+      "carrying": {
+        "context": null,
+        "last_action_feedback": null,
+        "object_id": null,
+        "target_id": null
+      },
+      "consumable_wheel": {
+        "held": false,
+        "hovered": null,
+        "open": false
+      },
+      "consumables": {
+        "food": [
+          null,
+          null,
+          null
+        ],
+        "medical": [
+          null,
+          null
+        ]
+      },
+      "equipment": {
+        "selected_slot": null,
+        "slots": [
+          "mining_tool",
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "fabricator": {
+        "jobs": [],
+        "queue_capacity": 64,
+        "requested_watts": 0.0,
+        "status": "Idle",
+        "stored": [
+          {
+            "milligrams": 0,
+            "resource": "iron-ore"
+          },
+          {
+            "milligrams": 0,
+            "resource": "silicate-rock"
+          },
+          {
+            "milligrams": 0,
+            "resource": "water-ice"
+          },
+          {
+            "milligrams": 0,
+            "resource": "organic-biomass"
+          },
+          {
+            "milligrams": 0,
+            "resource": "medicinal-compounds"
+          }
+        ],
+        "tray": null,
+        "ui_open": false
+      },
+      "ground_cache": {
+        "entries": 0,
+        "hits": 0,
+        "misses": 0
+      },
+      "interaction": null,
+      "journey": {
+        "active_duration": {
+          "nanos": 768000000,
+          "secs": 2
+        },
+        "distance_meters": 265.7280000000002,
+        "location": {
+          "altitude_meters": 1274657510069.0652,
+          "name": "Space near Sun",
+          "nearest_body": "Sun"
+        }
+      },
+      "journey_ended": null,
+      "machinery": {
+        "cockpit_active": true,
+        "converting": false,
+        "core_charge": 0.7499949336051941,
+        "fabrication_progress": 0.0,
+        "fabricator": "Idle",
+        "phase": 0.6919999718666077,
+        "rudder": 0.0,
+        "thrust": 0.0
+      },
+      "mining": {
+        "active": false,
+        "attached_fragment_id": null,
+        "capacity_kg": 10.0,
+        "equipped": false,
+        "extracted_mass_kg": 0.0,
+        "growth_preview": null,
+        "held": false,
+        "held_item_visible": false,
+        "range_meters": 4.0,
+        "rate_kg_per_second": 2.0,
+        "reserved_mass_kg": 0.0,
+        "target": null
+      },
+      "native_input_isolated": false,
+      "paused": false,
+      "performance": {
+        "cpu_render": {
+          "max_ms": 33.5595,
+          "mean_ms": 0.8418743297872344,
+          "min_ms": 0.159708,
+          "p95_ms": 1.196959,
+          "samples": 188
+        },
+        "cpu_update": {
+          "max_ms": 0.131334,
+          "mean_ms": 0.02061814361702128,
+          "min_ms": 0.0048330000000000005,
+          "p95_ms": 0.045583,
+          "samples": 188
+        },
+        "drawable_pixels": [
+          1920,
+          1080
+        ],
+        "gpu_allocator": null,
+        "gpu_pass": {
+          "max_ms": 1.783291,
+          "mean_ms": 0.6108272941176476,
+          "min_ms": 0.499333,
+          "p95_ms": 1.364375,
+          "samples": 187
+        },
+        "presented_interval": {
+          "max_ms": 49.786625,
+          "mean_ms": 16.67131471808511,
+          "min_ms": 0.0,
+          "p95_ms": 18.692625,
+          "samples": 188
+        },
+        "samples": 188
+      },
+      "player": {
+        "eye_position_meters": [
+          268.48800000000017,
+          1.799032258064516,
+          0.0
+        ],
+        "local_ship_position_meters": [
+          2.76,
+          1.799032258064516,
+          0.0
+        ],
+        "location": "Cockpit",
+        "look_target_meters": [
+          269.4830041652782,
+          1.6991988414176877,
+          0.0
+        ],
+        "nearby_body": null,
+        "relative_speed_meters_per_second": 0.0,
+        "relative_velocity_meters_per_second": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "ship_local_eye_position_meters": [
+          2.759999999999991,
+          1.799032258064516,
+          0.0
+        ],
+        "speed_meters_per_second": 96.0,
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "velocity_meters_per_second": [
+          96.0,
+          0.0,
+          0.0
+        ]
+      },
+      "resource_queries": {
+        "candidate_and_placement_micros": 26,
+        "candidate_micros": 26,
+        "candidate_queries": 174,
+        "placement_micros": 0,
+        "placement_misses": 0,
+        "reconciliation_micros": 10,
+        "reconciliations": 174
+      },
+      "resource_ui": {
+        "anchor_meters": null,
+        "context": null
+      },
+      "ship": {
+        "cockpit_control_active": true,
+        "cockpit_message": null,
+        "consumption_watts": 110000.0,
+        "conversion_remaining_joules": 0.0,
+        "door_open_fraction": 0.0,
+        "door_state": "Closed",
+        "energy_core": {
+          "capacity_joules": 60000000000,
+          "stored_joules": 44999695520
+        },
+        "engines_enabled": true,
+        "flight_state": "Flying",
+        "navigation": {
+          "acceleration": 0.0,
+          "angle_degrees": 0.0,
+          "braking": "Aligned { seconds: 0.192, distance_meters: 9.216000000000001, energy_joules: 9621120.0, sufficient_energy: true }",
+          "direction_local": [
+            1.0,
+            0.0,
+            0.0
+          ]
+        },
+        "nearby_body": null,
+        "orientation": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "position_meters": [
+          265.7280000000002,
+          0.0,
+          0.0
+        ],
+        "power_available": true,
+        "speed_meters_per_second": 96.0,
+        "thruster_percentage": 0,
+        "total_mass_kg": 100000.0,
+        "velocity_meters_per_second": [
+          96.0,
+          0.0,
+          0.0
+        ]
+      },
+      "simulation_backlog_millis": 0.0,
+      "survival": {
+        "effects": [],
+        "fatigue": 99.99572839506173,
+        "health": 100.0,
+        "hunger": 99.84622222222222,
+        "terminal": false
+      },
+      "survival_details_open": false,
+      "survival_hud": {
+        "penalties": [
+          "HUNGER SPEED -0%",
+          "FATIGUE SPEED -0%",
+          "COMBINED SPEED -0%",
+          "INTERACTION RATE -0%"
+        ],
+        "statuses": [],
+        "visible": true
+      },
+      "survival_restrictions": {
+        "can_consume": true,
+        "can_mine": true,
+        "can_pilot": true,
+        "exhausted": false,
+        "fatigue_movement_bps": 10000,
+        "hunger_movement_bps": 10000,
+        "interaction_bps": 10000,
+        "movement_bps": 10000
+      },
+      "terrain": {
+        "active_patches": 0,
+        "cache_patches": 0,
+        "cpu_cache_bytes": 0,
+        "generated_last_frame": 0,
+        "generated_peak": 0,
+        "generation_last_frame_micros": 0,
+        "generation_peak_micros": 0,
+        "generation_total_micros": 0,
+        "gpu_cache_bytes": 131072,
+        "gpu_ready": true,
+        "mode": "Flat",
+        "peak_upload_bytes": 0,
+        "pending_patches": 0,
+        "preparation_last_frame_micros": 0,
+        "preparation_overruns": 0,
+        "preparation_peak_micros": 34,
+        "presentation_ready": true,
+        "selection_last_frame_micros": 0,
+        "total_generated": 0,
+        "triangles": 0,
+        "uploaded_last_frame_bytes": 0
+      },
+      "terrain_upload_preparation_micros": [
+        1,
+        5
+      ],
+      "tutorial": {
+        "prompt": null,
+        "state": {
+          "completed": 0,
+          "skipped": true
+        }
+      },
+      "view_mode": "Gameplay",
+      "visual_context": {
+        "adapter": "Apple M1",
+        "backend": "Metal",
+        "driver": " / ",
+        "scale_factor": 2.0,
+        "viewport_pixels": [
+          1920,
+          1080
+        ]
+      },
+      "window": {
+        "inner_size": [
+          1920,
+          1080
+        ],
+        "minimized": false
+      },
+      "world": {
+        "bodies": [
+          {
+            "center_meters": [
+              999910000000.0,
+              -749982000000.0,
+              249994000000.0
+            ],
+            "name": "Sun",
+            "radius_meters": 15000000.0,
+            "ship_surface_distance_meters": 1274657510070.1716
+          },
+          {
+            "center_meters": [
+              999942000000.0,
+              -750022000000.0,
+              249994000000.0
+            ],
+            "name": "Mercury",
+            "radius_meters": 2400000.0,
+            "ship_surface_distance_meters": 1274718747291.6636
+          },
+          {
+            "center_meters": [
+              999970000000.0,
+              -749980000000.0,
+              249994000000.0
+            ],
+            "name": "Venus",
+            "radius_meters": 5500000.0,
+            "ship_surface_distance_meters": 1274712900590.7188
+          },
+          {
+            "center_meters": [
+              1000000000000.0,
+              -750000000000.0,
+              249994000000.0
+            ],
+            "name": "Earth",
+            "radius_meters": 6000000.0,
+            "ship_surface_distance_meters": 1274747701506.5083
+          },
+          {
+            "center_meters": [
+              1000020000000.0,
+              -750012000000.0,
+              249994000000.0
+            ],
+            "name": "Moon",
+            "radius_meters": 1600000.0,
+            "ship_surface_distance_meters": 1274774851009.5618
+          },
+          {
+            "center_meters": [
+              1000069500000.0,
+              -750000000000.0,
+              249994000000.0
+            ],
+            "name": "Mars",
+            "radius_meters": 3500000.0,
+            "ship_surface_distance_meters": 1274804722571.049
+          }
+        ],
+        "camera_phase": "Approach",
+        "deposit_query_error": null,
+        "deposits": [],
+        "deposits_by_id": {},
+        "fragment_count": 0,
+        "fragment_mass_kg": -0.0,
+        "fragments": [],
+        "fragments_by_id": {},
+        "nearest_deposit": null,
+        "resource_types": [],
+        "sleeping_fragment_count": 0
+      }
+    }
+  }
+]

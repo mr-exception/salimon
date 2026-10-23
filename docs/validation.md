@@ -440,3 +440,10 @@ concurrent craft/thrust/recovery funding, old-schema resource/job retention and
 real Save Now/normal-launch/restart with zero offline work. The
 [cloud report/driver](../reports/issue-515/README.md) exercises production
 intake/Fabricator/tray/installation/Archive controls and GPU captures.
+
+Scientific CPU cloud evidence #521: build the three documented release examples,
+then use the [report-local measurement driver](../reports/issue-521/README.md)
+for seven serial processes each of `reference_bench` and `partition_bench`.
+The C supervisor records Linux `wait4` peak RSS without Python's inherited memory
+floor. Raw inner JSON, process time/memory, fixture/binary/compiler/CPU context,
+control failures and comparisons are retained; no FPS/model-error budget follows.

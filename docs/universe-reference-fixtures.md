@@ -83,8 +83,12 @@ before interpreting a change. No timing thresholds, invented FPS or extrapolated
 native speed are installed by these CPU harnesses.
 
 [Portable report](../reports/issue-404/README.md) preserves Linux output and injected
-failure evidence. [Cloud follow-up #521](https://github.com/mr-exception/salimon/issues/521)
-owns reproducible release CPU measurements; actual M1 measurements remain unrun
+failure evidence. [Cloud measurements #521](../reports/issue-521/README.md)
+retain seven serial release processes per workload, raw timings, peak RSS,
+fixture/binary hashes and matched-size historical Linux comparisons. The report's
+`measure.py` uses its small C `measure_rss.c` supervisor to avoid inheriting the
+Python parent's peak-RSS floor; reproduction and observer controls are included.
+Actual M1 measurements remain unrun
 unless separately collected. Hardware budget decisions belong to #563 under the
 [verification workflow](verification-workflow.md). Whole-game cloud rendering and
 flight/restore integration remain #435–#439; human presentation, physical platform

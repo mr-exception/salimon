@@ -1,0 +1,100 @@
+{
+  "arch": "x86_64",
+  "limitations": "shared-executor CPU diagnostics incl allocation/parse overhead; no ephemeris solver, frame rate or native M1 signoff",
+  "os": "linux",
+  "profile": "release",
+  "reference_preflight": {
+    "cases": [
+      {
+        "budget": {
+          "position_meters": 0.00025,
+          "velocity_mps": 0.0
+        },
+        "id": "distant-submillimeter",
+        "passed": true,
+        "position_error_meters": 0.0,
+        "regime": "local_contact",
+        "velocity_error_mps": 0.0
+      },
+      {
+        "budget": {
+          "position_meters": 0.00025,
+          "velocity_mps": 1e-10
+        },
+        "id": "earth-jpl-1",
+        "passed": true,
+        "position_error_meters": 0.0,
+        "regime": "system_flight",
+        "velocity_error_mps": 9.094947017729282e-13
+      },
+      {
+        "budget": {
+          "position_meters": 0.00025,
+          "velocity_mps": 1e-10
+        },
+        "id": "earth-jpl-2",
+        "passed": true,
+        "position_error_meters": 0.0,
+        "regime": "system_flight",
+        "velocity_error_mps": 3.637978807091713e-12
+      },
+      {
+        "budget": {
+          "position_meters": 0.00025,
+          "velocity_mps": 1e-12
+        },
+        "id": "interstellar-proper-motion",
+        "passed": true,
+        "position_error_meters": 0.0,
+        "regime": "interstellar",
+        "velocity_error_mps": 0.0
+      },
+      {
+        "budget": {
+          "position_meters": 1e-12,
+          "velocity_mps": 1e-12
+        },
+        "id": "local-rotating",
+        "passed": true,
+        "position_error_meters": 0.0,
+        "regime": "local_contact",
+        "velocity_error_mps": 0.0
+      }
+    ],
+    "passed": true
+  },
+  "workloads": [
+    {
+      "elapsed_ms": [
+        6.989434,
+        7.599599,
+        11.477596,
+        9.20008,
+        9.08012,
+        7.302785,
+        7.007811
+      ],
+      "iterations_per_sample": 1000,
+      "max_ms": 11.477596,
+      "median_ms": 7.599599,
+      "min_ms": 6.989434,
+      "workload": "production_u02_and_frozen_source_adapter"
+    },
+    {
+      "elapsed_ms": [
+        0.331868,
+        0.39765599999999995,
+        0.327361,
+        0.332078,
+        0.339449,
+        0.32625,
+        0.324206
+      ],
+      "iterations_per_sample": 1000,
+      "max_ms": 0.39765599999999995,
+      "median_ms": 0.331868,
+      "min_ms": 0.324206,
+      "workload": "strict_comparator"
+    }
+  ]
+}

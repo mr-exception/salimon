@@ -505,3 +505,9 @@ action prompts and the gameplay reticle while they own the screen. Opening a
 modal does not clear prompt state or change interaction authority; closing it
 restores ordinary presentation from current state. Native evidence lives in
 [the Fabricator report](../../reports/issue-348/README.md).
+
+Archive cloud evidence (#505) initializes position only at opt-in E2E startup.
+Read-only protocol source/text cannot mark a record read; E navigation retains
+production gates. Save Now retains exact selection/read source without the modal;
+verified restart resets source and modal. See runtime architecture and the
+Archive persistence tests for the shared transaction boundary.

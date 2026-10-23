@@ -2,6 +2,22 @@
 use crate::{e2e::Scenario, session::GameplaySession};
 use salimon_fabrication::{FabricationCommand, RecipeId};
 
+/// Explicit initial placement at the Archive; never opens the reader or marks records.
+pub(crate) fn archive_initial_conditions(s: &mut GameplaySession) -> Result<(), String> {
+    *s = GameplaySession::new_run();
+    let mut source = serde_json::to_value(s.character.save_state()).map_err(|e| e.to_string())?;
+    source["position"] = serde_json::json!({"Inside":{"local":[-3.0,1.8,-2.8]}});
+    source["yaw_radians"] = serde_json::json!(std::f64::consts::PI * 1.5);
+    source["pitch_radians"] = serde_json::json!(0.0);
+    s.character = salimon_character::CharacterController::from_save(
+        serde_json::from_value(source).map_err(|e| e.to_string())?,
+        None,
+    )
+    .map_err(|e| e.to_string())?;
+    s.save_bytes(100).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
 pub(crate) fn initialize(s: &mut GameplaySession, scenario: Scenario) -> Result<(), String> {
     *s = GameplaySession::new_run();
     // Reuse the canonical exact 2 kg held identity and Core aim fixture. This is

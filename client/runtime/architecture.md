@@ -1393,3 +1393,15 @@ consumable/damage/crafting transactions and `SaveManager<NativeStore>`. It write
 only to a new explicitly supplied directory and verifies exact save roundtrips.
 It adds no production launch flag, save format, simulation clock or authority.
 See [validation](../../docs/validation.md#reference-savehud-fixtures-376).
+
+## Archive cloud verification (#505)
+
+`scout_walkthrough::archive_initial_conditions` adds an opt-in `scout-archive`
+E2E fixture at the physical terminal, with ordinary new-run source and no records
+read or reader opened. Subsequent E/arrow/Tab commands use production input and
+range/aim/power/modal gates. `automation::inspect_session` exposes immutable
+Archive source/open/text; inspection does not mutate knowledge or simulation.
+The `interact` key alias maps to physical E, including reader close, unlike a
+synthetic reader action. `session/archive/tests.rs` covers real Save Now worker
+completion, normal relaunch and verified death/restart reset. No save/schema,
+record content, renderer DTO, discovery or navigation authority changes.

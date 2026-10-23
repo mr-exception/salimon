@@ -1,0 +1,31 @@
+............Running native-1-dense-settled-facing
+Running native-1-dense-active-facing
+Running native-1-dense-settled-facing
+Running native-1-dense-active-facing
+...Running native-1-dense-settled-facing
+Running native-1-dense-active-facing-repeat-1
+Running native-1-dense-active-facing-repeat-2
+Running native-1-dense-active-facing-repeat-3
+Running native-1-dense-settled-facing
+Running native-1-dense-active-facing-repeat-1
+Running native-1-dense-active-facing-repeat-2
+Running native-1-dense-active-facing-repeat-3
+.Running physics-1-dense-active-facing
+Running physics-1-dense-active-facing
+..Prepared a
+Prepared b
+Measuring a (other fixtures idle)
+Measuring b (other fixtures idle)
+....Building: cargo build --locked -p salimon-client --target x86_64-unknown-linux-gnu --message-format json-render-diagnostics
+Building: cargo build --locked -p salimon-client --target x86_64-unknown-linux-gnu --message-format json-render-diagnostics --release
+.Building: cargo build --locked -p salimon-client --target x86_64-unknown-linux-gnu --message-format json-render-diagnostics
+Building: cargo build --locked -p salimon-client --target x86_64-unknown-linux-gnu --message-format json-render-diagnostics
+...................Switched to a new branch 'ci-reports'
+............................................................................
+----------------------------------------------------------------------
+Ran 118 tests in 4.779s
+
+OK
+No source change since the latest successful suites; skipping
+Run suites
+{"status": "failed", "report": "/tmp/tmpri2ubmym/failed.json", "error": "Command 'profile' timed out after 300 seconds"}

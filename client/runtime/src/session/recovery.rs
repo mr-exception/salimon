@@ -132,6 +132,11 @@ impl Recovery {
     }
 }
 impl GameplaySession {
+    /// Immutable source evidence; never advances work or transfers identity.
+    pub(crate) fn recovery_observation(&self) -> serde_json::Value {
+        serde_json::json!(self.recovery)
+    }
+
     pub(super) fn recovery_reserve(&self) -> f64 {
         let c = self.ship.energy_config();
         self.recovery.config.mobility_reserve_joules.max(

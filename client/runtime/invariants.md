@@ -511,3 +511,9 @@ Read-only protocol source/text cannot mark a record read; E navigation retains
 production gates. Save Now retains exact selection/read source without the modal;
 verified restart resets source and modal. See runtime architecture and the
 Archive persistence tests for the shared transaction boundary.
+
+Recovery cloud evidence (#515) declares initial raw materials explicitly and
+never treats them as measured acquisition. E collection transfers the existing
+tray job/unit into installed source without a second mass contribution. The
+read-only recovery observation cannot advance work, spend energy or publish an
+identity; only live production ticks do so, including after disk relaunch.

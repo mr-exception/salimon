@@ -13,7 +13,7 @@ from e2e_artifacts import Artifacts
 
 
 PROTOCOL = 1
-SETUPS = {"scout-archive", "scout-fabricator", "scout-work-blackout", "cargo-blackout", "flight-regression", "core-restart", "crash-recovery", "cargo-flight", "fragment-pile", "resource-approach", "landed-earth", "cockpit-earth", "orbit-earth", "orbit-moon", "open-space", "coasting-space", "coasting-orbit", "eva-approach", "terrain-earth-approach", "terrain-moon-approach", "terrain-mars-approach", "terrain-moon-steep", "terrain-earth", "terrain-moon", "terrain-mars", "terrain-earth-crater", "terrain-moon-crater", "terrain-mars-crater"}
+SETUPS = {"scout-recovery", "scout-archive", "scout-fabricator", "scout-work-blackout", "cargo-blackout", "flight-regression", "core-restart", "crash-recovery", "cargo-flight", "fragment-pile", "resource-approach", "landed-earth", "cockpit-earth", "orbit-earth", "orbit-moon", "open-space", "coasting-space", "coasting-orbit", "eva-approach", "terrain-earth-approach", "terrain-moon-approach", "terrain-mars-approach", "terrain-moon-steep", "terrain-earth", "terrain-moon", "terrain-mars", "terrain-earth-crater", "terrain-moon-crater", "terrain-mars-crater"}
 OPS = {"wheel_hover", "scout_reference", "crafting", "window", "performance_reset", "inspect", "step", "look", "aim_fragment", "restore_look", "key", "mouse", "interact", "landing", "thruster"}
 COMPARISONS = {"equals", "not_equals", "gt", "gte", "lt", "lte", "approx", "exists", "contains"}
 

@@ -2,6 +2,21 @@
 use crate::{e2e::Scenario, session::GameplaySession};
 use salimon_fabrication::{FabricationCommand, RecipeId};
 
+/// Declared raw-bin/held-fragment fixture, not evidence of resource acquisition.
+pub(crate) fn recovery_initial_conditions(s: &mut GameplaySession) -> Result<(), String> {
+    initialize(s, Scenario::ScoutFabricator)?;
+    s.execute_fabricator(FabricationCommand::Insert(
+        salimon_world::resources::RawMaterial::new(
+            salimon_world::resources::ResourceId::SilicateRock,
+            0.5,
+        )
+        .map_err(|e| format!("silicate fixture: {e:?}"))?,
+    ))
+    .map_err(|e| format!("recovery fixture: {e:?}"))?;
+    s.save_bytes(100).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
 /// Explicit initial placement at the Archive; never opens the reader or marks records.
 pub(crate) fn archive_initial_conditions(s: &mut GameplaySession) -> Result<(), String> {
     *s = GameplaySession::new_run();
@@ -88,6 +103,20 @@ mod tests {
     }
     fn feedback(s: &GameplaySession) -> salimon_renderer::MachineryFeedback {
         crate::scout_feedback::capture(s, s.ship.snapshot())
+    }
+    #[test]
+    fn recovery_fixture_retains_one_held_input_and_only_declared_raw_silicate() {
+        let s = setup(Scenario::ScoutRecovery);
+        let before = s.save_bytes(100).unwrap();
+        assert!(s.mining.session.carried_id().is_some());
+        assert_eq!(s.mining.session.fragments().len(), 1);
+        assert!(s.fabrication_snapshot().jobs.is_empty());
+        assert!(s.fabrication_snapshot().tray.is_none());
+        let source = s.recovery_observation();
+        assert!(source["module"].is_null());
+        assert_eq!(source["spent_joules"], serde_json::json!([0.0, 0.0]));
+        assert!(source["active"].is_null());
+        assert_eq!(s.save_bytes(100).unwrap(), before);
     }
     #[test]
     fn physical_intake_menu_work_pause_restore_blocked_and_exact_collection() {

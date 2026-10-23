@@ -1,5 +1,11 @@
 # Experience and narrative implementation/ownership map
 
+Current verification routing: [cloud and human workflows](verification-workflow.md).
+#568 owns automatable corpus/matrix/experience checks; #537 owns source rights,
+balance and human experience decisions; #561 presentation/audio, #557 physical
+platform checks and #563 hardware budgets. Earlier native wording below is
+context, not a requirement to wait for reference M1 access for cloud delivery.
+
 Status: **documentation planning only; implementation issue descriptions do not imply delivery**. Documentation issue #462. This matrix aligns the narrative, art, navigation and Absenat requirements with existing issues and newly planned features. Existing issue state may change; always inspect blockers and latest PRs before implementing.
 
 | Contract | Design source | Existing infrastructure/reconciliation | Development issue |
@@ -17,7 +23,7 @@ Status: **documentation planning only; implementation issue descriptions do not 
 | Completion, blank sign, permanent menu unlock with no prior spoiler | Absenat | Future backend required | #473 |
 | Global inscriptions, distance rankings, stable snapshot service | Absenat | #372 distance, #406 identity, future account/backend | #474 |
 | Return visit, streaming signs, own latest placement | Absenat | Future backend and Hall | #475 |
-| Playthrough, spoiler, native frame-time verification | All | #279/#308/#314, #435–439 M1, #440–442 docs CI | #476 |
+| Playthrough, spoiler, native frame-time verification | All | #279/#308/#314, #435–439 cloud, #557/#561/#563 human, #440–442 docs CI | #476 |
 
 ## Recommended dependency-order planning
 
@@ -47,7 +53,7 @@ opening/navigation/story/endgame blockers. Portable passes are not full E06,
 M1/audio/appearance approval or a backend fallback implementation.
 
 
-Full native/backend acceptance from #476 is tracked in
+Human experience/source/balance acceptance from #476 is tracked in
 [follow-up #537](https://github.com/mr-exception/salimon/issues/537) after the
 versioned matrix/runner delivery. Its feature prerequisites and human evidence
 requirements remain active when #476 closes.

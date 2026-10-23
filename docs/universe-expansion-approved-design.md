@@ -1,5 +1,10 @@
 # Real-scale universe expansion — approved design (2026-10-20)
 
+Verification ownership was revised by the owner on 2026-10-23:
+[cloud checks and instructed human evidence](verification-workflow.md) replace
+blanket M1-only issue completion. Feature/science contracts and hardware-specific
+performance targets are unchanged. Keep actual platform results distinct.
+
 Status: **approved design; portable U01–U11 foundations delivered with the limits below; remaining expansion not implemented**. Source: ten rounds of owner Q&A. This contract supersedes compressed-playable-world assumptions *for the future expansion*, not existing implementation until migrated. Work begins after the existing planned gameplay implementation queue completes. Keep separate native verification, no implementation PRs as part of planning.
 
 ## Narrative alignment (2026-10-21)
@@ -32,7 +37,7 @@ The approved alien homeworld becomes the traveler's **awakening location**; they
 
 ## Engineering / verification / rollout
 - Native Rust client and portability only; do not implement server now. Keep small crates and existing domain boundaries, avoid renderer authority and unnecessary frameworks.
-- Use independent dependency-blocked implementation issues and separate native Apple M1/Metal hardware signoff. Linux portable/headless/CI evidence never silently substitutes for native M1 tests. Benchmark catalog, memory, streaming and 60 FPS under representative conditions.
+- Use independent dependency-blocked `auto-verification` implementation/check issues, completed with reproducible cloud evidence and a PR. Human presentation, actual device/OS experiments and hardware budget decisions are separate `human-verification` issues under the [verification workflow](verification-workflow.md). Benchmark catalog, memory and streaming in cloud; measure hardware FPS only on actual suitable hardware. Cloud delivery does not wait for M1 access, and does not certify Metal or M1 performance.
 - Existing gameplay issues (survival, save/pause, visuals) are prerequisites for beginning the expansion. Reconcile #375, #381, #382, #373, #377, #379 and native #312–#314, #348, #376 as applicable; do not duplicate their scopes.
 
 ## Deferred / explicit TODOs
@@ -90,8 +95,9 @@ The [scientific reference harness](universe-reference-fixtures.md) delivers froz
 Horizons and analytic coordinate/time goldens, complete strict SI/frame/epoch
 comparison, test-level numerical budgets by flight regime, a candidate-file CLI
 and repeatable Linux CPU workloads. It implements no orbit/gravity solver and
-approves no future scientific model drift. Reference M1 profiling remains
-[native follow-up #521](https://github.com/mr-exception/salimon/issues/521);
+approves no future scientific model drift. Reproducible cloud reference profiling is
+[auto follow-up #521](https://github.com/mr-exception/salimon/issues/521);
+hardware budget decisions remain #563;
 full-game/flight/rendering acceptance remains #435–#439. Fixture/source-use and
 production pack limitations remain intact.
 
@@ -139,4 +145,5 @@ with checked ship-clearing walk paths. This is a cold airless fictional baseline
 not a biosphere, climate model, production Milky Way pack or native screenshot.
 U12 packaging, U14 evolving states and U23/U24 playable terrain/arrival/mining
 remain downstream. Current runtime startup, discovery/chart and save semantics
-are unchanged; native #436–#439 retain separate acceptance.
+are unchanged; cloud #436–#439 retain separate integration acceptance, with human
+presentation/platform/budget criteria routed to #561/#557/#563.

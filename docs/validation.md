@@ -1,5 +1,18 @@
 # Validation matrix
 
+## Verification ownership
+
+Follow [cloud and human verification](verification-workflow.md): reproducible
+Linux cloud checks are the default completion path (`auto-verification`).
+Subjective reviews, physical OS/device experiments and explicit owner decisions
+belong to instructed `human-verification` issues; return evidence to Codex.
+References below to older native/M1 issue gates follow the current issue labels
+and transferred ownership, not a blanket desktop prerequisite. Preserve actual
+failures and context: software Vulkan cannot certify Metal or hardware FPS.
+The existing native graphical commands below run the actual application on Linux;
+no game-engine or browser migration is implied. Existing numerical budgets remain
+in force for their stated workload/hardware.
+
 Run commands from the repository root. Use `python3` on macOS/Linux where
 `python` is not available, and `python` on Windows. Native builds require Python
 3.10+, stable Rust 1.89+ with rustfmt/Clippy, locked Cargo dependencies, and the
@@ -286,7 +299,7 @@ analytic production-U02 frames/motion/GPU narrowing, injected unit/axis/epoch/sc
 faults, missing/extra/duplicate coverage, malformed wire, finite budgets and norm
 boundaries. Release comparator and repeated CPU workloads are documented in the
 [reference guide](universe-reference-fixtures.md); retain raw JSON/context/hashes.
-Linux results do not approve M1 performance (#521), future ephemeris/integrator
+Cloud #521 measurements do not approve M1 performance (hardware decisions #563), future ephemeris/integrator
 model drift or whole-game frame rates. Reference data is not production reuse.
 
 U07: universe/workspace tests run Gaia/CSV goldens, quality/missing-data counts,
@@ -335,7 +348,8 @@ the manifest. Tests cover independent >=30 ly proof, physical screens, immutable
 IDs/digests, altered/unknown/oversized data, single-surface queries, all five
 resources, ship-clearing walk paths and visual independence. See
 [contract](universe-starting-system.md) and [evidence](../reports/issue-412/README.md).
-These CPU checks do not replace U24 integration or native #436–#439 acceptance.
+These CPU checks do not replace U24 integration or cloud #436–#439 rendered and
+session acceptance. Human presentation/platform/budget criteria are #561/#557/#563.
 
 ## Reference save/HUD fixtures (#376)
 

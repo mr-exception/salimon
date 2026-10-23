@@ -26,6 +26,11 @@ door, and radial surface traversal.
 
 ## Source of requirements
 
+Verification follows the [cloud and human workflow](docs/verification-workflow.md):
+AI runs reproducible cloud checks and delivers a PR; instructed human reviews
+return evidence to Codex. Routine feature delivery does not require M1 access.
+Hardware-specific performance and platform claims retain their actual context.
+
 The [project documents](docs/README.md) and
 [GitHub issues](https://github.com/mr-exception/salimon/issues) are the source of
 truth. Start with the [current scope](docs/project-phases.md),

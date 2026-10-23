@@ -78,7 +78,9 @@ WGSL lives with renderer pipelines. Change shader bindings, vertex/uniform
 layouts, alignment/padding and their Rust upload definitions together. Keep
 reverse-Z clear/comparison/projection conventions consistent. Document a layout
 or coordinate assumption where the CPU/shader contract is established. Shader
-appearance needs native visual evidence in addition to CPU-side tests.
+appearance needs actual renderer captures in addition to CPU-side tests,
+with human appearance review under the [verification workflow](verification-workflow.md).
+Cloud software Vulkan is suitable for routine rendered regression checks.
 
 ## Authored and generated files
 
@@ -108,6 +110,15 @@ link here for common rules instead of duplicating them. Historical reports
 record what was validated at their revision and do not override current guides.
 
 ## Issue completion and follow-up
+
+Use the [two-label verification workflow](verification-workflow.md).
+`auto-verification` means AI executes cloud checks and creates/updates a PR and
+issue. `human-verification` means an issue gives ordered review/capture steps;
+the person returns evidence to Codex for assessment and an issue update. Codex
+opens a PR when repository documentation, evidence, code or baselines change;
+only a complete evidence-only human decision requiring no repository change may
+close directly, with reviewer/date, provenance, outcomes and evidence retained
+in the issue. This is the sole exception to the report-file/PR rules below.
 
 Deliver an issue's completed work in the current PR and close the source issue
 on merge, using a closing reference such as `Closes #123` in the PR description.
@@ -139,7 +150,7 @@ approval explicitly.
 
 ## Task completion reports
 
-Every completed task must write/update `reports/issue-<number>/README.md`, or
+Except for the evidence-only human closure above, every completed task must write/update `reports/issue-<number>/README.md`, or
 `reports/task-<id>/README.md` for a task without an issue. Record:
 
 - Outcome and meaningful changes, including the affected ownership/contracts.

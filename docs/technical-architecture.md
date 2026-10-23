@@ -533,7 +533,9 @@ See [reference wire/budget/workload guide](universe-reference-fixtures.md),
 [architecture](../client/universe/architecture.md#scientific-reference-harness--u03-404)
 and [invariants](../client/universe/invariants.md). Strict SI/epoch/frame comparison
 and CPU diagnostics only; no solver/world migration or scientific model approval.
-Native reference measurements remain #521; full-game native gates remain #435–#439.
+Cloud reference measurements remain #521; full-game cloud gates remain #435–#439.
+Human presentation/platform/budget criteria are #561/#557/#563 under the
+[verification workflow](verification-workflow.md); no M1 result is inferred.
 
 ## Universe Gaia ingestion (#408)
 

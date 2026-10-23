@@ -137,5 +137,6 @@ See [measured report](../reports/issue-410/README.md).
 
 Production source reuse/full reviewed inputs remain #513/#524/#526; U10/U11 own
 population/canonical world generation, U12 packaging, U14 state evaluation and
-#436–#439 native integration/verification. Those are existing downstream scopes,
+#436–#439 cloud integration/verification, with human criteria routed by the
+[verification workflow](verification-workflow.md). Those are existing downstream scopes,
 not approvals established by this portable heuristic inference delivery.

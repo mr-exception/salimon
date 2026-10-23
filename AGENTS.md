@@ -1,5 +1,14 @@
 # Repository guidelines
 
+Use the owner-approved [cloud and human verification workflow](docs/verification-workflow.md).
+Label active issues `auto-verification` or `human-verification`; retire the
+`native` label and title prefix. AI executes cloud checks, creates/updates a PR
+and updates its issue. Human issues give actionable capture instructions and
+return evidence to Codex. Only a fully evidenced human review requiring no
+repository changes may close directly with a durable issue update instead of
+a report file/PR. Otherwise the completion/report rules below apply. Routine
+cloud delivery does not wait for M1 access; record actual platform limitations.
+
 ## Start here
 
 1. Read the active [GitHub issue](https://github.com/mr-exception/salimon/issues),
@@ -44,14 +53,16 @@ Keep behavior/contracts and affected guides aligned in the same change. Use one
 canonical definition per rule and link local guides to it. Preserve useful
 historical evidence while labeling its date/revision and limitations.
 
-Every completed task **must** create or update
+Except for the evidence-only human-review closure defined above, every completed
+task **must** create or update
 `reports/issue-<number>/README.md` (or `reports/task-<id>/README.md` without a
 GitHub issue), recording outcome, meaningful changes, checks/results, and
 limitations or blockers. Put applicable screenshots/images beside it with
 relative links. Follow [report conventions](docs/coding-conventions.md#task-completion-reports)
 and [reports layout](reports/README.md); never add task-result folders to `docs/`.
 Link the report and relevant commits/PR from the GitHub issue completion update.
-Close the source issue through the current PR and move unresolved points into
+Except for the documented evidence-only human-review case, close the source
+issue through the current PR and move unresolved points into
 linked follow-up issues; do not keep the whole source issue open for remaining
 work. Follow the canonical
 [issue completion and follow-up workflow](docs/coding-conventions.md#issue-completion-and-follow-up).

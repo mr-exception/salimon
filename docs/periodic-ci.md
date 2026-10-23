@@ -1,5 +1,10 @@
 # Periodic verification and reports
 
+Routine verification uses [AI/cloud checks](verification-workflow.md).
+Local cloud reproduction is valid when hosted dispatch is unavailable, with
+that limitation recorded; never report it as a hosted CI pass. Human image/audio
+approval, physical platform checks and hardware budgets are separately owned.
+
 PRs keep the single **Source build (Ubuntu)** check. The separate
 [Periodic verification workflow](../.github/workflows/periodic-checks.yml) has
 only schedule and manual triggers; it never runs on a PR or each push.

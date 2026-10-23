@@ -3,6 +3,11 @@
 Task-result evidence lives here; maintained specifications and guides live in
 `docs/`. Follow the mandatory [completion-report convention](../docs/coding-conventions.md#task-completion-reports).
 
+The [verification workflow](../docs/verification-workflow.md) defines one narrow
+exception: a fully evidenced human review requiring no repository changes can
+close with a durable issue update instead of a report file/PR. Repository changes
+and all automated implementation/verification deliveries retain reports and PRs.
+
 - GitHub tasks: `issue-<number>/README.md`.
 - Tasks without an issue: `task-<id>/README.md`.
 - Place applicable screenshots/images and useful state/logs beside each report;

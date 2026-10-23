@@ -274,6 +274,7 @@ fn prepare_instances(
         // Inflate slightly for f32 transform and frustum-plane rounding.
         if !crate::instance_intersects_frustum(
             crate::GpuInstance {
+                orientation: [0., 0., 0., 1.],
                 relative_center: center,
                 half_extents: [side * 0.481; 3],
                 color: [1.0; 4],

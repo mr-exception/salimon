@@ -153,6 +153,35 @@ pub(crate) fn dispatch_session_key(
 ) {
     use crate::session::Command;
     if pressed
+        && session.view_mode == crate::session::ViewMode::Gameplay
+        && !session.is_paused()
+        && !session.archive_reader.open
+        && !session.crafting_ui.open
+        && !session.wheel.open
+    {
+        use crate::session::construction::BuildAction as B;
+        let action = match key {
+            PhysicalKey::Code(KeyCode::KeyC) => Some(B::Toggle),
+            PhysicalKey::Code(KeyCode::Escape) if session.building.active => Some(B::Toggle),
+            PhysicalKey::Code(KeyCode::KeyR) if session.building.active => Some(B::Rotate),
+            PhysicalKey::Code(code) if session.building.active => match code {
+                KeyCode::Digit1 => Some(B::Select(0)),
+                KeyCode::Digit2 => Some(B::Select(1)),
+                KeyCode::Digit3 => Some(B::Select(2)),
+                KeyCode::Digit4 => Some(B::Select(3)),
+                KeyCode::Digit5 => Some(B::Select(4)),
+                KeyCode::Digit6 => Some(B::Select(5)),
+                KeyCode::Digit7 => Some(B::Select(6)),
+                _ => None,
+            },
+            _ => None,
+        };
+        if let Some(action) = action {
+            session.command(Command::Build(action));
+            return;
+        }
+    }
+    if pressed
         && key == PhysicalKey::Code(KeyCode::Escape)
         && session.view_mode == crate::session::ViewMode::Gameplay
     {

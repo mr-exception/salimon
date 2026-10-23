@@ -208,3 +208,14 @@ bounds. Authored geometry/exports stay unchanged. World-X/Z UVs previously misse
 all normalized circuit/food/medical artwork and collapsed vertical faces. The
 loaded-geometry regression requires [0,1] coordinates and noncollapsed full-face
 triangles. Human appearance is #561, physical input/DPI #557 and budgets #563.
+
+## Oriented marker instances (#542)
+
+Generic `SceneInstance` cuboids now carry an explicitly validated finite unit
+quaternion. CPU rebasing still subtracts absolute positions in f64 first; the
+64-byte instance stream adds orientation after center/half-extents/color. The
+bootstrap shader rotates local scaled vertices before camera-relative projection.
+Frustum bounding spheres remain conservative at every rotation. Existing world
+markers use identity rotation. Runtime supplies twelve thin cuboids per blueprint
+volume, leaving its interior transparent; renderer owns neither reservation nor
+completion. No new pipeline or game-engine dependency is introduced.

@@ -104,7 +104,7 @@ The starting ship comes fully playable with:
 
 ## Delivery boundaries and existing implementation
 
-This is a design contract for future implementation. The #538 authored starter envelope now includes an aft cargo compartment and habitation fixtures; **operable internal door/bin mechanics (#539), habitation interactions (#540), construction, advanced hull damage, full offline construction and the Jump Drive are not shipped by that envelope**. The existing implemented ship uses authored anchors, cockpit, Core fueling, Fabricator, Archive, ramp, cabin gravity, physical fragments and mass accounting; existing files and native tests continue to describe that implementation until changed.
+This is a design contract for future implementation. The #538 authored starter envelope now includes an aft cargo compartment and habitation fixtures; **operable internal door/bin mechanics (#539), habitation interactions (#540), funded construction, advanced hull damage, full offline construction and the Jump Drive are not shipped by that envelope**. The existing implemented ship uses authored anchors, cockpit, Core fueling, Fabricator, Archive, ramp, cabin gravity, physical fragments and mass accounting; existing files and native tests continue to describe that implementation until changed.
 
 The approved first reference slice is **a completely usable starter Scout**, not a beauty-only Blender render: cockpit, working Core/Fabricator/Archive, dedicated physical cargo, interior door/ramp and integrated habitation, with reliable HUD/UI/lighting/sound feedback. GLB budgets remain necessary. Cloud wgpu routes establish automated integration; #561 owns human spatial/presentation review, #557 actual platform experiments and #563 hardware budgets. M1 access is not a routine completion prerequisite.
 
@@ -125,3 +125,15 @@ boundaries above remain future work.
 **Modular construction:** [#541](https://github.com/mr-exception/salimon/issues/541) 3D structure → [#542](https://github.com/mr-exception/salimon/issues/542) placeholders → [#543](https://github.com/mr-exception/salimon/issues/543) resource delivery/proportional refunds → [#544](https://github.com/mr-exception/salimon/issues/544) automatic progress → [#545](https://github.com/mr-exception/salimon/issues/545) multi-cell room/deck geometry → [#546](https://github.com/mr-exception/salimon/issues/546) takeoff interlocks; [#547](https://github.com/mr-exception/salimon/issues/547) module installation/upgrades; [#549](https://github.com/mr-exception/salimon/issues/549) damage/salvage; [#550](https://github.com/mr-exception/salimon/issues/550) offline/persistence. Independent exception: [#548](https://github.com/mr-exception/salimon/issues/548) instant Core upgrades. Cloud integration gate: [#551](https://github.com/mr-exception/salimon/issues/551).
 
 Related existing work includes asset modularization #95, Scout cloud verification #489/#502 and human presentation review #561, and universe offline timed systems #433. Do not create duplicate issues or imply these existing tickets are complete.
+
+## Blueprint reservations delivered (#542)
+
+The native C tool now selects, rotates, previews, places, inspects and cancels
+unfunded placeholders, including multi-cell modules. Ship-owned admission checks
+support, ownership, reach, actual player/cargo/fixture clearance, protected routes,
+job overlaps and consequence-based flight restrictions. Two-deck room groups are
+one reservation in the portable domain. Hollow previews/projects are not solid or
+usable structure. The JSON catalog's economics are proposed estimates, not owner
+approval; no materials, power or build progress are consumed here. #543–#550 retain
+intake/progress/physical completion/flight/offline ownership, and #551 the complete
+integrated construction route. See runtime/ship guides and schema-8 save contract.

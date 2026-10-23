@@ -303,6 +303,7 @@ fn fragment_tint(resource: ResourceId) -> [f32; 4] {
 pub(crate) fn fragment_visual(fragment: ResourceFragment) -> SceneInstance {
     let color = fragment_tint(fragment.material().resource());
     SceneInstance {
+        orientation: [0., 0., 0., 1.],
         center_meters: fragment.transform().position().meters(),
         half_extents_meters: [(salimon_world::resource_fragments::diameter_meters(fragment) * 0.5)
             as f32; 3],

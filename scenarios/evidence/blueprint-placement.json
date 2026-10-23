@@ -1,0 +1,516 @@
+{
+  "setup": {
+    "scenario": "landed-earth",
+    "seed": 542,
+    "step_ms": 16
+  },
+  "timeout_ms": 180000,
+  "steps": [
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 72
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 1203.6034185545395,
+        "dy": 309.75505083712864
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "build",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "build",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.active",
+        "equals": true
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.preview.valid",
+        "equals": true
+      }
+    },
+    {
+      "screenshot": "stool-preview-clear"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "rotate_blueprint",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "rotate_blueprint",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.preview.valid",
+        "equals": false
+      }
+    },
+    {
+      "screenshot": "rotated-stool-clearance-declined"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "rotate_blueprint",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "rotate_blueprint",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "rotate_blueprint",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "rotate_blueprint",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "rotate_blueprint",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "rotate_blueprint",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.preview.valid",
+        "equals": true
+      }
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "left",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "left",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.projects.0.id",
+        "equals": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.aimed_project",
+        "equals": 1
+      }
+    },
+    {
+      "screenshot": "stool-project-inspection"
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 20
+      }
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "left",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "left",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.projects.1",
+        "exists": false
+      }
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "right",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "right",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.projects",
+        "equals": []
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "build",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "build",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.active",
+        "equals": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": -1203.6034185545395,
+        "dy": -309.75505083712864
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 70
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "left",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 36
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "left",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 39
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 559.8686470508883,
+        "dy": 426.2168122716007
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "build",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "build",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "blueprint_7",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "blueprint_7",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.selected",
+        "equals": "utility-module"
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.preview.valid",
+        "equals": true
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.preview.cells.3",
+        "equals": {
+          "x": -1,
+          "y": 0,
+          "z": 2
+        }
+      }
+    },
+    {
+      "screenshot": "multi-cell-module-preview"
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "left",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "left",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.projects.0.id",
+        "equals": 2
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.projects.0.cells.3",
+        "equals": {
+          "x": -1,
+          "y": 0,
+          "z": 2
+        }
+      }
+    },
+    {
+      "screenshot": "multi-cell-project-inspection"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.aimed_project",
+        "equals": 2
+      }
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "right",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "right",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.projects",
+        "equals": []
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "blueprint_6",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "blueprint_6",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.selected",
+        "equals": "two-deck-room"
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.preview.valid",
+        "equals": false
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.preview.duration_seconds",
+        "equals": 300
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 20
+      }
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "left",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "mouse",
+        "button": "left",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.projects",
+        "equals": []
+      }
+    },
+    {
+      "screenshot": "room-occupied-placement-declined"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "build",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "build",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "construction.active",
+        "equals": false
+      }
+    },
+    {
+      "screenshot": "builder-closed-world"
+    }
+  ]
+}

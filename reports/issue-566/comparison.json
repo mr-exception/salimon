@@ -1,0 +1,828 @@
+{
+  "schema": 1,
+  "workload": "frozen-scout-reference-v1",
+  "windows_per_lane": 24,
+  "matched_source_and_context": true,
+  "repeat_hashes_exact": true,
+  "hardware_gpu_metrics": null,
+  "normal_play_fps": null,
+  "approval_granted": false,
+  "rows": [
+    {
+      "view": "aft-door",
+      "powered": false,
+      "lanes": {
+        "control": {
+          "frames": 809,
+          "metrics": {
+            "interval_ms": {
+              "samples": 809,
+              "median": 17.603,
+              "p95": 43.195,
+              "p99": 47.119,
+              "max": 250.0
+            },
+            "present_wall_ms": {
+              "samples": 809,
+              "median": 17.029,
+              "p95": 42.156,
+              "p99": 46.894,
+              "max": 289.392
+            },
+            "cpu_update_ms": {
+              "samples": 809,
+              "median": 0.06,
+              "p95": 0.107,
+              "p99": 0.199,
+              "max": 0.387
+            },
+            "cpu_render_ms": {
+              "samples": 809,
+              "median": 0.181,
+              "p95": 0.31,
+              "p99": 0.462,
+              "max": 19.221
+            },
+            "gpu_latest_ms": {
+              "samples": 809,
+              "median": 15.575217,
+              "p95": 40.642204,
+              "p99": 45.118803,
+              "max": 288.116837
+            },
+            "backlog_ms": {
+              "samples": 809,
+              "median": 0.0,
+              "p95": 0.0,
+              "p99": 0.0,
+              "max": 0.0
+            }
+          },
+          "image_sha256": "45a865e8e1b9e91ee6fd8f17f85d652a7bfbe0f9bfa5de390f1186208cf64344"
+        },
+        "current": {
+          "frames": 821,
+          "metrics": {
+            "interval_ms": {
+              "samples": 821,
+              "median": 17.723,
+              "p95": 42.046,
+              "p99": 45.461,
+              "max": 52.518
+            },
+            "present_wall_ms": {
+              "samples": 821,
+              "median": 17.16,
+              "p95": 41.559,
+              "p99": 45.127,
+              "max": 52.399
+            },
+            "cpu_update_ms": {
+              "samples": 821,
+              "median": 0.058,
+              "p95": 0.09,
+              "p99": 0.156,
+              "max": 0.43
+            },
+            "cpu_render_ms": {
+              "samples": 821,
+              "median": 0.18,
+              "p95": 0.317,
+              "p99": 0.469,
+              "max": 0.944
+            },
+            "gpu_latest_ms": {
+              "samples": 821,
+              "median": 15.672585,
+              "p95": 40.171074,
+              "p99": 43.304237,
+              "max": 48.851698
+            },
+            "backlog_ms": {
+              "samples": 821,
+              "median": 0.0,
+              "p95": 0.0,
+              "p99": 0.0,
+              "max": 0.0
+            }
+          },
+          "image_sha256": "e501e1eba1e0dad41eaa0cc92b3420e8c5eec95db89f154db2a5c608cfc92f8c"
+        }
+      }
+    },
+    {
+      "view": "aft-door",
+      "powered": true,
+      "lanes": {
+        "control": {
+          "frames": 791,
+          "metrics": {
+            "interval_ms": {
+              "samples": 791,
+              "median": 18.14,
+              "p95": 42.975,
+              "p99": 46.029,
+              "max": 72.343
+            },
+            "present_wall_ms": {
+              "samples": 791,
+              "median": 17.463,
+              "p95": 42.293,
+              "p99": 45.294,
+              "max": 71.879
+            },
+            "cpu_update_ms": {
+              "samples": 791,
+              "median": 0.054,
+              "p95": 0.081,
+              "p99": 0.144,
+              "max": 1.303
+            },
+            "cpu_render_ms": {
+              "samples": 791,
+              "median": 0.191,
+              "p95": 0.317,
+              "p99": 0.451,
+              "max": 1.014
+            },
+            "gpu_latest_ms": {
+              "samples": 791,
+              "median": 15.914737,
+              "p95": 40.510362,
+              "p99": 43.940029,
+              "max": 70.661274
+            },
+            "backlog_ms": {
+              "samples": 791,
+              "median": 4.0,
+              "p95": 4.0,
+              "p99": 4.0,
+              "max": 4.0
+            }
+          },
+          "image_sha256": "4493749d3da8ebfd29ae6e4ffefc550d81ee139e1971b908b72b0d46f190c71e"
+        },
+        "current": {
+          "frames": 808,
+          "metrics": {
+            "interval_ms": {
+              "samples": 808,
+              "median": 17.971,
+              "p95": 42.569,
+              "p99": 46.262,
+              "max": 52.838
+            },
+            "present_wall_ms": {
+              "samples": 808,
+              "median": 17.4865,
+              "p95": 42.005,
+              "p99": 45.266,
+              "max": 51.669
+            },
+            "cpu_update_ms": {
+              "samples": 808,
+              "median": 0.055,
+              "p95": 0.086,
+              "p99": 0.139,
+              "max": 0.718
+            },
+            "cpu_render_ms": {
+              "samples": 808,
+              "median": 0.2065,
+              "p95": 0.338,
+              "p99": 0.48,
+              "max": 1.919
+            },
+            "gpu_latest_ms": {
+              "samples": 808,
+              "median": 15.916467,
+              "p95": 39.972443,
+              "p99": 42.956241,
+              "max": 49.24585
+            },
+            "backlog_ms": {
+              "samples": 808,
+              "median": 4.0,
+              "p95": 4.0,
+              "p99": 4.0,
+              "max": 4.0
+            }
+          },
+          "image_sha256": "81662d5de1b7801cbf50a9f15e6d52c648c43c4fd14d057b190ffe93f890a8d9"
+        }
+      }
+    },
+    {
+      "view": "cockpit",
+      "powered": false,
+      "lanes": {
+        "control": {
+          "frames": 984,
+          "metrics": {
+            "interval_ms": {
+              "samples": 984,
+              "median": 14.831,
+              "p95": 36.319,
+              "p99": 41.135,
+              "max": 157.807
+            },
+            "present_wall_ms": {
+              "samples": 984,
+              "median": 14.281,
+              "p95": 35.128,
+              "p99": 40.042,
+              "max": 157.666
+            },
+            "cpu_update_ms": {
+              "samples": 984,
+              "median": 0.058,
+              "p95": 0.098,
+              "p99": 0.261,
+              "max": 1.754
+            },
+            "cpu_render_ms": {
+              "samples": 984,
+              "median": 0.203,
+              "p95": 0.386,
+              "p99": 0.677,
+              "max": 1.52
+            },
+            "gpu_latest_ms": {
+              "samples": 984,
+              "median": 12.588863499999999,
+              "p95": 33.409623,
+              "p99": 38.475393,
+              "max": 152.913719
+            },
+            "backlog_ms": {
+              "samples": 984,
+              "median": 0.0,
+              "p95": 0.0,
+              "p99": 0.0,
+              "max": 0.0
+            }
+          },
+          "image_sha256": "7ae421da0d0479f26145bd217f0e357f7512c13bfb332f94344a74b0ba7c46cd"
+        },
+        "current": {
+          "frames": 1015,
+          "metrics": {
+            "interval_ms": {
+              "samples": 1015,
+              "median": 14.57,
+              "p95": 36.207,
+              "p99": 39.414,
+              "max": 64.851
+            },
+            "present_wall_ms": {
+              "samples": 1015,
+              "median": 13.966,
+              "p95": 35.393,
+              "p99": 38.673,
+              "max": 64.725
+            },
+            "cpu_update_ms": {
+              "samples": 1015,
+              "median": 0.06,
+              "p95": 0.093,
+              "p99": 0.205,
+              "max": 0.983
+            },
+            "cpu_render_ms": {
+              "samples": 1015,
+              "median": 0.208,
+              "p95": 0.355,
+              "p99": 0.504,
+              "max": 1.09
+            },
+            "gpu_latest_ms": {
+              "samples": 1015,
+              "median": 12.552227,
+              "p95": 33.404246,
+              "p99": 37.14733,
+              "max": 62.651484
+            },
+            "backlog_ms": {
+              "samples": 1015,
+              "median": 0.0,
+              "p95": 0.0,
+              "p99": 0.0,
+              "max": 0.0
+            }
+          },
+          "image_sha256": "4a04c84ee17bf9cdfb766501b4ef1f8d908e1730690b84c28f527daeb1e9dcef"
+        }
+      }
+    },
+    {
+      "view": "cockpit",
+      "powered": true,
+      "lanes": {
+        "control": {
+          "frames": 987,
+          "metrics": {
+            "interval_ms": {
+              "samples": 987,
+              "median": 14.983,
+              "p95": 36.047,
+              "p99": 39.844,
+              "max": 72.189
+            },
+            "present_wall_ms": {
+              "samples": 987,
+              "median": 14.308,
+              "p95": 35.277,
+              "p99": 38.669,
+              "max": 71.149
+            },
+            "cpu_update_ms": {
+              "samples": 987,
+              "median": 0.054,
+              "p95": 0.102,
+              "p99": 0.26,
+              "max": 0.467
+            },
+            "cpu_render_ms": {
+              "samples": 987,
+              "median": 0.221,
+              "p95": 0.372,
+              "p99": 0.632,
+              "max": 2.603
+            },
+            "gpu_latest_ms": {
+              "samples": 987,
+              "median": 12.717184,
+              "p95": 33.250028,
+              "p99": 37.124671,
+              "max": 50.087298
+            },
+            "backlog_ms": {
+              "samples": 987,
+              "median": 4.0,
+              "p95": 4.0,
+              "p99": 4.0,
+              "max": 4.0
+            }
+          },
+          "image_sha256": "56f06bd60f9eec599ff3bbb374a71afd5fb013003f545d171eb570a7606b214a"
+        },
+        "current": {
+          "frames": 998,
+          "metrics": {
+            "interval_ms": {
+              "samples": 998,
+              "median": 14.943,
+              "p95": 35.488,
+              "p99": 40.494,
+              "max": 59.015
+            },
+            "present_wall_ms": {
+              "samples": 998,
+              "median": 14.4625,
+              "p95": 35.212,
+              "p99": 39.945,
+              "max": 58.894
+            },
+            "cpu_update_ms": {
+              "samples": 998,
+              "median": 0.053,
+              "p95": 0.079,
+              "p99": 0.143,
+              "max": 0.373
+            },
+            "cpu_render_ms": {
+              "samples": 998,
+              "median": 0.204,
+              "p95": 0.342,
+              "p99": 0.473,
+              "max": 1.146
+            },
+            "gpu_latest_ms": {
+              "samples": 998,
+              "median": 12.7766605,
+              "p95": 33.106854,
+              "p99": 37.388102,
+              "max": 55.764492
+            },
+            "backlog_ms": {
+              "samples": 998,
+              "median": 4.0,
+              "p95": 4.0,
+              "p99": 4.0,
+              "max": 4.0
+            }
+          },
+          "image_sha256": "68ddbc5ec29d94d50d0ba41607e275b26c2f0f5ba96844647114e2d88f928006"
+        }
+      }
+    },
+    {
+      "view": "core",
+      "powered": false,
+      "lanes": {
+        "control": {
+          "frames": 510,
+          "metrics": {
+            "interval_ms": {
+              "samples": 510,
+              "median": 29.2225,
+              "p95": 53.356,
+              "p99": 57.864,
+              "max": 63.651
+            },
+            "present_wall_ms": {
+              "samples": 510,
+              "median": 28.496000000000002,
+              "p95": 52.724,
+              "p99": 57.684,
+              "max": 62.27
+            },
+            "cpu_update_ms": {
+              "samples": 510,
+              "median": 0.058,
+              "p95": 0.096,
+              "p99": 0.158,
+              "max": 0.502
+            },
+            "cpu_render_ms": {
+              "samples": 510,
+              "median": 0.2025,
+              "p95": 0.328,
+              "p99": 0.544,
+              "max": 1.089
+            },
+            "gpu_latest_ms": {
+              "samples": 510,
+              "median": 26.9820275,
+              "p95": 51.008337,
+              "p99": 56.333371,
+              "max": 60.22169
+            },
+            "backlog_ms": {
+              "samples": 510,
+              "median": 0.0,
+              "p95": 0.0,
+              "p99": 0.0,
+              "max": 0.0
+            }
+          },
+          "image_sha256": "d90fbf60f0eb8499de206184734bf422068440c8ffeafe2ebab192c32039489c"
+        },
+        "current": {
+          "frames": 502,
+          "metrics": {
+            "interval_ms": {
+              "samples": 502,
+              "median": 30.078,
+              "p95": 55.153,
+              "p99": 72.235,
+              "max": 202.957
+            },
+            "present_wall_ms": {
+              "samples": 502,
+              "median": 29.2395,
+              "p95": 53.837,
+              "p99": 71.19,
+              "max": 201.224
+            },
+            "cpu_update_ms": {
+              "samples": 502,
+              "median": 0.06,
+              "p95": 0.108,
+              "p99": 0.231,
+              "max": 1.837
+            },
+            "cpu_render_ms": {
+              "samples": 502,
+              "median": 0.198,
+              "p95": 0.35,
+              "p99": 0.554,
+              "max": 1.3
+            },
+            "gpu_latest_ms": {
+              "samples": 502,
+              "median": 27.574295499999998,
+              "p95": 51.959072,
+              "p99": 58.459165,
+              "max": 192.386556
+            },
+            "backlog_ms": {
+              "samples": 502,
+              "median": 0.0,
+              "p95": 0.0,
+              "p99": 0.0,
+              "max": 0.0
+            }
+          },
+          "image_sha256": "b46b01aeb0857e2c3ef60f20fa74d25a5cf51d3c3418f5917534876873f22b71"
+        }
+      }
+    },
+    {
+      "view": "core",
+      "powered": true,
+      "lanes": {
+        "control": {
+          "frames": 527,
+          "metrics": {
+            "interval_ms": {
+              "samples": 527,
+              "median": 28.673,
+              "p95": 52.082,
+              "p99": 60.915,
+              "max": 98.387
+            },
+            "present_wall_ms": {
+              "samples": 527,
+              "median": 27.915,
+              "p95": 51.692,
+              "p99": 60.682,
+              "max": 98.269
+            },
+            "cpu_update_ms": {
+              "samples": 527,
+              "median": 0.054,
+              "p95": 0.085,
+              "p99": 0.129,
+              "max": 0.408
+            },
+            "cpu_render_ms": {
+              "samples": 527,
+              "median": 0.19,
+              "p95": 0.364,
+              "p99": 0.599,
+              "max": 1.488
+            },
+            "gpu_latest_ms": {
+              "samples": 527,
+              "median": 26.080545,
+              "p95": 49.612048,
+              "p99": 58.043956,
+              "max": 96.344078
+            },
+            "backlog_ms": {
+              "samples": 527,
+              "median": 4.0,
+              "p95": 4.0,
+              "p99": 4.0,
+              "max": 4.0
+            }
+          },
+          "image_sha256": "a7844107245b92f95c5f58fb482f35bb639588aaf7531146d8ac97a48e51a934"
+        },
+        "current": {
+          "frames": 551,
+          "metrics": {
+            "interval_ms": {
+              "samples": 551,
+              "median": 27.602,
+              "p95": 50.261,
+              "p99": 56.087,
+              "max": 59.167
+            },
+            "present_wall_ms": {
+              "samples": 551,
+              "median": 26.955,
+              "p95": 49.67,
+              "p99": 54.941,
+              "max": 59.038
+            },
+            "cpu_update_ms": {
+              "samples": 551,
+              "median": 0.053,
+              "p95": 0.081,
+              "p99": 0.151,
+              "max": 0.227
+            },
+            "cpu_render_ms": {
+              "samples": 551,
+              "median": 0.192,
+              "p95": 0.305,
+              "p99": 0.474,
+              "max": 2.238
+            },
+            "gpu_latest_ms": {
+              "samples": 551,
+              "median": 25.288284,
+              "p95": 48.015819,
+              "p99": 53.371935,
+              "max": 56.876407
+            },
+            "backlog_ms": {
+              "samples": 551,
+              "median": 4.0,
+              "p95": 4.0,
+              "p99": 4.0,
+              "max": 4.0
+            }
+          },
+          "image_sha256": "e7a13a0efa7ef4e58ba8901136569d82279f6a7a9fa77337def4d31f3880bd7a"
+        }
+      }
+    },
+    {
+      "view": "fabricator",
+      "powered": false,
+      "lanes": {
+        "control": {
+          "frames": 566,
+          "metrics": {
+            "interval_ms": {
+              "samples": 566,
+              "median": 25.616,
+              "p95": 51.852,
+              "p99": 55.198,
+              "max": 60.764
+            },
+            "present_wall_ms": {
+              "samples": 566,
+              "median": 25.054000000000002,
+              "p95": 51.197,
+              "p99": 54.729,
+              "max": 59.919
+            },
+            "cpu_update_ms": {
+              "samples": 566,
+              "median": 0.064,
+              "p95": 0.111,
+              "p99": 0.165,
+              "max": 7.763
+            },
+            "cpu_render_ms": {
+              "samples": 566,
+              "median": 0.1885,
+              "p95": 0.329,
+              "p99": 0.512,
+              "max": 30.529
+            },
+            "gpu_latest_ms": {
+              "samples": 566,
+              "median": 23.5086115,
+              "p95": 49.751869,
+              "p99": 52.805515,
+              "max": 55.553673
+            },
+            "backlog_ms": {
+              "samples": 566,
+              "median": 0.0,
+              "p95": 0.0,
+              "p99": 0.0,
+              "max": 0.0
+            }
+          },
+          "image_sha256": "3083baa154b8d398fd0b544e4e672ff7d9f58437c23a343b4214c8df3a4e2746"
+        },
+        "current": {
+          "frames": 563,
+          "metrics": {
+            "interval_ms": {
+              "samples": 563,
+              "median": 25.866,
+              "p95": 51.064,
+              "p99": 56.57,
+              "max": 60.688
+            },
+            "present_wall_ms": {
+              "samples": 563,
+              "median": 25.44,
+              "p95": 50.647,
+              "p99": 56.169,
+              "max": 60.468
+            },
+            "cpu_update_ms": {
+              "samples": 563,
+              "median": 0.059,
+              "p95": 0.099,
+              "p99": 0.166,
+              "max": 0.316
+            },
+            "cpu_render_ms": {
+              "samples": 563,
+              "median": 0.179,
+              "p95": 0.277,
+              "p99": 0.436,
+              "max": 0.473
+            },
+            "gpu_latest_ms": {
+              "samples": 563,
+              "median": 23.381673,
+              "p95": 48.405616,
+              "p99": 52.764725,
+              "max": 57.601578
+            },
+            "backlog_ms": {
+              "samples": 563,
+              "median": 0.0,
+              "p95": 0.0,
+              "p99": 0.0,
+              "max": 0.0
+            }
+          },
+          "image_sha256": "2f1af7ef7084bec149bf9136c48ce515f1ac7fd9f5d45b2b1ca3db64e4f33905"
+        }
+      }
+    },
+    {
+      "view": "fabricator",
+      "powered": true,
+      "lanes": {
+        "control": {
+          "frames": 532,
+          "metrics": {
+            "interval_ms": {
+              "samples": 532,
+              "median": 27.180999999999997,
+              "p95": 53.527,
+              "p99": 62.624,
+              "max": 72.999
+            },
+            "present_wall_ms": {
+              "samples": 532,
+              "median": 26.414,
+              "p95": 53.197,
+              "p99": 62.306,
+              "max": 72.902
+            },
+            "cpu_update_ms": {
+              "samples": 532,
+              "median": 0.054,
+              "p95": 0.088,
+              "p99": 0.235,
+              "max": 0.757
+            },
+            "cpu_render_ms": {
+              "samples": 532,
+              "median": 0.198,
+              "p95": 0.371,
+              "p99": 0.631,
+              "max": 1.372
+            },
+            "gpu_latest_ms": {
+              "samples": 532,
+              "median": 24.712958,
+              "p95": 51.031491,
+              "p99": 59.094661,
+              "max": 67.389132
+            },
+            "backlog_ms": {
+              "samples": 532,
+              "median": 4.0,
+              "p95": 4.0,
+              "p99": 4.0,
+              "max": 4.0
+            }
+          },
+          "image_sha256": "9fa089bbd2ccff84db7b99195e99519683dcace666f7166182e7dc7a09d17f36"
+        },
+        "current": {
+          "frames": 561,
+          "metrics": {
+            "interval_ms": {
+              "samples": 561,
+              "median": 26.229,
+              "p95": 51.6,
+              "p99": 57.705,
+              "max": 63.562
+            },
+            "present_wall_ms": {
+              "samples": 561,
+              "median": 25.644,
+              "p95": 51.23,
+              "p99": 57.25,
+              "max": 63.17
+            },
+            "cpu_update_ms": {
+              "samples": 561,
+              "median": 0.054,
+              "p95": 0.08,
+              "p99": 0.18,
+              "max": 0.273
+            },
+            "cpu_render_ms": {
+              "samples": 561,
+              "median": 0.187,
+              "p95": 0.309,
+              "p99": 0.497,
+              "max": 2.132
+            },
+            "gpu_latest_ms": {
+              "samples": 561,
+              "median": 23.876213,
+              "p95": 49.372257,
+              "p99": 55.80239,
+              "max": 61.505651
+            },
+            "backlog_ms": {
+              "samples": 561,
+              "median": 4.0,
+              "p95": 4.0,
+              "p99": 4.0,
+              "max": 4.0
+            }
+          },
+          "image_sha256": "d80261b849f3dd59afb4bb01f088e42e1ec15d4844deb82b986ebc01ad6a282d"
+        }
+      }
+    }
+  ]
+}

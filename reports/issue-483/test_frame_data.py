@@ -34,4 +34,27 @@ class Admission(unittest.TestCase):
             elif change=='minimized':after['window']['minimized']=True
             else:after['native_input_isolated']=False
             with self.subTest(change=change), self.assertRaises(AssertionError):validate_window(row)
+
+class CloudAdmission(unittest.TestCase):
+    def cloud(self):
+        row=window()
+        for state in [row['before'],row['after']]:
+            state['visual_context'].update(backend='Vulkan',adapter='llvmpipe (LLVM 19.1.7, 256 bits)',viewport_pixels=[1280,800],scale_factor=1)
+        return row
+    def test_cloud_requires_named_profile_and_retains_native_default(self):
+        row=self.cloud()
+        validate_window(row,'cloud-llvmpipe-1280')
+        with self.assertRaises(AssertionError):validate_window(row)
+        with self.assertRaises(AssertionError):validate_window(row,'unknown')
+    def test_cloud_rejects_focus_geometry_adapter_and_context_changes(self):
+        for change in ['focus','viewport','adapter','context','isolation','ticks']:
+            row=self.cloud()
+            if change=='focus':row['samples'][50]['focused']=False
+            elif change=='viewport':row['before']['visual_context']['viewport_pixels']=[1920,1080]
+            elif change=='adapter':row['before']['visual_context']['adapter']='unknown'
+            elif change=='context':row['after']['visual_context']['driver']='changed'
+            elif change=='isolation':row['after']['native_input_isolated']=False
+            else:row['samples'][50]['ticks']=1
+            with self.subTest(change=change),self.assertRaises(AssertionError):validate_window(row,'cloud-llvmpipe-1280')
+
 if __name__ == '__main__':unittest.main()

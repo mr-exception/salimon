@@ -198,3 +198,14 @@ invariants were checked; the only production change inherited from #567 is
 opt-in observational frame logging, already documented there. No gameplay,
 shader, physics or asset contract changes. Offline links/paths and base-impact
 checks were run; this report is evidence, not a new numerical or art contract.
+
+## Matched software-Vulkan follow-up (#566)
+
+[#566](../issue-566/README.md) adds serial matched cloud lighting measurements
+under the owner's revised policy. The explicit cloud profile admits only the
+recorded Xvfb1280×800/scale1/Vulkan-llvmpipe context, with exact PID/focus/map-state
+and frozen-frame/source checks. It complements the strict default M1 profile;
+it does not admit the two failed locked-desktop M1 attempts above. All historical
+originals and zero accepted M1 timing windows remain unchanged. The old
+software-exclusion wording described the former M1 lane; cloud software samples
+are separately labelled and establish no hardware or normal-play budget.

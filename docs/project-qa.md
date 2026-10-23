@@ -14,7 +14,7 @@
   link the question to its new follow-up issue under the
   [completion workflow](coding-conventions.md#issue-completion-and-follow-up).
 ## Open questions
-### What budget should complete legacy active 500-piece M1 signoff (#479)?
+### What budget should complete legacy active 500-piece M1 signoff (#563)?
 
 The [2026-10-21 native evidence](../reports/issue-255/2026-10-21/README.md)
 retains 150 completed moving intervals across ten fresh drops: frame p95
@@ -29,8 +29,9 @@ Owner review must decide whether the proposed active/launch-period limits and
 remaining historical evidence justify acceptance or whether more profiling is
 required. Fresh exact historical binary pairs pass the 20% relative checks, but
 the six prior whole-window and three prior same-state CPU-render failures remain
-recorded failures without an attributed cause. [#479](https://github.com/mr-exception/salimon/issues/479)
-owns this decision and any required attribution after #255 delivery. Keep this
+recorded failures without an attributed cause. [#563](https://github.com/mr-exception/salimon/issues/563)
+owns this decision and any required attribution after the
+[#479 reverified decision package](../reports/issue-479/README.md). Keep this
 question open until explicit review resolves it; source closure grants no signoff.
 Current-cap/mixed-sphere overload is independently tracked in #455.
 

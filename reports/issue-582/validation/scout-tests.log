@@ -1,0 +1,19 @@
+   Compiling salimon-client v0.1.0 (/Users/mrexception/Documents/Codex/2026-10-24/now-go-into-open-issues-again/work/salimon/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.91s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-dadacd8134c68b86)
+
+running 11 tests
+test scout_audio::tests::spatial_channels_rotate_with_listener_and_attenuate_with_distance ... ok
+test scout_audio::tests::event_queue_and_mix_are_bounded_with_alert_priority ... ok
+test scout_audio::verification::cloud_audio_evidence_485 ... ignored, exports production-observation WAVs and matched synthesis diagnostics
+test scout_audio::tests::silence_and_resume_clear_queued_events_and_run_changes_do_not_replay ... ok
+test scout_audio::tests::footsteps_follow_local_distance_and_reject_drift_and_teleports ... ok
+test scout_audio::tests::maps_machinery_transitions_without_repeating_alerts ... ok
+test scout_audio::tests::production_core_recovery_and_pause_map_without_authority_changes ... ok
+test scout_audio::verification::terminal_restart_restore_and_focus_gates_discard_transients ... ok
+test scout_audio::tests::pcm_is_bounded_stereo_and_mute_has_no_samples ... ok
+test scout_audio::tests::narration_free_pcm_synthesis_has_fixed_memory_and_measured_cost ... ok
+test scout_audio::verification::production_loop_routes_audio_without_changing_saved_authority ... ok
+
+test result: ok. 10 passed; 0 failed; 1 ignored; 0 measured; 371 filtered out; finished in 0.33s
+

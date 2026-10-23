@@ -414,14 +414,11 @@ vignette; S returns and Enter/Escape resumes. Version-1 preferences live in
 survive restart/new runs. Save errors stay visible; corrupt/unknown settings use
 defaults with a warning. Settings do not enter run checkpoints.
 
-`condition_feedback/audio.rs` synthesizes original quiet one-second PCM WAV cues
-(22050 Hz mono, 16-bit, peak <=1500) beside the settings file. No third-party
-samples/licenses or Cargo/native audio link dependency. Playback uses macOS
-`afplay`, Windows PowerShell SoundPlayer, or optional Linux `paplay`/`aplay`. A
-bounded queue and one child process are polled without blocking the frame; menu
-suppression kills/reaps playback. Missing/failed players log an explicit warning;
-missing players also show an accessibility warning. Actual OS playback and sensory
-quality/performance require reference-device verification (#376).
+Continuous audio (#582) is composed by `scout_audio.rs` and the shared
+`native_audio.rs` CPAL output with fixed-memory `native_audio/mix.rs`.
+Survival thresholds remain in `condition_feedback.rs`; settings keep their owner.
+See the [canonical soundscape contract](../../docs/scout-presentation.md#soundscape-boundary-465)
+for voice limits, lifecycle, device recovery, telemetry and validation.
 
 Current-sphere benchmark/E2E profiles (#313) share the CPU workload's production
 extraction, counts, material/mass cycle and supported layered cells. These are
@@ -434,13 +431,11 @@ input/focus must not rotate the scripted camera, clear protocol holds or discard
 fixed-step backlog. Native OS-input probes keep normal delivery/reset semantics.
 Isolated scenario evidence cannot establish native input or lifecycle acceptance.
 
-Scout audio (#465) observes snapshots only. Four queued transients/eight mixed
-voices and one scene playback child are hard bounds; existing survival audio
-has its own one-child bound and uses the same platform spawn seam. Master mute
-suppresses both. Focus/pause/occlusion/suspend/terminal/time/run discontinuities
-clear scene events; E2E/benchmarks never spawn scene players. Surface/EVA has no
-transmitted ship sound in the absence of an atmosphere model. Settings stay
-outside run saves, and failed playback never changes gameplay.
+Continuous audio (#582) is composed by `scout_audio.rs` and the shared
+`native_audio.rs` CPAL output with fixed-memory `native_audio/mix.rs`.
+Survival thresholds remain in `condition_feedback.rs`; settings keep their owner.
+See the [canonical soundscape contract](../../docs/scout-presentation.md#soundscape-boundary-465)
+for voice limits, lifecycle, device recovery, telemetry and validation.
 
 Scout machinery feedback (#464) is stateless and observational. Real power,
 funded work/progress and ramped yaw gate the cues; retained throttle alone cannot
@@ -587,3 +582,8 @@ actual fixture draw/memory/upload counters; `window_state` reports true focused/
 occluded flags. Schema 10 is unchanged. Future room/module owners supply their
 real parent IDs and local poses through this boundary. See
 [architecture and budgets](../../docs/modular-interior-fixtures.md).
+
+
+Continuous audio verification: `native_audio/mix/tests.rs` covers callback-size
+invariance and reset/mute/stale control; original 60 Hz stereo fixtures and real
+device telemetry are opt-in. Linux builds require ALSA development headers.

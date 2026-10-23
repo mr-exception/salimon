@@ -58,54 +58,63 @@ cloud/reference fixture passes do not grant that acceptance.
 
 ## Soundscape boundary (#465)
 
-Runtime `scout_audio.rs` observes immutable session/ship/character snapshots. Its
-private typed cues cover Core hum/conversion, funded Fabricator work, selected
-powered thrust, moving ramp, grounded interior footsteps, bus loss/restoration
-and low-power crossing. E02 may consume the same authoritative observations;
-there is no second machinery controller, timer or gameplay event bus. Existing
-#383 heart/hunger/breath cues keep their content and threshold owner, sharing
-only `native_audio.rs` OS playback and the master mute preference.
+`scout_audio.rs` observes immutable session/ship/character snapshots. Core,
+conversion, funded Fabricator work, selected powered thrust, moving ramp,
+grounded interior footsteps, power transitions and low-energy crossing retain
+existing owners. Quiet ventilation is present only in a powered cabin. Idle
+Core gain is restrained; proximity/thrust change actual operating sources.
+Surface/Space/NearbyBody have no invented transmitted machinery, wind, music or
+chatter. DoorwayBlend retains cabin admission. A blackout retires loops and
+leaves only its finite transition. No audio state enters gameplay or run saves.
 
-The listener and machinery anchors are ship-local metres; left/right pan follows
-look direction. A softened inverse-square curve `1/(1+d*d/9)` and 20-metre cutoff
-bound sources, with equal-power stereo panning. There is no HRTF or obstruction
-solver. Interior footfalls require actual horizontal distance, walking input,
-power/artificial gravity and floor-level eye height. Ship translation, airborne
-drift and teleport/reset do not imply footsteps. No exterior wind/atmosphere,
-transmitted machinery in Surface/Space/NearbyBody, music, voices or chatter is
-invented. DoorwayBlend retains cabin sound until the location leaves the ship.
-A powerless cabin becomes quiet after its finite blackout cue; idle power retains
-only restrained Core hum. Existing prompts/screens remain visual alternatives.
+Listener/source positions remain ship-local metres, with look-relative panning,
+`1/(1+d*d/9)` attenuation, 20 m cutoff and equal-power stereo. No HRTF, room
+occlusion or atmosphere solver is implied. Footsteps still require real local
+travel, walking input, artificial gravity and floor-level eye height. Survival
+threshold/hysteresis/content remain `condition_feedback.rs`; its one-shot cues
+join the same output rather than a second OS player.
 
-Pause -> S settings adds M master mute, B ship audio and G ship volume, cycling
-0/20/40/60/80/100 percent. A still controls only survival condition cues. Version-1
-settings gain defaulted fields (master mute false, ship audio true, volume 60),
-preserving older preferences; invalid volume and unknown versions fail. These
-preferences live outside run saves and survive new runs/restarts. Pause, focus,
-occlusion, suspend, terminal, tour and run/time reset discard pending scene cues;
-E2E and benchmarks never start scene playback. Missing or failed playback is
-explicitly reported and stops retrying until a lifecycle/settings suppression.
+`native_audio.rs` uses maintained [CPAL 0.18.2](https://docs.rs/cpal/0.18.2/cpal/)
+(CoreAudio, WASAPI, ALSA defaults) for one continuous default-device stream.
+`native_audio/mix.rs` owns deterministic original sample synthesis. Six loop
+slots, four ship transient slots and three survival slots bound the mix to 13
+voices, with no pending audio queue. Repeated event counters coalesce to the
+latest event; alerts and footsteps retain the existing four-event input bound.
+Gain/pan converge over 10 ms without chunk-boundary fades. Low-pass procedural
+noise and smooth saturation preserve headroom; no downloaded media is used.
+Original survival timbre/envelope/relative level remain observational.
 
-Original deterministic 22050-Hz stereo 16-bit synthesis uses 0.5-second chunks,
-short edge fades and <=8 simultaneous voices. Four queued transients are bounded;
-power alerts take priority over footsteps. One 44,144-byte WAV is rewritten only
-after its single playback child exits, uses a PID-specific filename beside the
-settings file, and is removed on normal presenter drop. One scene child plus the
-existing one condition child are the maximum; no sample library or Cargo
-link/dependency is introduced. Absolute sample peak is bounded to 30,000.
-The scene's scratch PCM is ~43 KiB; event/mix storage is bounded independently
-of elapsed play time. There is no persistent gameplay audio history.
+The producer publishes a fixed 240-byte atomic mailbox; the callback attempts at
+most three coherent reads and retains its previous observation on contention.
+Callback state is 1,080 bytes and neither allocates, locks, writes files, logs nor
+calls back into CPAL. Sample phase persists across arbitrary buffer sizes. A
+250 ms producer watchdog fades stalled input to silence and consumes stale event
+counters. Pause/focus/occlusion/terminal/menu/reset/master mute retire events and
+fade to silence; unmuting never replays discarded cues. Cabin and survival gates
+remain independent. The silent stream stays resident until device replacement
+or application drop, avoiding repeated startup and delayed queued audio.
 
-This minimal OS boundary reuses afplay, Windows SoundPlayer or optional Linux
-paplay/aplay. It can have audible chunk gaps and up to a chunk of response latency;
-OS process startup/file IO are not realtime streaming. The [#485 cloud report](../reports/issue-485/README.md) retains production-loop
-PCM examples, exterior silence assertions, real-child lifecycle/failure checks
-and matched enabled/muted synthesis plus substitute-process/file diagnostics.
-Human listening, headroom/harshness and audible continuity review belong to #561;
-physical OS/audio-device experiments #557 and hardware costs #563. A continuous
-backend decision must follow actual listening/latency evidence. These diagnostics
-are not audio-device, whole-frame or M1 budget approval. See the
-[audio report](../reports/issue-465/README.md) for actual tests and limits.
+A default-device ID poll runs on the main thread at most once per second. A
+changed/failed/missing device drops the old stream, clears its mailbox and
+reopens from current source observations. Errors are explicit and retry no more
+than once per second; the callback only sets an atomic error flag. There is no
+subprocess, WAV rewrite, persistent PCM history or settings-path dependency.
+Supported default PCM formats convert at the boundary; mono downmixes, additional
+channels are silent. Linux build environments need `libasound2-dev`; CI recipes
+install it. Actual backend/frames/buffer/CPU-overrun telemetry is exposed by
+native inspection. Default hardware buffering is observed, not an invented
+universal latency guarantee.
+
+Existing master mute, ship-audio toggle, ship volume and survival-audio toggle
+retain the same separately persisted settings schema and visual alternatives.
+E2E/benchmarks suppress device playback. Pure tests verify chunk invariance,
+bounded onset, headroom, stale/reset/mute admission, exterior silence, real
+production mappings and unchanged saved authority. Opt-in original stereo WAVs
+and callback telemetry are retained in the [#582 report](../reports/issue-582/README.md).
+Historical #465/#485 chunk/process evidence remains historical; those subprocess
+lifecycle tests are replaced by callback lifecycle tests. Human listening #561,
+physical output/device switching #557 and whole-frame hardware budgets #563
+remain distinct from deterministic mixer evidence.
 
 ## Machinery feedback boundary (#464)
 

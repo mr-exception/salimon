@@ -225,95 +225,6 @@ fn terminal_restart_restore_and_focus_gates_discard_transients() {
     );
 }
 
-#[cfg(unix)]
-#[test]
-fn real_playback_child_failure_timeout_suppression_and_drop_are_bounded() {
-    use std::process::{Command as Process, Stdio};
-    let root = std::env::temp_dir().join(format!("salimon-485-child-{}", std::process::id()));
-    std::fs::create_dir_all(&root).unwrap();
-    let path = root.join("settings.json");
-    let s = Settings::default();
-    let session = GameplaySession::new_run();
-    let o = Observation::capture(&session, true);
-    let mut p = Presenter::default();
-    // Missing player and disk errors fail once, then suppression permits retry.
-    p.update_with_player(o, s, Some(&path), |_| {
-        Err(std::io::ErrorKind::NotFound.into())
-    });
-    assert!(p.unavailable());
-    p.update_with_player(o, s, Some(&path), |_| panic!("failed player retried"));
-    let mut muted = s;
-    muted.master_mute = true;
-    p.update_with_player(o, muted, Some(&path), |_| panic!("muted spawn"));
-    assert!(!p.unavailable());
-    let invalid_parent = root.join("file-as-parent");
-    std::fs::write(&invalid_parent, b"not a directory").unwrap();
-    p.update_with_player(o, s, Some(&invalid_parent.join("settings.json")), |_| {
-        panic!("invalid disk path reached player")
-    });
-    assert!(p.unavailable());
-    p.stop();
-    let spawn = |_: &Path| {
-        Process::new("sh")
-            .args(["-c", "exec sleep 30"])
-            .stdin(Stdio::null())
-            .spawn()
-    };
-    p.update_with_player(o, s, Some(&path), spawn);
-    let pid = p.child.as_ref().unwrap().0.id();
-    p.update_with_player(o, s, Some(&path), |_| panic!("overlapping child"));
-    p.child.as_mut().unwrap().1 = Instant::now() - Duration::from_secs(4);
-    p.update_with_player(o, s, Some(&path), |_| {
-        panic!("timeout must stop before retry")
-    });
-    assert!(p.unavailable() && p.child.is_none() && p.mixer.pending.is_empty());
-    assert!(
-        !Process::new("kill")
-            .args(["-0", &pid.to_string()])
-            .stderr(Stdio::null())
-            .status()
-            .unwrap()
-            .success()
-    );
-    p.stop();
-    p.update_with_player(o, s, Some(&path), |_| {
-        Process::new("sh").args(["-c", "exit 7"]).spawn()
-    });
-    assert!(!p.child.as_mut().unwrap().0.wait().unwrap().success());
-    p.update_with_player(o, s, Some(&path), |_| panic!("failed exit must stop"));
-    assert!(p.unavailable() && p.child.is_none());
-    p.stop();
-    p.update_with_player(o, s, Some(&path), spawn);
-    let pid = p.child.as_ref().unwrap().0.id();
-    let file = p.file.clone().unwrap();
-    assert!(file.exists());
-    let mut inactive = o;
-    inactive.active = false;
-    p.update_with_player(inactive, s, Some(&path), |_| panic!("inactive spawn"));
-    assert!(p.child.is_none() && p.mixer.pending.is_empty());
-    assert!(
-        !Process::new("kill")
-            .args(["-0", &pid.to_string()])
-            .stderr(Stdio::null())
-            .status()
-            .unwrap()
-            .success()
-    );
-    p.update_with_player(o, s, Some(&path), spawn);
-    let pid = p.child.as_ref().unwrap().0.id();
-    drop(p);
-    assert!(!file.exists());
-    assert!(
-        !Process::new("kill")
-            .args(["-0", &pid.to_string()])
-            .stderr(Stdio::null())
-            .status()
-            .unwrap()
-            .success()
-    );
-    std::fs::remove_dir_all(root).unwrap();
-}
-
 #[test]
 #[ignore = "exports production-observation WAVs and matched synthesis diagnostics"]
 fn cloud_audio_evidence_485() {
@@ -383,40 +294,20 @@ fn cloud_audio_evidence_485() {
             timings.push(json!({"trial":trial,"enabled":enabled,"updates":32,"elapsed_us":start.elapsed().as_micros()}));
         }
     }
-    #[cfg(unix)]
-    {
-        // Real process/file overhead with an immediate-success substitute player;
-        // no audio device or device latency is measured.
-        let path = root.join("boundary/settings.json");
-        for trial in 0..5 {
-            for enabled in if trial % 2 == 0 {
-                [false, true]
-            } else {
-                [true, false]
-            } {
-                let mut p = Presenter::default();
-                let start = Instant::now();
-                let mut children = 0;
-                for _ in 0..8 {
-                    let settings = Settings {
-                        master_mute: !enabled,
-                        ..Default::default()
-                    };
-                    p.update_with_player(
-                        Observation::capture(&s, true),
-                        settings,
-                        Some(&path),
-                        |_| std::process::Command::new("true").spawn(),
-                    );
-                    if let Some((child, _)) = &mut p.child {
-                        assert!(child.wait().unwrap().success());
-                        children += 1;
-                    }
-                }
-                timings.push(json!({"scope":"real subprocess/file boundary, substitute true player; no audio device","trial":trial,"enabled":enabled,"updates":8,"children":children,"elapsed_us":start.elapsed().as_micros()}));
-            }
-        }
-        let _ = std::fs::remove_dir(root.join("boundary"));
-    }
     std::fs::write(root.join("manifest.json"),serde_json::to_vec_pretty(&json!({"scope":"production session observations plus labeled channel controls; PCM exports, not a device recording","initialization":"seeded e2e/new-run fixtures; explicit power-loss fixture, production commands and controller adapters; not physical travel","samples":manifest,"matched_synthesis":timings,"hardware_audio":"unavailable; listening/OS latency/continuous output not verified"})).unwrap()).unwrap();
+}
+
+#[test]
+#[ignore = "exports current continuous PCM driven by actual production scenario observations"]
+fn continuous_production_audio_582() {
+    let root = PathBuf::from(std::env::var_os("SALIMON_AUDIO_EVIDENCE").unwrap());
+    std::fs::create_dir_all(&root).unwrap();
+    for (name, voices) in samples() {
+        let control = super::controls(voices, 0, true, None, Settings::default());
+        std::fs::write(
+            root.join(format!("{name}.wav")),
+            crate::native_audio::fixture_wav(control),
+        )
+        .unwrap();
+    }
 }

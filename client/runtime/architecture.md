@@ -1188,14 +1188,11 @@ S returns and Enter/Escape resumes. Version-1 preferences live in
 survive restart/new runs. Save errors stay visible; corrupt/unknown settings use
 defaults with a warning. Settings do not enter run checkpoints.
 
-`condition_feedback/audio.rs` synthesizes original quiet one-second PCM WAV cues
-(22050 Hz mono, 16-bit, peak <=1500) beside the settings file. No third-party
-samples/licenses or Cargo/native audio link dependency. The shared `native_audio.rs` playback seam uses macOS
-`afplay`, Windows PowerShell SoundPlayer, or optional Linux `paplay`/`aplay`. A
-bounded queue and one child process are polled without blocking the frame; menu
-suppression kills/reaps playback. Missing/failed players log an explicit warning;
-missing players also show an accessibility warning. Actual OS playback and sensory
-quality/performance require reference-device verification (#376).
+Continuous audio (#582) is composed by `scout_audio.rs` and the shared
+`native_audio.rs` CPAL output with fixed-memory `native_audio/mix.rs`.
+Survival thresholds remain in `condition_feedback.rs`; settings keep their owner.
+See the [canonical soundscape contract](../../docs/scout-presentation.md#soundscape-boundary-465)
+for voice limits, lifecycle, device recovery, telemetry and validation.
 
 ## Advanced food composition (#378)
 
@@ -1229,19 +1226,11 @@ feeding/restoration to compare blackout/powered views. See
 
 ## Scout audio composition (#465)
 
-`scout_audio.rs` owns snapshot-to-cue mapping, local listener/attenuation, bounded
-transients and native scene playback; `scout_audio/synth.rs` owns original stereo
-PCM. `native_audio.rs` is the existing survival/scene shared OS process seam.
-`condition_feedback/settings.rs` remains the sole preference store. Audio does
-not enter session commands, domain progression or run checkpoints. See the
-[canonical mix/budgets/validation contract](../../docs/scout-presentation.md#soundscape-boundary-465).
-The #485 production-observation suite and opt-in WAV/overhead export live in
-`src/scout_audio/verification.rs`. The presenter delegates only process creation
-to a supplied function so real-child timeout, exit, suppression and file cleanup
-contracts run without changing global PATH or requiring an audio device. Normal
-play still uses the shared native OS player. Listening/continuity remains #561;
-physical playback/backend checks #557 and hardware budgets #563. See the
-[#485 report](../../reports/issue-485/README.md) for evidence and exact limits.
+Continuous audio (#582) is composed by `scout_audio.rs` and the shared
+`native_audio.rs` CPAL output with fixed-memory `native_audio/mix.rs`.
+Survival thresholds remain in `condition_feedback.rs`; settings keep their owner.
+See the [canonical soundscape contract](../../docs/scout-presentation.md#soundscape-boundary-465)
+for voice limits, lifecycle, device recovery, telemetry and validation.
 
 ## Scout machinery composition (#464)
 
@@ -1500,3 +1489,8 @@ actual fixture draw/memory/upload counters; `window_state` reports true focused/
 occluded flags. Schema 10 is unchanged. Future room/module owners supply their
 real parent IDs and local poses through this boundary. See
 [architecture and budgets](../../docs/modular-interior-fixtures.md).
+
+
+Continuous audio verification: `native_audio/mix/tests.rs` covers callback-size
+invariance and reset/mute/stale control; original 60 Hz stereo fixtures and real
+device telemetry are opt-in. Linux builds require ALSA development headers.

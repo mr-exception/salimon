@@ -223,7 +223,7 @@ and eight power/view checkpoints live under `scenarios/visual/scout-*`; offline
 saving source assets. See [capture/limits](scout-presentation.md).
 
 Scout spatial soundscape (#465): runtime `scout_audio.rs`, `scout_audio/synth.rs`
-and `scout_audio/tests.rs`; shared OS playback `native_audio.rs`; persisted mix
+and `scout_audio/tests.rs`; shared continuous CPAL output `native_audio.rs` / `native_audio/mix.rs`; persisted mix
 controls remain in existing `condition_feedback/settings.rs`. See
 [soundscape contract/budgets](scout-presentation.md#soundscape-boundary-465).
 Do not duplicate #383 survival cues or simulate machinery in the audio adapter.

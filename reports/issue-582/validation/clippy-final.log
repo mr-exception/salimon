@@ -1,0 +1,13 @@
+    Checking salimon-client v0.1.0 (/Users/mrexception/Documents/Codex/2026-10-24/now-go-into-open-issues-again/work/salimon/client/runtime)
+error: unused import: `path::Path`
+  --> client/runtime/src/scout_audio.rs:13:34
+   |
+13 | use std::{collections::VecDeque, path::Path, time::Duration};
+   |                                  ^^^^^^^^^^
+   |
+   = note: `-D unused-imports` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(unused_imports)]`
+
+error: could not compile `salimon-client` (bin "salimon-client") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `salimon-client` (bin "salimon-client" test) due to 1 previous error

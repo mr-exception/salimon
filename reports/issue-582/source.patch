@@ -1,5 +1,5 @@
 diff --git a/.github/workflows/native-build.yml b/.github/workflows/native-build.yml
-index 25f52ce1..a1f07388 100644
+index 25f52ce..a1f0738 100644
 --- a/.github/workflows/native-build.yml
 +++ b/.github/workflows/native-build.yml
 @@ -48,7 +48,7 @@ jobs:
@@ -12,7 +12,7 @@ index 25f52ce1..a1f07388 100644
          run: cargo build --workspace --locked
        - name: Portable workspace unit and session E2E contracts
 diff --git a/.github/workflows/periodic-checks.yml b/.github/workflows/periodic-checks.yml
-index a1b57cd9..19949e96 100644
+index a1b57cd..19949e9 100644
 --- a/.github/workflows/periodic-checks.yml
 +++ b/.github/workflows/periodic-checks.yml
 @@ -82,7 +82,7 @@ jobs:
@@ -34,7 +34,7 @@ index a1b57cd9..19949e96 100644
          id: build
          run: cargo build --release --workspace --locked
 diff --git a/Cargo.lock b/Cargo.lock
-index 2bf42b37..c0499c05 100644
+index 2bf42b3..c0499c0 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
 @@ -52,6 +52,28 @@ version = "0.2.21"
@@ -252,7 +252,7 @@ index 2bf42b37..c0499c05 100644
   "log",
   "pollster",
 diff --git a/client/runtime/Cargo.toml b/client/runtime/Cargo.toml
-index aa24a101..125a5253 100644
+index aa24a10..125a525 100644
 --- a/client/runtime/Cargo.toml
 +++ b/client/runtime/Cargo.toml
 @@ -26,3 +26,4 @@ salimon-renderer = { path = "../renderer" }
@@ -261,7 +261,7 @@ index aa24a101..125a5253 100644
  winit.workspace = true
 +cpal = "0.18.2"
 diff --git a/client/runtime/README.ai.md b/client/runtime/README.ai.md
-index baa71131..b0130ad6 100644
+index baa7113..b0130ad 100644
 --- a/client/runtime/README.ai.md
 +++ b/client/runtime/README.ai.md
 @@ -328,3 +328,8 @@ actual fixture draw/memory/upload counters; `window_state` reports true focused/
@@ -274,7 +274,7 @@ index baa71131..b0130ad6 100644
 +invariance and reset/mute/stale control; original 60 Hz stereo fixtures and real
 +device telemetry are opt-in. Linux builds require ALSA development headers.
 diff --git a/client/runtime/architecture.md b/client/runtime/architecture.md
-index 1cb6ac24..b6f38f91 100644
+index 1cb6ac2..b6f38f9 100644
 --- a/client/runtime/architecture.md
 +++ b/client/runtime/architecture.md
 @@ -1188,14 +1188,11 @@ S returns and Enter/Escape resumes. Version-1 preferences live in
@@ -332,7 +332,7 @@ index 1cb6ac24..b6f38f91 100644
 +invariance and reset/mute/stale control; original 60 Hz stereo fixtures and real
 +device telemetry are opt-in. Linux builds require ALSA development headers.
 diff --git a/client/runtime/invariants.md b/client/runtime/invariants.md
-index 33c5b2eb..74319d33 100644
+index 33c5b2e..74319d3 100644
 --- a/client/runtime/invariants.md
 +++ b/client/runtime/invariants.md
 @@ -414,14 +414,11 @@ vignette; S returns and Enter/Escape resumes. Version-1 preferences live in
@@ -384,7 +384,7 @@ index 33c5b2eb..74319d33 100644
 +invariance and reset/mute/stale control; original 60 Hz stereo fixtures and real
 +device telemetry are opt-in. Linux builds require ALSA development headers.
 diff --git a/client/runtime/src/app.rs b/client/runtime/src/app.rs
-index 30bfa7d8..29d172b9 100644
+index 30bfa7d..29d172b 100644
 --- a/client/runtime/src/app.rs
 +++ b/client/runtime/src/app.rs
 @@ -213,6 +213,9 @@ impl Default for ClientApplication {
@@ -417,7 +417,7 @@ index 30bfa7d8..29d172b9 100644
          if let Some(checkpoints) = &mut self.checkpoints {
              checkpoints.poll(&self.session);
 diff --git a/client/runtime/src/automation.rs b/client/runtime/src/automation.rs
-index f8edbef4..f91e2204 100644
+index f8edbef..f91e220 100644
 --- a/client/runtime/src/automation.rs
 +++ b/client/runtime/src/automation.rs
 @@ -180,26 +180,27 @@ fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
@@ -467,7 +467,7 @@ index f8edbef4..f91e2204 100644
                  result[key] = value.clone();
              }
 diff --git a/client/runtime/src/condition_feedback.rs b/client/runtime/src/condition_feedback.rs
-index 3fd20fa1..0174cf5a 100644
+index 3fd20fa..0174cf5 100644
 --- a/client/runtime/src/condition_feedback.rs
 +++ b/client/runtime/src/condition_feedback.rs
 @@ -1,4 +1,5 @@
@@ -533,7 +533,7 @@ index 3fd20fa1..0174cf5a 100644
          let on = |v| if v { "ON" } else { "OFF" };
          format!(
 diff --git a/client/runtime/src/condition_feedback/audio.rs b/client/runtime/src/condition_feedback/audio.rs
-index f4d5e109..7cf53300 100644
+index f4d5e10..7cf5330 100644
 --- a/client/runtime/src/condition_feedback/audio.rs
 +++ b/client/runtime/src/condition_feedback/audio.rs
 @@ -1,84 +1,5 @@
@@ -622,7 +622,7 @@ index f4d5e109..7cf53300 100644
  fn wav(cue: Cue) -> Vec<u8> {
      let rate = 22050u32;
 diff --git a/client/runtime/src/native_audio.rs b/client/runtime/src/native_audio.rs
-index 25cc071b..88f8a825 100644
+index 25cc071..88f8a82 100644
 --- a/client/runtime/src/native_audio.rs
 +++ b/client/runtime/src/native_audio.rs
 @@ -1,44 +1,248 @@
@@ -914,8 +914,386 @@ index 25cc071b..88f8a825 100644
 +        assert!(muted["callbacks"].as_u64().unwrap() > active["callbacks"].as_u64().unwrap());
 +    }
  }
+diff --git a/client/runtime/src/native_audio/mix.rs b/client/runtime/src/native_audio/mix.rs
+new file mode 100644
+index 0000000..37ab992
+--- /dev/null
++++ b/client/runtime/src/native_audio/mix.rs
+@@ -0,0 +1,216 @@
++//! Fixed-memory callback state. No locks, allocation, logging or platform calls.
++use std::sync::atomic::{AtomicU32, AtomicU64, Ordering::SeqCst};
++pub(super) const VOICES: usize = 13;
++#[derive(Clone, Copy)]
++pub(crate) struct Control {
++    pub epoch: u64,
++    pub enabled: u32,
++    pub gains: [f32; VOICES],
++    pub pans: [f32; VOICES],
++    pub events: [bool; VOICES],
++}
++impl Default for Control {
++    fn default() -> Self {
++        Self {
++            epoch: 0,
++            enabled: 0,
++            gains: [0.; VOICES],
++            pans: [0.; VOICES],
++            events: [false; VOICES],
++        }
++    }
++}
++pub(super) struct Mailbox {
++    revision: AtomicU64,
++    epoch: AtomicU64,
++    enabled: AtomicU32,
++    stamp_ms: AtomicU64,
++    gains: [AtomicU32; VOICES],
++    pans: [AtomicU32; VOICES],
++    events: [AtomicU64; VOICES],
++}
++#[derive(Clone, Copy, Default)]
++struct Snapshot {
++    epoch: u64,
++    enabled: u32,
++    stamp_ms: u64,
++    gains: [f32; VOICES],
++    pans: [f32; VOICES],
++    events: [u64; VOICES],
++}
++impl Default for Mailbox {
++    fn default() -> Self {
++        Self {
++            revision: AtomicU64::new(0),
++            epoch: AtomicU64::new(0),
++            enabled: AtomicU32::new(0),
++            stamp_ms: AtomicU64::new(0),
++            gains: std::array::from_fn(|_| AtomicU32::new(0)),
++            pans: std::array::from_fn(|_| AtomicU32::new(0)),
++            events: std::array::from_fn(|_| AtomicU64::new(0)),
++        }
++    }
++}
++impl Mailbox {
++    // One producer. SeqCst makes the bounded coherent-copy protocol explicit.
++    pub(super) fn publish(&self, c: Control, stamp_ms: u64) {
++        self.revision.fetch_add(1, SeqCst);
++        self.epoch.store(c.epoch, SeqCst);
++        self.enabled.store(c.enabled, SeqCst);
++        self.stamp_ms.store(stamp_ms, SeqCst);
++        for i in 0..VOICES {
++            self.gains[i].store(c.gains[i].clamp(0., 1.).to_bits(), SeqCst);
++            self.pans[i].store(c.pans[i].clamp(-1., 1.).to_bits(), SeqCst);
++            if c.events[i] {
++                self.events[i].fetch_add(1, SeqCst);
++            }
++        }
++        self.revision.fetch_add(1, SeqCst);
++    }
++    fn read(&self) -> Option<Snapshot> {
++        for _ in 0..3 {
++            let rev = self.revision.load(SeqCst);
++            if rev & 1 != 0 {
++                continue;
++            }
++            let s = Snapshot {
++                epoch: self.epoch.load(SeqCst),
++                enabled: self.enabled.load(SeqCst),
++                stamp_ms: self.stamp_ms.load(SeqCst),
++                gains: std::array::from_fn(|i| f32::from_bits(self.gains[i].load(SeqCst))),
++                pans: std::array::from_fn(|i| f32::from_bits(self.pans[i].load(SeqCst))),
++                events: std::array::from_fn(|i| self.events[i].load(SeqCst)),
++            };
++            if rev == self.revision.load(SeqCst) {
++                return Some(s);
++            }
++        }
++        None
++    }
++}
++#[derive(Clone, Copy)]
++struct Voice {
++    gain: f64,
++    pan: f64,
++    target_pan: f64,
++    level: f64,
++    age: f64,
++    phase: f64,
++    seen: u64,
++    noise: f64,
++}
++impl Default for Voice {
++    fn default() -> Self {
++        Self {
++            gain: 0.,
++            pan: 0.,
++            target_pan: 0.,
++            level: 0.,
++            age: 2.,
++            phase: 0.,
++            seen: 0,
++            noise: 0.,
++        }
++    }
++}
++pub(super) struct Mix {
++    voices: [Voice; VOICES],
++    snapshot: Snapshot,
++    seed: u32,
++    rate: f64,
++}
++impl Mix {
++    pub(super) fn new(rate: u32) -> Self {
++        Self {
++            voices: [Voice::default(); VOICES],
++            snapshot: Snapshot::default(),
++            seed: 1,
++            rate: f64::from(rate),
++        }
++    }
++    pub(super) fn begin(&mut self, mailbox: &Mailbox, now_ms: u64) {
++        if let Some(s) = mailbox.read() {
++            if s.epoch != self.snapshot.epoch {
++                for (i, v) in self.voices.iter_mut().enumerate() {
++                    v.level = 0.;
++                    v.seen = s.events[i];
++                }
++            }
++            self.snapshot = s;
++        }
++        let stale = now_ms.saturating_sub(self.snapshot.stamp_ms) > 250;
++        for (i, v) in self.voices.iter_mut().enumerate() {
++            if stale || self.snapshot.enabled & (1 << i) == 0 {
++                v.seen = self.snapshot.events[i];
++                v.level = 0.;
++            } else if i < 6 {
++                v.level = f64::from(self.snapshot.gains[i]);
++                v.target_pan = f64::from(self.snapshot.pans[i]);
++            } else if v.seen != self.snapshot.events[i] {
++                v.seen = self.snapshot.events[i];
++                v.age = 0.;
++                v.level = f64::from(self.snapshot.gains[i]);
++                v.target_pan = f64::from(self.snapshot.pans[i]);
++            }
++        }
++    }
++    pub(super) fn sample(&mut self) -> [f32; 2] {
++        let dt = 1. / self.rate;
++        let smooth = 1. - (-dt / 0.01).exp();
++        let mut out = [0f64; 2];
++        for (i, v) in self.voices.iter_mut().enumerate() {
++            self.seed = self.seed.wrapping_mul(1664525).wrapping_add(1013904223);
++            let noise = f64::from(self.seed >> 8) / 8388608. - 1.;
++            v.noise += 0.035 * (noise - v.noise);
++            let hz = [
++                67., 47., 180., 220., 43., 120., 90., 180., 140., 440., 65., 360., 110.,
++            ][i];
++            v.phase = (v.phase + dt).rem_euclid(64.);
++            let t = v.phase;
++            let a = v.age;
++            let tone = |f: f64| (std::f64::consts::TAU * f * t).sin();
++            let signal = match i {
++                0 => tone(hz) * 0.6 + tone(134.) * 0.2,
++                1 => v.noise * 0.5,
++                2 => tone(hz) * (0.6 + 0.2 * tone(7.)),
++                3 => tone(hz) * 0.5 + v.noise * 0.12,
++                4 => tone(hz) * 0.5 + v.noise * 0.3,
++                5 => tone(hz) * 0.4 + v.noise * 0.2,
++                6 => (tone(hz) * 0.4 + v.noise * 0.4) * (-a * 30.).exp(),
++                7 => (std::f64::consts::TAU * (180. * a - 100. * a * a)).sin() * (-a * 8.).exp(),
++                8 => (std::f64::consts::TAU * (140. * a + 160. * a * a)).sin() * (-a * 8.).exp(),
++                9 => tone(hz) * (-a * 12.).exp(),
++                10 => {
++                    tone(hz)
++                        * if a < 0.12 {
++                            (1. - a / 0.12).powi(2)
++                        } else if (0.23..0.35).contains(&a) {
++                            (1. - (a - 0.23) / 0.12).powi(2)
++                        } else {
++                            0.
++                        }
++                }
++                11 => {
++                    tone(hz)
++                        * if a < 0.3 {
++                            (std::f64::consts::PI * a / 0.3).sin().powi(2)
++                        } else {
++                            0.
++                        }
++                }
++                _ => tone(hz) * (std::f64::consts::PI * a.min(1.)).sin().powi(2) * 0.35,
++            };
++            let level = if i >= 6 && a >= 1. { 0. } else { v.level };
++            v.gain += (level - v.gain) * smooth;
++            v.pan += (v.target_pan - v.pan) * smooth;
++            let sample = signal * v.gain * 0.36;
++            out[0] += sample * ((1. - v.pan) * 0.5).sqrt();
++            out[1] += sample * ((1. + v.pan) * 0.5).sqrt();
++            v.age = (a + dt).min(2.);
++        }
++        // Smooth saturation preserves headroom without hard sample clipping.
++        out.map(|v| v.tanh() as f32)
++    }
++}
++#[cfg(test)]
++mod tests;
+diff --git a/client/runtime/src/native_audio/mix/tests.rs b/client/runtime/src/native_audio/mix/tests.rs
+new file mode 100644
+index 0000000..0d02760
+--- /dev/null
++++ b/client/runtime/src/native_audio/mix/tests.rs
+@@ -0,0 +1,150 @@
++use super::*;
++fn control() -> Control {
++    Control {
++        enabled: (1 << VOICES) - 1,
++        gains: [0.15; VOICES],
++        ..Default::default()
++    }
++}
++#[test]
++fn samples_are_continuous_across_arbitrary_callback_boundaries_and_no_chunk_gaps() {
++    let box_ = Mailbox::default();
++    box_.publish(control(), 0);
++    let mut a = Mix::new(48000);
++    let mut b = Mix::new(48000);
++    a.begin(&box_, 0);
++    b.begin(&box_, 0);
++    let expected: Vec<_> = (0..48000).map(|_| a.sample()).collect();
++    let mut actual = Vec::new();
++    for n in [127, 512, 143, 11025, 36193] {
++        b.begin(&box_, 10);
++        actual.extend((0..n).map(|_| b.sample()));
++    }
++    assert_eq!(actual, expected);
++    assert!(
++        actual
++            .chunks(480)
++            .all(|c| c.iter().any(|p| p[0].abs() > 1e-5))
++    );
++    assert!(actual.windows(2).all(|p| (p[1][0] - p[0][0]).abs() < 0.08));
++}
++#[test]
++fn reset_mute_exterior_and_stale_control_retire_events_without_replay() {
++    let mb = Mailbox::default();
++    let mut c = control();
++    c.events[6] = true;
++    mb.publish(c, 0);
++    let mut mix = Mix::new(48000);
++    mix.begin(&mb, 0);
++    assert!((0..480).any(|_| mix.sample()[0] != 0.));
++    c.epoch = 1;
++    c.enabled = 0;
++    c.events = [false; VOICES];
++    mb.publish(c, 1);
++    mix.begin(&mb, 1);
++    for _ in 0..48000 {
++        mix.sample();
++    }
++    assert!(mix.sample().iter().all(|v| v.abs() < 1e-8));
++    c.enabled = 1 << 6;
++    mb.publish(c, 2);
++    mix.begin(&mb, 2);
++    assert!(mix.sample().iter().all(|v| v.abs() < 1e-8));
++    c.events[6] = true;
++    mb.publish(c, 3);
++    mix.begin(&mb, 1000);
++    for _ in 0..48000 {
++        mix.sample();
++    }
++    assert!(mix.sample().iter().all(|v| v.abs() < 1e-8));
++    c.events[6] = false;
++    mb.publish(c, 1001);
++    mix.begin(&mb, 1001);
++    assert!(mix.sample().iter().all(|v| v.abs() < 1e-8));
++}
++#[test]
++fn worst_mix_has_finite_headroom_bounded_state_and_immediate_transient_onset() {
++    let mb = Mailbox::default();
++    let mut c = control();
++    c.gains = [1.; VOICES];
++    c.events = [true; VOICES];
++    mb.publish(c, 0);
++    let mut mix = Mix::new(48000);
++    mix.begin(&mb, 0);
++    let pcm: Vec<_> = (0..48000).map(|_| mix.sample()).collect();
++    assert!(pcm.iter().flatten().all(|v| v.is_finite() && v.abs() < 1.));
++    assert!(pcm[..48].iter().flatten().any(|v| v.abs() > 1e-5));
++    assert!(std::mem::size_of::<Mix>() < 2048);
++    assert!(std::mem::size_of::<Mailbox>() < 512);
++}
++#[test]
++#[ignore = "writes original continuous listening fixtures and real-rate CPU measurements"]
++fn continuous_audio_evidence_582() {
++    use std::{path::PathBuf, time::Instant};
++    let root = PathBuf::from(std::env::var_os("SALIMON_AUDIO_EVIDENCE").unwrap());
++    std::fs::create_dir_all(&root).unwrap();
++    let mut timing = String::from(
++        "case,frames,sample_rate,cpu_ns,peak,first_nonzero_frame,mailbox_bytes,mixer_bytes\n",
++    );
++    for (name, enabled, events) in [
++        ("quiet-idle", 3, 0),
++        ("fabrication", 11, 0),
++        ("thrust", 19, 0),
++        ("survival", 0x1c00, 0x1c00),
++        ("blackout", 1 << 7, 1 << 7),
++        ("stress", (1 << VOICES) - 1, (1 << VOICES) - 1),
++        ("muted", 0, 0),
++    ] {
++        let mb = Mailbox::default();
++        let mut c = control();
++        c.enabled = enabled;
++        c.events = std::array::from_fn(|i| events & (1 << i) != 0);
++        if name == "quiet-idle" {
++            c.gains[0] = 0.03;
++            c.gains[1] = 0.02;
++        }
++        let mut mix = Mix::new(48000);
++        let mut pcm = Vec::new();
++        let start = Instant::now();
++        let mut peak = 0f32;
++        let mut first = None;
++        for block in 0..600 {
++            c.events = std::array::from_fn(|i| block == 0 && events & (1 << i) != 0);
++            mb.publish(c, block * 1000 / 60);
++            mix.begin(&mb, block * 1000 / 60);
++            for _ in 0..800 {
++                let s = mix.sample();
++                if first.is_none() && s.iter().any(|v| v.abs() > 1e-5) {
++                    first = Some(pcm.len() / 4);
++                }
++                for v in s {
++                    peak = peak.max(v.abs());
++                    pcm.extend_from_slice(&((v * 32767.) as i16).to_le_bytes());
++                }
++            }
++        }
++        let elapsed = start.elapsed().as_nanos();
++        let mut wav = Vec::new();
++        wav.extend_from_slice(b"RIFF");
++        wav.extend_from_slice(&(36 + pcm.len() as u32).to_le_bytes());
++        wav.extend_from_slice(b"WAVEfmt ");
++        wav.extend_from_slice(&16u32.to_le_bytes());
++        wav.extend_from_slice(&1u16.to_le_bytes());
++        wav.extend_from_slice(&2u16.to_le_bytes());
++        wav.extend_from_slice(&48000u32.to_le_bytes());
++        wav.extend_from_slice(&192000u32.to_le_bytes());
++        wav.extend_from_slice(&4u16.to_le_bytes());
++        wav.extend_from_slice(&16u16.to_le_bytes());
++        wav.extend_from_slice(b"data");
++        wav.extend_from_slice(&(pcm.len() as u32).to_le_bytes());
++        wav.extend(pcm);
++        std::fs::write(root.join(format!("{name}.wav")), wav).unwrap();
++        timing.push_str(&format!(
++            "{name},480000,48000,{elapsed},{peak},{},{},{}\n",
++            first.map_or("silent".into(), |v| v.to_string()),
++            std::mem::size_of::<Mailbox>(),
++            std::mem::size_of::<Mix>()
++        ));
++    }
++    std::fs::write(root.join("timings.csv"), timing).unwrap();
++}
 diff --git a/client/runtime/src/scout_audio.rs b/client/runtime/src/scout_audio.rs
-index e8f7b0bd..52bd0029 100644
+index e8f7b0b..cd8506e 100644
 --- a/client/runtime/src/scout_audio.rs
 +++ b/client/runtime/src/scout_audio.rs
 @@ -1,4 +1,5 @@
@@ -934,7 +1312,7 @@ index e8f7b0bd..52bd0029 100644
 -    process::Child,
 -    time::{Duration, Instant},
 -};
-+use std::{collections::VecDeque, path::Path, time::Duration};
++use std::{collections::VecDeque, time::Duration};
 +#[cfg(test)]
 +use std::{path::PathBuf, time::Instant};
  
@@ -1116,7 +1494,7 @@ index e8f7b0bd..52bd0029 100644
 +    control
  }
 diff --git a/client/runtime/src/scout_audio/synth.rs b/client/runtime/src/scout_audio/synth.rs
-index f62494f7..673bf9e4 100644
+index f62494f..673bf9e 100644
 --- a/client/runtime/src/scout_audio/synth.rs
 +++ b/client/runtime/src/scout_audio/synth.rs
 @@ -31,6 +31,7 @@ pub(super) fn wav(voices: &[Voice], sequence: u64) -> Vec<u8> {
@@ -1128,7 +1506,7 @@ index f62494f7..673bf9e4 100644
                  Cue::Conversion => tone(180.0) * (0.6 + 0.2 * tone(7.0)),
                  Cue::Fabricator => tone(220.0) * 0.5 + noise * 0.12,
 diff --git a/client/runtime/src/scout_audio/tests.rs b/client/runtime/src/scout_audio/tests.rs
-index 1e6a8d95..6f55f1f5 100644
+index 1e6a8d9..6f55f1f 100644
 --- a/client/runtime/src/scout_audio/tests.rs
 +++ b/client/runtime/src/scout_audio/tests.rs
 @@ -25,7 +25,7 @@ fn maps_machinery_transitions_without_repeating_alerts() {
@@ -1164,7 +1542,7 @@ index 1e6a8d95..6f55f1f5 100644
  #[test]
  fn footsteps_follow_local_distance_and_reject_drift_and_teleports() {
 diff --git a/client/runtime/src/scout_audio/verification.rs b/client/runtime/src/scout_audio/verification.rs
-index e3fbf6a8..63fb3d31 100644
+index e3fbf6a..63fb3d3 100644
 --- a/client/runtime/src/scout_audio/verification.rs
 +++ b/client/runtime/src/scout_audio/verification.rs
 @@ -225,95 +225,6 @@ fn terminal_restart_restore_and_focus_gates_discard_transients() {
@@ -1320,7 +1698,7 @@ index e3fbf6a8..63fb3d31 100644
 +    }
 +}
 diff --git a/docs/maintenance-map.md b/docs/maintenance-map.md
-index 668ca818..c7e5d0c9 100644
+index 668ca81..c7e5d0c 100644
 --- a/docs/maintenance-map.md
 +++ b/docs/maintenance-map.md
 @@ -223,7 +223,7 @@ and eight power/view checkpoints live under `scenarios/visual/scout-*`; offline
@@ -1333,7 +1711,7 @@ index 668ca818..c7e5d0c9 100644
  [soundscape contract/budgets](scout-presentation.md#soundscape-boundary-465).
  Do not duplicate #383 survival cues or simulate machinery in the audio adapter.
 diff --git a/docs/scout-presentation.md b/docs/scout-presentation.md
-index 4adc800e..1ab237af 100644
+index 4adc800..1ab237a 100644
 --- a/docs/scout-presentation.md
 +++ b/docs/scout-presentation.md
 @@ -58,54 +58,63 @@ cloud/reference fixture passes do not grant that acceptance.
@@ -1449,7 +1827,7 @@ index 4adc800e..1ab237af 100644
  ## Machinery feedback boundary (#464)
  
 diff --git a/docs/validation.md b/docs/validation.md
-index 20e2e700..03772d94 100644
+index 20e2e70..03772d9 100644
 --- a/docs/validation.md
 +++ b/docs/validation.md
 @@ -396,19 +396,24 @@ Run workspace tests/build/Clippy/fmt for its public mass/save boundaries. The

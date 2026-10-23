@@ -10,7 +10,7 @@ use crate::{
     session::{GameplaySession, ViewMode},
 };
 use salimon_character::CharacterLocation;
-use std::{collections::VecDeque, path::Path, time::Duration};
+use std::{collections::VecDeque, time::Duration};
 #[cfg(test)]
 use std::{path::PathBuf, time::Instant};
 

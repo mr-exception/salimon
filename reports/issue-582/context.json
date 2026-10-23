@@ -8,7 +8,7 @@
   "source_sha256": {
     "client/runtime/src/condition_feedback.rs": "3c4f3042c9be7d02ebf9ce6dff1c7aa659e352f7d4705381430984393c56ecb6",
     "client/runtime/src/automation.rs": "e3242cf659bdce003740a4f74a55e69d75b6f96e5259eabebc449e3c94c857dc",
-    "client/runtime/src/scout_audio.rs": "2fd9dea74f9bd0094714400d4ed1b170b750376f3a7f39f0d5d768835fec2021",
+    "client/runtime/src/scout_audio.rs": "ef92672d461b7854b7d4c887ce44eb1b8e8b5f255530988ea865f582f68fdba9",
     "client/runtime/src/native_audio.rs": "96627b150bd08242f6aa418cf2923186ba29d3ab827885a3729a4d3af6ffdbd0",
     "client/runtime/src/app.rs": "75872db17b60a5ac84293dc7b159cf0c41aa4af75f4ab10720896eadd2b2a291",
     "client/runtime/src/scout_audio/verification.rs": "45a91112f113881bfe4bd3f6db149a02fa3318628d06aa7b57c1c3c4f747a682",
@@ -17,5 +17,6 @@
     "client/runtime/src/native_audio/mix.rs": "c7ce8562e58953a8f1262399a8d21feb6b3f05ef16488bb24afa7db27c4ec143",
     "client/runtime/src/condition_feedback/audio.rs": "7c610f4dc6a533f4b30414c753150430ecaa452d7c210b117b87d162ac7e2897",
     "client/runtime/src/native_audio/mix/tests.rs": "004e10520745b426a78113119880211a60b455e0e7106d8c1cd7062fbdd72e91"
-  }
+  },
+  "post_measurement_changes": "remove unused settings-path argument/import and reorder test-only helper; no mixer/device behavior changes"
 }

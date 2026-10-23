@@ -18,7 +18,7 @@ dependencies; each crate's architecture/invariants defines its local contracts.
 | `client/runtime/` | Native shell/lifecycle/evidence IO plus portable GameplaySession commands, snapshots, stepping, resource/cargo adapters and presentation mapping |
 | `client/fabrication/` | Portable validated recipes, integer raw storage/reservation, FIFO jobs, single tray and typed consumable slots; runtime adapters remain separate |
 | `client/world/` | Static six-body compressed catalog, `f64` coordinates/camera tour, resource contracts, generation, extraction/session deltas, fragments and one-object carrying |
-| `client/ship/` | Pose, cockpit authority, inertial force-based flight, uncancellable landing/takeoff, airlock interlocks and live telemetry |
+| `client/ship/` | Pose, cockpit authority, inertial force-based flight, uncancellable landing/takeoff, airlock interlocks, live telemetry and independent portable structural topology |
 | `client/physics/` | Portable small-object gravity, ejection/release velocity, authored convex contacts and angular motion, restitution and deterministic substeps; caller-supplied surfaces/geometry |
 | `client/math/` | Dependency-free `f64` vector component arithmetic; no domain/frame ownership |
 | `client/character/` | Portable movement, collision, gravity, cockpit transitions and open-space/nearby-body EVA |
@@ -590,3 +590,13 @@ routes, independent domain digests and a single surface evaluator. See
 U01 recipe references remain unchanged; U12 packages the expanded U11 sidecar.
 The runtime still starts in the compressed prototype. U14 states, U23 LOD and
 U24 arrival/mining integration retain their scopes, with separate native gates.
+
+## Portable modular structure (#541)
+
+Ship's independent `structure` module owns the 3 m Core-rooted sparse graph,
+structural/room/equipment IDs and envelopes, safe removal, damage component
+handoffs, explicit baseline/additional mass and domain schema 1. See the
+[owned boundary](../client/ship/architecture.md#portable-structural-foundation-541).
+Runtime composition, current authored hull/colliders and whole-game schema are
+unchanged. This foundation does not claim player construction or the redesigned
+Scout is playable; #538–#550 retain their integration scopes.

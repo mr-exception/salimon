@@ -366,3 +366,13 @@ copy in a fresh isolated save directory. Normal launch uses the real wall clock
 and native OS events; no stdin stepping or rendering override is active.
 Fixture placement/aiming is not physical mining/travel, visual approval or FPS
 evidence. Keep blocked placement failures and human temporal review separate.
+
+## Structural foundation (#541)
+
+`cargo test -p salimon-ship --locked structure::tests` verifies six-face support,
+edge/corner rejection, precise origin/coordinate bounds, multi-deck/multi-cell
+membership, safe removal, damage transfers, stable IDs, atomic invalid-input
+rejection, disjoint mass contributions and versioned save reconstruction.
+Run workspace tests/build/Clippy/fmt for its public mass/save boundaries. The
+foundation is not composed into native gameplay; no visual, Metal/M1 or
+construction-interaction acceptance is claimed by these headless tests.

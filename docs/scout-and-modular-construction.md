@@ -100,6 +100,16 @@ This is a design contract for future implementation, **not a claim that current 
 
 The approved first reference slice is **a completely usable starter Scout**, not a beauty-only Blender render: cockpit, working Core/Fabricator/Archive, dedicated physical cargo, interior door/ramp and integrated habitation, with reliable HUD/UI/lighting/sound feedback. Native Metal/M1 checks and GLB budgets remain necessary.
 
+## Structural foundation delivered (#541)
+
+`salimon_ship::structure` now provides the portable 3 m Core-rooted graph,
+room/equipment footprint metadata, safe removal, damage-component handoffs,
+explicit baseline/additional mass and domain schema 1. See the
+[owned architecture](../client/ship/architecture.md#portable-structural-foundation-541).
+This is an independent domain boundary, not playable construction, a redesigned
+starter ship, generated colliders or a whole-game save migration. Later delivery
+boundaries above remain future work.
+
 ## Implementation issues (2026-10-22)
 
 **Starter Scout:** [#538](https://github.com/mr-exception/salimon/issues/538) layout/cargo/habitation envelope → [#539](https://github.com/mr-exception/salimon/issues/539) cargo mechanics and door; [#540](https://github.com/mr-exception/salimon/issues/540) habitation fixtures.

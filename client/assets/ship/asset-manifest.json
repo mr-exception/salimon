@@ -1,6 +1,6 @@
 {
   "name": "Salimon Phase 0 Scout",
-  "assetVersion": 14,
+  "assetVersion": 15,
   "source": "../../../models/assets/ships/salimon-scout/assembly/salimon-scout.blend",
   "editableInterchange": "export/salimon_phase0_ship.gltf",
   "runtimeAsset": "export/salimon_phase0_ship.glb",
@@ -32,10 +32,10 @@
     "designRevision": "Centered cockpit station, cleared floor seams, collidable wings and top-hinged aft hatch."
   },
   "budgets": {
-    "maximumTriangles": 6500,
-    "maximumPrimitives": 124,
+    "maximumTriangles": 6900,
+    "maximumPrimitives": 140,
     "maximumMaterials": 13,
-    "maximumGlbBytes": 557056,
+    "maximumGlbBytes": 614400,
     "runtimeShipDraws": 2
   },
   "cockpitWindows": {

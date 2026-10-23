@@ -1884,6 +1884,7 @@ version = "0.1.0"
 dependencies = [
  "gltf",
  "png",
+ "serde_json",
  "wgpu",
 ]
 

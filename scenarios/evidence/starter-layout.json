@@ -1,0 +1,260 @@
+{
+  "setup": {
+    "scenario": "landed-earth",
+    "seed": 538,
+    "step_ms": 16
+  },
+  "timeout_ms": 180000,
+  "steps": [
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 108
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "player.local_ship_position_meters.0",
+        "approx": -4.35,
+        "tolerance": 0.001
+      }
+    },
+    {
+      "screenshot": "bulkhead-side-route-blocked"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 10
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 36
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 50
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "interaction",
+        "equals": "exit_door"
+      }
+    },
+    {
+      "screenshot": "cargo-bay-ramp-closed"
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 45
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.door_state",
+        "equals": "Open"
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 110
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "Surface"
+      }
+    },
+    {
+      "screenshot": "ramp-clearance"
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 140
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "assert": {
+        "path": "player.location",
+        "equals": "InsideShip"
+      }
+    },
+    {
+      "assert": {
+        "path": "interaction",
+        "equals": "exit_door"
+      }
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 45
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.door_state",
+        "equals": "Closed"
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 25
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "forward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "left",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 36
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "left",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": -600,
+        "dy": 55
+      }
+    },
+    {
+      "assert": {
+        "path": "interaction",
+        "equals": "archive"
+      }
+    },
+    {
+      "screenshot": "archive-access"
+    }
+  ]
+}

@@ -1502,6 +1502,340 @@
           "visibility": "tray-occupied"
         }
       }
+    },
+    {
+      "name": "COLLIDER_Starter_BinPort",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -6.099999904632568,
+        0.6673118472099304,
+        3.450000047683716
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            1.6,
+            0.84,
+            1.2
+          ],
+          "purpose": "starter-binport"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Starter_BinStarboard",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -6.099999904632568,
+        0.6673118472099304,
+        -3.450000047683716
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            1.6,
+            0.84,
+            1.2
+          ],
+          "purpose": "starter-binstarboard"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Starter_BulkheadPort",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -4.650000095367432,
+        1.5243816375732422,
+        2.8499999046325684
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            0.12,
+            2.5641397311097833,
+            2.7
+          ],
+          "purpose": "starter-bulkheadport"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Starter_BulkheadStarboard",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -4.650000095367432,
+        1.5243816375732422,
+        -2.8499999046325684
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            0.12,
+            2.5641397311097833,
+            2.7
+          ],
+          "purpose": "starter-bulkheadstarboard"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Starter_Bunk",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -0.800000011920929,
+        1.1200000047683716,
+        -3.6500000953674316
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            2.2,
+            1.75,
+            0.85
+          ],
+          "purpose": "starter-bunk"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Starter_Galley",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        0.6499999761581421,
+        0.7900000214576721,
+        3.700000047683716
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            1.7,
+            1.08,
+            0.76
+          ],
+          "purpose": "starter-galley"
+        }
+      }
+    },
+    {
+      "name": "COLLIDER_Starter_Hygiene",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        1.5,
+        0.8199999928474426,
+        -3.6500000953674316
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            0.8,
+            1.14,
+            0.8
+          ],
+          "purpose": "starter-hygiene"
+        }
+      }
+    },
+    {
+      "name": "MARKER_Starter_AftExpansion",
+      "parent": "Interaction_Markers",
+      "visual": false,
+      "translation": [
+        -7.679999828338623,
+        0.24731183052062988,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "starter-aftexpansion"
+        }
+      }
+    },
+    {
+      "name": "MARKER_Starter_CargoDoor",
+      "parent": "Interaction_Markers",
+      "visual": false,
+      "translation": [
+        -4.650000095367432,
+        1.350000023841858,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "starter-cargodoor"
+        }
+      }
+    },
+    {
+      "name": "MARKER_Starter_UpperExpansion",
+      "parent": "Interaction_Markers",
+      "visual": false,
+      "translation": [
+        0,
+        2.8064515590667725,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "purpose": "starter-upperexpansion"
+        }
+      }
+    },
+    {
+      "name": "Starter_BunkCushion",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "Starter_BunkFrame",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "Starter_CargoBins",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "Starter_CargoBulkhead",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "Starter_DoorFrame",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "Starter_Galley",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "Starter_GalleyBasin",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "Starter_GalleyTap",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "Starter_GalleyWorktop",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "Starter_Hygiene",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "Starter_HygieneSeat",
+      "parent": "Interior",
+      "visual": true,
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "extras": {}
+    },
+    {
+      "name": "COLLIDER_Starter_Header",
+      "parent": "Collision_Proxies",
+      "visual": false,
+      "translation": [
+        -4.650000095367432,
+        2.6464998722076416,
+        0
+      ],
+      "extras": {
+        "salimon": {
+          "collisionShape": "box",
+          "sizeMeters": [
+            0.2,
+            0.3199031719699983,
+            3.02
+          ],
+          "purpose": "starter-header"
+        }
+      }
     }
   ],
   "materials": [

@@ -1,0 +1,27 @@
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/assembly/shared.blend', '//shared.blend', parent '<direct>'
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/components/cabin-interior/source.blend', '//../components/cabin-interior/source.blend', parent '<direct>'
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/components/cockpit/source.blend', '//../components/cockpit/source.blend', parent '<direct>'
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/components/cockpit-console/source.blend', '//../components/cockpit-console/source.blend', parent '<direct>'
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/components/energy-core/source.blend', '//../components/energy-core/source.blend', parent '<direct>'
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/components/engines/source.blend', '//../components/engines/source.blend', parent '<direct>'
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/components/exit-door/source.blend', '//../components/exit-door/source.blend', parent '<direct>'
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/components/hull/source.blend', '//../components/hull/source.blend', parent '<direct>'
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/components/pilot-seat/source.blend', '//../components/pilot-seat/source.blend', parent '<direct>'
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/components/wings/source.blend', '//../components/wings/source.blend', parent '<direct>'
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/assembly/shared.blend', '//../../assembly/shared.blend', parent '<direct>'
+Info: Saved as "source.blend"
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/assembly/shared.blend', '//shared.blend', parent '<direct>'
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/components/cabin-interior/source.blend', '//../components/cabin-interior/source.blend', parent '<direct>'
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/components/cockpit/source.blend', '//../components/cockpit/source.blend', parent '<direct>'
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/components/cockpit-console/source.blend', '//../components/cockpit-console/source.blend', parent '<direct>'
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/components/energy-core/source.blend', '//../components/energy-core/source.blend', parent '<direct>'
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/components/engines/source.blend', '//../components/engines/source.blend', parent '<direct>'
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/components/exit-door/source.blend', '//../components/exit-door/source.blend', parent '<direct>'
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/components/hull/source.blend', '//../components/hull/source.blend', parent '<direct>'
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/components/pilot-seat/source.blend', '//../components/pilot-seat/source.blend', parent '<direct>'
+Info: Read library: '/tmp/scout-modular-0j2xjqad/salimon-scout/components/wings/source.blend', '//../components/wings/source.blend', parent '<direct>'
+{"components": 9, "editPropagation": "passed"}
+Read blend: "/tmp/scout-modular-0j2xjqad/salimon-scout/assembly/salimon-scout.blend"
+Read blend: "/tmp/scout-modular-0j2xjqad/salimon-scout/components/hull/source.blend"
+Read blend: "/tmp/scout-modular-0j2xjqad/salimon-scout/assembly/salimon-scout.blend"
+Error: Not freed memory blocks: 8, total unfreed memory 0.000031 MB

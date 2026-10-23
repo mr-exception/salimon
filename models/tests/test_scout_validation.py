@@ -101,10 +101,11 @@ class ScoutValidationTests(unittest.TestCase):
         self.assertAlmostEqual(centers[0], 0.0)
         self.assertFalse(any(n["name"] in ("Monitor_Center", "Monitor_Port", "Monitor_Starboard")
                              for n in self.document["nodes"]))
-        self.assertEqual(len(self.manifest['contracts']['colliders']), 29)
+        self.assertEqual(len(self.manifest['contracts']['colliders']), 37)
         self.assertNotIn('cargoRoom', metadata)
         self.assertNotIn('cargoRoom', self.document['asset']['extras']['salimon'])
-        self.assertFalse(any('Cargo' in node['name'] for node in self.document['nodes']))
+        self.assertIn('Starter_CargoBulkhead', [n['name'] for n in self.document['nodes']])
+        self.assertFalse(any(n['name'].startswith('Cargo_Module') for n in self.document['nodes']))
 
     def test_window_sightline_regression(self):
         # Reposition an existing opaque wall in the seated forward ray while

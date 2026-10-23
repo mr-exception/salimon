@@ -1,0 +1,21 @@
+   Compiling salimon-renderer v0.1.0 (/workspace/salimon/client/renderer)
+   Compiling salimon-character v0.1.0 (/workspace/salimon/client/character)
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `serde_json`
+   --> client/renderer/src/ship_mesh.rs:747:13
+    |
+747 |             serde_json::from_str(include_str!("../../assets/ship/asset-manifest.json"))
+    |             ^^^^^^^^^^ use of unresolved module or unlinked crate `serde_json`
+    |
+    = help: if you wanted to use a crate named `serde_json`, use `cargo add serde_json` to add it to your `Cargo.toml`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `serde_json`
+   --> client/renderer/src/ship_mesh.rs:746:23
+    |
+746 |         let manifest: serde_json::Value =
+    |                       ^^^^^^^^^^ use of unresolved module or unlinked crate `serde_json`
+    |
+    = help: if you wanted to use a crate named `serde_json`, use `cargo add serde_json` to add it to your `Cargo.toml`
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `salimon-renderer` (lib test) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...

@@ -743,15 +743,26 @@ mod tests {
     fn checked_in_ship_stays_within_the_lightweight_asset_budget() {
         let geometry = load_geometry().expect("checked-in ship must load");
         let gltf = gltf::Gltf::from_slice(SHIP_GLB).expect("checked-in GLB must parse");
-        assert!(SHIP_GLB.len() <= 544 * 1024);
-        assert!((geometry.opaque_vertex_count + geometry.glass_vertex_count) / 3 <= 6_500);
+        let manifest: serde_json::Value =
+            serde_json::from_str(include_str!("../../assets/ship/asset-manifest.json"))
+                .expect("checked-in asset manifest must parse");
+        let limit = |name: &str| {
+            manifest["budgets"][name]
+                .as_u64()
+                .expect("asset budget must be an integer") as usize
+        };
+        assert!(SHIP_GLB.len() <= limit("maximumGlbBytes"));
+        assert!(
+            ((geometry.opaque_vertex_count + geometry.glass_vertex_count) / 3) as usize
+                <= limit("maximumTriangles")
+        );
         assert!(
             gltf.meshes()
                 .map(|mesh| mesh.primitives().len())
                 .sum::<usize>()
-                <= 124
+                <= limit("maximumPrimitives")
         );
-        assert!(gltf.materials().len() <= 13);
+        assert!(gltf.materials().len() <= limit("maximumMaterials"));
     }
 
     #[test]

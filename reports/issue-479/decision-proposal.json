@@ -1,0 +1,17 @@
+{
+  "status": "proposed_pending_owner_review",
+  "canonical_budget": "reports/issue-288/proposed-budget.json",
+  "canonical_budget_sha256": "6c8101c6b4ab414f7458c5eb0402faf8a7cf60cba7858233a96b80a81411f0d1",
+  "evaluation": "evidence/reanalysis.json",
+  "approve_scope": "existing legacy launch/settling-only proposal; retain historical failures and explicit unattributed cause limitation",
+  "preserved_independent_guidance": [
+    "17.5ms settled frame p95",
+    "5ms provisional physics partition",
+    "20% same-device relative regression checks"
+  ],
+  "reviewer": null,
+  "reviewed_at": null,
+  "evidence": null,
+  "acceptance_granted": false,
+  "remaining_decision": "https://github.com/mr-exception/salimon/issues/563"
+}

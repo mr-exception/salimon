@@ -664,8 +664,10 @@ fn solve_contacts<const PROFILE: bool>(
     for (cache, p) in pair_geometry.transformed.iter_mut().zip(pieces.iter()) {
         cache.refresh(p);
     }
-    // An empty spatial row stays empty across ordered passes until any center
-    // correction changes the bounds. Retain only absence, not a dense pair list.
+    // A row with no later candidate stays exhausted across ordered passes until
+    // a center correction changes the bounds. Earlier IDs own those pairs, so
+    // repeatedly querying their neighbors here cannot resolve another contact.
+    // Retain only absence, not a dense pair list.
     // Every solve starts fresh (including the post-integration solve).
     let mut empty_rows = vec![0_usize; pieces.len()];
     let mut bounds_revision = 1_usize;
@@ -680,7 +682,7 @@ fn solve_contacts<const PROFILE: bool>(
             pair_geometry
                 .grid
                 .query(i, 0.0, &mut pair_geometry.candidates);
-            if pair_geometry.candidates.is_empty() {
+            if pair_geometry.candidates.last().is_none_or(|&j| j <= i) {
                 empty_rows[i] = bounds_revision;
             }
             let mut after = i;

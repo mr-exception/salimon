@@ -1,0 +1,12 @@
+    Finished `release` profile [optimized] target(s) in 0.09s
+     Running unittests src/main.rs (artifacts/native-20261022/target/release/deps/salimon_client-a8157361c6c96f96)
+
+running 1 test
+fragment attribution 500+0 asleep passed
+fragment attribution 500+10000 asleep passed
+fragment attribution 1000+0 asleep passed
+fragment attribution 1000+10000 asleep passed
+test fragment_costs::fragment_update_costs ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 343 filtered out; finished in 1.24s
+

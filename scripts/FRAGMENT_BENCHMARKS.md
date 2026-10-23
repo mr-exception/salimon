@@ -646,3 +646,20 @@ worktree. A shared target reused the temporary damping ablation library during
 isolated production target. Record actual binary/source hashes and target paths,
 and run release physics invariants before native sampling. A checkout revision
 alone does not establish which physics artifact was linked.
+
+### Independent inactive-history measurement (#455)
+
+Run the unchanged #305–#306 sleeping fixtures separately from the expensive
+active matrix on the reference machine:
+
+```sh
+SALIMON_FRAGMENT_COST_INACTIVE_ONLY=1 SALIMON_FRAGMENT_COST_REPORT="$PWD/artifacts/inactive-history.json" cargo test --release -p salimon-client --locked fragment_update_costs -- --ignored --nocapture
+```
+
+This selects 500/1,000 nearby objects with 0/10,000 distant retained objects,
+20 samples per row by default. It verifies natural sleep, identities, mass and
+solver replay parity and records selection/history, adapter, frame-sync and
+mass costs. `SALIMON_FRAGMENT_COST_SAMPLES` controls repeats; do not combine
+with `SALIMON_FRAGMENT_COST_QUICK`. The fixture/schema stays version 1; additive
+`scope` identifies this subset. This CPU timing lane does not replace the
+current-cap/current-mixed native matrix. See the [#455 report](../reports/issue-455/README.md).

@@ -1,0 +1,317 @@
+{
+  "schema": 1,
+  "groups": {
+    "1000-current-cap-settled_requested-facing": {
+      "windows": [
+        {
+          "file": "native-1000-current-cap-settled-facing.stdout.gz",
+          "presentation": {
+            "foreground_visible": true,
+            "interval_kind": "submitted_present_calls",
+            "lifecycle": [
+              {
+                "elapsed_seconds": 0.176191542,
+                "event": "unfocused",
+                "ready": false
+              },
+              {
+                "elapsed_seconds": 0.185478875,
+                "event": "focused",
+                "ready": true
+              }
+            ],
+            "physical_scanout_verified": false,
+            "pid": 30474,
+            "schema": 1
+          },
+          "config": {
+            "camera": "facing",
+            "count": 1000,
+            "initial_state": "settled_requested",
+            "layout": "current-cap",
+            "minimum_samples": 100,
+            "sample_seconds": 5,
+            "seed": 155,
+            "settle_steps_limit": 300,
+            "warmup_seconds": 2
+          },
+          "renderer": {
+            "adapter": "Apple M1",
+            "backend": "Metal",
+            "device_type": "IntegratedGpu",
+            "gpu_timestamps_supported": true,
+            "height": 1080,
+            "present_mode": "AutoVsync",
+            "scale_factor": 2.0,
+            "width": 1920
+          },
+          "accounting_count": 1000,
+          "frames": 301
+        }
+      ],
+      "moving": {
+        "completed_intervals": 0,
+        "sufficient_active_pool": false,
+        "metrics": {
+          "frame_ms": null,
+          "physics_total_ms": null,
+          "physics_contact_ms": null,
+          "physics_integration_ms": null,
+          "physics_activation_ms": null,
+          "physics_adapter_ms": null,
+          "cpu_render_ms": null,
+          "gpu_latest_ms": null,
+          "game_backlog_ms": null,
+          "substeps": null,
+          "solver_passes": null,
+          "pair_visits": null,
+          "integrated_objects": null
+        },
+        "frames_over_50ms": 0
+      },
+      "quiet_awake": {
+        "completed_intervals": 0,
+        "sufficient_active_pool": null,
+        "metrics": {
+          "frame_ms": null,
+          "physics_total_ms": null,
+          "physics_contact_ms": null,
+          "physics_integration_ms": null,
+          "physics_activation_ms": null,
+          "physics_adapter_ms": null,
+          "cpu_render_ms": null,
+          "gpu_latest_ms": null,
+          "game_backlog_ms": null,
+          "substeps": null,
+          "solver_passes": null,
+          "pair_visits": null,
+          "integrated_objects": null
+        },
+        "frames_over_50ms": 0
+      },
+      "sleeping": {
+        "completed_intervals": 301,
+        "sufficient_active_pool": null,
+        "metrics": {
+          "frame_ms": {
+            "p95": 19.91575,
+            "max": 21.36275
+          },
+          "physics_total_ms": {
+            "p95": 2.012,
+            "max": 3.2508749999999997
+          },
+          "physics_contact_ms": {
+            "p95": 0.0,
+            "max": 0.0
+          },
+          "physics_integration_ms": {
+            "p95": 0.0,
+            "max": 0.0
+          },
+          "physics_activation_ms": {
+            "p95": 0.945584,
+            "max": 1.4523750000000002
+          },
+          "physics_adapter_ms": {
+            "p95": 1.064749,
+            "max": 1.719457
+          },
+          "cpu_render_ms": {
+            "p95": 1.027709,
+            "max": 2.012125
+          },
+          "gpu_latest_ms": {
+            "p95": 2.316916,
+            "max": 2.7596249999999998
+          },
+          "game_backlog_ms": {
+            "p95": 15.019459000000001,
+            "max": 15.979417
+          },
+          "substeps": {
+            "p95": 0,
+            "max": 0
+          },
+          "solver_passes": {
+            "p95": 0,
+            "max": 0
+          },
+          "pair_visits": {
+            "p95": 0,
+            "max": 0
+          },
+          "integrated_objects": {
+            "p95": 0,
+            "max": 0
+          }
+        },
+        "frames_over_50ms": 0
+      },
+      "accounting_sha256": "70ee0f844520ac7e46158203a72a3f99932d8766a7a39d3a9b066e6505b9ca37",
+      "mass_kg": 10000.0
+    },
+    "500-current-cap-settled_requested-facing": {
+      "windows": [
+        {
+          "file": "native-500-current-cap-settled-facing.stdout.gz",
+          "presentation": {
+            "foreground_visible": true,
+            "interval_kind": "submitted_present_calls",
+            "lifecycle": [
+              {
+                "elapsed_seconds": 0.202078708,
+                "event": "unfocused",
+                "ready": false
+              },
+              {
+                "elapsed_seconds": 0.212387791,
+                "event": "focused",
+                "ready": true
+              }
+            ],
+            "physical_scanout_verified": false,
+            "pid": 30193,
+            "schema": 1
+          },
+          "config": {
+            "camera": "facing",
+            "count": 500,
+            "initial_state": "settled_requested",
+            "layout": "current-cap",
+            "minimum_samples": 100,
+            "sample_seconds": 5,
+            "seed": 155,
+            "settle_steps_limit": 300,
+            "warmup_seconds": 2
+          },
+          "renderer": {
+            "adapter": "Apple M1",
+            "backend": "Metal",
+            "device_type": "IntegratedGpu",
+            "gpu_timestamps_supported": true,
+            "height": 1080,
+            "present_mode": "AutoVsync",
+            "scale_factor": 2.0,
+            "width": 1920
+          },
+          "accounting_count": 500,
+          "frames": 301
+        }
+      ],
+      "moving": {
+        "completed_intervals": 0,
+        "sufficient_active_pool": false,
+        "metrics": {
+          "frame_ms": null,
+          "physics_total_ms": null,
+          "physics_contact_ms": null,
+          "physics_integration_ms": null,
+          "physics_activation_ms": null,
+          "physics_adapter_ms": null,
+          "cpu_render_ms": null,
+          "gpu_latest_ms": null,
+          "game_backlog_ms": null,
+          "substeps": null,
+          "solver_passes": null,
+          "pair_visits": null,
+          "integrated_objects": null
+        },
+        "frames_over_50ms": 0
+      },
+      "quiet_awake": {
+        "completed_intervals": 0,
+        "sufficient_active_pool": null,
+        "metrics": {
+          "frame_ms": null,
+          "physics_total_ms": null,
+          "physics_contact_ms": null,
+          "physics_integration_ms": null,
+          "physics_activation_ms": null,
+          "physics_adapter_ms": null,
+          "cpu_render_ms": null,
+          "gpu_latest_ms": null,
+          "game_backlog_ms": null,
+          "substeps": null,
+          "solver_passes": null,
+          "pair_visits": null,
+          "integrated_objects": null
+        },
+        "frames_over_50ms": 0
+      },
+      "sleeping": {
+        "completed_intervals": 301,
+        "sufficient_active_pool": null,
+        "metrics": {
+          "frame_ms": {
+            "p95": 18.9765,
+            "max": 20.197334
+          },
+          "physics_total_ms": {
+            "p95": 1.198417,
+            "max": 2.338584
+          },
+          "physics_contact_ms": {
+            "p95": 0.0,
+            "max": 0.0
+          },
+          "physics_integration_ms": {
+            "p95": 0.0,
+            "max": 0.0
+          },
+          "physics_activation_ms": {
+            "p95": 0.5263340000000001,
+            "max": 0.924083
+          },
+          "physics_adapter_ms": {
+            "p95": 0.687793,
+            "max": 1.364708
+          },
+          "cpu_render_ms": {
+            "p95": 1.007417,
+            "max": 2.177416
+          },
+          "gpu_latest_ms": {
+            "p95": 2.2287909999999997,
+            "max": 2.295625
+          },
+          "game_backlog_ms": {
+            "p95": 15.061916,
+            "max": 15.977458
+          },
+          "substeps": {
+            "p95": 0,
+            "max": 0
+          },
+          "solver_passes": {
+            "p95": 0,
+            "max": 0
+          },
+          "pair_visits": {
+            "p95": 0,
+            "max": 0
+          },
+          "integrated_objects": {
+            "p95": 0,
+            "max": 0
+          }
+        },
+        "frames_over_50ms": 0
+      },
+      "accounting_sha256": "3c5a5d53a31ffb316b8f5ab8e10b0577893ee507ea14724077ae188f75d7a056",
+      "mass_kg": 5000.0
+    }
+  },
+  "failures": [
+    {
+      "case": "native-500-current-mixed-settled-facing",
+      "error": "benchmark exited 1"
+    },
+    {
+      "case": "native-1000-current-mixed-settled-facing",
+      "error": "Command '['/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/native-20261022/455/Salimon455.app/Contents/MacOS/salimon-client', '--benchmark', '--count', '1000', '--layout', 'current-mixed', '--state', 'settled', '--camera', 'facing', '--mode', 'native', '--seed', '155', '--warmup-seconds', '2', '--sample-seconds', '5', '--minimum-samples', '100', '--settle-steps', '300']' timed out after 45 seconds"
+    }
+  ],
+  "approval_granted": false,
+  "note": "Descriptive timings; submitted-present intervals are not optical scanout. No stress limit or 60 FPS signoff."
+}

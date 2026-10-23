@@ -1,0 +1,16 @@
+[
+  {
+    "pid": 29372,
+    "monotonic": 620389.710997958,
+    "returncode": 0,
+    "stdout": "frontmost=29372 target=29372\nposted PID=29372 operation=focus\n",
+    "stderr": ""
+  },
+  {
+    "pid": 29432,
+    "monotonic": 620397.221159458,
+    "returncode": 0,
+    "stdout": "frontmost=29432 target=29432\nposted PID=29432 operation=focus\n",
+    "stderr": ""
+  }
+]

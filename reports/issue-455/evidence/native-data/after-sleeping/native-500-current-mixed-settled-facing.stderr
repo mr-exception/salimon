@@ -1,0 +1,14 @@
+[2026-10-22T20:07:21Z INFO  salimon_client] starting Salimon native client
+motion: speed p50/p95 0.00000/0.00000 m/s, spin p50/p95 0.00000/0.00000 rad/s
+fixture preparation: 50 steps, 484/500 asleep, 492 quiet, 4 moving, 3.632 wall seconds
+motion: speed p50/p95 0.00000/0.00000 m/s, spin p50/p95 0.00000/0.00000 rad/s
+fixture preparation: 100 steps, 492/500 asleep, 496 quiet, 4 moving, 7.100 wall seconds
+motion: speed p50/p95 0.00000/0.00000 m/s, spin p50/p95 0.00000/0.00000 rad/s
+fixture preparation: 150 steps, 492/500 asleep, 496 quiet, 4 moving, 11.536 wall seconds
+motion: speed p50/p95 0.00000/0.00000 m/s, spin p50/p95 0.00000/0.00000 rad/s
+fixture preparation: 200 steps, 492/500 asleep, 496 quiet, 4 moving, 16.570 wall seconds
+motion: speed p50/p95 0.00000/0.00000 m/s, spin p50/p95 0.00000/0.00000 rad/s
+fixture preparation: 250 steps, 492/500 asleep, 496 quiet, 4 moving, 21.940 wall seconds
+motion: speed p50/p95 0.00000/0.00000 m/s, spin p50/p95 0.00000/0.00000 rad/s
+fixture preparation: 300 steps, 492/500 asleep, 496 quiet, 4 moving, 27.569 wall seconds
+Salimon benchmark failed: benchmark fixture failed: fixture did not sleep within 300 production steps: 492/500 asleep

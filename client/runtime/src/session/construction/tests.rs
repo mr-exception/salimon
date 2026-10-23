@@ -66,7 +66,10 @@ fn schema_eight_requires_source_and_legacy_seven_migrates_empty_atomically() {
     s.command(Command::Mining(false));
     let good = s.save_bytes(100).unwrap();
     let mut current: serde_json::Value = serde_json::from_slice(&good).unwrap();
-    assert_eq!(current["schema_version"], 8);
+    assert_eq!(
+        current["schema_version"],
+        salimon_persistence::SCHEMA_VERSION
+    );
     current["state"]
         .as_object_mut()
         .unwrap()

@@ -49,3 +49,16 @@ normalization/projection policy. Generated `spatial_contracts.rs` remains export
 Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
 and [world definition contract](../world/terrain-contract.md). Keep local rules
 and their consumers aligned; flat deterministic fixtures are explicit.
+
+
+## Physical cargo door and open bins (#539)
+
+Character `cargo.rs` supplies the authored aperture, opposed sliding-leaf bounds
+and hollow bin shells. Walking retains conservative bin envelopes. Loose cargo
+and pickup rays use the actual 4 cm side walls, 12 cm bottom and open top; no
+slot inventory, identity replacement, mass exemption or zero-G pin is introduced.
+Runtime `session/cargo.rs` composes manual door motion and swept player/object
+clearance, independent of the aft ramp, power and flight state. Aim at the
+port-side door handle and press E; reverse with a second press. Partial openings
+remain conservatively impassable. Door position is saved in schema 9 and
+legacy captures migrate open; see the [save contract](../../docs/save-contract.md#cargo-door-schema-9-539).

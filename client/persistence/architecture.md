@@ -43,7 +43,7 @@ current payload omissions/unknown identities reject transactionally. See
 ## Universe new-run envelope (#406)
 
 `universe.rs` owns the independent version-1 future universe save contract, using
-`salimon-universe` IDs/frames/epochs. It does not replace the compressed-world runtime envelope (now schema 8).
+`salimon-universe` IDs/frames/epochs. It does not replace the compressed-world runtime envelope (now schema 9).
 Catalog/definition incompatibility is fatal during recovery; corruption alone can
 fall back. Domain delta validators are mandatory. See the canonical
 [universe save contract](../../docs/save-contract.md#future-universe-new-run-contract--u05-406)
@@ -62,3 +62,11 @@ Current compressed-world captures require validated blueprint placeholder source
 Versions 1–7 migrate empty without ticking; UI/preview state is transient. The
 independent universe envelope remains version 1. See the canonical
 [placeholder save contract](../../docs/save-contract.md#blueprint-placeholder-schema-8-542).
+
+
+## Runtime schema 9 (#539)
+
+New runtime captures require independent cargo door position/direction. Older
+captures migrate to the previously open aperture without advancing time. World
+fragments retain original IDs, motion, mass and ship-local anchors. The independent
+universe envelope is unchanged. See [migration and validation](../../docs/save-contract.md#cargo-door-schema-9-539).

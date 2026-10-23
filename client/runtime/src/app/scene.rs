@@ -154,6 +154,43 @@ pub(super) fn construction_wireframes(
     result
 }
 
+/// Bounded procedural mechanical leaves and fixed manual release grips. All
+/// geometry follows character-owned bounds; it carries no interaction authority.
+pub(super) fn cargo_door(
+    session: &crate::session::GameplaySession,
+    ship: ShipSnapshot,
+) -> Vec<SceneInstance> {
+    let frame = crate::session::frames::character_ship_frame(ship.pose);
+    let mut instances = Vec::with_capacity(4);
+    for b in salimon_character::cargo::cargo_door_leaves(session.cargo_door.open_fraction) {
+        instances.push(SceneInstance {
+            center_meters: frame.local_to_world([
+                (b[0] + b[1]) * 0.5,
+                (b[2] + b[3]) * 0.5,
+                (b[4] + b[5]) * 0.5,
+            ]),
+            half_extents_meters: [
+                (b[1] - b[0]) as f32 * 0.5,
+                (b[3] - b[2]) as f32 * 0.5,
+                (b[5] - b[4]) as f32 * 0.5,
+            ],
+            orientation: ship.pose.orientation.map(|v| v as f32),
+            color: [0.13, 0.15, 0.17, 1.0],
+        });
+    }
+    for x in [-0.14, 0.14] {
+        let mut p = salimon_character::cargo::CARGO_DOOR_TARGET;
+        p[0] += x;
+        instances.push(SceneInstance {
+            center_meters: frame.local_to_world(p),
+            half_extents_meters: [0.035, 0.14, 0.035],
+            orientation: ship.pose.orientation.map(|v| v as f32),
+            color: [0.45, 0.24, 0.10, 1.0],
+        });
+    }
+    instances
+}
+
 #[cfg(test)]
 mod tests {
     use super::super::diagnostics::{camera_body_distances, camera_domain_metrics};

@@ -3,6 +3,7 @@
 //! This crate consumes typed input and reference-frame descriptions. It has no
 //! dependency on native window events, rendering, or ship simulation state.
 
+pub mod cargo;
 mod collision;
 mod controller;
 mod input;

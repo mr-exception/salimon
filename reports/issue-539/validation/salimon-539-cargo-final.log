@@ -1,0 +1,15 @@
+   Compiling salimon-client v0.1.0 (/Users/mrexception/Documents/Codex/2026-10-24/now-go-into-open-issues-again/work/salimon/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.41s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-e2041dd8d6985fa0)
+
+running 7 tests
+test session::persistence_scenarios::native_cargo_checkpoint_477 ... ignored, writes isolated cargo review fixture; requires SALIMON_NATIVE_CARGO_DIR
+test session::cargo::route_tests::cargo_handle_uses_explicit_aim_without_stealing_exit_ramp_interactions ... ok
+test session::tests::benchmark_configuration_advances_the_production_ship_character_and_cargo ... ok
+test session::cargo::tests::cargo_door_checks_loose_and_carried_objects_and_restores_partial_motion ... ok
+test session::cargo::tests::schema_nine_requires_door_and_schema_eight_migrates_open ... ok
+test session::cargo::tests::physical_bin_retains_identity_mass_and_can_be_retrieved_after_restore ... ok
+test flight_regression::tests::cargo_route ... ok
+
+test result: ok. 6 passed; 0 failed; 1 ignored; 0 measured; 366 filtered out; finished in 0.49s
+

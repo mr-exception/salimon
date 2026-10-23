@@ -37,7 +37,7 @@ command paths; [starter-layout](../../scenarios/evidence/starter-layout.json),
 [fragment-transfer](../../scenarios/fragment-transfer.json) retain the actual
 walking, Archive-targeting and post-flight retrieval routes. Runtime consumes
 character-owned generated fixture bounds; it does not derive collision geometry
-from rendered meshes. Closable cargo-door/bin mechanics remain #539 and
+from rendered meshes. Cargo-door/bin mechanics are implemented by #539;
 habitation interactions remain #540.
 
 Start in `app.rs` for native lifecycle, recovery, scheduling and evidence IO.
@@ -286,3 +286,16 @@ visible together with transient feedback in the action bar. Whole-session schema
 preserves project source and rejects malformed restore atomically, while tool UI
 resets. See the canonical [save contract](../../docs/save-contract.md#blueprint-placeholder-schema-8-542).
 Portable and native routes use `scenarios/evidence/blueprint-placement.json`.
+
+
+## Physical cargo door and open bins (#539)
+
+Character `cargo.rs` supplies the authored aperture, opposed sliding-leaf bounds
+and hollow bin shells. Walking retains conservative bin envelopes. Loose cargo
+and pickup rays use the actual 4 cm side walls, 12 cm bottom and open top; no
+slot inventory, identity replacement, mass exemption or zero-G pin is introduced.
+Runtime `session/cargo.rs` composes manual door motion and swept player/object
+clearance, independent of the aft ramp, power and flight state. Aim at the
+port-side door handle and press E; reverse with a second press. Partial openings
+remain conservatively impassable. Door position is saved in schema 9 and
+legacy captures migrate open; see the [save contract](../../docs/save-contract.md#cargo-door-schema-9-539).

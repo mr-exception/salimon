@@ -11,6 +11,7 @@ pub(crate) const COCKPIT_INTERACTION_PROMPT: &str = "[E] Use cockpit";
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum InteractionTarget {
+    CargoDoor,
     Archive,
     Fabricator,
     FabricatorScreen,
@@ -43,7 +44,9 @@ pub(crate) fn interaction_target(
         && dot(to_core, look_direction)
             / (core_distance * vector_length(look_direction)).max(f64::EPSILON)
             >= COCKPIT_INTERACTION_MINIMUM_AIM_DOT;
-    if super::archive::target(local_eye_position, local_look_target) {
+    if cargo_door_target(local_eye_position, local_look_target) {
+        Some(InteractionTarget::CargoDoor)
+    } else if super::archive::target(local_eye_position, local_look_target) {
         Some(InteractionTarget::Archive)
     } else if core_aimed {
         Some(InteractionTarget::Core)
@@ -81,7 +84,8 @@ pub(crate) fn available_interaction_target(
 ) -> Option<InteractionTarget> {
     match interaction_target(local_eye_position, local_look_target) {
         Some(
-            InteractionTarget::Archive
+            InteractionTarget::CargoDoor
+            | InteractionTarget::Archive
             | InteractionTarget::Cockpit
             | InteractionTarget::Core
             | InteractionTarget::Fabricator
@@ -127,6 +131,19 @@ pub(super) fn machine_target(eye: [f64; 3], look: [f64; 3], target: [f64; 3]) ->
         && (hit[1] - target[1]).abs() <= 0.22
         && salimon_character::fabricator_sight_obstruction(eye, target)
             .is_none_or(|obstruction| obstruction >= distance - 0.02)
+}
+
+fn cargo_door_target(eye: [f64; 3], look: [f64; 3]) -> bool {
+    let target = salimon_character::cargo::CARGO_DOOR_TARGET;
+    let direction = subtract(look, eye);
+    let t = (target[0] - eye[0]) / direction[0];
+    let hit_y = eye[1] + t * direction[1];
+    let hit_z = eye[2] + t * direction[2];
+    t > 0.0
+        && vector_length(subtract(target, eye)) <= 2.0
+        && (hit_y - target[1]).abs() <= 0.20
+        && (hit_z - target[2]).abs() <= 0.16
+        && eye[2].abs() <= 1.25
 }
 
 #[cfg(test)]

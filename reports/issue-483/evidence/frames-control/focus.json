@@ -1,0 +1,9 @@
+[
+  {
+    "pid": 87950,
+    "stdout": "frontmost=405 target=87950\nposted PID=87950 operation=focus\n",
+    "stderr": "",
+    "returncode": 0,
+    "unix": 1792735307.486882
+  }
+]

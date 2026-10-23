@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "scenario": "artifacts/483-cloud/candidates/scout-lighting/expanded.json",
+  "status": "failed",
+  "steps_completed": 0,
+  "steps": [],
+  "command": [
+    "/workspace/salimon/target/debug/salimon-client"
+  ],
+  "artifact_directory": "/workspace/salimon/artifacts/483-cloud/candidates-runs/scout-lighting/run-c33nj_9b",
+  "setup": {
+    "scenario": "core-restart",
+    "seed": 0,
+    "step_ms": 100
+  },
+  "error": "game exited before ready signal (exit 1): ",
+  "failure_screenshot": {
+    "status": "unavailable",
+    "reason": "game did not become ready"
+  },
+  "duration_ms": 15,
+  "game_exit_code": 1,
+  "result_file": "/workspace/salimon/artifacts/483-cloud/candidates-runs/scout-lighting/run-c33nj_9b/result.json"
+}

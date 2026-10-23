@@ -146,8 +146,13 @@ Run with an absolute output directory:
 SALIMON_SCOUT_FEEDBACK_DIR="$PWD/artifacts/scout-feedback" VK_DRIVER_FILES=/usr/share/vulkan/icd.d/lvp_icd.json cargo test -p salimon-renderer --locked scout_feedback_gpu_evidence -- --ignored --nocapture
 ```
 
-The normal-play interaction walkthrough, reference hardware budgets and observed
-Fabricator reference-text orientation remain [#489](https://github.com/mr-exception/salimon/issues/489).
+The [#489 cloud walkthrough](../reports/issue-489/README.md) retains production
+window/session state, actual GPU close views and stepped motion sequences for
+pedals, work sweep, blocked output, Core recovery and ramp reversal. Explicit
+initial fixture placement is distinct from physical mining/travel. Human motion/
+readability review remains #561, physical input/platform checks #557 and hardware
+budgets #563. Fabricator orientation retains its three-screen geometry regression;
+cloud images do not approve readability.
 The absent scanner hologram will integrate through #430/#466 when available.
 No native appearance, mask/tolerance or baseline approval is granted here.
 

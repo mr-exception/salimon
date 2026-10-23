@@ -33,7 +33,7 @@
     {
       "action": {
         "op": "step",
-        "frames": 110
+        "frames": 70
       }
     },
     {
@@ -60,6 +60,26 @@
       "action": {
         "op": "key",
         "key": "right",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 40
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
         "pressed": false
       }
     },

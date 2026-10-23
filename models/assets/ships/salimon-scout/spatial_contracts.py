@@ -19,9 +19,13 @@ LANDING_COLLIDERS = tuple(
     for part in ("Foot", "Leg")
 )
 WING_COLLIDERS = ("COLLIDER_Wing_Port", "COLLIDER_Wing_Starboard")
+STARTER_COLLIDERS = tuple('COLLIDER_Starter_' + name for name in (
+    'BulkheadPort', 'BulkheadStarboard', 'BinPort', 'BinStarboard',
+    'Bunk', 'Galley', 'Hygiene'))
 MARKERS = ("MARKER_CockpitSeat", "MARKER_ExitDoor", "MARKER_PlayerStart",
            "MARKER_DoorwayTransition", "MARKER_FabricatorInput", "MARKER_FabricatorMonitor", "MARKER_FabricatorTray")
 LAYOUT_BOXES = {
+    "CARGO_HEADER_BOUNDS": "COLLIDER_Starter_Header",
     "INTERIOR_FLOOR_BOUNDS": "COLLIDER_InteriorFloor",
     "NOSE_FLOOR_BOUNDS": "COLLIDER_CockpitNoseFloor",
     "CABIN_TRAVERSAL_BOUNDS": "COLLIDER_CabinTraversalEnvelope",
@@ -34,7 +38,7 @@ LAYOUT_BOXES = {
     "COCKPIT_PORT_HULL_BOUNDS": "COLLIDER_CockpitPortHull",
     "COCKPIT_STARBOARD_HULL_BOUNDS": "COLLIDER_CockpitStarboardHull",
 }
-REQUIRED_COLLIDERS = set(LAYOUT_BOXES.values()) | set(THRUSTER_COLLIDERS) | set(WING_COLLIDERS) | set(LANDING_COLLIDERS) | {
+REQUIRED_COLLIDERS = set(LAYOUT_BOXES.values()) | set(THRUSTER_COLLIDERS) | set(WING_COLLIDERS) | set(LANDING_COLLIDERS) | set(STARTER_COLLIDERS) | {
     "COLLIDER_InteriorPortWall", "COLLIDER_InteriorStarboardWall",
     "COLLIDER_InteriorCeiling", "COLLIDER_ExteriorHull",
 }
@@ -265,6 +269,7 @@ def spatial_rust_source(contracts):
         lines.append(f"// {name}")
         lines.append(f"pub(crate) const {rust_name}: [f64; 6] = {_rust_array(_bounds(contracts['colliders'][name]))};")
     for rust_name, names in (("THRUSTER_COLLIDERS", THRUSTER_COLLIDERS),
+                             ("STARTER_COLLIDERS", STARTER_COLLIDERS),
                              ("WING_COLLIDERS", WING_COLLIDERS),
                              ("LANDING_COLLIDERS", LANDING_COLLIDERS)):
         lines.append(f"pub(crate) const {rust_name}: [[f64; 6]; {len(names)}] = [")

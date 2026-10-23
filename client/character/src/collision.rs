@@ -19,6 +19,46 @@ pub(crate) fn slide_around_fixtures(previous: [f64; 3], proposed: [f64; 3]) -> [
     slide_around_obstacles(previous, proposed, &INTERIOR_OBSTACLES)
 }
 
+#[cfg(test)]
+mod starter_layout_tests {
+    use super::*;
+
+    #[test]
+    fn cargo_bulkhead_blocks_side_aisles_but_central_carrying_route_is_clear() {
+        let y = SHIP_FLOOR_HEIGHT + PLAYER_EYE_HEIGHT_METERS;
+        for z in [-2.2, 2.2] {
+            let result = slide_around_fixtures([-3.8, y, z], [-7.0, y, z]);
+            assert!(result[0] > -4.5, "bulkhead must block the entire body");
+        }
+        assert_eq!(
+            slide_around_fixtures([-3.8, y, 0.0], [-7.0, y, 0.0]),
+            [-7.0, y, 0.0]
+        );
+        assert_eq!(
+            slide_around_fixtures([-7.0, y, 0.0], [-3.8, y, 0.0]),
+            [-3.8, y, 0.0]
+        );
+    }
+
+    #[test]
+    fn starter_fixtures_reject_cargo_placement_but_preserve_service_aisles() {
+        for bounds in crate::spatial_contracts::STARTER_COLLIDERS {
+            let center = [
+                (bounds[0] + bounds[1]) * 0.5,
+                SHIP_FLOOR_HEIGHT,
+                (bounds[4] + bounds[5]) * 0.5,
+            ];
+            assert!(crate::ship_floor_placement(center, 0.1).is_none());
+        }
+        for x in [-6.5, -5.2, -3.8] {
+            assert!(crate::ship_floor_placement([x, SHIP_FLOOR_HEIGHT, 0.0], 0.4).is_some());
+        }
+        for z in [-2.2, 2.2] {
+            assert!(crate::ship_floor_placement([0.5, SHIP_FLOOR_HEIGHT, z], 0.2).is_some());
+        }
+    }
+}
+
 pub(crate) fn slide_around_appendages(
     previous: [f64; 3],
     mut proposed: [f64; 3],

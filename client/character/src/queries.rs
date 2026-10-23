@@ -18,6 +18,15 @@ pub fn ship_floor_placement(local: [f64; 3], half: f64) -> Option<[f64; 3]> {
     if !(cabin || nose) || SHIP_FLOOR_HEIGHT + half * 2.0 >= SHIP_CEILING_HEIGHT {
         return None;
     }
+    let header = crate::spatial_contracts::CARGO_HEADER_BOUNDS;
+    if local[0] + half > header[0]
+        && local[0] - half < header[1]
+        && local[2] + half > header[4]
+        && local[2] - half < header[5]
+        && SHIP_FLOOR_HEIGHT + half * 2.0 >= header[2]
+    {
+        return None;
+    }
     if INTERIOR_OBSTACLES.iter().any(|b| {
         local[0] + half > b[0]
             && local[0] - half < b[1]
@@ -109,6 +118,7 @@ fn sight_obstruction(
                     ]
                 }),
         );
+        boxes.push(crate::spatial_contracts::CARGO_HEADER_BOUNDS);
         // The shared deck and ceiling occlude objects on the other side.
         for (x0, x1, z0, z1) in [
             (
@@ -263,7 +273,7 @@ mod fabricator_tests {
     fn wall_module_blocks_physical_objects_and_sight_but_not_its_input_or_aisles() {
         assert!(ship_floor_placement([-3.0, 1.0, 3.5], 0.1).is_none());
         assert!(ship_floor_placement([-3.0, 1.0, 2.0], 0.1).is_some());
-        assert!(ship_floor_placement([-5.0, 1.0, 3.4], 0.1).is_some());
+        assert!(ship_floor_placement([-6.0, 1.0, 2.0], 0.1).is_some());
         let eye = [-3.0, 1.65, 2.0];
         let input = crate::FABRICATOR_INPUT_MARKER_METERS;
         assert!(ship_sight_obstruction(eye, input, true).unwrap() < 1.55);

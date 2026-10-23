@@ -1,0 +1,1 @@
+{"status": "passed", "results": [{"scenario": "scenarios/evidence/starter-layout.json", "status": "passed", "steps_completed": 41, "duration_ms": 12817, "artifact_directory": "/workspace/salimon/artifacts/issue-538/starter-final/run-ckdpj45u", "result_file": "/workspace/salimon/artifacts/issue-538/starter-final/run-ckdpj45u/result.json"}]}

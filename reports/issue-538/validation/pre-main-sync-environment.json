@@ -1,0 +1,18 @@
+{
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "python": "3.12.14",
+  "display": ":101",
+  "viewport": [
+    1280,
+    800
+  ],
+  "backend": "Vulkan",
+  "driver": "Mesa llvmpipe 25.0.7 / LLVM 19.1.7",
+  "input": "protocol fixed 16ms steps; Xvfb root screenshots, no physical input",
+  "blender": "bpy 4.5.3 LTS wheel / CPython 3.11.17",
+  "hashes": {
+    "target/release/salimon-client": "7cebc1bec964cc3ad92be0ac0fce125e14a7a79b8d94dcec0f7e0e9e0e9f7744",
+    "client/assets/ship/export/salimon_phase0_ship.glb": "cee49f44062daafd6e38b347848f0d5138e9b79bbc7e8251a9c09c88b874fa1d",
+    "models/assets/ships/salimon-scout/components/cabin-interior/source.blend": "ac3444ceb55fab3fba15953b51c4d801ab903ad23c8e3228b8b1e1fa07e24fef"
+  }
+}

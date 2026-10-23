@@ -1,8 +1,8 @@
 {
   "extras": {
     "salimon": {
-      "drawPrimitiveCount": 123,
-      "triangleCount": 6493,
+      "drawPrimitiveCount": 134,
+      "triangleCount": 6767,
       "materialCount": 13,
       "externalAssetDependencies": 0,
       "scaleFromTask7Baseline": [
@@ -25,7 +25,7 @@
         "width": 9.2,
         "height": 2.5591397849462365
       },
-      "designRevision": "wall-integrated-fabricator",
+      "designRevision": "separated-aft-cargo-and-integrated-habitation",
       "energyCore": {
         "centerMeters": [
           -1.0,
@@ -141,7 +141,7 @@
   },
   "assetExtras": {
     "salimon": {
-      "assetVersion": 14,
+      "assetVersion": 15,
       "units": "meters",
       "upAxis": "+Y",
       "forwardAxis": "+X",

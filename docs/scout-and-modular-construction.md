@@ -104,7 +104,7 @@ The starting ship comes fully playable with:
 
 ## Delivery boundaries and existing implementation
 
-This is a design contract for future implementation, **not a claim that current Rust code has construction, habitation, a starter cargo room, advanced hull damage, full offline construction or the Jump Drive**. The existing implemented ship uses authored anchors, cockpit, Core fueling, Fabricator, Archive, ramp, cabin gravity, physical fragments and mass accounting; existing files and native tests continue to describe that implementation until changed.
+This is a design contract for future implementation. The #538 authored starter envelope now includes an aft cargo compartment and habitation fixtures; **operable internal door/bin mechanics (#539), habitation interactions (#540), construction, advanced hull damage, full offline construction and the Jump Drive are not shipped by that envelope**. The existing implemented ship uses authored anchors, cockpit, Core fueling, Fabricator, Archive, ramp, cabin gravity, physical fragments and mass accounting; existing files and native tests continue to describe that implementation until changed.
 
 The approved first reference slice is **a completely usable starter Scout**, not a beauty-only Blender render: cockpit, working Core/Fabricator/Archive, dedicated physical cargo, interior door/ramp and integrated habitation, with reliable HUD/UI/lighting/sound feedback. GLB budgets remain necessary. Cloud wgpu routes establish automated integration; #561 owns human spatial/presentation review, #557 actual platform experiments and #563 hardware budgets. M1 access is not a routine completion prerequisite.
 

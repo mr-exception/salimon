@@ -1,0 +1,35 @@
+name: Human evidence or decision
+description: Give a person actionable steps and return evidence to Codex.
+labels: ["human-verification"]
+body:
+  - type: markdown
+    attributes:
+      value: Follow docs/verification-workflow.md. Review original cloud evidence remotely where possible; require physical hardware only for an actual device or OS experiment.
+  - type: textarea
+    id: prerequisites
+    attributes:
+      label: Build, artifacts and prerequisites
+      description: Exact revision, linked originals or download/build instructions, scenario/save setup, required device or software and dependency issues.
+    validations:
+      required: true
+  - type: textarea
+    id: procedure
+    attributes:
+      label: Ordered actions and expected outcomes
+      description: A person must be able to follow these steps and mark each criterion passed, failed, blocked or unrun.
+    validations:
+      required: true
+  - type: textarea
+    id: capture
+    attributes:
+      label: Evidence to capture
+      description: Original images, video, audio, raw logs or decision record; revision and artifact hashes, reviewer/date, expected versus observed, device/OS/backend/display/DPI/audio context where relevant. State exact review scope, masks, tolerances or thresholds.
+    validations:
+      required: true
+  - type: textarea
+    id: handoff
+    attributes:
+      label: Return to Codex and completion
+      value: Return this issue URL, the completed checklist, original files or accessible evidence links, context and explicit decisions to Codex in chat. Codex assesses coverage and updates the issue. Repository code, docs, baseline or evidence changes require a PR; a fully evidenced human review requiring no repository change may close directly with a durable issue record. Preserve failures and unrun criteria.
+    validations:
+      required: true

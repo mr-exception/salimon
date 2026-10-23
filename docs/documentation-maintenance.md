@@ -1,5 +1,10 @@
 # Documentation maintenance gate — Universe U35 (#440)
 
+Verification claims and issue closure use the
+[cloud/human workflow](verification-workflow.md). Match recorded evidence to its
+actual context and transfer human criteria explicitly; routine cloud PRs do not
+wait for M1-only acceptance. This changes no same-PR documentation requirement.
+
 This is a required author/reviewer gate for **every Universe U01–U34 implementation
 PR**, including later fixes to those systems. It applies alongside the existing
 [coding conventions](coding-conventions.md#tests-and-documentation) and

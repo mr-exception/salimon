@@ -1,5 +1,11 @@
 # Scout presentation foundation
 
+Verification ownership follows the [cloud/human policy](verification-workflow.md).
+#483/#485/#489/#498/#502/#505/#515/#566 own cloud-renderer/interaction/audio
+checks; #561 human presentation/listening, #557 physical platform checks and
+#563 hardware budgets. Retain dated native evidence/failures; desktop availability
+is not a prerequisite for independent cloud integration work.
+
 ## Lighting and material boundary (#463)
 
 Warm cockpit/workshop fill at ship-local X=4/-3 metres contrasts with a cooler

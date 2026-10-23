@@ -83,8 +83,10 @@ Clippy and fmt. Tests cover exact deterministic identity/order, golden schema-1
 bytes, mixed provenance/missing measurements, referential errors/cycles,
 nonfinite/uncertain/invalid data, domain dependency constraints, unsupported
 versions, malformed/oversized JSON and immutable explicit revision replacement.
-No native signoff is needed for this isolated portable schema; downstream native
-integration retains #436–439. See [approved design](../../docs/universe-expansion-approved-design.md)
+No hardware signoff is needed for this isolated portable schema; downstream cloud
+integration retains #436–439, with human presentation/platform/budget criteria in
+#561/#557/#563 under the [verification workflow](../../docs/verification-workflow.md).
+See [approved design](../../docs/universe-expansion-approved-design.md)
 and [canonical world policy](../../docs/canonical-planet-generation.md).
 
 ## Hierarchical frames and epoch — U02 (#403)
@@ -150,7 +152,8 @@ analytic goldens. `examples/support/reference_inputs.rs` is a frozen-source test
 adapter plus production U02 workload, not a U08 importer/solver. The comparator
 CLI and seven-sample CPU workload are `examples/reference_compare.rs` and
 `examples/reference_bench.rs`. Read the [reference/budget contract](../../docs/universe-reference-fixtures.md).
-No gameplay/model accuracy or M1 performance is inferred; native work remains #521.
+No gameplay/model accuracy or M1 performance is inferred; cloud workload profiling
+remains #521 and hardware budget decisions #563.
 
 ## Gaia ingestion — U07 (#408)
 

@@ -213,6 +213,10 @@ impl Default for ClientApplication {
 }
 
 impl ClientApplication {
+    pub(crate) fn fixture_batch_stats(&self) -> Option<salimon_renderer::FixtureBatchStats> {
+        self.renderer.as_ref().map(Renderer::fixture_batch_stats)
+    }
+
     pub(crate) fn show_session_feedback(&mut self) {
         if let Some(message) = self.session.feedback.take() {
             self.action_bar.show_transient(message);
@@ -427,7 +431,7 @@ impl ClientApplication {
     }
     pub(crate) fn window_state(&self) -> serde_json::Value {
         self.window.as_ref().map_or(serde_json::Value::Null,|w|serde_json::json!({
-            "minimized":w.is_minimized(), "inner_size":[w.inner_size().width,w.inner_size().height]
+            "minimized":w.is_minimized(), "focused":self.native_focused,"occluded":self.occluded, "inner_size":[w.inner_size().width,w.inner_size().height]
         }))
     }
     /// The only host restart path: publish archive and both fresh generations
@@ -992,6 +996,7 @@ impl ClientApplication {
                 camera = view.camera(presentation.ship.pose);
             }
             let mut mesh = map_ship_to_renderer(presentation.ship);
+            mesh.independent_interior = true;
             mesh.bunk_open_fraction = self.session.habitation.bunk_open_fraction as f32;
             mesh.fabricator_output_present = self.session.fabricator_output_present();
             mesh.fabricator_output_medical = self.session.fabricator_output_medical();
@@ -1161,6 +1166,11 @@ impl ClientApplication {
                     .held_item(presentation.character, mining_target.is_some())
             })
             .flatten();
+        let fixture_instances = if self.session.view_mode == ViewMode::Gameplay {
+            self.session.fixture_instances(presentation.ship)
+        } else {
+            Vec::new()
+        };
         let outcome = match self
             .renderer
             .as_mut()
@@ -1170,6 +1180,7 @@ impl ClientApplication {
                     camera,
                     instances: &scene_instances,
                     resource_meshes: &resource_meshes,
+                    fixtures: &fixture_instances,
                     spheres: &spheres,
                     terrain: &self.terrain_stream.active,
                     terrain_mask: self.terrain_stream.mask,

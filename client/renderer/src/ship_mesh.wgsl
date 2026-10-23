@@ -81,6 +81,7 @@ fn vs_main(
     );
     var output: VertexOutput;
     output.clip_position = ship.view_projection * vec4<f32>(relative, 1.0);
+    if door_flag == 3.0 && ship.port.w > 0.5 {output.clip_position=vec4<f32>(2.0,2.0,0.0,1.0);}
     output.color = color;
     let key = normalize(vec3<f32>(0.35, 0.82, 0.44));
     let exterior_light = vec3<f32>(0.82, 0.90, 1.0)

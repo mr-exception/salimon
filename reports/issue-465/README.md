@@ -65,3 +65,14 @@ matched whole-frame cost and the decision whether continuous playback is needed.
 Source closure records delivered portable/native adapter work and explicit
 transfer, not native audio acceptance. See the
 [canonical mix/quiet-zone/budget contract](../../docs/scout-presentation.md#soundscape-boundary-465).
+
+## Cloud verification follow-up — 2026-10-23
+
+The [#485 report](../issue-485/README.md) now retains production-loop and
+EVA/surface-silence verification, real playback-child failure/timeout/cleanup
+checks, nineteen stereo PCM examples and matched enabled/muted release
+synthesis/substitute-process diagnostics. The original portable/debug results
+above remain historical evidence. Human listening/headroom/quiet/continuity is
+#561; actual platform/device and physical sleep/focus checks #557; hardware and
+whole-frame budgets #563. PCM exports do not establish device playback latency
+or approve the current chunked backend's audible continuity.

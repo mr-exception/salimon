@@ -390,3 +390,17 @@ rejection, disjoint mass contributions and versioned save reconstruction.
 Run workspace tests/build/Clippy/fmt for its public mass/save boundaries. The
 foundation is not composed into native gameplay; no visual, Metal/M1 or
 construction-interaction acceptance is claimed by these headless tests.
+
+## Scout audio cloud verification (#485)
+
+`cargo test -p salimon-client --locked scout_audio` covers production walking,
+Core intake/restoration, Fabricator funded/paused/blocked work, engines, ramp,
+EVA/surface silence, terminal/restart/restore, spatial PCM and bounded lifecycle.
+Unix real-child tests cover missing player, disk failure, nonzero exit, timeout,
+suppression, no overlapping child and drop/file cleanup without an audio device.
+Run `SALIMON_AUDIO_EVIDENCE=/absolute/new/directory cargo test --release
+-p salimon-client --locked cloud_audio_evidence_485 -- --ignored --nocapture`
+serially for stereo WAVs and matched synthesis/substitute-process diagnostics.
+The directory must not exist. Exports are original PCM, not device recordings;
+#561 owns listening/continuity, #557 physical backend checks, #563 hardware budgets.
+See [evidence and limitations](../reports/issue-485/README.md).

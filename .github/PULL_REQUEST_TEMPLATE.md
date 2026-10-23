@@ -9,7 +9,11 @@ Report:
 ## Validation
 
 List the relevant commands and actual results. Preserve failures, ignored/unrun
-checks and native hardware limitations; link evidence rather than inventing it.
+checks and actual platform/hardware limitations; link evidence rather than inventing it.
+Use [cloud/human verification](../docs/verification-workflow.md): identify the
+primary label, cloud commands/results and any separately linked human evidence.
+For human evidence record reviewer/date, provenance, expected/observed outcomes
+and remaining failures. Cloud results do not establish Metal or hardware FPS.
 
 ## Documentation impact
 

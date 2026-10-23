@@ -37,6 +37,7 @@ These newer approved narrative contracts supersede historical Earth-start assump
 - [Feature ownership, sources, tests and scenarios](maintenance-map.md)
 - [Coding conventions and completion reports](coding-conventions.md)
 - [Issue completion and follow-up workflow](coding-conventions.md#issue-completion-and-follow-up)
+- [Cloud and human verification workflow and labels](verification-workflow.md)
 - [Validation matrix and prerequisites](validation.md)
 - [Historical task reports](../reports/README.md)
 

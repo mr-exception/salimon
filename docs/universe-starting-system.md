@@ -156,7 +156,9 @@ all-target Clippy/fmt and documentation gates. See [measured report](../reports/
 
 U12 #413 owns production merging/packaging; U14 #415 evolving states; U23 #424
 real-scale terrain LOD; U24 #425 playable arrival/resources integration.
-Reference hardware/native gates #436–#439 remain separate. There is no runtime
+Cloud integration gates #436–#439 remain separate; human review/platform/budget
+criteria are #561/#557/#563 under the [verification workflow](verification-workflow.md).
+There is no runtime
 startup, save, scanner/chart, Earth-route, backend or asset change. Renderer/native
 appearance, environmental survival and real hull contact are not validated by
 this portable definition. Explicit all-player-consistent fictional revision

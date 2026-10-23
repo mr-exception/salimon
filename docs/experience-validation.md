@@ -1,5 +1,11 @@
 # Experience validation — E06 (#476)
 
+Verification ownership follows the [cloud/human policy](verification-workflow.md):
+#568 executes automated matrix rows once their implementation dependencies ship;
+#537/#561 own instructed human decisions/reviews. Physical platform tests are
+#557, hardware budgets #563. Retain all blocked/unrun rows and real backend
+requirements; cloud passes do not invent hardware or human approval.
+
 The version-1 [scenario matrix](../scenarios/portable/experience-v1.json) maps
 26 accepted invariants to current portable tests and human native protocols.
 It traces [experience](experience-direction.md), [lost journey](narrative-and-lost-journey.md),

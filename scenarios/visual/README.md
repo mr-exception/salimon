@@ -1,5 +1,12 @@
 # Production model image regression
 
+Use the [cloud/human verification workflow](../../docs/verification-workflow.md).
+AI produces reproducible cloud candidates and regression evidence (#568); #561
+owns human image/mask/tolerance review, which can be performed remotely from
+original cloud images. Metal originals retain independent context/approval.
+Baseline promotion still needs a separate reviewed PR; neither temporal stability
+nor this workflow change grants appearance approval.
+
 Run from repository root, on a dedicated desktop with a fixed 1280×800 viewport,
 same driver/backend, build, seed and pixel density. Fixtures reuse maintained
 production scenarios, seed and fixed-step actions. Screenshots use the explicit

@@ -5,7 +5,9 @@ use std::time::{Duration, Instant};
 use salimon_math::{dot, length, sub};
 
 use crate::mining::ResourceGameplay;
-use salimon_character::{SHIP_FLOOR_HEIGHT_METERS, ShipFrame, ship_floor_placement};
+#[cfg(test)]
+use salimon_character::SHIP_FLOOR_HEIGHT_METERS;
+use salimon_character::ShipFrame;
 use salimon_world::resources::{FragmentId, ResourceTransform};
 use salimon_world::{BodyRole, CELESTIAL_BODIES, WorldPosition};
 
@@ -252,7 +254,14 @@ pub(crate) fn advance_measured(
     let states = &mut scratch.states;
     let ids = &scratch.ids;
     let solver_start = profile.then(Instant::now);
-    let contains = |position, radius| ship_floor_placement(position, radius).is_some();
+    let blocking = tool.cargo_door_blocking;
+    let contains = |position, radius| {
+        salimon_character::cargo::cargo_position_allowed(
+            position,
+            radius,
+            if blocking { 0.0 } else { 1.0 },
+        )
+    };
     measurements.solver = salimon_physics::advance_with_sleep(
         &mut tool.fragment_sleep,
         ids,
@@ -392,12 +401,18 @@ fn snapshots_into(
                         surface: if ship {
                             if tool.ship_gravity_disabled {
                                 Surface::UnpoweredFloor {
-                                    height_meters: SHIP_FLOOR_HEIGHT_METERS,
+                                    height_meters: salimon_character::cargo::cargo_support_height(
+                                        position,
+                                        sphere_radius(p),
+                                    ),
                                     ceiling_meters: salimon_character::SHIP_CEILING_HEIGHT_METERS,
                                 }
                             } else {
                                 Surface::Floor {
-                                    height_meters: SHIP_FLOOR_HEIGHT_METERS,
+                                    height_meters: salimon_character::cargo::cargo_support_height(
+                                        position,
+                                        sphere_radius(p),
+                                    ),
                                 }
                             }
                         } else {

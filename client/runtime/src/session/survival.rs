@@ -66,7 +66,7 @@ impl GameplaySession {
         match target {
             InteractionTarget::Archive => Action::Menu,
             InteractionTarget::Cockpit => Action::Pilot,
-            InteractionTarget::ExitDoor => Action::Door,
+            InteractionTarget::ExitDoor | InteractionTarget::CargoDoor => Action::Door,
             InteractionTarget::Core => Action::FeedCore,
             InteractionTarget::Fabricator
             | InteractionTarget::FabricatorScreen

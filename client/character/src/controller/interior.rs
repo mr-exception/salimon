@@ -40,6 +40,19 @@ impl CharacterController {
         local[2] = local[2].clamp(-INTERIOR_SIDE_LIMIT, INTERIOR_SIDE_LIMIT);
         local[0] = local[0].min(INTERIOR_FORWARD_MAX);
         local = slide_around_fixtures(previous, local);
+        if self.cargo_door_blocking {
+            let b = crate::cargo::cargo_door_bounds(0.0);
+            local = crate::collision::slide_around_obstacles(
+                previous,
+                local,
+                &[[
+                    b[0] - PLAYER_RADIUS_METERS,
+                    b[1] + PLAYER_RADIUS_METERS,
+                    b[4] - PLAYER_RADIUS_METERS,
+                    b[5] + PLAYER_RADIUS_METERS,
+                ]],
+            );
+        }
         let ceiling = interior_ceiling(local);
         let maximum_eye = ceiling - (PLAYER_BODY_HEIGHT_METERS - PLAYER_EYE_HEIGHT_METERS);
         if local[1] > maximum_eye {
@@ -119,6 +132,19 @@ impl CharacterController {
         local[2] = local[2].clamp(-INTERIOR_SIDE_LIMIT, INTERIOR_SIDE_LIMIT);
         local[0] = local[0].min(INTERIOR_FORWARD_MAX);
         local = slide_around_fixtures(previous, local);
+        if self.cargo_door_blocking {
+            let b = crate::cargo::cargo_door_bounds(0.0);
+            local = crate::collision::slide_around_obstacles(
+                previous,
+                local,
+                &[[
+                    b[0] - PLAYER_RADIUS_METERS,
+                    b[1] + PLAYER_RADIUS_METERS,
+                    b[4] - PLAYER_RADIUS_METERS,
+                    b[5] + PLAYER_RADIUS_METERS,
+                ]],
+            );
+        }
         let within_doorway = local[2].abs() <= DOORWAY_SIDE_LIMIT;
         let ceiling = interior_ceiling(local);
         local[1] = local[1].clamp(
@@ -880,5 +906,65 @@ mod energy_tests {
             true,
         );
         assert!(player.local_ship_position().unwrap()[1] < 2.2);
+    }
+}
+
+#[cfg(test)]
+mod cargo_door_tests {
+    use super::*;
+    use crate::controller::test_support::{frame, inside_at, surface};
+    #[test]
+    fn independent_internal_door_blocks_walking_and_zero_g_from_both_sides() {
+        for (x, forward) in [(-3.8, false), (-6.0, true)] {
+            for powered in [true, false] {
+                let mut c = inside_at(x, 0.0);
+                c.set_ship_gravity_enabled(powered);
+                c.set_cargo_door_blocking(true);
+                let input = MovementInput {
+                    forward,
+                    backward: !forward,
+                    ..Default::default()
+                };
+                for _ in 0..90 {
+                    c.advance(
+                        Duration::from_millis(16),
+                        input,
+                        frame(),
+                        surface(),
+                        false,
+                        true,
+                    );
+                }
+                let stopped = c
+                    .snapshot(frame(), surface())
+                    .local_ship_position_meters
+                    .unwrap();
+                if forward {
+                    assert!(stopped[0] < -4.8);
+                } else {
+                    assert!(stopped[0] > -4.6);
+                }
+                c.set_cargo_door_blocking(false);
+                for _ in 0..40 {
+                    c.advance(
+                        Duration::from_millis(16),
+                        input,
+                        frame(),
+                        surface(),
+                        false,
+                        true,
+                    );
+                }
+                let passed = c
+                    .snapshot(frame(), surface())
+                    .local_ship_position_meters
+                    .unwrap();
+                if forward {
+                    assert!(passed[0] > -4.6);
+                } else {
+                    assert!(passed[0] < -4.8);
+                }
+            }
+        }
     }
 }

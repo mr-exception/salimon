@@ -1458,3 +1458,16 @@ llvmpipe profile complements the strict default M1 profile. Both retain actual
 focus/visibility/source-state admission. No runtime scheduling, shader or frame
 logging rule is changed by that tooling extension. Software device timestamps
 cannot be interpreted as hardware GPU budget evidence.
+
+
+## Physical cargo door and open bins (#539)
+
+Character `cargo.rs` supplies the authored aperture, opposed sliding-leaf bounds
+and hollow bin shells. Walking retains conservative bin envelopes. Loose cargo
+and pickup rays use the actual 4 cm side walls, 12 cm bottom and open top; no
+slot inventory, identity replacement, mass exemption or zero-G pin is introduced.
+Runtime `session/cargo.rs` composes manual door motion and swept player/object
+clearance, independent of the aft ramp, power and flight state. Aim at the
+port-side door handle and press E; reverse with a second press. Partial openings
+remain conservatively impassable. Door position is saved in schema 9 and
+legacy captures migrate open; see the [save contract](../../docs/save-contract.md#cargo-door-schema-9-539).

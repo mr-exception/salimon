@@ -22,6 +22,7 @@ fn hull_obstruction(
     player: CharacterSnapshot,
     frame: ShipFrame,
     door_open: bool,
+    cargo_blocking: bool,
     target: [f64; 3],
 ) -> Option<f64> {
     salimon_character::ship_sight_obstruction(
@@ -29,6 +30,16 @@ fn hull_obstruction(
         frame.world_to_local(target),
         door_open,
     )
+    .into_iter()
+    .chain(if cargo_blocking {
+        salimon_character::cargo::cargo_sight_obstruction(
+            frame.world_to_local(player.eye_position_meters),
+            frame.world_to_local(target),
+        )
+    } else {
+        None
+    })
+    .min_by(f64::total_cmp)
 }
 
 pub(crate) fn target(
@@ -50,6 +61,7 @@ pub(crate) fn target(
             player,
             frame,
             door_open,
+            tool.cargo_door_blocking,
             player.look_target_meters,
         ))
         .min_by(f64::total_cmp)
@@ -152,6 +164,24 @@ pub(crate) fn follow(tool: &mut ResourceGameplay, player: CharacterSnapshot) {
         }
     }
 
+    if player.location == CharacterLocation::InsideShip
+        && tool.cargo_door_blocking
+        && let Some(frame) = tool.mass_frame
+    {
+        let local = frame.world_to_local(p);
+        if salimon_character::cargo::sphere_overlaps_box(
+            local,
+            clearance,
+            salimon_character::cargo::cargo_door_bounds(0.0),
+        ) || salimon_character::cargo::cargo_sight_obstruction(
+            frame.world_to_local(player.eye_position_meters),
+            local,
+        )
+        .is_some_and(|hit| hit < length(salimon_math::sub(p, player.eye_position_meters)))
+        {
+            return;
+        }
+    }
     if let Ok(pose) = ResourceTransform::new(position(p), orientation) {
         tool.session.move_carried(pose);
     }
@@ -176,11 +206,11 @@ pub(crate) fn release_pose(
         .find(|piece| piece.id() == id)
         .filter(|piece| {
             player.location != CharacterLocation::InsideShip
-                || salimon_character::ship_floor_placement(
+                || salimon_character::cargo::cargo_position_allowed(
                     frame.world_to_local(piece.transform().position().meters()),
                     salimon_world::resource_size::fragment_contact_radius_meters(piece.material()),
+                    if tool.cargo_door_blocking { 0.0 } else { 1.0 },
                 )
-                .is_some()
         })
         .map(|piece| piece.transform())
 }

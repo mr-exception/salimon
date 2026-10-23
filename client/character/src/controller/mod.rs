@@ -56,6 +56,8 @@ pub struct CharacterController {
     nearby_surface: Option<SurfaceFrame>,
     ramp_moving: bool,
     ship_gravity_enabled: bool,
+    #[serde(skip)]
+    cargo_door_blocking: bool,
 }
 
 impl Default for CharacterController {
@@ -76,6 +78,7 @@ impl Default for CharacterController {
             nearby_surface: None,
             ramp_moving: false,
             ship_gravity_enabled: true,
+            cargo_door_blocking: false,
         }
     }
 }
@@ -85,6 +88,11 @@ fn normal_movement_scale() -> f64 {
 }
 
 impl CharacterController {
+    /// Host supplies the independently saved internal door state before stepping.
+    pub fn set_cargo_door_blocking(&mut self, blocking: bool) {
+        self.cargo_door_blocking = blocking;
+    }
+
     /// Scales voluntary locomotion only, never gravity, elapsed time or inherited drift.
     pub fn set_movement_scale(&mut self, scale: f64) {
         self.movement_scale = if scale.is_finite() {

@@ -221,9 +221,21 @@ The exporter owns seven new starter fixture bounds and a separate cargo header.
 `layout.rs` expands the fixtures by the existing body radius. The central doorway
 remains traversable; bulkhead sides and habitation/storage envelopes block walking
 and cargo placement. `interior_ceiling` applies the header to powered jumping and
-zero-G movement, while sight uses its actual 3D bounds. The cargo door is an open
-interface until #539 implements its independent state and clearance interlock.
+zero-G movement, while sight uses its actual 3D bounds. The independent cargo door now uses the #539 obstruction and save contract below.
 
 Blueprint admission reads `ship_installation_obstacles` and the conservative
 hull envelope from the same authored layout used by movement. These read-only
 bounds do not install construction colliders or change character dimensions.
+
+
+## Physical cargo door and open bins (#539)
+
+Character `cargo.rs` supplies the authored aperture, opposed sliding-leaf bounds
+and hollow bin shells. Walking retains conservative bin envelopes. Loose cargo
+and pickup rays use the actual 4 cm side walls, 12 cm bottom and open top; no
+slot inventory, identity replacement, mass exemption or zero-G pin is introduced.
+Runtime `session/cargo.rs` composes manual door motion and swept player/object
+clearance, independent of the aft ramp, power and flight state. Aim at the
+port-side door handle and press E; reverse with a second press. Partial openings
+remain conservatively impassable. Door position is saved in schema 9 and
+legacy captures migrate open; see the [save contract](../../docs/save-contract.md#cargo-door-schema-9-539).

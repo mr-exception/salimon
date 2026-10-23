@@ -1,5 +1,6 @@
 //! Portable production gameplay composition. No window, GPU lifecycle or evidence IO.
 pub(crate) mod archive;
+mod cargo;
 pub(crate) mod construction;
 pub(crate) mod consumable_wheel;
 pub(crate) mod consumables;
@@ -37,6 +38,7 @@ use std::time::Duration;
 
 pub(crate) struct GameplaySession {
     paused: bool,
+    pub(crate) cargo_door: cargo::CargoDoor,
     pub(crate) tutorial: tutorial::Tutorial,
     pub(crate) building: construction::Building,
     pub(crate) archive: archive::Archive,
@@ -94,6 +96,7 @@ impl Default for GameplaySession {
     fn default() -> Self {
         Self {
             paused: false,
+            cargo_door: Default::default(),
             building: Default::default(),
             archive: Default::default(),
             recovery: Default::default(),
@@ -232,6 +235,7 @@ impl GameplaySession {
                     return;
                 }
                 match interaction {
+                    Some(InteractionTarget::CargoDoor) => self.toggle_cargo_door(),
                     Some(InteractionTarget::Archive) => self.open_archive(),
                     Some(InteractionTarget::FabricatorTray) => self.collect_fabricator_output(),
                     Some(InteractionTarget::FabricatorScreen) => {
@@ -313,6 +317,7 @@ impl GameplaySession {
         match available_interaction_target(self.character.location(), local_eye, local_look)
             .filter(|target| self.permitted_interaction(*target))
         {
+            Some(InteractionTarget::CargoDoor) => Some("cargo_door"),
             Some(InteractionTarget::Archive) => Some("archive"),
             Some(InteractionTarget::FabricatorTray) => Some("fabricator_tray"),
             Some(InteractionTarget::FabricatorScreen) => Some("fabricator_screen"),
@@ -524,6 +529,7 @@ impl GameplaySession {
                 .snapshot(character_ship_frame(ship.pose), self.terrain_frame(ship))
                 .eye_position_meters;
             self.character.set_nearby_surface(self.nearby_terrain(eye));
+            self.advance_cargo_door(delta);
             self.character
                 .set_ramp_moving(ship.door_open_fraction > 0.0 && ship.door_open_fraction < 1.0);
             self.character.advance_with_motion(

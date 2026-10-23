@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "scenario": "scenarios/evidence/cargo-door.json",
+  "status": "passed",
+  "steps_completed": 17,
+  "command": [
+    "/Users/mrexception/Documents/Codex/2026-10-24/now-go-into-open-issues-again/work/salimon/target/debug/salimon-client"
+  ],
+  "artifact_directory": "/Users/mrexception/Documents/Codex/2026-10-24/now-go-into-open-issues-again/work/salimon/artifacts/e2e/run-v3341i4j",
+  "setup": {
+    "scenario": "landed-earth",
+    "seed": 539,
+    "step_ms": 16
+  },
+  "duration_ms": 29522,
+  "game_exit_code": -15,
+  "result_file": "/Users/mrexception/Documents/Codex/2026-10-24/now-go-into-open-issues-again/work/salimon/artifacts/e2e/run-v3341i4j/result.json",
+  "original_result_sha256": "f8f7e3c347dbafb126357c3b9bc8c9d516fd0a44b09a91338427e1f676961d2c"
+}

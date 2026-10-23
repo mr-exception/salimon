@@ -1,0 +1,106 @@
+{
+  "setup": {
+    "scenario": "landed-earth",
+    "seed": 539,
+    "step_ms": 16
+  },
+  "timeout_ms": 180000,
+  "steps": [
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 65
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "backward",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": true
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 36
+      }
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "right",
+        "pressed": false
+      }
+    },
+    {
+      "action": {
+        "op": "look",
+        "dx": 1042.0503609668092,
+        "dy": 155.85404152871686
+      }
+    },
+    {
+      "assert": {
+        "path": "interaction",
+        "equals": "cargo_door"
+      }
+    },
+    {
+      "screenshot": "cargo-open"
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 55
+      }
+    },
+    {
+      "assert": {
+        "path": "cargo_door.open_fraction",
+        "equals": 0.0
+      }
+    },
+    {
+      "screenshot": "cargo-closed"
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 55
+      }
+    },
+    {
+      "assert": {
+        "path": "cargo_door.open_fraction",
+        "equals": 1.0
+      }
+    },
+    {
+      "screenshot": "cargo-reopened"
+    }
+  ]
+}

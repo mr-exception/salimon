@@ -467,3 +467,14 @@ The current power-aware shader remains owned by the
 The [dated native report](../../reports/issue-451/README.md) binds current M1
 captures to the shader/binary; it does not promote image baselines or change GPU
 work, authored materials or simulation authority.
+
+## Oriented marker instances (#542)
+
+Generic `SceneInstance` cuboids now carry an explicitly validated finite unit
+quaternion. CPU rebasing still subtracts absolute positions in f64 first; the
+64-byte instance stream adds orientation after center/half-extents/color. The
+bootstrap shader rotates local scaled vertices before camera-relative projection.
+Frustum bounding spheres remain conservative at every rotation. Existing world
+markers use identity rotation. Runtime supplies twelve thin cuboids per blueprint
+volume, leaving its interior transparent; renderer owns neither reservation nor
+completion. No new pipeline or game-engine dependency is introduced.

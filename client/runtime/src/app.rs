@@ -571,6 +571,14 @@ impl ClientApplication {
                 _ => {}
             }
         }
+        if pause_key && self.session.building.active && !self.session.is_paused() {
+            if pressed && !repeat && !synthetic && self.input_policy().admits_press(source, true) {
+                self.session.command(crate::session::Command::Build(
+                    crate::session::construction::BuildAction::Toggle,
+                ));
+            }
+            return;
+        }
         if pause_key {
             if pressed && !repeat && !synthetic && self.input_policy().admits_press(source, true) {
                 if self.session.is_paused()
@@ -838,12 +846,19 @@ impl ClientApplication {
         let ship_frame = character_ship_frame(ship_snapshot.pose);
         let surface_frame = self.session.terrain_frame(ship_snapshot);
         let world_snapshot = self.session.camera_prototype.snapshot();
-        let (mut camera, scene_instances, mut spheres, light) =
+        let (mut camera, mut scene_instances, mut spheres, light) =
             map_world_to_renderer(world_snapshot);
         let mut resource_meshes = Vec::new();
         let character_snapshot = self.session.character.snapshot(ship_frame, surface_frame);
         let presentation = self.session.presentation();
         let render_ship_frame = character_ship_frame(presentation.ship.pose);
+        if self.session.view_mode == ViewMode::Gameplay {
+            scene_instances.extend(scene::construction_wireframes(
+                &self.session,
+                render_ship_frame,
+                presentation.ship.pose.orientation.map(|v| v as f32),
+            ));
+        }
         let monitor_message = self.session.ship.contextual_cockpit_message();
         let interaction = if self.session.view_mode == ViewMode::Gameplay
             && character_snapshot.location != CharacterLocation::Cockpit
@@ -905,7 +920,13 @@ impl ClientApplication {
                 },
             }
         });
-        let contextual_action = if fragment_interaction {
+        let contextual_action = if let Some(text) = self.session.construction_hint() {
+            Some(crate::resource_context::Prompt {
+                fragment: None,
+                text,
+                placement: OverlayPlacement::BottomCenter,
+            })
+        } else if fragment_interaction {
             resource_context.or(ship_context)
         } else {
             ship_context.or(resource_context)
@@ -929,6 +950,8 @@ impl ClientApplication {
         if self.session.survival.snapshot().terminal {
             contextual_placement = OverlayPlacement::BottomCenter;
         }
+        self.action_bar
+            .set_combined_contextual(self.session.building.active);
         self.action_bar
             .set_contextual(if self.session.survival.snapshot().terminal {
                 None
@@ -1595,6 +1618,17 @@ impl ApplicationHandler for ClientApplication {
             {
                 release_cursor(&window);
                 self.release_input_capture();
+            }
+            WindowEvent::MouseInput {
+                state: ElementState::Pressed,
+                button: MouseButton::Right,
+                ..
+            } if self.session.building.active => {
+                if self.input_policy().admits_press(InputSource::Native, false) {
+                    self.session.command(crate::session::Command::Build(
+                        crate::session::construction::BuildAction::Cancel,
+                    ));
+                }
             }
             WindowEvent::MouseInput {
                 state,

@@ -517,3 +517,31 @@ never treats them as measured acquisition. E collection transfers the existing
 tray job/unit into installed source without a second mass contribution. The
 read-only recovery observation cannot advance work, spend energy or publish an
 identity; only live production ticks do so, including after disk relaunch.
+
+## Blueprint tool and placeholders (#542)
+
+`session/construction.rs` composes ship-owned placement with actual authored
+character geometry, individual physical cargo and protected starter escape/service
+lanes. `catalogs/blueprints.json` declares seven furniture/wall/door/hull/deck/room/
+module entries. Its costs/durations are **proposed estimates**, with
+`approved_economy=false`; they authorize no resource debit or construction progress.
+#537 owns economy approval before #543/#544 integration. Fine pitch is per-entry
+data (currently 0.5 m), not a mandatory global furnishing rule.
+
+C opens/closes the tool, 1–7 select, R rotates, left click places, E inspects the
+aimed project, right click cancels the aimed reachable reservation. Escape closes
+before pausing. Native and protocol inputs use the same session commands and
+native focus/repeat/synthetic admission remains in the shell. Opening stows the
+mining tool; closing never re-equips it. Existing essential carrying/escape paths
+are protected. The initial coarse structural graph is an explicit support model;
+it does not move authored anchors or generate physical hull. Exterior reservations
+also reject the conservative existing hull, wings and engine volumes. Actual hull
+modification/solid generation remain #545.
+
+`app/scene.rs` maps hollow colored edges into ordinary oriented cuboid instances:
+green clear preview, red declined preview, cyan placed project. These render-only
+edges never become solid colliders or installed mass. Requirements/status stay
+visible together with transient feedback in the action bar. Whole-session schema 8
+preserves project source and rejects malformed restore atomically, while tool UI
+resets. See the canonical [save contract](../../docs/save-contract.md#blueprint-placeholder-schema-8-542).
+Portable and native routes use `scenarios/evidence/blueprint-placement.json`.

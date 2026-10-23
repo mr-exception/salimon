@@ -14,3 +14,6 @@ serde.workspace = true
 salimon-persistence = { path = "../persistence" }
 salimon-math = { path = "../math" }
 salimon-world = { path = "../world" }
+
+[dev-dependencies]
+serde_json.workspace = true

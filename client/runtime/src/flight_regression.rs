@@ -196,6 +196,24 @@ mod tests {
                     &mut app,
                     &json!({"protocol":1,"id":index,"op":"inspect"}).to_string(),
                 );
+                if let Some(expected) = check.get("exists") {
+                    let found = check["path"].as_str().unwrap().split('.').try_fold(
+                        &state["result"],
+                        |v, part| {
+                            if let Ok(i) = part.parse::<usize>() {
+                                v.get(i)
+                            } else {
+                                v.get(part)
+                            }
+                        },
+                    );
+                    assert_eq!(
+                        found.is_some(),
+                        expected.as_bool().unwrap(),
+                        "step {index}: {check}"
+                    );
+                    continue;
+                }
                 let mut v = &state["result"];
                 for part in check["path"].as_str().unwrap().split('.') {
                     v = if let Ok(i) = part.parse::<usize>() {
@@ -237,6 +255,14 @@ mod tests {
                 panic!("unhandled route step {index}");
             }
         }
+    }
+
+    #[test]
+    fn blueprint_placement_replays_native_controls_and_multi_cell_jobs() {
+        replay(
+            Scenario::LandedEarth,
+            include_str!("../../../scenarios/evidence/blueprint-placement.json"),
+        );
     }
 
     #[test]

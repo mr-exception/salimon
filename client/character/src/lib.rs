@@ -7,6 +7,7 @@ mod collision;
 mod controller;
 mod input;
 mod layout;
+pub use layout::PLAYER_RADIUS_METERS;
 mod math;
 mod queries;
 mod ramp;
@@ -106,3 +107,29 @@ pub const CORE_INTERACTION_POSITION_METERS: [f64; 3] = [
 ];
 
 pub use controller::persistence::CharacterSaveState;
+
+/// Raw authored installation envelopes for construction clearance. These are
+/// conservative solids, independent of body expansion and the structural grid.
+pub fn ship_installation_obstacles() -> Vec<[f64; 6]> {
+    use spatial_contracts::*;
+    let mut bounds = vec![
+        CORE_BOUNDS,
+        PILOT_CHAIR_BOUNDS,
+        CONSOLE_BOUNDS,
+        FABRICATOR_BOUNDS,
+        COCKPIT_PORT_HULL_BOUNDS,
+        COCKPIT_STARBOARD_HULL_BOUNDS,
+        CARGO_HEADER_BOUNDS,
+    ];
+    bounds.extend(STARTER_COLLIDERS);
+    bounds.extend(THRUSTER_COLLIDERS);
+    bounds.extend(WING_COLLIDERS);
+    bounds.extend(LANDING_COLLIDERS);
+    bounds
+}
+
+/// Conservative existing cabin/nose hull envelope for exterior construction.
+/// Interior placement uses the individual authored fixture/containment queries.
+pub fn ship_conservative_hull_envelope() -> [f64; 6] {
+    spatial_contracts::CABIN_EXTERIOR_BOUNDS
+}

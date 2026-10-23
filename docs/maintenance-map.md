@@ -440,3 +440,14 @@ materials, `automation.rs` exposes read-only recovery source and the R alias,
 Renderer `ship_mesh.rs` normalizes the generic tray package's per-face artwork UVs;
 its geometry regression and the matched native before/after images cover the
 correction. See [the report](../reports/issue-515/README.md) and renderer architecture.
+
+## Blueprint placement (#542)
+
+- Authority: `client/ship/src/structure/placement.rs`, with focused regressions in
+  `structure/placement/tests.rs`.
+- Composition/catalog/save/input: runtime `session/construction.rs`,
+  `catalogs/blueprints.json`, `session/persistence.rs`, `app/input.rs` and automation.
+- Rendering: `app/scene.rs` maps hollow oriented cuboids; renderer `lib.rs` and
+  `bootstrap.wgsl` own validated quaternion upload/projection.
+- Integration: `scenarios/evidence/blueprint-placement.json`, portable construction
+  restore/transaction tests, native input admission and actual wgpu captures.

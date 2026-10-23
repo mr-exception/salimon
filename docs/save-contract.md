@@ -1,9 +1,9 @@
-# Canonical whole-game save contract (schema 7)
+# Canonical whole-game save contract (schema 8)
 
-> This is the **current compressed-world runtime save schema 7**. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. Under the approved policy, future fictional-planet upgrades require explicit versioned save/world-delta migration, preservation or validated remapping of physical anchors, and recoverable failure handling; scientific terrain detail on **any published real observed solid body** may not displace saved positions after its first authoritative real-scale surface publication. Future fictional-planet changes to geology/biome-dependent resource layouts likewise require explicit stable-ID, depletion and positional migration; the historical compressed prototype does not establish the real-body surface freeze. This note does not modify schema 3 or imply backend multiplayer exists.
+> This is the **current compressed-world runtime save schema 8**. Future real-scale universe saves (#406) must additionally pin the [published multi-seed planet definitions](canonical-planet-generation.md) by stable catalog/body/version/digest and save mutable world deltas separately. The current gameplay/world seed and terrain mode cannot stand in for the future shared-world canonical record. Under the approved policy, future fictional-planet upgrades require explicit versioned save/world-delta migration, preservation or validated remapping of physical anchors, and recoverable failure handling; scientific terrain detail on **any published real observed solid body** may not displace saved positions after its first authoritative real-scale surface publication. Future fictional-planet changes to geology/biome-dependent resource layouts likewise require explicit stable-ID, depletion and positional migration; the historical compressed prototype does not establish the real-body surface freeze. This note does not modify schema 3 or imply backend multiplayer exists.
 
 `salimon-persistence::SaveGame<T>` is the versioned envelope. New captures use
-version 7. Decode accepts versions 1–6 for explicit runtime migration; the
+version 8. Decode accepts versions 1–7 for explicit runtime migration; the
 following v1–v3 paragraphs record that historical migration:
 retain the complete physical/Fabricator/equipment payload, initialize newly
 introduced survival meters at 100 with no effects or retrospective active time,
@@ -368,7 +368,7 @@ checkpoint scheduling. See [source and input](../client/runtime/architecture.md#
 
 `salimon-persistence::universe::UniverseSave` is a **separate**
 `salimon.universe.save` version-1 wire envelope, not a migration of current
-`salimon.save` (now schema 7). It is delivered for future world integration; normal
+`salimon.save` (now schema 8). It is delivered for future world integration; normal
 startup still uses the compressed-world session source. Existing saves are never
 implicitly interpreted, discarded or rewritten by this API.
 
@@ -422,3 +422,24 @@ restore rebuilds occupancy and checks support and uniqueness. See
 This payload is not yet part of `GameplaySession` or disk checkpoints and does
 not change whole-game schema 7. Project/physical installation save integration
 remains #550; no player save acquires an invented grid or rounded Scout anchors.
+
+## Blueprint placeholder schema 8 (#542)
+
+Current captures require `state.construction`, an independent schema-1 project
+reservation ledger. It preserves stable project IDs/next-ID, owner, registered
+blueprint source, exact ship-local origin/anchor, quarter-turn orientation, target
+volume and occupied cells. These projects own no materials, installed structural
+mass, progress or power yet. Schema 1–7 migrates to an empty ledger without a
+simulation tick; unexpected nonempty construction source in a legacy envelope
+rejects. Missing schema-8 source, malformed cells/bounds, overlaps, unknown or
+changed catalog entries, wrong owner and inconsistent IDs reject before publishing
+any restored owner. An older application rejects the unknown schema rather than
+overwriting a checkpoint it cannot interpret.
+
+Builder activation, palette selection, preview, hover and visual wireframes are
+transient and rebuilt. Restored projects remain visible but never become solid or
+usable hardware by loading. The current support graph is an explicit coarse
+baseline, independent of authored collision, and is reconstructed; full installed
+structure/resource/progress/offline construction integration remains #543–#550.
+Future catalog economics changes need an explicit compatible source migration;
+this version does not silently retune an existing project's captured requirements.

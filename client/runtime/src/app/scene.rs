@@ -104,6 +104,7 @@ pub(super) fn map_world_to_renderer(
         .precision_markers
         .iter()
         .map(|marker| SceneInstance {
+            orientation: [0., 0., 0., 1.],
             center_meters: marker.absolute_center.meters(),
             half_extents_meters: marker.half_extents_meters,
             color: marker.color,
@@ -120,6 +121,37 @@ pub(super) fn map_world_to_renderer(
     };
 
     (camera, instances, spheres, light)
+}
+
+/// Hollow blueprint edges use the ordinary oriented instance pass. No domain state
+/// is owned here, and these visual markers never become collision geometry.
+pub(super) fn construction_wireframes(
+    session: &crate::session::GameplaySession,
+    frame: salimon_character::ShipFrame,
+    orientation: [f32; 4],
+) -> Vec<SceneInstance> {
+    let mut result = Vec::new();
+    for (space, color) in session.construction_boxes() {
+        for axis in 0..3 {
+            let other: Vec<_> = (0..3).filter(|i| *i != axis).collect();
+            for a in [space.min[other[0]], space.max[other[0]]] {
+                for b in [space.min[other[1]], space.max[other[1]]] {
+                    let mut center = std::array::from_fn(|i| (space.min[i] + space.max[i]) / 2.);
+                    center[other[0]] = a;
+                    center[other[1]] = b;
+                    let mut half = [0.012; 3];
+                    half[axis] = ((space.max[axis] - space.min[axis]) / 2.) as f32;
+                    result.push(SceneInstance {
+                        center_meters: frame.local_to_world(center),
+                        half_extents_meters: half,
+                        color,
+                        orientation,
+                    });
+                }
+            }
+        }
+    }
+    result
 }
 
 #[cfg(test)]

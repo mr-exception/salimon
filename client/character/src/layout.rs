@@ -1,7 +1,7 @@
 //! Shared authored dimensions and conservative traversal proxies.
 use crate::spatial_contracts::*;
 use crate::{PLAYER_EYE_HEIGHT_METERS, SHIP_FLOOR_HEIGHT_METERS};
-pub(crate) const PLAYER_RADIUS_METERS: f64 = 0.24;
+pub const PLAYER_RADIUS_METERS: f64 = 0.24;
 pub(crate) const SHIP_FLOOR_HEIGHT: f64 = SHIP_FLOOR_HEIGHT_METERS;
 // Keep the player's head below the lowest ceiling lamps and the aft lintel.
 pub(crate) const SHIP_CEILING_HEIGHT: f64 = CABIN_TRAVERSAL_BOUNDS[3];

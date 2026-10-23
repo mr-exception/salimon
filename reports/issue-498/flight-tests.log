@@ -1,0 +1,18 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.39s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-225cf3bc83389f81)
+
+running 10 tests
+test flight_regression::tests::cabin_blackout_coasts_with_held_fragment_and_restores_in_place ... ok
+test flight_regression::tests::cockpit_monitor_evidence_enters_assist_and_completes_landing ... ok
+test flight_regression::tests::crash_recovery_reservation_and_takeoff_route ... ok
+test flight_regression::tests::five_hundred_fragments_mass_power_transition_and_consumption ... ok
+test flight_regression::tests::inertial_route ... ok
+test flight_regression::tests::landing_cutoff_evidence_matches_current_engine ... ok
+test flight_regression::tests::landing_rejects_fast_tangential_motion_and_accepts_below_cutoff ... ok
+test flight_regression::tests::cargo_route ... ok
+test flight_regression::tests::mechanical_refuel_and_restart_route ... ok
+test flight_regression::tests::loaded_blackout_refuel_and_depletion_route has been running for over 60 seconds
+test flight_regression::tests::loaded_blackout_refuel_and_depletion_route ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 341 filtered out; finished in 67.84s
+

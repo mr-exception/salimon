@@ -14,8 +14,12 @@ Budget delta: zero new vertices, textures, buffers, draws or pipelines. The same
 original 160-byte uniform carried the bus bit in its previously unused `center.w`.
 Additional vertex arithmetic is bounded (two smoothstep zones, no light loop).
 The machinery extension below enlarges that uniform to 192 bytes.
-Measured Linux costs and unrun reference-hardware gates belong in the
-[delivery report](../reports/issue-463/README.md), not a claimed FPS target.
+Historical Linux costs belong in the [delivery report](../reports/issue-463/README.md).
+The [native lighting review](../reports/issue-483/README.md) retains actual M1/Metal
+1280/1920 power pairs, repeat checks and separate Blender 4.5 LTS mood references.
+Foreground matched timing and owner appearance decisions remain
+[#566](https://github.com/mr-exception/salimon/issues/566); no measured frame-budget
+acceptance is granted.
 
 ## Comparable native and offline reference cameras
 
@@ -40,7 +44,7 @@ Repeated frames must stay identical within the declared tolerance. Keep native
 captures separate from Blender mood references and from approved image corpora.
 Inspect screens, glass, walking-lane edges and dark housings; never promote a
 candidate without human image/mask/tolerance review. The [#451 native report](../reports/issue-451/README.md) verifies the current Core
-blackout condition. Broader lighting/art/baseline approval remains #483/#477;
+blackout condition. Broader lighting/art/baseline approval remains #566/#561;
 cloud/reference fixture passes do not grant that acceptance.
 
 ## Soundscape boundary (#465)

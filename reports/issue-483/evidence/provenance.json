@@ -1,0 +1,16 @@
+{
+  "base": "f7b592d1e7a5f2fc8b949c512a8b08fc5872fa32",
+  "production": {
+    "client/runtime/src/app.rs": "3d47e61d6df3ccab0b6441166988a2a36e4fc25661163e12233f5e270669d96c",
+    "client/physics/src/lib.rs": "437ab5fd437f21d66b2c325622818471f37118a10693432ccd401afbcffff96d",
+    "client/renderer/src/ship_mesh.wgsl": "db133422aa7e838479e445f2795bd6b3d75e6f56827b8a497c7471826529bbe3"
+  },
+  "control": {
+    "client/runtime/src/app.rs": "3d47e61d6df3ccab0b6441166988a2a36e4fc25661163e12233f5e270669d96c",
+    "client/physics/src/lib.rs": "437ab5fd437f21d66b2c325622818471f37118a10693432ccd401afbcffff96d",
+    "client/renderer/src/ship_mesh.wgsl": "460ceefc1efa0007803f929c8fc4a1869e7a6c57c918a1a4e57af6425930db07"
+  },
+  "control_scope": "pre-463 fill/emission expressions only in current interfaces; not an exact historical whole-game build",
+  "target_current": "artifacts/native-20261022/target",
+  "target_control": "artifacts/native-20261023/483/target-control"
+}

@@ -1,0 +1,2 @@
+[2026-10-23T12:24:13Z ERROR wgpu_hal::gles::egl] EGL 'eglInitialize' code 0x3001: DRI2: failed to load driver
+[2026-10-23T12:24:13Z ERROR wgpu_hal::gles::egl] EGL 'eglInitialize' code 0x3001: DRI2: failed to load driver

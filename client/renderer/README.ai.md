@@ -72,6 +72,13 @@ nearby-body DTO values into one cached
 is a self-lit surface in the existing opaque draw and stay live when unseated.
 Keep gameplay interaction and ship state out of these modules.
 
+The Scout starter layout retains one opaque plus one glass draw. Its embedded
+asset-budget regression decodes the canonical
+[ship manifest](../../models/assets/ships/salimon-scout/manifest.json), rather
+than duplicating triangle/byte limits in Rust. Starter cargo and habitation
+views belong to the opt-in `scout_feedback_gpu_evidence` capture fixture; keep
+its source/binary provenance and frozen-repeat checks with the originals.
+
 ## Shared maintenance rules
 
 Follow the root [coding conventions](../../docs/coding-conventions.md),

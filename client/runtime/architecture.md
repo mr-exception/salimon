@@ -1452,3 +1452,9 @@ sleep preparation steps. Moving pools collect 100 actual moving samples across
 fresh launches; quiet intervals remain raw. It is CPU evidence, not native FPS.
 Historical comparisons must retain the original character/layout revision;
 current Scout geometry can change supported columns without changing physics.
+
+#566 extends only the report-side frozen-frame collector: a named cloud
+llvmpipe profile complements the strict default M1 profile. Both retain actual
+focus/visibility/source-state admission. No runtime scheduling, shader or frame
+logging rule is changed by that tooling extension. Software device timestamps
+cannot be interpreted as hardware GPU budget evidence.

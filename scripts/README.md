@@ -697,3 +697,12 @@ normal Archive dispatch; `inspect.recovery` is immutable source evidence. Use
 artifacts/new-515` under Xvfb/Vulkan. It drives intake, menu, funded craft, tray
 collection/installation, real cabin walking, R start/stop and both paid records.
 This fixture does not measure mining/acquisition, balance or physical OS input.
+
+The #566 collector adds the explicit `--profile cloud-llvmpipe-1280` admission
+profile for Xvfb 1280×800, scale1, Vulkan llvmpipe. The default M1/Metal profile
+remains strict. Both require100 consecutive focused, non-occluded, zero-tick
+frames and unchanged source/context. The X11 helper verifies exact target PID,
+focused window, viewable map state and geometry; it does not certify physical
+input or scanout. Every repeated frozen capture must have the same PNG hash.
+See [matched cloud lighting evidence](../reports/issue-566/README.md) for commands,
+all failures, expression-only control lineage and hardware-counter limitations.

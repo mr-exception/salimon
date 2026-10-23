@@ -1,0 +1,2 @@
+SALIMON_E2E_READY scenario=core-restart seed=0 step_ms=100
+{"event":"ready","protocol":1,"scenario":"core-restart","seed":0,"step_ms":100,"timeout_ms":5000}

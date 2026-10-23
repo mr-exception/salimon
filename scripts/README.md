@@ -652,3 +652,14 @@ This prevents a shared desktop or initial cursor warp from changing fixture pose
 Direct `salimon_test.Game` defaults to `native_input=True` for opt-in OS probes
 and removes the variable; use those probes for native input/lifecycle signoff.
 Isolation never certifies real input or normal wall-clock interpolation.
+
+## Complete reference-frame logging (#483)
+
+`RUST_LOG=info,salimon_client::frame=trace` opts into every existing frame timing
+record (interval/present wall, CPU update/render, asynchronous latest GPU, tick
+and backlog). Ordinary debug output remains sampled every300 frames. Use the
+same log level/output for both reference variants and preserve warmup/spikes;
+logging IO is measurement overhead, never free production performance. Frozen
+E2E reference scenes measure presentation without normal-play simulation work.
+See the [lighting report](../reports/issue-483/README.md) for exact context and
+limits. The logger never changes scheduling, input or GPU polling.

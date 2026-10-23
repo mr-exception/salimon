@@ -530,7 +530,11 @@ Native benchmark samples sum solver work/time across all completed ticks in a
 render and retain the final activation counts. Zero-tick renders record zero new
 work while retaining the last activation observation. Samples include `game_ticks`,
 `game_backlog_ms` and cumulative `lifecycle_excluded_ms`; CPU-only samples have no
-native scheduler observation. Periodic frame debug logs include ticks/backlog.
+native scheduler observation. Periodic frame debug logs include ticks/backlog. Opt-in
+`RUST_LOG=info,salimon_client::frame=trace` records every presented-frame sample
+for matched reference measurements (#483); ordinary debug cadence remains one
+in 300 frames. Logging is observational and its IO overhead is present in both
+matched variants; it does not alter clocks, input, domain state or GPU readback.
 
 ## Bottom-hinged boarding ramp (#169)
 

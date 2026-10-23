@@ -44,3 +44,20 @@ capture/review, projection inspection and matched presentation timing. Existing
 #451/#477 evidence does not approve this new shader. Source closure records
 implementation plus explicit transfer; appearance/performance remain unverified.
 See [canonical contract and exact commands](../../docs/scout-presentation.md).
+
+## Native evidence follow-up — 2026-10-23
+
+[#483 report](../issue-483/README.md) now retains four-view power pairs at
+1280x800 and 1920x1080 on Apple M1/Metal, 32 zero-change temporal comparisons,
+and eight separate supported Blender 4.5.3 mood references. This supplements
+the historical cloud results above. Two timing attempts failed foreground
+admission while loginwindow owned the desktop; no timing window was accepted.
+Matched foreground timing and owner appearance approval remain
+[#566](https://github.com/mr-exception/salimon/issues/566), with broader baseline
+and full-rate review in #561. No shader, baseline or frame-budget approval is
+inferred from capture/repeat success.
+
+Current clean Linux cloud reproduction at both resolutions also passes; see the
+[#483 cloud appendix](../issue-483/README.md#cloud-re-verification--2026-10-23).
+Appearance review remains #561; hardware budget acceptance #563; additional
+matched cloud timing #566. Historical failures above remain historical.

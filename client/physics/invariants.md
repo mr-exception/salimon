@@ -86,3 +86,7 @@ contact/sleep/dwell state survive. No input latch, OS handle or GPU state is
 restored. An attached mining sphere becomes a detached existing physical entity,
 without allocating a new ID or losing mass. Whole-session/Fabricator publication
 is composed in #365; disk checkpoints remain #366.
+
+- Spatial query epoch stamps only deduplicate one query's snapshot indices.
+  Corrections, swept reach, large-body fallback and sorted contact order retain
+  the exact candidate set; rollover clears stamps before reuse.

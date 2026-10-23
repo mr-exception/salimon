@@ -46,3 +46,9 @@ reference-machine performance. See [active-group evaluation](architecture.md#act
 Follow the canonical [integration/budgets/validation guide](../../docs/terrain-validation.md)
 and [world definition contract](../world/terrain-contract.md). Keep local rules
 and their consumers aligned; flat deterministic fixtures are explicit.
+
+The #559 unique-visit query optimization and epoch rollover have exact bounds,
+all-pairs and correction-created-contact regressions in `broad_phase.rs`.
+`StepStats::grid_query_time` is a subset of profiled contact time. Historical
+runtime stress reproduction lives in `reports/issue-559`; preserve geometry and
+full inventories when comparing versions of the supported-deck fixture.

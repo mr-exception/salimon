@@ -434,3 +434,9 @@ Archive #505: `cargo test -p salimon-client --locked archive` includes the real
 Save Now worker, normal relaunch and verified restart reset. The
 [cloud report/driver](../reports/issue-505/README.md) captures all seven intact and
 damaged records via physical E/arrow/Tab dispatch at both supported resolutions.
+
+Recovery #515: `cargo test -p salimon-client --locked session::recovery` covers
+concurrent craft/thrust/recovery funding, old-schema resource/job retention and
+real Save Now/normal-launch/restart with zero offline work. The
+[cloud report/driver](../reports/issue-515/README.md) exercises production
+intake/Fabricator/tray/installation/Archive controls and GPU captures.

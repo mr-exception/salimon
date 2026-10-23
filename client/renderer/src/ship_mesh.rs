@@ -753,7 +753,7 @@ mod tests {
         };
         assert!(SHIP_GLB.len() <= limit("maximumGlbBytes"));
         assert!(
-            (geometry.opaque_vertex_count + geometry.glass_vertex_count) / 3
+            ((geometry.opaque_vertex_count + geometry.glass_vertex_count) / 3) as usize
                 <= limit("maximumTriangles")
         );
         assert!(

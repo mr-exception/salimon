@@ -1,0 +1,5 @@
+{
+  "scenario": "core-restart",
+  "seed": 502,
+  "step_ms": 96
+}

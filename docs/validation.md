@@ -423,3 +423,9 @@ native input, explicit seeded initial states and fixed simulation steps.
 Its motion frames/encoded clips are not wall-clock/display-FPS evidence.
 See the [report](../reports/issue-489/README.md) for native routes, source/context
 hashes, exact results and remaining #561/#557/#563 criteria.
+
+Scout UI cloud matrix #502: the [report and driver](../reports/issue-502/README.md)
+record actual wgpu screens at 1280x800/1920x1080 and simulated X11 scales 1/1.5/2,
+power restoration through Core intake, physical Fabricator prompts/modal exclusion
+and the existing anchored-world-prompt route. Device DPI remains #557 and human
+readability/appearance remains #561.

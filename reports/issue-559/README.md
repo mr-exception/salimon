@@ -109,6 +109,11 @@ failure is waived. Timing binaries were built serially in the historical
 checkout, with identical dependencies in both lanes; this cache failure happened
 later when switching the target back to the newer stacked source.
 
-Final clean workspace gates are being collected in an isolated target directory;
-this draft report will be updated with their actual results before review-ready
-status. Measured failures and #592 remain explicit regardless of those gates.
+Final isolated gates PASS: `cargo test --release --workspace --locked` —
+**895 passed, 0 failed, 32 opt-in ignored**; `cargo clippy --workspace --all-targets
+--locked -- -D warnings`; debug and release workspace builds. Raw logs are in
+[validation](validation/). The new exact sorted-bounds/duplicate-bucket/epoch-wrap
+regression passes alongside all-pairs, correction-created, activation and runtime
+continuation tests. Formatting and patch checks pass. The ignored stress harness
+was run separately as documented, with its failed outcomes retained; passing
+ordinary tests do not convert those into passes.

@@ -353,3 +353,9 @@ Survival onboarding: new runs show contextual objective guidance when the action
 band is free. H inspects survival details; hold Q and click a ration to consume;
 E at the Fabricator opens recipes/collects its tray; Escape shows checkpoint
 status. T skips the tutorial for this run. Progress and skip survive save/reload.
+
+Archive verification adds opt-in `scout-archive` initial placement at the physical
+terminal with ordinary unread new-run source. Use the existing key channel
+(`interact` = E, arrows and Tab) and immutable `inspect.archive` source/open/text;
+no command sets record progress. See the [runner](../../scripts/README.md#archive-cloud-verification-505)
+and [cloud report](../../reports/issue-505/README.md). Normal launches are unchanged.

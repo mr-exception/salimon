@@ -1405,3 +1405,15 @@ The `interact` key alias maps to physical E, including reader close, unlike a
 synthetic reader action. `session/archive/tests.rs` covers real Save Now worker
 completion, normal relaunch and verified death/restart reset. No save/schema,
 record content, renderer DTO, discovery or navigation authority changes.
+
+## Recovery cloud verification (#515)
+
+The opt-in `scout-recovery` fixture reuses the Fabricator-side held 2 kg iron
+identity and declares 0.5 kg raw silicate initially in the bin. It creates no job,
+tray output, installed module or paid progress. Subsequent production intake,
+menu enqueue, funded ticks, E tray collection, walking and Archive R actions
+retain their existing gates. `inspect.recovery` is an immutable serialized source
+snapshot supplied by `GameplaySession::recovery_observation`; `key: recovery`
+maps to physical R. No protocol command sets recovery state. Session regressions
+verify concurrent craft/thrust/recovery joule separation, schema-6 resources/jobs
+and actual Save Now/relaunch/restart with seven days of zero offline work.

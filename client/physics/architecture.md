@@ -385,3 +385,17 @@ contact/sleep/dwell state survive. No input latch, OS handle or GPU state is
 restored. An attached mining sphere becomes a detached existing physical entity,
 without allocating a new ID or losing mass. Whole-session/Fabricator publication
 is composed in #365; disk checkpoints remain #366.
+
+## Unique spatial query visits (#559)
+
+Each Grid query uses a retained per-body epoch stamp to visit bucket members
+once before exact AABB filtering, then sorts snapshot indices. This removes
+repeated overlap tests and duplicate sorting for multi-bucket bodies. Epoch
+wrap clears stamps. Membership refresh and every correction-created requery
+remain unchanged; no candidate/absence cache survives between queries. Scratch
+is O(n), with no population or pair cap. Profiled contact query time/call counts
+are included in contact time, not added to it. Activation timing remains separate.
+The grid width uses twice the upper-quartile radius, reducing bucket enumeration
+for ordinary larger mixed members while retaining the existing exact large-body
+fallback for outliers. Cell width only chooses candidate enumeration; exact
+AABBs and narrow phase remain authoritative. No physical tolerance changes.

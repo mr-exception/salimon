@@ -1445,3 +1445,10 @@ visible together with transient feedback in the action bar. Whole-session schema
 preserves project source and rejects malformed restore atomically, while tool UI
 resets. See the canonical [save contract](../../docs/save-contract.md#blueprint-placeholder-schema-8-542).
 Portable and native routes use `scenarios/evidence/blueprint-placement.json`.
+
+The opt-in `sphere_workloads::current_sphere_stress_cpu` records flushed JSONL
+inventories, exact-snapshot solver/contact/query/activation timings and all natural
+sleep preparation steps. Moving pools collect 100 actual moving samples across
+fresh launches; quiet intervals remain raw. It is CPU evidence, not native FPS.
+Historical comparisons must retain the original character/layout revision;
+current Scout geometry can change supported columns without changing physics.

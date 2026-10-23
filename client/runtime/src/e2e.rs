@@ -11,6 +11,8 @@ use crate::session::GameplaySession;
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum Scenario {
     LandedEarth,
+    ScoutFabricator,
+    ScoutWorkBlackout,
     FlightRegression,
     CargoFlight,
     CargoBlackout,
@@ -40,6 +42,8 @@ pub(crate) enum Scenario {
 impl Scenario {
     fn parse(value: &str) -> Result<Self, String> {
         match value {
+            "scout-fabricator" => Ok(Self::ScoutFabricator),
+            "scout-work-blackout" => Ok(Self::ScoutWorkBlackout),
             "flight-regression" => Ok(Self::FlightRegression),
             "cargo-flight" => Ok(Self::CargoFlight),
             "cargo-blackout" => Ok(Self::CargoBlackout),
@@ -73,6 +77,8 @@ impl Scenario {
 
     pub(crate) const fn name(self) -> &'static str {
         match self {
+            Self::ScoutFabricator => "scout-fabricator",
+            Self::ScoutWorkBlackout => "scout-work-blackout",
             Self::FlightRegression => "flight-regression",
             Self::CargoFlight => "cargo-flight",
             Self::CargoBlackout => "cargo-blackout",
@@ -216,6 +222,9 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
     app.character = CharacterController::default();
     app.ship = ShipController::default();
     match config.scenario {
+        Scenario::ScoutFabricator | Scenario::ScoutWorkBlackout => {
+            crate::scout_walkthrough::initialize(app, config.scenario)?;
+        }
         Scenario::FlightRegression
         | Scenario::CargoFlight
         | Scenario::CargoBlackout
@@ -370,6 +379,7 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
             | Scenario::CargoFlight
             | Scenario::CargoBlackout
             | Scenario::CoreRestart
+            | Scenario::ScoutWorkBlackout
             | Scenario::CrashRecovery
             | Scenario::TerrainEarthApproach
             | Scenario::TerrainMoonApproach

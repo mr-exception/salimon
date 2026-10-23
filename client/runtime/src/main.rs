@@ -27,6 +27,7 @@ mod reticle;
 mod scout_audio;
 mod scout_feedback;
 mod scout_reference;
+mod scout_walkthrough;
 mod session;
 #[cfg(test)]
 mod sphere_benchmark;

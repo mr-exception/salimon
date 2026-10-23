@@ -534,6 +534,7 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "wheel_next" => Some(KeyCode::Tab),
         "wheel_confirm" => Some(KeyCode::Enter),
         "engines" => Some(KeyCode::KeyB),
+        "interact" => Some(KeyCode::KeyE),
         "pause" => Some(KeyCode::Escape),
         "status" => Some(KeyCode::KeyH),
         "skip_tutorial" => Some(KeyCode::KeyT),
@@ -780,6 +781,8 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
             "nearest_deposit": nearest_deposit, "resource_types": resource_types, "deposits": deposits, "deposits_by_id": deposits_by_id, "deposit_query_error": deposit_error, "bodies": bodies, "camera_phase": format!("{:?}", app.camera_phase())}
     });
     observation["ship"]["engines_enabled"] = ship.engines_enabled.into();
+    observation["archive"] =
+        json!({"source":app.archive, "open":app.archive_reader.open, "text":app.archive_text()});
     observation["tutorial"] = json!({"state":app.tutorial,"prompt":app.tutorial.text()});
     observation
 }
@@ -831,6 +834,30 @@ mod tests {
         )
         .unwrap();
         app
+    }
+
+    #[test]
+    fn scout_archive_fixture_and_observation_preserve_unread_source_until_real_e() {
+        let mut s = app(Scenario::ScoutArchive);
+        let before = s.save_bytes(100).unwrap();
+        let initial = inspect(&s);
+        assert_eq!(initial["interaction"], "archive");
+        assert_eq!(initial["archive"]["source"]["read"], json!([]));
+        assert_eq!(initial["archive"]["open"], false);
+        assert_eq!(s.save_bytes(100).unwrap(), before);
+        let result = execute(
+            &mut s,
+            r#"{"protocol":1,"id":1,"op":"key","key":"interact","pressed":true}"#,
+        );
+        assert_eq!(result["ok"], true);
+        assert_eq!(inspect(&s)["archive"]["open"], true);
+        assert_eq!(
+            inspect(&s)["archive"]["source"]["read"]
+                .as_array()
+                .unwrap()
+                .len(),
+            1
+        );
     }
 
     #[test]

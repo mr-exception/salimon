@@ -3,6 +3,8 @@
 > Migrated from the Salimon project documents on 2026-09-29. For current task status and dependencies, use [GitHub issues](https://github.com/mr-exception/salimon/issues).
 
 > **Purpose:** This page is only for unresolved product, gameplay, visual, UX, or architecture questions that require a human decision before implementation continues.
+
+> **Resolved 2026-10-22:** Starter Scout cargo/storage is no longer an open question. The approved future design includes a **dedicated aft cargo bay, full-height partition, wide closable door and physical bins**, distinct from the current authored Scout implementation. See [approved Scout and modular construction contract](scout-and-modular-construction.md) and issues #538–#540.
 ## How to use this page
 - Add a question here only when the intended behavior cannot be safely inferred from existing project documentation.
 - Each question should explain what decision is needed, why it matters, and the main options or tradeoffs when useful.
@@ -31,17 +33,6 @@ recorded failures without an attributed cause. [#479](https://github.com/mr-exce
 owns this decision and any required attribution after #255 delivery. Keep this
 question open until explicit review resolves it; source closure grants no signoff.
 Current-cap/mixed-sphere overload is independently tracked in #455.
-
-### Where should dedicated physical storage go after the cargo-room removal?
-
-The current scout revision removes the dedicated port cargo room and its storage
-volume to improve the ship silhouette. Loose fragments can still be dropped on
-clear main-cabin deck space. The previous requirement for an initial dedicated
-cargo room is superseded. Decide whether a later scout revision should add
-integrated storage within the aerodynamic hull, use a detachable module, or defer
-dedicated storage to a later ship design. This decision affects future container
-placement, cargo capacity and ship expansion; it does not block the current
-geometry revision or loose-fragment storage on the deck.
 
 ### What does #236 require by “save/reload”?
 

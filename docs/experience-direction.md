@@ -1,6 +1,6 @@
 # Game experience direction: grounded cinematic Salimon
 
-Status: **approved experience direction; design guidance and planned work, not shipped native art signoff**. Documentation issue #458. Complements the authoritative [low-poly asset bible](visual-style.md), does not replace its geometry, palette, Blender, physical interfaces or validation rules.
+Status: **approved experience direction; design guidance and planned work, not shipped native art signoff**. Documentation issue #458. Complements the authoritative [low-poly asset bible](visual-style.md), does not replace its geometry, palette, Blender, physical interfaces or validation rules. The detailed **approved future starter Scout**, separate aft cargo bay, compact habitation and simplified modular-building experience are specified in [Scout art direction and modular construction](scout-and-modular-construction.md); they are not yet claimed as implemented.
 
 ## Player feeling and artistic identity
 
@@ -24,8 +24,9 @@ The initial review target is the complete Scout, not a new planet biome or an is
 - Seated and standing cockpit: wide monitor, lower windows and navigation readability; pilot exit/return; powered, powerless and landed/in-flight states.
 - Core: framed physical monitor, live power/conversion telemetry, fragment intake, charging and blackout feedback.
 - Fabricator: onboard input, supported/locked recipes, processing, pause/blocked state, output tray and collection.
-- Aft door and walkable boarding ramp, internal lanes, loose physical cargo, contextual hand actions.
+- Aft door and walkable boarding ramp, a separate aft physical cargo bay with closable wide internal door and real bins/racks, clear carrying lanes and contextual hand actions (**future redesigned starter**; current authored ship still uses main-cabin loose cargo).
 - Archive/communications terminal and eventual recovery equipment, integrated like machinery rather than a floating game-menu screen.
+- Fold-away bunk, compact galley and basic hygiene fixture as credible lived-in physical space; do not imply unimplemented hunger/hygiene/life-support systems are playable.
 - Scanner hologram when future #430 lands, without changing its five-second pulse rule.
 - Accessible context prompts, consistent interaction UI, predictable transitions and real-time sounds/animation.
 - Clear separation between a single whole-scene art target and independent crate/code responsibilities.

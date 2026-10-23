@@ -9,5 +9,7 @@
   "acceptance_granted": false,
   "reanalysis_summary_sha256": "941e063e1d4edc6e9ff18ee94d58b2f17ed3e3a06d2c7dd0074778d32c33dc11",
   "reanalysis_full_result_sha256": "1eece924c4f3254d1199f9d94bbb4880e543260c383e99196bf9a9f3a4e498f8",
-  "full_result_byte_identical_to_canonical": false
+  "full_result_byte_identical_to_canonical": false,
+  "semantic_result_matches_canonical": true,
+  "full_result_byte_difference": "Only ten recorded active-window file paths now name the committed gzip archive; every other field is identical."
 }

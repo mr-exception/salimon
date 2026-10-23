@@ -54,7 +54,9 @@ python3 reports/issue-255/2026-10-21/verify.py --root reports/issue-255/2026-10-
 ```
 
 The fresh [reanalysis](evidence/reanalysis.json) and
-[archive SHA-256 audit](evidence/verification.json) are retained beside this report. Raw bytes, provenance,
+[archive SHA-256 audit](evidence/verification.json) are retained beside this report. Only ten recorded file paths differ from the original result (committed gzip
+archive paths replace historical artifact paths); all other fields match exactly.
+Raw bytes, provenance,
 counts, exact historical binaries and commands remain in the canonical
 [#255 refresh](../issue-255/2026-10-21/README.md); they are not duplicated or
 relabelled as fresh native measurements. No completed native collection was

@@ -184,6 +184,11 @@ Engine #493: `cargo test -p salimon-ship --locked` plus workspace tests/build/
 Clippy/fmt. `inertial-flight.json` and `landing-speed-cutoff.json` now exercise
 1000/500 m/s² dry thrust, coast/braking and the unchanged 20m/s landing limit.
 Physical B input, handling and instrument appearance need #498 reference evidence.
+Cloud production-protocol engine captures, the seven realistic-flight routes and
+engine-off disk relaunch regression are recorded in
+[the #498 report](../reports/issue-498/README.md). Run its `verify.py` against a
+built native executable on Xvfb/software Vulkan; fresh output paths are required.
+Human handling/physical input and hardware qualification remain #561/#557/#563.
 The same runtime flight regression module replays the landing-cutoff and cockpit
 monitor evidence routes without GPU capture. Run `cargo test -p salimon-client
 --locked flight_regression` for both baseline and screenshot-route gameplay;

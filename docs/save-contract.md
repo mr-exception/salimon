@@ -411,3 +411,14 @@ without granting inputs or replaying work. Current schema-6 Archive identities
 and all prior physical/consumable state survive. Transient R/menu/native input
 and last-tick auxiliary power are never restored; no offline progress is credited.
 See [canonical Recovery contract](data-recovery-module.md#persistence-and-verification).
+
+## Independent structural domain schema (#541)
+
+`salimon_ship::structure::StructureSaveState` owns schema 1 for the independently
+validated 3 m structural graph. It preserves the Core ID, exact grid origin,
+parts/faces/envelopes, rooms, equipment, baseline/additional mass and retired IDs;
+restore rebuilds occupancy and checks support and uniqueness. See
+[owning architecture](../client/ship/architecture.md#portable-structural-foundation-541).
+This payload is not yet part of `GameplaySession` or disk checkpoints and does
+not change whole-game schema 7. Project/physical installation save integration
+remains #550; no player save acquires an invented grid or rounded Scout anchors.

@@ -261,3 +261,25 @@ Last-tick auxiliary watts are transient observation, included in total draw
 without another debit and cleared on subsequent advance/restore. Runtime owns
 record progress/config and the `RecoveryModule` physical mass ledger entry. See
 [canonical funding/priority contract](../../docs/data-recovery-module.md#core-funding-and-reserve).
+
+## Portable structure (#541)
+
+- Structural cells use exactly 3 m on each ship-local axis and six-face support.
+  Edge/corner contact alone never attaches a part. Room, traversal, pressure and
+  power relationships never substitute for structural support.
+- All admitted cells are connected to the one permanent Core-bearing part.
+  New parts and equipment have internally connected, nonempty, duplicate-free
+  footprints. Conservative envelope coordinates and additional masses are finite.
+- IDs are nonzero and unique across parts, rooms, equipment and retired IDs;
+  mutation/restore rejects invalid input without publishing partial state.
+- Ordinary removal cannot disconnect retained structure, remove the Core or
+  orphan existing room/equipment membership. Damage transfers each disconnected
+  component once with original identity; unsupported metadata/equipment is
+  returned explicitly. Destroying the Core is outside this API.
+- Baseline structure marked `IncludedInDryHull` adds no mass. Additional structure
+  and equipment emit one `MassObjectId::Structure` contribution each; rooms,
+  faces and carried input do not create another installed contribution.
+- Domain schema 1 restores source state and retired IDs, rebuilding indexes;
+  it neither mutates the live flight controller nor changes the whole-game save.
+- Current Scout precision anchors/colliders remain authored data. No existing
+  asset position is silently rounded or moved to this grid.

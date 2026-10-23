@@ -222,3 +222,15 @@ promoting any baseline or weakening an authored contract.
 See [#451 native evidence](../reports/issue-451/README.md) for the exact binary,
 shader digest, Metal/drawable context, images, pass results and remaining wider
 appearance/performance limits. The dated #299 report is retained unchanged.
+
+## Matched cloud lighting timings (#566)
+
+The [#566 report](../reports/issue-566/README.md) owns serial current/control
+software-Vulkan measurements and original repeated1280×800 captures. The control
+changes only the retained pre-#463 lighting expressions within current interfaces;
+it is not a historical whole-game build. The named cloud admission profile keeps
+PID/focus/visibility, viewport, frozen source and consecutive-frame checks; the
+default M1 profile remains strict. Frozen fixture intervals are not normal-play
+FPS. Actual hardware GPU counters/budgets remain #563, physical platform checks
+#557 and original-image/mood/projection/baseline approval #561. Existing1920/M1
+and Blender mood originals remain separate dated corpora.

@@ -16,8 +16,12 @@ fn vs_main(
     @location(1) relative_center: vec3<f32>,
     @location(2) half_extents: vec3<f32>,
     @location(3) color: vec4<f32>,
+    @location(4) orientation: vec4<f32>,
 ) -> VertexOutput {
-    let camera_relative_position = relative_center + local_position * half_extents;
+    let scaled = local_position * half_extents;
+    let twice_cross = 2.0 * cross(orientation.xyz, scaled);
+    let rotated = scaled + orientation.w * twice_cross + cross(orientation.xyz, twice_cross);
+    let camera_relative_position = relative_center + rotated;
     var output: VertexOutput;
     output.clip_position = camera.view_projection * vec4<f32>(camera_relative_position, 1.0);
     output.color = color;

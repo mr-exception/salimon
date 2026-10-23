@@ -22,6 +22,7 @@ pub(crate) struct ActionBarImage<'a> {
 #[derive(Debug)]
 pub(crate) struct ActionBar {
     contextual: Option<String>,
+    combine_contextual: bool,
     transient: Option<(&'static str, Duration)>,
     rendered_text: Option<String>,
     scale: u32,
@@ -35,6 +36,7 @@ impl Default for ActionBar {
     fn default() -> Self {
         Self {
             contextual: None,
+            combine_contextual: false,
             transient: None,
             rendered_text: None,
             scale: MIN_SCALE,
@@ -68,6 +70,14 @@ impl ActionBar {
         }
     }
 
+    /// Tool requirements and placement errors must remain readable together.
+    pub(crate) fn set_combined_contextual(&mut self, combined: bool) {
+        if self.combine_contextual != combined {
+            self.combine_contextual = combined;
+            self.rebuild_if_needed(false);
+        }
+    }
+
     pub(crate) fn show_transient(&mut self, message: &'static str) {
         self.transient = Some((message, TRANSIENT_DURATION));
         self.rebuild_if_needed(false);
@@ -96,10 +106,18 @@ impl ActionBar {
     }
 
     fn rebuild_if_needed(&mut self, force: bool) {
-        let text = self
+        let combined = if self.combine_contextual {
+            self.contextual
+                .as_ref()
+                .zip(self.transient)
+                .map(|(context, (message, _))| format!("{context}\n{message}"))
+        } else {
+            None
+        };
+        let text = combined.as_deref().or(self
             .transient
             .map(|(message, _)| message)
-            .or(self.contextual.as_deref());
+            .or(self.contextual.as_deref()));
         if !force && self.rendered_text.as_deref() == text {
             return;
         }
@@ -195,6 +213,23 @@ pub(crate) fn glyph_rows(character: char) -> [u8; 7] {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn tool_requirements_remain_visible_during_placement_feedback() {
+        let mut bar = super::ActionBar::default();
+        bar.set_contextual(Some("Iron 1kg / 10s".into()));
+        bar.set_combined_contextual(true);
+        bar.show_transient("Placeholder placed");
+        assert_eq!(
+            bar.rendered_text.as_deref(),
+            Some("Iron 1kg / 10s\nPlaceholder placed")
+        );
+        bar.advance(std::time::Duration::from_secs(4));
+        assert_eq!(bar.rendered_text.as_deref(), Some("Iron 1kg / 10s"));
+        bar.set_combined_contextual(false);
+        bar.show_transient("Door blocked");
+        assert_eq!(bar.rendered_text.as_deref(), Some("Door blocked"));
+    }
+
     use super::ActionBar;
     use std::time::Duration;
 

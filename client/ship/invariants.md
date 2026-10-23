@@ -283,3 +283,22 @@ record progress/config and the `RecoveryModule` physical mass ledger entry. See
   it neither mutates the live flight controller nor changes the whole-game save.
 - Current Scout precision anchors/colliders remain authored data. No existing
   asset position is silently rounded or moved to this grid.
+
+## Blueprint placement authority (#542)
+
+`structure/placement.rs` owns catalog validation, exact 3 m/fine-pitch snapping,
+quarter-turn transforms, stable non-reused placeholder IDs and geometry
+reservations. Runtime supplies trusted owner, flight, physical support,
+reachability and current player/cargo/installed/protected-route envelopes.
+Admission is repeated at placement and immediately before physical completion;
+rendered previews are never authority. One multi-cell/multi-deck volume is one
+project. Unbuilt neighbors cannot supply structural support. Interior versus
+hull-affecting consequences determine airborne permissions.
+
+Projects expose requirements/duration for inspection but contain no material,
+progress or installed mass. There is no separate worksite or Start action.
+Cancellation removes the unfunded reservation; #543 owns physical intake/refunds,
+#544 progress, #545 geometry and #546 flight interlocks. Domain schema-1 validation
+and the whole-session boundary are documented in the
+[save contract](../../docs/save-contract.md#blueprint-placeholder-schema-8-542).
+Tests live in `structure/placement/tests.rs`.

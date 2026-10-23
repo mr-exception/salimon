@@ -491,6 +491,15 @@ pub(crate) fn execute_session(app: &mut GameplaySession, line: &str) -> Value {
                     }
                     Ok(json!({"button": "left", "pressed": pressed}))
                 }
+                (Some("right"), Some(true)) if app.building.active => {
+                    app.command(crate::session::Command::Build(
+                        crate::session::construction::BuildAction::Cancel,
+                    ));
+                    Ok(json!({"button":"right","pressed":true}))
+                }
+                (Some("right"), Some(false)) if app.building.active => {
+                    Ok(json!({"button":"right","pressed":false}))
+                }
                 _ => Err((
                     "invalid_argument",
                     "left button and boolean pressed required",
@@ -534,6 +543,10 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "wheel_next" => Some(KeyCode::Tab),
         "wheel_confirm" => Some(KeyCode::Enter),
         "engines" => Some(KeyCode::KeyB),
+        "build" => Some(KeyCode::KeyC),
+        "rotate_blueprint" => Some(KeyCode::KeyR),
+        "blueprint_6" => Some(KeyCode::Digit6),
+        "blueprint_7" => Some(KeyCode::Digit7),
         "interact" => Some(KeyCode::KeyE),
         "recovery" => Some(KeyCode::KeyR),
         "pause" => Some(KeyCode::Escape),
@@ -781,6 +794,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
             "fragment_mass_kg": app.mining.session.fragments().iter().map(|piece| piece.material().mass_kg()).sum::<f64>(),
             "nearest_deposit": nearest_deposit, "resource_types": resource_types, "deposits": deposits, "deposits_by_id": deposits_by_id, "deposit_query_error": deposit_error, "bodies": bodies, "camera_phase": format!("{:?}", app.camera_phase())}
     });
+    observation["construction"] = app.construction_inspect();
     observation["ship"]["engines_enabled"] = ship.engines_enabled.into();
     observation["archive"] =
         json!({"source":app.archive, "open":app.archive_reader.open, "text":app.archive_text()});

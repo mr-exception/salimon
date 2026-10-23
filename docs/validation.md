@@ -447,3 +447,10 @@ for seven serial processes each of `reference_bench` and `partition_bench`.
 The C supervisor records Linux `wait4` peak RSS without Python's inherited memory
 floor. Raw inner JSON, process time/memory, fixture/binary/compiler/CPU context,
 control failures and comparisons are retained; no FPS/model-error budget follows.
+
+Blueprints #542: `cargo test -p salimon-ship --locked structure::placement` and
+`cargo test -p salimon-client --locked construction` check reservations, safety and
+schema-8 atomic restore. Run the production native
+`scenarios/evidence/blueprint-placement.json` route for visible previews/projects,
+rotation, inspect/cancel and one module spanning four cells. These placeholders
+have no intake/progress/completed geometry; those later gates remain #543–#551.

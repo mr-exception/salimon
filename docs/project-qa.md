@@ -119,3 +119,15 @@ production snapshot approval after #513 private-development/evidence-gate delive
 The owner chose private development only; production eligibility remains blocked
 until the source-review checklist is resolved. Closing either source issue grants
 no appearance or production-data approval.
+
+## Blueprint estimates awaiting economy approval (#542 → #537)
+
+B02 placement shows proposed catalog estimates, with `approved_economy:false`.
+No resources are consumed and no timer advances. Owner approval in #537 is
+required before #543/#544 turn these estimates into funded construction policy.
+The authored `client/runtime/catalogs/blueprints.json` is the single source:
+stool 1 kg Iron / 10 s; partition 5 kg / 20 s; internal door 5 kg / 30 s;
+hull cell 20 kg / 120 s; deck cell 15 kg / 90 s; two-deck room 40 kg / 300 s;
+utility module 3 kg / 60 s. These are review proposals, not approved balance.
+Fine-grid pitch is per blueprint (currently 0.5 m); the structural lattice stays
+3 m. B02 does not authorize occupied-room demolition or structural completion.

@@ -1,5 +1,6 @@
 //! Portable production gameplay composition. No window, GPU lifecycle or evidence IO.
 pub(crate) mod archive;
+pub(crate) mod construction;
 pub(crate) mod consumable_wheel;
 pub(crate) mod consumables;
 pub(crate) mod crafting_ui;
@@ -37,6 +38,7 @@ use std::time::Duration;
 pub(crate) struct GameplaySession {
     paused: bool,
     pub(crate) tutorial: tutorial::Tutorial,
+    pub(crate) building: construction::Building,
     pub(crate) archive: archive::Archive,
     recovery: recovery::Recovery,
     pub(crate) archive_reader: archive::Reader,
@@ -92,6 +94,7 @@ impl Default for GameplaySession {
     fn default() -> Self {
         Self {
             paused: false,
+            building: Default::default(),
             archive: Default::default(),
             recovery: Default::default(),
             archive_reader: Default::default(),
@@ -140,6 +143,7 @@ pub(crate) enum ControlKey {
 #[derive(Clone, Copy, Debug)]
 pub(crate) enum Command {
     Wheel(consumable_wheel::WheelAction),
+    Build(construction::BuildAction),
     TogglePause,
     InspectVitals,
     SkipTutorial,
@@ -660,6 +664,7 @@ impl GameplaySession {
             return;
         }
         match command {
+            Build(action) => self.construction_action(action),
             Control(key, pressed) => self.control(key, pressed),
             Throttle(direction, pressed) => {
                 if !pressed
@@ -670,6 +675,9 @@ impl GameplaySession {
                 } else {
                     self.ship.clear_throttle_input();
                 }
+            }
+            Interact if self.building.active => {
+                self.feedback = Some("Project inspected");
             }
             Interact => {
                 let location = self.character.location();
@@ -722,6 +730,12 @@ impl GameplaySession {
                 }
             }
             Look(dx, dy) => self.apply_look_delta(dx, dy),
+            Mining(pressed) if self.building.active => {
+                self.mining.clear_input();
+                if pressed {
+                    self.construction_action(construction::BuildAction::Place);
+                }
+            }
             Mining(pressed) => {
                 let was_down = std::mem::replace(&mut self.wheel.primary_down, pressed);
                 if !pressed || !was_down {

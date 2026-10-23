@@ -159,6 +159,8 @@ pub(crate) struct SessionState {
     archive: Option<super::archive::Archive>,
     #[serde(default)]
     recovery: Option<super::recovery::Recovery>,
+    #[serde(default)]
+    construction: Option<super::construction::ConstructionSave>,
     fabrication: salimon_fabrication::FabricationSaveState,
     equipment: crate::equipment::EquipmentToolbar,
     #[serde(default)]
@@ -185,6 +187,9 @@ impl Validate for SurvivalState {
 impl Validate for SessionState {
     fn validate(&self) -> Result<(), SaveError> {
         self.physical.validate()?;
+        if let Some(construction) = &self.construction {
+            construction.validate()?;
+        }
         if let Some(archive) = &self.archive {
             archive.validate()?;
         }
@@ -229,6 +234,7 @@ impl GameplaySession {
             physical: PhysicalState::capture(self),
             archive: Some(self.archive.clone()),
             recovery: Some(self.recovery.clone()),
+            construction: Some(self.building.source.clone()),
             fabrication: salimon_fabrication::FabricationSaveState::capture(
                 &self.fabricator,
                 &self.consumables,
@@ -262,7 +268,7 @@ impl GameplaySession {
                 restrictions: Default::default(),
                 run: Default::default(),
             },
-            (2..=7, Some(state)) => state,
+            (2..=8, Some(state)) => state,
             _ => return Err(invalid("survival payload does not match envelope version")),
         };
         if save.schema_version == 2 {
@@ -274,19 +280,29 @@ impl GameplaySession {
         }
         survival.validate()?;
         let tutorial = match (save.schema_version, save.state.tutorial) {
-            (4..=7, Some(tutorial)) => tutorial,
+            (4..=8, Some(tutorial)) => tutorial,
             (1..=3, _) => super::tutorial::Tutorial::dismissed(),
             _ => return Err(invalid("tutorial source missing for save schema")),
         };
         let archive = match (save.schema_version, save.state.archive) {
-            (6..=7, Some(archive)) => archive,
+            (6..=8, Some(archive)) => archive,
             (1..=5, _) => Default::default(),
             _ => return Err(invalid("archive source missing for save schema")),
         };
         let recovery = match (save.schema_version, save.state.recovery) {
-            (7, Some(recovery)) => recovery,
+            (7..=8, Some(recovery)) => recovery,
             (1..=6, _) => Default::default(),
             _ => return Err(invalid("recovery source missing for schema 7")),
+        };
+        let construction = match (save.schema_version, save.state.construction) {
+            (8, Some(source)) => source,
+            (1..=7, None) => Default::default(),
+            (1..=7, Some(source)) if source.projects.jobs().next().is_none() => Default::default(),
+            _ => {
+                return Err(invalid(
+                    "construction source missing or incompatible with save schema",
+                ));
+            }
         };
         let (mut fabricator, consumables) = save.state.fabrication.restore()?;
         if save.schema_version <= 6 {
@@ -296,6 +312,7 @@ impl GameplaySession {
         }
         let physical = save.state.physical.restore()?;
         let mut restored = Self {
+            building: super::construction::Building::from_source(construction)?,
             seed: physical.seed,
             archive,
             recovery,

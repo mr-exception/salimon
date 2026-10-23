@@ -46,7 +46,8 @@ are **independent** versioned corpora. The software-Vulkan corpus was approved
 by the repository owner on 2026-10-19 after PR #335; Metal approval remains pending. See the [software capture report](../../reports/issue-321/README.md)
 and [checkpoint index](../../reports/issue-321/checkpoints.md). Software approval is tracked in
 [#321](https://github.com/mr-exception/salimon/issues/321); native M1/Metal review
-remains [#314](https://github.com/mr-exception/salimon/issues/314).
+requires normal-clock evidence and explicit human review; see the
+[#477 report](../../reports/issue-477/README.md).
 
 Nightly now selects `baselines/software-vulkan-option-a-v2`, explicitly pending
 [review follow-up #537](https://github.com/mr-exception/salimon/issues/537). Engine #493

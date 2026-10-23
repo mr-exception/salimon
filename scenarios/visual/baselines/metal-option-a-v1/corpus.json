@@ -9,8 +9,9 @@
       1280,
       800
     ],
-    "scale_factor": 1.0
+    "scale_factor": 2.0
   },
-  "follow_up": "https://github.com/mr-exception/salimon/issues/477",
-  "reason": "No human-approved images, masks or tolerances yet. Replace only in a separately reviewed baseline PR."
+  "follow_up": "https://github.com/mr-exception/salimon/issues/561",
+  "reason": "Reference M1 built-in captures are observed at scale 2. Human image/mask/tolerance approval remains pending; candidates are not promoted.",
+  "candidate_evidence": "reports/issue-477/candidates/corpus.json"
 }

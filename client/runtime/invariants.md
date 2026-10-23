@@ -224,8 +224,9 @@ See the [canonical dispatch policy](architecture.md#gameplay-input-dispatch-302)
   bypass incompatible history. Doorway blending bypasses it throughout.
 - New/removed/transferred/carried/released objects never reuse incompatible
   object history; current ship/camera attachments use presented frames.
-- E2E presentation bypasses all interpolation. Native #314 remains required for
-  smoothness/capture/latency signoff; portable schedules cannot establish it.
+- E2E presentation bypasses all interpolation. Normal-clock recordings and
+  explicit human/native review remain required for smoothness/capture/latency
+  signoff; portable schedules cannot establish it. See the [reference review](../../reports/issue-477/README.md).
 
 ## Fabricator physical input (#339)
 

@@ -523,7 +523,8 @@ simulation. Interpolation adds up to one tick of positional/ship-orientation
 visual delay; mouse look remains immediate. Portable synthetic 60/120/144 Hz,
 zero/multiple tick, fractional/overloaded backlog, distant-anchor and frame-reset
 regressions do not establish native smoothness or input latency. Native signoff
-remains [#314](https://github.com/mr-exception/salimon/issues/314).
+requires normal-clock evidence and explicit human review; see the
+[#477 report](../../reports/issue-477/README.md).
 
 Native benchmark samples sum solver work/time across all completed ticks in a
 render and retain the final activation counts. Zero-tick renders record zero new

@@ -350,3 +350,19 @@ Run [the native review harness](../reports/issue-376/native_restore.py) only aga
 those isolated directories with the locally authorized OS-input helper. Retain
 source/binary/adapter/DPI, input/checkpoint records and actual images. Fixture
 rendering never grants full gameplay, balance or representative FPS acceptance.
+
+## Normal-clock cargo review fixture (#477)
+
+```sh
+SALIMON_NATIVE_CARGO_DIR="$PWD/artifacts/new-native-cargo" cargo test --release -p salimon-client --locked native_cargo_checkpoint_477 -- --ignored --nocapture
+```
+
+The output directory must not exist. This test reuses the existing seeded
+FragmentPile fixture, advances production ticks, aims at an existing identity,
+validates exact save roundtrip with automation absent after restore, and proves
+the typed F route can pick that identity. Only then does it write two verified
+slots. Use the [#477 native harnesses](../reports/issue-477/README.md) against a
+copy in a fresh isolated save directory. Normal launch uses the real wall clock
+and native OS events; no stdin stepping or rendering override is active.
+Fixture placement/aiming is not physical mining/travel, visual approval or FPS
+evidence. Keep blocked placement failures and human temporal review separate.

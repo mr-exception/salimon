@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "status": "candidate",
+  "context": {
+    "adapter": "Apple M1",
+    "backend": "Metal",
+    "driver": " / ",
+    "scale_factor": 2.0,
+    "viewport_pixels": [
+      1920,
+      1080
+    ],
+    "platform": "macOS-26.2-arm64-arm-64bit-Mach-O"
+  },
+  "revision": "97f3b9fb0202cb5a01a30628237ff73c6586d246",
+  "binary_sha256": "0e137f65ed29127ee4c91bbc48c61082f418d10daca308bdb044bea4707ce16c",
+  "fixture_contract_sha256": "df8244eaed8bda87c256fa87d4331a9f1d19123a2958e1b963ae1edb046f335c",
+  "images": {
+    "scout-lighting/aft-door-blackout-repeat-00.png": "6aec950efe274e59a497035ef48c72f0a58a12f55569c4d4e6ae36cd1944f7e6",
+    "scout-lighting/aft-door-blackout-repeat-01.png": "6aec950efe274e59a497035ef48c72f0a58a12f55569c4d4e6ae36cd1944f7e6",
+    "scout-lighting/aft-door-blackout-repeat-02.png": "6aec950efe274e59a497035ef48c72f0a58a12f55569c4d4e6ae36cd1944f7e6",
+    "scout-lighting/aft-door-powered-repeat-00.png": "fb2ba4956740af1363346eb32b9395bd7bf5f85d1bf12cf1d41262c6889847b8",
+    "scout-lighting/aft-door-powered-repeat-01.png": "fb2ba4956740af1363346eb32b9395bd7bf5f85d1bf12cf1d41262c6889847b8",
+    "scout-lighting/aft-door-powered-repeat-02.png": "fb2ba4956740af1363346eb32b9395bd7bf5f85d1bf12cf1d41262c6889847b8",
+    "scout-lighting/cockpit-blackout-repeat-00.png": "2d057e8c84e62aa3d282713e6290cfad0da43b01dd550cd1d31680e72781a04f",
+    "scout-lighting/cockpit-blackout-repeat-01.png": "2d057e8c84e62aa3d282713e6290cfad0da43b01dd550cd1d31680e72781a04f",
+    "scout-lighting/cockpit-blackout-repeat-02.png": "2d057e8c84e62aa3d282713e6290cfad0da43b01dd550cd1d31680e72781a04f",
+    "scout-lighting/cockpit-powered-repeat-00.png": "09f6f5152fed95924758a5ba4d8ffcbc924e110ea339aa9b3d5810b89fb95033",
+    "scout-lighting/cockpit-powered-repeat-01.png": "09f6f5152fed95924758a5ba4d8ffcbc924e110ea339aa9b3d5810b89fb95033",
+    "scout-lighting/cockpit-powered-repeat-02.png": "09f6f5152fed95924758a5ba4d8ffcbc924e110ea339aa9b3d5810b89fb95033",
+    "scout-lighting/core-blackout-repeat-00.png": "01f9acfebae1ef7f21afec814e85b059ccfa8bf0c307476f9449d3bbca63c726",
+    "scout-lighting/core-blackout-repeat-01.png": "01f9acfebae1ef7f21afec814e85b059ccfa8bf0c307476f9449d3bbca63c726",
+    "scout-lighting/core-blackout-repeat-02.png": "01f9acfebae1ef7f21afec814e85b059ccfa8bf0c307476f9449d3bbca63c726",
+    "scout-lighting/core-powered-repeat-00.png": "fd5093a0a3329bea2abb6ea0caeb0da0c0d710438fc67551b8025a0a9bd24733",
+    "scout-lighting/core-powered-repeat-01.png": "fd5093a0a3329bea2abb6ea0caeb0da0c0d710438fc67551b8025a0a9bd24733",
+    "scout-lighting/core-powered-repeat-02.png": "fd5093a0a3329bea2abb6ea0caeb0da0c0d710438fc67551b8025a0a9bd24733",
+    "scout-lighting/fabricator-blackout-repeat-00.png": "255622bff804d5acbccb60fb1e603ad08eb701ad2a6e8a60bea422c3ccd66741",
+    "scout-lighting/fabricator-blackout-repeat-01.png": "255622bff804d5acbccb60fb1e603ad08eb701ad2a6e8a60bea422c3ccd66741",
+    "scout-lighting/fabricator-blackout-repeat-02.png": "255622bff804d5acbccb60fb1e603ad08eb701ad2a6e8a60bea422c3ccd66741",
+    "scout-lighting/fabricator-powered-repeat-00.png": "7825d530cbf55632a94115449cec1582c4b217426cd8603983d240df897c1de1",
+    "scout-lighting/fabricator-powered-repeat-01.png": "7825d530cbf55632a94115449cec1582c4b217426cd8603983d240df897c1de1",
+    "scout-lighting/fabricator-powered-repeat-02.png": "7825d530cbf55632a94115449cec1582c4b217426cd8603983d240df897c1de1"
+  }
+}

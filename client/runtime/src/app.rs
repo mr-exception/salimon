@@ -1235,10 +1235,11 @@ impl ClientApplication {
                 );
                 if timing.frame_number == 1
                     || timing.frame_number.is_multiple_of(TIMING_LOG_INTERVAL)
+                    || log::log_enabled!(target: "salimon_client::frame", log::Level::Trace)
                 {
                     log::debug!(
                         target: "salimon_client::frame",
-                        "frame={} interval_ms={:.3} present_wall_ms={:.3} cpu_update_ms={:.3} cpu_render_ms={:.3} gpu_time={:?} ticks={} backlog_ms={:.3}",
+                        "frame={} interval_ms={:.3} present_wall_ms={:.3} cpu_update_ms={:.3} cpu_render_ms={:.3} gpu_time={:?} ticks={} backlog_ms={:.3} focused={} occluded={}",
                         timing.frame_number,
                         timing.frame_interval.as_secs_f64() * 1_000.0,
                         timing.submission_wall_time.as_secs_f64() * 1_000.0,
@@ -1246,7 +1247,9 @@ impl ClientApplication {
                         render_stats.cpu_render_time.as_secs_f64() * 1_000.0,
                         render_stats.gpu_frame_time,
                         ticks,
-                        self.session.update_clock.backlog().as_secs_f64() * 1_000.0
+                        self.session.update_clock.backlog().as_secs_f64() * 1_000.0,
+                        self.native_focused,
+                        self.occluded
                     );
                 }
                 let done = self.benchmark.as_mut().is_some_and(|benchmark| {

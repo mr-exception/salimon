@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/native-20261023/483/frame_reference.py", line 35, in <module>
+    focus();assert g.request({'op':'inspect'})['native_input_isolated'] is True
+    ~~~~~^^
+  File "/Users/mrexception/Documents/Projects/Salimon/salimon/artifacts/native-20261023/483/frame_reference.py", line 34, in focus
+    assert r.returncode==0 and f'frontmost={g.process.pid} target={g.process.pid}' in r.stdout
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

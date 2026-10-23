@@ -1,0 +1,7 @@
+{
+  "scenario": "flight-regression",
+  "seed": 0,
+  "step_ms": 100,
+  "lane": "cockpit",
+  "scope": "production protocol with explicit initial fixtures; fixed-step GPU surfaces; no OS input or display FPS"
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "scenario": "scenarios/inertial-flight.json",
+    "status": "passed",
+    "steps_completed": 425,
+    "duration_ms": 21842,
+    "artifact_directory": "/workspace/salimon/artifacts/489-baseline-routes/inertial-flight/run-w50dffui",
+    "result_file": "/workspace/salimon/artifacts/489-baseline-routes/inertial-flight/run-w50dffui/result.json"
+  },
+  {
+    "scenario": "scenarios/cargo-flight.json",
+    "status": "passed",
+    "steps_completed": 6,
+    "duration_ms": 2833,
+    "artifact_directory": "/workspace/salimon/artifacts/489-baseline-routes/cargo-flight/run-s669utgm",
+    "result_file": "/workspace/salimon/artifacts/489-baseline-routes/cargo-flight/run-s669utgm/result.json"
+  },
+  {
+    "scenario": "scenarios/cargo-blackout.json",
+    "status": "passed",
+    "steps_completed": 35,
+    "duration_ms": 21477,
+    "artifact_directory": "/workspace/salimon/artifacts/489-baseline-routes/cargo-blackout/run-kiad6mmx",
+    "result_file": "/workspace/salimon/artifacts/489-baseline-routes/cargo-blackout/run-kiad6mmx/result.json"
+  }
+]

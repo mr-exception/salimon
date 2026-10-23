@@ -1251,6 +1251,18 @@ presented ship pose; `automation.rs` exposes read-only inspection. No event queu
 animation controller, save state or additional elapsed admission is introduced.
 See the [canonical feedback contract](../../docs/scout-presentation.md#machinery-feedback-boundary-464).
 
+`scout_walkthrough.rs` supplies opt-in `scout-fabricator` and
+`scout-work-blackout` E2E initial conditions for #489: ordinary starter supplies
+plus the existing exact 2 kg Core-restart fragment. The first starts landed by
+the machine; the second starts with an unfunded job and Core aimed at the held
+fragment. Initial placement/energy are explicit fixtures, not normal-play mining
+or travel. There are no new mutation protocol operations: physical E intake,
+menu commands, production ticks and exact tray collection retain their gates.
+Portable regressions preserve save/restore/pause feedback and identity/mass;
+`reports/issue-489/walkthrough.py` drives the real window adapter and GPU captures.
+Two extra presentation-only close cameras live in `scout-machinery-cameras.json`;
+the four shared lighting/Blender poses remain in their original file.
+
 ## Pause checkpoint controls (#382)
 
 The paused menu offers Enter/Escape Resume, N Save Now, S Settings and X Save &

@@ -90,3 +90,13 @@ acceptance before any native signoff. Future scanner feedback remains with
 
 Closing #464 records portable delivery and scope transfer, not passing these
 remaining native/physical checks. No M1 signoff is claimed.
+
+## Cloud verification follow-up — 2026-10-23
+
+The [#489 report](../issue-489/README.md) now retains production window/session
+walkthroughs, exact intake/collection and pause/restore invariants, original GPU
+frames and stepped motion clips. It includes the corrected Fabricator text
+orientation and a corrected pedal close camera. The original synthetic DTO
+evidence and historical defect above remain dated evidence, not current approval.
+Human readability/motion review transfers to #561, physical platform/input #557
+and hardware costs #563. Scanner integration remains #503 after #430.

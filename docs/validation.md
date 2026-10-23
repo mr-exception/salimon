@@ -404,3 +404,17 @@ serially for stereo WAVs and matched synthesis/substitute-process diagnostics.
 The directory must not exist. Exports are original PCM, not device recordings;
 #561 owns listening/continuity, #557 physical backend checks, #563 hardware budgets.
 See [evidence and limitations](../reports/issue-485/README.md).
+
+## Scout machinery cloud walkthrough (#489)
+
+`cargo test -p salimon-client --locked scout_walkthrough` verifies physical
+Fabricator intake/menu/work/blocked/exact collection, unfunded-job Core recovery
+and byte-identical pause/save/restore feedback. Existing `scout_feedback`, flight,
+cargo, ramp/collision and renderer screen-orientation contracts remain required.
+With Xvfb and lavapipe active, run `python reports/issue-489/walkthrough.py
+--binary target/debug/salimon-client --output artifacts/new-489-walkthrough`.
+It uses production protocol/window adapters and direct GPU capture, isolated
+native input, explicit seeded initial states and fixed simulation steps.
+Its motion frames/encoded clips are not wall-clock/display-FPS evidence.
+See the [report](../reports/issue-489/README.md) for native routes, source/context
+hashes, exact results and remaining #561/#557/#563 criteria.

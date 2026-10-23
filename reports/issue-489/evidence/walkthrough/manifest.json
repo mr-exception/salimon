@@ -1,0 +1,13 @@
+{
+  "binary_sha256": "56be58e9edf05cd84aa2c413f0f9d950222e6bcb7c49e8350e79b4b640e53bd8",
+  "revision": "4b64c15cdf560f77f2c3e0b117930e63499c1e22",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "input": "production E2E protocol, native input isolated",
+  "time": "fixed simulation steps; captures are not real-time FPS evidence",
+  "lanes": {
+    "fabricator": "/workspace/salimon/artifacts/489-clean/fabricator/run-r5cebx_a",
+    "blackout": "/workspace/salimon/artifacts/489-clean/blackout/run-2sbumskt",
+    "cockpit": "/workspace/salimon/artifacts/489-clean/cockpit/run-wwzx2c1_",
+    "ramp": "/workspace/salimon/artifacts/489-clean/ramp/run-arobcq2g"
+  }
+}

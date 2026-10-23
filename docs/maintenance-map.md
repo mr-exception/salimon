@@ -424,3 +424,11 @@ repeat the manifest example and compare the golden; cross-platform CI also runs
 debug/release tests. Candidate/world hashes must not change silently. U12 merges
 and packages; U14 supplies states; U23/U24 integrate terrain/arrival/resources.
 No runtime, prototype save, player chart or native signoff changes are implied.
+
+Scout machinery verification (#489): runtime `scout_walkthrough.rs` supplies two
+validated E2E initial fixtures; `e2e.rs` and `scripts/salimon_test.py` select them.
+Subsequent intake/menu/power/work/collection uses production session/window routes.
+`reports/issue-489/walkthrough.py` retains GPU motion frames plus authoritative
+state, with two additional close cameras consumed by `scout_reference.rs`.
+See [evidence/limits](../reports/issue-489/README.md); subjective review #561,
+physical platform/input #557, hardware budgets #563, scanner integration #503/#430.

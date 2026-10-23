@@ -676,3 +676,14 @@ normal player's save or imply physical mining/travel.
 window adapter. Named `pedals-close` and `fabricator-close` cameras only change
 presentation; the original four Scout lighting/Blender cameras are unchanged.
 See [validation and limits](../reports/issue-489/README.md).
+
+## Archive cloud verification (#505)
+
+`--e2e --scenario scout-archive` starts with normal new-run source placed at the
+physical Archive; it does not open/read records. `inspect.archive` contains
+`source`, `open` and optional rendered `text`. `key: interact` maps to physical E
+for opening/closing through production dispatch. Existing `thruster_up/down`,
+`roll_left/right` and `wheel_next` map to arrows/Tab and navigate the reader.
+Use `reports/issue-505/verify.py --binary target/debug/salimon-client --output
+artifacts/new-505 --scale 1` under Xvfb/Vulkan for all seven records at both
+resolutions. Scales 1/1.5/2 are simulated via X11, not physical DPI evidence.

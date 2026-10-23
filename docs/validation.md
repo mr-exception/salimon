@@ -429,3 +429,8 @@ record actual wgpu screens at 1280x800/1920x1080 and simulated X11 scales 1/1.5/
 power restoration through Core intake, physical Fabricator prompts/modal exclusion
 and the existing anchored-world-prompt route. Device DPI remains #557 and human
 readability/appearance remains #561.
+
+Archive #505: `cargo test -p salimon-client --locked archive` includes the real
+Save Now worker, normal relaunch and verified restart reset. The
+[cloud report/driver](../reports/issue-505/README.md) captures all seven intact and
+damaged records via physical E/arrow/Tab dispatch at both supported resolutions.

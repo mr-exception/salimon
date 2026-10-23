@@ -13,6 +13,7 @@ pub(crate) enum Scenario {
     LandedEarth,
     ScoutFabricator,
     ScoutWorkBlackout,
+    ScoutArchive,
     FlightRegression,
     CargoFlight,
     CargoBlackout,
@@ -44,6 +45,7 @@ impl Scenario {
         match value {
             "scout-fabricator" => Ok(Self::ScoutFabricator),
             "scout-work-blackout" => Ok(Self::ScoutWorkBlackout),
+            "scout-archive" => Ok(Self::ScoutArchive),
             "flight-regression" => Ok(Self::FlightRegression),
             "cargo-flight" => Ok(Self::CargoFlight),
             "cargo-blackout" => Ok(Self::CargoBlackout),
@@ -79,6 +81,7 @@ impl Scenario {
         match self {
             Self::ScoutFabricator => "scout-fabricator",
             Self::ScoutWorkBlackout => "scout-work-blackout",
+            Self::ScoutArchive => "scout-archive",
             Self::FlightRegression => "flight-regression",
             Self::CargoFlight => "cargo-flight",
             Self::CargoBlackout => "cargo-blackout",
@@ -222,6 +225,9 @@ pub(crate) fn initialize(app: &mut GameplaySession, config: Config) -> Result<()
     app.character = CharacterController::default();
     app.ship = ShipController::default();
     match config.scenario {
+        Scenario::ScoutArchive => {
+            crate::scout_walkthrough::archive_initial_conditions(app)?;
+        }
         Scenario::ScoutFabricator | Scenario::ScoutWorkBlackout => {
             crate::scout_walkthrough::initialize(app, config.scenario)?;
         }

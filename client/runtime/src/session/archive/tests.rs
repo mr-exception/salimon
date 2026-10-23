@@ -190,3 +190,58 @@ fn production_e_native_keys_disk_checkpoint_and_blackout_use_same_reader() {
     );
     assert!(!s.archive_reader.open);
 }
+
+#[test]
+fn save_now_relaunch_and_verified_restart_preserve_then_reset_exact_archive_source() {
+    use crate::checkpoints::{
+        Checkpoints,
+        control::{Request, Status},
+    };
+    use std::time::Instant;
+    let path = std::env::temp_dir().join(format!("salimon-505-{}", std::process::id()));
+    std::fs::create_dir(&path).unwrap();
+    let mut s = at_terminal();
+    let mut host = Checkpoints::open_at(path.clone(), &mut s, 100).unwrap();
+    s.command(Command::Interact);
+    for _ in 0..6 {
+        s.archive_action(ReaderAction::Next);
+    }
+    let source = serde_json::to_value(&s.archive).unwrap();
+    s.toggle_pause();
+    let elapsed = s.elapsed;
+    host.request(Request::SaveNow, &s);
+    let deadline = Instant::now() + Duration::from_secs(10);
+    while !matches!(host.status().0, Status::Saved { .. }) {
+        assert!(
+            Instant::now() < deadline,
+            "Save Now did not complete: {:?}",
+            host.status()
+        );
+        host.poll(&s);
+        std::thread::yield_now();
+    }
+    let utc = host.status().1.unwrap();
+    assert_eq!(s.elapsed, elapsed);
+    drop(host);
+    let mut loaded = GameplaySession::default();
+    let mut host = Checkpoints::open_at(path.clone(), &mut loaded, utc).unwrap();
+    assert_eq!(serde_json::to_value(&loaded.archive).unwrap(), source);
+    assert!(!loaded.archive_reader.open);
+    loaded
+        .survival
+        .command(salimon_survival::Command::Damage(
+            salimon_survival::Points::FULL,
+        ))
+        .unwrap();
+    host.restart(&mut loaded).unwrap();
+    assert!(loaded.archive.read.is_empty());
+    assert_eq!(loaded.archive.selected, RECORDS[0].id);
+    assert!(!loaded.archive_reader.open);
+    drop(host);
+    let mut restarted = GameplaySession::default();
+    let host = Checkpoints::open_at(path.clone(), &mut restarted, utc).unwrap();
+    assert!(restarted.archive.read.is_empty());
+    assert!(!restarted.archive_reader.open);
+    drop(host);
+    std::fs::remove_dir_all(path).unwrap();
+}

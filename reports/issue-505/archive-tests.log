@@ -1,0 +1,20 @@
+   Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.87s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-225cf3bc83389f81)
+
+running 12 tests
+test checkpoints::lifecycle_tests::archive_is_idempotent_conflicting_report_rejects_and_new_run_serial_avoids_history ... ok
+test checkpoints::lifecycle_tests::death_checkpoint_archives_before_restart_and_launch_repairs_missing_report ... ok
+test app::input_tests::journey_ended_restart_uses_verified_archive_and_retries_failure_without_resurrection ... ok
+test journey_ended::tests::journey_ended_report_and_archive_share_typed_causes_statistics_and_location ... ok
+test session::archive::tests::archive_roundtrip_preserves_exact_records_and_read_progress_but_not_modal_input ... ok
+test session::archive::tests::initial_records_have_bounded_accessible_lines_and_no_destination_or_spoiler ... ok
+test session::archive::tests::missing_duplicate_unknown_and_future_record_state_reject_transactionally_and_legacy_initializes ... ok
+test session::archive::tests::physical_target_has_no_exterior_remote_or_behind_panel_access ... ok
+test checkpoints::lifecycle_tests::terminal_native_restart_archives_once_and_corrupt_latest_cannot_restore_old_run ... ok
+test session::archive::tests::reader_blocks_world_inputs_and_closes_on_pause_focus_power_loss_and_range_loss ... ok
+test session::journey::tests::archive_contains_named_final_location_exact_duration_and_typed_cause ... ok
+test session::archive::tests::production_e_native_keys_disk_checkpoint_and_blackout_use_same_reader ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 340 filtered out; finished in 0.10s
+

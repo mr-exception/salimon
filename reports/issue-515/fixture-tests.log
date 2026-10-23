@@ -1,0 +1,9 @@
+   Compiling salimon-client v0.1.0 (/workspace/salimon/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.06s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-225cf3bc83389f81)
+
+running 1 test
+test scout_walkthrough::tests::recovery_fixture_retains_one_held_input_and_only_declared_raw_silicate ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 357 filtered out; finished in 0.00s
+

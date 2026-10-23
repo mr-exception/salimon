@@ -117,6 +117,30 @@ fn geometry_from_bytes(bytes: &[u8]) -> Result<ShipGeometry, RendererError> {
                 || (0..positions.len() as u32).collect(),
                 |values| values.into_u32().collect(),
             );
+            // The authored package uses world-X/Z UVs. Category artwork needs
+            // a full [0,1] face, including vertical faces whose X/Z map collapses.
+            let package_bounds = if display_flag == 3.0 {
+                let mut min = [f32::INFINITY; 3];
+                let mut max = [f32::NEG_INFINITY; 3];
+                for position in &positions {
+                    let point = transform_position(matrix, *position);
+                    for axis in 0..3 {
+                        min[axis] = min[axis].min(point[axis]);
+                        max[axis] = max[axis].max(point[axis]);
+                    }
+                }
+                if (0..3).any(|axis| {
+                    !min[axis].is_finite() || !max[axis].is_finite() || max[axis] <= min[axis]
+                }) {
+                    return Err(RendererError::new(
+                        "failed to load Fabricator package",
+                        "package bounds must be finite and nondegenerate",
+                    ));
+                }
+                Some((min, max))
+            } else {
+                None
+            };
             let material = primitive.material();
             let color = material.pbr_metallic_roughness().base_color_factor();
             let is_glass = material.name() == Some("Cockpit Glass");
@@ -154,6 +178,19 @@ fn geometry_from_bytes(bytes: &[u8]) -> Result<ShipGeometry, RendererError> {
                 // Do not modify the authored mesh, normals, colliders or exports.
                 if node.name() == Some("Fabricator_Monitor") {
                     uv[0] = 1.0 - uv[0];
+                }
+                if let Some((min, max)) = package_bounds {
+                    let axes = if transformed_normal[1].abs() > 0.5 {
+                        [0, 2]
+                    } else if transformed_normal[0].abs() > 0.5 {
+                        [2, 1]
+                    } else {
+                        [0, 1]
+                    };
+                    uv = axes.map(|axis| {
+                        ((transformed_position[axis] - min[axis]) / (max[axis] - min[axis]))
+                            .clamp(0.0, 1.0)
+                    });
                 }
                 vertices.extend_from_slice(&[
                     transformed_position[0],
@@ -833,6 +870,18 @@ mod fabricator_tests {
             .collect();
         assert_eq!(vertices.len(), 36);
         assert!(vertices.iter().all(|v| v[10] == 0.0 && v[14] == 1.0)); // Stationary interior geometry.
+        for face in vertices.as_chunks::<3>().0 {
+            assert!(
+                face.iter()
+                    .all(|v| (0.0..=1.0).contains(&v[15]) && (0.0..=1.0).contains(&v[16]))
+            );
+            let [a, b, c] = [face[0], face[1], face[2]];
+            let area = (b[15] - a[15]) * (c[16] - a[16]) - (b[16] - a[16]) * (c[15] - a[15]);
+            assert!(
+                area.abs() > 0.9,
+                "category artwork needs a noncollapsed full face"
+            );
+        }
         let module = wgpu::naga::front::wgsl::parse_str(include_str!("ship_mesh.wgsl")).unwrap();
         wgpu::naga::valid::Validator::new(
             wgpu::naga::valid::ValidationFlags::all(),

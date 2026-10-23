@@ -432,3 +432,10 @@ Subsequent intake/menu/power/work/collection uses production session/window rout
 state, with two additional close cameras consumed by `scout_reference.rs`.
 See [evidence/limits](../reports/issue-489/README.md); subjective review #561,
 physical platform/input #557, hardware budgets #563, scanner integration #503/#430.
+
+Recovery cloud verification (#515): `scout_walkthrough.rs` owns declared initial
+materials, `automation.rs` exposes read-only recovery source and the R alias,
+`session/recovery/tests.rs` owns exact concurrent funding/migration/disk coverage.
+Renderer `ship_mesh.rs` normalizes the generic tray package's per-face artwork UVs;
+its geometry regression and the matched native before/after images cover the
+correction. See [the report](../reports/issue-515/README.md) and renderer architecture.

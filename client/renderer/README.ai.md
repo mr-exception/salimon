@@ -148,5 +148,10 @@ See [runtime contract](../runtime/architecture.md#scout-archive-467).
 existing anchored tray package. Its existing uniform lane encodes component=2,
 medical=1 or food=0; `ship_mesh.wgsl` draws grey/cyan circuit traces for components.
 No buffers/draws/colliders, installation authority or resource state are added.
-Archive work/progress text remains runtime-owned. Native appearance/input/budget
-acceptance is #515; CPU shader/layout contracts cannot establish it.
+Archive work/progress text remains runtime-owned. Cloud route #515 includes
+original GPU frames and an import-only package UV correction: `Fabricator_Output`
+uses normalized per-face coordinates selected by its flat normal and transformed
+bounds. Authored geometry/exports stay unchanged. World-X/Z UVs previously missed
+all normalized circuit/food/medical artwork and collapsed vertical faces. The
+loaded-geometry regression requires [0,1] coordinates and noncollapsed full-face
+triangles. Human appearance is #561, physical input/DPI #557 and budgets #563.

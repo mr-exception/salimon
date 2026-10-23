@@ -687,3 +687,13 @@ for opening/closing through production dispatch. Existing `thruster_up/down`,
 Use `reports/issue-505/verify.py --binary target/debug/salimon-client --output
 artifacts/new-505 --scale 1` under Xvfb/Vulkan for all seven records at both
 resolutions. Scales 1/1.5/2 are simulated via X11, not physical DPI evidence.
+
+## Recovery cloud verification (#515)
+
+`scout-recovery` explicitly starts with a held 2 kg iron identity and a 0.5 kg
+silicate bin, no module/job/progress. `key: recovery` maps to physical R through
+normal Archive dispatch; `inspect.recovery` is immutable source evidence. Use
+`reports/issue-515/verify.py --binary target/debug/salimon-client --output
+artifacts/new-515` under Xvfb/Vulkan. It drives intake, menu, funded craft, tray
+collection/installation, real cabin walking, R start/stop and both paid records.
+This fixture does not measure mining/acquisition, balance or physical OS input.

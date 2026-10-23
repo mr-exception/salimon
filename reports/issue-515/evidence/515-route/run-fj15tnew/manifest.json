@@ -1,0 +1,5 @@
+{
+  "revision": "264cd46c7fd0d5840bc359fcfc8ce9351eca6c30",
+  "binary_sha256": "071421b60bc9cd568fe12bac9e489ff73ab9030b73613c229a90922e46637a59",
+  "input": "production protocol, desktop input isolated; 96 ms requests / 16 ms simulation ticks"
+}

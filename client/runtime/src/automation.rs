@@ -535,6 +535,7 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "wheel_confirm" => Some(KeyCode::Enter),
         "engines" => Some(KeyCode::KeyB),
         "interact" => Some(KeyCode::KeyE),
+        "recovery" => Some(KeyCode::KeyR),
         "pause" => Some(KeyCode::Escape),
         "status" => Some(KeyCode::KeyH),
         "skip_tutorial" => Some(KeyCode::KeyT),
@@ -783,6 +784,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
     observation["ship"]["engines_enabled"] = ship.engines_enabled.into();
     observation["archive"] =
         json!({"source":app.archive, "open":app.archive_reader.open, "text":app.archive_text()});
+    observation["recovery"] = app.recovery_observation();
     observation["tutorial"] = json!({"state":app.tutorial,"prompt":app.tutorial.text()});
     observation
 }

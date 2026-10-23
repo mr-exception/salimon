@@ -229,8 +229,11 @@ Passing the proposed numbers does not grant #255/#288 signoff or establish
 continuous motion, larger-piece, dense-contact or #236 sphere acceptance.
 The [2026-10-21 refresh](../reports/issue-255/2026-10-21/README.md) passes all
 numerical proposal checks and fresh historical relative comparisons; prior failed
-windows remain recorded. [#479](https://github.com/mr-exception/salimon/issues/479)
-owns the remaining explicit budget/limitation review after #255 delivery.
+windows remain recorded. [#479 reanalysis and decision package](../reports/issue-479/README.md) reverify
+the unchanged archive/proposal without repeating completed collection.
+[#563](https://github.com/mr-exception/salimon/issues/563) owns the remaining
+explicit owner budget/limitation decision. Until recorded, the proposal remains
+pending; closing delivery issues does not grant approval.
 
 ### Same-device relative regression checks
 

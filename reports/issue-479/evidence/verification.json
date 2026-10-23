@@ -1,0 +1,13 @@
+{
+  "scope": "reanalysis and immutable archive audit; no new native measurements",
+  "archive_manifest": "reports/issue-255/2026-10-21/sha256.json",
+  "archive_files_verified": 89,
+  "archive_hash_failures": [],
+  "proposal_checks_passed": true,
+  "fresh_historical_relative_failures": [],
+  "older_recorded_failures_retained": 9,
+  "acceptance_granted": false,
+  "reanalysis_summary_sha256": "941e063e1d4edc6e9ff18ee94d58b2f17ed3e3a06d2c7dd0074778d32c33dc11",
+  "reanalysis_full_result_sha256": "1eece924c4f3254d1199f9d94bbb4880e543260c383e99196bf9a9f3a4e498f8",
+  "full_result_byte_identical_to_canonical": false
+}

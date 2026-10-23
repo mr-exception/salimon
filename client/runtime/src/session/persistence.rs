@@ -158,6 +158,8 @@ pub(crate) struct SessionState {
     #[serde(default)]
     cargo_door: Option<super::cargo::CargoDoor>,
     #[serde(default)]
+    habitation: Option<super::habitation::Habitation>,
+    #[serde(default)]
     archive: Option<super::archive::Archive>,
     #[serde(default)]
     recovery: Option<super::recovery::Recovery>,
@@ -189,6 +191,9 @@ impl Validate for SurvivalState {
 impl Validate for SessionState {
     fn validate(&self) -> Result<(), SaveError> {
         self.physical.validate()?;
+        if let Some(h) = &self.habitation {
+            h.validate()?;
+        }
         if let Some(door) = &self.cargo_door {
             door.validate()?;
         }
@@ -238,6 +243,7 @@ impl GameplaySession {
         let state = SessionState {
             physical: PhysicalState::capture(self),
             cargo_door: Some(self.cargo_door.clone()),
+            habitation: Some(self.habitation.clone()),
             archive: Some(self.archive.clone()),
             recovery: Some(self.recovery.clone()),
             construction: Some(self.building.source.clone()),
@@ -274,7 +280,7 @@ impl GameplaySession {
                 restrictions: Default::default(),
                 run: Default::default(),
             },
-            (2..=9, Some(state)) => state,
+            (2..=10, Some(state)) => state,
             _ => return Err(invalid("survival payload does not match envelope version")),
         };
         if save.schema_version == 2 {
@@ -286,22 +292,22 @@ impl GameplaySession {
         }
         survival.validate()?;
         let tutorial = match (save.schema_version, save.state.tutorial) {
-            (4..=9, Some(tutorial)) => tutorial,
+            (4..=10, Some(tutorial)) => tutorial,
             (1..=3, _) => super::tutorial::Tutorial::dismissed(),
             _ => return Err(invalid("tutorial source missing for save schema")),
         };
         let archive = match (save.schema_version, save.state.archive) {
-            (6..=9, Some(archive)) => archive,
+            (6..=10, Some(archive)) => archive,
             (1..=5, _) => Default::default(),
             _ => return Err(invalid("archive source missing for save schema")),
         };
         let recovery = match (save.schema_version, save.state.recovery) {
-            (7..=9, Some(recovery)) => recovery,
+            (7..=10, Some(recovery)) => recovery,
             (1..=6, _) => Default::default(),
             _ => return Err(invalid("recovery source missing for schema 7")),
         };
         let construction = match (save.schema_version, save.state.construction) {
-            (8..=9, Some(source)) => source,
+            (8..=10, Some(source)) => source,
             (1..=7, None) => Default::default(),
             (1..=7, Some(source)) if source.projects.jobs().next().is_none() => Default::default(),
             _ => {
@@ -311,12 +317,24 @@ impl GameplaySession {
             }
         };
         let cargo_door = match (save.schema_version, save.state.cargo_door) {
-            (9, Some(door)) => door,
+            (9..=10, Some(door)) => door,
             (1..=8, None) => Default::default(),
             (1..=8, Some(door)) if door.open_fraction == 1.0 && door.opening => Default::default(),
             _ => {
                 return Err(invalid(
                     "cargo door source missing or incompatible with schema",
+                ));
+            }
+        };
+        let habitation = match (save.schema_version, save.state.habitation) {
+            (10, Some(h)) => h,
+            (1..=9, None) => Default::default(),
+            (1..=9, Some(h)) if h.bunk_open_fraction == 0.0 && !h.bunk_deploying => {
+                Default::default()
+            }
+            _ => {
+                return Err(invalid(
+                    "habitation source missing or incompatible with schema",
                 ));
             }
         };
@@ -331,6 +349,7 @@ impl GameplaySession {
             building: super::construction::Building::from_source(construction)?,
             seed: physical.seed,
             cargo_door,
+            habitation,
             archive,
             recovery,
             tutorial,
@@ -639,7 +658,7 @@ impl GameplaySession {
         serde_json::to_vec(&(self.mining.session.fragments().len(), self.mining.session.fragments().last().map(|f| f.id()), self.mining.session.attached_sphere_id(), self.mining.session.carried_id(),
             ship.flight_state, ship.door_state, ship.power_available,
             machine.stored, jobs, machine.tray, &self.consumables, &self.equipment,
-            self.survival.snapshot().terminal, self.survival.active_effects().map(|(id,stacks,_)|(id,stacks)).collect::<Vec<_>>(),(self.run.serial, ship.engines_enabled), (&self.tutorial, &self.archive, self.recovery.checkpoint_events(), (self.cargo_door.opening,self.cargo_door.open_fraction == 0.0,self.cargo_door.open_fraction == 1.0))))
+            self.survival.snapshot().terminal, self.survival.active_effects().map(|(id,stacks,_)|(id,stacks)).collect::<Vec<_>>(),(self.run.serial, ship.engines_enabled), (&self.tutorial, &self.archive, self.recovery.checkpoint_events(), (self.cargo_door.opening,self.cargo_door.open_fraction == 0.0,self.cargo_door.open_fraction == 1.0), (self.habitation.bunk_deploying,self.habitation.bunk_open_fraction==0.0,self.habitation.bunk_open_fraction==1.0))))
             .expect("discrete checkpoint events contain only serializable finite identities and integer quantities")
     }
 }

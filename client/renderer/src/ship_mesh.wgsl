@@ -39,29 +39,41 @@ fn vs_main(
     @location(6) display: vec3<f32>,
     @location(7) machinery_role: f32,
 ) -> VertexOutput {
-    let angle = ship.door_pose.x * min(door_flag, 1.0);
+    let ramp_flag = select(0.0, door_flag, door_flag < 2.5);
+    let angle = ship.door_pose.x * min(ramp_flag, 1.0);
     let cosine = cos(angle);
     let sine = sin(angle);
     let hinge = ship.door_pose.yz;
-    let tip = select(0.0, 1.0, door_flag > 1.5);
+    let tip = select(0.0, 1.0, ramp_flag > 1.5);
     // Decorative pedal travel only; authority/colliders and structural supports
     // remain unchanged. Power-gated ramped yaw moves the two pedals in opposition.
     let pedal = select(0.0, -0.015 * ship.detail.w * sign(local_position.z), machinery_role == 5.0);
     let offset = local_position.xy + vec2<f32>(pedal, 0.0) + ship.padding.yx * tip - hinge;
-    let local = vec3<f32>(
+    var local = vec3<f32>(
         hinge.x + cosine * offset.x - sine * offset.y,
         hinge.y + sine * offset.x + cosine * offset.y,
         local_position.z,
     );
+    if door_flag == 3.0 {
+        let c = cos(ship.door_pose.w);
+        let s = sin(ship.door_pose.w);
+        let hinge_yz = vec2<f32>(ship.forward.w,ship.up.w);
+        let p = local.yz - hinge_yz;
+        local = vec3<f32>(local.x, hinge_yz.x+c*p.x-s*p.y, hinge_yz.y+s*p.x+c*p.y);
+    }
     let relative = ship.center.xyz
         + ship.forward.xyz * local.x
         + ship.up.xyz * local.y
         + ship.port.xyz * local.z;
-    let hinged_normal = vec3<f32>(
+    var hinged_normal = vec3<f32>(
         cosine * local_normal.x - sine * local_normal.y,
         sine * local_normal.x + cosine * local_normal.y,
         local_normal.z,
     );
+    if door_flag == 3.0 {
+        let c = cos(ship.door_pose.w); let s = sin(ship.door_pose.w);
+        hinged_normal = vec3<f32>(local_normal.x,c*local_normal.y-s*local_normal.z,s*local_normal.y+c*local_normal.z);
+    }
     let normal = normalize(
         ship.forward.xyz * hinged_normal.x
         + ship.up.xyz * hinged_normal.y

@@ -23,6 +23,8 @@ pub struct ShipMeshInstance {
     /// Unit quaternion `[x, y, z, w]` rotating ship-local coordinates to world.
     pub orientation: [f32; 4],
     pub door_open_fraction: f32,
+    /// Base habitation wall-hinged berth, stowed=0/deployed=1.
+    pub bunk_open_fraction: f32,
     /// Show the authored stationary package only while the Fabricator tray is occupied.
     pub fabricator_output_present: bool,
     pub fabricator_output_medical: bool,
@@ -63,6 +65,7 @@ fn geometry_from_bytes(bytes: &[u8]) -> Result<ShipGeometry, RendererError> {
         let door_flag = match node.name() {
             Some("Exit_Door") => 1.0,
             Some("Exit_Ramp_Tip") => 2.0,
+            Some("Starter_BunkFrame" | "Starter_BunkCushion") => 3.0,
             _ => 0.0,
         };
         let interior_flag = f32::from(interior_nodes[node.index()]);
@@ -517,6 +520,8 @@ impl ShipMeshRenderer {
         };
         if !ship.position_meters.iter().all(|value| value.is_finite())
             || !ship.orientation.iter().all(|value| value.is_finite())
+            || !ship.bunk_open_fraction.is_finite()
+            || !(0.0..=1.0).contains(&ship.bunk_open_fraction)
             || !ship.door_open_fraction.is_finite()
             || !(0.0..=1.0).contains(&ship.door_open_fraction)
         {
@@ -572,11 +577,11 @@ impl ShipMeshRenderer {
             axes[0][0],
             axes[0][1],
             axes[0][2],
-            0.0,
+            crate::habitation_geometry::BUNK_HINGE_METERS[1] as f32,
             axes[1][0],
             axes[1][1],
             axes[1][2],
-            0.0,
+            crate::habitation_geometry::BUNK_HINGE_METERS[2] as f32,
             axes[2][0],
             axes[2][1],
             axes[2][2],
@@ -584,7 +589,7 @@ impl ShipMeshRenderer {
             OPEN_DOOR_ANGLE_RADIANS * eased_fraction,
             DOOR_HINGE_X_METERS,
             DOOR_HINGE_Y_METERS,
-            0.0,
+            ship.bunk_open_fraction * std::f32::consts::FRAC_PI_2,
             RAMP_EXTENSION_METERS as f32 * extension_fraction,
             RAMP_FACE_OFFSET_METERS as f32 * extension_fraction,
             f32::from(ship.fabricator_output_present),

@@ -7,6 +7,8 @@ mod capture;
 mod cockpit_instruments;
 mod consumable_wheel;
 mod equipment_toolbar;
+#[allow(dead_code)]
+mod habitation_geometry;
 pub use consumable_wheel::{ConsumableWheel, ConsumableWheelRaster, consumable_wheel_hit_test};
 mod archive_terminal;
 mod gpu_timing;

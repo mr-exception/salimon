@@ -507,3 +507,54 @@ fn native_reference_checkpoints_376() {
     )
     .unwrap();
 }
+
+/// The normal launch discards E2E policy; only validated physical source is saved.
+#[test]
+#[ignore = "writes isolated cargo review fixture; requires SALIMON_NATIVE_CARGO_DIR"]
+fn native_cargo_checkpoint_477() {
+    let root = PathBuf::from(
+        std::env::var_os("SALIMON_NATIVE_CARGO_DIR").expect("new isolated directory required"),
+    );
+    std::fs::create_dir(&root).expect("never overwrite an existing save directory");
+    let mut s = GameplaySession::new_run();
+    e2e::initialize(
+        &mut s,
+        e2e::Config {
+            scenario: e2e::Scenario::FragmentPile,
+            seed: 0,
+            step: Duration::from_millis(16),
+            fragment_load: None,
+        },
+    )
+    .unwrap();
+    s.advance_game(Duration::from_secs(3));
+    let id = s.mining.session.fragments()[0].id();
+    assert_eq!(
+        protocol(&mut s, json!({"op":"aim_fragment", "fragment_id":id.0}))["ok"],
+        true
+    );
+    let utc = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+    let bytes = s.save_bytes(utc).unwrap();
+    let mut probe = GameplaySession::default();
+    probe.restore_bytes(&bytes).unwrap();
+    assert!(probe.e2e_step().is_none());
+    assert_eq!(probe.save_bytes(utc).unwrap(), bytes);
+    probe.automation_step = Some(Duration::from_millis(16));
+    assert_eq!(
+        protocol(
+            &mut probe,
+            json!({"op":"key","key":"grab_drop","pressed":true})
+        )["ok"],
+        true
+    );
+    assert_eq!(probe.mining.session.carried_id(), Some(id));
+    let mut manager = SaveManager::new(NativeStore::open(root.join("cargo")).unwrap());
+    manager.checkpoint(&bytes, validate).unwrap();
+    manager.checkpoint(&bytes, validate).unwrap();
+    std::fs::write(root.join("fixture.json"), serde_json::to_vec_pretty(&json!({
+        "fixture":true,"target_id":id.0,"scope":"normal-launch pickup/drop presentation; not physical mining/travel or performance acceptance"
+    })).unwrap()).unwrap();
+}

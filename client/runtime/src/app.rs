@@ -1235,6 +1235,7 @@ impl ClientApplication {
                 );
                 if timing.frame_number == 1
                     || timing.frame_number.is_multiple_of(TIMING_LOG_INTERVAL)
+                    || log::log_enabled!(target: "salimon_client::frame", log::Level::Trace)
                 {
                     log::debug!(
                         target: "salimon_client::frame",

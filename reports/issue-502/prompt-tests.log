@@ -1,0 +1,18 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-225cf3bc83389f81)
+
+running 11 tests
+test action_bar::tests::action_bar_is_hidden_outside_normal_gameplay_view ... ok
+test action_bar::tests::blocked_action_temporarily_overrides_then_restores_context ... ok
+test action_bar::tests::capped_dpi_reuses_raster_and_returning_to_one_x_rebuilds_it ... ok
+test action_bar::tests::contextual_prompts_appear_change_and_disappear ... ok
+test action_bar::tests::compact_prompt_typography_is_shared_and_tracks_bounded_dpi ... ok
+test action_bar::tests::dynamic_multiline_context_updates_mass_and_renders_both_rows ... ok
+test action_bar::tests::invalid_and_out_of_range_dpi_keep_prompts_readable_and_bounded ... ok
+test action_bar::tests::recipe_selection_marker_renders_and_controls_share_the_scout_face ... ok
+test action_bar::tests::scout_prompt_raster_evidence ... ignored, writes CPU prompt evidence; set SALIMON_SCOUT_UI_DIR
+test app::interaction::tests::action_bar_context_tracks_ship_prompt_state_transitions ... ok
+test action_bar::tests::raster_is_smaller_than_issue_238_without_clipping_or_filtering ... ok
+
+test result: ok. 10 passed; 0 failed; 1 ignored; 0 measured; 341 filtered out; finished in 0.05s
+

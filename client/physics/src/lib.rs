@@ -273,6 +273,9 @@ pub struct StepStats {
     pub activation_time: Duration,
     pub integration_time: Duration,
     pub contact_time: Duration,
+    /// Time inside contact broad-phase queries; included in contact_time.
+    pub grid_query_time: Duration,
+    pub grid_queries: u64,
 }
 
 // Six O(n) per-body arrays are retained between substeps and stateful ticks.
@@ -679,9 +682,14 @@ fn solve_contacts<const PROFILE: bool>(
             if empty_rows[i] == bounds_revision {
                 continue;
             }
+            let query_start = PROFILE.then(Instant::now);
             pair_geometry
                 .grid
                 .query(i, 0.0, &mut pair_geometry.candidates);
+            if let Some(start) = query_start {
+                stats.grid_query_time += start.elapsed();
+                stats.grid_queries += 1;
+            }
             if pair_geometry.candidates.last().is_none_or(|&j| j <= i) {
                 empty_rows[i] = bounds_revision;
             }
@@ -727,9 +735,14 @@ fn solve_contacts<const PROFILE: bool>(
                     }
                     // Match brute-force semantics: newly reachable later IDs are
                     // visited this pass; earlier IDs wait until the next pass.
+                    let query_start = PROFILE.then(Instant::now);
                     pair_geometry
                         .grid
                         .query(i, 0.0, &mut pair_geometry.candidates);
+                    if let Some(start) = query_start {
+                        stats.grid_query_time += start.elapsed();
+                        stats.grid_queries += 1;
+                    }
                 }
             }
         }

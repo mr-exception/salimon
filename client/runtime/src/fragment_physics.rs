@@ -209,7 +209,9 @@ impl Measurements {
             matrix_allocations,
             activation_time,
             integration_time,
-            contact_time
+            contact_time,
+            grid_query_time,
+            grid_queries
         );
         self.adapter_time += next.adapter_time;
         self.total_time += next.total_time;

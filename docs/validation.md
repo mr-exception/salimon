@@ -454,3 +454,16 @@ schema-8 atomic restore. Run the production native
 `scenarios/evidence/blueprint-placement.json` route for visible previews/projects,
 rotation, inspect/cancel and one module spanning four cells. These placeholders
 have no intake/progress/completed geometry; those later gates remain #543–#551.
+
+### Exact historical current-sphere stress (#559)
+
+`reports/issue-559/collect.py --binary /absolute/release-test-binary --output
+artifacts/559/lane` runs the ignored `current_sphere_stress_cpu` test serially.
+It retains every flushed sample and 120s moving / 45s natural-preparation
+subprocess timeout. The fixture uses production extraction/adapter snapshots, archived mass/radius
+bits and the stateful solver at 16 ms; natural preparation is at most 300 steps, without installed sleep flags.
+For the historical #455 comparison use its unchanged pre-starter-layout geometry
+and the identical test harness/instrumentation on both builds. See the report
+for exact checkout/build commands. Current layout results are separate controls,
+not silently the historical v1 population. Query/contact/activation timings
+include instrumentation; software/CPU results do not establish hardware FPS.

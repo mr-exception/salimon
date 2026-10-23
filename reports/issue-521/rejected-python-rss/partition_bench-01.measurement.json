@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/workspace/salimon/target/release/examples/partition_bench"
+  ],
+  "repeat": 1,
+  "exit_code": 0,
+  "wall_ms": 64.67600899986792,
+  "max_rss_kib": 14808,
+  "user_seconds": 0.054097,
+  "system_seconds": 0.010336999999999999,
+  "voluntary_switches": 1,
+  "involuntary_switches": 7
+}

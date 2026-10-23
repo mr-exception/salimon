@@ -1,0 +1,46 @@
+{
+  "arch": "x86_64",
+  "os": "linux",
+  "rows": [
+    {
+      "bytes_per_record_including_index": 411.75,
+      "cells": 1,
+      "encode_ms": 0.198818,
+      "index_open_ms": 0.009795,
+      "pack_bytes": 1647,
+      "raw_bytes": 2174,
+      "read_all_reverse_ms": 0.036034000000000004,
+      "records": 4,
+      "records_fitting_10gb_at_sample_density": 24286581.663630843,
+      "records_fitting_5gb_at_sample_density": 12143290.831815422,
+      "synthetically_replicated": false
+    },
+    {
+      "bytes_per_record_including_index": 258.984375,
+      "cells": 32,
+      "encode_ms": 1.915483,
+      "index_open_ms": 0.053049,
+      "pack_bytes": 33150,
+      "raw_bytes": 71792,
+      "read_all_reverse_ms": 0.755073,
+      "records": 128,
+      "records_fitting_10gb_at_sample_density": 38612368.02413273,
+      "records_fitting_5gb_at_sample_density": 19306184.012066364,
+      "synthetically_replicated": true
+    },
+    {
+      "bytes_per_record_including_index": 255.98779296875,
+      "cells": 512,
+      "encode_ms": 35.0642,
+      "index_open_ms": 0.9734200000000001,
+      "pack_bytes": 524263,
+      "raw_bytes": 1153168,
+      "read_all_reverse_ms": 12.273197,
+      "records": 2048,
+      "records_fitting_10gb_at_sample_density": 39064362.733971305,
+      "records_fitting_5gb_at_sample_density": 19532181.366985653,
+      "synthetically_replicated": true
+    }
+  ],
+  "workload": "U04 frozen Earth/Proxima identity and physical fields; duplicated cells are sensitivity only, not a Gaia population or pack-size forecast"
+}

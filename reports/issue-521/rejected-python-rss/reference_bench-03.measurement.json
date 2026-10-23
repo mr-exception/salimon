@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/workspace/salimon/target/release/examples/reference_bench"
+  ],
+  "repeat": 3,
+  "exit_code": 0,
+  "wall_ms": 50.85960799988243,
+  "max_rss_kib": 14808,
+  "user_seconds": 0.04674,
+  "system_seconds": 0.0039239999999999995,
+  "voluntary_switches": 1,
+  "involuntary_switches": 7
+}

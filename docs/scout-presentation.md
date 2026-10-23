@@ -6,6 +6,8 @@ checks; #561 human presentation/listening, #557 physical platform checks and
 #563 hardware budgets. Retain dated native evidence/failures; desktop availability
 is not a prerequisite for independent cloud integration work.
 
+The owner-approved *future* habitation/art requirements (2026-10-23) are maintained in [Scout interior art direction](scout-interior-art-direction.md). They add modular room/fixture lighting preferences, real observation-window shutters and selective glazing, independently animated furnishings, physical rail mounts, material-aware aging, clean repair appearance, continuous restrained ambience and simple doorway/screen sound attenuation. None is established as implemented merely by this note; continue to distinguish delivered #463/#465/#464 foundations from new development #575-#583 (specific issue links in the interior contract).
+
 ## Lighting and material boundary (#463)
 
 Warm cockpit/workshop fill at ship-local X=4/-3 metres contrasts with a cooler

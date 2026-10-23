@@ -2,6 +2,8 @@
 mod synth;
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod verification;
 use crate::{
     condition_feedback::Settings,
     session::{GameplaySession, ViewMode},
@@ -253,6 +255,17 @@ impl Presenter {
         self.failed = false;
     }
     pub(crate) fn update(&mut self, o: Observation, settings: Settings, path: Option<&Path>) {
+        self.update_with_player(o, settings, path, crate::native_audio::spawn);
+    }
+    // Keep process creation at the boundary so lifecycle/failure contracts can
+    // exercise real child processes without changing PATH or requiring a device.
+    fn update_with_player(
+        &mut self,
+        o: Observation,
+        settings: Settings,
+        path: Option<&Path>,
+        spawn: impl FnOnce(&Path) -> std::io::Result<Child>,
+    ) {
         if !self.mixer.observe(o, settings) || path.is_none() {
             self.stop();
             return;
@@ -285,7 +298,7 @@ impl Presenter {
                 std::fs::create_dir_all(parent)?;
             }
             std::fs::write(&file, synth::wav(&voices, self.sequence))?;
-            crate::native_audio::spawn(&file)
+            spawn(&file)
         })();
         self.sequence = self.sequence.wrapping_add(1);
         match result {

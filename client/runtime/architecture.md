@@ -1235,8 +1235,13 @@ PCM. `native_audio.rs` is the existing survival/scene shared OS process seam.
 `condition_feedback/settings.rs` remains the sole preference store. Audio does
 not enter session commands, domain progression or run checkpoints. See the
 [canonical mix/budgets/validation contract](../../docs/scout-presentation.md#soundscape-boundary-465).
-Native loop/listening and OS/device costs remain #485, distinct from portable
-mapping/settings/synthesis checks.
+The #485 production-observation suite and opt-in WAV/overhead export live in
+`src/scout_audio/verification.rs`. The presenter delegates only process creation
+to a supplied function so real-child timeout, exit, suppression and file cleanup
+contracts run without changing global PATH or requiring an audio device. Normal
+play still uses the shared native OS player. Listening/continuity remains #561;
+physical playback/backend checks #557 and hardware budgets #563. See the
+[#485 report](../../reports/issue-485/README.md) for evidence and exact limits.
 
 ## Scout machinery composition (#464)
 

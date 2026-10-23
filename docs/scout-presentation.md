@@ -95,10 +95,13 @@ of elapsed play time. There is no persistent gameplay audio history.
 
 This minimal OS boundary reuses afplay, Windows SoundPlayer or optional Linux
 paplay/aplay. It can have audible chunk gaps and up to a chunk of response latency;
-OS process startup/file IO are not realtime streaming. Native listening and
-matched whole-frame costs remain [#485](https://github.com/mr-exception/salimon/issues/485),
-which must decide whether a continuous backend is needed. Synthesis measurements
-are not audio-device or M1 budget approval. See the
+OS process startup/file IO are not realtime streaming. The [#485 cloud report](../reports/issue-485/README.md) retains production-loop
+PCM examples, exterior silence assertions, real-child lifecycle/failure checks
+and matched enabled/muted synthesis plus substitute-process/file diagnostics.
+Human listening, headroom/harshness and audible continuity review belong to #561;
+physical OS/audio-device experiments #557 and hardware costs #563. A continuous
+backend decision must follow actual listening/latency evidence. These diagnostics
+are not audio-device, whole-frame or M1 budget approval. See the
 [audio report](../reports/issue-465/README.md) for actual tests and limits.
 
 ## Machinery feedback boundary (#464)

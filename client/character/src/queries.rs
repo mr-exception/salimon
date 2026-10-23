@@ -118,6 +118,17 @@ fn sight_obstruction(
                     ]
                 }),
         );
+        // Bin envelopes block a walking body, but rays see the real hollow shells.
+        for b in &crate::spatial_contracts::STARTER_COLLIDERS[2..4] {
+            let footprint = [
+                b[0] - PLAYER_RADIUS_METERS,
+                b[1] + PLAYER_RADIUS_METERS,
+                b[4] - PLAYER_RADIUS_METERS,
+                b[5] + PLAYER_RADIUS_METERS,
+            ];
+            boxes.retain(|v| [v[0], v[1], v[4], v[5]] != footprint);
+        }
+        boxes.extend(crate::cargo::cargo_bin_solids());
         boxes.push(crate::spatial_contracts::CARGO_HEADER_BOUNDS);
         // The shared deck and ceiling occlude objects on the other side.
         for (x0, x1, z0, z1) in [

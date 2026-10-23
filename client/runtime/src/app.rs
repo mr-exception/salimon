@@ -976,6 +976,9 @@ impl ClientApplication {
             },
             crate::benchmark::Recorder::window_title,
         ));
+        if self.session.view_mode == ViewMode::Gameplay {
+            scene_instances.extend(scene::cargo_door(&self.session, presentation.ship));
+        }
         let ship_mesh = if self.session.view_mode == ViewMode::Gameplay {
             camera = CameraFrame {
                 position_meters: presentation.character.eye_position_meters,

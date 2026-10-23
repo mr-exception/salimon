@@ -32,6 +32,7 @@ pub(crate) struct MiningTool {
 #[derive(Default)]
 pub(crate) struct ResourceGameplay {
     pub(crate) ship_gravity_disabled: bool,
+    pub(crate) cargo_door_blocking: bool,
     pub(crate) ship_mass: salimon_ship::ShipMass,
     pub(crate) mass_frame: Option<ShipFrame>,
     pub(crate) terrain: salimon_world::terrain::TerrainMode,

@@ -1,0 +1,7 @@
+{
+  "scenario": "landed-earth",
+  "seed": 0,
+  "step_ms": 16,
+  "lane": "ramp",
+  "scope": "production protocol with explicit initial fixtures; fixed-step GPU surfaces; no OS input or display FPS"
+}

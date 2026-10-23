@@ -1,0 +1,22 @@
+{
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "python": "3.12.14",
+  "rust": "1.99.1",
+  "cpu": "AMD EPYC 9V74",
+  "capture_revision": "4b64c15",
+  "capture_tracked_tree_clean": true,
+  "binary_sha256": "56be58e9edf05cd84aa2c413f0f9d950222e6bcb7c49e8350e79b4b640e53bd8",
+  "source_sha256": {
+    "client/runtime/src/e2e.rs": "b5911fa65cf33e51aa4410d77e0f0e9992fe53eb936bbcc93d8be4c7f8a94161",
+    "client/runtime/src/scout_walkthrough.rs": "988c687d7ca39759f2c9ad58d434b36aa47c4cc41c3ded817fe7865d5d280bc9",
+    "client/runtime/src/scout_reference.rs": "c3972649a5b5d021cce45da5983b11014151bdb31b5568ea8487dd638e4a2b04",
+    "client/runtime/src/scout_feedback.rs": "57833aa0332ef536897d53284f12083c32ced6a3d8816ced640f970950754e51",
+    "client/renderer/src/ship_mesh.wgsl": "db133422aa7e838479e445f2795bd6b3d75e6f56827b8a497c7471826529bbe3",
+    "client/renderer/src/machinery.rs": "63ef38cb44132333a0b1383f5618914e857866002f33c48abe865097f0548c24",
+    "scenarios/visual/scout-machinery-cameras.json": "1821e7bd586425571bb1a4a3d4d7def61b7c6df318d8d75d06589d3f7f6b8e7e",
+    "reports/issue-489/walkthrough.py": "59dbd046c098654e972dc8212eeefcc3d86be8ca07eb799dd375dc38b0fca1b7"
+  },
+  "input": "production E2E/window adapters; native input isolated",
+  "renderer": "Mesa 25.0.7 llvmpipe LLVM 19.1.7, Vulkan, 1280x800, scale 1, Xvfb",
+  "timing": "fixed simulation step; no real-time/display FPS or hardware GPU-counter acceptance"
+}

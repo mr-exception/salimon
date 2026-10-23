@@ -663,3 +663,16 @@ logging IO is measurement overhead, never free production performance. Frozen
 E2E reference scenes measure presentation without normal-play simulation work.
 See the [lighting report](../reports/issue-483/README.md) for exact context and
 limits. The logger never changes scheduling, input or GPU polling.
+
+## Scout machinery fixtures (#489)
+
+The opt-in `scout-fabricator` E2E setup begins landed near the physical machine
+with starter ingredients and the existing exact 2 kg carried fixture fragment.
+`scout-work-blackout` begins with a queued unfunded ration and the Core-restart
+held fragment/aim. Both validate their initial save source. Subsequent production
+intake/menu/step/collection commands have no test bypass. They never alter a
+normal player's save or imply physical mining/travel.
+`reports/issue-489/walkthrough.py` captures real GPU surfaces through the existing
+window adapter. Named `pedals-close` and `fabricator-close` cameras only change
+presentation; the original four Scout lighting/Blender cameras are unchanged.
+See [validation and limits](../reports/issue-489/README.md).

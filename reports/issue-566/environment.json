@@ -1,0 +1,40 @@
+{
+  "source": "de73b940c6ffa1c80a7139cd456df620f720e52f",
+  "control_base": "e55d96a3332e92f48009a1afb974f8750fa63ce2",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "machine": "x86_64",
+  "logical_cpus": 3,
+  "cpu_quota": "200000 100000",
+  "context": {
+    "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+    "backend": "Vulkan",
+    "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+    "scale_factor": 1.0,
+    "viewport_pixels": [
+      1280,
+      800
+    ]
+  },
+  "display": ":101 Xvfb1280x800x24 at origin0,0; no window manager",
+  "profile": "release Rust1.90.0 / locked dependencies",
+  "sample_seconds": 6,
+  "repeats": 3,
+  "warmup_seconds": 0.75,
+  "admission_profile": "cloud-llvmpipe-1280",
+  "native_input_isolated": true,
+  "application_input_differences": [
+    "client/renderer/src/ship_mesh.wgsl"
+  ],
+  "binary_and_fixture_hashes": {
+    "/workspace/tools/salimon-566-control": "531681cd9b0c84927217dad46ef5beaced4cb4e920de44191026156bc12e93b0",
+    "/workspace/tools/salimon-566-current": "5537cb8648672a2e7ce0ddb9eacf261a2d8847570bf8b57fbf54a178e6d984fd",
+    "scenarios/visual/scout-cameras.json": "d87d4a983260763059db8a239a2395f57668d1c35f8bbf46514bffdfd199df94",
+    "reports/issue-483/frame_data.py": "f7c91fbc5028b270171bd4a3d4d22e9eec9b5c31d6223924cb24c7158b8b87b3",
+    "reports/issue-483/frame_reference.py": "0a749cb0a3f8ae8073e9d9653dbbb507536285532467edff32c415239ba9d573",
+    "reports/issue-566/x11_focus.py": "b42b6507f4c4d841446156bf24471ca918ffd860c6c4e8c026aaf88f03824151",
+    "reports/issue-566/analyze.py": "bd15736a6df2073f7e7d582e246cc4c044bee3acf9c261c072d26234da6496e8"
+  },
+  "gpu_hardware_counters": null,
+  "logging_overhead_included": true,
+  "runs_serial_without_concurrent_builds": true
+}

@@ -2,6 +2,8 @@
 
 Status: **approved experience direction; design guidance and planned work, not shipped native art signoff**. Documentation issue #458. Complements the authoritative [low-poly asset bible](visual-style.md), does not replace its geometry, palette, Blender, physical interfaces or validation rules. The detailed **approved future starter Scout**, separate aft cargo bay, compact habitation and simplified modular-building experience are specified in [Scout art direction and modular construction](scout-and-modular-construction.md); they are not yet claimed as implemented.
 
+The future Scout's detailed owner-approved **habitation, personalization, materials, window, animation, wear, clean repair, lighting and acoustics** are captured in [Scout interior art direction](scout-interior-art-direction.md). This is planned art/experience scope, not a current playable-feature claim; preserve existing authoritative physics, construction, gameplay and presentation acceptance boundaries.
+
 ## Player feeling and artistic identity
 
 Salimon should convey solitude, enormous physically plausible distances, curiosity, vulnerability, personal persistence and mystery. The playable world can contain many living alien planets, ships, stations and civilizations, yet enormous separation makes encounters uncommon; **thousands of inhabitants do not make the universe feel crowded**. Do not fill every empty world with decorative props or scripted company. An empty horizon is meaningful when intentional, legible and contrasted with recognizable landmarks, light, terrain and sound; it is a defect when the environment reads as an unlit proof-of-concept.

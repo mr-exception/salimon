@@ -109,10 +109,13 @@ monitor UVs, door metadata, budgets and licenses. Read the
 [scout regeneration guide](../client/assets/ship/README.md#source-and-regeneration)
 for commands and generated files; normal builds never require Blender.
 
-The current scout removes the dedicated cargo module, shortens the nose/glazing
-and uses one wide multifunction monitor on the center console with walking routes on both sides.
-Loose fragments use the cabin deck. Historical cargo and migration evidence in
-[reports/](../reports/README.md) describes earlier revisions. The mining tool now renders a Blender-authored GLB with a camera-local grip
+The current Scout retains its compact outer hull and precise ramp/cockpit/station
+anchors. The #538 cabin envelope adds a separate aft cargo compartment, a
+full-height bulkhead with a 3 m internal opening, open storage shells and
+wall-integrated stowed bunk, galley and hygiene fixtures. Character movement,
+sight and floor placement consume the same generated bounds. Operable internal
+door/bin mechanics remain #539; habitation interactions remain #540. Historical
+cargo-removal reports describe earlier revisions. The mining tool now renders a Blender-authored GLB with a camera-local grip
 and status material. Iron, silicate and water-ice fragments each use two Blender-authored variants selected by stable identity. All three deposit materials use four authored variants; see [renderer architecture](../client/renderer/architecture.md) for selection and bounds contracts.
 
 ## Physical-object simulation decision (#114)

@@ -109,7 +109,15 @@ pub(crate) const FABRICATOR_OBSTACLE: [f64; 4] = [
     FABRICATOR_BOUNDS[4] - PLAYER_RADIUS_METERS,
     FABRICATOR_BOUNDS[5] + PLAYER_RADIUS_METERS,
 ];
-pub(crate) const INTERIOR_OBSTACLES: [[f64; 4]; 8] = [
+const fn player_footprint(bounds: [f64; 6]) -> [f64; 4] {
+    [
+        bounds[0] - PLAYER_RADIUS_METERS,
+        bounds[1] + PLAYER_RADIUS_METERS,
+        bounds[4] - PLAYER_RADIUS_METERS,
+        bounds[5] + PLAYER_RADIUS_METERS,
+    ]
+}
+pub(crate) const INTERIOR_OBSTACLES: [[f64; 4]; 15] = [
     FABRICATOR_OBSTACLE,
     [
         CORE_FORWARD_MIN,
@@ -123,6 +131,13 @@ pub(crate) const INTERIOR_OBSTACLES: [[f64; 4]; 8] = [
     COCKPIT_STARBOARD_HULL_OBSTACLE,
     COCKPIT_PORT_NOSE_SHOULDER,
     COCKPIT_STARBOARD_NOSE_SHOULDER,
+    player_footprint(STARTER_COLLIDERS[0]),
+    player_footprint(STARTER_COLLIDERS[1]),
+    player_footprint(STARTER_COLLIDERS[2]),
+    player_footprint(STARTER_COLLIDERS[3]),
+    player_footprint(STARTER_COLLIDERS[4]),
+    player_footprint(STARTER_COLLIDERS[5]),
+    player_footprint(STARTER_COLLIDERS[6]),
 ];
 pub(crate) const COCKPIT_POSITION: [f64; 3] = [
     COCKPIT_SEAT_MARKER_METERS[0],
@@ -138,3 +153,17 @@ pub(crate) const PLAYER_START: [f64; 3] = [
     PLAYER_START_MARKER_METERS[2],
 ];
 pub(crate) const LOOK_SENSITIVITY_RADIANS_PER_PIXEL: f64 = 0.0022;
+
+/// Lowest authored lintel under the player's complete planar footprint.
+pub(crate) fn interior_ceiling(local: [f64; 3]) -> f64 {
+    if local[0] >= CARGO_HEADER_BOUNDS[0] - PLAYER_RADIUS_METERS
+        && local[0] <= CARGO_HEADER_BOUNDS[1] + PLAYER_RADIUS_METERS
+        && local[2].abs() < CARGO_HEADER_BOUNDS[5] + PLAYER_RADIUS_METERS
+    {
+        CARGO_HEADER_BOUNDS[2]
+    } else if local[0] < -6.88 && local[2].abs() < 1.84 {
+        DOORWAY_CEILING_HEIGHT
+    } else {
+        SHIP_CEILING_HEIGHT
+    }
+}

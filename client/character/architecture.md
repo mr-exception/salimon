@@ -214,3 +214,12 @@ Existing faster zero-G momentum is preserved. The field is excluded from saved
 source state and resets to one on restoration; the host reapplies current derived
 survival restrictions before stepping. Character has no survival dependency;
 thresholds/permissions remain in the survival domain and runtime composition.
+
+## Starter envelope (#538)
+
+The exporter owns seven new starter fixture bounds and a separate cargo header.
+`layout.rs` expands the fixtures by the existing body radius. The central doorway
+remains traversable; bulkhead sides and habitation/storage envelopes block walking
+and cargo placement. `interior_ceiling` applies the header to powered jumping and
+zero-G movement, while sight uses its actual 3D bounds. The cargo door is an open
+interface until #539 implements its independent state and clearance interlock.

@@ -403,7 +403,7 @@ def validate_scout(context, data):
     require(any(normal[1] > .99 for normal in lower_normals), "floor panes face upward")
     require(any(normal[1] < -.9 for normal in lower_normals), "nose pane faces downward")
 
-    require(manifest["budgets"]["maximumTriangles"] == 6500, 'manifest["budgets"]["maximumTriangles"] == 6500')
+    require(manifest["budgets"]["maximumTriangles"] == 6900, 'manifest["budgets"]["maximumTriangles"] == 6900')
     require(context["metrics"]["maxTriangles"] == metrics["triangleCount"], 'context["metrics"]["maxTriangles"] == metrics["triangleCount"]')
     require(context["metrics"]["maxPrimitives"] == metrics["drawPrimitiveCount"], 'context["metrics"]["maxPrimitives"] == metrics["drawPrimitiveCount"]')
     require(context["metrics"]["maxMaterials"] == metrics["materialCount"], 'context["metrics"]["maxMaterials"] == metrics["materialCount"]')

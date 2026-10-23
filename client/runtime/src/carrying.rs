@@ -446,7 +446,7 @@ mod tests {
     fn cabin_placement_rejects_walls_core_edges_and_oversized_objects() {
         use salimon_character::ship_floor_placement;
         assert!(ship_floor_placement([-5.8, 2.0, 0.0], 0.1).is_some());
-        assert!(ship_floor_placement([1.0, 2.0, 3.0], 0.1).is_some());
+        assert!(ship_floor_placement([-1.0, 2.0, 2.4], 0.1).is_some());
         for point in [
             [-1.0, 2.0, 0.0],
             [5.0, 2.0, -1.0],

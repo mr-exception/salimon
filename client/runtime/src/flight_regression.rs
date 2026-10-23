@@ -238,6 +238,14 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn starter_layout_replays_bulkhead_ramp_and_archive_route() {
+        replay(
+            Scenario::LandedEarth,
+            include_str!("../../../scenarios/evidence/starter-layout.json"),
+        );
+    }
     #[test]
     fn inertial_route() {
         replay(

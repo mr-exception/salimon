@@ -40,11 +40,7 @@ impl CharacterController {
         local[2] = local[2].clamp(-INTERIOR_SIDE_LIMIT, INTERIOR_SIDE_LIMIT);
         local[0] = local[0].min(INTERIOR_FORWARD_MAX);
         local = slide_around_fixtures(previous, local);
-        let ceiling = if local[0] < -6.88 && local[2].abs() < 1.84 {
-            DOORWAY_CEILING_HEIGHT
-        } else {
-            SHIP_CEILING_HEIGHT
-        };
+        let ceiling = interior_ceiling(local);
         let maximum_eye = ceiling - (PLAYER_BODY_HEIGHT_METERS - PLAYER_EYE_HEIGHT_METERS);
         if local[1] > maximum_eye {
             local[1] = maximum_eye;
@@ -124,11 +120,7 @@ impl CharacterController {
         local[0] = local[0].min(INTERIOR_FORWARD_MAX);
         local = slide_around_fixtures(previous, local);
         let within_doorway = local[2].abs() <= DOORWAY_SIDE_LIMIT;
-        let ceiling = if local[0] < -6.88 && local[2].abs() < 1.84 {
-            DOORWAY_CEILING_HEIGHT
-        } else {
-            SHIP_CEILING_HEIGHT
-        };
+        let ceiling = interior_ceiling(local);
         local[1] = local[1].clamp(
             PLAYER_EYE_HEIGHT_METERS + SHIP_FLOOR_HEIGHT,
             ceiling - (PLAYER_BODY_HEIGHT_METERS - PLAYER_EYE_HEIGHT_METERS),
@@ -308,7 +300,7 @@ mod tests {
     #[test]
     fn both_side_aisles_reach_the_nose_shoulder() {
         for side in [-2.4, 2.4] {
-            let mut controller = inside_at(-6.0, side);
+            let mut controller = inside_at(-3.8, side);
             walk_steps(
                 &mut controller,
                 MovementInput {
@@ -507,7 +499,7 @@ mod tests {
     fn interior_walls_and_short_nose_keep_the_complete_player_inside() {
         for (start, input, axis, expected) in [
             (
-                [-6.5, 0.0],
+                [2.2, 0.0],
                 MovementInput {
                     right: true,
                     ..MovementInput::default()
@@ -516,7 +508,7 @@ mod tests {
                 INTERIOR_SIDE_LIMIT,
             ),
             (
-                [1.0, 0.0],
+                [2.2, 0.0],
                 MovementInput {
                     left: true,
                     ..MovementInput::default()
@@ -625,8 +617,8 @@ mod tests {
     }
 
     #[test]
-    fn removed_port_cargo_area_cannot_support_or_admit_a_walker() {
-        for x in [-1.8, -1.0, 0.0, 1.3] {
+    fn retired_port_protrusion_stays_outside_the_compact_hull() {
+        for x in [-1.4, -1.0, -0.8] {
             let mut cabin = inside_at(x, 3.0);
             walk_steps(
                 &mut cabin,
@@ -674,7 +666,7 @@ mod tests {
                 },
             ),
         ] {
-            let mut controller = inside_at(-6.5, 0.0);
+            let mut controller = inside_at(2.2, 0.0);
             walk_steps(&mut controller, input, 20);
             let local = controller.local_ship_position().unwrap();
             assert!((local[2] - side * 3.96).abs() < 1.0e-12);

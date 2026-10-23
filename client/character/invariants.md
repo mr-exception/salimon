@@ -135,3 +135,12 @@ is composed in #365; disk checkpoints remain #366.
 - Voluntary speed scaling (#369) applies consistently in cabin, ramp, surface and
   EVA without scaling physical clocks, gravity or inherited motion. Derived scale
   is transient and must be recomputed by the host after save restoration.
+
+## Starter envelope (#538)
+
+The exporter owns seven new starter fixture bounds and a separate cargo header.
+`layout.rs` expands the fixtures by the existing body radius. The central doorway
+remains traversable; bulkhead sides and habitation/storage envelopes block walking
+and cargo placement. `interior_ceiling` applies the header to powered jumping and
+zero-G movement, while sight uses its actual 3D bounds. The cargo door is an open
+interface until #539 implements its independent state and clearance interlock.

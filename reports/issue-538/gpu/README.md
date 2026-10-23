@@ -1,0 +1,1 @@
+Original 1280×800 offscreen wgpu captures, Mesa llvmpipe Vulkan. Fixed scene DTOs exercise the production ship renderer; they are not gameplay or hardware FPS proof. Two frozen captures per case were compared byte-for-byte. See adapter.txt and timings.csv. CPU compilation and the native route overlapped this image-only run; these timings are not matched performance evidence.

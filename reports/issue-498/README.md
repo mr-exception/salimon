@@ -89,3 +89,11 @@ No production behavior/API/schema/ownership changes. The added regression is in
 [save contract](../../docs/save-contract.md). These owning guides remain accurate.
 The validation guide links this cloud report and reproduction route. Documentation
 and whitespace checks pass; original PNGs are retained without baseline promotion.
+
+CI source-impact follow-up: the initial hosted Ubuntu documentation step failed
+because the runtime source regression lacked an owning-guide change, even though
+the ordinary local link check passed. The runtime AI guide now documents the
+exact disk regression and unchanged engine/save contract. The initial failure is
+retained in `ci-docs-first-failure.txt`; scoped source-impact validation passes
+with the guide update. Later PRs already passed their hosted checks with the same
+engine test; this correction also re-runs the first PR's hosted gate.

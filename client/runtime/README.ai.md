@@ -210,6 +210,14 @@ screenshot flight timings aligned with the current engine and assert assist
 admission before advancing toward landing; native periodic runs verify capture
 and pixels. Software-Vulkan corpus renewal is tracked in #518.
 
+Engine cloud verification #498 adds a clear-space disk regression in
+`session/propulsion_tests.rs`: the real two-generation store and normal
+`Checkpoints::open_at` launch preserve engine-off, selected throttle and momentum.
+Refueling cannot enable the switch; a fresh command is required. This tests the
+existing save/engine contract without changing source ownership or gameplay.
+The [report and native driver](../../reports/issue-498/README.md) retain exact
+commands, GPU instruments, realistic-flight routes and human/hardware limits.
+
 
 Scout UI #466: prompt and crafting/status glyphs reuse renderer `ui_style`.
 See the [canonical surface matrix](../../docs/scout-presentation.md#scout-ui-readability-contract-466);

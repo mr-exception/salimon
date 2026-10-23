@@ -84,3 +84,26 @@ The final workspace run also exposed the renderer's duplicated old 544 KiB /
 6,500 triangle limits. Its test now decodes the same canonical asset manifest
 using an already pinned test dependency. Initial missing-dependency/type-check
 failures were corrected before the successful full rerun; no gate is waived.
+
+
+## CI correction — owning guides
+
+[Source-build run39992328933](https://github.com/mr-exception/salimon/actions/runs/39992328933)
+failed the offline documentation gate before Rust compilation: renderer budget/
+GPU-fixture tests and runtime traversal fixtures changed without same-PR owning
+guide updates. The later combined stack contained those updates, which hid this
+missing first-PR check in local validation. The first PR now documents the
+manifest-backed budget regression, starter capture views, production traversal
+routes and generated-boundary ownership in the renderer/runtime maintenance
+guides. No validator exception, baseline, workflow or game behavior is changed.
+
+Verification uses the same first-PR comparison as CI:
+`python scripts/check_docs.py --base 2ecb271ff4af43ad102367cdea91c8cb08e375ec`,
+plus `python -m unittest discover -s scripts -p test_check_docs.py -v`.
+Per-parent documentation validation is also run on each dependent PR after
+propagating this correction; combined-stack validation is insufficient.
+
+The corrected first-PR gate passes with **zero failures**, and all **five**
+validator contract tests pass. Exact failure excerpts and successful local
+outputs are retained in [validation](validation/). Rust/native/model evidence
+above remains unchanged; this correction changes documentation only.

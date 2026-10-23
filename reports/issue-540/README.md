@@ -1,6 +1,7 @@
 # Base Scout habitation (#540)
 
-Second PR in the requested stack, based on `stack/539-cargo` / PR #596.
+Second PR in the requested stack. PR #596 merged while this work was running;
+this branch is rebased onto updated main e863ded and targets main.
 
 The bunk is now a real manually folding 0.85 m berth. Two existing cabin-owned
 Blender panels rotate rigidly around the wall hinge; normals rotate with them.
@@ -62,3 +63,5 @@ scratch (installed Blender 5.2.2 is not used for the source edit).
 This is native macOS production-renderer evidence, not hosted Linux/software
 Vulkan CI, human appearance/comfort acceptance (#561), physical input/platform
 qualification (#557), or hardware frame-budget signoff (#563). No PR is merged.
+
+Per-parent documentation impact validation passes with zero findings.

@@ -69,3 +69,9 @@ B explicitly toggles engines while powered/seated outside an active assist. Engi
 off coasts with idle loads, preserves throttle and survives save/reload/blackout.
 Default dry acceleration is 1000/500 m/s² forward/reverse at 100/50 MW; landing
 still requires <=20 m/s. See [math and assist reconciliation](architecture.md#funded-core-impulse-and-engine-switch-493).
+
+
+The independent [portable structural foundation](architecture.md#portable-structural-foundation-541)
+implements the 3 m Core-rooted grid, room/equipment footprints, safe removal,
+damage partition data and domain save validation (#541). It does not yet enable
+player building or migrate the current authored Scout.

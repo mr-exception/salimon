@@ -403,3 +403,55 @@ Last-tick auxiliary watts are transient observation, included in total draw
 without another debit and cleared on subsequent advance/restore. Runtime owns
 record progress/config and the `RecoveryModule` physical mass ledger entry. See
 [canonical funding/priority contract](../../docs/data-recovery-module.md#core-funding-and-reserve).
+
+## Portable structural foundation (#541)
+
+`structure/` owns `ShipStructure`, independent of the live flight controller,
+renderer, character traversal and future power/pressure graphs. `grid.rs` defines
+3 m ship-local cells (+X forward, +Y up, +Z port), checked six-face neighbors and
+explicit position queries. The caller supplies a precise `f64` origin; existing
+Scout anchors, generated layouts, collision radius and dry hull are unchanged.
+No implicit grid migration or 0.5 m furnishing rule is introduced.
+
+`structure/mod.rs` admits connected multi-cell `StructuralPart`s into sparse,
+ordered indexes. Each part has a stable nonzero ID, frame/full/tapered/corner
+shell hint, one space envelope and conservative collision envelopes. These are
+portable authored bounds, not generated mesh colliders or final placement
+admission. Face metadata models walls, floors, ceilings, openings and doorways;
+a shared face has one owner. Removing a face preserves its underlying frame and
+has no salvage/mass transaction. `Room`s group connected existing cells without
+another mass contribution. Multi-cell equipment overlays supporting structure;
+equipment footprints reserve cells against other equipment, while room/frame
+membership remains distinct. Fine placement/overlap and physical door behavior
+belong to later placement/runtime owners.
+
+Normal removal refuses the permanent Core, a cut disconnecting any remaining
+cell, or a part referenced by room/equipment metadata. Damage can remove a
+non-Core part and partition the rest. The returned `DamageOutcome` transfers
+separate disconnected components with their original IDs, unsupported equipment
+and invalidated room metadata. It never creates another Core or silently deletes
+loose equipment. Physics, salvage, hull damage parameters and recovery gameplay
+remain #549. IDs removed/detached from the parent are retired, preventing reuse.
+
+`StructuralMass::IncludedInDryHull` explicitly marks baseline authored structure
+already covered by the starter's 100 t dry hull; `AddedKilograms` holds validated
+positive finite installation mass. `mass_entries` emits only additional part and
+equipment contributions in the disjoint `MassObjectId::Structure` namespace.
+Rooms/faces do not add duplicate entries. Future runtime installation must
+atomically transfer source material ownership before applying these entries;
+removal/detachment must remove them. Changing baseline dry-hull damage accounting
+is future integration, not an automatic change in this foundation.
+
+`structure/persistence.rs` owns independent domain schema 1. Ordered vector
+payloads retain stable IDs, precise origin, parts/faces/envelopes, room/equipment
+membership and retired IDs. `from_save` validates a temporary graph, handles IDs
+in arbitrary topological order and rebuilds indexes before publication. Unknown
+schemas, duplicates, unsupported topology and malformed geometry/mass reject.
+`StructureSaveState` implements the existing portable `Validate` boundary.
+The current whole-game schema and `ShipController` payload are unchanged;
+construction project/session save integration remains #550.
+
+Tests in `structure/tests.rs` map the admission/removal/damage/save and mass
+contracts to deterministic headless evidence. No player construction UI,
+blueprints, timers, Core upgrades, native hull migration or flight-readiness
+policy is enabled by this issue; #542–#550 consume the new boundary.

@@ -14,6 +14,7 @@ pub use energy::{EnergyConfig, EnergyCore, InvalidEnergy};
 mod mass;
 pub use mass::{MassObjectId, ShipMass};
 mod propulsion;
+pub mod structure;
 pub use propulsion::{
     InvalidFlightMotion, Propulsion, STARTER_DRY_MASS_KG, STARTER_IMPULSE_NS_PER_JOULE,
 };

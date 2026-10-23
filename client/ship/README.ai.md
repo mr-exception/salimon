@@ -65,3 +65,13 @@ Last-tick auxiliary watts are transient observation, included in total draw
 without another debit and cleared on subsequent advance/restore. Runtime owns
 record progress/config and the `RecoveryModule` physical mass ledger entry. See
 [canonical funding/priority contract](../../docs/data-recovery-module.md#core-funding-and-reserve).
+
+## Structural foundation (#541)
+
+`src/structure/` owns portable topology, structural metadata and a separate
+versioned save boundary. Read [structure architecture](architecture.md#portable-structural-foundation-541)
+and its invariants before changing admission/removal/damage or mass mapping.
+It is not yet composed into gameplay. Preserve authored coordinates; placement,
+physical construction, flight readiness and full-save integration retain their
+later issue owners. Run `cargo test -p salimon-ship --locked` and workspace gates
+for mass/persistence boundary changes.

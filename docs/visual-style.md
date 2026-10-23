@@ -12,6 +12,8 @@ The [2026-10-22 approved future starter Scout design](scout-and-modular-construc
 
 The approved overarching mood is **grounded cinematic sci-fi**, using the existing low-poly geometry identity but unifying it with believable physical machinery, coherent warm Scout-versus-cold-world lighting, spatial sound and deliberate quiet, meaningful rare encounters, consistent on-board UI/animation/VFX, environmental clues and strong composition. **Asset style alone does not establish experience direction.** The first reference vertical slice is the Scout interior and all on-board interactions. See [experience-direction.md](experience-direction.md) for the authoritative experiential contract. Native renderer verification and performance remain mandatory; do not assume advanced materials supported merely from authored Blender output.
 
+The future starter Scout's owner-approved room finishes, recessed habitation rails, material-specific localized cosmetic aging, clean repair behavior, distinctive physical furnishings, lighting/shutter conditions and sound/interaction presentation are described in [Scout interior art direction](scout-interior-art-direction.md). It does **not** relax per-asset budgets or certify renderer features not yet implemented.
+
 ## Form and shading
 
 Use broad geometric hull planes, clipped corners and strong engine/wing/landing
@@ -33,7 +35,7 @@ style checks are advisory and do not replace spatial validation.
 The following linear RGB defaults extend the existing authoring protocol. Hex
 swatches are **sRGB display equivalents**, rounded after the standard linear to
 sRGB transfer; do not paste those hex values as linear shader constants.
-Palette/composition approval is pending review of #274 reference renders.
+The #274 reference-scene issue is closed, but these palette values remain proposed until actual production-renderer appearance and composition are explicitly reviewed under #561; Blender references alone do not grant native art signoff.
 
 | Role | Linear RGB | Display hex | Use |
 | --- | --- | --- | --- |

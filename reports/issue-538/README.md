@@ -35,13 +35,13 @@ For these commands, `PATH=/workspace/tools/cargo/bin:$PATH`, `RUSTUP_HOME=/works
 | `BLENDER=/workspace/tools/bin/blender453 python -m unittest discover -s models/tests -v` | PASS, **99 tests**, no skips after installing the pinned glTF validator |
 | `cargo build --release --workspace --locked` | PASS |
 | `cargo clippy --workspace --all-targets --locked -- -D warnings` | PASS |
-| `cargo test --release --workspace --locked` | Final rerun pending; earlier route failures retained below |
-| `cargo build --workspace --locked` | Final debug build pending |
-| `cargo fmt --all -- --check` | Final check pending |
+| `cargo test --release --workspace --locked` | PASS, **876 passed / 31 existing opt-in ignored**, after rebasing onto main |
+| `cargo build --workspace --locked` | PASS, including post-rebase build |
+| `cargo fmt --all -- --check` | PASS |
 | `SALIMON_SCOUT_FEEDBACK_DIR=... VK_DRIVER_FILES=/workspace/tools/lvp.json WGPU_BACKEND=vulkan cargo test --release -p salimon-renderer --locked scout_feedback_gpu_evidence -- --ignored --nocapture` | PASS, production ship renderer; frozen pairs equal in every case, including four new starter views |
 | `DISPLAY=:101 WGPU_BACKEND=vulkan VK_DRIVER_FILES=/workspace/tools/lvp.json python scripts/salimon-test run scenarios/evidence/starter-layout.json --binary target/release/salimon-client --artifacts artifacts/issue-538/starter-final --summary` | PASS, **41 steps**, including side-wall rejection, ramp exit/re-entry and Archive targeting |
 | Same runner with `scenarios/evidence/cockpit-nose.json` | PASS, **31 steps**, both cockpit routes |
-| Same runner with `scenarios/fragment-transfer.json --screenshot-command '[]'` | Final cargo retrieval rerun pending; structured state only, no screenshot claim |
+| Same runner with `scenarios/fragment-transfer.json --screenshot-command '[]'` | PASS, **285 steps**, including post-rebase rerun; structured state, no screenshot claim |
 
 ### Original graphical evidence
 
@@ -63,3 +63,24 @@ Earlier workspace runs failed five empty-cabin traversal fixtures and then legac
 ## Documentation impact
 
 Updated the canonical technical architecture, approved construction delivery boundary, asset/source guides and character architecture/invariants. Generated layout and export ownership remain with the existing exporter. No Universe U01–U34 runtime/scientific behavior changes; its maintenance gate does not add a separate implementation scope here. Existing source validation and model schema tests check named paths/interfaces; `git diff --check` checks patch integrity.
+
+## Final delivery and main synchronization
+
+[PR #590](https://github.com/mr-exception/salimon/pull/590) is the first branch in
+the requested #538 → #542 → #559 → #566 review stack. No merge was performed.
+The final implementation was rebased onto main `2ecb271`; the checked revision
+is recorded in `environment.json`. After rebasing, workspace tests pass **876 / 0
+failed / 31 opt-in ignored**, Clippy, debug/release builds, formatting and **118
+script tests** pass. Native routes were rerun serially on that release binary:
+[starter, 41 steps](rebased-starter/), [fragment transfer/retrieval, 285 steps](rebased-fragment/),
+[cockpit, 31 steps](rebased-cockpit/). These directories retain originals and
+losslessly compressed raw protocol/results. They supersede the earlier native
+route as final build provenance; earlier records remain historical evidence.
+The GLB and source-library hashes are unchanged through main synchronization.
+The offscreen GPU originals were generated before synchronization, with their
+original environment retained in `validation/pre-main-sync-environment.json`.
+
+The final workspace run also exposed the renderer's duplicated old 544 KiB /
+6,500 triangle limits. Its test now decodes the same canonical asset manifest
+using an already pinned test dependency. Initial missing-dependency/type-check
+failures were corrected before the successful full rerun; no gate is waived.

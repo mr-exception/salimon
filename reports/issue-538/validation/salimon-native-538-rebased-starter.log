@@ -1,0 +1,1 @@
+{"status": "passed", "results": [{"scenario": "scenarios/evidence/starter-layout.json", "status": "passed", "steps_completed": 41, "duration_ms": 6033, "artifact_directory": "/workspace/salimon/artifacts/issue-538/rebased-starter/run-77rsy0aj", "result_file": "/workspace/salimon/artifacts/issue-538/rebased-starter/run-77rsy0aj/result.json"}]}

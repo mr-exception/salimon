@@ -153,8 +153,8 @@ The adapter generates portable spatial Rust layouts from Blender-authored
 proxy/marker nodes. `client/assets/ship/spatial-contracts.json` is the matching
 runtime sidecar. Seat, exit, spawn and engine anchors are sourced from authored
 spatial transforms while gameplay rules remain in Rust. The legacy manifest
-owns instrument assemblies and sightline samples, with the starter cargo/fixture bounds documented below; the retired port cargo-room
-volume. Read [the complete runtime contract](../../../../client/assets/ship/README.md#runtime-contract)
+owns instrument assemblies and sightline samples. The starter cargo/fixture
+bounds are documented below; the retired port cargo-room volume is not restored. Read [the complete runtime contract](../../../../client/assets/ship/README.md#runtime-contract)
 and its validator before altering them.
 
 The `legacy-scout-v1` profile explicitly validates legacy metadata boxes using

@@ -30,6 +30,16 @@ real second implementation requires it.
 
 ## Source routing
 
+Starter Scout movement/carrying scenarios cross the authored cargo bulkhead
+through its central opening. `flight_regression.rs` replays the production
+command paths; [starter-layout](../../scenarios/evidence/starter-layout.json),
+[cockpit-nose](../../scenarios/evidence/cockpit-nose.json) and
+[fragment-transfer](../../scenarios/fragment-transfer.json) retain the actual
+walking, Archive-targeting and post-flight retrieval routes. Runtime consumes
+character-owned generated fixture bounds; it does not derive collision geometry
+from rendered meshes. Closable cargo-door/bin mechanics remain #539 and
+habitation interactions remain #540.
+
 Start in `app.rs` for native lifecycle, recovery, scheduling and evidence IO.
 Use `session.rs` for typed commands/snapshots, gameplay state and exact cross-domain
 update order; `session/frames.rs` and `session/interaction.rs` own portable adapters.

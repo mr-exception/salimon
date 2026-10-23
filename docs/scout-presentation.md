@@ -23,9 +23,9 @@ The machinery extension below enlarges that uniform to 192 bytes.
 Historical Linux costs belong in the [delivery report](../reports/issue-463/README.md).
 The [native lighting review](../reports/issue-483/README.md) retains actual M1/Metal
 1280/1920 power pairs, repeat checks and separate Blender 4.5 LTS mood references.
-Foreground matched timing and owner appearance decisions remain
-[#566](https://github.com/mr-exception/salimon/issues/566); no measured frame-budget
-acceptance is granted.
+Cloud power transitions and repeatability are reproduced in that report. Additional
+matched cloud timing remains #566; subjective appearance belongs to #561 and
+hardware timing/budget acceptance to #563. No measured hardware budget is approved.
 
 ## Comparable native and offline reference cameras
 

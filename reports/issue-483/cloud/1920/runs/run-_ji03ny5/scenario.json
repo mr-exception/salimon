@@ -1,0 +1,159 @@
+{
+  "setup": {
+    "scenario": "core-restart",
+    "seed": 0,
+    "step_ms": 100
+  },
+  "timeout_ms": 120000,
+  "steps": [
+    {
+      "assert": {
+        "path": "ship.power_available",
+        "equals": false
+      }
+    },
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "cockpit"
+      }
+    },
+    {
+      "screenshot": "cockpit-blackout-repeat-00"
+    },
+    {
+      "screenshot": "cockpit-blackout-repeat-01"
+    },
+    {
+      "screenshot": "cockpit-blackout-repeat-02"
+    },
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "core"
+      }
+    },
+    {
+      "screenshot": "core-blackout-repeat-00"
+    },
+    {
+      "screenshot": "core-blackout-repeat-01"
+    },
+    {
+      "screenshot": "core-blackout-repeat-02"
+    },
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "fabricator"
+      }
+    },
+    {
+      "screenshot": "fabricator-blackout-repeat-00"
+    },
+    {
+      "screenshot": "fabricator-blackout-repeat-01"
+    },
+    {
+      "screenshot": "fabricator-blackout-repeat-02"
+    },
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "aft-door"
+      }
+    },
+    {
+      "screenshot": "aft-door-blackout-repeat-00"
+    },
+    {
+      "screenshot": "aft-door-blackout-repeat-01"
+    },
+    {
+      "screenshot": "aft-door-blackout-repeat-02"
+    },
+    {
+      "action": {
+        "op": "interact"
+      }
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 1
+      }
+    },
+    {
+      "assert": {
+        "path": "ship.power_available",
+        "equals": true
+      }
+    },
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "cockpit"
+      }
+    },
+    {
+      "screenshot": "cockpit-powered-repeat-00"
+    },
+    {
+      "screenshot": "cockpit-powered-repeat-01"
+    },
+    {
+      "screenshot": "cockpit-powered-repeat-02"
+    },
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "core"
+      }
+    },
+    {
+      "screenshot": "core-powered-repeat-00"
+    },
+    {
+      "screenshot": "core-powered-repeat-01"
+    },
+    {
+      "screenshot": "core-powered-repeat-02"
+    },
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "fabricator"
+      }
+    },
+    {
+      "screenshot": "fabricator-powered-repeat-00"
+    },
+    {
+      "screenshot": "fabricator-powered-repeat-01"
+    },
+    {
+      "screenshot": "fabricator-powered-repeat-02"
+    },
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "aft-door"
+      }
+    },
+    {
+      "screenshot": "aft-door-powered-repeat-00"
+    },
+    {
+      "screenshot": "aft-door-powered-repeat-01"
+    },
+    {
+      "screenshot": "aft-door-powered-repeat-02"
+    },
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "clear"
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "python": "3.12.14",
+  "source": "9f6f7e1ec549c0ea447b285ffe3e2921cc47d60e",
+  "binary_sha256": "ad77a5b2082790bc1b56c1bfbc0293e6beaffd3fa39db541af775ef0c1e91eee",
+  "input": "production E2E protocol, native input isolated",
+  "gpu": "Mesa lavapipe CPU software Vulkan; hardware counters unavailable",
+  "display": "Xvfb; scale 1",
+  "historical_manifest_pre_appendix": {
+    "checked": 280,
+    "mismatches": []
+  }
+}

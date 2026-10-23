@@ -1,0 +1,1 @@
+[2026-10-23T07:40:21Z ERROR salimon_client] Salimon client stopped: failed to create native event loop: os error at /workspace/.salimon-tools/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/winit-0.30.13/src/platform_impl/linux/mod.rs:788: Failed to open connection to X server

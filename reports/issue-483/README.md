@@ -131,3 +131,70 @@ substitute a structural zero-draw delta for measured performance.
   report collector → fail-closed admission tests above.
 
 All preserved evidence files are hashed in [SHA256SUMS](SHA256SUMS).
+
+## Cloud re-verification — 2026-10-23
+
+Current cloud acceptance is complete under the owner's revised issue policy.
+The historical sections above retain the actual M1 failures and zero accepted
+timing windows; no historical result is upgraded. All 280 historical manifest
+entries verified before this appendix was added. PR #567 supplied those original
+artifacts; this delivery includes them and adds the cloud evidence below.
+
+- Clean source and executable identity: [environment](cloud/environment.json).
+  Linux x86_64, AMD EPYC 9V74, Rust 1.99.1, Python 3.12.14; Xvfb, Mesa 25.0.7
+  llvmpipe Vulkan, scale 1. Protocol actions exercise production session/window
+  adapters with native input isolated; they are not physical OS-input evidence.
+- [1280 corpus](cloud/1280/candidates/corpus.json) and
+  [1920 corpus](cloud/1920/candidates/corpus.json): 24 original PNGs each,
+  eight view/power states with three repeats; both routes passed 37/37 steps.
+  Core intake consumes the actual held identity and one production tick restores
+  power. Actual frame state and logs are retained in each `runs/` directory.
+- [1280 repeats](cloud/1280/repeat-summary.json) and
+  [1920 repeats](cloud/1920/repeat-summary.json): 16 comparisons each passed
+  with zero changed pixels and zero peak channel delta. No masks or tolerance
+  changes; no baseline approval or promotion.
+- [Review sheet](cloud/review-1280.jpg): screens blank/restore and warm fill
+  changes; Core/Fabricator housings and aisle boundaries remain visible. This
+  observation is not subjective appearance acceptance. Original PNGs are canonical.
+- Workspace tests: **861 passed, 30 ignored**, no failures. Workspace build,
+  all-target Clippy with warnings denied, format, 118 Python runner tests, four
+  historical admission tests, six focused visual tests and docs validation passed.
+  [Raw logs](cloud/) retain actual output. Initial sandbox network and stale Xvfb
+  display attempts failed; rerunning with network access and Xvfb in the same
+  process lifetime succeeded. The failed capture remains in the 1280 run evidence.
+
+Reproduction from the repository root (use the installed lavapipe ICD and an
+active Xvfb display; this executor's tool paths are in `cloud/environment.json`):
+
+```sh
+cargo build --workspace --locked
+cargo test --workspace --locked
+cargo clippy --workspace --all-targets --locked -- -D warnings
+cargo fmt --all -- --check
+python -m unittest discover -s scripts -p 'test_*.py'
+python -m unittest discover -s reports/issue-483 -p 'test_*.py' -v
+DISPLAY=:100 WGPU_BACKEND=vulkan python scripts/model_visual_tests.py capture --binary target/debug/salimon-client --fixtures scenarios/visual/scout-fixtures.json --captures artifacts/483-cloud/candidates
+python scripts/model_visual_tests.py compare --fixtures scenarios/visual/scout-fixtures.json --captures artifacts/483-cloud/candidates --temporal-only --output artifacts/483-cloud/repeats
+SALIMON_REFERENCE_SIZE=1 DISPLAY=:100 WGPU_BACKEND=vulkan python scripts/model_visual_tests.py capture --binary target/debug/salimon-client --fixtures scenarios/visual/scout-fixtures.json --captures artifacts/483-cloud-1920/candidates
+python scripts/model_visual_tests.py compare --fixtures scenarios/visual/scout-fixtures.json --captures artifacts/483-cloud-1920/candidates --temporal-only --output artifacts/483-cloud-1920/repeats
+python scripts/check_docs.py
+```
+
+Supported Blender 4.5 LTS rerender was **not run**: cloud Blender is 4.3.2.
+The eight original 4.5.3 mood references remain intact and separate from native
+images. Additional matched cloud timing collection stays with
+[#566](https://github.com/mr-exception/salimon/issues/566), avoiding duplicate tooling.
+Subjective glass/housing/lane readability, warm/cool hierarchy, screen restoration
+and emission appearance transfer to [#561](https://github.com/mr-exception/salimon/issues/561).
+Hardware CPU/render/GPU/frame-tail budgets and zero accepted M1 timing windows
+transfer to [#563](https://github.com/mr-exception/salimon/issues/563). Real GPU
+counters, Metal fidelity, physical DPI/input and hardware 60 FPS are unavailable
+here; [#557](https://github.com/mr-exception/salimon/issues/557) owns physical checks.
+Source rights/balance remain [#537](https://github.com/mr-exception/salimon/issues/537).
+
+Documentation impact: canonical Scout presentation and #463 report link this
+cloud evidence and the exact remaining owners. Runtime/renderer architecture and
+invariants were checked; the only production change inherited from #567 is
+opt-in observational frame logging, already documented there. No gameplay,
+shader, physics or asset contract changes. Offline links/paths and base-impact
+checks were run; this report is evidence, not a new numerical or art contract.

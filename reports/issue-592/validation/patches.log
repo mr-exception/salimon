@@ -1,0 +1,4 @@
+fixture-before.patch applies
+prefix-harness.patch applies
+optimization.patch applies
+Reproduced source matches current root exactly for all optimized/harness files.

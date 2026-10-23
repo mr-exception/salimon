@@ -1,0 +1,542 @@
+{
+  "binary_sha256": "1326b96a931144ba5c68c30a4b82e7fd24bde42e29c05d3552bd563544e6200f",
+  "platform": "macOS-26.2-arm64-arm-64bit-Mach-O",
+  "cpu": "arm64",
+  "mode": "exact archived-bit CPU stateful solver; isolated historical layout; adapter libm differences remain labeled",
+  "rows": [
+    {
+      "case": "500-cap-moving",
+      "process_status": "finished",
+      "returncode": 0,
+      "timeout_seconds": 120,
+      "wall_seconds": 0.2566830419236794,
+      "outcome": [
+        {
+          "accepted_samples": 100,
+          "launches": 4,
+          "status": "completed",
+          "type": "outcome"
+        }
+      ],
+      "raw_samples": 103,
+      "metrics": {
+        "total_ms": {
+          "n": 100,
+          "median": 0.906583,
+          "p95": 1.766542,
+          "p99": 1.9013330000000002,
+          "max": 1.990459
+        },
+        "contact_ms": {
+          "n": 100,
+          "median": 0.552584,
+          "p95": 0.907582,
+          "p99": 1.007999,
+          "max": 1.0818329999999998
+        },
+        "grid_query_ms": {
+          "n": 100,
+          "median": 0.45071500000000003,
+          "p95": 0.709858,
+          "p99": 0.79577,
+          "max": 0.815524
+        },
+        "grid_queries": {
+          "n": 100,
+          "median": 2000,
+          "p95": 3000,
+          "p99": 3176,
+          "max": 3176
+        },
+        "activation_ms": {
+          "n": 100,
+          "median": 0.267417,
+          "p95": 0.369834,
+          "p99": 0.558,
+          "max": 0.741625
+        },
+        "integration_ms": {
+          "n": 100,
+          "median": 0.052958,
+          "p95": 0.391334,
+          "p99": 0.42174999999999996,
+          "max": 0.42429399999999995
+        },
+        "substeps": {
+          "n": 100,
+          "median": 2,
+          "p95": 3,
+          "p99": 3,
+          "max": 3
+        },
+        "pair_visits": {
+          "n": 100,
+          "median": 0,
+          "p95": 176,
+          "p99": 176,
+          "max": 176
+        },
+        "contacts": {
+          "n": 100,
+          "median": 0,
+          "p95": 176,
+          "p99": 176,
+          "max": 176
+        }
+      }
+    },
+    {
+      "case": "500-cap-natural",
+      "process_status": "finished",
+      "returncode": 0,
+      "timeout_seconds": 45,
+      "wall_seconds": 0.138872041949071,
+      "outcome": [
+        {
+          "accepted_samples": 100,
+          "launches": 1,
+          "status": "completed",
+          "type": "outcome"
+        }
+      ],
+      "raw_samples": 145,
+      "metrics": {
+        "total_ms": {
+          "n": 100,
+          "median": 0.07550000000000001,
+          "p95": 0.079083,
+          "p99": 0.09325,
+          "max": 0.109709
+        },
+        "contact_ms": {
+          "n": 100,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "grid_query_ms": {
+          "n": 100,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "grid_queries": {
+          "n": 100,
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "activation_ms": {
+          "n": 100,
+          "median": 0.07420800000000001,
+          "p95": 0.077541,
+          "p99": 0.078751,
+          "max": 0.09033300000000001
+        },
+        "integration_ms": {
+          "n": 100,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "substeps": {
+          "n": 100,
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "pair_visits": {
+          "n": 100,
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "contacts": {
+          "n": 100,
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        }
+      }
+    },
+    {
+      "case": "500-mixed-moving",
+      "process_status": "finished",
+      "returncode": 0,
+      "timeout_seconds": 120,
+      "wall_seconds": 1.1308762079570442,
+      "outcome": [
+        {
+          "accepted_samples": 100,
+          "launches": 1,
+          "status": "completed",
+          "type": "outcome"
+        }
+      ],
+      "raw_samples": 100,
+      "metrics": {
+        "total_ms": {
+          "n": 100,
+          "median": 10.82975,
+          "p95": 16.512584,
+          "p99": 23.503459,
+          "max": 24.559291
+        },
+        "contact_ms": {
+          "n": 100,
+          "median": 8.237546,
+          "p95": 10.935537,
+          "p99": 14.526038,
+          "max": 15.465289
+        },
+        "grid_query_ms": {
+          "n": 100,
+          "median": 5.4360859999999995,
+          "p95": 8.37767,
+          "p99": 11.541908999999999,
+          "max": 11.646243
+        },
+        "grid_queries": {
+          "n": 100,
+          "median": 24012,
+          "p95": 40000,
+          "p99": 46000,
+          "max": 49699
+        },
+        "activation_ms": {
+          "n": 100,
+          "median": 0.617625,
+          "p95": 1.015542,
+          "p99": 1.113708,
+          "max": 1.223583
+        },
+        "integration_ms": {
+          "n": 100,
+          "median": 0.438167,
+          "p95": 3.84496,
+          "p99": 6.197086,
+          "max": 6.216749
+        },
+        "substeps": {
+          "n": 100,
+          "median": 19,
+          "p95": 40,
+          "p99": 46,
+          "max": 47
+        },
+        "pair_visits": {
+          "n": 100,
+          "median": 2816,
+          "p95": 5632,
+          "p99": 5632,
+          "max": 5984
+        },
+        "contacts": {
+          "n": 100,
+          "median": 2816,
+          "p95": 5632,
+          "p99": 5632,
+          "max": 5984
+        }
+      }
+    },
+    {
+      "case": "500-mixed-natural",
+      "process_status": "finished",
+      "returncode": 0,
+      "timeout_seconds": 45,
+      "wall_seconds": 4.6104289159411564,
+      "outcome": [
+        {
+          "requested": 500,
+          "sleeping": 492,
+          "status": "failed-natural-sleep",
+          "steps": 300,
+          "type": "outcome"
+        }
+      ],
+      "raw_samples": 300,
+      "metrics": {
+        "total_ms": null,
+        "contact_ms": null,
+        "grid_query_ms": null,
+        "grid_queries": null,
+        "activation_ms": null,
+        "integration_ms": null,
+        "substeps": null,
+        "pair_visits": null,
+        "contacts": null
+      }
+    },
+    {
+      "case": "1000-cap-moving",
+      "process_status": "finished",
+      "returncode": 0,
+      "timeout_seconds": 120,
+      "wall_seconds": 0.6112389999907464,
+      "outcome": [
+        {
+          "accepted_samples": 100,
+          "launches": 4,
+          "status": "completed",
+          "type": "outcome"
+        }
+      ],
+      "raw_samples": 103,
+      "metrics": {
+        "total_ms": {
+          "n": 100,
+          "median": 1.885416,
+          "p95": 8.313292,
+          "p99": 11.36725,
+          "max": 12.389042
+        },
+        "contact_ms": {
+          "n": 100,
+          "median": 1.148376,
+          "p95": 6.981666,
+          "p99": 10.240499,
+          "max": 10.926583
+        },
+        "grid_query_ms": {
+          "n": 100,
+          "median": 0.935748,
+          "p95": 3.418969,
+          "p99": 8.645389,
+          "max": 9.177379
+        },
+        "grid_queries": {
+          "n": 100,
+          "median": 4000,
+          "p95": 13824,
+          "p99": 36068,
+          "max": 36068
+        },
+        "activation_ms": {
+          "n": 100,
+          "median": 0.559292,
+          "p95": 0.959292,
+          "p99": 1.202042,
+          "max": 1.277042
+        },
+        "integration_ms": {
+          "n": 100,
+          "median": 0.107252,
+          "p95": 0.48637600000000003,
+          "p99": 0.5003749999999999,
+          "max": 0.566626
+        },
+        "substeps": {
+          "n": 100,
+          "median": 2,
+          "p95": 3,
+          "p99": 3,
+          "max": 3
+        },
+        "pair_visits": {
+          "n": 100,
+          "median": 0,
+          "p95": 7824,
+          "p99": 8880,
+          "max": 8880
+        },
+        "contacts": {
+          "n": 100,
+          "median": 0,
+          "p95": 7824,
+          "p99": 8880,
+          "max": 8880
+        }
+      }
+    },
+    {
+      "case": "1000-cap-natural",
+      "process_status": "finished",
+      "returncode": 0,
+      "timeout_seconds": 45,
+      "wall_seconds": 1.2833733329316601,
+      "outcome": [
+        {
+          "accepted_samples": 100,
+          "launches": 1,
+          "status": "completed",
+          "type": "outcome"
+        }
+      ],
+      "raw_samples": 150,
+      "metrics": {
+        "total_ms": {
+          "n": 100,
+          "median": 0.218083,
+          "p95": 0.223,
+          "p99": 0.284167,
+          "max": 0.31825000000000003
+        },
+        "contact_ms": {
+          "n": 100,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "grid_query_ms": {
+          "n": 100,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "grid_queries": {
+          "n": 100,
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "activation_ms": {
+          "n": 100,
+          "median": 0.204125,
+          "p95": 0.208708,
+          "p99": 0.231459,
+          "max": 0.233667
+        },
+        "integration_ms": {
+          "n": 100,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "substeps": {
+          "n": 100,
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "pair_visits": {
+          "n": 100,
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        },
+        "contacts": {
+          "n": 100,
+          "median": 0,
+          "p95": 0,
+          "p99": 0,
+          "max": 0
+        }
+      }
+    },
+    {
+      "case": "1000-mixed-moving",
+      "process_status": "finished",
+      "returncode": 0,
+      "timeout_seconds": 120,
+      "wall_seconds": 82.94924900005572,
+      "outcome": [
+        {
+          "accepted_samples": 100,
+          "launches": 1,
+          "status": "completed",
+          "type": "outcome"
+        }
+      ],
+      "raw_samples": 100,
+      "metrics": {
+        "total_ms": {
+          "n": 100,
+          "median": 1088.041542,
+          "p95": 1309.552375,
+          "p99": 1331.231666,
+          "max": 1339.469375
+        },
+        "contact_ms": {
+          "n": 100,
+          "median": 1050.581121,
+          "p95": 1265.173286,
+          "p99": 1287.6174520000002,
+          "max": 1294.6318720000002
+        },
+        "grid_query_ms": {
+          "n": 100,
+          "median": 605.54037,
+          "p95": 878.039428,
+          "p99": 893.3478719999999,
+          "max": 898.7516840000001
+        },
+        "grid_queries": {
+          "n": 100,
+          "median": 2504504,
+          "p95": 3688772,
+          "p99": 3754060,
+          "max": 3786704
+        },
+        "activation_ms": {
+          "n": 100,
+          "median": 1.221749,
+          "p95": 2.071499,
+          "p99": 2.154542,
+          "max": 2.399834
+        },
+        "integration_ms": {
+          "n": 100,
+          "median": 7.496887,
+          "p95": 13.71617,
+          "p99": 14.336414000000001,
+          "max": 14.468628
+        },
+        "substeps": {
+          "n": 100,
+          "median": 76,
+          "p95": 113,
+          "p99": 115,
+          "max": 116
+        },
+        "pair_visits": {
+          "n": 100,
+          "median": 654656,
+          "p95": 1292928,
+          "p99": 1342656,
+          "max": 1359232
+        },
+        "contacts": {
+          "n": 100,
+          "median": 645535,
+          "p95": 1286787,
+          "p99": 1336112,
+          "max": 1352730
+        }
+      }
+    },
+    {
+      "case": "1000-mixed-natural",
+      "process_status": "timeout",
+      "returncode": null,
+      "timeout_seconds": 45,
+      "wall_seconds": 45.012902667047456,
+      "outcome": [],
+      "raw_samples": 64,
+      "metrics": {
+        "total_ms": null,
+        "contact_ms": null,
+        "grid_query_ms": null,
+        "grid_queries": null,
+        "activation_ms": null,
+        "integration_ms": null,
+        "substeps": null,
+        "pair_visits": null,
+        "contacts": null
+      }
+    }
+  ]
+}

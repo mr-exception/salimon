@@ -6,30 +6,35 @@
 
 /// Component-wise sum. Both operands must use the same frame and units.
 #[must_use]
+#[inline]
 pub fn add(left: [f64; 3], right: [f64; 3]) -> [f64; 3] {
     [left[0] + right[0], left[1] + right[1], left[2] + right[2]]
 }
 
 /// Component-wise difference. Subtract absolute positions before any `f32` cast.
 #[must_use]
+#[inline]
 pub fn sub(left: [f64; 3], right: [f64; 3]) -> [f64; 3] {
     [left[0] - right[0], left[1] - right[1], left[2] - right[2]]
 }
 
 /// Multiply every component by a scalar.
 #[must_use]
+#[inline]
 pub fn scale(vector: [f64; 3], amount: f64) -> [f64; 3] {
     vector.map(|value| value * amount)
 }
 
 /// Sum component products in X, Y, Z order.
 #[must_use]
+#[inline]
 pub fn dot(left: [f64; 3], right: [f64; 3]) -> f64 {
     left.into_iter().zip(right).map(|(a, b)| a * b).sum()
 }
 
 /// Right-handed cross product: +X crossed with +Y is +Z.
 #[must_use]
+#[inline]
 pub fn cross(left: [f64; 3], right: [f64; 3]) -> [f64; 3] {
     [
         left[1] * right[2] - left[2] * right[1],
@@ -40,6 +45,7 @@ pub fn cross(left: [f64; 3], right: [f64; 3]) -> [f64; 3] {
 
 /// Euclidean length using sum of squares. Very large components may overflow.
 #[must_use]
+#[inline]
 pub fn length(vector: [f64; 3]) -> f64 {
     dot(vector, vector).sqrt()
 }

@@ -12,3 +12,10 @@
 
 Tests protect handedness, arithmetic, distant-anchor precision and IEEE edge
 behavior. Normalization and quaternion tests stay with their domain policies.
+
+
+The six arithmetic primitives carry `#[inline]` so contact loops in dependent
+crates can optimize their existing expressions across the crate boundary (#592).
+Operation order, IEEE behavior, f64 types and APIs are unchanged; no fast-math,
+reassociation, FMA substitution or physics policy is introduced. Matched archived
+solver counters and terminal states accompany workspace checks in the task report.

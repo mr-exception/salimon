@@ -1,2 +1,1 @@
-client/runtime:1: source changed without owning guide update or scoped no_impact reason in scripts/docs-policy.json
-Documentation: 1 failures; 0 exact historical findings retained.
+Documentation: 0 failures; 0 exact historical findings retained.

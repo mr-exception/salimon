@@ -5,7 +5,8 @@ use wgpu::util::DeviceExt;
 use crate::cockpit_instruments::{ATLAS_HEIGHT, ATLAS_WIDTH, InstrumentAtlas};
 use crate::{CockpitInstruments, DEPTH_FORMAT, RendererError, SceneFrame, encode_f32s};
 
-const SHIP_GLB: &[u8] = include_bytes!("../../assets/ship/export/salimon_phase0_ship.glb");
+pub(crate) const SHIP_GLB: &[u8] =
+    include_bytes!("../../assets/ship/export/salimon_phase0_ship.glb");
 const VERTEX_FLOATS: usize = 19;
 const VERTEX_STRIDE: u64 = (VERTEX_FLOATS * size_of::<f32>()) as u64;
 const UNIFORM_SIZE: u64 = 192;
@@ -25,6 +26,8 @@ pub struct ShipMeshInstance {
     pub door_open_fraction: f32,
     /// Base habitation wall-hinged berth, stowed=0/deployed=1.
     pub bunk_open_fraction: f32,
+    /// v1 fixture renderer owns the separately instanced berth.
+    pub independent_interior: bool,
     /// Show the authored stationary package only while the Fabricator tray is occupied.
     pub fabricator_output_present: bool,
     pub fabricator_output_medical: bool,
@@ -585,7 +588,7 @@ impl ShipMeshRenderer {
             axes[2][0],
             axes[2][1],
             axes[2][2],
-            0.0,
+            f32::from(ship.independent_interior),
             OPEN_DOOR_ANGLE_RADIANS * eased_fraction,
             DOOR_HINGE_X_METERS,
             DOOR_HINGE_Y_METERS,
@@ -605,7 +608,12 @@ impl ShipMeshRenderer {
         Ok(())
     }
 
+    #[cfg(test)]
     pub(crate) fn draw<'pass>(&'pass self, pass: &mut wgpu::RenderPass<'pass>) {
+        self.draw_opaque(pass);
+        self.draw_glass(pass);
+    }
+    pub(crate) fn draw_opaque<'pass>(&'pass self, pass: &mut wgpu::RenderPass<'pass>) {
         if !self.visible {
             return;
         }
@@ -613,7 +621,13 @@ impl ShipMeshRenderer {
         pass.set_bind_group(0, &self.bind_group, &[]);
         pass.set_vertex_buffer(0, self.opaque_vertices.slice(..));
         pass.draw(0..self.opaque_vertex_count, 0..1);
+    }
+    pub(crate) fn draw_glass<'pass>(&'pass self, pass: &mut wgpu::RenderPass<'pass>) {
+        if !self.visible {
+            return;
+        }
         pass.set_pipeline(&self.glass_pipeline);
+        pass.set_bind_group(0, &self.bind_group, &[]);
         pass.set_vertex_buffer(0, self.glass_vertices.slice(..));
         pass.draw(0..self.glass_vertex_count, 0..1);
     }

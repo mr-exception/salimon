@@ -184,6 +184,7 @@ fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
                     "survival_details_open":app.survival_hud.details_open,
             "window": app.window_state(),
             "capture_status": app.capture_status,
+            "fixtures": app.fixture_batch_stats().map(|s| {json!({"layout_version":salimon_renderer::FIXTURE_LAYOUT_VERSION,"draws":s.draw_calls,"visible_instances":s.visible_instances,"triangles":s.triangles,"resident_geometry_bytes":s.resident_geometry_bytes,"instance_capacity_bytes":s.instance_capacity_bytes,"upload_bytes":s.upload_bytes,"prepare_micros":s.prepare_time.as_micros()})}),
             "performance": app.observations.snapshot(),
             "terrain": { "mode": format!("{:?}", app.session.mining.terrain), "active_patches": app.terrain_stream.active.len(),
                 "cache_patches": app.terrain_stream.cached(), "pending_patches": app.terrain_stream.pending,

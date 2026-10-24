@@ -235,3 +235,26 @@ No water/hygiene meter, sleep-time advancement or additional survival benefit is
 introduced. Sitting/lying, privacy mechanisms and expanded tactile presentation
 remain #577. Schema 10 saves source motion; see
 [the save contract](../../docs/save-contract.md#habitation-schema-10-540).
+
+
+## Modular interior fixture library (#575)
+
+Renderer `fixtures.rs` loads immutable named templates once, batches by mesh,
+rebases world positions in f64 before narrowing and validates identities, finite
+unit poses and bounded tint. `FixtureNode` resolves root/room/furnishing/attachment
+parents in deterministic input order using a linear queue; missing parents,
+cycles and duplicates fail. Physics/collision and persistent condition remain
+caller-owned. The 16,384-record renderer staging guard fails explicitly; it
+neither limits physical populations nor silently drops submitted instances.
+
+The existing berth migrates through
+[interior layout v1](../assets/ship/interior-layout-v1.json) without changing
+schema-10 gameplay source, identities, anchors, materials, mass or animation state.
+The original whole-ship path remains available for legacy/reference DTOs. Native
+composition selects independent presentation and hides only the old paired berth
+surfaces; opaque fixture batches draw before cockpit glass. Template instances
+share vertex/index buffers and compact 48-byte pose/tint/power records. Per-batch
+counts, allocation capacities and CPU preparation are read-only observations.
+The prototype Shelf/Seat/Panel/PanelDamaged templates demonstrate architecture;
+they do not install furniture or invent physical damage, construction or aging.
+See [fixture ownership/budgets](../../docs/modular-interior-fixtures.md).

@@ -574,3 +574,16 @@ No water/hygiene meter, sleep-time advancement or additional survival benefit is
 introduced. Sitting/lying, privacy mechanisms and expanded tactile presentation
 remain #577. Schema 10 saves source motion; see
 [the save contract](../../docs/save-contract.md#habitation-schema-10-540).
+
+
+## Interior fixture composition (#575)
+
+`session/fixtures.rs` maps existing saved habitation state to the versioned
+[interior layout](../assets/ship/interior-layout-v1.json), preserving the stable
+berth ID and ship-rooted f64 transform. `app.rs` supplies borrowed fixture DTOs;
+renderer resolves/batches presentation and never owns collision, installed mass,
+construction, cosmetic age or damage authority. Native debug inspect includes
+actual fixture draw/memory/upload counters; `window_state` reports true focused/
+occluded flags. Schema 10 is unchanged. Future room/module owners supply their
+real parent IDs and local poses through this boundary. See
+[architecture and budgets](../../docs/modular-interior-fixtures.md).

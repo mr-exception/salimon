@@ -255,3 +255,7 @@ No water/hygiene meter, sleep-time advancement or additional survival benefit is
 introduced. Sitting/lying, privacy mechanisms and expanded tactile presentation
 remain #577. Schema 10 saves source motion; see
 [the save contract](../../docs/save-contract.md#habitation-schema-10-540).
+
+## Physical mounts (#576)
+
+Runtime supplies installed fixture boxes to `set_interior_obstacles`; walking and zero-G use the same conservative body-expanded sliding query. Obstacles are derived and never saved as character authority. See [the canonical contract](../../docs/physical-mounts.md).

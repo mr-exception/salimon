@@ -468,3 +468,12 @@ freezes the fraction. Galley wheel/feedback remain transient and use existing
 consumable IDs. Hygiene adds no persistent need, water ledger or health grant.
 Bunk request/end states trigger checkpoints. Full tactile/occupancy transitions
 remain #577, using the same physical clearance and source boundaries.
+
+## Physical mount schema 11 (#576)
+
+Schema 11 persists stable rail/mount/secured-item source and a carried accessory's
+physical position. Restore validates source and exact child IDs, reconstructs the
+shared one-object slot and colliders before publishing, and rejects conflicts
+atomically. Schemas 1–10 migrate without new installed fixtures, preserving old
+player/cargo clearance. Hand motion does not trigger discrete autosaves. See the
+[physical mount contract](physical-mounts.md).

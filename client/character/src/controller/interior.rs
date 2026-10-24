@@ -40,6 +40,7 @@ impl CharacterController {
         local[2] = local[2].clamp(-INTERIOR_SIDE_LIMIT, INTERIOR_SIDE_LIMIT);
         local[0] = local[0].min(INTERIOR_FORWARD_MAX);
         local = slide_around_fixtures(previous, local);
+        local = self.slide_installed(previous, local);
         if self.cargo_door_blocking {
             let b = crate::cargo::cargo_door_bounds(0.0);
             local = crate::collision::slide_around_obstacles(
@@ -132,6 +133,7 @@ impl CharacterController {
         local[2] = local[2].clamp(-INTERIOR_SIDE_LIMIT, INTERIOR_SIDE_LIMIT);
         local[0] = local[0].min(INTERIOR_FORWARD_MAX);
         local = slide_around_fixtures(previous, local);
+        local = self.slide_installed(previous, local);
         if self.cargo_door_blocking {
             let b = crate::cargo::cargo_door_bounds(0.0);
             local = crate::collision::slide_around_obstacles(

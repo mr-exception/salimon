@@ -517,3 +517,7 @@ counts, allocation capacities and CPU preparation are read-only observations.
 The prototype Shelf/Seat/Panel/PanelDamaged templates demonstrate architecture;
 they do not install furniture or invent physical damage, construction or aging.
 See [fixture ownership/budgets](../../docs/modular-interior-fixtures.md).
+
+## Physical mounts (#576)
+
+Runtime maps physical rail/mount/clamp source into existing immutable Shelf template instances. Renderer remains observational; tint/pose cannot grant an attachment or change mass. See [the canonical contract](../../docs/physical-mounts.md).

@@ -891,7 +891,7 @@ impl ClientApplication {
                     | InteractionTarget::Core
                     | InteractionTarget::Fabricator
             )
-        ) && (self.session.mining.session.carried_id().is_some()
+        ) && (self.session.mining.session.carried_object().is_some()
             || crate::carrying::target(
                 &self.session.mining,
                 character_snapshot,
@@ -929,6 +929,12 @@ impl ClientApplication {
             Some(crate::resource_context::Prompt {
                 fragment: None,
                 text,
+                placement: OverlayPlacement::BottomCenter,
+            })
+        } else if let Some(text) = self.session.mount_prompt() {
+            Some(crate::resource_context::Prompt {
+                fragment: None,
+                text: text.to_owned(),
                 placement: OverlayPlacement::BottomCenter,
             })
         } else if fragment_interaction {

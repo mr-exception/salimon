@@ -172,3 +172,7 @@ No water/hygiene meter, sleep-time advancement or additional survival benefit is
 introduced. Sitting/lying, privacy mechanisms and expanded tactile presentation
 remain #577. Schema 10 saves source motion; see
 [the save contract](../../docs/save-contract.md#habitation-schema-10-540).
+
+## Physical mounts (#576)
+
+Installed fixture obstacle boxes are caller-owned metre geometry; they constrain walking and zero-G without being inferred from rendered meshes. See [the canonical contract](../../docs/physical-mounts.md).

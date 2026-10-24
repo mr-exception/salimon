@@ -605,3 +605,7 @@ handoffs, explicit baseline/additional mass and domain schema 1. See the
 Runtime composition, current authored hull/colliders and whole-game schema are
 unchanged. This foundation does not claim player construction or the redesigned
 Scout is playable; #538–#550 retain their integration scopes.
+
+## Physical mounts (#576)
+
+Physical mounts compose ship-owned attachments, the world-owned one-object slot and runtime physical/presentation adapters. Schema 11 preserves exact source and safe legacy layouts. See [the canonical contract](physical-mounts.md).

@@ -575,6 +575,9 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "4" | "slot_4" => Some(KeyCode::Digit4),
         "5" | "slot_5" => Some(KeyCode::Digit5),
         "6" => Some(KeyCode::Digit6),
+        "move_accessory" => Some(KeyCode::KeyJ),
+        "place_object" => Some(KeyCode::KeyG),
+        "secure_object" => Some(KeyCode::KeyK),
         "grab_drop" | "pickup" | "drop" => Some(KeyCode::KeyF),
         "roll_left" => Some(KeyCode::ArrowLeft),
         "roll_right" => Some(KeyCode::ArrowRight),
@@ -799,6 +802,7 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
             "fragment_mass_kg": app.mining.session.fragments().iter().map(|piece| piece.material().mass_kg()).sum::<f64>(),
             "nearest_deposit": nearest_deposit, "resource_types": resource_types, "deposits": deposits, "deposits_by_id": deposits_by_id, "deposit_query_error": deposit_error, "bodies": bodies, "camera_phase": format!("{:?}", app.camera_phase())}
     });
+    observation["mounts"] = serde_json::to_value(&app.mounts).expect("validated attachment state");
     observation["habitation"] = json!({"bunk_open_fraction":app.habitation.bunk_open_fraction,"bunk_deploying":app.habitation.bunk_deploying});
     observation["cargo_door"] =
         json!({"open_fraction":app.cargo_door.open_fraction,"opening":app.cargo_door.opening});
@@ -1394,7 +1398,7 @@ mod tests {
         test.interact();
         assert!(test.mining.session.carried_id().is_none());
         crate::app::input::dispatch_session_key(&mut test, PhysicalKey::Code(KeyCode::KeyF), true);
-        assert!(test.mining.session.carried_id().is_some());
+        assert!(test.mining.session.carried_object().is_some());
         assert_eq!(inspect(&test)["equipment"]["selected_slot"], Value::Null);
         assert!(!test.equipment.mining_equipped());
         assert_eq!(inspect(&test)["mining"]["held_item_visible"], false);
@@ -1408,9 +1412,9 @@ mod tests {
         crate::app::input::dispatch_session_key(&mut test, PhysicalKey::Code(KeyCode::KeyF), true);
         test.advance_game(Duration::from_secs(1));
         assert_eq!(test.mining.session.extracted_mass_kg(), mass);
-        assert!(test.mining.session.carried_id().is_some());
+        assert!(test.mining.session.carried_object().is_some());
         test.interact();
-        assert!(test.mining.session.carried_id().is_some());
+        assert!(test.mining.session.carried_object().is_some());
         crate::app::input::dispatch_session_key(&mut test, PhysicalKey::Code(KeyCode::KeyF), false);
         crate::app::input::dispatch_session_key(&mut test, PhysicalKey::Code(KeyCode::KeyF), true);
         assert!(test.mining.session.carried_id().is_none());

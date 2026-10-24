@@ -94,3 +94,7 @@ Cancellation removes the unfunded reservation; #543 owns physical intake/refunds
 and the whole-session boundary are documented in the
 [save contract](../../docs/save-contract.md#blueprint-placeholder-schema-8-542).
 Tests live in `structure/placement/tests.rs`.
+
+## Physical mounts (#576)
+
+Read the physical mount contract before changing rail identity/compatibility or existing-equipment dry-mass transfers. See [the canonical contract](../../docs/physical-mounts.md).

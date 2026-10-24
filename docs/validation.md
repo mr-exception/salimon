@@ -486,3 +486,7 @@ binary/source inventories. Never run builds, render workloads or other timing
 lanes concurrently with its release measurements. Diagnostic prefix snapshots
 cannot replace the required 100 completed moving intervals. Historical failed
 300-step preparations and native/frame-budget failures remain failures.
+
+## Physical mounts (#576)
+
+Run `cargo test -p salimon-client --locked session::mounts`, ship/world/character tests and workspace gates. The physical-mount evidence route retains original production-wgpu images. See [the canonical contract](physical-mounts.md).

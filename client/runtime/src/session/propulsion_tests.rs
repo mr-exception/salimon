@@ -25,6 +25,7 @@ fn engine_switch_survives_whole_save_and_legacy_forces_migrate_without_velocity_
     assert_eq!(s.save_bytes(100).unwrap(), before);
     let mut old: Value = serde_json::from_slice(&before).unwrap();
     old["schema_version"] = 4.into();
+    old["state"].as_object_mut().unwrap().remove("mounts");
     let ship = old["state"]["physical"]["ship"].as_object_mut().unwrap();
     ship.remove("engines_enabled");
     ship["propulsion"] =

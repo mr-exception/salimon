@@ -19,10 +19,12 @@ compare actual imported mesh bounds with physical proxies and rotational extrema
 - Focused `session::cabin`: 8/8 pass; disk persistence scenarios: 8 pass / 4 ignored.
 - `cargo clippy --workspace --all-targets --locked -- -D warnings`, `cargo fmt --all -- --check`, `git diff --check`, `python3 scripts/check_docs.py`: pass.
 - `python3 -m unittest discover -s scripts -p test_salimon_test.py`: 21/21 pass.
-- Production-wgpu native routes: original seat/restraint sequence 24/24, locker 7/7, table 7/7, corrected bunk/shutter/restraint sequence 24/24. Exact commands use `python3 scripts/salimon-test run scenarios/evidence/<scenario>.json --binary target/debug/salimon-client --screenshot-command '["native"]' --summary` with the checked scenarios `habitation-use`, `cabin-locker`, `cabin-table`, `cabin-bunk`. Original images and structured protocol are in [native results](native/results.json) and [protocol archive](native/protocol.zip); command logs including failed attempts are in [validation](validation.zip).
+- Production-wgpu native routes: original seat/restraint sequence 24/24, final free-look sequence 25/25, locker 7/7, table 7/7, corrected bunk/shutter/restraint sequence 24/24. Exact commands use `python3 scripts/salimon-test run scenarios/evidence/<scenario>.json --binary target/debug/salimon-client --screenshot-command '["native"]' --summary` with the checked scenarios `habitation-use`, `cabin-locker`, `cabin-table`, `cabin-bunk`. Original images and structured protocol are in [native results](native/results.json) and [protocol archive](native/protocol.zip); command logs including failed attempts are in [validation](validation.zip).
 
 ![Open physical locker](native/locker-native-step-007-locker-open.png)
 ![Lying player operating the closed shutter](native/bunk-native-final-step-019-shutter-closed.png)
+
+![Seated free look](native/seat-final-step-013-seated.png)
 
 The explicit evidence setups choose initial camera positions only; later E/X/U
 commands, animation, collision, prompts and rendering use production paths. They

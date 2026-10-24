@@ -90,3 +90,5 @@ remain #577. Schema 10 saves source motion; see
 ## Physical mounts (#576)
 
 Version 11 attachment validation cannot mutate the active session on failure or grant new fixtures to historical saves. See [the canonical contract](../../docs/physical-mounts.md).
+
+Whole-session schema 12 adds the optional runtime-owned cabin mechanisms and posture source. The storage envelope/atomic generation protocol is unchanged; see [cabin save semantics](../../docs/cabin-mechanisms.md#save-and-verification).

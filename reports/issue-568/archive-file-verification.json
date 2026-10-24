@@ -1,0 +1,110 @@
+[
+  {
+    "archive": "linux-main-build.tar.xz",
+    "verified_original_files": 2,
+    "executable_digests_only": 1,
+    "status": "passed"
+  },
+  {
+    "archive": "linux-main-e2e-01.tar.xz",
+    "verified_original_files": 325,
+    "executable_digests_only": 0,
+    "status": "passed"
+  },
+  {
+    "archive": "linux-main-e2e-02.tar.xz",
+    "verified_original_files": 514,
+    "executable_digests_only": 0,
+    "status": "passed"
+  },
+  {
+    "archive": "linux-main-e2e-03.tar.xz",
+    "verified_original_files": 1109,
+    "executable_digests_only": 0,
+    "status": "passed"
+  },
+  {
+    "archive": "linux-main-e2e-04.tar.xz",
+    "verified_original_files": 753,
+    "executable_digests_only": 0,
+    "status": "passed"
+  },
+  {
+    "archive": "linux-main-e2e-05.tar.xz",
+    "verified_original_files": 690,
+    "executable_digests_only": 0,
+    "status": "passed"
+  },
+  {
+    "archive": "linux-main-e2e-06.tar.xz",
+    "verified_original_files": 783,
+    "executable_digests_only": 0,
+    "status": "passed"
+  },
+  {
+    "archive": "linux-main-e2e-07.tar.xz",
+    "verified_original_files": 554,
+    "executable_digests_only": 0,
+    "status": "passed"
+  },
+  {
+    "archive": "linux-main-e2e-08.tar.xz",
+    "verified_original_files": 697,
+    "executable_digests_only": 0,
+    "status": "passed"
+  },
+  {
+    "archive": "linux-main-e2e-09.tar.xz",
+    "verified_original_files": 1106,
+    "executable_digests_only": 0,
+    "status": "passed"
+  },
+  {
+    "archive": "linux-main-e2e-10.tar.xz",
+    "verified_original_files": 1483,
+    "executable_digests_only": 0,
+    "status": "passed"
+  },
+  {
+    "archive": "linux-main-e2e-11.tar.xz",
+    "verified_original_files": 411,
+    "executable_digests_only": 0,
+    "status": "passed"
+  },
+  {
+    "archive": "linux-main-experience-568.tar.xz",
+    "verified_original_files": 13,
+    "executable_digests_only": 0,
+    "status": "passed"
+  },
+  {
+    "archive": "linux-main-glb.tar.xz",
+    "verified_original_files": 45,
+    "executable_digests_only": 0,
+    "status": "passed"
+  },
+  {
+    "archive": "linux-main-model-visual.tar.xz",
+    "verified_original_files": 1071,
+    "executable_digests_only": 0,
+    "status": "passed"
+  },
+  {
+    "archive": "linux-main-packaged-smoke.tar.xz",
+    "verified_original_files": 8,
+    "executable_digests_only": 0,
+    "status": "passed"
+  },
+  {
+    "archive": "linux-main-verification-568.tar.xz",
+    "verified_original_files": 27,
+    "executable_digests_only": 0,
+    "status": "passed"
+  },
+  {
+    "archive": "metal-stack-evidence.tar.xz",
+    "verified_original_files": 1365,
+    "executable_digests_only": 0,
+    "status": "passed"
+  }
+]

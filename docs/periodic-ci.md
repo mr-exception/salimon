@@ -141,3 +141,20 @@ captures and independent human image/mask/tolerance approval. Until then the lan
 reports **pending**, never approved appearance or full nightly success. Temporal
 completeness/stability, gameplay and packaged input smoke remain required;
 comparator compatibility, image hashes and pixel thresholds are unchanged.
+
+
+## Local Linux reproduction (#568)
+
+When hosted dispatch is denied, retain its actual error and use the
+[container recipe and nightly-equivalent runner](../reports/issue-568/README.md).
+Start from a clean tracked default-branch revision, record the resolved stable
+Rust version, image/ICD/adapter/driver and every command/status, and preserve
+original logs/corpus/temporal data. Local Linux software Vulkan is a distinct
+lane from hosted CI and native Metal. Independent steps continue after failures
+so missing graphical, corpus, balance and matrix results remain visible.
+
+Candidate images remain separate from approved baselines. Audit approval and
+all context/fixture fields before any baseline pixel comparison; temporal repeat
+checks are independent of human art acceptance. No mask/tolerance or approval is
+promoted by the reproduction script. The report retains failed, blocked and
+pending rows, including hosted dispatch and incomplete experience dependencies.

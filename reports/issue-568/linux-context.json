@@ -1,0 +1,15 @@
+{
+  "lane": "local Linux container, not hosted GitHub CI or native Metal",
+  "platform": "Linux-5.15.49-linuxkit-aarch64-with-glibc2.39",
+  "commands": {
+    "git rev-parse HEAD": "e863ded7e6eb60f7da53483d52ac6a73874a09be",
+    "git status --porcelain --untracked-files=no": "",
+    "rustc -vV": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: aarch64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1",
+    "cargo --version": "cargo 1.99.1 (5f94df478 2026-08-27)",
+    "node --version": "v22.16.0",
+    "python --version": "Python 3.12.3",
+    "uname -a": "Linux 36937c0fcbfb 5.15.49-linuxkit #1 SMP PREEMPT Tue Sep 13 07:51:32 UTC 2022 aarch64 aarch64 aarch64 GNU/Linux"
+  },
+  "vulkan_icd": "/usr/share/vulkan/icd.d/lvp_icd.json",
+  "icd_metadata": "{\n    \"ICD\": {\n        \"api_version\": \"1.4.318\",\n        \"library_path\": \"libvulkan_lvp.so\"\n    },\n    \"file_format_version\": \"1.0.1\"\n}"
+}

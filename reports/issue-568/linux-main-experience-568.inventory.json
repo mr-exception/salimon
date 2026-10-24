@@ -1,0 +1,9 @@
+{
+  "archive_sha256": "6a8f80dfbae6988bc7cf98ed5a0671e2689e9e3d352d400958090e79cb99cca7",
+  "file_count": 13,
+  "archived_files": 13,
+  "deduplicated_files": 0,
+  "full_inventory": "linux-main-experience-568.inventory.json.gz",
+  "full_inventory_sha256": "6b55a70ff2b77b93e151ccd9b7319832d246c22bbc48b5b70b6755263d881623",
+  "archive": "linux-main-experience-568.tar.xz"
+}

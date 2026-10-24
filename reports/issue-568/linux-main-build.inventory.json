@@ -1,0 +1,9 @@
+{
+  "archive_sha256": "c594a92aaa273cbcc2478123ad891de8838a7aec847ac68dc836c13bc639cd20",
+  "file_count": 3,
+  "archived_files": 2,
+  "deduplicated_files": 0,
+  "full_inventory": "linux-main-build.inventory.json.gz",
+  "full_inventory_sha256": "fa71aa5ba6858c945a0c321d567f84dc96fec44ef23c56fc650e549dbf47dccc",
+  "archive": "linux-main-build.tar.xz"
+}

@@ -55,6 +55,10 @@ class Artifacts:
 
     def screenshot(self, name, timeout=5):
         path = self.directory / f"{name}.png"
+        if self.command == ["native"]:
+            # The marker belongs to the live game protocol, never to exec/PATH.
+            # After a timeout that protocol may have an outstanding response.
+            return {"status": "unavailable", "reason": "native failure capture requires a synchronized live protocol; retain checkpoint images and last state"}
         if not self.command:
             return {"status": "unavailable", "reason": "no screenshot command/display available"}
         argv = [part.replace("{path}", str(path)) for part in self.command]

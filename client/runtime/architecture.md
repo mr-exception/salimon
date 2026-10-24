@@ -1505,3 +1505,12 @@ preparation; no sleep flags are installed. Reproduction uses a disposable
 historical-layout checkout and current production physics, preserving the actual
 current cabin/physical geometry in gameplay. Query clocks remain a subset of
 contact clocks; retain every timeout, partial sample and failed preparation.
+
+
+Capture verification (#568): native `inspect` with `scope: capture` returns only
+readback status after the usual E2E envelope/admission checks. It is observational
+and never builds the world snapshot. Ordinary inspection is unchanged; old
+executables may ignore the optional scope and return the full snapshot. The
+runner restores the real window before GPU capture and logs that OS request;
+it does not fake focus, disable occlusion or grant physical input qualification.
+See [runner protocol](../../scripts/README.md#bounded-native-capture-polling-568).

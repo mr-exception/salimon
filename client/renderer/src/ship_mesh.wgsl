@@ -9,6 +9,9 @@ struct ShipUniform {
     activity: vec4<f32>, // conversion, signed thrust, Fabricator mode, active phase
     detail: vec4<f32>, // Core charge, recipe progress, cockpit authority, ramped rudder yaw
     finishes: array<vec4<f32>, 10>,
+    ambient: array<vec4<f32>, 2>,
+    lamp_positions: array<vec4<f32>, 6>,
+    lamp_colors: array<vec4<f32>, 6>,
 };
 
 @group(0) @binding(0)
@@ -102,7 +105,19 @@ fn vs_main(
     let cabin_light = cold_spill + powered
         * (vec3<f32>(0.46, 0.34, 0.22)
         + vec3<f32>(0.18, 0.14, 0.09) * task_fill + vec3<f32>(ceiling));
-    output.light = mix(exterior_light, cabin_light, interior_flag);
+    var effective_cabin = cabin_light;
+    let room = select(0u,1u,local.x < -4.65);
+    if ship.ambient[room].w > 0.5 {
+        effective_cabin = ship.ambient[room].rgb;
+        for (var i=0u;i<6u;i=i+1u) {
+            if u32(ship.lamp_colors[i].w) == room {
+                let delta=local-ship.lamp_positions[i].xyz;
+                effective_cabin += ship.lamp_colors[i].rgb/(1.0+dot(delta,delta)*ship.lamp_positions[i].w);
+            }
+        }
+        effective_cabin=min(effective_cabin,vec3<f32>(2.0));
+    }
+    output.light = mix(exterior_light, effective_cabin, interior_flag);
     // Authored electrical lamps/accents extinguish on bus loss. Unpowered
     // surfaces retain a cool readability floor; this is not emergency power.
     var intensity = 1.0;
@@ -118,6 +133,11 @@ fn vs_main(
         intensity = 0.12 + 0.88 * ship.detail.z;
     }
     output.emissive = emissive * powered * intensity;
+    if ship.ambient[room].w > 0.5 && interior_flag > 0.5 && machinery_role == 0.0 && display.z == 0.0 {
+        var nearest=0u; var distance=1e9;
+        for(var i=0u;i<5u;i=i+1u) {let d=dot(local-ship.lamp_positions[i].xyz,local-ship.lamp_positions[i].xyz);if d<distance {distance=d;nearest=i;}}
+        output.emissive=emissive*ship.lamp_colors[nearest].rgb*2.0;
+    }
     output.screen_uv = display.xy;
     output.display_flag = u32(display.z);
     output.local = local;

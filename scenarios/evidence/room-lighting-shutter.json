@@ -1,0 +1,89 @@
+{
+  "setup": {
+    "scenario": "scout-lighting-shutter",
+    "seed": 580,
+    "step_ms": 16
+  },
+  "timeout_ms": 360000,
+  "steps": [
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "finishes"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "shutter-initial",
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 80
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "lighting.window_fraction",
+        "equals": 0
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "shutter-closed",
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "interact",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "step",
+        "frames": 80
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "lighting.window_fraction",
+        "equals": 1
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "shutter-opened",
+      "timeout_ms": 30000
+    }
+  ]
+}

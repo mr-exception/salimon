@@ -1,6 +1,9 @@
 //! Observational ship soundscape. No simulation, save or power authority.
+mod acoustics;
 #[cfg(test)]
 mod synth;
+#[cfg(test)]
+mod tactile_evidence;
 #[cfg(test)]
 mod tests;
 #[cfg(test)]
@@ -14,8 +17,8 @@ use std::{collections::VecDeque, time::Duration};
 #[cfg(test)]
 use std::{path::PathBuf, time::Instant};
 
-const MAX_EVENTS: usize = 4;
-const MAX_VOICES: usize = 8;
+const MAX_EVENTS: usize = 12;
+const MAX_VOICES: usize = 24;
 const CORE: [f64; 3] = [-1.0, 1.2, 0.0];
 const FABRICATOR: [f64; 3] = [-3.0, 1.65, 3.55];
 const RAMP: [f64; 3] = [-7.1, 1.34, 0.0];
@@ -32,10 +35,19 @@ enum Cue {
     Blackout,
     Restored,
     LowPower,
+    Travel(u8),
+    Latch,
+    HeavyLatch,
+    Mount,
+    Restraint,
+    CargoStep,
+    Release,
+    HeavyRelease,
 }
 #[derive(Clone, Copy, Debug)]
 struct Voice {
     cue: Cue,
+    filter: f64,
     gain: f64,
     pan: f64,
 }
@@ -53,6 +65,11 @@ pub(crate) struct Observation {
     door: f64,
     low_power: bool,
     serial: u64,
+    epoch: u64,
+    motions: [f64; 7],
+    restraints: u8,
+    mounts: u64,
+    mount_position: [f64; 3],
     now: Duration,
 }
 impl Observation {
@@ -70,7 +87,24 @@ impl Observation {
         } else {
             [0., 0., -1.]
         };
+        let c = s.habitation.cabin.as_ref();
+        let motions = [
+            s.habitation.bunk_open_fraction,
+            c.map_or(0., |c| c.motions[0].fraction),
+            c.map_or(0., |c| c.motions[1].fraction),
+            c.map_or(1., |c| c.motions[2].fraction),
+            c.map_or(1., |c| c.motions[3].fraction),
+            c.map_or(0., |c| c.motions[4].fraction),
+            s.cargo_door.open_fraction,
+        ];
         Self {
+            epoch: s.audio_epoch,
+            motions,
+            mounts: s.mount_audio.0,
+            mount_position: s.mount_audio.1,
+            restraints: c.map_or(0, |c| {
+                u8::from(c.seat_harness) | u8::from(c.bunk_harness) << 1
+            }),
             active: active
                 && !s.is_paused()
                 && !s.survival.snapshot().terminal
@@ -113,22 +147,33 @@ impl Observation {
     }
 }
 
+#[derive(Clone, Copy)]
+struct Event {
+    cue: Cue,
+    source: [f64; 3],
+}
 #[derive(Default)]
 struct Mixer {
     last: Option<Observation>,
-    pending: VecDeque<Cue>,
+    pending: VecDeque<Event>,
+    moving: [bool; 7],
+    directions: [i8; 7],
     walking_meters: f64,
     ramp_until: Duration,
 }
 impl Mixer {
     fn queue(&mut self, cue: Cue) {
+        self.queue_at(cue, CORE);
+    }
+    fn queue_at(&mut self, cue: Cue, source: [f64; 3]) {
+        let event = Event { cue, source };
         if matches!(cue, Cue::Blackout | Cue::Restored | Cue::LowPower) {
             if self.pending.len() == MAX_EVENTS {
                 self.pending.pop_back();
             }
-            self.pending.push_front(cue);
+            self.pending.push_front(event);
         } else if self.pending.len() < MAX_EVENTS {
-            self.pending.push_back(cue);
+            self.pending.push_back(event);
         }
     }
     fn observe(&mut self, o: Observation, settings: Settings) -> bool {
@@ -139,14 +184,19 @@ impl Mixer {
             && settings.scene_volume_percent > 0;
         let old = self.last.replace(o);
         if !enabled {
+            self.moving = [false; 7];
+            self.directions = [0; 7];
             self.pending.clear();
             self.walking_meters = 0.0;
             self.ramp_until = Duration::ZERO;
             self.last = None;
             return false;
         }
-        if let Some(old) = old.filter(|old| old.serial == o.serial && o.now >= old.now) {
+        if let Some(old) =
+            old.filter(|old| old.serial == o.serial && old.epoch == o.epoch && o.now >= old.now)
+        {
             if old.powered && !o.powered {
+                self.pending.clear();
                 self.queue(Cue::Blackout);
             }
             if !old.powered && o.powered {
@@ -158,6 +208,52 @@ impl Mixer {
             if (old.door - o.door).abs() > 1e-5 {
                 self.ramp_until = o.now + Duration::from_millis(500);
             }
+            if o.now > old.now {
+                for i in 0..7 {
+                    let delta = o.motions[i] - old.motions[i];
+                    let moving = delta.abs() > 1e-7;
+                    let direction = if delta > 0. { 1 } else { -1 };
+                    if moving {
+                        if ((!self.moving[i]) && (old.motions[i] == 0. || old.motions[i] == 1.))
+                            || (self.directions[i] != 0 && self.directions[i] != direction)
+                        {
+                            self.queue_at(
+                                if i == 4 || i == 6 {
+                                    Cue::HeavyRelease
+                                } else {
+                                    Cue::Release
+                                },
+                                mechanism_source(i),
+                            );
+                        }
+                        if o.motions[i] == 0. || o.motions[i] == 1. {
+                            self.queue_at(
+                                if i == 4 || i == 6 {
+                                    Cue::HeavyLatch
+                                } else {
+                                    Cue::Latch
+                                },
+                                mechanism_source(i),
+                            );
+                        }
+                        self.directions[i] = direction;
+                    }
+                    self.moving[i] = moving && o.motions[i] != 0. && o.motions[i] != 1.;
+                }
+            }
+            if o.restraints != old.restraints {
+                self.queue_at(
+                    Cue::Restraint,
+                    mechanism_source(if (o.restraints ^ old.restraints) & 2 != 0 {
+                        0
+                    } else {
+                        2
+                    }),
+                );
+            }
+            if o.mounts != old.mounts {
+                self.queue_at(Cue::Mount, o.mount_position);
+            }
             let delta = salimon_math::sub(o.eye, old.eye);
             let distance = delta[0].hypot(delta[2]);
             // Ignore resets/teleports and airborne drift. Ship translation does
@@ -166,12 +262,21 @@ impl Mixer {
                 self.walking_meters += distance;
                 if self.walking_meters >= 0.8 {
                     self.walking_meters %= 0.8;
-                    self.queue(Cue::Footstep);
+                    self.queue_at(
+                        if acoustics::area(o.eye) == "cargo" {
+                            Cue::CargoStep
+                        } else {
+                            Cue::Footstep
+                        },
+                        o.eye,
+                    );
                 }
             } else {
                 self.walking_meters = 0.0;
             }
         } else {
+            self.moving = [false; 7];
+            self.directions = [0; 7];
             self.pending.clear();
             self.walking_meters = 0.0;
             self.ramp_until = Duration::ZERO;
@@ -187,15 +292,33 @@ impl Mixer {
         let mut add = |cue, source, gain| {
             if voices.len() < MAX_VOICES {
                 let (attenuation, pan) = spatial(o.eye, o.right, source);
-                let gain = gain * volume * attenuation;
+                let (separation, filter) = acoustics::transmission(
+                    o.eye,
+                    source,
+                    &acoustics::scout(o.motions[6], o.motions[3]),
+                );
+                let gain = gain * volume * attenuation * separation;
                 if gain > 0.001 {
-                    voices.push(Voice { cue, gain, pan });
+                    voices.push(Voice {
+                        cue,
+                        gain,
+                        pan,
+                        filter,
+                    });
                 }
             }
         };
-        for cue in self.pending.drain(..) {
-            let source = if cue == Cue::Footstep { o.eye } else { CORE };
-            add(cue, source, 0.35);
+        for event in self.pending.drain(..) {
+            add(event.cue, event.source, 0.28);
+        }
+        for i in 0..7 {
+            if self.moving[i] {
+                add(
+                    Cue::Travel(i as u8),
+                    mechanism_source(i),
+                    if i == 4 || i == 6 { 0.22 } else { 0.13 },
+                );
+            }
         }
         if o.powered {
             add(Cue::Core, CORE, 0.065);
@@ -237,13 +360,22 @@ fn spatial(eye: [f64; 3], right: [f64; 3], source: [f64; 3]) -> (f64, f64) {
 #[derive(Default)]
 pub(crate) struct Presenter {
     mixer: Mixer,
+    last_control: crate::native_audio::Control,
+    event_counts: [u64; 27],
+    preview_only: bool,
     output: crate::native_audio::Output,
     epoch: u64,
-    last_run: Option<(u64, Duration)>,
+    last_run: Option<(u64, u64, Duration)>,
 }
 impl Presenter {
     pub(crate) fn telemetry(&self) -> serde_json::Value {
-        self.output.telemetry()
+        let mut v = self.output.telemetry();
+        v["preview_only"] = self.preview_only.into();
+        v["area"] = self.mixer.last.map(|o| acoustics::area(o.eye)).into();
+        v["scene_events"] = serde_json::json!(self.event_counts);
+        v["scene_gains"] = serde_json::json!(self.last_control.gains);
+        v["scene_filters"] = serde_json::json!(self.last_control.filters);
+        v
     }
     pub(crate) fn unavailable(&self) -> bool {
         self.output.unavailable()
@@ -251,8 +383,14 @@ impl Presenter {
     pub(crate) fn stop(&mut self) {
         self.mixer = Mixer::default();
         self.last_run = None;
+        self.last_control = Default::default();
         self.epoch = self.epoch.wrapping_add(1);
         self.output.silence(self.epoch);
+    }
+    /// E2E stays silent; expose the same observational mapping for captured state.
+    pub(crate) fn preview(&mut self, o: Observation, settings: Settings) {
+        self.preview_only = true;
+        self.present(o, settings, None);
     }
     pub(crate) fn update(
         &mut self,
@@ -260,13 +398,22 @@ impl Presenter {
         settings: Settings,
         condition: Option<crate::condition_feedback::Cue>,
     ) {
-        let reset = self
-            .last_run
-            .is_some_and(|(serial, now)| serial != o.serial || o.now < now);
+        self.preview_only = false;
+        self.present(o, settings, condition);
+    }
+    fn present(
+        &mut self,
+        o: Observation,
+        settings: Settings,
+        condition: Option<crate::condition_feedback::Cue>,
+    ) {
+        let reset = self.last_run.is_some_and(|(serial, epoch, now)| {
+            serial != o.serial || epoch != o.epoch || o.now < now
+        });
         if reset {
             self.stop();
         }
-        self.last_run = Some((o.serial, o.now));
+        self.last_run = Some((o.serial, o.epoch, o.now));
         let active = o.active && !settings.master_mute;
         let scene = self.mixer.observe(o, settings);
         if !active {
@@ -278,8 +425,16 @@ impl Presenter {
         } else {
             Vec::new()
         };
-        self.output
-            .update(controls(voices, self.epoch, scene, condition, settings));
+        let control = controls(voices, self.epoch, scene, condition, settings);
+        for (i, event) in control.events.iter().enumerate() {
+            if *event {
+                self.event_counts[i] = self.event_counts[i].saturating_add(1);
+            }
+        }
+        self.last_control = control;
+        if !self.preview_only {
+            self.output.update(control);
+        }
     }
 }
 
@@ -292,7 +447,11 @@ fn controls(
 ) -> crate::native_audio::Control {
     let mut control = crate::native_audio::Control {
         epoch,
-        enabled: if scene { (1 << 10) - 1 } else { 0 },
+        enabled: if scene {
+            ((1u32 << 27) - 1) & !(7 << 10)
+        } else {
+            0
+        },
         ..Default::default()
     };
     if settings.condition_audio {
@@ -310,10 +469,24 @@ fn controls(
             Cue::Blackout => 7,
             Cue::Restored => 8,
             Cue::LowPower => 9,
+            Cue::Travel(i) => 13 + usize::from(i),
+            Cue::Latch => 20,
+            Cue::HeavyLatch => 21,
+            Cue::Mount => 22,
+            Cue::Restraint => 23,
+            Cue::CargoStep => 24,
+            Cue::Release => 25,
+            Cue::HeavyRelease => 26,
         };
         control.gains[index] = v.gain as f32;
         control.pans[index] = v.pan as f32;
-        control.events[index] = index >= 6;
+        control.filters[index] = v.filter as f32;
+        control.events[index] = index >= 6 && !(13..20).contains(&index);
+    }
+    for i in 13..20 {
+        if control.gains[i] == 0. {
+            control.enabled &= !(1 << i);
+        }
     }
     if settings.condition_audio
         && let Some(cue) = condition
@@ -327,4 +500,17 @@ fn controls(
         control.events[index] = true;
     }
     control
+}
+
+fn mechanism_source(index: usize) -> [f64; 3] {
+    let g = crate::session::cabin::geometry();
+    [
+        salimon_character::habitation_geometry::BUNK_HINGE_METERS,
+        g.table,
+        g.seat,
+        g.screen,
+        g.shutter,
+        g.locker,
+        salimon_character::cargo::CARGO_DOOR_TARGET,
+    ][index]
 }

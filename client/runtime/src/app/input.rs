@@ -281,6 +281,19 @@ pub(crate) fn dispatch_session_key(
         Some(Command::ToggleView)
     } else if session.view_mode != crate::session::ViewMode::Gameplay {
         camera_command(ElementState::Pressed, false, key, true).map(Command::Camera)
+    } else if let PhysicalKey::Code(
+        code @ (KeyCode::F4 | KeyCode::F5 | KeyCode::F6 | KeyCode::F7 | KeyCode::F8 | KeyCode::F9),
+    ) = key
+    {
+        use crate::session::lighting::LightAction::*;
+        Some(Command::Light(match code {
+            KeyCode::F4 => Preset,
+            KeyCode::F5 => Master,
+            KeyCode::F6 => Fixture,
+            KeyCode::F7 => Brightness,
+            KeyCode::F9 => General,
+            _ => Warmth,
+        }))
     } else if key == PhysicalKey::Code(KeyCode::KeyH) {
         Some(Command::InspectVitals)
     } else if key == PhysicalKey::Code(KeyCode::KeyE) {

@@ -97,7 +97,8 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 ## Inertial propulsion (#201)
 
 Flying ships own persistent world-space f64 velocity independent of orientation.
-The starter dry hull is 100,000 kg. `Propulsion` validates cached total mass and
+The complete starter dry ship is 100,000 kg, including its registered portable shelf.
+The permanent hull minimum subtracts that 2 kg accessory when offboard. `Propulsion` validates cached total mass and
 one fictional impulse coefficient, initially 1 N·s/J (#493). Forward/reverse
 power limits are 100/50 MW; only allocated propulsion joules generate signed
 local +X impulse, giving 1000/500 m/s² dry acceleration. No independent force
@@ -153,16 +154,18 @@ settling remains locked. #198 owns native M1 collision smoke.
 
 ## Physical mass accounting (#187)
 
-Ship's `ShipMass` caches 100,000 kg dry hull plus positive finite physical masses
+Ship's `ShipMass` caches the 100,000 kg complete starter dry ship, subtracts
+registered dry equipment only while offboard, and adds positive finite physical masses
 by stable `MassObjectId` (separate fragment/equipment namespaces). Cargo uses
 an incremental error-free partial-sum expansion separate from dry hull mass, so
 replacement/removal retains small residuals without scanning objects. An empty
-ledger resets to exact dry mass; invalid/overflowing updates are transactional.
+ledger resets to the exact current dry mass; invalid/overflowing updates are transactional.
 This numerical rule is owned here; runtime only drains physical events. Upsert/removal
 is idempotent; handling and storage do not add another identity. Installed
-components can use the same ledger; the current asset has no separately defined
-installed-equipment masses beyond dry hull. No inventory/container implementation
-or invented component weights is added. `reconciles` is an explicit diagnostic,
+components use the same ledger. The registered portable shelf is included in
+starter dry mass and has a separate 2 kg source parameter for physical boundary
+transfers; it is never also inserted as cargo. Other dry equipment has no
+separately movable mass definition in this revision. `reconciles` is an explicit diagnostic,
 not flight work. `set_total_mass_kg` preserves the impulse coefficient and velocity.
 
 World coalesces creation/growth, pickup, carried/loose pose changes and physical
@@ -474,3 +477,7 @@ Cancellation removes the unfunded reservation; #543 owns physical intake/refunds
 and the whole-session boundary are documented in the
 [save contract](../../docs/save-contract.md#blueprint-placeholder-schema-8-542).
 Tests live in `structure/placement/tests.rs`.
+
+## Physical mounts (#576)
+
+`attachments.rs` owns registered rails, stable mount/child references, compatibility and explicit release on parent removal. `mass.rs` subtracts an existing dry equipment identity only while physically offboard. See [the canonical contract](../../docs/physical-mounts.md).

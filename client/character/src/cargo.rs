@@ -93,13 +93,17 @@ pub fn cargo_support_height(p: [f64; 3], radius: f64) -> f64 {
 
 /// Ray distance to the closed internal leaf; ordinary hull sight is queried separately.
 pub fn cargo_sight_obstruction(eye: [f64; 3], target: [f64; 3]) -> Option<f64> {
+    box_sight_obstruction(eye, target, cargo_door_bounds(0.0))
+}
+
+/// Shared exact slab query for installed physical fixture geometry.
+pub fn box_sight_obstruction(eye: [f64; 3], target: [f64; 3], b: [f64; 6]) -> Option<f64> {
     let delta = salimon_math::sub(target, eye);
     let length = salimon_math::length(delta);
     if !length.is_finite() || length <= 0.0 {
         return None;
     }
     let direction = delta.map(|v| v / length);
-    let b = cargo_door_bounds(0.0);
     let mut near: f64 = 0.0;
     let mut far = f64::INFINITY;
     for i in 0..3 {

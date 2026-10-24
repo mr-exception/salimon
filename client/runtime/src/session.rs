@@ -12,6 +12,7 @@ mod habitation;
 pub(crate) mod interaction;
 pub(crate) mod journey;
 pub(crate) mod lifecycle;
+pub(crate) mod mounts;
 mod presentation;
 mod recovery;
 mod survival;
@@ -40,6 +41,7 @@ use std::time::Duration;
 
 pub(crate) struct GameplaySession {
     paused: bool,
+    pub(crate) mounts: salimon_ship::attachments::Attachments,
     pub(crate) cargo_door: cargo::CargoDoor,
     pub(crate) habitation: habitation::Habitation,
     pub(crate) tutorial: tutorial::Tutorial,
@@ -99,6 +101,7 @@ impl Default for GameplaySession {
     fn default() -> Self {
         Self {
             paused: false,
+            mounts: Default::default(),
             cargo_door: Default::default(),
             habitation: Default::default(),
             building: Default::default(),
@@ -151,6 +154,7 @@ pub(crate) enum ControlKey {
 pub(crate) enum Command {
     Wheel(consumable_wheel::WheelAction),
     Build(construction::BuildAction),
+    Mount(mounts::MountAction),
     TogglePause,
     InspectVitals,
     SkipTutorial,
@@ -192,12 +196,14 @@ impl GameplaySession {
     pub(crate) fn new_run() -> Self {
         let (fabricator, consumables) = salimon_fabrication::Fabricator::starter_with_supplies();
         let mut session = Self {
+            mounts: salimon_ship::attachments::Attachments::starter(),
             fabricator,
             consumables,
             tutorial: tutorial::Tutorial::default(),
             ..Default::default()
         };
         session.sync_fabricator_mass();
+        session.sync_accessory();
         session
     }
 
@@ -394,6 +400,10 @@ impl GameplaySession {
     }
 
     pub(crate) fn carry_action(&mut self, pickup: bool) {
+        if self.mounts.carried.is_some() {
+            self.feedback = Some("Accessory in hand - G at a compatible rail to attach");
+            return;
+        }
         if !self.admit_survival_action(Action::Carry) {
             return;
         }
@@ -403,6 +413,9 @@ impl GameplaySession {
         let door_open = door_passable(ship);
         let message = if pickup {
             match crate::carrying::target(&self.mining, player, frame, door_open) {
+                Some(id) if self.mining.secured.contains(&id) => {
+                    "Release mechanical clamp with K first"
+                }
                 Some(id) if self.mining.session.pick_up(id) => {
                     self.equipment.sync_carrying(true);
                     self.mining.stop_mining();
@@ -459,6 +472,7 @@ impl GameplaySession {
         if self.paused {
             return;
         }
+        self.mining.mount_geometry = self.mounts.clone();
         let ship = self.ship.snapshot();
         let frame = character_ship_frame(ship.pose);
         crate::carrying::sync_ship_fragments(&mut self.mining, frame);
@@ -466,6 +480,7 @@ impl GameplaySession {
         crate::carrying::follow(&mut self.mining, player);
         crate::carrying::sync_ship_mass(&mut self.mining, frame, &mut self.ship);
         self.sync_fabricator_mass();
+        self.sync_accessory();
     }
 
     pub(crate) fn clear_held_controls(&mut self) {
@@ -684,6 +699,7 @@ impl GameplaySession {
         }
         match command {
             Build(action) => self.construction_action(action),
+            Mount(action) => self.mount_action(action),
             Control(key, pressed) => self.control(key, pressed),
             Throttle(direction, pressed) => {
                 if !pressed
@@ -724,7 +740,7 @@ impl GameplaySession {
             Select(slot) => {
                 let previous = self.equipment.selected();
                 self.equipment
-                    .select(slot, self.mining.session.carried_id().is_some());
+                    .select(slot, self.mining.session.carried_object().is_some());
                 if previous != self.equipment.selected() {
                     self.mining.clear_input();
                 }

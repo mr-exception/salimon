@@ -181,10 +181,27 @@ impl MiningSession {
         removed
     }
 
+    /// Shared one-object slot. External owners persist/validate their own fixture source.
+    pub fn carried_object(&self) -> Option<crate::carrying::WorldObjectId> {
+        self.carry.object()
+    }
+    pub fn carry_fixture(&mut self, id: u64) -> bool {
+        self.carry
+            .pick_up(crate::carrying::WorldObjectId::Fixture(id))
+    }
+    pub fn release_fixture(&mut self, id: u64) -> bool {
+        if self.carry.object() != Some(crate::carrying::WorldObjectId::Fixture(id)) {
+            return false;
+        }
+        self.carry.release();
+        true
+    }
+
     pub fn carried_id(&self) -> Option<crate::resources::FragmentId> {
-        self.carry.object().map(|object| match object {
-            crate::carrying::WorldObjectId::ResourceFragment(id) => id,
-        })
+        match self.carry.object() {
+            Some(crate::carrying::WorldObjectId::ResourceFragment(id)) => Some(id),
+            _ => None,
+        }
     }
 
     pub fn pick_up(&mut self, id: crate::resources::FragmentId) -> bool {

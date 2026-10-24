@@ -1,6 +1,9 @@
 //! Intentional fictional Core propulsion: funded joules become impulse, not kinetic-energy billing.
 use std::fmt;
 pub const STARTER_DRY_MASS_KG: f64 = 100_000.0;
+/// Permanent hull after the registered portable shelf leaves the ship.
+pub const PERMANENT_HULL_MASS_KG: f64 =
+    STARTER_DRY_MASS_KG - crate::attachments::PORTABLE_SHELF_MASS_KG;
 pub const STARTER_IMPULSE_NS_PER_JOULE: f64 = 1.0;
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct InvalidFlightMotion;
@@ -35,7 +38,7 @@ impl Propulsion {
     /// finite even for an f64::MAX input. This is not a velocity limit or upgrade.
     pub fn new(total_mass_kg: f64, impulse_ns_per_joule: f64) -> Result<Self, InvalidFlightMotion> {
         if !total_mass_kg.is_finite()
-            || total_mass_kg < STARTER_DRY_MASS_KG
+            || total_mass_kg < PERMANENT_HULL_MASS_KG
             || !impulse_ns_per_joule.is_finite()
             || !(0.0..=1000.0).contains(&impulse_ns_per_joule)
         {
@@ -81,7 +84,7 @@ mod tests {
                 .delta_velocity_meters_per_second(100e6),
             500.0
         );
-        for mass in [0.0, 99_999.0, f64::NAN, f64::INFINITY] {
+        for mass in [0.0, PERMANENT_HULL_MASS_KG - 1.0, f64::NAN, f64::INFINITY] {
             assert!(Propulsion::new(mass, 1.0).is_err());
         }
         for k in [-1.0, 1001.0, f64::NAN, f64::INFINITY] {

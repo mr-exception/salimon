@@ -93,3 +93,7 @@ contact/sleep/dwell state survive. No input latch, OS handle or GPU state is
 restored. An attached mining sphere becomes a detached existing physical entity,
 without allocating a new ID or losing mass. Whole-session/Fabricator publication
 is composed in #365; disk checkpoints remain #366.
+
+## Physical mounts (#576)
+
+Fixture pickup and fragment pickup use the same single CarrySlot; source owners cannot reconstruct two carried objects. Resource identity and mining debit remain unchanged. See [the canonical contract](../../docs/physical-mounts.md).

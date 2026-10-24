@@ -86,3 +86,7 @@ No water/hygiene meter, sleep-time advancement or additional survival benefit is
 introduced. Sitting/lying, privacy mechanisms and expanded tactile presentation
 remain #577. Schema 10 saves source motion; see
 [the save contract](../../docs/save-contract.md#habitation-schema-10-540).
+
+## Physical mounts (#576)
+
+Version 11 attachment validation cannot mutate the active session on failure or grant new fixtures to historical saves. See [the canonical contract](../../docs/physical-mounts.md).

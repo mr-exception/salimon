@@ -86,3 +86,7 @@ No water/hygiene meter, sleep-time advancement or additional survival benefit is
 introduced. Sitting/lying, privacy mechanisms and expanded tactile presentation
 remain #577. Schema 10 saves source motion; see
 [the save contract](../../docs/save-contract.md#habitation-schema-10-540).
+
+## Physical mounts (#576)
+
+Envelope version 11 adds runtime attachment source. Older saves retain their layout; current saves require validated source and reconstruct shared carry/collision caches before publication. See [the canonical contract](../../docs/physical-mounts.md).

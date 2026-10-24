@@ -466,3 +466,7 @@ loops and shared `salimon-math` arithmetic inlining; runtime `sphere_workloads.r
 provides diagnostic terminal prefixes. Reproduce with the isolated historical
 fixture/report, never by reverting gameplay geometry or weakening sleep/contact
 rules. Hardware cadence/frame budgets remain #563 and physical checks #557.
+
+## Physical mounts (#576)
+
+Source: `client/ship/src/attachments.rs`, `client/runtime/src/session/mounts.rs`, world carrying and character installed obstacles. Checks: `session::mounts`, ship attachment tests and `scenarios/evidence/physical-mounts.json`. See [the canonical contract](physical-mounts.md).

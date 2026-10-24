@@ -88,7 +88,7 @@ pub(crate) fn context(
     ) {
         return None;
     }
-    if tool.session.carried_id().is_some() {
+    if tool.session.carried_object().is_some() {
         Some(if target.is_some() {
             "Only one world object - F to drop first"
         } else {

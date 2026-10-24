@@ -154,3 +154,7 @@ contact/sleep/dwell state survive. No input latch, OS handle or GPU state is
 restored. An attached mining sphere becomes a detached existing physical entity,
 without allocating a new ID or losing mass. Whole-session/Fabricator publication
 is composed in #365; disk checkpoints remain #366.
+
+## Physical mounts (#576)
+
+`WorldObjectId::Fixture` shares the existing CarrySlot with fragments. External fixture owners persist/validate the fixture and reconstruct the slot during whole-session restore. See [the canonical contract](../../docs/physical-mounts.md).

@@ -258,3 +258,7 @@ counts, allocation capacities and CPU preparation are read-only observations.
 The prototype Shelf/Seat/Panel/PanelDamaged templates demonstrate architecture;
 they do not install furniture or invent physical damage, construction or aging.
 See [fixture ownership/budgets](../../docs/modular-interior-fixtures.md).
+
+## Physical mounts (#576)
+
+Physical rail, clamp and shelf instances retain stable caller IDs. Secured state is supplied by runtime; the renderer cannot create inventory or locks. See [the canonical contract](../../docs/physical-mounts.md).

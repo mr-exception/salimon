@@ -76,7 +76,7 @@ and their consumers aligned; flat deterministic fixtures are explicit.
 25. Physical cargo mass is cached by stable identity exactly once regardless of
     carrying/storage. Invalid/zero masses are rejected transactionally. Mass
     changes preserve velocity and impulse coefficient; empty cargo restores exact dry
-    mass and finite residuals survive replacement/removal. Validation reconciliation
+    mass for the equipment currently aboard and finite residuals survive replacement/removal. Validation reconciliation
     never runs in flight updates.
 
 26. Energy exhaustion stops free-flight force at the exact cutoff and preserves
@@ -302,3 +302,7 @@ Cancellation removes the unfunded reservation; #543 owns physical intake/refunds
 and the whole-session boundary are documented in the
 [save contract](../../docs/save-contract.md#blueprint-placeholder-schema-8-542).
 Tests live in `structure/placement/tests.rs`.
+
+## Physical mounts (#576)
+
+One item can belong to at most one mechanical mount. Existing equipment is included in dry mass, never counted again as cargo; boundary removal/return is idempotent. See [the canonical contract](../../docs/physical-mounts.md).

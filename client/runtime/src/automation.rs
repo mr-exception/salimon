@@ -577,6 +577,9 @@ fn key_code(name: &str) -> Option<KeyCode> {
         "5" | "slot_5" => Some(KeyCode::Digit5),
         "6" => Some(KeyCode::Digit6),
         "rest_furniture" => Some(KeyCode::KeyX),
+        "core_input_mode" => Some(KeyCode::KeyI),
+        "core_upgrade_apply" => Some(KeyCode::KeyY),
+        "core_upgrade_recover" => Some(KeyCode::KeyN),
         "finish_group" => Some(KeyCode::KeyV),
         "finish_next" => Some(KeyCode::KeyO),
         "finish_reset" => Some(KeyCode::KeyZ),
@@ -808,6 +811,8 @@ pub(crate) fn inspect_session(app: &GameplaySession) -> Value {
             "fragment_mass_kg": app.mining.session.fragments().iter().map(|piece| piece.material().mass_kg()).sum::<f64>(),
             "nearest_deposit": nearest_deposit, "resource_types": resource_types, "deposits": deposits, "deposits_by_id": deposits_by_id, "deposit_query_error": deposit_error, "bodies": bodies, "camera_phase": format!("{:?}", app.camera_phase())}
     });
+    observation["core_upgrades"] =
+        serde_json::to_value(&app.core_upgrades).expect("validated Core upgrades");
     observation["finishes"] = serde_json::to_value(&app.finishes).expect("validated finishes");
     observation["cabin"] = serde_json::to_value(&app.habitation.cabin).expect("validated cabin");
     observation["mounts"] = serde_json::to_value(&app.mounts).expect("validated attachment state");

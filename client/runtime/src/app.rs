@@ -954,6 +954,12 @@ impl ClientApplication {
                     placement: OverlayPlacement::BottomCenter,
                 })
             }
+        } else if let Some(text) = self.session.core_upgrade_hint() {
+            Some(crate::resource_context::Prompt {
+                fragment: None,
+                text,
+                placement: OverlayPlacement::BottomCenter,
+            })
         } else if let Some(text) = self.session.mount_prompt() {
             Some(crate::resource_context::Prompt {
                 fragment: None,
@@ -990,8 +996,9 @@ impl ClientApplication {
         if self.session.survival.snapshot().terminal {
             contextual_placement = OverlayPlacement::BottomCenter;
         }
-        self.action_bar
-            .set_combined_contextual(self.session.building.active);
+        self.action_bar.set_combined_contextual(
+            self.session.building.active || interaction == Some(InteractionTarget::Core),
+        );
         self.action_bar
             .set_contextual(if self.session.survival.snapshot().terminal {
                 None

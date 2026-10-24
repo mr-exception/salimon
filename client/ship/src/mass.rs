@@ -9,6 +9,7 @@ pub enum MassObjectId {
     FabricatorReserve,
     FabricatorTray,
     RecoveryModule,
+    CoreUpgradeMaterials,
     /// Installed modular structure/equipment, disjoint from loose cargo and legacy equipment.
     Structure(u64),
 }

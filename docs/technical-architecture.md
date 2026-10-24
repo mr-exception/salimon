@@ -619,3 +619,8 @@ The optional schema-12 cabin source, manual reversible fixtures, supported postu
 ## Persistent cosmetic groups (#579)
 
 Five room groups and exact furniture overrides now use the [bounded finish contract](room-finishes.md). Schema 13 preserves histories independently of divider topology; physical material replacement, future constructed room geometry (#545) and actual damage (#549) retain their owners. Shared instance tint factors are now bounded to [0,4] and cosmetic RGB is clamped before lighting; warning/functional surfaces retain authored values.
+
+
+## Instant direct-material Core upgrades (#548)
+
+The owner-authorized capacity tiers, exact receipt accounting, separate fuel/material controls and schema-14 save behavior are implemented in [Core upgrades](core-upgrades.md). Ordinary construction/commissioning and blackout throttle rules remain separate. No free charge or upgrade power/timer is introduced.

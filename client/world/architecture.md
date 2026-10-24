@@ -158,3 +158,6 @@ is composed in #365; disk checkpoints remain #366.
 ## Physical mounts (#576)
 
 `WorldObjectId::Fixture` shares the existing CarrySlot with fragments. External fixture owners persist/validate the fixture and reconstruct the slot during whole-session restore. See [the canonical contract](../../docs/physical-mounts.md).
+
+
+Instant Core upgrades #548: [canonical input, source, mass and schema-14 contract](../../docs/core-upgrades.md). Ship owns validated capacity-only transactions; world returns original caller-owned reserved entities through the one carry slot; runtime maps the data catalog/physical controls and reconstructs pending+installed material mass. No timer, joule grant, Core replacement or flight command.

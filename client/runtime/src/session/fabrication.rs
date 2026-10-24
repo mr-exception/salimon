@@ -73,6 +73,15 @@ impl GameplaySession {
                 .update(id, (mg > 0).then_some(mg as f64 / 1_000_000.0))
                 .expect("bounded stored quantities and validated output mass");
         }
+        let core_mass = self.core_upgrades.mass_kg();
+        changed |= self
+            .mining
+            .ship_mass
+            .update(
+                salimon_ship::MassObjectId::CoreUpgradeMaterials,
+                (core_mass > 0.).then_some(core_mass),
+            )
+            .expect("bounded Core receipt mass");
         if changed || self.ship.snapshot().total_mass_kg != self.mining.ship_mass.total_kg() {
             self.ship
                 .set_total_mass_kg(self.mining.ship_mass.total_kg())

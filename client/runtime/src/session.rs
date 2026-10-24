@@ -5,6 +5,7 @@ mod cargo;
 pub(crate) mod construction;
 pub(crate) mod consumable_wheel;
 pub(crate) mod consumables;
+pub(crate) mod core_upgrades;
 pub(crate) mod crafting_ui;
 mod fabrication;
 pub(crate) mod finishes;
@@ -43,6 +44,7 @@ use std::time::Duration;
 
 pub(crate) struct GameplaySession {
     paused: bool,
+    pub(crate) core_upgrades: salimon_ship::core_upgrades::CoreUpgrades,
     pub(crate) finishes: salimon_ship::finishes::Finishes,
     pub(crate) finish_group: usize,
     pub(crate) mounts: salimon_ship::attachments::Attachments,
@@ -105,6 +107,7 @@ impl Default for GameplaySession {
     fn default() -> Self {
         Self {
             paused: false,
+            core_upgrades: Default::default(),
             finishes: Default::default(),
             finish_group: 0,
             mounts: Default::default(),
@@ -163,6 +166,7 @@ pub(crate) enum Command {
     Mount(mounts::MountAction),
     Cabin(cabin::CabinAction),
     Finish(finishes::FinishAction),
+    CoreUpgrade(core_upgrades::CoreUpgradeAction),
     TogglePause,
     InspectVitals,
     SkipTutorial,
@@ -307,12 +311,18 @@ impl GameplaySession {
                                 Some("Carried object obstructed - back up or drop before intake");
                             return;
                         }
+                        if self.core_upgrades.mode
+                            == salimon_ship::core_upgrades::InputMode::Upgrade
+                        {
+                            self.contribute_core_upgrade();
+                            return;
+                        }
                         let result = self.ship.intake_carried_fragment(&mut self.mining.session);
                         let text = match result {
-                            salimon_ship::IntakeResult::Accepted => "Core accepted fragment",
+                            salimon_ship::IntakeResult::Accepted => "Core FUEL accepted fragment",
                             salimon_ship::IntakeResult::Busy => "Core is processing a fragment",
                             salimon_ship::IntakeResult::NoCarriedFragment => {
-                                "Carry a fragment to feed the Core"
+                                "CORE FUEL - carry fragment to burn; I selects upgrades"
                             }
                             salimon_ship::IntakeResult::InvalidYield => {
                                 "Invalid fragment energy yield"
@@ -769,6 +779,7 @@ impl GameplaySession {
             Mount(action) => self.mount_action(action),
             Cabin(action) => self.cabin_action(action),
             Finish(action) => self.finish_action(action),
+            CoreUpgrade(action) => self.core_upgrade_action(action),
             Control(key, pressed) => self.control(key, pressed),
             Throttle(direction, pressed) => {
                 if !pressed

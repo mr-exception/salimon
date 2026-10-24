@@ -1,0 +1,104 @@
+[
+  {
+    "archive": "linux-main-e2e-01.tar.xz",
+    "summary_inventory": "linux-main-e2e-01.inventory.json",
+    "full_inventory": "linux-main-e2e-01.inventory.json.gz",
+    "original_files": 325
+  },
+  {
+    "archive": "linux-main-e2e-02.tar.xz",
+    "summary_inventory": "linux-main-e2e-02.inventory.json",
+    "full_inventory": "linux-main-e2e-02.inventory.json.gz",
+    "original_files": 514
+  },
+  {
+    "archive": "linux-main-e2e-03.tar.xz",
+    "summary_inventory": "linux-main-e2e-03.inventory.json",
+    "full_inventory": "linux-main-e2e-03.inventory.json.gz",
+    "original_files": 1109
+  },
+  {
+    "archive": "linux-main-e2e-04.tar.xz",
+    "summary_inventory": "linux-main-e2e-04.inventory.json",
+    "full_inventory": "linux-main-e2e-04.inventory.json.gz",
+    "original_files": 753
+  },
+  {
+    "archive": "linux-main-e2e-05.tar.xz",
+    "summary_inventory": "linux-main-e2e-05.inventory.json",
+    "full_inventory": "linux-main-e2e-05.inventory.json.gz",
+    "original_files": 690
+  },
+  {
+    "archive": "linux-main-e2e-06.tar.xz",
+    "summary_inventory": "linux-main-e2e-06.inventory.json",
+    "full_inventory": "linux-main-e2e-06.inventory.json.gz",
+    "original_files": 783
+  },
+  {
+    "archive": "linux-main-e2e-07.tar.xz",
+    "summary_inventory": "linux-main-e2e-07.inventory.json",
+    "full_inventory": "linux-main-e2e-07.inventory.json.gz",
+    "original_files": 554
+  },
+  {
+    "archive": "linux-main-e2e-08.tar.xz",
+    "summary_inventory": "linux-main-e2e-08.inventory.json",
+    "full_inventory": "linux-main-e2e-08.inventory.json.gz",
+    "original_files": 697
+  },
+  {
+    "archive": "linux-main-e2e-09.tar.xz",
+    "summary_inventory": "linux-main-e2e-09.inventory.json",
+    "full_inventory": "linux-main-e2e-09.inventory.json.gz",
+    "original_files": 1106
+  },
+  {
+    "archive": "linux-main-e2e-10.tar.xz",
+    "summary_inventory": "linux-main-e2e-10.inventory.json",
+    "full_inventory": "linux-main-e2e-10.inventory.json.gz",
+    "original_files": 1483
+  },
+  {
+    "archive": "linux-main-e2e-11.tar.xz",
+    "summary_inventory": "linux-main-e2e-11.inventory.json",
+    "full_inventory": "linux-main-e2e-11.inventory.json.gz",
+    "original_files": 411
+  },
+  {
+    "archive": "linux-main-model-visual.tar.xz",
+    "summary_inventory": "linux-main-model-visual.inventory.json",
+    "full_inventory": "linux-main-model-visual.inventory.json.gz",
+    "original_files": 1071
+  },
+  {
+    "archive": "linux-main-verification-568.tar.xz",
+    "summary_inventory": "linux-main-verification-568.inventory.json",
+    "full_inventory": "linux-main-verification-568.inventory.json.gz",
+    "original_files": 27
+  },
+  {
+    "archive": "linux-main-experience-568.tar.xz",
+    "summary_inventory": "linux-main-experience-568.inventory.json",
+    "full_inventory": "linux-main-experience-568.inventory.json.gz",
+    "original_files": 13
+  },
+  {
+    "archive": "linux-main-glb.tar.xz",
+    "summary_inventory": "linux-main-glb.inventory.json",
+    "full_inventory": "linux-main-glb.inventory.json.gz",
+    "original_files": 45
+  },
+  {
+    "archive": "linux-main-build.tar.xz",
+    "summary_inventory": "linux-main-build.inventory.json",
+    "full_inventory": "linux-main-build.inventory.json.gz",
+    "original_files": 3
+  },
+  {
+    "archive": "linux-main-packaged-smoke.tar.xz",
+    "summary_inventory": "linux-main-packaged-smoke.inventory.json",
+    "full_inventory": "linux-main-packaged-smoke.inventory.json.gz",
+    "original_files": 8
+  }
+]

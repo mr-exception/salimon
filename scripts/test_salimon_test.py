@@ -51,6 +51,40 @@ class RunnerTests(unittest.TestCase):
     def execute(self):
         return run(self.scenario, [sys.executable, str(self.fake)], self.directory / "artifacts", [])
 
+    def test_native_capture_polls_only_status_and_preserves_the_png_contract(self):
+        from unittest.mock import Mock
+        from e2e_artifacts import Artifacts
+        from salimon_test import native_capture
+        artifacts = Artifacts({}, self.directory / "native", ["native"])
+        game = Mock()
+        def request(command, deadline):
+            if command["op"] == "window":
+                self.assertEqual(command, {"op": "window", "action": "restore"})
+                return {"requested": True}
+            if command["op"] == "capture":
+                Path(command["path"]).write_bytes(b"\x89PNG\r\n\x1a\n")
+                return {"scheduled": True}
+            self.assertEqual(command, {"op": "inspect", "scope": "capture"})
+            return {"capture_status": "captured"}
+        game.request.side_effect = request
+        shot = native_capture(game, artifacts, "view", time.monotonic() + 1)
+        self.assertEqual(shot["status"], "captured")
+        self.assertEqual(game.request.call_count, 3)
+
+    def test_native_failure_marker_never_becomes_an_executable_or_hides_failure(self):
+        from unittest.mock import patch
+        from e2e_artifacts import Artifacts
+        artifacts = Artifacts({}, self.directory / "native-failure", ["native"])
+        with patch("e2e_artifacts.subprocess.run") as execute:
+            self.assertEqual(artifacts.screenshot("failure")["status"], "unavailable")
+            execute.assert_not_called()
+        self.data["steps"] = [{"assert": {"path": "ship.speed", "equals": 8}}]
+        self.save()
+        result = run(self.scenario, [sys.executable, str(self.fake)], self.directory / "artifacts", ["native"])
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual(result["failure_screenshot"]["status"], "unavailable")
+        self.assertEqual(result["steps"][0]["assertion"]["actual"], 4)
+
     def test_parser_rejects_unknown_and_ambiguous_steps(self):
         self.data["steps"][0]["assert"] = {"path": "ship.speed", "equals": 4}
         self.save()

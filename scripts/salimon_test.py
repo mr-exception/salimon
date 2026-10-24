@@ -276,9 +276,11 @@ class Game:
 def native_capture(game, artifacts, name, deadline):
     """Capture the actual completed GPU color surface, without unrelated desktop pixels."""
     path = artifacts.directory / f"{name}.png"
+    # Restore the real window so occlusion is resolved by the OS, not bypassed.
+    game.request({"op": "window", "action": "restore"}, deadline)
     game.request({"op": "capture", "path": str(path)}, deadline)
     while time.monotonic() < deadline:
-        status = game.request({"op": "inspect"}, deadline).get("capture_status", "idle")
+        status = game.request({"op": "inspect", "scope": "capture"}, deadline).get("capture_status", "idle")
         if status == "captured":
             if not path.is_file() or path.read_bytes()[:8] != b"\x89PNG\r\n\x1a\n":
                 return {"status": "failed", "reason": "native capture did not produce a PNG"}

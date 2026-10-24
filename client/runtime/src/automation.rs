@@ -175,6 +175,9 @@ fn execute_native(app: &mut ClientApplication, line: &str) -> Value {
             app.observations.clear();
             Ok(json!({"reset":true}))
         }
+        Some("inspect") if command.get("scope").and_then(Value::as_str) == Some("capture") => {
+            Ok(json!({"capture_status":app.capture_status}))
+        }
         Some("inspect") => {
             let mut result = inspect_session(&app.session);
             let upload_times = app.terrain_upload_times();
@@ -1768,6 +1771,34 @@ mod tests {
         assert_eq!(
             execute(&mut test, r#"{"protocol":1,"id":3,"op":"warp"}"#)["error"]["code"],
             "unknown_op"
+        );
+    }
+
+    #[test]
+    fn capture_polling_observes_only_status_without_mutating_authority() {
+        let mut test = ClientApplication::default();
+        test.session = app(Scenario::LandedEarth);
+        test.e2e_config = Some(Config {
+            fragment_load: None,
+            scenario: Scenario::LandedEarth,
+            seed: 7,
+            step: Duration::from_millis(20),
+        });
+        test.capture_status = "captured".into();
+        let before = test.session.save_bytes(100).unwrap();
+        let response = super::execute(
+            &mut test,
+            r#"{"protocol":1,"id":1,"op":"inspect","scope":"capture"}"#,
+        );
+        assert_eq!(response["result"], json!({"capture_status":"captured"}));
+        assert_eq!(before, test.session.save_bytes(100).unwrap());
+        let mut normal = ClientApplication::default();
+        assert_eq!(
+            super::execute(
+                &mut normal,
+                r#"{"protocol":1,"id":1,"op":"inspect","scope":"capture"}"#
+            )["error"]["code"],
+            "disabled"
         );
     }
 

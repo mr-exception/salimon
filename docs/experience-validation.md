@@ -82,3 +82,16 @@ Human native comparisons and reference performance remain required separately.
 blocked and unrun outcomes. [Follow-up #537](https://github.com/mr-exception/salimon/issues/537)
 owns full native/backend experience acceptance after #476 matrix/runner delivery.
 Closing #476 does not resolve the feature dependencies or grant native signoff.
+
+
+## Automated reproduction (#568)
+
+The current matrix is audited against live implementation dependencies without
+inventing new test mappings: twelve Scout portable rows execute and fourteen
+future protocols retain exact `blocked_by` issue IDs. A runner exit of 3 is
+pending coverage, not a whole-matrix pass. Open #469–#475 still own their real
+navigation, alien opening, location, completion/account/backend and revisit
+features. Source rights and physical-route/balance decisions remain #537;
+appearance/audio/baseline review remains #561. See the [current report](../reports/issue-568/README.md)
+for fresh results, dependency snapshots, raw balance/availability and blank
+physical-trial worksheets. Do not count those unfilled worksheets as evidence.

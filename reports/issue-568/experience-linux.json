@@ -1,0 +1,424 @@
+{
+  "schema": 1,
+  "matrix_version": 1,
+  "revision": "e863ded7e6eb60f7da53483d52ac6a73874a09be",
+  "matrix_sha256": "3b2846c0dfb453212808715298d19cf750c4eab2b9b52b8642bcd3b89a96d19d",
+  "runner_sha256": "75c244d210b8312336f44b95dd2378dcec872acb8029d4abe31f1dcb9f9cf409",
+  "status": "pending",
+  "native_signoff": false,
+  "backend_signoff": false,
+  "cases": [
+    {
+      "id": "SCOUT-01",
+      "invariant": "Cockpit approach admits assist below the unchanged 20m/s gate and completes landing.",
+      "status": "passed",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "salimon-client",
+        "--locked",
+        "--bin",
+        "salimon-client",
+        "flight_regression::tests::cockpit_monitor_evidence_enters_assist_and_completes_landing",
+        "--",
+        "--exact"
+      ],
+      "log": "SCOUT-01.log",
+      "seconds": 0.7875828339997497,
+      "native_status": "not_run",
+      "native_protocol": "Capture standing/seated console and lower glazing during takeoff, coast, approach and landed states; inspect speed/thrust/assist text at 1080p, normal input and focus loss. Coordinate #498/#502."
+    },
+    {
+      "id": "SCOUT-02",
+      "invariant": "Power loss preserves inertial flight, held physical items and restoration state.",
+      "status": "passed",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "salimon-client",
+        "--locked",
+        "--bin",
+        "salimon-client",
+        "flight_regression::tests::cabin_blackout_coasts_with_held_fragment_and_restores_in_place",
+        "--",
+        "--exact"
+      ],
+      "log": "SCOUT-02.log",
+      "seconds": 0.6079032500001631,
+      "native_status": "not_run",
+      "native_protocol": "Record powered/unpowered cabin, console, Core, Fabricator, tool and cargo; physically restart Core and verify readable blackout feedback. Coordinate #451/#489."
+    },
+    {
+      "id": "SCOUT-03",
+      "invariant": "Archive terminal is physically targeted, with no remote exterior or back-panel activation.",
+      "status": "passed",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "salimon-client",
+        "--locked",
+        "--bin",
+        "salimon-client",
+        "session::archive::tests::physical_target_has_no_exterior_remote_or_behind_panel_access",
+        "--",
+        "--exact"
+      ],
+      "log": "SCOUT-03.log",
+      "seconds": 0.5546564590003982,
+      "native_status": "not_run",
+      "native_protocol": "Walk cabin and exterior, look at front/back of terminal; verify E prompt, reach and physical readability. Capture door/ramp clearance and return path."
+    },
+    {
+      "id": "SCOUT-04",
+      "invariant": "Archive read progress survives save/relaunch; temporary modal input does not.",
+      "status": "passed",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "salimon-client",
+        "--locked",
+        "--bin",
+        "salimon-client",
+        "session::archive::tests::archive_roundtrip_preserves_exact_records_and_read_progress_but_not_modal_input",
+        "--",
+        "--exact"
+      ],
+      "log": "SCOUT-04.log",
+      "seconds": 0.5411292499998126,
+      "native_status": "not_run",
+      "native_protocol": "Read ordinary/damaged records through physical input, save, close and reopen. Verify record identities/read state, focus, scrolling and no remote actions."
+    },
+    {
+      "id": "SCOUT-05",
+      "invariant": "Archive modal input closes on pause, focus, power and range loss.",
+      "status": "passed",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "salimon-client",
+        "--locked",
+        "--bin",
+        "salimon-client",
+        "session::archive::tests::reader_blocks_world_inputs_and_closes_on_pause_focus_power_loss_and_range_loss",
+        "--",
+        "--exact"
+      ],
+      "log": "SCOUT-05.log",
+      "seconds": 0.7724125009999625,
+      "native_status": "not_run",
+      "native_protocol": "Use E and navigation keys, change focus/escape/range/power; verify no held world action leaks and accessibility text remains usable."
+    },
+    {
+      "id": "SCOUT-06",
+      "invariant": "New-run Archive keeps unknown times, historical mentions and uncharted destinations distinct; no Hall/wormhole spoilers.",
+      "status": "passed",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "salimon-client",
+        "--locked",
+        "--bin",
+        "salimon-client",
+        "session::archive::tests::initial_records_have_bounded_accessible_lines_and_no_destination_or_spoiler",
+        "--",
+        "--exact"
+      ],
+      "log": "SCOUT-06.log",
+      "seconds": 0.8873857919998045,
+      "native_status": "not_run",
+      "native_protocol": "Review all seven initial records at 1080p. Separate received claims, ship telemetry, personal notes and unknowns; Earth/Mars history must not become a navigable destination. This does not cover future menus."
+    },
+    {
+      "id": "SCOUT-07",
+      "invariant": "Mining, carrying, physical Fabricator/Core intake, installed module and paid recovery compose through production authority.",
+      "status": "passed",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "salimon-client",
+        "--locked",
+        "--bin",
+        "salimon-client",
+        "session::recovery::tests::mined_carried_fabricated_installed_and_core_funded_first_record_loop",
+        "--",
+        "--exact"
+      ],
+      "log": "SCOUT-07.log",
+      "seconds": 0.5262175839998235,
+      "native_status": "not_run",
+      "native_protocol": "Walk and time the entire mine-carry-ramp-intake-Fabricator-install-Core-recover loop without placements. Existing CPU test uses fixture deposits/poses; reference native route remains #515/#496."
+    },
+    {
+      "id": "SCOUT-08",
+      "invariant": "Recovery consumes actual Core surplus and stops at emergency reserve without refund or free progress.",
+      "status": "passed",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "salimon-client",
+        "--locked",
+        "--bin",
+        "salimon-client",
+        "session::recovery::tests::progress_is_exactly_core_funded_and_stops_at_emergency_floor_without_refund",
+        "--",
+        "--exact"
+      ],
+      "log": "SCOUT-08.log",
+      "seconds": 0.5399038760001531,
+      "native_status": "not_run",
+      "native_protocol": "Observe progress/power under insufficient Core, emergency reserve, queue loads and stop/resume. Inspect machinery feedback and audible quiet/restoration transitions."
+    },
+    {
+      "id": "SCOUT-09",
+      "invariant": "Recovery save/restore, pause and native reader commands neither replay paid work nor bank offline progress.",
+      "status": "passed",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "salimon-client",
+        "--locked",
+        "--bin",
+        "salimon-client",
+        "session::recovery::tests::native_reader_controls_pause_and_durable_restore_do_not_replay_or_bank_work",
+        "--",
+        "--exact"
+      ],
+      "log": "SCOUT-09.log",
+      "seconds": 0.5494152499995835,
+      "native_status": "not_run",
+      "native_protocol": "Checkpoint/relaunch during partial work and blackout; verify exact paid progress, no offline work, and fresh input after resume. Coordinate #515."
+    },
+    {
+      "id": "SCOUT-10",
+      "invariant": "Audio observes Core/recovery/pause without changing machine authority.",
+      "status": "passed",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "salimon-client",
+        "--locked",
+        "--bin",
+        "salimon-client",
+        "scout_audio::tests::production_core_recovery_and_pause_map_without_authority_changes",
+        "--",
+        "--exact"
+      ],
+      "log": "SCOUT-10.log",
+      "seconds": 0.6879735419997814,
+      "native_status": "not_run",
+      "native_protocol": "Listen with reference speakers/headphones: quiet exterior/interior, spatial Core/Fabricator, alerts, mute/accessibility, focus/pause and stream continuity. Capture matched audio-on/off CPU/GPU frame costs; #485."
+    },
+    {
+      "id": "SCOUT-11",
+      "invariant": "Journey distance counts physical travel while excluding offline time, teleports and tours.",
+      "status": "passed",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "salimon-client",
+        "--locked",
+        "--bin",
+        "salimon-client",
+        "session::journey::tests::flight_roundtrip_offline_teleport_and_tour_preserve_only_real_travel",
+        "--",
+        "--exact"
+      ],
+      "log": "SCOUT-11.log",
+      "seconds": 0.5549882499999512,
+      "native_status": "not_run",
+      "native_protocol": "Record local walking/EVA/ship travel and save/relaunch telemetry. This is existing local distance accounting, not future great-circle/wormhole policy or backend ranking verification."
+    },
+    {
+      "id": "SCOUT-12",
+      "invariant": "Doorway and EVA frame crossings do not invent coordinate-jump travel.",
+      "status": "passed",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "salimon-client",
+        "--locked",
+        "--bin",
+        "salimon-client",
+        "session::journey::tests::doorway_frame_crossings_and_eva_have_no_coordinate_jump",
+        "--",
+        "--exact"
+      ],
+      "log": "SCOUT-12.log",
+      "seconds": 0.5401744989999315,
+      "native_status": "not_run",
+      "native_protocol": "Walk boarding ramp/door both ways, carry/drop fragments, leave moving ship and return. Observe collisions/contact, cargo and distance; retain physical-input video and raw timings."
+    },
+    {
+      "id": "OPENING-01",
+      "invariant": "Awaken outside familiar landed Scout on permanent alien world >=30ly from Earth, practical competence retained, autobiographical/landing memory unknown.",
+      "status": "blocked",
+      "blocked_by": [
+        471,
+        424,
+        425,
+        426
+      ],
+      "native_status": "not_run",
+      "native_protocol": "One-hour voluntary first-person opening on integrated Vesper: exterior silence to warm cabin, ordinary Archive discovery, first recovery resource loop. No Earth spawn, forced quest spam or unsupported landing explanation."
+    },
+    {
+      "id": "KNOWLEDGE-01",
+      "invariant": "Earth is remembered as home but uncharted; canonical catalog, names and old Archive entries never grant routes.",
+      "status": "blocked",
+      "blocked_by": [
+        469,
+        421,
+        428,
+        429
+      ],
+      "native_status": "not_run",
+      "native_protocol": "Inspect fresh chart, scanner, search and saved routes. Observe/contact/identify/verify with provenance/epoch/uncertainty and restore. No hidden Earth/Solar System autocomplete or marker."
+    },
+    {
+      "id": "NARRATIVE-01",
+      "invariant": "Recover distress location before separate distant warning origin; received claims, observations and hypotheses remain distinct.",
+      "status": "blocked",
+      "blocked_by": [
+        470,
+        469
+      ],
+      "native_status": "not_run",
+      "native_protocol": "Recover both packets, save/relaunch and revisit original records/sites. Verify separate source identities and unknown sender/time where appropriate. Do not invent later canonical revelations or call every damaged segment encryption."
+    },
+    {
+      "id": "NARRATIVE-02",
+      "invariant": "Actual wormhole entry, shortcut truth, warning truth and missing chronology stay unresolved; wormhole and Absenat gate remain distinct.",
+      "status": "blocked",
+      "blocked_by": [
+        470,
+        471
+      ],
+      "native_status": "not_run",
+      "native_protocol": "Review recovered messages, prompts, tutorials, achievements, narration, accessibility and jump presentation. Never assert traveler traversed a wormhole or automatically award Absenat coordinates."
+    },
+    {
+      "id": "CHOICE-01",
+      "invariant": "Charting Earth and investigating Absenat are independent voluntary goals with unrelated exploration and survival possible.",
+      "status": "blocked",
+      "blocked_by": [
+        469,
+        470,
+        471
+      ],
+      "native_status": "not_run",
+      "native_protocol": "Take each lead in either order, defer both and continue survival/flight. Verify no compulsory linear progression, fake autopilot or mandatory combat/NPC encounters."
+    },
+    {
+      "id": "SPOILER-01",
+      "invariant": "Before verified completion no Hall action, disabled slot, tooltip, loading hint, achievement, accessibility label or metadata preview is discoverable.",
+      "status": "blocked",
+      "blocked_by": [
+        473,
+        474
+      ],
+      "native_status": "not_run",
+      "native_protocol": "Fresh/returning-uncompleted/dead/restarted/offline accounts: inspect every shipping menu and accessible tree. Internal developer Hall fixtures must be explicitly gated; portable Archive checks are only partial coverage."
+    },
+    {
+      "id": "HALL-01",
+      "invariant": "Gate ceremony uses safe circular monumental geometry, central blazing primordial Core and concentric rings, with readable player-friendly presentation.",
+      "status": "blocked",
+      "blocked_by": [
+        472,
+        473,
+        474
+      ],
+      "native_status": "not_run",
+      "native_protocol": "Capture full floor traversal at 1080p with effects/accessibility variants. Check no exterior wall/social feed, no glare hazard, signs/LOD, center composition and quiet sound. Native M1 timing independent of Linux."
+    },
+    {
+      "id": "HALL-02",
+      "invariant": "First completion has one temporary local blank inner-ring sign without ejecting canonical ranked signs.",
+      "status": "blocked",
+      "blocked_by": [
+        473,
+        474
+      ],
+      "native_status": "not_run",
+      "native_protocol": "Complete an actual verified journey at rank below 40; compare canonical snapshot with local ceremony overlay before/after posting. No synthetic local registry can certify global behavior."
+    },
+    {
+      "id": "HALL-03",
+      "invariant": "Completion, inscription and permanent unlock are durable/idempotent and require real backend identity; retries and reloads cannot duplicate them.",
+      "status": "blocked",
+      "blocked_by": [
+        473,
+        474
+      ],
+      "native_status": "not_run",
+      "native_protocol": "Fault-test network before/during/after server commit, duplicate requests, disconnect/relaunch, invalid/moderated content and account mismatch. Keep pending/error explicit; no local unlock/global memorial fallback."
+    },
+    {
+      "id": "HALL-04",
+      "invariant": "Only after accepted completion/submission does Visit the Hall of Absenat unlock permanently across new runs/death.",
+      "status": "blocked",
+      "blocked_by": [
+        473,
+        474,
+        475
+      ],
+      "native_status": "not_run",
+      "native_protocol": "Compare pre/post complete menus and accessibility; retry rejected/pending completion. Verify account-scoped persistence and unchanged active survival save on entry/exit."
+    },
+    {
+      "id": "RANKING-01",
+      "invariant": "Rank uses greatest cumulative physical completed-run distance with authoritative discontinuity/tie/account rules; farther is nearer center.",
+      "status": "blocked",
+      "blocked_by": [
+        474
+      ],
+      "native_status": "not_run",
+      "native_protocol": "Use independent backend fixtures for actual great-circle/cumulative paths, discontinuities, ties, best completed runs and one visible sign/account. Keep original inscription on later journeys; pending tie/wormhole rules must be specified first."
+    },
+    {
+      "id": "RANKING-02",
+      "invariant": "Ring capacity is 40+20*(r-1), placements snapshot-stable through each visit; concurrent completions update only on reentry.",
+      "status": "blocked",
+      "blocked_by": [
+        474,
+        475
+      ],
+      "native_status": "not_run",
+      "native_protocol": "Test boundaries 40/41,100/101,180/181 with large registry and paginated/LOD signage. Freeze one visit version during concurrent rank changes; new visit refreshes, including own latest placement."
+    },
+    {
+      "id": "REVISIT-01",
+      "invariant": "Repeated visits allow reading/own-sign location without new inscription, new journey, save consumption or hidden data exposure.",
+      "status": "blocked",
+      "blocked_by": [
+        475
+      ],
+      "native_status": "not_run",
+      "native_protocol": "Revisit repeatedly with active save, terminal run, new game and account rename. Exercise stale/offline/page-error snapshots explicitly; immutable visit and independent journey state must survive."
+    },
+    {
+      "id": "CANON-01",
+      "invariant": "Core mystery, 18-hour Earth delivery message and cosmological Hall symbolism remain canon without invented literal Big Bang coordinates or entity explanation.",
+      "status": "blocked",
+      "blocked_by": [
+        470,
+        472,
+        473
+      ],
+      "native_status": "not_run",
+      "native_protocol": "Review narrative/art/audio wording against approved documents. Gate is fictional access to a universe boundary; ordinary ship Core and primordial Hall presence are distinct in scale; no developer hypothesis becomes revealed truth."
+    }
+  ]
+}

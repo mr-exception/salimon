@@ -1,4 +1,5 @@
 //! Snapshot-only, bounded sensory presentation. Never changes session authority.
+#[cfg(test)]
 mod audio;
 mod settings;
 use crate::session::{GameplaySession, ViewMode};
@@ -47,7 +48,7 @@ pub(crate) struct Presenter {
     pub(crate) settings_open: bool,
     pub(crate) message: String,
     path: Option<std::path::PathBuf>,
-    audio: audio::Player,
+    pending_audio: Option<Cue>,
     low: [bool; 3],
     fired: [bool; 3],
     last: Option<(u64, Duration)>,
@@ -95,7 +96,7 @@ impl Presenter {
         if !o.active {
             self.weight = 0.0;
             self.motion = 0.0;
-            self.audio.stop();
+            self.pending_audio = None;
             return None;
         }
         let fade = 1.0 - (-dt * 3.0).exp();
@@ -120,15 +121,10 @@ impl Presenter {
         None
     }
     pub(crate) fn update(&mut self, o: Observation) {
-        let cue = self.observe(o);
-        if self.settings.condition_audio && !self.settings.master_mute {
-            self.audio.update(cue, self.path.as_deref());
-            if self.audio.unavailable() {
-                self.message = "Audio unavailable - check OS player/output".into();
-            }
-        } else {
-            self.audio.stop();
-        }
+        self.pending_audio = self.observe(o);
+    }
+    pub(crate) fn take_audio_cue(&mut self) -> Option<Cue> {
+        self.pending_audio.take()
     }
     pub(crate) fn camera(&self, camera: &mut CameraFrame) {
         // Roll only the presentation up vector. The center ray/aim is unchanged.
@@ -192,15 +188,13 @@ impl Presenter {
         {
             Ok(()) => {
                 self.settings = next;
-                self.audio.stop();
+                self.pending_audio = None;
                 self.message = "Settings saved".into();
             }
             Err(e) => self.message = format!("Save failed: {e}"),
         }
     }
-    pub(crate) fn settings_path(&self) -> Option<&std::path::Path> {
-        self.path.as_deref()
-    }
+
     pub(crate) fn menu_text(&self) -> String {
         let on = |v| if v { "ON" } else { "OFF" };
         format!(

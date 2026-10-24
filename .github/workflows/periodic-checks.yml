@@ -82,7 +82,7 @@ jobs:
         id: tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends build-essential pkg-config libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev libx11-dev libxi-dev libxcursor-dev libxrandr-dev libvulkan1 mesa-vulkan-drivers xvfb xauth xdotool imagemagick
+          sudo apt-get install -y --no-install-recommends build-essential pkg-config libasound2-dev libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev libx11-dev libxi-dev libxcursor-dev libxrandr-dev libvulkan1 mesa-vulkan-drivers xvfb xauth xdotool imagemagick
           icd_files=(/usr/share/vulkan/icd.d/lvp_icd*.json)
           test -f "${icd_files[0]}"
           echo "VK_DRIVER_FILES=${icd_files[0]}" >> "$GITHUB_ENV"
@@ -189,7 +189,7 @@ jobs:
         id: tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends build-essential pkg-config libxkbcommon-dev libwayland-dev
+          sudo apt-get install -y --no-install-recommends build-essential pkg-config libasound2-dev libxkbcommon-dev libwayland-dev
       - name: Release CPU benchmark executable
         id: build
         run: cargo build --release --workspace --locked

@@ -1,0 +1,16 @@
+   Compiling salimon-client v0.1.0 (/Users/mrexception/Documents/Codex/2026-10-24/now-go-into-open-issues-again/work/salimon/client/runtime)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.56s
+     Running unittests src/main.rs (target/debug/deps/salimon_client-dadacd8134c68b86)
+
+running 8 tests
+test condition_feedback::integration_tests::master_mute_suppresses_existing_survival_cues ... ok
+test condition_feedback::tests::threshold_hysteresis_bounded_audio_fade_and_menu_suppression ... ok
+test condition_feedback::tests::disabled_effects_preserve_camera_and_center_ray ... ok
+test condition_feedback::audio::tests::original_wav_is_bounded_and_valid_pcm ... ok
+test condition_feedback::integration_tests::snapshots_do_not_mutate_authority_and_preview_has_clear_center ... ok
+test condition_feedback::settings::tests::settings_survive_restart_and_reject_unknown_version_or_corruption ... ok
+test condition_feedback::settings::tests::legacy_preferences_gain_audio_defaults_and_new_mix_roundtrips ... ok
+test condition_feedback::integration_tests::mix_controls_persist_separately_from_active_run ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 375 filtered out; finished in 0.10s
+

@@ -31,6 +31,7 @@ pub(super) fn wav(voices: &[Voice], sequence: u64) -> Vec<u8> {
                 / 8388608.0
                 - 1.0;
             let sample = match voice.cue {
+                Cue::Ventilation => noise * 0.3,
                 Cue::Core => tone(67.0) * 0.6 + tone(134.0) * 0.2,
                 Cue::Conversion => tone(180.0) * (0.6 + 0.2 * tone(7.0)),
                 Cue::Fabricator => tone(220.0) * 0.5 + noise * 0.12,

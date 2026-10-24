@@ -328,3 +328,8 @@ actual fixture draw/memory/upload counters; `window_state` reports true focused/
 occluded flags. Schema 10 is unchanged. Future room/module owners supply their
 real parent IDs and local poses through this boundary. See
 [architecture and budgets](../../docs/modular-interior-fixtures.md).
+
+
+Continuous audio verification: `native_audio/mix/tests.rs` covers callback-size
+invariance and reset/mute/stale control; original 60 Hz stereo fixtures and real
+device telemetry are opt-in. Linux builds require ALSA development headers.

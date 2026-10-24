@@ -9,7 +9,7 @@ pub(crate) const SHIP_GLB: &[u8] =
     include_bytes!("../../assets/ship/export/salimon_phase0_ship.glb");
 const VERTEX_FLOATS: usize = 20;
 const VERTEX_STRIDE: u64 = (VERTEX_FLOATS * size_of::<f32>()) as u64;
-const UNIFORM_SIZE: u64 = 352;
+const UNIFORM_SIZE: u64 = 576;
 use crate::ramp_geometry::{
     RAMP_ANGLE_RADIANS, RAMP_EXTENSION_METERS, RAMP_FACE_OFFSET_METERS, RAMP_HINGE,
 };
@@ -19,6 +19,7 @@ const DOOR_HINGE_Y_METERS: f32 = RAMP_HINGE[1] as f32;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ShipMeshInstance {
+    pub lighting: crate::CabinLighting,
     /// Bounded linear cosmetic factors: cabin/cargo × five finish groups.
     pub finish_tints: [[[f32; 3]; 5]; 2],
     pub machinery: crate::MachineryFeedback,
@@ -666,6 +667,7 @@ impl ShipMeshRenderer {
                 values.extend_from_slice(&[tint[0], tint[1], tint[2], 0.]);
             }
         }
+        values.extend(ship.lighting.values()?);
         queue.write_buffer(&self.uniform, 0, &encode_f32s(values));
         self.visible = true;
         Ok(())

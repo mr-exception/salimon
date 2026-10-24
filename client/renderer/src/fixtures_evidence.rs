@@ -102,6 +102,7 @@ fn modular_fixture_gpu_evidence() {
         let mut instances = if expanded {
             (0..500)
                 .map(|i| FixtureInstance {
+                    illumination: None,
                     id: i as u64,
                     mesh: mesh(i % 5),
                     pose: FixturePose {
@@ -129,6 +130,7 @@ fn modular_fixture_gpu_evidence() {
             .into_iter()
             .enumerate()
             .map(|(i, mesh)| FixtureInstance {
+                illumination: None,
                 id: i as u64,
                 mesh,
                 pose: FixturePose {

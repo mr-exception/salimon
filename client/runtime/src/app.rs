@@ -966,7 +966,11 @@ impl ClientApplication {
                 text: text.to_owned(),
                 placement: OverlayPlacement::BottomCenter,
             })
-        } else if let Some(text) = self.session.finish_hint() {
+        } else if let Some(text) = self
+            .session
+            .light_hint()
+            .or_else(|| self.session.finish_hint())
+        {
             Some(crate::resource_context::Prompt {
                 fragment: None,
                 text,
@@ -1024,6 +1028,7 @@ impl ClientApplication {
             crate::benchmark::Recorder::window_title,
         ));
         if self.session.view_mode == ViewMode::Gameplay {
+            scene_instances.extend(scene::room_lamps(&self.session, presentation.ship));
             scene_instances.extend(scene::cargo_door(&self.session, presentation.ship));
         }
         let ship_mesh = if self.session.view_mode == ViewMode::Gameplay {
@@ -1040,6 +1045,7 @@ impl ClientApplication {
             }
             let mut mesh = map_ship_to_renderer(presentation.ship);
             mesh.independent_interior = true;
+            mesh.lighting = self.session.lighting_dto();
             mesh.finish_tints = self.session.finish_palette();
             mesh.bunk_open_fraction = self.session.habitation.bunk_open_fraction as f32;
             mesh.fabricator_output_present = self.session.fabricator_output_present();

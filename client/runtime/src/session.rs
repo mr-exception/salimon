@@ -15,6 +15,7 @@ mod habitation;
 pub(crate) mod interaction;
 pub(crate) mod journey;
 pub(crate) mod lifecycle;
+pub(crate) mod lighting;
 pub(crate) mod mounts;
 mod presentation;
 mod recovery;
@@ -44,6 +45,7 @@ use std::time::Duration;
 
 pub(crate) struct GameplaySession {
     paused: bool,
+    pub(crate) lighting: salimon_ship::lighting::Lighting,
     pub(crate) core_upgrades: salimon_ship::core_upgrades::CoreUpgrades,
     pub(crate) finishes: salimon_ship::finishes::Finishes,
     pub(crate) finish_group: usize,
@@ -107,6 +109,7 @@ impl Default for GameplaySession {
     fn default() -> Self {
         Self {
             paused: false,
+            lighting: Default::default(),
             core_upgrades: Default::default(),
             finishes: Default::default(),
             finish_group: 0,
@@ -167,6 +170,7 @@ pub(crate) enum Command {
     Cabin(cabin::CabinAction),
     Finish(finishes::FinishAction),
     CoreUpgrade(core_upgrades::CoreUpgradeAction),
+    Light(lighting::LightAction),
     TogglePause,
     InspectVitals,
     SkipTutorial,
@@ -783,6 +787,7 @@ impl GameplaySession {
             Mount(action) => self.mount_action(action),
             Cabin(action) => self.cabin_action(action),
             Finish(action) => self.finish_action(action),
+            Light(action) => self.light_action(action),
             CoreUpgrade(action) => self.core_upgrade_action(action),
             Control(key, pressed) => self.control(key, pressed),
             Throttle(direction, pressed) => {

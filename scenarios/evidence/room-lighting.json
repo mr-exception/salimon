@@ -1,0 +1,187 @@
+{
+  "setup": {
+    "scenario": "scout-lighting",
+    "seed": 580,
+    "step_ms": 16
+  },
+  "timeout_ms": 360000,
+  "steps": [
+    {
+      "action": {
+        "op": "scout_reference",
+        "view": "finishes"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "work",
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "light_preset",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "light_preset",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "lighting.source.rooms.1.preset",
+        "equals": "Relax"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "relax",
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "light_preset",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "light_preset",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "lighting.source.rooms.1.preset",
+        "equals": "Night"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "night",
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "light_brightness",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "light_brightness",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "light_fixture",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "light_fixture",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "light_fixture",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "light_fixture",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "reading-override",
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "light_master",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "light_master",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "assert": {
+        "path": "lighting.source.rooms.1.master",
+        "equals": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "master-off",
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "light_master",
+        "pressed": true
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "key",
+        "key": "light_master",
+        "pressed": false
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "restored-preferences",
+      "timeout_ms": 30000
+    },
+    {
+      "action": {
+        "op": "window",
+        "action": "resize",
+        "width": 1920,
+        "height": 1080
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "screenshot": "full-hd",
+      "timeout_ms": 30000
+    }
+  ]
+}

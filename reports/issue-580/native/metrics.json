@@ -1,0 +1,2763 @@
+[
+  {
+    "case": "presets-final",
+    "capture": "restored-preferences",
+    "performance": {
+      "cpu_render": {
+        "max_ms": 1052.5433209999999,
+        "mean_ms": 98.19762698148149,
+        "min_ms": 1.404695,
+        "p95_ms": 1031.25567,
+        "samples": 54
+      },
+      "cpu_update": {
+        "max_ms": 10.066220000000001,
+        "mean_ms": 2.066703240740741,
+        "min_ms": 0.806443,
+        "p95_ms": 3.3876850000000003,
+        "samples": 54
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 27028776,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 323.203472,
+        "mean_ms": 69.41050409433961,
+        "min_ms": 48.83032,
+        "p95_ms": 84.066351,
+        "samples": 53
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 92.38778507407407,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 54
+      },
+      "samples": 54
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "fixtures": {
+      "draws": 10,
+      "instance_capacity_bytes": 1600,
+      "layout_version": 1,
+      "prepare_micros": 94,
+      "resident_geometry_bytes": 18128,
+      "triangles": 268,
+      "upload_bytes": 64,
+      "visible_instances": 16
+    },
+    "lighting": {
+      "lamp_colors": [
+        [
+          0.03999999910593033,
+          0.026399997994303703,
+          0.017999999225139618,
+          0.0
+        ],
+        [
+          0.03999999910593033,
+          0.026399997994303703,
+          0.017999999225139618,
+          0.0
+        ],
+        [
+          0.09000000357627869,
+          0.05939999967813492,
+          0.04050000011920929,
+          0.0
+        ],
+        [
+          0.03999999910593033,
+          0.026399997994303703,
+          0.017999999225139618,
+          0.0
+        ],
+        [
+          0.03999999910593033,
+          0.026399997994303703,
+          0.017999999225139618,
+          0.0
+        ],
+        [
+          0.05250000208616257,
+          0.06000000238418579,
+          0.07200000435113907,
+          0.0
+        ]
+      ],
+      "render": [
+        [
+          0.03999999910593033,
+          0.03447999805212021,
+          0.034599997103214264,
+          1.0
+        ],
+        [
+          0.25699999928474426,
+          0.1982799917459488,
+          0.1726749986410141,
+          1.0
+        ]
+      ],
+      "source": {
+        "rooms": {
+          "1": {
+            "fixtures": [
+              null,
+              null,
+              {
+                "brightness": 18,
+                "enabled": true,
+                "warmth": 100
+              },
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 8,
+              "enabled": true,
+              "warmth": 100
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Custom"
+          },
+          "2": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          }
+        }
+      },
+      "window_fraction": 1.0
+    },
+    "ship_resources": {
+      "draws": 2,
+      "resident_vertex_bytes": 1625040,
+      "triangles": 6771,
+      "uniform_bytes": 576
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    }
+  },
+  {
+    "case": "presets-final",
+    "capture": "reading-override",
+    "performance": {
+      "cpu_render": {
+        "max_ms": 1031.25567,
+        "mean_ms": 86.07624156756758,
+        "min_ms": 1.404695,
+        "p95_ms": 1025.606804,
+        "samples": 37
+      },
+      "cpu_update": {
+        "max_ms": 10.066220000000001,
+        "mean_ms": 2.137925972972973,
+        "min_ms": 0.806443,
+        "p95_ms": 3.3876850000000003,
+        "samples": 37
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 27028776,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 323.203472,
+        "mean_ms": 72.85309072222223,
+        "min_ms": 50.195617999999996,
+        "p95_ms": 109.316878,
+        "samples": 36
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 90.67284118918921,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 37
+      },
+      "samples": 37
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "fixtures": {
+      "draws": 10,
+      "instance_capacity_bytes": 1600,
+      "layout_version": 1,
+      "prepare_micros": 135,
+      "resident_geometry_bytes": 18128,
+      "triangles": 268,
+      "upload_bytes": 64,
+      "visible_instances": 16
+    },
+    "lighting": {
+      "lamp_colors": [
+        [
+          0.03999999910593033,
+          0.026399997994303703,
+          0.017999999225139618,
+          0.0
+        ],
+        [
+          0.03999999910593033,
+          0.026399997994303703,
+          0.017999999225139618,
+          0.0
+        ],
+        [
+          0.09000000357627869,
+          0.05939999967813492,
+          0.04050000011920929,
+          0.0
+        ],
+        [
+          0.03999999910593033,
+          0.026399997994303703,
+          0.017999999225139618,
+          0.0
+        ],
+        [
+          0.03999999910593033,
+          0.026399997994303703,
+          0.017999999225139618,
+          0.0
+        ],
+        [
+          0.05250000208616257,
+          0.06000000238418579,
+          0.07200000435113907,
+          0.0
+        ]
+      ],
+      "render": [
+        [
+          0.03999999910593033,
+          0.03447999805212021,
+          0.034599997103214264,
+          1.0
+        ],
+        [
+          0.25699999928474426,
+          0.1982799917459488,
+          0.1726749986410141,
+          1.0
+        ]
+      ],
+      "source": {
+        "rooms": {
+          "1": {
+            "fixtures": [
+              null,
+              null,
+              {
+                "brightness": 18,
+                "enabled": true,
+                "warmth": 100
+              },
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 8,
+              "enabled": true,
+              "warmth": 100
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Custom"
+          },
+          "2": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          }
+        }
+      },
+      "window_fraction": 1.0
+    },
+    "ship_resources": {
+      "draws": 2,
+      "resident_vertex_bytes": 1625040,
+      "triangles": 6771,
+      "uniform_bytes": 576
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    }
+  },
+  {
+    "case": "presets-final",
+    "capture": "master-off",
+    "performance": {
+      "cpu_render": {
+        "max_ms": 1040.5900319999998,
+        "mean_ms": 92.1511492826087,
+        "min_ms": 1.404695,
+        "p95_ms": 1025.606804,
+        "samples": 46
+      },
+      "cpu_update": {
+        "max_ms": 10.066220000000001,
+        "mean_ms": 2.0785348695652175,
+        "min_ms": 0.806443,
+        "p95_ms": 3.268522,
+        "samples": 46
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 27028776,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 323.203472,
+        "mean_ms": 70.47158224444443,
+        "min_ms": 49.840447000000005,
+        "p95_ms": 84.066351,
+        "samples": 45
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 92.11923721739132,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 46
+      },
+      "samples": 46
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "fixtures": {
+      "draws": 10,
+      "instance_capacity_bytes": 1600,
+      "layout_version": 1,
+      "prepare_micros": 98,
+      "resident_geometry_bytes": 18128,
+      "triangles": 268,
+      "upload_bytes": 64,
+      "visible_instances": 16
+    },
+    "lighting": {
+      "lamp_colors": [
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.05250000208616257,
+          0.06000000238418579,
+          0.07200000435113907,
+          0.0
+        ]
+      ],
+      "render": [
+        [
+          0.012000000104308128,
+          0.01600000075995922,
+          0.02199999988079071,
+          1.0
+        ],
+        [
+          0.25699999928474426,
+          0.1982799917459488,
+          0.1726749986410141,
+          1.0
+        ]
+      ],
+      "source": {
+        "rooms": {
+          "1": {
+            "fixtures": [
+              null,
+              null,
+              {
+                "brightness": 18,
+                "enabled": true,
+                "warmth": 100
+              },
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 8,
+              "enabled": true,
+              "warmth": 100
+            },
+            "master": false,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Custom"
+          },
+          "2": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          }
+        }
+      },
+      "window_fraction": 1.0
+    },
+    "ship_resources": {
+      "draws": 2,
+      "resident_vertex_bytes": 1625040,
+      "triangles": 6771,
+      "uniform_bytes": 576
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    }
+  },
+  {
+    "case": "presets-final",
+    "capture": "relax",
+    "performance": {
+      "cpu_render": {
+        "max_ms": 1015.032392,
+        "mean_ms": 89.41015933333334,
+        "min_ms": 1.404695,
+        "p95_ms": 1015.032392,
+        "samples": 12
+      },
+      "cpu_update": {
+        "max_ms": 10.066220000000001,
+        "mean_ms": 2.7485307500000005,
+        "min_ms": 0.816943,
+        "p95_ms": 10.066220000000001,
+        "samples": 12
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 27028776,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 323.203472,
+        "mean_ms": 90.159454,
+        "min_ms": 50.242681,
+        "p95_ms": 323.203472,
+        "samples": 11
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 87.89414383333333,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 12
+      },
+      "samples": 12
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "fixtures": {
+      "draws": 10,
+      "instance_capacity_bytes": 1600,
+      "layout_version": 1,
+      "prepare_micros": 92,
+      "resident_geometry_bytes": 18128,
+      "triangles": 268,
+      "upload_bytes": 64,
+      "visible_instances": 16
+    },
+    "lighting": {
+      "lamp_colors": [
+        [
+          0.20000000298023224,
+          0.13759998977184296,
+          0.10100000351667404,
+          0.0
+        ],
+        [
+          0.20000000298023224,
+          0.13759998977184296,
+          0.10100000351667404,
+          0.0
+        ],
+        [
+          0.20000000298023224,
+          0.13759998977184296,
+          0.10100000351667404,
+          0.0
+        ],
+        [
+          0.20000000298023224,
+          0.13759998977184296,
+          0.10100000351667404,
+          0.0
+        ],
+        [
+          0.20000000298023224,
+          0.13759998977184296,
+          0.10100000351667404,
+          0.0
+        ],
+        [
+          0.05250000208616257,
+          0.06000000238418579,
+          0.07200000435113907,
+          0.0
+        ]
+      ],
+      "render": [
+        [
+          0.15199999511241913,
+          0.11231999099254608,
+          0.09270000457763672,
+          1.0
+        ],
+        [
+          0.25699999928474426,
+          0.1982799917459488,
+          0.1726749986410141,
+          1.0
+        ]
+      ],
+      "source": {
+        "rooms": {
+          "1": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 40,
+              "enabled": true,
+              "warmth": 90
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Relax"
+          },
+          "2": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          }
+        }
+      },
+      "window_fraction": 1.0
+    },
+    "ship_resources": {
+      "draws": 2,
+      "resident_vertex_bytes": 1625040,
+      "triangles": 6771,
+      "uniform_bytes": 576
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    }
+  },
+  {
+    "case": "presets-final",
+    "capture": "full-hd",
+    "performance": {
+      "cpu_render": {
+        "max_ms": 1059.07675,
+        "mean_ms": 106.19303311666667,
+        "min_ms": 1.404695,
+        "p95_ms": 1040.5900319999998,
+        "samples": 60
+      },
+      "cpu_update": {
+        "max_ms": 10.066220000000001,
+        "mean_ms": 2.0249127833333334,
+        "min_ms": 0.806443,
+        "p95_ms": 3.3876850000000003,
+        "samples": 60
+      },
+      "drawable_pixels": [
+        1920,
+        1080
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 20024900,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 323.203472,
+        "mean_ms": 69.9520038135593,
+        "min_ms": 48.83032,
+        "p95_ms": 109.316878,
+        "samples": 59
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 95.76654491666667,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 60
+      },
+      "samples": 60
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1920,
+        1080
+      ]
+    },
+    "fixtures": {
+      "draws": 10,
+      "instance_capacity_bytes": 1600,
+      "layout_version": 1,
+      "prepare_micros": 94,
+      "resident_geometry_bytes": 18128,
+      "triangles": 268,
+      "upload_bytes": 64,
+      "visible_instances": 16
+    },
+    "lighting": {
+      "lamp_colors": [
+        [
+          0.03999999910593033,
+          0.026399997994303703,
+          0.017999999225139618,
+          0.0
+        ],
+        [
+          0.03999999910593033,
+          0.026399997994303703,
+          0.017999999225139618,
+          0.0
+        ],
+        [
+          0.09000000357627869,
+          0.05939999967813492,
+          0.04050000011920929,
+          0.0
+        ],
+        [
+          0.03999999910593033,
+          0.026399997994303703,
+          0.017999999225139618,
+          0.0
+        ],
+        [
+          0.03999999910593033,
+          0.026399997994303703,
+          0.017999999225139618,
+          0.0
+        ],
+        [
+          0.05250000208616257,
+          0.06000000238418579,
+          0.07200000435113907,
+          0.0
+        ]
+      ],
+      "render": [
+        [
+          0.03999999910593033,
+          0.03447999805212021,
+          0.034599997103214264,
+          1.0
+        ],
+        [
+          0.25699999928474426,
+          0.1982799917459488,
+          0.1726749986410141,
+          1.0
+        ]
+      ],
+      "source": {
+        "rooms": {
+          "1": {
+            "fixtures": [
+              null,
+              null,
+              {
+                "brightness": 18,
+                "enabled": true,
+                "warmth": 100
+              },
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 8,
+              "enabled": true,
+              "warmth": 100
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Custom"
+          },
+          "2": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          }
+        }
+      },
+      "window_fraction": 1.0
+    },
+    "ship_resources": {
+      "draws": 2,
+      "resident_vertex_bytes": 1625040,
+      "triangles": 6771,
+      "uniform_bytes": 576
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1920,
+        1080
+      ],
+      "minimized": false,
+      "occluded": false
+    }
+  },
+  {
+    "case": "presets-final",
+    "capture": "work",
+    "performance": {
+      "cpu_render": {
+        "max_ms": 41.089464,
+        "mean_ms": 14.987042333333333,
+        "min_ms": 1.75963,
+        "p95_ms": 41.089464,
+        "samples": 3
+      },
+      "cpu_update": {
+        "max_ms": 10.066220000000001,
+        "mean_ms": 5.508004666666667,
+        "min_ms": 3.070109,
+        "p95_ms": 10.066220000000001,
+        "samples": 3
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 27028776,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 323.203472,
+        "mean_ms": 216.260175,
+        "min_ms": 109.316878,
+        "p95_ms": 323.203472,
+        "samples": 2
+      },
+      "presented_interval": {
+        "max_ms": 125.393629,
+        "mean_ms": 67.93430833333333,
+        "min_ms": 0.0,
+        "p95_ms": 125.393629,
+        "samples": 3
+      },
+      "samples": 3
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "fixtures": {
+      "draws": 10,
+      "instance_capacity_bytes": 1600,
+      "layout_version": 1,
+      "prepare_micros": 115,
+      "resident_geometry_bytes": 18128,
+      "triangles": 268,
+      "upload_bytes": 64,
+      "visible_instances": 16
+    },
+    "lighting": {
+      "lamp_colors": [
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.05250000208616257,
+          0.06000000238418579,
+          0.07200000435113907,
+          0.0
+        ]
+      ],
+      "render": [
+        [
+          0.25699999928474426,
+          0.1982799917459488,
+          0.1726749986410141,
+          1.0
+        ],
+        [
+          0.25699999928474426,
+          0.1982799917459488,
+          0.1726749986410141,
+          1.0
+        ]
+      ],
+      "source": {
+        "rooms": {
+          "1": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          },
+          "2": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          }
+        }
+      },
+      "window_fraction": 1.0
+    },
+    "ship_resources": {
+      "draws": 2,
+      "resident_vertex_bytes": 1625040,
+      "triangles": 6771,
+      "uniform_bytes": 576
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    }
+  },
+  {
+    "case": "presets-final",
+    "capture": "night",
+    "performance": {
+      "cpu_render": {
+        "max_ms": 1025.606804,
+        "mean_ms": 101.36431833333333,
+        "min_ms": 1.404695,
+        "p95_ms": 1015.032392,
+        "samples": 21
+      },
+      "cpu_update": {
+        "max_ms": 10.066220000000001,
+        "mean_ms": 2.3443939523809525,
+        "min_ms": 0.806443,
+        "p95_ms": 3.3876850000000003,
+        "samples": 21
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 27028776,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 323.203472,
+        "mean_ms": 78.39148909999999,
+        "min_ms": 50.242681,
+        "p95_ms": 323.203472,
+        "samples": 20
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 92.07303357142857,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 21
+      },
+      "samples": 21
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "fixtures": {
+      "draws": 10,
+      "instance_capacity_bytes": 1600,
+      "layout_version": 1,
+      "prepare_micros": 102,
+      "resident_geometry_bytes": 18128,
+      "triangles": 268,
+      "upload_bytes": 64,
+      "visible_instances": 16
+    },
+    "lighting": {
+      "lamp_colors": [
+        [
+          0.03999999910593033,
+          0.026399997994303703,
+          0.017999999225139618,
+          0.0
+        ],
+        [
+          0.03999999910593033,
+          0.026399997994303703,
+          0.017999999225139618,
+          0.0
+        ],
+        [
+          0.03999999910593033,
+          0.026399997994303703,
+          0.017999999225139618,
+          0.0
+        ],
+        [
+          0.03999999910593033,
+          0.026399997994303703,
+          0.017999999225139618,
+          0.0
+        ],
+        [
+          0.03999999910593033,
+          0.026399997994303703,
+          0.017999999225139618,
+          0.0
+        ],
+        [
+          0.05250000208616257,
+          0.06000000238418579,
+          0.07200000435113907,
+          0.0
+        ]
+      ],
+      "render": [
+        [
+          0.03999999910593033,
+          0.03447999805212021,
+          0.034599997103214264,
+          1.0
+        ],
+        [
+          0.25699999928474426,
+          0.1982799917459488,
+          0.1726749986410141,
+          1.0
+        ]
+      ],
+      "source": {
+        "rooms": {
+          "1": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 8,
+              "enabled": true,
+              "warmth": 100
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Night"
+          },
+          "2": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          }
+        }
+      },
+      "window_fraction": 1.0
+    },
+    "ship_resources": {
+      "draws": 2,
+      "resident_vertex_bytes": 1625040,
+      "triangles": 6771,
+      "uniform_bytes": 576
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    }
+  },
+  {
+    "case": "shutter-final",
+    "capture": "shutter-opened",
+    "performance": {
+      "cpu_render": {
+        "max_ms": 1583.3470969999998,
+        "mean_ms": 132.05497304,
+        "min_ms": 1.5007650000000001,
+        "p95_ms": 1549.012931,
+        "samples": 25
+      },
+      "cpu_update": {
+        "max_ms": 10.03432,
+        "mean_ms": 3.2185847999999995,
+        "min_ms": 1.209098,
+        "p95_ms": 9.415711,
+        "samples": 25
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 26788712,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 189.25835999999998,
+        "mean_ms": 125.31113599999998,
+        "min_ms": 96.683716,
+        "p95_ms": 162.28742400000002,
+        "samples": 24
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 153.20074240000002,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 25
+      },
+      "samples": 25
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "fixtures": {
+      "draws": 10,
+      "instance_capacity_bytes": 1600,
+      "layout_version": 1,
+      "prepare_micros": 94,
+      "resident_geometry_bytes": 18128,
+      "triangles": 268,
+      "upload_bytes": 64,
+      "visible_instances": 16
+    },
+    "lighting": {
+      "lamp_colors": [
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.05250000208616257,
+          0.06000000238418579,
+          0.07200000435113907,
+          0.0
+        ]
+      ],
+      "render": [
+        [
+          0.25699999928474426,
+          0.1982799917459488,
+          0.1726749986410141,
+          1.0
+        ],
+        [
+          0.25699999928474426,
+          0.1982799917459488,
+          0.1726749986410141,
+          1.0
+        ]
+      ],
+      "source": {
+        "rooms": {
+          "1": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          },
+          "2": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          }
+        }
+      },
+      "window_fraction": 1.0
+    },
+    "ship_resources": {
+      "draws": 2,
+      "resident_vertex_bytes": 1625040,
+      "triangles": 6771,
+      "uniform_bytes": 576
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    }
+  },
+  {
+    "case": "shutter-final",
+    "capture": "shutter-initial",
+    "performance": {
+      "cpu_render": {
+        "max_ms": 77.562109,
+        "mean_ms": 27.17804966666667,
+        "min_ms": 1.740324,
+        "p95_ms": 77.562109,
+        "samples": 3
+      },
+      "cpu_update": {
+        "max_ms": 9.415711,
+        "mean_ms": 5.44866,
+        "min_ms": 3.2645030000000004,
+        "p95_ms": 9.415711,
+        "samples": 3
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 26788712,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 189.25835999999998,
+        "mean_ms": 149.37723799999998,
+        "min_ms": 109.496116,
+        "p95_ms": 189.25835999999998,
+        "samples": 2
+      },
+      "presented_interval": {
+        "max_ms": 163.619493,
+        "mean_ms": 95.62467199999999,
+        "min_ms": 0.0,
+        "p95_ms": 163.619493,
+        "samples": 3
+      },
+      "samples": 3
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "fixtures": {
+      "draws": 10,
+      "instance_capacity_bytes": 1600,
+      "layout_version": 1,
+      "prepare_micros": 95,
+      "resident_geometry_bytes": 18128,
+      "triangles": 268,
+      "upload_bytes": 64,
+      "visible_instances": 16
+    },
+    "lighting": {
+      "lamp_colors": [
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.05250000208616257,
+          0.06000000238418579,
+          0.07200000435113907,
+          0.0
+        ]
+      ],
+      "render": [
+        [
+          0.25699999928474426,
+          0.1982799917459488,
+          0.1726749986410141,
+          1.0
+        ],
+        [
+          0.25699999928474426,
+          0.1982799917459488,
+          0.1726749986410141,
+          1.0
+        ]
+      ],
+      "source": {
+        "rooms": {
+          "1": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          },
+          "2": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          }
+        }
+      },
+      "window_fraction": 1.0
+    },
+    "ship_resources": {
+      "draws": 2,
+      "resident_vertex_bytes": 1625040,
+      "triangles": 6771,
+      "uniform_bytes": 576
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    }
+  },
+  {
+    "case": "shutter-final",
+    "capture": "shutter-closed",
+    "performance": {
+      "cpu_render": {
+        "max_ms": 1549.012931,
+        "mean_ms": 119.82356871428571,
+        "min_ms": 1.5007650000000001,
+        "p95_ms": 1549.012931,
+        "samples": 14
+      },
+      "cpu_update": {
+        "max_ms": 9.415711,
+        "mean_ms": 3.2797185714285715,
+        "min_ms": 1.236619,
+        "p95_ms": 9.415711,
+        "samples": 14
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 26788712,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 189.25835999999998,
+        "mean_ms": 121.08630184615384,
+        "min_ms": 96.683716,
+        "p95_ms": 189.25835999999998,
+        "samples": 13
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 140.2024032142857,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 14
+      },
+      "samples": 14
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "fixtures": {
+      "draws": 10,
+      "instance_capacity_bytes": 1600,
+      "layout_version": 1,
+      "prepare_micros": 123,
+      "resident_geometry_bytes": 18128,
+      "triangles": 268,
+      "upload_bytes": 64,
+      "visible_instances": 16
+    },
+    "lighting": {
+      "lamp_colors": [
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "render": [
+        [
+          0.25699999928474426,
+          0.1982799917459488,
+          0.1726749986410141,
+          1.0
+        ],
+        [
+          0.25699999928474426,
+          0.1982799917459488,
+          0.1726749986410141,
+          1.0
+        ]
+      ],
+      "source": {
+        "rooms": {
+          "1": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          },
+          "2": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          }
+        }
+      },
+      "window_fraction": 0.0
+    },
+    "ship_resources": {
+      "draws": 2,
+      "resident_vertex_bytes": 1625040,
+      "triangles": 6771,
+      "uniform_bytes": 576
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    }
+  },
+  {
+    "case": "blackout-final",
+    "capture": "blackout-opened",
+    "performance": {
+      "cpu_render": {
+        "max_ms": 1506.133529,
+        "mean_ms": 155.2547609,
+        "min_ms": 1.456592,
+        "p95_ms": 1506.133529,
+        "samples": 20
+      },
+      "cpu_update": {
+        "max_ms": 43.832717,
+        "mean_ms": 7.101004650000002,
+        "min_ms": 1.1820570000000001,
+        "p95_ms": 43.832717,
+        "samples": 20
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 26788712,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 180.97581,
+        "mean_ms": 117.50676100000003,
+        "min_ms": 101.702079,
+        "p95_ms": 180.97581,
+        "samples": 19
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 154.79582320000003,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 20
+      },
+      "samples": 20
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "fixtures": {
+      "draws": 10,
+      "instance_capacity_bytes": 1600,
+      "layout_version": 1,
+      "prepare_micros": 91,
+      "resident_geometry_bytes": 18128,
+      "triangles": 268,
+      "upload_bytes": 64,
+      "visible_instances": 16
+    },
+    "lighting": {
+      "lamp_colors": [
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.05250000208616257,
+          0.06000000238418579,
+          0.07200000435113907,
+          0.0
+        ]
+      ],
+      "render": [
+        [
+          0.012000000104308128,
+          0.01600000075995922,
+          0.02199999988079071,
+          1.0
+        ],
+        [
+          0.012000000104308128,
+          0.01600000075995922,
+          0.02199999988079071,
+          1.0
+        ]
+      ],
+      "source": {
+        "rooms": {
+          "1": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          },
+          "2": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          }
+        }
+      },
+      "window_fraction": 1.0
+    },
+    "ship_resources": {
+      "draws": 2,
+      "resident_vertex_bytes": 1625040,
+      "triangles": 6771,
+      "uniform_bytes": 576
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    }
+  },
+  {
+    "case": "blackout-final",
+    "capture": "blackout-initial",
+    "performance": {
+      "cpu_render": {
+        "max_ms": 31.786622,
+        "mean_ms": 13.260663000000001,
+        "min_ms": 1.5513199999999998,
+        "p95_ms": 31.786622,
+        "samples": 3
+      },
+      "cpu_update": {
+        "max_ms": 9.064291,
+        "mean_ms": 5.339435000000001,
+        "min_ms": 3.259393,
+        "p95_ms": 9.064291,
+        "samples": 3
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 26788712,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 180.97581,
+        "mean_ms": 142.533814,
+        "min_ms": 104.091818,
+        "p95_ms": 180.97581,
+        "samples": 2
+      },
+      "presented_interval": {
+        "max_ms": 169.366625,
+        "mean_ms": 96.37419299999999,
+        "min_ms": 0.0,
+        "p95_ms": 169.366625,
+        "samples": 3
+      },
+      "samples": 3
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "fixtures": {
+      "draws": 10,
+      "instance_capacity_bytes": 1600,
+      "layout_version": 1,
+      "prepare_micros": 121,
+      "resident_geometry_bytes": 18128,
+      "triangles": 268,
+      "upload_bytes": 64,
+      "visible_instances": 16
+    },
+    "lighting": {
+      "lamp_colors": [
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.05250000208616257,
+          0.06000000238418579,
+          0.07200000435113907,
+          0.0
+        ]
+      ],
+      "render": [
+        [
+          0.012000000104308128,
+          0.01600000075995922,
+          0.02199999988079071,
+          1.0
+        ],
+        [
+          0.012000000104308128,
+          0.01600000075995922,
+          0.02199999988079071,
+          1.0
+        ]
+      ],
+      "source": {
+        "rooms": {
+          "1": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          },
+          "2": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          }
+        }
+      },
+      "window_fraction": 1.0
+    },
+    "ship_resources": {
+      "draws": 2,
+      "resident_vertex_bytes": 1625040,
+      "triangles": 6771,
+      "uniform_bytes": 576
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    }
+  },
+  {
+    "case": "blackout-final",
+    "capture": "blackout-closed",
+    "performance": {
+      "cpu_render": {
+        "max_ms": 1486.353745,
+        "mean_ms": 141.4138936363636,
+        "min_ms": 1.510633,
+        "p95_ms": 1486.353745,
+        "samples": 11
+      },
+      "cpu_update": {
+        "max_ms": 43.832717,
+        "mean_ms": 7.655871818181819,
+        "min_ms": 1.206944,
+        "p95_ms": 43.832717,
+        "samples": 11
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 26788712,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 180.97581,
+        "mean_ms": 117.61818779999999,
+        "min_ms": 101.702079,
+        "p95_ms": 180.97581,
+        "samples": 10
+      },
+      "presented_interval": {
+        "max_ms": 250.0,
+        "mean_ms": 143.38851127272727,
+        "min_ms": 0.0,
+        "p95_ms": 250.0,
+        "samples": 11
+      },
+      "samples": 11
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "fixtures": {
+      "draws": 10,
+      "instance_capacity_bytes": 1600,
+      "layout_version": 1,
+      "prepare_micros": 93,
+      "resident_geometry_bytes": 18128,
+      "triangles": 268,
+      "upload_bytes": 64,
+      "visible_instances": 16
+    },
+    "lighting": {
+      "lamp_colors": [
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "render": [
+        [
+          0.012000000104308128,
+          0.01600000075995922,
+          0.02199999988079071,
+          1.0
+        ],
+        [
+          0.012000000104308128,
+          0.01600000075995922,
+          0.02199999988079071,
+          1.0
+        ]
+      ],
+      "source": {
+        "rooms": {
+          "1": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          },
+          "2": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          }
+        }
+      },
+      "window_fraction": 0.0
+    },
+    "ship_resources": {
+      "draws": 2,
+      "resident_vertex_bytes": 1625040,
+      "triangles": 6771,
+      "uniform_bytes": 576
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    }
+  },
+  {
+    "case": "broken",
+    "capture": "broken-initial",
+    "performance": {
+      "cpu_render": {
+        "max_ms": 42.226109,
+        "mean_ms": 15.368452333333332,
+        "min_ms": 1.803393,
+        "p95_ms": 42.226109,
+        "samples": 3
+      },
+      "cpu_update": {
+        "max_ms": 10.050203,
+        "mean_ms": 5.919735,
+        "min_ms": 3.309789,
+        "p95_ms": 10.050203,
+        "samples": 3
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 27028776,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 82.929276,
+        "mean_ms": 72.1208145,
+        "min_ms": 61.312353,
+        "p95_ms": 82.929276,
+        "samples": 2
+      },
+      "presented_interval": {
+        "max_ms": 86.536214,
+        "mean_ms": 53.672558333333335,
+        "min_ms": 0.0,
+        "p95_ms": 86.536214,
+        "samples": 3
+      },
+      "samples": 3
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "fixtures": {
+      "draws": 10,
+      "instance_capacity_bytes": 1600,
+      "layout_version": 1,
+      "prepare_micros": 95,
+      "resident_geometry_bytes": 18128,
+      "triangles": 268,
+      "upload_bytes": 64,
+      "visible_instances": 16
+    },
+    "lighting": {
+      "lamp_colors": [
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.3499999940395355,
+          0.2603999972343445,
+          0.21525000035762787,
+          0.0
+        ],
+        [
+          0.05250000208616257,
+          0.06000000238418579,
+          0.07200000435113907,
+          0.0
+        ]
+      ],
+      "render": [
+        [
+          0.25699999928474426,
+          0.1982799917459488,
+          0.1726749986410141,
+          1.0
+        ],
+        [
+          0.25699999928474426,
+          0.1982799917459488,
+          0.1726749986410141,
+          1.0
+        ]
+      ],
+      "source": {
+        "rooms": {
+          "1": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              false,
+              true,
+              true
+            ],
+            "preset": "Work"
+          },
+          "2": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          }
+        }
+      },
+      "window_fraction": 1.0
+    },
+    "ship_resources": {
+      "draws": 2,
+      "resident_vertex_bytes": 1625040,
+      "triangles": 6771,
+      "uniform_bytes": 576
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    }
+  },
+  {
+    "case": "dark-final",
+    "capture": "dark-initial",
+    "performance": {
+      "cpu_render": {
+        "max_ms": 30.480742000000003,
+        "mean_ms": 11.309990333333333,
+        "min_ms": 1.501867,
+        "p95_ms": 30.480742000000003,
+        "samples": 3
+      },
+      "cpu_update": {
+        "max_ms": 2.541207,
+        "mean_ms": 1.4393366666666667,
+        "min_ms": 0.8845689999999999,
+        "p95_ms": 2.541207,
+        "samples": 3
+      },
+      "drawable_pixels": [
+        1280,
+        800
+      ],
+      "gpu_allocator": {
+        "allocated_bytes": 27025208,
+        "reserved_bytes": 62914560
+      },
+      "gpu_pass": {
+        "max_ms": 95.10971,
+        "mean_ms": 74.17846750000001,
+        "min_ms": 53.247225,
+        "p95_ms": 95.10971,
+        "samples": 2
+      },
+      "presented_interval": {
+        "max_ms": 106.005663,
+        "mean_ms": 69.93896333333333,
+        "min_ms": 0.0,
+        "p95_ms": 106.005663,
+        "samples": 3
+      },
+      "samples": 3
+    },
+    "visual_context": {
+      "adapter": "llvmpipe (LLVM 19.1.7, 256 bits)",
+      "backend": "Vulkan",
+      "driver": "llvmpipe / Mesa 25.0.7-2+deb13u1 (LLVM 19.1.7)",
+      "scale_factor": 1.0,
+      "viewport_pixels": [
+        1280,
+        800
+      ]
+    },
+    "fixtures": {
+      "draws": 10,
+      "instance_capacity_bytes": 1600,
+      "layout_version": 1,
+      "prepare_micros": 94,
+      "resident_geometry_bytes": 18128,
+      "triangles": 268,
+      "upload_bytes": 64,
+      "visible_instances": 16
+    },
+    "lighting": {
+      "lamp_colors": [
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "render": [
+        [
+          0.012000000104308128,
+          0.01600000075995922,
+          0.02199999988079071,
+          1.0
+        ],
+        [
+          0.012000000104308128,
+          0.01600000075995922,
+          0.02199999988079071,
+          1.0
+        ]
+      ],
+      "source": {
+        "rooms": {
+          "1": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          },
+          "2": {
+            "fixtures": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "general": {
+              "brightness": 70,
+              "enabled": true,
+              "warmth": 70
+            },
+            "master": true,
+            "operable": [
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "preset": "Work"
+          }
+        }
+      },
+      "window_fraction": 0.0
+    },
+    "ship_resources": {
+      "draws": 2,
+      "resident_vertex_bytes": 1625040,
+      "triangles": 6771,
+      "uniform_bytes": 576
+    },
+    "window": {
+      "focused": false,
+      "inner_size": [
+        1280,
+        800
+      ],
+      "minimized": false,
+      "occluded": false
+    }
+  }
+]

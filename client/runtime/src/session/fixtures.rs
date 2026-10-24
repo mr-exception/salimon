@@ -114,6 +114,7 @@ impl GameplaySession {
             };
             n.tint = self.finishes.item_tint(CABIN_ROOM, id, group);
         }
+        let lighting = self.lighting_dto();
         salimon_renderer::resolve_fixture_hierarchy(
             FixturePose {
                 position_meters: ship.pose.position_meters,
@@ -123,6 +124,13 @@ impl GameplaySession {
             &nodes,
         )
         .expect("validated ship and habitation source")
+        .into_iter()
+        .map(|mut instance| {
+            instance.illumination =
+                Some(lighting.sample(frame.world_to_local(instance.pose.position_meters)));
+            instance
+        })
+        .collect()
     }
 }
 

@@ -9,6 +9,7 @@ use salimon_world::{CelestialBodyId, WorldSnapshot};
 
 pub(super) fn map_ship_to_renderer(ship: ShipSnapshot) -> ShipMeshInstance {
     ShipMeshInstance {
+        lighting: Default::default(),
         finish_tints: [[[1.; 3]; 5]; 2],
         machinery: Default::default(),
         fabricator_output_present: false,
@@ -155,6 +156,44 @@ pub(super) fn construction_wireframes(
         }
     }
     result
+}
+
+/// Visible housings and diffusers share the effective electrical source state.
+pub(super) fn room_lamps(
+    session: &crate::session::GameplaySession,
+    ship: ShipSnapshot,
+) -> Vec<SceneInstance> {
+    let frame = crate::session::frames::character_ship_frame(ship.pose);
+    let lights = session.lighting_dto();
+    let mut out = Vec::new();
+    for i in 0..5 {
+        let p = crate::session::lighting::POSITIONS[i];
+        for (y, half, color) in [
+            (0., [0.12, 0.025, 0.06], [0.10, 0.11, 0.13, 1.]),
+            (
+                -0.027,
+                [0.09, 0.004, 0.04],
+                [
+                    0.015 + lights.colors[i][0] * 1.7,
+                    0.018 + lights.colors[i][1] * 1.7,
+                    0.02 + lights.colors[i][2] * 1.7,
+                    1.,
+                ],
+            ),
+        ] {
+            out.push(SceneInstance {
+                center_meters: frame.local_to_world([
+                    f64::from(p[0]),
+                    f64::from(p[1] + y),
+                    f64::from(p[2]),
+                ]),
+                half_extents_meters: half,
+                color,
+                orientation: ship.pose.orientation.map(|v| v as f32),
+            });
+        }
+    }
+    out
 }
 
 /// Bounded procedural mechanical leaves and fixed manual release grips. All

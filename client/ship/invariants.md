@@ -306,3 +306,6 @@ Tests live in `structure/placement/tests.rs`.
 ## Physical mounts (#576)
 
 One item can belong to at most one mechanical mount. Existing equipment is included in dry mass, never counted again as cargo; boundary removal/return is idempotent. See [the canonical contract](../../docs/physical-mounts.md).
+
+
+Scout cabin #577: follow [the canonical source, collision, posture and presentation contract](../../docs/cabin-mechanisms.md). Runtime owns admitted mechanism/posture source; renderer never grants physical authority. Manual mechanisms preserve original belongings and halt on swept obstruction.

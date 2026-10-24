@@ -146,3 +146,8 @@ saved motion; open bins expose hollow shell contacts/pickup sight rather than
 virtual inventory. The central corridor remains the loading route. See
 [character geometry](../client/character/architecture.md#physical-cargo-door-and-open-bins-539)
 and [schema 9](save-contract.md#cargo-door-schema-9-539).
+
+
+## Expanded cabin mechanisms (#577)
+
+The optional schema-12 cabin source, manual reversible fixtures, supported postures, visible restraints and native controls are implemented in [the maintained cabin contract](cabin-mechanisms.md). Historical schema-10 habitation remains the migration baseline; lighting preferences (#580), sound (#583), human comfort (#561) and hardware budgets (#563) retain their separate owners.

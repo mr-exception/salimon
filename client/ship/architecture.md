@@ -481,3 +481,6 @@ Tests live in `structure/placement/tests.rs`.
 ## Physical mounts (#576)
 
 `attachments.rs` owns registered rails, stable mount/child references, compatibility and explicit release on parent removal. `mass.rs` subtracts an existing dry equipment identity only while physically offboard. See [the canonical contract](../../docs/physical-mounts.md).
+
+
+Scout cabin #577: follow [the canonical source, collision, posture and presentation contract](../../docs/cabin-mechanisms.md). Runtime owns admitted mechanism/posture source; renderer never grants physical authority. Manual mechanisms preserve original belongings and halt on swept obstruction.

@@ -727,3 +727,5 @@ possibly desynchronized channel or hides the original failure with a PATH error.
 Contract tests cover bounded polling payload, original PNG validation, the native
 marker and failure-state preservation. Actual native corpus captures remain a
 separate required test. See [the #568 report](../reports/issue-568/README.md).
+
+Cabin evidence: `python3 scripts/salimon-test run scenarios/evidence/habitation-use.json --binary target/debug/salimon-client --screenshot-command '["native"]'` uses the explicit `scout-cabin` camera setup and production E/X/U commands.

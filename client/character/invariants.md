@@ -176,3 +176,6 @@ remain #577. Schema 10 saves source motion; see
 ## Physical mounts (#576)
 
 Installed fixture obstacle boxes are caller-owned metre geometry; they constrain walking and zero-G without being inferred from rendered meshes. See [the canonical contract](../../docs/physical-mounts.md).
+
+
+Scout cabin #577: follow [the canonical source, collision, posture and presentation contract](../../docs/cabin-mechanisms.md). Runtime owns admitted mechanism/posture source; renderer never grants physical authority. Manual mechanisms preserve original belongings and halt on swept obstruction.

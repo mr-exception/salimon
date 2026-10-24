@@ -312,8 +312,7 @@ poses cost no repeated clearance scan. Reserved walking clearance is unchanged.
 Galley E opens the existing exact-identity consumable wheel, with no generated
 food or additional inventory; hygiene remains an inspectable base fixture.
 No water/hygiene meter, sleep-time advancement or additional survival benefit is
-introduced. Sitting/lying, privacy mechanisms and expanded tactile presentation
-remain #577. Schema 10 saves source motion; see
+introduced. Expanded sitting/lying, restraints and privacy mechanisms are implemented by #577; see [cabin mechanisms](../../docs/cabin-mechanisms.md). Schema 10 saves source motion; see
 [the save contract](../../docs/save-contract.md#habitation-schema-10-540).
 
 

@@ -5,6 +5,8 @@ use std::time::Duration;
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct Habitation {
+    #[serde(default)]
+    pub(crate) cabin: Option<super::cabin::Cabin>,
     pub(crate) bunk_open_fraction: f64,
     pub(crate) bunk_deploying: bool,
 }
@@ -13,7 +15,18 @@ impl Validate for Habitation {
         if !self.bunk_open_fraction.is_finite() || !(0.0..=1.0).contains(&self.bunk_open_fraction) {
             return Err(invalid("habitation bunk motion"));
         }
+        if let Some(c) = &self.cabin {
+            c.validate()?;
+        }
         Ok(())
+    }
+}
+impl Habitation {
+    pub(super) fn starter() -> Self {
+        Self {
+            cabin: Some(Default::default()),
+            ..Default::default()
+        }
     }
 }
 impl GameplaySession {
@@ -41,6 +54,16 @@ impl GameplaySession {
         })
     }
     pub(super) fn toggle_bunk(&mut self) {
+        if self
+            .habitation
+            .cabin
+            .as_ref()
+            .and_then(|c| c.rest.as_ref())
+            .is_some_and(|r| r.kind == super::cabin::RestKind::Bunk)
+        {
+            self.feedback = Some("Get up before folding the occupied bunk");
+            return;
+        }
         if !self.bunk_clear() {
             self.feedback = Some("Bunk obstructed; clear belongings");
             return;
@@ -53,6 +76,8 @@ impl GameplaySession {
         });
     }
     pub(super) fn advance_habitation(&mut self, delta: Duration) {
+        self.advance_cabin(delta);
+        self.sync_mount_collision();
         let target = if self.habitation.bunk_deploying {
             1.0
         } else {

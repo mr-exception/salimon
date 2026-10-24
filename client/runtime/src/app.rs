@@ -42,7 +42,7 @@ use crate::action_bar::ActionBar;
 use crate::automation::{self, Request};
 use crate::e2e;
 use crate::frame_clock::FrameClock;
-use crate::session::interaction::{InteractionTarget, available_interaction_target};
+use crate::session::interaction::InteractionTarget;
 use crate::session::{ViewMode, door_passable};
 
 const TIMING_LOG_INTERVAL: u64 = 300;
@@ -868,12 +868,13 @@ impl ClientApplication {
         let interaction = if self.session.view_mode == ViewMode::Gameplay
             && character_snapshot.location != CharacterLocation::Cockpit
         {
-            available_interaction_target(
-                character_snapshot.location,
-                ship_frame.world_to_local(character_snapshot.eye_position_meters),
-                ship_frame.world_to_local(character_snapshot.look_target_meters),
-            )
-            .filter(|target| self.session.permitted_interaction(*target))
+            self.session
+                .available_target(
+                    character_snapshot.location,
+                    ship_frame.world_to_local(character_snapshot.eye_position_meters),
+                    ship_frame.world_to_local(character_snapshot.look_target_meters),
+                )
+                .filter(|target| self.session.permitted_interaction(*target))
         } else {
             None
         };
@@ -920,7 +921,13 @@ impl ClientApplication {
                     OverlayPlacement::BottomCenter
                 } else {
                     interaction.map_or(OverlayPlacement::BottomCenter, |target| {
-                        interaction::prompt_placement(target, render_ship_frame)
+                        self.session.cabin_interaction_anchor(target).map_or_else(
+                            || interaction::prompt_placement(target, render_ship_frame),
+                            |p| OverlayPlacement::World {
+                                anchor_meters: render_ship_frame.local_to_world(p),
+                                radius_meters: 0.15,
+                            },
+                        )
                     })
                 },
             }
@@ -931,6 +938,19 @@ impl ClientApplication {
                 text,
                 placement: OverlayPlacement::BottomCenter,
             })
+        } else if let Some(text) = self.session.cabin_hint() {
+            if matches!(
+                interaction,
+                Some(InteractionTarget::PrivacyScreen | InteractionTarget::ObservationShutter)
+            ) {
+                ship_context.or(resource_context)
+            } else {
+                Some(crate::resource_context::Prompt {
+                    fragment: None,
+                    text: text.to_owned(),
+                    placement: OverlayPlacement::BottomCenter,
+                })
+            }
         } else if let Some(text) = self.session.mount_prompt() {
             Some(crate::resource_context::Prompt {
                 fragment: None,

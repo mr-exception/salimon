@@ -125,6 +125,10 @@ impl GameplaySession {
     }
 
     pub(super) fn insert_fabricator_fragment(&mut self) {
+        if self.mining.carry_blocked {
+            self.feedback = Some("Carried object obstructed - back up or drop before intake");
+            return;
+        }
         if !self
             .restrictions()
             .permits(salimon_survival::restrictions::Action::Fabricate)

@@ -400,6 +400,15 @@ impl GameplaySession {
             .ok()
     }
     pub(crate) fn construction_action(&mut self, action: BuildAction) {
+        if self
+            .habitation
+            .cabin
+            .as_ref()
+            .is_some_and(|c| c.rest.is_some())
+        {
+            self.feedback = Some("Get up before placing construction projects");
+            return;
+        }
         if matches!(action, BuildAction::Place)
             && !self.admit_survival_action(salimon_survival::restrictions::Action::Fabricate)
         {

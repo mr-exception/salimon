@@ -521,3 +521,6 @@ See [fixture ownership/budgets](../../docs/modular-interior-fixtures.md).
 ## Physical mounts (#576)
 
 Runtime maps physical rail/mount/clamp source into existing immutable Shelf template instances. Renderer remains observational; tint/pose cannot grant an attachment or change mass. See [the canonical contract](../../docs/physical-mounts.md).
+
+
+Scout cabin #577: follow [the canonical source, collision, posture and presentation contract](../../docs/cabin-mechanisms.md). Runtime owns admitted mechanism/posture source; renderer never grants physical authority. Manual mechanisms preserve original belongings and halt on swept obstruction.

@@ -90,3 +90,5 @@ remain #577. Schema 10 saves source motion; see
 ## Physical mounts (#576)
 
 Envelope version 11 adds runtime attachment source. Older saves retain their layout; current saves require validated source and reconstruct shared carry/collision caches before publication. See [the canonical contract](../../docs/physical-mounts.md).
+
+Whole-session schema 12 adds the optional runtime-owned cabin mechanisms and posture source. The storage envelope/atomic generation protocol is unchanged; see [cabin save semantics](../../docs/cabin-mechanisms.md#save-and-verification).

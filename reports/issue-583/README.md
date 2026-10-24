@@ -76,3 +76,12 @@ an excluded audio epoch and never replays a saved latch, changes mass/joules or
 advances source state. Generic multiple-boundary tests support later rooms;
 actual constructed room registration stays #545. Baseline promotion and human
 listening approval are not implied by this delivery.
+
+## Final approved stack verification
+
+After the owner approved the construction catalog and all branches were rebased,
+`cargo test --workspace --locked` passed on the complete approved stack. Final
+all-target Clippy, fmt, docs and diff checks also passed; workspace is clean.
+[Full final test log](salimon-approved-stack-tests.log.gz),
+[Clippy log](salimon-approved-stack-clippy.log.gz),
+[documentation log](salimon-approved-stack-docs.log.gz).

@@ -1,5 +1,5 @@
 {
-  "README.md": "935b7a831b945fa75e719512e03bd7adb00d37a7c19b2cf1c9c97000046a4735",
+  "README.md": "1d621a25785aeae681a1c15b086ad9a23bd59cb55ad08269bd147ca8a6c82baf",
   "audio/actual-cpal-output-f32le.raw.gz": "18a601996c9ec3730cd9e68142b686d4fd142ba1a9f4b9b6e6cf0475a36fbc73",
   "audio/actual-cpal-output.wav": "0e39f0d02834b8bbf565cac27b8d2774c502dddd7376dc97584e5a4a90902ef9",
   "audio/actual-output.json": "c8b9a1e99199cc1ae532b67a06a922fdf6dfd7f6ba775f416de26cdad48097f6",
@@ -45,5 +45,8 @@
   "native/table-step-006-actual-travel.png": "75dc4f0c0a0791c49aea32c04d762fecf1437d1f81f36824d4c2087908893f6d",
   "native/table-step-012-reversed.png": "75dc4f0c0a0791c49aea32c04d762fecf1437d1f81f36824d4c2087908893f6d",
   "native/table-step-014-stopped.png": "cd73a233b6072edaf28f29078e2975592b204a4003135c82ad0db4d384f9a278",
+  "salimon-approved-stack-clippy.log.gz": "e757aacff16149ea5d5e9490e12af78068bda6961462d9da7cd7589c2cb281b1",
+  "salimon-approved-stack-docs.log.gz": "a979679835e767afd4d4f2db403d9c573eaefed2b2e347d37ecd5bd59367e559",
+  "salimon-approved-stack-tests.log.gz": "7a4a26c76f2d08d5b6f6c4b20162fff48633b3d389118d7028a84c7316a60776",
   "validation.zip": "81f85786ce42a3bdbb9d8712d4672cae236a16f01407b97f8f6ba9ab42416645"
 }

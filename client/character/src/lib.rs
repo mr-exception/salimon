@@ -6,6 +6,7 @@
 pub mod cargo;
 mod collision;
 mod controller;
+pub mod habitation_geometry;
 mod input;
 mod layout;
 pub use layout::PLAYER_RADIUS_METERS;
